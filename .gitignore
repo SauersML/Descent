@@ -1,0 +1,72 @@
+target/
+Cargo.lock
+model.toml
+build
+*.rds
+*.csv
+*.tsv
+t.py
+calibrate/tests/__pycache__/
+**/__pycache__/
+/.worktrees/
+report.md
+diff.txt
+.devcontainer/
+**/proofs/lakefile.lean
+**/proofs/lean-toolchain
+
+
+# Lean
+.lake/
+
+
+# Jules automation
+jules.patch
+build.log
+
+# Temporary tools
+gh_*/
+.lake/
+
+# macOS Finder metadata
+.DS_Store
+
+# Ignore files whose names do not contain a dot
+**/*
+!**/
+!**/*.*
+
+# Local workspace/editor state (machine-specific, not project source)
+/.claude/
+/proofs/.claude/
+
+# Lean/Lake build cache and vendored package checkouts (generated; huge/noisy)
+/.lake/
+
+# Scratch/debug files from ad-hoc investigations (ephemeral)
+/proofs/.tmp_find.lean
+/diff.txt
+
+# Downloaded/generated research artifacts (large reproducible data, not source)
+/data/snp_intersection_downloads/
+/data/snp_intersection_downloads_v2/
+/local_power/
+
+# Python bytecode cache (generated, interpreter-version specific)
+/scripts/__pycache__/
+
+# Local experiment outputs in repo root (analysis scratch, not canonical inputs)
+/Cargo.lock
+/confounding.tsv
+/divergence_g20.tsv
+
+# Keep local build/dependency caches out of git status
+/target/
+
+# Final override: always ignore Python bytecode caches (after broad unignore rules above)
+**/__pycache__/
+**/__pycache__/**
+
+# Final override: always ignore macOS Finder metadata (after broad unignore rules above)
+.DS_Store
+**/.DS_Store
