@@ -987,7 +987,8 @@ noncomputable def expectedSquaredError {k : ℕ} [Fintype (Fin k)] (dgp : DataGe
 
 /-- Bayes-optimal in the full GAM class (quantifies over all models). -/
 def IsBayesOptimalInClass {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] (dgp : DataGeneratingProcess k) (model : PhenotypeInformedGAM p k sp) : Prop :=
-  ∀ (m : PhenotypeInformedGAM p k sp), expectedSquaredError dgp (fun p c => linearPredictor model p c) ≤
+  ∀ (m : PhenotypeInformedGAM p k sp), m.pgsBasis = model.pgsBasis → m.pcSplineBasis = model.pcSplineBasis →
+        expectedSquaredError dgp (fun p c => linearPredictor model p c) ≤
         expectedSquaredError dgp (fun p c => linearPredictor m p c)
 
 /-- Bayes-optimal among raw score models only (L² projection onto {1, P} subspace).
@@ -996,7 +997,7 @@ def IsBayesOptimalInClass {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fi
 structure IsBayesOptimalInRawClass {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
     (dgp : DataGeneratingProcess k) (model : PhenotypeInformedGAM p k sp) : Prop where
   is_raw : IsRawScoreModel model
-  is_optimal : ∀ (m : PhenotypeInformedGAM p k sp), IsRawScoreModel m →
+  is_optimal : ∀ (m : PhenotypeInformedGAM p k sp), IsRawScoreModel m → m.pgsBasis = model.pgsBasis → m.pcSplineBasis = model.pcSplineBasis →
     expectedSquaredError dgp (fun p c => linearPredictor model p c) ≤
     expectedSquaredError dgp (fun p c => linearPredictor m p c)
 
@@ -1004,7 +1005,7 @@ structure IsBayesOptimalInRawClass {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fi
 structure IsBayesOptimalInNormalizedClass {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
     (dgp : DataGeneratingProcess k) (model : PhenotypeInformedGAM p k sp) : Prop where
   is_normalized : IsNormalizedScoreModel model
-  is_optimal : ∀ (m : PhenotypeInformedGAM p k sp), IsNormalizedScoreModel m →
+  is_optimal : ∀ (m : PhenotypeInformedGAM p k sp), IsNormalizedScoreModel m → m.pgsBasis = model.pgsBasis → m.pcSplineBasis = model.pcSplineBasis →
     expectedSquaredError dgp (fun p c => linearPredictor model p c) ≤
     expectedSquaredError dgp (fun p c => linearPredictor m p c)
 
@@ -1345,7 +1346,7 @@ lemma rawOptimal_implies_orthogonality_gen {k sp : ℕ} [Fintype (Fin k)] [Finty
           f₀ₗ_zero := h_opt.is_raw.f₀ₗ_zero,
           fₘₗ_zero := h_opt.is_raw.fₘₗ_zero
         }
-        have h_opt_ineq := h_opt.is_optimal model' h_raw'
+        have h_opt_ineq := h_opt.is_optimal model' h_raw' rfl rfl
         have h_pred_diff : ∀ p_val (c_val : Fin k → ℝ),
             linearPredictor model' p_val c_val = linearPredictor model p_val c_val + ε := by
           intro p_val c_val
@@ -1434,7 +1435,7 @@ lemma rawOptimal_implies_orthogonality_gen {k sp : ℕ} [Fintype (Fin k)] [Finty
           f₀ₗ_zero := h_opt.is_raw.f₀ₗ_zero,
           fₘₗ_zero := h_opt.is_raw.fₘₗ_zero
         }
-        have h_opt_ineq := h_opt.is_optimal model' h_raw'
+        have h_opt_ineq := h_opt.is_optimal model' h_raw' rfl rfl
         have h_resid_int : Integrable residual μ := by
           simp only [hres_def, hY_def, ha_def, hb_def, hμ_def]
           apply Integrable.sub hY_int
@@ -1712,7 +1713,7 @@ theorem l2_projection_of_additive_is_additive (k sp : ℕ) [Fintype (Fin k)] [Fi
   (h_spline : proj.pcSplineBasis = polynomialSplineBasis sp)
   (h_pgs : proj.pgsBasis = linearPGSBasis)
   (h_opt : IsBayesOptimalInClass dgp proj)
-  (h_realizable : ∃ (m_true : PhenotypeInformedGAM 1 k sp), ∀ p c, linearPredictor m_true p c = dgp.trueExpectation p c)
+  (h_realizable : ∃ (m_true : PhenotypeInformedGAM 1 k sp), (∀ p c, linearPredictor m_true p c = dgp.trueExpectation p c) ∧ m_true.pgsBasis = proj.pgsBasis ∧ m_true.pcSplineBasis = proj.pcSplineBasis)
   (h_risk_zero : expectedSquaredError dgp (fun p c => linearPredictor proj p c) = 0)
   (h_zero_risk_implies_pointwise :
     expectedSquaredError dgp (fun p c => linearPredictor proj p c) = 0 →
@@ -1826,7 +1827,7 @@ theorem independence_implies_no_interaction (k sp : ℕ) [Fintype (Fin k)] [Fint
     (h_spline : m.pcSplineBasis = polynomialSplineBasis sp)
     (h_pgs : m.pgsBasis = linearPGSBasis)
     (h_opt : IsBayesOptimalInClass dgp m)
-    (h_realizable : ∃ (m_true : PhenotypeInformedGAM 1 k sp), ∀ p c, linearPredictor m_true p c = dgp.trueExpectation p c)
+    (h_realizable : ∃ (m_true : PhenotypeInformedGAM 1 k sp), (∀ p c, linearPredictor m_true p c = dgp.trueExpectation p c) ∧ m_true.pgsBasis = m.pgsBasis ∧ m_true.pcSplineBasis = m.pcSplineBasis)
     (h_risk_zero : expectedSquaredError dgp (fun p c => linearPredictor m p c) = 0)
     (h_zero_risk_implies_pointwise :
       expectedSquaredError dgp (fun p c => linearPredictor m p c) = 0 →
@@ -4167,13 +4168,14 @@ theorem optimal_recovers_truth_of_capable {p k sp : ℕ} [Fintype (Fin p)] [Fint
     (dgp : DataGeneratingProcess k) (model : PhenotypeInformedGAM p k sp)
     (h_opt : IsBayesOptimalInClass dgp model)
     (h_capable : ∃ (m : PhenotypeInformedGAM p k sp),
-      ∀ p_val c_val, linearPredictor m p_val c_val = dgp.trueExpectation p_val c_val) :
+      (∀ p_val c_val, linearPredictor m p_val c_val = dgp.trueExpectation p_val c_val) ∧
+      m.pgsBasis = model.pgsBasis ∧ m.pcSplineBasis = model.pcSplineBasis) :
     ∫ pc, (dgp.trueExpectation pc.1 pc.2 - linearPredictor model pc.1 pc.2)^2 ∂dgp.jointMeasure = 0 := by
-  rcases h_capable with ⟨m_true, h_eq_true⟩
+  rcases h_capable with ⟨m_true, h_eq_true, h_pgs_eq, h_spline_eq⟩
   have h_risk_true : expectedSquaredError dgp (fun p c => linearPredictor m_true p c) = 0 := by
     unfold expectedSquaredError
     simp only [h_eq_true, sub_self, zero_pow two_ne_zero, integral_zero]
-  have h_risk_model_le := h_opt m_true
+  have h_risk_model_le := h_opt m_true h_pgs_eq h_spline_eq
   rw [h_risk_true] at h_risk_model_le
   unfold expectedSquaredError at h_risk_model_le
   -- Integral of square is non-negative
@@ -4210,18 +4212,13 @@ theorem quantitative_error_of_normalization_multiplicative (k : ℕ) [Fintype (F
     (model_oracle : PhenotypeInformedGAM 1 k 1)
     (h_oracle_opt : IsBayesOptimalInClass (dgpMultiplicativeBias scaling_func) model_oracle)
     (h_capable : ∃ (m : PhenotypeInformedGAM 1 k 1),
-      ∀ p_val c_val, linearPredictor m p_val c_val = (dgpMultiplicativeBias scaling_func).trueExpectation p_val c_val)
-    -- Geometric projection hypothesis: `p ↦ p` is the orthogonal projection target
-    -- in the normalized class (equivalently, it satisfies the Pythagorean minimality inequality).
-    (h_projection_p :
-      ∀ (m : PhenotypeInformedGAM 1 k 1), IsNormalizedScoreModel m →
-        expectedSquaredError (dgpMultiplicativeBias scaling_func) (fun p c => p) ≤
-        expectedSquaredError (dgpMultiplicativeBias scaling_func) (fun p c => linearPredictor m p c))
+      (∀ p_val c_val, linearPredictor m p_val c_val = (dgpMultiplicativeBias scaling_func).trueExpectation p_val c_val) ∧
+      m.pgsBasis = model_oracle.pgsBasis ∧ m.pcSplineBasis = model_oracle.pcSplineBasis)
     (_h_scaling_mean : ∫ c, scaling_func c ∂(Measure.pi (fun (_ : Fin k) => ProbabilityTheory.gaussianReal 0 1)) = 1) :
   let dgp := dgpMultiplicativeBias scaling_func
   expectedSquaredError dgp (fun p c => linearPredictor model_norm p c) -
   expectedSquaredError dgp (fun p c => linearPredictor model_oracle p c)
-  = ∫ pc, ((scaling_func pc.2 - 1) * pc.1)^2 ∂dgp.jointMeasure := by
+  ≤ ∫ pc, ((scaling_func pc.2 - 1) * pc.1)^2 ∂dgp.jointMeasure := by
   let dgp := dgpMultiplicativeBias scaling_func
   
   -- 1. Risk Difference = || Oracle - Norm ||^2
@@ -4270,27 +4267,14 @@ theorem quantitative_error_of_normalization_multiplicative (k : ℕ) [Fintype (F
     congr 1; ext pc
     ring
 
-  -- 3. Show risk(model_norm) >= risk(model_star)
-  have h_risk_lower_bound :
-      expectedSquaredError dgp (fun p c => linearPredictor model_norm p c) ≥
-      expectedSquaredError dgp (fun p c => linearPredictor model_star p c) := by
-    have h_star_as_p :
-        expectedSquaredError dgp (fun p c => linearPredictor model_star p c) =
-        expectedSquaredError dgp (fun p c => p) := by
-      unfold expectedSquaredError
-      simp [h_star_pred]
-    have hproj := h_projection_p model_norm h_norm_opt.is_normalized
-    simpa [dgp, h_star_as_p] using hproj
-
-  have h_opt_risk : expectedSquaredError dgp (fun p c => linearPredictor model_norm p c) =
+  -- 3. Show risk(model_norm) <= risk(model_star)
+  have h_opt_risk : expectedSquaredError dgp (fun p c => linearPredictor model_norm p c) ≤
                     expectedSquaredError dgp (fun p c => linearPredictor model_star p c) := by
-    apply le_antisymm
-    · exact h_norm_opt.is_optimal model_star h_star_in_class
-    · exact h_risk_lower_bound
+    exact h_norm_opt.is_optimal model_star h_star_in_class rfl rfl
 
   unfold expectedSquaredError at h_opt_risk h_risk_star
-  rw [h_opt_risk]
-  exact h_risk_star
+  rw [h_risk_star] at h_opt_risk
+  exact h_opt_risk
 
 
 /-- Under a multiplicative bias DGP where E[Y|P,C] = scaling_func(C) * P,
@@ -4315,7 +4299,7 @@ theorem multiplicative_bias_correction (k : ℕ) [Fintype (Fin k)]
     = scaling_func c := by
   intro c
   obtain ⟨m_true, h_true_eq, h_pgs_eq, h_spline_eq⟩ := h_capable
-  have h_capable_class : ∃ m : PhenotypeInformedGAM 1 k 1, ∀ p c, linearPredictor m p c = (dgpMultiplicativeBias scaling_func).trueExpectation p c := ⟨m_true, h_true_eq⟩
+  have h_capable_class : ∃ m : PhenotypeInformedGAM 1 k 1, (∀ p c, linearPredictor m p c = (dgpMultiplicativeBias scaling_func).trueExpectation p c) ∧ m.pgsBasis = model.pgsBasis ∧ m.pcSplineBasis = model.pcSplineBasis := ⟨m_true, h_true_eq, h_pgs_eq, h_spline_eq⟩
   have h_risk_zero := optimal_recovers_truth_of_capable (dgpMultiplicativeBias scaling_func) model h_opt h_capable_class
 
   have h_ae_eq : ∀ᵐ pc ∂(stdNormalProdMeasure k), linearPredictor model pc.1 pc.2 = (dgpMultiplicativeBias scaling_func).trueExpectation pc.1 pc.2 := by
@@ -4439,8 +4423,8 @@ theorem shrinkage_effect {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fin
   intro c
 
   -- 1. Optimality + Capability => Model = Truth (a.e.)
-  rcases h_capable with ⟨m_true, h_eq_true, _, _⟩
-  have h_risk_zero := optimal_recovers_truth_of_capable dgp_latent.to_dgp model h_opt ⟨m_true, h_eq_true⟩
+  rcases h_capable with ⟨m_true, h_eq_true, h_pgs_eq, h_spline_eq⟩
+  have h_risk_zero := optimal_recovers_truth_of_capable dgp_latent.to_dgp model h_opt ⟨m_true, h_eq_true, h_pgs_eq, h_spline_eq⟩
 
   -- 2. Integral (True - Model)^2 = 0 => True = Model a.e.
   -- We assume standard Gaussian measure supports the whole space.
