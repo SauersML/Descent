@@ -3237,20 +3237,11 @@ lemma gaussianPenalizedLoss_strictConvex {ι : Type*} {n : ℕ} [Fintype (Fin n)
     Even if S is only PSD, as long as λ > 0 and S has nontrivial action,
     or if we use ridge penalty (S = I), coercivity holds.
 
-    For ridge penalty specifically: L(β) ≥ λ·‖β‖² → ∞.
-
-    **TODO (suggestion 9)**: The `h_penalty_tendsto` hypothesis is tautological —
-    it is exactly what `penalty_quadratic_tendsto_proof` proves from `hS_posDef`.
-    A cleaner version would add `[Nonempty ι]` and derive tendsto internally:
-    `have := penalty_quadratic_tendsto_proof S lam hlam hS_posDef`. -/
+    For ridge penalty specifically: L(β) ≥ λ·‖β‖² → ∞. -/
 lemma gaussianPenalizedLoss_coercive {ι : Type*} {n : ℕ} [Fintype (Fin n)] [Fintype ι]
-    [DecidableEq ι]
+    [DecidableEq ι] [Nonempty ι]
     (X : Matrix (Fin n) ι ℝ) (y : Fin n → ℝ) (S : Matrix ι ι ℝ)
-    (lam : ℝ) (hlam : lam > 0) (hS_posDef : ∀ v : ι → ℝ, v ≠ 0 → 0 < dotProduct' (S.mulVec v) v)
-    (h_penalty_tendsto :
-      Filter.Tendsto
-        (fun β => lam * Finset.univ.sum (fun i => β i * (S.mulVec β) i))
-        (Filter.cocompact _) Filter.atTop) :
+    (lam : ℝ) (hlam : lam > 0) (hS_posDef : ∀ v : ι → ℝ, v ≠ 0 → 0 < dotProduct' (S.mulVec v) v) :
     Filter.Tendsto (gaussianPenalizedLoss X y S lam) (Filter.cocompact _) Filter.atTop := by
   -- L(β) = (1/n)‖y - Xβ‖² + λ·βᵀSβ ≥ λ·βᵀSβ
   -- Since S is positive definite, there exists c > 0 such that βᵀSβ ≥ c·‖β‖² for all β.
@@ -3287,7 +3278,7 @@ lemma gaussianPenalizedLoss_coercive {ι : Type*} {n : ℕ} [Fintype (Fin n)] [F
   -- Key: the penalty term Σᵢ βᵢ(Sβ)ᵢ grows as ‖β‖² → ∞
 
   -- Show penalty term tends to infinity
-  have h_penalty_tendsto := h_penalty_tendsto
+  have h_penalty_tendsto := penalty_quadratic_tendsto_proof S lam hlam hS_posDef
     -- The quadratic form is coercive when S is positive definite
     -- On finite-dimensional space, S pos def implies ∃ c > 0, βᵀSβ ≥ c‖β‖²
     -- This requires the spectral theorem or compactness of unit sphere.
@@ -3327,19 +3318,11 @@ lemma gaussianPenalizedLoss_coercive {ι : Type*} {n : ℕ} [Fintype (Fin n)] [F
 /-- Existence of minimizer: coercivity + continuity implies minimum exists.
 
     This uses the Weierstrass extreme value theorem: a continuous function
-    that tends to infinity at infinity achieves its minimum on ℝⁿ.
-
-    **TODO (suggestion 9)**: Same as `gaussianPenalizedLoss_coercive` — the
-    `h_penalty_tendsto` parameter could be derived internally from `hS_posDef`
-    via `penalty_quadratic_tendsto_proof`. -/
+    that tends to infinity at infinity achieves its minimum on ℝⁿ. -/
 lemma gaussianPenalizedLoss_exists_min {ι : Type*} {n : ℕ} [Fintype (Fin n)] [Fintype ι]
-    [DecidableEq ι]
+    [DecidableEq ι] [Nonempty ι]
     (X : Matrix (Fin n) ι ℝ) (y : Fin n → ℝ) (S : Matrix ι ι ℝ)
-    (lam : ℝ) (hlam : lam > 0) (hS_posDef : ∀ v : ι → ℝ, v ≠ 0 → 0 < dotProduct' (S.mulVec v) v)
-    (h_penalty_tendsto :
-      Filter.Tendsto
-        (fun β => lam * Finset.univ.sum (fun i => β i * (S.mulVec β) i))
-        (Filter.cocompact _) Filter.atTop) :
+    (lam : ℝ) (hlam : lam > 0) (hS_posDef : ∀ v : ι → ℝ, v ≠ 0 → 0 < dotProduct' (S.mulVec v) v) :
     ∃ β : ι → ℝ, ∀ β' : ι → ℝ, gaussianPenalizedLoss X y S lam β ≤ gaussianPenalizedLoss X y S lam β' := by
   -- Weierstrass theorem: A continuous coercive function achieves its minimum.
   --
@@ -3375,7 +3358,7 @@ lemma gaussianPenalizedLoss_exists_min {ι : Type*} {n : ℕ} [Fintype (Fin n)] 
                 lam * Finset.univ.sum (fun i => β i * (S.mulVec β) i)))
 
   -- Step 2: Get coercivity
-  have h_coercive := gaussianPenalizedLoss_coercive X y S lam hlam hS_posDef h_penalty_tendsto
+  have h_coercive := gaussianPenalizedLoss_coercive X y S lam hlam hS_posDef
 
   -- Step 3: Apply Weierstrass-style theorem
   -- For continuous coercive function on ℝⁿ, minimum exists.
