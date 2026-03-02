@@ -50,7 +50,11 @@ gh_*/
 # Downloaded/generated research artifacts (large reproducible data, not source)
 /data/snp_intersection_downloads/
 /data/snp_intersection_downloads_v2/
+/data/*.gnomon_cache/
 /local_power/
+/examples/convert_score_output/
+/sims/.cache/
+/tmp/
 
 # Python bytecode cache (generated, interpreter-version specific)
 /scripts/__pycache__/
