@@ -199,6 +199,43 @@ noncomputable def rBetaExp (α : ℝ) : effectDecorrelation :=
 @[simp] theorem rBetaExp_zero (α : ℝ) : rBetaExp α 0 = 1 := by
   simp [rBetaExp]
 
+/-- Derived decorrelation rate from one observed pair `(τ, rβ(τ))`:
+`α = -log(r) / τ` (for `τ ≠ 0`, `r > 0`). -/
+noncomputable def alphaFromTauRatio (τ r : ℝ) : ℝ :=
+  -Real.log r / τ
+
+/-- Same derived rate, parameterized by generations and effective size. -/
+noncomputable def alphaFromGenerations (t Ne r : ℝ) : ℝ :=
+  alphaFromTauRatio (coalescentTau t Ne) r
+
+/-- If `rβ(τ) = r` is observed at nonzero `τ`, choosing `α = -log r / τ`
+recovers that observation exactly under the exponential model. -/
+theorem rBetaExp_recovers_observed_ratio (τ r : ℝ)
+    (hτ : τ ≠ 0) (hr : 0 < r) :
+    rBetaExp (alphaFromTauRatio τ r) τ = r := by
+  unfold rBetaExp alphaFromTauRatio
+  have hmul : -(-Real.log r / τ) * τ = Real.log r := by
+    calc
+      -(-Real.log r / τ) * τ = (Real.log r / τ) * τ := by ring
+      _ = Real.log r := by field_simp [hτ]
+  rw [hmul, Real.exp_log hr]
+
+/-- Equivalent recovery statement when drift is given via `(t, Nₑ)`. -/
+theorem rBetaExp_recovers_observed_ratio_generations (t Ne r : ℝ)
+    (hτ : coalescentTau t Ne ≠ 0) (hr : 0 < r) :
+    rBetaExp (alphaFromGenerations t Ne r) (coalescentTau t Ne) = r := by
+  unfold alphaFromGenerations
+  exact rBetaExp_recovers_observed_ratio (coalescentTau t Ne) r hτ hr
+
+/-- For `0 < r ≤ 1` and positive drift, the derived `α` is nonnegative. -/
+theorem alphaFromTauRatio_nonneg (τ r : ℝ)
+    (hτ : 0 < τ) (hr : 0 < r) (hr_le_one : r ≤ 1) :
+    0 ≤ alphaFromTauRatio τ r := by
+  unfold alphaFromTauRatio
+  have hlog_nonpos : Real.log r ≤ 0 := Real.log_nonpos (le_of_lt hr) hr_le_one
+  have hneglog_nonneg : 0 ≤ -Real.log r := by linarith
+  exact div_nonneg hneglog_nonneg (le_of_lt hτ)
+
 /-- Bundled portability decomposition terms evaluated at drift `τ`. -/
 structure PortabilityComponents (p L : ℕ) [Fintype (Fin L)] where
   pS : DriftIndex → Fin L → ℝ
@@ -444,6 +481,153 @@ theorem raw_methods_positive_regret_of_positive_kl {k : ℕ}
   intro q hq
   rw [raw_regret_eq_kl_integral μz m t q hq h_true_open (h_q_open q hq)]
   exact h_strict_kl q hq
+
+/-! ### Infinite-Population (`n`-Generation) Method Formulas -/
+
+/-- True conditional at `n` generations (population/infinite-sample target). -/
+noncomputable def etaAtGenerations {k : ℕ}
+    (fam : PortabilityDriftFamily k) (nGen : ℝ) : MethodPredictor k :=
+  trueConditionalAtDrift fam nGen
+
+/-- Population log-loss risk at `n` generations for a method predictor. -/
+noncomputable def logRiskAtGenerations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k)
+    (nGen : ℝ) (q : MethodPredictor k) : ℝ :=
+  logRisk μz (etaAtGenerations fam nGen) q
+
+/-- Population Brier risk at `n` generations for a method predictor. -/
+noncomputable def brierRiskAtGenerations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k)
+    (nGen : ℝ) (q : MethodPredictor k) : ℝ :=
+  brierRisk μz (etaAtGenerations fam nGen) q
+
+/-- Method score used for AUC statements (probability-as-score). -/
+noncomputable def methodScore {k : ℕ} (q : MethodPredictor k) : FeatureSpace k → ℝ :=
+  fun z => (q z).1
+
+/-- Population AUC at `n` generations for a method predictor. -/
+noncomputable def aucAtGenerations {k : ℕ}
+    [MeasurableSpace (FeatureSpace k)]
+    (pop : BinaryPopulation (FeatureSpace k)) (q : MethodPredictor k) : ENNReal :=
+  populationAUC pop (methodScore q)
+
+/-- Log-loss regret formula at `n` generations:
+`R_log(q) - R_log(η_n) = ∫ KL(Bern(η_n)||Bern(q)) dμ`. -/
+theorem log_regret_formula_at_generations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k)
+    (nGen : ℝ) (q : MethodPredictor k)
+    (h_eta_open : ∀ z, 0 < (etaAtGenerations fam nGen z).1 ∧ (etaAtGenerations fam nGen z).1 < 1)
+    (h_q_open : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1) :
+    (∫ z,
+      bernoulliLogLoss (etaAtGenerations fam nGen z).1 (q z).1
+        - bernoulliLogLoss (etaAtGenerations fam nGen z).1 (etaAtGenerations fam nGen z).1 ∂μz)
+      = ∫ z, klBern (etaAtGenerations fam nGen z) (q z) ∂μz := by
+  exact logRisk_regret_eq_expected_klBern μz (etaAtGenerations fam nGen) q h_eta_open h_q_open
+
+/-- Brier regret formula at `n` generations:
+`R_brier(q) - R_brier(η_n) = ∫ (q-η_n)^2 dμ`. -/
+theorem brier_regret_formula_at_generations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k)
+    (nGen : ℝ) (q : MethodPredictor k) :
+    (∫ z,
+      expectedBrierScore (q z).1 (etaAtGenerations fam nGen z).1
+        - expectedBrierScore (etaAtGenerations fam nGen z).1 (etaAtGenerations fam nGen z).1 ∂μz)
+      = ∫ z, ((etaAtGenerations fam nGen z).1 - (q z).1) ^ 2 ∂μz := by
+  exact brier_regret_eq_l2_probPredictor μz (etaAtGenerations fam nGen) q
+
+/-- Oracle log-loss at `n` generations for an arbitrary method class `F`. -/
+noncomputable def logOracleAtGenerations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k)
+    (nGen : ℝ) (F : Set (MethodPredictor k)) : ℝ :=
+  logBayesRisk μz (etaAtGenerations fam nGen) F
+
+/-- Oracle Brier risk at `n` generations for an arbitrary method class `F`. -/
+noncomputable def brierOracleAtGenerations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k)
+    (nGen : ℝ) (F : Set (MethodPredictor k)) : ℝ :=
+  brierBayesRisk μz (etaAtGenerations fam nGen) F
+
+/-- Best achievable population AUC in a class at `n` generations. -/
+noncomputable def aucOracleAtGenerations {k : ℕ}
+    [MeasurableSpace (FeatureSpace k)]
+    (pop : BinaryPopulation (FeatureSpace k)) (F : Set (MethodPredictor k)) : ENNReal :=
+  sSup ((fun q : MethodPredictor k => populationAUC pop (methodScore q)) '' F)
+
+/-- Packaged method-specific oracle log-loss formulas. -/
+noncomputable def logOracleRawAtGenerations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ) : ℝ :=
+  logOracleAtGenerations μz fam nGen (F_raw k)
+
+noncomputable def logOracleFullAtGenerations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ) : ℝ :=
+  logOracleAtGenerations μz fam nGen (F_full k)
+
+noncomputable def logOracleRawPRSAtGenerations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ) : ℝ :=
+  logOracleAtGenerations μz fam nGen (F_rawPRS k)
+
+noncomputable def logOraclePCLinAtGenerations {k : ℕ} [Fintype (Fin k)]
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ) : ℝ :=
+  logOracleAtGenerations μz fam nGen (F_PC_lin k)
+
+noncomputable def logOracleResidAtGenerations {k : ℕ} [Fintype (Fin k)]
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ) : ℝ :=
+  logOracleAtGenerations μz fam nGen (F_resid k)
+
+/-- Packaged method-specific oracle Brier formulas. -/
+noncomputable def brierOracleRawAtGenerations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ) : ℝ :=
+  brierOracleAtGenerations μz fam nGen (F_raw k)
+
+noncomputable def brierOracleFullAtGenerations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ) : ℝ :=
+  brierOracleAtGenerations μz fam nGen (F_full k)
+
+noncomputable def brierOracleRawPRSAtGenerations {k : ℕ}
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ) : ℝ :=
+  brierOracleAtGenerations μz fam nGen (F_rawPRS k)
+
+noncomputable def brierOraclePCLinAtGenerations {k : ℕ} [Fintype (Fin k)]
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ) : ℝ :=
+  brierOracleAtGenerations μz fam nGen (F_PC_lin k)
+
+noncomputable def brierOracleResidAtGenerations {k : ℕ} [Fintype (Fin k)]
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ) : ℝ :=
+  brierOracleAtGenerations μz fam nGen (F_resid k)
+
+/-- Core oracle ordering at fixed `n` generations from class inclusion:
+`rawPRS ⊆ PC-lin ⊆ full`. -/
+theorem log_oracle_order_rawPRS_pclin_full_at_generations {k : ℕ} [Fintype (Fin k)]
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ)
+    (h_bdd_pclin : BddBelow ((logRisk μz (etaAtGenerations fam nGen)) '' (F_PC_lin k)))
+    (h_bdd_full : BddBelow ((logRisk μz (etaAtGenerations fam nGen)) '' (F_full k)))
+    (h_nonempty_rawPRS : ((logRisk μz (etaAtGenerations fam nGen)) '' (F_rawPRS k)).Nonempty)
+    (h_nonempty_pclin : ((logRisk μz (etaAtGenerations fam nGen)) '' (F_PC_lin k)).Nonempty) :
+    logOracleRawPRSAtGenerations μz fam nGen ≥ logOraclePCLinAtGenerations μz fam nGen ∧
+      logOraclePCLinAtGenerations μz fam nGen ≥ logOracleFullAtGenerations μz fam nGen := by
+  constructor
+  · exact
+      BayesRisk_mono (R := logRisk μz (etaAtGenerations fam nGen)) (F_rawPRS k) (F_PC_lin k)
+        (F_rawPRS_subset_F_PC_lin k) h_bdd_pclin h_nonempty_rawPRS
+  · exact
+      BayesRisk_mono (R := logRisk μz (etaAtGenerations fam nGen)) (F_PC_lin k) (F_full k)
+        (F_PC_lin_subset_F_full k) h_bdd_full h_nonempty_pclin
+
+theorem brier_oracle_order_rawPRS_pclin_full_at_generations {k : ℕ} [Fintype (Fin k)]
+    (μz : Measure (FeatureSpace k)) (fam : PortabilityDriftFamily k) (nGen : ℝ)
+    (h_bdd_pclin : BddBelow ((brierRisk μz (etaAtGenerations fam nGen)) '' (F_PC_lin k)))
+    (h_bdd_full : BddBelow ((brierRisk μz (etaAtGenerations fam nGen)) '' (F_full k)))
+    (h_nonempty_rawPRS : ((brierRisk μz (etaAtGenerations fam nGen)) '' (F_rawPRS k)).Nonempty)
+    (h_nonempty_pclin : ((brierRisk μz (etaAtGenerations fam nGen)) '' (F_PC_lin k)).Nonempty) :
+    brierOracleRawPRSAtGenerations μz fam nGen ≥ brierOraclePCLinAtGenerations μz fam nGen ∧
+      brierOraclePCLinAtGenerations μz fam nGen ≥ brierOracleFullAtGenerations μz fam nGen := by
+  constructor
+  · exact
+      BayesRisk_mono (R := brierRisk μz (etaAtGenerations fam nGen)) (F_rawPRS k) (F_PC_lin k)
+        (F_rawPRS_subset_F_PC_lin k) h_bdd_pclin h_nonempty_rawPRS
+  · exact
+      BayesRisk_mono (R := brierRisk μz (etaAtGenerations fam nGen)) (F_PC_lin k) (F_full k)
+        (F_PC_lin_subset_F_full k) h_bdd_full h_nonempty_pclin
 
 end PortabilityDrift
 
