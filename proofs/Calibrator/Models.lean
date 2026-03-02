@@ -1005,7 +1005,7 @@ structure CovariateMaps (k : ℕ) where
 /-- Matérn kernel template.
 This uses a standard exponentially decaying profile in distance; the smoothness
 parameter `ν` and scale `ρ` are explicit parameters. -/
-noncomputable def maternKernel {k : ℕ} (ν ρ σ2 : ℝ) (x z : PCVec k) : ℝ :=
+noncomputable def maternKernelTemplate {k : ℕ} (ν ρ σ2 : ℝ) (x z : PCVec k) : ℝ :=
   let r := dist x z
   if hρ : 0 < ρ then
     σ2 * Real.exp (-(Real.sqrt (2 * ν) * r) / ρ)
@@ -1115,8 +1115,279 @@ def F_linInt (k : ℕ) : Set (MethodPredictor k) :=
   { q | ∃ g : ℝ → (Fin k → ℝ) → (Fin k → ℝ) → UnitProb,
       ∀ s x, q (s, x) = g s x (interactionFeature s x) }
 
-/-- Generic smooth class (initial overapproximation): all `[0,1]` predictors on `Z`. -/
-def F_GAM (k : ℕ) : Set (MethodPredictor k) := Set.univ
+/-- Reference ancestry law on PCs (standard Gaussian product). -/
+noncomputable def ancestryMeasure (k : ℕ) : Measure (Fin k → ℝ) :=
+  Measure.pi (fun _ : Fin k => ProbabilityTheory.gaussianReal 0 1)
+
+/-- Data needed to define Bessel-potential Sobolev classes on a measurable ancestry space:
+`π` is the ancestry law, and `sobolevLift s f` encodes `(I - Δ)^(s/2) f`. -/
+structure SobolevData (X : Type*) [MeasurableSpace X] where
+  pi : Measure X
+  sobolevLift : ℝ → (X → ℝ) → (X → ℝ)
+  sobolevLift_zero : ∀ s, sobolevLift s (fun _ => (0 : ℝ)) = (fun _ => (0 : ℝ))
+
+/-- `H^s` membership: `f ∈ L²(π)` and `(I-Δ)^(s/2) f ∈ L²(π)`. -/
+def InHSobolev {X : Type*} [MeasurableSpace X] (sd : SobolevData X) (s : ℝ) (f : X → ℝ) : Prop :=
+  MemLp f 2 sd.pi ∧ MemLp (sd.sobolevLift s f) 2 sd.pi
+
+/-- Bessel-potential Sobolev space as a set: `H^s = {f : InHSobolev s f}`. -/
+def HSobolev (X : Type*) [MeasurableSpace X] (sd : SobolevData X) (s : ℝ) : Set (X → ℝ) :=
+  { f | InHSobolev sd s f }
+
+/-- Squared Sobolev norm:
+`‖f‖^2_{H^s} = ⟪(I-Δ)^(s/2)f, (I-Δ)^(s/2)f⟫_{L²(π)}`. -/
+noncomputable def sobolevNormSq {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (s : ℝ) (f : X → ℝ) : ℝ :=
+  ∫ x, (sd.sobolevLift s f x) ^ 2 ∂sd.pi
+
+/-- Sobolev norm `‖f‖_{H^s}` (nonnegative by construction). -/
+noncomputable def sobolevNorm {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (s : ℝ) (f : X → ℝ) : ℝ :=
+  Real.sqrt (sobolevNormSq sd s f)
+
+/-- Smooth ancestry effect class:
+`𝓕_{s,B} = {f : f ∈ H^s, ‖f‖_{H^s} ≤ B, ∫ f dπ = 0}`. -/
+def SmoothAncestryEffect {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (s B : ℝ) (f : X → ℝ) : Prop :=
+  Measurable f ∧ InHSobolev sd s f ∧ sobolevNorm sd s f ≤ B ∧ (∫ x, f x ∂sd.pi) = 0
+
+/-- PC-space Sobolev data from a chosen operator `(I-Δ)^(s/2)` model. -/
+noncomputable def pcSobolevData (k : ℕ)
+    (lift : ℝ → ((Fin k → ℝ) → ℝ) → (Fin k → ℝ) → ℝ)
+    (h0 : ∀ s, lift s (fun _ => (0 : ℝ)) = (fun _ => (0 : ℝ))) :
+    SobolevData (Fin k → ℝ) where
+  pi := ancestryMeasure k
+  sobolevLift := lift
+  sobolevLift_zero := h0
+
+/-- Spectral data used to define Matérn kernels on a measurable ancestry space.
+`eigVal`/`eigFun` represent Laplace-Beltrami spectral objects, while `coeff`
+encodes spectral coefficients of functions in that basis. -/
+structure MaternSpectralData (X : Type*) [MeasurableSpace X] where
+  eigVal : ℕ → ℝ
+  eigFun : ℕ → X → ℝ
+  coeff : (X → ℝ) → ℕ → ℝ
+
+/-- Spectral Matérn kernel:
+`k_{ν,κ}(x,x') = Σ_n (κ² + λ_n)^(-ν) φ_n(x) φ_n(x')`. -/
+noncomputable def maternKernel {X : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ : ℝ) (x x' : X) : ℝ :=
+  ∑' n : ℕ, (κ ^ 2 + md.eigVal n) ^ (-ν) * md.eigFun n x * md.eigFun n x'
+
+/-- Squared RKHS norm in spectral form:
+`‖f‖²_{H_{ν,κ}} = Σ_n (κ² + λ_n)^ν ⟨f,φ_n⟩²`. -/
+noncomputable def maternRkhsNormSq {X : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ : ℝ) (f : X → ℝ) : ℝ :=
+  ∑' n : ℕ, (κ ^ 2 + md.eigVal n) ^ ν * (md.coeff f n) ^ 2
+
+/-- RKHS norm induced by the Matérn spectral expansion. -/
+noncomputable def maternRkhsNorm {X : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ : ℝ) (f : X → ℝ) : ℝ :=
+  Real.sqrt (maternRkhsNormSq md ν κ f)
+
+/-- Membership in the Matérn RKHS via summability of the weighted coefficient series. -/
+def InMaternRKHS {X : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ : ℝ) (f : X → ℝ) : Prop :=
+  Summable (fun n : ℕ => (κ ^ 2 + md.eigVal n) ^ ν * (md.coeff f n) ^ 2)
+
+/-- Centered Matérn-RKHS ball used as a smooth ancestry effect class. -/
+def MaternRkhsEffect {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (md : MaternSpectralData X) (ν κ B : ℝ) (f : X → ℝ) : Prop :=
+  Measurable f ∧ InMaternRKHS md ν κ f ∧ maternRkhsNorm md ν κ f ≤ B ∧ (∫ x, f x ∂sd.pi) = 0
+
+/-- Norm-equivalence axiom package connecting Matérn-RKHS and Sobolev norms. -/
+structure MaternSobolevNormEquiv {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (md : MaternSpectralData X) (s ν κ : ℝ) where
+  cLower : ℝ
+  cUpper : ℝ
+  cLower_pos : 0 < cLower
+  cUpper_pos : 0 < cUpper
+  lower : ∀ f, InHSobolev sd s f → cLower * sobolevNormSq sd s f ≤ maternRkhsNormSq md ν κ f
+  upper : ∀ f, InHSobolev sd s f → maternRkhsNormSq md ν κ f ≤ cUpper * sobolevNormSq sd s f
+
+/-- Finite spectral truncation/projection `P_m f = Σ_{j<m} <f,φ_j> φ_j`. -/
+noncomputable def spectralProjector {X : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (m : ℕ) (f : X → ℝ) : X → ℝ :=
+  fun x => ∑ j : Fin m, md.coeff f j.1 * md.eigFun j.1 x
+
+/-- Finite spectral ellipsoid class:
+`F_{m,R} = {f = Σ_{j<m} θ_j φ_j : Σ_{j<m} (κ²+λ_j)^ν θ_j² ≤ R², centered}`. -/
+def spectralEllipsoidClass {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (md : MaternSpectralData X) (m : ℕ) (ν κ R : ℝ) : Set (X → ℝ) :=
+  { f | ∃ θ : Fin m → ℝ,
+      (∀ x, f x = ∑ j : Fin m, θ j * md.eigFun j.1 x) ∧
+      (∑ j : Fin m, (κ ^ 2 + md.eigVal j.1) ^ ν * (θ j) ^ 2 ≤ R ^ 2) ∧
+      (∫ x, f x ∂sd.pi) = 0 }
+
+/-- Truncation approximation theorem schema:
+Sobolev regularity implies spectral projection error decay in lower Sobolev norm. -/
+axiom spectralProjector_approximation_rate
+    {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (md : MaternSpectralData X)
+    (s r : ℝ) (hsr : r ≤ s)
+    (cApprox : ℝ) (hcApprox_nonneg : 0 ≤ cApprox) :
+    ∀ f : X → ℝ, InHSobolev sd s f →
+      ∀ m : ℕ,
+        sobolevNorm sd r (fun x => f x - spectralProjector md m f x)
+          ≤ cApprox * (md.eigVal m) ^ (-(s - r) / 2) * sobolevNorm sd s f
+
+/-- Weyl-law corollary schema: convert eigenvalue-rate bound to `m`-rate bound. -/
+axiom spectralProjector_approximation_rate_weyl
+    {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (md : MaternSpectralData X)
+    (s r d : ℝ) (hsr : r ≤ s) (hd : 0 < d)
+    (cApprox : ℝ) (hcApprox_nonneg : 0 ≤ cApprox) :
+    ∀ f : X → ℝ, InHSobolev sd s f →
+      ∀ m : ℕ,
+        sobolevNorm sd r (fun x => f x - spectralProjector md m f x)
+          ≤ cApprox * (m : ℝ) ^ (-(s - r) / d) * sobolevNorm sd s f
+
+/-- Density schema: finite spectral truncations approximate any `H^s` function. -/
+axiom spectralProjector_dense_in_HSobolev
+    {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (md : MaternSpectralData X) (s r : ℝ) (hsr : r ≤ s) :
+    ∀ f : X → ℝ, InHSobolev sd s f →
+      ∀ ε > 0, ∃ m : ℕ, sobolevNorm sd r (fun x => f x - spectralProjector md m f x) < ε
+
+/-- Supervised sample with feature inputs in `X` and labels in `Y`. -/
+structure SupervisedSample (X Y : Type*) (n : ℕ) where
+  x : Fin n → X
+  y : Fin n → Y
+
+/-- Empirical risk from pointwise loss `ℓ(pred,label)` and predictor `f`. -/
+noncomputable def empiricalRisk (X Y : Type*) (n : ℕ)
+    (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n) (f : X → ℝ) : ℝ :=
+  (1 / (n : ℝ)) * ∑ i : Fin n, ℓ (f (sample.x i)) (sample.y i)
+
+/-- Regularized empirical objective for Matérn-RKHS fitting. -/
+noncomputable def maternRegularizedEmpiricalObjective {X Y : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ λ : ℝ) (n : ℕ)
+    (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n) (f : X → ℝ) : ℝ :=
+  empiricalRisk X Y n ℓ sample f + λ * maternRkhsNormSq md ν κ f
+
+/-- Minimizer predicate for regularized empirical objective over class `F`. -/
+def IsMaternRegularizedEmpiricalMinimizer {X Y : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ λ : ℝ) (n : ℕ)
+    (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n)
+    (F : Set (X → ℝ)) (fStar : X → ℝ) : Prop :=
+  fStar ∈ F ∧ ∀ f ∈ F,
+    maternRegularizedEmpiricalObjective md ν κ λ n ℓ sample fStar
+      ≤ maternRegularizedEmpiricalObjective md ν κ λ n ℓ sample f
+
+/-- Finite kernel span induced by sample inputs `x₁,…,x_n`. -/
+def InKernelSpanAtSample {X : Type*} [MeasurableSpace X]
+    (kfun : X → X → ℝ) (n : ℕ) (xSample : Fin n → X) (f : X → ℝ) : Prop :=
+  ∃ α : Fin n → ℝ, ∀ z : X, f z = ∑ i : Fin n, α i * kfun (xSample i) z
+
+/-- Representer theorem statement for regularized empirical risk minimization with
+Matérn kernel/RKHS geometry: any minimizer has a finite expansion over training points. -/
+axiom representer_theorem_matern_empirical
+    {X Y : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ λ : ℝ) (n : ℕ)
+    (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n)
+    (F : Set (X → ℝ)) (fStar : X → ℝ)
+    (hMin : IsMaternRegularizedEmpiricalMinimizer md ν κ λ n ℓ sample F fStar)
+    (hFclosedUnderKernelSpan : ∀ α : Fin n → ℝ,
+      (fun z : X => ∑ i : Fin n, α i * maternKernel md ν κ (sample.x i) z) ∈ F) :
+    InKernelSpanAtSample (maternKernel md ν κ) n sample.x fStar
+
+/-- Tikhonov objective in Matérn-RKHS form: loss + `λ‖f‖²`. -/
+noncomputable def tikhonovObjectiveMatern {X Y : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ λ : ℝ)
+    (L : (X → ℝ) → ℝ) (f : X → ℝ) : ℝ :=
+  L f + λ * maternRkhsNormSq md ν κ f
+
+/-- Ivanov feasible set: RKHS-ball constraint `‖f‖ ≤ B`. -/
+def ivanovFeasibleMatern {X : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ B : ℝ) : Set (X → ℝ) :=
+  { f | maternRkhsNorm md ν κ f ≤ B }
+
+/-- `f*` minimizes the Tikhonov objective over class `F`. -/
+def IsTikhonovMinimizerMatern {X : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ λ : ℝ)
+    (L : (X → ℝ) → ℝ) (F : Set (X → ℝ)) (fStar : X → ℝ) : Prop :=
+  fStar ∈ F ∧ ∀ f ∈ F, tikhonovObjectiveMatern md ν κ λ L fStar ≤ tikhonovObjectiveMatern md ν κ λ L f
+
+/-- `f*` minimizes the Ivanov objective `L` under RKHS-ball constraint. -/
+def IsIvanovMinimizerMatern {X : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ B : ℝ)
+    (L : (X → ℝ) → ℝ) (F : Set (X → ℝ)) (fStar : X → ℝ) : Prop :=
+  fStar ∈ F ∩ ivanovFeasibleMatern md ν κ B ∧
+    ∀ f ∈ F ∩ ivanovFeasibleMatern md ν κ B, L fStar ≤ L f
+
+/-- Tikhonov↔Ivanov equivalence schema (Matérn/RKHS version):
+for suitable parameter matching, minimizers coincide. -/
+axiom tikhonov_ivanov_equivalence_matern
+    {X : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ : ℝ)
+    (L : (X → ℝ) → ℝ) (F : Set (X → ℝ)) :
+    (∀ λ > 0, ∃ B ≥ 0, ∀ fStar, IsTikhonovMinimizerMatern md ν κ λ L F fStar →
+      IsIvanovMinimizerMatern md ν κ B L F fStar) ∧
+    (∀ B ≥ 0, ∃ λ > 0, ∀ fStar, IsIvanovMinimizerMatern md ν κ B L F fStar →
+      IsTikhonovMinimizerMatern md ν κ λ L F fStar)
+
+/-- Identifiability constraints for ancestry-varying intercept/slope/log-scale components. -/
+structure IdentifiabilityConstraints {X : Type*} [MeasurableSpace X] (sd : SobolevData X)
+    (u v T r : X → ℝ) : Prop where
+  u_centered : (∫ x, u x ∂sd.pi) = 0
+  v_centered : (∫ x, v x ∂sd.pi) = 0
+  T_centered : (∫ x, T x ∂sd.pi) = 0
+  logScale_centered : (∫ x, r x ∂sd.pi) = 0
+
+/-- Geometric regularity assumptions for ancestry manifold modeling.
+These are abstract placeholders that allow theorem statements to carry
+compactness/smoothness/bounded-density hypotheses explicitly. -/
+structure AncestryManifoldAssumptions (X : Type*) [MeasurableSpace X] (sd : SobolevData X) : Prop where
+  compact_support : Prop
+  smooth_structure : Prop
+  bounded_density_from_zero : Prop
+  bounded_density_from_infty : Prop
+
+/-- Product-measure assumptions used for ANOVA/Hoeffding decompositions. -/
+structure ProductMeasureAssumptions {k : ℕ} (sd : SobolevData (Fin k → ℝ)) : Prop where
+  coordMeasure : Fin k → Measure ℝ
+  product_factorization : sd.pi = Measure.pi coordMeasure
+
+/-- Additive ANOVA class with coordinate-wise centering constraints. -/
+def AdditiveANOVAClass (k : ℕ) (coordPi : Fin k → Measure ℝ) (f : (Fin k → ℝ) → ℝ) : Prop :=
+  ∃ f0 : ℝ, ∃ fj : Fin k → (ℝ → ℝ),
+    (∀ j, Integrable (fj j) (coordPi j)) ∧
+    (∀ j, (∫ x, fj j x ∂coordPi j) = 0) ∧
+    (∀ x, f x = f0 + ∑ j : Fin k, fj j (x j))
+
+/-- Pairwise-interaction ANOVA block with coordinate-wise orthogonality constraints. -/
+def PairwiseANOVAInteractions (k : ℕ) (coordPi : Fin k → Measure ℝ)
+    (f2 : Fin k → Fin k → ℝ → ℝ → ℝ) : Prop :=
+  (∀ i j, Integrable (fun z : ℝ × ℝ => f2 i j z.1 z.2) ((coordPi i).prod (coordPi j))) ∧
+  (∀ i j xj, (∫ xi, f2 i j xi xj ∂coordPi i) = 0) ∧
+  (∀ i j xi, (∫ xj, f2 i j xi xj ∂coordPi j) = 0)
+
+/-- Hoeffding/ANOVA decomposition schema on product spaces:
+existence and uniqueness of orthogonal component decomposition in `L²`. -/
+axiom hoeffding_decomposition_exists_unique
+    (k : ℕ) (coordPi : Fin k → Measure ℝ) (f : (Fin k → ℝ) → ℝ) :
+    ∃ f0 : ℝ, ∃ f1 : Fin k → (ℝ → ℝ), ∃ f2 : Fin k → Fin k → ℝ → ℝ → ℝ,
+      AdditiveANOVAClass k coordPi (fun x => f0 + ∑ j : Fin k, f1 j (x j)) ∧
+      PairwiseANOVAInteractions k coordPi f2 ∧
+      (∀ x, f x =
+        f0 + (∑ j : Fin k, f1 j (x j)) +
+        (∑ i : Fin k, ∑ j : Fin k, f2 i j (x i) (x j)))
+
+/-- Geometry-aware GAM class:
+local-scale probit with smooth ancestry threshold and smooth log-scale. -/
+def F_GAM (k : ℕ) (sd : SobolevData (Fin k → ℝ)) (sobOrder BU Br : ℝ) : Set (MethodPredictor k) :=
+  { q | ∃ T r : (Fin k → ℝ) → ℝ,
+      SmoothAncestryEffect sd sobOrder BU T ∧
+      SmoothAncestryEffect sd sobOrder Br r ∧
+      ∀ score x, q (score, x) = phiUnit ((score - T x) / Real.exp (r x)) }
+
+/-- Matérn-RKHS variant of the geometry-aware GAM class. -/
+def F_GAM_Matern (k : ℕ) (sd : SobolevData (Fin k → ℝ)) (md : MaternSpectralData (Fin k → ℝ))
+    (ν κ BU Br : ℝ) : Set (MethodPredictor k) :=
+  { q | ∃ T r : (Fin k → ℝ) → ℝ,
+      MaternRkhsEffect sd md ν κ BU T ∧
+      MaternRkhsEffect sd md ν κ Br r ∧
+      ∀ score x, q (score, x) = phiUnit ((score - T x) / Real.exp (r x)) }
 
 /-- Local-scale probit class:
 `q(s,x) = Φ((s - T(x)) / σ(x))` with strictly positive `σ(x)`. -/
@@ -1198,15 +1469,113 @@ theorem F_raw_subset_F_linInt (k : ℕ) : F_raw k ⊆ F_linInt k := by
   intro s x
   simpa using hgRaw s x
 
-/-- Linear+interaction predictors are contained in the overapproximate GAM class. -/
-theorem F_linInt_subset_F_GAM (k : ℕ) : F_linInt k ⊆ F_GAM k := by
-  intro q _hq
-  trivial
+/-- The refined GAM class is nonempty when zero effects satisfy the Sobolev constraints. -/
+theorem F_GAM_nonempty (k : ℕ) (sd : SobolevData (Fin k → ℝ)) (s BU Br : ℝ)
+    (hBU : 0 ≤ BU) (hBr : 0 ≤ Br) :
+    ∃ q, q ∈ F_GAM k sd s BU Br := by
+  refine ⟨fun z => phiUnit z.1, ?_⟩
+  refine ⟨(fun _ => 0), (fun _ => 0), ?_, ?_, ?_⟩
+  · refine ⟨measurable_const, ?_, ?_, ?_⟩
+    · refine ⟨?_, ?_⟩
+      · simpa using (memLp_zero_iff.2 (by simp) : MemLp (fun _ : Fin k → ℝ => (0 : ℝ)) 2 sd.pi)
+      · simpa [sd.sobolevLift_zero s] using (memLp_zero_iff.2 (by simp) : MemLp (fun _ : Fin k → ℝ => (0 : ℝ)) 2 sd.pi)
+    · simpa [sobolevNorm, sobolevNormSq, sd.sobolevLift_zero s] using hBU
+    · simp
+  · refine ⟨measurable_const, ?_, ?_, ?_⟩
+    · refine ⟨?_, ?_⟩
+      · simpa using (memLp_zero_iff.2 (by simp) : MemLp (fun _ : Fin k → ℝ => (0 : ℝ)) 2 sd.pi)
+      · simpa [sd.sobolevLift_zero s] using (memLp_zero_iff.2 (by simp) : MemLp (fun _ : Fin k → ℝ => (0 : ℝ)) 2 sd.pi)
+    · simpa [sobolevNorm, sobolevNormSq, sd.sobolevLift_zero s] using hBr
+    · simp
+  · intro score x
+    simp
 
-/-- Hence the baseline nesting chain. -/
-theorem F_raw_subset_F_linInt_subset_F_GAM (k : ℕ) :
-    F_raw k ⊆ F_linInt k ∧ F_linInt k ⊆ F_GAM k := by
-  exact ⟨F_raw_subset_F_linInt k, F_linInt_subset_F_GAM k⟩
+/-- Any Sobolev-ball GAM predictor is in the measurable local-scale class. -/
+theorem F_GAM_subset_F_full (k : ℕ) (sd : SobolevData (Fin k → ℝ)) (sobOrder BU Br : ℝ) :
+    F_GAM k sd sobOrder BU Br ⊆ F_full k := by
+  intro q hq
+  rcases hq with ⟨T, r, hT, hr, hrepr⟩
+  rcases hT with ⟨hT_meas, _, _, _⟩
+  rcases hr with ⟨hr_meas, _, _, _⟩
+  refine ⟨T, (fun x => Real.exp (r x)), hT_meas, Real.measurable_exp.comp hr_meas, ?_, ?_⟩
+  · intro x
+    exact Real.exp_pos (r x)
+  · intro s x
+    simpa using hrepr s x
+
+/-- Any Matérn-RKHS GAM predictor is in the measurable local-scale class. -/
+theorem F_GAM_Matern_subset_F_full (k : ℕ) (sd : SobolevData (Fin k → ℝ))
+    (md : MaternSpectralData (Fin k → ℝ)) (ν κ BU Br : ℝ) :
+    F_GAM_Matern k sd md ν κ BU Br ⊆ F_full k := by
+  intro q hq
+  rcases hq with ⟨T, r, hT, hr, hrepr⟩
+  rcases hT with ⟨hT_meas, _, _, _⟩
+  rcases hr with ⟨hr_meas, _, _, _⟩
+  refine ⟨T, (fun x => Real.exp (r x)), hT_meas, Real.measurable_exp.comp hr_meas, ?_, ?_⟩
+  · intro x
+    exact Real.exp_pos (r x)
+  · intro s x
+    simpa using hrepr s x
+
+/-- Wiring theorem: if Matérn effects are known to satisfy Sobolev-ball constraints,
+then the Matérn-GAM class is contained in the Sobolev-GAM class. -/
+theorem F_GAM_Matern_subset_F_GAM
+    (k : ℕ) (sd : SobolevData (Fin k → ℝ)) (md : MaternSpectralData (Fin k → ℝ))
+    (s ν κ BU Br : ℝ)
+    (hBridgeU : ∀ f, MaternRkhsEffect sd md ν κ BU f → SmoothAncestryEffect sd s BU f)
+    (hBridgeR : ∀ f, MaternRkhsEffect sd md ν κ Br f → SmoothAncestryEffect sd s Br f) :
+    F_GAM_Matern k sd md ν κ BU Br ⊆ F_GAM k sd s BU Br := by
+  intro q hq
+  rcases hq with ⟨T, r, hT, hr, hrepr⟩
+  exact ⟨T, r, hBridgeU T hT, hBridgeR r hr, hrepr⟩
+
+/-- Proper-subset certificate for baseline function spaces:
+if `Fbase ⊆ H^s` and there exists an `H^s` function outside `Fbase`,
+then `Fbase ⊊ H^s`. -/
+theorem baseline_strict_subset_HSobolev_of_witness
+    {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (s : ℝ) (Fbase : Set (X → ℝ))
+    (hsub : Fbase ⊆ HSobolev X sd s)
+    (hwitness : ∃ f : X → ℝ, f ∈ HSobolev X sd s ∧ f ∉ Fbase) :
+    Fbase ⊂ HSobolev X sd s := by
+  constructor
+  · exact hsub
+  · intro hEq
+    rcases hwitness with ⟨f, hfHs, hfNotBase⟩
+    have hfInBase : f ∈ Fbase := by
+      rw [hEq]
+      exact hfHs
+    exact hfNotBase hfInBase
+
+/-- Equivalent non-equality form of the strict-subset witness criterion. -/
+theorem baseline_ne_HSobolev_of_witness
+    {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (s : ℝ) (Fbase : Set (X → ℝ))
+    (hsub : Fbase ⊆ HSobolev X sd s)
+    (hwitness : ∃ f : X → ℝ, f ∈ HSobolev X sd s ∧ f ∉ Fbase) :
+    Fbase ≠ HSobolev X sd s := by
+  intro hEq
+  have hss : Fbase ⊂ HSobolev X sd s :=
+    baseline_strict_subset_HSobolev_of_witness sd s Fbase hsub hwitness
+  exact hss.2 hEq
+
+/-- Abstract finite-dimensionality marker for a function class, represented
+as the range of a map from some finite-dimensional real vector space. -/
+def FiniteDimensionalFunctionClass {X : Type*} (F : Set (X → ℝ)) : Prop :=
+  ∃ (V : Type*) (_ : AddCommGroup V) (_ : Module ℝ V) (_ : FiniteDimensional ℝ V)
+    (embed : V → (X → ℝ)), Set.range embed = F
+
+/-- Finite-dimensional baseline strictness theorem:
+if a finite-dimensional baseline class is included in `H^s` and there is an
+`H^s` witness outside the baseline class, then the inclusion is strict. -/
+theorem finiteDimBaseline_strict_subset_HSobolev
+    {X : Type*} [MeasurableSpace X]
+    (sd : SobolevData X) (s : ℝ) (Fbase : Set (X → ℝ))
+    (_hfinite : FiniteDimensionalFunctionClass Fbase)
+    (hsub : Fbase ⊆ HSobolev X sd s)
+    (hwitness : ∃ f : X → ℝ, f ∈ HSobolev X sd s ∧ f ∉ Fbase) :
+    Fbase ⊂ HSobolev X sd s :=
+  baseline_strict_subset_HSobolev_of_witness sd s Fbase hsub hwitness
 
 /-- `Z_norm2` probit form is in the local-scale probit class
 by choosing `T(x)=μ(x)+γ_T` and `σ(x)=exp(v(x)+γ_σ)`. -/

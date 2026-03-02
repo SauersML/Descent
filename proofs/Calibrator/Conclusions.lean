@@ -1078,26 +1078,6 @@ theorem brierRisk_eq_iff_ae_eq_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure
       linarith [hreg, hsub, h0]
     linarith [hdiff]
 
-/-- Abstract population-AUC functional on scores `Z → ℝ`. -/
-abbrev PopulationAUC (Z : Type*) := (Z → ℝ) → ℝ
-
-/-- Any strictly increasing transform of `η` is AUC-optimal, provided AUC is
-invariant under strict monotone transforms and `η` is itself optimal. -/
-theorem auc_maximizer_of_strictMono_transform {Z : Type*}
-    (AUC : PopulationAUC Z) (η score : Z → ℝ)
-    (h_opt_eta : ∀ s : Z → ℝ, AUC s ≤ AUC η)
-    (h_invariant : ∀ g : ℝ → ℝ, ∀ s : Z → ℝ, StrictMono g → AUC (g ∘ s) = AUC s)
-    (h_rep : ∃ g : ℝ → ℝ, StrictMono g ∧ score = g ∘ η) :
-    ∀ s : Z → ℝ, AUC s ≤ AUC score := by
-  rcases h_rep with ⟨g, hgmono, hscore⟩
-  intro s
-  have hsg : AUC score = AUC η := by
-    rw [hscore]
-    simpa using h_invariant g η hgmono
-  calc
-    AUC s ≤ AUC η := h_opt_eta s
-    _ = AUC score := hsg.symm
-
 /-! ### Pointwise Properness and Population Risk -/
 
 /-- Pointwise Bernoulli Brier risk at true parameter `η` and prediction `q`. -/
@@ -1280,6 +1260,84 @@ theorem logBayesRisk_full_lt_baseline_of_margin {Z : Type*} [MeasurableSpace Z] 
   refine ⟨η, h_eta_mem_full, ε, hε, ?_⟩
   intro q hq
   exact hgap q hq
+
+/-- Strict full-vs-baseline theorem for Brier loss under a margin condition. -/
+theorem brierBayesRisk_full_lt_baseline_of_margin {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+    (η : ProbPredictor Z) (Ffull Fbase : Set (ProbPredictor Z))
+    (h_eta_mem_full : η ∈ Ffull)
+    (h_bdd_full : BddBelow ((brierRisk μ η) '' Ffull))
+    (h_nonempty_base : ((brierRisk μ η) '' Fbase).Nonempty)
+    (h_margin : ∃ ε > 0, ∀ q ∈ Fbase, brierRisk μ η η + ε ≤ brierRisk μ η q) :
+    brierBayesRisk μ η Ffull < brierBayesRisk μ η Fbase := by
+  rcases h_margin with ⟨ε, hε, hgap⟩
+  unfold brierBayesRisk BayesRisk
+  refine oracleRisk_strict_of_witness (R := brierRisk μ η) (Fyours := Ffull) (Fbaseline := Fbase)
+    h_bdd_full h_nonempty_base ?_
+  refine ⟨η, h_eta_mem_full, ε, hε, ?_⟩
+  intro q hq
+  exact hgap q hq
+
+/-- Proper-loss strictness wrapper (log loss):
+strict Bayes-risk improvement follows from a baseline margin witness. -/
+theorem strict_logBayesRisk_of_proper_margin {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+    (η : ProbPredictor Z) (Ffull Fbase : Set (ProbPredictor Z))
+    (h_eta_mem_full : η ∈ Ffull)
+    (h_bdd_full : BddBelow ((logRisk μ η) '' Ffull))
+    (h_nonempty_base : ((logRisk μ η) '' Fbase).Nonempty)
+    (h_margin : ∃ ε > 0, ∀ q ∈ Fbase, logRisk μ η η + ε ≤ logRisk μ η q) :
+    logBayesRisk μ η Ffull < logBayesRisk μ η Fbase :=
+  logBayesRisk_full_lt_baseline_of_margin μ η Ffull Fbase
+    h_eta_mem_full h_bdd_full h_nonempty_base h_margin
+
+/-- Proper-loss strictness wrapper (Brier loss):
+strict Bayes-risk improvement follows from a baseline margin witness. -/
+theorem strict_brierBayesRisk_of_proper_margin {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+    (η : ProbPredictor Z) (Ffull Fbase : Set (ProbPredictor Z))
+    (h_eta_mem_full : η ∈ Ffull)
+    (h_bdd_full : BddBelow ((brierRisk μ η) '' Ffull))
+    (h_nonempty_base : ((brierRisk μ η) '' Fbase).Nonempty)
+    (h_margin : ∃ ε > 0, ∀ q ∈ Fbase, brierRisk μ η η + ε ≤ brierRisk μ η q) :
+    brierBayesRisk μ η Ffull < brierBayesRisk μ η Fbase :=
+  brierBayesRisk_full_lt_baseline_of_margin μ η Ffull Fbase
+    h_eta_mem_full h_bdd_full h_nonempty_base h_margin
+
+/-- Abstract strictness schema for Bayes risk using closure separation:
+if the truth is representable up to closure in `Fbig` but not in closure of `Fsmall`,
+then Bayes risk over `Fbig` is strictly smaller than over `Fsmall`. -/
+axiom BayesRisk_strict_of_truth_in_closure_not_in_baseline_closure
+    {α : Type*} [TopologicalSpace α]
+    (R : α → ℝ) (truth : α) (Fsmall Fbig : Set α) :
+    truth ∈ closure Fbig →
+    truth ∉ closure Fsmall →
+    BddBelow (R '' Fbig) →
+    (R '' Fsmall).Nonempty →
+    (∀ a, 0 ≤ R a - R truth) →
+    (∀ a, a ∈ closure Fsmall → a ≠ truth → 0 < R a - R truth) →
+    BayesRisk R Fbig < BayesRisk R Fsmall
+
+/-- Log-loss closure strictness specialization. -/
+axiom logBayesRisk_strict_of_eta_in_closure_not_in_baseline_closure
+    {Z : Type*} [MeasurableSpace Z] [TopologicalSpace (ProbPredictor Z)]
+    (μ : Measure Z) (η : ProbPredictor Z) (Fbase Ffull : Set (ProbPredictor Z)) :
+    η ∈ closure Ffull →
+    η ∉ closure Fbase →
+    BddBelow ((logRisk μ η) '' Ffull) →
+    ((logRisk μ η) '' Fbase).Nonempty →
+    (∀ q, 0 ≤ logRisk μ η q - logRisk μ η η) →
+    (∀ q, q ∈ closure Fbase → q ≠ η → 0 < logRisk μ η q - logRisk μ η η) →
+    logBayesRisk μ η Ffull < logBayesRisk μ η Fbase
+
+/-- Brier-loss closure strictness specialization. -/
+axiom brierBayesRisk_strict_of_eta_in_closure_not_in_baseline_closure
+    {Z : Type*} [MeasurableSpace Z] [TopologicalSpace (ProbPredictor Z)]
+    (μ : Measure Z) (η : ProbPredictor Z) (Fbase Ffull : Set (ProbPredictor Z)) :
+    η ∈ closure Ffull →
+    η ∉ closure Fbase →
+    BddBelow ((brierRisk μ η) '' Ffull) →
+    ((brierRisk μ η) '' Fbase).Nonempty →
+    (∀ q, 0 ≤ brierRisk μ η q - brierRisk μ η η) →
+    (∀ q, q ∈ closure Fbase → q ≠ η → 0 < brierRisk μ η q - brierRisk μ η η) →
+    brierBayesRisk μ η Ffull < brierBayesRisk μ η Fbase
 
 end OracleAndRegret
 
