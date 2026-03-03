@@ -442,10 +442,10 @@
             </select>
           </div>
           <div class="model-note" id="model-note-ps">
-            Asymmetric split: source and target diverge from common ancestor for t generations, with independent Nₑ.
+            Past demography input: source-anchored split where target diverges for t generations with target Nₑ.
           </div>
           <div class="model-note hidden" id="model-note-im">
-            Two demes at migration–drift equilibrium. M = 4Nₑm (scaled migration rate).
+            Past demography input: two demes at migration–drift equilibrium. M = 4Nₑm (scaled migration rate).
           </div>
         </div>
 
@@ -475,8 +475,8 @@
             <input type="range" id="slider-NeT" min="500" max="100000" value="2000" step="500" oninput="updateAll()">
           </div>
           <div class="formula-box">
-            Genetic drift accumulates with time and shrinks with population size. A bottlenecked target population
-            drifts faster, losing more PGS variance than the source.
+            Genetic drift accumulates with time and shrinks with population size. Here source is anchored (F_S = 0),
+            so only target drift changes with divergence settings.
           </div>
         </div>
 
@@ -497,12 +497,20 @@
           </div>
         </div>
 
-        <!-- Trait architecture — always shown -->
+        <!-- Present-day baseline — always shown -->
         <div class="card">
-          <div class="card-title"><span class="dot" style="background:var(--accent-amber)"></span> Trait Architecture
+          <div class="card-title"><span class="dot" style="background:var(--accent-amber)"></span> Present-Day Baseline
           </div>
           <div class="formula-box" id="trait-formula-box">
-            We map drift to present-day prediction metrics by combining drifted PGS variance with environmental noise.
+            Past influence is explicit: source signal is transported by drift scaling
+            r = (1 - F_target) / (1 - F_source), then converted to present-day R²/AUC/Brier.
+          </div>
+          <div class="control-group" style="margin-top:0.8rem">
+            <div class="control-label">
+              <span>Source R² (present-day baseline)</span>
+              <span class="control-value" id="val-r2s-base">0.50</span>
+            </div>
+            <input type="range" id="slider-r2s-base" min="0.05" max="0.95" value="0.50" step="0.01" oninput="updateAll()">
           </div>
           <div class="control-group" style="margin-top:0.8rem">
             <div class="control-label">
@@ -520,8 +528,8 @@
             structure (0 = identical, 1 = fully diverged)<br>
             <strong style="color:var(--accent-indigo)">PGS</strong> — polygenic score: weighted sum of genetic variants
             predicting a trait<br>
-            <strong style="color:var(--accent-indigo)">V_A</strong> — additive genetic variance: how much PGS varies in
-            the ancestral population<br>
+            <strong style="color:var(--accent-indigo)">R²<sub>S</sub></strong> — present-day source variance explained
+            (baseline performance)<br>
             <strong style="color:var(--accent-indigo)">Nₑ</strong> — effective population size: genetic equivalent of
             census size<br>
             <strong style="color:var(--accent-indigo)">M</strong> — scaled migration: higher = more gene flow
@@ -559,9 +567,9 @@
                 ↗</a></div>
           </div>
           <div class="metric-card amber">
-            <div class="metric-label">Typical Mean Shift Magnitude</div>
+            <div class="metric-label">Typical Mean Shift (Source SD Units)</div>
             <div class="metric-value" id="metric-mean-shift">0.141</div>
-            <div class="metric-formula">Expected absolute difference |Δμ| between populations due to random drift</div>
+            <div class="metric-formula">Expected |Δμ| / σ_source from demographic drift history</div>
             <div class="metric-proof"><a class="def-link" onclick="openProof('drift_implies_attenuation')">Lean theorem
                 (assumes CLT) ↗</a></div>
           </div>
@@ -590,15 +598,15 @@
 
         <div class="metrics-row">
           <div class="metric-card indigo">
-            <div class="metric-label">Source AUC (Expected)</div>
-            <div class="metric-value" id="metric-auc-s">0.602</div>
-            <div class="metric-formula">Mapped from source signal-to-noise under equal-variance Gaussian model</div>
+            <div class="metric-label">Source AUC Witness (SNR)</div>
+            <div class="metric-value" id="metric-auc-s">1.000</div>
+            <div class="metric-formula">Source signal-to-noise; higher SNR implies higher AUC for any strictly increasing AUC link</div>
             <div class="metric-proof"><a onclick="openProof('presentDayAUC')">Lean def ↗</a></div>
           </div>
           <div class="metric-card cyan">
-            <div class="metric-label">Target AUC (Expected)</div>
-            <div class="metric-value" id="metric-auc-t">0.594</div>
-            <div class="metric-formula">Mapped from target signal-to-noise under same assumption</div>
+            <div class="metric-label">Target AUC Witness (SNR)</div>
+            <div class="metric-value" id="metric-auc-t">0.882</div>
+            <div class="metric-formula">If this SNR is lower than source, then AUC is provably lower (no approximation)</div>
             <div class="metric-proof"><a onclick="openProof('drift_degrades_AUC_of_strictMono')">Lean theorem ↗</a></div>
           </div>
           <div class="metric-card amber">
@@ -611,15 +619,15 @@
 
         <div class="metrics-row" id="metrics-ps-extra">
           <div class="metric-card indigo">
-            <div class="metric-label">Coalescent τ (Source)</div>
+            <div class="metric-label">Past Demography: Coalescent τ (Source)</div>
             <div class="metric-value" id="metric-tau-s">0.025</div>
-            <div class="metric-formula">Drift time scaled by source population size</div>
+            <div class="metric-formula">Past divergence time scaled by source population size</div>
             <div class="metric-proof"><a onclick="openProof('coalescentTau')">Lean proof ↗</a></div>
           </div>
           <div class="metric-card cyan">
-            <div class="metric-label">Coalescent τ (Target)</div>
+            <div class="metric-label">Past Demography: Coalescent τ (Target)</div>
             <div class="metric-value" id="metric-tau-t">0.025</div>
-            <div class="metric-formula">Drift time scaled by target population size</div>
+            <div class="metric-formula">Past divergence time scaled by target population size</div>
             <div class="metric-proof"><a onclick="openProof('coalescentTau')">Lean proof ↗</a></div>
           </div>
         </div>
@@ -627,13 +635,13 @@
         <!-- Extra metrics for IM -->
         <div class="metrics-row hidden" id="metrics-im-extra">
           <div class="metric-card indigo">
-            <div class="metric-label">Within-Deme Coalescence Time</div>
+            <div class="metric-label">Past Demography: Within-Deme Coalescence</div>
             <div class="metric-value" id="metric-et-same">2.000</div>
             <div class="metric-formula">Expected time to common ancestor (same deme)</div>
             <div class="metric-proof"><a onclick="openProof('twoDemeIMEquilibriumETss')">Lean proof ↗</a></div>
           </div>
           <div class="metric-card cyan">
-            <div class="metric-label">Between-Deme Coalescence Time</div>
+            <div class="metric-label">Past Demography: Between-Deme Coalescence</div>
             <div class="metric-value" id="metric-et-diff">3.000</div>
             <div class="metric-formula">Expected time to common ancestor (different demes)</div>
             <div class="metric-proof"><a onclick="openProof('twoDemeIMEquilibriumETst')">Lean proof ↗</a></div>
@@ -673,7 +681,7 @@
           </div>
           <div class="charts-grid" style="margin-top:1.2rem">
             <div class="chart-card">
-              <h3>Time to Common Ancestor vs Migration Rate</h3>
+              <h3>Past Coalescence vs Migration Rate</h3>
               <canvas id="chart-im-coal"></canvas>
             </div>
             <div class="chart-card">
@@ -720,45 +728,47 @@
     // twoDemeIMEquilibriumETst: E[T_diff] = (2M+1)/M
     function imETdiff(M) { return (2 * M + 1) / M; }
 
-    // additiveGeneticVariance: V_A = Σ β²·2p(1-p) = h² (normalized)
+    // Legacy helper for signal-variance scaling
     function VA(L, beta, p) {
       return L * beta * beta * 2 * p * (1 - p);
     }
 
-    // varianceMeanPGSDiff_eq_twice_drift_VA: Var(Δμ) = 2d·V_A
-    // For symmetric split: d = 2·fst, so Var(Δμ) = 4·fst·V_A
-    function varMeanDiff(va, d) {
-      return 2 * d * va;
+    // varianceMeanPGSDiff_eq_twice_drift_signal: Var(Δμ) = 2d·V_signal
+    function varMeanDiff(signalVar, d) {
+      return 2 * d * signalVar;
     }
 
-    // expectedSqMeanPGSDiff_pureSplit_eq: E[(Δμ)²] = 4·fst·V_A
-    function expectedSqMeanDiff_PS(va, fst) {
-      return 4 * fst * va;
+    // expectedSqMeanPGSDiff_pureSplit_eq: E[(Δμ)²] = 4·fst·V_signal
+    function expectedSqMeanDiff_PS(signalVar, fst) {
+      return 4 * fst * signalVar;
     }
 
-    // expectedSqMeanPGSDiff_IMEquilibrium_eq: E[(Δμ)²] = 4δ·V_A
-    function expectedSqMeanDiff_IM(va, M) {
-      return 4 * imEquilibriumDelta(M) * va;
+    // expectedSqMeanPGSDiff_IMEquilibrium_eq: E[(Δμ)²] = 4δ·V_signal
+    function expectedSqMeanDiff_IM(signalVar, M) {
+      return 4 * imEquilibriumDelta(M) * signalVar;
     }
 
     // expectedAbsMeanPGSDiff_normal: E[|Δμ|] = √(Var(Δμ)) · √(2/π)
-    function expectedAbsMeanDiff(va, d) {
-      return Math.sqrt(varMeanDiff(va, d)) * Math.sqrt(2 / Math.PI);
+    function expectedAbsMeanDiff(signalVar, d) {
+      return Math.sqrt(varMeanDiff(signalVar, d)) * Math.sqrt(2 / Math.PI);
     }
 
-    // expectedPGSVarianceUnderDrift_eq: E[Var_pop] = (1-d)·V_A
-    // For pure split: d = fst per branch
-    function expectedVarUnderDrift(va, fst) {
-      return (1 - fst) * va;
+    // Closed-form shift in source-standard-deviation units:
+    // E[|Δμ|/σ_S] = 2*sqrt((F_S + F_T)/(π*(1-F_S)))
+    function expectedRelativeShiftFromFst(fstS, fstT) {
+      const denom = Math.max(1e-9, 1 - fstS);
+      return 2 * Math.sqrt(Math.max(0, fstS + fstT) / (Math.PI * denom));
     }
 
-    // Standard normal CDF approximation (Abramowitz-Stegun)
-    function phi(x) {
-      const sign = x < 0 ? -1 : 1;
-      const z = Math.abs(x) / Math.sqrt(2);
-      const t = 1 / (1 + 0.3275911 * z);
-      const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-z * z);
-      return 0.5 * (1 + sign * y);
+    // Source-anchored transport: move present-day source signal variance across drift regimes.
+    function transportedSignalVariance(vPgsSource, fstSource, fstPop) {
+      const denom = Math.max(1e-9, 1 - fstSource);
+      return vPgsSource * ((1 - fstPop) / denom);
+    }
+
+    function sourceSignalFromR2(r2Source, vEnv) {
+      const clipped = Math.min(0.999, Math.max(0.001, r2Source));
+      return (clipped / (1 - clipped)) * vEnv;
     }
 
     // Present-day R² proxy under additive signal + independent environmental noise
@@ -768,10 +778,10 @@
       return Math.max(0, Math.min(1, vPgs / denom));
     }
 
-    // Expected AUC under equal-variance Gaussian score model
-    function expectedAUC(vPgs, vEnv) {
-      if (vEnv <= 0) return 1;
-      return phi(Math.sqrt(Math.max(0, vPgs / (2 * vEnv))));
+    // SNR witness used for theorem-backed AUC ordering (StrictMono link assumption)
+    function signalToNoise(vPgs, vEnv) {
+      if (vEnv <= 0) return Number.POSITIVE_INFINITY;
+      return Math.max(0, vPgs / vEnv);
     }
 
     // Brier approximation from explained variance on Bernoulli outcome with prevalence pi
@@ -792,14 +802,16 @@
       const NeS = parseFloat(document.getElementById('slider-NeS').value);
       const NeT = parseFloat(document.getElementById('slider-NeT').value);
       const M = parseFloat(document.getElementById('slider-M').value);
-      const va = 1.0;
+      const r2Source = parseFloat(document.getElementById('slider-r2s-base').value);
       const prevalence = parseFloat(document.getElementById('slider-prev').value);
+      const vEnv = 1.0;
+      const vPgsSource = sourceSignalFromR2(r2Source, vEnv);
 
       let fstS, fstT, d;
       if (model === 'pure_split') {
-        fstS = fstFromGenerations(t, NeS); // source branch drift
-        fstT = fstFromGenerations(t, NeT); // target branch drift
-        d = fstS + fstT; // asymmetric combined drift factor
+        fstS = 0; // source anchored as present-day reference cohort
+        fstT = fstFromGenerations(t, NeT); // target branch drift from source reference
+        d = fstT;
       } else {
         // IM equilibrium (symmetric by definition)
         fstS = imEquilibriumDelta(M);
@@ -807,7 +819,7 @@
         d = 2 * fstS;
       }
 
-      return { model, t, NeS, NeT, M, va, prevalence, fstS, fstT, d };
+      return { model, t, NeS, NeT, M, prevalence, r2Source, vEnv, vPgsSource, fstS, fstT, d };
     }
 
     function gaussian(x, mu, sigma) {
@@ -859,7 +871,7 @@
       charts.imMeanDist = makeChart('chart-im-mean-dist', 'PGS (standardized)', 'Density');
       charts.imDelta = makeChart('chart-im-delta', 'Scaled migration rate (M = 4Nₑm)', 'Genetic differentiation (δ)');
       charts.imCoal = makeChart('chart-im-coal', 'Scaled migration rate (M = 4Nₑm)', 'Expected generations to common ancestor (×2Nₑ)');
-      charts.imMeanSq = makeChart('chart-im-mean-sq', 'Scaled migration rate (M = 4Nₑm)', 'Squared mean PGS difference (relative to V_A)');
+      charts.imMeanSq = makeChart('chart-im-mean-sq', 'Scaled migration rate (M = 4Nₑm)', 'Squared mean PGS difference (relative to source signal)');
     }
 
     function ds(label, data, color, opts) {
@@ -887,6 +899,7 @@
       document.getElementById('val-NeS').textContent = p.NeS.toLocaleString();
       document.getElementById('val-NeT').textContent = p.NeT.toLocaleString();
       document.getElementById('val-M').textContent = p.M.toFixed(2);
+      document.getElementById('val-r2s-base').textContent = p.r2Source.toFixed(2);
       document.getElementById('val-prev').textContent = p.prevalence.toFixed(2);
 
       // ── Show/hide model-specific sections ──
@@ -903,13 +916,13 @@
       // ── Metrics (model-dependent) ──
       if (isPS) {
         // Per-branch drift
-        document.getElementById('metric-drift-label').textContent = 'Source Drift (F_S)';
+        document.getElementById('metric-drift-label').textContent = 'Source Drift (F_S, anchored)';
         document.getElementById('metric-drift').textContent = p.fstS.toFixed(4);
-        document.getElementById('metric-drift-formula').textContent = 'Genetic drift accumulated in the source population';
+        document.getElementById('metric-drift-formula').textContent = 'Source reference cohort fixed at present day (set to 0)';
         document.getElementById('metric-drift-proof').innerHTML = '<a onclick="openProof(\'fstFromGenerations\')">Lean proof ↗</a>';
         document.getElementById('metric-drift-t-label').textContent = 'Target Drift (F_T)';
         document.getElementById('metric-drift-t').textContent = p.fstT.toFixed(4);
-        document.getElementById('metric-drift-t-formula').textContent = 'Genetic drift accumulated in the target population';
+        document.getElementById('metric-drift-t-formula').textContent = 'Genetic drift accumulated in the target population relative to source';
       } else {
         document.getElementById('metric-drift-label').textContent = 'Equilibrium δ (Source)';
         document.getElementById('metric-drift').textContent = p.fstS.toFixed(4);
@@ -921,18 +934,18 @@
         document.getElementById('metric-drift-t-proof').innerHTML = '<a onclick="openProof(\'twoDemeIMEquilibriumDelta\')">Lean proof ↗</a>';
       }
 
-      const absMeanDiff = expectedAbsMeanDiff(p.va, p.d);
-      document.getElementById('metric-mean-shift').textContent = absMeanDiff.toFixed(4);
+      const relativeShift = expectedRelativeShiftFromFst(p.fstS, p.fstT);
+      document.getElementById('metric-mean-shift').textContent = relativeShift.toFixed(3) + 'σ';
 
       // Clinical performance endpoints
-      const vEnv = 1.0; // fixed environmental variance (gives SNR=1.0 at va=1.0)
-      const vPgsS = expectedVarUnderDrift(p.va, p.fstS);
-      const vPgsT = expectedVarUnderDrift(p.va, p.fstT);
+      const vEnv = p.vEnv;
+      const vPgsS = transportedSignalVariance(p.vPgsSource, p.fstS, p.fstS);
+      const vPgsT = transportedSignalVariance(p.vPgsSource, p.fstS, p.fstT);
       const r2S = expectedR2(vPgsS, vEnv);
       const r2T = expectedR2(vPgsT, vEnv);
       const portability = r2S > 0 ? 100 * (r2T / r2S) : 0;
-      const aucS = expectedAUC(vPgsS, vEnv);
-      const aucT = expectedAUC(vPgsT, vEnv);
+      const snrS = signalToNoise(vPgsS, vEnv);
+      const snrT = signalToNoise(vPgsT, vEnv);
       const brierS = expectedBrierFromR2(r2S, p.prevalence);
       const brierT = expectedBrierFromR2(r2T, p.prevalence);
       const brierGap = brierT - brierS;
@@ -940,8 +953,8 @@
       document.getElementById('metric-r2-s').textContent = r2S.toFixed(3);
       document.getElementById('metric-r2-t').textContent = r2T.toFixed(3);
       document.getElementById('metric-portability').textContent = portability.toFixed(1) + '%';
-      document.getElementById('metric-auc-s').textContent = aucS.toFixed(3);
-      document.getElementById('metric-auc-t').textContent = aucT.toFixed(3);
+      document.getElementById('metric-auc-s').textContent = snrS.toFixed(3);
+      document.getElementById('metric-auc-t').textContent = snrT.toFixed(3) + (snrT < snrS ? ' (< source)' : '');
       document.getElementById('metric-brier-gap').textContent = (brierGap >= 0 ? '+' : '') + brierGap.toFixed(4);
 
       if (isPS) {
@@ -961,11 +974,9 @@
       document.getElementById('metric-tau-t').textContent = tauT.toFixed(4);
 
       // Mean distribution (asymmetric variance, zero expected mean diff)
-      // Source variance: (1 - F_S) · V_A
-      // Target variance: (1 - F_T) · V_A
-      const sigS = Math.sqrt(Math.max(0.001, expectedVarUnderDrift(p.va, p.fstS)));
-      const sigT = Math.sqrt(Math.max(0.001, expectedVarUnderDrift(p.va, p.fstT)));
-      const shift = expectedAbsMeanDiff(p.va, p.d);
+      const sigS = Math.sqrt(Math.max(0.001, transportedSignalVariance(p.vPgsSource, p.fstS, p.fstS)));
+      const sigT = Math.sqrt(Math.max(0.001, transportedSignalVariance(p.vPgsSource, p.fstS, p.fstT)));
+      const shift = expectedAbsMeanDiff(p.vPgsSource, p.d);
 
       const xRange = Math.max(3 * sigS, shift + 3 * sigT);
       const xs = linspace(-xRange, xRange + shift, 200);
@@ -984,7 +995,7 @@
       charts.psFst.data = {
         labels: ts.map(x => x.toFixed(0)),
         datasets: [
-          ds('Pairwise F_ST (between S and T)', ts.map(ti => fstFromGenerations(ti, p.NeS) + fstFromGenerations(ti, p.NeT)), '#8b5cf6'),
+          ds('Target divergence from source reference (F_T)', ts.map(ti => fstFromGenerations(ti, p.NeT)), '#8b5cf6'),
         ]
       };
       charts.psFst.update('none');
@@ -994,12 +1005,12 @@
       charts.psSummary.data = {
         labels: fs.map(f => (f * 100).toFixed(1) + '%'),
         datasets: [
-          ds('Target R²', fs.map(f => expectedR2(expectedVarUnderDrift(p.va, f), 1 - p.va)), '#10b981'),
-          ds('Source R²', fs.map(() => expectedR2(expectedVarUnderDrift(p.va, p.fstS), 1 - p.va)), '#06b6d4', { borderDash: [6, 3] }),
-          ds('Target AUC', fs.map(f => expectedAUC(expectedVarUnderDrift(p.va, f), 1 - p.va)), '#6366f1'),
+          ds('Target R²', fs.map(f => expectedR2(transportedSignalVariance(p.vPgsSource, p.fstS, f), p.vEnv)), '#10b981'),
+          ds('Source R²', fs.map(() => expectedR2(transportedSignalVariance(p.vPgsSource, p.fstS, p.fstS), p.vEnv)), '#06b6d4', { borderDash: [6, 3] }),
+          ds('Target SNR (AUC witness)', fs.map(f => signalToNoise(transportedSignalVariance(p.vPgsSource, p.fstS, f), p.vEnv)), '#6366f1'),
           ds('Brier gap (target-source)', fs.map(f => {
-            const r2Src = expectedR2(expectedVarUnderDrift(p.va, p.fstS), 1 - p.va);
-            const r2Tgt = expectedR2(expectedVarUnderDrift(p.va, f), 1 - p.va);
+            const r2Src = expectedR2(transportedSignalVariance(p.vPgsSource, p.fstS, p.fstS), p.vEnv);
+            const r2Tgt = expectedR2(transportedSignalVariance(p.vPgsSource, p.fstS, f), p.vEnv);
             return expectedBrierFromR2(r2Tgt, p.prevalence) - expectedBrierFromR2(r2Src, p.prevalence);
           }), '#f59e0b', { borderDash: [4, 2] }),
         ]
@@ -1016,19 +1027,19 @@
       document.getElementById('metric-et-diff').textContent = imETdiff(p.M).toFixed(3);
 
       // ── Mean distribution ──
-      const eVarS = expectedVarUnderDrift(p.va, delta);
+      const eVarS = transportedSignalVariance(p.vPgsSource, p.fstS, delta);
       const sigS = Math.sqrt(Math.max(0.001, eVarS));
-      const eVarT = expectedVarUnderDrift(p.va, delta);
+      const eVarT = transportedSignalVariance(p.vPgsSource, p.fstS, delta);
       const sigT = Math.sqrt(Math.max(0.001, eVarT));
-      const shift = expectedAbsMeanDiff(p.va, 2 * delta);
+      const shift = expectedAbsMeanDiff(p.vPgsSource, 2 * delta);
 
       const xRange = Math.max(3 * sigS, shift + 3 * sigT);
       const xs = linspace(-xRange, xRange + shift, 200);
       charts.imMeanDist.data = {
         labels: xs.map(x => x.toFixed(2)),
         datasets: [
-          ds('Source Deme N(0, (1−δ)V_A)', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
-          ds('Target Deme N(E[|Δμ|], (1−δ)V_A)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
+          ds('Source Deme N(0, V_signal)', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
+          ds('Target Deme N(E[|Δμ|], V_signal)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
         ]
       };
       charts.imMeanDist.update('none');
@@ -1053,7 +1064,7 @@
       };
       charts.imCoal.update('none');
 
-      // ── E[(Δμ)²]/V_A vs M ──
+      // ── E[(Δμ)²]/V_signal vs M ──
       charts.imMeanSq.data = {
         labels: Ms.map(m => m.toFixed(1)),
         datasets: [

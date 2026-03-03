@@ -221,6 +221,285 @@ theorem portability_ratio_lt_one_of_positive_drift
   exact portability_ratio_lt_one_of_drop (presentDayR2 V_A V_E fstS)
     (presentDayR2 V_A V_E fstT) hsrc_pos hdrop
 
+/-- Source variance implied by present-day source `R²` after fixing noise scale to `1`. -/
+noncomputable def sourceVarianceFromR2 (r2Source : ℝ) : ℝ :=
+  r2Source / (1 - r2Source)
+
+/-- Drift transport written purely from present-day source variance and observable `F_ST`s. -/
+noncomputable def targetVarianceFromSource
+    (vSource fstSource fstTarget : ℝ) : ℝ :=
+  vSource * ((1 - fstTarget) / (1 - fstSource))
+
+/-- `R²` induced by a variance ratio after fixing environmental scale to `1`. -/
+noncomputable def r2FromVarianceScaleOne (v : ℝ) : ℝ :=
+  v / (v + 1)
+
+/-- On nonnegative variances, `v ↦ v/(v+1)` is strictly increasing. -/
+theorem r2FromVarianceScaleOne_strictMono_nonneg
+    (x y : ℝ) (hx : 0 ≤ x) (hxy : x < y) :
+    r2FromVarianceScaleOne x < r2FromVarianceScaleOne y := by
+  unfold r2FromVarianceScaleOne
+  have hx1 : 0 < x + 1 := by linarith
+  have hy1 : 0 < y + 1 := by linarith [hx, hxy]
+  have hxy1 : x + 1 < y + 1 := by linarith
+  have hInv : 1 / (y + 1) < 1 / (x + 1) := by
+    rw [one_div_lt_one_div hy1 hx1]
+    exact hxy1
+  have hsub : 1 - 1 / (x + 1) < 1 - 1 / (y + 1) := by linarith
+  have hxne : x + 1 ≠ 0 := by linarith
+  have hyne : y + 1 ≠ 0 := by linarith
+  have hxrepr : x / (x + 1) = 1 - 1 / (x + 1) := by
+    field_simp [hxne]
+    ring
+  have hyrepr : y / (y + 1) = 1 - 1 / (y + 1) := by
+    field_simp [hyne]
+    ring
+  simpa [hxrepr, hyrepr] using hsub
+
+/-- Present-day target `R²` written only from source `R²` and source/target `F_ST`. -/
+noncomputable def targetR2FromObservables
+    (r2Source fstSource fstTarget : ℝ) : ℝ :=
+  r2FromVarianceScaleOne
+    (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
+
+/-- Source `R²` represented through the scale-one variance map. -/
+theorem sourceR2_eq_r2FromVarianceScaleOne (r2Source : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1) :
+    r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) = r2Source := by
+  rcases h_r2 with ⟨h0, h1⟩
+  unfold r2FromVarianceScaleOne sourceVarianceFromR2
+  have hden : 1 - r2Source ≠ 0 := by linarith
+  field_simp [hden]
+  ring
+
+/-- Positivity of source variance induced by `0 < R²_source < 1`. -/
+theorem sourceVarianceFromR2_pos (r2Source : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1) :
+    0 < sourceVarianceFromR2 r2Source := by
+  rcases h_r2 with ⟨h0, h1⟩
+  unfold sourceVarianceFromR2
+  have hden : 0 < 1 - r2Source := by linarith
+  exact div_pos h0 hden
+
+/-- Under `fstSource < fstTarget < 1`, target variance is strictly below source variance. -/
+theorem targetVarianceFromSource_lt_source
+    (vSource fstSource fstTarget : ℝ)
+    (hv : 0 < vSource)
+    (hfst : fstSource < fstTarget)
+    (hfstBound : fstTarget < 1) :
+    targetVarianceFromSource vSource fstSource fstTarget < vSource := by
+  unfold targetVarianceFromSource
+  have hden : 0 < 1 - fstSource := by
+    have : fstSource < 1 := lt_trans hfst hfstBound
+    linarith
+  have hratio : ((1 - fstTarget) / (1 - fstSource)) < 1 := by
+    rw [div_lt_one hden]
+    linarith
+  have hmul : vSource * ((1 - fstTarget) / (1 - fstSource)) < vSource * 1 :=
+    mul_lt_mul_of_pos_left hratio hv
+  simpa using hmul
+
+/-- Under `fstSource < fstTarget < 1`, transported target variance stays positive. -/
+theorem targetVarianceFromSource_pos
+    (vSource fstSource fstTarget : ℝ)
+    (hv : 0 < vSource)
+    (hfst : fstSource < fstTarget)
+    (hfstBound : fstTarget < 1) :
+    0 < targetVarianceFromSource vSource fstSource fstTarget := by
+  unfold targetVarianceFromSource
+  have hden : 0 < 1 - fstSource := by
+    have : fstSource < 1 := lt_trans hfst hfstBound
+    linarith
+  have hnum : 0 < 1 - fstTarget := by linarith
+  have hratio : 0 < (1 - fstTarget) / (1 - fstSource) := div_pos hnum hden
+  exact mul_pos hv hratio
+
+/-- Observable-only portability theorem: target/source `R²` ratio is strictly below `1`. -/
+theorem portability_ratio_from_observables
+    (r2Source fstSource fstTarget : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
+    targetR2FromObservables r2Source fstSource fstTarget / r2Source < 1 := by
+  rcases h_fst_bounds with ⟨_, hfstT_lt_one⟩
+  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
+    sourceVarianceFromR2_pos r2Source h_r2
+  have hvT_lt : targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget
+      < sourceVarianceFromR2 r2Source :=
+    targetVarianceFromSource_lt_source (sourceVarianceFromR2 r2Source)
+      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
+  have hr2_drop :
+      r2FromVarianceScaleOne
+          (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
+        < r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) := by
+    have hvT_nonneg :
+        0 ≤ targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget := by
+      exact le_of_lt (targetVarianceFromSource_pos
+        (sourceVarianceFromR2 r2Source) fstSource fstTarget hvS_pos h_fst hfstT_lt_one)
+    exact r2FromVarianceScaleOne_strictMono_nonneg
+      (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
+      (sourceVarianceFromR2 r2Source) hvT_nonneg hvT_lt
+  have hr2S_pos : 0 < r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) := by
+    unfold r2FromVarianceScaleOne
+    have hden : 0 < sourceVarianceFromR2 r2Source + 1 := by linarith [hvS_pos]
+    exact div_pos hvS_pos hden
+  have hratio :
+      (r2FromVarianceScaleOne
+          (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget))
+        / (r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source)) < 1 :=
+    portability_ratio_lt_one_of_drop
+      (r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source))
+      (r2FromVarianceScaleOne
+        (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget))
+      hr2S_pos hr2_drop
+  have hsrc_eq : r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) = r2Source :=
+    sourceR2_eq_r2FromVarianceScaleOne r2Source h_r2
+  unfold targetR2FromObservables
+  simpa [hsrc_eq] using hratio
+
+/-- Observable-only strict `R²` drop: target `R²` is below source `R²`. -/
+theorem targetR2_lt_source_from_observables
+    (r2Source fstSource fstTarget : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
+    targetR2FromObservables r2Source fstSource fstTarget < r2Source := by
+  rcases h_fst_bounds with ⟨_, hfstT_lt_one⟩
+  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
+    sourceVarianceFromR2_pos r2Source h_r2
+  have hvT_lt : targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget
+      < sourceVarianceFromR2 r2Source :=
+    targetVarianceFromSource_lt_source (sourceVarianceFromR2 r2Source)
+      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
+  have hr2_drop :
+      r2FromVarianceScaleOne
+          (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
+        < r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) := by
+    have hvT_nonneg :
+        0 ≤ targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget := by
+      exact le_of_lt (targetVarianceFromSource_pos
+        (sourceVarianceFromR2 r2Source) fstSource fstTarget hvS_pos h_fst hfstT_lt_one)
+    exact r2FromVarianceScaleOne_strictMono_nonneg
+      (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
+      (sourceVarianceFromR2 r2Source) hvT_nonneg hvT_lt
+  have hsrc_eq : r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) = r2Source :=
+    sourceR2_eq_r2FromVarianceScaleOne r2Source h_r2
+  unfold targetR2FromObservables
+  simpa [hsrc_eq] using hr2_drop
+
+/-- Drift transport ratio from observable source/target `F_ST`. -/
+noncomputable def driftTransportRatio (fstSource fstTarget : ℝ) : ℝ :=
+  (1 - fstTarget) / (1 - fstSource)
+
+/-- Exact transport identity: target signal variance equals ratio times source variance. -/
+theorem targetVarianceFromSource_eq_ratio_mul
+    (vSource fstSource fstTarget : ℝ) :
+    targetVarianceFromSource vSource fstSource fstTarget =
+      driftTransportRatio fstSource fstTarget * vSource := by
+  unfold targetVarianceFromSource driftTransportRatio
+  ring
+
+/-- Exact closed form for target `R²` from source `R²` and drift ratio `r`. -/
+theorem targetR2FromObservables_closed_form
+    (r2Source fstSource fstTarget : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1) :
+    targetR2FromObservables r2Source fstSource fstTarget =
+      ((driftTransportRatio fstSource fstTarget) * r2Source) /
+        (1 - r2Source + (driftTransportRatio fstSource fstTarget) * r2Source) := by
+  rcases h_r2 with ⟨_, h1⟩
+  set r : ℝ := driftTransportRatio fstSource fstTarget
+  have h_target :
+      targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget
+        = r * sourceVarianceFromR2 r2Source := by
+    simpa [r, mul_comm] using
+      (targetVarianceFromSource_eq_ratio_mul
+        (sourceVarianceFromR2 r2Source) fstSource fstTarget)
+  unfold targetR2FromObservables r2FromVarianceScaleOne
+  rw [h_target]
+  unfold sourceVarianceFromR2
+  have hden : 1 - r2Source ≠ 0 := by linarith
+  field_simp [hden]
+  ring_nf
+
+/-- AUC conversion map used in the dashboard when environmental scale is fixed to `1`. -/
+noncomputable def aucFromR2 (aucLink : ℝ → ℝ) (r2 : ℝ) : ℝ :=
+  aucLink (sourceVarianceFromR2 r2)
+
+/-- Observable source AUC map used by the dashboard. -/
+noncomputable def sourceAUCFromObservables
+    (aucLink : ℝ → ℝ) (r2Source : ℝ) : ℝ :=
+  aucLink (sourceVarianceFromR2 r2Source)
+
+/-- Brier conversion map used in the dashboard (`π(1-π)(1-R²)`). -/
+noncomputable def brierFromR2 (π r2 : ℝ) : ℝ :=
+  π * (1 - π) * (1 - r2)
+
+/-- Observable target AUC map used by the dashboard: transport variance, then apply AUC link. -/
+noncomputable def targetAUCFromObservables
+    (aucLink : ℝ → ℝ) (r2Source fstSource fstTarget : ℝ) : ℝ :=
+  aucLink (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
+
+/-- Observable source Brier map used by the dashboard. -/
+noncomputable def sourceBrierFromObservables (π r2Source : ℝ) : ℝ :=
+  brierFromR2 π r2Source
+
+/-- Observable target Brier map used by the dashboard (`Brier(R²_target)`). -/
+noncomputable def targetBrierFromObservables
+    (π r2Source fstSource fstTarget : ℝ) : ℝ :=
+  brierFromR2 π (targetR2FromObservables r2Source fstSource fstTarget)
+
+/-- The AUC observable map is exactly "transport then link" by definition. -/
+@[simp] theorem targetAUCFromObservables_eq
+    (aucLink : ℝ → ℝ) (r2Source fstSource fstTarget : ℝ) :
+    targetAUCFromObservables aucLink r2Source fstSource fstTarget =
+      aucLink (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget) := by
+  rfl
+
+/-- Full observable AUC degradation theorem:
+strictly higher drift implies strictly lower target AUC for any strictly increasing AUC link. -/
+theorem targetAUC_lt_source_of_observables
+    (aucLink : ℝ → ℝ) (hauc : StrictMono aucLink)
+    (r2Source fstSource fstTarget : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
+    targetAUCFromObservables aucLink r2Source fstSource fstTarget <
+      sourceAUCFromObservables aucLink r2Source := by
+  rcases h_fst_bounds with ⟨_, hfstT_lt_one⟩
+  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
+    sourceVarianceFromR2_pos r2Source h_r2
+  have hvT_lt : targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget
+      < sourceVarianceFromR2 r2Source :=
+    targetVarianceFromSource_lt_source (sourceVarianceFromR2 r2Source)
+      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
+  unfold targetAUCFromObservables sourceAUCFromObservables
+  exact hauc hvT_lt
+
+/-- The Brier observable map is exactly `brierFromR2` at transported target `R²` by definition. -/
+@[simp] theorem targetBrierFromObservables_eq
+    (π r2Source fstSource fstTarget : ℝ) :
+    targetBrierFromObservables π r2Source fstSource fstTarget =
+      brierFromR2 π (targetR2FromObservables r2Source fstSource fstTarget) := by
+  rfl
+
+/-- Full observable Brier degradation theorem:
+if target `R²` drops and `0 ≤ π ≤ 1`, target Brier is at least source Brier. -/
+theorem targetBrier_ge_source_of_observables
+    (π r2Source fstSource fstTarget : ℝ)
+    (h_pi : 0 ≤ π ∧ π ≤ 1)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
+    sourceBrierFromObservables π r2Source ≤
+      targetBrierFromObservables π r2Source fstSource fstTarget := by
+  rcases h_pi with ⟨hpi0, hpi1⟩
+  have hr2_drop : targetR2FromObservables r2Source fstSource fstTarget < r2Source :=
+    targetR2_lt_source_from_observables r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds
+  have hcoef_nonneg : 0 ≤ π * (1 - π) := by nlinarith
+  unfold sourceBrierFromObservables targetBrierFromObservables brierFromR2
+  have hbase : 1 - r2Source ≤ 1 - targetR2FromObservables r2Source fstSource fstTarget := by linarith
+  exact mul_le_mul_of_nonneg_left hbase hcoef_nonneg
+
 /-- Pointwise Brier regret relative to the true Bernoulli probability. -/
 noncomputable def brierRegretPoint (η q : ℝ) : ℝ :=
   brierBernoulliRisk η q - brierBernoulliRisk η η

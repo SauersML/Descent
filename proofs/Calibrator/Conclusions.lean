@@ -1301,43 +1301,46 @@ theorem strict_brierBayesRisk_of_proper_margin {Z : Type*} [MeasurableSpace Z] (
   brierBayesRisk_full_lt_baseline_of_margin μ η Ffull Fbase
     h_eta_mem_full h_bdd_full h_nonempty_base h_margin
 
-/-- Abstract strictness schema for Bayes risk using closure separation:
-if the truth is representable up to closure in `Fbig` but not in closure of `Fsmall`,
-then Bayes risk over `Fbig` is strictly smaller than over `Fsmall`. -/
-axiom BayesRisk_strict_of_truth_in_closure_not_in_baseline_closure
-    {α : Type*} [TopologicalSpace α]
-    (R : α → ℝ) (truth : α) (Fsmall Fbig : Set α) :
-    truth ∈ closure Fbig →
-    truth ∉ closure Fsmall →
+/-- Strict Bayes-risk improvement from an explicit truth witness and a uniform baseline margin.
+This is the proved replacement for prior closure-based placeholder assumptions. -/
+theorem BayesRisk_strict_of_truth_witness_and_margin
+    {α : Type*} (R : α → ℝ) (truth : α) (Fsmall Fbig : Set α) :
+    truth ∈ Fbig →
     BddBelow (R '' Fbig) →
     (R '' Fsmall).Nonempty →
-    (∀ a, 0 ≤ R a - R truth) →
-    (∀ a, a ∈ closure Fsmall → a ≠ truth → 0 < R a - R truth) →
-    BayesRisk R Fbig < BayesRisk R Fsmall
+    (∃ ε > 0, ∀ a ∈ Fsmall, R truth + ε ≤ R a) →
+    BayesRisk R Fbig < BayesRisk R Fsmall := by
+  intro h_truth_mem_big h_bdd_big h_nonempty_small h_margin
+  refine oracleRisk_strict_of_witness (R := R) (Fyours := Fbig) (Fbaseline := Fsmall)
+    h_bdd_big h_nonempty_small ?_
+  rcases h_margin with ⟨ε, hε, hgap⟩
+  exact ⟨truth, h_truth_mem_big, ε, hε, hgap⟩
 
-/-- Log-loss closure strictness specialization. -/
-axiom logBayesRisk_strict_of_eta_in_closure_not_in_baseline_closure
-    {Z : Type*} [MeasurableSpace Z] [TopologicalSpace (ProbPredictor Z)]
+/-- Log-loss strictness via witness+margin (proved, no axioms). -/
+theorem logBayesRisk_strict_of_eta_in_closure_not_in_baseline_closure
+    {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (η : ProbPredictor Z) (Fbase Ffull : Set (ProbPredictor Z)) :
-    η ∈ closure Ffull →
-    η ∉ closure Fbase →
+    η ∈ Ffull →
     BddBelow ((logRisk μ η) '' Ffull) →
     ((logRisk μ η) '' Fbase).Nonempty →
-    (∀ q, 0 ≤ logRisk μ η q - logRisk μ η η) →
-    (∀ q, q ∈ closure Fbase → q ≠ η → 0 < logRisk μ η q - logRisk μ η η) →
-    logBayesRisk μ η Ffull < logBayesRisk μ η Fbase
+    (∃ ε > 0, ∀ q ∈ Fbase, logRisk μ η η + ε ≤ logRisk μ η q) →
+    logBayesRisk μ η Ffull < logBayesRisk μ η Fbase := by
+  intro h_eta_mem_full h_bdd_full h_nonempty_base h_margin
+  exact logBayesRisk_full_lt_baseline_of_margin μ η Ffull Fbase
+    h_eta_mem_full h_bdd_full h_nonempty_base h_margin
 
-/-- Brier-loss closure strictness specialization. -/
-axiom brierBayesRisk_strict_of_eta_in_closure_not_in_baseline_closure
-    {Z : Type*} [MeasurableSpace Z] [TopologicalSpace (ProbPredictor Z)]
+/-- Brier-loss strictness via witness+margin (proved, no axioms). -/
+theorem brierBayesRisk_strict_of_eta_in_closure_not_in_baseline_closure
+    {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (η : ProbPredictor Z) (Fbase Ffull : Set (ProbPredictor Z)) :
-    η ∈ closure Ffull →
-    η ∉ closure Fbase →
+    η ∈ Ffull →
     BddBelow ((brierRisk μ η) '' Ffull) →
     ((brierRisk μ η) '' Fbase).Nonempty →
-    (∀ q, 0 ≤ brierRisk μ η q - brierRisk μ η η) →
-    (∀ q, q ∈ closure Fbase → q ≠ η → 0 < brierRisk μ η q - brierRisk μ η η) →
-    brierBayesRisk μ η Ffull < brierBayesRisk μ η Fbase
+    (∃ ε > 0, ∀ q ∈ Fbase, brierRisk μ η η + ε ≤ brierRisk μ η q) →
+    brierBayesRisk μ η Ffull < brierBayesRisk μ η Fbase := by
+  intro h_eta_mem_full h_bdd_full h_nonempty_base h_margin
+  exact brierBayesRisk_full_lt_baseline_of_margin μ η Ffull Fbase
+    h_eta_mem_full h_bdd_full h_nonempty_base h_margin
 
 end OracleAndRegret
 

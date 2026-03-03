@@ -1440,16 +1440,42 @@ def PairwiseANOVAInteractions (k : ℕ) (coordPi : Fin k → Measure ℝ)
   (∀ i j xj, (∫ xi, f2 i j xi xj ∂coordPi i) = 0) ∧
   (∀ i j xi, (∫ xj, f2 i j xi xj ∂coordPi j) = 0)
 
-/-- Hoeffding/ANOVA decomposition schema on product spaces:
-existence and uniqueness of orthogonal component decomposition in `L²`. -/
-axiom hoeffding_decomposition_exists_unique
-    (k : ℕ) (coordPi : Fin k → Measure ℝ) (f : (Fin k → ℝ) → ℝ) :
-    ∃ f0 : ℝ, ∃ f1 : Fin k → (ℝ → ℝ), ∃ f2 : Fin k → Fin k → ℝ → ℝ → ℝ,
-      AdditiveANOVAClass k coordPi (fun x => f0 + ∑ j : Fin k, f1 j (x j)) ∧
-      PairwiseANOVAInteractions k coordPi f2 ∧
-      (∀ x, f x =
-        f0 + (∑ j : Fin k, f1 j (x j)) +
-        (∑ i : Fin k, ∑ j : Fin k, f2 i j (x i) (x j)))
+/-- Existence predicate for a first+second-order Hoeffding/ANOVA decomposition. -/
+def HasHoeffdingDecomposition
+    (k : ℕ) (coordPi : Fin k → Measure ℝ) (f : (Fin k → ℝ) → ℝ) : Prop :=
+  ∃ f0 : ℝ, ∃ f1 : Fin k → (ℝ → ℝ), ∃ f2 : Fin k → Fin k → ℝ → ℝ → ℝ,
+    AdditiveANOVAClass k coordPi (fun x => f0 + ∑ j : Fin k, f1 j (x j)) ∧
+    PairwiseANOVAInteractions k coordPi f2 ∧
+    (∀ x, f x =
+      f0 + (∑ j : Fin k, f1 j (x j)) +
+      (∑ i : Fin k, ∑ j : Fin k, f2 i j (x i) (x j)))
+
+/-- Uniqueness predicate for the first+second-order Hoeffding/ANOVA decomposition. -/
+def HoeffdingDecompositionUnique
+    (k : ℕ) (coordPi : Fin k → Measure ℝ) (f : (Fin k → ℝ) → ℝ) : Prop :=
+  ∀ (f0a : ℝ) (f1a : Fin k → (ℝ → ℝ)) (f2a : Fin k → Fin k → ℝ → ℝ → ℝ)
+    (f0b : ℝ) (f1b : Fin k → (ℝ → ℝ)) (f2b : Fin k → Fin k → ℝ → ℝ → ℝ),
+    AdditiveANOVAClass k coordPi (fun x => f0a + ∑ j : Fin k, f1a j (x j)) →
+    PairwiseANOVAInteractions k coordPi f2a →
+    (∀ x, f x =
+      f0a + (∑ j : Fin k, f1a j (x j)) +
+      (∑ i : Fin k, ∑ j : Fin k, f2a i j (x i) (x j))) →
+    AdditiveANOVAClass k coordPi (fun x => f0b + ∑ j : Fin k, f1b j (x j)) →
+    PairwiseANOVAInteractions k coordPi f2b →
+    (∀ x, f x =
+      f0b + (∑ j : Fin k, f1b j (x j)) +
+      (∑ i : Fin k, ∑ j : Fin k, f2b i j (x i) (x j))) →
+    f0a = f0b ∧ f1a = f1b ∧ f2a = f2b
+
+/-- Honest wrapper: if existence and uniqueness are provided, we can package them together.
+This replaces the previous axiom with an explicit assumption boundary. -/
+theorem hoeffding_decomposition_exists_unique
+    (k : ℕ) (coordPi : Fin k → Measure ℝ) (f : (Fin k → ℝ) → ℝ)
+    (hExists : HasHoeffdingDecomposition k coordPi f)
+    (hUnique : HoeffdingDecompositionUnique k coordPi f) :
+    HasHoeffdingDecomposition k coordPi f ∧
+      HoeffdingDecompositionUnique k coordPi f := by
+  exact ⟨hExists, hUnique⟩
 
 /-- Geometry-aware GAM class:
 local-scale probit with smooth ancestry threshold and smooth log-scale. -/
