@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gnomon · PGS Portability Explorer</title>
   <meta name="description"
-    content="Interactive explorer for PGS portability across populations under genetic drift. All formulas formally proven in Lean 4 / Mathlib.">
+    content="Interactive explorer for polygenic score portability across populations under genetic drift.">
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
@@ -480,9 +480,8 @@
             <input type="range" id="slider-NeT" min="500" max="100000" value="10000" step="500" oninput="updateAll()">
           </div>
           <div class="formula-box">
-            <strong>F_S</strong> = 1 − exp(−t/(2Nₑ_S)), <strong>F_T</strong> = 1 − exp(−t/(2Nₑ_T))<br>
-            <strong>E[ΔVar]</strong> = −(F_T − F_S) · V_A<br>
-            <em>Proven: fstFromGenerations_eq, expectedPGSVarianceDiff_asymmetric</em>
+            Genetic drift accumulates with time and shrinks with population size. A bottlenecked target population
+            drifts faster, losing more PGS variance than the source.
           </div>
         </div>
 
@@ -492,16 +491,14 @@
           </div>
           <div class="control-group">
             <div class="control-label">
-              <span>Scaled migration (M = 4Nₑm)</span>
+              <span>Scaled migration rate (M)</span>
               <span class="control-value" id="val-M">1.00</span>
             </div>
             <input type="range" id="slider-M" min="0.05" max="20" value="1" step="0.05" oninput="updateAll()">
           </div>
           <div class="formula-box">
-            <strong>δ_eq</strong> = 1/(2M+1)<br>
-            <strong>E[T_same]</strong> = 2 coal. units<br>
-            <strong>E[T_diff]</strong> = (2M+1)/M<br>
-            <em>Proven: twoDemeIMEquilibriumDelta_eq</em>
+            Higher gene flow (larger M) means less differentiation between demes. At equilibrium, within-deme
+            coalescence time is always 2 units; between-deme time grows as gene flow decreases.
           </div>
         </div>
 
@@ -531,9 +528,8 @@
             <input type="range" id="slider-maf" min="0.01" max="0.50" value="0.25" step="0.01" oninput="updateAll()">
           </div>
           <div class="formula-box" id="trait-formula-box">
-            h² sets the total genetic variance. L and MAF control the per-locus effect size distribution.<br>
-            <em><a onclick="openProof('additiveGeneticVariance')" style="color:var(--accent-violet);cursor:pointer">Lean
-                proof ↗</a></em>
+            Heritability sets total genetic variance. More causal loci means smaller per-locus effects, which affects
+            how PGS variance fluctuates under drift.
           </div>
           <div class="assumption-note">
             ⚠ Dashboard assumes equal-effect architecture (all loci same β, same MAF). Lean proofs use arbitrary β and p
@@ -575,20 +571,23 @@
           <div class="metric-card indigo">
             <div class="metric-label" id="metric-drift-label">Source Drift (F_S)</div>
             <div class="metric-value" id="metric-drift">0.0247</div>
-            <div class="metric-formula" id="metric-drift-formula">Drift on source branch</div>
+            <div class="metric-formula" id="metric-drift-formula">Genetic drift accumulated in the source population
+            </div>
             <div class="metric-proof" id="metric-drift-proof"><a onclick="openProof('fstFromGenerations')">Lean proof
                 ↗</a></div>
           </div>
           <div class="metric-card cyan">
             <div class="metric-label" id="metric-drift-t-label">Target Drift (F_T)</div>
             <div class="metric-value" id="metric-drift-t">0.0247</div>
-            <div class="metric-formula" id="metric-drift-t-formula">Drift on target branch</div>
+            <div class="metric-formula" id="metric-drift-t-formula">Genetic drift accumulated in the target population
+            </div>
             <div class="metric-proof"><a onclick="openProof('fstFromGenerations')">Lean proof ↗</a></div>
           </div>
           <div class="metric-card amber">
             <div class="metric-label">Expected Mean PGS Shift</div>
             <div class="metric-value" id="metric-mean-shift">0.141</div>
-            <div class="metric-formula">Assumes Δμ ~ Normal (CLT not formally proved)</div>
+            <div class="metric-formula">Typical magnitude of the PGS mean difference due to random drift (assumes
+              normality)</div>
             <div class="metric-proof"><a class="def-link" onclick="openProof('expectedAbsMeanPGSDiff')">Lean def
                 (assumes CLT) ↗</a></div>
           </div>
@@ -598,19 +597,20 @@
           <div class="metric-card indigo">
             <div class="metric-label">Source Var Retained</div>
             <div class="metric-value" id="metric-var-ratio-s">0.975</div>
-            <div class="metric-formula">(1 − F_S) · V_A / V_A</div>
+            <div class="metric-formula">Fraction of ancestral PGS variance remaining in the source</div>
             <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceUnderDrift')">Lean proof ↗</a></div>
           </div>
           <div class="metric-card cyan">
             <div class="metric-label">Target Var Retained</div>
             <div class="metric-value" id="metric-var-ratio-t">0.975</div>
-            <div class="metric-formula">(1 − F_T) · V_A / V_A</div>
+            <div class="metric-formula">Fraction of ancestral PGS variance remaining in the target</div>
             <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceUnderDrift')">Lean proof ↗</a></div>
           </div>
           <div class="metric-card amber">
-            <div class="metric-label">E[Var_T − Var_S] / V_A</div>
+            <div class="metric-label">Variance Difference</div>
             <div class="metric-value" id="metric-var-diff">0.0000</div>
-            <div class="metric-formula">−(F_T − F_S), negative = target lost more variance</div>
+            <div class="metric-formula">Negative means target lost more PGS variance than source (e.g., bottleneck)
+            </div>
             <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceDiff_asymmetric')">Lean proof ↗</a>
             </div>
           </div>
@@ -620,13 +620,13 @@
           <div class="metric-card indigo">
             <div class="metric-label">Coalescent τ (Source)</div>
             <div class="metric-value" id="metric-tau-s">0.025</div>
-            <div class="metric-formula">t/(2Nₑ_S) coalescent units</div>
+            <div class="metric-formula">Drift time scaled by source population size</div>
             <div class="metric-proof"><a onclick="openProof('coalescentTau')">Lean proof ↗</a></div>
           </div>
           <div class="metric-card cyan">
             <div class="metric-label">Coalescent τ (Target)</div>
             <div class="metric-value" id="metric-tau-t">0.025</div>
-            <div class="metric-formula">t/(2Nₑ_T) coalescent units</div>
+            <div class="metric-formula">Drift time scaled by target population size</div>
             <div class="metric-proof"><a onclick="openProof('coalescentTau')">Lean proof ↗</a></div>
           </div>
         </div>
@@ -908,27 +908,27 @@
       document.getElementById('ctrl-L').classList.toggle('hidden', !isPS);
       document.getElementById('ctrl-maf').classList.toggle('hidden', !isPS);
       document.getElementById('trait-formula-box').textContent = isPS
-        ? 'h² sets genetic variance. L and MAF control per-locus effect sizes (affects variance shift).'
-        : 'h² sets genetic variance. Only h² matters for IM (L and MAF cancel out in ratios).';
+        ? 'Heritability sets total genetic variance. More causal loci means smaller per-locus effects, which affects how PGS variance fluctuates under drift.'
+        : 'Heritability sets total genetic variance. Under the island model, only heritability matters (locus count and MAF cancel out).';
 
       // ── Metrics (model-dependent) ──
       if (isPS) {
         // Per-branch drift
         document.getElementById('metric-drift-label').textContent = 'Source Drift (F_S)';
         document.getElementById('metric-drift').textContent = p.fstS.toFixed(4);
-        document.getElementById('metric-drift-formula').textContent = '1 − exp(−t/(2Nₑ_S))';
+        document.getElementById('metric-drift-formula').textContent = 'Genetic drift accumulated in the source population';
         document.getElementById('metric-drift-proof').innerHTML = '<a onclick="openProof(\'fstFromGenerations\')">Lean proof ↗</a>';
         document.getElementById('metric-drift-t-label').textContent = 'Target Drift (F_T)';
         document.getElementById('metric-drift-t').textContent = p.fstT.toFixed(4);
-        document.getElementById('metric-drift-t-formula').textContent = '1 − exp(−t/(2Nₑ_T))';
+        document.getElementById('metric-drift-t-formula').textContent = 'Genetic drift accumulated in the target population';
       } else {
         document.getElementById('metric-drift-label').textContent = 'Equilibrium δ (Source)';
         document.getElementById('metric-drift').textContent = p.fstS.toFixed(4);
-        document.getElementById('metric-drift-formula').textContent = '1/(2M+1)';
+        document.getElementById('metric-drift-formula').textContent = 'Equilibrium differentiation from migration-drift balance';
         document.getElementById('metric-drift-proof').innerHTML = '<a onclick="openProof(\'twoDemeIMEquilibriumDelta\')">Lean proof ↗</a>';
         document.getElementById('metric-drift-t-label').textContent = 'Equilibrium δ (Target)';
         document.getElementById('metric-drift-t').textContent = p.fstT.toFixed(4);
-        document.getElementById('metric-drift-t-formula').textContent = 'Same as source (symmetric IM)';
+        document.getElementById('metric-drift-t-formula').textContent = 'Same as source under symmetric island model';
       }
 
       const absMeanDiff = expectedAbsMeanDiff(p.va, p.d);
