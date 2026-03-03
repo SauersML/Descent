@@ -1688,6 +1688,197 @@ noncomputable def expectedSqMeanPGSDiff_IMFiniteTau {L : ℕ}
   expectedSqMeanPGSDiff β pAnc
     (2 * twoDemeIMHudsonFiniteTauFromGenerator M τ)
 
+/-! #### Expected PGS Variance Difference Between Populations -/
+
+/-- Population-specific PGS variance for a population with allele frequencies `p`:
+`Var(PGS) = Σ_ℓ β_ℓ² · 2 p_ℓ(1 - p_ℓ)` (Hardy–Weinberg, unlinked loci).
+This is identical to `additiveGeneticVariance` evaluated at that population's frequencies. -/
+noncomputable def pgsVarianceAtFreqs {L : ℕ}
+    (β : Fin L → ℝ) (p : Fin L → ℝ) : ℝ :=
+  additiveGeneticVariance β p
+
+/-- Expected PGS variance in a drifted population:
+`E[Var_pop(PGS)] = (1 - d) · V_A_anc`
+where `d` is the branch drift factor and `V_A_anc` is the ancestral additive genetic variance.
+
+This follows from the Balding–Nichols identity:
+`E[p_drift(1 - p_drift) | p_anc] = (1 - d) · p_anc(1 - p_anc)`.
+Summing over loci: `E[Var_pop] = (1-d) · Σ β² · 2p(1-p) = (1-d) · V_A`. -/
+noncomputable def expectedPGSVarianceUnderDrift {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (driftFactor : ℝ) : ℝ :=
+  (1 - driftFactor) * additiveGeneticVariance β pAnc
+
+theorem expectedPGSVarianceUnderDrift_eq {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (d : ℝ) :
+    expectedPGSVarianceUnderDrift β pAnc d =
+      (1 - d) * additiveGeneticVariance β pAnc := by
+  rfl
+
+/-- At zero drift, expected PGS variance equals ancestral V_A. -/
+theorem expectedPGSVarianceUnderDrift_zero {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) :
+    expectedPGSVarianceUnderDrift β pAnc 0 = additiveGeneticVariance β pAnc := by
+  unfold expectedPGSVarianceUnderDrift; ring
+
+/-- At full drift (d = 1), expected PGS variance is zero (all loci fixed). -/
+theorem expectedPGSVarianceUnderDrift_one {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) :
+    expectedPGSVarianceUnderDrift β pAnc 1 = 0 := by
+  unfold expectedPGSVarianceUnderDrift; ring
+
+/-- **Expected PGS variance difference between target and source populations:**
+`E[Var_T(PGS) - Var_S(PGS)] = -(d_T - d_S) · V_A_anc`
+where `d_T`, `d_S` are the branch drift factors for each population.
+
+Derivation:
+  `E[Var_T] = (1 - d_T) · V_A`
+  `E[Var_S] = (1 - d_S) · V_A`
+  `E[Var_T - Var_S] = ((1-d_T) - (1-d_S)) · V_A = -(d_T - d_S) · V_A` -/
+noncomputable def expectedPGSVarianceDiff {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (dT dS : ℝ) : ℝ :=
+  expectedPGSVarianceUnderDrift β pAnc dT - expectedPGSVarianceUnderDrift β pAnc dS
+
+theorem expectedPGSVarianceDiff_eq {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (dT dS : ℝ) :
+    expectedPGSVarianceDiff β pAnc dT dS =
+      -(dT - dS) * additiveGeneticVariance β pAnc := by
+  unfold expectedPGSVarianceDiff expectedPGSVarianceUnderDrift; ring
+
+/-- **Expected magnitude** of PGS variance difference:
+`E[|Var_T - Var_S|] = |d_T - d_S| · V_A_anc`. -/
+noncomputable def expectedAbsPGSVarianceDiff {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (dT dS : ℝ) : ℝ :=
+  |dT - dS| * additiveGeneticVariance β pAnc
+
+theorem expectedAbsPGSVarianceDiff_eq_abs {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (dT dS : ℝ) :
+    expectedAbsPGSVarianceDiff β pAnc dT dS =
+      |expectedPGSVarianceDiff β pAnc dT dS| := by
+  unfold expectedAbsPGSVarianceDiff expectedPGSVarianceDiff expectedPGSVarianceUnderDrift
+  rw [abs_mul, abs_neg]; ring_nf
+  rw [abs_of_nonneg (abs_nonneg _)]
+
+/-- **Symmetric split:** both branches have equal drift `F`, so `d_T = d_S = F`.
+The variance difference is exactly zero: `E[Var_T - Var_S] = 0`.
+Unlike the *mean* difference, the *variance* difference vanishes under symmetric divergence. -/
+theorem expectedPGSVarianceDiff_symmetric {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ) :
+    expectedPGSVarianceDiff β pAnc F F = 0 := by
+  rw [expectedPGSVarianceDiff_eq]; ring
+
+/-- **Asymmetric split:** source branch drift `F_S`, target branch drift `F_T`.
+`E[Var_T - Var_S] = -(F_T - F_S) · V_A`.
+The target has **lower** PGS variance when `F_T > F_S` (more drift → less variance). -/
+theorem expectedPGSVarianceDiff_asymmetric {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (FT FS : ℝ) :
+    expectedPGSVarianceDiff β pAnc FT FS =
+      -(FT - FS) * additiveGeneticVariance β pAnc :=
+  expectedPGSVarianceDiff_eq β pAnc FT FS
+
+/-- Coancestry-matrix version:
+`E[Var_T - Var_S] = -(f_TT - f_SS) · V_A`
+where `f_TT` and `f_SS` are the within-population coancestry coefficients. -/
+theorem expectedPGSVarianceDiff_coancestry {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (fTT fSS : ℝ) :
+    expectedPGSVarianceDiff β pAnc fTT fSS =
+      -(fTT - fSS) * additiveGeneticVariance β pAnc :=
+  expectedPGSVarianceDiff_eq β pAnc fTT fSS
+
+/-! ##### Model-Specific Variance Difference Instantiations -/
+
+/-- **Pure split model:** both populations split from ancestor at same time,
+but possibly with different effective sizes.
+With `d_S = fst(t, Ne_S)` and `d_T = fst(t, Ne_T)`:
+`E[Var_T - Var_S] = -(fst_T - fst_S) · V_A`. -/
+noncomputable def expectedPGSVarianceDiff_pureSplit {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (tT NeT tS NeS : ℝ) : ℝ :=
+  expectedPGSVarianceDiff β pAnc (fstFromGenerations tT NeT) (fstFromGenerations tS NeS)
+
+theorem expectedPGSVarianceDiff_pureSplit_eq {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (tT NeT tS NeS : ℝ) :
+    expectedPGSVarianceDiff_pureSplit β pAnc tT NeT tS NeS =
+      -(fstFromGenerations tT NeT - fstFromGenerations tS NeS) *
+        additiveGeneticVariance β pAnc := by
+  unfold expectedPGSVarianceDiff_pureSplit
+  exact expectedPGSVarianceDiff_eq β pAnc _ _
+
+/-- Coalescent-time version:
+`E[Var_T - Var_S] = -(fst(τ_T) - fst(τ_S)) · V_A`. -/
+noncomputable def expectedPGSVarianceDiff_coalescent {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (τT τS : ℝ) : ℝ :=
+  expectedPGSVarianceDiff β pAnc (fstFromTau τT) (fstFromTau τS)
+
+theorem expectedPGSVarianceDiff_coalescent_eq {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (τT τS : ℝ) :
+    expectedPGSVarianceDiff_coalescent β pAnc τT τS =
+      -(fstFromTau τT - fstFromTau τS) * additiveGeneticVariance β pAnc := by
+  unfold expectedPGSVarianceDiff_coalescent
+  exact expectedPGSVarianceDiff_eq β pAnc _ _
+
+/-- **Explicit coalescent formula** using `fst(τ) = 1 - exp(-τ)`:
+`E[Var_T - Var_S] = (exp(-τ_T) - exp(-τ_S)) · V_A`. -/
+theorem expectedPGSVarianceDiff_coalescent_explicit {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (τT τS : ℝ) :
+    expectedPGSVarianceDiff_coalescent β pAnc τT τS =
+      (Real.exp (-τT) - Real.exp (-τS)) * additiveGeneticVariance β pAnc := by
+  rw [expectedPGSVarianceDiff_coalescent_eq]
+  unfold fstFromTau; ring
+
+/-- **IM equilibrium variance difference:** In a two-deme IM model at equilibrium,
+within-deme PGS variance uses `d = fst_within = f₀` (identity by descent within deme),
+and between-deme uses the between-deme drift.
+For same-size demes at equilibrium: `d = 1/(2M+1)` for the divergence scalar,
+but intra-population drift differs from inter-population divergence.
+
+Under the structured coalescent at equilibrium with `M = 4Nₑm`:
+`d_within = scaling factor from within-deme coalescence`.
+
+For simplicity, we express the IM equilibrium variance in terms of the
+equilibrium delta `δ = 1/(2M+1)`:
+`E[Var_T] = (1 - d_T) · V_A`, `E[Var_S] = (1 - d_S) · V_A`.
+At equilibrium with symmetric demes, `d_T = d_S`, so `E[Var_T - Var_S] = 0`. -/
+theorem expectedPGSVarianceDiff_IMEquilibrium_symmetric {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (M : ℝ) :
+    expectedPGSVarianceDiff β pAnc
+      (twoDemeIMEquilibriumDelta M) (twoDemeIMEquilibriumDelta M) = 0 :=
+  expectedPGSVarianceDiff_symmetric β pAnc _
+
+/-- For asymmetric cases (e.g., source deme has experienced more drift than target),
+the magnitude is `|d_T - d_S| · V_A`. This is the variance-difference analogue
+of the mean-difference formula `Var(Δμ) = 2d · V_A`. -/
+noncomputable def expectedAbsPGSVarianceDiff_asymmetric {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (dT dS : ℝ) : ℝ :=
+  expectedAbsPGSVarianceDiff β pAnc dT dS
+
+/-- **Key contrast with mean difference:**
+The mean PGS difference magnitude scales as `√(2d · V_A)` (grows with drift),
+while the variance difference is `|d_T - d_S| · V_A` (vanishes under symmetric drift).
+This makes the variance difference a *differential drift* indicator,
+not a *total drift* indicator. -/
+theorem varianceDiff_vs_meanDiff_scaling {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (d : ℝ) :
+    -- Under symmetric split (d_T = d_S = d): variance diff = 0
+    expectedPGSVarianceDiff β pAnc d d = 0 ∧
+    -- But mean diff variance = 2·(2d)·V_A = 4d·V_A > 0 (generically)
+    varianceMeanPGSDiff β pAnc (2 * d) = 4 * d * additiveGeneticVariance β pAnc := by
+  constructor
+  · exact expectedPGSVarianceDiff_symmetric β pAnc d
+  · rw [varianceMeanPGSDiff_eq_twice_drift_VA]; ring
+
+/-! ##### End-to-End Variance Difference Theorems -/
+
+/-- **End-to-end theorem (pure split, asymmetric):**
+Given unequal divergence times/sizes, the expected PGS variance difference is:
+`E[Var_T - Var_S] = (exp(-t_T/(2Ne_T)) - exp(-t_S/(2Ne_S))) · V_A`. -/
+theorem endToEnd_expectedPGSVarianceDiff_pureSplit {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (tT NeT tS NeS : ℝ) :
+    expectedPGSVarianceDiff_pureSplit β pAnc tT NeT tS NeS =
+      (Real.exp (-(tT / (2 * NeT))) - Real.exp (-(tS / (2 * NeS)))) *
+        (∑ i : Fin L, β i ^ 2 * (2 * pAnc i * (1 - pAnc i))) := by
+  rw [expectedPGSVarianceDiff_pureSplit_eq]
+  unfold fstFromGenerations fstFromTau coalescentTau additiveGeneticVariance alleleScale
+  ring
+
 /-! #### Bundled End-to-End Theorems -/
 
 /-- **End-to-end theorem (pure split):**
