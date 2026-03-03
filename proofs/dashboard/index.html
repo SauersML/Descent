@@ -508,13 +508,13 @@
           </div>
           <div class="control-group">
             <div class="control-label">
-              <span>Heritability (h²)</span>
-              <span class="control-value" id="val-h2">0.50</span>
+              <span>Ancestral Additive Genetic Var. (V_A)</span>
+              <span class="control-value" id="val-va">0.50</span>
             </div>
-            <input type="range" id="slider-h2" min="0.01" max="0.99" value="0.5" step="0.01" oninput="updateAll()">
+            <input type="range" id="slider-va" min="0.01" max="0.99" value="0.5" step="0.01" oninput="updateAll()">
           </div>
           <div class="formula-box" id="trait-formula-box">
-            Heritability sets the total additive genetic variance.
+            The additive genetic variance (V_A) linearly scales all expected variance differences.
           </div>
         </div>
 
@@ -527,8 +527,6 @@
             predicting a trait<br>
             <strong style="color:var(--accent-indigo)">V_A</strong> — additive genetic variance: how much PGS varies in
             the ancestral population<br>
-            <strong style="color:var(--accent-indigo)">h²</strong> — heritability: fraction of trait variation explained
-            by genetics<br>
             <strong style="color:var(--accent-indigo)">Nₑ</strong> — effective population size: genetic equivalent of
             census size<br>
             <strong style="color:var(--accent-indigo)">M</strong> — scaled migration: 4Nₑm, higher = more gene flow
@@ -565,10 +563,9 @@
             <div class="metric-proof"><a onclick="openProof('fstFromGenerations')">Lean proof ↗</a></div>
           </div>
           <div class="metric-card amber">
-            <div class="metric-label">Expected Mean PGS Shift</div>
+            <div class="metric-label">Typical Mean Shift Magnitude</div>
             <div class="metric-value" id="metric-mean-shift">0.141</div>
-            <div class="metric-formula">Typical magnitude of the PGS mean difference due to random drift (assumes
-              normality)</div>
+            <div class="metric-formula">Expected absolute difference |Δμ| between populations due to random drift</div>
             <div class="metric-proof"><a class="def-link" onclick="openProof('expectedAbsMeanPGSDiff')">Lean def
                 (assumes CLT) ↗</a></div>
           </div>
@@ -752,8 +749,7 @@
       const NeS = parseFloat(document.getElementById('slider-NeS').value);
       const NeT = parseFloat(document.getElementById('slider-NeT').value);
       const M = parseFloat(document.getElementById('slider-M').value);
-      const h2 = parseFloat(document.getElementById('slider-h2').value);
-      const va = h2; // by construction, additive genetic variance = heritability
+      const va = parseFloat(document.getElementById('slider-va').value);
 
       let fstS, fstT, d;
       if (model === 'pure_split') {
@@ -767,7 +763,7 @@
         d = 2 * fstS;
       }
 
-      return { model, t, NeS, NeT, M, h2, va, fstS, fstT, d };
+      return { model, t, NeS, NeT, M, va, fstS, fstT, d };
     }
 
     function gaussian(x, mu, sigma) {
@@ -845,7 +841,7 @@
       document.getElementById('val-t').textContent = p.t;
       document.getElementById('val-NeS').textContent = p.NeS.toLocaleString();
       document.getElementById('val-NeT').textContent = p.NeT.toLocaleString();
-      document.getElementById('val-h2').textContent = p.h2.toFixed(2);
+      document.getElementById('val-va').textContent = p.va.toFixed(2);
 
       // ── Show/hide model-specific sections ──
       const isPS = p.model === 'pure_split';
@@ -905,19 +901,22 @@
       document.getElementById('metric-tau-s').textContent = tauS.toFixed(4);
       document.getElementById('metric-tau-t').textContent = tauT.toFixed(4);
 
-      // ── Mean distribution (asymmetric) ──
+      // Mean distribution (asymmetric variance, zero expected mean diff)
       // Source variance: (1 - F_S) · V_A
       // Target variance: (1 - F_T) · V_A
       const sigS = Math.sqrt(Math.max(0.001, expectedVarUnderDrift(p.va, p.fstS)));
       const sigT = Math.sqrt(Math.max(0.001, expectedVarUnderDrift(p.va, p.fstT)));
-      const shift = expectedAbsMeanDiff(p.va, p.d);
-      const xRange = Math.max(3 * sigS, shift + 3 * sigT);
-      const xs = linspace(-xRange, xRange + shift, 200);
+      const sigmaDeltaMu = Math.sqrt(varMeanDiff(p.va, p.d)); // std dev of the mean shift
+
+      const xRange = Math.max(4 * sigS, sigmaDeltaMu + 3 * sigT);
+      const xs = linspace(-xRange, xRange, 200);
       charts.psMeanDist.data = {
         labels: xs.map(x => x.toFixed(2)),
         datasets: [
           ds('Source (Nₑ=' + p.NeS.toLocaleString() + ')', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
-          ds('Target (Nₑ=' + p.NeT.toLocaleString() + ', drifted)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
+          ds('Target (expected)', xs.map(x => gaussian(x, 0, sigT)), '#f59e0b', { fill: true, borderWidth: 3 }),
+          ds('Target (+1σ mean shift)', xs.map(x => gaussian(x, sigmaDeltaMu, sigT)), '#f59e0b', { borderDash: [4, 4], borderWidth: 1 }),
+          ds('Target (−1σ mean shift)', xs.map(x => gaussian(x, -sigmaDeltaMu, sigT)), '#f59e0b', { borderDash: [4, 4], borderWidth: 1 }),
         ]
       };
       charts.psMeanDist.update('none');
@@ -960,14 +959,17 @@
       const sigS = Math.sqrt(p.va);
       const eVarT = expectedVarUnderDrift(p.va, delta);
       const sigT = Math.sqrt(Math.max(0.001, eVarT));
-      const shift = expectedAbsMeanDiff(p.va, 2 * delta);
-      const xRange = Math.max(3 * sigS, shift + 3 * sigT);
-      const xs = linspace(-xRange, xRange + shift, 200);
+      const sigmaDeltaMu = Math.sqrt(varMeanDiff(p.va, 2 * delta));
+
+      const xRange = Math.max(4 * sigS, sigmaDeltaMu + 3 * sigT);
+      const xs = linspace(-xRange, xRange, 200);
       charts.imMeanDist.data = {
         labels: xs.map(x => x.toFixed(2)),
         datasets: [
           ds('Source N(0, V_A)', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
-          ds('Target N(E[|Δμ|], (1−δ)V_A)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
+          ds('Target expected N(0, (1−δ)V_A)', xs.map(x => gaussian(x, 0, sigT)), '#f59e0b', { fill: true, borderWidth: 3 }),
+          ds('Target +1σ shift', xs.map(x => gaussian(x, sigmaDeltaMu, sigT)), '#f59e0b', { borderDash: [4, 4], borderWidth: 1 }),
+          ds('Target −1σ shift', xs.map(x => gaussian(x, -sigmaDeltaMu, sigT)), '#f59e0b', { borderDash: [4, 4], borderWidth: 1 }),
         ]
       };
       charts.imMeanDist.update('none');
