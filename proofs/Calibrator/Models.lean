@@ -1221,10 +1221,9 @@ def spectralEllipsoidClass {X : Type*} [MeasurableSpace X]
 
 /-- Assumption bundle for RKHS/spectral regularity facts used downstream.
 These are parameterized hypotheses rather than kernel-level axioms. -/
-structure RKHSRegularityAssumptions : Prop where
+structure RKHSRegularityAssumptions (X : Type*) [MeasurableSpace X] : Prop where
   spectralProjector_approximation_rate :
-    ∀ {X : Type*} [MeasurableSpace X]
-      (sd : SobolevData X) (md : MaternSpectralData X)
+    ∀ (sd : SobolevData X) (md : MaternSpectralData X)
       (s r : ℝ) (hsr : r ≤ s)
       (cApprox : ℝ) (hcApprox_nonneg : 0 ≤ cApprox),
       ∀ f : X → ℝ, InHSobolev sd s f →
@@ -1232,8 +1231,7 @@ structure RKHSRegularityAssumptions : Prop where
           sobolevNorm sd r (fun x => f x - spectralProjector md m f x)
             ≤ cApprox * (md.eigVal m) ^ (-(s - r) / 2) * sobolevNorm sd s f
   spectralProjector_approximation_rate_weyl :
-    ∀ {X : Type*} [MeasurableSpace X]
-      (sd : SobolevData X) (md : MaternSpectralData X)
+    ∀ (sd : SobolevData X) (md : MaternSpectralData X)
       (s r d : ℝ) (hsr : r ≤ s) (hd : 0 < d)
       (cApprox : ℝ) (hcApprox_nonneg : 0 ≤ cApprox),
       ∀ f : X → ℝ, InHSobolev sd s f →
@@ -1241,12 +1239,11 @@ structure RKHSRegularityAssumptions : Prop where
           sobolevNorm sd r (fun x => f x - spectralProjector md m f x)
             ≤ cApprox * (m : ℝ) ^ (-(s - r) / d) * sobolevNorm sd s f
   spectralProjector_dense_in_HSobolev :
-    ∀ {X : Type*} [MeasurableSpace X]
-      (sd : SobolevData X) (md : MaternSpectralData X) (s r : ℝ) (hsr : r ≤ s),
+    ∀ (sd : SobolevData X) (md : MaternSpectralData X) (s r : ℝ) (hsr : r ≤ s),
       ∀ f : X → ℝ, InHSobolev sd s f →
         ∀ ε > 0, ∃ m : ℕ, sobolevNorm sd r (fun x => f x - spectralProjector md m f x) < ε
   representer_theorem_matern_empirical :
-    ∀ {X Y : Type*} [MeasurableSpace X]
+    ∀ {Y : Type*}
       (md : MaternSpectralData X) (ν κ λ : ℝ) (n : ℕ)
       (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n)
       (F : Set (X → ℝ)) (fStar : X → ℝ),
@@ -1255,8 +1252,7 @@ structure RKHSRegularityAssumptions : Prop where
         (fun z : X => ∑ i : Fin n, α i * maternKernel md ν κ (sample.x i) z) ∈ F) →
       InKernelSpanAtSample (maternKernel md ν κ) n sample.x fStar
   tikhonov_ivanov_equivalence_matern :
-    ∀ {X : Type*} [MeasurableSpace X]
-      (md : MaternSpectralData X) (ν κ : ℝ)
+    ∀ (md : MaternSpectralData X) (ν κ : ℝ)
       (L : (X → ℝ) → ℝ) (F : Set (X → ℝ)),
       (∀ λ > 0, ∃ B ≥ 0, ∀ fStar, IsTikhonovMinimizerMatern md ν κ λ L F fStar →
         IsIvanovMinimizerMatern md ν κ B L F fStar) ∧
@@ -1267,7 +1263,7 @@ structure RKHSRegularityAssumptions : Prop where
 Sobolev regularity implies spectral projection error decay in lower Sobolev norm. -/
 theorem spectralProjector_approximation_rate
     {X : Type*} [MeasurableSpace X]
-    (h_rkhs : RKHSRegularityAssumptions)
+    (h_rkhs : RKHSRegularityAssumptions X)
     (sd : SobolevData X) (md : MaternSpectralData X)
     (s r : ℝ) (hsr : r ≤ s)
     (cApprox : ℝ) (hcApprox_nonneg : 0 ≤ cApprox) :
@@ -1280,7 +1276,7 @@ theorem spectralProjector_approximation_rate
 /-- Weyl-law corollary schema: convert eigenvalue-rate bound to `m`-rate bound. -/
 theorem spectralProjector_approximation_rate_weyl
     {X : Type*} [MeasurableSpace X]
-    (h_rkhs : RKHSRegularityAssumptions)
+    (h_rkhs : RKHSRegularityAssumptions X)
     (sd : SobolevData X) (md : MaternSpectralData X)
     (s r d : ℝ) (hsr : r ≤ s) (hd : 0 < d)
     (cApprox : ℝ) (hcApprox_nonneg : 0 ≤ cApprox) :
@@ -1293,7 +1289,7 @@ theorem spectralProjector_approximation_rate_weyl
 /-- Density schema: finite spectral truncations approximate any `H^s` function. -/
 theorem spectralProjector_dense_in_HSobolev
     {X : Type*} [MeasurableSpace X]
-    (h_rkhs : RKHSRegularityAssumptions)
+    (h_rkhs : RKHSRegularityAssumptions X)
     (sd : SobolevData X) (md : MaternSpectralData X) (s r : ℝ) (hsr : r ≤ s) :
     ∀ f : X → ℝ, InHSobolev sd s f →
       ∀ ε > 0, ∃ m : ℕ, sobolevNorm sd r (fun x => f x - spectralProjector md m f x) < ε :=
@@ -1333,7 +1329,7 @@ def InKernelSpanAtSample {X : Type*} [MeasurableSpace X]
 Matérn kernel/RKHS geometry: any minimizer has a finite expansion over training points. -/
 theorem representer_theorem_matern_empirical
     {X Y : Type*} [MeasurableSpace X]
-    (h_rkhs : RKHSRegularityAssumptions)
+    (h_rkhs : RKHSRegularityAssumptions X)
     (md : MaternSpectralData X) (ν κ λ : ℝ) (n : ℕ)
     (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n)
     (F : Set (X → ℝ)) (fStar : X → ℝ)
@@ -1372,7 +1368,7 @@ def IsIvanovMinimizerMatern {X : Type*} [MeasurableSpace X]
 for suitable parameter matching, minimizers coincide. -/
 theorem tikhonov_ivanov_equivalence_matern
     {X : Type*} [MeasurableSpace X]
-    (h_rkhs : RKHSRegularityAssumptions)
+    (h_rkhs : RKHSRegularityAssumptions X)
     (md : MaternSpectralData X) (ν κ : ℝ)
     (L : (X → ℝ) → ℝ) (F : Set (X → ℝ)) :
     (∀ λ > 0, ∃ B ≥ 0, ∀ fStar, IsTikhonovMinimizerMatern md ν κ λ L F fStar →
