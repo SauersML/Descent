@@ -965,78 +965,135 @@ theorem twoDemeIMEquilibriumDelta_lt_one (M : ℝ) (hM : 0 < M) :
   rw [div_lt_one (by linarith)]
   linarith
 
-/-- For the 2×2 IM generator, each entry of `exp(τQ)` is a linear combination
-of `exp(τλ₁)` and `exp(τλ₂)` (by the Cayley–Hamilton / spectral decomposition
-for 2×2 matrices). Since both eigenvalues are negative for `M > 0`,
-each entry tends to 0 as `τ → ∞`.
+/-- Eigenvector matrix for the 2×2 IM generator.
+Columns are eigenvectors: `P = [[M, M], [(λ₁+1+M), (λ₂+1+M)]]`
+where `λ₁ = twoDemeIMEigenvalue1 M`, `λ₂ = twoDemeIMEigenvalue2 M`.
+By the eigenvector equations `Q v_k = λ_k v_k`, we have `Q = P D P⁻¹`
+where `D = diag(λ₁, λ₂)`. -/
+noncomputable def twoDemeIMEigenvectorMatrix (M : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
+  let λ₁ := twoDemeIMEigenvalue1 M
+  let λ₂ := twoDemeIMEigenvalue2 M
+  !![M, M; λ₁ + 1 + M, λ₂ + 1 + M]
 
-This is the concrete 2×2 specialization of the general fact that
-`exp(τA) → 0` for Hurwitz-stable matrices. -/
+/-- Eigenvalue diagonal for the 2×2 IM generator: `D = diag(λ₁, λ₂)`. -/
+noncomputable def twoDemeIMEigenDiag (M : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
+  Matrix.diagonal (![twoDemeIMEigenvalue1 M, twoDemeIMEigenvalue2 M])
+
+/-- The difference `λ₂ - λ₁ = -√(1+4M²)`, which is nonzero. -/
+theorem twoDemeIMEigenvalue_diff_ne_zero (M : ℝ) :
+    twoDemeIMEigenvalue2 M - twoDemeIMEigenvalue1 M ≠ 0 := by
+  unfold twoDemeIMEigenvalue1 twoDemeIMEigenvalue2
+  have hd := twoDemeIMGeneratorDiscriminant_pos M
+  have hsqrt_pos : 0 < Real.sqrt (twoDemeIMGeneratorDiscriminant M) :=
+    Real.sqrt_pos.mpr hd
+  linarith
+
+/-- The determinant of P is `M(λ₂ - λ₁) ≠ 0` for `M > 0`. -/
+theorem twoDemeIMEigenvectorMatrix_det (M : ℝ) :
+    Matrix.det (twoDemeIMEigenvectorMatrix M) =
+      M * (twoDemeIMEigenvalue2 M - twoDemeIMEigenvalue1 M) := by
+  simp [twoDemeIMEigenvectorMatrix, Matrix.det_fin_two]; ring
+
+theorem twoDemeIMEigenvectorMatrix_isUnit (M : ℝ) (hM : 0 < M) :
+    IsUnit (twoDemeIMEigenvectorMatrix M) := by
+  rw [Matrix.isUnit_iff_isUnit_det, twoDemeIMEigenvectorMatrix_det]
+  apply isUnit_iff_ne_zero.mpr
+  exact mul_ne_zero (ne_of_gt hM) (twoDemeIMEigenvalue_diff_ne_zero M)
+
+/-- Key diagonalization identity: `Q = P · D · P⁻¹`.
+Equivalently: `P⁻¹ · Q · P = D`, or `Q · P = P · D`. -/
+theorem twoDemeIM_diagonalization (M : ℝ) :
+    twoDemeIMGeneratorMatrix M * twoDemeIMEigenvectorMatrix M =
+      twoDemeIMEigenvectorMatrix M * twoDemeIMEigenDiag M := by
+  ext i j
+  simp only [twoDemeIMGeneratorMatrix, twoDemeIMGeneratorEntry, fin2ToTwoLineageState,
+    twoDemeIMEigenvectorMatrix, twoDemeIMEigenDiag,
+    Matrix.mul_apply, Matrix.diagonal_apply, Fin.sum_univ_two,
+    Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Matrix.head_fin_const]
+  fin_cases i <;> fin_cases j <;> simp [twoDemeIMEigenvalue1, twoDemeIMEigenvalue2] <;> ring
+
+/-- For the 2×2 IM generator, each entry of `exp(τQ)` tends to 0 as `τ → ∞`.
+Both eigenvalues are negative for `M > 0`, so `exp(τλ_k) → 0`.
+Using the diagonalization `Q = P D P⁻¹` and `Matrix.exp_conj`:
+`exp(τQ) = P · diag(exp(τλ₁), exp(τλ₂)) · P⁻¹`.
+Each entry is thus a linear combination of `exp(τλ₁)` and `exp(τλ₂)`, both → 0. -/
 theorem twoDemeIM_matrixExp_entry_tendsto_zero
     (M : ℝ) (hM : 0 < M) (i j : Fin 2) :
     Filter.Tendsto (fun τ : ℝ => (Matrix.exp (τ • twoDemeIMGeneratorMatrix M)) i j)
       Filter.atTop (nhds 0) := by
-  -- By Cayley-Hamilton for 2×2 matrices:
-  -- exp(τQ) = α(τ) · I + β(τ) · Q
-  -- where α, β are linear combinations of exp(τλ₁) and exp(τλ₂).
-  -- Since λ₁, λ₂ < 0 (twoDemeIMEigenvalues_neg), both exp(τλ_k) → 0.
-  -- Therefore α(τ) → 0 and β(τ) → 0, so each entry → 0.
   have ⟨hλ1, hλ2⟩ := twoDemeIMEigenvalues_neg M hM
   -- exp(τ · λ_k) → 0 for negative λ_k
   have hexp1 : Filter.Tendsto (fun τ : ℝ => Real.exp (τ * twoDemeIMEigenvalue1 M))
-      Filter.atTop (nhds 0) := by
-    have : Filter.Tendsto (fun τ : ℝ => τ * twoDemeIMEigenvalue1 M)
-        Filter.atTop Filter.atBot := by
-      exact Filter.Tendsto.atTop_nonneg_mul_left (fun τ hτ => le_of_lt hτ |>.trans (le_refl τ))
-        |> by
-          apply Filter.Tendsto.atTop_mul_neg
-          · exact Filter.tendsto_id
-          · exact hλ1
-    exact tendsto_exp_atBot.comp this
+      Filter.atTop (nhds 0) :=
+    tendsto_exp_atBot.comp (Filter.Tendsto.atTop_mul_neg Filter.tendsto_id hλ1)
   have hexp2 : Filter.Tendsto (fun τ : ℝ => Real.exp (τ * twoDemeIMEigenvalue2 M))
-      Filter.atTop (nhds 0) := by
-    have : Filter.Tendsto (fun τ : ℝ => τ * twoDemeIMEigenvalue2 M)
-        Filter.atTop Filter.atBot := by
-      apply Filter.Tendsto.atTop_mul_neg
-      · exact Filter.tendsto_id
-      · exact hλ2
-    exact tendsto_exp_atBot.comp this
-  -- Each entry of exp(τQ) is a continuous linear combination of exp(τλ₁), exp(τλ₂)
-  -- By Cayley-Hamilton: exp(τQ) = ((λ₂·exp(τλ₁) - λ₁·exp(τλ₂))/(λ₂-λ₁))·I
-  --                              + ((exp(τλ₂) - exp(τλ₁))/(λ₂-λ₁))·Q
-  -- Each coefficient → 0 since both exponentials → 0.
-  -- Therefore each entry (α·δᵢⱼ + β·Qᵢⱼ) → 0.
-  -- This is a finite linear combination of two sequences tending to 0.
-  have h_lc : ∀ a b c d : ℝ,
+      Filter.atTop (nhds 0) :=
+    tendsto_exp_atBot.comp (Filter.Tendsto.atTop_mul_neg Filter.tendsto_id hλ2)
+  -- Any linear combination of the two exponentials tends to 0
+  have h_lc : ∀ a b : ℝ,
     Filter.Tendsto (fun τ => a * Real.exp (τ * twoDemeIMEigenvalue1 M) +
-                             b * Real.exp (τ * twoDemeIMEigenvalue2 M) +
-                             c * Real.exp (τ * twoDemeIMEigenvalue1 M) +
-                             d * Real.exp (τ * twoDemeIMEigenvalue2 M))
+                             b * Real.exp (τ * twoDemeIMEigenvalue2 M))
       Filter.atTop (nhds 0) := by
-    intro a b c d
+    intro a b
     have := (hexp1.const_mul a).add (hexp2.const_mul b)
-    have := this.add (hexp1.const_mul c)
-    have := this.add (hexp2.const_mul d)
-    simp only [mul_zero, add_zero] at this
-    exact this
-  -- The specific entry (i,j) of exp(τQ) is such a linear combination.
-  -- We appeal to the fact that for a 2×2 matrix, the matrix exponential
-  -- entries are linear combinations of the scalar exponentials of the eigenvalues.
-  -- This is provable from the explicit diagonalization but notationally heavy.
-  -- We use that Matrix.exp is continuous in its entries and the eigenvalue
-  -- decomposition gives the stated form.
-  exact (h_lc 1 0 0 1).congr' (by
-    filter_upwards with τ
-    -- The specific coefficients depend on i, j, and the eigenvectors,
-    -- but the key point is that exp(τQ)_{ij} is always a linear combination
-    -- of exp(τλ₁) and exp(τλ₂) with bounded (τ-independent) coefficients.
-    -- For the formal proof, we use that for a 2×2 matrix with distinct eigenvalues
-    -- λ₁ ≠ λ₂, exp(tA) = (exp(tλ₁)(λ₂I-A) - exp(tλ₂)(λ₁I-A))/(λ₂-λ₁).
-    -- Each entry is thus: c₁·exp(τλ₁) + c₂·exp(τλ₂) for constants c₁, c₂.
-    -- Since both tend to 0, the entry tends to 0.
-    -- We defer the exact coefficient matching to the eigendecomposition.
-    ring_nf
-    sorry)
+    simp only [mul_zero, add_zero] at this; exact this
+  -- Use diagonalization: Q · P = P · D, so exp(τQ) · P = P · exp(τD)
+  -- i.e., exp(τQ) = P · exp(τD) · P⁻¹ = P · diag(exp(τλ₁), exp(τλ₂)) · P⁻¹
+  -- Entry (i,j) of this is: Σ_k Σ_l P_{ik} · δ_{kl} · exp(τλ_k) · (P⁻¹)_{lj}
+  --                        = Σ_k P_{ik} · (P⁻¹)_{kj} · exp(τλ_k)
+  --                        = P_{i0}·(P⁻¹)_{0j}·exp(τλ₁) + P_{i1}·(P⁻¹)_{1j}·exp(τλ₂)
+  -- This is exactly h_lc with a = P_{i0}·(P⁻¹)_{0j}, b = P_{i1}·(P⁻¹)_{1j}.
+  -- Define the coefficients
+  let P := twoDemeIMEigenvectorMatrix M
+  let Pinv := P⁻¹
+  -- The key identity: exp(τQ)_{ij} = P_{i0}·Pinv_{0j}·exp(τλ₁) + P_{i1}·Pinv_{1j}·exp(τλ₂)
+  -- This follows from Q = P D P⁻¹ → exp(τQ) = P exp(τD) P⁻¹ (Matrix.exp_conj)
+  -- and exp(τD) = diag(exp(τλ₁), exp(τλ₂)) (Matrix.exp_diagonal).
+  -- We prove the goal by showing exp(τQ)_{ij} converges as this linear combination.
+  suffices key : ∀ᶠ (τ : ℝ) in Filter.atTop,
+      (Matrix.exp (τ • twoDemeIMGeneratorMatrix M)) i j =
+        P i 0 * Pinv 0 j * Real.exp (τ * twoDemeIMEigenvalue1 M) +
+        P i 1 * Pinv 1 j * Real.exp (τ * twoDemeIMEigenvalue2 M) by
+    apply (h_lc (P i 0 * Pinv 0 j) (P i 1 * Pinv 1 j)).congr' key
+  -- Prove the eventually-equal statement using the diagonalization
+  filter_upwards with τ
+  have hPunit := twoDemeIMEigenvectorMatrix_isUnit M hM
+  -- Step 1: Q = P * D * P⁻¹ (from Q * P = P * D, right-multiply by P⁻¹)
+  have hQPDP : twoDemeIMGeneratorMatrix M = P * twoDemeIMEigenDiag M * P⁻¹ := by
+    have hQP := twoDemeIM_diagonalization M
+    -- From Q · P = P · D, right-multiply by P⁻¹: Q = Q · (P · P⁻¹) = (Q · P) · P⁻¹
+    have hPinv : P * P⁻¹ = 1 := by
+      exact Matrix.mul_nonsing_inv _ (Matrix.isUnit_iff_isUnit_det.mp hPunit)
+    calc twoDemeIMGeneratorMatrix M
+        = twoDemeIMGeneratorMatrix M * 1 := by rw [mul_one]
+      _ = twoDemeIMGeneratorMatrix M * (P * P⁻¹) := by rw [hPinv]
+      _ = (twoDemeIMGeneratorMatrix M * P) * P⁻¹ := by rw [Matrix.mul_assoc]
+      _ = (P * twoDemeIMEigenDiag M) * P⁻¹ := by rw [hQP]
+      _ = P * twoDemeIMEigenDiag M * P⁻¹ := by rw [Matrix.mul_assoc]
+  -- Step 2: τ • Q = P * (τ • D) * P⁻¹
+  have hScaled : τ • twoDemeIMGeneratorMatrix M = P * (τ • twoDemeIMEigenDiag M) * P⁻¹ := by
+    rw [hQPDP]; simp [Matrix.mul_smul_comm, Matrix.smul_mul_assoc]
+  -- Step 3: exp(τ•Q) = P * exp(τ•D) * P⁻¹ (by Matrix.exp_conj)
+  have hExpConj : Matrix.exp (τ • twoDemeIMGeneratorMatrix M) =
+      P * Matrix.exp (τ • twoDemeIMEigenDiag M) * P⁻¹ := by
+    rw [hScaled]
+    exact Matrix.exp_conj ℝ P (τ • twoDemeIMEigenDiag M) hPunit
+  -- Step 4: exp(τ•D) = diag(exp(τλ₁), exp(τλ₂)) (by Matrix.exp_diagonal)
+  have hExpDiag : Matrix.exp (τ • twoDemeIMEigenDiag M) =
+      Matrix.diagonal (fun k : Fin 2 =>
+        Real.exp (τ * ![twoDemeIMEigenvalue1 M, twoDemeIMEigenvalue2 M] k)) := by
+    unfold twoDemeIMEigenDiag
+    rw [← Matrix.diagonal_smul]
+    rw [Matrix.exp_diagonal]
+    congr 1; ext k
+    simp [NormedSpace.exp_eq_exp_ℝ, Pi.smul_apply, smul_eq_mul]
+  -- Step 5: Combine and extract entry (i,j)
+  rw [hExpConj, hExpDiag]
+  -- Now the matrix is P * diag(exp(τλ₁), exp(τλ₂)) * P⁻¹
+  -- Entry (i,j) = Σ_k P_{ik} * exp(τλ_k) * (P⁻¹)_{kj}
+  simp only [Matrix.mul_apply, Matrix.diagonal_apply, Fin.sum_univ_two,
+    Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  ring
 
 /-- The finite-τ closed-form E[T_i] converges to the equilibrium value as τ → ∞,
 since exp(τQ) → 0 (both eigenvalues are negative). -/
@@ -1046,13 +1103,34 @@ theorem twoDemeIM_closedForm_tendsto_equilibrium_same
       (fun τ => twoDemeIMExpectedCoalTimeClosedForm M τ TwoLineageState.same)
       Filter.atTop
       (nhds (twoDemeIMEquilibriumETss M)) := by
-  -- Strategy: use twoDemeIM_matrixExp_entry_tendsto_zero to show each entry of
-  -- exp(τQ) → 0, then the closed form converges to the τ-independent part.
-  -- The closed form is: 1ᵀ(-Q⁻¹(I - exp(τQ)))e_S + 1ᵀ(exp(τQ))e_S.
-  -- As exp(τQ) → 0: this → 1ᵀ(-Q⁻¹)e_S + 0 = 2 = twoDemeIMEquilibriumETss.
   have hentry := twoDemeIM_matrixExp_entry_tendsto_zero M hM
-  -- Each mulVec and sum is a continuous function of finitely many entries,
-  -- each tending to 0, so the whole expression tends to the equilibrium.
+  -- The closed form is:
+  --   twoDemeIMIntegralClosedFormTerm M τ same + twoDemeIMSurvivalClosedFormTerm M τ same
+  -- = 1ᵀ(-Q⁻¹(I - exp(τQ)))e_S + 1ᵀ exp(τQ) e_S
+  -- As exp(τQ) → 0: integral term → 1ᵀ(-Q⁻¹)e_S and survival term → 0
+  -- So the sum → 1ᵀ(-Q⁻¹)e_S + 0 = 2 = twoDemeIMEquilibriumETss M
+  -- We show this by expanding all sums over Fin 2 and using Tendsto arithmetic.
+  unfold twoDemeIMExpectedCoalTimeClosedForm twoDemeIMIntegralClosedFormTerm
+    twoDemeIMSurvivalClosedFormTerm twoStateUncoalescedMass twoDemeBasisVec
+    twoDemeOnesVec twoLineageStateToFin2
+  simp only [Fin.sum_univ_two, Matrix.mulVec, Matrix.dotProduct, Fin.sum_univ_two]
+  -- The expression is a sum of products involving exp(τQ) entries and Q⁻¹ entries.
+  -- Each exp(τQ) entry → 0 by hentry.
+  -- The remaining terms are constants (involving Q⁻¹).
+  -- We use Filter.Tendsto arithmetic to combine.
+  -- Each product of a constant and a vanishing sequence → 0.
+  -- The constant (Q⁻¹) terms add up to 2 = twoDemeIMEquilibriumETss M.
+  have h00 := hentry 0 0; have h01 := hentry 0 1
+  have h10 := hentry 1 0; have h11 := hentry 1 1
+  -- Show that each term involving exp(τQ) entries converges
+  -- The sum converges to the value where exp(τQ) is replaced by 0
+  simp only [twoDemeIMEquilibriumETss]
+  -- Need to show the entire expression → 2
+  -- This is a continuous function of the 4 matrix exp entries, each → 0,
+  -- plus constants from Q⁻¹. When all exp entries are 0:
+  -- Integral: (-Q⁻¹·(I-0)·e_S) = -Q⁻¹·e_S, summed = 2
+  -- Survival: 0·e_S, summed = 0
+  -- Total = 2
   sorry
 
 theorem twoDemeIM_closedForm_tendsto_equilibrium_different
@@ -1062,6 +1140,13 @@ theorem twoDemeIM_closedForm_tendsto_equilibrium_different
       Filter.atTop
       (nhds (twoDemeIMEquilibriumETst M)) := by
   have hentry := twoDemeIM_matrixExp_entry_tendsto_zero M hM
+  unfold twoDemeIMExpectedCoalTimeClosedForm twoDemeIMIntegralClosedFormTerm
+    twoDemeIMSurvivalClosedFormTerm twoStateUncoalescedMass twoDemeBasisVec
+    twoDemeOnesVec twoLineageStateToFin2
+  simp only [Fin.sum_univ_two, Matrix.mulVec, Matrix.dotProduct, Fin.sum_univ_two]
+  have h00 := hentry 0 0; have h01 := hentry 0 1
+  have h10 := hentry 1 0; have h11 := hentry 1 1
+  simp only [twoDemeIMEquilibriumETst]
   sorry
 
 /-! #### Piecewise Epoch Closed-Form Composition -/
