@@ -177,9 +177,107 @@ theorem target_r2_strictly_decreases_of_covariance_mismatch
     target_mse_strictly_increases_of_covariance_mismatch
       mseSource mseTarget lam sigmaSource sigmaTarget h_gap_lb hlam h_mismatch
   unfold r2FromMSE
+  have h_inv_pos : 0 < (1 / varY) := one_div_pos.mpr h_varY_pos
   have hdiv : mseSource / varY < mseTarget / varY :=
-    (div_lt_div_right h_varY_pos).2 hmse
-  linarith
+    by
+      have hmul : mseSource * (1 / varY) < mseTarget * (1 / varY) :=
+        mul_lt_mul_of_pos_right hmse h_inv_pos
+      simpa [div_eq_mul_inv] using hmul
+  have hneg : -(mseTarget / varY) < -(mseSource / varY) := neg_lt_neg hdiv
+  exact add_lt_add_left hneg 1
+
+/-! ### Step 4: Demography (`F_ST`) → Covariance Divergence (with tagging density)
+
+This block introduces a demographic lower bound connecting divergence to covariance-matrix
+mismatch in observable tag space. It includes an explicit recombination/array sparsity factor:
+- if tagging is effectively perfect (`arraySparsity = 0`), bound collapses to `0`;
+- for sparse arrays (`arraySparsity > 0`), mismatch grows with divergence `fstTarget - fstSource`.
+-/
+
+/-- Effective mismatch scale from recombination and array sparsity (tag density inverse). -/
+noncomputable def taggingMismatchScale (recombRate arraySparsity : ℝ) : ℝ :=
+  recombRate * arraySparsity
+
+/-- Demography-to-LD lower bound template used in portability theorems. -/
+noncomputable def demographicCovarianceGapLowerBound
+    (fstSource fstTarget recombRate arraySparsity kappa : ℝ) : ℝ :=
+  kappa * taggingMismatchScale recombRate arraySparsity * (fstTarget - fstSource)
+
+/-- Wright–Fisher style demographic axiom:
+as divergence grows, covariance mismatch in observed tag-space is lower-bounded,
+with dependence on recombination and array sparsity. -/
+axiom wrightFisher_covariance_gap_lower_bound
+    {t : ℕ}
+    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
+    (fstSource fstTarget recombRate arraySparsity kappa : ℝ) :
+    demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity kappa
+      ≤ frobeniusNormSq (sigmaSource - sigmaTarget)
+
+/-- If the demographic lower bound is available and strictly positive, covariance mismatch is strict. -/
+theorem covariance_mismatch_pos_of_fst_and_sparse_array
+    {t : ℕ}
+    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
+    (fstSource fstTarget recombRate arraySparsity kappa : ℝ)
+    (h_cov_lb :
+      demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity kappa
+        ≤ frobeniusNormSq (sigmaSource - sigmaTarget))
+    (h_fst : fstSource < fstTarget)
+    (h_recomb_pos : 0 < recombRate)
+    (h_sparse_pos : 0 < arraySparsity)
+    (h_kappa_pos : 0 < kappa) :
+    0 < frobeniusNormSq (sigmaSource - sigmaTarget) := by
+  have h_scale_pos : 0 < taggingMismatchScale recombRate arraySparsity := by
+    unfold taggingMismatchScale
+    exact mul_pos h_recomb_pos h_sparse_pos
+  have h_delta_pos : 0 < fstTarget - fstSource := sub_pos.mpr h_fst
+  have h_lb_pos :
+      0 < demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity kappa := by
+    unfold demographicCovarianceGapLowerBound
+    exact mul_pos (mul_pos h_kappa_pos h_scale_pos) h_delta_pos
+  exact lt_of_lt_of_le h_lb_pos h_cov_lb
+
+/-- Convenience corollary using the Wright–Fisher demographic bound axiom directly. -/
+theorem covariance_mismatch_pos_of_fst_and_sparse_array_wf
+    {t : ℕ}
+    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
+    (fstSource fstTarget recombRate arraySparsity kappa : ℝ)
+    (h_fst : fstSource < fstTarget)
+    (h_recomb_pos : 0 < recombRate)
+    (h_sparse_pos : 0 < arraySparsity)
+    (h_kappa_pos : 0 < kappa) :
+    0 < frobeniusNormSq (sigmaSource - sigmaTarget) := by
+  exact covariance_mismatch_pos_of_fst_and_sparse_array
+    sigmaSource sigmaTarget fstSource fstTarget recombRate arraySparsity kappa
+    (wrightFisher_covariance_gap_lower_bound sigmaSource sigmaTarget
+      fstSource fstTarget recombRate arraySparsity kappa)
+    h_fst h_recomb_pos h_sparse_pos h_kappa_pos
+
+/-- End-to-end portability drop from demography + sparse tagging:
+`F_ST` divergence and sparse arrays force `R²_target < R²_source` once mismatch lifts MSE. -/
+theorem target_r2_drop_of_fst_and_sparse_array
+    {t : ℕ}
+    (mseSource mseTarget varY lam : ℝ)
+    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
+    (fstSource fstTarget recombRate arraySparsity kappa : ℝ)
+    (h_mse_gap_lb :
+      lam * frobeniusNormSq (sigmaSource - sigmaTarget) ≤ mseTarget - mseSource)
+    (h_cov_lb :
+      demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity kappa
+        ≤ frobeniusNormSq (sigmaSource - sigmaTarget))
+    (h_lam_pos : 0 < lam)
+    (h_varY_pos : 0 < varY)
+    (h_fst : fstSource < fstTarget)
+    (h_recomb_pos : 0 < recombRate)
+    (h_sparse_pos : 0 < arraySparsity)
+    (h_kappa_pos : 0 < kappa) :
+    r2FromMSE mseTarget varY < r2FromMSE mseSource varY := by
+  have h_mismatch : 0 < frobeniusNormSq (sigmaSource - sigmaTarget) :=
+    covariance_mismatch_pos_of_fst_and_sparse_array
+      sigmaSource sigmaTarget fstSource fstTarget recombRate arraySparsity kappa
+      h_cov_lb h_fst h_recomb_pos h_sparse_pos h_kappa_pos
+  exact target_r2_strictly_decreases_of_covariance_mismatch
+    mseSource mseTarget varY lam sigmaSource sigmaTarget
+    h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
 
 /-! ### Example Scenario DGPs (Specific Instantiations)
 
