@@ -506,13 +506,6 @@
         <div class="card">
           <div class="card-title"><span class="dot" style="background:var(--accent-amber)"></span> Trait Architecture
           </div>
-          <div class="control-group" id="ctrl-L">
-            <div class="control-label">
-              <span>Causal loci (L)</span>
-              <span class="control-value" id="val-L">1000</span>
-            </div>
-            <input type="range" id="slider-L" min="10" max="50000" value="1000" step="10" oninput="updateAll()">
-          </div>
           <div class="control-group">
             <div class="control-label">
               <span>Heritability (h²)</span>
@@ -520,20 +513,8 @@
             </div>
             <input type="range" id="slider-h2" min="0.01" max="0.99" value="0.5" step="0.01" oninput="updateAll()">
           </div>
-          <div class="control-group" id="ctrl-maf">
-            <div class="control-label">
-              <span>Mean ancestral MAF (p̄)</span>
-              <span class="control-value" id="val-maf">0.25</span>
-            </div>
-            <input type="range" id="slider-maf" min="0.01" max="0.50" value="0.25" step="0.01" oninput="updateAll()">
-          </div>
           <div class="formula-box" id="trait-formula-box">
-            Heritability sets total genetic variance. More causal loci means smaller per-locus effects, which affects
-            how PGS variance fluctuates under drift.
-          </div>
-          <div class="assumption-note">
-            ⚠ Dashboard assumes equal-effect architecture (all loci same β, same MAF). Lean proofs use arbitrary β and p
-            vectors.
+            Heritability sets the total additive genetic variance.
           </div>
         </div>
 
@@ -578,7 +559,7 @@
           </div>
           <div class="metric-card cyan">
             <div class="metric-label" id="metric-drift-t-label">Target Drift (F_T)</div>
-            <div class="metric-value" id="metric-drift-t">0.0247</div>
+            <div class="metric-value">0.0247</div>
             <div class="metric-formula" id="metric-drift-t-formula">Genetic drift accumulated in the target population
             </div>
             <div class="metric-proof"><a onclick="openProof('fstFromGenerations')">Lean proof ↗</a></div>
@@ -759,25 +740,7 @@
       return (1 - fst) * va;
     }
 
-    // perLocusHeterozygosityVariance: exact Balding-Nichols formula
-    function perLocusHetVar(F, p0) {
-      const q0 = 1 - p0;
-      const pq = p0 * q0;
-      if (F <= 0 || F >= 1) return 0;
-      return pq * F * (1 - F) * ((1 + F) * (1 - 6 * pq * F) + 2 * pq * F * F) /
-        ((1 + F) * (1 + 2 * F));
-    }
 
-    // varianceOfPGSVarianceDiff: Var(V_T-V_S) = 8·Σβ⁴·Var(p(1-p))
-    function varOfVarDiff(L, beta, p, F) {
-      return 8 * L * Math.pow(beta, 4) * perLocusHetVar(F, p);
-    }
-
-    // expectedAbsPGSVarianceDiff_normal: E[|ΔV|] = √(Var(ΔV))·√(2/π)
-    function expectedAbsVarDiff(L, beta, p, F) {
-      const v = varOfVarDiff(L, beta, p, F);
-      return Math.sqrt(Math.max(0, v)) * Math.sqrt(2 / Math.PI);
-    }
 
     // ════════════════════════════════════════════════════════════
     // UI LOGIC
@@ -789,14 +752,8 @@
       const NeS = parseFloat(document.getElementById('slider-NeS').value);
       const NeT = parseFloat(document.getElementById('slider-NeT').value);
       const M = parseFloat(document.getElementById('slider-M').value);
-      const L = parseInt(document.getElementById('slider-L').value);
       const h2 = parseFloat(document.getElementById('slider-h2').value);
-      const maf = parseFloat(document.getElementById('slider-maf').value);
-
-      // Equal-effect model: β² = h²/(L·2p(1-p)) so that V_A = h²
-      // Proven: additiveGeneticVariance_equalEffect
-      const beta = Math.sqrt(h2 / (L * 2 * maf * (1 - maf)));
-      const va = h2; // by construction
+      const va = h2; // by construction, additive genetic variance = heritability
 
       let fstS, fstT, d;
       if (model === 'pure_split') {
@@ -810,7 +767,7 @@
         d = 2 * fstS;
       }
 
-      return { model, t, NeS, NeT, M, L, h2, maf, beta, va, fstS, fstT, d };
+      return { model, t, NeS, NeT, M, h2, va, fstS, fstT, d };
     }
 
     function gaussian(x, mu, sigma) {
@@ -888,10 +845,7 @@
       document.getElementById('val-t').textContent = p.t;
       document.getElementById('val-NeS').textContent = p.NeS.toLocaleString();
       document.getElementById('val-NeT').textContent = p.NeT.toLocaleString();
-      document.getElementById('val-M').textContent = p.M.toFixed(2);
-      document.getElementById('val-L').textContent = p.L.toLocaleString();
       document.getElementById('val-h2').textContent = p.h2.toFixed(2);
-      document.getElementById('val-maf').textContent = p.maf.toFixed(2);
 
       // ── Show/hide model-specific sections ──
       const isPS = p.model === 'pure_split';
@@ -903,13 +857,6 @@
       document.getElementById('metrics-im-extra').classList.toggle('hidden', isPS);
       document.getElementById('charts-ps').classList.toggle('hidden', !isPS);
       document.getElementById('charts-im').classList.toggle('hidden', isPS);
-
-      // Hide L and MAF for IM (they don't affect any IM output)
-      document.getElementById('ctrl-L').classList.toggle('hidden', !isPS);
-      document.getElementById('ctrl-maf').classList.toggle('hidden', !isPS);
-      document.getElementById('trait-formula-box').textContent = isPS
-        ? 'Heritability sets total genetic variance. More causal loci means smaller per-locus effects, which affects how PGS variance fluctuates under drift.'
-        : 'Heritability sets total genetic variance. Under the island model, only heritability matters (locus count and MAF cancel out).';
 
       // ── Metrics (model-dependent) ──
       if (isPS) {
