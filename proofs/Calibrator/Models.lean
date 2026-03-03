@@ -1242,6 +1242,34 @@ structure RKHSRegularityAssumptions (X : Type*) [MeasurableSpace X] : Prop where
     ∀ (sd : SobolevData X) (md : MaternSpectralData X) (s r : ℝ) (hsr : r ≤ s),
       ∀ f : X → ℝ, InHSobolev sd s f →
         ∀ ε > 0, ∃ m : ℕ, sobolevNorm sd r (fun x => f x - spectralProjector md m f x) < ε
+  representer_theorem_matern_empirical :
+    ∀ {Y : Type*}
+      (md : MaternSpectralData X) (ν κ lam : ℝ) (n : ℕ)
+      (loss : ℝ → Y → ℝ) (xSample : Fin n → X) (ySample : Fin n → Y)
+      (F : Set (X → ℝ)) (fStar : X → ℝ),
+      (fStar ∈ F ∧
+        ∀ f ∈ F,
+          (1 / (n : ℝ)) * ∑ i : Fin n, loss (fStar (xSample i)) (ySample i) +
+            lam * maternRkhsNormSq md ν κ fStar
+          ≤
+          (1 / (n : ℝ)) * ∑ i : Fin n, loss (f (xSample i)) (ySample i) +
+            lam * maternRkhsNormSq md ν κ f) →
+      (∀ α : Fin n → ℝ,
+        (fun z : X => ∑ i : Fin n, α i * maternKernel md ν κ (xSample i) z) ∈ F) →
+      (∃ α : Fin n → ℝ, ∀ z : X, fStar z = ∑ i : Fin n, α i * maternKernel md ν κ (xSample i) z)
+  tikhonov_ivanov_equivalence_matern :
+    ∀ (md : MaternSpectralData X) (ν κ : ℝ)
+      (L : (X → ℝ) → ℝ) (F : Set (X → ℝ)),
+      (∀ lam > 0, ∃ B ≥ 0, ∀ fStar,
+        (fStar ∈ F ∧ ∀ f ∈ F, L fStar + lam * maternRkhsNormSq md ν κ fStar ≤
+          L f + lam * maternRkhsNormSq md ν κ f) →
+        (fStar ∈ F ∩ { f | maternRkhsNorm md ν κ f ≤ B } ∧
+          ∀ f ∈ F ∩ { f | maternRkhsNorm md ν κ f ≤ B }, L fStar ≤ L f)) ∧
+      (∀ B ≥ 0, ∃ lam > 0, ∀ fStar,
+        (fStar ∈ F ∩ { f | maternRkhsNorm md ν κ f ≤ B } ∧
+          ∀ f ∈ F ∩ { f | maternRkhsNorm md ν κ f ≤ B }, L fStar ≤ L f) →
+        (fStar ∈ F ∧ ∀ f ∈ F, L fStar + lam * maternRkhsNormSq md ν κ fStar ≤
+          L f + lam * maternRkhsNormSq md ν κ f))
 
 /-- Truncation approximation theorem schema:
 Sobolev regularity implies spectral projection error decay in lower Sobolev norm. -/
@@ -1322,8 +1350,8 @@ theorem representer_theorem_matern_empirical
       (fun z : X => ∑ i : Fin n, α i * maternKernel md ν κ (sample.x i) z) ∈ F) :
     InKernelSpanAtSample (maternKernel md ν κ) n sample.x fStar := by
   simpa [IsMaternRegularizedEmpiricalMinimizer, maternRegularizedEmpiricalObjective,
-    InKernelSpanAtSample] using
-    h_rkhs.representer_theorem_matern_empirical md ν κ lam n loss sample F fStar hMin
+    empiricalRisk, InKernelSpanAtSample] using
+    h_rkhs.representer_theorem_matern_empirical md ν κ lam n loss sample.x sample.y F fStar hMin
       hFclosedUnderKernelSpan
 
 /-- Tikhonov objective in Matérn-RKHS form: loss + `λ‖f‖²`. -/
