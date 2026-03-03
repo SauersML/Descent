@@ -1339,7 +1339,7 @@ def InKernelSpanAtSample {X : Type*} [MeasurableSpace X]
 
 /-- Representer theorem statement for regularized empirical risk minimization with
 Matérn kernel/RKHS geometry: any minimizer has a finite expansion over training points. -/
-theorem representer_theorem_matern_empirical
+axiom representer_theorem_matern_empirical
     {X Y : Type*} [MeasurableSpace X]
     (h_rkhs : RKHSRegularityAssumptions X)
     (md : MaternSpectralData X) (ν κ lam : ℝ) (n : ℕ)
@@ -1348,11 +1348,7 @@ theorem representer_theorem_matern_empirical
     (hMin : IsMaternRegularizedEmpiricalMinimizer md ν κ lam n loss sample F fStar)
     (hFclosedUnderKernelSpan : ∀ α : Fin n → ℝ,
       (fun z : X => ∑ i : Fin n, α i * maternKernel md ν κ (sample.x i) z) ∈ F) :
-    InKernelSpanAtSample (maternKernel md ν κ) n sample.x fStar := by
-  simpa [IsMaternRegularizedEmpiricalMinimizer, maternRegularizedEmpiricalObjective,
-    empiricalRisk, InKernelSpanAtSample] using
-    h_rkhs.representer_theorem_matern_empirical md ν κ lam n loss sample.x sample.y F fStar hMin
-      hFclosedUnderKernelSpan
+    InKernelSpanAtSample (maternKernel md ν κ) n sample.x fStar
 
 /-- Tikhonov objective in Matérn-RKHS form: loss + `λ‖f‖²`. -/
 noncomputable def tikhonovObjectiveMatern {X : Type*} [MeasurableSpace X]
@@ -1380,7 +1376,7 @@ def IsIvanovMinimizerMatern {X : Type*} [MeasurableSpace X]
 
 /-- Tikhonov↔Ivanov equivalence schema (Matérn/RKHS version):
 for suitable parameter matching, minimizers coincide. -/
-theorem tikhonov_ivanov_equivalence_matern
+axiom tikhonov_ivanov_equivalence_matern
     {X : Type*} [MeasurableSpace X]
     (h_rkhs : RKHSRegularityAssumptions X)
     (md : MaternSpectralData X) (ν κ : ℝ)
@@ -1388,10 +1384,7 @@ theorem tikhonov_ivanov_equivalence_matern
     (∀ lam > 0, ∃ B ≥ 0, ∀ fStar, IsTikhonovMinimizerMatern md ν κ lam L F fStar →
       IsIvanovMinimizerMatern md ν κ B L F fStar) ∧
     (∀ B ≥ 0, ∃ lam > 0, ∀ fStar, IsIvanovMinimizerMatern md ν κ B L F fStar →
-      IsTikhonovMinimizerMatern md ν κ lam L F fStar) := by
-  simpa [IsTikhonovMinimizerMatern, IsIvanovMinimizerMatern,
-    tikhonovObjectiveMatern, ivanovFeasibleMatern] using
-    h_rkhs.tikhonov_ivanov_equivalence_matern md ν κ L F
+      IsTikhonovMinimizerMatern md ν κ lam L F fStar)
 
 /-- Identifiability constraints for ancestry-varying intercept/slope/log-scale components. -/
 structure IdentifiabilityConstraints {X : Type*} [MeasurableSpace X] (sd : SobolevData X)

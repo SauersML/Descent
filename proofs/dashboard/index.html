@@ -227,14 +227,9 @@
     /* ─── Metrics ─── */
     .metrics-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.8rem;
-    }
-
-    @media (max-width: 900px) {
-      .metrics-row {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
     }
 
     .metric-card {
@@ -475,7 +470,7 @@
           <div class="control-group">
             <div class="control-label">
               <span>Target Nₑ</span>
-              <span class="control-value" id="val-NeT">10000</span>
+              <span class="control-value" id="val-NeT">2000</span>
             </div>
             <input type="range" id="slider-NeT" min="500" max="100000" value="2000" step="500" oninput="updateAll()">
           </div>
@@ -529,7 +524,7 @@
             the ancestral population<br>
             <strong style="color:var(--accent-indigo)">Nₑ</strong> — effective population size: genetic equivalent of
             census size<br>
-            <strong style="color:var(--accent-indigo)">M</strong> — scaled migration: 4Nₑm, higher = more gene flow
+            <strong style="color:var(--accent-indigo)">M</strong> — scaled migration: higher = more gene flow
             between demes<br>
             <strong style="color:var(--accent-indigo)">δ</strong> — equilibrium differentiation between demes under
             migration-drift balance<br>
@@ -560,7 +555,8 @@
             <div class="metric-value" id="metric-drift-t">0.0247</div>
             <div class="metric-formula" id="metric-drift-t-formula">Genetic drift accumulated in the target population
             </div>
-            <div class="metric-proof"><a onclick="openProof('fstFromGenerations')">Lean proof ↗</a></div>
+            <div class="metric-proof" id="metric-drift-t-proof"><a onclick="openProof('fstFromGenerations')">Lean proof
+                ↗</a></div>
           </div>
           <div class="metric-card amber">
             <div class="metric-label">Typical Mean Shift Magnitude</div>
@@ -826,6 +822,7 @@
     }
 
     function linspace(a, b, n) {
+      if (n <= 1) return [a];
       const xs = [];
       for (let i = 0; i < n; i++) xs.push(a + (b - a) * i / (n - 1));
       return xs;
@@ -841,6 +838,7 @@
       document.getElementById('val-t').textContent = p.t;
       document.getElementById('val-NeS').textContent = p.NeS.toLocaleString();
       document.getElementById('val-NeT').textContent = p.NeT.toLocaleString();
+      document.getElementById('val-M').textContent = p.M.toFixed(2);
       document.getElementById('val-va').textContent = p.va.toFixed(2);
 
       // ── Show/hide model-specific sections ──
@@ -872,6 +870,7 @@
         document.getElementById('metric-drift-t-label').textContent = 'Equilibrium δ (Target)';
         document.getElementById('metric-drift-t').textContent = p.fstT.toFixed(4);
         document.getElementById('metric-drift-t-formula').textContent = 'Same as source under symmetric island model';
+        document.getElementById('metric-drift-t-proof').innerHTML = '<a onclick="openProof(\'twoDemeIMEquilibriumDelta\')">Lean proof ↗</a>';
       }
 
       const absMeanDiff = expectedAbsMeanDiff(p.va, p.d);
@@ -919,14 +918,13 @@
       };
       charts.psMeanDist.update('none');
 
-      // ── FST vs generations (both branches) ──
+      // ── FST vs generations (pairwise FST between populations) ──
       const maxT = Math.max(p.t * 2.5, 100);
       const ts = linspace(0, maxT, 100);
       charts.psFst.data = {
         labels: ts.map(x => x.toFixed(0)),
         datasets: [
-          ds('Source F_S (Nₑ=' + p.NeS.toLocaleString() + ')', ts.map(ti => fstFromGenerations(ti, p.NeS)), '#6366f1'),
-          ds('Target F_T (Nₑ=' + p.NeT.toLocaleString() + ')', ts.map(ti => fstFromGenerations(ti, p.NeT)), '#f59e0b'),
+          ds('Pairwise F_ST (between S and T)', ts.map(ti => fstFromGenerations(ti, p.NeS) + fstFromGenerations(ti, p.NeT)), '#8b5cf6'),
         ]
       };
       charts.psFst.update('none');
@@ -954,7 +952,8 @@
       document.getElementById('metric-et-diff').textContent = imETdiff(p.M).toFixed(3);
 
       // ── Mean distribution ──
-      const sigS = Math.sqrt(p.va);
+      const eVarS = expectedVarUnderDrift(p.va, delta);
+      const sigS = Math.sqrt(Math.max(0.001, eVarS));
       const eVarT = expectedVarUnderDrift(p.va, delta);
       const sigT = Math.sqrt(Math.max(0.001, eVarT));
       const shift = expectedAbsMeanDiff(p.va, 2 * delta);
@@ -964,8 +963,8 @@
       charts.imMeanDist.data = {
         labels: xs.map(x => x.toFixed(2)),
         datasets: [
-          ds('Source N(0, V_A)', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
-          ds('Target N(E[|Δμ|], (1−δ)V_A)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
+          ds('Source Deme N(0, (1−δ)V_A)', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
+          ds('Target Deme N(E[|Δμ|], (1−δ)V_A)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
         ]
       };
       charts.imMeanDist.update('none');
