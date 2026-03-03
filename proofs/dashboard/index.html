@@ -322,6 +322,27 @@
       color: var(--accent-indigo);
     }
 
+    .metric-proof a.def-link {
+      color: var(--accent-amber);
+      border-bottom-color: var(--accent-amber);
+    }
+
+    .metric-proof a.def-link:hover {
+      color: var(--accent-amber);
+      opacity: 1;
+    }
+
+    .assumption-note {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      background: rgba(100, 116, 139, 0.08);
+      border: 1px solid rgba(100, 116, 139, 0.15);
+      border-radius: 6px;
+      padding: 0.4rem 0.6rem;
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+
     /* ─── Charts ─── */
     .charts-grid {
       display: grid;
@@ -406,11 +427,7 @@
 
 <body>
 
-  <div class="hero">
-    <h1>Gnomon · PGS Portability Explorer</h1>
-    <p class="subtitle">Exact drift-theoretic formulas for polygenic score transferability</p>
-    <span class="badge">Every formula formally verified in Lean 4 / Mathlib</span>
-  </div>
+
 
   <div class="container">
     <div class="grid-main">
@@ -430,7 +447,7 @@
             </select>
           </div>
           <div class="model-note" id="model-note-ps">
-            Symmetric split: both pops diverge from common ancestor for t generations at size Nₑ.
+            Asymmetric split: source and target diverge from common ancestor for t generations, with independent Nₑ.
           </div>
           <div class="model-note hidden" id="model-note-im">
             Two demes at migration–drift equilibrium. M = 4Nₑm (scaled migration rate).
@@ -450,15 +467,22 @@
           </div>
           <div class="control-group">
             <div class="control-label">
-              <span>Effective pop size (Nₑ)</span>
-              <span class="control-value" id="val-Ne">10000</span>
+              <span>Source Nₑ</span>
+              <span class="control-value" id="val-NeS">10000</span>
             </div>
-            <input type="range" id="slider-Ne" min="500" max="100000" value="10000" step="500" oninput="updateAll()">
+            <input type="range" id="slider-NeS" min="500" max="100000" value="10000" step="500" oninput="updateAll()">
+          </div>
+          <div class="control-group">
+            <div class="control-label">
+              <span>Target Nₑ</span>
+              <span class="control-value" id="val-NeT">10000</span>
+            </div>
+            <input type="range" id="slider-NeT" min="500" max="100000" value="10000" step="500" oninput="updateAll()">
           </div>
           <div class="formula-box">
-            <strong>F_ST</strong> = 1 − exp(−t/(2Nₑ))<br>
-            <strong>τ</strong> = t/(2Nₑ) coalescent units<br>
-            <em>Proven: fstFromGenerations_eq</em>
+            <strong>F_S</strong> = 1 − exp(−t/(2Nₑ_S)), <strong>F_T</strong> = 1 − exp(−t/(2Nₑ_T))<br>
+            <strong>E[ΔVar]</strong> = −(F_T − F_S) · V_A<br>
+            <em>Proven: fstFromGenerations_eq, expectedPGSVarianceDiff_asymmetric</em>
           </div>
         </div>
 
@@ -511,6 +535,32 @@
             <em><a onclick="openProof('additiveGeneticVariance')" style="color:var(--accent-violet);cursor:pointer">Lean
                 proof ↗</a></em>
           </div>
+          <div class="assumption-note">
+            ⚠ Dashboard assumes equal-effect architecture (all loci same β, same MAF). Lean proofs use arbitrary β and p
+            vectors.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="dot" style="background:var(--accent-emerald)"></span> Glossary</div>
+          <div style="font-size:0.75rem;color:var(--text-secondary);line-height:1.7">
+            <strong style="color:var(--accent-indigo)">F_ST</strong> — fraction of genetic variation due to population
+            structure (0 = identical, 1 = fully diverged)<br>
+            <strong style="color:var(--accent-indigo)">PGS</strong> — polygenic score: weighted sum of genetic variants
+            predicting a trait<br>
+            <strong style="color:var(--accent-indigo)">V_A</strong> — additive genetic variance: how much PGS varies in
+            the ancestral population<br>
+            <strong style="color:var(--accent-indigo)">h²</strong> — heritability: fraction of trait variation explained
+            by genetics<br>
+            <strong style="color:var(--accent-indigo)">Nₑ</strong> — effective population size: genetic equivalent of
+            census size<br>
+            <strong style="color:var(--accent-indigo)">M</strong> — scaled migration: 4Nₑm, higher = more gene flow
+            between demes<br>
+            <strong style="color:var(--accent-indigo)">δ</strong> — equilibrium differentiation between demes under
+            migration-drift balance<br>
+            <strong style="color:var(--accent-indigo)">MAF</strong> — minor allele frequency: how common the
+            less-frequent variant is
+          </div>
         </div>
 
       </div>
@@ -520,47 +570,63 @@
       <!-- ═══════════════════════════════════════ -->
       <div class="content">
 
-        <!-- Key Metrics — 3 that are proven for BOTH models -->
+        <!-- Key Metrics -->
         <div class="metrics-row">
           <div class="metric-card indigo">
-            <div class="metric-label" id="metric-drift-label">Population Divergence (F_ST)</div>
+            <div class="metric-label" id="metric-drift-label">Source Drift (F_S)</div>
             <div class="metric-value" id="metric-drift">0.0247</div>
-            <div class="metric-formula" id="metric-drift-formula">How genetically different the populations are</div>
+            <div class="metric-formula" id="metric-drift-formula">Drift on source branch</div>
             <div class="metric-proof" id="metric-drift-proof"><a onclick="openProof('fstFromGenerations')">Lean proof
                 ↗</a></div>
           </div>
           <div class="metric-card cyan">
-            <div class="metric-label">Expected Mean PGS Shift</div>
-            <div class="metric-value" id="metric-mean-shift">0.141</div>
-            <div class="metric-formula">In phenotype standard deviations</div>
-            <div class="metric-proof"><a onclick="openProof('expectedAbsMeanPGSDiff')">Lean proof ↗</a></div>
+            <div class="metric-label" id="metric-drift-t-label">Target Drift (F_T)</div>
+            <div class="metric-value" id="metric-drift-t">0.0247</div>
+            <div class="metric-formula" id="metric-drift-t-formula">Drift on target branch</div>
+            <div class="metric-proof"><a onclick="openProof('fstFromGenerations')">Lean proof ↗</a></div>
           </div>
           <div class="metric-card amber">
-            <div class="metric-label">PGS Variance Retained in Target</div>
-            <div class="metric-value" id="metric-var-ratio">0.975</div>
-            <div class="metric-formula">Fraction of genetic variance remaining</div>
-            <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceUnderDrift')">Lean proof ↗</a></div>
+            <div class="metric-label">Expected Mean PGS Shift</div>
+            <div class="metric-value" id="metric-mean-shift">0.141</div>
+            <div class="metric-formula">Assumes Δμ ~ Normal (CLT not formally proved)</div>
+            <div class="metric-proof"><a class="def-link" onclick="openProof('expectedAbsMeanPGSDiff')">Lean def
+                (assumes CLT) ↗</a></div>
           </div>
         </div>
 
-        <!-- Extra metrics for Pure Split (variance magnitude) -->
-        <div class="metrics-row" id="metrics-ps-extra">
+        <div class="metrics-row">
           <div class="metric-card indigo">
-            <div class="metric-label">Squared Mean PGS Difference</div>
-            <div class="metric-value" id="metric-sq-mean">0.0988</div>
-            <div class="metric-formula">Relative to genetic variance</div>
-            <div class="metric-proof"><a onclick="openProof('expectedSqMeanPGSDiff_pureSplit')">Lean proof ↗</a></div>
+            <div class="metric-label">Source Var Retained</div>
+            <div class="metric-value" id="metric-var-ratio-s">0.975</div>
+            <div class="metric-formula">(1 − F_S) · V_A / V_A</div>
+            <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceUnderDrift')">Lean proof ↗</a></div>
           </div>
           <div class="metric-card cyan">
-            <div class="metric-label">Expected PGS Variance Shift</div>
-            <div class="metric-value" id="metric-abs-var-diff">0.008</div>
-            <div class="metric-formula">Magnitude of variance change between pops</div>
-            <div class="metric-proof"><a onclick="openProof('expectedAbsPGSVarianceDiff')">Lean proof ↗</a></div>
+            <div class="metric-label">Target Var Retained</div>
+            <div class="metric-value" id="metric-var-ratio-t">0.975</div>
+            <div class="metric-formula">(1 − F_T) · V_A / V_A</div>
+            <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceUnderDrift')">Lean proof ↗</a></div>
           </div>
           <div class="metric-card amber">
-            <div class="metric-label">Coalescent Time</div>
-            <div class="metric-value" id="metric-tau">0.025</div>
-            <div class="metric-formula">Drift time in units of 2Nₑ generations</div>
+            <div class="metric-label">E[Var_T − Var_S] / V_A</div>
+            <div class="metric-value" id="metric-var-diff">0.0000</div>
+            <div class="metric-formula">−(F_T − F_S), negative = target lost more variance</div>
+            <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceDiff_asymmetric')">Lean proof ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-row" id="metrics-ps-extra">
+          <div class="metric-card indigo">
+            <div class="metric-label">Coalescent τ (Source)</div>
+            <div class="metric-value" id="metric-tau-s">0.025</div>
+            <div class="metric-formula">t/(2Nₑ_S) coalescent units</div>
+            <div class="metric-proof"><a onclick="openProof('coalescentTau')">Lean proof ↗</a></div>
+          </div>
+          <div class="metric-card cyan">
+            <div class="metric-label">Coalescent τ (Target)</div>
+            <div class="metric-value" id="metric-tau-t">0.025</div>
+            <div class="metric-formula">t/(2Nₑ_T) coalescent units</div>
             <div class="metric-proof"><a onclick="openProof('coalescentTau')">Lean proof ↗</a></div>
           </div>
         </div>
@@ -568,19 +634,12 @@
         <!-- Extra metrics for IM -->
         <div class="metrics-row hidden" id="metrics-im-extra">
           <div class="metric-card indigo">
-            <div class="metric-label">Squared Mean PGS Difference</div>
-            <div class="metric-value" id="metric-sq-mean-im">1.333</div>
-            <div class="metric-formula">Relative to genetic variance</div>
-            <div class="metric-proof"><a onclick="openProof('expectedSqMeanPGSDiff_IMEquilibrium')">Lean proof ↗</a>
-            </div>
-          </div>
-          <div class="metric-card cyan">
             <div class="metric-label">Within-Deme Coalescence Time</div>
             <div class="metric-value" id="metric-et-same">2.000</div>
             <div class="metric-formula">Expected time to common ancestor (same deme)</div>
             <div class="metric-proof"><a onclick="openProof('twoDemeIMEquilibriumETss')">Lean proof ↗</a></div>
           </div>
-          <div class="metric-card amber">
+          <div class="metric-card cyan">
             <div class="metric-label">Between-Deme Coalescence Time</div>
             <div class="metric-value" id="metric-et-diff">3.000</div>
             <div class="metric-formula">Expected time to common ancestor (different demes)</div>
@@ -588,23 +647,18 @@
           </div>
         </div>
 
-        <!-- ═══ CHARTS: Pure Split ═══ -->
         <div id="charts-ps">
           <div class="charts-grid">
             <div class="chart-card">
-              <h3>PGS Mean Distribution: Source vs Target</h3>
+              <h3>PGS Distribution: Source vs Target Population</h3>
               <canvas id="chart-ps-mean-dist"></canvas>
             </div>
-            <div class="chart-card">
-              <h3>PGS Variance Distribution: Source vs Target</h3>
-              <canvas id="chart-ps-var-dist"></canvas>
-            </div>
-          </div>
-          <div class="charts-grid" style="margin-top:1.2rem">
             <div class="chart-card">
               <h3>Population Divergence Over Time</h3>
               <canvas id="chart-ps-fst"></canvas>
             </div>
+          </div>
+          <div class="charts-grid" style="margin-top:1.2rem">
             <div class="chart-card">
               <h3>Portability Metrics vs Population Divergence</h3>
               <canvas id="chart-ps-summary"></canvas>
@@ -640,11 +694,7 @@
     </div>
   </div>
 
-  <div class="footer">
-    All formulas formally verified in <a href="https://github.com/SauersML/gnomon" target="_blank">Lean 4 / Mathlib</a>
-    ·
-    <code>proofs/Calibrator/PortabilityDrift.lean</code>
-  </div>
+
 
   <script>
     // Open proof in GitHub via code search (auto-resolves, no manual line tracking)
@@ -736,27 +786,31 @@
     function getParams() {
       const model = document.getElementById('model-select').value;
       const t = parseFloat(document.getElementById('slider-t').value);
-      const Ne = parseFloat(document.getElementById('slider-Ne').value);
+      const NeS = parseFloat(document.getElementById('slider-NeS').value);
+      const NeT = parseFloat(document.getElementById('slider-NeT').value);
       const M = parseFloat(document.getElementById('slider-M').value);
       const L = parseInt(document.getElementById('slider-L').value);
       const h2 = parseFloat(document.getElementById('slider-h2').value);
       const maf = parseFloat(document.getElementById('slider-maf').value);
 
       // Equal-effect model: β² = h²/(L·2p(1-p)) so that V_A = h²
+      // Proven: additiveGeneticVariance_equalEffect
       const beta = Math.sqrt(h2 / (L * 2 * maf * (1 - maf)));
       const va = h2; // by construction
 
-      let fst, d;
+      let fstS, fstT, d;
       if (model === 'pure_split') {
-        fst = fstFromGenerations(t, Ne);
-        d = 2 * fst; // symmetric: combined drift = 2F
+        fstS = fstFromGenerations(t, NeS); // source branch drift
+        fstT = fstFromGenerations(t, NeT); // target branch drift
+        d = fstS + fstT; // asymmetric combined drift factor
       } else {
-        // IM equilibrium
-        fst = imEquilibriumDelta(M);
-        d = 2 * fst;
+        // IM equilibrium (symmetric by definition)
+        fstS = imEquilibriumDelta(M);
+        fstT = fstS;
+        d = 2 * fstS;
       }
 
-      return { model, t, Ne, M, L, h2, maf, beta, va, fst, d };
+      return { model, t, NeS, NeT, M, L, h2, maf, beta, va, fstS, fstT, d };
     }
 
     function gaussian(x, mu, sigma) {
@@ -801,7 +855,6 @@
     function initCharts() {
       // Pure Split charts
       charts.psMeanDist = makeChart('chart-ps-mean-dist', 'PGS (standardized)', 'Density');
-      charts.psVarDist = makeChart('chart-ps-var-dist', 'PGS Variance', 'Density');
       charts.psFst = makeChart('chart-ps-fst', 'Generations since split', 'Population divergence (F_ST)');
       charts.psSummary = makeChart('chart-ps-summary', 'Population divergence (F_ST)', 'Metric value');
 
@@ -833,7 +886,8 @@
 
       // ── Display values ──
       document.getElementById('val-t').textContent = p.t;
-      document.getElementById('val-Ne').textContent = p.Ne.toLocaleString();
+      document.getElementById('val-NeS').textContent = p.NeS.toLocaleString();
+      document.getElementById('val-NeT').textContent = p.NeT.toLocaleString();
       document.getElementById('val-M').textContent = p.M.toFixed(2);
       document.getElementById('val-L').textContent = p.L.toLocaleString();
       document.getElementById('val-h2').textContent = p.h2.toFixed(2);
@@ -857,23 +911,36 @@
         ? 'h² sets genetic variance. L and MAF control per-locus effect sizes (affects variance shift).'
         : 'h² sets genetic variance. Only h² matters for IM (L and MAF cancel out in ratios).';
 
-      // ── Shared metrics ──
-      document.getElementById('metric-drift').textContent = p.fst.toFixed(4);
+      // ── Metrics (model-dependent) ──
       if (isPS) {
-        document.getElementById('metric-drift-label').textContent = 'Population Divergence (F_ST)';
-        document.getElementById('metric-drift-formula').textContent = 'How genetically different the populations are';
+        // Per-branch drift
+        document.getElementById('metric-drift-label').textContent = 'Source Drift (F_S)';
+        document.getElementById('metric-drift').textContent = p.fstS.toFixed(4);
+        document.getElementById('metric-drift-formula').textContent = '1 − exp(−t/(2Nₑ_S))';
         document.getElementById('metric-drift-proof').innerHTML = '<a onclick="openProof(\'fstFromGenerations\')">Lean proof ↗</a>';
+        document.getElementById('metric-drift-t-label').textContent = 'Target Drift (F_T)';
+        document.getElementById('metric-drift-t').textContent = p.fstT.toFixed(4);
+        document.getElementById('metric-drift-t-formula').textContent = '1 − exp(−t/(2Nₑ_T))';
       } else {
-        document.getElementById('metric-drift-label').textContent = 'Equilibrium Differentiation (δ)';
-        document.getElementById('metric-drift-formula').textContent = 'Steady-state genetic distance between demes';
+        document.getElementById('metric-drift-label').textContent = 'Equilibrium δ (Source)';
+        document.getElementById('metric-drift').textContent = p.fstS.toFixed(4);
+        document.getElementById('metric-drift-formula').textContent = '1/(2M+1)';
         document.getElementById('metric-drift-proof').innerHTML = '<a onclick="openProof(\'twoDemeIMEquilibriumDelta\')">Lean proof ↗</a>';
+        document.getElementById('metric-drift-t-label').textContent = 'Equilibrium δ (Target)';
+        document.getElementById('metric-drift-t').textContent = p.fstT.toFixed(4);
+        document.getElementById('metric-drift-t-formula').textContent = 'Same as source (symmetric IM)';
       }
 
       const absMeanDiff = expectedAbsMeanDiff(p.va, p.d);
       document.getElementById('metric-mean-shift').textContent = absMeanDiff.toFixed(4);
 
-      const eVarT = expectedVarUnderDrift(p.va, p.fst);
-      document.getElementById('metric-var-ratio').textContent = (eVarT / p.va).toFixed(4);
+      // Per-branch variance retained
+      const eVarS = expectedVarUnderDrift(p.va, p.fstS);
+      const eVarT = expectedVarUnderDrift(p.va, p.fstT);
+      document.getElementById('metric-var-ratio-s').textContent = (eVarS / p.va).toFixed(4);
+      document.getElementById('metric-var-ratio-t').textContent = (eVarT / p.va).toFixed(4);
+      // Asymmetric variance difference: -(F_T - F_S)
+      document.getElementById('metric-var-diff').textContent = (-(p.fstT - p.fstS)).toFixed(4);
 
       if (isPS) {
         updatePureSplit(p);
@@ -886,68 +953,52 @@
     // PURE SPLIT UPDATE
     // ════════════════════════════════════════════════════════════
     function updatePureSplit(p) {
-      const tau = coalescentTau(p.t, p.Ne);
-      document.getElementById('metric-sq-mean').textContent = (4 * p.fst).toFixed(4);
-      document.getElementById('metric-tau').textContent = tau.toFixed(4);
+      const tauS = coalescentTau(p.t, p.NeS);
+      const tauT = coalescentTau(p.t, p.NeT);
+      document.getElementById('metric-tau-s').textContent = tauS.toFixed(4);
+      document.getElementById('metric-tau-t').textContent = tauT.toFixed(4);
 
-      const absVD = expectedAbsVarDiff(p.L, p.beta, p.maf, p.fst);
-      document.getElementById('metric-abs-var-diff').textContent = p.va > 0 ? (absVD / p.va).toFixed(4) : '0';
-
-      // ── Mean distribution ──
-      const sigS = Math.sqrt(p.va);
-      const sigT = Math.sqrt(Math.max(0.001, expectedVarUnderDrift(p.va, p.fst)));
+      // ── Mean distribution (asymmetric) ──
+      // Source variance: (1 - F_S) · V_A
+      // Target variance: (1 - F_T) · V_A
+      const sigS = Math.sqrt(Math.max(0.001, expectedVarUnderDrift(p.va, p.fstS)));
+      const sigT = Math.sqrt(Math.max(0.001, expectedVarUnderDrift(p.va, p.fstT)));
       const shift = expectedAbsMeanDiff(p.va, p.d);
       const xRange = Math.max(3 * sigS, shift + 3 * sigT);
       const xs = linspace(-xRange, xRange + shift, 200);
       charts.psMeanDist.data = {
         labels: xs.map(x => x.toFixed(2)),
         datasets: [
-          ds('Source N(0, V_A)', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
-          ds('Target N(E[|Δμ|], (1−F)V_A)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
+          ds('Source (Nₑ=' + p.NeS.toLocaleString() + ')', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
+          ds('Target (Nₑ=' + p.NeT.toLocaleString() + ', drifted)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
         ]
       };
-      charts.psMeanDist.update();
+      charts.psMeanDist.update('none');
 
-      // ── Variance distribution ──
-      const sigVarDiff = Math.sqrt(Math.max(0, varOfVarDiff(p.L, p.beta, p.maf, p.fst)));
-      const sigVS = Math.max(sigVarDiff / Math.SQRT2, p.va * 0.02);
-      const sigVT = sigVS;
-      const eVarT = expectedVarUnderDrift(p.va, p.fst);
-      const vSpread = Math.max(4 * sigVS, Math.abs(p.va - eVarT) + 3 * sigVS);
-      const midV = (p.va + eVarT) / 2;
-      const vxs = linspace(Math.max(0, midV - vSpread), midV + vSpread, 200);
-      charts.psVarDist.data = {
-        labels: vxs.map(x => x.toFixed(3)),
-        datasets: [
-          ds('Source V ≈ V_A', vxs.map(x => gaussian(x, p.va, sigVS)), '#6366f1', { fill: true }),
-          ds('Target V ≈ (1−F)·V_A', vxs.map(x => gaussian(x, eVarT, sigVT)), '#10b981', { fill: true }),
-        ]
-      };
-      charts.psVarDist.update();
-
-      // ── FST vs generations ──
+      // ── FST vs generations (both branches) ──
       const maxT = Math.max(p.t * 2.5, 100);
       const ts = linspace(0, maxT, 100);
       charts.psFst.data = {
         labels: ts.map(x => x.toFixed(0)),
         datasets: [
-          ds('F_ST (Nₑ=' + p.Ne.toLocaleString() + ')', ts.map(ti => fstFromGenerations(ti, p.Ne)), '#6366f1'),
-          ds('Current', [{ x: ts.indexOf(ts.reduce((a, b) => Math.abs(b - p.t) < Math.abs(a - p.t) ? b : a)), y: p.fst }], '#f43f5e', { pointRadius: 6, pointBackgroundColor: '#f43f5e', showLine: false }),
+          ds('Source F_S (Nₑ=' + p.NeS.toLocaleString() + ')', ts.map(ti => fstFromGenerations(ti, p.NeS)), '#6366f1'),
+          ds('Target F_T (Nₑ=' + p.NeT.toLocaleString() + ')', ts.map(ti => fstFromGenerations(ti, p.NeT)), '#f59e0b'),
         ]
       };
-      charts.psFst.update();
+      charts.psFst.update('none');
 
-      // ── All metrics vs F ──
+      // ── Portability metrics vs F (sweeping target drift) ──
       const fs = linspace(0.001, 0.4, 100);
       charts.psSummary.data = {
         labels: fs.map(f => (f * 100).toFixed(1) + '%'),
         datasets: [
-          ds('Mean PGS shift (std. devs)', fs.map(f => expectedAbsMeanDiff(p.va, 2 * f)), '#6366f1'),
-          ds('Variance retained in target', fs.map(f => 1 - f), '#10b981'),
-          ds('Variance shift magnitude', fs.map(f => p.va > 0 ? expectedAbsVarDiff(p.L, p.beta, p.maf, f) / p.va : 0), '#f59e0b', { borderDash: [4, 2] }),
+          ds('Mean PGS shift (σ units)', fs.map(f => expectedAbsMeanDiff(p.va, p.fstS + f)), '#6366f1'),
+          ds('Target var retained: (1−F_T)', fs.map(f => 1 - f), '#10b981'),
+          ds('Source var retained: (1−F_S)', fs.map(() => 1 - p.fstS), '#06b6d4', { borderDash: [6, 3] }),
+          ds('E[ΔVar]/V_A = −(F_T−F_S)', fs.map(f => -(f - p.fstS)), '#f59e0b', { borderDash: [4, 2] }),
         ]
       };
-      charts.psSummary.update();
+      charts.psSummary.update('none');
     }
 
     // ════════════════════════════════════════════════════════════
@@ -955,7 +1006,6 @@
     // ════════════════════════════════════════════════════════════
     function updateIM(p) {
       const delta = imEquilibriumDelta(p.M);
-      document.getElementById('metric-sq-mean-im').textContent = (4 * delta).toFixed(4);
       document.getElementById('metric-et-same').textContent = imETsame().toFixed(3);
       document.getElementById('metric-et-diff').textContent = imETdiff(p.M).toFixed(3);
 
@@ -973,7 +1023,7 @@
           ds('Target N(E[|Δμ|], (1−δ)V_A)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
         ]
       };
-      charts.imMeanDist.update();
+      charts.imMeanDist.update('none');
 
       // ── Delta vs M ──
       const Ms = linspace(0.05, 20, 100);
@@ -983,7 +1033,7 @@
           ds('Genetic differentiation (δ)', Ms.map(m => imEquilibriumDelta(m)), '#06b6d4'),
         ]
       };
-      charts.imDelta.update();
+      charts.imDelta.update('none');
 
       // ── Coalescence times vs M ──
       charts.imCoal.data = {
@@ -993,7 +1043,7 @@
           ds('Between demes', Ms.map(m => imETdiff(m)), '#f59e0b'),
         ]
       };
-      charts.imCoal.update();
+      charts.imCoal.update('none');
 
       // ── E[(Δμ)²]/V_A vs M ──
       charts.imMeanSq.data = {
@@ -1002,7 +1052,7 @@
           ds('Relative to genetic variance', Ms.map(m => 4 * imEquilibriumDelta(m)), '#8b5cf6'),
         ]
       };
-      charts.imMeanSq.update();
+      charts.imMeanSq.update('none');
     }
 
     // ── Init ──

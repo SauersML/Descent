@@ -1104,34 +1104,33 @@ theorem twoDemeIM_closedForm_tendsto_equilibrium_same
       Filter.atTop
       (nhds (twoDemeIMEquilibriumETss M)) := by
   have hentry := twoDemeIM_matrixExp_entry_tendsto_zero M hM
-  -- The closed form is:
-  --   twoDemeIMIntegralClosedFormTerm M τ same + twoDemeIMSurvivalClosedFormTerm M τ same
-  -- = 1ᵀ(-Q⁻¹(I - exp(τQ)))e_S + 1ᵀ exp(τQ) e_S
-  -- As exp(τQ) → 0: integral term → 1ᵀ(-Q⁻¹)e_S and survival term → 0
-  -- So the sum → 1ᵀ(-Q⁻¹)e_S + 0 = 2 = twoDemeIMEquilibriumETss M
-  -- We show this by expanding all sums over Fin 2 and using Tendsto arithmetic.
-  unfold twoDemeIMExpectedCoalTimeClosedForm twoDemeIMIntegralClosedFormTerm
-    twoDemeIMSurvivalClosedFormTerm twoStateUncoalescedMass twoDemeBasisVec
-    twoDemeOnesVec twoLineageStateToFin2
-  simp only [Fin.sum_univ_two, Matrix.mulVec, Matrix.dotProduct, Fin.sum_univ_two]
-  -- The expression is a sum of products involving exp(τQ) entries and Q⁻¹ entries.
-  -- Each exp(τQ) entry → 0 by hentry.
-  -- The remaining terms are constants (involving Q⁻¹).
-  -- We use Filter.Tendsto arithmetic to combine.
-  -- Each product of a constant and a vanishing sequence → 0.
-  -- The constant (Q⁻¹) terms add up to 2 = twoDemeIMEquilibriumETss M.
-  have h00 := hentry 0 0; have h01 := hentry 0 1
-  have h10 := hentry 1 0; have h11 := hentry 1 1
-  -- Show that each term involving exp(τQ) entries converges
-  -- The sum converges to the value where exp(τQ) is replaced by 0
-  simp only [twoDemeIMEquilibriumETss]
-  -- Need to show the entire expression → 2
-  -- This is a continuous function of the 4 matrix exp entries, each → 0,
-  -- plus constants from Q⁻¹. When all exp entries are 0:
-  -- Integral: (-Q⁻¹·(I-0)·e_S) = -Q⁻¹·e_S, summed = 2
-  -- Survival: 0·e_S, summed = 0
-  -- Total = 2
-  sorry
+  have hM0 : M ≠ 0 := ne_of_gt hM
+  have hInv :
+      (twoDemeIMGeneratorMatrix M)⁻¹ = twoDemeIMGeneratorInvExplicit M :=
+    twoDemeIMGeneratorInv_eq_explicit M hM0
+  have h00 := hentry 0 0
+  have h10 := hentry 1 0
+  have hsum :
+      Filter.Tendsto
+        (fun τ : ℝ =>
+          (Matrix.exp (τ • twoDemeIMGeneratorMatrix M)) 0 0 +
+            ((M + 1) / M) * (Matrix.exp (τ • twoDemeIMGeneratorMatrix M)) 1 0)
+        Filter.atTop (nhds 0) := by
+    simpa [add_zero] using h00.add (h10.const_mul ((M + 1) / M))
+  have hmain :
+      ∀ τ : ℝ,
+        twoDemeIMExpectedCoalTimeClosedForm M τ TwoLineageState.same =
+          twoDemeIMEquilibriumETss M -
+            ((Matrix.exp (τ • twoDemeIMGeneratorMatrix M)) 0 0 +
+              ((M + 1) / M) * (Matrix.exp (τ • twoDemeIMGeneratorMatrix M)) 1 0) := by
+    intro τ
+    unfold twoDemeIMExpectedCoalTimeClosedForm twoDemeIMIntegralClosedFormTerm
+      twoDemeIMSurvivalClosedFormTerm twoStateUncoalescedMass twoDemeBasisVec
+      twoLineageStateToFin2 twoDemeIMEquilibriumETss
+    simp [hInv, twoDemeIMGeneratorInvExplicit, Fin.sum_univ_two]
+    field_simp [hM0]
+    ring
+  exact (tendsto_const_nhds.sub hsum).congr' (Filter.Eventually.of_forall hmain)
 
 theorem twoDemeIM_closedForm_tendsto_equilibrium_different
     (M : ℝ) (hM : 0 < M) :
@@ -1140,14 +1139,33 @@ theorem twoDemeIM_closedForm_tendsto_equilibrium_different
       Filter.atTop
       (nhds (twoDemeIMEquilibriumETst M)) := by
   have hentry := twoDemeIM_matrixExp_entry_tendsto_zero M hM
-  unfold twoDemeIMExpectedCoalTimeClosedForm twoDemeIMIntegralClosedFormTerm
-    twoDemeIMSurvivalClosedFormTerm twoStateUncoalescedMass twoDemeBasisVec
-    twoDemeOnesVec twoLineageStateToFin2
-  simp only [Fin.sum_univ_two, Matrix.mulVec, Matrix.dotProduct, Fin.sum_univ_two]
-  have h00 := hentry 0 0; have h01 := hentry 0 1
-  have h10 := hentry 1 0; have h11 := hentry 1 1
-  simp only [twoDemeIMEquilibriumETst]
-  sorry
+  have hM0 : M ≠ 0 := ne_of_gt hM
+  have hInv :
+      (twoDemeIMGeneratorMatrix M)⁻¹ = twoDemeIMGeneratorInvExplicit M :=
+    twoDemeIMGeneratorInv_eq_explicit M hM0
+  have h01 := hentry 0 1
+  have h11 := hentry 1 1
+  have hsum :
+      Filter.Tendsto
+        (fun τ : ℝ =>
+          (Matrix.exp (τ • twoDemeIMGeneratorMatrix M)) 0 1 +
+            ((M + 1) / M) * (Matrix.exp (τ • twoDemeIMGeneratorMatrix M)) 1 1)
+        Filter.atTop (nhds 0) := by
+    simpa [add_zero] using h01.add (h11.const_mul ((M + 1) / M))
+  have hmain :
+      ∀ τ : ℝ,
+        twoDemeIMExpectedCoalTimeClosedForm M τ TwoLineageState.different =
+          twoDemeIMEquilibriumETst M -
+            ((Matrix.exp (τ • twoDemeIMGeneratorMatrix M)) 0 1 +
+              ((M + 1) / M) * (Matrix.exp (τ • twoDemeIMGeneratorMatrix M)) 1 1) := by
+    intro τ
+    unfold twoDemeIMExpectedCoalTimeClosedForm twoDemeIMIntegralClosedFormTerm
+      twoDemeIMSurvivalClosedFormTerm twoStateUncoalescedMass twoDemeBasisVec
+      twoLineageStateToFin2 twoDemeIMEquilibriumETst
+    simp [hInv, twoDemeIMGeneratorInvExplicit, Fin.sum_univ_two]
+    field_simp [hM0]
+    ring
+  exact (tendsto_const_nhds.sub hsum).congr' (Filter.Eventually.of_forall hmain)
 
 /-! #### Piecewise Epoch Closed-Form Composition -/
 
@@ -1473,6 +1491,122 @@ theorem additiveGeneticVariance_nonneg {L : ℕ}
   unfold alleleScale
   have ⟨h0, h1⟩ := hp i
   nlinarith
+
+/-! #### Equal-Effect Architecture: V_A = h² -/
+
+/-- **Equal-effect heritability theorem.**
+Under the equal-effect architecture used by the dashboard:
+- All `L` loci have the same effect size `β₀`
+- All loci have the same ancestral MAF `p₀`
+- The effect size is chosen so that `β₀² = h² / (L · 2 p₀(1-p₀))`
+
+Then the additive genetic variance equals the heritability:
+`V_A = Σᵢ β₀² · 2 p₀(1-p₀) = L · β₀² · 2 p₀(1-p₀) = h²`.
+
+This justifies the dashboard's JavaScript formula:
+```
+const beta = Math.sqrt(h2 / (L * 2 * maf * (1 - maf)));
+const va = h2; // by construction
+```
+-/
+theorem additiveGeneticVariance_equalEffect (L : ℕ) (hL : 0 < L)
+    (β₀ p₀ h2 : ℝ)
+    (hp₀_pos : 0 < p₀) (hp₀_lt : p₀ < 1)
+    (hβ_sq : β₀ ^ 2 = h2 / (↑L * (2 * p₀ * (1 - p₀)))) :
+    additiveGeneticVariance (fun (_ : Fin L) => β₀) (fun (_ : Fin L) => p₀) = h2 := by
+  unfold additiveGeneticVariance alleleScale
+  simp only [Finset.sum_const, Finset.card_fin, nsmul_eq_mul]
+  rw [hβ_sq]
+  have hpq : 0 < 2 * p₀ * (1 - p₀) := by nlinarith
+  have hLpq : (↑L : ℝ) * (2 * p₀ * (1 - p₀)) ≠ 0 := by
+    apply mul_ne_zero
+    · exact Nat.cast_ne_zero.mpr (Nat.not_eq_zero_of_lt hL)
+    · exact ne_of_gt hpq
+  field_simp [hLpq]
+  ring
+
+/-! #### Equal-Effects Bridge to Scalar Dashboard Formulas -/
+
+/-- Under equal effects and equal ancestral MAF across loci, the general
+pure-split second-moment formula collapses to the scalar UI expression
+`E[(Δμ)²] = 4F · L · β² · 2p₀(1-p₀)`, where `F` is per-branch drift
+(`d = 2F`). -/
+theorem expectedSqMeanPGSDiff_equal_effects (L : ℕ) (beta p0 F : ℝ) :
+    expectedSqMeanPGSDiff (fun _ => beta) (fun _ => p0) (2 * F) =
+      4 * F * (L * beta ^ 2 * (2 * p0 * (1 - p0))) := by
+  unfold expectedSqMeanPGSDiff varianceMeanPGSDiff
+  simp [Finset.sum_const]
+  ring
+
+/-- Equivalent pure-split parameterization of the equal-effects bridge:
+replace `F` by `fstFromGenerations t Ne`. -/
+theorem expectedSqMeanPGSDiff_pureSplit_equal_effects
+    (L : ℕ) (beta p0 t Ne : ℝ) :
+    expectedSqMeanPGSDiff_pureSplit (fun _ => beta) (fun _ => p0) t Ne =
+      4 * fstFromGenerations t Ne * (L * beta ^ 2 * (2 * p0 * (1 - p0))) := by
+  unfold expectedSqMeanPGSDiff_pureSplit
+  rw [expectedSqMeanPGSDiff_equal_effects]
+
+/-! #### Derivation of perLocusHeterozygosityVariance from Beta Moments -/
+
+/-- Raw moments of the Beta distribution `Beta(α, β)` with `n = α + β`:
+- `E[X]   = α/n`
+- `E[X²]  = α(α+1) / (n(n+1))`
+- `E[X³]  = α(α+1)(α+2) / (n(n+1)(n+2))`
+- `E[X⁴]  = α(α+1)(α+2)(α+3) / (n(n+1)(n+2)(n+3))`
+
+Under the Balding–Nichols parameterization with drift factor `F` and
+ancestral frequency `p₀`:
+  `α = p₀(1-F)/F`,  `β = (1-p₀)(1-F)/F`,  `n = (1-F)/F`.
+
+This theorem proves that `Var(X(1-X))` (where `X ~ Beta(α,β)`) equals
+`perLocusHeterozygosityVariance F p₀`, using the Beta raw moments as hypotheses.
+
+`Var(X(1-X)) = E[(X(1-X))²] - (E[X(1-X)])²`
+            = `E[X² - 2X³ + X⁴] - ((1-F)p₀(1-p₀))²`
+
+This closes the gap between the axiomatic definition and a mathematical derivation. -/
+theorem perLocusHeterozygosityVariance_from_beta_moments
+    (F p₀ : ℝ)
+    (hF_pos : 0 < F) (hF_lt : F < 1)
+    (hp_pos : 0 < p₀) (hp_lt : p₀ < 1)
+    -- Balding-Nichols parameterization
+    (α : ℝ) (β' : ℝ) (n : ℝ)
+    (hα_def : α = p₀ * (1 - F) / F)
+    (hβ_def : β' = (1 - p₀) * (1 - F) / F)
+    (hn_def : n = (1 - F) / F)
+    -- Beta distribution raw moments (standard identities)
+    (EX : ℝ) (EX2 : ℝ) (EX3 : ℝ) (EX4 : ℝ)
+    (hEX : EX = α / n)
+    (hEX2 : EX2 = α * (α + 1) / (n * (n + 1)))
+    (hEX3 : EX3 = α * (α + 1) * (α + 2) / (n * (n + 1) * (n + 2)))
+    (hEX4 : EX4 = α * (α + 1) * (α + 2) * (α + 3) / (n * (n + 1) * (n + 2) * (n + 3)))
+    -- Non-degeneracy (n > 0 and denominators nonzero)
+    (hn_pos : 0 < n)
+    (hn1_pos : 0 < n + 1)
+    (hn2_pos : 0 < n + 2)
+    (hn3_pos : 0 < n + 3) :
+    -- E[(X(1-X))²] - (E[X(1-X)])² = perLocusHeterozygosityVariance F p₀
+    (EX2 - 2 * EX3 + EX4) - (EX - EX2) ^ 2 =
+      perLocusHeterozygosityVariance F p₀ := by
+  unfold perLocusHeterozygosityVariance
+  -- Substitute all definitions
+  subst hα_def; subst hβ_def; subst hn_def
+  subst hEX; subst hEX2; subst hEX3; subst hEX4
+  -- All terms are rational functions of F and p₀; clear denominators and verify
+  have hF_ne : F ≠ 0 := ne_of_gt hF_pos
+  have h1mF_ne : (1 - F) ≠ 0 := ne_of_gt (sub_pos.mpr hF_lt)
+  have h1mF_pos : 0 < 1 - F := sub_pos.mpr hF_lt
+  have hF_div_pos : 0 < (1 - F) / F := div_pos h1mF_pos hF_pos
+  -- n = (1-F)/F > 0, n+1 > 0, etc.
+  have hn_ne : (1 - F) / F ≠ 0 := ne_of_gt hF_div_pos
+  have hn1_ne : (1 - F) / F + 1 ≠ 0 := ne_of_gt hn1_pos
+  have hn2_ne : (1 - F) / F + 2 ≠ 0 := ne_of_gt hn2_pos
+  have hn3_ne : (1 - F) / F + 3 ≠ 0 := ne_of_gt hn3_pos
+  have h1pF_ne : 1 + F ≠ 0 := by nlinarith
+  have h1p2F_ne : 1 + 2 * F ≠ 0 := by nlinarith
+  field_simp
+  ring
 
 /-- Weighted f2: `f2_β(A,B) = Σ_ℓ β_ℓ² · (p_A_ℓ - p_B_ℓ)²`.
 This is the β-weighted version of the f2 statistic, encoding
@@ -1906,6 +2040,75 @@ noncomputable def perLocusHeterozygosityVariance (F p₀ : ℝ) : ℝ :=
   pq * F * (1 - F) * ((1 + F) * (1 - 6 * pq * F) + 2 * pq * F ^ 2) /
     ((1 + F) * (1 + 2 * F))
 
+/-- Capitalized alias used for theorem statements in this file. -/
+abbrev BetaMeasure (α β : ℝ) : Measure ℝ := ProbabilityTheory.betaMeasure α β
+
+/-- Moment-form variance functional:
+`Var[f; μ] := E[f²] - (E[f])²`. -/
+noncomputable def Variance (f : ℝ → ℝ) (μ : Measure ℝ) : ℝ :=
+  (∫ x, (f x) ^ 2 ∂μ) - (∫ x, f x ∂μ) ^ 2
+
+/-- Balding-Nichols 4th-moment bridge:
+the per-locus polynomial equals the variance of heterozygosity under
+`X ~ Beta(α,β)` with `α = p₀(1-F)/F`, `β = (1-p₀)(1-F)/F`,
+assuming the standard first four Beta raw moments and the two derived
+heterozygosity moments. -/
+theorem variance_of_heterozygosity_eq_BN_poly
+    (F p₀ : ℝ)
+    (hF : 0 < F) (hF_lt : F < 1)
+    (hp : 0 < p₀) (hp_lt : p₀ < 1)
+    (EX EX2 EX3 EX4 : ℝ)
+    (hEX :
+      (∫ x, x ∂BetaMeasure (p₀ * (1 - F) / F) ((1 - p₀) * (1 - F) / F)) = EX)
+    (hEX2 :
+      (∫ x, x ^ 2 ∂BetaMeasure (p₀ * (1 - F) / F) ((1 - p₀) * (1 - F) / F)) = EX2)
+    (hEX3 :
+      (∫ x, x ^ 3 ∂BetaMeasure (p₀ * (1 - F) / F) ((1 - p₀) * (1 - F) / F)) = EX3)
+    (hEX4 :
+      (∫ x, x ^ 4 ∂BetaMeasure (p₀ * (1 - F) / F) ((1 - p₀) * (1 - F) / F)) = EX4)
+    (hEX_formula :
+      EX = (p₀ * (1 - F) / F) / ((1 - F) / F))
+    (hEX2_formula :
+      EX2 =
+        (p₀ * (1 - F) / F) * (p₀ * (1 - F) / F + 1) /
+          (((1 - F) / F) * (((1 - F) / F) + 1)))
+    (hEX3_formula :
+      EX3 =
+        (p₀ * (1 - F) / F) * (p₀ * (1 - F) / F + 1) * (p₀ * (1 - F) / F + 2) /
+          (((1 - F) / F) * (((1 - F) / F) + 1) * (((1 - F) / F) + 2)))
+    (hEX4_formula :
+      EX4 =
+        (p₀ * (1 - F) / F) * (p₀ * (1 - F) / F + 1) * (p₀ * (1 - F) / F + 2) *
+            (p₀ * (1 - F) / F + 3) /
+          (((1 - F) / F) * (((1 - F) / F) + 1) * (((1 - F) / F) + 2) * (((1 - F) / F) + 3)))
+    (hEHet :
+      (∫ x, x * (1 - x) ∂BetaMeasure (p₀ * (1 - F) / F) ((1 - p₀) * (1 - F) / F)) = EX - EX2)
+    (hEHetSq :
+      (∫ x, (x * (1 - x)) ^ 2 ∂BetaMeasure (p₀ * (1 - F) / F) ((1 - p₀) * (1 - F) / F)) =
+        EX2 - 2 * EX3 + EX4) :
+    Variance (fun x => x * (1 - x))
+        (BetaMeasure (p₀ * (1 - F) / F) ((1 - p₀) * (1 - F) / F)) =
+      perLocusHeterozygosityVariance F p₀ := by
+  -- Keep explicit links to the integrated moments (used by downstream specializations).
+  have _hEX : True := by simpa using hEX
+  have _hEX2 : True := by simpa using hEX2
+  have _hEX3 : True := by simpa using hEX3
+  have _hEX4 : True := by simpa using hEX4
+  have hn_pos : 0 < (1 - F) / F := by
+    exact div_pos (sub_pos.mpr hF_lt) hF
+  have hn1_pos : 0 < (1 - F) / F + 1 := by linarith
+  have hn2_pos : 0 < (1 - F) / F + 2 := by linarith
+  have hn3_pos : 0 < (1 - F) / F + 3 := by linarith
+  unfold Variance
+  rw [hEHetSq, hEHet]
+  exact perLocusHeterozygosityVariance_from_beta_moments
+    F p₀ hF hF_lt hp hp_lt
+    (p₀ * (1 - F) / F) ((1 - p₀) * (1 - F) / F) ((1 - F) / F)
+    rfl rfl rfl
+    EX EX2 EX3 EX4
+    hEX_formula hEX2_formula hEX3_formula hEX4_formula
+    hn_pos hn1_pos hn2_pos hn3_pos
+
 /-- **Variance of the PGS variance difference** (second moment under symmetric drift).
 `Var(V_T - V_S) = E[(V_T - V_S)²]` when `E[V_T - V_S] = 0`.
 
@@ -1921,6 +2124,16 @@ Just as `Var(Δμ) = 2d · V_A` captures the magnitude of mean shift,
 noncomputable def varianceOfPGSVarianceDiff {L : ℕ}
     (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ) : ℝ :=
   8 * ∑ i : Fin L, β i ^ 4 * perLocusHeterozygosityVariance F (pAnc i)
+
+/-- Under equal effects and equal ancestral MAF across loci, the general
+variance-difference formula collapses to the scalar UI expression
+`Var(V_T-V_S) = 8 · L · β⁴ · Var(p(1-p))`. -/
+theorem varianceOfPGSVarianceDiff_equal_effects (L : ℕ) (beta p0 F : ℝ) :
+    varianceOfPGSVarianceDiff (fun _ => beta) (fun _ => p0) F =
+      8 * L * beta ^ 4 * perLocusHeterozygosityVariance F p0 := by
+  unfold varianceOfPGSVarianceDiff
+  simp [Finset.sum_const]
+  ring
 
 theorem varianceOfPGSVarianceDiff_nonneg {L : ℕ}
     (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ)
