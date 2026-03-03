@@ -906,17 +906,15 @@
       // Target variance: (1 - F_T) · V_A
       const sigS = Math.sqrt(Math.max(0.001, expectedVarUnderDrift(p.va, p.fstS)));
       const sigT = Math.sqrt(Math.max(0.001, expectedVarUnderDrift(p.va, p.fstT)));
-      const sigmaDeltaMu = Math.sqrt(varMeanDiff(p.va, p.d)); // std dev of the mean shift
+      const shift = expectedAbsMeanDiff(p.va, p.d);
 
-      const xRange = Math.max(4 * sigS, sigmaDeltaMu + 3 * sigT);
-      const xs = linspace(-xRange, xRange, 200);
+      const xRange = Math.max(3 * sigS, shift + 3 * sigT);
+      const xs = linspace(-xRange, xRange + shift, 200);
       charts.psMeanDist.data = {
         labels: xs.map(x => x.toFixed(2)),
         datasets: [
           ds('Source (Nₑ=' + p.NeS.toLocaleString() + ')', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
-          ds('Target (expected)', xs.map(x => gaussian(x, 0, sigT)), '#f59e0b', { fill: true, borderWidth: 3 }),
-          ds('Target (+1σ mean shift)', xs.map(x => gaussian(x, sigmaDeltaMu, sigT)), '#f59e0b', { borderDash: [4, 4], borderWidth: 1 }),
-          ds('Target (−1σ mean shift)', xs.map(x => gaussian(x, -sigmaDeltaMu, sigT)), '#f59e0b', { borderDash: [4, 4], borderWidth: 1 }),
+          ds('Target (Nₑ=' + p.NeT.toLocaleString() + ', drifted)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
         ]
       };
       charts.psMeanDist.update('none');
@@ -959,17 +957,15 @@
       const sigS = Math.sqrt(p.va);
       const eVarT = expectedVarUnderDrift(p.va, delta);
       const sigT = Math.sqrt(Math.max(0.001, eVarT));
-      const sigmaDeltaMu = Math.sqrt(varMeanDiff(p.va, 2 * delta));
+      const shift = expectedAbsMeanDiff(p.va, 2 * delta);
 
-      const xRange = Math.max(4 * sigS, sigmaDeltaMu + 3 * sigT);
-      const xs = linspace(-xRange, xRange, 200);
+      const xRange = Math.max(3 * sigS, shift + 3 * sigT);
+      const xs = linspace(-xRange, xRange + shift, 200);
       charts.imMeanDist.data = {
         labels: xs.map(x => x.toFixed(2)),
         datasets: [
           ds('Source N(0, V_A)', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
-          ds('Target expected N(0, (1−δ)V_A)', xs.map(x => gaussian(x, 0, sigT)), '#f59e0b', { fill: true, borderWidth: 3 }),
-          ds('Target +1σ shift', xs.map(x => gaussian(x, sigmaDeltaMu, sigT)), '#f59e0b', { borderDash: [4, 4], borderWidth: 1 }),
-          ds('Target −1σ shift', xs.map(x => gaussian(x, -sigmaDeltaMu, sigT)), '#f59e0b', { borderDash: [4, 4], borderWidth: 1 }),
+          ds('Target N(E[|Δμ|], (1−δ)V_A)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
         ]
       };
       charts.imMeanDist.update('none');

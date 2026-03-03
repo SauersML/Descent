@@ -1242,22 +1242,6 @@ structure RKHSRegularityAssumptions (X : Type*) [MeasurableSpace X] : Prop where
     ∀ (sd : SobolevData X) (md : MaternSpectralData X) (s r : ℝ) (hsr : r ≤ s),
       ∀ f : X → ℝ, InHSobolev sd s f →
         ∀ ε > 0, ∃ m : ℕ, sobolevNorm sd r (fun x => f x - spectralProjector md m f x) < ε
-  representer_theorem_matern_empirical :
-    ∀ {Y : Type*}
-      (md : MaternSpectralData X) (ν κ λ : ℝ) (n : ℕ)
-      (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n)
-      (F : Set (X → ℝ)) (fStar : X → ℝ),
-      IsMaternRegularizedEmpiricalMinimizer md ν κ λ n ℓ sample F fStar →
-      (∀ α : Fin n → ℝ,
-        (fun z : X => ∑ i : Fin n, α i * maternKernel md ν κ (sample.x i) z) ∈ F) →
-      InKernelSpanAtSample (maternKernel md ν κ) n sample.x fStar
-  tikhonov_ivanov_equivalence_matern :
-    ∀ (md : MaternSpectralData X) (ν κ : ℝ)
-      (L : (X → ℝ) → ℝ) (F : Set (X → ℝ)),
-      (∀ λ > 0, ∃ B ≥ 0, ∀ fStar, IsTikhonovMinimizerMatern md ν κ λ L F fStar →
-        IsIvanovMinimizerMatern md ν κ B L F fStar) ∧
-      (∀ B ≥ 0, ∃ λ > 0, ∀ fStar, IsIvanovMinimizerMatern md ν κ B L F fStar →
-        IsTikhonovMinimizerMatern md ν κ λ L F fStar)
 
 /-- Truncation approximation theorem schema:
 Sobolev regularity implies spectral projection error decay in lower Sobolev norm. -/
@@ -1300,25 +1284,25 @@ structure SupervisedSample (X Y : Type*) (n : ℕ) where
   x : Fin n → X
   y : Fin n → Y
 
-/-- Empirical risk from pointwise loss `ℓ(pred,label)` and predictor `f`. -/
+/-- Empirical risk from pointwise loss and predictor `f`. -/
 noncomputable def empiricalRisk (X Y : Type*) (n : ℕ)
-    (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n) (f : X → ℝ) : ℝ :=
-  (1 / (n : ℝ)) * ∑ i : Fin n, ℓ (f (sample.x i)) (sample.y i)
+    (loss : ℝ → Y → ℝ) (sample : SupervisedSample X Y n) (f : X → ℝ) : ℝ :=
+  (1 / (n : ℝ)) * ∑ i : Fin n, loss (f (sample.x i)) (sample.y i)
 
 /-- Regularized empirical objective for Matérn-RKHS fitting. -/
 noncomputable def maternRegularizedEmpiricalObjective {X Y : Type*} [MeasurableSpace X]
-    (md : MaternSpectralData X) (ν κ λ : ℝ) (n : ℕ)
-    (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n) (f : X → ℝ) : ℝ :=
-  empiricalRisk X Y n ℓ sample f + λ * maternRkhsNormSq md ν κ f
+    (md : MaternSpectralData X) (ν κ lam : ℝ) (n : ℕ)
+    (loss : ℝ → Y → ℝ) (sample : SupervisedSample X Y n) (f : X → ℝ) : ℝ :=
+  empiricalRisk X Y n loss sample f + lam * maternRkhsNormSq md ν κ f
 
 /-- Minimizer predicate for regularized empirical objective over class `F`. -/
 def IsMaternRegularizedEmpiricalMinimizer {X Y : Type*} [MeasurableSpace X]
-    (md : MaternSpectralData X) (ν κ λ : ℝ) (n : ℕ)
-    (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n)
+    (md : MaternSpectralData X) (ν κ lam : ℝ) (n : ℕ)
+    (loss : ℝ → Y → ℝ) (sample : SupervisedSample X Y n)
     (F : Set (X → ℝ)) (fStar : X → ℝ) : Prop :=
   fStar ∈ F ∧ ∀ f ∈ F,
-    maternRegularizedEmpiricalObjective md ν κ λ n ℓ sample fStar
-      ≤ maternRegularizedEmpiricalObjective md ν κ λ n ℓ sample f
+    maternRegularizedEmpiricalObjective md ν κ lam n loss sample fStar
+      ≤ maternRegularizedEmpiricalObjective md ν κ lam n loss sample f
 
 /-- Finite kernel span induced by sample inputs `x₁,…,x_n`. -/
 def InKernelSpanAtSample {X : Type*} [MeasurableSpace X]
@@ -1330,21 +1314,23 @@ Matérn kernel/RKHS geometry: any minimizer has a finite expansion over training
 theorem representer_theorem_matern_empirical
     {X Y : Type*} [MeasurableSpace X]
     (h_rkhs : RKHSRegularityAssumptions X)
-    (md : MaternSpectralData X) (ν κ λ : ℝ) (n : ℕ)
-    (ℓ : ℝ → Y → ℝ) (sample : SupervisedSample X Y n)
+    (md : MaternSpectralData X) (ν κ lam : ℝ) (n : ℕ)
+    (loss : ℝ → Y → ℝ) (sample : SupervisedSample X Y n)
     (F : Set (X → ℝ)) (fStar : X → ℝ)
-    (hMin : IsMaternRegularizedEmpiricalMinimizer md ν κ λ n ℓ sample F fStar)
+    (hMin : IsMaternRegularizedEmpiricalMinimizer md ν κ lam n loss sample F fStar)
     (hFclosedUnderKernelSpan : ∀ α : Fin n → ℝ,
       (fun z : X => ∑ i : Fin n, α i * maternKernel md ν κ (sample.x i) z) ∈ F) :
-    InKernelSpanAtSample (maternKernel md ν κ) n sample.x fStar :=
-  h_rkhs.representer_theorem_matern_empirical md ν κ λ n ℓ sample F fStar hMin
-    hFclosedUnderKernelSpan
+    InKernelSpanAtSample (maternKernel md ν κ) n sample.x fStar := by
+  simpa [IsMaternRegularizedEmpiricalMinimizer, maternRegularizedEmpiricalObjective,
+    InKernelSpanAtSample] using
+    h_rkhs.representer_theorem_matern_empirical md ν κ lam n loss sample F fStar hMin
+      hFclosedUnderKernelSpan
 
 /-- Tikhonov objective in Matérn-RKHS form: loss + `λ‖f‖²`. -/
-noncomputable def tikhonovObjectiveMatern {X Y : Type*} [MeasurableSpace X]
-    (md : MaternSpectralData X) (ν κ λ : ℝ)
+noncomputable def tikhonovObjectiveMatern {X : Type*} [MeasurableSpace X]
+    (md : MaternSpectralData X) (ν κ lam : ℝ)
     (L : (X → ℝ) → ℝ) (f : X → ℝ) : ℝ :=
-  L f + λ * maternRkhsNormSq md ν κ f
+  L f + lam * maternRkhsNormSq md ν κ f
 
 /-- Ivanov feasible set: RKHS-ball constraint `‖f‖ ≤ B`. -/
 def ivanovFeasibleMatern {X : Type*} [MeasurableSpace X]
@@ -1353,9 +1339,9 @@ def ivanovFeasibleMatern {X : Type*} [MeasurableSpace X]
 
 /-- `f*` minimizes the Tikhonov objective over class `F`. -/
 def IsTikhonovMinimizerMatern {X : Type*} [MeasurableSpace X]
-    (md : MaternSpectralData X) (ν κ λ : ℝ)
+    (md : MaternSpectralData X) (ν κ lam : ℝ)
     (L : (X → ℝ) → ℝ) (F : Set (X → ℝ)) (fStar : X → ℝ) : Prop :=
-  fStar ∈ F ∧ ∀ f ∈ F, tikhonovObjectiveMatern md ν κ λ L fStar ≤ tikhonovObjectiveMatern md ν κ λ L f
+  fStar ∈ F ∧ ∀ f ∈ F, tikhonovObjectiveMatern md ν κ lam L fStar ≤ tikhonovObjectiveMatern md ν κ lam L f
 
 /-- `f*` minimizes the Ivanov objective `L` under RKHS-ball constraint. -/
 def IsIvanovMinimizerMatern {X : Type*} [MeasurableSpace X]
@@ -1371,11 +1357,13 @@ theorem tikhonov_ivanov_equivalence_matern
     (h_rkhs : RKHSRegularityAssumptions X)
     (md : MaternSpectralData X) (ν κ : ℝ)
     (L : (X → ℝ) → ℝ) (F : Set (X → ℝ)) :
-    (∀ λ > 0, ∃ B ≥ 0, ∀ fStar, IsTikhonovMinimizerMatern md ν κ λ L F fStar →
+    (∀ lam > 0, ∃ B ≥ 0, ∀ fStar, IsTikhonovMinimizerMatern md ν κ lam L F fStar →
       IsIvanovMinimizerMatern md ν κ B L F fStar) ∧
-    (∀ B ≥ 0, ∃ λ > 0, ∀ fStar, IsIvanovMinimizerMatern md ν κ B L F fStar →
-      IsTikhonovMinimizerMatern md ν κ λ L F fStar) :=
-  h_rkhs.tikhonov_ivanov_equivalence_matern md ν κ L F
+    (∀ B ≥ 0, ∃ lam > 0, ∀ fStar, IsIvanovMinimizerMatern md ν κ B L F fStar →
+      IsTikhonovMinimizerMatern md ν κ lam L F fStar) := by
+  simpa [IsTikhonovMinimizerMatern, IsIvanovMinimizerMatern,
+    tikhonovObjectiveMatern, ivanovFeasibleMatern] using
+    h_rkhs.tikhonov_ivanov_equivalence_matern md ν κ L F
 
 /-- Identifiability constraints for ancestry-varying intercept/slope/log-scale components. -/
 structure IdentifiabilityConstraints {X : Type*} [MeasurableSpace X] (sd : SobolevData X)
@@ -1388,14 +1376,14 @@ structure IdentifiabilityConstraints {X : Type*} [MeasurableSpace X] (sd : Sobol
 /-- Geometric regularity assumptions for ancestry manifold modeling.
 These are abstract placeholders that allow theorem statements to carry
 compactness/smoothness/bounded-density hypotheses explicitly. -/
-structure AncestryManifoldAssumptions (X : Type*) [MeasurableSpace X] (sd : SobolevData X) : Prop where
+structure AncestryManifoldAssumptions (X : Type*) [MeasurableSpace X] (sd : SobolevData X) where
   compact_support : Prop
   smooth_structure : Prop
   bounded_density_from_zero : Prop
   bounded_density_from_infty : Prop
 
 /-- Product-measure assumptions used for ANOVA/Hoeffding decompositions. -/
-structure ProductMeasureAssumptions {k : ℕ} (sd : SobolevData (Fin k → ℝ)) : Prop where
+structure ProductMeasureAssumptions {k : ℕ} (sd : SobolevData (Fin k → ℝ)) where
   coordMeasure : Fin k → Measure ℝ
   product_factorization : sd.pi = Measure.pi coordMeasure
 
@@ -1591,11 +1579,9 @@ theorem baseline_strict_subset_HSobolev_of_witness
     Fbase ⊂ HSobolev X sd s := by
   constructor
   · exact hsub
-  · intro hEq
+  · intro hsup
     rcases hwitness with ⟨f, hfHs, hfNotBase⟩
-    have hfInBase : f ∈ Fbase := by
-      rw [hEq]
-      exact hfHs
+    have hfInBase : f ∈ Fbase := hsup hfHs
     exact hfNotBase hfInBase
 
 /-- Equivalent non-equality form of the strict-subset witness criterion. -/
@@ -1608,7 +1594,7 @@ theorem baseline_ne_HSobolev_of_witness
   intro hEq
   have hss : Fbase ⊂ HSobolev X sd s :=
     baseline_strict_subset_HSobolev_of_witness sd s Fbase hsub hwitness
-  exact hss.2 hEq
+  exact hss.ne hEq
 
 /-- Abstract finite-dimensionality marker for a function class, represented
 as the range of a map from some finite-dimensional real vector space. -/
