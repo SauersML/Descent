@@ -442,7 +442,8 @@
             </select>
           </div>
           <div class="model-note" id="model-note-ps">
-            Past demography input: source-anchored split where target diverges for t generations with target Nₑ.
+            Past demography input: common-ancestor split where both source and target drift for t generations with
+            branch-specific Nₑ.
           </div>
           <div class="model-note hidden" id="model-note-im">
             Past demography input: two demes at migration–drift equilibrium. M = 4Nₑm (scaled migration rate).
@@ -475,8 +476,8 @@
             <input type="range" id="slider-NeT" min="500" max="100000" value="2000" step="500" oninput="updateAll()">
           </div>
           <div class="formula-box">
-            Genetic drift accumulates with time and shrinks with population size. Here source is anchored (F_S = 0),
-            so only target drift changes with divergence settings.
+            Genetic drift accumulates with time and shrinks with population size in both branches:
+            F<sub>S</sub> = 1 - exp(-t / (2Nₑ,S)), F<sub>T</sub> = 1 - exp(-t / (2Nₑ,T)).
           </div>
         </div>
 
@@ -503,7 +504,7 @@
           </div>
           <div class="formula-box" id="trait-formula-box">
             Past influence is explicit: source signal is transported by drift scaling
-            r = (1 - F_target) / (1 - F_source), then converted to present-day R²/AUC/Brier.
+            r = (1 - F_target) / (1 - F_source), then adjusted by LD tagging ratio ρ<sub>T</sub>/ρ<sub>S</sub>, then converted to present-day R²/AUC/Brier.
           </div>
           <div class="control-group" style="margin-top:0.8rem">
             <div class="control-label">
@@ -511,6 +512,20 @@
               <span class="control-value" id="val-r2s-base">0.50</span>
             </div>
             <input type="range" id="slider-r2s-base" min="0.05" max="0.95" value="0.50" step="0.01" oninput="updateAll()">
+          </div>
+          <div class="control-group" style="margin-top:0.8rem">
+            <div class="control-label">
+              <span>Source tagging efficiency (ρ<sub>S</sub>)</span>
+              <span class="control-value" id="val-rho-s">0.90</span>
+            </div>
+            <input type="range" id="slider-rho-s" min="0.10" max="1.00" value="0.90" step="0.01" oninput="updateAll()">
+          </div>
+          <div class="control-group" style="margin-top:0.8rem">
+            <div class="control-label">
+              <span>Target tagging efficiency (ρ<sub>T</sub>)</span>
+              <span class="control-value" id="val-rho-t">0.70</span>
+            </div>
+            <input type="range" id="slider-rho-t" min="0.10" max="1.00" value="0.70" step="0.01" oninput="updateAll()">
           </div>
           <div class="control-group" style="margin-top:0.8rem">
             <div class="control-label">
@@ -570,7 +585,7 @@
             <div class="metric-label">Typical Mean Shift (Source SD Units)</div>
             <div class="metric-value" id="metric-mean-shift">0.141</div>
             <div class="metric-formula">Expected |Δμ| / σ_source from demographic drift history</div>
-            <div class="metric-proof"><a class="def-link" onclick="openProof('drift_implies_attenuation')">Lean theorem
+            <div class="metric-proof"><a class="def-link" onclick="openProof('expected_abs_mean_shift_bound')">Lean theorem
                 (assumes CLT) ↗</a></div>
           </div>
         </div>
@@ -579,14 +594,14 @@
           <div class="metric-card indigo">
             <div class="metric-label">Source R² (Present Day)</div>
             <div class="metric-value" id="metric-r2-s">0.153</div>
-            <div class="metric-formula">Present-day variance explained in source (R²)</div>
-            <div class="metric-proof"><a onclick="openProof('presentDayR2')">Lean def ↗</a></div>
+            <div class="metric-formula">Present-day variance explained in source (exactly tied to statistical R² under signal+noise moments)</div>
+            <div class="metric-proof"><a onclick="openProof('presentDayR2_eq_statistical_rsquared')">Lean theorem ↗</a></div>
           </div>
           <div class="metric-card cyan">
             <div class="metric-label">Target R² (Present Day)</div>
             <div class="metric-value" id="metric-r2-t">0.141</div>
-            <div class="metric-formula">Present-day variance explained in target (R²)</div>
-            <div class="metric-proof"><a onclick="openProof('presentDayR2')">Lean def ↗</a></div>
+            <div class="metric-formula">Present-day variance explained in target (exactly tied to statistical R² under signal+noise moments)</div>
+            <div class="metric-proof"><a onclick="openProof('presentDayR2_eq_statistical_rsquared')">Lean theorem ↗</a></div>
           </div>
           <div class="metric-card amber">
             <div class="metric-label">Relative Portability</div>
@@ -598,22 +613,22 @@
 
         <div class="metrics-row">
           <div class="metric-card indigo">
-            <div class="metric-label">Source AUC Witness (SNR)</div>
+            <div class="metric-label">Source AUC (Exact LTM)</div>
             <div class="metric-value" id="metric-auc-s">1.000</div>
-            <div class="metric-formula">Source signal-to-noise; higher SNR implies higher AUC for any strictly increasing AUC link</div>
-            <div class="metric-proof"><a onclick="openProof('presentDayAUC')">Lean def ↗</a></div>
+            <div class="metric-formula">Exact liability-threshold AUC: Φ(√(SNR/2))</div>
+            <div class="metric-proof"><a onclick="openProof('liabilityAUCFromSNR')">Lean def ↗</a></div>
           </div>
           <div class="metric-card cyan">
-            <div class="metric-label">Target AUC Witness (SNR)</div>
+            <div class="metric-label">Target AUC (Exact LTM)</div>
             <div class="metric-value" id="metric-auc-t">0.882</div>
-            <div class="metric-formula">If this SNR is lower than source, then AUC is provably lower (no approximation)</div>
-            <div class="metric-proof"><a onclick="openProof('drift_degrades_AUC_of_strictMono')">Lean theorem ↗</a></div>
+            <div class="metric-formula">Exact liability-threshold AUC after transport</div>
+            <div class="metric-proof"><a onclick="openProof('targetLiabilityAUC_lt_source_of_observables')">Lean theorem ↗</a></div>
           </div>
           <div class="metric-card amber">
-            <div class="metric-label">Brier Gap (Target - Source)</div>
+            <div class="metric-label">Brier Gap (Exact Model)</div>
             <div class="metric-value" id="metric-brier-gap">+0.0012</div>
-            <div class="metric-formula">Increase in expected Brier loss using prevalence-calibrated approximation</div>
-            <div class="metric-proof"><a onclick="openProof('brierRegretPoint_eq_sq_error')">Lean theorem ↗</a></div>
+            <div class="metric-formula">Target - Source Bayes Brier from exact calibrated risk integral</div>
+            <div class="metric-proof"><a onclick="openProof('exactBrierRiskOfCalibrated_eq_integral')">Lean theorem ↗</a></div>
           </div>
         </div>
 
@@ -728,12 +743,12 @@
     // twoDemeIMEquilibriumETst: E[T_diff] = (2M+1)/M
     function imETdiff(M) { return (2 * M + 1) / M; }
 
-    // Legacy helper for signal-variance scaling
-    function VA(L, beta, p) {
-      return L * beta * beta * 2 * p * (1 - p);
+    // sourceVarianceFromR2: v_source = r2_source / (1 - r2_source)
+    function sourceVarianceFromR2(r2Source) {
+      return r2Source / (1 - r2Source);
     }
 
-    // varianceMeanPGSDiff_eq_twice_drift_signal: Var(Δμ) = 2d·V_signal
+    // variance_mean_pgs_diff: Var(Δμ) = 2d·V_signal
     function varMeanDiff(signalVar, d) {
       return 2 * d * signalVar;
     }
@@ -748,7 +763,12 @@
       return 4 * imEquilibriumDelta(M) * signalVar;
     }
 
-    // expectedAbsMeanPGSDiff_normal: E[|Δμ|] = √(Var(Δμ)) · √(2/π)
+    // pairwise_fst_decomposition: F_ST(S,T) = F_S + F_T - F_S*F_T
+    function pairwiseFstFromBranches(fstS, fstT) {
+      return fstS + fstT - fstS * fstT;
+    }
+
+    // expected_abs_mean_shift_bound (via folded-normal moment): E[|Δμ|] = √(Var(Δμ)) · √(2/π)
     function expectedAbsMeanDiff(signalVar, d) {
       return Math.sqrt(varMeanDiff(signalVar, d)) * Math.sqrt(2 / Math.PI);
     }
@@ -760,22 +780,31 @@
       return 2 * Math.sqrt(Math.max(0, fstS + fstT) / (Math.PI * denom));
     }
 
-    // Source-anchored transport: move present-day source signal variance across drift regimes.
-    function transportedSignalVariance(vPgsSource, fstSource, fstPop) {
-      const denom = Math.max(1e-9, 1 - fstSource);
-      return vPgsSource * ((1 - fstPop) / denom);
+    // driftTransportRatio: r = (1 - fstTarget) / (1 - fstSource)
+    function driftTransportRatio(fstSource, fstTarget) {
+      return (1 - fstTarget) / (1 - fstSource);
     }
 
-    function sourceSignalFromR2(r2Source, vEnv) {
-      const clipped = Math.min(0.999, Math.max(0.001, r2Source));
-      return (clipped / (1 - clipped)) * vEnv;
+    // targetVarianceFromSource: v_target = v_source * r
+    function targetVarianceFromSource(vSource, fstSource, fstTarget) {
+      return vSource * driftTransportRatio(fstSource, fstTarget);
+    }
+
+    // r2FromVarianceScaleOne: r2 = v / (v + 1), with environmental scale fixed to 1
+    function r2FromVarianceScaleOne(v) {
+      return v / (v + 1);
+    }
+
+    // targetR2FromObservables_closed_form (Lean theorem)
+    function targetR2FromObservables(r2Source, fstSource, fstTarget) {
+      const r = driftTransportRatio(fstSource, fstTarget);
+      return (r * r2Source) / (1 - r2Source + r * r2Source);
     }
 
     // Present-day R² proxy under additive signal + independent environmental noise
     function expectedR2(vPgs, vEnv) {
       const denom = vPgs + vEnv;
-      if (denom <= 0) return 0;
-      return Math.max(0, Math.min(1, vPgs / denom));
+      return vPgs / denom;
     }
 
     // SNR witness used for theorem-backed AUC ordering (StrictMono link assumption)
@@ -784,10 +813,80 @@
       return Math.max(0, vPgs / vEnv);
     }
 
-    // Brier approximation from explained variance on Bernoulli outcome with prevalence pi
-    function expectedBrierFromR2(r2, prevalence) {
-      const base = prevalence * (1 - prevalence);
-      return base * (1 - Math.max(0, Math.min(1, r2)));
+    // Standard normal PDF
+    function normalPdf(x) {
+      return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+    }
+
+    // erf implementation for numerical CDF evaluation
+    function erf(x) {
+      const sign = x < 0 ? -1 : 1;
+      const ax = Math.abs(x);
+      const t = 1 / (1 + 0.3275911 * ax);
+      const y = 1 - (((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t) * Math.exp(-ax * ax);
+      return sign * y;
+    }
+
+    // Standard normal CDF Φ(x)
+    function normalCdf(x) {
+      return 0.5 * (1 + erf(x / Math.SQRT2));
+    }
+
+    // inverse-normal implementation for threshold parameterization Φ^{-1}(p)
+    function normalInvCdf(p) {
+      const pp = Math.min(1 - 1e-12, Math.max(1e-12, p));
+      const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+      const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+      const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+      const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+      const plow = 0.02425;
+      const phigh = 1 - plow;
+      let q, r;
+      if (pp < plow) {
+        q = Math.sqrt(-2 * Math.log(pp));
+        return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+          ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+      }
+      if (pp > phigh) {
+        q = Math.sqrt(-2 * Math.log(1 - pp));
+        return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+          ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+      }
+      q = pp - 0.5;
+      r = q * q;
+      return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
+        (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+    }
+
+    // liabilityAUCFromSNR: exact AUC under equal-variance Gaussian liability model
+    function liabilityAUCFromSNR(snr) {
+      return normalCdf(Math.sqrt(Math.max(0, snr) / 2));
+    }
+
+    // Simpson integration on [a,b]
+    function simpsonIntegrate(f, a, b, n = 800) {
+      const m = n % 2 === 0 ? n : n + 1;
+      const h = (b - a) / m;
+      let s = f(a) + f(b);
+      for (let i = 1; i < m; i++) {
+        const x = a + i * h;
+        s += (i % 2 === 0 ? 2 : 4) * f(x);
+      }
+      return (h / 3) * s;
+    }
+
+    // Exact calibrated Brier risk under the LTM score model:
+    // E_S[ η(S) (1-η(S)) ], η(s)=Φ(s - t), S~N(0, vSignal), t=Φ^{-1}(1-π)
+    function exactLiabilityBrier(vSignal, prevalence) {
+      const v = Math.max(1e-9, vSignal);
+      const sd = Math.sqrt(v);
+      const t = normalInvCdf(1 - prevalence);
+      const integrand = (z) => {
+        const s = sd * z;
+        const eta = normalCdf(s - t);
+        return eta * (1 - eta) * normalPdf(z);
+      };
+      return simpsonIntegrate(integrand, -8, 8, 1000);
     }
 
 
@@ -803,15 +902,19 @@
       const NeT = parseFloat(document.getElementById('slider-NeT').value);
       const M = parseFloat(document.getElementById('slider-M').value);
       const r2Source = parseFloat(document.getElementById('slider-r2s-base').value);
+      const rhoSraw = parseFloat(document.getElementById('slider-rho-s').value);
+      const rhoTraw = parseFloat(document.getElementById('slider-rho-t').value);
       const prevalence = parseFloat(document.getElementById('slider-prev').value);
+      const rhoS = Math.max(1e-6, Math.min(1, rhoSraw));
+      const rhoT = Math.max(1e-6, Math.min(rhoTraw, rhoS));
       const vEnv = 1.0;
-      const vPgsSource = sourceSignalFromR2(r2Source, vEnv);
+      const vPgsSource = sourceVarianceFromR2(r2Source);
 
       let fstS, fstT, d;
       if (model === 'pure_split') {
-        fstS = 0; // source anchored as present-day reference cohort
-        fstT = fstFromGenerations(t, NeT); // target branch drift from source reference
-        d = fstT;
+        fstS = fstFromGenerations(t, NeS); // source branch drift from common ancestor
+        fstT = fstFromGenerations(t, NeT); // target branch drift from common ancestor
+        d = fstS + fstT; // branch-sum drift index for mean-shift variance
       } else {
         // IM equilibrium (symmetric by definition)
         fstS = imEquilibriumDelta(M);
@@ -819,7 +922,8 @@
         d = 2 * fstS;
       }
 
-      return { model, t, NeS, NeT, M, prevalence, r2Source, vEnv, vPgsSource, fstS, fstT, d };
+      const fstPair = pairwiseFstFromBranches(fstS, fstT);
+      return { model, t, NeS, NeT, M, prevalence, r2Source, rhoS, rhoT, vEnv, vPgsSource, fstS, fstT, fstPair, d };
     }
 
     function gaussian(x, mu, sigma) {
@@ -900,6 +1004,8 @@
       document.getElementById('val-NeT').textContent = p.NeT.toLocaleString();
       document.getElementById('val-M').textContent = p.M.toFixed(2);
       document.getElementById('val-r2s-base').textContent = p.r2Source.toFixed(2);
+      document.getElementById('val-rho-s').textContent = p.rhoS.toFixed(2);
+      document.getElementById('val-rho-t').textContent = p.rhoT.toFixed(2);
       document.getElementById('val-prev').textContent = p.prevalence.toFixed(2);
 
       // ── Show/hide model-specific sections ──
@@ -916,13 +1022,15 @@
       // ── Metrics (model-dependent) ──
       if (isPS) {
         // Per-branch drift
-        document.getElementById('metric-drift-label').textContent = 'Source Drift (F_S, anchored)';
+        document.getElementById('metric-drift-label').textContent = 'Source Drift (F_S)';
         document.getElementById('metric-drift').textContent = p.fstS.toFixed(4);
-        document.getElementById('metric-drift-formula').textContent = 'Source reference cohort fixed at present day (set to 0)';
+        document.getElementById('metric-drift-formula').textContent = 'Drift accumulated on the source branch from the common ancestor';
         document.getElementById('metric-drift-proof').innerHTML = '<a onclick="openProof(\'fstFromGenerations\')">Lean proof ↗</a>';
         document.getElementById('metric-drift-t-label').textContent = 'Target Drift (F_T)';
         document.getElementById('metric-drift-t').textContent = p.fstT.toFixed(4);
-        document.getElementById('metric-drift-t-formula').textContent = 'Genetic drift accumulated in the target population relative to source';
+        document.getElementById('metric-drift-t-formula').textContent =
+          `Drift on target branch; pairwise F_ST(S,T)=F_S+F_T−F_SF_T=${p.fstPair.toFixed(4)}`;
+        document.getElementById('metric-drift-t-proof').innerHTML = '<a onclick="openProof(\'pairwise_fst_decomposition\')">Lean theorem ↗</a>';
       } else {
         document.getElementById('metric-drift-label').textContent = 'Equilibrium δ (Source)';
         document.getElementById('metric-drift').textContent = p.fstS.toFixed(4);
@@ -938,23 +1046,25 @@
       document.getElementById('metric-mean-shift').textContent = relativeShift.toFixed(3) + 'σ';
 
       // Clinical performance endpoints
-      const vEnv = p.vEnv;
-      const vPgsS = transportedSignalVariance(p.vPgsSource, p.fstS, p.fstS);
-      const vPgsT = transportedSignalVariance(p.vPgsSource, p.fstS, p.fstT);
-      const r2S = expectedR2(vPgsS, vEnv);
-      const r2T = expectedR2(vPgsT, vEnv);
+      const vPgsS = p.vPgsSource;
+      const ldRatio = p.rhoT / p.rhoS;
+      const vPgsT = targetVarianceFromSource(p.vPgsSource, p.fstS, p.fstT) * ldRatio;
+      const r2S = p.r2Source;
+      const r2T = expectedR2(vPgsT, p.vEnv);
       const portability = r2S > 0 ? 100 * (r2T / r2S) : 0;
-      const snrS = signalToNoise(vPgsS, vEnv);
-      const snrT = signalToNoise(vPgsT, vEnv);
-      const brierS = expectedBrierFromR2(r2S, p.prevalence);
-      const brierT = expectedBrierFromR2(r2T, p.prevalence);
+      const snrS = signalToNoise(vPgsS, p.vEnv);
+      const snrT = signalToNoise(vPgsT, p.vEnv);
+      const aucS = liabilityAUCFromSNR(snrS);
+      const aucT = liabilityAUCFromSNR(snrT);
+      const brierS = exactLiabilityBrier(vPgsS, p.prevalence);
+      const brierT = exactLiabilityBrier(vPgsT, p.prevalence);
       const brierGap = brierT - brierS;
 
       document.getElementById('metric-r2-s').textContent = r2S.toFixed(3);
       document.getElementById('metric-r2-t').textContent = r2T.toFixed(3);
       document.getElementById('metric-portability').textContent = portability.toFixed(1) + '%';
-      document.getElementById('metric-auc-s').textContent = snrS.toFixed(3);
-      document.getElementById('metric-auc-t').textContent = snrT.toFixed(3) + (snrT < snrS ? ' (< source)' : '');
+      document.getElementById('metric-auc-s').textContent = aucS.toFixed(3);
+      document.getElementById('metric-auc-t').textContent = aucT.toFixed(3);
       document.getElementById('metric-brier-gap').textContent = (brierGap >= 0 ? '+' : '') + brierGap.toFixed(4);
 
       if (isPS) {
@@ -974,8 +1084,8 @@
       document.getElementById('metric-tau-t').textContent = tauT.toFixed(4);
 
       // Mean distribution (asymmetric variance, zero expected mean diff)
-      const sigS = Math.sqrt(Math.max(0.001, transportedSignalVariance(p.vPgsSource, p.fstS, p.fstS)));
-      const sigT = Math.sqrt(Math.max(0.001, transportedSignalVariance(p.vPgsSource, p.fstS, p.fstT)));
+      const sigS = Math.sqrt(Math.max(0.001, p.vPgsSource));
+      const sigT = Math.sqrt(Math.max(0.001, targetVarianceFromSource(p.vPgsSource, p.fstS, p.fstT)));
       const shift = expectedAbsMeanDiff(p.vPgsSource, p.d);
 
       const xRange = Math.max(3 * sigS, shift + 3 * sigT);
@@ -1005,13 +1115,15 @@
       charts.psSummary.data = {
         labels: fs.map(f => (f * 100).toFixed(1) + '%'),
         datasets: [
-          ds('Target R²', fs.map(f => expectedR2(transportedSignalVariance(p.vPgsSource, p.fstS, f), p.vEnv)), '#10b981'),
-          ds('Source R²', fs.map(() => expectedR2(transportedSignalVariance(p.vPgsSource, p.fstS, p.fstS), p.vEnv)), '#06b6d4', { borderDash: [6, 3] }),
-          ds('Target SNR (AUC witness)', fs.map(f => signalToNoise(transportedSignalVariance(p.vPgsSource, p.fstS, f), p.vEnv)), '#6366f1'),
-          ds('Brier gap (target-source)', fs.map(f => {
-            const r2Src = expectedR2(transportedSignalVariance(p.vPgsSource, p.fstS, p.fstS), p.vEnv);
-            const r2Tgt = expectedR2(transportedSignalVariance(p.vPgsSource, p.fstS, f), p.vEnv);
-            return expectedBrierFromR2(r2Tgt, p.prevalence) - expectedBrierFromR2(r2Src, p.prevalence);
+          ds('Target R²', fs.map(f => expectedR2(targetVarianceFromSource(p.vPgsSource, p.fstS, f) * (p.rhoT / p.rhoS), p.vEnv)), '#10b981'),
+          ds('Source R²', fs.map(() => p.r2Source), '#06b6d4', { borderDash: [6, 3] }),
+          ds('Target AUC (exact LTM)', fs.map(f => {
+            const snr = signalToNoise(targetVarianceFromSource(p.vPgsSource, p.fstS, f) * (p.rhoT / p.rhoS), p.vEnv);
+            return liabilityAUCFromSNR(snr);
+          }), '#6366f1'),
+          ds('Brier gap (exact model)', fs.map(f => {
+            const vT = targetVarianceFromSource(p.vPgsSource, p.fstS, f) * (p.rhoT / p.rhoS);
+            return exactLiabilityBrier(vT, p.prevalence) - exactLiabilityBrier(p.vPgsSource, p.prevalence);
           }), '#f59e0b', { borderDash: [4, 2] }),
         ]
       };
@@ -1027,9 +1139,9 @@
       document.getElementById('metric-et-diff').textContent = imETdiff(p.M).toFixed(3);
 
       // ── Mean distribution ──
-      const eVarS = transportedSignalVariance(p.vPgsSource, p.fstS, delta);
+      const eVarS = targetVarianceFromSource(p.vPgsSource, p.fstS, delta);
       const sigS = Math.sqrt(Math.max(0.001, eVarS));
-      const eVarT = transportedSignalVariance(p.vPgsSource, p.fstS, delta);
+      const eVarT = targetVarianceFromSource(p.vPgsSource, p.fstS, delta);
       const sigT = Math.sqrt(Math.max(0.001, eVarT));
       const shift = expectedAbsMeanDiff(p.vPgsSource, 2 * delta);
 

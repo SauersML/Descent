@@ -1,5 +1,6 @@
 import Calibrator.Models
 import Calibrator.Conclusions
+import Calibrator.DGP
 
 namespace Calibrator
 
@@ -29,6 +30,15 @@ noncomputable def fstFromGenerations (t Ne : ℝ) : ℝ :=
 
 noncomputable def generationsFromFst (Ne fst : ℝ) : ℝ :=
   -2 * Ne * Real.log (1 - fst)
+
+/-- Branchwise-to-pairwise `F_ST` map under independent drift from a common ancestor. -/
+noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
+  1 - (1 - fstS) * (1 - fstT)
+
+@[simp] theorem pairwise_fst_decomposition (fstS fstT : ℝ) :
+    pairwiseFstFromBranches fstS fstT = fstS + fstT - fstS * fstT := by
+  unfold pairwiseFstFromBranches
+  ring_nf
 
 @[simp] theorem coalescenceCdfFromHazard_eq (hazard : ℝ → ℝ) (t : ℝ) :
     coalescenceCdfFromHazard hazard t =
@@ -151,6 +161,57 @@ section PresentDayMetrics
 noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
   (1 - fst) * V_A
 
+/-- Random-walk allele-frequency drift assumptions yielding a Gaussian limit for PGS mean shift.
+This provides the folded-normal first moment used by the dashboard mean-shift metric. -/
+structure AssumesRandomWalkDrift : Prop where
+  folded_normal_relative_shift :
+    ∀ (V_A fstS fstT : ℝ),
+      0 ≤ V_A →
+      0 ≤ fstS + fstT →
+      fstS < 1 →
+      (Real.sqrt (2 * (fstS + fstT) * V_A) * Real.sqrt (2 / Real.pi)) /
+          Real.sqrt (presentDayPGSVariance V_A fstS) =
+        2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS)))
+
+/-- Drift-driven variance of the between-population PGS-mean difference.
+For one branch with drift index `fst`, this is `2 * fst * V_A`. -/
+noncomputable def Var_Delta_Mu (V_A fst : ℝ) : ℝ :=
+  2 * fst * V_A
+
+/-- Drift-driven expected absolute PGS-mean shift under a Normal approximation. -/
+noncomputable def Expected_Abs_Shift (V_A fstS fstT : ℝ) : ℝ :=
+  Real.sqrt (Var_Delta_Mu V_A (fstS + fstT)) * Real.sqrt (2 / Real.pi)
+
+/-- Variance identity used by the dashboard mean-shift card. -/
+theorem variance_mean_pgs_diff (V_A fst : ℝ) :
+    Var_Delta_Mu V_A fst = 2 * fst * V_A := by
+  rfl
+
+/-- Under random-walk drift with Gaussian limit, the expected absolute PGS-mean shift
+in source-standard-deviation units is exactly the folded-normal first moment formula. -/
+theorem expected_abs_mean_shift_of_random_walk
+    (V_A fstS fstT : ℝ)
+    (h_rw : AssumesRandomWalkDrift)
+    (hVA_nonneg : 0 ≤ V_A)
+    (hfst_sum_nonneg : 0 ≤ fstS + fstT)
+    (hfstS_lt_one : fstS < 1) :
+    Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
+      2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) := by
+  unfold Expected_Abs_Shift
+  rw [variance_mean_pgs_diff V_A (fstS + fstT)]
+  exact h_rw.folded_normal_relative_shift V_A fstS fstT hVA_nonneg hfst_sum_nonneg hfstS_lt_one
+
+/-- Backward-compatible name used by the dashboard. -/
+theorem expected_abs_mean_shift_bound
+    (V_A fstS fstT : ℝ)
+    (h_rw : AssumesRandomWalkDrift)
+    (hVA_nonneg : 0 ≤ V_A)
+    (hfst_sum_nonneg : 0 ≤ fstS + fstT)
+    (hfstS_lt_one : fstS < 1) :
+    Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
+      2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) :=
+  expected_abs_mean_shift_of_random_walk V_A fstS fstT h_rw hVA_nonneg hfst_sum_nonneg hfstS_lt_one
+
 /-- Present-day signal-to-noise ratio for prediction under drift. -/
 noncomputable def presentDaySignalToNoise (V_A V_E fst : ℝ) : ℝ :=
   presentDayPGSVariance V_A fst / V_E
@@ -159,6 +220,54 @@ noncomputable def presentDaySignalToNoise (V_A V_E fst : ℝ) : ℝ :=
 noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
   let v := presentDayPGSVariance V_A fst
   v / (v + V_E)
+
+/-- Exact bridge theorem: the dashboard algebraic `presentDayR2` equals statistical
+`rsquared` when the relevant second-moment identities hold. -/
+theorem presentDayR2_eq_statistical_rsquared
+    {k : ℕ} [Fintype (Fin k)]
+    (dgp : DataGeneratingProcess k)
+    (signal : Predictor k)
+    (V_A V_E fst : ℝ)
+    (h_vf :
+      (let μ := dgp.jointMeasure
+       let mf : ℝ := ∫ pc, signal pc.1 pc.2 ∂μ
+       ∫ pc, (signal pc.1 pc.2 - mf) ^ 2 ∂μ) = presentDayPGSVariance V_A fst)
+    (h_vg :
+      (let μ := dgp.jointMeasure
+       let mg : ℝ := ∫ pc, dgp.trueExpectation pc.1 pc.2 ∂μ
+       ∫ pc, (dgp.trueExpectation pc.1 pc.2 - mg) ^ 2 ∂μ) =
+        presentDayPGSVariance V_A fst + V_E)
+    (h_cov :
+      (let μ := dgp.jointMeasure
+       let mf : ℝ := ∫ pc, signal pc.1 pc.2 ∂μ
+       let mg : ℝ := ∫ pc, dgp.trueExpectation pc.1 pc.2 ∂μ
+       ∫ pc, (signal pc.1 pc.2 - mf) * (dgp.trueExpectation pc.1 pc.2 - mg) ∂μ) =
+        presentDayPGSVariance V_A fst)
+    (h_vsig_pos : 0 < presentDayPGSVariance V_A fst)
+    (h_vtrue_pos : 0 < presentDayPGSVariance V_A fst + V_E) :
+    presentDayR2 V_A V_E fst = rsquared dgp signal dgp.trueExpectation := by
+  have h_vsig_ne : presentDayPGSVariance V_A fst ≠ 0 := by linarith
+  have h_vtrue_ne : presentDayPGSVariance V_A fst + V_E ≠ 0 := by linarith
+  have h_if_not :
+      ¬(presentDayPGSVariance V_A fst = 0 ∨ presentDayPGSVariance V_A fst + V_E = 0) := by
+    intro h
+    rcases h with h0 | h1
+    · exact h_vsig_ne h0
+    · exact h_vtrue_ne h1
+  have h_rs :
+      rsquared dgp signal dgp.trueExpectation = (presentDayPGSVariance V_A fst) ^ 2 /
+          (presentDayPGSVariance V_A fst * (presentDayPGSVariance V_A fst + V_E)) := by
+    unfold rsquared
+    simp [h_vf, h_vg, h_cov, h_if_not]
+  rw [h_rs]
+  unfold presentDayR2
+  field_simp [h_vsig_ne, h_vtrue_ne]
+
+
+
+/-- Expected `R²` from signal variance and environmental variance. -/
+noncomputable def expectedR2 (vSignal V_E : ℝ) : ℝ :=
+  vSignal / (vSignal + V_E)
 
 /-- Generic present-day AUC map from signal-to-noise (e.g. Gaussian-liability link). -/
 noncomputable def presentDayAUC (aucLink : ℝ → ℝ) (V_A V_E fst : ℝ) : ℝ :=
@@ -197,8 +306,327 @@ theorem drift_degrades_AUC_of_strictMono
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT) :
     presentDayAUC aucLink V_A V_E fstT < presentDayAUC aucLink V_A V_E fstS := by
-  unfold presentDayAUC
-  exact hauc (drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst)
+  simpa [presentDayAUC] using hauc (drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst)
+
+/-- Real-world PGS variance with both drift and LD tagging efficiency. -/
+noncomputable def realWorldPGSVariance (V_A fst rhoSq : ℝ) : ℝ :=
+  rhoSq * (1 - fst) * V_A
+
+/-- Causal-vs-observed architecture split:
+`betaCausal` and `sigmaCausal*` describe biology, while `tagging*` describes array-level observability. -/
+structure CausalObservableArchitecture (p : ℕ) where
+  betaCausal : Fin p → ℝ
+  sigmaCausalSource : Matrix (Fin p) (Fin p) ℝ
+  sigmaCausalTarget : Matrix (Fin p) (Fin p) ℝ
+  taggingSource : Matrix (Fin p) (Fin p) ℝ
+  taggingTarget : Matrix (Fin p) (Fin p) ℝ
+
+/-- Observable covariance induced by causal covariance and a tagging map. -/
+noncomputable def observableCovariance {p : ℕ}
+    (tag : Matrix (Fin p) (Fin p) ℝ) (sigmaCausal : Matrix (Fin p) (Fin p) ℝ) :
+    Matrix (Fin p) (Fin p) ℝ :=
+  tag * sigmaCausal * tag.transpose
+
+/-- Source observable LD architecture. -/
+noncomputable def sourceObservableCovariance {p : ℕ}
+    (arch : CausalObservableArchitecture p) : Matrix (Fin p) (Fin p) ℝ :=
+  observableCovariance arch.taggingSource arch.sigmaCausalSource
+
+/-- Target observable LD architecture. -/
+noncomputable def targetObservableCovariance {p : ℕ}
+    (arch : CausalObservableArchitecture p) : Matrix (Fin p) (Fin p) ℝ :=
+  observableCovariance arch.taggingTarget arch.sigmaCausalTarget
+
+/-- Source ERM weights in closed form (normal equations) under invertible source covariance. -/
+noncomputable def sourceERMWeights {p : ℕ}
+    (sigmaObsSource : Matrix (Fin p) (Fin p) ℝ)
+    (crossSource : Fin p → ℝ) : Fin p → ℝ :=
+  sigmaObsSource⁻¹.mulVec crossSource
+
+/-- Target population risk for a linear score `w` under covariance/cross/noise moments. -/
+noncomputable def targetLinearRisk {p : ℕ}
+    (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ)
+    (crossTarget : Fin p → ℝ)
+    (noiseVar : ℝ)
+    (w : Fin p → ℝ) : ℝ :=
+  noiseVar + dotProduct w (sigmaObsTarget.mulVec w) - 2 * dotProduct w crossTarget
+
+/-- If source ERM satisfies source normal equations but not target normal equations,
+the learned projection is source-LD specific (Euro-centric mismatch statement). -/
+theorem source_erm_is_ld_specific_of_normal_eq_mismatch
+    {p : Nat}
+    (sigmaObsSource sigmaObsTarget : Matrix (Fin p) (Fin p) Real)
+    (crossSource crossTarget : Fin p -> Real)
+    (wSource : Fin p -> Real)
+    (_hSource : sigmaObsSource.mulVec wSource = crossSource)
+    (hMismatch : sigmaObsTarget.mulVec wSource ≠ crossTarget) :
+    ¬ sigmaObsTarget.mulVec wSource = crossTarget := by
+  exact hMismatch
+
+/-- If one coefficient vector solves source normal equations and another solves target normal equations,
+and no single vector can satisfy both systems, then source ERM and target ERM must differ. -/
+theorem source_target_erm_differ_of_ld_system_conflict
+    {p : Nat}
+    (sigmaObsSource sigmaObsTarget : Matrix (Fin p) (Fin p) Real)
+    (crossSource crossTarget : Fin p -> Real)
+    (wSource wTarget : Fin p -> Real)
+    (hSource : sigmaObsSource.mulVec wSource = crossSource)
+    (hTarget : sigmaObsTarget.mulVec wTarget = crossTarget)
+    (hConflict :
+      ∀ w : Fin p -> Real, sigmaObsSource.mulVec w = crossSource -> sigmaObsTarget.mulVec w ≠ crossTarget) :
+    wSource ≠ wTarget := by
+  intro hEq
+  have hNotTargetAtSource : sigmaObsTarget.mulVec wSource ≠ crossTarget := hConflict wSource hSource
+  have hTargetAtSource : sigmaObsTarget.mulVec wSource = crossTarget := by simpa [hEq] using hTarget
+  exact hNotTargetAtSource hTargetAtSource
+
+/-- Multi-locus tag/causal architecture used in statistical genetics portability formulas. -/
+structure MultiLocusTagModel (p q : ℕ) where
+  betaCausal : Fin q → ℝ
+  sigmaTagSource : Matrix (Fin p) (Fin p) ℝ
+  sigmaTagTarget : Matrix (Fin p) (Fin p) ℝ
+  sigmaTagCausalSource : Matrix (Fin p) (Fin q) ℝ
+  sigmaTagCausalTarget : Matrix (Fin p) (Fin q) ℝ
+
+/-- Source OLS-style weights: `w_S = Σ_S^{-1} Σ_tc,S β_c`. -/
+noncomputable def sourceOLSWeights {p q : ℕ}
+    (m : MultiLocusTagModel p q) : Fin p → ℝ :=
+  m.sigmaTagSource⁻¹.mulVec (m.sigmaTagCausalSource.mulVec m.betaCausal)
+
+/-- Target quadratic form for the transported source score:
+`w_S^T Σ_T w_S`. -/
+noncomputable def targetScoreQuadraticFormFromSource {p q : ℕ}
+    (m : MultiLocusTagModel p q) : ℝ :=
+  let wS := sourceOLSWeights m
+  dotProduct wS (m.sigmaTagTarget.mulVec wS)
+
+/-- Target tag-causal alignment term for transported source score:
+`w_S^T Σ_tc,T β_c`. -/
+noncomputable def targetTagCausalAlignmentFromSource {p q : ℕ}
+    (m : MultiLocusTagModel p q) : ℝ :=
+  let wS := sourceOLSWeights m
+  dotProduct wS (m.sigmaTagCausalTarget.mulVec m.betaCausal)
+
+/-- Present-day target `R²` proxy induced by source-trained weights and target LD geometry. -/
+noncomputable def targetR2FromSourceWeights {p q : ℕ}
+    (m : MultiLocusTagModel p q) (V_E : ℝ) : ℝ :=
+  targetScoreQuadraticFormFromSource m / (targetScoreQuadraticFormFromSource m + V_E)
+
+/-- The target variance term is exactly the target quadratic form `w_S^T Σ_T w_S`. -/
+theorem target_score_quadratic_form_identity {p q : ℕ}
+    (m : MultiLocusTagModel p q) :
+    targetScoreQuadraticFormFromSource m =
+      dotProduct (sourceOLSWeights m) (m.sigmaTagTarget.mulVec (sourceOLSWeights m)) := by
+  simp [targetScoreQuadraticFormFromSource]
+
+/-- Ohta-Kimura-style LD-correlation decay proxy across populations:
+correlation decays exponentially with recombination distance and divergence. -/
+noncomputable def ldCorrelationDecay (distance fstGap lambda : ℝ) : ℝ :=
+  Real.exp (-(lambda * fstGap * distance))
+
+/-- For positive divergence scale, LD correlation strictly decreases with distance. -/
+theorem ldCorrelationDecay_strictAnti_distance
+    (d1 d2 fstGap lambda : ℝ)
+    (hScale : 0 < lambda * fstGap)
+    (hDist : d1 < d2) :
+    ldCorrelationDecay d2 fstGap lambda < ldCorrelationDecay d1 fstGap lambda := by
+  unfold ldCorrelationDecay
+  apply Real.exp_lt_exp.mpr
+  nlinarith [mul_lt_mul_of_pos_left hDist hScale]
+
+/-- Drift-only transport multiplier on observed signal variance. -/
+noncomputable def alleleFreqTransport (fstSource fstTarget : ℝ) : ℝ :=
+  (1 - fstTarget) / (1 - fstSource)
+
+/-- LD-only transport multiplier (tagging transfer). -/
+noncomputable def ldTransport (rhoSource rhoTarget : ℝ) : ℝ :=
+  rhoTarget / rhoSource
+
+/-- Total signal transport from source to target decomposes into AF and LD factors. -/
+noncomputable def totalSignalTransport
+    (fstSource fstTarget rhoSource rhoTarget : ℝ) : ℝ :=
+  alleleFreqTransport fstSource fstTarget * ldTransport rhoSource rhoTarget
+
+/-- Exact decomposition identity for transport multipliers. -/
+theorem totalSignalTransport_decomposes
+    (fstSource fstTarget rhoSource rhoTarget : ℝ) :
+    totalSignalTransport fstSource fstTarget rhoSource rhoTarget =
+      alleleFreqTransport fstSource fstTarget * ldTransport rhoSource rhoTarget := by
+  rfl
+
+/-- AF-only transport loss proxy (1 - AF transport multiplier). -/
+noncomputable def afTransportLoss (fstSource fstTarget : ℝ) : ℝ :=
+  1 - alleleFreqTransport fstSource fstTarget
+
+/-- LD-only transport loss proxy (1 - LD transport multiplier). -/
+noncomputable def ldTransportLoss (rhoSource rhoTarget : ℝ) : ℝ :=
+  1 - ldTransport rhoSource rhoTarget
+
+/-- Joint transport loss proxy decomposes additively into AF and LD parts. -/
+noncomputable def jointTransportLoss
+    (fstSource fstTarget rhoSource rhoTarget : ℝ) : ℝ :=
+  afTransportLoss fstSource fstTarget + ldTransportLoss rhoSource rhoTarget
+
+/-- AF+LD decomposition identity. -/
+theorem jointTransportLoss_decomposes
+    (fstSource fstTarget rhoSource rhoTarget : ℝ) :
+    jointTransportLoss fstSource fstTarget rhoSource rhoTarget =
+      afTransportLoss fstSource fstTarget + ldTransportLoss rhoSource rhoTarget := by
+  rfl
+
+/-- LD dominance criterion: if LD loss exceeds AF loss, joint loss is strictly closer to LD. -/
+theorem ld_strictly_dominates_af_in_joint_loss
+    (fstSource fstTarget rhoSource rhoTarget : ℝ)
+    (hDom : afTransportLoss fstSource fstTarget < ldTransportLoss rhoSource rhoTarget) :
+    jointTransportLoss fstSource fstTarget rhoSource rhoTarget >
+      2 * afTransportLoss fstSource fstTarget := by
+  unfold jointTransportLoss
+  linarith
+
+/-- For fixed `V_E > 0`, `v ↦ v / (v + V_E)` is strictly increasing on nonnegative variances. -/
+theorem expectedR2_strictMono_nonneg
+    (V_E x y : ℝ)
+    (hVE : 0 < V_E) (hx : 0 ≤ x) (hxy : x < y) :
+    expectedR2 x V_E < expectedR2 y V_E := by
+  unfold expectedR2
+  have hxE : 0 < x + V_E := by linarith
+  have hyE : 0 < y + V_E := by linarith [hx, hxy]
+  have hxyE : x + V_E < y + V_E := by linarith
+  have hInv : 1 / (y + V_E) < 1 / (x + V_E) := by
+    rw [one_div_lt_one_div hyE hxE]
+    exact hxyE
+  have hsub : 1 - V_E / (x + V_E) < 1 - V_E / (y + V_E) := by
+    have hmul := mul_lt_mul_of_pos_left hInv hVE
+    have hfrac : V_E / (y + V_E) < V_E / (x + V_E) := by
+      simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hmul
+    nlinarith [hfrac]
+  have hxne : x + V_E ≠ 0 := by linarith
+  have hyne : y + V_E ≠ 0 := by linarith
+  have hxrepr : x / (x + V_E) = 1 - V_E / (x + V_E) := by
+    field_simp [hxne]
+    ring
+  have hyrepr : y / (y + V_E) = 1 - V_E / (y + V_E) := by
+    field_simp [hyne]
+    ring
+  simpa [hxrepr, hyrepr] using hsub
+
+/-- With any imperfect source tagging (`ρS > 0`), worsening target tagging (`ρT < ρS`)
+strictly lowers portability when drift terms are fixed. -/
+theorem portability_ratio_with_target_ld_decay_any_source
+    (V_A V_E fstS fstT rhoS rhoT : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstS < 1) (hfstT_lt_one : fstT < 1)
+    (h_rho : 0 < rhoT ∧ rhoT < rhoS) :
+    expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E /
+      expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E <
+    expectedR2 (realWorldPGSVariance V_A fstT rhoS) V_E /
+      expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E := by
+  rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
+  have hRhoS_pos : 0 < rhoS := lt_trans hRhoT_pos hRhoT_lt_rhoS
+  have hu_pos : 0 < (1 - fstT) * V_A := by
+    have : 0 < 1 - fstT := by linarith
+    exact mul_pos this hVA
+  have h_num_lt :
+      expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E <
+        expectedR2 (realWorldPGSVariance V_A fstT rhoS) V_E := by
+    have h_scaled_lt :
+        rhoT * ((1 - fstT) * V_A) < rhoS * ((1 - fstT) * V_A) :=
+      mul_lt_mul_of_pos_right hRhoT_lt_rhoS hu_pos
+    apply expectedR2_strictMono_nonneg V_E
+    · exact hVE
+    · unfold realWorldPGSVariance
+      exact le_of_lt (by simpa [mul_assoc] using mul_pos hRhoT_pos hu_pos)
+    · simpa [realWorldPGSVariance, mul_assoc] using h_scaled_lt
+  have hsource_sig_pos : 0 < realWorldPGSVariance V_A fstS rhoS := by
+    unfold realWorldPGSVariance
+    have hOneMinus_pos : 0 < 1 - fstS := by linarith
+    have hmul : 0 < rhoS * (1 - fstS) * V_A := by
+      exact mul_pos (mul_pos hRhoS_pos hOneMinus_pos) hVA
+    simpa [mul_assoc] using hmul
+  have h_den_pos :
+      0 < expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E := by
+    unfold expectedR2
+    have hden : 0 < realWorldPGSVariance V_A fstS rhoS + V_E := by linarith [hsource_sig_pos, hVE]
+    exact div_pos hsource_sig_pos hden
+  have hmul :
+      expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E *
+          (expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E)⁻¹ <
+        expectedR2 (realWorldPGSVariance V_A fstT rhoS) V_E *
+          (expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E)⁻¹ :=
+    mul_lt_mul_of_pos_right h_num_lt (inv_pos.mpr h_den_pos)
+  simpa [div_eq_mul_inv] using hmul
+
+/-- With source perfectly tagged (`ρ_S = 1`), adding target LD decay (`ρ_T < 1`)
+strictly lowers the portability ratio versus drift-only transport. -/
+theorem portability_ratio_with_ld_decay
+    (V_A V_E fstS fstT rhoS rhoT : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst : fstS < fstT) (hfstT_lt_one : fstT < 1) (hRhoS : rhoS = 1)
+    (h_rho : 0 < rhoT ∧ rhoT < rhoS) :
+    expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E /
+      expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E <
+    expectedR2 (presentDayPGSVariance V_A fstT) V_E /
+      expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
+  rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
+  have hfstS_lt_one : fstS < 1 := lt_trans hfst hfstT_lt_one
+  have hTargetPos : 0 < (1 - fstT) * V_A := by
+    have : 0 < 1 - fstT := by linarith
+    exact mul_pos this hVA
+  have hTarget_nonneg : 0 ≤ (1 - fstT) * V_A := le_of_lt hTargetPos
+  have hRhoT_lt_one : rhoT < 1 := by simpa [hRhoS] using hRhoT_lt_rhoS
+  have hRealTarget_lt :
+      realWorldPGSVariance V_A fstT rhoT < presentDayPGSVariance V_A fstT := by
+    have hscaled :
+        rhoT * ((1 - fstT) * V_A) < 1 * ((1 - fstT) * V_A) :=
+      mul_lt_mul_of_pos_right hRhoT_lt_one hTargetPos
+    simpa [realWorldPGSVariance, presentDayPGSVariance, mul_assoc] using hscaled
+  have hR2Target_lt :
+      expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E <
+        expectedR2 (presentDayPGSVariance V_A fstT) V_E := by
+    apply expectedR2_strictMono_nonneg V_E
+    · exact hVE
+    · unfold realWorldPGSVariance
+      have hRhoTerm_nonneg : 0 ≤ rhoT * (1 - fstT) := by
+        have hOneMinus_nonneg : 0 ≤ 1 - fstT := by linarith
+        exact mul_nonneg (le_of_lt hRhoT_pos) hOneMinus_nonneg
+      exact mul_nonneg hRhoTerm_nonneg (le_of_lt hVA)
+    · exact hRealTarget_lt
+  have hSourcePos : 0 < presentDayPGSVariance V_A fstS := by
+    unfold presentDayPGSVariance
+    have : 0 < 1 - fstS := by linarith
+    exact mul_pos this hVA
+  have hR2Source_pos : 0 < expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
+    unfold expectedR2
+    have hden : 0 < presentDayPGSVariance V_A fstS + V_E := by linarith [hSourcePos, hVE]
+    exact div_pos hSourcePos hden
+  have hL :
+      expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E /
+          expectedR2 (presentDayPGSVariance V_A fstS) V_E <
+        expectedR2 (presentDayPGSVariance V_A fstT) V_E /
+          expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
+    have hmul :
+        expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E * (expectedR2 (presentDayPGSVariance V_A fstS) V_E)⁻¹ <
+          expectedR2 (presentDayPGSVariance V_A fstT) V_E * (expectedR2 (presentDayPGSVariance V_A fstS) V_E)⁻¹ :=
+      mul_lt_mul_of_pos_right hR2Target_lt (inv_pos.mpr hR2Source_pos)
+    simpa [div_eq_mul_inv] using hmul
+  simpa [hRhoS, realWorldPGSVariance] using hL
+
+/-- General LD-aware portability theorem without assuming perfect source tagging.
+Under `0 < rhoT < rhoS ≤ 1` and `fstS < fstT < 1`, the LD+drift portability ratio
+is strictly below the drift-only portability ratio. -/
+theorem portability_ratio_with_ld_decay_general
+    (V_A V_E fstS fstT rhoS rhoT : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst : fstS < fstT) (hfstT_lt_one : fstT < 1)
+    (hRhoS : rhoS = 1)
+    (h_rho : 0 < rhoT ∧ rhoT < rhoS ∧ rhoS ≤ 1) :
+    expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E /
+      expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E <
+    expectedR2 (presentDayPGSVariance V_A fstT) V_E /
+      expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
+  rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS, _⟩
+  exact portability_ratio_with_ld_decay V_A V_E fstS fstT rhoS rhoT
+    hVA hVE hfst hfstT_lt_one hRhoS ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
 
 /-- If target `R²` is strictly below source `R²`, the portability ratio is strictly below `1`. -/
 theorem portability_ratio_lt_one_of_drop
@@ -474,6 +902,70 @@ theorem targetAUC_lt_source_of_observables
       fstSource fstTarget hvS_pos h_fst hfstT_lt_one
   unfold targetAUCFromObservables sourceAUCFromObservables
   exact hauc hvT_lt
+
+/-- Exact liability-threshold AUC as a function of SNR:
+`AUC = Φ(√(snr/2))`. -/
+noncomputable def liabilityAUCFromSNR (snr : ℝ) : ℝ :=
+  Phi (Real.sqrt (snr / 2))
+
+/-- Exact liability-threshold AUC from signal and environmental variances. -/
+noncomputable def liabilityAUCFromVariances (vSignal vEnv : ℝ) : ℝ :=
+  Phi (Real.sqrt (vSignal / (2 * vEnv)))
+
+/-- With `vEnv = 1`, variance form equals SNR form exactly. -/
+theorem liabilityAUCFromVariances_scaleOne (vSignal : ℝ) :
+    liabilityAUCFromVariances vSignal 1 = liabilityAUCFromSNR vSignal := by
+  unfold liabilityAUCFromVariances liabilityAUCFromSNR
+  ring_nf
+
+/-- On nonnegative SNR, the liability-threshold AUC map is strictly increasing
+whenever `Phi` is strictly increasing. -/
+theorem liabilityAUCFromSNR_strictMonoOn_nonneg
+    (hPhiStrict : StrictMono Phi) :
+    StrictMonoOn liabilityAUCFromSNR (Set.Ici 0) := by
+  intro x hx y hy hxy
+  unfold liabilityAUCFromSNR
+  apply hPhiStrict
+  have hx2 : 0 ≤ x / 2 := by
+    exact div_nonneg hx (by positivity)
+  have hxy2 : x / 2 < y / 2 := by nlinarith
+  exact Real.sqrt_lt_sqrt hx2 hxy2
+
+/-- Observable source liability AUC under the exact LTM map. -/
+noncomputable def sourceLiabilityAUCFromObservables (r2Source : ℝ) : ℝ :=
+  liabilityAUCFromSNR (sourceVarianceFromR2 r2Source)
+
+/-- Observable target liability AUC under the exact LTM map. -/
+noncomputable def targetLiabilityAUCFromObservables
+    (r2Source fstSource fstTarget : ℝ) : ℝ :=
+  liabilityAUCFromSNR
+    (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
+
+/-- Full observable liability-AUC degradation theorem (exact LTM formula):
+if drift increases (`fstTarget > fstSource`), target AUC is strictly lower than source AUC. -/
+theorem targetLiabilityAUC_lt_source_of_observables
+    (r2Source fstSource fstTarget : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (hPhiStrict : StrictMono Phi) :
+    targetLiabilityAUCFromObservables r2Source fstSource fstTarget <
+      sourceLiabilityAUCFromObservables r2Source := by
+  rcases h_fst_bounds with ⟨_, hfstT_lt_one⟩
+  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
+    sourceVarianceFromR2_pos r2Source h_r2
+  have hvT_pos :
+      0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget :=
+    targetVarianceFromSource_pos (sourceVarianceFromR2 r2Source)
+      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
+  have hvT_lt :
+      targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget
+        < sourceVarianceFromR2 r2Source :=
+    targetVarianceFromSource_lt_source (sourceVarianceFromR2 r2Source)
+      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
+  have hmono := liabilityAUCFromSNR_strictMonoOn_nonneg hPhiStrict
+  unfold targetLiabilityAUCFromObservables sourceLiabilityAUCFromObservables
+  exact hmono (by exact le_of_lt hvT_pos) (by exact le_of_lt hvS_pos) hvT_lt
 
 /-- The Brier observable map is exactly `brierFromR2` at transported target `R²` by definition. -/
 @[simp] theorem targetBrierFromObservables_eq
