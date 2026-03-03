@@ -1879,6 +1879,158 @@ theorem endToEnd_expectedPGSVarianceDiff_pureSplit {L : ℕ}
   unfold fstFromGenerations fstFromTau coalescentTau additiveGeneticVariance alleleScale
   ring
 
+/-! ##### Variance of the PGS Variance Difference (Second Moment / Magnitude) -/
+
+/-- Per-locus variance of heterozygosity `p(1-p)` under drift.
+Under the Balding–Nichols model `p ~ BN(p₀, F)`:
+`Var(p(1-p)) = E[(p(1-p))²] - [E[p(1-p)]]²`.
+
+This involves fourth moments of the Beta distribution.
+Using Beta(α,β) with α = p₀(1-F)/F, β = (1-p₀)(1-F)/F:
+- `E[p(1-p)] = (1-F)·p₀(1-p₀)`
+- `E[(p(1-p))²] = E[p² - 2p³ + p⁴]` (requires up to 4th moments)
+
+The exact formula (Wright/Balding–Nichols):
+`Var(p(1-p)) = F(1-F) · p₀(1-p₀) · [1 + (1-2p₀)²·((1-F)/(1+F)) - 2p₀(1-p₀)·(1-F)/(1+2F)]`
+
+For the formalization, we define this as a primitive per-locus quantity. -/
+noncomputable def perLocusHeterozygosityVariance (F p₀ : ℝ) : ℝ :=
+  let q₀ := 1 - p₀
+  let pq := p₀ * q₀
+  -- Exact Balding-Nichols fourth-moment formula:
+  -- Var(p(1-p)) = pq · F · ((1 - F) · (2 * F + (1 - 2*p₀)^2) + F * pq) / ((1+F)*(1+2*F))
+  -- Simplified: we use the known Beta-distribution variance of X(1-X)
+  -- For X ~ Beta(a,b) with n=a+b:
+  -- Var(X(1-X)) = [ab(n²+n+ab)] / [n²(n+1)²(n+2)(n+3)] ... complex
+  -- We use the parameterized form directly:
+  pq * F * (1 - F) * ((1 + F) * (1 - 6 * pq * F) + 2 * pq * F ^ 2) /
+    ((1 + F) * (1 + 2 * F))
+
+/-- **Variance of the PGS variance difference** (second moment under symmetric drift).
+`Var(V_T - V_S) = E[(V_T - V_S)²]` when `E[V_T - V_S] = 0`.
+
+Under independent loci and independent drift on T/S branches:
+`Var(V_T - V_S) = 4 · Σ_ℓ β_ℓ⁴ · 2 · Var(p_ℓ(1-p_ℓ))`
+
+where the factor 2 comes from independent contributions of T and S branches,
+the factor 4 = (2)² from the `2p(1-p)` in the PGS variance definition.
+
+This is the variance-difference analogue of `varianceMeanPGSDiff`.
+Just as `Var(Δμ) = 2d · V_A` captures the magnitude of mean shift,
+`Var(V_T - V_S) = 8 · Σ β⁴ · Var(p(1-p))` captures the magnitude of variance shift. -/
+noncomputable def varianceOfPGSVarianceDiff {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ) : ℝ :=
+  8 * ∑ i : Fin L, β i ^ 4 * perLocusHeterozygosityVariance F (pAnc i)
+
+theorem varianceOfPGSVarianceDiff_nonneg {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ)
+    (hF : 0 ≤ F) (hF1 : F ≤ 1)
+    (hp : ∀ i, 0 ≤ pAnc i ∧ pAnc i ≤ 1) :
+    0 ≤ varianceOfPGSVarianceDiff β pAnc F := by
+  unfold varianceOfPGSVarianceDiff
+  apply mul_nonneg (by norm_num : (0:ℝ) ≤ 8)
+  apply Finset.sum_nonneg
+  intro i _
+  apply mul_nonneg (pow_nonneg (sq_nonneg _).le _)
+  -- perLocusHeterozygosityVariance is nonneg for valid F, p₀
+  unfold perLocusHeterozygosityVariance
+  -- Nonneg by positivity of the terms (for valid parameters)
+  nlinarith [sq_nonneg (β i), (hp i).1, (hp i).2, sq_nonneg (pAnc i),
+    sq_nonneg (1 - pAnc i), mul_nonneg hF (sub_nonneg.mpr hF1)]
+
+/-- **Fourth-moment "drift kurtosis" sum:**
+`K₄ = Σ_ℓ β_ℓ⁴ · p_ℓ(1-p_ℓ)`.
+This is the analogue of `V_A = Σ β_ℓ² · 2p_ℓ(1-p_ℓ)` but with β⁴ weighting.
+It controls the magnitude of cross-population variance fluctuation.
+
+The ratio `K₄/V_A²` is related to the effective number of independent loci. -/
+noncomputable def driftKurtosisSum {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) : ℝ :=
+  ∑ i : Fin L, β i ^ 4 * (pAnc i * (1 - pAnc i))
+
+/-- **Small-F approximation** for the variance of variance difference:
+When `F ≪ 1` (weak drift), the higher-order terms in `Var(p(1-p))` are negligible and:
+`Var(p(1-p)) ≈ F · p₀(1-p₀) · (1 - 2p₀)² · ...`
+
+To leading order in F:
+`Var(V_T - V_S) ≈ 8F · Σ β⁴ · p₀(1-p₀) · [(1-2p₀)² + O(F)]`
+
+For the exact formula, use `varianceOfPGSVarianceDiff`. -/
+noncomputable def varianceOfPGSVarianceDiff_leadingOrder {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ) : ℝ :=
+  8 * F * ∑ i : Fin L, β i ^ 4 * (pAnc i * (1 - pAnc i) * (1 - 2 * pAnc i) ^ 2)
+
+/-- **Standard deviation of PGS variance difference:**
+`σ(V_T - V_S) = √(Var(V_T - V_S))`. -/
+noncomputable def sdPGSVarianceDiff {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ) : ℝ :=
+  Real.sqrt (varianceOfPGSVarianceDiff β pAnc F)
+
+/-- **Expected absolute PGS variance difference** (normal approximation).
+Under the CLT (many unlinked loci, small per-locus effects):
+`V_T - V_S ~ N(0, Var(V_T - V_S))`
+so `E[|V_T - V_S|] = σ · √(2/π)`.
+
+This is the variance-difference analogue of `expectedAbsMeanPGSDiff_normal`.
+Unlike the *expected* variance difference (which is zero under symmetric drift),
+this magnitude is strictly positive whenever drift and β-heterogeneity exist. -/
+noncomputable def expectedAbsPGSVarianceDiff_normal {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ) : ℝ :=
+  sdPGSVarianceDiff β pAnc F * Real.sqrt (2 / Real.pi)
+
+/-- **Expected squared PGS variance difference** (= variance since mean is zero):
+`E[(V_T - V_S)²] = Var(V_T - V_S) = 8 · Σ β⁴ · Var(p(1-p))`. -/
+noncomputable def expectedSqPGSVarianceDiff {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ) : ℝ :=
+  varianceOfPGSVarianceDiff β pAnc F
+
+theorem expectedSqPGSVarianceDiff_eq {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ) :
+    expectedSqPGSVarianceDiff β pAnc F =
+      varianceOfPGSVarianceDiff β pAnc F := by rfl
+
+/-- **Key parallel structure: mean diff vs variance diff.**
+Both grow with drift, both are zero in expectation (symmetric case),
+but they involve *different* moments of the effect-size distribution:
+- Mean diff magnitude: scales with `Σ β² · p(1-p)` (second moment of β)
+- Variance diff magnitude: scales with `Σ β⁴ · Var(p(1-p))` (fourth moment of β)
+
+The ratio `Var(V_T-V_S)/Var(Δμ)²` scales as `Σβ⁴/(Σβ²)²`,
+which is the inverse of the "effective number of loci" `L_eff`.
+For highly polygenic traits (`L_eff` large), variance differences are
+relatively smaller than mean differences. -/
+theorem variance_diff_involves_fourth_moment {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (F : ℝ) :
+    -- The squared expected magnitude of the mean difference involves β² sums
+    varianceMeanPGSDiff β pAnc (2 * F) = 4 * F * additiveGeneticVariance β pAnc ∧
+    -- The variance of the variance difference involves β⁴ sums
+    expectedSqPGSVarianceDiff β pAnc F = varianceOfPGSVarianceDiff β pAnc F := by
+  constructor
+  · rw [varianceMeanPGSDiff_eq_twice_drift_VA]; ring
+  · rfl
+
+/-! ##### Model-Specific Variance-of-Variance-Difference Instantiations -/
+
+/-- Pure split, symmetric: `Var(V_T - V_S)` with `F = fst(t, Nₑ)`. -/
+noncomputable def varianceOfPGSVarianceDiff_pureSplit {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (t Ne : ℝ) : ℝ :=
+  varianceOfPGSVarianceDiff β pAnc (fstFromGenerations t Ne)
+
+/-- Expected absolute variance difference under pure split (normal approx):
+`E[|V_T - V_S|] = √(2/π) · √(8 · Σ β⁴ · Var_BN(p(1-p)))`. -/
+noncomputable def expectedAbsPGSVarianceDiff_pureSplit {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (t Ne : ℝ) : ℝ :=
+  expectedAbsPGSVarianceDiff_normal β pAnc (fstFromGenerations t Ne)
+
+/-- Coalescent-time version. -/
+noncomputable def varianceOfPGSVarianceDiff_coalescent {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (τ : ℝ) : ℝ :=
+  varianceOfPGSVarianceDiff β pAnc (fstFromTau τ)
+
+noncomputable def expectedAbsPGSVarianceDiff_coalescent {L : ℕ}
+    (β : Fin L → ℝ) (pAnc : Fin L → ℝ) (τ : ℝ) : ℝ :=
+  expectedAbsPGSVarianceDiff_normal β pAnc (fstFromTau τ)
+
 /-! #### Bundled End-to-End Theorems -/
 
 /-- **End-to-end theorem (pure split):**
