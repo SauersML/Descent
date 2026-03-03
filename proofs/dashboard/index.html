@@ -1,935 +1,1013 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gnomon · PGS Portability Explorer</title>
-<meta name="description" content="Interactive explorer for PGS portability across populations under genetic drift. All formulas are formally proven in Lean 4 / Mathlib.">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<style>
-:root {
-  --bg-primary: #0a0e1a;
-  --bg-secondary: #111827;
-  --bg-card: #1a2035;
-  --bg-card-hover: #1e2642;
-  --border: #2a3352;
-  --border-glow: rgba(99, 102, 241, 0.3);
-  --text-primary: #f0f2f8;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent-indigo: #6366f1;
-  --accent-violet: #8b5cf6;
-  --accent-cyan: #06b6d4;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
-  --gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6);
-  --gradient-warm: linear-gradient(135deg, #f59e0b, #f43f5e);
-  --gradient-cool: linear-gradient(135deg, #06b6d4, #10b981);
-  --shadow-lg: 0 20px 60px -12px rgba(0,0,0,0.5);
-  --shadow-glow: 0 0 30px rgba(99,102,241,0.15);
-  --radius: 12px;
-  --radius-lg: 16px;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Inter', -apple-system, sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  min-height: 100vh;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-.hero {
-  background: linear-gradient(180deg, rgba(99,102,241,0.08) 0%, transparent 60%);
-  border-bottom: 1px solid var(--border);
-  padding: 2rem 2rem 1.5rem;
-  text-align: center;
-}
-.hero h1 {
-  font-size: 2.2rem;
-  font-weight: 800;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.3rem;
-}
-.hero .subtitle {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  font-weight: 400;
-}
-.hero .badge {
-  display: inline-block;
-  margin-top: 0.6rem;
-  padding: 0.25rem 0.8rem;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  background: rgba(99,102,241,0.15);
-  color: var(--accent-indigo);
-  border: 1px solid rgba(99,102,241,0.25);
-}
-.container {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-.grid-main {
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 1.5rem;
-}
-@media (max-width: 1024px) {
-  .grid-main { grid-template-columns: 1fr; }
-}
-/* Sidebar / Controls */
-.sidebar { display: flex; flex-direction: column; gap: 1rem; }
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.2rem;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-.card:hover {
-  border-color: var(--border-glow);
-  box-shadow: var(--shadow-glow);
-}
-.card-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.card-title .icon {
-  width: 18px; height: 18px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-}
-.control-group {
-  margin-bottom: 0.9rem;
-}
-.control-group:last-child { margin-bottom: 0; }
-.control-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 0.3rem;
-}
-.control-label span:first-child {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-.control-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--accent-indigo);
-  background: rgba(99,102,241,0.1);
-  padding: 0.1rem 0.45rem;
-  border-radius: 4px;
-}
-input[type="range"] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--border);
-  outline: none;
-  cursor: pointer;
-}
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--accent-indigo);
-  box-shadow: 0 0 10px rgba(99,102,241,0.5);
-  cursor: pointer;
-  transition: transform 0.15s;
-}
-input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
-select {
-  width: 100%;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.45rem 0.6rem;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.82rem;
-  cursor: pointer;
-  outline: none;
-}
-select:focus { border-color: var(--accent-indigo); }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gnomon · PGS Portability Explorer</title>
+  <meta name="description"
+    content="Interactive explorer for PGS portability across populations under genetic drift. All formulas formally proven in Lean 4 / Mathlib.">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #111827;
+      --bg-card: #1a2035;
+      --border: #2a3352;
+      --border-glow: rgba(99, 102, 241, 0.3);
+      --text-primary: #f0f2f8;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-indigo: #6366f1;
+      --accent-violet: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6);
+      --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+      --radius: 12px;
+      --radius-lg: 16px;
+    }
 
-/* Main content */
-.content { display: flex; flex-direction: column; gap: 1.5rem; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* Metric cards row */
-.metrics-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-}
-@media (max-width: 900px) {
-  .metrics-row { grid-template-columns: repeat(2, 1fr); }
-}
-.metric-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.2rem;
-  position: relative;
-  overflow: hidden;
-}
-.metric-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-}
-.metric-card.indigo::before { background: var(--gradient-primary); }
-.metric-card.cyan::before { background: var(--gradient-cool); }
-.metric-card.amber::before { background: var(--gradient-warm); }
-.metric-card.emerald::before { background: linear-gradient(135deg, #10b981, #06b6d4); }
-.metric-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  margin-bottom: 0.35rem;
-}
-.metric-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.6rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-.metric-card.indigo .metric-value { color: var(--accent-indigo); }
-.metric-card.cyan .metric-value { color: var(--accent-cyan); }
-.metric-card.amber .metric-value { color: var(--accent-amber); }
-.metric-card.emerald .metric-value { color: var(--accent-emerald); }
-.metric-unit {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  margin-top: 0.15rem;
-}
-.metric-formula {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  margin-top: 0.4rem;
-  opacity: 0.7;
-}
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-/* Charts */
-.charts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-@media (max-width: 900px) {
-  .charts-grid { grid-template-columns: 1fr; }
-}
-.chart-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.2rem;
-}
-.chart-card h3 {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.8rem;
-}
-.chart-card canvas {
-  width: 100% !important;
-  height: 260px !important;
-}
-.chart-card-wide canvas {
-  height: 300px !important;
-}
+    /* ─── Hero ─── */
+    .hero {
+      background: linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 2rem 1.2rem;
+      text-align: center;
+    }
 
-/* Distribution viz */
-.dist-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-@media (max-width: 900px) {
-  .dist-row { grid-template-columns: 1fr; }
-}
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
 
-/* Footer */
-.footer {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  border-top: 1px solid var(--border);
-  margin-top: 2rem;
-}
-.footer a { color: var(--accent-indigo); text-decoration: none; }
+    .hero .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
 
-/* Tooltip */
-.formula-tooltip {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  color: var(--text-secondary);
-  background: rgba(99,102,241,0.08);
-  padding: 0.5rem 0.7rem;
-  border-radius: 6px;
-  margin-top: 0.6rem;
-  border: 1px solid rgba(99,102,241,0.15);
-  line-height: 1.5;
-}
-</style>
+    .hero .badge {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--accent-indigo);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+    }
+
+    /* ─── Layout ─── */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    /* ─── Cards ─── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--border-glow);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .card-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .card-title .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* ─── Controls ─── */
+    .control-group {
+      margin-bottom: 0.8rem;
+    }
+
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.25rem;
+    }
+
+    .control-label span:first-child {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .control-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent-indigo);
+      background: rgba(99, 102, 241, 0.1);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-indigo);
+      box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    select {
+      width: 100%;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.4rem 0.5rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      outline: none;
+    }
+
+    select:focus {
+      border-color: var(--accent-indigo);
+    }
+
+    /* ─── Metrics ─── */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+    }
+
+    @media (max-width: 900px) {
+      .metrics-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .metric-card.indigo::before {
+      background: var(--gradient-primary);
+    }
+
+    .metric-card.cyan::before {
+      background: linear-gradient(135deg, #06b6d4, #10b981);
+    }
+
+    .metric-card.amber::before {
+      background: linear-gradient(135deg, #f59e0b, #f43f5e);
+    }
+
+    .metric-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .metric-card.indigo .metric-value {
+      color: var(--accent-indigo);
+    }
+
+    .metric-card.cyan .metric-value {
+      color: var(--accent-cyan);
+    }
+
+    .metric-card.amber .metric-value {
+      color: var(--accent-amber);
+    }
+
+    .metric-formula {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      opacity: 0.8;
+    }
+
+    .metric-proof {
+      font-size: 0.58rem;
+      color: var(--accent-violet);
+      margin-top: 0.15rem;
+      opacity: 0.7;
+    }
+
+    .metric-proof a {
+      color: var(--accent-violet);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--accent-violet);
+      cursor: pointer;
+    }
+
+    .metric-proof a:hover {
+      opacity: 1;
+      color: var(--accent-indigo);
+    }
+
+    /* ─── Charts ─── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 900px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+    }
+
+    .chart-card h3 {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.6rem;
+    }
+
+    .chart-card canvas {
+      width: 100% !important;
+      height: 240px !important;
+    }
+
+    .chart-card-wide canvas {
+      height: 280px !important;
+    }
+
+    /* ─── Info box ─── */
+    .formula-box {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      background: rgba(99, 102, 241, 0.06);
+      padding: 0.6rem 0.7rem;
+      border-radius: 6px;
+      border: 1px solid rgba(99, 102, 241, 0.12);
+      line-height: 1.6;
+    }
+
+    .formula-box strong {
+      color: var(--accent-indigo);
+    }
+
+    .model-note {
+      font-size: 0.72rem;
+      color: var(--accent-amber);
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.15);
+      border-radius: 6px;
+      padding: 0.5rem 0.7rem;
+      margin-top: 0.5rem;
+    }
+
+    /* ─── Footer ─── */
+    .footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      border-top: 1px solid var(--border);
+      margin-top: 1.5rem;
+    }
+
+    .footer a {
+      color: var(--accent-indigo);
+      text-decoration: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="hero">
-  <h1>Gnomon · PGS Portability Explorer</h1>
-  <p class="subtitle">Exact drift-theoretic formulas for polygenic score transferability across populations</p>
-  <span class="badge">All formulas formally verified in Lean 4 / Mathlib</span>
-</div>
-
-<div class="container">
-<div class="grid-main">
-
-<!-- ═══ SIDEBAR / CONTROLS ═══ -->
-<div class="sidebar">
-
-  <div class="card">
-    <div class="card-title"><span class="icon" style="background:var(--accent-indigo);">⚙</span> Demographic Model</div>
-    <div class="control-group">
-      <select id="model-select" onchange="updateAll()">
-        <option value="pure_split">Pure Split (t, Nₑ)</option>
-        <option value="im_equilibrium">Isolation-with-Migration (M)</option>
-        <option value="coalescent">Coalescent Units (τ)</option>
-      </select>
-    </div>
+  <div class="hero">
+    <h1>Gnomon · PGS Portability Explorer</h1>
+    <p class="subtitle">Exact drift-theoretic formulas for polygenic score transferability</p>
+    <span class="badge">Every formula formally verified in Lean 4 / Mathlib</span>
   </div>
 
-  <div class="card" id="params-pure-split">
-    <div class="card-title"><span class="icon" style="background:var(--accent-violet);">𝜏</span> Divergence Parameters</div>
-    <div class="control-group">
-      <div class="control-label">
-        <span>Split time (generations)</span>
-        <span class="control-value" id="val-t">500</span>
+  <div class="container">
+    <div class="grid-main">
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- SIDEBAR                                -->
+      <!-- ═══════════════════════════════════════ -->
+      <div class="sidebar">
+
+        <div class="card">
+          <div class="card-title"><span class="dot" style="background:var(--accent-indigo)"></span> Demographic Model
+          </div>
+          <div class="control-group">
+            <select id="model-select" onchange="updateAll()">
+              <option value="pure_split">Pure Split (t, Nₑ)</option>
+              <option value="im_equilibrium">2-Deme IM Equilibrium (M)</option>
+            </select>
+          </div>
+          <div class="model-note" id="model-note-ps">
+            Symmetric split: both pops diverge from common ancestor for t generations at size Nₑ.
+          </div>
+          <div class="model-note hidden" id="model-note-im">
+            Two demes at migration–drift equilibrium. M = 4Nₑm (scaled migration rate).
+          </div>
+        </div>
+
+        <!-- Pure Split params -->
+        <div class="card" id="params-ps">
+          <div class="card-title"><span class="dot" style="background:var(--accent-violet)"></span> Divergence
+            Parameters</div>
+          <div class="control-group">
+            <div class="control-label">
+              <span>Split time (generations)</span>
+              <span class="control-value" id="val-t">500</span>
+            </div>
+            <input type="range" id="slider-t" min="10" max="10000" value="500" step="10" oninput="updateAll()">
+          </div>
+          <div class="control-group">
+            <div class="control-label">
+              <span>Effective pop size (Nₑ)</span>
+              <span class="control-value" id="val-Ne">10000</span>
+            </div>
+            <input type="range" id="slider-Ne" min="500" max="100000" value="10000" step="500" oninput="updateAll()">
+          </div>
+          <div class="formula-box">
+            <strong>F_ST</strong> = 1 − exp(−t/(2Nₑ))<br>
+            <strong>τ</strong> = t/(2Nₑ) coalescent units<br>
+            <em>Proven: fstFromGenerations_eq</em>
+          </div>
+        </div>
+
+        <!-- IM params -->
+        <div class="card hidden" id="params-im">
+          <div class="card-title"><span class="dot" style="background:var(--accent-cyan)"></span> Migration Parameters
+          </div>
+          <div class="control-group">
+            <div class="control-label">
+              <span>Scaled migration (M = 4Nₑm)</span>
+              <span class="control-value" id="val-M">1.00</span>
+            </div>
+            <input type="range" id="slider-M" min="0.05" max="20" value="1" step="0.05" oninput="updateAll()">
+          </div>
+          <div class="formula-box">
+            <strong>δ_eq</strong> = 1/(2M+1)<br>
+            <strong>E[T_same]</strong> = 2 coal. units<br>
+            <strong>E[T_diff]</strong> = (2M+1)/M<br>
+            <em>Proven: twoDemeIMEquilibriumDelta_eq</em>
+          </div>
+        </div>
+
+        <!-- Trait architecture — always shown -->
+        <div class="card">
+          <div class="card-title"><span class="dot" style="background:var(--accent-amber)"></span> Trait Architecture
+          </div>
+          <div class="control-group" id="ctrl-L">
+            <div class="control-label">
+              <span>Causal loci (L)</span>
+              <span class="control-value" id="val-L">1000</span>
+            </div>
+            <input type="range" id="slider-L" min="10" max="50000" value="1000" step="10" oninput="updateAll()">
+          </div>
+          <div class="control-group">
+            <div class="control-label">
+              <span>Heritability (h²)</span>
+              <span class="control-value" id="val-h2">0.50</span>
+            </div>
+            <input type="range" id="slider-h2" min="0.01" max="0.99" value="0.5" step="0.01" oninput="updateAll()">
+          </div>
+          <div class="control-group" id="ctrl-maf">
+            <div class="control-label">
+              <span>Mean ancestral MAF (p̄)</span>
+              <span class="control-value" id="val-maf">0.25</span>
+            </div>
+            <input type="range" id="slider-maf" min="0.01" max="0.50" value="0.25" step="0.01" oninput="updateAll()">
+          </div>
+          <div class="formula-box" id="trait-formula-box">
+            h² sets the total genetic variance. L and MAF control the per-locus effect size distribution.<br>
+            <em><a onclick="openProof('additiveGeneticVariance')" style="color:var(--accent-violet);cursor:pointer">Lean
+                proof ↗</a></em>
+          </div>
+        </div>
+
       </div>
-      <input type="range" id="slider-t" min="10" max="5000" value="500" step="10" oninput="updateAll()">
-    </div>
-    <div class="control-group">
-      <div class="control-label">
-        <span>Effective pop size (Nₑ)</span>
-        <span class="control-value" id="val-Ne">10000</span>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- MAIN CONTENT                           -->
+      <!-- ═══════════════════════════════════════ -->
+      <div class="content">
+
+        <!-- Key Metrics — 3 that are proven for BOTH models -->
+        <div class="metrics-row">
+          <div class="metric-card indigo">
+            <div class="metric-label" id="metric-drift-label">Population Divergence (F_ST)</div>
+            <div class="metric-value" id="metric-drift">0.0247</div>
+            <div class="metric-formula" id="metric-drift-formula">How genetically different the populations are</div>
+            <div class="metric-proof" id="metric-drift-proof"><a onclick="openProof('fstFromGenerations')">Lean proof
+                ↗</a></div>
+          </div>
+          <div class="metric-card cyan">
+            <div class="metric-label">Expected Mean PGS Shift</div>
+            <div class="metric-value" id="metric-mean-shift">0.141</div>
+            <div class="metric-formula">In phenotype standard deviations</div>
+            <div class="metric-proof"><a onclick="openProof('expectedAbsMeanPGSDiff')">Lean proof ↗</a></div>
+          </div>
+          <div class="metric-card amber">
+            <div class="metric-label">PGS Variance Retained in Target</div>
+            <div class="metric-value" id="metric-var-ratio">0.975</div>
+            <div class="metric-formula">Fraction of genetic variance remaining</div>
+            <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceUnderDrift')">Lean proof ↗</a></div>
+          </div>
+        </div>
+
+        <!-- Extra metrics for Pure Split (variance magnitude) -->
+        <div class="metrics-row" id="metrics-ps-extra">
+          <div class="metric-card indigo">
+            <div class="metric-label">Squared Mean PGS Difference</div>
+            <div class="metric-value" id="metric-sq-mean">0.0988</div>
+            <div class="metric-formula">Relative to genetic variance</div>
+            <div class="metric-proof"><a onclick="openProof('expectedSqMeanPGSDiff_pureSplit')">Lean proof ↗</a></div>
+          </div>
+          <div class="metric-card cyan">
+            <div class="metric-label">Expected PGS Variance Shift</div>
+            <div class="metric-value" id="metric-abs-var-diff">0.008</div>
+            <div class="metric-formula">Magnitude of variance change between pops</div>
+            <div class="metric-proof"><a onclick="openProof('expectedAbsPGSVarianceDiff')">Lean proof ↗</a></div>
+          </div>
+          <div class="metric-card amber">
+            <div class="metric-label">Coalescent Time</div>
+            <div class="metric-value" id="metric-tau">0.025</div>
+            <div class="metric-formula">Drift time in units of 2Nₑ generations</div>
+            <div class="metric-proof"><a onclick="openProof('coalescentTau')">Lean proof ↗</a></div>
+          </div>
+        </div>
+
+        <!-- Extra metrics for IM -->
+        <div class="metrics-row hidden" id="metrics-im-extra">
+          <div class="metric-card indigo">
+            <div class="metric-label">Squared Mean PGS Difference</div>
+            <div class="metric-value" id="metric-sq-mean-im">1.333</div>
+            <div class="metric-formula">Relative to genetic variance</div>
+            <div class="metric-proof"><a onclick="openProof('expectedSqMeanPGSDiff_IMEquilibrium')">Lean proof ↗</a>
+            </div>
+          </div>
+          <div class="metric-card cyan">
+            <div class="metric-label">Within-Deme Coalescence Time</div>
+            <div class="metric-value" id="metric-et-same">2.000</div>
+            <div class="metric-formula">Expected time to common ancestor (same deme)</div>
+            <div class="metric-proof"><a onclick="openProof('twoDemeIMEquilibriumETss')">Lean proof ↗</a></div>
+          </div>
+          <div class="metric-card amber">
+            <div class="metric-label">Between-Deme Coalescence Time</div>
+            <div class="metric-value" id="metric-et-diff">3.000</div>
+            <div class="metric-formula">Expected time to common ancestor (different demes)</div>
+            <div class="metric-proof"><a onclick="openProof('twoDemeIMEquilibriumETst')">Lean proof ↗</a></div>
+          </div>
+        </div>
+
+        <!-- ═══ CHARTS: Pure Split ═══ -->
+        <div id="charts-ps">
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h3>PGS Mean Distribution: Source vs Target</h3>
+              <canvas id="chart-ps-mean-dist"></canvas>
+            </div>
+            <div class="chart-card">
+              <h3>PGS Variance Distribution: Source vs Target</h3>
+              <canvas id="chart-ps-var-dist"></canvas>
+            </div>
+          </div>
+          <div class="charts-grid" style="margin-top:1.2rem">
+            <div class="chart-card">
+              <h3>Population Divergence Over Time</h3>
+              <canvas id="chart-ps-fst"></canvas>
+            </div>
+            <div class="chart-card">
+              <h3>Portability Metrics vs Population Divergence</h3>
+              <canvas id="chart-ps-summary"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ CHARTS: IM Equilibrium ═══ -->
+        <div id="charts-im" class="hidden">
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h3>PGS Mean Distribution: Source vs Target (IM Eq.)</h3>
+              <canvas id="chart-im-mean-dist"></canvas>
+            </div>
+            <div class="chart-card">
+              <h3>Genetic Differentiation vs Migration Rate</h3>
+              <canvas id="chart-im-delta"></canvas>
+            </div>
+          </div>
+          <div class="charts-grid" style="margin-top:1.2rem">
+            <div class="chart-card">
+              <h3>Time to Common Ancestor vs Migration Rate</h3>
+              <canvas id="chart-im-coal"></canvas>
+            </div>
+            <div class="chart-card">
+              <h3>Squared Mean PGS Difference vs Migration Rate</h3>
+              <canvas id="chart-im-mean-sq"></canvas>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <input type="range" id="slider-Ne" min="100" max="100000" value="10000" step="100" oninput="updateAll()">
     </div>
   </div>
 
-  <div class="card" id="params-im" style="display:none">
-    <div class="card-title"><span class="icon" style="background:var(--accent-cyan);">↔</span> Migration Parameters</div>
-    <div class="control-group">
-      <div class="control-label">
-        <span>Scaled migration (M = 4Nₑm)</span>
-        <span class="control-value" id="val-M">1.0</span>
-      </div>
-      <input type="range" id="slider-M" min="0.01" max="20" value="1" step="0.01" oninput="updateAll()">
-    </div>
-    <div class="control-group">
-      <div class="control-label">
-        <span>Number of demes (n)</span>
-        <span class="control-value" id="val-n">10</span>
-      </div>
-      <input type="range" id="slider-n" min="2" max="100" value="10" step="1" oninput="updateAll()">
-    </div>
+  <div class="footer">
+    All formulas formally verified in <a href="https://github.com/SauersML/gnomon" target="_blank">Lean 4 / Mathlib</a>
+    ·
+    <code>proofs/Calibrator/PortabilityDrift.lean</code>
   </div>
 
-  <div class="card" id="params-coal" style="display:none">
-    <div class="card-title"><span class="icon" style="background:var(--accent-emerald);">τ</span> Coalescent Time</div>
-    <div class="control-group">
-      <div class="control-label">
-        <span>Coalescent units (τ)</span>
-        <span class="control-value" id="val-tau">0.025</span>
-      </div>
-      <input type="range" id="slider-tau" min="0.001" max="2" value="0.025" step="0.001" oninput="updateAll()">
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="icon" style="background:var(--accent-amber);">β</span> Trait Architecture</div>
-    <div class="control-group">
-      <div class="control-label">
-        <span>Number of causal loci (L)</span>
-        <span class="control-value" id="val-L">1000</span>
-      </div>
-      <input type="range" id="slider-L" min="10" max="50000" value="1000" step="10" oninput="updateAll()">
-    </div>
-    <div class="control-group">
-      <div class="control-label">
-        <span>Heritability (h²)</span>
-        <span class="control-value" id="val-h2">0.50</span>
-      </div>
-      <input type="range" id="slider-h2" min="0.01" max="0.99" value="0.5" step="0.01" oninput="updateAll()">
-    </div>
-    <div class="control-group">
-      <div class="control-label">
-        <span>Mean ancestral MAF</span>
-        <span class="control-value" id="val-maf">0.25</span>
-      </div>
-      <input type="range" id="slider-maf" min="0.01" max="0.50" value="0.25" step="0.01" oninput="updateAll()">
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="icon" style="background:var(--accent-rose);">📐</span> Proven Formulas</div>
-    <div class="formula-tooltip">
-      <strong>fst(t,Nₑ)</strong> = 1 − exp(−t/(2Nₑ))<br>
-      <strong>V_A</strong> = Σ β²·2p(1−p)<br>
-      <strong>E[(Δμ)²]</strong> = 2d·V_A<br>
-      <strong>E[|Δμ|]</strong> = σ·√(2/π)<br>
-      <strong>E[Var_pop]</strong> = (1−d)·V_A<br>
-      <strong>Var(ΔV)</strong> = 8·Σβ⁴·Var(p(1−p))<br>
-      <strong>δ_eq</strong> = 1/(2M+1)<br>
-      <strong>F_ST</strong> = 1/(1+M·n²/(n−1)²)
-    </div>
-  </div>
-
-</div>
-
-<!-- ═══ MAIN CONTENT ═══ -->
-<div class="content">
-
-  <!-- Key Metrics -->
-  <div class="metrics-row">
-    <div class="metric-card indigo">
-      <div class="metric-label">Drift Factor (F_ST)</div>
-      <div class="metric-value" id="metric-fst">0.025</div>
-      <div class="metric-formula" id="formula-fst">1 − exp(−t/(2Nₑ))</div>
-    </div>
-    <div class="metric-card cyan">
-      <div class="metric-label">E[|Δμ|] / σ_pheno</div>
-      <div class="metric-value" id="metric-mean-shift">0.142</div>
-      <div class="metric-formula">√(2/π) · √(2d·V_A)</div>
-    </div>
-    <div class="metric-card amber">
-      <div class="metric-label">E[|ΔVar|] / V_A</div>
-      <div class="metric-value" id="metric-var-shift">0.008</div>
-      <div class="metric-formula">√(2/π) · √(8·Σβ⁴·Var(p(1−p)))</div>
-    </div>
-    <div class="metric-card emerald">
-      <div class="metric-label">Relative R² Loss</div>
-      <div class="metric-value" id="metric-r2-loss">2.5%</div>
-      <div class="metric-formula">≈ 2d · h² / (1 + h²·…)</div>
-    </div>
-  </div>
-
-  <!-- Distribution visualizations -->
-  <div class="dist-row">
-    <div class="chart-card">
-      <h3>PGS Mean Distribution: Source vs Target</h3>
-      <canvas id="chart-mean-dist"></canvas>
-    </div>
-    <div class="chart-card">
-      <h3>PGS Variance Distribution: Source vs Target</h3>
-      <canvas id="chart-var-dist"></canvas>
-    </div>
-  </div>
-
-  <!-- Portability curves -->
-  <div class="charts-grid">
-    <div class="chart-card">
-      <h3>F_ST vs Divergence Time</h3>
-      <canvas id="chart-fst-time"></canvas>
-    </div>
-    <div class="chart-card">
-      <h3>E[(Δμ)²] / V_A vs Drift Factor</h3>
-      <canvas id="chart-mean-sq"></canvas>
-    </div>
-    <div class="chart-card">
-      <h3>Expected PGS Variance Ratio vs Drift</h3>
-      <canvas id="chart-var-ratio"></canvas>
-    </div>
-    <div class="chart-card">
-      <h3>F_ST: Finite Island vs Many-Deme Limit</h3>
-      <canvas id="chart-fst-island"></canvas>
-    </div>
-  </div>
-
-  <!-- Wide chart -->
-  <div class="chart-card chart-card-wide">
-    <h3>Portability Summary: All Metrics vs Drift Factor</h3>
-    <canvas id="chart-summary"></canvas>
-  </div>
-
-</div>
-</div>
-</div>
-
-<div class="footer">
-  All formulas are formally verified in <a href="https://github.com/SauersML/gnomon" target="_blank">Lean 4 / Mathlib</a>.
-  See <code>proofs/Calibrator/PortabilityDrift.lean</code> for the complete proof chain.
-</div>
-
-<script>
-// ═══════════════════════════════════════════════════════════════
-// EXACT FORMULAS FROM LEAN PROOFS
-// Each function corresponds to a proven theorem in PortabilityDrift.lean
-// ═══════════════════════════════════════════════════════════════
-
-// fstFromGenerations (t Ne : ℝ) := 1 - exp(-t/(2*Ne))
-// Proven: fstFromGenerations_eq
-function fstFromGenerations(t, Ne) {
-  return 1 - Math.exp(-t / (2 * Ne));
-}
-
-// fstFromTau (τ : ℝ) := 1 - exp(-τ)
-// Proven: fst_from_tau in pure definitional equality
-function fstFromTau(tau) {
-  return 1 - Math.exp(-tau);
-}
-
-// coalescentTau (t Ne : ℝ) := t / (2 * Ne)
-// Proven: coalescentTau definition
-function coalescentTau(t, Ne) {
-  return t / (2 * Ne);
-}
-
-// generationsFromFst (Ne fst : ℝ) := -2 * Ne * log(1 - fst)
-// Proven: generationsFromFst_tau_inverse
-function generationsFromFst(Ne, fst) {
-  return -2 * Ne * Math.log(1 - fst);
-}
-
-// demesCorrectionFactor (n : ℕ) := n² / (n-1)²
-// Proven: demesCorrectionFactor definition
-function demesCorrectionFactor(n) {
-  return (n * n) / ((n - 1) * (n - 1));
-}
-
-// WilkinsonHerbotsIslandModel.fstGlobalExact:
-// 1 / (1 + M * n²/(n-1)² + h * n/(n-1))
-// Proven: WilkinsonHerbots_fstGlobal_exact
-function fstIslandGlobalExact(M, n, h) {
-  h = h || 0;
-  return 1 / (1 + M * demesCorrectionFactor(n) + h * n / (n - 1));
-}
-
-// Many-deme limit: 1/(1+M)
-// Proven: WilkinsonHerbots_fstGlobal_manyDeme_limit
-function fstManyDemeLimit(M) {
-  return 1 / (1 + M);
-}
-
-// twoDemeIMEquilibriumDelta (M : ℝ) := 1 / (2 * M + 1)
-// Proven: twoDemeIMEquilibriumDelta_eq
-function imEquilibriumDelta(M) {
-  return 1 / (2 * M + 1);
-}
-
-// twoDemeIMEquilibriumETss (M : ℝ) := 2 (coalescent units)
-// Proven: twoDemeIMEquilibriumETss definition
-function imEquilibriumETss() { return 2; }
-
-// twoDemeIMEquilibriumETst (M : ℝ) := (2*M+1)/M
-// Proven: twoDemeIMEquilibriumETst definition
-function imEquilibriumETst(M) { return (2 * M + 1) / M; }
-
-// additiveGeneticVariance: V_A = Σ β² · 2p(1-p)
-// Proven: additiveGeneticVariance definition
-// We use a simplified model: equal β, equal MAF
-function additiveGeneticVariance(L, beta, p) {
-  return L * beta * beta * 2 * p * (1 - p);
-}
-
-// varianceMeanPGSDiff := 4 * d * Σ β² · p(1-p)
-// Proven: varianceMeanPGSDiff_eq_twice_drift_VA
-// = 2 * d * V_A
-function varianceMeanPGSDiff(L, beta, p, d) {
-  return 2 * d * additiveGeneticVariance(L, beta, p);
-}
-
-// expectedSqMeanPGSDiff_pureSplit := varianceMeanPGSDiff β pAnc (2*fst)
-// = 4 * fst * V_A
-// Proven: expectedSqMeanPGSDiff_pureSplit_eq
-function expectedSqMeanPGSDiff(L, beta, p, fst) {
-  return 4 * fst * additiveGeneticVariance(L, beta, p);
-}
-
-// sdMeanPGSDiff := sqrt(varianceMeanPGSDiff)
-// Proven: sdMeanPGSDiff definition
-function sdMeanPGSDiff(L, beta, p, d) {
-  return Math.sqrt(varianceMeanPGSDiff(L, beta, p, d));
-}
-
-// expectedAbsMeanPGSDiff_normal := sd * sqrt(2/π)
-// Proven: expectedAbsMeanPGSDiff_normal definition
-function expectedAbsMeanPGSDiff(L, beta, p, d) {
-  return sdMeanPGSDiff(L, beta, p, d) * Math.sqrt(2 / Math.PI);
-}
-
-// expectedPGSVarianceUnderDrift := (1 - d) * V_A
-// Proven: expectedPGSVarianceUnderDrift_eq
-function expectedPGSVarianceUnderDrift(L, beta, p, d) {
-  return (1 - d) * additiveGeneticVariance(L, beta, p);
-}
-
-// perLocusHeterozygosityVariance (F p₀)
-// Proven: perLocusHeterozygosityVariance definition
-function perLocusHeterozygosityVariance(F, p0) {
-  const q0 = 1 - p0;
-  const pq = p0 * q0;
-  if (F <= 0 || F >= 1) return 0;
-  return pq * F * (1 - F) * ((1 + F) * (1 - 6 * pq * F) + 2 * pq * F * F) /
-    ((1 + F) * (1 + 2 * F));
-}
-
-// varianceOfPGSVarianceDiff = 8 * Σ β⁴ * Var(p(1-p))
-// Proven: varianceOfPGSVarianceDiff definition
-function varianceOfPGSVarianceDiff(L, beta, p, F) {
-  return 8 * L * Math.pow(beta, 4) * perLocusHeterozygosityVariance(F, p);
-}
-
-// expectedAbsPGSVarianceDiff_normal = sqrt(Var) * sqrt(2/π)
-// Proven: expectedAbsPGSVarianceDiff_normal definition
-function expectedAbsPGSVarianceDiff(L, beta, p, F) {
-  const v = varianceOfPGSVarianceDiff(L, beta, p, F);
-  return Math.sqrt(Math.max(0, v)) * Math.sqrt(2 / Math.PI);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// DERIVED QUANTITIES (composed from proven primitives)
-// ═══════════════════════════════════════════════════════════════
-
-function getParams() {
-  const model = document.getElementById('model-select').value;
-  const t = parseFloat(document.getElementById('slider-t').value);
-  const Ne = parseFloat(document.getElementById('slider-Ne').value);
-  const M = parseFloat(document.getElementById('slider-M').value);
-  const n = parseInt(document.getElementById('slider-n').value);
-  const tau = parseFloat(document.getElementById('slider-tau').value);
-  const L = parseInt(document.getElementById('slider-L').value);
-  const h2 = parseFloat(document.getElementById('slider-h2').value);
-  const maf = parseFloat(document.getElementById('slider-maf').value);
-
-  // Equal-effect model: V_A = h² (when phenotypic variance = 1)
-  // V_A = L * beta² * 2*p*(1-p) = h²
-  // => beta² = h² / (L * 2*p*(1-p))
-  const beta = Math.sqrt(h2 / (L * 2 * maf * (1 - maf)));
-
-  let d, fst;
-  if (model === 'pure_split') {
-    fst = fstFromGenerations(t, Ne);
-    d = 2 * fst; // symmetric split: combined drift = 2F
-  } else if (model === 'im_equilibrium') {
-    fst = imEquilibriumDelta(M);
-    d = 2 * fst;
-  } else {
-    fst = fstFromTau(tau);
-    d = 2 * fst;
-  }
-
-  return { model, t, Ne, M, n, tau, L, h2, maf, beta, d, fst };
-}
-
-// ═══════════════════════════════════════════════════════════════
-// CHART INSTANCES
-// ═══════════════════════════════════════════════════════════════
-
-const chartOpts = {
-  responsive: true,
-  maintainAspectRatio: false,
-  animation: { duration: 200 },
-  plugins: {
-    legend: { labels: { color: '#94a3b8', font: { size: 11, family: 'Inter' } } },
-    tooltip: {
-      backgroundColor: '#1a2035',
-      borderColor: '#2a3352',
-      borderWidth: 1,
-      titleFont: { family: 'Inter', size: 12 },
-      bodyFont: { family: 'JetBrains Mono', size: 11 },
+  <script>
+    // Open proof in GitHub via code search (auto-resolves, no manual line tracking)
+    function openProof(theoremName) {
+      window.open('https://github.com/SauersML/gnomon/search?q=' + encodeURIComponent('theorem ' + theoremName) + '&type=code', '_blank');
     }
-  },
-  scales: {
-    x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(42,51,82,0.5)' } },
-    y: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(42,51,82,0.5)' } }
-  }
-};
 
-let charts = {};
+    // ════════════════════════════════════════════════════════════
+    // PROVEN FORMULAS — each annotated with its Lean theorem name
+    // ════════════════════════════════════════════════════════════
 
-function initCharts() {
-  // Mean distribution
-  charts.meanDist = new Chart(document.getElementById('chart-mean-dist'), {
-    type: 'line',
-    data: { labels: [], datasets: [] },
-    options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: true, labels: { color: '#94a3b8', font: { size: 11 } } } },
-      scales: { ...chartOpts.scales, x: { ...chartOpts.scales.x, title: { display: true, text: 'PGS (standardized)', color: '#64748b' } },
-        y: { ...chartOpts.scales.y, title: { display: true, text: 'Density', color: '#64748b' } } } }
-  });
+    // fstFromGenerations_eq: fst(t,Ne) = 1 - exp(-t/(2Ne))
+    function fstFromGenerations(t, Ne) {
+      return 1 - Math.exp(-t / (2 * Ne));
+    }
 
-  // Var distribution
-  charts.varDist = new Chart(document.getElementById('chart-var-dist'), {
-    type: 'line',
-    data: { labels: [], datasets: [] },
-    options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: true, labels: { color: '#94a3b8', font: { size: 11 } } } },
-      scales: { ...chartOpts.scales, x: { ...chartOpts.scales.x, title: { display: true, text: 'PGS Variance (V)', color: '#64748b' } },
-        y: { ...chartOpts.scales.y, title: { display: true, text: 'Density', color: '#64748b' } } } }
-  });
+    // coalescentTau: τ = t/(2Ne)
+    function coalescentTau(t, Ne) {
+      return t / (2 * Ne);
+    }
 
-  // FST vs time
-  charts.fstTime = new Chart(document.getElementById('chart-fst-time'), {
-    type: 'line',
-    data: { labels: [], datasets: [] },
-    options: { ...chartOpts, scales: { ...chartOpts.scales,
-      x: { ...chartOpts.scales.x, title: { display: true, text: 'Generations', color: '#64748b' } },
-      y: { ...chartOpts.scales.y, title: { display: true, text: 'F_ST', color: '#64748b' } } } }
-  });
+    // twoDemeIMEquilibriumDelta_eq: δ = 1/(2M+1)
+    function imEquilibriumDelta(M) {
+      return 1 / (2 * M + 1);
+    }
 
-  // Mean squared diff
-  charts.meanSq = new Chart(document.getElementById('chart-mean-sq'), {
-    type: 'line',
-    data: { labels: [], datasets: [] },
-    options: { ...chartOpts, scales: { ...chartOpts.scales,
-      x: { ...chartOpts.scales.x, title: { display: true, text: 'Drift Factor (F)', color: '#64748b' } },
-      y: { ...chartOpts.scales.y, title: { display: true, text: 'E[(Δμ)²] / V_A', color: '#64748b' } } } }
-  });
+    // twoDemeIMEquilibriumETss: E[T_same] = 2
+    function imETsame() { return 2; }
 
-  // Var ratio
-  charts.varRatio = new Chart(document.getElementById('chart-var-ratio'), {
-    type: 'line',
-    data: { labels: [], datasets: [] },
-    options: { ...chartOpts, scales: { ...chartOpts.scales,
-      x: { ...chartOpts.scales.x, title: { display: true, text: 'Drift Factor (F)', color: '#64748b' } },
-      y: { ...chartOpts.scales.y, title: { display: true, text: 'E[Var_T] / V_A', color: '#64748b' } } } }
-  });
+    // twoDemeIMEquilibriumETst: E[T_diff] = (2M+1)/M
+    function imETdiff(M) { return (2 * M + 1) / M; }
 
-  // FST island
-  charts.fstIsland = new Chart(document.getElementById('chart-fst-island'), {
-    type: 'line',
-    data: { labels: [], datasets: [] },
-    options: { ...chartOpts, scales: { ...chartOpts.scales,
-      x: { ...chartOpts.scales.x, title: { display: true, text: 'Scaled Migration (M)', color: '#64748b' } },
-      y: { ...chartOpts.scales.y, title: { display: true, text: 'F_ST', color: '#64748b' } } } }
-  });
+    // additiveGeneticVariance: V_A = Σ β²·2p(1-p) = h² (normalized)
+    function VA(L, beta, p) {
+      return L * beta * beta * 2 * p * (1 - p);
+    }
 
-  // Summary
-  charts.summary = new Chart(document.getElementById('chart-summary'), {
-    type: 'line',
-    data: { labels: [], datasets: [] },
-    options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: true, position: 'top', labels: { color: '#94a3b8', font: { size: 11 } } } },
-      scales: { ...chartOpts.scales,
-        x: { ...chartOpts.scales.x, title: { display: true, text: 'Drift Factor (F)', color: '#64748b' } },
-        y: { ...chartOpts.scales.y, title: { display: true, text: 'Metric Value', color: '#64748b' } } } }
-  });
-}
+    // varianceMeanPGSDiff_eq_twice_drift_VA: Var(Δμ) = 2d·V_A
+    // For symmetric split: d = 2·fst, so Var(Δμ) = 4·fst·V_A
+    function varMeanDiff(va, d) {
+      return 2 * d * va;
+    }
 
-function gaussian(x, mu, sigma) {
-  return Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2)) / (sigma * Math.sqrt(2 * Math.PI));
-}
+    // expectedSqMeanPGSDiff_pureSplit_eq: E[(Δμ)²] = 4·fst·V_A
+    function expectedSqMeanDiff_PS(va, fst) {
+      return 4 * fst * va;
+    }
 
-function updateAll() {
-  const p = getParams();
+    // expectedSqMeanPGSDiff_IMEquilibrium_eq: E[(Δμ)²] = 4δ·V_A
+    function expectedSqMeanDiff_IM(va, M) {
+      return 4 * imEquilibriumDelta(M) * va;
+    }
 
-  // Update display values
-  document.getElementById('val-t').textContent = p.t;
-  document.getElementById('val-Ne').textContent = p.Ne.toLocaleString();
-  document.getElementById('val-M').textContent = p.M.toFixed(2);
-  document.getElementById('val-n').textContent = p.n;
-  document.getElementById('val-tau').textContent = p.tau.toFixed(3);
-  document.getElementById('val-L').textContent = p.L.toLocaleString();
-  document.getElementById('val-h2').textContent = p.h2.toFixed(2);
-  document.getElementById('val-maf').textContent = p.maf.toFixed(2);
+    // expectedAbsMeanPGSDiff_normal: E[|Δμ|] = √(Var(Δμ)) · √(2/π)
+    function expectedAbsMeanDiff(va, d) {
+      return Math.sqrt(varMeanDiff(va, d)) * Math.sqrt(2 / Math.PI);
+    }
 
-  // Show/hide model params
-  document.getElementById('params-pure-split').style.display = p.model === 'pure_split' ? '' : 'none';
-  document.getElementById('params-im').style.display = p.model === 'im_equilibrium' ? '' : 'none';
-  document.getElementById('params-coal').style.display = p.model === 'coalescent' ? '' : 'none';
+    // expectedPGSVarianceUnderDrift_eq: E[Var_pop] = (1-d)·V_A
+    // For pure split: d = fst per branch
+    function expectedVarUnderDrift(va, fst) {
+      return (1 - fst) * va;
+    }
 
-  // Compute key metrics (all from proven formulas)
-  const VA = additiveGeneticVariance(p.L, p.beta, p.maf);
-  const varMeanDiff = varianceMeanPGSDiff(p.L, p.beta, p.maf, p.d);
-  const sdMean = Math.sqrt(varMeanDiff);
-  const abseMeanDiff = sdMean * Math.sqrt(2 / Math.PI);
-  const sigmaPheno = 1; // standardized
-  const expectedVarT = expectedPGSVarianceUnderDrift(p.L, p.beta, p.maf, p.fst);
-  const abseVarDiff = expectedAbsPGSVarianceDiff(p.L, p.beta, p.maf, p.fst);
-  const relR2Loss = Math.min(1, p.d * p.h2); // approximation
+    // perLocusHeterozygosityVariance: exact Balding-Nichols formula
+    function perLocusHetVar(F, p0) {
+      const q0 = 1 - p0;
+      const pq = p0 * q0;
+      if (F <= 0 || F >= 1) return 0;
+      return pq * F * (1 - F) * ((1 + F) * (1 - 6 * pq * F) + 2 * pq * F * F) /
+        ((1 + F) * (1 + 2 * F));
+    }
 
-  // Update metric cards
-  document.getElementById('metric-fst').textContent = p.fst.toFixed(4);
-  document.getElementById('metric-mean-shift').textContent = (abseMeanDiff / sigmaPheno).toFixed(4);
-  document.getElementById('metric-var-shift').textContent = VA > 0 ? (abseVarDiff / VA).toFixed(4) : '0';
-  document.getElementById('metric-r2-loss').textContent = (relR2Loss * 100).toFixed(1) + '%';
+    // varianceOfPGSVarianceDiff: Var(V_T-V_S) = 8·Σβ⁴·Var(p(1-p))
+    function varOfVarDiff(L, beta, p, F) {
+      return 8 * L * Math.pow(beta, 4) * perLocusHetVar(F, p);
+    }
 
-  if (p.model === 'pure_split') {
-    document.getElementById('formula-fst').textContent = `1 − exp(−${p.t}/(2·${p.Ne}))`;
-  } else if (p.model === 'im_equilibrium') {
-    document.getElementById('formula-fst').textContent = `δ = 1/(2·${p.M.toFixed(2)}+1)`;
-  } else {
-    document.getElementById('formula-fst').textContent = `1 − exp(−${p.tau.toFixed(3)})`;
-  }
+    // expectedAbsPGSVarianceDiff_normal: E[|ΔV|] = √(Var(ΔV))·√(2/π)
+    function expectedAbsVarDiff(L, beta, p, F) {
+      const v = varOfVarDiff(L, beta, p, F);
+      return Math.sqrt(Math.max(0, v)) * Math.sqrt(2 / Math.PI);
+    }
 
-  // ═══ CHART: Mean Distribution ═══
-  {
-    const sigmaS = Math.sqrt(VA);
-    const sigmaT = Math.sqrt(Math.max(0.001, expectedVarT));
-    const meanShift = abseMeanDiff;
-    const xMin = -4 * sigmaS;
-    const xMax = 4 * sigmaS + meanShift;
-    const xs = []; for (let x = xMin; x <= xMax; x += (xMax - xMin) / 200) xs.push(x);
-    const ysS = xs.map(x => gaussian(x, 0, sigmaS));
-    const ysT = xs.map(x => gaussian(x, meanShift, sigmaT));
-    charts.meanDist.data = {
-      labels: xs.map(x => x.toFixed(2)),
-      datasets: [
-        { label: 'Source N(0, V_A)', data: ysS, borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4 },
-        { label: `Target N(${meanShift.toFixed(3)}, ${expectedVarT.toFixed(3)})`, data: ysT, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4 }
-      ]
-    };
-    charts.meanDist.options.scales.x.ticks.maxTicksLimit = 8;
-    charts.meanDist.update();
-  }
+    // ════════════════════════════════════════════════════════════
+    // UI LOGIC
+    // ════════════════════════════════════════════════════════════
 
-  // ═══ CHART: Variance Distribution ═══
-  {
-    const sigmaVarDiff = Math.sqrt(Math.max(0, varianceOfPGSVarianceDiff(p.L, p.beta, p.maf, p.fst)));
-    const varCenter = VA;
-    const spread = Math.max(sigmaVarDiff * 4, VA * 0.3);
-    const xs = []; for (let x = Math.max(0, varCenter - spread); x <= varCenter + spread; x += (2 * spread) / 200) xs.push(x);
-    const sigSource = Math.max(sigmaVarDiff / Math.sqrt(2), VA * 0.01);
-    const sigTarget = Math.max(sigmaVarDiff / Math.sqrt(2), VA * 0.01);
-    const ysS = xs.map(x => gaussian(x, VA, sigSource));
-    const ysT = xs.map(x => gaussian(x, expectedVarT, sigTarget));
-    charts.varDist.data = {
-      labels: xs.map(x => x.toFixed(3)),
-      datasets: [
-        { label: `Source V ≈ V_A = ${VA.toFixed(3)}`, data: ysS, borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4 },
-        { label: `Target V ≈ ${expectedVarT.toFixed(3)}`, data: ysT, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4 }
-      ]
-    };
-    charts.varDist.options.scales.x.ticks.maxTicksLimit = 8;
-    charts.varDist.update();
-  }
+    function getParams() {
+      const model = document.getElementById('model-select').value;
+      const t = parseFloat(document.getElementById('slider-t').value);
+      const Ne = parseFloat(document.getElementById('slider-Ne').value);
+      const M = parseFloat(document.getElementById('slider-M').value);
+      const L = parseInt(document.getElementById('slider-L').value);
+      const h2 = parseFloat(document.getElementById('slider-h2').value);
+      const maf = parseFloat(document.getElementById('slider-maf').value);
 
-  // ═══ CHART: FST vs Time ═══
-  {
-    const ts = []; for (let ti = 0; ti <= p.t * 3; ti += Math.max(1, p.t * 3 / 100)) ts.push(ti);
-    const fsts = ts.map(ti => fstFromGenerations(ti, p.Ne));
-    charts.fstTime.data = {
-      labels: ts.map(ti => ti.toFixed(0)),
-      datasets: [
-        { label: `F_ST (Nₑ=${p.Ne})`, data: fsts, borderColor: '#6366f1', borderWidth: 2, pointRadius: 0, tension: 0.4 }
-      ]
-    };
-    charts.fstTime.options.scales.x.ticks.maxTicksLimit = 8;
-    charts.fstTime.update();
-  }
+      // Equal-effect model: β² = h²/(L·2p(1-p)) so that V_A = h²
+      const beta = Math.sqrt(h2 / (L * 2 * maf * (1 - maf)));
+      const va = h2; // by construction
 
-  // ═══ CHART: E[(Δμ)²]/V_A vs drift ═══
-  {
-    const fs = []; for (let fi = 0; fi <= 0.5; fi += 0.005) fs.push(fi);
-    // E[(Δμ)²] = 4F·V_A (symmetric split, d=2F)
-    // E[(Δμ)²]/V_A = 4F
-    const ratios = fs.map(fi => 4 * fi);
-    charts.meanSq.data = {
-      labels: fs.map(fi => fi.toFixed(3)),
-      datasets: [
-        { label: 'E[(Δμ)²]/V_A = 4F', data: ratios, borderColor: '#06b6d4', borderWidth: 2, pointRadius: 0, tension: 0.4 }
-      ]
-    };
-    charts.meanSq.options.scales.x.ticks.maxTicksLimit = 8;
-    charts.meanSq.update();
-  }
+      let fst, d;
+      if (model === 'pure_split') {
+        fst = fstFromGenerations(t, Ne);
+        d = 2 * fst; // symmetric: combined drift = 2F
+      } else {
+        // IM equilibrium
+        fst = imEquilibriumDelta(M);
+        d = 2 * fst;
+      }
 
-  // ═══ CHART: Expected variance ratio ═══
-  {
-    const fs = []; for (let fi = 0; fi <= 0.5; fi += 0.005) fs.push(fi);
-    // E[Var_T]/V_A = 1 - F
-    const ratios = fs.map(fi => 1 - fi);
-    const absVarDiffs = fs.map(fi => {
-      const v = varianceOfPGSVarianceDiff(p.L, p.beta, p.maf, fi);
-      return VA > 0 ? Math.sqrt(Math.max(0, v)) * Math.sqrt(2 / Math.PI) / VA : 0;
+      return { model, t, Ne, M, L, h2, maf, beta, va, fst, d };
+    }
+
+    function gaussian(x, mu, sigma) {
+      if (sigma <= 0) return 0;
+      return Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2)) / (sigma * Math.sqrt(2 * Math.PI));
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // CHART DEFAULTS
+    // ════════════════════════════════════════════════════════════
+    const baseOpts = (xLabel, yLabel) => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 150 },
+      plugins: {
+        legend: { labels: { color: '#94a3b8', font: { size: 10, family: 'Inter' } } },
+      },
+      scales: {
+        x: {
+          ticks: { color: '#64748b', font: { size: 9 }, maxTicksLimit: 8 },
+          grid: { color: 'rgba(42,51,82,0.5)' },
+          title: { display: true, text: xLabel, color: '#64748b', font: { size: 10 } }
+        },
+        y: {
+          ticks: { color: '#64748b', font: { size: 9 } },
+          grid: { color: 'rgba(42,51,82,0.5)' },
+          title: { display: true, text: yLabel, color: '#64748b', font: { size: 10 } }
+        }
+      }
     });
-    charts.varRatio.data = {
-      labels: fs.map(fi => fi.toFixed(3)),
-      datasets: [
-        { label: 'E[Var_T]/V_A = 1−F', data: ratios, borderColor: '#10b981', borderWidth: 2, pointRadius: 0, tension: 0.4 },
-        { label: 'E[|ΔVar|]/V_A', data: absVarDiffs, borderColor: '#f59e0b', borderWidth: 2, pointRadius: 0, borderDash: [5, 3], tension: 0.4 }
-      ]
-    };
-    charts.varRatio.options.scales.x.ticks.maxTicksLimit = 8;
-    charts.varRatio.update();
-  }
 
-  // ═══ CHART: FST Island model ═══
-  {
-    const Ms = []; for (let mi = 0.01; mi <= 20; mi += 0.2) Ms.push(mi);
-    const fstFinite = Ms.map(mi => fstIslandGlobalExact(mi, p.n, 0));
-    const fstLimit = Ms.map(mi => fstManyDemeLimit(mi));
-    charts.fstIsland.data = {
-      labels: Ms.map(mi => mi.toFixed(1)),
-      datasets: [
-        { label: `Exact (n=${p.n})`, data: fstFinite, borderColor: '#8b5cf6', borderWidth: 2, pointRadius: 0, tension: 0.4 },
-        { label: '1/(1+M) limit', data: fstLimit, borderColor: '#64748b', borderWidth: 2, pointRadius: 0, borderDash: [5, 3], tension: 0.4 }
-      ]
-    };
-    charts.fstIsland.options.scales.x.ticks.maxTicksLimit = 8;
-    charts.fstIsland.update();
-  }
+    let charts = {};
 
-  // ═══ CHART: Summary ═══
-  {
-    const fs = []; for (let fi = 0.001; fi <= 0.3; fi += 0.003) fs.push(fi);
-    const meanShifts = fs.map(fi => {
-      const d = 2 * fi;
-      return expectedAbsMeanPGSDiff(p.L, p.beta, p.maf, d);
-    });
-    const varRatios = fs.map(fi => 1 - fi);
-    const varDiffs = fs.map(fi => {
-      return VA > 0 ? expectedAbsPGSVarianceDiff(p.L, p.beta, p.maf, fi) / VA : 0;
-    });
-    const r2losses = fs.map(fi => Math.min(1, 2 * fi * p.h2));
+    function makeChart(id, xLabel, yLabel) {
+      return new Chart(document.getElementById(id), {
+        type: 'line',
+        data: { labels: [], datasets: [] },
+        options: baseOpts(xLabel, yLabel),
+      });
+    }
 
-    charts.summary.data = {
-      labels: fs.map(fi => fi.toFixed(3)),
-      datasets: [
-        { label: 'E[|Δμ|] (std units)', data: meanShifts, borderColor: '#6366f1', borderWidth: 2.5, pointRadius: 0, tension: 0.4 },
-        { label: 'E[Var_T]/V_A', data: varRatios, borderColor: '#10b981', borderWidth: 2, pointRadius: 0, tension: 0.4 },
-        { label: 'E[|ΔVar|]/V_A', data: varDiffs, borderColor: '#f59e0b', borderWidth: 2, pointRadius: 0, borderDash: [4, 2], tension: 0.4 },
-        { label: 'Relative R² loss', data: r2losses, borderColor: '#f43f5e', borderWidth: 2, pointRadius: 0, tension: 0.4 }
-      ]
-    };
-    charts.summary.options.scales.x.ticks.maxTicksLimit = 10;
-    charts.summary.update();
-  }
-}
+    function initCharts() {
+      // Pure Split charts
+      charts.psMeanDist = makeChart('chart-ps-mean-dist', 'PGS (standardized)', 'Density');
+      charts.psVarDist = makeChart('chart-ps-var-dist', 'PGS Variance', 'Density');
+      charts.psFst = makeChart('chart-ps-fst', 'Generations since split', 'Population divergence (F_ST)');
+      charts.psSummary = makeChart('chart-ps-summary', 'Population divergence (F_ST)', 'Metric value');
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-  initCharts();
-  updateAll();
-});
-</script>
+      // IM charts
+      charts.imMeanDist = makeChart('chart-im-mean-dist', 'PGS (standardized)', 'Density');
+      charts.imDelta = makeChart('chart-im-delta', 'Scaled migration rate (M = 4Nₑm)', 'Genetic differentiation (δ)');
+      charts.imCoal = makeChart('chart-im-coal', 'Scaled migration rate (M = 4Nₑm)', 'Expected generations to common ancestor (×2Nₑ)');
+      charts.imMeanSq = makeChart('chart-im-mean-sq', 'Scaled migration rate (M = 4Nₑm)', 'Squared mean PGS difference (relative to V_A)');
+    }
+
+    function ds(label, data, color, opts) {
+      return {
+        label, data, borderColor: color, backgroundColor: color + '18',
+        borderWidth: 2, pointRadius: 0, tension: 0.4, fill: !!opts?.fill, ...opts
+      };
+    }
+
+    function linspace(a, b, n) {
+      const xs = [];
+      for (let i = 0; i < n; i++) xs.push(a + (b - a) * i / (n - 1));
+      return xs;
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // UPDATE ALL
+    // ════════════════════════════════════════════════════════════
+    function updateAll() {
+      const p = getParams();
+
+      // ── Display values ──
+      document.getElementById('val-t').textContent = p.t;
+      document.getElementById('val-Ne').textContent = p.Ne.toLocaleString();
+      document.getElementById('val-M').textContent = p.M.toFixed(2);
+      document.getElementById('val-L').textContent = p.L.toLocaleString();
+      document.getElementById('val-h2').textContent = p.h2.toFixed(2);
+      document.getElementById('val-maf').textContent = p.maf.toFixed(2);
+
+      // ── Show/hide model-specific sections ──
+      const isPS = p.model === 'pure_split';
+      document.getElementById('params-ps').classList.toggle('hidden', !isPS);
+      document.getElementById('params-im').classList.toggle('hidden', isPS);
+      document.getElementById('model-note-ps').classList.toggle('hidden', !isPS);
+      document.getElementById('model-note-im').classList.toggle('hidden', isPS);
+      document.getElementById('metrics-ps-extra').classList.toggle('hidden', !isPS);
+      document.getElementById('metrics-im-extra').classList.toggle('hidden', isPS);
+      document.getElementById('charts-ps').classList.toggle('hidden', !isPS);
+      document.getElementById('charts-im').classList.toggle('hidden', isPS);
+
+      // Hide L and MAF for IM (they don't affect any IM output)
+      document.getElementById('ctrl-L').classList.toggle('hidden', !isPS);
+      document.getElementById('ctrl-maf').classList.toggle('hidden', !isPS);
+      document.getElementById('trait-formula-box').textContent = isPS
+        ? 'h² sets genetic variance. L and MAF control per-locus effect sizes (affects variance shift).'
+        : 'h² sets genetic variance. Only h² matters for IM (L and MAF cancel out in ratios).';
+
+      // ── Shared metrics ──
+      document.getElementById('metric-drift').textContent = p.fst.toFixed(4);
+      if (isPS) {
+        document.getElementById('metric-drift-label').textContent = 'Population Divergence (F_ST)';
+        document.getElementById('metric-drift-formula').textContent = 'How genetically different the populations are';
+        document.getElementById('metric-drift-proof').innerHTML = '<a onclick="openProof(\'fstFromGenerations\')">Lean proof ↗</a>';
+      } else {
+        document.getElementById('metric-drift-label').textContent = 'Equilibrium Differentiation (δ)';
+        document.getElementById('metric-drift-formula').textContent = 'Steady-state genetic distance between demes';
+        document.getElementById('metric-drift-proof').innerHTML = '<a onclick="openProof(\'twoDemeIMEquilibriumDelta\')">Lean proof ↗</a>';
+      }
+
+      const absMeanDiff = expectedAbsMeanDiff(p.va, p.d);
+      document.getElementById('metric-mean-shift').textContent = absMeanDiff.toFixed(4);
+
+      const eVarT = expectedVarUnderDrift(p.va, p.fst);
+      document.getElementById('metric-var-ratio').textContent = (eVarT / p.va).toFixed(4);
+
+      if (isPS) {
+        updatePureSplit(p);
+      } else {
+        updateIM(p);
+      }
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // PURE SPLIT UPDATE
+    // ════════════════════════════════════════════════════════════
+    function updatePureSplit(p) {
+      const tau = coalescentTau(p.t, p.Ne);
+      document.getElementById('metric-sq-mean').textContent = (4 * p.fst).toFixed(4);
+      document.getElementById('metric-tau').textContent = tau.toFixed(4);
+
+      const absVD = expectedAbsVarDiff(p.L, p.beta, p.maf, p.fst);
+      document.getElementById('metric-abs-var-diff').textContent = p.va > 0 ? (absVD / p.va).toFixed(4) : '0';
+
+      // ── Mean distribution ──
+      const sigS = Math.sqrt(p.va);
+      const sigT = Math.sqrt(Math.max(0.001, expectedVarUnderDrift(p.va, p.fst)));
+      const shift = expectedAbsMeanDiff(p.va, p.d);
+      const xRange = Math.max(3 * sigS, shift + 3 * sigT);
+      const xs = linspace(-xRange, xRange + shift, 200);
+      charts.psMeanDist.data = {
+        labels: xs.map(x => x.toFixed(2)),
+        datasets: [
+          ds('Source N(0, V_A)', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
+          ds('Target N(E[|Δμ|], (1−F)V_A)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
+        ]
+      };
+      charts.psMeanDist.update();
+
+      // ── Variance distribution ──
+      const sigVarDiff = Math.sqrt(Math.max(0, varOfVarDiff(p.L, p.beta, p.maf, p.fst)));
+      const sigVS = Math.max(sigVarDiff / Math.SQRT2, p.va * 0.02);
+      const sigVT = sigVS;
+      const eVarT = expectedVarUnderDrift(p.va, p.fst);
+      const vSpread = Math.max(4 * sigVS, Math.abs(p.va - eVarT) + 3 * sigVS);
+      const midV = (p.va + eVarT) / 2;
+      const vxs = linspace(Math.max(0, midV - vSpread), midV + vSpread, 200);
+      charts.psVarDist.data = {
+        labels: vxs.map(x => x.toFixed(3)),
+        datasets: [
+          ds('Source V ≈ V_A', vxs.map(x => gaussian(x, p.va, sigVS)), '#6366f1', { fill: true }),
+          ds('Target V ≈ (1−F)·V_A', vxs.map(x => gaussian(x, eVarT, sigVT)), '#10b981', { fill: true }),
+        ]
+      };
+      charts.psVarDist.update();
+
+      // ── FST vs generations ──
+      const maxT = Math.max(p.t * 2.5, 100);
+      const ts = linspace(0, maxT, 100);
+      charts.psFst.data = {
+        labels: ts.map(x => x.toFixed(0)),
+        datasets: [
+          ds('F_ST (Nₑ=' + p.Ne.toLocaleString() + ')', ts.map(ti => fstFromGenerations(ti, p.Ne)), '#6366f1'),
+          ds('Current', [{ x: ts.indexOf(ts.reduce((a, b) => Math.abs(b - p.t) < Math.abs(a - p.t) ? b : a)), y: p.fst }], '#f43f5e', { pointRadius: 6, pointBackgroundColor: '#f43f5e', showLine: false }),
+        ]
+      };
+      charts.psFst.update();
+
+      // ── All metrics vs F ──
+      const fs = linspace(0.001, 0.4, 100);
+      charts.psSummary.data = {
+        labels: fs.map(f => (f * 100).toFixed(1) + '%'),
+        datasets: [
+          ds('Mean PGS shift (std. devs)', fs.map(f => expectedAbsMeanDiff(p.va, 2 * f)), '#6366f1'),
+          ds('Variance retained in target', fs.map(f => 1 - f), '#10b981'),
+          ds('Variance shift magnitude', fs.map(f => p.va > 0 ? expectedAbsVarDiff(p.L, p.beta, p.maf, f) / p.va : 0), '#f59e0b', { borderDash: [4, 2] }),
+        ]
+      };
+      charts.psSummary.update();
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // IM EQUILIBRIUM UPDATE
+    // ════════════════════════════════════════════════════════════
+    function updateIM(p) {
+      const delta = imEquilibriumDelta(p.M);
+      document.getElementById('metric-sq-mean-im').textContent = (4 * delta).toFixed(4);
+      document.getElementById('metric-et-same').textContent = imETsame().toFixed(3);
+      document.getElementById('metric-et-diff').textContent = imETdiff(p.M).toFixed(3);
+
+      // ── Mean distribution ──
+      const sigS = Math.sqrt(p.va);
+      const eVarT = expectedVarUnderDrift(p.va, delta);
+      const sigT = Math.sqrt(Math.max(0.001, eVarT));
+      const shift = expectedAbsMeanDiff(p.va, 2 * delta);
+      const xRange = Math.max(3 * sigS, shift + 3 * sigT);
+      const xs = linspace(-xRange, xRange + shift, 200);
+      charts.imMeanDist.data = {
+        labels: xs.map(x => x.toFixed(2)),
+        datasets: [
+          ds('Source N(0, V_A)', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
+          ds('Target N(E[|Δμ|], (1−δ)V_A)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
+        ]
+      };
+      charts.imMeanDist.update();
+
+      // ── Delta vs M ──
+      const Ms = linspace(0.05, 20, 100);
+      charts.imDelta.data = {
+        labels: Ms.map(m => m.toFixed(1)),
+        datasets: [
+          ds('Genetic differentiation (δ)', Ms.map(m => imEquilibriumDelta(m)), '#06b6d4'),
+        ]
+      };
+      charts.imDelta.update();
+
+      // ── Coalescence times vs M ──
+      charts.imCoal.data = {
+        labels: Ms.map(m => m.toFixed(1)),
+        datasets: [
+          ds('Within deme (always 2)', Ms.map(() => 2), '#6366f1', { borderDash: [4, 2] }),
+          ds('Between demes', Ms.map(m => imETdiff(m)), '#f59e0b'),
+        ]
+      };
+      charts.imCoal.update();
+
+      // ── E[(Δμ)²]/V_A vs M ──
+      charts.imMeanSq.data = {
+        labels: Ms.map(m => m.toFixed(1)),
+        datasets: [
+          ds('Relative to genetic variance', Ms.map(m => 4 * imEquilibriumDelta(m)), '#8b5cf6'),
+        ]
+      };
+      charts.imMeanSq.update();
+    }
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', () => { initCharts(); updateAll(); });
+  </script>
 </body>
+
 </html>
