@@ -1243,7 +1243,7 @@ structure RKHSRegularityAssumptions (X : Type*) [MeasurableSpace X] : Prop where
       ∀ f : X → ℝ, InHSobolev sd s f →
         ∀ ε > 0, ∃ m : ℕ, sobolevNorm sd r (fun x => f x - spectralProjector md m f x) < ε
   representer_theorem_matern_empirical :
-    ∀ {Y : Type*}
+    ∀ (Y : Type)
       (md : MaternSpectralData X) (ν κ lam : ℝ) (n : ℕ)
       (loss : ℝ → Y → ℝ) (xSample : Fin n → X) (ySample : Fin n → Y)
       (F : Set (X → ℝ)) (fStar : X → ℝ),
@@ -1339,8 +1339,8 @@ def InKernelSpanAtSample {X : Type*} [MeasurableSpace X]
 
 /-- Representer theorem statement for regularized empirical risk minimization with
 Matérn kernel/RKHS geometry: any minimizer has a finite expansion over training points. -/
-axiom representer_theorem_matern_empirical
-    {X Y : Type*} [MeasurableSpace X]
+theorem representer_theorem_matern_empirical
+    {X : Type*} {Y : Type} [MeasurableSpace X]
     (h_rkhs : RKHSRegularityAssumptions X)
     (md : MaternSpectralData X) (ν κ lam : ℝ) (n : ℕ)
     (loss : ℝ → Y → ℝ) (sample : SupervisedSample X Y n)
@@ -1348,7 +1348,22 @@ axiom representer_theorem_matern_empirical
     (hMin : IsMaternRegularizedEmpiricalMinimizer md ν κ lam n loss sample F fStar)
     (hFclosedUnderKernelSpan : ∀ α : Fin n → ℝ,
       (fun z : X => ∑ i : Fin n, α i * maternKernel md ν κ (sample.x i) z) ∈ F) :
-    InKernelSpanAtSample (maternKernel md ν κ) n sample.x fStar
+    InKernelSpanAtSample (maternKernel md ν κ) n sample.x fStar := by
+  have hMin' :
+      fStar ∈ F ∧
+        ∀ f ∈ F,
+          (1 / (n : ℝ)) * ∑ i : Fin n, loss (fStar (sample.x i)) (sample.y i) +
+            lam * maternRkhsNormSq md ν κ fStar
+          ≤
+          (1 / (n : ℝ)) * ∑ i : Fin n, loss (f (sample.x i)) (sample.y i) +
+            lam * maternRkhsNormSq md ν κ f := by
+    simpa [IsMaternRegularizedEmpiricalMinimizer, maternRegularizedEmpiricalObjective,
+      empiricalRisk] using hMin
+  have hspan :
+      ∃ α : Fin n → ℝ, ∀ z : X, fStar z = ∑ i : Fin n, α i * maternKernel md ν κ (sample.x i) z :=
+    @RKHSRegularityAssumptions.representer_theorem_matern_empirical X _ h_rkhs Y
+      md ν κ lam n loss sample.x sample.y F fStar hMin' hFclosedUnderKernelSpan
+  simpa [InKernelSpanAtSample] using hspan
 
 /-- Tikhonov objective in Matérn-RKHS form: loss + `λ‖f‖²`. -/
 noncomputable def tikhonovObjectiveMatern {X : Type*} [MeasurableSpace X]
@@ -1376,7 +1391,7 @@ def IsIvanovMinimizerMatern {X : Type*} [MeasurableSpace X]
 
 /-- Tikhonov↔Ivanov equivalence schema (Matérn/RKHS version):
 for suitable parameter matching, minimizers coincide. -/
-axiom tikhonov_ivanov_equivalence_matern
+theorem tikhonov_ivanov_equivalence_matern
     {X : Type*} [MeasurableSpace X]
     (h_rkhs : RKHSRegularityAssumptions X)
     (md : MaternSpectralData X) (ν κ : ℝ)
@@ -1384,7 +1399,10 @@ axiom tikhonov_ivanov_equivalence_matern
     (∀ lam > 0, ∃ B ≥ 0, ∀ fStar, IsTikhonovMinimizerMatern md ν κ lam L F fStar →
       IsIvanovMinimizerMatern md ν κ B L F fStar) ∧
     (∀ B ≥ 0, ∃ lam > 0, ∀ fStar, IsIvanovMinimizerMatern md ν κ B L F fStar →
-      IsTikhonovMinimizerMatern md ν κ lam L F fStar)
+      IsTikhonovMinimizerMatern md ν κ lam L F fStar) := by
+  simpa [IsTikhonovMinimizerMatern, IsIvanovMinimizerMatern,
+    tikhonovObjectiveMatern, ivanovFeasibleMatern] using
+    h_rkhs.tikhonov_ivanov_equivalence_matern md ν κ L F
 
 /-- Identifiability constraints for ancestry-varying intercept/slope/log-scale components. -/
 structure IdentifiabilityConstraints {X : Type*} [MeasurableSpace X] (sd : SobolevData X)

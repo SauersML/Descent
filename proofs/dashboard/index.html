@@ -572,19 +572,19 @@
             <div class="metric-label">Source R² (Present Day)</div>
             <div class="metric-value" id="metric-r2-s">0.153</div>
             <div class="metric-formula">Present-day variance explained in source (R²)</div>
-            <div class="metric-proof"><a onclick="openProof('rsquared')">Lean def ↗</a></div>
+            <div class="metric-proof"><a onclick="openProof('presentDayR2')">Lean def ↗</a></div>
           </div>
           <div class="metric-card cyan">
             <div class="metric-label">Target R² (Present Day)</div>
             <div class="metric-value" id="metric-r2-t">0.141</div>
             <div class="metric-formula">Present-day variance explained in target (R²)</div>
-            <div class="metric-proof"><a onclick="openProof('rsquared')">Lean def ↗</a></div>
+            <div class="metric-proof"><a onclick="openProof('presentDayR2')">Lean def ↗</a></div>
           </div>
           <div class="metric-card amber">
             <div class="metric-label">Relative Portability</div>
             <div class="metric-value" id="metric-portability">92.3%</div>
             <div class="metric-formula">Target R² / Source R²</div>
-            <div class="metric-proof"><a onclick="openProof('drift_implies_attenuation')">Lean theorem ↗</a></div>
+            <div class="metric-proof"><a onclick="openProof('portability_ratio_lt_one_of_positive_drift')">Lean theorem ↗</a></div>
           </div>
         </div>
 
@@ -593,19 +593,19 @@
             <div class="metric-label">Source AUC (Expected)</div>
             <div class="metric-value" id="metric-auc-s">0.602</div>
             <div class="metric-formula">Mapped from source signal-to-noise under equal-variance Gaussian model</div>
-            <div class="metric-proof"><a onclick="openProof('populationAUC')">Lean def ↗</a></div>
+            <div class="metric-proof"><a onclick="openProof('presentDayAUC')">Lean def ↗</a></div>
           </div>
           <div class="metric-card cyan">
             <div class="metric-label">Target AUC (Expected)</div>
             <div class="metric-value" id="metric-auc-t">0.594</div>
             <div class="metric-formula">Mapped from target signal-to-noise under same assumption</div>
-            <div class="metric-proof"><a onclick="openProof('populationAUC')">Lean def ↗</a></div>
+            <div class="metric-proof"><a onclick="openProof('drift_degrades_AUC_of_strictMono')">Lean theorem ↗</a></div>
           </div>
           <div class="metric-card amber">
             <div class="metric-label">Brier Gap (Target - Source)</div>
             <div class="metric-value" id="metric-brier-gap">+0.0012</div>
             <div class="metric-formula">Increase in expected Brier loss using prevalence-calibrated approximation</div>
-            <div class="metric-proof"><a onclick="openProof('expectedBrierScore')">Lean def ↗</a></div>
+            <div class="metric-proof"><a onclick="openProof('brierRegretPoint_eq_sq_error')">Lean theorem ↗</a></div>
           </div>
         </div>
 
