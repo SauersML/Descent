@@ -501,15 +501,15 @@
         <div class="card">
           <div class="card-title"><span class="dot" style="background:var(--accent-amber)"></span> Trait Architecture
           </div>
-          <div class="control-group">
-            <div class="control-label">
-              <span>Ancestral Additive Genetic Var. (V_A)</span>
-              <span class="control-value" id="val-va">0.50</span>
-            </div>
-            <input type="range" id="slider-va" min="0.01" max="0.99" value="0.5" step="0.01" oninput="updateAll()">
-          </div>
           <div class="formula-box" id="trait-formula-box">
-            The additive genetic variance (V_A) linearly scales all expected variance differences.
+            We map drift to present-day prediction metrics by combining drifted PGS variance with environmental noise.
+          </div>
+          <div class="control-group" style="margin-top:0.8rem">
+            <div class="control-label">
+              <span>Outcome prevalence (for Brier)</span>
+              <span class="control-value" id="val-prev">0.10</span>
+            </div>
+            <input type="range" id="slider-prev" min="0.01" max="0.50" value="0.10" step="0.01" oninput="updateAll()">
           </div>
         </div>
 
@@ -562,31 +562,50 @@
             <div class="metric-label">Typical Mean Shift Magnitude</div>
             <div class="metric-value" id="metric-mean-shift">0.141</div>
             <div class="metric-formula">Expected absolute difference |Δμ| between populations due to random drift</div>
-            <div class="metric-proof"><a class="def-link" onclick="openProof('expectedAbsMeanPGSDiff')">Lean def
+            <div class="metric-proof"><a class="def-link" onclick="openProof('drift_implies_attenuation')">Lean theorem
                 (assumes CLT) ↗</a></div>
           </div>
         </div>
 
         <div class="metrics-row">
           <div class="metric-card indigo">
-            <div class="metric-label">Source Var Retained</div>
-            <div class="metric-value" id="metric-var-ratio-s">0.975</div>
-            <div class="metric-formula">Fraction of ancestral PGS variance remaining in the source</div>
-            <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceUnderDrift')">Lean proof ↗</a></div>
+            <div class="metric-label">Source R² (Present Day)</div>
+            <div class="metric-value" id="metric-r2-s">0.153</div>
+            <div class="metric-formula">Present-day variance explained in source (R²)</div>
+            <div class="metric-proof"><a onclick="openProof('rsquared')">Lean def ↗</a></div>
           </div>
           <div class="metric-card cyan">
-            <div class="metric-label">Target Var Retained</div>
-            <div class="metric-value" id="metric-var-ratio-t">0.975</div>
-            <div class="metric-formula">Fraction of ancestral PGS variance remaining in the target</div>
-            <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceUnderDrift')">Lean proof ↗</a></div>
+            <div class="metric-label">Target R² (Present Day)</div>
+            <div class="metric-value" id="metric-r2-t">0.141</div>
+            <div class="metric-formula">Present-day variance explained in target (R²)</div>
+            <div class="metric-proof"><a onclick="openProof('rsquared')">Lean def ↗</a></div>
           </div>
           <div class="metric-card amber">
-            <div class="metric-label">Variance Difference</div>
-            <div class="metric-value" id="metric-var-diff">0.0000</div>
-            <div class="metric-formula">Negative means target lost more PGS variance than source (e.g., bottleneck)
-            </div>
-            <div class="metric-proof"><a onclick="openProof('expectedPGSVarianceDiff_asymmetric')">Lean proof ↗</a>
-            </div>
+            <div class="metric-label">Relative Portability</div>
+            <div class="metric-value" id="metric-portability">92.3%</div>
+            <div class="metric-formula">Target R² / Source R²</div>
+            <div class="metric-proof"><a onclick="openProof('drift_implies_attenuation')">Lean theorem ↗</a></div>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-card indigo">
+            <div class="metric-label">Source AUC (Expected)</div>
+            <div class="metric-value" id="metric-auc-s">0.602</div>
+            <div class="metric-formula">Mapped from source signal-to-noise under equal-variance Gaussian model</div>
+            <div class="metric-proof"><a onclick="openProof('populationAUC')">Lean def ↗</a></div>
+          </div>
+          <div class="metric-card cyan">
+            <div class="metric-label">Target AUC (Expected)</div>
+            <div class="metric-value" id="metric-auc-t">0.594</div>
+            <div class="metric-formula">Mapped from target signal-to-noise under same assumption</div>
+            <div class="metric-proof"><a onclick="openProof('populationAUC')">Lean def ↗</a></div>
+          </div>
+          <div class="metric-card amber">
+            <div class="metric-label">Brier Gap (Target - Source)</div>
+            <div class="metric-value" id="metric-brier-gap">+0.0012</div>
+            <div class="metric-formula">Increase in expected Brier loss using prevalence-calibrated approximation</div>
+            <div class="metric-proof"><a onclick="openProof('expectedBrierScore')">Lean def ↗</a></div>
           </div>
         </div>
 
@@ -634,7 +653,7 @@
           </div>
           <div class="charts-grid" style="margin-top:1.2rem">
             <div class="chart-card">
-              <h3>Portability Metrics vs Population Divergence</h3>
+              <h3>Present-Day Performance vs Target Divergence</h3>
               <canvas id="chart-ps-summary"></canvas>
             </div>
           </div>
@@ -671,9 +690,9 @@
 
 
   <script>
-    // Open proof in GitHub via code search (auto-resolves, no manual line tracking)
-    function openProof(theoremName) {
-      window.open('https://github.com/SauersML/gnomon/search?q=' + encodeURIComponent('theorem ' + theoremName) + '&type=code', '_blank');
+    // Open Lean symbol in GitHub code search (works for defs/lemmas/theorems)
+    function openProof(symbolName) {
+      window.open('https://github.com/SauersML/gnomon/search?q=' + encodeURIComponent(symbolName) + '&type=code', '_blank');
     }
 
     // ════════════════════════════════════════════════════════════
@@ -733,6 +752,34 @@
       return (1 - fst) * va;
     }
 
+    // Standard normal CDF approximation (Abramowitz-Stegun)
+    function phi(x) {
+      const sign = x < 0 ? -1 : 1;
+      const z = Math.abs(x) / Math.sqrt(2);
+      const t = 1 / (1 + 0.3275911 * z);
+      const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-z * z);
+      return 0.5 * (1 + sign * y);
+    }
+
+    // Present-day R² proxy under additive signal + independent environmental noise
+    function expectedR2(vPgs, vEnv) {
+      const denom = vPgs + vEnv;
+      if (denom <= 0) return 0;
+      return Math.max(0, Math.min(1, vPgs / denom));
+    }
+
+    // Expected AUC under equal-variance Gaussian score model
+    function expectedAUC(vPgs, vEnv) {
+      if (vEnv <= 0) return 1;
+      return phi(Math.sqrt(Math.max(0, vPgs / (2 * vEnv))));
+    }
+
+    // Brier approximation from explained variance on Bernoulli outcome with prevalence pi
+    function expectedBrierFromR2(r2, prevalence) {
+      const base = prevalence * (1 - prevalence);
+      return base * (1 - Math.max(0, Math.min(1, r2)));
+    }
+
 
 
     // ════════════════════════════════════════════════════════════
@@ -745,7 +792,8 @@
       const NeS = parseFloat(document.getElementById('slider-NeS').value);
       const NeT = parseFloat(document.getElementById('slider-NeT').value);
       const M = parseFloat(document.getElementById('slider-M').value);
-      const va = parseFloat(document.getElementById('slider-va').value);
+      const va = 1.0;
+      const prevalence = parseFloat(document.getElementById('slider-prev').value);
 
       let fstS, fstT, d;
       if (model === 'pure_split') {
@@ -759,7 +807,7 @@
         d = 2 * fstS;
       }
 
-      return { model, t, NeS, NeT, M, va, fstS, fstT, d };
+      return { model, t, NeS, NeT, M, va, prevalence, fstS, fstT, d };
     }
 
     function gaussian(x, mu, sigma) {
@@ -805,7 +853,7 @@
       // Pure Split charts
       charts.psMeanDist = makeChart('chart-ps-mean-dist', 'PGS (standardized)', 'Density');
       charts.psFst = makeChart('chart-ps-fst', 'Generations since split', 'Population divergence (F_ST)');
-      charts.psSummary = makeChart('chart-ps-summary', 'Population divergence (F_ST)', 'Metric value');
+      charts.psSummary = makeChart('chart-ps-summary', 'Target divergence (F_T)', 'Present-day performance');
 
       // IM charts
       charts.imMeanDist = makeChart('chart-im-mean-dist', 'PGS (standardized)', 'Density');
@@ -839,7 +887,7 @@
       document.getElementById('val-NeS').textContent = p.NeS.toLocaleString();
       document.getElementById('val-NeT').textContent = p.NeT.toLocaleString();
       document.getElementById('val-M').textContent = p.M.toFixed(2);
-      document.getElementById('val-va').textContent = p.va.toFixed(2);
+      document.getElementById('val-prev').textContent = p.prevalence.toFixed(2);
 
       // ── Show/hide model-specific sections ──
       const isPS = p.model === 'pure_split';
@@ -876,13 +924,25 @@
       const absMeanDiff = expectedAbsMeanDiff(p.va, p.d);
       document.getElementById('metric-mean-shift').textContent = absMeanDiff.toFixed(4);
 
-      // Per-branch variance retained
-      const eVarS = expectedVarUnderDrift(p.va, p.fstS);
-      const eVarT = expectedVarUnderDrift(p.va, p.fstT);
-      document.getElementById('metric-var-ratio-s').textContent = (eVarS / p.va).toFixed(4);
-      document.getElementById('metric-var-ratio-t').textContent = (eVarT / p.va).toFixed(4);
-      // Asymmetric variance difference: -(F_T - F_S)
-      document.getElementById('metric-var-diff').textContent = (-(p.fstT - p.fstS)).toFixed(4);
+      // Clinical performance endpoints
+      const vEnv = 1.0; // fixed environmental variance (gives SNR=1.0 at va=1.0)
+      const vPgsS = expectedVarUnderDrift(p.va, p.fstS);
+      const vPgsT = expectedVarUnderDrift(p.va, p.fstT);
+      const r2S = expectedR2(vPgsS, vEnv);
+      const r2T = expectedR2(vPgsT, vEnv);
+      const portability = r2S > 0 ? 100 * (r2T / r2S) : 0;
+      const aucS = expectedAUC(vPgsS, vEnv);
+      const aucT = expectedAUC(vPgsT, vEnv);
+      const brierS = expectedBrierFromR2(r2S, p.prevalence);
+      const brierT = expectedBrierFromR2(r2T, p.prevalence);
+      const brierGap = brierT - brierS;
+
+      document.getElementById('metric-r2-s').textContent = r2S.toFixed(3);
+      document.getElementById('metric-r2-t').textContent = r2T.toFixed(3);
+      document.getElementById('metric-portability').textContent = portability.toFixed(1) + '%';
+      document.getElementById('metric-auc-s').textContent = aucS.toFixed(3);
+      document.getElementById('metric-auc-t').textContent = aucT.toFixed(3);
+      document.getElementById('metric-brier-gap').textContent = (brierGap >= 0 ? '+' : '') + brierGap.toFixed(4);
 
       if (isPS) {
         updatePureSplit(p);
@@ -934,10 +994,14 @@
       charts.psSummary.data = {
         labels: fs.map(f => (f * 100).toFixed(1) + '%'),
         datasets: [
-          ds('Mean PGS shift (σ units)', fs.map(f => expectedAbsMeanDiff(p.va, p.fstS + f)), '#6366f1'),
-          ds('Target var retained: (1−F_T)', fs.map(f => 1 - f), '#10b981'),
-          ds('Source var retained: (1−F_S)', fs.map(() => 1 - p.fstS), '#06b6d4', { borderDash: [6, 3] }),
-          ds('E[ΔVar]/V_A = −(F_T−F_S)', fs.map(f => -(f - p.fstS)), '#f59e0b', { borderDash: [4, 2] }),
+          ds('Target R²', fs.map(f => expectedR2(expectedVarUnderDrift(p.va, f), 1 - p.va)), '#10b981'),
+          ds('Source R²', fs.map(() => expectedR2(expectedVarUnderDrift(p.va, p.fstS), 1 - p.va)), '#06b6d4', { borderDash: [6, 3] }),
+          ds('Target AUC', fs.map(f => expectedAUC(expectedVarUnderDrift(p.va, f), 1 - p.va)), '#6366f1'),
+          ds('Brier gap (target-source)', fs.map(f => {
+            const r2Src = expectedR2(expectedVarUnderDrift(p.va, p.fstS), 1 - p.va);
+            const r2Tgt = expectedR2(expectedVarUnderDrift(p.va, f), 1 - p.va);
+            return expectedBrierFromR2(r2Tgt, p.prevalence) - expectedBrierFromR2(r2Src, p.prevalence);
+          }), '#f59e0b', { borderDash: [4, 2] }),
         ]
       };
       charts.psSummary.update('none');
