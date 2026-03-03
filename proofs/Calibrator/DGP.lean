@@ -10,6 +10,177 @@ section AllClaims
 
 variable {p k sp n : ℕ}
 
+abbrev CausalVec (c : ℕ) := Fin c → ℝ
+abbrev TagVec (t : ℕ) := Fin t → ℝ
+
+/-! ### Tagged DGP (Causal vs Observable Architecture)
+
+This block explicitly separates:
+- latent causal variants `X_causal`
+- observed/tag variants `X_tag`
+
+and defines LD as the causal-tag correlation matrix under a joint law on `(X_causal, X_tag)`.
+-/
+
+/-- Data-generating process with separate latent causal and observed/tag spaces. -/
+structure TaggedDataGeneratingProcess (c t : ℕ) where
+  trueExpectation : CausalVec c → TagVec t → ℝ
+  jointMeasureCT : Measure (CausalVec c × TagVec t)
+
+/-- Mean of causal coordinate `i` under the joint tagged law. -/
+noncomputable def causalMean {c t : ℕ}
+    (dgp : TaggedDataGeneratingProcess c t) (i : Fin c) : ℝ :=
+  ∫ x : CausalVec c × TagVec t, x.1 i ∂dgp.jointMeasureCT
+
+/-- Mean of tag coordinate `j` under the joint tagged law. -/
+noncomputable def tagMean {c t : ℕ}
+    (dgp : TaggedDataGeneratingProcess c t) (j : Fin t) : ℝ :=
+  ∫ x : CausalVec c × TagVec t, x.2 j ∂dgp.jointMeasureCT
+
+/-- Causal-tag cross-covariance entry `Cov(X_causal[i], X_tag[j])`. -/
+noncomputable def crossCovEntry {c t : ℕ}
+    (dgp : TaggedDataGeneratingProcess c t) (i : Fin c) (j : Fin t) : ℝ :=
+  ∫ x : CausalVec c × TagVec t,
+      (x.1 i - causalMean dgp i) * (x.2 j - tagMean dgp j) ∂dgp.jointMeasureCT
+
+/-- Causal variance entry `Var(X_causal[i])`. -/
+noncomputable def causalVarEntry {c t : ℕ}
+    (dgp : TaggedDataGeneratingProcess c t) (i : Fin c) : ℝ :=
+  ∫ x : CausalVec c × TagVec t, (x.1 i - causalMean dgp i) ^ 2 ∂dgp.jointMeasureCT
+
+/-- Tag variance entry `Var(X_tag[j])`. -/
+noncomputable def tagVarEntry {c t : ℕ}
+    (dgp : TaggedDataGeneratingProcess c t) (j : Fin t) : ℝ :=
+  ∫ x : CausalVec c × TagVec t, (x.2 j - tagMean dgp j) ^ 2 ∂dgp.jointMeasureCT
+
+/-- Cross-covariance matrix `Σ_tc` between tag and causal coordinates. -/
+noncomputable def sigmaTagCausal {c t : ℕ}
+    (dgp : TaggedDataGeneratingProcess c t) : Matrix (Fin t) (Fin c) ℝ :=
+  Matrix.of fun j i => crossCovEntry dgp i j
+
+/-- LD correlation entry `Corr(X_causal[i], X_tag[j])`.
+If either marginal variance is zero, we set the entry to `0`. -/
+noncomputable def ldCorrelationEntry {c t : ℕ}
+    (dgp : TaggedDataGeneratingProcess c t) (i : Fin c) (j : Fin t) : ℝ :=
+  let denom := Real.sqrt (causalVarEntry dgp i) * Real.sqrt (tagVarEntry dgp j)
+  if denom = 0 then 0 else crossCovEntry dgp i j / denom
+
+/-- LD parameter matrix between causal and tag spaces (correlation form). -/
+noncomputable def ldCorrelationMatrix {c t : ℕ}
+    (dgp : TaggedDataGeneratingProcess c t) : Matrix (Fin t) (Fin c) ℝ :=
+  Matrix.of fun j i => ldCorrelationEntry dgp i j
+
+/-- Linear causal outcome map `y = β_cᵀ x_causal`. -/
+noncomputable def causalLinearOutcome {c : ℕ}
+    (betaCausal : CausalVec c) (xCausal : CausalVec c) : ℝ :=
+  dotProduct betaCausal xCausal
+
+/-- Observable ML predictor restricted to tag-space input `x_tag ↦ wᵀ x_tag`. -/
+noncomputable def tagLinearPredictor {t : ℕ}
+    (wTag : TagVec t) (xTag : TagVec t) : ℝ :=
+  dotProduct wTag xTag
+
+/-- Tagged squared loss: predictor only sees `X_tag`, while target is causal outcome from `X_causal`. -/
+noncomputable def taggedSquaredLoss {c t : ℕ}
+    (betaCausal : CausalVec c) (wTag : TagVec t)
+    (x : CausalVec c × TagVec t) : ℝ :=
+  (causalLinearOutcome betaCausal x.1 - tagLinearPredictor wTag x.2) ^ 2
+
+/-- Observable risk in tagged setting: expectation over the joint causal-tag population law. -/
+noncomputable def observableTaggedRisk {c t : ℕ}
+    (dgp : TaggedDataGeneratingProcess c t)
+    (betaCausal : CausalVec c) (wTag : TagVec t) : ℝ :=
+  ∫ x, taggedSquaredLoss betaCausal wTag x ∂dgp.jointMeasureCT
+
+/-- Source tagged second moments for best linear prediction from tags. -/
+structure SourceTaggedMoments (c t : ℕ) where
+  sigmaTagSource : Matrix (Fin t) (Fin t) ℝ
+  sigmaTagCausalSource : Matrix (Fin t) (Fin c) ℝ
+
+/-- Closed-form source best linear predictor weights:
+`w*_S = Σ_tag,S^{-1} Σ_tc,S β_c`. -/
+noncomputable def sourceBestLinearWeightsFromLD {c t : ℕ}
+    (mom : SourceTaggedMoments c t) (betaCausal : CausalVec c) : TagVec t :=
+  mom.sigmaTagSource⁻¹.mulVec (mom.sigmaTagCausalSource.mulVec betaCausal)
+
+/-- Best linear predictor theorem (source population):
+the optimal source weights are a function of source LD moments only. -/
+theorem bestLinearPredictor_source_from_ld {c t : ℕ}
+    (mom : SourceTaggedMoments c t) (betaCausal : CausalVec c) :
+    sourceBestLinearWeightsFromLD mom betaCausal =
+      mom.sigmaTagSource⁻¹.mulVec (mom.sigmaTagCausalSource.mulVec betaCausal) := by
+  rfl
+
+/-- Frobenius norm squared for a square covariance matrix:
+`‖A‖_F² = Σᵢ Σⱼ Aᵢⱼ²`. -/
+noncomputable def frobeniusNormSq {t : ℕ}
+    (A : Matrix (Fin t) (Fin t) ℝ) : ℝ :=
+  ∑ i : Fin t, ∑ j : Fin t, (A i j) ^ 2
+
+theorem frobeniusNormSq_nonneg {t : ℕ}
+    (A : Matrix (Fin t) (Fin t) ℝ) :
+    0 ≤ frobeniusNormSq A := by
+  unfold frobeniusNormSq
+  exact Finset.sum_nonneg (fun i _ => Finset.sum_nonneg (fun j _ => sq_nonneg (A i j)))
+
+theorem frobeniusNormSq_pos_of_exists_ne_zero {t : ℕ}
+    (A : Matrix (Fin t) (Fin t) ℝ)
+    (h : ∃ i j, A i j ≠ 0) :
+    0 < frobeniusNormSq A := by
+  rcases h with ⟨i0, j0, hne⟩
+  unfold frobeniusNormSq
+  have h_inner_nonneg : 0 ≤ ∑ j : Fin t, (A i0 j) ^ 2 :=
+    Finset.sum_nonneg (fun j _ => sq_nonneg (A i0 j))
+  have h_inner_lower : (A i0 j0) ^ 2 ≤ ∑ j : Fin t, (A i0 j) ^ 2 := by
+    exact Finset.single_le_sum (fun j _ => sq_nonneg (A i0 j)) (by simp)
+  have h_outer_lower :
+      ∑ j : Fin t, (A i0 j) ^ 2 ≤ ∑ i : Fin t, ∑ j : Fin t, (A i j) ^ 2 := by
+    exact Finset.single_le_sum
+      (fun i _ => Finset.sum_nonneg (fun j _ => sq_nonneg (A i j)))
+      (by simp)
+  have hsq_pos : 0 < (A i0 j0) ^ 2 := by
+    exact sq_pos_of_ne_zero hne
+  exact lt_of_lt_of_le hsq_pos (le_trans h_inner_lower h_outer_lower)
+
+/-- Source/target `R²` represented from MSE and total phenotype variance. -/
+noncomputable def r2FromMSE (mse varY : ℝ) : ℝ :=
+  1 - mse / varY
+
+/-- Core mismatch theorem:
+if target excess MSE is lower-bounded by `λ * ‖ΣS-ΣT‖_F²` with `λ>0`
+and covariance mismatch is nonzero, then target MSE is strictly larger. -/
+theorem target_mse_strictly_increases_of_covariance_mismatch
+    {t : ℕ}
+    (mseSource mseTarget lam : ℝ)
+    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
+    (h_gap_lb :
+      lam * frobeniusNormSq (sigmaSource - sigmaTarget) ≤ mseTarget - mseSource)
+    (hlam : 0 < lam)
+    (h_mismatch : 0 < frobeniusNormSq (sigmaSource - sigmaTarget)) :
+    mseSource < mseTarget := by
+  have hpos : 0 < lam * frobeniusNormSq (sigmaSource - sigmaTarget) := mul_pos hlam h_mismatch
+  linarith
+
+/-- Core mismatch theorem in `R²` units:
+under fixed positive total variance, strict MSE increase implies strict target `R²` drop. -/
+theorem target_r2_strictly_decreases_of_covariance_mismatch
+    {t : ℕ}
+    (mseSource mseTarget varY lam : ℝ)
+    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
+    (h_gap_lb :
+      lam * frobeniusNormSq (sigmaSource - sigmaTarget) ≤ mseTarget - mseSource)
+    (hlam : 0 < lam)
+    (h_mismatch : 0 < frobeniusNormSq (sigmaSource - sigmaTarget))
+    (h_varY_pos : 0 < varY) :
+    r2FromMSE mseTarget varY < r2FromMSE mseSource varY := by
+  have hmse : mseSource < mseTarget :=
+    target_mse_strictly_increases_of_covariance_mismatch
+      mseSource mseTarget lam sigmaSource sigmaTarget h_gap_lb hlam h_mismatch
+  unfold r2FromMSE
+  have hdiv : mseSource / varY < mseTarget / varY :=
+    (div_lt_div_right h_varY_pos).2 hmse
+  linarith
+
 /-! ### Example Scenario DGPs (Specific Instantiations)
 
 The following are **example instantiations** of `dgpAdditiveBias` with specific β values

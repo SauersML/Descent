@@ -106,6 +106,20 @@ theorem brierScore_strict_minimum (π p : ℝ) (hp : p ≠ π) :
   have hsq : (p - π) ^ 2 > 0 := sq_pos_of_ne_zero hne
   linarith
 
+/-- Exact population Brier risk of a calibrated predictor (`q = η`). -/
+noncomputable def exactBrierRiskOfCalibrated {Z : Type*} [MeasurableSpace Z]
+    (μ : Measure Z) (η : Z → ℝ) : ℝ :=
+  ∫ z, expectedBrierScore (η z) (η z) ∂μ
+
+/-- Exact calibrated Brier-risk identity: pointwise Bernoulli variance integrated over the population. -/
+theorem exactBrierRiskOfCalibrated_eq_integral {Z : Type*} [MeasurableSpace Z]
+    (μ : Measure Z) (η : Z → ℝ) :
+    exactBrierRiskOfCalibrated μ η = ∫ z, η z * (1 - η z) ∂μ := by
+  unfold exactBrierRiskOfCalibrated
+  refine integral_congr_ae ?_
+  filter_upwards with z
+  simpa [brierScore_at_true_prob] using (brierScore_at_true_prob (η z))
+
 /-! ### Posterior Mean Optimality -/
 
 /-- The posterior mean prediction for a binary outcome.
@@ -960,6 +974,62 @@ noncomputable def logRisk {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
 noncomputable def brierRisk {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
     (η q : ProbPredictor Z) : ℝ :=
   ∫ z, expectedBrierScore (q z).1 (η z).1 ∂μ
+
+/-- Covariate-shift transport bound for Brier risk under a bounded density ratio.
+If `μT = w · μS` and `w(z) ≤ M`, then `R_T ≤ M · R_S`. -/
+theorem brierRisk_target_le_mul_source_of_withDensity
+    {Z : Type*} [MeasurableSpace Z]
+    (μS μT : Measure Z)
+    (η q : ProbPredictor Z)
+    (w : Z → ℝ) (M : ℝ)
+    (h_density : μT = μS.withDensity (fun z => ENNReal.ofReal (w z)))
+    (hw_meas : AEMeasurable (fun z => ENNReal.ofReal (w z)) μS)
+    (hw_nonneg : ∀ z, 0 ≤ w z)
+    (hw_bdd : ∀ z, w z ≤ M)
+    (hM_nonneg : 0 ≤ M)
+    (h_int_source : Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μS)
+    (h_int_weighted : Integrable (fun z => w z * expectedBrierScore (q z).1 (η z).1) μS) :
+    brierRisk μT η q ≤ M * brierRisk μS η q := by
+  let ℓ : Z → ℝ := fun z => expectedBrierScore (q z).1 (η z).1
+  have hℓ_nonneg : ∀ z, 0 ≤ ℓ z := by
+    intro z
+    unfold ℓ expectedBrierScore
+    have hη0 : 0 ≤ (η z).1 := (η z).2.1
+    have hη1 : (η z).1 ≤ 1 := (η z).2.2
+    have h1η : 0 ≤ 1 - (η z).1 := by linarith
+    nlinarith [sq_nonneg (1 - (q z).1), sq_nonneg ((q z).1), hη0, h1η]
+  have h_pointwise : ∀ z, w z * ℓ z ≤ M * ℓ z := by
+    intro z
+    nlinarith [hw_bdd z, hℓ_nonneg z]
+  have h_rw :
+      brierRisk μT η q = ∫ z, w z * ℓ z ∂μS := by
+    unfold brierRisk
+    simp [ℓ]
+    rw [h_density]
+    have h_lt_top : ∀ᵐ z ∂μS, ENNReal.ofReal (w z) < ⊤ := by
+      exact Filter.Eventually.of_forall (fun _ => ENNReal.ofReal_lt_top)
+    calc
+      ∫ z, ℓ z ∂μS.withDensity (fun z => ENNReal.ofReal (w z))
+          = ∫ z, ((ENNReal.ofReal (w z)).toReal) • ℓ z ∂μS := by
+              simpa using
+                (integral_withDensity_eq_integral_toReal_smul₀
+                  (μ := μS) (f := fun z => ENNReal.ofReal (w z)) hw_meas h_lt_top ℓ)
+      _ = ∫ z, w z * ℓ z ∂μS := by
+            refine integral_congr_ae ?_
+            exact Filter.Eventually.of_forall (fun z => by
+              simp [smul_eq_mul, ENNReal.toReal_ofReal (hw_nonneg z)])
+  have h_int_Mℓ : Integrable (fun z => M * ℓ z) μS := h_int_source.const_mul M
+  have h_mono :
+      ∫ z, w z * ℓ z ∂μS ≤ ∫ z, M * ℓ z ∂μS :=
+    integral_mono_ae h_int_weighted h_int_Mℓ (Filter.Eventually.of_forall h_pointwise)
+  have h_scal :
+      (∫ z, M * ℓ z ∂μS) = M * ∫ z, ℓ z ∂μS := by
+    simpa using (integral_const_mul M ℓ)
+  calc
+    brierRisk μT η q = ∫ z, w z * ℓ z ∂μS := h_rw
+    _ ≤ ∫ z, M * ℓ z ∂μS := h_mono
+    _ = M * ∫ z, ℓ z ∂μS := h_scal
+    _ = M * brierRisk μS η q := by simp [brierRisk, ℓ]
 
 /-- Log-loss Bayes-optimality: `η` minimizes risk among all measurable predictors in `[0,1]`. -/
 theorem logRisk_minimized_at_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
