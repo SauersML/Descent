@@ -53,4 +53,54 @@ theorem covariance_mismatch_pos_of_fst_and_sparse_array_wf_proved
     (wrightFisher_covariance_gap_lower_bound_proved fstSource fstTarget recombRate arraySparsity rS rT h_delta)
     h_fst h_recomb_pos h_sparse_pos h_kappa_pos
 
+
+/-- The true derivative of expected Brier score with respect to p,
+    resolving the specification gaming in expectedBrierScore_deriv. -/
+theorem expectedBrierScore_deriv_proved (p π : ℝ) :
+    deriv (fun x => expectedBrierScore x π) p = 2 * (p - π) := by
+  have hd1 : DifferentiableAt ℝ (fun x : ℝ => π * (1 - x) ^ 2) p := by
+    apply DifferentiableAt.const_mul
+    apply DifferentiableAt.pow
+    apply DifferentiableAt.sub (differentiableAt_const 1) differentiableAt_id
+  have hd2 : DifferentiableAt ℝ (fun x : ℝ => (1 - π) * x ^ 2) p := by
+    apply DifferentiableAt.const_mul
+    apply DifferentiableAt.pow differentiableAt_id
+
+  unfold expectedBrierScore
+  have h_add : deriv (fun x : ℝ => π * (1 - x) ^ 2 + (1 - π) * x ^ 2) p = deriv (fun x : ℝ => π * (1 - x) ^ 2) p + deriv (fun x : ℝ => (1 - π) * x ^ 2) p := by
+    exact deriv_add hd1 hd2
+  rw [h_add]
+
+  have hd_sub : deriv (fun x : ℝ => π * (1 - x) ^ 2) p = -2 * π * (1 - p) := by
+    rw [deriv_const_mul]
+    · have h_chain : deriv (fun x : ℝ => (1 - x) ^ 2) p = 2 * (1 - p) * deriv (fun x : ℝ => 1 - x) p := by
+        have h1 : deriv (fun x : ℝ => (1 - x) ^ 2) p = 2 * ((fun x : ℝ => 1 - x) p) ^ (2 - 1) * deriv (fun x : ℝ => 1 - x) p := deriv_pow (n := 2) (DifferentiableAt.sub (differentiableAt_const 1) differentiableAt_id)
+        rw [h1]
+        ring_nf
+      rw [h_chain]
+      have h_inner : deriv (fun x : ℝ => 1 - x) p = -1 := by
+        have h_sub_inner : deriv (fun x : ℝ => 1 - x) p = deriv (fun x : ℝ => 1) p - deriv (fun x : ℝ => x) p := deriv_sub (differentiableAt_const 1) differentiableAt_id
+        rw [h_sub_inner, deriv_const]
+        have h_id : deriv (fun x : ℝ => x) p = 1 := deriv_id p
+        rw [h_id, zero_sub]
+      rw [h_inner]
+      ring
+    · apply DifferentiableAt.pow
+      apply DifferentiableAt.sub (differentiableAt_const 1) differentiableAt_id
+
+  have hd_add : deriv (fun x : ℝ => (1 - π) * x ^ 2) p = 2 * (1 - π) * p := by
+    rw [deriv_const_mul]
+    · have h_pow : deriv (fun x : ℝ => x ^ 2) p = 2 * p := by
+        have h_chain2 : deriv (fun x : ℝ => x ^ 2) p = 2 * ((fun x : ℝ => x) p) ^ (2 - 1) * deriv (fun x : ℝ => x) p := deriv_pow (n := 2) differentiableAt_id
+        rw [h_chain2]
+        have h_id : deriv (fun x : ℝ => x) p = 1 := deriv_id p
+        rw [h_id]
+        ring_nf
+      rw [h_pow]
+      ring
+    · apply DifferentiableAt.pow differentiableAt_id
+
+  rw [hd_sub, hd_add]
+  ring
+
 end Calibrator
