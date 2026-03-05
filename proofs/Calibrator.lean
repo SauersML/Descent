@@ -53,4 +53,133 @@ theorem covariance_mismatch_pos_of_fst_and_sparse_array_wf_proved
     (wrightFisher_covariance_gap_lower_bound_proved fstSource fstTarget recombRate arraySparsity rS rT h_delta)
     h_fst h_recomb_pos h_sparse_pos h_kappa_pos
 
+/--
+Helper lemma: A Bayes-optimal model in a capable class Recovers the true expectation pointwise,
+assuming continuity and a strictly positive measure, avoiding specification gaming.
+-/
+lemma optimal_implies_pointwise_eq_proved {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (dgp : DataGeneratingProcess k) (model : PhenotypeInformedGAM p k sp)
+    (h_opt : IsBayesOptimalInClass dgp model)
+    (h_capable : ∃ (m : PhenotypeInformedGAM p k sp),
+      (∀ p_val c_val, linearPredictor m p_val c_val = dgp.trueExpectation p_val c_val) ∧
+      m.pgsBasis = model.pgsBasis ∧ m.pcSplineBasis = model.pcSplineBasis)
+    (h_measure_pos : MeasureTheory.Measure.IsOpenPosMeasure dgp.jointMeasure)
+    (h_cont_true : Continuous (fun pc : ℝ × (Fin k → ℝ) => dgp.trueExpectation pc.1 pc.2))
+    (h_pgs_cont : ∀ i, Continuous (model.pgsBasis.B i))
+    (h_spline_cont : ∀ i, Continuous (model.pcSplineBasis.b i))
+    (h_int_sq : MeasureTheory.Integrable (fun pc : ℝ × (Fin k → ℝ) => (dgp.trueExpectation pc.1 pc.2 - linearPredictor model pc.1 pc.2)^2) dgp.jointMeasure) :
+    ∀ p_val c_val, linearPredictor model p_val c_val = dgp.trueExpectation p_val c_val := by
+  have h_risk_zero := optimal_recovers_truth_of_capable dgp model h_opt h_capable
+  have h_ae_eq : ∀ᵐ pc ∂dgp.jointMeasure, linearPredictor model pc.1 pc.2 = dgp.trueExpectation pc.1 pc.2 := by
+    rw [MeasureTheory.integral_eq_zero_iff_of_nonneg] at h_risk_zero
+    · filter_upwards [h_risk_zero] with pc h_sq
+      have h_sq_eq_zero : dgp.trueExpectation pc.1 pc.2 - linearPredictor model pc.1 pc.2 = 0 := sq_eq_zero_iff.mp h_sq
+      exact eq_of_sub_eq_zero h_sq_eq_zero |>.symm
+    · intro pc; exact sq_nonneg _
+    · exact h_int_sq
+  let f := fun pc : ℝ × (Fin k → ℝ) => linearPredictor model pc.1 pc.2
+  let g := fun pc : ℝ × (Fin k → ℝ) => dgp.trueExpectation pc.1 pc.2
+  have h_eq_fun : f = g := by
+    have h_f_cont : Continuous f := by
+       apply Continuous.add
+       · apply Continuous.add
+         · exact continuous_const
+         · refine continuous_finset_sum _ (fun l _ => ?_)
+           dsimp [evalSmooth]
+           refine continuous_finset_sum _ (fun i _ => ?_)
+           apply Continuous.mul continuous_const
+           apply Continuous.comp (h_spline_cont i)
+           exact (continuous_apply l).comp continuous_snd
+       · refine continuous_finset_sum _ (fun m _ => ?_)
+         apply Continuous.mul
+         · apply Continuous.add
+           · exact continuous_const
+           · refine continuous_finset_sum _ (fun l _ => ?_)
+             dsimp [evalSmooth]
+             refine continuous_finset_sum _ (fun i _ => ?_)
+             apply Continuous.mul continuous_const
+             apply Continuous.comp (h_spline_cont i)
+             exact (continuous_apply l).comp continuous_snd
+         · apply Continuous.comp (h_pgs_cont _) continuous_fst
+    haveI := h_measure_pos
+    have h_ae_eq' : f =ᵐ[dgp.jointMeasure] g := by
+      simpa [f, g] using h_ae_eq
+    exact MeasureTheory.Measure.eq_of_ae_eq h_ae_eq' h_f_cont h_cont_true
+  intro p c
+  exact congr_fun h_eq_fun (p, c)
+
+/-- Rigorous replacement for `context_specificity` avoiding the begging-the-question `h_repr` hypothesis. -/
+theorem context_specificity_proved {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] (dgp1 dgp2 : DGPWithEnvironment k)
+    (h_same_genetics : dgp1.trueGeneticEffect = dgp2.trueGeneticEffect ∧ dgp1.to_dgp.jointMeasure = dgp2.to_dgp.jointMeasure)
+    (h_diff_env : dgp1.environmentalEffect ≠ dgp2.environmentalEffect)
+    (model1 : PhenotypeInformedGAM p k sp)
+    (h_opt1 : IsBayesOptimalInClass dgp1.to_dgp model1)
+    (h_capable1 : ∃ (m : PhenotypeInformedGAM p k sp),
+      (∀ p_val c_val, linearPredictor m p_val c_val = dgp1.to_dgp.trueExpectation p_val c_val) ∧
+      m.pgsBasis = model1.pgsBasis ∧ m.pcSplineBasis = model1.pcSplineBasis)
+    (h_capable2 : ∃ (m : PhenotypeInformedGAM p k sp),
+      (∀ p_val c_val, linearPredictor m p_val c_val = dgp2.to_dgp.trueExpectation p_val c_val) ∧
+      m.pgsBasis = model1.pgsBasis ∧ m.pcSplineBasis = model1.pcSplineBasis)
+    (h_measure_pos : MeasureTheory.Measure.IsOpenPosMeasure dgp1.to_dgp.jointMeasure)
+    (h_cont_true1 : Continuous (fun pc : ℝ × (Fin k → ℝ) => dgp1.to_dgp.trueExpectation pc.1 pc.2))
+    (h_cont_true2 : Continuous (fun pc : ℝ × (Fin k → ℝ) => dgp2.to_dgp.trueExpectation pc.1 pc.2))
+    (h_pgs_cont : ∀ i, Continuous (model1.pgsBasis.B i))
+    (h_spline_cont : ∀ i, Continuous (model1.pcSplineBasis.b i))
+    (h_int_sq1 : MeasureTheory.Integrable (fun pc : ℝ × (Fin k → ℝ) => (dgp1.to_dgp.trueExpectation pc.1 pc.2 - linearPredictor model1 pc.1 pc.2)^2) dgp1.to_dgp.jointMeasure)
+    (h_int_sq2 : MeasureTheory.Integrable (fun pc : ℝ × (Fin k → ℝ) => (dgp2.to_dgp.trueExpectation pc.1 pc.2 - linearPredictor model1 pc.1 pc.2)^2) dgp2.to_dgp.jointMeasure) :
+  ¬ IsBayesOptimalInClass dgp2.to_dgp model1 := by
+  intro h_opt2
+  have h_pt1 := optimal_implies_pointwise_eq_proved dgp1.to_dgp model1 h_opt1 h_capable1 h_measure_pos h_cont_true1 h_pgs_cont h_spline_cont h_int_sq1
+  have h_measure_pos2 : MeasureTheory.Measure.IsOpenPosMeasure dgp2.to_dgp.jointMeasure := by
+    rw [← h_same_genetics.2]
+    exact h_measure_pos
+  have h_pt2 := optimal_implies_pointwise_eq_proved dgp2.to_dgp model1 h_opt2 h_capable2 h_measure_pos2 h_cont_true2 h_pgs_cont h_spline_cont h_int_sq2
+  have h_eq_fn : dgp1.to_dgp.trueExpectation = dgp2.to_dgp.trueExpectation := by
+    ext p c
+    rw [← h_pt1 p c, ← h_pt2 p c]
+  rw [dgp1.is_additive_causal, dgp2.is_additive_causal, h_same_genetics.1] at h_eq_fn
+  have : dgp1.environmentalEffect = dgp2.environmentalEffect := by
+    ext c
+    have := congr_fun (congr_fun h_eq_fn 0) c
+    simp at this; exact this
+  exact h_diff_env this
+
+/-- Rigorous replacement for `l2_projection_of_additive_is_additive` avoiding the begging-the-question risk hypotheses. -/
+theorem l2_projection_of_additive_is_additive_proved (k sp : ℕ) [Fintype (Fin k)] [Fintype (Fin sp)] {f : ℝ → ℝ} {g : Fin k → ℝ → ℝ} {dgp : DataGeneratingProcess k}
+  (h_true_fn : dgp.trueExpectation = fun p c => f p + ∑ i, g i (c i))
+  (proj : PhenotypeInformedGAM 1 k sp)
+  (h_spline : proj.pcSplineBasis = polynomialSplineBasis sp)
+  (h_pgs : proj.pgsBasis = linearPGSBasis)
+  (h_opt : IsBayesOptimalInClass dgp proj)
+  (h_realizable : ∃ (m_true : PhenotypeInformedGAM 1 k sp), (∀ p c, linearPredictor m_true p c = dgp.trueExpectation p c) ∧ m_true.pgsBasis = proj.pgsBasis ∧ m_true.pcSplineBasis = proj.pcSplineBasis)
+  (h_measure_pos : MeasureTheory.Measure.IsOpenPosMeasure dgp.jointMeasure)
+  (h_cont_true : Continuous (fun pc : ℝ × (Fin k → ℝ) => dgp.trueExpectation pc.1 pc.2))
+  (h_pgs_cont : ∀ i, Continuous (proj.pgsBasis.B i))
+  (h_spline_cont : ∀ i, Continuous (proj.pcSplineBasis.b i))
+  (h_int_sq : MeasureTheory.Integrable (fun pc : ℝ × (Fin k → ℝ) => (dgp.trueExpectation pc.1 pc.2 - linearPredictor proj pc.1 pc.2)^2) dgp.jointMeasure) :
+  IsNormalizedScoreModel proj := by
+  have h_risk_zero : expectedSquaredError dgp (fun p c => linearPredictor proj p c) = 0 := by
+    exact optimal_recovers_truth_of_capable dgp proj h_opt h_realizable
+  have h_zero_risk_implies_pointwise : expectedSquaredError dgp (fun p c => linearPredictor proj p c) = 0 → ∀ p c, linearPredictor proj p c = dgp.trueExpectation p c := by
+    intro _
+    exact optimal_implies_pointwise_eq_proved dgp proj h_opt h_realizable h_measure_pos h_cont_true h_pgs_cont h_spline_cont h_int_sq
+  exact l2_projection_of_additive_is_additive k sp h_true_fn proj h_spline h_pgs h_opt h_realizable h_risk_zero h_zero_risk_implies_pointwise
+
+/-- Rigorous replacement for `independence_implies_no_interaction` avoiding the begging-the-question risk hypotheses. -/
+theorem independence_implies_no_interaction_proved (k sp : ℕ) [Fintype (Fin k)] [Fintype (Fin sp)] (dgp : DataGeneratingProcess k)
+    (h_additive : ∃ (f : ℝ → ℝ) (g : Fin k → ℝ → ℝ), dgp.trueExpectation = fun p c => f p + ∑ i, g i (c i))
+    (m : PhenotypeInformedGAM 1 k sp)
+    (h_spline : m.pcSplineBasis = polynomialSplineBasis sp)
+    (h_pgs : m.pgsBasis = linearPGSBasis)
+    (h_opt : IsBayesOptimalInClass dgp m)
+    (h_realizable : ∃ (m_true : PhenotypeInformedGAM 1 k sp), (∀ p c, linearPredictor m_true p c = dgp.trueExpectation p c) ∧ m_true.pgsBasis = m.pgsBasis ∧ m_true.pcSplineBasis = m.pcSplineBasis)
+    (h_measure_pos : MeasureTheory.Measure.IsOpenPosMeasure dgp.jointMeasure)
+    (h_cont_true : Continuous (fun pc : ℝ × (Fin k → ℝ) => dgp.trueExpectation pc.1 pc.2))
+    (h_pgs_cont : ∀ i, Continuous (m.pgsBasis.B i))
+    (h_spline_cont : ∀ i, Continuous (m.pcSplineBasis.b i))
+    (h_int_sq : MeasureTheory.Integrable (fun pc : ℝ × (Fin k → ℝ) => (dgp.trueExpectation pc.1 pc.2 - linearPredictor m pc.1 pc.2)^2) dgp.jointMeasure) :
+    IsNormalizedScoreModel m := by
+  rcases h_additive with ⟨f, g, h_fn_struct⟩
+  exact l2_projection_of_additive_is_additive_proved k sp h_fn_struct m h_spline h_pgs h_opt h_realizable h_measure_pos h_cont_true h_pgs_cont h_spline_cont h_int_sq
+
 end Calibrator
