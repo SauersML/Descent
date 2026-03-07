@@ -6,6 +6,8 @@ import Calibrator.PortabilityDrift
 
 namespace Calibrator
 
+local instance : Fact (2 ≤ 2) := ⟨by decide⟩
+
 /-- Top-level HWE expectation identity for the diploid alternative-allele count. -/
 theorem hardyWeinberg_expectedAltAlleleCount_proved
     (h : HardyWeinbergModel) :
@@ -43,11 +45,9 @@ theorem twoLocusCoalescent_covariance_gap_lower_bound_proved
           (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤
       frobeniusNormSq
         (twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tSource -
-          twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tTarget) := by
-  haveI : Fact (2 ≤ 2) := ⟨by decide⟩
-  simpa using
-    (twoLocusCoalescent_covariance_gap_lower_bound
-      (t := 2) ibdWeight recombRate tSource tTarget h_time)
+          twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tTarget) :=
+  twoLocusCoalescent_covariance_gap_lower_bound
+    (t := 2) ibdWeight recombRate tSource tTarget h_time
 
 /-- Concrete `2 × 2` positivity corollary for the two-locus coalescent witness. -/
 theorem covariance_mismatch_pos_of_twoLocusCoalescent_proved
@@ -60,12 +60,10 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent_proved
     0 <
       frobeniusNormSq
         (twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tSource -
-          twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tTarget) := by
-  haveI : Fact (2 ≤ 2) := ⟨by decide⟩
-  simpa using
-    (covariance_mismatch_pos_of_twoLocusCoalescent
-      (t := 2) ibdWeight recombRate tSource tTarget
-      h_ibd_pos h_recomb_pos h_recomb_lt_one h_time)
+          twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tTarget) :=
+  covariance_mismatch_pos_of_twoLocusCoalescent
+    (t := 2) ibdWeight recombRate tSource tTarget
+    h_ibd_pos h_recomb_pos h_recomb_lt_one h_time
 
 /-- Top-level AUC interval membership from a Berry-Esseen error bound on the discrete HWE score. -/
 theorem hwe_aucApproximationInterval_membership_proved
@@ -446,16 +444,6 @@ theorem expected_abs_mean_shift_of_wrightFisher_proved
           (Real.pi * (1 - wrightFisherFst NS tS))) := by
   exact expected_abs_mean_shift_of_wrightFisher V_A NS tS NT tT hVA_pos hNS hNT
 
-/-- Rigorous name for the exact mean-shift identity. -/
-theorem expected_abs_mean_shift_bound_proved
-    (V_A fstS fstT : ℝ)
-    (hVA_pos : 0 < V_A)
-    (hfst_sum_nonneg : 0 ≤ fstS + fstT)
-    (hfstS_lt_one : fstS < 1) :
-    Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
-      2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) :=
-  expected_abs_mean_shift_formula_proved V_A fstS fstT hVA_pos hfst_sum_nonneg hfstS_lt_one
-
 /-- Rigorous `2 × 2` target-`R²` drop proof using the two-locus coalescent witness. -/
 theorem target_r2_drop_of_twoLocusCoalescent_proved
     (mseSource mseTarget varY lam : ℝ)
@@ -473,14 +461,12 @@ theorem target_r2_drop_of_twoLocusCoalescent_proved
     (h_recomb_pos : 0 < recombRate)
     (h_recomb_lt_one : recombRate < 1)
     (h_time : tSource < tTarget) :
-    r2FromMSE mseTarget varY < r2FromMSE mseSource varY := by
-  haveI : Fact (2 ≤ 2) := ⟨by decide⟩
-  simpa using
-    (target_r2_drop_of_twoLocusCoalescent
-      (t := 2) mseSource mseTarget varY lam
-      ibdWeight recombRate tSource tTarget
-      h_mse_gap_lb h_lam_pos h_varY_pos
-      h_ibd_pos h_recomb_pos h_recomb_lt_one h_time)
+    r2FromMSE mseTarget varY < r2FromMSE mseSource varY :=
+  target_r2_drop_of_twoLocusCoalescent
+    (t := 2) mseSource mseTarget varY lam
+    ibdWeight recombRate tSource tTarget
+    h_mse_gap_lb h_lam_pos h_varY_pos
+    h_ibd_pos h_recomb_pos h_recomb_lt_one h_time
 
 section NoAxioms
 

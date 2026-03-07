@@ -181,13 +181,16 @@ theorem wrightFisherFst_nonneg
   have hNreal : (0 : ℝ) < N := by exact_mod_cast hN
   have hbase_nonneg : 0 ≤ 1 - 1 / (2 * (N : ℝ)) := by
     have h_le : (1 : ℝ) / (2 * (N : ℝ)) ≤ 1 / 2 := by
-      have hdenom_ge : (2 : ℝ) ≤ 2 * (N : ℝ) := by nlinarith
+      have hdenom_ge : (2 : ℝ) ≤ 2 * (N : ℝ) := by
+        have hNge : (1 : ℝ) ≤ N := by exact_mod_cast Nat.succ_le_of_lt hN
+        nlinarith
       have hpos : 0 < 2 * (N : ℝ) := by positivity
-      exact (one_div_le_one_div₀ (by norm_num : (0 : ℝ) < 2) hpos).2 hdenom_ge
+      simpa using one_div_le_one_div_of_le (by norm_num : (0 : ℝ) < 2) hdenom_ge
     linarith
   have hpow_le_one : (1 - 1 / (2 * (N : ℝ))) ^ t ≤ 1 := by
+    have hfrac_nonneg : 0 ≤ (1 : ℝ) / (2 * (N : ℝ)) := by positivity
     have hbase_le_one : 1 - 1 / (2 * (N : ℝ)) ≤ 1 := by linarith
-    exact pow_le_one₀ hbase_nonneg hbase_le_one t
+    exact pow_le_one₀ hbase_nonneg hbase_le_one
   rw [wrightFisherFst_eq]
   linarith
 
@@ -198,8 +201,10 @@ theorem wrightFisherFst_lt_one
   have hNreal : (0 : ℝ) < N := by exact_mod_cast hN
   have hbase_pos : 0 < 1 - 1 / (2 * (N : ℝ)) := by
     have h_lt : (1 : ℝ) / (2 * (N : ℝ)) < 1 := by
-      have hdenom_gt : (1 : ℝ) < 2 * (N : ℝ) := by nlinarith
-      exact one_div_lt_one_div₀ (by norm_num : (0 : ℝ) < 1) (by positivity) hdenom_gt
+      have hdenom_gt : (1 : ℝ) < 2 * (N : ℝ) := by
+        have hNge : (1 : ℝ) ≤ N := by exact_mod_cast Nat.succ_le_of_lt hN
+        nlinarith
+      simpa using one_div_lt_one_div_of_lt (by norm_num : (0 : ℝ) < 1) hdenom_gt
     linarith
   rw [wrightFisherFst_eq]
   have hpow_pos : 0 < (1 - 1 / (2 * (N : ℝ))) ^ t := pow_pos hbase_pos t

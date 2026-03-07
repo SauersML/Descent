@@ -58,7 +58,6 @@ theorem HWEPolygenicScoreDGP.mem_aucApproximationInterval_of_abs_sub_le
     (aucExact aucGaussian : ℝ)
     (h : |aucExact - aucGaussian| ≤ dgp.scoreApproximationError) :
     aucExact ∈ dgp.aucApproximationInterval aucGaussian := by
-  letI : Fintype (Fin m) := Fin.fintype m
   simpa [HWEPolygenicScoreDGP.aucApproximationInterval] using
     (mem_approximationInterval_of_abs_sub_le
     aucExact aucGaussian dgp.scoreApproximationError
@@ -74,7 +73,6 @@ theorem HWEPolygenicScoreDGP.mem_r2ApproximationInterval_of_abs_sub_le
     (r2Exact r2Gaussian : ℝ)
     (h : |r2Exact - r2Gaussian| ≤ dgp.scoreApproximationError) :
     r2Exact ∈ dgp.r2ApproximationInterval r2Gaussian := by
-  letI : Fintype (Fin m) := Fin.fintype m
   simpa [HWEPolygenicScoreDGP.r2ApproximationInterval] using
     (mem_approximationInterval_of_abs_sub_le
     r2Exact r2Gaussian dgp.scoreApproximationError
@@ -340,16 +338,16 @@ private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
       (A i1 i0)^2 ≤ ∑ j : Fin t, (A i1 j)^2 := by
     exact Finset.single_le_sum (fun j _ => sq_nonneg (A i1 j)) (by simp)
   have h_pair :
-      (∑ i in ({i0, i1} : Finset (Fin t)), (∑ j : Fin t, (A i j)^2)) =
+      Finset.sum ({i0, i1} : Finset (Fin t)) (fun i => ∑ j : Fin t, (A i j)^2) =
         (∑ j : Fin t, (A i0 j)^2) + (∑ j : Fin t, (A i1 j)^2) := by
-    simp [hi_ne]
+    rw [Finset.sum_pair hi_ne]
   have h_selected_le :
       (A i0 i1)^2 + (A i1 i0)^2 ≤
-        ∑ i in ({i0, i1} : Finset (Fin t)), (∑ j : Fin t, (A i j)^2) := by
+        Finset.sum ({i0, i1} : Finset (Fin t)) (fun i => ∑ j : Fin t, (A i j)^2) := by
     rw [h_pair]
     exact add_le_add h_row01 h_row10
   have h_subset_le :
-      (∑ i in ({i0, i1} : Finset (Fin t)), (∑ j : Fin t, (A i j)^2)) ≤
+      Finset.sum ({i0, i1} : Finset (Fin t)) (fun i => ∑ j : Fin t, (A i j)^2) ≤
         ∑ i : Fin t, (∑ j : Fin t, (A i j)^2) := by
     exact Finset.sum_le_sum_of_subset_of_nonneg (by simp) (by
       intro i _ _
@@ -361,7 +359,7 @@ private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
         (A i0 i1)^2 + (A i1 i0)^2 := by
       rw [h01, h10]
       ring
-    _ ≤ ∑ i in ({i0, i1} : Finset (Fin t)), (∑ j : Fin t, (A i j)^2) := h_selected_le
+    _ ≤ Finset.sum ({i0, i1} : Finset (Fin t)) (fun i => ∑ j : Fin t, (A i j)^2) := h_selected_le
     _ ≤ ∑ i : Fin t, (∑ j : Fin t, (A i j)^2) := h_subset_le
 
 /-- Algebraic decomposition of the two-locus covariance gap in terms of the MRCA time gap. -/
@@ -4392,33 +4390,95 @@ theorem multiplicative_bias_correction (k : ℕ) [Fintype (Fin k)]
     · exact h_integrable_sq
 
   have h_pointwise : ∀ p c, linearPredictor model p c = (dgpMultiplicativeBias scaling_func).trueExpectation p c := by
-    let f := fun pc : ℝ × (Fin k → ℝ) => linearPredictor model pc.1 pc.2
-    let g := fun pc : ℝ × (Fin k → ℝ) => (dgpMultiplicativeBias scaling_func).trueExpectation pc.1 pc.2
-    have h_eq_fun : f = g := by
-      have h_f_cont : Continuous f := by
-        exact
-          (linearPredictor_continuous_of_basis_continuous 1 k 1 model h_pgs_cont h_spline_cont)
-      have h_pgs_cont_true : ∀ i, Continuous (m_true.pgsBasis.B i) := by
-        simpa [h_pgs_eq] using h_pgs_cont
-      have h_spline_cont_true : ∀ i, Continuous (m_true.pcSplineBasis.b i) := by
-        simpa [h_spline_eq] using h_spline_cont
-      have h_g_cont : Continuous g := by
-        have h_g_eq : g = fun pc : ℝ × (Fin k → ℝ) => linearPredictor m_true pc.1 pc.2 := by
-          funext pc
-          simpa [g] using (h_true_eq pc.1 pc.2).symm
-        have h_cont_true : Continuous (fun pc : ℝ × (Fin k → ℝ) => linearPredictor m_true pc.1 pc.2) := by
-          exact
-            (linearPredictor_continuous_of_basis_continuous 1 k 1 m_true
-              h_pgs_cont_true h_spline_cont_true)
-        simpa [h_g_eq] using h_cont_true
-      letI : (stdNormalProdMeasure k).IsOpenPosMeasure := h_measure_pos
-      have h_ae_eq' : f =ᵐ[stdNormalProdMeasure k] g := by
-        filter_upwards [h_ae_eq] with pc hpc
-        simpa [f, g] using hpc
-      apply Measure.eq_of_ae_eq h_ae_eq' h_f_cont h_g_cont
-
+    have h_true_eq' :
+        ∀ p c,
+          @linearPredictor 1 k 1 (Fin.fintype 1) (inferInstance : Fintype (Fin k)) (Fin.fintype 1)
+              m_true p c =
+            (dgpMultiplicativeBias scaling_func).trueExpectation p c := by
+      simpa using h_true_eq
+    have h_ae_eq' :
+        ∀ᵐ pc ∂(@stdNormalProdMeasure k (inferInstance : Fintype (Fin k))),
+          linearPredictor model pc.1 pc.2 = (dgpMultiplicativeBias scaling_func).trueExpectation pc.1 pc.2 := by
+      simpa using h_ae_eq
+    have h_measure_pos' :
+        Measure.IsOpenPosMeasure (@stdNormalProdMeasure k (inferInstance : Fintype (Fin k))) := by
+      simpa using h_measure_pos
+    have h_evalSmooth_cont_model : ∀ (coeffs : SmoothFunction 1),
+        Continuous (fun x => evalSmooth model.pcSplineBasis coeffs x) := by
+      intro coeffs
+      dsimp only [evalSmooth]
+      refine continuous_finset_sum _ (fun i _ => ?_)
+      apply Continuous.mul continuous_const (h_spline_cont i)
+    have h_model_cont : Continuous (fun pc : ℝ × (Fin k → ℝ) => linearPredictor model pc.1 pc.2) := by
+      simp only [linearPredictor]
+      apply Continuous.add
+      · apply Continuous.add
+        · exact continuous_const
+        · refine continuous_finset_sum _ (fun l _ => ?_)
+          apply Continuous.comp (h_evalSmooth_cont_model _)
+          exact (continuous_apply l).comp continuous_snd
+      · refine continuous_finset_sum _ (fun m _ => ?_)
+        apply Continuous.mul
+        · apply Continuous.add
+          · exact continuous_const
+          · refine continuous_finset_sum _ (fun l _ => ?_)
+            apply Continuous.comp (h_evalSmooth_cont_model _)
+            exact (continuous_apply l).comp continuous_snd
+        · apply Continuous.comp (h_pgs_cont _) continuous_fst
+    have h_pgs_cont_true : ∀ i, Continuous (m_true.pgsBasis.B i) := by
+      simpa [h_pgs_eq] using h_pgs_cont
+    have h_spline_cont_true : ∀ i, Continuous (m_true.pcSplineBasis.b i) := by
+      simpa [h_spline_eq] using h_spline_cont
+    have h_evalSmooth_cont_true : ∀ (coeffs : SmoothFunction 1),
+        Continuous (fun x => evalSmooth m_true.pcSplineBasis coeffs x) := by
+      intro coeffs
+      dsimp only [evalSmooth]
+      refine continuous_finset_sum _ (fun i _ => ?_)
+      apply Continuous.mul continuous_const (h_spline_cont_true i)
+    have h_true_cont :
+        Continuous
+          (fun pc : ℝ × (Fin k → ℝ) =>
+            @linearPredictor 1 k 1 (Fin.fintype 1) (inferInstance : Fintype (Fin k)) (Fin.fintype 1)
+              m_true pc.1 pc.2) := by
+      simp only [linearPredictor]
+      apply Continuous.add
+      · apply Continuous.add
+        · exact continuous_const
+        · refine continuous_finset_sum _ (fun l _ => ?_)
+          apply Continuous.comp (h_evalSmooth_cont_true _)
+          exact (continuous_apply l).comp continuous_snd
+      · refine continuous_finset_sum _ (fun m _ => ?_)
+        apply Continuous.mul
+        · apply Continuous.add
+          · exact continuous_const
+          · refine continuous_finset_sum _ (fun l _ => ?_)
+            apply Continuous.comp (h_evalSmooth_cont_true _)
+            exact (continuous_apply l).comp continuous_snd
+        · apply Continuous.comp (h_pgs_cont_true _) continuous_fst
+    have h_ae_model_true :
+        (fun pc : ℝ × (Fin k → ℝ) => linearPredictor model pc.1 pc.2) =ᵐ[
+            @stdNormalProdMeasure k (inferInstance : Fintype (Fin k))]
+          (fun pc : ℝ × (Fin k → ℝ) =>
+            @linearPredictor 1 k 1 (Fin.fintype 1) (inferInstance : Fintype (Fin k)) (Fin.fintype 1)
+              m_true pc.1 pc.2) := by
+      filter_upwards [h_ae_eq'] with pc hpc
+      exact hpc.trans (h_true_eq' pc.1 pc.2).symm
+    haveI :
+        Measure.IsOpenPosMeasure (@stdNormalProdMeasure k (inferInstance : Fintype (Fin k))) :=
+      h_measure_pos'
+    have h_eq_fun :
+        (fun pc : ℝ × (Fin k → ℝ) => linearPredictor model pc.1 pc.2) =
+          (fun pc : ℝ × (Fin k → ℝ) =>
+            @linearPredictor 1 k 1 (Fin.fintype 1) (inferInstance : Fintype (Fin k)) (Fin.fintype 1)
+              m_true pc.1 pc.2) := by
+      exact Measure.eq_of_ae_eq h_ae_model_true h_model_cont h_true_cont
     intro p c
-    simpa [f, g] using congr_fun h_eq_fun (p, c)
+    calc
+      linearPredictor model p c =
+          @linearPredictor 1 k 1 (Fin.fintype 1) (inferInstance : Fintype (Fin k)) (Fin.fintype 1)
+            m_true p c := by
+        simpa using congr_fun h_eq_fun (p, c)
+      _ = (dgpMultiplicativeBias scaling_func).trueExpectation p c := h_true_eq' p c
 
   have h_pred : linearPredictor model 1 c = (dgpMultiplicativeBias scaling_func).trueExpectation 1 c := h_pointwise 1 c
   have h_pred0 : linearPredictor model 0 c = (dgpMultiplicativeBias scaling_func).trueExpectation 0 c := h_pointwise 0 c
