@@ -67,7 +67,39 @@ theorem expectedBrierScore_quadratic (p π : ℝ) :
 
     Setting this to zero gives p* = π. -/
 theorem expectedBrierScore_deriv (p π : ℝ) :
-    2 * (p - π) = -2 * π + 2 * p := by ring
+    deriv (fun x : ℝ => expectedBrierScore x π) p = 2 * (p - π) := by
+  have h_eq : (fun x : ℝ => expectedBrierScore x π) = fun x : ℝ => π - 2 * π * x + x ^ 2 := by
+    ext x
+    exact expectedBrierScore_quadratic x π
+  rw [h_eq]
+  have hd1 : DifferentiableAt ℝ (fun x : ℝ => π - 2 * π * x) p := by
+    apply DifferentiableAt.sub
+    · exact differentiableAt_const π
+    · apply DifferentiableAt.const_mul
+      exact differentiableAt_id
+  have hd2 : DifferentiableAt ℝ (fun x : ℝ => x ^ 2) p := by
+    exact differentiableAt_id.pow 2
+  have h_deriv_add : deriv (fun x : ℝ => (π - 2 * π * x) + x ^ 2) p = deriv (fun x : ℝ => π - 2 * π * x) p + deriv (fun x : ℝ => x ^ 2) p := by
+    exact deriv_add hd1 hd2
+  have h_eq_add : (fun x : ℝ => π - 2 * π * x + x ^ 2) = (fun x : ℝ => (π - 2 * π * x) + x ^ 2) := rfl
+  rw [h_eq_add, h_deriv_add]
+  have hd1_sub1 : DifferentiableAt ℝ (fun x : ℝ => π) p := differentiableAt_const π
+  have hd1_sub2 : DifferentiableAt ℝ (fun x : ℝ => 2 * π * x) p := differentiableAt_id.const_mul (2 * π)
+  have h_deriv_sub : deriv (fun x : ℝ => π - 2 * π * x) p = deriv (fun x : ℝ => π) p - deriv (fun x : ℝ => 2 * π * x) p := by
+    exact deriv_sub hd1_sub1 hd1_sub2
+  rw [h_deriv_sub]
+  rw [deriv_const]
+  have h_deriv_const_mul : deriv (fun x : ℝ => 2 * π * x) p = 2 * π * deriv (fun x : ℝ => x) p := by
+    exact deriv_const_mul (2 * π) differentiableAt_id
+  rw [h_deriv_const_mul]
+  have h_deriv_id : deriv (fun x : ℝ => x) p = 1 := by
+    exact deriv_id p
+  rw [h_deriv_id]
+  have h_deriv_pow : deriv (fun x : ℝ => x ^ 2) p = 2 * p ^ (2 - 1) * deriv (fun x : ℝ => x) p := by
+    exact deriv_pow (n := 2) differentiableAt_id
+  rw [h_deriv_pow]
+  rw [h_deriv_id]
+  ring
 
 /-! ### Brier Score is a Proper Scoring Rule -/
 
