@@ -261,12 +261,12 @@ theorem HardyWeinbergModel.genotypeProb_nonneg
     0 ≤ h.genotypeProb g := by
   cases g with
   | homRef =>
-      simp [HardyWeinbergModel.genotypeProb]
+      simp [HardyWeinbergModel.genotypeProb, sq_nonneg]
   | het =>
       simp [HardyWeinbergModel.genotypeProb]
       nlinarith [h.refFreq_nonneg, h.altFreq_nonneg]
   | homAlt =>
-      simp [HardyWeinbergModel.genotypeProb]
+      simp [HardyWeinbergModel.genotypeProb, sq_nonneg]
 
 /-- Hardy-Weinberg genotype probabilities sum to `1`. -/
 theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
@@ -274,6 +274,11 @@ theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
   have hsum : h.refFreq + h.altFreq = 1 := by
     unfold HardyWeinbergModel.refFreq
     ring
+  have huniv :
+      (Finset.univ : Finset DiploidGenotype) =
+        ({DiploidGenotype.homRef, DiploidGenotype.het, DiploidGenotype.homAlt} : Finset DiploidGenotype) := by
+    decide
+  rw [Finset.sum_univ, huniv]
   simp [HardyWeinbergModel.genotypeProb]
   calc
     h.refFreq ^ 2 + 2 * h.refFreq * h.altFreq + h.altFreq ^ 2
@@ -290,7 +295,13 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
   have hsum : h.refFreq + h.altFreq = 1 := by
     unfold HardyWeinbergModel.refFreq
     ring
-  simp [HardyWeinbergModel.expectedAltAlleleCount, HardyWeinbergModel.genotypeProb]
+  have huniv :
+      (Finset.univ : Finset DiploidGenotype) =
+        ({DiploidGenotype.homRef, DiploidGenotype.het, DiploidGenotype.homAlt} : Finset DiploidGenotype) := by
+    decide
+  unfold HardyWeinbergModel.expectedAltAlleleCount
+  rw [Finset.sum_univ, huniv]
+  simp [HardyWeinbergModel.genotypeProb]
   calc
     2 * (h.refFreq * h.altFreq) + 2 * h.altFreq ^ 2
         = 2 * h.altFreq * (h.refFreq + h.altFreq) := by ring
@@ -312,8 +323,13 @@ theorem HardyWeinbergModel.genotypeVariance_eq
   have hsum : h.refFreq + h.altFreq = 1 := by
     unfold HardyWeinbergModel.refFreq
     ring
+  have huniv :
+      (Finset.univ : Finset DiploidGenotype) =
+        ({DiploidGenotype.homRef, DiploidGenotype.het, DiploidGenotype.homAlt} : Finset DiploidGenotype) := by
+    decide
   unfold HardyWeinbergModel.genotypeVariance HardyWeinbergModel.centeredAltAlleleCount
   rw [h.expectedAltAlleleCount_eq]
+  rw [Finset.sum_univ, huniv]
   simp [HardyWeinbergModel.genotypeProb]
   calc
     h.refFreq ^ 2 * (0 - 2 * h.altFreq) ^ 2 +
@@ -405,14 +421,14 @@ theorem berryEsseenErrorBound_nonneg
 /-- Berry-Esseen error bound specialized to the HWE score model. -/
 noncomputable def HWEScoreModel.berryEsseenErrorBound {m : ℕ} [Fintype (Fin m)]
     (model : HWEScoreModel m) (berryEsseenConstant : ℝ) : ℝ :=
-  _root_.berryEsseenErrorBound
+  Calibrator.berryEsseenErrorBound
     berryEsseenConstant model.scoreVariance model.scoreThirdAbsMomentBound
 
 theorem HWEScoreModel.berryEsseenErrorBound_nonneg {m : ℕ} [Fintype (Fin m)]
     (model : HWEScoreModel m) (berryEsseenConstant : ℝ)
     (hC : 0 ≤ berryEsseenConstant) :
     0 ≤ model.berryEsseenErrorBound berryEsseenConstant := by
-  exact _root_.berryEsseenErrorBound_nonneg
+  exact Calibrator.berryEsseenErrorBound_nonneg
     berryEsseenConstant model.scoreVariance model.scoreThirdAbsMomentBound
     hC (model.scoreVariance_nonneg) (model.scoreThirdAbsMomentBound_nonneg)
 
@@ -430,8 +446,8 @@ then the corresponding tail probability is also within `ε`. -/
 theorem tail_probability_error_of_cdf_error
     (cert : CdfApproximationCertificate) (t : ℝ) :
     |((1 - cert.exactCdf t) - (1 - cert.approxCdf t))| ≤ cert.epsilon := by
-  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc, abs_sub_comm]
-    using cert.pointwise_error t
+  convert cert.pointwise_error t using 1
+  ring_nf
 
 /-- Closed interval of values consistent with an approximation center and error radius. -/
 def approximationInterval (center epsilon : ℝ) : Set ℝ :=
