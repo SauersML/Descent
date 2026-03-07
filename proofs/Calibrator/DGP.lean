@@ -278,7 +278,7 @@ private def twoLocusIdx1 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
   ⟨1, lt_of_lt_of_le (by decide : 1 < 2) Fact.out⟩
 
 private theorem twoLocusIdx0_ne_twoLocusIdx1 {t : ℕ} [Fact (2 ≤ t)] :
-    twoLocusIdx0 ≠ twoLocusIdx1 := by
+    twoLocusIdx0 (t := t) ≠ twoLocusIdx1 (t := t) := by
   intro h
   have hval := congrArg Fin.val h
   simp [twoLocusIdx0, twoLocusIdx1] at hval
@@ -338,17 +338,17 @@ private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
       (A i1 i0)^2 ≤ ∑ j : Fin t, (A i1 j)^2 := by
     exact Finset.single_le_sum (fun j _ => sq_nonneg (A i1 j)) (by simp)
   have h_pair :
-      (∑ i in ({i0, i1} : Finset (Fin t)), ∑ j : Fin t, (A i j)^2) =
+      (∑ i in ({i0, i1} : Finset (Fin t)), (∑ j : Fin t, (A i j)^2)) =
         (∑ j : Fin t, (A i0 j)^2) + (∑ j : Fin t, (A i1 j)^2) := by
     simp [hi_ne]
   have h_selected_le :
       (A i0 i1)^2 + (A i1 i0)^2 ≤
-        ∑ i in ({i0, i1} : Finset (Fin t)), ∑ j : Fin t, (A i j)^2 := by
+        ∑ i in ({i0, i1} : Finset (Fin t)), (∑ j : Fin t, (A i j)^2) := by
     rw [h_pair]
     exact add_le_add h_row01 h_row10
   have h_subset_le :
-      (∑ i in ({i0, i1} : Finset (Fin t)), ∑ j : Fin t, (A i j)^2) ≤
-        ∑ i : Fin t, ∑ j : Fin t, (A i j)^2 := by
+      (∑ i in ({i0, i1} : Finset (Fin t)), (∑ j : Fin t, (A i j)^2)) ≤
+        ∑ i : Fin t, (∑ j : Fin t, (A i j)^2) := by
     exact Finset.sum_le_sum_of_subset_of_nonneg (by simp) (by
       intro i _ _
       exact Finset.sum_nonneg (fun j _ => sq_nonneg (A i j)))
@@ -359,8 +359,8 @@ private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
         (A i0 i1)^2 + (A i1 i0)^2 := by
       rw [h01, h10]
       ring
-    _ ≤ ∑ i in ({i0, i1} : Finset (Fin t)), ∑ j : Fin t, (A i j)^2 := h_selected_le
-    _ ≤ ∑ i : Fin t, ∑ j : Fin t, (A i j)^2 := h_subset_le
+    _ ≤ ∑ i in ({i0, i1} : Finset (Fin t)), (∑ j : Fin t, (A i j)^2) := h_selected_le
+    _ ≤ ∑ i : Fin t, (∑ j : Fin t, (A i j)^2) := h_subset_le
 
 /-- Algebraic decomposition of the two-locus covariance gap in terms of the MRCA time gap. -/
 theorem twoLocusIBDCovariance_gap_eq
