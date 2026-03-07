@@ -4,7 +4,6 @@ import Calibrator.Models
 import Calibrator.Conclusions
 import Calibrator.PortabilityDrift
 
-
 namespace Calibrator
 
 /-- Concrete 2x2 matrix representing simplified LD decay for the demographic bound proof. -/
@@ -75,32 +74,33 @@ lemma optimal_implies_pointwise_eq_proved {p k sp : ℕ} [Fintype (Fin p)] [Fint
     · filter_upwards [h_risk_zero] with pc h_sq
       have h_sq_eq_zero : dgp.trueExpectation pc.1 pc.2 - linearPredictor model pc.1 pc.2 = 0 := sq_eq_zero_iff.mp h_sq
       exact eq_of_sub_eq_zero h_sq_eq_zero |>.symm
-    · intro pc; exact sq_nonneg _
+    · intro pc
+      exact sq_nonneg _
     · exact h_int_sq
   let f := fun pc : ℝ × (Fin k → ℝ) => linearPredictor model pc.1 pc.2
   let g := fun pc : ℝ × (Fin k → ℝ) => dgp.trueExpectation pc.1 pc.2
   have h_eq_fun : f = g := by
     have h_f_cont : Continuous f := by
-       apply Continuous.add
-       · apply Continuous.add
-         · exact continuous_const
-         · refine continuous_finset_sum _ (fun l _ => ?_)
-           dsimp [evalSmooth]
-           refine continuous_finset_sum _ (fun i _ => ?_)
-           apply Continuous.mul continuous_const
-           apply Continuous.comp (h_spline_cont i)
-           exact (continuous_apply l).comp continuous_snd
-       · refine continuous_finset_sum _ (fun m _ => ?_)
-         apply Continuous.mul
-         · apply Continuous.add
-           · exact continuous_const
-           · refine continuous_finset_sum _ (fun l _ => ?_)
-             dsimp [evalSmooth]
-             refine continuous_finset_sum _ (fun i _ => ?_)
-             apply Continuous.mul continuous_const
-             apply Continuous.comp (h_spline_cont i)
-             exact (continuous_apply l).comp continuous_snd
-         · apply Continuous.comp (h_pgs_cont _) continuous_fst
+      apply Continuous.add
+      · apply Continuous.add
+        · exact continuous_const
+        · refine continuous_finset_sum _ (fun l _ => ?_)
+          dsimp [evalSmooth]
+          refine continuous_finset_sum _ (fun i _ => ?_)
+          apply Continuous.mul continuous_const
+          apply Continuous.comp (h_spline_cont i)
+          exact (continuous_apply l).comp continuous_snd
+      · refine continuous_finset_sum _ (fun m _ => ?_)
+        apply Continuous.mul
+        · apply Continuous.add
+          · exact continuous_const
+          · refine continuous_finset_sum _ (fun l _ => ?_)
+            dsimp [evalSmooth]
+            refine continuous_finset_sum _ (fun i _ => ?_)
+            apply Continuous.mul continuous_const
+            apply Continuous.comp (h_spline_cont i)
+            exact (continuous_apply l).comp continuous_snd
+        · apply Continuous.comp (h_pgs_cont _) continuous_fst
     haveI := h_measure_pos
     have h_ae_eq' : f =ᵐ[dgp.jointMeasure] g := by
       simpa [f, g] using h_ae_eq
@@ -127,7 +127,7 @@ theorem context_specificity_proved {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fi
     (h_spline_cont : ∀ i, Continuous (model1.pcSplineBasis.b i))
     (h_int_sq1 : MeasureTheory.Integrable (fun pc : ℝ × (Fin k → ℝ) => (dgp1.to_dgp.trueExpectation pc.1 pc.2 - linearPredictor model1 pc.1 pc.2)^2) dgp1.to_dgp.jointMeasure)
     (h_int_sq2 : MeasureTheory.Integrable (fun pc : ℝ × (Fin k → ℝ) => (dgp2.to_dgp.trueExpectation pc.1 pc.2 - linearPredictor model1 pc.1 pc.2)^2) dgp2.to_dgp.jointMeasure) :
-  ¬ IsBayesOptimalInClass dgp2.to_dgp model1 := by
+    ¬ IsBayesOptimalInClass dgp2.to_dgp model1 := by
   intro h_opt2
   have h_pt1 := optimal_implies_pointwise_eq_proved dgp1.to_dgp model1 h_opt1 h_capable1 h_measure_pos h_cont_true1 h_pgs_cont h_spline_cont h_int_sq1
   have h_measure_pos2 : MeasureTheory.Measure.IsOpenPosMeasure dgp2.to_dgp.jointMeasure := by
@@ -141,23 +141,24 @@ theorem context_specificity_proved {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fi
   have : dgp1.environmentalEffect = dgp2.environmentalEffect := by
     ext c
     have := congr_fun (congr_fun h_eq_fn 0) c
-    simp at this; exact this
+    simp at this
+    exact this
   exact h_diff_env this
 
 /-- Rigorous replacement for `l2_projection_of_additive_is_additive` avoiding the begging-the-question risk hypotheses. -/
 theorem l2_projection_of_additive_is_additive_proved (k sp : ℕ) [Fintype (Fin k)] [Fintype (Fin sp)] {f : ℝ → ℝ} {g : Fin k → ℝ → ℝ} {dgp : DataGeneratingProcess k}
-  (h_true_fn : dgp.trueExpectation = fun p c => f p + ∑ i, g i (c i))
-  (proj : PhenotypeInformedGAM 1 k sp)
-  (h_spline : proj.pcSplineBasis = polynomialSplineBasis sp)
-  (h_pgs : proj.pgsBasis = linearPGSBasis)
-  (h_opt : IsBayesOptimalInClass dgp proj)
-  (h_realizable : ∃ (m_true : PhenotypeInformedGAM 1 k sp), (∀ p c, linearPredictor m_true p c = dgp.trueExpectation p c) ∧ m_true.pgsBasis = proj.pgsBasis ∧ m_true.pcSplineBasis = proj.pcSplineBasis)
-  (h_measure_pos : MeasureTheory.Measure.IsOpenPosMeasure dgp.jointMeasure)
-  (h_cont_true : Continuous (fun pc : ℝ × (Fin k → ℝ) => dgp.trueExpectation pc.1 pc.2))
-  (h_pgs_cont : ∀ i, Continuous (proj.pgsBasis.B i))
-  (h_spline_cont : ∀ i, Continuous (proj.pcSplineBasis.b i))
-  (h_int_sq : MeasureTheory.Integrable (fun pc : ℝ × (Fin k → ℝ) => (dgp.trueExpectation pc.1 pc.2 - linearPredictor proj pc.1 pc.2)^2) dgp.jointMeasure) :
-  IsNormalizedScoreModel proj := by
+    (h_true_fn : dgp.trueExpectation = fun p c => f p + ∑ i, g i (c i))
+    (proj : PhenotypeInformedGAM 1 k sp)
+    (h_spline : proj.pcSplineBasis = polynomialSplineBasis sp)
+    (h_pgs : proj.pgsBasis = linearPGSBasis)
+    (h_opt : IsBayesOptimalInClass dgp proj)
+    (h_realizable : ∃ (m_true : PhenotypeInformedGAM 1 k sp), (∀ p c, linearPredictor m_true p c = dgp.trueExpectation p c) ∧ m_true.pgsBasis = proj.pgsBasis ∧ m_true.pcSplineBasis = proj.pcSplineBasis)
+    (h_measure_pos : MeasureTheory.Measure.IsOpenPosMeasure dgp.jointMeasure)
+    (h_cont_true : Continuous (fun pc : ℝ × (Fin k → ℝ) => dgp.trueExpectation pc.1 pc.2))
+    (h_pgs_cont : ∀ i, Continuous (proj.pgsBasis.B i))
+    (h_spline_cont : ∀ i, Continuous (proj.pcSplineBasis.b i))
+    (h_int_sq : MeasureTheory.Integrable (fun pc : ℝ × (Fin k → ℝ) => (dgp.trueExpectation pc.1 pc.2 - linearPredictor proj pc.1 pc.2)^2) dgp.jointMeasure) :
+    IsNormalizedScoreModel proj := by
   have h_risk_zero : expectedSquaredError dgp (fun p c => linearPredictor proj p c) = 0 := by
     exact optimal_recovers_truth_of_capable dgp proj h_opt h_realizable
   have h_zero_risk_implies_pointwise : expectedSquaredError dgp (fun p c => linearPredictor proj p c) = 0 → ∀ p c, linearPredictor proj p c = dgp.trueExpectation p c := by
@@ -181,5 +182,28 @@ theorem independence_implies_no_interaction_proved (k sp : ℕ) [Fintype (Fin k)
     IsNormalizedScoreModel m := by
   rcases h_additive with ⟨f, g, h_fn_struct⟩
   exact l2_projection_of_additive_is_additive_proved k sp h_fn_struct m h_spline h_pgs h_opt h_realizable h_measure_pos h_cont_true h_pgs_cont h_spline_cont h_int_sq
+
+/-- Rigorous proof of the target R2 drop using the concrete LD matrix model,
+    eliminating the unproved axiom completely. -/
+theorem target_r2_drop_of_fst_and_sparse_array_proved
+    (mseSource mseTarget varY lam : ℝ)
+    (rS rT : ℝ)
+    (h_mse_gap_lb :
+      lam * frobeniusNormSq (ldMatrix rS - ldMatrix rT) ≤ mseTarget - mseSource)
+    (h_lam_pos : 0 < lam)
+    (h_varY_pos : 0 < varY)
+    (h_diff : rS ≠ rT) :
+    r2FromMSE mseTarget varY < r2FromMSE mseSource varY := by
+  have h_mismatch : 0 < frobeniusNormSq (ldMatrix rS - ldMatrix rT) := by
+    unfold frobeniusNormSq
+    have h_norm : ∑ i : Fin 2, ∑ j : Fin 2, (((ldMatrix rS) - (ldMatrix rT)) i j) ^ 2 = 2 * (rS - rT)^2 := by
+      simp only [ldMatrix, Matrix.sub_apply, Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val', Matrix.cons_val_fin_one, sub_self, sq, zero_add, MulZeroClass.zero_mul, add_zero]
+      ring
+    rw [h_norm]
+    have h_sq_pos : 0 < (rS - rT)^2 := sq_pos_of_ne_zero (sub_ne_zero.mpr h_diff)
+    linarith
+  exact target_r2_strictly_decreases_of_covariance_mismatch
+    mseSource mseTarget varY lam (ldMatrix rS) (ldMatrix rT)
+    h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
 
 end Calibrator
