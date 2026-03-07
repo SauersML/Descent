@@ -6,8 +6,6 @@ import Calibrator.PortabilityDrift
 
 namespace Calibrator
 
-open Matrix
-
 /-- Explicit 2x2 LD correlation matrix parameterizing distance-based decay based on F_ST. -/
 noncomputable def ldMatrix2x2 (fst recombRate arraySparsity : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
   ![![1, fst * recombRate * arraySparsity],
