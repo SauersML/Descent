@@ -223,6 +223,21 @@ inductive DiploidGenotype
   | homAlt
   deriving DecidableEq, Fintype, Repr
 
+/-- Concrete enumeration of diploid genotypes by `Fin 3`. -/
+def DiploidGenotype.equivFin3 : DiploidGenotype ≃ Fin 3 where
+  toFun
+    | .homRef => 0
+    | .het => 1
+    | .homAlt => 2
+  invFun
+    | ⟨0, _⟩ => .homRef
+    | ⟨1, _⟩ => .het
+    | ⟨2, _⟩ => .homAlt
+  left_inv g := by
+    cases g <;> rfl
+  right_inv i := by
+    fin_cases i <;> rfl
+
 /-- Number of alternative alleles carried by a diploid genotype. -/
 def altAlleleCount : DiploidGenotype → ℝ
   | .homRef => 0
@@ -274,12 +289,12 @@ theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
   have hsum : h.refFreq + h.altFreq = 1 := by
     unfold HardyWeinbergModel.refFreq
     ring
-  have huniv :
-      (Finset.univ : Finset DiploidGenotype) =
-        ({DiploidGenotype.homRef, DiploidGenotype.het, DiploidGenotype.homAlt} : Finset DiploidGenotype) := by
-    decide
-  rw [Finset.sum_univ, huniv]
-  simp [HardyWeinbergModel.genotypeProb]
+  have hrewrite :
+      (∑ g : DiploidGenotype, h.genotypeProb g) =
+        ∑ i : Fin 3, h.genotypeProb (DiploidGenotype.equivFin3.symm i) := by
+    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (fun _ => rfl)
+  rw [hrewrite]
+  simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
   calc
     h.refFreq ^ 2 + 2 * h.refFreq * h.altFreq + h.altFreq ^ 2
         = (h.refFreq + h.altFreq) ^ 2 := by ring
@@ -295,13 +310,14 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
   have hsum : h.refFreq + h.altFreq = 1 := by
     unfold HardyWeinbergModel.refFreq
     ring
-  have huniv :
-      (Finset.univ : Finset DiploidGenotype) =
-        ({DiploidGenotype.homRef, DiploidGenotype.het, DiploidGenotype.homAlt} : Finset DiploidGenotype) := by
-    decide
   unfold HardyWeinbergModel.expectedAltAlleleCount
-  rw [Finset.sum_univ, huniv]
-  simp [HardyWeinbergModel.genotypeProb]
+  have hrewrite :
+      (∑ g : DiploidGenotype, altAlleleCount g * h.genotypeProb g) =
+        ∑ i : Fin 3, altAlleleCount (DiploidGenotype.equivFin3.symm i) *
+          h.genotypeProb (DiploidGenotype.equivFin3.symm i) := by
+    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (fun _ => rfl)
+  rw [hrewrite]
+  simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
   calc
     2 * (h.refFreq * h.altFreq) + 2 * h.altFreq ^ 2
         = 2 * h.altFreq * (h.refFreq + h.altFreq) := by ring
@@ -323,14 +339,16 @@ theorem HardyWeinbergModel.genotypeVariance_eq
   have hsum : h.refFreq + h.altFreq = 1 := by
     unfold HardyWeinbergModel.refFreq
     ring
-  have huniv :
-      (Finset.univ : Finset DiploidGenotype) =
-        ({DiploidGenotype.homRef, DiploidGenotype.het, DiploidGenotype.homAlt} : Finset DiploidGenotype) := by
-    decide
   unfold HardyWeinbergModel.genotypeVariance HardyWeinbergModel.centeredAltAlleleCount
   rw [h.expectedAltAlleleCount_eq]
-  rw [Finset.sum_univ, huniv]
-  simp [HardyWeinbergModel.genotypeProb]
+  have hrewrite :
+      (∑ g : DiploidGenotype, h.genotypeProb g * (altAlleleCount g - 2 * h.altFreq) ^ 2) =
+        ∑ i : Fin 3,
+          h.genotypeProb (DiploidGenotype.equivFin3.symm i) *
+            (altAlleleCount (DiploidGenotype.equivFin3.symm i) - 2 * h.altFreq) ^ 2 := by
+    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (fun _ => rfl)
+  rw [hrewrite]
+  simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
   calc
     h.refFreq ^ 2 * (0 - 2 * h.altFreq) ^ 2 +
         (2 * h.refFreq * h.altFreq) * (1 - 2 * h.altFreq) ^ 2 +
@@ -446,8 +464,7 @@ then the corresponding tail probability is also within `ε`. -/
 theorem tail_probability_error_of_cdf_error
     (cert : CdfApproximationCertificate) (t : ℝ) :
     |((1 - cert.exactCdf t) - (1 - cert.approxCdf t))| ≤ cert.epsilon := by
-  convert cert.pointwise_error t using 1
-  ring_nf
+  simpa [sub_eq_add_neg, add_comm, abs_sub_comm] using cert.pointwise_error t
 
 /-- Closed interval of values consistent with an approximation center and error radius. -/
 def approximationInterval (center epsilon : ℝ) : Set ℝ :=
