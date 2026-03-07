@@ -152,7 +152,7 @@ theorem integrable_poly_n (n : Nat) : MeasureTheory.Integrable (poly_n n) stdGau
     simpa [ div_eq_inv_mul ] using @this ( 1 / 2 ) ( by norm_num ) n ( by linarith )
   unfold poly_n
   unfold stdGaussianMeasure
-  simp_all +decide [ mul_comm, ProbabilityTheory.gaussianReal ]
+  simp_all +decide [ProbabilityTheory.gaussianReal]
   refine' MeasureTheory.Integrable.mono' _ _ _
   refine' fun x => |x ^ n|
   · refine' MeasureTheory.Integrable.abs _
@@ -186,7 +186,7 @@ theorem integrable_prod_mul {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y
     {μ : Measure X} {ν : Measure Y} [SigmaFinite μ] [SigmaFinite ν]
     (f : X → ℝ) (g : Y → ℝ) (hf : Integrable f μ) (hg : Integrable g ν) :
     Integrable (fun p : X × Y => f p.1 * g p.2) (μ.prod ν) := by
-  exact hf.prod_mul hg
+  exact hf.mul_prod hg
 
 /-!
 =================================================================
@@ -259,16 +259,26 @@ def HardyWeinbergModel.genotypeProb (h : HardyWeinbergModel) : DiploidGenotype �
 theorem HardyWeinbergModel.genotypeProb_nonneg
     (h : HardyWeinbergModel) (g : DiploidGenotype) :
     0 ≤ h.genotypeProb g := by
-  cases g <;>
-    simp [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq_nonneg,
-      h.altFreq_nonneg]
+  cases g with
+  | homRef =>
+      simp [HardyWeinbergModel.genotypeProb]
+  | het =>
+      simp [HardyWeinbergModel.genotypeProb]
+      nlinarith [h.refFreq_nonneg, h.altFreq_nonneg]
+  | homAlt =>
+      simp [HardyWeinbergModel.genotypeProb]
 
 /-- Hardy-Weinberg genotype probabilities sum to `1`. -/
 theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
     (∑ g : DiploidGenotype, h.genotypeProb g) = 1 := by
-  unfold HardyWeinbergModel.genotypeProb HardyWeinbergModel.refFreq
-  ring_nf
-  linarith [h.altFreq_nonneg, h.altFreq_le_one]
+  have hsum : h.refFreq + h.altFreq = 1 := by
+    unfold HardyWeinbergModel.refFreq
+    ring
+  simp [HardyWeinbergModel.genotypeProb]
+  calc
+    h.refFreq ^ 2 + 2 * h.refFreq * h.altFreq + h.altFreq ^ 2
+        = (h.refFreq + h.altFreq) ^ 2 := by ring
+    _ = 1 := by rw [hsum]; norm_num
 
 /-- Expected alternative-allele count under Hardy-Weinberg equilibrium. -/
 noncomputable def HardyWeinbergModel.expectedAltAlleleCount (h : HardyWeinbergModel) : ℝ :=
@@ -277,9 +287,14 @@ noncomputable def HardyWeinbergModel.expectedAltAlleleCount (h : HardyWeinbergMo
 theorem HardyWeinbergModel.expectedAltAlleleCount_eq
     (h : HardyWeinbergModel) :
     h.expectedAltAlleleCount = 2 * h.altFreq := by
-  unfold HardyWeinbergModel.expectedAltAlleleCount HardyWeinbergModel.genotypeProb
-  unfold HardyWeinbergModel.refFreq
-  ring_nf
+  have hsum : h.refFreq + h.altFreq = 1 := by
+    unfold HardyWeinbergModel.refFreq
+    ring
+  simp [HardyWeinbergModel.expectedAltAlleleCount, HardyWeinbergModel.genotypeProb]
+  calc
+    2 * (h.refFreq * h.altFreq) + 2 * h.altFreq ^ 2
+        = 2 * h.altFreq * (h.refFreq + h.altFreq) := by ring
+    _ = 2 * h.altFreq := by rw [hsum]; ring
 
 /-- Centered alternative-allele count at one locus. -/
 noncomputable def HardyWeinbergModel.centeredAltAlleleCount
@@ -294,11 +309,18 @@ noncomputable def HardyWeinbergModel.genotypeVariance (h : HardyWeinbergModel) :
 theorem HardyWeinbergModel.genotypeVariance_eq
     (h : HardyWeinbergModel) :
     h.genotypeVariance = 2 * h.altFreq * h.refFreq := by
-  unfold HardyWeinbergModel.genotypeVariance
-  unfold HardyWeinbergModel.centeredAltAlleleCount
+  have hsum : h.refFreq + h.altFreq = 1 := by
+    unfold HardyWeinbergModel.refFreq
+    ring
+  unfold HardyWeinbergModel.genotypeVariance HardyWeinbergModel.centeredAltAlleleCount
   rw [h.expectedAltAlleleCount_eq]
-  unfold HardyWeinbergModel.genotypeProb HardyWeinbergModel.refFreq
-  ring_nf
+  simp [HardyWeinbergModel.genotypeProb]
+  calc
+    h.refFreq ^ 2 * (0 - 2 * h.altFreq) ^ 2 +
+        (2 * h.refFreq * h.altFreq) * (1 - 2 * h.altFreq) ^ 2 +
+        h.altFreq ^ 2 * (2 - 2 * h.altFreq) ^ 2
+        = 2 * h.altFreq * (h.refFreq + h.altFreq) * h.refFreq := by ring
+    _ = 2 * h.altFreq * h.refFreq := by rw [hsum]; ring
 
 /-- Absolute third centered moment at one Hardy-Weinberg locus. This is the term that
 enters the Berry-Esseen numerator for weighted sums of bounded genotype variables. -/
@@ -383,13 +405,14 @@ theorem berryEsseenErrorBound_nonneg
 /-- Berry-Esseen error bound specialized to the HWE score model. -/
 noncomputable def HWEScoreModel.berryEsseenErrorBound {m : ℕ} [Fintype (Fin m)]
     (model : HWEScoreModel m) (berryEsseenConstant : ℝ) : ℝ :=
-  berryEsseenErrorBound berryEsseenConstant model.scoreVariance model.scoreThirdAbsMomentBound
+  _root_.berryEsseenErrorBound
+    berryEsseenConstant model.scoreVariance model.scoreThirdAbsMomentBound
 
 theorem HWEScoreModel.berryEsseenErrorBound_nonneg {m : ℕ} [Fintype (Fin m)]
     (model : HWEScoreModel m) (berryEsseenConstant : ℝ)
     (hC : 0 ≤ berryEsseenConstant) :
     0 ≤ model.berryEsseenErrorBound berryEsseenConstant := by
-  exact berryEsseenErrorBound_nonneg
+  exact _root_.berryEsseenErrorBound_nonneg
     berryEsseenConstant model.scoreVariance model.scoreThirdAbsMomentBound
     hC (model.scoreVariance_nonneg) (model.scoreThirdAbsMomentBound_nonneg)
 
@@ -407,7 +430,8 @@ then the corresponding tail probability is also within `ε`. -/
 theorem tail_probability_error_of_cdf_error
     (cert : CdfApproximationCertificate) (t : ℝ) :
     |((1 - cert.exactCdf t) - (1 - cert.approxCdf t))| ≤ cert.epsilon := by
-  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using cert.pointwise_error t
+  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc, abs_sub_comm]
+    using cert.pointwise_error t
 
 /-- Closed interval of values consistent with an approximation center and error radius. -/
 def approximationInterval (center epsilon : ℝ) : Set ℝ :=
@@ -416,7 +440,7 @@ def approximationInterval (center epsilon : ℝ) : Set ℝ :=
 /-- Any quantity within absolute error `ε` belongs to the corresponding approximation interval. -/
 theorem mem_approximationInterval_of_abs_sub_le
     (x center epsilon : ℝ)
-    (heps : 0 ≤ epsilon)
+    (_heps : 0 ≤ epsilon)
     (h : |x - center| ≤ epsilon) :
     x ∈ approximationInterval center epsilon := by
   unfold approximationInterval
