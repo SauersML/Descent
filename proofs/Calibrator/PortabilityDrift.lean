@@ -212,6 +212,76 @@ theorem expected_abs_mean_shift_bound
       2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) :=
   expected_abs_mean_shift_of_random_walk V_A fstS fstT h_rw hVA_nonneg hfst_sum_nonneg hfstS_lt_one
 
+/-- Rigorous algebraic proof of the expected absolute mean-shift formula, avoiding the
+    random-walk axiom by explicit `Real.sqrt` and fraction manipulation. -/
+theorem expected_abs_mean_shift_bound_proved
+    (V_A fstS fstT : ℝ)
+    (hVA_pos : 0 < V_A)
+    (hfst_sum_nonneg : 0 ≤ fstS + fstT)
+    (hfstS_lt_one : fstS < 1) :
+    Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
+      2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) := by
+  unfold Expected_Abs_Shift Var_Delta_Mu presentDayPGSVariance
+  have h1 :
+      Real.sqrt (2 * (fstS + fstT) * V_A) =
+        Real.sqrt (2 * (fstS + fstT)) * Real.sqrt V_A := by
+    have h_nonneg : 0 ≤ 2 * (fstS + fstT) := mul_nonneg (by norm_num) hfst_sum_nonneg
+    rw [Real.sqrt_mul h_nonneg]
+  have h2 :
+      Real.sqrt ((1 - fstS) * V_A) =
+        Real.sqrt (1 - fstS) * Real.sqrt V_A := by
+    have h_nonneg : 0 ≤ 1 - fstS := by linarith
+    rw [Real.sqrt_mul h_nonneg]
+  rw [h1, h2]
+  have h_sqrt_VA_ne_zero : Real.sqrt V_A ≠ 0 := Real.sqrt_ne_zero'.mpr hVA_pos
+  have h_div :
+      (Real.sqrt (2 * (fstS + fstT)) * Real.sqrt V_A * Real.sqrt (2 / Real.pi)) /
+          (Real.sqrt (1 - fstS) * Real.sqrt V_A) =
+        (Real.sqrt (2 * (fstS + fstT)) * Real.sqrt (2 / Real.pi)) /
+          Real.sqrt (1 - fstS) := by
+    calc
+      (Real.sqrt (2 * (fstS + fstT)) * Real.sqrt V_A * Real.sqrt (2 / Real.pi)) /
+          (Real.sqrt (1 - fstS) * Real.sqrt V_A)
+        = (Real.sqrt (2 * (fstS + fstT)) * Real.sqrt (2 / Real.pi) * Real.sqrt V_A) /
+            (Real.sqrt (1 - fstS) * Real.sqrt V_A) := by
+              congr 1
+              ring
+      _ =
+          (Real.sqrt (2 * (fstS + fstT)) * Real.sqrt (2 / Real.pi)) /
+            Real.sqrt (1 - fstS) := by
+              rw [mul_div_mul_right _ _ h_sqrt_VA_ne_zero]
+  rw [h_div]
+  have h3 :
+      Real.sqrt (2 * (fstS + fstT)) * Real.sqrt (2 / Real.pi) =
+        Real.sqrt (4 * (fstS + fstT) / Real.pi) := by
+    have h_nonneg : 0 ≤ 2 * (fstS + fstT) := mul_nonneg (by norm_num) hfst_sum_nonneg
+    rw [← Real.sqrt_mul h_nonneg]
+    congr 1
+    ring
+  rw [h3]
+  have h4 :
+      Real.sqrt (4 * (fstS + fstT) / Real.pi) / Real.sqrt (1 - fstS) =
+        Real.sqrt ((4 * (fstS + fstT) / Real.pi) / (1 - fstS)) := by
+    have h_nonneg : 0 ≤ 4 * (fstS + fstT) / Real.pi := by
+      apply div_nonneg
+      · linarith
+      · exact Real.pi_pos.le
+    rw [← Real.sqrt_div h_nonneg]
+  rw [h4]
+  have h5 :
+      (4 * (fstS + fstT) / Real.pi) / (1 - fstS) =
+        4 * ((fstS + fstT) / (Real.pi * (1 - fstS))) := by
+    calc
+      (4 * (fstS + fstT) / Real.pi) / (1 - fstS) =
+          (4 * (fstS + fstT)) / (Real.pi * (1 - fstS)) := by
+            rw [div_div]
+      _ = 4 * ((fstS + fstT) / (Real.pi * (1 - fstS))) := by
+            ring
+  rw [h5]
+  have h4_nonneg : (0 : ℝ) ≤ 4 := by norm_num
+  rw [Real.sqrt_mul h4_nonneg]
+  norm_num
+
 /-- Present-day signal-to-noise ratio for prediction under drift. -/
 noncomputable def presentDaySignalToNoise (V_A V_E fst : ℝ) : ℝ :=
   presentDayPGSVariance V_A fst / V_E
@@ -388,6 +458,38 @@ structure MultiLocusTagModel (p q : ℕ) where
   sigmaTagCausalSource : Matrix (Fin p) (Fin q) ℝ
   sigmaTagCausalTarget : Matrix (Fin p) (Fin q) ℝ
 
+/-- Minimal `1 × 1` tag/causal fixture for tests of OLS weight transport under LD shift. -/
+def concreteTagModel (rS rT : ℝ) : MultiLocusTagModel 1 1 :=
+  { betaCausal := ![1]
+    sigmaTagSource := !![1]
+    sigmaTagTarget := !![1]
+    sigmaTagCausalSource := !![rS]
+    sigmaTagCausalTarget := !![rT] }
+
+/-- Dense source covariance witness for non-degenerate ERM-transport tests. -/
+def sigmaObsSource : Matrix (Fin 2) (Fin 2) ℝ :=
+  !![1, 0.5; 0.5, 1]
+
+/-- Dense target covariance witness for non-degenerate ERM-transport tests. -/
+def sigmaObsTarget : Matrix (Fin 2) (Fin 2) ℝ :=
+  !![1, 0.1; 0.1, 1]
+
+/-- Source cross-covariance vector paired with `sigmaObsSource`. -/
+def crossSource : Fin 2 → ℝ :=
+  ![0.8, 0.4]
+
+/-- Target cross-covariance vector paired with `sigmaObsTarget`. -/
+def crossTarget : Fin 2 → ℝ :=
+  ![0.8, 0.0]
+
+/-- Exact source OLS solution for the dense witness system. -/
+noncomputable def wSource_opt : Fin 2 → ℝ :=
+  ![0.8, 0.0]
+
+/-- Exact target OLS solution for the dense witness system. -/
+noncomputable def wTarget_opt : Fin 2 → ℝ :=
+  ![80 / 99, -8 / 99]
+
 /-- Source OLS-style weights: `w_S = Σ_S^{-1} Σ_tc,S β_c`. -/
 noncomputable def sourceOLSWeights {p q : ℕ}
     (m : MultiLocusTagModel p q) : Fin p → ℝ :=
@@ -433,6 +535,20 @@ theorem ldCorrelationDecay_strictAnti_distance
   unfold ldCorrelationDecay
   apply Real.exp_lt_exp.mpr
   nlinarith [mul_lt_mul_of_pos_left hDist hScale]
+
+/-- For positive distance and decay scale, LD correlation strictly decreases with `F_ST`. -/
+theorem ldCorrelationDecay_strictAnti_fst
+    (distance lambda fstSource fstTarget : ℝ)
+    (hDist : 0 < distance)
+    (hLambda : 0 < lambda)
+    (hFst : fstSource < fstTarget) :
+    ldCorrelationDecay distance fstTarget lambda < ldCorrelationDecay distance fstSource lambda := by
+  unfold ldCorrelationDecay
+  apply Real.exp_lt_exp.mpr
+  have h_pos : 0 < lambda * distance := mul_pos hLambda hDist
+  have h_lt : fstSource * (lambda * distance) < fstTarget * (lambda * distance) :=
+    mul_lt_mul_of_pos_right hFst h_pos
+  linarith
 
 /-- Drift-only transport multiplier on observed signal variance. -/
 noncomputable def alleleFreqTransport (fstSource fstTarget : ℝ) : ℝ :=

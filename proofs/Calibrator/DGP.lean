@@ -1487,6 +1487,36 @@ lemma polynomial_spline_coeffs_unique {n : ℕ} [Fintype (Fin n)] (coeffs : Fin 
   exact by
     simpa [h_coeff'] using h_coeff
 
+/-- Topological continuity of a GAM linear predictor from continuity of its basis maps.
+    This extracts the explicit `Continuous.add`/`Continuous.mul`/`continuous_finset_sum`
+    proof pattern into a reusable theorem. -/
+theorem linearPredictor_continuous_of_basis_continuous
+    (n k sp : ℕ)
+    (model : PhenotypeInformedGAM n k sp)
+    (h_pgs_cont : ∀ i, Continuous (model.pgsBasis.B i))
+    (h_spline_cont : ∀ i, Continuous (model.pcSplineBasis.b i)) :
+    Continuous (fun pc : ℝ × (Fin k → ℝ) => linearPredictor model pc.1 pc.2) := by
+  simp only [linearPredictor]
+  apply Continuous.add
+  · apply Continuous.add
+    · exact continuous_const
+    · refine continuous_finset_sum _ (fun l _ => ?_)
+      dsimp [evalSmooth]
+      refine continuous_finset_sum _ (fun i _ => ?_)
+      apply Continuous.mul continuous_const
+      apply Continuous.comp (h_spline_cont i)
+      exact (continuous_apply l).comp continuous_snd
+  · refine continuous_finset_sum _ (fun m _ => ?_)
+    apply Continuous.mul
+    · apply Continuous.add
+      · exact continuous_const
+      · refine continuous_finset_sum _ (fun l _ => ?_)
+        dsimp [evalSmooth]
+        refine continuous_finset_sum _ (fun i _ => ?_)
+        apply Continuous.mul continuous_const
+        apply Continuous.comp (h_spline_cont i)
+        exact (continuous_apply l).comp continuous_snd
+    · apply Continuous.comp (h_pgs_cont _) continuous_fst
 
 theorem l2_projection_of_additive_is_additive (k sp : ℕ) [Fintype (Fin k)] [Fintype (Fin sp)] {f : ℝ → ℝ} {g : Fin k → ℝ → ℝ} {dgp : DataGeneratingProcess k}
   (h_true_fn : dgp.trueExpectation = fun p c => f p + ∑ i, g i (c i))
@@ -4095,26 +4125,8 @@ theorem multiplicative_bias_correction (k : ℕ) [Fintype (Fin k)]
     let g := fun pc : ℝ × (Fin k → ℝ) => (dgpMultiplicativeBias scaling_func).trueExpectation pc.1 pc.2
     have h_eq_fun : f = g := by
       have h_f_cont : Continuous f := by
-         apply Continuous.add
-         · apply Continuous.add
-           · exact continuous_const
-           · refine continuous_finset_sum _ (fun l _ => ?_)
-             dsimp [evalSmooth]
-             refine continuous_finset_sum _ (fun i _ => ?_)
-             apply Continuous.mul continuous_const
-             apply Continuous.comp (h_spline_cont i)
-             exact (continuous_apply l).comp continuous_snd
-         · refine continuous_finset_sum _ (fun m _ => ?_)
-           apply Continuous.mul
-           · apply Continuous.add
-             · exact continuous_const
-             · refine continuous_finset_sum _ (fun l _ => ?_)
-               dsimp [evalSmooth]
-               refine continuous_finset_sum _ (fun i _ => ?_)
-               apply Continuous.mul continuous_const
-               apply Continuous.comp (h_spline_cont i)
-               exact (continuous_apply l).comp continuous_snd
-           · apply Continuous.comp (h_pgs_cont _) continuous_fst
+        simpa [f] using
+          linearPredictor_continuous_of_basis_continuous 1 k 1 model h_pgs_cont h_spline_cont
       have h_pgs_cont_true : ∀ i, Continuous (m_true.pgsBasis.B i) := by
         simpa [h_pgs_eq] using h_pgs_cont
       have h_spline_cont_true : ∀ i, Continuous (m_true.pcSplineBasis.b i) := by
@@ -4124,26 +4136,9 @@ theorem multiplicative_bias_correction (k : ℕ) [Fintype (Fin k)]
           funext pc
           exact (h_true_eq pc.1 pc.2).symm
         have h_cont_true : Continuous (fun pc : ℝ × (Fin k → ℝ) => linearPredictor m_true pc.1 pc.2) := by
-          apply Continuous.add
-          · apply Continuous.add
-            · exact continuous_const
-            · refine continuous_finset_sum _ (fun l _ => ?_)
-              dsimp [evalSmooth]
-              refine continuous_finset_sum _ (fun i _ => ?_)
-              apply Continuous.mul continuous_const
-              apply Continuous.comp (h_spline_cont_true i)
-              exact (continuous_apply l).comp continuous_snd
-          · refine continuous_finset_sum _ (fun m _ => ?_)
-            apply Continuous.mul
-            · apply Continuous.add
-              · exact continuous_const
-              · refine continuous_finset_sum _ (fun l _ => ?_)
-                dsimp [evalSmooth]
-                refine continuous_finset_sum _ (fun i _ => ?_)
-                apply Continuous.mul continuous_const
-                apply Continuous.comp (h_spline_cont_true i)
-                exact (continuous_apply l).comp continuous_snd
-            · apply Continuous.comp (h_pgs_cont_true _) continuous_fst
+          exact
+            linearPredictor_continuous_of_basis_continuous 1 k 1 m_true
+              h_pgs_cont_true h_spline_cont_true
         simpa [h_g_eq] using h_cont_true
       haveI := h_measure_pos
       have h_ae_eq' : f =ᵐ[stdNormalProdMeasure k] g := by
