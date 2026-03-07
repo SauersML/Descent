@@ -58,6 +58,7 @@ theorem HWEPolygenicScoreDGP.mem_aucApproximationInterval_of_abs_sub_le
     (aucExact aucGaussian : ℝ)
     (h : |aucExact - aucGaussian| ≤ dgp.scoreApproximationError) :
     aucExact ∈ dgp.aucApproximationInterval aucGaussian := by
+  letI : Fintype (Fin m) := Fin.fintype m
   simpa [HWEPolygenicScoreDGP.aucApproximationInterval] using
     (mem_approximationInterval_of_abs_sub_le
     aucExact aucGaussian dgp.scoreApproximationError
@@ -73,6 +74,7 @@ theorem HWEPolygenicScoreDGP.mem_r2ApproximationInterval_of_abs_sub_le
     (r2Exact r2Gaussian : ℝ)
     (h : |r2Exact - r2Gaussian| ≤ dgp.scoreApproximationError) :
     r2Exact ∈ dgp.r2ApproximationInterval r2Gaussian := by
+  letI : Fintype (Fin m) := Fin.fintype m
   simpa [HWEPolygenicScoreDGP.r2ApproximationInterval] using
     (mem_approximationInterval_of_abs_sub_le
     r2Exact r2Gaussian dgp.scoreApproximationError
@@ -4390,7 +4392,6 @@ theorem multiplicative_bias_correction (k : ℕ) [Fintype (Fin k)]
     · exact h_integrable_sq
 
   have h_pointwise : ∀ p c, linearPredictor model p c = (dgpMultiplicativeBias scaling_func).trueExpectation p c := by
-    letI : Fintype (Fin k) := Fin.fintype k
     let f := fun pc : ℝ × (Fin k → ℝ) => linearPredictor model pc.1 pc.2
     let g := fun pc : ℝ × (Fin k → ℝ) => (dgpMultiplicativeBias scaling_func).trueExpectation pc.1 pc.2
     have h_eq_fun : f = g := by
@@ -4410,14 +4411,14 @@ theorem multiplicative_bias_correction (k : ℕ) [Fintype (Fin k)]
             (linearPredictor_continuous_of_basis_continuous 1 k 1 m_true
               h_pgs_cont_true h_spline_cont_true)
         simpa [h_g_eq] using h_cont_true
-      haveI := h_measure_pos
+      letI : (stdNormalProdMeasure k).IsOpenPosMeasure := h_measure_pos
       have h_ae_eq' : f =ᵐ[stdNormalProdMeasure k] g := by
         filter_upwards [h_ae_eq] with pc hpc
         simpa [f, g] using hpc
       apply Measure.eq_of_ae_eq h_ae_eq' h_f_cont h_g_cont
 
     intro p c
-    exact congr_fun h_eq_fun (p, c)
+    simpa [f, g] using congr_fun h_eq_fun (p, c)
 
   have h_pred : linearPredictor model 1 c = (dgpMultiplicativeBias scaling_func).trueExpectation 1 c := h_pointwise 1 c
   have h_pred0 : linearPredictor model 0 c = (dgpMultiplicativeBias scaling_func).trueExpectation 0 c := h_pointwise 0 c
