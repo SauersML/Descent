@@ -238,6 +238,18 @@ def DiploidGenotype.equivFin3 : DiploidGenotype ≃ Fin 3 where
   right_inv i := by
     fin_cases i <;> rfl
 
+@[simp] theorem DiploidGenotype.equivFin3_symm_apply (i : Fin 3) :
+    DiploidGenotype.equivFin3.symm i =
+      match i with
+      | ⟨0, _⟩ => DiploidGenotype.homRef
+      | ⟨1, _⟩ => DiploidGenotype.het
+      | ⟨2, _⟩ => DiploidGenotype.homAlt := by
+  fin_cases i <;> rfl
+
+@[simp] theorem DiploidGenotype.equivFin3_symm_apply_apply (g : DiploidGenotype) :
+    DiploidGenotype.equivFin3.symm (DiploidGenotype.equivFin3 g) = g := by
+  exact DiploidGenotype.equivFin3.left_inv g
+
 /-- Number of alternative alleles carried by a diploid genotype. -/
 def altAlleleCount : DiploidGenotype → ℝ
   | .homRef => 0
@@ -294,7 +306,7 @@ theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
         ∑ i : Fin 3, h.genotypeProb (DiploidGenotype.equivFin3.symm i) := by
     exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
       intro x
-      simp [DiploidGenotype.equivFin3])
+      rw [DiploidGenotype.equivFin3_symm_apply_apply])
   rw [hrewrite]
   rw [Fin.sum_univ_three]
   simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
@@ -320,7 +332,7 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
           h.genotypeProb (DiploidGenotype.equivFin3.symm i) := by
     exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
       intro x
-      simp [DiploidGenotype.equivFin3])
+      rw [DiploidGenotype.equivFin3_symm_apply_apply])
   rw [hrewrite]
   rw [Fin.sum_univ_three]
   simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
@@ -354,7 +366,7 @@ theorem HardyWeinbergModel.genotypeVariance_eq
             (altAlleleCount (DiploidGenotype.equivFin3.symm i) - 2 * h.altFreq) ^ 2 := by
     exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
       intro x
-      simp [DiploidGenotype.equivFin3])
+      rw [DiploidGenotype.equivFin3_symm_apply_apply])
   rw [hrewrite]
   rw [Fin.sum_univ_three]
   simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
@@ -362,7 +374,7 @@ theorem HardyWeinbergModel.genotypeVariance_eq
     h.refFreq ^ 2 * (0 - 2 * h.altFreq) ^ 2 +
         (2 * h.refFreq * h.altFreq) * (1 - 2 * h.altFreq) ^ 2 +
         h.altFreq ^ 2 * (2 - 2 * h.altFreq) ^ 2
-        = 2 * h.altFreq * (h.refFreq + h.altFreq) * h.refFreq := by ring
+        = 2 * h.altFreq * (h.refFreq + h.altFreq) * h.refFreq := by ring_nf
     _ = 2 * h.altFreq * h.refFreq := by rw [hsum]; ring
 
 /-- Absolute third centered moment at one Hardy-Weinberg locus. This is the term that
@@ -473,7 +485,8 @@ then the corresponding tail probability is also within `ε`. -/
 theorem tail_probability_error_of_cdf_error
     (cert : CdfApproximationCertificate) (t : ℝ) :
     |((1 - cert.exactCdf t) - (1 - cert.approxCdf t))| ≤ cert.epsilon := by
-  simpa [sub_eq_add_neg, add_comm, abs_sub_comm] using cert.pointwise_error t
+  convert cert.pointwise_error t using 1
+  ring_nf
 
 /-- Closed interval of values consistent with an approximation center and error radius. -/
 def approximationInterval (center epsilon : ℝ) : Set ℝ :=
