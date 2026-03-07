@@ -101,6 +101,28 @@ def crossS : Fin 2 → ℝ := ![1, 0]
 /-- Target cross-covariances. -/
 def crossT : Fin 2 → ℝ := ![1, 1]
 
+/-- Another target LD matrix with a different correlation structure. -/
+def sigmaT2 : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 0.5], ![0.5, 1]]
+
+/-- A concrete proof that the source ERM is LD-specific and does not solve
+    the target normal equations under a new correlation structure, without relying on the vacuous `hMismatch`
+    hypothesis from `source_erm_is_ld_specific_of_normal_eq_mismatch`. -/
+theorem source_erm_is_ld_specific_proved :
+    let wS : Fin 2 → ℝ := ![1, 0]
+    sigmaS.mulVec wS = crossS ∧
+    sigmaT2.mulVec wS ≠ crossT := by
+  intro wS
+  refine ⟨?_, ?_⟩
+  · ext i
+    fin_cases i
+    · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
+    · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
+  · intro heq
+    have h : (sigmaT2.mulVec wS) 1 = crossT 1 := congrFun heq 1
+    revert h
+    simp [wS, sigmaT2, crossT, Matrix.mulVec, dotProduct]
+    norm_num
+
 /-- A concrete proof that ERM mismatch occurs under LD shift, without relying on
     the abstract, vacuous `hConflict` hypothesis from `source_target_erm_differ_of_ld_system_conflict`.
     Here we construct explicit 2x2 covariance and cross-covariance matrices
