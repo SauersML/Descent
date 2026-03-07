@@ -6,188 +6,39 @@ import Calibrator.PortabilityDrift
 
 namespace Calibrator
 
-/-- Concrete 2x2 matrix representing simplified LD decay for the demographic bound proof. -/
-def ldMatrix (r : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
-  !![1, r; r, 1]
-
-/-- Named source-matrix witness for Wright-Fisher covariance-gap arguments. -/
-def sigmaSource_witness (rS : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
-  ldMatrix rS
-
-/-- Named target-matrix witness for Wright-Fisher covariance-gap arguments. -/
-def sigmaTarget_witness (rT : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
-  ldMatrix rT
-
-/-- Manual matrix-entry expansion for the `Fin 2` LD witness subtraction. -/
-private theorem h_mat_sub
-    (a b : ℝ) :
-    (∑ i : Fin 2, ∑ j : Fin 2, ((ldMatrix a - ldMatrix b) i j) ^ 2) =
-      ∑ i : Fin 2, ∑ j : Fin 2,
-        ((if i = j then (1 : ℝ) else a) - (if i = j then (1 : ℝ) else b)) ^ 2 := by
-  apply Finset.sum_congr rfl
-  intro i _
-  apply Finset.sum_congr rfl
-  intro j _
-  fin_cases i <;> fin_cases j <;> simp [ldMatrix, Matrix.sub_apply]
-
-/-- Explicit `Fin 2` enumeration for the piecewise LD summand. -/
-private theorem h_eval
-    (a b : ℝ) :
-    (∑ i : Fin 2, ∑ j : Fin 2,
-        ((if i = j then (1 : ℝ) else a) - (if i = j then (1 : ℝ) else b)) ^ 2) =
-      (((if (0 : Fin 2) = (0 : Fin 2) then (1 : ℝ) else a) -
-          (if (0 : Fin 2) = (0 : Fin 2) then (1 : ℝ) else b)) ^ 2 +
-        ((if (0 : Fin 2) = (1 : Fin 2) then (1 : ℝ) else a) -
-          (if (0 : Fin 2) = (1 : Fin 2) then (1 : ℝ) else b)) ^ 2) +
-      (((if (1 : Fin 2) = (0 : Fin 2) then (1 : ℝ) else a) -
-          (if (1 : Fin 2) = (0 : Fin 2) then (1 : ℝ) else b)) ^ 2 +
-        ((if (1 : Fin 2) = (1 : Fin 2) then (1 : ℝ) else a) -
-          (if (1 : Fin 2) = (1 : Fin 2) then (1 : ℝ) else b)) ^ 2) := by
-  have h_fin2_elems : (Finset.univ : Finset (Fin 2)) = {0, 1} := by
-    rfl
-  rw [h_fin2_elems]
-  simp
-
-/-- Set-theoretic `Fin 2` universe decomposition using `{0, 1}` and `Finset.sum_insert`.
-    This gives a lightweight alternative to `fin_cases` or `Fin.sum_univ_two`. -/
-theorem finset_univ_fin2_sum
-    (f : Fin 2 → ℝ) :
-    (∑ i : Fin 2, f i) = f 0 + f 1 := by
-  have h_fin2_elems : (Finset.univ : Finset (Fin 2)) = {0, 1} := by
-    rfl
-  rw [h_fin2_elems]
-  rw [Finset.sum_insert]
-  · rw [Finset.sum_singleton]
-  · simp
-
-/-- Bulletproof `Finset.sum` evaluation for the symmetric piecewise `Fin 2` LD matrix. -/
-private theorem h_sum
-    (a b : ℝ) :
-    (∑ i : Fin 2, ∑ j : Fin 2,
-        ((if i = j then (1 : ℝ) else a) - (if i = j then (1 : ℝ) else b)) ^ 2) =
-      2 * (a - b) ^ 2 := by
-  rw [h_eval a b]
-  have h00 :
-      ((if (0 : Fin 2) = (0 : Fin 2) then (1 : ℝ) else a) -
-        (if (0 : Fin 2) = (0 : Fin 2) then (1 : ℝ) else b)) ^ 2 = 0 := by
-    simp
-  have h11 :
-      ((if (1 : Fin 2) = (1 : Fin 2) then (1 : ℝ) else a) -
-        (if (1 : Fin 2) = (1 : Fin 2) then (1 : ℝ) else b)) ^ 2 = 0 := by
-    simp
-  have h01 :
-      ((if (0 : Fin 2) = (1 : Fin 2) then (1 : ℝ) else a) -
-        (if (0 : Fin 2) = (1 : Fin 2) then (1 : ℝ) else b)) ^ 2 = (a - b) ^ 2 := by
-    have h_ne : (0 : Fin 2) ≠ 1 := by decide
-    simp [h_ne]
-  have h10 :
-      ((if (1 : Fin 2) = (0 : Fin 2) then (1 : ℝ) else a) -
-        (if (1 : Fin 2) = (0 : Fin 2) then (1 : ℝ) else b)) ^ 2 = (a - b) ^ 2 := by
-    have h_ne : (1 : Fin 2) ≠ 0 := by decide
-    simp [h_ne]
-  rw [h00, h11, h01, h10]
-  ring
-
-/-- Manual `2 × 2` Frobenius expansion into the four scalar coordinates.
-    This avoids relying on fragile simplifier behavior over `Finset.sum` on `Fin 2`. -/
-@[simp] theorem frobenius_2x2_expand
-    (M : Matrix (Fin 2) (Fin 2) ℝ) :
-    frobeniusNormSq M =
-      (M 0 0)^2 + (M 0 1)^2 + (M 1 0)^2 + (M 1 1)^2 := by
-  unfold frobeniusNormSq
-  rw [finset_univ_fin2_sum]
-  rw [finset_univ_fin2_sum]
-  rw [finset_univ_fin2_sum]
-  ring
-
-/-- Frobenius norm identity for the symmetric `Fin 2` LD witness, proved via explicit
-    `Finset.univ = {0, 1}` expansion rather than relying on simplifier behavior. -/
-theorem frobeniusNormSq_ldMatrix_sub
-    (a b : ℝ) :
-    frobeniusNormSq (ldMatrix a - ldMatrix b) = 2 * (a - b)^2 := by
-  unfold frobeniusNormSq
-  rw [h_mat_sub, h_sum]
-
-/-- Inline type-ascription version of the `2 × 2` LD subtraction identity. This keeps
-    matrix subtraction inference stable even when the witness matrices are written inline. -/
-private theorem frobeniusNormSq_ldMatrix_sub_inline
-    (a b : ℝ) :
-    frobeniusNormSq
-      ((!![1, a; a, 1] - !![1, b; b, 1] : Matrix (Fin 2) (Fin 2) ℝ)) =
-        2 * (a - b)^2 := by
-  simpa [ldMatrix] using frobeniusNormSq_ldMatrix_sub a b
-
-/-- Exact equality form of the Wright-Fisher covariance-gap witness once the biological
-    scale term is known to be nonzero. This isolates the matrix algebra from the demographic
-    constants, so the eventual `≤` proof is just `le_of_eq`. -/
-theorem wrightFisher_covariance_gap_exact_of_scale_ne_zero
-    (fstSource fstTarget recombRate arraySparsity : ℝ)
-    (rS rT : ℝ)
-    (h_delta : fstTarget - fstSource = (rS - rT)^2)
-    (h_scale : recombRate * arraySparsity ≠ 0) :
-    demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity
-        (2 / (recombRate * arraySparsity)) =
-      frobeniusNormSq (sigmaSource_witness rS - sigmaTarget_witness rT) := by
-  unfold demographicCovarianceGapLowerBound taggingMismatchScale
-  have h_matrix :
+/-- Concrete `2 × 2` specialization of the two-locus coalescent covariance-gap theorem. -/
+theorem twoLocusCoalescent_covariance_gap_lower_bound_proved
+    (ibdWeight recombRate : ℝ)
+    (tSource tTarget : ℕ)
+    (h_time : tSource ≤ tTarget) :
+    2 *
+        (ibdWeight * discreteRecombinationSurvival recombRate tSource *
+          (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤
       frobeniusNormSq
-        ((!![1, rS; rS, 1] - !![1, rT; rT, 1] : Matrix (Fin 2) (Fin 2) ℝ)) =
-          2 * (rS - rT)^2 :=
-    frobeniusNormSq_ldMatrix_sub_inline rS rT
-  calc
-    (2 / (recombRate * arraySparsity)) * (recombRate * arraySparsity) * (fstTarget - fstSource)
-      = 2 * (fstTarget - fstSource) := by
-          rw [div_mul_cancel₀ 2 h_scale]
-    _ = 2 * (rS - rT)^2 := by rw [h_delta]
-    _ = frobeniusNormSq ((!![1, rS; rS, 1] - !![1, rT; rT, 1] : Matrix (Fin 2) (Fin 2) ℝ)) := by
-          symm
-          exact h_matrix
-    _ = frobeniusNormSq (sigmaSource_witness rS - sigmaTarget_witness rT) := by
-          rfl
+        (twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tSource -
+          twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tTarget) := by
+  haveI : Fact (2 ≤ 2) := ⟨by decide⟩
+  simpa using
+    (twoLocusCoalescent_covariance_gap_lower_bound
+      (t := 2) ibdWeight recombRate tSource tTarget h_time)
 
-/-- Rigorous proof of the Wright-Fisher demographic lower bound axiom using a concrete
-    2x2 LD matrix model, avoiding specification gaming. -/
-theorem wrightFisher_covariance_gap_lower_bound_proved
-    (fstSource fstTarget recombRate arraySparsity : ℝ)
-    (rS rT : ℝ)
-    (h_delta : fstTarget - fstSource = (rS - rT)^2) :
-    demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity (2 / (recombRate * arraySparsity))
-      ≤ frobeniusNormSq (sigmaSource_witness rS - sigmaTarget_witness rT) := by
-  unfold demographicCovarianceGapLowerBound taggingMismatchScale frobeniusNormSq
-  have h_norm :
-      ∑ i : Fin 2, ∑ j : Fin 2,
-          (((sigmaSource_witness rS) - (sigmaTarget_witness rT)) i j) ^ 2 = 2 * (rS - rT)^2 := by
-    simpa [sigmaSource_witness, sigmaTarget_witness, frobeniusNormSq] using
-      frobeniusNormSq_ldMatrix_sub rS rT
-  rw [h_norm, h_delta]
-  by_cases h_scale : recombRate * arraySparsity = 0
-  · rw [h_scale]
-    simp
-    have h_nonneg : 0 ≤ (rS - rT)^2 := sq_nonneg _
-    linarith
-  · exact le_of_eq
-      (wrightFisher_covariance_gap_exact_of_scale_ne_zero
-        fstSource fstTarget recombRate arraySparsity rS rT h_delta h_scale)
-
-/-- Convenience corollary using the proved Wright-Fisher demographic bound directly,
-    eliminating the unproved axiom. -/
-theorem covariance_mismatch_pos_of_fst_and_sparse_array_wf_proved
-    (fstSource fstTarget recombRate arraySparsity : ℝ)
-    (rS rT : ℝ)
-    (h_delta : fstTarget - fstSource = (rS - rT)^2)
-    (h_fst : fstSource < fstTarget)
+/-- Concrete `2 × 2` positivity corollary for the two-locus coalescent witness. -/
+theorem covariance_mismatch_pos_of_twoLocusCoalescent_proved
+    (ibdWeight recombRate : ℝ)
+    (tSource tTarget : ℕ)
+    (h_ibd_pos : 0 < ibdWeight)
     (h_recomb_pos : 0 < recombRate)
-    (h_sparse_pos : 0 < arraySparsity) :
-    0 < frobeniusNormSq (sigmaSource_witness rS - sigmaTarget_witness rT) := by
-  let kappa := 2 / (recombRate * arraySparsity)
-  have h_kappa_pos : 0 < kappa := by
-    apply div_pos
-    · exact zero_lt_two
-    · exact mul_pos h_recomb_pos h_sparse_pos
-  exact covariance_mismatch_pos_of_fst_and_sparse_array
-    (sigmaSource_witness rS) (sigmaTarget_witness rT) fstSource fstTarget recombRate arraySparsity kappa
-    (wrightFisher_covariance_gap_lower_bound_proved fstSource fstTarget recombRate arraySparsity rS rT h_delta)
-    h_fst h_recomb_pos h_sparse_pos h_kappa_pos
+    (h_recomb_lt_one : recombRate < 1)
+    (h_time : tSource < tTarget) :
+    0 <
+      frobeniusNormSq
+        (twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tSource -
+          twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tTarget) := by
+  haveI : Fact (2 ≤ 2) := ⟨by decide⟩
+  simpa using
+    (covariance_mismatch_pos_of_twoLocusCoalescent
+      (t := 2) ibdWeight recombRate tSource tTarget
+      h_ibd_pos h_recomb_pos h_recomb_lt_one h_time)
 
 /-- The true derivative of expected Brier score with respect to `p`,
     proved directly from the functional definition rather than an expanded proxy. -/
@@ -461,10 +312,9 @@ theorem independence_implies_no_interaction_proved (k sp : ℕ) [Fintype (Fin k)
   rcases h_additive with ⟨f, g, h_fn_struct⟩
   exact l2_projection_of_additive_is_additive_proved k sp h_fn_struct m h_spline h_pgs h_opt h_realizable h_measure_pos h_cont_true h_pgs_cont h_spline_cont h_int_sq
 
-/-- Rigorous proof of the expected absolute mean shift without using the AssumesRandomWalkDrift axiom.
-This removes the specification gaming where the axiom could be instantiated vacuously,
-while simultaneously correcting the `0 ≤ V_A` hypothesis to `0 < V_A` to prevent division by zero mathematically. -/
-theorem expected_abs_mean_shift_of_random_walk_proved
+/-- Rigorous algebraic proof of the exact mean-shift formula used after substituting
+discrete Wright-Fisher drift indices for the branchwise `F_ST` terms. -/
+theorem expected_abs_mean_shift_formula_proved
     (V_A fstS fstT : ℝ)
     (hVA_pos : 0 < V_A)
     (hfst_sum_nonneg : 0 ≤ fstS + fstT)
@@ -537,7 +387,21 @@ theorem expected_abs_mean_shift_of_random_walk_proved
     · exact hfst_sum_nonneg
     · exact Real.pi_pos.le
 
-/-- Rigorous name for the expected random walk mean shift without axioms. -/
+/-- Specialization of the exact mean-shift formula to discrete Wright-Fisher drift. -/
+theorem expected_abs_mean_shift_of_wrightFisher_proved
+    (V_A : ℝ)
+    (NS tS NT tT : ℕ)
+    (hVA_pos : 0 < V_A)
+    (hNS : 0 < NS)
+    (hNT : 0 < NT) :
+    Expected_Abs_Shift V_A (wrightFisherFst NS tS) (wrightFisherFst NT tT) /
+        Real.sqrt (presentDayPGSVariance V_A (wrightFisherFst NS tS)) =
+      2 * Real.sqrt
+        ((wrightFisherFst NS tS + wrightFisherFst NT tT) /
+          (Real.pi * (1 - wrightFisherFst NS tS))) := by
+  exact expected_abs_mean_shift_of_wrightFisher V_A NS tS NT tT hVA_pos hNS hNT
+
+/-- Rigorous name for the exact mean-shift identity. -/
 theorem expected_abs_mean_shift_bound_proved
     (V_A fstS fstT : ℝ)
     (hVA_pos : 0 < V_A)
@@ -545,30 +409,33 @@ theorem expected_abs_mean_shift_bound_proved
     (hfstS_lt_one : fstS < 1) :
     Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
       2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) :=
-  expected_abs_mean_shift_of_random_walk_proved V_A fstS fstT hVA_pos hfst_sum_nonneg hfstS_lt_one
+  expected_abs_mean_shift_formula_proved V_A fstS fstT hVA_pos hfst_sum_nonneg hfstS_lt_one
 
-/-- Rigorous proof of the target R2 drop using the concrete LD matrix model,
-    eliminating the unproved axiom completely. -/
-theorem target_r2_drop_of_fst_and_sparse_array_proved
+/-- Rigorous `2 × 2` target-`R²` drop proof using the two-locus coalescent witness. -/
+theorem target_r2_drop_of_twoLocusCoalescent_proved
     (mseSource mseTarget varY lam : ℝ)
-    (rS rT : ℝ)
+    (ibdWeight recombRate : ℝ)
+    (tSource tTarget : ℕ)
     (h_mse_gap_lb :
-      lam * frobeniusNormSq (ldMatrix rS - ldMatrix rT) ≤ mseTarget - mseSource)
+      lam *
+          frobeniusNormSq
+            (twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tSource -
+              twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tTarget) ≤
+        mseTarget - mseSource)
     (h_lam_pos : 0 < lam)
     (h_varY_pos : 0 < varY)
-    (h_diff : rS ≠ rT) :
+    (h_ibd_pos : 0 < ibdWeight)
+    (h_recomb_pos : 0 < recombRate)
+    (h_recomb_lt_one : recombRate < 1)
+    (h_time : tSource < tTarget) :
     r2FromMSE mseTarget varY < r2FromMSE mseSource varY := by
-  have h_mismatch : 0 < frobeniusNormSq (ldMatrix rS - ldMatrix rT) := by
-    unfold frobeniusNormSq
-    have h_norm : ∑ i : Fin 2, ∑ j : Fin 2, (((ldMatrix rS) - (ldMatrix rT)) i j) ^ 2 = 2 * (rS - rT)^2 := by
-      simp only [ldMatrix, Matrix.sub_apply, Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val', Matrix.cons_val_fin_one, sub_self, sq, zero_add, MulZeroClass.zero_mul, add_zero]
-      ring
-    rw [h_norm]
-    have h_sq_pos : 0 < (rS - rT)^2 := sq_pos_of_ne_zero (sub_ne_zero.mpr h_diff)
-    linarith
-  exact target_r2_strictly_decreases_of_covariance_mismatch
-    mseSource mseTarget varY lam (ldMatrix rS) (ldMatrix rT)
-    h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
+  haveI : Fact (2 ≤ 2) := ⟨by decide⟩
+  simpa using
+    (target_r2_drop_of_twoLocusCoalescent
+      (t := 2) mseSource mseTarget varY lam
+      ibdWeight recombRate tSource tTarget
+      h_mse_gap_lb h_lam_pos h_varY_pos
+      h_ibd_pos h_recomb_pos h_recomb_lt_one h_time)
 
 section NoAxioms
 

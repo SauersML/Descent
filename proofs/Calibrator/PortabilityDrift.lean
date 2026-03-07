@@ -161,17 +161,49 @@ section PresentDayMetrics
 noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
   (1 - fst) * V_A
 
-/-- Random-walk allele-frequency drift assumptions yielding a Gaussian limit for PGS mean shift.
-This provides the folded-normal first moment used by the dashboard mean-shift metric. -/
-structure AssumesRandomWalkDrift : Prop where
-  folded_normal_relative_shift :
-    ∀ (V_A fstS fstT : ℝ),
-      0 ≤ V_A →
-      0 ≤ fstS + fstT →
-      fstS < 1 →
-      (Real.sqrt (2 * (fstS + fstT) * V_A) * Real.sqrt (2 / Real.pi)) /
-          Real.sqrt (presentDayPGSVariance V_A fstS) =
-        2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS)))
+/-- The exact discrete Wright-Fisher retention factor after `t` generations. -/
+noncomputable def wrightFisherDriftRetention (N t : ℕ) : ℝ :=
+  (1 - 1 / (2 * (N : ℝ))) ^ t
+
+/-- Exact discrete Wright-Fisher branch drift index after `t` generations. -/
+noncomputable def wrightFisherFst (N t : ℕ) : ℝ :=
+  1 - wrightFisherDriftRetention N t
+
+theorem wrightFisherFst_eq
+    (N t : ℕ) :
+    wrightFisherFst N t = 1 - (1 - 1 / (2 * (N : ℝ))) ^ t := by
+  simp [wrightFisherFst, wrightFisherDriftRetention]
+
+theorem wrightFisherFst_nonneg
+    (N t : ℕ)
+    (hN : 0 < N) :
+    0 ≤ wrightFisherFst N t := by
+  have hNreal : (0 : ℝ) < N := by exact_mod_cast hN
+  have hbase_nonneg : 0 ≤ 1 - 1 / (2 * (N : ℝ)) := by
+    have h_le : (1 : ℝ) / (2 * (N : ℝ)) ≤ 1 / 2 := by
+      have hdenom_ge : (2 : ℝ) ≤ 2 * (N : ℝ) := by nlinarith
+      have hpos : 0 < 2 * (N : ℝ) := by positivity
+      exact (one_div_le_one_div₀ (by norm_num : (0 : ℝ) < 2) hpos).2 hdenom_ge
+    linarith
+  have hpow_le_one : (1 - 1 / (2 * (N : ℝ))) ^ t ≤ 1 := by
+    have hbase_le_one : 1 - 1 / (2 * (N : ℝ)) ≤ 1 := by linarith
+    exact pow_le_one₀ hbase_nonneg hbase_le_one t
+  rw [wrightFisherFst_eq]
+  linarith
+
+theorem wrightFisherFst_lt_one
+    (N t : ℕ)
+    (hN : 0 < N) :
+    wrightFisherFst N t < 1 := by
+  have hNreal : (0 : ℝ) < N := by exact_mod_cast hN
+  have hbase_pos : 0 < 1 - 1 / (2 * (N : ℝ)) := by
+    have h_lt : (1 : ℝ) / (2 * (N : ℝ)) < 1 := by
+      have hdenom_gt : (1 : ℝ) < 2 * (N : ℝ) := by nlinarith
+      exact one_div_lt_one_div₀ (by norm_num : (0 : ℝ) < 1) (by positivity) hdenom_gt
+    linarith
+  rw [wrightFisherFst_eq]
+  have hpow_pos : 0 < (1 - 1 / (2 * (N : ℝ))) ^ t := pow_pos hbase_pos t
+  linarith
 
 /-- Drift-driven variance of the between-population PGS-mean difference.
 For one branch with drift index `fst`, this is `2 * fst * V_A`. -/
@@ -187,33 +219,8 @@ theorem variance_mean_pgs_diff (V_A fst : ℝ) :
     Var_Delta_Mu V_A fst = 2 * fst * V_A := by
   rfl
 
-/-- Under random-walk drift with Gaussian limit, the expected absolute PGS-mean shift
-in source-standard-deviation units is exactly the folded-normal first moment formula. -/
-theorem expected_abs_mean_shift_of_random_walk
-    (V_A fstS fstT : ℝ)
-    (h_rw : AssumesRandomWalkDrift)
-    (hVA_nonneg : 0 ≤ V_A)
-    (hfst_sum_nonneg : 0 ≤ fstS + fstT)
-    (hfstS_lt_one : fstS < 1) :
-    Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
-      2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) := by
-  unfold Expected_Abs_Shift
-  rw [variance_mean_pgs_diff V_A (fstS + fstT)]
-  exact h_rw.folded_normal_relative_shift V_A fstS fstT hVA_nonneg hfst_sum_nonneg hfstS_lt_one
-
-/-- Backward-compatible name used by the dashboard. -/
-theorem expected_abs_mean_shift_bound
-    (V_A fstS fstT : ℝ)
-    (h_rw : AssumesRandomWalkDrift)
-    (hVA_nonneg : 0 ≤ V_A)
-    (hfst_sum_nonneg : 0 ≤ fstS + fstT)
-    (hfstS_lt_one : fstS < 1) :
-    Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
-      2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) :=
-  expected_abs_mean_shift_of_random_walk V_A fstS fstT h_rw hVA_nonneg hfst_sum_nonneg hfstS_lt_one
-
-/-- Rigorous algebraic proof of the expected absolute mean-shift formula, avoiding the
-    random-walk axiom by explicit `Real.sqrt` and fraction manipulation. -/
+/-- Rigorous algebraic proof of the expected absolute mean-shift formula for
+    discrete Wright-Fisher drift, via explicit `Real.sqrt` and fraction manipulation. -/
 theorem expected_abs_mean_shift_bound_proved
     (V_A fstS fstT : ℝ)
     (hVA_pos : 0 < V_A)
@@ -281,6 +288,23 @@ theorem expected_abs_mean_shift_bound_proved
   have h4_nonneg : (0 : ℝ) ≤ 4 := by norm_num
   rw [Real.sqrt_mul h4_nonneg]
   norm_num
+
+/-- Exact discrete Wright-Fisher mean-shift formula in source-standard-deviation units. -/
+theorem expected_abs_mean_shift_of_wrightFisher
+    (V_A : ℝ)
+    (NS tS NT tT : ℕ)
+    (hVA_pos : 0 < V_A)
+    (hNS : 0 < NS)
+    (hNT : 0 < NT) :
+    Expected_Abs_Shift V_A (wrightFisherFst NS tS) (wrightFisherFst NT tT) /
+        Real.sqrt (presentDayPGSVariance V_A (wrightFisherFst NS tS)) =
+      2 * Real.sqrt
+        ((wrightFisherFst NS tS + wrightFisherFst NT tT) /
+          (Real.pi * (1 - wrightFisherFst NS tS))) := by
+  apply expected_abs_mean_shift_bound_proved
+  · exact hVA_pos
+  · exact add_nonneg (wrightFisherFst_nonneg NS tS hNS) (wrightFisherFst_nonneg NT tT hNT)
+  · exact wrightFisherFst_lt_one NS tS hNS
 
 /-- Present-day signal-to-noise ratio for prediction under drift. -/
 noncomputable def presentDaySignalToNoise (V_A V_E fst : ℝ) : ℝ :=

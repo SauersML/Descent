@@ -205,6 +205,231 @@ structure RealizedData (n k : ℕ) where
   p : Fin n → ℝ
   c : Fin n → (Fin k → ℝ)
 
+/-! ### Discrete Genotypes, Hardy-Weinberg Equilibrium, and Score Approximation
+
+This block replaces the "score is Gaussian by assumption" shortcut with a discrete
+genotype model. Each locus is diploid with genotype in `{0, 1, 2}` alternative alleles.
+Hardy-Weinberg equilibrium determines the one-locus genotype law, and polygenic scores
+are finite weighted sums of these bounded random variables.
+
+The Gaussian score formulas are then interpreted as approximations with an explicit
+Berry-Esseen-style error term rather than as exact biology.
+-/
+
+/-- Diploid genotype state at a biallelic locus. -/
+inductive DiploidGenotype
+  | homRef
+  | het
+  | homAlt
+  deriving DecidableEq, Fintype, Repr
+
+/-- Number of alternative alleles carried by a diploid genotype. -/
+def altAlleleCount : DiploidGenotype → ℝ
+  | .homRef => 0
+  | .het => 1
+  | .homAlt => 2
+
+/-- One-locus Hardy-Weinberg model with alternative-allele frequency `q ∈ [0,1]`. -/
+structure HardyWeinbergModel where
+  altFreq : ℝ
+  altFreq_nonneg : 0 ≤ altFreq
+  altFreq_le_one : altFreq ≤ 1
+
+/-- Reference-allele frequency `p = 1 - q`. -/
+def HardyWeinbergModel.refFreq (h : HardyWeinbergModel) : ℝ :=
+  1 - h.altFreq
+
+theorem HardyWeinbergModel.refFreq_nonneg (h : HardyWeinbergModel) :
+    0 ≤ h.refFreq := by
+  unfold HardyWeinbergModel.refFreq
+  linarith [h.altFreq_le_one]
+
+theorem HardyWeinbergModel.refFreq_le_one (h : HardyWeinbergModel) :
+    h.refFreq ≤ 1 := by
+  unfold HardyWeinbergModel.refFreq
+  linarith [h.altFreq_nonneg]
+
+/-- Hardy-Weinberg genotype probabilities:
+`P(AA) = p^2`, `P(Aa) = 2pq`, `P(aa) = q^2`, where `q` is the alternative-allele frequency. -/
+def HardyWeinbergModel.genotypeProb (h : HardyWeinbergModel) : DiploidGenotype → ℝ
+  | .homRef => h.refFreq ^ 2
+  | .het => 2 * h.refFreq * h.altFreq
+  | .homAlt => h.altFreq ^ 2
+
+theorem HardyWeinbergModel.genotypeProb_nonneg
+    (h : HardyWeinbergModel) (g : DiploidGenotype) :
+    0 ≤ h.genotypeProb g := by
+  cases g <;>
+    simp [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq_nonneg,
+      h.altFreq_nonneg]
+
+/-- Hardy-Weinberg genotype probabilities sum to `1`. -/
+theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
+    (∑ g : DiploidGenotype, h.genotypeProb g) = 1 := by
+  unfold HardyWeinbergModel.genotypeProb HardyWeinbergModel.refFreq
+  ring_nf
+  linarith [h.altFreq_nonneg, h.altFreq_le_one]
+
+/-- Expected alternative-allele count under Hardy-Weinberg equilibrium. -/
+noncomputable def HardyWeinbergModel.expectedAltAlleleCount (h : HardyWeinbergModel) : ℝ :=
+  ∑ g : DiploidGenotype, altAlleleCount g * h.genotypeProb g
+
+theorem HardyWeinbergModel.expectedAltAlleleCount_eq
+    (h : HardyWeinbergModel) :
+    h.expectedAltAlleleCount = 2 * h.altFreq := by
+  unfold HardyWeinbergModel.expectedAltAlleleCount HardyWeinbergModel.genotypeProb
+  unfold HardyWeinbergModel.refFreq
+  ring_nf
+
+/-- Centered alternative-allele count at one locus. -/
+noncomputable def HardyWeinbergModel.centeredAltAlleleCount
+    (h : HardyWeinbergModel) (g : DiploidGenotype) : ℝ :=
+  altAlleleCount g - h.expectedAltAlleleCount
+
+/-- One-locus genotype variance under Hardy-Weinberg equilibrium. -/
+noncomputable def HardyWeinbergModel.genotypeVariance (h : HardyWeinbergModel) : ℝ :=
+  ∑ g : DiploidGenotype,
+    h.genotypeProb g * (h.centeredAltAlleleCount g) ^ 2
+
+theorem HardyWeinbergModel.genotypeVariance_eq
+    (h : HardyWeinbergModel) :
+    h.genotypeVariance = 2 * h.altFreq * h.refFreq := by
+  unfold HardyWeinbergModel.genotypeVariance
+  unfold HardyWeinbergModel.centeredAltAlleleCount
+  rw [h.expectedAltAlleleCount_eq]
+  unfold HardyWeinbergModel.genotypeProb HardyWeinbergModel.refFreq
+  ring_nf
+
+/-- Absolute third centered moment at one Hardy-Weinberg locus. This is the term that
+enters the Berry-Esseen numerator for weighted sums of bounded genotype variables. -/
+noncomputable def HardyWeinbergModel.genotypeThirdAbsMoment
+    (h : HardyWeinbergModel) : ℝ :=
+  ∑ g : DiploidGenotype,
+    h.genotypeProb g * |h.centeredAltAlleleCount g| ^ 3
+
+theorem HardyWeinbergModel.genotypeThirdAbsMoment_nonneg
+    (h : HardyWeinbergModel) :
+    0 ≤ h.genotypeThirdAbsMoment := by
+  unfold HardyWeinbergModel.genotypeThirdAbsMoment
+  refine Finset.sum_nonneg ?_
+  intro g _
+  exact mul_nonneg (h.genotypeProb_nonneg g) (by positivity)
+
+/-- A diploid genome over `m` loci. -/
+abbrev DiscreteGenome (m : ℕ) := Fin m → DiploidGenotype
+
+/-- Polygenic score as a weighted sum of discrete allele counts. -/
+noncomputable def polygenicScoreOfGenome {m : ℕ} [Fintype (Fin m)]
+    (beta : Fin m → ℝ) (genome : DiscreteGenome m) : ℝ :=
+  ∑ i : Fin m, beta i * altAlleleCount (genome i)
+
+/-- Locuswise Hardy-Weinberg panel for a polygenic score architecture. -/
+structure HWEScoreModel (m : ℕ) where
+  alleleFreq : Fin m → HardyWeinbergModel
+  effect : Fin m → ℝ
+
+/-- Exact HWE score mean from one-locus expectations. -/
+noncomputable def HWEScoreModel.scoreMean {m : ℕ} [Fintype (Fin m)]
+    (model : HWEScoreModel m) : ℝ :=
+  ∑ i : Fin m, model.effect i * (model.alleleFreq i).expectedAltAlleleCount
+
+/-- Exact HWE score variance under locus independence. -/
+noncomputable def HWEScoreModel.scoreVariance {m : ℕ} [Fintype (Fin m)]
+    (model : HWEScoreModel m) : ℝ :=
+  ∑ i : Fin m, (model.effect i) ^ 2 * (model.alleleFreq i).genotypeVariance
+
+/-- Berry-Esseen numerator for the weighted HWE score under locus independence. -/
+noncomputable def HWEScoreModel.scoreThirdAbsMomentBound {m : ℕ} [Fintype (Fin m)]
+    (model : HWEScoreModel m) : ℝ :=
+  ∑ i : Fin m, |model.effect i| ^ 3 * (model.alleleFreq i).genotypeThirdAbsMoment
+
+theorem HWEScoreModel.scoreVariance_nonneg {m : ℕ} [Fintype (Fin m)]
+    (model : HWEScoreModel m) :
+    0 ≤ model.scoreVariance := by
+  unfold HWEScoreModel.scoreVariance
+  refine Finset.sum_nonneg ?_
+  intro i _
+  have hvar_nonneg : 0 ≤ (model.alleleFreq i).genotypeVariance := by
+    rw [(model.alleleFreq i).genotypeVariance_eq]
+    exact mul_nonneg (mul_nonneg (by norm_num) (model.alleleFreq i).altFreq_nonneg)
+      ((model.alleleFreq i).refFreq_nonneg)
+  exact mul_nonneg (sq_nonneg (model.effect i)) hvar_nonneg
+
+theorem HWEScoreModel.scoreThirdAbsMomentBound_nonneg {m : ℕ} [Fintype (Fin m)]
+    (model : HWEScoreModel m) :
+    0 ≤ model.scoreThirdAbsMomentBound := by
+  unfold HWEScoreModel.scoreThirdAbsMomentBound
+  refine Finset.sum_nonneg ?_
+  intro i _
+  exact mul_nonneg (by positivity)
+    ((model.alleleFreq i).genotypeThirdAbsMoment_nonneg)
+
+/-- Berry-Esseen error term for a centered score with variance `σ²` and third-moment sum `ρ₃`.
+We write the denominator as `σ² * sqrt(σ²)` to stay inside the existing real-analysis library. -/
+noncomputable def berryEsseenErrorBound (berryEsseenConstant variance thirdMomentSum : ℝ) : ℝ :=
+  berryEsseenConstant * thirdMomentSum / (variance * Real.sqrt variance)
+
+theorem berryEsseenErrorBound_nonneg
+    (berryEsseenConstant variance thirdMomentSum : ℝ)
+    (hC : 0 ≤ berryEsseenConstant)
+    (hVar : 0 ≤ variance)
+    (hThird : 0 ≤ thirdMomentSum) :
+    0 ≤ berryEsseenErrorBound berryEsseenConstant variance thirdMomentSum := by
+  unfold berryEsseenErrorBound
+  by_cases hzero : variance * Real.sqrt variance = 0
+  · simp [hzero]
+  · exact div_nonneg (mul_nonneg hC hThird) (mul_nonneg hVar (Real.sqrt_nonneg _))
+
+/-- Berry-Esseen error bound specialized to the HWE score model. -/
+noncomputable def HWEScoreModel.berryEsseenErrorBound {m : ℕ} [Fintype (Fin m)]
+    (model : HWEScoreModel m) (berryEsseenConstant : ℝ) : ℝ :=
+  berryEsseenErrorBound berryEsseenConstant model.scoreVariance model.scoreThirdAbsMomentBound
+
+theorem HWEScoreModel.berryEsseenErrorBound_nonneg {m : ℕ} [Fintype (Fin m)]
+    (model : HWEScoreModel m) (berryEsseenConstant : ℝ)
+    (hC : 0 ≤ berryEsseenConstant) :
+    0 ≤ model.berryEsseenErrorBound berryEsseenConstant := by
+  exact berryEsseenErrorBound_nonneg
+    berryEsseenConstant model.scoreVariance model.scoreThirdAbsMomentBound
+    hC (model.scoreVariance_nonneg) (model.scoreThirdAbsMomentBound_nonneg)
+
+/-- A pointwise CDF-approximation certificate. This is the interface needed to transport
+Berry-Esseen bounds into liability-threshold, AUC, and `R²` error envelopes. -/
+structure CdfApproximationCertificate where
+  exactCdf : ℝ → ℝ
+  approxCdf : ℝ → ℝ
+  epsilon : ℝ
+  epsilon_nonneg : 0 ≤ epsilon
+  pointwise_error : ∀ x : ℝ, |exactCdf x - approxCdf x| ≤ epsilon
+
+/-- If a score CDF is within `ε` of an approximating CDF at threshold `t`,
+then the corresponding tail probability is also within `ε`. -/
+theorem tail_probability_error_of_cdf_error
+    (cert : CdfApproximationCertificate) (t : ℝ) :
+    |((1 - cert.exactCdf t) - (1 - cert.approxCdf t))| ≤ cert.epsilon := by
+  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using cert.pointwise_error t
+
+/-- Closed interval of values consistent with an approximation center and error radius. -/
+def approximationInterval (center epsilon : ℝ) : Set ℝ :=
+  Set.Icc (center - epsilon) (center + epsilon)
+
+/-- Any quantity within absolute error `ε` belongs to the corresponding approximation interval. -/
+theorem mem_approximationInterval_of_abs_sub_le
+    (x center epsilon : ℝ)
+    (heps : 0 ≤ epsilon)
+    (h : |x - center| ≤ epsilon) :
+    x ∈ approximationInterval center epsilon := by
+  unfold approximationInterval
+  constructor <;> linarith [abs_le.mp h |>.1, abs_le.mp h |>.2]
+
+/-- AUC approximation envelope from a Gaussian center and a Berry-Esseen error radius. -/
+def aucApproximationInterval (aucGaussian epsilon : ℝ) : Set ℝ :=
+  approximationInterval aucGaussian epsilon
+
+/-- `R²` approximation envelope from a Gaussian center and a Berry-Esseen error radius. -/
+def r2ApproximationInterval (r2Gaussian epsilon : ℝ) : Set ℝ :=
+  approximationInterval r2Gaussian epsilon
+
 noncomputable def stdNormalProdMeasure (k : ℕ) [Fintype (Fin k)] : Measure (ℝ × (Fin k → ℝ)) :=
   (ProbabilityTheory.gaussianReal 0 1).prod (Measure.pi (fun (_ : Fin k) => ProbabilityTheory.gaussianReal 0 1))
 

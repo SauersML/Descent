@@ -13,6 +13,102 @@ variable {p k sp n : ℕ}
 abbrev CausalVec (c : ℕ) := Fin c → ℝ
 abbrev TagVec (t : ℕ) := Fin t → ℝ
 
+/-! ### Discrete HWE Score DGP
+
+This block provides a population-genetics DGP for polygenic scores built from discrete
+diploid genotypes under locuswise Hardy-Weinberg equilibrium. Gaussian score formulas are
+exposed only as approximation centers, together with an explicit Berry-Esseen error radius.
+-/
+
+/-- Discrete genotype-based score DGP under locuswise HWE and an external liability/AUC link. -/
+structure HWEPolygenicScoreDGP (m : ℕ) where
+  scoreModel : HWEScoreModel m
+  berryEsseenConstant : ℝ
+  berryEsseenConstant_nonneg : 0 ≤ berryEsseenConstant
+
+/-- Exact score mean under the discrete HWE architecture. -/
+noncomputable def HWEPolygenicScoreDGP.scoreMean {m : ℕ} [Fintype (Fin m)]
+    (dgp : HWEPolygenicScoreDGP m) : ℝ :=
+  dgp.scoreModel.scoreMean
+
+/-- Exact score variance under the discrete HWE architecture. -/
+noncomputable def HWEPolygenicScoreDGP.scoreVariance {m : ℕ} [Fintype (Fin m)]
+    (dgp : HWEPolygenicScoreDGP m) : ℝ :=
+  dgp.scoreModel.scoreVariance
+
+/-- Berry-Esseen error radius for the discrete HWE score. -/
+noncomputable def HWEPolygenicScoreDGP.scoreApproximationError {m : ℕ} [Fintype (Fin m)]
+    (dgp : HWEPolygenicScoreDGP m) : ℝ :=
+  dgp.scoreModel.berryEsseenErrorBound dgp.berryEsseenConstant
+
+/-- AUC interval induced by a Gaussian approximation center and Berry-Esseen error radius. -/
+def HWEPolygenicScoreDGP.aucApproximationInterval {m : ℕ}
+    (dgp : HWEPolygenicScoreDGP m) (aucGaussian : ℝ) : Set ℝ :=
+  aucApproximationInterval aucGaussian dgp.scoreApproximationError
+
+/-- `R²` interval induced by a Gaussian approximation center and Berry-Esseen error radius. -/
+def HWEPolygenicScoreDGP.r2ApproximationInterval {m : ℕ}
+    (dgp : HWEPolygenicScoreDGP m) (r2Gaussian : ℝ) : Set ℝ :=
+  r2ApproximationInterval r2Gaussian dgp.scoreApproximationError
+
+/-- Any exact AUC lying within the Berry-Esseen error radius belongs to the certified interval. -/
+theorem HWEPolygenicScoreDGP.mem_aucApproximationInterval_of_abs_sub_le
+    {m : ℕ} [Fintype (Fin m)]
+    (dgp : HWEPolygenicScoreDGP m)
+    (aucExact aucGaussian : ℝ)
+    (h : |aucExact - aucGaussian| ≤ dgp.scoreApproximationError) :
+    aucExact ∈ dgp.aucApproximationInterval aucGaussian := by
+  exact mem_approximationInterval_of_abs_sub_le
+    aucExact aucGaussian dgp.scoreApproximationError
+    (by
+      unfold HWEPolygenicScoreDGP.scoreApproximationError
+      unfold HWEScoreModel.berryEsseenErrorBound berryEsseenErrorBound
+      have hnum_nonneg :
+          0 ≤ dgp.scoreModel.scoreThirdAbsMomentBound := by
+        unfold HWEScoreModel.scoreThirdAbsMomentBound
+        refine Finset.sum_nonneg ?_
+        intro i _
+        exact mul_nonneg (by positivity)
+          ((dgp.scoreModel.alleleFreq i).genotypeThirdAbsMoment_nonneg)
+      by_cases hvar : dgp.scoreModel.scoreVariance = 0
+      · simp [hvar, dgp.berryEsseenConstant_nonneg]
+      · have hsqrt_nonneg : 0 ≤ Real.sqrt dgp.scoreModel.scoreVariance := Real.sqrt_nonneg _
+        have hvar_nonneg : 0 ≤ dgp.scoreModel.scoreVariance :=
+          HWEScoreModel.scoreVariance_nonneg dgp.scoreModel
+        have hden_nonneg : 0 ≤ dgp.scoreModel.scoreVariance * Real.sqrt dgp.scoreModel.scoreVariance :=
+          mul_nonneg hvar_nonneg hsqrt_nonneg
+        exact div_nonneg (mul_nonneg dgp.berryEsseenConstant_nonneg hnum_nonneg) hden_nonneg)
+    h
+
+/-- Any exact `R²` lying within the Berry-Esseen error radius belongs to the certified interval. -/
+theorem HWEPolygenicScoreDGP.mem_r2ApproximationInterval_of_abs_sub_le
+    {m : ℕ} [Fintype (Fin m)]
+    (dgp : HWEPolygenicScoreDGP m)
+    (r2Exact r2Gaussian : ℝ)
+    (h : |r2Exact - r2Gaussian| ≤ dgp.scoreApproximationError) :
+    r2Exact ∈ dgp.r2ApproximationInterval r2Gaussian := by
+  exact mem_approximationInterval_of_abs_sub_le
+    r2Exact r2Gaussian dgp.scoreApproximationError
+    (by
+      unfold HWEPolygenicScoreDGP.scoreApproximationError
+      unfold HWEScoreModel.berryEsseenErrorBound berryEsseenErrorBound
+      have hnum_nonneg :
+          0 ≤ dgp.scoreModel.scoreThirdAbsMomentBound := by
+        unfold HWEScoreModel.scoreThirdAbsMomentBound
+        refine Finset.sum_nonneg ?_
+        intro i _
+        exact mul_nonneg (by positivity)
+          ((dgp.scoreModel.alleleFreq i).genotypeThirdAbsMoment_nonneg)
+      by_cases hvar : dgp.scoreModel.scoreVariance = 0
+      · simp [hvar, dgp.berryEsseenConstant_nonneg]
+      · have hsqrt_nonneg : 0 ≤ Real.sqrt dgp.scoreModel.scoreVariance := Real.sqrt_nonneg _
+        have hvar_nonneg : 0 ≤ dgp.scoreModel.scoreVariance :=
+          HWEScoreModel.scoreVariance_nonneg dgp.scoreModel
+        have hden_nonneg : 0 ≤ dgp.scoreModel.scoreVariance * Real.sqrt dgp.scoreModel.scoreVariance :=
+          mul_nonneg hvar_nonneg hsqrt_nonneg
+        exact div_nonneg (mul_nonneg dgp.berryEsseenConstant_nonneg hnum_nonneg) hden_nonneg)
+    h
+
 /-! ### Tagged DGP (Causal vs Observable Architecture)
 
 This block explicitly separates:
@@ -203,40 +299,65 @@ noncomputable def demographicCovarianceGapLowerBound
     (fstSource fstTarget recombRate arraySparsity kappa : ℝ) : ℝ :=
   kappa * taggingMismatchScale recombRate arraySparsity * (fstTarget - fstSource)
 
-private def wfIdx0 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
+private def twoLocusIdx0 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
   ⟨0, lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
 
-private def wfIdx1 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
+private def twoLocusIdx1 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
   ⟨1, lt_of_lt_of_le (by decide : 1 < 2) Fact.out⟩
 
-private theorem wfIdx0_ne_wfIdx1 {t : ℕ} [Fact (2 ≤ t)] : wfIdx0 ≠ wfIdx1 := by
+private theorem twoLocusIdx0_ne_twoLocusIdx1 {t : ℕ} [Fact (2 ≤ t)] :
+    twoLocusIdx0 ≠ twoLocusIdx1 := by
   intro h
   have hval := congrArg Fin.val h
-  simp [wfIdx0, wfIdx1] at hval
+  simp [twoLocusIdx0, twoLocusIdx1] at hval
 
-/-- Wright-Fisher-style witness matrix in arbitrary dimension: only the `(0,1)` and `(1,0)`
-entries carry the off-diagonal LD parameter, while the diagonal is fixed at `1`. -/
-def wrightFisherWitnessMatrix {t : ℕ} [Fact (2 ≤ t)] (r : ℝ) : Matrix (Fin t) (Fin t) ℝ :=
+/-- Survival of two linked loci to the MRCA under discrete recombination. -/
+noncomputable def discreteRecombinationSurvival (recombRate : ℝ) (tmrca : ℕ) : ℝ :=
+  (1 - recombRate) ^ tmrca
+
+/-- Two-locus covariance induced by IBD persistence up to the MRCA. -/
+noncomputable def twoLocusIBDCovariance (ibdWeight recombRate : ℝ) (tmrca : ℕ) : ℝ :=
+  ibdWeight * discreteRecombinationSurvival recombRate tmrca
+
+/-- `N × N` covariance matrix generated by a single two-locus coalescent block.
+The diagonal is normalized to `1`; the linked pair `(0,1)` and `(1,0)` carries
+the covariance implied by the recombination-survival probability. -/
+def twoLocusCoalescentCovarianceMatrix {t : ℕ} [Fact (2 ≤ t)]
+    (ibdWeight recombRate : ℝ) (tmrca : ℕ) : Matrix (Fin t) (Fin t) ℝ :=
   fun i j =>
-    if i = wfIdx0 ∧ j = wfIdx1 then r
-    else if i = wfIdx1 ∧ j = wfIdx0 then r
+    if i = twoLocusIdx0 ∧ j = twoLocusIdx1 then twoLocusIBDCovariance ibdWeight recombRate tmrca
+    else if i = twoLocusIdx1 ∧ j = twoLocusIdx0 then twoLocusIBDCovariance ibdWeight recombRate tmrca
     else if i = j then 1 else 0
 
-private theorem wrightFisherWitnessMatrix_diff_lower_bound
-    {t : ℕ} [Fact (2 ≤ t)] (rS rT : ℝ) :
-    2 * (rS - rT)^2 ≤
-      frobeniusNormSq (wrightFisherWitnessMatrix rS - wrightFisherWitnessMatrix rT) := by
-  let i0 : Fin t := wfIdx0
-  let i1 : Fin t := wfIdx1
-  let A := wrightFisherWitnessMatrix rS - wrightFisherWitnessMatrix rT
+private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
+    {t : ℕ} [Fact (2 ≤ t)]
+    (ibdWeightS recombRateS : ℝ) (tmrcaS : ℕ)
+    (ibdWeightT recombRateT : ℝ) (tmrcaT : ℕ) :
+    2 *
+        (twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
+          twoLocusIBDCovariance ibdWeightT recombRateT tmrcaT) ^ 2 ≤
+      frobeniusNormSq
+        (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeightS recombRateS tmrcaS -
+          twoLocusCoalescentCovarianceMatrix (t := t) ibdWeightT recombRateT tmrcaT) := by
+  let i0 : Fin t := twoLocusIdx0
+  let i1 : Fin t := twoLocusIdx1
+  let A :=
+    twoLocusCoalescentCovarianceMatrix (t := t) ibdWeightS recombRateS tmrcaS -
+      twoLocusCoalescentCovarianceMatrix (t := t) ibdWeightT recombRateT tmrcaT
   have hi_ne : i0 ≠ i1 := by
-    simpa [i0, i1] using (wfIdx0_ne_wfIdx1 : wfIdx0 ≠ (@wfIdx1 t _))
+    simpa [i0, i1] using
+      (twoLocusIdx0_ne_twoLocusIdx1 : twoLocusIdx0 ≠ (@twoLocusIdx1 t _))
   have h01 :
-      A i0 i1 = rS - rT := by
-    simp [A, i0, i1, wrightFisherWitnessMatrix, hi_ne, Matrix.sub_apply]
+      A i0 i1 =
+        twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
+          twoLocusIBDCovariance ibdWeightT recombRateT tmrcaT := by
+    simp [A, i0, i1, twoLocusCoalescentCovarianceMatrix, hi_ne, Matrix.sub_apply]
   have h10 :
-      A i1 i0 = rS - rT := by
-    simp [A, i0, i1, wrightFisherWitnessMatrix, hi_ne, Matrix.sub_apply, and_left_comm, and_assoc]
+      A i1 i0 =
+        twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
+          twoLocusIBDCovariance ibdWeightT recombRateT tmrcaT := by
+    simp [A, i0, i1, twoLocusCoalescentCovarianceMatrix, hi_ne, Matrix.sub_apply,
+      and_left_comm, and_assoc]
   have h_row01 :
       (A i0 i1)^2 ≤ ∑ j : Fin t, (A i0 j)^2 := by
     exact Finset.single_le_sum (fun j _ => sq_nonneg (A i0 j)) (by simp)
@@ -259,38 +380,151 @@ private theorem wrightFisherWitnessMatrix_diff_lower_bound
       intro i _ _
       exact Finset.sum_nonneg (fun j _ => sq_nonneg (A i j)))
   calc
-    2 * (rS - rT)^2 = (A i0 i1)^2 + (A i1 i0)^2 := by
+    2 *
+        (twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
+          twoLocusIBDCovariance ibdWeightT recombRateT tmrcaT) ^ 2 =
+        (A i0 i1)^2 + (A i1 i0)^2 := by
       rw [h01, h10]
       ring
     _ ≤ ∑ i in ({i0, i1} : Finset (Fin t)), ∑ j : Fin t, (A i j)^2 := h_selected_le
     _ ≤ ∑ i : Fin t, ∑ j : Fin t, (A i j)^2 := h_subset_le
 
-/-- Fully proved Wright-Fisher covariance-gap theorem in arbitrary dimension, for an explicit
-embedded witness family. This replaces the false universal axiom by a correct theorem:
-for every `t ≥ 2`, the demographic lower bound is realized by concrete witness matrices. -/
-theorem wrightFisher_covariance_gap_lower_bound
+/-- Algebraic decomposition of the two-locus covariance gap in terms of the MRCA time gap. -/
+theorem twoLocusIBDCovariance_gap_eq
+    (ibdWeight recombRate : ℝ) (tSource tTarget : ℕ)
+    (h_time : tSource ≤ tTarget) :
+    twoLocusIBDCovariance ibdWeight recombRate tSource -
+        twoLocusIBDCovariance ibdWeight recombRate tTarget =
+      ibdWeight * discreteRecombinationSurvival recombRate tSource *
+        (1 - discreteRecombinationSurvival recombRate (tTarget - tSource)) := by
+  have h_split :
+      discreteRecombinationSurvival recombRate tTarget =
+        discreteRecombinationSurvival recombRate tSource *
+          discreteRecombinationSurvival recombRate (tTarget - tSource) := by
+    unfold discreteRecombinationSurvival
+    rw [← pow_add, Nat.add_sub_of_le h_time]
+  unfold twoLocusIBDCovariance
+  rw [h_split]
+  ring
+
+/-- Exact covariance-gap lower bound generated by the two-locus coalescent.
+The `N × N` matrix mismatch is therefore controlled by recombination and the MRCA time gap,
+not by an arbitrary covariance witness. -/
+theorem twoLocusCoalescent_covariance_gap_lower_bound
     {t : ℕ} [Fact (2 ≤ t)]
-    (fstSource fstTarget recombRate arraySparsity : ℝ)
-    (rS rT : ℝ)
-    (h_delta : fstTarget - fstSource = (rS - rT)^2) :
-    let sigmaSource := wrightFisherWitnessMatrix (t := t) rS
-    let sigmaTarget := wrightFisherWitnessMatrix (t := t) rT
-    demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity
-        (2 / (recombRate * arraySparsity)) ≤
-      frobeniusNormSq (sigmaSource - sigmaTarget) := by
-  dsimp
-  by_cases h_scale : recombRate * arraySparsity = 0
-  · unfold demographicCovarianceGapLowerBound taggingMismatchScale
-    rw [h_scale]
-    simp [frobeniusNormSq_nonneg]
-  · have h_dem :
-        demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity
-          (2 / (recombRate * arraySparsity)) =
-          2 * (rS - rT)^2 := by
-      unfold demographicCovarianceGapLowerBound taggingMismatchScale
-      rw [div_mul_cancel₀ 2 h_scale, h_delta]
-    rw [h_dem]
-    exact wrightFisherWitnessMatrix_diff_lower_bound rS rT
+    (ibdWeight recombRate : ℝ)
+    (tSource tTarget : ℕ)
+    (h_time : tSource ≤ tTarget) :
+    2 *
+        (ibdWeight * discreteRecombinationSurvival recombRate tSource *
+          (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤
+      frobeniusNormSq
+        (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource -
+          twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget) := by
+  have h_gap :
+      twoLocusIBDCovariance ibdWeight recombRate tSource -
+          twoLocusIBDCovariance ibdWeight recombRate tTarget =
+        ibdWeight * discreteRecombinationSurvival recombRate tSource *
+          (1 - discreteRecombinationSurvival recombRate (tTarget - tSource)) :=
+    twoLocusIBDCovariance_gap_eq ibdWeight recombRate tSource tTarget h_time
+  have h_matrix :
+      2 *
+          (twoLocusIBDCovariance ibdWeight recombRate tSource -
+            twoLocusIBDCovariance ibdWeight recombRate tTarget) ^ 2 ≤
+        frobeniusNormSq
+          (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource -
+            twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget) := by
+    simpa using
+      (twoLocusCoalescentCovarianceMatrix_diff_lower_bound
+        (t := t)
+        ibdWeight recombRate tSource
+        ibdWeight recombRate tTarget)
+  rw [h_gap] at h_matrix
+  exact h_matrix
+
+/-- Strict positivity of the covariance mismatch when the target population has a larger
+expected MRCA time and recombination is non-degenerate. -/
+theorem covariance_mismatch_pos_of_twoLocusCoalescent
+    {t : ℕ} [Fact (2 ≤ t)]
+    (ibdWeight recombRate : ℝ)
+    (tSource tTarget : ℕ)
+    (h_ibd_pos : 0 < ibdWeight)
+    (h_recomb_pos : 0 < recombRate)
+    (h_recomb_lt_one : recombRate < 1)
+    (h_time : tSource < tTarget) :
+    0 <
+      frobeniusNormSq
+        (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource -
+          twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget) := by
+  have h_gap_lb :=
+    twoLocusCoalescent_covariance_gap_lower_bound
+      (t := t) ibdWeight recombRate tSource tTarget h_time.le
+  have h_base_nonneg : 0 ≤ 1 - recombRate := by linarith
+  have h_base_pos : 0 < 1 - recombRate := by linarith
+  have h_base_lt_one : 1 - recombRate < 1 := by linarith
+  have h_delta_ne : tTarget - tSource ≠ 0 := Nat.sub_ne_zero_of_lt h_time
+  have h_survival_pos : 0 < discreteRecombinationSurvival recombRate tSource := by
+    unfold discreteRecombinationSurvival
+    exact pow_pos h_base_pos _
+  have h_decay_lt_one :
+      discreteRecombinationSurvival recombRate (tTarget - tSource) < 1 := by
+    unfold discreteRecombinationSurvival
+    exact pow_lt_one₀ h_base_nonneg h_base_lt_one h_delta_ne
+  have h_tail_pos :
+      0 < 1 - discreteRecombinationSurvival recombRate (tTarget - tSource) := by
+    linarith
+  have h_inner_pos :
+      0 <
+        ibdWeight * discreteRecombinationSurvival recombRate tSource *
+          (1 - discreteRecombinationSurvival recombRate (tTarget - tSource)) := by
+    exact mul_pos (mul_pos h_ibd_pos h_survival_pos) h_tail_pos
+  have h_lb_pos :
+      0 <
+        2 *
+          (ibdWeight * discreteRecombinationSurvival recombRate tSource *
+            (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 := by
+    have h_sq_pos :
+        0 <
+          (ibdWeight * discreteRecombinationSurvival recombRate tSource *
+            (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 :=
+      sq_pos_of_ne_zero h_inner_pos.ne'
+    nlinarith
+  exact lt_of_lt_of_le h_lb_pos h_gap_lb
+
+/-- End-to-end portability drop under a two-locus coalescent witness:
+once source-trained ERM incurs target excess MSE proportional to covariance mismatch,
+an increase in expected MRCA time in the target population forces `R²_target < R²_source`. -/
+theorem target_r2_drop_of_twoLocusCoalescent
+    {t : ℕ} [Fact (2 ≤ t)]
+    (mseSource mseTarget varY lam : ℝ)
+    (ibdWeight recombRate : ℝ)
+    (tSource tTarget : ℕ)
+    (h_mse_gap_lb :
+      lam *
+          frobeniusNormSq
+            (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource -
+              twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget) ≤
+        mseTarget - mseSource)
+    (h_lam_pos : 0 < lam)
+    (h_varY_pos : 0 < varY)
+    (h_ibd_pos : 0 < ibdWeight)
+    (h_recomb_pos : 0 < recombRate)
+    (h_recomb_lt_one : recombRate < 1)
+    (h_time : tSource < tTarget) :
+    r2FromMSE mseTarget varY < r2FromMSE mseSource varY := by
+  have h_mismatch :
+      0 <
+        frobeniusNormSq
+          (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource -
+            twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget) :=
+    covariance_mismatch_pos_of_twoLocusCoalescent
+      (t := t) ibdWeight recombRate tSource tTarget
+      h_ibd_pos h_recomb_pos h_recomb_lt_one h_time
+  exact target_r2_strictly_decreases_of_covariance_mismatch
+    mseSource mseTarget varY lam
+    (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource)
+    (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget)
+    h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
 
 /-- If the demographic lower bound is available and strictly positive, covariance mismatch is strict. -/
 theorem covariance_mismatch_pos_of_fst_and_sparse_array
@@ -315,36 +549,7 @@ theorem covariance_mismatch_pos_of_fst_and_sparse_array
     exact mul_pos (mul_pos h_kappa_pos h_scale_pos) h_delta_pos
   exact lt_of_lt_of_le h_lb_pos h_cov_lb
 
-/-- Axiom-free convenience corollary for the explicit Wright-Fisher witness family
-in arbitrary dimension `t ≥ 2`. -/
-theorem covariance_mismatch_pos_of_fst_and_sparse_array_wf
-    {t : ℕ} [Fact (2 ≤ t)]
-    (fstSource fstTarget recombRate arraySparsity : ℝ)
-    (rS rT : ℝ)
-    (h_delta : fstTarget - fstSource = (rS - rT)^2)
-    (h_fst : fstSource < fstTarget)
-    (h_recomb_pos : 0 < recombRate)
-    (h_sparse_pos : 0 < arraySparsity) :
-    0 < frobeniusNormSq
-      (wrightFisherWitnessMatrix (t := t) rS - wrightFisherWitnessMatrix (t := t) rT) := by
-  let kappa := 2 / (recombRate * arraySparsity)
-  have h_kappa_pos : 0 < kappa := by
-    apply div_pos
-    · norm_num
-    · exact mul_pos h_recomb_pos h_sparse_pos
-  exact covariance_mismatch_pos_of_fst_and_sparse_array
-    (wrightFisherWitnessMatrix (t := t) rS)
-    (wrightFisherWitnessMatrix (t := t) rT)
-    fstSource fstTarget recombRate arraySparsity kappa
-    (by
-      simpa [kappa] using
-        wrightFisher_covariance_gap_lower_bound
-          (t := t) fstSource fstTarget recombRate arraySparsity rS rT h_delta)
-    h_fst h_recomb_pos h_sparse_pos h_kappa_pos
-
-/-- End-to-end portability drop from demography + sparse tagging:
-given a model-specific lower bound witnessing covariance divergence,
-`F_ST` divergence and sparse arrays force `R²_target < R²_source` once mismatch lifts MSE. -/
+/-- End-to-end portability drop from any demographic covariance lower bound. -/
 theorem target_r2_drop_of_fst_and_sparse_array
     {t : ℕ}
     (mseSource mseTarget varY lam : ℝ)
