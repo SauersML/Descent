@@ -377,7 +377,7 @@ theorem HardyWeinbergModel.genotypeVariance_eq
   rw [Fin.sum_univ_three]
   simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb, altAlleleCount]
   calc
-    h.refFreq ^ 2 * (0 - 2 * h.altFreq) ^ 2 +
+    h.refFreq ^ 2 * (2 * h.altFreq) ^ 2 +
         (2 * h.refFreq * h.altFreq) * (1 - 2 * h.altFreq) ^ 2 +
         h.altFreq ^ 2 * (2 - 2 * h.altFreq) ^ 2
         = 2 * h.refFreq * h.altFreq * (h.refFreq + h.altFreq) := by ring_nf
