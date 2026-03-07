@@ -376,12 +376,9 @@ theorem HardyWeinbergModel.genotypeVariance_eq
   rw [hrewrite]
   rw [Fin.sum_univ_three]
   simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb, altAlleleCount]
-  calc
-    h.refFreq ^ 2 * (2 * h.altFreq) ^ 2 +
-        (2 * h.refFreq * h.altFreq) * (1 - 2 * h.altFreq) ^ 2 +
-        h.altFreq ^ 2 * (2 - 2 * h.altFreq) ^ 2
-        = 2 * h.refFreq * h.altFreq * (h.refFreq + h.altFreq) := by ring_nf
-    _ = 2 * h.altFreq * h.refFreq := by rw [hsum]; ring
+  have hsum' := hsum
+  ring_nf at hsum' ⊢
+  nlinarith
 
 /-- Absolute third centered moment at one Hardy-Weinberg locus. This is the term that
 enters the Berry-Esseen numerator for weighted sums of bounded genotype variables. -/
