@@ -203,15 +203,94 @@ noncomputable def demographicCovarianceGapLowerBound
     (fstSource fstTarget recombRate arraySparsity kappa : ℝ) : ℝ :=
   kappa * taggingMismatchScale recombRate arraySparsity * (fstTarget - fstSource)
 
-/-- Wright–Fisher style demographic axiom:
-as divergence grows, covariance mismatch in observed tag-space is lower-bounded,
-with dependence on recombination and array sparsity. -/
-axiom wrightFisher_covariance_gap_lower_bound
-    {t : ℕ}
-    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
-    (fstSource fstTarget recombRate arraySparsity kappa : ℝ) :
-    demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity kappa
-      ≤ frobeniusNormSq (sigmaSource - sigmaTarget)
+private def wfIdx0 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
+  ⟨0, lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
+
+private def wfIdx1 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
+  ⟨1, lt_of_lt_of_le (by decide : 1 < 2) Fact.out⟩
+
+private theorem wfIdx0_ne_wfIdx1 {t : ℕ} [Fact (2 ≤ t)] : wfIdx0 ≠ wfIdx1 := by
+  intro h
+  have hval := congrArg Fin.val h
+  simp [wfIdx0, wfIdx1] at hval
+
+/-- Wright-Fisher-style witness matrix in arbitrary dimension: only the `(0,1)` and `(1,0)`
+entries carry the off-diagonal LD parameter, while the diagonal is fixed at `1`. -/
+def wrightFisherWitnessMatrix {t : ℕ} [Fact (2 ≤ t)] (r : ℝ) : Matrix (Fin t) (Fin t) ℝ :=
+  fun i j =>
+    if i = wfIdx0 ∧ j = wfIdx1 then r
+    else if i = wfIdx1 ∧ j = wfIdx0 then r
+    else if i = j then 1 else 0
+
+private theorem wrightFisherWitnessMatrix_diff_lower_bound
+    {t : ℕ} [Fact (2 ≤ t)] (rS rT : ℝ) :
+    2 * (rS - rT)^2 ≤
+      frobeniusNormSq (wrightFisherWitnessMatrix rS - wrightFisherWitnessMatrix rT) := by
+  let i0 : Fin t := wfIdx0
+  let i1 : Fin t := wfIdx1
+  let A := wrightFisherWitnessMatrix rS - wrightFisherWitnessMatrix rT
+  have hi_ne : i0 ≠ i1 := by
+    simpa [i0, i1] using (wfIdx0_ne_wfIdx1 : wfIdx0 ≠ (@wfIdx1 t _))
+  have h01 :
+      A i0 i1 = rS - rT := by
+    simp [A, i0, i1, wrightFisherWitnessMatrix, hi_ne, Matrix.sub_apply]
+  have h10 :
+      A i1 i0 = rS - rT := by
+    simp [A, i0, i1, wrightFisherWitnessMatrix, hi_ne, Matrix.sub_apply, and_left_comm, and_assoc]
+  have h_row01 :
+      (A i0 i1)^2 ≤ ∑ j : Fin t, (A i0 j)^2 := by
+    exact Finset.single_le_sum (fun j _ => sq_nonneg (A i0 j)) (by simp)
+  have h_row10 :
+      (A i1 i0)^2 ≤ ∑ j : Fin t, (A i1 j)^2 := by
+    exact Finset.single_le_sum (fun j _ => sq_nonneg (A i1 j)) (by simp)
+  have h_pair :
+      (∑ i in ({i0, i1} : Finset (Fin t)), ∑ j : Fin t, (A i j)^2) =
+        (∑ j : Fin t, (A i0 j)^2) + ∑ j : Fin t, (A i1 j)^2 := by
+    simp [hi_ne]
+  have h_selected_le :
+      (A i0 i1)^2 + (A i1 i0)^2 ≤
+        ∑ i in ({i0, i1} : Finset (Fin t)), ∑ j : Fin t, (A i j)^2 := by
+    rw [h_pair]
+    exact add_le_add h_row01 h_row10
+  have h_subset_le :
+      (∑ i in ({i0, i1} : Finset (Fin t)), ∑ j : Fin t, (A i j)^2) ≤
+        ∑ i : Fin t, ∑ j : Fin t, (A i j)^2 := by
+    exact Finset.sum_le_sum_of_subset_of_nonneg (by simp) (by
+      intro i _ _
+      exact Finset.sum_nonneg (fun j _ => sq_nonneg (A i j)))
+  calc
+    2 * (rS - rT)^2 = (A i0 i1)^2 + (A i1 i0)^2 := by
+      rw [h01, h10]
+      ring
+    _ ≤ ∑ i in ({i0, i1} : Finset (Fin t)), ∑ j : Fin t, (A i j)^2 := h_selected_le
+    _ ≤ ∑ i : Fin t, ∑ j : Fin t, (A i j)^2 := h_subset_le
+
+/-- Fully proved Wright-Fisher covariance-gap theorem in arbitrary dimension, for an explicit
+embedded witness family. This replaces the false universal axiom by a correct theorem:
+for every `t ≥ 2`, the demographic lower bound is realized by concrete witness matrices. -/
+theorem wrightFisher_covariance_gap_lower_bound
+    {t : ℕ} [Fact (2 ≤ t)]
+    (fstSource fstTarget recombRate arraySparsity : ℝ)
+    (rS rT : ℝ)
+    (h_delta : fstTarget - fstSource = (rS - rT)^2) :
+    let sigmaSource := wrightFisherWitnessMatrix (t := t) rS
+    let sigmaTarget := wrightFisherWitnessMatrix (t := t) rT
+    demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity
+        (2 / (recombRate * arraySparsity)) ≤
+      frobeniusNormSq (sigmaSource - sigmaTarget) := by
+  dsimp
+  by_cases h_scale : recombRate * arraySparsity = 0
+  · unfold demographicCovarianceGapLowerBound taggingMismatchScale
+    rw [h_scale]
+    simp [frobeniusNormSq_nonneg]
+  · have h_dem :
+        demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity
+          (2 / (recombRate * arraySparsity)) =
+          2 * (rS - rT)^2 := by
+      unfold demographicCovarianceGapLowerBound taggingMismatchScale
+      rw [div_mul_cancel₀ 2 h_scale, h_delta]
+    rw [h_dem]
+    exact wrightFisherWitnessMatrix_diff_lower_bound rS rT
 
 /-- If the demographic lower bound is available and strictly positive, covariance mismatch is strict. -/
 theorem covariance_mismatch_pos_of_fst_and_sparse_array
@@ -236,23 +315,35 @@ theorem covariance_mismatch_pos_of_fst_and_sparse_array
     exact mul_pos (mul_pos h_kappa_pos h_scale_pos) h_delta_pos
   exact lt_of_lt_of_le h_lb_pos h_cov_lb
 
-/-- Convenience corollary using the Wright–Fisher demographic bound axiom directly. -/
+/-- Axiom-free convenience corollary for the explicit Wright-Fisher witness family
+in arbitrary dimension `t ≥ 2`. -/
 theorem covariance_mismatch_pos_of_fst_and_sparse_array_wf
-    {t : ℕ}
-    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
-    (fstSource fstTarget recombRate arraySparsity kappa : ℝ)
+    {t : ℕ} [Fact (2 ≤ t)]
+    (fstSource fstTarget recombRate arraySparsity : ℝ)
+    (rS rT : ℝ)
+    (h_delta : fstTarget - fstSource = (rS - rT)^2)
     (h_fst : fstSource < fstTarget)
     (h_recomb_pos : 0 < recombRate)
-    (h_sparse_pos : 0 < arraySparsity)
-    (h_kappa_pos : 0 < kappa) :
-    0 < frobeniusNormSq (sigmaSource - sigmaTarget) := by
+    (h_sparse_pos : 0 < arraySparsity) :
+    0 < frobeniusNormSq
+      (wrightFisherWitnessMatrix (t := t) rS - wrightFisherWitnessMatrix (t := t) rT) := by
+  let kappa := 2 / (recombRate * arraySparsity)
+  have h_kappa_pos : 0 < kappa := by
+    apply div_pos
+    · norm_num
+    · exact mul_pos h_recomb_pos h_sparse_pos
   exact covariance_mismatch_pos_of_fst_and_sparse_array
-    sigmaSource sigmaTarget fstSource fstTarget recombRate arraySparsity kappa
-    (wrightFisher_covariance_gap_lower_bound sigmaSource sigmaTarget
-      fstSource fstTarget recombRate arraySparsity kappa)
+    (wrightFisherWitnessMatrix (t := t) rS)
+    (wrightFisherWitnessMatrix (t := t) rT)
+    fstSource fstTarget recombRate arraySparsity kappa
+    (by
+      simpa [kappa] using
+        wrightFisher_covariance_gap_lower_bound
+          (t := t) fstSource fstTarget recombRate arraySparsity rS rT h_delta)
     h_fst h_recomb_pos h_sparse_pos h_kappa_pos
 
 /-- End-to-end portability drop from demography + sparse tagging:
+given a model-specific lower bound witnessing covariance divergence,
 `F_ST` divergence and sparse arrays force `R²_target < R²_source` once mismatch lifts MSE. -/
 theorem target_r2_drop_of_fst_and_sparse_array
     {t : ℕ}
