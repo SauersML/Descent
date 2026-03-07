@@ -42,12 +42,12 @@ noncomputable def HWEPolygenicScoreDGP.scoreApproximationError {m : ℕ} [Fintyp
   dgp.scoreModel.berryEsseenErrorBound dgp.berryEsseenConstant
 
 /-- AUC interval induced by a Gaussian approximation center and Berry-Esseen error radius. -/
-def HWEPolygenicScoreDGP.aucApproximationInterval {m : ℕ}
+noncomputable def HWEPolygenicScoreDGP.aucApproximationInterval {m : ℕ} [Fintype (Fin m)]
     (dgp : HWEPolygenicScoreDGP m) (aucGaussian : ℝ) : Set ℝ :=
   Calibrator.aucApproximationInterval aucGaussian dgp.scoreApproximationError
 
 /-- `R²` interval induced by a Gaussian approximation center and Berry-Esseen error radius. -/
-def HWEPolygenicScoreDGP.r2ApproximationInterval {m : ℕ}
+noncomputable def HWEPolygenicScoreDGP.r2ApproximationInterval {m : ℕ} [Fintype (Fin m)]
     (dgp : HWEPolygenicScoreDGP m) (r2Gaussian : ℝ) : Set ℝ :=
   Calibrator.r2ApproximationInterval r2Gaussian dgp.scoreApproximationError
 
@@ -317,7 +317,9 @@ private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
     twoLocusCoalescentCovarianceMatrix (t := t) ibdWeightS recombRateS tmrcaS -
       twoLocusCoalescentCovarianceMatrix (t := t) ibdWeightT recombRateT tmrcaT
   have hi_ne : i0 ≠ i1 := by
-    simpa [i0, i1] using (twoLocusIdx0_ne_twoLocusIdx1 (t := t))
+    intro h
+    have hval := congrArg Fin.val h
+    simp [i0, i1, twoLocusIdx0, twoLocusIdx1] at hval
   have h01 :
       A i0 i1 =
         twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
@@ -337,7 +339,7 @@ private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
     exact Finset.single_le_sum (fun j _ => sq_nonneg (A i1 j)) (by simp)
   have h_pair :
       (∑ i in ({i0, i1} : Finset (Fin t)), ∑ j : Fin t, (A i j)^2) =
-        (∑ j : Fin t, (A i0 j)^2) + ∑ j : Fin t, (A i1 j)^2 := by
+        (∑ j : Fin t, (A i0 j)^2) + (∑ j : Fin t, (A i1 j)^2) := by
     simp [hi_ne]
   have h_selected_le :
       (A i0 i1)^2 + (A i1 i0)^2 ≤
@@ -4402,7 +4404,7 @@ theorem multiplicative_bias_correction (k : ℕ) [Fintype (Fin k)]
       have h_g_cont : Continuous g := by
         have h_g_eq : g = fun pc : ℝ × (Fin k → ℝ) => linearPredictor m_true pc.1 pc.2 := by
           funext pc
-          exact (h_true_eq pc.1 pc.2).symm
+          simpa [g] using (h_true_eq pc.1 pc.2).symm
         have h_cont_true : Continuous (fun pc : ℝ × (Fin k → ℝ) => linearPredictor m_true pc.1 pc.2) := by
           exact
             (linearPredictor_continuous_of_basis_continuous 1 k 1 m_true
@@ -4410,7 +4412,8 @@ theorem multiplicative_bias_correction (k : ℕ) [Fintype (Fin k)]
         simpa [h_g_eq] using h_cont_true
       haveI := h_measure_pos
       have h_ae_eq' : f =ᵐ[stdNormalProdMeasure k] g := by
-        simpa [f, g] using h_ae_eq
+        filter_upwards [h_ae_eq] with pc hpc
+        simpa [f, g] using hpc
       apply Measure.eq_of_ae_eq h_ae_eq' h_f_cont h_g_cont
 
     intro p c
