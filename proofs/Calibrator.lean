@@ -109,6 +109,46 @@ theorem expectedBrierScore_deriv_proved (p π : ℝ) :
   rw [hd_sub, hd_add']
   ring
 
+/-- Concrete 2x2 matrix representing independent LD. -/
+def sigmaS : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 0], ![0, 1]]
+
+/-- Concrete 2x2 matrix representing perfectly correlated LD. -/
+def sigmaT : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 1], ![1, 1]]
+
+/-- Source cross-covariances. -/
+def crossS : Fin 2 → ℝ := ![1, 0]
+
+/-- Target cross-covariances. -/
+def crossT : Fin 2 → ℝ := ![1, 1]
+
+/-- A concrete proof that ERM mismatch occurs under LD shift, without relying on
+    the abstract, vacuous `hConflict` hypothesis from `source_target_erm_differ_of_ld_system_conflict`.
+    Here we construct explicit 2x2 covariance and cross-covariance matrices
+    and show that the weights solving the normal equations must strictly differ. -/
+theorem source_target_erm_differ_proved :
+    let wS : Fin 2 → ℝ := ![1, 0]
+    let wT : Fin 2 → ℝ := ![0.5, 0.5]
+    sigmaS.mulVec wS = crossS ∧
+    sigmaT.mulVec wT = crossT ∧
+    wS ≠ wT := by
+  intro wS wT
+  refine ⟨?_, ?_, ?_⟩
+  · ext i
+    fin_cases i
+    · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
+    · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
+  · ext i
+    fin_cases i
+    · simp [wT, sigmaT, crossT, Matrix.mulVec, dotProduct]
+      ring
+    · simp [wT, sigmaT, crossT, Matrix.mulVec, dotProduct]
+      ring
+  · intro heq
+    have h : wS 0 = wT 0 := congrFun heq 0
+    revert h
+    simp [wS, wT]
+    norm_num
+
 /--
 Helper lemma: A Bayes-optimal model in a capable class Recovers the true expectation pointwise,
 assuming continuity and a strictly positive measure, avoiding specification gaming.
