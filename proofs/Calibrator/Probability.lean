@@ -341,6 +341,7 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
         altAlleleCount DiploidGenotype.het * (2 * h.refFreq * h.altFreq) +
         altAlleleCount DiploidGenotype.homAlt * h.altFreq ^ 2
         = 2 * (h.refFreq * h.altFreq) + 2 * h.altFreq ^ 2 := by
+          simp [altAlleleCount]
           ring
     _ 
         = 2 * h.altFreq * (h.refFreq + h.altFreq) := by ring
@@ -379,7 +380,7 @@ theorem HardyWeinbergModel.genotypeVariance_eq
     h.refFreq ^ 2 * (0 - 2 * h.altFreq) ^ 2 +
         (2 * h.refFreq * h.altFreq) * (1 - 2 * h.altFreq) ^ 2 +
         h.altFreq ^ 2 * (2 - 2 * h.altFreq) ^ 2
-        = 2 * h.refFreq * h.altFreq * (h.refFreq + h.altFreq) := by ring
+        = 2 * h.refFreq * h.altFreq * (h.refFreq + h.altFreq) := by ring_nf
     _ = 2 * h.altFreq * h.refFreq := by rw [hsum]; ring
 
 /-- Absolute third centered moment at one Hardy-Weinberg locus. This is the term that
@@ -491,11 +492,11 @@ theorem tail_probability_error_of_cdf_error
     (cert : CdfApproximationCertificate) (t : ℝ) :
     |((1 - cert.exactCdf t) - (1 - cert.approxCdf t))| ≤ cert.epsilon := by
   have h := cert.pointwise_error t
-  change |-cert.exactCdf t + cert.approxCdf t| ≤ cert.epsilon
-  have habs : |-cert.exactCdf t + cert.approxCdf t| = |cert.exactCdf t - cert.approxCdf t| := by
-    rw [show -cert.exactCdf t + cert.approxCdf t = cert.approxCdf t - cert.exactCdf t by ring]
-    exact abs_sub_comm _ _
-  exact habs.trans_le h
+  calc
+    |((1 - cert.exactCdf t) - (1 - cert.approxCdf t))|
+        = |-(cert.exactCdf t - cert.approxCdf t)| := by ring_nf
+    _ = |cert.exactCdf t - cert.approxCdf t| := by rw [abs_neg]
+    _ ≤ cert.epsilon := h
 
 /-- Closed interval of values consistent with an approximation center and error radius. -/
 def approximationInterval (center epsilon : ℝ) : Set ℝ :=
