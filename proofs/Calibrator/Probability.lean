@@ -292,8 +292,11 @@ theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
   have hrewrite :
       (∑ g : DiploidGenotype, h.genotypeProb g) =
         ∑ i : Fin 3, h.genotypeProb (DiploidGenotype.equivFin3.symm i) := by
-    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (fun _ => rfl)
+    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
+      intro x
+      simp [DiploidGenotype.equivFin3])
   rw [hrewrite]
+  rw [Fin.sum_univ_three]
   simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
   calc
     h.refFreq ^ 2 + 2 * h.refFreq * h.altFreq + h.altFreq ^ 2
@@ -315,8 +318,11 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
       (∑ g : DiploidGenotype, altAlleleCount g * h.genotypeProb g) =
         ∑ i : Fin 3, altAlleleCount (DiploidGenotype.equivFin3.symm i) *
           h.genotypeProb (DiploidGenotype.equivFin3.symm i) := by
-    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (fun _ => rfl)
+    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
+      intro x
+      simp [DiploidGenotype.equivFin3])
   rw [hrewrite]
+  rw [Fin.sum_univ_three]
   simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
   calc
     2 * (h.refFreq * h.altFreq) + 2 * h.altFreq ^ 2
@@ -346,8 +352,11 @@ theorem HardyWeinbergModel.genotypeVariance_eq
         ∑ i : Fin 3,
           h.genotypeProb (DiploidGenotype.equivFin3.symm i) *
             (altAlleleCount (DiploidGenotype.equivFin3.symm i) - 2 * h.altFreq) ^ 2 := by
-    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (fun _ => rfl)
+    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
+      intro x
+      simp [DiploidGenotype.equivFin3])
   rw [hrewrite]
+  rw [Fin.sum_univ_three]
   simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
   calc
     h.refFreq ^ 2 * (0 - 2 * h.altFreq) ^ 2 +
