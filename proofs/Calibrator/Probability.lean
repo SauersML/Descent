@@ -441,7 +441,7 @@ instance stdNormalProdMeasure_is_prob {k : ℕ} [Fintype (Fin k)] : IsProbabilit
 
 This block sets up a canonical random-variable environment for disease modeling:
 - `Ω_k = ℝ × ℝ^k × ℝ`, with coordinates `(S, x, E)`
-- `S`: continuous polygenic score
+- `S`: score coordinate, interpreted either as an exact score or as a Gaussian approximation center
 - `x`: principal-component coordinates
 - `E`: environmental noise
 

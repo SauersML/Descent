@@ -6,6 +6,33 @@ import Calibrator.PortabilityDrift
 
 namespace Calibrator
 
+/-- Top-level HWE expectation identity for the diploid alternative-allele count. -/
+theorem hardyWeinberg_expectedAltAlleleCount_proved
+    (h : HardyWeinbergModel) :
+    h.expectedAltAlleleCount = 2 * h.altFreq :=
+  h.expectedAltAlleleCount_eq
+
+/-- Top-level HWE variance identity for the diploid alternative-allele count. -/
+theorem hardyWeinberg_genotypeVariance_proved
+    (h : HardyWeinbergModel) :
+    h.genotypeVariance = 2 * h.altFreq * h.refFreq :=
+  h.genotypeVariance_eq
+
+/-- Top-level HWE score variance is nonnegative. -/
+theorem hweScoreVariance_nonneg_proved
+    {m : ℕ} [Fintype (Fin m)]
+    (model : HWEScoreModel m) :
+    0 ≤ model.scoreVariance :=
+  model.scoreVariance_nonneg
+
+/-- Top-level Berry-Esseen error radius is nonnegative for the HWE score model. -/
+theorem hweBerryEsseenError_nonneg_proved
+    {m : ℕ} [Fintype (Fin m)]
+    (model : HWEScoreModel m) (berryEsseenConstant : ℝ)
+    (hC : 0 ≤ berryEsseenConstant) :
+    0 ≤ model.berryEsseenErrorBound berryEsseenConstant :=
+  model.berryEsseenErrorBound_nonneg berryEsseenConstant hC
+
 /-- Concrete `2 × 2` specialization of the two-locus coalescent covariance-gap theorem. -/
 theorem twoLocusCoalescent_covariance_gap_lower_bound_proved
     (ibdWeight recombRate : ℝ)
@@ -39,6 +66,24 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent_proved
     (covariance_mismatch_pos_of_twoLocusCoalescent
       (t := 2) ibdWeight recombRate tSource tTarget
       h_ibd_pos h_recomb_pos h_recomb_lt_one h_time)
+
+/-- Top-level AUC interval membership from a Berry-Esseen error bound on the discrete HWE score. -/
+theorem hwe_aucApproximationInterval_membership_proved
+    {m : ℕ} [Fintype (Fin m)]
+    (dgp : HWEPolygenicScoreDGP m)
+    (aucExact aucGaussian : ℝ)
+    (h : |aucExact - aucGaussian| ≤ dgp.scoreApproximationError) :
+    aucExact ∈ dgp.aucApproximationInterval aucGaussian :=
+  dgp.mem_aucApproximationInterval_of_abs_sub_le aucExact aucGaussian h
+
+/-- Top-level `R²` interval membership from a Berry-Esseen error bound on the discrete HWE score. -/
+theorem hwe_r2ApproximationInterval_membership_proved
+    {m : ℕ} [Fintype (Fin m)]
+    (dgp : HWEPolygenicScoreDGP m)
+    (r2Exact r2Gaussian : ℝ)
+    (h : |r2Exact - r2Gaussian| ≤ dgp.scoreApproximationError) :
+    r2Exact ∈ dgp.r2ApproximationInterval r2Gaussian :=
+  dgp.mem_r2ApproximationInterval_of_abs_sub_le r2Exact r2Gaussian h
 
 /-- The true derivative of expected Brier score with respect to `p`,
     proved directly from the functional definition rather than an expanded proxy. -/

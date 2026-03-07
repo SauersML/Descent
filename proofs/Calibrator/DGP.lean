@@ -62,22 +62,7 @@ theorem HWEPolygenicScoreDGP.mem_aucApproximationInterval_of_abs_sub_le
     aucExact aucGaussian dgp.scoreApproximationError
     (by
       unfold HWEPolygenicScoreDGP.scoreApproximationError
-      unfold HWEScoreModel.berryEsseenErrorBound berryEsseenErrorBound
-      have hnum_nonneg :
-          0 ≤ dgp.scoreModel.scoreThirdAbsMomentBound := by
-        unfold HWEScoreModel.scoreThirdAbsMomentBound
-        refine Finset.sum_nonneg ?_
-        intro i _
-        exact mul_nonneg (by positivity)
-          ((dgp.scoreModel.alleleFreq i).genotypeThirdAbsMoment_nonneg)
-      by_cases hvar : dgp.scoreModel.scoreVariance = 0
-      · simp [hvar, dgp.berryEsseenConstant_nonneg]
-      · have hsqrt_nonneg : 0 ≤ Real.sqrt dgp.scoreModel.scoreVariance := Real.sqrt_nonneg _
-        have hvar_nonneg : 0 ≤ dgp.scoreModel.scoreVariance :=
-          HWEScoreModel.scoreVariance_nonneg dgp.scoreModel
-        have hden_nonneg : 0 ≤ dgp.scoreModel.scoreVariance * Real.sqrt dgp.scoreModel.scoreVariance :=
-          mul_nonneg hvar_nonneg hsqrt_nonneg
-        exact div_nonneg (mul_nonneg dgp.berryEsseenConstant_nonneg hnum_nonneg) hden_nonneg)
+      exact dgp.scoreModel.berryEsseenErrorBound_nonneg _ dgp.berryEsseenConstant_nonneg)
     h
 
 /-- Any exact `R²` lying within the Berry-Esseen error radius belongs to the certified interval. -/
@@ -91,22 +76,7 @@ theorem HWEPolygenicScoreDGP.mem_r2ApproximationInterval_of_abs_sub_le
     r2Exact r2Gaussian dgp.scoreApproximationError
     (by
       unfold HWEPolygenicScoreDGP.scoreApproximationError
-      unfold HWEScoreModel.berryEsseenErrorBound berryEsseenErrorBound
-      have hnum_nonneg :
-          0 ≤ dgp.scoreModel.scoreThirdAbsMomentBound := by
-        unfold HWEScoreModel.scoreThirdAbsMomentBound
-        refine Finset.sum_nonneg ?_
-        intro i _
-        exact mul_nonneg (by positivity)
-          ((dgp.scoreModel.alleleFreq i).genotypeThirdAbsMoment_nonneg)
-      by_cases hvar : dgp.scoreModel.scoreVariance = 0
-      · simp [hvar, dgp.berryEsseenConstant_nonneg]
-      · have hsqrt_nonneg : 0 ≤ Real.sqrt dgp.scoreModel.scoreVariance := Real.sqrt_nonneg _
-        have hvar_nonneg : 0 ≤ dgp.scoreModel.scoreVariance :=
-          HWEScoreModel.scoreVariance_nonneg dgp.scoreModel
-        have hden_nonneg : 0 ≤ dgp.scoreModel.scoreVariance * Real.sqrt dgp.scoreModel.scoreVariance :=
-          mul_nonneg hvar_nonneg hsqrt_nonneg
-        exact div_nonneg (mul_nonneg dgp.berryEsseenConstant_nonneg hnum_nonneg) hden_nonneg)
+      exact dgp.scoreModel.berryEsseenErrorBound_nonneg _ dgp.berryEsseenConstant_nonneg)
     h
 
 /-! ### Tagged DGP (Causal vs Observable Architecture)
