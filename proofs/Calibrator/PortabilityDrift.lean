@@ -390,13 +390,39 @@ theorem drift_degrades_signalToNoise
 /-- Drift monotonically degrades present-day `R²` when `V_A, V_E > 0` and `fst < 1`. -/
 theorem drift_degrades_R2
     (V_A V_E fstS fstT : ℝ)
-    (hVA : 0 < V_A)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
-    (hmono : StrictMono (fun x : ℝ => x / (x + V_E))) :
+    (hfstT_le_one : fstT ≤ 1) :
     presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS := by
   unfold presentDayR2 presentDayPGSVariance
-  apply hmono
-  nlinarith [mul_lt_mul_of_pos_right hfst hVA]
+  have h_mono : ∀ (x y : ℝ), 0 ≤ x → x < y → x / (x + V_E) < y / (y + V_E) := by
+    intro x y hx hxy
+    have hxE : 0 < x + V_E := by linarith
+    have hyE : 0 < y + V_E := by linarith [hx, hxy]
+    have hxyE : x + V_E < y + V_E := by linarith
+    have hInv : 1 / (y + V_E) < 1 / (x + V_E) := by
+      rw [one_div_lt_one_div hyE hxE]
+      exact hxyE
+    have hsub : 1 - V_E / (x + V_E) < 1 - V_E / (y + V_E) := by
+      have hmul := mul_lt_mul_of_pos_left hInv hVE
+      have hfrac : V_E / (y + V_E) < V_E / (x + V_E) := by
+        simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hmul
+      nlinarith [hfrac]
+    have hxne : x + V_E ≠ 0 := by linarith
+    have hyne : y + V_E ≠ 0 := by linarith
+    have hxrepr : x / (x + V_E) = 1 - V_E / (x + V_E) := by
+      field_simp [hxne]
+      ring
+    have hyrepr : y / (y + V_E) = 1 - V_E / (y + V_E) := by
+      field_simp [hyne]
+      ring
+    simpa [hxrepr, hyrepr] using hsub
+  have hT_nonneg : 0 ≤ (1 - fstT) * V_A := by
+    have : 0 ≤ 1 - fstT := by linarith
+    exact mul_nonneg this (le_of_lt hVA)
+  have h_lt : (1 - fstT) * V_A < (1 - fstS) * V_A := by
+    nlinarith [mul_lt_mul_of_pos_right hfst hVA]
+  exact h_mono ((1 - fstT) * V_A) ((1 - fstS) * V_A) hT_nonneg h_lt
 
 /-- Drift monotonically degrades AUC for any strictly increasing AUC link on SNR. -/
 theorem drift_degrades_AUC_of_strictMono
@@ -784,13 +810,13 @@ theorem portability_ratio_lt_one_of_drop
 /-- Headline portability theorem: positive drift implies `R²` ratio is strictly below `1`. -/
 theorem portability_ratio_lt_one_of_positive_drift
     (V_A V_E fstS fstT : ℝ)
-    (hVA : 0 < V_A)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
-    (hmono : StrictMono (fun x : ℝ => x / (x + V_E)))
+    (hfstT_le_one : fstT ≤ 1)
     (hsrc_pos : 0 < presentDayR2 V_A V_E fstS) :
     presentDayR2 V_A V_E fstT / presentDayR2 V_A V_E fstS < 1 := by
   have hdrop : presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS :=
-    drift_degrades_R2 V_A V_E fstS fstT hVA hfst hmono
+    drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT_le_one
   exact portability_ratio_lt_one_of_drop (presentDayR2 V_A V_E fstS)
     (presentDayR2 V_A V_E fstT) hsrc_pos hdrop
 
