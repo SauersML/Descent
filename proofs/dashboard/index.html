@@ -422,7 +422,11 @@
 
 <body>
 
-
+  <div class="hero">
+    <h1>Gnomon</h1>
+    <p class="subtitle">PGS Portability Explorer</p>
+    <span class="badge">Every formula backed by a Lean 4 proof</span>
+  </div>
 
   <div class="container">
     <div class="grid-main">
@@ -1084,8 +1088,10 @@
       document.getElementById('metric-tau-t').textContent = tauT.toFixed(4);
 
       // Mean distribution (asymmetric variance, zero expected mean diff)
+      // Apply LD ratio to target variance to match the metrics cards
+      const ldRatio = p.rhoT / p.rhoS;
       const sigS = Math.sqrt(Math.max(0.001, p.vPgsSource));
-      const sigT = Math.sqrt(Math.max(0.001, targetVarianceFromSource(p.vPgsSource, p.fstS, p.fstT)));
+      const sigT = Math.sqrt(Math.max(0.001, targetVarianceFromSource(p.vPgsSource, p.fstS, p.fstT) * ldRatio));
       const shift = expectedAbsMeanDiff(p.vPgsSource, p.d);
 
       const xRange = Math.max(3 * sigS, shift + 3 * sigT);
@@ -1139,10 +1145,12 @@
       document.getElementById('metric-et-diff').textContent = imETdiff(p.M).toFixed(3);
 
       // ── Mean distribution ──
-      const eVarS = targetVarianceFromSource(p.vPgsSource, p.fstS, delta);
-      const sigS = Math.sqrt(Math.max(0.001, eVarS));
-      const eVarT = targetVarianceFromSource(p.vPgsSource, p.fstS, delta);
-      const sigT = Math.sqrt(Math.max(0.001, eVarT));
+      // Under symmetric IM, both demes have the same drift level, so
+      // the variance ratio from drift alone is 1. The only variance
+      // difference comes from differential LD tagging (rhoT/rhoS).
+      const ldRatio = p.rhoT / p.rhoS;
+      const sigS = Math.sqrt(Math.max(0.001, p.vPgsSource));
+      const sigT = Math.sqrt(Math.max(0.001, p.vPgsSource * ldRatio));
       const shift = expectedAbsMeanDiff(p.vPgsSource, 2 * delta);
 
       const xRange = Math.max(3 * sigS, shift + 3 * sigT);
