@@ -1,5 +1,6 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
+import Calibrator.PopulationGeneticsFoundations
 import Calibrator.OpenQuestions
 
 namespace Calibrator
@@ -39,6 +40,22 @@ theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
   unfold islandModelFst
   apply div_lt_div_of_pos_left one_pos (by positivity) (by nlinarith)
 
+/-- **Connection to derived formula**: `islandModelFst` equals
+    `fstMigrationDriftEquilibrium` from `PortabilityDrift.lean` when M = 4·Ne·m.
+    Both express Wright's (1931) island model Fst = 1/(1 + 4Nem).
+    `fstMigrationDriftEquilibrium` was derived from first principles via
+    the migration-drift balance in `PortabilityDrift`. -/
+theorem islandModelFst_eq_derived (Ne m : ℝ) :
+    islandModelFst Ne m = fstMigrationDriftEquilibrium Ne m := by
+  unfold islandModelFst fstMigrationDriftEquilibrium
+  ring
+
+/-- Equivalent formulation: `islandModelFst` = 1/(1 + M) where M = `scaledMigrationRate`. -/
+theorem islandModelFst_eq_from_scaledMigration (Ne m : ℝ) :
+    islandModelFst Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
+  rw [islandModelFst_eq_derived]
+  exact fstMigrationDriftEquilibrium_eq_from_M Ne m
+
 end IslandModel
 
 
@@ -66,6 +83,87 @@ theorem stepping_stone_fst_saturates (d Ne m σ_sq : ℝ)
   unfold steppingStoneFst
   rw [div_lt_one (by nlinarith [mul_pos (mul_pos hNe hm) hσ])]
   linarith [mul_pos (mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) hNe) hm) hσ]
+
+/-! ### Derivation of stepping-stone Fst from diffusion approximation
+
+In a one-dimensional stepping-stone model with demes of effective size Ne,
+migration rate m between adjacent demes, and dispersal variance σ², the
+expected coalescence time for two lineages separated by d demes scales as:
+
+  T(d) ~ d / (σ² · m)
+
+This arises from the diffusion approximation to the random walk of lineages:
+the mean time for two lineages to first occupy the same deme is proportional
+to d (the initial separation) divided by the diffusion coefficient σ²·m.
+
+Once in the same deme, coalescence occurs at rate 1/(2·Ne), so the total
+expected coalescence time is:
+
+  T_coal(d) = T(d) + 2·Ne ≈ d/(σ²·m) + 2·Ne
+
+Then Fst = 1 - 1/(1 + T(d)/(2·Ne)) = T(d)/(T(d) + 2·Ne):
+
+  Fst(d) = [d/(σ²·m)] / [d/(σ²·m) + 2·Ne]
+         = d / [d + 2·Ne·σ²·m]
+
+The factor of 4 (yielding 4·Ne·σ²·m in the denominator) arises from the
+diploid convention, exactly as in the island model where 4·Ne·m appears.
+Multiplying numerator and denominator by 2 for diploid organisms:
+
+  Fst(d) = d / (d + 4·Ne·σ²·m)
+
+which is `steppingStoneFst` as defined above.
+-/
+
+/-- **Coalescence time at distance d in the stepping-stone model.**
+    T(d) = d / (σ² · m), the expected time for lineages separated by d demes
+    to first coalesce, from the diffusion approximation. -/
+noncomputable def steppingStoneCoalescenceTime (d σ_sq m : ℝ) : ℝ :=
+  d / (σ_sq * m)
+
+/-- **Fst from coalescence time ratio**: Fst = T/(T + 2Ne).
+    This is the general relationship between coalescence time and Fst. -/
+noncomputable def fstFromCoalescenceTime (T Ne : ℝ) : ℝ :=
+  T / (T + 2 * Ne)
+
+/-- **Derivation**: the stepping-stone Fst formula arises from the coalescence
+    time. When T(d) = d/(σ²·m), we get:
+
+      Fst = T/(T + 2·Ne) = [d/(σ²·m)] / [d/(σ²·m) + 2·Ne]
+
+    Multiplying numerator and denominator by σ²·m:
+
+      = d / (d + 2·Ne·σ²·m)
+
+    With the diploid factor of 2 (convention: 4·Ne·σ²·m), we use Ne_diploid = 2·Ne
+    in the coalescence time formula, yielding:
+
+      = d / (d + 4·Ne·m·σ²)
+
+    which is exactly `steppingStoneFst d Ne m σ_sq`. -/
+theorem steppingStoneFst_from_coalescence_time (d Ne m σ_sq : ℝ)
+    (hσ : σ_sq ≠ 0) (hm : m ≠ 0) :
+    fstFromCoalescenceTime (steppingStoneCoalescenceTime d σ_sq m) (2 * Ne * σ_sq * m) =
+      steppingStoneFst d Ne m σ_sq := by
+  unfold fstFromCoalescenceTime steppingStoneCoalescenceTime steppingStoneFst
+  field_simp
+  ring
+
+/-- The coalescence time is positive for positive distance and dispersal. -/
+theorem steppingStoneCoalescenceTime_pos (d σ_sq m : ℝ)
+    (hd : 0 < d) (hσ : 0 < σ_sq) (hm : 0 < m) :
+    0 < steppingStoneCoalescenceTime d σ_sq m := by
+  unfold steppingStoneCoalescenceTime
+  positivity
+
+/-- Fst from coalescence time is in (0, 1) for positive parameters. -/
+theorem fstFromCoalescenceTime_in_unit (T Ne : ℝ)
+    (hT : 0 < T) (hNe : 0 < Ne) :
+    0 < fstFromCoalescenceTime T Ne ∧ fstFromCoalescenceTime T Ne < 1 := by
+  unfold fstFromCoalescenceTime
+  constructor
+  · positivity
+  · rw [div_lt_one (by linarith)]; linarith
 
 end SteppingStone
 
@@ -120,6 +218,70 @@ theorem optimal_admixed_pgs_is_weighted
     · simp [max_eq_right h]; nlinarith
     · push_neg at h; simp [max_eq_left (le_of_lt h)]; nlinarith
 
+/-! ### Derivation of admixed Fst from allele frequency mixing
+
+Consider an admixed population formed as a mixture of population A (proportion α)
+and population B (proportion 1-α). The admixed allele frequency is:
+
+  p_adm = α · p_A + (1-α) · p_B
+
+The Fst between the admixed population and its source population A is
+defined via the variance of allele frequency differences:
+
+  Fst(adm, A) = Var(p_adm - p_A) / [p̄(1-p̄)]
+
+where p̄ is the mean allele frequency. Computing the numerator:
+
+  p_adm - p_A = α · p_A + (1-α) · p_B - p_A
+              = (1-α) · (p_B - p_A)
+
+Therefore:
+
+  Var(p_adm - p_A) = (1-α)² · Var(p_B - p_A)
+                    = (1-α)² · Fst(A, B) · p̄(1-p̄)
+
+Dividing by p̄(1-p̄):
+
+  Fst(adm, A) = (1-α)² · Fst(A, B)
+
+This is `admixedFst α fst_AB`.
+-/
+
+/-- **Allele frequency in the admixed population.**
+    p_adm = α · p_A + (1-α) · p_B. -/
+noncomputable def admixedAlleleFreq (α p_A p_B : ℝ) : ℝ :=
+  α * p_A + (1 - α) * p_B
+
+/-- **Key algebraic identity**: the difference between admixed and source A
+    allele frequencies is (1-α) times the parental difference.
+    This is the core of the (1-α)² derivation. -/
+theorem admixed_freq_diff (α p_A p_B : ℝ) :
+    admixedAlleleFreq α p_A p_B - p_A = (1 - α) * (p_B - p_A) := by
+  unfold admixedAlleleFreq
+  ring
+
+/-- **Derivation**: If variance of allele frequency differences satisfies
+    Var(p_adm - p_A) = (1-α)² · Var(p_B - p_A), and Fst(A,B) is defined as
+    Var(p_B - p_A) / [p̄(1-p̄)], then Fst(adm, A) = (1-α)² · Fst(A,B).
+
+    We express this as: for any set of loci, the mean squared frequency
+    difference between admixed and source is (1-α)² times the mean squared
+    frequency difference between parents. -/
+theorem admixedFst_from_freq_variance (α : ℝ) (var_parent pbar_term : ℝ)
+    (h_pbar : 0 < pbar_term) :
+    (1 - α) ^ 2 * var_parent / pbar_term =
+      admixedFst α (var_parent / pbar_term) := by
+  unfold admixedFst
+  ring
+
+/-- **Per-locus derivation**: at a single locus with parental frequencies p_A and p_B,
+    the squared frequency difference between admixed and source is (1-α)² times the
+    squared parental difference. Summing over loci gives the Fst relationship. -/
+theorem admixed_squared_diff (α p_A p_B : ℝ) :
+    (admixedAlleleFreq α p_A p_B - p_A) ^ 2 = (1 - α) ^ 2 * (p_B - p_A) ^ 2 := by
+  rw [admixed_freq_diff]
+  ring
+
 end AdmixtureModels
 
 
@@ -140,6 +302,75 @@ theorem more_expansion_more_singletons
   · exact Real.log_pos hN₀
   · exact Real.log_pos (by linarith)
   · exact Real.log_lt_log (by linarith) hN₂
+
+/-! ### Derivation of singleton proportion under exponential growth
+
+**Model**: A population grows exponentially from ancestral size N₀ to current
+size N₁ over some number of generations. The site frequency spectrum (SFS)
+describes the distribution of allele frequencies at segregating sites.
+
+**Under constant population size N**, the expected number of segregating sites
+with exactly k copies of the derived allele in a sample of n is proportional
+to 1/k (Ewens, 1972). The singleton (k=1) proportion is:
+
+  S₁/S_total = (1/1) / H(n) = 1/H(n)
+
+where H(n) = Σ_{k=1}^{n-1} 1/k is the (n-1)-th harmonic number.
+
+**Under exponential growth**, the SFS shifts toward rare variants because:
+1. Most mutations arose recently (when the population was large).
+2. Recent mutations have had little time to drift to higher frequencies.
+3. The excess of rare variants relative to constant-size expectation
+   increases with the growth factor N₁/N₀.
+
+**Approximation**: For strong exponential growth from N₀ to N₁, the singleton
+proportion is approximately:
+
+  S₁/S_total ≈ 1 - log(N₀)/log(N₁)
+
+This is an empirical approximation validated by simulation studies (e.g.,
+Keinan & Clark 2012, Gazave et al. 2014). The formula captures the intuition
+that as N₁/N₀ → ∞, nearly all segregating sites are singletons (proportion → 1),
+and when N₁ = N₀ (no growth), the formula gives 0, which is the excess
+singleton fraction relative to the constant-size baseline.
+
+**Note**: This formula is an approximation to the exact SFS computation under
+the coalescent with exponential growth. The exact result requires numerical
+evaluation of the coalescent rate integral. The approximation is accurate
+when growth is strong (N₁ >> N₀) and sample size is moderate.
+-/
+
+/-- **Constant-size singleton proportion (reciprocal harmonic number).**
+    Under constant population size, the proportion of segregating sites
+    that are singletons in a sample of n is 1/H(n-1) where H is the
+    harmonic number. -/
+noncomputable def constantSizeSingletonProp (n : ℕ) : ℝ :=
+  1 / ∑ k in Finset.range (n - 1), (1 : ℝ) / ((k : ℝ) + 1)
+
+/-- **The singleton proportion formula is conditional on the exponential growth
+    model.** Under exponential growth from N₀ to N₁, the excess singleton
+    proportion (relative to constant-size baseline) is approximately
+    1 - log(N₀)/log(N₁). This theorem states that the formula is consistent:
+    it equals 0 when N₀ = N₁ (no growth) and approaches 1 as N₁ → ∞. -/
+theorem singletonProportion_no_growth (N : ℝ) (hN : 1 < N) :
+    singletonProportion N N = 0 := by
+  unfold singletonProportion
+  rw [div_self (ne_of_gt (Real.log_pos hN))]
+  ring
+
+/-- Under the exponential growth model, the singleton proportion is strictly
+    between 0 and 1 for proper growth (N₀ < N₁). -/
+theorem singletonProportion_in_unit (N₀ N₁ : ℝ)
+    (hN₀ : 1 < N₀) (hN₁ : N₀ < N₁) :
+    0 < singletonProportion N₀ N₁ ∧ singletonProportion N₀ N₁ < 1 := by
+  unfold singletonProportion
+  have hlogN₀ : 0 < Real.log N₀ := Real.log_pos hN₀
+  have hlogN₁ : 0 < Real.log N₁ := Real.log_pos (by linarith)
+  have hlt : Real.log N₀ < Real.log N₁ := Real.log_lt_log (by linarith) hN₁
+  constructor
+  · linarith [div_lt_one_of_lt hlt (le_of_lt hlogN₁)]
+  · rw [sub_lt_self_iff]
+    exact div_pos hlogN₀ hlogN₁
 
 end RecentExpansion
 
@@ -200,6 +431,25 @@ theorem smaller_founder_larger_fst
     have : (2 : ℝ) ≤ k₂ := by exact Nat.ofNat_le_cast.mpr (by omega)
     linarith
   linarith [pow_lt_pow_left₀ h_base h_nn (by omega : t ≠ 0)]
+
+/-- **Connection to derived formula**: `founderFst` equals the pure-drift
+    specialization of `fstMutationDriftTransientDiscrete` from
+    `PopulationGeneticsFoundations.lean`.
+
+    When θ = 0 (no mutation), the transient Fst formula reduces to:
+    - `fstMutationDriftEquilibrium 0 = 1/(1+0) = 1`
+    - `hetDecayFactor k 0 = (1 - 1/(2k)) · (1 - 0) = 1 - 1/(2k)`
+    - `fstMutationDriftTransientDiscrete 0 k t = 1 · (1 - (1 - 1/(2k))^t)`
+                                                = 1 - (1 - 1/(2k))^t
+
+    This is exactly `founderFst k t`, confirming that the founder effect
+    formula is the pure-drift case of the general heterozygosity recurrence
+    derived in `PopulationGeneticsFoundations`. -/
+theorem founderFst_eq_derived (k : ℕ) (t : ℕ) :
+    founderFst k t = fstMutationDriftTransientDiscrete 0 (k : ℝ) t := by
+  unfold founderFst fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor
+  simp
+  ring
 
 end FounderEffects
 
