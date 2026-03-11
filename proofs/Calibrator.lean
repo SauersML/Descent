@@ -36,6 +36,8 @@ import Calibrator.PowerAnalysis
 import Calibrator.CovarianceStructure
 import Calibrator.MendelianRandomization
 import Calibrator.CausalInference
+import Calibrator.FineMapping
+import Calibrator.PolygenicArchitecture
 
 namespace Calibrator
 
