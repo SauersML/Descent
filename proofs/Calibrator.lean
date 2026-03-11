@@ -16,6 +16,11 @@ import Calibrator.VarianceComponents
 import Calibrator.ScoreDistribution
 import Calibrator.SimulationValidation
 import Calibrator.GeneticArchitectureDiscovery
+import Calibrator.PredictionIntervalTheory
+import Calibrator.BayesianPGSTheory
+import Calibrator.PhenomeWidePortability
+import Calibrator.AncestryDeconvolution
+import Calibrator.TransferLearningPGS
 
 namespace Calibrator
 
