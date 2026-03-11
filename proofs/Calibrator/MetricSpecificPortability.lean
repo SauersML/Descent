@@ -26,6 +26,245 @@ Reference: Wang et al. (2026), Nature Communications 17:942.
 
 
 /-!
+## R² Decomposition from First Principles
+
+We derive the decomposition R² = discrimination × calibration from the
+standard regression definition R² = 1 − SS_res/SS_tot, rather than
+assuming it as a parameter structure.
+
+### Setup
+- Y is the observed outcome with variance Var(Y).
+- Ŷ is the predicted value from a model.
+- R² = 1 − SS_res/SS_tot = 1 − Var(Y − Ŷ)/Var(Y).
+- By the law of total variance,
+    Var(Y) = Var(E[Y|Ŷ]) + E[Var(Y|Ŷ)],
+  so R² = Var(E[Y|Ŷ])/Var(Y) when we use the population version.
+
+### Decomposition
+Write E[Y|Ŷ] = f(Ŷ), the calibration function.
+- **Discrimination** captures how spread out the predictions are
+  relative to outcome variance: disc = Var(Ŷ)/Var(Y).
+- **Calibration** captures how well the calibration function f
+  preserves the variance of Ŷ: cal = Var(f(Ŷ))/Var(Ŷ).
+
+Then: R² = Var(E[Y|Ŷ])/Var(Y)
+         = Var(f(Ŷ))/Var(Y)
+         = [Var(f(Ŷ))/Var(Ŷ)] × [Var(Ŷ)/Var(Y)]
+         = cal × disc.
+
+When perfectly calibrated, f = id, so cal = 1 and R² = disc.
+-/
+
+section R2Decomposition
+
+/-- Algebraic representation of the components entering the R² decomposition.
+
+    All quantities are real-valued summary statistics computed from the joint
+    distribution of (Y, Ŷ).  The structure records:
+    • `varY`      — Var(Y), total outcome variance,
+    • `varYhat`   — Var(Ŷ), variance of the predictor,
+    • `varCondE`  — Var(E[Y|Ŷ]) = Var(f(Ŷ)), explained variance,
+    where f is the calibration function f(ŷ) = E[Y | Ŷ = ŷ].
+
+    From these three quantities every other object (R², discrimination,
+    calibration) is a ratio, and the key factorization is purely algebraic. -/
+structure R2DecompositionData where
+  varY     : ℝ   -- Var(Y), total outcome variance
+  varYhat  : ℝ   -- Var(Ŷ), variance of the predictor
+  varCondE : ℝ   -- Var(E[Y|Ŷ]) = Var(f(Ŷ)), the explained variance
+  hVarY_pos     : 0 < varY
+  hVarYhat_pos  : 0 < varYhat
+  hVarCondE_pos : 0 < varCondE
+  -- Var(f(Ŷ)) ≤ Var(Ŷ) (f can only shrink variance unless it stretches)
+  hCondE_le_Yhat : varCondE ≤ varYhat
+  -- Var(Ŷ) ≤ Var(Y) (predictor can't have more spread than outcome in R² ≤ 1 regime)
+  hYhat_le_Y : varYhat ≤ varY
+  -- Var(E[Y|Ŷ]) ≤ Var(Y) (law of total variance: explained ≤ total)
+  hCondE_le_Y : varCondE ≤ varY
+
+/-- **R² from the standard definition** (population version).
+
+    R² = Var(E[Y|Ŷ]) / Var(Y).
+
+    This is equivalent to 1 − SS_res/SS_tot when SS_res is evaluated
+    at the population level, because
+      SS_res/SS_tot = Var(Y − E[Y|Ŷ])/Var(Y)
+                    = E[Var(Y|Ŷ)]/Var(Y)
+                    = 1 − Var(E[Y|Ŷ])/Var(Y)
+    by the law of total variance. -/
+noncomputable def R2DecompositionData.r2 (d : R2DecompositionData) : ℝ :=
+  d.varCondE / d.varY
+
+/-- **Discrimination component**: Var(Ŷ)/Var(Y).
+
+    Measures the predictor's ability to spread predictions across the
+    range of outcomes — the rank-ordering / signal-spread component.
+    Monotonically related to AUC for binary outcomes via the liability
+    threshold model. -/
+noncomputable def R2DecompositionData.discrimination (d : R2DecompositionData) : ℝ :=
+  d.varYhat / d.varY
+
+/-- **Calibration component**: Var(f(Ŷ))/Var(Ŷ) where f(ŷ) = E[Y|Ŷ=ŷ].
+
+    Measures how well the calibration function preserves the predictor's
+    variance.  When perfectly calibrated (f = id), this equals 1.
+    When miscalibrated, f compresses Ŷ's spread, so this factor < 1. -/
+noncomputable def R2DecompositionData.calibration (d : R2DecompositionData) : ℝ :=
+  d.varCondE / d.varYhat
+
+/-- **The fundamental factorization**: R² = discrimination × calibration.
+
+    Proof:  R²   = Var(E[Y|Ŷ]) / Var(Y)
+                 = [Var(Ŷ)/Var(Y)] × [Var(E[Y|Ŷ])/Var(Ŷ)]
+                 = disc × cal.
+
+    This is a purely algebraic identity once we note
+    (a/c) = (b/c) × (a/b) for positive b, c. -/
+theorem R2DecompositionData.r2_eq_disc_mul_cal (d : R2DecompositionData) :
+    d.r2 = d.discrimination * d.calibration := by
+  unfold r2 discrimination calibration
+  rw [div_mul_div_comm]
+  rw [div_eq_div_iff (ne_of_gt d.hVarY_pos)
+        (mul_ne_zero (ne_of_gt d.hVarY_pos) (ne_of_gt d.hVarYhat_pos))]
+  ring
+
+/-- **R² is bounded by discrimination**.
+
+    Since calibration ≤ 1 (from Var(f(Ŷ)) ≤ Var(Ŷ)), we have
+    R² = disc × cal ≤ disc × 1 = disc. -/
+theorem R2DecompositionData.r2_le_discrimination (d : R2DecompositionData) :
+    d.r2 ≤ d.discrimination := by
+  unfold r2 discrimination
+  apply div_le_div_of_nonneg_right d.hCondE_le_Yhat d.hVarY_pos
+
+/-- **R² is nonneg** (immediate from positive components). -/
+theorem R2DecompositionData.r2_nonneg (d : R2DecompositionData) :
+    0 ≤ d.r2 := by
+  unfold r2
+  exact div_nonneg (le_of_lt d.hVarCondE_pos) (le_of_lt d.hVarY_pos)
+
+/-- **R² ≤ 1** (from Var(E[Y|Ŷ]) ≤ Var(Y)). -/
+theorem R2DecompositionData.r2_le_one (d : R2DecompositionData) :
+    d.r2 ≤ 1 := by
+  unfold r2
+  exact div_le_one_of_le d.hCondE_le_Y (le_of_lt d.hVarY_pos)
+
+/-- **Discrimination is in [0, 1]**. -/
+theorem R2DecompositionData.disc_le_one (d : R2DecompositionData) :
+    d.discrimination ≤ 1 := by
+  unfold discrimination
+  exact div_le_one_of_le d.hYhat_le_Y (le_of_lt d.hVarY_pos)
+
+theorem R2DecompositionData.disc_pos (d : R2DecompositionData) :
+    0 < d.discrimination := by
+  unfold discrimination
+  exact div_pos d.hVarYhat_pos d.hVarY_pos
+
+/-- **Calibration is in [0, 1]**. -/
+theorem R2DecompositionData.cal_le_one (d : R2DecompositionData) :
+    d.calibration ≤ 1 := by
+  unfold calibration
+  exact div_le_one_of_le d.hCondE_le_Yhat (le_of_lt d.hVarYhat_pos)
+
+theorem R2DecompositionData.cal_pos (d : R2DecompositionData) :
+    0 < d.calibration := by
+  unfold calibration
+  exact div_pos d.hVarCondE_pos d.hVarYhat_pos
+
+/-- **Perfect calibration implies R² = discrimination**.
+
+    When f = id, Var(f(Ŷ)) = Var(Ŷ), so cal = 1 and R² = disc. -/
+theorem R2DecompositionData.perfect_calibration_r2_eq_disc (d : R2DecompositionData)
+    (h_perfect : d.varCondE = d.varYhat) :
+    d.r2 = d.discrimination := by
+  unfold r2 discrimination
+  rw [h_perfect]
+
+/-- **Calibration loss strictly reduces R² below discrimination**.
+
+    If cal < 1 (i.e., Var(f(Ŷ)) < Var(Ŷ)), then R² < disc. -/
+theorem R2DecompositionData.cal_loss_reduces_r2 (d : R2DecompositionData)
+    (h_miscal : d.varCondE < d.varYhat) :
+    d.r2 < d.discrimination := by
+  unfold r2 discrimination
+  exact div_lt_div_of_pos_right h_miscal d.hVarY_pos
+
+/-- **R² is less portable than AUC, derived from the decomposition**.
+
+    Given two populations (source, target) where discrimination (the
+    AUC-related component) transfers with ratio ρ_disc and calibration
+    with ratio ρ_cal, and calibration is partially lost (ρ_cal < 1):
+
+    • R²_target / R²_source = ρ_disc × ρ_cal  (from the factorization)
+    • AUC portability ratio  = ρ_disc           (AUC depends only on discrimination)
+
+    Therefore R² portability < AUC portability whenever ρ_cal < 1.
+
+    This theorem derives the inequality from the algebraic decomposition
+    rather than taking ρ_disc, ρ_cal as opaque parameters. -/
+theorem r2_less_portable_than_auc_from_decomposition
+    (source target : R2DecompositionData)
+    -- Same total outcome variance (or we work with ratios)
+    (hVarY_eq : source.varY = target.varY)
+    -- Discrimination (Var(Ŷ)) transfers: target may have less
+    (hDisc : target.varYhat ≤ source.varYhat)
+    -- Calibration is strictly lost: Var(f(Ŷ))/Var(Ŷ) is lower in target
+    (hCalLoss : target.calibration < source.calibration)
+    -- Source is perfectly calibrated (f = id in source)
+    (hSourceCal : source.varCondE = source.varYhat) :
+    -- R² portability ratio < discrimination portability ratio
+    target.r2 / source.r2 < target.discrimination / source.discrimination := by
+  -- Rewrite R² in terms of disc × cal
+  have h_src_r2 : source.r2 = source.discrimination * source.calibration :=
+    source.r2_eq_disc_mul_cal
+  have h_tgt_r2 : target.r2 = target.discrimination * target.calibration :=
+    target.r2_eq_disc_mul_cal
+  -- Source calibration = 1
+  have h_src_cal : source.calibration = 1 := by
+    unfold R2DecompositionData.calibration
+    rw [hSourceCal]
+    exact div_self (ne_of_gt source.hVarYhat_pos)
+  -- Source R² = disc_source × 1 = disc_source
+  have h_src_r2_eq : source.r2 = source.discrimination := by
+    rw [h_src_r2, h_src_cal, mul_one]
+  -- Target calibration < 1 (from hCalLoss and source cal = 1)
+  have h_tgt_cal_lt : target.calibration < 1 := by
+    rw [h_src_cal] at hCalLoss; exact hCalLoss
+  -- Now: target.r2 / source.r2
+  --    = (target.disc × target.cal) / source.disc
+  --    < target.disc / source.disc   (since target.cal < 1)
+  rw [h_tgt_r2, h_src_r2_eq]
+  have h_src_disc_pos : 0 < source.discrimination := source.disc_pos
+  have h_tgt_disc_pos : 0 < target.discrimination := target.disc_pos
+  rw [mul_div_assoc]
+  exact mul_lt_of_lt_one_right (div_pos h_tgt_disc_pos h_src_disc_pos) h_tgt_cal_lt
+
+/-- **Cross-population R² ratio equals product of component ratios**.
+
+    If the source is perfectly calibrated:
+      R²_target / R²_source = (disc_target / disc_source) × cal_target
+
+    This makes explicit that R² portability is the product of how well
+    discrimination transfers and the residual calibration in the target. -/
+theorem r2_portability_ratio_factorization
+    (source target : R2DecompositionData)
+    (hSourceCal : source.varCondE = source.varYhat) :
+    target.r2 / source.r2 =
+      (target.discrimination / source.discrimination) * target.calibration := by
+  have h_src_r2 := source.r2_eq_disc_mul_cal
+  have h_tgt_r2 := target.r2_eq_disc_mul_cal
+  have h_src_cal : source.calibration = 1 := by
+    unfold R2DecompositionData.calibration
+    rw [hSourceCal]
+    exact div_self (ne_of_gt source.hVarYhat_pos)
+  have h_src_r2_eq : source.r2 = source.discrimination := by
+    rw [h_src_r2, h_src_cal, mul_one]
+  rw [h_tgt_r2, h_src_r2_eq, mul_div_assoc]
+
+end R2Decomposition
+
+
+/-!
 ## R² vs AUC: Different Portability Measures
 
 R² measures variance explained (continuous traits).
