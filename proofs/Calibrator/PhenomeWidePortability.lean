@@ -110,8 +110,8 @@ section ImmuneTraits
     balancing/diversifying selection → low portability. -/
 theorem hla_disproportionate_variance
     (r2_hla r2_genome_wide n_hla_snps n_total_snps : ℝ)
-    (h_snp_fraction : n_hla_snps / n_total_snps < 0.01)
-    (h_var_fraction : 0.1 < r2_hla / r2_genome_wide)
+    (h_snp_fraction : n_hla_snps / n_total_snps < 1/100)
+    (h_var_fraction : 1/10 < r2_hla / r2_genome_wide)
     (h_r2_gw : 0 < r2_genome_wide) (h_snps : 0 < n_total_snps) :
     -- HLA contributes >10x its share of genome
     n_hla_snps / n_total_snps < r2_hla / r2_genome_wide := by
@@ -133,8 +133,8 @@ theorem immune_portability_bounded_by_rho
         differences due to malaria selection. -/
 theorem wbc_portability_below_neutral
     (port_wbc port_neutral : ℝ)
-    (h_wbc : port_wbc < 0.3)
-    (h_neutral : 0.8 < port_neutral) :
+    (h_wbc : port_wbc < 3/10)
+    (h_neutral : 4/5 < port_neutral) :
     port_wbc < port_neutral := by linarith
 
 /-- **Allele under selection contributes disproportionally to portability loss.**
@@ -205,10 +205,10 @@ section AnthropometricTraits
     Neutral prediction: ~85%. The small gap is mostly LD mismatch,
     not effect size differences. -/
 theorem height_near_neutral_portability
-    (port_height port_neutral gap : ℝ)
+    (port_height port_neutral gap ε : ℝ)
     (h_gap_def : gap = port_neutral - port_height)
-    (h_small_gap : gap < 0.15) (h_neutral : 0 < port_neutral) :
-    port_height > port_neutral - 0.15 := by linarith
+    (h_small_gap : gap < ε) (h_neutral : 0 < port_neutral) :
+    port_height > port_neutral - ε := by linarith
 
 /-- **Height's high polygenicity aids portability.**
     With ~10000 loci, no single locus dominates.
@@ -220,13 +220,13 @@ theorem polygenicity_stabilizes_portability
     (h_total : total_var = n_loci * per_locus_var)
     (h_var_pos : 0 < per_locus_var) :
     -- Each locus contributes < 0.1% of total variance
-    per_locus_var / total_var < 0.001 := by
+    per_locus_var / total_var < 1/1000 := by
   rw [h_total]
   rw [show per_locus_var / (↑n_loci * per_locus_var) = 1 / ↑n_loci from by
     field_simp]
   have h_n_pos : (0 : ℝ) < ↑n_loci := Nat.cast_pos.mpr (by omega)
-  rw [one_div, inv_lt_comm₀ h_n_pos (by norm_num : (0:ℝ) < 0.001)]
-  calc (0.001 : ℝ)⁻¹ = 1000 := by norm_num
+  rw [one_div, inv_lt_comm₀ h_n_pos (by norm_num : (0:ℝ) < (1 : ℝ)/1000)]
+  calc ((1 : ℝ)/1000)⁻¹ = 1000 := by norm_num
     _ < ↑n_loci := by exact_mod_cast h_many
 
 /-- **Skin pigmentation shows the worst anthropometric portability.**
@@ -234,7 +234,7 @@ theorem polygenicity_stabilizes_portability
     This is the exception among anthropometric traits. -/
 theorem pigmentation_poor_portability
     (port_height port_pigmentation : ℝ)
-    (h_much_worse : port_pigmentation < 0.5 * port_height)
+    (h_much_worse : port_pigmentation < 1/2 * port_height)
     (h_height_pos : 0 < port_height) :
     port_pigmentation < port_height := by linarith
 
@@ -265,12 +265,12 @@ theorem correlated_architecture_correlated_portability
     The second factor captures selection-driven divergence.
     Together they explain >80% of portability variance across traits. -/
 theorem two_factor_model_of_portability
-    (var_explained_f1 var_explained_f2 : ℝ)
-    (h_f1 : 0.5 < var_explained_f1)
-    (h_f2 : 0.2 < var_explained_f2)
+    (var_explained_f1 var_explained_f2 lb₁ lb₂ : ℝ)
+    (h_f1 : lb₁ < var_explained_f1)
+    (h_f2 : lb₂ < var_explained_f2)
     (h_total : var_explained_f1 + var_explained_f2 ≤ 1)
     (h_f1_nn : 0 ≤ var_explained_f1) (h_f2_nn : 0 ≤ var_explained_f2) :
-    0.7 < var_explained_f1 + var_explained_f2 := by linarith
+    lb₁ + lb₂ < var_explained_f1 + var_explained_f2 := by linarith
 
 /-- **Portability prediction from trait characteristics.**
     Given: polygenicity, heritability, and selection signal,
@@ -278,10 +278,10 @@ theorem two_factor_model_of_portability
     High polygenicity + low selection → good portability.
     Low polygenicity + high selection → poor portability. -/
 theorem portability_predictable_from_characteristics
-    (polygenicity selection_signal predicted_port actual_port ε : ℝ)
+    (polygenicity selection_signal predicted_port actual_port ε bound : ℝ)
     (h_prediction : |actual_port - predicted_port| ≤ ε)
-    (h_small_error : ε < 0.1) :
-    |actual_port - predicted_port| < 0.1 := by linarith
+    (h_small_error : ε < bound) :
+    |actual_port - predicted_port| < bound := by linarith
 
 /-- **Disease traits vs quantitative traits.**
     Disease traits often show worse portability than their

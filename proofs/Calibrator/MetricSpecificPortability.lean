@@ -109,8 +109,9 @@ section CalibrationVsDiscrimination
 theorem discrimination_preserved_calibration_lost
     (auc_source auc_target : ℝ)
     (cal_source cal_target : ℝ)
-    (h_disc_preserved : |auc_source - auc_target| < 0.05)
-    (h_cal_lost : 0.1 < |cal_source - cal_target|) :
+    (δ : ℝ)
+    (h_disc_preserved : |auc_source - auc_target| < δ)
+    (h_cal_lost : δ < |cal_source - cal_target|) :
     -- Calibration is more affected than discrimination
     |auc_source - auc_target| < |cal_source - cal_target| := by
   linarith
@@ -264,8 +265,10 @@ section MetricAndClinicalDecisions
     The appropriate portability metric depends on the clinical use. -/
 theorem different_uses_different_metrics
     (port_sensitivity port_ppv : ℝ)
-    (h_screening_ok : 0.9 < port_sensitivity)
-    (h_diagnosis_bad : port_ppv < 0.7) :
+    (t_sens t_ppv : ℝ)
+    (h_screening_ok : t_sens < port_sensitivity)
+    (h_diagnosis_bad : port_ppv < t_ppv)
+    (h_thresholds : t_ppv ≤ t_sens) :
     -- Screening is portable but diagnosis is not
     port_ppv < port_sensitivity := by linarith
 
@@ -293,10 +296,12 @@ theorem clinical_utility_threshold
     reporting R², AUC, calibration, and NRI together. -/
 theorem single_metric_misleading
     (port_r2 port_auc port_cal port_nri : ℝ)
-    (h_r2_bad : port_r2 < 0.5)
-    (h_auc_ok : 0.8 < port_auc)
-    (h_cal_bad : port_cal < 0.5)
-    (h_nri_ok : 0.6 < port_nri) :
+    (t₁ t₂ t₃ t₄ : ℝ)
+    (h_r2_bad : port_r2 < t₁)
+    (h_auc_ok : t₂ < port_auc)
+    (h_cal_bad : port_cal < t₃)
+    (h_nri_ok : t₄ < port_nri)
+    (h_t₁_le_t₂ : t₁ ≤ t₂) (h_t₃_le_t₄ : t₃ ≤ t₄) :
     -- Metrics disagree: R² and calibration bad, AUC and NRI ok
     port_r2 < port_auc ∧ port_cal < port_nri := by
   constructor <;> linarith

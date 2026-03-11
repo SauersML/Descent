@@ -83,7 +83,7 @@ theorem height_near_neutral_qst
     genetic architecture across populations. -/
 theorem immune_excess_qst
     (qst_immune fst : ℝ)
-    (h_excess : fst + 0.1 < qst_immune) :
+    (h_excess : fst + 1/10 < qst_immune) :
     fst < qst_immune := by linarith
 
 end QSTFSTTest
@@ -249,10 +249,10 @@ theorem confounding_overestimates_portability_loss
     Adaptation for immune defense can change lipid levels, BMI, etc.
     This creates correlated portability patterns across traits. -/
 theorem pleiotropic_adaptation_correlates_portability
-    (port_trait1 port_trait2 rg : ℝ)
+    (port_trait1 port_trait2 rg lb : ℝ)
     (h_correlated : |port_trait1 - port_trait2| ≤ 2 * (1 - |rg|))
-    (h_rg_high : 0.8 < |rg|) :
-    |port_trait1 - port_trait2| < 0.4 := by linarith
+    (h_rg_high : lb < |rg|) :
+    |port_trait1 - port_trait2| < 2 * (1 - lb) := by linarith
 
 end DetectingAdaptation
 
