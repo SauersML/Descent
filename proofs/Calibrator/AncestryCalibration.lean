@@ -210,14 +210,12 @@ theorem measurement_invariance_violation
     have : 1 = scale ^ 2 := by
       field_simp at this ⊢
       nlinarith
-    have : scale = 1 ∨ scale = -1 := by
-      have h_sq : scale ^ 2 = 1 := by linarith
-      rcases sq_eq_one_iff_of_ne_neg_one (by linarith : scale ≠ -1) |>.mp h_sq with h
-      · left; exact h
-      sorry  -- edge case: scale = -1 but we have scale > 0
-    rcases this with h | h
-    · exact h_scale h
-    · linarith
+    have h_sq_one : scale ^ 2 = 1 := by
+      field_simp at this ⊢
+      nlinarith
+    have : scale = 1 := by
+      nlinarith [sq_nonneg (scale - 1)]
+    exact h_scale this
 
 /-- **Liability threshold model for binary traits.**
     Under the liability threshold model, the liability is continuous
