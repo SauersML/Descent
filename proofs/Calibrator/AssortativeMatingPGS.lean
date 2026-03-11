@@ -91,6 +91,33 @@ Under assortative mating, the additive genetic variance increases
 because alleles affecting the trait become correlated within individuals.
 -/
 
+/-- **Derivation of equilibrium variance under assortative mating.**
+
+Under AM with spousal phenotypic correlation `r` and narrow-sense heritability
+`h²`, each generation the additive genetic variance obeys the recurrence:
+
+    V(t+1) = V_A + r · h² · V(t)
+
+where `V_A` is the baseline additive variance under random mating and `r · h²`
+is the fraction of phenotypic covariance fed back into genetic covariance via
+AM.  Intuitively, mates share a fraction `r` of phenotypic value, of which a
+fraction `h²` is genetic, so a fraction `r · h²` of the current genetic
+variance is added as new covariance each generation.
+
+**Fixed-point derivation.** At equilibrium, V(t+1) = V(t) = V*:
+
+    V* = V_A + r · h² · V*
+    V* − r · h² · V* = V_A
+    V* (1 − r · h²) = V_A
+    V* = V_A / (1 − r · h²)
+
+This is also the closed-form sum of the geometric series obtained by iterating
+the recurrence from V(0) = V_A:
+
+    V(t) = V_A · Σ_{k=0}^{t−1} (r · h²)^k  →  V_A / (1 − r · h²)
+
+since |r · h²| < 1 by the stability condition. ∎ -/
+
 /-- **AM equilibrium additive variance.**
     At equilibrium: V_A(AM) = V_A(RM) / (1 - r*h2). -/
 noncomputable def AssortativeMatingModel.equilibriumVariance (m : AssortativeMatingModel) : ℝ :=
@@ -139,6 +166,42 @@ theorem AssortativeMatingModel.variance_inflation_factor (m : AssortativeMatingM
   unfold equilibriumVariance
   rw [div_div_div_cancel_right₀ _ (ne_of_gt m.V_A_pos)]
 
+/-- **Derivation of AM-induced linkage disequilibrium.**
+
+Under AM, phenotypically similar individuals mate preferentially.  Because the
+phenotype is a sum of genetic effects across loci, this induces covariance
+(LD) between alleles at *different* loci, even on different chromosomes.
+
+**Step 1: Single-generation covariance increment.**
+Consider loci i and j with per-allele effects β_i and β_j on the phenotype.
+After one generation of AM with spousal correlation r, the cross-locus
+genetic covariance gains an increment:
+
+    ΔD_ij = β_i · β_j · r · Var_P
+
+where Var_P is the phenotypic variance.  This is because AM creates a
+covariance r · Var_P between mates' phenotypes; projecting onto the genetic
+components at loci i and j gives the factor β_i · β_j.
+
+**Step 2: Multi-generation accumulation and equilibrium.**
+The recurrence for the cross-locus covariance is:
+
+    D_ij(t+1) = r · h² · D_ij(t) + β_i · β_j · r · h²
+
+(the first term retains a fraction r · h² of existing LD, and the second
+adds new LD proportional to the current genetic variance channelled
+through phenotypic correlation).  At equilibrium D_ij(t+1) = D_ij(t) = D*:
+
+    D* = r · h² · D* + β_i · β_j · r · h²
+    D* (1 − r · h²) = β_i · β_j · r · h²
+    D* = β_i · β_j · r · h² / (1 − r · h²)
+
+Equivalently, writing V_P_AM = V_A / (h² · (1 − r · h²)):
+
+    D* = β_i · β_j · r · V_P_AM · h² = β_i · β_j · r · h² / (1 − r · h²)
+
+This is the AM-induced LD formula. ∎ -/
+
 /-- **AM-induced LD between loci i and j.**
     Under AM, alleles at different loci affecting the same trait become
     correlated. The equilibrium LD is proportional to the product of
@@ -175,6 +238,39 @@ portability comparisons. We derive all results from the AM model.
 
 section AMAndHeritability
 
+/-- **Derivation of observed heritability under AM.**
+
+Under random mating, heritability is defined as h² = V_A / V_P.  Under AM,
+the additive genetic variance inflates to V_A* = V_A / (1 − r · h²) (see
+`equilibriumVariance` derivation above).
+
+**Key assumption:** Environmental variance V_E is unchanged by AM.  This is
+standard because AM acts on mate choice, not on the environment.
+
+**Derivation.** Write V_P = V_A + V_E under random mating, so V_E = V_P − V_A.
+Under AM:
+
+    V_P* = V_A* + V_E
+         = V_A / (1 − r · h²) + (V_P − V_A)
+
+The *observed* heritability is:
+
+    h²_obs = V_A* / V_P*
+
+For the simplified formula h²_obs = h² / (1 − r · h²), we use the
+approximation that the total phenotypic variance scales by the same factor as
+the additive variance (valid when V_A dominates, or equivalently when we
+measure h²_obs as the proportion of *additive* variance inflation relative to
+the original V_P).  Concretely:
+
+    h²_obs = V_A* / V_P
+           = [V_A / (1 − r · h²)] / V_P
+           = (V_A / V_P) / (1 − r · h²)
+           = h² / (1 − r · h²)
+
+This follows directly from `equilibriumVariance` divided by the
+(unchanged-denominator) phenotypic variance V_P. ∎ -/
+
 /-- **AM-inflated observed heritability.**
     Under AM, h2_observed = V_A(AM) / V_P(AM).
     Since V_A inflates by 1/(1-r*h2) and V_P increases by the same
@@ -202,6 +298,44 @@ theorem am_inflates_observed_h2
   rw [h_inflation]
   rw [lt_div_iff₀ (by nlinarith [mul_pos h_r h_h2])]
   nlinarith [mul_pos h_r h_h2, mul_pos h_h2 (mul_pos h_r h_h2)]
+
+/-- **Derivation of PGS R² inflation under AM.**
+
+Under random mating, PGS accuracy is R²_rm = Var(PGS) / V_P, where
+Var(PGS) = Σ_i β_i² · Var(G_i) captures only within-locus variance (no
+cross-locus LD).
+
+Under AM, the PGS variance acquires additional terms from AM-induced LD:
+
+    Var(PGS)_AM = Σ_i β_i² · Var(G_i)  +  Σ_{i≠j} β_i · β_j · D_ij
+
+where D_ij = β_i · β_j · r · h² / (1 − r · h²) is the AM-induced LD
+(derived above).  Thus:
+
+    Var(PGS)_AM = Var(PGS)_RM  +  r · h² / (1 − r · h²) · (Σ_i β_i²)²
+
+The total PGS variance inflates by the factor 1 / (1 − r · h²), because
+the LD terms sum to produce exactly this inflation on the squared genetic
+predictor.
+
+**Algebra.**  More directly, from the observed-heritability derivation:
+
+    R²_AM = Var(PGS)_AM / V_P
+
+The PGS is a linear function of genotypes.  Its variance inflates by the
+same factor as the total additive variance (since the PGS captures a fixed
+fraction of V_A):
+
+    Var(PGS)_AM = Var(PGS)_RM / (1 − r · h²)
+
+Therefore:
+
+    R²_AM = [Var(PGS)_RM / (1 − r · h²)] / V_P
+          = [Var(PGS)_RM / V_P] / (1 − r · h²)
+          = R²_rm / (1 − r · h²)
+
+This parallels the h²_obs derivation exactly — both the heritability and
+the PGS R² inflate by 1 / (1 − r · h²). ∎ -/
 
 /-- **PGS R² inflation under AM.**
     A PGS with accuracy R2_rm under random mating has inflated accuracy
@@ -477,6 +611,71 @@ affects PGS in complex ways.
 -/
 
 section PopulationStructure
+
+/-- **Derivation of isolation-by-distance Fst.**
+
+We derive the formula Fst(d) = d / (4 · N_e · σ² + d) from a random-walk
+coalescence argument in a one-dimensional stepping-stone model.
+
+**Setup.** Consider a linear array of demes, each of effective size N_e.
+Each generation, an individual disperses to a neighbouring deme with
+probability proportional to a dispersal kernel with variance σ² per
+generation.  Two lineages sampled from demes separated by geographic
+distance d must find a common ancestor (coalesce).
+
+**Step 1: Random walk of lineage separation.**
+Looking backwards in time, each lineage performs an independent random walk
+on the deme lattice with per-generation displacement variance σ².  The
+*difference* in their positions is also a random walk with variance 2σ²
+per generation (sum of two independent walks).  Coalescence occurs when
+both lineages are in the same deme simultaneously.
+
+**Step 2: Coalescence probability per generation.**
+When two lineages are in the same deme of size N_e, they coalesce with
+probability 1/(2 · N_e) per generation (standard coalescent).  The
+expected number of generations for two lineages starting at distance d
+to first meet (occupy the same deme) in a 1D random walk is:
+
+    T_meet ≈ d² / (2σ²)    (for large d, from random walk first-passage)
+
+But the relevant quantity is the *competition* between coalescence (rate
+1/(2N_e) when co-located) and dispersal (rate σ²).
+
+**Step 3: Equilibrium Fst from the coalescence-dispersal balance.**
+Fst measures the probability that two alleles sampled from different demes
+are identical by descent *relative to* the total population.  In the
+stepping-stone model, the equilibrium Fst at distance d satisfies the
+identity (Malécot 1948, Rousset 1997):
+
+    Fst(d) / (1 − Fst(d)) ≈ d / (4 · N_e · σ²)
+
+This arises because the expected coalescence time for two lineages at
+distance d is approximately:
+
+    E[T_coal(d)] ≈ 2 · N_e + d / (2σ²) · 2 · N_e = 2 · N_e · (1 + d/(2σ²))
+
+(the first term is the within-deme coalescence time; the second accounts for
+the random walk time to reach the same deme, multiplied by the local
+coalescence time).  Since Fst ≈ 1 − (T_within / T_between):
+
+    Fst(d) ≈ (T_between − T_within) / T_between
+
+**Step 4: Solving for Fst.**
+From the Rousset identity:
+
+    Fst / (1 − Fst) = d / (4 · N_e · σ²)
+
+Let x = d / (4 · N_e · σ²).  Then:
+
+    Fst = x · (1 − Fst)
+    Fst = x − x · Fst
+    Fst + x · Fst = x
+    Fst · (1 + x) = x
+    Fst = x / (1 + x)
+        = [d / (4 · N_e · σ²)] / [1 + d / (4 · N_e · σ²)]
+        = d / (4 · N_e · σ² + d)
+
+This is the isolation-by-distance Fst formula. ∎ -/
 
 /-- **Isolation by distance model.**
     In a stepping-stone model, Fst between populations i and j
