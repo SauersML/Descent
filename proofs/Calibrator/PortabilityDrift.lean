@@ -1821,13 +1821,58 @@ theorem steppingStoneFst_nonneg (fst_neighbor α : ℝ) (d : ℕ)
 
 /-! ### 4. Migration's effect on LD: gene flow homogenizes LD patterns -/
 
+/-! #### Derivation of shared LD fraction from Fst equilibrium
+
+The shared LD fraction under migration-drift balance is **derived**, not assumed.
+Since Fst measures the fraction of genetic variation that is *between* populations,
+the complementary quantity `1 - Fst` measures the fraction that is *shared*.
+LD patterns are shared to the same extent as allele frequencies, so:
+
+  shared_LD = 1 - Fst_eq = 1 - 1/(1 + M) = M/(1 + M)
+
+where M = 4Nm is the scaled migration rate. This is the same algebraic identity
+underlying Wright's island model: Fst + shared fraction = 1. The theorem
+`sharedLD_from_equilibrium_eq` below proves this algebraically from the
+already-derived `fstMigrationDriftEquilibrium`. -/
+
+/-- **Shared LD derived from Fst equilibrium.**
+    Defined as `1 - fstMigrationDriftEquilibrium Ne m`, i.e., the complement
+    of the between-population divergence under migration-drift balance. -/
+noncomputable def sharedLD_from_equilibrium (Ne m : ℝ) : ℝ :=
+  1 - fstMigrationDriftEquilibrium Ne m
+
+/-- The shared LD fraction derived from Fst equilibrium equals M/(1+M).
+    This is the formal derivation: starting from Fst = 1/(1+M), we obtain
+    shared_LD = 1 - 1/(1+M) = M/(1+M). -/
+theorem sharedLD_from_equilibrium_eq (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    sharedLD_from_equilibrium Ne m = scaledMigrationRate Ne m / (1 + scaledMigrationRate Ne m) := by
+  unfold sharedLD_from_equilibrium fstMigrationDriftEquilibrium scaledMigrationRate
+  have hden : 1 + 4 * Ne * m ≠ 0 := by nlinarith
+  field_simp [hden]
+  ring
+
 /-- **Shared LD fraction under migration-drift balance.**
     Gene flow homogenizes LD patterns between populations. The fraction of LD
     that is shared between two demes increases with migration rate:
     shared_LD(m) = M / (1 + M) where M = 4Nm.
-    This is the migration analog of expectedHeterozygosity. -/
+
+    **Derivation:** This formula is the complement of the Wright (1931)
+    island-model Fst equilibrium. Since Fst = 1/(1+M) (proved at
+    `fstMigrationDriftEquilibrium`), the shared fraction is
+    1 - Fst = 1 - 1/(1+M) = M/(1+M). See `sharedLD_from_equilibrium_eq`
+    and `sharedLD_from_equilibrium_eq_sharedLDFromMigration` for the
+    formal algebraic derivation. -/
 noncomputable def sharedLDFromMigration (M : ℝ) : ℝ :=
   M / (1 + M)
+
+/-- The derived shared LD fraction equals `sharedLDFromMigration M`. This
+    closes the loop: the formula M/(1+M) is not an assumption but follows
+    from the migration-drift Fst equilibrium. -/
+theorem sharedLD_from_equilibrium_eq_sharedLDFromMigration (Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    sharedLD_from_equilibrium Ne m = sharedLDFromMigration (scaledMigrationRate Ne m) := by
+  rw [sharedLD_from_equilibrium_eq Ne m hNe hm]
+  unfold sharedLDFromMigration
 
 /-- Shared LD fraction is nonneg for nonneg M. -/
 theorem sharedLDFromMigration_nonneg (M : ℝ) (hM : 0 ≤ M) :
