@@ -42,7 +42,8 @@ import Calibrator.SampleOverlapBias
 import Calibrator.HaplotypeTheory
 import Calibrator.MultiTraitPGS
 import Calibrator.AncestrySpecificArchitecture
-import Calibrator.MultiTraitPGS
+import Calibrator.AncestrySpecificPower
+import Calibrator.PGSCalibrationTheory
 
 namespace Calibrator
 
