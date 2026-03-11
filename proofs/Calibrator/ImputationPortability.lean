@@ -159,9 +159,9 @@ section RareVariantImputation
     This means rare variant PGS components are very noisy. -/
 theorem rare_variant_poor_imputation
     (r2_common r2_rare : ℝ)
-    (h_much_worse : r2_rare < 0.5 * r2_common)
-    (h_common_good : 0.9 < r2_common) (h_common_le : r2_common ≤ 1) :
-    r2_rare < 0.5 := by nlinarith
+    (h_much_worse : r2_rare < (1 / 2) * r2_common)
+    (h_common_good : 9 / 10 < r2_common) (h_common_le : r2_common ≤ 1) :
+    r2_rare < 1 / 2 := by nlinarith
 
 /-- **Population specificity of rare variant imputation.**
     Rare variants are population-specific → they're only in the
