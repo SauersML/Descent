@@ -210,22 +210,33 @@ theorem recalibration_easier_than_rediscovery
     n_per_param * n_cal_params < n_per_param * n_disc_params := by
   exact Nat.mul_lt_mul_left h_n_pos h_disc_more
 
-/-- **Expected calibration error (ECE).**
-    ECE = Σᵢ |observed_risk_in_bin_i - predicted_risk_in_bin_i| × n_i/n.
-    ECE increases in the target population by the mean shift δ_mean. -/
-theorem ece_increases_with_portability_loss
-    (ece_source δ_mean : ℝ)
-    (h_nn : 0 ≤ ece_source) (h_shift : 0 < δ_mean) :
-    ece_source < ece_source + δ_mean := by linarith
+/-- **Brier score increases with portability loss (derived from Brier definition).**
+    Since `brierFromR2 π r2 = π(1-π)(1-r2)`, a decrease in R² (from drift)
+    directly increases the Brier score. When R² drops from source to target
+    via drift, the Brier score strictly increases. -/
+theorem brier_increases_with_portability_loss
+    (π r2_source r2_target : ℝ)
+    (h_π : 0 < π) (h_π' : π < 1)
+    (h_r2s : 0 < r2_source) (h_r2s' : r2_source < 1)
+    (h_r2t : 0 < r2_target) (h_r2t' : r2_target < 1)
+    (h_drop : r2_target < r2_source) :
+    brierFromR2 π r2_source < brierFromR2 π r2_target := by
+  unfold brierFromR2
+  have h_prev : 0 < π * (1 - π) := by nlinarith
+  nlinarith
 
-/-- **Brier score decomposes into calibration and discrimination.**
-    Brier = calibration_component + refinement_component.
-    Portability can affect each component differently. -/
-theorem brier_decomposition
-    (calibration refinement brier : ℝ)
-    (h_decomp : brier = calibration + refinement)
-    (h_cal_nn : 0 ≤ calibration) (h_ref_nn : 0 ≤ refinement) :
-    0 ≤ brier := by linarith
+/-- **Brier score is bounded by prevalence (derived from Brier definition).**
+    `brierFromR2 π r2 = π(1-π)(1-r2)`. Since 0 ≤ r2, the Brier score is
+    at most `π(1-π)` (achieved at r2 = 0, the uninformative predictor).
+    A positive R² strictly reduces the Brier score below the baseline. -/
+theorem brier_bounded_by_prevalence
+    (π r2 : ℝ)
+    (h_π : 0 < π) (h_π' : π < 1)
+    (h_r2 : 0 < r2) (h_r2' : r2 ≤ 1) :
+    brierFromR2 π r2 < π * (1 - π) := by
+  unfold brierFromR2
+  have h_prev : 0 < π * (1 - π) := by nlinarith
+  nlinarith
 
 /-- **Cross-population Brier score increases mainly from calibration.**
     For PGS, the discrimination component is relatively stable
@@ -337,18 +348,25 @@ specific portability has direct practical consequences.
 
 section MetricAndClinicalDecisions
 
-/-- **Screening vs diagnosis have different metric priorities.**
-    Screening: maximize sensitivity (catch all cases) → sensitivity-driven.
-    Diagnosis: maximize PPV (minimize false positives) → PPV-driven.
-    The appropriate portability metric depends on the clinical use. -/
+/-- **Screening vs diagnosis: PPV degrades faster than sensitivity under drift.**
+    From the `ppv` definition, PPV depends on prevalence via Bayes' theorem.
+    Under drift, if prevalence changes (K₁ ≠ K₂), PPV changes even if
+    sensitivity and specificity are the same (from `ppv_changes_with_prevalence`).
+    Meanwhile, sensitivity depends only on discrimination (rank ordering),
+    which is more stable.
+
+    We show: if sensitivity and specificity are perfectly portable but
+    prevalence changes, PPV in the target differs from PPV in the source
+    while sensitivity stays the same. -/
 theorem different_uses_different_metrics
-    (port_sensitivity port_ppv : ℝ)
-    (t_sens t_ppv : ℝ)
-    (h_screening_ok : t_sens < port_sensitivity)
-    (h_diagnosis_bad : port_ppv < t_ppv)
-    (h_thresholds : t_ppv ≤ t_sens) :
-    -- Screening is portable but diagnosis is not
-    port_ppv < port_sensitivity := by linarith
+    (se sp K_source K_target : ℝ)
+    (h_se : 0 < se) (h_sp : 0 < sp) (h_sp1 : sp < 1)
+    (h_Ks : 0 < K_source) (h_Ks' : K_source < 1)
+    (h_Kt : 0 < K_target) (h_Kt' : K_target < 1)
+    (h_diff : K_source ≠ K_target) :
+    ppv se sp K_source ≠ ppv se sp K_target :=
+  ppv_changes_with_prevalence se sp K_source K_target h_se h_sp h_sp1
+    h_Ks h_Ks' h_Kt h_Kt' h_diff
 
 /-- **Decision curve analysis across populations.**
     The net benefit at threshold p_t depends on both PPV and sensitivity:
