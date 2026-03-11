@@ -122,15 +122,15 @@ simultaneously satisfied when base rates differ.
 
 section Fairness
 
-/-- **Calibration (sufficiency).**
+/- **Calibration (sufficiency).**
     A model is calibrated if E[Y | Ŷ = s] = s for all scores s.
     Calibration within groups: E[Y | Ŷ = s, G = g] = s for each group g. -/
 
-/-- **Equalized odds (separation).**
+/- **Equalized odds (separation).**
     TPR and FPR are equal across groups.
     TPR(g) = P(Ŷ = 1 | Y = 1, G = g) is the same for all g. -/
 
-/-- **Demographic parity (independence).**
+/- **Demographic parity (independence).**
     P(Ŷ = 1 | G = g) is the same for all groups g. -/
 
 /-- **Impossibility: calibration + equalized odds requires equal base rates.**
@@ -182,7 +182,7 @@ Portability determines how accurate these categories are.
 
 section RiskStratification
 
-/-- **Risk category assignment from PGS.**
+/- **Risk category assignment from PGS.**
     Individuals with PGS > threshold t are placed in "high risk" category.
     True positive rate depends on PGS accuracy. -/
 

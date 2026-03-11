@@ -81,26 +81,26 @@ section SteppingStone
 /-- **Pairwise Fst in the stepping-stone model.**
     F_ST(d) ≈ d / (d + 4·Ne·m·σ²) for physical distance d,
     dispersal variance σ², and local migration rate m. -/
-noncomputable def steppingStoneFst (d Ne m σ² : ℝ) : ℝ :=
-  d / (d + 4 * Ne * m * σ²)
+noncomputable def steppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
+  d / (d + 4 * Ne * m * σ_sq)
 
 /-- Stepping-stone Fst increases with distance. -/
-theorem stepping_stone_fst_increasing (d₁ d₂ Ne m σ² : ℝ)
-    (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ²)
+theorem stepping_stone_fst_increasing (d₁ d₂ Ne m σ_sq : ℝ)
+    (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq)
     (hd₁ : 0 < d₁) (h_farther : d₁ < d₂) :
-    steppingStoneFst d₁ Ne m σ² < steppingStoneFst d₂ Ne m σ² := by
+    steppingStoneFst d₁ Ne m σ_sq < steppingStoneFst d₂ Ne m σ_sq := by
   unfold steppingStoneFst
   have h_C := mul_pos (mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) hNe) hm) hσ
-  rw [div_lt_div_iff (by linarith) (by linarith)]
+  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
 /-- **Stepping-stone Fst saturates at large distances.**
     As d → ∞, F_ST → 1. But for moderate distances, Fst grows sublinearly.
     This means portability should decline slower at larger distances. -/
-theorem stepping_stone_fst_saturates (d Ne m σ² : ℝ)
-    (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ²)
+theorem stepping_stone_fst_saturates (d Ne m σ_sq : ℝ)
+    (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq)
     (hd : 0 < d) :
-    steppingStoneFst d Ne m σ² < 1 := by
+    steppingStoneFst d Ne m σ_sq < 1 := by
   unfold steppingStoneFst
   rw [div_lt_one (by nlinarith [mul_pos (mul_pos hNe hm) hσ])]
   linarith [mul_pos (mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) hNe) hm) hσ]
@@ -140,7 +140,7 @@ theorem admixed_fst_smaller (α fst_AB : ℝ)
     admixedFst α fst_AB < fst_AB := by
   unfold admixedFst
   have h1 : (1 - α) ^ 2 < 1 := by
-    apply sq_lt_one_of_abs_lt_one
+    apply (sq_lt_one_iff_abs_lt_one _).mpr
     rw [abs_of_nonneg (by linarith)]; linarith
   calc (1 - α) ^ 2 * fst_AB < 1 * fst_AB := mul_lt_mul_of_pos_right h1 h_fst
     _ = fst_AB := one_mul _
@@ -310,7 +310,7 @@ theorem smaller_founder_larger_fst
     rw [sub_nonneg, div_le_one (by positivity)]
     have : (2 : ℝ) ≤ k₂ := by exact Nat.ofNat_le_cast.mpr (by omega)
     linarith
-  linarith [pow_lt_pow_left h_base h_nn (by omega : t ≠ 0)]
+  linarith [pow_lt_pow_left₀ h_base h_nn (by omega : t ≠ 0)]
 
 /-- **PGS portability to isolated populations is poor.**
     Finnish, Ashkenazi Jewish, and Pacific Islander populations

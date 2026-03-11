@@ -46,7 +46,7 @@ theorem overlap_inflation_positive (r2_true r2_observed : ℝ)
     (h_true : 0 < r2_true) (h_inflated : r2_true < r2_observed) :
     0 < overlapInflation r2_true r2_observed := by
   unfold overlapInflation
-  rw [sub_pos, one_lt_div h_true]
+  rw [sub_pos, one_lt_div₀ h_true]
   exact h_inflated
 
 /-- **Partial overlap inflation.**
@@ -70,7 +70,7 @@ theorem more_overlap_more_inflation (r2_true h2 f₁ f₂ : ℝ) (n_gwas : ℕ)
   unfold partialOverlapR2
   have h_pos : 0 < (h2 - r2_true) / ↑n_gwas := by
     exact div_pos (by linarith) (Nat.cast_pos.mpr h_n)
-  linarith
+  nlinarith
 
 /-- **Inflation decreases with GWAS sample size.**
     Larger GWAS → less overfitting → less inflation. -/
@@ -83,7 +83,7 @@ theorem inflation_decreases_with_gwas_n (r2_true h2 f : ℝ) (n₁ n₂ : ℕ)
   have h_diff : 0 < h2 - r2_true := by linarith
   have h₁ : (0 : ℝ) < n₁ := Nat.cast_pos.mpr h_n₁
   have h₂ : (0 : ℝ) < n₂ := Nat.cast_pos.mpr h_n₂
-  linarith [div_lt_div_left (mul_pos h_f h_diff) h₂ h₁ |>.mpr (Nat.cast_lt.mpr h_n)]
+  linarith [div_lt_div_iff_of_pos_left (mul_pos h_f h_diff) h₂ h₁ |>.mpr (Nat.cast_lt.mpr h_n)]
 
 end OverlapInflation
 
@@ -139,7 +139,7 @@ independent samples.
 
 section LOOCorrections
 
-/-- **Leave-one-out PGS.**
+/- **Leave-one-out PGS.**
     For each individual i, compute PGS using GWAS that
     excludes individual i. This eliminates overfitting
     but is computationally expensive. -/

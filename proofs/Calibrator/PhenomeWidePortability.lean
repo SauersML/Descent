@@ -86,20 +86,11 @@ theorem portability_three_factor_decomposition
     (h_rho : 0 ≤ rho) (h_rho_le : rho ≤ 1)
     (h_ld : 0 ≤ ld_factor) (h_ld_le : ld_factor ≤ 1) :
     r2_source * (1 - fst) * rho ^ 2 * ld_factor ≤ r2_source := by
-  calc r2_source * (1 - fst) * rho ^ 2 * ld_factor
-      ≤ r2_source * 1 * 1 * 1 := by
-        apply mul_le_mul
-        · apply mul_le_mul
-          · apply mul_le_mul_of_nonneg_left (by linarith) (le_of_lt h_r2)
-          · exact pow_le_one₀ h_rho h_rho_le
-          · exact sq_nonneg _
-          · exact mul_nonneg (le_of_lt h_r2) (by linarith)
-        · exact h_ld_le
-        · exact h_ld
-        · apply mul_nonneg
-          · exact mul_nonneg (le_of_lt h_r2) (by linarith)
-          · exact sq_nonneg _
-    _ = r2_source := by ring
+  have h1 : 0 ≤ 1 - fst := by linarith
+  have h2 : rho ^ 2 ≤ 1 := pow_le_one₀ h_rho h_rho_le
+  have h3 : (1 - fst) * rho ^ 2 ≤ 1 := by nlinarith
+  have h4 : (1 - fst) * rho ^ 2 * ld_factor ≤ 1 := by nlinarith
+  nlinarith
 
 end TraitClassification
 
@@ -169,7 +160,7 @@ dietary adaptation across populations.
 
 section MetabolicTraits
 
-/-- **Lactase persistence as a portability example.**
+/- **Lactase persistence as a portability example.**
     The LCT locus (2q21) has dramatically different frequencies
     across populations due to dairy farming adaptation.
     This creates a large portability loss for any trait where
@@ -230,10 +221,10 @@ theorem polygenicity_stabilizes_portability
     (h_var_pos : 0 < per_locus_var) :
     -- Each locus contributes < 0.1% of total variance
     per_locus_var / total_var < 0.001 := by
-  rw [h_total, div_mul_eq_div_div]
-  rw [div_self (ne_of_gt h_var_pos)]
-  rw [one_div]
-  rw [inv_lt (Nat.cast_pos.mpr (by omega)) (by norm_num : (0:ℝ) < 0.001)]
+  rw [h_total]
+  rw [show per_locus_var / (↑n_loci * per_locus_var) = 1 / ↑n_loci from by
+    field_simp]
+  rw [one_div, inv_lt (Nat.cast_pos.mpr (by omega)) (by norm_num : (0:ℝ) < 0.001)]
   exact_mod_cast show 1000 < n_loci from h_many
 
 /-- **Skin pigmentation shows the worst anthropometric portability.**
@@ -309,7 +300,9 @@ theorem rank_more_portable_than_r2
     (h_rank_better : |pearson_r| ≤ |spearman_rho|)
     (h_pearson_nn : 0 ≤ pearson_r) :
     pearson_r ^ 2 ≤ spearman_rho ^ 2 := by
-  exact sq_le_sq' (by linarith [abs_nonneg spearman_rho]) h_rank_better
+  have : |pearson_r| ^ 2 ≤ |spearman_rho| ^ 2 := by
+    exact sq_le_sq' (by linarith [abs_nonneg spearman_rho, abs_nonneg pearson_r]) h_rank_better
+  rwa [sq_abs, sq_abs] at this
 
 end PhenomeWideStructure
 

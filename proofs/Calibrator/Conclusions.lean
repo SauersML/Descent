@@ -162,7 +162,7 @@ theorem exactBrierRiskOfCalibrated_eq_integral {Z : Type*} [MeasurableSpace Z]
 
     This structure captures the key distinction between Mode and Mean prediction. -/
 structure PosteriorPrediction where
-  /-- The posterior mean of η (the linear predictor) -/
+  /- The posterior mean of η (the linear predictor) -/
   η_mean : ℝ
   /-- The posterior mean of sigmoid(η) = E[sigmoid(η)] -/
   prob_mean : ℝ
@@ -278,8 +278,7 @@ lemma differentiable_sigmoid (x : ℝ) : DifferentiableAt ℝ sigmoid x := by
     · exact differentiableAt_const _
     · apply DifferentiableAt.exp
       exact differentiableAt_id.neg
-  · apply ne_of_gt
-    have : Real.exp (-x) > 0 := Real.exp_pos (-x)
+  · have : Real.exp (-x) > 0 := Real.exp_pos (-x)
     linarith
 
 lemma deriv_sigmoid (x : ℝ) : deriv sigmoid x = sigmoid x * (1 - sigmoid x) := by
@@ -289,7 +288,6 @@ lemma deriv_sigmoid (x : ℝ) : deriv sigmoid x = sigmoid x * (1 - sigmoid x) :=
     · apply DifferentiableAt.exp
       exact differentiableAt_id.neg
   have h_ne : 1 + Real.exp (-x) ≠ 0 := by
-    apply ne_of_gt
     have : Real.exp (-x) > 0 := Real.exp_pos (-x)
     linarith
   unfold sigmoid
@@ -415,7 +413,7 @@ theorem derivative_log_det_H_matrix (A B : Matrix m m ℝ)
     (_hB : B.IsSymm)
     (rho : ℝ) (h_pos : (H_matrix A B rho).PosDef) :
     deriv (log_det_H A B) rho = Real.exp rho * ((H_matrix A B rho)⁻¹ * B).trace := by
-  have h_inv : (H_matrix A B rho).det ≠ 0 := h_pos.det_pos.ne'
+  have h_inv : (H_matrix A B rho).det ≠ 0 := isUnit_iff_ne_zero.mp ((Matrix.isUnit_iff_isUnit_det _).mp (Matrix.PosDef.isUnit h_pos))
   have h_det : deriv (fun rho => Real.log (Matrix.det (A + Real.exp rho • B))) rho = Real.exp rho * Matrix.trace ((A + Real.exp rho • B)⁻¹ * B) := by
     have h_det_step1 : deriv (fun rho => Matrix.det (A + Real.exp rho • B)) rho = Matrix.det (A + Real.exp rho • B) * Matrix.trace ((A + Real.exp rho • B)⁻¹ * B) * Real.exp rho := by
       have h_jacobi : deriv (fun rho => Matrix.det (A + Real.exp rho • B)) rho = Matrix.trace (Matrix.adjugate (A + Real.exp rho • B) * deriv (fun rho => A + Real.exp rho • B) rho) := by
@@ -727,7 +725,7 @@ theorem laml_gradient_validity
   rust_direct_gradient_fn S_basis X W beta_hat log_lik rho i +
   rust_correction_fn S_basis X W beta_hat grad_op rho i :=
 by
-  have h_hess_det : (Hessian_fn S_basis X W rho (beta_hat rho)).det ≠ 0 := h_hess_pos.det_pos.ne'
+  have h_hess_det : (Hessian_fn S_basis X W rho (beta_hat rho)).det ≠ 0 := isUnit_iff_ne_zero.mp ((Matrix.isUnit_iff_isUnit_det _).mp (Matrix.PosDef.isUnit h_hess_pos))
   have h_deriv_beta : deriv (fun r => beta_hat (Function.update rho i r)) (rho i) =
       rust_delta_fn S_basis X W beta_hat rho i := by
     let H := Hessian_fn S_basis X W rho (beta_hat rho)
@@ -878,7 +876,7 @@ theorem bernoulliKLReal_nonneg (p q : ℝ) (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 
   have h2_neg : - ((1 - p) * Real.log ((1 - q) / (1 - p))) ≥ - (1 - p) * ((1 - q) / (1 - p) - 1) := by
     linarith [mul_le_mul_of_nonneg_left h2 (le_of_lt hp1_pos)]
   have h_log_inv1 : Real.log (p / q) = - Real.log (q / p) := by
-    rw [Real.log_div (ne_of_gt hp0) (ne_of_gt hq0), Real.log_div (ne_of_gt hq0) (ne_of_gt hp0)]
+    rw [Real.log_div (hp0.ne') (hq0.ne'), Real.log_div (hq0.ne') (hp0.ne')]
     ring
   have h_log_inv2 : Real.log ((1 - p) / (1 - q)) = - Real.log ((1 - q) / (1 - p)) := by
     have h1p : 1 - p ≠ 0 := by linarith
@@ -893,7 +891,7 @@ theorem bernoulliKLReal_nonneg (p q : ℝ) (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 
     _ = - (p * (q / p)) + p - ((1 - p) * ((1 - q) / (1 - p))) + (1 - p) := by ring
     _ = - q + p - (1 - q) + (1 - p) := by
       have hqp : p * (q / p) = q := by
-        rw [mul_div_cancel₀ _ (ne_of_gt hp0)]
+        rw [mul_div_cancel₀ _ (hp0.ne')]
       have h1qp : (1 - p) * ((1 - q) / (1 - p)) = 1 - q := by
         rw [mul_div_cancel₀ _ (by linarith)]
       rw [hqp, h1qp]
@@ -903,8 +901,8 @@ theorem bernoulliKLReal_nonneg (p q : ℝ) (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 
 theorem logLoss_regret_eq_kl_pointwise (p q : ℝ)
     (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 < q) (hq1 : q < 1) :
     bernoulliLogLoss p q - bernoulliLogLoss p p = bernoulliKLReal p q := by
-  have hp_ne : p ≠ 0 := ne_of_gt hp0
-  have hq_ne : q ≠ 0 := ne_of_gt hq0
+  have hp_ne : p ≠ 0 := hp0.ne'
+  have hq_ne : q ≠ 0 := hq0.ne'
   have hp1_ne : 1 - p ≠ 0 := sub_ne_zero.mpr (ne_of_lt hp1).symm
   have hq1_ne : 1 - q ≠ 0 := sub_ne_zero.mpr (ne_of_lt hq1).symm
   unfold bernoulliLogLoss bernoulliKLReal

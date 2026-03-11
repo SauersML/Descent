@@ -34,7 +34,7 @@ older population history. This affects PGS portability.
 
 section HaplotypeDiversity
 
-/-- **Number of distinct haplotypes in a region.**
+/- **Number of distinct haplotypes in a region.**
     With k SNPs and n haplotypes sampled, the expected number
     of distinct haplotypes H ≈ 2^k × (1 - (1-1/2^k)^n). -/
 
@@ -92,7 +92,7 @@ noncomputable def cisEffect (beta1 beta2 delta_cis : ℝ) : ℝ :=
 theorem cis_differs_from_additive (beta1 beta2 delta_cis : ℝ)
     (h_delta : delta_cis ≠ 0) :
     cisEffect beta1 beta2 delta_cis ≠ beta1 + beta2 := by
-  unfold cisEffect; linarith [h_delta]
+  unfold cisEffect; intro h; apply h_delta; linarith
 
 /-- **Compound heterozygosity.**
     Having different damaging alleles on each copy (trans)
@@ -128,7 +128,7 @@ PGS accuracy and portability.
 
 section HaplotypePGS
 
-/-- **Haplotype PGS is sum of haplotype effects.**
+/- **Haplotype PGS is sum of haplotype effects.**
     PGS_hap = Σ_b (effect of haplotype at block b).
     This captures within-block interactions automatically. -/
 
@@ -267,7 +267,7 @@ theorem segments_shorten_with_time (g₁ g₂ r_total : ℝ)
     (h_g : g₁ < g₂) :
     expectedSegmentLength g₂ r_total < expectedSegmentLength g₁ r_total := by
   unfold expectedSegmentLength
-  exact div_lt_div_left one_pos (mul_pos h_g₂ h_r) (mul_pos h_g₁ h_r) |>.mpr
+  exact div_lt_div_iff_of_pos_left one_pos (mul_pos h_g₂ h_r) (mul_pos h_g₁ h_r) |>.mpr
     (mul_lt_mul_of_pos_right h_g h_r)
 
 end LocalAncestryHaplotypes

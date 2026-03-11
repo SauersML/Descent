@@ -252,7 +252,7 @@ theorem target_r2_strictly_decreases_of_covariance_mismatch
         mul_lt_mul_of_pos_right hmse h_inv_pos
       simpa [div_eq_mul_inv] using hmul
   have hneg : -(mseTarget / varY) < -(mseSource / varY) := neg_lt_neg hdiv
-  exact add_lt_add_left hneg 1
+  linarith
 
 /-! ### Step 4: Demography (`F_ST`) → Covariance Divergence (with tagging density)
 
@@ -691,10 +691,10 @@ theorem linear_noise_implies_nonlinear_slope
   set S := slope_error
 
   -- Non-zero denominators
-  have h_ne_K : K ≠ 0 := ne_of_gt h_g_pos
-  have h_ne_A : A ≠ 0 := ne_of_gt hB_pos
-  have h_ne_AS : A + S ≠ 0 := ne_of_gt hB1_pos
-  have h_ne_A2S : A + 2 * S ≠ 0 := ne_of_gt hB2_pos
+  have h_ne_K : K ≠ 0 := h_g_pos.ne'
+  have h_ne_A : A ≠ 0 := hB_pos.ne'
+  have h_ne_AS : A + S ≠ 0 := hB1_pos.ne'
+  have h_ne_A2S : A + 2 * S ≠ 0 := hB2_pos.ne'
 
   -- Rewrite hypotheses in terms of K, A, S
   have h0' : beta0 * A = K := by
@@ -817,7 +817,7 @@ theorem normalization_erases_heritability {k : ℕ} [Fintype (Fin k)]
     (h_cov_pos : arch.V_cov c > 0) :
     optimalSlopeFromVariance arch c > 1 := by
   unfold optimalSlopeFromVariance totalVariance
-  rw [add_div, div_self (ne_of_gt h_genic_pos)]
+  rw [add_div, div_self (h_genic_pos.ne')]
   rw [gt_iff_lt, lt_add_iff_pos_right]
   apply div_pos h_cov_pos h_genic_pos
 
@@ -4623,7 +4623,7 @@ theorem shrinkage_effect {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fin
 
 /-- Orthogonal projection onto a finite-dimensional subspace (L2). -/
 noncomputable def orthogonalProjection {n : ℕ} (K : Submodule ℝ (Fin n → ℝ)) (y : Fin n → ℝ) : Fin n → ℝ :=
-  let iso := WithLp.linearEquiv 2 ℝ (Fin n → ℝ)
+  let iso := (WithLp.linearEquiv 2 ℝ (Fin n → ℝ)).symm
   let K' : Submodule ℝ (EuclideanSpace ℝ (Fin n)) := K.map iso
   let p' := Submodule.orthogonalProjection K' (iso y)
   iso.symm (p' : EuclideanSpace ℝ (Fin n))
@@ -4633,7 +4633,7 @@ noncomputable def orthogonalProjection {n : ℕ} (K : Submodule ℝ (Fin n → �
 lemma orthogonalProjection_eq_of_dist_le {n : ℕ} (K : Submodule ℝ (Fin n → ℝ)) (y p : Fin n → ℝ)
     (h_mem : p ∈ K) (h_min : ∀ w ∈ K, l2norm_sq (y - p) ≤ l2norm_sq (y - w)) :
     p = orthogonalProjection K y := by
-  let iso : (Fin n → ℝ) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin n) := WithLp.linearEquiv 2 ℝ (Fin n → ℝ)
+  let iso : (Fin n → ℝ) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin n) := (WithLp.linearEquiv 2 ℝ (Fin n → ℝ)).symm
   let K_E : Submodule ℝ (EuclideanSpace ℝ (Fin n)) := K.map iso
   let y_E : EuclideanSpace ℝ (Fin n) := iso y
   let p_E : EuclideanSpace ℝ (Fin n) := iso p

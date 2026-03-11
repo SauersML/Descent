@@ -72,15 +72,19 @@ theorem ld_decays_with_time (D₀ r Ne : ℝ) (t₁ t₂ : ℕ)
     (hD₀ : 0 < D₀) (hr : 0 < r) (hr1 : r < 1) (hNe : 1 < Ne)
     (h_time : t₁ < t₂) :
     |ldAfterGenerations D₀ r Ne t₂| < |ldAfterGenerations D₀ r Ne t₁| := by
-  unfold ldAfterGenerations
-  rw [abs_mul, abs_mul, abs_of_pos hD₀, abs_of_pos hD₀]
+  simp only [ldAfterGenerations, abs_mul, abs_of_pos hD₀]
   apply mul_lt_mul_of_pos_left _ hD₀
   have h_ret_nn : 0 ≤ ldRetentionPerGen r Ne :=
     ld_retention_nonneg r Ne (le_of_lt hr) (le_of_lt hr1) (le_of_lt hNe)
   have h_ret_lt : ldRetentionPerGen r Ne < 1 :=
     ld_retention_lt_one r Ne hr hr1 hNe
   rw [abs_of_nonneg (pow_nonneg h_ret_nn _), abs_of_nonneg (pow_nonneg h_ret_nn _)]
-  exact pow_lt_pow_of_lt_one h_ret_nn h_ret_lt h_time
+  have h_ret_pos : 0 < ldRetentionPerGen r Ne := by
+    unfold ldRetentionPerGen
+    apply mul_pos
+    · linarith
+    · rw [sub_pos, div_lt_one (by linarith)]; linarith
+  exact pow_lt_pow_right_of_lt_one₀ h_ret_pos h_ret_lt h_time
 
 end OhtaKimuraDecay
 
@@ -96,14 +100,14 @@ section LDTagging
 
 /-- **Tag SNP r² with causal variant.**
     The proportion of causal variant information captured by a tag. -/
-noncomputable def tagR2 (D² var_tag var_causal : ℝ) : ℝ :=
-  D² / (var_tag * var_causal)
+noncomputable def tagR2 (D_sq var_tag var_causal : ℝ) : ℝ :=
+  D_sq / (var_tag * var_causal)
 
 /-- Tag r² is bounded by 1. -/
-theorem tag_r2_le_one (D² var_tag var_causal : ℝ)
-    (h_cauchy_schwarz : D² ≤ var_tag * var_causal)
+theorem tag_r2_le_one (D_sq var_tag var_causal : ℝ)
+    (h_cauchy_schwarz : D_sq ≤ var_tag * var_causal)
     (h_vt : 0 < var_tag) (h_vc : 0 < var_causal) :
-    tagR2 D² var_tag var_causal ≤ 1 := by
+    tagR2 D_sq var_tag var_causal ≤ 1 := by
   unfold tagR2
   rw [div_le_one (mul_pos h_vt h_vc)]
   exact h_cauchy_schwarz
@@ -111,10 +115,10 @@ theorem tag_r2_le_one (D² var_tag var_causal : ℝ)
 /-- **Tag r² decreases when LD structure changes.**
     In the target population, D² between tag and causal may be different. -/
 theorem tag_r2_decreases_with_ld_change
-    (D²_source D²_target var_tag var_causal : ℝ)
+    (D_sq_source D_sq_target var_tag var_causal : ℝ)
     (h_vt : 0 < var_tag) (h_vc : 0 < var_causal)
-    (h_ld_drop : D²_target < D²_source) :
-    tagR2 D²_target var_tag var_causal < tagR2 D²_source var_tag var_causal := by
+    (h_ld_drop : D_sq_target < D_sq_source) :
+    tagR2 D_sq_target var_tag var_causal < tagR2 D_sq_source var_tag var_causal := by
   unfold tagR2
   exact div_lt_div_of_pos_right h_ld_drop (mul_pos h_vt h_vc)
 
@@ -122,9 +126,9 @@ theorem tag_r2_decreases_with_ld_change
     R²_PGS ≈ Σᵢ r²_tag_i × β_causal_i² / V_Y.
     When tag r² drops, PGS R² drops proportionally. -/
 theorem pgs_accuracy_from_tagging
-    {m : ℕ} (r2_tag : Fin m → ℝ) (β² : Fin m → ℝ) (v_y : ℝ)
-    (h_vy : 0 < v_y) (h_β : ∀ i, 0 ≤ β² i) (h_r2 : ∀ i, 0 ≤ r2_tag i) :
-    0 ≤ (∑ i, r2_tag i * β² i) / v_y := by
+    {m : ℕ} (r2_tag : Fin m → ℝ) (β_sq : Fin m → ℝ) (v_y : ℝ)
+    (h_vy : 0 < v_y) (h_β : ∀ i, 0 ≤ β_sq i) (h_r2 : ∀ i, 0 ≤ r2_tag i) :
+    0 ≤ (∑ i, r2_tag i * β_sq i) / v_y := by
   apply div_nonneg _ (le_of_lt h_vy)
   apply Finset.sum_nonneg
   intro i _
@@ -134,11 +138,11 @@ theorem pgs_accuracy_from_tagging
     The LD score ℓ_j = Σ_k r²_jk counts how many causal variants
     tag SNP j captures. Higher LD score → more heritability. -/
 theorem ld_score_regression_interpretation
-    (h²_total h²_captured ld_score_mean : ℝ)
-    (h_total_pos : 0 < h²_total)
-    (h_regression : h²_captured = h²_total * ld_score_mean)
+    (h_sq_total h_sq_captured ld_score_mean : ℝ)
+    (h_total_pos : 0 < h_sq_total)
+    (h_regression : h_sq_captured = h_sq_total * ld_score_mean)
     (h_ld_pos : 0 < ld_score_mean) (h_ld_le : ld_score_mean ≤ 1) :
-    h²_captured ≤ h²_total := by
+    h_sq_captured ≤ h_sq_total := by
   rw [h_regression]
   exact mul_le_of_le_one_right (le_of_lt h_total_pos) h_ld_le
 
@@ -177,7 +181,7 @@ theorem admixture_ld_max_at_half (Δp₁ Δp₂ α : ℝ)
 theorem admixture_ld_decays_unlinked (D₀ : ℝ) (t : ℕ) (hD₀ : 0 < D₀) :
     D₀ * (1/2 : ℝ) ^ (t + 1) < D₀ * (1/2 : ℝ) ^ t := by
   apply mul_lt_mul_of_pos_left _ hD₀
-  apply pow_lt_pow_of_lt_one
+  apply pow_lt_pow_right_of_lt_one₀
   · norm_num
   · norm_num
   · omega
@@ -229,7 +233,7 @@ theorem bottleneck_ld_increases_with_duration
     rw [sub_pos, div_lt_one (by linarith)]; linarith
   have h_base_lt : 1 - 1/(2 * N_b) < 1 := by
     rw [sub_lt_self_iff]; positivity
-  linarith [pow_lt_pow_of_lt_one (le_of_lt h_base_pos) h_base_lt h_time]
+  linarith [pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt h_time]
 
 /-- Bottleneck LD increases with smaller bottleneck size. -/
 theorem bottleneck_ld_increases_with_severity
@@ -248,7 +252,7 @@ theorem bottleneck_ld_increases_with_severity
   have h_lt_one : 1 - 1/(2 * N₁) < 1 := by
     rw [sub_lt_self_iff]; positivity
   -- (1-1/(2N₂))^t < (1-1/(2N₁))^t because base is smaller and both in [0,1)
-  have h_pow := pow_lt_pow_left h_base h_nn (by omega : t ≠ 0)
+  have h_pow := pow_lt_pow_left₀ h_base h_nn (by omega : t ≠ 0)
   linarith
 
 /-- **European bottleneck creates different LD structure.**
@@ -280,21 +284,21 @@ section LDMismatchQuantification
     The Frobenius norm of the difference between source and target
     LD matrices captures the total LD mismatch. -/
 noncomputable def ldMismatchFrobenius
-    {p : ℕ} (Σ_S Σ_T : Matrix (Fin p) (Fin p) ℝ) : ℝ :=
-  frobeniusNormSq (Σ_S - Σ_T)
+    {p : ℕ} (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ) : ℝ :=
+  frobeniusNormSq (Sig_S - Sig_T)
 
 /-- LD mismatch is nonneg. -/
 theorem ld_mismatch_nonneg {p : ℕ}
-    (Σ_S Σ_T : Matrix (Fin p) (Fin p) ℝ) :
-    0 ≤ ldMismatchFrobenius Σ_S Σ_T := by
+    (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ) :
+    0 ≤ ldMismatchFrobenius Sig_S Sig_T := by
   unfold ldMismatchFrobenius
   exact frobeniusNormSq_nonneg _
 
 /-- LD mismatch is positive when matrices differ. -/
 theorem ld_mismatch_pos_of_ne {p : ℕ}
-    (Σ_S Σ_T : Matrix (Fin p) (Fin p) ℝ)
-    (h_ne : ∃ i j, (Σ_S - Σ_T) i j ≠ 0) :
-    0 < ldMismatchFrobenius Σ_S Σ_T := by
+    (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ)
+    (h_ne : ∃ i j, (Sig_S - Sig_T) i j ≠ 0) :
+    0 < ldMismatchFrobenius Sig_S Sig_T := by
   unfold ldMismatchFrobenius
   exact frobeniusNormSq_pos_of_exists_ne_zero _ h_ne
 
@@ -303,9 +307,9 @@ theorem ld_mismatch_pos_of_ne {p : ℕ}
     bounded by a constant times the LD mismatch. -/
 theorem mse_bounded_by_ld_mismatch
     {p : ℕ} (mse_source mse_target c : ℝ)
-    (Σ_S Σ_T : Matrix (Fin p) (Fin p) ℝ)
-    (h_bound : mse_target ≤ mse_source + c * ldMismatchFrobenius Σ_S Σ_T)
-    (h_c : 0 < c) (h_mismatch : 0 < ldMismatchFrobenius Σ_S Σ_T) :
+    (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ)
+    (h_bound : mse_target ≤ mse_source + c * ldMismatchFrobenius Sig_S Sig_T)
+    (h_c : 0 < c) (h_mismatch : 0 < ldMismatchFrobenius Sig_S Sig_T) :
     mse_source < mse_target := by
   linarith [mul_pos h_c h_mismatch]
 

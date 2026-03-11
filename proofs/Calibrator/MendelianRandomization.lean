@@ -67,7 +67,7 @@ theorem f_stat_increases_with_r2 (n : ℕ) (r2₁ r2₂ : ℝ)
   have h_n_pos : (0 : ℝ) < n - 2 := by
     have : (2 : ℝ) < n := Nat.ofNat_lt_cast.mpr h_n
     linarith
-  rw [div_lt_div_iff (by linarith) (by linarith)]
+  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
 /-- **Weak instrument bias.**
@@ -82,7 +82,7 @@ theorem weak_bias_decreases_with_f (beta_OLS F₁ F₂ : ℝ)
     (h_F₁ : 0 < F₁) (h_F₂ : 0 < F₂) (h_lt : F₁ < F₂) :
     weakInstrumentBias beta_OLS F₂ < weakInstrumentBias beta_OLS F₁ := by
   unfold weakInstrumentBias
-  exact div_lt_div_left h_beta h_F₂ h_F₁ |>.mpr h_lt
+  exact div_lt_div_iff_of_pos_left h_beta h_F₂ h_F₁ |>.mpr h_lt
 
 end IVAssumptions
 
@@ -133,6 +133,7 @@ theorem population_specific_pleiotropy
     pleiotropy or LD. -/
 theorem outlier_detection_identifies_violations
     (residual threshold : ℝ)
+    (h_threshold : 0 ≤ threshold)
     (h_outlier : threshold < |residual|) :
     residual ≠ 0 := by
   intro h; rw [h, abs_zero] at h_outlier; linarith
@@ -184,7 +185,7 @@ theorem cross_better_when_bias_dominates
     (h_mse : mrMSE bias_cross var_cross < mrMSE bias_same var_same) :
     mrMSE bias_cross var_cross < mrMSE bias_same var_same := h_mse
 
-/-- **IVW estimator for multiple instruments.**
+/- **IVW estimator for multiple instruments.**
     β_IVW = Σ w_j β_j / Σ w_j
     where w_j = 1/σ²_j and β_j are individual Wald ratios.
     Cross-ancestry weights differ due to different σ²_j. -/
@@ -267,7 +268,7 @@ theorem collider_bias_from_selection
     (h_biased : beta_observed = beta_true + selection_bias)
     (h_bias_nn : selection_bias ≠ 0) :
     beta_observed ≠ beta_true := by
-  rw [h_biased]; linarith [h_bias_nn]
+  rw [h_biased]; intro h; apply h_bias_nn; linarith
 
 /-- **Index event bias in PGS studies.**
     Conditioning on disease status (case-control design)

@@ -16,7 +16,7 @@ for comparing observed portability with theoretical predictions.
 Key results:
 1. Forward simulation under Wright-Fisher models
 2. Goodness-of-fit tests for portability models
-3. Bootstrap confidence intervals for R²
+3. Bootstrap confidence intervals for R_sq
 4. Model comparison (neutral vs selection)
 5. Power analysis for distinguishing models
 
@@ -71,7 +71,7 @@ theorem wf_variance_increases_with_time
     rw [sub_pos, div_lt_one (by linarith)]; linarith
   have h_ret_lt : 1 - 1 / (2 * Ne) < 1 := by
     rw [sub_lt_self_iff]; positivity
-  exact pow_lt_pow_of_lt_one (le_of_lt h_ret_pos) h_ret_lt h_time
+  exact pow_lt_pow_right_of_lt_one₀ h_ret_pos h_ret_lt h_time
 
 /-- **Fixation probability under drift.**
     P(fixation of allele A) = p₀ under neutrality.
@@ -131,9 +131,9 @@ end GoodnessOfFit
 
 
 /-!
-## Bootstrap Confidence Intervals for R²
+## Bootstrap Confidence Intervals for R_sq
 
-R² is a biased estimator. Bootstrap provides confidence intervals
+R_sq is a biased estimator. Bootstrap provides confidence intervals
 that account for the bias and the non-normal sampling distribution.
 -/
 
@@ -174,7 +174,7 @@ theorem adjusted_r2_le_r2 (r2 n k : ℝ)
   -- ⟺  n - k - 1 ≤ n - 1   [since 1-r2 ≥ 0]
   rw [show r2 = 1 - (1 - r2) from by ring]
   simp only [sub_le_sub_iff_left]
-  rw [le_div_iff h_denom]
+  rw [le_div_iff₀ h_denom]
   nlinarith
 
 /-- **Bootstrap CI width decreases with sample size.**
@@ -219,7 +219,8 @@ theorem aic_complexity_penalty
     aic k₁ logL₁ < aic k₂ logL₂ := by
   unfold aic
   rw [h_same_fit]
-  linarith [Nat.cast_lt.mpr h_more_params]
+  have : (k₁ : ℝ) < (k₂ : ℝ) := Nat.cast_lt.mpr h_more_params
+  linarith
 
 /-- **Likelihood ratio test for nested models.**
     LRT = -2(logL₀ - logL₁) ~ χ²(df) under the null.
@@ -254,16 +255,16 @@ Cross-validation methods for assessing PGS portability predictions.
 
 section CrossValidation
 
-/-- **Leave-one-population-out cross-validation.**
+/- **Leave-one-population-out cross-validation.**
     Train the portability model on all populations except one,
     predict for the held-out population, repeat for each. -/
 
 /-- **Cross-validation error decomposition.**
     CV error = bias² + variance + irreducible noise. -/
 theorem cv_error_decomposition
-    (bias² variance noise : ℝ)
-    (h_bias : 0 ≤ bias²) (h_var : 0 ≤ variance) (h_noise : 0 ≤ noise) :
-    0 ≤ bias² + variance + noise := by linarith
+    (bias_sq variance noise : ℝ)
+    (h_bias : 0 ≤ bias_sq) (h_var : 0 ≤ variance) (h_noise : 0 ≤ noise) :
+    0 ≤ bias_sq + variance + noise := by linarith
 
 /-- **More diverse training set → lower CV error.**
     Including more populations in training reduces both bias and variance
@@ -327,7 +328,7 @@ theorem lymphocyte_portability_prediction :
     dominates the between-group variance. -/
 theorem individual_error_r2_is_tiny
     (cv_squared : ℝ) (r2_distance_error : ℝ)
-    (h_cv : cv_squared = 2)  -- χ²₁ has CV² = 2
+    (h_cv : cv_squared = 2)  -- χ_sq₁ has CV_sq = 2
     (h_r2_small : r2_distance_error ≤ 0.01) :
     r2_distance_error ≤ 0.01 := h_r2_small
 

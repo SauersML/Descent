@@ -117,14 +117,14 @@ theorem portability_ratio_approximation_error
     |r2t / r2s - r2t_approx / r2s_approx| ≤
       (εt * r2s_approx + εs * |r2t_approx|) / (r2s * r2s_approx) := by
   have h_denom_pos : 0 < r2s * r2s_approx := mul_pos h_rs_pos h_rs_approx_pos
-  rw [div_sub_div _ _ (ne_of_gt h_rs_pos) (ne_of_gt h_rs_approx_pos)]
-  rw [abs_div, div_le_div_iff (abs_pos.mpr (ne_of_gt h_denom_pos)) h_denom_pos]
+  rw [div_sub_div _ _ (h_rs_pos.ne') (h_rs_approx_pos.ne')]
+  rw [abs_div, div_le_div_iff₀ (abs_pos.mpr (h_denom_pos.ne')) h_denom_pos]
   rw [abs_of_pos h_denom_pos]
   -- |r2t * r2s_approx - r2t_approx * r2s| ≤ εt * r2s_approx + εs * |r2t_approx|
   calc |r2t * r2s_approx - r2t_approx * r2s|
       = |(r2t - r2t_approx) * r2s_approx + r2t_approx * (r2s_approx - r2s)| := by ring_nf
     _ ≤ |(r2t - r2t_approx) * r2s_approx| + |r2t_approx * (r2s_approx - r2s)| :=
-        abs_add _ _
+        abs_add_le _ _
     _ = |r2t - r2t_approx| * |r2s_approx| + |r2t_approx| * |r2s_approx - r2s| := by
         rw [abs_mul, abs_mul]
     _ = |r2t - r2t_approx| * r2s_approx + |r2t_approx| * |r2s_approx - r2s| := by
@@ -157,24 +157,24 @@ theorem squared_error_expansion (μ μ_hat ε : ℝ) :
 /-- **Expected squared error given X = x.**
     E[(Y - Ŷ)² | X = x] = (μ(x) - μ̂(x))² + σ².
     The first term is the squared bias, the second is irreducible noise. -/
-theorem expected_squared_error_given_x (bias σ² : ℝ) (hσ : 0 ≤ σ²) :
-    bias ^ 2 + σ² ≥ σ² := by
+theorem expected_squared_error_given_x (bias σ_sq : ℝ) (hσ : 0 ≤ σ_sq) :
+    bias ^ 2 + σ_sq ≥ σ_sq := by
   linarith [sq_nonneg bias]
 
 /-- **Variance of squared error given X = x.**
     Var((Y - Ŷ)² | X = x) ≈ 4·bias²·σ² + 2·σ⁴.
     This is large even for moderate σ², explaining why individual-level
     accuracy has high variance. -/
-theorem variance_of_squared_error_lower_bound (σ² : ℝ) (hσ : 0 < σ²) :
-    0 < 2 * σ² ^ 2 := by positivity
+theorem variance_of_squared_error_lower_bound (σ_sq : ℝ) (hσ : 0 < σ_sq) :
+    0 < 2 * σ_sq ^ 2 := by positivity
 
 /-- **Conditional variance is large relative to conditional mean.**
     Var(ε²) / E[ε²]² = 2 for χ²₁ variables.
     This means even a perfect model has CV² = 2 for individual prediction accuracy.
     Adding bias only makes this worse. -/
-theorem high_cv_inevitable (σ² bias² : ℝ) (hσ : 0 < σ²) (hb : 0 ≤ bias²) :
+theorem high_cv_inevitable (σ_sq bias_sq : ℝ) (hσ : 0 < σ_sq) (hb : 0 ≤ bias_sq) :
     -- Noise variance dominates signal for individual-level prediction
-    2 * σ² ^ 2 > 0 := by positivity
+    2 * σ_sq ^ 2 > 0 := by positivity
 
 /-- **Spline fit R² bounded above by noise-to-signal ratio.**
     A cubic spline fit of ε² on genetic distance d can explain at most
@@ -230,19 +230,19 @@ theorem stabilizing_le_neutral (r2_0 fst strength : ℝ)
 
 /-- **Diversifying/fluctuating selection model: much-faster-than-neutral decay.**
     Under fluctuating selection (immune traits), effects change rapidly. -/
-noncomputable def diversifyingPortability (r2_0 fst λ_turn : ℝ) : ℝ :=
-  r2_0 * (1 - 2 * fst) * (Real.exp (-λ_turn * fst)) ^ 2
+noncomputable def diversifyingPortability (r2_0 fst lam_turn : ℝ) : ℝ :=
+  r2_0 * (1 - 2 * fst) * (Real.exp (-lam_turn * fst)) ^ 2
 
 /-- Diversifying selection gives strictly worse portability than stabilizing. -/
 theorem diversifying_lt_stabilizing
-    (r2_0 fst λ_stab λ_turn : ℝ)
+    (r2_0 fst lam_stab lam_turn : ℝ)
     (hr2 : 0 < r2_0)
     (hfst : 0 < fst) (hfst_small : 2 * fst < 1)
-    (hλs : 0 < λ_stab) (hλt : 0 < λ_turn)
+    (hlams : 0 < lam_stab) (hlamt : 0 < lam_turn)
     -- Diversifying effect is stronger than stabilizing
-    (h_stronger : 2 * λ_turn > λ_stab) :
-    diversifyingPortability r2_0 fst λ_turn <
-      stabilizingPortability r2_0 fst λ_stab := by
+    (h_stronger : 2 * lam_turn > lam_stab) :
+    diversifyingPortability r2_0 fst lam_turn <
+      stabilizingPortability r2_0 fst lam_stab := by
   unfold diversifyingPortability stabilizingPortability
   have h_base_pos : 0 < r2_0 * (1 - 2 * fst) := mul_pos hr2 (by linarith)
   apply mul_lt_mul_of_pos_left _ h_base_pos
@@ -259,8 +259,8 @@ end EvolutionaryModels
 
 We construct concrete parameter witnesses showing that the theoretical
 framework produces the qualitative patterns observed in the paper:
-- Height: monotonic R² decay with distance
-- Lymphocyte count: near-zero R² even at short distance
+- Height: monotonic R_sq decay with distance
+- Lymphocyte count: near-zero R_sq even at short distance
 -/
 
 section ConcreteWitnesses
@@ -268,7 +268,7 @@ section ConcreteWitnesses
 /-- **Height parameters: slow decay.**
     Height has highly conserved genetic architecture across populations.
     Effect correlation ≈ 0.95 even at large genetic distances. -/
-noncomputable def heightParams : ℝ × ℝ × ℝ := (0.5, 0.01, 0.95)  -- (R², λ_LD, ρ_eff)
+noncomputable def heightParams : ℝ × ℝ × ℝ := (0.5, 0.01, 0.95)  -- (R_sq, lam_LD, ρ_eff)
 
 /-- **Lymphocyte parameters: fast decay.**
     Lymphocyte count has rapidly changing genetic effects.

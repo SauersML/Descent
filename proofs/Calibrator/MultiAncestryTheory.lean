@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Calibrator.PortabilityBounds
 
 namespace Calibrator
 
@@ -25,7 +26,7 @@ GWAS diversity affects portability bounds.
 
 section GWASDiversity
 
-/-- **GWAS sample genetic distance from target.**
+/- **GWAS sample genetic distance from target.**
     d_GWAS(target) = weighted distance from target individual to GWAS centroid. -/
 
 /-- **Multi-ancestry GWAS reduces effective Fst.**
@@ -237,10 +238,10 @@ section PGSConstruction
     With fewer variants, each SNP's contribution is larger,
     making the score more sensitive to individual LD changes. -/
 theorem fewer_variants_noisier
-    (m₁ m₂ : ℕ) (σ² : ℝ)
-    (hm : m₁ < m₂) (hσ : 0 < σ²)
+    (m₁ m₂ : ℕ) (σ_sq : ℝ)
+    (hm : m₁ < m₂) (hσ : 0 < σ_sq)
     (hm₁ : 0 < m₁) :
-    σ² / (m₁ : ℝ) > σ² / (m₂ : ℝ) := by
+    σ_sq / (m₁ : ℝ) > σ_sq / (m₂ : ℝ) := by
   apply div_lt_div_of_pos_left hσ
   · exact Nat.cast_pos.mpr hm₁
   · exact Nat.cast_lt.mpr hm
@@ -258,10 +259,10 @@ theorem more_variants_more_stable
     Bayesian shrinkage (PRS-CS) pulls small effects toward zero,
     reducing the impact of LD-specific noise on portability. -/
 theorem shrinkage_reduces_portability_variance
-    (β_raw β_shrunk σ²_noise : ℝ)
+    (β_raw β_shrunk σ_sq_noise : ℝ)
     (h_shrunk : |β_shrunk| ≤ |β_raw|)
-    (hσ : 0 < σ²_noise) :
-    β_shrunk ^ 2 * σ²_noise ≤ β_raw ^ 2 * σ²_noise := by
+    (hσ : 0 < σ_sq_noise) :
+    β_shrunk ^ 2 * σ_sq_noise ≤ β_raw ^ 2 * σ_sq_noise := by
   apply mul_le_mul_of_nonneg_right _ (le_of_lt hσ)
   exact sq_le_sq' (by linarith [abs_nonneg β_shrunk, abs_nonneg β_raw]) h_shrunk
 

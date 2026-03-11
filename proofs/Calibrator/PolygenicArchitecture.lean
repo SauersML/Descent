@@ -45,7 +45,7 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
     (h_M : M₁ < M₂) :
     expectedSquaredEffect h2 M₂ < expectedSquaredEffect h2 M₁ := by
   unfold expectedSquaredEffect
-  exact div_lt_div_left h_h2 h_M₂ h_M₁ |>.mpr h_M
+  exact div_lt_div_iff_of_pos_left h_h2 h_M₂ h_M₁ |>.mpr h_M
 
 /-- **Spike-and-slab model.**
     π proportion of variants have effect ~ N(0, σ²_large),
@@ -103,7 +103,7 @@ theorem effective_polygenicity_ge_one
     (h_cs : sum_fourth ≤ sum_sq^2) :
     1 ≤ effectivePolygenicity sum_sq sum_fourth := by
   unfold effectivePolygenicity
-  rw [le_div_iff h_fourth]
+  rw [le_div_iff₀ h_fourth]
   linarith
 
 /-- **More polygenic → more portable.**
@@ -162,7 +162,7 @@ theorem enrichment_interpretation (h2_c M_c h2_t M_t : ℝ)
     (h_enriched : h2_c / M_c > h2_t / M_t) :
     1 < heritabilityEnrichment h2_c M_c h2_t M_t := by
   unfold heritabilityEnrichment
-  rw [one_lt_div (div_pos h_ht h_Mt)]
+  rw [one_lt_div₀ (div_pos h_ht h_Mt)]
   exact h_enriched
 
 /-- **Coding regions are enriched.**
@@ -175,13 +175,11 @@ theorem coding_enriched
     (h_all_pos : 0 < h2_coding ∧ 0 < h2_total ∧ 0 < M_coding ∧ 0 < M_total) :
     5 < heritabilityEnrichment h2_coding M_coding h2_total M_total := by
   unfold heritabilityEnrichment
-  rw [lt_div_iff (div_pos h_all_pos.2.1 h_all_pos.2.2.2)]
-  rw [div_lt_iff h_all_pos.2.2.1] at h_prop_variants
-  rw [lt_div_iff h_all_pos.2.1] at h_prop_h2
-  -- h_prop_variants: M_coding < 0.02 * M_total
-  -- h_prop_h2: 0.1 * h2_total < h2_coding
-  -- Goal: 5 * (h2_total / M_total) < h2_coding / M_coding
-  rw [div_lt_div_iff h_all_pos.2.2.2 h_all_pos.2.2.1]
+  obtain ⟨h_hc, h_ht, h_mc, h_mt⟩ := h_all_pos
+  rw [gt_iff_lt, lt_div_iff₀ (div_pos h_ht h_mt)]
+  rw [div_lt_iff₀ h_mt] at h_prop_variants
+  rw [lt_div_iff₀ h_ht] at h_prop_h2
+  rw [div_lt_div_iff₀ h_mt h_mc]
   nlinarith
 
 /-- **Portability varies by functional category.**
@@ -192,7 +190,7 @@ theorem coding_more_portable_than_regulatory
     (h_more : port_regulatory < port_coding) :
     port_regulatory < port_coding := h_more
 
-/-- **LDSC-SEG for partitioned heritability.**
+/- **LDSC-SEG for partitioned heritability.**
     h²_c = M_c × (Σ_j∈c l_j × τ_c) / (N × Σ_j l_j)
     where τ_c is the per-SNP heritability coefficient for category c. -/
 
@@ -221,8 +219,12 @@ theorem predicted_le_source (r2_source rg fst_ld bias_tech : ℝ)
     (h_tech : 0 ≤ bias_tech) (h_tech_le : bias_tech ≤ 1) :
     predictedPortability r2_source rg fst_ld bias_tech ≤ r2_source := by
   unfold predictedPortability
-  have h_rg_sq : rg^2 ≤ 1 := by nlinarith [sq_abs rg]
-  nlinarith [sq_nonneg rg, mul_nonneg h_r2 (sq_nonneg rg)]
+  have h_rg_sq : rg^2 ≤ 1 := by nlinarith [sq_abs rg, abs_nonneg rg]
+  have h1 : 0 ≤ (1 - fst_ld) := by linarith
+  have h2 : 0 ≤ (1 - bias_tech) := by linarith
+  have h3 : rg ^ 2 * (1 - fst_ld) ≤ 1 := by nlinarith
+  have h4 : rg ^ 2 * (1 - fst_ld) * (1 - bias_tech) ≤ 1 := by nlinarith
+  nlinarith
 
 /-- **Architecture-based trait classification.**
     Traits can be classified by their architecture:

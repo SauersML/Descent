@@ -33,7 +33,7 @@ LD structure and allele frequency spectrum.
 
 section GWASDiscovery
 
-/-- **GWAS power function.**
+/- **GWAS power function.**
     Power = Φ(√NCP - z_α/2) where NCP = n × β² × 2p(1-p). -/
 
 /-- **Power increases with sample size.** -/
@@ -70,12 +70,13 @@ theorem winners_curse_worse_near_threshold
     (β₁ β₂ threshold : ℝ)
     (h₁_near : |β₁| < 1.5 * threshold)
     (h₂_far : 2 * threshold < |β₂|)
-    (h_thr : 0 < threshold) :
+    (h_thr : 0 < threshold)
+    (hβ₁ : β₁ ≠ 0) :
     -- Relative bias is larger for β₁
     threshold / |β₁| > threshold / |β₂| := by
   apply div_lt_div_of_pos_left h_thr
-  · exact abs_pos.mpr (by linarith [abs_nonneg β₂])
-  · linarith [abs_nonneg β₁]
+  · exact abs_pos.mpr hβ₁
+  · linarith
 
 end GWASDiscovery
 
@@ -89,7 +90,7 @@ why the method matters for portability.
 
 section PGSMethods
 
-/-- **C+T selects independent SNPs above a p-value threshold.**
+/- **C+T selects independent SNPs above a p-value threshold.**
     This discards information from sub-threshold SNPs and
     from LD between SNPs. -/
 
@@ -149,14 +150,14 @@ theorem ols_unbiased
     β̂_ridge = (X'X + λI)⁻¹X'Y = β_true × X'X/(X'X + λI).
     Bias: E[β̂] = β_true × (1 - λ/(X'X + λ)). -/
 theorem ridge_introduces_bias
-    (β_true λ xtx : ℝ)
-    (h_λ : 0 < λ) (h_xtx : 0 < xtx) :
-    |β_true * xtx / (xtx + λ)| < |β_true| ∨ β_true = 0 := by
+    (β_true lam xtx : ℝ)
+    (h_lam : 0 < lam) (h_xtx : 0 < xtx) :
+    |β_true * xtx / (xtx + lam)| < |β_true| ∨ β_true = 0 := by
   by_cases hβ : β_true = 0
   · right; exact hβ
   · left
     rw [abs_mul, abs_div]
-    rw [div_lt_iff (by positivity)]
+    rw [div_lt_iff₀ (by positivity)]
     rw [abs_of_pos (by linarith), abs_of_pos (by linarith)]
     nlinarith [abs_nonneg β_true, abs_pos.mpr hβ]
 
@@ -207,9 +208,9 @@ theorem genetic_correlation_bounded
     |geneticCorrelation cov_g vg₁ vg₂| ≤ 1 := by
   unfold geneticCorrelation
   rw [abs_div]
-  rw [div_le_one (by exact abs_pos.mpr (ne_of_gt (Real.sqrt_pos.mpr (by positivity))))]
+  rw [div_le_one (by exact abs_pos.mpr (Real.sqrt_pos.mpr (by positivity)).ne')]
   rw [abs_of_pos (Real.sqrt_pos.mpr (by positivity))]
-  exact Real.le_sqrt (abs_nonneg _) h_cs
+  exact (Real.le_sqrt (abs_nonneg _) (by positivity)).mpr (by nlinarith [sq_abs cov_g])
 
 /-- **Cross-trait portability leverages genetic correlation.**
     If trait A has good portability and rg(A,B) is high,
@@ -261,11 +262,7 @@ theorem wgs_eliminates_ld_mismatch
     -- With WGS, LD factor becomes 1 (no tagging loss)
     port_effect_factor * port_env_factor ≥
       port_ld_factor * port_effect_factor * port_env_factor := by
-  have h_prod : 0 < port_effect_factor * port_env_factor := mul_pos h_eff h_env
-  calc port_effect_factor * port_env_factor
-      = 1 * (port_effect_factor * port_env_factor) := by ring
-    _ ≥ port_ld_factor * (port_effect_factor * port_env_factor) :=
-        mul_le_mul_of_nonneg_right h_ld_le (le_of_lt h_prod)
+  nlinarith [mul_pos h_eff h_env]
 
 /-- **Rare variant PGS has poor cross-population portability.**
     Variants with MAF < 1% are mostly population-specific → zero shared signal. -/

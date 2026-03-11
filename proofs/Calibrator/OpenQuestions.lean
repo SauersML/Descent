@@ -60,7 +60,7 @@ theorem r2_small_when_within_dominates
     (hδ_pos : 0 < δ) :
     varEZgivenD / varZ ≤ δ := by
   have h1 : varEZgivenD = varZ - eVarZgivenD := by linarith
-  rw [h1, sub_div, div_self (ne_of_gt h_varZ_pos)]
+  rw [h1, sub_div, div_self (h_varZ_pos.ne')]
   linarith [le_div_iff₀ h_varZ_pos |>.mpr (by linarith : (1 - δ) * varZ ≤ eVarZgivenD)]
 
 /-- **χ² coefficient of variation.**
@@ -69,13 +69,13 @@ theorem r2_small_when_within_dominates
 theorem squared_error_cv_is_two (sigma_sq : ℝ) (hσ : 0 < sigma_sq) :
     2 * sigma_sq ^ 2 / sigma_sq ^ 2 = 2 := by
   rw [mul_div_cancel_right₀]
-  exact pow_ne_zero 2 (ne_of_gt hσ)
+  exact pow_ne_zero 2 (hσ.ne')
 
 /-- **SES explains as much as genetic distance.**
     If both covariates explain comparable fractions and their total
     is bounded, each individual fraction must be small. -/
 theorem comparable_covariates_both_small
-    (r2_d r2_s : ℝ)
+    (r2_d r2_s B ε : ℝ)
     (h_d_nonneg : 0 ≤ r2_d) (h_s_nonneg : 0 ≤ r2_s)
     (h_comparable : r2_d ≤ r2_s + ε)
     (h_sum_bound : r2_d + r2_s ≤ B)
@@ -603,7 +603,7 @@ theorem r2_incomparable_across_groups
   apply h_noise_diff
   have h_d₁ : (0 : ℝ) < v_signal + v_noise₁ := by linarith
   have h_d₂ : (0 : ℝ) < v_signal + v_noise₂ := by linarith
-  have h_cross := (div_eq_div_iff (ne_of_gt h_d₁) (ne_of_gt h_d₂)).mp h_eq
+  have h_cross := (div_eq_div_iff (h_d₁.ne') (h_d₂.ne')).mp h_eq
   nlinarith
 
 /-- **Heteroscedasticity inflates apparent portability loss.**

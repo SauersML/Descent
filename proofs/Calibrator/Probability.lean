@@ -833,7 +833,7 @@ noncomputable def mseRisk {k : ℕ} [Fintype (Fin k)] (dgp : DataGeneratingProce
     Fully deriving E[Y|P,C] via disintegration is heavy in Mathlib; this structure
     captures the *characterizing property* that proofs actually need. -/
 structure ConditionalMeanDGP (k : ℕ) where
-  /-- Joint law on (P, C, Y). -/
+  /- Joint law on (P, C, Y). -/
   μ : Measure (ℝ × (Fin k → ℝ) × ℝ)
   prob : IsProbabilityMeasure μ := by infer_instance
   /-- Conditional mean function m = E[Y | P, C]. -/

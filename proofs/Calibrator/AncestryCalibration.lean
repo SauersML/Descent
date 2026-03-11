@@ -41,16 +41,15 @@ theorem recalibration_slope_under_drift
     (b_source ρ α : ℝ) (h_α : α ≠ 0) :
     ρ * (b_source * α) / (α ^ 2) = ρ * b_source / α := by
   field_simp
-  ring
 
 /-- **Recalibration recovers R² up to effect turnover limit.**
     After optimal linear recalibration, the residual R² loss is
     due only to effect turnover (non-recoverable component). -/
 theorem recalibration_recovers_up_to_turnover
-    (r2_source ρ² r2_recalibrated r2_loss_turnover : ℝ)
-    (h_recalib : r2_recalibrated = r2_source * ρ²)
-    (h_turnover : r2_loss_turnover = r2_source * (1 - ρ²))
-    (h_ρ : 0 ≤ ρ²) (h_ρ_le : ρ² ≤ 1)
+    (r2_source ρ_sq r2_recalibrated r2_loss_turnover : ℝ)
+    (h_recalib : r2_recalibrated = r2_source * ρ_sq)
+    (h_turnover : r2_loss_turnover = r2_source * (1 - ρ_sq))
+    (h_ρ : 0 ≤ ρ_sq) (h_ρ_le : ρ_sq ≤ 1)
     (h_r2 : 0 < r2_source) :
     r2_recalibrated + r2_loss_turnover = r2_source := by
   rw [h_recalib, h_turnover]; ring
@@ -85,7 +84,7 @@ section SplineCalibration
 theorem spline_error_improves_with_knots
     (h₁ h₂ : ℝ) (h_finer : h₂ < h₁) (h_pos : 0 < h₂) :
     h₂ ^ 4 < h₁ ^ 4 := by
-  apply pow_lt_pow_left h_finer (le_of_lt h_pos)
+  apply pow_lt_pow_left₀ h_finer (le_of_lt h_pos)
   norm_num
 
 /-- **Bias-variance tradeoff in spline calibration.**
@@ -125,7 +124,7 @@ of transfer learning for PGS.
 
 section TransferLearning
 
-/-- **Transfer learning decomposition.**
+/- **Transfer learning decomposition.**
     With n_T target samples, the transferred estimator has:
     MSE = MSE_oracle + gap(ρ) × σ²/n_T + bias²(ρ)
     where ρ is the effect correlation and gap(ρ) captures
@@ -133,11 +132,11 @@ section TransferLearning
 
 /-- **More target data reduces MSE monotonically.** -/
 theorem more_target_data_reduces_mse
-    (σ² gap : ℝ) (n₁ n₂ : ℕ)
-    (h_σ : 0 < σ²) (h_gap : 0 < gap)
+    (σ_sq gap : ℝ) (n₁ n₂ : ℕ)
+    (h_σ : 0 < σ_sq) (h_gap : 0 < gap)
     (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
     (h_more : n₁ < n₂) :
-    gap * σ² / (n₂ : ℝ) < gap * σ² / (n₁ : ℝ) := by
+    gap * σ_sq / (n₂ : ℝ) < gap * σ_sq / (n₁ : ℝ) := by
   apply div_lt_div_of_pos_left (mul_pos h_gap h_σ)
   · exact Nat.cast_pos.mpr h_n₁
   · exact Nat.cast_lt.mpr h_more
@@ -172,10 +171,11 @@ theorem meta_analysis_reduces_variance
     (var₁ var₂ : ℝ) (h₁ : 0 < var₁) (h₂ : 0 < var₂) :
     -- Inverse-variance weighted combination has smaller variance
     1 / (1/var₁ + 1/var₂) < var₁ := by
-  rw [div_add_div _ _ (ne_of_gt h₁) (ne_of_gt h₂)]
-  rw [one_div, one_div, div_inv_eq_mul_div]
-  rw [one_mul, div_lt_iff (by positivity)]
-  nlinarith
+  have h_sum_pos : 0 < 1/var₁ + 1/var₂ := by positivity
+  rw [div_lt_iff₀ h_sum_pos]
+  have : var₁ * (1/var₁ + 1/var₂) = 1 + var₁/var₂ := by field_simp
+  rw [this]
+  linarith [div_pos h₁ h₂]
 
 end TransferLearning
 
@@ -195,18 +195,18 @@ section PhenotypeHeterogeneity
 theorem measurement_invariance_violation
     (r2₁ r2₂ : ℝ) (scale : ℝ)
     (h_scale : scale ≠ 1) (h_scale_pos : 0 < scale)
-    (h_r2₁ : 0 < r2₁) :
+    (h_r2₁ : 0 < r2₁) (h_r2₁_le : r2₁ ≤ 1) :
     -- Scaling the phenotype changes R² when there's additive noise
     r2₁ ≠ r2₁ * scale ^ 2 / (r2₁ * scale ^ 2 + (1 - r2₁)) ∨ r2₁ = 1 := by
   by_cases h : r2₁ = 1
   · right; exact h
   · left; intro heq
-    have h_lt : r2₁ < 1 := lt_of_le_of_ne (by nlinarith [sq_nonneg scale]) (Ne.symm h)
+    have h_lt : r2₁ < 1 := lt_of_le_of_ne h_r2₁_le h
     have h_pos_denom : 0 < r2₁ * scale ^ 2 + (1 - r2₁) := by nlinarith [sq_nonneg scale]
-    rw [eq_div_iff (ne_of_gt h_pos_denom)] at heq
+    rw [eq_div_iff h_pos_denom.ne'] at heq
     have : r2₁ * (r2₁ * scale ^ 2 + (1 - r2₁)) = r2₁ * scale ^ 2 := heq
     have : r2₁ * (1 - r2₁) = r2₁ * scale ^ 2 * (1 - r2₁) := by nlinarith
-    have h_nonzero : r2₁ * (1 - r2₁) ≠ 0 := mul_ne_zero (ne_of_gt h_r2₁) (by linarith)
+    have h_nonzero : r2₁ * (1 - r2₁) ≠ 0 := mul_ne_zero (h_r2₁.ne') (by linarith)
     have : 1 = scale ^ 2 := by
       field_simp at this ⊢
       nlinarith
@@ -277,12 +277,10 @@ theorem epistatic_changes_faster
     (h₁_drop : H₁_t < H₁_s) (h₂_drop : H₂_t < H₂_s)
     (h₁_pos : 0 < H₁_t) (h₂_pos : 0 < H₂_t) :
     H₁_t * H₂_t / (H₁_s * H₂_s) < H₁_t / H₁_s := by
-  rw [div_lt_div_iff (mul_pos h₁_pos h₂_pos) (by linarith : 0 < H₁_s)]
-  rw [mul_comm (H₁_t * H₂_t), mul_comm H₁_t]
-  -- H₁_s * (H₁_t * H₂_t) < H₁_s * H₂_s * H₁_t
-  -- = H₁_t * (H₁_s * H₂_s)
-  -- Need: H₂_t < H₂_s, and H₁_s * H₁_t > 0
-  nlinarith [mul_pos (by linarith : 0 < H₁_s) h₁_pos]
+  have h₁_s_pos : 0 < H₁_s := by linarith
+  have h₂_s_pos : 0 < H₂_s := by linarith
+  rw [div_lt_div_iff₀ (mul_pos h₁_s_pos h₂_s_pos) h₁_s_pos]
+  nlinarith [mul_pos h₁_s_pos h₁_pos]
 
 /-- **Additive PGS misses epistatic signal → portability of epistatic component is zero.**
     An additive PGS captures V_A but not V_epistasis. The "missing heritability"

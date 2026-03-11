@@ -117,9 +117,9 @@ theorem chouldechova_impossibility
   intro h
   apply h_prev_diff
   have h_sens : 0 < 1 - fnr := by linarith
-  have h1_pos : 0 < K₁ * (1 - fnr) + (1 - K₁) * fpr := by positivity
-  have h2_pos : 0 < K₂ * (1 - fnr) + (1 - K₂) * fpr := by positivity
-  rw [div_eq_div_iff (ne_of_gt h1_pos) (ne_of_gt h2_pos)] at h
+  have h1_pos : 0 < K₁ * (1 - fnr) + (1 - K₁) * fpr := by nlinarith
+  have h2_pos : 0 < K₂ * (1 - fnr) + (1 - K₂) * fpr := by nlinarith
+  rw [div_eq_div_iff h1_pos.ne' h2_pos.ne'] at h
   -- K₁(1-fnr)(K₂(1-fnr) + (1-K₂)fpr) = K₂(1-fnr)(K₁(1-fnr) + (1-K₁)fpr)
   -- K₁(1-fnr)(1-K₂)fpr = K₂(1-fnr)(1-K₁)fpr
   -- K₁(1-K₂) = K₂(1-K₁)  [cancel (1-fnr)fpr > 0]
@@ -142,9 +142,9 @@ theorem equal_fpr_requires_different_thresholds
   intro h_eq
   apply h_mu_diff
   rw [h_eq, h_sigma_eq] at h_equal_z
-  have := mul_right_cancel₀ (ne_of_gt (inv_pos.mpr h_sigma₂))
   rw [div_eq_mul_inv, div_eq_mul_inv] at h_equal_z
-  linarith [mul_left_cancel₀ (inv_ne_zero.mpr (ne_of_gt h_sigma₂)) h_equal_z]
+  have h_inv_ne : (sigma₂)⁻¹ ≠ 0 := inv_ne_zero h_sigma₂.ne'
+  linarith [mul_left_cancel₀ h_inv_ne h_equal_z]
 
 /-- **Group-blind vs group-aware PGS policies.**
     A group-blind policy (same threshold for all) violates
@@ -170,7 +170,7 @@ to minimize the maximum portability gap.
 
 section ResourceAllocation
 
-/-- **Minimax allocation minimizes the maximum disparity.**
+/- **Minimax allocation minimizes the maximum disparity.**
     Instead of maximizing average R², allocate resources to
     minimize max_pop(R²_EUR - R²_pop). -/
 
@@ -187,8 +187,8 @@ theorem r2_increases_with_n
     (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂) (h_more : n₁ < n₂) :
     expectedR2FromN n₁ h2 M < expectedR2FromN n₂ h2 M := by
   unfold expectedR2FromN
-  rw [div_lt_div_iff (by positivity) (by positivity)]
-  nlinarith
+  rw [div_lt_div_iff₀ (by positivity) (by positivity)]
+  nlinarith [mul_pos h_h2 h_M]
 
 /-- R² is concave in n (diminishing returns). -/
 theorem r2_concave_in_n
@@ -204,9 +204,9 @@ theorem r2_concave_in_n
   have h1 : 0 < n * h2 + M := by positivity
   have h2' : 0 < (n + dn) * h2 + M := by positivity
   have h3 : 0 < (n + 2 * dn) * h2 + M := by positivity
-  rw [div_sub_div _ _ (ne_of_gt h3) (ne_of_gt h2'),
-      div_sub_div _ _ (ne_of_gt h2') (ne_of_gt h1)]
-  rw [div_lt_div_iff (mul_pos h3 h2') (mul_pos h2' h1)]
+  rw [div_sub_div _ _ (h3.ne') (h2'.ne'),
+      div_sub_div _ _ (h2'.ne') (h1.ne')]
+  rw [div_lt_div_iff₀ (mul_pos h3 h2') (mul_pos h2' h1)]
   nlinarith [sq_nonneg h2, sq_nonneg M, sq_nonneg dn,
              mul_pos h_h2 h_M, mul_pos h_h2 h_dn,
              mul_pos h_M h_dn]
@@ -240,7 +240,7 @@ theorem r2_threshold_for_utility
     -- PGS is not useful in this population
     r2 < r2_threshold := h_below
 
-/-- **Population-specific PGS report cards.**
+/- **Population-specific PGS report cards.**
     For each PGS, report: R², AUC, calibration, and portability ratio
     for each clinically relevant population. -/
 
@@ -252,6 +252,7 @@ theorem validation_n_depends_on_r2
     (h_r2_afr_smaller : r2_afr < r2_eur)
     (h_r2_eur : 0 < r2_eur) (h_r2_afr : 0 < r2_afr)
     (h_delta : 0 < delta)
+    (h_r2_eur_lt : r2_eur < 1) (h_r2_afr_lt : r2_afr < 1)
     -- For smaller R², the relative SE is larger → need more samples
     (n_eur n_afr : ℝ)
     (h_n_eur : n_eur = 4 * r2_eur * (1 - r2_eur) ^ 2 / delta ^ 2)
@@ -260,10 +261,10 @@ theorem validation_n_depends_on_r2
     -- But the relative precision n_needed / R² is what matters for utility assessment
     0 < n_eur ∧ 0 < n_afr := by
   constructor
-  · rw [h_n_eur]; positivity
-  · rw [h_n_afr]; positivity
+  · rw [h_n_eur]; apply div_pos; · positivity; · positivity
+  · rw [h_n_afr]; apply div_pos; · positivity; · positivity
 
-/-- **Ancestry-aware clinical decision support.**
+/- **Ancestry-aware clinical decision support.**
     The clinical decision system should:
     1. Report ancestry-specific PGS performance
     2. Adjust confidence intervals for portability

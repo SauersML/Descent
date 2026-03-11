@@ -96,7 +96,7 @@ of this mismatch directly predicts PGS portability loss.
 
 section LDMismatch
 
-/-- **Frobenius norm of LD difference.**
+/- **Frobenius norm of LD difference.**
     ||Σ_source - Σ_target||²_F = Σ_ij (r_ij^source - r_ij^target)²
     This quantifies the total LD mismatch. -/
 
@@ -169,7 +169,7 @@ theorem smaller_blocks_more_segments
     (h_smaller : block₁ < block₂) :
     numBlocks L block₂ < numBlocks L block₁ := by
   unfold numBlocks
-  exact div_lt_div_left h_L h_b₂ h_b₁ |>.mpr h_smaller
+  exact div_lt_div_iff_of_pos_left h_L h_b₂ h_b₁ |>.mpr h_smaller
 
 /-- **Block-wise portability contribution.**
     Each LD block contributes independently to PGS portability.
@@ -204,7 +204,7 @@ variant has with its neighbors. This is crucial for PGS weighting.
 
 section LDScore
 
-/-- **LD score definition.**
+/- **LD score definition.**
     ℓ_j = Σ_k r²_jk where sum is over all variants within
     a window. Higher LD score → more tagging → more signal
     but also more noise in GWAS. -/
@@ -233,6 +233,7 @@ theorem ldsr_increases_with_ell (N h2 M ell₁ ell₂ a : ℝ)
     (h_ell : ell₁ < ell₂) :
     ldsrExpectedChi2 N h2 M ell₁ a < ldsrExpectedChi2 N h2 M ell₂ a := by
   unfold ldsrExpectedChi2
+  have : 0 < N * h2 / M := div_pos (mul_pos h_N h_h2) h_M
   nlinarith
 
 /-- **Cross-ancestry LDSR.**
@@ -247,11 +248,10 @@ theorem cross_ancestry_ldsr_biased
     h2_estimated ≠ h2_true := by
   rw [h_formula]
   intro h
-  have : ell_discovery / ell_reference = 1 := by
-    rw [eq_div_iff (ne_of_gt h_ref)]
-    linarith [mul_div_cancel₀ h2_true (ne_of_gt h_ref)]
-  rw [div_eq_one_iff_eq (ne_of_gt h_ref)] at this
-  exact h_mismatch this
+  apply h_mismatch
+  have h_ne : h2_true ≠ 0 := h_true.ne'
+  field_simp at h
+  nlinarith
 
 end LDScore
 
@@ -294,8 +294,6 @@ theorem admixture_ld_max_at_half (alpha p_A p_B r : ℝ) (g : ℕ)
   have h_sq : 0 ≤ (p_A - p_B) ^ 2 := sq_nonneg _
   have h_pow : 0 ≤ (1 - r) ^ g := pow_nonneg (by linarith) g
   -- Need: α(1-α) ≤ 0.25
-  have h_key : alpha * (1 - alpha) ≤ 0.5 * (1 - 0.5) := by nlinarith [sq_nonneg (alpha - 0.5)]
-  simp only [mul_comm 0.5 (1 - 0.5)] at h_key
   nlinarith [sq_nonneg (alpha - 0.5)]
 
 /-- **Admixture LD decays over generations.**
@@ -309,7 +307,7 @@ theorem admixture_ld_decays (alpha p_A p_B r : ℝ) (g₁ g₂ : ℕ)
       admixtureLDMagnitude alpha p_A p_B r g₁ := by
   unfold admixtureLDMagnitude
   have h_coeff : 0 < alpha * (1 - alpha) * (p_A - p_B) ^ 2 := by
-    exact mul_pos (mul_pos h_alpha (by linarith)) (sq_pos_of_ne_zero _ (sub_ne_zero.mpr h_diff))
+    exact mul_pos (mul_pos h_alpha (by linarith)) (sq_pos_of_ne_zero (sub_ne_zero.mpr h_diff))
   apply mul_lt_mul_of_pos_left _ h_coeff
   exact pow_lt_pow_right_of_lt_one₀ (by linarith) (by linarith) h_g
 
@@ -321,7 +319,8 @@ theorem admixture_ld_confounds_pgs
     (h_confounded : pgs_effect = true_effect + confounding_bias)
     (h_bias : confounding_bias ≠ 0) :
     pgs_effect ≠ true_effect := by
-  rw [h_confounded]; linarith [h_bias]
+  rw [h_confounded]
+  intro h; apply h_bias; linarith
 
 end AdmixtureLD
 

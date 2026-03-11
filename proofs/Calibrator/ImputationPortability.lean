@@ -33,7 +33,7 @@ correlation between imputed and true genotypes.
 
 section ImputationQuality
 
-/-- **Imputation r² (INFO score).**
+/- **Imputation r² (INFO score).**
     r²_imp = Var(E[g|observed]) / Var(g_true).
     This measures how well the imputed dosage captures the true genotype. -/
 
@@ -118,7 +118,7 @@ theorem matched_panel_optimal
     (h_optimal : r2_unmatched ≤ r2_matched) :
     r2_unmatched ≤ r2_matched := h_optimal
 
-/-- **Imputation quality at a variant depends on local LD.**
+/- **Imputation quality at a variant depends on local LD.**
     r²_imp(j) ≈ r²_LD(j, best_tag) where best_tag is the genotyped
     variant in highest LD with j. -/
 
@@ -160,7 +160,7 @@ section RareVariantImputation
 theorem rare_variant_poor_imputation
     (r2_common r2_rare : ℝ)
     (h_much_worse : r2_rare < 0.5 * r2_common)
-    (h_common_good : 0.9 < r2_common) :
+    (h_common_good : 0.9 < r2_common) (h_common_le : r2_common ≤ 1) :
     r2_rare < 0.5 := by nlinarith
 
 /-- **Population specificity of rare variant imputation.**
@@ -203,7 +203,7 @@ This creates systematic bias in cross-population PGS.
 
 section ArrayAscertainment
 
-/-- **SNP ascertainment on arrays is EUR-biased.**
+/- **SNP ascertainment on arrays is EUR-biased.**
     Most array variants were discovered in European GWAS.
     These variants have higher MAF in EUR → better imputation
     → higher PGS signal in EUR. -/

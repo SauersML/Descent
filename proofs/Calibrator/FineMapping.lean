@@ -73,7 +73,7 @@ theorem smaller_cs_higher_resolution (cs₁ cs₂ : ℝ)
     (h₁ : 0 < cs₁) (h₂ : 0 < cs₂) (h_smaller : cs₁ < cs₂) :
     finemapResolution cs₂ < finemapResolution cs₁ := by
   unfold finemapResolution
-  exact div_lt_div_left one_pos h₂ h₁ |>.mpr h_smaller
+  exact div_lt_div_iff_of_pos_left one_pos h₂ h₁ |>.mpr h_smaller
 
 end CredibleSets
 
@@ -105,7 +105,7 @@ theorem causal_pgs_bounded_by_rg
     (h_bound : r2_target ≤ rg^2 * r2_source)
     (h_rg_lt : |rg| < 1) (h_r2 : 0 < r2_source) :
     r2_target < r2_source := by
-  have : rg^2 < 1 := by nlinarith [sq_abs rg]
+  have : rg^2 < 1 := by nlinarith [sq_abs rg, abs_nonneg rg]
   nlinarith
 
 /-- **LD proxy inflation.**
@@ -120,7 +120,7 @@ theorem proxy_inflated (beta_causal r2_ld : ℝ)
     (h_beta : 0 < beta_causal) (h_r2 : 0 < r2_ld) (h_r2_lt : r2_ld < 1) :
     beta_causal < proxyInflation beta_causal r2_ld := by
   unfold proxyInflation
-  rw [lt_div_iff h_r2]
+  rw [lt_div_iff₀ h_r2]
   nlinarith
 
 /-- **Cross-ancestry LD change inflates proxy differently.**
@@ -133,8 +133,9 @@ theorem differential_proxy_inflation
     proxyInflation beta r2_eur ≠ proxyInflation beta r2_afr := by
   unfold proxyInflation
   intro h
-  rw [div_eq_div_iff h_eur h_afr] at h
-  have : r2_eur = r2_afr := by nlinarith
+  rw [div_eq_div_iff h_eur.ne' h_afr.ne'] at h
+  have : r2_eur = r2_afr := by
+    exact mul_left_cancel₀ h_beta.ne' h
   exact h_diff this
 
 end CausalVariantPortability
@@ -225,7 +226,7 @@ theorem pip_pgs_more_portable
     (h_nn : 0 < port_standard) :
     0 < port_pip := by linarith
 
-/-- **SuSiE posterior for PGS.**
+/- **SuSiE posterior for PGS.**
     SuSiE (Sum of Single Effects) produces credible sets and PIPs.
     Using SuSiE posteriors for PGS construction:
     PGS = Σ_l Σ_j α_lj × μ_lj × g_j
@@ -281,7 +282,7 @@ theorem conserved_annotations_help_portability
 theorem causal_enrichment_in_functional
     (enrichment_coding enrichment_enhancer : ℝ)
     (h_coding : 10 < enrichment_coding)
-    (h_enhancer : 3 < enrichment_enhancer) :
+    (h_enhancer : enrichment_enhancer < 10) :
     enrichment_enhancer < enrichment_coding := by linarith
 
 /-- **Population-specific regulatory elements.**

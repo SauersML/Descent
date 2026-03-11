@@ -213,12 +213,12 @@ GWAS effect sizes and allele frequencies.
 
 section DetectingAdaptation
 
-/-- **Turchin et al. height signal.**
+/- **Turchin et al. height signal.**
     Height-increasing alleles are systematically more common
     in Northern Europeans. This was initially interpreted as
     evidence of directional selection for height. -/
 
-/-- **Berg-Coop test for polygenic adaptation.**
+/- **Berg-Coop test for polygenic adaptation.**
     Tests whether the variance of trait-associated allele frequencies
     exceeds neutral expectation, accounting for population structure. -/
 

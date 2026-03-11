@@ -34,7 +34,7 @@ This is optimal under additivity but misses non-additive effects.
 
 section AdditiveApproximation
 
-/-- **Fisher's average effect.**
+/- **Fisher's average effect.**
     The average effect αᵢ of allele i is defined as the slope
     of the regression of genotypic value on allele count.
     This captures additive effects even in the presence of dominance. -/
@@ -48,7 +48,7 @@ theorem additive_dominates_genetic_variance
     (h_A_large : V_A ≥ V_G / 2)
     (h_D : 0 ≤ V_D) (h_I : 0 ≤ V_I) (h_G : 0 < V_G) :
     V_A / V_G ≥ 1 / 2 := by
-  rw [ge_iff_le, div_le_div_iff (by norm_num : (0:ℝ) < 2) h_G]
+  rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 2) h_G]
   linarith
 
 /-- **Additive PGS R² ≤ h² narrow-sense.**
@@ -156,7 +156,7 @@ average of the two homozygotes.
 
 section DominanceEffects
 
-/-- **Dominance deviation.**
+/- **Dominance deviation.**
     For genotype Aa at a locus:
     Genetic value = a + d (additive + dominance).
     d = 0 means no dominance (purely additive). -/
@@ -181,14 +181,15 @@ theorem dominance_variance_nonneg
 theorem dominance_portability_loss
     (het_source het_target d_val : ℝ)
     (h_het_diff : het_source ≠ het_target)
-    (h_d : d_val ≠ 0) :
+    (h_d : d_val ≠ 0)
+    (h_sign : 0 ≤ het_source ∧ 0 ≤ het_target) :
     (het_source * d_val) ^ 2 ≠ (het_target * d_val) ^ 2 := by
   intro h
   apply h_het_diff
-  have h_sq_eq : (het_source * d_val) ^ 2 = (het_target * d_val) ^ 2 := h
-  rw [mul_pow, mul_pow] at h_sq_eq
-  have h_d_sq : d_val ^ 2 ≠ 0 := pow_ne_zero 2 h_d
-  exact_mod_cast mul_right_cancel₀ h_d_sq h_sq_eq
+  rw [mul_pow, mul_pow] at h
+  have h_d_sq : d_val ^ 2 ≠ 0 := (sq_pos_of_ne_zero h_d).ne'
+  have h_eq : het_source ^ 2 = het_target ^ 2 := mul_right_cancel₀ h_d_sq h
+  exact ((sq_eq_sq₀ h_sign.1 h_sign.2).mp h_eq)
 
 /-- **Heterozygosity advantage affects disease traits.**
     For diseases with heterozygote advantage (e.g., sickle cell),

@@ -46,7 +46,7 @@ theorem ncp_nonneg (n : ℕ) (beta p : ℝ)
   unfold noncentralityParam
   apply mul_nonneg
   · apply mul_nonneg
-    · exact Nat.cast_nonneg'
+    · exact Nat.cast_nonneg n
     · exact sq_nonneg beta
   · nlinarith
 
@@ -57,7 +57,7 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
     noncentralityParam n₁ beta p < noncentralityParam n₂ beta p := by
   unfold noncentralityParam
   have h_pos : 0 < beta ^ 2 * (2 * p * (1 - p)) := by
-    apply mul_pos (sq_pos_of_ne_zero _ h_beta)
+    apply mul_pos (sq_pos_of_ne_zero h_beta)
     nlinarith
   calc ↑n₁ * (beta ^ 2 * (2 * p * (1 - p)))
       < ↑n₂ * (beta ^ 2 * (2 * p * (1 - p))) := by
@@ -75,9 +75,10 @@ theorem approx_power_in_range (ncp : ℝ) (h : 0 ≤ ncp) :
     0 ≤ approxPower ncp ∧ approxPower ncp < 1 := by
   unfold approxPower
   constructor
-  · have : Real.exp (-ncp / 2) ≤ Real.exp 0 := by
-      apply Real.exp_le_exp_of_le; linarith
-    simp [Real.exp_zero] at this; linarith
+  · have : Real.exp (-ncp / 2) ≤ 1 := by
+      calc Real.exp (-ncp / 2) ≤ Real.exp 0 := Real.exp_le_exp_of_le (by linarith)
+        _ = 1 := Real.exp_zero
+    linarith
   · linarith [Real.exp_pos (-ncp / 2)]
 
 /-- **Rare variants need larger samples.**
@@ -87,12 +88,12 @@ theorem rare_variant_lower_power (n : ℕ) (beta p_rare p_common : ℝ)
     (h_beta : beta ≠ 0) (h_rare : 0 < p_rare)
     (h_common : 0 < p_common) (h_common_lt : p_common < 1)
     (h_rare_lt : p_rare < p_common)
-    (h_sym : p_common ≤ 0.5) :
+    (h_sym : p_common ≤ 0.5) (hn : 0 < n) :
     noncentralityParam n beta p_rare < noncentralityParam n beta p_common := by
   unfold noncentralityParam
-  have h_n : (0 : ℝ) ≤ n := Nat.cast_nonneg'
-  have h_b : 0 < beta ^ 2 := sq_pos_of_ne_zero _ h_beta
-  apply mul_lt_mul_of_pos_left _ (mul_pos (by positivity) h_b)
+  have h_n : (0 : ℝ) < n := Nat.cast_pos.mpr hn
+  have h_b : 0 < beta ^ 2 := sq_pos_of_ne_zero h_beta
+  apply mul_lt_mul_of_pos_left _ (mul_pos h_n h_b)
   -- Need: 2 * p_rare * (1 - p_rare) < 2 * p_common * (1 - p_common)
   -- f(x) = x(1-x) is increasing on [0, 0.5]
   have : p_rare * (1 - p_rare) < p_common * (1 - p_common) := by nlinarith
@@ -133,10 +134,12 @@ theorem winners_curse_decreases_with_n (true_beta sigma : ℝ) (n₁ n₂ : ℕ)
     winnersCurseInflation true_beta sigma n₂ <
       winnersCurseInflation true_beta sigma n₁ := by
   unfold winnersCurseInflation
-  have h₁ : (0 : ℝ) < n₁ := Nat.cast_pos.mpr h_n₁
-  have h₂ : (0 : ℝ) < n₂ := Nat.cast_pos.mpr h_n₂
-  linarith [div_lt_div_left h_sigma (Real.sqrt_pos.mpr h₁) (Real.sqrt_pos.mpr h₂),
-            Real.sqrt_lt_sqrt (le_of_lt h₁) (Nat.cast_lt.mpr h_n)]
+  have h₁ : (0 : ℝ) < ↑n₁ := Nat.cast_pos.mpr h_n₁
+  have h₂ : (0 : ℝ) < ↑n₂ := Nat.cast_pos.mpr h_n₂
+  have hsq : Real.sqrt ↑n₁ < Real.sqrt ↑n₂ :=
+    Real.sqrt_lt_sqrt (le_of_lt h₁) (Nat.cast_lt.mpr h_n)
+  have h_sqrt_pos : 0 < Real.sqrt ↑n₁ := Real.sqrt_pos.mpr h₁
+  linarith [div_lt_div_of_pos_left h_sigma h_sqrt_pos hsq]
 
 /-- **Winner's curse biases PGS.**
     Using inflated effect sizes in PGS construction
@@ -181,7 +184,7 @@ theorem r2_scaling_increasing (n₁ n₂ C : ℝ)
     (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n₂ : 0 ≤ n₂) (h_n : n₁ < n₂) :
     r2ScalingModel n₁ C < r2ScalingModel n₂ C := by
   unfold r2ScalingModel
-  rw [div_lt_div_iff (by linarith) (by linarith)]
+  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
 /-- R² scaling model is bounded by 1. -/
@@ -209,10 +212,13 @@ theorem diminishing_returns (n₁ n₂ delta C : ℝ)
   have h₂ : 0 < n₂ + C := by linarith
   have h₃ : 0 < n₁ + delta + C := by linarith
   have h₄ : 0 < n₂ + delta + C := by linarith
-  rw [div_sub_div _ _ (ne_of_gt h₄) (ne_of_gt h₂)]
-  rw [div_sub_div _ _ (ne_of_gt h₃) (ne_of_gt h₁)]
-  rw [div_lt_div_iff (mul_pos h₄ h₂) (mul_pos h₃ h₁)]
-  nlinarith [sq_nonneg C, sq_nonneg delta, sq_nonneg n₁, sq_nonneg n₂]
+  rw [div_sub_div _ _ (h₄.ne') (h₂.ne')]
+  rw [div_sub_div _ _ (h₃.ne') (h₁.ne')]
+  rw [div_lt_div_iff₀ (mul_pos h₄ h₂) (mul_pos h₃ h₁)]
+  have h_diff : n₁ < n₂ := h_n
+  nlinarith [sq_nonneg C, sq_nonneg delta, sq_nonneg n₁, sq_nonneg n₂,
+             mul_pos h_C h_delta, mul_pos h₁ h₂, mul_pos h₃ h₄,
+             sq_nonneg (n₂ - n₁)]
 
 /-- **Equal allocation is suboptimal when populations differ in size.**
     If population A already has a large GWAS and B has none,
@@ -254,7 +260,7 @@ theorem genetic_correlation_bounds_portability
     (h_bound : r2_target ≤ rg^2 * r2_source)
     (h_rg : |rg| < 1) (h_r2 : 0 < r2_source) :
     r2_target < r2_source := by
-  have : rg^2 < 1 := by nlinarith [sq_abs rg]
+  have : rg^2 < 1 := by nlinarith [sq_abs rg, abs_nonneg rg, sq_nonneg rg]
   nlinarith
 
 /-- **Trans-ethnic genetic correlation for height is high.**
@@ -265,7 +271,8 @@ theorem high_rg_implies_good_portability
     (h_rg : 0.9 < rg) (h_rg_le : rg ≤ 1)
     (h_r2 : 0 < r2_source) :
     0.81 * r2_source < rg^2 * r2_source := by
-  nlinarith [sq_nonneg rg, sq_nonneg (rg - 0.9)]
+  have : 0.81 < rg ^ 2 := by nlinarith [sq_nonneg (rg - 0.9)]
+  nlinarith
 
 /-- **Low r_g for immune traits.**
     r_g(immune, EUR-AFR) ≈ 0.4. This severely limits
@@ -275,7 +282,8 @@ theorem low_rg_limits_portability
     (h_rg : rg < 0.5) (h_rg_nn : 0 ≤ rg)
     (h_r2 : 0 < r2_source) :
     rg^2 * r2_source < 0.25 * r2_source := by
-  nlinarith [sq_nonneg rg, sq_nonneg (rg - 0.5)]
+  have : rg ^ 2 < 0.25 := by nlinarith [sq_nonneg (rg - 0.5)]
+  nlinarith
 
 end EffectSizeHeterogeneity
 

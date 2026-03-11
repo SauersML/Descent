@@ -59,7 +59,7 @@ theorem shrinkage_increases_with_n (h : ℝ) (n₁ n₂ : ℝ)
     (h_more : n₁ < n₂) :
     gaussianPosteriorShrinkage n₁ h < gaussianPosteriorShrinkage n₂ h := by
   unfold gaussianPosteriorShrinkage
-  rw [div_lt_div_iff (by positivity) (by positivity)]
+  rw [div_lt_div_iff₀ (by positivity) (by positivity)]
   nlinarith
 
 /-- **Shrinkage increases with per-SNP heritability.**
@@ -69,7 +69,7 @@ theorem shrinkage_increases_with_h (n : ℝ) (h₁ h₂ : ℝ)
     (h_more : h₁ < h₂) :
     gaussianPosteriorShrinkage n h₁ < gaussianPosteriorShrinkage n h₂ := by
   unfold gaussianPosteriorShrinkage
-  rw [div_lt_div_iff (by positivity) (by positivity)]
+  rw [div_lt_div_iff₀ (by positivity) (by positivity)]
   nlinarith
 
 /-- **Bayesian shrinkage reduces MSE compared to OLS.**
@@ -93,7 +93,7 @@ match the GWAS sample or target population, performance degrades.
 
 section LDReferenceMismatch
 
-/-- **LD mismatch error in posterior estimates.**
+/- **LD mismatch error in posterior estimates.**
     When the LD reference Σ_ref ≠ Σ_true, the posterior mean is biased:
     β̂ = (n × Σ_ref + τ⁻¹I)⁻¹ × n × Σ_ref × β̂_marginal
     but the true posterior uses Σ_true. -/
@@ -154,7 +154,7 @@ genetic architecture may differ across populations.
 
 section PriorSpecification
 
-/-- **Gaussian prior assumes infinitesimal architecture.**
+/- **Gaussian prior assumes infinitesimal architecture.**
     All SNPs have small, normally distributed effects.
     Good for highly polygenic traits (height). -/
 
@@ -283,7 +283,7 @@ theorem global_shrinkage_controls_sparsity
     (h_more : n_effective_small < n_effective_large) :
     n_effective_small < n_effective_large := h_more
 
-/-- **PRS-CS automatically adapts to genetic architecture.**
+/- **PRS-CS automatically adapts to genetic architecture.**
     The continuous shrinkage prior adapts the effective number of
     nonzero effects based on the data, without specifying π directly. -/
 
@@ -325,7 +325,7 @@ framework to improve portability.
 
 section MultiAncestryBayesian
 
-/-- **Joint posterior from multi-ancestry GWAS.**
+/- **Joint posterior from multi-ancestry GWAS.**
     P(β | data_EUR, data_AFR, ...) combines information across
     ancestries, weighted by sample size and genetic correlation. -/
 

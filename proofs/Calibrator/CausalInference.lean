@@ -55,7 +55,7 @@ theorem ld_dominant_pathway
     (h_LD_large : delta_total / 2 < delta_LD)
     (h_LD_le : delta_LD ≤ delta_total) :
     1 / 2 < delta_LD / delta_total := by
-  rw [div_lt_div_iff (by norm_num : (0:ℝ) < 2) h_total]
+  rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 2) h_total]
   linarith
 
 /-- **Selection pathway dominates for immune traits.**
@@ -67,7 +67,7 @@ theorem selection_dominant_for_immune
     (h_effect_large : delta_total / 2 < delta_effect)
     (h_effect_le : delta_effect ≤ delta_total) :
     1 / 2 < delta_effect / delta_total := by
-  rw [div_lt_div_iff (by norm_num : (0:ℝ) < 2) h_total]
+  rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 2) h_total]
   linarith
 
 /-- **Interaction effects between pathways.**
@@ -77,7 +77,8 @@ theorem pathway_interactions_exist
     (sum_individual total_with_interactions interaction : ℝ)
     (h_interaction : total_with_interactions = sum_individual + interaction)
     (h_nonzero : interaction ≠ 0) :
-    total_with_interactions ≠ sum_individual := by linarith [h_nonzero]
+    total_with_interactions ≠ sum_individual := by
+  rw [h_interaction]; intro h; apply h_nonzero; linarith
 
 end PathDecomposition
 
@@ -240,7 +241,7 @@ theorem choose_more_cost_effective
     (h_c₁ : 0 < cost₁) (h_c₂ : 0 < cost₂) :
     improv₁ * cost₂ > improv₂ * cost₁ := by
   unfold costEffectiveness at h_ce₁
-  rwa [div_lt_div_iff h_c₂ h_c₁] at h_ce₁
+  rwa [div_lt_div_iff₀ h_c₂ h_c₁] at h_ce₁
 
 end InterventionsForPortability
 
@@ -275,8 +276,8 @@ theorem ld_reference_sensitivity
     (h_diff : r2_in_sample = r2_external + delta)
     (h_delta : 0 < |delta|) :
     r2_in_sample ≠ r2_external := by
-  rw [h_diff]
-  linarith [abs_nonneg delta, abs_pos.mp h_delta]
+  rw [h_diff]; intro h; have : delta = 0 := by linarith
+  exact absurd (this ▸ h_delta) (by simp)
 
 /-- **Sensitivity to phenotype definition.**
     Different phenotype definitions (self-report vs clinical,

@@ -102,7 +102,7 @@ PGS partially captures environmental effects.
 
 section GeneEnvironmentCorrelation
 
-/-- **Three types of rGE.**
+/- **Three types of rGE.**
     1. Passive: shared family genetics and environment
     2. Evocative: genetic traits elicit environmental responses
     3. Active: genetic predispositions guide environmental choices -/
@@ -266,7 +266,7 @@ measures and what it doesn't.
 
 section CounterfactualFramework
 
-/-- **Counterfactual PGS interpretation.**
+/- **Counterfactual PGS interpretation.**
     PGS predicts: "if this person had grown up in the average
     environment of the discovery population, their expected
     phenotype would be..."

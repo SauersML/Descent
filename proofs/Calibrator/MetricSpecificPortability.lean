@@ -157,7 +157,10 @@ theorem brier_increase_mainly_calibration
     (Δcal Δref : ℝ)
     (h_cal_dominates : |Δref| < |Δcal|)
     (h_cal_pos : 0 < Δcal) :
-    Δref < Δcal := by linarith [abs_lt.mp (lt_of_lt_of_le h_cal_dominates (le_abs_self Δcal))]
+    Δref < Δcal := by
+  have h1 : Δref ≤ |Δref| := le_abs_self _
+  have h2 : |Δcal| = Δcal := abs_of_pos h_cal_pos
+  linarith
 
 end CalibrationVsDiscrimination
 
@@ -178,7 +181,7 @@ noncomputable def ppv (sensitivity specificity prevalence : ℝ) : ℝ :=
   sensitivity * prevalence /
     (sensitivity * prevalence + (1 - specificity) * (1 - prevalence))
 
-/-- **Recall (sensitivity) of high-risk classification.**
+/- **Recall (sensitivity) of high-risk classification.**
     Sensitivity = P(PGS says high risk | actually high risk).
     Depends on the PGS's discriminative ability. -/
 
@@ -198,8 +201,7 @@ theorem ppv_changes_with_prevalence
   -- Cross-multiply and simplify
   have h_d1 : 0 < se * K₁ + (1 - sp) * (1 - K₁) := by nlinarith
   have h_d2 : 0 < se * K₂ + (1 - sp) * (1 - K₂) := by nlinarith
-  have h_cross := div_eq_div_iff (ne_of_gt h_d1) (ne_of_gt h_d2)
-  rw [h_cross] at h
+  rw [div_eq_div_iff h_d1.ne' h_d2.ne'] at h
   -- se * K₁ * (se * K₂ + (1-sp)(1-K₂)) = se * K₂ * (se * K₁ + (1-sp)(1-K₁))
   -- se²K₁K₂ + se*K₁*(1-sp)(1-K₂) = se²K₁K₂ + se*K₂*(1-sp)(1-K₁)
   -- se*K₁*(1-sp)(1-K₂) = se*K₂*(1-sp)(1-K₁)
@@ -230,23 +232,23 @@ theorem nns_increases_with_ppv_drop
 /-- **F1 score captures precision-recall balance.**
     F1 = 2 × PPV × sensitivity / (PPV + sensitivity).
     F1 portability reflects both precision and recall portability. -/
-noncomputable def f1Score (precision recall : ℝ) : ℝ :=
-  2 * precision * recall / (precision + recall)
+noncomputable def f1ScoreMetric (precision sens : ℝ) : ℝ :=
+  2 * precision * sens / (precision + sens)
 
-/-- F1 is bounded by the minimum of precision and recall. -/
+/-- F1 is bounded by the minimum of precision and sens. -/
 theorem f1_le_min
-    (precision recall : ℝ)
-    (h_p : 0 < precision) (h_r : 0 < recall)
-    (h_p1 : precision ≤ 1) (h_r1 : recall ≤ 1) :
-    f1Score precision recall ≤ min precision recall := by
-  unfold f1Score
-  by_cases h : precision ≤ recall
+    (precision sens : ℝ)
+    (h_p : 0 < precision) (h_r : 0 < sens)
+    (h_p1 : precision ≤ 1) (h_r1 : sens ≤ 1) :
+    f1ScoreMetric precision sens ≤ min precision sens := by
+  unfold f1ScoreMetric
+  by_cases h : precision ≤ sens
   · rw [min_eq_left h]
-    rw [div_le_iff (by linarith)]
+    rw [div_le_iff₀ (by linarith)]
     nlinarith [mul_nonneg (le_of_lt h_p) (le_of_lt h_r)]
   · push_neg at h
     rw [min_eq_right (le_of_lt h)]
-    rw [div_le_iff (by linarith)]
+    rw [div_le_iff₀ (by linarith)]
     nlinarith [mul_nonneg (le_of_lt h_p) (le_of_lt h_r)]
 
 end PrecisionRecall
@@ -318,12 +320,12 @@ section ProperScoringRules
 
 /-- **Brier score is a proper scoring rule.**
     Brier(p, y) = (p - y)². The unique minimizer is p = P(Y=1|X). -/
-noncomputable def brierScore (p y : ℝ) : ℝ := (p - y) ^ 2
+noncomputable def brierScoreMetric (p y : ℝ) : ℝ := (p - y) ^ 2
 
 /-- Brier score is nonneg. -/
-theorem brier_nonneg (p y : ℝ) : 0 ≤ brierScore p y := sq_nonneg _
+theorem brier_nonneg (p y : ℝ) : 0 ≤ brierScoreMetric p y := sq_nonneg _
 
-/-- **Log score (cross-entropy) is also proper.**
+/- **Log score (cross-entropy) is also proper.**
     Log(p, y) = -y log(p) - (1-y) log(1-p).
     Log score is more sensitive to calibration than Brier. -/
 

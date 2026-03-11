@@ -76,7 +76,9 @@ theorem linear_bound_tight
     (bound actual_gap : ℝ)
     (h_tight : |actual_gap - bound| < 0.1 * bound)
     (h_bound_pos : 0 < bound) :
-    actual_gap < 1.1 * bound := by nlinarith [abs_le.mp (le_of_lt h_tight)]
+    actual_gap < 1.1 * bound := by
+  have h := abs_lt.mp h_tight
+  linarith [h.1, h.2]
 
 end DomainAdaptation
 
@@ -90,11 +92,11 @@ between source and target populations by reweighting individuals.
 
 section ImportanceWeighting
 
-/-- **Importance weights for genetic ancestry.**
+/- **Importance weights for genetic ancestry.**
     w(x) = P_target(x) / P_source(x) for genotype x.
     In practice, estimated from allele frequency ratios. -/
 
-/-- **IW-corrected PGS.**
+/- **IW-corrected PGS.**
     β̂_IW = argmin Σᵢ wᵢ (yᵢ - x'ᵢ β)²
     This gives unbiased estimates for the target population. -/
 
@@ -112,7 +114,7 @@ theorem iw_ess_le_n
     (h_sw_pos : 0 < sum_w_sq) :
     importanceWeightESS sum_w sum_w_sq ≤ n := by
   unfold importanceWeightESS
-  rw [div_le_iff h_sw_pos]
+  rw [div_le_iff₀ h_sw_pos]
   exact h_cauchy_schwarz
 
 /-- **IW ESS decreases with population divergence.**
@@ -144,9 +146,7 @@ theorem doubly_robust_consistency
     (h_model_imperfect : |bias_model_only| < 1) :
     |bias_dr| < 1 := by
   calc |bias_dr| ≤ |bias_iw_only| * |bias_model_only| := h_dr_better_iw
-    _ < 1 * 1 := mul_lt_mul h_iw_imperfect (le_of_lt h_model_imperfect)
-        (abs_nonneg _) (by norm_num)
-    _ = 1 := by ring
+    _ < 1 := by nlinarith [abs_nonneg bias_iw_only, abs_nonneg bias_model_only]
 
 end ImportanceWeighting
 
@@ -160,7 +160,7 @@ while preserving trait-relevant information.
 
 section FeatureRepresentation
 
-/-- **Ancestry-invariant representations.**
+/- **Ancestry-invariant representations.**
     Find a mapping φ(x) such that P_S(φ(x)) ≈ P_T(φ(x))
     while preserving Y = f(φ(x)) + ε. -/
 
@@ -203,10 +203,10 @@ theorem adversarial_improves_portability
     while maximizing I(φ(X); Y). This is the information bottleneck
     applied to the portability problem. -/
 theorem info_bottleneck_tradeoff
-    (I_phi_A I_phi_Y λ : ℝ)
-    (h_objective : I_phi_Y - λ * I_phi_A > 0)
-    (h_λ : 0 < λ) (h_I_A_nn : 0 ≤ I_phi_A) :
-    I_phi_Y > λ * I_phi_A := by linarith
+    (I_phi_A I_phi_Y lam : ℝ)
+    (h_objective : I_phi_Y - lam * I_phi_A > 0)
+    (h_lam : 0 < lam) (h_I_A_nn : 0 ≤ I_phi_A) :
+    I_phi_Y > lam * I_phi_A := by linarith
 
 end FeatureRepresentation
 
@@ -220,7 +220,7 @@ limited target-population data.
 
 section FineTuning
 
-/-- **Sample complexity for PGS fine-tuning.**
+/- **Sample complexity for PGS fine-tuning.**
     The number of target-population samples needed to improve
     upon the source PGS depends on:
     1. The divergence (Fst) between source and target
@@ -245,7 +245,7 @@ theorem critical_sample_size_exists
     (n : ℕ) (h_n : n < n_crit) :
     r2_target_trained n < r2_source_unadjusted n := h_below n h_n
 
-/-- **Regularized fine-tuning shrinks toward source PGS.**
+/- **Regularized fine-tuning shrinks toward source PGS.**
     β̂_target = argmin Σ wᵢ(yᵢ - x'ᵢβ)² + λ‖β - β̂_source‖²
     The regularization λ controls how much to trust the source PGS. -/
 
@@ -253,11 +253,11 @@ theorem critical_sample_size_exists
     With more target data, we should trust the target data more
     and the source PGS less. -/
 theorem optimal_lambda_decreases_with_n
-    (λ₁ λ₂ : ℝ) (n₁ n₂ : ℕ)
+    (lam₁ lam₂ : ℝ) (n₁ n₂ : ℕ)
     (h_more_data : n₁ < n₂)
-    (h_less_reg : λ₂ < λ₁)
-    (h_nn : 0 < λ₂) :
-    λ₂ < λ₁ := h_less_reg
+    (h_less_reg : lam₂ < lam₁)
+    (h_nn : 0 < lam₂) :
+    lam₂ < lam₁ := h_less_reg
 
 /-- **Meta-learning across populations.**
     MAML-style meta-learning: find initial PGS weights that can

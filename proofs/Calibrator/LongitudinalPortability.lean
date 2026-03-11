@@ -81,7 +81,7 @@ theorem larger_Ne_slower_drift (Ne₁ Ne₂ : ℝ)
     (h₁ : 0 < Ne₁) (h₂ : 0 < Ne₂) (h_lt : Ne₁ < Ne₂) :
     driftDecayRate Ne₂ < driftDecayRate Ne₁ := by
   unfold driftDecayRate
-  rw [div_lt_div_iff (by positivity) (by positivity)]
+  rw [div_lt_div_iff₀ (by positivity) (by positivity)]
   nlinarith
 
 /-- **LD decay component.**
@@ -154,7 +154,8 @@ theorem changing_env_variance_changes_h2
   have h₁ : V_A + V_E₁ ≠ 0 := by linarith
   have h₂ : V_A + V_E₂ ≠ 0 := by linarith
   rw [div_eq_div_iff h₁ h₂] at h
-  nlinarith
+  apply h_diff
+  nlinarith [mul_comm V_A V_E₁, mul_comm V_A V_E₂]
 
 /-- **Industrialization effect on BMI PGS.**
     BMI heritability has changed with industrialization because
@@ -165,7 +166,7 @@ theorem heritability_increases_when_env_equalizes
     (h_VA : 0 < V_A) (h_VE_b : 0 < V_E_before) (h_VE_a : 0 < V_E_after)
     (h_reduced : V_E_after < V_E_before) :
     V_A / (V_A + V_E_before) < V_A / (V_A + V_E_after) := by
-  rw [div_lt_div_iff (by linarith) (by linarith)]
+  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
 end EnvironmentalEpochs
@@ -250,7 +251,7 @@ theorem calibration_slope_changes_with_prevalence
   unfold calibrationSlope
   intro h
   have : π₁ * (1 - π₁) = π₂ * (1 - π₂) := by
-    have h_beta_ne : beta ≠ 0 := ne_of_gt h_beta
+    have h_beta_ne : beta ≠ 0 := h_beta.ne'
     field_simp at h
     linarith
   have h_factor : (π₁ - π₂) * (1 - π₁ - π₂) = 0 := by nlinarith
@@ -303,9 +304,9 @@ theorem staleness_nonneg (lambda t : ℝ)
     (h_lam : 0 ≤ lambda) (h_t : 0 ≤ t) :
     0 ≤ modelStaleness lambda t := by
   unfold modelStaleness
-  have : Real.exp (-lambda * t) ≤ Real.exp 0 := by
+  have h1 : Real.exp (-lambda * t) ≤ Real.exp 0 := by
     apply Real.exp_le_exp_of_le; nlinarith
-  simp [Real.exp_zero] at this
+  rw [Real.exp_zero] at h1
   linarith
 
 /-- Staleness increases with time. -/

@@ -65,7 +65,7 @@ theorem snp_h2_le_narrow_h2
     snpH2 V_A_tagged (V_A_total + V_D + V_I + V_E) ≤
       narrowSenseH2 V_A_total V_D V_I V_E := by
   unfold snpH2 narrowSenseH2
-  exact div_le_div_of_nonneg_right h_tagged h_total
+  exact div_le_div_of_nonneg_right h_tagged (le_of_lt h_total)
 
 /-- **The missing heritability gap.**
     h²_twin - h²_SNP > 0 for most traits. This is the "missing heritability".
@@ -117,16 +117,18 @@ theorem frequency_change_affects_va
     (p₁ p₂ α : ℝ)
     (h₁ : 0 < p₁) (h₁' : p₁ < 1)
     (h₂ : 0 < p₂) (h₂' : p₂ < 1)
-    (h_freq : p₁ ≠ p₂) (h_α : α ≠ 0) :
+    (h_freq : p₁ ≠ p₂) (h_α : α ≠ 0)
+    (h_sum : p₁ + p₂ ≠ 1) :
     2 * p₁ * (1 - p₁) * α ^ 2 ≠ 2 * p₂ * (1 - p₂) * α ^ 2 := by
   intro h
   have h_sq : 0 < α ^ 2 := sq_pos_of_ne_zero h_α
-  have : 2 * p₁ * (1 - p₁) = 2 * p₂ * (1 - p₂) := by
-    have := mul_right_cancel₀ (ne_of_gt h_sq)
-    exact this h
-  -- 2p(1-p) = 2p - 2p² is injective on (0, 1/2] and on [1/2, 1)
-  -- but the quadratic 2p - 2p² has p₁ and p₂ as two roots of a shifted version
-  nlinarith [sq_nonneg (p₁ - p₂)]
+  have h_eq : 2 * p₁ * (1 - p₁) = 2 * p₂ * (1 - p₂) :=
+    mul_right_cancel₀ h_sq.ne' h
+  -- From 2p₁(1-p₁) = 2p₂(1-p₂), get (p₁-p₂)(1-(p₁+p₂)) = 0
+  have : (p₁ - p₂) * (1 - (p₁ + p₂)) = 0 := by nlinarith
+  rcases mul_eq_zero.mp this with h | h
+  · exact h_freq (sub_eq_zero.mp h)
+  · exact h_sum (by linarith)
 
 /-- **Environmental variance heterogeneity across populations.**
     If Ve differs, h² differs even with identical genetic architecture. -/
@@ -211,14 +213,11 @@ theorem three_way_ceiling
     (h_h2_nn : 0 ≤ h2) (h_power_nn : 0 ≤ gwas_power) (h_port_nn : 0 ≤ port_ratio)
     (h_bound : target_r2 ≤ h2 * gwas_power * port_ratio) :
     target_r2 ≤ 1 := by
-  calc target_r2 ≤ h2 * gwas_power * port_ratio := h_bound
-    _ ≤ 1 * 1 * 1 := by
-        apply mul_le_mul
-        · exact mul_le_mul h_h2_le h_power_le h_power_nn h_h2_nn
-        · exact h_port_le
-        · exact h_port_nn
-        · exact mul_nonneg h_h2_nn h_power_nn
-    _ = 1 := by ring
+  have : h2 * gwas_power * port_ratio ≤ 1 := by
+    calc h2 * gwas_power * port_ratio
+        ≤ 1 * 1 * 1 := by nlinarith [mul_nonneg h_h2_nn h_power_nn]
+      _ = 1 := by ring
+  linarith
 
 end PGSCeiling
 
@@ -240,7 +239,7 @@ theorem greml_ld_sensitive
     (h_bias : h2_estimated = h2_true + ld_bias)
     (h_ld_nonzero : ld_bias ≠ 0) :
     h2_estimated ≠ h2_true := by
-  rw [h_bias]; linarith [h_ld_nonzero.lt_or_lt]
+  rw [h_bias]; intro h; apply h_ld_nonzero; linarith
 
 /-- **GREML underestimates h² when causal variants are poorly tagged.**
     If tag-causal r² < 1, GREML underestimates V_A. -/

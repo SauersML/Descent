@@ -56,7 +56,7 @@ theorem rare_variants_substantial_heritability
     (h_fraction : h2_rare / h2_total > 0.2)
     (h_total_pos : 0 < h2_total) :
     0.2 * h2_total < h2_rare := by
-  rwa [lt_div_iff h_total_pos] at h_fraction
+  rwa [gt_iff_lt, lt_div_iff₀ h_total_pos] at h_fraction
 
 /-- **Rare variant PGS has zero cross-population portability.**
     If a variant exists only in population A (MAF_B = 0),
@@ -86,7 +86,7 @@ theorem african_populations_most_diverse
     (h_eur_pos : 0 < n_rare_eur) :
     2 * n_rare_eur < n_rare_afr := by
   have : 2 < n_rare_afr / n_rare_eur := by linarith
-  rwa [lt_div_iff h_eur_pos] at this
+  rwa [lt_div_iff₀ h_eur_pos] at this
 
 end RareVariantSpecificity
 
@@ -100,7 +100,7 @@ and can improve portability.
 
 section BurdenTests
 
-/-- **Burden test aggregates rare variants per gene.**
+/- **Burden test aggregates rare variants per gene.**
     Gene-level score = Σ_i w_i × g_i for rare variants i in the gene.
     This improves power by reducing the multiple testing burden. -/
 
@@ -216,7 +216,7 @@ theorem lof_large_effects
     (h_larger : |β_common| < |β_lof|)
     (h_common_pos : 0 < |β_common|) :
     1 < |β_lof| / |β_common| := by
-  rw [one_lt_div h_common_pos]
+  rw [one_lt_div₀ h_common_pos]
   exact h_larger
 
 /-- **LoF variant portability depends on gene constraint.**
@@ -293,10 +293,8 @@ theorem rare_variant_needs_large_n
     100 < 1 / (maf * β ^ 2) := by
   have h_β_sq : β ^ 2 ≤ 1 := by nlinarith [sq_abs β]
   have h_prod_pos : 0 < maf * β ^ 2 := mul_pos h_maf (sq_pos_of_ne_zero h_β)
-  rw [lt_div_iff h_prod_pos]
-  calc 100 * (maf * β ^ 2) ≤ 100 * (0.01 * 1) := by
-        nlinarith [sq_nonneg β, le_of_lt h_maf_small]
-    _ = 1 := by norm_num
+  rw [lt_div_iff₀ h_prod_pos]
+  nlinarith [sq_nonneg β, mul_pos h_maf (sq_pos_of_ne_zero h_β)]
 
 /-- **Population-specific rare variant PGS is optimal for within-population.**
     Each population should have its own rare variant PGS component,

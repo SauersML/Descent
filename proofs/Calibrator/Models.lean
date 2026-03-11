@@ -1755,7 +1755,7 @@ theorem F_PC_lin_subset_F_full (k : ℕ) [Fintype (Fin k)] :
   · intro s x
     rw [hform s x]
     unfold T sigma
-    have ha0 : a ≠ 0 := ne_of_gt ha
+    have ha0 : a ≠ 0 := ha.ne'
     field_simp [ha0]
     ring
 

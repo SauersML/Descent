@@ -32,7 +32,7 @@ This bias is a form of confounding.
 
 section StratificationBias
 
-/-- **Stratification bias model.**
+/- **Stratification bias model.**
     True effect: β. Stratification inflates to β̂ = β + b_confound.
     b_confound = Cov(ancestry, phenotype) * Cov(ancestry, genotype) / Var(genotype). -/
 
@@ -46,7 +46,7 @@ theorem stratification_bias_nonzero
     cov_anc_pheno * cov_anc_geno / var_geno ≠ 0 := by
   apply div_ne_zero
   · exact mul_ne_zero h_pheno h_geno
-  · exact ne_of_gt h_var
+  · exact h_var.ne'
 
 /-- **Stratification inflates PGS variance.**
     If each SNP has bias bᵢ, PGS has additional variance Σ bᵢ² · Hᵢ + cross terms.
@@ -83,10 +83,10 @@ theorem pc_correction_residual_bias
 /-- **More PCs reduce residual bias monotonically.**
     Eigenvalues are decreasing, so more PCs always help. -/
 theorem more_pcs_less_bias
-    (λ_k λ_k1 c : ℝ)
+    (lam_k lam_k1 c : ℝ)
     (h_c : 0 < c)
-    (h_decreasing : λ_k1 < λ_k) :
-    c * λ_k1 < c * λ_k := by
+    (h_decreasing : lam_k1 < lam_k) :
+    c * lam_k1 < c * lam_k := by
   exact mul_lt_mul_of_pos_left h_decreasing h_c
 
 end StratificationBias
@@ -113,7 +113,7 @@ noncomputable def amInflationFactor (r : ℝ) : ℝ :=
 theorem am_inflation_gt_one (r : ℝ) (hr : 0 < r) (hr1 : r < 1) :
     1 < amInflationFactor r := by
   unfold amInflationFactor
-  rw [lt_div_iff (by linarith)]
+  rw [lt_div_iff₀ (by linarith)]
   linarith
 
 /-- **Differential AM creates portability artifact.**
@@ -137,8 +137,8 @@ theorem am_increases_r2
     v_pgs / (v_pgs + v_e) < (α * v_pgs) / (α * v_pgs + v_e) := by
   have h_d1 : 0 < v_pgs + v_e := by linarith
   have h_d2 : 0 < α * v_pgs + v_e := by nlinarith
-  rw [div_lt_div_iff h_d1 h_d2]
-  nlinarith
+  rw [div_lt_div_iff₀ h_d1 h_d2]
+  nlinarith [mul_pos h_vpgs h_ve]
 
 end AssortativeMating
 
@@ -184,7 +184,7 @@ theorem differential_ascertainment_artifact
     (h_source_asc : r2_source_asc < r2_source_pop)
     (h_target_asc : r2_target_asc < r2_target_pop)
     -- Different ascertainment severity
-    (h_diff_severity : r2_source_pop - r2_source_asc < r2_target_pop - r2_target_asc) :
+    (h_diff_severity : r2_target_pop - r2_target_asc < r2_source_pop - r2_source_asc) :
     -- Apparent portability drop is larger than true portability drop
     r2_source_asc - r2_target_asc > r2_source_pop - r2_target_pop →
       False := by
@@ -204,7 +204,7 @@ the environmental mediation may differ across populations.
 
 section GeneEnvironmentCorrelation
 
-/-- **rGE decomposition of PGS prediction.**
+/- **rGE decomposition of PGS prediction.**
     PGS predicts outcome through two pathways:
     1. Direct genetic effect: β_direct
     2. Indirect (rGE-mediated) effect: β_indirect = β_genetic × r_GE × β_env
@@ -219,12 +219,11 @@ theorem rge_changes_total_prediction
     β_direct + β_genetic * rge_source * β_env ≠
       β_direct + β_genetic * rge_target * β_env := by
   intro h
-  have : β_genetic * rge_source * β_env = β_genetic * rge_target * β_env := by linarith
-  have : rge_source = rge_target := by
-    have h1 := mul_right_cancel₀ (mul_ne_zero h_genetic h_env : β_genetic * β_env ≠ 0)
-    rw [mul_assoc, mul_assoc] at this
-    exact h1 this
-  exact h_rge_diff this
+  have h_eq : β_genetic * rge_source * β_env = β_genetic * rge_target * β_env := by linarith
+  apply h_rge_diff
+  have h_ne : β_genetic * β_env ≠ 0 := mul_ne_zero h_genetic h_env
+  have : rge_source * (β_genetic * β_env) = rge_target * (β_genetic * β_env) := by nlinarith
+  exact mul_right_cancel₀ h_ne this
 
 /-- **rGE inflation of apparent heritability.**
     In the source population, rGE inflates R². In a population with
@@ -376,10 +375,10 @@ theorem weak_instrument_bias_increases
     (h_conf : 0 < conf_bias)
     (h_F₁ : 1 < F₁) (h_F₂ : 1 < F₂)
     (h_weaker : F₂ < F₁) :
-    (1 - 1/F₁) * conf_bias < (1 - 1/F₂) * conf_bias := by
+    (1 - 1/F₂) * conf_bias < (1 - 1/F₁) * conf_bias := by
   apply mul_lt_mul_of_pos_right _ h_conf
-  have h1 : 1/F₁ > 1/F₂ := by
-    rw [div_lt_div_iff (by linarith) (by linarith)]
+  have h1 : 1/F₁ < 1/F₂ := by
+    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
     linarith
   linarith
 
@@ -449,7 +448,7 @@ theorem small_effect_needs_large_n
     n_required ≥ 100 := by
   calc n_required ≥ 1 / r2_effect := h_formula
     _ ≥ 1 / 0.01 := by
-        exact div_le_div_of_nonneg_left one_pos h_effect_pos h_small
+        exact div_le_div_of_nonneg_left (le_of_lt one_pos) h_effect_pos h_small
     _ = 100 := by norm_num
 
 end PowerAnalysis

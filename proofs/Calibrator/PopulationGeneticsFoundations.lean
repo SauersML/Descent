@@ -123,7 +123,7 @@ theorem het_increases_with_ne
     (θ₁ θ₂ : ℝ) (h₁ : 0 < θ₁) (h₂ : 0 < θ₂) (h_more : θ₁ < θ₂) :
     expectedHeterozygosity θ₁ < expectedHeterozygosity θ₂ := by
   unfold expectedHeterozygosity
-  rw [div_lt_div_iff (by linarith) (by linarith)]
+  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
 /-- **Coalescence time between populations.**
@@ -145,7 +145,7 @@ theorem coal_fst_increases_with_time
     (h_t₁ : 0 ≤ t₁) (h_t₂ : 0 ≤ t₂) (h_more : t₁ < t₂) :
     coalFst t₁ Ne < coalFst t₂ Ne := by
   unfold coalFst
-  rw [div_lt_div_iff (by linarith) (by linarith)]
+  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
 /-- Coalescent Fst approaches 1 as t → ∞ (relative to Ne). -/
@@ -155,7 +155,7 @@ theorem coal_fst_approaches_one
     0.98 < coalFst t Ne := by
   unfold coalFst
   rw [show (0.98 : ℝ) = 98 / 100 from by norm_num]
-  rw [div_lt_div_iff (by norm_num : (0:ℝ) < 100) (by linarith)]
+  rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 100) (by linarith)]
   nlinarith
 
 end CoalescentTheory
@@ -255,7 +255,7 @@ theorem strong_selection_high_differentiation
     0.9 < selectionMigrationEquilibrium s m := by
   unfold selectionMigrationEquilibrium
   rw [show (0.9 : ℝ) = 9 / 10 from by norm_num]
-  rw [div_lt_div_iff (by norm_num : (0:ℝ) < 10) (by linarith)]
+  rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 10) (by linarith)]
   nlinarith
 
 /-- **Weak selection is overwhelmed by migration.**
@@ -265,7 +265,7 @@ theorem weak_selection_low_differentiation
     (s m : ℝ) (h_s : 0 < s) (h_m : 0 < m) (h_weak : s < 0.1 * m) :
     selectionMigrationEquilibrium s m < 0.1 := by
   unfold selectionMigrationEquilibrium
-  rw [div_lt_iff (by linarith)]
+  rw [div_lt_iff₀ (by linarith)]
   nlinarith
 
 /-- **Loci under selection contribute disproportionally to portability loss.**
@@ -297,7 +297,9 @@ theorem genome_wide_fst_neutral_dominated
   have : (1 - f_sel) * fst_neutral + f_sel * fst_selected - fst_neutral =
       f_sel * (fst_selected - fst_neutral) := by ring
   rw [this, abs_of_nonneg (mul_nonneg (le_of_lt h_pos) (by linarith))]
-  exact mul_lt_mul_of_pos_right h_small (by linarith)
+  calc f_sel * (fst_selected - fst_neutral) < 0.01 * (fst_selected - fst_neutral) :=
+        mul_lt_mul_of_pos_right h_small (by linarith)
+    _ ≤ 0.01 * fst_selected := by nlinarith
 
 end SelectionMigrationBalance
 
@@ -358,7 +360,7 @@ theorem fst_drift_increases (Ne : ℝ) (t₁ t₂ : ℕ) (h_Ne : 2 < Ne)
     rw [sub_pos, div_lt_one (by linarith)]; linarith
   have h_base_lt : 1 - 1 / (2 * Ne) < 1 := by
     rw [sub_lt_self_iff]; positivity
-  exact pow_lt_pow_of_lt_one (le_of_lt h_base_pos) h_base_lt h_time
+  exact pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt h_time
 
 end WrightFStatistics
 

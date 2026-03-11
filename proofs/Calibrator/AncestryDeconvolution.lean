@@ -34,7 +34,7 @@ depending on the local ancestry at each PGS locus.
 
 section GlobalVsLocalAncestry
 
-/-- **Global ancestry proportion.**
+/- **Global ancestry proportion.**
     For a two-way admixed individual: proportion α from pop A,
     (1-α) from pop B. The expected PGS performance depends on α. -/
 
@@ -88,7 +88,7 @@ genomic segment by the appropriate ancestry-specific model.
 
 section LocalAncestryPGS
 
-/-- **Local ancestry-informed PGS.**
+/- **Local ancestry-informed PGS.**
     PGS_LAI = Σᵢ [L_i = A] × β_A_i × g_i + [L_i = B] × β_B_i × g_i
     where L_i is local ancestry and β_A, β_B are ancestry-specific effects. -/
 
@@ -147,7 +147,7 @@ one ancestry's alleles contribute more to the phenotype.
 
 section AdmixtureMapping
 
-/-- **Admixture mapping signal.**
+/- **Admixture mapping signal.**
     At a causal locus, the phenotype correlates with local ancestry
     if the causal allele has different frequency across ancestries. -/
 
@@ -194,11 +194,11 @@ samples, enabling estimation of population-specific effects.
 
 section Tractor
 
-/-- **Tractor decomposes admixed genotypes by local ancestry.**
+/- **Tractor decomposes admixed genotypes by local ancestry.**
     At each locus, the allele count is split into ancestry-specific
     components: g = g_A + g_B where g_A counts alleles from ancestry A. -/
 
-/-- **Ancestry-specific effect estimation.**
+/- **Ancestry-specific effect estimation.**
     Tractor regresses: Y ~ g_A × β_A + g_B × β_B + covariates.
     This directly estimates the ancestry-specific effects needed
     for portable PGS construction. -/
@@ -243,7 +243,7 @@ ancestry representation using principal components.
 
 section ContinuousAncestry
 
-/-- **PC-based continuous ancestry.**
+/- **PC-based continuous ancestry.**
     Ancestry is represented as a point in PC space rather than
     a discrete label. This better captures the continuous nature
     of human genetic variation. -/
@@ -263,7 +263,7 @@ theorem r2_decreases_with_distance
     r2AsFunction r2_source slope d₂ < r2AsFunction r2_source slope d₁ := by
   unfold r2AsFunction
   apply mul_lt_mul_of_pos_left _ h_r2
-  linarith
+  nlinarith
 
 /-- **Within-group variation dominates between-group variation.**
     Wang et al. Open Question 1: genetic distance explains only

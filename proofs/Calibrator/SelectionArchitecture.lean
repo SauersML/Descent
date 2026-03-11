@@ -85,7 +85,7 @@ theorem polygenicity_improves_portability
     Portability is relatively good (slow decay with distance).
     We verify the parameter regime. -/
 theorem height_parameter_regime :
-    let n_loci := 10000
+    let n_loci : ℝ := 10000
     let per_locus_h2 := 0.00005  -- Each locus explains 0.005% of variance
     let total_h2 := n_loci * per_locus_h2
     total_h2 = 0.5 := by norm_num
@@ -129,7 +129,7 @@ theorem shorter_autocorrelation_faster_decay
   unfold fluctuatingEffectCorrelation
   apply Real.exp_lt_exp.mpr
   rw [neg_div, neg_div, neg_lt_neg_iff]
-  exact div_lt_div_of_pos_left h_t h_τ₁ h_shorter
+  exact div_lt_div_of_pos_left h_t (by linarith) h_shorter
 
 /-- **Immune traits have short autocorrelation times.**
     Pathogen-driven selection creates fluctuating fitness landscapes
@@ -194,7 +194,7 @@ theorem selected_shift_positive
     0 < polygenicAdaptationShift β Δp := by
   unfold polygenicAdaptationShift
   obtain ⟨i₀, hi₀⟩ := h_exists_pos
-  exact Finset.sum_pos_of_nonneg_of_exists_pos _ (fun i _ => h_concordant i) ⟨i₀, Finset.mem_univ _, hi₀⟩
+  exact Finset.sum_pos' (fun i _ => h_concordant i) ⟨i₀, Finset.mem_univ _, hi₀⟩
 
 /-- **Polygenic adaptation creates PGS mean shift but not R² loss.**
     The mean shift is recoverable by recalibration (intercept adjustment).
@@ -214,7 +214,7 @@ theorem qst_fst_comparison_directional
     (h_directional : fst < qst) :
     -- Q_ST / F_ST > 1 indicates directional selection
     1 < qst / fst := by
-  rw [lt_div_iff h_fst]; linarith
+  rw [lt_div_iff₀ h_fst]; linarith
 
 theorem qst_fst_comparison_stabilizing
     (qst fst : ℝ)
@@ -290,7 +290,7 @@ parameters for different trait classes.
 
 section ArchitecturePredictions
 
-/-- **Trait classification by selection regime.**
+/- **Trait classification by selection regime.**
     Different trait classes have different expected portability patterns:
     - Metabolic/anthropometric: stabilizing selection → slow decay
     - Immune/inflammatory: fluctuating selection → fast decay
@@ -341,7 +341,7 @@ through shared pleiotropic architecture.
 
 section Pleiotropy
 
-/-- **Pleiotropic effect model.**
+/- **Pleiotropic effect model.**
     A locus affects trait 1 with effect β₁ and trait 2 with effect β₂.
     The genetic correlation rg = Σ β₁ᵢβ₂ᵢ / √(Σβ₁ᵢ²·Σβ₂ᵢ²). -/
 

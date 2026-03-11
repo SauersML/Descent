@@ -89,7 +89,7 @@ theorem relative_width_increase
     1 < Real.sqrt ((1 - r2_target) / (1 - r2_source)) := by
   rw [show (1 : ℝ) = Real.sqrt 1 from (Real.sqrt_one).symm]
   apply Real.sqrt_lt_sqrt (by norm_num)
-  rw [one_lt_div (by linarith)]
+  rw [one_lt_div (by linarith : (0:ℝ) < 1 - r2_source)]
   linarith
 
 end PredictionIntervalWidth
@@ -104,7 +104,7 @@ matches the actual coverage. Portability loss disrupts calibration.
 
 section IntervalCalibration
 
-/-- **Coverage probability definition.**
+/- **Coverage probability definition.**
     Coverage(α) = P(Y ∈ PI(PGS, α)). Well-calibrated: Coverage = 1 - α. -/
 
 /-- **Source-calibrated intervals have reduced coverage in target.**
@@ -125,7 +125,7 @@ theorem coverage_gap_from_variance_ratio
     (h_loss : r2_target < r2_source) :
     -- Residual variance ratio > 1
     1 < (1 - r2_target) / (1 - r2_source) := by
-  rw [one_lt_div (by linarith)]
+  rw [one_lt_div₀ (by linarith)]
   linarith
 
 /-- **Corrected prediction interval width for target population.**
@@ -145,7 +145,7 @@ theorem interval_calibration_sample_size
     (ε : ℝ) (h_ε : 0 < ε) (h_ε_lt : ε < 1) :
     -- 2/ε² > 2 for any ε < 1
     2 < 2 / ε ^ 2 := by
-  rw [lt_div_iff (sq_pos_of_ne_zero (ne_of_gt h_ε))]
+  rw [lt_div_iff₀ (sq_pos_of_ne_zero (h_ε.ne'))]
   have : ε ^ 2 < 1 := by
     calc ε ^ 2 = ε * ε := by ring
     _ < 1 * 1 := mul_lt_mul h_ε_lt (le_of_lt h_ε_lt) h_ε (by norm_num)
@@ -164,7 +164,7 @@ individual-level uncertainty quantification.
 
 section ConditionalIntervals
 
-/-- **Ancestry-conditional residual variance.**
+/- **Ancestry-conditional residual variance.**
     σ²_ε(a) = Var(Y | ancestry = a) × (1 - R²(a)).
     This varies across ancestry groups. -/
 
@@ -229,9 +229,9 @@ theorem bonferroni_simultaneous_coverage
     The actual simultaneous coverage is at least 1 - α when
     each interval has coverage at least 1 - α/k. -/
 theorem bonferroni_conservative
-    (α : ℝ) (k : ℕ) (h_k : 1 ≤ k) :
+    (α : ℝ) (k : ℕ) (h_α : 0 ≤ α) (h_k : 1 ≤ k) :
     α / k ≤ α := by
-  exact div_le_self (by linarith [show 0 < α from by linarith]) (by exact_mod_cast h_k)
+  exact div_le_self h_α (by exact_mod_cast h_k)
 
 /-- **Šidák correction is tighter.**
     Per-population level: 1 - (1-α)^(1/k) ≤ α/k.
@@ -259,7 +259,7 @@ theorem heterogeneous_r2_requires_specific_intervals
   unfold residualVariance
   intro h
   apply h_diff
-  have := mul_left_cancel₀ (ne_of_gt h_var) h
+  have := mul_left_cancel₀ (h_var.ne') h
   linarith
 
 end SimultaneousCoverage
@@ -343,7 +343,7 @@ derived from information theory.
 
 section InformationTheoreticBounds
 
-/-- **Entropy power inequality bounds prediction interval width.**
+/- **Entropy power inequality bounds prediction interval width.**
     For additive noise Y = g(X) + ε, the prediction interval width
     is at least 2πe × N(ε) where N(ε) is the entropy power of noise. -/
 

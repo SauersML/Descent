@@ -66,16 +66,14 @@ theorem mean_shift_eq_diff {m : ℕ} (β : Fin m → ℝ)
     pgsMeanShift β p_source p_target =
       pgsMean β p_target - pgsMean β p_source := by
   unfold pgsMeanShift pgsMean
-  simp [Finset.sum_sub_distrib, mul_sub]
-  ring_nf
-  rfl
+  simp [Finset.sum_sub_distrib, mul_sub, Finset.sum_sub_distrib]
 
 /-- **Variance ratio between populations.**
     Var_T / Var_S can be > 1 or < 1 depending on frequency changes. -/
 theorem variance_ratio_can_exceed_one
     (var_s var_t : ℝ) (h_s : 0 < var_s) (h_t_larger : var_s < var_t) :
     1 < var_t / var_s := by
-  rw [lt_div_iff h_s]; linarith
+  rw [lt_div_iff₀ h_s]; linarith
 
 theorem variance_ratio_can_be_below_one
     (var_s var_t : ℝ) (h_s : 0 < var_s) (h_t_smaller : var_t < var_s) :
@@ -132,7 +130,7 @@ theorem source_threshold_misclassifies_mean_shift
     (threshold - μ_S) / σ ≠ (threshold - μ_T) / σ := by
   intro h
   apply h_shift
-  have h_ne : σ ≠ 0 := ne_of_gt h_σ
+  have h_ne : σ ≠ 0 := h_σ.ne'
   have : (threshold - μ_S) * σ = (threshold - μ_T) * σ := by
     rwa [div_eq_div_iff h_ne h_ne] at h
   linarith [mul_right_cancel₀ h_ne this]
@@ -148,7 +146,11 @@ theorem source_threshold_misclassifies_variance_change
     (threshold - μ) / σ_S ≠ (threshold - μ) / σ_T := by
   intro h
   apply h_σ_ne
-  exact div_left_injective₀ (sub_ne_zero.mpr h_thr) h
+  have h_ne : threshold - μ ≠ 0 := sub_ne_zero.mpr h_thr
+  apply h_σ_ne
+  have h1 : (threshold - μ) * σ_T = (threshold - μ) * σ_S := by
+    rwa [div_eq_div_iff h_σS.ne' h_σT.ne'] at h
+  exact mul_left_cancel₀ h_ne h1
 
 /-- **Population-specific thresholds are necessary (combined).**
     Using source-population thresholds in the target population
@@ -176,7 +178,7 @@ Calibration in the source does not imply calibration in the target.
 
 section Calibration
 
-/-- **Calibration definition.**
+/- **Calibration definition.**
     A score is calibrated if E[Y | PGS = s] = g(s) for the specified
     link function g. -/
 
@@ -254,7 +256,7 @@ The Gaussian approximation error affects tail probability estimates.
 
 section GaussianApproximation
 
-/-- **Berry-Esseen bound for PGS.**
+/- **Berry-Esseen bound for PGS.**
     sup_x |F_PGS(x) - Φ((x-μ)/σ)| ≤ C × ρ / σ³
     where ρ = Σᵢ E[|Xᵢ - E[Xᵢ]|³] and σ² = Var(PGS). -/
 
@@ -262,15 +264,15 @@ section GaussianApproximation
     As the number of SNPs m increases, ρ/σ³ decreases as 1/√m
     (assuming each SNP contributes comparably). -/
 theorem berry_esseen_error_decreases_with_snps
-    (C ρ_per_snp σ²_per_snp : ℝ) (m₁ m₂ : ℕ)
-    (h_C : 0 < C) (h_ρ : 0 < ρ_per_snp) (h_σ : 0 < σ²_per_snp)
+    (C ρ_per_snp σ_sq_per_snp : ℝ) (m₁ m₂ : ℕ)
+    (h_C : 0 < C) (h_ρ : 0 < ρ_per_snp) (h_σ : 0 < σ_sq_per_snp)
     (h_m₁ : 0 < m₁) (h_m₂ : 0 < m₂)
     (h_more : m₁ < m₂) :
     -- Total ρ = m × ρ_per_snp, σ³ = (m × σ²_per_snp)^(3/2)
     -- Error ∝ m × ρ / (m × σ²)^(3/2) = ρ / (σ² × √m)
     -- More SNPs → smaller error
-    C * ρ_per_snp / (σ²_per_snp * Real.sqrt m₂) <
-      C * ρ_per_snp / (σ²_per_snp * Real.sqrt m₁) := by
+    C * ρ_per_snp / (σ_sq_per_snp * Real.sqrt m₂) <
+      C * ρ_per_snp / (σ_sq_per_snp * Real.sqrt m₁) := by
   apply div_lt_div_of_pos_left
   · exact mul_pos h_C h_ρ
   · exact mul_pos h_σ (Real.sqrt_pos.mpr (Nat.cast_pos.mpr h_m₁))
@@ -340,7 +342,11 @@ theorem external_vs_internal_differ_variance
       internallyStandardized pgs μ σ_T := by
   unfold externallyStandardized internallyStandardized
   intro h
-  exact h_σ (div_left_injective₀ (sub_ne_zero.mpr h_pgs) h)
+  apply h_σ
+  have h_ne : pgs - μ ≠ 0 := sub_ne_zero.mpr h_pgs
+  have h1 : (pgs - μ) * σ_T = (pgs - μ) * σ_S := by
+    rwa [div_eq_div_iff h_σS h_σT] at h
+  exact mul_left_cancel₀ h_ne h1
 
 /-- **External and internal standardization give different values (combined).**
     When σ differs between populations and the score is not at either mean,

@@ -49,8 +49,8 @@ theorem am_variance_exceeds_random
     (h_product : r * h2 < 1) :
     V_A < amEquilibriumVariance V_A r h2 := by
   unfold amEquilibriumVariance
-  rw [lt_div_iff (by linarith)]
-  nlinarith
+  rw [lt_div_iff₀ (by linarith)]
+  nlinarith [mul_pos h_r h_h2, mul_pos h_VA (mul_pos h_r h_h2)]
 
 /-- **AM equilibrium variance is finite when r × h² < 1.** -/
 theorem am_variance_finite
@@ -60,7 +60,7 @@ theorem am_variance_finite
   unfold amEquilibriumVariance
   exact div_pos h_VA (by linarith)
 
-/-- **AM creates between-locus LD.**
+/- **AM creates between-locus LD.**
     Under AM, alleles at different loci affecting the same trait
     become positively correlated (gametic phase disequilibrium). -/
 
@@ -79,7 +79,7 @@ theorem am_ld_sign
     0 < amInducedLD beta_i beta_j r h2 := by
   unfold amInducedLD
   apply div_pos
-  · nlinarith
+  · exact mul_pos (mul_pos (mul_pos h_bi h_bj) h_r) h_h2
   · linarith
 
 end AMVarianceInflation
@@ -104,8 +104,8 @@ theorem am_inflates_observed_h2
     (h_h2 : 0 < h2_true) (h_h2_le : h2_true < 1) :
     h2_true < h2_observed := by
   rw [h_inflation]
-  rw [lt_div_iff (by nlinarith)]
-  nlinarith
+  rw [lt_div_iff₀ (by nlinarith [mul_pos h_r h_h2])]
+  nlinarith [mul_pos h_r h_h2, mul_pos h_h2 (mul_pos h_r h_h2)]
 
 /-- **PGS R² is also inflated under AM.**
     The PGS appears more predictive because the AM-induced LD
@@ -145,7 +145,7 @@ creating population-specific AM effects.
 
 section DifferentialAM
 
-/-- **Spousal correlation varies across populations.**
+/- **Spousal correlation varies across populations.**
     For educational attainment: r_EUR ≈ 0.5, r_AFR ≈ 0.3.
     For height: r ≈ 0.2 in most populations. -/
 
@@ -176,10 +176,10 @@ theorem am_correction_increases_portability
     (h_product_s : r_s * h2 < 1) (h_product_t : r_t * h2 < 1) :
     port_m < amCorrectedPortability port_m r_s r_t h2 := by
   unfold amCorrectedPortability
-  rw [lt_div_iff (by linarith)]
+  rw [lt_div_iff₀ (by linarith)]
   rw [show port_m * (1 - r_t * h2) = port_m - port_m * r_t * h2 from by ring]
   rw [show port_m * (1 - r_s * h2) = port_m - port_m * r_s * h2 from by ring]
-  nlinarith
+  nlinarith [mul_pos h_port h_h2]
 
 end DifferentialAM
 
@@ -193,7 +193,7 @@ affects PGS portability in specific ways.
 
 section AMInducedLDPortability
 
-/-- **AM-induced LD is trait-specific.**
+/- **AM-induced LD is trait-specific.**
     LD is only created between loci affecting the assorted trait.
     For height (strong AM), there's long-range LD between height loci.
     For immune traits (no AM), there's no additional LD. -/
@@ -239,7 +239,7 @@ affects PGS in complex ways.
 
 section PopulationStructure
 
-/-- **Continuous population structure.**
+/- **Continuous population structure.**
     In reality, populations form a continuum, not discrete groups.
     PGS portability varies continuously along this gradient. -/
 
@@ -257,10 +257,10 @@ theorem ibd_fst_increases_with_distance
     (h_d₁ : 0 ≤ d₁) (h_d₂ : 0 ≤ d₂) (h_more : d₁ < d₂) :
     ibdFst d₁ N sigma_sq < ibdFst d₂ N sigma_sq := by
   unfold ibdFst
-  rw [div_lt_div_iff (by positivity) (by positivity)]
-  nlinarith
+  rw [div_lt_div_iff₀ (by positivity) (by positivity)]
+  nlinarith [mul_pos h_N h_s]
 
-/-- **Admixed populations have intermediate PGS performance.**
+/- **Admixed populations have intermediate PGS performance.**
     For an admixed population with proportion α from pop A:
     PGS R² ≈ α² R²_A + (1-α)² R²_B + interaction terms. -/
 
