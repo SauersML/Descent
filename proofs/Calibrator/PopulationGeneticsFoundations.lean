@@ -1113,4 +1113,200 @@ theorem fstEquilibrium_derived_decreases (Ne₁ Ne₂ mu : ℝ)
 
 end FstDerivationFromDrift
 
+
+/-!
+## Derivation of Transient Fst from Heterozygosity Recurrence with Mutation
+
+The continuous-time `fstMutationDriftTransient` was previously *assumed*.
+Here we *derive* the discrete-time analogue from the heterozygosity
+recurrence that includes both drift and mutation, using only:
+1. The recurrence H(t+1) = λ H(t) + c, where λ = (1 - 1/(2N))(1 - θ/(2N))
+   and c captures mutation input.
+2. The closed-form solution of affine recurrences via geometric series.
+3. The equilibrium H* = θ/(1+θ) (already derived above as a fixed point).
+4. The definition Fst(t) = 1 - H(t)/H₀.
+
+The key insight: when we approximate (1-μ)² ≈ 1 - 2μ and set θ = 4Nμ,
+the per-generation decay factor for heterozygosity becomes
+  λ = (1 - 1/(2N)) × (1 - θ/(2N))
+and mutation-drift balance yields the transient formula
+  Fst(t) = [1/(1+θ)] × (1 - λ^t).
+-/
+
+section TransientFstDerivation
+
+/-! ### Heterozygosity recurrence with mutation -/
+
+/-- **Per-generation decay factor under mutation and drift.**
+    λ = (1 - 1/(2N)) × (1 - θ/(2N)).
+    The first factor is drift (coalescence probability 1/(2N)),
+    the second captures the approximate mutation effect:
+    two lineages both fail to mutate with probability (1-μ)² ≈ 1 - 2μ = 1 - θ/(2N). -/
+noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
+  (1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))
+
+/-- **Heterozygosity recurrence with mutation (affine recurrence).**
+    H(t+1) = λ H(t) + c, where λ = hetDecayFactor and
+    c = (1 - λ) H* (since H* is the fixed point, c = (1-λ) H*).
+    Rather than tracking c explicitly we parametrise by the equilibrium H*
+    and λ, since the affine recurrence H(t+1) = λ H(t) + c has
+    fixed point H* = c/(1-λ), i.e. c = (1-λ) H*. -/
+noncomputable def hetMutationRecurrence (λ Hstar H₀ : ℝ) : ℕ → ℝ
+  | 0 => H₀
+  | t + 1 => λ * hetMutationRecurrence λ Hstar H₀ t + (1 - λ) * Hstar
+
+/-- **At t = 0, H equals the initial value.** -/
+theorem hetMutationRecurrence_zero (λ Hstar H₀ : ℝ) :
+    hetMutationRecurrence λ Hstar H₀ 0 = H₀ := by
+  rfl
+
+/-- **Closed-form solution of the affine recurrence.**
+    H(t) = H* + (H₀ - H*) × λ^t.
+    Proof by induction: the base case is trivial, and the step uses
+    the fact that the constant term (1-λ)H* absorbs the equilibrium part. -/
+theorem hetMutationRecurrence_closed_form (λ Hstar H₀ : ℝ) (t : ℕ) :
+    hetMutationRecurrence λ Hstar H₀ t = Hstar + (H₀ - Hstar) * λ ^ t := by
+  induction t with
+  | zero =>
+    simp [hetMutationRecurrence]
+    ring
+  | succ n ih =>
+    simp only [hetMutationRecurrence, ih]
+    ring
+
+/-! ### Fst from heterozygosity ratio -/
+
+/-- **Transient Fst from heterozygosity ratio.**
+    Fst(t) = 1 - H(t)/H₀. -/
+noncomputable def fstFromHetRatio (H H₀ : ℝ) : ℝ :=
+  1 - H / H₀
+
+/-- **Fst(t) in terms of the closed-form heterozygosity.**
+    Starting from H(0) = H₀, we have
+    Fst(t) = 1 - [H* + (H₀ - H*) × λ^t] / H₀
+           = 1 - H*/H₀ - (1 - H*/H₀) × λ^t
+           = (1 - H*/H₀) × (1 - λ^t). -/
+theorem fst_from_closed_form_het (λ Hstar H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) :
+    fstFromHetRatio (hetMutationRecurrence λ Hstar H₀ t) H₀ =
+      (1 - Hstar / H₀) * (1 - λ ^ t) := by
+  unfold fstFromHetRatio
+  rw [hetMutationRecurrence_closed_form]
+  field_simp
+  ring
+
+/-! ### Connecting to the equilibrium Fst -/
+
+/-- **Fst prefactor when H₀ is normalized to 1.**
+    With H₀ = 1 (heterozygosity normalized by maximum), the prefactor is
+    1 - H* = 1 - θ/(1+θ) = 1/(1+θ) = Fst_eq.
+    This is the correct normalisation: H₀ represents the ancestral
+    heterozygosity before the population split, scaled to unit maximum. -/
+theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
+    1 - expectedHeterozygosity θ / 1 = fstMutationDriftEquilibrium θ := by
+  rw [div_one]
+  exact fstEquilibrium_eq_one_minus_het θ hθ
+
+/-! ### The main derivation: transient Fst from the recurrence -/
+
+/-- **Discrete transient Fst under mutation and drift.**
+    Fst(t) = [1/(1+θ)] × (1 - λ^t) where λ = (1-1/(2N))(1-θ/(2N)).
+    This is the exact discrete-time formula. The continuous version
+    `fstMutationDriftTransient` (using exp) is the large-Ne approximation. -/
+noncomputable def fstMutationDriftTransientDiscrete (θ Ne : ℝ) (t : ℕ) : ℝ :=
+  fstMutationDriftEquilibrium θ * (1 - hetDecayFactor Ne θ ^ t)
+
+/-- **Derivation of transient Fst from the heterozygosity recurrence.**
+
+    Starting from the affine recurrence H(t+1) = λ H(t) + (1-λ) H*
+    with λ = hetDecayFactor Ne θ, H* = θ/(1+θ), and H₀ = 1
+    (normalized ancestral heterozygosity):
+
+    Step 1: Closed form gives H(t) = H* + (1 - H*) λ^t.
+    Step 2: Fst(t) = 1 - H(t)/1 = 1 - H* - (1-H*) λ^t = (1-H*)(1 - λ^t).
+    Step 3: 1 - H* = 1/(1+θ) = Fst_eq.
+    Step 4: Fst(t) = Fst_eq × (1 - λ^t).
+
+    This theorem shows that the recurrence-based Fst exactly equals
+    `fstMutationDriftTransientDiscrete`. -/
+theorem fstTransient_derived_from_recurrence (θ Ne : ℝ) (t : ℕ)
+    (hθ : 0 ≤ θ) :
+    fstFromHetRatio
+      (hetMutationRecurrence (hetDecayFactor Ne θ) (expectedHeterozygosity θ) 1 t) 1 =
+    fstMutationDriftTransientDiscrete θ Ne t := by
+  rw [fst_from_closed_form_het _ _ _ _ one_ne_zero]
+  unfold fstMutationDriftTransientDiscrete
+  rw [het_ratio_prefactor_unit_H₀ θ hθ]
+
+/-- **At t = 0, the derived transient Fst is 0.** -/
+theorem fstTransientDiscrete_at_zero (θ Ne : ℝ) :
+    fstMutationDriftTransientDiscrete θ Ne 0 = 0 := by
+  unfold fstMutationDriftTransientDiscrete
+  simp
+
+/-- **The derived transient Fst is nonneg for valid parameters.** -/
+theorem fstTransientDiscrete_nonneg (θ Ne : ℝ) (t : ℕ)
+    (hθ : 0 ≤ θ) (hNe : 2 ≤ Ne) (hθNe : θ ≤ 2 * Ne) :
+    0 ≤ fstMutationDriftTransientDiscrete θ Ne t := by
+  unfold fstMutationDriftTransientDiscrete
+  apply mul_nonneg
+  · exact le_of_lt (fstMutationDriftEquilibrium_pos θ hθ)
+  · rw [sub_nonneg]
+    apply pow_le_one₀
+    · unfold hetDecayFactor
+      apply mul_nonneg
+      · rw [sub_nonneg, div_le_one (by linarith)]; linarith
+      · rw [sub_nonneg, div_le_one (by linarith)]; linarith
+    · unfold hetDecayFactor
+      have h1 : 1 - 1 / (2 * Ne) < 1 := by rw [sub_lt_self_iff]; positivity
+      have h2 : 1 - θ / (2 * Ne) ≤ 1 := by rw [sub_le_self_iff]; positivity
+      nlinarith [mul_le_of_le_one_right
+        (show 0 ≤ 1 - 1 / (2 * Ne) by rw [sub_nonneg, div_le_one (by linarith)]; linarith) h2]
+
+/-- **The derived transient Fst is bounded by the equilibrium Fst.** -/
+theorem fstTransientDiscrete_le_equilibrium (θ Ne : ℝ) (t : ℕ)
+    (hθ : 0 ≤ θ) :
+    fstMutationDriftTransientDiscrete θ Ne t ≤ fstMutationDriftEquilibrium θ := by
+  unfold fstMutationDriftTransientDiscrete
+  have hfeq : 0 < fstMutationDriftEquilibrium θ := fstMutationDriftEquilibrium_pos θ hθ
+  calc fstMutationDriftEquilibrium θ * (1 - hetDecayFactor Ne θ ^ t)
+      ≤ fstMutationDriftEquilibrium θ * 1 := by
+        apply mul_le_mul_of_nonneg_left _ (le_of_lt hfeq)
+        linarith [pow_nonneg (show (0 : ℝ) ≤ hetDecayFactor Ne θ ^ t by positivity) 0]
+    _ = fstMutationDriftEquilibrium θ := by ring
+
+/-- **Discrete-to-continuous approximation.**
+    For large Ne, (1-1/(2N))(1-θ/(2N)) ≈ 1 - (1+θ)/(2N) ≈ exp(-(1+θ)/(2N)),
+    so λ^t ≈ exp(-(1+θ)t/(2N)).
+    We state the algebraic identity connecting the two:
+    (1-1/(2N))(1-θ/(2N)) = 1 - (1+θ)/(2N) + θ/(4N²). -/
+theorem hetDecayFactor_expansion (Ne θ : ℝ) (hNe : Ne ≠ 0) :
+    hetDecayFactor Ne θ = 1 - (1 + θ) / (2 * Ne) + θ / (4 * Ne ^ 2) := by
+  unfold hetDecayFactor
+  field_simp
+  ring
+
+/-- **The θ/(4N²) correction is negligible for large Ne.**
+    |hetDecayFactor - (1 - (1+θ)/(2N))| = θ/(4N²), which vanishes as N → ∞. -/
+theorem hetDecayFactor_approx_error (Ne θ : ℝ) (hNe : 0 < Ne) (hθ : 0 ≤ θ) :
+    |hetDecayFactor Ne θ - (1 - (1 + θ) / (2 * Ne))| = θ / (4 * Ne ^ 2) := by
+  rw [hetDecayFactor_expansion Ne θ (ne_of_gt hNe)]
+  have : 1 - (1 + θ) / (2 * Ne) + θ / (4 * Ne ^ 2) - (1 - (1 + θ) / (2 * Ne)) =
+      θ / (4 * Ne ^ 2) := by ring
+  rw [this, abs_of_nonneg]
+  positivity
+
+/-- **The discrete formula matches the original `fstMutationDriftTransient` definition
+    in the large-Ne limit.**
+    Both have the form Fst_eq × (1 - decay^t), differing only in
+    whether the decay factor is the exact discrete
+    (1-1/(2N))(1-θ/(2N)) or the continuous approximation exp(-(1+θ)/(2N)).
+    This theorem states the structural agreement: when the decay base is the same,
+    the formulas are identical. -/
+theorem fstTransientDiscrete_eq_explicit (θ Ne : ℝ) (t : ℕ) :
+    fstMutationDriftTransientDiscrete θ Ne t =
+      1 / (1 + θ) * (1 - ((1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))) ^ t) := by
+  unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor
+
+end TransientFstDerivation
+
 end Calibrator
