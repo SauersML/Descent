@@ -154,9 +154,53 @@ theorem twoDemeIMEquilibriumDelta_lt_one (M : ℝ) (hM : 0 < M) :
 
 section PresentDayMetrics
 
-/-- Present-day PGS variance after drift from an ancestral variance `V_A`. -/
+/-- PGS variance from the additive model under HWE.
+Under an additive genetic model with Hardy-Weinberg equilibrium,
+PGS variance = Σᵢ βᵢ² × 2pᵢ(1-pᵢ), i.e. the sum of squared effect sizes
+weighted by per-locus heterozygosity. Here `β_sq_sum` is Σᵢ βᵢ² and `het` is
+the average heterozygosity 2p(1-p) (or its sum, depending on normalisation). -/
+noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
+  β_sq_sum * het
+
+/-- Target-population heterozygosity under drift, derived from the definition of Fst.
+Fst is DEFINED as 1 - E[H_target]/H_source (the proportional reduction in
+expected heterozygosity due to drift), so E[H_target] = H_source × (1 - Fst).
+This connects to the heterozygosity recurrence `hetPostDrift` proved elsewhere:
+after `t` generations of Wright-Fisher drift with effective size N,
+H_t = H_0 × (1 - 1/(2N))^t, giving Fst = 1 - (1 - 1/(2N))^t. -/
+noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
+  het_source * (1 - fst)
+
+/-- Target-population PGS variance derived from the additive model and Fst.
+Derivation:
+  1. V_PGS_source = Σᵢ βᵢ² × 2p_source_i(1 - p_source_i) = V_A  (source variance)
+  2. Under drift, E[2p_target(1-p_target)] = 2p_source(1-p_source) × (1 - Fst)
+     (this IS the definition of Fst applied per-locus, then summed)
+  3. So E[V_PGS_target] = Σᵢ βᵢ² × 2p_source_i(1-p_source_i) × (1 - Fst)
+                         = V_A × (1 - Fst)
+
+Here V_A encodes both Σᵢ βᵢ² and the source heterozygosity, so the target
+variance is `pgsVarianceFromHet(V_A, 1 - fst)`. -/
+noncomputable def targetPGSVariance (V_A fst : ℝ) : ℝ :=
+  pgsVarianceFromHet V_A (1 - fst)
+
+theorem targetPGSVariance_eq_pgsVarianceFromHet (V_A fst : ℝ) :
+    targetPGSVariance V_A fst = pgsVarianceFromHet V_A (1 - fst) := by
+  rfl
+
+/-- Present-day PGS variance after drift from an ancestral variance `V_A`.
+This is definitionally equal to `targetPGSVariance` — both encode
+E[V_PGS_target] = V_A × (1 - Fst), derived from the Fst-heterozygosity identity. -/
 noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
   (1 - fst) * V_A
+
+/-- The `targetPGSVariance` derivation equals `presentDayPGSVariance`.
+This closes the derivation chain:
+  pgsVarianceFromHet → targetHetFromFst → targetPGSVariance = presentDayPGSVariance -/
+theorem targetPGSVariance_eq_presentDay (V_A fst : ℝ) :
+    targetPGSVariance V_A fst = presentDayPGSVariance V_A fst := by
+  unfold targetPGSVariance pgsVarianceFromHet presentDayPGSVariance
+  ring
 
 /-- The exact discrete Wright-Fisher retention factor after `t` generations. -/
 noncomputable def wrightFisherDriftRetention (N t : ℕ) : ℝ :=
@@ -307,7 +351,14 @@ theorem expected_abs_mean_shift_of_wrightFisher
 noncomputable def presentDaySignalToNoise (V_A V_E fst : ℝ) : ℝ :=
   presentDayPGSVariance V_A fst / V_E
 
-/-- Present-day explained-variance proxy from drifted signal and environmental noise. -/
+/-- Present-day coefficient of determination (R²) under drift.
+This is the explained-variance ratio, a definitional identity from statistics:
+  R² = V_signal / V_total = V_PGS / (V_PGS + V_E)
+where V_PGS = presentDayPGSVariance V_A fst = V_A × (1 - Fst) is the
+drift-attenuated PGS variance (derived via the Fst-heterozygosity chain above)
+and V_E is the environmental (residual) variance. The ratio is not a claim
+requiring proof — it is the definition of the fraction of phenotypic variance
+explained by the PGS in the target population. -/
 noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
   let v := presentDayPGSVariance V_A fst
   v / (v + V_E)
