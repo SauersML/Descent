@@ -84,61 +84,10 @@ theorem hwe_r2ApproximationInterval_membership_proved
   dgp.mem_r2ApproximationInterval_of_abs_sub_le r2Exact r2Gaussian h
 
 /-- The true derivative of expected Brier score with respect to `p`,
-    proved directly from the functional definition rather than an expanded proxy. -/
+    proved via the quadratic-form derivative in `Conclusions`. -/
 theorem expectedBrierScore_deriv_proved (p π : ℝ) :
-    deriv (fun x => expectedBrierScore x π) p = 2 * (p - π) := by
-  have hd1 : DifferentiableAt ℝ (fun x : ℝ => π * (1 - x) ^ 2) p := by
-    apply DifferentiableAt.const_mul
-    apply DifferentiableAt.pow
-    apply DifferentiableAt.sub (differentiableAt_const 1) differentiableAt_id
-  have hd2 : DifferentiableAt ℝ (fun x : ℝ => (1 - π) * x ^ 2) p := by
-    apply DifferentiableAt.const_mul
-    apply DifferentiableAt.pow differentiableAt_id
-  unfold expectedBrierScore
-  have h_add :
-      deriv (fun x : ℝ => π * (1 - x) ^ 2 + (1 - π) * x ^ 2) p =
-        deriv (fun x : ℝ => π * (1 - x) ^ 2) p + deriv (fun x : ℝ => (1 - π) * x ^ 2) p := by
-    exact deriv_add hd1 hd2
-  rw [h_add]
-  have hd_sub : deriv (fun x : ℝ => π * (1 - x) ^ 2) p = -2 * π * (1 - p) := by
-    rw [deriv_const_mul]
-    · have h_chain :
-          deriv (fun x : ℝ => (1 - x) ^ 2) p =
-            2 * (1 - p) * deriv (fun x : ℝ => 1 - x) p := by
-        have h1 :
-            deriv (fun x : ℝ => (1 - x) ^ 2) p =
-              2 * ((fun x : ℝ => 1 - x) p) ^ (2 - 1) * deriv (fun x : ℝ => 1 - x) p :=
-          deriv_pow (n := 2) (DifferentiableAt.sub (differentiableAt_const 1) differentiableAt_id)
-        rw [h1]
-        ring_nf
-      rw [h_chain]
-      have h_inner : deriv (fun x : ℝ => 1 - x) p = -1 := by
-        have h_sub_inner :
-            deriv (fun x : ℝ => 1 - x) p = deriv (fun x : ℝ => 1) p - deriv (fun x : ℝ => x) p :=
-          deriv_sub (differentiableAt_const 1) differentiableAt_id
-        rw [h_sub_inner, deriv_const]
-        have h_id : deriv (fun x : ℝ => x) p = 1 := deriv_id p
-        rw [h_id, zero_sub]
-      rw [h_inner]
-      ring
-    · apply DifferentiableAt.pow
-      apply DifferentiableAt.sub (differentiableAt_const 1) differentiableAt_id
-  have hd_add' : deriv (fun x : ℝ => (1 - π) * x ^ 2) p = 2 * (1 - π) * p := by
-    rw [deriv_const_mul]
-    · have h_pow : deriv (fun x : ℝ => x ^ 2) p = 2 * p := by
-        have h_chain2 :
-            deriv (fun x : ℝ => x ^ 2) p =
-              2 * ((fun x : ℝ => x) p) ^ (2 - 1) * deriv (fun x : ℝ => x) p :=
-          deriv_pow (n := 2) differentiableAt_id
-        rw [h_chain2]
-        have h_id : deriv (fun x : ℝ => x) p = 1 := deriv_id p
-        rw [h_id]
-        ring_nf
-      rw [h_pow]
-      ring
-    · apply DifferentiableAt.pow differentiableAt_id
-  rw [hd_sub, hd_add']
-  ring
+    deriv (fun x => expectedBrierScore x π) p = 2 * (p - π) :=
+  expectedBrierScore_deriv p π
 
 /-- Concrete 2x2 matrix representing independent LD. -/
 def sigmaS : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 0], ![0, 1]]
@@ -164,21 +113,11 @@ theorem source_target_erm_differ_proved :
     wS ≠ wT := by
   intro wS wT
   refine ⟨?_, ?_, ?_⟩
-  · ext i
-    fin_cases i
-    · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
-    · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
-  · ext i
-    fin_cases i
-    · simp [wT, sigmaT, crossT, Matrix.mulVec, dotProduct]
-      ring
-    · simp [wT, sigmaT, crossT, Matrix.mulVec, dotProduct]
-      ring
+  · ext i; fin_cases i <;> simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
+  · ext i; fin_cases i <;> simp [wT, sigmaT, crossT, Matrix.mulVec, dotProduct] <;> ring
   · intro heq
     have h : wS 0 = wT 0 := congrFun heq 0
-    revert h
-    simp [wS, wT]
-    norm_num
+    simp [wS, wT] at h
 
 /--
 Helper lemma: A Bayes-optimal model in a capable class Recovers the true expectation pointwise,
@@ -355,80 +294,15 @@ theorem independence_implies_no_interaction_proved (k sp : ℕ) [Fintype (Fin k)
   rcases h_additive with ⟨f, g, h_fn_struct⟩
   exact l2_projection_of_additive_is_additive_proved k sp h_fn_struct m h_spline h_pgs h_opt h_realizable h_measure_pos h_cont_true h_pgs_cont h_spline_cont h_int_sq
 
-/-- Rigorous algebraic proof of the exact mean-shift formula used after substituting
-discrete Wright-Fisher drift indices for the branchwise `F_ST` terms. -/
+/-- Top-level mean-shift formula: delegates to `PortabilityDrift.expected_abs_mean_shift_bound_proved`. -/
 theorem expected_abs_mean_shift_formula_proved
     (V_A fstS fstT : ℝ)
     (hVA_pos : 0 < V_A)
     (hfst_sum_nonneg : 0 ≤ fstS + fstT)
     (hfstS_lt_one : fstS < 1) :
     Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
-      2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) := by
-  unfold Expected_Abs_Shift
-  rw [variance_mean_pgs_diff V_A (fstS + fstT)]
-  unfold presentDayPGSVariance
-  have h1 : Real.sqrt (2 * (fstS + fstT) * V_A) = Real.sqrt (2 * (fstS + fstT)) * Real.sqrt V_A := by
-    apply Real.sqrt_mul
-    apply mul_nonneg
-    · norm_num
-    · exact hfst_sum_nonneg
-  have h2 : Real.sqrt ((1 - fstS) * V_A) = Real.sqrt (1 - fstS) * Real.sqrt V_A := by
-    apply Real.sqrt_mul
-    linarith
-  rw [h1, h2]
-  have h3 : (Real.sqrt (2 * (fstS + fstT)) * Real.sqrt V_A * Real.sqrt (2 / Real.pi)) /
-          (Real.sqrt (1 - fstS) * Real.sqrt V_A) =
-      (Real.sqrt (2 * (fstS + fstT)) * Real.sqrt (2 / Real.pi)) / Real.sqrt (1 - fstS) := by
-    have h4 : Real.sqrt V_A ≠ 0 := by
-      intro h
-      have h5 : V_A = 0 := by
-        exact (Real.sqrt_eq_zero (le_of_lt hVA_pos)).mp h
-      linarith
-    calc
-      (Real.sqrt (2 * (fstS + fstT)) * Real.sqrt V_A * Real.sqrt (2 / Real.pi)) / (Real.sqrt (1 - fstS) * Real.sqrt V_A)
-        = (Real.sqrt (2 * (fstS + fstT)) * Real.sqrt (2 / Real.pi) * Real.sqrt V_A) / (Real.sqrt (1 - fstS) * Real.sqrt V_A) := by
-            ring_nf
-      _ = (Real.sqrt (2 * (fstS + fstT)) * Real.sqrt (2 / Real.pi)) / Real.sqrt (1 - fstS) := by
-            rw [mul_div_mul_right _ _ h4]
-  rw [h3]
-  have h5 : Real.sqrt (2 * (fstS + fstT)) * Real.sqrt (2 / Real.pi) = Real.sqrt (4 * ((fstS + fstT) / Real.pi)) := by
-    rw [← Real.sqrt_mul]
-    · congr 1
-      ring
-    · apply mul_nonneg
-      · norm_num
-      · exact hfst_sum_nonneg
-  rw [h5]
-  have h6 : Real.sqrt (4 * ((fstS + fstT) / Real.pi)) = 2 * Real.sqrt ((fstS + fstT) / Real.pi) := by
-    have h_split : Real.sqrt (4 * ((fstS + fstT) / Real.pi)) = Real.sqrt 4 * Real.sqrt ((fstS + fstT) / Real.pi) := by
-      apply Real.sqrt_mul
-      norm_num
-    rw [h_split]
-    have h_sqrt4 : Real.sqrt 4 = 2 := by
-      have : (2 : ℝ) ≥ 0 := by norm_num
-      have h_sq : (2 : ℝ)^2 = 4 := by norm_num
-      rw [← h_sq]
-      exact Real.sqrt_sq this
-    rw [h_sqrt4]
-  rw [h6]
-  have h7 : (2 * Real.sqrt ((fstS + fstT) / Real.pi)) / Real.sqrt (1 - fstS) = 2 * (Real.sqrt ((fstS + fstT) / Real.pi) / Real.sqrt (1 - fstS)) := by
-    ring
-  rw [h7]
-  congr 1
-  rw [← Real.sqrt_div]
-  · congr 1
-    calc
-      ((fstS + fstT) / Real.pi) / (1 - fstS) = (fstS + fstT) * (Real.pi)⁻¹ * (1 - fstS)⁻¹ := by
-        ring_nf
-      _ = (fstS + fstT) * ((Real.pi) * (1 - fstS))⁻¹ := by
-        rw [mul_assoc]
-        congr 1
-        rw [mul_inv]
-      _ = (fstS + fstT) / (Real.pi * (1 - fstS)) := by
-        rfl
-  · apply div_nonneg
-    · exact hfst_sum_nonneg
-    · exact Real.pi_pos.le
+      2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) :=
+  expected_abs_mean_shift_bound_proved V_A fstS fstT hVA_pos hfst_sum_nonneg hfstS_lt_one
 
 /-- Specialization of the exact mean-shift formula to discrete Wright-Fisher drift. -/
 theorem expected_abs_mean_shift_of_wrightFisher_proved
@@ -516,4 +390,30 @@ theorem target_r2_drop_of_fst_and_sparse_array_proved
     h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
 
 end NoAxioms
+
+/-- Top-level: at zero divergence, target R² equals source R². -/
+theorem targetR2_eq_source_at_zero_drift_proved
+    (r2Source fst : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (hfst : fst < 1) :
+    targetR2FromObservables r2Source fst fst = r2Source :=
+  targetR2FromObservables_self r2Source fst h_r2 hfst
+
+/-- Top-level: strict Brier degradation under positive drift and non-degenerate prevalence. -/
+theorem targetBrier_strict_gt_source_proved
+    (π r2Source fstSource fstTarget : ℝ)
+    (hπ0 : 0 < π) (hπ1 : π < 1)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
+    sourceBrierFromObservables π r2Source <
+      targetBrierFromObservables π r2Source fstSource fstTarget :=
+  targetBrier_strict_gt_source_of_observables π r2Source fstSource fstTarget
+    hπ0 hπ1 h_r2 h_fst h_fst_bounds
+
+/-- Top-level: increasing migration strictly reduces IM equilibrium differentiation. -/
+theorem im_delta_strictAnti_proved :
+    StrictAnti (fun M : ℝ => twoDemeIMEquilibriumDelta M) :=
+  twoDemeIMEquilibriumDelta_strictAnti
+
 end Calibrator

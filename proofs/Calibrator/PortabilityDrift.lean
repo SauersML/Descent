@@ -28,9 +28,6 @@ noncomputable def fstFromTau (tau : ℝ) : ℝ :=
 noncomputable def fstFromGenerations (t Ne : ℝ) : ℝ :=
   fstFromTau (coalescentTau t Ne)
 
-noncomputable def generationsFromFst (Ne fst : ℝ) : ℝ :=
-  -2 * Ne * Real.log (1 - fst)
-
 /-- Branchwise-to-pairwise `F_ST` map under independent drift from a common ancestor. -/
 noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
   1 - (1 - fstS) * (1 - fstT)
@@ -174,40 +171,34 @@ theorem wrightFisherFst_eq
     wrightFisherFst N t = 1 - (1 - 1 / (2 * (N : ℝ))) ^ t := by
   simp [wrightFisherFst, wrightFisherDriftRetention]
 
+private lemma wrightFisherBase_bounds (N : ℕ) (hN : 0 < N) :
+    0 < 1 - 1 / (2 * (N : ℝ)) ∧ 1 - 1 / (2 * (N : ℝ)) ≤ 1 := by
+  have hNge : (1 : ℝ) ≤ N := by exact_mod_cast Nat.succ_le_of_lt hN
+  have hpos : 0 < 2 * (N : ℝ) := by positivity
+  constructor
+  · have : (1 : ℝ) < 2 * (N : ℝ) := by nlinarith
+    have := div_lt_one_of_lt this (by positivity)
+    linarith
+  · have := div_nonneg (le_refl (1 : ℝ)) (le_of_lt hpos)
+    linarith
+
 theorem wrightFisherFst_nonneg
     (N t : ℕ)
     (hN : 0 < N) :
     0 ≤ wrightFisherFst N t := by
-  have hNreal : (0 : ℝ) < N := by exact_mod_cast hN
-  have hbase_nonneg : 0 ≤ 1 - 1 / (2 * (N : ℝ)) := by
-    have h_le : (1 : ℝ) / (2 * (N : ℝ)) ≤ 1 / 2 := by
-      have hdenom_ge : (2 : ℝ) ≤ 2 * (N : ℝ) := by
-        have hNge : (1 : ℝ) ≤ N := by exact_mod_cast Nat.succ_le_of_lt hN
-        nlinarith
-      have hpos : 0 < 2 * (N : ℝ) := by positivity
-      simpa using one_div_le_one_div_of_le (by norm_num : (0 : ℝ) < 2) hdenom_ge
-    linarith
-  have hpow_le_one : (1 - 1 / (2 * (N : ℝ))) ^ t ≤ 1 := by
-    have hfrac_nonneg : 0 ≤ (1 : ℝ) / (2 * (N : ℝ)) := by positivity
-    have hbase_le_one : 1 - 1 / (2 * (N : ℝ)) ≤ 1 := by linarith
-    exact pow_le_one₀ hbase_nonneg hbase_le_one
+  obtain ⟨hbase_pos, hbase_le_one⟩ := wrightFisherBase_bounds N hN
   rw [wrightFisherFst_eq]
+  have : (1 - 1 / (2 * (N : ℝ))) ^ t ≤ 1 :=
+    pow_le_one₀ (le_of_lt hbase_pos) hbase_le_one
   linarith
 
 theorem wrightFisherFst_lt_one
     (N t : ℕ)
     (hN : 0 < N) :
     wrightFisherFst N t < 1 := by
-  have hNreal : (0 : ℝ) < N := by exact_mod_cast hN
-  have hbase_pos : 0 < 1 - 1 / (2 * (N : ℝ)) := by
-    have h_lt : (1 : ℝ) / (2 * (N : ℝ)) < 1 := by
-      have hdenom_gt : (1 : ℝ) < 2 * (N : ℝ) := by
-        have hNge : (1 : ℝ) ≤ N := by exact_mod_cast Nat.succ_le_of_lt hN
-        nlinarith
-      simpa using one_div_lt_one_div_of_lt (by norm_num : (0 : ℝ) < 1) hdenom_gt
-    linarith
+  obtain ⟨hbase_pos, _⟩ := wrightFisherBase_bounds N hN
   rw [wrightFisherFst_eq]
-  have hpow_pos : 0 < (1 - 1 / (2 * (N : ℝ))) ^ t := pow_pos hbase_pos t
+  have : 0 < (1 - 1 / (2 * (N : ℝ))) ^ t := pow_pos hbase_pos t
   linarith
 
 /-- Drift-driven variance of the between-population PGS-mean difference.
@@ -636,24 +627,16 @@ theorem expectedR2_strictMono_nonneg
   unfold expectedR2
   have hxE : 0 < x + V_E := by linarith
   have hyE : 0 < y + V_E := by linarith [hx, hxy]
-  have hxyE : x + V_E < y + V_E := by linarith
-  have hInv : 1 / (y + V_E) < 1 / (x + V_E) := by
-    rw [one_div_lt_one_div hyE hxE]
-    exact hxyE
-  have hsub : 1 - V_E / (x + V_E) < 1 - V_E / (y + V_E) := by
-    have hmul := mul_lt_mul_of_pos_left hInv hVE
-    have hfrac : V_E / (y + V_E) < V_E / (x + V_E) := by
-      simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hmul
-    nlinarith [hfrac]
-  have hxne : x + V_E ≠ 0 := by linarith
-  have hyne : y + V_E ≠ 0 := by linarith
-  have hxrepr : x / (x + V_E) = 1 - V_E / (x + V_E) := by
-    field_simp [hxne]
-    ring
-  have hyrepr : y / (y + V_E) = 1 - V_E / (y + V_E) := by
-    field_simp [hyne]
-    ring
-  simpa [hxrepr, hyrepr] using hsub
+  -- Use the identity v/(v+E) = 1 - E/(v+E) to reduce to monotonicity of E/(v+E)
+  have hxne : x + V_E ≠ 0 := ne_of_gt hxE
+  have hyne : y + V_E ≠ 0 := ne_of_gt hyE
+  have hxrepr : x / (x + V_E) = 1 - V_E / (x + V_E) := by field_simp; ring
+  have hyrepr : y / (y + V_E) = 1 - V_E / (y + V_E) := by field_simp; ring
+  rw [hxrepr, hyrepr]
+  -- E/(y+E) < E/(x+E) because x+E < y+E and E > 0
+  have : V_E / (y + V_E) < V_E / (x + V_E) :=
+    div_lt_div_of_pos_left hVE hxE (by linarith)
+  linarith
 
 /-- With any imperfect source tagging (`ρS > 0`), worsening target tagging (`ρT < ρS`)
 strictly lowers portability when drift terms are fixed. -/
@@ -668,38 +651,26 @@ theorem portability_ratio_with_target_ld_decay_any_source
       expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E := by
   rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
   have hRhoS_pos : 0 < rhoS := lt_trans hRhoT_pos hRhoT_lt_rhoS
-  have hu_pos : 0 < (1 - fstT) * V_A := by
-    have : 0 < 1 - fstT := by linarith
-    exact mul_pos this hVA
+  have hu_pos : 0 < (1 - fstT) * V_A := mul_pos (by linarith) hVA
+  -- Numerator: rhoT < rhoS implies R²(rhoT·u) < R²(rhoS·u)
   have h_num_lt :
       expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E <
         expectedR2 (realWorldPGSVariance V_A fstT rhoS) V_E := by
-    have h_scaled_lt :
-        rhoT * ((1 - fstT) * V_A) < rhoS * ((1 - fstT) * V_A) :=
-      mul_lt_mul_of_pos_right hRhoT_lt_rhoS hu_pos
-    apply expectedR2_strictMono_nonneg V_E
-    · exact hVE
+    apply expectedR2_strictMono_nonneg V_E _ _ hVE
     · unfold realWorldPGSVariance
       exact le_of_lt (by simpa [mul_assoc] using mul_pos hRhoT_pos hu_pos)
-    · simpa [realWorldPGSVariance, mul_assoc] using h_scaled_lt
+    · simpa [realWorldPGSVariance, mul_assoc] using
+        mul_lt_mul_of_pos_right hRhoT_lt_rhoS hu_pos
+  -- Denominator positivity
   have hsource_sig_pos : 0 < realWorldPGSVariance V_A fstS rhoS := by
     unfold realWorldPGSVariance
-    have hOneMinus_pos : 0 < 1 - fstS := by linarith
-    have hmul : 0 < rhoS * (1 - fstS) * V_A := by
-      exact mul_pos (mul_pos hRhoS_pos hOneMinus_pos) hVA
-    simpa [mul_assoc] using hmul
-  have h_den_pos :
-      0 < expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E := by
+    simpa [mul_assoc] using mul_pos (mul_pos hRhoS_pos (by linarith : 0 < 1 - fstS)) hVA
+  have h_den_pos : 0 < expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E := by
     unfold expectedR2
-    have hden : 0 < realWorldPGSVariance V_A fstS rhoS + V_E := by linarith [hsource_sig_pos, hVE]
-    exact div_pos hsource_sig_pos hden
-  have hmul :
-      expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E *
-          (expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E)⁻¹ <
-        expectedR2 (realWorldPGSVariance V_A fstT rhoS) V_E *
-          (expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E)⁻¹ :=
+    exact div_pos hsource_sig_pos (by linarith)
+  -- Divide both sides by positive denominator
+  simpa [div_eq_mul_inv] using
     mul_lt_mul_of_pos_right h_num_lt (inv_pos.mpr h_den_pos)
-  simpa [div_eq_mul_inv] using hmul
 
 /-- With source perfectly tagged (`ρ_S = 1`), adding target LD decay (`ρ_T < 1`)
 strictly lowers the portability ratio versus drift-only transport. -/
@@ -811,23 +782,11 @@ noncomputable def r2FromVarianceScaleOne (v : ℝ) : ℝ :=
 theorem r2FromVarianceScaleOne_strictMono_nonneg
     (x y : ℝ) (hx : 0 ≤ x) (hxy : x < y) :
     r2FromVarianceScaleOne x < r2FromVarianceScaleOne y := by
-  unfold r2FromVarianceScaleOne
-  have hx1 : 0 < x + 1 := by linarith
-  have hy1 : 0 < y + 1 := by linarith [hx, hxy]
-  have hxy1 : x + 1 < y + 1 := by linarith
-  have hInv : 1 / (y + 1) < 1 / (x + 1) := by
-    rw [one_div_lt_one_div hy1 hx1]
-    exact hxy1
-  have hsub : 1 - 1 / (x + 1) < 1 - 1 / (y + 1) := by linarith
-  have hxne : x + 1 ≠ 0 := by linarith
-  have hyne : y + 1 ≠ 0 := by linarith
-  have hxrepr : x / (x + 1) = 1 - 1 / (x + 1) := by
-    field_simp [hxne]
-    ring
-  have hyrepr : y / (y + 1) = 1 - 1 / (y + 1) := by
-    field_simp [hyne]
-    ring
-  simpa [hxrepr, hyrepr] using hsub
+  -- r2FromVarianceScaleOne v = v/(v+1) = expectedR2 v 1
+  show r2FromVarianceScaleOne x < r2FromVarianceScaleOne y
+  have : expectedR2 x 1 < expectedR2 y 1 :=
+    expectedR2_strictMono_nonneg 1 x y one_pos hx hxy
+  simpa [expectedR2, r2FromVarianceScaleOne] using this
 
 /-- Present-day target `R²` written only from source `R²` and source/target `F_ST`. -/
 noncomputable def targetR2FromObservables
@@ -1184,6 +1143,106 @@ theorem logLossRegretRatio_eq_kl_ratio (η qSource qTarget : ℝ)
   unfold logLossRegretRatio
   rw [logLossRegretPoint_eq_kl η qTarget hη0 hη1 hqT0 hqT1,
     logLossRegretPoint_eq_kl η qSource hη0 hη1 hqS0 hqS1]
+
+/-- Drift transport ratio is nonneg when both drifts are below 1. -/
+theorem driftTransportRatio_nonneg
+    (fstSource fstTarget : ℝ)
+    (hS : fstSource < 1) (hT : fstTarget ≤ 1) :
+    0 ≤ driftTransportRatio fstSource fstTarget := by
+  unfold driftTransportRatio
+  exact div_nonneg (by linarith) (by linarith)
+
+/-- Drift transport ratio is strictly below 1 when target has more drift. -/
+theorem driftTransportRatio_lt_one
+    (fstSource fstTarget : ℝ)
+    (hS : fstSource < 1)
+    (hfst : fstSource < fstTarget) :
+    driftTransportRatio fstSource fstTarget < 1 := by
+  unfold driftTransportRatio
+  rw [div_lt_one (by linarith : (0 : ℝ) < 1 - fstSource)]
+  linarith
+
+/-- At zero divergence, drift transport ratio equals 1 (no signal loss). -/
+@[simp] theorem driftTransportRatio_self (fst : ℝ) (hfst : fst < 1) :
+    driftTransportRatio fst fst = 1 := by
+  unfold driftTransportRatio
+  exact div_self (by linarith : (1 : ℝ) - fst ≠ 0)
+
+/-- At zero divergence, target R² equals source R². -/
+theorem targetR2FromObservables_self (r2Source fst : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (hfst : fst < 1) :
+    targetR2FromObservables r2Source fst fst = r2Source := by
+  unfold targetR2FromObservables targetVarianceFromSource
+  have hden : (1 : ℝ) - fst ≠ 0 := by linarith
+  have hratio : (1 - fst) / (1 - fst) = 1 := div_self hden
+  rw [hratio, mul_one]
+  exact sourceR2_eq_r2FromVarianceScaleOne r2Source h_r2
+
+/-- For valid prevalence `0 < π < 1`, the linear Brier approximation `π(1-π)(1-R²)`
+is strictly decreasing in `R²`. -/
+theorem brierFromR2_strictAnti (π : ℝ) (hπ0 : 0 < π) (hπ1 : π < 1) :
+    StrictAnti (brierFromR2 π) := by
+  intro r2a r2b hab
+  unfold brierFromR2
+  have hcoef : 0 < π * (1 - π) := mul_pos hπ0 (by linarith)
+  nlinarith
+
+/-- Strict Brier degradation: under positive drift and non-degenerate prevalence,
+target Brier is strictly worse than source Brier. -/
+theorem targetBrier_strict_gt_source_of_observables
+    (π r2Source fstSource fstTarget : ℝ)
+    (hπ0 : 0 < π) (hπ1 : π < 1)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
+    sourceBrierFromObservables π r2Source <
+      targetBrierFromObservables π r2Source fstSource fstTarget := by
+  have hr2_drop := targetR2_lt_source_from_observables r2Source fstSource fstTarget
+    h_r2 h_fst h_fst_bounds
+  unfold sourceBrierFromObservables targetBrierFromObservables
+  exact brierFromR2_strictAnti π hπ0 hπ1 hr2_drop
+
+/-- Squared mean PGS difference under the pure split model. -/
+noncomputable def expectedSqMeanPGSDiff_pureSplit (V_A fstS fstT : ℝ) : ℝ :=
+  Var_Delta_Mu V_A (fstS + fstT)
+
+/-- The expected squared mean PGS difference equals `2(F_S + F_T) V_A`. -/
+@[simp] theorem expectedSqMeanPGSDiff_pureSplit_eq (V_A fstS fstT : ℝ) :
+    expectedSqMeanPGSDiff_pureSplit V_A fstS fstT = 2 * (fstS + fstT) * V_A := by
+  rfl
+
+/-- The expected squared mean PGS difference under the IM equilibrium model:
+`E[(Δμ)²] = 4δ V_A` where `δ = 1/(2M+1)`. -/
+noncomputable def expectedSqMeanPGSDiff_IMEquilibrium (V_A M : ℝ) : ℝ :=
+  Var_Delta_Mu V_A (2 * twoDemeIMEquilibriumDelta M)
+
+/-- IM equilibrium squared mean difference equals `4δ V_A`. -/
+@[simp] theorem expectedSqMeanPGSDiff_IMEquilibrium_eq (V_A M : ℝ) :
+    expectedSqMeanPGSDiff_IMEquilibrium V_A M =
+      4 * twoDemeIMEquilibriumDelta M * V_A := by
+  unfold expectedSqMeanPGSDiff_IMEquilibrium Var_Delta_Mu
+  ring
+
+/-- IM equilibrium: increasing migration strictly decreases genetic differentiation. -/
+theorem twoDemeIMEquilibriumDelta_strictAnti :
+    StrictAnti (fun M : ℝ => twoDemeIMEquilibriumDelta M) := by
+  intro a b hab
+  unfold twoDemeIMEquilibriumDelta
+  have ha : 0 < 2 * a + 1 := by linarith
+  have hb : 0 < 2 * b + 1 := by linarith
+  rw [div_lt_div_iff hb ha]
+  linarith
+
+/-- Under the IM model, the mean-shift variance is strictly decreasing in migration rate
+when `V_A > 0`. -/
+theorem expectedSqMeanPGSDiff_IMEquilibrium_strictAnti_M
+    (V_A : ℝ) (hVA : 0 < V_A) :
+    StrictAnti (fun M : ℝ => expectedSqMeanPGSDiff_IMEquilibrium V_A M) := by
+  intro a b hab
+  simp only [expectedSqMeanPGSDiff_IMEquilibrium_eq]
+  have := twoDemeIMEquilibriumDelta_strictAnti hab
+  nlinarith
 
 end PresentDayMetrics
 
