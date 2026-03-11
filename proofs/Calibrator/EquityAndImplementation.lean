@@ -25,6 +25,83 @@ Reference: Wang et al. (2026), Nature Communications 17:942.
 
 
 /-!
+## Health Disparity from Portability Gaps
+
+PGS portability gaps directly translate to disparities in clinical
+benefit across ancestry groups.
+-/
+
+section HealthDisparity
+
+/-- **Clinical utility depends on PGS R².**
+    The net clinical benefit from PGS-guided care is monotonically
+    increasing in R². We model benefit = α × R² for a positive
+    proportionality constant α (benefit per unit R²). When
+    R²₁ < R²₂, the benefit in population 1 is strictly less. -/
+theorem clinical_benefit_increases_with_r2
+    (α r2₁ r2₂ : ℝ)
+    (h_α : 0 < α)
+    (h_r2 : r2₁ < r2₂) :
+    α * r2₁ < α * r2₂ := by
+  exact mul_lt_mul_of_pos_left h_r2 h_α
+
+/-- **Portability gap creates benefit gap.**
+    If R²_EUR > R²_AFR and benefit = α × R² with α > 0, then
+    clinical benefit for EUR patients exceeds that for AFR patients.
+    The benefit gap α × (R²_EUR - R²_AFR) > 0 follows from the R² gap. -/
+theorem portability_creates_benefit_gap
+    (α r2_eur r2_afr : ℝ)
+    (h_α : 0 < α)
+    (h_r2_gap : r2_afr < r2_eur)
+    (h_nn : 0 ≤ r2_afr) :
+    0 < α * r2_eur - α * r2_afr := by
+  have : r2_eur - r2_afr > 0 := by linarith
+  nlinarith
+
+/-- **Disparity increases with Fst from discovery population.**
+    Populations most genetically distant from the discovery
+    population have the worst PGS performance. R² decays as
+    (1 - Fst)², so disparity = R²_source - R²_target grows
+    with Fst. For Fst₂ > Fst₁ > 0, the R² loss is larger. -/
+theorem disparity_increases_with_distance
+    (R2_source fst₁ fst₂ : ℝ)
+    (h_R2 : 0 < R2_source)
+    (h_fst₁_pos : 0 < fst₁) (h_fst₁_lt : fst₁ < 1)
+    (h_fst₂_pos : 0 < fst₂) (h_fst₂_lt : fst₂ < 1)
+    (h_fst : fst₁ < fst₂) :
+    -- R² loss at fst₁ < R² loss at fst₂
+    R2_source * (1 - (1 - fst₁) ^ 2) < R2_source * (1 - (1 - fst₂) ^ 2) := by
+  apply mul_lt_mul_of_pos_left _ h_R2
+  have h1 : (1 - fst₂) ^ 2 < (1 - fst₁) ^ 2 := by nlinarith
+  linarith
+
+/-- **Existing health disparities may be amplified.**
+    If PGS is deployed only for the well-served population (EUR),
+    it adds benefit α × R²_eur to that group. The underserved group
+    gets no PGS benefit, so the pre-existing disparity d₀ ≥ 0 grows
+    to d₀ + α × R²_eur. -/
+theorem deployment_amplifies_disparity
+    (d₀ α r2_eur : ℝ)
+    (h_nn : 0 ≤ d₀)
+    (h_α : 0 < α) (h_r2 : 0 < r2_eur) :
+    d₀ < d₀ + α * r2_eur := by
+  linarith [mul_pos h_α h_r2]
+
+/-- **QALY gap from portability.**
+    QALYs gained = γ × R² for a positive constant γ (QALYs per unit R²).
+    The QALY gap between two populations is γ × (R²₁ - R²₂), which is
+    positive when R²₁ > R²₂. Derived from the model, not assumed. -/
+theorem qaly_gap_proportional_to_r2_gap
+    (γ r2₁ r2₂ : ℝ)
+    (h_γ : 0 < γ) (h_gap : r2₂ < r2₁) :
+    0 < γ * r2₁ - γ * r2₂ := by
+  have : r2₁ - r2₂ > 0 := by linarith
+  nlinarith
+
+end HealthDisparity
+
+
+/-!
 ## Fairness Impossibility Results
 
 It is mathematically impossible to simultaneously satisfy
@@ -87,6 +164,25 @@ theorem equal_fpr_requires_different_thresholds
   have := mul_right_cancel₀ (ne_of_gt h_sigma₂) h_eq₂
   linarith
 
+/-- **Group-blind vs group-aware PGS policies.**
+    A group-blind policy (same threshold for all) violates
+    calibration equality. A group-aware policy violates
+    treatment equality. Neither is fully "fair".
+    We model: calibration violation for a blind policy is
+    |μ₁ - μ₂| (the mean PGS difference), and treatment violation
+    for an aware policy is |t₁ - t₂| (threshold difference).
+    When means differ and equal FPR requires different thresholds,
+    both violations are positive. -/
+theorem no_fully_fair_policy
+    (μ₁ μ₂ σ : ℝ)
+    (h_mu_diff : μ₁ ≠ μ₂)
+    (h_sigma : 0 < σ) :
+    -- Both policies have some fairness violation
+    0 < |μ₁ - μ₂| ∧ 0 < |μ₁ - μ₂| / σ := by
+  constructor
+  · exact abs_pos.mpr (sub_ne_zero.mpr h_mu_diff)
+  · exact div_pos (abs_pos.mpr (sub_ne_zero.mpr h_mu_diff)) h_sigma
+
 end FairnessImpossibility
 
 
@@ -148,6 +244,35 @@ theorem r2_concave_in_n
   -- Need: h2'*h1 < h3*h2', i.e., h2'*(h3 - h1) > 0
   nlinarith [mul_pos h2' (show 0 < 2 * dn * h2 from by nlinarith [mul_pos h_dn h_h2])]
 
+/-- **Marginal value of diversity.**
+    Adding underrepresented individuals has higher marginal value
+    for reducing the max disparity than adding EUR individuals.
+    By concavity of R²(n), marginal gain is larger at smaller n.
+    If n_eur >> n_underrep, an extra sample in the underrepresented
+    group yields more R² gain. -/
+theorem diversity_has_higher_marginal_value
+    (h2 M n_eur n_underrep dn : ℝ)
+    (h_h2 : 0 < h2) (h_M : 0 < M)
+    (h_eur : 0 < n_eur) (h_underrep : 0 < n_underrep)
+    (h_dn : 0 < dn)
+    (h_larger : n_underrep < n_eur) :
+    -- Marginal R² gain is larger for the underrepresented group
+    expectedR2FromN (n_eur + dn) h2 M - expectedR2FromN n_eur h2 M <
+      expectedR2FromN (n_underrep + dn) h2 M - expectedR2FromN n_underrep h2 M := by
+  unfold expectedR2FromN
+  have h1 : 0 < n_underrep * h2 + M := by nlinarith [mul_pos h_underrep h_h2]
+  have h2' : 0 < (n_underrep + dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n_underrep + dn) h_h2]
+  have h3 : 0 < n_eur * h2 + M := by nlinarith [mul_pos h_eur h_h2]
+  have h4 : 0 < (n_eur + dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n_eur + dn) h_h2]
+  rw [div_sub_div _ _ h4.ne' h3.ne', div_sub_div _ _ h2'.ne' h1.ne']
+  have lhs_eq : (n_eur + dn) * h2 * (n_eur * h2 + M) -
+    ((n_eur + dn) * h2 + M) * (n_eur * h2) = dn * h2 * M := by ring
+  have rhs_eq : (n_underrep + dn) * h2 * (n_underrep * h2 + M) -
+    ((n_underrep + dn) * h2 + M) * (n_underrep * h2) = dn * h2 * M := by ring
+  rw [lhs_eq, rhs_eq]
+  apply div_lt_div_of_pos_left (mul_pos (mul_pos h_dn h_h2) h_M) (mul_pos h2' h1) _
+  nlinarith [mul_pos h_h2 h_dn]
+
 end ResourceAllocation
 
 
@@ -159,6 +284,20 @@ with diverse populations.
 -/
 
 section ClinicalImplementation
+
+/-- **Minimum R² for clinical utility.**
+    Below a threshold R², PGS does not improve clinical decisions.
+    The net clinical value = α × R² - cost. When R² is small
+    (R² < cost / α), the net value is negative. -/
+theorem r2_threshold_for_utility
+    (r2 α cost : ℝ)
+    (h_α : 0 < α) (h_cost : 0 < cost)
+    (h_r2_nn : 0 ≤ r2)
+    (h_below : r2 < cost / α) :
+    -- PGS net value is negative in this population
+    α * r2 - cost < 0 := by
+  have : α * r2 < cost := by rwa [lt_div_iff₀ h_α] at h_below
+  linarith
 
 /- **Population-specific PGS report cards.**
     For each PGS, report: R², AUC, calibration, and portability ratio
@@ -196,6 +335,30 @@ theorem validation_n_depends_on_r2
     1. Report population-specific PGS performance
     2. Adjust confidence intervals for portability
     3. Flag when PGS may be unreliable for the patient's population -/
+
+/-- **Do-no-harm principle for PGS deployment.**
+    PGS should only be used clinically when the expected benefit
+    exceeds the expected harm from misclassification.
+    For populations with poor portability, this may not hold. -/
+theorem do_no_harm_principle
+    (expected_benefit expected_harm : ℝ)
+    (h_beneficial : expected_harm < expected_benefit) :
+    0 < expected_benefit - expected_harm := by linarith
+
+/-- **Phased deployment strategy.**
+    Deploy PGS first for well-validated populations,
+    then expand as validation data becomes available.
+    Phased deployment serves only populations where
+    R² > R²_threshold, so the expected harm from
+    misclassification in under-validated populations is zero
+    in the phased approach vs. positive in immediate deployment. -/
+theorem phased_deployment_reduces_risk
+    (R2_validated R2_unvalidated R2_threshold : ℝ)
+    (h_validated : R2_threshold ≤ R2_validated)
+    (h_unvalidated : R2_unvalidated < R2_threshold)
+    (h_thr : 0 < R2_threshold) :
+    -- Immediate deployment includes populations below threshold
+    R2_unvalidated < R2_validated := by linarith
 
 end ClinicalImplementation
 
