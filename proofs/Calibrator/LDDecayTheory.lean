@@ -311,7 +311,8 @@ theorem mse_bounded_by_ld_mismatch
     (h_bound : mse_target ≤ mse_source + c * ldMismatchFrobenius Sig_S Sig_T)
     (h_c : 0 < c) (h_mismatch : 0 < ldMismatchFrobenius Sig_S Sig_T) :
     mse_source < mse_target := by
-  linarith [mul_pos h_c h_mismatch]
+  have h_pos := mul_pos h_c h_mismatch
+  linarith
 
 end LDMismatchQuantification
 

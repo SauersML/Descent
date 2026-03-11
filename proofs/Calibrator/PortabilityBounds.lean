@@ -118,11 +118,16 @@ theorem portability_ratio_approximation_error
       (εt * r2s_approx + εs * |r2t_approx|) / (r2s * r2s_approx) := by
   have h_denom_pos : 0 < r2s * r2s_approx := mul_pos h_rs_pos h_rs_approx_pos
   rw [div_sub_div _ _ (h_rs_pos.ne') (h_rs_approx_pos.ne')]
-  rw [abs_div, div_le_div_iff₀ (abs_pos.mpr (h_denom_pos.ne')) h_denom_pos]
+  rw [abs_div]
+  rw [div_le_div_iff₀ (abs_pos.mpr (h_denom_pos.ne')) h_denom_pos]
   rw [abs_of_pos h_denom_pos]
-  -- |r2t * r2s_approx - r2t_approx * r2s| ≤ εt * r2s_approx + εs * |r2t_approx|
-  calc |r2t * r2s_approx - r2t_approx * r2s|
-      = |(r2t - r2t_approx) * r2s_approx + r2t_approx * (r2s_approx - r2s)| := by ring_nf
+  -- Goal: |r2t * r2s_approx - r2s * r2t_approx| * (r2s * r2s_approx) ≤
+  --       (εt * r2s_approx + εs * |r2t_approx|) * (r2s * r2s_approx)
+  apply mul_le_mul_of_nonneg_right _ (le_of_lt h_denom_pos)
+  -- Now: |r2t * r2s_approx - r2s * r2t_approx| ≤ εt * r2s_approx + εs * |r2t_approx|
+  calc |r2t * r2s_approx - r2s * r2t_approx|
+      = |r2t * r2s_approx - r2t_approx * r2s| := by ring_nf
+    _ = |(r2t - r2t_approx) * r2s_approx + r2t_approx * (r2s_approx - r2s)| := by ring_nf
     _ ≤ |(r2t - r2t_approx) * r2s_approx| + |r2t_approx * (r2s_approx - r2s)| :=
         abs_add_le _ _
     _ = |r2t - r2t_approx| * |r2s_approx| + |r2t_approx| * |r2s_approx - r2s| := by

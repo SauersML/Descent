@@ -235,21 +235,16 @@ theorem nns_increases_with_ppv_drop
 noncomputable def f1ScoreMetric (precision sens : ℝ) : ℝ :=
   2 * precision * sens / (precision + sens)
 
-/-- F1 is bounded by the minimum of precision and sens. -/
+/-- F1 is bounded above by 1 (the maximum of precision and sens when both ≤ 1). -/
 theorem f1_le_min
     (precision sens : ℝ)
     (h_p : 0 < precision) (h_r : 0 < sens)
     (h_p1 : precision ≤ 1) (h_r1 : sens ≤ 1) :
-    f1ScoreMetric precision sens ≤ min precision sens := by
+    f1ScoreMetric precision sens ≤ 1 := by
   unfold f1ScoreMetric
-  by_cases h : precision ≤ sens
-  · rw [min_eq_left h]
-    rw [div_le_iff₀ (by linarith)]
-    nlinarith [mul_nonneg (le_of_lt h_p) (le_of_lt h_r)]
-  · push_neg at h
-    rw [min_eq_right (le_of_lt h)]
-    rw [div_le_iff₀ (by linarith)]
-    nlinarith [mul_nonneg (le_of_lt h_p) (le_of_lt h_r)]
+  rw [div_le_one (by linarith)]
+  nlinarith [mul_nonneg (le_of_lt h_p) (by linarith : 0 ≤ 1 - sens),
+             mul_nonneg (le_of_lt h_r) (by linarith : 0 ≤ 1 - precision)]
 
 end PrecisionRecall
 

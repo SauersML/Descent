@@ -68,9 +68,11 @@ theorem more_overlap_more_inflation (r2_true h2 f₁ f₂ : ℝ) (n_gwas : ℕ)
     partialOverlapR2 r2_true h2 f₁ n_gwas <
       partialOverlapR2 r2_true h2 f₂ n_gwas := by
   unfold partialOverlapR2
-  have h_pos : 0 < (h2 - r2_true) / ↑n_gwas := by
-    exact div_pos (by linarith) (Nat.cast_pos.mpr h_n)
-  nlinarith
+  have h_diff : 0 < h2 - r2_true := by linarith
+  have h_cast : (0 : ℝ) < ↑n_gwas := Nat.cast_pos.mpr h_n
+  have h_lt : f₁ * (h2 - r2_true) < f₂ * (h2 - r2_true) :=
+    mul_lt_mul_of_pos_right h_f h_diff
+  linarith [div_lt_div_of_pos_right h_lt h_cast]
 
 /-- **Inflation decreases with GWAS sample size.**
     Larger GWAS → less overfitting → less inflation. -/

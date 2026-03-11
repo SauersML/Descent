@@ -294,7 +294,11 @@ theorem rare_variant_needs_large_n
   have h_β_sq : β ^ 2 ≤ 1 := by nlinarith [sq_abs β]
   have h_prod_pos : 0 < maf * β ^ 2 := mul_pos h_maf (sq_pos_of_ne_zero h_β)
   rw [lt_div_iff₀ h_prod_pos]
-  nlinarith [sq_nonneg β, mul_pos h_maf (sq_pos_of_ne_zero h_β)]
+  have h_prod_small : maf * β ^ 2 < 0.01 := by
+    calc maf * β ^ 2 ≤ maf * 1 := by nlinarith [sq_nonneg β]
+    _ = maf := mul_one maf
+    _ < 0.01 := h_maf_small
+  nlinarith
 
 /-- **Population-specific rare variant PGS is optimal for within-population.**
     Each population should have its own rare variant PGS component,

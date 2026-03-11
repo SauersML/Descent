@@ -167,19 +167,21 @@ noncomputable def amCorrectedPortability
     (port_measured r_source r_target h2 : ℝ) : ℝ :=
   port_measured * (1 - r_source * h2) / (1 - r_target * h2)
 
-/-- AM correction increases portability when source has more AM. -/
+/-- AM correction adjusts portability downward when source has more AM.
+    The source AM inflates source R², so measured portability overstates
+    true portability. The correction factor (1-r_s h²)/(1-r_t h²) < 1. -/
 theorem am_correction_increases_portability
     (port_m r_s r_t h2 : ℝ)
     (h_port : 0 < port_m) (h_rs : 0 < r_s) (h_rt : 0 ≤ r_t)
     (h_h2 : 0 < h2) (h_h2_le : h2 < 1) (h_rs_le : r_s < 1)
     (h_more_am : r_t < r_s)
     (h_product_s : r_s * h2 < 1) (h_product_t : r_t * h2 < 1) :
-    port_m < amCorrectedPortability port_m r_s r_t h2 := by
+    amCorrectedPortability port_m r_s r_t h2 < port_m := by
   unfold amCorrectedPortability
-  rw [lt_div_iff₀ (by linarith)]
+  rw [div_lt_iff₀ (by linarith : 0 < 1 - r_t * h2)]
   rw [show port_m * (1 - r_t * h2) = port_m - port_m * r_t * h2 from by ring]
   rw [show port_m * (1 - r_s * h2) = port_m - port_m * r_s * h2 from by ring]
-  nlinarith [mul_pos h_port h_h2]
+  nlinarith [mul_pos h_port (mul_pos (by linarith : 0 < r_s - r_t) h_h2)]
 
 end DifferentialAM
 

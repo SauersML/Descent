@@ -176,10 +176,15 @@ theorem coding_enriched
     5 < heritabilityEnrichment h2_coding M_coding h2_total M_total := by
   unfold heritabilityEnrichment
   obtain ⟨h_hc, h_ht, h_mc, h_mt⟩ := h_all_pos
-  rw [gt_iff_lt, lt_div_iff₀ (div_pos h_ht h_mt)]
   rw [div_lt_iff₀ h_mt] at h_prop_variants
   rw [lt_div_iff₀ h_ht] at h_prop_h2
-  rw [div_lt_div_iff₀ h_mt h_mc]
+  -- Goal: 5 < h2_coding / M_coding / (h2_total / M_total)
+  -- Rewrite (a / b) / (c / d) using field_simp-style reasoning
+  have h_eq : h2_coding / M_coding / (h2_total / M_total) =
+    h2_coding * M_total / (M_coding * h2_total) := by
+    field_simp
+    ring
+  rw [h_eq, lt_div_iff₀ (mul_pos h_mc h_ht)]
   nlinarith
 
 /-- **Portability varies by functional category.**

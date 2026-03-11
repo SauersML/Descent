@@ -87,10 +87,12 @@ theorem relative_width_increase
     (h_t : 0 ≤ r2_target) (h_t_le : r2_target ≤ 1)
     (h_loss : r2_target < r2_source) :
     1 < Real.sqrt ((1 - r2_target) / (1 - r2_source)) := by
-  rw [show (1 : ℝ) = Real.sqrt 1 from (Real.sqrt_one).symm]
-  apply Real.sqrt_lt_sqrt (by norm_num)
-  rw [one_lt_div (by linarith : (0:ℝ) < 1 - r2_source)]
-  linarith
+  have h_denom_pos : (0 : ℝ) < 1 - r2_source := by linarith
+  have h_one_lt : 1 < (1 - r2_target) / (1 - r2_source) := by
+    rw [one_lt_div h_denom_pos]; linarith
+  calc (1 : ℝ) = Real.sqrt 1 := Real.sqrt_one.symm
+    _ < Real.sqrt ((1 - r2_target) / (1 - r2_source)) := by
+        apply Real.sqrt_lt_sqrt (by norm_num) h_one_lt
 
 end PredictionIntervalWidth
 

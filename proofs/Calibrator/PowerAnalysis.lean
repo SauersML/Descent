@@ -59,11 +59,8 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
   have h_pos : 0 < beta ^ 2 * (2 * p * (1 - p)) := by
     apply mul_pos (sq_pos_of_ne_zero h_beta)
     nlinarith
-  calc ↑n₁ * (beta ^ 2 * (2 * p * (1 - p)))
-      < ↑n₂ * (beta ^ 2 * (2 * p * (1 - p))) := by
-        apply mul_lt_mul_of_pos_right _ h_pos
-        exact Nat.cast_lt.mpr h_n
-    _ = ↑n₂ * beta ^ 2 * (2 * p * (1 - p)) := by ring
+  have h_n_cast : (↑n₁ : ℝ) < ↑n₂ := Nat.cast_lt.mpr h_n
+  nlinarith
 
 /-- **Power increases with NCP (monotone approximation).**
     True power = Φ(√NCP - z_α). We model it as 1 - exp(-NCP/2). -/
@@ -215,10 +212,14 @@ theorem diminishing_returns (n₁ n₂ delta C : ℝ)
   rw [div_sub_div _ _ (h₄.ne') (h₂.ne')]
   rw [div_sub_div _ _ (h₃.ne') (h₁.ne')]
   rw [div_lt_div_iff₀ (mul_pos h₄ h₂) (mul_pos h₃ h₁)]
-  have h_diff : n₁ < n₂ := h_n
-  nlinarith [sq_nonneg C, sq_nonneg delta, sq_nonneg n₁, sq_nonneg n₂,
-             mul_pos h_C h_delta, mul_pos h₁ h₂, mul_pos h₃ h₄,
-             sq_nonneg (n₂ - n₁)]
+  -- Each side simplifies: (n+δ)(n+C) - n(n+δ+C) = δC
+  -- So we need δC × ((n₁+δ+C)(n₁+C)) < δC × ((n₂+δ+C)(n₂+C)) ... wait no,
+  -- we need LHS×denom_RHS < RHS×denom_LHS:
+  -- ((n₂+δ)(n₂+C) - n₂(n₂+δ+C))×((n₁+δ+C)(n₁+C)) < ((n₁+δ)(n₁+C) - n₁(n₁+δ+C))×((n₂+δ+C)(n₂+C))
+  -- Each numerator = δC, so this reduces to (n₁+δ+C)(n₁+C) < (n₂+δ+C)(n₂+C)
+  have h_num : ∀ x : ℝ, (x + delta) * (x + C) - x * (x + delta + C) = delta * C := by intro x; ring
+  nlinarith [h_num n₁, h_num n₂, mul_pos h_C h_delta,
+             mul_pos (by linarith : (0 : ℝ) < n₂ - n₁) (by linarith : (0 : ℝ) < 2 * n₁ + delta + 2 * C)]
 
 /-- **Equal allocation is suboptimal when populations differ in size.**
     If population A already has a large GWAS and B has none,

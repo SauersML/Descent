@@ -224,8 +224,10 @@ theorem polygenicity_stabilizes_portability
   rw [h_total]
   rw [show per_locus_var / (↑n_loci * per_locus_var) = 1 / ↑n_loci from by
     field_simp]
-  rw [one_div, inv_lt (Nat.cast_pos.mpr (by omega)) (by norm_num : (0:ℝ) < 0.001)]
-  exact_mod_cast show 1000 < n_loci from h_many
+  have h_n_pos : (0 : ℝ) < ↑n_loci := Nat.cast_pos.mpr (by omega)
+  rw [one_div, inv_lt_comm₀ h_n_pos (by norm_num : (0:ℝ) < 0.001)]
+  calc (0.001 : ℝ)⁻¹ = 1000 := by norm_num
+    _ < ↑n_loci := by exact_mod_cast h_many
 
 /-- **Skin pigmentation shows the worst anthropometric portability.**
     Strong divergent selection → ρ ≪ 1 → very poor portability.

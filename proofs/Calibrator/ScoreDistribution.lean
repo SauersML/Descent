@@ -147,10 +147,9 @@ theorem source_threshold_misclassifies_variance_change
   intro h
   apply h_σ_ne
   have h_ne : threshold - μ ≠ 0 := sub_ne_zero.mpr h_thr
-  apply h_σ_ne
   have h1 : (threshold - μ) * σ_T = (threshold - μ) * σ_S := by
     rwa [div_eq_div_iff h_σS.ne' h_σT.ne'] at h
-  exact mul_left_cancel₀ h_ne h1
+  exact (mul_left_cancel₀ h_ne h1).symm
 
 /-- **Population-specific thresholds are necessary (combined).**
     Using source-population thresholds in the target population
@@ -346,7 +345,7 @@ theorem external_vs_internal_differ_variance
   have h_ne : pgs - μ ≠ 0 := sub_ne_zero.mpr h_pgs
   have h1 : (pgs - μ) * σ_T = (pgs - μ) * σ_S := by
     rwa [div_eq_div_iff h_σS h_σT] at h
-  exact mul_left_cancel₀ h_ne h1
+  exact (mul_left_cancel₀ h_ne h1).symm
 
 /-- **External and internal standardization give different values (combined).**
     When σ differs between populations and the score is not at either mean,

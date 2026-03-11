@@ -156,9 +156,9 @@ theorem ridge_introduces_bias
   by_cases hβ : β_true = 0
   · right; exact hβ
   · left
-    rw [abs_mul, abs_div]
-    rw [div_lt_iff₀ (by positivity)]
-    rw [abs_of_pos (by linarith), abs_of_pos (by linarith)]
+    rw [abs_div, abs_mul]
+    rw [div_lt_iff₀ (by positivity : (0:ℝ) < |xtx + lam|)]
+    rw [abs_of_pos (by linarith : (0:ℝ) < xtx), abs_of_pos (by linarith : (0:ℝ) < xtx + lam)]
     nlinarith [abs_nonneg β_true, abs_pos.mpr hβ]
 
 /-- **LASSO performs variable selection.**

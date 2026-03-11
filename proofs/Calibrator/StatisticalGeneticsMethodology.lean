@@ -64,7 +64,9 @@ theorem r2_se_decreases_with_n
     · positivity
     · linarith
   · apply div_lt_div_of_pos_left
-    · positivity
+    · have h1mr2_ne : 1 - r2 ≠ 0 := by linarith
+      exact mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) h_r2)
+        (sq_pos_of_ne_zero h1mr2_ne)
     · linarith
     · linarith
 
