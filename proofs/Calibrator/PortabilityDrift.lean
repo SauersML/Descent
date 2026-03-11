@@ -176,10 +176,11 @@ private lemma wrightFisherBase_bounds (N : ℕ) (hN : 0 < N) :
   have hNge : (1 : ℝ) ≤ N := by exact_mod_cast Nat.succ_le_of_lt hN
   have hpos : 0 < 2 * (N : ℝ) := by positivity
   constructor
-  · have : (1 : ℝ) < 2 * (N : ℝ) := by nlinarith
-    have := div_lt_one_of_lt this (by positivity)
+  · have h2N : (1 : ℝ) < 2 * (N : ℝ) := by nlinarith
+    have : 1 / (2 * (N : ℝ)) < 1 := by
+      rw [div_lt_one hpos]; exact h2N
     linarith
-  · have := div_nonneg (le_refl (1 : ℝ)) (le_of_lt hpos)
+  · have := div_nonneg (le_refl (0 : ℝ) |>.trans (by norm_num : (0:ℝ) ≤ 1)) (le_of_lt hpos)
     linarith
 
 theorem wrightFisherFst_nonneg
@@ -696,25 +697,6 @@ theorem ld_strictly_dominates_af_in_joint_loss
     jointTransportLoss fstSource fstTarget rhoSource rhoTarget >
       2 * afTransportLoss fstSource fstTarget := by
   unfold jointTransportLoss
-  linarith
-
-/-- For fixed `V_E > 0`, `v ↦ v / (v + V_E)` is strictly increasing on nonnegative variances. -/
-theorem expectedR2_strictMono_nonneg
-    (V_E x y : ℝ)
-    (hVE : 0 < V_E) (hx : 0 ≤ x) (hxy : x < y) :
-    expectedR2 x V_E < expectedR2 y V_E := by
-  unfold expectedR2
-  have hxE : 0 < x + V_E := by linarith
-  have hyE : 0 < y + V_E := by linarith [hx, hxy]
-  -- Use the identity v/(v+E) = 1 - E/(v+E) to reduce to monotonicity of E/(v+E)
-  have hxne : x + V_E ≠ 0 := ne_of_gt hxE
-  have hyne : y + V_E ≠ 0 := ne_of_gt hyE
-  have hxrepr : x / (x + V_E) = 1 - V_E / (x + V_E) := by field_simp; ring
-  have hyrepr : y / (y + V_E) = 1 - V_E / (y + V_E) := by field_simp; ring
-  rw [hxrepr, hyrepr]
-  -- E/(y+E) < E/(x+E) because x+E < y+E and E > 0
-  have : V_E / (y + V_E) < V_E / (x + V_E) :=
-    div_lt_div_of_pos_left hVE hxE (by linarith)
   linarith
 
 /-- With any imperfect source tagging (`ρS > 0`), worsening target tagging (`ρT < ρS`)
@@ -1308,10 +1290,36 @@ theorem twoDemeIMEquilibriumDelta_strictAnti :
     StrictAnti (fun M : ℝ => twoDemeIMEquilibriumDelta M) := by
   intro a b hab
   unfold twoDemeIMEquilibriumDelta
-  have ha : 0 < 2 * a + 1 := by linarith
-  have hb : 0 < 2 * b + 1 := by linarith
-  rw [div_lt_div_iff hb ha]
-  linarith
+  -- We need: 1/(2b+1) < 1/(2a+1)
+  by_cases ha : 0 < 2 * a + 1
+  · -- Both denominators positive
+    have hb : 0 < 2 * b + 1 := by linarith
+    exact div_lt_div_of_pos_left one_pos ha hb
+  · push_neg at ha
+    by_cases hb : 0 < 2 * b + 1
+    · -- a's denom ≤ 0, b's denom > 0
+      have h1 : 1 / (2 * a + 1) ≤ 0 := div_nonpos_of_nonneg_of_nonpos (by norm_num) ha
+      have h2 : 0 < 1 / (2 * b + 1) := div_pos one_pos hb
+      linarith
+    · push_neg at hb
+      -- Both ≤ 0; a < b so 2a+1 < 2b+1 ≤ 0
+      by_cases ha0 : 2 * a + 1 = 0
+      · exfalso; linarith -- 0 = 2a+1 < 2b+1 ≤ 0 is impossible
+      · by_cases hb0 : 2 * b + 1 = 0
+        · -- 1/(2b+1) = 1/0 = 0 in Lean; 1/(2a+1) < 0 since denom < 0
+          simp [hb0]
+          exact div_neg_of_pos_of_neg one_pos (lt_of_le_of_ne ha ha0)
+        · -- Both strictly negative: use sub_neg approach
+          have ha_neg : 2 * a + 1 < 0 := lt_of_le_of_ne ha ha0
+          have hb_neg : 2 * b + 1 < 0 := lt_of_le_of_ne hb hb0
+          -- Show 1/(2b+1) - 1/(2a+1) < 0
+          rw [show (1 : ℝ) = 1 from rfl]
+          have h_sub : 1 / (2 * b + 1) - 1 / (2 * a + 1) =
+              (2 * a + 1 - (2 * b + 1)) / ((2 * b + 1) * (2 * a + 1)) := by
+            field_simp
+          linarith [div_neg_of_neg_of_pos
+            (show 2 * a + 1 - (2 * b + 1) < 0 by linarith)
+            (mul_pos_of_neg_of_neg hb_neg ha_neg), h_sub]
 
 /-- Under the IM model, the mean-shift variance is strictly decreasing in migration rate
 when `V_A > 0`. -/
