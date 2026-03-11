@@ -38,6 +38,8 @@ import Calibrator.MendelianRandomization
 import Calibrator.CausalInference
 import Calibrator.FineMapping
 import Calibrator.PolygenicArchitecture
+import Calibrator.SampleOverlapBias
+import Calibrator.HaplotypeTheory
 
 namespace Calibrator
 
