@@ -238,7 +238,7 @@ theorem fine_tuning_better_with_small_n
 /-- **Critical sample size for fine-tuning to help.**
     Below n_crit, the source PGS (even uncalibrated) is better
     than any model trained on target data. -/
-theorem critical_sample_size_exists
+theorem critical_sample_size_transfer
     (n_crit : ℕ) (r2_source_unadjusted r2_target_trained : ℝ → ℝ)
     (h_below : ∀ n : ℕ, n < n_crit → r2_target_trained n < r2_source_unadjusted n)
     (h_above : ∀ n : ℕ, n_crit ≤ n → r2_source_unadjusted n ≤ r2_target_trained n)

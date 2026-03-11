@@ -270,27 +270,17 @@ framework produces the qualitative patterns observed in the paper:
 
 section ConcreteWitnesses
 
-/-- **Height parameters: slow decay.**
-    Height has highly conserved genetic architecture across populations.
-    Effect correlation ≈ 0.95 even at large genetic distances. -/
-noncomputable def heightParams : ℝ × ℝ × ℝ := (0.5, 0.01, 0.95)  -- (R_sq, lam_LD, ρ_eff)
-
-/-- **Lymphocyte parameters: fast decay.**
-    Lymphocyte count has rapidly changing genetic effects.
-    Effect correlation ≈ 0.3 at moderate genetic distances. -/
-noncomputable def lymphocyteParams : ℝ × ℝ × ℝ := (0.3, 0.05, 0.3)
-
-/-- Height portability is much better than lymphocyte at the same Fst. -/
-theorem height_more_portable_than_lymphocyte :
-    let (r2h, _, ρh) := heightParams
-    let (r2l, _, ρl) := lymphocyteParams
-    -- Height R² after turnover
-    let r2h_target := r2h * ρh ^ 2
-    -- Lymphocyte R² after turnover
-    let r2l_target := r2l * ρl ^ 2
-    r2l_target < r2h_target := by
-  simp [heightParams, lymphocyteParams]
-  norm_num
+/-- **Higher effect correlation → better portability.**
+    Traits with higher genetic effect correlation ρ across populations
+    retain more predictive accuracy (R² scales as ρ²). -/
+theorem higher_rho_better_portability
+    (r2_A r2_B ρ_A ρ_B : ℝ)
+    (h_r2_A : 0 < r2_A) (h_r2_B : 0 < r2_B) (h_r2_le : r2_B ≤ r2_A)
+    (h_ρA : 0 ≤ ρ_A) (h_ρB : 0 ≤ ρ_B) (h_ρ : ρ_B < ρ_A) :
+    r2_B * ρ_B ^ 2 < r2_A * ρ_A ^ 2 := by
+  have h_sq : ρ_B ^ 2 < ρ_A ^ 2 := by nlinarith [sq_nonneg ρ_A, sq_nonneg ρ_B]
+  calc r2_B * ρ_B ^ 2 ≤ r2_A * ρ_B ^ 2 := by nlinarith [sq_nonneg ρ_B]
+    _ < r2_A * ρ_A ^ 2 := by nlinarith
 
 /-- **Sign discordance rate.**
     Under N(ρβ, σ²) model for target effects, the probability of sign flip is

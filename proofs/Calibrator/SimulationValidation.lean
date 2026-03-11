@@ -299,39 +299,46 @@ Concrete numerical predictions from the theoretical framework
 that can be compared with Wang et al.'s findings.
 -/
 
-section EmpiricalPredictions
+section GeneralPredictions
 
-/-- **Predicted R² for height at Fst = 0.12 (CEU → CHB).**
-    Neutral: R² × (1-0.12) = 0.88 × R².
-    Observed: typically ~0.4-0.6 of source R².
-    Gap explained by LD mismatch and array ascertainment. -/
-theorem height_portability_prediction :
-    let neutral_ratio : ℝ := 22/25    -- 1 - 0.12 = 0.88
-    let ld_factor : ℝ := 17/20        -- 0.85
-    let predicted_ratio := neutral_ratio * ld_factor
-    7/10 < predicted_ratio ∧ predicted_ratio < 4/5 := by
-  constructor <;> norm_num
+/-- **Portability ratio is bounded by neutral prediction times LD factor.**
+    For any trait, the predicted portability ratio from the neutral model
+    combined with LD tagging adjustment gives a product in (0, 1). -/
+theorem portability_prediction_bounded
+    (neutral_ratio ld_factor : ℝ)
+    (h_nr : 0 < neutral_ratio) (h_nr_le : neutral_ratio < 1)
+    (h_ld : 0 < ld_factor) (h_ld_le : ld_factor ≤ 1) :
+    0 < neutral_ratio * ld_factor ∧ neutral_ratio * ld_factor < 1 := by
+  constructor
+  · exact mul_pos h_nr h_ld
+  · calc neutral_ratio * ld_factor ≤ neutral_ratio * 1 := by nlinarith
+      _ = neutral_ratio := mul_one _
+      _ < 1 := h_nr_le
 
-/-- **Predicted R² for lymphocyte count at Fst = 0.12.**
-    Neutral: 0.88 × R². But with selection (ρ ≈ 0.3):
-    Actual: 0.88 × 0.3² × LD_factor = very small. -/
-theorem lymphocyte_portability_prediction :
-    let neutral_ratio : ℝ := 22/25    -- 1 - 0.12 = 0.88
-    let effect_correlation : ℝ := 3/10  -- 0.3
-    let ld_factor : ℝ := 17/20        -- 0.85
-    let predicted_ratio := neutral_ratio * effect_correlation ^ 2 * ld_factor
-    predicted_ratio < 1/10 := by
-  norm_num
+/-- **Selection reduces portability below neutral prediction.**
+    When genetic correlation ρ < 1 (selection-driven effect changes),
+    the actual portability is reduced by ρ² relative to neutral. -/
+theorem selection_reduces_portability
+    (neutral_ratio rho : ℝ)
+    (h_nr : 0 < neutral_ratio) (h_nr_le : neutral_ratio ≤ 1)
+    (h_rho : 0 ≤ rho) (h_rho_lt : rho < 1) :
+    neutral_ratio * rho ^ 2 < neutral_ratio := by
+  have h_sq : rho ^ 2 < 1 := by nlinarith [sq_nonneg rho]
+  nlinarith
 
-/-- **Wang et al.'s key finding: R² of genetic distance on squared error is ~0.5%.**
-    Our theoretical prediction matches: the within-group variance of ε²
-    dominates the between-group variance. -/
-theorem individual_error_r2_is_tiny
-    (cv_squared : ℝ) (r2_distance_error : ℝ)
-    (h_cv : cv_squared = 2)  -- χ_sq₁ has CV_sq = 2
-    (h_r2_small : r2_distance_error ≤ 0.01) :
-    r2_distance_error ≤ 0.01 := h_r2_small
+/-- **Within-group variance dominates between-group variance.**
+    The R² of genetic distance on individual squared error is bounded
+    by the ratio of between-group to total variance. -/
+theorem individual_error_r2_bounded
+    (var_between var_within r2 : ℝ)
+    (h_vb : 0 ≤ var_between) (h_vw : 0 < var_within)
+    (h_r2 : r2 = var_between / (var_between + var_within))
+    (h_small : var_between < var_within / 100) :
+    r2 < 1/100 := by
+  rw [h_r2]
+  rw [div_lt_div_iff₀ (by linarith) (by norm_num : (0:ℝ) < 100)]
+  nlinarith
 
-end EmpiricalPredictions
+end GeneralPredictions
 
 end Calibrator
