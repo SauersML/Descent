@@ -118,7 +118,7 @@ theorem immune_portability_below_neutral
       r2_source * (Real.exp (-lam_neutral * d)) ^ 2 := by
   apply mul_lt_mul_of_pos_left _ hr2
   apply sq_lt_sq'
-  · linarith [Real.exp_nonneg (-lam_immune * d), Real.exp_nonneg (-lam_neutral * d)]
+  · linarith [Real.exp_pos (-lam_immune * d), Real.exp_pos (-lam_neutral * d)]
   · exact faster_decay_lower_correlation lam_neutral lam_immune d hlamn hlami hd
 
 /-- **Heterozygosity increases toward 0.5.**
