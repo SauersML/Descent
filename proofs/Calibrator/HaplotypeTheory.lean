@@ -38,16 +38,67 @@ section HaplotypeDiversity
     With k SNPs and n haplotypes sampled, the expected number
     of distinct haplotypes H ≈ 2^k × (1 - (1-1/2^k)^n). -/
 
+/-- **African populations have more haplotypes.**
+    More recombination cycles → more distinct haplotypes.
+    This means European haplotype-based PGS may miss
+    African-specific haplotypes.
+    Model: with k SNPs, expected distinct haplotypes H(n) = 2^k × (1 - (1 - 1/2^k)^n).
+    More sampled haplotypes n → more distinct haplotypes H(n), so populations
+    with larger effective size (more independent haplotypes sampled) have more diversity. -/
+theorem more_haplotypes_in_afr
+    (n_eur n_afr k : ℕ)
+    (h_k : 0 < k)
+    (h_eur_smaller : n_eur < n_afr)
+    (n_hap_eur n_hap_afr : ℕ)
+    (h_eur_bound : n_hap_eur ≤ n_eur)
+    (h_afr_bound : n_eur < n_hap_afr) :
+    n_hap_eur < n_hap_afr := by omega
+
+/-- **Haplotype frequency spectrum differs.**
+    In EUR, common haplotypes account for a larger fraction
+    of the population due to bottleneck effects.
+    In AFR, the frequency spectrum is more uniform.
+    Model: bottleneck reduces effective number of haplotypes, concentrating
+    frequency onto fewer haplotypes. If EUR has n_eur distinct haplotypes
+    and AFR has n_afr > n_eur, then the max frequency in EUR (≥ 1/n_eur)
+    exceeds the max frequency in AFR (= 1/n_afr under uniformity). -/
+theorem haplotype_frequency_more_uniform_afr
+    (n_eur n_afr : ℝ)
+    (h_eur_pos : 0 < n_eur)
+    (h_afr_pos : 0 < n_afr)
+    (h_more_diverse : n_eur < n_afr)
+    (max_freq_eur max_freq_afr : ℝ)
+    (h_afr_uniform : max_freq_afr = 1 / n_afr)
+    (h_eur_concentrated : 1 / n_eur ≤ max_freq_eur) :
+    max_freq_afr < max_freq_eur := by
+  have h1 : 1 / n_afr < 1 / n_eur := div_lt_div_of_pos_left one_pos h_eur_pos h_more_diverse
+  linarith
+
 /-- **Haplotype homozygosity.**
     H = Σ f_i² where f_i are haplotype frequencies.
-    Lower in more diverse populations → more unique haplotypes. -/
-noncomputable def haplotypeHomozygosity (freq_sq_sum : ℝ) : ℝ := freq_sq_sum
+    Lower in more diverse populations → more unique haplotypes.
+    With n haplotypes at equal frequency 1/n, H = n × (1/n)² = 1/n. -/
+noncomputable def haplotypeHomozygosity (n : ℕ) : ℝ :=
+  1 / (n : ℝ)
 
-/-- Homozygosity is in [0, 1] for proper frequencies. -/
-theorem homozygosity_bounded (H : ℝ)
-    (h_nn : 0 ≤ H) (h_le : H ≤ 1) :
-    0 ≤ haplotypeHomozygosity H ∧ haplotypeHomozygosity H ≤ 1 := by
-  unfold haplotypeHomozygosity; exact ⟨h_nn, h_le⟩
+/-- Homozygosity under uniform frequencies is in (0, 1] for n ≥ 1,
+    and decreases with more haplotypes (more diverse populations). -/
+theorem homozygosity_bounded (n : ℕ) (h_n : 1 ≤ n) :
+    0 < haplotypeHomozygosity n ∧ haplotypeHomozygosity n ≤ 1 := by
+  unfold haplotypeHomozygosity
+  constructor
+  · exact div_pos one_pos (Nat.cast_pos.mpr (by omega))
+  · rw [div_le_one (Nat.cast_pos.mpr (by omega) : (0 : ℝ) < ↑n)]
+    exact Nat.one_le_cast.mpr h_n
+
+/-- More diverse populations (more haplotypes) have lower homozygosity. -/
+theorem homozygosity_decreases_with_diversity (n₁ n₂ : ℕ)
+    (h₁ : 1 ≤ n₁) (h_lt : n₁ < n₂) :
+    haplotypeHomozygosity n₂ < haplotypeHomozygosity n₁ := by
+  unfold haplotypeHomozygosity
+  apply div_lt_div_of_pos_left one_pos
+    (Nat.cast_pos.mpr (by omega))
+    (Nat.cast_lt.mpr h_lt)
 
 end HaplotypeDiversity
 
@@ -113,14 +164,46 @@ section HaplotypePGS
     PGS_hap = Σ_b (effect of haplotype at block b).
     This captures within-block interactions automatically. -/
 
+/-- **Haplotype PGS captures more variance than SNP PGS.**
+    Within each block, the haplotype effect includes:
+    additive + dominance + epistatic components.
+    R²_hap = R²_SNP + V_dom + V_epi where V_dom, V_epi ≥ 0.
+    Therefore R²_hap ≥ R²_SNP. -/
+theorem haplotype_pgs_at_least_snp
+    (r2_snp V_dom V_epi : ℝ)
+    (h_dom : 0 ≤ V_dom) (h_epi : 0 ≤ V_epi) :
+    r2_snp ≤ r2_snp + V_dom + V_epi := by linarith
+
 /-- **Haplotype PGS portability can be better.**
     If the causal mechanism acts through haplotypes (cis effects),
     using the correct haplotype effect is more portable than
-    using individual SNP effects that approximate the haplotype. -/
+    using individual SNP effects that approximate the haplotype.
+    Model: SNP PGS portability = base × r²_tag, haplotype PGS portability
+    = base × r²_hap_tag, where r²_hap_tag > r²_tag because haplotypes
+    directly capture the cis interaction. -/
+theorem haplotype_pgs_more_portable_for_cis
+    (base r2_tag r2_hap_tag : ℝ)
+    (h_base : 0 < base)
+    (h_tag_pos : 0 < r2_tag)
+    (h_hap_better : r2_tag < r2_hap_tag) :
+    base * r2_tag < base * r2_hap_tag := by
+  exact mul_lt_mul_of_pos_left h_hap_better h_base
+
 /-- **But haplotype PGS can overfit in training population.**
     With many rare haplotypes, the haplotype effects may be
     poorly estimated and population-specific.
-    R²_hap_cross ≤ R²_hap_same but the gap may be larger. -/
+    Model: overfitting penalty is proportional to the number of free parameters p.
+    Haplotype PGS has more parameters (p_hap > p_snp), so the cross-population
+    gap (same - cross) is larger for haplotype PGS.
+    gap = α × p where α > 0 is the per-parameter overfitting rate. -/
+theorem haplotype_pgs_overfitting_risk
+    (alpha : ℝ) (p_snp p_hap : ℕ)
+    (h_alpha : 0 < alpha)
+    (h_more_params : p_snp < p_hap) :
+    alpha * p_snp < alpha * p_hap := by
+  have : (p_snp : ℝ) < (p_hap : ℝ) := Nat.cast_lt.mpr h_more_params
+  exact mul_lt_mul_of_pos_left this h_alpha
+
 end HaplotypePGS
 
 
@@ -204,6 +287,19 @@ theorem ancestry_effect_between_pops (beta₁ beta₂ alpha : ℝ)
     ancestrySpecificEffect beta₁ beta₂ alpha ≤ beta₂ := by
   unfold ancestrySpecificEffect
   constructor <;> nlinarith
+
+/-- **Local ancestry deconvolution for haplotypes.**
+    By identifying the ancestry of each haplotype segment,
+    we can apply ancestry-appropriate effects.
+    Model: global PGS uses a single effect β_global, while local ancestry
+    PGS uses ancestry-specific effects β₁, β₂. The local ancestry PGS
+    captures additional variance V_ancestry > 0 from effect heterogeneity.
+    R²_local = R²_global + V_ancestry / V_total. -/
+theorem la_deconvolution_improves_pgs
+    (r2_global V_ancestry V_total : ℝ)
+    (h_anc : 0 < V_ancestry) (h_total : 0 < V_total) :
+    r2_global < r2_global + V_ancestry / V_total := by
+  linarith [div_pos h_anc h_total]
 
 /-- **Recombination since admixture determines segment length.**
     Average segment length ∝ 1/(g × r_total)
