@@ -400,11 +400,11 @@ theorem ld_reference_sensitivity
 
 /-- **Sensitivity to phenotype definition.**
     Different phenotype definitions (self-report vs clinical,
-    ICD-9 vs ICD-10) can change portability estimates
-    by >10% for some traits. -/
+    ICD-9 vs ICD-10) can change portability estimates.
+    When the difference exceeds any threshold ε > 0, the estimates differ. -/
 theorem phenotype_definition_matters
-    (port_def1 port_def2 : ℝ)
-    (h_large_diff : 1/10 < |port_def1 - port_def2|) :
+    (port_def1 port_def2 ε : ℝ) (h_ε : 0 < ε)
+    (h_large_diff : ε < |port_def1 - port_def2|) :
     port_def1 ≠ port_def2 := by
   intro h; rw [h, sub_self, abs_zero] at h_large_diff; linarith
 

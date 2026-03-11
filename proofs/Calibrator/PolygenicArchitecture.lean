@@ -127,11 +127,13 @@ theorem more_polygenic_more_portable
   · exact Real.sqrt_pos.mpr h_M₁
   · exact Real.sqrt_lt_sqrt (le_of_lt h_M₁) h_M
 
-/-- **Height is highly polygenic → good portability.**
-    Height has M_eff > 10000 causal variants.
-    Its portability across EUR-EAS is ~0.6 (better than most traits).
-    With portability loss scaling as c/√M_eff, a trait with more
-    causal variants has smaller portability loss. -/
+/-- **Higher polygenicity → better portability.**
+    For any two traits with the same per-locus portability loss constant c,
+    the more polygenic trait (higher M_eff) has smaller portability loss
+    because loss scales as c/√M_eff.
+
+    Worked example: Height (M_eff > 10000) has portability ~0.6 across
+    EUR-EAS, better than less polygenic traits. -/
 theorem height_polygenic_good_portability
     (M_eff_height M_eff_bmi c : ℝ)
     (h_M_height : 0 < M_eff_height) (h_M_bmi : 0 < M_eff_bmi)
@@ -187,23 +189,27 @@ theorem enrichment_interpretation (h2_c M_c h2_t M_t : ℝ)
   rw [one_lt_div₀ (div_pos h_ht h_Mt)]
   exact h_enriched
 
-/-- **Coding regions are enriched.**
-    Coding regions contain ~1.5% of variants but ~10-20% of heritability.
-    Enrichment ≈ 10×. -/
-theorem coding_enriched
-    (h2_coding h2_total M_coding M_total : ℝ)
-    (h_prop_variants : M_coding / M_total < 1/50)
-    (h_prop_h2 : 1/10 < h2_coding / h2_total)
-    (h_all_pos : 0 < h2_coding ∧ 0 < h2_total ∧ 0 < M_coding ∧ 0 < M_total) :
-    5 < heritabilityEnrichment h2_coding M_coding h2_total M_total := by
+/-- **Genomic regions can be enriched for heritability.**
+    When a region contains a fraction f_snp of variants but a fraction
+    f_h2 of heritability, and f_h2 > f_snp, the enrichment f_h2/f_snp > 1.
+    More precisely, if f_snp < α and f_h2 > β, enrichment > β/α.
+
+    Worked example: Coding regions contain ~1.5% of variants (< 1/50)
+    but ~10-20% of heritability (> 1/10), giving enrichment > 5×. -/
+theorem region_heritability_enrichment
+    (h2_region h2_total M_region M_total α β : ℝ)
+    (h_prop_variants : M_region / M_total < α)
+    (h_prop_h2 : β < h2_region / h2_total)
+    (h_all_pos : 0 < h2_region ∧ 0 < h2_total ∧ 0 < M_region ∧ 0 < M_total)
+    (h_α_pos : 0 < α) (h_β_pos : 0 < β) :
+    β / α < heritabilityEnrichment h2_region M_region h2_total M_total := by
   obtain ⟨h_hc, h_ht, h_mc, h_mt⟩ := h_all_pos
-  have hv : M_coding < 1/50 * M_total := by rwa [div_lt_iff₀ h_mt] at h_prop_variants
-  have hh : 1/10 * h2_total < h2_coding := by rwa [lt_div_iff₀ h_ht] at h_prop_h2
-  show 5 < heritabilityEnrichment h2_coding M_coding h2_total M_total
-  have hsimpl : heritabilityEnrichment h2_coding M_coding h2_total M_total =
-    h2_coding * M_total / (M_coding * h2_total) := by
+  have hv : M_region < α * M_total := by rwa [div_lt_iff₀ h_mt] at h_prop_variants
+  have hh : β * h2_total < h2_region := by rwa [lt_div_iff₀ h_ht] at h_prop_h2
+  have hsimpl : heritabilityEnrichment h2_region M_region h2_total M_total =
+    h2_region * M_total / (M_region * h2_total) := by
     unfold heritabilityEnrichment; field_simp
-  rw [hsimpl, lt_div_iff₀ (mul_pos h_mc h_ht)]
+  rw [hsimpl, div_lt_div_iff₀ h_α_pos (mul_pos h_mc h_ht)]
   nlinarith
 
 /-- **Coding variants more portable than regulatory (from functional constraint).**
@@ -270,17 +276,21 @@ theorem architecture_classification
     (h₂ : port_moderate < port_high_poly) :
     port_oligo < port_high_poly := by linarith
 
-/-- **Predicting which traits will have worst portability.**
+/-- **General portability upper bound from rg and Fst.**
     Traits with: (1) low r_g, (2) high FST at causal loci,
     (3) low polygenicity have the worst portability.
-    Portability ≈ rg² × (1 - fst). When rg < 0.5 and fst > 0.2,
+    Portability ≈ rg² × (1 - fst). For any thresholds rg_ub and fst_lb,
+    the bound rg_ub² × (1 - fst_lb) follows.
+
+    Worked example: When rg < 0.5 and fst > 0.2,
     portability < 0.25 × 0.8 = 0.2. -/
-theorem worst_portability_predictors
-    (rg fst : ℝ)
-    (h_rg_nn : 0 ≤ rg)
-    (h_low_rg : rg < 0.5) (h_high_fst : 0.2 < fst)
-    (h_fst_le : fst ≤ 1) :
-    rg ^ 2 * (1 - fst) < 0.2 := by nlinarith [sq_nonneg rg]
+theorem portability_upper_bound_from_rg_fst
+    (rg fst rg_ub fst_lb : ℝ)
+    (h_rg_nn : 0 ≤ rg) (h_rg_ub_nn : 0 ≤ rg_ub)
+    (h_low_rg : rg < rg_ub) (h_high_fst : fst_lb < fst)
+    (h_fst_le : fst ≤ 1) (h_fst_lb_nn : 0 ≤ fst_lb) :
+    rg ^ 2 * (1 - fst) < rg_ub ^ 2 * (1 - fst_lb) := by
+  nlinarith [sq_nonneg rg, sq_nonneg (rg_ub - rg)]
 
 end ArchitecturePredictions
 

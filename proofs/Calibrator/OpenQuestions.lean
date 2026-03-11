@@ -49,7 +49,8 @@ theorem law_of_total_variance_r2_bound
 
 /-- **When within-group variance dominates, R² is small.**
     If E[Var(Z|D)] ≥ (1 - δ)·Var(Z), then R²(Z,D) ≤ δ.
-    For height, Wang et al. find δ ≈ 0.005 (R² = 0.51%). -/
+
+    Worked example: For height, Wang et al. find δ ≈ 0.005 (R² = 0.51%). -/
 theorem r2_small_when_within_dominates
     (varZ eVarZgivenD varEZgivenD δ : ℝ)
     (h_decomp : varZ = eVarZgivenD + varEZgivenD)

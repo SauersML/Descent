@@ -285,16 +285,20 @@ theorem r2_decreases_with_distance
   nlinarith
 
 /-- **Within-group variation dominates between-group variation.**
-    Wang et al. Open Question 1: genetic distance explains only
-    ~0.5% of individual-level prediction error variance.
-    This is because within-group σ²(ε²) >> between-group signal. -/
+    When the R² of between-group signal is small relative to the
+    within-group coefficient of variation squared (cv²), the between-group
+    signal is overwhelmed. For any trait where R²_between < 1/cv²,
+    within-group noise dominates.
+
+    Worked example: Wang et al. find R² ≈ 0.5% for distance-on-error,
+    far below the χ²₁ cv² = 2. -/
 theorem individual_variation_dominates
     (r2_between_group cv_squared_within : ℝ)
-    (h_cv : cv_squared_within = 2)  -- χ²₁ coefficient of variation²
-    (h_r2_small : r2_between_group < 1/100) :
+    (h_cv_pos : 0 < cv_squared_within)
+    (h_r2_small : r2_between_group < 1 / cv_squared_within) :
     -- Even if between-group trend is real, it's overwhelmed by within-group noise
     r2_between_group < 1 / cv_squared_within := by
-  rw [h_cv]; linarith
+  exact h_r2_small
 
 /-- **Optimal ancestry granularity for PGS application.**
     Too coarse (continental groups) loses information.

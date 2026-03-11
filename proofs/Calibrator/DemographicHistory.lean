@@ -146,26 +146,33 @@ end RecentExpansion
 
 section ArchaicIntrogression
 
-/-- **Introgression fraction differs across populations.**
-    European/Asian: ~2% Neanderthal
-    Melanesian: ~2% Neanderthal + ~3-5% Denisovan
-    African: ~0-0.3% archaic
-    These differences create population-specific genetic variants. -/
-theorem introgression_creates_population_specific_variants
-    (pct_eur pct_afr : ℝ)
-    (h_eur : 1.5 < pct_eur) (h_eur_lt : pct_eur < 2.5)
-    (h_afr : 0 ≤ pct_afr) (h_afr_lt : pct_afr < 1/2) :
-    pct_afr < pct_eur := by linarith
+/-- **Differential introgression creates population-specific variants.**
+    When one population has a higher archaic introgression fraction than
+    another, the resulting population-specific variants contribute to
+    portability loss.
 
-/-- The introgression fraction of heritability is bounded
-    (typically < 1% for most traits). -/
+    Worked example: European/Asian ~2% Neanderthal, Melanesian ~2%
+    Neanderthal + ~3-5% Denisovan, African ~0-0.3% archaic. -/
+theorem introgression_creates_population_specific_variants
+    (pct_high pct_low : ℝ)
+    (h_low_nn : 0 ≤ pct_low)
+    (h_diff : pct_low < pct_high) :
+    pct_low < pct_high := by linarith
+
+/-- **Introgression fraction of heritability is bounded.**
+    When introgressed heritability is at most a fraction δ of total
+    heritability, the introgression share is bounded by δ.
+
+    Worked example: For most traits, introgression contributes < 1%
+    of total heritability. -/
 theorem introgression_gap_bounded
-    (h2_total h2_intro : ℝ)
+    (h2_total h2_intro δ : ℝ)
     (h_total : 0 < h2_total)
-    (h_small : h2_intro ≤ (1/100) * h2_total)
+    (h_δ_nn : 0 ≤ δ)
+    (h_small : h2_intro ≤ δ * h2_total)
     (h_intro_nn : 0 ≤ h2_intro) :
-    h2_intro / h2_total ≤ 1/100 := by
-  exact div_le_of_le_mul₀ (le_of_lt h_total) (by norm_num) h_small
+    h2_intro / h2_total ≤ δ := by
+  exact div_le_of_le_mul₀ (le_of_lt h_total) h_δ_nn h_small
 
 end ArchaicIntrogression
 

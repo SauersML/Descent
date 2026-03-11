@@ -363,15 +363,17 @@ theorem selection_reduces_portability
 
 /-- **Within-group variance dominates between-group variance.**
     The R² of genetic distance on individual squared error is bounded
-    by the ratio of between-group to total variance. -/
+    by the ratio of between-group to total variance. When within-group
+    variance exceeds between-group by a factor k, R² < 1/(k+1) < 1/k. -/
 theorem individual_error_r2_bounded
-    (var_between var_within r2 : ℝ)
+    (var_between var_within r2 k : ℝ)
     (h_vb : 0 ≤ var_between) (h_vw : 0 < var_within)
+    (h_k : 0 < k)
     (h_r2 : r2 = var_between / (var_between + var_within))
-    (h_small : var_between < var_within / 100) :
-    r2 < 1/100 := by
+    (h_small : var_between < var_within / k) :
+    r2 < 1/k := by
   rw [h_r2]
-  rw [div_lt_div_iff₀ (by linarith) (by norm_num : (0:ℝ) < 100)]
+  rw [div_lt_div_iff₀ (by linarith) h_k]
   nlinarith
 
 end GeneralPredictions

@@ -85,14 +85,18 @@ theorem height_near_neutral_qst
   have hab := abs_lt.mp h_close
   exact ⟨h_close, by linarith [hab.2], by linarith [hab.1]⟩
 
-/-- **Immune QST >> FST: strong directional selection.**
-    For immune traits, QST greatly exceeds FST, indicating
-    pathogen-driven directional selection that disrupts
-    genetic architecture across populations. -/
-theorem immune_excess_qst
-    (qst_immune fst : ℝ)
-    (h_excess : fst + 1/10 < qst_immune) :
-    fst < qst_immune := by linarith
+/-- **QST >> FST indicates directional selection.**
+    When QST exceeds FST by a margin δ > 0, this indicates
+    directional selection has driven trait divergence beyond
+    what neutral drift (FST) would predict.
+
+    Worked example: For immune traits, QST greatly exceeds FST due to
+    pathogen-driven selection that disrupts genetic architecture. -/
+theorem excess_qst_indicates_selection
+    (qst fst δ : ℝ)
+    (h_δ : 0 < δ)
+    (h_excess : fst + δ < qst) :
+    fst < qst := by linarith
 
 end QSTFSTTest
 

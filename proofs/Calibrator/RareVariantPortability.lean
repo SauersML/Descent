@@ -304,13 +304,16 @@ theorem lof_large_effects
   exact h_larger
 
 /-- **LoF variant portability depends on gene constraint.**
-    Highly constrained genes (pLI > 0.9) have LoF variants
-    in all populations (purifying selection maintains them rare).
-    Under purifying selection with coefficient s, the equilibrium
-    frequency is μ/s (mutation-selection balance). For strong selection
-    (large s), variants are rarer but consistently present across
-    populations. The proportion of genetic variance maintained across
-    populations increases with selection strength. -/
+    Highly constrained genes have LoF variants in all populations
+    (purifying selection maintains them rare). Under purifying selection
+    with coefficient s, the equilibrium frequency is μ/s
+    (mutation-selection balance). For strong selection (large s),
+    variants are rarer but consistently present across populations.
+    The proportion of genetic variance maintained across populations
+    increases with selection strength.
+
+    Worked example: Genes with high constraint (e.g., pLI > 0.9) show
+    this pattern most clearly. -/
 theorem constrained_genes_more_portable_lof
     (s_constrained s_unconstrained μ : ℝ)
     (h_μ : 0 < μ)

@@ -317,23 +317,28 @@ theorem divergence_increases_with_fst
   exact mul_lt_mul_of_pos_left h_fst h_c
 
 /-- **The irreducible error λ* is trait-specific.**
-    For height (neutral): λ* ≈ 0 (same genetic architecture).
-    For immune traits (selected): λ* >> 0 (different architecture).
-    This is the formal explanation for Open Question 2. -/
+    Traits under neutral evolution have small λ* (similar architecture
+    across populations), while traits under divergent selection have
+    large λ* (different architecture). When one trait's λ* falls below
+    a threshold and another's exceeds it, the gap is provable.
+
+    Worked example: Height (neutral, λ* near 0) vs immune traits
+    (selected, λ* >> 0). This is the formal explanation for Open Question 2. -/
 theorem lambda_star_trait_specific
-    (lambda_height lambda_immune : ℝ)
-    (h_height_small : lambda_height < 1/20)
-    (h_immune_large : 1/5 < lambda_immune) :
-    lambda_height < lambda_immune := by linarith
+    (lambda_neutral lambda_selected threshold : ℝ)
+    (h_neutral_small : lambda_neutral < threshold)
+    (h_selected_large : threshold < lambda_selected) :
+    lambda_neutral < lambda_selected := by linarith
 
 /-- **Domain adaptation bound is tight for linear hypotheses.**
     For linear predictors (PGS), the bound is achievable because
-    the H-divergence can be estimated from data. -/
+    the H-divergence can be estimated from data. When the actual gap
+    is within a fraction ε of the bound, the gap is at most (1+ε)·bound. -/
 theorem linear_bound_tight
-    (bound actual_gap : ℝ)
-    (h_tight : |actual_gap - bound| < (1/10) * bound)
-    (h_bound_pos : 0 < bound) :
-    actual_gap < (11/10) * bound := by
+    (bound actual_gap ε : ℝ)
+    (h_tight : |actual_gap - bound| < ε * bound)
+    (h_bound_pos : 0 < bound) (h_ε_pos : 0 < ε) :
+    actual_gap < (1 + ε) * bound := by
   have h := abs_lt.mp h_tight
   linarith [h.1, h.2]
 
@@ -388,12 +393,14 @@ theorem iw_ess_decreases_with_divergence
 /-- **IW fails for very different populations.**
     When source and target are too different (Fst too large),
     the importance weights have high variance → n_eff ≈ 0.
-    This means IW alone cannot fix portability for distant populations. -/
+    This means IW alone cannot fix portability for distant populations.
+    When ESS < α·n for any α < 1, the effective sample is less than n. -/
 theorem iw_fails_for_large_divergence
-    (ess n : ℝ)
-    (h_ess_tiny : ess < (1/100) * n)
+    (ess n α : ℝ)
+    (h_ess_tiny : ess < α * n)
+    (h_α : α < 1) (h_α_pos : 0 < α)
     (h_n : 0 < n) :
-    ess < n := by linarith
+    ess < n := by nlinarith
 
 /-- **Doubly robust estimation combines IW with model adaptation.**
     DR estimator: if either the model or the weights are correct,

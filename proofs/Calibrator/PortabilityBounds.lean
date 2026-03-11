@@ -64,22 +64,26 @@ theorem selection_worsens_portability
         mul_le_mul_of_nonneg_left h_sq_le h_ratio_nonneg
     _ = neutralPortabilityRatio fstS fstT := mul_one _
 
-/-- **Concrete UKB example: CEU-like to CHB-like portability.**
-    With Fst ≈ 0.12 (European to East Asian), neutral portability ratio ≈ 0.88.
-    But observed R² drops are often much larger, confirming non-neutral effects. -/
-theorem ukb_ceu_chb_neutral_bound :
-    17/20 < neutralPortabilityRatio 0 (3/25) ∧
-    neutralPortabilityRatio 0 (3/25) < 9/10 := by
-  unfold neutralPortabilityRatio
-  constructor <;> norm_num
+/-- **General neutral portability bound.**
+    For any target population with Fst_T > Fst_S (both < 1),
+    the neutral portability ratio is strictly between 0 and 1,
+    and decreasing in (Fst_T - Fst_S). The ratio equals (1 - Fst_T)/(1 - Fst_S).
 
-/-- **Concrete UKB example: CEU-like to YRI-like portability.**
-    With Fst ≈ 0.15, neutral portability ratio ≈ 0.85. -/
-theorem ukb_ceu_yri_neutral_bound :
-    41/50 < neutralPortabilityRatio 0 (3/20) ∧
-    neutralPortabilityRatio 0 (3/20) < 87/100 := by
+    Worked example: With Fst ≈ 0.12 (EUR→EAS), ratio ≈ 0.88.
+    Worked example: With Fst ≈ 0.15 (EUR→YRI), ratio ≈ 0.85.
+    Observed R² drops are often larger, confirming non-neutral effects. -/
+theorem neutral_portability_bounded_by_fst
+    (fstS fstT : ℝ)
+    (h_fstS : 0 ≤ fstS) (h_fstS_lt : fstS < 1)
+    (h_fstT : 0 ≤ fstT) (h_fstT_lt : fstT < 1)
+    (h_diverged : fstS < fstT) :
+    0 < neutralPortabilityRatio fstS fstT ∧
+    neutralPortabilityRatio fstS fstT < 1 := by
   unfold neutralPortabilityRatio
-  constructor <;> norm_num
+  constructor
+  · exact div_pos (by linarith) (by linarith)
+  · rw [div_lt_one (by linarith)]
+    linarith
 
 end FstBounds
 
@@ -191,14 +195,16 @@ theorem high_cv_inevitable (σ_sq bias_sq : ℝ) (hσ : 0 < σ_sq) (hb : 0 ≤ b
     A cubic spline fit of ε² on genetic distance d can explain at most
     Var(E[ε²|d]) / Var(ε²).
     When σ² >> bias variation, this fraction is tiny.
-    Wang et al. find R² = 0.51% for height. -/
+
+    Worked example: Wang et al. find R² = 0.51% for height. -/
 theorem spline_r2_bounded_by_bias_variation
-    (var_bias var_total : ℝ)
+    (var_bias var_total δ : ℝ)
     (h_total_pos : 0 < var_total)
-    (h_bias_small : var_bias ≤ 1/100 * var_total)
+    (h_δ_nn : 0 ≤ δ)
+    (h_bias_small : var_bias ≤ δ * var_total)
     (h_bias_nonneg : 0 ≤ var_bias) :
-    var_bias / var_total ≤ 1/100 := by
-  exact div_le_of_le_mul₀ (le_of_lt h_total_pos) (by norm_num) h_bias_small
+    var_bias / var_total ≤ δ := by
+  exact div_le_of_le_mul₀ (le_of_lt h_total_pos) h_δ_nn h_bias_small
 
 end IndividualErrorDistribution
 
@@ -290,8 +296,10 @@ theorem higher_rho_better_portability
 
 /-- **Sign discordance rate.**
     Under N(ρβ, σ²) model for target effects, the probability of sign flip is
-    Φ(-|ρβ|/σ). With ρ ≈ 0.3 for lymphocyte count, sign flips are common.
-    We prove that smaller ρ implies more sign flips (larger flip probability). -/
+    Φ(-|ρβ|/σ). We prove that smaller ρ implies more sign flips (larger flip
+    probability), since the z-score ρβ/σ decreases with ρ.
+
+    Worked example: With ρ ≈ 0.3 for lymphocyte count, sign flips are common. -/
 theorem more_turnover_more_sign_flips
     (β σ ρ₁ ρ₂ : ℝ)
     (hβ : 0 < β) (hσ : 0 < σ)

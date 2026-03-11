@@ -259,39 +259,51 @@ neutral expectation, reflecting pathogen-driven divergent selection.
 
 section ImmuneTraits
 
-/-- **HLA region dominates immune trait architecture.**
-    The HLA region (~6p21) contains a disproportionate fraction
-    of genetic variance for immune traits. HLA is under strong
-    balancing/diversifying selection → low portability. -/
-theorem hla_disproportionate_variance
-    (r2_hla r2_genome_wide n_hla_snps n_total_snps : ℝ)
-    (h_snp_fraction : n_hla_snps / n_total_snps < 1/100)
-    (h_var_fraction : 1/10 < r2_hla / r2_genome_wide)
+/-- **Genomic region dominates trait architecture disproportionately.**
+    A genomic region that occupies a small fraction of the genome can
+    contribute a disproportionately large fraction of genetic variance
+    for traits under strong selection in that region. When the region's
+    SNP fraction is below some bound and its variance fraction exceeds
+    that bound, the region is enriched.
+
+    Worked example: HLA region (~6p21) contains <1% of SNPs but >10%
+    of immune trait variance due to balancing/diversifying selection. -/
+theorem region_disproportionate_variance
+    (r2_region r2_genome_wide n_region_snps n_total_snps bound : ℝ)
+    (h_snp_fraction : n_region_snps / n_total_snps < bound)
+    (h_var_fraction : bound < r2_region / r2_genome_wide)
     (h_r2_gw : 0 < r2_genome_wide) (h_snps : 0 < n_total_snps) :
-    -- HLA contributes >10x its share of genome
-    n_hla_snps / n_total_snps < r2_hla / r2_genome_wide := by
+    -- Region contributes more variance per SNP than genome average
+    n_region_snps / n_total_snps < r2_region / r2_genome_wide := by
   linarith
 
-/-- **Immune trait portability is bounded by effect correlation.**
-    For immune traits, the cross-population effect correlation ρ
-    is often much less than 1 due to pathogen-driven selection.
-    Pathogen selection reduces ρ from a baseline by δ_pathogen > 0. -/
-theorem immune_portability_bounded_by_rho
-    (rho_baseline δ_pathogen : ℝ)
-    (h_pathogen : 0 < δ_pathogen)
-    (h_baseline_high : 0.9 < rho_baseline) :
-    rho_baseline - δ_pathogen < rho_baseline := by linarith
+/-- **Trait portability is bounded by effect correlation.**
+    For any trait under population-specific selection (e.g., pathogen-driven
+    for immune traits), the cross-population effect correlation ρ
+    is reduced from a baseline by δ_selection > 0. Given any baseline ρ₀,
+    the post-selection correlation ρ₀ - δ is strictly less than ρ₀.
 
-/-- **White blood cell count portability example.**
-    WBC portability EUR→AFR is typically ~20-30% of source R².
-    Neutral prediction would give ~85%. The gap is from:
-    (1) Duffy null variant (DARC/ACKR1) with strong frequency
-        differences due to malaria selection. -/
-theorem wbc_portability_below_neutral
-    (port_wbc port_neutral : ℝ)
-    (h_wbc : port_wbc < 3/10)
-    (h_neutral : 4/5 < port_neutral) :
-    port_wbc < port_neutral := by linarith
+    Worked example: For immune traits, ρ_baseline > 0.9 but pathogen-driven
+    selection can reduce it substantially (e.g., WBC, lymphocyte count). -/
+theorem selection_reduces_effect_correlation
+    (rho_baseline δ_selection : ℝ)
+    (h_selection : 0 < δ_selection) :
+    rho_baseline - δ_selection < rho_baseline := by linarith
+
+/-- **Selection-driven portability falls below neutral expectation.**
+    For any trait where observed portability is below a threshold and the
+    neutral prediction exceeds that threshold, the trait's portability is
+    strictly below the neutral expectation. This gap indicates the presence
+    of non-neutral forces (e.g., directional selection, GxE interactions).
+
+    Worked example: WBC portability EUR→AFR is ~20-30% of source R²,
+    while neutral prediction gives ~85%. The gap is from the Duffy null
+    variant (DARC/ACKR1) with large frequency differences due to malaria selection. -/
+theorem observed_portability_below_neutral
+    (port_observed port_neutral threshold : ℝ)
+    (h_observed : port_observed < threshold)
+    (h_neutral : threshold < port_neutral) :
+    port_observed < port_neutral := by linarith
 
 /-- **Allele under selection contributes disproportionally to portability loss.**
     If a selected allele explains a fraction f of genetic variance
@@ -397,10 +409,10 @@ section AnthropometricTraits
     We model: ρ = 1 - δ where δ = c/n for some constant c.
     Then 1 - ρ² = 1 - (1-δ)² = 2δ - δ² < 2δ = 2c/n.
     For large n, this gap is small. -/
-theorem height_near_neutral_portability
+theorem near_neutral_portability_highly_polygenic
     (c : ℝ) (n : ℕ)
     (h_c_pos : 0 < c) (h_c_le : c ≤ 1)
-    (h_n_large : 1000 < n) :
+    (h_n_large : 1 < n) :
     let delta := c / n
     let rho := 1 - delta
     let gap := 1 - rho ^ 2  -- portability gap proportional to 1 - ρ²
@@ -414,33 +426,42 @@ theorem height_near_neutral_portability
   have : 0 < (c / ↑n) ^ 2 := by positivity
   linarith
 
-/-- **Height's high polygenicity aids portability.**
-    With ~10000 loci, no single locus dominates.
-    Population-specific effects average out, giving ρ ≈ 1.
-    By CLT, the sum of many small contributions is robust. -/
+/-- **High polygenicity aids portability.**
+    When a trait has many contributing loci (n_loci > n_threshold),
+    no single locus dominates. Population-specific effects average out.
+    By CLT, the sum of many small contributions is robust.
+    Each locus contributes < 1/n_threshold of total variance.
+
+    Worked example: Height (~10000 loci) has per-locus contribution < 0.01%. -/
 theorem polygenicity_stabilizes_portability
-    (n_loci : ℕ) (per_locus_var total_var : ℝ)
-    (h_many : 1000 < n_loci)
+    (n_loci n_threshold : ℕ) (per_locus_var total_var : ℝ)
+    (h_many : n_threshold < n_loci) (h_thresh_pos : 0 < n_threshold)
     (h_total : total_var = n_loci * per_locus_var)
     (h_var_pos : 0 < per_locus_var) :
-    -- Each locus contributes < 0.1% of total variance
-    per_locus_var / total_var < 1/1000 := by
+    -- Each locus contributes < 1/n_threshold of total variance
+    per_locus_var / total_var < 1 / n_threshold := by
   rw [h_total]
   rw [show per_locus_var / (↑n_loci * per_locus_var) = 1 / ↑n_loci from by
     field_simp]
   have h_n_pos : (0 : ℝ) < ↑n_loci := Nat.cast_pos.mpr (by omega)
-  rw [one_div, inv_lt_comm₀ h_n_pos (by norm_num : (0:ℝ) < (1 : ℝ)/1000)]
-  calc ((1 : ℝ)/1000)⁻¹ = 1000 := by norm_num
-    _ < ↑n_loci := by exact_mod_cast h_many
+  have h_t_pos : (0 : ℝ) < ↑n_threshold := Nat.cast_pos.mpr h_thresh_pos
+  rw [div_lt_div_iff₀ h_n_pos h_t_pos]
+  have : (n_threshold : ℝ) < (n_loci : ℝ) := by exact_mod_cast h_many
+  linarith
 
-/-- **Skin pigmentation shows the worst anthropometric portability.**
-    Strong divergent selection → ρ ≪ 1 → very poor portability.
-    This is the exception among anthropometric traits. -/
-theorem pigmentation_poor_portability
-    (port_height port_pigmentation : ℝ)
-    (h_much_worse : port_pigmentation < 1/2 * port_height)
-    (h_height_pos : 0 < port_height) :
-    port_pigmentation < port_height := by linarith
+/-- **Traits under divergent selection have poor portability.**
+    When a trait's portability is a fraction α < 1 of another trait's
+    portability (due to divergent selection reducing effect correlation),
+    its portability is strictly lower.
+
+    Worked example: Skin pigmentation portability is much less than
+    half of height portability, despite both being anthropometric traits,
+    because pigmentation is under strong divergent selection. -/
+theorem selected_trait_poor_portability
+    (port_reference port_selected α : ℝ)
+    (h_much_worse : port_selected < α * port_reference)
+    (h_ref_pos : 0 < port_reference) (h_α_lt : α < 1) (h_α_pos : 0 < α) :
+    port_selected < port_reference := by nlinarith
 
 end AnthropometricTraits
 

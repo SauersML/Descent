@@ -97,24 +97,32 @@ another due to LD differences and population-specific pleiotropy.
 section CrossAncestryInstruments
 
 /-- **Instrument strength varies across ancestries.**
-    An instrument selected in EUR may be a weak instrument in AFR
-    because LD between the instrument and causal variant differs. -/
+    An instrument selected in one population (source) may be a weak instrument
+    in another (target) because LD between instrument and causal variant differs.
+    When the source F-statistic exceeds a threshold but the target falls below it,
+    the target instrument is strictly weaker. -/
 theorem instrument_strength_varies
-    (f_stat_eur f_stat_afr : ℝ)
-    (h_strong_eur : 10 < f_stat_eur)
-    (h_weak_afr : f_stat_afr < 10) :
-    f_stat_afr < f_stat_eur := by linarith
+    (f_stat_source f_stat_target threshold : ℝ)
+    (h_strong_source : threshold < f_stat_source)
+    (h_weak_target : f_stat_target < threshold) :
+    f_stat_target < f_stat_source := by linarith
 
-/-- **LD proxy instruments.**
+/-- **LD proxy instruments weaken across ancestry.**
     In MR, we often use a proxy SNP (in LD with causal SNP).
     In different LD backgrounds, the proxy may be less correlated
-    with the causal SNP → weaker instrument. -/
+    with the causal SNP → weaker instrument.
+
+    General statement: for any two populations where the LD r² between
+    proxy and causal is r2_source > r2_target, the apparent effect
+    |β| × r² is diminished in the target.
+
+    Worked example: EUR r² > 0.8 vs AFR r² < 0.5 for the same locus. -/
 theorem ld_proxy_weakens_cross_ancestry
-    (r2_ld_eur r2_ld_afr beta_causal : ℝ)
-    (h_eur : 4/5 < r2_ld_eur) (h_afr : r2_ld_afr < 1/2)
+    (r2_ld_source r2_ld_target beta_causal : ℝ)
+    (h_ld_diff : r2_ld_target < r2_ld_source)
     (h_beta : beta_causal ≠ 0) :
-    |beta_causal| * r2_ld_afr < |beta_causal| * r2_ld_eur := by
-  apply mul_lt_mul_of_pos_left (by linarith)
+    |beta_causal| * r2_ld_target < |beta_causal| * r2_ld_source := by
+  apply mul_lt_mul_of_pos_left h_ld_diff
   exact abs_pos.mpr h_beta
 
 /-- **Horizontal pleiotropy may be population-specific.**

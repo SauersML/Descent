@@ -308,9 +308,12 @@ theorem berry_esseen_error_decreases_with_snps
     exact Real.sqrt_lt_sqrt (Nat.cast_nonneg _) (Nat.cast_lt.mpr h_more)
 
 /-- **Gaussian approximation is better for highly polygenic traits.**
-    Height (~10000 loci) has better Gaussian approximation than
-    a trait with 10 loci. The Berry-Esseen error scales as C·ρ/(σ³·√m)
-    where m is the number of loci. More loci → smaller error. -/
+    The Berry-Esseen error scales as C·ρ/(σ³·√m) where m is the number
+    of loci. More loci → smaller error. Any trait with more contributing
+    loci than another will have a better Gaussian approximation.
+
+    Worked example: Height (~10000 loci) has much better Gaussian
+    approximation than an oligogenic trait with ~10 loci. -/
 theorem highly_polygenic_better_gaussian
     (C ρ σ_sq : ℝ) (m_oligo m_poly : ℕ)
     (h_C : 0 < C) (h_ρ : 0 < ρ) (h_σ : 0 < σ_sq)
