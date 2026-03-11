@@ -187,7 +187,7 @@ noncomputable def phaseAttenuation (s : ℝ) : ℝ := (1 - 2 * s)^2
 
 /-- Phase attenuation is in [0,1] for small error rate. -/
 theorem phase_attenuation_bounded (s : ℝ)
-    (h_s : 0 ≤ s) (h_s_le : s ≤ 0.5) :
+    (h_s : 0 ≤ s) (h_s_le : s ≤ 1 / 2) :
     0 ≤ phaseAttenuation s ∧ phaseAttenuation s ≤ 1 := by
   unfold phaseAttenuation
   constructor
@@ -198,8 +198,8 @@ theorem phase_attenuation_bounded (s : ℝ)
 
 /-- Phase attenuation decreases with higher error rate. -/
 theorem more_errors_more_attenuation (s₁ s₂ : ℝ)
-    (h_s₁ : 0 ≤ s₁) (h_s₁_le : s₁ ≤ 0.5)
-    (h_s₂ : 0 ≤ s₂) (h_s₂_le : s₂ ≤ 0.5)
+    (h_s₁ : 0 ≤ s₁) (h_s₁_le : s₁ ≤ 1 / 2)
+    (h_s₂ : 0 ≤ s₂) (h_s₂_le : s₂ ≤ 1 / 2)
     (h_lt : s₁ < s₂) :
     phaseAttenuation s₂ < phaseAttenuation s₁ := by
   unfold phaseAttenuation
@@ -214,7 +214,7 @@ theorem more_errors_more_attenuation (s₁ s₂ : ℝ)
 theorem phasing_worse_for_underrepresented
     (s_eur s_afr : ℝ)
     (h_worse : s_eur < s_afr)
-    (h_nn : 0 ≤ s_eur) (h_afr_le : s_afr ≤ 0.5) :
+    (h_nn : 0 ≤ s_eur) (h_afr_le : s_afr ≤ 1 / 2) :
     phaseAttenuation s_afr < phaseAttenuation s_eur := by
   exact more_errors_more_attenuation s_eur s_afr h_nn (by linarith) (by linarith) h_afr_le h_worse
 

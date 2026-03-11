@@ -174,8 +174,8 @@ theorem afr_efficient_for_fine_mapping
     the cross-ancestry analysis can distinguish which is causal. -/
 theorem ld_discordance_identifies_causal
     (r2_eur_AB r2_afr_AB : ℝ)
-    (h_eur_high : 0.8 < r2_eur_AB)
-    (h_afr_low : r2_afr_AB < 0.2) :
+    (h_eur_high : 4 / 5 < r2_eur_AB)
+    (h_afr_low : r2_afr_AB < 1 / 5) :
     -- The variants are distinguishable in AFR but not EUR
     r2_afr_AB < r2_eur_AB := by linarith
 
@@ -270,8 +270,8 @@ theorem functional_prior_concentrates_pips
 theorem conserved_annotations_help_portability
     (prop_conserved prop_specific : ℝ)
     (h_sum : prop_conserved + prop_specific = 1)
-    (h_mostly_conserved : 0.7 < prop_conserved) :
-    prop_specific < 0.3 := by linarith
+    (h_mostly_conserved : 7 / 10 < prop_conserved) :
+    prop_specific < 3 / 10 := by linarith
 
 /-- **Enrichment of causal variants in functional categories.**
     Causal variants are enriched in specific functional categories:

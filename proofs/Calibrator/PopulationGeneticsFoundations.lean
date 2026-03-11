@@ -152,10 +152,9 @@ theorem coal_fst_increases_with_time
 theorem coal_fst_approaches_one
     (Ne t : ℝ) (h_Ne : 0 < Ne) (h_t : 0 < t)
     (h_large : 100 * Ne < t) :
-    0.98 < coalFst t Ne := by
+    49 / 50 < coalFst t Ne := by
   unfold coalFst
-  rw [show (0.98 : ℝ) = 98 / 100 from by norm_num]
-  rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 100) (by linarith)]
+  rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 50) (by linarith)]
   nlinarith
 
 end CoalescentTheory
@@ -252,9 +251,8 @@ theorem sel_mig_eq_in_unit (s m : ℝ)
     This creates population-specific genetic architecture. -/
 theorem strong_selection_high_differentiation
     (s m : ℝ) (h_s : 0 < s) (h_m : 0 < m) (h_strong : 10 * m < s) :
-    0.9 < selectionMigrationEquilibrium s m := by
+    9 / 10 < selectionMigrationEquilibrium s m := by
   unfold selectionMigrationEquilibrium
-  rw [show (0.9 : ℝ) = 9 / 10 from by norm_num]
   rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 10) (by linarith)]
   nlinarith
 
@@ -262,8 +260,8 @@ theorem strong_selection_high_differentiation
     When s << m, allele frequencies homogenize (Fst_locus → 0).
     These loci contribute to portable genetic architecture. -/
 theorem weak_selection_low_differentiation
-    (s m : ℝ) (h_s : 0 < s) (h_m : 0 < m) (h_weak : s < 0.1 * m) :
-    selectionMigrationEquilibrium s m < 0.1 := by
+    (s m : ℝ) (h_s : 0 < s) (h_m : 0 < m) (h_weak : s < (1 / 10) * m) :
+    selectionMigrationEquilibrium s m < 1 / 10 := by
   unfold selectionMigrationEquilibrium
   rw [div_lt_iff₀ (by linarith)]
   nlinarith
@@ -274,7 +272,7 @@ theorem weak_selection_low_differentiation
 theorem selected_loci_disproportionate_impact
     (fst_selected fst_neutral fraction_selected : ℝ)
     (h_higher : fst_neutral < fst_selected)
-    (h_small_fraction : fraction_selected < 0.01)
+    (h_small_fraction : fraction_selected < 1 / 100)
     (h_pos : 0 < fraction_selected)
     (h_nn : 0 ≤ fst_neutral) :
     -- Even 1% of loci can have >10% impact if their Fst is 10x higher
@@ -288,18 +286,18 @@ theorem genome_wide_fst_neutral_dominated
     (fst_gw fst_neutral fst_selected : ℝ)
     (f_sel : ℝ) -- fraction of selected loci
     (h_gw : fst_gw = (1 - f_sel) * fst_neutral + f_sel * fst_selected)
-    (h_small : f_sel < 0.01)
+    (h_small : f_sel < 1 / 100)
     (h_pos : 0 < f_sel)
     (h_neutral_nn : 0 ≤ fst_neutral) (h_sel_nn : 0 ≤ fst_selected)
     (h_sel_higher : fst_neutral < fst_selected) :
-    |fst_gw - fst_neutral| < 0.01 * fst_selected := by
+    |fst_gw - fst_neutral| < (1 / 100) * fst_selected := by
   rw [h_gw]
   have : (1 - f_sel) * fst_neutral + f_sel * fst_selected - fst_neutral =
       f_sel * (fst_selected - fst_neutral) := by ring
   rw [this, abs_of_nonneg (mul_nonneg (le_of_lt h_pos) (by linarith))]
-  calc f_sel * (fst_selected - fst_neutral) < 0.01 * (fst_selected - fst_neutral) :=
+  calc f_sel * (fst_selected - fst_neutral) < (1 / 100) * (fst_selected - fst_neutral) :=
         mul_lt_mul_of_pos_right h_small (by linarith)
-    _ ≤ 0.01 * fst_selected := by nlinarith
+    _ ≤ (1 / 100) * fst_selected := by nlinarith
 
 end SelectionMigrationBalance
 

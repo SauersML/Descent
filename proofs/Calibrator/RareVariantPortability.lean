@@ -44,8 +44,8 @@ noncomputable def variantSharingProb (fst maf : ℝ) : ℝ :=
     For MAF < 0.001, sharing probability → 0 for divergent populations. -/
 theorem ultra_rare_not_shared
     (sharing_prob : ℝ)
-    (h_small : sharing_prob < 0.01) :
-    sharing_prob < 0.01 := h_small
+    (h_small : sharing_prob < 1 / 100) :
+    sharing_prob < 1 / 100 := h_small
 
 /-- **Rare variant contribution to heritability.**
     Rare variants collectively explain a significant fraction of h².
@@ -53,9 +53,9 @@ theorem ultra_rare_not_shared
 theorem rare_variants_substantial_heritability
     (h2_rare h2_common h2_total : ℝ)
     (h_total : h2_total = h2_rare + h2_common)
-    (h_fraction : h2_rare / h2_total > 0.2)
+    (h_fraction : h2_rare / h2_total > 1 / 5)
     (h_total_pos : 0 < h2_total) :
-    0.2 * h2_total < h2_rare := by
+    (1 / 5) * h2_total < h2_rare := by
   rwa [gt_iff_lt, lt_div_iff₀ h_total_pos] at h_fraction
 
 /-- **Rare variant PGS has zero cross-population portability.**
@@ -288,16 +288,16 @@ theorem alpha_model_portability_impact
     With very small MAF, enormous samples are needed.
     n > 1/(MAF × β²) for adequate power per variant. -/
 theorem rare_variant_needs_large_n
-    (maf β : ℝ) (h_maf : 0 < maf) (h_maf_small : maf < 0.01)
+    (maf β : ℝ) (h_maf : 0 < maf) (h_maf_small : maf < 1 / 100)
     (h_β : β ≠ 0) (h_β_le : |β| ≤ 1) :
     100 < 1 / (maf * β ^ 2) := by
   have h_β_sq : β ^ 2 ≤ 1 := by nlinarith [sq_abs β, abs_nonneg β]
   have h_prod_pos : 0 < maf * β ^ 2 := mul_pos h_maf (sq_pos_of_ne_zero h_β)
   rw [lt_div_iff₀ h_prod_pos]
-  have h_prod_small : maf * β ^ 2 < 0.01 := by
+  have h_prod_small : maf * β ^ 2 < 1 / 100 := by
     calc maf * β ^ 2 ≤ maf * 1 := by nlinarith [sq_nonneg β]
     _ = maf := mul_one maf
-    _ < 0.01 := h_maf_small
+    _ < 1 / 100 := h_maf_small
   nlinarith
 
 /-- **Population-specific rare variant PGS is optimal for within-population.**
