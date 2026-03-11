@@ -27,6 +27,7 @@ import Calibrator.GeneEnvironmentInterplay
 import Calibrator.RareVariantPortability
 import Calibrator.StatisticalGeneticsMethodology
 import Calibrator.EquityAndImplementation
+import Calibrator.EpistasisAndNonAdditivity
 
 namespace Calibrator
 
