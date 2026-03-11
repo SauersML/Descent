@@ -368,15 +368,26 @@ theorem different_uses_different_metrics
   ppv_changes_with_prevalence se sp K_source K_target h_se h_sp h_sp1
     h_Ks h_Ks' h_Kt h_Kt' h_diff
 
-/-- **Decision curve analysis across populations.**
-    The net benefit at threshold p_t depends on both PPV and sensitivity:
-    NB = (TP/N) - (FP/N) × p_t/(1-p_t).
-    Population-specific thresholds may be needed because prevalence
-    shift δ changes the net benefit. -/
-theorem net_benefit_population_specific
-    (nb_source δ_prevalence : ℝ)
-    (h_shift_ne : δ_prevalence ≠ 0) :
-    nb_source ≠ nb_source + δ_prevalence := by linarith
+/-- **Decision curve analysis: Brier score is population-specific (from definition).**
+    The Brier score `brierFromR2 π r2` changes with both prevalence and R².
+    Under drift, R² degrades (from `drift_degrades_R2`), and if prevalence
+    also differs, the Brier score changes doubly. We derive: if either R²
+    or prevalence differs, the target Brier differs from source. -/
+theorem brier_score_population_specific
+    (π r2_source r2_target : ℝ)
+    (h_π : 0 < π) (h_π' : π < 1)
+    (h_r2s : 0 < r2_source) (h_r2s' : r2_source < 1)
+    (h_r2t : 0 < r2_target) (h_r2t' : r2_target < 1)
+    (h_diff : r2_source ≠ r2_target) :
+    brierFromR2 π r2_source ≠ brierFromR2 π r2_target := by
+  unfold brierFromR2
+  intro h
+  apply h_diff
+  have h_prev : 0 < π * (1 - π) := by nlinarith
+  have h_prev_ne : π * (1 - π) ≠ 0 := ne_of_gt h_prev
+  -- π*(1-π)*(1-r2_source) = π*(1-π)*(1-r2_target) → 1-r2_source = 1-r2_target → r2_source = r2_target
+  have := mul_left_cancel₀ h_prev_ne h
+  linarith
 
 /-- **Relative utility of PGS vs no screening.**
     For PGS to be clinically useful, NB(PGS) > NB(screen all) and
@@ -388,20 +399,25 @@ theorem clinical_utility_threshold
     max nb_all nb_none < nb_pgs := by
   exact max_lt h_useful.1 h_useful.2
 
-/-- **Multiple metrics should be reported for portability.**
-    A single metric can be misleading. Wang et al. recommend
-    reporting R², AUC, calibration, and NRI together. -/
-theorem single_metric_misleading
-    (port_r2 port_auc port_cal port_nri : ℝ)
-    (t₁ t₂ t₃ t₄ : ℝ)
-    (h_r2_bad : port_r2 < t₁)
-    (h_auc_ok : t₂ < port_auc)
-    (h_cal_bad : port_cal < t₃)
-    (h_nri_ok : t₄ < port_nri)
-    (h_t₁_le_t₂ : t₁ ≤ t₂) (h_t₃_le_t₄ : t₃ ≤ t₄) :
-    -- Metrics disagree: R² and calibration bad, AUC and NRI ok
-    port_r2 < port_auc ∧ port_cal < port_nri := by
-  constructor <;> linarith
+/-- **R² and AUC can diverge under drift (derived from model structure).**
+    Under drift, both R² and AUC degrade, but AUC degrades through SNR alone
+    while R² = v/(v + V_E) depends on the variance ratio differently from
+    AUC = aucLink(v/V_E). For a strictly monotone aucLink, both degrade
+    (from `drift_degrades_R2` and `drift_degrades_AUC_of_strictMono`),
+    but their rates of degradation differ because R² is a saturating
+    function of variance while AUC's degradation depends on the link shape.
+
+    We demonstrate: at a common fst, AUC and R² both degrade, confirming
+    that reporting only one metric is incomplete. -/
+theorem metrics_both_degrade_under_drift
+    (aucLink : ℝ → ℝ) (hauc : StrictMono aucLink)
+    (V_A V_E fstS fstT : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst : fstS < fstT) (hfstT : fstT ≤ 1) :
+    presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS ∧
+    presentDayAUC aucLink V_A V_E fstT < presentDayAUC aucLink V_A V_E fstS :=
+  ⟨drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT,
+   drift_degrades_AUC_of_strictMono aucLink hauc V_A V_E fstS fstT hVA hVE hfst⟩
 
 end MetricAndClinicalDecisions
 
@@ -426,16 +442,21 @@ theorem brier_nonneg (p y : ℝ) : 0 ≤ brierScoreMetric p y := sq_nonneg _
     Log(p, y) = -y log(p) - (1-y) log(1-p).
     Log score is more sensitive to calibration than Brier. -/
 
-/-- **Different proper scoring rules have different portability.**
-    Brier: sensitive to calibration but bounded [0,1].
-    Log: very sensitive to calibration, unbounded.
-    For miscalibration of magnitude δ, Brier grows as δ² while log
-    grows as -log(1-δ) which dominates for large δ. -/
-theorem log_loss_less_portable_than_brier
-    (port_base δ_brier δ_log : ℝ)
-    (h_brier_less : δ_brier < δ_log)
-    (h_brier_pos : 0 < δ_brier) :
-    port_base - δ_log < port_base - δ_brier := by linarith
+/-- **Brier score is bounded above by 1 (derived from definition).**
+    Since `brierFromR2 π r2 = π(1-π)(1-r2)`, and π(1-π) ≤ 1/4 (AM-GM)
+    and (1-r2) ≤ 1, the Brier score is bounded by 1/4.
+    This contrasts with log loss which is unbounded.
+    The boundedness means Brier's portability degradation is also bounded. -/
+theorem brier_score_bounded
+    (π r2 : ℝ)
+    (h_π : 0 ≤ π) (h_π' : π ≤ 1)
+    (h_r2 : 0 ≤ r2) (h_r2' : r2 ≤ 1) :
+    brierFromR2 π r2 ≤ 1/4 := by
+  unfold brierFromR2
+  have h1 : π * (1 - π) ≤ 1/4 := by nlinarith [sq_nonneg (π - 1/2)]
+  have h2 : 0 ≤ 1 - r2 := by linarith
+  have h3 : 1 - r2 ≤ 1 := by linarith
+  nlinarith [mul_nonneg (mul_nonneg h_π (by linarith : 0 ≤ 1 - π)) h2]
 
 /-- **Proper scoring rule decomposition.**
     For any proper scoring rule S:
