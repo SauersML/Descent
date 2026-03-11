@@ -33,11 +33,74 @@ most fundamental driver of PGS portability issues.
 
 section AlleleFrequencyDivergence
 
+/-!
+### Derivation of expectedFreqDiffSq = 2·Fst·p₀(1-p₀)
+
+Under the Wright-Fisher model, genetic drift causes allele frequencies
+to fluctuate randomly across generations. For a single population
+diverging from an ancestor with allele frequency p₀:
+
+  Var(p_t - p₀) = p₀(1-p₀) × Fst(t)
+
+This **is** the definition of Fst: the proportion of total allelic
+variance (p₀(1-p₀)) that lies between populations.
+
+**Single-population drift variance:**
+  driftVariance(p₀, Fst) = p₀·(1-p₀)·Fst
+
+**Two-population divergence:**
+Consider two populations (pop₁, pop₂) that diverged independently
+from the same ancestral population with frequency p₀. Their allele
+frequency deviations (p₁ - p₀) and (p₂ - p₀) are independent
+because drift is driven by independent sampling in each lineage.
+
+  E[(p₁ - p₂)²] = Var(p₁ - p₂)          (since E[p₁ - p₂] = 0)
+                 = Var(p₁) + Var(p₂)      (independence of drift)
+                 = p₀(1-p₀)·Fst + p₀(1-p₀)·Fst
+                 = 2·p₀(1-p₀)·Fst
+
+The factor of 2 arises because **both** lineages drift independently,
+so the variance of their difference is the sum of their individual
+drift variances.
+-/
+
+/-- **Drift variance for a single population.**
+    Var(p_t - p₀) = p₀(1-p₀) × Fst, which is the definition
+    of Fst as the proportion of ancestral heterozygosity that
+    has become between-population variance. -/
+noncomputable def driftVariance (p0 fst : ℝ) : ℝ :=
+  p0 * (1 - p0) * fst
+
+/-- Drift variance is nonneg. -/
+theorem drift_variance_nonneg (p0 fst : ℝ)
+    (h_p0 : 0 ≤ p0) (h_p0_le : p0 ≤ 1) (h_fst : 0 ≤ fst) :
+    0 ≤ driftVariance p0 fst := by
+  unfold driftVariance; nlinarith
+
+/-- **Two-population drift variance from independent lineages.**
+    For two populations diverging independently from the same
+    ancestor, Var(p₁ - p₂) = Var(p₁) + Var(p₂) = 2·driftVariance.
+    The factor of 2 comes from independence of drift. -/
+noncomputable def twoPopDriftVariance (p0 fst : ℝ) : ℝ :=
+  2 * driftVariance p0 fst
+
+/-- Two-population drift variance equals the sum of individual drift variances. -/
+theorem twoPopDriftVariance_eq_sum (p0 fst : ℝ) :
+    twoPopDriftVariance p0 fst = driftVariance p0 fst + driftVariance p0 fst := by
+  unfold twoPopDriftVariance; ring
+
 /-- **Expected allele frequency difference from drift.**
     E[(p₁ - p₂)²] = 2 × FST × p₀(1-p₀)
     where p₀ is the ancestral frequency. -/
 noncomputable def expectedFreqDiffSq (fst p0 : ℝ) : ℝ :=
   2 * fst * p0 * (1 - p0)
+
+/-- **The two-population drift variance equals expectedFreqDiffSq.**
+    This connects the derivation (summing independent drift variances)
+    to the closed-form formula 2·Fst·p₀(1-p₀). -/
+theorem twoPopDriftVariance_eq_expectedFreqDiffSq (p0 fst : ℝ) :
+    twoPopDriftVariance p0 fst = expectedFreqDiffSq fst p0 := by
+  unfold twoPopDriftVariance driftVariance expectedFreqDiffSq; ring
 
 /-- Expected frequency difference is nonneg. -/
 theorem expected_freq_diff_nonneg (fst p0 : ℝ)

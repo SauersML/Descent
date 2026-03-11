@@ -247,6 +247,80 @@ section LDScore
     a window. Higher LD score → more tagging → more signal
     but also more noise in GWAS. -/
 
+/-!
+### Derivation of ldsrExpectedChi2 = N·h²/M·ℓ_j + N·a/M + 1
+
+**GWAS marginal test statistic:**
+For SNP j with sample size N, the chi-squared statistic is:
+  χ²_j = N × β̂_j²
+where β̂_j is the marginal OLS estimate of SNP j's effect.
+
+Under the null hypothesis (no association), E[χ²_j] = 1.
+
+**Marginal effect as a sum over tagged causal effects:**
+The marginal estimate β̂_j captures not just SNP j's own effect
+but also the effects of all SNPs in LD with it. Specifically:
+  β̂_j ≈ Σ_k r_jk × β_k + ε_j
+where r_jk is the LD correlation between SNPs j and k, β_k is the
+true causal effect of SNP k, and ε_j is sampling noise with
+Var(ε_j) = 1/N.
+
+**Expected squared marginal effect:**
+Taking expectation over the distribution of causal effects
+(assuming equal per-SNP heritability σ²_k = h²/M):
+  E[β̂_j²] = Σ_k r²_jk × E[β_k²] + 1/N
+            = Σ_k r²_jk × (h²/M) + 1/N
+            = (h²/M) × ℓ_j + 1/N
+
+where ℓ_j = Σ_k r²_jk is the **LD score** of SNP j.
+
+**From marginal effects to chi-squared:**
+Multiplying by N:
+  E[χ²_j] = N × E[β̂_j²]
+           = N × (h²/M) × ℓ_j + 1
+
+**Adding confounding:**
+Population stratification and cryptic relatedness contribute
+an additional intercept inflation a/M per SNP:
+  E[χ²_j] = N·(h²/M)·ℓ_j + N·(a/M) + 1
+
+This is a **linear regression model** with:
+- **Slope** = N·h²/M (proportional to per-SNP heritability)
+- **LD score ℓ_j** as the predictor (captures tagging/LD structure)
+- **Intercept** = N·a/M + 1 (1 from null + confounding)
+
+The key insight is that LD scores create a linear relationship
+between E[χ²] and ℓ_j because each SNP's marginal statistic
+tags a number of causal effects proportional to its LD score.
+-/
+
+/-- **LDSR regression model: per-SNP expected squared marginal effect.**
+    E[β̂_j²] = (h²/M) × ℓ_j + 1/N, where the first term is the
+    signal from LD-tagged causal effects and the second is sampling noise. -/
+noncomputable def ldsrExpectedBetaSq (h2 M ell_j N : ℝ) : ℝ :=
+  h2 / M * ell_j + 1 / N
+
+/-- **From per-SNP β² to chi-squared: multiply by N.**
+    χ²_j = N × β̂_j², so E[χ²_j] = N × E[β̂_j²]. -/
+theorem ldsr_chi2_from_beta_sq (h2 M ell_j N : ℝ) (h_N : N ≠ 0) :
+    N * ldsrExpectedBetaSq h2 M ell_j N =
+      N * h2 / M * ell_j + 1 := by
+  unfold ldsrExpectedBetaSq
+  field_simp
+  ring
+
+/-- **Adding confounding to the LDSR model.**
+    The confounding term a captures population stratification
+    and cryptic relatedness, contributing N·a/M to E[χ²_j].
+    The full model is: E[χ²_j] = N·h²/M·ℓ_j + N·a/M + 1. -/
+theorem ldsr_with_confounding_eq (N h2 M ell_j a : ℝ)
+    (h_N : N ≠ 0) :
+    N * ldsrExpectedBetaSq h2 M ell_j N + N * a / M =
+      ldsrExpectedChi2 N h2 M ell_j a := by
+  unfold ldsrExpectedBetaSq ldsrExpectedChi2
+  field_simp
+  ring
+
 /-- **LD score varies across populations.**
     Populations with longer LD blocks have higher average LD scores
     due to more extensive correlation. -/
