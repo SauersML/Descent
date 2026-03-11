@@ -374,6 +374,44 @@ are to violations of modeling assumptions.
 
 section SensitivityAnalysis
 
+/-- **Derivation: E-value from the confounding bounding formula.**
+
+    The E-value (VanderWeele & Ding, 2017) is the minimum strength of
+    unmeasured confounding on the risk ratio scale that could fully explain
+    away an observed association. We derive E = RR + √(RR(RR-1)).
+
+    **Setup.** Let RR_obs be the observed risk ratio. An unmeasured
+    confounder U introduces bias through two pathways:
+    - RR_{EU}: the confounder-exposure association (risk ratio)
+    - RR_{UD}: the confounder-outcome association (risk ratio)
+
+    **Step 1: The Cornfield/bounding inequality.**
+    The maximum bias factor B from an unmeasured confounder satisfies:
+        B ≤ (RR_{EU} × RR_{UD}) / (RR_{EU} + RR_{UD} - 1)
+    The observed RR relates to the true RR via: RR_obs = RR_true × B.
+
+    **Step 2: Setting up the E-value equation.**
+    The E-value asks: what is the minimum confounding strength E such that
+    B = RR_obs (i.e., RR_true = 1, the association is fully explained)?
+    For the sharpest bound, set RR_{EU} = RR_{UD} = E (symmetric
+    confounding). Then:
+        RR_obs = E² / (2E - 1)
+
+    **Step 3: Solving for E.**
+    Rearranging RR = E²/(2E - 1):
+        RR × (2E - 1) = E²
+        E² - 2·RR·E + RR = 0
+    By the quadratic formula:
+        E = (2·RR ± √(4·RR² - 4·RR)) / 2
+          = RR ± √(RR² - RR)
+          = RR ± √(RR(RR - 1))
+    Taking the positive root (E ≥ RR ≥ 1):
+        **E = RR + √(RR(RR - 1))**
+
+    **Verification.** When RR = 1: E = 1 + 0 = 1 (no confounding needed).
+    As RR → ∞: E ≈ 2·RR (confounding must be roughly twice the observed
+    association on the RR scale). -/
+
 /-- **E-value for unmeasured confounding.**
     The E-value is the minimum confounding strength that could
     explain away the observed portability difference. -/

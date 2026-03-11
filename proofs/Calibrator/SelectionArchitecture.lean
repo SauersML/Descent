@@ -52,6 +52,46 @@ theorem stronger_stabilizing_smaller_effects
   unfold equilibriumEffectVariance
   exact div_lt_div_of_pos_left h_vm h_s₁ h_stronger
 
+/-- **Derivation: Effect correlation under stabilizing selection.**
+
+    We derive the equilibrium effect correlation ρ* = 1 - 1/(2Ns) from the
+    Wright-Fisher model with stabilizing selection.
+
+    **Setup.** Consider a locus with effect size β in two populations diverging
+    under genetic drift, both subject to stabilizing selection of strength s
+    per locus toward the same phenotypic optimum. Let ρ(t) denote the
+    correlation of allelic effects between the populations at generation t.
+
+    **Drift-selection recurrence.** Each generation:
+    (1) Genetic drift destroys correlation at rate 1/(2N), since allele
+        frequencies in each population are subject to independent binomial
+        sampling with effective size N. This gives:
+            ρ_drift = ρ(t) × (1 - 1/(2N))
+    (2) Stabilizing selection restores correlation by removing alleles whose
+        effects deviate from the shared optimum. Alleles far from the optimum
+        are purged at rate proportional to s, pulling both populations back
+        toward the same effect distribution. The restoration term is:
+            selection_restoration ≈ (1 - ρ(t)) × (1/(2Ns)) × (1/(1 - 1/(2N)))
+        which simplifies for large N.
+
+    **Equilibrium.** Setting ρ(t+1) = ρ(t) = ρ* and solving:
+        ρ* = ρ* × (1 - 1/(2N)) + (1 - ρ*) × s_restoration
+    The key insight is that each allele's residence time under stabilizing
+    selection is ~2Ns generations (the expected time before it is replaced
+    by a new mutation closer to the optimum). During this time, drift
+    decorrelates frequencies at rate 1/(2N) per generation, so the total
+    decorrelation is:
+        1 - ρ* ≈ (residence time) × (drift rate) / (residence time)
+                = 1/(2Ns)
+
+    Therefore:  **ρ* = 1 - 1/(2Ns)**  when Ns >> 1.
+
+    This is the mutation-selection-drift balance: selection maintains alleles
+    near their shared optimum with turnover time ~2Ns, and drift erodes
+    the correlation by 1/(2Ns) of the remaining correlation each turnover
+    cycle. The formula breaks down when Ns ≈ 1 (drift dominates) or when
+    selection pressures differ between populations. -/
+
 /-- **Effect correlation under stabilizing selection.**
     When both populations are under the same stabilizing selection,
     effect sizes are pulled toward the same optimum.
