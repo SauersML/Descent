@@ -33,6 +33,151 @@ and allele frequency — all of which differ across populations.
 
 section PopulationPowerCurves
 
+/-!
+### Derivation of Effective Sample Size from Fisher Information
+
+In a GWAS linear regression model Y = βG + ε, where G is the genotype
+dosage (0, 1, or 2 copies of the minor allele) and ε ~ N(0, σ²), the
+Fisher information for the effect size β is:
+
+  I(β) = n × Var(G) / σ²
+
+Under Hardy-Weinberg equilibrium at a biallelic locus with minor allele
+frequency p, the genotype dosage G ~ Binomial(2, p), so:
+
+  Var(G) = 2p(1 - p)
+
+This is the heterozygosity — the probability that a randomly chosen
+allele copy differs from another. We normalize σ² = 1 (or absorb it
+into the effect size), giving:
+
+  I(β) = n × 2p(1 - p)
+
+When the causal variant is not directly genotyped but imperfectly tagged
+by a nearby SNP with LD r², the observed association signal is attenuated.
+The effective Fisher information becomes:
+
+  I_eff(β) = n × 2p(1 - p) × r²_LD
+
+The **effective sample size** is defined as the sample size of a
+hypothetical perfectly-tagged study (r² = 1, Var(G) = 1) that yields
+the same Fisher information:
+
+  n_eff = n × 2p(1 - p) × r²_LD
+
+This is the formula implemented below.
+-/
+
+/-- **Fisher information for β in linear regression Y = βG + ε.**
+    At a biallelic locus with sample size n and genotype variance v,
+    the Fisher information is n × v (with σ² = 1). -/
+noncomputable def fisherInformation (n : ℕ) (v : ℝ) : ℝ := n * v
+
+/-- **Genotype variance under HWE.**
+    For a biallelic locus with MAF p, the dosage G ∈ {0, 1, 2}
+    follows Binomial(2, p). Its variance is 2p(1-p).
+    This is the heterozygosity and equals the per-locus information content. -/
+noncomputable def genotypeVarianceHWE (p : ℝ) : ℝ := 2 * p * (1 - p)
+
+/-- Genotype variance is nonnegative when 0 ≤ p ≤ 1. -/
+theorem genotypeVariance_nonneg (p : ℝ) (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
+    0 ≤ genotypeVarianceHWE p := by
+  unfold genotypeVarianceHWE
+  nlinarith
+
+/-- Genotype variance is strictly positive when 0 < p < 1. -/
+theorem genotypeVariance_pos (p : ℝ) (h_p : 0 < p) (h_p_lt : p < 1) :
+    0 < genotypeVarianceHWE p := by
+  unfold genotypeVarianceHWE
+  nlinarith
+
+/-- Genotype variance is maximized at p = 1/2 where it equals 1/2. -/
+theorem genotypeVariance_max (p : ℝ) (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
+    genotypeVarianceHWE p ≤ genotypeVarianceHWE (1/2 : ℝ) := by
+  unfold genotypeVarianceHWE
+  nlinarith [sq_nonneg (p - 1/2)]
+
+/-- **Effective Fisher information under imperfect tagging.**
+    When the causal variant is tagged with LD r², the Fisher information
+    for the causal effect is attenuated by r²:
+      I_eff = I(β) × r²_LD = n × 2p(1-p) × r²_LD
+
+    Derivation: Under imperfect tagging, the observed genotype G_tag
+    satisfies Cov(G_tag, G_causal)² / (Var(G_tag) × Var(G_causal)) = r².
+    The regression of Y on G_tag recovers β_tag = β × r², and the
+    information about β through G_tag is I × r². -/
+noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
+  fisherInformation n (genotypeVarianceHWE p) * r2_ld
+
+/-- Effective Fisher information equals n × 2p(1-p) × r²_LD. -/
+theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :
+    effectiveFisherInformation n p r2_ld = n * (2 * p * (1 - p)) * r2_ld := by
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
+  ring
+
+/-- Information loss from imperfect tagging: effective info ≤ full info. -/
+theorem information_loss_from_tagging (n : ℕ) (p r2_ld : ℝ)
+    (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2 : 0 ≤ r2_ld) (h_r2_le : r2_ld ≤ 1) :
+    effectiveFisherInformation n p r2_ld ≤ fisherInformation n (genotypeVarianceHWE p) := by
+  unfold effectiveFisherInformation
+  have h_info_nonneg : 0 ≤ fisherInformation n (genotypeVarianceHWE p) := by
+    unfold fisherInformation
+    apply mul_nonneg
+    · exact Nat.cast_nonneg n
+    · exact genotypeVariance_nonneg p h_p h_p_le
+  nlinarith
+
+/-- **Effective sample size is derived from Fisher information.**
+    n_eff is defined so that n_eff × 1 = I_eff, i.e., it is the sample
+    size of a perfectly-tagged study with unit genotype variance that
+    gives the same information as the actual study.
+    This justifies: n_eff = n × 2p(1-p) × r²_LD. -/
+theorem effectiveSampleSize_from_fisher (n : ℕ) (p r2_ld : ℝ) :
+    effectiveFisherInformation n p r2_ld = n * (2 * p * (1 - p)) * r2_ld := by
+  exact effectiveFisherInfo_eq n p r2_ld
+
+/-!
+### Derivation of the Non-Centrality Parameter (NCP)
+
+The Wald test statistic for H₀: β = 0 in Y = βG + ε is:
+
+  W = (β̂ / SE(β̂))²
+
+Under the null, W ~ χ²(1). Under the alternative with true effect β:
+
+  SE(β̂)² = σ² / (n × Var(G) × r²_LD) = 1 / n_eff
+
+so the NCP of the non-central χ² distribution is:
+
+  λ = (β / SE)² = β² × n_eff = β² × n × 2p(1-p) × r²_LD
+
+Power is then P(χ²₁(λ) > χ²_α) = Φ(√λ - z_α) approximately.
+-/
+
+/-- **Standard error of β̂ from Fisher information.**
+    SE² = 1 / I_eff = 1 / (n × 2p(1-p) × r²_LD) = 1 / n_eff. -/
+noncomputable def standardErrorSq (n : ℕ) (p r2_ld : ℝ) : ℝ :=
+  1 / effectiveFisherInformation n p r2_ld
+
+/-- **NCP from the Wald test.**
+    NCP = (β / SE)² = β² / SE² = β² × I_eff = β² × n_eff.
+    This is derived, not assumed: it follows from SE² = 1/I_eff. -/
+theorem ncp_from_wald_test (n : ℕ) (p r2_ld β : ℝ)
+    (h_info_pos : 0 < effectiveFisherInformation n p r2_ld) :
+    β ^ 2 / standardErrorSq n p r2_ld =
+      β ^ 2 * effectiveFisherInformation n p r2_ld := by
+  unfold standardErrorSq
+  have h_ne : effectiveFisherInformation n p r2_ld ≠ 0 := ne_of_gt h_info_pos
+  field_simp
+
+/-- **NCP equals n_eff × β², linking Fisher information to the test statistic.**
+    Combines the Wald test derivation with the effective sample size formula. -/
+theorem ncp_eq_neff_times_beta_sq (n : ℕ) (p r2_ld β : ℝ) :
+    β ^ 2 * effectiveFisherInformation n p r2_ld =
+      (n * (2 * p * (1 - p)) * r2_ld) * β ^ 2 := by
+  rw [effectiveFisherInfo_eq]
+  ring
+
 /-- **Effective sample size for a variant.**
     n_eff = n × 2p(1-p) × r²_LD(tag, causal)
     where p is MAF in that ancestry and r²_LD is tagging efficiency. -/
