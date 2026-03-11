@@ -285,7 +285,7 @@ theorem ld_reference_sensitivity
     by >10% for some traits. -/
 theorem phenotype_definition_matters
     (port_def1 port_def2 : ℝ)
-    (h_large_diff : 0.1 < |port_def1 - port_def2|) :
+    (h_large_diff : 1/10 < |port_def1 - port_def2|) :
     port_def1 ≠ port_def2 := by
   intro h; rw [h, sub_self, abs_zero] at h_large_diff; linarith
 

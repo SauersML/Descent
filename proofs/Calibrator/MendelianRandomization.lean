@@ -111,7 +111,7 @@ theorem instrument_strength_varies
     with the causal SNP → weaker instrument. -/
 theorem ld_proxy_weakens_cross_ancestry
     (r2_ld_eur r2_ld_afr beta_causal : ℝ)
-    (h_eur : 0.8 < r2_ld_eur) (h_afr : r2_ld_afr < 0.5)
+    (h_eur : 4/5 < r2_ld_eur) (h_afr : r2_ld_afr < 1/2)
     (h_beta : beta_causal ≠ 0) :
     |beta_causal| * r2_ld_afr < |beta_causal| * r2_ld_eur := by
   apply mul_lt_mul_of_pos_left (by linarith)

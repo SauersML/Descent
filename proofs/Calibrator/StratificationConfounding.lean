@@ -442,12 +442,12 @@ theorem larger_sample_more_power
     enormous samples are needed to detect this reliably. -/
 theorem small_effect_needs_large_n
     (r2_effect n_required : ℝ)
-    (h_small : r2_effect ≤ 0.01)
+    (h_small : r2_effect ≤ 1/100)
     (h_formula : n_required ≥ 1 / r2_effect)
     (h_effect_pos : 0 < r2_effect) :
     n_required ≥ 100 := by
   calc n_required ≥ 1 / r2_effect := h_formula
-    _ ≥ 1 / 0.01 := by
+    _ ≥ 1 / (1/100) := by
         exact div_le_div_of_nonneg_left (le_of_lt one_pos) h_effect_pos h_small
     _ = 100 := by norm_num
 

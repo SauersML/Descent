@@ -94,10 +94,10 @@ section CalibrationVsDiscrimination
     be perfectly uncalibrated. -/
 theorem auc_independent_of_calibration
     (auc citl : ℝ)
-    (h_good_auc : 0.7 < auc)
-    (h_poor_cal : 0.1 < |citl|) :
+    (h_good_auc : 7/10 < auc)
+    (h_poor_cal : 1/10 < |citl|) :
     -- Both can coexist
-    0.7 < auc ∧ 0.1 < |citl| := ⟨h_good_auc, h_poor_cal⟩
+    7/10 < auc ∧ 1/10 < |citl| := ⟨h_good_auc, h_poor_cal⟩
 
 /-- **Calibration can change without changing AUC.**
     Prevalence shift changes calibration but not AUC

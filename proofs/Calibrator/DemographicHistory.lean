@@ -249,7 +249,7 @@ section ArchaicIntrogression
 theorem introgression_creates_population_specific_variants
     (pct_eur pct_afr : ℝ)
     (h_eur : 1.5 < pct_eur) (h_eur_lt : pct_eur < 2.5)
-    (h_afr : 0 ≤ pct_afr) (h_afr_lt : pct_afr < 0.5) :
+    (h_afr : 0 ≤ pct_afr) (h_afr_lt : pct_afr < 1/2) :
     pct_afr < pct_eur := by linarith
 
 /-- **Introgressed variants contribute to trait heritability.**
@@ -270,9 +270,9 @@ theorem introgression_portability_gap
 theorem introgression_gap_bounded
     (h2_total h2_intro : ℝ)
     (h_total : 0 < h2_total)
-    (h_small : h2_intro ≤ 0.01 * h2_total)
+    (h_small : h2_intro ≤ (1/100) * h2_total)
     (h_intro_nn : 0 ≤ h2_intro) :
-    h2_intro / h2_total ≤ 0.01 := by
+    h2_intro / h2_total ≤ 1/100 := by
   exact div_le_of_le_mul₀ (le_of_lt h_total) (by norm_num) h_small
 
 end ArchaicIntrogression

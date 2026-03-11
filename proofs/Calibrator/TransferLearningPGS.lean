@@ -65,8 +65,8 @@ theorem divergence_increases_with_fst
     This is the formal explanation for Open Question 2. -/
 theorem lambda_star_trait_specific
     (lambda_height lambda_immune : ℝ)
-    (h_height_small : lambda_height < 0.05)
-    (h_immune_large : 0.2 < lambda_immune) :
+    (h_height_small : lambda_height < 1/20)
+    (h_immune_large : 1/5 < lambda_immune) :
     lambda_height < lambda_immune := by linarith
 
 /-- **Domain adaptation bound is tight for linear hypotheses.**
@@ -74,9 +74,9 @@ theorem lambda_star_trait_specific
     the H-divergence can be estimated from data. -/
 theorem linear_bound_tight
     (bound actual_gap : ℝ)
-    (h_tight : |actual_gap - bound| < 0.1 * bound)
+    (h_tight : |actual_gap - bound| < (1/10) * bound)
     (h_bound_pos : 0 < bound) :
-    actual_gap < 1.1 * bound := by
+    actual_gap < (11/10) * bound := by
   have h := abs_lt.mp h_tight
   linarith [h.1, h.2]
 
@@ -132,7 +132,7 @@ theorem iw_ess_decreases_with_divergence
     This means IW alone cannot fix portability for distant populations. -/
 theorem iw_fails_for_large_divergence
     (ess n : ℝ)
-    (h_ess_tiny : ess < 0.01 * n)
+    (h_ess_tiny : ess < (1/100) * n)
     (h_n : 0 < n) :
     ess < n := by linarith
 
