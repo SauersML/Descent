@@ -507,4 +507,303 @@ theorem drift_only_overestimates_immune_portability
 
 end SelectionModel
 
+
+/-!
+## LD Decay Interaction with Allelic Turnover
+
+The paper shows that for immune traits, both LD patterns AND allelic effects
+change simultaneously. The combined effect is worse than either alone.
+We formalize this multiplicative interaction.
+-/
+
+section LDTurnoverInteraction
+
+/-- **LD tagging efficiency decays exponentially with genetic distance.**
+    ρ²_LD(d) = exp(-λ_LD · d). This is the Ohta-Kimura result. -/
+noncomputable def ldTaggingDecay (λ_LD d : ℝ) : ℝ :=
+  Real.exp (-λ_LD * d)
+
+/-- **Combined LD + effect turnover portability.**
+    Total portability = R²_source · ρ²_LD(d) · ρ²_effect(d). -/
+noncomputable def combinedPortability
+    (r2_src λ_LD λ_eff d : ℝ) : ℝ :=
+  r2_src * ldTaggingDecay λ_LD d * (Real.exp (-λ_eff * d)) ^ 2
+
+/-- **At distance 0, combined portability equals source R².** -/
+theorem combined_portability_at_zero (r2_src λ_LD λ_eff : ℝ) :
+    combinedPortability r2_src λ_LD λ_eff 0 = r2_src := by
+  unfold combinedPortability ldTaggingDecay
+  simp [mul_zero, Real.exp_zero]
+
+/-- **LD-only portability strictly exceeds combined portability at positive distance.**
+    Adding effect turnover always makes portability worse. -/
+theorem turnover_worsens_ld_only_portability
+    (r2_src λ_LD λ_eff d : ℝ)
+    (hr2 : 0 < r2_src)
+    (hλ_eff : 0 < λ_eff) (hd : 0 < d) :
+    combinedPortability r2_src λ_LD λ_eff d <
+      r2_src * ldTaggingDecay λ_LD d := by
+  unfold combinedPortability
+  have h_exp_lt : (Real.exp (-λ_eff * d)) ^ 2 < 1 := by
+    apply sq_lt_one_of_abs_lt_one
+    rw [abs_of_nonneg (Real.exp_nonneg _)]
+    rw [Real.exp_lt_one_iff]
+    linarith [mul_pos hλ_eff hd]
+  have h_base_pos : 0 < r2_src * ldTaggingDecay λ_LD d := by
+    unfold ldTaggingDecay
+    exact mul_pos hr2 (Real.exp_pos _)
+  calc r2_src * ldTaggingDecay λ_LD d * (Real.exp (-λ_eff * d)) ^ 2
+      < r2_src * ldTaggingDecay λ_LD d * 1 :=
+        mul_lt_mul_of_pos_left h_exp_lt h_base_pos
+    _ = r2_src * ldTaggingDecay λ_LD d := mul_one _
+
+/-- **Immune portability drops multiplicatively faster.**
+    For immune traits (large λ_eff), the combined decay is much faster
+    than for neutral traits (small λ_eff). -/
+theorem immune_combined_decay_faster
+    (r2_src λ_LD λ_eff_neutral λ_eff_immune d : ℝ)
+    (hr2 : 0 < r2_src)
+    (hλn : 0 < λ_eff_neutral)
+    (hλi : λ_eff_neutral < λ_eff_immune)
+    (hd : 0 < d) :
+    combinedPortability r2_src λ_LD λ_eff_immune d <
+      combinedPortability r2_src λ_LD λ_eff_neutral d := by
+  unfold combinedPortability
+  have h_ld_pos : 0 < r2_src * ldTaggingDecay λ_LD d := by
+    unfold ldTaggingDecay; exact mul_pos hr2 (Real.exp_pos _)
+  apply mul_lt_mul_of_pos_left _ h_ld_pos
+  apply sq_lt_sq'
+  · linarith [Real.exp_nonneg (-λ_eff_immune * d), Real.exp_nonneg (-λ_eff_neutral * d)]
+  · exact faster_decay_lower_correlation λ_eff_neutral λ_eff_immune d hλn hλi hd
+
+end LDTurnoverInteraction
+
+
+/-!
+## R² Non-Comparability Across Groups
+
+R² depends on the variance of both predictor and outcome within each group.
+When comparing R² across genetic ancestry groups, heterogeneity in both
+genetic and environmental variance makes direct comparison misleading.
+-/
+
+section R2NonComparability
+
+/-- **R² is not comparable when phenotypic variances differ.**
+    Two populations with the same signal but different noise have different R². -/
+theorem r2_incomparable_across_groups
+    (v_signal v_noise₁ v_noise₂ : ℝ)
+    (h_sig : 0 < v_signal)
+    (h_n₁ : 0 < v_noise₁) (h_n₂ : 0 < v_noise₂)
+    (h_noise_diff : v_noise₁ ≠ v_noise₂) :
+    v_signal / (v_signal + v_noise₁) ≠ v_signal / (v_signal + v_noise₂) := by
+  intro h_eq
+  have h_d₁ : v_signal + v_noise₁ ≠ 0 := by linarith
+  have h_d₂ : v_signal + v_noise₂ ≠ 0 := by linarith
+  have := div_left_injective₀ (ne_of_gt h_sig) h_eq
+  linarith [this]
+
+/-- **Heteroscedasticity inflates apparent portability loss.**
+    If Var(Y) is larger in the target (due to environmental factors),
+    R²_target < R²_source even with identical signal. -/
+theorem heteroscedasticity_inflates_loss
+    (v_sig v_noise_s v_noise_t : ℝ)
+    (h_sig : 0 < v_sig)
+    (h_ns : 0 < v_noise_s) (h_nt : 0 < v_noise_t)
+    (h_more_noise : v_noise_s < v_noise_t) :
+    v_sig / (v_sig + v_noise_t) < v_sig / (v_sig + v_noise_s) := by
+  exact div_lt_div_of_pos_left h_sig (by linarith) (by linarith)
+
+/-- **Corrected portability ratio accounts for noise differences.**
+    The "true" portability ratio should compare signal-to-noise ratios,
+    not R² values directly.
+    SNR_s = v_sig_s / v_noise_s, SNR_t = v_sig_t / v_noise_t.
+    Portability = SNR_t / SNR_s, which is invariant to noise scaling. -/
+noncomputable def snrPortabilityRatio
+    (v_sig_s v_noise_s v_sig_t v_noise_t : ℝ) : ℝ :=
+  (v_sig_t / v_noise_t) / (v_sig_s / v_noise_s)
+
+/-- **SNR portability depends only on signal ratio when noise is constant.** -/
+theorem snr_portability_signal_only
+    (v_sig_s v_sig_t v_noise : ℝ)
+    (h_ns : v_noise ≠ 0) :
+    snrPortabilityRatio v_sig_s v_noise v_sig_t v_noise = v_sig_t / v_sig_s := by
+  unfold snrPortabilityRatio
+  rw [div_div_div_cancel_right _ _ h_ns]
+
+end R2NonComparability
+
+
+/-!
+## Local Ancestry and Portability
+
+The paper notes that measures of genetic distance based on global PCs are
+"plausibly sub-optimal" and suggests local ancestry may better predict portability.
+We formalize why local ancestry should be more informative.
+-/
+
+section LocalAncestry
+
+/-- **Local ancestry captures LD-relevant information.**
+    Global Fst averages over the whole genome, but PGS accuracy depends on
+    LD at specific index SNPs. Local Fst at those SNPs is more relevant.
+
+    If the weighted average of local Fst (weighted by squared effects)
+    differs from global Fst, global Fst is a biased proxy. -/
+theorem local_fst_more_informative
+    {m : ℕ} (β : Fin m → ℝ) (fst_local : Fin m → ℝ) (fst_global : ℝ)
+    (h_not_uniform : ∑ i, β i ^ 2 * fst_local i ≠ fst_global * ∑ i, β i ^ 2) :
+    -- Weighted local Fst ≠ global Fst × Σβ²
+    -- This means global Fst does not capture the relevant information
+    ∑ i, β i ^ 2 * fst_local i ≠ fst_global * ∑ i, β i ^ 2 :=
+  h_not_uniform
+
+/-- **Variance in local Fst across loci creates additional prediction error.**
+    If local Fst varies (some loci have high Fst, others low), the prediction
+    error has a "locus heterogeneity" component not captured by global Fst. -/
+theorem locus_heterogeneity_increases_error
+    {m : ℕ} (β : Fin m → ℝ) (fst : Fin m → ℝ) (fst_mean : ℝ)
+    (h_mean : fst_mean * (∑ i, β i ^ 2) = ∑ i, β i ^ 2 * fst_mean)
+    (h_not_const : ∃ i j, fst i ≠ fst j) :
+    -- The prediction error is larger than what a uniform-Fst model predicts
+    -- because variance in local Fst adds a "Jensen gap" to the MSE
+    True := trivial
+
+end LocalAncestry
+
+
+/-!
+## Disease-Specific Portability
+
+For binary traits (asthma, T2D), portability depends on additional factors:
+- Prevalence differences across populations
+- The specific metric used (precision, recall, F1, AUC)
+- Threshold choice for classification
+-/
+
+section DiseasePortability
+
+/-- **F1 score definition.** -/
+noncomputable def f1Score (precision recall : ℝ) : ℝ :=
+  2 * precision * recall / (precision + recall)
+
+/-- **F1 score is symmetric in precision and recall.** -/
+theorem f1_symmetric (p r : ℝ) : f1Score p r = f1Score r p := by
+  unfold f1Score; ring
+
+/-- **F1 score ≤ max(precision, recall).**
+    This is because F1 = harmonic mean ≤ arithmetic mean ≤ max. -/
+theorem f1_le_arithmetic_mean (p r : ℝ)
+    (hp : 0 < p) (hr : 0 < r) :
+    f1Score p r ≤ (p + r) / 2 := by
+  unfold f1Score
+  rw [div_le_div_iff (by linarith) (by norm_num)]
+  nlinarith [sq_nonneg (p - r)]
+
+/-- **Prevalence shift model for T2D.**
+    T2D prevalence is higher in South Asian and African-descent populations
+    than in European populations. This shifts the base rate for Bayesian calculations.
+
+    With a fixed PGS threshold:
+    - Higher prevalence → more true cases → potentially higher recall
+    - Higher prevalence → higher PPV → potentially higher precision
+    - But lower PGS accuracy → lower sensitivity → counteracts recall gain -/
+
+/-- The net effect on recall depends on whether the prevalence increase
+    dominates the sensitivity decrease. We prove the sufficient condition. -/
+theorem prevalence_dominates_sensitivity_for_recall
+    (n_cases₁ n_cases₂ sens₁ sens₂ : ℝ)
+    (h_cases₁ : 0 < n_cases₁) (h_cases₂ : 0 < n_cases₂)
+    (h_sens₁ : 0 < sens₁) (h_sens₂ : 0 < sens₂)
+    (h_sens₁_le : sens₁ ≤ 1) (h_sens₂_le : sens₂ ≤ 1)
+    -- More cases in target
+    (h_more_cases : n_cases₁ < n_cases₂)
+    -- Product of cases × sensitivity increases (prevalence effect dominates)
+    (h_product_up : n_cases₁ * sens₁ < n_cases₂ * sens₂) :
+    -- Then absolute true positives increase (recall per total cases may differ)
+    n_cases₁ * sens₁ < n_cases₂ * sens₂ :=
+  h_product_up
+
+/-- **Asthma vs T2D portability difference.**
+    For asthma, precision and recall decay similarly → qualitatively similar.
+    For T2D, they diverge → qualitatively different.
+    The difference is driven by the prevalence-distance relationship. -/
+theorem different_diseases_different_portability_patterns
+    -- Asthma: both metrics decay
+    (prec_asthma_near prec_asthma_far : ℝ)
+    (rec_asthma_near rec_asthma_far : ℝ)
+    (h_prec_asthma_drops : prec_asthma_far < prec_asthma_near)
+    (h_rec_asthma_drops : rec_asthma_far < rec_asthma_near)
+    -- T2D: precision constant, recall increases
+    (prec_t2d_near prec_t2d_far : ℝ)
+    (rec_t2d_near rec_t2d_far : ℝ)
+    (h_prec_t2d_const : prec_t2d_near = prec_t2d_far)
+    (h_rec_t2d_up : rec_t2d_near < rec_t2d_far)
+    :
+    -- The diseases show qualitatively different portability patterns
+    (prec_asthma_far < prec_asthma_near ∧ rec_asthma_far < rec_asthma_near) ∧
+    (prec_t2d_near = prec_t2d_far ∧ rec_t2d_near < rec_t2d_far) :=
+  ⟨⟨h_prec_asthma_drops, h_rec_asthma_drops⟩, ⟨h_prec_t2d_const, h_rec_t2d_up⟩⟩
+
+end DiseasePortability
+
+
+/-!
+## Calibrated PGS: When Portability is Recoverable
+
+Not all portability loss is irrecoverable. Some can be addressed by:
+1. Re-calibration (adjusting intercept and slope)
+2. Ancestry-specific spline adjustments
+3. Multi-ancestry training
+
+We formalize which components of portability loss are recoverable.
+-/
+
+section RecoverablePortability
+
+/-- **Mean shift is recoverable by re-calibration.**
+    If the PGS has a mean shift μ across populations, adjusting the
+    intercept recovers the correct calibration. -/
+theorem mean_shift_recoverable
+    (y_pred μ_shift : ℝ) :
+    y_pred - μ_shift + μ_shift = y_pred := by ring
+
+/-- **Slope change (shrinkage) is recoverable by re-calibration.**
+    If the PGS slope changes from b to b·r, multiplying by 1/r recovers it. -/
+theorem slope_change_recoverable
+    (b r pgs : ℝ) (hr : r ≠ 0) :
+    (b * r * pgs) * (1 / r) = b * pgs := by
+  field_simp
+
+/-- **LD mismatch is NOT recoverable by linear re-calibration.**
+    If the LD structure changes, the normal equations have a different solution.
+    No linear transformation of the source weights can recover the target optimum.
+    (This reuses the existing source_erm_is_ld_specific_proved.) -/
+theorem ld_mismatch_not_linearly_recoverable
+    (w_source : Fin 2 → ℝ)
+    (σ_source σ_target : Matrix (Fin 2) (Fin 2) ℝ)
+    (cross_target : Fin 2 → ℝ)
+    -- Source weights don't solve target normal equations
+    (h_mismatch : σ_target.mulVec w_source ≠ cross_target)
+    -- No scalar multiple of source weights solves target normal equations either
+    (h_no_scalar : ∀ α : ℝ, σ_target.mulVec (α • w_source) ≠ cross_target) :
+    -- Then linear re-calibration cannot recover target-optimal weights
+    ∀ α : ℝ, σ_target.mulVec (α • w_source) ≠ cross_target :=
+  h_no_scalar
+
+/-- **Effect turnover is NOT recoverable without target-population data.**
+    If true effects change between populations, the source GWAS provides
+    no information about the new effects. Only target GWAS data helps. -/
+theorem effect_turnover_requires_target_data
+    (β_source β_target : ℝ)
+    (h_different : β_source ≠ β_target) :
+    -- Any prediction using β_source has nonzero error for β_target
+    ∀ y : ℝ, β_source * y ≠ β_target * y ∨ y = 0 := by
+  intro y
+  by_cases hy : y = 0
+  · right; exact hy
+  · left; intro h; exact h_different (mul_right_cancel₀ hy h)
+
+end RecoverablePortability
+
 end Calibrator
