@@ -97,13 +97,12 @@ PGS R² scales as ρ(d)², so faster ρ decay → faster R² decay.
 section Question2
 
 /-- **Effect correlation decay model.**
-    Under exponential decay: ρ(d) = exp(-λd). Immune λ >> neutral λ. -/
-
-/-- Faster exponential decay rate implies smaller correlation at any positive distance. -/
+    Under exponential decay: ρ(d) = exp(-lam*d). Immune lam >> neutral lam.
+    Faster exponential decay rate implies smaller correlation at any positive distance. -/
 theorem faster_decay_lower_correlation
     (lam_slow lam_fast d : ℝ)
-    (hλ_slow_pos : 0 < lam_slow)
-    (hλ_faster : lam_slow < lam_fast)
+    (hlam_slow_pos : 0 < lam_slow)
+    (hlam_faster : lam_slow < lam_fast)
     (hd_pos : 0 < d) :
     Real.exp (-lam_fast * d) < Real.exp (-lam_slow * d) := by
   apply Real.exp_lt_exp.mpr
@@ -113,14 +112,14 @@ theorem faster_decay_lower_correlation
 theorem immune_portability_below_neutral
     (r2_source lam_neutral lam_immune d : ℝ)
     (hr2 : 0 < r2_source)
-    (hλn : 0 < lam_neutral) (hλi : lam_neutral < lam_immune)
+    (hlamn : 0 < lam_neutral) (hlami : lam_neutral < lam_immune)
     (hd : 0 < d) :
     r2_source * (Real.exp (-lam_immune * d)) ^ 2 <
       r2_source * (Real.exp (-lam_neutral * d)) ^ 2 := by
   apply mul_lt_mul_of_pos_left _ hr2
   apply sq_lt_sq'
   · linarith [Real.exp_nonneg (-lam_immune * d), Real.exp_nonneg (-lam_neutral * d)]
-  · exact faster_decay_lower_correlation lam_neutral lam_immune d hλn hλi hd
+  · exact faster_decay_lower_correlation lam_neutral lam_immune d hlamn hlami hd
 
 /-- **Heterozygosity increases toward 0.5.**
     Under divergent selection, allele freq p moves from extreme to
@@ -210,7 +209,8 @@ theorem ppv_increases_with_prevalence
   have h_d₁ : 0 < π₁ * s + (1 - π₁) * f := by nlinarith [mul_pos hπ₁ hs, mul_pos (by linarith : (0 : ℝ) < 1 - π₁) hf]
   have h_d₂ : 0 < π₂ * s + (1 - π₂) * f := by nlinarith [mul_pos hπ₂ hs, mul_pos (by linarith : (0 : ℝ) < 1 - π₂) hf]
   rw [div_lt_div_iff₀ h_d₁ h_d₂]
-  nlinarith [mul_pos hπ₁ hs, mul_pos hπ₂ hf]
+  nlinarith [mul_pos hs hf, mul_pos hπ₁ hs, mul_pos hπ₂ hs, mul_pos hπ₁ hf, mul_pos hπ₂ hf,
+             sq_nonneg s, sq_nonneg f, sq_nonneg π₁, sq_nonneg π₂]
 
 /-- **Recall increases when more true cases exceed threshold.**
     With fixed threshold and higher PGS mean among cases: recall ↑. -/
@@ -312,11 +312,10 @@ end Question4
 section Question5
 
 /-- **Winner's curse prediction error model.**
-    GWAS estimate β̂ = β_true + δ (inflation).
-    Target effect β_t = ρ · β_true (turnover).
-    Prediction error = β̂ - β_t = (1-ρ)·β + δ. -/
-
-/-- Prediction error decomposes into turnover + inflation. -/
+    GWAS estimate β_hat = β_true + δ (inflation).
+    Target effect β_t = ρ * β_true (turnover).
+    Prediction error = β_hat - β_t = (1-ρ)*β + δ.
+    Prediction error decomposes into turnover + inflation. -/
 theorem prediction_error_decomp (β δ ρ : ℝ) :
     (β + δ) - ρ * β = (1 - ρ) * β + δ := by ring
 
@@ -334,7 +333,8 @@ theorem relative_error_increases_with_turnover
     (hρ₁ : 0 < ρ₁) (hρ₂ : 0 < ρ₂) (hρ : ρ₂ < ρ₁) (hρ₁_le : ρ₁ ≤ 1) :
     ((1 - ρ₁) * β + δ) / (ρ₁ * β) < ((1 - ρ₂) * β + δ) / (ρ₂ * β) := by
   rw [div_lt_div_iff₀ (mul_pos hρ₁ hβ) (mul_pos hρ₂ hβ)]
-  nlinarith [sq_nonneg β, mul_pos hρ₁ hβ, mul_pos hρ₂ hβ]
+  nlinarith [sq_nonneg β, sq_nonneg δ, mul_pos hρ₁ hβ, mul_pos hρ₂ hβ,
+             mul_pos hβ hδ, mul_pos hρ₁ hδ, mul_pos hρ₂ hδ]
 
 /-- **Heterozygosity increase → PGS variance increase at a single locus.** -/
 theorem het_increase_implies_locus_var_increase
@@ -541,14 +541,14 @@ theorem combined_portability_at_zero (r2_src lam_LD lam_eff : ℝ) :
 theorem turnover_worsens_ld_only_portability
     (r2_src lam_LD lam_eff d : ℝ)
     (hr2 : 0 < r2_src)
-    (hλ_eff : 0 < lam_eff) (hd : 0 < d) :
+    (hlam_eff : 0 < lam_eff) (hd : 0 < d) :
     combinedPortability r2_src lam_LD lam_eff d <
       r2_src * ldTaggingDecay lam_LD d := by
   unfold combinedPortability
   have h_exp_lt : (Real.exp (-lam_eff * d)) ^ 2 < 1 := by
     have h1 : Real.exp (-lam_eff * d) < 1 := by
       rw [Real.exp_lt_one_iff]
-      linarith [mul_pos hλ_eff hd]
+      linarith [mul_pos hlam_eff hd]
     have h2 : 0 ≤ Real.exp (-lam_eff * d) := Real.exp_nonneg _
     nlinarith [sq_abs (Real.exp (-lam_eff * d))]
   have h_base_pos : 0 < r2_src * ldTaggingDecay lam_LD d := by
@@ -565,8 +565,8 @@ theorem turnover_worsens_ld_only_portability
 theorem immune_combined_decay_faster
     (r2_src lam_LD lam_eff_neutral lam_eff_immune d : ℝ)
     (hr2 : 0 < r2_src)
-    (hλn : 0 < lam_eff_neutral)
-    (hλi : lam_eff_neutral < lam_eff_immune)
+    (hlamn : 0 < lam_eff_neutral)
+    (hlami : lam_eff_neutral < lam_eff_immune)
     (hd : 0 < d) :
     combinedPortability r2_src lam_LD lam_eff_immune d <
       combinedPortability r2_src lam_LD lam_eff_neutral d := by
@@ -576,7 +576,7 @@ theorem immune_combined_decay_faster
   apply mul_lt_mul_of_pos_left _ h_ld_pos
   apply sq_lt_sq'
   · linarith [Real.exp_nonneg (-lam_eff_immune * d), Real.exp_nonneg (-lam_eff_neutral * d)]
-  · exact faster_decay_lower_correlation lam_eff_neutral lam_eff_immune d hλn hλi hd
+  · exact faster_decay_lower_correlation lam_eff_neutral lam_eff_immune d hlamn hlami hd
 
 end LDTurnoverInteraction
 
@@ -600,10 +600,11 @@ theorem r2_incomparable_across_groups
     (h_noise_diff : v_noise₁ ≠ v_noise₂) :
     v_signal / (v_signal + v_noise₁) ≠ v_signal / (v_signal + v_noise₂) := by
   intro h_eq
-  have h_d₁ : v_signal + v_noise₁ ≠ 0 := by linarith
-  have h_d₂ : v_signal + v_noise₂ ≠ 0 := by linarith
-  have := div_left_injective₀ (ne_of_gt h_sig) h_eq
-  linarith [this]
+  apply h_noise_diff
+  have h_d₁ : (0 : ℝ) < v_signal + v_noise₁ := by linarith
+  have h_d₂ : (0 : ℝ) < v_signal + v_noise₂ := by linarith
+  have h_cross := (div_eq_div_iff (ne_of_gt h_d₁) (ne_of_gt h_d₂)).mp h_eq
+  nlinarith
 
 /-- **Heteroscedasticity inflates apparent portability loss.**
     If Var(Y) is larger in the target (due to environmental factors),
@@ -631,7 +632,7 @@ theorem snr_portability_signal_only
     (h_ns : v_noise ≠ 0) :
     snrPortabilityRatio v_sig_s v_noise v_sig_t v_noise = v_sig_t / v_sig_s := by
   unfold snrPortabilityRatio
-  rw [div_div_div_cancel_right _ _ h_ns]
+  field_simp
 
 end R2NonComparability
 
@@ -709,9 +710,9 @@ theorem f1_le_arithmetic_mean (p r : ℝ)
     With a fixed PGS threshold:
     - Higher prevalence → more true cases → potentially higher recall
     - Higher prevalence → higher PPV → potentially higher precision
-    - But lower PGS accuracy → lower sensitivity → counteracts recall gain -/
+    - But lower PGS accuracy → lower sensitivity → counteracts recall gain
 
-/-- The net effect on recall depends on whether the prevalence increase
+    The net effect on recall depends on whether the prevalence increase
     dominates the sensitivity decrease. We prove the sufficient condition. -/
 theorem prevalence_dominates_sensitivity_for_recall
     (n_cases₁ n_cases₂ sens₁ sens₂ : ℝ)
