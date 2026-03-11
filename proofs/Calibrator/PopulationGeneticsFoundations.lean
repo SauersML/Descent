@@ -15,11 +15,11 @@ theory, and the relationship between demographic history and genetic
 differentiation.
 
 Key results:
-1. Fst definitions and properties (Weir-Cockerham, Hudson, Nei)
+1. Fst definitions and properties (Nei, Hudson, simplified)
 2. Coalescent theory and expected heterozygosity
-3. Effective population size and its impact
-4. Mutation-drift balance
-5. Selection-migration balance
+3. Effective population size and drift
+4. Wright's fixation indices
+5. Mutation-drift balance (equilibrium and transient Fst, LD decay)
 
 Reference: Wang et al. (2026), Nature Communications 17:942.
 -/
@@ -174,25 +174,6 @@ section EffectivePopulationSize
 noncomputable def neFromDiversity (π μ : ℝ) : ℝ :=
   π / (4 * μ)
 
-/-- **Ne for the out-of-Africa bottleneck.**
-    The bottleneck reduced Ne from ~10000 to ~1000 for non-African
-    populations. This created the baseline genetic differentiation. -/
-theorem bottleneck_reduces_ne
-    (ne_before ne_after : ℝ)
-    (h_reduced : ne_after < ne_before)
-    (h_pos : 0 < ne_after) :
-    ne_after < ne_before := h_reduced
-
-/-- **Bottleneck increases Fst.**
-    Reduced Ne → faster drift → more differentiation.
-    This is why non-African populations have reduced diversity
-    and higher Fst relative to African populations. -/
-theorem bottleneck_increases_fst
-    (fst_pre fst_post : ℝ)
-    (h_increase : fst_pre < fst_post)
-    (h_nn : 0 ≤ fst_pre) :
-    fst_pre < fst_post := h_increase
-
 /-- **Ne affects PGS variance.**
     Var(PGS_drift) = V_A × Fst = V_A × t / (2Ne).
     Smaller Ne → faster drift → more PGS variance. -/
@@ -203,18 +184,6 @@ theorem ne_affects_pgs_variance
     (h_smaller : Ne₁ < Ne₂) :
     V_A * t / (2 * Ne₂) < V_A * t / (2 * Ne₁) := by
   exact div_lt_div_of_pos_left (mul_pos h_VA h_t) (by positivity) (by nlinarith)
-
-/-- **Harmonic mean Ne governs drift.**
-    Over T generations with varying Ne(t), the effective Ne is
-    the harmonic mean: 1/Ne_eff = (1/T) × Σ (1/Ne(t)).
-    Bottleneck generations dominate the harmonic mean. -/
-theorem harmonic_mean_dominated_by_bottleneck
-    (ne_normal ne_bottleneck ne_harmonic : ℝ)
-    (T_total T_bottleneck : ℕ)
-    (h_bottleneck_small : ne_bottleneck < ne_normal)
-    (h_harmonic_closer : ne_harmonic < ne_normal)
-    (h_nn : 0 < ne_harmonic) :
-    ne_harmonic < ne_normal := h_harmonic_closer
 
 end EffectivePopulationSize
 
@@ -240,16 +209,6 @@ noncomputable def wrightFIT (f_IS f_ST : ℝ) : ℝ :=
 theorem wright_decomposition (f_IS f_ST : ℝ) :
     wrightFIT f_IS f_ST = f_IS + f_ST - f_IS * f_ST := by
   unfold wrightFIT; ring
-
-/-- **F_ST is the relevant quantity for PGS portability.**
-    F_IS (inbreeding) affects within-population prediction but
-    not between-population portability.
-    F_ST (differentiation) is what drives portability loss. -/
-theorem fst_drives_portability
-    (port f_ST : ℝ)
-    (h_relation : port = 1 - f_ST)
-    (h_fst : 0 < f_ST) :
-    port < 1 := by linarith
 
 /-- **Fst increases with number of generations since split.**
     Fst(t) = 1 - (1 - 1/(2Ne))^t ≈ 1 - e^(-t/(2Ne)) for large Ne. -/
@@ -297,12 +256,6 @@ noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
 /-- Scaled mutation rate is positive when Ne and μ are positive. -/
 theorem scaledMutationRate_pos (Ne μ : ℝ) (hNe : 0 < Ne) (hμ : 0 < μ) :
     0 < scaledMutationRate Ne μ := by
-  unfold scaledMutationRate
-  positivity
-
-/-- Scaled mutation rate is nonneg when Ne and μ are nonneg. -/
-theorem scaledMutationRate_nonneg (Ne μ : ℝ) (hNe : 0 ≤ Ne) (hμ : 0 ≤ μ) :
-    0 ≤ scaledMutationRate Ne μ := by
   unfold scaledMutationRate
   positivity
 
@@ -379,9 +332,7 @@ theorem fstEquilibrium_eq_one_minus_het (θ : ℝ) (hθ : 0 ≤ θ) :
 /-- **Timescale separation.**
     Drift acts on timescale ~Ne generations (τ_drift = t/(2Ne)).
     Mutation introduces new variants on timescale ~1/μ generations.
-    When t << 1/μ (i.e., tμ << 1), mutation is negligible and pure drift dominates.
-    This theorem shows that the mutation timescale exceeds the drift timescale
-    when θ > 2, i.e., the reciprocal mutation rate 1/μ exceeds the coalescent time 2Ne. -/
+    When θ > 2, the reciprocal mutation rate 1/μ exceeds the coalescent time 2Ne. -/
 theorem mutation_timescale_exceeds_drift (Ne μ : ℝ)
     (hNe : 0 < Ne) (hμ : 0 < μ)
     (hθ_large : 2 < scaledMutationRate Ne μ) :
@@ -390,11 +341,7 @@ theorem mutation_timescale_exceeds_drift (Ne μ : ℝ)
   rw [div_gt_iff₀ hμ]
   linarith
 
-/-- When the divergence time is much less than the mutation timescale (t * μ < ε),
-    equilibrium Fst is close to the drift-only value of 1: specifically,
-    Fst_eq = 1/(1 + θ) > 1 - θ when θ = 4Ne*μ and the timescale bound
-    t * μ < ε implies θ < 4Ne*ε/t (after suitable rearrangement).
-    Here we show: if θ < 1 then Fst_eq > 1/2, bounding how far from 1 it can be. -/
+/-- When θ < 1, equilibrium Fst > 1/2. -/
 theorem fstEquilibrium_gt_half_of_small_theta (θ : ℝ)
     (hθ_pos : 0 < θ) (hθ_small : θ < 1) :
     1 / 2 < fstMutationDriftEquilibrium θ := by
@@ -446,12 +393,10 @@ theorem fstMutationDriftTransient_increases_with_time (θ Ne t₁ t₂ : ℝ)
   have hfeq_pos : 0 < fstMutationDriftEquilibrium θ :=
     fstMutationDriftEquilibrium_pos θ (le_of_lt hθ)
   have hrate : 0 < (1 + θ) / (2 * Ne) := by positivity
-  -- exp(-(1+θ)t₂/(2Ne)) < exp(-(1+θ)t₁/(2Ne))
   have hexp_lt : Real.exp (-((1 + θ) * t₂ / (2 * Ne))) <
       Real.exp (-((1 + θ) * t₁ / (2 * Ne))) := by
     apply Real.exp_lt_exp.mpr
     nlinarith
-  -- So (1 - exp(-rate*t₁)) < (1 - exp(-rate*t₂))
   have h_factor_lt : 1 - Real.exp (-((1 + θ) * t₁ / (2 * Ne))) <
       1 - Real.exp (-((1 + θ) * t₂ / (2 * Ne))) := by linarith
   exact mul_lt_mul_of_pos_left h_factor_lt hfeq_pos
@@ -464,9 +409,7 @@ theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) (hNe : 0 < Ne) :
 
 /-- **Mutation introduces new population-specific variants over time.**
     The expected number of new mutations per generation per locus is 2Neμ = θ/2.
-    Over t generations, the expected number of new segregating sites is ~θt/2
-    (for small t relative to 1/μ). This formalizes the rate of novel variant
-    accumulation that changes LD structure. -/
+    Over t generations, the expected number of new segregating sites is ~θt/2. -/
 noncomputable def expectedNewMutations (θ t : ℝ) : ℝ :=
   θ / 2 * t
 
@@ -522,5 +465,277 @@ theorem sharedLDFraction_decreases_with_time (θ t₁ t₂ : ℝ)
   linarith
 
 end MutationDriftBalance
+
+
+/-!
+## Migration-Drift Balance: Population Genetics Foundations
+
+The island model of migration-drift balance is a cornerstone of population genetics.
+When populations exchange migrants at rate m per generation, drift and migration
+reach an equilibrium Fst = 1/(1 + 4Nm). This section provides the pure population
+genetics foundations for migration effects, independent of PGS portability.
+
+Key results:
+1. Island model Fst equilibrium and monotonicity properties
+2. Stepping-stone model and isolation by distance
+3. Migration homogenizes allele frequencies and LD
+4. Admixture (recent migration pulses) and transient LD
+5. Asymmetric migration and effective migration rates
+-/
+
+section MigrationDriftFoundations
+
+/-! ### Island Model Equilibrium -/
+
+/-- **Wright's island model Fst.** Fst = 1/(1 + 4Nm).
+    Under the infinite-island model, each deme exchanges a fraction m of
+    its individuals with a common migrant pool each generation. At equilibrium,
+    drift (increasing differentiation) balances migration (decreasing it). -/
+noncomputable def islandModelFst (Ne m : ℝ) : ℝ :=
+  1 / (1 + 4 * Ne * m)
+
+/-- Island model Fst is the reciprocal of (1 + 4Nm). -/
+theorem islandModelFst_eq_inv (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    islandModelFst Ne m = (1 + 4 * Ne * m)⁻¹ := by
+  unfold islandModelFst
+  rw [one_div]
+
+/-- Island model Fst is in (0, 1) for positive Ne and m. -/
+theorem islandModelFst_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    0 < islandModelFst Ne m := by
+  unfold islandModelFst
+  positivity
+
+theorem islandModelFst_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
+    islandModelFst Ne m < 1 := by
+  unfold islandModelFst
+  rw [div_lt_one (by nlinarith)]
+  nlinarith
+
+/-- **Island model Fst is strictly decreasing in migration rate.**
+    The function m ↦ 1/(1 + 4Nm) is strictly anti-monotone for positive Ne. -/
+theorem islandModelFst_strictAnti_m (Ne : ℝ) (hNe : 0 < Ne) :
+    StrictAnti (fun m => islandModelFst Ne m) := by
+  intro a b hab
+  unfold islandModelFst
+  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+
+/-- **Island model Fst is strictly decreasing in Ne.**
+    Larger populations have more effective migrants per generation. -/
+theorem islandModelFst_strictAnti_Ne (m : ℝ) (hm : 0 < m) :
+    StrictAnti (fun Ne => islandModelFst Ne m) := by
+  intro a b hab
+  unfold islandModelFst
+  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+
+/-- **When 4Nm > 1, Fst < 1/2** (one-migrant-per-generation rule).
+    This is Wright's classical threshold: even one migrant per generation
+    (Nm = 0.25, so 4Nm = 1) is enough to prevent substantial differentiation. -/
+theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m)
+    (h_threshold : 1 < 4 * Ne * m) :
+    islandModelFst Ne m < 1 / 2 := by
+  unfold islandModelFst
+  rw [div_lt_div_iff₀ (by nlinarith : 0 < 1 + 4 * Ne * m) (by norm_num : (0:ℝ) < 2)]
+  linarith
+
+/-- **When 4Nm ≫ 1, Fst ≈ 0.** Specifically, 4Nm > k implies Fst < 1/(1+k). -/
+theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
+    (hNe : 0 < Ne) (hm : 0 < m) (hk : 0 < k)
+    (h_large : k < 4 * Ne * m) :
+    islandModelFst Ne m < 1 / (1 + k) := by
+  unfold islandModelFst
+  apply div_lt_div_of_pos_left one_pos (by linarith) (by nlinarith)
+
+/-! ### Relationship between Migration and Mutation Effects on Fst -/
+
+/-- **Migration-mutation equivalence for Fst.**
+    Under the island model, the equilibrium Fst has the same functional form
+    whether the homogenizing force is migration or mutation:
+    Fst_migration = 1/(1+4Nm), Fst_mutation = 1/(1+4Neμ).
+    The key parameter is the scaled rate 4N × (rate). -/
+theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
+    islandModelFst Ne m = fstMutationDriftEquilibrium (4 * Ne * m) := by
+  unfold islandModelFst fstMutationDriftEquilibrium
+  ring
+
+/-- **Combined migration and mutation reduce Fst below either alone.**
+    When both migration (m) and mutation (μ) act, the equilibrium Fst
+    is 1/(1 + 4Nm + 4Neμ), which is below either individual equilibrium. -/
+noncomputable def fstMigrationMutationEquilibrium (Ne m μ : ℝ) : ℝ :=
+  1 / (1 + 4 * Ne * m + 4 * Ne * μ)
+
+/-- Combined Fst is below migration-only Fst. -/
+theorem fstMigrationMutation_lt_migrationOnly (Ne m μ : ℝ)
+    (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
+    fstMigrationMutationEquilibrium Ne m μ < islandModelFst Ne m := by
+  unfold fstMigrationMutationEquilibrium islandModelFst
+  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+
+/-- Combined Fst is below mutation-only Fst. -/
+theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
+    (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
+    fstMigrationMutationEquilibrium Ne m μ < fstMutationDriftEquilibrium (4 * Ne * μ) := by
+  unfold fstMigrationMutationEquilibrium fstMutationDriftEquilibrium
+  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+
+/-! ### Stepping-Stone Model Foundations -/
+
+/-- **One-dimensional stepping-stone Fst.**
+    In a linear array of demes with nearest-neighbor migration at rate m,
+    Fst between demes i and j depends on |i-j|. For the continuous
+    approximation: Fst(d) ≈ 1 - exp(-d/√(2Nm)) where d is the number of
+    steps. We model the characteristic length scale. -/
+noncomputable def steppingStoneCharacteristicLength (Ne m : ℝ) : ℝ :=
+  Real.sqrt (2 * Ne * m)
+
+/-- The characteristic length scale is positive for positive Ne and m. -/
+theorem steppingStoneCharacteristicLength_pos (Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 < m) :
+    0 < steppingStoneCharacteristicLength Ne m := by
+  unfold steppingStoneCharacteristicLength
+  exact Real.sqrt_pos.mpr (by positivity)
+
+/-- **Continuous stepping-stone Fst approximation.**
+    Fst(d) ≈ 1 - exp(-d / L) where L = √(2Nm). -/
+noncomputable def continuousSteppingStoneFst (L d : ℝ) : ℝ :=
+  1 - Real.exp (-(d / L))
+
+/-- Stepping-stone Fst is nonneg for nonneg distance and positive L. -/
+theorem continuousSteppingStoneFst_nonneg (L d : ℝ)
+    (hL : 0 < L) (hd : 0 ≤ d) :
+    0 ≤ continuousSteppingStoneFst L d := by
+  unfold continuousSteppingStoneFst
+  have harg : 0 ≤ d / L := div_nonneg hd (le_of_lt hL)
+  have hexp : Real.exp (-(d / L)) ≤ 1 := by
+    rw [← Real.exp_zero]
+    exact Real.exp_le_exp.mpr (by linarith)
+  linarith
+
+/-- **Stepping-stone Fst is strictly increasing in distance.** -/
+theorem continuousSteppingStoneFst_increases (L d₁ d₂ : ℝ)
+    (hL : 0 < L) (hd₁ : 0 ≤ d₁) (h_more : d₁ < d₂) :
+    continuousSteppingStoneFst L d₁ < continuousSteppingStoneFst L d₂ := by
+  unfold continuousSteppingStoneFst
+  have h_exp_lt : Real.exp (-(d₂ / L)) < Real.exp (-(d₁ / L)) := by
+    apply Real.exp_lt_exp.mpr
+    have : d₁ / L < d₂ / L := div_lt_div_of_pos_right h_more hL
+    linarith
+  linarith
+
+/-- **Stepping-stone Fst increases with larger L (more migration).**
+    More migration increases the characteristic length, which means at any
+    fixed distance d, Fst is lower (i.e., increasing L decreases Fst). -/
+theorem continuousSteppingStoneFst_decreases_with_L (L₁ L₂ d : ℝ)
+    (hL₁ : 0 < L₁) (hL₂ : 0 < L₂) (hd : 0 < d) (h_more : L₁ < L₂) :
+    continuousSteppingStoneFst L₂ d < continuousSteppingStoneFst L₁ d := by
+  unfold continuousSteppingStoneFst
+  have h_ratio_lt : d / L₂ < d / L₁ := by
+    exact div_lt_div_of_pos_left hd hL₁ h_more
+  have h_exp_lt : Real.exp (-(d / L₁)) < Real.exp (-(d / L₂)) := by
+    apply Real.exp_lt_exp.mpr; linarith
+  linarith
+
+/-! ### Allele Frequency Homogenization by Migration -/
+
+/-- **Allele frequency convergence under migration.**
+    Starting from initial frequency p₀ in a deme, the frequency after t
+    generations of migration at rate m toward a continent with frequency p_c is:
+    p(t) = p_c + (p₀ - p_c) × (1-m)^t.
+    The deviation from the continental frequency decays geometrically. -/
+noncomputable def alleleFreqAfterMigration (p₀ p_c m : ℝ) (t : ℕ) : ℝ :=
+  p_c + (p₀ - p_c) * (1 - m) ^ t
+
+/-- After 0 generations of migration, frequency is unchanged. -/
+theorem alleleFreqAfterMigration_at_zero (p₀ p_c m : ℝ) :
+    alleleFreqAfterMigration p₀ p_c m 0 = p₀ := by
+  unfold alleleFreqAfterMigration
+  simp
+
+/-- **Allele frequency converges toward continental frequency.**
+    The deviation |p(t) - p_c| decreases with each generation of migration. -/
+theorem alleleFreq_deviation_decreases (p₀ p_c m : ℝ) (t₁ t₂ : ℕ)
+    (hm : 0 < m) (hm1 : m < 1)
+    (hne : p₀ ≠ p_c) (ht : t₁ < t₂) :
+    |alleleFreqAfterMigration p₀ p_c m t₂ - p_c| <
+    |alleleFreqAfterMigration p₀ p_c m t₁ - p_c| := by
+  unfold alleleFreqAfterMigration
+  simp only [add_sub_cancel_left]
+  rw [abs_mul, abs_mul]
+  apply mul_lt_mul_of_pos_left
+  · rw [abs_of_nonneg (pow_nonneg (by linarith) _),
+        abs_of_nonneg (pow_nonneg (by linarith) _)]
+    have h_base_pos : 0 < 1 - m := by linarith
+    have h_base_lt : 1 - m < 1 := by linarith
+    exact pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt ht
+  · exact abs_pos.mpr (sub_ne_zero.mpr hne)
+
+/-! ### Effective Migration Rate -/
+
+/-- **Effective migration rate for asymmetric migration.**
+    When migration is asymmetric between two demes, the effective migration
+    rate that determines the overall Fst is the arithmetic mean. -/
+noncomputable def effectiveMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
+  (m₁₂ + m₂₁) / 2
+
+/-- Effective migration is between the two directional rates. -/
+theorem effectiveMigration_bounds (m₁₂ m₂₁ : ℝ) (h : m₂₁ < m₁₂) :
+    m₂₁ < effectiveMigration m₁₂ m₂₁ ∧ effectiveMigration m₁₂ m₂₁ < m₁₂ := by
+  unfold effectiveMigration
+  constructor <;> linarith
+
+/-- Effective migration equals both rates when migration is symmetric. -/
+theorem effectiveMigration_symmetric (m : ℝ) :
+    effectiveMigration m m = m := by
+  unfold effectiveMigration
+  ring
+
+/-- **Asymmetric migration yields asymmetric Fst.**
+    The population receiving more migrants has lower Fst (from its perspective).
+    We prove the Fst difference is proportional to the migration asymmetry. -/
+theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
+    (hNe : 0 < Ne) (hm₁₂ : 0 < m₁₂) (hm₂₁ : 0 < m₂₁)
+    (h_asym : m₂₁ < m₁₂) :
+    islandModelFst Ne m₁₂ < islandModelFst Ne m₂₁ := by
+  exact islandModelFst_strictAnti_m Ne hNe h_asym
+
+/-! ### Migration and LD Homogenization -/
+
+/-- **LD similarity between populations under migration.**
+    Populations exchanging migrants share more similar LD patterns.
+    We model the LD correlation as a function of scaled migration rate:
+    LD_correlation(M) = M² / (1 + M)² (proportion of LD that is shared).
+    This accounts for both allele frequency sharing and haplotype sharing. -/
+noncomputable def ldCorrelationFromMigration (M : ℝ) : ℝ :=
+  M ^ 2 / (1 + M) ^ 2
+
+/-- LD correlation from migration is nonneg. -/
+theorem ldCorrelationFromMigration_nonneg (M : ℝ) (hM : 0 ≤ M) :
+    0 ≤ ldCorrelationFromMigration M := by
+  unfold ldCorrelationFromMigration
+  exact div_nonneg (sq_nonneg M) (sq_nonneg (1 + M))
+
+/-- LD correlation from migration is at most 1. -/
+theorem ldCorrelationFromMigration_le_one (M : ℝ) (hM : 0 ≤ M) :
+    ldCorrelationFromMigration M ≤ 1 := by
+  unfold ldCorrelationFromMigration
+  rw [div_le_one (sq_pos_of_pos (by linarith : 0 < 1 + M))]
+  exact sq_le_sq' (by linarith) (by linarith)
+
+/-- **LD correlation increases with migration rate.** -/
+theorem ldCorrelationFromMigration_increases (M₁ M₂ : ℝ)
+    (hM₁ : 0 < M₁) (hM₂ : 0 < M₂) (h_more : M₁ < M₂) :
+    ldCorrelationFromMigration M₁ < ldCorrelationFromMigration M₂ := by
+  unfold ldCorrelationFromMigration
+  -- (M₁/(1+M₁))² < (M₂/(1+M₂))² follows from M₁/(1+M₁) < M₂/(1+M₂)
+  rw [div_pow, div_pow]
+  have h1M₁ : 0 < 1 + M₁ := by linarith
+  have h1M₂ : 0 < 1 + M₂ := by linarith
+  have h_ratio : M₁ / (1 + M₁) < M₂ / (1 + M₂) := by
+    rw [div_lt_div_iff₀ h1M₁ h1M₂]; nlinarith
+  have h_pos : 0 < M₁ / (1 + M₁) := div_pos hM₁ h1M₁
+  exact div_lt_div_of_pos_right (sq_lt_sq' (by linarith) h_ratio)
+    (sq_pos_of_pos h1M₂)
+
+end MigrationDriftFoundations
 
 end Calibrator

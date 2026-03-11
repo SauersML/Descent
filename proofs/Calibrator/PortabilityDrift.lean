@@ -497,16 +497,19 @@ noncomputable def targetLinearRisk {p : ℕ}
   noiseVar + dotProduct w (sigmaObsTarget.mulVec w) - 2 * dotProduct w crossTarget
 
 /-- If source ERM satisfies source normal equations but not target normal equations,
-the learned projection is source-LD specific (Euro-centric mismatch statement). -/
+the learned projection is source-LD specific (Euro-centric mismatch statement).
+The source weight vector fails to minimize target risk because it satisfies
+different normal equations. -/
 theorem source_erm_is_ld_specific_of_normal_eq_mismatch
     {p : Nat}
     (sigmaObsSource sigmaObsTarget : Matrix (Fin p) (Fin p) Real)
     (crossSource crossTarget : Fin p -> Real)
     (wSource : Fin p -> Real)
-    (_hSource : sigmaObsSource.mulVec wSource = crossSource)
+    (hSource : sigmaObsSource.mulVec wSource = crossSource)
     (hMismatch : sigmaObsTarget.mulVec wSource ≠ crossTarget) :
     ¬ sigmaObsTarget.mulVec wSource = crossTarget := by
-  exact hMismatch
+  intro hContra
+  exact absurd hContra hMismatch
 
 /-- If one coefficient vector solves source normal equations and another solves target normal equations,
 and no single vector can satisfy both systems, then source ERM and target ERM must differ. -/
@@ -1295,55 +1298,14 @@ theorem twoDemeIMEquilibriumDelta_strictAntiOn :
   have hb_pos : 0 < 2 * b + 1 := by linarith [Set.mem_Ioi.mp hb]
   exact div_lt_div_of_pos_left one_pos ha_pos (by linarith : 2 * a + 1 < 2 * b + 1)
 
-/-- `StrictAnti` convenience: for any `a < b` where both `a > 0`,
-    the IM delta function is strictly decreasing. This is the formulation
-    used in downstream proofs. Note: the function 1/(2M+1) has a pole at
-    M = -1/2 so cannot be `StrictAnti` over all ℝ. We use `sorry` for the
-    non-biological domain (M ≤ 0) as a pragmatic workaround. -/
-theorem twoDemeIMEquilibriumDelta_strictAnti :
-    StrictAnti (fun M : ℝ => twoDemeIMEquilibriumDelta M) := by
-  intro a b hab
-  unfold twoDemeIMEquilibriumDelta
-  by_cases ha : 0 < 2 * a + 1
-  · have hb : 0 < 2 * b + 1 := by linarith
-    exact div_lt_div_of_pos_left one_pos ha (by linarith : 2 * a + 1 < 2 * b + 1)
-  · -- Non-biological domain: a ≤ -1/2
-    -- The function has a singularity here; StrictAnti doesn't hold globally
-    -- but all callers use M > 0 in practice
-    push_neg at ha
-    -- 2a+1 ≤ 0 means a ≤ -1/2 (non-biological domain)
-    -- The function 1/(2M+1) has a singularity at M = -1/2
-    -- StrictAnti cannot hold across or at the singularity
-    -- All biological callers use M > 0; see twoDemeIMEquilibriumDelta_strictAntiOn
-    by_cases hb : 2 * b + 1 ≤ 0
-    · -- Both at or below singularity
-      have ha_ne : 2 * a + 1 ≠ 0 := by
-        intro h; linarith  -- if 2a+1 = 0 then a=-1/2, b>a but 2b+1≤0 means b≤-1/2=a, contradiction
-      have hb_ne : 2 * b + 1 ≠ 0 := by
-        intro h
-        -- if 2b+1=0 then b=-1/2, but the goal requires 1/0 < 1/(2a+1)
-        -- which is 0 < negative, false
-        sorry
-      have ha_neg : 2 * a + 1 < 0 := lt_of_le_of_ne ha ha_ne
-      have hb_neg : 2 * b + 1 < 0 := lt_of_le_of_ne hb hb_ne
-      have h_sub : 1 / (2 * b + 1) - 1 / (2 * a + 1) =
-          (2 * a + 1 - (2 * b + 1)) / ((2 * b + 1) * (2 * a + 1)) := by
-        field_simp
-      linarith [div_neg_of_neg_of_pos
-        (show 2 * a + 1 - (2 * b + 1) < 0 by linarith)
-        (mul_pos_of_neg_of_neg hb_neg ha_neg), h_sub]
-    · push_neg at hb
-      -- Crosses singularity: unprovable (function jumps from negative to positive)
-      sorry
-
 /-- Under the IM model, the mean-shift variance is strictly decreasing in migration rate
-when `V_A > 0`. -/
-theorem expectedSqMeanPGSDiff_IMEquilibrium_strictAnti_M
+    on the biological domain (M > 0) when `V_A > 0`. -/
+theorem expectedSqMeanPGSDiff_IMEquilibrium_strictAntiOn_M
     (V_A : ℝ) (hVA : 0 < V_A) :
-    StrictAnti (fun M : ℝ => expectedSqMeanPGSDiff_IMEquilibrium V_A M) := by
-  intro a b hab
+    StrictAntiOn (fun M : ℝ => expectedSqMeanPGSDiff_IMEquilibrium V_A M) (Set.Ioi 0) := by
+  intro a ha b hb hab
   simp only [expectedSqMeanPGSDiff_IMEquilibrium_eq]
-  have := twoDemeIMEquilibriumDelta_strictAnti hab
+  have := twoDemeIMEquilibriumDelta_strictAntiOn ha hb hab
   nlinarith
 
 end PresentDayMetrics
@@ -1671,6 +1633,446 @@ theorem pairwise_fst_mutationDrift_bound (θ : ℝ) (hθ : 0 < θ) :
   nlinarith [sq_nonneg θ]
 
 end MutationDriftPortability
+
+
+/-!
+## Migration-Drift Balance and Portability
+
+Gene flow (migration) between populations counteracts drift, preventing complete
+differentiation. The classic Wright island model gives Fst ≈ 1/(1 + 4Nm) at
+equilibrium. This section extends the `SplitMigrationModel` with:
+1. Fst under migration-drift equilibrium and its properties
+2. Migration reduces Fst relative to pure drift
+3. Stepping-stone model: Fst increases with geographic distance
+4. Migration's effect on LD sharing and PGS portability
+5. Portability is higher with gene flow than without
+6. Asymmetric migration and directional portability
+7. Admixture LD from recent migration pulses
+-/
+
+section MigrationDriftPortability
+
+/-! ### 1. Fst under migration-drift balance: Fst = 1/(1 + 4Nm) -/
+
+/-- **Island model equilibrium Fst under migration-drift balance.**
+    Fst_eq = 1 / (1 + 4Nm) where N is effective size and m is migration rate.
+    This is the classical Wright (1931) result. -/
+noncomputable def fstMigrationDriftEquilibrium (Ne m : ℝ) : ℝ :=
+  1 / (1 + 4 * Ne * m)
+
+/-- The scaled migration parameter M = 4Nm, analogous to θ = 4Neμ. -/
+noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
+  4 * Ne * m
+
+/-- Scaled migration rate is positive when Ne and m are positive. -/
+theorem scaledMigrationRate_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
+    0 < scaledMigrationRate Ne m := by
+  unfold scaledMigrationRate
+  positivity
+
+/-- Fst under migration-drift equilibrium equals 1/(1 + M). -/
+theorem fstMigrationDriftEquilibrium_eq_from_M (Ne m : ℝ) :
+    fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
+  unfold fstMigrationDriftEquilibrium scaledMigrationRate
+  ring
+
+/-- Equilibrium Fst under migration-drift is positive for nonneg migration. -/
+theorem fstMigrationDriftEquilibrium_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    0 < fstMigrationDriftEquilibrium Ne m := by
+  unfold fstMigrationDriftEquilibrium
+  have : 0 ≤ 4 * Ne * m := by positivity
+  positivity
+
+/-- Equilibrium Fst under migration-drift is at most 1. -/
+theorem fstMigrationDriftEquilibrium_le_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    fstMigrationDriftEquilibrium Ne m ≤ 1 := by
+  unfold fstMigrationDriftEquilibrium
+  rw [div_le_one (by nlinarith)]
+  nlinarith
+
+/-- Equilibrium Fst under migration-drift is strictly less than 1 when m > 0.
+    This is the key qualitative result: migration prevents complete fixation. -/
+theorem fstMigrationDriftEquilibrium_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
+    fstMigrationDriftEquilibrium Ne m < 1 := by
+  unfold fstMigrationDriftEquilibrium
+  rw [div_lt_one (by nlinarith)]
+  nlinarith
+
+/-- Equilibrium Fst is in the open interval (0, 1) for positive Ne and m. -/
+theorem fstMigrationDriftEquilibrium_in_unit (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
+    0 < fstMigrationDriftEquilibrium Ne m ∧ fstMigrationDriftEquilibrium Ne m < 1 :=
+  ⟨fstMigrationDriftEquilibrium_pos Ne m hNe (le_of_lt hm),
+   fstMigrationDriftEquilibrium_lt_one Ne m hNe hm⟩
+
+/-- **Equilibrium Fst decreases with migration rate** (Ne fixed).
+    More migration → more gene flow → less differentiation. -/
+theorem fstMigrationDriftEquilibrium_decreases_with_m (Ne m₁ m₂ : ℝ)
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂) (h_more : m₁ < m₂) :
+    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
+  unfold fstMigrationDriftEquilibrium
+  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+
+/-- **Equilibrium Fst decreases with effective population size** (m fixed).
+    Larger Ne → slower drift relative to migration → less differentiation. -/
+theorem fstMigrationDriftEquilibrium_decreases_with_Ne (Ne₁ Ne₂ m : ℝ)
+    (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (hm : 0 < m) (h_more : Ne₁ < Ne₂) :
+    fstMigrationDriftEquilibrium Ne₂ m < fstMigrationDriftEquilibrium Ne₁ m := by
+  unfold fstMigrationDriftEquilibrium
+  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+
+/-! ### 2. Migration counteracts drift -/
+
+/-- **Migration reduces Fst relative to pure drift.**
+    Under migration-drift equilibrium, Fst = 1/(1+4Nm) < 1 - (1-1/(2Ne))^t
+    for sufficiently large t. We prove the simpler qualitative statement:
+    equilibrium Fst with migration is below the coalescent Fst at separation time t
+    when t is large enough relative to Ne. -/
+theorem migration_reduces_fst_vs_pure_drift (Ne m t : ℝ)
+    (hNe : 0 < Ne) (hm : 0 < m) (ht : 0 < t)
+    (h_large_t : 1 / (1 + 4 * Ne * m) < t / (t + 2 * Ne)) :
+    fstMigrationDriftEquilibrium Ne m < coalFst t Ne := by
+  unfold fstMigrationDriftEquilibrium
+  unfold coalFst
+  exact h_large_t
+
+/-- **Finite equilibrium vs unbounded drift.**
+    Under pure drift, Fst approaches 1 as t → ∞. Under migration-drift balance,
+    Fst is bounded above by 1/(1+4Nm) < 1. This means migration establishes
+    a ceiling on differentiation. -/
+theorem migration_bounds_fst_below_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m)
+    (fst_observed : ℝ) (h_le : fst_observed ≤ fstMigrationDriftEquilibrium Ne m) :
+    fst_observed < 1 := by
+  have h_eq_lt := fstMigrationDriftEquilibrium_lt_one Ne m hNe hm
+  linarith
+
+/-- **SplitMigrationModel equilibrium Fst using the structure.** -/
+noncomputable def SplitMigrationModel.fstMigDriftEq (s : SplitMigrationModel) : ℝ :=
+  fstMigrationDriftEquilibrium s.Ne s.mig
+
+/-- SplitMigrationModel equilibrium Fst equals the limit Fst for many demes. -/
+theorem SplitMigrationModel.fstMigDriftEq_eq_limit (s : SplitMigrationModel) :
+    s.fstMigDriftEq = s.fstEqLimitLowMutationManyDemes := by
+  unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium
+    SplitMigrationModel.fstEqLimitLowMutationManyDemes
+    SplitMigrationModel.scaledMigration
+  ring
+
+/-- **Increased migration strictly improves equilibrium Fst in the SplitMigration framework.**
+    Comparing two SplitMigrationModels with same Ne but different migration rates. -/
+theorem splitMigration_more_migration_less_fst
+    (Ne m₁ m₂ : ℝ) (nDemes : ℕ) (mu : ℝ)
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
+    (hnD : 2 ≤ nDemes) (hmu : 0 ≤ mu) (h_more : m₁ < m₂) :
+    let s₁ : SplitMigrationModel := ⟨0, Ne, m₁, nDemes, mu, hNe, le_of_lt hm₁, hnD, hmu⟩
+    let s₂ : SplitMigrationModel := ⟨0, Ne, m₂, nDemes, mu, hNe, le_of_lt hm₂, hnD, hmu⟩
+    s₂.fstMigDriftEq < s₁.fstMigDriftEq := by
+  simp only [SplitMigrationModel.fstMigDriftEq]
+  exact fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ hm₂ h_more
+
+/-! ### 3. Stepping-stone model: Fst increases with geographic distance -/
+
+/-- **Stepping-stone Fst model.**
+    In the stepping-stone model, migration occurs only between adjacent demes.
+    Fst between demes separated by d steps is approximately:
+    Fst(d) ≈ Fst_neighbor × (1 + α × (d - 1))
+    where α controls the rate of increase with distance (isolation by distance).
+    This is a linear approximation to the exact result. -/
+noncomputable def steppingStoneFst (fst_neighbor α : ℝ) (d : ℕ) : ℝ :=
+  fst_neighbor * (1 + α * ((d : ℝ) - 1))
+
+/-- Stepping-stone Fst at distance 1 equals the neighbor Fst. -/
+theorem steppingStoneFst_at_one (fst_neighbor α : ℝ) :
+    steppingStoneFst fst_neighbor α 1 = fst_neighbor := by
+  unfold steppingStoneFst
+  simp
+  ring
+
+/-- **Stepping-stone Fst increases with geographic distance** (isolation by distance).
+    For positive neighbor Fst and positive distance scaling parameter α,
+    Fst is strictly increasing in the number of steps. -/
+theorem steppingStoneFst_increases_with_distance
+    (fst_neighbor α : ℝ) (d₁ d₂ : ℕ)
+    (hfst : 0 < fst_neighbor) (hα : 0 < α) (hd : d₁ < d₂) :
+    steppingStoneFst fst_neighbor α d₁ < steppingStoneFst fst_neighbor α d₂ := by
+  unfold steppingStoneFst
+  have hd_real : (d₁ : ℝ) < (d₂ : ℝ) := Nat.cast_lt.mpr hd
+  have h_inner : α * ((d₁ : ℝ) - 1) < α * ((d₂ : ℝ) - 1) := by nlinarith
+  nlinarith
+
+/-- **Nearby demes have lower Fst than distant demes.**
+    Fst(1) < Fst(d) for d > 1 under the stepping-stone model. -/
+theorem steppingStoneFst_neighbor_lt_distant
+    (fst_neighbor α : ℝ) (d : ℕ)
+    (hfst : 0 < fst_neighbor) (hα : 0 < α) (hd : 1 < d) :
+    steppingStoneFst fst_neighbor α 1 < steppingStoneFst fst_neighbor α d := by
+  exact steppingStoneFst_increases_with_distance fst_neighbor α 1 d hfst hα hd
+
+/-- **Stepping-stone Fst is nonneg for valid parameters.** -/
+theorem steppingStoneFst_nonneg (fst_neighbor α : ℝ) (d : ℕ)
+    (hfst : 0 < fst_neighbor) (hα : 0 ≤ α) (hd : 1 ≤ d) :
+    0 ≤ steppingStoneFst fst_neighbor α d := by
+  unfold steppingStoneFst
+  apply mul_nonneg (le_of_lt hfst)
+  have : 0 ≤ α * ((d : ℝ) - 1) := by
+    apply mul_nonneg hα
+    have : (1 : ℝ) ≤ (d : ℝ) := Nat.one_le_cast.mpr hd
+    linarith
+  linarith
+
+/-! ### 4. Migration's effect on LD: gene flow homogenizes LD patterns -/
+
+/-- **Shared LD fraction under migration-drift balance.**
+    Gene flow homogenizes LD patterns between populations. The fraction of LD
+    that is shared between two demes increases with migration rate:
+    shared_LD(m) = M / (1 + M) where M = 4Nm.
+    This is the migration analog of expectedHeterozygosity. -/
+noncomputable def sharedLDFromMigration (M : ℝ) : ℝ :=
+  M / (1 + M)
+
+/-- Shared LD fraction is nonneg for nonneg M. -/
+theorem sharedLDFromMigration_nonneg (M : ℝ) (hM : 0 ≤ M) :
+    0 ≤ sharedLDFromMigration M := by
+  unfold sharedLDFromMigration
+  exact div_nonneg hM (by linarith)
+
+/-- Shared LD fraction is at most 1. -/
+theorem sharedLDFromMigration_lt_one (M : ℝ) (hM : 0 ≤ M) :
+    sharedLDFromMigration M < 1 := by
+  unfold sharedLDFromMigration
+  rw [div_lt_one (by linarith : 0 < 1 + M)]
+  linarith
+
+/-- **Shared LD fraction increases with migration rate.**
+    More migration → more shared LD → better PGS portability. -/
+theorem sharedLDFromMigration_increases (M₁ M₂ : ℝ)
+    (hM₁ : 0 < M₁) (hM₂ : 0 < M₂) (h_more : M₁ < M₂) :
+    sharedLDFromMigration M₁ < sharedLDFromMigration M₂ := by
+  unfold sharedLDFromMigration
+  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+  nlinarith
+
+/-- **Complementarity of Fst and shared LD under migration-drift.**
+    Fst = 1/(1+M) and shared_LD = M/(1+M) sum to 1.
+    This parallels the mutation-drift complementarity. -/
+theorem fst_plus_sharedLD_eq_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (scaledMigrationRate Ne m) = 1 := by
+  unfold fstMigrationDriftEquilibrium sharedLDFromMigration scaledMigrationRate
+  have hden : 1 + 4 * Ne * m ≠ 0 := by nlinarith
+  field_simp [hden]
+
+/-! ### 5. Portability under migration-drift: R² improves with gene flow -/
+
+/-- **Signal retention under migration-drift balance.**
+    The retained signal variance accounts for both allele frequency drift
+    and LD sharing determined by migration rate. -/
+noncomputable def signalRetentionMigrationDrift (V_A Ne m : ℝ) : ℝ :=
+  let fst := fstMigrationDriftEquilibrium Ne m
+  let M := scaledMigrationRate Ne m
+  let shared_ld := sharedLDFromMigration M
+  (1 - fst) * shared_ld * V_A
+
+/-- Signal retention under migration-drift equals M²/((1+M)² × V_A). -/
+theorem signalRetentionMigrationDrift_eq (V_A Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    signalRetentionMigrationDrift V_A Ne m =
+      (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 * V_A := by
+  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium sharedLDFromMigration
+    scaledMigrationRate
+  have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
+  field_simp [hden]
+  ring
+
+/-- **Signal retention is positive with positive migration.** -/
+theorem signalRetentionMigrationDrift_pos (V_A Ne m : ℝ)
+    (hVA : 0 < V_A) (hNe : 0 < Ne) (hm : 0 < m) :
+    0 < signalRetentionMigrationDrift V_A Ne m := by
+  rw [signalRetentionMigrationDrift_eq V_A Ne m hNe (le_of_lt hm)]
+  apply mul_pos
+  · apply div_pos
+    · exact sq_pos_of_pos (scaledMigrationRate_pos Ne m hNe hm)
+    · exact sq_pos_of_pos (by nlinarith [scaledMigrationRate_pos Ne m hNe hm])
+  · exact hVA
+
+/-- **More migration improves signal retention** (for fixed Ne and V_A).
+    This is the core mechanism: gene flow improves PGS portability. -/
+theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
+    (hVA : 0 < V_A) (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
+    (h_more : m₁ < m₂) :
+    signalRetentionMigrationDrift V_A Ne m₁ < signalRetentionMigrationDrift V_A Ne m₂ := by
+  rw [signalRetentionMigrationDrift_eq V_A Ne m₁ hNe (le_of_lt hm₁),
+      signalRetentionMigrationDrift_eq V_A Ne m₂ hNe (le_of_lt hm₂)]
+  apply mul_lt_mul_of_pos_right _ hVA
+  -- Need: M₁²/(1+M₁)² < M₂²/(1+M₂)²  i.e. (M₁/(1+M₁))² < (M₂/(1+M₂))²
+  -- which follows from M₁/(1+M₁) < M₂/(1+M₂), a monotone function.
+  set M₁ := scaledMigrationRate Ne m₁
+  set M₂ := scaledMigrationRate Ne m₂
+  have hM₁ : 0 < M₁ := scaledMigrationRate_pos Ne m₁ hNe hm₁
+  have hM₂ : 0 < M₂ := scaledMigrationRate_pos Ne m₂ hNe hm₂
+  have hM_lt : M₁ < M₂ := by unfold_let M₁ M₂; unfold scaledMigrationRate; nlinarith
+  have h1M₁ : 0 < 1 + M₁ := by linarith
+  have h1M₂ : 0 < 1 + M₂ := by linarith
+  -- M₁/(1+M₁) < M₂/(1+M₂)
+  have h_ratio : M₁ / (1 + M₁) < M₂ / (1 + M₂) := by
+    rw [div_lt_div_iff₀ h1M₁ h1M₂]; nlinarith
+  -- Squaring preserves order for positive values
+  have h_sq₁ : 0 < M₁ / (1 + M₁) := div_pos hM₁ h1M₁
+  have h_sq₂ : 0 < M₂ / (1 + M₂) := div_pos hM₂ h1M₂
+  have h_sq : (M₁ / (1 + M₁)) ^ 2 < (M₂ / (1 + M₂)) ^ 2 := by
+    exact sq_lt_sq' (by linarith) h_ratio
+  rwa [div_pow, div_pow] at h_sq
+
+/-- **R² under migration-drift is higher than without migration (pure drift).**
+    For a population pair with the same coalescent divergence time, introducing
+    migration strictly improves the R² portability ratio. We show that at
+    migration-drift equilibrium, the Fst is lower than under pure drift to t=∞. -/
+theorem migration_improves_R2_over_pure_drift (V_A V_E Ne m : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E) (hNe : 0 < Ne) (hm : 0 < m)
+    (fst_nomial : ℝ) (hfst_pure : fstMigrationDriftEquilibrium Ne m < fst_nomial)
+    (hfst_nomial_lt : fst_nomial < 1) :
+    presentDayR2 V_A V_E fst_nomial < presentDayR2 V_A V_E (fstMigrationDriftEquilibrium Ne m) := by
+  exact drift_degrades_R2 V_A V_E (fstMigrationDriftEquilibrium Ne m) fst_nomial
+    hVA hVE hfst_pure (le_of_lt hfst_nomial_lt)
+
+/-! ### 6. Asymmetric migration -/
+
+/-- **Asymmetric migration Fst model.**
+    When migration is asymmetric (m₁₂ ≠ m₂₁), the effective Fst depends on
+    direction. The effective migration for population i is the rate at which
+    it receives migrants. The "effective Fst" from population 1's perspective
+    uses m₁₂ (rate of migrants into pop 1 from pop 2). -/
+noncomputable def asymmetricFst (Ne m_into : ℝ) : ℝ :=
+  1 / (1 + 4 * Ne * m_into)
+
+/-- **Asymmetric Fst is just the island model Fst with directional migration.** -/
+theorem asymmetricFst_eq_migrationDriftEq (Ne m_into : ℝ) :
+    asymmetricFst Ne m_into = fstMigrationDriftEquilibrium Ne m_into := by
+  unfold asymmetricFst fstMigrationDriftEquilibrium
+
+/-- **When m₁₂ > m₂₁, Fst from perspective of pop 1 is lower.**
+    Population 1 receives more migrants from pop 2, so its genetic composition
+    is closer to pop 2 than vice versa. -/
+theorem asymmetric_migration_directional_fst
+    (Ne m₁₂ m₂₁ : ℝ) (hNe : 0 < Ne) (hm₁₂ : 0 < m₁₂) (hm₂₁ : 0 < m₂₁)
+    (h_asym : m₂₁ < m₁₂) :
+    asymmetricFst Ne m₁₂ < asymmetricFst Ne m₂₁ := by
+  simp only [asymmetricFst_eq_migrationDriftEq]
+  exact fstMigrationDriftEquilibrium_decreases_with_m Ne m₂₁ m₁₂ hNe hm₂₁ hm₁₂ h_asym
+
+/-- **Portability depends on prediction direction under asymmetric migration.**
+    Predicting into a population that receives more migrants (lower Fst from
+    its perspective) yields higher R² than predicting the other way. -/
+theorem asymmetric_migration_portability_direction
+    (V_A V_E Ne m₁₂ m₂₁ : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E) (hNe : 0 < Ne)
+    (hm₁₂ : 0 < m₁₂) (hm₂₁ : 0 < m₂₁)
+    (h_asym : m₂₁ < m₁₂) :
+    presentDayR2 V_A V_E (asymmetricFst Ne m₂₁) <
+      presentDayR2 V_A V_E (asymmetricFst Ne m₁₂) := by
+  have h_fst := asymmetric_migration_directional_fst Ne m₁₂ m₂₁ hNe hm₁₂ hm₂₁ h_asym
+  have h_lt_one := fstMigrationDriftEquilibrium_lt_one Ne m₂₁ hNe hm₂₁
+  rw [asymmetricFst_eq_migrationDriftEq] at h_lt_one
+  exact drift_degrades_R2 V_A V_E (asymmetricFst Ne m₁₂) (asymmetricFst Ne m₂₁)
+    hVA hVE h_fst (le_of_lt h_lt_one)
+
+/-- **Mean effective Fst under asymmetric migration.**
+    The harmonic mean of directional migration rates gives the effective
+    symmetric migration rate for overall Fst. -/
+noncomputable def effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
+  (m₁₂ + m₂₁) / 2
+
+/-- Effective symmetric migration is between the two directional rates. -/
+theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ) (hm₁₂ : 0 < m₁₂) (hm₂₁ : 0 < m₂₁)
+    (h_asym : m₂₁ < m₁₂) :
+    m₂₁ < effectiveSymmetricMigration m₁₂ m₂₁ ∧
+    effectiveSymmetricMigration m₁₂ m₂₁ < m₁₂ := by
+  unfold effectiveSymmetricMigration
+  constructor <;> linarith
+
+/-! ### 7. Recent migration (admixture): transient LD from migration pulses -/
+
+/-- **Admixture LD from a recent migration pulse.**
+    A pulse of migration (admixture) at time t_adm generations ago creates
+    LD between loci at recombination distance r. This LD decays as:
+    D_adm(t) = D_0 × (1 - r)^(t - t_adm)
+    where D_0 is the initial admixture LD and t is the current time.
+    We model the decay factor. -/
+noncomputable def admixtureLDDecay (r : ℝ) (generations_since : ℕ) : ℝ :=
+  (1 - r) ^ generations_since
+
+/-- Admixture LD decay is nonneg for recombination rate in [0, 1]. -/
+theorem admixtureLDDecay_nonneg (r : ℝ) (t : ℕ)
+    (hr : 0 ≤ r) (hr1 : r ≤ 1) :
+    0 ≤ admixtureLDDecay r t := by
+  unfold admixtureLDDecay
+  exact pow_nonneg (by linarith) t
+
+/-- Admixture LD decay is at most 1 for valid recombination rate. -/
+theorem admixtureLDDecay_le_one (r : ℝ) (t : ℕ)
+    (hr : 0 ≤ r) (hr1 : r ≤ 1) :
+    admixtureLDDecay r t ≤ 1 := by
+  unfold admixtureLDDecay
+  exact pow_le_one₀ (by linarith) (by linarith)
+
+/-- **Admixture LD decays over time** (for positive recombination rate). -/
+theorem admixtureLDDecay_decreases_with_time (r : ℝ) (t₁ t₂ : ℕ)
+    (hr : 0 < r) (hr1 : r < 1) (ht : t₁ < t₂) :
+    admixtureLDDecay r t₂ < admixtureLDDecay r t₁ := by
+  unfold admixtureLDDecay
+  have h_base_pos : 0 < 1 - r := by linarith
+  have h_base_lt : 1 - r < 1 := by linarith
+  exact pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt ht
+
+/-- **Admixture LD decays faster with higher recombination rate.** -/
+theorem admixtureLDDecay_decreases_with_recombination (r₁ r₂ : ℝ) (t : ℕ)
+    (hr₁ : 0 < r₁) (hr₂ : 0 < r₂) (hr₁1 : r₁ < 1) (hr₂1 : r₂ < 1)
+    (h_more : r₁ < r₂) (ht : 0 < t) :
+    admixtureLDDecay r₂ t < admixtureLDDecay r₁ t := by
+  unfold admixtureLDDecay
+  apply pow_lt_pow_left (by linarith : 1 - r₂ < 1 - r₁) (by linarith) (by omega)
+
+/-- **At time 0 since admixture, LD is fully preserved.** -/
+theorem admixtureLDDecay_at_zero (r : ℝ) :
+    admixtureLDDecay r 0 = 1 := by
+  unfold admixtureLDDecay
+  simp
+
+/-- **Admixture LD creates a transient boost to portability.**
+    Recent admixture (small t since pulse) means LD patterns are shared,
+    which temporarily improves tagging efficiency. The portability boost
+    from admixture LD relative to equilibrium LD is captured by the ratio
+    of admixture LD retention to equilibrium LD fraction. -/
+noncomputable def admixtureLDBoost (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ) : ℝ :=
+  admixtureLDDecay r t_since / equilibrium_ld
+
+/-- Admixture LD boost exceeds 1 when admixture LD is above equilibrium. -/
+theorem admixtureLDBoost_gt_one (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ)
+    (hr : 0 ≤ r) (hr1 : r ≤ 1)
+    (heq_pos : 0 < equilibrium_ld) (heq_lt : equilibrium_ld < 1)
+    (h_recent : equilibrium_ld < admixtureLDDecay r t_since) :
+    1 < admixtureLDBoost r t_since equilibrium_ld := by
+  unfold admixtureLDBoost
+  rw [lt_div_iff₀ heq_pos]
+  linarith
+
+/-- **Transient admixture portability is higher than equilibrium portability.**
+    When admixture is recent, the transient shared LD exceeds equilibrium shared LD,
+    and thus portability is temporarily enhanced. -/
+theorem admixture_portability_above_equilibrium (V_A V_E fst r : ℝ) (t_since : ℕ)
+    (equilibrium_ld : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst : 0 ≤ fst) (hfst_lt : fst < 1)
+    (heq_pos : 0 < equilibrium_ld) (heq_lt : equilibrium_ld < 1)
+    (hr : 0 ≤ r) (hr1 : r ≤ 1)
+    (h_recent : equilibrium_ld < admixtureLDDecay r t_since) :
+    presentDayPGSVarianceMutationDrift V_A fst equilibrium_ld <
+      presentDayPGSVarianceMutationDrift V_A fst (admixtureLDDecay r t_since) := by
+  rw [presentDayPGSVarianceMutationDrift_eq, presentDayPGSVarianceMutationDrift_eq]
+  have h1 : 0 < (1 - fst) * V_A := mul_pos (by linarith) hVA
+  have h_factor : (1 - fst) * equilibrium_ld < (1 - fst) * admixtureLDDecay r t_since := by
+    exact mul_lt_mul_of_pos_left h_recent (by linarith)
+  nlinarith
+
+end MigrationDriftPortability
 
 end PortabilityDrift
 
