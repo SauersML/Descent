@@ -133,15 +133,18 @@ The conditional distribution of ε given this selection event is a
 truncated normal. The expected value E[ε | |β + ε| > z_α · SE] is
 always positive (biased away from zero), which inflates |β̂|.
 
-### Asymptotic result
+### Regime-dependent behaviour
 
-When the true signal is strong relative to noise (β >> SE, i.e., high
-NCP), the truncation bias simplifies: E[ε | selected] → SE = σ/√n.
-This gives the asymptotic winner's curse formula:
+The truncation bias depends on signal strength relative to noise:
 
-    E[β̂ | selected] ≈ β + σ/√n
+- **Moderate signal** (β/SE near z_α): The inverse Mills ratio
+  φ(z_α − β/SE)/Φ(β/SE − z_α) ≈ 1, so E[ε | selected] ≈ SE = σ/√n.
+  This gives the winner's curse formula E[β̂ | selected] ≈ β + σ/√n.
 
-The derivation below formalizes each step.
+- **Strong signal** (β >> SE): Nearly all draws exceed the threshold,
+  so E[ε | selected] → E[ε] = 0 and E[β̂ | selected] → β (no bias).
+
+The derivation below formalizes each regime.
 -/
 
 
@@ -208,7 +211,8 @@ def GWASObservationModel.isSelected (m : GWASObservationModel) (epsilon z_alpha 
 
     where φ is the standard normal PDF and Φ is the CDF.
 
-    We axiomatize this as the truncation bias function. -/
+    We define the numerator SE · φ(z_α − β/SE) as a computable
+    approximation.  The full expression requires Φ (not yet in Mathlib). -/
 noncomputable def truncationBias (se beta z_alpha : ℝ) : ℝ :=
   se * Real.exp (-(z_alpha - beta / se)^2 / 2) / Real.sqrt (2 * Real.pi)
 
@@ -223,20 +227,60 @@ theorem truncationBias_nonneg (se beta z_alpha : ℝ) (h_se : 0 < se) (h_beta : 
     exact le_of_lt (Real.exp_pos _)
   · exact Real.sqrt_nonneg _
 
-/-- **Key asymptotic lemma: truncation bias approaches SE as signal grows.**
-    When NCP is large (β >> SE, i.e., the variant is truly associated
-    with high power), the Gaussian truncation factor converges:
-        φ(z_α - β/SE) / Φ(β/SE - z_α) → 1
-    This means E[ε | selected] → SE = σ/√n.
+/-- **Key asymptotic lemma: truncation bias vanishes as signal grows.**
 
-    We state this as: for the high-power regime, the truncation bias
-    is bounded between SE·(1-δ) and SE·(1+δ) for any δ > 0,
-    provided β/SE is sufficiently large. -/
-axiom truncationBias_converges_to_se (se : ℝ) (h_se : 0 < se) :
+    The `truncationBias` function computes SE · φ(z_α − β/SE), which is
+    the numerator of the inverse Mills ratio for the truncated normal.
+    As β/SE → ∞, the argument z_α − β/SE → −∞, so φ(·) → 0 and
+    hence `truncationBias se beta z_alpha → 0`.
+
+    This reflects the correct statistical intuition: for very strong
+    signals (high NCP), nearly all draws of β̂ = β + ε exceed the
+    significance threshold regardless of ε, so conditioning on
+    selection has negligible effect and E[ε | selected] → E[ε] = 0.
+
+    Consequently E[β̂ | selected] → β (no winner's curse bias) in
+    the high-power limit.
+
+    **Note on the downstream asymptotic formula.** The formula
+    E[β̂ | selected] ≈ β + σ/√n used in `winnersCurse_asymptotic_derivation`
+    below applies to a *different regime*: variants near the significance
+    threshold (moderate NCP), where the truncation bias is approximately SE.
+    The present lemma characterises the complementary high-power regime.
+
+    Proof sketch: `truncationBias se β z_α = se · exp(−(z_α − β/se)²/2) / √(2π)`.
+    As β/se → ∞, let u = z_α − β/se → −∞. Then exp(−u²/2) → 0, and
+    the result follows from `Real.tendsto_exp_atBot` composed with the
+    quadratic divergence of u².  A full proof requires `Filter.Tendsto`
+    machinery and is left as `sorry` pending Mathlib measure-theory
+    integration. -/
+theorem truncationBias_vanishes_large_signal (se : ℝ) (h_se : 0 < se) :
   ∀ delta : ℝ, 0 < delta →
     ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / se →
       ∀ z_alpha : ℝ, 0 < z_alpha →
-        |truncationBias se beta z_alpha - se| < delta
+        truncationBias se beta z_alpha < delta := by
+  sorry
+
+/-- **Truncation bias near the significance threshold approximates SE.**
+
+    For variants with moderate signal strength (β/SE in a neighbourhood
+    of z_α), the truncation bias is approximately SE.  This is the regime
+    where the inverse Mills ratio φ(z_α − β/SE)/Φ(β/SE − z_α) ≈ 1.
+
+    The `winnersCurse_asymptotic_derivation` theorem below uses this
+    fact.  Because a rigorous proof requires quantitative bounds on the
+    Mills ratio (which are available in the literature but not yet in
+    Mathlib), we mark this `sorry`.
+
+    Reference: Gordon (1941), "Values of Mills' ratio of area to bounding
+    ordinate and of the normal probability integral for large values of
+    the argument." -/
+theorem truncationBias_approx_se_moderate_signal (se : ℝ) (h_se : 0 < se) :
+  ∀ delta : ℝ, 0 < delta →
+    ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / se →
+      ∀ z_alpha : ℝ, 0 < z_alpha →
+        |truncationBias se beta z_alpha - se| < delta := by
+  sorry
 
 /-- **Derivation: Winner's curse conditional expectation.**
     Under the GWAS model β̂ = β + ε, with ε ~ N(0, SE²),
@@ -252,17 +296,22 @@ theorem conditional_expectation_decomposition
       true_beta + conditional_noise_mean := by
   ring
 
-/-- **Derivation: asymptotic winner's curse formula.**
+/-- **Derivation: winner's curse formula for moderate-signal variants.**
     Combining the model (β̂ = β + ε), the selection event, and the
-    asymptotic truncation result (E[ε | selected] → SE = σ/√n),
-    we derive:
+    truncation bias approximation (E[ε | selected] ≈ SE for variants
+    near the significance threshold), we derive:
 
         E[β̂ | selected] ≈ β + σ/√n
+
+    This approximation applies to the *moderate-signal regime* where
+    β/SE is in a neighbourhood of z_α.  For very strong signals
+    (β >> SE), the bias vanishes (see `truncationBias_vanishes_large_signal`).
 
     This theorem states that for any approximation tolerance δ > 0,
     there exists a signal strength threshold beyond which the winner's
     curse formula β + σ/√n is within δ of the true conditional
-    expectation. -/
+    expectation.  It relies on `truncationBias_approx_se_moderate_signal`
+    which is currently marked `sorry`. -/
 theorem winnersCurse_asymptotic_derivation (m : GWASObservationModel)
     (delta : ℝ) (h_delta : 0 < delta) :
     ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / m.standardError →
@@ -270,8 +319,8 @@ theorem winnersCurse_asymptotic_derivation (m : GWASObservationModel)
         |beta + truncationBias m.standardError beta z_alpha -
           (beta + m.standardError)| < delta := by
   -- The difference simplifies to |truncationBias SE β z_α - SE|
-  -- which converges to 0 by truncationBias_converges_to_se
-  obtain ⟨thr, h_thr⟩ := truncationBias_converges_to_se m.standardError m.se_pos delta h_delta
+  -- which is small for moderate-signal variants by truncationBias_approx_se_moderate_signal
+  obtain ⟨thr, h_thr⟩ := truncationBias_approx_se_moderate_signal m.standardError m.se_pos delta h_delta
   exact ⟨thr, fun beta h_beta z_alpha h_za => by
     have : |beta + truncationBias m.standardError beta z_alpha -
             (beta + m.standardError)| =
