@@ -131,13 +131,56 @@ theorem liabilitySensitivity_zScore_monotone_in_R
     (hR : R₁ < R₂)
     (hR2₁ : 0 ≤ R₁ ^ 2) (hR2₂ : R₂ ^ 2 ≤ 1)
     -- σ_resid is positive at R₂ (the tighter bound)
-    (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq))) :
+    (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq)))
+    -- The z-score numerator is nonneg at the lower R value.
+    -- This is the clinically relevant regime: the PGS classification
+    -- threshold T' is at or below the expected PGS among cases at R₁.
+    (h_num_nonneg : 0 ≤ R₁ * Real.sqrt m.h_sq * m.case_mean - T') :
     let h := Real.sqrt m.h_sq
     let σ₁ := Real.sqrt (m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq))
     let σ₂ := Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq))
     (R₁ * h * m.case_mean - T') / σ₁ <
       (R₂ * h * m.case_mean - T') / σ₂ := by
-  sorry
+  -- Strategy: show (num₁/σ₁ < num₂/σ₂) via cross-multiplication.
+  -- We have num₂ > num₁ ≥ 0, and 0 < σ₂ ≤ σ₁, so:
+  --   num₁ · σ₂ ≤ num₁ · σ₁ < num₂ · σ₁
+  -- giving num₁ · σ₂ < num₂ · σ₁, hence num₁/σ₁ < num₂/σ₂.
+  simp only
+  -- Establish σ₁ > 0
+  have h_rv₁_pos : 0 < m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq) := by
+    have : R₁ ^ 2 ≤ R₂ ^ 2 := by nlinarith
+    have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
+    nlinarith [m.h_sq_pos]
+  have h_σ₁_pos : 0 < Real.sqrt (m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq)) :=
+    Real.sqrt_pos_of_pos h_rv₁_pos
+  -- Establish σ₂ ≤ σ₁ (residual variance decreases as R² increases)
+  have h_R2_le : R₁ ^ 2 ≤ R₂ ^ 2 := by nlinarith
+  have h_rv_le : m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq) ≤
+      m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq) := by nlinarith [m.h_sq_pos]
+  have h_σ_le : Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq)) ≤
+      Real.sqrt (m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq)) :=
+    Real.sqrt_le_sqrt (le_of_lt (by nlinarith [m.h_sq_pos] :
+      0 < m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq))) h_rv_le
+  -- Establish num₂ > num₁ (numerator increases with R)
+  have h_h_pos : 0 < Real.sqrt m.h_sq := Real.sqrt_pos_of_pos m.h_sq_pos
+  have h_num_lt : R₁ * Real.sqrt m.h_sq * m.case_mean - T' <
+      R₂ * Real.sqrt m.h_sq * m.case_mean - T' := by
+    nlinarith [mul_pos h_h_pos m.case_mean_pos]
+  -- Cross-multiply: need num₁ · σ₂ < num₂ · σ₁
+  rw [div_lt_div_iff h_σ₁_pos h_σ_pos]
+  -- num₁ · σ₂ ≤ num₁ · σ₁ (since num₁ ≥ 0 and σ₂ ≤ σ₁)
+  have h1 : (R₁ * Real.sqrt m.h_sq * m.case_mean - T') *
+      Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq)) ≤
+      (R₁ * Real.sqrt m.h_sq * m.case_mean - T') *
+      Real.sqrt (m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq)) :=
+    mul_le_mul_of_nonneg_left h_σ_le h_num_nonneg
+  -- num₁ · σ₁ < num₂ · σ₁ (since num₁ < num₂ and σ₁ > 0)
+  have h2 : (R₁ * Real.sqrt m.h_sq * m.case_mean - T') *
+      Real.sqrt (m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq)) <
+      (R₂ * Real.sqrt m.h_sq * m.case_mean - T') *
+      Real.sqrt (m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq)) :=
+    mul_lt_mul_of_pos_right h_num_lt h_σ₁_pos
+  linarith
 
 /-- **Monotonicity of liability sensitivity in R².**
     The main result: since Φ is monotone increasing and the z-score
@@ -158,13 +201,52 @@ theorem liabilitySensitivity_monotone_in_R2
     (R2₁ R2₂ : ℝ) (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
     (hR2 : R2₁ < R2₂)
     -- σ_resid remains positive throughout the range
-    (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq))) :
+    (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)))
+    -- The z-score numerator is nonneg at the lower R² value (clinically
+    -- relevant regime: classification threshold T' ≤ expected PGS among cases).
+    (h_num_nonneg : 0 ≤ Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') :
     liabilitySensitivity Φ m R2₁ T' < liabilitySensitivity Φ m R2₂ T' := by
   -- The z-score is monotone in R² and Φ is strictly monotone,
   -- so the composition is strictly monotone.
   unfold liabilitySensitivity
   apply hΦ_mono
-  sorry
+  -- Reduce to the z-score monotonicity in R.
+  -- We need: (√R2₁ · h · μ - T') / σ₁ < (√R2₂ · h · μ - T') / σ₂
+  -- with the same structure as liabilitySensitivity_zScore_monotone_in_R.
+  simp only
+  -- σ₁ > 0
+  have h_σ₁_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
+    apply Real.sqrt_pos_of_pos
+    have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
+    nlinarith [m.h_sq_pos]
+  -- σ₂ ≤ σ₁
+  have h_σ_le : Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
+      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
+    apply Real.sqrt_le_sqrt
+    · have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
+      nlinarith [m.h_sq_pos]
+    · nlinarith [m.h_sq_pos]
+  -- √R2₁ < √R2₂
+  have h_sqrt_lt : Real.sqrt R2₁ < Real.sqrt R2₂ :=
+    Real.sqrt_lt_sqrt hR2₁ hR2
+  -- numerator increases
+  have h_h_pos : 0 < Real.sqrt m.h_sq := Real.sqrt_pos_of_pos m.h_sq_pos
+  have h_num_lt : Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T' <
+      Real.sqrt R2₂ * Real.sqrt m.h_sq * m.case_mean - T' := by
+    nlinarith [mul_pos h_h_pos m.case_mean_pos]
+  -- Cross-multiply: num₁ · σ₂ < num₂ · σ₁
+  rw [div_lt_div_iff h_σ₁_pos h_σ_pos]
+  have h1 : (Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') *
+      Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
+      (Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') *
+      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) :=
+    mul_le_mul_of_nonneg_left h_σ_le h_num_nonneg
+  have h2 : (Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') *
+      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) <
+      (Real.sqrt R2₂ * Real.sqrt m.h_sq * m.case_mean - T') *
+      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) :=
+    mul_lt_mul_of_pos_right h_num_lt h_σ₁_pos
+  linarith
 
 /-- **Monotonicity of liability specificity in R².**
     Analogous result for specificity: higher R² → better specificity.
@@ -178,12 +260,56 @@ theorem liabilitySpecificity_monotone_in_R2
     (hμ_control_neg : μ_control < 0)
     (R2₁ R2₂ : ℝ) (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
     (hR2 : R2₁ < R2₂)
-    (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq))) :
+    (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)))
+    -- The specificity z-score numerator is nonneg at R2₁.
+    -- Since μ_control < 0, the term -R·h·μ_control ≥ 0, so this holds
+    -- whenever T' ≥ 0 (which is the standard clinical regime).
+    (h_num_nonneg : 0 ≤ T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) :
     liabilitySpecificity Φ m R2₁ T' μ_control <
       liabilitySpecificity Φ m R2₂ T' μ_control := by
   unfold liabilitySpecificity
   apply hΦ_mono
-  sorry
+  -- Need: (T' - √R2₁·h·μ_ctrl) / σ₁ < (T' - √R2₂·h·μ_ctrl) / σ₂
+  -- The numerator T' - R·h·μ_control increases with R (since h > 0, μ_control < 0,
+  -- so -h·μ_control > 0 and the numerator grows with R).
+  -- The denominator σ_resid decreases with R². Same cross-multiply argument.
+  simp only
+  -- σ₁ > 0
+  have h_σ₁_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
+    apply Real.sqrt_pos_of_pos
+    have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
+    nlinarith [m.h_sq_pos]
+  -- σ₂ ≤ σ₁
+  have h_σ_le : Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
+      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
+    apply Real.sqrt_le_sqrt
+    · have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
+      nlinarith [m.h_sq_pos]
+    · nlinarith [m.h_sq_pos]
+  -- √R2₁ < √R2₂
+  have h_sqrt_lt : Real.sqrt R2₁ < Real.sqrt R2₂ :=
+    Real.sqrt_lt_sqrt hR2₁ hR2
+  -- numerator increases: since μ_control < 0, -R·h·μ_control increases with R
+  have h_h_pos : 0 < Real.sqrt m.h_sq := Real.sqrt_pos_of_pos m.h_sq_pos
+  have h_num_lt : T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control <
+      T' - Real.sqrt R2₂ * Real.sqrt m.h_sq * μ_control := by
+    -- T' - a₁ < T' - a₂  iff  a₂ < a₁, i.e., √R2₂·h·μ < √R2₁·h·μ
+    -- Since μ < 0 and √R2₂ > √R2₁ and h > 0: √R2₂·h·|μ| > √R2₁·h·|μ|
+    -- so √R2₂·h·μ < √R2₁·h·μ. ✓
+    nlinarith [mul_pos h_h_pos (neg_pos.mpr hμ_control_neg)]
+  -- Cross-multiply
+  rw [div_lt_div_iff h_σ₁_pos h_σ_pos]
+  have h1 : (T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) *
+      Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
+      (T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) *
+      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) :=
+    mul_le_mul_of_nonneg_left h_σ_le h_num_nonneg
+  have h2 : (T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) *
+      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) <
+      (T' - Real.sqrt R2₂ * Real.sqrt m.h_sq * μ_control) *
+      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) :=
+    mul_lt_mul_of_pos_right h_num_lt h_σ₁_pos
+  linarith
 
 /-- **Derived monotone sensitivity link.**
     From the liability threshold model, we can construct a concrete
@@ -199,11 +325,17 @@ theorem liability_model_provides_sensLink
     (hΦ_mono : StrictMono Φ)
     -- Residual variance stays positive across [0,1]
     (h_σ_pos : ∀ R2, 0 ≤ R2 → R2 ≤ 1 →
-      0 < Real.sqrt (m.h_sq * (1 - R2) + (1 - m.h_sq))) :
+      0 < Real.sqrt (m.h_sq * (1 - R2) + (1 - m.h_sq)))
+    -- Classification threshold is in the clinically relevant regime:
+    -- T' ≤ expected PGS among cases even at R² = 0 (i.e., T' ≤ 0).
+    -- This ensures the z-score numerator is nonneg throughout [0,1].
+    (h_T' : ∀ R2, 0 ≤ R2 → R2 ≤ 1 →
+      0 ≤ Real.sqrt R2 * Real.sqrt m.h_sq * m.case_mean - T') :
     StrictMonoOn (fun R2 => liabilitySensitivity Φ m R2 T') (Set.Icc 0 1) := by
   intro R2₁ hR2₁ R2₂ hR2₂ hlt
   exact liabilitySensitivity_monotone_in_R2 Φ m T' hΦ_mono R2₁ R2₂
     hR2₁.1 hR2₂.2 hlt (h_σ_pos R2₂ hR2₂.1 hR2₂.2)
+    (h_T' R2₁ hR2₁.1 (le_trans (le_of_lt hlt) hR2₂.2))
 
 /-- **Derived monotone specificity link.**
     Analogous to `liability_model_provides_sensLink` but for specificity. -/
@@ -212,11 +344,16 @@ theorem liability_model_provides_specLink
     (hΦ_mono : StrictMono Φ)
     (hμ_control_neg : μ_control < 0)
     (h_σ_pos : ∀ R2, 0 ≤ R2 → R2 ≤ 1 →
-      0 < Real.sqrt (m.h_sq * (1 - R2) + (1 - m.h_sq))) :
+      0 < Real.sqrt (m.h_sq * (1 - R2) + (1 - m.h_sq)))
+    -- The specificity z-score numerator is nonneg across [0,1].
+    -- Since μ_control < 0, this holds whenever T' ≥ 0.
+    (h_T' : ∀ R2, 0 ≤ R2 → R2 ≤ 1 →
+      0 ≤ T' - Real.sqrt R2 * Real.sqrt m.h_sq * μ_control) :
     StrictMonoOn (fun R2 => liabilitySpecificity Φ m R2 T' μ_control) (Set.Icc 0 1) := by
   intro R2₁ hR2₁ R2₂ hR2₂ hlt
   exact liabilitySpecificity_monotone_in_R2 Φ m T' μ_control hΦ_mono hμ_control_neg R2₁ R2₂
     hR2₁.1 hR2₂.2 hlt (h_σ_pos R2₂ hR2₂.1 hR2₂.2)
+    (h_T' R2₁ hR2₁.1 (le_trans (le_of_lt hlt) hR2₂.2))
 
 /-- **Residual variance is positive on [0,1].**
     The residual variance σ²_resid = h²(1 − R²) + (1 − h²) is strictly positive
