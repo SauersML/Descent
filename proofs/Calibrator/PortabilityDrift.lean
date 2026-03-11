@@ -1348,6 +1348,330 @@ theorem expectedSqMeanPGSDiff_IMEquilibrium_strictAnti_M
 
 end PresentDayMetrics
 
+
+/-!
+## Mutation-Drift Balance and Portability
+
+When mutation is non-negligible, Fst has a finite equilibrium (Wright's
+1/(1+4Neμ)) instead of approaching 1. This section generalizes the drift-only
+portability model to include mutation as a first-class parameter.
+
+Key results:
+1. Generalized divergence model that includes mutation rate
+2. Covariance divergence including both drift and mutation terms
+3. Portability under mutation-drift: mutation-generated population-specific
+   variants reduce tagging efficiency
+4. Comparison: mutation-drift equilibrium portability vs pure-drift portability
+-/
+
+section MutationDriftPortability
+
+/-- Generalized divergence model assumptions that include mutation as a parameter
+    rather than assuming it is negligible. -/
+structure MutationDriftModelAssumptions where
+  Ne : ℝ
+  μ : ℝ
+  t : ℝ
+  Ne_pos : 0 < Ne
+  mu_pos : 0 < μ
+  t_nonneg : 0 ≤ t
+
+/-- The scaled mutation parameter θ = 4Neμ for a mutation-drift model. -/
+noncomputable def MutationDriftModelAssumptions.theta (m : MutationDriftModelAssumptions) : ℝ :=
+  4 * m.Ne * m.μ
+
+/-- θ is positive for any valid mutation-drift model. -/
+theorem MutationDriftModelAssumptions.theta_pos (m : MutationDriftModelAssumptions) :
+    0 < m.theta := by
+  unfold MutationDriftModelAssumptions.theta
+  positivity
+
+/-- **Equilibrium Fst under mutation-drift balance: Fst = 1/(1 + θ).**
+    This is the Wright (1931) island model result. -/
+noncomputable def MutationDriftModelAssumptions.fstEquilibrium
+    (m : MutationDriftModelAssumptions) : ℝ :=
+  1 / (1 + m.theta)
+
+/-- Equilibrium Fst is positive. -/
+theorem MutationDriftModelAssumptions.fstEquilibrium_pos
+    (m : MutationDriftModelAssumptions) :
+    0 < m.fstEquilibrium := by
+  unfold MutationDriftModelAssumptions.fstEquilibrium
+  positivity
+
+/-- Equilibrium Fst is strictly less than 1 (mutation prevents complete fixation). -/
+theorem MutationDriftModelAssumptions.fstEquilibrium_lt_one
+    (m : MutationDriftModelAssumptions) :
+    m.fstEquilibrium < 1 := by
+  unfold MutationDriftModelAssumptions.fstEquilibrium
+  rw [div_lt_one (by linarith [m.theta_pos])]
+  linarith [m.theta_pos]
+
+/-- **Transient Fst under mutation-drift: approach to equilibrium.**
+    Fst(t) = Fst_eq × (1 - exp(-(1+θ)t/(2Ne))) -/
+noncomputable def MutationDriftModelAssumptions.fstTransient
+    (m : MutationDriftModelAssumptions) : ℝ :=
+  m.fstEquilibrium * (1 - Real.exp (-(1 + m.theta) * m.t / (2 * m.Ne)))
+
+/-- Transient Fst is nonneg. -/
+theorem MutationDriftModelAssumptions.fstTransient_nonneg
+    (m : MutationDriftModelAssumptions) :
+    0 ≤ m.fstTransient := by
+  unfold MutationDriftModelAssumptions.fstTransient
+  apply mul_nonneg (le_of_lt m.fstEquilibrium_pos)
+  have harg : 0 ≤ (1 + m.theta) * m.t / (2 * m.Ne) := by positivity
+  have hexp : Real.exp (-(((1 + m.theta) * m.t / (2 * m.Ne)))) ≤ 1 := by
+    rw [← Real.exp_zero]
+    exact Real.exp_le_exp.mpr (by linarith)
+  linarith
+
+/-- Transient Fst is bounded by the equilibrium Fst. -/
+theorem MutationDriftModelAssumptions.fstTransient_le_equilibrium
+    (m : MutationDriftModelAssumptions) :
+    m.fstTransient ≤ m.fstEquilibrium := by
+  unfold MutationDriftModelAssumptions.fstTransient
+  have hfeq_pos : 0 < m.fstEquilibrium := m.fstEquilibrium_pos
+  have hexp_pos : 0 < Real.exp (-(((1 + m.theta) * m.t / (2 * m.Ne)))) :=
+    Real.exp_pos _
+  have h_factor_le : 1 - Real.exp (-(((1 + m.theta) * m.t / (2 * m.Ne)))) ≤ 1 := by linarith
+  calc m.fstEquilibrium * (1 - Real.exp (-(((1 + m.theta) * m.t / (2 * m.Ne))))
+    ) ≤ m.fstEquilibrium * 1 :=
+        mul_le_mul_of_nonneg_left h_factor_le (le_of_lt hfeq_pos)
+    _ = m.fstEquilibrium := by ring
+
+/-- **Generalized covariance divergence under mutation-drift.**
+    The total covariance divergence between source and target populations
+    includes both:
+    (a) drift-driven frequency changes: proportional to Fst
+    (b) mutation-driven LD changes: proportional to tagging decay from new variants
+
+    Total divergence factor = Fst_drift + (1 - Fst_drift) × (1 - shared_LD)
+    where shared_LD is the fraction of LD preserved despite new mutations. -/
+noncomputable def covarianceDivergenceMutationDrift
+    (fst_drift shared_ld : ℝ) : ℝ :=
+  fst_drift + (1 - fst_drift) * (1 - shared_ld)
+
+/-- Covariance divergence simplifies algebraically. -/
+theorem covarianceDivergenceMutationDrift_eq (fst_drift shared_ld : ℝ) :
+    covarianceDivergenceMutationDrift fst_drift shared_ld = 1 - (1 - fst_drift) * shared_ld := by
+  unfold covarianceDivergenceMutationDrift
+  ring
+
+/-- With perfect shared LD (shared_ld = 1), covariance divergence reduces to pure drift. -/
+theorem covarianceDivergence_pure_drift (fst_drift : ℝ) :
+    covarianceDivergenceMutationDrift fst_drift 1 = fst_drift := by
+  unfold covarianceDivergenceMutationDrift
+  ring
+
+/-- With zero drift (fst_drift = 0), covariance divergence equals the LD divergence. -/
+theorem covarianceDivergence_pure_mutation (shared_ld : ℝ) :
+    covarianceDivergenceMutationDrift 0 shared_ld = 1 - shared_ld := by
+  unfold covarianceDivergenceMutationDrift
+  ring
+
+/-- Covariance divergence is at least the drift component alone when shared LD ≤ 1. -/
+theorem covarianceDivergence_ge_drift (fst_drift shared_ld : ℝ)
+    (hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
+    (hld : shared_ld ≤ 1) :
+    fst_drift ≤ covarianceDivergenceMutationDrift fst_drift shared_ld := by
+  unfold covarianceDivergenceMutationDrift
+  have h1 : 0 ≤ 1 - fst_drift := by linarith
+  have h2 : 0 ≤ 1 - shared_ld := by linarith
+  linarith [mul_nonneg h1 h2]
+
+/-- Covariance divergence is at most 1 when parameters are in [0, 1]. -/
+theorem covarianceDivergence_le_one (fst_drift shared_ld : ℝ)
+    (hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
+    (hld : 0 ≤ shared_ld) (hld_le : shared_ld ≤ 1) :
+    covarianceDivergenceMutationDrift fst_drift shared_ld ≤ 1 := by
+  rw [covarianceDivergenceMutationDrift_eq]
+  have h1 : 0 ≤ (1 - fst_drift) * shared_ld := by
+    exact mul_nonneg (by linarith) hld
+  linarith
+
+/-- **Generalized signal retention under mutation-drift.**
+    The retained signal is (1 - total_divergence) × V_A. -/
+noncomputable def presentDayPGSVarianceMutationDrift
+    (V_A fst_drift shared_ld : ℝ) : ℝ :=
+  (1 - covarianceDivergenceMutationDrift fst_drift shared_ld) * V_A
+
+/-- Signal retention equals (1 - fst) × shared_ld × V_A. -/
+theorem presentDayPGSVarianceMutationDrift_eq (V_A fst_drift shared_ld : ℝ) :
+    presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld =
+      (1 - fst_drift) * shared_ld * V_A := by
+  unfold presentDayPGSVarianceMutationDrift
+  rw [covarianceDivergenceMutationDrift_eq]
+  ring
+
+/-- With perfect shared LD, signal retention reduces to the pure drift formula. -/
+theorem presentDayPGSVarianceMutationDrift_pure_drift (V_A fst_drift : ℝ) :
+    presentDayPGSVarianceMutationDrift V_A fst_drift 1 = presentDayPGSVariance V_A fst_drift := by
+  rw [presentDayPGSVarianceMutationDrift_eq]
+  unfold presentDayPGSVariance
+  ring
+
+/-- Signal retention is nonneg under valid parameters. -/
+theorem presentDayPGSVarianceMutationDrift_nonneg (V_A fst_drift shared_ld : ℝ)
+    (hVA : 0 ≤ V_A) (hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
+    (hld : 0 ≤ shared_ld) :
+    0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld := by
+  rw [presentDayPGSVarianceMutationDrift_eq]
+  exact mul_nonneg (mul_nonneg (by linarith) hld) hVA
+
+/-- **Mutation strictly reduces signal retention beyond drift alone.**
+    When shared_ld < 1 and other parameters are positive, mutation-drift signal
+    retention is strictly below drift-only signal retention. -/
+theorem mutationDrift_signal_lt_puredrift (V_A fst_drift shared_ld : ℝ)
+    (hVA : 0 < V_A) (hfst : 0 ≤ fst_drift) (hfst_lt : fst_drift < 1)
+    (hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
+    presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld <
+      presentDayPGSVariance V_A fst_drift := by
+  rw [presentDayPGSVarianceMutationDrift_eq]
+  unfold presentDayPGSVariance
+  have h1 : 0 < 1 - fst_drift := by linarith
+  have h_factor : (1 - fst_drift) * shared_ld < (1 - fst_drift) * 1 := by
+    exact mul_lt_mul_of_pos_left hld_lt h1
+  nlinarith
+
+/-- **R² under mutation-drift balance.** -/
+noncomputable def presentDayR2MutationDrift (V_A V_E fst_drift shared_ld : ℝ) : ℝ :=
+  let v := presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld
+  v / (v + V_E)
+
+/-- **Mutation-drift R² is below drift-only R².**
+    When shared LD is imperfect, R² under mutation-drift is strictly below
+    drift-only R². This is the key portability result: ignoring mutation
+    overestimates portability. -/
+theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst : 0 ≤ fst_drift) (hfst_lt : fst_drift < 1)
+    (hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
+    presentDayR2MutationDrift V_A V_E fst_drift shared_ld <
+      presentDayR2 V_A V_E fst_drift := by
+  unfold presentDayR2MutationDrift presentDayR2
+  have h_sig_lt := mutationDrift_signal_lt_puredrift V_A fst_drift shared_ld
+    hVA hfst hfst_lt hld hld_lt
+  have h_md_nonneg : 0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld := by
+    exact presentDayPGSVarianceMutationDrift_nonneg V_A fst_drift shared_ld
+      (le_of_lt hVA) hfst (le_of_lt hfst_lt) (le_of_lt hld)
+  exact expectedR2_strictMono_nonneg V_E
+    (presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld)
+    (presentDayPGSVariance V_A fst_drift)
+    hVE h_md_nonneg h_sig_lt
+
+/-- **Mutation-drift transport ratio.**
+    The generalized transport ratio includes both allele frequency divergence
+    and LD tagging decay from mutation. -/
+noncomputable def mutationDriftTransportRatio
+    (fstSource fstTarget shared_ld_source shared_ld_target : ℝ) : ℝ :=
+  ((1 - fstTarget) * shared_ld_target) / ((1 - fstSource) * shared_ld_source)
+
+/-- Mutation-drift transport ratio reduces to drift transport ratio when LD is perfect. -/
+theorem mutationDriftTransportRatio_pure_drift (fstSource fstTarget : ℝ) :
+    mutationDriftTransportRatio fstSource fstTarget 1 1 =
+      driftTransportRatio fstSource fstTarget := by
+  unfold mutationDriftTransportRatio driftTransportRatio
+  ring_nf
+
+/-- **Mutation-drift transport ratio is below drift-only transport ratio**
+    when target shared LD is worse than source shared LD. -/
+theorem mutationDrift_transport_lt_drift_transport
+    (fstSource fstTarget shared_ld_source shared_ld_target : ℝ)
+    (hfstS : fstSource < 1) (hfstT : fstTarget < 1)
+    (hldS : 0 < shared_ld_source) (hldS_le : shared_ld_source ≤ 1)
+    (hldT : 0 < shared_ld_target)
+    (hld_decay : shared_ld_target / shared_ld_source < 1) :
+    mutationDriftTransportRatio fstSource fstTarget shared_ld_source shared_ld_target <
+      driftTransportRatio fstSource fstTarget := by
+  unfold mutationDriftTransportRatio driftTransportRatio
+  have h1 : 0 < 1 - fstSource := by linarith
+  have h_den_pos : 0 < (1 - fstSource) * shared_ld_source := mul_pos h1 hldS
+  rw [div_lt_div_iff₀ h_den_pos h1]
+  have h_ld_ratio : shared_ld_target < shared_ld_source := by
+    rwa [div_lt_one hldS] at hld_decay
+  nlinarith
+
+/-- **Equilibrium portability bound.**
+    Under mutation-drift equilibrium (where Fst = 1/(1+θ)), the portability
+    ratio has a finite lower bound that depends on θ. Larger θ (more mutation
+    relative to drift) means lower equilibrium Fst and thus better portability
+    from the drift component, but worse from the mutation/LD component. -/
+noncomputable def equilibriumPortabilityR2
+    (V_A V_E θ_source θ_target shared_ld : ℝ) : ℝ :=
+  let fst_target := 1 / (1 + θ_target)
+  let fst_source := 1 / (1 + θ_source)
+  presentDayR2MutationDrift V_A V_E fst_target shared_ld /
+    presentDayR2MutationDrift V_A V_E fst_source 1
+
+/-- **At equilibrium, larger θ means lower Fst and thus the drift component
+    of portability improves.**
+    If we compare two populations at equilibrium with θ₁ < θ₂, the population
+    with larger θ has smaller Fst. This improves the allele frequency component
+    of signal retention. -/
+theorem equilibrium_drift_component_improves_with_theta
+    (V_A θ₁ θ₂ : ℝ)
+    (hVA : 0 < V_A) (hθ₁ : 0 < θ₁) (hθ₂ : 0 < θ₂)
+    (h_more : θ₁ < θ₂) :
+    presentDayPGSVariance V_A (1 / (1 + θ₁)) <
+      presentDayPGSVariance V_A (1 / (1 + θ₂)) := by
+  unfold presentDayPGSVariance
+  have h1 : 0 < 1 + θ₁ := by linarith
+  have h2 : 0 < 1 + θ₂ := by linarith
+  -- 1/(1+θ₂) < 1/(1+θ₁), so 1 - 1/(1+θ₁) < 1 - 1/(1+θ₂)
+  -- i.e., θ₁/(1+θ₁) < θ₂/(1+θ₂)
+  have hfst₁ : 1 - 1 / (1 + θ₁) = θ₁ / (1 + θ₁) := by field_simp
+  have hfst₂ : 1 - 1 / (1 + θ₂) = θ₂ / (1 + θ₂) := by field_simp
+  rw [hfst₁, hfst₂]
+  have h_ratio_lt : θ₁ / (1 + θ₁) < θ₂ / (1 + θ₂) := by
+    rw [div_lt_div_iff₀ h1 h2]
+    nlinarith
+  exact mul_lt_mul_of_pos_right h_ratio_lt hVA
+
+/-- **Pure drift model overestimates portability.**
+    The drift-only model (which sets `negligibleMutation` = True) always
+    overestimates signal retention compared to the mutation-drift model.
+    This theorem quantifies the gap: the ratio of mutation-drift variance
+    to drift-only variance is exactly shared_ld. -/
+theorem mutationDrift_variance_ratio (V_A fst shared_ld : ℝ)
+    (hVA : 0 < V_A) (hfst : fst < 1)
+    (hld : 0 < shared_ld) :
+    presentDayPGSVarianceMutationDrift V_A fst shared_ld /
+      presentDayPGSVariance V_A fst = shared_ld := by
+  rw [presentDayPGSVarianceMutationDrift_eq]
+  unfold presentDayPGSVariance
+  have h1 : 0 < (1 - fst) * V_A := mul_pos (by linarith) hVA
+  field_simp
+  ring
+
+/-- **Correction factor for the drift-only model.**
+    To convert drift-only portability predictions to mutation-drift predictions,
+    multiply by the shared LD fraction. This gives the exact correction. -/
+theorem portability_correction_factor (V_A V_E fst_target shared_ld : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst : 0 ≤ fst_target) (hfst_lt : fst_target < 1)
+    (hld : 0 < shared_ld) (hld_le : shared_ld ≤ 1) :
+    presentDayPGSVarianceMutationDrift V_A fst_target shared_ld =
+      shared_ld * presentDayPGSVariance V_A fst_target := by
+  rw [presentDayPGSVarianceMutationDrift_eq]
+  unfold presentDayPGSVariance
+  ring
+
+/-- **Pairwise Fst under mutation-drift balance is bounded.**
+    Under mutation-drift equilibrium, pairwise Fst between any two populations
+    is bounded above by 2 × Fst_eq (since each branch contributes at most Fst_eq). -/
+theorem pairwise_fst_mutationDrift_bound (θ : ℝ) (hθ : 0 < θ) :
+    let fst_eq := 1 / (1 + θ)
+    pairwiseFstFromBranches fst_eq fst_eq ≤ 2 / (1 + θ) := by
+  simp [pairwiseFstFromBranches]
+  ring_nf
+  have h1 : 0 < 1 + θ := by linarith
+  have h1sq : 0 < (1 + θ) ^ 2 := by positivity
+  rw [div_add_div_same, sub_le_iff_le_add, div_add_div _ _ (ne_of_gt h1sq) (ne_of_gt h1)]
+  rw [div_le_div_iff₀ h1sq (by positivity : 0 < (1 + θ) ^ 2 * (1 + θ))]
+  nlinarith [sq_nonneg θ]
+
+end MutationDriftPortability
+
 end PortabilityDrift
 
 end Calibrator
