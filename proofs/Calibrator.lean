@@ -28,6 +28,7 @@ import Calibrator.RareVariantPortability
 import Calibrator.StatisticalGeneticsMethodology
 import Calibrator.EquityAndImplementation
 import Calibrator.EpistasisAndNonAdditivity
+import Calibrator.PolygenicAdaptation
 
 namespace Calibrator
 
