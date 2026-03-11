@@ -46,25 +46,6 @@ theorem genetic_correlation_bounded_mt
     -1 ≤ rg ∧ rg ≤ 1 := by
   exact ⟨by linarith [abs_nonneg rg, abs_le.mp h_bound |>.1], abs_le.mp h_bound |>.2⟩
 
-/-- **Genetic correlation is partially ancestry-specific.**
-    r_g between traits A and B may differ between EUR and AFR
-    due to different LD patterns and GxE. -/
-theorem rg_ancestry_specific
-    (rg_eur rg_afr : ℝ)
-    (h_diff : rg_eur ≠ rg_afr) :
-    rg_eur ≠ rg_afr := h_diff
-
-/-- **Genetic correlation matrix must be positive semidefinite.**
-    This constrains which trait combinations are possible. -/
-theorem rg_matrix_psd_constraint
-    (rg_AB rg_AC rg_BC : ℝ)
-    (h_bound_AB : |rg_AB| ≤ 1)
-    (h_bound_AC : |rg_AC| ≤ 1)
-    (h_bound_BC : |rg_BC| ≤ 1)
-    -- PSD constraint: det of correlation submatrix ≥ 0
-    (h_psd : 1 - rg_AB^2 - rg_AC^2 - rg_BC^2 + 2 * rg_AB * rg_AC * rg_BC ≥ 0) :
-    0 ≤ 1 - rg_AB^2 - rg_AC^2 - rg_BC^2 + 2 * rg_AB * rg_AC * rg_BC := h_psd
-
 end GeneticCorrelation
 
 
@@ -98,17 +79,6 @@ theorem mtblup_improves (rg n_aux n_target h2_aux h2_target : ℝ)
             mul_pos (mul_pos (sq_pos_of_ne_zero h_rg) (div_pos h_n_aux h_n_target))
                     (div_pos h_h2_aux h_h2_target)]
 
-/-- **MTBLUP portability.**
-    The multi-trait improvement may be less portable because:
-    1. Genetic correlations differ across ancestries
-    2. The auxiliary trait information may not transfer -/
-theorem mtblup_portability_uncertain
-    (improvement_same improvement_cross : ℝ)
-    (h_less : improvement_cross < improvement_same)
-    (h_still_helps : 1 < improvement_cross) :
-    1 < improvement_cross ∧ improvement_cross < improvement_same :=
-  ⟨h_still_helps, h_less⟩
-
 end MultiTraitBLUP
 
 
@@ -130,26 +100,6 @@ theorem pleiotropic_correlated_portability
     (h_rg : lb < |rg|)
     (h_lb_nn : 0 ≤ lb) :
     |port_A - port_B| < 2 * (1 - lb) := by linarith
-
-/-- **Mediated pleiotropy vs biological pleiotropy.**
-    Mediated: A → B, so variant affects B through A.
-    Portability of B is bounded by portability of A.
-    Biological: variant independently affects A and B. -/
-theorem mediated_pleiotropy_portability_bound
-    (port_A port_B_mediated : ℝ)
-    (h_mediated : port_B_mediated ≤ port_A)
-    (h_nn : 0 ≤ port_B_mediated) :
-    port_B_mediated ≤ port_A := h_mediated
-
-/-- **Trait-specific genetic components are less portable.**
-    The component of genetic variance unique to a trait (not shared
-    via pleiotropy) is more likely to be affected by population-specific
-    selection and thus less portable. -/
-theorem unique_component_less_portable
-    (port_shared port_unique : ℝ)
-    (h_less : port_unique < port_shared)
-    (h_nn : 0 < port_unique) :
-    port_unique < port_shared := h_less
 
 /-- **Decomposing trait heritability into shared and unique.**
     h²_trait = h²_shared + h²_unique
@@ -173,11 +123,11 @@ directly measure portability of genetic effects.
 
 section CrossAncestryRg
 
-/-- **Cross-ancestry r_g measures effect portability.**
-    r_g(trait_EUR, trait_AFR) measures how similar the genetic
-    effects are between EUR and AFR for the same trait. -/
-noncomputable def crossAncestryRg (cov_cross V_g_eur V_g_afr : ℝ) : ℝ :=
-  cov_cross / Real.sqrt (V_g_eur * V_g_afr)
+/-- **Cross-population r_g measures effect portability.**
+    r_g(trait_source, trait_target) measures how similar the genetic
+    effects are between source and target for the same trait. -/
+noncomputable def crossAncestryRg (cov_cross V_g_source V_g_target : ℝ) : ℝ :=
+  cov_cross / Real.sqrt (V_g_source * V_g_target)
 
 /-- **r_g bounds PGS portability.**
     R²_target / R²_source ≤ r_g² (cross-ancestry). -/
@@ -188,22 +138,20 @@ theorem rg_bounds_portability_ratio
     r2_target ≤ rg_cross^2 * r2_source := by
   rwa [div_le_iff₀ h_r2_s] at h_bound
 
-/-- **Height has high cross-ancestry r_g.**
-    r_g(height, EUR-EAS) ≈ 0.95
-    → R² portability ≤ 0.90. -/
-theorem height_high_cross_rg
+/-- **Traits with high cross-population r_g have good portability.**
+    When r_g is high (e.g., ~0.95), R² portability is bounded by ~0.90. -/
+theorem high_cross_rg
     (rg lb : ℝ) (h_rg : lb < rg) (h_lb_nn : 0 ≤ lb) (h_rg_le : rg ≤ 1) :
     lb^2 < rg^2 := by nlinarith [sq_nonneg (rg - lb)]
 
-/-- **Immune traits have low cross-ancestry r_g.**
-    r_g(WBC, EUR-AFR) ≈ 0.3
-    → R² portability ≤ 0.09. Very poor. -/
-theorem immune_low_cross_rg
+/-- **Traits with low cross-population r_g have poor portability.**
+    When r_g is low (e.g., ~0.3), R² portability is bounded by ~0.09. -/
+theorem low_cross_rg
     (rg ub : ℝ) (h_rg : rg ≤ ub) (h_rg_nn : 0 ≤ rg) (h_ub_nn : 0 ≤ ub) :
     rg^2 ≤ ub^2 := by nlinarith [sq_nonneg rg, sq_nonneg (rg - ub)]
 
 /-- **r_g can be underestimated due to power.**
-    With low power in non-EUR GWAS, r_g estimates are
+    With low power in underrepresented-population GWAS, r_g estimates are
     attenuated toward zero. Correction for attenuation:
     r_g_corrected = r_g_observed / √(h²_1 × h²_2). -/
 theorem rg_attenuation_correction

@@ -53,16 +53,6 @@ theorem credible_set_shrinks_with_power
     size_large_n / size_small_n < 1 := by
   rw [div_lt_one (by linarith)]; exact h_smaller
 
-/-- **LD affects credible set size.**
-    In long-LD regions (EUR), credible sets are larger because
-    more variants are in high LD with the causal variant.
-    In short-LD regions (AFR), credible sets are smaller. -/
-theorem shorter_ld_smaller_credible_sets
-    (cs_eur cs_afr : ℝ)
-    (h_smaller : cs_afr < cs_eur)
-    (h_nn : 0 < cs_afr) :
-    cs_afr < cs_eur := h_smaller
-
 /-- **Credible set resolution.**
     Resolution = 1 / credible_set_size.
     Higher resolution → more precise causal variant identification. -/
@@ -123,18 +113,18 @@ theorem proxy_inflated (beta_causal r2_ld : ℝ)
   rw [lt_div_iff₀ h_r2]
   nlinarith
 
-/-- **Cross-ancestry LD change inflates proxy differently.**
-    If LD(proxy, causal) differs between EUR and AFR,
+/-- **Cross-population LD change inflates proxy differently.**
+    If LD(proxy, causal) differs between source and target,
     the proxy-based PGS has different effective weights. -/
 theorem differential_proxy_inflation
-    (beta r2_eur r2_afr : ℝ)
-    (h_beta : 0 < beta) (h_eur : 0 < r2_eur) (h_afr : 0 < r2_afr)
-    (h_diff : r2_eur ≠ r2_afr) :
-    proxyInflation beta r2_eur ≠ proxyInflation beta r2_afr := by
+    (beta r2_source r2_target : ℝ)
+    (h_beta : 0 < beta) (h_source : 0 < r2_source) (h_target : 0 < r2_target)
+    (h_diff : r2_source ≠ r2_target) :
+    proxyInflation beta r2_source ≠ proxyInflation beta r2_target := by
   unfold proxyInflation
   intro h
-  rw [div_eq_div_iff h_eur.ne' h_afr.ne'] at h
-  have : r2_eur = r2_afr := by nlinarith
+  rw [div_eq_div_iff h_source.ne' h_target.ne'] at h
+  have : r2_source = r2_target := by nlinarith
   exact h_diff this
 
 end CausalVariantPortability
@@ -149,35 +139,15 @@ by leveraging different LD structures.
 
 section CrossAncestryFineMapping
 
-/-- **Multi-ancestry fine-mapping narrows credible sets.**
-    Combining data from populations with different LD patterns
-    helps distinguish causal from correlated variants. -/
-theorem multi_ancestry_narrows_cs
-    (cs_single cs_multi : ℝ)
-    (h_narrower : cs_multi < cs_single)
-    (h_nn : 0 < cs_multi) :
-    cs_multi < cs_single := h_narrower
-
-/-- **African ancestry is most informative for fine-mapping.**
-    Shorter LD blocks in AFR provide natural fine-mapping.
-    A small AFR sample can be as informative as a large EUR sample
-    for identifying causal variants. -/
-theorem afr_efficient_for_fine_mapping
-    (n_afr n_eur resolution_afr resolution_eur : ℝ)
-    (h_smaller_n : n_afr < n_eur)
-    (h_comparable : resolution_eur ≤ resolution_afr) :
-    -- AFR achieves comparable resolution with fewer samples
-    resolution_eur ≤ resolution_afr := h_comparable
-
 /-- **LD matrix discordance helps identification.**
-    When two variants are in high LD in EUR but low LD in AFR,
-    the cross-ancestry analysis can distinguish which is causal. -/
+    When two variants are in high LD in one population but low LD in another,
+    the cross-population analysis can distinguish which is causal. -/
 theorem ld_discordance_identifies_causal
-    (r2_eur_AB r2_afr_AB : ℝ)
-    (h_eur_high : 4 / 5 < r2_eur_AB)
-    (h_afr_low : r2_afr_AB < 1 / 5) :
-    -- The variants are distinguishable in AFR but not EUR
-    r2_afr_AB < r2_eur_AB := by linarith
+    (r2_source_AB r2_target_AB : ℝ)
+    (h_source_high : 4 / 5 < r2_source_AB)
+    (h_target_low : r2_target_AB < 1 / 5) :
+    -- The variants are distinguishable in the target but not source
+    r2_target_AB < r2_source_AB := by linarith
 
 /-- **Trans-ethnic Bayes factor.**
     Combining Bayes factors across ancestries (assuming shared

@@ -69,14 +69,14 @@ theorem portability_concave_in_fst_reduction
 
     This is a consequence of the concavity of the portability function. -/
 theorem maxmin_allocation_favors_diversity
-    (n_total n_eur n_other : ℝ)
-    (h_sum : n_eur + n_other = n_total)
-    (fst_min_eur fst_min_mixed : ℝ)
-    -- Moving samples from European to other ancestries reduces max Fst
-    (h_mixed_better : fst_min_mixed < fst_min_eur)
-    (h_nn : 0 ≤ fst_min_mixed) (h_lt : fst_min_eur < 1) :
+    (n_total n_source n_other : ℝ)
+    (h_sum : n_source + n_other = n_total)
+    (fst_min_source fst_min_mixed : ℝ)
+    -- Moving samples from overrepresented to other populations reduces max Fst
+    (h_mixed_better : fst_min_mixed < fst_min_source)
+    (h_nn : 0 ≤ fst_min_mixed) (h_lt : fst_min_source < 1) :
     neutralPortabilityRatio 0 fst_min_mixed >
-      neutralPortabilityRatio 0 fst_min_eur := by
+      neutralPortabilityRatio 0 fst_min_source := by
   unfold neutralPortabilityRatio
   simp; linarith
 
@@ -225,15 +225,15 @@ end EquityImplications
 
 
 /-!
-## PGS Construction Method Effects on Portability
+## Variant Count and Estimation Noise
 
-The paper uses clumping and thresholding (C+T). Reviewers suggest PRS-CS.
-We formalize why PGS construction method affects portability patterns.
+We formalize how the number of variants and effect estimation approach
+affect portability noise and stability.
 -/
 
-section PGSConstruction
+section VariantCountAndEstimationNoise
 
-/-- **C+T uses fewer variants → noisier portability estimates.**
+/-- **Fewer variants → noisier portability estimates.**
     With fewer variants, each SNP's contribution is larger,
     making the score more sensitive to individual LD changes. -/
 theorem fewer_variants_noisier
@@ -254,8 +254,8 @@ theorem more_variants_more_stable
     var_per_snp / (m : ℝ) > 0 := by
   exact div_pos hv (Nat.cast_pos.mpr hm)
 
-/-- **PRS-CS regularization dampens portability noise.**
-    Bayesian shrinkage (PRS-CS) pulls small effects toward zero,
+/-- **Shrinkage regularization dampens portability noise.**
+    Bayesian shrinkage pulls small effects toward zero,
     reducing the impact of LD-specific noise on portability. -/
 theorem shrinkage_reduces_portability_variance
     (β_raw β_shrunk σ_sq_noise : ℝ)
@@ -265,6 +265,6 @@ theorem shrinkage_reduces_portability_variance
   apply mul_le_mul_of_nonneg_right _ (le_of_lt hσ)
   nlinarith [sq_abs β_shrunk, sq_abs β_raw, abs_nonneg β_shrunk, abs_nonneg β_raw]
 
-end PGSConstruction
+end VariantCountAndEstimationNoise
 
 end Calibrator

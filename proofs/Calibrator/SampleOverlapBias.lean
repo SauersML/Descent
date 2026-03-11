@@ -99,14 +99,6 @@ because discovery and target samples are from different populations.
 
 section CrossAncestryNoOverlap
 
-/-- **Cross-ancestry has zero overlap by design.**
-    When discovery is EUR and validation is AFR, there is no
-    sample overlap → no overfitting inflation. -/
-theorem cross_ancestry_no_overlap_bias
-    (r2_cross r2_cross_true : ℝ)
-    (h_no_overlap : r2_cross = r2_cross_true) :
-    r2_cross = r2_cross_true := h_no_overlap
-
 /-- **Same-ancestry R² is inflated relative to cross-ancestry.**
     Some apparent portability loss is actually the absence of
     overlap inflation in the cross-ancestry estimate. -/
@@ -119,15 +111,6 @@ theorem apparent_portability_loss_includes_overlap
   constructor
   · linarith
   · linarith
-
-/-- **Correcting for overlap reveals true portability.**
-    After removing overlap bias from same-ancestry R²,
-    the true portability gap is smaller than it appeared. -/
-theorem corrected_portability_better
-    (port_apparent port_corrected : ℝ)
-    (h_better : port_apparent < port_corrected)
-    (h_nn : 0 < port_apparent) :
-    port_apparent < port_corrected := h_better
 
 end CrossAncestryNoOverlap
 
@@ -212,23 +195,6 @@ theorem kinship_inflates (r2_true K h2_family : ℝ)
     Removing individuals with GRM off-diagonal > threshold
     (e.g., 0.05) removes close relatives but not distant
     population structure. -/
-theorem grm_threshold_tradeoff
-    (n_before n_after threshold₁ threshold₂ : ℝ)
-    (h_stricter : threshold₁ < threshold₂)
-    (h_less_samples : n_after < n_before)
-    (h_nn : 0 < n_after) :
-    n_after < n_before := h_less_samples
-
-/-- **Cross-ancestry naturally avoids cryptic relatedness.**
-    Individuals from different continental ancestries have
-    near-zero kinship, eliminating kinship-based inflation. -/
-theorem cross_ancestry_no_kinship_bias
-    (K_cross : ℝ)
-    (h_near_zero : |K_cross| < 0.001)
-    (h_r2_true : ∀ r2 h2 : ℝ, 0 < h2 →
-      |kinshipInflation r2 K_cross h2 - r2| < 0.001 * h2) :
-    |K_cross| < 0.001 := h_near_zero
-
 end CrypticRelatedness
 
 end Calibrator

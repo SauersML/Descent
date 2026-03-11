@@ -132,14 +132,6 @@ theorem coverage_gap_from_variance_ratio
 
 /-- **Corrected prediction interval width for target population.**
     Use √(Var_target(Y)(1 - R²_target)) instead of source residual variance. -/
-theorem corrected_interval_uses_target_variance
-    (varY_s varY_t r2_s r2_t : ℝ)
-    (h_vs : 0 < varY_s) (h_vt : 0 < varY_t)
-    (h_rs : 0 ≤ r2_s) (h_rs1 : r2_s < 1)
-    (h_rt : 0 ≤ r2_t) (h_rt1 : r2_t < 1)
-    (h_larger_resid : residualVariance varY_s r2_s < residualVariance varY_t r2_t) :
-    residualVariance varY_s r2_s < residualVariance varY_t r2_t := h_larger_resid
-
 /-- **Minimum sample size for interval calibration.**
     To estimate the target residual variance with relative error ε,
     need n ≈ 2/ε² observations. -/
@@ -201,11 +193,6 @@ theorem finer_ancestry_narrower_intervals
 /-- **Continuous ancestry via genetic PCs.**
     Using PCs instead of discrete groups gives the narrowest
     conditional intervals (finest stratification). -/
-theorem pc_conditional_intervals_optimal
-    (var_discrete var_pc : ℝ)
-    (h_pc_better : var_pc ≤ var_discrete) :
-    var_pc ≤ var_discrete := h_pc_better
-
 end ConditionalIntervals
 
 
@@ -234,20 +221,6 @@ theorem bonferroni_conservative
     (α : ℝ) (k : ℕ) (h_α : 0 ≤ α) (h_k : 1 ≤ k) :
     α / k ≤ α := by
   exact div_le_self h_α (by exact_mod_cast h_k)
-
-/-- **Šidák correction is tighter.**
-    Per-population level: 1 - (1-α)^(1/k) ≤ α/k.
-    This gives shorter intervals while maintaining coverage. -/
-theorem sidak_tighter_than_bonferroni
-    (α : ℝ) (k : ℕ)
-    (h_α : 0 < α) (h_α_le : α < 1)
-    (h_k : 1 < k)
-    -- Šidák level per-population is larger → shorter intervals
-    (sidak_level bonf_level : ℝ)
-    (h_sidak : sidak_level = 1 - (1 - α) ^ (1 / (k : ℝ)))
-    (h_bonf : bonf_level = α / k)
-    (h_sidak_ge : bonf_level ≤ sidak_level) :
-    bonf_level ≤ sidak_level := h_sidak_ge
 
 /-- **Heterogeneous coverage across populations requires adjustment.**
     If R² varies widely across populations, a single prediction interval
@@ -298,13 +271,6 @@ theorem conformal_gap_decreases
 /-- **Conformal intervals are adaptive to local difficulty.**
     In regions where the model is worse (e.g., for certain ancestry groups),
     conformal intervals are automatically wider. -/
-theorem conformal_adaptive_width
-    (residual_easy residual_hard : ℝ)
-    (h_harder : residual_easy < residual_hard)
-    (h_nn : 0 ≤ residual_easy) :
-    -- Conformal quantile is larger for harder cases
-    residual_easy < residual_hard := h_harder
-
 /-- **Conformal requires exchangeability, which portability violates.**
     When the target distribution differs from calibration distribution,
     the coverage guarantee breaks down. This is the fundamental challenge
@@ -319,20 +285,9 @@ theorem covariate_shift_breaks_conformal
     If we know the likelihood ratio P_target(X)/P_source(X),
     weighted conformal prediction restores marginal coverage.
     The price: wider intervals (effective sample size reduced). -/
-theorem weighted_conformal_wider
-    (width_unweighted width_weighted : ℝ)
-    (h_wider : width_unweighted ≤ width_weighted)
-    (h_nn : 0 ≤ width_unweighted) :
-    width_unweighted ≤ width_weighted := h_wider
-
 /-- **Effective sample size under importance weighting.**
     n_eff = (Σ wᵢ)² / Σ wᵢ² ≤ n.
     Large weights → small n_eff → wider intervals. -/
-theorem effective_sample_size_le_n
-    (n_eff n : ℝ)
-    (h_le : n_eff ≤ n) (h_nn : 0 ≤ n_eff) :
-    n_eff ≤ n := h_le
-
 end ConformalPrediction
 
 
@@ -353,39 +308,15 @@ section InformationTheoreticBounds
     Among all noise distributions with the same variance,
     Gaussian gives the widest entropy power → tightest bound.
     (This is Gaussian optimality from the EPI.) -/
-theorem gaussian_optimal_prediction_interval
-    (var_ε width_gaussian width_other : ℝ)
-    (h_gaussian_optimal : width_gaussian ≤ width_other)
-    (h_nn : 0 ≤ width_gaussian) :
-    width_gaussian ≤ width_other := h_gaussian_optimal
-
 /-- **Mutual information bounds R².**
     I(Y; PGS) ≤ H(Y), and R² ≈ 1 - exp(-2I(Y;PGS)) for Gaussian.
     This sets a fundamental limit on prediction interval width. -/
-theorem mutual_info_bounds_r2
-    (I_Y_PGS H_Y : ℝ)
-    (h_bound : I_Y_PGS ≤ H_Y)
-    (h_nn : 0 ≤ I_Y_PGS) :
-    I_Y_PGS ≤ H_Y := h_bound
-
 /-- **Cross-population prediction loses mutual information.**
     I(Y_target; PGS_source) ≤ I(Y_source; PGS_source).
     The information loss determines the minimum interval widening. -/
-theorem cross_population_info_loss
-    (I_source I_target : ℝ)
-    (h_loss : I_target ≤ I_source)
-    (h_nn : 0 ≤ I_target) :
-    I_target ≤ I_source := h_loss
-
 /-- **Data processing inequality for PGS portability.**
     Y_target → Genetics → PGS forms a Markov chain (DPI).
     Any post-processing of PGS cannot increase prediction quality. -/
-theorem data_processing_inequality_portability
-    (I_genetics_Y I_pgs_Y : ℝ)
-    (h_dpi : I_pgs_Y ≤ I_genetics_Y)
-    (h_nn : 0 ≤ I_pgs_Y) :
-    I_pgs_Y ≤ I_genetics_Y := h_dpi
-
 end InformationTheoreticBounds
 
 end Calibrator

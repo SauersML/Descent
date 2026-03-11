@@ -17,9 +17,8 @@ portability challenges.
 Key results:
 1. Rare variant population-specificity
 2. Burden tests and gene-based PGS
-3. WGS-based PGS vs array-based PGS
-4. Loss-of-function variant portability
-5. Rare variant effect size distribution
+3. Loss-of-function variant portability
+4. Rare variant effect size distribution
 
 Reference: Wang et al. (2026), Nature Communications 17:942.
 -/
@@ -42,11 +41,6 @@ noncomputable def variantSharingProb (fst maf : ℝ) : ℝ :=
 
 /-- **Ultra-rare variants are almost never shared.**
     For MAF < 0.001, sharing probability → 0 for divergent populations. -/
-theorem ultra_rare_not_shared
-    (sharing_prob : ℝ)
-    (h_small : sharing_prob < 1 / 100) :
-    sharing_prob < 1 / 100 := h_small
-
 /-- **Rare variant contribution to heritability.**
     Rare variants collectively explain a significant fraction of h².
     For many traits, 20-50% of h² is from MAF < 1% variants. -/
@@ -65,28 +59,6 @@ theorem rare_variant_zero_portability
     (β maf_B : ℝ) (h_absent : maf_B = 0) :
     β ^ 2 * (2 * maf_B * (1 - maf_B)) = 0 := by
   rw [h_absent]; ring
-
-/-- **Number of rare variants scales with population size.**
-    n_rare ∝ θ × Σ_{i=1}^{2N} 1/i ≈ θ × ln(2N).
-    Larger populations have more rare variants. -/
-theorem more_variants_in_larger_population
-    (n_rare₁ n_rare₂ Ne₁ Ne₂ : ℝ)
-    (h_larger : Ne₁ < Ne₂)
-    (h_more : n_rare₁ < n_rare₂)
-    (h_pos : 0 < n_rare₁) :
-    n_rare₁ < n_rare₂ := h_more
-
-/-- **African populations have the most rare variants.**
-    Due to larger long-term Ne and no out-of-Africa bottleneck,
-    African populations have ~3x more rare variants than European. -/
-theorem african_populations_most_diverse
-    (n_rare_afr n_rare_eur ratio : ℝ)
-    (h_ratio : ratio = n_rare_afr / n_rare_eur)
-    (h_more : 2 < ratio)
-    (h_eur_pos : 0 < n_rare_eur) :
-    2 * n_rare_eur < n_rare_afr := by
-  have : 2 < n_rare_afr / n_rare_eur := by linarith
-  rwa [lt_div_iff₀ h_eur_pos] at this
 
 end RareVariantSpecificity
 
@@ -108,12 +80,6 @@ section BurdenTests
     Even if specific rare variants differ, the gene-level burden
     may be similar across populations (same genes mutated,
     different specific variants). -/
-theorem gene_level_more_portable
-    (port_variant port_gene : ℝ)
-    (h_more_portable : port_variant < port_gene)
-    (h_nn : 0 ≤ port_variant) :
-    port_variant < port_gene := h_more_portable
-
 /-- **Functional equivalence across populations.**
     Different rare variants in the same gene may have equivalent
     functional effects. This creates "functional portability"
@@ -135,68 +101,7 @@ theorem functional_weights_improve_portability
     (h_const_worst : port_constant < port_maf) :
     port_constant < port_functional := by linarith
 
-/-- **SKAT (sequence kernel association test) handles bidirectional effects.**
-    Unlike burden tests, SKAT allows variants to have different
-    directions of effect within a gene. This is more realistic
-    and gives better portability for complex genes. -/
-theorem skat_handles_bidirectional
-    (r2_burden r2_skat : ℝ)
-    (h_skat_better : r2_burden ≤ r2_skat) :
-    r2_burden ≤ r2_skat := h_skat_better
-
 end BurdenTests
-
-
-/-!
-## WGS-Based PGS
-
-Whole genome sequencing enables inclusion of rare variants in PGS,
-but the portability implications are complex.
--/
-
-section WGSBasedPGS
-
-/-- **WGS PGS = common + rare components.**
-    PGS_WGS = PGS_common + PGS_rare.
-    The portability of each component differs dramatically. -/
-noncomputable def wgsPGS (pgs_common pgs_rare : ℝ) : ℝ :=
-  pgs_common + pgs_rare
-
-/-- **Common variant component ports better.**
-    PGS_common has moderate portability (shared variants, LD issues).
-    PGS_rare has very poor portability (population-specific variants). -/
-theorem common_component_more_portable
-    (port_common port_rare : ℝ)
-    (h_common_better : port_rare < port_common)
-    (h_nn : 0 ≤ port_rare) :
-    port_rare < port_common := h_common_better
-
-/-- **WGS PGS within-population outperforms array PGS.**
-    Within the discovery population, WGS PGS captures more variance
-    (including rare variant contributions). -/
-theorem wgs_within_pop_better
-    (r2_array r2_wgs : ℝ)
-    (h_better : r2_array < r2_wgs)
-    (h_nn : 0 < r2_array) :
-    r2_array < r2_wgs := h_better
-
-/-- **WGS PGS cross-population can be worse than array PGS.**
-    Because population-specific rare variants add noise in the
-    target population (zero signal + estimation error). -/
-theorem wgs_cross_pop_can_be_worse
-    (r2_array_cross r2_wgs_cross : ℝ)
-    (h_worse : r2_wgs_cross < r2_array_cross) :
-    r2_wgs_cross < r2_array_cross := h_worse
-
-/-- **Optimal strategy: population-specific rare + shared common.**
-    Use common variants for the shared component (portable)
-    and population-specific rare variants for local prediction. -/
-theorem optimal_combined_strategy
-    (r2_common_only r2_combined : ℝ)
-    (h_better : r2_common_only ≤ r2_combined) :
-    r2_common_only ≤ r2_combined := h_better
-
-end WGSBasedPGS
 
 
 /-!
@@ -218,15 +123,6 @@ theorem lof_large_effects
     1 < |β_lof| / |β_common| := by
   rw [one_lt_div₀ h_common_pos]
   exact h_larger
-
-/-- **LoF variant portability depends on gene constraint.**
-    Highly constrained genes (pLI > 0.9) have LoF variants
-    in all populations (purifying selection maintains them rare).
-    Less constrained genes may have population-specific LoF. -/
-theorem constrained_genes_more_portable_lof
-    (port_constrained port_unconstrained : ℝ)
-    (h_constrained_better : port_unconstrained < port_constrained) :
-    port_unconstrained < port_constrained := h_constrained_better
 
 /-- **Haploinsufficiency gives directional effects.**
     For haploinsufficient genes, any LoF variant reduces function.
@@ -262,17 +158,6 @@ variants, affecting both PGS construction and portability.
 
 section EffectSizeDistribution
 
-/-- **Negative selection constrains common variant effects.**
-    E[|β|² | MAF] decreases with MAF because purifying selection
-    removes large-effect alleles that reach high frequency.
-    β² ∝ 1/p^α where α ≈ 0.5-1 (the LDAK-thin model). -/
-theorem negative_selection_constraint
-    (β_rare β_common : ℝ)
-    (maf_rare maf_common : ℝ)
-    (h_rare_maf : maf_rare < maf_common)
-    (h_rare_larger : |β_common| < |β_rare|) :
-    |β_common| < |β_rare| := h_rare_larger
-
 /-- **The α model: E[β²] ∝ [p(1-p)]^(1+α).**
     α = 0: neutral (no relationship between MAF and effect)
     α = -1: LDAK (β² ∝ 1/[p(1-p)])
@@ -303,11 +188,6 @@ theorem rare_variant_needs_large_n
 /-- **Population-specific rare variant PGS is optimal for within-population.**
     Each population should have its own rare variant PGS component,
     estimated from population-specific large samples. -/
-theorem population_specific_rare_pgs_optimal
-    (r2_generic r2_specific : ℝ)
-    (h_specific_better : r2_generic ≤ r2_specific) :
-    r2_generic ≤ r2_specific := h_specific_better
-
 end EffectSizeDistribution
 
 end Calibrator

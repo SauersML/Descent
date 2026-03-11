@@ -88,37 +88,6 @@ and vice versa.
 
 section CalibrationVsDiscrimination
 
-/-- **Good AUC does not imply good calibration.**
-    AUC measures ranking ability; calibration measures
-    absolute risk accuracy. A model with AUC = 0.8 can
-    be perfectly uncalibrated. -/
-theorem auc_independent_of_calibration
-    (auc citl : ℝ)
-    (h_good_auc : 7/10 < auc)
-    (h_poor_cal : 1/10 < |citl|) :
-    -- Both can coexist
-    7/10 < auc ∧ 1/10 < |citl| := ⟨h_good_auc, h_poor_cal⟩
-
-/-- **Calibration can change without changing AUC.**
-    Prevalence shift changes calibration but not AUC
-    (ranking is preserved under monotone transforms). -/
-theorem prevalence_shift_changes_calibration_not_auc
-    (auc₁ auc₂ citl₁ citl₂ : ℝ)
-    (h_auc_same : auc₁ = auc₂)
-    (h_cal_diff : citl₁ ≠ citl₂) :
-    auc₁ = auc₂ ∧ citl₁ ≠ citl₂ := ⟨h_auc_same, h_cal_diff⟩
-
-/-- **Cross-ancestry: discrimination drops AND calibration worsens.**
-    In practice, both deteriorate because:
-    - AUC drops due to LD mismatch (less signal)
-    - Calibration worsens due to prevalence/environment differences -/
-theorem cross_ancestry_both_worsen
-    (auc_source auc_target citl_source citl_target : ℝ)
-    (h_auc : auc_target < auc_source)
-    (h_cal : |citl_source| < |citl_target|) :
-    auc_target < auc_source ∧ |citl_source| < |citl_target| :=
-  ⟨h_auc, h_cal⟩
-
 end CalibrationVsDiscrimination
 
 
@@ -164,17 +133,6 @@ theorem env_differences_shift_calibration
     (h_effect : env_effect ≠ 0) :
     citl_env_diff ≠ 0 := by rw [h_diff]; exact h_effect
 
-/-- **Genetic risk distribution shift.**
-    If the PGS distribution differs (mean or variance) in the target,
-    both CITL and calibration slope change. -/
-theorem genetic_distribution_shift
-    (mean_pgs_source mean_pgs_target var_pgs_source var_pgs_target : ℝ)
-    (h_mean_diff : mean_pgs_source ≠ mean_pgs_target)
-    (h_var_diff : var_pgs_source ≠ var_pgs_target) :
-    -- Both mean and variance differences affect calibration
-    mean_pgs_source ≠ mean_pgs_target ∧ var_pgs_source ≠ var_pgs_target :=
-  ⟨h_mean_diff, h_var_diff⟩
-
 end PopulationCalibrationDrift
 
 
@@ -217,14 +175,6 @@ theorem recalibration_needs_events
     (h_insufficient : n_events < n_params * events_per_param) :
     n_events < 400 := by subst h_rule; subst h_params; omega
 
-/-- **Recalibration does not improve discrimination.**
-    Recalibration is a monotone transform → AUC unchanged.
-    R² may change slightly due to variance recalibration. -/
-theorem recalibration_preserves_auc
-    (auc_before auc_after : ℝ)
-    (h_monotone : auc_before = auc_after) :
-    auc_before = auc_after := h_monotone
-
 end RecalibrationMethods
 
 
@@ -236,17 +186,6 @@ based on PGS thresholds.
 -/
 
 section DecisionImplications
-
-/-- **Miscalibration changes clinical decisions.**
-    If threshold = 10% risk and PGS is miscalibrated,
-    individuals may be incorrectly classified as high/low risk. -/
-theorem miscalibration_changes_decisions
-    (true_risk predicted_risk threshold : ℝ)
-    (h_above : threshold < predicted_risk)
-    (h_below : true_risk < threshold) :
-    -- Patient classified as high risk but actually low risk
-    true_risk < threshold ∧ threshold < predicted_risk :=
-  ⟨h_below, h_above⟩
 
 /-- **Net reclassification improvement (NRI) from recalibration.**
     NRI measures the proportion of patients correctly reclassified.

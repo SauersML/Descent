@@ -61,13 +61,6 @@ theorem allelic_variance_zero_at_fixation_one :
     allelicVariance 1 = 0 := by
   unfold allelicVariance; ring
 
-/-- **Off-diagonal LD is bounded.**
-    |D_ij| ≤ min(p_i p_j, (1-p_i)(1-p_j), p_i(1-p_j), (1-p_i)p_j). -/
-theorem ld_bounded_by_freq (D p_i p_j : ℝ)
-    (h_bound : |D| ≤ p_i * p_j)
-    (h_pi : 0 < p_i) (h_pj : 0 < p_j) :
-    |D| ≤ p_i * p_j := h_bound
-
 /-- **LD correlation r² is in [0,1].**
     r²_ij = D²_ij / (p_i(1-p_i) × p_j(1-p_j)). -/
 noncomputable def ldCorrelationSq (D p_i p_j : ℝ) : ℝ :=
@@ -110,17 +103,6 @@ theorem r2_loss_bounded_by_ld_mismatch
     (h_target_less : r2_target < r2_source) :
     0 < c * frob_sq := by positivity
 
-/-- **Spectral norm bound.**
-    The largest eigenvalue difference between LD matrices
-    gives a tighter bound on PGS loss for sparse PGS. -/
-theorem spectral_bound_tighter_for_sparse
-    (frob_loss spectral_loss sparsity : ℝ)
-    (h_frob : 0 < frob_loss)
-    (h_spectral : spectral_loss ≤ frob_loss)
-    (h_sparse_bound : spectral_loss * sparsity ≤ frob_loss)
-    (h_sparse : 0 < sparsity) (h_sparse_le : sparsity ≤ 1) :
-    spectral_loss * sparsity ≤ frob_loss := h_sparse_bound
-
 /-- **LD mismatch decomposes into components.**
     ||Σ_S - Σ_T||² = ||Σ_S - Σ_T||²_local + ||Σ_S - Σ_T||²_long_range
     where local LD decays quickly and long-range LD is population-specific. -/
@@ -144,14 +126,14 @@ to genomic regions separated by recombination hotspots.
 section BlockDiagonalLD
 
 /-- **LD block size is population-dependent.**
-    African populations have smaller LD blocks due to older
-    haplotype structure. European populations have larger blocks
+    Populations with older haplotype structure have smaller LD blocks.
+    Populations that experienced bottlenecks have larger blocks
     due to bottleneck-induced LD. -/
 theorem shorter_ld_smaller_blocks
-    (block_afr block_eur : ℝ)
-    (h_smaller : block_afr < block_eur)
-    (h_nn : 0 < block_afr) :
-    block_afr / block_eur < 1 := by
+    (block_pop₁ block_pop₂ : ℝ)
+    (h_smaller : block_pop₁ < block_pop₂)
+    (h_nn : 0 < block_pop₁) :
+    block_pop₁ / block_pop₂ < 1 := by
   rw [div_lt_one (by linarith)]
   exact h_smaller
 
@@ -180,18 +162,6 @@ theorem total_portability_from_blocks
     (h_nn : 0 ≤ avg_block_port) :
     0 ≤ port_total := by linarith
 
-/-- **Recombination hotspots define block boundaries.**
-    Hotspot density varies across populations, affecting
-    block structure and hence PGS portability. -/
-theorem hotspot_density_affects_blocks
-    (density_afr density_eur block_afr block_eur : ℝ)
-    (h_more_hotspots : density_eur < density_afr)
-    (h_smaller_blocks : block_afr < block_eur)
-    (h_nn_afr : 0 < block_afr) (h_nn_eur : 0 < block_eur) :
-    -- More hotspots correlate with smaller blocks
-    density_eur < density_afr ∧ block_afr < block_eur :=
-  ⟨h_more_hotspots, h_smaller_blocks⟩
-
 end BlockDiagonalLD
 
 
@@ -210,13 +180,13 @@ section LDScore
     but also more noise in GWAS. -/
 
 /-- **LD score varies across populations.**
-    EUR has higher average LD scores than AFR because EUR
-    has longer LD blocks and more extensive correlation. -/
-theorem eur_higher_ld_scores
-    (ell_eur ell_afr : ℝ)
-    (h_higher : ell_afr < ell_eur)
-    (h_nn : 0 < ell_afr) :
-    ell_afr / ell_eur < 1 := by
+    Populations with longer LD blocks have higher average LD scores
+    due to more extensive correlation. -/
+theorem higher_ld_scores_ratio
+    (ell_high ell_low : ℝ)
+    (h_higher : ell_low < ell_high)
+    (h_nn : 0 < ell_low) :
+    ell_low / ell_high < 1 := by
   rw [div_lt_one (by linarith)]
   exact h_higher
 

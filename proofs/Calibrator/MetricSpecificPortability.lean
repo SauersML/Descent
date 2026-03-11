@@ -45,51 +45,9 @@ theorem r2_sensitive_to_mean_shift
     -- R² dropped due to mean shift, even with preserved ranking
     0 < r2_source - r2_target := by linarith
 
-/-- **AUC is invariant to monotone transformations.**
-    AUC depends only on the rank ordering of predictions,
-    not on their absolute values. -/
-theorem auc_rank_invariant
-    (auc_original auc_transformed : ℝ)
-    (h_monotone_preserved : auc_original = auc_transformed) :
-    auc_original = auc_transformed := h_monotone_preserved
-
-/-- **AUC can be more portable than R².**
-    Since AUC only depends on ranking and R² depends on calibration,
-    AUC may show better portability when the main portability loss
-    is in calibration (mean shift, variance change). -/
-theorem auc_more_portable_than_r2
-    (port_r2 port_auc : ℝ)
-    (h_auc_better : port_r2 < port_auc)
-    (h_nn : 0 ≤ port_r2) :
-    port_r2 < port_auc := h_auc_better
-
-/-- **AUC depends on prevalence.**
-    For a fixed PGS, AUC changes if the case-control ratio changes
-    across populations (different disease prevalence). -/
-theorem auc_depends_on_prevalence
-    (auc₁ auc₂ : ℝ)
-    (h_diff_prev : auc₁ ≠ auc₂) :
-    auc₁ ≠ auc₂ := h_diff_prev
-
-/-- **R² to AUC conversion (Wray et al., 2010).**
-    AUC ≈ Φ(√(R²/(1-R²)/2)) for liability threshold model.
-    This is approximately √(R²) for small R². -/
-theorem r2_auc_relationship
-    (r2 auc : ℝ)
-    (h_r2_pos : 0 < r2) (h_r2_lt : r2 < 1)
-    (h_auc_gt_half : 0.5 < auc) (h_auc_le : auc ≤ 1) :
-    -- AUC > 0.5 when R² > 0
-    0.5 < auc := h_auc_gt_half
-
 /-- **Portability of AUC vs R² for binary traits.**
     R²_Nagelkerke drops faster than AUC because Nagelkerke R²
     is sensitive to prevalence changes. -/
-theorem nagelkerke_drops_faster_than_auc
-    (port_nagelkerke port_auc : ℝ)
-    (h_faster : port_nagelkerke < port_auc)
-    (h_nn : 0 < port_nagelkerke) :
-    port_nagelkerke < port_auc := h_faster
-
 end R2VsAUC
 
 
@@ -119,29 +77,13 @@ theorem discrimination_preserved_calibration_lost
 /-- **Calibration is affected by allele frequency shifts.**
     The mean PGS shifts when allele frequencies change → calibration-
     in-the-large is violated. This is independent of discrimination. -/
-theorem allele_freq_shift_disrupts_calibration
-    (mean_pgs_source mean_pgs_target : ℝ)
-    (h_shift : mean_pgs_source ≠ mean_pgs_target) :
-    mean_pgs_source ≠ mean_pgs_target := h_shift
-
 /-- **Recalibration is easier than improving discrimination.**
     Calibration can be fixed with a small target-population sample
     (just need to estimate intercept + slope). Discrimination
     requires new genetic discoveries. -/
-theorem recalibration_easier_than_rediscovery
-    (n_for_cal n_for_disc : ℕ)
-    (h_cal_cheap : n_for_cal < n_for_disc)
-    (h_cal_pos : 0 < n_for_cal) :
-    n_for_cal < n_for_disc := h_cal_cheap
-
 /-- **Expected calibration error (ECE).**
     ECE = Σᵢ |observed_risk_in_bin_i - predicted_risk_in_bin_i| × n_i/n.
     ECE can increase dramatically across populations. -/
-theorem ece_increases_with_portability_loss
-    (ece_source ece_target : ℝ)
-    (h_worse : ece_source < ece_target) (h_nn : 0 ≤ ece_source) :
-    ece_source < ece_target := h_worse
-
 /-- **Brier score decomposes into calibration and discrimination.**
     Brier = calibration_component + refinement_component.
     Portability can affect each component differently. -/
@@ -215,11 +157,6 @@ theorem ppv_changes_with_prevalence
     Sensitivity depends mainly on discrimination (rank ordering),
     which is more stable across populations.
     PPV depends on both discrimination and prevalence. -/
-theorem sensitivity_more_portable_than_ppv
-    (Δsensitivity Δppv : ℝ)
-    (h_sens_stable : |Δsensitivity| < |Δppv|) :
-    |Δsensitivity| < |Δppv| := h_sens_stable
-
 /-- **Number needed to screen (NNS) portability.**
     NNS = 1/PPV. If PPV drops, NNS increases → more individuals
     need screening for each true positive. -/
@@ -276,11 +213,6 @@ theorem different_uses_different_metrics
     The net benefit at threshold p_t depends on both PPV and sensitivity:
     NB = (TP/N) - (FP/N) × p_t/(1-p_t).
     Population-specific thresholds may be needed. -/
-theorem net_benefit_population_specific
-    (nb_source nb_target : ℝ)
-    (h_diff : nb_source ≠ nb_target) :
-    nb_source ≠ nb_target := h_diff
-
 /-- **Relative utility of PGS vs no screening.**
     For PGS to be clinically useful, NB(PGS) > NB(screen all) and
     NB(PGS) > NB(screen none). If portability loss brings NB below
@@ -334,22 +266,10 @@ theorem brier_nonneg (p y : ℝ) : 0 ≤ brierScoreMetric p y := sq_nonneg _
     Log: very sensitive to calibration, unbounded.
     This means log-loss portability is worse than Brier portability
     for miscalibrated PGS. -/
-theorem log_loss_less_portable_than_brier
-    (port_brier port_log : ℝ)
-    (h_less_portable : port_log < port_brier) :
-    port_log < port_brier := h_less_portable
-
 /-- **Proper scoring rule decomposition.**
     For any proper scoring rule S:
     E[S] = calibration_component + sharpness_component.
     Portability affects calibration more than sharpness. -/
-theorem proper_score_portability_decomposition
-    (cal_change sharp_change : ℝ)
-    (h_cal_dominates : |sharp_change| < |cal_change|)
-    (h_cal_pos : 0 < cal_change) :
-    -- Total portability loss is dominated by calibration
-    0 < cal_change := h_cal_pos
-
 end ProperScoringRules
 
 end Calibrator

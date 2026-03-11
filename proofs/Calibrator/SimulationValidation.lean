@@ -205,11 +205,6 @@ section ModelComparison
 noncomputable def aic (k : ℕ) (logL : ℝ) : ℝ :=
   2 * k - 2 * logL
 
-/-- **Model with lower AIC is preferred.** -/
-theorem lower_aic_preferred
-    (aic₁ aic₂ : ℝ) (h_better : aic₁ < aic₂) :
-    aic₁ < aic₂ := h_better
-
 /-- **AIC penalizes model complexity.**
     A model with more parameters needs proportionally better fit. -/
 theorem aic_complexity_penalty
@@ -234,62 +229,7 @@ theorem lrt_nonneg (logL_null logL_alt : ℝ)
     0 ≤ likelihoodRatioStat logL_null logL_alt := by
   unfold likelihoodRatioStat; nlinarith
 
-/-- **Selection model fits immune traits better than neutral model.**
-    For immune traits, the LRT of neutral vs selection is large,
-    indicating the selection model provides significantly better fit. -/
-theorem selection_model_preferred_for_immune
-    (lrt_immune lrt_height : ℝ)
-    (h_immune_large : 10 < lrt_immune)  -- Very significant
-    (h_height_small : lrt_height < 3)   -- Not significant
-    :
-    lrt_height < lrt_immune := by linarith
-
 end ModelComparison
-
-
-/-!
-## Cross-Validation for Portability Prediction
-
-Cross-validation methods for assessing PGS portability predictions.
--/
-
-section CrossValidation
-
-/- **Leave-one-population-out cross-validation.**
-    Train the portability model on all populations except one,
-    predict for the held-out population, repeat for each. -/
-
-/-- **Cross-validation error decomposition.**
-    CV error = bias² + variance + irreducible noise. -/
-theorem cv_error_decomposition
-    (bias_sq variance noise : ℝ)
-    (h_bias : 0 ≤ bias_sq) (h_var : 0 ≤ variance) (h_noise : 0 ≤ noise) :
-    0 ≤ bias_sq + variance + noise := by linarith
-
-/-- **More diverse training set → lower CV error.**
-    Including more populations in training reduces both bias and variance
-    of portability predictions for the held-out population. -/
-theorem more_populations_lower_cv_error
-    (cv_err_few cv_err_many : ℝ)
-    (h_better : cv_err_many < cv_err_few)
-    (h_nn : 0 ≤ cv_err_many) :
-    cv_err_many < cv_err_few := h_better
-
-/-- **The bias-variance tradeoff in portability prediction.**
-    Simple models (e.g., linear in Fst) have high bias but low variance.
-    Complex models (e.g., spline in multiple PCs) have low bias but high variance.
-    The optimal model depends on the number of populations available. -/
-theorem optimal_complexity_depends_on_n_pops
-    (bias_simple variance_simple bias_complex variance_complex : ℝ)
-    (h_bias_complex_lower : bias_complex < bias_simple)
-    (h_var_complex_higher : variance_simple < variance_complex)
-    -- For few populations, simple model wins
-    (h_few_pops : bias_simple ^ 2 + variance_simple < bias_complex ^ 2 + variance_complex)
-    -- For many populations, complex model wins (hypothetical)
-    : bias_simple ^ 2 + variance_simple < bias_complex ^ 2 + variance_complex :=
-  h_few_pops
-
-end CrossValidation
 
 
 /-!
@@ -314,17 +254,6 @@ theorem portability_prediction_bounded
   · calc neutral_ratio * ld_factor ≤ neutral_ratio * 1 := by nlinarith
       _ = neutral_ratio := mul_one _
       _ < 1 := h_nr_le
-
-/-- **Selection reduces portability below neutral prediction.**
-    When genetic correlation ρ < 1 (selection-driven effect changes),
-    the actual portability is reduced by ρ² relative to neutral. -/
-theorem selection_reduces_portability
-    (neutral_ratio rho : ℝ)
-    (h_nr : 0 < neutral_ratio) (h_nr_le : neutral_ratio ≤ 1)
-    (h_rho : 0 ≤ rho) (h_rho_lt : rho < 1) :
-    neutral_ratio * rho ^ 2 < neutral_ratio := by
-  have h_sq : rho ^ 2 < 1 := by nlinarith [sq_nonneg rho]
-  nlinarith
 
 /-- **Within-group variance dominates between-group variance.**
     The R² of genetic distance on individual squared error is bounded

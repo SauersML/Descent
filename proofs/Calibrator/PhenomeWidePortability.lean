@@ -14,12 +14,9 @@ in greater depth, connecting to phenome-wide association studies (PheWAS)
 and the biological mechanisms underlying trait-specific portability.
 
 Key results:
-1. Selection pressure signatures in portability patterns
-2. Immune trait portability and pathogen-driven selection
-3. Metabolic trait portability and dietary adaptation
-4. Anthropometric trait portability
-5. Behavioral/cognitive trait portability challenges
-6. Phenome-wide portability correlation structure
+1. Metabolic trait portability and dietary adaptation
+2. Anthropometric trait portability
+3. Phenome-wide portability correlation structure
 
 Reference: Wang et al. (2026), Nature Communications 17:942.
 -/
@@ -54,22 +51,6 @@ theorem neutral_ratio_in_unit (fst ld : ℝ)
           apply mul_le_mul (by linarith) h_ld1 h_ld (by linarith)
       _ = 1 := by ring
 
-/-- **Traits with better-than-neutral portability.**
-    Some traits (e.g., height) port better than neutral prediction.
-    This suggests stabilizing selection maintaining similar architecture. -/
-theorem better_than_neutral_implies_stabilizing_selection
-    (port_observed port_neutral : ℝ)
-    (h_better : port_neutral < port_observed) :
-    0 < port_observed - port_neutral := by linarith
-
-/-- **Traits with worse-than-neutral portability.**
-    Some traits (e.g., immune) port worse than neutral prediction.
-    This suggests diversifying selection changing architecture. -/
-theorem worse_than_neutral_implies_diversifying_selection
-    (port_observed port_neutral : ℝ)
-    (h_worse : port_observed < port_neutral) :
-    0 < port_neutral - port_observed := by linarith
-
 /-- **Effect size correlation between populations.**
     ρ(β_pop1, β_pop2) captures how similar genetic effects are.
     ρ = 1 for neutral evolution, ρ < 1 for divergent selection. -/
@@ -96,62 +77,6 @@ end TraitClassification
 
 
 /-!
-## Immune Trait Portability
-
-Immune-related traits consistently show worse portability than
-neutral expectation, reflecting pathogen-driven divergent selection.
--/
-
-section ImmuneTraits
-
-/-- **HLA region dominates immune trait architecture.**
-    The HLA region (~6p21) contains a disproportionate fraction
-    of genetic variance for immune traits. HLA is under strong
-    balancing/diversifying selection → low portability. -/
-theorem hla_disproportionate_variance
-    (r2_hla r2_genome_wide n_hla_snps n_total_snps : ℝ)
-    (h_snp_fraction : n_hla_snps / n_total_snps < 1/100)
-    (h_var_fraction : 1/10 < r2_hla / r2_genome_wide)
-    (h_r2_gw : 0 < r2_genome_wide) (h_snps : 0 < n_total_snps) :
-    -- HLA contributes >10x its share of genome
-    n_hla_snps / n_total_snps < r2_hla / r2_genome_wide := by
-  linarith
-
-/-- **Immune trait portability is bounded by effect correlation.**
-    For immune traits, the cross-population effect correlation ρ
-    is often much less than 1 due to pathogen-driven selection. -/
-theorem immune_portability_bounded_by_rho
-    (rho_immune rho_height : ℝ)
-    (h_immune_lower : rho_immune < rho_height)
-    (h_height_high : 0.9 < rho_height) :
-    rho_immune < rho_height := h_immune_lower
-
-/-- **White blood cell count portability example.**
-    WBC portability EUR→AFR is typically ~20-30% of source R².
-    Neutral prediction would give ~85%. The gap is from:
-    (1) Duffy null variant (DARC/ACKR1) with strong frequency
-        differences due to malaria selection. -/
-theorem wbc_portability_below_neutral
-    (port_wbc port_neutral : ℝ)
-    (h_wbc : port_wbc < 3/10)
-    (h_neutral : 4/5 < port_neutral) :
-    port_wbc < port_neutral := by linarith
-
-/-- **Allele under selection contributes disproportionally to portability loss.**
-    If a selected allele explains a fraction f of genetic variance
-    but has portability 0, the trait-level portability drops by f. -/
-theorem selected_allele_portability_impact
-    (f port_rest : ℝ)
-    (h_f : 0 < f) (h_f_le : f < 1)
-    (h_port : 0 < port_rest) (h_port_le : port_rest ≤ 1) :
-    (1 - f) * port_rest < port_rest := by
-  have : 0 < f * port_rest := mul_pos h_f h_port
-  linarith [mul_comm f port_rest]
-
-end ImmuneTraits
-
-
-/-!
 ## Metabolic Trait Portability
 
 Metabolic traits show intermediate portability, reflecting
@@ -171,12 +96,6 @@ section MetabolicTraits
     in different dietary environments. This means ρ < 1 for
     metabolic traits even without divergent selection on the
     genetic variants themselves. -/
-theorem gxe_reduces_effect_correlation
-    (rho_genetics_only rho_with_gxe : ℝ)
-    (h_gxe : rho_with_gxe < rho_genetics_only)
-    (h_genetics : 0 < rho_genetics_only) :
-    rho_with_gxe < rho_genetics_only := h_gxe
-
 /-- **Lipid trait portability varies by lipid type.**
     LDL: good portability (largely genetic)
     HDL: moderate (GxE with diet)
@@ -200,8 +119,8 @@ variants captured by GWAS.
 
 section AnthropometricTraits
 
-/-- **Height portability is near-neutral.**
-    Height EUR→EAS portability is typically ~70-80% of source R².
+/-- **Near-neutral portability for highly polygenic traits.**
+    Cross-population portability is typically ~70-80% of source R².
     Neutral prediction: ~85%. The small gap is mostly LD mismatch,
     not effect size differences. -/
 theorem height_near_neutral_portability
@@ -229,31 +148,21 @@ theorem polygenicity_stabilizes_portability
   calc ((1 : ℝ)/1000)⁻¹ = 1000 := by norm_num
     _ < ↑n_loci := by exact_mod_cast h_many
 
-/-- **Skin pigmentation shows the worst anthropometric portability.**
-    Strong divergent selection → ρ ≪ 1 → very poor portability.
-    This is the exception among anthropometric traits. -/
-theorem pigmentation_poor_portability
-    (port_height port_pigmentation : ℝ)
-    (h_much_worse : port_pigmentation < 1/2 * port_height)
-    (h_height_pos : 0 < port_height) :
-    port_pigmentation < port_height := by linarith
-
 end AnthropometricTraits
 
 
 /-!
 ## Phenome-Wide Portability Correlation Structure
 
-Portability across traits is correlated: traits under similar
-selective pressures show similar portability patterns.
+Portability across traits is correlated: traits with similar
+genetic architecture show similar portability patterns.
 -/
 
 section PhenomeWideStructure
 
 /-- **Portability correlation between traits.**
     Traits with correlated genetic architecture have correlated
-    portability loss. This can be predicted from genetic correlation
-    and shared selection pressures. -/
+    portability loss. This can be predicted from genetic correlation. -/
 theorem correlated_architecture_correlated_portability
     (rg port_corr : ℝ)
     (h_relation : |port_corr| ≤ |rg|)
@@ -262,7 +171,7 @@ theorem correlated_architecture_correlated_portability
 
 /-- **Factor analysis of portability across traits.**
     The first factor captures overall genetic divergence (Fst).
-    The second factor captures selection-driven divergence.
+    The second factor captures effect-size divergence.
     Together they explain >80% of portability variance across traits. -/
 theorem two_factor_model_of_portability
     (var_explained_f1 var_explained_f2 lb₁ lb₂ : ℝ)
@@ -271,28 +180,6 @@ theorem two_factor_model_of_portability
     (h_total : var_explained_f1 + var_explained_f2 ≤ 1)
     (h_f1_nn : 0 ≤ var_explained_f1) (h_f2_nn : 0 ≤ var_explained_f2) :
     lb₁ + lb₂ < var_explained_f1 + var_explained_f2 := by linarith
-
-/-- **Portability prediction from trait characteristics.**
-    Given: polygenicity, heritability, and selection signal,
-    we can predict portability rank across traits.
-    High polygenicity + low selection → good portability.
-    Low polygenicity + high selection → poor portability. -/
-theorem portability_predictable_from_characteristics
-    (polygenicity selection_signal predicted_port actual_port ε bound : ℝ)
-    (h_prediction : |actual_port - predicted_port| ≤ ε)
-    (h_small_error : ε < bound) :
-    |actual_port - predicted_port| < bound := by linarith
-
-/-- **Disease traits vs quantitative traits.**
-    Disease traits often show worse portability than their
-    quantitative risk factors because:
-    1. Ascertainment bias in case-control studies
-    2. Different disease prevalence across populations
-    3. Liability threshold model nonlinearity -/
-theorem disease_worse_portability_than_risk_factor
-    (port_disease port_rf : ℝ)
-    (h_worse : port_disease < port_rf) :
-    port_disease < port_rf := h_worse
 
 /-- **Transferability of PGS percentile rank.**
     Even when R² drops, the rank ordering of individuals may

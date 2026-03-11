@@ -119,12 +119,6 @@ theorem overlap_bias
     When evaluating PGS in populations with family structure,
     standard CV overestimates R² due to shared segments.
     Family-blocked CV gives unbiased estimates. -/
-theorem blocked_cv_less_biased
-    (r2_standard_cv r2_blocked_cv r2_true : ℝ)
-    (h_standard_biased : r2_true < r2_standard_cv)
-    (h_blocked_closer : |r2_blocked_cv - r2_true| < |r2_standard_cv - r2_true|) :
-    |r2_blocked_cv - r2_true| < |r2_standard_cv - r2_true| := h_blocked_closer
-
 /- **Time-split validation for discovery bias.**
     If the PGS discovery includes newer data, temporal validation
     (train on older data, test on newer) avoids temporal confounding. -/
@@ -177,12 +171,6 @@ theorem effective_n_pos (se : ℝ) (h_se : 0 < se) :
     Random effects: allows β to vary (models heterogeneity).
     For PGS portability: random effects captures the reality
     that effects differ across populations. -/
-theorem random_effects_captures_heterogeneity
-    (tau_sq : ℝ) -- between-population variance
-    (h_heterogeneous : 0 < tau_sq) :
-    -- Random effects model has wider CI but is less biased
-    0 < tau_sq := h_heterogeneous
-
 end SummaryStatPGS
 
 
@@ -227,23 +215,10 @@ theorem genetic_correlation_predicts_portability
 /-- **LDSC standard error for ρ_g.**
     SE(ρ̂_g) depends on sample sizes, LD structure, and polygenicity.
     For well-powered GWAS: SE ≈ √(1/(n₁ × n₂ × h²₁ × h²₂)) × correction. -/
-theorem ldsc_se_decreases_with_n
-    (se₁ se₂ n₁ n₂ : ℝ)
-    (h_more : n₁ < n₂)
-    (h_se_decreases : se₂ < se₁)
-    (h_nn : 0 < se₂) :
-    se₂ < se₁ := h_se_decreases
-
 /-- **Constrained intercept LDSC.**
     When there's no sample overlap, the intercept should be 1.
     Constraining it improves power but can bias h² estimates
     if there's hidden stratification. -/
-theorem constrained_intercept_more_powerful
-    (se_unconstrained se_constrained : ℝ)
-    (h_more_powerful : se_constrained < se_unconstrained)
-    (h_nn : 0 < se_constrained) :
-    se_constrained < se_unconstrained := h_more_powerful
-
 end LDScoreRegression
 
 
@@ -287,12 +262,6 @@ theorem local_genetic_correlation_varies
 /-- **Genetic correlation is frequency-dependent.**
     Common variants may have higher ρ_g than rare variants
     because common variants are older and more shared. -/
-theorem common_variants_higher_correlation
-    (rho_common rho_rare : ℝ)
-    (h_higher : rho_rare < rho_common)
-    (h_nn : 0 ≤ rho_rare) :
-    rho_rare < rho_common := h_higher
-
 end GeneticCorrelationMethods
 
 end Calibrator

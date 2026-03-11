@@ -28,8 +28,8 @@ Reference: Wang et al. (2026), Nature Communications 17:942.
 /-!
 ## Haplotype Diversity Across Populations
 
-African populations have more haplotype diversity due to
-older population history. This affects PGS portability.
+Populations with older demographic history have more haplotype
+diversity. This affects PGS portability.
 -/
 
 section HaplotypeDiversity
@@ -38,28 +38,9 @@ section HaplotypeDiversity
     With k SNPs and n haplotypes sampled, the expected number
     of distinct haplotypes H ≈ 2^k × (1 - (1-1/2^k)^n). -/
 
-/-- **African populations have more haplotypes.**
-    More recombination cycles → more distinct haplotypes.
-    This means European haplotype-based PGS may miss
-    African-specific haplotypes. -/
-theorem more_haplotypes_in_afr
-    (n_hap_eur n_hap_afr : ℕ)
-    (h_more : n_hap_eur < n_hap_afr) :
-    n_hap_eur < n_hap_afr := h_more
-
-/-- **Haplotype frequency spectrum differs.**
-    In EUR, common haplotypes account for a larger fraction
-    of the population due to bottleneck effects.
-    In AFR, the frequency spectrum is more uniform. -/
-theorem haplotype_frequency_more_uniform_afr
-    (max_freq_eur max_freq_afr : ℝ)
-    (h_eur_concentrated : max_freq_afr < max_freq_eur)
-    (h_nn : 0 < max_freq_afr) :
-    max_freq_afr < max_freq_eur := h_eur_concentrated
-
 /-- **Haplotype homozygosity.**
     H = Σ f_i² where f_i are haplotype frequencies.
-    Lower in AFR (more diverse) → more unique haplotypes. -/
+    Lower in more diverse populations → more unique haplotypes. -/
 noncomputable def haplotypeHomozygosity (freq_sq_sum : ℝ) : ℝ := freq_sq_sum
 
 /-- Homozygosity is in [0, 1] for proper frequencies. -/
@@ -108,10 +89,10 @@ theorem compound_het_not_captured_by_dosage
     Haplotype frequencies differ → phase configuration frequencies
     differ → average phase-dependent effect differs across populations. -/
 theorem phase_effects_population_specific
-    (freq_cis_eur freq_cis_afr delta_cis : ℝ)
-    (h_diff_freq : freq_cis_eur ≠ freq_cis_afr)
+    (freq_cis_source freq_cis_target delta_cis : ℝ)
+    (h_diff_freq : freq_cis_source ≠ freq_cis_target)
     (h_delta : delta_cis ≠ 0) :
-    freq_cis_eur * delta_cis ≠ freq_cis_afr * delta_cis := by
+    freq_cis_source * delta_cis ≠ freq_cis_target * delta_cis := by
   intro h
   have := mul_right_cancel₀ h_delta h
   exact h_diff_freq this
@@ -132,35 +113,14 @@ section HaplotypePGS
     PGS_hap = Σ_b (effect of haplotype at block b).
     This captures within-block interactions automatically. -/
 
-/-- **Haplotype PGS captures more variance than SNP PGS.**
-    Within each block, the haplotype effect includes:
-    additive + dominance + epistatic components.
-    R²_hap ≥ R²_SNP. -/
-theorem haplotype_pgs_at_least_snp
-    (r2_snp r2_hap : ℝ)
-    (h_better : r2_snp ≤ r2_hap) :
-    r2_snp ≤ r2_hap := h_better
-
 /-- **Haplotype PGS portability can be better.**
     If the causal mechanism acts through haplotypes (cis effects),
     using the correct haplotype effect is more portable than
     using individual SNP effects that approximate the haplotype. -/
-theorem haplotype_pgs_more_portable_for_cis
-    (port_snp port_hap : ℝ)
-    (h_better : port_snp < port_hap)
-    (h_nn : 0 < port_snp) :
-    port_snp < port_hap := h_better
-
-/-- **But haplotype PGS can overfit in training ancestry.**
+/-- **But haplotype PGS can overfit in training population.**
     With many rare haplotypes, the haplotype effects may be
     poorly estimated and population-specific.
     R²_hap_cross ≤ R²_hap_same but the gap may be larger. -/
-theorem haplotype_pgs_overfitting_risk
-    (r2_hap_same r2_hap_cross r2_snp_same r2_snp_cross : ℝ)
-    (h_hap_gap : r2_hap_same - r2_hap_cross > r2_snp_same - r2_snp_cross)
-    (h_same : r2_snp_same ≤ r2_hap_same) :
-    r2_hap_same - r2_hap_cross > r2_snp_same - r2_snp_cross := h_hap_gap
-
 end HaplotypePGS
 
 
@@ -207,16 +167,16 @@ theorem more_errors_more_attenuation (s₁ s₂ : ℝ)
   have h₂ : 1 - 2 * s₂ < 1 - 2 * s₁ := by linarith
   exact sq_lt_sq' (by linarith) h₂
 
-/-- **Phasing accuracy varies by ancestry.**
-    EUR-trained phasing algorithms work worse on AFR samples
-    because reference panels are EUR-biased.
-    This creates an ancestry-specific phasing artifact. -/
+/-- **Phasing accuracy varies by population representation.**
+    Phasing algorithms trained on well-represented populations
+    work worse on underrepresented samples because reference
+    panels are biased toward the training population. -/
 theorem phasing_worse_for_underrepresented
-    (s_eur s_afr : ℝ)
-    (h_worse : s_eur < s_afr)
-    (h_nn : 0 ≤ s_eur) (h_afr_le : s_afr ≤ 1 / 2) :
-    phaseAttenuation s_afr < phaseAttenuation s_eur := by
-  exact more_errors_more_attenuation s_eur s_afr h_nn (by linarith) (by linarith) h_afr_le h_worse
+    (s_source s_target : ℝ)
+    (h_worse : s_source < s_target)
+    (h_nn : 0 ≤ s_source) (h_target_le : s_target ≤ 1 / 2) :
+    phaseAttenuation s_target < phaseAttenuation s_source := by
+  exact more_errors_more_attenuation s_source s_target h_nn (by linarith) (by linarith) h_target_le h_worse
 
 end PhasingErrors
 
@@ -244,16 +204,6 @@ theorem ancestry_effect_between_pops (beta₁ beta₂ alpha : ℝ)
     ancestrySpecificEffect beta₁ beta₂ alpha ≤ beta₂ := by
   unfold ancestrySpecificEffect
   constructor <;> nlinarith
-
-/-- **Local ancestry deconvolution for haplotypes.**
-    By identifying the ancestry of each haplotype segment,
-    we can apply ancestry-appropriate effects.
-    This improves PGS in admixed populations. -/
-theorem la_deconvolution_improves_pgs
-    (r2_global r2_local_ancestry : ℝ)
-    (h_better : r2_global < r2_local_ancestry)
-    (h_nn : 0 < r2_global) :
-    r2_global < r2_local_ancestry := h_better
 
 /-- **Recombination since admixture determines segment length.**
     Average segment length ∝ 1/(g × r_total)

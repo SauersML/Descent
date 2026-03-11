@@ -149,16 +149,16 @@ theorem winners_curse_overestimates_r2
     r2_true < r2_apparent := by
   rw [h_relation]; nlinarith
 
-/-- **Cross-ancestry winner's curse asymmetry.**
-    When GWAS is done in EUR with large n, winner's curse is mild.
-    Applying these inflated effects in AFR (where LD differs)
-    compounds the bias. -/
-theorem cross_ancestry_winners_curse_compounds
-    (r2_eur_wc r2_afr_wc r2_afr_true : ℝ)
-    (h_eur_mild : 0 < r2_eur_wc)
-    (h_afr_worse : r2_afr_wc < r2_afr_true)
-    (h_afr_true_lt_eur : r2_afr_true < r2_eur_wc) :
-    r2_afr_wc < r2_eur_wc := by linarith
+/-- **Cross-population winner's curse asymmetry.**
+    When GWAS is done in the source population with large n,
+    winner's curse is mild. Applying these inflated effects in
+    the target (where LD differs) compounds the bias. -/
+theorem cross_population_winners_curse_compounds
+    (r2_source_wc r2_target_wc r2_target_true : ℝ)
+    (h_source_mild : 0 < r2_source_wc)
+    (h_target_worse : r2_target_wc < r2_target_true)
+    (h_target_true_lt_source : r2_target_true < r2_source_wc) :
+    r2_target_wc < r2_source_wc := by linarith
 
 end WinnersCurse
 
@@ -266,8 +266,8 @@ theorem genetic_correlation_bounds_portability
   have : rg^2 < 1 := by nlinarith [sq_abs rg, abs_nonneg rg, sq_nonneg rg]
   nlinarith
 
-/-- **Trans-ethnic genetic correlation for height is high.**
-    r_g(height, EUR-EAS) ≈ 0.95. This means most of the
+/-- **High genetic correlation implies good portability.**
+    When cross-population r_g is high (e.g., ~0.95), most of the
     genetic architecture is shared. -/
 theorem high_rg_implies_good_portability
     (rg lb r2_source : ℝ)
@@ -277,9 +277,9 @@ theorem high_rg_implies_good_portability
   have : lb ^ 2 < rg ^ 2 := by nlinarith [sq_nonneg (rg - lb)]
   nlinarith
 
-/-- **Low r_g for immune traits.**
-    r_g(immune, EUR-AFR) ≈ 0.4. This severely limits
-    cross-ancestry PGS for immune-related traits. -/
+/-- **Low r_g limits portability.**
+    When cross-population r_g is low (e.g., ~0.4), this severely limits
+    cross-population PGS for the affected traits. -/
 theorem low_rg_limits_portability
     (rg ub r2_source : ℝ)
     (h_rg : rg < ub) (h_rg_nn : 0 ≤ rg) (h_ub_nn : 0 ≤ ub)

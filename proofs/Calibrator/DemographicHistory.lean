@@ -145,15 +145,6 @@ theorem admixed_fst_smaller (α fst_AB : ℝ)
   calc (1 - α) ^ 2 * fst_AB < 1 * fst_AB := mul_lt_mul_of_pos_right h1 h_fst
     _ = fst_AB := one_mul _
 
-/-- **PGS trained in parent population has intermediate portability to admixed.**
-    Better than to the other parent, worse than to itself. -/
-theorem admixed_intermediate_portability
-    (r2_A_to_A r2_A_to_admixed r2_A_to_B : ℝ)
-    (h_self : r2_A_to_admixed < r2_A_to_A)
-    (h_better : r2_A_to_B < r2_A_to_admixed) :
-    r2_A_to_B < r2_A_to_admixed ∧ r2_A_to_admixed < r2_A_to_A :=
-  ⟨h_better, h_self⟩
-
 /-- **Admixture proportion determines optimal PGS combination.**
     For an individual with α fraction ancestry A and (1-α) from B,
     the optimal PGS is approximately α × PGS_A + (1-α) × PGS_B. -/
@@ -241,22 +232,11 @@ PGS portability for traits where introgressed variants contribute.
 
 section ArchaicIntrogression
 
-/-- **Introgression fraction differs across populations.**
-    European/Asian: ~2% Neanderthal
-    Melanesian: ~2% Neanderthal + ~3-5% Denisovan
-    African: ~0-0.3% archaic
-    These differences create population-specific genetic variants. -/
-theorem introgression_creates_population_specific_variants
-    (pct_eur pct_afr : ℝ)
-    (h_eur : 1.5 < pct_eur) (h_eur_lt : pct_eur < 2.5)
-    (h_afr : 0 ≤ pct_afr) (h_afr_lt : pct_afr < 1/2) :
-    pct_afr < pct_eur := by linarith
-
 /-- **Introgressed variants contribute to trait heritability.**
     For traits under selection involving introgressed regions
     (e.g., immune function, skin pigmentation), a fraction of
     heritability comes from Neanderthal-derived alleles.
-    This fraction is absent in African populations → portability gap. -/
+    This fraction is absent in non-introgressed populations → portability gap. -/
 theorem introgression_portability_gap
     (h2_shared h2_introgressed : ℝ)
     (h_shared : 0 < h2_shared)

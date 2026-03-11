@@ -196,15 +196,6 @@ theorem admixture_inflates_pgs_variance
     (h_admix : 0 < v_admixture_ld) :
     v_true < v_true + v_admixture_ld := by linarith
 
-/-- **Local ancestry deconvolution improves PGS.**
-    By conditioning on local ancestry, admixture LD is removed,
-    and the PGS can use ancestry-appropriate weights. -/
-theorem local_ancestry_improves_prediction
-    (r2_global r2_local : ℝ)
-    (h_improvement : r2_global < r2_local)
-    (h_global_nn : 0 ≤ r2_global) :
-    0 < r2_local - r2_global := by linarith
-
 end AdmixtureLD
 
 
@@ -255,18 +246,17 @@ theorem bottleneck_ld_increases_with_severity
   have h_pow := pow_lt_pow_left₀ h_base h_nn (by omega : t ≠ 0)
   linarith
 
-/-- **European bottleneck creates different LD structure.**
-    The Out-of-Africa bottleneck and subsequent European bottleneck
-    created extended LD blocks in European populations.
-    This means PGS trained on Europeans may have inflated tagging
-    that doesn't transfer to African populations. -/
-theorem european_ld_doesnt_transfer_to_african
-    (ld_eur ld_afr : ℝ)
-    (h_eur_higher : ld_afr < ld_eur)
-    (h_afr_pos : 0 < ld_afr) :
-    -- Tag r² in African populations is lower
-    ld_afr / ld_eur < 1 := by
-  rw [div_lt_one (by linarith)]; exact h_eur_higher
+/-- **Bottleneck-extended LD does not transfer to non-bottlenecked populations.**
+    Populations that experienced bottlenecks have extended LD blocks.
+    PGS trained on bottlenecked populations may have inflated tagging
+    that doesn't transfer to populations with shorter LD. -/
+theorem bottleneck_ld_doesnt_transfer
+    (ld_source ld_target : ℝ)
+    (h_source_higher : ld_target < ld_source)
+    (h_target_pos : 0 < ld_target) :
+    -- Tag r² in target population is lower
+    ld_target / ld_source < 1 := by
+  rw [div_lt_one (by linarith)]; exact h_source_higher
 
 end BottleneckLD
 
@@ -324,22 +314,6 @@ recover some portability loss from LD mismatch.
 -/
 
 section HaplotypeStructure
-
-/-- **Haplotype-based PGS captures phase information.**
-    A haplotype-based PGS can model the specific combination of alleles
-    on each chromosome, not just marginal genotype counts. -/
-theorem haplotype_pgs_at_least_as_good
-    (r2_marginal r2_haplotype : ℝ)
-    (h_at_least : r2_marginal ≤ r2_haplotype) :
-    r2_marginal ≤ r2_haplotype := h_at_least
-
-/-- **Haplotype diversity is higher in African populations.**
-    More haplotype diversity → more information → potentially better PGS
-    if trained with enough data. -/
-theorem more_haplotype_diversity_more_information
-    (h_div_afr h_div_eur : ℝ)
-    (h_more_diverse : h_div_eur < h_div_afr) :
-    h_div_eur < h_div_afr := h_more_diverse
 
 /-- **The portability ceiling from haplotype mismatch.**
     Even with infinite GWAS sample size, haplotype-based PGS trained

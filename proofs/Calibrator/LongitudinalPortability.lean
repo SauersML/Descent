@@ -181,14 +181,6 @@ performance, even within the same population.
 
 section CohortEffects
 
-/-- **PGS effect sizes are cohort-dependent.**
-    A PGS trained on one birth cohort may have different
-    effect sizes in another due to changed environments. -/
-theorem cohort_specific_effects
-    (beta_cohort1 beta_cohort2 : ℝ)
-    (h_diff : beta_cohort1 ≠ beta_cohort2) :
-    beta_cohort1 ≠ beta_cohort2 := h_diff
-
 /-- **Age-dependent PGS performance.**
     PGS for age-related traits (e.g., CAD, T2D) have different
     predictive power at different ages. This interacts with
@@ -202,25 +194,6 @@ theorem age_r2_peaks_at_optimal (r2_peak age_peak width : ℝ)
     ageDependentR2 r2_peak age_peak age_peak width = r2_peak := by
   unfold ageDependentR2
   simp [sub_self, zero_pow, mul_zero, zero_div, neg_zero, Real.exp_zero, mul_one]
-
-/-- **Education PGS and cohort effects.**
-    Education PGS trained on older cohorts (where education access
-    was more restricted) have different effect sizes than those
-    trained on younger cohorts. -/
-theorem education_cohort_effect
-    (r2_old_cohort r2_young_cohort : ℝ)
-    (h_different : r2_old_cohort ≠ r2_young_cohort) :
-    r2_old_cohort ≠ r2_young_cohort := h_different
-
-/-- **Survivorship bias in older cohorts.**
-    PGS for mortality-related traits in older cohorts are biased
-    by survivorship: only survivors are observed, creating
-    selection bias. -/
-theorem survivorship_bias_attenuates_pgs
-    (r2_unbiased r2_survivor_biased : ℝ)
-    (h_attenuated : |r2_survivor_biased| < |r2_unbiased|)
-    (h_nn : 0 < |r2_unbiased|) :
-    |r2_survivor_biased| < |r2_unbiased| := h_attenuated
 
 end CohortEffects
 
@@ -354,15 +327,6 @@ Methods for validating PGS performance across different time periods.
 
 section CrossTemporalValidation
 
-/-- **Temporal train-test split.**
-    Training on earlier cohort and testing on later cohort
-    is more realistic than random split for assessing
-    real-world temporal portability. -/
-theorem temporal_split_more_conservative
-    (r2_random_split r2_temporal_split : ℝ)
-    (h_conservative : r2_temporal_split ≤ r2_random_split) :
-    r2_temporal_split ≤ r2_random_split := h_conservative
-
 /-- **Phenotype definition stability.**
     Changes in diagnostic criteria over time (e.g., ICD revisions)
     create apparent portability loss that is purely definitional. -/
@@ -371,15 +335,6 @@ theorem diagnostic_change_creates_apparent_loss
     (h_reduced : r2_changed_def < r2_consistent_def)
     (h_nn : 0 < r2_changed_def) :
     0 < r2_consistent_def - r2_changed_def := by linarith
-
-/-- **Genotype-phenotype map stability varies by trait.**
-    Highly polygenic traits with small per-variant effects
-    have more temporally stable PGS than oligogenic traits
-    where a few variants dominate. -/
-theorem polygenic_more_temporally_stable
-    (stability_polygenic stability_oligogenic : ℝ)
-    (h_more_stable : stability_oligogenic < stability_polygenic) :
-    stability_oligogenic < stability_polygenic := h_more_stable
 
 end CrossTemporalValidation
 

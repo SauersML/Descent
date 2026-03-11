@@ -181,33 +181,6 @@ section Calibration
     A score is calibrated if E[Y | PGS = s] = g(s) for the specified
     link function g. -/
 
-/-- **Calibration-in-the-large (intercept).**
-    Mean predicted risk = mean observed risk. -/
-theorem calibration_in_large
-    (mean_predicted mean_observed : ℝ)
-    (h_calibrated : mean_predicted = mean_observed) :
-    mean_predicted = mean_observed := h_calibrated
-
-/-- **Calibration slope.**
-    A well-calibrated model has slope = 1 in the regression of
-    outcome on predicted risk. -/
-theorem calibration_slope_one
-    (slope : ℝ) (h_well_calibrated : slope = 1) :
-    slope = 1 := h_well_calibrated
-
-/-- **Portability loss disrupts calibration.**
-    If the PGS is calibrated in the source, it's generally not
-    calibrated in the target because:
-    1. Different prevalence → intercept shift
-    2. Different R² → slope ≠ 1 -/
-theorem portability_disrupts_calibration
-    (intercept_source intercept_target slope_target : ℝ)
-    (h_intercept_shift : intercept_source ≠ intercept_target)
-    (h_slope_shift : slope_target ≠ 1) :
-    -- Both calibration-in-the-large and calibration slope are violated
-    intercept_source ≠ intercept_target ∧ slope_target ≠ 1 :=
-  ⟨h_intercept_shift, h_slope_shift⟩
-
 /-- **Recalibration restores calibration-in-the-large.**
     Adjusting the intercept to match target prevalence restores
     the mean calibration. -/
@@ -282,12 +255,6 @@ theorem berry_esseen_error_decreases_with_snps
     Height (~10000 loci) has better Gaussian approximation than
     a trait with 10 loci. This affects the accuracy of
     Gaussian-based portability predictions. -/
-theorem highly_polygenic_better_gaussian
-    (err_oligo err_poly : ℝ)
-    (h_better : err_poly < err_oligo)
-    (h_poly_nn : 0 ≤ err_poly) :
-    err_poly < err_oligo := h_better
-
 end GaussianApproximation
 
 

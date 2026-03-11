@@ -106,36 +106,6 @@ theorem effective_polygenicity_ge_one
   rw [le_div_iff₀ h_fourth]
   linarith
 
-/-- **More polygenic → more portable.**
-    With M_eff causal variants, the expected portability loss
-    from LD mismatch scales as ~1/√M_eff.
-    Higher M_eff → smaller per-variant LD contribution → more portable. -/
-theorem more_polygenic_more_portable
-    (port₁ port₂ M_eff₁ M_eff₂ : ℝ)
-    (h_M : M_eff₁ < M_eff₂)
-    (h_port : port₁ < port₂) :
-    -- More polygenic traits have better portability
-    port₁ < port₂ := h_port
-
-/-- **Height is highly polygenic → good portability.**
-    Height has M_eff > 10000 causal variants.
-    Its portability across EUR-EAS is ~0.6 (better than most traits). -/
-theorem height_polygenic_good_portability
-    (M_eff_height M_eff_bmi port_height port_bmi : ℝ)
-    (h_M : M_eff_bmi < M_eff_height)
-    (h_port : port_bmi < port_height) :
-    port_bmi < port_height := h_port
-
-/-- **Immune traits: moderate polygenicity but strong selection.**
-    Immune traits have moderate M_eff but strong directional selection
-    creates large effect size differences → poor portability
-    despite reasonable polygenicity. -/
-theorem selection_overrides_polygenicity
-    (M_eff_immune M_eff_height port_immune port_height : ℝ)
-    (h_moderate : 100 < M_eff_immune)
-    (h_poor : port_immune < port_height) :
-    port_immune < port_height := h_poor
-
 end PolygenicityAndPortability
 
 
@@ -187,11 +157,6 @@ theorem coding_enriched
 /-- **Portability varies by functional category.**
     Coding variants are more portable (conserved effects).
     Regulatory variants are less portable (population-specific regulation). -/
-theorem coding_more_portable_than_regulatory
-    (port_coding port_regulatory : ℝ)
-    (h_more : port_regulatory < port_coding) :
-    port_regulatory < port_coding := h_more
-
 /- **LDSC-SEG for partitioned heritability.**
     h²_c = M_c × (Σ_j∈c l_j × τ_c) / (N × Σ_j l_j)
     where τ_c is the per-SNP heritability coefficient for category c. -/
@@ -238,16 +203,6 @@ theorem architecture_classification
     (h₁ : port_oligo < port_moderate)
     (h₂ : port_moderate < port_high_poly) :
     port_oligo < port_high_poly := by linarith
-
-/-- **Predicting which traits will have worst portability.**
-    Traits with: (1) low r_g, (2) high FST at causal loci,
-    (3) low polygenicity have the worst portability. -/
-theorem worst_portability_predictors
-    (rg fst polygenicity port : ℝ)
-    (h_low_rg : rg < 0.5) (h_high_fst : 0.2 < fst)
-    (h_low_poly : polygenicity < 100)
-    (h_poor : port < 0.2) :
-    port < 0.2 := h_poor
 
 end ArchitecturePredictions
 

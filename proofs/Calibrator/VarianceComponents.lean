@@ -69,7 +69,7 @@ theorem snp_h2_le_narrow_h2
 
 /-- **The missing heritability gap.**
     h²_twin - h²_SNP > 0 for most traits. This is the "missing heritability".
-    It sets an upper bound on what PGS can achieve with current arrays. -/
+    It sets an upper bound on what PGS can achieve with current genotyping. -/
 theorem missing_heritability_gap
     (h2_twin h2_snp : ℝ)
     (h_gap : h2_snp < h2_twin)
@@ -167,14 +167,6 @@ and the GWAS sample size.
 -/
 
 section PGSCeiling
-
-/-- **PGS R² ceiling from heritability.**
-    R²_PGS ≤ h²_SNP. No PGS can explain more variance than what's
-    genetically tagged. -/
-theorem pgs_r2_ceiling_from_h2
-    (r2_pgs h2_snp : ℝ)
-    (h_ceiling : r2_pgs ≤ h2_snp) :
-    r2_pgs ≤ h2_snp := h_ceiling
 
 /-- **PGS R² ceiling from GWAS power.**
     R²_PGS ≤ h²_SNP × (1 - (1-power)^m)

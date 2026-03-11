@@ -58,18 +58,6 @@ theorem ld_dominant_pathway
   rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 2) h_total]
   linarith
 
-/-- **Selection pathway dominates for immune traits.**
-    For immune/pathogen-related traits, effect size differences
-    (due to local adaptation) dominate the portability loss. -/
-theorem selection_dominant_for_immune
-    (delta_total delta_effect : ℝ)
-    (h_total : 0 < delta_total)
-    (h_effect_large : delta_total / 2 < delta_effect)
-    (h_effect_le : delta_effect ≤ delta_total) :
-    1 / 2 < delta_effect / delta_total := by
-  rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 2) h_total]
-  linarith
-
 /-- **Interaction effects between pathways.**
     Pathways are not fully independent: LD changes interact
     with MAF changes (LD × MAF interaction). -/
@@ -142,58 +130,6 @@ end MediationAnalysis
 
 
 /-!
-## Counterfactual Portability
-
-What would PGS portability look like under hypothetical
-alternative study designs?
--/
-
-section CounterfactualPortability
-
-/-- **Counterfactual: diverse training GWAS.**
-    If the training GWAS had been done in the target ancestry,
-    portability would be 1.0 by definition. The gap between
-    this ideal and reality is the portability loss. -/
-theorem counterfactual_same_ancestry_perfect
-    (r2_target_trained r2_cross : ℝ)
-    (h_ideal : r2_target_trained = 1)
-    (h_cross : r2_cross < 1)
-    (h_nn : 0 < r2_cross) :
-    r2_cross < r2_target_trained := by linarith
-
-/-- **Counterfactual: WGS eliminates technical artifacts.**
-    With WGS, imputation error = 0 and array ascertainment = 0.
-    Remaining portability loss is purely genetic. -/
-theorem counterfactual_wgs_residual
-    (loss_total loss_technical loss_genetic : ℝ)
-    (h_decomp : loss_total = loss_genetic + loss_technical)
-    (h_tech : 0 < loss_technical) (h_gen : 0 ≤ loss_genetic) :
-    loss_genetic < loss_total := by linarith
-
-/-- **Counterfactual: infinite sample size.**
-    With n → ∞, winner's curse → 0 and all causal variants
-    are detected. Remaining loss is from LD mismatch and
-    true effect size differences. -/
-theorem counterfactual_infinite_sample
-    (loss_power loss_ld loss_effect total : ℝ)
-    (h_sum : total = loss_power + loss_ld + loss_effect)
-    (h_power : 0 < loss_power) (h_ld : 0 ≤ loss_ld) (h_eff : 0 ≤ loss_effect) :
-    loss_ld + loss_effect < total := by linarith
-
-/-- **Counterfactual: equalized environments.**
-    If environments were identical across populations, GxE = 0.
-    Remaining portability loss is purely from genetic architecture
-    differences. -/
-theorem counterfactual_equal_environments
-    (port_with_gxe port_without_gxe gxe_contribution : ℝ)
-    (h_gxe : port_without_gxe = port_with_gxe + gxe_contribution)
-    (h_pos : 0 < gxe_contribution) :
-    port_with_gxe < port_without_gxe := by linarith
-
-end CounterfactualPortability
-
-
-/-!
 ## Interventions to Improve Portability
 
 The do-calculus framework identifies which interventions
@@ -201,31 +137,6 @@ can improve PGS portability.
 -/
 
 section InterventionsForPortability
-
-/-- **Intervention hierarchy (most to least effective).**
-    1. Do new GWAS in target (eliminates LD + power loss)
-    2. Multi-ancestry meta-analysis (reduces LD loss)
-    3. LD correction methods (reduces LD loss partially)
-    4. Recalibration (fixes calibration, not discrimination) -/
-theorem intervention_hierarchy
-    (r2_new_gwas r2_meta r2_ld_corrected r2_recalibrated r2_original : ℝ)
-    (h₁ : r2_recalibrated ≤ r2_ld_corrected)
-    (h₂ : r2_ld_corrected ≤ r2_meta)
-    (h₃ : r2_meta ≤ r2_new_gwas)
-    (h₄ : r2_original ≤ r2_recalibrated) :
-    r2_original ≤ r2_new_gwas := by linarith
-
-/-- **Diminishing returns from each intervention.**
-    Each subsequent intervention in the hierarchy gives
-    less additional improvement because it addresses a
-    smaller component of the total loss. -/
-theorem diminishing_marginal_returns
-    (gain₁ gain₂ gain₃ : ℝ)
-    (h₁ : gain₂ ≤ gain₁)
-    (h₂ : gain₃ ≤ gain₂)
-    (h_all_pos : 0 < gain₃) :
-    -- Total improvement bounded by sum of gains
-    gain₃ + gain₂ + gain₁ ≤ 3 * gain₁ := by linarith
 
 /-- **Cost-effectiveness analysis.**
     New GWAS is most effective but most expensive.

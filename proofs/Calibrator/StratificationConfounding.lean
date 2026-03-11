@@ -69,17 +69,6 @@ theorem spurious_portability_from_stratification
     (r2_true + r2_bias_source) - (r2_true + r2_bias_target) > 0 := by
   linarith
 
-/-- **PC correction reduces but doesn't eliminate bias.**
-    After k PCs, residual bias is proportional to the (k+1)-th eigenvalue
-    of the ancestry covariance matrix. -/
-theorem pc_correction_residual_bias
-    (bias_uncorrected eigenval_residual c : ℝ)
-    (h_residual : 0 < eigenval_residual)
-    (h_c : 0 < c)
-    (h_bound : c * eigenval_residual < bias_uncorrected)
-    (h_bias : 0 < bias_uncorrected) :
-    c * eigenval_residual < bias_uncorrected := h_bound
-
 /-- **More PCs reduce residual bias monotonically.**
     Eigenvalues are decreasing, so more PCs always help. -/
 theorem more_pcs_less_bias
@@ -258,15 +247,6 @@ in older cohorts differs from birth cohorts due to differential mortality.
 
 section SurvivorshipBias
 
-/-- **Age-dependent genotype frequency shift.**
-    If genotype G increases mortality risk, the frequency of G
-    decreases with age in cross-sectional data. -/
-theorem survivorship_shifts_genotype_freq
-    (p_birth p_surviving : ℝ)
-    (h_birth : 0 < p_birth) (h_birth_lt : p_birth < 1)
-    (h_mortality : p_surviving < p_birth) :
-    p_surviving < p_birth := h_mortality
-
 /-- **Survivorship bias attenuates PGS-outcome association in older cohorts.**
     Among survivors, genetic risk is truncated → weaker association. -/
 theorem survivorship_attenuates_in_older
@@ -345,53 +325,6 @@ theorem transportability_violation_creates_gap
   exact fun h => hi (h i)
 
 end CausalInference
-
-
-/-!
-## Mendelian Randomization and Portability
-
-MR uses genetic variants as instruments. Portability of MR estimates
-depends on the same factors as PGS portability, plus additional
-assumptions about pleiotropy and instrument strength.
--/
-
-section MRPortability
-
-/-- **Instrument strength decreases with genetic distance.**
-    F-statistic of the instrument decreases as allele frequencies diverge. -/
-theorem instrument_strength_decreases
-    (f_source f_target : ℝ)
-    (h_source : 10 < f_source)  -- Standard F > 10 threshold
-    (h_weaker : f_target < f_source) :
-    -- Target may fall below the weak instrument threshold
-    f_target < f_source := h_weaker
-
-/-- **Weak instrument bias in MR.**
-    Bias = (1 - 1/F) × confounding bias.
-    As F decreases (weaker instrument), bias increases toward the
-    confounded OLS estimate. -/
-theorem weak_instrument_bias_increases
-    (conf_bias : ℝ) (F₁ F₂ : ℝ)
-    (h_conf : 0 < conf_bias)
-    (h_F₁ : 1 < F₁) (h_F₂ : 1 < F₂)
-    (h_weaker : F₂ < F₁) :
-    (1 - 1/F₂) * conf_bias < (1 - 1/F₁) * conf_bias := by
-  apply mul_lt_mul_of_pos_right _ h_conf
-  have h1 : 1/F₁ < 1/F₂ := by
-    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
-    linarith
-  linarith
-
-/-- **Horizontal pleiotropy patterns differ across populations.**
-    If pleiotropic effects change across populations (due to different
-    LD patterns or gene regulation), MR estimates are not portable. -/
-theorem pleiotropy_changes_invalidate_mr
-    (β_causal α_pleio_source α_pleio_target : ℝ)
-    (h_diff : α_pleio_source ≠ α_pleio_target) :
-    β_causal + α_pleio_source ≠ β_causal + α_pleio_target := by
-  intro h; exact h_diff (by linarith)
-
-end MRPortability
 
 
 /-!

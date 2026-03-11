@@ -15,7 +15,7 @@ ancestries and how these differences create portability barriers.
 
 Key results:
 1. Allele frequency divergence via drift
-2. Effect size heterogeneity from GxE and epistasis
+2. Effect size heterogeneity from GxE
 3. Ancestry-specific LD tagging
 4. Allelic heterogeneity (different causal variants per locus)
 5. Architecture convergence under shared environments
@@ -111,23 +111,23 @@ in different ancestries due to population-specific LD.
 
 section LDTagging
 
-/-- **Tag SNP may differ across ancestries.**
-    If tag_EUR is the best proxy for causal variant C in EUR,
-    and tag_AFR is the best proxy in AFR,
+/-- **Tag SNP may differ across populations.**
+    If tag_source is the best proxy for causal variant C in the source,
+    and tag_target is the best proxy in the target,
     these may be different SNPs entirely. -/
 theorem different_tags_different_weights
-    (beta_causal r2_tag_eur r2_tag_afr : ℝ)
+    (beta_causal r2_tag_source r2_tag_target : ℝ)
     (h_beta : 0 < beta_causal)
-    (h_eur : 0 < r2_tag_eur) (h_afr : 0 < r2_tag_afr)
-    (h_diff : r2_tag_eur ≠ r2_tag_afr) :
+    (h_source : 0 < r2_tag_source) (h_target : 0 < r2_tag_target)
+    (h_diff : r2_tag_source ≠ r2_tag_target) :
     -- The apparent effect at the tag differs
-    beta_causal * r2_tag_eur ≠ beta_causal * r2_tag_afr := by
+    beta_causal * r2_tag_source ≠ beta_causal * r2_tag_target := by
   intro h
   exact h_diff (mul_left_cancel₀ (ne_of_gt h_beta) h)
 
 /-- **LD tagging efficiency.**
     The proportion of heritability captured by GWAS depends on
-    how well the array tags causal variants:
+    how well the genotyped SNPs tag causal variants:
     h²_GWAS = h²_true × average_r²_tag. -/
 noncomputable def gwasHeritability (h2_true avg_r2_tag : ℝ) : ℝ :=
   h2_true * avg_r2_tag
@@ -139,14 +139,14 @@ theorem gwas_h2_le_true (h2_true avg_r2_tag : ℝ)
   unfold gwasHeritability
   nlinarith
 
-/-- **Tagging efficiency varies by ancestry.**
-    EUR arrays tag EUR LD better than AFR LD.
+/-- **Tagging efficiency varies by population.**
+    Source LD is tagged better in source-derived GWAS than target LD.
     This creates a technical portability artifact. -/
 theorem tagging_creates_portability_artifact
-    (h2_eur_gwas h2_afr_gwas h2_true : ℝ)
-    (h_eur_better : h2_afr_gwas < h2_eur_gwas)
-    (h_true : h2_eur_gwas ≤ h2_true) :
-    h2_afr_gwas < h2_true := by linarith
+    (h2_source_gwas h2_target_gwas h2_true : ℝ)
+    (h_source_better : h2_target_gwas < h2_source_gwas)
+    (h_true : h2_source_gwas ≤ h2_true) :
+    h2_target_gwas < h2_true := by linarith
 
 end LDTagging
 
@@ -159,40 +159,6 @@ causal variants due to independent mutation and selection.
 -/
 
 section AllelicHeterogeneity
-
-/-- **Multiple causal variants per locus.**
-    GWAS identifies the "lead SNP" which is a composite of
-    multiple causal variants. Different populations may have
-    different causal variants at the same locus. -/
-theorem allelic_heterogeneity_reduces_portability
-    (r2_if_same_causal r2_with_heterogeneity : ℝ)
-    (h_reduced : r2_with_heterogeneity < r2_if_same_causal)
-    (h_nn : 0 < r2_with_heterogeneity) :
-    r2_with_heterogeneity < r2_if_same_causal := h_reduced
-
-/-- **Population-specific rare variants at shared loci.**
-    A gene may be important for a trait in all populations,
-    but the specific damaging variants differ because rare
-    mutations are recent and population-specific. -/
-theorem gene_shared_variants_specific
-    (gene_effect_eur gene_effect_afr : ℝ)
-    (h_both_important : 0 < gene_effect_eur ∧ 0 < gene_effect_afr)
-    (h_diff_variants : gene_effect_eur ≠ gene_effect_afr) :
-    gene_effect_eur ≠ gene_effect_afr := h_diff_variants
-
-/-- **Conditional analysis reveals heterogeneity.**
-    Running conditional analysis (adjusting for lead SNP)
-    may reveal secondary signals. If secondary signals are
-    population-specific, this indicates allelic heterogeneity. -/
-theorem conditional_reveals_heterogeneity
-    (n_signals_eur n_signals_afr n_shared : ℕ)
-    (h_eur : 0 < n_signals_eur) (h_afr : 0 < n_signals_afr)
-    (h_some_shared : 0 < n_shared)
-    (h_not_all : n_shared < n_signals_eur)
-    (h_not_all_afr : n_shared < n_signals_afr) :
-    -- Some but not all signals are shared
-    n_shared < n_signals_eur ∧ n_shared < n_signals_afr :=
-  ⟨h_not_all, h_not_all_afr⟩
 
 end AllelicHeterogeneity
 
@@ -221,16 +187,6 @@ theorem fst_decreases_with_migration (m₁ m₂ Ne : ℝ)
   unfold equilibriumFst
   rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
   nlinarith
-
-/-- **Shared selection homogenizes architecture.**
-    If both populations experience the same selective pressure
-    (e.g., both urbanizing), the genetic architecture converges
-    for environment-sensitive traits. -/
-theorem shared_selection_improves_portability
-    (rg_before rg_after : ℝ)
-    (h_improves : rg_before < rg_after)
-    (h_le : rg_after ≤ 1) :
-    rg_before < 1 := by linarith
 
 /-- **Portability prediction from architecture parameters.**
     Given M_eff, r_g, FST, and tagging efficiency,

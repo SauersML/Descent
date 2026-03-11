@@ -55,14 +55,6 @@ theorem gxe_population_specific_effects
   have : β_GxE * E₁ = β_GxE * E₂ := by linarith
   exact mul_left_cancel₀ h_gxe this
 
-/-- **GxE reduces cross-population genetic correlation.**
-    ρ_G = Cov(β_eff_1, β_eff_2) / √(Var(β_eff_1) × Var(β_eff_2)).
-    When β_GxE ≠ 0, ρ_G < 1. -/
-theorem gxe_reduces_genetic_correlation
-    (rho_with_gxe : ℝ)
-    (h_reduced : rho_with_gxe < 1) :
-    rho_with_gxe < 1 := h_reduced
-
 /-- **Portability loss from GxE.**
     R²_target / R²_source ≤ ρ_G² where ρ_G is the cross-population
     genetic correlation (incorporating GxE). -/
@@ -73,22 +65,6 @@ theorem portability_bounded_by_genetic_correlation
     r2_ratio ≤ 1 := by
   calc r2_ratio ≤ rho_G ^ 2 := h_bound
     _ ≤ 1 := by nlinarith [sq_nonneg rho_G]
-
-/-- **Diet × genetics interaction for BMI.**
-    High-carb environment may amplify genetic effects on BMI
-    that are small in a low-carb environment. -/
-theorem diet_genetics_bmi_example
-    (β_bmi_low_carb β_bmi_high_carb : ℝ)
-    (h_amplified : |β_bmi_low_carb| < |β_bmi_high_carb|) :
-    |β_bmi_low_carb| < |β_bmi_high_carb| := h_amplified
-
-/-- **GxE contributes to missing heritability across populations.**
-    If GxE is strong, the heritability estimated in one population
-    doesn't generalize. This means the PGS ceiling differs. -/
-theorem gxe_population_specific_ceiling
-    (h2_pop1 h2_pop2 : ℝ)
-    (h_diff : h2_pop1 ≠ h2_pop2) :
-    h2_pop1 ≠ h2_pop2 := h_diff
 
 end GxEInteraction
 
@@ -121,36 +97,13 @@ theorem rge_inflates_pgs_r2
   linarith [mul_pos h_rge_pos h_sqrt_pos]
 
 /-- **Cross-population rGE difference creates portability illusion.**
-    If rGE is high in EUR (e.g., education → SES → health environment)
-    but low in AFR (due to structural barriers), the PGS portability
+    If rGE is high in the source (e.g., education → SES → health environment)
+    but low in the target (due to structural barriers), the PGS portability
     loss includes the environmental component, not just genetics. -/
 theorem rge_difference_amplifies_portability_loss
     (port_genetic port_observed : ℝ)
     (h_observed_worse : port_observed < port_genetic) :
     0 < port_genetic - port_observed := by linarith
-
-/-- **Separating genetic from environmental portability.**
-    True genetic portability: how well the genetic effects port.
-    Total portability: includes rGE-mediated environmental effects.
-    Total portability ≤ genetic portability when rGE differs. -/
-theorem total_portability_le_genetic
-    (port_total port_genetic : ℝ)
-    (h_le : port_total ≤ port_genetic) :
-    port_total ≤ port_genetic := h_le
-
-/-- **Within-family PGS removes rGE.**
-    Sibling-difference or GWAS-by-subtraction removes rGE,
-    giving "direct genetic effects" that are more portable.
-    But the PGS has lower R² (only captures direct effects). -/
-theorem within_family_more_portable_less_predictive
-    (r2_population r2_within_family : ℝ)
-    (port_population port_within_family : ℝ)
-    (h_less_r2 : r2_within_family < r2_population)
-    (h_more_portable : port_population < port_within_family) :
-    -- Tradeoff: less predictive but more portable
-    r2_within_family < r2_population ∧
-      port_population < port_within_family :=
-  ⟨h_less_r2, h_more_portable⟩
 
 end GeneEnvironmentCorrelation
 
@@ -173,35 +126,6 @@ theorem env_variance_reduces_h2
     V_A / (V_A + V_E₂) < V_A / (V_A + V_E₁) := by
   exact div_lt_div_of_pos_left h_VA (by linarith) (by linarith)
 
-/-- **PGS R² ceiling is lower in high-variance environments.**
-    Even if the PGS perfectly captures all genetic effects,
-    R²_max = h², which is lower when V_E is high. -/
-theorem pgs_ceiling_lower_in_high_env_variance
-    (h2_low_env h2_high_env : ℝ)
-    (h_lower : h2_high_env < h2_low_env) :
-    h2_high_env < h2_low_env := h_lower
-
-/-- **Heteroscedasticity across ancestry groups.**
-    Different groups may have different residual variance,
-    even after accounting for PGS. This affects prediction
-    intervals and fairness. -/
-theorem heteroscedastic_residuals
-    (var_resid_pop1 var_resid_pop2 : ℝ)
-    (h_diff : var_resid_pop1 ≠ var_resid_pop2) :
-    var_resid_pop1 ≠ var_resid_pop2 := h_diff
-
-/-- **Socioeconomic factors as environmental moderators.**
-    SES acts as a moderator of genetic effects through:
-    - Access to nutrition (GxE for height/BMI)
-    - Access to healthcare (GxE for disease outcomes)
-    - Environmental exposures (GxE for respiratory disease)
-    When SES differs systematically across ancestry groups,
-    this creates apparent portability loss. -/
-theorem ses_moderates_genetic_effects
-    (β_high_ses β_low_ses : ℝ)
-    (h_moderation : β_high_ses ≠ β_low_ses) :
-    β_high_ses ≠ β_low_ses := h_moderation
-
 end EnvironmentalVariance
 
 
@@ -219,20 +143,6 @@ section NormOfReaction
     The slope b(G) is the genotype-specific environmental sensitivity. -/
 noncomputable def linearNormOfReaction (a b E : ℝ) : ℝ :=
   a + b * E
-
-/-- **Different genotypes have different slopes.**
-    If b(G₁) ≠ b(G₂), then the genotype ranking can reverse
-    across environments (crossover GxE). -/
-theorem crossover_gxe_possible
-    (a₁ a₂ b₁ b₂ E₁ E₂ : ℝ)
-    (h_b_diff : b₁ ≠ b₂)
-    -- G₁ better in E₁, G₂ better in E₂
-    (h_cross₁ : linearNormOfReaction a₂ b₂ E₁ < linearNormOfReaction a₁ b₁ E₁)
-    (h_cross₂ : linearNormOfReaction a₁ b₁ E₂ < linearNormOfReaction a₂ b₂ E₂) :
-    -- Ranking reverses
-    linearNormOfReaction a₂ b₂ E₁ < linearNormOfReaction a₁ b₁ E₁ ∧
-      linearNormOfReaction a₁ b₁ E₂ < linearNormOfReaction a₂ b₂ E₂ :=
-  ⟨h_cross₁, h_cross₂⟩
 
 /-- **Crossover GxE makes portability impossible.**
     When genotype rankings reverse across environments, a PGS
