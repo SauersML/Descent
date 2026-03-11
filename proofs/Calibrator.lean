@@ -23,6 +23,8 @@ import Calibrator.AncestryDeconvolution
 import Calibrator.TransferLearningPGS
 import Calibrator.MetricSpecificPortability
 import Calibrator.PopulationGeneticsFoundations
+import Calibrator.GeneEnvironmentInterplay
+import Calibrator.RareVariantPortability
 
 namespace Calibrator
 
