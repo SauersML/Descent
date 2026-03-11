@@ -1224,22 +1224,22 @@ These are parameterized hypotheses rather than kernel-level axioms. -/
 structure RKHSRegularityAssumptions (X : Type*) [MeasurableSpace X] : Prop where
   spectralProjector_approximation_rate :
     ∀ (sd : SobolevData X) (md : MaternSpectralData X)
-      (s r : ℝ) (hsr : r ≤ s)
-      (cApprox : ℝ) (hcApprox_nonneg : 0 ≤ cApprox),
+      (s r : ℝ) (_ : r ≤ s)
+      (cApprox : ℝ) (_ : 0 ≤ cApprox),
       ∀ f : X → ℝ, InHSobolev sd s f →
         ∀ m : ℕ,
           sobolevNorm sd r (fun x => f x - spectralProjector md m f x)
             ≤ cApprox * (md.eigVal m) ^ (-(s - r) / 2) * sobolevNorm sd s f
   spectralProjector_approximation_rate_weyl :
     ∀ (sd : SobolevData X) (md : MaternSpectralData X)
-      (s r d : ℝ) (hsr : r ≤ s) (hd : 0 < d)
-      (cApprox : ℝ) (hcApprox_nonneg : 0 ≤ cApprox),
+      (s r d : ℝ) (_ : r ≤ s) (_ : 0 < d)
+      (cApprox : ℝ) (_ : 0 ≤ cApprox),
       ∀ f : X → ℝ, InHSobolev sd s f →
         ∀ m : ℕ,
           sobolevNorm sd r (fun x => f x - spectralProjector md m f x)
             ≤ cApprox * (m : ℝ) ^ (-(s - r) / d) * sobolevNorm sd s f
   spectralProjector_dense_in_HSobolev :
-    ∀ (sd : SobolevData X) (md : MaternSpectralData X) (s r : ℝ) (hsr : r ≤ s),
+    ∀ (sd : SobolevData X) (md : MaternSpectralData X) (s r : ℝ) (_ : r ≤ s),
       ∀ f : X → ℝ, InHSobolev sd s f →
         ∀ ε > 0, ∃ m : ℕ, sobolevNorm sd r (fun x => f x - spectralProjector md m f x) < ε
   representer_theorem_matern_empirical :
@@ -1580,15 +1580,11 @@ theorem F_GAM_nonempty (k : ℕ) (sd : SobolevData (Fin k → ℝ)) (s BU Br : �
   refine ⟨fun z => phiUnit z.1, ?_⟩
   refine ⟨(fun _ => 0), (fun _ => 0), ?_, ?_, ?_⟩
   · refine ⟨measurable_const, ?_, ?_, ?_⟩
-    · refine ⟨?_, ?_⟩
-      · simpa using (memLp_zero_iff.2 (by simp) : MemLp (fun _ : Fin k → ℝ => (0 : ℝ)) 2 sd.pi)
-      · simpa [sd.sobolevLift_zero s] using (memLp_zero_iff.2 (by simp) : MemLp (fun _ : Fin k → ℝ => (0 : ℝ)) 2 sd.pi)
+    · simp [InHSobolev, sd.sobolevLift_zero]
     · simpa [sobolevNorm, sobolevNormSq, sd.sobolevLift_zero s] using hBU
     · simp
   · refine ⟨measurable_const, ?_, ?_, ?_⟩
-    · refine ⟨?_, ?_⟩
-      · simpa using (memLp_zero_iff.2 (by simp) : MemLp (fun _ : Fin k → ℝ => (0 : ℝ)) 2 sd.pi)
-      · simpa [sd.sobolevLift_zero s] using (memLp_zero_iff.2 (by simp) : MemLp (fun _ : Fin k → ℝ => (0 : ℝ)) 2 sd.pi)
+    · simp [InHSobolev, sd.sobolevLift_zero]
     · simpa [sobolevNorm, sobolevNormSq, sd.sobolevLift_zero s] using hBr
     · simp
   · intro score x

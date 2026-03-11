@@ -1446,5 +1446,32 @@ theorem brierBayesRisk_strict_of_eta_in_closure_not_in_baseline_closure
 
 end OracleAndRegret
 
+theorem BayesRisk_strict_of_truth_in_closure_not_in_baseline_closure
+    {α : Type*} [TopologicalSpace α]
+    (R : α → ℝ) (truth : α) (Fsmall Fbig : Set α)
+    (h_cont : Continuous R)
+    (h_truth_mem_big : truth ∈ closure Fbig)
+    (h_truth_not_in_small : truth ∉ closure Fsmall)
+    (h_bdd_big : BddBelow (R '' Fbig))
+    (h_attain : ∃ a ∈ closure Fsmall, BayesRisk R Fsmall = R a)
+    (h_strict_min : ∀ a ∈ closure Fsmall, a ≠ truth → R truth < R a) :
+    BayesRisk R Fbig < BayesRisk R Fsmall := by
+  rcases h_attain with ⟨a, ha_mem, ha_eq⟩
+  have h_inf_le : BayesRisk R Fbig ≤ R truth := by
+    unfold BayesRisk
+    have hr_mem : R truth ∈ closure (R '' Fbig) :=
+      image_closure_subset_closure_image h_cont (Set.mem_image_of_mem R h_truth_mem_big)
+    have h_le_closure : closure (R '' Fbig) ⊆ Set.Ici (sInf (R '' Fbig)) := by
+      apply isClosed_Ici.closure_subset_iff.mpr
+      intro x hx
+      exact csInf_le h_bdd_big hx
+    exact h_le_closure hr_mem
+  have h_neq : a ≠ truth := by
+    intro heq
+    subst heq
+    contradiction
+  have h_strict : R truth < R a := h_strict_min a ha_mem h_neq
+  rw [ha_eq]
+  linarith
 
 end Calibrator
