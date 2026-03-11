@@ -34,6 +34,8 @@ import Calibrator.ImputationPortability
 import Calibrator.LongitudinalPortability
 import Calibrator.PowerAnalysis
 import Calibrator.CovarianceStructure
+import Calibrator.MendelianRandomization
+import Calibrator.CausalInference
 
 namespace Calibrator
 
