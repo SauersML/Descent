@@ -31,6 +31,9 @@ import Calibrator.EpistasisAndNonAdditivity
 import Calibrator.PolygenicAdaptation
 import Calibrator.AssortativeMatingPGS
 import Calibrator.ImputationPortability
+import Calibrator.LongitudinalPortability
+import Calibrator.PowerAnalysis
+import Calibrator.CovarianceStructure
 
 namespace Calibrator
 
