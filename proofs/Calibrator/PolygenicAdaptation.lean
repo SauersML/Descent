@@ -110,12 +110,66 @@ populations exceed what's expected from drift alone.
 
 section PGSOverdispersion
 
+/-- **PGS drift variance in a single population.**
+
+    **Derivation from drift theory:**
+    - PGS = Σᵢ βᵢ × Gᵢ, so under drift E[ΔPGS] = Σᵢ βᵢ × E[Δpᵢ] = 0
+      (drift is unbiased on allele frequencies).
+    - Var(ΔPGS) = Σᵢ βᵢ² × Var(Δpᵢ)     (independent loci)
+                = Σᵢ βᵢ² × 2pᵢ(1-pᵢ) × Fst  (definition of Fst)
+                = Fst × Σᵢ 2pᵢ(1-pᵢ)βᵢ²
+                = Fst × V_A              (definition of additive genetic variance)
+
+    This gives the variance of PGS change in one population due to drift. -/
+noncomputable def pgsDriftVariance_one_pop (V_A fst : ℝ) : ℝ :=
+  fst * V_A
+
+/-- Single-population PGS drift variance is nonneg. -/
+theorem pgsDriftVariance_one_pop_nonneg (V_A fst : ℝ)
+    (h_VA : 0 ≤ V_A) (h_fst : 0 ≤ fst) :
+    0 ≤ pgsDriftVariance_one_pop V_A fst := by
+  unfold pgsDriftVariance_one_pop; positivity
+
+/-- **PGS difference variance between two independently drifting populations.**
+
+    For two populations that diverged from a common ancestor and drifted
+    independently:
+    - Var(PGS₁ - PGS₂) = Var(PGS₁) + Var(PGS₂)  (independence of drift)
+                        = Fst × V_A + Fst × V_A
+                        = 2 × Fst × V_A
+                        = 2 × pgsDriftVariance_one_pop(V_A, Fst)
+
+    The factor of 2 arises because both populations drift independently
+    from their common ancestor, analogous to the factor of 2 in
+    expectedFreqDiffSq for allele frequency differences. -/
+noncomputable def pgsDiffVariance_two_pop (V_A fst : ℝ) : ℝ :=
+  2 * pgsDriftVariance_one_pop V_A fst
+
+/-- Two-population PGS difference variance decomposes as sum of
+    independent single-population drift variances. -/
+theorem pgsDiffVariance_two_pop_eq_sum (V_A fst : ℝ) :
+    pgsDiffVariance_two_pop V_A fst =
+      pgsDriftVariance_one_pop V_A fst + pgsDriftVariance_one_pop V_A fst := by
+  unfold pgsDiffVariance_two_pop; ring
+
 /-- **Expected PGS mean difference under drift.**
     Under pure drift, the PGS mean difference has variance:
     Var(ΔPGS) = V_A × 2FST.
     The expected |ΔPGS| ∝ √(V_A × FST). -/
 noncomputable def expectedPGSDiffVariance (V_A fst : ℝ) : ℝ :=
   V_A * 2 * fst
+
+/-- **The two-population PGS difference variance equals expectedPGSDiffVariance.**
+
+    This connects the step-by-step derivation to the original definition:
+    pgsDiffVariance_two_pop V_A fst
+      = 2 × (fst × V_A)          (unfolding pgsDriftVariance_one_pop)
+      = V_A × 2 × fst            (commutativity of multiplication)
+      = expectedPGSDiffVariance V_A fst -/
+theorem pgsDiffVariance_eq_expected (V_A fst : ℝ) :
+    pgsDiffVariance_two_pop V_A fst = expectedPGSDiffVariance V_A fst := by
+  unfold pgsDiffVariance_two_pop pgsDriftVariance_one_pop expectedPGSDiffVariance
+  ring
 
 /-- Expected variance is nonneg. -/
 theorem expected_pgs_diff_var_nonneg (V_A fst : ℝ)

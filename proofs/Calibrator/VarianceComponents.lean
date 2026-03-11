@@ -277,9 +277,41 @@ the liability scale. Conversion depends on prevalence.
 section LiabilityScale
 
 /-- **Observed-to-liability scale conversion (Dempster-Lee-Risch).**
-    h²_liability = h²_observed × K(1-K) / (z²)
-    where K is prevalence and z is the height of the standard normal
-    at the threshold = Φ⁻¹(1-K). -/
+
+    **Derivation of the Dempster-Lee-Risch conversion:**
+
+    On the liability scale, assume Y ~ N(0, 1). Disease occurs when Y > T,
+    where T = Φ⁻¹(1-K) and K = prevalence. This is the "liability threshold
+    model."
+
+    The key question: how does a unit change in liability translate to a
+    change in disease risk on the observed (binary 0/1) scale?
+
+    1. The observed (binary) heritability h²_obs measures variance explained
+       on the 0/1 disease scale.
+
+    2. The liability heritability h²_liab measures variance explained on the
+       continuous latent liability scale.
+
+    3. The relationship between the two involves the "ascertainment correction"
+       factor. At the threshold T, the standard normal density is z = φ(T).
+       A small shift δ in mean liability changes disease risk by:
+         ΔP(disease) ≈ z × δ
+
+    4. Variance on observed scale vs liability scale:
+       - A genetic variant explaining variance σ² on the liability scale
+         explains variance ≈ z² × σ² / (K(1-K)) on the observed scale
+         (after accounting for the Bernoulli variance K(1-K) of the binary outcome).
+
+    5. Therefore: h²_obs = h²_liab × z² / (K(1-K))
+
+    6. Rearranging: **h²_liab = h²_obs × K(1-K) / z²**
+
+    The factor K(1-K)/z² is the inverse of the "ascertainment correction,"
+    which accounts for the nonlinear mapping between the continuous liability
+    and binary disease status. For rare diseases (small K), the threshold T
+    is far in the tail, z = φ(T) is small, and z² << K(1-K), so
+    h²_liab >> h²_obs. -/
 noncomputable def liabilityScaleH2
     (h2_observed prevalence z_height : ℝ) : ℝ :=
   h2_observed * prevalence * (1 - prevalence) / z_height ^ 2
