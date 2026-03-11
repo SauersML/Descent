@@ -38,16 +38,16 @@ section TraitClassification
     Under pure neutral drift with no selection or GxE:
     R²_target / R²_source ≈ (1 - Fst_additional)
     accounting for LD tagging loss. -/
-noncomputable def neutralPortabilityRatio (fst_additional ld_factor : ℝ) : ℝ :=
+noncomputable def neutralPortabilityRatioLD (fst_additional ld_factor : ℝ) : ℝ :=
   (1 - fst_additional) * ld_factor
 
 /-- Neutral ratio is in [0, 1] under valid parameters. -/
 theorem neutral_ratio_in_unit (fst ld : ℝ)
     (h_fst : 0 ≤ fst) (h_fst1 : fst ≤ 1)
     (h_ld : 0 ≤ ld) (h_ld1 : ld ≤ 1) :
-    0 ≤ neutralPortabilityRatio fst ld ∧
-      neutralPortabilityRatio fst ld ≤ 1 := by
-  unfold neutralPortabilityRatio
+    0 ≤ neutralPortabilityRatioLD fst ld ∧
+      neutralPortabilityRatioLD fst ld ≤ 1 := by
+  unfold neutralPortabilityRatioLD
   constructor
   · exact mul_nonneg (by linarith) h_ld
   · calc (1 - fst) * ld ≤ 1 * 1 := by
