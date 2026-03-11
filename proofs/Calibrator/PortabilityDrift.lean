@@ -2074,6 +2074,269 @@ theorem admixture_portability_above_equilibrium (V_A V_E fst r : ℝ) (t_since :
 
 end MigrationDriftPortability
 
+/-! ## Migration-Drift Recurrence: Deriving Fst = 1/(1 + 4Nm) from First Principles
+
+We derive the classical Wright (1931) equilibrium Fst formula from the
+migration-drift recurrence relation. The island model with migration rate m
+and effective population size Ne yields a linear recurrence on Fst:
+
+  Fst_{t+1} = (1 - 2m - 1/(2Ne)) * Fst_t + 1/(2Ne)
+
+This is the linearized form where (1-m)² ≈ 1 - 2m. At equilibrium
+Fst* = Fst_{t+1} = Fst_t, solving the linear equation gives:
+
+  Fst* = 1 / (4*Ne*m + 1)
+
+We prove this closed form satisfies the recurrence, then derive monotonicity
+and portability consequences directly from the recurrence structure.
+-/
+
+section MigrationDriftRecurrence
+
+/-! ### 1. The migration-drift recurrence -/
+
+/-- **Migration-drift recurrence on Fst.**
+    In the island model with migration rate `m` and effective size `Ne`,
+    the linearized one-generation update of Fst is:
+      Fst_{t+1} = (1 - 2m - 1/(2Ne)) * Fst_t + 1/(2Ne)
+    Migration reduces Fst by a factor (1-2m), and drift adds (1-Fst)/(2Ne).
+    The linearization replaces (1-m)² with 1-2m (valid for small m). -/
+noncomputable def fstMigDriftNext (Ne m Fst : ℝ) : ℝ :=
+  (1 - 2 * m - 1 / (2 * Ne)) * Fst + 1 / (2 * Ne)
+
+/-- The recurrence can be written as Fst_{t+1} = a * Fst_t + b where
+    a = 1 - 2m - 1/(2Ne) and b = 1/(2Ne). -/
+theorem fstMigDriftNext_eq (Ne m Fst : ℝ) :
+    fstMigDriftNext Ne m Fst =
+      (1 - 2 * m - 1 / (2 * Ne)) * Fst + 1 / (2 * Ne) := by
+  rfl
+
+/-- The drift term: when m = 0, the recurrence reduces to pure drift. -/
+theorem fstMigDriftNext_no_migration (Ne Fst : ℝ) :
+    fstMigDriftNext Ne 0 Fst = (1 - 1 / (2 * Ne)) * Fst + 1 / (2 * Ne) := by
+  unfold fstMigDriftNext
+  ring
+
+/-- With no migration, the recurrence pushes Fst toward 1: the drift-only
+    fixed point is Fst = 1. We verify: f(1) = 1. -/
+theorem fstMigDriftNext_no_migration_fixedpoint_one (Ne : ℝ) (hNe : Ne ≠ 0) :
+    fstMigDriftNext Ne 0 1 = 1 := by
+  rw [fstMigDriftNext_no_migration]
+  field_simp
+
+/-! ### 2. The exact equilibrium fixed point -/
+
+/-- **Equilibrium Fst from the migration-drift recurrence.**
+    Solving Fst* = (1 - 2m - 1/(2Ne)) * Fst* + 1/(2Ne) for Fst*:
+      Fst* - (1 - 2m - 1/(2Ne)) * Fst* = 1/(2Ne)
+      Fst* * (2m + 1/(2Ne)) = 1/(2Ne)
+      Fst* = (1/(2Ne)) / (2m + 1/(2Ne))
+            = 1 / (4*Ne*m + 1)
+    This is the exact solution of the linearized recurrence. -/
+noncomputable def fstMigDriftEquil (Ne m : ℝ) : ℝ :=
+  1 / (4 * Ne * m + 1)
+
+/-- **The equilibrium Fst satisfies the recurrence.**
+    This is the core derivation: we verify algebraically that
+    fstMigDriftNext Ne m (fstMigDriftEquil Ne m) = fstMigDriftEquil Ne m. -/
+theorem fstMigDriftEquil_is_fixed_point (Ne m : ℝ)
+    (hNe : 0 < Ne) (h4Nm1 : 4 * Ne * m + 1 ≠ 0) :
+    fstMigDriftNext Ne m (fstMigDriftEquil Ne m) = fstMigDriftEquil Ne m := by
+  unfold fstMigDriftNext fstMigDriftEquil
+  have hNe_ne : (2 : ℝ) * Ne ≠ 0 := by positivity
+  have hden : 4 * Ne * m + 1 ≠ 0 := h4Nm1
+  field_simp [hNe_ne, hden]
+  ring
+
+/-- The derived equilibrium matches the previously defined formula. -/
+theorem fstMigDriftEquil_eq_fstMigrationDriftEquilibrium (Ne m : ℝ) :
+    fstMigDriftEquil Ne m = fstMigrationDriftEquilibrium Ne m := by
+  unfold fstMigDriftEquil fstMigrationDriftEquilibrium
+  ring
+
+/-- **Intermediate form of the fixed-point equation.**
+    The equilibrium can also be written as
+      Fst* = (1/(2Ne)) / (2m + 1/(2Ne))
+    which makes the balance between drift (numerator) and
+    migration + drift (denominator) explicit. -/
+theorem fstMigDriftEquil_ratio_form (Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    fstMigDriftEquil Ne m =
+      (1 / (2 * Ne)) / (2 * m + 1 / (2 * Ne)) := by
+  unfold fstMigDriftEquil
+  have hNe2 : (0 : ℝ) < 2 * Ne := by positivity
+  have hden : 2 * m + 1 / (2 * Ne) ≠ 0 := by
+    have : 0 < 2 * m + 1 / (2 * Ne) := by positivity
+    linarith
+  field_simp [hden]
+  ring
+
+/-! ### 3. Equilibrium Fst is positive and bounded -/
+
+/-- Equilibrium Fst from the recurrence is positive. -/
+theorem fstMigDriftEquil_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    0 < fstMigDriftEquil Ne m := by
+  unfold fstMigDriftEquil
+  positivity
+
+/-- Equilibrium Fst from the recurrence is at most 1. -/
+theorem fstMigDriftEquil_le_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    fstMigDriftEquil Ne m ≤ 1 := by
+  unfold fstMigDriftEquil
+  rw [div_le_one (by nlinarith)]
+  nlinarith
+
+/-- Equilibrium Fst from the recurrence is strictly less than 1 when m > 0. -/
+theorem fstMigDriftEquil_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
+    fstMigDriftEquil Ne m < 1 := by
+  unfold fstMigDriftEquil
+  rw [div_lt_one (by nlinarith)]
+  nlinarith
+
+/-! ### 4. Equilibrium Fst is decreasing in m (derived from the formula) -/
+
+/-- **Equilibrium Fst decreases with migration rate.**
+    From Fst* = 1/(4Nm + 1), increasing m increases the denominator,
+    hence decreases Fst*. This is derived, not assumed. -/
+theorem fstMigDriftEquil_decreasing_in_m (Ne m₁ m₂ : ℝ)
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
+    (h_more : m₁ < m₂) :
+    fstMigDriftEquil Ne m₂ < fstMigDriftEquil Ne m₁ := by
+  unfold fstMigDriftEquil
+  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+
+/-! ### 5. Equilibrium Fst is decreasing in Ne (derived from the formula) -/
+
+/-- **Equilibrium Fst decreases with effective population size.**
+    From Fst* = 1/(4Nm + 1), increasing Ne increases the denominator 4Nm + 1,
+    hence decreases Fst*. Larger populations have slower drift relative to
+    migration, so less differentiation. -/
+theorem fstMigDriftEquil_decreasing_in_Ne (Ne₁ Ne₂ m : ℝ)
+    (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (hm : 0 < m)
+    (h_more : Ne₁ < Ne₂) :
+    fstMigDriftEquil Ne₂ m < fstMigDriftEquil Ne₁ m := by
+  unfold fstMigDriftEquil
+  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+
+/-! ### 6. The full (non-linearized) recurrence and its fixed point -/
+
+/-- **Full migration-drift recurrence (non-linearized).**
+    Without the (1-m)² ≈ 1-2m approximation, the exact one-generation
+    update is:
+      Fst_{t+1} = (1-m)² * (1 - 1/(2Ne)) * Fst_t + (1 - Fst_t)/(2Ne)
+    This retains the quadratic term m². -/
+noncomputable def fstMigDriftNextFull (Ne m Fst : ℝ) : ℝ :=
+  (1 - m) ^ 2 * (1 - 1 / (2 * Ne)) * Fst + (1 - Fst) / (2 * Ne)
+
+/-- The full recurrence agrees with the simplified one up to order m² terms.
+    Specifically: fstMigDriftNextFull - fstMigDriftNext = m² * (...). -/
+theorem fstMigDriftNextFull_minus_simplified (Ne m Fst : ℝ) (hNe : 0 < Ne) :
+    fstMigDriftNextFull Ne m Fst - fstMigDriftNext Ne m Fst =
+      m ^ 2 * (1 - 1 / (2 * Ne)) * Fst := by
+  unfold fstMigDriftNextFull fstMigDriftNext
+  have hNe2 : (2 : ℝ) * Ne ≠ 0 := by positivity
+  field_simp [hNe2]
+  ring
+
+/-- **Exact fixed point of the full recurrence.**
+    Solving Fst* = (1-m)²(1 - 1/(2N)) Fst* + (1 - Fst*)/(2N):
+    Let a = (1-m)²(1 - 1/(2N)), b = 1/(2N). Then:
+      Fst* = a * Fst* + b - b * Fst*
+      Fst*(1 - a + b) = b
+      Fst* = b / (1 - a + b)
+           = 1/(2N) / (1 - (1-m)²(1-1/(2N)) + 1/(2N)) -/
+noncomputable def fstMigDriftEquilFull (Ne m : ℝ) : ℝ :=
+  let a := (1 - m) ^ 2 * (1 - 1 / (2 * Ne))
+  let b := 1 / (2 * Ne)
+  b / (1 - a + b)
+
+/-- **The exact equilibrium satisfies the full recurrence.** -/
+theorem fstMigDriftEquilFull_is_fixed_point (Ne m : ℝ)
+    (hNe : 0 < Ne)
+    (hden : 1 - (1 - m) ^ 2 * (1 - 1 / (2 * Ne)) + 1 / (2 * Ne) ≠ 0) :
+    fstMigDriftNextFull Ne m (fstMigDriftEquilFull Ne m) =
+      fstMigDriftEquilFull Ne m := by
+  unfold fstMigDriftNextFull fstMigDriftEquilFull
+  simp only []
+  have hNe2 : (2 : ℝ) * Ne ≠ 0 := by positivity
+  set a := (1 - m) ^ 2 * (1 - 1 / (2 * Ne))
+  set b := 1 / (2 * Ne)
+  set D := 1 - a + b
+  -- We need: a * (b / D) + (1 - b / D) * b = b / D
+  -- i.e. a * b / D + b - b² / D = b / D
+  -- i.e. (a * b + b * D - b²) / D = b / D
+  -- i.e. a * b + b * D - b² = b
+  -- i.e. b * (a + D - b - 1) = 0
+  -- a + D - b = a + 1 - a + b - b = 1, so a + D - b - 1 = 0. ✓
+  field_simp [hden, hNe2]
+  ring
+
+/-! ### 7. Migration-to-portability connection derived from the recurrence -/
+
+/-- **Portability ratio from the derived Fst formula.**
+    The portability ratio is 1 - Fst = 1 - 1/(4Nm + 1) = 4Nm/(4Nm + 1).
+    This shows portability is directly determined by scaled migration 4Nm. -/
+noncomputable def portabilityFromRecurrence (Ne m : ℝ) : ℝ :=
+  1 - fstMigDriftEquil Ne m
+
+/-- Portability ratio equals 4Nm / (4Nm + 1). -/
+theorem portabilityFromRecurrence_eq (Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    portabilityFromRecurrence Ne m = 4 * Ne * m / (4 * Ne * m + 1) := by
+  unfold portabilityFromRecurrence fstMigDriftEquil
+  have hden : 4 * Ne * m + 1 ≠ 0 := by nlinarith
+  field_simp [hden]
+
+/-- **Portability increases with migration rate.**
+    From the derived formula portability = 4Nm/(4Nm+1), increasing m
+    increases the ratio. This connects the recurrence derivation to
+    the portability prediction. -/
+theorem portabilityFromRecurrence_increasing_in_m (Ne m₁ m₂ : ℝ)
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
+    (h_more : m₁ < m₂) :
+    portabilityFromRecurrence Ne m₁ < portabilityFromRecurrence Ne m₂ := by
+  rw [portabilityFromRecurrence_eq Ne m₁ hNe (le_of_lt hm₁),
+      portabilityFromRecurrence_eq Ne m₂ hNe (le_of_lt hm₂)]
+  rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
+  nlinarith
+
+/-- **Portability is nonneg.** -/
+theorem portabilityFromRecurrence_nonneg (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    0 ≤ portabilityFromRecurrence Ne m := by
+  rw [portabilityFromRecurrence_eq Ne m hNe hm]
+  exact div_nonneg (by nlinarith) (by nlinarith)
+
+/-- **Portability is strictly positive with migration.** -/
+theorem portabilityFromRecurrence_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
+    0 < portabilityFromRecurrence Ne m := by
+  rw [portabilityFromRecurrence_eq Ne m hNe (le_of_lt hm)]
+  exact div_pos (by nlinarith) (by nlinarith)
+
+/-- **Portability is strictly less than 1 (some signal always lost to drift).** -/
+theorem portabilityFromRecurrence_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    portabilityFromRecurrence Ne m < 1 := by
+  rw [portabilityFromRecurrence_eq Ne m hNe hm]
+  rw [div_lt_one (by nlinarith : 0 < 4 * Ne * m + 1)]
+  linarith
+
+/-- **The derived portability connects back to the R² portability ratio.**
+    Using the derived Fst from the recurrence, the R² in the target population
+    is presentDayR2 with Fst = fstMigDriftEquil. More migration yields
+    higher R². -/
+theorem recurrence_derived_R2_increases_with_m (V_A V_E Ne m₁ m₂ : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E) (hNe : 0 < Ne)
+    (hm₁ : 0 < m₁) (hm₂ : 0 < m₂) (h_more : m₁ < m₂) :
+    presentDayR2 V_A V_E (fstMigDriftEquil Ne m₁) <
+      presentDayR2 V_A V_E (fstMigDriftEquil Ne m₂) := by
+  rw [fstMigDriftEquil_eq_fstMigrationDriftEquilibrium,
+      fstMigDriftEquil_eq_fstMigrationDriftEquilibrium]
+  exact migration_improves_R2_over_pure_drift V_A V_E Ne m₁ hVA hVE hNe hm₁
+    (fstMigrationDriftEquilibrium Ne m₁)
+    (fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ hm₂ h_more)
+    (fstMigrationDriftEquilibrium_lt_one Ne m₁ hNe hm₁)
+
+end MigrationDriftRecurrence
+
 end PortabilityDrift
 
 end Calibrator
