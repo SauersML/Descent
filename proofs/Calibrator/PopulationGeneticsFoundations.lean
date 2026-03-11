@@ -402,12 +402,61 @@ theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
   nlinarith
 
 /-- **Complementarity of heterozygosity and Fst under mutation-drift balance.**
-    H = θ/(1+θ) and Fst = 1/(1+θ) sum to 1. -/
+
+    **Biological derivation.** Nei's Fst is *defined* as the proportion of total
+    heterozygosity that is due to between-population differences:
+
+      Fst = (H_T − H_S) / H_T = 1 − H_S / H_T
+
+    where H_T is total (meta-population) heterozygosity and H_S is the mean
+    subpopulation heterozygosity. Rearranging gives
+
+      H_S / H_T  +  Fst  =  1
+
+    so the within-population share and the between-population share of genetic
+    diversity are complementary *by definition* of Fst as a variance partition.
+
+    At mutation-drift equilibrium under the infinite-alleles model,
+    H_S / H_T = θ/(1+θ) = `expectedHeterozygosity θ` and
+    Fst = 1/(1+θ) = `fstMutationDriftEquilibrium θ`.  The algebraic identity
+    θ/(1+θ) + 1/(1+θ) = 1 is therefore the equilibrium instantiation of the
+    definitional partition H_S/H_T + Fst = 1.
+
+    See also `nei_fst_complement` for the general (non-equilibrium)
+    version derived directly from Nei's definition, and
+    `nei_fst_equilibrium_consistent` which connects the two. -/
 theorem het_plus_fst_eq_one (θ : ℝ) (hθ : 0 ≤ θ) :
     expectedHeterozygosity θ + fstMutationDriftEquilibrium θ = 1 := by
   unfold expectedHeterozygosity fstMutationDriftEquilibrium
   have hden : (1 + θ) ≠ 0 := by linarith
   field_simp [hden]
+
+/-- **The within-population heterozygosity share and Nei's Fst sum to 1.**
+    Since `neiFst H_T H_S = (H_T − H_S) / H_T = 1 − H_S / H_T`, we have
+    H_S / H_T + neiFst H_T H_S = 1.  No equilibrium assumption is needed;
+    the identity holds for *any* H_T ≠ 0.  This is the general form of the
+    variance partition that `het_plus_fst_eq_one` instantiates at equilibrium. -/
+theorem nei_fst_complement (H_S H_T : ℝ) (hHT : H_T ≠ 0) :
+    H_S / H_T + neiFst H_T H_S = 1 := by
+  unfold neiFst
+  field_simp
+
+/-- **At mutation-drift equilibrium, Nei's Fst recovers fstMutationDriftEquilibrium.**
+    When H_S = θ/(1+θ) (`expectedHeterozygosity θ`) and H_T = 1 (maximal
+    heterozygosity under the infinite-alleles model), Nei's formula gives
+    Fst = 1/(1+θ) = `fstMutationDriftEquilibrium θ`. -/
+theorem nei_fst_equilibrium_consistent (θ : ℝ) (hθ : 0 ≤ θ) :
+    neiFst 1 (expectedHeterozygosity θ) = fstMutationDriftEquilibrium θ := by
+  unfold neiFst expectedHeterozygosity fstMutationDriftEquilibrium
+  have hden : (1 + θ) ≠ 0 := by linarith
+  field_simp [hden]
+  ring
+
+/-- **At mutation-drift equilibrium, the within-population share equals expectedHeterozygosity.**
+    When H_T = 1, we have H_S / H_T = H_S = θ/(1+θ). -/
+theorem within_pop_share_eq_het (θ : ℝ) :
+    expectedHeterozygosity θ / 1 = expectedHeterozygosity θ := by
+  simp
 
 /-- **Heterozygosity determines Fst and vice versa.**
     Fst = 1 - H under mutation-drift balance. -/
