@@ -272,10 +272,35 @@ theorem selected_shift_positive
 
 /-- **Polygenic adaptation creates PGS mean shift but not R² loss.**
     The mean shift is recoverable by recalibration (intercept adjustment).
-    R² only drops if effect sizes change, not just if frequencies shift. -/
+
+    We prove the key statistical claim: if the PGS has variance V and the
+    adaptation shift μ is a constant (same for all individuals), then the
+    R² of (PGS + μ) for predicting the phenotype equals R² of PGS alone.
+    This is because R² = Var(predictor) × corr² / Var(outcome), and adding
+    a constant does not change variance or correlation.
+
+    Formally: for any set of n individual scores, the sample variance is
+    invariant under translation by a constant shift. -/
 theorem adaptation_shift_recoverable
-    (pgs μ_shift : ℝ) :
-    (pgs + μ_shift) - μ_shift = pgs := by ring
+    {n : ℕ} (scores : Fin n → ℝ) (μ_shift : ℝ) :
+    let shifted := fun i => scores i + μ_shift
+    let mean_orig := (∑ i, scores i) / n
+    let mean_shifted := (∑ i, shifted i) / n
+    (∑ i, (shifted i - mean_shifted) ^ 2) =
+      ∑ i, (scores i - mean_orig) ^ 2 := by
+  simp only
+  congr 1
+  ext i
+  have : (∑ j : Fin n, (scores j + μ_shift)) / ↑n =
+    (∑ j, scores j) / ↑n + μ_shift := by
+    rw [show (∑ j : Fin n, (scores j + μ_shift)) =
+      (∑ j, scores j) + n * μ_shift by
+      simp [Finset.sum_add_distrib, Finset.mul_sum]]
+    by_cases hn : (n : ℝ) = 0
+    · simp [hn]
+    · field_simp
+  rw [this]
+  ring_nf
 
 /-- **QST-FST comparison detects polygenic adaptation.**
     Q_ST = Var(between-pop trait means) / Var(total).
@@ -345,7 +370,12 @@ theorem ncp_ratio_from_maf
 
 /-- **Population-specific GWAS recovers population-specific signals.**
     Variants that are common in the target population but rare in the
-    source population are missed by source GWAS. Target GWAS recovers them. -/
+    source population are missed by source GWAS. Target GWAS recovers them.
+
+    Note: This is a direct algebraic consequence of the model assumption
+    that combined R² exceeds source-only R². The substantive claim is in
+    the model: multi-ancestry GWAS discovers variants with population-specific
+    MAF spectra that single-ancestry GWAS misses. -/
 theorem target_gwas_recovers_missed_variants
     (r2_source_only r2_combined : ℝ)
     (h_improvement : r2_source_only < r2_combined)

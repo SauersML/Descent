@@ -69,12 +69,27 @@ theorem snp_h2_le_narrow_h2
 
 /-- **The missing heritability gap.**
     h²_twin - h²_SNP > 0 for most traits. This is the "missing heritability".
-    It sets an upper bound on what PGS can achieve with current genotyping. -/
+    It sets an upper bound on what PGS can achieve with current genotyping.
+
+    We derive the gap from the variance component model: h²_twin captures
+    V_A_total / V_P while h²_SNP captures only V_A_tagged / V_P. The gap
+    arises whenever some additive variance is not tagged by genotyped SNPs
+    (V_A_untagged > 0). We prove that h²_twin - h²_SNP = V_A_untagged / V_P > 0,
+    connecting the gap to the concrete untagged variance component. -/
 theorem missing_heritability_gap
-    (h2_twin h2_snp : ℝ)
-    (h_gap : h2_snp < h2_twin)
-    (h_snp_nn : 0 ≤ h2_snp) :
-    0 < h2_twin - h2_snp := by linarith
+    (V_A_tagged V_A_untagged V_D V_I V_E : ℝ)
+    (h_tagged_nn : 0 ≤ V_A_tagged) (h_untagged_pos : 0 < V_A_untagged)
+    (h_D : 0 ≤ V_D) (h_I : 0 ≤ V_I) (h_E : 0 ≤ V_E)
+    (h_total : 0 < V_A_tagged + V_A_untagged + V_D + V_I + V_E) :
+    let V_P := V_A_tagged + V_A_untagged + V_D + V_I + V_E
+    let h2_twin := (V_A_tagged + V_A_untagged) / V_P
+    let h2_snp := V_A_tagged / V_P
+    0 < h2_twin - h2_snp := by
+  simp only
+  rw [div_sub_div_eq_sub_div]
+  apply div_pos
+  · linarith
+  · linarith
 
 end HeritabilityDefinitions
 
@@ -257,12 +272,28 @@ theorem greml_underestimates_with_poor_tagging
 
 /-- **Population structure inflates GREML h² estimate.**
     Cryptic stratification in the GWAS sample creates a positive bias
-    in the GRM-based h² estimate. -/
+    in the GRM-based h² estimate.
+
+    **Model:** GREML estimates h² = V_A / V_P by fitting a linear mixed
+    model with a GRM kernel. When there is population structure, the GRM
+    captures both true genetic relatedness and stratification-induced
+    correlations. The GREML estimate becomes:
+      h²_GREML = (V_A + V_strat) / (V_A + V_strat + V_E)
+    while the true h² is:
+      h²_true = V_A / (V_A + V_strat + V_E)
+
+    We derive: h²_GREML > h²_true whenever V_strat > 0, because
+    (V_A + V_strat)/V_P > V_A/V_P when V_P > 0. -/
 theorem stratification_inflates_greml
-    (h2_true h2_greml stratification_bias : ℝ)
-    (h_inflation : h2_greml = h2_true + stratification_bias)
-    (h_bias_pos : 0 < stratification_bias) :
-    h2_true < h2_greml := by linarith
+    (V_A V_strat V_E : ℝ)
+    (h_VA : 0 ≤ V_A) (h_strat_pos : 0 < V_strat) (h_VE : 0 ≤ V_E)
+    (h_total : 0 < V_A + V_strat + V_E) :
+    let V_P := V_A + V_strat + V_E
+    let h2_true := V_A / V_P
+    let h2_greml := (V_A + V_strat) / V_P
+    h2_true < h2_greml := by
+  simp only
+  exact div_lt_div_of_pos_right (by linarith) h_total
 
 end GREML
 
