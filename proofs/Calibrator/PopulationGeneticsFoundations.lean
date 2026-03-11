@@ -738,4 +738,243 @@ theorem ldCorrelationFromMigration_increases (M₁ M₂ : ℝ)
 
 end MigrationDriftFoundations
 
+
+/-!
+## Derivation of Fst from Wright-Fisher Drift Dynamics
+
+Rather than *defining* Fst as a formula, we *derive* it from the fundamental
+Wright-Fisher recurrence for heterozygosity.  The key identity is:
+
+  H(t+1) = (1 - 1/(2N)) × H(t)
+
+which expresses the fact that two alleles drawn from generation t+1 are
+identical by descent with probability 1/(2N), leaving heterozygosity reduced
+by that factor each generation.
+
+We then:
+1. Solve this recurrence in closed form by induction.
+2. Define Fst(t) = 1 - H(t)/H₀ and derive its properties.
+3. Introduce mutation, find the equilibrium heterozygosity H* = θ/(1+θ),
+   and derive Fst_eq = 1/(1+θ) as a *consequence*.
+-/
+
+section FstDerivationFromDrift
+
+/-! ### Pure-drift heterozygosity recurrence -/
+
+/-- **Heterozygosity recurrence under pure drift.**
+    Each generation, the probability that two sampled alleles are distinct
+    is reduced by a factor of (1 - 1/(2Ne)). -/
+noncomputable def hetRecurrence (Ne : ℝ) (H₀ : ℝ) : ℕ → ℝ
+  | 0 => H₀
+  | t + 1 => (1 - 1 / (2 * Ne)) * hetRecurrence Ne H₀ t
+
+/-- **Closed-form solution by induction.**
+    hetRecurrence Ne H₀ t = (1 - 1/(2Ne))^t × H₀. -/
+theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
+    hetRecurrence Ne H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ := by
+  induction t with
+  | zero =>
+    simp [hetRecurrence]
+  | succ n ih =>
+    simp only [hetRecurrence, ih]
+    ring
+
+/-! ### Fst derived from heterozygosity loss -/
+
+/-- **Fst derived from heterozygosity decay.**
+    Fst(t) = 1 - H(t)/H₀ = 1 - (1 - 1/(2Ne))^t.
+    This is not a definition imposed from outside; it is the fractional
+    loss of heterozygosity after t generations of drift. -/
+noncomputable def fstDerived (Ne : ℝ) (t : ℕ) : ℝ :=
+  1 - (1 - 1 / (2 * Ne)) ^ t
+
+/-- **Fst matches heterozygosity loss.**
+    When H₀ > 0, fstDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀. -/
+theorem fstDerived_eq_het_loss (Ne H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) :
+    fstDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀ := by
+  unfold fstDerived
+  rw [hetRecurrence_closed_form]
+  field_simp
+
+/-- **Fst(0) = 0**: populations start undifferentiated. -/
+theorem fstDerived_zero (Ne : ℝ) : fstDerived Ne 0 = 0 := by
+  unfold fstDerived
+  simp
+
+/-- **Fst is monotonically increasing in t.**
+    More generations of drift → more differentiation. -/
+theorem fstDerived_mono (Ne : ℝ) (t₁ t₂ : ℕ) (hNe : 2 < Ne)
+    (h_lt : t₁ < t₂) :
+    fstDerived Ne t₁ < fstDerived Ne t₂ := by
+  unfold fstDerived
+  have h_base_pos : 0 < 1 - 1 / (2 * Ne) := by
+    rw [sub_pos, div_lt_one (by linarith)]; linarith
+  have h_base_lt : 1 - 1 / (2 * Ne) < 1 := by
+    rw [sub_lt_self_iff]; positivity
+  linarith [pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt h_lt]
+
+/-- **0 ≤ Fst(t) for all t when Ne ≥ 2.** -/
+theorem fstDerived_nonneg (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
+    0 ≤ fstDerived Ne t := by
+  unfold fstDerived
+  rw [sub_nonneg]
+  apply pow_le_one₀
+  · rw [sub_nonneg, div_le_one (by linarith)]; linarith
+  · rw [sub_le_self_iff]; positivity
+
+/-- **Fst(t) < 1 for all t when Ne ≥ 2.** -/
+theorem fstDerived_lt_one (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
+    fstDerived Ne t < 1 := by
+  unfold fstDerived
+  linarith [pow_pos (show 0 < 1 - 1 / (2 * Ne) by
+    rw [sub_pos, div_lt_one (by linarith)]; linarith) t]
+
+/-- **Fst increases faster with smaller Ne.**
+    For t ≥ 1 and Ne₁ < Ne₂, we have fstDerived Ne₁ t > fstDerived Ne₂ t.
+    Smaller populations drift faster. -/
+theorem fstDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) (ht : 1 ≤ t)
+    (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂) (h_lt : Ne₁ < Ne₂) :
+    fstDerived Ne₂ t < fstDerived Ne₁ t := by
+  unfold fstDerived
+  -- Need (1 - 1/(2Ne₂))^t > (1 - 1/(2Ne₁))^t, i.e. larger base → larger power
+  -- which means 1 - (larger)^t < 1 - (smaller)^t
+  have h_base₁_pos : 0 < 1 - 1 / (2 * Ne₁) := by
+    rw [sub_pos, div_lt_one (by linarith)]; linarith
+  have h_base₂_lt_one : 1 - 1 / (2 * Ne₂) < 1 := by
+    rw [sub_lt_self_iff]; positivity
+  have h_base_lt : 1 - 1 / (2 * Ne₁) < 1 - 1 / (2 * Ne₂) := by
+    rw [sub_lt_sub_iff_left]
+    exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+  linarith [pow_lt_pow_left₀ h_base_lt (le_of_lt h_base₁_pos) (Nat.not_eq_zero_of_lt (by omega : 0 < t))]
+
+/-- **Consistency check: fstDerived agrees with the earlier fstFromDrift.**
+    This confirms our derivation produces the same formula that was previously
+    defined axiomatically. -/
+theorem fstDerived_eq_fstFromDrift (Ne : ℝ) (t : ℕ) :
+    fstDerived Ne t = fstFromDrift t Ne := by
+  unfold fstDerived fstFromDrift
+
+/-! ### Mutation-drift recurrence and equilibrium -/
+
+/-- **Heterozygosity recurrence with mutation.**
+    Drift reduces heterozygosity by factor (1 - 1/(2N)), while mutation
+    creates new heterozygosity at rate 2μ from homozygous sites. -/
+noncomputable def hetMutationDriftRecurrence (Ne mu : ℝ) (H₀ : ℝ) : ℕ → ℝ
+  | 0 => H₀
+  | t + 1 => (1 - 1 / (2 * Ne)) * hetMutationDriftRecurrence Ne mu H₀ t +
+              2 * mu * (1 - hetMutationDriftRecurrence Ne mu H₀ t)
+
+/-- **Equilibrium heterozygosity.**
+    At mutation-drift balance, H* = θ/(1+θ) where θ = 4Neμ. -/
+noncomputable def hetEquilibrium (Ne mu : ℝ) : ℝ :=
+  4 * Ne * mu / (1 + 4 * Ne * mu)
+
+/-- **Algebraic verification of the fixed point.**
+    If we start at H* = θ/(1+θ), one step of the recurrence returns H*.
+    This proves H* is indeed a fixed point — the equilibrium heterozygosity. -/
+theorem hetMutationDrift_fixed_point (Ne mu : ℝ)
+    (hNe : 0 < Ne) (hmu : 0 < mu) :
+    hetMutationDriftRecurrence Ne mu (hetEquilibrium Ne mu) 1 =
+      hetEquilibrium Ne mu := by
+  unfold hetMutationDriftRecurrence hetEquilibrium
+  -- We need: (1 - 1/(2Ne)) * (4Neμ/(1+4Neμ)) + 2μ * (1 - 4Neμ/(1+4Neμ))
+  --        = 4Neμ/(1+4Neμ)
+  have hθ : 0 < 4 * Ne * mu := by positivity
+  have hden : (1 + 4 * Ne * mu) ≠ 0 := by linarith
+  have hNe2 : (2 * Ne) ≠ 0 := by linarith
+  field_simp
+  ring
+
+/-- **The fixed point is unique in [0,1].**
+    For any H in [0,1] satisfying f(H) = H, we must have H = θ/(1+θ).
+    We prove this by direct algebra: the fixed-point equation is linear in H. -/
+theorem hetMutationDrift_fixed_point_unique (Ne mu H : ℝ)
+    (hNe : 0 < Ne) (hmu : 0 < mu)
+    (h_fixed : (1 - 1 / (2 * Ne)) * H + 2 * mu * (1 - H) = H) :
+    H = hetEquilibrium Ne mu := by
+  unfold hetEquilibrium
+  -- From the fixed-point equation:
+  -- H - (1 - 1/(2Ne))H - 2μ(1-H) = 0
+  -- H × [1 - (1 - 1/(2Ne)) + 2μ] = 2μ
+  -- H × [1/(2Ne) + 2μ] = 2μ
+  -- H = 2μ / (1/(2Ne) + 2μ) = 4Neμ / (1 + 4Neμ)
+  have hNe2 : (2 * Ne) ≠ 0 := by linarith
+  have hθ : 0 < 4 * Ne * mu := by positivity
+  have hden : (1 + 4 * Ne * mu) ≠ 0 := by linarith
+  have hcoeff : 0 < 1 / (2 * Ne) + 2 * mu := by positivity
+  -- Rearrange h_fixed: H * (1/(2Ne) + 2μ) = 2μ
+  have h_rearranged : H * (1 / (2 * Ne) + 2 * mu) = 2 * mu := by
+    field_simp at h_fixed ⊢
+    linarith
+  -- Solve for H
+  have h_solve : H = 2 * mu / (1 / (2 * Ne) + 2 * mu) := by
+    field_simp at h_rearranged ⊢
+    linarith
+  -- Now show 2μ / (1/(2Ne) + 2μ) = 4Neμ / (1 + 4Neμ)
+  rw [h_solve]
+  field_simp
+  ring
+
+/-- **Derive Fst_eq = 1/(1+θ) from the equilibrium heterozygosity.**
+    Since H* = θ/(1+θ) and Fst = 1 - H* (for biallelic loci where H_max = 1),
+    we get Fst_eq = 1 - θ/(1+θ) = 1/(1+θ).
+
+    This is Wright's classical result, but *derived* from the recurrence
+    rather than postulated. -/
+theorem fstEquilibrium_derived (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
+    1 - hetEquilibrium Ne mu = 1 / (1 + 4 * Ne * mu) := by
+  unfold hetEquilibrium
+  have hθ : 0 < 4 * Ne * mu := by positivity
+  have hden : (1 + 4 * Ne * mu) ≠ 0 := by linarith
+  field_simp
+  ring
+
+/-- **Derived Fst_eq agrees with the earlier fstMutationDriftEquilibrium.**
+    This confirms that the formula we derived from the recurrence is the
+    same as the one previously defined. -/
+theorem fstEquilibrium_derived_consistent (Ne mu : ℝ)
+    (hNe : 0 < Ne) (hmu : 0 < mu) :
+    1 - hetEquilibrium Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu) := by
+  rw [fstEquilibrium_derived Ne mu hNe hmu]
+  unfold fstMutationDriftEquilibrium
+
+/-- **Equilibrium heterozygosity is in (0, 1) for positive parameters.** -/
+theorem hetEquilibrium_pos (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
+    0 < hetEquilibrium Ne mu := by
+  unfold hetEquilibrium
+  positivity
+
+theorem hetEquilibrium_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
+    hetEquilibrium Ne mu < 1 := by
+  unfold hetEquilibrium
+  rw [div_lt_one (by positivity)]
+  linarith
+
+/-- **Equilibrium Fst is in (0, 1) for positive parameters.** -/
+theorem fstEquilibrium_derived_pos (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
+    0 < 1 - hetEquilibrium Ne mu := by
+  linarith [hetEquilibrium_lt_one Ne mu hNe hmu]
+
+theorem fstEquilibrium_derived_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
+    1 - hetEquilibrium Ne mu < 1 := by
+  linarith [hetEquilibrium_pos Ne mu hNe hmu]
+
+/-- **Larger θ → lower equilibrium Fst** (derived version).
+    More mutation (or larger Ne) means more diversity maintained against drift. -/
+theorem fstEquilibrium_derived_decreases (Ne₁ Ne₂ mu : ℝ)
+    (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (hmu : 0 < mu)
+    (h_lt : Ne₁ < Ne₂) :
+    1 - hetEquilibrium Ne₂ mu < 1 - hetEquilibrium Ne₁ mu := by
+  -- Equivalent to hetEquilibrium Ne₁ mu < hetEquilibrium Ne₂ mu
+  -- i.e., 4Ne₁μ/(1+4Ne₁μ) < 4Ne₂μ/(1+4Ne₂μ)
+  unfold hetEquilibrium
+  have h₁ : 0 < 1 + 4 * Ne₁ * mu := by positivity
+  have h₂ : 0 < 1 + 4 * Ne₂ * mu := by positivity
+  rw [sub_lt_sub_iff_left]
+  rw [div_lt_div_iff₀ h₁ h₂]
+  nlinarith
+
+end FstDerivationFromDrift
+
 end Calibrator
