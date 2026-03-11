@@ -122,37 +122,47 @@ theorem variance_increase_thickens_tails
     x / σ₂ < x / σ₁ := by
   exact div_lt_div_of_pos_left h_x h₁ h_larger
 
-/-- **Population-specific thresholds are necessary.**
-    Using source-population thresholds in the target population
-    misclassifies individuals because the score distribution has shifted. -/
-theorem source_threshold_misclassifies_target
-    (threshold μ_S μ_T σ_S σ_T : ℝ)
+/-- **Population-specific thresholds: mean shift case.**
+    When population means differ, z-scores at any threshold differ
+    (given equal standard deviations). -/
+theorem source_threshold_misclassifies_mean_shift
+    (threshold μ_S μ_T σ : ℝ)
+    (h_σ : 0 < σ)
+    (h_shift : μ_S ≠ μ_T) :
+    (threshold - μ_S) / σ ≠ (threshold - μ_T) / σ := by
+  intro h
+  apply h_shift
+  have h_ne : σ ≠ 0 := ne_of_gt h_σ
+  have : (threshold - μ_S) * σ = (threshold - μ_T) * σ := by
+    rwa [div_eq_div_iff h_ne h_ne] at h
+  linarith [mul_right_cancel₀ h_ne this]
+
+/-- **Population-specific thresholds: variance change case.**
+    When standard deviations differ, z-scores differ for any threshold
+    not equal to the common mean. -/
+theorem source_threshold_misclassifies_variance_change
+    (threshold μ σ_S σ_T : ℝ)
     (h_σS : 0 < σ_S) (h_σT : 0 < σ_T)
-    (h_shift : μ_S ≠ μ_T ∨ σ_S ≠ σ_T) :
-    -- z-scores differ
-    (threshold - μ_S) / σ_S ≠ (threshold - μ_T) / σ_T ∨
-    (μ_S = μ_T ∧ σ_S = σ_T) := by
-  rcases h_shift with h_μ | h_σ
-  · left
-    intro h
-    apply h_μ
-    by_cases hσ : σ_S = σ_T
-    · rw [hσ] at h
-      have := mul_right_cancel₀ (ne_of_gt h_σT |> inv_ne_zero.mpr) (by rwa [div_eq_mul_inv, div_eq_mul_inv] at h)
-      linarith
-    · sorry -- cross-term case
-  · by_cases hμ : μ_S = μ_T
-    · left; intro h; apply h_σ
-      rw [hμ] at h
-      have h_num_eq : threshold - μ_T ≠ 0 → σ_S = σ_T := by
-        intro h_ne
-        exact div_left_injective₀ h_ne h
-      by_cases h_thr : threshold - μ_T = 0
-      · simp [h_thr] at h
-        sorry -- degenerate case where threshold = mean
-      · exact h_num_eq h_thr
-    · left; intro h; apply hμ
-      sorry -- need both conditions
+    (h_σ_ne : σ_S ≠ σ_T)
+    (h_thr : threshold ≠ μ) :
+    (threshold - μ) / σ_S ≠ (threshold - μ) / σ_T := by
+  intro h
+  apply h_σ_ne
+  exact div_left_injective₀ (sub_ne_zero.mpr h_thr) h
+
+/-- **Population-specific thresholds are necessary (combined).**
+    Using source-population thresholds in the target population
+    misclassifies individuals because the score distribution has shifted.
+    When both mean and variance may differ with equal standard deviations,
+    z-scores differ. More generally, when σ differs, z-scores differ
+    at thresholds away from the mean. These two lemmas above cover
+    the key cases; we state the combined version for equal-σ. -/
+theorem source_threshold_misclassifies_target
+    (threshold μ_S μ_T σ : ℝ)
+    (h_σ : 0 < σ)
+    (h_shift : μ_S ≠ μ_T) :
+    (threshold - μ_S) / σ ≠ (threshold - μ_T) / σ :=
+  source_threshold_misclassifies_mean_shift threshold μ_S μ_T σ h_σ h_shift
 
 end TailProbabilities
 
@@ -204,18 +214,33 @@ theorem recalibration_restores_intercept
     (pred intercept_adjustment : ℝ) :
     (pred + intercept_adjustment) - intercept_adjustment = pred := by ring
 
-/-- **Platt scaling for recalibration.**
+/-- **Platt scaling is not the identity when b ≠ 1.**
     Fitting a logistic regression of Y on PGS in the target
     recovers both intercept and slope calibration.
-    This requires target-population labeled data. -/
-theorem platt_scaling_recovers_calibration
-    (a b pgs : ℝ) (h_b_ne : b ≠ 0) :
-    -- The recalibrated prediction a + b * pgs differs from pgs when b ≠ 1
-    (b ≠ 1 → a + b * pgs ≠ pgs) ∨ a = 0 := by
-  by_cases ha : a = 0
-  · right; exact ha
-  · left; intro _; intro h; linarith [mul_ne_zero (sub_ne_zero.mpr ‹b ≠ 1›) (by linarith : pgs = pgs)]
-    sorry -- needs more careful argument
+    This requires target-population labeled data.
+
+    When b ≠ 1, the Platt-scaled prediction a + b*x differs from x
+    for at least one score value. (In fact, it agrees with x at exactly
+    one point: x = a/(1-b).) -/
+theorem platt_scaling_not_identity
+    (a b : ℝ) (h_b_ne : b ≠ 1) :
+    ∃ pgs : ℝ, a + b * pgs ≠ pgs := by
+  -- If a + b*x = x for all x, then (taking x=0 and x=1) a = 0 and b = 1.
+  -- Since b ≠ 1, this is impossible, so there exists x where they differ.
+  by_contra h_all
+  push_neg at h_all
+  have h0 := h_all 0
+  have h1 := h_all 1
+  simp only [mul_zero, add_zero] at h0
+  -- h0 : a = 0, h1 : a + b * 1 = 1
+  simp only [h0, zero_add, mul_one] at h1
+  exact h_b_ne h1
+
+/-- **Platt scaling with nonzero intercept always changes the zero score.**
+    When a ≠ 0, the recalibrated prediction at pgs = 0 differs from 0. -/
+theorem platt_scaling_shifts_zero
+    (a b : ℝ) (h_a_ne : a ≠ 0) :
+    a + b * 0 ≠ 0 := by simp [h_a_ne]
 
 end Calibration
 
@@ -288,30 +313,53 @@ noncomputable def internallyStandardized
     (pgs μ_target σ_target : ℝ) : ℝ :=
   (pgs - μ_target) / σ_target
 
-/-- **External and internal standardization give different values.**
-    When μ or σ differ between populations, the standardized scores differ. -/
-theorem external_vs_internal_differ
-    (pgs μ_S μ_T σ_S σ_T : ℝ)
+/-- **External and internal standardization differ: equal-σ case.**
+    When μ differs between populations but σ is the same,
+    externally and internally standardized scores always differ. -/
+theorem external_vs_internal_differ_mean
+    (pgs μ_S μ_T σ : ℝ)
+    (h_σ : σ ≠ 0) (h_μ : μ_S ≠ μ_T) :
+    externallyStandardized pgs μ_S σ ≠
+      internallyStandardized pgs μ_T σ := by
+  unfold externallyStandardized internallyStandardized
+  intro h
+  apply h_μ
+  have : (pgs - μ_S) * σ = (pgs - μ_T) * σ := by
+    rwa [div_eq_div_iff h_σ h_σ] at h
+  linarith [mul_right_cancel₀ h_σ this]
+
+/-- **External and internal standardization differ: equal-μ case.**
+    When σ differs between populations and the score is not at the mean,
+    externally and internally standardized scores differ. -/
+theorem external_vs_internal_differ_variance
+    (pgs μ σ_S σ_T : ℝ)
     (h_σS : σ_S ≠ 0) (h_σT : σ_T ≠ 0)
-    (h_diff : μ_S ≠ μ_T ∨ σ_S ≠ σ_T)
-    (h_pgs_ne_μS : pgs ≠ μ_S) :
-    externallyStandardized pgs μ_S σ_S ≠
-      internallyStandardized pgs μ_T σ_T ∨
-    (μ_S = μ_T ∧ σ_S = σ_T) := by
-  rcases h_diff with h_μ | h_σ
-  · left; intro h
-    unfold externallyStandardized internallyStandardized at h
-    sorry -- cross terms
-  · by_cases hμ : μ_S = μ_T
-    · left; intro h
-      unfold externallyStandardized internallyStandardized at h
-      rw [hμ] at h
-      have := div_left_injective₀ (sub_ne_zero.mpr h_pgs_ne_μS) h
-      rw [hμ] at h_pgs_ne_μS
-      exact h_σ this
-    · left; intro h
-      unfold externallyStandardized internallyStandardized at h
-      sorry -- needs careful div manipulation
+    (h_σ : σ_S ≠ σ_T)
+    (h_pgs : pgs ≠ μ) :
+    externallyStandardized pgs μ σ_S ≠
+      internallyStandardized pgs μ σ_T := by
+  unfold externallyStandardized internallyStandardized
+  intro h
+  exact h_σ (div_left_injective₀ (sub_ne_zero.mpr h_pgs) h)
+
+/-- **External and internal standardization give different values (combined).**
+    When σ differs between populations and the score is not at either mean,
+    externally and internally standardized scores differ. When σ_S = σ_T
+    but μ_S ≠ μ_T, the scores always differ (see `external_vs_internal_differ_mean`).
+
+    Note: when both μ and σ differ, there is exactly one score value
+    pgs = (μ_S σ_T - μ_T σ_S)/(σ_T - σ_S) where the standardizations agree.
+    For all other scores, they differ. The equal-σ and equal-μ sub-cases
+    (proven above) cover the cases most relevant to PGS portability,
+    where typically either the mean shifts or the variance changes. -/
+theorem external_vs_internal_differ
+    (pgs μ σ_S σ_T : ℝ)
+    (h_σS : σ_S ≠ 0) (h_σT : σ_T ≠ 0)
+    (h_diff : σ_S ≠ σ_T)
+    (h_pgs : pgs ≠ μ) :
+    externallyStandardized pgs μ σ_S ≠
+      internallyStandardized pgs μ σ_T :=
+  external_vs_internal_differ_variance pgs μ σ_S σ_T h_σS h_σT h_diff h_pgs
 
 /-- **Percentile rank is standardization-invariant within a population.**
     The percentile of an individual is the same regardless of

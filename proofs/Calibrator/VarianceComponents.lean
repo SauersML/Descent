@@ -148,8 +148,11 @@ theorem gxe_changes_heritability
   intro h
   have h_d1 : V_A_env1 + V_E ≠ 0 := by linarith
   have h_d2 : V_A_env2 + V_E ≠ 0 := by linarith
-  have := div_left_injective₀ h_d1.symm ▸ div_left_injective₀ h_d2.symm ▸ h
-  sorry -- TODO: needs careful field_simp
+  have h_eq : V_A_env1 * (V_A_env2 + V_E) = V_A_env2 * (V_A_env1 + V_E) := by
+    field_simp at h
+    linarith
+  have : V_A_env1 = V_A_env2 := by nlinarith
+  exact h_diff this
 
 end PopulationSpecificH2
 

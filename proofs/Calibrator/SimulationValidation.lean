@@ -51,14 +51,11 @@ theorem wf_variance_nonneg (p₀ Ne : ℝ) (t : ℕ)
     0 ≤ wfFrequencyVariance p₀ Ne t := by
   unfold wfFrequencyVariance
   apply mul_nonneg
-  · apply mul_nonneg
-    · exact mul_nonneg hp₀ (by linarith)
-    · rw [sub_nonneg]
-      apply pow_le_one₀
-      · rw [sub_nonneg, div_le_one (by linarith)]; linarith
-      · rw [sub_le_self_iff]; positivity
-  · rfl ▸ le_refl _  -- trivial
-  sorry -- need to verify the last step
+  · exact mul_nonneg hp₀ (by linarith)
+  · rw [sub_nonneg]
+    apply pow_le_one₀
+    · rw [sub_nonneg, div_le_one (by linarith)]; linarith
+    · rw [sub_le_self_iff]; positivity
 
 /-- **WF variance increases with time.** -/
 theorem wf_variance_increases_with_time
@@ -169,14 +166,16 @@ theorem adjusted_r2_le_r2 (r2 n k : ℝ)
   -- ⟺ 1 - r2 ≤ (1-r2)(n-1)/(n-k-1)
   -- ⟺ 1 ≤ (n-1)/(n-k-1) [when 1-r2 > 0]
   -- ⟺ n-k-1 ≤ n-1 ⟺ -k ≤ 0 ✓
-  by_cases hr : r2 = 1
-  · simp [hr]
-  · have h_gap : 0 < 1 - r2 := by linarith [lt_of_le_of_ne h_r2_lt hr]
-    have h_denom : 0 < n - k - 1 := by linarith
-    rw [sub_le_iff_le_add]
-    linarith [div_le_div_of_nonneg_left (by linarith : 0 < (1 - r2) * (n - 1)) h_denom
-      (by linarith : n - k - 1 ≤ n - 1)]
-    sorry -- technical div manipulation
+  have h_denom : 0 < n - k - 1 := by linarith
+  have h_one_minus_r2 : 0 ≤ 1 - r2 := by linarith
+  -- Goal: 1 - (1 - r2) * (n - 1) / (n - k - 1) ≤ r2
+  -- ⟺  1 - r2 ≤ (1 - r2) * (n - 1) / (n - k - 1)
+  -- ⟺  (1 - r2) * (n - k - 1) ≤ (1 - r2) * (n - 1)   [since n-k-1 > 0]
+  -- ⟺  n - k - 1 ≤ n - 1   [since 1-r2 ≥ 0]
+  rw [show r2 = 1 - (1 - r2) from by ring]
+  simp only [sub_le_sub_iff_left]
+  rw [le_div_iff h_denom]
+  nlinarith
 
 /-- **Bootstrap CI width decreases with sample size.**
     Approximately, CI width ∝ 1/√n. -/
