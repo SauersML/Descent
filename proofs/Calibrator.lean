@@ -10,6 +10,8 @@ import Calibrator.StratificationConfounding
 import Calibrator.AncestryCalibration
 import Calibrator.LDDecayTheory
 import Calibrator.SelectionArchitecture
+import Calibrator.DemographicHistory
+import Calibrator.ClinicalUtilityFairness
 
 namespace Calibrator
 
