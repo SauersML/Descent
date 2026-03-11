@@ -50,17 +50,25 @@ theorem ncp_nonneg (n : ℕ) (beta p : ℝ)
     · exact sq_nonneg beta
   · nlinarith
 
-/-- NCP increases with sample size. -/
+/-- NCP increases with sample size.
+    NCP = n × β² × 2p(1−p). Since β² > 0 and 2p(1−p) > 0, NCP is
+    strictly monotone in n via `mul_lt_mul_of_pos_right`. -/
 theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
     (h_beta : beta ≠ 0) (h_p : 0 < p) (h_p_lt : p < 1)
     (h_n : n₁ < n₂) :
     noncentralityParam n₁ beta p < noncentralityParam n₂ beta p := by
   unfold noncentralityParam
-  have h_pos : 0 < beta ^ 2 * (2 * p * (1 - p)) := by
-    apply mul_pos (sq_pos_of_ne_zero h_beta)
-    nlinarith
+  -- n₁ < n₂ lifts to ℝ
   have h_n_cast : (↑n₁ : ℝ) < ↑n₂ := Nat.cast_lt.mpr h_n
-  nlinarith
+  -- β² > 0 since β ≠ 0
+  have h_b2 : (0 : ℝ) < beta ^ 2 := sq_pos_of_ne_zero h_beta
+  -- 2p(1−p) > 0 for p ∈ (0,1)
+  have h_pq : (0 : ℝ) < 2 * p * (1 - p) := by nlinarith
+  -- Step 1: n₁ * β² < n₂ * β² by mul_lt_mul_of_pos_right
+  have step1 : ↑n₁ * beta ^ 2 < ↑n₂ * beta ^ 2 :=
+    mul_lt_mul_of_pos_right h_n_cast h_b2
+  -- Step 2: (n₁ * β²) * 2p(1−p) < (n₂ * β²) * 2p(1−p)
+  exact mul_lt_mul_of_pos_right step1 h_pq
 
 /-- **Power increases with NCP (monotone approximation).**
     True power = Φ(√NCP - z_α). We model it as 1 - exp(-NCP/2). -/
@@ -115,7 +123,8 @@ section WinnersCurse
 noncomputable def winnersCurseInflation (true_beta sigma : ℝ) (n : ℕ) : ℝ :=
   true_beta + sigma / Real.sqrt n
 
-/-- Winner's curse inflates the absolute effect size. -/
+/-- Winner's curse inflates the absolute effect size.
+    Derived: β̂ = β + σ/√n > β since σ/√n > 0 for σ > 0, n > 0. -/
 theorem winners_curse_inflates (true_beta sigma : ℝ) (n : ℕ)
     (h_beta : 0 < true_beta) (h_sigma : 0 < sigma)
     (h_n : 0 < n) :
@@ -124,7 +133,8 @@ theorem winners_curse_inflates (true_beta sigma : ℝ) (n : ℕ)
   linarith [div_pos h_sigma (Real.sqrt_pos.mpr (Nat.cast_pos.mpr h_n))]
 
 /-- **Winner's curse decreases with sample size.**
-    Larger studies have less inflation. -/
+    Derived: σ/√n₂ < σ/√n₁ when n₁ < n₂, since √ is monotone
+    and division by a larger denominator yields a smaller quotient. -/
 theorem winners_curse_decreases_with_n (true_beta sigma : ℝ) (n₁ n₂ : ℕ)
     (h_sigma : 0 < sigma) (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
     (h_n : n₁ < n₂) :
@@ -138,27 +148,45 @@ theorem winners_curse_decreases_with_n (true_beta sigma : ℝ) (n₁ n₂ : ℕ)
   have h_sqrt_pos : 0 < Real.sqrt ↑n₁ := Real.sqrt_pos.mpr h₁
   linarith [div_lt_div_of_pos_left h_sigma h_sqrt_pos hsq]
 
-/-- **Winner's curse biases PGS.**
-    Using inflated effect sizes in PGS construction
-    overestimates PGS variance and prediction R². -/
-theorem winners_curse_overestimates_r2
-    (r2_true r2_apparent inflation : ℝ)
-    (h_inflation : 1 < inflation)
-    (h_relation : r2_apparent = r2_true * inflation)
-    (h_r2 : 0 < r2_true) :
-    r2_true < r2_apparent := by
-  rw [h_relation]; nlinarith
+/-- **Winner's curse inflation ratio exceeds 1.**
+    Since winnersCurseInflation β σ n = β + σ/√n > β for positive β, σ, n,
+    the ratio (inflated / true) is strictly greater than 1. -/
+theorem winners_curse_inflation_ratio_gt_one (true_beta sigma : ℝ) (n : ℕ)
+    (h_beta : 0 < true_beta) (h_sigma : 0 < sigma) (h_n : 0 < n) :
+    1 < winnersCurseInflation true_beta sigma n / true_beta := by
+  unfold winnersCurseInflation
+  rw [lt_div_iff₀ h_beta]
+  ring_nf
+  linarith [div_pos h_sigma (Real.sqrt_pos.mpr (Nat.cast_pos.mpr h_n))]
 
-/-- **Cross-population winner's curse asymmetry.**
-    When GWAS is done in the source population with large n,
-    winner's curse is mild. Applying these inflated effects in
-    the target (where LD differs) compounds the bias. -/
+/-- **Winner's curse biases PGS.**
+    PGS R² is proportional to β̂². Using the winner's-curse-inflated
+    estimate β̂ = β + σ/√n, we get β̂² > β², so apparent R² exceeds true R².
+    Derived from the inflation definition, not assumed. -/
+theorem winners_curse_overestimates_r2 (true_beta sigma : ℝ) (n : ℕ)
+    (h_beta : 0 < true_beta) (h_sigma : 0 < sigma) (h_n : 0 < n) :
+    true_beta ^ 2 < (winnersCurseInflation true_beta sigma n) ^ 2 := by
+  -- β < β̂ from winners_curse_inflates
+  have h_lt : true_beta < winnersCurseInflation true_beta sigma n :=
+    winners_curse_inflates true_beta sigma n h_beta h_sigma h_n
+  -- 0 < β ≤ β̂, so β² < β̂²
+  exact sq_lt_sq' (by linarith) h_lt
+
+/-- **Cross-population winner's curse compounds with smaller target n.**
+    The winner's curse inflation is larger in the target population
+    (smaller n_target) than in the source (larger n_source).
+    Therefore the bias gap widens: the inflated estimate in the target
+    deviates more from truth than the inflated estimate in the source. -/
 theorem cross_population_winners_curse_compounds
-    (r2_source_wc r2_target_wc r2_target_true : ℝ)
-    (h_source_mild : 0 < r2_source_wc)
-    (h_target_worse : r2_target_wc < r2_target_true)
-    (h_target_true_lt_source : r2_target_true < r2_source_wc) :
-    r2_target_wc < r2_source_wc := by linarith
+    (true_beta sigma : ℝ) (n_source n_target : ℕ)
+    (h_beta : 0 < true_beta) (h_sigma : 0 < sigma)
+    (h_ns : 0 < n_source) (h_nt : 0 < n_target)
+    (h_gap : n_source > n_target) :
+    winnersCurseInflation true_beta sigma n_source <
+      winnersCurseInflation true_beta sigma n_target := by
+  -- Larger sample → less inflation, so source inflation < target inflation
+  exact winners_curse_decreases_with_n true_beta sigma n_target n_source
+    h_sigma h_nt h_ns h_gap
 
 end WinnersCurse
 
@@ -172,8 +200,10 @@ allocated across ancestries to maximize global PGS utility?
 
 section OptimalAllocation
 
-/-- **R² scales approximately as n/(n+C) for some constant C.**
-    This gives diminishing returns from larger discovery samples. -/
+/-- **R² in the infinitesimal model: R² ≈ n/(n + M/h²).**
+    In the infinitesimal model, R² ≈ n·h²/(n·h² + M) = n/(n + C)
+    where C = M/h² (M = effective number of loci, h² = heritability).
+    This is a concave function of n, giving diminishing returns. -/
 noncomputable def r2ScalingModel (n C : ℝ) : ℝ := n / (n + C)
 
 /-- R² scaling model is increasing in n. -/
@@ -192,10 +222,10 @@ theorem r2_scaling_bounded (n C : ℝ)
   rw [div_lt_one (by linarith)]
   linarith
 
-/-- **Diminishing returns: second derivative is negative.**
-    Adding samples to already-large studies gives less marginal benefit
-    than adding to small studies. Formally: for n₁ < n₂,
-    the gain from n₁→n₁+Δ exceeds gain from n₂→n₂+Δ. -/
+/-- **Diminishing returns from concavity of R²(n) = n/(n+C).**
+    The second derivative d²R²/dn² = −2C/(n+C)³ < 0, so R² is concave.
+    Discretely: for n₁ < n₂, the marginal gain δC/((n+δ+C)(n+C)) is
+    larger at n₁ than at n₂. Proved algebraically from the definition. -/
 theorem diminishing_returns (n₁ n₂ delta C : ℝ)
     (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n₂ : 0 ≤ n₂)
     (h_delta : 0 < delta) (h_n : n₁ < n₂) :
