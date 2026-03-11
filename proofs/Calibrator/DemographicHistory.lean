@@ -283,32 +283,6 @@ theorem bottleneck_excess_ld_pos (Ne_b Ne_stable : ℝ) (t_b : ℕ)
   have h_pow := pow_lt_pow_left₀ h_base h_nn (by omega : t_b ≠ 0)
   linarith
 
-/-- **Different demographic histories break the Fst-portability relationship.**
-    For two source-target pairs with the same Fst, the pair where the target
-    went through a bottleneck has worse portability (larger LD mismatch
-    with the source).
-
-    Formalized: if total_ld_mismatch = base_fst_mismatch + excess_ld,
-    and excess_ld > 0 for the bottlenecked pair, then its total mismatch
-    exceeds the non-bottlenecked pair. -/
-theorem bottleneck_worsens_portability
-    (mismatch_base excess_ld : ℝ)
-    (h_base_nn : 0 ≤ mismatch_base) (h_excess_pos : 0 < excess_ld) :
-    mismatch_base < mismatch_base + excess_ld := by
-  linarith
-
-/-- **Portability ratio** between bottlenecked and stable populations.
-    If source PGS accuracy is R²_source, then target accuracy under
-    pure Fst decay is R²_source · (1 - Fst). With additional LD mismatch
-    from bottleneck, accuracy drops further. -/
-theorem bottleneck_reduces_portability_ratio
-    (R2_source fst ld_penalty : ℝ)
-    (hR2 : 0 < R2_source) (hfst : 0 ≤ fst) (hfst1 : fst < 1)
-    (h_pen_pos : 0 < ld_penalty) (h_pen_bound : ld_penalty < 1 - fst) :
-    R2_source * ((1 - fst) - ld_penalty) < R2_source * (1 - fst) := by
-  apply mul_lt_mul_of_pos_left _ hR2
-  linarith
-
 /-- Populations that experienced expansion retain more pre-existing LD,
     meaning their LD structure is closer to the source population's LD
     (since both have large modern Ne). We show that if the expanded population

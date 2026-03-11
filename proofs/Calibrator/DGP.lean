@@ -5272,13 +5272,6 @@ theorem unifiedPortabilityRatio_nonneg (p : EvolutionaryParameters)
     · exact le_of_lt (mutationLDErosion_pos p)
   · linarith [migrationLDBoost_ge_one p]
 
-/-- **Portability is bounded by the drift-only bound.**
-    Adding mutation and migration can only improve (or maintain) portability
-    relative to the pure drift case, because Fst is lower at equilibrium. -/
-theorem unified_portability_drift_component_improves
-    (p : EvolutionaryParameters) (h : 0 < p.theta + p.bigM) :
-    fstEquilibrium p < 1 := fstEquilibrium_lt_one p h
-
 /-- **Each force's marginal effect on Fst.**
     Increasing any counterbalancing force (θ or M) strictly decreases Fst. -/
 theorem fstEquilibrium_decreasing_in_theta
@@ -5311,47 +5304,6 @@ theorem fstEquilibrium_decreasing_in_migration
   rw [div_lt_div_iff
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₂)
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₁)]
-  nlinarith
-
-/-- **Portability loss decomposition into four components.**
-    Total loss = drift_loss + LD_loss + mutation_loss - migration_gain.
-    Each component is nonneg (migration gain reduces total loss). -/
-theorem portability_loss_additive_decomposition
-    (drift_loss ld_loss mutation_loss migration_gain total_loss : ℝ)
-    (h_decomp : total_loss = drift_loss + ld_loss + mutation_loss - migration_gain)
-    (h_drift : 0 ≤ drift_loss) (h_ld : 0 ≤ ld_loss)
-    (h_mut : 0 ≤ mutation_loss) (h_mig : 0 ≤ migration_gain) :
-    -- Total loss is bounded above by drift + LD + mutation (without migration benefit)
-    total_loss ≤ drift_loss + ld_loss + mutation_loss := by linarith
-
-/-- Migration gain cannot exceed the sum of other losses (portability ≥ 0). -/
-theorem migration_gain_bounded
-    (drift_loss ld_loss mutation_loss migration_gain total_loss : ℝ)
-    (h_decomp : total_loss = drift_loss + ld_loss + mutation_loss - migration_gain)
-    (h_nonneg_total : 0 ≤ total_loss)
-    (h_drift : 0 ≤ drift_loss) (h_ld : 0 ≤ ld_loss)
-    (h_mut : 0 ≤ mutation_loss) :
-    migration_gain ≤ drift_loss + ld_loss + mutation_loss := by linarith
-
-/-- **Timescale hierarchy**: drift acts on ~Ne generations, LD decay on ~1/r generations,
-    mutation on ~1/μ generations. For typical parameters (Ne ~ 10⁴, r ~ 10⁻², μ ~ 10⁻⁸),
-    LD decay is fastest, then drift, then mutation.
-
-    Formally: if 1/r < Ne < 1/μ, then LD loss dominates for recent divergences
-    and drift dominates for ancient divergences. -/
-theorem ld_loss_dominates_recent_divergence
-    (ld_halflife drift_halflife mutation_halflife : ℝ)
-    (h_ld_fast : ld_halflife < drift_halflife)
-    (h_drift_fast : drift_halflife < mutation_halflife)
-    (t : ℝ) (h_recent : t < ld_halflife)
-    (ld_loss drift_loss : ℝ)
-    (h_ld_scale : ld_loss = t / ld_halflife)
-    (h_drift_scale : drift_loss = t / drift_halflife) :
-    drift_loss < ld_loss := by
-  rw [h_ld_scale, h_drift_scale]
-  have h_pos_ld : 0 < ld_halflife := by linarith
-  have h_pos_drift : 0 < drift_halflife := by linarith
-  rw [div_lt_div_iff h_pos_drift h_pos_ld]
   nlinarith
 
 /-- **Connecting to the DGP framework**: The unified Fst maps to the demographic
@@ -5387,21 +5339,36 @@ theorem harmonic_mean_governs_drift
     (h_harmonic : T_total / Ne_h = T_bottleneck / Ne_small + (T_total - T_bottleneck) / Ne_large) :
     -- The harmonic mean Ne is less than the arithmetic mean (bottleneck dominates)
     Ne_h < (T_bottleneck * Ne_small + (T_total - T_bottleneck) * Ne_large) / T_total := by
-  rw [div_lt_div_iff h_T_pos (by positivity : 0 < T_total)]
-  -- Ne_h * T_total < T_b * Ne_small + (T - T_b) * Ne_large
-  -- From h_harmonic: T_total = Ne_h * (T_b/Ne_small + (T-T_b)/Ne_large)
-  have h_rw : T_total = Ne_h * (T_bottleneck / Ne_small + (T_total - T_bottleneck) / Ne_large) := by
-    field_simp at h_harmonic ⊢
-    linarith
-  rw [h_rw]
-  -- Need: Ne_h * Ne_h * (T_b/Ne_s + (T-T_b)/Ne_l) < (T_b * Ne_s + (T-T_b) * Ne_l) * 1
-  -- This is AM-HM inequality applied to the two terms
-  -- Simplify: want Ne_h² * (a/x + b/y) < (ax + by) where a = T_b, b = T-T_b, x = Ne_s, y = Ne_l
-  -- By Cauchy-Schwarz: (a/x + b/y)(ax + by) ≥ (a + b)² = T²
-  -- And Ne_h = T / (a/x + b/y), so Ne_h * (a/x + b/y) = T
-  -- Want: Ne_h * T < ax + by, i.e., T² / (a/x + b/y) < ax + by
-  -- i.e., T² < (a/x + b/y)(ax + by), which is Cauchy-Schwarz with equality iff x = y
-  sorry
+  -- Strategy: HM < AM via the Cauchy-Schwarz identity
+  --   P·D - T²·Ne_s·Ne_l = T_b·(T-T_b)·(Ne_l - Ne_s)² > 0
+  -- where D = T_b·Ne_l + (T-T_b)·Ne_s  and  P = T_b·Ne_s + (T-T_b)·Ne_l
+  rw [lt_div_iff h_T_pos]
+  -- Clear fractions in harmonic mean to get: Ne_h · D = T · Ne_s · Ne_l
+  have hD_pos : (0:ℝ) < T_bottleneck * Ne_large + (T_total - T_bottleneck) * Ne_small := by
+    positivity
+  have h1 : Ne_h * (T_bottleneck * Ne_large + (T_total - T_bottleneck) * Ne_small) =
+      T_total * Ne_small * Ne_large := by
+    field_simp at h_harmonic ⊢; linarith
+  -- Key algebraic identity (Cauchy-Schwarz for two terms):
+  have identity :
+      (T_bottleneck * Ne_small + (T_total - T_bottleneck) * Ne_large) *
+      (T_bottleneck * Ne_large + (T_total - T_bottleneck) * Ne_small) =
+      T_total * (T_total * Ne_small * Ne_large) +
+      T_bottleneck * (T_total - T_bottleneck) * (Ne_large - Ne_small) ^ 2 := by ring
+  -- Multiply goal by D > 0: reduces to T²·Ne_s·Ne_l < P·D
+  have hmul :
+      Ne_h * T_total * (T_bottleneck * Ne_large + (T_total - T_bottleneck) * Ne_small) <
+      (T_bottleneck * Ne_small + (T_total - T_bottleneck) * Ne_large) *
+      (T_bottleneck * Ne_large + (T_total - T_bottleneck) * Ne_small) := by
+    -- LHS = T · (Ne_h · D) = T · (T · Ne_s · Ne_l) by h1
+    have lhs_eq :
+        Ne_h * T_total * (T_bottleneck * Ne_large + (T_total - T_bottleneck) * Ne_small) =
+        T_total * (T_total * Ne_small * Ne_large) := by linear_combination T_total * h1
+    rw [lhs_eq, identity]
+    -- Now: T²·Ne_s·Ne_l < T²·Ne_s·Ne_l + T_b·(T-T_b)·(Ne_l - Ne_s)²
+    linarith [mul_pos (mul_pos h_Tb_pos (show (0:ℝ) < T_total - T_bottleneck by linarith))
+                       (sq_pos_of_pos (show (0:ℝ) < Ne_large - Ne_small by linarith))]
+  exact (mul_lt_mul_right hD_pos).mp hmul
 
 /-- **Integration theorem**: Under the unified model, portability at equilibrium is
     strictly between 0 and 1 when all forces are present. -/
@@ -5414,17 +5381,6 @@ theorem unified_portability_between_zero_and_one
   constructor
   · exact fstEquilibrium_pos p
   · exact fstEquilibrium_lt_one p (by linarith)
-
-/-- **Sensitivity ranking**: Portability is most sensitive to Fst (drift),
-    then recombination (LD decay), then mutation, then migration.
-    Formally: ∂port/∂Fst > ∂port/∂r > ∂port/∂μ > ∂port/∂m
-    We prove the simpler statement that doubling Fst has more effect than doubling θ. -/
-theorem fst_dominates_portability_sensitivity
-    (fst₁ fst₂ : ℝ)
-    (h_fst₁ : 0 < fst₁) (h_fst₁_lt : fst₁ < 1)
-    (h_double : fst₂ = 2 * fst₁) (h_fst₂_lt : fst₂ < 1) :
-    -- Doubling Fst reduces (1-Fst) by a factor of (1 - 2f)/(1 - f) < 1
-    (1 - fst₂) < (1 - fst₁) := by linarith
 
 end UnifiedEvolutionaryPortability
 
