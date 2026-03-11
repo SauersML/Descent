@@ -210,10 +210,16 @@ theorem r2_concave_in_n
   have h2' : 0 < (n + dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n + dn) h_h2]
   have h3 : 0 < (n + 2 * dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n + 2 * dn) h_h2]
   rw [div_sub_div _ _ h3.ne' h2'.ne', div_sub_div _ _ h2'.ne' h1.ne']
-  rw [div_lt_div_iff₀ (mul_pos h3 h2') (mul_pos h2' h1)]
-  have h_num : ∀ x : ℝ, (x + dn) * h2 * (x * h2 + M) - ((x + dn) * h2 + M) * (x * h2) = dn * h2 * M := by
-    intro x; ring
-  nlinarith [h_num n, h_num (n + dn), mul_pos h_h2 h_M, mul_pos h_dn h_h2, sq_nonneg (dn * h2)]
+  -- Both numerators simplify to dn * h2 * M
+  have lhs_eq : (n + 2 * dn) * h2 * ((n + dn) * h2 + M) -
+    (n + dn) * h2 * ((n + 2 * dn) * h2 + M) = dn * h2 * M := by ring
+  have rhs_eq : (n + dn) * h2 * (n * h2 + M) -
+    n * h2 * ((n + dn) * h2 + M) = dn * h2 * M := by ring
+  rw [lhs_eq, rhs_eq]
+  -- Goal: dn*h2*M / (h3*h2') < dn*h2*M / (h2'*h1)
+  apply div_lt_div_of_pos_left (mul_pos (mul_pos h_dn h_h2) h_M) (mul_pos h2' h1) _
+  -- Need: h2'*h1 < h3*h2', i.e., h2'*(h3 - h1) > 0
+  nlinarith [mul_pos h2' (show 0 < 2 * dn * h2 from by nlinarith [mul_pos h_dn h_h2])]
 
 /-- **Marginal value of diversity.**
     Adding underrepresented individuals has higher marginal value

@@ -94,7 +94,7 @@ theorem rare_variants_drift_more
   have h_r2 : (0 : ℝ) < p_rare ^ 2 := sq_pos_of_pos h_rare
   have h_c2 : (0 : ℝ) < p_common ^ 2 := sq_pos_of_pos (by linarith)
   rw [gt_iff_lt, div_lt_div_iff₀ h_c2 h_r2]
-  nlinarith [sq_nonneg p_rare, sq_nonneg p_common, mul_pos h_rare h_common]
+  nlinarith [sq_nonneg p_rare, sq_nonneg p_common, mul_pos h_rare (show (0:ℝ) < p_common from by linarith)]
 
 end AlleleFrequencyDivergence
 

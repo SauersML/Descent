@@ -180,7 +180,7 @@ theorem coding_enriched
   show 5 < heritabilityEnrichment h2_coding M_coding h2_total M_total
   have hsimpl : heritabilityEnrichment h2_coding M_coding h2_total M_total =
     h2_coding * M_total / (M_coding * h2_total) := by
-    unfold heritabilityEnrichment; field_simp; ring
+    unfold heritabilityEnrichment; field_simp
   rw [hsimpl, lt_div_iff₀ (mul_pos h_mc h_ht)]
   nlinarith
 

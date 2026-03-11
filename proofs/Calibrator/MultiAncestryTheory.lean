@@ -41,7 +41,7 @@ theorem multi_ancestry_reduces_fst
     neutralPortabilityRatio 0 fst_multi > neutralPortabilityRatio 0 fst_single := by
   unfold neutralPortabilityRatio
   simp
-  exact sub_lt_sub_left h_multi_closer 1
+  linarith
 
 /-- **Diminishing returns from more similar samples.**
     At small Fst, the derivative d(R²)/d(Fst) is steep.
@@ -58,7 +58,6 @@ theorem portability_concave_in_fst_reduction
     neutralPortabilityRatio 0 (fst₁ - Δ) - neutralPortabilityRatio 0 fst₁ := by
   unfold neutralPortabilityRatio
   simp
-  ring
 
 /-- **Optimal GWAS allocation.**
     Given a fixed total sample size N, how should samples be allocated
@@ -264,7 +263,7 @@ theorem shrinkage_reduces_portability_variance
     (hσ : 0 < σ_sq_noise) :
     β_shrunk ^ 2 * σ_sq_noise ≤ β_raw ^ 2 * σ_sq_noise := by
   apply mul_le_mul_of_nonneg_right _ (le_of_lt hσ)
-  exact sq_le_sq' (by linarith [abs_nonneg β_shrunk, abs_nonneg β_raw]) h_shrunk
+  nlinarith [sq_abs β_shrunk, sq_abs β_raw, abs_nonneg β_shrunk, abs_nonneg β_raw]
 
 end PGSConstruction
 

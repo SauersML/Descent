@@ -310,6 +310,7 @@ theorem height_portability_prediction :
     let ld_factor := 0.85  -- Estimated LD tagging loss
     let predicted_ratio := neutral_ratio * ld_factor
     0.7 < predicted_ratio ∧ predicted_ratio < 0.8 := by
+  show 0.7 < (1 - 0.12) * 0.85 ∧ (1 - 0.12) * 0.85 < 0.8
   constructor <;> norm_num
 
 /-- **Predicted R² for lymphocyte count at Fst = 0.12.**
@@ -321,6 +322,7 @@ theorem lymphocyte_portability_prediction :
     let ld_factor := 0.85
     let predicted_ratio := neutral_ratio * effect_correlation ^ 2 * ld_factor
     predicted_ratio < 0.1 := by
+  show (1 - 0.12) * 0.3 ^ 2 * 0.85 < 0.1
   norm_num
 
 /-- **Wang et al.'s key finding: R² of genetic distance on squared error is ~0.5%.**
