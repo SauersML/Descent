@@ -378,12 +378,120 @@ is a special case of population-specific LD.
 
 section AdmixtureLD
 
+/-!
+### Derivation of Admixture LD from Haplotype Frequencies
+
+We derive the admixture LD formula D(g) = α(1−α)(p_A − p_B)²(1−r)^g
+from first principles, starting with haplotype frequency dynamics.
+
+**Setup.** Two source populations A, B with mixing proportion α from A.
+- Locus 1: allele frequencies p_A (pop A), p_B (pop B)
+- Locus 2: allele frequencies q_A (pop A), q_B (pop B)
+- Assume linkage equilibrium within each source population, i.e.,
+  freq(AB in A) = p_A × q_A and freq(AB in B) = p_B × q_B.
+
+**Step 1 — Haplotype AB frequency in the admixed population:**
+  freq(AB) = α × p_A × q_A + (1−α) × p_B × q_B
+
+**Step 2 — Marginal allele frequencies in the admixed population:**
+  freq(allele at locus 1) = α × p_A + (1−α) × p_B
+  freq(allele at locus 2) = α × q_A + (1−α) × q_B
+
+**Step 3 — LD in the admixed population (generation 0):**
+  D = freq(AB) − freq(A) × freq(B)
+    = [α p_A q_A + (1−α) p_B q_B] − [α p_A + (1−α) p_B][α q_A + (1−α) q_B]
+
+**Step 4 — Algebraic simplification:**
+  Expanding the product of marginals:
+    [α p_A + (1−α) p_B][α q_A + (1−α) q_B]
+      = α² p_A q_A + α(1−α) p_A q_B + α(1−α) p_B q_A + (1−α)² p_B q_B
+  Subtracting from freq(AB):
+    D = α p_A q_A + (1−α) p_B q_B
+      − α² p_A q_A − α(1−α) p_A q_B − α(1−α) p_B q_A − (1−α)² p_B q_B
+      = α(1−α) p_A q_A − α(1−α) p_A q_B − α(1−α) p_B q_A + α(1−α) p_B q_B
+      = α(1−α) [p_A(q_A − q_B) − p_B(q_A − q_B)]
+      = α(1−α) (p_A − p_B)(q_A − q_B)
+
+**Step 5 — Recombination decay:**
+  Each generation of random mating reduces LD by a factor (1−r):
+    D(g) = (1−r)^g × D(0) = α(1−α)(p_A − p_B)(q_A − q_B)(1−r)^g
+
+**Step 6 — Specialization to `admixtureLDMagnitude`:**
+  When both loci share the same frequency difference between populations
+  (q_A − q_B = p_A − p_B), the product (p_A − p_B)(q_A − q_B) becomes
+  (p_A − p_B)², recovering:
+    D(g) = α(1−α)(p_A − p_B)²(1−r)^g
+-/
+
+/-- **Haplotype AB frequency in an admixed population.**
+    Under linkage equilibrium within each source population,
+    freq(AB)_admix = α × p_A × q_A + (1−α) × p_B × q_B. -/
+noncomputable def haplotypeFreqAdmixed (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
+  alpha * p_A * q_A + (1 - alpha) * p_B * q_B
+
+/-- **Marginal allele frequency at locus 1 in the admixed population.** -/
+noncomputable def admixedAlleleFreq1 (alpha p_A p_B : ℝ) : ℝ :=
+  alpha * p_A + (1 - alpha) * p_B
+
+/-- **Marginal allele frequency at locus 2 in the admixed population.** -/
+noncomputable def admixedAlleleFreq2 (alpha q_A q_B : ℝ) : ℝ :=
+  alpha * q_A + (1 - alpha) * q_B
+
+/-- **Admixture LD at generation 0 (two-locus form).**
+    D_admix = freq(AB) − freq(A) × freq(B).
+    This is the general two-locus definition before any
+    recombination has acted. -/
+noncomputable def admixtureLDTwoLocus (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
+  haplotypeFreqAdmixed alpha p_A q_A p_B q_B
+    - admixedAlleleFreq1 alpha p_A p_B * admixedAlleleFreq2 alpha q_A q_B
+
+/-- **Core algebraic identity (Step 4): D_admix = α(1−α)(p_A − p_B)(q_A − q_B).**
+    Expanding the haplotype frequency minus the product of marginals
+    and collecting terms yields this factored form. The proof is
+    purely algebraic (ring). -/
+theorem admixture_ld_two_locus_eq (alpha p_A q_A p_B q_B : ℝ) :
+    admixtureLDTwoLocus alpha p_A q_A p_B q_B =
+      alpha * (1 - alpha) * (p_A - p_B) * (q_A - q_B) := by
+  unfold admixtureLDTwoLocus haplotypeFreqAdmixed admixedAlleleFreq1 admixedAlleleFreq2
+  ring
+
+/-- **Recombination decay of admixture LD (Step 5).**
+    After g generations of random mating, recombination reduces LD
+    by (1−r) each generation: D(g) = (1−r)^g × D(0). -/
+noncomputable def admixtureLDAtGen (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) : ℝ :=
+  (1 - r) ^ g * admixtureLDTwoLocus alpha p_A q_A p_B q_B
+
+/-- **Full admixture LD formula at generation g.**
+    Combining the algebraic identity with recombination decay:
+    D(g) = α(1−α)(p_A − p_B)(q_A − q_B)(1−r)^g. -/
+theorem admixture_ld_at_gen_eq (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) :
+    admixtureLDAtGen alpha p_A q_A p_B q_B r g =
+      alpha * (1 - alpha) * (p_A - p_B) * (q_A - q_B) * (1 - r) ^ g := by
+  unfold admixtureLDAtGen
+  rw [admixture_ld_two_locus_eq]
+  ring
+
 /-- **Admixture LD magnitude.**
     D_admix ≈ α(1-α) × (p_A - p_B)² × (1-r)^g
     where α is admixture proportion, g is generations since
     admixture, r is recombination rate. -/
 noncomputable def admixtureLDMagnitude (alpha p_A p_B r : ℝ) (g : ℕ) : ℝ :=
   alpha * (1 - alpha) * (p_A - p_B)^2 * (1 - r)^g
+
+/-- **Connection to `admixtureLDMagnitude` (Step 6).**
+    When both loci share the same frequency difference between populations
+    (q_A − q_B = p_A − p_B), the general two-locus formula specializes to:
+      D(g) = α(1−α)(p_A − p_B)²(1−r)^g
+    which is exactly `admixtureLDMagnitude`. This shows the magnitude formula
+    is not assumed but derived from haplotype frequency dynamics. -/
+theorem admixture_ld_specializes_to_magnitude (alpha p_A p_B r : ℝ) (g : ℕ)
+    (q_A q_B : ℝ) (h_same_diff : q_A - q_B = p_A - p_B) :
+    admixtureLDAtGen alpha p_A q_A p_B q_B r g =
+      admixtureLDMagnitude alpha p_A p_B r g := by
+  rw [admixture_ld_at_gen_eq]
+  unfold admixtureLDMagnitude
+  rw [h_same_diff, sq]
+  ring
 
 /-- Admixture LD is nonneg. -/
 theorem admixture_ld_nonneg (alpha p_A p_B r : ℝ) (g : ℕ)
