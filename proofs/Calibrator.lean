@@ -29,6 +29,7 @@ import Calibrator.StatisticalGeneticsMethodology
 import Calibrator.EquityAndImplementation
 import Calibrator.EpistasisAndNonAdditivity
 import Calibrator.PolygenicAdaptation
+import Calibrator.AssortativeMatingPGS
 
 namespace Calibrator
 
