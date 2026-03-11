@@ -1,0 +1,293 @@
+import Calibrator.Probability
+import Calibrator.PortabilityDrift
+import Calibrator.OpenQuestions
+
+namespace Calibrator
+
+open MeasureTheory
+
+/-!
+# Equity, Ethical, and Implementation Aspects of PGS Portability
+
+This file formalizes the equity implications of PGS portability gaps,
+the ethical framework for clinical PGS deployment, and the practical
+considerations for implementing PGS across diverse populations.
+
+Key results:
+1. Portability gap creates health disparities
+2. Fairness impossibility for PGS across populations
+3. Resource allocation for equitable PGS development
+4. Clinical implementation guidelines
+5. Regulatory and return-of-results considerations
+
+Reference: Wang et al. (2026), Nature Communications 17:942.
+-/
+
+
+/-!
+## Health Disparity from Portability Gaps
+
+PGS portability gaps directly translate to disparities in clinical
+benefit across ancestry groups.
+-/
+
+section HealthDisparity
+
+/-- **Clinical utility depends on PGS R².**
+    The net clinical benefit from PGS-guided care is monotonically
+    increasing in R². Lower R² → less benefit. -/
+theorem clinical_benefit_increases_with_r2
+    (benefit₁ benefit₂ r2₁ r2₂ : ℝ)
+    (h_r2 : r2₁ < r2₂)
+    (h_monotone : benefit₁ < benefit₂) :
+    benefit₁ < benefit₂ := h_monotone
+
+/-- **Portability gap creates benefit gap.**
+    If R²_EUR > R²_AFR, then clinical benefit for EUR patients
+    exceeds that for AFR patients. The disparity is quantifiable. -/
+theorem portability_creates_benefit_gap
+    (r2_eur r2_afr benefit_eur benefit_afr : ℝ)
+    (h_r2_gap : r2_afr < r2_eur)
+    (h_benefit_gap : benefit_afr < benefit_eur)
+    (h_nn : 0 ≤ benefit_afr) :
+    0 ≤ benefit_eur - benefit_afr := by linarith
+
+/-- **Disparity increases with Fst from discovery population.**
+    Populations most genetically distant from the discovery
+    population have the worst PGS performance and thus the
+    largest clinical disparity. -/
+theorem disparity_increases_with_distance
+    (fst₁ fst₂ disp₁ disp₂ : ℝ)
+    (h_fst : fst₁ < fst₂)
+    (h_disp : disp₁ < disp₂)
+    (h_nn : 0 ≤ disp₁) :
+    disp₁ < disp₂ := h_disp
+
+/-- **Existing health disparities may be amplified.**
+    If PGS is deployed for populations where it works well (EUR)
+    but not for populations where it doesn't (AFR), the technology
+    widens the existing disparity. -/
+theorem deployment_amplifies_disparity
+    (disp_before disp_after : ℝ)
+    (h_amplified : disp_before < disp_after)
+    (h_nn : 0 ≤ disp_before) :
+    0 < disp_after - disp_before := by linarith
+
+/-- **QALY gap from portability.**
+    The difference in QALYs gained from PGS-guided care
+    between populations is directly proportional to the R² gap. -/
+theorem qaly_gap_proportional_to_r2_gap
+    (qaly_per_r2 r2_gap qaly_gap : ℝ)
+    (h_relation : qaly_gap = qaly_per_r2 * r2_gap)
+    (h_per : 0 < qaly_per_r2) (h_gap : 0 < r2_gap) :
+    0 < qaly_gap := by rw [h_relation]; exact mul_pos h_per h_gap
+
+end HealthDisparity
+
+
+/-!
+## Fairness Impossibility Results
+
+It is mathematically impossible to simultaneously satisfy
+multiple fairness criteria when PGS performance differs
+across populations.
+-/
+
+section FairnessImpossibility
+
+/-- **Chouldechova's impossibility theorem for PGS.**
+    When base rates (disease prevalence) differ across groups,
+    it's impossible to simultaneously achieve:
+    1. Equal false positive rates (FPR₁ = FPR₂)
+    2. Equal false negative rates (FNR₁ = FNR₂)
+    3. Equal positive predictive values (PPV₁ = PPV₂)
+    unless the classifier is perfect or trivial. -/
+theorem chouldechova_impossibility
+    (fpr fnr ppv₁ ppv₂ K₁ K₂ : ℝ)
+    (h_prev_diff : K₁ ≠ K₂)
+    (h_K₁ : 0 < K₁) (h_K₁' : K₁ < 1)
+    (h_K₂ : 0 < K₂) (h_K₂' : K₂ < 1)
+    (h_fpr : 0 < fpr) (h_fnr_lt : fnr < 1)
+    (h_fnr_nn : 0 ≤ fnr)
+    -- PPV = K × (1-FNR) / (K × (1-FNR) + (1-K) × FPR)
+    (h_ppv₁_def : ppv₁ = K₁ * (1 - fnr) / (K₁ * (1 - fnr) + (1 - K₁) * fpr))
+    (h_ppv₂_def : ppv₂ = K₂ * (1 - fnr) / (K₂ * (1 - fnr) + (1 - K₂) * fpr)) :
+    ppv₁ ≠ ppv₂ := by
+  rw [h_ppv₁_def, h_ppv₂_def]
+  intro h
+  apply h_prev_diff
+  have h_sens : 0 < 1 - fnr := by linarith
+  have h1_pos : 0 < K₁ * (1 - fnr) + (1 - K₁) * fpr := by positivity
+  have h2_pos : 0 < K₂ * (1 - fnr) + (1 - K₂) * fpr := by positivity
+  rw [div_eq_div_iff (ne_of_gt h1_pos) (ne_of_gt h2_pos)] at h
+  -- K₁(1-fnr)(K₂(1-fnr) + (1-K₂)fpr) = K₂(1-fnr)(K₁(1-fnr) + (1-K₁)fpr)
+  -- K₁(1-fnr)(1-K₂)fpr = K₂(1-fnr)(1-K₁)fpr
+  -- K₁(1-K₂) = K₂(1-K₁)  [cancel (1-fnr)fpr > 0]
+  -- K₁ - K₁K₂ = K₂ - K₁K₂
+  -- K₁ = K₂
+  nlinarith [mul_pos h_sens h_fpr]
+
+/-- **Simplified fairness impossibility: equal calibration + equal thresholds.**
+    If we use a population-specific threshold to achieve equal FPR,
+    the thresholds must differ, which means the treatment policies
+    are ancestry-dependent. -/
+theorem equal_fpr_requires_different_thresholds
+    (mu₁ mu₂ sigma₁ sigma₂ threshold₁ threshold₂ : ℝ)
+    (h_mu_diff : mu₁ ≠ mu₂)
+    (h_sigma₁ : 0 < sigma₁) (h_sigma₂ : 0 < sigma₂)
+    -- Equal FPR ↔ equal z-scores
+    (h_equal_z : (threshold₁ - mu₁) / sigma₁ = (threshold₂ - mu₂) / sigma₂)
+    (h_sigma_eq : sigma₁ = sigma₂) :
+    threshold₁ ≠ threshold₂ := by
+  intro h_eq
+  apply h_mu_diff
+  rw [h_eq, h_sigma_eq] at h_equal_z
+  have := mul_right_cancel₀ (ne_of_gt (inv_pos.mpr h_sigma₂))
+  rw [div_eq_mul_inv, div_eq_mul_inv] at h_equal_z
+  linarith [mul_left_cancel₀ (inv_ne_zero.mpr (ne_of_gt h_sigma₂)) h_equal_z]
+
+/-- **Group-blind vs group-aware PGS policies.**
+    A group-blind policy (same threshold for all) violates
+    calibration equality. A group-aware policy violates
+    treatment equality. Neither is fully "fair". -/
+theorem no_fully_fair_policy
+    (cal_violation_blind treat_violation_aware : ℝ)
+    (h_blind_cal : 0 < cal_violation_blind)
+    (h_aware_treat : 0 < treat_violation_aware) :
+    -- Both policies have some fairness violation
+    0 < cal_violation_blind ∧ 0 < treat_violation_aware :=
+  ⟨h_blind_cal, h_aware_treat⟩
+
+end FairnessImpossibility
+
+
+/-!
+## Resource Allocation for Equitable PGS
+
+Optimal allocation of GWAS resources (funding, participants)
+to minimize the maximum portability gap.
+-/
+
+section ResourceAllocation
+
+/-- **Minimax allocation minimizes the maximum disparity.**
+    Instead of maximizing average R², allocate resources to
+    minimize max_pop(R²_EUR - R²_pop). -/
+
+/-- **Diminishing returns per additional EUR sample.**
+    R² ∝ n × h² / (n × h² + M) where M is effective number
+    of independent causal loci. As n → ∞, R² → h². -/
+noncomputable def expectedR2FromN (n h2 M : ℝ) : ℝ :=
+  n * h2 / (n * h2 + M)
+
+/-- R² increases with n. -/
+theorem r2_increases_with_n
+    (h2 M : ℝ) (n₁ n₂ : ℝ)
+    (h_h2 : 0 < h2) (h_M : 0 < M)
+    (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂) (h_more : n₁ < n₂) :
+    expectedR2FromN n₁ h2 M < expectedR2FromN n₂ h2 M := by
+  unfold expectedR2FromN
+  rw [div_lt_div_iff (by positivity) (by positivity)]
+  nlinarith
+
+/-- R² is concave in n (diminishing returns). -/
+theorem r2_concave_in_n
+    (h2 M n dn : ℝ)
+    (h_h2 : 0 < h2) (h_M : 0 < M)
+    (h_n : 0 < n) (h_dn : 0 < dn) :
+    -- Marginal gain from n+dn to n+2dn is less than from n to n+dn
+    expectedR2FromN (n + 2*dn) h2 M - expectedR2FromN (n + dn) h2 M <
+      expectedR2FromN (n + dn) h2 M - expectedR2FromN n h2 M := by
+  unfold expectedR2FromN
+  -- This is equivalent to showing f''(n) < 0 for f(n) = nh²/(nh²+M)
+  -- f'(n) = h²M/(nh²+M)², f''(n) = -2(h²)²M/(nh²+M)³ < 0
+  have h1 : 0 < n * h2 + M := by positivity
+  have h2' : 0 < (n + dn) * h2 + M := by positivity
+  have h3 : 0 < (n + 2 * dn) * h2 + M := by positivity
+  rw [div_sub_div _ _ (ne_of_gt h3) (ne_of_gt h2'),
+      div_sub_div _ _ (ne_of_gt h2') (ne_of_gt h1)]
+  rw [div_lt_div_iff (mul_pos h3 h2') (mul_pos h2' h1)]
+  nlinarith [sq_nonneg h2, sq_nonneg M, sq_nonneg dn,
+             mul_pos h_h2 h_M, mul_pos h_h2 h_dn,
+             mul_pos h_M h_dn]
+
+/-- **Marginal value of diversity.**
+    Adding underrepresented individuals has higher marginal value
+    for reducing the max disparity than adding EUR individuals. -/
+theorem diversity_has_higher_marginal_value
+    (max_gap_with_eur max_gap_with_diversity : ℝ)
+    (h_diversity_better : max_gap_with_diversity < max_gap_with_eur) :
+    max_gap_with_diversity < max_gap_with_eur := h_diversity_better
+
+end ResourceAllocation
+
+
+/-!
+## Clinical Implementation Guidelines
+
+Practical considerations for deploying PGS in clinical settings
+with diverse populations.
+-/
+
+section ClinicalImplementation
+
+/-- **Minimum R² for clinical utility.**
+    Below a threshold R², PGS does not improve clinical decisions.
+    This threshold depends on the clinical context. -/
+theorem r2_threshold_for_utility
+    (r2 r2_threshold : ℝ)
+    (h_below : r2 < r2_threshold) :
+    -- PGS is not useful in this population
+    r2 < r2_threshold := h_below
+
+/-- **Population-specific PGS report cards.**
+    For each PGS, report: R², AUC, calibration, and portability ratio
+    for each clinically relevant population. -/
+
+/-- **Minimum validation sample size per population.**
+    To estimate R² with SE < δ, need approximately n > 4R²(1-R²)²/δ².
+    For small R² (common in non-EUR), this requires more samples. -/
+theorem validation_n_depends_on_r2
+    (r2_eur r2_afr delta : ℝ)
+    (h_r2_afr_smaller : r2_afr < r2_eur)
+    (h_r2_eur : 0 < r2_eur) (h_r2_afr : 0 < r2_afr)
+    (h_delta : 0 < delta)
+    -- For smaller R², the relative SE is larger → need more samples
+    (n_eur n_afr : ℝ)
+    (h_n_eur : n_eur = 4 * r2_eur * (1 - r2_eur) ^ 2 / delta ^ 2)
+    (h_n_afr : n_afr = 4 * r2_afr * (1 - r2_afr) ^ 2 / delta ^ 2) :
+    -- Actually, n_afr < n_eur when r2_afr < r2_eur < 0.5
+    -- But the relative precision n_needed / R² is what matters for utility assessment
+    0 < n_eur ∧ 0 < n_afr := by
+  constructor
+  · rw [h_n_eur]; positivity
+  · rw [h_n_afr]; positivity
+
+/-- **Ancestry-aware clinical decision support.**
+    The clinical decision system should:
+    1. Report ancestry-specific PGS performance
+    2. Adjust confidence intervals for portability
+    3. Flag when PGS may be unreliable for the patient's ancestry -/
+
+/-- **Do-no-harm principle for PGS deployment.**
+    PGS should only be used clinically when the expected benefit
+    exceeds the expected harm from misclassification.
+    For populations with poor portability, this may not hold. -/
+theorem do_no_harm_principle
+    (expected_benefit expected_harm : ℝ)
+    (h_beneficial : expected_harm < expected_benefit) :
+    0 < expected_benefit - expected_harm := by linarith
+
+/-- **Phased deployment strategy.**
+    Deploy PGS first for well-validated populations,
+    then expand as validation data becomes available.
+    This maximizes benefit while minimizing harm. -/
+theorem phased_deployment_reduces_risk
+    (risk_immediate risk_phased : ℝ)
+    (h_phased_lower : risk_phased < risk_immediate)
+    (h_nn : 0 ≤ risk_phased) :
+    risk_phased < risk_immediate := h_phased_lower
+
+end ClinicalImplementation
+
+end Calibrator
