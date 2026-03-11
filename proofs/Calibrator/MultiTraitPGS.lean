@@ -36,12 +36,12 @@ section GeneticCorrelation
 /-- **Genetic correlation definition.**
     r_g(A,B) = Cov_g(A,B) / √(V_gA × V_gB)
     where V_gX is the genetic variance of trait X. -/
-noncomputable def geneticCorrelation (cov_g V_gA V_gB : ℝ) : ℝ :=
+noncomputable def geneticCorrelationMT (cov_g V_gA V_gB : ℝ) : ℝ :=
   cov_g / Real.sqrt (V_gA * V_gB)
 
 /-- Genetic correlation is bounded by 1 in absolute value
     (Cauchy-Schwarz). -/
-theorem genetic_correlation_bounded
+theorem genetic_correlation_bounded_mt
     (rg : ℝ) (h_bound : |rg| ≤ 1) :
     -1 ≤ rg ∧ rg ≤ 1 := by
   exact ⟨by linarith [abs_nonneg rg, abs_le.mp h_bound |>.1], abs_le.mp h_bound |>.2⟩

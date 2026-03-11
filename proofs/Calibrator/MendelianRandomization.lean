@@ -230,7 +230,7 @@ theorem valid_iv_ld_invariant
     MR can test whether environmental factors mediate the
     portability gap. If environment → portability loss,
     adjusting for environment should improve portability. -/
-theorem environment_mediates_portability
+theorem environment_mediates_portability_mr
     (port_unadjusted port_adjusted : ℝ)
     (h_improved : port_unadjusted < port_adjusted)
     (h_nn : 0 < port_unadjusted) :

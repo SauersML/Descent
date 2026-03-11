@@ -855,7 +855,7 @@ noncomputable def bernoulliKLReal (p q : ℝ) : ℝ :=
   p * Real.log (p / q) + (1 - p) * Real.log ((1 - p) / (1 - q))
 
 /-- Bernoulli KL on `[0,1]` probabilities. -/
-noncomputable def klBern (p q : UnitProb) : ℝ :=
+noncomputable def klBernReal (p q : UnitProb) : ℝ :=
   bernoulliKLReal p.1 q.1
 
 theorem bernoulliKLReal_nonneg (p q : ℝ) (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 < q) (hq1 : q < 1) :
@@ -931,14 +931,14 @@ theorem logLoss_regret_eq_integral_kl {Z : Type*} [MeasurableSpace Z] (μ : Meas
     exact logLoss_regret_eq_kl_pointwise (p z) (q z) (hp z).1 (hp z).2 (hq z).1 (hq z).2)
 
 /-- Method-agnostic main theorem:
-`R_log(q) - R_log(p) = ∫ klBern(p(z), q(z)) dμ`. -/
-theorem logRisk_regret_eq_expected_klBern {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+`R_log(q) - R_log(p) = ∫ klBernReal(p(z), q(z)) dμ`. -/
+theorem logRisk_regret_eq_expected_klBernReal {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
     (p q : ProbPredictor Z)
     (hp : ∀ z, 0 < (p z).1 ∧ (p z).1 < 1)
     (hq : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1) :
     (∫ z, bernoulliLogLoss (p z).1 (q z).1 - bernoulliLogLoss (p z).1 (p z).1 ∂μ)
-      = ∫ z, klBern (p z) (q z) ∂μ := by
-  unfold klBern
+      = ∫ z, klBernReal (p z) (q z) ∂μ := by
+  unfold klBernReal
   exact logLoss_regret_eq_integral_kl μ (fun z => (p z).1) (fun z => (q z).1) hp hq
 
 /-- Method-comparison magnitude identity:
@@ -949,26 +949,26 @@ theorem logRisk_gap_eq_integral_klGap {Z : Type*} [MeasurableSpace Z] (μ : Meas
     (hqBaseline : ∀ z, 0 < (qBaseline z).1 ∧ (qBaseline z).1 < 1)
     (hqYours : ∀ z, 0 < (qYours z).1 ∧ (qYours z).1 < 1) :
     (∫ z, bernoulliLogLoss (p z).1 (qBaseline z).1 - bernoulliLogLoss (p z).1 (qYours z).1 ∂μ)
-      = ∫ z, (klBern (p z) (qBaseline z) - klBern (p z) (qYours z)) ∂μ := by
+      = ∫ z, (klBernReal (p z) (qBaseline z) - klBernReal (p z) (qYours z)) ∂μ := by
   refine integral_congr_ae ?_
   exact Filter.Eventually.of_forall (fun z => by
     have hB := logLoss_regret_eq_kl_pointwise (p z).1 (qBaseline z).1
       (hp z).1 (hp z).2 (hqBaseline z).1 (hqBaseline z).2
     have hY := logLoss_regret_eq_kl_pointwise (p z).1 (qYours z).1
       (hp z).1 (hp z).2 (hqYours z).1 (hqYours z).2
-    unfold klBern
+    unfold klBernReal
     linarith [hB, hY])
 
-/-- Corollary: nonnegativity of log-loss regret from pointwise nonnegativity of `klBern`. -/
+/-- Corollary: nonnegativity of log-loss regret from pointwise nonnegativity of `klBernReal`. -/
 theorem logRisk_regret_nonneg {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
     (p q : ProbPredictor Z)
     (hp : ∀ z, 0 < (p z).1 ∧ (p z).1 < 1)
     (hq : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1) :
     0 ≤ (∫ z, bernoulliLogLoss (p z).1 (q z).1 - bernoulliLogLoss (p z).1 (p z).1 ∂μ) := by
-  rw [logRisk_regret_eq_expected_klBern μ p q hp hq]
-  have h_kl_nonneg : ∀ z, 0 ≤ klBern (p z) (q z) := by
+  rw [logRisk_regret_eq_expected_klBernReal μ p q hp hq]
+  have h_kl_nonneg : ∀ z, 0 ≤ klBernReal (p z) (q z) := by
     intro z
-    unfold klBern
+    unfold klBernReal
     exact bernoulliKLReal_nonneg (p z).1 (q z).1 (hp z).1 (hp z).2 (hq z).1 (hq z).2
   exact integral_nonneg h_kl_nonneg
 
@@ -978,23 +978,23 @@ theorem logRisk_regret_zero_iff_ae_eq {Z : Type*} [MeasurableSpace Z] (μ : Meas
     (p q : ProbPredictor Z)
     (hp : ∀ z, 0 < (p z).1 ∧ (p z).1 < 1)
     (hq : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
-    (h_int : Integrable (fun z => klBern (p z) (q z)) μ)
-    (h_kl_zero_iff : ∀ z, klBern (p z) (q z) = 0 ↔ q z = p z) :
+    (h_int : Integrable (fun z => klBernReal (p z) (q z)) μ)
+    (h_kl_zero_iff : ∀ z, klBernReal (p z) (q z) = 0 ↔ q z = p z) :
     (∫ z, bernoulliLogLoss (p z).1 (q z).1 - bernoulliLogLoss (p z).1 (p z).1 ∂μ) = 0
       ↔ q =ᵐ[μ] p := by
-  have h_kl_nonneg : ∀ z, 0 ≤ klBern (p z) (q z) := by
+  have h_kl_nonneg : ∀ z, 0 ≤ klBernReal (p z) (q z) := by
     intro z
-    unfold klBern
+    unfold klBernReal
     exact bernoulliKLReal_nonneg (p z).1 (q z).1 (hp z).1 (hp z).2 (hq z).1 (hq z).2
-  rw [logRisk_regret_eq_expected_klBern μ p q hp hq]
+  rw [logRisk_regret_eq_expected_klBernReal μ p q hp hq]
   constructor
   · intro h0
-    have h_ae_zero : (fun z => klBern (p z) (q z)) =ᵐ[μ] 0 := by
+    have h_ae_zero : (fun z => klBernReal (p z) (q z)) =ᵐ[μ] 0 := by
       exact (integral_eq_zero_iff_of_nonneg h_kl_nonneg h_int).mp h0
     filter_upwards [h_ae_zero] with z hz
     exact (h_kl_zero_iff z).1 hz
   · intro hqeqp
-    have h_ae_zero : (fun z => klBern (p z) (q z)) =ᵐ[μ] 0 := by
+    have h_ae_zero : (fun z => klBernReal (p z) (q z)) =ᵐ[μ] 0 := by
       filter_upwards [hqeqp] with z hz
       exact (h_kl_zero_iff z).2 hz
     rw [integral_congr_ae h_ae_zero]
@@ -1133,8 +1133,8 @@ theorem logRisk_eq_iff_ae_eq_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure Z
     (η q : ProbPredictor Z)
     (hη_open : ∀ z, 0 < (η z).1 ∧ (η z).1 < 1)
     (hq_open : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
-    (h_int_kl : Integrable (fun z => klBern (η z) (q z)) μ)
-    (h_kl_zero_iff : ∀ z, klBern (η z) (q z) = 0 ↔ q z = η z)
+    (h_int_kl : Integrable (fun z => klBernReal (η z) (q z)) μ)
+    (h_kl_zero_iff : ∀ z, klBernReal (η z) (q z) = 0 ↔ q z = η z)
     (h_int_eta : Integrable (fun z => bernoulliLogLoss (η z).1 (η z).1) μ)
     (h_int_q : Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ) :
     logRisk μ η q = logRisk μ η η ↔ q =ᵐ[μ] η := by

@@ -255,14 +255,14 @@ section Epistasis
     For two loci with frequencies p₁, p₂ and interaction effect γ,
     the epistatic variance component is:
     V_epistasis = γ² × H₁ × H₂ where Hᵢ = 2pᵢ(1-pᵢ). -/
-noncomputable def epistaticVariance (γ p₁ p₂ : ℝ) : ℝ :=
+noncomputable def epistaticVariancePairwise (γ p₁ p₂ : ℝ) : ℝ :=
   γ ^ 2 * (2 * p₁ * (1 - p₁)) * (2 * p₂ * (1 - p₂))
 
 /-- Epistatic variance is nonneg. -/
-theorem epistatic_variance_nonneg (γ p₁ p₂ : ℝ)
+theorem epistatic_variance_pairwise_nonneg (γ p₁ p₂ : ℝ)
     (h₁ : 0 ≤ p₁) (h₁' : p₁ ≤ 1) (h₂ : 0 ≤ p₂) (h₂' : p₂ ≤ 1) :
-    0 ≤ epistaticVariance γ p₁ p₂ := by
-  unfold epistaticVariance
+    0 ≤ epistaticVariancePairwise γ p₁ p₂ := by
+  unfold epistaticVariancePairwise
   apply mul_nonneg
   · apply mul_nonneg
     · exact sq_nonneg γ

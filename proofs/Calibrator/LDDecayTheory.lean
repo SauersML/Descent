@@ -166,7 +166,7 @@ noncomputable def admixtureLD (α Δp₁ Δp₂ : ℝ) : ℝ :=
   α * (1 - α) * Δp₁ * Δp₂
 
 /-- Admixture LD is maximized at α = 0.5. -/
-theorem admixture_ld_max_at_half (Δp₁ Δp₂ α : ℝ)
+theorem admixture_ld_max_at_half_freq (Δp₁ Δp₂ α : ℝ)
     (h_pos₁ : 0 < Δp₁) (h_pos₂ : 0 < Δp₂)
     (h_α : 0 < α) (h_α1 : α < 1) :
     admixtureLD α Δp₁ Δp₂ ≤ admixtureLD (1/2) Δp₁ Δp₂ := by
