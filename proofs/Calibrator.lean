@@ -30,6 +30,7 @@ import Calibrator.EquityAndImplementation
 import Calibrator.EpistasisAndNonAdditivity
 import Calibrator.PolygenicAdaptation
 import Calibrator.AssortativeMatingPGS
+import Calibrator.ImputationPortability
 
 namespace Calibrator
 

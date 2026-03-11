@@ -575,7 +575,7 @@ theorem immune_combined_decay_faster
     unfold ldTaggingDecay; exact mul_pos hr2 (Real.exp_pos _)
   apply mul_lt_mul_of_pos_left _ h_ld_pos
   apply sq_lt_sq'
-  · linarith [Real.exp_nonneg (-lam_eff_immune * d), Real.exp_nonneg (-lam_eff_neutral * d)]
+  · linarith [Real.exp_pos (-lam_eff_immune * d), Real.exp_pos (-lam_eff_neutral * d)]
   · exact faster_decay_lower_correlation lam_eff_neutral lam_eff_immune d hlamn hlami hd
 
 end LDTurnoverInteraction
