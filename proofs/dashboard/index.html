@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gnomon · PGS Portability Explorer</title>
   <meta name="description"
-    content="Interactive explorer for polygenic score portability across populations under genetic drift.">
+    content="Interactive explorer for polygenic score portability across populations, based on formally verified evolutionary theory.">
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
@@ -50,1153 +50,1120 @@
       overflow-x: hidden;
     }
 
-    /* ─── Hero ─── */
+    /* Hero */
     .hero {
-      background: linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
-      border-bottom: 1px solid var(--border);
-      padding: 2rem 2rem 1.2rem;
       text-align: center;
+      padding: 3rem 1.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99, 102, 241, 0.12), transparent);
+      pointer-events: none;
     }
 
     .hero h1 {
-      font-size: 2rem;
+      font-size: clamp(2rem, 5vw, 3.2rem);
       font-weight: 800;
+      letter-spacing: -0.03em;
       background: var(--gradient-primary);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      letter-spacing: -0.02em;
+      background-clip: text;
     }
 
-    .hero .subtitle {
-      font-size: 0.9rem;
+    .hero p {
       color: var(--text-secondary);
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0.75rem auto 0;
     }
 
-    .hero .badge {
-      display: inline-block;
-      margin-top: 0.5rem;
-      padding: 0.2rem 0.7rem;
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      padding: 0.35rem 1rem;
       border-radius: 999px;
-      font-size: 0.68rem;
+      font-size: 0.78rem;
       font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      background: rgba(99, 102, 241, 0.15);
-      color: var(--accent-indigo);
+      background: rgba(99, 102, 241, 0.12);
       border: 1px solid rgba(99, 102, 241, 0.25);
+      color: var(--accent-indigo);
     }
 
-    /* ─── Layout ─── */
+    .badge svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Layout */
     .container {
-      max-width: 1440px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 1.5rem;
+      padding: 0 1.5rem 4rem;
     }
 
-    .grid-main {
+    .grid-2 {
       display: grid;
-      grid-template-columns: 320px 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
     }
 
-    @media (max-width: 1024px) {
-      .grid-main {
-        grid-template-columns: 1fr;
-      }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
     }
 
-    .sidebar {
-      display: flex;
-      flex-direction: column;
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
     }
 
-    .content {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
+    @media (max-width: 1100px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
     }
 
-    /* ─── Cards ─── */
+    @media (max-width: 600px) {
+      .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    /* Cards */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 1.1rem;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    .card:hover {
-      border-color: var(--border-glow);
-      box-shadow: var(--shadow-glow);
+      padding: 1.5rem;
     }
 
     .card-title {
-      font-size: 0.72rem;
-      font-weight: 700;
+      font-size: 0.82rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       color: var(--text-muted);
-      margin-bottom: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
+      margin-bottom: 1rem;
     }
 
-    .card-title .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
+    /* Section headings */
+    .section-heading {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1rem;
+      letter-spacing: -0.02em;
     }
 
-    /* ─── Controls ─── */
-    .control-group {
-      margin-bottom: 0.8rem;
+    /* Sliders */
+    .slider-group {
+      margin-bottom: 1.1rem;
     }
 
-    .control-group:last-child {
-      margin-bottom: 0;
-    }
-
-    .control-label {
+    .slider-label {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.3rem;
     }
 
-    .control-label span:first-child {
-      font-size: 0.8rem;
+    .slider-label span:first-child {
+      font-size: 0.85rem;
       font-weight: 500;
       color: var(--text-secondary);
     }
 
-    .control-value {
+    .slider-value {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 500;
       color: var(--accent-indigo);
-      background: rgba(99, 102, 241, 0.1);
-      padding: 0.1rem 0.4rem;
-      border-radius: 4px;
     }
 
     input[type="range"] {
       -webkit-appearance: none;
       width: 100%;
-      height: 5px;
+      height: 6px;
       border-radius: 3px;
       background: var(--border);
       outline: none;
-      cursor: pointer;
     }
 
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: var(--accent-indigo);
-      box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
       cursor: pointer;
-      transition: transform 0.15s;
+      border: 2px solid var(--bg-card);
+      box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
     }
 
-    input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.2);
-    }
-
-    select {
-      width: 100%;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.4rem 0.5rem;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.8rem;
-      cursor: pointer;
-      outline: none;
-    }
-
-    select:focus {
-      border-color: var(--accent-indigo);
-    }
-
-    /* ─── Metrics ─── */
-    .metrics-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.2rem;
-      margin-bottom: 2rem;
-    }
-
+    /* Metric cards */
     .metric-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 0.9rem 1rem;
-      position: relative;
-      overflow: hidden;
+      padding: 1.2rem;
+      text-align: center;
     }
 
-    .metric-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-    }
-
-    .metric-card.indigo::before {
-      background: var(--gradient-primary);
-    }
-
-    .metric-card.cyan::before {
-      background: linear-gradient(135deg, #06b6d4, #10b981);
-    }
-
-    .metric-card.amber::before {
-      background: linear-gradient(135deg, #f59e0b, #f43f5e);
-    }
-
-    .metric-label {
-      font-size: 0.68rem;
+    .metric-card .label {
+      font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--text-muted);
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.3rem;
     }
 
-    .metric-value {
+    .metric-card .value {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 1.4rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      line-height: 1.2;
     }
 
-    .metric-card.indigo .metric-value {
-      color: var(--accent-indigo);
-    }
-
-    .metric-card.cyan .metric-value {
-      color: var(--accent-cyan);
-    }
-
-    .metric-card.amber .metric-value {
-      color: var(--accent-amber);
-    }
-
-    .metric-formula {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.62rem;
+    .metric-card .sub {
+      font-size: 0.72rem;
       color: var(--text-muted);
-      margin-top: 0.25rem;
-      opacity: 0.8;
-    }
-
-    .metric-proof {
-      font-size: 0.58rem;
-      color: var(--accent-violet);
       margin-top: 0.15rem;
-      opacity: 0.7;
     }
 
-    .metric-proof a {
-      color: var(--accent-violet);
-      text-decoration: none;
-      border-bottom: 1px dotted var(--accent-violet);
-      cursor: pointer;
+    .color-indigo { color: var(--accent-indigo); }
+    .color-cyan { color: var(--accent-cyan); }
+    .color-amber { color: var(--accent-amber); }
+    .color-emerald { color: var(--accent-emerald); }
+    .color-violet { color: var(--accent-violet); }
+    .color-rose { color: var(--accent-rose); }
+
+    /* Factor bar */
+    .factor-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.65rem;
     }
 
-    .metric-proof a:hover {
-      opacity: 1;
-      color: var(--accent-indigo);
-    }
-
-    .metric-proof a.def-link {
-      color: var(--accent-amber);
-      border-bottom-color: var(--accent-amber);
-    }
-
-    .metric-proof a.def-link:hover {
-      color: var(--accent-amber);
-      opacity: 1;
-    }
-
-    .assumption-note {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-      background: rgba(100, 116, 139, 0.08);
-      border: 1px solid rgba(100, 116, 139, 0.15);
-      border-radius: 6px;
-      padding: 0.4rem 0.6rem;
-      margin-top: 0.5rem;
-      line-height: 1.5;
-    }
-
-    /* ─── Charts ─── */
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    @media (max-width: 900px) {
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .chart-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1rem;
-    }
-
-    .chart-card h3 {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 0.6rem;
-    }
-
-    .chart-card canvas {
-      width: 100% !important;
-      height: 240px !important;
-    }
-
-    .chart-card-wide canvas {
-      height: 280px !important;
-    }
-
-    /* ─── Info box ─── */
-    .formula-box {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68rem;
+    .factor-bar .factor-label {
+      font-size: 0.78rem;
+      font-weight: 500;
       color: var(--text-secondary);
-      background: rgba(99, 102, 241, 0.06);
-      padding: 0.6rem 0.7rem;
-      border-radius: 6px;
-      border: 1px solid rgba(99, 102, 241, 0.12);
-      line-height: 1.6;
+      min-width: 120px;
     }
 
-    .formula-box strong {
-      color: var(--accent-indigo);
+    .factor-bar .bar-track {
+      flex: 1;
+      height: 22px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
     }
 
-    .model-note {
-      font-size: 0.72rem;
-      color: var(--accent-amber);
-      background: rgba(245, 158, 11, 0.08);
-      border: 1px solid rgba(245, 158, 11, 0.15);
-      border-radius: 6px;
-      padding: 0.5rem 0.7rem;
-      margin-top: 0.5rem;
+    .factor-bar .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 6px;
     }
 
-    /* ─── Footer ─── */
-    .footer {
-      text-align: center;
-      padding: 1.5rem;
+    .factor-bar .bar-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    /* Rate table */
+    .rate-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .rate-table th, .rate-table td {
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      font-size: 0.82rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .rate-table th {
       color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       font-size: 0.72rem;
-      border-top: 1px solid var(--border);
-      margin-top: 1.5rem;
     }
 
-    .footer a {
+    .rate-table td {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .rate-table .dominant {
+      font-weight: 700;
+    }
+
+    .rate-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    /* Chart container */
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      height: 350px;
+    }
+
+    /* Proof links */
+    .proof-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
       color: var(--accent-indigo);
       text-decoration: none;
+      opacity: 0.8;
+      transition: opacity 0.2s;
     }
 
-    .hidden {
-      display: none !important;
+    .proof-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
+    /* Methodology */
+    .methodology {
+      background: rgba(99, 102, 241, 0.06);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-top: 2rem;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .methodology strong {
+      color: var(--text-primary);
+    }
+
+    /* Glossary */
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .glossary-item {
+      display: flex;
+      gap: 0.6rem;
+      padding: 0.6rem 0;
+    }
+
+    .glossary-item dt {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--accent-violet);
+      min-width: 50px;
+      font-weight: 600;
+    }
+
+    .glossary-item dd {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    /* Formula block */
+    .formula-block {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+    }
+
+    .formula-block .comment {
+      color: var(--text-muted);
     }
   </style>
 </head>
 
 <body>
 
-  <div class="hero">
+  <!-- Hero -->
+  <header class="hero">
     <h1>Gnomon</h1>
-    <p class="subtitle">PGS Portability Explorer</p>
-    <span class="badge">Every formula backed by a Lean 4 proof</span>
-  </div>
+    <p>Unified evolutionary model for polygenic score portability across populations.
+       Drift, LD decay, mutation erosion, and migration &mdash; every formula formally verified.</p>
+    <div class="badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M9 12l2 2 4-4" /><circle cx="12" cy="12" r="10" />
+      </svg>
+      Formally verified in Lean 4 with Mathlib
+    </div>
+  </header>
 
   <div class="container">
-    <div class="grid-main">
 
-      <!-- ═══════════════════════════════════════ -->
-      <!-- SIDEBAR                                -->
-      <!-- ═══════════════════════════════════════ -->
-      <div class="sidebar">
+    <!-- Parameter Controls + Portability Ratio -->
+    <div class="grid-2">
 
-        <div class="card">
-          <div class="card-title"><span class="dot" style="background:var(--accent-indigo)"></span> Demographic Model
+      <!-- Left: All sliders -->
+      <div class="card">
+        <div class="card-title">Evolutionary Parameters</div>
+
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>N<sub>e</sub> &mdash; effective population size</span>
+            <span class="slider-value" id="val-Ne">10,000</span>
           </div>
-          <div class="control-group">
-            <select id="model-select" onchange="updateAll()">
-              <option value="pure_split">Pure Split (t, Nₑ)</option>
-              <option value="im_equilibrium">2-Deme IM Equilibrium (M)</option>
-            </select>
-          </div>
-          <div class="model-note" id="model-note-ps">
-            Past demography input: common-ancestor split where both source and target drift for t generations with
-            branch-specific Nₑ.
-          </div>
-          <div class="model-note hidden" id="model-note-im">
-            Past demography input: two demes at migration–drift equilibrium. M = 4Nₑm (scaled migration rate).
-          </div>
+          <input type="range" id="sl-Ne" min="500" max="100000" step="500" value="10000">
         </div>
 
-        <!-- Pure Split params -->
-        <div class="card" id="params-ps">
-          <div class="card-title"><span class="dot" style="background:var(--accent-violet)"></span> Divergence
-            Parameters</div>
-          <div class="control-group">
-            <div class="control-label">
-              <span>Split time (generations)</span>
-              <span class="control-value" id="val-t">500</span>
-            </div>
-            <input type="range" id="slider-t" min="10" max="10000" value="500" step="10" oninput="updateAll()">
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>&mu; &mdash; mutation rate / generation</span>
+            <span class="slider-value" id="val-mu">1.0e-8</span>
           </div>
-          <div class="control-group">
-            <div class="control-label">
-              <span>Source Nₑ</span>
-              <span class="control-value" id="val-NeS">10000</span>
-            </div>
-            <input type="range" id="slider-NeS" min="500" max="100000" value="10000" step="500" oninput="updateAll()">
-          </div>
-          <div class="control-group">
-            <div class="control-label">
-              <span>Target Nₑ</span>
-              <span class="control-value" id="val-NeT">2000</span>
-            </div>
-            <input type="range" id="slider-NeT" min="500" max="100000" value="2000" step="500" oninput="updateAll()">
-          </div>
-          <div class="formula-box">
-            Genetic drift accumulates with time and shrinks with population size in both branches:
-            F<sub>S</sub> = 1 - exp(-t / (2Nₑ,S)), F<sub>T</sub> = 1 - exp(-t / (2Nₑ,T)).
-          </div>
+          <input type="range" id="sl-mu" min="-9" max="-6" step="0.1" value="-8">
         </div>
 
-        <!-- IM params -->
-        <div class="card hidden" id="params-im">
-          <div class="card-title"><span class="dot" style="background:var(--accent-cyan)"></span> Migration Parameters
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>m &mdash; migration rate / generation</span>
+            <span class="slider-value" id="val-m">0.001</span>
           </div>
-          <div class="control-group">
-            <div class="control-label">
-              <span>Scaled migration rate (M)</span>
-              <span class="control-value" id="val-M">1.00</span>
-            </div>
-            <input type="range" id="slider-M" min="0.05" max="20" value="1" step="0.05" oninput="updateAll()">
-          </div>
-          <div class="formula-box">
-            Higher gene flow (larger M) means less differentiation between demes. At equilibrium, within-deme
-            coalescence time is always 2 units; between-deme time grows as gene flow decreases.
-          </div>
+          <input type="range" id="sl-m" min="-5" max="-1" step="0.1" value="-3">
         </div>
 
-        <!-- Present-day baseline — always shown -->
-        <div class="card">
-          <div class="card-title"><span class="dot" style="background:var(--accent-amber)"></span> Present-Day Baseline
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>r &mdash; recombination rate</span>
+            <span class="slider-value" id="val-r">0.010</span>
           </div>
-          <div class="formula-box" id="trait-formula-box">
-            Past influence is explicit: source signal is transported by drift scaling
-            r = (1 - F_target) / (1 - F_source), then adjusted by LD tagging ratio ρ<sub>T</sub>/ρ<sub>S</sub>, then converted to present-day R²/AUC/Brier.
-          </div>
-          <div class="control-group" style="margin-top:0.8rem">
-            <div class="control-label">
-              <span>Source R² (present-day baseline)</span>
-              <span class="control-value" id="val-r2s-base">0.50</span>
-            </div>
-            <input type="range" id="slider-r2s-base" min="0.05" max="0.95" value="0.50" step="0.01" oninput="updateAll()">
-          </div>
-          <div class="control-group" style="margin-top:0.8rem">
-            <div class="control-label">
-              <span>Source tagging efficiency (ρ<sub>S</sub>)</span>
-              <span class="control-value" id="val-rho-s">0.90</span>
-            </div>
-            <input type="range" id="slider-rho-s" min="0.10" max="1.00" value="0.90" step="0.01" oninput="updateAll()">
-          </div>
-          <div class="control-group" style="margin-top:0.8rem">
-            <div class="control-label">
-              <span>Target tagging efficiency (ρ<sub>T</sub>)</span>
-              <span class="control-value" id="val-rho-t">0.70</span>
-            </div>
-            <input type="range" id="slider-rho-t" min="0.10" max="1.00" value="0.70" step="0.01" oninput="updateAll()">
-          </div>
-          <div class="control-group" style="margin-top:0.8rem">
-            <div class="control-label">
-              <span>Outcome prevalence (for Brier)</span>
-              <span class="control-value" id="val-prev">0.10</span>
-            </div>
-            <input type="range" id="slider-prev" min="0.01" max="0.50" value="0.10" step="0.01" oninput="updateAll()">
-          </div>
+          <input type="range" id="sl-r" min="-3" max="-0.301" step="0.05" value="-2">
         </div>
 
-        <div class="card">
-          <div class="card-title"><span class="dot" style="background:var(--accent-emerald)"></span> Glossary</div>
-          <div style="font-size:0.75rem;color:var(--text-secondary);line-height:1.7">
-            <strong style="color:var(--accent-indigo)">F_ST</strong> — fraction of genetic variation due to population
-            structure (0 = identical, 1 = fully diverged)<br>
-            <strong style="color:var(--accent-indigo)">PGS</strong> — polygenic score: weighted sum of genetic variants
-            predicting a trait<br>
-            <strong style="color:var(--accent-indigo)">R²<sub>S</sub></strong> — present-day source variance explained
-            (baseline performance)<br>
-            <strong style="color:var(--accent-indigo)">Nₑ</strong> — effective population size: genetic equivalent of
-            census size<br>
-            <strong style="color:var(--accent-indigo)">M</strong> — scaled migration: higher = more gene flow
-            between demes<br>
-            <strong style="color:var(--accent-indigo)">δ</strong> — equilibrium differentiation between demes under
-            migration-drift balance<br>
-            <strong style="color:var(--accent-indigo)">MAF</strong> — minor allele frequency: how common the
-            less-frequent variant is
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>t &mdash; divergence time (generations)</span>
+            <span class="slider-value" id="val-t">500</span>
           </div>
+          <input type="range" id="sl-t" min="0" max="5000" step="10" value="500">
         </div>
 
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>R&sup2;<sub>source</sub> &mdash; source accuracy</span>
+            <span class="slider-value" id="val-R2">0.30</span>
+          </div>
+          <input type="range" id="sl-R2" min="0.01" max="0.95" step="0.01" value="0.30">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>&pi; &mdash; disease prevalence</span>
+            <span class="slider-value" id="val-pi">0.10</span>
+          </div>
+          <input type="range" id="sl-pi" min="0.01" max="0.50" step="0.01" value="0.10">
+        </div>
+
+        <div style="margin-top: 0.5rem;">
+          <a class="proof-link" href="https://github.com/SauersML/gnomon/blob/main/proofs/Calibrator/DGP.lean#L5068" target="_blank">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            EvolutionaryParameters &mdash; DGP.lean:5068
+          </a>
+        </div>
       </div>
 
-      <!-- ═══════════════════════════════════════ -->
-      <!-- MAIN CONTENT                           -->
-      <!-- ═══════════════════════════════════════ -->
-      <div class="content">
+      <!-- Right: Portability ratio + decomposition -->
+      <div class="card">
+        <div class="card-title">Portability Ratio &rho;(t)</div>
 
-        <!-- Key Metrics -->
-        <div class="metrics-row">
-          <div class="metric-card indigo">
-            <div class="metric-label" id="metric-drift-label">Source Drift (F_S)</div>
-            <div class="metric-value" id="metric-drift">0.0247</div>
-            <div class="metric-formula" id="metric-drift-formula">Genetic drift accumulated in the source population
-            </div>
-            <div class="metric-proof" id="metric-drift-proof"><a onclick="openProof('fstFromGenerations')">Lean proof
-                ↗</a></div>
+        <div style="text-align:center; margin-bottom: 1.25rem;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size: 2.8rem; font-weight: 800;" id="rho-big" class="color-violet">0.000</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">fraction of source R&sup2; retained</div>
+        </div>
+
+        <div class="formula-block">
+          <span class="comment">-- DGP.lean:5601</span><br>
+          &rho;(t) = <span style="color:var(--accent-indigo)">(1 - F<sub>ST</sub>)</span>
+          &times; <span style="color:var(--accent-cyan)">exp(-2rt)</span>
+          &times; <span style="color:var(--accent-amber)">exp(-&theta;&tau;)</span>
+          &times; <span style="color:var(--accent-emerald)">(1 + M&tau;/(1+M))</span>
+        </div>
+
+        <!-- Factor bars -->
+        <div style="margin-top: 1rem;">
+          <div class="factor-bar">
+            <span class="factor-label"><span class="rate-dot" style="background:var(--accent-indigo)"></span>1 - F<sub>ST</sub>(t)</span>
+            <div class="bar-track"><div class="bar-fill" id="bar-drift" style="background:var(--accent-indigo); width:80%"><span class="bar-value" id="bv-drift">0.80</span></div></div>
           </div>
-          <div class="metric-card cyan">
-            <div class="metric-label" id="metric-drift-t-label">Target Drift (F_T)</div>
-            <div class="metric-value" id="metric-drift-t">0.0247</div>
-            <div class="metric-formula" id="metric-drift-t-formula">Genetic drift accumulated in the target population
-            </div>
-            <div class="metric-proof" id="metric-drift-t-proof"><a onclick="openProof('fstFromGenerations')">Lean proof
-                ↗</a></div>
+          <div class="factor-bar">
+            <span class="factor-label"><span class="rate-dot" style="background:var(--accent-cyan)"></span>LD retention</span>
+            <div class="bar-track"><div class="bar-fill" id="bar-ld" style="background:var(--accent-cyan); width:80%"><span class="bar-value" id="bv-ld">0.80</span></div></div>
           </div>
-          <div class="metric-card amber">
-            <div class="metric-label">Typical Mean Shift (Source SD Units)</div>
-            <div class="metric-value" id="metric-mean-shift">0.141</div>
-            <div class="metric-formula">Expected |Δμ| / σ_source from demographic drift history</div>
-            <div class="metric-proof"><a class="def-link" onclick="openProof('expected_abs_mean_shift_bound')">Lean theorem
-                (assumes CLT) ↗</a></div>
+          <div class="factor-bar">
+            <span class="factor-label"><span class="rate-dot" style="background:var(--accent-amber)"></span>Mut. erosion</span>
+            <div class="bar-track"><div class="bar-fill" id="bar-mut" style="background:var(--accent-amber); width:80%"><span class="bar-value" id="bv-mut">0.80</span></div></div>
+          </div>
+          <div class="factor-bar">
+            <span class="factor-label"><span class="rate-dot" style="background:var(--accent-emerald)"></span>Mig. boost</span>
+            <div class="bar-track"><div class="bar-fill" id="bar-mig" style="background:var(--accent-emerald); width:100%"><span class="bar-value" id="bv-mig">1.00</span></div></div>
           </div>
         </div>
 
-        <div class="metrics-row">
-          <div class="metric-card indigo">
-            <div class="metric-label">Source R² (Present Day)</div>
-            <div class="metric-value" id="metric-r2-s">0.153</div>
-            <div class="metric-formula">Present-day variance explained in source (exactly tied to statistical R² under signal+noise moments)</div>
-            <div class="metric-proof"><a onclick="openProof('presentDayR2_eq_statistical_rsquared')">Lean theorem ↗</a></div>
-          </div>
-          <div class="metric-card cyan">
-            <div class="metric-label">Target R² (Present Day)</div>
-            <div class="metric-value" id="metric-r2-t">0.141</div>
-            <div class="metric-formula">Present-day variance explained in target (exactly tied to statistical R² under signal+noise moments)</div>
-            <div class="metric-proof"><a onclick="openProof('presentDayR2_eq_statistical_rsquared')">Lean theorem ↗</a></div>
-          </div>
-          <div class="metric-card amber">
-            <div class="metric-label">Relative Portability</div>
-            <div class="metric-value" id="metric-portability">92.3%</div>
-            <div class="metric-formula">Target R² / Source R²</div>
-            <div class="metric-proof"><a onclick="openProof('portability_ratio_lt_one_of_positive_drift')">Lean theorem ↗</a></div>
-          </div>
+        <div style="margin-top: 1rem;">
+          <a class="proof-link" href="https://github.com/SauersML/gnomon/blob/main/proofs/Calibrator/DGP.lean#L5601" target="_blank">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            portabilityRatio &mdash; DGP.lean:5601
+          </a>
         </div>
-
-        <div class="metrics-row">
-          <div class="metric-card indigo">
-            <div class="metric-label">Source AUC (Exact LTM)</div>
-            <div class="metric-value" id="metric-auc-s">1.000</div>
-            <div class="metric-formula">Exact liability-threshold AUC: Φ(√(SNR/2))</div>
-            <div class="metric-proof"><a onclick="openProof('liabilityAUCFromSNR')">Lean def ↗</a></div>
-          </div>
-          <div class="metric-card cyan">
-            <div class="metric-label">Target AUC (Exact LTM)</div>
-            <div class="metric-value" id="metric-auc-t">0.882</div>
-            <div class="metric-formula">Exact liability-threshold AUC after transport</div>
-            <div class="metric-proof"><a onclick="openProof('targetLiabilityAUC_lt_source_of_observables')">Lean theorem ↗</a></div>
-          </div>
-          <div class="metric-card amber">
-            <div class="metric-label">Brier Gap (Exact Model)</div>
-            <div class="metric-value" id="metric-brier-gap">+0.0012</div>
-            <div class="metric-formula">Target - Source Bayes Brier from exact calibrated risk integral</div>
-            <div class="metric-proof"><a onclick="openProof('exactBrierRiskOfCalibrated_eq_integral')">Lean theorem ↗</a></div>
-          </div>
-        </div>
-
-        <div class="metrics-row" id="metrics-ps-extra">
-          <div class="metric-card indigo">
-            <div class="metric-label">Past Demography: Coalescent τ (Source)</div>
-            <div class="metric-value" id="metric-tau-s">0.025</div>
-            <div class="metric-formula">Past divergence time scaled by source population size</div>
-            <div class="metric-proof"><a onclick="openProof('coalescentTau')">Lean proof ↗</a></div>
-          </div>
-          <div class="metric-card cyan">
-            <div class="metric-label">Past Demography: Coalescent τ (Target)</div>
-            <div class="metric-value" id="metric-tau-t">0.025</div>
-            <div class="metric-formula">Past divergence time scaled by target population size</div>
-            <div class="metric-proof"><a onclick="openProof('coalescentTau')">Lean proof ↗</a></div>
-          </div>
-        </div>
-
-        <!-- Extra metrics for IM -->
-        <div class="metrics-row hidden" id="metrics-im-extra">
-          <div class="metric-card indigo">
-            <div class="metric-label">Past Demography: Within-Deme Coalescence</div>
-            <div class="metric-value" id="metric-et-same">2.000</div>
-            <div class="metric-formula">Expected time to common ancestor (same deme)</div>
-            <div class="metric-proof"><a onclick="openProof('twoDemeIMEquilibriumETss')">Lean proof ↗</a></div>
-          </div>
-          <div class="metric-card cyan">
-            <div class="metric-label">Past Demography: Between-Deme Coalescence</div>
-            <div class="metric-value" id="metric-et-diff">3.000</div>
-            <div class="metric-formula">Expected time to common ancestor (different demes)</div>
-            <div class="metric-proof"><a onclick="openProof('twoDemeIMEquilibriumETst')">Lean proof ↗</a></div>
-          </div>
-        </div>
-
-        <div id="charts-ps">
-          <div class="charts-grid">
-            <div class="chart-card">
-              <h3>PGS Distribution: Source vs Target Population</h3>
-              <canvas id="chart-ps-mean-dist"></canvas>
-            </div>
-            <div class="chart-card">
-              <h3>Population Divergence Over Time</h3>
-              <canvas id="chart-ps-fst"></canvas>
-            </div>
-          </div>
-          <div class="charts-grid" style="margin-top:1.2rem">
-            <div class="chart-card">
-              <h3>Present-Day Performance vs Target Divergence</h3>
-              <canvas id="chart-ps-summary"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- ═══ CHARTS: IM Equilibrium ═══ -->
-        <div id="charts-im" class="hidden">
-          <div class="charts-grid">
-            <div class="chart-card">
-              <h3>PGS Mean Distribution: Source vs Target (IM Eq.)</h3>
-              <canvas id="chart-im-mean-dist"></canvas>
-            </div>
-            <div class="chart-card">
-              <h3>Genetic Differentiation vs Migration Rate</h3>
-              <canvas id="chart-im-delta"></canvas>
-            </div>
-          </div>
-          <div class="charts-grid" style="margin-top:1.2rem">
-            <div class="chart-card">
-              <h3>Past Coalescence vs Migration Rate</h3>
-              <canvas id="chart-im-coal"></canvas>
-            </div>
-            <div class="chart-card">
-              <h3>Squared Mean PGS Difference vs Migration Rate</h3>
-              <canvas id="chart-im-mean-sq"></canvas>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
-  </div>
 
+    <!-- Metric Cards: Source vs Target -->
+    <h2 class="section-heading">Source vs. Target Metrics</h2>
+    <div class="grid-4" style="margin-bottom: 0.75rem;">
+      <div class="metric-card">
+        <div class="label">R&sup2; source</div>
+        <div class="value color-indigo" id="mc-r2s">0.300</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">R&sup2; target</div>
+        <div class="value color-violet" id="mc-r2t">0.000</div>
+        <div class="sub" id="mc-r2drop"></div>
+      </div>
+      <div class="metric-card">
+        <div class="label">AUC source</div>
+        <div class="value color-cyan" id="mc-aucs">0.500</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">AUC target</div>
+        <div class="value color-amber" id="mc-auct">0.500</div>
+        <div class="sub" id="mc-aucdrop"></div>
+      </div>
+    </div>
+    <div class="grid-4">
+      <div class="metric-card">
+        <div class="label">Brier source</div>
+        <div class="value color-emerald" id="mc-brs">0.000</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Brier target</div>
+        <div class="value color-rose" id="mc-brt">0.000</div>
+        <div class="sub" id="mc-brdrop"></div>
+      </div>
+      <div class="metric-card">
+        <div class="label">SNR source</div>
+        <div class="value" style="color:var(--text-secondary)" id="mc-snrs">0.000</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">SNR target</div>
+        <div class="value" style="color:var(--text-secondary)" id="mc-snrt">0.000</div>
+      </div>
+    </div>
 
+    <!-- Temporal Evolution Chart -->
+    <h2 class="section-heading">Temporal Evolution of Portability</h2>
+    <div class="card">
+      <div class="card-title">R&sup2;, AUC, and Brier score over divergence time</div>
+      <div class="chart-wrap"><canvas id="chart-temporal"></canvas></div>
+      <div style="margin-top: 0.75rem;">
+        <a class="proof-link" href="https://github.com/SauersML/gnomon/blob/main/proofs/Calibrator/DGP.lean#L5472" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          End-to-end pipeline &mdash; DGP.lean:5472
+        </a>
+      </div>
+    </div>
+
+    <!-- Decomposition + Decay Rates side by side -->
+    <h2 class="section-heading">Portability Decay Rate Decomposition</h2>
+    <div class="grid-2">
+
+      <!-- Decomposition chart -->
+      <div class="card">
+        <div class="card-title">Factor contributions (log scale)</div>
+        <div class="chart-wrap" style="height:280px;"><canvas id="chart-decomp"></canvas></div>
+      </div>
+
+      <!-- Decay rates table -->
+      <div class="card">
+        <div class="card-title">Instantaneous decay rates (per generation)</div>
+
+        <div class="formula-block" style="margin-bottom:1rem;">
+          <span class="comment">-- DGP.lean:5821</span><br>
+          d log(&rho;)/dt &asymp; -(drift + LD + mutation - migration)
+        </div>
+
+        <table class="rate-table">
+          <thead>
+            <tr><th>Force</th><th>Formula</th><th>Rate</th><th>Share</th></tr>
+          </thead>
+          <tbody>
+            <tr id="rate-drift">
+              <td><span class="rate-dot" style="background:var(--accent-indigo)"></span>Drift</td>
+              <td>1/(2N<sub>e</sub>(1+&theta;+M))</td>
+              <td class="rate-val">0</td>
+              <td class="rate-pct">0%</td>
+            </tr>
+            <tr id="rate-ld">
+              <td><span class="rate-dot" style="background:var(--accent-cyan)"></span>LD decay</td>
+              <td>2r</td>
+              <td class="rate-val">0</td>
+              <td class="rate-pct">0%</td>
+            </tr>
+            <tr id="rate-mut">
+              <td><span class="rate-dot" style="background:var(--accent-amber)"></span>Mutation</td>
+              <td>2&mu;</td>
+              <td class="rate-val">0</td>
+              <td class="rate-pct">0%</td>
+            </tr>
+            <tr id="rate-mig">
+              <td><span class="rate-dot" style="background:var(--accent-emerald)"></span>Migration</td>
+              <td>-M/(2N<sub>e</sub>(1+M))</td>
+              <td class="rate-val">0</td>
+              <td class="rate-pct">0%</td>
+            </tr>
+            <tr style="font-weight:700; border-top: 2px solid var(--border);">
+              <td colspan="2">Net decay rate</td>
+              <td class="rate-val" id="rate-net">0</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top: 0.75rem;">
+          <a class="proof-link" href="https://github.com/SauersML/gnomon/blob/main/proofs/Calibrator/DGP.lean#L5821" target="_blank">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            portabilityDecayRate &mdash; DGP.lean:5821
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scaled Parameters -->
+    <h2 class="section-heading">Scaled Parameters</h2>
+    <div class="grid-4">
+      <div class="metric-card">
+        <div class="label">&theta; = 4N<sub>e</sub>&mu;</div>
+        <div class="value" style="color:var(--text-secondary); font-size:1.3rem;" id="mc-theta">0.000</div>
+        <div class="sub">scaled mutation</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">&tau; = t/(2N<sub>e</sub>)</div>
+        <div class="value" style="color:var(--text-secondary); font-size:1.3rem;" id="mc-tau">0.000</div>
+        <div class="sub">scaled time</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">M = 4N<sub>e</sub>m</div>
+        <div class="value" style="color:var(--text-secondary); font-size:1.3rem;" id="mc-bigM">0.000</div>
+        <div class="sub">scaled migration</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">F<sub>ST</sub>(eq)</div>
+        <div class="value" style="color:var(--text-secondary); font-size:1.3rem;" id="mc-fsteq">0.000</div>
+        <div class="sub">1/(1+&theta;+M)</div>
+      </div>
+    </div>
+
+    <!-- Methodology -->
+    <div class="methodology">
+      <strong>Methodology.</strong>
+      All formulas displayed are computed using the unified evolutionary portability model formally proven in Lean 4 with Mathlib.
+      The model derives R&sup2;, AUC, and Brier score degradation from Wright-Fisher population genetics,
+      with every step verified by machine-checked proof. The four evolutionary forces &mdash; genetic drift,
+      LD decay via recombination, mutation erosion, and migration boost &mdash; compose multiplicatively because
+      they act on independent aspects of the PGS-phenotype covariance. The temporal dynamics follow from the
+      heterozygosity recurrence H(t+1) = (1-1/(2N<sub>e</sub>))(1-&theta;/(2N<sub>e</sub>)) H(t) and the LD
+      recurrence D(t+1) = (1-r) D(t). See
+      <a href="https://github.com/SauersML/gnomon/blob/main/proofs/Calibrator/DGP.lean" target="_blank" style="color:var(--accent-indigo)">DGP.lean</a>
+      for the complete end-to-end pipeline proof.
+    </div>
+
+    <!-- Glossary -->
+    <h2 class="section-heading">Glossary</h2>
+    <div class="card">
+      <dl class="glossary-grid">
+        <div class="glossary-item">
+          <dt>N<sub>e</sub></dt>
+          <dd>Effective population size (harmonic mean)</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>&mu;</dt>
+          <dd>Per-locus mutation rate per generation</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>m</dt>
+          <dd>Migration rate per generation (symmetric)</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>r</dt>
+          <dd>Recombination rate per locus per generation</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>t</dt>
+          <dd>Divergence time in generations</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>&theta;</dt>
+          <dd>Scaled mutation rate: 4N<sub>e</sub>&mu;</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>&tau;</dt>
+          <dd>Scaled divergence time: t / (2N<sub>e</sub>)</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>M</dt>
+          <dd>Scaled migration rate: 4N<sub>e</sub>m</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>F<sub>ST</sub></dt>
+          <dd>Fixation index measuring allele frequency divergence</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>&rho;(t)</dt>
+          <dd>Portability ratio: fraction of R&sup2; transferred</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>AUC</dt>
+          <dd>Area under ROC curve from liability threshold model</dd>
+        </div>
+        <div class="glossary-item">
+          <dt>Brier</dt>
+          <dd>Brier score: &pi;(1-&pi;)(1-R&sup2;)</dd>
+        </div>
+      </dl>
+    </div>
+
+  </div><!-- /container -->
 
   <script>
-    // Open Lean symbol in GitHub code search (works for defs/lemmas/theorems)
-    function openProof(symbolName) {
-      window.open('https://github.com/SauersML/gnomon/search?q=' + encodeURIComponent(symbolName) + '&type=code', '_blank');
-    }
+    // ================================================================
+    // UNIFIED EVOLUTIONARY PORTABILITY MODEL
+    // Matches DGP.lean PGSEvolutionaryModel exactly
+    // ================================================================
 
-    // ════════════════════════════════════════════════════════════
-    // PROVEN FORMULAS — each annotated with its Lean theorem name
-    // ════════════════════════════════════════════════════════════
-
-    // fstFromGenerations_eq: fst(t,Ne) = 1 - exp(-t/(2Ne))
-    function fstFromGenerations(t, Ne) {
-      return 1 - Math.exp(-t / (2 * Ne));
-    }
-
-    // coalescentTau: τ = t/(2Ne)
-    function coalescentTau(t, Ne) {
-      return t / (2 * Ne);
-    }
-
-    // twoDemeIMEquilibriumDelta_eq: δ = 1/(2M+1)
-    function imEquilibriumDelta(M) {
-      return 1 / (2 * M + 1);
-    }
-
-    // twoDemeIMEquilibriumETss: E[T_same] = 2
-    function imETsame() { return 2; }
-
-    // twoDemeIMEquilibriumETst: E[T_diff] = (2M+1)/M
-    function imETdiff(M) { return (2 * M + 1) / M; }
-
-    // sourceVarianceFromR2: v_source = r2_source / (1 - r2_source)
-    function sourceVarianceFromR2(r2Source) {
-      return r2Source / (1 - r2Source);
-    }
-
-    // variance_mean_pgs_diff: Var(Δμ) = 2d·V_signal
-    function varMeanDiff(signalVar, d) {
-      return 2 * d * signalVar;
-    }
-
-    // expectedSqMeanPGSDiff_pureSplit_eq: E[(Δμ)²] = 4·fst·V_signal
-    function expectedSqMeanDiff_PS(signalVar, fst) {
-      return 4 * fst * signalVar;
-    }
-
-    // expectedSqMeanPGSDiff_IMEquilibrium_eq: E[(Δμ)²] = 4δ·V_signal
-    function expectedSqMeanDiff_IM(signalVar, M) {
-      return 4 * imEquilibriumDelta(M) * signalVar;
-    }
-
-    // pairwise_fst_decomposition: F_ST(S,T) = F_S + F_T - F_S*F_T
-    function pairwiseFstFromBranches(fstS, fstT) {
-      return fstS + fstT - fstS * fstT;
-    }
-
-    // expected_abs_mean_shift_bound (via folded-normal moment): E[|Δμ|] = √(Var(Δμ)) · √(2/π)
-    function expectedAbsMeanDiff(signalVar, d) {
-      return Math.sqrt(varMeanDiff(signalVar, d)) * Math.sqrt(2 / Math.PI);
-    }
-
-    // Closed-form shift in source-standard-deviation units:
-    // E[|Δμ|/σ_S] = 2*sqrt((F_S + F_T)/(π*(1-F_S)))
-    function expectedRelativeShiftFromFst(fstS, fstT) {
-      const denom = Math.max(1e-9, 1 - fstS);
-      return 2 * Math.sqrt(Math.max(0, fstS + fstT) / (Math.PI * denom));
-    }
-
-    // driftTransportRatio: r = (1 - fstTarget) / (1 - fstSource)
-    function driftTransportRatio(fstSource, fstTarget) {
-      return (1 - fstTarget) / (1 - fstSource);
-    }
-
-    // targetVarianceFromSource: v_target = v_source * r
-    function targetVarianceFromSource(vSource, fstSource, fstTarget) {
-      return vSource * driftTransportRatio(fstSource, fstTarget);
-    }
-
-    // r2FromVarianceScaleOne: r2 = v / (v + 1), with environmental scale fixed to 1
-    function r2FromVarianceScaleOne(v) {
-      return v / (v + 1);
-    }
-
-    // targetR2FromObservables_closed_form (Lean theorem)
-    function targetR2FromObservables(r2Source, fstSource, fstTarget) {
-      const r = driftTransportRatio(fstSource, fstTarget);
-      return (r * r2Source) / (1 - r2Source + r * r2Source);
-    }
-
-    // Present-day R² proxy under additive signal + independent environmental noise
-    function expectedR2(vPgs, vEnv) {
-      const denom = vPgs + vEnv;
-      return vPgs / denom;
-    }
-
-    // SNR witness used for theorem-backed AUC ordering (StrictMono link assumption)
-    function signalToNoise(vPgs, vEnv) {
-      if (vEnv <= 0) return Number.POSITIVE_INFINITY;
-      return Math.max(0, vPgs / vEnv);
-    }
-
-    // Standard normal PDF
-    function normalPdf(x) {
-      return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
-    }
-
-    // erf implementation for numerical CDF evaluation
-    function erf(x) {
+    // Standard normal CDF approximation (Abramowitz & Stegun 26.2.17)
+    function phi(x) {
+      const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;
+      const a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
       const sign = x < 0 ? -1 : 1;
-      const ax = Math.abs(x);
-      const t = 1 / (1 + 0.3275911 * ax);
-      const y = 1 - (((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t) * Math.exp(-ax * ax);
-      return sign * y;
+      const t = 1 / (1 + p * Math.abs(x));
+      const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x / 2);
+      return 0.5 * (1 + sign * y);
     }
 
-    // Standard normal CDF Φ(x)
-    function normalCdf(x) {
-      return 0.5 * (1 + erf(x / Math.SQRT2));
+    // SNR from R^2: DGP.lean:5667
+    function snrFromR2(r2) {
+      return r2 / (1 - r2);
     }
 
-    // inverse-normal implementation for threshold parameterization Φ^{-1}(p)
-    function normalInvCdf(p) {
-      const pp = Math.min(1 - 1e-12, Math.max(1e-12, p));
-      const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
-      const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
-      const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
-      const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
-      const plow = 0.02425;
-      const phigh = 1 - plow;
-      let q, r;
-      if (pp < plow) {
-        q = Math.sqrt(-2 * Math.log(pp));
-        return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
-          ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
-      }
-      if (pp > phigh) {
-        q = Math.sqrt(-2 * Math.log(1 - pp));
-        return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
-          ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
-      }
-      q = pp - 0.5;
-      r = q * q;
-      return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
-        (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+    // AUC from R^2: DGP.lean:5688
+    function aucFromR2(r2) {
+      if (r2 <= 0) return 0.5;
+      if (r2 >= 1) return 1.0;
+      return phi(Math.sqrt(snrFromR2(r2) / 2));
     }
 
-    // liabilityAUCFromSNR: exact AUC under equal-variance Gaussian liability model
-    function liabilityAUCFromSNR(snr) {
-      return normalCdf(Math.sqrt(Math.max(0, snr) / 2));
+    // Brier from R^2 and prevalence: DGP.lean:5738
+    function brierFromR2(r2, prev) {
+      return prev * (1 - prev) * (1 - r2);
     }
 
-    // Simpson integration on [a,b]
-    function simpsonIntegrate(f, a, b, n = 800) {
-      const m = n % 2 === 0 ? n : n + 1;
-      const h = (b - a) / m;
-      let s = f(a) + f(b);
-      for (let i = 1; i < m; i++) {
-        const x = a + i * h;
-        s += (i % 2 === 0 ? 2 : 4) * f(x);
-      }
-      return (h / 3) * s;
-    }
+    // Compute all model quantities from raw parameters
+    function computeModel(Ne, mu, mig, r, t, R2_source, prev) {
+      // Scaled parameters: DGP.lean:5090-5099
+      const theta = 4 * Ne * mu;
+      const tau = t / (2 * Ne);
+      const bigM = 4 * Ne * mig;
 
-    // Exact calibrated Brier risk under the LTM score model:
-    // E_S[ η(S) (1-η(S)) ], η(s)=Φ(s - t), S~N(0, vSignal), t=Φ^{-1}(1-π)
-    function exactLiabilityBrier(vSignal, prevalence) {
-      const v = Math.max(1e-9, vSignal);
-      const sd = Math.sqrt(v);
-      const t = normalInvCdf(1 - prevalence);
-      const integrand = (z) => {
-        const s = sd * z;
-        const eta = normalCdf(s - t);
-        return eta * (1 - eta) * normalPdf(z);
+      // Fst equilibrium: DGP.lean:5137
+      const fstEq = 1 / (1 + theta + bigM);
+
+      // Heterozygosity decay factor: DGP.lean:5529
+      const lambda = (1 - 1 / (2 * Ne)) * (1 - theta / (2 * Ne));
+
+      // Transient Fst: DGP.lean:5541
+      const fstTransient = fstEq * (1 - Math.pow(lambda, Math.floor(t)));
+
+      // LD retention: DGP.lean:5553 (via sharedLDRetention at 5185)
+      const ldRetention = Math.exp(-2 * r * t);
+
+      // Mutation erosion: DGP.lean:5565 (via mutationLDErosion at 5216)
+      const mutErosion = Math.exp(-theta * tau);
+
+      // Migration boost: DGP.lean:5576 (via migrationLDBoost at 5234)
+      const migBoost = 1 + bigM * tau / (1 + bigM);
+
+      // Portability ratio: DGP.lean:5601
+      const rho = (1 - fstTransient) * ldRetention * mutErosion * migBoost;
+
+      // Target R^2: DGP.lean:5623
+      const R2_target = R2_source * Math.max(0, Math.min(1, rho));
+
+      // Decay rates: DGP.lean:5821-5848
+      const driftRate = 1 / (2 * Ne * (1 + theta + bigM));
+      const ldRate = 2 * r;
+      const mutRate = 2 * mu;
+      const migRate = bigM / (2 * Ne * (1 + bigM));
+      const netRate = driftRate + ldRate + mutRate - migRate;
+
+      return {
+        theta, tau, bigM, fstEq, fstTransient, lambda,
+        ldRetention, mutErosion, migBoost, rho,
+        R2_source, R2_target,
+        AUC_source: aucFromR2(R2_source),
+        AUC_target: aucFromR2(R2_target),
+        Brier_source: brierFromR2(R2_source, prev),
+        Brier_target: brierFromR2(R2_target, prev),
+        SNR_source: snrFromR2(R2_source),
+        SNR_target: snrFromR2(R2_target),
+        driftRate, ldRate, mutRate, migRate, netRate,
+        driftFactor: 1 - fstTransient,
+        prev
       };
-      return simpsonIntegrate(integrand, -8, 8, 1000);
     }
 
+    // Compute model at a given time (for temporal chart)
+    function computeAtTime(Ne, mu, mig, r, t, R2_source, prev) {
+      return computeModel(Ne, mu, mig, r, t, R2_source, prev);
+    }
 
+    // ================================================================
+    // DOM / CONTROLS
+    // ================================================================
 
-    // ════════════════════════════════════════════════════════════
-    // UI LOGIC
-    // ════════════════════════════════════════════════════════════
+    const sliders = {
+      Ne:  document.getElementById('sl-Ne'),
+      mu:  document.getElementById('sl-mu'),
+      m:   document.getElementById('sl-m'),
+      r:   document.getElementById('sl-r'),
+      t:   document.getElementById('sl-t'),
+      R2:  document.getElementById('sl-R2'),
+      pi:  document.getElementById('sl-pi'),
+    };
 
     function getParams() {
-      const model = document.getElementById('model-select').value;
-      const t = parseFloat(document.getElementById('slider-t').value);
-      const NeS = parseFloat(document.getElementById('slider-NeS').value);
-      const NeT = parseFloat(document.getElementById('slider-NeT').value);
-      const M = parseFloat(document.getElementById('slider-M').value);
-      const r2Source = parseFloat(document.getElementById('slider-r2s-base').value);
-      const rhoSraw = parseFloat(document.getElementById('slider-rho-s').value);
-      const rhoTraw = parseFloat(document.getElementById('slider-rho-t').value);
-      const prevalence = parseFloat(document.getElementById('slider-prev').value);
-      const rhoS = Math.max(1e-6, Math.min(1, rhoSraw));
-      const rhoT = Math.max(1e-6, Math.min(rhoTraw, rhoS));
-      const vEnv = 1.0;
-      const vPgsSource = sourceVarianceFromR2(r2Source);
-
-      let fstS, fstT, d;
-      if (model === 'pure_split') {
-        fstS = fstFromGenerations(t, NeS); // source branch drift from common ancestor
-        fstT = fstFromGenerations(t, NeT); // target branch drift from common ancestor
-        d = fstS + fstT; // branch-sum drift index for mean-shift variance
-      } else {
-        // IM equilibrium (symmetric by definition)
-        fstS = imEquilibriumDelta(M);
-        fstT = fstS;
-        d = 2 * fstS;
-      }
-
-      const fstPair = pairwiseFstFromBranches(fstS, fstT);
-      return { model, t, NeS, NeT, M, prevalence, r2Source, rhoS, rhoT, vEnv, vPgsSource, fstS, fstT, fstPair, d };
+      return {
+        Ne:  +sliders.Ne.value,
+        mu:  Math.pow(10, +sliders.mu.value),
+        m:   Math.pow(10, +sliders.m.value),
+        r:   Math.pow(10, +sliders.r.value),
+        t:   +sliders.t.value,
+        R2:  +sliders.R2.value,
+        pi:  +sliders.pi.value,
+      };
     }
 
-    function gaussian(x, mu, sigma) {
-      if (sigma <= 0) return 0;
-      return Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2)) / (sigma * Math.sqrt(2 * Math.PI));
+    function fmtSci(x, digits) {
+      if (x === 0) return '0';
+      return x.toExponential(digits || 1);
     }
 
-    // ════════════════════════════════════════════════════════════
-    // CHART DEFAULTS
-    // ════════════════════════════════════════════════════════════
-    const baseOpts = (xLabel, yLabel) => ({
+    function fmtNum(x, d) {
+      return x.toFixed(d === undefined ? 3 : d);
+    }
+
+    function fmtPct(x) {
+      return (x * 100).toFixed(1) + '%';
+    }
+
+    // ================================================================
+    // CHARTS
+    // ================================================================
+
+    const chartColors = {
+      r2: '#8b5cf6',
+      auc: '#06b6d4',
+      brier: '#f43f5e',
+      rho: '#6366f1',
+    };
+
+    const commonChartOptions = {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 150 },
       plugins: {
-        legend: { labels: { color: '#94a3b8', font: { size: 10, family: 'Inter' } } },
+        legend: {
+          labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 } }
+        }
       },
       scales: {
         x: {
-          ticks: { color: '#64748b', font: { size: 9 }, maxTicksLimit: 8 },
-          grid: { color: 'rgba(42,51,82,0.5)' },
-          title: { display: true, text: xLabel, color: '#64748b', font: { size: 10 } }
+          ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 11 } },
+          grid: { color: 'rgba(255,255,255,0.04)' },
         },
         y: {
-          ticks: { color: '#64748b', font: { size: 9 } },
-          grid: { color: 'rgba(42,51,82,0.5)' },
-          title: { display: true, text: yLabel, color: '#64748b', font: { size: 10 } }
+          ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 11 } },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+        }
+      }
+    };
+
+    // Temporal chart
+    const ctxTemporal = document.getElementById('chart-temporal').getContext('2d');
+    const temporalChart = new Chart(ctxTemporal, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'R\u00B2 target',
+            data: [],
+            borderColor: chartColors.r2,
+            backgroundColor: chartColors.r2 + '18',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 0,
+            borderWidth: 2,
+          },
+          {
+            label: 'AUC target',
+            data: [],
+            borderColor: chartColors.auc,
+            backgroundColor: 'transparent',
+            tension: 0.3,
+            pointRadius: 0,
+            borderWidth: 2,
+          },
+          {
+            label: 'Brier target',
+            data: [],
+            borderColor: chartColors.brier,
+            backgroundColor: 'transparent',
+            tension: 0.3,
+            pointRadius: 0,
+            borderWidth: 2,
+            borderDash: [6, 3],
+          },
+          {
+            label: '\u03C1(t)',
+            data: [],
+            borderColor: chartColors.rho,
+            backgroundColor: 'transparent',
+            tension: 0.3,
+            pointRadius: 0,
+            borderWidth: 2,
+            borderDash: [2, 2],
+          },
+        ]
+      },
+      options: {
+        ...commonChartOptions,
+        scales: {
+          ...commonChartOptions.scales,
+          x: {
+            ...commonChartOptions.scales.x,
+            title: { display: true, text: 'Generations', color: '#64748b' }
+          },
+          y: {
+            ...commonChartOptions.scales.y,
+            min: 0, max: 1,
+            title: { display: true, text: 'Value', color: '#64748b' }
+          }
+        },
+        plugins: {
+          ...commonChartOptions.plugins,
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(4);
+              }
+            }
+          }
         }
       }
     });
 
-    let charts = {};
+    // Decomposition bar chart
+    const ctxDecomp = document.getElementById('chart-decomp').getContext('2d');
+    const decompChart = new Chart(ctxDecomp, {
+      type: 'bar',
+      data: {
+        labels: ['1 - Fst', 'LD retention', 'Mut. erosion', 'Mig. boost'],
+        datasets: [{
+          label: 'log contribution',
+          data: [0, 0, 0, 0],
+          backgroundColor: [
+            'rgba(99,102,241,0.7)',
+            'rgba(6,182,212,0.7)',
+            'rgba(245,158,11,0.7)',
+            'rgba(16,185,129,0.7)',
+          ],
+          borderColor: [
+            '#6366f1', '#06b6d4', '#f59e0b', '#10b981',
+          ],
+          borderWidth: 1,
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        ...commonChartOptions,
+        indexAxis: 'y',
+        scales: {
+          x: {
+            ...commonChartOptions.scales.x,
+            title: { display: true, text: 'log\u2081\u2080(factor)', color: '#64748b' }
+          },
+          y: {
+            ...commonChartOptions.scales.y,
+          }
+        },
+        plugins: {
+          ...commonChartOptions.plugins,
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return 'log\u2081\u2080 = ' + ctx.parsed.x.toFixed(4);
+              }
+            }
+          }
+        }
+      }
+    });
 
-    function makeChart(id, xLabel, yLabel) {
-      return new Chart(document.getElementById(id), {
-        type: 'line',
-        data: { labels: [], datasets: [] },
-        options: baseOpts(xLabel, yLabel),
-      });
-    }
+    // ================================================================
+    // UPDATE
+    // ================================================================
 
-    function initCharts() {
-      // Pure Split charts
-      charts.psMeanDist = makeChart('chart-ps-mean-dist', 'PGS (standardized)', 'Density');
-      charts.psFst = makeChart('chart-ps-fst', 'Generations since split', 'Population divergence (F_ST)');
-      charts.psSummary = makeChart('chart-ps-summary', 'Target divergence (F_T)', 'Present-day performance');
-
-      // IM charts
-      charts.imMeanDist = makeChart('chart-im-mean-dist', 'PGS (standardized)', 'Density');
-      charts.imDelta = makeChart('chart-im-delta', 'Scaled migration rate (M = 4Nₑm)', 'Genetic differentiation (δ)');
-      charts.imCoal = makeChart('chart-im-coal', 'Scaled migration rate (M = 4Nₑm)', 'Expected generations to common ancestor (×2Nₑ)');
-      charts.imMeanSq = makeChart('chart-im-mean-sq', 'Scaled migration rate (M = 4Nₑm)', 'Squared mean PGS difference (relative to source signal)');
-    }
-
-    function ds(label, data, color, opts) {
-      return {
-        label, data, borderColor: color, backgroundColor: color + '18',
-        borderWidth: 2, pointRadius: 0, tension: 0.4, fill: !!opts?.fill, ...opts
-      };
-    }
-
-    function linspace(a, b, n) {
-      if (n <= 1) return [a];
-      const xs = [];
-      for (let i = 0; i < n; i++) xs.push(a + (b - a) * i / (n - 1));
-      return xs;
-    }
-
-    // ════════════════════════════════════════════════════════════
-    // UPDATE ALL
-    // ════════════════════════════════════════════════════════════
-    function updateAll() {
+    function update() {
       const p = getParams();
 
-      // ── Display values ──
-      document.getElementById('val-t').textContent = p.t;
-      document.getElementById('val-NeS').textContent = p.NeS.toLocaleString();
-      document.getElementById('val-NeT').textContent = p.NeT.toLocaleString();
-      document.getElementById('val-M').textContent = p.M.toFixed(2);
-      document.getElementById('val-r2s-base').textContent = p.r2Source.toFixed(2);
-      document.getElementById('val-rho-s').textContent = p.rhoS.toFixed(2);
-      document.getElementById('val-rho-t').textContent = p.rhoT.toFixed(2);
-      document.getElementById('val-prev').textContent = p.prevalence.toFixed(2);
+      // Update slider value displays
+      document.getElementById('val-Ne').textContent = p.Ne.toLocaleString();
+      document.getElementById('val-mu').textContent = fmtSci(p.mu);
+      document.getElementById('val-m').textContent = fmtSci(p.m);
+      document.getElementById('val-r').textContent = fmtNum(p.r, 4);
+      document.getElementById('val-t').textContent = p.t.toLocaleString();
+      document.getElementById('val-R2').textContent = fmtNum(p.R2, 2);
+      document.getElementById('val-pi').textContent = fmtNum(p.pi, 2);
 
-      // ── Show/hide model-specific sections ──
-      const isPS = p.model === 'pure_split';
-      document.getElementById('params-ps').classList.toggle('hidden', !isPS);
-      document.getElementById('params-im').classList.toggle('hidden', isPS);
-      document.getElementById('model-note-ps').classList.toggle('hidden', !isPS);
-      document.getElementById('model-note-im').classList.toggle('hidden', isPS);
-      document.getElementById('metrics-ps-extra').classList.toggle('hidden', !isPS);
-      document.getElementById('metrics-im-extra').classList.toggle('hidden', isPS);
-      document.getElementById('charts-ps').classList.toggle('hidden', !isPS);
-      document.getElementById('charts-im').classList.toggle('hidden', isPS);
+      // Compute model
+      const m = computeModel(p.Ne, p.mu, p.m, p.r, p.t, p.R2, p.pi);
 
-      // ── Metrics (model-dependent) ──
-      if (isPS) {
-        // Per-branch drift
-        document.getElementById('metric-drift-label').textContent = 'Source Drift (F_S)';
-        document.getElementById('metric-drift').textContent = p.fstS.toFixed(4);
-        document.getElementById('metric-drift-formula').textContent = 'Drift accumulated on the source branch from the common ancestor';
-        document.getElementById('metric-drift-proof').innerHTML = '<a onclick="openProof(\'fstFromGenerations\')">Lean proof ↗</a>';
-        document.getElementById('metric-drift-t-label').textContent = 'Target Drift (F_T)';
-        document.getElementById('metric-drift-t').textContent = p.fstT.toFixed(4);
-        document.getElementById('metric-drift-t-formula').textContent =
-          `Drift on target branch; pairwise F_ST(S,T)=F_S+F_T−F_SF_T=${p.fstPair.toFixed(4)}`;
-        document.getElementById('metric-drift-t-proof').innerHTML = '<a onclick="openProof(\'pairwise_fst_decomposition\')">Lean theorem ↗</a>';
-      } else {
-        document.getElementById('metric-drift-label').textContent = 'Equilibrium δ (Source)';
-        document.getElementById('metric-drift').textContent = p.fstS.toFixed(4);
-        document.getElementById('metric-drift-formula').textContent = 'Equilibrium differentiation from migration-drift balance';
-        document.getElementById('metric-drift-proof').innerHTML = '<a onclick="openProof(\'twoDemeIMEquilibriumDelta\')">Lean proof ↗</a>';
-        document.getElementById('metric-drift-t-label').textContent = 'Equilibrium δ (Target)';
-        document.getElementById('metric-drift-t').textContent = p.fstT.toFixed(4);
-        document.getElementById('metric-drift-t-formula').textContent = 'Same as source under symmetric island model';
-        document.getElementById('metric-drift-t-proof').innerHTML = '<a onclick="openProof(\'twoDemeIMEquilibriumDelta\')">Lean proof ↗</a>';
+      // Portability ratio
+      document.getElementById('rho-big').textContent = fmtNum(Math.max(0, m.rho), 4);
+
+      // Factor bars
+      const setBar = (id, vId, val) => {
+        // For factors <= 1, width is val*100%. For migration boost > 1, cap display at 120%
+        const pct = Math.min(Math.max(val, 0), 1.2) / 1.2 * 100;
+        document.getElementById(id).style.width = pct + '%';
+        document.getElementById(vId).textContent = fmtNum(val, 4);
+      };
+      setBar('bar-drift', 'bv-drift', m.driftFactor);
+      setBar('bar-ld', 'bv-ld', m.ldRetention);
+      setBar('bar-mut', 'bv-mut', m.mutErosion);
+      setBar('bar-mig', 'bv-mig', m.migBoost);
+
+      // Metric cards
+      document.getElementById('mc-r2s').textContent = fmtNum(m.R2_source);
+      document.getElementById('mc-r2t').textContent = fmtNum(m.R2_target);
+      document.getElementById('mc-r2drop').textContent = (m.R2_target < m.R2_source)
+        ? '\u2193 ' + fmtPct(1 - m.R2_target / m.R2_source) + ' drop'
+        : '';
+      document.getElementById('mc-aucs').textContent = fmtNum(m.AUC_source);
+      document.getElementById('mc-auct').textContent = fmtNum(m.AUC_target);
+      document.getElementById('mc-aucdrop').textContent = (m.AUC_target < m.AUC_source)
+        ? '\u2193 ' + fmtPct(1 - m.AUC_target / m.AUC_source) + ' drop'
+        : '';
+      document.getElementById('mc-brs').textContent = fmtNum(m.Brier_source);
+      document.getElementById('mc-brt').textContent = fmtNum(m.Brier_target);
+      document.getElementById('mc-brdrop').textContent = (m.Brier_target > m.Brier_source)
+        ? '\u2191 ' + fmtPct(m.Brier_target / m.Brier_source - 1) + ' increase'
+        : '';
+      document.getElementById('mc-snrs').textContent = fmtNum(m.SNR_source);
+      document.getElementById('mc-snrt').textContent = fmtNum(m.SNR_target);
+
+      // Scaled parameters
+      document.getElementById('mc-theta').textContent = fmtNum(m.theta, 4);
+      document.getElementById('mc-tau').textContent = fmtNum(m.tau, 5);
+      document.getElementById('mc-bigM').textContent = fmtNum(m.bigM, 4);
+      document.getElementById('mc-fsteq').textContent = fmtNum(m.fstEq, 5);
+
+      // Decay rates table
+      const totalPositive = m.driftRate + m.ldRate + m.mutRate;
+      const setRate = (rowId, rate, isNeg) => {
+        const row = document.getElementById(rowId);
+        const cells = row.querySelectorAll('td');
+        cells[2].textContent = (isNeg ? '-' : '') + fmtSci(rate, 2);
+        const pct = totalPositive > 0 ? (rate / totalPositive * 100) : 0;
+        cells[3].textContent = fmtPct(rate / totalPositive);
+        // Highlight dominant
+        const isDominant = rate === Math.max(m.driftRate, m.ldRate, m.mutRate);
+        cells[2].className = 'rate-val' + (isDominant && !isNeg ? ' dominant' : '');
+      };
+      setRate('rate-drift', m.driftRate, false);
+      setRate('rate-ld', m.ldRate, false);
+      setRate('rate-mut', m.mutRate, false);
+      setRate('rate-mig', m.migRate, true);
+      document.getElementById('rate-net').textContent = fmtSci(m.netRate, 2);
+
+      // Decomposition chart (log10 of each factor)
+      const safeLog = (x) => x > 0 ? Math.log10(x) : -6;
+      decompChart.data.datasets[0].data = [
+        safeLog(m.driftFactor),
+        safeLog(m.ldRetention),
+        safeLog(m.mutErosion),
+        Math.log10(m.migBoost),
+      ];
+      decompChart.update('none');
+
+      // Temporal chart
+      const tMax = Math.max(p.t, 100);
+      const nSteps = 200;
+      const labels = [];
+      const r2Data = [], aucData = [], brierData = [], rhoData = [];
+      for (let i = 0; i <= nSteps; i++) {
+        const ti = (tMax * i) / nSteps;
+        labels.push(Math.round(ti));
+        const mi = computeAtTime(p.Ne, p.mu, p.m, p.r, ti, p.R2, p.pi);
+        const r2t = Math.max(0, Math.min(1, mi.R2_target));
+        r2Data.push(r2t);
+        aucData.push(mi.AUC_target);
+        brierData.push(mi.Brier_target);
+        rhoData.push(Math.max(0, Math.min(1, mi.rho)));
       }
+      temporalChart.data.labels = labels;
+      temporalChart.data.datasets[0].data = r2Data;
+      temporalChart.data.datasets[1].data = aucData;
+      temporalChart.data.datasets[2].data = brierData;
+      temporalChart.data.datasets[3].data = rhoData;
 
-      const relativeShift = expectedRelativeShiftFromFst(p.fstS, p.fstT);
-      document.getElementById('metric-mean-shift').textContent = relativeShift.toFixed(3) + 'σ';
+      // Adjust Brier axis — it can be small
+      const maxBrier = Math.max(...brierData, 0.1);
+      temporalChart.options.scales.y.max = Math.min(1, Math.max(maxBrier * 1.2, p.R2 * 1.1, 0.5));
 
-      // Clinical performance endpoints
-      const vPgsS = p.vPgsSource;
-      const ldRatio = p.rhoT / p.rhoS;
-      const vPgsT = targetVarianceFromSource(p.vPgsSource, p.fstS, p.fstT) * ldRatio;
-      const r2S = p.r2Source;
-      const r2T = expectedR2(vPgsT, p.vEnv);
-      const portability = r2S > 0 ? 100 * (r2T / r2S) : 0;
-      const snrS = signalToNoise(vPgsS, p.vEnv);
-      const snrT = signalToNoise(vPgsT, p.vEnv);
-      const aucS = liabilityAUCFromSNR(snrS);
-      const aucT = liabilityAUCFromSNR(snrT);
-      const brierS = exactLiabilityBrier(vPgsS, p.prevalence);
-      const brierT = exactLiabilityBrier(vPgsT, p.prevalence);
-      const brierGap = brierT - brierS;
-
-      document.getElementById('metric-r2-s').textContent = r2S.toFixed(3);
-      document.getElementById('metric-r2-t').textContent = r2T.toFixed(3);
-      document.getElementById('metric-portability').textContent = portability.toFixed(1) + '%';
-      document.getElementById('metric-auc-s').textContent = aucS.toFixed(3);
-      document.getElementById('metric-auc-t').textContent = aucT.toFixed(3);
-      document.getElementById('metric-brier-gap').textContent = (brierGap >= 0 ? '+' : '') + brierGap.toFixed(4);
-
-      if (isPS) {
-        updatePureSplit(p);
-      } else {
-        updateIM(p);
-      }
+      temporalChart.update('none');
     }
 
-    // ════════════════════════════════════════════════════════════
-    // PURE SPLIT UPDATE
-    // ════════════════════════════════════════════════════════════
-    function updatePureSplit(p) {
-      const tauS = coalescentTau(p.t, p.NeS);
-      const tauT = coalescentTau(p.t, p.NeT);
-      document.getElementById('metric-tau-s').textContent = tauS.toFixed(4);
-      document.getElementById('metric-tau-t').textContent = tauT.toFixed(4);
+    // Bind all sliders
+    Object.values(sliders).forEach(s => s.addEventListener('input', update));
 
-      // Mean distribution (asymmetric variance, zero expected mean diff)
-      // Apply LD ratio to target variance to match the metrics cards
-      const ldRatio = p.rhoT / p.rhoS;
-      const sigS = Math.sqrt(Math.max(0.001, p.vPgsSource));
-      const sigT = Math.sqrt(Math.max(0.001, targetVarianceFromSource(p.vPgsSource, p.fstS, p.fstT) * ldRatio));
-      const shift = expectedAbsMeanDiff(p.vPgsSource, p.d);
-
-      const xRange = Math.max(3 * sigS, shift + 3 * sigT);
-      const xs = linspace(-xRange, xRange + shift, 200);
-      charts.psMeanDist.data = {
-        labels: xs.map(x => x.toFixed(2)),
-        datasets: [
-          ds('Source (Nₑ=' + p.NeS.toLocaleString() + ')', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
-          ds('Target (Nₑ=' + p.NeT.toLocaleString() + ', drifted)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
-        ]
-      };
-      charts.psMeanDist.update('none');
-
-      // ── FST vs generations (pairwise FST between populations) ──
-      const maxT = Math.max(p.t * 2.5, 100);
-      const ts = linspace(0, maxT, 100);
-      charts.psFst.data = {
-        labels: ts.map(x => x.toFixed(0)),
-        datasets: [
-          ds('Target divergence from source reference (F_T)', ts.map(ti => fstFromGenerations(ti, p.NeT)), '#8b5cf6'),
-        ]
-      };
-      charts.psFst.update('none');
-
-      // ── Portability metrics vs F (sweeping target drift) ──
-      const fs = linspace(0.001, 0.4, 100);
-      charts.psSummary.data = {
-        labels: fs.map(f => (f * 100).toFixed(1) + '%'),
-        datasets: [
-          ds('Target R²', fs.map(f => expectedR2(targetVarianceFromSource(p.vPgsSource, p.fstS, f) * (p.rhoT / p.rhoS), p.vEnv)), '#10b981'),
-          ds('Source R²', fs.map(() => p.r2Source), '#06b6d4', { borderDash: [6, 3] }),
-          ds('Target AUC (exact LTM)', fs.map(f => {
-            const snr = signalToNoise(targetVarianceFromSource(p.vPgsSource, p.fstS, f) * (p.rhoT / p.rhoS), p.vEnv);
-            return liabilityAUCFromSNR(snr);
-          }), '#6366f1'),
-          ds('Brier gap (exact model)', fs.map(f => {
-            const vT = targetVarianceFromSource(p.vPgsSource, p.fstS, f) * (p.rhoT / p.rhoS);
-            return exactLiabilityBrier(vT, p.prevalence) - exactLiabilityBrier(p.vPgsSource, p.prevalence);
-          }), '#f59e0b', { borderDash: [4, 2] }),
-        ]
-      };
-      charts.psSummary.update('none');
-    }
-
-    // ════════════════════════════════════════════════════════════
-    // IM EQUILIBRIUM UPDATE
-    // ════════════════════════════════════════════════════════════
-    function updateIM(p) {
-      const delta = imEquilibriumDelta(p.M);
-      document.getElementById('metric-et-same').textContent = imETsame().toFixed(3);
-      document.getElementById('metric-et-diff').textContent = imETdiff(p.M).toFixed(3);
-
-      // ── Mean distribution ──
-      // Under symmetric IM, both demes have the same drift level, so
-      // the variance ratio from drift alone is 1. The only variance
-      // difference comes from differential LD tagging (rhoT/rhoS).
-      const ldRatio = p.rhoT / p.rhoS;
-      const sigS = Math.sqrt(Math.max(0.001, p.vPgsSource));
-      const sigT = Math.sqrt(Math.max(0.001, p.vPgsSource * ldRatio));
-      const shift = expectedAbsMeanDiff(p.vPgsSource, 2 * delta);
-
-      const xRange = Math.max(3 * sigS, shift + 3 * sigT);
-      const xs = linspace(-xRange, xRange + shift, 200);
-      charts.imMeanDist.data = {
-        labels: xs.map(x => x.toFixed(2)),
-        datasets: [
-          ds('Source Deme N(0, V_signal)', xs.map(x => gaussian(x, 0, sigS)), '#6366f1', { fill: true }),
-          ds('Target Deme N(E[|Δμ|], V_signal)', xs.map(x => gaussian(x, shift, sigT)), '#f59e0b', { fill: true }),
-        ]
-      };
-      charts.imMeanDist.update('none');
-
-      // ── Delta vs M ──
-      const Ms = linspace(0.05, 20, 100);
-      charts.imDelta.data = {
-        labels: Ms.map(m => m.toFixed(1)),
-        datasets: [
-          ds('Genetic differentiation (δ)', Ms.map(m => imEquilibriumDelta(m)), '#06b6d4'),
-        ]
-      };
-      charts.imDelta.update('none');
-
-      // ── Coalescence times vs M ──
-      charts.imCoal.data = {
-        labels: Ms.map(m => m.toFixed(1)),
-        datasets: [
-          ds('Within deme (always 2)', Ms.map(() => 2), '#6366f1', { borderDash: [4, 2] }),
-          ds('Between demes', Ms.map(m => imETdiff(m)), '#f59e0b'),
-        ]
-      };
-      charts.imCoal.update('none');
-
-      // ── E[(Δμ)²]/V_signal vs M ──
-      charts.imMeanSq.data = {
-        labels: Ms.map(m => m.toFixed(1)),
-        datasets: [
-          ds('Relative to genetic variance', Ms.map(m => 4 * imEquilibriumDelta(m)), '#8b5cf6'),
-        ]
-      };
-      charts.imMeanSq.update('none');
-    }
-
-    // ── Init ──
-    document.addEventListener('DOMContentLoaded', () => { initCharts(); updateAll(); });
+    // Initial render
+    update();
   </script>
-</body>
 
+</body>
 </html>
