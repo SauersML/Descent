@@ -125,10 +125,11 @@ section Pleiotropy
     If variant j affects both traits A and B, its portability
     loss affects both traits simultaneously. -/
 theorem pleiotropic_correlated_portability
-    (port_A port_B rg : ℝ)
+    (port_A port_B rg lb : ℝ)
     (h_correlated : |port_A - port_B| ≤ 2 * (1 - |rg|))
-    (h_rg : 0.8 < |rg|) :
-    |port_A - port_B| < 0.4 := by linarith
+    (h_rg : lb < |rg|)
+    (h_lb_nn : 0 ≤ lb) :
+    |port_A - port_B| < 2 * (1 - lb) := by linarith
 
 /-- **Mediated pleiotropy vs biological pleiotropy.**
     Mediated: A → B, so variant affects B through A.
@@ -191,15 +192,15 @@ theorem rg_bounds_portability_ratio
     r_g(height, EUR-EAS) ≈ 0.95
     → R² portability ≤ 0.90. -/
 theorem height_high_cross_rg
-    (rg : ℝ) (h_rg : 0.9 < rg) (h_rg_le : rg ≤ 1) :
-    0.81 < rg^2 := by nlinarith [sq_nonneg (rg - 0.9)]
+    (rg lb : ℝ) (h_rg : lb < rg) (h_lb_nn : 0 ≤ lb) (h_rg_le : rg ≤ 1) :
+    lb^2 < rg^2 := by nlinarith [sq_nonneg (rg - lb)]
 
 /-- **Immune traits have low cross-ancestry r_g.**
     r_g(WBC, EUR-AFR) ≈ 0.3
     → R² portability ≤ 0.09. Very poor. -/
 theorem immune_low_cross_rg
-    (rg : ℝ) (h_rg : rg ≤ 0.3) (h_rg_nn : 0 ≤ rg) :
-    rg^2 ≤ 0.09 := by nlinarith [sq_nonneg rg, sq_nonneg (rg - 0.3)]
+    (rg ub : ℝ) (h_rg : rg ≤ ub) (h_rg_nn : 0 ≤ rg) (h_ub_nn : 0 ≤ ub) :
+    rg^2 ≤ ub^2 := by nlinarith [sq_nonneg rg, sq_nonneg (rg - ub)]
 
 /-- **r_g can be underestimated due to power.**
     With low power in non-EUR GWAS, r_g estimates are

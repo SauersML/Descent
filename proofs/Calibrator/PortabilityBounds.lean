@@ -68,16 +68,16 @@ theorem selection_worsens_portability
     With Fst ≈ 0.12 (European to East Asian), neutral portability ratio ≈ 0.88.
     But observed R² drops are often much larger, confirming non-neutral effects. -/
 theorem ukb_ceu_chb_neutral_bound :
-    0.85 < neutralPortabilityRatio 0 0.12 ∧
-    neutralPortabilityRatio 0 0.12 < 0.90 := by
+    17/20 < neutralPortabilityRatio 0 (3/25) ∧
+    neutralPortabilityRatio 0 (3/25) < 9/10 := by
   unfold neutralPortabilityRatio
   constructor <;> norm_num
 
 /-- **Concrete UKB example: CEU-like to YRI-like portability.**
     With Fst ≈ 0.15, neutral portability ratio ≈ 0.85. -/
 theorem ukb_ceu_yri_neutral_bound :
-    0.82 < neutralPortabilityRatio 0 0.15 ∧
-    neutralPortabilityRatio 0 0.15 < 0.87 := by
+    41/50 < neutralPortabilityRatio 0 (3/20) ∧
+    neutralPortabilityRatio 0 (3/20) < 87/100 := by
   unfold neutralPortabilityRatio
   constructor <;> norm_num
 
@@ -189,9 +189,9 @@ theorem high_cv_inevitable (σ_sq bias_sq : ℝ) (hσ : 0 < σ_sq) (hb : 0 ≤ b
 theorem spline_r2_bounded_by_bias_variation
     (var_bias var_total : ℝ)
     (h_total_pos : 0 < var_total)
-    (h_bias_small : var_bias ≤ 0.01 * var_total)
+    (h_bias_small : var_bias ≤ 1/100 * var_total)
     (h_bias_nonneg : 0 ≤ var_bias) :
-    var_bias / var_total ≤ 0.01 := by
+    var_bias / var_total ≤ 1/100 := by
   exact div_le_of_le_mul₀ (le_of_lt h_total_pos) (by norm_num) h_bias_small
 
 end IndividualErrorDistribution

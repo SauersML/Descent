@@ -85,7 +85,7 @@ theorem rare_variant_lower_power (n : ℕ) (beta p_rare p_common : ℝ)
     (h_beta : beta ≠ 0) (h_rare : 0 < p_rare)
     (h_common : 0 < p_common) (h_common_lt : p_common < 1)
     (h_rare_lt : p_rare < p_common)
-    (h_sym : p_common ≤ 0.5) (hn : 0 < n) :
+    (h_sym : p_common ≤ 1/2) (hn : 0 < n) :
     noncentralityParam n beta p_rare < noncentralityParam n beta p_common := by
   unfold noncentralityParam
   have h_n : (0 : ℝ) < n := Nat.cast_pos.mpr hn
@@ -270,22 +270,22 @@ theorem genetic_correlation_bounds_portability
     r_g(height, EUR-EAS) ≈ 0.95. This means most of the
     genetic architecture is shared. -/
 theorem high_rg_implies_good_portability
-    (rg r2_source : ℝ)
-    (h_rg : 0.9 < rg) (h_rg_le : rg ≤ 1)
+    (rg lb r2_source : ℝ)
+    (h_rg : lb < rg) (h_lb_nn : 0 ≤ lb) (h_rg_le : rg ≤ 1)
     (h_r2 : 0 < r2_source) :
-    0.81 * r2_source < rg^2 * r2_source := by
-  have : 0.81 < rg ^ 2 := by nlinarith [sq_nonneg (rg - 0.9)]
+    lb^2 * r2_source < rg^2 * r2_source := by
+  have : lb ^ 2 < rg ^ 2 := by nlinarith [sq_nonneg (rg - lb)]
   nlinarith
 
 /-- **Low r_g for immune traits.**
     r_g(immune, EUR-AFR) ≈ 0.4. This severely limits
     cross-ancestry PGS for immune-related traits. -/
 theorem low_rg_limits_portability
-    (rg r2_source : ℝ)
-    (h_rg : rg < 0.5) (h_rg_nn : 0 ≤ rg)
+    (rg ub r2_source : ℝ)
+    (h_rg : rg < ub) (h_rg_nn : 0 ≤ rg) (h_ub_nn : 0 ≤ ub)
     (h_r2 : 0 < r2_source) :
-    rg^2 * r2_source < 0.25 * r2_source := by
-  have : rg ^ 2 < 0.25 := by nlinarith [sq_nonneg (rg - 0.5)]
+    rg^2 * r2_source < ub^2 * r2_source := by
+  have : rg ^ 2 < ub ^ 2 := by nlinarith [sq_nonneg (rg - ub)]
   nlinarith
 
 end EffectSizeHeterogeneity

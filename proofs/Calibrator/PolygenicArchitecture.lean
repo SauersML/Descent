@@ -170,13 +170,13 @@ theorem enrichment_interpretation (h2_c M_c h2_t M_t : ℝ)
     Enrichment ≈ 10×. -/
 theorem coding_enriched
     (h2_coding h2_total M_coding M_total : ℝ)
-    (h_prop_variants : M_coding / M_total < 0.02)
-    (h_prop_h2 : 0.1 < h2_coding / h2_total)
+    (h_prop_variants : M_coding / M_total < 1/50)
+    (h_prop_h2 : 1/10 < h2_coding / h2_total)
     (h_all_pos : 0 < h2_coding ∧ 0 < h2_total ∧ 0 < M_coding ∧ 0 < M_total) :
     5 < heritabilityEnrichment h2_coding M_coding h2_total M_total := by
   obtain ⟨h_hc, h_ht, h_mc, h_mt⟩ := h_all_pos
-  have hv : M_coding < 0.02 * M_total := by rwa [div_lt_iff₀ h_mt] at h_prop_variants
-  have hh : 0.1 * h2_total < h2_coding := by rwa [lt_div_iff₀ h_ht] at h_prop_h2
+  have hv : M_coding < 1/50 * M_total := by rwa [div_lt_iff₀ h_mt] at h_prop_variants
+  have hh : 1/10 * h2_total < h2_coding := by rwa [lt_div_iff₀ h_ht] at h_prop_h2
   show 5 < heritabilityEnrichment h2_coding M_coding h2_total M_total
   have hsimpl : heritabilityEnrichment h2_coding M_coding h2_total M_total =
     h2_coding * M_total / (M_coding * h2_total) := by
