@@ -42,6 +42,33 @@ section StabilizingSelection
 noncomputable def equilibriumEffectVariance (v_mutation s : ℝ) : ℝ :=
   v_mutation / s
 
+/-- **Mutation-selection balance recurrence.**
+    Each generation, new mutational variance v_mut is added and selection
+    of strength s removes a fraction s of the standing variance V.
+    The recurrence is: V(t+1) = (1 - s) × V(t) + v_mut. -/
+noncomputable def effectVarianceRecurrence (V v_mut s : ℝ) : ℝ :=
+  (1 - s) * V + v_mut
+
+/-- **The equilibrium variance is a fixed point of the recurrence.**
+    Solving V* = (1 - s) × V* + v_mut gives V* = v_mut / s.
+    This verifies that `equilibriumEffectVariance` is the unique
+    fixed point of the mutation-selection balance recurrence. -/
+theorem effectVarianceRecurrence_fixedPoint
+    (v_mut s : ℝ) (hs : s ≠ 0) :
+    effectVarianceRecurrence (v_mut / s) v_mut s = v_mut / s := by
+  unfold effectVarianceRecurrence
+  field_simp
+  ring
+
+/-- **`equilibriumEffectVariance` is the fixed point of the recurrence.**
+    Connects the standalone definition to the recurrence derivation. -/
+theorem equilibriumEffectVariance_is_fixedPoint
+    (v_mut s : ℝ) (hs : s ≠ 0) :
+    effectVarianceRecurrence (equilibriumEffectVariance v_mut s) v_mut s
+      = equilibriumEffectVariance v_mut s := by
+  unfold equilibriumEffectVariance
+  exact effectVarianceRecurrence_fixedPoint v_mut s hs
+
 /-- Stronger stabilizing selection → smaller effect sizes. -/
 theorem stronger_stabilizing_smaller_effects
     (v_mutation s₁ s₂ : ℝ)
@@ -142,7 +169,16 @@ section DiversifyingSelection
 
 /-- **Fluctuating selection accelerates effect turnover.**
     Under fluctuating selection with autocorrelation time τ,
-    the effect correlation decays as ρ(t) = exp(-t/τ). -/
+    the effect correlation decays as ρ(t) = exp(-t/τ).
+
+    This models the selection environment as an Ornstein-Uhlenbeck (OU) process:
+    the fitness optimum θ(t) satisfies dθ = -θ/τ dt + σ dW, where τ is the
+    relaxation time and W is a Wiener process. The autocorrelation function of
+    an OU process is Cov(θ(t), θ(t+Δ)) = (σ²τ/2) exp(-Δ/τ), which after
+    normalization gives the correlation exp(-Δ/τ). The parameter τ controls
+    how quickly the selective landscape decorrelates: small τ (e.g., pathogen-driven
+    immune selection) means rapid turnover, while τ → ∞ recovers stabilizing
+    selection with a fixed optimum. -/
 noncomputable def fluctuatingEffectCorrelation (t τ : ℝ) : ℝ :=
   Real.exp (-t / τ)
 
