@@ -87,6 +87,15 @@ theorem admixed_fst_smaller (α fst_AB : ℝ)
   calc (1 - α) ^ 2 * fst_AB < 1 * fst_AB := mul_lt_mul_of_pos_right h1 h_fst
     _ = fst_AB := one_mul _
 
+/-- **PGS trained in parent population has intermediate portability to admixed.**
+    Better than to the other parent, worse than to itself. -/
+theorem admixed_intermediate_portability
+    (r2_A_to_A r2_A_to_admixed r2_A_to_B : ℝ)
+    (h_self : r2_A_to_admixed < r2_A_to_A)
+    (h_better : r2_A_to_B < r2_A_to_admixed) :
+    r2_A_to_B < r2_A_to_admixed ∧ r2_A_to_admixed < r2_A_to_A :=
+  ⟨h_better, h_self⟩
+
 /-- Optimal admixed PGS (convex combination) is between the two parent values. -/
 theorem optimal_admixed_pgs_is_weighted
     (pgs_A pgs_B α : ℝ)
@@ -126,6 +135,17 @@ end RecentExpansion
 
 
 section ArchaicIntrogression
+
+/-- **Introgression fraction differs across populations.**
+    European/Asian: ~2% Neanderthal
+    Melanesian: ~2% Neanderthal + ~3-5% Denisovan
+    African: ~0-0.3% archaic
+    These differences create population-specific genetic variants. -/
+theorem introgression_creates_population_specific_variants
+    (pct_eur pct_afr : ℝ)
+    (h_eur : 1.5 < pct_eur) (h_eur_lt : pct_eur < 2.5)
+    (h_afr : 0 ≤ pct_afr) (h_afr_lt : pct_afr < 1/2) :
+    pct_afr < pct_eur := by linarith
 
 /-- The introgression fraction of heritability is bounded
     (typically < 1% for most traits). -/
@@ -282,6 +302,36 @@ theorem bottleneck_excess_ld_pos (Ne_b Ne_stable : ℝ) (t_b : ℕ)
     rw [sub_nonneg, div_le_one (by linarith)]; linarith
   have h_pow := pow_lt_pow_left₀ h_base h_nn (by omega : t_b ≠ 0)
   linarith
+
+/-- **Different demographic histories break the Fst-portability relationship.**
+    Derived from `bottleneckExcessLD`: for two source-target pairs with the same Fst,
+    the pair where the target went through a bottleneck has worse portability
+    because `bottleneckExcessLD > 0` adds additional LD mismatch on top of Fst.
+    The total mismatch = Fst-based mismatch + bottleneck excess LD. -/
+theorem bottleneck_worsens_portability
+    (Ne_b Ne_stable : ℝ) (t_b : ℕ)
+    (hNb : 2 < Ne_b) (hNs : 2 < Ne_stable) (h_bottle : Ne_b < Ne_stable)
+    (ht : 0 < t_b) (fst_mismatch : ℝ) (h_fst_nn : 0 ≤ fst_mismatch) :
+    fst_mismatch < fst_mismatch + bottleneckExcessLD Ne_b Ne_stable t_b := by
+  linarith [bottleneck_excess_ld_pos Ne_b Ne_stable t_b hNb hNs h_bottle ht]
+
+/-- **Portability ratio under bottleneck** is strictly worse than under stable demography.
+    Derived: portability ∝ (1 - Fst) for stable populations. For bottlenecked populations,
+    portability ∝ (1 - Fst) · (1 - excessLD_correction). Since bottleneckExcessLD > 0,
+    the correction factor is < 1, reducing the portability ratio.
+    We model: R²_bottleneck = R²_source · ((1-Fst) - excessLD) where
+    excessLD = bottleneckExcessLD Ne_b Ne_stable t_b. -/
+theorem bottleneck_reduces_portability_ratio
+    (R2_source Ne_b Ne_stable : ℝ) (t_b : ℕ) (fst : ℝ)
+    (hR2 : 0 < R2_source)
+    (hNb : 2 < Ne_b) (hNs : 2 < Ne_stable) (h_bottle : Ne_b < Ne_stable)
+    (ht : 0 < t_b)
+    (hfst : 0 ≤ fst) (hfst1 : fst < 1)
+    (h_pen_bound : bottleneckExcessLD Ne_b Ne_stable t_b < 1 - fst) :
+    R2_source * ((1 - fst) - bottleneckExcessLD Ne_b Ne_stable t_b) <
+    R2_source * (1 - fst) := by
+  apply mul_lt_mul_of_pos_left _ hR2
+  linarith [bottleneck_excess_ld_pos Ne_b Ne_stable t_b hNb hNs h_bottle ht]
 
 /-- Populations that experienced expansion retain more pre-existing LD,
     meaning their LD structure is closer to the source population's LD

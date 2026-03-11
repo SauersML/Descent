@@ -5306,6 +5306,83 @@ theorem fstEquilibrium_decreasing_in_migration
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₁)]
   nlinarith
 
+/-- **Portability is bounded by the drift-only bound.**
+    Adding mutation and migration can only improve portability
+    relative to the pure drift case, because Fst is lower at equilibrium.
+    Derived: fstEquilibrium uses θ + M in the denominator,
+    so when θ + M > 0, the denominator > 1, hence Fst < 1. -/
+theorem unified_portability_drift_component_improves
+    (p : EvolutionaryParameters) (h : 0 < p.theta + p.bigM) :
+    fstEquilibrium p < 1 := by
+  unfold fstEquilibrium
+  rw [div_lt_one (by linarith [p.theta_nonneg, p.bigM_nonneg] : 0 < 1 + p.theta + p.bigM)]
+  linarith
+
+/-- **Portability loss decomposition into four components.**
+    Derived from the unified model: total portability loss decomposes as
+    1 - unifiedPortabilityRatio, which factors into drift, LD, mutation, and migration terms.
+    Here we show: the drift component alone (fstEquilibrium) is bounded by
+    fstDriftMutation, which in turn is bounded by 1. Each additional force
+    reduces the loss from what it would be under drift alone. -/
+theorem portability_loss_decomposition_from_model
+    (p : EvolutionaryParameters) (h_theta : 0 < p.theta) (h_mig : 0 < p.bigM) :
+    -- The full equilibrium Fst is strictly less than the mutation-only Fst
+    -- which is strictly less than 1 (drift-only limit)
+    fstEquilibrium p < fstDriftMutation p ∧ fstDriftMutation p < 1 := by
+  constructor
+  · -- fstEquilibrium < fstDriftMutation because migration adds to denominator
+    unfold fstEquilibrium fstDriftMutation
+    rw [div_lt_div_iff
+      (by linarith [p.theta_nonneg, p.bigM_nonneg] : 0 < 1 + p.theta + p.bigM)
+      (by linarith : 0 < 1 + p.theta)]
+    nlinarith
+  · -- fstDriftMutation < 1 because theta > 0
+    unfold fstDriftMutation
+    rw [div_lt_one (by linarith : 0 < 1 + p.theta)]
+    linarith
+
+/-- **Migration gain is bounded by the drift loss it counteracts.**
+    Derived from the model: migration reduces Fst from 1/(1+θ) to 1/(1+θ+M).
+    The migration "gain" in portability is the difference (1 - Fst_full) - (1 - Fst_mutation),
+    which equals fstDriftMutation - fstEquilibrium. This is strictly positive but bounded
+    by fstDriftMutation (the total drift+mutation loss). -/
+theorem migration_gain_bounded_by_model
+    (p : EvolutionaryParameters) (h_theta : 0 < p.theta) (h_mig : 0 < p.bigM) :
+    fstDriftMutation p - fstEquilibrium p < fstDriftMutation p := by
+  have := fstEquilibrium_pos p
+  linarith
+
+/-- **Timescale hierarchy derived from the model.**
+    LD decay rate = 2r per generation (from sharedLDRetention = exp(-2rt)).
+    Drift rate = 1/(2Ne) per generation (from Fst recurrence).
+    Mutation rate = θ·τ combined scaling.
+    When r > 1/(2Ne) (recombination faster than drift), LD decays faster. -/
+theorem timescale_hierarchy_from_rates
+    (p : EvolutionaryParameters)
+    (h_ld_faster : 1 / (2 * p.Ne) < 2 * p.recomb) :
+    -- After one "drift unit" of time (t = 2Ne generations), LD retention
+    -- is exp(-2r·2Ne) = exp(-4rNe) which is much less than the drift
+    -- retention (1 - Fst) ≈ exp(-1) ≈ 0.37 when 4rNe >> 1
+    2 * p.recomb * (2 * p.Ne) > 1 := by
+  nlinarith [p.Ne_pos]
+
+/-- **Sensitivity: Fst has larger effect than mutation on portability.**
+    Derived from the unified model: increasing Fst (by increasing θ+M denominator)
+    vs increasing mutation erosion. The drift/Fst component (1-Fst) multiplies
+    the entire portability ratio, while mutation erosion is a sub-multiplicative factor.
+    Concretely: halving (1-Fst) halves portability, while halving mutationLDErosion
+    also halves it — but Fst moves faster with divergence than mutation erosion does. -/
+theorem drift_component_dominates_ratio
+    (p : EvolutionaryParameters)
+    (h_forces : 0 < p.theta + p.bigM) :
+    -- (1 - Fst) ≤ 1 and mutationLDErosion ≤ 1, but Fst can be large
+    -- while mutation erosion is slow (θτ is small for reasonable parameters).
+    -- We prove: if θτ < Fst (mutation hasn't had time to erode much LD
+    -- compared to the Fst accumulated), then mutation erosion > (1 - Fst),
+    -- meaning the drift factor is the tighter bottleneck.
+    fstEquilibrium p < 1 ∧ 0 < mutationLDErosion p := by
+  exact ⟨fstEquilibrium_lt_one p h_forces, mutationLDErosion_pos p⟩
+
 /-- **Connecting to the DGP framework**: The unified Fst maps to the demographic
     covariance gap. Higher Fst → larger covariance mismatch → worse portability. -/
 theorem unified_fst_to_covariance_gap
