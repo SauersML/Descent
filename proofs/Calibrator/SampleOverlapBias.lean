@@ -99,18 +99,56 @@ because discovery and target samples are from different populations.
 
 section CrossAncestryNoOverlap
 
+/-- **Cross-ancestry has zero overlap by design.**
+    When discovery is EUR and validation is AFR, there is no
+    sample overlap → no overfitting inflation. With zero overlap
+    fraction f = 0, the partial overlap formula gives R²_observed = R²_true. -/
+theorem cross_ancestry_no_overlap_bias
+    (r2_true h2 : ℝ) (n_gwas : ℕ) :
+    partialOverlapR2 r2_true h2 0 n_gwas = r2_true :=
+  no_overlap_unbiased r2_true h2 n_gwas
+
 /-- **Same-ancestry R² is inflated relative to cross-ancestry.**
-    Some apparent portability loss is actually the absence of
-    overlap inflation in the cross-ancestry estimate. -/
+    Derived from the overfitting bias formula `partialOverlapR2`:
+    same-ancestry R² with overlap fraction f > 0 exceeds true R²,
+    while cross-ancestry R² (f = 0) equals true cross R².
+    The apparent portability gap therefore includes a spurious
+    overlap-driven component. -/
 theorem apparent_portability_loss_includes_overlap
-    (r2_same_with_overlap r2_same_true r2_cross : ℝ)
-    (h_overlap : r2_same_true < r2_same_with_overlap)
+    (r2_same_true h2 r2_cross : ℝ) (f : ℝ) (n_gwas : ℕ)
+    (h_h2 : r2_same_true < h2)
+    (h_f_pos : 0 < f)
+    (h_n : 0 < n_gwas)
     (h_real_gap : r2_cross < r2_same_true) :
+    let r2_same_with_overlap := partialOverlapR2 r2_same_true h2 f n_gwas
     r2_cross < r2_same_with_overlap ∧
     r2_same_with_overlap - r2_cross > r2_same_true - r2_cross := by
+  simp only
+  have h_inflation : r2_same_true < partialOverlapR2 r2_same_true h2 f n_gwas := by
+    have h0 := no_overlap_unbiased r2_same_true h2 n_gwas
+    have hlt := more_overlap_more_inflation r2_same_true h2 0 f n_gwas h_h2 h_n h_f_pos
+    rw [h0] at hlt
+    exact hlt
   constructor
   · linarith
   · linarith
+
+/-- **Correcting for overlap reveals true portability.**
+    After removing overlap bias from same-ancestry R²,
+    the true portability gap is smaller than it appeared.
+    Portability ratio = R²_cross / R²_same. When R²_same is inflated
+    by overlap bias, the apparent portability ratio is lower than the
+    true ratio R²_cross / R²_same_true. -/
+theorem corrected_portability_better
+    (r2_cross r2_same_true overlap_bias : ℝ)
+    (h_cross_pos : 0 < r2_cross)
+    (h_same_pos : 0 < r2_same_true)
+    (h_bias_pos : 0 < overlap_bias)
+    (h_cross_le : r2_cross < r2_same_true) :
+    -- apparent portability < true portability
+    r2_cross / (r2_same_true + overlap_bias) < r2_cross / r2_same_true := by
+  apply div_lt_div_of_pos_left h_cross_pos h_same_pos
+  linarith
 
 end CrossAncestryNoOverlap
 
@@ -194,7 +232,36 @@ theorem kinship_inflates (r2_true K h2_family : ℝ)
 /-- **GRM-based exclusion.**
     Removing individuals with GRM off-diagonal > threshold
     (e.g., 0.05) removes close relatives but not distant
-    population structure. -/
+    population structure. A stricter (lower) threshold removes
+    more individuals. If the number of pairs exceeding threshold t
+    is monotone decreasing in t, a lower threshold excludes more. -/
+theorem grm_threshold_tradeoff
+    (n_total n_excluded_strict n_excluded_lenient : ℝ)
+    (h_total_pos : 0 < n_total)
+    (h_strict_pos : 0 < n_excluded_strict)
+    (h_lenient_nn : 0 ≤ n_excluded_lenient)
+    (h_stricter_excludes_more : n_excluded_lenient ≤ n_excluded_strict)
+    (h_not_all : n_excluded_strict < n_total) :
+    -- Remaining sample under strict threshold < remaining under lenient threshold
+    n_total - n_excluded_strict ≤ n_total - n_excluded_lenient := by linarith
+
+/-- **Cross-ancestry naturally avoids cryptic relatedness.**
+    Individuals from different continental ancestries have
+    near-zero kinship, eliminating kinship-based inflation.
+    When |K| < ε, the inflation |K × h²_family| < ε × h²_family,
+    so the bias is bounded by ε × h²_family. -/
+theorem cross_ancestry_no_kinship_bias
+    (K_cross h2_family ε : ℝ)
+    (h_ε_pos : 0 < ε)
+    (h_K_small : |K_cross| < ε)
+    (h_h2_pos : 0 < h2_family) (h_h2_le : h2_family ≤ 1) :
+    |K_cross * h2_family| < ε := by
+  calc |K_cross * h2_family| = |K_cross| * |h2_family| := abs_mul _ _
+    _ = |K_cross| * h2_family := by rw [abs_of_pos h_h2_pos]
+    _ ≤ |K_cross| * 1 := by nlinarith [abs_nonneg K_cross]
+    _ = |K_cross| := mul_one _
+    _ < ε := h_K_small
+
 end CrypticRelatedness
 
 end Calibrator

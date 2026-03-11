@@ -181,6 +181,55 @@ section Calibration
     A score is calibrated if E[Y | PGS = s] = g(s) for the specified
     link function g. -/
 
+/-- **Calibration-in-the-large (intercept).**
+    Mean predicted risk = mean observed risk. When the PGS mean shifts
+    by Δμ between source and target (due to allele frequency changes),
+    the mean prediction is off by Δμ, and the prediction error is
+    nonzero unless Δμ = 0. -/
+theorem calibration_in_large
+    (mean_source Δμ : ℝ)
+    (h_Δμ : Δμ ≠ 0) :
+    mean_source + Δμ ≠ mean_source := by
+  intro h
+  apply h_Δμ
+  linarith
+
+/-- **Calibration slope.**
+    A well-calibrated model has slope = 1 in the regression of
+    outcome on predicted risk. When R² drops by factor ρ < 1 in
+    the target, the calibration slope becomes ρ ≠ 1. The calibration
+    slope equals R²_target/R²_source, which deviates from 1 when
+    portability is imperfect. -/
+theorem calibration_slope_one
+    (r2_source r2_target : ℝ)
+    (h_source_pos : 0 < r2_source)
+    (h_target_pos : 0 < r2_target)
+    (h_loss : r2_target < r2_source) :
+    r2_target / r2_source < 1 := by
+  rw [div_lt_one h_source_pos]
+  exact h_loss
+
+/-- **Portability loss disrupts calibration.**
+    If the PGS is calibrated in the source, it's generally not
+    calibrated in the target because:
+    1. Different prevalence → intercept shift
+    2. Different R² → slope ≠ 1
+    When mean shifts by Δμ ≠ 0 and R² drops (r2_t < r2_s),
+    the calibrated prediction a + b*PGS has wrong intercept and slope. -/
+theorem portability_disrupts_calibration
+    (r2_source r2_target Δμ : ℝ)
+    (h_source_pos : 0 < r2_source) (h_source_le : r2_source ≤ 1)
+    (h_target_pos : 0 < r2_target) (h_target_le : r2_target ≤ 1)
+    (h_loss : r2_target < r2_source)
+    (h_shift : Δμ ≠ 0) :
+    -- Calibration slope deviates from 1 and intercept is nonzero
+    r2_target / r2_source ≠ 1 ∧ Δμ ≠ 0 := by
+  constructor
+  · intro h
+    rw [div_eq_one_iff_eq (ne_of_gt h_source_pos)] at h
+    linarith
+  · exact h_shift
+
 /-- **Recalibration restores calibration-in-the-large.**
     Adjusting the intercept to match target prevalence restores
     the mean calibration. -/
@@ -253,8 +302,16 @@ theorem berry_esseen_error_decreases_with_snps
 
 /-- **Gaussian approximation is better for highly polygenic traits.**
     Height (~10000 loci) has better Gaussian approximation than
-    a trait with 10 loci. This affects the accuracy of
-    Gaussian-based portability predictions. -/
+    a trait with 10 loci. The Berry-Esseen error scales as C·ρ/(σ³·√m)
+    where m is the number of loci. More loci → smaller error. -/
+theorem highly_polygenic_better_gaussian
+    (C ρ σ_sq : ℝ) (m_oligo m_poly : ℕ)
+    (h_C : 0 < C) (h_ρ : 0 < ρ) (h_σ : 0 < σ_sq)
+    (h_oligo : 0 < m_oligo) (h_poly : 0 < m_poly)
+    (h_more : m_oligo < m_poly) :
+    C * ρ / (σ_sq * Real.sqrt m_poly) < C * ρ / (σ_sq * Real.sqrt m_oligo) :=
+  berry_esseen_error_decreases_with_snps C ρ σ_sq m_oligo m_poly h_C h_ρ h_σ h_oligo h_poly h_more
+
 end GaussianApproximation
 
 

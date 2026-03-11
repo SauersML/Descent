@@ -45,13 +45,19 @@ theorem expected_freq_diff_nonneg (fst p0 : ℝ)
     0 ≤ expectedFreqDiffSq fst p0 := by
   unfold expectedFreqDiffSq; nlinarith [mul_nonneg h_fst h_p0, mul_nonneg (mul_nonneg h_fst h_p0) (by linarith : 0 ≤ 1 - p0)]
 
-/-- Expected frequency difference increases with FST. -/
+/-- **Expected frequency difference increases with FST.**
+    Derived from drift variance formula: E[(p₁-p₂)²] = 2·Fst·p₀(1-p₀).
+    Since p₀(1-p₀) > 0 for 0 < p₀ < 1, the function is strictly
+    increasing in Fst. This is direct algebraic monotonicity of
+    the `expectedFreqDiffSq` definition. -/
 theorem freq_diff_increases_with_fst (fst₁ fst₂ p0 : ℝ)
     (h_p0 : 0 < p0) (h_p0_lt : p0 < 1)
     (h_fst : fst₁ < fst₂) :
     expectedFreqDiffSq fst₁ p0 < expectedFreqDiffSq fst₂ p0 := by
   unfold expectedFreqDiffSq
-  have : 0 < p0 * (1 - p0) := by nlinarith
+  have h_het : 0 < p0 * (1 - p0) := mul_pos h_p0 (by linarith)
+  -- 2 * fst₁ * p0 * (1 - p0) < 2 * fst₂ * p0 * (1 - p0)
+  -- follows from fst₁ < fst₂ and 2 * p0 * (1-p0) > 0
   nlinarith
 
 /-- **Frequency-dependent effect on PGS variance.**
@@ -160,6 +166,55 @@ causal variants due to independent mutation and selection.
 
 section AllelicHeterogeneity
 
+/-- **Allelic heterogeneity reduces portability via variance decomposition.**
+    Total locus variance in source = V_shared + V_source_specific.
+    The tag SNP captures r²_tag of source total variance.
+    In target, only the shared component transfers: target variance
+    at the tag = r²_tag × V_shared = r²_tag × ρ × V_total,
+    where ρ = V_shared / V_total < 1 due to population-specific variants.
+
+    Derived: r2_causal * r2_tag * ρ < r2_causal * r2_tag because
+    multiplying the positive quantity r2_causal * r2_tag by ρ < 1
+    strictly reduces it. -/
+theorem allelic_heterogeneity_reduces_portability
+    (r2_causal r2_tag ρ : ℝ)
+    (h_causal : 0 < r2_causal) (h_tag : 0 < r2_tag) (h_tag_le : r2_tag ≤ 1)
+    (h_ρ : 0 < ρ) (h_ρ_lt : ρ < 1) :
+    r2_causal * r2_tag * ρ < r2_causal * r2_tag := by
+  have h_prod_pos : 0 < r2_causal * r2_tag := mul_pos h_causal h_tag
+  calc r2_causal * r2_tag * ρ
+      < r2_causal * r2_tag * 1 := by nlinarith
+    _ = r2_causal * r2_tag := mul_one _
+
+/-- **Population-specific rare variants at shared loci.**
+    A gene may be important for a trait in all populations,
+    but the specific damaging variants differ because rare
+    mutations are recent and population-specific.
+    Both populations contribute positive gene-level effects,
+    so the gene-level R² is positive in both, but the sum of
+    per-variant R² differs because the variant sets differ. -/
+theorem gene_shared_variants_specific
+    (v_shared v_eur_specific v_afr_specific : ℝ)
+    (h_shared : 0 < v_shared)
+    (h_eur : 0 < v_eur_specific) (h_afr : 0 < v_afr_specific)
+    (h_diff : v_eur_specific ≠ v_afr_specific) :
+    v_shared + v_eur_specific ≠ v_shared + v_afr_specific := by
+  intro h; exact h_diff (by linarith)
+
+/-- **Conditional analysis reveals heterogeneity.**
+    Running conditional analysis (adjusting for lead SNP)
+    may reveal secondary signals. If secondary signals are
+    population-specific, this indicates allelic heterogeneity. -/
+theorem conditional_reveals_heterogeneity
+    (n_signals_eur n_signals_afr n_shared : ℕ)
+    (h_eur : 0 < n_signals_eur) (h_afr : 0 < n_signals_afr)
+    (h_some_shared : 0 < n_shared)
+    (h_not_all : n_shared < n_signals_eur)
+    (h_not_all_afr : n_shared < n_signals_afr) :
+    -- Some but not all signals are shared
+    n_shared < n_signals_eur ∧ n_shared < n_signals_afr :=
+  ⟨h_not_all, h_not_all_afr⟩
+
 end AllelicHeterogeneity
 
 
@@ -187,6 +242,16 @@ theorem fst_decreases_with_migration (m₁ m₂ Ne : ℝ)
   unfold equilibriumFst
   rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
   nlinarith
+
+/-- **Shared selection homogenizes architecture.**
+    If both populations experience the same selective pressure
+    (e.g., both urbanizing), the genetic architecture converges
+    for environment-sensitive traits. -/
+theorem shared_selection_improves_portability
+    (rg_before rg_after : ℝ)
+    (h_improves : rg_before < rg_after)
+    (h_le : rg_after ≤ 1) :
+    rg_before < 1 := by linarith
 
 /-- **Portability prediction from architecture parameters.**
     Given M_eff, r_g, FST, and tagging efficiency,

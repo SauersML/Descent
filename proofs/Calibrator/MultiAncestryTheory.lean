@@ -30,18 +30,29 @@ section GWASDiversity
     d_GWAS(target) = weighted distance from target individual to GWAS centroid. -/
 
 /-- **Multi-ancestry GWAS reduces effective Fst.**
-    If the GWAS includes individuals from multiple ancestries,
-    the effective Fst to any target individual is smaller than
-    the Fst to a single-ancestry GWAS. -/
+    A multi-ancestry GWAS with fraction α from a second ancestry
+    at Fst distance d₂ from the target (and the primary ancestry at
+    distance d₁) has effective Fst = (1-α)·d₁ + α·d₂ to the target.
+    When d₂ < d₁ (the second ancestry is closer to the target),
+    the mixture Fst is lower, yielding higher portability.
+
+    Derived from: the convex combination (1-α)·d₁ + α·d₂ < d₁
+    when α > 0 and d₂ < d₁, and monotonicity of neutralPortabilityRatio. -/
 theorem multi_ancestry_reduces_fst
-    (fst_single fst_multi : ℝ)
-    (h_multi_closer : fst_multi < fst_single)
-    (h_multi_nn : 0 ≤ fst_multi)
-    (h_single_lt : fst_single < 1) :
+    (d₁ d₂ α : ℝ)
+    (h_d₁_pos : 0 < d₁) (h_d₁_lt : d₁ < 1)
+    (h_d₂_nn : 0 ≤ d₂) (h_d₂_closer : d₂ < d₁)
+    (h_α_pos : 0 < α) (h_α_le : α ≤ 1) :
+    let fst_single := d₁
+    let fst_multi := (1 - α) * d₁ + α * d₂
     neutralPortabilityRatio 0 fst_multi > neutralPortabilityRatio 0 fst_single := by
+  simp only
   unfold neutralPortabilityRatio
   simp
-  linarith
+  -- Need: (1 - α) * d₁ + α * d₂ < d₁
+  -- i.e. d₁ - α * d₁ + α * d₂ < d₁
+  -- i.e. α * (d₂ - d₁) < 0, true since α > 0 and d₂ < d₁
+  nlinarith
 
 /-- **Diminishing returns from more similar samples.**
     At small Fst, the derivative d(R²)/d(Fst) is steep.

@@ -106,6 +106,58 @@ theorem effective_polygenicity_ge_one
   rw [le_div_iff₀ h_fourth]
   linarith
 
+/-- **More polygenic → more portable (from CLT / variance aggregation).**
+    Under CLT, the PGS is approximately Gaussian with variance
+    Var(PGS) = Σ βᵢ² · 2pᵢ(1-pᵢ).
+    The per-variant LD mismatch contribution to portability loss
+    has variance σ²_LD per SNP. By variance aggregation (CLT),
+    the total portability loss SD scales as σ_LD · √M / (√M · per-snp-signal)
+    = σ_LD / √(M_eff), giving portability loss ∝ 1/√M_eff.
+
+    Derived: monotonicity of 1/√x for x > 0 means larger M_eff
+    gives smaller portability loss c/√M_eff. -/
+theorem more_polygenic_more_portable
+    (M_eff₁ M_eff₂ c : ℝ)
+    (h_M₁ : 0 < M_eff₁) (h_M₂ : 0 < M_eff₂)
+    (h_M : M_eff₁ < M_eff₂)
+    (h_c : 0 < c) :
+    -- More polygenic traits have smaller portability loss c/√M_eff
+    c / Real.sqrt M_eff₂ < c / Real.sqrt M_eff₁ := by
+  apply div_lt_div_of_pos_left h_c
+  · exact Real.sqrt_pos.mpr h_M₁
+  · exact Real.sqrt_lt_sqrt (le_of_lt h_M₁) h_M
+
+/-- **Height is highly polygenic → good portability.**
+    Height has M_eff > 10000 causal variants.
+    Its portability across EUR-EAS is ~0.6 (better than most traits).
+    With portability loss scaling as c/√M_eff, a trait with more
+    causal variants has smaller portability loss. -/
+theorem height_polygenic_good_portability
+    (M_eff_height M_eff_bmi c : ℝ)
+    (h_M_height : 0 < M_eff_height) (h_M_bmi : 0 < M_eff_bmi)
+    (h_M : M_eff_bmi < M_eff_height)
+    (h_c : 0 < c) (h_c_small : c < Real.sqrt M_eff_bmi) :
+    1 - c / Real.sqrt M_eff_bmi < 1 - c / Real.sqrt M_eff_height := by
+  have h1 : Real.sqrt M_eff_bmi < Real.sqrt M_eff_height :=
+    Real.sqrt_lt_sqrt (le_of_lt h_M_bmi) h_M
+  have h2 : 0 < Real.sqrt M_eff_bmi := Real.sqrt_pos.mpr h_M_bmi
+  linarith [div_lt_div_of_pos_left h_c h2 h1]
+
+/-- **Immune traits: moderate polygenicity but strong selection.**
+    Immune traits have moderate M_eff but strong directional selection
+    creates large effect size differences → poor portability
+    despite reasonable polygenicity. Selection reduces genetic
+    correlation rg, and portability scales as rg². Even moderate
+    polygenicity cannot compensate for low rg. -/
+theorem selection_overrides_polygenicity
+    (rg_immune rg_height ld_factor : ℝ)
+    (h_rg_immune : 0 ≤ rg_immune) (h_rg_height : 0 ≤ rg_height)
+    (h_ld : 0 < ld_factor) (h_ld_le : ld_factor ≤ 1)
+    (h_selection_lowers_rg : rg_immune < rg_height) :
+    rg_immune ^ 2 * ld_factor < rg_height ^ 2 * ld_factor := by
+  have : rg_immune ^ 2 < rg_height ^ 2 := by nlinarith [sq_nonneg (rg_height - rg_immune)]
+  nlinarith
+
 end PolygenicityAndPortability
 
 
@@ -154,9 +206,23 @@ theorem coding_enriched
   rw [hsimpl, lt_div_iff₀ (mul_pos h_mc h_ht)]
   nlinarith
 
-/-- **Portability varies by functional category.**
-    Coding variants are more portable (conserved effects).
-    Regulatory variants are less portable (population-specific regulation). -/
+/-- **Coding variants more portable than regulatory (from functional constraint).**
+    Coding regions are under stronger purifying selection across all
+    populations (protein sequences are conserved), so effect sizes at
+    coding variants are more correlated cross-population: rg_coding > rg_reg.
+    Since portability ∝ rg², and x ↦ x² is strictly monotone on [0,∞),
+    higher rg implies higher portability.
+
+    Derived: from rg_regulatory < rg_coding (both ≥ 0),
+    the strict monotonicity of squaring on nonneg reals gives the result. -/
+theorem coding_more_portable_than_regulatory
+    (rg_coding rg_regulatory : ℝ)
+    (h_coding_nn : 0 ≤ rg_coding) (h_reg_nn : 0 ≤ rg_regulatory)
+    (h_coding_higher : rg_regulatory < rg_coding) :
+    rg_regulatory ^ 2 < rg_coding ^ 2 := by
+  -- x² is strictly monotone on [0, ∞): if 0 ≤ a < b then a² < b²
+  nlinarith [sq_nonneg (rg_coding - rg_regulatory)]
+
 /- **LDSC-SEG for partitioned heritability.**
     h²_c = M_c × (Σ_j∈c l_j × τ_c) / (N × Σ_j l_j)
     where τ_c is the per-SNP heritability coefficient for category c. -/
@@ -203,6 +269,18 @@ theorem architecture_classification
     (h₁ : port_oligo < port_moderate)
     (h₂ : port_moderate < port_high_poly) :
     port_oligo < port_high_poly := by linarith
+
+/-- **Predicting which traits will have worst portability.**
+    Traits with: (1) low r_g, (2) high FST at causal loci,
+    (3) low polygenicity have the worst portability.
+    Portability ≈ rg² × (1 - fst). When rg < 0.5 and fst > 0.2,
+    portability < 0.25 × 0.8 = 0.2. -/
+theorem worst_portability_predictors
+    (rg fst : ℝ)
+    (h_rg_nn : 0 ≤ rg)
+    (h_low_rg : rg < 0.5) (h_high_fst : 0.2 < fst)
+    (h_fst_le : fst ≤ 1) :
+    rg ^ 2 * (1 - fst) < 0.2 := by nlinarith [sq_nonneg rg]
 
 end ArchitecturePredictions
 
