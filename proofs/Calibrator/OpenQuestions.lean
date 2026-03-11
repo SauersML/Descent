@@ -66,8 +66,8 @@ theorem r2_small_when_within_dominates
 /-- **χ² coefficient of variation.**
     Squared prediction error ε² ~ σ² · χ²₁ has Var(ε²) = 2σ⁴ and E[ε²] = σ².
     So CV² = 2σ⁴/σ⁴ = 2, making individual errors inherently noisy. -/
-theorem squared_error_cv_is_two (σ² : ℝ) (hσ : 0 < σ²) :
-    2 * σ² ^ 2 / σ² ^ 2 = 2 := by
+theorem squared_error_cv_is_two (sigma_sq : ℝ) (hσ : 0 < sigma_sq) :
+    2 * sigma_sq ^ 2 / sigma_sq ^ 2 = 2 := by
   rw [mul_div_cancel_right₀]
   exact pow_ne_zero 2 (ne_of_gt hσ)
 
@@ -101,26 +101,26 @@ section Question2
 
 /-- Faster exponential decay rate implies smaller correlation at any positive distance. -/
 theorem faster_decay_lower_correlation
-    (λ_slow λ_fast d : ℝ)
-    (hλ_slow_pos : 0 < λ_slow)
-    (hλ_faster : λ_slow < λ_fast)
+    (lam_slow lam_fast d : ℝ)
+    (hλ_slow_pos : 0 < lam_slow)
+    (hλ_faster : lam_slow < lam_fast)
     (hd_pos : 0 < d) :
-    Real.exp (-λ_fast * d) < Real.exp (-λ_slow * d) := by
+    Real.exp (-lam_fast * d) < Real.exp (-lam_slow * d) := by
   apply Real.exp_lt_exp.mpr
   nlinarith
 
 /-- Squared correlation: immune portability is strictly lower than neutral. -/
 theorem immune_portability_below_neutral
-    (r2_source λ_neutral λ_immune d : ℝ)
+    (r2_source lam_neutral lam_immune d : ℝ)
     (hr2 : 0 < r2_source)
-    (hλn : 0 < λ_neutral) (hλi : λ_neutral < λ_immune)
+    (hλn : 0 < lam_neutral) (hλi : lam_neutral < lam_immune)
     (hd : 0 < d) :
-    r2_source * (Real.exp (-λ_immune * d)) ^ 2 <
-      r2_source * (Real.exp (-λ_neutral * d)) ^ 2 := by
+    r2_source * (Real.exp (-lam_immune * d)) ^ 2 <
+      r2_source * (Real.exp (-lam_neutral * d)) ^ 2 := by
   apply mul_lt_mul_of_pos_left _ hr2
   apply sq_lt_sq'
-  · linarith [Real.exp_nonneg (-λ_immune * d), Real.exp_nonneg (-λ_neutral * d)]
-  · exact faster_decay_lower_correlation λ_neutral λ_immune d hλn hλi hd
+  · linarith [Real.exp_nonneg (-lam_immune * d), Real.exp_nonneg (-lam_neutral * d)]
+  · exact faster_decay_lower_correlation lam_neutral lam_immune d hλn hλi hd
 
 /-- **Heterozygosity increases toward 0.5.**
     Under divergent selection, allele freq p moves from extreme to
@@ -162,11 +162,11 @@ theorem compound_r2_drop
   have h_denom_s : 0 < vpgs_s * vy := mul_pos h_vpgs_pos h_vy_pos
   have h_denom_t : 0 < vpgs_t * vy := mul_pos (by linarith) h_vy_pos
   have h_denom_up : vpgs_s * vy < vpgs_t * vy := mul_lt_mul_of_pos_right h_vpgs_up h_vy_pos
+  have key : cov_t ^ 2 * (vpgs_s * vy) ≤ cov_t ^ 2 * (vpgs_t * vy) := by
+    apply mul_le_mul_of_nonneg_left (le_of_lt h_denom_up) (sq_nonneg cov_t)
   calc cov_t ^ 2 / (vpgs_t * vy)
       ≤ cov_t ^ 2 / (vpgs_s * vy) := by
-        apply div_le_div_of_nonneg_left (sq_nonneg cov_t |>.trans_lt h_cov_drop |>.le
-          |>.trans (le_of_lt h_cov_drop |>.symm ▸ sq_nonneg cov_t)) h_denom_s
-          (le_of_lt h_denom_up)
+        rwa [div_le_div_iff₀ h_denom_t h_denom_s]
     _ < cov_s ^ 2 / (vpgs_s * vy) := by
         exact div_lt_div_of_pos_right h_cov_drop h_denom_s
 
@@ -207,9 +207,9 @@ theorem ppv_increases_with_prevalence
     (h_prev : π₁ < π₂) :
     bayesPPV π₁ s f < bayesPPV π₂ s f := by
   unfold bayesPPV
-  have h_d₁ : 0 < π₁ * s + (1 - π₁) * f := by positivity
-  have h_d₂ : 0 < π₂ * s + (1 - π₂) * f := by positivity
-  rw [div_lt_div_iff h_d₁ h_d₂]
+  have h_d₁ : 0 < π₁ * s + (1 - π₁) * f := by nlinarith [mul_pos hπ₁ hs, mul_pos (by linarith : (0 : ℝ) < 1 - π₁) hf]
+  have h_d₂ : 0 < π₂ * s + (1 - π₂) * f := by nlinarith [mul_pos hπ₂ hs, mul_pos (by linarith : (0 : ℝ) < 1 - π₂) hf]
+  rw [div_lt_div_iff₀ h_d₁ h_d₂]
   nlinarith [mul_pos hπ₁ hs, mul_pos hπ₂ hf]
 
 /-- **Recall increases when more true cases exceed threshold.**
@@ -240,11 +240,11 @@ theorem r2_up_while_error_up
     When PGS variance changes with distance, partial R² can be non-monotonic
     even if "accuracy per unit variance" is constant. -/
 theorem partial_r2_from_signal_variance
-    (v₁ v₂ slope² v_resid : ℝ)
-    (hv₁ : 0 < v₁) (hv₂ : 0 < v₂) (hs : 0 < slope²) (hvr : 0 < v_resid)
+    (v₁ v₂ slope_sq v_resid : ℝ)
+    (hv₁ : 0 < v₁) (hv₂ : 0 < v₂) (hs : 0 < slope_sq) (hvr : 0 < v_resid)
     (hv_up : v₁ < v₂) :
-    slope² * v₁ / (slope² * v₁ + v_resid) < slope² * v₂ / (slope² * v₂ + v_resid) := by
-  exact expectedR2_strictMono_nonneg v_resid (slope² * v₁) (slope² * v₂) hvr
+    slope_sq * v₁ / (slope_sq * v₁ + v_resid) < slope_sq * v₂ / (slope_sq * v₂ + v_resid) := by
+  exact expectedR2_strictMono_nonneg v_resid (slope_sq * v₁) (slope_sq * v₂) hvr
     (le_of_lt (mul_pos hs hv₁)) (mul_lt_mul_of_pos_left hv_up hs)
 
 /-- **Precision-recall divergence is consistent.**
@@ -333,13 +333,13 @@ theorem relative_error_increases_with_turnover
     (β δ ρ₁ ρ₂ : ℝ) (hβ : 0 < β) (hδ : 0 < δ)
     (hρ₁ : 0 < ρ₁) (hρ₂ : 0 < ρ₂) (hρ : ρ₂ < ρ₁) (hρ₁_le : ρ₁ ≤ 1) :
     ((1 - ρ₁) * β + δ) / (ρ₁ * β) < ((1 - ρ₂) * β + δ) / (ρ₂ * β) := by
-  rw [div_lt_div_iff (mul_pos hρ₁ hβ) (mul_pos hρ₂ hβ)]
+  rw [div_lt_div_iff₀ (mul_pos hρ₁ hβ) (mul_pos hρ₂ hβ)]
   nlinarith [sq_nonneg β, mul_pos hρ₁ hβ, mul_pos hρ₂ hβ]
 
 /-- **Heterozygosity increase → PGS variance increase at a single locus.** -/
 theorem het_increase_implies_locus_var_increase
-    (β² H_s H_t : ℝ) (hβ : 0 < β²) (hH : H_s < H_t) :
-    β² * H_s < β² * H_t := by
+    (beta_sq H_s H_t : ℝ) (hβ : 0 < beta_sq) (hH : H_s < H_t) :
+    beta_sq * H_s < beta_sq * H_t := by
   exact mul_lt_mul_of_pos_left hH hβ
 
 end Question5
@@ -355,7 +355,7 @@ section Question6
 theorem variance_decomposition
     {m : ℕ} (w : Fin m → ℝ) (S : Finset (Fin m)) :
     ∑ i, w i = ∑ i ∈ S, w i + ∑ i ∈ Sᶜ, w i := by
-  rw [← Finset.sum_union Finset.disjoint_compl_right]
+  rw [← Finset.sum_union disjoint_compl_right]
   congr 1; exact (Finset.union_compl S).symm
 
 /-- **Sufficient condition for PGS variance increase.**
@@ -480,7 +480,8 @@ theorem neutral_beats_immune
     (hρ_pos : 0 ≤ ρ) (hρ_lt : ρ < 1) :
     r2 * ρ ^ 2 < r2 * 1 ^ 2 := by
   rw [one_pow]
-  exact mul_lt_mul_of_pos_left (sq_lt_one_of_abs_lt_one (by rwa [abs_of_nonneg hρ_pos])) hr2
+  apply mul_lt_mul_of_pos_left _ hr2
+  nlinarith [sq_abs ρ, sq_nonneg ρ]
 
 /-- **Drift-only portability (using existing infrastructure).**
     Under pure drift, portability ratio = (1-Fst_T)/(1-Fst_S).
@@ -501,8 +502,8 @@ theorem drift_only_overestimates_immune_portability
       unfold presentDayPGSVariance; exact mul_pos (by linarith) hVA
     calc ρ ^ 2 * presentDayPGSVariance V_A fstT
         < 1 * presentDayPGSVariance V_A fstT := by
-          exact mul_lt_mul_of_pos_right
-            (sq_lt_one_of_abs_lt_one (by rwa [abs_of_nonneg (le_of_lt hρ_pos)])) h_pdv_pos
+          apply mul_lt_mul_of_pos_right _ h_pdv_pos
+          nlinarith [sq_abs ρ, sq_nonneg ρ]
       _ = presentDayPGSVariance V_A fstT := one_mul _
 
 end SelectionModel
@@ -520,61 +521,62 @@ section LDTurnoverInteraction
 
 /-- **LD tagging efficiency decays exponentially with genetic distance.**
     ρ²_LD(d) = exp(-λ_LD · d). This is the Ohta-Kimura result. -/
-noncomputable def ldTaggingDecay (λ_LD d : ℝ) : ℝ :=
-  Real.exp (-λ_LD * d)
+noncomputable def ldTaggingDecay (lam_LD d : ℝ) : ℝ :=
+  Real.exp (-lam_LD * d)
 
 /-- **Combined LD + effect turnover portability.**
     Total portability = R²_source · ρ²_LD(d) · ρ²_effect(d). -/
 noncomputable def combinedPortability
-    (r2_src λ_LD λ_eff d : ℝ) : ℝ :=
-  r2_src * ldTaggingDecay λ_LD d * (Real.exp (-λ_eff * d)) ^ 2
+    (r2_src lam_LD lam_eff d : ℝ) : ℝ :=
+  r2_src * ldTaggingDecay lam_LD d * (Real.exp (-lam_eff * d)) ^ 2
 
 /-- **At distance 0, combined portability equals source R².** -/
-theorem combined_portability_at_zero (r2_src λ_LD λ_eff : ℝ) :
-    combinedPortability r2_src λ_LD λ_eff 0 = r2_src := by
+theorem combined_portability_at_zero (r2_src lam_LD lam_eff : ℝ) :
+    combinedPortability r2_src lam_LD lam_eff 0 = r2_src := by
   unfold combinedPortability ldTaggingDecay
   simp [mul_zero, Real.exp_zero]
 
 /-- **LD-only portability strictly exceeds combined portability at positive distance.**
     Adding effect turnover always makes portability worse. -/
 theorem turnover_worsens_ld_only_portability
-    (r2_src λ_LD λ_eff d : ℝ)
+    (r2_src lam_LD lam_eff d : ℝ)
     (hr2 : 0 < r2_src)
-    (hλ_eff : 0 < λ_eff) (hd : 0 < d) :
-    combinedPortability r2_src λ_LD λ_eff d <
-      r2_src * ldTaggingDecay λ_LD d := by
+    (hλ_eff : 0 < lam_eff) (hd : 0 < d) :
+    combinedPortability r2_src lam_LD lam_eff d <
+      r2_src * ldTaggingDecay lam_LD d := by
   unfold combinedPortability
-  have h_exp_lt : (Real.exp (-λ_eff * d)) ^ 2 < 1 := by
-    apply sq_lt_one_of_abs_lt_one
-    rw [abs_of_nonneg (Real.exp_nonneg _)]
-    rw [Real.exp_lt_one_iff]
-    linarith [mul_pos hλ_eff hd]
-  have h_base_pos : 0 < r2_src * ldTaggingDecay λ_LD d := by
+  have h_exp_lt : (Real.exp (-lam_eff * d)) ^ 2 < 1 := by
+    have h1 : Real.exp (-lam_eff * d) < 1 := by
+      rw [Real.exp_lt_one_iff]
+      linarith [mul_pos hλ_eff hd]
+    have h2 : 0 ≤ Real.exp (-lam_eff * d) := Real.exp_nonneg _
+    nlinarith [sq_abs (Real.exp (-lam_eff * d))]
+  have h_base_pos : 0 < r2_src * ldTaggingDecay lam_LD d := by
     unfold ldTaggingDecay
     exact mul_pos hr2 (Real.exp_pos _)
-  calc r2_src * ldTaggingDecay λ_LD d * (Real.exp (-λ_eff * d)) ^ 2
-      < r2_src * ldTaggingDecay λ_LD d * 1 :=
+  calc r2_src * ldTaggingDecay lam_LD d * (Real.exp (-lam_eff * d)) ^ 2
+      < r2_src * ldTaggingDecay lam_LD d * 1 :=
         mul_lt_mul_of_pos_left h_exp_lt h_base_pos
-    _ = r2_src * ldTaggingDecay λ_LD d := mul_one _
+    _ = r2_src * ldTaggingDecay lam_LD d := mul_one _
 
 /-- **Immune portability drops multiplicatively faster.**
     For immune traits (large λ_eff), the combined decay is much faster
     than for neutral traits (small λ_eff). -/
 theorem immune_combined_decay_faster
-    (r2_src λ_LD λ_eff_neutral λ_eff_immune d : ℝ)
+    (r2_src lam_LD lam_eff_neutral lam_eff_immune d : ℝ)
     (hr2 : 0 < r2_src)
-    (hλn : 0 < λ_eff_neutral)
-    (hλi : λ_eff_neutral < λ_eff_immune)
+    (hλn : 0 < lam_eff_neutral)
+    (hλi : lam_eff_neutral < lam_eff_immune)
     (hd : 0 < d) :
-    combinedPortability r2_src λ_LD λ_eff_immune d <
-      combinedPortability r2_src λ_LD λ_eff_neutral d := by
+    combinedPortability r2_src lam_LD lam_eff_immune d <
+      combinedPortability r2_src lam_LD lam_eff_neutral d := by
   unfold combinedPortability
-  have h_ld_pos : 0 < r2_src * ldTaggingDecay λ_LD d := by
+  have h_ld_pos : 0 < r2_src * ldTaggingDecay lam_LD d := by
     unfold ldTaggingDecay; exact mul_pos hr2 (Real.exp_pos _)
   apply mul_lt_mul_of_pos_left _ h_ld_pos
   apply sq_lt_sq'
-  · linarith [Real.exp_nonneg (-λ_eff_immune * d), Real.exp_nonneg (-λ_eff_neutral * d)]
-  · exact faster_decay_lower_correlation λ_eff_neutral λ_eff_immune d hλn hλi hd
+  · linarith [Real.exp_nonneg (-lam_eff_immune * d), Real.exp_nonneg (-lam_eff_neutral * d)]
+  · exact faster_decay_lower_correlation lam_eff_neutral lam_eff_immune d hλn hλi hd
 
 end LDTurnoverInteraction
 
@@ -697,7 +699,7 @@ theorem f1_le_arithmetic_mean (p r : ℝ)
     (hp : 0 < p) (hr : 0 < r) :
     f1Score p r ≤ (p + r) / 2 := by
   unfold f1Score
-  rw [div_le_div_iff (by linarith) (by norm_num)]
+  rw [div_le_div_iff₀ (by linarith) (by norm_num)]
   nlinarith [sq_nonneg (p - r)]
 
 /-- **Prevalence shift model for T2D.**
