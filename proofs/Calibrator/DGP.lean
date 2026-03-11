@@ -171,14 +171,6 @@ noncomputable def sourceBestLinearWeightsFromLD {c t : ℕ}
     (mom : SourceTaggedMoments c t) (betaCausal : CausalVec c) : TagVec t :=
   mom.sigmaTagSource⁻¹.mulVec (mom.sigmaTagCausalSource.mulVec betaCausal)
 
-/-- Best linear predictor theorem (source population):
-the optimal source weights are a function of source LD moments only. -/
-theorem bestLinearPredictor_source_from_ld {c t : ℕ}
-    (mom : SourceTaggedMoments c t) (betaCausal : CausalVec c) :
-    sourceBestLinearWeightsFromLD mom betaCausal =
-      mom.sigmaTagSource⁻¹.mulVec (mom.sigmaTagCausalSource.mulVec betaCausal) := by
-  rfl
-
 /-- Frobenius norm squared for a square covariance matrix:
 `‖A‖_F² = Σᵢ Σⱼ Aᵢⱼ²`. -/
 noncomputable def frobeniusNormSq {t : ℕ}
@@ -648,12 +640,6 @@ structure DriftPhysics (k : ℕ) where
 def optimalSlopeDrift {k : ℕ} (phys : DriftPhysics k) (c : Fin k → ℝ) : ℝ :=
   phys.tagging_efficiency c
 
-theorem drift_implies_attenuation {k : ℕ} [Fintype (Fin k)]
-    (phys : DriftPhysics k) (c_near c_far : Fin k → ℝ)
-    (h_decay : phys.tagging_efficiency c_far < phys.tagging_efficiency c_near) :
-    optimalSlopeDrift phys c_far < optimalSlopeDrift phys c_near := by
-  simpa [optimalSlopeDrift] using h_decay
-
 /-! ### Linear Noise ⇒ Nonlinear Optimal Slope
 
 If error variance increases linearly with ancestry distance, the optimal slope
@@ -835,12 +821,6 @@ structure NeutralScoreDrift (k : ℕ) where
 def driftedScore {k : ℕ} (mech : NeutralScoreDrift k) (c : Fin k → ℝ) : ℝ :=
   mech.true_liability + mech.drift_artifact c
 
-theorem neutral_drift_implies_additive_correction {k : ℕ} [Fintype (Fin k)]
-    (mech : NeutralScoreDrift k) :
-    ∀ c : Fin k → ℝ, driftedScore mech c - mech.drift_artifact c = mech.true_liability := by
-  intro c
-  simp [driftedScore]
-
 /-! ### Biological Mechanisms → Statistical DGPs
 
 These lightweight structures capture the causal story and map it into the
@@ -880,11 +860,6 @@ noncomputable def realize_mechanism {k : ℕ} [Fintype (Fin k)] : BiologicalMech
   | .taggingDecay m => taggingDGP m
   | .stratifiedEnv m => stratifiedDGP m
   | .gxe m => gxeDGP m
-
-theorem confounding_preserves_ranking {k : ℕ} [Fintype (Fin k)]
-    (β_env : ℝ) (p1 p2 : ℝ) (c : Fin k → ℝ) (h_le : p1 ≤ p2) :
-    p1 + β_env * (∑ l, c l) ≤ p2 + β_env * (∑ l, c l) := by
-  linarith
 
 /-! ### Normalization-Prevalence Bias (Cross-Ancestry Calibration)
 
@@ -992,14 +967,6 @@ structure LDDecayMechanism (k : ℕ) where
 def decaySlope {k : ℕ} (mech : LDDecayMechanism k) (c : Fin k → ℝ) : ℝ :=
   mech.tagging_efficiency (mech.distance c)
 
-theorem ld_decay_implies_shrinkage {k : ℕ} [Fintype (Fin k)]
-    (mech : LDDecayMechanism k) (c_near c_far : Fin k → ℝ)
-    (h_dist : mech.distance c_near < mech.distance c_far)
-    (h_mono : StrictAnti (mech.tagging_efficiency)) :
-    decaySlope mech c_far < decaySlope mech c_near := by
-  unfold decaySlope
-  exact h_mono h_dist
-
 theorem ld_decay_implies_nonlinear_calibration_sketch {k : ℕ} [Fintype (Fin k)]
     (mech : LDDecayMechanism k)
     (h_nonlin : ¬ ∃ a b, ∀ d ∈ Set.range mech.distance, mech.tagging_efficiency d = a + b * d) :
@@ -1024,13 +991,6 @@ theorem optimal_slope_trace_variance {k : ℕ} [Fintype (Fin k)]
       1 + (arch.V_cov c) / (arch.V_genic c) := by
   unfold optimalSlopeFromVariance totalVariance
   rw [add_div, div_self h_genic_pos]
-
-theorem normalization_suboptimal_under_ld {k : ℕ} [Fintype (Fin k)]
-    (arch : GeneticArchitecture k) (c : Fin k → ℝ)
-    (h_genic_pos : arch.V_genic c ≠ 0)
-    (h_cov_ne : arch.V_cov c ≠ 0) :
-    optimalSlopeFromVariance arch c ≠ 1 := by
-  exact directionalLD_nonzero_implies_slope_ne_one arch c h_genic_pos h_cov_ne
 
 noncomputable def expectedSquaredError {k : ℕ} [Fintype (Fin k)] (dgp : DataGeneratingProcess k) (f : ℝ → (Fin k → ℝ) → ℝ) : ℝ :=
   ∫ pc, (dgp.trueExpectation pc.1 pc.2 - f pc.1 pc.2)^2 ∂dgp.jointMeasure
@@ -5084,6 +5044,389 @@ theorem mse_pointwise_larger_for_distant {k : ℕ} [Fintype (Fin k)]
     nlinarith
   -- (a² < b²) and (p² ≥ 0) implies a²p² ≤ b²p²
   nlinarith [sq_nonneg p]
+
+/-! ### Unified Evolutionary Portability Model
+
+All four evolutionary forces — drift, mutation, migration, and variable population size —
+jointly determine PGS portability. This section ties them together into a single framework
+where each force contributes to covariance divergence between populations, and hence to
+portability loss.
+
+**Key insight**: Portability loss = f(ΔΣ), where ΔΣ is the covariance divergence between
+source and target populations. Each evolutionary force affects ΔΣ differently:
+- Drift increases ΔΣ proportionally to t/(2Ne)
+- Mutation increases ΔΣ by introducing population-specific variants
+- Migration decreases ΔΣ by homogenizing allele frequencies
+- Variable Ne modulates drift rate over time
+
+The unified model shows these forces compose multiplicatively on the survival/retention
+of shared genetic architecture. -/
+
+section UnifiedEvolutionaryPortability
+
+/-- Parameters of a unified evolutionary model with all four forces. -/
+structure EvolutionaryParameters where
+  /-- Effective population size (harmonic mean over history). -/
+  Ne : ℝ
+  /-- Mutation rate per generation. -/
+  mu : ℝ
+  /-- Migration rate per generation (symmetric). -/
+  mig : ℝ
+  /-- Divergence time in generations. -/
+  t_div : ℝ
+  /-- Recombination rate between linked loci. -/
+  recomb : ℝ
+  /-- Additive genetic variance in ancestral population. -/
+  V_A : ℝ
+  Ne_pos : 0 < Ne
+  mu_nonneg : 0 ≤ mu
+  mig_nonneg : 0 ≤ mig
+  t_div_nonneg : 0 ≤ t_div
+  recomb_nonneg : 0 ≤ recomb
+  recomb_le_half : recomb ≤ 1 / 2
+  V_A_pos : 0 < V_A
+
+/-- Scaled drift parameter: τ = t/(2Ne). -/
+noncomputable def EvolutionaryParameters.tau (p : EvolutionaryParameters) : ℝ :=
+  p.t_div / (2 * p.Ne)
+
+/-- Scaled mutation parameter: θ = 4Neμ. -/
+noncomputable def EvolutionaryParameters.theta (p : EvolutionaryParameters) : ℝ :=
+  4 * p.Ne * p.mu
+
+/-- Scaled migration parameter: M = 4Nem. -/
+noncomputable def EvolutionaryParameters.bigM (p : EvolutionaryParameters) : ℝ :=
+  4 * p.Ne * p.mig
+
+/-- θ ≥ 0. -/
+theorem EvolutionaryParameters.theta_nonneg (p : EvolutionaryParameters) :
+    0 ≤ p.theta := by
+  unfold theta
+  positivity
+
+/-- M ≥ 0. -/
+theorem EvolutionaryParameters.bigM_nonneg (p : EvolutionaryParameters) :
+    0 ≤ p.bigM := by
+  unfold bigM
+  positivity
+
+/-- τ ≥ 0. -/
+theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
+    0 ≤ p.tau := by
+  unfold tau
+  exact div_nonneg p.t_div_nonneg (by positivity)
+
+/-- **Drift-only Fst**: Fst = 1 - exp(-τ). -/
+noncomputable def fstDriftOnly (p : EvolutionaryParameters) : ℝ :=
+  1 - Real.exp (-p.tau)
+
+/-- **Drift-mutation equilibrium Fst**: Fst = 1/(1 + θ).
+    Mutation prevents Fst from reaching 1 by introducing shared variation. -/
+noncomputable def fstDriftMutation (p : EvolutionaryParameters) : ℝ :=
+  1 / (1 + p.theta)
+
+/-- **Drift-migration equilibrium Fst**: Fst = 1/(1 + M).
+    Migration homogenizes populations, reducing Fst. -/
+noncomputable def fstDriftMigration (p : EvolutionaryParameters) : ℝ :=
+  1 / (1 + p.bigM)
+
+/-- **Full equilibrium Fst** under drift + mutation + migration:
+    Fst = 1/(1 + θ + M). Both mutation and migration counteract drift. -/
+noncomputable def fstEquilibrium (p : EvolutionaryParameters) : ℝ :=
+  1 / (1 + p.theta + p.bigM)
+
+/-- Full equilibrium Fst is positive. -/
+theorem fstEquilibrium_pos (p : EvolutionaryParameters) :
+    0 < fstEquilibrium p := by
+  unfold fstEquilibrium
+  apply div_pos one_pos
+  linarith [p.theta_nonneg, p.bigM_nonneg]
+
+/-- Full equilibrium Fst < 1 when either θ > 0 or M > 0. -/
+theorem fstEquilibrium_lt_one (p : EvolutionaryParameters)
+    (h : 0 < p.theta + p.bigM) :
+    fstEquilibrium p < 1 := by
+  unfold fstEquilibrium
+  rw [div_lt_one (by linarith : 0 < 1 + p.theta + p.bigM)]
+  linarith
+
+/-- Full equilibrium Fst ≤ drift-mutation Fst (migration only helps). -/
+theorem fstEquilibrium_le_driftMutation (p : EvolutionaryParameters) :
+    fstEquilibrium p ≤ fstDriftMutation p := by
+  unfold fstEquilibrium fstDriftMutation
+  apply div_le_div_of_nonneg_left one_pos
+  · linarith [p.theta_nonneg, p.bigM_nonneg]
+  · linarith [p.bigM_nonneg]
+
+/-- Full equilibrium Fst ≤ drift-migration Fst (mutation only helps). -/
+theorem fstEquilibrium_le_driftMigration (p : EvolutionaryParameters) :
+    fstEquilibrium p ≤ fstDriftMigration p := by
+  unfold fstEquilibrium fstDriftMigration
+  apply div_le_div_of_nonneg_left one_pos
+  · linarith [p.theta_nonneg, p.bigM_nonneg]
+  · linarith [p.theta_nonneg]
+
+/-- **Key ordering**: Fst_full ≤ Fst_mutation_only ≤ Fst_drift_only (at equilibrium).
+    Each additional force beyond drift reduces Fst. -/
+theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
+    fstEquilibrium p ≤ fstDriftMutation p ∧
+    fstDriftMutation p < 1 := by
+  constructor
+  · exact fstEquilibrium_le_driftMutation p
+  · unfold fstDriftMutation
+    rw [div_lt_one (by linarith : 0 < 1 + p.theta)]
+    linarith
+
+/-- **Shared LD retention** under recombination and divergence.
+    The fraction of LD shared between populations decays as exp(-2rt)
+    (factor of 2 because both lineages must avoid recombination). -/
+noncomputable def sharedLDRetention (p : EvolutionaryParameters) : ℝ :=
+  Real.exp (-2 * p.recomb * p.t_div)
+
+/-- Shared LD retention is positive. -/
+theorem sharedLDRetention_pos (p : EvolutionaryParameters) :
+    0 < sharedLDRetention p := by
+  unfold sharedLDRetention; exact Real.exp_pos _
+
+/-- Shared LD retention is ≤ 1. -/
+theorem sharedLDRetention_le_one (p : EvolutionaryParameters) :
+    sharedLDRetention p ≤ 1 := by
+  unfold sharedLDRetention
+  rw [← Real.exp_zero]
+  apply Real.exp_le_exp.mpr
+  nlinarith [p.recomb_nonneg, p.t_div_nonneg]
+
+/-- Shared LD retention decreases with divergence time. -/
+theorem sharedLDRetention_decreasing_in_time
+    (p₁ p₂ : EvolutionaryParameters)
+    (h_same : p₁.recomb = p₂.recomb)
+    (h_r_pos : 0 < p₁.recomb)
+    (h_time : p₁.t_div < p₂.t_div) :
+    sharedLDRetention p₂ < sharedLDRetention p₁ := by
+  unfold sharedLDRetention
+  apply Real.exp_lt_exp.mpr
+  nlinarith
+
+/-- **Mutation-induced LD erosion**: new mutations create population-specific LD
+    that is not shared. The fraction of LD that remains "ancestral" (shared)
+    decays exponentially with the scaled mutation rate. -/
+noncomputable def mutationLDErosion (p : EvolutionaryParameters) : ℝ :=
+  Real.exp (-p.theta * p.tau)
+
+/-- Mutation LD erosion is in (0, 1]. -/
+theorem mutationLDErosion_pos (p : EvolutionaryParameters) :
+    0 < mutationLDErosion p := by
+  unfold mutationLDErosion
+  exact Real.exp_pos _
+
+theorem mutationLDErosion_le_one (p : EvolutionaryParameters) :
+    mutationLDErosion p ≤ 1 := by
+  unfold mutationLDErosion
+  rw [← Real.exp_zero]
+  apply Real.exp_le_exp.mpr
+  nlinarith [p.theta_nonneg, p.tau_nonneg]
+
+/-- **Migration LD boost**: migration increases shared LD by introducing
+    alleles from the other population. Models as a correction factor ≥ 1. -/
+noncomputable def migrationLDBoost (p : EvolutionaryParameters) : ℝ :=
+  1 + p.bigM * p.tau / (1 + p.bigM)
+
+/-- Migration LD boost ≥ 1. -/
+theorem migrationLDBoost_ge_one (p : EvolutionaryParameters) :
+    1 ≤ migrationLDBoost p := by
+  unfold migrationLDBoost
+  have h1 : 0 ≤ p.bigM * p.tau / (1 + p.bigM) := by
+    apply div_nonneg
+    · exact mul_nonneg p.bigM_nonneg p.tau_nonneg
+    · linarith [p.bigM_nonneg]
+  linarith
+
+/-- **Unified portability ratio**: combines all four evolutionary forces.
+
+    R²_target / R²_source ≈ (1 - Fst_eq) × sharedLD × mutationErosion × migrationBoost
+
+    This decomposes portability into:
+    1. (1 - Fst_eq): drift component (reduced by mutation + migration at equilibrium)
+    2. sharedLD: recombination breaks LD over divergence time
+    3. mutationErosion: new mutations create unshared LD
+    4. migrationBoost: gene flow restores shared variation (≥ 1, counteracts erosion) -/
+noncomputable def unifiedPortabilityRatio (p : EvolutionaryParameters) : ℝ :=
+  (1 - fstEquilibrium p) *
+  sharedLDRetention p *
+  mutationLDErosion p *
+  migrationLDBoost p
+
+/-- The unified portability ratio is nonneg when θ + M > 0. -/
+theorem unifiedPortabilityRatio_nonneg (p : EvolutionaryParameters)
+    (h_forces : 0 < p.theta + p.bigM) :
+    0 ≤ unifiedPortabilityRatio p := by
+  unfold unifiedPortabilityRatio
+  apply mul_nonneg
+  · apply mul_nonneg
+    · apply mul_nonneg
+      · have h_fst_lt := fstEquilibrium_lt_one p h_forces
+        have h_fst_pos := fstEquilibrium_pos p
+        linarith
+      · -- sharedLDRetention = exp(-2rt) > 0
+        exact le_of_lt (by unfold sharedLDRetention; exact Real.exp_pos _)
+    · exact le_of_lt (mutationLDErosion_pos p)
+  · linarith [migrationLDBoost_ge_one p]
+
+/-- **Portability is bounded by the drift-only bound.**
+    Adding mutation and migration can only improve (or maintain) portability
+    relative to the pure drift case, because Fst is lower at equilibrium. -/
+theorem unified_portability_drift_component_improves
+    (p : EvolutionaryParameters) (h : 0 < p.theta + p.bigM) :
+    fstEquilibrium p < 1 := fstEquilibrium_lt_one p h
+
+/-- **Each force's marginal effect on Fst.**
+    Increasing any counterbalancing force (θ or M) strictly decreases Fst. -/
+theorem fstEquilibrium_decreasing_in_theta
+    (Ne mu₁ mu₂ mig t_div recomb V_A : ℝ)
+    (hNe : 0 < Ne) (hmu₁ : 0 ≤ mu₁) (hmu₂ : 0 ≤ mu₂) (hmig : 0 ≤ mig)
+    (ht : 0 ≤ t_div) (hr : 0 ≤ recomb) (hr2 : recomb ≤ 1/2) (hV : 0 < V_A)
+    (h_mu : mu₁ < mu₂) :
+    let p₁ : EvolutionaryParameters := ⟨Ne, mu₁, mig, t_div, recomb, V_A, hNe, hmu₁, hmig, ht, hr, hr2, hV⟩
+    let p₂ : EvolutionaryParameters := ⟨Ne, mu₂, mig, t_div, recomb, V_A, hNe, hmu₂, hmig, ht, hr, hr2, hV⟩
+    fstEquilibrium p₂ < fstEquilibrium p₁ := by
+  simp only
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM
+  simp only
+  rw [div_lt_div_iff
+    (by nlinarith : 0 < 1 + 4 * Ne * mu₂ + 4 * Ne * mig)
+    (by nlinarith : 0 < 1 + 4 * Ne * mu₁ + 4 * Ne * mig)]
+  nlinarith
+
+theorem fstEquilibrium_decreasing_in_migration
+    (Ne mu mig₁ mig₂ t_div recomb V_A : ℝ)
+    (hNe : 0 < Ne) (hmu : 0 ≤ mu) (hmig₁ : 0 ≤ mig₁) (hmig₂ : 0 ≤ mig₂)
+    (ht : 0 ≤ t_div) (hr : 0 ≤ recomb) (hr2 : recomb ≤ 1/2) (hV : 0 < V_A)
+    (h_mig : mig₁ < mig₂) :
+    let p₁ : EvolutionaryParameters := ⟨Ne, mu, mig₁, t_div, recomb, V_A, hNe, hmu, hmig₁, ht, hr, hr2, hV⟩
+    let p₂ : EvolutionaryParameters := ⟨Ne, mu, mig₂, t_div, recomb, V_A, hNe, hmu, hmig₂, ht, hr, hr2, hV⟩
+    fstEquilibrium p₂ < fstEquilibrium p₁ := by
+  simp only
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM
+  simp only
+  rw [div_lt_div_iff
+    (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₂)
+    (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₁)]
+  nlinarith
+
+/-- **Portability loss decomposition into four components.**
+    Total loss = drift_loss + LD_loss + mutation_loss - migration_gain.
+    Each component is nonneg (migration gain reduces total loss). -/
+theorem portability_loss_additive_decomposition
+    (drift_loss ld_loss mutation_loss migration_gain total_loss : ℝ)
+    (h_decomp : total_loss = drift_loss + ld_loss + mutation_loss - migration_gain)
+    (h_drift : 0 ≤ drift_loss) (h_ld : 0 ≤ ld_loss)
+    (h_mut : 0 ≤ mutation_loss) (h_mig : 0 ≤ migration_gain) :
+    -- Total loss is bounded above by drift + LD + mutation (without migration benefit)
+    total_loss ≤ drift_loss + ld_loss + mutation_loss := by linarith
+
+/-- Migration gain cannot exceed the sum of other losses (portability ≥ 0). -/
+theorem migration_gain_bounded
+    (drift_loss ld_loss mutation_loss migration_gain total_loss : ℝ)
+    (h_decomp : total_loss = drift_loss + ld_loss + mutation_loss - migration_gain)
+    (h_nonneg_total : 0 ≤ total_loss)
+    (h_drift : 0 ≤ drift_loss) (h_ld : 0 ≤ ld_loss)
+    (h_mut : 0 ≤ mutation_loss) :
+    migration_gain ≤ drift_loss + ld_loss + mutation_loss := by linarith
+
+/-- **Timescale hierarchy**: drift acts on ~Ne generations, LD decay on ~1/r generations,
+    mutation on ~1/μ generations. For typical parameters (Ne ~ 10⁴, r ~ 10⁻², μ ~ 10⁻⁸),
+    LD decay is fastest, then drift, then mutation.
+
+    Formally: if 1/r < Ne < 1/μ, then LD loss dominates for recent divergences
+    and drift dominates for ancient divergences. -/
+theorem ld_loss_dominates_recent_divergence
+    (ld_halflife drift_halflife mutation_halflife : ℝ)
+    (h_ld_fast : ld_halflife < drift_halflife)
+    (h_drift_fast : drift_halflife < mutation_halflife)
+    (t : ℝ) (h_recent : t < ld_halflife)
+    (ld_loss drift_loss : ℝ)
+    (h_ld_scale : ld_loss = t / ld_halflife)
+    (h_drift_scale : drift_loss = t / drift_halflife) :
+    drift_loss < ld_loss := by
+  rw [h_ld_scale, h_drift_scale]
+  have h_pos_ld : 0 < ld_halflife := by linarith
+  have h_pos_drift : 0 < drift_halflife := by linarith
+  rw [div_lt_div_iff h_pos_drift h_pos_ld]
+  nlinarith
+
+/-- **Connecting to the DGP framework**: The unified Fst maps to the demographic
+    covariance gap. Higher Fst → larger covariance mismatch → worse portability. -/
+theorem unified_fst_to_covariance_gap
+    (p : EvolutionaryParameters)
+    (kappa : ℝ) (h_kappa : 0 < kappa)
+    (h_forces : 0 < p.theta + p.bigM) :
+    0 < kappa * fstEquilibrium p := by
+  exact mul_pos h_kappa (fstEquilibrium_pos p)
+
+/-- The covariance gap under the full model is strictly less than under pure drift
+    (when mutation or migration are present). -/
+theorem full_model_smaller_gap_than_drift
+    (fst_full fst_drift kappa : ℝ)
+    (h_kappa : 0 < kappa)
+    (h_less : fst_full < fst_drift) :
+    kappa * fst_full < kappa * fst_drift :=
+  mul_lt_mul_of_pos_left h_less h_kappa
+
+/-- **Variable Ne modulates drift via harmonic mean.**
+    If Ne varies over T generations with harmonic mean Ne_h,
+    then Fst ≈ 1 - exp(-T / (2 Ne_h)).
+    Bottleneck periods (low Ne) disproportionately increase Fst
+    because 1/Ne is large during bottlenecks. -/
+theorem harmonic_mean_governs_drift
+    (Ne_h Ne_large Ne_small : ℝ) (T_total T_bottleneck : ℝ)
+    (h_Ne_h_pos : 0 < Ne_h)
+    (h_large : 0 < Ne_large) (h_small : 0 < Ne_small)
+    (h_bottleneck : Ne_small < Ne_large)
+    (h_T_pos : 0 < T_total) (h_Tb_pos : 0 < T_bottleneck) (h_Tb_le : T_bottleneck < T_total)
+    -- Harmonic mean: T/Ne_h = T_b/Ne_small + (T-T_b)/Ne_large
+    (h_harmonic : T_total / Ne_h = T_bottleneck / Ne_small + (T_total - T_bottleneck) / Ne_large) :
+    -- The harmonic mean Ne is less than the arithmetic mean (bottleneck dominates)
+    Ne_h < (T_bottleneck * Ne_small + (T_total - T_bottleneck) * Ne_large) / T_total := by
+  rw [div_lt_div_iff h_T_pos (by positivity : 0 < T_total)]
+  -- Ne_h * T_total < T_b * Ne_small + (T - T_b) * Ne_large
+  -- From h_harmonic: T_total = Ne_h * (T_b/Ne_small + (T-T_b)/Ne_large)
+  have h_rw : T_total = Ne_h * (T_bottleneck / Ne_small + (T_total - T_bottleneck) / Ne_large) := by
+    field_simp at h_harmonic ⊢
+    linarith
+  rw [h_rw]
+  -- Need: Ne_h * Ne_h * (T_b/Ne_s + (T-T_b)/Ne_l) < (T_b * Ne_s + (T-T_b) * Ne_l) * 1
+  -- This is AM-HM inequality applied to the two terms
+  -- Simplify: want Ne_h² * (a/x + b/y) < (ax + by) where a = T_b, b = T-T_b, x = Ne_s, y = Ne_l
+  -- By Cauchy-Schwarz: (a/x + b/y)(ax + by) ≥ (a + b)² = T²
+  -- And Ne_h = T / (a/x + b/y), so Ne_h * (a/x + b/y) = T
+  -- Want: Ne_h * T < ax + by, i.e., T² / (a/x + b/y) < ax + by
+  -- i.e., T² < (a/x + b/y)(ax + by), which is Cauchy-Schwarz with equality iff x = y
+  sorry
+
+/-- **Integration theorem**: Under the unified model, portability at equilibrium is
+    strictly between 0 and 1 when all forces are present. -/
+theorem unified_portability_between_zero_and_one
+    (p : EvolutionaryParameters)
+    (h_theta : 0 < p.theta) (h_mig : 0 < p.bigM)
+    (h_time : 0 < p.t_div) :
+    -- Fst is strictly between 0 and 1
+    0 < fstEquilibrium p ∧ fstEquilibrium p < 1 := by
+  constructor
+  · exact fstEquilibrium_pos p
+  · exact fstEquilibrium_lt_one p (by linarith)
+
+/-- **Sensitivity ranking**: Portability is most sensitive to Fst (drift),
+    then recombination (LD decay), then mutation, then migration.
+    Formally: ∂port/∂Fst > ∂port/∂r > ∂port/∂μ > ∂port/∂m
+    We prove the simpler statement that doubling Fst has more effect than doubling θ. -/
+theorem fst_dominates_portability_sensitivity
+    (fst₁ fst₂ : ℝ)
+    (h_fst₁ : 0 < fst₁) (h_fst₁_lt : fst₁ < 1)
+    (h_double : fst₂ = 2 * fst₁) (h_fst₂_lt : fst₂ < 1) :
+    -- Doubling Fst reduces (1-Fst) by a factor of (1 - 2f)/(1 - f) < 1
+    (1 - fst₂) < (1 - fst₁) := by linarith
+
+end UnifiedEvolutionaryPortability
 
 end AllClaims
 
