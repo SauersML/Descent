@@ -44,15 +44,22 @@ theorem recalibration_slope_under_drift
 
 /-- **Recalibration recovers R² up to effect turnover limit.**
     After optimal linear recalibration, the residual R² loss is
-    due only to effect turnover (non-recoverable component). -/
+    due only to effect turnover (non-recoverable component).
+
+    Model: recalibrated R² = r2_source × ρ² (proportion of variance
+    explained after drift attenuates effects by squared correlation ρ²).
+    The turnover loss = r2_source × (1 - ρ²) is the non-recoverable part.
+    These two components sum to r2_source by algebraic decomposition:
+      r2_source × ρ² + r2_source × (1 - ρ²) = r2_source × (ρ² + 1 - ρ²) = r2_source. -/
 theorem recalibration_recovers_up_to_turnover
-    (r2_source ρ_sq r2_recalibrated r2_loss_turnover : ℝ)
-    (h_recalib : r2_recalibrated = r2_source * ρ_sq)
-    (h_turnover : r2_loss_turnover = r2_source * (1 - ρ_sq))
+    (r2_source ρ_sq : ℝ)
     (h_ρ : 0 ≤ ρ_sq) (h_ρ_le : ρ_sq ≤ 1)
     (h_r2 : 0 < r2_source) :
+    let r2_recalibrated := r2_source * ρ_sq
+    let r2_loss_turnover := r2_source * (1 - ρ_sq)
     r2_recalibrated + r2_loss_turnover = r2_source := by
-  rw [h_recalib, h_turnover]; ring
+  simp only
+  ring
 
 /-- **Recalibration cannot exceed oracle R².**
     The best linear recalibration cannot exceed the R² achievable
@@ -93,16 +100,22 @@ theorem spline_error_improves_with_knots
 /-- **Bias-variance tradeoff in spline calibration.**
     More knots → less bias (better approximation)
     More knots → more variance (overfitting)
-    Optimal: minimize bias² + variance.
-    When the variance increase exceeds the bias² decrease,
-    fewer knots (configuration 1) is better. -/
+    Optimal: minimize bias² + variance = MSE.
+
+    Model: MSE(k knots) = bias(k)² + var(k).
+    Config 1 (fewer knots): higher bias, lower variance.
+    Config 2 (more knots): lower bias, higher variance.
+
+    Derived: the MSE of config 1 is lower iff the variance increase
+    exceeds the bias² decrease. This is the "if" direction of
+    var₂ - var₁ > bias₁² - bias₂² ↔ bias₁² + var₁ < bias₂² + var₂,
+    which is direct rearrangement. The real content is the model
+    decomposition MSE = bias² + variance. -/
 theorem bias_variance_tradeoff
     (bias₁ bias₂ var₁ var₂ : ℝ)
     (h_bias_improves : bias₂ ^ 2 < bias₁ ^ 2)
     (h_var_worsens : var₁ < var₂)
-    -- Variance increase exceeds bias decrease
     (h_var_dominates : var₂ - var₁ > bias₁ ^ 2 - bias₂ ^ 2) :
-    -- First configuration is better (fewer knots)
     bias₁ ^ 2 + var₁ < bias₂ ^ 2 + var₂ := by linarith
 
 /-- **Spline R² is bounded by the signal-to-noise ratio.**
@@ -151,14 +164,33 @@ theorem more_target_data_reduces_mse
 /-- **Transfer is beneficial when source provides information.**
     The transferred estimator beats the target-only estimator when
     n_T is small relative to the information from source.
-    Model: MSE_transfer = σ²/n_T + bias² and MSE_target = σ²/n_T + σ²_extra/n_T
-    where σ²_extra/n_T > bias² when n_T is small and source is informative. -/
+
+    Model definitions:
+    - MSE_transfer = σ²/n_T + bias² (transfer bias is fixed, not sample-dependent)
+    - MSE_target = (σ² + σ²_extra)/n_T (target-only has extra variance from
+      estimating all effects de novo, but no transfer bias)
+
+    Derived: MSE_transfer < MSE_target ↔ bias² < σ²_extra/n_T.
+    When n_T is small, σ²_extra/n_T is large, so transfer wins.
+    As n_T → ∞, σ²_extra/n_T → 0, so target-only wins (bias² > 0). -/
 theorem transfer_beats_target_only
     (σ_sq bias_sq σ_extra_sq : ℝ) (n_T : ℝ)
-    (h_σ : 0 < σ_sq) (h_bias : 0 ≤ bias_sq)
+    (h_σ : 0 < σ_sq) (h_bias : 0 < bias_sq)
     (h_extra : 0 < σ_extra_sq) (h_n : 0 < n_T)
-    (h_source_helpful : bias_sq < σ_extra_sq / n_T) :
-    σ_sq / n_T + bias_sq < σ_sq / n_T + σ_extra_sq / n_T := by linarith
+    (h_small_n : n_T < σ_extra_sq / bias_sq) :
+    let mse_transfer := σ_sq / n_T + bias_sq
+    let mse_target := (σ_sq + σ_extra_sq) / n_T
+    mse_transfer < mse_target := by
+  simp only
+  -- From h_small_n: n_T < σ_extra_sq / bias_sq
+  -- Multiply both sides by bias_sq > 0: n_T * bias_sq < σ_extra_sq
+  -- Divide by n_T > 0: bias_sq < σ_extra_sq / n_T
+  -- Then σ_sq/n_T + bias_sq < σ_sq/n_T + σ_extra_sq/n_T = (σ_sq + σ_extra_sq)/n_T
+  have h_key : bias_sq < σ_extra_sq / n_T := by
+    rw [lt_div_iff₀ h_n]
+    rw [div_lt_iff₀ h_bias] at h_small_n
+    linarith
+  rw [add_div]; linarith
 
 /-- **Critical sample size for transfer benefit.**
     Transfer learning helps when n_T < n_crit, where

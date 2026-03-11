@@ -335,18 +335,21 @@ theorem discovered_variants_eur_biased
   het_strict_mono_on_lower_half p_afr p_eur h_afr h_afr_lt h_eur h_eur_lt h_drift_down
 
 /-- **Discovery bias inflates apparent portability gap.**
-    Model: the source PGS R² decomposes as
-      r²_source = r²_causal + r²_tag_bonus
-    where r²_tag_bonus > 0 comes from tagging optimization in the
-    source LD. The target PGS uses same weights but misses the
-    tag bonus: r²_target = r²_causal × ρ² for portability ratio ρ² ≤ 1.
+    Model definitions (let-bindings below):
+    - r²_source = r²_causal + r²_tag_bonus (source R² includes tagging bonus)
+    - r²_target = r²_causal × ρ² (target gets only causal signal, attenuated)
+    - apparent_gap = r²_source - r²_target
+    - true_causal_gap = r²_causal × (1 - ρ²)
 
-    The apparent gap (r²_source - r²_target) is therefore:
-      = r²_causal + r²_tag_bonus - r²_causal × ρ²
-      = r²_causal(1 - ρ²) + r²_tag_bonus
-    while the true causal gap is just r²_causal(1 - ρ²).
-    We derive that the apparent gap exceeds the true gap by exactly
-    the tag bonus term. -/
+    Algebraic derivation (verified by `ring`):
+      apparent_gap = (r²_causal + r²_tag_bonus) - r²_causal × ρ²
+                   = r²_causal - r²_causal × ρ² + r²_tag_bonus
+                   = r²_causal × (1 - ρ²) + r²_tag_bonus
+                   = true_causal_gap + r²_tag_bonus
+
+    The tag bonus inflates the apparent gap beyond the true causal gap.
+    This is a definitional identity: the proof content is the model
+    decomposition, not the algebra. -/
 theorem discovery_bias_inflates_source_r2
     (r2_causal r2_tag_bonus ρ_sq : ℝ)
     (h_causal_pos : 0 < r2_causal)
@@ -449,7 +452,13 @@ theorem minimax_favors_multi_ancestry
 
 /-- **Pareto frontier of power vs portability.**
     The set of achievable (power, portability) pairs forms a
-    Pareto frontier. No design dominates in both dimensions. -/
+    Pareto frontier. No design dominates in both dimensions.
+
+    This is the definition of Pareto incomparability: if design 2
+    has strictly more power but strictly less portability than
+    design 1, then neither design Pareto-dominates the other.
+    The proof is elementary order logic: strict inequality in one
+    dimension contradicts the weak inequality required for dominance. -/
 theorem pareto_no_dominance
     (power₁ port₁ power₂ port₂ : ℝ)
     (h_more_power : power₁ < power₂)

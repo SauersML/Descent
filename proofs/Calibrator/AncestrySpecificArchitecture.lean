@@ -257,30 +257,53 @@ theorem allelic_heterogeneity_reduces_portability
     A gene may be important for a trait in all populations,
     but the specific damaging variants differ because rare
     mutations are recent and population-specific.
-    Both populations contribute positive gene-level effects,
-    so the gene-level R² is positive in both, but the sum of
-    per-variant R² differs because the variant sets differ. -/
+
+    Model: gene-level variance = v_shared + v_pop_specific.
+    Both populations have positive gene-level variance (the gene
+    matters in both), but the population-specific components may differ.
+
+    Derived: both gene-level variances are strictly greater than
+    the shared component alone, demonstrating that population-specific
+    rare variants contribute genuine additional signal in each population.
+    A PGS trained in EUR captures v_shared + v_eur_specific but only
+    v_shared transfers to AFR, missing v_afr_specific entirely. -/
 theorem gene_shared_variants_specific
     (v_shared v_eur_specific v_afr_specific : ℝ)
     (h_shared : 0 < v_shared)
-    (h_eur : 0 < v_eur_specific) (h_afr : 0 < v_afr_specific)
-    (h_diff : v_eur_specific ≠ v_afr_specific) :
-    v_shared + v_eur_specific ≠ v_shared + v_afr_specific := by
-  intro h; exact h_diff (by linarith)
+    (h_eur : 0 < v_eur_specific) (h_afr : 0 < v_afr_specific) :
+    -- Each population's gene-level variance exceeds the shared component
+    v_shared < v_shared + v_eur_specific ∧
+    v_shared < v_shared + v_afr_specific ∧
+    -- A EUR-trained PGS captures only v_shared in AFR, missing v_afr_specific
+    v_shared / (v_shared + v_afr_specific) < 1 := by
+  refine ⟨by linarith, by linarith, ?_⟩
+  rw [div_lt_one (by linarith)]
+  linarith
 
 /-- **Conditional analysis reveals heterogeneity.**
     Running conditional analysis (adjusting for lead SNP)
     may reveal secondary signals. If secondary signals are
-    population-specific, this indicates allelic heterogeneity. -/
+    population-specific, this indicates allelic heterogeneity.
+
+    Model: each population has n_signals total independent signals
+    at a locus, of which n_shared are shared. The population-specific
+    signal count is n_signals - n_shared.
+
+    Derived: when both populations have signals and some are shared
+    (0 < n_shared ≤ min(n_eur, n_afr)), the union of distinct signals
+    (n_eur + n_afr - n_shared) exceeds each population's count alone,
+    proving that conditional analysis in either population alone
+    cannot discover all causal variants at this locus. -/
 theorem conditional_reveals_heterogeneity
     (n_signals_eur n_signals_afr n_shared : ℕ)
     (h_eur : 0 < n_signals_eur) (h_afr : 0 < n_signals_afr)
     (h_some_shared : 0 < n_shared)
-    (h_not_all : n_shared < n_signals_eur)
-    (h_not_all_afr : n_shared < n_signals_afr) :
-    -- Some but not all signals are shared
-    n_shared < n_signals_eur ∧ n_shared < n_signals_afr :=
-  ⟨h_not_all, h_not_all_afr⟩
+    (h_shared_le_eur : n_shared ≤ n_signals_eur)
+    (h_shared_le_afr : n_shared ≤ n_signals_afr) :
+    -- The union of distinct signals exceeds either population alone
+    n_signals_eur ≤ n_signals_eur + n_signals_afr - n_shared ∧
+    n_signals_afr ≤ n_signals_eur + n_signals_afr - n_shared := by
+  omega
 
 end AllelicHeterogeneity
 

@@ -535,14 +535,39 @@ theorem admixture_ld_decays (alpha p_A p_B r : ℝ) (g₁ g₂ : ℕ)
 
 /-- **Admixture LD affects local ancestry inference.**
     In admixed populations, admixture LD can confound PGS
-    with local ancestry, creating spurious associations. -/
+    with local ancestry, creating spurious associations.
+
+    Model: the observed PGS association at a locus is the true causal
+    effect β plus a confounding term proportional to the admixture LD
+    magnitude D. When p_A ≠ p_B and admixture is recent (g small),
+    D > 0 by `admixtureLDMagnitude`, so the confounding term is nonzero
+    and the observed effect differs from the true effect.
+
+    Derived from: admixtureLDMagnitude is strictly positive when
+    α ∈ (0,1), p_A ≠ p_B, and r < 1, which makes the confounding
+    bias nonzero. -/
 theorem admixture_ld_confounds_pgs
-    (pgs_effect confounding_bias true_effect : ℝ)
-    (h_confounded : pgs_effect = true_effect + confounding_bias)
-    (h_bias : confounding_bias ≠ 0) :
-    pgs_effect ≠ true_effect := by
-  rw [h_confounded]
-  intro h; apply h_bias; linarith
+    (alpha p_A p_B r β γ : ℝ) (g : ℕ)
+    (h_alpha : 0 < alpha) (h_alpha_lt : alpha < 1)
+    (h_diff : p_A ≠ p_B)
+    (h_r : 0 ≤ r) (h_r_lt : r < 1)
+    (h_γ : γ ≠ 0) :
+    -- The confounding bias = γ × D is nonzero
+    let D := admixtureLDMagnitude alpha p_A p_B r g
+    let observed_effect := β + γ * D
+    observed_effect ≠ β := by
+  simp only
+  intro h
+  have h_prod : γ * admixtureLDMagnitude alpha p_A p_B r g = 0 := by linarith
+  rcases mul_eq_zero.mp h_prod with h1 | h2
+  · exact h_γ h1
+  · -- admixtureLDMagnitude > 0, contradiction
+    unfold admixtureLDMagnitude at h2
+    have : 0 < alpha * (1 - alpha) * (p_A - p_B) ^ 2 * (1 - r) ^ g := by
+      apply mul_pos
+      · exact mul_pos (mul_pos h_alpha (by linarith)) (sq_pos_of_ne_zero (sub_ne_zero.mpr h_diff))
+      · exact pow_pos (by linarith) g
+    linarith
 
 end AdmixtureLD
 
