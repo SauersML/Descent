@@ -5649,13 +5649,17 @@ monotone functions of R² through the normal CDF Φ (which is itself monotone).
 AUC integrates sensitivity over 1-specificity, giving Φ(√(SNR/2)).
 -/
 
-/-- Standard normal CDF (axiomatized — this is a Mathlib-level concept). -/
+/-- Standard normal CDF.
+    Axiomatized because the full construction requires Mathlib's measure theory
+    (Lebesgue integral of the Gaussian density). The properties below (monotonicity,
+    symmetry) are provable from the measure-theoretic definition and are standard
+    Mathlib-level facts, not population genetics or statistical genetics claims. -/
 noncomputable def Phi : ℝ → ℝ := sorry
 
-/-- Phi is monotone increasing (property of the standard normal CDF). -/
+/-- Phi is monotone increasing (the Gaussian density is positive everywhere). -/
 axiom Phi_mono : StrictMono Phi
 
-/-- Phi(0) = 1/2 (standard normal is symmetric). -/
+/-- Phi(0) = 1/2 (standard normal density is symmetric about 0). -/
 axiom Phi_zero : Phi 0 = 1 / 2
 
 /-- **Signal-to-noise ratio** from R².
@@ -5700,12 +5704,23 @@ theorem PGSEvolutionaryModel.AUC_target_le_source (m : PGSEvolutionaryModel)
     (h_ratio_nn : 0 ≤ m.portabilityRatio) :
     m.AUC_target ≤ m.AUC_source := by
   unfold AUC_target AUC_source
-  -- Monotonicity chain: R2_target ≤ R2_source → SNR ↑ → √ ↑ → Φ ↑
-  have h_r2 := m.R2_target_le_source h_forces h_ratio_le
+  -- Monotonicity chain: R2 ≤ → SNR ≤ → √(·/2) ≤ → Φ(·) ≤
+  have h_r2_le := m.R2_target_le_source h_forces h_ratio_le
   have h_r2_nn := m.R2_target_nonneg h_ratio_nn
-  -- The full chain requires SNR monotonicity, sqrt monotonicity, and Phi monotonicity
-  -- Each step is proved above; the composition gives the result
-  sorry
+  have h_r2t_lt1 : m.R2_target < 1 := by
+    unfold R2_target; nlinarith [m.R2_source_lt_one, m.R2_source_pos]
+  -- Step 1: SNR monotone (a/(1-a) ≤ b/(1-b) when a ≤ b and both < 1)
+  have h_snr_le : snrFromR2 m.R2_target ≤ snrFromR2 m.R2_source := by
+    unfold snrFromR2
+    rw [div_le_div_iff (by linarith : 0 < 1 - m.R2_target)
+      (by linarith [m.R2_source_lt_one] : 0 < 1 - m.R2_source)]
+    nlinarith
+  -- Step 2: √(SNR/2) monotone (√ is monotone, /2 preserves order)
+  have h_sqrt_le : Real.sqrt (snrFromR2 m.R2_target / 2) ≤
+      Real.sqrt (snrFromR2 m.R2_source / 2) :=
+    Real.sqrt_le_sqrt (by linarith)
+  -- Step 3: Φ is monotone
+  exact Phi_mono.monotone h_sqrt_le
 
 /-! ### Step 5: Target Brier score
 
