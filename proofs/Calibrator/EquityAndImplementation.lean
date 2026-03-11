@@ -144,8 +144,8 @@ theorem equal_fpr_requires_different_thresholds
   rw [h_eq, h_sigma_eq] at h_equal_z
   -- h_equal_z : (threshold₂ - mu₁) / sigma₂ = (threshold₂ - mu₂) / sigma₂
   have h_eq₂ : (threshold₂ - mu₁) * sigma₂ = (threshold₂ - mu₂) * sigma₂ := by
-    rwa [div_eq_div_iff h_sigma₂.ne' h_sigma₂.ne'] at h_equal_z
-  have := mul_right_cancel₀ h_sigma₂.ne' h_eq₂
+    rwa [div_eq_div_iff (ne_of_gt h_sigma₂) (ne_of_gt h_sigma₂)] at h_equal_z
+  have := mul_right_cancel₀ (ne_of_gt h_sigma₂) h_eq₂
   linarith
 
 /-- **Group-blind vs group-aware PGS policies.**
@@ -203,17 +203,17 @@ theorem r2_concave_in_n
   unfold expectedR2FromN
   -- This is equivalent to showing f''(n) < 0 for f(n) = nh²/(nh²+M)
   -- f'(n) = h²M/(nh²+M)², f''(n) = -2(h²)²M/(nh²+M)³ < 0
-  have h1 : 0 < n * h2 + M := by positivity
-  have h2' : 0 < (n + dn) * h2 + M := by positivity
-  have h3 : 0 < (n + 2 * dn) * h2 + M := by positivity
-  rw [div_sub_div _ _ (h3.ne') (h2'.ne'),
-      div_sub_div _ _ (h2'.ne') (h1.ne')]
+  -- f(n) = nh²/(nh²+M) is concave in n, so f(n+2d)-f(n+d) < f(n+d)-f(n)
+  -- Each difference = dh²M / ((xh²+M)((x+d)h²+M))
+  -- Denominator grows with x → difference shrinks
+  have h1 : 0 < n * h2 + M := by nlinarith [mul_pos h_n h_h2]
+  have h2' : 0 < (n + dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n + dn) h_h2]
+  have h3 : 0 < (n + 2 * dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n + 2 * dn) h_h2]
+  rw [div_sub_div _ _ h3.ne' h2'.ne', div_sub_div _ _ h2'.ne' h1.ne']
   rw [div_lt_div_iff₀ (mul_pos h3 h2') (mul_pos h2' h1)]
-  -- Each numerator: (x+dn)h2(xh2+M) - ((x+dn)h2+M)(xh2) = dn*h2*M
   have h_num : ∀ x : ℝ, (x + dn) * h2 * (x * h2 + M) - ((x + dn) * h2 + M) * (x * h2) = dn * h2 * M := by
     intro x; ring
-  nlinarith [h_num n, h_num (n + dn), mul_pos h_h2 h_M, mul_pos h_h2 h_dn,
-             mul_pos (by linarith : (0:ℝ) < dn * h2) (by linarith : (0:ℝ) < 2 * n * h2 + dn * h2 + 2 * M)]
+  nlinarith [h_num n, h_num (n + dn), mul_pos h_h2 h_M, sq_nonneg (dn * h2)]
 
 /-- **Marginal value of diversity.**
     Adding underrepresented individuals has higher marginal value
@@ -270,11 +270,11 @@ theorem validation_n_depends_on_r2
   · rw [h_n_eur]; apply div_pos
     · exact mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) h_r2_eur)
         (sq_pos_of_ne_zero h1)
-    · exact sq_pos_of_ne_zero h_delta.ne'
+    · exact sq_pos_of_ne_zero (ne_of_gt h_delta)
   · rw [h_n_afr]; apply div_pos
     · exact mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) h_r2_afr)
         (sq_pos_of_ne_zero h2)
-    · exact sq_pos_of_ne_zero h_delta.ne'
+    · exact sq_pos_of_ne_zero (ne_of_gt h_delta)
 
 /- **Ancestry-aware clinical decision support.**
     The clinical decision system should:

@@ -178,10 +178,10 @@ theorem am_correction_increases_portability
     (h_product_s : r_s * h2 < 1) (h_product_t : r_t * h2 < 1) :
     amCorrectedPortability port_m r_s r_t h2 < port_m := by
   unfold amCorrectedPortability
-  rw [div_lt_iff₀ (by linarith : 0 < 1 - r_t * h2)]
-  rw [show port_m * (1 - r_t * h2) = port_m - port_m * r_t * h2 from by ring]
-  rw [show port_m * (1 - r_s * h2) = port_m - port_m * r_s * h2 from by ring]
-  nlinarith [mul_pos h_port (mul_pos (by linarith : 0 < r_s - r_t) h_h2)]
+  have h_denom : 0 < 1 - r_t * h2 := by nlinarith [mul_nonneg h_rt (le_of_lt h_h2)]
+  rw [div_lt_iff₀ h_denom]
+  have : (1 - r_s * h2) < (1 - r_t * h2) := by nlinarith [mul_pos (by linarith : 0 < r_s - r_t) h_h2]
+  nlinarith [mul_pos h_port h_denom]
 
 end DifferentialAM
 
