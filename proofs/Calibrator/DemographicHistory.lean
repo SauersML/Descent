@@ -88,13 +88,23 @@ theorem admixed_fst_smaller (α fst_AB : ℝ)
     _ = fst_AB := one_mul _
 
 /-- **PGS trained in parent population has intermediate portability to admixed.**
-    Better than to the other parent, worse than to itself. -/
+    Better than to the other parent, worse than to itself.
+    Model: R² to admixed = α · R²(A→A) + (1-α) · R²(A→B) for admixture
+    proportion α from population A. Since R²(A→B) < R²(A→A) and 0 < α < 1,
+    the weighted average is strictly between the two parent values. -/
 theorem admixed_intermediate_portability
-    (r2_A_to_A r2_A_to_admixed r2_A_to_B : ℝ)
-    (h_self : r2_A_to_admixed < r2_A_to_A)
-    (h_better : r2_A_to_B < r2_A_to_admixed) :
-    r2_A_to_B < r2_A_to_admixed ∧ r2_A_to_admixed < r2_A_to_A :=
-  ⟨h_better, h_self⟩
+    (r2_AA r2_AB α : ℝ)
+    (h_AA_pos : 0 < r2_AA)
+    (h_AB_nn : 0 ≤ r2_AB)
+    (h_gap : r2_AB < r2_AA)
+    (hα : 0 < α) (hα1 : α < 1) :
+    r2_AB < α * r2_AA + (1 - α) * r2_AB ∧
+      α * r2_AA + (1 - α) * r2_AB < r2_AA := by
+  constructor
+  · -- r2_AB = 0 · r2_AA + 1 · r2_AB < α · r2_AA + (1-α) · r2_AB
+    nlinarith
+  · -- α · r2_AA + (1-α) · r2_AB < α · r2_AA + (1-α) · r2_AA = r2_AA
+    nlinarith
 
 /-- Optimal admixed PGS (convex combination) is between the two parent values. -/
 theorem optimal_admixed_pgs_is_weighted

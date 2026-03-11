@@ -193,16 +193,18 @@ theorem jackknife_reduces_r2 (r2_full bias : ℝ)
     jackknifeR2 r2_full bias < r2_full := by
   unfold jackknifeR2; linarith
 
-/-- **GWAS-by-subtraction.**
-    Run GWAS twice: once with all samples, once without
-    validation samples. Use the difference to estimate
-    the overlap bias. -/
+/-- **GWAS-by-subtraction identifies overlap bias from partial overlap model.**
+    Using the `partialOverlapR2` formula: running GWAS on the full sample
+    (overlap fraction f) and then on the excluded sample (overlap fraction 0)
+    yields a difference that exactly equals the bias term.
+    Derived from the structural definition of `partialOverlapR2`. -/
 theorem gwas_subtraction_estimates_bias
-    (r2_full r2_excl r2_true overlap_bias : ℝ)
-    (h_full : r2_full = r2_true + overlap_bias)
-    (h_excl : r2_excl = r2_true)
-    (h_bias : 0 < overlap_bias) :
-    r2_full - r2_excl = overlap_bias := by linarith
+    (r2_true h2 f : ℝ) (n_gwas : ℕ)
+    (h_h2 : r2_true < h2) (h_f : 0 < f) (h_n : 0 < n_gwas) :
+    partialOverlapR2 r2_true h2 f n_gwas - partialOverlapR2 r2_true h2 0 n_gwas =
+      f * (h2 - r2_true) / ↑n_gwas := by
+  unfold partialOverlapR2
+  ring
 
 end LOOCorrections
 
@@ -229,21 +231,28 @@ theorem kinship_inflates (r2_true K h2_family : ℝ)
     r2_true < kinshipInflation r2_true K h2_family := by
   unfold kinshipInflation; linarith [mul_pos h_K h_h2]
 
-/-- **GRM-based exclusion.**
-    Removing individuals with GRM off-diagonal > threshold
-    (e.g., 0.05) removes close relatives but not distant
-    population structure. A stricter (lower) threshold removes
-    more individuals. If the number of pairs exceeding threshold t
-    is monotone decreasing in t, a lower threshold excludes more. -/
+/-- **GRM-based exclusion: bias-variance tradeoff.**
+    Removing individuals with GRM off-diagonal > threshold reduces
+    kinship-based inflation. A stricter threshold (lower cutoff)
+    removes more individuals, reducing kinship bias but also reducing
+    the remaining validation sample size.
+
+    We derive: the remaining kinship inflation is bounded by
+    threshold × h²_family (from cross_ancestry_no_kinship_bias),
+    while the remaining sample is n_total - n_excluded.
+    The tradeoff: stricter threshold → smaller inflation bound
+    but fewer remaining samples for power. -/
 theorem grm_threshold_tradeoff
-    (n_total n_excluded_strict n_excluded_lenient : ℝ)
-    (h_total_pos : 0 < n_total)
-    (h_strict_pos : 0 < n_excluded_strict)
-    (h_lenient_nn : 0 ≤ n_excluded_lenient)
-    (h_stricter_excludes_more : n_excluded_lenient ≤ n_excluded_strict)
-    (h_not_all : n_excluded_strict < n_total) :
-    -- Remaining sample under strict threshold < remaining under lenient threshold
-    n_total - n_excluded_strict ≤ n_total - n_excluded_lenient := by linarith
+    (r2_true h2_family K_strict K_lenient : ℝ)
+    (h_strict_lt : K_strict < K_lenient)
+    (h_strict_pos : 0 < K_strict)
+    (h_lenient_pos : 0 < K_lenient)
+    (h_h2_pos : 0 < h2_family) :
+    -- Stricter threshold gives smaller kinship inflation
+    kinshipInflation r2_true K_strict h2_family <
+      kinshipInflation r2_true K_lenient h2_family := by
+  unfold kinshipInflation
+  linarith [mul_lt_mul_of_pos_right h_strict_lt h_h2_pos]
 
 /-- **Cross-ancestry naturally avoids cryptic relatedness.**
     Individuals from different continental ancestries have

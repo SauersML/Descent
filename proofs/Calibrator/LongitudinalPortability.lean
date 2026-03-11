@@ -181,6 +181,20 @@ performance, even within the same population.
 
 section CohortEffects
 
+/-- **PGS effect sizes are cohort-dependent.**
+    A PGS trained on one birth cohort may have different
+    effect sizes in another due to changed environments.
+    Model: the observed effect β_obs = β_genetic × env_modifier, where
+    env_modifier differs between cohorts due to changing environments.
+    If env₁ ≠ env₂ and β_genetic ≠ 0, then the observed effects differ. -/
+theorem cohort_specific_effects
+    (beta_genetic env₁ env₂ : ℝ)
+    (h_beta : beta_genetic ≠ 0)
+    (h_env_diff : env₁ ≠ env₂) :
+    beta_genetic * env₁ ≠ beta_genetic * env₂ := by
+  intro h
+  exact h_env_diff (mul_left_cancel₀ h_beta h)
+
 /-- **Age-dependent PGS performance.**
     PGS for age-related traits (e.g., CAD, T2D) have different
     predictive power at different ages. This interacts with
@@ -194,6 +208,44 @@ theorem age_r2_peaks_at_optimal (r2_peak age_peak width : ℝ)
     ageDependentR2 r2_peak age_peak age_peak width = r2_peak := by
   unfold ageDependentR2
   simp [sub_self, zero_pow, mul_zero, zero_div, neg_zero, Real.exp_zero, mul_one]
+
+/-- **Education PGS and cohort effects.**
+    Education PGS trained on older cohorts (where education access
+    was more restricted) have different effect sizes than those
+    trained on younger cohorts.
+    Model: R² = V_A / (V_A + V_E), where V_E differs between cohorts.
+    Older cohorts had more environmental barriers (V_E_old > V_E_young),
+    so R²_old < R²_young. -/
+theorem education_cohort_effect
+    (V_A V_E_old V_E_young : ℝ)
+    (h_VA : 0 < V_A) (h_VE_old : 0 < V_E_old) (h_VE_young : 0 < V_E_young)
+    (h_more_barriers : V_E_young < V_E_old) :
+    V_A / (V_A + V_E_old) ≠ V_A / (V_A + V_E_young) := by
+  intro h
+  have h₁ : V_A + V_E_old ≠ 0 := by linarith
+  have h₂ : V_A + V_E_young ≠ 0 := by linarith
+  rw [div_eq_div_iff h₁ h₂] at h
+  nlinarith [mul_comm V_A V_E_old, mul_comm V_A V_E_young]
+
+/-- **Survivorship bias in older cohorts.**
+    PGS for mortality-related traits in older cohorts are biased
+    by survivorship: only survivors are observed, creating
+    selection bias.
+    Model: observed effect = true effect × attenuation, where
+    attenuation = (1 - selection_intensity) and 0 < selection_intensity < 1.
+    Therefore |β_observed| < |β_true|. -/
+theorem survivorship_bias_attenuates_pgs
+    (beta_true attenuation : ℝ)
+    (h_beta : beta_true ≠ 0)
+    (h_att_pos : 0 < attenuation) (h_att_lt : attenuation < 1) :
+    |beta_true * attenuation| < |beta_true| := by
+  rw [abs_mul]
+  calc |beta_true| * |attenuation|
+      < |beta_true| * 1 := by {
+        apply mul_lt_mul_of_pos_left _ (abs_pos.mpr h_beta)
+        rwa [abs_of_pos h_att_pos]
+      }
+    _ = |beta_true| := mul_one _
 
 end CohortEffects
 
@@ -327,6 +379,22 @@ Methods for validating PGS performance across different time periods.
 
 section CrossTemporalValidation
 
+/-- **Temporal train-test split.**
+    Training on earlier cohort and testing on later cohort
+    is more realistic than random split for assessing
+    real-world temporal portability.
+    Model: R²_random = R²_true, but R²_temporal = R²_true × decay(Δt)
+    where decay(Δt) = exp(-λ × Δt) ≤ 1. So R²_temporal ≤ R²_random. -/
+theorem temporal_split_more_conservative
+    (r2_true lambda delta_t : ℝ)
+    (h_r2 : 0 ≤ r2_true) (h_lam : 0 ≤ lambda) (h_dt : 0 ≤ delta_t) :
+    r2_true * Real.exp (-lambda * delta_t) ≤ r2_true := by
+  have h_exp_le : Real.exp (-lambda * delta_t) ≤ 1 := by
+    rw [Real.exp_le_one_iff_nonpos]; nlinarith
+  calc r2_true * Real.exp (-lambda * delta_t)
+      ≤ r2_true * 1 := mul_le_mul_of_nonneg_left h_exp_le h_r2
+    _ = r2_true := mul_one _
+
 /-- **Phenotype definition stability.**
     Changes in diagnostic criteria over time (e.g., ICD revisions)
     create apparent portability loss that is purely definitional. -/
@@ -335,6 +403,21 @@ theorem diagnostic_change_creates_apparent_loss
     (h_reduced : r2_changed_def < r2_consistent_def)
     (h_nn : 0 < r2_changed_def) :
     0 < r2_consistent_def - r2_changed_def := by linarith
+
+/-- **Genotype-phenotype map stability varies by trait.**
+    Highly polygenic traits with small per-variant effects
+    have more temporally stable PGS than oligogenic traits
+    where a few variants dominate.
+    Model: stability = 1 - max_variant_contribution, where
+    max_variant_contribution = max(β²_i) / Σ β²_i.
+    Polygenic traits have many small effects → smaller max contribution.
+    Oligogenic traits have few large effects → larger max contribution. -/
+theorem polygenic_more_temporally_stable
+    (max_contrib_poly max_contrib_oligo : ℝ)
+    (h_poly_small : 0 ≤ max_contrib_poly) (h_poly_le : max_contrib_poly ≤ 1)
+    (h_oligo_small : 0 ≤ max_contrib_oligo) (h_oligo_le : max_contrib_oligo ≤ 1)
+    (h_poly_more_even : max_contrib_poly < max_contrib_oligo) :
+    1 - max_contrib_oligo < 1 - max_contrib_poly := by linarith
 
 end CrossTemporalValidation
 

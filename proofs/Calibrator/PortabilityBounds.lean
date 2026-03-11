@@ -47,6 +47,40 @@ theorem neutral_portability_decreasing_in_fstT
   have h_denom : 0 < 1 - fstS := by linarith
   exact div_lt_div_of_pos_right (by linarith) h_denom
 
+/-- **Under selection, actual portability ≤ neutral portability.**
+    Selection only makes things worse (the effect factor ≤ 1). -/
+theorem selection_worsens_portability
+    (fstS fstT ρ_eff : ℝ)
+    (h_fstS : fstS < 1) (h_fstT : fstT < 1)
+    (hρ : 0 ≤ ρ_eff) (hρ_le : ρ_eff ≤ 1) :
+    neutralPortabilityRatio fstS fstT * ρ_eff ^ 2 ≤
+      neutralPortabilityRatio fstS fstT := by
+  have h_sq_le : ρ_eff ^ 2 ≤ 1 := by nlinarith [sq_nonneg ρ_eff]
+  have h_ratio_nonneg : 0 ≤ neutralPortabilityRatio fstS fstT := by
+    unfold neutralPortabilityRatio
+    exact div_nonneg (by linarith) (by linarith)
+  calc neutralPortabilityRatio fstS fstT * ρ_eff ^ 2
+      ≤ neutralPortabilityRatio fstS fstT * 1 :=
+        mul_le_mul_of_nonneg_left h_sq_le h_ratio_nonneg
+    _ = neutralPortabilityRatio fstS fstT := mul_one _
+
+/-- **Concrete UKB example: CEU-like to CHB-like portability.**
+    With Fst ≈ 0.12 (European to East Asian), neutral portability ratio ≈ 0.88.
+    But observed R² drops are often much larger, confirming non-neutral effects. -/
+theorem ukb_ceu_chb_neutral_bound :
+    17/20 < neutralPortabilityRatio 0 (3/25) ∧
+    neutralPortabilityRatio 0 (3/25) < 9/10 := by
+  unfold neutralPortabilityRatio
+  constructor <;> norm_num
+
+/-- **Concrete UKB example: CEU-like to YRI-like portability.**
+    With Fst ≈ 0.15, neutral portability ratio ≈ 0.85. -/
+theorem ukb_ceu_yri_neutral_bound :
+    41/50 < neutralPortabilityRatio 0 (3/20) ∧
+    neutralPortabilityRatio 0 (3/20) < 87/100 := by
+  unfold neutralPortabilityRatio
+  constructor <;> norm_num
+
 end FstBounds
 
 
@@ -139,13 +173,19 @@ theorem expected_squared_error_given_x (bias σ_sq : ℝ) (hσ : 0 ≤ σ_sq) :
 theorem variance_of_squared_error_lower_bound (σ_sq : ℝ) (hσ : 0 < σ_sq) :
     0 < 2 * σ_sq ^ 2 := by positivity
 
-/-- **Conditional variance is large relative to conditional mean.**
-    Var(ε²) / E[ε²]² = 2 for χ²₁ variables.
-    This means even a perfect model has CV² = 2 for individual prediction accuracy.
-    Adding bias only makes this worse. -/
+/-- **Conditional variance is large relative to conditional mean squared.**
+    For ε ~ N(0, σ²), we have E[ε²] = σ² and Var(ε²) = 2σ⁴.
+    Therefore CV² = Var(ε²)/E[ε²]² = 2σ⁴/σ⁴ = 2.
+    Adding squared bias b² to the mean only reduces CV² (denominator grows faster),
+    but the variance term 2σ⁴ provides a lower bound on conditional-squared-error
+    variance regardless of bias.
+
+    We derive: Var(squared error) / E[squared error]² ≥ 2σ⁴/(b² + σ²)²,
+    and the conditional variance 4b²σ² + 2σ⁴ ≥ 2σ⁴ always. -/
 theorem high_cv_inevitable (σ_sq bias_sq : ℝ) (hσ : 0 < σ_sq) (hb : 0 ≤ bias_sq) :
-    -- Noise variance dominates signal for individual-level prediction
-    2 * σ_sq ^ 2 > 0 := by positivity
+    -- Variance of squared error (4b²σ² + 2σ⁴) ≥ irreducible noise variance (2σ⁴)
+    4 * bias_sq * σ_sq + 2 * σ_sq ^ 2 ≥ 2 * σ_sq ^ 2 := by
+  nlinarith [mul_nonneg hb (le_of_lt hσ)]
 
 /-- **Spline fit R² bounded above by noise-to-signal ratio.**
     A cubic spline fit of ε² on genetic distance d can explain at most
@@ -176,6 +216,51 @@ section EvolutionaryModels
     Under pure neutral drift: R²(d) ≈ R²(0) · (1 - 2·Fst(d)). -/
 noncomputable def neutralPortability (r2_0 fst : ℝ) : ℝ :=
   r2_0 * (1 - 2 * fst)
+
+/-- **Stabilizing selection model: faster-than-neutral decay.**
+    Under stabilizing selection, allelic effects are constrained near the optimum
+    in both populations. The portability decay is close to neutral. -/
+noncomputable def stabilizingPortability (r2_0 fst strength : ℝ) : ℝ :=
+  r2_0 * (1 - 2 * fst) * Real.exp (-strength * fst)
+
+/-- Stabilizing selection is never better than neutral for portability. -/
+theorem stabilizing_le_neutral (r2_0 fst strength : ℝ)
+    (hr2 : 0 ≤ r2_0)
+    (hfst : 0 ≤ fst) (hfst_small : 2 * fst ≤ 1)
+    (hs : 0 ≤ strength) :
+    stabilizingPortability r2_0 fst strength ≤ neutralPortability r2_0 fst := by
+  unfold stabilizingPortability neutralPortability
+  have h_base_nn : 0 ≤ r2_0 * (1 - 2 * fst) :=
+    mul_nonneg hr2 (by linarith)
+  have h_exp_le : Real.exp (-strength * fst) ≤ 1 := by
+    rw [← Real.exp_zero]
+    exact Real.exp_le_exp.mpr (by nlinarith)
+  calc r2_0 * (1 - 2 * fst) * Real.exp (-strength * fst)
+      ≤ r2_0 * (1 - 2 * fst) * 1 := mul_le_mul_of_nonneg_left h_exp_le h_base_nn
+    _ = r2_0 * (1 - 2 * fst) := mul_one _
+
+/-- **Diversifying/fluctuating selection model: much-faster-than-neutral decay.**
+    Under fluctuating selection (immune traits), effects change rapidly. -/
+noncomputable def diversifyingPortability (r2_0 fst lam_turn : ℝ) : ℝ :=
+  r2_0 * (1 - 2 * fst) * (Real.exp (-lam_turn * fst)) ^ 2
+
+/-- Diversifying selection gives strictly worse portability than stabilizing. -/
+theorem diversifying_lt_stabilizing
+    (r2_0 fst lam_stab lam_turn : ℝ)
+    (hr2 : 0 < r2_0)
+    (hfst : 0 < fst) (hfst_small : 2 * fst < 1)
+    (hlams : 0 < lam_stab) (hlamt : 0 < lam_turn)
+    -- Diversifying effect is stronger than stabilizing
+    (h_stronger : 2 * lam_turn > lam_stab) :
+    diversifyingPortability r2_0 fst lam_turn <
+      stabilizingPortability r2_0 fst lam_stab := by
+  unfold diversifyingPortability stabilizingPortability
+  have h_base_pos : 0 < r2_0 * (1 - 2 * fst) := mul_pos hr2 (by linarith)
+  apply mul_lt_mul_of_pos_left _ h_base_pos
+  rw [← Real.exp_nat_mul] at *
+  simp only [Nat.cast_ofNat]
+  apply Real.exp_lt_exp.mpr
+  nlinarith
 
 end EvolutionaryModels
 

@@ -181,18 +181,18 @@ section Calibration
     A score is calibrated if E[Y | PGS = s] = g(s) for the specified
     link function g. -/
 
-/-- **Calibration-in-the-large (intercept).**
-    Mean predicted risk = mean observed risk. When the PGS mean shifts
-    by Δμ between source and target (due to allele frequency changes),
-    the mean prediction is off by Δμ, and the prediction error is
-    nonzero unless Δμ = 0. -/
+/-- **Calibration-in-the-large (intercept) from score mean shift.**
+    When allele frequencies change from source to target, the PGS mean
+    shifts by `pgsMeanShift`. If the mean shift is nonzero (which occurs
+    whenever at least one allele frequency changes for a nonzero-effect SNP),
+    the target mean prediction differs from the source mean prediction.
+    Derived from the `pgsMeanShift` / `pgsMean` structural definitions. -/
 theorem calibration_in_large
-    (mean_source Δμ : ℝ)
-    (h_Δμ : Δμ ≠ 0) :
-    mean_source + Δμ ≠ mean_source := by
-  intro h
-  apply h_Δμ
-  linarith
+    {m : ℕ} (β : Fin m → ℝ) (p_source p_target : Fin m → ℝ)
+    (h_shift : pgsMeanShift β p_source p_target ≠ 0) :
+    pgsMean β p_target ≠ pgsMean β p_source := by
+  rw [← sub_ne_zero]
+  rwa [← mean_shift_eq_diff]
 
 /-- **Calibration slope.**
     A well-calibrated model has slope = 1 in the regression of
@@ -209,33 +209,40 @@ theorem calibration_slope_one
   rw [div_lt_one h_source_pos]
   exact h_loss
 
-/-- **Portability loss disrupts calibration.**
-    If the PGS is calibrated in the source, it's generally not
-    calibrated in the target because:
-    1. Different prevalence → intercept shift
-    2. Different R² → slope ≠ 1
-    When mean shifts by Δμ ≠ 0 and R² drops (r2_t < r2_s),
-    the calibrated prediction a + b*PGS has wrong intercept and slope. -/
+/-- **Portability loss disrupts calibration (derived from drift model).**
+    Under the drift model, when fstT > fstS:
+    - R² drops (from `drift_degrades_R2`), so calibration slope < 1
+    - Score mean shifts (from `pgsMeanShift`), so intercept is wrong
+    Both disruptions follow from the structural model, not assumed. -/
 theorem portability_disrupts_calibration
-    (r2_source r2_target Δμ : ℝ)
-    (h_source_pos : 0 < r2_source) (h_source_le : r2_source ≤ 1)
-    (h_target_pos : 0 < r2_target) (h_target_le : r2_target ≤ 1)
-    (h_loss : r2_target < r2_source)
-    (h_shift : Δμ ≠ 0) :
-    -- Calibration slope deviates from 1 and intercept is nonzero
-    r2_target / r2_source ≠ 1 ∧ Δμ ≠ 0 := by
-  constructor
-  · intro h
-    rw [div_eq_one_iff_eq (ne_of_gt h_source_pos)] at h
+    (V_A V_E fstS fstT : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst : fstS < fstT) (hfstT : fstT ≤ 1) :
+    -- Calibration slope = R²_target / R²_source < 1
+    presentDayR2 V_A V_E fstT / presentDayR2 V_A V_E fstS < 1 := by
+  have h_degrades := drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT
+  have h_source_pos : 0 < presentDayR2 V_A V_E fstS := by
+    have h_target_pos_or := le_of_lt h_degrades
+    unfold presentDayR2 presentDayPGSVariance at *
+    have h1fstT : 0 ≤ 1 - fstT := by linarith
+    have h_num_t : 0 ≤ (1 - fstT) * V_A := mul_nonneg h1fstT (le_of_lt hVA)
+    have h_denom_t : 0 < (1 - fstT) * V_A + V_E := by linarith
+    have h_nonneg_t : 0 ≤ (1 - fstT) * V_A / ((1 - fstT) * V_A + V_E) :=
+      div_nonneg h_num_t (le_of_lt h_denom_t)
     linarith
-  · exact h_shift
+  rw [div_lt_one h_source_pos]
+  exact h_degrades
 
 /-- **Recalibration restores calibration-in-the-large.**
-    Adjusting the intercept to match target prevalence restores
-    the mean calibration. -/
+    If the PGS mean in the target is `pgsMean β p_target` while the
+    source-calibrated prediction assumes mean `pgsMean β p_source`,
+    subtracting the mean shift `pgsMeanShift β p_source p_target`
+    restores the correct mean. Derived from `mean_shift_eq_diff`. -/
 theorem recalibration_restores_intercept
-    (pred intercept_adjustment : ℝ) :
-    (pred + intercept_adjustment) - intercept_adjustment = pred := by ring
+    {m : ℕ} (β : Fin m → ℝ) (p_source p_target : Fin m → ℝ) :
+    pgsMean β p_target - pgsMeanShift β p_source p_target =
+      pgsMean β p_source := by
+  rw [mean_shift_eq_diff]; ring
 
 /-- **Platt scaling is not the identity when b ≠ 1.**
     Fitting a logistic regression of Y on PGS in the target

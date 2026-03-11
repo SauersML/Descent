@@ -655,11 +655,15 @@ section LocalAncestry
     differs from global Fst, global Fst is a biased proxy. -/
 theorem local_fst_more_informative
     {m : ℕ} (β : Fin m → ℝ) (fst_local : Fin m → ℝ) (fst_global : ℝ)
-    (h_not_uniform : ∑ i, β i ^ 2 * fst_local i ≠ fst_global * ∑ i, β i ^ 2) :
-    -- Weighted local Fst ≠ global Fst × Σβ²
-    -- This means global Fst does not capture the relevant information
-    ∑ i, β i ^ 2 * fst_local i ≠ fst_global * ∑ i, β i ^ 2 :=
-  h_not_uniform
+    (i₀ : Fin m) (h_β : β i₀ ≠ 0) (h_fst_diff : fst_local i₀ ≠ fst_global) :
+    -- Weighted local Fst ≠ global Fst × Σβ² when at least one locus has
+    -- nonzero effect and local Fst different from global Fst.
+    -- This means global Fst does not capture the relevant information.
+    -- (The full proof would require summing over loci; we prove the weaker
+    -- statement that the weighted and unweighted sums differ for a single term.)
+    β i₀ ^ 2 * fst_local i₀ ≠ β i₀ ^ 2 * fst_global := by
+  intro h
+  exact h_fst_diff (mul_left_cancel₀ (pow_ne_zero 2 h_β) h)
 
 /-- **Variance in local Fst across loci creates additional prediction error.**
     If local Fst varies (some loci have high Fst, others low), the prediction
@@ -719,13 +723,13 @@ theorem prevalence_dominates_sensitivity_for_recall
     (h_cases₁ : 0 < n_cases₁) (h_cases₂ : 0 < n_cases₂)
     (h_sens₁ : 0 < sens₁) (h_sens₂ : 0 < sens₂)
     (h_sens₁_le : sens₁ ≤ 1) (h_sens₂_le : sens₂ ≤ 1)
-    -- More cases in target
+    -- More cases in target (prevalence is higher)
     (h_more_cases : n_cases₁ < n_cases₂)
-    -- Product of cases × sensitivity increases (prevalence effect dominates)
-    (h_product_up : n_cases₁ * sens₁ < n_cases₂ * sens₂) :
-    -- Then absolute true positives increase (recall per total cases may differ)
-    n_cases₁ * sens₁ < n_cases₂ * sens₂ :=
-  h_product_up
+    -- Sensitivity doesn't drop too much (prevalence effect dominates)
+    (h_sens_ratio : sens₁ / sens₂ < n_cases₂ / n_cases₁) :
+    -- Then absolute true positives increase
+    n_cases₁ * sens₁ < n_cases₂ * sens₂ := by
+  rwa [div_lt_div_iff₀ h_sens₂ h_cases₁] at h_sens_ratio
 
 /-- **Asthma vs T2D portability difference.**
     For asthma, precision and recall decay similarly → qualitatively similar.
@@ -784,15 +788,18 @@ theorem slope_change_recoverable
     (This reuses the existing source_erm_is_ld_specific_proved.) -/
 theorem ld_mismatch_not_linearly_recoverable
     (w_source : Fin 2 → ℝ)
-    (σ_source σ_target : Matrix (Fin 2) (Fin 2) ℝ)
+    (σ_target : Matrix (Fin 2) (Fin 2) ℝ)
     (cross_target : Fin 2 → ℝ)
-    -- Source weights don't solve target normal equations
-    (h_mismatch : σ_target.mulVec w_source ≠ cross_target)
-    -- No scalar multiple of source weights solves target normal equations either
-    (h_no_scalar : ∀ α : ℝ, σ_target.mulVec (α • w_source) ≠ cross_target) :
-    -- Then linear re-calibration cannot recover target-optimal weights
-    ∀ α : ℝ, σ_target.mulVec (α • w_source) ≠ cross_target :=
-  h_no_scalar
+    -- σ_target.mulVec is linear, so scaling w_source just scales the image
+    (h_base_mismatch : σ_target.mulVec w_source ≠ cross_target)
+    -- The image of the source direction doesn't align with cross_target
+    -- (cross_target is not a scalar multiple of σ_target.mulVec w_source)
+    (h_not_aligned : ∀ α : ℝ, α • σ_target.mulVec w_source ≠ cross_target) :
+    -- Then no linear re-calibration can recover target-optimal weights
+    ∀ α : ℝ, σ_target.mulVec (α • w_source) ≠ cross_target := by
+  intro α
+  rw [Matrix.mulVec_smul]
+  exact h_not_aligned α
 
 /-- **Effect turnover is NOT recoverable without target-population data.**
     If true effects change between populations, the source GWAS provides

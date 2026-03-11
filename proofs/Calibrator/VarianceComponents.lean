@@ -168,6 +168,17 @@ and the GWAS sample size.
 
 section PGSCeiling
 
+/-- **PGS R² ceiling from heritability.**
+    R²_PGS ≤ h²_SNP. No PGS can explain more variance than what's
+    genetically tagged. The PGS explains a fraction f of tagged
+    additive variance, so R²_PGS = f × h²_SNP ≤ h²_SNP. -/
+theorem pgs_r2_ceiling_from_h2
+    (h2_snp f : ℝ)
+    (h_h2 : 0 < h2_snp)
+    (h_f_nn : 0 ≤ f) (h_f_le : f ≤ 1) :
+    h2_snp * f ≤ h2_snp := by
+  exact mul_le_of_le_one_right (le_of_lt h_h2) h_f_le
+
 /-- **PGS R² ceiling from GWAS power.**
     R²_PGS ≤ h²_SNP × (1 - (1-power)^m)
     where power is per-SNP GWAS power and m is number of causal SNPs.

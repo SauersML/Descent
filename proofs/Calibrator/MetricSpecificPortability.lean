@@ -48,17 +48,20 @@ theorem r2_sensitive_to_mean_shift
   have h := drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT_le_one
   linarith
 
-/-- **AUC is invariant to monotone transformations.**
-    AUC depends only on the rank ordering of predictions,
-    not on their absolute values. If a monotone transform
-    preserves rank ordering, AUC is unchanged while absolute
-    predictions shift by some offset δ. -/
+/-- **AUC rank-invariance: AUC degrades only through SNR, not through mean shift.**
+    Under the drift model, AUC = aucLink(SNR) where SNR = (1-fst)·V_A / V_E.
+    The SNR depends on fst (which captures variance loss from drift) but is
+    structurally independent of any additive mean shift δ.
+
+    We prove: AUC at a given fst is fully determined by the signal-to-noise
+    ratio at that fst. Two populations with the same fst have the same AUC,
+    even if their score means differ due to different ancestral allele
+    frequencies. This is the formal content of "AUC depends only on
+    discrimination (rank ordering), not on calibration (absolute values)." -/
 theorem auc_rank_invariant
-    (auc_original auc_transformed : ℝ)
-    (pred_shift : ℝ)
-    (h_rank_preserved : auc_original = auc_transformed + 0 * pred_shift)
-    (h_shift_nonzero : pred_shift ≠ 0) :
-    auc_original = auc_transformed := by linarith
+    (aucLink : ℝ → ℝ) (V_A V_E fst : ℝ) :
+    presentDayAUC aucLink V_A V_E fst = aucLink (presentDaySignalToNoise V_A V_E fst) := by
+  unfold presentDayAUC; rfl
 
 /-- **AUC can be more portable than R² (derived from metric structure).**
     We model R² portability as the product of a discrimination factor ρ_disc
@@ -76,25 +79,37 @@ theorem auc_more_portable_than_r2
     mul_lt_mul_of_pos_left h_cal_lt h_disc_pos
   linarith [mul_one ρ_disc]
 
-/-- **AUC depends on prevalence.**
-    For a fixed PGS, AUC changes if the case-control ratio changes
-    across populations (different disease prevalence).
-    AUC is perturbed from a baseline by a prevalence-dependent shift. -/
-theorem auc_depends_on_prevalence
-    (auc_base prev_shift : ℝ)
-    (h_shift_ne : prev_shift ≠ 0) :
-    auc_base ≠ auc_base + prev_shift := by linarith
-
-/-- **R² to AUC conversion (Wray et al., 2010).**
-    AUC ≈ Φ(√(R²/(1-R²)/2)) for liability threshold model.
-    This is approximately √(R²) for small R².
-    When R² > 0, AUC = 0.5 + increment where increment > 0. -/
-theorem r2_auc_relationship
-    (r2 increment : ℝ)
+/-- **Brier score depends on prevalence (derived from Brier definition).**
+    The Brier score `brierFromR2 π r2 = π(1-π)(1-r2)` explicitly depends on
+    prevalence π. Higher prevalence (up to 0.5) gives higher Brier score
+    for the same R², because π(1-π) increases on (0, 0.5).
+    This is why calibration-sensitive metrics are less portable than
+    discrimination-only metrics like AUC when prevalence differs. -/
+theorem brier_depends_on_prevalence
+    (r2 π₁ π₂ : ℝ)
     (h_r2_pos : 0 < r2) (h_r2_lt : r2 < 1)
-    (h_increment_pos : 0 < increment) (h_increment_le : increment ≤ 0.5) :
-    -- AUC > 0.5 when R² > 0
-    0.5 < 0.5 + increment := by linarith
+    (h_π₁ : 0 < π₁) (h_π₂ : 0 < π₂) (h_π₂' : π₂ < 1)
+    (h_order : π₁ < π₂) (h_half : π₂ ≤ 1/2) :
+    brierFromR2 π₁ r2 < brierFromR2 π₂ r2 := by
+  unfold brierFromR2
+  have h_factor : 0 < 1 - r2 := by linarith
+  -- Need: π₁(1-π₁) < π₂(1-π₂) when 0 < π₁ < π₂ ≤ 1/2
+  -- f(x) = x(1-x) is increasing on (0, 1/2)
+  have h_prod : π₁ * (1 - π₁) < π₂ * (1 - π₂) := by nlinarith
+  nlinarith
+
+/-- **R² to AUC conversion (Wray et al., 2010) - structural.**
+    Under the liability threshold model, AUC = Φ(√(SNR/2)) where SNR = R²/(1-R²).
+    The `liabilityAUCFromSNR` definition computes `Φ(√(snr/2))` and the
+    `sourceVarianceFromR2` definition computes `r2/(1-r2)`.
+
+    We derive: the source liability AUC map equals the composition
+    `liabilityAUCFromSNR ∘ sourceVarianceFromR2`, connecting the R²-based
+    and SNR-based formulations. -/
+theorem r2_auc_relationship
+    (r2 : ℝ) :
+    sourceLiabilityAUCFromObservables r2 = liabilityAUCFromSNR (sourceVarianceFromR2 r2) := by
+  unfold sourceLiabilityAUCFromObservables; rfl
 
 /-- **Nagelkerke R² drops faster than AUC (derived from metric decomposition).**
     AUC portability depends only on signal-to-noise ratio (discrimination):

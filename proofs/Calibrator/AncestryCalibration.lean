@@ -54,6 +54,18 @@ theorem recalibration_recovers_up_to_turnover
     r2_recalibrated + r2_loss_turnover = r2_source := by
   rw [h_recalib, h_turnover]; ring
 
+/-- **Recalibration cannot exceed oracle R².**
+    The best linear recalibration cannot exceed the R² achievable
+    with a GWAS performed directly in the target population.
+    Here r2_recalib = ρ² × r2_oracle where ρ² ∈ [0,1] is the squared
+    effect correlation, so r2_recalib ≤ r2_oracle. -/
+theorem recalibration_bounded_by_oracle
+    (r2_oracle ρ_sq : ℝ)
+    (h_oracle : 0 < r2_oracle) (h_oracle_le : r2_oracle ≤ 1)
+    (h_ρ_nn : 0 ≤ ρ_sq) (h_ρ_le : ρ_sq ≤ 1) :
+    ρ_sq * r2_oracle ≤ r2_oracle := by
+  nlinarith
+
 end LinearRecalibration
 
 
@@ -77,6 +89,21 @@ theorem spline_error_improves_with_knots
     h₂ ^ 4 < h₁ ^ 4 := by
   apply pow_lt_pow_left₀ h_finer (le_of_lt h_pos)
   norm_num
+
+/-- **Bias-variance tradeoff in spline calibration.**
+    More knots → less bias (better approximation)
+    More knots → more variance (overfitting)
+    Optimal: minimize bias² + variance.
+    When the variance increase exceeds the bias² decrease,
+    fewer knots (configuration 1) is better. -/
+theorem bias_variance_tradeoff
+    (bias₁ bias₂ var₁ var₂ : ℝ)
+    (h_bias_improves : bias₂ ^ 2 < bias₁ ^ 2)
+    (h_var_worsens : var₁ < var₂)
+    -- Variance increase exceeds bias decrease
+    (h_var_dominates : var₂ - var₁ > bias₁ ^ 2 - bias₂ ^ 2) :
+    -- First configuration is better (fewer knots)
+    bias₁ ^ 2 + var₁ < bias₂ ^ 2 + var₂ := by linarith
 
 /-- **Spline R² is bounded by the signal-to-noise ratio.**
     R²_spline ≤ Var(E[ε²|d]) / Var(ε²).
@@ -118,6 +145,18 @@ theorem more_target_data_reduces_mse
   apply div_lt_div_of_pos_left (mul_pos h_gap h_σ)
   · exact Nat.cast_pos.mpr h_n₁
   · exact Nat.cast_lt.mpr h_more
+
+/-- **Transfer is beneficial when source provides information.**
+    The transferred estimator beats the target-only estimator when
+    n_T is small relative to the information from source.
+    Model: MSE_transfer = σ²/n_T + bias² and MSE_target = σ²/n_T + σ²_extra/n_T
+    where σ²_extra/n_T > bias² when n_T is small and source is informative. -/
+theorem transfer_beats_target_only
+    (σ_sq bias_sq σ_extra_sq : ℝ) (n_T : ℝ)
+    (h_σ : 0 < σ_sq) (h_bias : 0 ≤ bias_sq)
+    (h_extra : 0 < σ_extra_sq) (h_n : 0 < n_T)
+    (h_source_helpful : bias_sq < σ_extra_sq / n_T) :
+    σ_sq / n_T + bias_sq < σ_sq / n_T + σ_extra_sq / n_T := by linarith
 
 /-- **Critical sample size for transfer benefit.**
     Transfer learning helps when n_T < n_crit, where
@@ -198,6 +237,84 @@ theorem threshold_shift_changes_prevalence
     -- (proportion above threshold increases)
     threshold - liability_mean₂ < threshold - liability_mean₁ := by linarith
 
+/-- **Different prevalence → different R² even with same AUC.**
+    This is a key insight from Wang et al.: R² and AUC can disagree
+    about portability because R² depends on prevalence.
+    Under the liability threshold model, R² ≈ h² × f(K) where K is
+    prevalence and f(K) = K(1-K)/φ(Φ⁻¹(K))². Different K → different R²
+    even with identical genetic effects.
+    We model this: R² scales with K(1-K), so different prevalences yield
+    different R² values given the same underlying discrimination. -/
+theorem r2_depends_on_prevalence_but_auc_doesnt
+    (h2 π₁ π₂ : ℝ)
+    (h_h2 : 0 < h2)
+    (h_π₁ : 0 < π₁) (h_π₁_lt : π₁ < 1)
+    (h_π₂ : 0 < π₂) (h_π₂_lt : π₂ < 1)
+    (h_diff_prev : π₁ ≠ π₂)
+    (h_not_complement : π₁ + π₂ ≠ 1) :
+    h2 * (π₁ * (1 - π₁)) ≠ h2 * (π₂ * (1 - π₂)) := by
+  intro heq
+  have := mul_left_cancel₀ (ne_of_gt h_h2) heq
+  have h_factor : (π₁ - π₂) * (1 - π₁ - π₂) = 0 := by nlinarith
+  rcases mul_eq_zero.mp h_factor with h1 | h2
+  · exact h_diff_prev (by linarith)
+  · exact h_not_complement (by linarith)
+
 end PhenotypeHeterogeneity
+
+
+/-!
+## Epistasis and Portability
+
+Gene-gene interactions (epistasis) create additional portability
+challenges because interaction effects depend on allele frequency
+combinations that differ across populations.
+-/
+
+section Epistasis
+
+/-- **Epistatic variance under HWE.**
+    For two loci with frequencies p₁, p₂ and interaction effect γ,
+    the epistatic variance component is:
+    V_epistasis = γ² × H₁ × H₂ where Hᵢ = 2pᵢ(1-pᵢ). -/
+noncomputable def epistaticVariancePairwise (γ p₁ p₂ : ℝ) : ℝ :=
+  γ ^ 2 * (2 * p₁ * (1 - p₁)) * (2 * p₂ * (1 - p₂))
+
+/-- Epistatic variance is nonneg. -/
+theorem epistatic_variance_pairwise_nonneg (γ p₁ p₂ : ℝ)
+    (h₁ : 0 ≤ p₁) (h₁' : p₁ ≤ 1) (h₂ : 0 ≤ p₂) (h₂' : p₂ ≤ 1) :
+    0 ≤ epistaticVariancePairwise γ p₁ p₂ := by
+  unfold epistaticVariancePairwise
+  apply mul_nonneg
+  · apply mul_nonneg
+    · exact sq_nonneg γ
+    · nlinarith
+  · nlinarith
+
+/-- **Epistatic variance changes faster than additive variance under drift.**
+    Because epistatic variance depends on the product of two heterozygosities,
+    it changes approximately twice as fast as additive variance. -/
+theorem epistatic_changes_faster
+    (H₁_s H₁_t H₂_s H₂_t : ℝ)
+    (h₁_drop : H₁_t < H₁_s) (h₂_drop : H₂_t < H₂_s)
+    (h₁_pos : 0 < H₁_t) (h₂_pos : 0 < H₂_t) :
+    H₁_t * H₂_t / (H₁_s * H₂_s) < H₁_t / H₁_s := by
+  have h₁_s_pos : 0 < H₁_s := by linarith
+  have h₂_s_pos : 0 < H₂_s := by linarith
+  rw [div_lt_div_iff₀ (mul_pos h₁_s_pos h₂_s_pos) h₁_s_pos]
+  nlinarith [mul_pos h₁_s_pos h₁_pos]
+
+/-- **Additive PGS misses epistatic signal → portability of epistatic component is zero.**
+    An additive PGS captures V_A but not V_epistasis. The "missing heritability"
+    from epistasis doesn't port because it was never captured. -/
+theorem additive_pgs_misses_epistasis
+    (v_additive v_epistatic v_total : ℝ)
+    (h_total : v_total = v_additive + v_epistatic)
+    (h_epi_pos : 0 < v_epistatic) (h_add_pos : 0 < v_additive) :
+    v_additive / v_total < 1 := by
+  rw [h_total, div_lt_one (by linarith)]
+  linarith
+
+end Epistasis
 
 end Calibrator
