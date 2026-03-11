@@ -145,10 +145,11 @@ theorem immune_short_autocorrelation
     allele frequencies are maintained near 0.5 → high heterozygosity.
     This increases PGS variance even as accuracy drops. -/
 theorem balancing_selection_high_het
-    (p_neutral p_balanced : ℝ)
-    (h_neutral_low : p_neutral < 0.1)
+    (p_neutral p_balanced lo hi : ℝ)
+    (h_neutral_low : p_neutral < lo)
     (h_neutral_pos : 0 < p_neutral)
-    (h_balanced : 0.3 < p_balanced) (h_balanced_lt : p_balanced < 0.5) :
+    (h_balanced : hi < p_balanced) (h_balanced_lt : p_balanced < 1/2)
+    (h_lo_le_hi : lo ≤ hi) (h_lo_pos : 0 < lo) :
     2 * p_neutral * (1 - p_neutral) < 2 * p_balanced * (1 - p_balanced) := by
   nlinarith [sq_nonneg (p_balanced - 1/2), sq_nonneg (p_neutral - 1/2)]
 
@@ -350,16 +351,17 @@ theorem shared_pleiotropy_correlated_portability
     (r2_t1_source r2_t1_target r2_t2_source r2_t2_target ρ_shared : ℝ)
     (h_shared : 0 < ρ_shared) (h_shared_le : ρ_shared ≤ 1)
     -- Both traits drop proportionally to the shared component
-    (h_t1_drop : r2_t1_target = r2_t1_source * (1 - ρ_shared * 0.5))
-    (h_t2_drop : r2_t2_target = r2_t2_source * (1 - ρ_shared * 0.3))
+    (d₁ d₂ : ℝ) (h_d₁ : 0 < d₁) (h_d₂ : 0 < d₂)
+    (h_t1_drop : r2_t1_target = r2_t1_source * (1 - ρ_shared * d₁))
+    (h_t2_drop : r2_t2_target = r2_t2_source * (1 - ρ_shared * d₂))
     (h_t1_pos : 0 < r2_t1_source) (h_t2_pos : 0 < r2_t2_source) :
     r2_t1_target < r2_t1_source ∧ r2_t2_target < r2_t2_source := by
   constructor
   · rw [h_t1_drop]
-    have : 1 - ρ_shared * 0.5 < 1 := by nlinarith
+    have : 1 - ρ_shared * d₁ < 1 := by nlinarith
     exact mul_lt_of_lt_one_right h_t1_pos this
   · rw [h_t2_drop]
-    have : 1 - ρ_shared * 0.3 < 1 := by nlinarith
+    have : 1 - ρ_shared * d₂ < 1 := by nlinarith
     exact mul_lt_of_lt_one_right h_t2_pos this
 
 /-- **Cross-trait portability prediction.**
