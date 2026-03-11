@@ -40,6 +40,7 @@ import Calibrator.FineMapping
 import Calibrator.PolygenicArchitecture
 import Calibrator.SampleOverlapBias
 import Calibrator.HaplotypeTheory
+import Calibrator.MultiTraitPGS
 
 namespace Calibrator
 
