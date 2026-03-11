@@ -66,11 +66,9 @@ theorem eur_higher_effective_n
       effectiveSampleSize n_eur p_eur r2_eur := by
   unfold effectiveSampleSize
   rw [h_same_p]
-  apply mul_lt_mul_of_pos_right
-  · apply mul_lt_mul_of_pos_right
-    · exact Nat.cast_lt.mpr h_n
-    · nlinarith
-  · linarith
+  have h_het : 0 < 2 * p_afr * (1 - p_afr) := by nlinarith
+  have h_n_cast : (↑n_afr : ℝ) < ↑n_eur := Nat.cast_lt.mpr h_n
+  nlinarith [mul_pos h_het h_r2_afr, mul_pos (Nat.cast_pos.mpr h_n_afr : (0:ℝ) < ↑n_afr) h_het]
 
 /-- **Power gap compounds across the genome.**
     If EUR has power p_EUR for each variant and AFR has p_AFR,
@@ -208,7 +206,6 @@ theorem proportional_sums_to_total
       proportionalAllocation pop_B n_total (pop_A + pop_B) = n_total := by
   unfold proportionalAllocation
   field_simp
-  ring
 
 /-- **Equal allocation.**
     Give each ancestry group the same sample size.

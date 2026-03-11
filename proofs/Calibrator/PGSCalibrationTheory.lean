@@ -215,7 +215,7 @@ theorem recalibration_needs_events
     (h_rule : events_per_param = 200)
     (h_params : n_params = 2)
     (h_insufficient : n_events < n_params * events_per_param) :
-    n_events < 400 := by omega
+    n_events < 400 := by subst h_rule; subst h_params; omega
 
 /-- **Recalibration does not improve discrimination.**
     Recalibration is a monotone transform → AUC unchanged.

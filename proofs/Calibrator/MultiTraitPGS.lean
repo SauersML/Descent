@@ -44,7 +44,7 @@ noncomputable def geneticCorrelation (cov_g V_gA V_gB : ℝ) : ℝ :=
 theorem genetic_correlation_bounded
     (rg : ℝ) (h_bound : |rg| ≤ 1) :
     -1 ≤ rg ∧ rg ≤ 1 := by
-  constructor <;> [exact neg_one_le_of_abs_le h_bound; exact le_of_abs_le h_bound]
+  exact ⟨by linarith [abs_nonneg rg, abs_le.mp h_bound |>.1], abs_le.mp h_bound |>.2⟩
 
 /-- **Genetic correlation is partially ancestry-specific.**
     r_g between traits A and B may differ between EUR and AFR
@@ -214,8 +214,8 @@ theorem rg_attenuation_correction
   rw [lt_div_iff₀ (Real.sqrt_pos.mpr (mul_pos h_h2_1 h_h2_2))]
   have h_prod_lt : h2_1 * h2_2 < 1 := by nlinarith
   have h_sqrt_lt : Real.sqrt (h2_1 * h2_2) < 1 := by
-    rw [Real.sqrt_lt_one (mul_nonneg (le_of_lt h_h2_1) (le_of_lt h_h2_2))]
-    exact h_prod_lt
+    rw [show (1 : ℝ) = Real.sqrt 1 from (Real.sqrt_one).symm]
+    exact Real.sqrt_lt_sqrt (mul_nonneg (le_of_lt h_h2_1) (le_of_lt h_h2_2)) h_prod_lt
   nlinarith
 
 end CrossAncestryRg

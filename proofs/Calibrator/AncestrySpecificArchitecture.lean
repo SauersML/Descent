@@ -43,14 +43,16 @@ noncomputable def expectedFreqDiffSq (fst p0 : ℝ) : ℝ :=
 theorem expected_freq_diff_nonneg (fst p0 : ℝ)
     (h_fst : 0 ≤ fst) (h_p0 : 0 ≤ p0) (h_p0_le : p0 ≤ 1) :
     0 ≤ expectedFreqDiffSq fst p0 := by
-  unfold expectedFreqDiffSq; nlinarith
+  unfold expectedFreqDiffSq; nlinarith [mul_nonneg h_fst h_p0, mul_nonneg (mul_nonneg h_fst h_p0) (by linarith : 0 ≤ 1 - p0)]
 
 /-- Expected frequency difference increases with FST. -/
 theorem freq_diff_increases_with_fst (fst₁ fst₂ p0 : ℝ)
     (h_p0 : 0 < p0) (h_p0_lt : p0 < 1)
     (h_fst : fst₁ < fst₂) :
     expectedFreqDiffSq fst₁ p0 < expectedFreqDiffSq fst₂ p0 := by
-  unfold expectedFreqDiffSq; nlinarith
+  unfold expectedFreqDiffSq
+  have : 0 < p0 * (1 - p0) := by nlinarith
+  nlinarith
 
 /-- **Frequency-dependent effect on PGS variance.**
     PGS variance = Σ β²_j × 2p_j(1-p_j).
@@ -89,9 +91,10 @@ theorem rare_variants_drift_more
   -- = (1-p_rare)/p_rare > (1-p_common)/p_common
   -- = 1/p_rare - 1 > 1/p_common - 1
   -- = 1/p_rare > 1/p_common, true since p_rare < p_common
-  rw [div_lt_div_iff₀ (sq_pos_of_ne_zero (ne_of_gt h_common)) (sq_pos_of_ne_zero (ne_of_gt h_rare))]
-  nlinarith [sq_nonneg p_rare, sq_nonneg p_common,
-             sq_nonneg (p_rare * p_common)]
+  have h_r2 : (0 : ℝ) < p_rare ^ 2 := sq_pos_of_ne_zero h_rare.ne'
+  have h_c2 : (0 : ℝ) < p_common ^ 2 := sq_pos_of_ne_zero h_common.ne'
+  rw [gt_iff_lt, div_lt_div_iff₀ h_c2 h_r2]
+  nlinarith [sq_nonneg p_rare, sq_nonneg p_common, mul_pos h_rare h_common]
 
 end AlleleFrequencyDivergence
 
@@ -240,7 +243,8 @@ theorem portability_bounded_by_rg_sq
     (h_tag : 0 ≤ tagging_ratio) (h_tag_le : tagging_ratio ≤ 1) :
     portabilityFromArchitecture rg fst tagging_ratio ≤ rg^2 := by
   unfold portabilityFromArchitecture
-  nlinarith [sq_nonneg rg]
+  have h1 : (1 - fst) * tagging_ratio ≤ 1 := by nlinarith [mul_nonneg (by linarith : 0 ≤ 1 - fst) h_tag]
+  nlinarith [sq_nonneg rg, mul_nonneg (sq_nonneg rg) (mul_nonneg (by linarith : 0 ≤ 1 - fst) h_tag)]
 
 end ArchitectureConvergence
 
