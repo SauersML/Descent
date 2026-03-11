@@ -303,32 +303,31 @@ theorem r2_threshold_for_utility
     For each PGS, report: R², AUC, calibration, and portability ratio
     for each clinically relevant population. -/
 
-/-- **Minimum validation sample size per population.**
+/-- **Relative precision of R² estimate is worse for smaller R².**
     To estimate R² with SE < δ, need approximately n > 4R²(1-R²)²/δ².
-    For small R² (common in underrepresented populations), this requires more samples. -/
+    The *relative* standard error SE/R² = (1-R²)/√(nR²) × 2/δ grows as R²
+    shrinks.  For the same sample size, the relative error is larger for the
+    target population (smaller R²).
+
+    Equivalently, the required sample size per unit R² (n/R²) is larger for
+    smaller R².  Here we prove: n/R² = 4(1-R²)²/δ² is a decreasing function
+    of R² on (0,1), so the target population (lower R²) requires a larger
+    sample-per-unit-R². -/
 theorem validation_n_depends_on_r2
     (r2_source r2_target delta : ℝ)
     (h_r2_target_smaller : r2_target < r2_source)
     (h_r2_source : 0 < r2_source) (h_r2_target : 0 < r2_target)
     (h_delta : 0 < delta)
-    (h_r2_source_lt : r2_source < 1) (h_r2_target_lt : r2_target < 1)
-    -- For smaller R², the relative SE is larger → need more samples
-    (n_source n_target : ℝ)
-    (h_n_source : n_source = 4 * r2_source * (1 - r2_source) ^ 2 / delta ^ 2)
-    (h_n_target : n_target = 4 * r2_target * (1 - r2_target) ^ 2 / delta ^ 2) :
-    -- The relative precision n_needed / R² is what matters for utility assessment
-    0 < n_source ∧ 0 < n_target := by
-  have h1 : (1 - r2_source) ≠ 0 := by linarith
-  have h2 : (1 - r2_target) ≠ 0 := by linarith
-  constructor
-  · rw [h_n_source]; apply div_pos
-    · exact mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) h_r2_source)
-        (sq_pos_of_ne_zero h1)
-    · exact sq_pos_of_ne_zero (ne_of_gt h_delta)
-  · rw [h_n_target]; apply div_pos
-    · exact mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) h_r2_target)
-        (sq_pos_of_ne_zero h2)
-    · exact sq_pos_of_ne_zero (ne_of_gt h_delta)
+    (h_r2_source_lt : r2_source < 1) (h_r2_target_lt : r2_target < 1) :
+    -- n/R² = 4(1-R²)²/δ² is larger for the target (smaller R²)
+    4 * (1 - r2_source) ^ 2 / delta ^ 2 <
+      4 * (1 - r2_target) ^ 2 / delta ^ 2 := by
+  apply div_lt_div_of_pos_right _ (sq_pos_of_ne_zero (ne_of_gt h_delta))
+  apply mul_lt_mul_of_pos_left _ (by norm_num : (0:ℝ) < 4)
+  -- (1-r2_source)² < (1-r2_target)² because 0 < 1-r2_source < 1-r2_target
+  apply sq_lt_sq'
+  · linarith
+  · linarith
 
 /- **Population-aware clinical decision support.**
     The clinical decision system should:
@@ -337,28 +336,79 @@ theorem validation_n_depends_on_r2
     3. Flag when PGS may be unreliable for the patient's population -/
 
 /-- **Do-no-harm principle for PGS deployment.**
-    PGS should only be used clinically when the expected benefit
-    exceeds the expected harm from misclassification.
-    For populations with poor portability, this may not hold. -/
+    PGS should only be used clinically when the expected benefit exceeds
+    the expected harm from misclassification.
+
+    We model benefit and harm through R²-dependent sensitivity and specificity
+    via monotone link functions (from the liability-threshold model).  As R²
+    increases, sensitivity rises (more true positives treated) and specificity
+    rises (fewer false positives harmed).  There exists a critical R² above
+    which the benefit-harm tradeoff is favorable.
+
+    Here we prove the structural result: if the target population's R² is
+    strictly below the source's (portability loss), the net clinical value
+    in the target is strictly less than in the source. This means populations
+    with poor portability may violate the do-no-harm principle even when the
+    source population satisfies it.  This is derived from monotonicity, not
+    assumed. -/
 theorem do_no_harm_principle
-    (expected_benefit expected_harm : ℝ)
-    (h_beneficial : expected_harm < expected_benefit) :
-    0 < expected_benefit - expected_harm := by linarith
+    (sensLink specLink : ℝ → ℝ) (r2_source r2_target π benefit harm : ℝ)
+    (h_sens_mono : StrictMono sensLink)
+    (h_spec_mono : StrictMono specLink)
+    (h_r2_loss : r2_target < r2_source)
+    (h_π : 0 < π) (h_π1 : π < 1)
+    (h_benefit : 0 < benefit) (h_harm : 0 < harm)
+    (h_sens_t : 0 ≤ sensLink r2_target) (h_spec_t : 0 ≤ specLink r2_target)
+    (h_spec_s1 : specLink r2_source ≤ 1) :
+    -- Net value in target is strictly less than in source
+    sensLink r2_target * π * benefit - (1 - specLink r2_target) * (1 - π) * harm <
+      sensLink r2_source * π * benefit - (1 - specLink r2_source) * (1 - π) * harm := by
+  have h_sens : sensLink r2_target < sensLink r2_source := h_sens_mono h_r2_loss
+  have h_spec : specLink r2_target < specLink r2_source := h_spec_mono h_r2_loss
+  have h1 : sensLink r2_target * π * benefit < sensLink r2_source * π * benefit := by
+    apply mul_lt_mul_of_pos_right _ h_benefit
+    exact mul_lt_mul_of_pos_right h_sens h_π
+  have h2 : (1 - specLink r2_source) * (1 - π) * harm <
+             (1 - specLink r2_target) * (1 - π) * harm := by
+    apply mul_lt_mul_of_pos_right _ h_harm
+    apply mul_lt_mul_of_pos_right _ (by linarith)
+    linarith
+  linarith
 
 /-- **Phased deployment strategy.**
-    Deploy PGS first for well-validated populations,
+    Deploy PGS first for well-validated populations (R² above threshold),
     then expand as validation data becomes available.
-    Phased deployment serves only populations where
-    R² > R²_threshold, so the expected harm from
-    misclassification in under-validated populations is zero
-    in the phased approach vs. positive in immediate deployment. -/
+
+    We model: the validated population has strictly higher R² than the
+    unvalidated population (portability gap).  By monotonicity of
+    sensitivity and specificity in R² (from the liability threshold model),
+    the validated population has strictly better discrimination.
+
+    Phased deployment achieves the same clinical benefit for the validated
+    population while avoiding the risk of deploying a poorly-performing
+    PGS in the unvalidated population.  The benefit gap between
+    validated and unvalidated populations is derived from the R² gap. -/
 theorem phased_deployment_reduces_risk
-    (R2_validated R2_unvalidated R2_threshold : ℝ)
-    (h_validated : R2_threshold ≤ R2_validated)
-    (h_unvalidated : R2_unvalidated < R2_threshold)
-    (h_thr : 0 < R2_threshold) :
-    -- Immediate deployment includes populations below threshold
-    R2_unvalidated < R2_validated := by linarith
+    (sensLink specLink : ℝ → ℝ) (r2_validated r2_unvalidated π : ℝ)
+    (h_sens_mono : StrictMono sensLink)
+    (h_spec_mono : StrictMono specLink)
+    (h_r2_gap : r2_unvalidated < r2_validated)
+    (h_π : 0 < π) (h_π1 : π < 1)
+    (h_sens_u : 0 ≤ sensLink r2_unvalidated)
+    (h_spec_u : 0 ≤ specLink r2_unvalidated)
+    (h_spec_v : specLink r2_validated ≤ 1) :
+    -- The validated population has strictly better risk stratification
+    -- (proportion correctly classified) than the unvalidated population,
+    -- derived from the R² gap via monotone links.
+    sensLink r2_unvalidated * π + specLink r2_unvalidated * (1 - π) <
+      sensLink r2_validated * π + specLink r2_validated * (1 - π) := by
+  have h_sens : sensLink r2_unvalidated < sensLink r2_validated := h_sens_mono h_r2_gap
+  have h_spec : specLink r2_unvalidated < specLink r2_validated := h_spec_mono h_r2_gap
+  have h1 : sensLink r2_unvalidated * π < sensLink r2_validated * π :=
+    mul_lt_mul_of_pos_right h_sens h_π
+  have h2 : specLink r2_unvalidated * (1 - π) < specLink r2_validated * (1 - π) :=
+    mul_lt_mul_of_pos_right h_spec (by linarith)
+  linarith
 
 end ClinicalImplementation
 

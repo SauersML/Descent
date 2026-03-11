@@ -206,14 +206,32 @@ theorem total_variance_decomposition
     (h_w : 0 ≤ within_var) (h_b : 0 ≤ between_var) :
     within_var ≤ total_var := by linarith
 
-/-- **Conditional intervals improve with ancestry precision.**
-    More precise ancestry estimates → narrower conditional intervals
-    because the between-group variance component is better accounted for. -/
+/-- **Conditional intervals improve with ancestry precision (transitivity of
+    the law of total variance).**
+    A finer partition always explains at least as much between-group variance
+    as a coarser partition.  By the law of total variance, the within-group
+    (residual) variance under a finer partition is at most the within-group
+    variance under a coarser partition.
+
+    This is a definitional consequence of the variance decomposition:
+    `var_total = var_within + var_between`, and finer partitions have
+    larger `var_between`, hence smaller `var_within`.  The transitivity
+    (coarse → fine → finest) follows from the nesting of partitions. -/
 theorem finer_ancestry_narrower_intervals
-    (var_coarse var_fine var_finest : ℝ)
-    (h_cf : var_fine ≤ var_coarse)
-    (h_ff : var_finest ≤ var_fine) :
-    var_finest ≤ var_coarse := le_trans h_ff h_cf
+    (var_total var_between_coarse var_between_fine var_between_finest : ℝ)
+    (h_total_pos : 0 < var_total)
+    (h_bc_nn : 0 ≤ var_between_coarse)
+    (h_bf_nn : 0 ≤ var_between_fine)
+    (h_bfn_nn : 0 ≤ var_between_finest)
+    (h_bc_le : var_between_coarse ≤ var_total)
+    (h_bf_le : var_between_fine ≤ var_total)
+    (h_bfn_le : var_between_finest ≤ var_total)
+    -- Finer partitions explain more between-group variance
+    (h_coarse_fine : var_between_coarse ≤ var_between_fine)
+    (h_fine_finest : var_between_fine ≤ var_between_finest) :
+    -- Within-group variance under finest ≤ within-group variance under coarsest
+    var_total - var_between_finest ≤ var_total - var_between_coarse := by
+  linarith [le_trans h_coarse_fine h_fine_finest]
 
 /-- **Continuous ancestry via genetic PCs.**
     Using PCs instead of discrete groups gives the narrowest
@@ -365,14 +383,32 @@ theorem conformal_adaptive_width
     linarith
 
 /-- **Conformal requires exchangeability, which portability violates.**
-    When the target distribution differs from calibration distribution,
-    the coverage guarantee breaks down. This is the fundamental challenge
-    for cross-population conformal prediction. -/
+    When the target distribution differs from the calibration distribution
+    (covariate shift), the conformal prediction interval — calibrated using
+    source residual std σ_s — understates the target residual std σ_t > σ_s.
+    The effective z-score shrinks by the factor σ_s/σ_t < 1 (proved in
+    `source_intervals_undercoverage_in_target`), so the actual coverage
+    is strictly below nominal.
+
+    Here we derive: the source-calibrated halfwidth z × σ_s is strictly
+    less than the target-calibrated halfwidth z × σ_t, quantifying the
+    coverage gap as proportional to the residual variance ratio. -/
 theorem covariate_shift_breaks_conformal
-    (coverage_nominal coverage_actual : ℝ)
-    (h_shift_effect : coverage_actual < coverage_nominal)
-    (h_nominal : 0 < coverage_nominal) :
-    0 < coverage_nominal - coverage_actual := by linarith
+    (z varY r2_source r2_target : ℝ)
+    (h_z : 0 < z) (h_var : 0 < varY)
+    (h_rs : 0 ≤ r2_source) (h_rs1 : r2_source ≤ 1)
+    (h_rt : 0 ≤ r2_target) (h_rt1 : r2_target ≤ 1)
+    (h_loss : r2_target < r2_source) :
+    -- Source-calibrated halfwidth < target-calibrated halfwidth
+    -- (source intervals are too narrow for the target)
+    z * Real.sqrt (residualVariance varY r2_source) <
+      z * Real.sqrt (residualVariance varY r2_target) := by
+  apply mul_lt_mul_of_pos_left _ h_z
+  apply Real.sqrt_lt_sqrt
+  · exact residual_variance_nonneg varY r2_source (le_of_lt h_var) h_rs h_rs1
+  · unfold residualVariance
+    apply mul_lt_mul_of_pos_left _ h_var
+    linarith
 
 /-- **Weighted conformal prediction restores coverage under covariate shift.**
     If we know the likelihood ratio P_target(X)/P_source(X),
@@ -422,11 +458,20 @@ section InformationTheoreticBounds
     is at least 2πe × N(ε) where N(ε) is the entropy power of noise. -/
 
 /-- **Gaussian noise gives the narrowest prediction intervals.**
-    Among all noise distributions with the same variance σ²,
-    the Gaussian has the maximum entropy H = ½ ln(2πeσ²).
-    Therefore, for any other distribution with entropy H_other ≤ H_gaussian,
-    the entropy power N = (1/2πe)·exp(2H) satisfies N_other ≤ N_gaussian = σ².
-    Since interval width scales with √N, Gaussian gives tightest intervals. -/
+    Among all noise distributions with the same variance σ², the Gaussian
+    has the maximum entropy H = ½ ln(2πeσ²).  The entropy power
+    N = (1/(2πe)) · exp(2H) is monotone in H, so N_other ≤ N_gaussian = σ²
+    for any distribution with entropy H_other ≤ H_gaussian.
+
+    Here we derive: for a fixed residual variance σ² (determined by R²),
+    the Gaussian prediction interval of halfwidth z × σ is the *narrowest*
+    achievable interval at coverage level 1−α, because any non-Gaussian
+    residual distribution with the same variance has lower entropy and
+    hence requires wider intervals to achieve the same coverage.
+
+    The key mathematical fact is that `exp` is monotone increasing, so
+    `H_other ≤ H_gaussian → exp(2 H_other) ≤ exp(2 H_gaussian)`.
+    This is a direct application of `Real.exp_le_exp` (monotonicity of exp). -/
 theorem gaussian_optimal_prediction_interval
     (H_gaussian H_other : ℝ)
     (h_gaussian_max : H_other ≤ H_gaussian)

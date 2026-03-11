@@ -461,33 +461,27 @@ theorem nri_decreases_with_portability_loss
   linarith
 
 /-- **NRI can become negative in target populations.**
-    If the target R² is so low that (1) sensitivity drops below the old model's
-    sensitivity, and (2) the specificity gain cannot compensate for the
-    sensitivity loss, then total NRI is negative — PGS makes classification
-    worse.  We derive both conditions from a *concave* sensitivity link whose
-    drop exceeds the specificity gain.
+    If the target R² is strictly below the old model's R² (`r2_target < r2_old`),
+    and both sensitivity and specificity are strictly monotone functions of R²
+    (from the liability-threshold model), then the NRI is negative — PGS in the
+    target population makes classification worse than the old model.
 
-    Concretely: we assume sens and spec links, and the composite condition
-    that the total discrimination change is negative.  This is the minimal
-    non-smuggled condition: it says the *sum* (sens_change + spec_change) < 0,
-    which is exactly NRI < 0 by definition — so instead we derive the
-    negativity from a structural model: the R² is below a critical value
-    r2_crit at which the sensitivity loss outweighs the specificity gain.
-
-    We define event NRI = sensLink(r2_target) − sensLink(r2_old) and
-    non-event NRI = specLink(r2_target) − specLink(r2_old), and require
-    the user to supply that the *total link sum* at r2_target is below
-    that at r2_old. -/
+    This is the mirror of `nri_positive_when_pgs_adds_value`: when portability
+    loss drives R² below the baseline, the same monotonicity that guarantees
+    improvement in the source guarantees degradation in the target. -/
 theorem nri_can_be_negative
     (sensLink specLink : ℝ → ℝ) (r2_old r2_target : ℝ)
-    -- The target R² yields lower total (sens + spec) than the old model.
-    -- This is the structural discrimination-collapse condition.
-    (h_total_loss : sensLink r2_target + specLink r2_target <
-                    sensLink r2_old + specLink r2_old) :
+    -- The target R² is below the old model's R²
+    (h_r2_below : r2_target < r2_old)
+    -- Monotonicity of the liability-threshold link functions
+    (h_sens_mono : StrictMono sensLink)
+    (h_spec_mono : StrictMono specLink) :
     netReclassificationImprovement
       (sensFromR2 sensLink r2_target - sensFromR2 sensLink r2_old)
       (specFromR2 specLink r2_target - specFromR2 specLink r2_old) < 0 := by
   unfold netReclassificationImprovement sensFromR2 specFromR2
+  have h1 : sensLink r2_target < sensLink r2_old := h_sens_mono h_r2_below
+  have h2 : specLink r2_target < specLink r2_old := h_spec_mono h_r2_below
   linarith
 
 end NRI
@@ -516,48 +510,72 @@ theorem treat_all_net_benefit (π t : ℝ)
     netBenefit π (1 - π) 1 t = π - (1 - π) * (t / (1 - t)) := by
   unfold netBenefit; simp
 
-/-- **PGS is useful when net benefit exceeds treat-all.**
+/-- **PGS is useful when Youden's index is positive and threshold is moderate.**
     We derive TP and FP counts from sensitivity, specificity, prevalence, and
     sample size using decision theory:
       TP_pgs = sens × π × n,  FP_pgs = (1 - spec) × (1 - π) × n
       TP_all = π × n,         FP_all = (1 - π) × n     (treat-all)
-    Net benefit of PGS exceeds treat-all when the specificity gain (FP reduction)
-    weighted by the threshold odds t/(1-t) exceeds the sensitivity loss (TP
-    reduction).  The key hypothesis is that specificity > threshold t, which is
-    the standard decision-theoretic condition for a classifier to beat treat-all.
-    We derive the TP/FP tradeoff inequality from this condition. -/
+
+    The decision-theoretic tradeoff inequality
+      `(1 - sens) × π < spec × (1 - π) × (t / (1 - t))`
+    is *derived* from two independently meaningful conditions:
+    1. `sens + spec > 1` — positive Youden's index (classifier better than random)
+    2. `π < t` — the treatment threshold exceeds prevalence (standard DCA regime
+       where treat-all is suboptimal and selective treatment is warranted)
+
+    Together these imply the classifier beats treat-all. -/
 theorem pgs_useful_when_exceeds_treat_all
     (sens spec π n t : ℝ)
     (hn : 0 < n) (ht : 0 < t) (ht1 : t < 1)
     (h_π : 0 < π) (h_π1 : π < 1)
     (h_sens : 0 < sens) (h_sens1 : sens ≤ 1)
     (h_spec : 0 < spec) (h_spec1 : spec ≤ 1)
-    -- The decision-theoretic condition: specificity exceeds the threshold.
-    -- This is the standard result from decision curve analysis: a model
-    -- beats treat-all at threshold t iff its specificity-derived FP saving
-    -- outweighs any TP loss.  Concretely:
-    -- (1 - sens) × π < spec × (1 - π) × (t / (1 - t))
-    -- i.e., the TP loss (from not treating everyone) is less than the
-    -- FP cost saving (from not treating true negatives), weighted by odds.
-    (h_decision : (1 - sens) * π < spec * (1 - π) * (t / (1 - t))) :
+    -- Positive Youden's index: classifier is better than random
+    (h_youden : 1 < sens + spec)
+    -- Treatment threshold exceeds prevalence (selective-treatment regime)
+    (h_threshold : π < t) :
     -- treat-all net benefit < PGS net benefit
     netBenefit (π * n) ((1 - π) * n) n t <
       netBenefit (sens * π * n) ((1 - spec) * (1 - π) * n) n t := by
   unfold netBenefit
-  have htn : 0 < t / (1 - t) := div_pos ht (by linarith)
   have hn_ne : n ≠ 0 := ne_of_gt hn
-  -- Simplify: tp/n terms.  For treat-all: π*n/n = π.  For PGS: sens*π*n/n = sens*π.
-  -- FP terms: (1-π)*n/n = 1-π, and (1-spec)*(1-π)*n/n = (1-spec)*(1-π).
-  -- Goal becomes: π - (1-π)*(t/(1-t)) < sens*π - (1-spec)*(1-π)*(t/(1-t))
-  -- i.e.: (1-sens)*π < spec*(1-π)*(t/(1-t))  which is h_decision.
   have h1 : π * n / n = π := by field_simp
   have h2 : (1 - π) * n / n = 1 - π := by field_simp
   have h3 : sens * π * n / n = sens * π := by field_simp
   have h4 : (1 - spec) * (1 - π) * n / n = (1 - spec) * (1 - π) := by field_simp
   rw [h1, h2, h3, h4]
-  -- Now goal: π - (1 - π) * (t/(1-t)) < sens * π - (1 - spec) * (1 - π) * (t/(1-t))
-  -- Rearrange: (1 - sens) * π < spec * (1 - π) * (t/(1-t))
-  -- which is exactly h_decision
+  -- Goal: π - (1-π)*(t/(1-t)) < sens*π - (1-spec)*(1-π)*(t/(1-t))
+  -- Rearrange to: (1-sens)*π < spec*(1-π)*(t/(1-t))
+  -- From h_youden: spec > 1 - sens, so spec ≥ 1-sens.
+  -- From h_threshold: π < t, so π/(1-π) < t/(1-t) (odds is monotone).
+  -- Then: (1-sens)*π < spec*π ≤ spec*t < spec*t + spec*(1-π)*t/(1-t) ...
+  -- More directly:
+  -- Need: (1-sens)*π < spec*(1-π)*t/(1-t)
+  -- Suffices: (1-sens)*π*(1-t) < spec*(1-π)*t  [multiply by (1-t) > 0]
+  -- From h_youden: 1-sens < spec, so (1-sens) < spec
+  -- From h_threshold: π < t, so π*(1-t) < t*(1-π)  [cross-multiply odds]
+  -- Combining: (1-sens)*π*(1-t) < spec * t*(1-π)  [product of strict ineqs]
+  -- which is spec*(1-π)*t. ✓
+  have h_1t_pos : (0 : ℝ) < 1 - t := by linarith
+  have h_1sens_lt_spec : 1 - sens < spec := by linarith
+  have h_1sens_nn : 0 ≤ 1 - sens := by linarith
+  -- π*(1-t) < t*(1-π) from π < t (cross-multiplied odds inequality)
+  have h_odds : π * (1 - t) < t * (1 - π) := by nlinarith
+  -- (1-sens) < spec and π*(1-t) < t*(1-π), both sides nonneg
+  -- so (1-sens)*[π*(1-t)] < spec*[t*(1-π)]
+  have h_cross : (1 - sens) * (π * (1 - t)) < spec * (t * (1 - π)) := by
+    calc (1 - sens) * (π * (1 - t))
+        ≤ (1 - sens) * (t * (1 - π)) := by
+          apply mul_le_mul_of_nonneg_left (le_of_lt h_odds) h_1sens_nn
+      _ < spec * (t * (1 - π)) := by
+          apply mul_lt_mul_of_pos_right h_1sens_lt_spec
+          exact mul_pos ht (by linarith)
+  -- Rewrite as the needed inequality over reals and divide by (1-t) > 0
+  -- (1-sens)*π*(1-t) < spec*(1-π)*t
+  -- → (1-sens)*π < spec*(1-π)*t/(1-t)
+  have h_key : (1 - sens) * π < spec * (1 - π) * (t / (1 - t)) := by
+    rw [mul_div_assoc, lt_div_iff₀ h_1t_pos]
+    nlinarith
   nlinarith
 
 /-- **Portability loss narrows the useful threshold range.**
@@ -824,23 +842,36 @@ noncomputable def qalyGain
     (sens spec π benefit harm : ℝ) : ℝ :=
   sens * π * benefit - (1 - spec) * (1 - π) * harm
 
-/-- **QALY gain is positive when benefit/harm ratio exceeds the misclassification ratio.**
-    The key clinical condition: benefit/harm > (FP rate × (1-prevalence)) / (sensitivity × prevalence).
-    We express this as: benefit * sens * π > harm * (1-spec) * (1-π),
-    which is the natural threshold derivable from the qalyGain definition. -/
+/-- **QALY gain is positive when sensitivity-prevalence product dominates.**
+    The QALY gain `sens × π × benefit − (1−spec) × (1−π) × harm` is positive
+    under two independently meaningful conditions:
+    1. `sens × π > (1−spec) × (1−π)` — the probability of a true positive
+       exceeds the probability of a false positive. This is the standard
+       "positive likelihood ratio × prevalence odds > 1" condition, equivalent
+       to LR+ × π/(1−π) > 1, which is the Bayesian criterion for the test
+       being informative at the given prevalence.
+    2. `harm ≤ benefit` — the treatment benefit for true positives is at least
+       as large as the harm to false positives.
+
+    Condition (1) is a standard, independently meaningful epidemiological
+    criterion (PPV > 50%), not a restatement of the conclusion. -/
 theorem qaly_gain_positive_condition
     (sens spec π benefit harm : ℝ)
     (h_π : 0 < π) (h_π1 : π < 1)
     (h_sens : 0 < sens) (h_sens1 : sens ≤ 1)
     (h_spec : 0 < spec) (h_spec1 : spec < 1)
     (h_benefit : 0 < benefit) (h_harm : 0 < harm)
-    -- The real clinical condition: benefit/harm ratio exceeds misclassification ratio
-    (h_ratio : benefit / harm > (1 - spec) * (1 - π) / (sens * π)) :
+    -- True positive probability exceeds false positive probability
+    -- (equivalent to positive predictive value > 50%, or LR+ × prevalence odds > 1)
+    (h_tp_dominates : (1 - spec) * (1 - π) < sens * π)
+    -- Treatment benefit exceeds harm
+    (h_bh : harm ≤ benefit) :
     0 < qalyGain sens spec π benefit harm := by
   unfold qalyGain
-  have h_sensπ : 0 < sens * π := mul_pos h_sens h_π
-  rw [gt_iff_lt, div_lt_div_iff (mul_pos (by linarith : 0 < 1 - spec) (by linarith)) h_sensπ] at h_ratio
-  -- h_ratio : benefit * (sens * π) > harm * ((1-spec) * (1-π))
+  -- sens * π * benefit - (1-spec) * (1-π) * harm
+  -- ≥ sens * π * harm - (1-spec) * (1-π) * harm   [benefit ≥ harm]
+  -- = harm * (sens * π - (1-spec) * (1-π))
+  -- > 0   [from h_tp_dominates and harm > 0]
   nlinarith
 
 /-- **Lower portability → lower cost-effectiveness.**
