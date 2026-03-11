@@ -136,8 +136,8 @@ theorem portability_ratio_approximation_error
         rw [abs_of_pos h_rs_approx_pos]
     _ ≤ εt * r2s_approx + |r2t_approx| * εs := by
         apply add_le_add
-        · exact mul_le_mul_of_nonneg_right (by rwa [abs_sub_comm] at h_rt) (le_of_lt h_rs_approx_pos)
-        · exact mul_le_mul_of_nonneg_left (by rwa [abs_sub_comm] at h_rs) (abs_nonneg _)
+        · exact mul_le_mul_of_nonneg_right h_rt (le_of_lt h_rs_approx_pos)
+        · exact mul_le_mul_of_nonneg_left (by rw [abs_sub_comm]; exact h_rs) (abs_nonneg _)
     _ = εt * r2s_approx + εs * |r2t_approx| := by ring
 
 end BerryEsseenPortability

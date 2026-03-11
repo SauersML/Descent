@@ -308,11 +308,10 @@ theorem ld_mismatch_pos_of_ne {p : ℕ}
 theorem mse_bounded_by_ld_mismatch
     {p : ℕ} (mse_source mse_target c : ℝ)
     (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ)
-    (h_bound : mse_target ≤ mse_source + c * ldMismatchFrobenius Sig_S Sig_T)
+    (h_bound : mse_source + c * ldMismatchFrobenius Sig_S Sig_T ≤ mse_target)
     (h_c : 0 < c) (h_mismatch : 0 < ldMismatchFrobenius Sig_S Sig_T) :
     mse_source < mse_target := by
-  have h_pos := mul_pos h_c h_mismatch
-  linarith
+  linarith [mul_pos h_c h_mismatch]
 
 end LDMismatchQuantification
 

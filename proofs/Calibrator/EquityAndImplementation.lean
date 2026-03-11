@@ -213,7 +213,7 @@ theorem r2_concave_in_n
   rw [div_lt_div_iff₀ (mul_pos h3 h2') (mul_pos h2' h1)]
   have h_num : ∀ x : ℝ, (x + dn) * h2 * (x * h2 + M) - ((x + dn) * h2 + M) * (x * h2) = dn * h2 * M := by
     intro x; ring
-  nlinarith [h_num n, h_num (n + dn), mul_pos h_h2 h_M, sq_nonneg (dn * h2)]
+  nlinarith [h_num n, h_num (n + dn), mul_pos h_h2 h_M, mul_pos h_dn h_h2, sq_nonneg (dn * h2)]
 
 /-- **Marginal value of diversity.**
     Adding underrepresented individuals has higher marginal value

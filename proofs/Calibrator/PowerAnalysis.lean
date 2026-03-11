@@ -218,8 +218,10 @@ theorem diminishing_returns (n₁ n₂ delta C : ℝ)
   -- ((n₂+δ)(n₂+C) - n₂(n₂+δ+C))×((n₁+δ+C)(n₁+C)) < ((n₁+δ)(n₁+C) - n₁(n₁+δ+C))×((n₂+δ+C)(n₂+C))
   -- Each numerator = δC, so this reduces to (n₁+δ+C)(n₁+C) < (n₂+δ+C)(n₂+C)
   have h_num : ∀ x : ℝ, (x + delta) * (x + C) - x * (x + delta + C) = delta * C := by intro x; ring
-  nlinarith [h_num n₁, h_num n₂, mul_pos h_C h_delta,
-             mul_pos (by linarith : (0 : ℝ) < n₂ - n₁) (by linarith : (0 : ℝ) < 2 * n₁ + delta + 2 * C)]
+  have h_denom_lt : (n₁ + delta + C) * (n₁ + C) < (n₂ + delta + C) * (n₂ + C) := by
+    nlinarith [mul_pos (show (0:ℝ) < n₂ - n₁ by linarith)
+                        (show (0:ℝ) < n₁ + n₂ + delta + 2 * C by linarith)]
+  nlinarith [h_num n₁, h_num n₂, mul_pos h_delta h_C, h_denom_lt]
 
 /-- **Equal allocation is suboptimal when populations differ in size.**
     If population A already has a large GWAS and B has none,

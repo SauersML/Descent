@@ -291,7 +291,7 @@ theorem rare_variant_needs_large_n
     (maf β : ℝ) (h_maf : 0 < maf) (h_maf_small : maf < 0.01)
     (h_β : β ≠ 0) (h_β_le : |β| ≤ 1) :
     100 < 1 / (maf * β ^ 2) := by
-  have h_β_sq : β ^ 2 ≤ 1 := by nlinarith [sq_abs β]
+  have h_β_sq : β ^ 2 ≤ 1 := by nlinarith [sq_abs β, abs_nonneg β]
   have h_prod_pos : 0 < maf * β ^ 2 := mul_pos h_maf (sq_pos_of_ne_zero h_β)
   rw [lt_div_iff₀ h_prod_pos]
   have h_prod_small : maf * β ^ 2 < 0.01 := by
