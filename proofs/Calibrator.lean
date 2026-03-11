@@ -15,6 +15,7 @@ import Calibrator.ClinicalUtilityFairness
 import Calibrator.VarianceComponents
 import Calibrator.ScoreDistribution
 import Calibrator.SimulationValidation
+import Calibrator.GeneticArchitectureDiscovery
 
 namespace Calibrator
 
