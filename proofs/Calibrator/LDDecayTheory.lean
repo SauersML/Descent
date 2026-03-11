@@ -16,8 +16,9 @@ affect PGS portability. LD patterns are shaped by population history
 Key results:
 1. LD decay with recombination distance follows the Ohta-Kimura model
 2. LD differences create PGS prediction error via tagging mismatch
-3. Population-specific LD requires population-specific PGS weights
-4. Admixture creates long-range LD that disrupts PGS calibration
+3. Admixture creates long-range LD maximized at equal mixing
+4. Population bottlenecks amplify LD as a function of severity and duration
+5. LD mismatch quantification via Frobenius norm
 
 Reference: Wang et al. (2026), Nature Communications 17:942.
 -/
@@ -134,18 +135,6 @@ theorem pgs_accuracy_from_tagging
   intro i _
   exact mul_nonneg (h_r2 i) (h_β i)
 
-/-- **LD score regression captures the total tagging.**
-    The LD score ℓ_j = Σ_k r²_jk counts how many causal variants
-    tag SNP j captures. Higher LD score → more heritability. -/
-theorem ld_score_regression_interpretation
-    (h_sq_total h_sq_captured ld_score_mean : ℝ)
-    (h_total_pos : 0 < h_sq_total)
-    (h_regression : h_sq_captured = h_sq_total * ld_score_mean)
-    (h_ld_pos : 0 < ld_score_mean) (h_ld_le : ld_score_mean ≤ 1) :
-    h_sq_captured ≤ h_sq_total := by
-  rw [h_regression]
-  exact mul_le_of_le_one_right (le_of_lt h_total_pos) h_ld_le
-
 end LDTagging
 
 
@@ -185,16 +174,6 @@ theorem admixture_ld_decays_unlinked (D₀ : ℝ) (t : ℕ) (hD₀ : 0 < D₀) :
   · norm_num
   · norm_num
   · omega
-
-/-- **Admixture LD creates false positive tagging.**
-    In an admixed population, a tag SNP may be in LD with a causal variant
-    on a different chromosome simply because both have ancestry-specific
-    allele frequencies. This inflates PGS variance. -/
-theorem admixture_inflates_pgs_variance
-    (v_true v_admixture_ld : ℝ)
-    (h_true : 0 < v_true)
-    (h_admix : 0 < v_admixture_ld) :
-    v_true < v_true + v_admixture_ld := by linarith
 
 end AdmixtureLD
 
@@ -246,18 +225,6 @@ theorem bottleneck_ld_increases_with_severity
   have h_pow := pow_lt_pow_left₀ h_base h_nn (by omega : t ≠ 0)
   linarith
 
-/-- **Bottleneck-extended LD does not transfer to non-bottlenecked populations.**
-    Populations that experienced bottlenecks have extended LD blocks.
-    PGS trained on bottlenecked populations may have inflated tagging
-    that doesn't transfer to populations with shorter LD. -/
-theorem bottleneck_ld_doesnt_transfer
-    (ld_source ld_target : ℝ)
-    (h_source_higher : ld_target < ld_source)
-    (h_target_pos : 0 < ld_target) :
-    -- Tag r² in target population is lower
-    ld_target / ld_source < 1 := by
-  rw [div_lt_one (by linarith)]; exact h_source_higher
-
 end BottleneckLD
 
 
@@ -292,42 +259,249 @@ theorem ld_mismatch_pos_of_ne {p : ℕ}
   unfold ldMismatchFrobenius
   exact frobeniusNormSq_pos_of_exists_ne_zero _ h_ne
 
-/-- **PGS MSE increases linearly with LD mismatch.**
-    Under the linear model, the MSE of the transferred PGS is
-    bounded by a constant times the LD mismatch. -/
-theorem mse_bounded_by_ld_mismatch
-    {p : ℕ} (mse_source mse_target c : ℝ)
-    (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ)
-    (h_bound : mse_source + c * ldMismatchFrobenius Sig_S Sig_T ≤ mse_target)
-    (h_c : 0 < c) (h_mismatch : 0 < ldMismatchFrobenius Sig_S Sig_T) :
-    mse_source < mse_target := by
-  linarith [mul_pos h_c h_mismatch]
-
 end LDMismatchQuantification
 
 
 /-!
-## Haplotype Structure and PGS
+## Harmonic Mean Effective Population Size
 
-Modern PGS methods that use haplotype information can potentially
-recover some portability loss from LD mismatch.
+When Ne varies over time, the effective drift is governed by the harmonic
+mean: 1/Ne_eff = (1/T) Σ 1/Ne(t). Bottleneck generations dominate because
+their small Ne contributes disproportionately large 1/Ne terms.
 -/
 
-section HaplotypeStructure
+section HarmonicMeanNe
 
-/-- **The portability ceiling from haplotype mismatch.**
-    Even with infinite GWAS sample size, haplotype-based PGS trained
-    in one population has limited portability because the relevant
-    haplotypes may not exist in the target population. -/
-theorem haplotype_portability_ceiling
-    (n_shared_haplotypes n_total_source n_total_target : ℝ)
-    (h_shared_lt_source : n_shared_haplotypes < n_total_source)
-    (h_shared_lt_target : n_shared_haplotypes < n_total_target)
-    (h_source_pos : 0 < n_total_source) :
-    n_shared_haplotypes / n_total_source < 1 := by
-  rw [div_lt_one h_source_pos]
-  exact h_shared_lt_source
+/-- **Harmonic mean Ne** for a population size trajectory over T generations. -/
+noncomputable def harmonicMeanNe (Ne : Fin T → ℝ) : ℝ :=
+  (T : ℝ) / ∑ i, (1 / Ne i)
 
-end HaplotypeStructure
+/-- The reciprocal of the harmonic mean equals the average of reciprocals. -/
+theorem harmonic_mean_reciprocal (T : ℕ) (hT : 0 < T)
+    (Ne : Fin T → ℝ) (hNe : ∀ i, 0 < Ne i) :
+    1 / harmonicMeanNe Ne = (1 / (T : ℝ)) * ∑ i, (1 / Ne i) := by
+  unfold harmonicMeanNe
+  have hT_pos : (0 : ℝ) < T := Nat.cast_pos.mpr hT
+  have hsum_pos : 0 < ∑ i, (1 / Ne i) := by
+    apply Finset.sum_pos
+    · intro i _; exact div_pos one_pos (hNe i)
+    · exact Finset.univ_nonempty
+  rw [one_div, inv_div, div_div]
+  field_simp
+
+/-- Replacing one generation's Ne with a smaller value decreases the harmonic mean.
+    This shows bottleneck generations dominate. -/
+theorem bottleneck_dominates_harmonic_mean (T : ℕ) (hT : 0 < T)
+    (Ne₁ Ne₂ : Fin T → ℝ)
+    (hNe₁ : ∀ i, 0 < Ne₁ i) (hNe₂ : ∀ i, 0 < Ne₂ i)
+    (h_recip_larger : ∑ i, (1 / Ne₁ i) < ∑ i, (1 / Ne₂ i)) :
+    harmonicMeanNe Ne₂ < harmonicMeanNe Ne₁ := by
+  unfold harmonicMeanNe
+  have hT_pos : (0 : ℝ) < T := Nat.cast_pos.mpr hT
+  have hs₁ : 0 < ∑ i, (1 / Ne₁ i) := by
+    apply Finset.sum_pos
+    · intro i _; exact div_pos one_pos (hNe₁ i)
+    · exact Finset.univ_nonempty
+  have hs₂ : 0 < ∑ i, (1 / Ne₂ i) := by
+    apply Finset.sum_pos
+    · intro i _; exact div_pos one_pos (hNe₂ i)
+    · exact Finset.univ_nonempty
+  exact div_lt_div_of_pos_left hT_pos hs₂ h_recip_larger
+
+/-- A single bottleneck generation (small Ne_b) makes the harmonic mean
+    smaller than the arithmetic mean would suggest.
+    Specifically: if Ne_b < Ne_normal, then 1/Ne_b > 1/Ne_normal,
+    so the sum of reciprocals is dominated by bottleneck terms. -/
+theorem bottleneck_reciprocal_dominance (Ne_b Ne_normal : ℝ)
+    (hb : 0 < Ne_b) (hn : 0 < Ne_normal)
+    (h_bottle : Ne_b < Ne_normal) :
+    1 / Ne_normal < 1 / Ne_b := by
+  exact div_lt_div_of_pos_left one_pos hb h_bottle
+
+end HarmonicMeanNe
+
+
+/-!
+## Bottleneck Effects on LD
+
+A bottleneck (temporary reduction in Ne) amplifies LD above equilibrium
+levels. After recovery, LD decays back but excess persists proportionally
+to recovery population size.
+-/
+
+section BottleneckLDExcess
+
+/-- **Excess LD from a bottleneck.**
+    During a bottleneck of size N_b for t_b generations, drift generates
+    LD of magnitude ≈ 1/(2N_b) per generation. After recovery to size N_r,
+    this excess decays at rate 1/(2N_r) per generation. -/
+noncomputable def excessLDAfterBottleneck (N_b N_r : ℝ) (t_b t_r : ℕ) : ℝ :=
+  (1 - (1 - 1/(2 * N_b)) ^ t_b) * (1 - 1/(2 * N_r)) ^ t_r
+
+/-- Excess LD is nonneg for reasonable parameters. -/
+theorem excess_ld_nonneg (N_b N_r : ℝ) (t_b t_r : ℕ)
+    (hNb : 2 < N_b) (hNr : 2 < N_r) :
+    0 ≤ excessLDAfterBottleneck N_b N_r t_b t_r := by
+  unfold excessLDAfterBottleneck
+  apply mul_nonneg
+  · rw [sub_nonneg]
+    apply pow_le_one₀
+    · rw [sub_nonneg, div_le_one (by linarith)]; linarith
+    · rw [sub_le_self_iff]; positivity
+  · apply pow_nonneg
+    rw [sub_nonneg, div_le_one (by linarith)]; linarith
+
+/-- More severe bottleneck (smaller N_b) produces more excess LD. -/
+theorem more_severe_bottleneck_more_ld (N₁ N₂ N_r : ℝ) (t_b t_r : ℕ)
+    (hN₁ : 2 < N₁) (hN₂ : 2 < N₂) (hNr : 2 < N_r)
+    (h_smaller : N₂ < N₁) (ht_b : 0 < t_b) :
+    excessLDAfterBottleneck N₁ N_r t_b t_r <
+      excessLDAfterBottleneck N₂ N_r t_b t_r := by
+  unfold excessLDAfterBottleneck
+  have h_decay_nn : 0 ≤ (1 - 1/(2 * N_r)) ^ t_r := by
+    apply pow_nonneg; rw [sub_nonneg, div_le_one (by linarith)]; linarith
+  have h_decay_pos : 0 < (1 - 1/(2 * N_r)) ^ t_r := by
+    apply pow_pos; rw [sub_pos, div_lt_one (by linarith)]; linarith
+  apply mul_lt_mul_of_pos_right _ h_decay_pos
+  -- Need: 1 - (1 - 1/(2N₁))^t_b < 1 - (1 - 1/(2N₂))^t_b
+  -- i.e., (1 - 1/(2N₂))^t_b < (1 - 1/(2N₁))^t_b
+  rw [sub_lt_sub_iff_left]
+  -- Since N₂ < N₁, 1/(2N₂) > 1/(2N₁), so 1 - 1/(2N₂) < 1 - 1/(2N₁)
+  have h_base : 1 - 1/(2 * N₂) < 1 - 1/(2 * N₁) := by
+    rw [sub_lt_sub_iff_left]
+    exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+  have h_nn : 0 ≤ 1 - 1/(2 * N₂) := by
+    rw [sub_nonneg, div_le_one (by linarith)]; linarith
+  exact pow_lt_pow_left₀ h_base h_nn (by omega)
+
+/-- After recovery, excess LD decays with time. -/
+theorem excess_ld_decays_after_recovery (N_b N_r : ℝ) (t_b : ℕ) (t₁ t₂ : ℕ)
+    (hNb : 2 < N_b) (hNr : 2 < N_r) (ht_b : 0 < t_b)
+    (h_time : t₁ < t₂) :
+    excessLDAfterBottleneck N_b N_r t_b t₂ <
+      excessLDAfterBottleneck N_b N_r t_b t₁ := by
+  unfold excessLDAfterBottleneck
+  have h_amp_pos : 0 < 1 - (1 - 1/(2 * N_b)) ^ t_b := by
+    rw [sub_pos]
+    apply pow_lt_one₀
+    · rw [sub_nonneg, div_le_one (by linarith)]; linarith
+    · rw [sub_lt_self_iff]; positivity
+    · omega
+  apply mul_lt_mul_of_pos_left _ h_amp_pos
+  have h_base_pos : 0 < 1 - 1/(2 * N_r) := by
+    rw [sub_pos, div_lt_one (by linarith)]; linarith
+  have h_base_lt : 1 - 1/(2 * N_r) < 1 := by
+    rw [sub_lt_self_iff]; positivity
+  exact pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt h_time
+
+end BottleneckLDExcess
+
+
+/-!
+## Population Expansion and LD Persistence
+
+Population expansion reduces the rate of new drift, so LD generated
+pre-expansion persists longer. Large modern Ne means current drift is slow.
+-/
+
+section ExpansionLD
+
+/-- **LD decay rate depends on current Ne.**
+    The fraction of LD that decays per generation is 1/(2Ne).
+    Larger Ne → slower decay → LD persists longer. -/
+noncomputable def ldDecayRatePerGen (Ne : ℝ) : ℝ :=
+  1 / (2 * Ne)
+
+/-- Larger population has slower LD decay rate. -/
+theorem larger_pop_slower_ld_decay (Ne₁ Ne₂ : ℝ)
+    (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (h_larger : Ne₁ < Ne₂) :
+    ldDecayRatePerGen Ne₂ < ldDecayRatePerGen Ne₁ := by
+  unfold ldDecayRatePerGen
+  exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+
+/-- **LD half-life is proportional to Ne.**
+    After a perturbation, the number of generations for LD to halve
+    is approximately 2·Ne·ln(2). We define it and show monotonicity. -/
+noncomputable def ldHalfLife (Ne : ℝ) : ℝ :=
+  2 * Ne * Real.log 2
+
+/-- LD half-life increases with population size. -/
+theorem ld_half_life_increasing (Ne₁ Ne₂ : ℝ)
+    (hNe₁ : 0 < Ne₁) (h_larger : Ne₁ < Ne₂) :
+    ldHalfLife Ne₁ < ldHalfLife Ne₂ := by
+  unfold ldHalfLife
+  have hln2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  nlinarith
+
+/-- Pre-expansion LD retained after t generations in expanded population.
+    If pre-expansion LD level is D₀ and expansion is to Ne_new,
+    the retained fraction after t generations is (1 - 1/(2·Ne_new))^t.
+    Larger Ne_new retains more LD. -/
+theorem expansion_retains_more_ld (Ne_small Ne_large D₀ : ℝ) (t : ℕ)
+    (hNs : 2 < Ne_small) (hNl : 2 < Ne_large)
+    (h_exp : Ne_small < Ne_large) (hD₀ : 0 < D₀) (ht : 0 < t) :
+    D₀ * (1 - 1/(2 * Ne_small)) ^ t < D₀ * (1 - 1/(2 * Ne_large)) ^ t := by
+  apply mul_lt_mul_of_pos_left _ hD₀
+  have h_base : 1 - 1/(2 * Ne_small) < 1 - 1/(2 * Ne_large) := by
+    rw [sub_lt_sub_iff_left]
+    exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+  have h_nn : 0 ≤ 1 - 1/(2 * Ne_small) := by
+    rw [sub_nonneg, div_le_one (by linarith)]; linarith
+  have h_lt_one : 1 - 1/(2 * Ne_large) < 1 := by
+    rw [sub_lt_self_iff]; positivity
+  exact pow_lt_pow_left₀ h_base h_nn (by omega)
+
+end ExpansionLD
+
+
+/-!
+## LD Half-Life Depends on Ne Trajectory
+
+After a perturbation (bottleneck, admixture, etc.), LD decays with
+half-life proportional to the current Ne. Populations with larger modern
+Ne have slower LD decay toward equilibrium.
+-/
+
+section LDHalfLifeTrajectory
+
+/-- **LD retained fraction** after t generations at constant size Ne. -/
+noncomputable def ldRetainedFraction (Ne : ℝ) (t : ℕ) : ℝ :=
+  (1 - 1/(2 * Ne)) ^ t
+
+/-- Larger current Ne means more LD retained after any fixed time. -/
+theorem larger_ne_more_ld_retained (Ne₁ Ne₂ : ℝ) (t : ℕ)
+    (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂) (h : Ne₁ < Ne₂) (ht : 0 < t) :
+    ldRetainedFraction Ne₁ t < ldRetainedFraction Ne₂ t := by
+  unfold ldRetainedFraction
+  have h_base : 1 - 1/(2 * Ne₁) < 1 - 1/(2 * Ne₂) := by
+    rw [sub_lt_sub_iff_left]
+    exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+  have h_nn : 0 ≤ 1 - 1/(2 * Ne₁) := by
+    rw [sub_nonneg, div_le_one (by linarith)]; linarith
+  exact pow_lt_pow_left₀ h_base h_nn (by omega)
+
+/-- Retained fraction is strictly decreasing with time for finite Ne. -/
+theorem ld_retained_decreasing (Ne : ℝ) (t₁ t₂ : ℕ)
+    (hNe : 2 < Ne) (h_time : t₁ < t₂) :
+    ldRetainedFraction Ne t₂ < ldRetainedFraction Ne t₁ := by
+  unfold ldRetainedFraction
+  have h_pos : 0 < 1 - 1/(2 * Ne) := by
+    rw [sub_pos, div_lt_one (by linarith)]; linarith
+  have h_lt_one : 1 - 1/(2 * Ne) < 1 := by
+    rw [sub_lt_self_iff]; positivity
+  exact pow_lt_pow_right_of_lt_one₀ h_pos h_lt_one h_time
+
+/-- Two populations with the same initial LD perturbation but different
+    modern Ne will have different LD levels after the same time.
+    The one with larger Ne retains more excess LD. -/
+theorem different_ne_different_ld_persistence
+    (D₀ Ne₁ Ne₂ : ℝ) (t : ℕ)
+    (hD₀ : 0 < D₀) (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂)
+    (h_larger : Ne₁ < Ne₂) (ht : 0 < t) :
+    D₀ * ldRetainedFraction Ne₁ t < D₀ * ldRetainedFraction Ne₂ t := by
+  apply mul_lt_mul_of_pos_left _ hD₀
+  exact larger_ne_more_ld_retained Ne₁ Ne₂ t hNe₁ hNe₂ h_larger ht
+
+end LDHalfLifeTrajectory
 
 end Calibrator

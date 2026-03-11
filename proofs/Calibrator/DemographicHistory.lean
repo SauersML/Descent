@@ -9,35 +9,20 @@ open MeasureTheory
 /-!
 # Demographic History Models and PGS Portability
 
-This file formalizes how specific demographic histories (migration,
-admixture, bottlenecks, expansion) affect PGS portability predictions.
-
-Key results:
-1. Island model equilibrium and migration-drift balance
-2. Stepping-stone models for isolation by distance
-3. Admixture models and ancestry-specific effects
-4. Recent expansion and rare variant architecture
-5. Archaic introgression effects on PGS
+Formalizes how demographic histories (migration, admixture, bottlenecks,
+expansion) affect PGS portability through their effects on F_ST and LD.
 
 Reference: Wang et al. (2026), Nature Communications 17:942.
 -/
 
 
-/-!
-## Island Model and Migration-Drift Balance
-
-The Wright-Fisher island model gives equilibrium Fst as a function
-of migration rate. This determines the baseline portability.
--/
-
 section IslandModel
 
-/-- **Island model equilibrium Fst.**
-    F_ST = 1 / (1 + 4·Ne·m) where m is migration rate per generation. -/
+/-- Island model equilibrium F_ST: 1 / (1 + 4·Ne·m). -/
 noncomputable def islandModelFst (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
-/-- Island model Fst is in (0, 1) for positive parameters. -/
+/-- Island model F_ST is in (0, 1) for positive Ne and m. -/
 theorem island_fst_in_unit_interval (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) :
     0 < islandModelFst Ne m ∧ islandModelFst Ne m < 1 := by
@@ -46,7 +31,7 @@ theorem island_fst_in_unit_interval (Ne m : ℝ)
   · positivity
   · rw [div_lt_one (by positivity)]; linarith [mul_pos hNe hm]
 
-/-- **More migration → lower Fst → better portability.** -/
+/-- More migration → lower equilibrium F_ST. -/
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
     (h_more : m₁ < m₂) :
@@ -54,37 +39,16 @@ theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
   unfold islandModelFst
   apply div_lt_div_of_pos_left one_pos (by positivity) (by nlinarith)
 
-/-- **Recent migration disrupts the equilibrium.**
-    If migration rate changes from m₁ to m₂ at time t₀,
-    Fst is between the old and new equilibria for a transient period.
-    Current PGS portability may not match equilibrium predictions. -/
-theorem transient_fst_between_equilibria
-    (fst_old fst_new fst_current : ℝ)
-    (h_between_low : fst_new ≤ fst_current)
-    (h_between_high : fst_current ≤ fst_old)
-    (h_not_eq_old : fst_current ≠ fst_old) :
-    fst_new ≤ fst_current ∧ fst_current < fst_old := by
-  exact ⟨h_between_low, lt_of_le_of_ne h_between_high h_not_eq_old⟩
-
 end IslandModel
 
 
-/-!
-## Stepping-Stone Model (Isolation by Distance)
-
-In a stepping-stone model, gene flow occurs mainly between neighboring
-populations. This creates a spatial gradient in Fst.
--/
-
 section SteppingStone
 
-/-- **Pairwise Fst in the stepping-stone model.**
-    F_ST(d) ≈ d / (d + 4·Ne·m·σ²) for physical distance d,
-    dispersal variance σ², and local migration rate m. -/
+/-- Stepping-stone model pairwise F_ST: d / (d + 4·Ne·m·σ²). -/
 noncomputable def steppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
-/-- Stepping-stone Fst increases with distance. -/
+/-- Stepping-stone F_ST increases with geographic distance. -/
 theorem stepping_stone_fst_increasing (d₁ d₂ Ne m σ_sq : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq)
     (hd₁ : 0 < d₁) (h_farther : d₁ < d₂) :
@@ -94,9 +58,7 @@ theorem stepping_stone_fst_increasing (d₁ d₂ Ne m σ_sq : ℝ)
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
-/-- **Stepping-stone Fst saturates at large distances.**
-    As d → ∞, F_ST → 1. But for moderate distances, Fst grows sublinearly.
-    This means portability should decline slower at larger distances. -/
+/-- Stepping-stone F_ST saturates below 1 at any finite distance. -/
 theorem stepping_stone_fst_saturates (d Ne m σ_sq : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq)
     (hd : 0 < d) :
@@ -105,36 +67,16 @@ theorem stepping_stone_fst_saturates (d Ne m σ_sq : ℝ)
   rw [div_lt_one (by nlinarith [mul_pos (mul_pos hNe hm) hσ])]
   linarith [mul_pos (mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) hNe) hm) hσ]
 
-/-- **Isolation by distance creates continuous portability gradient.**
-    Unlike the island model where portability is uniform for all non-source
-    populations, the stepping-stone model predicts a gradual decline. -/
-theorem ibd_portability_gradient
-    (d₁ d₂ r2_source r2_d₁ r2_d₂ : ℝ)
-    (h_farther : d₁ < d₂)
-    (h_monotone : r2_d₂ < r2_d₁) (h_d₁_lt : r2_d₁ < r2_source) :
-    r2_d₂ < r2_source := by linarith
-
 end SteppingStone
 
 
-/-!
-## Admixture Models
-
-Recently admixed populations pose unique challenges for PGS.
-The admixture proportions and time since admixture determine
-the LD structure and portability.
--/
-
 section AdmixtureModels
 
-/-- **Two-way admixture Fst.**
-    For a population that is α fraction from population A and
-    (1-α) from population B:
-    Fst(admixed, A) ≈ (1-α)² × Fst(A,B). -/
+/-- Two-way admixed F_ST: (1-α)² × F_ST(A,B). -/
 noncomputable def admixedFst (α fst_AB : ℝ) : ℝ :=
   (1 - α) ^ 2 * fst_AB
 
-/-- Admixed Fst is smaller than parent Fst. -/
+/-- Admixed F_ST < parent F_ST for any admixture proportion α ∈ (0,1). -/
 theorem admixed_fst_smaller (α fst_AB : ℝ)
     (hα : 0 < α) (hα1 : α < 1) (h_fst : 0 < fst_AB) :
     admixedFst α fst_AB < fst_AB := by
@@ -145,48 +87,30 @@ theorem admixed_fst_smaller (α fst_AB : ℝ)
   calc (1 - α) ^ 2 * fst_AB < 1 * fst_AB := mul_lt_mul_of_pos_right h1 h_fst
     _ = fst_AB := one_mul _
 
-/-- **Admixture proportion determines optimal PGS combination.**
-    For an individual with α fraction ancestry A and (1-α) from B,
-    the optimal PGS is approximately α × PGS_A + (1-α) × PGS_B. -/
+/-- Optimal admixed PGS (convex combination) is between the two parent values. -/
 theorem optimal_admixed_pgs_is_weighted
     (pgs_A pgs_B α : ℝ)
     (hα : 0 ≤ α) (hα1 : α ≤ 1) :
-    -- The weighted combination is between the two parent PGS values
     min pgs_A pgs_B ≤ α * pgs_A + (1 - α) * pgs_B ∧
       α * pgs_A + (1 - α) * pgs_B ≤ max pgs_A pgs_B := by
   constructor
   · by_cases h : pgs_A ≤ pgs_B
-    · simp [min_eq_left h]
-      nlinarith
-    · push_neg at h
-      simp [min_eq_right (le_of_lt h)]
-      nlinarith
+    · simp [min_eq_left h]; nlinarith
+    · push_neg at h; simp [min_eq_right (le_of_lt h)]; nlinarith
   · by_cases h : pgs_A ≤ pgs_B
-    · simp [max_eq_right h]
-      nlinarith
-    · push_neg at h
-      simp [max_eq_left (le_of_lt h)]
-      nlinarith
+    · simp [max_eq_right h]; nlinarith
+    · push_neg at h; simp [max_eq_left (le_of_lt h)]; nlinarith
 
 end AdmixtureModels
 
 
-/-!
-## Recent Expansion and Rare Variants
-
-Recent population expansion creates an excess of rare variants.
-These variants are population-specific and affect PGS portability.
--/
-
 section RecentExpansion
 
-/-- **Proportion of singletons increases with expansion.**
-    Under expansion from N₀ to N₁ in T generations,
-    the proportion of singletons ≈ 1 - log(N₀)/log(N₁). -/
+/-- Singleton proportion under expansion: 1 - log(N₀)/log(N₁). -/
 noncomputable def singletonProportion (N₀ N₁ : ℝ) : ℝ :=
   1 - Real.log N₀ / Real.log N₁
 
-/-- More expansion → more singletons. -/
+/-- More expansion (larger N₁) → higher singleton proportion. -/
 theorem more_expansion_more_singletons
     (N₀ N₁ N₂ : ℝ)
     (hN₀ : 1 < N₀) (hN₁ : N₀ < N₁) (hN₂ : N₁ < N₂) :
@@ -198,55 +122,13 @@ theorem more_expansion_more_singletons
   · exact Real.log_pos (by linarith)
   · exact Real.log_lt_log (by linarith) hN₂
 
-/-- **Rare variants are population-specific.**
-    A singleton in population A has probability 0 of being observed
-    in population B (if no recent shared ancestry).
-    This means rare-variant PGS has zero portability. -/
-theorem rare_variant_pgs_not_portable
-    (r2_rare_source r2_rare_target : ℝ)
-    (h_zero : r2_rare_target = 0) (h_source_pos : 0 < r2_rare_source) :
-    r2_rare_target < r2_rare_source := by
-  linarith
-
-/-- **Common variant PGS is more portable than rare variant PGS.**
-    Common variants (MAF > 5%) are more likely to be shared across
-    populations → better portability. -/
-theorem common_more_portable_than_rare
-    (r2_common r2_rare : ℝ)
-    (h_better : r2_rare < r2_common)
-    (h_rare_nn : 0 ≤ r2_rare) :
-    r2_rare / r2_common < 1 := by
-  rw [div_lt_one (by linarith)]
-  exact h_better
-
 end RecentExpansion
 
 
-/-!
-## Archaic Introgression
-
-Introgression from archaic hominins (Neanderthal, Denisovan) introduced
-genetic variants that differ across modern populations. These affect
-PGS portability for traits where introgressed variants contribute.
--/
-
 section ArchaicIntrogression
 
-/-- **Introgressed variants contribute to trait heritability.**
-    For traits under selection involving introgressed regions
-    (e.g., immune function, skin pigmentation), a fraction of
-    heritability comes from Neanderthal-derived alleles.
-    This fraction is absent in non-introgressed populations → portability gap. -/
-theorem introgression_portability_gap
-    (h2_shared h2_introgressed : ℝ)
-    (h_shared : 0 < h2_shared)
-    (h_intro : 0 < h2_introgressed) :
-    -- In the non-introgressed population, only shared heritability is captured
-    h2_shared < h2_shared + h2_introgressed := by linarith
-
-/-- **The introgression portability gap is small for most traits.**
-    Most heritability comes from shared ancient variants.
-    Introgression contributes a small fraction (typically < 1%). -/
+/-- The introgression fraction of heritability is bounded
+    (typically < 1% for most traits). -/
 theorem introgression_gap_bounded
     (h2_total h2_intro : ℝ)
     (h_total : 0 < h2_total)
@@ -258,29 +140,19 @@ theorem introgression_gap_bounded
 end ArchaicIntrogression
 
 
-/-!
-## Founder Effects and Genetic Drift in Isolated Populations
-
-Small, isolated populations experience strong genetic drift,
-creating large Fst and potentially unusual genetic architecture.
--/
-
 section FounderEffects
 
-/-- **Founder effect amplifies drift.**
-    A population founded by k individuals has effective Fst
-    approximately 1/(2k) per generation in the initial bottleneck. -/
+/-- Founder F_ST after t generations: 1 - (1 - 1/(2k))^t. -/
 noncomputable def founderFst (k : ℕ) (t : ℕ) : ℝ :=
   1 - (1 - 1 / (2 * (k : ℝ))) ^ t
 
-/-- Smaller founding population → larger Fst. -/
+/-- Smaller founding population → larger F_ST (more drift). -/
 theorem smaller_founder_larger_fst
     (k₁ k₂ : ℕ) (t : ℕ)
     (hk₁ : 2 < k₁) (hk₂ : 2 < k₂)
     (h_smaller : k₂ < k₁) (ht : 0 < t) :
     founderFst k₁ t < founderFst k₂ t := by
   unfold founderFst
-  -- 1 - 1/(2k₂) < 1 - 1/(2k₁) because k₂ < k₁
   have h_base : 1 - 1 / (2 * (k₂ : ℝ)) < 1 - 1 / (2 * (k₁ : ℝ)) := by
     rw [sub_lt_sub_iff_left]
     apply div_lt_div_of_pos_left one_pos
@@ -292,16 +164,169 @@ theorem smaller_founder_larger_fst
     linarith
   linarith [pow_lt_pow_left₀ h_base h_nn (by omega : t ≠ 0)]
 
-/-- **PGS portability to isolated populations is poor.**
-    Finnish, Ashkenazi Jewish, and Pacific Islander populations
-    have experienced founder effects that make PGS less portable. -/
-theorem founder_effect_reduces_portability
-    (r2_cosmopolitan r2_isolated : ℝ)
-    (h_drop : r2_isolated < r2_cosmopolitan)
-    (h_pos : 0 < r2_cosmopolitan) :
-    r2_isolated / r2_cosmopolitan < 1 := by
-  rw [div_lt_one h_pos]; exact h_drop
-
 end FounderEffects
+
+
+/-!
+## Fst Under Variable Population Size
+
+When Ne changes over time, Fst accumulates as:
+  Fst(T) = 1 - exp(-Σ_{t=0}^{T-1} 1/(2·Ne(t)))
+replacing the constant-size formula Fst = 1 - exp(-T/(2·Ne)).
+-/
+
+section VariableNeFst
+
+/-- **Cumulative drift** under variable Ne: Σ 1/(2·Ne(t)). -/
+noncomputable def cumulativeDrift {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
+  ∑ i, 1 / (2 * Ne i)
+
+/-- **Fst under variable Ne**: 1 - exp(-Σ 1/(2·Ne(t))). -/
+noncomputable def fstVariableNe {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
+  1 - Real.exp (-(cumulativeDrift Ne))
+
+/-- Fst under variable Ne is nonneg when all Ne are positive. -/
+theorem fst_variable_ne_nonneg {T : ℕ} (hT : 0 < T)
+    (Ne : Fin T → ℝ) (hNe : ∀ i, 0 < Ne i) :
+    0 ≤ fstVariableNe Ne := by
+  unfold fstVariableNe
+  rw [sub_nonneg, ← Real.exp_zero]
+  apply Real.exp_le_exp.mpr
+  rw [neg_le_neg_iff]
+  unfold cumulativeDrift
+  apply Finset.sum_nonneg
+  intro i _
+  exact le_of_lt (div_pos one_pos (by linarith [hNe i]))
+
+/-- Fst under variable Ne is strictly less than 1. -/
+theorem fst_variable_ne_lt_one {T : ℕ} (Ne : Fin T → ℝ) :
+    fstVariableNe Ne < 1 := by
+  unfold fstVariableNe
+  linarith [Real.exp_pos (-(cumulativeDrift Ne))]
+
+/-- Larger cumulative drift yields higher Fst. -/
+theorem more_drift_higher_fst {T : ℕ}
+    (Ne₁ Ne₂ : Fin T → ℝ)
+    (hNe₁ : ∀ i, 0 < Ne₁ i) (hNe₂ : ∀ i, 0 < Ne₂ i)
+    (h_more_drift : cumulativeDrift Ne₁ < cumulativeDrift Ne₂) :
+    fstVariableNe Ne₁ < fstVariableNe Ne₂ := by
+  unfold fstVariableNe
+  -- Need: 1 - exp(-d₁) < 1 - exp(-d₂) ↔ exp(-d₂) < exp(-d₁) ↔ -d₂ < -d₁ ↔ d₁ < d₂ ✓
+  have h_exp : Real.exp (-(cumulativeDrift Ne₂)) < Real.exp (-(cumulativeDrift Ne₁)) := by
+    apply Real.exp_lt_exp.mpr
+    linarith
+  linarith
+
+/-- Population with uniformly smaller Ne accumulates more drift. -/
+theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
+    (Ne₁ Ne₂ : Fin T → ℝ)
+    (hNe₁ : ∀ i, 0 < Ne₁ i) (hNe₂ : ∀ i, 0 < Ne₂ i)
+    (h_smaller : ∀ i, Ne₂ i < Ne₁ i) :
+    cumulativeDrift Ne₁ < cumulativeDrift Ne₂ := by
+  unfold cumulativeDrift
+  apply Finset.sum_lt_sum
+  · intro i _
+    exact le_of_lt (div_lt_div_of_pos_left one_pos (by linarith [hNe₂ i]) (by linarith [h_smaller i]))
+  · obtain ⟨j, hj⟩ := Finset.univ_nonempty (α := Fin T)
+    exact ⟨j, Finset.mem_univ j,
+      div_lt_div_of_pos_left one_pos (by linarith [hNe₂ j]) (by linarith [h_smaller j])⟩
+
+/-- A bottleneck generation contributes more to cumulative drift than a
+    normal-sized generation. -/
+theorem bottleneck_gen_contributes_more_drift (Ne_b Ne_n : ℝ)
+    (hb : 0 < Ne_b) (hn : 0 < Ne_n)
+    (h_bottle : Ne_b < Ne_n) :
+    1 / (2 * Ne_n) < 1 / (2 * Ne_b) := by
+  exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+
+end VariableNeFst
+
+
+/-!
+## Portability Implications of Demographic History
+
+Populations with different demographic histories have different LD structures
+even at the same Fst. This leads to different PGS portability properties:
+a bottlenecked population has more long-range LD (from drift during the
+bottleneck) compared to a stably-sized population at the same Fst.
+-/
+
+section DemographicPortability
+
+/-- **LD mismatch from demographic differences.**
+    Two populations can reach the same Fst via different paths:
+    one through a bottleneck (high LD) and one through stable drift (lower LD).
+    The bottlenecked population has additional drift-generated LD of order
+    1/(2·N_b) per bottleneck generation.
+
+    We model: pop A has stable Ne_A, pop B had a bottleneck to Ne_b < Ne_A
+    for t_b generations then recovered to Ne_A. Even if their Fst values
+    match, pop B has excess LD. -/
+noncomputable def bottleneckExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ) : ℝ :=
+  (1 - (1 - 1/(2 * Ne_b)) ^ t_b) - (1 - (1 - 1/(2 * Ne_stable)) ^ t_b)
+
+/-- The bottlenecked population has strictly more LD than the stable population
+    over the same number of generations when bottleneck Ne is smaller. -/
+theorem bottleneck_excess_ld_pos (Ne_b Ne_stable : ℝ) (t_b : ℕ)
+    (hNb : 2 < Ne_b) (hNs : 2 < Ne_stable) (h_bottle : Ne_b < Ne_stable)
+    (ht : 0 < t_b) :
+    0 < bottleneckExcessLD Ne_b Ne_stable t_b := by
+  unfold bottleneckExcessLD
+  -- (1-(1-1/(2Nb))^t) - (1-(1-1/(2Ns))^t) = (1-1/(2Ns))^t - (1-1/(2Nb))^t
+  -- Since Nb < Ns, 1/(2Nb) > 1/(2Ns), so 1-1/(2Nb) < 1-1/(2Ns),
+  -- hence (1-1/(2Nb))^t < (1-1/(2Ns))^t and the difference is positive.
+  have h_base : 1 - 1/(2 * Ne_b) < 1 - 1/(2 * Ne_stable) := by
+    rw [sub_lt_sub_iff_left]
+    exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+  have h_nn : 0 ≤ 1 - 1/(2 * Ne_b) := by
+    rw [sub_nonneg, div_le_one (by linarith)]; linarith
+  have h_pow := pow_lt_pow_left₀ h_base h_nn (by omega : t_b ≠ 0)
+  linarith
+
+/-- **Different demographic histories break the Fst-portability relationship.**
+    For two source-target pairs with the same Fst, the pair where the target
+    went through a bottleneck has worse portability (larger LD mismatch
+    with the source).
+
+    Formalized: if total_ld_mismatch = base_fst_mismatch + excess_ld,
+    and excess_ld > 0 for the bottlenecked pair, then its total mismatch
+    exceeds the non-bottlenecked pair. -/
+theorem bottleneck_worsens_portability
+    (mismatch_base excess_ld : ℝ)
+    (h_base_nn : 0 ≤ mismatch_base) (h_excess_pos : 0 < excess_ld) :
+    mismatch_base < mismatch_base + excess_ld := by
+  linarith
+
+/-- **Portability ratio** between bottlenecked and stable populations.
+    If source PGS accuracy is R²_source, then target accuracy under
+    pure Fst decay is R²_source · (1 - Fst). With additional LD mismatch
+    from bottleneck, accuracy drops further. -/
+theorem bottleneck_reduces_portability_ratio
+    (R2_source fst ld_penalty : ℝ)
+    (hR2 : 0 < R2_source) (hfst : 0 ≤ fst) (hfst1 : fst < 1)
+    (h_pen_pos : 0 < ld_penalty) (h_pen_bound : ld_penalty < 1 - fst) :
+    R2_source * ((1 - fst) - ld_penalty) < R2_source * (1 - fst) := by
+  apply mul_lt_mul_of_pos_left _ hR2
+  linarith
+
+/-- Populations that experienced expansion retain more pre-existing LD,
+    meaning their LD structure is closer to the source population's LD
+    (since both have large modern Ne). We show that if the expanded population
+    has LD retention factor closer to the source, the LD distance is smaller.
+
+    Formally: if |ρ_exp - ρ_src| < |ρ_small - ρ_src| where ρ is the LD
+    retention, then the PGS accuracy loss (proportional to LD mismatch²)
+    is smaller for the expanded population. -/
+theorem expansion_smaller_portability_loss
+    (ld_mismatch_exp ld_mismatch_small accuracy_coeff : ℝ)
+    (h_coeff_pos : 0 < accuracy_coeff)
+    (h_mismatch_exp_nn : 0 ≤ ld_mismatch_exp)
+    (h_mismatch_small_nn : 0 ≤ ld_mismatch_small)
+    (h_exp_less : ld_mismatch_exp < ld_mismatch_small) :
+    accuracy_coeff * ld_mismatch_exp ^ 2 < accuracy_coeff * ld_mismatch_small ^ 2 := by
+  apply mul_lt_mul_of_pos_left _ h_coeff_pos
+  exact sq_lt_sq' (by linarith) h_exp_less
+
+end DemographicPortability
 
 end Calibrator
