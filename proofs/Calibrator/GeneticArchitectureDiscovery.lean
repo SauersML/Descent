@@ -114,8 +114,8 @@ theorem shrinkage_stabilizes_portability
 theorem methods_converge_at_large_n
     (r2_ct r2_bayes ε : ℝ)
     (h_close : |r2_ct - r2_bayes| ≤ ε)
-    (h_small : ε ≤ 0.01) :
-    |r2_ct - r2_bayes| ≤ 0.01 := by linarith
+    (h_small : ε ≤ 1/100) :
+    |r2_ct - r2_bayes| ≤ 1/100 := by linarith
 
 /-- **P-value threshold selection affects portability differently.**
     Stringent threshold → fewer SNPs → noisier but less LD-dependent.

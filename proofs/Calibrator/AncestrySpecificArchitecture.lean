@@ -79,8 +79,8 @@ theorem freq_change_alters_pgs_variance
     changes under drift than common variants. -/
 theorem rare_variants_drift_more
     (p_rare p_common fst : ℝ)
-    (h_rare : 0 < p_rare) (h_rare_lt : p_rare < 0.01)
-    (h_common : 0.05 < p_common) (h_common_lt : p_common < 0.5)
+    (h_rare : 0 < p_rare) (h_rare_lt : p_rare < 1/100)
+    (h_common : 1/20 < p_common) (h_common_lt : p_common < 1/2)
     (h_fst : 0 < fst) :
     -- Coefficient of variation of frequency is larger for rare
     expectedFreqDiffSq fst p_rare / p_rare^2 >

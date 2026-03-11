@@ -188,10 +188,10 @@ theorem prior_misspec_worse_for_sparse
       that are more likely shared across populations. -/
 theorem portability_prior_interaction
     (port_gauss_poly port_spike_poly port_gauss_sparse port_spike_sparse : ℝ)
-    (h_poly_similar : |port_gauss_poly - port_spike_poly| < 0.05)
+    (h_poly_similar : |port_gauss_poly - port_spike_poly| < 1/20)
     (h_sparse_different : port_gauss_sparse < port_spike_sparse) :
     port_gauss_sparse < port_spike_sparse ∧
-      |port_gauss_poly - port_spike_poly| < 0.05 :=
+      |port_gauss_poly - port_spike_poly| < 1/20 :=
   ⟨h_sparse_different, h_poly_similar⟩
 
 /-- **Empirical Bayes estimation of prior parameters.**
@@ -382,7 +382,7 @@ theorem optimal_allocation_oversamples_minority
     (h_oversampled : proportion < h_optimal_minority_share)
     (h_prop_def : proportion = n_minority / n_total)
     (h_pos : 0 < n_total)
-    (h_minority_share : n_minority / n_total < 0.5) :
+    (h_minority_share : n_minority / n_total < 1/2) :
     -- The optimal minority share exceeds the population proportion
     n_minority / n_total < h_optimal_minority_share := by linarith
 

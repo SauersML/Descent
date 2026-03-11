@@ -105,7 +105,7 @@ theorem lai_pgs_at_least_as_good
     LAI-PGS only helps if local ancestry can be called accurately.
     With error rate ε in LAI, the improvement is proportional to (1-2ε). -/
 theorem lai_improvement_requires_accuracy
-    (ε : ℝ) (h_ε : 0 ≤ ε) (h_ε_lt : ε < 0.5) :
+    (ε : ℝ) (h_ε : 0 ≤ ε) (h_ε_lt : ε < 1/2) :
     0 < 1 - 2 * ε := by linarith
 
 /-- **LAI accuracy decreases with admixture time.**
@@ -272,7 +272,7 @@ theorem r2_decreases_with_distance
 theorem individual_variation_dominates
     (r2_between_group cv_squared_within : ℝ)
     (h_cv : cv_squared_within = 2)  -- χ²₁ coefficient of variation²
-    (h_r2_small : r2_between_group < 0.01) :
+    (h_r2_small : r2_between_group < 1/100) :
     -- Even if between-group trend is real, it's overwhelmed by within-group noise
     r2_between_group < 1 / cv_squared_within := by
   rw [h_cv]; linarith

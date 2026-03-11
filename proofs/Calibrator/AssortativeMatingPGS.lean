@@ -215,7 +215,7 @@ theorem am_ld_breaks_cross_population
     genetic signal but a correlation artifact. -/
 theorem am_ld_decays_immediately
     (ld_gen0 ld_gen1 : ℝ)
-    (h_rapid : ld_gen1 < 0.5 * ld_gen0)
+    (h_rapid : ld_gen1 < (1/2) * ld_gen0)
     (h_nn : 0 ≤ ld_gen1) :
     ld_gen1 < ld_gen0 := by nlinarith
 
@@ -282,7 +282,7 @@ theorem within_continent_structure_matters
     drift-induced architecture changes. -/
 theorem founder_effects_outlier_portability
     (port_expected port_actual : ℝ)
-    (h_outlier : |port_actual - port_expected| > 0.15) :
+    (h_outlier : |port_actual - port_expected| > 3/20) :
     port_actual ≠ port_expected := by
   intro h
   rw [h, sub_self, abs_zero] at h_outlier

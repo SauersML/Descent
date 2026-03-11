@@ -47,10 +47,10 @@ theorem allelic_variance_nonneg (p : ℝ)
 /-- Allelic variance is maximized at p = 0.5. -/
 theorem allelic_variance_max_at_half (p : ℝ)
     (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
-    allelicVariance p ≤ allelicVariance 0.5 := by
+    allelicVariance p ≤ allelicVariance (1/2) := by
   unfold allelicVariance
-  have : (p - 0.5) ^ 2 ≤ 0.25 := by nlinarith
-  nlinarith [sq_nonneg (p - 0.5)]
+  have : (p - 1/2) ^ 2 ≤ 1/4 := by nlinarith
+  nlinarith [sq_nonneg (p - 1/2)]
 
 /-- Allelic variance is zero at fixation. -/
 theorem allelic_variance_zero_at_fixation_zero :
@@ -289,12 +289,12 @@ theorem admixture_ld_max_at_half (alpha p_A p_B r : ℝ) (g : ℕ)
     (h_r : 0 ≤ r) (h_r_le : r ≤ 1)
     (h_diff : p_A ≠ p_B) :
     admixtureLDMagnitude alpha p_A p_B r g ≤
-      admixtureLDMagnitude 0.5 p_A p_B r g := by
+      admixtureLDMagnitude (1/2) p_A p_B r g := by
   unfold admixtureLDMagnitude
   have h_sq : 0 ≤ (p_A - p_B) ^ 2 := sq_nonneg _
   have h_pow : 0 ≤ (1 - r) ^ g := pow_nonneg (by linarith) g
-  -- Need: α(1-α) ≤ 0.25
-  have h_key : alpha * (1 - alpha) ≤ 0.5 * (1 - 0.5) := by nlinarith [sq_nonneg (alpha - 0.5)]
+  -- Need: α(1-α) ≤ 1/4
+  have h_key : alpha * (1 - alpha) ≤ (1/2) * (1 - 1/2) := by nlinarith [sq_nonneg (alpha - 1/2)]
   have h_prod : 0 ≤ (p_A - p_B) ^ 2 * (1 - r) ^ g := mul_nonneg h_sq h_pow
   nlinarith [mul_le_mul_of_nonneg_right h_key h_prod]
 
