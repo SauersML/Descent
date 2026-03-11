@@ -306,23 +306,21 @@ section EmpiricalPredictions
     Observed: typically ~0.4-0.6 of source R².
     Gap explained by LD mismatch and array ascertainment. -/
 theorem height_portability_prediction :
-    let neutral_ratio := 1 - 0.12
-    let ld_factor := 0.85  -- Estimated LD tagging loss
+    let neutral_ratio : ℝ := 22/25    -- 1 - 0.12 = 0.88
+    let ld_factor : ℝ := 17/20        -- 0.85
     let predicted_ratio := neutral_ratio * ld_factor
-    0.7 < predicted_ratio ∧ predicted_ratio < 0.8 := by
-  show 0.7 < (1 - 0.12) * 0.85 ∧ (1 - 0.12) * 0.85 < 0.8
+    7/10 < predicted_ratio ∧ predicted_ratio < 4/5 := by
   constructor <;> norm_num
 
 /-- **Predicted R² for lymphocyte count at Fst = 0.12.**
     Neutral: 0.88 × R². But with selection (ρ ≈ 0.3):
     Actual: 0.88 × 0.3² × LD_factor = very small. -/
 theorem lymphocyte_portability_prediction :
-    let neutral_ratio := 1 - 0.12
-    let effect_correlation := 0.3
-    let ld_factor := 0.85
+    let neutral_ratio : ℝ := 22/25    -- 1 - 0.12 = 0.88
+    let effect_correlation : ℝ := 3/10  -- 0.3
+    let ld_factor : ℝ := 17/20        -- 0.85
     let predicted_ratio := neutral_ratio * effect_correlation ^ 2 * ld_factor
-    predicted_ratio < 0.1 := by
-  show (1 - 0.12) * 0.3 ^ 2 * 0.85 < 0.1
+    predicted_ratio < 1/10 := by
   norm_num
 
 /-- **Wang et al.'s key finding: R² of genetic distance on squared error is ~0.5%.**

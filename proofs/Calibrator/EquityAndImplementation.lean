@@ -210,11 +210,11 @@ theorem r2_concave_in_n
   have h2' : 0 < (n + dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n + dn) h_h2]
   have h3 : 0 < (n + 2 * dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n + 2 * dn) h_h2]
   rw [div_sub_div _ _ h3.ne' h2'.ne', div_sub_div _ _ h2'.ne' h1.ne']
-  -- Both numerators simplify to dn * h2 * M
+  -- Both numerators simplify to dn * h2 * M (matching div_sub_div output order)
   have lhs_eq : (n + 2 * dn) * h2 * ((n + dn) * h2 + M) -
-    (n + dn) * h2 * ((n + 2 * dn) * h2 + M) = dn * h2 * M := by ring
+    ((n + 2 * dn) * h2 + M) * ((n + dn) * h2) = dn * h2 * M := by ring
   have rhs_eq : (n + dn) * h2 * (n * h2 + M) -
-    n * h2 * ((n + dn) * h2 + M) = dn * h2 * M := by ring
+    ((n + dn) * h2 + M) * (n * h2) = dn * h2 * M := by ring
   rw [lhs_eq, rhs_eq]
   -- Goal: dn*h2*M / (h3*h2') < dn*h2*M / (h2'*h1)
   apply div_lt_div_of_pos_left (mul_pos (mul_pos h_dn h_h2) h_M) (mul_pos h2' h1) _

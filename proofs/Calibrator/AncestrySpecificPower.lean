@@ -68,7 +68,10 @@ theorem eur_higher_effective_n
   rw [h_same_p]
   have h_het : 0 < 2 * p_afr * (1 - p_afr) := by nlinarith
   have h_n_cast : (↑n_afr : ℝ) < ↑n_eur := Nat.cast_lt.mpr h_n
-  nlinarith [mul_pos h_het h_r2_afr, show (0 : ℝ) ≤ ↑n_afr from Nat.cast_nonneg n_afr]
+  have h_r2_eur : 0 < r2_eur := by linarith
+  nlinarith [mul_pos (show (0:ℝ) < ↑n_eur - ↑n_afr from by linarith) (mul_pos h_het h_r2_eur),
+             mul_nonneg (show (0:ℝ) ≤ ↑n_afr from Nat.cast_nonneg n_afr)
+                        (mul_nonneg (le_of_lt h_het) (by linarith : 0 ≤ r2_eur - r2_afr))]
 
 /-- **Power gap compounds across the genome.**
     If EUR has power p_EUR for each variant and AFR has p_AFR,
