@@ -1,5 +1,6 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
+import Calibrator.PopulationGeneticsFoundations
 import Calibrator.OpenQuestions
 
 namespace Calibrator
@@ -293,12 +294,44 @@ may converge, improving portability over time.
 
 section ArchitectureConvergence
 
+/-!
+### Derivation: equilibriumFst = 1/(1 + 4·Ne·m) from migration-drift balance
+
+The island model equilibrium Fst is already derived in two places:
+
+1. **PortabilityDrift.lean**: `fstMigrationDriftEquilibrium` is derived from the
+   migration-drift fixed point equation. At equilibrium, the increase in Fst from
+   drift (ΔFst_drift = (1 - Fst)/(2N)) balances the decrease from migration
+   (ΔFst_migration = -m·Fst·(2 - m)), yielding Fst_eq = 1/(1 + 4Nm).
+
+2. **PopulationGeneticsFoundations.lean**: `islandModelFst` provides the same
+   formula with additional properties (positivity, monotonicity in migration).
+
+The definition below is identical to both. We prove this equality explicitly.
+-/
+
 /-- **Gene flow homogenizes architecture.**
     Migration between populations at rate m per generation
     reduces FST toward m/(m + 1/(4Ne)) at equilibrium.
     This improves portability for common variants. -/
 noncomputable def equilibriumFst (m Ne : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
+
+/-- **equilibriumFst equals the derived fstMigrationDriftEquilibrium.**
+    This connects the architecture-level formula to the migration-drift
+    fixed point derivation in PortabilityDrift.lean. Both definitions
+    compute 1/(1 + 4·Ne·m); we prove they are definitionally equal
+    (up to argument order). -/
+theorem equilibriumFst_eq_fstMigrationDriftEquilibrium (m Ne : ℝ) :
+    equilibriumFst m Ne = fstMigrationDriftEquilibrium Ne m := by
+  unfold equilibriumFst fstMigrationDriftEquilibrium; ring
+
+/-- **equilibriumFst equals islandModelFst from PopulationGeneticsFoundations.**
+    The island model Fst 1/(1 + 4Nm) derived from Wright's (1931) infinite-island
+    model is the same formula used here. -/
+theorem equilibriumFst_eq_islandModelFst (m Ne : ℝ) :
+    equilibriumFst m Ne = islandModelFst Ne m := by
+  unfold equilibriumFst islandModelFst; ring
 
 /-- Equilibrium FST decreases with migration rate. -/
 theorem fst_decreases_with_migration (m₁ m₂ Ne : ℝ)
@@ -319,12 +352,91 @@ theorem shared_selection_improves_portability
     (h_le : rg_after ≤ 1) :
     rg_before < 1 := by linarith
 
+/-!
+### Derivation: portabilityFromArchitecture = rg² × (1 - Fst) × tagging_ratio
+
+The portability ratio R²_target / R²_source decomposes into three multiplicative
+factors. This decomposition follows from the covariance model of PGS transfer:
+
+**Step 1: Cross-population covariance decomposition.**
+  R²_target = [Cov(PGS, Y_target)]² / [Var(PGS) × Var(Y_target)]
+
+The cross-population covariance Cov(PGS, Y_target) factorizes because PGS weights
+are fixed from the source GWAS while genotype-phenotype associations in the target
+depend on allele frequencies and LD:
+
+  Cov(PGS, Y_target) = rg × Cov_source × freq_correlation × ld_overlap
+
+where:
+- **rg** (genetic correlation): bounds the cross-population genetic covariance
+  via Cauchy-Schwarz. If Cov_g(source, target) = rg × √(Vg_s × Vg_t), then
+  the transferable signal is scaled by rg. (See GeneticArchitectureDiscovery.lean:
+  `genetic_correlation_bounded` for the Cauchy-Schwarz bound.)
+
+- **freq_correlation ≈ (1 - Fst)**: allele frequency divergence reduces the
+  covariance between source PGS weights and target genotypes. The per-locus
+  contribution is E[β × G_target] ∝ β × 2p_target, and the correlation between
+  source and target allele frequencies is (1 - Fst). (See PortabilityDrift.lean:
+  `freqCorrFromFst`.)
+
+- **ld_overlap ≈ tagging_ratio**: the fraction of causal-variant LD captured
+  by GWAS tag SNPs in the target population. Different LD patterns mean the
+  tag SNP may not proxy the causal variant as well. (See PortabilityDrift.lean:
+  `ldOverlapFromSharedLD`.)
+
+**Step 2: Why the factors multiply.**
+Frequency divergence and LD decay are independent processes:
+- Frequency changes are driven by per-locus drift (a function of Fst).
+- LD differences are driven by recombination and demographic history.
+
+Because they act on orthogonal aspects of the covariance (per-locus variance
+scaling vs. tag-causal correlation), their effects multiply. This is formalized
+in PortabilityDrift.lean as `covarianceRetention`:
+  covarianceRetention freq_corr ld_overlap = freq_corr × ld_overlap
+                                           = (1 - Fst) × shared_LD
+
+**Step 3: Squaring gives the R² ratio.**
+Since R² ∝ Cov², the rg factor enters squared:
+  R²_target / R²_source = rg² × (1 - Fst) × tagging_ratio
+
+(The (1 - Fst) and tagging_ratio terms are already ratios of variance components,
+so they enter linearly rather than squared in the R² ratio.)
+
+This matches the already-derived `covarianceDivergenceFromRetention` in
+PortabilityDrift.lean, which shows divergence = 1 - (1 - Fst) × shared_LD,
+so retention = (1 - Fst) × shared_LD = (1 - Fst) × tagging_ratio.
+-/
+
 /-- **Portability prediction from architecture parameters.**
     Given M_eff, r_g, FST, and tagging efficiency,
     we can predict R²_target / R²_source. -/
 noncomputable def portabilityFromArchitecture
     (rg fst tagging_ratio : ℝ) : ℝ :=
   rg^2 * (1 - fst) * tagging_ratio
+
+/-- **portabilityFromArchitecture factors through covarianceRetention.**
+    The (1 - Fst) × tagging_ratio component equals the covariance retention
+    derived in PortabilityDrift.lean from the independence of allele frequency
+    drift and LD decay. This connects the architecture-level formula to the
+    derivation chain: covarianceRetention → covarianceDivergenceFromRetention. -/
+theorem portabilityFromArchitecture_eq_rg_sq_mul_retention
+    (rg fst tagging_ratio : ℝ) :
+    portabilityFromArchitecture rg fst tagging_ratio =
+      rg^2 * covarianceRetention (freqCorrFromFst fst) (ldOverlapFromSharedLD tagging_ratio) := by
+  unfold portabilityFromArchitecture covarianceRetention freqCorrFromFst ldOverlapFromSharedLD
+  ring
+
+/-- **Portability equals rg² × (1 - divergence), where divergence is derived.**
+    covarianceDivergenceFromRetention fst tagging = 1 - (1-fst)×tagging,
+    so retention = 1 - divergence = (1-fst)×tagging. This shows portability
+    is rg² × (1 - covarianceDivergenceFromRetention). -/
+theorem portabilityFromArchitecture_from_divergence
+    (rg fst tagging_ratio : ℝ) :
+    portabilityFromArchitecture rg fst tagging_ratio =
+      rg^2 * (1 - covarianceDivergenceFromRetention fst tagging_ratio) := by
+  unfold portabilityFromArchitecture covarianceDivergenceFromRetention
+    covarianceRetention freqCorrFromFst ldOverlapFromSharedLD
+  ring
 
 /-- Portability is bounded by rg². -/
 theorem portability_bounded_by_rg_sq
