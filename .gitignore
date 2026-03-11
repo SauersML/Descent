@@ -74,3 +74,4 @@ gh_*/
 # Final override: always ignore macOS Finder metadata (after broad unignore rules above)
 .DS_Store
 **/.DS_Store
+proofs/.lake/
