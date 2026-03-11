@@ -684,8 +684,8 @@ For binary traits (asthma, T2D), portability depends on additional factors:
 section DiseasePortability
 
 /-- **F1 score definition.** -/
-noncomputable def f1Score (precision recall : ℝ) : ℝ :=
-  2 * precision * recall / (precision + recall)
+noncomputable def f1Score (precision sensitivity : ℝ) : ℝ :=
+  2 * precision * sensitivity / (precision + sensitivity)
 
 /-- **F1 score is symmetric in precision and recall.** -/
 theorem f1_symmetric (p r : ℝ) : f1Score p r = f1Score r p := by
