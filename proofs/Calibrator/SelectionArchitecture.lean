@@ -80,15 +80,12 @@ theorem polygenicity_improves_portability
     var_per_locus / (m₂ : ℝ) < var_per_locus / (m₁ : ℝ) := by
   exact div_lt_div_of_pos_left h_var (Nat.cast_pos.mpr h_m₁) (Nat.cast_lt.mpr h_more)
 
-/-- **Height is a prototypical stabilizing selection trait.**
-    Height has ~10,000 associated loci, each of small effect.
-    Portability is relatively good (slow decay with distance).
-    We verify the parameter regime. -/
-theorem height_parameter_regime :
-    let n_loci : ℝ := 10000
-    let per_locus_h2 := 0.00005  -- Each locus explains 0.005% of variance
-    let total_h2 := n_loci * per_locus_h2
-    total_h2 = 0.5 := by norm_num
+/-- **Highly polygenic architecture: total heritability sums from small effects.**
+    With M causal loci each contributing h²/M, the total heritability
+    is recovered as M × (h²/M) = h². -/
+theorem polygenic_h2_summation (M h2 : ℝ) (h_M : M ≠ 0) :
+    M * (h2 / M) = h2 := by
+  field_simp
 
 end StabilizingSelection
 

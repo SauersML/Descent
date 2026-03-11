@@ -279,7 +279,7 @@ noncomputable def portabilityGapATE (r2_own r2_other : ℝ) : ℝ :=
   r2_own - r2_other
 
 /-- Portability gap is nonneg when own-ancestry PGS is better. -/
-theorem portability_gap_nonneg
+theorem portability_gap_ate_nonneg
     (r2_own r2_other : ℝ) (h_own_better : r2_other ≤ r2_own) :
     0 ≤ portabilityGapATE r2_own r2_other := by
   unfold portabilityGapATE; linarith
