@@ -170,7 +170,7 @@ theorem source_erm_is_ld_specific_proved :
     and show that the weights solving the normal equations must strictly differ. -/
 theorem source_target_erm_differ_proved :
     let wS : Fin 2 → ℝ := ![1, 0]
-    let wT : Fin 2 → ℝ := ![0.5, 0.5]
+    let wT : Fin 2 → ℝ := ![1/2, 1/2]
     sigmaS.mulVec wS = crossS ∧
     sigmaT.mulVec wT = crossT ∧
     wS ≠ wT := by
