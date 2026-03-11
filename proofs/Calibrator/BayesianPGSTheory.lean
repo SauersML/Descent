@@ -35,12 +35,117 @@ The shrinkage pattern depends on the prior and LD.
 
 section BayesianShrinkage
 
+/-!
+### Derivation of Bayesian Shrinkage from First Principles
+
+We derive the Gaussian posterior shrinkage factor from a standard
+Bayesian linear regression model:
+  - Prior: β ~ N(0, h)  where h = σ²_β is the prior variance
+  - Likelihood: y | β ~ N(β, 1/n)  where n is the data precision
+    (equivalently, y is a sufficient statistic with variance 1/n)
+
+By conjugacy of Gaussian prior and Gaussian likelihood:
+  - Posterior precision = prior precision + likelihood precision = 1/h + n
+  - Posterior variance  = 1/(1/h + n) = h/(1 + n·h)
+  - Posterior mean      = posterior_variance × (n × y) = n·h/(1 + n·h) × y
+
+The shrinkage factor n·h/(1 + n·h) is exactly `gaussianPosteriorShrinkage`.
+-/
+
+/-- A Bayesian linear regression model with Gaussian prior and Gaussian likelihood.
+    `prior_var` is the prior variance h (so prior precision is 1/h).
+    `data_precision` is the likelihood precision n (so likelihood variance is 1/n). -/
+structure BayesianLinearModel where
+  prior_var : ℝ
+  data_precision : ℝ
+  prior_var_pos : 0 < prior_var
+  data_precision_pos : 0 < data_precision
+
+namespace BayesianLinearModel
+
+/-- Posterior precision = prior precision + data precision = 1/h + n. -/
+noncomputable def posteriorPrecision (m : BayesianLinearModel) : ℝ :=
+  1 / m.prior_var + m.data_precision
+
+/-- Posterior precision is positive. -/
+theorem posteriorPrecision_pos (m : BayesianLinearModel) :
+    0 < m.posteriorPrecision := by
+  unfold posteriorPrecision
+  have := m.prior_var_pos
+  have := m.data_precision_pos
+  positivity
+
+/-- Posterior variance = 1 / posterior precision = 1 / (1/h + n). -/
+noncomputable def posteriorVariance (m : BayesianLinearModel) : ℝ :=
+  1 / m.posteriorPrecision
+
+/-- Posterior variance is positive. -/
+theorem posteriorVariance_pos (m : BayesianLinearModel) :
+    0 < m.posteriorVariance := by
+  unfold posteriorVariance
+  exact div_pos one_pos m.posteriorPrecision_pos
+
+/-- Posterior mean = posterior_variance × data_precision × observation.
+    This is the standard Bayesian update: posterior mean is a precision-weighted
+    combination of prior mean (0) and data (n × y), divided by total precision. -/
+noncomputable def posteriorMean (m : BayesianLinearModel) (y : ℝ) : ℝ :=
+  m.posteriorVariance * m.data_precision * y
+
+/-- The shrinkage factor applied to the observation y in the posterior mean.
+    shrinkageFactor = posteriorVariance × data_precision = n / (1/h + n). -/
+noncomputable def shrinkageFactor (m : BayesianLinearModel) : ℝ :=
+  m.posteriorVariance * m.data_precision
+
+/-- The posterior mean factors as shrinkageFactor × y. -/
+theorem posteriorMean_eq_shrinkage_mul (m : BayesianLinearModel) (y : ℝ) :
+    m.posteriorMean y = m.shrinkageFactor * y := by
+  unfold posteriorMean shrinkageFactor
+  ring
+
+/-- **Key identity:** posteriorVariance = h / (1 + n·h).
+    Proof: 1/(1/h + n) = 1/((1 + n·h)/h) = h/(1 + n·h). -/
+theorem posteriorVariance_eq (m : BayesianLinearModel) :
+    m.posteriorVariance = m.prior_var / (1 + m.data_precision * m.prior_var) := by
+  unfold posteriorVariance posteriorPrecision
+  have hh : m.prior_var ≠ 0 := ne_of_gt m.prior_var_pos
+  have hdenom : 1 + m.data_precision * m.prior_var > 0 := by positivity
+  rw [div_add' _ _ _ hh]
+  field_simp
+
+/-- **Key identity:** shrinkageFactor = n·h / (n·h + 1).
+    This is the algebraic derivation from the Bayesian model:
+    shrinkage = posteriorVariance × n = (h/(1 + n·h)) × n = n·h/(1 + n·h). -/
+theorem shrinkageFactor_eq (m : BayesianLinearModel) :
+    m.shrinkageFactor =
+      m.data_precision * m.prior_var /
+        (m.data_precision * m.prior_var + 1) := by
+  unfold shrinkageFactor
+  rw [m.posteriorVariance_eq]
+  have hh : m.prior_var ≠ 0 := ne_of_gt m.prior_var_pos
+  have hdenom : 1 + m.data_precision * m.prior_var > 0 := by positivity
+  have hdenom_ne : (1 + m.data_precision * m.prior_var) ≠ 0 := ne_of_gt hdenom
+  field_simp
+  ring
+
+end BayesianLinearModel
+
 /-- **Posterior mean under Gaussian prior.**
     β̂_Bayes = (n × Σ_LD + σ²_β⁻¹ × I)⁻¹ × n × Σ_LD × β̂_OLS
     For a single SNP: β̂ = β̂_OLS × n × h / (n × h + 1)
     where h = σ²_β / σ²_ε is the per-SNP heritability. -/
 noncomputable def gaussianPosteriorShrinkage (n h : ℝ) : ℝ :=
   n * h / (n * h + 1)
+
+/-- **Connection theorem:** The shrinkage factor derived from the Bayesian
+    linear model is exactly `gaussianPosteriorShrinkage n h`.
+    This justifies the previously-assumed formula by deriving it from first principles. -/
+theorem BayesianLinearModel.shrinkageFactor_eq_gaussianPosteriorShrinkage
+    (m : BayesianLinearModel) :
+    m.shrinkageFactor =
+      gaussianPosteriorShrinkage m.data_precision m.prior_var := by
+  rw [m.shrinkageFactor_eq]
+  unfold gaussianPosteriorShrinkage
+  ring
 
 /-- Shrinkage factor is in [0, 1). -/
 theorem gaussian_shrinkage_in_unit (n h : ℝ)
