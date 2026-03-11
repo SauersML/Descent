@@ -134,8 +134,7 @@ theorem differential_proxy_inflation
   unfold proxyInflation
   intro h
   rw [div_eq_div_iff h_eur.ne' h_afr.ne'] at h
-  have : r2_eur = r2_afr := by
-    exact mul_left_cancel₀ h_beta.ne' h.symm
+  have : r2_eur = r2_afr := by nlinarith
   exact h_diff this
 
 end CausalVariantPortability

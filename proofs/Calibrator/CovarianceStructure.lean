@@ -295,7 +295,8 @@ theorem admixture_ld_max_at_half (alpha p_A p_B r : ℝ) (g : ℕ)
   have h_pow : 0 ≤ (1 - r) ^ g := pow_nonneg (by linarith) g
   -- Need: α(1-α) ≤ 0.25
   have h_key : alpha * (1 - alpha) ≤ 0.5 * (1 - 0.5) := by nlinarith [sq_nonneg (alpha - 0.5)]
-  nlinarith [sq_nonneg (p_A - p_B)]
+  have h_prod : 0 ≤ (p_A - p_B) ^ 2 * (1 - r) ^ g := mul_nonneg h_sq h_pow
+  nlinarith [mul_le_mul_of_nonneg_right h_key h_prod]
 
 /-- **Admixture LD decays over generations.**
     Rate of decay: (1-r)^g → 0 as g → ∞.

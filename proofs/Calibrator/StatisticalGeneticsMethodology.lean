@@ -61,14 +61,13 @@ theorem r2_se_decreases_with_n
   unfold r2StandardError
   apply Real.sqrt_lt_sqrt
   · apply div_nonneg
-    · positivity
-    · linarith
+    · apply mul_nonneg (mul_nonneg (by norm_num) (le_of_lt h_r2)) (sq_nonneg _)
+    · exact Nat.cast_nonneg _
   · apply div_lt_div_of_pos_left
-    · have h1mr2_ne : 1 - r2 ≠ 0 := by linarith
-      exact mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) h_r2)
-        (sq_pos_of_ne_zero h1mr2_ne)
-    · linarith
-    · linarith
+    · exact mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) h_r2)
+        (sq_pos_of_ne_zero (by linarith : (1 : ℝ) - r2 ≠ 0))
+    · exact Nat.cast_pos.mpr (by omega)
+    · exact Nat.cast_lt.mpr h_n
 
 /-- **Portability ratio with confidence interval.**
     Port = ΔR²_target / ΔR²_source.
