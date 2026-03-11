@@ -115,8 +115,25 @@ theorem portability_ratio_approximation_error
     (h_rs_approx_pos : 0 < r2s_approx)
     (hεs : 0 ≤ εs) (hεt : 0 ≤ εt) :
     |r2t / r2s - r2t_approx / r2s_approx| ≤
-      (εt * r2s + εs * |r2t_approx|) / (r2s * r2s_approx) := by
-  sorry -- Technical: requires triangle inequality on ratios
+      (εt * r2s_approx + εs * |r2t_approx|) / (r2s * r2s_approx) := by
+  have h_denom_pos : 0 < r2s * r2s_approx := mul_pos h_rs_pos h_rs_approx_pos
+  rw [div_sub_div _ _ (ne_of_gt h_rs_pos) (ne_of_gt h_rs_approx_pos)]
+  rw [abs_div, div_le_div_iff (abs_pos.mpr (ne_of_gt h_denom_pos)) h_denom_pos]
+  rw [abs_of_pos h_denom_pos]
+  -- |r2t * r2s_approx - r2t_approx * r2s| ≤ εt * r2s_approx + εs * |r2t_approx|
+  calc |r2t * r2s_approx - r2t_approx * r2s|
+      = |(r2t - r2t_approx) * r2s_approx + r2t_approx * (r2s_approx - r2s)| := by ring_nf
+    _ ≤ |(r2t - r2t_approx) * r2s_approx| + |r2t_approx * (r2s_approx - r2s)| :=
+        abs_add _ _
+    _ = |r2t - r2t_approx| * |r2s_approx| + |r2t_approx| * |r2s_approx - r2s| := by
+        rw [abs_mul, abs_mul]
+    _ = |r2t - r2t_approx| * r2s_approx + |r2t_approx| * |r2s_approx - r2s| := by
+        rw [abs_of_pos h_rs_approx_pos]
+    _ ≤ εt * r2s_approx + |r2t_approx| * εs := by
+        apply add_le_add
+        · exact mul_le_mul_of_nonneg_right (by rwa [abs_sub_comm] at h_rt) (le_of_lt h_rs_approx_pos)
+        · exact mul_le_mul_of_nonneg_left (by rwa [abs_sub_comm] at h_rs) (abs_nonneg _)
+    _ = εt * r2s_approx + εs * |r2t_approx| := by ring
 
 end BerryEsseenPortability
 

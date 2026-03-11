@@ -6,6 +6,8 @@ import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
 import Calibrator.PortabilityBounds
 import Calibrator.MultiAncestryTheory
+import Calibrator.StratificationConfounding
+import Calibrator.AncestryCalibration
 
 namespace Calibrator
 
