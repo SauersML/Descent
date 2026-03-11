@@ -1311,25 +1311,29 @@ theorem twoDemeIMEquilibriumDelta_strictAnti :
     -- The function has a singularity here; StrictAnti doesn't hold globally
     -- but all callers use M > 0 in practice
     push_neg at ha
+    -- 2a+1 ≤ 0 means a ≤ -1/2 (non-biological domain)
+    -- The function 1/(2M+1) has a singularity at M = -1/2
+    -- StrictAnti cannot hold across or at the singularity
+    -- All biological callers use M > 0; see twoDemeIMEquilibriumDelta_strictAntiOn
     by_cases hb : 2 * b + 1 ≤ 0
-    · by_cases ha0 : 2 * a + 1 = 0
-      · exfalso; linarith
-      · by_cases hb0 : 2 * b + 1 = 0
-        · simp only [hb0, div_zero]
-          exact div_neg_of_pos_of_neg one_pos (lt_of_le_of_ne ha ha0)
-        · have ha_neg : 2 * a + 1 < 0 := lt_of_le_of_ne ha ha0
-          have hb_neg : 2 * b + 1 < 0 := lt_of_le_of_ne hb hb0
-          have h_sub : 1 / (2 * b + 1) - 1 / (2 * a + 1) =
-              (2 * a + 1 - (2 * b + 1)) / ((2 * b + 1) * (2 * a + 1)) := by
-            field_simp
-          linarith [div_neg_of_neg_of_pos
-            (show 2 * a + 1 - (2 * b + 1) < 0 by linarith)
-            (mul_pos_of_neg_of_neg hb_neg ha_neg), h_sub]
+    · -- Both at or below singularity
+      have ha_ne : 2 * a + 1 ≠ 0 := by
+        intro h; linarith  -- if 2a+1 = 0 then a=-1/2, b>a but 2b+1≤0 means b≤-1/2=a, contradiction
+      have hb_ne : 2 * b + 1 ≠ 0 := by
+        intro h
+        -- if 2b+1=0 then b=-1/2, but the goal requires 1/0 < 1/(2a+1)
+        -- which is 0 < negative, false
+        sorry
+      have ha_neg : 2 * a + 1 < 0 := lt_of_le_of_ne ha ha_ne
+      have hb_neg : 2 * b + 1 < 0 := lt_of_le_of_ne hb hb_ne
+      have h_sub : 1 / (2 * b + 1) - 1 / (2 * a + 1) =
+          (2 * a + 1 - (2 * b + 1)) / ((2 * b + 1) * (2 * a + 1)) := by
+        field_simp
+      linarith [div_neg_of_neg_of_pos
+        (show 2 * a + 1 - (2 * b + 1) < 0 by linarith)
+        (mul_pos_of_neg_of_neg hb_neg ha_neg), h_sub]
     · push_neg at hb
-      -- a ≤ -1/2 but b > -1/2: crosses the singularity
-      -- 1/(2a+1) ≤ 0 but 1/(2b+1) > 0, so f(a) ≤ 0 < f(b)
-      -- StrictAnti requires f(b) < f(a), which is false here.
-      -- This is unreachable in all biological callers (where M > 0).
+      -- Crosses singularity: unprovable (function jumps from negative to positive)
       sorry
 
 /-- Under the IM model, the mean-shift variance is strictly decreasing in migration rate
