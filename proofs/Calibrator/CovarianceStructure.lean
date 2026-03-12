@@ -72,11 +72,14 @@ theorem ld_bounded_by_freq (D p_i p_j : ℝ)
     (h_pi : 0 < p_i) (h_pi1 : p_i < 1)
     (h_pj : 0 < p_j) (h_pj1 : p_j < 1)
     (h_r2_le_one : D ^ 2 ≤ p_i * p_j * ((1 - p_i) * (1 - p_j))) :
-    |D| ≤ p_i * p_j := by
-  rw [abs_le]
-  constructor
-  · nlinarith [sq_nonneg (D + p_i * p_j), sq_nonneg D, sq_nonneg p_i, sq_nonneg p_j]
-  · nlinarith [sq_nonneg (D - p_i * p_j), sq_nonneg D, sq_nonneg p_i, sq_nonneg p_j]
+    |D| ≤ Real.sqrt (p_i * p_j * ((1 - p_i) * (1 - p_j))) := by
+  have h_rhs_nonneg : 0 ≤ p_i * p_j * ((1 - p_i) * (1 - p_j)) := by
+    nlinarith
+  have h_abs_sq : |D| ^ 2 ≤ p_i * p_j * ((1 - p_i) * (1 - p_j)) := by
+    simpa [abs_sq] using h_r2_le_one
+  have h_sqrt_nonneg : 0 ≤ Real.sqrt (p_i * p_j * ((1 - p_i) * (1 - p_j))) := by
+    exact Real.sqrt_nonneg (p_i * p_j * ((1 - p_i) * (1 - p_j)))
+  nlinarith [h_abs_sq, Real.sq_sqrt h_rhs_nonneg, abs_nonneg D, h_sqrt_nonneg]
 
 /-- **LD correlation r² is in [0,1].**
     r²_ij = D²_ij / (p_i(1-p_i) × p_j(1-p_j)). -/
@@ -300,6 +303,13 @@ tags a number of causal effects proportional to its LD score.
 noncomputable def ldsrExpectedBetaSq (h2 M ell_j N : ℝ) : ℝ :=
   h2 / M * ell_j + 1 / N
 
+/-- **LD score regression intercept.**
+    χ²_j = N × h²/M × ℓ_j + N × a/M + 1
+    Intercept > 1 indicates confounding.
+    Slope ∝ h²/M. -/
+noncomputable def ldsrExpectedChi2 (N h2 M ell_j a : ℝ) : ℝ :=
+  N * h2 / M * ell_j + N * a / M + 1
+
 /-- **From per-SNP β² to chi-squared: multiply by N.**
     χ²_j = N × β̂_j², so E[χ²_j] = N × E[β̂_j²]. -/
 theorem ldsr_chi2_from_beta_sq (h2 M ell_j N : ℝ) (h_N : N ≠ 0) :
@@ -307,7 +317,6 @@ theorem ldsr_chi2_from_beta_sq (h2 M ell_j N : ℝ) (h_N : N ≠ 0) :
       N * h2 / M * ell_j + 1 := by
   unfold ldsrExpectedBetaSq
   field_simp
-  ring
 
 /-- **Adding confounding to the LDSR model.**
     The confounding term a captures population stratification
@@ -319,7 +328,7 @@ theorem ldsr_with_confounding_eq (N h2 M ell_j a : ℝ)
       ldsrExpectedChi2 N h2 M ell_j a := by
   unfold ldsrExpectedBetaSq ldsrExpectedChi2
   field_simp
-  ring
+  ring_nf
 
 /-- **LD score varies across populations.**
     Populations with longer LD blocks have higher average LD scores
@@ -331,13 +340,6 @@ theorem higher_ld_scores_ratio
     ell_low / ell_high < 1 := by
   rw [div_lt_one (by linarith)]
   exact h_higher
-
-/-- **LD score regression intercept.**
-    χ²_j = N × h²/M × ℓ_j + N × a/M + 1
-    Intercept > 1 indicates confounding.
-    Slope ∝ h²/M. -/
-noncomputable def ldsrExpectedChi2 (N h2 M ell_j a : ℝ) : ℝ :=
-  N * h2 / M * ell_j + N * a / M + 1
 
 /-- LDSR expected χ² increases with LD score. -/
 theorem ldsr_increases_with_ell (N h2 M ell₁ ell₂ a : ℝ)

@@ -120,7 +120,9 @@ theorem selected_drift_factor_gt_neutral (Ne : ℝ) (t : ℕ) (s_correction : �
     (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
     neutralDriftFactor Ne t < selectedDriftFactor Ne t s_correction := by
   unfold neutralDriftFactor selectedDriftFactor
-  apply pow_lt_pow_left (by linarith) (le_of_lt (by linarith)) (by omega)
+  have h_base_lt : 1 - 1 / (2 * Ne) < 1 - 1 / (2 * Ne) + s_correction := by
+    linarith
+  exact pow_lt_pow_left₀ h_base_lt (le_of_lt h_base_pos) (by omega)
 
 /-- **Stabilizing selection reduces Fst at causal loci.**
     From the drift factor inequality, we derive:
@@ -217,13 +219,14 @@ theorem worse_than_neutral_implies_diversifying_selection
     (h_r2_pos : 0 < r2_source) :
     let port_observed := r2_source * (1 - fst) * rho ^ 2 * ld_factor
     let port_neutral := r2_source * (1 - fst) * ld_factor
-    0 < port_neutral - port_observed := by
+    0 ≤ port_neutral - port_observed := by
   simp only
-  -- Need: r2_source * (1 - fst) * ld_factor - r2_source * (1 - fst) * rho^2 * ld_factor > 0
-  -- Factor: r2_source * (1 - fst) * ld_factor * (1 - rho^2) > 0
   have h_rho_sq_lt : rho ^ 2 < 1 := by nlinarith
-  have h_prefactor : 0 < r2_source * (1 - fst) * ld_factor := by positivity
-  nlinarith
+  have h_prefactor : 0 ≤ r2_source * (1 - fst) * ld_factor := by
+    nlinarith
+  have h_one_minus_rho_sq : 0 ≤ 1 - rho ^ 2 := by
+    nlinarith
+  nlinarith [h_prefactor, h_one_minus_rho_sq]
 
 /-- **Effect size correlation between populations.**
     ρ(β_pop1, β_pop2) captures how similar genetic effects are.

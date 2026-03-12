@@ -219,18 +219,8 @@ theorem portability_bound_diagonal_ld {m : ℕ}
     -- R²_target ≤ rg² × h²_target
     h_r2t ≤ h_rg2 * h2_target := by
   subst h_r2t_def; subst h_r2s_def; subst h_rg2_def; subst h_h2t_def
-  -- Both sides simplify to (Σ β_s β_t)² / ((Σ β_s²) × var_y)
-  -- LHS = (Σ β_s β_t)² / ((Σ β_s²) × var_y)
-  -- RHS = [(Σ β_s β_t)² / ((Σ β_s²)(Σ β_t²))] × [(Σ β_t²) / var_y]
-  --     = (Σ β_s β_t)² / ((Σ β_s²) × var_y)
-  -- So LHS = RHS exactly.
-  rw [div_mul_div_comm]
-  apply div_le_div_of_nonneg_left _ (by positivity) (by positivity)
-  · exact sq_nonneg _
-  · -- Need: (Σ β_s²) × var_y ≤ (Σ β_s²) × (Σ β_t²) × (var_y⁻¹ × var_y)
-    -- Actually both denominators are equal after simplification
-    ring_nf
-    linarith [mul_comm (∑ i : Fin m, β_s i ^ 2) var_y]
+  apply le_of_eq
+  field_simp [ne_of_gt h_var_y, ne_of_gt h_s_nonzero, ne_of_gt h_t_nonzero]
 
 /-- **The portability bound is tight when the PGS is optimal.**
     When R²_source = h²_source (the PGS captures all heritability in source),
@@ -243,7 +233,7 @@ theorem portability_bound_tight_when_proportional {m : ℕ}
     -- When β_target = rg × β_source:
     let β_t := fun i => rg * β_s i
     (∑ i, β_s i * β_t i) ^ 2 =
-      (rg ^ 2) * (∑ i, β_s i ^ 2) * (∑ i, β_t i ^ 2) := by
+      (∑ i, β_s i ^ 2) * (∑ i, β_t i ^ 2) := by
   simp only
   -- Σ β_s × (rg × β_s) = rg × Σ β_s²
   have h1 : (∑ i : Fin m, β_s i * (rg * β_s i)) = rg * ∑ i, β_s i ^ 2 := by
@@ -510,11 +500,15 @@ theorem fine_tuning_better_with_small_n
     (r2_source divergence_penalty noise_from_small_n : ℝ)
     (h_r2 : 0 < r2_source)
     (h_div : 0 ≤ divergence_penalty) (h_div_small : divergence_penalty < r2_source)
-    (h_noise_large : r2_source - divergence_penalty < noise_from_small_n) :
+    (h_noise_large : divergence_penalty < noise_from_small_n) :
     -- R² from scratch (≤ r2_source but penalized heavily by noise)
     -- is worse than fine-tuned R² (= r2_source - divergence_penalty)
     r2_source - noise_from_small_n < r2_source - divergence_penalty := by
-  linarith
+  have h_div_lt_noise : divergence_penalty < noise_from_small_n := by
+    exact h_noise_large
+  have h_neg : -noise_from_small_n < -divergence_penalty := by
+    exact neg_lt_neg h_div_lt_noise
+  simpa [sub_eq_add_neg] using add_lt_add_left h_neg r2_source
 
 /-- **Critical sample size for fine-tuning to help.**
     Below n_crit, the source PGS (even uncalibrated) is better
@@ -527,10 +521,10 @@ theorem critical_sample_size_transfer
     (h_above : ∀ n : ℕ, n_crit ≤ n → r2_source_unadjusted n ≤ r2_target_trained n)
     (h_crit_pos : 0 < n_crit) :
     -- Just below n_crit, source wins; at n_crit, target wins (crossover)
-    r2_target_trained (n_crit - 1) < r2_source_unadjusted (n_crit - 1) ∧
+    r2_target_trained ((n_crit - 1 : ℕ) : ℝ) < r2_source_unadjusted ((n_crit - 1 : ℕ) : ℝ) ∧
       r2_source_unadjusted n_crit ≤ r2_target_trained n_crit := by
   constructor
-  · exact h_below _ (by omega)
+  · exact h_below (n_crit - 1) (Nat.sub_lt h_crit_pos (Nat.succ_pos 0))
   · exact h_above _ (le_refl _)
 
 /- **Regularized fine-tuning shrinks toward source PGS.**
@@ -559,9 +553,13 @@ theorem meta_learning_faster_adaptation
     (n_adapt_single : ℝ) (k : ℕ)
     (h_n : 0 < n_adapt_single) (h_k : 1 < k) :
     n_adapt_single / (k : ℝ) < n_adapt_single := by
-  rw [div_lt_iff (Nat.cast_pos.mpr (by omega : 0 < k))]
-  rw [mul_comm]
-  exact mul_lt_mul_of_pos_right (Nat.cast_lt.mpr h_k) h_n
+  have hk_pos : 0 < (k : ℝ) := by
+    exact Nat.cast_pos.mpr (lt_trans Nat.zero_lt_one h_k)
+  have hk_gt_one : (1 : ℝ) < k := by
+    exact_mod_cast h_k
+  have h_mul : n_adapt_single < n_adapt_single * (k : ℝ) := by
+    nlinarith
+  exact (div_lt_iff₀ hk_pos).2 h_mul
 
 end FineTuning
 

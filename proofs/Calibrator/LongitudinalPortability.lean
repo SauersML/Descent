@@ -68,20 +68,23 @@ theorem portability_decreases_with_time (r2_initial lambda_total t₁ t₂ : ℝ
 /-- **Drift component of decay.**
     Under Wright-Fisher drift with Ne:
     λ_drift = 1/(2Ne) per generation. -/
-noncomputable def driftDecayRate (Ne : ℝ) : ℝ := 1 / (2 * Ne)
+noncomputable def longitudinalDriftDecayRate (Ne : ℝ) : ℝ := 1 / (2 * Ne)
 
 /-- Drift decay rate is positive for positive Ne. -/
 theorem drift_decay_rate_pos (Ne : ℝ) (h : 0 < Ne) :
-    0 < driftDecayRate Ne := by
-  unfold driftDecayRate; positivity
+    0 < longitudinalDriftDecayRate Ne := by
+  unfold longitudinalDriftDecayRate
+  positivity
 
 /-- **Larger populations drift slower.**
     If Ne₁ < Ne₂, then λ_drift₁ > λ_drift₂. -/
 theorem larger_Ne_slower_drift (Ne₁ Ne₂ : ℝ)
     (h₁ : 0 < Ne₁) (h₂ : 0 < Ne₂) (h_lt : Ne₁ < Ne₂) :
-    driftDecayRate Ne₂ < driftDecayRate Ne₁ := by
-  unfold driftDecayRate
-  rw [div_lt_div_iff₀ (by positivity) (by positivity)]
+    longitudinalDriftDecayRate Ne₂ < longitudinalDriftDecayRate Ne₁ := by
+  unfold longitudinalDriftDecayRate
+  have h1' : 0 < 2 * Ne₁ := by positivity
+  have h2' : 0 < 2 * Ne₂ := by positivity
+  apply (div_lt_div_iff₀ h2' h1').2
   nlinarith
 
 /-- **LD decay component.**
@@ -390,7 +393,11 @@ theorem temporal_split_more_conservative
     (h_r2 : 0 ≤ r2_true) (h_lam : 0 ≤ lambda) (h_dt : 0 ≤ delta_t) :
     r2_true * Real.exp (-lambda * delta_t) ≤ r2_true := by
   have h_exp_le : Real.exp (-lambda * delta_t) ≤ 1 := by
-    rw [Real.exp_le_one_iff_nonpos]; nlinarith
+    calc
+      Real.exp (-lambda * delta_t) ≤ Real.exp 0 := by
+        apply Real.exp_le_exp.mpr
+        nlinarith
+      _ = 1 := by simp
   calc r2_true * Real.exp (-lambda * delta_t)
       ≤ r2_true * 1 := mul_le_mul_of_nonneg_left h_exp_le h_r2
     _ = r2_true := mul_one _

@@ -447,7 +447,7 @@ theorem recalibration_easier_than_rediscovery
     (h_disc_more : n_cal_params < n_disc_params)
     (h_n_pos : 0 < n_per_param) :
     n_per_param * n_cal_params < n_per_param * n_disc_params := by
-  exact Nat.mul_lt_mul_left h_n_pos h_disc_more
+  exact (Nat.mul_lt_mul_left h_n_pos).2 h_disc_more
 
 /-- **Brier score increases with portability loss (derived from Brier definition).**
     Since `brierFromR2 π r2 = π(1-π)(1-r2)`, a decrease in R² (from drift)

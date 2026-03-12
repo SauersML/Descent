@@ -186,10 +186,11 @@ theorem transfer_beats_target_only
   -- Multiply both sides by bias_sq > 0: n_T * bias_sq < σ_extra_sq
   -- Divide by n_T > 0: bias_sq < σ_extra_sq / n_T
   -- Then σ_sq/n_T + bias_sq < σ_sq/n_T + σ_extra_sq/n_T = (σ_sq + σ_extra_sq)/n_T
+  have h_prod : bias_sq * n_T < σ_extra_sq := by
+    rw [mul_comm]
+    exact (lt_div_iff₀ h_bias).mp h_small_n
   have h_key : bias_sq < σ_extra_sq / n_T := by
-    rw [lt_div_iff₀ h_n]
-    rw [div_lt_iff₀ h_bias] at h_small_n
-    linarith
+    exact (lt_div_iff₀ h_n).2 h_prod
   rw [add_div]; linarith
 
 /-- **Critical sample size for transfer benefit.**

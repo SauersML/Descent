@@ -91,7 +91,7 @@ Under assortative mating, the additive genetic variance increases
 because alleles affecting the trait become correlated within individuals.
 -/
 
-/-- **Derivation of equilibrium variance under assortative mating.**
+/- **Derivation of equilibrium variance under assortative mating.**
 
 Under AM with spousal phenotypic correlation `r` and narrow-sense heritability
 `h²`, each generation the additive genetic variance obeys the recurrence:
@@ -164,9 +164,10 @@ theorem am_variance_finite
 theorem AssortativeMatingModel.variance_inflation_factor (m : AssortativeMatingModel) :
     m.equilibriumVariance / m.V_A = 1 / (1 - m.r * m.h2) := by
   unfold equilibriumVariance
-  rw [div_div_div_cancel_right₀ _ (ne_of_gt m.V_A_pos)]
+  have hden : 1 - m.r * m.h2 ≠ 0 := by linarith [m.stability]
+  field_simp [hden, ne_of_gt m.V_A_pos]
 
-/-- **Derivation of AM-induced linkage disequilibrium.**
+/- **Derivation of AM-induced linkage disequilibrium.**
 
 Under AM, phenotypically similar individuals mate preferentially.  Because the
 phenotype is a sum of genetic effects across loci, this induces covariance
@@ -238,7 +239,7 @@ portability comparisons. We derive all results from the AM model.
 
 section AMAndHeritability
 
-/-- **Derivation of observed heritability under AM.**
+/- **Derivation of observed heritability under AM.**
 
 Under random mating, heritability is defined as h² = V_A / V_P.  Under AM,
 the additive genetic variance inflates to V_A* = V_A / (1 − r · h²) (see
@@ -299,7 +300,7 @@ theorem am_inflates_observed_h2
   rw [lt_div_iff₀ (by nlinarith [mul_pos h_r h_h2])]
   nlinarith [mul_pos h_r h_h2, mul_pos h_h2 (mul_pos h_r h_h2)]
 
-/-- **Derivation of PGS R² inflation under AM.**
+/- **Derivation of PGS R² inflation under AM.**
 
 Under random mating, PGS accuracy is R²_rm = Var(PGS) / V_P, where
 Var(PGS) = Σ_i β_i² · Var(G_i) captures only within-locus variance (no
@@ -362,8 +363,8 @@ theorem AssortativeMatingModel.pgs_r2_inflation_eq_h2_inflation
     (m : AssortativeMatingModel) (R2_rm : ℝ) (hR2 : 0 < R2_rm) :
     m.pgsR2AM R2_rm / R2_rm = m.observedH2 / m.h2 := by
   unfold pgsR2AM observedH2
-  rw [div_div_div_cancel_right₀ _ (ne_of_gt hR2)]
-  rw [div_div_div_cancel_right₀ _ (ne_of_gt m.h2_pos)]
+  have hden : 1 - m.r * m.h2 ≠ 0 := by linarith [m.stability]
+  field_simp [hden, ne_of_gt hR2, ne_of_gt m.h2_pos]
 
 /-- **Within-family PGS model.**
     Within-family (e.g., sibling) PGS differences remove the
@@ -398,8 +399,9 @@ theorem AssortativeMatingModel.am_gap_formula
     (m : AssortativeMatingModel) (R2_rm : ℝ) :
     m.amGap R2_rm = R2_rm * (m.r * m.h2) / (1 - m.r * m.h2) := by
   unfold amGap pgsR2AM
-  field_simp
-  ring
+  have hden : 1 - m.r * m.h2 ≠ 0 := by linarith [m.stability]
+  field_simp [hden]
+  ring_nf
 
 end AMAndHeritability
 
@@ -495,7 +497,8 @@ theorem am_correction_recovers_true
     (r_s r_t h2 : ℝ) (h_denom_s : 1 - r_s * h2 ≠ 0) (h_denom_t : 1 - r_t * h2 ≠ 0) :
     amCorrectedPortability ((1 - r_t * h2) / (1 - r_s * h2)) r_s r_t h2 = 1 := by
   unfold amCorrectedPortability
-  field_simp
+  have h_denom_s' : 1 - h2 * r_s ≠ 0 := by simpa [mul_comm] using h_denom_s
+  field_simp [h_denom_s, h_denom_t, h_denom_s']
 
 end DifferentialAM
 
@@ -542,10 +545,13 @@ theorem CrossPopAMLD.source_ld_exceeds_target (c : CrossPopAMLD)
   have h_dt : 0 < 1 - c.r_t * c.h2 := by linarith [c.stability_t]
   rw [div_lt_div_iff₀ h_dt h_ds]
   have h_diff : 0 < c.r_s - c.r_t := by linarith [c.r_t_lt_rs]
-  nlinarith [mul_pos hprod c.h2_pos, mul_pos h_diff c.h2_pos,
-             mul_pos hprod (mul_pos h_diff c.h2_pos),
-             mul_pos (mul_pos hprod c.r_t) c.h2_pos,
-             mul_pos (mul_pos hprod c.r_s) c.h2_pos]
+  have hprod_h2 : 0 < c.beta_i * c.beta_j * c.h2 := by
+    nlinarith [hprod, c.h2_pos]
+  have hrt_h2 : 0 ≤ c.r_t * c.h2 := by
+    exact mul_nonneg c.r_t_nonneg (le_of_lt c.h2_pos)
+  have hrs_h2 : 0 < c.r_s * c.h2 := by
+    exact mul_pos c.r_s_pos c.h2_pos
+  nlinarith [hprod_h2, hrt_h2, hrs_h2, h_diff]
 
 /-- **AM-LD breaks cross-population prediction.**
     The PGS trained in the source captures AM-LD variance equal to
@@ -562,9 +568,7 @@ theorem am_ld_breaks_cross_population
     (h_stab_s : r_s * h2 < 1) (h_stab_t : r_t * h2 < 1)
     (h_more : r_t < r_s) :
     r_t * (1 - r_s * h2) < r_s * (1 - r_t * h2) := by
-  have h_diff : 0 < r_s - r_t := by linarith
-  nlinarith [mul_pos h_diff (by linarith : 0 < 1 - r_t * h2 - (r_s - r_t) * r_t * h2),
-             mul_pos h_rt h2]
+  nlinarith
 
 /-- **AM-LD disappears under random mating.**
     When r = 0, the AM-induced LD component vanishes entirely.
@@ -612,7 +616,7 @@ affects PGS in complex ways.
 
 section PopulationStructure
 
-/-- **Derivation of isolation-by-distance Fst.**
+/- **Derivation of isolation-by-distance Fst.**
 
 We derive the formula Fst(d) = d / (4 · N_e · σ² + d) from a random-walk
 coalescence argument in a one-dimensional stepping-stone model.
@@ -719,8 +723,14 @@ theorem founder_effect_excess_fst
     (h_s : 0 < sigma_sq) (h_bottleneck : N_bottleneck < N_large) :
     ibdFst d N_bottleneck sigma_sq > ibdFst d N_large sigma_sq := by
   unfold ibdFst
-  rw [div_lt_div_iff₀ (by positivity) (by positivity)]
-  nlinarith [mul_pos h_s (by linarith : 0 < N_large - N_bottleneck)]
+  have hden_b : 0 < 4 * N_bottleneck * sigma_sq + d := by positivity
+  have hden_l : 0 < 4 * N_large * sigma_sq + d := by positivity
+  have hden_lt : 4 * N_bottleneck * sigma_sq + d < 4 * N_large * sigma_sq + d := by
+    nlinarith [h_bottleneck, h_s]
+  have hlt : d / (4 * N_large * sigma_sq + d) < d / (4 * N_bottleneck * sigma_sq + d) := by
+    apply (div_lt_div_iff₀ hden_l hden_b).2
+    nlinarith [h_d, hden_lt]
+  simpa [gt_iff_lt] using hlt
 
 end PopulationStructure
 

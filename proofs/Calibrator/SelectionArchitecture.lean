@@ -79,7 +79,7 @@ theorem stronger_stabilizing_smaller_effects
   unfold equilibriumEffectVariance
   exact div_lt_div_of_pos_left h_vm h_s₁ h_stronger
 
-/-- **Derivation: Effect correlation under stabilizing selection.**
+/- **Derivation: Effect correlation under stabilizing selection.**
 
     We derive the equilibrium effect correlation ρ* = 1 - 1/(2Ns) from the
     Wright-Fisher model with stabilizing selection.
@@ -288,6 +288,9 @@ theorem adaptation_shift_recoverable
     let mean_shifted := (∑ i, shifted i) / n
     (∑ i, (shifted i - mean_shifted) ^ 2) =
       ∑ i, (scores i - mean_orig) ^ 2 := by
+  by_cases hzero : n = 0
+  · subst hzero
+    simp
   simp only
   congr 1
   ext i
@@ -296,9 +299,9 @@ theorem adaptation_shift_recoverable
     rw [show (∑ j : Fin n, (scores j + μ_shift)) =
       (∑ j, scores j) + n * μ_shift by
       simp [Finset.sum_add_distrib, Finset.mul_sum]]
-    by_cases hn : (n : ℝ) = 0
-    · simp [hn]
-    · field_simp
+    have hn : (n : ℝ) ≠ 0 := by
+      exact_mod_cast hzero
+    field_simp [hn]
   rw [this]
   ring_nf
 

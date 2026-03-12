@@ -232,14 +232,12 @@ theorem bayesian_shrinkage_reduces_mse
   -- Then σ²β²/(σ²+β²) < σ² ⟺ β² < σ²+β² ⟺ 0 < σ². ✓
   have h_sum : 0 < σ_sq + β_sq := by linarith
   have h_sum_ne : (σ_sq + β_sq) ≠ 0 := ne_of_gt h_sum
-  -- Clear the denominators by multiplying through by (σ_sq + β_sq)²
-  rw [show β_sq / (σ_sq + β_sq) = β_sq / (σ_sq + β_sq) from rfl]
   have h1 : 1 - β_sq / (σ_sq + β_sq) = σ_sq / (σ_sq + β_sq) := by
-    field_simp
-  rw [h1, div_pow, div_pow, div_mul_eq_mul_div, div_mul_eq_mul_div, div_add_div_same,
-      div_lt_iff₀ (sq_pos_of_pos h_sum)]
-  nlinarith [sq_nonneg σ_sq, sq_nonneg β_sq, sq_nonneg (σ_sq * β_sq),
-             mul_pos h_σ h_β]
+    field_simp [h_sum_ne]
+    ring
+  rw [h1]
+  field_simp [h_sum_ne]
+  nlinarith [h_σ, h_β]
 
 end BayesianShrinkage
 
@@ -289,8 +287,9 @@ theorem ld_mismatch_bias_proportional
   have h_num : σ_ref * (σ_true + τ) - (σ_ref + τ) * σ_true = τ * (σ_ref - σ_true) := by ring
   rw [h_num, abs_div, abs_mul, abs_of_pos h_τ, abs_of_pos (mul_pos h_d2 h_d1)]
   rw [div_le_div_iff₀ (mul_pos h_d2 h_d1) h_τ]
-  -- Goal: τ * |σ_ref - σ_true| * τ ≤ |σ_ref - σ_true| * ((σ_ref + τ) * (σ_true + τ))
-  nlinarith [abs_nonneg (σ_ref - σ_true), mul_pos h_d2 h_d1]
+  have h_den_bound : τ * τ ≤ (σ_ref + τ) * (σ_true + τ) := by
+    nlinarith
+  nlinarith [abs_nonneg (σ_ref - σ_true), h_den_bound]
 
 /-- **Cross-ancestry LD reference introduces systematic bias.**
     Using EUR LD reference for AFR GWAS summary statistics introduces
@@ -312,7 +311,9 @@ theorem cross_ancestry_ld_bias
     c * fst * σ / τ < c * (2 * fst) * σ / τ := by
   constructor
   · apply div_pos _ h_τ; positivity
-  · rw [div_lt_div_iff_right h_τ]; nlinarith
+  · rw [div_lt_div_iff_right h_τ]
+    ring_nf
+    nlinarith
 
 /-- **In-sample LD reference is optimal.**
     Using LD reference from the same population as GWAS minimizes bias.

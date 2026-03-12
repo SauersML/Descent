@@ -349,8 +349,12 @@ theorem diminishing_marginal_returns
   have hnum : 0 < Δ * V_E := by positivity
   have hden2 : 0 < (v + 2 * Δ + V_E) * (v + Δ + V_E) := mul_pos hc hb
   have hden1 : 0 < (v + Δ + V_E) * (v + V_E) := mul_pos hb ha
-  rw [div_lt_div_iff₀ hden2 hden1]
-  nlinarith
+  have hden_lt :
+      (v + Δ + V_E) * (v + V_E) <
+        (v + 2 * Δ + V_E) * (v + Δ + V_E) := by
+    nlinarith
+  apply (div_lt_div_iff₀ hden2 hden1).2
+  nlinarith [hnum, hden_lt]
 
 /-- **Cost-effectiveness analysis.**
     New GWAS is most effective but most expensive.

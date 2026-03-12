@@ -261,7 +261,9 @@ theorem directional_selection_shifts_pgs
   have : s * V_A * t ≠ 0 := by
     apply mul_ne_zero (mul_ne_zero h_s (ne_of_gt h_VA))
     exact Nat.cast_ne_zero.mpr (by omega)
-  linarith [this]
+  intro h_eq
+  have h_zero : s * V_A * t = 0 := by linarith
+  exact this h_zero
 
 /-- **Stabilizing selection maintains architecture.**
     Under stabilizing selection toward the same optimum, extreme-effect
@@ -290,8 +292,10 @@ theorem stabilizing_maintains_architecture
   have h_sN : 0 < s * N := mul_pos h_s h_N
   have h_denom : 1 < 1 + s * N := by linarith
   have h_denom_pos : 0 < 1 + s * N := by linarith
-  linarith [div_lt_of_lt_mul₀ h_denom_pos (by linarith : 0 ≤ d)
-    (by rw [mul_comm]; exact (mul_lt_mul_of_pos_left h_denom h_d_pos))]
+  have h_frac_lt : d / (1 + s * N) < d := by
+    rw [div_lt_iff h_denom_pos]
+    nlinarith
+  nlinarith
 
 /-- **Fluctuating selection is worst for portability.**
     Under the drift-selection model:
@@ -319,8 +323,10 @@ theorem fluctuating_selection_worst_portability
   · -- ρ_fluct < ρ_neutral: 1 - d·(1+fN) < 1 - d ↔ d < d·(1+fN)
     linarith [mul_lt_mul_of_pos_left (show (1 : ℝ) < 1 + f * N by linarith) h_d_pos]
   · -- ρ_neutral < ρ_stab: 1 - d < 1 - d/(1+sN) ↔ d/(1+sN) < d
-    linarith [div_lt_of_lt_mul₀ h_denom_pos (le_of_lt h_d_pos)
-      (by rw [mul_comm]; exact mul_lt_mul_of_pos_left h_denom h_d_pos)]
+    have h_frac_lt : d / (1 + s * N) < d := by
+      rw [div_lt_iff h_denom_pos]
+      nlinarith
+    nlinarith
 
 /-- **Selection strength determines portability impact.**
     Weak selection (s << 1/(2Ne)): alleles behave neutrally → portable.

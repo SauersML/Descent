@@ -159,8 +159,7 @@ theorem liabilitySensitivity_zScore_monotone_in_R
       m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq) := by nlinarith [m.h_sq_pos]
   have h_σ_le : Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq)) ≤
       Real.sqrt (m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq)) :=
-    Real.sqrt_le_sqrt (le_of_lt (by nlinarith [m.h_sq_pos] :
-      0 < m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq))) h_rv_le
+    Real.sqrt_le_sqrt h_rv_le
   -- Establish num₂ > num₁ (numerator increases with R)
   have h_h_pos : 0 < Real.sqrt m.h_sq := Real.sqrt_pos_of_pos m.h_sq_pos
   have h_num_lt : R₁ * Real.sqrt m.h_sq * m.case_mean - T' <
@@ -574,8 +573,9 @@ theorem pgs_useful_when_exceeds_treat_all
   -- (1-sens)*π*(1-t) < spec*(1-π)*t
   -- → (1-sens)*π < spec*(1-π)*t/(1-t)
   have h_key : (1 - sens) * π < spec * (1 - π) * (t / (1 - t)) := by
-    rw [mul_div_assoc, lt_div_iff₀ h_1t_pos]
-    nlinarith
+    rw [lt_div_iff₀ h_1t_pos]
+    ring_nf
+    simpa [mul_assoc, mul_left_comm, mul_comm] using h_cross
   nlinarith
 
 /-- **Portability loss narrows the useful threshold range.**
@@ -642,7 +642,7 @@ section Fairness
 /- **Demographic parity (independence).**
     P(Ŷ = 1 | G = g) is the same for all groups g. -/
 
-/-- **Derivation: PPV from Bayes' theorem.**
+/- **Derivation: PPV from Bayes' theorem.**
 
     The positive predictive value PPV = P(D+ | T+) is derived directly
     from Bayes' theorem on conditional probability.
@@ -708,21 +708,17 @@ theorem fairness_impossibility
     · exact mul_pos (by linarith) h_fpr
   unfold ppv
   intro h_eq
-  -- If prev_A * tpr / denom_A = prev_B * tpr / denom_B, then cross-multiply:
-  -- prev_A * tpr * denom_B = prev_B * tpr * denom_A
-  have hcross := div_eq_div_iff (ne_of_gt h_denom_A) (ne_of_gt h_denom_B)
-  rw [hcross] at h_eq
-  -- Expand: prev_A * tpr * (prev_B * tpr + (1-prev_B) * fpr)
-  --       = prev_B * tpr * (prev_A * tpr + (1-prev_A) * fpr)
-  -- Simplify: both sides have prev_A * prev_B * tpr², remaining terms give
-  -- prev_A * tpr * (1-prev_B) * fpr = prev_B * tpr * (1-prev_A) * fpr
-  -- i.e., prev_A * (1-prev_B) = prev_B * (1-prev_A) since tpr, fpr > 0
-  -- i.e., prev_A - prev_A*prev_B = prev_B - prev_A*prev_B
-  -- i.e., prev_A = prev_B — contradiction.
   have htpr_ne : tpr ≠ 0 := ne_of_gt h_tpr
   have hfpr_ne : fpr ≠ 0 := ne_of_gt h_fpr
-  apply h_diff_prev
-  nlinarith
+  have hcross :
+      prev_A * tpr * (prev_B * tpr + (1 - prev_B) * fpr) =
+        prev_B * tpr * (prev_A * tpr + (1 - prev_A) * fpr) := by
+    exact (div_eq_div_iff (ne_of_gt h_denom_A) (ne_of_gt h_denom_B)).mp h_eq
+  have h_prev_eq : prev_A = prev_B := by
+    have h_reduced : prev_A * (1 - prev_B) = prev_B * (1 - prev_A) := by
+      nlinarith [hcross, h_tpr, h_fpr]
+    nlinarith
+  exact h_diff_prev h_prev_eq
 
 /-- **Portability gap amplifies fairness violations.**
     If PGS R² differs across groups (r2_target < r2_source), and sensitivity
@@ -757,8 +753,9 @@ theorem fairness_accuracy_tradeoff
     (h_fp : 0 ≤ fp_B) :
     netBenefit sens_B_fair fp_B n t < netBenefit sens_B_unconstrained fp_B n t := by
   unfold netBenefit
-  have h1 : sens_B_fair / n < sens_B_unconstrained / n :=
-    (div_lt_div_right hn).mpr h_sens_drop
+  have h1 : sens_B_fair / n < sens_B_unconstrained / n := by
+    rw [div_lt_div_iff₀ hn hn]
+    nlinarith
   linarith
 
 end Fairness
@@ -868,11 +865,20 @@ theorem qaly_gain_positive_condition
     (h_bh : harm ≤ benefit) :
     0 < qalyGain sens spec π benefit harm := by
   unfold qalyGain
-  -- sens * π * benefit - (1-spec) * (1-π) * harm
-  -- ≥ sens * π * harm - (1-spec) * (1-π) * harm   [benefit ≥ harm]
-  -- = harm * (sens * π - (1-spec) * (1-π))
-  -- > 0   [from h_tp_dominates and harm > 0]
-  nlinarith
+  have h_prob_gap : 0 < sens * π - (1 - spec) * (1 - π) := by
+    nlinarith
+  have h_lower_pos : 0 < harm * (sens * π - (1 - spec) * (1 - π)) := by
+    exact mul_pos h_harm h_prob_gap
+  have h_weight_nonneg : 0 ≤ sens * π := by
+    positivity
+  have h_lower_le :
+      harm * (sens * π - (1 - spec) * (1 - π)) ≤
+        qalyGain sens spec π benefit harm := by
+    unfold qalyGain
+    have h_gain_term_nonneg : 0 ≤ sens * π * (benefit - harm) := by
+      nlinarith
+    nlinarith
+  exact lt_of_lt_of_le h_lower_pos h_lower_le
 
 /-- **Lower portability → lower cost-effectiveness.**
     If the target population has lower sensitivity and higher false positive rate
@@ -1036,20 +1042,20 @@ theorem marginal_value_highest_for_underserved
   rw [div_sub_div _ _ (ne_of_gt hd_u) (ne_of_gt hd_su),
       div_sub_div _ _ (ne_of_gt hd_s) (ne_of_gt hd_ss)]
   rw [gt_iff_lt]
-  -- Goal: num / (denom_s * denom_ss) < num / (denom_u * denom_su)
-  -- where num = (s+Δ)*π - s*π = Δ*π > 0 (same for both sides)
-  -- and denom_u * denom_su < denom_s * denom_ss
-  apply div_lt_div_of_pos_left
-  · -- Numerator positive: Δsens * π > 0
+  have h_num_under :
+      1 * ((sens_under + Δsens) * π) - sens_under * π * 1 = Δsens * π := by ring
+  have h_num_served :
+      1 * ((sens_served + Δsens) * π) - sens_served * π * 1 = Δsens * π := by ring
+  rw [h_num_served, h_num_under]
+  have h_prod_lt :
+      sens_under * (sens_under + Δsens) <
+        sens_served * (sens_served + Δsens) := by
     nlinarith
-  · -- Denominator of served side positive
-    exact mul_pos hd_s hd_ss
-  · -- denom_under < denom_served
-    -- sens_under*π * (sens_under+Δ)*π < sens_served*π * (sens_served+Δ)*π
-    -- sens_under * (sens_under + Δ) < sens_served * (sens_served + Δ)
-    -- since sens_under < sens_served and sens_under + Δ < sens_served + Δ (both positive)
-    -- Then multiply both sides by π² > 0
-    nlinarith [mul_pos h_π h_π]
+  have h_den_lt :
+      sens_under * π * ((sens_under + Δsens) * π) <
+        sens_served * π * ((sens_served + Δsens) * π) := by
+    nlinarith [h_prod_lt, sq_pos_of_pos h_π]
+  exact div_lt_div_of_pos_left (show 0 < Δsens * π by positivity) (mul_pos hd_u hd_su) h_den_lt
 
 /-- **Minimum sample size for clinical-grade PGS.**
     If target R² = r2_source × portability_ratio is below the clinical

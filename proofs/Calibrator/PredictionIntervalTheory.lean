@@ -422,9 +422,9 @@ theorem weighted_conformal_wider
     (h_eff_le : n_eff ≤ n) :
     -- Width ∝ 1/√n_eff ≥ 1/√n (wider intervals with importance weighting)
     1 / Real.sqrt n ≤ 1 / Real.sqrt n_eff := by
-  apply div_le_div_of_nonneg_left one_pos
-  · exact Real.sqrt_pos.mpr h_n_eff_pos
-  · exact Real.sqrt_le_sqrt h_eff_le
+  exact one_div_le_one_div_of_le
+    (Real.sqrt_pos.mpr h_n_eff_pos)
+    (Real.sqrt_le_sqrt h_eff_le)
 
 /-- **Effective sample size under importance weighting.**
     n_eff = (Σ wᵢ)² / Σ wᵢ² ≤ n.
