@@ -375,11 +375,13 @@ theorem fstMutationDriftEquilibrium_lt_one (θ : ℝ) (hθ : 0 < θ) :
   linarith
 
 /-- Equilibrium Fst decreases with θ: more mutation → less differentiation. -/
-theorem fstMutationDriftEquilibrium_strictAnti :
-    StrictAnti fstMutationDriftEquilibrium := by
-  intro a b hab
+theorem fstMutationDriftEquilibrium_strictAnti (a b : ℝ)
+    (ha : 0 ≤ a) (hab : a < b) :
+    fstMutationDriftEquilibrium b < fstMutationDriftEquilibrium a := by
   unfold fstMutationDriftEquilibrium
-  exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+  have hden : 0 < 1 + a := by linarith
+  have hden_lt : 1 + a < 1 + b := by linarith
+  simpa using div_lt_div_of_pos_left one_pos hden hden_lt
 
 /-- Equilibrium Fst decreases when Ne increases (with μ fixed). -/
 theorem fstEquilibrium_decreases_with_Ne (μ Ne₁ Ne₂ : ℝ)
@@ -388,6 +390,8 @@ theorem fstEquilibrium_decreases_with_Ne (μ Ne₁ Ne₂ : ℝ)
     fstMutationDriftEquilibrium (scaledMutationRate Ne₂ μ) <
       fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ) := by
   apply fstMutationDriftEquilibrium_strictAnti
+  · unfold scaledMutationRate
+    nlinarith
   unfold scaledMutationRate
   nlinarith
 
@@ -398,6 +402,8 @@ theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
     fstMutationDriftEquilibrium (scaledMutationRate Ne μ₂) <
       fstMutationDriftEquilibrium (scaledMutationRate Ne μ₁) := by
   apply fstMutationDriftEquilibrium_strictAnti
+  · unfold scaledMutationRate
+    nlinarith
   unfold scaledMutationRate
   nlinarith
 
@@ -430,6 +436,7 @@ theorem het_plus_fst_eq_one (θ : ℝ) (hθ : 0 ≤ θ) :
   unfold expectedHeterozygosity fstMutationDriftEquilibrium
   have hden : (1 + θ) ≠ 0 := by linarith
   field_simp [hden]
+  ring
 
 /-- **The within-population heterozygosity share and Nei's Fst sum to 1.**
     Since `neiFst H_T H_S = (H_T − H_S) / H_T = 1 − H_S / H_T`, we have
@@ -439,7 +446,8 @@ theorem het_plus_fst_eq_one (θ : ℝ) (hθ : 0 ≤ θ) :
 theorem nei_fst_complement (H_S H_T : ℝ) (hHT : H_T ≠ 0) :
     H_S / H_T + neiFst H_T H_S = 1 := by
   unfold neiFst
-  field_simp
+  field_simp [hHT]
+  ring_nf
 
 /-- **At mutation-drift equilibrium, Nei's Fst recovers fstMutationDriftEquilibrium.**
     When H_S = θ/(1+θ) (`expectedHeterozygosity θ`) and H_T = 1 (maximal
@@ -468,14 +476,14 @@ theorem fstEquilibrium_eq_one_minus_het (θ : ℝ) (hθ : 0 ≤ θ) :
 /-- **Timescale separation.**
     Drift acts on timescale ~Ne generations (τ_drift = t/(2Ne)).
     Mutation introduces new variants on timescale ~1/μ generations.
-    When θ > 2, the reciprocal mutation rate 1/μ exceeds the coalescent time 2Ne. -/
+    When θ > 2, mutation acts faster than drift, so 1/μ < 2Ne. -/
 theorem mutation_timescale_exceeds_drift (Ne μ : ℝ)
     (hNe : 0 < Ne) (hμ : 0 < μ)
     (hθ_large : 2 < scaledMutationRate Ne μ) :
-    2 * Ne < 1 / μ := by
+    1 / μ < 2 * Ne := by
   unfold scaledMutationRate at hθ_large
-  rw [div_gt_iff₀ hμ]
-  linarith
+  rw [div_lt_iff₀ hμ]
+  nlinarith
 
 /-- When θ < 1, equilibrium Fst > 1/2. -/
 theorem fstEquilibrium_gt_half_of_small_theta (θ : ℝ)
@@ -500,10 +508,16 @@ theorem fstMutationDriftTransient_nonneg (θ t Ne : ℝ)
   apply mul_nonneg
   · exact le_of_lt (fstMutationDriftEquilibrium_pos θ hθ)
   · have harg : 0 ≤ (1 + θ) * t / (2 * Ne) := by positivity
-    have hexp : Real.exp (-(((1 + θ) * t / (2 * Ne)))) ≤ 1 := by
+    have hexp : Real.exp (-(1 + θ) * t / (2 * Ne)) ≤ 1 := by
       rw [← Real.exp_zero]
-      exact Real.exp_le_exp.mpr (by linarith)
-    linarith
+      have h_nonpos : -(Real.exp 0 + θ) * t / (2 * Ne) ≤ 0 := by
+        have hnum_nonpos : -(Real.exp 0 + θ) * t ≤ 0 := by
+          have hneg_nonpos : -(Real.exp 0 + θ) ≤ 0 := by
+            nlinarith [hθ, Real.exp_pos 0]
+          exact mul_nonpos_of_nonpos_of_nonneg hneg_nonpos ht
+        exact div_nonpos_of_nonpos_of_nonneg hnum_nonpos (by positivity : 0 ≤ 2 * Ne)
+      exact Real.exp_le_exp.mpr h_nonpos
+    exact sub_nonneg.mpr hexp
 
 /-- Transient Fst is bounded above by the equilibrium Fst. -/
 theorem fstMutationDriftTransient_le_equilibrium (θ t Ne : ℝ)
@@ -512,11 +526,11 @@ theorem fstMutationDriftTransient_le_equilibrium (θ t Ne : ℝ)
   unfold fstMutationDriftTransient
   have hfeq_pos : 0 < fstMutationDriftEquilibrium θ :=
     fstMutationDriftEquilibrium_pos θ hθ
-  have hexp_pos : 0 < Real.exp (-(((1 + θ) * t / (2 * Ne)))) :=
+  have hexp_pos : 0 < Real.exp (-(1 + θ) * t / (2 * Ne)) :=
     Real.exp_pos _
-  have h_factor_le : 1 - Real.exp (-(((1 + θ) * t / (2 * Ne)))) ≤ 1 := by linarith
-  calc fstMutationDriftEquilibrium θ * (1 - Real.exp (-(((1 + θ) * t / (2 * Ne))))
-    ) ≤ fstMutationDriftEquilibrium θ * 1 := by
+  have h_factor_le : 1 - Real.exp (-(1 + θ) * t / (2 * Ne)) ≤ 1 := by linarith
+  calc fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ) * t / (2 * Ne)))
+      ≤ fstMutationDriftEquilibrium θ * 1 := by
         exact mul_le_mul_of_nonneg_left h_factor_le (le_of_lt hfeq_pos)
     _ = fstMutationDriftEquilibrium θ := by ring
 
@@ -528,14 +542,25 @@ theorem fstMutationDriftTransient_increases_with_time (θ Ne t₁ t₂ : ℝ)
   unfold fstMutationDriftTransient
   have hfeq_pos : 0 < fstMutationDriftEquilibrium θ :=
     fstMutationDriftEquilibrium_pos θ (le_of_lt hθ)
-  have hrate : 0 < (1 + θ) / (2 * Ne) := by positivity
+  have harg_lt : (1 + θ) * t₁ / (2 * Ne) < (1 + θ) * t₂ / (2 * Ne) := by
+    exact div_lt_div_of_pos_right (by nlinarith) (by positivity)
+  have hneg_arg_lt : -((1 + θ) * t₂ / (2 * Ne)) < -((1 + θ) * t₁ / (2 * Ne)) := by
+    exact neg_lt_neg harg_lt
   have hexp_lt : Real.exp (-((1 + θ) * t₂ / (2 * Ne))) <
       Real.exp (-((1 + θ) * t₁ / (2 * Ne))) := by
-    apply Real.exp_lt_exp.mpr
-    nlinarith
-  have h_factor_lt : 1 - Real.exp (-((1 + θ) * t₁ / (2 * Ne))) <
-      1 - Real.exp (-((1 + θ) * t₂ / (2 * Ne))) := by linarith
-  exact mul_lt_mul_of_pos_left h_factor_lt hfeq_pos
+    exact Real.exp_lt_exp.mpr hneg_arg_lt
+  have h_factor_lt :
+      1 - Real.exp (-((1 + θ) * t₁ / (2 * Ne))) <
+        1 - Real.exp (-((1 + θ) * t₂ / (2 * Ne))) := by
+    linarith
+  have h_factor_lt' :
+      1 - Real.exp (-(1 + θ) * t₁ / (2 * Ne)) <
+        1 - Real.exp (-(1 + θ) * t₂ / (2 * Ne)) := by
+    have harg₁ : -(1 + θ) * t₁ / (2 * Ne) = -((1 + θ) * t₁ / (2 * Ne)) := by ring
+    have harg₂ : -(1 + θ) * t₂ / (2 * Ne) = -((1 + θ) * t₂ / (2 * Ne)) := by ring
+    rw [harg₁, harg₂]
+    exact h_factor_lt
+  exact mul_lt_mul_of_pos_left h_factor_lt' hfeq_pos
 
 /-- At t=0, transient Fst is 0 (populations are undifferentiated). -/
 theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) (hNe : 0 < Ne) :
@@ -650,19 +675,23 @@ theorem islandModelFst_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
 
 /-- **Island model Fst is strictly decreasing in migration rate.**
     The function m ↦ 1/(1 + 4Nm) is strictly anti-monotone for positive Ne. -/
-theorem islandModelFst_strictAnti_m (Ne : ℝ) (hNe : 0 < Ne) :
-    StrictAnti (fun m => islandModelFst Ne m) := by
-  intro a b hab
+theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
+    (ha : 0 ≤ a) (hab : a < b) :
+    islandModelFst Ne b < islandModelFst Ne a := by
   unfold islandModelFst
-  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+  have hden_pos : 0 < 1 + 4 * Ne * a := by nlinarith
+  have hden_lt : 1 + 4 * Ne * a < 1 + 4 * Ne * b := by nlinarith
+  exact div_lt_div_of_pos_left one_pos hden_pos hden_lt
 
 /-- **Island model Fst is strictly decreasing in Ne.**
     Larger populations have more effective migrants per generation. -/
-theorem islandModelFst_strictAnti_Ne (m : ℝ) (hm : 0 < m) :
-    StrictAnti (fun Ne => islandModelFst Ne m) := by
-  intro a b hab
+theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
+    (ha : 0 ≤ a) (hab : a < b) :
+    islandModelFst b m < islandModelFst a m := by
   unfold islandModelFst
-  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+  have hden_pos : 0 < 1 + 4 * a * m := by nlinarith
+  have hden_lt : 1 + 4 * a * m < 1 + 4 * b * m := by nlinarith
+  exact div_lt_div_of_pos_left one_pos hden_pos hden_lt
 
 /-- **When 4Nm > 1, Fst < 1/2** (one-migrant-per-generation rule).
     This is Wright's classical threshold: even one migrant per generation
@@ -832,7 +861,7 @@ theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
     (hNe : 0 < Ne) (hm₁₂ : 0 < m₁₂) (hm₂₁ : 0 < m₂₁)
     (h_asym : m₂₁ < m₁₂) :
     islandModelFst Ne m₁₂ < islandModelFst Ne m₂₁ := by
-  exact islandModelFst_strictAnti_m Ne hNe h_asym
+  exact islandModelFst_strictAnti_m Ne m₂₁ m₁₂ hNe (le_of_lt hm₂₁) h_asym
 
 /-! ### Migration and LD Homogenization -/
 
@@ -862,15 +891,15 @@ theorem ldCorrelationFromMigration_increases (M₁ M₂ : ℝ)
     (hM₁ : 0 < M₁) (hM₂ : 0 < M₂) (h_more : M₁ < M₂) :
     ldCorrelationFromMigration M₁ < ldCorrelationFromMigration M₂ := by
   unfold ldCorrelationFromMigration
-  -- (M₁/(1+M₁))² < (M₂/(1+M₂))² follows from M₁/(1+M₁) < M₂/(1+M₂)
-  rw [div_pow, div_pow]
   have h1M₁ : 0 < 1 + M₁ := by linarith
   have h1M₂ : 0 < 1 + M₂ := by linarith
   have h_ratio : M₁ / (1 + M₁) < M₂ / (1 + M₂) := by
-    rw [div_lt_div_iff₀ h1M₁ h1M₂]; nlinarith
-  have h_pos : 0 < M₁ / (1 + M₁) := div_pos hM₁ h1M₁
-  exact div_lt_div_of_pos_right (sq_lt_sq' (by linarith) h_ratio)
-    (sq_pos_of_pos h1M₂)
+    rw [div_lt_div_iff₀ h1M₁ h1M₂]
+    nlinarith
+  have h_sq :
+      (M₁ / (1 + M₁)) ^ 2 < (M₂ / (1 + M₂)) ^ 2 := by
+    nlinarith [h_ratio, div_pos hM₁ h1M₁, div_pos hM₂ h1M₂]
+  simpa [div_pow] using h_sq
 
 end MigrationDriftFoundations
 
@@ -990,6 +1019,7 @@ theorem fstDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) (ht : 1 ≤ t)
 theorem fstDerived_eq_fstFromDrift (Ne : ℝ) (t : ℕ) :
     fstDerived Ne t = fstFromDrift t Ne := by
   unfold fstDerived fstFromDrift
+  rfl
 
 /-! ### Mutation-drift recurrence and equilibrium -/
 
@@ -1013,14 +1043,14 @@ theorem hetMutationDrift_fixed_point (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
     hetMutationDriftRecurrence Ne mu (hetEquilibrium Ne mu) 1 =
       hetEquilibrium Ne mu := by
-  unfold hetMutationDriftRecurrence hetEquilibrium
+  simp [hetMutationDriftRecurrence, hetEquilibrium]
   -- We need: (1 - 1/(2Ne)) * (4Neμ/(1+4Neμ)) + 2μ * (1 - 4Neμ/(1+4Neμ))
   --        = 4Neμ/(1+4Neμ)
   have hθ : 0 < 4 * Ne * mu := by positivity
   have hden : (1 + 4 * Ne * mu) ≠ 0 := by linarith
   have hNe2 : (2 * Ne) ≠ 0 := by linarith
   field_simp
-  ring
+  ring_nf
 
 /-- **The fixed point is unique in [0,1].**
     For any H in [0,1] satisfying f(H) = H, we must have H = θ/(1+θ).
@@ -1074,6 +1104,7 @@ theorem fstEquilibrium_derived_consistent (Ne mu : ℝ)
     1 - hetEquilibrium Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu) := by
   rw [fstEquilibrium_derived Ne mu hNe hmu]
   unfold fstMutationDriftEquilibrium
+  rfl
 
 /-- **Equilibrium heterozygosity is in (0, 1) for positive parameters.** -/
 theorem hetEquilibrium_pos (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
@@ -1151,25 +1182,24 @@ noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
     Rather than tracking c explicitly we parametrise by the equilibrium H*
     and λ, since the affine recurrence H(t+1) = λ H(t) + c has
     fixed point H* = c/(1-λ), i.e. c = (1-λ) H*. -/
-noncomputable def hetMutationRecurrence (λ Hstar H₀ : ℝ) : ℕ → ℝ
+noncomputable def hetMutationRecurrence (lam Hstar H₀ : ℝ) : ℕ → ℝ
   | 0 => H₀
-  | t + 1 => λ * hetMutationRecurrence λ Hstar H₀ t + (1 - λ) * Hstar
+  | t + 1 => lam * hetMutationRecurrence lam Hstar H₀ t + (1 - lam) * Hstar
 
 /-- **At t = 0, H equals the initial value.** -/
-theorem hetMutationRecurrence_zero (λ Hstar H₀ : ℝ) :
-    hetMutationRecurrence λ Hstar H₀ 0 = H₀ := by
+theorem hetMutationRecurrence_zero (lam Hstar H₀ : ℝ) :
+    hetMutationRecurrence lam Hstar H₀ 0 = H₀ := by
   rfl
 
 /-- **Closed-form solution of the affine recurrence.**
     H(t) = H* + (H₀ - H*) × λ^t.
     Proof by induction: the base case is trivial, and the step uses
     the fact that the constant term (1-λ)H* absorbs the equilibrium part. -/
-theorem hetMutationRecurrence_closed_form (λ Hstar H₀ : ℝ) (t : ℕ) :
-    hetMutationRecurrence λ Hstar H₀ t = Hstar + (H₀ - Hstar) * λ ^ t := by
+theorem hetMutationRecurrence_closed_form (lam Hstar H₀ : ℝ) (t : ℕ) :
+    hetMutationRecurrence lam Hstar H₀ t = Hstar + (H₀ - Hstar) * lam ^ t := by
   induction t with
   | zero =>
     simp [hetMutationRecurrence]
-    ring
   | succ n ih =>
     simp only [hetMutationRecurrence, ih]
     ring
@@ -1186,9 +1216,9 @@ noncomputable def fstFromHetRatio (H H₀ : ℝ) : ℝ :=
     Fst(t) = 1 - [H* + (H₀ - H*) × λ^t] / H₀
            = 1 - H*/H₀ - (1 - H*/H₀) × λ^t
            = (1 - H*/H₀) × (1 - λ^t). -/
-theorem fst_from_closed_form_het (λ Hstar H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) :
-    fstFromHetRatio (hetMutationRecurrence λ Hstar H₀ t) H₀ =
-      (1 - Hstar / H₀) * (1 - λ ^ t) := by
+theorem fst_from_closed_form_het (lam Hstar H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) :
+    fstFromHetRatio (hetMutationRecurrence lam Hstar H₀ t) H₀ =
+      (1 - Hstar / H₀) * (1 - lam ^ t) := by
   unfold fstFromHetRatio
   rw [hetMutationRecurrence_closed_form]
   field_simp
@@ -1204,7 +1234,7 @@ theorem fst_from_closed_form_het (λ Hstar H₀ : ℝ) (t : ℕ) (hH₀ : H₀ �
 theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
     1 - expectedHeterozygosity θ / 1 = fstMutationDriftEquilibrium θ := by
   rw [div_one]
-  exact fstEquilibrium_eq_one_minus_het θ hθ
+  exact (fstEquilibrium_eq_one_minus_het θ hθ).symm
 
 /-! ### The main derivation: transient Fst from the recurrence -/
 
@@ -1264,14 +1294,22 @@ theorem fstTransientDiscrete_nonneg (θ Ne : ℝ) (t : ℕ)
 
 /-- **The derived transient Fst is bounded by the equilibrium Fst.** -/
 theorem fstTransientDiscrete_le_equilibrium (θ Ne : ℝ) (t : ℕ)
-    (hθ : 0 ≤ θ) :
+    (hθ : 0 ≤ θ) (hNe : 2 ≤ Ne) (hθNe : θ ≤ 2 * Ne) :
     fstMutationDriftTransientDiscrete θ Ne t ≤ fstMutationDriftEquilibrium θ := by
   unfold fstMutationDriftTransientDiscrete
   have hfeq : 0 < fstMutationDriftEquilibrium θ := fstMutationDriftEquilibrium_pos θ hθ
   calc fstMutationDriftEquilibrium θ * (1 - hetDecayFactor Ne θ ^ t)
       ≤ fstMutationDriftEquilibrium θ * 1 := by
         apply mul_le_mul_of_nonneg_left _ (le_of_lt hfeq)
-        linarith [pow_nonneg (show (0 : ℝ) ≤ hetDecayFactor Ne θ ^ t by positivity) 0]
+        have hpow_nonneg : 0 ≤ hetDecayFactor Ne θ ^ t := by
+          apply pow_nonneg
+          unfold hetDecayFactor
+          apply mul_nonneg
+          · rw [sub_nonneg, div_le_one (by linarith)]
+            linarith
+          · rw [sub_nonneg, div_le_one (by linarith)]
+            linarith
+        linarith
     _ = fstMutationDriftEquilibrium θ := by ring
 
 /-- **Discrete-to-continuous approximation.**
@@ -1306,6 +1344,7 @@ theorem fstTransientDiscrete_eq_explicit (θ Ne : ℝ) (t : ℕ) :
     fstMutationDriftTransientDiscrete θ Ne t =
       1 / (1 + θ) * (1 - ((1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))) ^ t) := by
   unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor
+  rfl
 
 end TransientFstDerivation
 

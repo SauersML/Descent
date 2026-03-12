@@ -311,7 +311,7 @@ section DiscoveryBias
 
 /-- **Heterozygosity function.** het(p) = 2p(1-p) is the per-variant
     information content for association testing. -/
-noncomputable def heterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
+noncomputable def ancestryHeterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
 
 /-- Heterozygosity is strictly increasing on (0, 1/2).
     Proof: het(q) - het(p) = 2(q - p)(1 - p - q). When p < q < 1/2,
@@ -320,8 +320,8 @@ theorem het_strict_mono_on_lower_half (p q : ℝ)
     (h_p : 0 < p) (h_p_lt : p < 1/2)
     (h_q : 0 < q) (h_q_lt : q < 1/2)
     (h_pq : p < q) :
-    heterozygosity p < heterozygosity q := by
-  unfold heterozygosity
+    ancestryHeterozygosity p < ancestryHeterozygosity q := by
+  unfold ancestryHeterozygosity
   nlinarith [sq_nonneg p, sq_nonneg q]
 
 /-- **Discovered variants are biased toward EUR-common.**
@@ -340,7 +340,7 @@ theorem discovered_variants_eur_biased
     (h_eur : 0 < p_eur) (h_eur_lt : p_eur < 1/2)
     (h_afr : 0 < p_afr) (h_afr_lt : p_afr < 1/2)
     (h_drift_down : p_afr < p_eur) :
-    heterozygosity p_afr < heterozygosity p_eur :=
+    ancestryHeterozygosity p_afr < ancestryHeterozygosity p_eur :=
   het_strict_mono_on_lower_half p_afr p_eur h_afr h_afr_lt h_eur h_eur_lt h_drift_down
 
 /-- **Discovery bias inflates apparent portability gap.**

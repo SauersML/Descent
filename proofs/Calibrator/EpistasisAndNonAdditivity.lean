@@ -234,7 +234,7 @@ theorem heterozygote_advantage_large_dominance
   have habs_sq : |d_typical| ^ 2 < |d_sickle| ^ 2 := by
     nlinarith
   rw [← abs_sq d_typical, ← abs_sq d_sickle]
-  exact mul_lt_mul_of_pos_left habs_sq hhet_sq
+  simpa [mul_comm, mul_left_comm, mul_assoc] using mul_lt_mul_of_pos_left habs_sq hhet_sq
 
 end DominanceEffects
 

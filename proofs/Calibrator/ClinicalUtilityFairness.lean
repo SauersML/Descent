@@ -166,7 +166,7 @@ theorem liabilitySensitivity_zScore_monotone_in_R
       R₂ * Real.sqrt m.h_sq * m.case_mean - T' := by
     nlinarith [mul_pos h_h_pos m.case_mean_pos]
   -- Cross-multiply: need num₁ · σ₂ < num₂ · σ₁
-  rw [div_lt_div_iff h_σ₁_pos h_σ_pos]
+  rw [div_lt_div_iff₀ h_σ₁_pos h_σ_pos]
   -- num₁ · σ₂ ≤ num₁ · σ₁ (since num₁ ≥ 0 and σ₂ ≤ σ₁)
   have h1 : (R₁ * Real.sqrt m.h_sq * m.case_mean - T') *
       Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq)) ≤
@@ -212,7 +212,6 @@ theorem liabilitySensitivity_monotone_in_R2
   -- Reduce to the z-score monotonicity in R.
   -- We need: (√R2₁ · h · μ - T') / σ₁ < (√R2₂ · h · μ - T') / σ₂
   -- with the same structure as liabilitySensitivity_zScore_monotone_in_R.
-  simp only
   -- σ₁ > 0
   have h_σ₁_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
     apply Real.sqrt_pos_of_pos
@@ -220,11 +219,8 @@ theorem liabilitySensitivity_monotone_in_R2
     nlinarith [m.h_sq_pos]
   -- σ₂ ≤ σ₁
   have h_σ_le : Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
-      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
-    apply Real.sqrt_le_sqrt
-    · have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
-      nlinarith [m.h_sq_pos]
-    · nlinarith [m.h_sq_pos]
+      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) :=
+    Real.sqrt_le_sqrt (by nlinarith [m.h_sq_pos])
   -- √R2₁ < √R2₂
   have h_sqrt_lt : Real.sqrt R2₁ < Real.sqrt R2₂ :=
     Real.sqrt_lt_sqrt hR2₁ hR2
@@ -234,7 +230,7 @@ theorem liabilitySensitivity_monotone_in_R2
       Real.sqrt R2₂ * Real.sqrt m.h_sq * m.case_mean - T' := by
     nlinarith [mul_pos h_h_pos m.case_mean_pos]
   -- Cross-multiply: num₁ · σ₂ < num₂ · σ₁
-  rw [div_lt_div_iff h_σ₁_pos h_σ_pos]
+  rw [div_lt_div_iff₀ h_σ₁_pos h_σ_pos]
   have h1 : (Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') *
       Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
       (Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') *
@@ -272,7 +268,6 @@ theorem liabilitySpecificity_monotone_in_R2
   -- The numerator T' - R·h·μ_control increases with R (since h > 0, μ_control < 0,
   -- so -h·μ_control > 0 and the numerator grows with R).
   -- The denominator σ_resid decreases with R². Same cross-multiply argument.
-  simp only
   -- σ₁ > 0
   have h_σ₁_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
     apply Real.sqrt_pos_of_pos
@@ -280,11 +275,8 @@ theorem liabilitySpecificity_monotone_in_R2
     nlinarith [m.h_sq_pos]
   -- σ₂ ≤ σ₁
   have h_σ_le : Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
-      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
-    apply Real.sqrt_le_sqrt
-    · have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
-      nlinarith [m.h_sq_pos]
-    · nlinarith [m.h_sq_pos]
+      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) :=
+    Real.sqrt_le_sqrt (by nlinarith [m.h_sq_pos])
   -- √R2₁ < √R2₂
   have h_sqrt_lt : Real.sqrt R2₁ < Real.sqrt R2₂ :=
     Real.sqrt_lt_sqrt hR2₁ hR2
@@ -297,7 +289,7 @@ theorem liabilitySpecificity_monotone_in_R2
     -- so √R2₂·h·μ < √R2₁·h·μ. ✓
     nlinarith [mul_pos h_h_pos (neg_pos.mpr hμ_control_neg)]
   -- Cross-multiply
-  rw [div_lt_div_iff h_σ₁_pos h_σ_pos]
+  rw [div_lt_div_iff₀ h_σ₁_pos h_σ_pos]
   have h1 : (T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) *
       Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
       (T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) *
@@ -573,9 +565,12 @@ theorem pgs_useful_when_exceeds_treat_all
   -- (1-sens)*π*(1-t) < spec*(1-π)*t
   -- → (1-sens)*π < spec*(1-π)*t/(1-t)
   have h_key : (1 - sens) * π < spec * (1 - π) * (t / (1 - t)) := by
-    rw [lt_div_iff₀ h_1t_pos]
-    ring_nf
-    simpa [mul_assoc, mul_left_comm, mul_comm] using h_cross
+    have h_cross' : ((1 - sens) * π) * (1 - t) < (spec * (1 - π)) * t := by
+      simpa [mul_assoc, mul_left_comm, mul_comm] using h_cross
+    have h_div :
+        ((1 - sens) * π) < ((spec * (1 - π)) * t) / (1 - t) :=
+      (lt_div_iff₀ h_1t_pos).2 h_cross'
+    simpa [mul_assoc, mul_left_comm, mul_comm, div_eq_mul_inv] using h_div
   nlinarith
 
 /-- **Portability loss narrows the useful threshold range.**
@@ -716,7 +711,12 @@ theorem fairness_impossibility
     exact (div_eq_div_iff (ne_of_gt h_denom_A) (ne_of_gt h_denom_B)).mp h_eq
   have h_prev_eq : prev_A = prev_B := by
     have h_reduced : prev_A * (1 - prev_B) = prev_B * (1 - prev_A) := by
-      nlinarith [hcross, h_tpr, h_fpr]
+      have hscaled :
+          prev_A * (1 - prev_B) * (tpr * fpr) =
+            prev_B * (1 - prev_A) * (tpr * fpr) := by
+        nlinarith [hcross]
+      exact mul_right_cancel₀ (show tpr * fpr ≠ 0 by positivity) <| by
+        simpa [mul_assoc, mul_left_comm, mul_comm] using hscaled
     nlinarith
   exact h_diff_prev h_prev_eq
 

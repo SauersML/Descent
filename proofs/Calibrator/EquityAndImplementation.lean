@@ -271,7 +271,11 @@ theorem diversity_has_higher_marginal_value
     ((n_underrep + dn) * h2 + M) * (n_underrep * h2) = dn * h2 * M := by ring
   rw [lhs_eq, rhs_eq]
   apply div_lt_div_of_pos_left (mul_pos (mul_pos h_dn h_h2) h_M) (mul_pos h2' h1) _
-  nlinarith [h_larger, mul_pos h_h2 h_dn]
+  have h_base_lt : n_underrep * h2 + M < n_eur * h2 + M := by
+    nlinarith [h_larger, h_h2]
+  have h_shift_lt : (n_underrep + dn) * h2 + M < (n_eur + dn) * h2 + M := by
+    nlinarith [h_larger, h_h2]
+  nlinarith [h_base_lt, h_shift_lt, h1, h2', h3, h4]
 
 end ResourceAllocation
 

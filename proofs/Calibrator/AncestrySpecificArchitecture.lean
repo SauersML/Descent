@@ -76,7 +76,10 @@ noncomputable def driftVariance (p0 fst : ℝ) : ℝ :=
 theorem drift_variance_nonneg (p0 fst : ℝ)
     (h_p0 : 0 ≤ p0) (h_p0_le : p0 ≤ 1) (h_fst : 0 ≤ fst) :
     0 ≤ driftVariance p0 fst := by
-  unfold driftVariance; nlinarith
+  unfold driftVariance
+  apply mul_nonneg
+  · exact mul_nonneg h_p0 (sub_nonneg.mpr h_p0_le)
+  · exact h_fst
 
 /-- **Two-population drift variance from independent lineages.**
     For two populations diverging independently from the same

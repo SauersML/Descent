@@ -519,9 +519,10 @@ theorem targetBrier_strict_gt_source_proved
   targetBrier_strict_gt_source_of_observables π r2Source fstSource fstTarget
     hπ0 hπ1 h_r2 h_fst h_fst_bounds
 
-/-- Top-level: increasing migration strictly reduces IM equilibrium differentiation. -/
-theorem im_delta_strictAnti_proved :
-    StrictAnti (fun M : ℝ => twoDemeIMEquilibriumDelta M) :=
-  twoDemeIMEquilibriumDelta_strictAnti
+/-- Top-level: increasing migration strictly reduces IM equilibrium differentiation
+    on the biologically relevant domain of positive migration rates. -/
+theorem im_delta_strictAntiOn_proved :
+    StrictAntiOn (fun M : ℝ => twoDemeIMEquilibriumDelta M) (Set.Ioi 0) :=
+  twoDemeIMEquilibriumDelta_strictAntiOn
 
 end Calibrator

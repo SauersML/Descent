@@ -223,10 +223,20 @@ theorem worse_than_neutral_implies_diversifying_selection
   simp only
   have h_rho_sq_lt : rho ^ 2 < 1 := by nlinarith
   have h_prefactor : 0 ≤ r2_source * (1 - fst) * ld_factor := by
-    nlinarith
+    apply mul_nonneg
+    · apply mul_nonneg
+      · exact le_of_lt h_r2_pos
+      · exact sub_nonneg.mpr h_fst_le
+    · exact le_of_lt h_ld_pos
   have h_one_minus_rho_sq : 0 ≤ 1 - rho ^ 2 := by
     nlinarith
-  nlinarith [h_prefactor, h_one_minus_rho_sq]
+  have hdiff :
+      r2_source * (1 - fst) * ld_factor -
+        r2_source * (1 - fst) * rho ^ 2 * ld_factor =
+      r2_source * (1 - fst) * ld_factor * (1 - rho ^ 2) := by
+    ring
+  rw [hdiff]
+  exact mul_nonneg h_prefactor h_one_minus_rho_sq
 
 /-- **Effect size correlation between populations.**
     ρ(β_pop1, β_pop2) captures how similar genetic effects are.

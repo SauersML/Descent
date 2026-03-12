@@ -285,9 +285,8 @@ theorem harmonic_mean_reciprocal (T : ℕ) (hT : 0 < T)
   have hsum_pos : 0 < ∑ i, (1 / Ne i) := by
     apply Finset.sum_pos
     · intro i _; exact div_pos one_pos (hNe i)
-    · exact Finset.univ_nonempty
-  rw [one_div, inv_div, div_div]
-  field_simp
+    · exact ⟨⟨0, hT⟩, by simp⟩
+  field_simp [ne_of_gt hT_pos, ne_of_gt hsum_pos]
 
 /-- Replacing one generation's Ne with a smaller value decreases the harmonic mean.
     This shows bottleneck generations dominate. -/
@@ -301,12 +300,12 @@ theorem bottleneck_dominates_harmonic_mean (T : ℕ) (hT : 0 < T)
   have hs₁ : 0 < ∑ i, (1 / Ne₁ i) := by
     apply Finset.sum_pos
     · intro i _; exact div_pos one_pos (hNe₁ i)
-    · exact Finset.univ_nonempty
+    · exact ⟨⟨0, hT⟩, by simp⟩
   have hs₂ : 0 < ∑ i, (1 / Ne₂ i) := by
     apply Finset.sum_pos
     · intro i _; exact div_pos one_pos (hNe₂ i)
-    · exact Finset.univ_nonempty
-  exact div_lt_div_of_pos_left hT_pos hs₂ h_recip_larger
+    · exact ⟨⟨0, hT⟩, by simp⟩
+  exact div_lt_div_of_pos_left hT_pos hs₁ h_recip_larger
 
 /-- A single bottleneck generation (small Ne_b) makes the harmonic mean
     smaller than the arithmetic mean would suggest.
@@ -553,7 +552,7 @@ theorem ld_decay_closed_form (r D₀ : ℝ) (t : ℕ) :
   | zero =>
     simp
   | succ n ih =>
-    simp [ih, pow_succ, mul_assoc]
+    simp [ih, pow_succ, mul_assoc, mul_left_comm, mul_comm]
 
 /-- **LD magnitude decreases each generation** when 0 < r < 1 and D(t) > 0.
 
@@ -564,21 +563,17 @@ theorem ld_recurrence_decreasing (r D₀ : ℝ) (t : ℕ)
     |ldRecurrence r D₀ (t + 1)| < |ldRecurrence r D₀ t| := by
   rw [ld_decay_closed_form, ld_decay_closed_form]
   rw [pow_succ, mul_assoc, abs_mul, abs_mul, abs_mul]
-  have h_pow_pos : 0 < |(1 - r) ^ t * D₀| := by
-    rw [abs_mul]
-    apply mul_pos
-    · apply abs_pos.mpr
-      exact pow_ne_zero _ (by linarith)
-    · exact abs_pos.mpr hD₀
   have h_abs_lt : |1 - r| < 1 := by
     rw [abs_lt]
     constructor <;> linarith
-  calc |1 - r| * (|(1 - r) ^ t| * |D₀|)
-      < 1 * (|(1 - r) ^ t| * |D₀|) := by {
-        apply mul_lt_mul_of_pos_right h_abs_lt
-        apply mul_pos (abs_pos.mpr (pow_ne_zero _ (by linarith))) (abs_pos.mpr hD₀)
-      }
-    _ = |(1 - r) ^ t| * |D₀| := one_mul _
+  have h_pow_abs_pos : 0 < |(1 - r) ^ t| := by
+    exact abs_pos.mpr (pow_ne_zero _ (by linarith))
+  calc
+    |(1 - r) ^ t| * (|1 - r| * |D₀|) < |(1 - r) ^ t| * (1 * |D₀|) := by
+      apply mul_lt_mul_of_pos_left
+      · exact mul_lt_mul_of_pos_right h_abs_lt (abs_pos.mpr hD₀)
+      · exact h_pow_abs_pos
+    _ = |(1 - r) ^ t| * |D₀| := by simp
 
 /-- **LD decay ratio is strictly decreasing in t.**
 

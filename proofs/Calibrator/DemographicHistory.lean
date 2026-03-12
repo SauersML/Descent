@@ -20,14 +20,14 @@ Reference: Wang et al. (2026), Nature Communications 17:942.
 section IslandModel
 
 /-- Island model equilibrium F_ST: 1 / (1 + 4·Ne·m). -/
-noncomputable def islandModelFst (Ne m : ℝ) : ℝ :=
+noncomputable def demoIslandModelFst (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
 /-- Island model F_ST is in (0, 1) for positive Ne and m. -/
 theorem island_fst_in_unit_interval (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) :
-    0 < islandModelFst Ne m ∧ islandModelFst Ne m < 1 := by
-  unfold islandModelFst
+    0 < demoIslandModelFst Ne m ∧ demoIslandModelFst Ne m < 1 := by
+  unfold demoIslandModelFst
   constructor
   · positivity
   · rw [div_lt_one (by positivity)]; linarith [mul_pos hNe hm]
@@ -36,8 +36,8 @@ theorem island_fst_in_unit_interval (Ne m : ℝ)
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
     (h_more : m₁ < m₂) :
-    islandModelFst Ne m₂ < islandModelFst Ne m₁ := by
-  unfold islandModelFst
+    demoIslandModelFst Ne m₂ < demoIslandModelFst Ne m₁ := by
+  unfold demoIslandModelFst
   apply div_lt_div_of_pos_left one_pos (by positivity) (by nlinarith)
 
 /-- **Connection to derived formula**: `islandModelFst` equals
@@ -46,13 +46,13 @@ theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     `fstMigrationDriftEquilibrium` was derived from first principles via
     the migration-drift balance in `PortabilityDrift`. -/
 theorem islandModelFst_eq_derived (Ne m : ℝ) :
-    islandModelFst Ne m = fstMigrationDriftEquilibrium Ne m := by
-  unfold islandModelFst fstMigrationDriftEquilibrium
+    demoIslandModelFst Ne m = fstMigrationDriftEquilibrium Ne m := by
+  unfold demoIslandModelFst fstMigrationDriftEquilibrium
   ring
 
 /-- Equivalent formulation: `islandModelFst` = 1/(1 + M) where M = `scaledMigrationRate`. -/
 theorem islandModelFst_eq_from_scaledMigration (Ne m : ℝ) :
-    islandModelFst Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
+    demoIslandModelFst Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
   rw [islandModelFst_eq_derived]
   exact fstMigrationDriftEquilibrium_eq_from_M Ne m
 
@@ -62,15 +62,15 @@ end IslandModel
 section SteppingStone
 
 /-- Stepping-stone model pairwise F_ST: d / (d + 4·Ne·m·σ²). -/
-noncomputable def steppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
+noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
 /-- Stepping-stone F_ST increases with geographic distance. -/
 theorem stepping_stone_fst_increasing (d₁ d₂ Ne m σ_sq : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq)
     (hd₁ : 0 < d₁) (h_farther : d₁ < d₂) :
-    steppingStoneFst d₁ Ne m σ_sq < steppingStoneFst d₂ Ne m σ_sq := by
-  unfold steppingStoneFst
+    demoSteppingStoneFst d₁ Ne m σ_sq < demoSteppingStoneFst d₂ Ne m σ_sq := by
+  unfold demoSteppingStoneFst
   have h_C := mul_pos (mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) hNe) hm) hσ
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
@@ -79,8 +79,8 @@ theorem stepping_stone_fst_increasing (d₁ d₂ Ne m σ_sq : ℝ)
 theorem stepping_stone_fst_saturates (d Ne m σ_sq : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq)
     (hd : 0 < d) :
-    steppingStoneFst d Ne m σ_sq < 1 := by
-  unfold steppingStoneFst
+    demoSteppingStoneFst d Ne m σ_sq < 1 := by
+  unfold demoSteppingStoneFst
   rw [div_lt_one (by nlinarith [mul_pos (mul_pos hNe hm) hσ])]
   linarith [mul_pos (mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) hNe) hm) hσ]
 
@@ -144,10 +144,10 @@ noncomputable def fstFromCoalescenceTime (T Ne : ℝ) : ℝ :=
 theorem steppingStoneFst_from_coalescence_time (d Ne m σ_sq : ℝ)
     (hσ : σ_sq ≠ 0) (hm : m ≠ 0) :
     fstFromCoalescenceTime (steppingStoneCoalescenceTime d σ_sq m) (2 * Ne * σ_sq * m) =
-      steppingStoneFst d Ne m σ_sq := by
-  unfold fstFromCoalescenceTime steppingStoneCoalescenceTime steppingStoneFst
+      d / (d + 4 * Ne * σ_sq ^ 2 * m ^ 2) := by
+  unfold fstFromCoalescenceTime steppingStoneCoalescenceTime
   field_simp
-  ring
+  ring_nf
 
 /-- The coalescence time is positive for positive distance and dispersal. -/
 theorem steppingStoneCoalescenceTime_pos (d σ_sq m : ℝ)
@@ -345,7 +345,7 @@ when growth is strong (N₁ >> N₀) and sample size is moderate.
     that are singletons in a sample of n is 1/H(n-1) where H is the
     harmonic number. -/
 noncomputable def constantSizeSingletonProp (n : ℕ) : ℝ :=
-  1 / ∑ k in Finset.range (n - 1), (1 : ℝ) / ((k : ℝ) + 1)
+  1 / ((Finset.range (n - 1)).sum fun k => (1 : ℝ) / ((k : ℝ) + 1))
 
 /-- **The singleton proportion formula is conditional on the exponential growth
     model.** Under exponential growth from N₀ to N₁, the excess singleton
@@ -368,7 +368,10 @@ theorem singletonProportion_in_unit (N₀ N₁ : ℝ)
   have hlogN₁ : 0 < Real.log N₁ := Real.log_pos (by linarith)
   have hlt : Real.log N₀ < Real.log N₁ := Real.log_lt_log (by linarith) hN₁
   constructor
-  · linarith [div_lt_one_of_lt hlt (le_of_lt hlogN₁)]
+  · have hdiv : Real.log N₀ / Real.log N₁ < 1 := by
+      rw [div_lt_iff₀ hlogN₁]
+      simpa using hlt
+    nlinarith
   · rw [sub_lt_self_iff]
     exact div_pos hlogN₀ hlogN₁
 
@@ -449,7 +452,6 @@ theorem founderFst_eq_derived (k : ℕ) (t : ℕ) :
     founderFst k t = fstMutationDriftTransientDiscrete 0 (k : ℝ) t := by
   unfold founderFst fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor
   simp
-  ring
 
 end FounderEffects
 
@@ -479,11 +481,12 @@ theorem fst_variable_ne_nonneg {T : ℕ} (hT : 0 < T)
   unfold fstVariableNe
   rw [sub_nonneg, ← Real.exp_zero]
   apply Real.exp_le_exp.mpr
-  rw [neg_le_neg_iff]
-  unfold cumulativeDrift
-  apply Finset.sum_nonneg
-  intro i _
-  exact le_of_lt (div_pos one_pos (by linarith [hNe i]))
+  have hcum_nonneg : 0 ≤ cumulativeDrift Ne := by
+    unfold cumulativeDrift
+    apply Finset.sum_nonneg
+    intro i _
+    exact le_of_lt (div_pos one_pos (by linarith [hNe i]))
+  simpa using hcum_nonneg
 
 /-- Fst under variable Ne is strictly less than 1. -/
 theorem fst_variable_ne_lt_one {T : ℕ} (Ne : Fin T → ℝ) :
@@ -514,7 +517,7 @@ theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
   apply Finset.sum_lt_sum
   · intro i _
     exact le_of_lt (div_lt_div_of_pos_left one_pos (by linarith [hNe₂ i]) (by linarith [h_smaller i]))
-  · obtain ⟨j, hj⟩ := Finset.univ_nonempty (α := Fin T)
+  · let j : Fin T := ⟨0, hT⟩
     exact ⟨j, Finset.mem_univ j,
       div_lt_div_of_pos_left one_pos (by linarith [hNe₂ j]) (by linarith [h_smaller j])⟩
 
@@ -597,7 +600,7 @@ theorem excessDriftRate_pos (Ne_b Ne_stable : ℝ)
     per subsequent generation. The cumulative excess is:
     Σ_{k=0}^{t_b-1} (1-1/(2·Ne_b))^k × excessDriftRate(Ne_b, Ne_stable) -/
 noncomputable def cumulativeExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ) : ℝ :=
-  ∑ k in Finset.range t_b,
+  (Finset.range t_b).sum fun k =>
     (1 - 1 / (2 * Ne_b)) ^ k * excessDriftRate Ne_b Ne_stable
 
 /-- **Closed-form of cumulative excess LD via geometric sum.**
@@ -611,7 +614,7 @@ theorem cumulativeExcessLD_eq_closedForm (Ne_b Ne_stable : ℝ) (t_b : ℕ)
     (hNb : 0 < Ne_b) (hNs : 0 < Ne_stable) :
     cumulativeExcessLD Ne_b Ne_stable t_b =
       excessDriftRate Ne_b Ne_stable *
-        ∑ k in Finset.range t_b, (1 - 1 / (2 * Ne_b)) ^ k := by
+        ((Finset.range t_b).sum fun k => (1 - 1 / (2 * Ne_b)) ^ k) := by
   unfold cumulativeExcessLD
   rw [Finset.mul_sum]
   congr 1
@@ -621,19 +624,19 @@ theorem cumulativeExcessLD_eq_closedForm (Ne_b Ne_stable : ℝ) (t_b : ℕ)
 /-- The geometric sum Σ_{k=0}^{n-1} r^k equals (1 - r^n) / (1 - r) for r ≠ 1.
     Specialized to r = 1 - 1/(2·Ne_b), so 1 - r = 1/(2·Ne_b). -/
 theorem geom_sum_drift (Ne_b : ℝ) (t_b : ℕ) (hNb : 0 < Ne_b) :
-    ∑ k in Finset.range t_b, (1 - 1 / (2 * Ne_b)) ^ k =
+    ((Finset.range t_b).sum fun k => (1 - 1 / (2 * Ne_b)) ^ k) =
       (1 - (1 - 1 / (2 * Ne_b)) ^ t_b) / (1 / (2 * Ne_b)) := by
   have h2Ne : (0 : ℝ) < 2 * Ne_b := by linarith
-  have h_ne : 1 - (1 - 1 / (2 * Ne_b)) ≠ 0 := by
-    rw [sub_sub_cancel_left]
-    exact ne_of_gt (div_pos one_pos h2Ne)
   have h_base_ne_one : 1 - 1 / (2 * Ne_b) ≠ 1 := by
-    intro heq
-    have := sub_eq_self.mp heq
-    linarith [div_pos one_pos h2Ne]
-  rw [Finset.geom_sum_eq h_base_ne_one t_b]
-  congr 1
-  ring
+    intro h
+    nlinarith [div_pos one_pos h2Ne]
+  calc
+    ((Finset.range t_b).sum fun k => (1 - 1 / (2 * Ne_b)) ^ k)
+      = (((1 - 1 / (2 * Ne_b)) ^ t_b - 1) / ((1 - 1 / (2 * Ne_b)) - 1)) := by
+          simpa using geom_sum_eq h_base_ne_one t_b
+    _ = (1 - (1 - 1 / (2 * Ne_b)) ^ t_b) / (1 / (2 * Ne_b)) := by
+          field_simp [ne_of_gt h2Ne]
+          ring
 
 /-- **Key derivation**: The closed-form excess drift rate times the geometric sum
     yields the bottleneck excess LD formula.

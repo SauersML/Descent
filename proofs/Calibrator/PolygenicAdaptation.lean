@@ -293,7 +293,7 @@ theorem stabilizing_maintains_architecture
   have h_denom : 1 < 1 + s * N := by linarith
   have h_denom_pos : 0 < 1 + s * N := by linarith
   have h_frac_lt : d / (1 + s * N) < d := by
-    rw [div_lt_iff h_denom_pos]
+    rw [div_lt_iff₀ h_denom_pos]
     nlinarith
   nlinarith
 
@@ -324,7 +324,7 @@ theorem fluctuating_selection_worst_portability
     linarith [mul_lt_mul_of_pos_left (show (1 : ℝ) < 1 + f * N by linarith) h_d_pos]
   · -- ρ_neutral < ρ_stab: 1 - d < 1 - d/(1+sN) ↔ d/(1+sN) < d
     have h_frac_lt : d / (1 + s * N) < d := by
-      rw [div_lt_iff h_denom_pos]
+      rw [div_lt_iff₀ h_denom_pos]
       nlinarith
     nlinarith
 

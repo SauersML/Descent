@@ -311,9 +311,8 @@ theorem cross_ancestry_ld_bias
     c * fst * σ / τ < c * (2 * fst) * σ / τ := by
   constructor
   · apply div_pos _ h_τ; positivity
-  · rw [div_lt_div_iff_right h_τ]
-    ring_nf
-    nlinarith
+  · apply div_lt_div_of_pos_right _ h_τ
+    nlinarith [mul_pos h_c (mul_pos h_fst h_σ)]
 
 /-- **In-sample LD reference is optimal.**
     Using LD reference from the same population as GWAS minimizes bias.

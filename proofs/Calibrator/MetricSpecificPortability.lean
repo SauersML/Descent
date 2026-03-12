@@ -135,7 +135,7 @@ theorem R2DecompositionData.r2_eq_disc_mul_cal (d : R2DecompositionData) :
 theorem R2DecompositionData.r2_le_discrimination (d : R2DecompositionData) :
     d.r2 ≤ d.discrimination := by
   unfold r2 discrimination
-  apply div_le_div_of_nonneg_right d.hCondE_le_Yhat d.hVarY_pos
+  exact div_le_div_of_nonneg_right d.hCondE_le_Yhat (le_of_lt d.hVarY_pos)
 
 /-- **R² is nonneg** (immediate from positive components). -/
 theorem R2DecompositionData.r2_nonneg (d : R2DecompositionData) :
@@ -147,13 +147,15 @@ theorem R2DecompositionData.r2_nonneg (d : R2DecompositionData) :
 theorem R2DecompositionData.r2_le_one (d : R2DecompositionData) :
     d.r2 ≤ 1 := by
   unfold r2
-  exact div_le_one_of_le d.hCondE_le_Y (le_of_lt d.hVarY_pos)
+  rw [div_le_iff₀ d.hVarY_pos]
+  simpa using d.hCondE_le_Y
 
 /-- **Discrimination is in [0, 1]**. -/
 theorem R2DecompositionData.disc_le_one (d : R2DecompositionData) :
     d.discrimination ≤ 1 := by
   unfold discrimination
-  exact div_le_one_of_le d.hYhat_le_Y (le_of_lt d.hVarY_pos)
+  rw [div_le_iff₀ d.hVarY_pos]
+  simpa using d.hYhat_le_Y
 
 theorem R2DecompositionData.disc_pos (d : R2DecompositionData) :
     0 < d.discrimination := by
@@ -164,7 +166,8 @@ theorem R2DecompositionData.disc_pos (d : R2DecompositionData) :
 theorem R2DecompositionData.cal_le_one (d : R2DecompositionData) :
     d.calibration ≤ 1 := by
   unfold calibration
-  exact div_le_one_of_le d.hCondE_le_Yhat (le_of_lt d.hVarYhat_pos)
+  rw [div_le_iff₀ d.hVarYhat_pos]
+  simpa using d.hCondE_le_Yhat
 
 theorem R2DecompositionData.cal_pos (d : R2DecompositionData) :
     0 < d.calibration := by
@@ -236,8 +239,8 @@ theorem r2_less_portable_than_auc_from_decomposition
   rw [h_tgt_r2, h_src_r2_eq]
   have h_src_disc_pos : 0 < source.discrimination := source.disc_pos
   have h_tgt_disc_pos : 0 < target.discrimination := target.disc_pos
-  rw [mul_div_assoc]
-  exact mul_lt_of_lt_one_right (div_pos h_tgt_disc_pos h_src_disc_pos) h_tgt_cal_lt
+  apply div_lt_div_of_pos_right _ h_src_disc_pos
+  nlinarith
 
 /-- **Cross-population R² ratio equals product of component ratios**.
 
@@ -260,6 +263,7 @@ theorem r2_portability_ratio_factorization
   have h_src_r2_eq : source.r2 = source.discrimination := by
     rw [h_src_r2, h_src_cal, mul_one]
   rw [h_tgt_r2, h_src_r2_eq, mul_div_assoc]
+  ring
 
 end R2Decomposition
 
@@ -504,7 +508,7 @@ section PrecisionRecall
 /-- **Precision (PPV) of high-risk classification.**
     PPV = P(actually high risk | PGS says high risk).
     Depends on prevalence via Bayes' theorem. -/
-noncomputable def ppv (sensitivity specificity prevalence : ℝ) : ℝ :=
+noncomputable def metricPPV (sensitivity specificity prevalence : ℝ) : ℝ :=
   sensitivity * prevalence /
     (sensitivity * prevalence + (1 - specificity) * (1 - prevalence))
 
@@ -521,8 +525,8 @@ theorem ppv_changes_with_prevalence
     (h_K1 : 0 < K₁) (h_K1' : K₁ < 1)
     (h_K2 : 0 < K₂) (h_K2' : K₂ < 1)
     (h_diff : K₁ ≠ K₂) :
-    ppv se sp K₁ ≠ ppv se sp K₂ := by
-  unfold ppv
+    metricPPV se sp K₁ ≠ metricPPV se sp K₂ := by
+  unfold metricPPV
   intro h
   apply h_diff
   -- Cross-multiply and simplify
@@ -603,7 +607,7 @@ theorem different_uses_different_metrics
     (h_Ks : 0 < K_source) (h_Ks' : K_source < 1)
     (h_Kt : 0 < K_target) (h_Kt' : K_target < 1)
     (h_diff : K_source ≠ K_target) :
-    ppv se sp K_source ≠ ppv se sp K_target :=
+    metricPPV se sp K_source ≠ metricPPV se sp K_target :=
   ppv_changes_with_prevalence se sp K_source K_target h_se h_sp h_sp1
     h_Ks h_Ks' h_Kt h_Kt' h_diff
 

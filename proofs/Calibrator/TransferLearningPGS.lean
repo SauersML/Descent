@@ -52,12 +52,6 @@ structure PGSModel (m : ℕ) where
   var_y_source_pos : 0 < var_y_source
   var_y_target_pos : 0 < var_y_target
 
-/-- PGS variance in a population: Var(PGS) = β' Σ β = Σᵢ Σⱼ βᵢ βⱼ Σᵢⱼ.
-    This is the quadratic form of the weight vector under the LD matrix. -/
-noncomputable def pgsVariance {m : ℕ} (β : Fin m → ℝ)
-    (ld : Fin m → Fin m → ℝ) : ℝ :=
-  ∑ i : Fin m, ∑ j : Fin m, β i * ld i j * β j
-
 /-- Covariance between PGS (using source weights) and the genetic component
     of the phenotype in a given population:
     Cov(PGS, Y_genetic) = Σᵢ Σⱼ β_source_i × Σᵢⱼ × β_causal_j
@@ -76,7 +70,7 @@ noncomputable def pgsR2 {m : ℕ} (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ 
     where the covariance is over the set of causal variants.
     Equivalently, rg = Σᵢ β_source_i × β_target_i / √(Σᵢ β_source_i² × Σⱼ β_target_j²)
     when effect sizes are mean-zero. -/
-noncomputable def geneticCorrelation {m : ℕ} (β_source β_target : Fin m → ℝ) : ℝ :=
+noncomputable def effectGeneticCorrelation {m : ℕ} (β_source β_target : Fin m → ℝ) : ℝ :=
   (∑ i : Fin m, β_source i * β_target i) /
     Real.sqrt ((∑ i : Fin m, β_source i ^ 2) * (∑ i : Fin m, β_target i ^ 2))
 
@@ -99,33 +93,16 @@ theorem effect_size_cauchy_schwarz {m : ℕ}
     (h_cross : cross = ∑ i : Fin m, β_s i * β_t i) :
     cross ^ 2 ≤ sum_s_sq * sum_t_sq := by
   subst h_ss; subst h_tt; subst h_cross
-  -- Use Finset.inner_mul_le_norm_mul_sq from Mathlib:
-  -- For real-valued functions on Fin m, the discrete Cauchy-Schwarz states
-  -- (Σ f g)² ≤ (Σ f²)(Σ g²). We derive this from the standard algebraic
-  -- proof: 0 ≤ Σᵢ Σⱼ (fᵢ gⱼ - fⱼ gᵢ)² which expands to
-  -- 2((Σ f²)(Σ g²) - (Σ fg)²) ≥ 0.
-  have key : 0 ≤ ∑ i : Fin m, ∑ j : Fin m,
-      (β_s i * β_t j - β_s j * β_t i) ^ 2 := by
-    apply Finset.sum_nonneg
-    intro i _
-    apply Finset.sum_nonneg
-    intro j _
-    exact sq_nonneg _
-  -- Expanding: Σᵢ Σⱼ (aᵢ bⱼ - aⱼ bᵢ)² = 2((Σ a²)(Σ b²) - (Σ ab)²)
-  -- So (Σ ab)² ≤ (Σ a²)(Σ b²).
-  nlinarith [sq_nonneg (∑ i : Fin m, β_s i * β_t i),
-             Finset.sum_nonneg (fun i (_ : i ∈ Finset.univ) => sq_nonneg (β_s i)),
-             Finset.sum_nonneg (fun i (_ : i ∈ Finset.univ) => sq_nonneg (β_t i)),
-             key]
+  simpa using sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (Fin m)) β_s β_t
 
 /-- **Genetic correlation is bounded by [-1, 1].**
     |rg| ≤ 1 follows directly from Cauchy-Schwarz on effect sizes. -/
-theorem genetic_correlation_bounded {m : ℕ}
+theorem effect_genetic_correlation_bounded {m : ℕ}
     (β_s β_t : Fin m → ℝ)
     (h_s_nonzero : 0 < ∑ i : Fin m, β_s i ^ 2)
     (h_t_nonzero : 0 < ∑ i : Fin m, β_t i ^ 2) :
-    (geneticCorrelation β_s β_t) ^ 2 ≤ 1 := by
-  unfold geneticCorrelation
+    (effectGeneticCorrelation β_s β_t) ^ 2 ≤ 1 := by
+  unfold effectGeneticCorrelation
   rw [div_pow]
   rw [Real.sq_sqrt (by positivity : 0 ≤ (∑ i, β_s i ^ 2) * (∑ i, β_t i ^ 2))]
   rw [div_le_one (by positivity)]
