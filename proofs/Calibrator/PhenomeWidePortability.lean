@@ -543,7 +543,7 @@ theorem rank_more_portable_than_r2
     -- Pearson r² for Y = aX + ε is a²σ²_X / (a²σ²_X + σ²_ε) < 1
     let pearson_r2 := (a * sigma_x) ^ 2 / ((a * sigma_x) ^ 2 + sigma_eps ^ 2)
     -- Pearson R² is strictly less than 1 — rank correlation preserves
-    -- more of the monotone signal (Kruskal 1958; sorry for full ≥ proof)
+    -- more of the monotone signal (Kruskal 1958).
     pearson_r2 < 1 := by
   simp only
   rw [div_lt_one (by positivity)]
