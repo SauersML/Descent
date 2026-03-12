@@ -242,18 +242,13 @@ theorem truncationBias_nonneg (se beta z_alpha : ℝ) (h_se : 0 < se) (h_beta : 
     Consequently E[β̂ | selected] → β (no winner's curse bias) in
     the high-power limit.
 
-    **Note on the downstream asymptotic formula.** The formula
-    E[β̂ | selected] ≈ β + σ/√n used in `winnersCurse_asymptotic_derivation`
-    below applies to a *different regime*: variants near the significance
-    threshold (moderate NCP), where the truncation bias is approximately SE.
-    The present lemma characterises the complementary high-power regime.
+    The present lemma characterises the high-power regime directly and is
+    the input for `winnersCurse_high_signal_derivation` below.
 
     Proof sketch: `truncationBias se β z_α = se · exp(−(z_α − β/se)²/2) / √(2π)`.
     As β/se → ∞, let u = z_α − β/se → −∞. Then exp(−u²/2) → 0, and
     the result follows from `Real.tendsto_exp_atBot` composed with the
-    quadratic divergence of u².  A full proof requires `Filter.Tendsto`
-    machinery and is left as `sorry` pending Mathlib measure-theory
-    integration. -/
+    quadratic divergence of u². -/
 theorem truncationBias_vanishes_large_signal (se : ℝ) (h_se : 0 < se) :
   ∀ delta : ℝ, 0 < delta →
     ∀ z_alpha : ℝ, 0 < z_alpha →
@@ -300,26 +295,30 @@ theorem truncationBias_vanishes_large_signal (se : ℝ) (h_se : 0 < se) :
     field_simp [h_se.ne', Real.sqrt_ne_zero'.mpr (by positivity : 0 < 2 * Real.pi)]
   exact h_scaled.trans_eq h_target
 
-/-- **Truncation bias near the significance threshold approximates SE.**
+/-- **Truncation bias becomes negligible for sufficiently strong signal.**
 
-    For variants with moderate signal strength (β/SE in a neighbourhood
-    of z_α), the truncation bias is approximately SE.  This is the regime
-    where the inverse Mills ratio φ(z_α − β/SE)/Φ(β/SE − z_α) ≈ 1.
-
-    The `winnersCurse_asymptotic_derivation` theorem below uses this
-    fact.  Because a rigorous proof requires quantitative bounds on the
-    Mills ratio (which are available in the literature but not yet in
-    Mathlib), we mark this `sorry`.
-
-    Reference: Gordon (1941), "Values of Mills' ratio of area to bounding
-    ordinate and of the normal probability integral for large values of
-    the argument." -/
-theorem truncationBias_approx_se_moderate_signal (se : ℝ) (h_se : 0 < se) :
+    For the concrete proxy `truncationBias` formalized in this file,
+    the exponential tail term forces the bias toward `0` once `β / SE`
+    is sufficiently large. This is the regime compatible with the
+    computable numerator `SE * φ(z_α - β / SE)` used here. -/
+theorem truncationBias_small_for_large_signal (se : ℝ) (h_se : 0 < se) :
   ∀ delta : ℝ, 0 < delta →
-    ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / se →
-      ∀ z_alpha : ℝ, 0 < z_alpha →
-        |truncationBias se beta z_alpha - se| < delta := by
-  sorry
+    ∀ z_alpha : ℝ, 0 < z_alpha →
+      ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / se →
+        |truncationBias se beta z_alpha| < delta := by
+  intro delta h_delta
+  intro z_alpha h_zalpha
+  obtain ⟨threshold, hthreshold⟩ := truncationBias_vanishes_large_signal se h_se delta h_delta z_alpha h_zalpha
+  refine ⟨threshold, ?_⟩
+  intro beta h_beta
+  have h_lt : truncationBias se beta z_alpha < delta := hthreshold beta h_beta
+  have h_nonneg : 0 ≤ truncationBias se beta z_alpha := by
+    unfold truncationBias
+    apply div_nonneg
+    · apply mul_nonneg (le_of_lt h_se)
+      exact le_of_lt (Real.exp_pos _)
+    · exact Real.sqrt_nonneg _
+  simpa [abs_of_nonneg h_nonneg] using h_lt
 
 /-- **Derivation: Winner's curse conditional expectation.**
     Under the GWAS model β̂ = β + ε, with ε ~ N(0, SE²),
@@ -335,42 +334,34 @@ theorem conditional_expectation_decomposition
       true_beta + conditional_noise_mean := by
   ring
 
-/-- **Derivation: winner's curse formula for moderate-signal variants.**
-    Combining the model (β̂ = β + ε), the selection event, and the
-    truncation bias approximation (E[ε | selected] ≈ SE for variants
-    near the significance threshold), we derive:
+/-- **Derivation: winner's curse bias vanishes in the high-signal regime.**
+    Combining the model (β̂ = β + ε) with the exponential proxy
+    `truncationBias`, we obtain a formal high-signal statement:
 
-        E[β̂ | selected] ≈ β + σ/√n
+        E[β̂ | selected] ≈ β
 
-    This approximation applies to the *moderate-signal regime* where
-    β/SE is in a neighbourhood of z_α.  For very strong signals
-    (β >> SE), the bias vanishes (see `truncationBias_vanishes_large_signal`).
-
-    This theorem states that for any approximation tolerance δ > 0,
-    there exists a signal strength threshold beyond which the winner's
-    curse formula β + σ/√n is within δ of the true conditional
-    expectation.  It relies on `truncationBias_approx_se_moderate_signal`
-    which is currently marked `sorry`. -/
-theorem winnersCurse_asymptotic_derivation (m : GWASObservationModel)
+    for sufficiently large `β / SE`. This matches the behaviour proved
+    above for `truncationBias_vanishes_large_signal`. -/
+theorem winnersCurse_high_signal_derivation (m : GWASObservationModel)
     (delta : ℝ) (h_delta : 0 < delta) :
-    ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / m.standardError →
-      ∀ z_alpha : ℝ, 0 < z_alpha →
+    ∀ z_alpha : ℝ, 0 < z_alpha →
+      ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / m.standardError →
         |beta + truncationBias m.standardError beta z_alpha -
-          (beta + m.standardError)| < delta := by
-  -- The difference simplifies to |truncationBias SE β z_α - SE|
-  -- which is small for moderate-signal variants by truncationBias_approx_se_moderate_signal
-  obtain ⟨thr, h_thr⟩ := truncationBias_approx_se_moderate_signal m.standardError m.se_pos delta h_delta
-  exact ⟨thr, fun beta h_beta z_alpha h_za => by
+          beta| < delta := by
+  intro z_alpha h_za
+  obtain ⟨thr, h_thr⟩ :=
+    truncationBias_small_for_large_signal m.standardError m.se_pos delta h_delta z_alpha h_za
+  exact ⟨thr, fun beta h_beta => by
     have : |beta + truncationBias m.standardError beta z_alpha -
-            (beta + m.standardError)| =
-           |truncationBias m.standardError beta z_alpha - m.standardError| := by
+            beta| =
+           |truncationBias m.standardError beta z_alpha| := by
       congr 1; ring
     rw [this]
-    exact h_thr beta h_beta z_alpha h_za⟩
+    exact h_thr beta h_beta⟩
 
 /-- **The standard error equals σ/√n.**
-    This connects the model's SE back to the concrete expression,
-    confirming that the asymptotic derivation yields β + σ/√n. -/
+    This connects the model's SE back to the concrete expression used
+    throughout the winner's-curse heuristics in this file. -/
 theorem se_equals_sigma_over_sqrt_n (m : GWASObservationModel) :
     m.standardError = m.sigma / Real.sqrt m.n := by
   unfold GWASObservationModel.standardError
@@ -385,22 +376,17 @@ end WinnersCurseDerivation
 Significant GWAS associations have inflated effect size estimates.
 This inflation is worse for less powered studies and biases PGS.
 
-The definition below is the asymptotic formula derived in the section
-above: E[β̂ | selected] ≈ β + σ/√n, which holds when the true signal
-strength β is large relative to the standard error SE = σ/√n.
+The definition below records the common heuristic correction
+`β + σ/√n`. The formal theorem in the section above proves the
+complementary large-signal fact that the explicit `truncationBias`
+proxy itself becomes negligible.
 -/
 
 section WinnersCurse
 
-/-- **Winner's curse inflation factor (asymptotic form).**
-    Derived above from the GWAS observation model β̂ = β + ε with
-    ε ~ N(0, σ²/n) and significance thresholding |β̂/SE| > z_α.
-    In the high-power regime (β >> SE), the truncation bias
-    E[ε | selected] → SE = σ/√n, giving:
-
-        E[β̂ | selected] ≈ β + σ/√n
-
-    See `winnersCurse_asymptotic_derivation` for the formal derivation. -/
+/-- **Winner's curse inflation factor (heuristic form).**
+    This definition packages the common approximation `β + σ/√n`
+    used in applied discussions of winner's-curse inflation. -/
 noncomputable def winnersCurseInflation (true_beta sigma : ℝ) (n : ℕ) : ℝ :=
   true_beta + sigma / Real.sqrt n
 
