@@ -1524,16 +1524,6 @@ theorem covarianceDivergenceFromRetention_eq (fst shared_ld : ℝ) :
   unfold covarianceDivergenceFromRetention
   rw [covarianceRetention_from_fst_ld]
 
-/-- **The derived formula matches the existing definition.**
-    This connects the derivation from covariance principles back to
-    `covarianceDivergenceMutationDrift`, confirming the multiplicative
-    structure is not merely assumed but follows from the independence
-    of allele frequency drift and LD decay. -/
-theorem covarianceDivergence_derivation_matches (fst shared_ld : ℝ) :
-    covarianceDivergenceFromRetention fst shared_ld =
-      covarianceDivergenceMutationDrift fst shared_ld := by
-  rw [covarianceDivergenceFromRetention_eq, covarianceDivergenceMutationDrift_eq]
-
 /-- **Generalized covariance divergence under mutation-drift.**
     The total covariance divergence between source and target populations
     includes both:
@@ -1551,6 +1541,16 @@ theorem covarianceDivergenceMutationDrift_eq (fst_drift shared_ld : ℝ) :
     covarianceDivergenceMutationDrift fst_drift shared_ld = 1 - (1 - fst_drift) * shared_ld := by
   unfold covarianceDivergenceMutationDrift
   ring
+
+/-- **The derived formula matches the existing definition.**
+    This connects the derivation from covariance principles back to
+    `covarianceDivergenceMutationDrift`, confirming the multiplicative
+    structure is not merely assumed but follows from the independence
+    of allele frequency drift and LD decay. -/
+theorem covarianceDivergence_derivation_matches (fst shared_ld : ℝ) :
+    covarianceDivergenceFromRetention fst shared_ld =
+      covarianceDivergenceMutationDrift fst shared_ld := by
+  rw [covarianceDivergenceFromRetention_eq, covarianceDivergenceMutationDrift_eq]
 
 /-- With perfect shared LD (shared_ld = 1), covariance divergence reduces to pure drift. -/
 theorem covarianceDivergence_pure_drift (fst_drift : ℝ) :
