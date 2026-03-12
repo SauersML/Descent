@@ -121,7 +121,7 @@ noncomputable def DemographicCoalescenceScalars.delta
     d.delta = 1 - d.ETss / d.ETst := by
   rfl
 
-noncomputable def twoDemeIMEquilibriumETss (M : ℝ) : ℝ := 2
+noncomputable def twoDemeIMEquilibriumETss (_M : ℝ) : ℝ := 2
 
 noncomputable def twoDemeIMEquilibriumETst (M : ℝ) : ℝ :=
   (2 * M + 1) / M
@@ -556,7 +556,7 @@ theorem source_erm_is_ld_specific_of_normal_eq_mismatch
     (sigmaObsSource sigmaObsTarget : Matrix (Fin p) (Fin p) Real)
     (crossSource crossTarget : Fin p -> Real)
     (wSource : Fin p -> Real)
-    (hSource : sigmaObsSource.mulVec wSource = crossSource)
+    (_hSource : sigmaObsSource.mulVec wSource = crossSource)
     (hMismatch : sigmaObsTarget.mulVec wSource ≠ crossTarget) :
     ¬ sigmaObsTarget.mulVec wSource = crossTarget := by
   intro hContra
@@ -1584,7 +1584,7 @@ theorem covarianceDivergence_pure_mutation (shared_ld : ℝ) :
 
 /-- Covariance divergence is at least the drift component alone when shared LD ≤ 1. -/
 theorem covarianceDivergence_ge_drift (fst_drift shared_ld : ℝ)
-    (hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
+    (_hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
     (hld : shared_ld ≤ 1) :
     fst_drift ≤ covarianceDivergenceMutationDrift fst_drift shared_ld := by
   unfold covarianceDivergenceMutationDrift
@@ -1595,7 +1595,7 @@ theorem covarianceDivergence_ge_drift (fst_drift shared_ld : ℝ)
 /-- Covariance divergence is at most 1 when parameters are in [0, 1]. -/
 theorem covarianceDivergence_le_one (fst_drift shared_ld : ℝ)
     (hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
-    (hld : 0 ≤ shared_ld) (hld_le : shared_ld ≤ 1) :
+    (hld : 0 ≤ shared_ld) (_hld_le : shared_ld ≤ 1) :
     covarianceDivergenceMutationDrift fst_drift shared_ld ≤ 1 := by
   rw [covarianceDivergenceMutationDrift_eq]
   have h1 : 0 ≤ (1 - fst_drift) * shared_ld := by
@@ -1625,7 +1625,7 @@ theorem presentDayPGSVarianceMutationDrift_pure_drift (V_A fst_drift : ℝ) :
 
 /-- Signal retention is nonneg under valid parameters. -/
 theorem presentDayPGSVarianceMutationDrift_nonneg (V_A fst_drift shared_ld : ℝ)
-    (hVA : 0 ≤ V_A) (hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
+    (hVA : 0 ≤ V_A) (_hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
     (hld : 0 ≤ shared_ld) :
     0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld := by
   rw [presentDayPGSVarianceMutationDrift_eq]
@@ -1691,8 +1691,8 @@ theorem mutationDriftTransportRatio_pure_drift (fstSource fstTarget : ℝ) :
 theorem mutationDrift_transport_lt_drift_transport
     (fstSource fstTarget shared_ld_source shared_ld_target : ℝ)
     (hfstS : fstSource < 1) (hfstT : fstTarget < 1)
-    (hldS : 0 < shared_ld_source) (hldS_le : shared_ld_source ≤ 1)
-    (hldT : 0 < shared_ld_target)
+    (hldS : 0 < shared_ld_source) (_hldS_le : shared_ld_source ≤ 1)
+    (_hldT : 0 < shared_ld_target)
     (hld_decay : shared_ld_target / shared_ld_source < 1) :
     mutationDriftTransportRatio fstSource fstTarget shared_ld_source shared_ld_target <
       driftTransportRatio fstSource fstTarget := by
@@ -1727,7 +1727,7 @@ noncomputable def equilibriumPortabilityR2
     of signal retention. -/
 theorem equilibrium_drift_component_improves_with_theta
     (V_A θ₁ θ₂ : ℝ)
-    (hVA : 0 < V_A) (hθ₁ : 0 < θ₁) (hθ₂ : 0 < θ₂)
+    (hVA : 0 < V_A) (hθ₁ : 0 < θ₁) (_hθ₂ : 0 < θ₂)
     (h_more : θ₁ < θ₂) :
     presentDayPGSVariance V_A (1 / (1 + θ₁)) <
       presentDayPGSVariance V_A (1 / (1 + θ₂)) := by
@@ -1770,9 +1770,9 @@ theorem mutationDrift_variance_ratio (V_A fst shared_ld : ℝ)
     To convert drift-only portability predictions to mutation-drift predictions,
     multiply by the shared LD fraction. This gives the exact correction. -/
 theorem portability_correction_factor (V_A V_E fst_target shared_ld : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst : 0 ≤ fst_target) (hfst_lt : fst_target < 1)
-    (hld : 0 < shared_ld) (hld_le : shared_ld ≤ 1) :
+    (_hVA : 0 < V_A) (_hVE : 0 < V_E)
+    (_hfst : 0 ≤ fst_target) (_hfst_lt : fst_target < 1)
+    (_hld : 0 < shared_ld) (_hld_le : shared_ld ≤ 1) :
     presentDayPGSVarianceMutationDrift V_A fst_target shared_ld =
       shared_ld * presentDayPGSVariance V_A fst_target := by
   rw [presentDayPGSVarianceMutationDrift_eq]
@@ -1866,7 +1866,7 @@ theorem fstMigrationDriftEquilibrium_in_unit (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0
 /-- **Equilibrium Fst decreases with migration rate** (Ne fixed).
     More migration → more gene flow → less differentiation. -/
 theorem fstMigrationDriftEquilibrium_decreases_with_m (Ne m₁ m₂ : ℝ)
-    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂) (h_more : m₁ < m₂) :
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (_hm₂ : 0 < m₂) (h_more : m₁ < m₂) :
     fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
   unfold fstMigrationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
@@ -1874,7 +1874,7 @@ theorem fstMigrationDriftEquilibrium_decreases_with_m (Ne m₁ m₂ : ℝ)
 /-- **Equilibrium Fst decreases with effective population size** (m fixed).
     Larger Ne → slower drift relative to migration → less differentiation. -/
 theorem fstMigrationDriftEquilibrium_decreases_with_Ne (Ne₁ Ne₂ m : ℝ)
-    (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (hm : 0 < m) (h_more : Ne₁ < Ne₂) :
+    (hNe₁ : 0 < Ne₁) (_hNe₂ : 0 < Ne₂) (hm : 0 < m) (h_more : Ne₁ < Ne₂) :
     fstMigrationDriftEquilibrium Ne₂ m < fstMigrationDriftEquilibrium Ne₁ m := by
   unfold fstMigrationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
@@ -1887,7 +1887,7 @@ theorem fstMigrationDriftEquilibrium_decreases_with_Ne (Ne₁ Ne₂ m : ℝ)
     equilibrium Fst with migration is below the coalescent Fst at separation time t
     when t is large enough relative to Ne. -/
 theorem migration_reduces_fst_vs_pure_drift (Ne m t : ℝ)
-    (hNe : 0 < Ne) (hm : 0 < m) (ht : 0 < t)
+    (_hNe : 0 < Ne) (_hm : 0 < m) (_ht : 0 < t)
     (h_large_t : 1 / (1 + 4 * Ne * m) < t / (t + 2 * Ne)) :
     fstMigrationDriftEquilibrium Ne m < t / (t + 2 * Ne) := by
   unfold fstMigrationDriftEquilibrium
@@ -2048,7 +2048,7 @@ theorem sharedLDFromMigration_lt_one (M : ℝ) (hM : 0 ≤ M) :
 /-- **Shared LD fraction increases with migration rate.**
     More migration → more shared LD → better PGS portability. -/
 theorem sharedLDFromMigration_increases (M₁ M₂ : ℝ)
-    (hM₁ : 0 < M₁) (hM₂ : 0 < M₂) (h_more : M₁ < M₂) :
+    (hM₁ : 0 < M₁) (_hM₂ : 0 < M₂) (h_more : M₁ < M₂) :
     sharedLDFromMigration M₁ < sharedLDFromMigration M₂ := by
   unfold sharedLDFromMigration
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
@@ -2133,7 +2133,7 @@ theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
     migration strictly improves the R² portability ratio. We show that at
     migration-drift equilibrium, the Fst is lower than under pure drift to t=∞. -/
 theorem migration_improves_R2_over_pure_drift (V_A V_E Ne m : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E) (hNe : 0 < Ne) (hm : 0 < m)
+    (hVA : 0 < V_A) (hVE : 0 < V_E) (_hNe : 0 < Ne) (_hm : 0 < m)
     (fst_nomial : ℝ) (hfst_pure : fstMigrationDriftEquilibrium Ne m < fst_nomial)
     (hfst_nomial_lt : fst_nomial < 1) :
     presentDayR2 V_A V_E fst_nomial < presentDayR2 V_A V_E (fstMigrationDriftEquilibrium Ne m) := by
@@ -2210,7 +2210,7 @@ noncomputable def admixtureLDDecay (r : ℝ) (generations_since : ℕ) : ℝ :=
 
 /-- Admixture LD decay is nonneg for recombination rate in [0, 1]. -/
 theorem admixtureLDDecay_nonneg (r : ℝ) (t : ℕ)
-    (hr : 0 ≤ r) (hr1 : r ≤ 1) :
+    (_hr : 0 ≤ r) (hr1 : r ≤ 1) :
     0 ≤ admixtureLDDecay r t := by
   unfold admixtureLDDecay
   exact pow_nonneg (by linarith) t
@@ -2233,7 +2233,7 @@ theorem admixtureLDDecay_decreases_with_time (r : ℝ) (t₁ t₂ : ℕ)
 
 /-- **Admixture LD decays faster with higher recombination rate.** -/
 theorem admixtureLDDecay_decreases_with_recombination (r₁ r₂ : ℝ) (t : ℕ)
-    (hr₁ : 0 < r₁) (hr₂ : 0 < r₂) (hr₁1 : r₁ < 1) (hr₂1 : r₂ < 1)
+    (_hr₁ : 0 < r₁) (_hr₂ : 0 < r₂) (_hr₁1 : r₁ < 1) (hr₂1 : r₂ < 1)
     (h_more : r₁ < r₂) (ht : 0 < t) :
     admixtureLDDecay r₂ t < admixtureLDDecay r₁ t := by
   unfold admixtureLDDecay
@@ -2255,8 +2255,8 @@ noncomputable def admixtureLDBoost (r : ℝ) (t_since : ℕ) (equilibrium_ld : �
 
 /-- Admixture LD boost exceeds 1 when admixture LD is above equilibrium. -/
 theorem admixtureLDBoost_gt_one (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ)
-    (hr : 0 ≤ r) (hr1 : r ≤ 1)
-    (heq_pos : 0 < equilibrium_ld) (heq_lt : equilibrium_ld < 1)
+    (_hr : 0 ≤ r) (_hr1 : r ≤ 1)
+    (heq_pos : 0 < equilibrium_ld) (_heq_lt : equilibrium_ld < 1)
     (h_recent : equilibrium_ld < admixtureLDDecay r t_since) :
     1 < admixtureLDBoost r t_since equilibrium_ld := by
   unfold admixtureLDBoost
@@ -2268,10 +2268,10 @@ theorem admixtureLDBoost_gt_one (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ)
     and thus portability is temporarily enhanced. -/
 theorem admixture_portability_above_equilibrium (V_A V_E fst r : ℝ) (t_since : ℕ)
     (equilibrium_ld : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst : 0 ≤ fst) (hfst_lt : fst < 1)
-    (heq_pos : 0 < equilibrium_ld) (heq_lt : equilibrium_ld < 1)
-    (hr : 0 ≤ r) (hr1 : r ≤ 1)
+    (hVA : 0 < V_A) (_hVE : 0 < V_E)
+    (_hfst : 0 ≤ fst) (hfst_lt : fst < 1)
+    (_heq_pos : 0 < equilibrium_ld) (_heq_lt : equilibrium_ld < 1)
+    (_hr : 0 ≤ r) (_hr1 : r ≤ 1)
     (h_recent : equilibrium_ld < admixtureLDDecay r t_since) :
     presentDayPGSVarianceMutationDrift V_A fst equilibrium_ld <
       presentDayPGSVarianceMutationDrift V_A fst (admixtureLDDecay r t_since) := by
@@ -2397,7 +2397,7 @@ theorem fstMigDriftEquil_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
     From Fst* = 1/(4Nm + 1), increasing m increases the denominator,
     hence decreases Fst*. This is derived, not assumed. -/
 theorem fstMigDriftEquil_decreasing_in_m (Ne m₁ m₂ : ℝ)
-    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (_hm₂ : 0 < m₂)
     (h_more : m₁ < m₂) :
     fstMigDriftEquil Ne m₂ < fstMigDriftEquil Ne m₁ := by
   unfold fstMigDriftEquil
@@ -2410,7 +2410,7 @@ theorem fstMigDriftEquil_decreasing_in_m (Ne m₁ m₂ : ℝ)
     hence decreases Fst*. Larger populations have slower drift relative to
     migration, so less differentiation. -/
 theorem fstMigDriftEquil_decreasing_in_Ne (Ne₁ Ne₂ m : ℝ)
-    (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (hm : 0 < m)
+    (hNe₁ : 0 < Ne₁) (_hNe₂ : 0 < Ne₂) (hm : 0 < m)
     (h_more : Ne₁ < Ne₂) :
     fstMigDriftEquil Ne₂ m < fstMigDriftEquil Ne₁ m := by
   unfold fstMigDriftEquil

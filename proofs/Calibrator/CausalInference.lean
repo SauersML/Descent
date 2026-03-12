@@ -160,13 +160,11 @@ theorem ld_mediates_portability
   · -- Corrected noise = V_E + (1-α)·V_ld < V_E + V_ld = uncorrected noise
     -- since α > 0 implies (1-α) < 1, so (1-α)·V_ld < V_ld.
     unfold expectedR2
-    rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
-    nlinarith
+    exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
   · -- If α < 1, then (1-α)·V_ld > 0, so corrected noise > V_E = source noise.
     intro h_α_lt
     unfold expectedR2
-    rw [div_lt_div_iff₀ (by nlinarith) (by linarith)]
-    nlinarith
+    exact div_lt_div_of_pos_left h_sig (by linarith) (by nlinarith)
 
 /-- **Environment mediates ancestry → PGS accuracy.**
     Ancestry → Environment → Phenotype → Accuracy.
@@ -315,10 +313,11 @@ theorem intervention_hierarchy
     expectedR2 vSig (V_E + (1 - β) * V_ld) <
       expectedR2 vSig V_E := by
   unfold expectedR2
-  refine ⟨?_, ?_, ?_, ?_⟩ <;> {
-    rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
-    nlinarith
-  }
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
+  · exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
+  · exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
+  · exact div_lt_div_of_pos_left h_sig (by linarith) (by nlinarith)
 
 /-- **Diminishing returns from each intervention.**
     R² = v/(v + V_E) is concave in signal variance v.
@@ -343,8 +342,11 @@ theorem diminishing_marginal_returns
   rw [div_sub_div _ _ (ne_of_gt hc) (ne_of_gt hb),
       div_sub_div _ _ (ne_of_gt hb) (ne_of_gt ha),
       div_lt_div_iff₀ (mul_pos hc hb) (mul_pos hb ha)]
-  nlinarith [sq_nonneg V_E, sq_nonneg Δ, mul_pos hΔ hVE,
-             sq_nonneg v, mul_pos ha hb, mul_pos hb hc]
+  ring_nf
+  have h_extra1 : 0 ≤ 2 * v * Δ ^ 2 * V_E := by nlinarith
+  have h_extra2 : 0 ≤ 2 * Δ ^ 2 * V_E ^ 2 := by positivity
+  have h_extra3 : 0 < 2 * Δ ^ 3 * V_E := by positivity
+  nlinarith
 
 /-- **Cost-effectiveness analysis.**
     New GWAS is most effective but most expensive.
@@ -374,7 +376,7 @@ are to violations of modeling assumptions.
 
 section SensitivityAnalysis
 
-/-- **Derivation: E-value from the confounding bounding formula.**
+/- **Derivation: E-value from the confounding bounding formula.**
 
     The E-value (VanderWeele & Ding, 2017) is the minimum strength of
     unmeasured confounding on the risk ratio scale that could fully explain

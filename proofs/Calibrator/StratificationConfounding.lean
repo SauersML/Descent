@@ -81,7 +81,7 @@ theorem stratification_bias_variance_pos {p : ℕ} (m : StratificationModel p) :
   apply Finset.sum_pos'
   · intro i _
     exact mul_nonneg (sq_nonneg _) (le_of_lt (m.H_pos i))
-  · exact ⟨j, Finset.mem_univ _, mul_pos (sq_pos_of_ne_zero _ hj) (m.H_pos j)⟩
+  · exact ⟨j, Finset.mem_univ _, mul_pos (sq_pos_of_ne_zero hj) (m.H_pos j)⟩
 
 /-- **Stratification inflates PGS variance.**
     The observed PGS variance (true + bias components, ignoring cross-term for
@@ -117,7 +117,7 @@ theorem spurious_portability_from_stratification {p : ℕ} (m : TwoPopBiasModel 
   have hv := stratification_bias_variance_pos m.toStratificationModel
   have : m.attenuation * m.toStratificationModel.varBias < m.toStratificationModel.varBias := by
     rw [← mul_one m.toStratificationModel.varBias]
-    exact mul_lt_mul_of_pos_right m.atten_lt_one hv
+    simpa [mul_assoc] using mul_lt_mul_of_pos_right m.atten_lt_one hv
   linarith
 
 /-- **PC correction model.**
@@ -172,7 +172,9 @@ theorem pc_correction_residual_bias (m : PCCorrectionModel) :
       split_ifs with h
       · exact le_refl _
       · exact le_of_lt (m.eig_pos i)
-    · refine ⟨⟨0, by omega⟩, Finset.mem_univ _, ?_⟩
+    · have hp : 0 < m.p := by
+        exact lt_trans (Nat.succ_pos m.k.val) m.k_lt
+      refine ⟨⟨0, hp⟩, Finset.mem_univ _, ?_⟩
       simp only [show ¬(m.k.val < 0) from Nat.not_lt_zero _, ite_false]
       exact m.eig_pos _
 
@@ -191,10 +193,13 @@ theorem more_pcs_less_bias
   · intro i _
     split_ifs with h1 h2
     · exact le_refl _
+    · exfalso
+      exact h2 (lt_trans (Nat.lt_succ_self k) h1)
     · exact le_of_lt (h_eig_pos i)
-    · omega
     · exact le_refl _
-  · refine ⟨⟨k + 1, by omega⟩, Finset.mem_univ _, ?_⟩
+  · have hk1_bound : k + 1 < p := by
+      exact lt_trans (Nat.lt_succ_self (k + 1)) h_k_bound
+    refine ⟨⟨k + 1, hk1_bound⟩, Finset.mem_univ _, ?_⟩
     simp only [show ¬(k + 1 < k + 1) from lt_irrefl _, ite_false,
                show k < k + 1 from Nat.lt_succ_iff.mpr (le_refl _), ite_true]
     exact h_eig_pos _
@@ -415,7 +420,7 @@ theorem rge_inflates_apparent_heritability (m : RGEInflationModel) :
     m.r2_direct < m.r2_obs := by
   unfold RGEInflationModel.r2_obs
   have : 0 < m.β_indirect ^ 2 * m.σ2 :=
-    mul_pos (sq_pos_of_ne_zero _ m.β_indirect_ne) m.σ2_pos
+    mul_pos (sq_pos_of_ne_zero m.β_indirect_ne) m.σ2_pos
   linarith
 
 /-- **Loss of rGE is not recoverable from genetic data alone.**
@@ -691,7 +696,7 @@ theorem instrument_strength_decreases (m : MRInstrumentModel)
   unfold MRInstrumentModel.fStat
   apply div_lt_div_of_pos_right _ m.σ2_Y_pos
   apply mul_lt_mul_of_pos_left h_het
-  exact mul_pos m.n_pos (sq_pos_of_ne_zero _ m.β_inst_ne)
+  exact mul_pos m.n_pos (sq_pos_of_ne_zero m.β_inst_ne)
 
 /-- **Weak instrument bias in MR.**
     Bias = (1 - 1/F) × confounding bias.

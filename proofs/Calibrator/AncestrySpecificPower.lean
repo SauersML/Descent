@@ -243,20 +243,29 @@ theorem source_higher_effective_n
     (h_same_p : p_source = p_target) :
     effectiveSampleSize n_target p_target r2_target <
       effectiveSampleSize n_source p_source r2_source := by
-  -- Step 1: mono in r² at fixed n_target
-  have step1 : effectiveSampleSize n_target p_target r2_target <
-      effectiveSampleSize n_target p_target r2_source :=
-    effective_n_mono_r2 n_target p_target r2_target r2_source
-      (Nat.pos_of_ne_zero (by omega)) h_p_target h_p_target_lt
-      (le_of_lt h_r2_target) (le_of_lt (by linarith)) h_r2
-  -- Step 2: mono in n at fixed r2_source
-  have step2 : effectiveSampleSize n_target p_target r2_source <
-      effectiveSampleSize n_source p_target r2_source :=
-    effective_n_mono_n n_target n_source p_target r2_source
-      h_p_target h_p_target_lt (by linarith) h_n
-  -- Compose and rewrite p_source = p_target
   rw [h_same_p]
-  linarith
+  -- Case split: n_target = 0 vs n_target > 0
+  by_cases h_nt : n_target = 0
+  · -- When n_target = 0, LHS is 0; RHS is positive since n_source ≥ 1
+    have h_ns_pos : 0 < n_source := by omega
+    unfold effectiveSampleSize
+    rw [h_nt]; simp
+    have h_het : 0 < 2 * p_target * (1 - p_target) := by nlinarith
+    have h_cast : (0 : ℝ) < ↑n_source := Nat.cast_pos.mpr h_ns_pos
+    have h_r2_source : 0 < r2_source := by linarith
+    exact mul_pos (mul_pos h_cast h_het) h_r2_source
+  · -- When n_target > 0, compose monotonicity in r² and n
+    have h_nt_pos : 0 < n_target := Nat.pos_of_ne_zero h_nt
+    have step1 : effectiveSampleSize n_target p_target r2_target <
+        effectiveSampleSize n_target p_target r2_source :=
+      effective_n_mono_r2 n_target p_target r2_target r2_source
+        h_nt_pos h_p_target h_p_target_lt
+        (le_of_lt h_r2_target) (le_of_lt (by linarith)) h_r2
+    have step2 : effectiveSampleSize n_target p_target r2_source <
+        effectiveSampleSize n_source p_target r2_source :=
+      effective_n_mono_n n_target n_source p_target r2_source
+        h_p_target h_p_target_lt (by linarith) h_n
+    linarith
 
 /-- **Non-centrality parameter (NCP) for association test.**
     NCP = n_eff × β² where β is the true effect size.
