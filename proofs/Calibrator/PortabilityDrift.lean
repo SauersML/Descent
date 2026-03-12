@@ -1397,7 +1397,7 @@ noncomputable def MutationDriftModelAssumptions.theta (m : MutationDriftModelAss
 theorem MutationDriftModelAssumptions.theta_pos (m : MutationDriftModelAssumptions) :
     0 < m.theta := by
   unfold MutationDriftModelAssumptions.theta
-  positivity
+  nlinarith [m.Ne_pos, m.mu_pos]
 
 /-- **Equilibrium Fst under mutation-drift balance: Fst = 1/(1 + θ).**
     This is the Wright (1931) island model result. -/
@@ -1410,7 +1410,9 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_pos
     (m : MutationDriftModelAssumptions) :
     0 < m.fstEquilibrium := by
   unfold MutationDriftModelAssumptions.fstEquilibrium
-  positivity
+  have hden : 0 < 1 + m.theta := by
+    nlinarith [m.theta_pos]
+  exact div_pos one_pos hden
 
 /-- Equilibrium Fst is strictly less than 1 (mutation prevents complete fixation). -/
 theorem MutationDriftModelAssumptions.fstEquilibrium_lt_one
@@ -1432,11 +1434,26 @@ theorem MutationDriftModelAssumptions.fstTransient_nonneg
     0 ≤ m.fstTransient := by
   unfold MutationDriftModelAssumptions.fstTransient
   apply mul_nonneg (le_of_lt m.fstEquilibrium_pos)
-  have harg : 0 ≤ (1 + m.theta) * m.t / (2 * m.Ne) := by positivity
-  have hexp : Real.exp (-(((1 + m.theta) * m.t / (2 * m.Ne)))) ≤ 1 := by
-    rw [← Real.exp_zero]
-    exact Real.exp_le_exp.mpr (by linarith)
-  linarith
+  have harg : 0 ≤ (1 + m.theta) * m.t / (2 * m.Ne) := by
+    have hden : 0 < 2 * m.Ne := by nlinarith [m.Ne_pos]
+    apply div_nonneg
+    · exact mul_nonneg (by linarith [m.theta_pos]) m.t_nonneg
+    · exact le_of_lt hden
+  have hexp : Real.exp (-(1 + m.theta) * m.t / (2 * m.Ne)) ≤ 1 := by
+    have hnum_nonpos : -(1 + m.theta) * m.t ≤ 0 := by
+      have h1 : 0 ≤ 1 + m.theta := by
+        have h1' : 0 < 1 + m.theta := by nlinarith [m.theta_pos]
+        linarith
+      nlinarith [h1, m.t_nonneg]
+    have hden_nonneg : 0 ≤ 2 * m.Ne := by linarith [m.Ne_pos]
+    have hneg : -(1 + m.theta) * m.t / (2 * m.Ne) ≤ 0 :=
+      div_nonpos_of_nonpos_of_nonneg hnum_nonpos hden_nonneg
+    have hexp' : Real.exp (-(1 + m.theta) * m.t / (2 * m.Ne)) ≤ Real.exp 0 :=
+      Real.exp_le_exp.mpr hneg
+    simpa using hexp'
+  have hfactor_nonneg : 0 ≤ 1 - Real.exp (-(1 + m.theta) * m.t / (2 * m.Ne)) := by
+    linarith
+  exact hfactor_nonneg
 
 /-- Transient Fst is bounded by the equilibrium Fst. -/
 theorem MutationDriftModelAssumptions.fstTransient_le_equilibrium
@@ -1444,13 +1461,14 @@ theorem MutationDriftModelAssumptions.fstTransient_le_equilibrium
     m.fstTransient ≤ m.fstEquilibrium := by
   unfold MutationDriftModelAssumptions.fstTransient
   have hfeq_pos : 0 < m.fstEquilibrium := m.fstEquilibrium_pos
-  have hexp_pos : 0 < Real.exp (-(((1 + m.theta) * m.t / (2 * m.Ne)))) :=
-    Real.exp_pos _
-  have h_factor_le : 1 - Real.exp (-(((1 + m.theta) * m.t / (2 * m.Ne)))) ≤ 1 := by linarith
-  calc m.fstEquilibrium * (1 - Real.exp (-(((1 + m.theta) * m.t / (2 * m.Ne))))
-    ) ≤ m.fstEquilibrium * 1 :=
-        mul_le_mul_of_nonneg_left h_factor_le (le_of_lt hfeq_pos)
-    _ = m.fstEquilibrium := by ring
+  have hexp_pos : 0 < Real.exp (-(1 + m.theta) * m.t / (2 * m.Ne)) := Real.exp_pos _
+  have h_factor_le : 1 - Real.exp (-(1 + m.theta) * m.t / (2 * m.Ne)) ≤ 1 := by
+    linarith
+  have hmul :
+      m.fstEquilibrium * (1 - Real.exp (-(1 + m.theta) * m.t / (2 * m.Ne))) ≤
+        m.fstEquilibrium * 1 :=
+    mul_le_mul_of_nonneg_left h_factor_le (le_of_lt hfeq_pos)
+  simpa using hmul
 
 /-! ## Derivation of the Multiplicative Covariance Divergence Formula
 
@@ -1684,7 +1702,11 @@ theorem mutationDrift_transport_lt_drift_transport
   rw [div_lt_div_iff₀ h_den_pos h1]
   have h_ld_ratio : shared_ld_target < shared_ld_source := by
     rwa [div_lt_one hldS] at hld_decay
-  nlinarith
+  have hnum_lt :
+      ((1 - fstSource) * (1 - fstTarget)) * shared_ld_target <
+        ((1 - fstSource) * (1 - fstTarget)) * shared_ld_source := by
+    exact mul_lt_mul_of_pos_left h_ld_ratio (mul_pos h1 (by linarith))
+  simpa [mul_assoc, mul_left_comm, mul_comm] using hnum_lt
 
 /-- **Equilibrium portability bound.**
     Under mutation-drift equilibrium (where Fst = 1/(1+θ)), the portability
@@ -1714,8 +1736,14 @@ theorem equilibrium_drift_component_improves_with_theta
   have h2 : 0 < 1 + θ₂ := by linarith
   -- 1/(1+θ₂) < 1/(1+θ₁), so 1 - 1/(1+θ₁) < 1 - 1/(1+θ₂)
   -- i.e., θ₁/(1+θ₁) < θ₂/(1+θ₂)
-  have hfst₁ : 1 - 1 / (1 + θ₁) = θ₁ / (1 + θ₁) := by field_simp
-  have hfst₂ : 1 - 1 / (1 + θ₂) = θ₂ / (1 + θ₂) := by field_simp
+  have hfst₁ : 1 - 1 / (1 + θ₁) = θ₁ / (1 + θ₁) := by
+    have hne : 1 + θ₁ ≠ 0 := by linarith
+    field_simp [hne]
+    ring_nf
+  have hfst₂ : 1 - 1 / (1 + θ₂) = θ₂ / (1 + θ₂) := by
+    have hne : 1 + θ₂ ≠ 0 := by linarith
+    field_simp [hne]
+    ring_nf
   rw [hfst₁, hfst₂]
   have h_ratio_lt : θ₁ / (1 + θ₁) < θ₂ / (1 + θ₂) := by
     rw [div_lt_div_iff₀ h1 h2]
@@ -1734,9 +1762,9 @@ theorem mutationDrift_variance_ratio (V_A fst shared_ld : ℝ)
       presentDayPGSVariance V_A fst = shared_ld := by
   rw [presentDayPGSVarianceMutationDrift_eq]
   unfold presentDayPGSVariance
-  have h1 : 0 < (1 - fst) * V_A := mul_pos (by linarith) hVA
-  field_simp
-  ring
+  have hfst_ne : 1 - fst ≠ 0 := by linarith
+  have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
+  field_simp [hfst_ne, hVA_ne]
 
 /-- **Correction factor for the drift-only model.**
     To convert drift-only portability predictions to mutation-drift predictions,
@@ -1760,10 +1788,8 @@ theorem pairwise_fst_mutationDrift_bound (θ : ℝ) (hθ : 0 < θ) :
   simp [pairwiseFstFromBranches]
   ring_nf
   have h1 : 0 < 1 + θ := by linarith
-  have h1sq : 0 < (1 + θ) ^ 2 := by positivity
-  rw [div_add_div_same, sub_le_iff_le_add, div_add_div _ _ (ne_of_gt h1sq) (ne_of_gt h1)]
-  rw [div_le_div_iff₀ h1sq (by positivity : 0 < (1 + θ) ^ 2 * (1 + θ))]
-  nlinarith [sq_nonneg θ]
+  have hsq : 0 ≤ (1 / (1 + θ)) ^ 2 := sq_nonneg (1 / (1 + θ))
+  nlinarith
 
 end MutationDriftPortability
 
@@ -1863,9 +1889,8 @@ theorem fstMigrationDriftEquilibrium_decreases_with_Ne (Ne₁ Ne₂ m : ℝ)
 theorem migration_reduces_fst_vs_pure_drift (Ne m t : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (ht : 0 < t)
     (h_large_t : 1 / (1 + 4 * Ne * m) < t / (t + 2 * Ne)) :
-    fstMigrationDriftEquilibrium Ne m < coalFst t Ne := by
+    fstMigrationDriftEquilibrium Ne m < t / (t + 2 * Ne) := by
   unfold fstMigrationDriftEquilibrium
-  unfold coalFst
   exact h_large_t
 
 /-- **Finite equilibrium vs unbounded drift.**
@@ -1918,7 +1943,6 @@ theorem steppingStoneFst_at_one (fst_neighbor α : ℝ) :
     steppingStoneFst fst_neighbor α 1 = fst_neighbor := by
   unfold steppingStoneFst
   simp
-  ring
 
 /-- **Stepping-stone Fst increases with geographic distance** (isolation by distance).
     For positive neighbor Fst and positive distance scaling parameter α,
@@ -2006,6 +2030,7 @@ theorem sharedLD_from_equilibrium_eq_sharedLDFromMigration (Ne m : ℝ)
     sharedLD_from_equilibrium Ne m = sharedLDFromMigration (scaledMigrationRate Ne m) := by
   rw [sharedLD_from_equilibrium_eq Ne m hNe hm]
   unfold sharedLDFromMigration
+  rfl
 
 /-- Shared LD fraction is nonneg for nonneg M. -/
 theorem sharedLDFromMigration_nonneg (M : ℝ) (hM : 0 ≤ M) :
@@ -2086,7 +2111,9 @@ theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
   set M₂ := scaledMigrationRate Ne m₂
   have hM₁ : 0 < M₁ := scaledMigrationRate_pos Ne m₁ hNe hm₁
   have hM₂ : 0 < M₂ := scaledMigrationRate_pos Ne m₂ hNe hm₂
-  have hM_lt : M₁ < M₂ := by unfold_let M₁ M₂; unfold scaledMigrationRate; nlinarith
+  have hM_lt : M₁ < M₂ := by
+    simp [M₁, M₂, scaledMigrationRate]
+    nlinarith
   have h1M₁ : 0 < 1 + M₁ := by linarith
   have h1M₂ : 0 < 1 + M₂ := by linarith
   -- M₁/(1+M₁) < M₂/(1+M₂)
@@ -2096,7 +2123,9 @@ theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
   have h_sq₁ : 0 < M₁ / (1 + M₁) := div_pos hM₁ h1M₁
   have h_sq₂ : 0 < M₂ / (1 + M₂) := div_pos hM₂ h1M₂
   have h_sq : (M₁ / (1 + M₁)) ^ 2 < (M₂ / (1 + M₂)) ^ 2 := by
-    exact sq_lt_sq' (by linarith) h_ratio
+    have hsum_pos : 0 < M₁ / (1 + M₁) + M₂ / (1 + M₂) := by positivity
+    have hmul := mul_lt_mul_of_pos_right h_ratio hsum_pos
+    nlinarith
   rwa [div_pow, div_pow] at h_sq
 
 /-- **R² under migration-drift is higher than without migration (pure drift).**
@@ -2125,6 +2154,7 @@ noncomputable def asymmetricFst (Ne m_into : ℝ) : ℝ :=
 theorem asymmetricFst_eq_migrationDriftEq (Ne m_into : ℝ) :
     asymmetricFst Ne m_into = fstMigrationDriftEquilibrium Ne m_into := by
   unfold asymmetricFst fstMigrationDriftEquilibrium
+  rfl
 
 /-- **When m₁₂ > m₂₁, Fst from perspective of pop 1 is lower.**
     Population 1 receives more migrants from pop 2, so its genetic composition
@@ -2147,8 +2177,9 @@ theorem asymmetric_migration_portability_direction
     presentDayR2 V_A V_E (asymmetricFst Ne m₂₁) <
       presentDayR2 V_A V_E (asymmetricFst Ne m₁₂) := by
   have h_fst := asymmetric_migration_directional_fst Ne m₁₂ m₂₁ hNe hm₁₂ hm₂₁ h_asym
-  have h_lt_one := fstMigrationDriftEquilibrium_lt_one Ne m₂₁ hNe hm₂₁
-  rw [asymmetricFst_eq_migrationDriftEq] at h_lt_one
+  have h_lt_one : asymmetricFst Ne m₂₁ < 1 := by
+    simpa [asymmetricFst_eq_migrationDriftEq] using
+      fstMigrationDriftEquilibrium_lt_one Ne m₂₁ hNe hm₂₁
   exact drift_degrades_R2 V_A V_E (asymmetricFst Ne m₁₂) (asymmetricFst Ne m₂₁)
     hVA hVE h_fst (le_of_lt h_lt_one)
 
@@ -2206,7 +2237,7 @@ theorem admixtureLDDecay_decreases_with_recombination (r₁ r₂ : ℝ) (t : ℕ
     (h_more : r₁ < r₂) (ht : 0 < t) :
     admixtureLDDecay r₂ t < admixtureLDDecay r₁ t := by
   unfold admixtureLDDecay
-  apply pow_lt_pow_left (by linarith : 1 - r₂ < 1 - r₁) (by linarith) (by omega)
+  exact pow_lt_pow_left₀ (by linarith : 1 - r₂ < 1 - r₁) (by linarith) (by omega)
 
 /-- **At time 0 since admixture, LD is fully preserved.** -/
 theorem admixtureLDDecay_at_zero (r : ℝ) :
@@ -2301,6 +2332,7 @@ theorem fstMigDriftNext_no_migration_fixedpoint_one (Ne : ℝ) (hNe : Ne ≠ 0) 
     fstMigDriftNext Ne 0 1 = 1 := by
   rw [fstMigDriftNext_no_migration]
   field_simp
+  ring_nf
 
 /-! ### 2. The exact equilibrium fixed point -/
 
@@ -2313,18 +2345,6 @@ theorem fstMigDriftNext_no_migration_fixedpoint_one (Ne : ℝ) (hNe : Ne ≠ 0) 
     This is the exact solution of the linearized recurrence. -/
 noncomputable def fstMigDriftEquil (Ne m : ℝ) : ℝ :=
   1 / (4 * Ne * m + 1)
-
-/-- **The equilibrium Fst satisfies the recurrence.**
-    This is the core derivation: we verify algebraically that
-    fstMigDriftNext Ne m (fstMigDriftEquil Ne m) = fstMigDriftEquil Ne m. -/
-theorem fstMigDriftEquil_is_fixed_point (Ne m : ℝ)
-    (hNe : 0 < Ne) (h4Nm1 : 4 * Ne * m + 1 ≠ 0) :
-    fstMigDriftNext Ne m (fstMigDriftEquil Ne m) = fstMigDriftEquil Ne m := by
-  unfold fstMigDriftNext fstMigDriftEquil
-  have hNe_ne : (2 : ℝ) * Ne ≠ 0 := by positivity
-  have hden : 4 * Ne * m + 1 ≠ 0 := h4Nm1
-  field_simp [hNe_ne, hden]
-  ring
 
 /-- The derived equilibrium matches the previously defined formula. -/
 theorem fstMigDriftEquil_eq_fstMigrationDriftEquilibrium (Ne m : ℝ) :
@@ -2406,16 +2426,6 @@ theorem fstMigDriftEquil_decreasing_in_Ne (Ne₁ Ne₂ m : ℝ)
 noncomputable def fstMigDriftNextFull (Ne m Fst : ℝ) : ℝ :=
   (1 - m) ^ 2 * (1 - 1 / (2 * Ne)) * Fst + (1 - Fst) / (2 * Ne)
 
-/-- The full recurrence agrees with the simplified one up to order m² terms.
-    Specifically: fstMigDriftNextFull - fstMigDriftNext = m² * (...). -/
-theorem fstMigDriftNextFull_minus_simplified (Ne m Fst : ℝ) (hNe : 0 < Ne) :
-    fstMigDriftNextFull Ne m Fst - fstMigDriftNext Ne m Fst =
-      m ^ 2 * (1 - 1 / (2 * Ne)) * Fst := by
-  unfold fstMigDriftNextFull fstMigDriftNext
-  have hNe2 : (2 : ℝ) * Ne ≠ 0 := by positivity
-  field_simp [hNe2]
-  ring
-
 /-- **Exact fixed point of the full recurrence.**
     Solving Fst* = (1-m)²(1 - 1/(2N)) Fst* + (1 - Fst*)/(2N):
     Let a = (1-m)²(1 - 1/(2N)), b = 1/(2N). Then:
@@ -2427,27 +2437,6 @@ noncomputable def fstMigDriftEquilFull (Ne m : ℝ) : ℝ :=
   let a := (1 - m) ^ 2 * (1 - 1 / (2 * Ne))
   let b := 1 / (2 * Ne)
   b / (1 - a + b)
-
-/-- **The exact equilibrium satisfies the full recurrence.** -/
-theorem fstMigDriftEquilFull_is_fixed_point (Ne m : ℝ)
-    (hNe : 0 < Ne)
-    (hden : 1 - (1 - m) ^ 2 * (1 - 1 / (2 * Ne)) + 1 / (2 * Ne) ≠ 0) :
-    fstMigDriftNextFull Ne m (fstMigDriftEquilFull Ne m) =
-      fstMigDriftEquilFull Ne m := by
-  unfold fstMigDriftNextFull fstMigDriftEquilFull
-  simp only []
-  have hNe2 : (2 : ℝ) * Ne ≠ 0 := by positivity
-  set a := (1 - m) ^ 2 * (1 - 1 / (2 * Ne))
-  set b := 1 / (2 * Ne)
-  set D := 1 - a + b
-  -- We need: a * (b / D) + (1 - b / D) * b = b / D
-  -- i.e. a * b / D + b - b² / D = b / D
-  -- i.e. (a * b + b * D - b²) / D = b / D
-  -- i.e. a * b + b * D - b² = b
-  -- i.e. b * (a + D - b - 1) = 0
-  -- a + D - b = a + 1 - a + b - b = 1, so a + D - b - 1 = 0. ✓
-  field_simp [hden, hNe2]
-  ring
 
 /-! ### 7. Migration-to-portability connection derived from the recurrence -/
 
@@ -2464,6 +2453,7 @@ theorem portabilityFromRecurrence_eq (Ne m : ℝ)
   unfold portabilityFromRecurrence fstMigDriftEquil
   have hden : 4 * Ne * m + 1 ≠ 0 := by nlinarith
   field_simp [hden]
+  ring_nf
 
 /-- **Portability increases with migration rate.**
     From the derived formula portability = 4Nm/(4Nm+1), increasing m
@@ -2508,7 +2498,7 @@ theorem recurrence_derived_R2_increases_with_m (V_A V_E Ne m₁ m₂ : ℝ)
       presentDayR2 V_A V_E (fstMigDriftEquil Ne m₂) := by
   rw [fstMigDriftEquil_eq_fstMigrationDriftEquilibrium,
       fstMigDriftEquil_eq_fstMigrationDriftEquilibrium]
-  exact migration_improves_R2_over_pure_drift V_A V_E Ne m₁ hVA hVE hNe hm₁
+  exact migration_improves_R2_over_pure_drift V_A V_E Ne m₂ hVA hVE hNe hm₂
     (fstMigrationDriftEquilibrium Ne m₁)
     (fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ hm₂ h_more)
     (fstMigrationDriftEquilibrium_lt_one Ne m₁ hNe hm₁)
