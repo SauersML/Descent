@@ -5102,19 +5102,21 @@ noncomputable def EvolutionaryParameters.bigM (p : EvolutionaryParameters) : ℝ
 theorem EvolutionaryParameters.theta_nonneg (p : EvolutionaryParameters) :
     0 ≤ p.theta := by
   unfold theta
-  positivity
+  have h1 : 0 < 4 * p.Ne := by linarith [p.Ne_pos]
+  exact mul_nonneg (le_of_lt h1) p.mu_nonneg
 
 /-- M ≥ 0. -/
 theorem EvolutionaryParameters.bigM_nonneg (p : EvolutionaryParameters) :
     0 ≤ p.bigM := by
   unfold bigM
-  positivity
+  have h1 : 0 < 4 * p.Ne := by linarith [p.Ne_pos]
+  exact mul_nonneg (le_of_lt h1) p.mig_nonneg
 
 /-- τ ≥ 0. -/
 theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
     0 ≤ p.tau := by
   unfold tau
-  exact div_nonneg p.t_div_nonneg (by positivity)
+  exact div_nonneg p.t_div_nonneg (by linarith [p.Ne_pos])
 
 /-- **Drift-only Fst**: Fst = 1 - exp(-τ). -/
 noncomputable def fstDriftOnly (p : EvolutionaryParameters) : ℝ :=
@@ -5154,16 +5156,14 @@ theorem fstEquilibrium_lt_one (p : EvolutionaryParameters)
 theorem fstEquilibrium_le_driftMutation (p : EvolutionaryParameters) :
     fstEquilibrium p ≤ fstDriftMutation p := by
   unfold fstEquilibrium fstDriftMutation
-  apply div_le_div_of_nonneg_left one_pos
-  · linarith [p.theta_nonneg, p.bigM_nonneg]
-  · linarith [p.bigM_nonneg]
+  exact one_div_le_one_div_of_le (by linarith [p.theta_nonneg]) (by linarith [p.bigM_nonneg])
 
 /-- Full equilibrium Fst ≤ drift-migration Fst (mutation only helps). -/
 theorem fstEquilibrium_le_driftMigration (p : EvolutionaryParameters) :
     fstEquilibrium p ≤ fstDriftMigration p := by
   unfold fstEquilibrium fstDriftMigration
-  apply div_le_div_of_nonneg_left one_pos
-  · linarith [p.theta_nonneg, p.bigM_nonneg]
+  apply one_div_le_one_div_of_le
+  · linarith [p.bigM_nonneg]
   · linarith [p.theta_nonneg]
 
 /-- **Key ordering**: Fst_full ≤ Fst_mutation_only ≤ Fst_drift_only (at equilibrium).
@@ -5205,7 +5205,8 @@ theorem sharedLDRetention_decreasing_in_time
     sharedLDRetention p₂ < sharedLDRetention p₁ := by
   unfold sharedLDRetention
   apply Real.exp_lt_exp.mpr
-  nlinarith
+  rw [h_same]
+  nlinarith [h_r_pos, h_time]
 
 /-- **Mutation-induced LD erosion**: new mutations create population-specific LD
     that is not shared. The fraction of LD that remains "ancestral" (shared)
@@ -5285,7 +5286,7 @@ theorem fstEquilibrium_decreasing_in_theta
   simp only
   unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM
   simp only
-  rw [div_lt_div_iff
+  rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu₂ + 4 * Ne * mig)
     (by nlinarith : 0 < 1 + 4 * Ne * mu₁ + 4 * Ne * mig)]
   nlinarith
@@ -5301,7 +5302,7 @@ theorem fstEquilibrium_decreasing_in_migration
   simp only
   unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM
   simp only
-  rw [div_lt_div_iff
+  rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₂)
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₁)]
   nlinarith
@@ -5332,7 +5333,7 @@ theorem portability_loss_decomposition_from_model
   constructor
   · -- fstEquilibrium < fstDriftMutation because migration adds to denominator
     unfold fstEquilibrium fstDriftMutation
-    rw [div_lt_div_iff
+    rw [div_lt_div_iff₀
       (by linarith [p.theta_nonneg, p.bigM_nonneg] : 0 < 1 + p.theta + p.bigM)
       (by linarith : 0 < 1 + p.theta)]
     nlinarith
@@ -5364,7 +5365,10 @@ theorem timescale_hierarchy_from_rates
     -- is exp(-2r·2Ne) = exp(-4rNe) which is much less than the drift
     -- retention (1 - Fst) ≈ exp(-1) ≈ 0.37 when 4rNe >> 1
     2 * p.recomb * (2 * p.Ne) > 1 := by
-  nlinarith [p.Ne_pos]
+  have hNe := p.Ne_pos
+  have h2Ne : 0 < 2 * p.Ne := by linarith
+  rw [gt_iff_lt, ← div_lt_iff₀ h2Ne]
+  exact h_ld_faster
 
 /-- **Sensitivity: Fst has larger effect than mutation on portability.**
     Derived from the unified model: increasing Fst (by increasing θ+M denominator)
@@ -5419,10 +5423,11 @@ theorem harmonic_mean_governs_drift
   -- Strategy: HM < AM via the Cauchy-Schwarz identity
   --   P·D - T²·Ne_s·Ne_l = T_b·(T-T_b)·(Ne_l - Ne_s)² > 0
   -- where D = T_b·Ne_l + (T-T_b)·Ne_s  and  P = T_b·Ne_s + (T-T_b)·Ne_l
-  rw [lt_div_iff h_T_pos]
+  rw [lt_div_iff₀ h_T_pos]
   -- Clear fractions in harmonic mean to get: Ne_h · D = T · Ne_s · Ne_l
   have hD_pos : (0:ℝ) < T_bottleneck * Ne_large + (T_total - T_bottleneck) * Ne_small := by
-    positivity
+    have : 0 < T_total - T_bottleneck := by linarith
+    nlinarith [mul_pos h_Tb_pos h_large, mul_pos this h_small]
   have h1 : Ne_h * (T_bottleneck * Ne_large + (T_total - T_bottleneck) * Ne_small) =
       T_total * Ne_small * Ne_large := by
     field_simp at h_harmonic ⊢; linarith
@@ -5649,13 +5654,6 @@ monotone functions of R² through the normal CDF Φ (which is itself monotone).
 AUC integrates sensitivity over 1-specificity, giving Φ(√(SNR/2)).
 -/
 
-/-- Standard normal CDF.
-    Axiomatized because the full construction requires Mathlib's measure theory
-    (Lebesgue integral of the Gaussian density). The properties below (monotonicity,
-    symmetry) are provable from the measure-theoretic definition and are standard
-    Mathlib-level facts, not population genetics or statistical genetics claims. -/
-noncomputable def Phi : ℝ → ℝ := sorry
-
 /-- Phi is monotone increasing (the Gaussian density is positive everywhere). -/
 axiom Phi_mono : StrictMono Phi
 
@@ -5679,7 +5677,7 @@ theorem snrFromR2_nonneg (r2 : ℝ) (h0 : 0 ≤ r2) (h1 : r2 < 1) :
 theorem snrFromR2_strictMono : StrictMonoOn snrFromR2 (Set.Ico 0 1) := by
   intro a ⟨ha0, ha1⟩ b ⟨_, hb1⟩ hab
   unfold snrFromR2
-  rw [div_lt_div_iff (by linarith : 0 < 1 - a) (by linarith : 0 < 1 - b)]
+  rw [div_lt_div_iff₀ (by linarith : 0 < 1 - a) (by linarith : 0 < 1 - b)]
   nlinarith
 
 /-- **Target AUC from the liability threshold model.**
@@ -5712,7 +5710,7 @@ theorem PGSEvolutionaryModel.AUC_target_le_source (m : PGSEvolutionaryModel)
   -- Step 1: SNR monotone (a/(1-a) ≤ b/(1-b) when a ≤ b and both < 1)
   have h_snr_le : snrFromR2 m.R2_target ≤ snrFromR2 m.R2_source := by
     unfold snrFromR2
-    rw [div_le_div_iff (by linarith : 0 < 1 - m.R2_target)
+    rw [div_le_div_iff₀ (by linarith : 0 < 1 - m.R2_target)
       (by linarith [m.R2_source_lt_one] : 0 < 1 - m.R2_source)]
     nlinarith
   -- Step 2: √(SNR/2) monotone (√ is monotone, /2 preserves order)
@@ -5756,7 +5754,9 @@ theorem PGSEvolutionaryModel.Brier_target_ge_source (m : PGSEvolutionaryModel)
   unfold Brier_target Brier_source R2_target
   have h_prev : 0 < m.prevalence * (1 - m.prevalence) := by
     exact mul_pos m.prev_pos (by linarith [m.prev_lt_one])
-  have h_r2 := m.R2_target_le_source h_forces h_ratio_le
+  have h_r2_pos := m.R2_source_pos
+  have h_rho_le := h_ratio_le
+  have h_prod_le : m.R2_source * m.portabilityRatio ≤ m.R2_source := by nlinarith
   nlinarith
 
 /-- Brier score is nonneg. -/
@@ -5849,11 +5849,15 @@ noncomputable def migrationRestorationRate (Ne m_rate : ℝ) : ℝ :=
   bigM / (2 * Ne * (1 + bigM))
 
 /-- The decay rate decomposes additively. -/
-theorem portabilityDecayRate_decomposition (Ne mu m_rate r : ℝ) :
+theorem portabilityDecayRate_decomposition (Ne mu m_rate r : ℝ)
+    (hNe : Ne ≠ 0) (hM : 1 + 4 * Ne * m_rate ≠ 0)
+    (hTM : 1 + 4 * Ne * mu + 4 * Ne * m_rate ≠ 0) :
     portabilityDecayRate Ne mu m_rate r =
       driftDecayRate Ne mu m_rate + ldDecayRate r +
       mutationDecayRate mu - migrationRestorationRate Ne m_rate := by
   unfold portabilityDecayRate driftDecayRate ldDecayRate mutationDecayRate migrationRestorationRate
+  dsimp only
+  field_simp
   ring
 
 /-- **LD decay dominates** when recombination rate exceeds drift rate.
@@ -5871,10 +5875,11 @@ theorem ld_decay_dominates_drift
   have bigM_nn : 0 ≤ 4 * Ne * m_rate := by positivity
   have denom_pos : 0 < 2 * Ne * (1 + 4 * Ne * mu + 4 * Ne * m_rate) := by positivity
   calc 1 / (2 * Ne * (1 + 4 * Ne * mu + 4 * Ne * m_rate))
-      ≤ 1 / (2 * Ne * 1) := by
-        apply div_le_div_of_nonneg_left one_pos denom_pos
-        · exact mul_le_mul_of_nonneg_left (by linarith) (by positivity)
-    _ = 1 / (2 * Ne) := by ring_nf
+      ≤ 1 / (2 * Ne) := by
+        apply one_div_le_one_div_of_le (by linarith)
+        have : 0 ≤ 4 * Ne * mu := by positivity
+        have : 0 ≤ 4 * Ne * m_rate := by positivity
+        nlinarith
     _ < 2 * r := h_ld_fast
 
 /-! ### Step 8: Metric ordering — which metrics degrade fastest?
@@ -5963,7 +5968,8 @@ theorem PGSEvolutionaryModel.all_metrics_degrade (m : PGSEvolutionaryModel)
     unfold Brier_target Brier_source R2_target
     have h_prev : 0 < m.prevalence * (1 - m.prevalence) :=
       mul_pos m.prev_pos (by linarith [m.prev_lt_one])
-    have := m.R2_source_pos
+    have h_r2_pos := m.R2_source_pos
+    have h_prod_lt : m.R2_source * m.portabilityRatio < m.R2_source := by nlinarith
     nlinarith
 
 /-- **Explicit formula** expanding all definitions into a single expression.
@@ -5979,12 +5985,11 @@ theorem PGSEvolutionaryModel.R2_target_explicit (m : PGSEvolutionaryModel) :
        Real.exp (-m.theta * m.tau) *
        (1 + m.bigM * m.tau / (1 + m.bigM))) := by
   unfold R2_target portabilityRatio fstTransient ldRetention mutErosion migBoost
-  unfold sharedLDRetention mutationLDErosion migrationLDBoost
-  ring
+  unfold sharedLDRetention mutationLDErosion migrationLDBoost fstEquilibrium
+  unfold toEvo toEvolutionaryParameters
+  simp only [EvolutionaryParameters.theta, EvolutionaryParameters.bigM, EvolutionaryParameters.tau]
 
 end EndToEndMetrics
-
-end UnifiedEvolutionaryPortability
 
 end AllClaims
 
