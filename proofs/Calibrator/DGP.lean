@@ -316,13 +316,13 @@ private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
       A i0 i1 =
         twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
           twoLocusIBDCovariance ibdWeightT recombRateT tmrcaT := by
-    simp [A, i0, i1, twoLocusCoalescentCovarianceMatrix, hi_ne, Matrix.sub_apply]
+    simp [A, i0, i1, twoLocusCoalescentCovarianceMatrix, hi_ne]
   have h10 :
       A i1 i0 =
         twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
           twoLocusIBDCovariance ibdWeightT recombRateT tmrcaT := by
     simp [A, i0, i1, twoLocusCoalescentCovarianceMatrix, hi_ne, Matrix.sub_apply,
-      and_left_comm, and_assoc]
+      and_assoc]
   have h_row01 :
       (A i0 i1)^2 ≤ ∑ j : Fin t, (A i0 j)^2 := by
     exact Finset.single_le_sum (fun j _ => sq_nonneg (A i0 j)) (by simp)
@@ -1477,7 +1477,7 @@ lemma rawOptimal_implies_orthogonality_gen {k sp : ℕ} [Fintype (Fin k)] [Finty
           intro p_val c_val
           have h := linearPredictor_eq_affine_of_raw_gen model' h_raw' h_linear p_val c_val
           simp only [model', ha_def, hb_def] at h
-          convert h using 2 <;> ring
+          simpa using h
 
         have h_expand_full : ∫ pc, (residual pc - ε * pc.1) ^ 2 ∂μ =
             ∫ pc, residual pc ^ 2 ∂μ - 2 * ε * ∫ pc, residual pc * pc.1 ∂μ + ε ^ 2 * ∫ pc, pc.1 ^ 2 ∂μ := by
@@ -1689,7 +1689,7 @@ lemma polynomial_spline_coeffs_unique {n : ℕ} [Fintype (Fin n)] (coeffs : Fin 
     intro x
     simpa using h_eval x
   have h_coeff : p.coeff (i.val + 1) = 0 := by
-    simpa [h_p_zero]
+    simp [h_p_zero]
   have h_coeff' : p.coeff (i.val + 1) = coeffs i := by
     classical
     have h_sum :
@@ -1773,30 +1773,30 @@ theorem l2_projection_of_additive_is_additive (k sp : ℕ) [Fintype (Fin k)] [Fi
     intros c1 c2
     have h1 : predictorBase proj c1 + predictorSlope proj c1 = f 1 + ∑ i, g i (c1 i) := by
       have h_fit1 : linearPredictor proj 1 c1 = f 1 + ∑ i, g i (c1 i) := by
-        simpa [h_fit, h_true_fn]
+        simp [h_fit, h_true_fn]
       have h_pred1 : linearPredictor proj 1 c1 = predictorBase proj c1 + predictorSlope proj c1 := by
-        simpa [h_pred]
+        simp [h_pred]
       simpa [h_pred1] using h_fit1
     have h0 : predictorBase proj c1 = f 0 + ∑ i, g i (c1 i) := by
       have h_fit0 : linearPredictor proj 0 c1 = f 0 + ∑ i, g i (c1 i) := by
-        simpa [h_fit, h_true_fn]
+        simp [h_fit, h_true_fn]
       have h_pred0 : linearPredictor proj 0 c1 = predictorBase proj c1 := by
-        simpa [h_pred]
+        simp [h_pred]
       simpa [h_pred0] using h_fit0
     have hs1 : predictorSlope proj c1 = (f 1 - f 0) := by
       linarith
 
     have h1' : predictorBase proj c2 + predictorSlope proj c2 = f 1 + ∑ i, g i (c2 i) := by
       have h_fit1 : linearPredictor proj 1 c2 = f 1 + ∑ i, g i (c2 i) := by
-        simpa [h_fit, h_true_fn]
+        simp [h_fit, h_true_fn]
       have h_pred1 : linearPredictor proj 1 c2 = predictorBase proj c2 + predictorSlope proj c2 := by
-        simpa [h_pred]
+        simp [h_pred]
       simpa [h_pred1] using h_fit1
     have h0' : predictorBase proj c2 = f 0 + ∑ i, g i (c2 i) := by
       have h_fit0 : linearPredictor proj 0 c2 = f 0 + ∑ i, g i (c2 i) := by
-        simpa [h_fit, h_true_fn]
+        simp [h_fit, h_true_fn]
       have h_pred0 : linearPredictor proj 0 c2 = predictorBase proj c2 := by
-        simpa [h_pred]
+        simp [h_pred]
       simpa [h_pred0] using h_fit0
     have hs2 : predictorSlope proj c2 = (f 1 - f 0) := by
       linarith
@@ -1897,7 +1897,7 @@ theorem prediction_causality_tradeoff_linear_general (sp : ℕ) [Fintype (Fin sp
     (_hC0 : ∫ pc, pc.2 ⟨0, by norm_num⟩ ∂dgp_env.to_dgp.jointMeasure = 0)
     (hP2 : ∫ pc, pc.1^2 ∂dgp_env.to_dgp.jointMeasure = 1)
     (hP_int : Integrable (fun pc : ℝ × (Fin 1 → ℝ) => pc.1) dgp_env.to_dgp.jointMeasure)
-    (hC_int : Integrable (fun pc : ℝ × (Fin 1 → ℝ) => pc.2 ⟨0, by norm_num⟩) dgp_env.to_dgp.jointMeasure)
+    (_hC_int : Integrable (fun pc : ℝ × (Fin 1 → ℝ) => pc.2 ⟨0, by norm_num⟩) dgp_env.to_dgp.jointMeasure)
     (hP2_int : Integrable (fun pc : ℝ × (Fin 1 → ℝ) => pc.1 ^ 2) dgp_env.to_dgp.jointMeasure)
     (hPC_int : Integrable (fun pc : ℝ × (Fin 1 → ℝ) => pc.1 * pc.2 ⟨0, by norm_num⟩) dgp_env.to_dgp.jointMeasure)
     (hY_int : Integrable (fun pc => dgp_env.to_dgp.trueExpectation pc.1 pc.2) dgp_env.to_dgp.jointMeasure)
@@ -2234,11 +2234,11 @@ lemma linearPredictor_eq_designMatrix_mulVec {n p k sp : ℕ}
                   ⟨mlj.1.val + 1, by simpa using (Nat.succ_lt_succ mlj.1.isLt)⟩ (data.p i) *
                   (m.pcSplineBasis.b mlj.2.2 (data.c i mlj.2.1) * m.fₘₗ mlj.1 mlj.2.1 mlj.2.2))) := by
     simp [linearPredictor, evalSmooth, Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul,
-      add_mul, mul_add, mul_comm, mul_left_comm, mul_assoc]
-    simp [hsum_pc, hsum_int, mul_comm, mul_left_comm, mul_assoc]
+      add_mul, mul_add, mul_comm]
+    simp [hsum_pc, hsum_int, mul_comm]
     ring_nf
   -- Finish by expanding the design-matrix side.
-  simpa [designMatrix, packParams, Matrix.mulVec, dotProduct, mul_assoc, mul_left_comm, mul_comm,
+  simpa [designMatrix, packParams, Matrix.mulVec, dotProduct, mul_comm,
     add_assoc, add_left_comm, add_comm] using hsum_lin.trans hsum_paramix.symm
 
 /-- Full column rank implies `X.mulVec` is injective.
@@ -2424,7 +2424,7 @@ theorem penalty_quadratic_tendsto_proof {ι : Type*} [Fintype ι] [DecidableEq �
       have hu_norm : ‖u‖ = 1 := by
         have hnorm : ‖β‖ ≠ 0 := by
           simpa [norm_eq_zero] using hβ
-        simp [u, norm_smul, norm_inv, norm_norm, hnorm]
+        simpa [u] using norm_smul_inv_norm hβ
       have hu_in : u ∈ sphere := by simp [sphere, hu_norm]
       have hQu : c ≤ Q u := by
         have := h_min (a := u) hu_in
@@ -2563,7 +2563,7 @@ noncomputable def fit (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fint
           _ = (1 / (2 : ℝ)) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
                 Finset.univ.sum (fun i => (data.y i) ^ 2) := by
                     simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg,
-                      add_comm, add_left_comm, add_assoc, mul_comm, mul_left_comm, mul_assoc]
+                      add_comm, add_left_comm, add_assoc]
       have h_pen_nonneg :
           0 ≤ lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) := by
         have hsum_nonneg :
@@ -2573,7 +2573,7 @@ noncomputable def fit (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fint
           have hSi : (S.mulVec β) i = s i * β i := by
             classical
             simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply,
-              Finset.sum_ite_eq', Finset.sum_ite_eq, mul_comm, mul_left_comm, mul_assoc]
+              Finset.sum_ite_eq', Finset.sum_ite_eq]
           cases i <;> simp [hSi, s, mul_comm, mul_left_comm, mul_assoc, mul_self_nonneg]
         exact mul_nonneg h_lambda_nonneg hsum_nonneg
       have h_scale :
@@ -2593,11 +2593,11 @@ noncomputable def fit (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fint
         have h_left :
             Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) =
               dotProduct (X.mulVec β) (X.mulVec β) := by
-          simp [dotProduct, pow_two, mul_comm]
+          simp [dotProduct, pow_two]
         have h_right :
             Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i) =
               dotProduct β ((Matrix.transpose X * X).mulVec β) := by
-          simp [dotProduct, mul_comm]
+          simp [dotProduct]
         have h_eq :
             dotProduct β ((Matrix.transpose X * X).mulVec β) =
               dotProduct (X.mulVec β) (X.mulVec β) := by
@@ -2606,9 +2606,9 @@ noncomputable def fit (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fint
                 = dotProduct β ((Matrix.transpose X).mulVec (X.mulVec β)) := by
                     simp [Matrix.mulVec_mulVec]
             _ = dotProduct (Matrix.vecMul β (Matrix.transpose X)) (X.mulVec β) := by
-                    simpa [Matrix.dotProduct_mulVec]
+                    simp [Matrix.dotProduct_mulVec]
             _ = dotProduct (X.mulVec β) (X.mulVec β) := by
-                    simpa [Matrix.vecMul_transpose]
+                    simp [Matrix.vecMul_transpose]
         simpa [h_left, h_right] using h_eq.symm
       -- add the nonnegative penalty and rewrite the quadratic term via h_XtX
       have hL1 :
@@ -2724,7 +2724,7 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
           _ = (1 / (2 : ℝ)) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
                 Finset.univ.sum (fun i => (data.y i) ^ 2) := by
                     simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg,
-                      add_comm, add_left_comm, add_assoc, mul_comm, mul_left_comm, mul_assoc]
+                      add_comm, add_left_comm, add_assoc]
       have h_pen_nonneg :
           0 ≤ lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) := by
         have hsum_nonneg :
@@ -2734,7 +2734,7 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
           have hSi : (S.mulVec β) i = s i * β i := by
             classical
             simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply,
-              Finset.sum_ite_eq', Finset.sum_ite_eq, mul_comm, mul_left_comm, mul_assoc]
+              Finset.sum_ite_eq', Finset.sum_ite_eq]
           cases i <;> simp [hSi, s, mul_comm, mul_left_comm, mul_assoc, mul_self_nonneg]
         exact mul_nonneg h_lambda_nonneg hsum_nonneg
       have h_scale :
@@ -2753,11 +2753,11 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
         have h_left :
             Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) =
               dotProduct (X.mulVec β) (X.mulVec β) := by
-          simp [dotProduct, pow_two, mul_comm]
+          simp [dotProduct, pow_two]
         have h_right :
             Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i) =
               dotProduct β ((Matrix.transpose X * X).mulVec β) := by
-          simp [dotProduct, mul_comm]
+          simp [dotProduct]
         have h_eq :
             dotProduct β ((Matrix.transpose X * X).mulVec β) =
               dotProduct (X.mulVec β) (X.mulVec β) := by
@@ -2766,9 +2766,9 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
                 = dotProduct β ((Matrix.transpose X).mulVec (X.mulVec β)) := by
                     simp [Matrix.mulVec_mulVec]
             _ = dotProduct (Matrix.vecMul β (Matrix.transpose X)) (X.mulVec β) := by
-                    simpa [Matrix.dotProduct_mulVec]
+                    simp [Matrix.dotProduct_mulVec]
             _ = dotProduct (X.mulVec β) (X.mulVec β) := by
-                    simpa [Matrix.vecMul_transpose]
+                    simp [Matrix.vecMul_transpose]
         simpa [h_left, h_right] using h_eq.symm
       have hL1 :
           (1 / (n : ℝ)) * Finset.univ.sum (fun i => (data.y i - X.mulVec β i) ^ 2) +
@@ -2815,7 +2815,7 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
       intro i
       classical
       simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply,
-        Finset.sum_ite_eq', Finset.sum_ite_eq, mul_comm, mul_left_comm, mul_assoc]
+        Finset.sum_ite_eq', Finset.sum_ite_eq]
     have h_penalty :
         Finset.univ.sum (fun i => (packParams m) i * (S.mulVec (packParams m)) i) =
           (∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) +
@@ -3029,8 +3029,7 @@ lemma gaussianPenalizedLoss_strictConvex {ι : Type*} {n : ℕ} [Fintype (Fin n)
       have hsum :
           a * (∑ i, r₁ i ^ 2) + b * (∑ i, r₂ i ^ 2) - (∑ i, r_mid i ^ 2) =
             ∑ i, (a * r₁ i ^ 2 + b * r₂ i ^ 2 - r_mid i ^ 2) := by
-        simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg,
-          add_comm, add_left_comm, add_assoc]
+        simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg]
       have hsum' :
           a * b * (∑ i, (r₁ i - r₂ i) ^ 2) =
             ∑ i, a * b * (r₁ i - r₂ i) ^ 2 := by
@@ -3106,8 +3105,7 @@ lemma gaussianPenalizedLoss_strictConvex {ι : Type*} {n : ℕ} [Fintype (Fin n)
                 (a * ((S.mulVec β₁) i * β₁ i) +
                   b * ((S.mulVec β₂) i * β₂ i) -
                   ((S.mulVec (a • β₁ + b • β₂)) i * (a • β₁ + b • β₂) i)) := by
-                simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg,
-                  add_comm, add_left_comm, add_assoc]
+                simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg]
           _ = ∑ i, a * b * ((S.mulVec (β₁ - β₂)) i * (β₁ - β₂) i) := by
                 apply Finset.sum_congr rfl
                 intro i _
@@ -3116,7 +3114,7 @@ lemma gaussianPenalizedLoss_strictConvex {ι : Type*} {n : ℕ} [Fintype (Fin n)
                   add_mul, sub_eq_add_neg, hb']
                 ring
           _ = a * b * ∑ i, (S.mulVec (β₁ - β₂)) i * (β₁ - β₂) i := by
-                simp [Finset.mul_sum, mul_left_comm, mul_comm, mul_assoc]
+                simp [Finset.mul_sum, mul_comm]
           _ = a * b * dotProduct' (S.mulVec (β₁ - β₂)) (β₁ - β₂) := by
                 rfl
       -- The RHS is ≥ 0 by PSD of S
@@ -3591,8 +3589,8 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
         simpa [β₂] using h_unpack₂
       have h_m_eq : m₁ = m₂ := by
         calc
-          m₁ = unpackParams pgsBasis splineBasis β₁ := by simpa [h_unpack₁']
-          _ = unpackParams pgsBasis splineBasis β₂ := by simpa [h_eq]
+          m₁ = unpackParams pgsBasis splineBasis β₁ := by simp [h_unpack₁']
+          _ = unpackParams pgsBasis splineBasis β₂ := by simp [h_eq]
           _ = m₂ := h_unpack₂'
       exact hne h_m_eq
 
@@ -3670,7 +3668,7 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
                   exact h_linear_pc x
             _ = t * ∑ x, evalSmooth splineBasis (fun j => β₁ (ParamIx.pcSpline l j)) (data.c x l) +
                 (1 - t) * ∑ x, evalSmooth splineBasis (fun j => β₂ (ParamIx.pcSpline l j)) (data.c x l) := by
-                  simp [Finset.sum_add_distrib, Finset.mul_sum, mul_add, add_mul, mul_assoc, mul_left_comm, mul_comm]
+                  simp [Finset.sum_add_distrib, Finset.mul_sum, mul_add, add_mul, mul_comm]
             _ = 0 := by
                   simp [h₁, h₂]
 
@@ -3689,7 +3687,7 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
                   intro j _
                   ring
               _ = ∑ j, a * (c₁ j * splineBasis.b j x) + ∑ j, b * (c₂ j * splineBasis.b j x) := by
-                  simpa [Finset.sum_add_distrib]
+                  simp [Finset.sum_add_distrib]
               _ = a * ∑ j, c₁ j * splineBasis.b j x + b * ∑ j, c₂ j * splineBasis.b j x := by
                   simp [Finset.mul_sum]
 
@@ -3723,7 +3721,7 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
                   exact h_linear_int x
             _ = t * ∑ x, evalSmooth splineBasis (fun j => β₁ (ParamIx.interaction mIdx l j)) (data.c x l) +
                 (1 - t) * ∑ x, evalSmooth splineBasis (fun j => β₂ (ParamIx.interaction mIdx l j)) (data.c x l) := by
-                  simp [Finset.sum_add_distrib, Finset.mul_sum, mul_add, add_mul, mul_assoc, mul_left_comm, mul_comm]
+                  simp [Finset.sum_add_distrib, Finset.mul_sum, mul_add, add_mul, mul_comm]
             _ = 0 := by
                   simp [h₁, h₂]
     refine ⟨hm_interp, ?_⟩
@@ -3745,7 +3743,7 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
       have hmul : (S.mulVec v) i = s i * v i := by
         classical
         simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply,
-          Finset.sum_ite_eq', Finset.sum_ite_eq, mul_comm, mul_left_comm, mul_assoc]
+          Finset.sum_ite_eq', Finset.sum_ite_eq]
       cases i <;> simp [s, hmul, mul_comm, mul_left_comm, mul_assoc, mul_self_nonneg]
 
     have h_emp_eq :
@@ -3829,7 +3827,7 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
             (∑ x : ParamIxSum p k sp, g x) =
               (∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) +
                 (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2) := by
-          simp [ParamIxSum, g, hsum_pc, hsum_int, Finset.sum_add_distrib]
+          simp [ParamIxSum, g, hsum_pc, hsum_int]
         simpa [hsum, hsum'] using hsum''
       unfold empiricalLoss gaussianPenalizedLoss
       simp [h_data, h_penalty]
@@ -4650,7 +4648,7 @@ lemma orthogonalProjection_eq_of_dist_le {n : ℕ} (K : Submodule ℝ (Fin n →
 
   let P_y := Submodule.orthogonalProjection K_E y_E
   have h_orth_P : y_E - (P_y : EuclideanSpace ℝ (Fin n)) ∈ K_E.orthogonal :=
-    Submodule.sub_orthogonalProjection_mem_orthogonal y_E
+    Submodule.sub_starProjection_mem_orthogonal y_E
   have h_mem_P : (P_y : EuclideanSpace ℝ (Fin n)) ∈ K_E := P_y.2
   have h_diff_mem : (P_y : EuclideanSpace ℝ (Fin n)) - p_E ∈ K_E :=
     Submodule.sub_mem K_E h_mem_P h_mem_E
@@ -4671,7 +4669,7 @@ lemma orthogonalProjection_eq_of_dist_le {n : ℕ} (K : Submodule ℝ (Fin n →
 
   apply iso.injective
   rw [orthogonalProjection]
-  simp only [iso.symm_apply_apply]
+  simp
   exact h_eq_E
 set_option maxHeartbeats 10000000 in
 /-- Predictions are invariant under affine transformations of ancestry coordinates,
@@ -4770,7 +4768,7 @@ lemma range_eq_of_two_sided_design_reparam {n m : Type} [Fintype n] [Fintype m] 
       _ = (X' * U).mulVec β := by
         symm
         simpa using (Matrix.mulVec_mulVec X' U β)
-      _ = X.mulVec β := by simpa [hU]
+      _ = X.mulVec β := by simp [hU]
       _ = Matrix.toLin' X β := by rw [Matrix.toLin'_apply]
       _ = y := hβ
   · intro y hy
@@ -4784,7 +4782,7 @@ lemma range_eq_of_two_sided_design_reparam {n m : Type} [Fintype n] [Fintype m] 
       _ = (X * T).mulVec β := by
         symm
         simpa using (Matrix.mulVec_mulVec X T β)
-      _ = X'.mulVec β := by simpa [hT]
+      _ = X'.mulVec β := by simp [hT]
       _ = Matrix.toLin' X' β := by rw [Matrix.toLin'_apply]
       _ = y := hβ
 
@@ -4902,7 +4900,7 @@ theorem extrapolation_error_bound_lipschitz {n k p sp : ℕ} [Fintype (Fin n)] [
 theorem context_specificity {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] (dgp1 dgp2 : DGPWithEnvironment k)
     (h_same_genetics : dgp1.trueGeneticEffect = dgp2.trueGeneticEffect ∧ dgp1.to_dgp.jointMeasure = dgp2.to_dgp.jointMeasure)
     (h_diff_env : dgp1.environmentalEffect ≠ dgp2.environmentalEffect)
-    (model1 : PhenotypeInformedGAM p k sp) (h_opt1 : IsBayesOptimalInClass dgp1.to_dgp model1)
+    (model1 : PhenotypeInformedGAM p k sp) (_h_opt1 : IsBayesOptimalInClass dgp1.to_dgp model1)
     (h_repr :
       IsBayesOptimalInClass dgp2.to_dgp model1 →
         dgp1.to_dgp.trueExpectation = dgp2.to_dgp.trueExpectation) :
@@ -5348,7 +5346,7 @@ theorem portability_loss_decomposition_from_model
     which equals fstDriftMutation - fstEquilibrium. This is strictly positive but bounded
     by fstDriftMutation (the total drift+mutation loss). -/
 theorem migration_gain_bounded_by_model
-    (p : EvolutionaryParameters) (h_theta : 0 < p.theta) (h_mig : 0 < p.bigM) :
+    (p : EvolutionaryParameters) (_h_theta : 0 < p.theta) (_h_mig : 0 < p.bigM) :
     fstDriftMutation p - fstEquilibrium p < fstDriftMutation p := by
   have := fstEquilibrium_pos p
   linarith
@@ -5378,21 +5376,21 @@ theorem timescale_hierarchy_from_rates
     also halves it — but Fst moves faster with divergence than mutation erosion does. -/
 theorem drift_component_dominates_ratio
     (p : EvolutionaryParameters)
-    (h_forces : 0 < p.theta + p.bigM) :
+    (_h_forces : 0 < p.theta + p.bigM) :
     -- (1 - Fst) ≤ 1 and mutationLDErosion ≤ 1, but Fst can be large
     -- while mutation erosion is slow (θτ is small for reasonable parameters).
     -- We prove: if θτ < Fst (mutation hasn't had time to erode much LD
     -- compared to the Fst accumulated), then mutation erosion > (1 - Fst),
     -- meaning the drift factor is the tighter bottleneck.
     fstEquilibrium p < 1 ∧ 0 < mutationLDErosion p := by
-  exact ⟨fstEquilibrium_lt_one p h_forces, mutationLDErosion_pos p⟩
+  exact ⟨fstEquilibrium_lt_one p _h_forces, mutationLDErosion_pos p⟩
 
 /-- **Connecting to the DGP framework**: The unified Fst maps to the demographic
     covariance gap. Higher Fst → larger covariance mismatch → worse portability. -/
 theorem unified_fst_to_covariance_gap
     (p : EvolutionaryParameters)
     (kappa : ℝ) (h_kappa : 0 < kappa)
-    (h_forces : 0 < p.theta + p.bigM) :
+    (_h_forces : 0 < p.theta + p.bigM) :
     0 < kappa * fstEquilibrium p := by
   exact mul_pos h_kappa (fstEquilibrium_pos p)
 
@@ -5450,14 +5448,14 @@ theorem harmonic_mean_governs_drift
     -- Now: T²·Ne_s·Ne_l < T²·Ne_s·Ne_l + T_b·(T-T_b)·(Ne_l - Ne_s)²
     linarith [mul_pos (mul_pos h_Tb_pos (show (0:ℝ) < T_total - T_bottleneck by linarith))
                        (sq_pos_of_pos (show (0:ℝ) < Ne_large - Ne_small by linarith))]
-  exact (mul_lt_mul_right hD_pos).mp hmul
+  exact (mul_lt_mul_iff_left₀ hD_pos).mp hmul
 
 /-- **Integration theorem**: Under the unified model, portability at equilibrium is
     strictly between 0 and 1 when all forces are present. -/
 theorem unified_portability_between_zero_and_one
     (p : EvolutionaryParameters)
-    (h_theta : 0 < p.theta) (h_mig : 0 < p.bigM)
-    (h_time : 0 < p.t_div) :
+    (_h_theta : 0 < p.theta) (_h_mig : 0 < p.bigM)
+    (_h_time : 0 < p.t_div) :
     -- Fst is strictly between 0 and 1
     0 < fstEquilibrium p ∧ fstEquilibrium p < 1 := by
   constructor
@@ -5626,7 +5624,7 @@ noncomputable def PGSEvolutionaryModel.R2_target (m : PGSEvolutionaryModel) : �
 
 /-- R²_target ≤ R²_source (portability ratio ≤ 1 at equilibrium). -/
 theorem PGSEvolutionaryModel.R2_target_le_source (m : PGSEvolutionaryModel)
-    (h_forces : 0 < m.theta + m.bigM)
+    (_h_forces : 0 < m.theta + m.bigM)
     (h_ratio_le : m.portabilityRatio ≤ 1) :
     m.R2_target ≤ m.R2_source := by
   unfold R2_target
@@ -5747,9 +5745,9 @@ noncomputable def PGSEvolutionaryModel.Brier_source (m : PGSEvolutionaryModel) :
     DERIVED: R²_target ≤ R²_source → (1 - R²_target) ≥ (1 - R²_source)
     → π(1-π)(1 - R²_target) ≥ π(1-π)(1 - R²_source). -/
 theorem PGSEvolutionaryModel.Brier_target_ge_source (m : PGSEvolutionaryModel)
-    (h_forces : 0 < m.theta + m.bigM)
+    (_h_forces : 0 < m.theta + m.bigM)
     (h_ratio_le : m.portabilityRatio ≤ 1)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
+    (_h_ratio_nn : 0 ≤ m.portabilityRatio) :
     m.Brier_source ≤ m.Brier_target := by
   unfold Brier_target Brier_source R2_target
   have h_prev : 0 < m.prevalence * (1 - m.prevalence) := by
@@ -5850,8 +5848,8 @@ noncomputable def migrationRestorationRate (Ne m_rate : ℝ) : ℝ :=
 
 /-- The decay rate decomposes additively. -/
 theorem portabilityDecayRate_decomposition (Ne mu m_rate r : ℝ)
-    (hNe : Ne ≠ 0) (hM : 1 + 4 * Ne * m_rate ≠ 0)
-    (hTM : 1 + 4 * Ne * mu + 4 * Ne * m_rate ≠ 0) :
+    (hNe : Ne ≠ 0) (_hM : 1 + 4 * Ne * m_rate ≠ 0)
+    (_hTM : 1 + 4 * Ne * mu + 4 * Ne * m_rate ≠ 0) :
     portabilityDecayRate Ne mu m_rate r =
       driftDecayRate Ne mu m_rate + ldDecayRate r +
       mutationDecayRate mu - migrationRestorationRate Ne m_rate := by
@@ -5913,7 +5911,7 @@ theorem r2_drops_faster_than_snr (r2_s r2_t : ℝ)
     Nagelkerke = R² × calibration_factor, and both R² and calibration
     degrade across populations, so the product drops faster than either alone. -/
 theorem nagelkerke_drops_faster_than_r2 (r2_target cal : ℝ)
-    (h_r2 : 0 < r2_target) (h_cal : 0 < cal) (h_cal_lt : cal < 1) :
+    (h_r2 : 0 < r2_target) (_h_cal : 0 < cal) (h_cal_lt : cal < 1) :
     r2_target * cal < r2_target := by
   nlinarith
 
@@ -5951,9 +5949,9 @@ noncomputable def PGSEvolutionaryModel.allMetrics (m : PGSEvolutionaryModel) :
 /-- **All metrics degrade together** when portability ratio < 1.
     R² decreases, AUC decreases, Brier increases. -/
 theorem PGSEvolutionaryModel.all_metrics_degrade (m : PGSEvolutionaryModel)
-    (h_forces : 0 < m.theta + m.bigM)
-    (h_ratio_le : m.portabilityRatio ≤ 1)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio)
+    (_h_forces : 0 < m.theta + m.bigM)
+    (_h_ratio_le : m.portabilityRatio ≤ 1)
+    (_h_ratio_nn : 0 ≤ m.portabilityRatio)
     (h_ratio_lt : m.portabilityRatio < 1) :
     -- R² decreases
     m.R2_target < m.R2_source ∧

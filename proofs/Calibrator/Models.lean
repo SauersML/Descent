@@ -731,7 +731,7 @@ theorem sum_to_zero_after_projection
       (∑ x_1, (B * Z) x x_1 * β x_1) * W x x
           = W x x * ∑ x_1, (B * Z) x x_1 * β x_1 := by ring
       _ = ∑ x_1, W x x * ((B * Z) x x_1 * β x_1) := by
-          simpa [Finset.mul_sum]
+          simp [Finset.mul_sum]
       _ = ∑ x_1, (B * Z) x x_1 * β x_1 * W x x := by
           refine Finset.sum_congr rfl ?_
           intro x_1 _
@@ -750,7 +750,7 @@ theorem sum_to_zero_after_projection
               intro x _
               ring
       _ = β y * ∑ x, (B * Z) x y * W x x := by
-              simpa [Finset.mul_sum]
+              simp [Finset.mul_sum]
   simp [h_factor]
   -- Now: Σⱼ βⱼ * (Σᵢ (B*Z)ᵢⱼ * Wᵢᵢ)
 
@@ -1007,7 +1007,7 @@ This uses a standard exponentially decaying profile in distance; the smoothness
 parameter `ν` and scale `ρ` are explicit parameters. -/
 noncomputable def maternKernelTemplate {k : ℕ} (ν ρ σ2 : ℝ) (x z : PCVec k) : ℝ :=
   let r := dist x z
-  if hρ : 0 < ρ then
+  if 0 < ρ then
     σ2 * Real.exp (-(Real.sqrt (2 * ν) * r) / ρ)
   else
     0
@@ -1715,7 +1715,7 @@ theorem F_rawPRS_subset_F_PC_lin (k : ℕ) [Fintype (Fin k)] :
   rcases hq with ⟨a, b, ha, hform⟩
   refine ⟨a, b, (fun _ => 0), ha, ?_⟩
   intro s x
-  simpa [pcLinForm, hform s x]
+  simp [pcLinForm, hform s x]
 
 theorem F_resid_subset_F_PC_lin (k : ℕ) [Fintype (Fin k)] :
     F_resid k ⊆ F_PC_lin k := by
@@ -1822,12 +1822,12 @@ theorem rawPGSEquivalence {k : ℕ} (cov : CovariateMaps k)
 
 /-- Zero-penalty flexibility: the model class can realize arbitrary threshold and scale functions.
 We construct blocks that exactly match target `T(x)` and strictly positive `σ(x)`. -/
-theorem flexibilityZeroPenalty {k : ℕ} (cov : CovariateMaps k) (lambda : ℝ) (h_lambda_zero : lambda = 0)
+theorem flexibilityZeroPenalty {k : ℕ} (cov : CovariateMaps k) (lambda : ℝ) (_h_lambda_zero : lambda = 0)
     (Ttarget sigmaTarget : PCPoint k → ℝ) (h_sigma_pos : ∀ x, 0 < sigmaTarget x) :
     ∃ tBlk : ThresholdBlock k, ∃ sBlk : LogScaleBlock k,
       (∀ x, thresholdPredictor cov tBlk x = Ttarget x) ∧
       (∀ x, sigmaPredictor cov sBlk x = sigmaTarget x) := by
-  subst h_lambda_zero
+  subst lambda
   refine ⟨
     { alphaT := 0, gammaT := 0, fT := Ttarget },
     { alphaSigma := 0, gammaSigma := 0, fSigma := fun x => Real.log (sigmaTarget x) },
