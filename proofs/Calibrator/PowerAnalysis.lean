@@ -256,10 +256,49 @@ theorem truncationBias_nonneg (se beta z_alpha : ℝ) (h_se : 0 < se) (h_beta : 
     integration. -/
 theorem truncationBias_vanishes_large_signal (se : ℝ) (h_se : 0 < se) :
   ∀ delta : ℝ, 0 < delta →
-    ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / se →
-      ∀ z_alpha : ℝ, 0 < z_alpha →
+    ∀ z_alpha : ℝ, 0 < z_alpha →
+      ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / se →
         truncationBias se beta z_alpha < delta := by
-  sorry
+  intro delta h_delta z_alpha h_zalpha
+  let c : ℝ := delta * Real.sqrt (2 * Real.pi) / se
+  have h_sqrt_pos : 0 < Real.sqrt (2 * Real.pi) := by
+    apply Real.sqrt_pos.mpr
+    positivity
+  have h_c_pos : 0 < c := by
+    unfold c
+    exact div_pos (mul_pos h_delta h_sqrt_pos) h_se
+  refine ⟨z_alpha + max 1 (-2 * Real.log c), ?_⟩
+  intro beta h_beta
+  unfold truncationBias
+  have hx : max 1 (-2 * Real.log c) < beta / se - z_alpha := by
+    linarith
+  have hx_one : 1 < beta / se - z_alpha := lt_of_le_of_lt (le_max_left _ _) hx
+  have hx_log : -2 * Real.log c < beta / se - z_alpha := lt_of_le_of_lt (le_max_right _ _) hx
+  have h_quad :
+      -((z_alpha - beta / se) ^ 2) / 2 < Real.log c := by
+    have hx_sq_ge : beta / se - z_alpha ≤ (beta / se - z_alpha) ^ 2 := by
+      nlinarith [hx_one]
+    have hneg_half :
+        -((beta / se - z_alpha) ^ 2) / 2 ≤ -(beta / se - z_alpha) / 2 := by
+      nlinarith
+    have hlin : -(beta / se - z_alpha) / 2 < Real.log c := by
+      nlinarith
+    have h_eq : -((z_alpha - beta / se) ^ 2) / 2 = -((beta / se - z_alpha) ^ 2) / 2 := by
+      congr 1
+      ring
+    rw [h_eq]
+    exact lt_of_le_of_lt hneg_half hlin
+  have h_exp_lt : Real.exp (-((z_alpha - beta / se) ^ 2) / 2) < c := by
+    rw [← Real.exp_log h_c_pos]
+    exact Real.exp_lt_exp.mpr h_quad
+  have h_scaled :
+      se * Real.exp (-((z_alpha - beta / se) ^ 2) / 2) / Real.sqrt (2 * Real.pi) <
+        se * c / Real.sqrt (2 * Real.pi) := by
+    exact (div_lt_div_of_pos_right (mul_lt_mul_of_pos_left h_exp_lt h_se) h_sqrt_pos)
+  have h_target : se * c / Real.sqrt (2 * Real.pi) = delta := by
+    unfold c
+    field_simp [h_se.ne', Real.sqrt_ne_zero'.mpr (by positivity : 0 < 2 * Real.pi)]
+  exact h_scaled.trans_eq h_target
 
 /-- **Truncation bias near the significance threshold approximates SE.**
 
@@ -406,9 +445,10 @@ theorem winners_curse_inflation_ratio_gt_one (true_beta sigma : ℝ) (n : ℕ)
     (h_beta : 0 < true_beta) (h_sigma : 0 < sigma) (h_n : 0 < n) :
     1 < winnersCurseInflation true_beta sigma n / true_beta := by
   unfold winnersCurseInflation
-  rw [lt_div_iff₀ h_beta]
-  ring_nf
-  linarith [div_pos h_sigma (Real.sqrt_pos.mpr (Nat.cast_pos.mpr h_n))]
+  apply (lt_div_iff₀ h_beta).2
+  have h_pos : 0 < sigma / Real.sqrt n := by
+    exact div_pos h_sigma (Real.sqrt_pos.mpr (Nat.cast_pos.mpr h_n))
+  linarith
 
 /-- **Winner's curse biases PGS.**
     PGS R² is proportional to β̂². Using the winner's-curse-inflated
@@ -421,7 +461,7 @@ theorem winners_curse_overestimates_r2 (true_beta sigma : ℝ) (n : ℕ)
   have h_lt : true_beta < winnersCurseInflation true_beta sigma n :=
     winners_curse_inflates true_beta sigma n h_beta h_sigma h_n
   -- 0 < β ≤ β̂, so β² < β̂²
-  exact sq_lt_sq' (by linarith) h_lt
+  nlinarith
 
 /-- **Cross-population winner's curse compounds with smaller target n.**
     The winner's curse inflation is larger in the target population
