@@ -133,7 +133,7 @@ noncomputable def twoDemeIMEquilibriumScalars (M : ℝ) : DemographicCoalescence
 noncomputable def twoDemeIMEquilibriumDelta (M : ℝ) : ℝ :=
   1 / (2 * M + 1)
 
-theorem twoDemeIMEquilibriumDelta_eq (M : ℝ) (hM : M ≠ 0) (h2M1 : 2 * M + 1 ≠ 0) :
+theorem twoDemeIMEquilibriumDelta_eq (M : ℝ) (_hM : M ≠ 0) (h2M1 : 2 * M + 1 ≠ 0) :
     (twoDemeIMEquilibriumScalars M).delta = twoDemeIMEquilibriumDelta M := by
   simp [DemographicCoalescenceScalars.delta, hudsonFstFromCoalescenceTimes,
     twoDemeIMEquilibriumScalars, twoDemeIMEquilibriumETss,
@@ -1594,7 +1594,7 @@ theorem covarianceDivergence_ge_drift (fst_drift shared_ld : ℝ)
 
 /-- Covariance divergence is at most 1 when parameters are in [0, 1]. -/
 theorem covarianceDivergence_le_one (fst_drift shared_ld : ℝ)
-    (hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
+    (_hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
     (hld : 0 ≤ shared_ld) (_hld_le : shared_ld ≤ 1) :
     covarianceDivergenceMutationDrift fst_drift shared_ld ≤ 1 := by
   rw [covarianceDivergenceMutationDrift_eq]
@@ -1635,8 +1635,8 @@ theorem presentDayPGSVarianceMutationDrift_nonneg (V_A fst_drift shared_ld : ℝ
     When shared_ld < 1 and other parameters are positive, mutation-drift signal
     retention is strictly below drift-only signal retention. -/
 theorem mutationDrift_signal_lt_puredrift (V_A fst_drift shared_ld : ℝ)
-    (hVA : 0 < V_A) (hfst : 0 ≤ fst_drift) (hfst_lt : fst_drift < 1)
-    (hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
+    (hVA : 0 < V_A) (_hfst : 0 ≤ fst_drift) (hfst_lt : fst_drift < 1)
+    (_hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
     presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld <
       presentDayPGSVariance V_A fst_drift := by
   rw [presentDayPGSVarianceMutationDrift_eq]
@@ -2190,7 +2190,7 @@ noncomputable def effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
   (m₁₂ + m₂₁) / 2
 
 /-- Effective symmetric migration is between the two directional rates. -/
-theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ) (hm₁₂ : 0 < m₁₂) (hm₂₁ : 0 < m₂₁)
+theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ) (_hm₁₂ : 0 < m₁₂) (_hm₂₁ : 0 < m₂₁)
     (h_asym : m₂₁ < m₁₂) :
     m₂₁ < effectiveSymmetricMigration m₁₂ m₂₁ ∧
     effectiveSymmetricMigration m₁₂ m₂₁ < m₁₂ := by

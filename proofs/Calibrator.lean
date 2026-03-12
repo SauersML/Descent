@@ -49,6 +49,13 @@ namespace Calibrator
 
 local instance : Fact (2 ≤ 2) := ⟨by decide⟩
 
+/--
+Proof policy: do not add theorems whose conclusion merely repackages a premise
+by trivial algebra, rewriting, or conjunction-introduction. Such statements add
+noise without adding usable mathematical content and should be deleted rather
+than retained as named results.
+-/
+
 /-- Top-level HWE expectation identity for the diploid alternative-allele count. -/
 theorem hardyWeinberg_expectedAltAlleleCount_proved
     (h : HardyWeinbergModel) :

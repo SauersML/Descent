@@ -41,24 +41,12 @@ section CalibrationDefinitions
 noncomputable def calibrationInTheLarge (mean_observed mean_predicted : ℝ) : ℝ :=
   mean_observed - mean_predicted
 
-/-- Perfect CITL is zero. -/
-theorem perfect_citl_is_zero (mean_obs mean_pred : ℝ)
-    (h_equal : mean_obs = mean_pred) :
-    calibrationInTheLarge mean_obs mean_pred = 0 := by
-  unfold calibrationInTheLarge; linarith
-
 /-- **Calibration slope.**
     Regress observed on predicted: Y = a + b × predicted.
     b = 1 means well-calibrated spread.
     b < 1 means predictions are too extreme (overfitting).
     b > 1 means predictions are too conservative. -/
 noncomputable def calibrationSlopeDeviation (slope : ℝ) : ℝ := |slope - 1|
-
-/-- Perfect calibration slope deviation is zero. -/
-theorem perfect_slope_is_one (slope : ℝ)
-    (h : slope = 1) :
-    calibrationSlopeDeviation slope = 0 := by
-  unfold calibrationSlopeDeviation; rw [h]; simp
 
 /-- **Hosmer-Lemeshow statistic.**
     Group predictions into deciles, compare observed vs expected

@@ -42,7 +42,7 @@ theorem law_of_total_variance_r2_bound
     (h_decomp : varZ = eVarZgivenD + varEZgivenD)
     (h_varZ_pos : 0 < varZ)
     (h_eVar_nonneg : 0 ≤ eVarZgivenD)
-    (h_varE_nonneg : 0 ≤ varEZgivenD) :
+    (_h_varE_nonneg : 0 ≤ varEZgivenD) :
     varEZgivenD / varZ ≤ 1 := by
   rw [div_le_one h_varZ_pos, h_decomp]
   linarith
@@ -55,10 +55,10 @@ theorem r2_small_when_within_dominates
     (varZ eVarZgivenD varEZgivenD δ : ℝ)
     (h_decomp : varZ = eVarZgivenD + varEZgivenD)
     (h_varZ_pos : 0 < varZ)
-    (h_eVar_nonneg : 0 ≤ eVarZgivenD)
-    (h_varE_nonneg : 0 ≤ varEZgivenD)
+    (_h_eVar_nonneg : 0 ≤ eVarZgivenD)
+    (_h_varE_nonneg : 0 ≤ varEZgivenD)
     (h_within_dominates : eVarZgivenD ≥ (1 - δ) * varZ)
-    (hδ_pos : 0 < δ) :
+    (_hδ_pos : 0 < δ) :
     varEZgivenD / varZ ≤ δ := by
   have h1 : varEZgivenD = varZ - eVarZgivenD := by linarith
   rw [h1, sub_div, div_self (h_varZ_pos.ne')]
@@ -77,10 +77,10 @@ theorem squared_error_cv_is_two (sigma_sq : ℝ) (hσ : 0 < sigma_sq) :
     is bounded, each individual fraction must be small. -/
 theorem comparable_covariates_both_small
     (r2_d r2_s B ε : ℝ)
-    (h_d_nonneg : 0 ≤ r2_d) (h_s_nonneg : 0 ≤ r2_s)
+    (_h_d_nonneg : 0 ≤ r2_d) (_h_s_nonneg : 0 ≤ r2_s)
     (h_comparable : r2_d ≤ r2_s + ε)
     (h_sum_bound : r2_d + r2_s ≤ B)
-    (hB_pos : 0 < B) :
+    (_hB_pos : 0 < B) :
     r2_d ≤ (B + ε) / 2 := by
   linarith
 
@@ -102,7 +102,7 @@ section Question2
     Faster exponential decay rate implies smaller correlation at any positive distance. -/
 theorem faster_decay_lower_correlation
     (lam_slow lam_fast d : ℝ)
-    (hlam_slow_pos : 0 < lam_slow)
+    (_hlam_slow_pos : 0 < lam_slow)
     (hlam_faster : lam_slow < lam_fast)
     (hd_pos : 0 < d) :
     Real.exp (-lam_fast * d) < Real.exp (-lam_slow * d) := by
@@ -128,7 +128,7 @@ theorem immune_portability_below_neutral
     This drives PGS variance increase for immune traits. -/
 theorem heterozygosity_increases_toward_half
     (p₁ p₂ : ℝ)
-    (hp₁_pos : 0 < p₁)
+    (_hp₁_pos : 0 < p₁)
     (hp₁_lt_p₂ : p₁ < p₂)
     (hp₂_le_half : p₂ ≤ 1 / 2) :
     2 * p₁ * (1 - p₁) < 2 * p₂ * (1 - p₂) := by
@@ -138,7 +138,7 @@ theorem heterozygosity_increases_toward_half
     total PGS variance increases.** This is the mechanism for WBC/lymphocyte count. -/
 theorem pgs_variance_can_increase
     (v_large_s v_large_t v_small_s v_small_t : ℝ)
-    (h_large_up : v_large_s < v_large_t)
+    (_h_large_up : v_large_s < v_large_t)
     (h_net : v_large_t - v_large_s > v_small_s - v_small_t) :
     v_large_s + v_small_s < v_large_t + v_small_t := by
   linarith
@@ -211,8 +211,8 @@ theorem ppv_increases_with_prevalence
     With fixed threshold and higher PGS mean among cases: recall ↑. -/
 theorem recall_increases_with_tp
     (tp₁ tp₂ fn₁ fn₂ : ℝ)
-    (htp₁ : 0 < tp₁) (hfn₁ : 0 ≤ fn₁)
-    (htp₂ : 0 < tp₂) (hfn₂ : 0 ≤ fn₂)
+    (htp₁ : 0 < tp₁) (_hfn₁ : 0 ≤ fn₁)
+    (_htp₂ : 0 < tp₂) (_hfn₂ : 0 ≤ fn₂)
     (h_tp_up : tp₁ < tp₂)
     (h_total_same : tp₁ + fn₁ = tp₂ + fn₂) :
     tp₁ / (tp₁ + fn₁) < tp₂ / (tp₂ + fn₂) := by
@@ -224,9 +224,9 @@ theorem recall_increases_with_tp
     even though individual errors are larger. -/
 theorem r2_up_while_error_up
     (sse₁ sse₂ sst₁ sst₂ : ℝ)
-    (h_sse_pos₁ : 0 < sse₁) (h_sst_pos₁ : 0 < sst₁)
-    (h_sse_pos₂ : 0 < sse₂) (h_sst_pos₂ : 0 < sst₂)
-    (h_sse_up : sse₁ < sse₂)
+    (_h_sse_pos₁ : 0 < sse₁) (_h_sst_pos₁ : 0 < sst₁)
+    (_h_sse_pos₂ : 0 < sse₂) (_h_sst_pos₂ : 0 < sst₂)
+    (_h_sse_up : sse₁ < sse₂)
     (h_ratio_down : sse₂ / sst₂ < sse₁ / sst₁) :
     1 - sse₁ / sst₁ < 1 - sse₂ / sst₂ := by
   linarith
@@ -271,7 +271,7 @@ section Question4
     R² = Vg/(Vg + Ve), so larger Ve → smaller R². -/
 theorem env_variance_lowers_r2
     (Vg Ve₁ Ve₂ : ℝ)
-    (hVg : 0 < Vg) (hVe₁ : 0 < Ve₁) (hVe₂ : 0 < Ve₂)
+    (hVg : 0 < Vg) (hVe₁ : 0 < Ve₁) (_hVe₂ : 0 < Ve₂)
     (h_more_env : Ve₁ < Ve₂) :
     Vg / (Vg + Ve₂) < Vg / (Vg + Ve₁) := by
   apply div_lt_div_of_pos_left hVg (by linarith) (by linarith)
@@ -325,7 +325,7 @@ theorem prediction_error_positive
     Relative error = ((1-ρ)β + δ) / (ρβ). As ρ↓, this increases. -/
 theorem relative_error_increases_with_turnover
     (β δ ρ₁ ρ₂ : ℝ) (hβ : 0 < β) (hδ : 0 < δ)
-    (hρ₁ : 0 < ρ₁) (hρ₂ : 0 < ρ₂) (hρ : ρ₂ < ρ₁) (hρ₁_le : ρ₁ ≤ 1) :
+    (hρ₁ : 0 < ρ₁) (hρ₂ : 0 < ρ₂) (hρ : ρ₂ < ρ₁) (_hρ₁_le : ρ₁ ≤ 1) :
     ((1 - ρ₁) * β + δ) / (ρ₁ * β) < ((1 - ρ₂) * β + δ) / (ρ₂ * β) := by
   rw [div_lt_div_iff₀ (mul_pos hρ₁ hβ) (mul_pos hρ₂ hβ)]
   nlinarith [sq_nonneg β, sq_nonneg δ, mul_pos hρ₁ hβ, mul_pos hρ₂ hβ,
@@ -358,7 +358,7 @@ theorem variance_decomposition
     in small-effect component, total variance increases. -/
 theorem variance_increase_sufficient
     (vL_s vL_t vS_s vS_t : ℝ)
-    (h_large_up : vL_s < vL_t)
+    (_h_large_up : vL_s < vL_t)
     (h_net : vL_t - vL_s > vS_s - vS_t) :
     vL_s + vS_s < vL_t + vS_t := by linarith
 
@@ -383,8 +383,8 @@ theorem brier_uncertainty_max_at_half (π : ℝ) :
 /-- **Closer to 1/2 ↔ higher uncertainty.** -/
 theorem closer_to_half_more_uncertainty
     (π₁ π₂ : ℝ)
-    (h₁ : 0 < π₁) (h₁' : π₁ < 1)
-    (h₂ : 0 < π₂) (h₂' : π₂ < 1)
+    (_h₁ : 0 < π₁) (_h₁' : π₁ < 1)
+    (_h₂ : 0 < π₂) (_h₂' : π₂ < 1)
     (h_closer : (π₂ - 1/2) ^ 2 < (π₁ - 1/2) ^ 2) :
     π₁ * (1 - π₁) < π₂ * (1 - π₂) := by
   nlinarith [brier_uncertainty_formula π₁, brier_uncertainty_formula π₂]
@@ -392,7 +392,7 @@ theorem closer_to_half_more_uncertainty
 /-- **Prediction interval width increases as R² decreases.** -/
 theorem interval_width_increases
     (r2₁ r2₂ : ℝ)
-    (hr2₁ : r2₂ < r2₁) (hr2₁_lt : r2₁ < 1) (hr2₂_nn : 0 ≤ r2₂) :
+    (hr2₁ : r2₂ < r2₁) (hr2₁_lt : r2₁ < 1) (_hr2₂_nn : 0 ≤ r2₂) :
     Real.sqrt (1 - r2₁) < Real.sqrt (1 - r2₂) := by
   exact Real.sqrt_lt_sqrt (by linarith) (by linarith)
 
@@ -412,7 +412,7 @@ section UnifiedTheory
 /-- **No single factor captures the full ratio.** -/
 theorem single_factor_insufficient
     (af ld eff env : ℝ)
-    (h_af : 0 < af) (h_af_le : af ≤ 1)
+    (h_af : 0 < af) (_h_af_le : af ≤ 1)
     (h_ld : 0 < ld) (h_ld_lt : ld < 1)
     (h_eff : 0 < eff) (h_eff_lt : eff < 1)
     (h_env : 0 < env) (h_env_le : env ≤ 1) :
@@ -457,7 +457,7 @@ theorem selection_bounds_effect_retention
     (r2_src ρ_eff ρ_sel : ℝ)
     (hr2 : 0 ≤ r2_src)
     (h_bound : ρ_eff ≤ ρ_sel)
-    (h_eff_nn : 0 ≤ ρ_eff) (h_sel_nn : 0 ≤ ρ_sel) :
+    (h_eff_nn : 0 ≤ ρ_eff) (_h_sel_nn : 0 ≤ ρ_sel) :
     r2_src * ρ_eff ^ 2 ≤ r2_src * ρ_sel ^ 2 := by
   apply mul_le_mul_of_nonneg_left _ hr2
   exact sq_le_sq' (by linarith) h_bound
@@ -601,7 +601,7 @@ theorem r2_incomparable_across_groups
 theorem heteroscedasticity_inflates_loss
     (v_sig v_noise_s v_noise_t : ℝ)
     (h_sig : 0 < v_sig)
-    (h_ns : 0 < v_noise_s) (h_nt : 0 < v_noise_t)
+    (h_ns : 0 < v_noise_s) (_h_nt : 0 < v_noise_t)
     (h_more_noise : v_noise_s < v_noise_t) :
     v_sig / (v_sig + v_noise_t) < v_sig / (v_sig + v_noise_s) := by
   exact div_lt_div_of_pos_left h_sig (by linarith) (by linarith)
@@ -659,8 +659,8 @@ theorem local_fst_more_informative
     error has a "locus heterogeneity" component not captured by global Fst. -/
 theorem locus_heterogeneity_increases_error
     {m : ℕ} (β : Fin m → ℝ) (fst : Fin m → ℝ) (fst_mean : ℝ)
-    (h_mean : fst_mean * (∑ i, β i ^ 2) = ∑ i, β i ^ 2 * fst_mean)
-    (h_not_const : ∃ i j, fst i ≠ fst j) :
+    (_h_mean : fst_mean * (∑ i, β i ^ 2) = ∑ i, β i ^ 2 * fst_mean)
+    (_h_not_const : ∃ i j, fst i ≠ fst j) :
     -- The prediction error is larger than what a uniform-Fst model predicts
     -- because variance in local Fst adds a "Jensen gap" to the MSE
     True := trivial
@@ -709,11 +709,11 @@ theorem f1_le_arithmetic_mean (p r : ℝ)
     dominates the sensitivity decrease. We prove the sufficient condition. -/
 theorem prevalence_dominates_sensitivity_for_recall
     (n_cases₁ n_cases₂ sens₁ sens₂ : ℝ)
-    (h_cases₁ : 0 < n_cases₁) (h_cases₂ : 0 < n_cases₂)
-    (h_sens₁ : 0 < sens₁) (h_sens₂ : 0 < sens₂)
-    (h_sens₁_le : sens₁ ≤ 1) (h_sens₂_le : sens₂ ≤ 1)
+    (h_cases₁ : 0 < n_cases₁) (_h_cases₂ : 0 < n_cases₂)
+    (_h_sens₁ : 0 < sens₁) (h_sens₂ : 0 < sens₂)
+    (_h_sens₁_le : sens₁ ≤ 1) (_h_sens₂_le : sens₂ ≤ 1)
     -- More cases in target (prevalence is higher)
-    (h_more_cases : n_cases₁ < n_cases₂)
+    (_h_more_cases : n_cases₁ < n_cases₂)
     -- Sensitivity doesn't drop too much (prevalence effect dominates)
     (h_sens_ratio : sens₁ / sens₂ < n_cases₂ / n_cases₁) :
     -- Then absolute true positives increase
@@ -782,7 +782,7 @@ theorem ld_mismatch_not_linearly_recoverable
     (σ_target : Matrix (Fin 2) (Fin 2) ℝ)
     (cross_target : Fin 2 → ℝ)
     -- σ_target.mulVec is linear, so scaling w_source just scales the image
-    (h_base_mismatch : σ_target.mulVec w_source ≠ cross_target)
+    (_h_base_mismatch : σ_target.mulVec w_source ≠ cross_target)
     -- The image of the source direction doesn't align with cross_target
     -- (cross_target is not a scalar multiple of σ_target.mulVec w_source)
     (h_not_aligned : ∀ α : ℝ, α • σ_target.mulVec w_source ≠ cross_target) :

@@ -150,7 +150,7 @@ theorem exactBrierRiskOfCalibrated_eq_integral {Z : Type*} [MeasurableSpace Z]
   unfold exactBrierRiskOfCalibrated
   refine integral_congr_ae ?_
   filter_upwards with z
-  simpa [brierScore_at_true_prob] using (brierScore_at_true_prob (η z))
+  simp [brierScore_at_true_prob]
 
 /-! ### Posterior Mean Optimality -/
 
@@ -525,7 +525,7 @@ noncomputable def rust_correction_fn (S_basis : Fin k → Matrix (Fin p) (Fin p)
   let dV_dbeta := (fun b_val => 0.5 * Real.log (Matrix.det (Hessian_fn S_basis X W rho b_val)))
   ((grad_op dV_dbeta b).transpose * delta).trace
 
-noncomputable def rust_direct_gradient_fn (S_basis : Fin k → Matrix (Fin p) (Fin p) ℝ) (X : Matrix (Fin n) (Fin p) ℝ) (W : Matrix (Fin p) (Fin 1) ℝ → Matrix (Fin n) (Fin n) ℝ) (beta_hat : (Fin k → ℝ) → Matrix (Fin p) (Fin 1) ℝ) (log_lik : Matrix (Fin p) (Fin 1) ℝ → ℝ) (rho : Fin k → ℝ) (i : Fin k) : ℝ :=
+noncomputable def rust_direct_gradient_fn (S_basis : Fin k → Matrix (Fin p) (Fin p) ℝ) (X : Matrix (Fin n) (Fin p) ℝ) (W : Matrix (Fin p) (Fin 1) ℝ → Matrix (Fin n) (Fin n) ℝ) (beta_hat : (Fin k → ℝ) → Matrix (Fin p) (Fin 1) ℝ) (_log_lik : Matrix (Fin p) (Fin 1) ℝ → ℝ) (rho : Fin k → ℝ) (i : Fin k) : ℝ :=
   let b := beta_hat rho
   let H := Hessian_fn S_basis X W rho b
   let H_inv := matrixInvAlg H
@@ -713,7 +713,7 @@ theorem laml_gradient_validity
     -- 3. Gradient wrt beta matches the term used in rust_correction_fn
     --    Note: rust_correction_fn uses `grad_op dV_dbeta`.
     --    Optimality of beta implies grad(L_pen) = 0, so grad(LAML) = grad(0.5 log det H).
-    (h_grad_beta : HasGradientAt (fun b => LAML_fn log_lik S_basis X W (fun _ => b) rho)
+    (_h_grad_beta : HasGradientAt (fun b => LAML_fn log_lik S_basis X W (fun _ => b) rho)
                                  (grad_op (fun b_val => 0.5 * Real.log (Matrix.det (Hessian_fn S_basis X W rho b_val))) (beta_hat rho))
                                  (beta_hat rho))
     -- 4. Chain rule holds for the total derivative
@@ -740,9 +740,9 @@ by
           symm
           exact h_left
         _ = H⁻¹ * (- (Real.exp (rho i) • S_basis i) * beta_hat rho) := by
-          simpa [H] using h_mul
+          simp [H] using h_mul
         _ = -H⁻¹ * ((Real.exp (rho i) • S_basis i) * beta_hat rho) := by
-          simp [Matrix.mul_assoc, neg_mul]
+          simp [neg_mul]
     calc
       deriv (fun r => beta_hat (Function.update rho i r)) (rho i)
           = -H⁻¹ * ((Real.exp (rho i) • S_basis i) * beta_hat rho) := h_solved
@@ -837,7 +837,7 @@ theorem BayesRisk_mono {α : Type*} (R : α → ℝ) (F G : Set α)
 /-- Bernoulli log-loss with Boolean outcome, valued in `ℝ≥0∞`.
     Outside the open interval `(0,1)` for `p̂`, the loss is set to `∞`. -/
 noncomputable def LogLoss (pHat : ℝ) (y : Bool) : ENNReal :=
-  if h : 0 < pHat ∧ pHat < 1 then
+  if _h : 0 < pHat ∧ pHat < 1 then
     ENNReal.ofReal (if y then -Real.log pHat else -Real.log (1 - pHat))
   else
     ⊤
@@ -1061,7 +1061,7 @@ theorem brierRisk_target_le_mul_source_of_withDensity
     (hw_meas : AEMeasurable (fun z => ENNReal.ofReal (w z)) μS)
     (hw_nonneg : ∀ z, 0 ≤ w z)
     (hw_bdd : ∀ z, w z ≤ M)
-    (hM_nonneg : 0 ≤ M)
+    (_hM_nonneg : 0 ≤ M)
     (h_int_source : Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μS)
     (h_int_weighted : Integrable (fun z => w z * expectedBrierScore (q z).1 (η z).1) μS) :
     brierRisk μT η q ≤ M * brierRisk μS η q := by

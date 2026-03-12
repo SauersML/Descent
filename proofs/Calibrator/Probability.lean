@@ -971,13 +971,13 @@ avoid threading explicit moment hypotheses (hP0, hP2, hPC0) through every theore
 /-- E[P] = 0 under the standard Gaussian. -/
 theorem gaussian_mean_zero :
     ∫ x, x ∂(ProbabilityTheory.gaussianReal 0 1) = 0 := by
-  simpa using (ProbabilityTheory.integral_id_gaussianReal (μ := (0 : ℝ)) (v := (1 : ℝ≥0)))
+  simp [ProbabilityTheory.integral_id_gaussianReal]
 
 /-- E[P²] = 1 under the standard Gaussian (variance = 1). -/
 theorem gaussian_second_moment :
     ∫ x, x ^ 2 ∂(ProbabilityTheory.gaussianReal 0 1) = 1 := by
   have h_var : ProbabilityTheory.variance id (ProbabilityTheory.gaussianReal 0 1) = (1 : ℝ) := by
-    simpa using (ProbabilityTheory.variance_id_gaussianReal (μ := (0 : ℝ)) (v := (1 : ℝ≥0)))
+    norm_num [ProbabilityTheory.variance_id_gaussianReal]
   have h_var_int :
       ProbabilityTheory.variance id (ProbabilityTheory.gaussianReal 0 1) =
         ∫ x, (x - ∫ t, t ∂(ProbabilityTheory.gaussianReal 0 1)) ^ 2
@@ -1015,13 +1015,15 @@ theorem independent_product_mean_zero {k : ℕ} [Fintype (Fin k)] (l : Fin k) :
         simpa using
           (MeasureTheory.integral_map (μ := μC) (φ := Function.eval l)
             (f := fun x : ℝ => x) h_eval_ae aestronglyMeasurable_id).symm
-      _ = 0 := by simpa [hC_map] using gaussian_mean_zero
+      _ = ∫ x, x ∂(ProbabilityTheory.gaussianReal 0 1) := by rw [hC_map]
+      _ = 0 := gaussian_mean_zero
+  have h_prod : stdNormalProdMeasure k = μP.prod μC := by
+    simp [stdNormalProdMeasure, μP, μC]
   calc
     ∫ pc, pc.1 * pc.2 l ∂(stdNormalProdMeasure k)
-        = ∫ pc, pc.1 * pc.2 l ∂(μP.prod μC) := by
-          simp [stdNormalProdMeasure, μP, μC]
+        = ∫ pc, pc.1 * pc.2 l ∂(μP.prod μC) := by rw [h_prod]
     _ = (∫ p, p ∂μP) * (∫ c, c l ∂μC) := hPC
-    _ = 0 := by simp [gaussian_mean_zero, hC0]
+    _ = 0 := by simp [hC0]
 
 /-! ### Standardized a.e. → Pointwise Upgrade
 

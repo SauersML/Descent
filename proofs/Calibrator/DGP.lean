@@ -316,13 +316,12 @@ private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
       A i0 i1 =
         twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
           twoLocusIBDCovariance ibdWeightT recombRateT tmrcaT := by
-    simp [A, i0, i1, twoLocusCoalescentCovarianceMatrix, hi_ne]
+    simp [A, i0, i1, twoLocusCoalescentCovarianceMatrix]
   have h10 :
       A i1 i0 =
         twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
           twoLocusIBDCovariance ibdWeightT recombRateT tmrcaT := by
-    simp [A, i0, i1, twoLocusCoalescentCovarianceMatrix, hi_ne, Matrix.sub_apply,
-      and_assoc]
+    simp [A, i0, i1, twoLocusCoalescentCovarianceMatrix, hi_ne, Matrix.sub_apply]
   have h_row01 :
       (A i0 i1)^2 ≤ ∑ j : Fin t, (A i0 j)^2 := by
     exact Finset.single_le_sum (fun j _ => sq_nonneg (A i0 j)) (by simp)
@@ -666,7 +665,7 @@ theorem linear_noise_implies_nonlinear_slope
   dsimp [optimalSlopeLinearNoise] at h0 h1 h2
 
   -- Simplify the equations
-  simp only [mul_zero, add_zero, zero_mul, mul_one] at h0 h1
+  simp only [mul_zero, add_zero, zero_mul] at h0 h1
   have h2 : beta0 + 2 * beta1 = sigma_g_sq / (sigma_g_sq + base_error + slope_error * 2) := by
     convert h2 using 1
     ring
@@ -918,7 +917,7 @@ theorem normalization_prevalence_bias {k : ℕ} [Fintype (Fin k)]
     (pdgp : PrevalenceDGP k)
     (pi_bar : ℝ)
     -- π̄ is the population-average prevalence under the training distribution
-    (h_pi_bar : pi_bar = ∫ pc, pdgp.prevalence pc.2 ∂pdgp.jointMeasure)
+    (_h_pi_bar : pi_bar = ∫ pc, pdgp.prevalence pc.2 ∂pdgp.jointMeasure)
     -- The normalized predictor uses π̄ as its intercept (ignoring ancestry-specific π)
     (f_norm : ℝ → (Fin k → ℝ) → ℝ)
     (h_norm : ∀ p c, f_norm p c = pi_bar + pdgp.pgs_effect * p) :
@@ -1477,7 +1476,7 @@ lemma rawOptimal_implies_orthogonality_gen {k sp : ℕ} [Fintype (Fin k)] [Finty
           intro p_val c_val
           have h := linearPredictor_eq_affine_of_raw_gen model' h_raw' h_linear p_val c_val
           simp only [model', ha_def, hb_def] at h
-          simpa using h
+          exact h
 
         have h_expand_full : ∫ pc, (residual pc - ε * pc.1) ^ 2 ∂μ =
             ∫ pc, residual pc ^ 2 ∂μ - 2 * ε * ∫ pc, residual pc * pc.1 ∂μ + ε ^ 2 * ∫ pc, pc.1 ^ 2 ∂μ := by
@@ -2081,10 +2080,10 @@ noncomputable def designMatrix {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (Fin 
     match j with
     | .intercept => 1
     | .pgsCoeff m =>
-        pgsBasis.B ⟨m.val + 1, by simpa using (Nat.succ_lt_succ m.isLt)⟩ (data.p i)
+        pgsBasis.B ⟨m.val + 1, by exact Nat.succ_lt_succ m.isLt⟩ (data.p i)
     | .pcSpline l s => splineBasis.b s (data.c i l)
     | .interaction m l s =>
-        pgsBasis.B ⟨m.val + 1, by simpa using (Nat.succ_lt_succ m.isLt)⟩ (data.p i) *
+        pgsBasis.B ⟨m.val + 1, by exact Nat.succ_lt_succ m.isLt⟩ (data.p i) *
           splineBasis.b s (data.c i l)
 
 /-- **Key Lemma**: Linear predictor equals design matrix times parameter vector.
@@ -2118,31 +2117,31 @@ lemma linearPredictor_eq_designMatrix_mulVec {n p k sp : ℕ}
             | ParamIx.interaction m0 l s => m.fₘₗ m0 l s) *
           match x with
           | ParamIx.intercept => 1
-          | ParamIx.pgsCoeff m_1 => m.pgsBasis.B ⟨m_1.val + 1, by simpa using (Nat.succ_lt_succ m_1.isLt)⟩ (data.p i)
+          | ParamIx.pgsCoeff m_1 => m.pgsBasis.B ⟨m_1.val + 1, by exact Nat.succ_lt_succ m_1.isLt⟩ (data.p i)
           | ParamIx.pcSpline l s => m.pcSplineBasis.b s (data.c i l)
           | ParamIx.interaction m_1 l s =>
-              m.pgsBasis.B ⟨m_1.val + 1, by simpa using (Nat.succ_lt_succ m_1.isLt)⟩ (data.p i) *
+              m.pgsBasis.B ⟨m_1.val + 1, by exact Nat.succ_lt_succ m_1.isLt⟩ (data.p i) *
                 m.pcSplineBasis.b s (data.c i l)) =
       m.γ₀₀
       + (∑ mIdx, m.pgsBasis.B
-          ⟨mIdx.val + 1, by simpa using (Nat.succ_lt_succ mIdx.isLt)⟩ (data.p i) * m.γₘ₀ mIdx
+          ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) * m.γₘ₀ mIdx
         + (∑ lj : Fin k × Fin sp,
             m.pcSplineBasis.b lj.2 (data.c i lj.1) * m.f₀ₗ lj.1 lj.2
           + ∑ mlj : Fin p × Fin k × Fin sp,
               m.pgsBasis.B
-                ⟨mlj.1.val + 1, by simpa using (Nat.succ_lt_succ mlj.1.isLt)⟩ (data.p i) *
+                ⟨mlj.1.val + 1, by exact Nat.succ_lt_succ mlj.1.isLt⟩ (data.p i) *
                 (m.pcSplineBasis.b mlj.2.2 (data.c i mlj.2.1) * m.fₘₗ mlj.1 mlj.2.1 mlj.2.2))) := by
     -- Convert the sum over ParamIx using the equivalence to a sum type, then split.
     let g : ParamIxSum p k sp → ℝ
       | Sum.inl _ => m.γ₀₀
       | Sum.inr (Sum.inl mIdx) =>
           m.pgsBasis.B
-            ⟨mIdx.val + 1, by simpa using (Nat.succ_lt_succ mIdx.isLt)⟩ (data.p i) * m.γₘ₀ mIdx
+            ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) * m.γₘ₀ mIdx
       | Sum.inr (Sum.inr (Sum.inl (l, j))) =>
           m.pcSplineBasis.b j (data.c i l) * m.f₀ₗ l j
       | Sum.inr (Sum.inr (Sum.inr (mIdx, l, j))) =>
           m.pgsBasis.B
-            ⟨mIdx.val + 1, by simpa using (Nat.succ_lt_succ mIdx.isLt)⟩ (data.p i) *
+            ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
             (m.pcSplineBasis.b j (data.c i l) * m.fₘₗ mIdx l j)
     have hsum' :
         (∑ x : ParamIx p k sp,
@@ -2153,15 +2152,15 @@ lemma linearPredictor_eq_designMatrix_mulVec {n p k sp : ℕ}
               | ParamIx.interaction m0 l s => m.fₘₗ m0 l s) *
             match x with
             | ParamIx.intercept => 1
-            | ParamIx.pgsCoeff m_1 => m.pgsBasis.B ⟨m_1.val + 1, by simpa using (Nat.succ_lt_succ m_1.isLt)⟩ (data.p i)
+            | ParamIx.pgsCoeff m_1 => m.pgsBasis.B ⟨m_1.val + 1, by exact Nat.succ_lt_succ m_1.isLt⟩ (data.p i)
             | ParamIx.pcSpline l s => m.pcSplineBasis.b s (data.c i l)
             | ParamIx.interaction m_1 l s =>
-                m.pgsBasis.B ⟨m_1.val + 1, by simpa using (Nat.succ_lt_succ m_1.isLt)⟩ (data.p i) *
+                m.pgsBasis.B ⟨m_1.val + 1, by exact Nat.succ_lt_succ m_1.isLt⟩ (data.p i) *
                   m.pcSplineBasis.b s (data.c i l)) =
           ∑ x : ParamIxSum p k sp, g x := by
       refine (Fintype.sum_equiv (ParamIx.equivSum p k sp) _ g ?_)
       intro x
-      cases x <;> simp [g, ParamIx.equivSum, mul_assoc, mul_left_comm, mul_comm]
+      cases x <;> simp [g, ParamIx.equivSum]
     -- Split the sum over the nested Sum type.
     simpa [ParamIxSum, g] using hsum'
   -- Expand linearPredictor and match sums (convert double sums to pair sums).
@@ -2175,22 +2174,22 @@ lemma linearPredictor_eq_designMatrix_mulVec {n p k sp : ℕ}
   have hsum_int :
       (∑ mIdx, ∑ l, ∑ j,
           m.pgsBasis.B
-            ⟨mIdx.val + 1, by simpa using (Nat.succ_lt_succ mIdx.isLt)⟩ (data.p i) *
+            ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
             (m.pcSplineBasis.b j (data.c i l) * m.fₘₗ mIdx l j)) =
         ∑ mlj : Fin p × Fin k × Fin sp,
           m.pgsBasis.B
-            ⟨mlj.1.val + 1, by simpa using (Nat.succ_lt_succ mlj.1.isLt)⟩ (data.p i) *
+            ⟨mlj.1.val + 1, by exact Nat.succ_lt_succ mlj.1.isLt⟩ (data.p i) *
             (m.pcSplineBasis.b mlj.2.2 (data.c i mlj.2.1) * m.fₘₗ mlj.1 mlj.2.1 mlj.2.2) := by
     classical
     -- First convert the inner (l, j) sums into a sum over pairs.
     have hsum_inner :
         (∑ mIdx, ∑ l, ∑ j,
             m.pgsBasis.B
-              ⟨mIdx.val + 1, by simpa using (Nat.succ_lt_succ mIdx.isLt)⟩ (data.p i) *
+              ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
               (m.pcSplineBasis.b j (data.c i l) * m.fₘₗ mIdx l j)) =
           ∑ mIdx, ∑ lj : Fin k × Fin sp,
             m.pgsBasis.B
-              ⟨mIdx.val + 1, by simpa using (Nat.succ_lt_succ mIdx.isLt)⟩ (data.p i) *
+              ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
               (m.pcSplineBasis.b lj.2 (data.c i lj.1) * m.fₘₗ mIdx lj.1 lj.2) := by
       refine Finset.sum_congr rfl ?_
       intro mIdx _
@@ -2198,44 +2197,43 @@ lemma linearPredictor_eq_designMatrix_mulVec {n p k sp : ℕ}
         (Finset.sum_product (s := Finset.univ) (t := Finset.univ)
           (f := fun lj =>
             m.pgsBasis.B
-              ⟨mIdx.val + 1, by simpa using (Nat.succ_lt_succ mIdx.isLt)⟩ (data.p i) *
+              ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
               (m.pcSplineBasis.b lj.2 (data.c i lj.1) * m.fₘₗ mIdx lj.1 lj.2))).symm
     -- Then combine mIdx with (l, j) into a single product sum.
     calc
       (∑ mIdx, ∑ l, ∑ j,
           m.pgsBasis.B
-            ⟨mIdx.val + 1, by simpa using (Nat.succ_lt_succ mIdx.isLt)⟩ (data.p i) *
+            ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
             (m.pcSplineBasis.b j (data.c i l) * m.fₘₗ mIdx l j))
           =
           ∑ mIdx, ∑ lj : Fin k × Fin sp,
             m.pgsBasis.B
-              ⟨mIdx.val + 1, by simpa using (Nat.succ_lt_succ mIdx.isLt)⟩ (data.p i) *
+              ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
               (m.pcSplineBasis.b lj.2 (data.c i lj.1) * m.fₘₗ mIdx lj.1 lj.2) := hsum_inner
       _ =
           ∑ mlj : Fin p × Fin k × Fin sp,
             m.pgsBasis.B
-              ⟨mlj.1.val + 1, by simpa using (Nat.succ_lt_succ mlj.1.isLt)⟩ (data.p i) *
+              ⟨mlj.1.val + 1, by exact Nat.succ_lt_succ mlj.1.isLt⟩ (data.p i) *
               (m.pcSplineBasis.b mlj.2.2 (data.c i mlj.2.1) * m.fₘₗ mlj.1 mlj.2.1 mlj.2.2) := by
           simpa using
             (Finset.sum_product (s := Finset.univ) (t := Finset.univ)
               (f := fun mlj : Fin p × (Fin k × Fin sp) =>
                 m.pgsBasis.B
-                  ⟨mlj.1.val + 1, by simpa using (Nat.succ_lt_succ mlj.1.isLt)⟩ (data.p i) *
+                  ⟨mlj.1.val + 1, by exact Nat.succ_lt_succ mlj.1.isLt⟩ (data.p i) *
                   (m.pcSplineBasis.b mlj.2.2 (data.c i mlj.2.1) * m.fₘₗ mlj.1 mlj.2.1 mlj.2.2))).symm
   have hsum_lin :
       linearPredictor m (data.p i) (data.c i) =
         m.γ₀₀
         + (∑ mIdx, m.pgsBasis.B
-            ⟨mIdx.val + 1, by simpa using (Nat.succ_lt_succ mIdx.isLt)⟩ (data.p i) * m.γₘ₀ mIdx
+            ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) * m.γₘ₀ mIdx
           + (∑ lj : Fin k × Fin sp,
               m.pcSplineBasis.b lj.2 (data.c i lj.1) * m.f₀ₗ lj.1 lj.2
             + ∑ mlj : Fin p × Fin k × Fin sp,
                 m.pgsBasis.B
-                  ⟨mlj.1.val + 1, by simpa using (Nat.succ_lt_succ mlj.1.isLt)⟩ (data.p i) *
+                  ⟨mlj.1.val + 1, by exact Nat.succ_lt_succ mlj.1.isLt⟩ (data.p i) *
                   (m.pcSplineBasis.b mlj.2.2 (data.c i mlj.2.1) * m.fₘₗ mlj.1 mlj.2.1 mlj.2.2))) := by
-    simp [linearPredictor, evalSmooth, Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul,
-      add_mul, mul_add, mul_comm]
-    simp [hsum_pc, hsum_int, mul_comm]
+    simp [linearPredictor, evalSmooth, Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul]
+    simp [hsum_pc, hsum_int]
     ring_nf
   -- Finish by expanding the design-matrix side.
   simpa [designMatrix, packParams, Matrix.mulVec, dotProduct, mul_comm,
@@ -2400,7 +2398,7 @@ theorem penalty_quadratic_tendsto_proof {ι : Type*} [Fintype ι] [DecidableEq �
   -- Sphere is nonempty in the nontrivial case
   have h_sphere_nonempty : sphere.Nonempty := by
     have : 0 ≤ (1 : ℝ) := by linarith
-    simpa [sphere] using (NormedSpace.sphere_nonempty (x := (0 : ι → ℝ)) (r := (1 : ℝ))).2 this
+    simp [sphere] using (NormedSpace.sphere_nonempty (x := (0 : ι → ℝ)) (r := (1 : ℝ))).2 this
 
   -- Q attains a minimum on the sphere
   obtain ⟨v_min, hv_min_in, h_min⟩ :=
@@ -2410,7 +2408,9 @@ theorem penalty_quadratic_tendsto_proof {ι : Type*} [Fintype ι] [DecidableEq �
   have hv_min_ne : v_min ≠ 0 := by
     intro h0
     have : ‖v_min‖ = (1 : ℝ) := by simpa [sphere] using hv_min_in
-    have h : (0 : ℝ) = 1 := by simpa [h0] using this
+    have h : (0 : ℝ) = 1 := by
+      simp [h0] at this
+      exact this
     exact (one_ne_zero (α := ℝ)) (by simpa using h.symm)
   have hc_pos : 0 < c := hS_posDef v_min hv_min_ne
 
@@ -2562,8 +2562,7 @@ noncomputable def fit (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fint
                     intro i _; exact h_term i
           _ = (1 / (2 : ℝ)) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
                 Finset.univ.sum (fun i => (data.y i) ^ 2) := by
-                    simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg,
-                      add_comm, add_left_comm, add_assoc]
+                    simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg]
       have h_pen_nonneg :
           0 ≤ lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) := by
         have hsum_nonneg :
@@ -2572,9 +2571,8 @@ noncomputable def fit (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fint
           intro i _
           have hSi : (S.mulVec β) i = s i * β i := by
             classical
-            simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply,
-              Finset.sum_ite_eq', Finset.sum_ite_eq]
-          cases i <;> simp [hSi, s, mul_comm, mul_left_comm, mul_assoc, mul_self_nonneg]
+            simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
+          cases i <;> simp [hSi, s, mul_self_nonneg]
         exact mul_nonneg h_lambda_nonneg hsum_nonneg
       have h_scale :
           (1 / (n : ℝ)) * Finset.univ.sum (fun i => (data.y i - X.mulVec β i) ^ 2)
@@ -2723,8 +2721,7 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
                     intro i _; exact h_term i
           _ = (1 / (2 : ℝ)) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
                 Finset.univ.sum (fun i => (data.y i) ^ 2) := by
-                    simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg,
-                      add_comm, add_left_comm, add_assoc]
+                    simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg]
       have h_pen_nonneg :
           0 ≤ lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) := by
         have hsum_nonneg :
@@ -2733,9 +2730,8 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
           intro i _
           have hSi : (S.mulVec β) i = s i * β i := by
             classical
-            simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply,
-              Finset.sum_ite_eq', Finset.sum_ite_eq]
-          cases i <;> simp [hSi, s, mul_comm, mul_left_comm, mul_assoc, mul_self_nonneg]
+            simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
+          cases i <;> simp [hSi, s, mul_self_nonneg]
         exact mul_nonneg h_lambda_nonneg hsum_nonneg
       have h_scale :
           (1 / (n : ℝ)) * Finset.univ.sum (fun i => (data.y i - X.mulVec β i) ^ 2)
@@ -2810,7 +2806,7 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
       classical
       refine Finset.sum_congr rfl ?_
       intro i _
-      simp [pointwiseNLL, hm.dist_gaussian, Pi.sub_apply, h_lin, X]
+      simp [pointwiseNLL, hm.dist_gaussian, Pi.sub_apply, h_lin]
     have h_diag : ∀ i, (S.mulVec (packParams m)) i = s i * (packParams m) i := by
       intro i
       classical
@@ -2826,7 +2822,7 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
             Finset.univ.sum (fun i => s i * (packParams m i) ^ 2) := by
         refine Finset.sum_congr rfl ?_
         intro i _
-        simp [h_diag, pow_two, mul_comm, mul_left_comm, mul_assoc]
+        simp [h_diag, pow_two]
       let g : ParamIxSum p k sp → ℝ
         | Sum.inl _ => 0
         | Sum.inr (Sum.inl _) => 0
@@ -3170,8 +3166,8 @@ lemma gaussianPenalizedLoss_strictConvex {ι : Type*} {n : ℕ} [Fintype (Fin n)
         intro h0
         have hzero : β₁ - β₂ = 0 := by
           apply h_inj
-          simpa [h0] using (X.mulVec_zero : X.mulVec (0 : ι → ℝ) = 0)
-        exact h_diff_ne (by simpa using hzero)
+          simp [h0] using (X.mulVec_zero : X.mulVec (0 : ι → ℝ) = 0)
+        exact h_diff_ne (by simp using hzero)
       have h_nonneg : 0 ≤ l2norm_sq (X.mulVec (β₁ - β₂)) := by
         unfold l2norm_sq
         exact Finset.sum_nonneg (by intro i _; exact sq_nonneg _)
@@ -3668,7 +3664,7 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
                   exact h_linear_pc x
             _ = t * ∑ x, evalSmooth splineBasis (fun j => β₁ (ParamIx.pcSpline l j)) (data.c x l) +
                 (1 - t) * ∑ x, evalSmooth splineBasis (fun j => β₂ (ParamIx.pcSpline l j)) (data.c x l) := by
-                  simp [Finset.sum_add_distrib, Finset.mul_sum, mul_add, add_mul, mul_comm]
+                simp [Finset.sum_add_distrib, Finset.mul_sum]
             _ = 0 := by
                   simp [h₁, h₂]
 
@@ -3721,7 +3717,7 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
                   exact h_linear_int x
             _ = t * ∑ x, evalSmooth splineBasis (fun j => β₁ (ParamIx.interaction mIdx l j)) (data.c x l) +
                 (1 - t) * ∑ x, evalSmooth splineBasis (fun j => β₂ (ParamIx.interaction mIdx l j)) (data.c x l) := by
-                  simp [Finset.sum_add_distrib, Finset.mul_sum, mul_add, add_mul, mul_comm]
+                  simp [Finset.sum_add_distrib, Finset.mul_sum]
             _ = 0 := by
                   simp [h₁, h₂]
     refine ⟨hm_interp, ?_⟩
@@ -3742,9 +3738,8 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
       intro i _
       have hmul : (S.mulVec v) i = s i * v i := by
         classical
-        simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply,
-          Finset.sum_ite_eq', Finset.sum_ite_eq]
-      cases i <;> simp [s, hmul, mul_comm, mul_left_comm, mul_assoc, mul_self_nonneg]
+        simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
+      cases i <;> simp [s, hmul, mul_self_nonneg]
 
     have h_emp_eq :
         ∀ m, InModelClass m pgsBasis splineBasis →
@@ -3761,13 +3756,12 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
         unfold l2norm_sq
         refine Finset.sum_congr rfl ?_
         intro i _
-        simp [pointwiseNLL, hm.dist_gaussian, Pi.sub_apply, h_lin, X]
+        simp [pointwiseNLL, hm.dist_gaussian, Pi.sub_apply, h_lin]
       -- penalty term (diagonal mask)
       have h_diag : ∀ i, (S.mulVec (packParams m)) i = s i * (packParams m) i := by
         intro i
         classical
-        simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply,
-          Finset.sum_ite_eq', Finset.sum_ite_eq, mul_comm, mul_left_comm, mul_assoc]
+        simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
       have h_penalty :
           Finset.univ.sum (fun i => (packParams m) i * (S.mulVec (packParams m)) i) =
             (∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) +
@@ -3778,7 +3772,7 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
               Finset.univ.sum (fun i => s i * (packParams m i) ^ 2) := by
           refine Finset.sum_congr rfl ?_
           intro i _
-          simp [h_diag, pow_two, mul_comm, mul_left_comm, mul_assoc]
+          simp [h_diag, pow_two]
         let g : ParamIxSum p k sp → ℝ
           | Sum.inl _ => 0
           | Sum.inr (Sum.inl _) => 0
@@ -4767,7 +4761,7 @@ lemma range_eq_of_two_sided_design_reparam {n m : Type} [Fintype n] [Fintype m] 
           = X'.mulVec (U.mulVec β) := by rw [Matrix.toLin'_apply]
       _ = (X' * U).mulVec β := by
         symm
-        simpa using (Matrix.mulVec_mulVec X' U β)
+        simp using (Matrix.mulVec_mulVec X' U β)
       _ = X.mulVec β := by simp [hU]
       _ = Matrix.toLin' X β := by rw [Matrix.toLin'_apply]
       _ = y := hβ
@@ -4781,7 +4775,7 @@ lemma range_eq_of_two_sided_design_reparam {n m : Type} [Fintype n] [Fintype m] 
           = X.mulVec (T.mulVec β) := by rw [Matrix.toLin'_apply]
       _ = (X * T).mulVec β := by
         symm
-        simpa using (Matrix.mulVec_mulVec X T β)
+        simp using (Matrix.mulVec_mulVec X T β)
       _ = X'.mulVec β := by simp [hT]
       _ = Matrix.toLin' X' β := by rw [Matrix.toLin'_apply]
       _ = y := hβ

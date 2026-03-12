@@ -52,39 +52,6 @@ theorem qst_in_unit (V_b V_w : ℝ)
   · exact div_nonneg h_b (le_of_lt h_denom)
   · rw [div_le_one h_denom]; linarith
 
-/-- **QST > FST indicates directional selection.**
-    If the trait is more differentiated than neutral markers,
-    selection must have driven populations apart. -/
-theorem directional_selection_detected
-    (qst_val fst_val : ℝ)
-    (h_excess : fst_val < qst_val) :
-    0 < qst_val - fst_val := by linarith
-
-/-- **QST < FST indicates stabilizing selection.**
-    If the trait is less differentiated than neutral markers,
-    selection is maintaining the same optimum across populations.
-    This is favorable for PGS portability. -/
-theorem stabilizing_selection_detected
-    (qst_val fst_val : ℝ)
-    (h_deficit : qst_val < fst_val) :
-    0 < fst_val - qst_val := by linarith
-
-/-- **Height QST ≈ FST: consistent with near-neutral evolution.**
-    For height, QST across continental groups is close to FST,
-    suggesting the genetic architecture is largely shared.
-    If QST and FST are both in [0,1] and within ε of each other,
-    then neither directional nor stabilizing selection is detectable
-    at threshold ε. -/
-theorem height_near_neutral_qst
-    (qst_height fst ε : ℝ)
-    (h_qst_nn : 0 ≤ qst_height) (h_fst_nn : 0 ≤ fst)
-    (h_qst_le : qst_height ≤ 1) (h_fst_le : fst ≤ 1)
-    (h_eps : 0 < ε)
-    (h_close : |qst_height - fst| < ε) :
-    |qst_height - fst| < ε ∧ ¬(ε ≤ qst_height - fst) ∧ ¬(ε ≤ fst - qst_height) := by
-  have hab := abs_lt.mp h_close
-  exact ⟨h_close, by linarith [hab.2], by linarith [hab.1]⟩
-
 /-- **QST >> FST indicates directional selection.**
     When QST exceeds FST by a margin δ > 0, this indicates
     directional selection has driven trait divergence beyond
@@ -92,12 +59,6 @@ theorem height_near_neutral_qst
 
     Worked example: For immune traits, QST greatly exceeds FST due to
     pathogen-driven selection that disrupts genetic architecture. -/
-theorem excess_qst_indicates_selection
-    (qst fst δ : ℝ)
-    (h_δ : 0 < δ)
-    (h_excess : fst + δ < qst) :
-    fst < qst := by linarith
-
 end QSTFSTTest
 
 
