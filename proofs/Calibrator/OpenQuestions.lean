@@ -134,12 +134,6 @@ theorem heterozygosity_increases_toward_half
     2 * p₁ * (1 - p₁) < 2 * p₂ * (1 - p₂) := by
   nlinarith [sq_nonneg (p₂ - p₁), sq_nonneg (1/2 - p₂)]
 
-/-- **PGS variance with per-locus heterozygosity.**
-    V_PGS = Σᵢ βᵢ² · Hᵢ  where Hᵢ = 2pᵢ(1-pᵢ). -/
-noncomputable def pgsVarianceFromHet
-    {m : ℕ} (β : Fin m → ℝ) (het : Fin m → ℝ) : ℝ :=
-  ∑ i, β i ^ 2 * het i
-
 /-- **If large-effect heterozygosity increases more than small-effect decreases,
     total PGS variance increases.** This is the mechanism for WBC/lymphocyte count. -/
 theorem pgs_variance_can_increase
@@ -415,11 +409,6 @@ poorly predicts individual-level accuracy.
 
 section UnifiedTheory
 
-/-- **Unified portability ratio as a product of four factors.** -/
-noncomputable def unifiedPortabilityRatio
-    (af_factor ld_factor eff_factor env_factor : ℝ) : ℝ :=
-  af_factor * ld_factor * eff_factor * env_factor
-
 /-- **No single factor captures the full ratio.** -/
 theorem single_factor_insufficient
     (af ld eff env : ℝ)
@@ -427,8 +416,7 @@ theorem single_factor_insufficient
     (h_ld : 0 < ld) (h_ld_lt : ld < 1)
     (h_eff : 0 < eff) (h_eff_lt : eff < 1)
     (h_env : 0 < env) (h_env_le : env ≤ 1) :
-    unifiedPortabilityRatio af ld eff env < af := by
-  unfold unifiedPortabilityRatio
+    af * ld * eff * env < af := by
   have h1 : ld * eff < 1 := by
     calc ld * eff < 1 * eff := mul_lt_mul_of_pos_right h_ld_lt h_eff
       _ = eff := one_mul eff
@@ -730,7 +718,9 @@ theorem prevalence_dominates_sensitivity_for_recall
     (h_sens_ratio : sens₁ / sens₂ < n_cases₂ / n_cases₁) :
     -- Then absolute true positives increase
     n_cases₁ * sens₁ < n_cases₂ * sens₂ := by
-  rwa [div_lt_div_iff₀ h_sens₂ h_cases₁] at h_sens_ratio
+  have htp : sens₁ * n_cases₁ < n_cases₂ * sens₂ := by
+    rwa [div_lt_div_iff₀ h_sens₂ h_cases₁] at h_sens_ratio
+  simpa [mul_comm] using htp
 
 /-- **Asthma vs T2D portability difference.**
     For asthma, precision and recall decay similarly → qualitatively similar.
