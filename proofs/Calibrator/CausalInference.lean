@@ -332,20 +332,24 @@ theorem diminishing_marginal_returns
     expectedR2 (v + 2 * Δ) V_E - expectedR2 (v + Δ) V_E <
       expectedR2 (v + Δ) V_E - expectedR2 v V_E := by
   unfold expectedR2
-  -- Let a = v, b = v + Δ, c = v + 2Δ. Need c/(c+E) - b/(b+E) < b/(b+E) - a/(a+E).
-  -- Equivalently: c/(c+E) + a/(a+E) < 2·b/(b+E).
-  -- x/(x+E) = 1 - E/(x+E), so this is E/(b+E) < (E/(a+E) + E/(c+E))/2,
-  -- i.e., 1/(b+E) > (harmonic mean), which follows from strict convexity of 1/x.
   have ha : 0 < v + V_E := by linarith
   have hb : 0 < v + Δ + V_E := by linarith
   have hc : 0 < v + 2 * Δ + V_E := by linarith
-  rw [div_sub_div _ _ (ne_of_gt hc) (ne_of_gt hb),
-      div_sub_div _ _ (ne_of_gt hb) (ne_of_gt ha),
-      div_lt_div_iff₀ (mul_pos hc hb) (mul_pos hb ha)]
-  ring_nf
-  have h_extra1 : 0 ≤ 2 * v * Δ ^ 2 * V_E := by nlinarith
-  have h_extra2 : 0 ≤ 2 * Δ ^ 2 * V_E ^ 2 := by positivity
-  have h_extra3 : 0 < 2 * Δ ^ 3 * V_E := by positivity
+  have h_gain2 :
+      (v + 2 * Δ) / (v + 2 * Δ + V_E) - (v + Δ) / (v + Δ + V_E) =
+        (Δ * V_E) / ((v + 2 * Δ + V_E) * (v + Δ + V_E)) := by
+    field_simp [ne_of_gt hb, ne_of_gt hc]
+    ring
+  have h_gain1 :
+      (v + Δ) / (v + Δ + V_E) - v / (v + V_E) =
+        (Δ * V_E) / ((v + Δ + V_E) * (v + V_E)) := by
+    field_simp [ne_of_gt ha, ne_of_gt hb]
+    ring
+  rw [h_gain2, h_gain1]
+  have hnum : 0 < Δ * V_E := by positivity
+  have hden2 : 0 < (v + 2 * Δ + V_E) * (v + Δ + V_E) := mul_pos hc hb
+  have hden1 : 0 < (v + Δ + V_E) * (v + V_E) := mul_pos hb ha
+  rw [div_lt_div_iff₀ hden2 hden1]
   nlinarith
 
 /-- **Cost-effectiveness analysis.**
