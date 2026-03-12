@@ -108,7 +108,8 @@ theorem posteriorVariance_eq (m : BayesianLinearModel) :
     m.posteriorVariance = m.prior_var / (1 + m.data_precision * m.prior_var) := by
   unfold posteriorVariance posteriorPrecision
   have hh : m.prior_var ≠ 0 := ne_of_gt m.prior_var_pos
-  have hdenom : 1 + m.data_precision * m.prior_var > 0 := by positivity
+  have hdenom : 1 + m.data_precision * m.prior_var > 0 := by
+    have := m.prior_var_pos; have := m.data_precision_pos; positivity
   rw [div_add' _ _ _ hh]
   field_simp
 
@@ -122,7 +123,8 @@ theorem shrinkageFactor_eq (m : BayesianLinearModel) :
   unfold shrinkageFactor
   rw [m.posteriorVariance_eq]
   have hh : m.prior_var ≠ 0 := ne_of_gt m.prior_var_pos
-  have hdenom : 1 + m.data_precision * m.prior_var > 0 := by positivity
+  have hdenom : 1 + m.data_precision * m.prior_var > 0 := by
+    have := m.prior_var_pos; have := m.data_precision_pos; positivity
   have hdenom_ne : (1 + m.data_precision * m.prior_var) ≠ 0 := ne_of_gt hdenom
   field_simp
   ring
@@ -183,8 +185,8 @@ theorem shrinkage_increases_with_h (n : ℝ) (h₁ h₂ : ℝ)
       MSE(λ) = λ²·σ² + (1-λ)²·β²
     where the first term is the (scaled) variance and the second is
     the squared bias from shrinking toward zero. -/
-noncomputable def jamesSteinMSE (λ σ_sq β_sq : ℝ) : ℝ :=
-  λ ^ 2 * σ_sq + (1 - λ) ^ 2 * β_sq
+noncomputable def jamesSteinMSE (lam σ_sq β_sq : ℝ) : ℝ :=
+  lam ^ 2 * σ_sq + (1 - lam) ^ 2 * β_sq
 
 /-- **OLS MSE is the no-shrinkage case.** MSE(1) = σ² (full weight on data). -/
 theorem mse_ols_is_no_shrinkage (σ_sq β_sq : ℝ) :
@@ -284,8 +286,8 @@ theorem ld_mismatch_bias_proportional
   have h_d1 : 0 < σ_true + τ := by linarith
   have h_d2 : 0 < σ_ref + τ := by linarith
   rw [div_sub_div _ _ (ne_of_gt h_d2) (ne_of_gt h_d1)]
-  rw [show σ_ref * (σ_true + τ) - σ_true * (σ_ref + τ) = τ * (σ_ref - σ_true) by ring]
-  rw [abs_div, abs_mul, abs_of_pos h_τ, abs_of_pos (mul_pos h_d2 h_d1)]
+  have h_num : σ_ref * (σ_true + τ) - (σ_ref + τ) * σ_true = τ * (σ_ref - σ_true) := by ring
+  rw [h_num, abs_div, abs_mul, abs_of_pos h_τ, abs_of_pos (mul_pos h_d2 h_d1)]
   rw [div_le_div_iff₀ (mul_pos h_d2 h_d1) h_τ]
   -- Goal: τ * |σ_ref - σ_true| * τ ≤ |σ_ref - σ_true| * ((σ_ref + τ) * (σ_true + τ))
   nlinarith [abs_nonneg (σ_ref - σ_true), mul_pos h_d2 h_d1]
@@ -310,7 +312,7 @@ theorem cross_ancestry_ld_bias
     c * fst * σ / τ < c * (2 * fst) * σ / τ := by
   constructor
   · apply div_pos _ h_τ; positivity
-  · rw [div_lt_div_right h_τ]; nlinarith
+  · rw [div_lt_div_iff_right h_τ]; nlinarith
 
 /-- **In-sample LD reference is optimal.**
     Using LD reference from the same population as GWAS minimizes bias.
@@ -380,7 +382,7 @@ theorem spike_slab_variance_nonneg (π σ_slab : ℝ)
   unfold spikeAndSlabPriorVariance
   exact mul_nonneg h_π (sq_nonneg _)
 
-/-- **Bayes risk under correct vs misspecified prior.**
+/- **Bayes risk under correct vs misspecified prior.**
     Under a spike-and-slab truth with causal proportion π and per-SNP
     effect variance σ²_β, the oracle Bayes risk (correct prior) applies
     optimal shrinkage only to causal SNPs. The misspecified Gaussian
@@ -604,7 +606,7 @@ theorem prs_cs_dominates_ct
     (h_noise_cs : 0 ≤ noise_cs) (h_noise_cs1 : noise_cs < 1)
     (h_cs_better : noise_cs ≤ noise_ct) :
     h_sq * (p / M) * (1 - noise_ct) ≤ h_sq * (1 - noise_cs) := by
-  have h_pM_ratio : p / M ≤ 1 := div_le_one_of_le h_pM (le_of_lt h_M)
+  have h_pM_ratio : p / M ≤ 1 := by rwa [div_le_one (by linarith : (0:ℝ) < M)]
   have h1 : (1 - noise_ct) ≤ (1 - noise_cs) := by linarith
   have h2 : p / M * (1 - noise_ct) ≤ 1 * (1 - noise_cs) := by
     apply mul_le_mul h_pM_ratio h1 (by linarith) (by linarith)
@@ -640,7 +642,7 @@ theorem ld_mismatch_can_reverse_advantage
     (h_penalty_large : base_r2 * (1 - p / M) < mismatch_penalty)
     (h_pen_lt : mismatch_penalty < base_r2) :
     base_r2 - mismatch_penalty < base_r2 * (p / M) := by
-  have : p / M ≤ 1 := div_le_one_of_le h_pM (le_of_lt h_M)
+  have : p / M ≤ 1 := by rwa [div_le_one (by linarith : (0:ℝ) < M)]
   nlinarith
 
 end PRSCS

@@ -86,7 +86,10 @@ theorem missing_heritability_gap
     let h2_snp := V_A_tagged / V_P
     0 < h2_twin - h2_snp := by
   simp only
-  rw [div_sub_div_eq_sub_div]
+  rw [show (V_A_tagged + V_A_untagged) / (V_A_tagged + V_A_untagged + V_D + V_I + V_E) -
+    V_A_tagged / (V_A_tagged + V_A_untagged + V_D + V_I + V_E) =
+    ((V_A_tagged + V_A_untagged) - V_A_tagged) / (V_A_tagged + V_A_untagged + V_D + V_I + V_E)
+    from (sub_div _ _ _).symm]
   apply div_pos
   · linarith
   · linarith

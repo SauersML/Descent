@@ -374,7 +374,11 @@ theorem individual_error_r2_bounded
     r2 < 1/k := by
   rw [h_r2]
   rw [div_lt_div_iff₀ (by linarith) h_k]
-  nlinarith
+  -- Goal: var_between * k < 1 * (var_between + var_within)
+  -- From h_small: var_between < var_within / k, so var_between * k < var_within
+  have hbk : var_between * k < var_within := by
+    rwa [lt_div_iff₀ h_k] at h_small
+  linarith
 
 end GeneralPredictions
 

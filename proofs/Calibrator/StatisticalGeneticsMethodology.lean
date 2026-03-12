@@ -64,7 +64,7 @@ theorem incremental_r2_nonneg
   have : rss_cov / tss - rss_full / tss = (rss_cov - rss_full) / tss := by ring
   linarith [div_nonneg (by linarith : 0 ≤ rss_cov - rss_full) (le_of_lt h_tss)]
 
-/-- **Derivation: Standard error of R² via the delta method.**
+/- **Derivation: Standard error of R² via the delta method.**
 
     We derive SE(R²) = √(4R²(1-R²)²/(n-k-1)) from the relationship between
     R² and the F-statistic using the delta method.
@@ -355,7 +355,7 @@ theorem local_genetic_correlation_varies
     (h_w1 : 0 < w₁) (h_w6 : 0 < w₆) :
     -- Genome-wide weighted average is between the two regional estimates
     rho_chr6 < (w₁ * rho_chr1 + w₆ * rho_chr6) / (w₁ + w₆) := by
-  rw [lt_div_iff (by linarith)]
+  rw [lt_div_iff₀ (by linarith : (0:ℝ) < w₁ + w₆)]
   nlinarith
 
 /-- **Genetic correlation is frequency-dependent.**

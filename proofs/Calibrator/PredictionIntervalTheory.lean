@@ -295,7 +295,7 @@ theorem sidak_tighter_than_bonferroni
     -- Bonferroni level is strictly less than the full α
     α / k < α := by
   rw [div_lt_iff₀ (by exact_mod_cast (Nat.zero_lt_of_lt h_k) : (0 : ℝ) < k)]
-  calc α * 1 = α := mul_one α
+  calc α = α * 1 := (mul_one α).symm
     _ < α * k := by
         apply mul_lt_mul_of_pos_left _ h_α
         exact_mod_cast h_k
@@ -424,7 +424,7 @@ theorem weighted_conformal_wider
     1 / Real.sqrt n ≤ 1 / Real.sqrt n_eff := by
   apply div_le_div_of_nonneg_left one_pos
   · exact Real.sqrt_pos.mpr h_n_eff_pos
-  · exact Real.sqrt_le_sqrt (le_of_lt h_n_eff_pos) h_eff_le
+  · exact Real.sqrt_le_sqrt h_eff_le
 
 /-- **Effective sample size under importance weighting.**
     n_eff = (Σ wᵢ)² / Σ wᵢ² ≤ n.

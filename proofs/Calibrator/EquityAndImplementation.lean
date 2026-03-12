@@ -296,8 +296,8 @@ theorem r2_threshold_for_utility
     (h_below : r2 < cost / α) :
     -- PGS net value is negative in this population
     α * r2 - cost < 0 := by
-  have : α * r2 < cost := by rwa [lt_div_iff₀ h_α] at h_below
-  linarith
+  have : r2 * α < cost := by rwa [lt_div_iff₀ h_α] at h_below
+  linarith [mul_comm α r2]
 
 /- **Population-specific PGS report cards.**
     For each PGS, report: R², AUC, calibration, and portability ratio

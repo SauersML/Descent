@@ -389,8 +389,8 @@ theorem portability_gap_decomposition
     let gap := r2_own - r2_other
     gap = (loss_genetic + loss_env) / V_P ∧ 0 < gap := by
   constructor
-  · simp only; rw [← sub_div]; congr 1; ring
-  · simp only
+  · dsimp only; rw [← sub_div]; congr 1; ring
+  · dsimp only
     rw [← sub_div]
     apply div_pos
     · linarith

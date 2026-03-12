@@ -53,7 +53,10 @@ theorem genetic_correlation_bounded_mt
 theorem rg_ancestry_specific
     (rg_eur δ : ℝ)
     (h_delta_ne : δ ≠ 0) :
-    rg_eur ≠ rg_eur + δ := by linarith
+    rg_eur ≠ rg_eur + δ := by
+  intro h
+  have : δ = 0 := by linarith
+  exact h_delta_ne this
 
 /-- **Equal-correlation PSD constraint.**
     For a 3×3 correlation matrix with equal pairwise correlation r,

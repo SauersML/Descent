@@ -129,7 +129,7 @@ theorem methods_converge_at_large_n
     (h_σ2 : 0 < σ2) (h_k₁ : 0 < k₁) (h_k₂ : 0 < k₂) (h_kt : 0 < k_total)
     (h_order : k₁ < k₂) (h_le : k₂ ≤ k_total) :
     σ2 / k₂ - σ2 / k_total ≤ σ2 / k₁ - σ2 / k_total := by
-  have h₁ : σ2 / k_total ≤ σ2 / k₂ := div_le_div_of_nonneg_left h_σ2 h_k₂ h_le
+  have h₁ : σ2 / k_total ≤ σ2 / k₂ := div_le_div_of_nonneg_left (le_of_lt h_σ2) h_k₂ h_le
   have h₂ : σ2 / k₂ < σ2 / k₁ := div_lt_div_of_pos_left h_σ2 h_k₁ (by linarith)
   linarith
 
@@ -294,7 +294,9 @@ theorem genetic_correlation_population_specific
   intro h
   apply h_cov_diff
   have h_sqrt_pos : 0 < Real.sqrt (vg₁ * vg₂) := Real.sqrt_pos.mpr (mul_pos h_vg₁ h_vg₂)
-  exact div_left_injective₀ (ne_of_gt h_sqrt_pos) h
+  have h_sqrt_ne : Real.sqrt (vg₁ * vg₂) ≠ 0 := ne_of_gt h_sqrt_pos
+  field_simp at h
+  exact h
 
 end MultiTraitAnalysis
 

@@ -59,7 +59,8 @@ theorem ultra_rare_not_shared
     -- sharing_prob = 2 * Ne * p (coalescent approximation) is < 1
     2 * Ne * p < 1 := by
   have h2Ne_pos : (0 : ℝ) < 2 * Ne := by positivity
-  rwa [div_lt_iff₀ h2Ne_pos, mul_comm] at h_ultra_rare
+  rw [lt_div_iff₀ h2Ne_pos] at h_ultra_rare
+  linarith [mul_comm p (2 * Ne)]
 
 /-- **Rare variant contribution to heritability.**
     Under the LDAK-thin model with negative selection (α < 0),
@@ -175,7 +176,7 @@ theorem functional_equivalence_aids_portability
     β ^ 2 < ↑k * β ^ 2 := by
   have h_β2 : 0 < β ^ 2 := sq_pos_of_ne_zero h_β
   have h_k_real : (1 : ℝ) < ↑k := by
-    exact_mod_cast Nat.lt_of_lt_pred (by omega : 1 < k)
+    exact_mod_cast (by omega : 1 < k)
   linarith [mul_lt_mul_of_pos_right h_k_real h_β2]
 
 /-- **Optimal weighting of rare variants in burden test.**
@@ -242,9 +243,17 @@ theorem common_component_more_portable
     β ^ 2 * (2 * p_rare * (1 - p_rare)) * s_rare ≤
       β ^ 2 * (2 * p_common * (1 - p_common)) * s_common := by
   have h_β2 : 0 < β ^ 2 := sq_pos_of_ne_zero h_β
-  apply mul_le_mul_of_nonneg_left h_sharing
-  apply mul_nonneg (le_of_lt h_β2)
-  nlinarith [sq_nonneg (p_common - 1/2), sq_nonneg (p_rare - 1/2)]
+  have h_het_rare : 0 ≤ 2 * p_rare * (1 - p_rare) := by nlinarith
+  have h_het_le : 2 * p_rare * (1 - p_rare) ≤ 2 * p_common * (1 - p_common) := by
+    nlinarith [sq_nonneg (p_common - 1/2), sq_nonneg (p_rare - 1/2)]
+  calc β ^ 2 * (2 * p_rare * (1 - p_rare)) * s_rare
+      ≤ β ^ 2 * (2 * p_common * (1 - p_common)) * s_rare := by
+        apply mul_le_mul_of_nonneg_right _ (le_of_lt h_sr)
+        exact mul_le_mul_of_nonneg_left h_het_le (le_of_lt h_β2)
+    _ ≤ β ^ 2 * (2 * p_common * (1 - p_common)) * s_common := by
+        apply mul_le_mul_of_nonneg_left h_sharing
+        apply mul_nonneg (le_of_lt h_β2)
+        nlinarith [sq_nonneg (p_common - 1/2)]
 
 /-- **WGS PGS within-population outperforms array PGS.**
     Within the discovery population, WGS PGS captures more variance

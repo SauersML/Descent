@@ -62,7 +62,7 @@ theorem additive_pgs_ceiling
     V_A / (V_A + V_D + V_I + V_E) ≤ V_A / (V_A + V_E) := by
   rcases eq_or_lt_of_le h_A with rfl | h_A_pos
   · simp
-  · exact div_le_div_of_nonneg_left h_A_pos (by linarith) (by linarith)
+  · exact div_le_div_of_nonneg_left (le_of_lt h_A_pos) (by linarith) (by linarith)
 
 /-- **The additive approximation is frequency-dependent.**
     Fisher's average effect changes when allele frequencies change.
@@ -231,7 +231,7 @@ theorem heterozygote_advantage_large_dominance
     (het * d_typical) ^ 2 < (het * d_sickle) ^ 2 := by
   rw [mul_pow, mul_pow]
   apply mul_lt_mul_of_pos_left _ (sq_pos_of_ne_zero (ne_of_gt h_het))
-  rwa [sq_abs, sq_abs]
+  exact sq_lt_sq' (by linarith) h_large
 
 end DominanceEffects
 
@@ -311,12 +311,12 @@ theorem epistatic_kernel_improves_within_pop
     Larger λ suppresses non-additive terms, reducing the
     population-specific overfitting penalty k_eff / n. -/
 theorem regularization_controls_portability
-    (k_NA n λ_weak λ_strong : ℝ)
+    (k_NA n lam_weak lam_strong : ℝ)
     (h_k : 0 < k_NA) (h_n : 0 < n)
-    (h_lw : 0 < λ_weak) (h_ls : 0 < λ_strong)
-    (h_stronger : λ_weak < λ_strong) :
+    (h_lw : 0 < lam_weak) (h_ls : 0 < lam_strong)
+    (h_stronger : lam_weak < lam_strong) :
     -- Stronger regularization → fewer effective parameters → less overfit
-    k_NA / (1 + λ_strong) / n < k_NA / (1 + λ_weak) / n := by
+    k_NA / (1 + lam_strong) / n < k_NA / (1 + lam_weak) / n := by
   apply div_lt_div_of_pos_right _ h_n
   apply div_lt_div_of_pos_left h_k (by linarith) (by linarith)
 

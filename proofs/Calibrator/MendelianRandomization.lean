@@ -188,7 +188,7 @@ theorem cross_ancestry_mr_lower_power
     (h_weaker : beta_ZX_cross < beta_ZX_same) :
     sigma_Y / (beta_ZX_same * sqrt_n) < sigma_Y / (beta_ZX_cross * sqrt_n) := by
   exact div_lt_div_iff_of_pos_left h_sigma
-    (mul_pos h_cross h_n) (mul_pos h_same h_n) |>.mpr
+    (mul_pos h_same h_n) (mul_pos h_cross h_n) |>.mpr
     (mul_lt_mul_of_pos_right h_weaker h_n)
 
 /-- **Bias-variance tradeoff in cross-ancestry MR.**
