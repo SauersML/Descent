@@ -103,12 +103,11 @@ theorem auc_independent_of_calibration
     π₁ to π₂, the CITL shifts. Using calibrationInTheLarge, the shift
     is exactly (π₂ - π₁) when the model's mean prediction remains fixed. -/
 theorem prevalence_shift_changes_calibration
-    (mean_pred π₁ π₂ : ℝ)
-    (h_diff : π₁ ≠ π₂) :
-    calibrationInTheLarge π₁ mean_pred ≠
-      calibrationInTheLarge π₂ mean_pred := by
+    (mean_pred π₁ π₂ : ℝ) :
+    calibrationInTheLarge π₂ mean_pred -
+      calibrationInTheLarge π₁ mean_pred = π₂ - π₁ := by
   unfold calibrationInTheLarge
-  intro h; apply h_diff; linarith
+  ring
 
 /-- **Cross-ancestry AUC drops while calibration-in-the-large worsens.**
     This theorem states the claim on the repository's actual metrics:
@@ -135,14 +134,17 @@ theorem cross_ancestry_auc_and_citl_worsen
   constructor
   · exact targetAUC_lt_source_of_observables aucLink hauc
       r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds
-  · have h_citl_diff :
-        calibrationInTheLarge πSource mean_pred ≠
-          calibrationInTheLarge πTarget mean_pred :=
-      prevalence_shift_changes_calibration mean_pred πSource πTarget h_prev_shift
+  · have h_citl_shift :
+        calibrationInTheLarge πTarget mean_pred -
+          calibrationInTheLarge πSource mean_pred = πTarget - πSource :=
+      prevalence_shift_changes_calibration mean_pred πSource πTarget
+    have h_tgt_eq :
+        calibrationInTheLarge πTarget mean_pred = πTarget - πSource := by
+      linarith [h_citl_shift, h_src_cal]
     have h_tgt_ne_zero : calibrationInTheLarge πTarget mean_pred ≠ 0 := by
       intro h_tgt_zero
-      apply h_citl_diff
-      simp [h_src_cal, h_tgt_zero]
+      apply h_prev_shift
+      linarith [h_tgt_eq, h_tgt_zero]
     have h_tgt_abs_pos : 0 < |calibrationInTheLarge πTarget mean_pred| :=
       abs_pos.mpr h_tgt_ne_zero
     simpa [h_src_cal] using h_tgt_abs_pos
@@ -195,7 +197,7 @@ theorem no_citl_shift_same_prevalence (pi : ℝ) (h_pi : 0 < pi) :
 
 /-- CITL shift is positive when target has higher prevalence. -/
 theorem citl_shift_positive_higher_prevalence
-    (pi_s pi_t : ℝ) (h_s : 0 < pi_s) (h_t : 0 < pi_t)
+    (pi_s pi_t : ℝ) (h_s : 0 < pi_s)
     (h_higher : pi_s < pi_t) :
     0 < prevalenceCITLShift pi_s pi_t := by
   unfold prevalenceCITLShift
@@ -204,14 +206,26 @@ theorem citl_shift_positive_higher_prevalence
   exact h_higher
 
 /-- **Environmental confounding shifts calibration.**
-    If environmental risk factors differ between populations,
-    the baseline risk changes → CITL ≠ 0. -/
+    If environmental risk factors change the population mean outcome by
+    `env_effect` while the model's mean prediction is unchanged, then
+    calibration-in-the-large shifts by exactly `env_effect`. -/
 theorem env_differences_shift_calibration
-    (citl_env_same citl_env_diff env_effect : ℝ)
-    (h_same : citl_env_same = 0)
-    (h_diff : citl_env_diff = env_effect)
+    (mean_obs mean_pred env_effect : ℝ) :
+    calibrationInTheLarge (mean_obs + env_effect) mean_pred =
+      calibrationInTheLarge mean_obs mean_pred + env_effect := by
+  unfold calibrationInTheLarge
+  ring
+
+/-- Under a source model calibrated in the large, any nonzero environmental
+    shift induces nonzero target CITL. -/
+theorem env_differences_shift_calibration_nonzero_of_calibrated_source
+    (mean_obs mean_pred env_effect : ℝ)
+    (h_src_cal : calibrationInTheLarge mean_obs mean_pred = 0)
     (h_effect : env_effect ≠ 0) :
-    citl_env_diff ≠ 0 := by rw [h_diff]; exact h_effect
+    calibrationInTheLarge (mean_obs + env_effect) mean_pred ≠ 0 := by
+  rw [env_differences_shift_calibration]
+  rw [h_src_cal]
+  simpa using h_effect
 
 /-- **Genetic risk distribution shift.**
     If the PGS mean shifts by Δμ in the target population, the CITL
@@ -221,12 +235,34 @@ theorem env_differences_shift_calibration
     equal to the mean difference when the model was calibrated (CITL=0) in source.
     CITL_target = mean_obs_target - mean_obs_source + (mean_pgs_source - mean_pgs_target). -/
 theorem genetic_distribution_shift
+    (mean_obs_s mean_obs_t mean_pgs_s mean_pgs_t : ℝ) :
+    calibrationInTheLarge mean_obs_t mean_pgs_t =
+      calibrationInTheLarge mean_obs_s mean_pgs_s +
+        (mean_obs_t - mean_obs_s) + (mean_pgs_s - mean_pgs_t) := by
+  unfold calibrationInTheLarge
+  ring
+
+/-- If the source model is calibrated in the large, the target CITL equals the
+    observed-mean shift plus the PGS-mean shift exactly. -/
+theorem genetic_distribution_shift_of_calibrated_source
+    (mean_obs_s mean_obs_t mean_pgs_s mean_pgs_t : ℝ)
+    (h_calibrated_source : calibrationInTheLarge mean_obs_s mean_pgs_s = 0) :
+    calibrationInTheLarge mean_obs_t mean_pgs_t =
+      mean_obs_t - mean_obs_s + (mean_pgs_s - mean_pgs_t) := by
+  rw [genetic_distribution_shift]
+  rw [h_calibrated_source]
+  ring
+
+/-- Under a calibrated source model, any nonzero net mean shift induces
+    nonzero target CITL. -/
+theorem genetic_distribution_shift_nonzero_of_calibrated_source
     (mean_obs_s mean_obs_t mean_pgs_s mean_pgs_t : ℝ)
     (h_calibrated_source : calibrationInTheLarge mean_obs_s mean_pgs_s = 0)
-    (h_mean_pgs_diff : mean_pgs_s ≠ mean_pgs_t) :
-    calibrationInTheLarge mean_obs_s mean_pgs_t ≠ 0 := by
-  unfold calibrationInTheLarge at *
-  intro h; apply h_mean_pgs_diff; linarith
+    (h_net_shift : mean_obs_t - mean_obs_s + (mean_pgs_s - mean_pgs_t) ≠ 0) :
+    calibrationInTheLarge mean_obs_t mean_pgs_t ≠ 0 := by
+  rw [genetic_distribution_shift_of_calibrated_source
+    mean_obs_s mean_obs_t mean_pgs_s mean_pgs_t h_calibrated_source]
+  exact h_net_shift
 
 end PopulationCalibrationDrift
 
@@ -245,12 +281,24 @@ section RecalibrationMethods
 noncomputable def interceptRecalibrated (pgs new_intercept : ℝ) : ℝ :=
   new_intercept + pgs
 
-/-- Intercept recalibration corrects CITL. -/
+/-- Intercept recalibration shifts CITL by exactly the fitted intercept. -/
+theorem intercept_recalibration_shifts_citl
+    (mean_obs mean_pgs new_intercept : ℝ) :
+    calibrationInTheLarge mean_obs
+        (interceptRecalibrated mean_pgs new_intercept) =
+      calibrationInTheLarge mean_obs mean_pgs - new_intercept := by
+  unfold calibrationInTheLarge interceptRecalibrated
+  ring
+
+/-- Intercept recalibration corrects CITL exactly when the fitted intercept
+    equals the original CITL. -/
 theorem intercept_recal_corrects_citl
-    (mean_pgs citl_original new_intercept : ℝ)
-    (h_correction : new_intercept = citl_original) :
-    -- The new CITL is 0 by construction
-    citl_original - new_intercept = 0 := by linarith
+    (mean_obs mean_pgs new_intercept : ℝ)
+    (h_correction : new_intercept = calibrationInTheLarge mean_obs mean_pgs) :
+    calibrationInTheLarge mean_obs
+      (interceptRecalibrated mean_pgs new_intercept) = 0 := by
+  rw [intercept_recalibration_shifts_citl, h_correction]
+  ring
 
 /-- **Logistic recalibration.**
     Fit Y = a + b × PGS (both intercept and slope).
@@ -297,6 +345,11 @@ based on PGS thresholds.
 
 section DecisionImplications
 
+/-- A risk score is classified as high risk when it exceeds the decision
+    threshold. -/
+def classifiedHighRisk (threshold predictedRisk : ℝ) : Prop :=
+  threshold < predictedRisk
+
 /-- **Miscalibration changes clinical decisions.**
     If the PGS is miscalibrated with CITL shift c > 0 (over-prediction),
     a patient with true risk r < threshold gets predicted risk r + c.
@@ -305,12 +358,13 @@ section DecisionImplications
 theorem miscalibration_changes_decisions
     (true_risk threshold c : ℝ)
     (h_truly_low : true_risk < threshold)
-    (h_miscal : threshold - true_risk < c)
-    (h_c_pos : 0 < c) :
-    -- The predicted risk (true_risk + c) exceeds the threshold
-    -- while the true risk is below it: a false positive
-    true_risk < threshold ∧ threshold < true_risk + c := by
-  exact ⟨h_truly_low, by linarith⟩
+    (h_miscal : threshold - true_risk < c) :
+    ¬ classifiedHighRisk threshold true_risk ∧
+      classifiedHighRisk threshold (true_risk + c) := by
+  unfold classifiedHighRisk
+  constructor
+  · linarith
+  · linarith
 
 /-- **Net reclassification improvement (NRI) from recalibration.**
     NRI measures the proportion of patients correctly reclassified.

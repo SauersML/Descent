@@ -1,5 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
+import Calibrator.PGSCalibrationTheory
+import Calibrator.ClinicalUtilityFairness
 import Calibrator.OpenQuestions
 
 namespace Calibrator
@@ -207,10 +209,6 @@ theorem R2DecompositionData.cal_loss_reduces_r2 (d : R2DecompositionData)
     rather than taking ρ_disc, ρ_cal as opaque parameters. -/
 theorem r2_less_portable_than_auc_from_decomposition
     (source target : R2DecompositionData)
-    -- Same total outcome variance (or we work with ratios)
-    (hVarY_eq : source.varY = target.varY)
-    -- Discrimination (Var(Ŷ)) transfers: target may have less
-    (hDisc : target.varYhat ≤ source.varYhat)
     -- Calibration is strictly lost: Var(f(Ŷ))/Var(Ŷ) is lower in target
     (hCalLoss : target.calibration < source.calibration)
     -- Source is perfectly calibrated (f = id in source)
@@ -278,11 +276,10 @@ These metrics respond differently to distribution shifts.
 
 section R2VsAUC
 
-/-- **R² is sensitive to mean shift (derived from drift model).**
-    When drift increases (fstS < fstT), `presentDayR2` strictly decreases,
-    so the R² drop is positive. This is derived from the structural
-    `drift_degrades_R2` theorem, not assumed. -/
-theorem r2_sensitive_to_mean_shift
+/-- **R² is sensitive to drift in the observable transport model.**
+    When drift increases (`fstS < fstT`), `presentDayR2` strictly decreases, so
+    the source-to-target R² drop is positive. -/
+theorem r2_sensitive_to_drift
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
@@ -291,36 +288,29 @@ theorem r2_sensitive_to_mean_shift
   have h := drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT_le_one
   linarith
 
-/-- **AUC rank-invariance: AUC degrades only through SNR, not through mean shift.**
-    Under the drift model, AUC = aucLink(SNR) where SNR = (1-fst)·V_A / V_E.
-    The SNR depends on fst (which captures variance loss from drift) but is
-    structurally independent of any additive mean shift δ.
-
-    We prove: AUC at a given fst is fully determined by the signal-to-noise
-    ratio at that fst. Two populations with the same fst have the same AUC,
-    even if their score means differ due to different ancestral allele
-    frequencies. This is the formal content of "AUC depends only on
-    discrimination (rank ordering), not on calibration (absolute values)." -/
-theorem auc_rank_invariant
+/-- **`presentDayAUC` is exactly `aucLink` applied to the drifted SNR.**
+    This theorem is the structural identity built into the observable drift
+    model. Any invariance interpretation must be derived separately from this
+    formula. -/
+theorem presentDayAUC_formula
     (aucLink : ℝ → ℝ) (V_A V_E fst : ℝ) :
     presentDayAUC aucLink V_A V_E fst = aucLink (presentDaySignalToNoise V_A V_E fst) := by
   unfold presentDayAUC; rfl
 
-/-- **AUC can be more portable than R² (derived from metric structure).**
-    We model R² portability as the product of a discrimination factor ρ_disc
-    and a calibration factor ρ_cal (both in [0,1]), while AUC portability
-    depends only on discrimination ρ_disc. When calibration loss is
-    nontrivial (ρ_cal < 1), AUC portability exceeds R² portability.
-    This is derived from the multiplicative structure, not assumed. -/
-theorem auc_more_portable_than_r2
-    (ρ_disc ρ_cal : ℝ)
-    (h_disc_pos : 0 < ρ_disc) (h_disc_le : ρ_disc ≤ 1)
-    (h_cal_pos : 0 < ρ_cal) (h_cal_lt : ρ_cal < 1) :
-    -- R² portability = ρ_disc * ρ_cal < ρ_disc = AUC portability
-    ρ_disc * ρ_cal < ρ_disc := by
-  have h : ρ_disc * ρ_cal < ρ_disc * 1 :=
-    mul_lt_mul_of_pos_left h_cal_lt h_disc_pos
-  linarith [mul_one ρ_disc]
+/-- On `(0,1)`, the observable variance parameter `r2 / (1-r2)` is strictly
+    increasing in `r2`. -/
+theorem sourceVarianceFromR2_strictMono
+    (r2₁ r2₂ : ℝ)
+    (h_r2₂ : r2₂ < 1)
+    (h_lt : r2₁ < r2₂) :
+    sourceVarianceFromR2 r2₁ < sourceVarianceFromR2 r2₂ := by
+  unfold sourceVarianceFromR2
+  have h_d1 : 0 < 1 - r2₁ := by linarith
+  have h_d2 : 0 < 1 - r2₂ := by linarith
+  have h_d1_ne : 1 - r2₁ ≠ 0 := ne_of_gt h_d1
+  have h_d2_ne : 1 - r2₂ ≠ 0 := ne_of_gt h_d2
+  field_simp [h_d1_ne, h_d2_ne]
+  nlinarith
 
 /-- **Brier score depends on prevalence (derived from Brier definition).**
     The Brier score `brierFromR2 π r2 = π(1-π)(1-r2)` explicitly depends on
@@ -330,8 +320,7 @@ theorem auc_more_portable_than_r2
     discrimination-only metrics like AUC when prevalence differs. -/
 theorem brier_depends_on_prevalence
     (r2 π₁ π₂ : ℝ)
-    (h_r2_pos : 0 < r2) (h_r2_lt : r2 < 1)
-    (h_π₁ : 0 < π₁) (h_π₂ : 0 < π₂) (h_π₂' : π₂ < 1)
+    (h_r2_lt : r2 < 1)
     (h_order : π₁ < π₂) (h_half : π₂ ≤ 1/2) :
     brierFromR2 π₁ r2 < brierFromR2 π₂ r2 := by
   unfold brierFromR2
@@ -341,35 +330,56 @@ theorem brier_depends_on_prevalence
   have h_prod : π₁ * (1 - π₁) < π₂ * (1 - π₂) := by nlinarith
   nlinarith
 
-/-- **R² to AUC conversion (Wray et al., 2010) - structural.**
-    Under the liability threshold model, AUC = Φ(√(SNR/2)) where SNR = R²/(1-R²).
-    The `liabilityAUCFromSNR` definition computes `Φ(√(snr/2))` and the
-    `sourceVarianceFromR2` definition computes `r2/(1-r2)`.
+/-- **Source liability AUC is strictly increasing in source `R²`.**
+    Under the exact liability-threshold map `AUC = Φ(√(SNR/2))` with
+    `SNR = r2 / (1-r2)`, higher source `R²` yields higher source liability AUC.
+    This is a true metric comparison, not just a formula expansion. -/
+theorem sourceLiabilityAUC_strictly_increases_with_r2
+    (r2₁ r2₂ : ℝ)
+    (h_r2₁ : 0 < r2₁) (h_r2₂ : r2₂ < 1)
+    (h_lt : r2₁ < r2₂)
+    (hPhiStrict : StrictMono Phi) :
+    sourceLiabilityAUCFromObservables r2₁ <
+      sourceLiabilityAUCFromObservables r2₂ := by
+  have h_r2₁_range : 0 < r2₁ ∧ r2₁ < 1 := ⟨h_r2₁, lt_trans h_lt h_r2₂⟩
+  have h_r2₂_pos : 0 < r2₂ := lt_trans h_r2₁ h_lt
+  have h_r2₂_range : 0 < r2₂ ∧ r2₂ < 1 := ⟨h_r2₂_pos, h_r2₂⟩
+  have hv₁_pos : 0 < sourceVarianceFromR2 r2₁ :=
+    sourceVarianceFromR2_pos r2₁ h_r2₁_range
+  have hv₂_pos : 0 < sourceVarianceFromR2 r2₂ :=
+    sourceVarianceFromR2_pos r2₂ h_r2₂_range
+  have hv_lt :
+      sourceVarianceFromR2 r2₁ < sourceVarianceFromR2 r2₂ :=
+    sourceVarianceFromR2_strictMono r2₁ r2₂ h_r2₂ h_lt
+  have hmono := liabilityAUCFromSNR_strictMonoOn_nonneg hPhiStrict
+  unfold sourceLiabilityAUCFromObservables
+  exact hmono (by simpa using le_of_lt hv₁_pos) (by simpa using le_of_lt hv₂_pos) hv_lt
 
-    We derive: the source liability AUC map equals the composition
-    `liabilityAUCFromSNR ∘ sourceVarianceFromR2`, connecting the R²-based
-    and SNR-based formulations. -/
-theorem r2_auc_relationship
-    (r2 : ℝ) :
-    sourceLiabilityAUCFromObservables r2 = liabilityAUCFromSNR (sourceVarianceFromR2 r2) := by
-  unfold sourceLiabilityAUCFromObservables; rfl
+/-- **Liability AUC is sensitive to drift in the observable transport model.**
+    With fixed source `R²`, increasing drift strictly lowers the transported
+    liability-threshold AUC. This is the exact metric-level AUC analogue of the
+    observable `R²` drift result. -/
+theorem liability_auc_sensitive_to_drift
+    (r2Source fstS fstT : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstS < fstT)
+    (h_fst_bounds : 0 ≤ fstS ∧ fstT < 1)
+    (hPhiStrict : StrictMono Phi) :
+    0 < sourceLiabilityAUCFromObservables r2Source -
+      targetLiabilityAUCFromObservables r2Source fstS fstT := by
+  have h_drop :=
+    targetLiabilityAUC_lt_source_of_observables
+      r2Source fstS fstT h_r2 h_fst h_fst_bounds hPhiStrict
+  linarith
 
-/-- **Brier score drops faster than AUC under drift (derived from definitions).**
-    Under the drift model, AUC portability depends only on the signal-to-noise
-    ratio via `presentDayAUC aucLink V_A V_E fst = aucLink(SNR(fst))`, while
-    Brier score `brierFromR2 π r2 = π(1-π)(1-r2)` depends on both R² and
-    prevalence π. When prevalence increases (π closer to 0.5) in the target,
-    Brier score increases even if R² stays the same, compounding the R² loss.
-
-    We derive: target Brier > source Brier from the structural definitions,
-    showing that the Brier metric captures both discrimination and prevalence
-    effects while AUC captures only discrimination. -/
-theorem brier_drops_faster_than_auc_metric
+/-- **Brier worsens when R² drops and the prevalence factor weakly increases.**
+    This theorem is about the Brier metric alone. Under the observable formula
+    `Brier = π(1-π)(1-r2)`, a lower target `r2` together with a weakly larger
+    prevalence factor implies a weakly worse target Brier score. -/
+theorem brier_worsens_when_r2_drops_and_prevalence_factor_grows
     (π_source π_target r2_source r2_target : ℝ)
     (h_πs : 0 < π_source) (h_πs' : π_source < 1)
-    (h_πt : 0 < π_target) (h_πt' : π_target < 1)
-    (h_r2s : 0 < r2_source) (h_r2s' : r2_source < 1)
-    (h_r2t : 0 < r2_target) (h_r2t' : r2_target < 1)
+    (h_r2s' : r2_source < 1)
     -- R² drops in target
     (h_r2_drop : r2_target < r2_source)
     -- Prevalence factor is at least as large in target
@@ -395,39 +405,63 @@ across populations.
 
 section CalibrationVsDiscrimination
 
-/-- **Discrimination preserved while calibration is lost (AUC rank-invariance).**
-    Under the drift model, two populations at the same fst have the same AUC
-    (since `presentDayAUC` depends only on `presentDaySignalToNoise` which is
-    `(1 - fst) * V_A / V_E`, independent of mean shift).
+/-- **At fixed drift, AUC is preserved while CITL shifts exactly with the mean-score offset.**
+    This theorem formalizes the intended metric split on the repository's
+    actual metrics:
 
-    Meanwhile, R² degrades with increasing drift (`drift_degrades_R2`).
-    We show: at a single fst value, AUC is preserved (it's a function of
-    SNR alone) while R² can be recalculated to show calibration loss.
+    - discrimination is measured by observable transport AUC;
+    - calibration is measured by calibration-in-the-large (CITL).
 
-    Formally, we prove AUC = aucLink(SNR) where SNR is structurally
-    independent of any mean-shift parameter, and that R² at a higher fst
-    is strictly lower. This demonstrates discrimination (AUC) is preserved
-    while calibration (captured by R²) is lost. -/
+    If source and target have the same `fst`, then the observable transport map
+    gives exactly the same AUC. If the target mean prediction is shifted by an
+    additive offset `δ`, then CITL shifts by exactly `-δ`. This is the precise
+    fixed-`fst` statement behind "rank-based discrimination can be preserved
+    while calibration is lost." -/
+theorem auc_preserved_citl_shift_at_fixed_fst
+    (aucLink : ℝ → ℝ)
+    (r2Source fst mean_obs mean_pred δ : ℝ)
+    (hfst : fst < 1) :
+    targetAUCFromObservables aucLink r2Source fst fst =
+      sourceAUCFromObservables aucLink r2Source ∧
+    calibrationInTheLarge mean_obs (mean_pred + δ) =
+      calibrationInTheLarge mean_obs mean_pred - δ := by
+  constructor
+  · unfold targetAUCFromObservables sourceAUCFromObservables targetVarianceFromSource
+    have hden : (1 : ℝ) - fst ≠ 0 := by linarith
+    rw [div_self hden, mul_one]
+  · unfold calibrationInTheLarge
+    ring
+
+/-- **Discrimination preserved while calibration is lost at fixed drift.**
+    In the observable transport model, if source and target share the same
+    drift level `fst`, then AUC is unchanged. If the source is calibrated in
+    the large and the target mean prediction is shifted by a nonzero offset
+    `δ`, then target absolute CITL becomes strictly worse.
+
+    This is the actual fixed-`fst` result the surrounding prose was aiming at:
+    AUC is preserved, while calibration loss is witnessed by a standard
+    calibration metric rather than an `R²` surrogate. -/
 theorem discrimination_preserved_calibration_lost
-    (aucLink : ℝ → ℝ) (hauc : StrictMono aucLink)
-    (V_A V_E fstS fstT : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst : fstS < fstT) (hfstT : fstT ≤ 1) :
-    -- AUC degrades strictly less than R² in relative terms:
-    -- AUC_target < AUC_source (from drift_degrades_AUC_of_strictMono)
-    -- R²_target < R²_source (from drift_degrades_R2)
-    -- Both degrade, but the key structural point is that AUC depends
-    -- only on SNR (discrimination) while R² captures both.
-    -- We prove: the AUC degradation is driven solely by variance loss,
-    -- not by mean shift, by showing AUC factors through SNR.
-    presentDayAUC aucLink V_A V_E fstT < presentDayAUC aucLink V_A V_E fstS ∧
-    presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS ∧
-    presentDayAUC aucLink V_A V_E fstT =
-      aucLink (presentDaySignalToNoise V_A V_E fstT) := by
-  refine ⟨?_, ?_, ?_⟩
-  · exact drift_degrades_AUC_of_strictMono aucLink hauc V_A V_E fstS fstT hVA hVE hfst
-  · exact drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT
-  · unfold presentDayAUC; rfl
+    (aucLink : ℝ → ℝ)
+    (r2Source fst mean_obs mean_pred δ : ℝ)
+    (hfst : fst < 1)
+    (h_src_cal : calibrationInTheLarge mean_obs mean_pred = 0)
+    (h_shift : δ ≠ 0) :
+    targetAUCFromObservables aucLink r2Source fst fst =
+      sourceAUCFromObservables aucLink r2Source ∧
+    |calibrationInTheLarge mean_obs mean_pred| <
+      |calibrationInTheLarge mean_obs (mean_pred + δ)| := by
+  rcases auc_preserved_citl_shift_at_fixed_fst aucLink r2Source fst mean_obs mean_pred δ hfst with
+    ⟨h_auc, h_citl_shift⟩
+  refine ⟨h_auc, ?_⟩
+  rw [h_src_cal]
+  rw [h_citl_shift, h_src_cal]
+  have h_shift_sub : 0 - δ ≠ 0 := by
+    intro h
+    apply h_shift
+    linarith
+  simp only [abs_zero]
+  exact abs_pos.mpr h_shift_sub
 
 /-- **Calibration is affected by allele frequency shifts (derived from drift model).**
     Under drift, R² in the target is strictly lower than in the source
@@ -441,17 +475,103 @@ theorem allele_freq_shift_disrupts_calibration
     presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS :=
   drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT
 
-/-- **Recalibration is easier than improving discrimination.**
-    Calibration can be fixed with a small target-population sample
-    (just need to estimate intercept + slope, ~2 parameters).
-    Discrimination requires discovering new variants (~m parameters). -/
+/-- **Dimension-to-information ratio for a target adaptation task.**
+    In an orthogonal Fisher model with `d` target-specific parameters and
+    per-sample Fisher information `I` for each parameter, the natural
+    difficulty scale is `d / I`. Smaller values mean the target task can
+    be estimated more precisely from the same effective sample size. -/
+noncomputable def adaptationDifficultyIndex
+    (nParams infoPerSample : ℝ) : ℝ :=
+  nParams / infoPerSample
+
+/-- **Trace-MSE lower bound under an orthogonal Fisher model.**
+    For an unbiased estimator of `d` orthogonal target parameters, the summed
+    estimation variance is lower-bounded by `(d / I) / n_eff`, where `I` is the
+    per-sample Fisher information and `n_eff` is the effective target sample size. -/
+noncomputable def fisherTraceMSELowerBound
+    (nEff nParams infoPerSample : ℝ) : ℝ :=
+  adaptationDifficultyIndex nParams infoPerSample / nEff
+
+/-- **Effective sample size needed to beat a target trace-MSE threshold.**
+    Solving `(d / I) / n_eff ≤ τ` for `n_eff` gives the exact threshold
+    `(d / I) / τ` in the orthogonal Fisher model. -/
+noncomputable def requiredEffectiveSampleSizeForTraceMSE
+    (nParams infoPerSample targetTraceMSE : ℝ) : ℝ :=
+  adaptationDifficultyIndex nParams infoPerSample / targetTraceMSE
+
+/-- The `requiredEffectiveSampleSizeForTraceMSE` definition is the exact
+    threshold corresponding to the Fisher trace-MSE lower bound. -/
+theorem fisherTraceMSELowerBound_le_target_iff
+    (nEff nParams infoPerSample targetTraceMSE : ℝ)
+    (h_nEff : 0 < nEff)
+    (h_target : 0 < targetTraceMSE) :
+    fisherTraceMSELowerBound nEff nParams infoPerSample ≤ targetTraceMSE ↔
+      requiredEffectiveSampleSizeForTraceMSE nParams infoPerSample targetTraceMSE ≤ nEff := by
+  unfold fisherTraceMSELowerBound requiredEffectiveSampleSizeForTraceMSE adaptationDifficultyIndex
+  constructor
+  · intro h
+    rw [div_le_iff₀ h_target]
+    rw [div_le_iff₀ h_nEff] at h
+    simpa [mul_comm, mul_left_comm, mul_assoc] using h
+  · intro h
+    rw [div_le_iff₀ h_nEff]
+    rw [div_le_iff₀ h_target] at h
+    simpa [mul_comm, mul_left_comm, mul_assoc] using h
+
+/-- If the rediscovery task has both more free parameters and no more
+    per-sample Fisher information than recalibration, then its
+    dimension-to-information ratio is strictly larger. -/
+theorem adaptationDifficultyIndex_recal_lt_rediscovery
+    (infoCal infoDisc m : ℝ)
+    (h_infoDisc : 0 < infoDisc)
+    (h_info_order : infoDisc ≤ infoCal)
+    (h_more_params : 2 < m) :
+    adaptationDifficultyIndex 2 infoCal <
+      adaptationDifficultyIndex m infoDisc := by
+  unfold adaptationDifficultyIndex
+  have h_two_over_cal_le_disc : 2 / infoCal ≤ 2 / infoDisc := by
+    have h_inv : 1 / infoCal ≤ 1 / infoDisc := by
+      exact one_div_le_one_div_of_le h_infoDisc h_info_order
+    have h_mul :=
+      mul_le_mul_of_nonneg_left h_inv (show (0 : ℝ) ≤ 2 by norm_num)
+    simpa [div_eq_mul_inv] using h_mul
+  have h_two_over_disc_lt_m_over_disc : 2 / infoDisc < m / infoDisc := by
+    exact div_lt_div_of_pos_right h_more_params h_infoDisc
+  exact lt_of_le_of_lt h_two_over_cal_le_disc h_two_over_disc_lt_m_over_disc
+
+/-- **Recalibration is easier than rediscovery at the same precision target.**
+    The honest version of this claim is sample-complexity based, not raw
+    parameter counting. Model recalibration estimates only two target-specific
+    parameters (intercept and slope), while discrimination rediscovery must
+    estimate `m` target-specific effect parameters. In the orthogonal Fisher
+    model, if rediscovery has at least as many free parameters and no more
+    per-sample information than recalibration, then:
+
+    1. at any fixed effective sample size, the Fisher trace-MSE lower bound is
+       smaller for recalibration;
+    2. to reach the same target trace-MSE threshold, recalibration requires
+       strictly fewer effective target samples. -/
 theorem recalibration_easier_than_rediscovery
-    (n_per_param : ℕ) (n_cal_params n_disc_params : ℕ)
-    (h_cal_params : n_cal_params = 2)
-    (h_disc_more : n_cal_params < n_disc_params)
-    (h_n_pos : 0 < n_per_param) :
-    n_per_param * n_cal_params < n_per_param * n_disc_params := by
-  exact (Nat.mul_lt_mul_left h_n_pos).2 h_disc_more
+    (nEff targetTraceMSE infoCal infoDisc m : ℝ)
+    (h_nEff : 0 < nEff)
+    (h_target : 0 < targetTraceMSE)
+    (h_infoDisc : 0 < infoDisc)
+    (h_info_order : infoDisc ≤ infoCal)
+    (h_more_params : 2 < m) :
+    fisherTraceMSELowerBound nEff 2 infoCal <
+      fisherTraceMSELowerBound nEff m infoDisc ∧
+    requiredEffectiveSampleSizeForTraceMSE 2 infoCal targetTraceMSE <
+      requiredEffectiveSampleSizeForTraceMSE m infoDisc targetTraceMSE := by
+  have h_diff :
+      adaptationDifficultyIndex 2 infoCal <
+        adaptationDifficultyIndex m infoDisc :=
+    adaptationDifficultyIndex_recal_lt_rediscovery
+      infoCal infoDisc m h_infoDisc h_info_order h_more_params
+  constructor
+  · unfold fisherTraceMSELowerBound
+    exact div_lt_div_of_pos_right h_diff h_nEff
+  · unfold requiredEffectiveSampleSizeForTraceMSE
+    exact div_lt_div_of_pos_right h_diff h_target
 
 /-- **Brier score increases with portability loss (derived from Brier definition).**
     Since `brierFromR2 π r2 = π(1-π)(1-r2)`, a decrease in R² (from drift)
@@ -460,8 +580,6 @@ theorem recalibration_easier_than_rediscovery
 theorem brier_increases_with_portability_loss
     (π r2_source r2_target : ℝ)
     (h_π : 0 < π) (h_π' : π < 1)
-    (h_r2s : 0 < r2_source) (h_r2s' : r2_source < 1)
-    (h_r2t : 0 < r2_target) (h_r2t' : r2_target < 1)
     (h_drop : r2_target < r2_source) :
     brierFromR2 π r2_source < brierFromR2 π r2_target := by
   unfold brierFromR2
@@ -475,22 +593,125 @@ theorem brier_increases_with_portability_loss
 theorem brier_bounded_by_prevalence
     (π r2 : ℝ)
     (h_π : 0 < π) (h_π' : π < 1)
-    (h_r2 : 0 < r2) (h_r2' : r2 ≤ 1) :
+    (h_r2 : 0 < r2) :
     brierFromR2 π r2 < π * (1 - π) := by
   unfold brierFromR2
   have h_prev : 0 < π * (1 - π) := by nlinarith
   nlinarith
 
-/-- **Cross-population Brier score increases mainly from calibration.**
-    For PGS, the discrimination component is relatively stable
-    (shared genetic effects) but calibration degrades (frequency shifts). -/
+/-- Brier worsening caused by discrimination loss alone, holding target prevalence fixed. -/
+noncomputable def brierDiscriminationLoss
+    (πTarget r2Source fstSource fstTarget : ℝ) : ℝ :=
+  targetBrierFromObservables πTarget r2Source fstSource fstTarget -
+    sourceBrierFromObservables πTarget r2Source
+
+/-- Brier worsening caused by calibration/prevalence shift alone, holding source `R²` fixed. -/
+noncomputable def brierCalibrationLoss
+    (πSource πTarget r2Source : ℝ) : ℝ :=
+  sourceBrierFromObservables πTarget r2Source -
+    sourceBrierFromObservables πSource r2Source
+
+/-- Exact formula for the discrimination-loss contribution to Brier worsening. -/
+theorem brierDiscriminationLoss_eq
+    (πTarget r2Source fstSource fstTarget : ℝ) :
+    brierDiscriminationLoss πTarget r2Source fstSource fstTarget =
+      πTarget * (1 - πTarget) *
+        (r2Source - targetR2FromObservables r2Source fstSource fstTarget) := by
+  unfold brierDiscriminationLoss targetBrierFromObservables sourceBrierFromObservables brierFromR2
+  ring
+
+/-- Exact formula for the calibration/prevalence contribution to Brier worsening. -/
+theorem brierCalibrationLoss_eq
+    (πSource πTarget r2Source : ℝ) :
+    brierCalibrationLoss πSource πTarget r2Source =
+      (πTarget * (1 - πTarget) - πSource * (1 - πSource)) * (1 - r2Source) := by
+  unfold brierCalibrationLoss sourceBrierFromObservables brierFromR2
+  ring
+
+/-- Exact decomposition of observable Brier worsening into discrimination and calibration terms. -/
+theorem observableBrier_change_decomposition
+    (πSource πTarget r2Source fstSource fstTarget : ℝ) :
+    targetBrierFromObservables πTarget r2Source fstSource fstTarget -
+      sourceBrierFromObservables πSource r2Source =
+      brierDiscriminationLoss πTarget r2Source fstSource fstTarget +
+      brierCalibrationLoss πSource πTarget r2Source := by
+  unfold brierDiscriminationLoss brierCalibrationLoss
+  ring
+
+/-- Positive drift makes the discrimination-loss contribution to Brier worsening positive. -/
+theorem brierDiscriminationLoss_pos_of_drift
+    (πTarget r2Source fstSource fstTarget : ℝ)
+    (hπ0 : 0 < πTarget) (hπ1 : πTarget < 1)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
+    0 < brierDiscriminationLoss πTarget r2Source fstSource fstTarget := by
+  unfold brierDiscriminationLoss
+  exact sub_pos.mpr
+    (targetBrier_strict_gt_source_of_observables πTarget r2Source fstSource fstTarget
+      hπ0 hπ1 h_r2 h_fst h_fst_bounds)
+
+/-- If the prevalence factor increases, the calibration/prevalence contribution is positive. -/
+theorem brierCalibrationLoss_pos_of_prevalence_factor_increase
+    (πSource πTarget r2Source : ℝ)
+    (h_r2_lt : r2Source < 1)
+    (h_prev_factor :
+      πSource * (1 - πSource) < πTarget * (1 - πTarget)) :
+    0 < brierCalibrationLoss πSource πTarget r2Source := by
+  rw [brierCalibrationLoss_eq]
+  have h_prev_gap : 0 < πTarget * (1 - πTarget) - πSource * (1 - πSource) := by
+    linarith
+  have h_one_minus_r2 : 0 < 1 - r2Source := by
+    linarith
+  exact mul_pos h_prev_gap h_one_minus_r2
+
+/-- **Cross-population Brier worsening is mainly from calibration when the calibration term dominates.**
+    This theorem uses the repository's actual observable Brier metric and proves
+    an exact two-part decomposition:
+
+    - `brierDiscriminationLoss` is the worsening caused by transported `R²` loss
+      at fixed target prevalence;
+    - `brierCalibrationLoss` is the worsening caused by prevalence/calibration
+      shift at fixed source `R²`.
+
+    If the prevalence-linked calibration term exceeds the discrimination term,
+    then it contributes more than half of the total Brier worsening. -/
 theorem brier_increase_mainly_calibration
-    (Δcal Δref : ℝ)
-    (h_cal_dominates : |Δref| < |Δcal|)
-    (h_cal_pos : 0 < Δcal) :
-    Δref < Δcal := by
-  have h1 : Δref ≤ |Δref| := le_abs_self _
-  have h2 : |Δcal| = Δcal := abs_of_pos h_cal_pos
+    (πSource πTarget r2Source fstSource fstTarget : ℝ)
+    (hπ0 : 0 < πTarget) (hπ1 : πTarget < 1)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (h_prev_factor :
+      πSource * (1 - πSource) < πTarget * (1 - πTarget))
+    (h_cal_dom :
+      πTarget * (1 - πTarget) *
+          (r2Source - targetR2FromObservables r2Source fstSource fstTarget) <
+        (πTarget * (1 - πTarget) - πSource * (1 - πSource)) * (1 - r2Source)) :
+    targetBrierFromObservables πTarget r2Source fstSource fstTarget -
+      sourceBrierFromObservables πSource r2Source =
+        brierDiscriminationLoss πTarget r2Source fstSource fstTarget +
+        brierCalibrationLoss πSource πTarget r2Source ∧
+    0 < brierDiscriminationLoss πTarget r2Source fstSource fstTarget ∧
+    0 < brierCalibrationLoss πSource πTarget r2Source ∧
+    brierDiscriminationLoss πTarget r2Source fstSource fstTarget <
+      brierCalibrationLoss πSource πTarget r2Source ∧
+    (targetBrierFromObservables πTarget r2Source fstSource fstTarget -
+        sourceBrierFromObservables πSource r2Source) / 2 <
+      brierCalibrationLoss πSource πTarget r2Source := by
+  have h_decomp := observableBrier_change_decomposition
+    πSource πTarget r2Source fstSource fstTarget
+  have h_disc_pos := brierDiscriminationLoss_pos_of_drift
+    πTarget r2Source fstSource fstTarget hπ0 hπ1 h_r2 h_fst h_fst_bounds
+  have h_cal_pos := brierCalibrationLoss_pos_of_prevalence_factor_increase
+    πSource πTarget r2Source h_r2.2 h_prev_factor
+  have h_cal_dom' :
+      brierDiscriminationLoss πTarget r2Source fstSource fstTarget <
+        brierCalibrationLoss πSource πTarget r2Source := by
+    rw [brierDiscriminationLoss_eq, brierCalibrationLoss_eq]
+    exact h_cal_dom
+  refine ⟨h_decomp, h_disc_pos, h_cal_pos, h_cal_dom', ?_⟩
+  rw [h_decomp]
   linarith
 
 end CalibrationVsDiscrimination
@@ -512,52 +733,70 @@ noncomputable def metricPPV (sensitivity specificity prevalence : ℝ) : ℝ :=
   sensitivity * prevalence /
     (sensitivity * prevalence + (1 - specificity) * (1 - prevalence))
 
+/-- Absolute portability gap for sensitivity between source and target use cases. -/
+def sensitivityPortabilityGap (sensSource sensTarget : ℝ) : ℝ :=
+  |sensTarget - sensSource|
+
+/-- Absolute portability gap for PPV between source and target prevalences. -/
+noncomputable def ppvPortabilityGap
+    (sensitivity specificity prevalenceSource prevalenceTarget : ℝ) : ℝ :=
+  |metricPPV sensitivity specificity prevalenceTarget -
+    metricPPV sensitivity specificity prevalenceSource|
+
 /- **Recall (sensitivity) of high-risk classification.**
     Sensitivity = P(PGS says high risk | actually high risk).
     Depends on the PGS's discriminative ability. -/
 
-/-- **PPV changes with prevalence.**
-    Even if sensitivity and specificity are perfectly portable,
-    PPV changes if disease prevalence differs. -/
-theorem ppv_changes_with_prevalence
+/-- **PPV is strictly increasing in prevalence.**
+    At fixed sensitivity and specificity, higher prevalence yields higher PPV.
+    This is the concrete base-rate sensitivity of PPV. -/
+theorem ppv_increases_with_prevalence
     (se sp K₁ K₂ : ℝ)
-    (h_se : 0 < se) (h_sp : 0 < sp) (h_sp1 : sp < 1)
+    (h_se : 0 < se) (h_sp1 : sp < 1)
     (h_K1 : 0 < K₁) (h_K1' : K₁ < 1)
-    (h_K2 : 0 < K₂) (h_K2' : K₂ < 1)
-    (h_diff : K₁ ≠ K₂) :
-    metricPPV se sp K₁ ≠ metricPPV se sp K₂ := by
+    (h_K2' : K₂ < 1)
+    (h_order : K₁ < K₂) :
+    metricPPV se sp K₁ < metricPPV se sp K₂ := by
   unfold metricPPV
-  intro h
-  apply h_diff
-  -- Cross-multiply and simplify
   have h_d1 : 0 < se * K₁ + (1 - sp) * (1 - K₁) := by nlinarith
   have h_d2 : 0 < se * K₂ + (1 - sp) * (1 - K₂) := by nlinarith
-  rw [div_eq_div_iff h_d1.ne' h_d2.ne'] at h
-  -- se * K₁ * (se * K₂ + (1-sp)(1-K₂)) = se * K₂ * (se * K₁ + (1-sp)(1-K₁))
-  -- se²K₁K₂ + se*K₁*(1-sp)(1-K₂) = se²K₁K₂ + se*K₂*(1-sp)(1-K₁)
-  -- se*K₁*(1-sp)(1-K₂) = se*K₂*(1-sp)(1-K₁)
-  -- K₁*(1-K₂) = K₂*(1-K₁)  [cancel se*(1-sp)]
-  -- K₁ - K₁K₂ = K₂ - K₁K₂
-  -- K₁ = K₂
+  have h_d1_ne : se * K₁ + (1 - sp) * (1 - K₁) ≠ 0 := ne_of_gt h_d1
+  have h_d2_ne : se * K₂ + (1 - sp) * (1 - K₂) ≠ 0 := ne_of_gt h_d2
+  field_simp [h_d1_ne, h_d2_ne]
   nlinarith [mul_pos h_se (sub_pos.mpr h_sp1)]
 
-/-- **Sensitivity is more portable than PPV.**
-    Sensitivity depends mainly on discrimination (rank ordering),
-    which is more stable across populations.
-    PPV depends on both discrimination δ_disc and prevalence δ_prev.
-    Sensitivity only depends on δ_disc. -/
+/-- **If prevalence shifts while sensitivity and specificity are fixed, PPV changes but sensitivity does not.**
+    This is the concrete metric statement behind the portability claim. Under a
+    pure prevalence shift with identical sensitivity and specificity,
+    sensitivity has zero portability gap while PPV has a strictly positive gap,
+    so the PPV portability gap strictly exceeds the sensitivity portability gap. -/
 theorem sensitivity_more_portable_than_ppv
-    (δ_disc δ_prev : ℝ)
-    (h_disc_nn : 0 ≤ |δ_disc|)
-    (h_prev_pos : 0 < |δ_prev|) :
-    |δ_disc| < |δ_disc| + |δ_prev| := by linarith
+    (se sp K_source K_target : ℝ)
+    (h_se : 0 < se) (h_sp1 : sp < 1)
+    (h_Ks : 0 < K_source) (h_Ks' : K_source < 1)
+    (h_Kt' : K_target < 1)
+    (h_order : K_source < K_target) :
+    sensitivityPortabilityGap se se <
+      ppvPortabilityGap se sp K_source K_target := by
+  have h_ppv :
+      metricPPV se sp K_source < metricPPV se sp K_target :=
+    ppv_increases_with_prevalence
+      se sp K_source K_target h_se h_sp1 h_Ks h_Ks' h_Kt' h_order
+  have h_gap_pos :
+      0 < metricPPV se sp K_target - metricPPV se sp K_source := sub_pos.mpr h_ppv
+  have h_ppv_gap :
+      0 < ppvPortabilityGap se sp K_source K_target := by
+    unfold ppvPortabilityGap
+    rw [abs_of_pos h_gap_pos]
+    exact h_gap_pos
+  simpa [sensitivityPortabilityGap] using h_ppv_gap
 
 /-- **Number needed to screen (NNS) portability.**
     NNS = 1/PPV. If PPV drops, NNS increases → more individuals
     need screening for each true positive. -/
 theorem nns_increases_with_ppv_drop
     (ppv₁ ppv₂ : ℝ)
-    (h_ppv₁ : 0 < ppv₁) (h_ppv₂ : 0 < ppv₂)
+    (h_ppv₂ : 0 < ppv₂)
     (h_drop : ppv₂ < ppv₁) :
     1 / ppv₁ < 1 / ppv₂ := by
   exact div_lt_div_of_pos_left one_pos h_ppv₂ h_drop
@@ -568,8 +807,8 @@ theorem nns_increases_with_ppv_drop
 noncomputable def f1ScoreMetric (precision sens : ℝ) : ℝ :=
   2 * precision * sens / (precision + sens)
 
-/-- F1 is bounded above by 1 (the maximum of precision and sens when both ≤ 1). -/
-theorem f1_le_min
+/-- F1 is bounded above by 1 when both precision and sensitivity lie in `(0,1]`. -/
+theorem f1_le_one
     (precision sens : ℝ)
     (h_p : 0 < precision) (h_r : 0 < sens)
     (h_p1 : precision ≤ 1) (h_r1 : sens ≤ 1) :
@@ -591,56 +830,71 @@ specific portability has direct practical consequences.
 
 section MetricAndClinicalDecisions
 
-/-- **Screening vs diagnosis: PPV degrades faster than sensitivity under drift.**
-    From the `ppv` definition, PPV depends on prevalence via Bayes' theorem.
-    Under drift, if prevalence changes (K₁ ≠ K₂), PPV changes even if
-    sensitivity and specificity are the same (from `ppv_changes_with_prevalence`).
-    Meanwhile, sensitivity depends only on discrimination (rank ordering),
-    which is more stable.
-
-    We show: if sensitivity and specificity are perfectly portable but
-    prevalence changes, PPV in the target differs from PPV in the source
-    while sensitivity stays the same. -/
+/-- **Screening PPV can shift even when case-finding sensitivity is unchanged.**
+    Under a pure prevalence shift with identical sensitivity and specificity,
+    the sensitivity portability gap stays below the PPV portability gap, and the
+    higher-prevalence use case has strictly higher PPV.
+    This is the metric split relevant to screening versus case-finding use
+    cases. -/
 theorem different_uses_different_metrics
     (se sp K_source K_target : ℝ)
-    (h_se : 0 < se) (h_sp : 0 < sp) (h_sp1 : sp < 1)
+    (h_se : 0 < se) (h_sp1 : sp < 1)
     (h_Ks : 0 < K_source) (h_Ks' : K_source < 1)
-    (h_Kt : 0 < K_target) (h_Kt' : K_target < 1)
-    (h_diff : K_source ≠ K_target) :
-    metricPPV se sp K_source ≠ metricPPV se sp K_target :=
-  ppv_changes_with_prevalence se sp K_source K_target h_se h_sp h_sp1
-    h_Ks h_Ks' h_Kt h_Kt' h_diff
+    (h_Kt' : K_target < 1)
+    (h_order : K_source < K_target) :
+    sensitivityPortabilityGap se se <
+      ppvPortabilityGap se sp K_source K_target ∧
+    metricPPV se sp K_source < metricPPV se sp K_target := by
+  constructor
+  · exact sensitivity_more_portable_than_ppv
+      se sp K_source K_target h_se h_sp1 h_Ks h_Ks' h_Kt' h_order
+  · exact ppv_increases_with_prevalence
+      se sp K_source K_target h_se h_sp1 h_Ks h_Ks' h_Kt' h_order
 
 /-- **Decision curve analysis: Brier score is population-specific (from definition).**
-    The Brier score `brierFromR2 π r2` changes with both prevalence and R².
-    Under drift, R² degrades (from `drift_degrades_R2`), and if prevalence
-    also differs, the Brier score changes doubly. We derive: if either R²
-    or prevalence differs, the target Brier differs from source. -/
-theorem brier_score_population_specific
+    At fixed prevalence, any nonzero `R²` shift induces a strictly positive
+    absolute Brier portability gap. -/
+theorem brier_portability_gap_positive_of_r2_shift
     (π r2_source r2_target : ℝ)
     (h_π : 0 < π) (h_π' : π < 1)
-    (h_r2s : 0 < r2_source) (h_r2s' : r2_source < 1)
-    (h_r2t : 0 < r2_target) (h_r2t' : r2_target < 1)
     (h_diff : r2_source ≠ r2_target) :
-    brierFromR2 π r2_source ≠ brierFromR2 π r2_target := by
-  unfold brierFromR2
-  intro h
-  apply h_diff
-  have h_prev : 0 < π * (1 - π) := by nlinarith
-  have h_prev_ne : π * (1 - π) ≠ 0 := ne_of_gt h_prev
-  -- π*(1-π)*(1-r2_source) = π*(1-π)*(1-r2_target) → 1-r2_source = 1-r2_target → r2_source = r2_target
-  have := mul_left_cancel₀ h_prev_ne h
-  linarith
+    0 < |brierFromR2 π r2_source - brierFromR2 π r2_target| := by
+  have h_ne : brierFromR2 π r2_source ≠ brierFromR2 π r2_target := by
+    unfold brierFromR2
+    intro h
+    apply h_diff
+    have h_prev : 0 < π * (1 - π) := by nlinarith
+    have h_prev_ne : π * (1 - π) ≠ 0 := ne_of_gt h_prev
+    have := mul_left_cancel₀ h_prev_ne h
+    linarith
+  exact abs_pos.mpr (sub_ne_zero.mpr h_ne)
 
-/-- **Relative utility of PGS vs no screening.**
-    For PGS to be clinically useful, NB(PGS) > NB(screen all) and
-    NB(PGS) > NB(screen none). If portability loss brings NB below
-    these baselines, PGS is not useful in the target population. -/
+/-- **Lower target sensitivity and specificity reduce net benefit at a fixed
+    decision threshold.** -/
 theorem clinical_utility_threshold
-    (nb_pgs nb_all nb_none : ℝ)
-    (h_useful : nb_all < nb_pgs ∧ nb_none < nb_pgs) :
-    max nb_all nb_none < nb_pgs := by
-  exact max_lt h_useful.1 h_useful.2
+    (sens_source spec_source sens_target spec_target π t : ℝ)
+    (h_π : 0 < π) (h_π1 : π < 1)
+    (ht : 0 < t) (ht1 : t < 1)
+    (h_sens : sens_target < sens_source)
+    (h_spec : spec_target < spec_source) :
+    netBenefit (sens_target * π) ((1 - spec_target) * (1 - π)) 1 t <
+      netBenefit (sens_source * π) ((1 - spec_source) * (1 - π)) 1 t := by
+  unfold netBenefit
+  have h_threshold_weight_pos : 0 < t / (1 - t) := div_pos ht (by linarith)
+  have h_tp : sens_target * π < sens_source * π := by
+    exact mul_lt_mul_of_pos_right h_sens h_π
+  have h_fp :
+      (1 - spec_source) * (1 - π) <
+        (1 - spec_target) * (1 - π) := by
+    apply mul_lt_mul_of_pos_right
+    · linarith
+    · linarith
+  have h_fp_weighted :
+      (1 - spec_source) * (1 - π) * (t / (1 - t)) <
+        (1 - spec_target) * (1 - π) * (t / (1 - t)) :=
+    mul_lt_mul_of_pos_right h_fp h_threshold_weight_pos
+  simp only [div_one]
+  linarith
 
 /-- **R² and AUC can diverge under drift (derived from model structure).**
     Under drift, both R² and AUC degrade, but AUC degrades through SNR alone
@@ -697,28 +951,43 @@ theorem brier_score_bounded
     brierFromR2 π r2 ≤ 1/4 := by
   unfold brierFromR2
   have h1 : π * (1 - π) ≤ 1/4 := by nlinarith [sq_nonneg (π - 1/2)]
+  have h_one_minus_pi : 0 ≤ 1 - π := by linarith
   have h2 : 0 ≤ 1 - r2 := by linarith
   have h3 : 1 - r2 ≤ 1 := by linarith
-  nlinarith [mul_nonneg (mul_nonneg h_π (by linarith : 0 ≤ 1 - π)) h2]
+  have h_nonneg : 0 ≤ π * (1 - π) * (1 - r2) := by
+    exact mul_nonneg (mul_nonneg h_π h_one_minus_pi) h2
+  nlinarith
 
-/-- **Proper scoring rule decomposition.**
-    For any proper scoring rule S:
-    E[S] = calibration_component + sharpness_component.
-    Portability affects calibration more than sharpness.
-    Total portability loss = cal_change + sharp_change, and
-    calibration dominates: cal_change > half the total. -/
-theorem proper_score_portability_decomposition
-    (cal_change sharp_change : ℝ)
-    (h_cal_dominates : |sharp_change| < |cal_change|)
-    (h_cal_pos : 0 < cal_change)
-    (h_sharp_nn : 0 ≤ sharp_change) :
-    -- Total portability loss is dominated by calibration
-    (cal_change + sharp_change) / 2 < cal_change := by
-  have h1 : sharp_change < cal_change := by
-    calc sharp_change ≤ |sharp_change| := le_abs_self _
-    _ < |cal_change| := h_cal_dominates
-    _ = cal_change := abs_of_pos h_cal_pos
-  linarith
+/-- **Brier portability decomposition as the concrete proper-score result in this file.**
+    The file formalizes Brier as its proper scoring rule. Under the observable
+    Brier transport model, total portability loss decomposes exactly into a
+    discrimination term and a calibration/prevalence term. If the calibration
+    term dominates, then it contributes more than half of the total Brier
+    worsening. -/
+theorem brier_proper_score_portability_decomposition
+    (πSource πTarget r2Source fstSource fstTarget : ℝ)
+    (hπ0 : 0 < πTarget) (hπ1 : πTarget < 1)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (h_prev_factor :
+      πSource * (1 - πSource) < πTarget * (1 - πTarget))
+    (h_cal_dom :
+      πTarget * (1 - πTarget) *
+          (r2Source - targetR2FromObservables r2Source fstSource fstTarget) <
+        (πTarget * (1 - πTarget) - πSource * (1 - πSource)) * (1 - r2Source)) :
+    targetBrierFromObservables πTarget r2Source fstSource fstTarget -
+      sourceBrierFromObservables πSource r2Source =
+        brierDiscriminationLoss πTarget r2Source fstSource fstTarget +
+        brierCalibrationLoss πSource πTarget r2Source ∧
+    (targetBrierFromObservables πTarget r2Source fstSource fstTarget -
+        sourceBrierFromObservables πSource r2Source) / 2 <
+      brierCalibrationLoss πSource πTarget r2Source := by
+  rcases brier_increase_mainly_calibration
+      πSource πTarget r2Source fstSource fstTarget
+      hπ0 hπ1 h_r2 h_fst h_fst_bounds h_prev_factor h_cal_dom with
+    ⟨h_decomp, _h_disc_pos, _h_cal_pos, _h_dom, h_half⟩
+  exact ⟨h_decomp, h_half⟩
 
 end ProperScoringRules
 

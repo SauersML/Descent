@@ -9,8 +9,24 @@ open MeasureTheory Finset
 /-!
 # Derivation of the PGS Portability Bound from First Principles
 
-We derive R²_target ≤ rg² × R²_source from the definition of a PGS
-as a weighted sum of genotypes, using Cauchy-Schwarz.
+We formalize the portability derivation first in a general shared-LD kernel
+model, where the transported PGS uses source effect sizes as weights and both
+the score variance and target genetic variance are evaluated under a common
+genotype covariance operator `K`. The standardized diagonal-LD
+(independent-variant) model then appears as a specialization.
+
+In the shared-LD model we prove the exact identity
+
+  R²_target = rg_K² × h²_target
+
+where `rg_K` is the effect correlation induced by the shared LD kernel. We then
+derive the practical portability bound
+
+  R²_target ≤ rg_K² × R²_source
+
+under an explicit target-vs-source heritability comparison. In the
+standardized diagonal-LD model, `rg_K` reduces to the ordinary Euclidean
+effect-size correlation.
 
 ## Setup
 
@@ -32,26 +48,6 @@ Combined with the effect correlation rg, this yields:
 
 section PGSPortabilityDerivation
 
-/-- A polygenic score model with `m` variants, capturing source and target
-    population effect sizes and LD (genotype covariance) matrices. -/
-structure PGSModel (m : ℕ) where
-  /-- GWAS effect sizes estimated in the source population. -/
-  β_source : Fin m → ℝ
-  /-- True causal effect sizes in the target population. -/
-  β_target : Fin m → ℝ
-  /-- LD matrix (genotype covariance) in the source population.
-      Entry (i,j) = Cov(Gᵢ, Gⱼ) in source. -/
-  ld_source : Fin m → Fin m → ℝ
-  /-- LD matrix in the target population. -/
-  ld_target : Fin m → Fin m → ℝ
-  /-- Phenotypic variance in the source population. -/
-  var_y_source : ℝ
-  /-- Phenotypic variance in the target population. -/
-  var_y_target : ℝ
-  /-- Phenotypic variances are positive. -/
-  var_y_source_pos : 0 < var_y_source
-  var_y_target_pos : 0 < var_y_target
-
 /-- Covariance between PGS (using source weights) and the genetic component
     of the phenotype in a given population:
     Cov(PGS, Y_genetic) = Σᵢ Σⱼ β_source_i × Σᵢⱼ × β_causal_j
@@ -60,19 +56,70 @@ noncomputable def pgsPhenoCov {m : ℕ} (β_weights β_causal : Fin m → ℝ)
     (ld : Fin m → Fin m → ℝ) : ℝ :=
   ∑ i : Fin m, ∑ j : Fin m, β_weights i * ld i j * β_causal j
 
+/-- Genetic variance induced by a shared LD kernel. -/
+noncomputable def sharedLDGeneticVariance {m : ℕ}
+    (β : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) : ℝ :=
+  pgsPhenoCov β β ld
+
+/-- Heritability induced by a shared LD kernel. -/
+noncomputable def sharedLDHeritability {m : ℕ}
+    (β : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
+  sharedLDGeneticVariance β ld / var_y
+
 /-- R² of a PGS: the squared correlation between PGS and phenotype.
     R² = Cov(PGS, Y)² / (Var(PGS) × Var(Y)). -/
-noncomputable def pgsR2 {m : ℕ} (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
+noncomputable def pgsR2 (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
   cov_pgs_y ^ 2 / (var_pgs * var_y)
 
-/-- The genetic correlation between source and target populations.
-    rg = Cov(β_source, β_target) / √(Var(β_source) × Var(β_target))
-    where the covariance is over the set of causal variants.
-    Equivalently, rg = Σᵢ β_source_i × β_target_i / √(Σᵢ β_source_i² × Σⱼ β_target_j²)
-    when effect sizes are mean-zero. -/
+/-- Source-population `R²` of the score that uses the true source effects as
+    weights under a shared LD kernel. -/
+noncomputable def sourceTruthR2SharedLD {m : ℕ}
+    (β_source : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
+  pgsR2 (sharedLDGeneticVariance β_source ld)
+    (sharedLDGeneticVariance β_source ld) var_y
+
+/-- Target-population transported `R²` of the source-weighted score under a
+    shared LD kernel. -/
+noncomputable def transportedTargetR2SharedLD {m : ℕ}
+    (β_source β_target : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
+  pgsR2 (pgsPhenoCov β_source β_target ld)
+    (sharedLDGeneticVariance β_source ld) var_y
+
+/-- Effect correlation induced by a shared LD kernel. -/
+noncomputable def ldEffectGeneticCorrelation {m : ℕ}
+    (β_source β_target : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) : ℝ :=
+  pgsPhenoCov β_source β_target ld /
+    Real.sqrt (sharedLDGeneticVariance β_source ld * sharedLDGeneticVariance β_target ld)
+
+/-- Euclidean / independent-variant genetic correlation between source and
+    target effect-size vectors. This is the diagonal-LD specialization of the
+    shared-LD correlation above. -/
 noncomputable def effectGeneticCorrelation {m : ℕ} (β_source β_target : Fin m → ℝ) : ℝ :=
   (∑ i : Fin m, β_source i * β_target i) /
     Real.sqrt ((∑ i : Fin m, β_source i ^ 2) * (∑ i : Fin m, β_target i ^ 2))
+
+/-- Standardized diagonal LD operator: independent variants with unit variance. -/
+def standardizedDiagonalLD {m : ℕ} : Fin m → Fin m → ℝ :=
+  fun i j => if i = j then 1 else 0
+
+/-- Additive genetic variance in the standardized diagonal-LD model. -/
+noncomputable def additiveGeneticVariance {m : ℕ} (β : Fin m → ℝ) : ℝ :=
+  ∑ i : Fin m, β i ^ 2
+
+/-- Additive heritability `h² = V_A / V_Y` in the standardized diagonal-LD model. -/
+noncomputable def additiveHeritability {m : ℕ} (β : Fin m → ℝ) (var_y : ℝ) : ℝ :=
+  additiveGeneticVariance β / var_y
+
+/-- Source-population `R²` of the score that uses source effect sizes as weights in the
+    standardized diagonal-LD model. -/
+noncomputable def sourceSelfR2DiagonalLD {m : ℕ} (β_source : Fin m → ℝ) (var_y : ℝ) : ℝ :=
+  sourceTruthR2SharedLD β_source standardizedDiagonalLD var_y
+
+/-- Target-population transported `R²` of the source-weighted score in the
+    standardized diagonal-LD model. -/
+noncomputable def transportedTargetR2DiagonalLD {m : ℕ}
+    (β_source β_target : Fin m → ℝ) (var_y : ℝ) : ℝ :=
+  transportedTargetR2SharedLD β_source β_target standardizedDiagonalLD var_y
 
 /-- **Cauchy-Schwarz for effect-size inner product.**
     |Σᵢ β_source_i × β_target_i|² ≤ (Σᵢ β_source_i²) × (Σᵢ β_target_i²).
@@ -109,95 +156,218 @@ theorem effect_genetic_correlation_bounded {m : ℕ}
   exact effect_size_cauchy_schwarz β_s β_t _ _ _
     rfl rfl rfl
 
-/-- **R²_target ≤ rg² × R²_source: the portability bound.**
+/-- A source-truth score achieves the shared-LD heritability exactly. -/
+theorem sourceTruthR2_eq_sharedLDHeritability {m : ℕ}
+    (β : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ)
+    (h_var_y : 0 < var_y)
+    (h_beta_nonzero : 0 < sharedLDGeneticVariance β ld) :
+    sourceTruthR2SharedLD β ld var_y = sharedLDHeritability β ld var_y := by
+  unfold sourceTruthR2SharedLD pgsR2 sharedLDHeritability
+  field_simp [ne_of_gt h_var_y, ne_of_gt h_beta_nonzero]
 
-    Derivation from first principles:
+/-- **Exact transported `R²` identity under a shared LD kernel.**
 
-    1. PGS = Σᵢ β_source_i × Gᵢ (weighted sum of genotypes using source weights).
+    If the transported score uses the source effect vector as weights and both
+    the score variance and target genetic variance are evaluated under a common
+    LD kernel `K`, then
 
-    2. In the source population:
-       R²_source = Cov(PGS, Y_source)² / (Var(PGS_source) × Var(Y_source))
+    `R²_target = rg_K² × h²_target`.
 
-    3. In the target population, the PGS uses SOURCE weights but the true
-       effects are β_target. The cross-population covariance is:
-       Cov(PGS, Y_target) = Σᵢ Σⱼ β_source_i × Σ_target_ij × β_target_j
+    This is the actual first-principles identity behind the portability
+    derivation. The diagonal-LD theorem below is a specialization, not the
+    flagship statement. -/
+theorem transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD
+    {m : ℕ}
+    (β_s β_t : Fin m → ℝ)
+    (ld : Fin m → Fin m → ℝ)
+    (var_y : ℝ)
+    (h_var_y : 0 < var_y)
+    (h_s_nonzero : 0 < sharedLDGeneticVariance β_s ld)
+    (h_t_nonzero : 0 < sharedLDGeneticVariance β_t ld) :
+    transportedTargetR2SharedLD β_s β_t ld var_y =
+      (ldEffectGeneticCorrelation β_s β_t ld) ^ 2 * sharedLDHeritability β_t ld var_y := by
+  unfold transportedTargetR2SharedLD ldEffectGeneticCorrelation sharedLDHeritability
+    sharedLDGeneticVariance pgsR2
+  rw [div_pow]
+  have hsqrt :
+      Real.sqrt (pgsPhenoCov β_s β_s ld * pgsPhenoCov β_t β_t ld) ^ 2 =
+        pgsPhenoCov β_s β_s ld * pgsPhenoCov β_t β_t ld := by
+    apply Real.sq_sqrt
+    exact mul_nonneg (le_of_lt h_s_nonzero) (le_of_lt h_t_nonzero)
+  rw [hsqrt]
+  field_simp [ne_of_gt h_var_y, ne_of_gt h_s_nonzero, ne_of_gt h_t_nonzero]
+  have h_t_cov_nonzero : pgsPhenoCov β_t β_t ld ≠ 0 := by
+    simpa [sharedLDGeneticVariance] using ne_of_gt h_t_nonzero
+  have h_t_self : pgsPhenoCov β_t β_t ld * (pgsPhenoCov β_t β_t ld)⁻¹ = 1 := by
+    rw [mul_inv_cancel₀ h_t_cov_nonzero]
+  calc
+    pgsPhenoCov β_s β_t ld ^ 2 * (pgsPhenoCov β_s β_s ld)⁻¹ =
+        pgsPhenoCov β_s β_t ld ^ 2 * (pgsPhenoCov β_s β_s ld)⁻¹ * 1 := by ring
+    _ =
+        pgsPhenoCov β_s β_t ld ^ 2 * (pgsPhenoCov β_s β_s ld)⁻¹ *
+          (pgsPhenoCov β_t β_t ld * (pgsPhenoCov β_t β_t ld)⁻¹) := by
+        rw [h_t_self]
+    _ =
+        pgsPhenoCov β_s β_t ld ^ 2 * (pgsPhenoCov β_s β_s ld)⁻¹ *
+          pgsPhenoCov β_t β_t ld * (pgsPhenoCov β_t β_t ld)⁻¹ := by ring
+    _ =
+        pgsPhenoCov β_s β_t ld ^ 2 * pgsPhenoCov β_t β_t ld /
+          (pgsPhenoCov β_s β_s ld * pgsPhenoCov β_t β_t ld) := by
+        ring_nf
 
-    4. By Cauchy-Schwarz on the bilinear form (assuming diagonal LD for clarity):
-       Cov(PGS, Y_target)² ≤ Var(PGS) × Var(Y_target_genetic)
+/-- **Practical portability bound under a shared LD kernel.**
 
-    5. The genetic correlation rg constrains the cross-population covariance:
-       |Cov(β_source, β_target)| ≤ rg × √(Var(β_source) × Var(β_target))
-       so Cov(PGS, Y_target) scales as rg × Cov(PGS, Y_source).
+    In the shared-LD model, the exact identity above gives
+    `R²_target = rg_K² × h²_target`. If the target heritability under the same
+    kernel does not exceed the source heritability, then
 
-    6. Combining: R²_target ≤ rg² × R²_source.
+    `R²_target ≤ rg_K² × R²_source`.
 
-    The proof below works in the simplified (diagonal LD) setting where
-    the PGS R² factors cleanly into effect-size inner products.
-    We prove: if R²_target = (Σ β_s × β_t)² / ((Σ β_s²)(Σ β_t²))
-    and R²_source ≥ some value depending on source accuracy, then
-    R²_target ≤ rg² × R²_source.
+    No extra source-optimality surrogate is assumed here: the source `R²`
+    term is the actual source-truth score under the same kernel. -/
+theorem portability_bound_sharedLD {m : ℕ}
+    (β_s β_t : Fin m → ℝ)
+    (ld : Fin m → Fin m → ℝ)
+    (var_y : ℝ)
+    (h_var_y : 0 < var_y)
+    (h_s_nonzero : 0 < sharedLDGeneticVariance β_s ld)
+    (h_t_nonzero : 0 < sharedLDGeneticVariance β_t ld)
+    (h_target_h2_le_source_h2 :
+      sharedLDHeritability β_t ld var_y ≤ sharedLDHeritability β_s ld var_y) :
+    transportedTargetR2SharedLD β_s β_t ld var_y ≤
+      (ldEffectGeneticCorrelation β_s β_t ld) ^ 2 * sourceTruthR2SharedLD β_s ld var_y := by
+  rw [transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD β_s β_t ld var_y
+    h_var_y h_s_nonzero h_t_nonzero]
+  rw [sourceTruthR2_eq_sharedLDHeritability β_s ld var_y h_var_y h_s_nonzero]
+  exact mul_le_mul_of_nonneg_left h_target_h2_le_source_h2 (sq_nonneg _)
 
-    More precisely, we show that for any decomposition satisfying the
-    structural constraints, the bound holds. -/
-theorem portability_bound_from_cauchy_schwarz
-    (r2_source r2_target rg_sq : ℝ)
-    (h_r2s_nn : 0 ≤ r2_source) (h_r2t_nn : 0 ≤ r2_target)
-    (h_rg_nn : 0 ≤ rg_sq) (h_rg_le : rg_sq ≤ 1)
-    -- The key structural hypothesis: target R² decomposes as
-    -- R²_target = rg² × (source-accuracy factor) where the
-    -- source-accuracy factor ≤ R²_source. This follows from:
-    -- (a) Cauchy-Schwarz bounds the cross-population covariance
-    -- (b) The genetic correlation rg scales the cross-pop covariance
-    -- (c) R²_source upper-bounds the source accuracy factor
-    (source_accuracy : ℝ)
-    (h_sa_nn : 0 ≤ source_accuracy)
-    (h_sa_le_r2s : source_accuracy ≤ r2_source)
-    (h_r2t_decomp : r2_target = rg_sq * source_accuracy) :
-    r2_target ≤ rg_sq * r2_source := by
-  rw [h_r2t_decomp]
-  exact mul_le_mul_of_nonneg_left h_sa_le_r2s h_rg_nn
+/-- Under standardized diagonal LD, `pgsPhenoCov` reduces to the effect-size inner product. -/
+theorem pgsPhenoCov_standardizedDiagonalLD {m : ℕ}
+    (β_weights β_causal : Fin m → ℝ) :
+    pgsPhenoCov β_weights β_causal standardizedDiagonalLD =
+      ∑ i : Fin m, β_weights i * β_causal i := by
+  unfold pgsPhenoCov standardizedDiagonalLD
+  simp
 
-/-- **Portability bound in the diagonal-LD (independent-variants) model.**
+/-- Under standardized diagonal LD, the source PGS variance is the additive genetic variance. -/
+theorem pgsPhenoCov_self_standardizedDiagonalLD {m : ℕ}
+    (β : Fin m → ℝ) :
+    pgsPhenoCov β β standardizedDiagonalLD = additiveGeneticVariance β := by
+  rw [pgsPhenoCov_standardizedDiagonalLD]
+  unfold additiveGeneticVariance
+  congr with i
+  ring
 
-    When LD is diagonal (variants are independent), the PGS model simplifies:
-    - Var(PGS) = Σᵢ βᵢ² σᵢ² (allelic variances σᵢ²)
-    - Cov(PGS_source_weights, Y_target) = Σᵢ β_source_i × σ_target_i² × β_target_i
+/-- Under standardized diagonal LD, the shared-LD genetic variance is additive genetic variance. -/
+theorem sharedLDGeneticVariance_standardizedDiagonalLD_eq_additiveGeneticVariance {m : ℕ}
+    (β : Fin m → ℝ) :
+    sharedLDGeneticVariance β standardizedDiagonalLD = additiveGeneticVariance β := by
+  unfold sharedLDGeneticVariance
+  exact pgsPhenoCov_self_standardizedDiagonalLD β
 
-    Assuming equal allelic variances (σ² = 1 WLOG after standardization):
-    - R²_source ∝ (Σ β_s²)
-    - R²_target ∝ (Σ β_s × β_t)² / (Σ β_s²)
-    - rg² = (Σ β_s × β_t)² / ((Σ β_s²)(Σ β_t²))
+/-- Under standardized diagonal LD, shared-LD heritability is additive heritability. -/
+theorem sharedLDHeritability_standardizedDiagonalLD_eq_additiveHeritability {m : ℕ}
+    (β : Fin m → ℝ) (var_y : ℝ) :
+    sharedLDHeritability β standardizedDiagonalLD var_y = additiveHeritability β var_y := by
+  unfold sharedLDHeritability additiveHeritability sharedLDGeneticVariance
+  rw [pgsPhenoCov_self_standardizedDiagonalLD]
 
-    Then R²_target / R²_source = (Σ β_s × β_t)² / (Σ β_s²)² ≤ rg² × (Σ β_t²) / (Σ β_s²)
-    But since R²_source = Σ β_s² / var_y and the PGS can at most explain its
-    own genetic variance, we get R²_target ≤ rg² × h²_target.
-    Since R²_source ≤ h²_source, the practical bound R²_target ≤ rg² × R²_source
-    holds when the source PGS is well-calibrated (R²_source ≈ h²_source). -/
+/-- Under standardized diagonal LD, the shared-LD effect correlation is the Euclidean
+    effect-size correlation. -/
+theorem ldEffectGeneticCorrelation_standardizedDiagonalLD_eq_effectGeneticCorrelation {m : ℕ}
+    (β_s β_t : Fin m → ℝ) :
+    ldEffectGeneticCorrelation β_s β_t standardizedDiagonalLD =
+      effectGeneticCorrelation β_s β_t := by
+  unfold ldEffectGeneticCorrelation effectGeneticCorrelation sharedLDGeneticVariance
+  rw [pgsPhenoCov_standardizedDiagonalLD, pgsPhenoCov_self_standardizedDiagonalLD,
+    pgsPhenoCov_self_standardizedDiagonalLD]
+  unfold additiveGeneticVariance
+  rfl
+
+/-- In the standardized diagonal-LD model, a source-optimal score has
+    `R²_source = h²_source`. -/
+theorem sourceOptimalR2_eq_additiveHeritability {m : ℕ}
+    (β : Fin m → ℝ) (var_y : ℝ)
+    (h_var_y : 0 < var_y)
+    (h_beta_nonzero : 0 < additiveGeneticVariance β) :
+    sourceSelfR2DiagonalLD β var_y = additiveHeritability β var_y := by
+  unfold sourceSelfR2DiagonalLD
+  rw [sourceTruthR2_eq_sharedLDHeritability β standardizedDiagonalLD var_y h_var_y]
+  · exact sharedLDHeritability_standardizedDiagonalLD_eq_additiveHeritability β var_y
+  · simpa [sharedLDGeneticVariance_standardizedDiagonalLD_eq_additiveGeneticVariance] using
+      h_beta_nonzero
+
+/-- **Exact transported `R²` identity in the standardized diagonal-LD model.**
+
+    In the independent-variant standardized model, with source weights equal
+    to the source effect sizes, the transported target `R²` admits the exact
+    factorization
+
+    `R²_target = rg² × h²_target`.
+
+    This is the precise algebraic bridge between the transported covariance
+    formula and the genetic-correlation normalization. The Cauchy-Schwarz step
+    enters through the fact that `rg² ≤ 1`; the factorization itself is exact. -/
+theorem transportedTargetR2_eq_rgSq_mul_targetH2_diagonalLD
+    {m : ℕ}
+    (β_s β_t : Fin m → ℝ)
+    (var_y : ℝ)
+    (h_var_y : 0 < var_y)
+    (h_s_nonzero : 0 < additiveGeneticVariance β_s)
+    (h_t_nonzero : 0 < additiveGeneticVariance β_t) :
+    transportedTargetR2DiagonalLD β_s β_t var_y =
+      (effectGeneticCorrelation β_s β_t) ^ 2 * additiveHeritability β_t var_y := by
+  unfold transportedTargetR2DiagonalLD
+  rw [transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD β_s β_t standardizedDiagonalLD
+    var_y h_var_y]
+  · rw [ldEffectGeneticCorrelation_standardizedDiagonalLD_eq_effectGeneticCorrelation]
+    rw [sharedLDHeritability_standardizedDiagonalLD_eq_additiveHeritability]
+  · simpa [sharedLDGeneticVariance_standardizedDiagonalLD_eq_additiveGeneticVariance] using
+      h_s_nonzero
+  · simpa [sharedLDGeneticVariance_standardizedDiagonalLD_eq_additiveGeneticVariance] using
+      h_t_nonzero
+
+/-- **Practical diagonal-LD portability bound specialized to the source-truth score.**
+
+    This is the standardized diagonal-LD specialization of the shared-LD
+    portability bound. The exact identity above gives
+
+    `R²_target = rg² × h²_target`.
+
+    If the target additive heritability does not exceed the source additive
+    heritability, then we recover the practical portability bound
+
+    `R²_target ≤ rg² × R²_source`.
+
+    This is a corollary of the shared-LD theorem, not a separately assumed
+    source-optimality statement. -/
 theorem portability_bound_diagonal_ld {m : ℕ}
     (β_s β_t : Fin m → ℝ)
     (var_y : ℝ)
     (h_var_y : 0 < var_y)
-    (h_s_nonzero : 0 < ∑ i : Fin m, β_s i ^ 2)
-    (h_t_nonzero : 0 < ∑ i : Fin m, β_t i ^ 2)
-    -- R²_target in the standardized model: cross² / (source-var × var_y)
-    (h_r2t : ℝ)
-    (h_r2t_def : h_r2t = (∑ i, β_s i * β_t i) ^ 2 /
-      ((∑ i, β_s i ^ 2) * var_y))
-    -- R²_source in the standardized model: source-var / var_y
-    (h_r2s : ℝ)
-    (h_r2s_def : h_r2s = (∑ i, β_s i ^ 2) / var_y)
-    -- rg² from effect sizes
-    (h_rg2 : ℝ)
-    (h_rg2_def : h_rg2 = (∑ i, β_s i * β_t i) ^ 2 /
-      ((∑ i, β_s i ^ 2) * (∑ i, β_t i ^ 2)))
-    -- Heritability in target bounds the target genetic variance contribution
-    (h2_target : ℝ)
-    (h_h2t_def : h2_target = (∑ i, β_t i ^ 2) / var_y) :
-    -- R²_target ≤ rg² × h²_target
-    h_r2t ≤ h_rg2 * h2_target := by
-  subst h_r2t_def; subst h_r2s_def; subst h_rg2_def; subst h_h2t_def
-  apply le_of_eq
-  field_simp [ne_of_gt h_var_y, ne_of_gt h_s_nonzero, ne_of_gt h_t_nonzero]
+    (h_s_nonzero : 0 < additiveGeneticVariance β_s)
+    (h_t_nonzero : 0 < additiveGeneticVariance β_t)
+    (h_target_h2_le_source_h2 :
+      additiveHeritability β_t var_y ≤ additiveHeritability β_s var_y) :
+    transportedTargetR2DiagonalLD β_s β_t var_y ≤
+      (effectGeneticCorrelation β_s β_t) ^ 2 * sourceSelfR2DiagonalLD β_s var_y := by
+  unfold transportedTargetR2DiagonalLD sourceSelfR2DiagonalLD
+  have h_shared :
+      sharedLDHeritability β_t standardizedDiagonalLD var_y ≤
+        sharedLDHeritability β_s standardizedDiagonalLD var_y := by
+    simpa [sharedLDHeritability_standardizedDiagonalLD_eq_additiveHeritability] using
+      h_target_h2_le_source_h2
+  have h_s_nonzero' : 0 < sharedLDGeneticVariance β_s standardizedDiagonalLD := by
+    simpa [sharedLDGeneticVariance_standardizedDiagonalLD_eq_additiveGeneticVariance] using
+      h_s_nonzero
+  have h_t_nonzero' : 0 < sharedLDGeneticVariance β_t standardizedDiagonalLD := by
+    simpa [sharedLDGeneticVariance_standardizedDiagonalLD_eq_additiveGeneticVariance] using
+      h_t_nonzero
+  have h_bound :=
+    portability_bound_sharedLD β_s β_t standardizedDiagonalLD var_y
+      h_var_y h_s_nonzero' h_t_nonzero' h_shared
+  simpa [ldEffectGeneticCorrelation_standardizedDiagonalLD_eq_effectGeneticCorrelation] using
+    h_bound
 
 /-- **The portability bound is tight when the PGS is optimal.**
     When R²_source = h²_source (the PGS captures all heritability in source),
@@ -205,8 +375,7 @@ theorem portability_bound_diagonal_ld {m : ℕ}
     This is the equality case of Cauchy-Schwarz, achieved when
     β_target = rg × β_source (proportional effect sizes). -/
 theorem portability_bound_tight_when_proportional {m : ℕ}
-    (β_s : Fin m → ℝ) (rg : ℝ)
-    (h_s_nonzero : 0 < ∑ i : Fin m, β_s i ^ 2) :
+    (β_s : Fin m → ℝ) (rg : ℝ) :
     -- When β_target = rg × β_source:
     let β_t := fun i => rg * β_s i
     (∑ i, β_s i * β_t i) ^ 2 =
@@ -214,7 +383,7 @@ theorem portability_bound_tight_when_proportional {m : ℕ}
   simp only
   -- Σ β_s × (rg × β_s) = rg × Σ β_s²
   have h1 : (∑ i : Fin m, β_s i * (rg * β_s i)) = rg * ∑ i, β_s i ^ 2 := by
-    simp [mul_comm, Finset.mul_sum, sq]
+    simp [Finset.mul_sum, sq]
     congr 1; ext i; ring
   rw [h1]
   -- Σ (rg × β_s)² = rg² × Σ β_s²
@@ -318,17 +487,18 @@ theorem larger_lambda_star_worsens_ben_david_bound
   unfold benDavidUpperBound
   linarith
 
-/-- **Domain adaptation bound is tight for linear hypotheses.**
-    For linear predictors (PGS), the bound is achievable because
-    the H-divergence can be estimated from data. When the actual gap
-    is within a fraction ε of the bound, the gap is at most (1+ε)·bound. -/
-theorem linear_bound_tight
+/-- **A relative tightness certificate gives a two-sided envelope around a bound.**
+    This theorem does not derive tightness of the Ben-David bound from a model
+    class. It records the exact quantitative consequence of a supplied
+    certificate `|actual_gap - bound| < ε * bound`: the realized target-source
+    gap lies within a multiplicative `(1 ± ε)` envelope around the reference
+    bound. -/
+theorem relative_gap_certificate_yields_two_sided_envelope
     (bound actual_gap ε : ℝ)
-    (h_tight : |actual_gap - bound| < ε * bound)
-    (h_bound_pos : 0 < bound) (h_ε_pos : 0 < ε) :
-    actual_gap < (1 + ε) * bound := by
+    (h_tight : |actual_gap - bound| < ε * bound) :
+    (1 - ε) * bound < actual_gap ∧ actual_gap < (1 + ε) * bound := by
   have h := abs_lt.mp h_tight
-  linarith [h.1, h.2]
+  constructor <;> linarith [h.1, h.2]
 
 end DomainAdaptation
 
@@ -373,22 +543,23 @@ theorem iw_ess_le_n
     grows with Fst, and ESS = n / (1 + Var(w)). -/
 theorem iw_ess_decreases_with_divergence
     (n var_w₁ var_w₂ : ℝ)
-    (h_n : 0 < n) (h_v1 : 0 ≤ var_w₁) (h_v2 : 0 ≤ var_w₂)
+    (h_n : 0 < n) (h_v1 : 0 ≤ var_w₁)
     (h_more_divergent : var_w₁ < var_w₂) :
     n / (1 + var_w₂) < n / (1 + var_w₁) := by
   apply div_lt_div_of_pos_left h_n (by linarith) (by linarith)
 
-/-- **IW fails for very different populations.**
-    When source and target are too different (Fst too large),
-    the importance weights have high variance → n_eff ≈ 0.
-    This means IW alone cannot fix portability for distant populations.
-    When ESS < α·n for any α < 1, the effective sample is less than n. -/
-theorem iw_fails_for_large_divergence
-    (ess n α : ℝ)
-    (h_ess_tiny : ess < α * n)
-    (h_α : α < 1) (h_α_pos : 0 < α)
-    (h_n : 0 < n) :
-    ess < n := by nlinarith
+/-- **Any positive weight variance strictly reduces the IW effective sample size.**
+    In the explicit model `ESS = n / (1 + Var(w))`, positive weight variance
+    forces the effective sample size below the unweighted sample size. -/
+theorem iw_positive_weight_variance_reduces_ess
+    (n var_w : ℝ)
+    (h_n : 0 < n)
+    (h_var : 0 < var_w) :
+    n / (1 + var_w) < n := by
+  have h_denom : 1 < 1 + var_w := by linarith
+  have h_denom_pos : 0 < 1 + var_w := by linarith
+  have h_mul : n < n * (1 + var_w) := by nlinarith
+  exact (div_lt_iff₀ h_denom_pos).2 h_mul
 
 /-- **Doubly robust estimation combines IW with model adaptation.**
     DR estimator: if either the weighting model or the outcome model is
@@ -487,18 +658,18 @@ section FeatureRepresentation
 theorem pca_tradeoff
     (ancestry_bias_with ancestry_bias_without signal_with signal_without : ℝ)
     (h_less_bias : ancestry_bias_without < ancestry_bias_with)
-    (h_less_signal : signal_without < signal_with)
-    (h_bias_nn : 0 ≤ ancestry_bias_without) (h_sig_nn : 0 ≤ signal_without) :
+    (h_less_signal : signal_without < signal_with) :
     -- The bias reduction is a genuine improvement component
     0 < ancestry_bias_with - ancestry_bias_without ∧
     -- But the signal loss is a genuine cost
       0 < signal_with - signal_without := by
   constructor <;> linarith
 
-/-- **Optimal number of PCs to remove.**
-    There exists an optimal k* that minimizes the target error
-    by balancing bias reduction and signal loss. -/
-theorem optimal_pc_removal_exists
+/-- **A local PC-removal minimum beats the adjacent choices.**
+    This theorem does not prove existence of a globally optimal number of
+    removed PCs. It records the exact local-optimality consequence available
+    from two neighboring error comparisons. -/
+theorem local_pc_removal_minimum_beats_adjacent_choices
     (err_k err_k_plus_1 err_k_minus_1 : ℝ)
     (h_local_min_right : err_k ≤ err_k_plus_1)
     (h_local_min_left : err_k ≤ err_k_minus_1) :
@@ -526,11 +697,11 @@ theorem lower_divergence_representation_tightens_ben_david_bound
   unfold benDavidUpperBound
   linarith
 
-/-- **Information bottleneck perspective.**
-    The optimal portable representation minimizes I(φ(X); A)
-    while maximizing I(φ(X); Y). This is the information bottleneck
-    applied to the portability problem. -/
-theorem info_bottleneck_tradeoff
+/-- **Positive information-bottleneck objective means signal exceeds the ancestry penalty.**
+    The theorem states only the exact inequality encoded by the objective
+    `I(φ(X); Y) - λ I(φ(X); A)`: if that scalar objective is positive, then the
+    retained trait information exceeds the penalized ancestry information. -/
+theorem positive_info_bottleneck_objective_means_signal_exceeds_penalty
     (I_phi_A I_phi_Y lam : ℝ)
     (h_objective : I_phi_Y - lam * I_phi_A > 0)
     (_h_lam : 0 < lam) (_h_I_A_nn : 0 ≤ I_phi_A) :
@@ -612,19 +783,19 @@ theorem crossover_from_assumed_critical_sample_size
 theorem optimal_lambda_decreases_with_n
     (c : ℝ) (n₁ n₂ : ℕ)
     (h_c : 0 < c)
-    (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
+    (h_n₁ : 0 < n₁)
     (h_more_data : n₁ < n₂) :
     c / (n₂ : ℝ) < c / (n₁ : ℝ) := by
   apply div_lt_div_of_pos_left h_c
   · exact Nat.cast_pos.mpr h_n₁
   · exact Nat.cast_lt.mpr h_more_data
 
-/-- **Meta-learning across populations.**
-    MAML-style meta-learning: find initial PGS weights that can
-    be quickly adapted to any target population.
-    Meta-learning from k source populations reduces the per-population
-    adaptation cost by a factor of k (amortization). -/
-theorem meta_learning_faster_adaptation
+/-- **Amortized per-population adaptation cost falls with the number of source tasks.**
+    In the simple amortization model where a one-off adaptation cost
+    `n_adapt_single` is spread evenly across `k` source populations, the
+    per-population cost `n_adapt_single / k` is strictly below the single-task
+    cost whenever `k > 1`. -/
+theorem amortized_per_population_adaptation_cost_falls_with_task_count
     (n_adapt_single : ℝ) (k : ℕ)
     (h_n : 0 < n_adapt_single) (h_k : 1 < k) :
     n_adapt_single / (k : ℝ) < n_adapt_single := by
@@ -648,33 +819,39 @@ on cross-population PGS performance.
 
 section TransferLimits
 
-/-- **Fundamental limit from GxE.**
-    When gene-environment interaction is present, no amount of
-    genetic data can fully predict the target phenotype.
-    The limit is: R²_T ≤ r_G² × h²_T where r_G is the genetic
-    correlation and h²_T is heritability in the target. -/
-theorem gxe_limits_transfer
+/-- **Subunit cross-pop effect correlation prevents attaining target heritability.**
+    If a transported score is certified to satisfy the ceiling
+    `R²_target ≤ rg_sq × h²_target` and the cross-pop effect-correlation factor
+    satisfies `rg_sq < 1`, then the score falls strictly below the target
+    heritability ceiling. This is the actual transfer-limit consequence used in
+    this file. -/
+theorem subunit_effect_correlation_prevents_attaining_target_heritability
     (r2_target rg_sq h2_target : ℝ)
     (h_bound : r2_target ≤ rg_sq * h2_target)
-    (h_rg : 0 ≤ rg_sq) (h_rg_le : rg_sq ≤ 1)
-    (h_h2 : 0 ≤ h2_target) (h_h2_le : h2_target ≤ 1) :
-    r2_target ≤ 1 := by
-  calc r2_target ≤ rg_sq * h2_target := h_bound
-    _ ≤ 1 * 1 := mul_le_mul h_rg_le h_h2_le h_h2 (by linarith)
-    _ = 1 := by ring
+    (h_rg_lt : rg_sq < 1)
+    (h_h2_pos : 0 < h2_target) :
+    r2_target < h2_target := by
+  have h_ceiling_lt : rg_sq * h2_target < h2_target := by
+    nlinarith
+  exact lt_of_le_of_lt h_bound h_ceiling_lt
 
-/-- **Fundamental limit from causal variant non-overlap.**
-    If a fraction f of causal variants are population-specific
-    (private or very different frequency), PGS cannot capture
-    their contribution in the target. -/
-theorem causal_variant_non_overlap_limit
+/-- **A positive private causal fraction lowers the transferable `R²` ceiling.**
+    In the simple overlap model where only the shared fraction `f_shared`
+    contributes cross-population signal, the transferable ceiling is
+    `r2_source * f_shared = r2_source * (1 - f_private)`. Any strictly positive
+    private fraction therefore lowers that ceiling below the source `R²`. -/
+theorem private_causal_fraction_lowers_transfer_ceiling
     (r2_source f_shared f_private : ℝ)
     (h_total : f_shared + f_private = 1)
-    (h_shared : 0 ≤ f_shared) (h_private : 0 < f_private)
+    (h_private : 0 < f_private)
     (h_r2 : 0 < r2_source) :
-    r2_source * f_shared < r2_source := by
-  have : f_shared < 1 := by linarith
-  exact mul_lt_of_lt_one_right h_r2 this
+    r2_source * f_shared = r2_source * (1 - f_private) ∧
+      r2_source * f_shared < r2_source := by
+  have h_shared_eq : f_shared = 1 - f_private := by linarith
+  constructor
+  · rw [h_shared_eq]
+  · have h_shared_lt_one : f_shared < 1 := by linarith
+    exact mul_lt_of_lt_one_right h_r2 h_shared_lt_one
 
 /-- **Transporting a source-optimized PGS to a more diverged target lowers `R²`.**
     This is the honest transfer-limit statement available from the core drift

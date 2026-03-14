@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Calibrator.SelectionArchitecture
 
 namespace Calibrator
 
@@ -252,29 +253,218 @@ theorem lrt_nonneg (logL_null logL_alt : ℝ)
     0 ≤ likelihoodRatioStat logL_null logL_alt := by
   unfold likelihoodRatioStat; nlinarith
 
-/-- **Selection model preferred when it captures additional variance.**
-    The LRT statistic equals -2(logL_null - logL_alt).
-    When the selection model explains fraction f_sel of residual variance
-    beyond the neutral model, and neutral explains f_neut of total variance,
-    the LRT is approximately n * log(1 + f_sel/(1 - f_neut)).
-    For immune traits (high f_sel due to balancing/directional selection)
-    this exceeds the LRT for height (low f_sel under near-neutrality).
+/-- **Profile Gaussian log-likelihood from fitted residual variance.**
+    For a held-out validation sample of size `n`, profiling out the mean leaves
+    a Gaussian log-likelihood that is monotone in the fitted residual variance. -/
+noncomputable def gaussianProfileLogLik (n residualVar : ℝ) : ℝ :=
+  -(n / 2) * (1 + Real.log (2 * Real.pi * residualVar))
 
-    We derive: if one model captures more residual variance than another,
-    its LRT is larger, using the definition of likelihoodRatioStat. -/
-theorem selection_model_preferred_when_better_fit
-    (logL_neutral_immune logL_sel_immune : ℝ)
-    (logL_neutral_height logL_sel_height : ℝ)
-    (h_immune_fit : logL_neutral_immune < logL_sel_immune)
-    (h_height_fit : logL_neutral_height ≤ logL_sel_height)
-    -- Immune traits have larger fit improvement from selection model
-    (h_immune_bigger_gap :
-      logL_sel_immune - logL_neutral_immune >
-      logL_sel_height - logL_neutral_height) :
-    likelihoodRatioStat logL_neutral_height logL_sel_height <
-      likelihoodRatioStat logL_neutral_immune logL_sel_immune := by
-  unfold likelihoodRatioStat
+/-- **Validation model for neutral vs selection-aware portability fits.**
+    `baselineResidualVar` is the residual variance left after the ancestry-neutral
+    part of the model is fit. `selectedArchitectureVar` is the trait variance
+    carried by a selection-sensitive component whose cross-population effect
+    correlation is `effectCorrelation`. A neutral drift model misses the fraction
+    `1 - effectCorrelation^2` of that component. -/
+structure SelectionValidationModel where
+  sampleSize : ℝ
+  baselineResidualVar : ℝ
+  selectedArchitectureVar : ℝ
+  effectCorrelation : ℝ
+
+/-- Residual variance missed by a neutral drift fit when a selected component has
+    cross-population effect correlation `ρ`. -/
+noncomputable def missedSelectedVariance (model : SelectionValidationModel) : ℝ :=
+  model.selectedArchitectureVar * (1 - model.effectCorrelation ^ 2)
+
+/-- Residual variance under the neutral fit. -/
+noncomputable def neutralResidualVariance (model : SelectionValidationModel) : ℝ :=
+  model.baselineResidualVar + missedSelectedVariance model
+
+/-- Residual variance under the selection-aware fit, which recovers the selected
+    architecture component explicitly. -/
+noncomputable def selectionResidualVariance (model : SelectionValidationModel) : ℝ :=
+  model.baselineResidualVar
+
+/-- Likelihood-ratio statistic comparing the neutral fit to a selection-aware fit. -/
+noncomputable def selectionModelLRT (model : SelectionValidationModel) : ℝ :=
+  likelihoodRatioStat
+    (gaussianProfileLogLik model.sampleSize (neutralResidualVariance model))
+    (gaussianProfileLogLik model.sampleSize (selectionResidualVariance model))
+
+/-- A height-like validation model under stabilizing selection. -/
+noncomputable def stabilizingSelectionValidationModel
+    (n baselineResidualVar selectedArchitectureVar Ns : ℝ) :
+    SelectionValidationModel :=
+  { sampleSize := n
+    baselineResidualVar := baselineResidualVar
+    selectedArchitectureVar := selectedArchitectureVar
+    effectCorrelation := effectCorrelationStabilizing Ns }
+
+/-- An immune-like validation model under fluctuating selection. -/
+noncomputable def fluctuatingSelectionValidationModel
+    (n baselineResidualVar selectedArchitectureVar t τ : ℝ) :
+    SelectionValidationModel :=
+  { sampleSize := n
+    baselineResidualVar := baselineResidualVar
+    selectedArchitectureVar := selectedArchitectureVar
+    effectCorrelation := fluctuatingEffectCorrelation t τ }
+
+/-- The nested-model LRT equals the sample size times the log residual-variance
+    reduction under the Gaussian profile likelihood. -/
+theorem selectionModelLRT_eq_sampleSize_mul_log_residual_gap
+    (model : SelectionValidationModel)
+    (h_base : 0 < model.baselineResidualVar)
+    (h_missed : 0 ≤ missedSelectedVariance model) :
+    selectionModelLRT model =
+      model.sampleSize * (Real.log (model.baselineResidualVar + missedSelectedVariance model) -
+        Real.log model.baselineResidualVar) := by
+  have h_two_pi_ne : (2 * Real.pi) ≠ 0 := by positivity
+  have h_base_ne : model.baselineResidualVar ≠ 0 := ne_of_gt h_base
+  have h_neutral_pos : 0 < model.baselineResidualVar + missedSelectedVariance model := by
+    linarith
+  have h_neutral_ne : model.baselineResidualVar + missedSelectedVariance model ≠ 0 :=
+    ne_of_gt h_neutral_pos
+  unfold selectionModelLRT likelihoodRatioStat gaussianProfileLogLik
+    neutralResidualVariance selectionResidualVariance
+  rw [Real.log_mul h_two_pi_ne h_neutral_ne, Real.log_mul h_two_pi_ne h_base_ne]
+  ring
+
+/-- For fixed sample size and baseline residual variance, the exact LRT is
+    strictly increasing in the residual variance recovered by the selection term. -/
+theorem selectionModelLRT_strictMono_in_missedVariance
+    (n base miss₁ miss₂ : ℝ)
+    (h_n : 0 < n)
+    (h_base : 0 < base)
+    (h_miss₁ : 0 ≤ miss₁)
+    (h_miss_lt : miss₁ < miss₂) :
+    n * (Real.log (base + miss₁) - Real.log base) <
+      n * (Real.log (base + miss₂) - Real.log base) := by
+  have h_sum₁ : 0 < base + miss₁ := by
+    linarith
+  have h_sum₂ : 0 < base + miss₂ := by
+    linarith
+  have h_log : Real.log (base + miss₁) < Real.log (base + miss₂) := by
+    apply Real.log_lt_log h_sum₁
+    linarith
   nlinarith
+
+/-- If trait 2 has at least as much selection-sensitive variance as trait 1 and
+    strictly lower cross-pop effect correlation, then the neutral model misses
+    strictly more residual variance for trait 2. -/
+theorem missedSelectedVariance_lt_of_variance_and_correlation
+    (v₁ v₂ ρ₁ ρ₂ : ℝ)
+    (h_v₂ : 0 < v₂)
+    (h_ρ₁ : 0 ≤ ρ₁)
+    (h_ρ₁_lt : ρ₁ < 1)
+    (h_ρ₂ : 0 ≤ ρ₂)
+    (h_corr : ρ₂ < ρ₁)
+    (h_var : v₁ ≤ v₂) :
+    v₁ * (1 - ρ₁ ^ 2) < v₂ * (1 - ρ₂ ^ 2) := by
+  have h_loss₁_nonneg : 0 ≤ 1 - ρ₁ ^ 2 := by
+    nlinarith [sq_nonneg ρ₁]
+  have h_loss_lt : 1 - ρ₁ ^ 2 < 1 - ρ₂ ^ 2 := by
+    nlinarith [sq_nonneg ρ₁, sq_nonneg ρ₂]
+  have h_left : v₁ * (1 - ρ₁ ^ 2) ≤ v₂ * (1 - ρ₁ ^ 2) := by
+    exact mul_le_mul_of_nonneg_right h_var h_loss₁_nonneg
+  have h_right : v₂ * (1 - ρ₁ ^ 2) < v₂ * (1 - ρ₂ ^ 2) := by
+    exact mul_lt_mul_of_pos_left h_loss_lt h_v₂
+  exact lt_of_le_of_lt h_left h_right
+
+/-- **Selection model preferred when it captures architecture-specific variance.**
+    Consider two held-out portability fits on the same sample and with the same
+    ancestry-neutral baseline residual variance. The neutral model misses a
+    selection-sensitive component of variance `V_sel * (1 - ρ^2)`, where `ρ`
+    is the cross-population effect correlation of that component. For a
+    height-like trait we use the stabilizing-selection correlation
+    `effectCorrelationStabilizing`; for an immune-like trait we use the
+    fluctuating-selection correlation `fluctuatingEffectCorrelation`.
+
+    If the immune-like trait carries at least as much selection-sensitive
+    variance and has strictly lower cross-population effect correlation, then
+    the exact Gaussian nested-model LRT for adding the selection term is
+    strictly larger for the immune-like trait. -/
+theorem selection_model_preferred_when_better_fit
+    (n sigma2_base v_mut_height s_height Ns_height immuneSelectedVar t τ_immune : ℝ)
+    (h_n : 0 < n)
+    (h_sigma : 0 < sigma2_base)
+    (h_vmut_height : 0 ≤ v_mut_height)
+    (h_s_height : 0 < s_height)
+    (h_Ns_height : 1 < Ns_height)
+    (h_immuneVar : 0 < immuneSelectedVar)
+    (h_var :
+      equilibriumEffectVariance v_mut_height s_height ≤ immuneSelectedVar)
+    (h_corr :
+      fluctuatingEffectCorrelation t τ_immune <
+        effectCorrelationStabilizing Ns_height) :
+    selectionModelLRT
+      (stabilizingSelectionValidationModel n sigma2_base
+        (equilibriumEffectVariance v_mut_height s_height) Ns_height) <
+    selectionModelLRT
+      (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune) := by
+  have h_heightVar_nonneg : 0 ≤ equilibriumEffectVariance v_mut_height s_height := by
+    unfold equilibriumEffectVariance
+    exact div_nonneg h_vmut_height (le_of_lt h_s_height)
+  have h_heightCorr_nonneg : 0 ≤ effectCorrelationStabilizing Ns_height := by
+    unfold effectCorrelationStabilizing
+    have h_den_pos : 0 < 2 * Ns_height := by
+      linarith
+    have h_div_le_one : 1 / (2 * Ns_height) ≤ 1 := by
+      rw [div_le_iff₀ h_den_pos]
+      linarith
+    nlinarith
+  have h_heightCorr_lt_one : effectCorrelationStabilizing Ns_height < 1 := by
+    unfold effectCorrelationStabilizing
+    have h_div_pos : 0 < 1 / (2 * Ns_height) := by
+      positivity
+    nlinarith
+  have h_immuneCorr_nonneg : 0 ≤ fluctuatingEffectCorrelation t τ_immune := by
+    unfold fluctuatingEffectCorrelation
+    exact le_of_lt (Real.exp_pos _)
+  have h_missed_height_nonneg :
+      0 ≤ missedSelectedVariance
+        (stabilizingSelectionValidationModel n sigma2_base
+          (equilibriumEffectVariance v_mut_height s_height) Ns_height) := by
+    unfold missedSelectedVariance stabilizingSelectionValidationModel
+    exact mul_nonneg h_heightVar_nonneg (by nlinarith [sq_nonneg (effectCorrelationStabilizing Ns_height)])
+  have h_missed_immune_nonneg :
+      0 ≤ missedSelectedVariance
+        (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune) := by
+    unfold missedSelectedVariance fluctuatingSelectionValidationModel
+    exact mul_nonneg (le_of_lt h_immuneVar)
+      (by nlinarith [sq_nonneg (fluctuatingEffectCorrelation t τ_immune)])
+  have h_missed_lt :
+      missedSelectedVariance
+          (stabilizingSelectionValidationModel n sigma2_base
+            (equilibriumEffectVariance v_mut_height s_height) Ns_height) <
+        missedSelectedVariance
+          (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune) := by
+    unfold missedSelectedVariance stabilizingSelectionValidationModel
+      fluctuatingSelectionValidationModel
+    exact missedSelectedVariance_lt_of_variance_and_correlation
+      (equilibriumEffectVariance v_mut_height s_height)
+      immuneSelectedVar
+      (effectCorrelationStabilizing Ns_height)
+      (fluctuatingEffectCorrelation t τ_immune)
+      h_immuneVar
+      h_heightCorr_nonneg
+      h_heightCorr_lt_one
+      h_immuneCorr_nonneg
+      h_corr
+      h_var
+  rw [selectionModelLRT_eq_sampleSize_mul_log_residual_gap
+        (stabilizingSelectionValidationModel n sigma2_base
+          (equilibriumEffectVariance v_mut_height s_height) Ns_height)
+        h_sigma h_missed_height_nonneg]
+  rw [selectionModelLRT_eq_sampleSize_mul_log_residual_gap
+        (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune)
+        h_sigma h_missed_immune_nonneg]
+  exact selectionModelLRT_strictMono_in_missedVariance n sigma2_base
+    (missedSelectedVariance
+      (stabilizingSelectionValidationModel n sigma2_base
+        (equilibriumEffectVariance v_mut_height s_height) Ns_height))
+    (missedSelectedVariance
+      (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune))
+    h_n h_sigma h_missed_height_nonneg h_missed_lt
 
 end ModelComparison
 
@@ -291,12 +481,25 @@ section CrossValidation
     Train the portability model on all populations except one,
     predict for the held-out population, repeat for each. -/
 
+/-- Population-level CV prediction error under a bias-variance-noise model. -/
+def cvPredictionError (bias_sq variance noise : ℝ) : ℝ :=
+  bias_sq + variance + noise
+
 /-- **Cross-validation error decomposition.**
-    CV error = bias² + variance + irreducible noise. -/
+    In the explicit bias-variance-noise model used in this section, CV
+    prediction error is exactly `bias² + variance + irreducible noise`. -/
 theorem cv_error_decomposition
+    (bias_sq variance noise : ℝ) :
+    cvPredictionError bias_sq variance noise = bias_sq + variance + noise := by
+  rfl
+
+/-- CV prediction error is nonnegative when all three components are nonnegative. -/
+theorem cvPredictionError_nonneg
     (bias_sq variance noise : ℝ)
     (h_bias : 0 ≤ bias_sq) (h_var : 0 ≤ variance) (h_noise : 0 ≤ noise) :
-    0 ≤ bias_sq + variance + noise := by linarith
+    0 ≤ cvPredictionError bias_sq variance noise := by
+  unfold cvPredictionError
+  linarith
 
 /-- **More diverse training set → lower CV error.**
     Including more populations in training reduces both bias and variance
@@ -304,10 +507,11 @@ theorem cv_error_decomposition
     Modeled: adding populations reduces both bias² and variance components. -/
 theorem more_populations_lower_cv_error
     (bias_sq_few variance_few bias_sq_many variance_many : ℝ)
-    (h_bias_nn : 0 ≤ bias_sq_many) (h_var_nn : 0 ≤ variance_many)
     (h_bias_reduced : bias_sq_many ≤ bias_sq_few)
     (h_var_reduced : variance_many < variance_few) :
-    bias_sq_many + variance_many < bias_sq_few + variance_few := by
+    cvPredictionError bias_sq_many variance_many 0 <
+      cvPredictionError bias_sq_few variance_few 0 := by
+  unfold cvPredictionError
   linarith
 
 /-- **The bias-variance tradeoff in portability prediction.**
@@ -350,14 +554,21 @@ theorem portability_prediction_bounded
       _ = neutral_ratio := mul_one _
       _ < 1 := h_nr_le
 
-/-- **Selection reduces portability below neutral prediction.**
-    When genetic correlation ρ < 1 (selection-driven effect changes),
-    the actual portability is reduced by ρ² relative to neutral. -/
+/-- Neutral portability prediction adjusted by a squared effect-correlation penalty. -/
+def selectionAdjustedPortabilityRatio (neutral_ratio rho : ℝ) : ℝ :=
+  neutral_ratio * rho ^ 2
+
+/-- **Selection reduces portability in the multiplicative `neutral_ratio × ρ²` model.**
+    This theorem is explicit about the model being used: a neutral portability
+    prediction is attenuated by the squared cross-population effect correlation
+    `ρ²`. When `ρ < 1`, the selection-adjusted ratio is strictly below the
+    neutral ratio. -/
 theorem selection_reduces_portability
     (neutral_ratio rho : ℝ)
-    (h_nr : 0 < neutral_ratio) (h_nr_le : neutral_ratio ≤ 1)
+    (h_nr : 0 < neutral_ratio)
     (h_rho : 0 ≤ rho) (h_rho_lt : rho < 1) :
-    neutral_ratio * rho ^ 2 < neutral_ratio := by
+    selectionAdjustedPortabilityRatio neutral_ratio rho < neutral_ratio := by
+  unfold selectionAdjustedPortabilityRatio
   have h_sq : rho ^ 2 < 1 := by nlinarith [sq_nonneg rho]
   nlinarith
 
