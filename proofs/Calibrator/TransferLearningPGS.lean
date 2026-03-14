@@ -258,19 +258,38 @@ The PGS portability problem maps to domain adaptation:
 
 section DomainAdaptation
 
-/-- **Ben-David bound for PGS portability.**
-    ε_T(h) ≤ ε_S(h) + d_{H}(S, T) + λ*
-    where ε is the error, d_H is the H-divergence,
-    and λ* is the optimal combined error.
+/-- Hypothesis-specific Ben-David certificate for a transferred PGS.
 
-    For PGS: target error ≤ source error + divergence + irreducible gap.
-    Since divergence and lambda_star are nonneg, target error is at most
-    source error plus their sum, and both terms inflate the bound. -/
+    This is an explicit assumption boundary: proving the certificate requires
+    external domain-adaptation arguments, but once it is available we can
+    derive concrete target-error bounds from separate caps on its components. -/
+structure PGSBenDavidCertificate where
+  err_source : ℝ
+  err_target : ℝ
+  divergence : ℝ
+  lambda_star : ℝ
+  target_le_source_plus_divergence_plus_lambda :
+    err_target ≤ err_source + divergence + lambda_star
+
+/-- Ben-David upper-bound functional `ε_S(h) + d_H(S,T) + λ*`. -/
+def benDavidUpperBound (err_source divergence lambda_star : ℝ) : ℝ :=
+  err_source + divergence + lambda_star
+
+/-- **Ben-David bound for PGS portability.**
+    For a fixed transferred PGS hypothesis `h`, suppose a Ben-David certificate
+    establishes `ε_T(h) ≤ ε_S(h) + d_H(S,T) + λ*`. If the source error,
+    divergence term, and irreducible gap are separately upper-bounded by
+    `source_err_ub`, `div_ub`, and `lambda_ub`, then the target error is at
+    most the sum of those component caps. -/
 theorem ben_david_pgs_bound
-    (err_source divergence lambda_star : ℝ)
-    (h_err : 0 ≤ err_source)
-    (h_div_nn : 0 ≤ divergence) (h_lambda_nn : 0 ≤ lambda_star) :
-    err_source ≤ err_source + divergence + lambda_star := by linarith
+    (cert : PGSBenDavidCertificate)
+    (source_err_ub div_ub lambda_ub : ℝ)
+    (h_source : cert.err_source ≤ source_err_ub)
+    (h_div : cert.divergence ≤ div_ub)
+    (h_lambda : cert.lambda_star ≤ lambda_ub) :
+    cert.err_target ≤ benDavidUpperBound source_err_ub div_ub lambda_ub := by
+  unfold benDavidUpperBound
+  linarith [cert.target_le_source_plus_divergence_plus_lambda, h_source, h_div, h_lambda]
 
 /-- **The divergence term relates to Fst.**
     The H-divergence between two genetic ancestry populations
@@ -283,19 +302,21 @@ theorem divergence_increases_with_fst
     c * fst₁ < c * fst₂ := by
   exact mul_lt_mul_of_pos_left h_fst h_c
 
-/-- **The irreducible error λ* is trait-specific.**
-    Traits under neutral evolution have small λ* (similar architecture
-    across populations), while traits under divergent selection have
-    large λ* (different architecture). When one trait's λ* falls below
-    a threshold and another's exceeds it, the gap is provable.
+/-- **Larger `λ*` worsens the Ben-David upper bound.**
+    `λ*` is the irreducible source-target approximation gap appearing in the
+    domain-adaptation certificate. For fixed source error and divergence, a
+    larger `λ*` strictly increases the certified target-error upper bound.
 
-    Worked example: Height (neutral, λ* near 0) vs immune traits
-    (selected, λ* >> 0). This is the formal explanation for Open Question 2. -/
-theorem lambda_star_trait_specific
-    (lambda_neutral lambda_selected threshold : ℝ)
-    (h_neutral_small : lambda_neutral < threshold)
-    (h_selected_large : threshold < lambda_selected) :
-    lambda_neutral < lambda_selected := by linarith
+    This is the honest formal statement available in this file. Biological
+    claims that specific traits have different `λ*` values require a separate
+    trait-level model or certificate and are not asserted here. -/
+theorem larger_lambda_star_worsens_ben_david_bound
+    (err_source divergence lambda₁ lambda₂ : ℝ)
+    (h_lambda : lambda₁ < lambda₂) :
+    benDavidUpperBound err_source divergence lambda₁ <
+      benDavidUpperBound err_source divergence lambda₂ := by
+  unfold benDavidUpperBound
+  linarith
 
 /-- **Domain adaptation bound is tight for linear hypotheses.**
     For linear predictors (PGS), the bound is achievable because
@@ -370,16 +391,76 @@ theorem iw_fails_for_large_divergence
     ess < n := by nlinarith
 
 /-- **Doubly robust estimation combines IW with model adaptation.**
-    DR estimator: if either the model or the weights are correct,
-    the estimate is consistent. This provides robustness. -/
+    DR estimator: if either the weighting model or the outcome model is
+    asymptotically correct, and the other nuisance component remains
+    uniformly bounded, the target-population estimator is consistent. -/
+def AsymptoticallyZero (err : ℕ → ℝ) : Prop :=
+  ∀ ε > 0, ∃ N : ℕ, ∀ n ≥ N, |err n| < ε
+
+/-- An estimator sequence converges to the target parameter in absolute error. -/
+def AsymptoticallyConsistent (est : ℕ → ℝ) (truth : ℝ) : Prop :=
+  AsymptoticallyZero (fun n => est n - truth)
+
+/-- If an error term is bounded by a product and one factor converges to zero
+    while the other is uniformly bounded, then the error also converges to zero. -/
+theorem asymptoticallyZero_of_abs_le_mul
+    (h f g : ℕ → ℝ)
+    (h_bound : ∀ n, |h n| ≤ |f n| * |g n|)
+    (hg_bounded : ∃ C ≥ 0, ∀ n, |g n| ≤ C)
+    (hf_zero : AsymptoticallyZero f) :
+    AsymptoticallyZero h := by
+  intro ε hε
+  rcases hg_bounded with ⟨C, hC_nn, hgC⟩
+  have hC1_pos : 0 < C + 1 := by linarith
+  have h_scaled_pos : 0 < ε / (C + 1) := by positivity
+  rcases hf_zero (ε / (C + 1)) h_scaled_pos with ⟨N, hN⟩
+  refine ⟨N, ?_⟩
+  intro n hn
+  have hf_small : |f n| < ε / (C + 1) := hN n hn
+  have hg_le : |g n| ≤ C := hgC n
+  have h_mul_le : |f n| * |g n| ≤ |f n| * C := by
+    exact mul_le_mul_of_nonneg_left hg_le (abs_nonneg _)
+  have h_mul_le' : |f n| * C ≤ (ε / (C + 1)) * C := by
+    exact mul_le_mul_of_nonneg_right hf_small.le hC_nn
+  have hC_lt : C < C + 1 := by linarith
+  have h_scaled_lt : (ε / (C + 1)) * C < (ε / (C + 1)) * (C + 1) := by
+    exact mul_lt_mul_of_pos_left hC_lt h_scaled_pos
+  have h_cancel : (ε / (C + 1)) * (C + 1) = ε := by
+    field_simp [ne_of_gt hC1_pos]
+  calc
+    |h n| ≤ |f n| * |g n| := h_bound n
+    _ ≤ |f n| * C := h_mul_le
+    _ ≤ (ε / (C + 1)) * C := h_mul_le'
+    _ < (ε / (C + 1)) * (C + 1) := h_scaled_lt
+    _ = ε := h_cancel
+
+/-- **Doubly robust consistency.**
+    Let `est_dr n` estimate a target parameter `θ`. If the DR estimation error is
+    bounded by the product of the residual weighting bias and residual outcome-model
+    bias, then consistency follows whenever either nuisance component converges to
+    zero and the other stays uniformly bounded. -/
 theorem doubly_robust_consistency
-    (bias_iw_only bias_model_only bias_dr : ℝ)
-    (h_dr_better_iw : |bias_dr| ≤ |bias_iw_only| * |bias_model_only|)
-    (h_iw_imperfect : |bias_iw_only| < 1)
-    (h_model_imperfect : |bias_model_only| < 1) :
-    |bias_dr| < 1 := by
-  calc |bias_dr| ≤ |bias_iw_only| * |bias_model_only| := h_dr_better_iw
-    _ < 1 := by nlinarith [abs_nonneg bias_iw_only, abs_nonneg bias_model_only]
+    (θ : ℝ)
+    (est_dr bias_iw_only bias_model_only : ℕ → ℝ)
+    (h_dr_error_bound :
+      ∀ n, |est_dr n - θ| ≤ |bias_iw_only n| * |bias_model_only n|)
+    (h_iw_bounded : ∃ C ≥ 0, ∀ n, |bias_iw_only n| ≤ C)
+    (h_model_bounded : ∃ C ≥ 0, ∀ n, |bias_model_only n| ≤ C)
+    (h_either :
+      AsymptoticallyZero bias_iw_only ∨ AsymptoticallyZero bias_model_only) :
+    AsymptoticallyConsistent est_dr θ := by
+  unfold AsymptoticallyConsistent
+  rcases h_either with h_iw_zero | h_model_zero
+  · exact asymptoticallyZero_of_abs_le_mul
+      (fun n => est_dr n - θ) bias_iw_only bias_model_only
+      h_dr_error_bound h_model_bounded h_iw_zero
+  · exact asymptoticallyZero_of_abs_le_mul
+      (fun n => est_dr n - θ) bias_model_only bias_iw_only
+      (by
+        intro n
+        have h := h_dr_error_bound n
+        simpa [mul_comm] using h)
+      h_iw_bounded h_model_zero
 
 end ImportanceWeighting
 
@@ -424,20 +505,26 @@ theorem optimal_pc_removal_exists
     err_k ≤ min err_k_plus_1 err_k_minus_1 := by
   exact le_min h_local_min_right h_local_min_left
 
-/-- **Adversarial training for ancestry invariance.**
-    Train the PGS model while adversarially removing ancestry
-    information from the representation. The minimax objective:
-    min_θ max_ψ E[loss(Y, f_θ(X))] - λ E[loss(A, g_ψ(h_θ(X)))]
-    Adversarial training removes a fraction of the ancestry-driven error,
-    improving portability by reducing the divergence component. -/
-theorem adversarial_improves_portability
-    (err_source divergence_standard divergence_adversarial lambda_star : ℝ)
-    (h_div_reduced : divergence_adversarial < divergence_standard)
-    (_h_divs_nn : 0 ≤ divergence_adversarial)
-    (_h_lambda_nn : 0 ≤ lambda_star) (_h_err_nn : 0 ≤ err_source) :
-    -- Adversarial bound is tighter than standard bound
-    err_source + divergence_adversarial + lambda_star <
-      err_source + divergence_standard + lambda_star := by linarith
+/-- **A certified lower-divergence representation tightens the transfer bound.**
+    Compare two representation-learning strategies through the actual
+    domain-adaptation bound components they induce. If the new representation
+    has no larger source error, strictly smaller divergence, and no larger
+    `λ*`, then its Ben-David upper bound is strictly smaller.
+
+    This theorem does not formalize adversarial optimization itself. It gives
+    the rigorous consequence available once any method, adversarial or
+    otherwise, is certified to improve the bound components. -/
+theorem lower_divergence_representation_tightens_ben_david_bound
+    (err_source_standard err_source_new : ℝ)
+    (divergence_standard divergence_new : ℝ)
+    (lambda_standard lambda_new : ℝ)
+    (h_source : err_source_new ≤ err_source_standard)
+    (h_div : divergence_new < divergence_standard)
+    (h_lambda : lambda_new ≤ lambda_standard) :
+    benDavidUpperBound err_source_new divergence_new lambda_new <
+      benDavidUpperBound err_source_standard divergence_standard lambda_standard := by
+  unfold benDavidUpperBound
+  linarith
 
 /-- **Information bottleneck perspective.**
     The optimal portable representation minimizes I(φ(X); A)
@@ -468,31 +555,42 @@ section FineTuning
     2. The genetic architecture complexity
     3. The source PGS quality -/
 
-/-- **Fine-tuning outperforms training from scratch with small n.**
-    When n_target is small, fine-tuning a source PGS is better
-    than training a new PGS from target data alone.
-    Modeled: fine-tuning starts from source R² and loses only a divergence
-    penalty, while from-scratch R² is limited by n_target. -/
-theorem fine_tuning_better_with_small_n
-    (r2_source divergence_penalty noise_from_small_n : ℝ)
-    (h_r2 : 0 < r2_source)
-    (h_div : 0 ≤ divergence_penalty) (h_div_small : divergence_penalty < r2_source)
-    (h_noise_large : divergence_penalty < noise_from_small_n) :
-    -- R² from scratch (≤ r2_source but penalized heavily by noise)
-    -- is worse than fine-tuned R² (= r2_source - divergence_penalty)
-    r2_source - noise_from_small_n < r2_source - divergence_penalty := by
-  have h_div_lt_noise : divergence_penalty < noise_from_small_n := by
-    exact h_noise_large
-  have h_neg : -noise_from_small_n < -divergence_penalty := by
-    exact neg_lt_neg h_div_lt_noise
-  simpa [sub_eq_add_neg] using add_lt_add_left h_neg r2_source
+/-- Fine-tuned target `R²` in a simple additive penalty model. -/
+def fineTunedTargetR2 (r2_source divergence_penalty adaptation_gain : ℝ) : ℝ :=
+  r2_source - divergence_penalty + adaptation_gain
 
-/-- **Critical sample size for fine-tuning to help.**
-    Below n_crit, the source PGS (even uncalibrated) is better
-    than any model trained on target data.
-    Above n_crit, the target-trained model catches up.
-    This implies at n_crit there is a crossover. -/
-theorem critical_sample_size_transfer
+/-- Target-trained `R²` in a simple additive estimation-penalty model. -/
+def scratchTargetR2 (oracle_target_r2 estimation_penalty : ℝ) : ℝ :=
+  oracle_target_r2 - estimation_penalty
+
+/-- **Fine-tuning wins in the explicit additive penalty model.**
+    This theorem does not claim a universal fine-tuning advantage. It works in
+    the two formal score models above:
+
+    - `fineTunedTargetR2` starts from source `R²`, pays a portability penalty,
+      and gains target-specific adaptation;
+    - `scratchTargetR2` starts from an oracle target ceiling and pays a
+      finite-sample estimation penalty.
+
+    If the fine-tuned baseline `r2_source + adaptation_gain` weakly exceeds the
+    scratch oracle ceiling, and the scratch estimator pays a larger penalty than
+    the fine-tuning portability cost, then the modeled fine-tuned target `R²`
+    exceeds the modeled scratch target `R²`. -/
+theorem fine_tuned_target_r2_exceeds_scratch_of_penalty_gap
+    (r2_source divergence_penalty adaptation_gain oracle_target_r2 estimation_penalty : ℝ)
+    (h_baseline : oracle_target_r2 ≤ r2_source + adaptation_gain)
+    (h_penalty : divergence_penalty < estimation_penalty) :
+    scratchTargetR2 oracle_target_r2 estimation_penalty <
+      fineTunedTargetR2 r2_source divergence_penalty adaptation_gain := by
+  unfold scratchTargetR2 fineTunedTargetR2
+  linarith
+
+/-- **Crossover extracted from assumed learning-curve inequalities.**
+    This theorem does not derive a critical sample size from optimization or
+    statistics. It simply records the two boundary inequalities that follow once
+    the user supplies a candidate `n_crit` together with below-threshold and
+    above-threshold dominance assumptions for the two learning curves. -/
+theorem crossover_from_assumed_critical_sample_size
     (n_crit : ℕ) (r2_source_unadjusted r2_target_trained : ℝ → ℝ)
     (h_below : ∀ n : ℕ, n < n_crit → r2_target_trained n < r2_source_unadjusted n)
     (h_above : ∀ n : ℕ, n_crit ≤ n → r2_source_unadjusted n ≤ r2_target_trained n)
@@ -578,19 +676,20 @@ theorem causal_variant_non_overlap_limit
   have : f_shared < 1 := by linarith
   exact mul_lt_of_lt_one_right h_r2 this
 
-/-- **No free lunch for PGS portability.**
-    There is no universally optimal PGS: any PGS that is optimal
-    for population A is suboptimal for some population B.
-    Modeled: optimizing for A means R²_A = h²_A, but in B the
-    portability ratio < 1 reduces performance below B's ceiling. -/
-theorem no_free_lunch_pgs
-    (h2_A h2_B port_ratio : ℝ)
-    (h_h2A : 0 < h2_A) (h_h2B : 0 < h2_B)
-    (h_port : 0 < port_ratio) (h_port_lt : port_ratio < 1) :
-    -- PGS optimized for A achieves h2_A × port_ratio in B, which is < h2_B
-    -- (the B-optimal ceiling), when h2_B is not too small
-    h2_A * port_ratio < h2_A := by
-  exact mul_lt_of_lt_one_right h_h2A h_port_lt
+/-- **Transporting a source-optimized PGS to a more diverged target lowers `R²`.**
+    This is the honest transfer-limit statement available from the core drift
+    transport model: once the target population is strictly farther in `F_ST`
+    than the source, the transported target `R²` is strictly below the source
+    `R²`. This rules out a universally optimal score within that model, without
+    overclaiming a general no-free-lunch theorem over all predictors. -/
+theorem transported_source_pgs_loses_r2_with_positive_drift
+    (r2Source fstSource fstTarget : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
+    targetR2FromObservables r2Source fstSource fstTarget < r2Source := by
+  exact targetR2_lt_source_from_observables r2Source fstSource fstTarget
+    h_r2 h_fst h_fst_bounds
 
 end TransferLimits
 

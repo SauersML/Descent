@@ -1,4 +1,5 @@
 import Calibrator.Probability
+import Calibrator.Conclusions
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
 
@@ -76,25 +77,32 @@ and vice versa.
 
 section CalibrationVsDiscrimination
 
-/-- **Good AUC does not imply good calibration.**
-    AUC measures ranking ability; calibration measures
-    absolute risk accuracy. Adding a constant offset c to all predictions
-    preserves ranking (AUC unchanged) but shifts CITL by exactly c.
-    So for any desired AUC level, CITL can be made arbitrarily large. -/
+/-- **Additive score shifts preserve AUC but change calibration.**
+    AUC depends only on pairwise ranking of scores. Adding a constant offset
+    leaves every pairwise comparison unchanged, so population AUC is
+    invariant. Calibration-in-the-large, however, shifts by exactly the same
+    offset with opposite sign. This is the formal content behind the claim
+    that discrimination does not determine calibration. -/
 theorem auc_independent_of_calibration
-    (mean_obs mean_pred c : ℝ)
-    (h_c_pos : 0 < c) :
-    -- Adding offset c shifts CITL: new CITL = old CITL - c
-    calibrationInTheLarge mean_obs (mean_pred + c) =
-      calibrationInTheLarge mean_obs mean_pred - c := by
-  unfold calibrationInTheLarge; ring
+    {Z : Type*} [MeasurableSpace Z]
+    (pop : BinaryPopulation Z) (score : Z → ℝ)
+    (mean_obs mean_pred c : ℝ) :
+    populationAUC pop (fun z => score z + c) = populationAUC pop score ∧
+      calibrationInTheLarge mean_obs (mean_pred + c) =
+        calibrationInTheLarge mean_obs mean_pred - c := by
+  constructor
+  · simpa [Function.comp] using
+      populationAUC_strictMono_invariant pop score (fun x => x + c) (by
+        intro a b hab
+        linarith)
+  · unfold calibrationInTheLarge
+    ring
 
-/-- **Calibration can change without changing AUC.**
+/-- **Prevalence shift changes calibration.**
     Prevalence shift changes calibration: if prevalence changes from
     π₁ to π₂, the CITL shifts. Using calibrationInTheLarge, the shift
-    is exactly (π₂ - π₁) when the model's mean prediction remains fixed.
-    AUC (ranking) is unaffected because the genetic risk ranking is unchanged. -/
-theorem prevalence_shift_changes_calibration_not_auc
+    is exactly (π₂ - π₁) when the model's mean prediction remains fixed. -/
+theorem prevalence_shift_changes_calibration
     (mean_pred π₁ π₂ : ℝ)
     (h_diff : π₁ ≠ π₂) :
     calibrationInTheLarge π₁ mean_pred ≠
@@ -102,22 +110,63 @@ theorem prevalence_shift_changes_calibration_not_auc
   unfold calibrationInTheLarge
   intro h; apply h_diff; linarith
 
-/-- **Cross-ancestry: discrimination drops AND calibration worsens.**
-    Model: AUC_target = AUC_source × √portability_ratio (signal attenuation).
-    CITL_target = prevalence difference (from prevalenceCITLShift).
-    Combined loss: the product AUC × (1 - |CITL|) captures both effects.
-    With AUC dropping by factor f < 1 and |CITL| increasing by δ > 0,
-    the combined metric drops by more than either alone. -/
-theorem cross_ancestry_both_worsen
-    (auc f δ : ℝ)
-    (h_auc_pos : 0 < auc) (h_auc_le : auc ≤ 1)
-    (h_f_pos : 0 < f) (h_f_lt : f < 1)
-    (h_δ_pos : 0 < δ) (h_δ_small : δ < 1) :
-    auc * f * (1 - δ) < auc := by
-  have h1 : f * (1 - δ) < 1 := by nlinarith
-  calc auc * f * (1 - δ) = auc * (f * (1 - δ)) := by ring
-    _ < auc * 1 := mul_lt_mul_of_pos_left h1 h_auc_pos
-    _ = auc := mul_one _
+/-- **Cross-ancestry AUC drops while calibration-in-the-large worsens.**
+    This theorem states the claim on the repository's actual metrics:
+
+    - discrimination is measured by observable transport AUC;
+    - calibration is measured by absolute calibration-in-the-large.
+
+    Under positive drift (`fstTarget > fstSource`), the transported target
+    AUC is strictly below the source AUC. If the source is calibrated in the
+    large but target prevalence differs, then absolute CITL is strictly larger
+    in the target. -/
+theorem cross_ancestry_auc_and_citl_worsen
+    (aucLink : ℝ → ℝ) (hauc : StrictMono aucLink)
+    (r2Source fstSource fstTarget mean_pred πSource πTarget : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (h_src_cal : calibrationInTheLarge πSource mean_pred = 0)
+    (h_prev_shift : πSource ≠ πTarget) :
+    targetAUCFromObservables aucLink r2Source fstSource fstTarget <
+      sourceAUCFromObservables aucLink r2Source ∧
+    |calibrationInTheLarge πSource mean_pred| <
+      |calibrationInTheLarge πTarget mean_pred| := by
+  constructor
+  · exact targetAUC_lt_source_of_observables aucLink hauc
+      r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds
+  · have h_citl_diff :
+        calibrationInTheLarge πSource mean_pred ≠
+          calibrationInTheLarge πTarget mean_pred :=
+      prevalence_shift_changes_calibration mean_pred πSource πTarget h_prev_shift
+    have h_tgt_ne_zero : calibrationInTheLarge πTarget mean_pred ≠ 0 := by
+      intro h_tgt_zero
+      apply h_citl_diff
+      simp [h_src_cal, h_tgt_zero]
+    have h_tgt_abs_pos : 0 < |calibrationInTheLarge πTarget mean_pred| :=
+      abs_pos.mpr h_tgt_ne_zero
+    simpa [h_src_cal] using h_tgt_abs_pos
+
+/-- **Cross-ancestry AUC drops while Brier worsens.**
+    `AUC` measures discrimination, while `Brier` is the standard proper scoring
+    rule carried by the observable drift model. Under positive drift, the target
+    AUC is strictly lower and the target Brier score is strictly higher. -/
+theorem cross_ancestry_auc_and_brier_worsen
+    (aucLink : ℝ → ℝ) (hauc : StrictMono aucLink)
+    (π r2Source fstSource fstTarget : ℝ)
+    (hπ0 : 0 < π) (hπ1 : π < 1)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
+    targetAUCFromObservables aucLink r2Source fstSource fstTarget <
+      sourceAUCFromObservables aucLink r2Source ∧
+    sourceBrierFromObservables π r2Source <
+      targetBrierFromObservables π r2Source fstSource fstTarget := by
+  constructor
+  · exact targetAUC_lt_source_of_observables aucLink hauc
+      r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds
+  · exact targetBrier_strict_gt_source_of_observables π r2Source fstSource fstTarget
+      hπ0 hπ1 h_r2 h_fst h_fst_bounds
 
 end CalibrationVsDiscrimination
 
@@ -221,16 +270,20 @@ theorem recalibration_needs_events
     (h_insufficient : n_events < n_params * events_per_param) :
     n_events < 400 := by subst h_rule; subst h_params; omega
 
-/-- **Recalibration does not improve discrimination.**
-    Recalibration applies an affine transform (a + b × PGS with b > 0).
-    For any two individuals with scores s₁ < s₂, the transform preserves
-    the ordering: a + b*s₁ < a + b*s₂. Since AUC depends only on
-    pairwise ordering, AUC is unchanged. -/
+/-- **Recalibration does not change AUC.**
+    Recalibration applies a strictly increasing affine transform
+    `s ↦ a + b × s` with `b > 0`. Such transforms preserve pairwise score
+    orderings, so population AUC is unchanged. -/
 theorem recalibration_preserves_auc
-    (s₁ s₂ a b : ℝ)
-    (h_b_pos : 0 < b)
-    (h_order : s₁ < s₂) :
-    a + b * s₁ < a + b * s₂ := by linarith [mul_lt_mul_of_pos_left h_order h_b_pos]
+    {Z : Type*} [MeasurableSpace Z]
+    (pop : BinaryPopulation Z) (score : Z → ℝ)
+    (a b : ℝ)
+    (h_b_pos : 0 < b) :
+    populationAUC pop (fun z => a + b * score z) = populationAUC pop score := by
+  simpa [Function.comp] using
+    populationAUC_strictMono_invariant pop score (fun x => a + b * x) (by
+      intro x y hxy
+      linarith [mul_lt_mul_of_pos_left hxy h_b_pos])
 
 end RecalibrationMethods
 

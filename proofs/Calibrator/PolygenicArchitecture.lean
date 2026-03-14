@@ -170,6 +170,12 @@ noncomputable def cltPolygenicPortabilityScore
       perLocusMismatchSD := perLocusMismatchSD }
   model.portabilityScore
 
+/-- Overall portability after multiplying the polygenicity-only score by a
+    cross-population effect-correlation penalty `rg²` and an LD-retention factor. -/
+noncomputable def selectionAdjustedPortability
+    (model : PolygenicCLTPortabilityModel) (rg ld_factor : ℝ) : ℝ :=
+  rg ^ 2 * model.portabilityScore * ld_factor
+
 /-- **More polygenic → more portable (from the formal CLT model).**
     If two traits share the same per-locus signal and per-locus LD-mismatch scale,
     then the trait with larger `M_eff` has smaller relative portability loss because
@@ -224,20 +230,111 @@ theorem height_polygenic_good_portability
     PolygenicCLTPortabilityModel.portabilityScore] at h_loss ⊢
   linarith
 
-/-- **Immune traits: moderate polygenicity but strong selection.**
-    Immune traits have moderate M_eff but strong directional selection
-    creates large effect size differences → poor portability
-    despite reasonable polygenicity. Selection reduces genetic
-    correlation rg, and portability scales as rg². Even moderate
-    polygenicity cannot compensate for low rg. -/
+/-- The CLT portability score has the explicit closed form
+    `1 - lossConstant / √M_eff`. -/
+theorem PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_lossConstant_div_sqrt
+    (model : PolygenicCLTPortabilityModel)
+    (h_M : 0 < model.M_eff)
+    (h_signal : 0 < model.perLocusSignal) :
+    model.portabilityScore = 1 - model.lossConstant / Real.sqrt model.M_eff := by
+  unfold PolygenicCLTPortabilityModel.portabilityScore
+  rw [PolygenicCLTPortabilityModel.relativePortabilityLoss_eq_lossConstant_div_sqrt
+    model h_M h_signal]
+
+/-- Relative portability loss is nonnegative under positive signal and
+    nonnegative mismatch scale. -/
+theorem PolygenicCLTPortabilityModel.relativePortabilityLoss_nonneg
+    (model : PolygenicCLTPortabilityModel)
+    (h_M : 0 < model.M_eff)
+    (h_signal : 0 < model.perLocusSignal)
+    (h_mismatch : 0 ≤ model.perLocusMismatchSD) :
+    0 ≤ model.relativePortabilityLoss := by
+  rw [PolygenicCLTPortabilityModel.relativePortabilityLoss_eq_lossConstant_div_sqrt
+    model h_M h_signal]
+  unfold PolygenicCLTPortabilityModel.lossConstant
+  exact div_nonneg
+    (div_nonneg h_mismatch (le_of_lt h_signal))
+    (le_of_lt (Real.sqrt_pos.mpr h_M))
+
+/-- The CLT portability score is always at most `1`. -/
+theorem PolygenicCLTPortabilityModel.portabilityScore_le_one
+    (model : PolygenicCLTPortabilityModel)
+    (h_M : 0 < model.M_eff)
+    (h_signal : 0 < model.perLocusSignal)
+    (h_mismatch : 0 ≤ model.perLocusMismatchSD) :
+    model.portabilityScore ≤ 1 := by
+  unfold PolygenicCLTPortabilityModel.portabilityScore
+  have h_loss_nn :=
+    PolygenicCLTPortabilityModel.relativePortabilityLoss_nonneg model h_M h_signal h_mismatch
+  linarith
+
+/-- **Selection can outweigh a polygenicity advantage.**
+    In the CLT model, larger `M_eff` improves the polygenicity-only portability
+    score. But overall portability also multiplies by the cross-population
+    effect-correlation factor `rg²`. So a selected trait can be more polygenic
+    than a neutral trait and still have worse total portability if selection
+    depresses `rg` enough. -/
 theorem selection_overrides_polygenicity
-    (rg_immune rg_height ld_factor : ℝ)
-    (h_rg_immune : 0 ≤ rg_immune) (h_rg_height : 0 ≤ rg_height)
-    (h_ld : 0 < ld_factor) (h_ld_le : ld_factor ≤ 1)
-    (h_selection_lowers_rg : rg_immune < rg_height) :
-    rg_immune ^ 2 * ld_factor < rg_height ^ 2 * ld_factor := by
-  have : rg_immune ^ 2 < rg_height ^ 2 := by nlinarith [sq_nonneg (rg_height - rg_immune)]
-  nlinarith
+    (neutralModel selectedModel : PolygenicCLTPortabilityModel)
+    (rg_neutral rg_selected ld_factor : ℝ)
+    (h_M_neutral : 0 < neutralModel.M_eff)
+    (h_M_selected : 0 < selectedModel.M_eff)
+    (h_more_polygenic : neutralModel.M_eff < selectedModel.M_eff)
+    (h_signal : 0 < neutralModel.perLocusSignal)
+    (h_mismatch : 0 < neutralModel.perLocusMismatchSD)
+    (h_same_signal : neutralModel.perLocusSignal = selectedModel.perLocusSignal)
+    (h_same_mismatch : neutralModel.perLocusMismatchSD = selectedModel.perLocusMismatchSD)
+    (h_ld : 0 < ld_factor)
+    (h_selection_dominates :
+      rg_selected ^ 2 <
+        rg_neutral ^ 2 *
+          (1 - neutralModel.lossConstant / Real.sqrt neutralModel.M_eff)) :
+    neutralModel.portabilityScore < selectedModel.portabilityScore ∧
+      selectionAdjustedPortability selectedModel rg_selected ld_factor <
+        selectionAdjustedPortability neutralModel rg_neutral ld_factor := by
+  have h_poly_loss :
+      selectedModel.relativePortabilityLoss < neutralModel.relativePortabilityLoss := by
+    exact more_polygenic_more_portable
+      neutralModel selectedModel h_M_neutral h_M_selected h_more_polygenic
+      h_signal h_mismatch h_same_signal h_same_mismatch
+  have h_poly_score :
+      neutralModel.portabilityScore < selectedModel.portabilityScore := by
+    unfold PolygenicCLTPortabilityModel.portabilityScore at h_poly_loss ⊢
+    linarith
+  have h_selected_signal : 0 < selectedModel.perLocusSignal := by
+    simpa [h_same_signal] using h_signal
+  have h_selected_mismatch_nn : 0 ≤ selectedModel.perLocusMismatchSD := by
+    simpa [h_same_mismatch] using (le_of_lt h_mismatch)
+  have h_selected_score_le_one :
+      selectedModel.portabilityScore ≤ 1 := by
+    exact PolygenicCLTPortabilityModel.portabilityScore_le_one
+      selectedModel h_M_selected h_selected_signal h_selected_mismatch_nn
+  have h_neutral_score_eq :
+      neutralModel.portabilityScore =
+        1 - neutralModel.lossConstant / Real.sqrt neutralModel.M_eff := by
+    exact PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_lossConstant_div_sqrt
+      neutralModel h_M_neutral h_signal
+  have h_selection_dominates' :
+      rg_selected ^ 2 < rg_neutral ^ 2 * neutralModel.portabilityScore := by
+    simpa [h_neutral_score_eq] using h_selection_dominates
+  have h_selected_core_le :
+      rg_selected ^ 2 * selectedModel.portabilityScore ≤ rg_selected ^ 2 := by
+    have h_sq_nn : 0 ≤ rg_selected ^ 2 := sq_nonneg rg_selected
+    have h_mul :
+        rg_selected ^ 2 * selectedModel.portabilityScore ≤
+          rg_selected ^ 2 * 1 := by
+      exact mul_le_mul_of_nonneg_left h_selected_score_le_one h_sq_nn
+    simpa using h_mul
+  have h_core_lt :
+      rg_selected ^ 2 * selectedModel.portabilityScore <
+        rg_neutral ^ 2 * neutralModel.portabilityScore := by
+    exact lt_of_le_of_lt h_selected_core_le h_selection_dominates'
+  have h_adjusted_lt :
+      (rg_selected ^ 2 * selectedModel.portabilityScore) * ld_factor <
+        (rg_neutral ^ 2 * neutralModel.portabilityScore) * ld_factor := by
+    exact mul_lt_mul_of_pos_right h_core_lt h_ld
+  refine ⟨h_poly_score, ?_⟩
+  simpa [selectionAdjustedPortability, mul_assoc, mul_left_comm, mul_comm] using h_adjusted_lt
 
 end PolygenicityAndPortability
 
