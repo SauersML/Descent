@@ -307,16 +307,132 @@ theorem intercept_recal_corrects_citl
 noncomputable def logisticRecalibrated (pgs a b : ℝ) : ℝ :=
   a + b * pgs
 
+/-- **Trace-MSE lower bound for target recalibration.**
+    In an orthogonal Fisher model with `d` target calibration parameters and
+    per-event Fisher information `I_event`, the summed estimation variance is
+    lower-bounded by `d / (n_events * I_event)`. This is the exact precision
+    object that drives target-data requirements; there is no hard-coded
+    "200 events per parameter" rule in the theorem. -/
+noncomputable def recalibrationTraceMSELowerBound
+    (nEvents nParams infoPerEvent : ℝ) : ℝ :=
+  nParams / (nEvents * infoPerEvent)
+
+/-- **Exact event threshold for a target recalibration precision goal.**
+    Solving `d / (n_events * I_event) ≤ τ` for `n_events` gives the exact event
+    requirement `d / (I_event * τ)`. Specializing to logistic recalibration
+    means `d = 2` (intercept and slope), but the theorem is generic in the
+    number of calibration parameters. -/
+noncomputable def requiredEventsForRecalibration
+    (nParams infoPerEvent targetTraceMSE : ℝ) : ℝ :=
+  nParams / (infoPerEvent * targetTraceMSE)
+
 /-- **Sample size needed for recalibration.**
-    Good calibration requires ~200 events per parameter.
-    With 2 parameters (intercept + slope), need ~400 events.
-    This can be limiting in rare diseases or small populations. -/
+    Under the orthogonal Fisher trace-MSE model, achieving target calibration
+    precision `τ` is equivalent to having at least
+    `d / (I_event * τ)` target events, where `d` is the number of fitted
+    recalibration parameters and `I_event` is the per-event Fisher information.
+    This is an exact event-threshold theorem about calibration uncertainty,
+    not bookkeeping on a fixed heuristic constant. -/
 theorem recalibration_needs_events
-    (n_events n_params events_per_param : ℕ)
-    (h_rule : events_per_param = 200)
-    (h_params : n_params = 2)
-    (h_insufficient : n_events < n_params * events_per_param) :
-    n_events < 400 := by subst h_rule; subst h_params; omega
+    (nEvents nParams infoPerEvent targetTraceMSE : ℝ)
+    (h_n : 0 < nEvents)
+    (h_info : 0 < infoPerEvent)
+    (h_target : 0 < targetTraceMSE) :
+    recalibrationTraceMSELowerBound nEvents nParams infoPerEvent ≤ targetTraceMSE ↔
+      requiredEventsForRecalibration nParams infoPerEvent targetTraceMSE ≤ nEvents := by
+  unfold recalibrationTraceMSELowerBound requiredEventsForRecalibration
+  constructor
+  · intro h
+    rw [div_le_iff₀ (mul_pos h_n h_info)] at h
+    rw [div_le_iff₀ (mul_pos h_info h_target)]
+    nlinarith
+  · intro h
+    rw [div_le_iff₀ (mul_pos h_info h_target)] at h
+    rw [div_le_iff₀ (mul_pos h_n h_info)]
+    nlinarith
+
+/-- **Required event count increases with recalibration dimension.**
+    Holding per-event information and the target trace-MSE goal fixed, fitting
+    more target-specific calibration parameters strictly increases the event
+    count needed to achieve the same uncertainty target. -/
+theorem required_events_increase_with_recalibration_dimension
+    (nParams₁ nParams₂ infoPerEvent targetTraceMSE : ℝ)
+    (h_dim : nParams₁ < nParams₂)
+    (h_info : 0 < infoPerEvent)
+    (h_target : 0 < targetTraceMSE) :
+    requiredEventsForRecalibration nParams₁ infoPerEvent targetTraceMSE <
+      requiredEventsForRecalibration nParams₂ infoPerEvent targetTraceMSE := by
+  unfold requiredEventsForRecalibration
+  exact div_lt_div_of_pos_right h_dim (mul_pos h_info h_target)
+
+/-- **Required event count decreases with per-event information.**
+    More informative target events, whether from sharper score spread or richer
+    recalibration covariates, strictly reduce the event count needed to hit a
+    fixed trace-MSE target. -/
+theorem required_events_decrease_with_event_information
+    (nParams info₁ info₂ targetTraceMSE : ℝ)
+    (h_params : 0 < nParams)
+    (h_info₁ : 0 < info₁)
+    (h_info : info₁ < info₂)
+    (h_target : 0 < targetTraceMSE) :
+    requiredEventsForRecalibration nParams info₂ targetTraceMSE <
+      requiredEventsForRecalibration nParams info₁ targetTraceMSE := by
+  unfold requiredEventsForRecalibration
+  have hden₁ : 0 < info₁ * targetTraceMSE := mul_pos h_info₁ h_target
+  exact div_lt_div_of_pos_left h_params hden₁ (by nlinarith)
+
+/-- **Rarer target prevalence requires more labeled target samples for the same
+    recalibration precision.**
+    If only a fraction `π` of target individuals are events, then the total
+    target cohort size needed to reach a given recalibration trace-MSE target is
+    the required event count divided by `π`. Therefore rarer diseases require
+    larger target cohorts even when the per-event information and calibration
+    precision target are fixed. -/
+noncomputable def requiredTargetCohortSizeForRecalibration
+    (nParams prevalence infoPerEvent targetTraceMSE : ℝ) : ℝ :=
+  requiredEventsForRecalibration nParams infoPerEvent targetTraceMSE / prevalence
+
+/-- **Exact labeled-cohort threshold for target recalibration.**
+    If a fraction `π` of target individuals are events, then `n = n_events / π`
+    labeled target samples are needed. Therefore hitting a target trace-MSE
+    level is equivalent to having at least
+    `requiredTargetCohortSizeForRecalibration d π I_event τ` labeled target
+    individuals. This connects calibration precision directly to the clinically
+    relevant target-cohort size rather than only to the abstract event count. -/
+theorem recalibration_needs_target_cohort
+    (nTarget nParams prevalence infoPerEvent targetTraceMSE : ℝ)
+    (h_target_n : 0 < nTarget)
+    (h_prev : 0 < prevalence)
+    (h_info : 0 < infoPerEvent)
+    (h_target : 0 < targetTraceMSE) :
+    recalibrationTraceMSELowerBound (prevalence * nTarget) nParams infoPerEvent ≤ targetTraceMSE ↔
+      requiredTargetCohortSizeForRecalibration nParams prevalence infoPerEvent targetTraceMSE ≤ nTarget := by
+  have h_events : 0 < prevalence * nTarget := mul_pos h_prev h_target_n
+  rw [recalibration_needs_events (prevalence * nTarget) nParams infoPerEvent targetTraceMSE
+    h_events h_info h_target]
+  unfold requiredTargetCohortSizeForRecalibration
+  rw [div_le_iff₀ h_prev]
+  simpa [mul_comm, mul_left_comm, mul_assoc]
+
+/-- At fixed parameter count, per-event information, and target precision,
+    lower event prevalence strictly increases the total target cohort size
+    needed for recalibration. -/
+theorem rarer_target_prevalence_requires_larger_recalibration_cohort
+    (nParams π₁ π₂ infoPerEvent targetTraceMSE : ℝ)
+    (h_params : 0 < nParams)
+    (hπ₁ : 0 < π₁)
+    (hπ : π₁ < π₂)
+    (h_info : 0 < infoPerEvent)
+    (h_target : 0 < targetTraceMSE) :
+    requiredTargetCohortSizeForRecalibration nParams π₂ infoPerEvent targetTraceMSE <
+      requiredTargetCohortSizeForRecalibration nParams π₁ infoPerEvent targetTraceMSE := by
+  have h_required_pos : 0 < requiredEventsForRecalibration nParams infoPerEvent targetTraceMSE := by
+    unfold requiredEventsForRecalibration
+    exact div_pos h_params (mul_pos h_info h_target)
+  have hπ₂ : 0 < π₂ := lt_trans hπ₁ hπ
+  unfold requiredTargetCohortSizeForRecalibration
+  field_simp [ne_of_gt h_required_pos, ne_of_gt hπ₁, ne_of_gt hπ₂]
+  nlinarith
 
 /-- **Recalibration does not change AUC.**
     Recalibration applies a strictly increasing affine transform

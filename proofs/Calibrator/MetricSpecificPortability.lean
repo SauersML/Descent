@@ -194,51 +194,62 @@ theorem R2DecompositionData.cal_loss_reduces_r2 (d : R2DecompositionData)
   unfold r2 discrimination
   exact div_lt_div_of_pos_right h_miscal d.hVarY_pos
 
-/-- **R² is less portable than AUC, derived from the decomposition**.
+/-- Exact liability-threshold AUC attached to the discrimination component
+    of the `R² = discrimination × calibration` decomposition. -/
+noncomputable def R2DecompositionData.liabilityAUC (d : R2DecompositionData) : ℝ :=
+  sourceLiabilityAUCFromObservables d.discrimination
 
-    Given two populations (source, target) where discrimination (the
-    AUC-related component) transfers with ratio ρ_disc and calibration
-    with ratio ρ_cal, and calibration is partially lost (ρ_cal < 1):
+/-- **R² is less portable than true AUC when only calibration is lost.**
 
-    • R²_target / R²_source = ρ_disc × ρ_cal  (from the factorization)
-    • AUC portability ratio  = ρ_disc           (AUC depends only on discrimination)
+    Assume the source and target have the same discrimination component
+    `Var(Ŷ) / Var(Y)`, so the exact liability-threshold AUC implied by that
+    discrimination is identical in both populations. If the source is perfectly
+    calibrated but the target loses calibration, then:
 
-    Therefore R² portability < AUC portability whenever ρ_cal < 1.
+    - the literal liability-threshold AUC is preserved exactly;
+    - the absolute AUC portability gap is exactly `0`;
+    - the `R²` portability ratio equals the residual target calibration;
+    - the `R²` portability loss `1 - R²_target / R²_source` is strictly positive.
 
-    This theorem derives the inequality from the algebraic decomposition
-    rather than taking ρ_disc, ρ_cal as opaque parameters. -/
+    This states the metric comparison directly on the true AUC object in this
+    file, not on a discrimination proxy. -/
 theorem r2_less_portable_than_auc_from_decomposition
     (source target : R2DecompositionData)
     -- Calibration is strictly lost: Var(f(Ŷ))/Var(Ŷ) is lower in target
     (hCalLoss : target.calibration < source.calibration)
     -- Source is perfectly calibrated (f = id in source)
-    (hSourceCal : source.varCondE = source.varYhat) :
-    -- R² portability ratio < discrimination portability ratio
-    target.r2 / source.r2 < target.discrimination / source.discrimination := by
-  -- Rewrite R² in terms of disc × cal
+    (hSourceCal : source.varCondE = source.varYhat)
+    -- Discrimination transfers perfectly, so AUC should be preserved.
+    (hDiscPreserved : target.discrimination = source.discrimination) :
+    target.liabilityAUC = source.liabilityAUC ∧
+    |target.liabilityAUC - source.liabilityAUC| = 0 ∧
+    target.r2 / source.r2 = target.calibration ∧
+    0 < 1 - target.r2 / source.r2 := by
   have h_src_r2 : source.r2 = source.discrimination * source.calibration :=
     source.r2_eq_disc_mul_cal
   have h_tgt_r2 : target.r2 = target.discrimination * target.calibration :=
     target.r2_eq_disc_mul_cal
-  -- Source calibration = 1
   have h_src_cal : source.calibration = 1 := by
     unfold R2DecompositionData.calibration
     rw [hSourceCal]
     exact div_self (ne_of_gt source.hVarYhat_pos)
-  -- Source R² = disc_source × 1 = disc_source
   have h_src_r2_eq : source.r2 = source.discrimination := by
     rw [h_src_r2, h_src_cal, mul_one]
-  -- Target calibration < 1 (from hCalLoss and source cal = 1)
   have h_tgt_cal_lt : target.calibration < 1 := by
     rw [h_src_cal] at hCalLoss; exact hCalLoss
-  -- Now: target.r2 / source.r2
-  --    = (target.disc × target.cal) / source.disc
-  --    < target.disc / source.disc   (since target.cal < 1)
-  rw [h_tgt_r2, h_src_r2_eq]
-  have h_src_disc_pos : 0 < source.discrimination := source.disc_pos
-  have h_tgt_disc_pos : 0 < target.discrimination := target.disc_pos
-  apply div_lt_div_of_pos_right _ h_src_disc_pos
-  nlinarith
+  have h_r2_ratio : target.r2 / source.r2 = target.calibration := by
+    rw [h_tgt_r2, h_src_r2_eq, hDiscPreserved]
+    field_simp [ne_of_gt source.disc_pos]
+  have h_auc_eq : target.liabilityAUC = source.liabilityAUC := by
+    unfold R2DecompositionData.liabilityAUC
+    rw [hDiscPreserved]
+  have h_auc_gap_zero : |target.liabilityAUC - source.liabilityAUC| = 0 := by
+    rw [h_auc_eq]
+    simp
+  have h_r2_gap_pos : 0 < 1 - target.r2 / source.r2 := by
+    rw [h_r2_ratio]
+    linarith
+  exact ⟨h_auc_eq, h_auc_gap_zero, h_r2_ratio, h_r2_gap_pos⟩
 
 /-- **Cross-population R² ratio equals product of component ratios**.
 
@@ -463,17 +474,84 @@ theorem discrimination_preserved_calibration_lost
   simp only [abs_zero]
   exact abs_pos.mpr h_shift_sub
 
-/-- **Calibration is affected by allele frequency shifts (derived from drift model).**
-    Under drift, R² in the target is strictly lower than in the source
-    (from `drift_degrades_R2`). The calibration slope R²_target / R²_source
-    is therefore strictly less than 1, meaning calibration is disrupted.
-    This is derived from the structural `presentDayR2` definition. -/
+/-- Observable calibration slope induced by transporting a score from source
+    drift level `fstS` to target drift level `fstT` in the present-day `R²`
+    model. The source-calibrated baseline has slope `1`; deviations from `1`
+    quantify spread miscalibration after transport. -/
+noncomputable def driftCalibrationSlope (V_A V_E fstS fstT : ℝ) : ℝ :=
+  presentDayR2 V_A V_E fstT / presentDayR2 V_A V_E fstS
+
+/-- **Allele-frequency shift worsens calibration slope and Brier score.**
+    In the observable drift model, a larger target `F_ST` produces a real
+    calibration degradation on actual metrics:
+
+    - the target calibration slope is strictly below the ideal source baseline
+      `1`;
+    - the calibration-slope deviation from perfect calibration is therefore
+      strictly larger than the source value `0`, and equals exactly `1 - slope`;
+    - at any nondegenerate prevalence `π`, the observable target Brier score is
+      strictly worse than the source Brier score.
+
+    This is the metric-level calibration statement the surrounding prose needs,
+    not just an `R²` drop. -/
 theorem allele_freq_shift_disrupts_calibration
-    (V_A V_E fstS fstT : ℝ)
+    (π V_A V_E fstS fstT : ℝ)
+    (hπ0 : 0 < π) (hπ1 : π < 1)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst : fstS < fstT) (hfstT : fstT ≤ 1) :
-    presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS :=
-  drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT
+    (hfst : fstS < fstT)
+    (hfst_bounds : 0 ≤ fstS ∧ fstT < 1) :
+    driftCalibrationSlope V_A V_E fstS fstT < 1 ∧
+    calibrationSlopeDeviation 1 <
+      calibrationSlopeDeviation (driftCalibrationSlope V_A V_E fstS fstT) ∧
+    calibrationSlopeDeviation (driftCalibrationSlope V_A V_E fstS fstT) =
+      1 - driftCalibrationSlope V_A V_E fstS fstT ∧
+    sourceBrierFromObservables π (presentDayR2 V_A V_E fstS) <
+      targetBrierFromObservables π (presentDayR2 V_A V_E fstS) fstS fstT := by
+  have hfstS_lt_one : fstS < 1 := lt_trans hfst hfst_bounds.2
+  have hsrc_pos : 0 < presentDayR2 V_A V_E fstS := by
+    unfold presentDayR2 presentDayPGSVariance
+    have h_num : 0 < (1 - fstS) * V_A := by
+      have h_one_minus : 0 < 1 - fstS := by linarith
+      exact mul_pos h_one_minus hVA
+    have h_den : 0 < (1 - fstS) * V_A + V_E := by linarith
+    exact div_pos h_num h_den
+  have hsrc_lt_one : presentDayR2 V_A V_E fstS < 1 := by
+    unfold presentDayR2 presentDayPGSVariance
+    have h_num : 0 < (1 - fstS) * V_A := by
+      have h_one_minus : 0 < 1 - fstS := by linarith
+      exact mul_pos h_one_minus hVA
+    have h_den : 0 < (1 - fstS) * V_A + V_E := by linarith
+    rw [div_lt_one h_den]
+    linarith
+  have hsrc_range : 0 < presentDayR2 V_A V_E fstS ∧ presentDayR2 V_A V_E fstS < 1 :=
+    ⟨hsrc_pos, hsrc_lt_one⟩
+  have hslope_lt :
+      driftCalibrationSlope V_A V_E fstS fstT < 1 := by
+    unfold driftCalibrationSlope
+    exact portability_ratio_lt_one_of_positive_drift
+      V_A V_E fstS fstT hVA hVE hfst (le_of_lt hfst_bounds.2) hsrc_pos
+  have hslope_dev_pos :
+      calibrationSlopeDeviation 1 <
+        calibrationSlopeDeviation (driftCalibrationSlope V_A V_E fstS fstT) := by
+    unfold calibrationSlopeDeviation
+    rw [show (1 : ℝ) - 1 = 0 by ring, abs_zero]
+    have hneg : driftCalibrationSlope V_A V_E fstS fstT - 1 < 0 := by
+      linarith [hslope_lt]
+    rw [abs_of_neg hneg]
+    linarith
+  have hslope_dev :
+      calibrationSlopeDeviation (driftCalibrationSlope V_A V_E fstS fstT) =
+        1 - driftCalibrationSlope V_A V_E fstS fstT := by
+    unfold calibrationSlopeDeviation
+    rw [abs_of_neg]
+    · ring
+    · linarith [hslope_lt]
+  have hbrier :
+      sourceBrierFromObservables π (presentDayR2 V_A V_E fstS) <
+        targetBrierFromObservables π (presentDayR2 V_A V_E fstS) fstS fstT := by
+    exact targetBrier_strict_gt_source_of_observables
+      π (presentDayR2 V_A V_E fstS) fstS fstT hπ0 hπ1 hsrc_range hfst hfst_bounds
+  exact ⟨hslope_lt, hslope_dev_pos, hslope_dev, hbrier⟩
 
 /-- **Dimension-to-information ratio for a target adaptation task.**
     In an orthogonal Fisher model with `d` target-specific parameters and

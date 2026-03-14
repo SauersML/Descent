@@ -515,18 +515,298 @@ theorem more_populations_lower_cv_error
   linarith
 
 /-- **The bias-variance tradeoff in portability prediction.**
-    Simple models (e.g., linear in Fst) have high bias but low variance.
-    Complex models (e.g., spline in multiple PCs) have low bias but high variance.
-    When variance dominates (few populations), the simple model wins. -/
+    In leave-one-population-out CV, a model trained on `n_pops - 1`
+    populations has an estimation-variance penalty that scales inversely with
+    the available training populations. More complex portability models carry
+    larger variance penalties but smaller approximation bias. -/
+noncomputable def loPoTrainingPopulationCount (nPops : ℝ) : ℝ :=
+  nPops - 1
+
+/-- Variance penalty for a portability model of complexity `c` trained with
+    leave-one-population-out CV on `nPops` populations. The variance scale
+    `σ²_cv` converts one unit of model complexity into out-of-sample variance,
+    and the penalty shrinks like `1 / (nPops - 1)` because each fold trains on
+    `nPops - 1` populations. -/
+noncomputable def loPoVariancePenalty
+    (complexity varianceScale nPops : ℝ) : ℝ :=
+  varianceScale * complexity / loPoTrainingPopulationCount nPops
+
+/-- Leave-one-population-out CV error for a portability model with squared bias
+    `bias_sq`, complexity `complexity`, variance scale `varianceScale`, and
+    irreducible held-out noise `noise`. -/
+noncomputable def loPoCvPredictionError
+    (nPops bias_sq complexity varianceScale noise : ℝ) : ℝ :=
+  cvPredictionError bias_sq (loPoVariancePenalty complexity varianceScale nPops) noise
+
+/-- Critical total population count above which the complex portability model
+    overtakes the simple model in leave-one-population-out CV. -/
+noncomputable def criticalPopulationCountForComplexCV
+    (bias_sq_simple bias_sq_complex complexity_simple complexity_complex varianceScale : ℝ) : ℝ :=
+  1 + varianceScale * (complexity_complex - complexity_simple) /
+    (bias_sq_simple - bias_sq_complex)
+
+/-- **Two fixed portability models cross over at a critical population count.**
+    This is the abstract LOPO-CV crossover lemma for two already-specified
+    models with fixed approximation-bias terms and complexity-dependent
+    variance penalties. The biologically stronger theorem below specializes
+    it to an explicit model family where approximation bias decreases with
+    model complexity. -/
+theorem fixed_bias_models_cross_over_in_lopo_cv
+    (nPops bias_sq_simple bias_sq_complex complexity_simple complexity_complex varianceScale noise : ℝ)
+    (h_nPops : 1 < nPops)
+    (h_bias_complex_lower : bias_sq_complex < bias_sq_simple)
+    (h_complexity_higher : complexity_simple < complexity_complex)
+    (h_var_scale : 0 < varianceScale) :
+    (loPoCvPredictionError nPops bias_sq_simple complexity_simple varianceScale noise <
+        loPoCvPredictionError nPops bias_sq_complex complexity_complex varianceScale noise ↔
+      nPops < criticalPopulationCountForComplexCV
+        bias_sq_simple bias_sq_complex complexity_simple complexity_complex varianceScale) ∧
+    (loPoCvPredictionError nPops bias_sq_complex complexity_complex varianceScale noise <
+        loPoCvPredictionError nPops bias_sq_simple complexity_simple varianceScale noise ↔
+      criticalPopulationCountForComplexCV
+        bias_sq_simple bias_sq_complex complexity_simple complexity_complex varianceScale < nPops) := by
+  have h_train_pos : 0 < loPoTrainingPopulationCount nPops := by
+    unfold loPoTrainingPopulationCount
+    linarith
+  have h_bias_gap : 0 < bias_sq_simple - bias_sq_complex := by
+    linarith
+  have h_complexity_gap : 0 < complexity_complex - complexity_simple := by
+    linarith
+  have h_variance_gap : 0 < varianceScale * (complexity_complex - complexity_simple) := by
+    nlinarith
+  have h_simple_error :
+      loPoCvPredictionError nPops bias_sq_simple complexity_simple varianceScale noise <
+        loPoCvPredictionError nPops bias_sq_complex complexity_complex varianceScale noise ↔
+      (nPops - 1) * (bias_sq_simple - bias_sq_complex) <
+        varianceScale * (complexity_complex - complexity_simple) := by
+    unfold loPoCvPredictionError cvPredictionError loPoVariancePenalty loPoTrainingPopulationCount
+    constructor <;> intro h
+    · have hdiff :
+          bias_sq_simple - bias_sq_complex <
+            varianceScale * complexity_complex / (nPops - 1) -
+              varianceScale * complexity_simple / (nPops - 1) := by
+        nlinarith
+      have h_frac :
+          varianceScale * complexity_complex / (nPops - 1) -
+              varianceScale * complexity_simple / (nPops - 1) =
+            varianceScale * (complexity_complex - complexity_simple) / (nPops - 1) := by
+        ring_nf
+      rw [h_frac] at hdiff
+      have hmul :
+          (bias_sq_simple - bias_sq_complex) * (nPops - 1) <
+            varianceScale * (complexity_complex - complexity_simple) :=
+        (lt_div_iff₀ h_train_pos).1 hdiff
+      simpa [mul_comm, mul_left_comm, mul_assoc] using hmul
+    · have hmul :
+          (bias_sq_simple - bias_sq_complex) * (nPops - 1) <
+            varianceScale * (complexity_complex - complexity_simple) := by
+        simpa [mul_comm, mul_left_comm, mul_assoc] using h
+      have hdiff :
+          bias_sq_simple - bias_sq_complex <
+            varianceScale * (complexity_complex - complexity_simple) / (nPops - 1) :=
+        (lt_div_iff₀ h_train_pos).2 hmul
+      have h_frac :
+          varianceScale * (complexity_complex - complexity_simple) / (nPops - 1) =
+            varianceScale * complexity_complex / (nPops - 1) -
+              varianceScale * complexity_simple / (nPops - 1) := by
+        ring_nf
+      rw [h_frac] at hdiff
+      nlinarith
+  have h_complex_error :
+      loPoCvPredictionError nPops bias_sq_complex complexity_complex varianceScale noise <
+        loPoCvPredictionError nPops bias_sq_simple complexity_simple varianceScale noise ↔
+      varianceScale * (complexity_complex - complexity_simple) <
+        (nPops - 1) * (bias_sq_simple - bias_sq_complex) := by
+    unfold loPoCvPredictionError cvPredictionError loPoVariancePenalty loPoTrainingPopulationCount
+    constructor <;> intro h
+    · have hdiff :
+          varianceScale * complexity_complex / (nPops - 1) -
+              varianceScale * complexity_simple / (nPops - 1) <
+            bias_sq_simple - bias_sq_complex := by
+        nlinarith
+      have h_frac :
+          varianceScale * complexity_complex / (nPops - 1) -
+              varianceScale * complexity_simple / (nPops - 1) =
+            varianceScale * (complexity_complex - complexity_simple) / (nPops - 1) := by
+        ring_nf
+      rw [h_frac] at hdiff
+      have hmul :
+          varianceScale * (complexity_complex - complexity_simple) <
+            (bias_sq_simple - bias_sq_complex) * (nPops - 1) :=
+        (div_lt_iff₀ h_train_pos).1 hdiff
+      simpa [mul_comm, mul_left_comm, mul_assoc] using hmul
+    · have hmul :
+          varianceScale * (complexity_complex - complexity_simple) <
+            (bias_sq_simple - bias_sq_complex) * (nPops - 1) := by
+        simpa [mul_comm, mul_left_comm, mul_assoc] using h
+      have hdiff :
+          varianceScale * (complexity_complex - complexity_simple) / (nPops - 1) <
+            bias_sq_simple - bias_sq_complex :=
+        (div_lt_iff₀ h_train_pos).2 hmul
+      have h_frac :
+          varianceScale * (complexity_complex - complexity_simple) / (nPops - 1) =
+            varianceScale * complexity_complex / (nPops - 1) -
+              varianceScale * complexity_simple / (nPops - 1) := by
+        ring_nf
+      rw [h_frac] at hdiff
+      nlinarith
+  have h_simple_threshold :
+      (nPops - 1) * (bias_sq_simple - bias_sq_complex) <
+        varianceScale * (complexity_complex - complexity_simple) ↔
+      nPops < criticalPopulationCountForComplexCV
+        bias_sq_simple bias_sq_complex complexity_simple complexity_complex varianceScale := by
+    unfold criticalPopulationCountForComplexCV
+    constructor
+    · intro h
+      have hdiv :
+          nPops - 1 <
+            varianceScale * (complexity_complex - complexity_simple) /
+              (bias_sq_simple - bias_sq_complex) := by
+        exact (lt_div_iff₀ h_bias_gap).2 (by simpa [mul_comm, mul_left_comm, mul_assoc] using h)
+      linarith
+    · intro h
+      have hdiv :
+          nPops - 1 <
+            varianceScale * (complexity_complex - complexity_simple) /
+              (bias_sq_simple - bias_sq_complex) := by
+        linarith
+      have hmul :
+          (nPops - 1) * (bias_sq_simple - bias_sq_complex) <
+            varianceScale * (complexity_complex - complexity_simple) :=
+        (lt_div_iff₀ h_bias_gap).1 hdiv
+      simpa [mul_comm, mul_left_comm, mul_assoc] using hmul
+  have h_complex_threshold :
+      varianceScale * (complexity_complex - complexity_simple) <
+        (nPops - 1) * (bias_sq_simple - bias_sq_complex) ↔
+      criticalPopulationCountForComplexCV
+        bias_sq_simple bias_sq_complex complexity_simple complexity_complex varianceScale < nPops := by
+    unfold criticalPopulationCountForComplexCV
+    constructor
+    · intro h
+      have hdiv :
+          varianceScale * (complexity_complex - complexity_simple) /
+              (bias_sq_simple - bias_sq_complex) <
+            nPops - 1 := by
+        exact (div_lt_iff₀ h_bias_gap).2 (by simpa [mul_comm, mul_left_comm, mul_assoc] using h)
+      linarith
+    · intro h
+      have hdiv :
+          varianceScale * (complexity_complex - complexity_simple) /
+              (bias_sq_simple - bias_sq_complex) <
+            nPops - 1 := by
+        linarith [h_variance_gap]
+      have hmul :
+          varianceScale * (complexity_complex - complexity_simple) <
+            (bias_sq_simple - bias_sq_complex) * (nPops - 1) := by
+        simpa [mul_comm, mul_left_comm, mul_assoc] using (div_lt_iff₀ h_bias_gap).1 hdiv
+      simpa [mul_comm, mul_left_comm, mul_assoc] using hmul
+  exact ⟨h_simple_error.trans h_simple_threshold, h_complex_error.trans h_complex_threshold⟩
+
+/-- Approximation-bias law for a portability model family whose misspecification
+    error decays like `1 / complexity`. -/
+noncomputable def inverseComplexityBiasSq
+    (biasScale complexity : ℝ) : ℝ :=
+  biasScale / complexity
+
+/-- Leave-one-population-out CV error for a portability-model family with
+    inverse-complexity approximation bias and complexity-proportional variance. -/
+noncomputable def inverseComplexityLoPoCvError
+    (nPops complexity biasScale varianceScale noise : ℝ) : ℝ :=
+  loPoCvPredictionError nPops
+    (inverseComplexityBiasSq biasScale complexity) complexity varianceScale noise
+
+/-- Critical total-population count at which two model complexities in the
+    inverse-bias family have equal LOPO-CV error. -/
+noncomputable def criticalPopulationCountForInverseBiasFamily
+    (complexity_simple complexity_complex biasScale varianceScale : ℝ) : ℝ :=
+  1 + varianceScale * complexity_simple * complexity_complex / biasScale
+
+/-- **Optimal portability-model complexity depends on the number of populations.**
+    In this explicit portability-model family, approximation bias decreases
+    as `biasScale / complexity`, while leave-one-population-out estimation
+    variance increases as `varianceScale * complexity / (nPops - 1)`.
+
+    For two candidate model complexities, there is an exact population-count
+    crossover:
+    - with too few populations, the simpler model wins because variance dominates;
+    - with enough populations, the more complex model wins because approximation
+      bias dominates.
+
+    This is stronger than a free bias-variance inequality because the bias terms
+    are derived from the model-complexity law rather than inserted by hand. -/
 theorem optimal_complexity_depends_on_n_pops
-    (bias_simple variance_simple bias_complex variance_complex : ℝ)
-    (h_bias_complex_lower : bias_complex < bias_simple)
-    (h_var_complex_higher : variance_simple < variance_complex)
-    -- The variance gap exceeds the bias² gap (few populations regime)
-    (h_var_dominates : variance_complex - variance_simple >
-        bias_simple ^ 2 - bias_complex ^ 2) :
-    bias_simple ^ 2 + variance_simple < bias_complex ^ 2 + variance_complex := by
-  nlinarith
+    (nPops complexity_simple complexity_complex biasScale varianceScale noise : ℝ)
+    (h_nPops : 1 < nPops)
+    (h_complexity_simple_pos : 0 < complexity_simple)
+    (h_complexity_higher : complexity_simple < complexity_complex)
+    (h_bias_scale : 0 < biasScale)
+    (h_var_scale : 0 < varianceScale) :
+    (inverseComplexityLoPoCvError nPops complexity_simple biasScale varianceScale noise <
+        inverseComplexityLoPoCvError nPops complexity_complex biasScale varianceScale noise ↔
+      nPops < criticalPopulationCountForInverseBiasFamily
+        complexity_simple complexity_complex biasScale varianceScale) ∧
+    (inverseComplexityLoPoCvError nPops complexity_complex biasScale varianceScale noise <
+        inverseComplexityLoPoCvError nPops complexity_simple biasScale varianceScale noise ↔
+      criticalPopulationCountForInverseBiasFamily
+        complexity_simple complexity_complex biasScale varianceScale < nPops) := by
+  have h_complexity_complex_pos : 0 < complexity_complex := by
+    linarith
+  have h_bias_complex_lower :
+      inverseComplexityBiasSq biasScale complexity_complex <
+        inverseComplexityBiasSq biasScale complexity_simple := by
+    unfold inverseComplexityBiasSq
+    have hmul :
+        biasScale * complexity_simple < biasScale * complexity_complex := by
+      exact mul_lt_mul_of_pos_left h_complexity_higher h_bias_scale
+    exact (div_lt_div_iff₀ h_complexity_complex_pos h_complexity_simple_pos).2 hmul
+  have hbase := fixed_bias_models_cross_over_in_lopo_cv
+      nPops
+      (inverseComplexityBiasSq biasScale complexity_simple)
+      (inverseComplexityBiasSq biasScale complexity_complex)
+      complexity_simple complexity_complex varianceScale noise
+      h_nPops h_bias_complex_lower h_complexity_higher h_var_scale
+  have hthreshold :
+      criticalPopulationCountForComplexCV
+          (inverseComplexityBiasSq biasScale complexity_simple)
+          (inverseComplexityBiasSq biasScale complexity_complex)
+          complexity_simple complexity_complex varianceScale =
+        criticalPopulationCountForInverseBiasFamily
+          complexity_simple complexity_complex biasScale varianceScale := by
+    have hgap_ne : complexity_complex - complexity_simple ≠ 0 := by
+      linarith
+    have hden :
+        inverseComplexityBiasSq biasScale complexity_simple -
+            inverseComplexityBiasSq biasScale complexity_complex =
+          biasScale * (complexity_complex - complexity_simple) /
+            (complexity_simple * complexity_complex) := by
+      unfold inverseComplexityBiasSq
+      field_simp [ne_of_gt h_complexity_simple_pos, ne_of_gt h_complexity_complex_pos]
+    unfold criticalPopulationCountForComplexCV
+      criticalPopulationCountForInverseBiasFamily
+    rw [hden]
+    field_simp [ne_of_gt h_complexity_simple_pos, ne_of_gt h_complexity_complex_pos,
+      ne_of_gt h_bias_scale, hgap_ne]
+  constructor
+  · constructor <;> intro h
+    · have h' := (hbase.1).1 h
+      simpa [hthreshold] using h'
+    · have h' : nPops <
+          criticalPopulationCountForComplexCV
+            (inverseComplexityBiasSq biasScale complexity_simple)
+            (inverseComplexityBiasSq biasScale complexity_complex)
+            complexity_simple complexity_complex varianceScale := by
+        simpa [hthreshold] using h
+      exact (hbase.1).2 h'
+  · constructor <;> intro h
+    · have h' := (hbase.2).1 h
+      simpa [hthreshold] using h'
+    · have h' :
+          criticalPopulationCountForComplexCV
+            (inverseComplexityBiasSq biasScale complexity_simple)
+            (inverseComplexityBiasSq biasScale complexity_complex)
+            complexity_simple complexity_complex varianceScale < nPops := by
+        simpa [hthreshold] using h
+      exact (hbase.2).2 h'
 
 end CrossValidation
 
@@ -540,19 +820,125 @@ that can be compared with Wang et al.'s findings.
 
 section GeneralPredictions
 
-/-- **Portability ratio is bounded by neutral prediction times LD factor.**
-    For any trait, the predicted portability ratio from the neutral model
-    combined with LD tagging adjustment gives a product in (0, 1). -/
-theorem portability_prediction_bounded
-    (neutral_ratio ld_factor : ℝ)
-    (h_nr : 0 < neutral_ratio) (h_nr_le : neutral_ratio < 1)
-    (h_ld : 0 < ld_factor) (h_ld_le : ld_factor ≤ 1) :
-    0 < neutral_ratio * ld_factor ∧ neutral_ratio * ld_factor < 1 := by
-  constructor
-  · exact mul_pos h_nr h_ld
-  · calc neutral_ratio * ld_factor ≤ neutral_ratio * 1 := by nlinarith
-      _ = neutral_ratio := mul_one _
-      _ < 1 := h_nr_le
+/-- Observable portability-ratio prediction combining neutral drift, LD tagging,
+    and cross-population effect conservation.
+
+    The first factor is the neutral-drift target/source `R²` ratio implied by
+    the source `R²` and source/target `F_ST`. The second factor, `ldFactor`,
+    accounts for LD tagging retention in the target population. The third
+    factor, `ρ²`, accounts for loss of portability from cross-population effect
+    decorrelation. -/
+noncomputable def empiricalPortabilityRatio
+    (r2Source fstSource fstTarget ldFactor rho : ℝ) : ℝ :=
+  (targetR2FromObservables r2Source fstSource fstTarget / r2Source) * (ldFactor * rho ^ 2)
+
+/-- **Empirical portability prediction lies strictly below the neutral drift baseline.**
+    For a fixed source score and ancestry pair, any additional LD loss
+    (`ldFactor ≤ 1`) together with imperfect cross-population effect
+    conservation (`ρ < 1`) strictly attenuates the observable neutral-drift
+    portability ratio. This is a directly testable prediction: observed
+    target/source `R²` should fall below the `F_ST`-only neutral benchmark by a
+    multiplicative LD-and-effect-correlation factor. -/
+theorem empirical_portability_ratio_lt_neutral_drift_prediction
+    (r2Source fstSource fstTarget ldFactor rho : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (h_ld : 0 < ldFactor) (h_ld_le : ldFactor ≤ 1)
+    (h_rho : 0 ≤ rho) (h_rho_lt : rho < 1) :
+    empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor rho <
+      targetR2FromObservables r2Source fstSource fstTarget / r2Source ∧
+    empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor rho < 1 := by
+  rcases h_r2 with ⟨hr2_pos, hr2_lt_one⟩
+  rcases h_fst_bounds with ⟨hfstS_nonneg, hfstT_lt_one⟩
+  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
+    sourceVarianceFromR2_pos r2Source ⟨hr2_pos, hr2_lt_one⟩
+  have hvT_pos :
+      0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget := by
+    exact targetVarianceFromSource_pos (sourceVarianceFromR2 r2Source)
+      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
+  have h_target_pos : 0 < targetR2FromObservables r2Source fstSource fstTarget := by
+    unfold targetR2FromObservables r2FromVarianceScaleOne
+    have hden : 0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget + 1 := by
+      linarith
+    exact div_pos hvT_pos hden
+  have h_neutral_pos :
+      0 < targetR2FromObservables r2Source fstSource fstTarget / r2Source := by
+    exact div_pos h_target_pos hr2_pos
+  have h_neutral_lt_one :
+      targetR2FromObservables r2Source fstSource fstTarget / r2Source < 1 := by
+    exact portability_ratio_from_observables r2Source fstSource fstTarget
+      ⟨hr2_pos, hr2_lt_one⟩ h_fst ⟨hfstS_nonneg, hfstT_lt_one⟩
+  have h_sq_lt_one : rho ^ 2 < 1 := by
+    nlinarith [sq_nonneg rho]
+  have h_atten_nonneg : 0 ≤ ldFactor * rho ^ 2 := by
+    exact mul_nonneg (le_of_lt h_ld) (sq_nonneg rho)
+  have h_attentuation_lt_one : ldFactor * rho ^ 2 < 1 := by
+    have h_le : ldFactor * rho ^ 2 ≤ 1 * rho ^ 2 := by
+      exact mul_le_mul_of_nonneg_right h_ld_le (sq_nonneg rho)
+    have h_lt : 1 * rho ^ 2 < 1 := by
+      simpa using h_sq_lt_one
+    exact lt_of_le_of_lt h_le h_lt
+  have h_pred_lt_neutral :
+      empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor rho <
+        targetR2FromObservables r2Source fstSource fstTarget / r2Source := by
+    unfold empiricalPortabilityRatio
+    have hmul :=
+      mul_lt_mul_of_pos_left h_attentuation_lt_one h_neutral_pos
+    simpa [mul_assoc] using hmul
+  have h_pred_lt_one :
+      empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor rho < 1 := by
+    exact lt_trans h_pred_lt_neutral h_neutral_lt_one
+  exact ⟨h_pred_lt_neutral, h_pred_lt_one⟩
+
+/-- **Traits or target cohorts with better LD retention and more conserved effects
+    are predicted to be more portable.**
+    At fixed source `R²` and source/target divergence, the empirical
+    portability ratio is strictly ordered by the product `ldFactor × ρ²`. This
+    is the comparative prediction relevant for simulation or held-out
+    validation: once the ancestry pair is fixed, better LD sharing and higher
+    cross-population effect correlation imply higher target/source `R²`. -/
+theorem empirical_portability_ratio_strictly_orders_by_ld_and_effect_correlation
+    (r2Source fstSource fstTarget ldWorse ldBetter rhoWorse rhoBetter : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (h_ldWorse : 0 < ldWorse)
+    (h_ld_order : ldWorse ≤ ldBetter)
+    (h_rhoWorse : 0 ≤ rhoWorse)
+    (h_rho_order : rhoWorse < rhoBetter) :
+    empiricalPortabilityRatio r2Source fstSource fstTarget ldWorse rhoWorse <
+      empiricalPortabilityRatio r2Source fstSource fstTarget ldBetter rhoBetter := by
+  rcases h_r2 with ⟨hr2_pos, hr2_lt_one⟩
+  rcases h_fst_bounds with ⟨hfstS_nonneg, hfstT_lt_one⟩
+  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
+    sourceVarianceFromR2_pos r2Source ⟨hr2_pos, hr2_lt_one⟩
+  have hvT_pos :
+      0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget := by
+    exact targetVarianceFromSource_pos (sourceVarianceFromR2 r2Source)
+      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
+  have h_target_pos : 0 < targetR2FromObservables r2Source fstSource fstTarget := by
+    unfold targetR2FromObservables r2FromVarianceScaleOne
+    have hden : 0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget + 1 := by
+      linarith
+    exact div_pos hvT_pos hden
+  have h_neutral_pos :
+      0 < targetR2FromObservables r2Source fstSource fstTarget / r2Source := by
+    exact div_pos h_target_pos hr2_pos
+  have h_sq_order : rhoWorse ^ 2 < rhoBetter ^ 2 := by
+    nlinarith [sq_nonneg rhoWorse, sq_nonneg rhoBetter]
+  have h_worse_att_lt :
+      ldWorse * rhoWorse ^ 2 < ldWorse * rhoBetter ^ 2 := by
+    exact mul_lt_mul_of_pos_left h_sq_order h_ldWorse
+  have h_better_att_ge :
+      ldWorse * rhoBetter ^ 2 ≤ ldBetter * rhoBetter ^ 2 := by
+    exact mul_le_mul_of_nonneg_right h_ld_order (sq_nonneg rhoBetter)
+  have h_att_order :
+      ldWorse * rhoWorse ^ 2 < ldBetter * rhoBetter ^ 2 := by
+    exact lt_of_lt_of_le h_worse_att_lt h_better_att_ge
+  unfold empiricalPortabilityRatio
+  have hmul := mul_lt_mul_of_pos_left h_att_order h_neutral_pos
+  simpa [mul_assoc] using hmul
 
 /-- Neutral portability prediction adjusted by a squared effect-correlation penalty. -/
 def selectionAdjustedPortabilityRatio (neutral_ratio rho : ℝ) : ℝ :=

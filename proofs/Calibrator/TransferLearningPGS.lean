@@ -369,28 +369,133 @@ theorem portability_bound_diagonal_ld {m : ℕ}
   simpa [ldEffectGeneticCorrelation_standardizedDiagonalLD_eq_effectGeneticCorrelation] using
     h_bound
 
-/-- **The portability bound is tight when the PGS is optimal.**
-    When R²_source = h²_source (the PGS captures all heritability in source),
-    R²_target = rg² × R²_source exactly (not just ≤).
-    This is the equality case of Cauchy-Schwarz, achieved when
-    β_target = rg × β_source (proportional effect sizes). -/
-theorem portability_bound_tight_when_proportional {m : ℕ}
-    (β_s : Fin m → ℝ) (rg : ℝ) :
-    -- When β_target = rg × β_source:
-    let β_t := fun i => rg * β_s i
-    (∑ i, β_s i * β_t i) ^ 2 =
-      (∑ i, β_s i ^ 2) * (∑ i, β_t i ^ 2) := by
-  simp only
-  -- Σ β_s × (rg × β_s) = rg × Σ β_s²
-  have h1 : (∑ i : Fin m, β_s i * (rg * β_s i)) = rg * ∑ i, β_s i ^ 2 := by
-    simp [Finset.mul_sum, sq]
-    congr 1; ext i; ring
-  rw [h1]
-  -- Σ (rg × β_s)² = rg² × Σ β_s²
-  have h2 : (∑ i : Fin m, (rg * β_s i) ^ 2) = rg ^ 2 * ∑ i, β_s i ^ 2 := by
-    simp [mul_pow, Finset.mul_sum]
-  rw [h2]
+/-- Proportional effect vectors scale additive genetic variance by the squared
+    proportionality constant. -/
+theorem additiveGeneticVariance_proportional {m : ℕ}
+    (β : Fin m → ℝ) (c : ℝ) :
+    additiveGeneticVariance (fun i => c * β i) = c ^ 2 * additiveGeneticVariance β := by
+  unfold additiveGeneticVariance
+  calc
+    ∑ i : Fin m, (c * β i) ^ 2 = ∑ i : Fin m, c ^ 2 * (β i ^ 2) := by
+      apply Finset.sum_congr rfl
+      intro i _
+      ring
+    _ = c ^ 2 * ∑ i : Fin m, β i ^ 2 := by
+      rw [← Finset.mul_sum]
+    _ = c ^ 2 * additiveGeneticVariance β := by
+      rfl
+
+/-- Proportional effect vectors scale additive heritability by the squared
+    proportionality constant. -/
+theorem additiveHeritability_proportional {m : ℕ}
+    (β : Fin m → ℝ) (c var_y : ℝ) :
+    additiveHeritability (fun i => c * β i) var_y =
+      c ^ 2 * additiveHeritability β var_y := by
+  unfold additiveHeritability
+  rw [additiveGeneticVariance_proportional]
   ring
+
+/-- If target effects are a nonzero scalar multiple of source effects, their
+    squared effect correlation is exactly one. -/
+theorem effectGeneticCorrelation_sq_one_of_proportional {m : ℕ}
+    (β : Fin m → ℝ) (c : ℝ)
+    (h_beta_nonzero : 0 < additiveGeneticVariance β)
+    (h_c : c ≠ 0) :
+    (effectGeneticCorrelation β (fun i => c * β i)) ^ 2 = 1 := by
+  have h_cross :
+      (∑ i : Fin m, β i * (c * β i)) = c * additiveGeneticVariance β := by
+    unfold additiveGeneticVariance
+    calc
+      ∑ i : Fin m, β i * (c * β i) = ∑ i : Fin m, c * (β i ^ 2) := by
+        apply Finset.sum_congr rfl
+        intro i _
+        ring
+      _ = c * ∑ i : Fin m, β i ^ 2 := by
+        rw [← Finset.mul_sum]
+      _ = c * additiveGeneticVariance β := by
+        rfl
+  have h_t_nonzero :
+      0 < additiveGeneticVariance (fun i => c * β i) := by
+    rw [additiveGeneticVariance_proportional]
+    have h_c_sq_pos : 0 < c ^ 2 := by
+      nlinarith [sq_pos_iff.mpr h_c]
+    exact mul_pos h_c_sq_pos h_beta_nonzero
+  have h_beta_ne : additiveGeneticVariance β ≠ 0 := ne_of_gt h_beta_nonzero
+  have h_c_sq_ne : c ^ 2 ≠ 0 := by
+    nlinarith [sq_pos_iff.mpr h_c]
+  unfold effectGeneticCorrelation
+  rw [h_cross]
+  change
+    (c * additiveGeneticVariance β /
+        Real.sqrt
+          (additiveGeneticVariance β *
+            ∑ i : Fin m, (fun i => c * β i) i ^ 2)) ^ 2 = 1
+  change
+    (c * additiveGeneticVariance β /
+        Real.sqrt
+          (additiveGeneticVariance β *
+            additiveGeneticVariance (fun i => c * β i))) ^ 2 = 1
+  rw [additiveGeneticVariance_proportional, div_pow]
+  rw [Real.sq_sqrt]
+  · field_simp [h_beta_ne, h_c_sq_ne]
+  · positivity
+
+/-- **The diagonal-LD portability bound is tight for proportional effects.**
+    If the target effect vector is exactly `rg × β_source`, then the transported
+    target score achieves
+
+    `R²_target = rg² × R²_source`
+
+    exactly in the standardized diagonal-LD model for the source-truth score.
+    This is the equality case of Cauchy-Schwarz expressed on the actual `R²`
+    objects, not only on the underlying inner-product identity. -/
+theorem portability_bound_tight_when_proportional {m : ℕ}
+    (β_s : Fin m → ℝ) (rg var_y : ℝ)
+    (h_var_y : 0 < var_y)
+    (h_s_nonzero : 0 < additiveGeneticVariance β_s)
+    (h_rg : rg ≠ 0) :
+    transportedTargetR2DiagonalLD β_s (fun i => rg * β_s i) var_y =
+      rg ^ 2 * sourceSelfR2DiagonalLD β_s var_y := by
+  have h_t_nonzero :
+      0 < additiveGeneticVariance (fun i => rg * β_s i) := by
+    rw [additiveGeneticVariance_proportional]
+    have h_rg_sq_pos : 0 < rg ^ 2 := by
+      nlinarith [sq_pos_iff.mpr h_rg]
+    exact mul_pos h_rg_sq_pos h_s_nonzero
+  rw [transportedTargetR2_eq_rgSq_mul_targetH2_diagonalLD
+    β_s (fun i => rg * β_s i) var_y h_var_y h_s_nonzero h_t_nonzero]
+  rw [effectGeneticCorrelation_sq_one_of_proportional β_s rg h_s_nonzero h_rg]
+  rw [one_mul]
+  rw [additiveHeritability_proportional]
+  rw [sourceOptimalR2_eq_additiveHeritability β_s var_y h_var_y h_s_nonzero]
+
+/-- Source-truth diagonal-LD `R²` is positive for a nonzero additive signal and
+    positive phenotype variance. -/
+theorem sourceSelfR2DiagonalLD_pos {m : ℕ}
+    (β : Fin m → ℝ) (var_y : ℝ)
+    (h_var_y : 0 < var_y)
+    (h_beta_nonzero : 0 < additiveGeneticVariance β) :
+    0 < sourceSelfR2DiagonalLD β var_y := by
+  rw [sourceOptimalR2_eq_additiveHeritability β var_y h_var_y h_beta_nonzero]
+  unfold additiveHeritability
+  exact div_pos h_beta_nonzero h_var_y
+
+/-- **Exact portability-ratio equality for proportional effects.**
+    In the standardized diagonal-LD source-truth setting, if
+    `β_target = rg × β_source`, then the transported/source `R²` ratio is
+    exactly `rg²`. This is the direct portability-ratio statement most useful
+    for interpretation or comparison with observed target/source `R²` ratios. -/
+theorem portability_ratio_tight_when_proportional {m : ℕ}
+    (β_s : Fin m → ℝ) (rg var_y : ℝ)
+    (h_var_y : 0 < var_y)
+    (h_s_nonzero : 0 < additiveGeneticVariance β_s)
+    (h_rg : rg ≠ 0) :
+    transportedTargetR2DiagonalLD β_s (fun i => rg * β_s i) var_y /
+      sourceSelfR2DiagonalLD β_s var_y = rg ^ 2 := by
+  have h_source_pos : 0 < sourceSelfR2DiagonalLD β_s var_y :=
+    sourceSelfR2DiagonalLD_pos β_s var_y h_var_y h_s_nonzero
+  rw [portability_bound_tight_when_proportional β_s rg var_y h_var_y h_s_nonzero h_rg]
+  rw [mul_div_assoc, div_self (ne_of_gt h_source_pos), mul_one]
 
 end PGSPortabilityDerivation
 
@@ -653,17 +758,189 @@ section FeatureRepresentation
     Projecting genotypes onto top PCs separates ancestry from
     trait-relevant variation. Removing top PCs reduces ancestry
     signal but may also remove trait signal.
-    Net target error = (bias due to ancestry) + (signal loss).
-    There is a tradeoff: the net error may increase or decrease. -/
+    Net target error is modeled as ancestry-induced bias plus a weighted
+    penalty for discarded trait signal. -/
+def pcaSignalLossPenalty
+    (signalBaseline signalRetained lossWeight : ℝ) : ℝ :=
+  lossWeight * (signalBaseline - signalRetained)
+
+/-- Reduction in ancestry-induced target bias achieved by removing ancestry PCs. -/
+def pcaBiasReduction
+    (ancestryBiasWith ancestryBiasWithout : ℝ) : ℝ :=
+  ancestryBiasWith - ancestryBiasWithout
+
+/-- Linearized target error after PCA adjustment: ancestry bias plus a
+    weighted trait-signal loss penalty. -/
+def pcaNetTargetError
+    (ancestryBias signalBaseline signalRetained lossWeight : ℝ) : ℝ :=
+  ancestryBias + pcaSignalLossPenalty signalBaseline signalRetained lossWeight
+
+/-- Exact error difference induced by removing ancestry PCs. -/
+theorem pca_target_error_difference
+    (ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight : ℝ) :
+    pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight -
+        pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight =
+      pcaSignalLossPenalty signal_with signal_without lossWeight -
+        pcaBiasReduction ancestry_bias_with ancestry_bias_without := by
+  unfold pcaNetTargetError pcaSignalLossPenalty pcaBiasReduction
+  ring
+
+/-- **PCA removal improves target error iff bias reduction exceeds weighted signal loss.**
+    This is the exact total-error criterion: PC removal helps iff the
+    ancestry-bias reduction is larger than the weighted trait-signal loss,
+    is neutral iff they are equal, and hurts iff the loss term is larger. -/
 theorem pca_tradeoff
-    (ancestry_bias_with ancestry_bias_without signal_with signal_without : ℝ)
-    (h_less_bias : ancestry_bias_without < ancestry_bias_with)
-    (h_less_signal : signal_without < signal_with) :
-    -- The bias reduction is a genuine improvement component
-    0 < ancestry_bias_with - ancestry_bias_without ∧
-    -- But the signal loss is a genuine cost
-      0 < signal_with - signal_without := by
-  constructor <;> linarith
+    (ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight : ℝ) :
+    (pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight <
+        pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight ↔
+      pcaSignalLossPenalty signal_with signal_without lossWeight <
+        pcaBiasReduction ancestry_bias_with ancestry_bias_without) ∧
+    (pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight ≤
+        pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight ↔
+      pcaSignalLossPenalty signal_with signal_without lossWeight ≤
+        pcaBiasReduction ancestry_bias_with ancestry_bias_without) ∧
+    (pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight <
+        pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight ↔
+      pcaBiasReduction ancestry_bias_with ancestry_bias_without <
+        pcaSignalLossPenalty signal_with signal_without lossWeight) ∧
+    (pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight =
+        pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight ↔
+      pcaSignalLossPenalty signal_with signal_without lossWeight =
+        pcaBiasReduction ancestry_bias_with ancestry_bias_without) := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · have hdiff := pca_target_error_difference
+      ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight
+    constructor <;> intro h
+    · have hsub :
+          pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight -
+              pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight < 0 := by
+        linarith
+      rw [hdiff] at hsub
+      nlinarith
+    · have hsub :
+          pcaSignalLossPenalty signal_with signal_without lossWeight -
+              pcaBiasReduction ancestry_bias_with ancestry_bias_without < 0 := by
+        nlinarith
+      rw [← hdiff] at hsub
+      linarith
+  · have hdiff := pca_target_error_difference
+      ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight
+    constructor <;> intro h
+    · have hsub :
+          pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight -
+              pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight ≤ 0 := by
+        linarith
+      rw [hdiff] at hsub
+      linarith
+    · have hsub :
+          pcaSignalLossPenalty signal_with signal_without lossWeight -
+              pcaBiasReduction ancestry_bias_with ancestry_bias_without ≤ 0 := by
+        linarith
+      rw [← hdiff] at hsub
+      linarith
+  · have hdiff := pca_target_error_difference
+      ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight
+    constructor <;> intro h
+    · have hsub :
+          0 <
+            pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight -
+              pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight := by
+        linarith
+      rw [hdiff] at hsub
+      linarith
+    · have hsub :
+          0 < pcaSignalLossPenalty signal_with signal_without lossWeight -
+              pcaBiasReduction ancestry_bias_with ancestry_bias_without := by
+        linarith
+      rw [← hdiff] at hsub
+      linarith
+  · have hdiff := pca_target_error_difference
+      ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight
+    constructor <;> intro h
+    · have hsub :
+          pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight -
+              pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight = 0 := by
+        linarith
+      rw [hdiff] at hsub
+      nlinarith
+    · have hsub :
+          pcaSignalLossPenalty signal_with signal_without lossWeight -
+              pcaBiasReduction ancestry_bias_with ancestry_bias_without = 0 := by
+        linarith
+      rw [← hdiff] at hsub
+      linarith
+
+/-- When the ancestry-bias reduction and signal loss are both positive,
+    the total-error tradeoff is controlled by a single loss-weight threshold. -/
+theorem pca_tradeoff_threshold_on_lossWeight
+    (ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight : ℝ)
+    (h_signal_gap : signal_without < signal_with) :
+    (pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight <
+        pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight ↔
+      lossWeight <
+        pcaBiasReduction ancestry_bias_with ancestry_bias_without /
+          (signal_with - signal_without)) ∧
+    (pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight =
+        pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight ↔
+      lossWeight =
+        pcaBiasReduction ancestry_bias_with ancestry_bias_without /
+          (signal_with - signal_without)) := by
+  have hgap_pos : 0 < signal_with - signal_without := sub_pos.mpr h_signal_gap
+  have hgap_ne : signal_with - signal_without ≠ 0 := ne_of_gt hgap_pos
+  rcases pca_tradeoff ancestry_bias_with ancestry_bias_without
+      signal_with signal_without lossWeight with
+      ⟨hImprove, _, _, hNeutral⟩
+  refine ⟨?_, ?_⟩
+  · constructor <;> intro h
+    · have hpenalty := hImprove.mp h
+      unfold pcaSignalLossPenalty at hpenalty
+      by_contra hnot
+      have hge :
+          pcaBiasReduction ancestry_bias_with ancestry_bias_without /
+              (signal_with - signal_without) ≤ lossWeight := by
+        linarith
+      have hmul :
+          (pcaBiasReduction ancestry_bias_with ancestry_bias_without /
+              (signal_with - signal_without)) * (signal_with - signal_without) ≤
+            lossWeight * (signal_with - signal_without) := by
+        exact mul_le_mul_of_nonneg_right hge hgap_pos.le
+      have hdiv :
+          (pcaBiasReduction ancestry_bias_with ancestry_bias_without /
+              (signal_with - signal_without)) * (signal_with - signal_without) =
+            pcaBiasReduction ancestry_bias_with ancestry_bias_without := by
+        field_simp [hgap_ne]
+      rw [hdiv] at hmul
+      linarith
+    · have hpenalty :
+          lossWeight * (signal_with - signal_without) <
+            pcaBiasReduction ancestry_bias_with ancestry_bias_without := by
+        have hmul :
+            lossWeight * (signal_with - signal_without) <
+              (pcaBiasReduction ancestry_bias_with ancestry_bias_without /
+                  (signal_with - signal_without)) * (signal_with - signal_without) := by
+          exact mul_lt_mul_of_pos_right h hgap_pos
+        have hdiv :
+            (pcaBiasReduction ancestry_bias_with ancestry_bias_without /
+                (signal_with - signal_without)) * (signal_with - signal_without) =
+              pcaBiasReduction ancestry_bias_with ancestry_bias_without := by
+          field_simp [hgap_ne]
+        rw [hdiv] at hmul
+        exact hmul
+      exact hImprove.mpr (by
+        unfold pcaSignalLossPenalty
+        simpa [sub_eq_add_neg, mul_comm, mul_left_comm, mul_assoc] using hpenalty)
+  · constructor <;> intro h
+    · have hpenalty := hNeutral.mp h
+      unfold pcaSignalLossPenalty at hpenalty
+      exact (eq_div_iff hgap_ne).2 (by
+        simpa [sub_eq_add_neg, mul_comm, mul_left_comm, mul_assoc] using hpenalty)
+    · have hpenalty :
+          lossWeight * (signal_with - signal_without) =
+            pcaBiasReduction ancestry_bias_with ancestry_bias_without := by
+        exact (eq_div_iff hgap_ne).1 h
+      exact hNeutral.mpr (by
+        unfold pcaSignalLossPenalty
+        simpa [sub_eq_add_neg, mul_comm, mul_left_comm, mul_assoc] using hpenalty)
 
 /-- **A local PC-removal minimum beats the adjacent choices.**
     This theorem does not prove existence of a globally optimal number of
