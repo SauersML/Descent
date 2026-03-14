@@ -488,30 +488,367 @@ theorem miscalibration_changes_decisions
 noncomputable def nri (up_events down_events up_nonevents down_nonevents n_events n_nonevents : ℝ) : ℝ :=
   (up_events - down_events) / n_events + (down_nonevents - up_nonevents) / n_nonevents
 
-/-- Positive NRI means recalibration improves classification. -/
+/-- **Downward reclassification at a clinical decision threshold.**
+    A downward intercept correction of size `δ > 0` moves an individual from
+    high risk to low risk exactly when the baseline score lies in the threshold
+    band `(threshold, threshold + δ]`. -/
+theorem down_reclassified_after_downward_shift_iff_mem_band
+    (threshold score δ : ℝ) :
+    classifiedHighRisk threshold score ∧
+      ¬ classifiedHighRisk threshold (score - δ) ↔
+      score ∈ Set.Ioc threshold (threshold + δ) := by
+  unfold classifiedHighRisk
+  constructor
+  · intro h
+    rcases h with ⟨h_high, h_not_high_after⟩
+    constructor
+    · exact h_high
+    · have h_after_le : score - δ ≤ threshold := not_lt.mp h_not_high_after
+      linarith
+  · intro h
+    rcases h with ⟨h_high, h_band_upper⟩
+    constructor
+    · exact h_high
+    · have h_after_le : score - δ ≤ threshold := by
+        linarith
+      exact not_lt.mpr h_after_le
+
+/-- **Threshold-band reclassification rate.**
+    Under a downward intercept correction by `δ > 0`, this is the fraction of
+    a class-specific score law lying in the band `(threshold, threshold + δ]`.
+    It is exactly the reclassification rate for that class. -/
+noncomputable def thresholdBandRate
+    (μ : Measure ℝ) [IsProbabilityMeasure μ] (threshold δ : ℝ) : ℝ :=
+  (μ (Set.Ioc threshold (threshold + δ))).toReal
+
+/-- **Downward reclassification rate under intercept recalibration.**
+    This is the probability that a score is above threshold before
+    recalibration but at or below threshold after subtracting `δ`. -/
+noncomputable def downReclassificationRate
+    (μ : Measure ℝ) [IsProbabilityMeasure μ] (threshold δ : ℝ) : ℝ :=
+  (μ {score | classifiedHighRisk threshold score ∧
+      ¬ classifiedHighRisk threshold (score - δ)}).toReal
+
+/-- Downward reclassification is exactly threshold-band mass. -/
+theorem downReclassificationRate_eq_thresholdBandRate
+    (μ : Measure ℝ) [IsProbabilityMeasure μ] (threshold δ : ℝ) :
+    downReclassificationRate μ threshold δ = thresholdBandRate μ threshold δ := by
+  unfold downReclassificationRate thresholdBandRate
+  have hset :
+      {score | classifiedHighRisk threshold score ∧
+          ¬ classifiedHighRisk threshold (score - δ)} =
+        Set.Ioc threshold (threshold + δ) := by
+    ext score
+    exact down_reclassified_after_downward_shift_iff_mem_band threshold score δ
+  rw [hset]
+
+/-- **NRI induced by a downward intercept recalibration.**
+    For an over-predicting model corrected by subtracting `δ > 0` from every
+    score, only downward reclassifications can occur. Event NRI is therefore
+    the sensitivity loss, while non-event NRI is the specificity gain. -/
+noncomputable def nriFromDownwardInterceptRecalibration
+    (μevent μnonevent : Measure ℝ)
+    [IsProbabilityMeasure μevent] [IsProbabilityMeasure μnonevent]
+    (threshold δ : ℝ) : ℝ :=
+  nri
+    0 (downReclassificationRate μevent threshold δ)
+    0 (downReclassificationRate μnonevent threshold δ)
+    1 1
+
+/-- Exact NRI formula for a downward intercept correction. -/
+theorem nriFromDownwardInterceptRecalibration_eq_band_difference
+    (μevent μnonevent : Measure ℝ)
+    [IsProbabilityMeasure μevent] [IsProbabilityMeasure μnonevent]
+    (threshold δ : ℝ) :
+    nriFromDownwardInterceptRecalibration μevent μnonevent threshold δ =
+      thresholdBandRate μnonevent threshold δ -
+        thresholdBandRate μevent threshold δ := by
+  unfold nriFromDownwardInterceptRecalibration nri
+  rw [downReclassificationRate_eq_thresholdBandRate μevent threshold δ]
+  rw [downReclassificationRate_eq_thresholdBandRate μnonevent threshold δ]
+  ring
+
+/-- **Positive NRI means recalibration improves threshold classification.**
+    For a downward intercept recalibration, positive NRI is equivalent to the
+    moved threshold band `(threshold, threshold + δ]` containing a larger
+    fraction of non-events than of events. Equivalently, the specificity gain
+    exceeds the sensitivity loss. -/
 theorem positive_nri_means_improvement
-    (up_e down_e up_ne down_ne n_e n_ne : ℝ)
-    (h_events : down_e < up_e) (h_nonevents : up_ne < down_ne)
-    (h_ne : 0 < n_e) (h_nne : 0 < n_ne) :
-    0 < nri up_e down_e up_ne down_ne n_e n_ne := by
-  unfold nri
-  apply add_pos
-  · exact div_pos (by linarith) h_ne
-  · exact div_pos (by linarith) h_nne
+    (μevent μnonevent : Measure ℝ)
+    [IsProbabilityMeasure μevent] [IsProbabilityMeasure μnonevent]
+    (threshold δ : ℝ) :
+    0 < nriFromDownwardInterceptRecalibration μevent μnonevent threshold δ ↔
+      thresholdBandRate μevent threshold δ <
+        thresholdBandRate μnonevent threshold δ := by
+  rw [nriFromDownwardInterceptRecalibration_eq_band_difference
+    μevent μnonevent threshold δ]
+  constructor <;> intro h <;> linarith
+
+/-- **Outcome prevalence among reclassified patients.**
+    Let `π` be the cohort event prevalence. Among the patients moved across the
+    decision threshold by a downward intercept recalibration, this is the event
+    rate in the moved threshold band `(threshold, threshold + δ]`. -/
+noncomputable def reclassifiedBandEventPrevalence
+    (π : ℝ)
+    (μevent μnonevent : Measure ℝ)
+    [IsProbabilityMeasure μevent] [IsProbabilityMeasure μnonevent]
+    (threshold δ : ℝ) : ℝ :=
+  (π * thresholdBandRate μevent threshold δ) /
+    (π * thresholdBandRate μevent threshold δ +
+      (1 - π) * thresholdBandRate μnonevent threshold δ)
+
+/-- **Positive NRI means the reclassified band is lower risk than the cohort.**
+    For a downward intercept recalibration, positive NRI is equivalent to the
+    patients moved from high risk to low risk having event prevalence below the
+    overall cohort prevalence `π`. This is the clinically useful interpretation:
+    threshold reclassification helps exactly when the patients being moved below
+    threshold are genuinely lower risk than the cohort average. -/
+theorem positive_nri_iff_reclassifiedBandEventPrevalence_below_cohort_prevalence
+    (π : ℝ)
+    (μevent μnonevent : Measure ℝ)
+    [IsProbabilityMeasure μevent] [IsProbabilityMeasure μnonevent]
+    (threshold δ : ℝ)
+    (h_pi : 0 < π)
+    (h_pi_lt : π < 1)
+    (h_band :
+      0 < π * thresholdBandRate μevent threshold δ +
+          (1 - π) * thresholdBandRate μnonevent threshold δ) :
+    0 < nriFromDownwardInterceptRecalibration μevent μnonevent threshold δ ↔
+      reclassifiedBandEventPrevalence π μevent μnonevent threshold δ < π := by
+  rw [positive_nri_means_improvement μevent μnonevent threshold δ]
+  unfold reclassifiedBandEventPrevalence
+  constructor
+  · intro h
+    have h_scale_pos : 0 < π * (1 - π) := by
+      nlinarith
+    have h_scaled :
+        π * (1 - π) * thresholdBandRate μevent threshold δ <
+          π * (1 - π) * thresholdBandRate μnonevent threshold δ := by
+      exact mul_lt_mul_of_pos_left h h_scale_pos
+    rw [div_lt_iff₀ h_band]
+    nlinarith [h_scaled]
+  · intro h
+    have h_cross :
+        π * thresholdBandRate μevent threshold δ <
+          π *
+            (π * thresholdBandRate μevent threshold δ +
+              (1 - π) * thresholdBandRate μnonevent threshold δ) := by
+      exact (div_lt_iff₀ h_band).1 h
+    have h_scale_pos : 0 < π * (1 - π) := by
+      nlinarith
+    have h_scaled :
+        π * (1 - π) * thresholdBandRate μevent threshold δ <
+          π * (1 - π) * thresholdBandRate μnonevent threshold δ := by
+      nlinarith [h_cross]
+    exact (mul_lt_mul_left h_scale_pos).mp (by simpa [mul_assoc] using h_scaled)
+
+/-- **Clinical treatment model induced by a decision threshold.**
+    Treatment yields benefit `benefit × trueRisk` in expectation and incurs
+    harm `harm` whenever given. The clinically optimal threshold is therefore
+    `harm / benefit`; we encode this exactly as `harm = benefit × threshold`. -/
+structure ThresholdTreatmentModel where
+  threshold : ℝ
+  benefit : ℝ
+  harm : ℝ
+  benefit_pos : 0 < benefit
+  harm_eq_threshold : harm = benefit * threshold
+
+/-- **QALY gain under a threshold-based treatment decision.**
+    The deployed system treats when the risk used for decision-making exceeds
+    the clinical treatment threshold. -/
+noncomputable def qalyGainUnderDecision
+    (model : ThresholdTreatmentModel) (trueRisk decisionRisk : ℝ) : ℝ :=
+  if _ : model.threshold < decisionRisk then
+      model.benefit * trueRisk - model.harm
+    else
+      0
+
+/-- **Per-individual QALY loss from using predicted instead of true risk.**
+    This is the regret relative to the oracle threshold rule that would act on
+    the individual's true risk. -/
+noncomputable def qalyLoss
+    (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ :=
+  qalyGainUnderDecision model trueRisk trueRisk -
+    qalyGainUnderDecision model trueRisk predictedRisk
+
+/-- **Threshold-decision regret margin.**
+    This is the clinically relevant risk margin by which the deployed decision
+    disagrees with the oracle threshold rule:
+    - false positives pay `threshold - trueRisk`,
+    - false negatives pay `trueRisk - threshold`,
+    - correct decisions pay `0`. -/
+noncomputable def thresholdDecisionRegretMargin
+    (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ :=
+  by
+    classical
+    exact if classifiedHighRisk model.threshold predictedRisk then
+        max (model.threshold - trueRisk) 0
+      else
+        max (trueRisk - model.threshold) 0
+
+/-- **Exact QALY loss for a false positive treatment decision.**
+    If the patient's true risk is below threshold but the predicted risk is
+    above threshold, the loss equals the treatment benefit scale times the
+    distance from the true risk to the treatment threshold. -/
+theorem qalyLoss_false_positive_exact
+    (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ)
+    (h_true_low : trueRisk ≤ model.threshold)
+    (h_pred_high : classifiedHighRisk model.threshold predictedRisk) :
+    qalyLoss model trueRisk predictedRisk =
+      model.benefit * (model.threshold - trueRisk) := by
+  have h_true_not_high : ¬ model.threshold < trueRisk := not_lt.mpr h_true_low
+  have h_pred_high' : model.threshold < predictedRisk := by
+    simpa [classifiedHighRisk] using h_pred_high
+  unfold qalyLoss qalyGainUnderDecision
+  simp [h_true_not_high, h_pred_high', model.harm_eq_threshold]
+  ring_nf
+
+/-- **Exact QALY loss for a false negative treatment decision.**
+    If the patient's true risk is above threshold but the predicted risk is
+    at or below threshold, the loss equals the missed-treatment margin above
+    threshold on the QALY-benefit scale. -/
+theorem qalyLoss_false_negative_exact
+    (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ)
+    (h_true_high : model.threshold < trueRisk)
+    (h_pred_not_high : ¬ classifiedHighRisk model.threshold predictedRisk) :
+    qalyLoss model trueRisk predictedRisk =
+      model.benefit * (trueRisk - model.threshold) := by
+  have h_pred_not_high' : ¬ model.threshold < predictedRisk := by
+    simpa [classifiedHighRisk] using h_pred_not_high
+  unfold qalyLoss qalyGainUnderDecision
+  simp [h_true_high, h_pred_not_high', model.harm_eq_threshold]
+  ring_nf
+
+/-- **QALY loss equals benefit-scaled threshold-decision regret.**
+    The QALY object above is exactly the regret of using the predicted-risk
+    threshold rule instead of the oracle true-risk threshold rule, scaled by the
+    treatment benefit. This gives a single exact piecewise formula covering
+    false positives, false negatives, and correct decisions. -/
+theorem qalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
+    (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) :
+    qalyLoss model trueRisk predictedRisk =
+      model.benefit * thresholdDecisionRegretMargin model trueRisk predictedRisk := by
+  by_cases h_pred : classifiedHighRisk model.threshold predictedRisk
+  · by_cases h_true_low : trueRisk ≤ model.threshold
+    · unfold thresholdDecisionRegretMargin
+      rw [if_pos h_pred]
+      rw [qalyLoss_false_positive_exact model trueRisk predictedRisk h_true_low h_pred]
+      have hmax : max (model.threshold - trueRisk) 0 = model.threshold - trueRisk := by
+        exact max_eq_left (by linarith)
+      rw [hmax]
+    · have h_true_high : model.threshold < trueRisk := by linarith
+      have h_pred_high' : model.threshold < predictedRisk := by
+        simpa [classifiedHighRisk] using h_pred
+      have h_zero : qalyLoss model trueRisk predictedRisk = 0 := by
+        unfold qalyLoss qalyGainUnderDecision
+        simp [h_true_high, h_pred_high', model.harm_eq_threshold]
+      unfold thresholdDecisionRegretMargin
+      rw [if_pos h_pred]
+      rw [h_zero]
+      have hmax : max (model.threshold - trueRisk) 0 = 0 := by
+        exact max_eq_right (by linarith)
+      rw [hmax]
+      ring
+  · by_cases h_true_high : model.threshold < trueRisk
+    · unfold thresholdDecisionRegretMargin
+      rw [if_neg h_pred]
+      rw [qalyLoss_false_negative_exact model trueRisk predictedRisk h_true_high h_pred]
+      have hmax : max (trueRisk - model.threshold) 0 = trueRisk - model.threshold := by
+        exact max_eq_left (by linarith)
+      rw [hmax]
+    · have h_true_low : trueRisk ≤ model.threshold := by linarith
+      have h_pred_not_high' : ¬ model.threshold < predictedRisk := by
+        simpa [classifiedHighRisk] using h_pred
+      have h_zero : qalyLoss model trueRisk predictedRisk = 0 := by
+        unfold qalyLoss qalyGainUnderDecision
+        simp [h_true_high, h_pred_not_high', model.harm_eq_threshold]
+      unfold thresholdDecisionRegretMargin
+      rw [if_neg h_pred]
+      rw [h_zero]
+      have hmax : max (trueRisk - model.threshold) 0 = 0 := by
+        exact max_eq_right (by linarith)
+      rw [hmax]
+      ring
+
+/-- QALY loss is always nonnegative under the threshold-decision regret model. -/
+theorem qalyLoss_nonneg
+    (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) :
+    0 ≤ qalyLoss model trueRisk predictedRisk := by
+  rw [qalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin]
+  have h_margin_nonneg :
+      0 ≤ thresholdDecisionRegretMargin model trueRisk predictedRisk := by
+    unfold thresholdDecisionRegretMargin
+    by_cases h_pred : classifiedHighRisk model.threshold predictedRisk
+    · rw [if_pos h_pred]
+      exact le_max_right _ _
+    · rw [if_neg h_pred]
+      exact le_max_right _ _
+  exact mul_nonneg model.benefit_pos.le h_margin_nonneg
+
+/-- **QALY loss is zero under perfect calibration at the decision point.**
+    If the deployed decision uses the true risk itself, it matches the oracle
+    threshold rule and incurs no regret. -/
+theorem qalyLoss_eq_zero_of_perfect_calibration
+    (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ)
+    (h_cal : predictedRisk = trueRisk) :
+    qalyLoss model trueRisk predictedRisk = 0 := by
+  subst h_cal
+  unfold qalyLoss
+  ring
+
+/-- **Miscalibration-induced overtreatment has an exact QALY cost.**
+    A positive intercept shift that pushes a truly low-risk patient above the
+    treatment threshold creates a false positive treatment decision, and the
+    resulting regret is exactly the false-positive QALY loss. -/
+theorem miscalibration_induced_false_positive_qaly_loss
+    (model : ThresholdTreatmentModel) (trueRisk c : ℝ)
+    (h_truly_low : trueRisk < model.threshold)
+    (h_miscal : model.threshold - trueRisk < c) :
+    qalyLoss model trueRisk (trueRisk + c) =
+      model.benefit * (model.threshold - trueRisk) := by
+  have h_decision :=
+    miscalibration_changes_decisions trueRisk model.threshold c h_truly_low h_miscal
+  exact qalyLoss_false_positive_exact model trueRisk (trueRisk + c) (le_of_lt h_truly_low) h_decision.2
 
 /-- **Expected QALY loss from miscalibration.**
-    Miscalibrated PGS leads to suboptimal treatment decisions.
-    The QALY loss is proportional to the miscalibration magnitude
-    and the treatment effect. -/
-noncomputable def qalyLoss (miscalibration treatment_effect prevalence : ℝ) : ℝ :=
-  |miscalibration| * treatment_effect * prevalence
+    This is the population expectation of threshold-decision regret under the
+    joint law of true risk and predicted risk. -/
+noncomputable def expectedQalyLoss {Z : Type*} [MeasurableSpace Z]
+    (μ : Measure Z) (model : ThresholdTreatmentModel)
+    (trueRisk predictedRisk : Z → ℝ) : ℝ :=
+  ∫ z, qalyLoss model (trueRisk z) (predictedRisk z) ∂μ
 
-/-- QALY loss is nonneg. -/
-theorem qaly_loss_nonneg (miscal treat prev : ℝ)
-    (h_treat : 0 ≤ treat) (h_prev : 0 ≤ prev) :
-    0 ≤ qalyLoss miscal treat prev := by
-  unfold qalyLoss
-  exact mul_nonneg (mul_nonneg (abs_nonneg _) h_treat) h_prev
+/-- Perfect calibration implies zero expected QALY loss. -/
+theorem expectedQalyLoss_eq_zero_of_perfect_calibration
+    {Z : Type*} [MeasurableSpace Z]
+    (μ : Measure Z) (model : ThresholdTreatmentModel)
+    (trueRisk predictedRisk : Z → ℝ)
+    (h_cal : ∀ z, predictedRisk z = trueRisk z) :
+    expectedQalyLoss μ model trueRisk predictedRisk = 0 := by
+  unfold expectedQalyLoss
+  have hfun :
+      (fun z => qalyLoss model (trueRisk z) (predictedRisk z)) = fun _ => (0 : ℝ) := by
+    funext z
+    exact qalyLoss_eq_zero_of_perfect_calibration model (trueRisk z) (predictedRisk z) (h_cal z)
+  rw [hfun]
+  simp
+
+/-- **Expected QALY loss is the expected threshold-decision regret.**
+    Population QALY loss is exactly the expected decision-regret margin scaled
+    by the treatment benefit. This makes the population-level clinical utility
+    object a direct consequence of the threshold treatment model above. -/
+theorem expectedQalyLoss_eq_expected_thresholdDecisionRegret
+    {Z : Type*} [MeasurableSpace Z]
+    (μ : Measure Z) (model : ThresholdTreatmentModel)
+    (trueRisk predictedRisk : Z → ℝ) :
+    expectedQalyLoss μ model trueRisk predictedRisk =
+      ∫ z, model.benefit *
+        thresholdDecisionRegretMargin model (trueRisk z) (predictedRisk z) ∂μ := by
+  unfold expectedQalyLoss
+  refine integral_congr_ae ?_
+  exact Filter.Eventually.of_forall (fun z =>
+    qalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
+      model (trueRisk z) (predictedRisk z))
 
 end DecisionImplications
 

@@ -940,23 +940,172 @@ theorem empirical_portability_ratio_strictly_orders_by_ld_and_effect_correlation
   have hmul := mul_lt_mul_of_pos_left h_att_order h_neutral_pos
   simpa [mul_assoc] using hmul
 
-/-- Neutral portability prediction adjusted by a squared effect-correlation penalty. -/
-def selectionAdjustedPortabilityRatio (neutral_ratio rho : ℝ) : ℝ :=
-  neutral_ratio * rho ^ 2
+/-- **Selection predicts both lower portability and stronger evidence for a
+    selection-aware model.**
+    This theorem ties the empirical portability ratio in this section to the
+    explicit validation-model machinery proved above. For the same ancestry pair
+    and LD-retention factor, compare a height-like trait with stabilizing
+    cross-pop effect correlation `effectCorrelationStabilizing Ns_height` to an
+    immune-like trait with fluctuating-selection correlation
+    `fluctuatingEffectCorrelation t τ_immune`.
 
-/-- **Selection reduces portability in the multiplicative `neutral_ratio × ρ²` model.**
-    This theorem is explicit about the model being used: a neutral portability
-    prediction is attenuated by the squared cross-population effect correlation
-    `ρ²`. When `ρ < 1`, the selection-adjusted ratio is strictly below the
-    neutral ratio. -/
+    If the immune-like trait has strictly lower cross-pop effect correlation and
+    at least as much selection-sensitive architecture variance, then:
+    1. its predicted target/source `R²` ratio is strictly lower, and
+    2. the exact Gaussian held-out LRT in favor of a selection-aware model is
+       strictly larger.
+
+    So the same selection mechanism that worsens portability also strengthens
+    empirical evidence against a neutral portability model. -/
 theorem selection_reduces_portability
-    (neutral_ratio rho : ℝ)
-    (h_nr : 0 < neutral_ratio)
-    (h_rho : 0 ≤ rho) (h_rho_lt : rho < 1) :
-    selectionAdjustedPortabilityRatio neutral_ratio rho < neutral_ratio := by
-  unfold selectionAdjustedPortabilityRatio
-  have h_sq : rho ^ 2 < 1 := by nlinarith [sq_nonneg rho]
-  nlinarith
+    (r2Source fstSource fstTarget ldFactor : ℝ)
+    (n sigma2_base v_mut_height s_height Ns_height immuneSelectedVar t τ_immune : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (h_ld : 0 < ldFactor)
+    (h_n : 0 < n)
+    (h_sigma : 0 < sigma2_base)
+    (h_vmut_height : 0 ≤ v_mut_height)
+    (h_s_height : 0 < s_height)
+    (h_Ns_height : 1 < Ns_height)
+    (h_immuneVar : 0 < immuneSelectedVar)
+    (h_var :
+      equilibriumEffectVariance v_mut_height s_height ≤ immuneSelectedVar)
+    (h_corr :
+      fluctuatingEffectCorrelation t τ_immune <
+        effectCorrelationStabilizing Ns_height) :
+    empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor
+        (fluctuatingEffectCorrelation t τ_immune) <
+      empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor
+        (effectCorrelationStabilizing Ns_height) ∧
+    selectionModelLRT
+      (stabilizingSelectionValidationModel n sigma2_base
+        (equilibriumEffectVariance v_mut_height s_height) Ns_height) <
+    selectionModelLRT
+      (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune) := by
+  constructor
+  · exact empirical_portability_ratio_strictly_orders_by_ld_and_effect_correlation
+      r2Source fstSource fstTarget ldFactor ldFactor
+      (fluctuatingEffectCorrelation t τ_immune)
+      (effectCorrelationStabilizing Ns_height)
+      h_r2 h_fst h_fst_bounds h_ld le_rfl
+      (by
+        unfold fluctuatingEffectCorrelation
+        exact le_of_lt (Real.exp_pos _))
+      h_corr
+  · exact selection_model_preferred_when_better_fit
+      n sigma2_base v_mut_height s_height Ns_height immuneSelectedVar t τ_immune
+      h_n h_sigma h_vmut_height h_s_height h_Ns_height h_immuneVar h_var h_corr
+
+/-- **Shorter selection autocorrelation predicts both lower portability and
+    stronger held-out evidence for a selection-aware model.**
+    This is the mechanism-level corollary of the previous theorem for two traits
+    governed by fluctuating selection with the same ancestry pair, sample size,
+    and LD-retention factor. If one trait has a shorter selection
+    autocorrelation time, then `SelectionArchitecture.immune_short_autocorrelation`
+    gives a strictly lower cross-population effect correlation for the same
+    divergence time. In that case:
+    1. the predicted target/source `R²` portability ratio is strictly lower, and
+    2. the exact Gaussian held-out LRT for adding a selection-aware term is
+       strictly larger, provided the shorter-autocorrelation trait has at least
+       as much selection-sensitive variance.
+
+    This ties the empirical portability prediction directly to the actual
+    fluctuating-selection mechanism already formalized elsewhere in the repo,
+    rather than leaving the correlation ordering as a free assumption. -/
+theorem shorter_autocorrelation_reduces_portability_and_increases_selection_evidence
+    (r2Source fstSource fstTarget ldFactor : ℝ)
+    (n sigma2_base selectedVar_long selectedVar_short t τ_long τ_short : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (h_ld : 0 < ldFactor)
+    (h_n : 0 < n)
+    (h_sigma : 0 < sigma2_base)
+    (h_var_long : 0 ≤ selectedVar_long)
+    (h_var_short : 0 < selectedVar_short)
+    (h_var_order : selectedVar_long ≤ selectedVar_short)
+    (h_tau_short : 0 < τ_short)
+    (h_tau_long : 0 < τ_long)
+    (h_shorter : τ_short < τ_long)
+    (h_t : 0 < t) :
+    empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor
+        (fluctuatingEffectCorrelation t τ_short) <
+      empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor
+        (fluctuatingEffectCorrelation t τ_long) ∧
+    selectionModelLRT
+      (fluctuatingSelectionValidationModel n sigma2_base selectedVar_long t τ_long) <
+    selectionModelLRT
+      (fluctuatingSelectionValidationModel n sigma2_base selectedVar_short t τ_short) := by
+  have h_corr :
+      fluctuatingEffectCorrelation t τ_short <
+        fluctuatingEffectCorrelation t τ_long := by
+    exact immune_short_autocorrelation τ_short τ_long t
+      h_tau_short h_tau_long h_shorter h_t
+  have h_rho_long_nonneg : 0 ≤ fluctuatingEffectCorrelation t τ_long := by
+    unfold fluctuatingEffectCorrelation
+    exact le_of_lt (Real.exp_pos _)
+  have h_rho_long_lt_one : fluctuatingEffectCorrelation t τ_long < 1 := by
+    unfold fluctuatingEffectCorrelation
+    apply Real.exp_lt_one_iff.mpr
+    have h_div_pos : 0 < t / τ_long := div_pos h_t h_tau_long
+    have h_neg : -(t / τ_long) < 0 := by linarith
+    simpa [neg_div] using h_neg
+  have h_rho_short_nonneg : 0 ≤ fluctuatingEffectCorrelation t τ_short := by
+    unfold fluctuatingEffectCorrelation
+    exact le_of_lt (Real.exp_pos _)
+  have h_rho_short_lt_one : fluctuatingEffectCorrelation t τ_short < 1 := by
+    unfold fluctuatingEffectCorrelation
+    apply Real.exp_lt_one_iff.mpr
+    have h_div_pos : 0 < t / τ_short := div_pos h_t h_tau_short
+    have h_neg : -(t / τ_short) < 0 := by linarith
+    simpa [neg_div] using h_neg
+  have h_missed_long_nonneg :
+      0 ≤ missedSelectedVariance
+        (fluctuatingSelectionValidationModel n sigma2_base selectedVar_long t τ_long) := by
+    unfold missedSelectedVariance fluctuatingSelectionValidationModel
+    exact mul_nonneg h_var_long
+      (by nlinarith [h_rho_long_nonneg, h_rho_long_lt_one])
+  have h_missed_lt :
+      missedSelectedVariance
+          (fluctuatingSelectionValidationModel n sigma2_base selectedVar_long t τ_long) <
+        missedSelectedVariance
+          (fluctuatingSelectionValidationModel n sigma2_base selectedVar_short t τ_short) := by
+    unfold missedSelectedVariance fluctuatingSelectionValidationModel
+    exact missedSelectedVariance_lt_of_variance_and_correlation
+      selectedVar_long selectedVar_short
+      (fluctuatingEffectCorrelation t τ_long)
+      (fluctuatingEffectCorrelation t τ_short)
+      h_var_short h_rho_long_nonneg h_rho_long_lt_one
+      h_rho_short_nonneg
+      h_corr h_var_order
+  constructor
+  · exact empirical_portability_ratio_strictly_orders_by_ld_and_effect_correlation
+      r2Source fstSource fstTarget ldFactor ldFactor
+      (fluctuatingEffectCorrelation t τ_short)
+      (fluctuatingEffectCorrelation t τ_long)
+      h_r2 h_fst h_fst_bounds h_ld le_rfl
+      (by
+        unfold fluctuatingEffectCorrelation
+        exact le_of_lt (Real.exp_pos _))
+      h_corr
+  · rw [selectionModelLRT_eq_sampleSize_mul_log_residual_gap
+          (fluctuatingSelectionValidationModel n sigma2_base selectedVar_long t τ_long)
+          h_sigma h_missed_long_nonneg]
+    rw [selectionModelLRT_eq_sampleSize_mul_log_residual_gap
+          (fluctuatingSelectionValidationModel n sigma2_base selectedVar_short t τ_short)
+          h_sigma
+          (by
+            unfold missedSelectedVariance fluctuatingSelectionValidationModel
+            exact mul_nonneg (le_of_lt h_var_short)
+              (by nlinarith [h_rho_short_nonneg, h_rho_short_lt_one]))]
+    exact selectionModelLRT_strictMono_in_missedVariance n sigma2_base
+      (missedSelectedVariance
+        (fluctuatingSelectionValidationModel n sigma2_base selectedVar_long t τ_long))
+      (missedSelectedVariance
+        (fluctuatingSelectionValidationModel n sigma2_base selectedVar_short t τ_short))
+      h_n h_sigma h_missed_long_nonneg h_missed_lt
 
 /-- **Within-group variance dominates between-group variance.**
     The R² of genetic distance on individual squared error is bounded

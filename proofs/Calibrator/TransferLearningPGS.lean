@@ -974,15 +974,87 @@ theorem lower_divergence_representation_tightens_ben_david_bound
   unfold benDavidUpperBound
   linarith
 
-/-- **Positive information-bottleneck objective means signal exceeds the ancestry penalty.**
-    The theorem states only the exact inequality encoded by the objective
-    `I(φ(X); Y) - λ I(φ(X); A)`: if that scalar objective is positive, then the
-    retained trait information exceeds the penalized ancestry information. -/
-theorem positive_info_bottleneck_objective_means_signal_exceeds_penalty
-    (I_phi_A I_phi_Y lam : ℝ)
-    (h_objective : I_phi_Y - lam * I_phi_A > 0)
-    (_h_lam : 0 < lam) (_h_I_A_nn : 0 ≤ I_phi_A) :
-    I_phi_Y > lam * I_phi_A := by linarith
+/-- Information-bottleneck objective `I(φ(X); Y) - λ I(φ(X); A)`. -/
+def infoBottleneckObjective (I_phi_Y I_phi_A lam : ℝ) : ℝ :=
+  I_phi_Y - lam * I_phi_A
+
+/-- **Improving the information-bottleneck objective tightens the transfer bound.**
+    Compare a standard representation and a new learned representation `φ`.
+    Suppose:
+    - more trait information lowers source error at rate `gainScale`;
+    - more ancestry information raises divergence at rate `gainScale * λ`;
+    - the irreducible `λ*` term does not worsen.
+
+    Then any strict improvement in the information-bottleneck objective yields
+    a strictly smaller Ben-David target-error upper bound. This is the
+    transport consequence of the representation objective, not just a restated
+    inequality. -/
+theorem higher_info_bottleneck_objective_tightens_ben_david_bound
+    (err_source_standard err_source_new : ℝ)
+    (divergence_standard divergence_new : ℝ)
+    (lambda_standard lambda_new : ℝ)
+    (I_phi_Y_standard I_phi_Y_new I_phi_A_standard I_phi_A_new : ℝ)
+    (lam gainScale : ℝ)
+    (h_gainScale : 0 < gainScale)
+    (h_source :
+      err_source_new ≤ err_source_standard -
+        gainScale * (I_phi_Y_new - I_phi_Y_standard))
+    (h_div :
+      divergence_new ≤ divergence_standard +
+        gainScale * lam * (I_phi_A_new - I_phi_A_standard))
+    (h_lambda : lambda_new ≤ lambda_standard)
+    (h_obj :
+      infoBottleneckObjective I_phi_Y_new I_phi_A_new lam >
+        infoBottleneckObjective I_phi_Y_standard I_phi_A_standard lam) :
+    benDavidUpperBound err_source_new divergence_new lambda_new <
+      benDavidUpperBound err_source_standard divergence_standard lambda_standard := by
+  have h_obj_scaled :
+      gainScale * (I_phi_Y_new - I_phi_Y_standard) >
+        gainScale * lam * (I_phi_A_new - I_phi_A_standard) := by
+    unfold infoBottleneckObjective at h_obj
+    have hmul := mul_lt_mul_of_pos_left h_obj h_gainScale
+    nlinarith
+  unfold benDavidUpperBound
+  linarith
+
+/-- **A better information-bottleneck representation certifies a lower target-error cap.**
+    If a learned representation `φ` comes with a Ben-David certificate and its
+    source error / divergence terms satisfy the calibrated information-to-bound
+    inequalities above, then a strict gain in the bottleneck objective gives a
+    strictly smaller certified cap on target prediction error than the standard
+    representation's bound. -/
+theorem higher_info_bottleneck_objective_lowers_target_error_cap
+    (cert_new : PGSBenDavidCertificate)
+    (err_source_standard divergence_standard lambda_standard : ℝ)
+    (I_phi_Y_standard I_phi_Y_new I_phi_A_standard I_phi_A_new : ℝ)
+    (lam gainScale : ℝ)
+    (h_gainScale : 0 < gainScale)
+    (h_source :
+      cert_new.err_source ≤ err_source_standard -
+        gainScale * (I_phi_Y_new - I_phi_Y_standard))
+    (h_div :
+      cert_new.divergence ≤ divergence_standard +
+        gainScale * lam * (I_phi_A_new - I_phi_A_standard))
+    (h_lambda : cert_new.lambda_star ≤ lambda_standard)
+    (h_obj :
+      infoBottleneckObjective I_phi_Y_new I_phi_A_new lam >
+        infoBottleneckObjective I_phi_Y_standard I_phi_A_standard lam) :
+    cert_new.err_target <
+      benDavidUpperBound err_source_standard divergence_standard lambda_standard := by
+  have h_bound :
+      benDavidUpperBound cert_new.err_source cert_new.divergence cert_new.lambda_star <
+        benDavidUpperBound err_source_standard divergence_standard lambda_standard := by
+    exact higher_info_bottleneck_objective_tightens_ben_david_bound
+      err_source_standard cert_new.err_source
+      divergence_standard cert_new.divergence
+      lambda_standard cert_new.lambda_star
+      I_phi_Y_standard I_phi_Y_new I_phi_A_standard I_phi_A_new
+      lam gainScale h_gainScale h_source h_div h_lambda h_obj
+  have h_target :
+      cert_new.err_target ≤
+        benDavidUpperBound cert_new.err_source cert_new.divergence cert_new.lambda_star := by
+    exact cert_new.target_le_source_plus_divergence_plus_lambda
+  linarith
 
 end FeatureRepresentation
 
@@ -1033,56 +1105,579 @@ theorem fine_tuned_target_r2_exceeds_scratch_of_penalty_gap
   unfold scratchTargetR2 fineTunedTargetR2
   linarith
 
-/-- **Crossover extracted from assumed learning-curve inequalities.**
-    This theorem does not derive a critical sample size from optimization or
-    statistics. It simply records the two boundary inequalities that follow once
-    the user supplies a candidate `n_crit` together with below-threshold and
-    above-threshold dominance assumptions for the two learning curves. -/
-theorem crossover_from_assumed_critical_sample_size
-    (n_crit : ℕ) (r2_source_unadjusted r2_target_trained : ℝ → ℝ)
-    (h_below : ∀ n : ℕ, n < n_crit → r2_target_trained n < r2_source_unadjusted n)
-    (h_above : ∀ n : ℕ, n_crit ≤ n → r2_source_unadjusted n ≤ r2_target_trained n)
-    (h_crit_pos : 0 < n_crit) :
-    -- Just below n_crit, source wins; at n_crit, target wins (crossover)
-    r2_target_trained ((n_crit - 1 : ℕ) : ℝ) < r2_source_unadjusted ((n_crit - 1 : ℕ) : ℝ) ∧
-      r2_source_unadjusted n_crit ≤ r2_target_trained n_crit := by
+/-- Scratch-trained target `R²` with finite-sample estimation noise
+    `noiseVar / nTarget`. -/
+noncomputable def sampleLimitedScratchTargetR2
+    (oracle_target_r2 noiseVar nTarget : ℝ) : ℝ :=
+  scratchTargetR2 oracle_target_r2 (noiseVar / nTarget)
+
+/-- Exact target sample size at which scratch training matches fine-tuning in
+    the explicit additive `R²` model above. -/
+noncomputable def scratchVsFineTuningCriticalSampleSize
+    (r2_source divergence_penalty adaptation_gain oracle_target_r2 noiseVar : ℝ) : ℝ :=
+  noiseVar /
+    (oracle_target_r2 -
+      fineTunedTargetR2 r2_source divergence_penalty adaptation_gain)
+
+/-- **Scratch training matches fine-tuning at the derived critical sample size.**
+    In the explicit model
+    `scratchTargetR2 = oracle_target_r2 - noiseVar / nTarget`,
+    the crossover point is solved exactly rather than assumed. -/
+theorem scratchTargetR2_eq_fineTunedTargetR2_at_critical_sample_size
+    (r2_source divergence_penalty adaptation_gain oracle_target_r2 noiseVar : ℝ)
+    (h_gap :
+      fineTunedTargetR2 r2_source divergence_penalty adaptation_gain <
+        oracle_target_r2)
+    (h_noise : 0 < noiseVar) :
+    sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar
+        (scratchVsFineTuningCriticalSampleSize
+          r2_source divergence_penalty adaptation_gain oracle_target_r2 noiseVar) =
+      fineTunedTargetR2 r2_source divergence_penalty adaptation_gain := by
+  unfold sampleLimitedScratchTargetR2 scratchVsFineTuningCriticalSampleSize
+    scratchTargetR2 fineTunedTargetR2
+  have h_gap_pos :
+      0 < oracle_target_r2 - (r2_source - divergence_penalty + adaptation_gain) := by
+    unfold fineTunedTargetR2 at h_gap
+    linarith
+  field_simp [ne_of_gt h_gap_pos, ne_of_gt h_noise]
+  ring_nf
+
+/-- **Scratch training beats fine-tuning exactly above a derived sample threshold.**
+    In the explicit additive `R²` model, the target-only estimator overtakes
+    fine-tuning if and only if the target sample size exceeds the exact
+    crossover `noiseVar / (oracle_target_r2 - fineTunedTargetR2)`. -/
+theorem scratch_beats_fine_tuning_iff_target_sample_exceeds_critical
+    (r2_source divergence_penalty adaptation_gain oracle_target_r2 noiseVar nTarget : ℝ)
+    (h_gap :
+      fineTunedTargetR2 r2_source divergence_penalty adaptation_gain <
+        oracle_target_r2)
+    (h_n : 0 < nTarget) :
+    fineTunedTargetR2 r2_source divergence_penalty adaptation_gain <
+      sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar nTarget ↔
+    scratchVsFineTuningCriticalSampleSize
+        r2_source divergence_penalty adaptation_gain oracle_target_r2 noiseVar <
+      nTarget := by
+  have h_gap_pos :
+      0 < oracle_target_r2 -
+        fineTunedTargetR2 r2_source divergence_penalty adaptation_gain := by
+    exact sub_pos.mpr h_gap
   constructor
-  · exact h_below (n_crit - 1) (Nat.sub_lt h_crit_pos (Nat.succ_pos 0))
-  · exact h_above _ (le_refl _)
+  · intro h
+    unfold sampleLimitedScratchTargetR2 scratchVsFineTuningCriticalSampleSize
+      scratchTargetR2 at *
+    have hineq :
+        noiseVar / nTarget <
+          oracle_target_r2 -
+            fineTunedTargetR2 r2_source divergence_penalty adaptation_gain := by
+      linarith
+    have hcross :
+        noiseVar <
+          nTarget *
+            (oracle_target_r2 -
+              fineTunedTargetR2 r2_source divergence_penalty adaptation_gain) := by
+      rw [div_lt_iff₀ h_n] at hineq
+      simpa [mul_comm, mul_left_comm, mul_assoc] using hineq
+    rw [div_lt_iff₀ h_gap_pos]
+    simpa [mul_comm, mul_left_comm, mul_assoc] using hcross
+  · intro h
+    unfold sampleLimitedScratchTargetR2 scratchVsFineTuningCriticalSampleSize
+      scratchTargetR2 at *
+    have hcross :
+        noiseVar <
+          nTarget *
+            (oracle_target_r2 -
+              fineTunedTargetR2 r2_source divergence_penalty adaptation_gain) := by
+      rw [div_lt_iff₀ h_gap_pos] at h
+      simpa [mul_comm, mul_left_comm, mul_assoc] using h
+    have hineq :
+        noiseVar / nTarget <
+          oracle_target_r2 -
+            fineTunedTargetR2 r2_source divergence_penalty adaptation_gain := by
+      rw [div_lt_iff₀ h_n]
+      simpa [mul_comm, mul_left_comm, mul_assoc] using hcross
+    linarith
 
 /- **Regularized fine-tuning shrinks toward source PGS.**
     β̂_target = argmin Σ wᵢ(yᵢ - x'ᵢβ)² + λ‖β - β̂_source‖²
     The regularization λ controls how much to trust the source PGS. -/
 
-/-- **Optimal regularization decreases with n_target.**
-    With more target data, we should trust the target data more
-    and the source PGS less. Modeled: optimal λ ∝ 1/n. -/
+/-- **Target fine-tuning shrinkage MSE.**
+    We model the fine-tuned estimator as a convex combination of the unbiased
+    target-only estimator and the source estimator, with source weight `λ`.
+
+    - `gapSq` is the squared source-target effect mismatch.
+    - `noiseVar` is the per-sample target estimation variance scale.
+    - `noiseVar / nTarget` is the variance of the target-only estimator.
+
+    The resulting MSE decomposes into:
+    - squared transfer bias: `gapSq * λ^2`
+    - residual target-estimation variance: `(noiseVar / nTarget) * (1 - λ)^2`. -/
+noncomputable def sourceShrinkageMSE (gapSq noiseVar nTarget lam : ℝ) : ℝ :=
+  gapSq * lam^2 + (noiseVar / nTarget) * (1 - lam)^2
+
+/-- **Exact optimizer of the source-shrinkage MSE.**
+    In the explicit bias-variance model above, the unique minimizer is
+    `(noiseVar / nTarget) / (gapSq + noiseVar / nTarget)`. This is derived from the
+    quadratic objective, not assumed. -/
+noncomputable def optimalSourceShrinkageWeight (gapSq noiseVar nTarget : ℝ) : ℝ :=
+  (noiseVar / nTarget) / (gapSq + noiseVar / nTarget)
+
+/-- Exact quadratic decomposition around the optimal source weight. -/
+theorem sourceShrinkageMSE_eq_optimal_plus_square
+    (gapSq noiseVar nTarget lam : ℝ)
+    (h_curv : gapSq + noiseVar / nTarget ≠ 0) :
+    sourceShrinkageMSE gapSq noiseVar nTarget lam =
+      gapSq * (noiseVar / nTarget) / (gapSq + noiseVar / nTarget) +
+        (gapSq + noiseVar / nTarget) *
+          (lam - optimalSourceShrinkageWeight gapSq noiseVar nTarget)^2 := by
+  set b : ℝ := noiseVar / nTarget
+  have h_curv' : gapSq + b ≠ 0 := by simpa [b] using h_curv
+  have hquad :
+      gapSq * lam ^ 2 + b * (1 - lam)^2 =
+        gapSq * b / (gapSq + b) +
+          (gapSq + b) * (lam - b / (gapSq + b))^2 := by
+    field_simp [h_curv']
+    ring_nf
+  simpa [sourceShrinkageMSE, optimalSourceShrinkageWeight, b] using hquad
+
+/-- Closed-form optimizer rewritten with the original denominator. -/
+theorem optimalSourceShrinkageWeight_eq_closed_form
+    (gapSq noiseVar nTarget : ℝ)
+    (h_n : 0 < nTarget)
+    (h_curv : gapSq + noiseVar / nTarget ≠ 0) :
+    optimalSourceShrinkageWeight gapSq noiseVar nTarget =
+      noiseVar / (nTarget * gapSq + noiseVar) := by
+  have hn_ne : nTarget ≠ 0 := ne_of_gt h_n
+  have h_denom : nTarget * gapSq + noiseVar ≠ 0 := by
+    intro h_zero
+    apply h_curv
+    have hmul : nTarget * (gapSq + noiseVar / nTarget) = 0 := by
+      calc
+        nTarget * (gapSq + noiseVar / nTarget) = nTarget * gapSq + noiseVar := by
+          field_simp [hn_ne]
+        _ = 0 := h_zero
+    rcases mul_eq_zero.mp hmul with h0 | h0
+    · exact False.elim (hn_ne h0)
+    · exact h0
+  unfold optimalSourceShrinkageWeight
+  field_simp [hn_ne, h_curv, h_denom]
+
+/-- **The explicit source-shrinkage weight minimizes the fine-tuning MSE.**
+    This is a true optimization theorem for the quadratic transfer-bias /
+    target-variance objective above. -/
+theorem optimalSourceShrinkageWeight_minimizes_mse
+    (gapSq noiseVar nTarget lam : ℝ)
+    (h_gapSq : 0 ≤ gapSq)
+    (h_noise : 0 ≤ noiseVar)
+    (h_n : 0 < nTarget) :
+    sourceShrinkageMSE gapSq noiseVar nTarget
+        (optimalSourceShrinkageWeight gapSq noiseVar nTarget) ≤
+      sourceShrinkageMSE gapSq noiseVar nTarget lam := by
+  have hcoeff_nonneg : 0 ≤ gapSq + noiseVar / nTarget := by
+    have hdiv_nonneg : 0 ≤ noiseVar / nTarget := by
+      exact div_nonneg h_noise (le_of_lt h_n)
+    linarith
+  by_cases h_curv : gapSq + noiseVar / nTarget = 0
+  · have hdiv_zero : noiseVar / nTarget = 0 := by
+      have hdiv_nonneg : 0 ≤ noiseVar / nTarget := by
+        exact div_nonneg h_noise (le_of_lt h_n)
+      linarith
+    have h_gap_zero : gapSq = 0 := by
+      have hdiv_nonneg : 0 ≤ noiseVar / nTarget := by
+        exact div_nonneg h_noise (le_of_lt h_n)
+      linarith
+    have h_noise_zero : noiseVar = 0 := by
+      have hn_ne : nTarget ≠ 0 := ne_of_gt h_n
+      have hmul : (noiseVar / nTarget) * nTarget = 0 := by
+        simpa using congrArg (fun x : ℝ => x * nTarget) hdiv_zero
+      calc
+        noiseVar = (noiseVar / nTarget) * nTarget := by
+          field_simp [hn_ne]
+        _ = 0 := hmul
+    simp [sourceShrinkageMSE, optimalSourceShrinkageWeight, h_gap_zero, h_noise_zero]
+  · rw [sourceShrinkageMSE_eq_optimal_plus_square gapSq noiseVar nTarget lam h_curv]
+    have hsquare_nonneg :
+        0 ≤ (gapSq + noiseVar / nTarget) *
+          (lam - optimalSourceShrinkageWeight gapSq noiseVar nTarget)^2 := by
+      exact mul_nonneg hcoeff_nonneg (sq_nonneg _)
+    have h_at_opt :
+        sourceShrinkageMSE gapSq noiseVar nTarget
+            (optimalSourceShrinkageWeight gapSq noiseVar nTarget) =
+          gapSq * (noiseVar / nTarget) / (gapSq + noiseVar / nTarget) := by
+      rw [sourceShrinkageMSE_eq_optimal_plus_square gapSq noiseVar nTarget
+        (optimalSourceShrinkageWeight gapSq noiseVar nTarget) h_curv]
+      ring
+    rw [h_at_opt]
+    linarith
+
+/-- **Optimal regularization decreases with target sample size.**
+    In the explicit shrinkage-MSE model above, the source weight solving the
+    optimization problem is
+    `noiseVar / (nTarget * gapSq + noiseVar)`. Hence, with a fixed transfer gap
+    and fixed per-sample target noise, more target data strictly decreases the
+    optimal amount of shrinkage toward the source PGS. -/
 theorem optimal_lambda_decreases_with_n
-    (c : ℝ) (n₁ n₂ : ℕ)
-    (h_c : 0 < c)
+    (gapSq noiseVar : ℝ) (n₁ n₂ : ℕ)
+    (h_gapSq : 0 < gapSq)
+    (h_noise : 0 < noiseVar)
     (h_n₁ : 0 < n₁)
     (h_more_data : n₁ < n₂) :
-    c / (n₂ : ℝ) < c / (n₁ : ℝ) := by
-  apply div_lt_div_of_pos_left h_c
-  · exact Nat.cast_pos.mpr h_n₁
-  · exact Nat.cast_lt.mpr h_more_data
-
-/-- **Amortized per-population adaptation cost falls with the number of source tasks.**
-    In the simple amortization model where a one-off adaptation cost
-    `n_adapt_single` is spread evenly across `k` source populations, the
-    per-population cost `n_adapt_single / k` is strictly below the single-task
-    cost whenever `k > 1`. -/
-theorem amortized_per_population_adaptation_cost_falls_with_task_count
-    (n_adapt_single : ℝ) (k : ℕ)
-    (h_n : 0 < n_adapt_single) (h_k : 1 < k) :
-    n_adapt_single / (k : ℝ) < n_adapt_single := by
-  have hk_pos : 0 < (k : ℝ) := by
-    exact Nat.cast_pos.mpr (lt_trans Nat.zero_lt_one h_k)
-  have hk_gt_one : (1 : ℝ) < k := by
-    exact_mod_cast h_k
-  have h_mul : n_adapt_single < n_adapt_single * (k : ℝ) := by
+    optimalSourceShrinkageWeight gapSq noiseVar n₂ <
+      optimalSourceShrinkageWeight gapSq noiseVar n₁ := by
+  have h_n₂ : 0 < n₂ := lt_trans h_n₁ h_more_data
+  have h_curv₁ : gapSq + noiseVar / (n₁ : ℝ) ≠ 0 := by
+    have h_pos : 0 < gapSq + noiseVar / (n₁ : ℝ) := by
+      have hn₁_real : 0 < (n₁ : ℝ) := Nat.cast_pos.mpr h_n₁
+      have hdiv_pos : 0 < noiseVar / (n₁ : ℝ) := by
+        exact div_pos h_noise hn₁_real
+      linarith
+    linarith
+  have h_curv₂ : gapSq + noiseVar / (n₂ : ℝ) ≠ 0 := by
+    have hn₂_real : 0 < (n₂ : ℝ) := Nat.cast_pos.mpr h_n₂
+    have h_pos : 0 < gapSq + noiseVar / (n₂ : ℝ) := by
+      have hdiv_pos : 0 < noiseVar / (n₂ : ℝ) := by
+        exact div_pos h_noise hn₂_real
+      linarith
+    linarith
+  rw [optimalSourceShrinkageWeight_eq_closed_form gapSq noiseVar (n₂ : ℝ)
+      (Nat.cast_pos.mpr h_n₂) h_curv₂,
+    optimalSourceShrinkageWeight_eq_closed_form gapSq noiseVar (n₁ : ℝ)
+      (Nat.cast_pos.mpr h_n₁) h_curv₁]
+  apply div_lt_div_of_pos_left h_noise
+  · have hn₁_real : 0 < (n₁ : ℝ) := Nat.cast_pos.mpr h_n₁
     nlinarith
-  exact (div_lt_iff₀ hk_pos).2 h_mul
+  · have hcast : (n₁ : ℝ) < (n₂ : ℝ) := by
+      exact_mod_cast h_more_data
+    nlinarith
+
+/-- **The optimal source weight drops below one-half exactly past a target
+    sample threshold.**
+    In the explicit shrinkage-MSE model, this gives an interpretable
+    sample-complexity criterion for when the target data should dominate the
+    source PGS in the optimal convex combination. -/
+theorem optimalSourceShrinkageWeight_le_half_iff_target_samples_dominate_gap
+    (gapSq noiseVar nTarget : ℝ)
+    (h_gapSq : 0 < gapSq)
+    (h_noise : 0 < noiseVar)
+    (h_n : 0 < nTarget) :
+    optimalSourceShrinkageWeight gapSq noiseVar nTarget ≤ 1 / 2 ↔
+      noiseVar ≤ nTarget * gapSq := by
+  have h_curv : gapSq + noiseVar / nTarget ≠ 0 := by
+    have h_pos : 0 < gapSq + noiseVar / nTarget := by
+      exact add_pos h_gapSq (div_pos h_noise h_n)
+    linarith
+  have h_denom_pos : 0 < nTarget * gapSq + noiseVar := by
+    nlinarith
+  rw [optimalSourceShrinkageWeight_eq_closed_form gapSq noiseVar nTarget h_n h_curv]
+  constructor
+  · intro h
+    have h_cross : noiseVar ≤ (1 / 2 : ℝ) * (nTarget * gapSq + noiseVar) := by
+      exact (div_le_iff₀ h_denom_pos).1 h
+    nlinarith
+  · intro h
+    exact (div_le_iff₀ h_denom_pos).2 (by nlinarith)
+
+/-- Residual source-target effect mismatch after learning a representation from
+    `k` source populations.
+
+    The irreducible transport gap `irreducibleGap` remains even with unlimited
+    source diversity, while the population-specific component
+    `populationSpecificGap` is averaged down by the shared representation and
+    scales as `1 / k`. -/
+noncomputable def metaLearnedTransferGapSq
+    (irreducibleGap populationSpecificGap : ℝ) (k : ℕ) : ℝ :=
+  irreducibleGap + populationSpecificGap / k
+
+/-- More source populations strictly reduce the residual transfer gap in the
+    explicit shared-representation model above. -/
+theorem metaLearnedTransferGapSq_strictMono
+    (irreducibleGap populationSpecificGap : ℝ) (k₁ k₂ : ℕ)
+    (h_pop : 0 < populationSpecificGap)
+    (h_k₁ : 0 < k₁) (h_more : k₁ < k₂) :
+    metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂ <
+      metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁ := by
+  have hk₁ : 0 < (k₁ : ℝ) := Nat.cast_pos.mpr h_k₁
+  have hcast : (k₁ : ℝ) < (k₂ : ℝ) := by
+    exact_mod_cast h_more
+  unfold metaLearnedTransferGapSq
+  have hdiv : populationSpecificGap / (k₂ : ℝ) < populationSpecificGap / (k₁ : ℝ) := by
+    exact div_lt_div_of_pos_left h_pop hk₁ hcast
+  linarith
+
+/-- The shared-representation transfer gap is positive when both the
+    irreducible and population-specific components are nonnegative and the
+    latter is nonzero. -/
+theorem metaLearnedTransferGapSq_pos
+    (irreducibleGap populationSpecificGap : ℝ) (k : ℕ)
+    (h_irred : 0 ≤ irreducibleGap)
+    (h_pop : 0 < populationSpecificGap)
+    (h_k : 0 < k) :
+    0 < metaLearnedTransferGapSq irreducibleGap populationSpecificGap k := by
+  have hk : 0 < (k : ℝ) := Nat.cast_pos.mpr h_k
+  unfold metaLearnedTransferGapSq
+  have hdiv : 0 < populationSpecificGap / (k : ℝ) := by
+    exact div_pos h_pop hk
+  linarith
+
+/-- Optimal fine-tuning MSE after choosing the source-shrinkage weight
+    optimally. -/
+noncomputable def optimalFineTuningMSE (gapSq noiseVar nTarget : ℝ) : ℝ :=
+  sourceShrinkageMSE gapSq noiseVar nTarget
+    (optimalSourceShrinkageWeight gapSq noiseVar nTarget)
+
+/-- Closed form of the optimal fine-tuning MSE. -/
+theorem optimalFineTuningMSE_eq_closed_form
+    (gapSq noiseVar nTarget : ℝ)
+    (h_curv : gapSq + noiseVar / nTarget ≠ 0) :
+    optimalFineTuningMSE gapSq noiseVar nTarget =
+      gapSq * (noiseVar / nTarget) / (gapSq + noiseVar / nTarget) := by
+  unfold optimalFineTuningMSE
+  rw [sourceShrinkageMSE_eq_optimal_plus_square gapSq noiseVar nTarget
+    (optimalSourceShrinkageWeight gapSq noiseVar nTarget) h_curv]
+  ring
+
+/-- For fixed target sample size and noise level, the optimal fine-tuning MSE
+    is strictly increasing in the residual source-target mismatch. -/
+theorem optimalFineTuningMSE_strictMono_in_gapSq
+    (gap₁ gap₂ noiseVar nTarget : ℝ)
+    (h_gap₁ : 0 ≤ gap₁)
+    (h_gap : gap₁ < gap₂)
+    (h_noise : 0 < noiseVar)
+    (h_n : 0 < nTarget) :
+    optimalFineTuningMSE gap₁ noiseVar nTarget <
+      optimalFineTuningMSE gap₂ noiseVar nTarget := by
+  have h_curv₁ : gap₁ + noiseVar / nTarget ≠ 0 := by
+    have h_pos : 0 < gap₁ + noiseVar / nTarget := by
+      have hdiv : 0 < noiseVar / nTarget := div_pos h_noise h_n
+      linarith
+    linarith
+  have h_curv₂ : gap₂ + noiseVar / nTarget ≠ 0 := by
+    have h_pos : 0 < gap₂ + noiseVar / nTarget := by
+      have hdiv : 0 < noiseVar / nTarget := div_pos h_noise h_n
+      linarith
+    linarith
+  rw [optimalFineTuningMSE_eq_closed_form gap₁ noiseVar nTarget h_curv₁,
+    optimalFineTuningMSE_eq_closed_form gap₂ noiseVar nTarget h_curv₂]
+  set b : ℝ := noiseVar / nTarget
+  have hb_pos : 0 < b := by
+    unfold b
+    exact div_pos h_noise h_n
+  change gap₁ * b / (gap₁ + b) < gap₂ * b / (gap₂ + b)
+  apply (div_lt_div_iff₀ (by linarith) (by linarith)).2
+  have h_sq_term : gap₁ * (b * b) < gap₂ * (b * b) := by
+    exact mul_lt_mul_of_pos_right h_gap (mul_pos hb_pos hb_pos)
+  nlinarith
+
+/-- Target sample size needed for the optimal fine-tuning MSE to reach a target
+    tolerance `τ`. This is the exact threshold obtained by solving the
+    closed-form optimal-MSE equation for `nTarget`. -/
+noncomputable def requiredTargetSamplesForOptimalFineTuningMSE
+    (gapSq noiseVar tau : ℝ) : ℝ :=
+  noiseVar * (gapSq - tau) / (tau * gapSq)
+
+/-- The required target sample size is positive whenever the desired MSE target
+    lies strictly below the transfer gap. -/
+theorem requiredTargetSamplesForOptimalFineTuningMSE_pos
+    (gapSq noiseVar tau : ℝ)
+    (h_noise : 0 < noiseVar)
+    (h_tau : 0 < tau)
+    (h_gap : tau < gapSq) :
+    0 < requiredTargetSamplesForOptimalFineTuningMSE gapSq noiseVar tau := by
+  unfold requiredTargetSamplesForOptimalFineTuningMSE
+  have h_gap_pos : 0 < gapSq := by linarith
+  have h_num : 0 < noiseVar * (gapSq - tau) := by
+    have : 0 < gapSq - tau := by linarith
+    exact mul_pos h_noise this
+  have h_den : 0 < tau * gapSq := by
+    exact mul_pos h_tau h_gap_pos
+  exact div_pos h_num h_den
+
+/-- For a fixed MSE tolerance, reducing the transfer gap strictly lowers the
+    target sample size required to hit that tolerance under optimal fine-tuning. -/
+theorem requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
+    (gap₁ gap₂ noiseVar tau : ℝ)
+    (h_gap₁ : 0 < gap₁)
+    (h_gap : gap₁ < gap₂)
+    (h_noise : 0 < noiseVar)
+    (h_tau : 0 < tau) :
+    requiredTargetSamplesForOptimalFineTuningMSE gap₁ noiseVar tau <
+      requiredTargetSamplesForOptimalFineTuningMSE gap₂ noiseVar tau := by
+  have h_gap₂ : 0 < gap₂ := lt_trans h_gap₁ h_gap
+  have h_rewrite₁ :
+      requiredTargetSamplesForOptimalFineTuningMSE gap₁ noiseVar tau =
+        noiseVar / tau - noiseVar / gap₁ := by
+    unfold requiredTargetSamplesForOptimalFineTuningMSE
+    field_simp [ne_of_gt h_tau, ne_of_gt h_gap₁]
+  have h_rewrite₂ :
+      requiredTargetSamplesForOptimalFineTuningMSE gap₂ noiseVar tau =
+        noiseVar / tau - noiseVar / gap₂ := by
+    unfold requiredTargetSamplesForOptimalFineTuningMSE
+    field_simp [ne_of_gt h_tau, ne_of_gt h_gap₂]
+  rw [h_rewrite₁, h_rewrite₂]
+  have hdiv : noiseVar / gap₂ < noiseVar / gap₁ := by
+    exact div_lt_div_of_pos_left h_noise h_gap₁ h_gap
+  nlinarith
+
+/-- Representation-certified transfer gap obtained by scaling the Ben-David
+    target-error cap into the residual mismatch term used by the fine-tuning
+    sample-complexity model. -/
+noncomputable def representationCertifiedTransferGapSq
+    (irreducibleGap boundScale err_source divergence lambda_star : ℝ) : ℝ :=
+  irreducibleGap + boundScale * benDavidUpperBound err_source divergence lambda_star
+
+/-- **A better information-bottleneck representation lowers target sample needs.**
+    Combine the representation theorem in `FeatureRepresentation` with the exact
+    fine-tuning sample-size formula in this section. If a better bottleneck
+    representation strictly tightens the Ben-David bound, and residual transfer
+    mismatch is modeled as an affine function of that certified bound, then the
+    target sample size needed to hit any fixed fine-tuning MSE tolerance
+    strictly decreases. -/
+theorem higher_info_bottleneck_objective_reduces_required_target_samples
+    (cert_new : PGSBenDavidCertificate)
+    (err_source_standard divergence_standard lambda_standard : ℝ)
+    (I_phi_Y_standard I_phi_Y_new I_phi_A_standard I_phi_A_new : ℝ)
+    (lam gainScale : ℝ)
+    (irreducibleGap boundScale noiseVar tau : ℝ)
+    (h_gainScale : 0 < gainScale)
+    (h_boundScale : 0 < boundScale)
+    (h_noise : 0 < noiseVar)
+    (h_tau : 0 < tau)
+    (h_source :
+      cert_new.err_source ≤ err_source_standard -
+        gainScale * (I_phi_Y_new - I_phi_Y_standard))
+    (h_div :
+      cert_new.divergence ≤ divergence_standard +
+        gainScale * lam * (I_phi_A_new - I_phi_A_standard))
+    (h_lambda : cert_new.lambda_star ≤ lambda_standard)
+    (h_obj :
+      infoBottleneckObjective I_phi_Y_new I_phi_A_new lam >
+        infoBottleneckObjective I_phi_Y_standard I_phi_A_standard lam)
+    (h_tau_small :
+      tau <
+        representationCertifiedTransferGapSq irreducibleGap boundScale
+          cert_new.err_source cert_new.divergence cert_new.lambda_star) :
+    requiredTargetSamplesForOptimalFineTuningMSE
+        (representationCertifiedTransferGapSq irreducibleGap boundScale
+          cert_new.err_source cert_new.divergence cert_new.lambda_star)
+        noiseVar tau <
+      requiredTargetSamplesForOptimalFineTuningMSE
+        (representationCertifiedTransferGapSq irreducibleGap boundScale
+          err_source_standard divergence_standard lambda_standard)
+        noiseVar tau := by
+  have h_bound_lt :
+      benDavidUpperBound cert_new.err_source cert_new.divergence cert_new.lambda_star <
+        benDavidUpperBound err_source_standard divergence_standard lambda_standard := by
+    exact higher_info_bottleneck_objective_tightens_ben_david_bound
+      err_source_standard cert_new.err_source
+      divergence_standard cert_new.divergence
+      lambda_standard cert_new.lambda_star
+      I_phi_Y_standard I_phi_Y_new I_phi_A_standard I_phi_A_new
+      lam gainScale h_gainScale h_source h_div h_lambda h_obj
+  have h_gap_order :
+      representationCertifiedTransferGapSq irreducibleGap boundScale
+          cert_new.err_source cert_new.divergence cert_new.lambda_star <
+        representationCertifiedTransferGapSq irreducibleGap boundScale
+          err_source_standard divergence_standard lambda_standard := by
+    unfold representationCertifiedTransferGapSq
+    nlinarith
+  have h_gap_new_pos :
+      0 <
+        representationCertifiedTransferGapSq irreducibleGap boundScale
+          cert_new.err_source cert_new.divergence cert_new.lambda_star := by
+    linarith
+  exact requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
+    (representationCertifiedTransferGapSq irreducibleGap boundScale
+      cert_new.err_source cert_new.divergence cert_new.lambda_star)
+    (representationCertifiedTransferGapSq irreducibleGap boundScale
+      err_source_standard divergence_standard lambda_standard)
+    noiseVar tau h_gap_new_pos h_gap_order h_noise h_tau
+
+/-- **More source populations reduce the target fine-tuning burden.**
+    This is an explicit shared-representation model, not a bookkeeping
+    amortization identity. We assume:
+
+    - residual source-target mismatch after pretraining on `k` source
+      populations is `irreducibleGap + populationSpecificGap / k`;
+    - fine-tuning then uses the optimal shrinkage estimator already solved above;
+    - adaptation burden is measured both by the resulting optimal MSE at a fixed
+      target sample size and by the target sample size required to hit a fixed
+      MSE tolerance `τ`.
+
+    Under that model, more source populations strictly reduce:
+    1. the residual transfer gap,
+    2. the optimal fine-tuning MSE at fixed `nTarget`, and
+    3. the target sample size needed to reach the same MSE tolerance. -/
+theorem amortized_per_population_adaptation_cost_falls_with_task_count
+    (irreducibleGap populationSpecificGap noiseVar nTarget tau : ℝ)
+    (k₁ k₂ : ℕ)
+    (h_irred : 0 ≤ irreducibleGap)
+    (h_pop : 0 < populationSpecificGap)
+    (h_noise : 0 < noiseVar)
+    (h_n : 0 < nTarget)
+    (h_tau : 0 < tau)
+    (h_k₁ : 0 < k₁)
+    (h_more_tasks : k₁ < k₂)
+    (h_tau_small :
+      tau < metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂) :
+    metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂ <
+      metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁ ∧
+    optimalFineTuningMSE
+        (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+        noiseVar nTarget <
+      optimalFineTuningMSE
+        (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+        noiseVar nTarget ∧
+    0 <
+      requiredTargetSamplesForOptimalFineTuningMSE
+        (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+        noiseVar tau ∧
+    requiredTargetSamplesForOptimalFineTuningMSE
+        (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+        noiseVar tau <
+      requiredTargetSamplesForOptimalFineTuningMSE
+        (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+        noiseVar tau := by
+  have h_k₂ : 0 < k₂ := lt_trans h_k₁ h_more_tasks
+  have h_gap_order :
+      metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂ <
+        metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁ := by
+    exact metaLearnedTransferGapSq_strictMono
+      irreducibleGap populationSpecificGap k₁ k₂ h_pop h_k₁ h_more_tasks
+  have h_gap₂_pos :
+      0 < metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂ := by
+    exact metaLearnedTransferGapSq_pos
+      irreducibleGap populationSpecificGap k₂ h_irred h_pop h_k₂
+  have h_mse_order :
+      optimalFineTuningMSE
+          (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+          noiseVar nTarget <
+        optimalFineTuningMSE
+          (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+          noiseVar nTarget := by
+    exact optimalFineTuningMSE_strictMono_in_gapSq
+      (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+      (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+      noiseVar nTarget (le_of_lt h_gap₂_pos) h_gap_order h_noise h_n
+  have h_req_pos :
+      0 <
+        requiredTargetSamplesForOptimalFineTuningMSE
+          (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+          noiseVar tau := by
+    exact requiredTargetSamplesForOptimalFineTuningMSE_pos
+      (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+      noiseVar tau h_noise h_tau h_tau_small
+  have h_req_order :
+      requiredTargetSamplesForOptimalFineTuningMSE
+          (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+          noiseVar tau <
+        requiredTargetSamplesForOptimalFineTuningMSE
+          (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+          noiseVar tau := by
+    exact requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
+      (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+      (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+      noiseVar tau h_gap₂_pos h_gap_order h_noise h_tau
+  exact ⟨h_gap_order, h_mse_order, h_req_pos, h_req_order⟩
 
 end FineTuning
 
@@ -1112,23 +1707,75 @@ theorem subunit_effect_correlation_prevents_attaining_target_heritability
     nlinarith
   exact lt_of_le_of_lt h_bound h_ceiling_lt
 
+/-- **Transfer ceiling from private architecture and migration-limited LD sharing.**
+    Even with perfect transport on the shared loci, only the shared causal
+    fraction `1 - f_private` can contribute across populations, and only the
+    migration-drift shared-LD fraction `sharedLDFromMigration M` can be tagged
+    coherently in the target. This gives the architecture-aware ceiling
+
+    `h²_target × (1 - f_private) × sharedLDFromMigration M`.
+
+    The ceiling is stated in terms of target heritability rather than source
+    `R²`, so it is directly comparable to the theoretical transport limits above
+    and to the migration-drift LD machinery in `PortabilityDrift`. -/
+noncomputable def privateArchitectureTransferCeiling
+    (h2_target f_private M : ℝ) : ℝ :=
+  h2_target * (1 - f_private) * sharedLDFromMigration M
+
 /-- **A positive private causal fraction lowers the transferable `R²` ceiling.**
-    In the simple overlap model where only the shared fraction `f_shared`
-    contributes cross-population signal, the transferable ceiling is
-    `r2_source * f_shared = r2_source * (1 - f_private)`. Any strictly positive
-    private fraction therefore lowers that ceiling below the source `R²`. -/
+    In the architecture-aware transfer model above, compare a trait with
+    private causal fraction `f_private` to the same trait with no private
+    architecture (`f_private = 0`) at the same migration-drift LD sharing level
+    `sharedLDFromMigration M`.
+
+    If a transported score is certified to satisfy the private-architecture
+    ceiling, then any strictly positive private fraction pushes the achievable
+    target `R²` strictly below the no-private benchmark, and therefore strictly
+    below target heritability as well. This is a real transport-limit statement,
+    not just the algebraic identity `f_shared = 1 - f_private`. -/
 theorem private_causal_fraction_lowers_transfer_ceiling
-    (r2_source f_shared f_private : ℝ)
-    (h_total : f_shared + f_private = 1)
+    (r2_target h2_target f_private M : ℝ)
+    (h_bound : r2_target ≤ privateArchitectureTransferCeiling h2_target f_private M)
+    (h_h2 : 0 < h2_target)
     (h_private : 0 < f_private)
-    (h_r2 : 0 < r2_source) :
-    r2_source * f_shared = r2_source * (1 - f_private) ∧
-      r2_source * f_shared < r2_source := by
-  have h_shared_eq : f_shared = 1 - f_private := by linarith
-  constructor
-  · rw [h_shared_eq]
-  · have h_shared_lt_one : f_shared < 1 := by linarith
-    exact mul_lt_of_lt_one_right h_r2 h_shared_lt_one
+    (hM : 0 < M) :
+    privateArchitectureTransferCeiling h2_target f_private M <
+      privateArchitectureTransferCeiling h2_target 0 M ∧
+    r2_target < privateArchitectureTransferCeiling h2_target 0 M ∧
+    r2_target < h2_target := by
+  have h_shared_pos : 0 < sharedLDFromMigration M := by
+    unfold sharedLDFromMigration
+    have h_den_pos : 0 < 1 + M := by linarith
+    exact div_pos hM h_den_pos
+  have h_shared_lt_one : sharedLDFromMigration M < 1 :=
+    sharedLDFromMigration_lt_one M (le_of_lt hM)
+  have h_one_minus_lt_one : 1 - f_private < 1 := by linarith
+  have h_ceiling_lt_no_private :
+      privateArchitectureTransferCeiling h2_target f_private M <
+        privateArchitectureTransferCeiling h2_target 0 M := by
+    unfold privateArchitectureTransferCeiling
+    have h_base_pos : 0 < h2_target * sharedLDFromMigration M := by
+      exact mul_pos h_h2 h_shared_pos
+    calc
+      h2_target * (1 - f_private) * sharedLDFromMigration M
+          = (h2_target * sharedLDFromMigration M) * (1 - f_private) := by ring
+      _ < h2_target * sharedLDFromMigration M := by
+        exact mul_lt_of_lt_one_right h_base_pos h_one_minus_lt_one
+      _ = h2_target * (1 - (0 : ℝ)) * sharedLDFromMigration M := by ring
+  have h_no_private_lt_h2 :
+      privateArchitectureTransferCeiling h2_target 0 M < h2_target := by
+    unfold privateArchitectureTransferCeiling
+    calc
+      h2_target * (1 - (0 : ℝ)) * sharedLDFromMigration M
+          = h2_target * sharedLDFromMigration M := by ring
+      _ < h2_target := by
+        exact mul_lt_of_lt_one_right h_h2 h_shared_lt_one
+  have h_r2_lt_no_private :
+      r2_target < privateArchitectureTransferCeiling h2_target 0 M :=
+    lt_of_le_of_lt h_bound h_ceiling_lt_no_private
+  have h_r2_lt_h2 : r2_target < h2_target :=
+    lt_trans h_r2_lt_no_private h_no_private_lt_h2
+  exact ⟨h_ceiling_lt_no_private, h_r2_lt_no_private, h_r2_lt_h2⟩
 
 /-- **Transporting a source-optimized PGS to a more diverged target lowers `R²`.**
     This is the honest transfer-limit statement available from the core drift
