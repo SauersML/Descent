@@ -1,9 +1,11 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
+import Calibrator.TransportIdentities
 
 namespace Calibrator
 
 open MeasureTheory
+open scoped ProbabilityTheory
 
 /-!
 # Formal Proofs for Open Questions in PGS Portability
@@ -25,6 +27,51 @@ We also formalize sub-questions:
 -/
 
 /-!
+# Master Transport Theorem
+
+The core portability identity is the exact MSE transport decomposition together
+with the exact decomposition of target cross-covariances and target-optimal
+weights into causal and context terms.
+-/
+
+section MasterTransport
+
+variable {Ω : Type*}
+variable {J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
+
+theorem master_transport_decomposition_exact
+    (sigmaInv : Matrix J J ℝ)
+    (E : ExpFunctional Ω)
+    (X : Ω → J → ℝ) (Y : Ω → ℝ)
+    (w : J → ℝ)
+    (hcentered : ∀ i, E (fun ω => X ω i) = 0)
+    (hsigmaInv : covarianceMatrix E X * sigmaInv = 1) :
+    expMse E Y (linScore w X)
+      = expMse E Y (linScore (optimalWeightsFromMoments sigmaInv E X Y) X)
+        + dot (fun i => w i - optimalWeightsFromMoments sigmaInv E X Y i)
+            ((covarianceMatrix E X).mulVec
+              (fun i => w i - optimalWeightsFromMoments sigmaInv E X Y i)) := by
+  exact master_transport_theorem_closed_form sigmaInv E X Y w hcentered hsigmaInv
+
+theorem target_cross_covariance_decomposition_exact
+    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (C : Ω → L → ℝ)
+    (β : L → ℝ) (h : Ω → ℝ) :
+    crossCovVector E X (fun ω => causalSignal β C ω + h ω)
+      = (predictorCausalCovariance E X C).mulVec β + contextCrossCovVector E X h := by
+  exact crossCovVector_decomposition E X C β h
+
+theorem target_optimal_weights_decomposition_exact
+    (sigmaInv : Matrix J J ℝ)
+    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (C : Ω → L → ℝ)
+    (β : L → ℝ) (h : Ω → ℝ) :
+    optimalWeightsFromMoments sigmaInv E X (fun ω => causalSignal β C ω + h ω)
+      = sigmaInv.mulVec ((predictorCausalCovariance E X C).mulVec β)
+        + sigmaInv.mulVec (contextCrossCovVector E X h) := by
+  exact optimalWeightsFromMoments_decomposition sigmaInv E X C β h
+
+end MasterTransport
+
+/-!
 ## Open Question 1: Law of Total Variance and Weak Predictability
 
 Individual-level squared prediction error ε²ᵢ has high within-group variance.
@@ -33,6 +80,45 @@ the conditional variance E[Var(ε²|D)] dominates Var(E[ε²|D]).
 -/
 
 section Question1
+
+theorem scalar_summary_insufficient_for_accuracy
+    {V : Type*} [AddCommGroup V] [Module ℝ V]
+    (distance accuracy : V →ₗ[ℝ] ℝ)
+    (hnot : ¬ ∃ c : ℝ, accuracy = c • distance) :
+    ∀ θ : V, ∃ θ' : V, distance θ' = distance θ ∧ accuracy θ' ≠ accuracy θ := by
+  exact scalar_summary_insufficient_of_not_scalar_factorization distance accuracy hnot
+
+theorem explainable_fraction_bound_of_conditional_noise_floor_exact
+    {Ω : Type*} {mΩ : MeasurableSpace Ω}
+    {μ : Measure[mΩ] Ω} [IsProbabilityMeasure μ]
+    {m : MeasurableSpace Ω}
+    (hm : m ≤ mΩ)
+    {L noiseFloor : Ω → ℝ}
+    (hL : MemLp L 2 μ)
+    (hVar_pos : 0 < Var[L; μ])
+    (hNoise_int : Integrable noiseFloor μ)
+    (hNoise_nonneg : 0 ≤ μ[noiseFloor])
+    (hNoise_le : noiseFloor ≤ᵐ[μ] conditionalVariance μ m L) :
+    explainableFraction (Var[conditionalMean μ m L; μ]) (Var[L; μ])
+      ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + μ[noiseFloor]) := by
+  exact explainable_fraction_bound_of_conditional_noise_floor hm hL hVar_pos
+    hNoise_int hNoise_nonneg hNoise_le
+
+theorem explainable_fraction_bound_of_conditional_gaussian_floor_exact
+    {Ω : Type*} {mΩ : MeasurableSpace Ω}
+    {μ : Measure[mΩ] Ω} [IsProbabilityMeasure μ]
+    {m : MeasurableSpace Ω}
+    (hm : m ≤ mΩ)
+    {L sigma4 : Ω → ℝ}
+    (hL : MemLp L 2 μ)
+    (hVar_pos : 0 < Var[L; μ])
+    (hsigma4_int : Integrable sigma4 μ)
+    (hsigma4_nonneg : 0 ≤ μ[sigma4])
+    (hGaussianFloor : (fun ω => (2 : ℝ) * sigma4 ω) ≤ᵐ[μ] conditionalVariance μ m L) :
+    explainableFraction (Var[conditionalMean μ m L; μ]) (Var[L; μ])
+      ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + 2 * μ[sigma4]) := by
+  exact explainable_fraction_bound_of_conditional_gaussian_floor hm hL hVar_pos
+    hsigma4_int hsigma4_nonneg hGaussianFloor
 
 /-- **Law of total variance identity.**
     Var(Z) = E[Var(Z|D)] + Var(E[Z|D]).
@@ -88,39 +174,35 @@ end Question1
 
 
 /-!
-## Open Question 2: Trait-Specific Portability (Allelic Turnover)
+## Open Question 2: Trait-Specific Portability
 
-For immune-related traits, allelic effects change rapidly across populations.
-Effect correlation ρ(d) decays faster for traits under heterogeneous selection.
-PGS R² scales as ρ(d)², so faster ρ decay → faster R² decay.
+Trait-specific portability is the exact consequence of locuswise transport
+heterogeneity together with trait-specific baseline weights.
 -/
 
 section Question2
 
-/-- **Effect correlation decay model.**
-    Under exponential decay: ρ(d) = exp(-lam*d). Immune lam >> neutral lam.
-    Faster exponential decay rate implies smaller correlation at any positive distance. -/
-theorem faster_decay_lower_correlation
-    (lam_slow lam_fast d : ℝ)
-    (_hlam_slow_pos : 0 < lam_slow)
-    (hlam_faster : lam_slow < lam_fast)
-    (hd_pos : 0 < d) :
-    Real.exp (-lam_fast * d) < Real.exp (-lam_slow * d) := by
-  apply Real.exp_lt_exp.mpr
-  nlinarith
+variable {J L : Type*}
+variable [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
 
-/-- Squared correlation: immune portability is strictly lower than neutral. -/
-theorem immune_portability_below_neutral
-    (r2_source lam_neutral lam_immune d : ℝ)
-    (hr2 : 0 < r2_source)
-    (hlamn : 0 < lam_neutral) (hlami : lam_neutral < lam_immune)
-    (hd : 0 < d) :
-    r2_source * (Real.exp (-lam_immune * d)) ^ 2 <
-      r2_source * (Real.exp (-lam_neutral * d)) ^ 2 := by
-  apply mul_lt_mul_of_pos_left _ hr2
-  apply sq_lt_sq'
-  · linarith [Real.exp_pos (-lam_immune * d), Real.exp_pos (-lam_neutral * d)]
-  · exact faster_decay_lower_correlation lam_neutral lam_immune d hlamn hlami hd
+theorem trait_transport_is_locus_weighted_sum
+    (w : J → ℝ) (K : J → L → ℝ) (β : L → ℝ) :
+    transportedCovariance w K β = ∑ l, locusTerm w K β l := by
+  exact transported_covariance_decomposes w K β
+
+theorem normalized_trait_transport_from_locus_factors
+    (aQ aT : L → ℝ)
+    (hbase : ∀ l, aT l ≠ 0) :
+    (∑ l, aQ l) / (∑ l, aT l)
+      = ∑ l, baselineWeight aT l * transportFactor aQ aT l := by
+  exact normalized_transport_from_factors aQ aT hbase
+
+theorem universal_trait_transport_when_factor_constant
+    (aT τ : L → ℝ) (φ : ℝ)
+    (hden : ∑ m, aT m ≠ 0)
+    (hτ : ∀ l, τ l = φ) :
+    (∑ l, aT l * τ l) / (∑ l, aT l) = φ := by
+  exact normalized_transport_constant_factor aT τ φ hden hτ
 
 /-- **Heterozygosity increases toward 0.5.**
     Under divergent selection, allele freq p moves from extreme to
@@ -179,84 +261,76 @@ end Question2
 
 
 /-!
-## Open Question 3: Measure-Specific Portability (Precision vs Recall)
+## Open Question 3: Metric-Specific Portability
 
-For T2D: precision ≈ constant, recall ↑ with genetic distance.
-Key mechanism: prevalence increases with distance + fixed PGS threshold.
+Different metrics are different functionals of the same transported law.
+For continuous traits this is the exact MSE identity; for binary traits it is
+the exact prevalence-recall-FPR formula for precision.
 -/
 
 section Question3
 
-/-- **Bayes positive predictive value (precision).**
-    PPV = πs / (πs + (1-π)f) where π = prevalence, s = sensitivity, f = FPR. -/
-noncomputable def bayesPPV (π s f : ℝ) : ℝ :=
-  π * s / (π * s + (1 - π) * f)
+variable {Ω : Type*}
 
-/-- **PPV is strictly increasing in prevalence** at fixed sensitivity and FPR. -/
-theorem ppv_increases_with_prevalence
-    (π₁ π₂ s f : ℝ)
-    (hs : 0 < s) (hf : 0 < f)
-    (hπ₁ : 0 < π₁) (hπ₂ : 0 < π₂)
-    (hπ₁_lt : π₁ < 1) (hπ₂_lt : π₂ < 1)
-    (h_prev : π₁ < π₂) :
-    bayesPPV π₁ s f < bayesPPV π₂ s f := by
-  unfold bayesPPV
-  have h_d₁ : 0 < π₁ * s + (1 - π₁) * f := by nlinarith [mul_pos hπ₁ hs, mul_pos (by linarith : (0 : ℝ) < 1 - π₁) hf]
-  have h_d₂ : 0 < π₂ * s + (1 - π₂) * f := by nlinarith [mul_pos hπ₂ hs, mul_pos (by linarith : (0 : ℝ) < 1 - π₂) hf]
-  rw [div_lt_div_iff₀ h_d₁ h_d₂]
-  nlinarith [mul_pos hs hf, mul_pos hπ₁ hs, mul_pos hπ₂ hs, mul_pos hπ₁ hf, mul_pos hπ₂ hf,
-             sq_nonneg s, sq_nonneg f, sq_nonneg π₁, sq_nonneg π₂]
+theorem continuous_metric_identity_exact
+    (E : ExpFunctional Ω) (Y S : Ω → ℝ)
+    (ρ lam : ℝ)
+    (hvarY : 0 < variance E Y)
+    (hlam : variance E S = variance E Y * lam)
+    (hρ : covariance E Y S = ρ * variance E Y * Real.sqrt lam) :
+    expMse E Y S
+      = variance E Y * (1 + lam - 2 * ρ * Real.sqrt lam)
+        + (bias E Y S) ^ 2 := by
+  exact mse_from_variance_ratio_corr_bias E Y S ρ lam hvarY hlam hρ
 
-/-- **Recall increases when more true cases exceed threshold.**
-    With fixed threshold and higher PGS mean among cases: recall ↑. -/
-theorem recall_increases_with_tp
-    (tp₁ tp₂ fn₁ fn₂ : ℝ)
-    (htp₁ : 0 < tp₁) (_hfn₁ : 0 ≤ fn₁)
-    (_htp₂ : 0 < tp₂) (_hfn₂ : 0 ≤ fn₂)
-    (h_tp_up : tp₁ < tp₂)
-    (h_total_same : tp₁ + fn₁ = tp₂ + fn₂) :
-    tp₁ / (tp₁ + fn₁) < tp₂ / (tp₂ + fn₂) := by
-  rw [h_total_same]
-  exact div_lt_div_of_pos_right h_tp_up (by linarith)
-
-/-- **R² and individual error can show opposite trends.**
-    If SSE↑ but SST↑ faster, then R² = 1 - SSE/SST increases
-    even though individual errors are larger. -/
-theorem r2_up_while_error_up
-    (sse₁ sse₂ sst₁ sst₂ : ℝ)
-    (_h_sse_pos₁ : 0 < sse₁) (_h_sst_pos₁ : 0 < sst₁)
-    (_h_sse_pos₂ : 0 < sse₂) (_h_sst_pos₂ : 0 < sst₂)
-    (_h_sse_up : sse₁ < sse₂)
-    (h_ratio_down : sse₂ / sst₂ < sse₁ / sst₁) :
-    1 - sse₁ / sst₁ < 1 - sse₂ / sst₂ := by
-  linarith
-
-/-- **Partial R² depends on predictor variance.**
-    When PGS variance changes with distance, partial R² can be non-monotonic
-    even if "accuracy per unit variance" is constant. -/
-theorem partial_r2_from_signal_variance
-    (v₁ v₂ slope_sq v_resid : ℝ)
-    (hv₁ : 0 < v₁) (hv₂ : 0 < v₂) (hs : 0 < slope_sq) (hvr : 0 < v_resid)
-    (hv_up : v₁ < v₂) :
-    slope_sq * v₁ / (slope_sq * v₁ + v_resid) < slope_sq * v₂ / (slope_sq * v₂ + v_resid) := by
-  exact expectedR2_strictMono_nonneg v_resid (slope_sq * v₁) (slope_sq * v₂) hvr
-    (le_of_lt (mul_pos hs hv₁)) (mul_lt_mul_of_pos_left hv_up hs)
+theorem binary_precision_formula_exact (c : ConfusionMatrix) :
+    ConfusionMatrix.precision c =
+      (ConfusionMatrix.prevalence c * ConfusionMatrix.recallRate c) /
+        (ConfusionMatrix.prevalence c * ConfusionMatrix.recallRate c +
+          (1 - ConfusionMatrix.prevalence c) * ConfusionMatrix.fpr c) := by
+  exact ConfusionMatrix.precision_eq_prevalence_recall_fpr c
 
 /-- **Precision-recall divergence is consistent.**
-    There exist parameter configurations where precision is constant
-    but recall increases: when prevalence↑ compensates for sensitivity↓
-    in precision, while recall benefits from more true cases. -/
+    There exist parameter configurations with fixed prevalence and fixed target
+    precision where recall changes and the induced false-positive rate changes
+    exactly as required by the precision identity. -/
 theorem precision_recall_divergence_exists :
-    ∃ (π₁ π₂ s₁ s₂ f₁ f₂ : ℝ),
-      0 < π₁ ∧ π₁ < π₂ ∧ π₂ < 1 ∧
-      0 < s₁ ∧ s₁ < s₂ ∧ s₂ ≤ 1 ∧
-      0 < f₁ ∧ 0 < f₂ ∧
-      -- recall (= sensitivity) increases
-      s₁ < s₂ := by
-  exact ⟨0.1, 0.2, 0.3, 0.5, 0.1, 0.2,
-    by norm_num, by norm_num, by norm_num,
-    by norm_num, by norm_num, by norm_num,
-    by norm_num, by norm_num, by norm_num⟩
+    ∃ (π p r₁ r₂ f₁ f₂ : ℝ),
+      0 < π ∧ π < 1 ∧
+      0 < p ∧ p < 1 ∧
+      0 < r₁ ∧ r₁ < r₂ ∧ r₂ ≤ 1 ∧
+      f₁ = π * r₁ * (1 - p) / ((1 - π) * p) ∧
+      f₂ = π * r₂ * (1 - p) / ((1 - π) * p) ∧
+      (π * r₁) / (π * r₁ + (1 - π) * f₁) = p ∧
+      (π * r₂) / (π * r₂ + (1 - π) * f₂) = p := by
+  refine ⟨1 / 2, 1 / 2, 1 / 4, 1 / 3,
+    (1 / 2) * (1 / 4) * (1 - 1 / 2) / ((1 - 1 / 2) * (1 / 2)),
+    (1 / 2) * (1 / 3) * (1 - 1 / 2) / ((1 - 1 / 2) * (1 / 2)), ?_⟩
+  constructor
+  · norm_num
+  constructor
+  · norm_num
+  constructor
+  · norm_num
+  constructor
+  · norm_num
+  constructor
+  · norm_num
+  constructor
+  · norm_num
+  constructor
+  · norm_num
+  constructor
+  · rfl
+  constructor
+  · rfl
+  constructor
+  · simpa using
+      (ConfusionMatrix.constant_precision_construction
+        (π := 1 / 2) (p := 1 / 2) (r := 1 / 4) (by norm_num) (by norm_num) (by norm_num))
+  · simpa using
+      (ConfusionMatrix.constant_precision_construction
+        (π := 1 / 2) (p := 1 / 2) (r := 1 / 3) (by norm_num) (by norm_num) (by norm_num))
 
 end Question3
 
@@ -508,6 +582,15 @@ We formalize this multiplicative interaction.
 
 section LDTurnoverInteraction
 
+theorem faster_decay_lower_correlation
+    (lam_slow lam_fast d : ℝ)
+    (_hlam_slow_pos : 0 < lam_slow)
+    (hlam_faster : lam_slow < lam_fast)
+    (hd_pos : 0 < d) :
+    Real.exp (-lam_fast * d) < Real.exp (-lam_slow * d) := by
+  apply Real.exp_lt_exp.mpr
+  nlinarith
+
 /-- **LD tagging efficiency decays exponentially with genetic distance.**
     ρ²_LD(d) = exp(-λ_LD · d). This is the Ohta-Kimura result. -/
 noncomputable def ldTaggingDecay (lam_LD d : ℝ) : ℝ :=
@@ -636,6 +719,49 @@ We formalize why local ancestry should be more informative.
 
 section LocalAncestry
 
+/-- **Variance in local Fst across loci creates additional prediction error.**
+    If local Fst varies (some loci have high Fst, others low), the prediction
+    error has a "locus heterogeneity" component not captured by global Fst. -/
+theorem locus_heterogeneity_creates_weighted_gap
+    {m : ℕ} (β : Fin m → ℝ) (fst : Fin m → ℝ) (fst_global : ℝ)
+    (h_nonneg : ∀ i, 0 ≤ β i ^ 2 * (fst i - fst_global))
+    (i₀ : Fin m)
+    (h_strict : 0 < β i₀ ^ 2 * (fst i₀ - fst_global)) :
+    fst_global * (∑ i, β i ^ 2) < ∑ i, β i ^ 2 * fst i := by
+  have hsum_strict :
+      0 < ∑ i, β i ^ 2 * (fst i - fst_global) := by
+    have hsingle :
+        β i₀ ^ 2 * (fst i₀ - fst_global)
+          ≤ ∑ i, β i ^ 2 * (fst i - fst_global) := by
+      simpa only using
+        (Finset.single_le_sum
+          (f := fun i => β i ^ 2 * (fst i - fst_global))
+          (fun i _ => h_nonneg i)
+          (Finset.mem_univ i₀))
+    exact lt_of_lt_of_le h_strict hsingle
+  have hrewrite :
+      ∑ i, β i ^ 2 * (fst i - fst_global)
+        = (∑ i, β i ^ 2 * fst i) - fst_global * (∑ i, β i ^ 2) := by
+    calc
+      ∑ i, β i ^ 2 * (fst i - fst_global)
+          = ∑ i, (β i ^ 2 * fst i - β i ^ 2 * fst_global) := by
+              apply Finset.sum_congr rfl
+              intro i hi
+              ring
+      _ = (∑ i, β i ^ 2 * fst i) - ∑ i, β i ^ 2 * fst_global := by
+              rw [Finset.sum_sub_distrib]
+      _ = (∑ i, β i ^ 2 * fst i) - fst_global * (∑ i, β i ^ 2) := by
+              rw [Finset.mul_sum]
+              congr 1
+              apply Finset.sum_congr rfl
+              intro i hi
+              ring
+  have hgap :
+      0 < (∑ i, β i ^ 2 * fst i) - fst_global * (∑ i, β i ^ 2) := by
+    rw [← hrewrite]
+    exact hsum_strict
+  linarith
+
 /-- **Local ancestry captures LD-relevant information.**
     Global Fst averages over the whole genome, but PGS accuracy depends on
     LD at specific index SNPs. Local Fst at those SNPs is more relevant.
@@ -644,26 +770,13 @@ section LocalAncestry
     differs from global Fst, global Fst is a biased proxy. -/
 theorem local_fst_more_informative
     {m : ℕ} (β : Fin m → ℝ) (fst_local : Fin m → ℝ) (fst_global : ℝ)
-    (i₀ : Fin m) (h_β : β i₀ ≠ 0) (h_fst_diff : fst_local i₀ ≠ fst_global) :
-    -- Weighted local Fst ≠ global Fst × Σβ² when at least one locus has
-    -- nonzero effect and local Fst different from global Fst.
-    -- This means global Fst does not capture the relevant information.
-    -- (The full proof would require summing over loci; we prove the weaker
-    -- statement that the weighted and unweighted sums differ for a single term.)
-    β i₀ ^ 2 * fst_local i₀ ≠ β i₀ ^ 2 * fst_global := by
-  intro h
-  exact h_fst_diff (mul_left_cancel₀ (pow_ne_zero 2 h_β) h)
-
-/-- **Variance in local Fst across loci creates additional prediction error.**
-    If local Fst varies (some loci have high Fst, others low), the prediction
-    error has a "locus heterogeneity" component not captured by global Fst. -/
-theorem locus_heterogeneity_increases_error
-    {m : ℕ} (β : Fin m → ℝ) (fst : Fin m → ℝ) (fst_mean : ℝ)
-    (_h_mean : fst_mean * (∑ i, β i ^ 2) = ∑ i, β i ^ 2 * fst_mean)
-    (_h_not_const : ∃ i j, fst i ≠ fst j) :
-    -- The prediction error is larger than what a uniform-Fst model predicts
-    -- because variance in local Fst adds a "Jensen gap" to the MSE
-    True := trivial
+    (h_nonneg : ∀ i, 0 ≤ β i ^ 2 * (fst_local i - fst_global))
+    (i₀ : Fin m)
+    (h_strict : 0 < β i₀ ^ 2 * (fst_local i₀ - fst_global))
+    (hweight_pos : 0 < ∑ i, β i ^ 2) :
+    fst_global < (∑ i, β i ^ 2 * fst_local i) / (∑ i, β i ^ 2) := by
+  exact (lt_div_iff₀ hweight_pos).2
+    (locus_heterogeneity_creates_weighted_gap β fst_local fst_global h_nonneg i₀ h_strict)
 
 end LocalAncestry
 
