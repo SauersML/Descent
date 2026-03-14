@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 namespace Calibrator
 
@@ -38,6 +39,47 @@ section HaplotypeDiversity
     With k SNPs and n haplotypes sampled, the expected number
     of distinct haplotypes H ≈ 2^k × (1 - (1-1/2^k)^n). -/
 
+noncomputable def expectedDistinctHaplotypes (k n : ℕ) : ℝ :=
+  (2 : ℝ) ^ k * (1 - (1 - 1 / ((2 : ℝ) ^ k)) ^ n)
+
+/-- The occupancy-model expectation is strictly increasing in the number of sampled haplotypes
+    whenever at least two haplotypes are possible in the region (`k > 0`). -/
+theorem expectedDistinctHaplotypes_strictMono
+    (k : ℕ) (h_k : 0 < k) :
+    StrictMono (expectedDistinctHaplotypes k) := by
+  refine strictMono_nat_of_lt_succ fun n ↦ ?_
+  let m : ℝ := (2 : ℝ) ^ k
+  have h_m_pos : 0 < m := by
+    dsimp [m]
+    positivity
+  have h_m_gt_one : 1 < m := by
+    rcases Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt h_k) with ⟨k', rfl⟩
+    dsimp [m]
+    have h_one_le_pow : (1 : ℝ) ≤ (2 : ℝ) ^ k' := by
+      exact_mod_cast (Nat.one_le_pow k' 2 (by decide : 0 < 2))
+    calc
+      (1 : ℝ) < 2 := one_lt_two
+      _ ≤ 2 * (2 : ℝ) ^ k' := by nlinarith
+      _ = (2 : ℝ) ^ (Nat.succ k') := by simp [pow_succ, mul_comm]
+  have h_q_pos : 0 < 1 - 1 / m := by
+    have h_inv_lt_one : 1 / m < 1 := by
+      rw [div_lt_one h_m_pos]
+      exact h_m_gt_one
+    exact sub_pos.mpr h_inv_lt_one
+  have h_step :
+      expectedDistinctHaplotypes k (n + 1) =
+        expectedDistinctHaplotypes k n + (1 - 1 / m) ^ n := by
+    unfold expectedDistinctHaplotypes
+    dsimp [m]
+    rw [pow_succ]
+    field_simp [h_m_pos.ne']
+    ring
+  have h_increment_pos : 0 < (1 - 1 / m) ^ n := pow_pos h_q_pos n
+  calc
+    expectedDistinctHaplotypes k n
+      < expectedDistinctHaplotypes k n + (1 - 1 / m) ^ n := by linarith
+    _ = expectedDistinctHaplotypes k (n + 1) := h_step.symm
+
 /-- **African populations have more haplotypes.**
     More recombination cycles → more distinct haplotypes.
     This means European haplotype-based PGS may miss
@@ -48,11 +90,9 @@ section HaplotypeDiversity
 theorem more_haplotypes_in_afr
     (n_eur n_afr k : ℕ)
     (h_k : 0 < k)
-    (h_eur_smaller : n_eur < n_afr)
-    (n_hap_eur n_hap_afr : ℕ)
-    (h_eur_bound : n_hap_eur ≤ n_eur)
-    (h_afr_bound : n_eur < n_hap_afr) :
-    n_hap_eur < n_hap_afr := by omega
+    (h_eur_smaller : n_eur < n_afr) :
+    expectedDistinctHaplotypes k n_eur < expectedDistinctHaplotypes k n_afr := by
+  exact expectedDistinctHaplotypes_strictMono k h_k h_eur_smaller
 
 /-- **Haplotype frequency spectrum differs.**
     In EUR, common haplotypes account for a larger fraction
@@ -78,26 +118,65 @@ theorem haplotype_frequency_more_uniform_afr
     H = Σ f_i² where f_i are haplotype frequencies.
     Lower in more diverse populations → more unique haplotypes.
     With n haplotypes at equal frequency 1/n, H = n × (1/n)² = 1/n. -/
-noncomputable def haplotypeHomozygosity (n : ℕ) : ℝ :=
-  1 / (n : ℝ)
+noncomputable def haplotypeHomozygosity {α : Type*} [Fintype α] (freq : α → ℝ) : ℝ :=
+  ∑ i, freq i ^ 2
 
-/-- Homozygosity under uniform frequencies is in (0, 1] for n ≥ 1,
-    and decreases with more haplotypes (more diverse populations). -/
-theorem homozygosity_bounded (n : ℕ) (h_n : 1 ≤ n) :
-    0 < haplotypeHomozygosity n ∧ haplotypeHomozygosity n ≤ 1 := by
-  unfold haplotypeHomozygosity
+/-- For any valid haplotype frequency distribution, homozygosity is in `(0, 1]`. -/
+theorem homozygosity_bounded {α : Type*} [Fintype α] (freq : α → ℝ)
+    (h_nonneg : ∀ i, 0 ≤ freq i)
+    (h_sum : ∑ i, freq i = 1) :
+    0 < haplotypeHomozygosity freq ∧ haplotypeHomozygosity freq ≤ 1 := by
+  have h_nonneg_total : 0 ≤ haplotypeHomozygosity freq := by
+    unfold haplotypeHomozygosity
+    exact Fintype.sum_nonneg fun i ↦ sq_nonneg (freq i)
+  have h_ne_zero : haplotypeHomozygosity freq ≠ 0 := by
+    intro h_zero
+    have h_sq_zero : ∀ i, freq i ^ 2 = 0 := by
+      have :
+          (∑ i, freq i ^ 2) = 0 := by
+        simpa [haplotypeHomozygosity] using h_zero
+      have h_sq_zero_fun :
+          (fun i ↦ freq i ^ 2) = 0 :=
+        (Fintype.sum_eq_zero_iff_of_nonneg fun i ↦ sq_nonneg (freq i)).1 this
+      intro i
+      exact congrFun h_sq_zero_fun i
+    have h_freq_zero : ∀ i, freq i = 0 := fun i ↦ sq_eq_zero_iff.mp (h_sq_zero i)
+    have h_total_zero : (∑ i, freq i) = 0 := by simp [h_freq_zero]
+    linarith
+  have h_le_one : haplotypeHomozygosity freq ≤ 1 := by
+    unfold haplotypeHomozygosity
+    calc
+      ∑ i, freq i ^ 2 ≤ (∑ i, freq i) ^ 2 := by
+        simpa using
+          (Finset.sum_sq_le_sq_sum_of_nonneg (s := Finset.univ) (f := freq)
+            fun i _ ↦ h_nonneg i)
+      _ = 1 := by rw [h_sum]; norm_num
   constructor
-  · exact div_pos one_pos (Nat.cast_pos.mpr (by omega))
-  · rw [div_le_one (Nat.cast_pos.mpr (by omega) : (0 : ℝ) < ↑n)]
-    exact Nat.one_le_cast.mpr h_n
+  · exact lt_of_le_of_ne h_nonneg_total h_ne_zero.symm
+  · exact h_le_one
 
-/-- More diverse populations (more haplotypes) have lower homozygosity. -/
-theorem homozygosity_decreases_with_diversity (n₁ n₂ : ℕ)
-    (h₁ : 1 ≤ n₁) (h_lt : n₁ < n₂) :
-    haplotypeHomozygosity n₂ < haplotypeHomozygosity n₁ := by
+/-- Under uniform frequencies across `n` haplotypes, the general homozygosity formula reduces to
+    `1 / n`. -/
+theorem uniform_homozygosity_eq_inverse_haplotype_count
+    (n : ℕ) (h_n : 1 ≤ n) :
+    haplotypeHomozygosity (fun _ : Fin n ↦ 1 / (n : ℝ)) = 1 / (n : ℝ) := by
+  have h_n_pos : (0 : ℝ) < n := Nat.cast_pos.mpr (Nat.succ_le_iff.mp h_n)
   unfold haplotypeHomozygosity
-  apply div_lt_div_of_pos_left one_pos
-    (Nat.cast_pos.mpr (by omega))
+  calc
+    ∑ _ : Fin n, (1 / (n : ℝ)) ^ 2 = (n : ℝ) * (1 / (n : ℝ)) ^ 2 := by simp
+    _ = 1 / (n : ℝ) := by
+      field_simp [h_n_pos.ne']
+
+/-- In the uniform-frequency special case, more haplotypes imply lower homozygosity. -/
+theorem uniform_homozygosity_decreases_with_diversity (n₁ n₂ : ℕ)
+    (h₁ : 1 ≤ n₁) (h_lt : n₁ < n₂) :
+    haplotypeHomozygosity (fun _ : Fin n₂ ↦ 1 / (n₂ : ℝ)) <
+      haplotypeHomozygosity (fun _ : Fin n₁ ↦ 1 / (n₁ : ℝ)) := by
+  have h₂ : 1 ≤ n₂ := le_trans h₁ (Nat.le_of_lt h_lt)
+  rw [uniform_homozygosity_eq_inverse_haplotype_count n₂ h₂]
+  rw [uniform_homozygosity_eq_inverse_haplotype_count n₁ h₁]
+  exact div_lt_div_of_pos_left one_pos
+    (Nat.cast_pos.mpr (Nat.succ_le_iff.mp h₁))
     (Nat.cast_lt.mpr h_lt)
 
 end HaplotypeDiversity

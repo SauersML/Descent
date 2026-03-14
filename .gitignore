@@ -51,10 +51,14 @@ gh_*/
 /data/snp_intersection_downloads/
 /data/snp_intersection_downloads_v2/
 /data/*.gnomon_cache/
+/data/autosomal.txt
+/data/genome_Joshua_Yoakem_v5_Full_20250129211749.txt
+/data/arrays.snps_callrate_ge_0.9999.tsv
 /local_power/
 /examples/convert_score_output/
 /sims/.cache/
 /tmp/
+/rust_digest.txt
 
 # Python bytecode cache (generated, interpreter-version specific)
 /scripts/__pycache__/

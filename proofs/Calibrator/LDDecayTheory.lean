@@ -273,7 +273,7 @@ their small Ne contributes disproportionately large 1/Ne terms.
 section HarmonicMeanNe
 
 /-- **Harmonic mean Ne** for a population size trajectory over T generations. -/
-noncomputable def harmonicMeanNe (Ne : Fin T → ℝ) : ℝ :=
+noncomputable def harmonicMeanNe {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
   (T : ℝ) / ∑ i, (1 / Ne i)
 
 /-- The reciprocal of the harmonic mean equals the average of reciprocals. -/

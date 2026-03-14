@@ -433,8 +433,8 @@ theorem optimal_pc_removal_exists
 theorem adversarial_improves_portability
     (err_source divergence_standard divergence_adversarial lambda_star : ℝ)
     (h_div_reduced : divergence_adversarial < divergence_standard)
-    (h_divs_nn : 0 ≤ divergence_adversarial)
-    (h_lambda_nn : 0 ≤ lambda_star) (h_err_nn : 0 ≤ err_source) :
+    (_h_divs_nn : 0 ≤ divergence_adversarial)
+    (_h_lambda_nn : 0 ≤ lambda_star) (_h_err_nn : 0 ≤ err_source) :
     -- Adversarial bound is tighter than standard bound
     err_source + divergence_adversarial + lambda_star <
       err_source + divergence_standard + lambda_star := by linarith
@@ -446,7 +446,7 @@ theorem adversarial_improves_portability
 theorem info_bottleneck_tradeoff
     (I_phi_A I_phi_Y lam : ℝ)
     (h_objective : I_phi_Y - lam * I_phi_A > 0)
-    (h_lam : 0 < lam) (h_I_A_nn : 0 ≤ I_phi_A) :
+    (_h_lam : 0 < lam) (_h_I_A_nn : 0 ≤ I_phi_A) :
     I_phi_Y > lam * I_phi_A := by linarith
 
 end FeatureRepresentation

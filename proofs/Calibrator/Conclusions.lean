@@ -740,9 +740,9 @@ by
           symm
           exact h_left
         _ = H⁻¹ * (- (Real.exp (rho i) • S_basis i) * beta_hat rho) := by
-          simp [H] using h_mul
+          simpa [H, dbeta] using h_mul
         _ = -H⁻¹ * ((Real.exp (rho i) • S_basis i) * beta_hat rho) := by
-          simp [neg_mul]
+          rw [Matrix.neg_mul, Matrix.mul_neg, Matrix.neg_mul]
     calc
       deriv (fun r => beta_hat (Function.update rho i r)) (rho i)
           = -H⁻¹ * ((Real.exp (rho i) • S_basis i) * beta_hat rho) := h_solved

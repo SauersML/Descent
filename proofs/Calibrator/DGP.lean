@@ -665,7 +665,7 @@ theorem linear_noise_implies_nonlinear_slope
   dsimp [optimalSlopeLinearNoise] at h0 h1 h2
 
   -- Simplify the equations
-  simp only [mul_zero, add_zero, zero_mul] at h0 h1
+  simp only [mul_zero, add_zero, zero_mul, mul_one] at h0 h1
   have h2 : beta0 + 2 * beta1 = sigma_g_sq / (sigma_g_sq + base_error + slope_error * 2) := by
     convert h2 using 1
     ring
@@ -2086,6 +2086,7 @@ noncomputable def designMatrix {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (Fin 
         pgsBasis.B ⟨m.val + 1, by exact Nat.succ_lt_succ m.isLt⟩ (data.p i) *
           splineBasis.b s (data.c i l)
 
+set_option maxHeartbeats 10000000 in
 /-- **Key Lemma**: Linear predictor equals design matrix times parameter vector.
     This is the bridge between the GAM structure and linear algebra.
 
@@ -2160,7 +2161,7 @@ lemma linearPredictor_eq_designMatrix_mulVec {n p k sp : ℕ}
           ∑ x : ParamIxSum p k sp, g x := by
       refine (Fintype.sum_equiv (ParamIx.equivSum p k sp) _ g ?_)
       intro x
-      cases x <;> simp [g, ParamIx.equivSum]
+      cases x <;> simp [g, ParamIx.equivSum, mul_comm, mul_left_comm, mul_assoc]
     -- Split the sum over the nested Sum type.
     simpa [ParamIxSum, g] using hsum'
   -- Expand linearPredictor and match sums (convert double sums to pair sums).
@@ -2232,9 +2233,69 @@ lemma linearPredictor_eq_designMatrix_mulVec {n p k sp : ℕ}
                 m.pgsBasis.B
                   ⟨mlj.1.val + 1, by exact Nat.succ_lt_succ mlj.1.isLt⟩ (data.p i) *
                   (m.pcSplineBasis.b mlj.2.2 (data.c i mlj.2.1) * m.fₘₗ mlj.1 mlj.2.1 mlj.2.2))) := by
-    simp [linearPredictor, evalSmooth, Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul]
-    simp [hsum_pc, hsum_int]
-    ring_nf
+    have h_expand :
+        linearPredictor m (data.p i) (data.c i) =
+          m.γ₀₀
+          + (∑ l, ∑ j, m.pcSplineBasis.b j (data.c i l) * m.f₀ₗ l j)
+          + ∑ mIdx,
+              m.pgsBasis.B
+                ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
+                (m.γₘ₀ mIdx + ∑ l, ∑ j, m.pcSplineBasis.b j (data.c i l) * m.fₘₗ mIdx l j) := by
+      simpa [linearPredictor, evalSmooth, add_assoc, add_left_comm, add_comm,
+        mul_assoc, mul_left_comm, mul_comm]
+    have h_pgs :
+        (∑ mIdx,
+            m.pgsBasis.B
+              ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
+                (m.γₘ₀ mIdx + ∑ l, ∑ j, m.pcSplineBasis.b j (data.c i l) * m.fₘₗ mIdx l j)) =
+          (∑ mIdx,
+              m.pgsBasis.B
+                ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) * m.γₘ₀ mIdx) +
+            ∑ mIdx, ∑ l, ∑ j,
+              m.pgsBasis.B
+                ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
+                (m.pcSplineBasis.b j (data.c i l) * m.fₘₗ mIdx l j) := by
+      simp [mul_add, Finset.mul_sum, Finset.sum_add_distrib,
+        add_assoc, add_left_comm, add_comm]
+    calc
+      linearPredictor m (data.p i) (data.c i)
+          = m.γ₀₀
+            + (∑ l, ∑ j, m.pcSplineBasis.b j (data.c i l) * m.f₀ₗ l j)
+            + ∑ mIdx,
+                m.pgsBasis.B
+                  ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
+                  (m.γₘ₀ mIdx + ∑ l, ∑ j, m.pcSplineBasis.b j (data.c i l) * m.fₘₗ mIdx l j) := h_expand
+      _ = m.γ₀₀
+            + (∑ l, ∑ j, m.pcSplineBasis.b j (data.c i l) * m.f₀ₗ l j)
+            + ((∑ mIdx,
+                  m.pgsBasis.B
+                    ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) * m.γₘ₀ mIdx) +
+                ∑ mIdx, ∑ l, ∑ j,
+                  m.pgsBasis.B
+                    ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) *
+                    (m.pcSplineBasis.b j (data.c i l) * m.fₘₗ mIdx l j)) := by
+              rw [h_pgs]
+      _ = m.γ₀₀
+            + (∑ lj : Fin k × Fin sp, m.pcSplineBasis.b lj.2 (data.c i lj.1) * m.f₀ₗ lj.1 lj.2)
+            + ((∑ mIdx,
+                  m.pgsBasis.B
+                    ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) * m.γₘ₀ mIdx) +
+                ∑ mlj : Fin p × Fin k × Fin sp,
+                  m.pgsBasis.B
+                    ⟨mlj.1.val + 1, by exact Nat.succ_lt_succ mlj.1.isLt⟩ (data.p i) *
+                    (m.pcSplineBasis.b mlj.2.2 (data.c i mlj.2.1) * m.fₘₗ mlj.1 mlj.2.1 mlj.2.2)) := by
+              rw [hsum_pc, hsum_int]
+      _ = m.γ₀₀
+            + (∑ mIdx,
+                m.pgsBasis.B
+                  ⟨mIdx.val + 1, by exact Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) * m.γₘ₀ mIdx
+              + (∑ lj : Fin k × Fin sp,
+                  m.pcSplineBasis.b lj.2 (data.c i lj.1) * m.f₀ₗ lj.1 lj.2
+                + ∑ mlj : Fin p × Fin k × Fin sp,
+                    m.pgsBasis.B
+                      ⟨mlj.1.val + 1, by exact Nat.succ_lt_succ mlj.1.isLt⟩ (data.p i) *
+                      (m.pcSplineBasis.b mlj.2.2 (data.c i mlj.2.1) * m.fₘₗ mlj.1 mlj.2.1 mlj.2.2))) := by
+              simpa [add_assoc, add_left_comm, add_comm]
   -- Finish by expanding the design-matrix side.
   simpa [designMatrix, packParams, Matrix.mulVec, dotProduct, mul_comm,
     add_assoc, add_left_comm, add_comm] using hsum_lin.trans hsum_paramix.symm
@@ -2398,7 +2459,7 @@ theorem penalty_quadratic_tendsto_proof {ι : Type*} [Fintype ι] [DecidableEq �
   -- Sphere is nonempty in the nontrivial case
   have h_sphere_nonempty : sphere.Nonempty := by
     have : 0 ≤ (1 : ℝ) := by linarith
-    simp [sphere] using (NormedSpace.sphere_nonempty (x := (0 : ι → ℝ)) (r := (1 : ℝ))).2 this
+    simpa [sphere] using (NormedSpace.sphere_nonempty (x := (0 : ι → ℝ)) (r := (1 : ℝ))).2 this
 
   -- Q attains a minimum on the sphere
   obtain ⟨v_min, hv_min_in, h_min⟩ :=
@@ -2409,8 +2470,7 @@ theorem penalty_quadratic_tendsto_proof {ι : Type*} [Fintype ι] [DecidableEq �
     intro h0
     have : ‖v_min‖ = (1 : ℝ) := by simpa [sphere] using hv_min_in
     have h : (0 : ℝ) = 1 := by
-      simp [h0] at this
-      exact this
+      simpa [h0] using this
     exact (one_ne_zero (α := ℝ)) (by simpa using h.symm)
   have hc_pos : 0 < c := hS_posDef v_min hv_min_ne
 
@@ -2806,7 +2866,7 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
       classical
       refine Finset.sum_congr rfl ?_
       intro i _
-      simp [pointwiseNLL, hm.dist_gaussian, Pi.sub_apply, h_lin]
+      simp [X, pointwiseNLL, hm.dist_gaussian, Pi.sub_apply, h_lin]
     have h_diag : ∀ i, (S.mulVec (packParams m)) i = s i * (packParams m) i := by
       intro i
       classical
@@ -2822,7 +2882,7 @@ theorem fit_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] 
             Finset.univ.sum (fun i => s i * (packParams m i) ^ 2) := by
         refine Finset.sum_congr rfl ?_
         intro i _
-        simp [h_diag, pow_two]
+        simp [h_diag, pow_two, mul_comm, mul_left_comm, mul_assoc]
       let g : ParamIxSum p k sp → ℝ
         | Sum.inl _ => 0
         | Sum.inr (Sum.inl _) => 0
@@ -3166,8 +3226,8 @@ lemma gaussianPenalizedLoss_strictConvex {ι : Type*} {n : ℕ} [Fintype (Fin n)
         intro h0
         have hzero : β₁ - β₂ = 0 := by
           apply h_inj
-          simp [h0] using (X.mulVec_zero : X.mulVec (0 : ι → ℝ) = 0)
-        exact h_diff_ne (by simp using hzero)
+          simpa [h0] using (X.mulVec_zero : X.mulVec (0 : ι → ℝ) = 0)
+        exact h_diff_ne (by simpa using hzero)
       have h_nonneg : 0 ≤ l2norm_sq (X.mulVec (β₁ - β₂)) := by
         unfold l2norm_sq
         exact Finset.sum_nonneg (by intro i _; exact sq_nonneg _)
@@ -3756,7 +3816,7 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
         unfold l2norm_sq
         refine Finset.sum_congr rfl ?_
         intro i _
-        simp [pointwiseNLL, hm.dist_gaussian, Pi.sub_apply, h_lin]
+        simp [X, pointwiseNLL, hm.dist_gaussian, Pi.sub_apply, h_lin]
       -- penalty term (diagonal mask)
       have h_diag : ∀ i, (S.mulVec (packParams m)) i = s i * (packParams m) i := by
         intro i
@@ -3772,7 +3832,7 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
               Finset.univ.sum (fun i => s i * (packParams m i) ^ 2) := by
           refine Finset.sum_congr rfl ?_
           intro i _
-          simp [h_diag, pow_two]
+          simp [h_diag, pow_two, mul_comm, mul_left_comm, mul_assoc]
         let g : ParamIxSum p k sp → ℝ
           | Sum.inl _ => 0
           | Sum.inr (Sum.inl _) => 0
@@ -4760,8 +4820,7 @@ lemma range_eq_of_two_sided_design_reparam {n m : Type} [Fintype n] [Fintype m] 
       Matrix.toLin' X' (U.mulVec β)
           = X'.mulVec (U.mulVec β) := by rw [Matrix.toLin'_apply]
       _ = (X' * U).mulVec β := by
-        symm
-        simp using (Matrix.mulVec_mulVec X' U β)
+        simpa using (Matrix.mulVec_mulVec β X' U)
       _ = X.mulVec β := by simp [hU]
       _ = Matrix.toLin' X β := by rw [Matrix.toLin'_apply]
       _ = y := hβ
@@ -4774,8 +4833,7 @@ lemma range_eq_of_two_sided_design_reparam {n m : Type} [Fintype n] [Fintype m] 
       Matrix.toLin' X (T.mulVec β)
           = X.mulVec (T.mulVec β) := by rw [Matrix.toLin'_apply]
       _ = (X * T).mulVec β := by
-        symm
-        simp using (Matrix.mulVec_mulVec X T β)
+        simpa using (Matrix.mulVec_mulVec β X T)
       _ = X'.mulVec β := by simp [hT]
       _ = Matrix.toLin' X' β := by rw [Matrix.toLin'_apply]
       _ = y := hβ
@@ -5646,11 +5704,10 @@ monotone functions of R² through the normal CDF Φ (which is itself monotone).
 AUC integrates sensitivity over 1-specificity, giving Φ(√(SNR/2)).
 -/
 
-/-- Phi is monotone increasing (the Gaussian density is positive everywhere). -/
-axiom Phi_mono : StrictMono Phi
-
-/-- Phi(0) = 1/2 (standard normal density is symmetric about 0). -/
-axiom Phi_zero : Phi 0 = 1 / 2
+/-- Phi is monotone increasing because it is the standard normal CDF. -/
+theorem Phi_monotone : Monotone Phi := by
+  simpa [Phi] using
+    (ProbabilityTheory.monotone_cdf (μ := ProbabilityTheory.gaussianReal 0 1))
 
 /-- **Signal-to-noise ratio** from R².
     SNR = R² / (1 - R²) = Var(predicted_genetic) / Var(residual).
@@ -5710,7 +5767,7 @@ theorem PGSEvolutionaryModel.AUC_target_le_source (m : PGSEvolutionaryModel)
       Real.sqrt (snrFromR2 m.R2_source / 2) :=
     Real.sqrt_le_sqrt (by linarith)
   -- Step 3: Φ is monotone
-  exact Phi_mono.monotone h_sqrt_le
+  exact Phi_monotone h_sqrt_le
 
 /-! ### Step 5: Target Brier score
 

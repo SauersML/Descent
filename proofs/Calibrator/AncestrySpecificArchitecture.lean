@@ -133,8 +133,8 @@ theorem freq_diff_increases_with_fst (fst₁ fst₂ p0 : ℝ)
     with identical effect sizes. -/
 theorem freq_change_alters_pgs_variance
     (beta_sq p_source p_target : ℝ)
-    (h_beta : 0 < beta_sq) (h_ps : 0 < p_source) (h_ps_lt : p_source < 1)
-    (h_pt : 0 < p_target) (h_pt_lt : p_target < 1)
+    (h_beta : 0 < beta_sq) (_h_ps : 0 < p_source) (_h_ps_lt : p_source < 1)
+    (_h_pt : 0 < p_target) (_h_pt_lt : p_target < 1)
     (h_diff : p_source ≠ p_target)
     (h_not_complement : p_source + p_target ≠ 1) :
     beta_sq * (2 * p_source * (1 - p_source)) ≠

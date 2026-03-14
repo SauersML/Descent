@@ -52,13 +52,13 @@ theorem qst_in_unit (V_b V_w : ℝ)
   · exact div_nonneg h_b (le_of_lt h_denom)
   · rw [div_le_one h_denom]; linarith
 
-/-- **QST >> FST indicates directional selection.**
-    When QST exceeds FST by a margin δ > 0, this indicates
-    directional selection has driven trait divergence beyond
-    what neutral drift (FST) would predict.
+/- **QST >> FST indicates directional selection.**
+   When QST exceeds FST by a margin δ > 0, this indicates
+   directional selection has driven trait divergence beyond
+   what neutral drift (FST) would predict.
 
-    Worked example: For immune traits, QST greatly exceeds FST due to
-    pathogen-driven selection that disrupts genetic architecture. -/
+   Worked example: For immune traits, QST greatly exceeds FST due to
+   pathogen-driven selection that disrupts genetic architecture. -/
 end QSTFSTTest
 
 

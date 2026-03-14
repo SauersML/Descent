@@ -106,44 +106,123 @@ theorem effective_polygenicity_ge_one
   rw [le_div_iff₀ h_fourth]
   linarith
 
-/-- **More polygenic → more portable (from CLT / variance aggregation).**
-    Under CLT, the PGS is approximately Gaussian with variance
-    Var(PGS) = Σ βᵢ² · 2pᵢ(1-pᵢ).
-    The per-variant LD mismatch contribution to portability loss
-    has variance σ²_LD per SNP. By variance aggregation (CLT),
-    the total portability loss SD scales as σ_LD · √M / (√M · per-snp-signal)
-    = σ_LD / √(M_eff), giving portability loss ∝ 1/√M_eff.
+/-- **CLT-based portability model for polygenic traits.**
+    `M_eff` is the effective number of approximately independent causal loci.
+    `perLocusSignal` is the mean signal contribution per locus, and
+    `perLocusMismatchSD` is the standard deviation of the per-locus LD-mismatch
+    contribution. Under variance aggregation, total mismatch SD grows like `√M_eff`
+    while total signal grows like `M_eff`. -/
+structure PolygenicCLTPortabilityModel where
+  M_eff : ℝ
+  perLocusSignal : ℝ
+  perLocusMismatchSD : ℝ
 
-    Derived: monotonicity of 1/√x for x > 0 means larger M_eff
-    gives smaller portability loss c/√M_eff. -/
+namespace PolygenicCLTPortabilityModel
+
+/-- Aggregate signal scales linearly with the effective number of loci. -/
+def aggregateSignal (model : PolygenicCLTPortabilityModel) : ℝ :=
+  model.M_eff * model.perLocusSignal
+
+/-- Independent per-locus mismatch contributions aggregate with `√M_eff` scaling. -/
+noncomputable def aggregateMismatchSD (model : PolygenicCLTPortabilityModel) : ℝ :=
+  Real.sqrt model.M_eff * model.perLocusMismatchSD
+
+/-- Relative portability loss is mismatch SD divided by aggregate signal. -/
+noncomputable def relativePortabilityLoss (model : PolygenicCLTPortabilityModel) : ℝ :=
+  model.aggregateMismatchSD / model.aggregateSignal
+
+/-- The part of the loss scale that does not depend on `M_eff`. -/
+noncomputable def lossConstant (model : PolygenicCLTPortabilityModel) : ℝ :=
+  model.perLocusMismatchSD / model.perLocusSignal
+
+/-- A simple portability score obtained by subtracting relative loss from `1`. -/
+noncomputable def portabilityScore (model : PolygenicCLTPortabilityModel) : ℝ :=
+  1 - model.relativePortabilityLoss
+
+/-- The `1 / √M_eff` loss law is derived from the CLT scaling assumptions above,
+    not assumed as a theorem premise. -/
+theorem relativePortabilityLoss_eq_lossConstant_div_sqrt
+    (model : PolygenicCLTPortabilityModel)
+    (h_M : 0 < model.M_eff)
+    (h_signal : 0 < model.perLocusSignal) :
+    model.relativePortabilityLoss = model.lossConstant / Real.sqrt model.M_eff := by
+  unfold relativePortabilityLoss aggregateMismatchSD aggregateSignal lossConstant
+  have h_sqrt_ne : Real.sqrt model.M_eff ≠ 0 := Real.sqrt_ne_zero'.mpr h_M
+  have h_signal_ne : model.perLocusSignal ≠ 0 := h_signal.ne'
+  calc
+    (Real.sqrt model.M_eff * model.perLocusMismatchSD) / (model.M_eff * model.perLocusSignal)
+      = (Real.sqrt model.M_eff * model.perLocusMismatchSD) /
+          ((Real.sqrt model.M_eff * Real.sqrt model.M_eff) * model.perLocusSignal) := by
+            congr 1
+            nlinarith [Real.sq_sqrt (le_of_lt h_M)]
+    _ = (model.perLocusMismatchSD / model.perLocusSignal) / Real.sqrt model.M_eff := by
+          field_simp [h_sqrt_ne, h_signal_ne]
+
+end PolygenicCLTPortabilityModel
+
+/-- Portability score from the CLT portability model, written directly in terms of the
+    effective number of loci and per-locus parameters. -/
+noncomputable def cltPolygenicPortabilityScore
+    (M_eff perLocusSignal perLocusMismatchSD : ℝ) : ℝ :=
+  let model : PolygenicCLTPortabilityModel :=
+    { M_eff := M_eff
+      perLocusSignal := perLocusSignal
+      perLocusMismatchSD := perLocusMismatchSD }
+  model.portabilityScore
+
+/-- **More polygenic → more portable (from the formal CLT model).**
+    If two traits share the same per-locus signal and per-locus LD-mismatch scale,
+    then the trait with larger `M_eff` has smaller relative portability loss because
+    aggregate mismatch grows like `√M_eff` while aggregate signal grows like `M_eff`. -/
 theorem more_polygenic_more_portable
-    (M_eff₁ M_eff₂ c : ℝ)
-    (h_M₁ : 0 < M_eff₁) (h_M₂ : 0 < M_eff₂)
-    (h_M : M_eff₁ < M_eff₂)
-    (h_c : 0 < c) :
-    -- More polygenic traits have smaller portability loss c/√M_eff
-    c / Real.sqrt M_eff₂ < c / Real.sqrt M_eff₁ := by
-  apply div_lt_div_of_pos_left h_c
-  · exact Real.sqrt_pos.mpr h_M₁
-  · exact Real.sqrt_lt_sqrt (le_of_lt h_M₁) h_M
+    (model₁ model₂ : PolygenicCLTPortabilityModel)
+    (h_M₁ : 0 < model₁.M_eff) (h_M₂ : 0 < model₂.M_eff)
+    (h_M : model₁.M_eff < model₂.M_eff)
+    (h_signal : 0 < model₁.perLocusSignal)
+    (h_mismatch : 0 < model₁.perLocusMismatchSD)
+    (h_same_signal : model₁.perLocusSignal = model₂.perLocusSignal)
+    (h_same_mismatch : model₁.perLocusMismatchSD = model₂.perLocusMismatchSD) :
+    model₂.relativePortabilityLoss < model₁.relativePortabilityLoss := by
+  rw [PolygenicCLTPortabilityModel.relativePortabilityLoss_eq_lossConstant_div_sqrt
+      model₂ h_M₂]
+  · rw [PolygenicCLTPortabilityModel.relativePortabilityLoss_eq_lossConstant_div_sqrt
+      model₁ h_M₁ h_signal]
+    unfold PolygenicCLTPortabilityModel.lossConstant
+    rw [← h_same_signal, ← h_same_mismatch]
+    have h_const_pos : 0 < model₁.perLocusMismatchSD / model₁.perLocusSignal := by
+      exact div_pos h_mismatch h_signal
+    exact div_lt_div_of_pos_left h_const_pos
+      (Real.sqrt_pos.mpr h_M₁)
+      (Real.sqrt_lt_sqrt (le_of_lt h_M₁) h_M)
+  · simpa [h_same_signal] using h_signal
 
 /-- **Higher polygenicity → better portability.**
-    For any two traits with the same per-locus portability loss constant c,
-    the more polygenic trait (higher M_eff) has smaller portability loss
-    because loss scales as c/√M_eff.
-
-    Worked example: Height (M_eff > 10000) has portability ~0.6 across
-    EUR-EAS, better than less polygenic traits. -/
+    For two traits with the same per-locus signal and LD-mismatch scale, the more
+    polygenic trait has the higher CLT portability score because its derived
+    relative loss is smaller. -/
 theorem height_polygenic_good_portability
-    (M_eff_height M_eff_bmi c : ℝ)
+    (M_eff_height M_eff_bmi perLocusSignal perLocusMismatchSD : ℝ)
     (h_M_height : 0 < M_eff_height) (h_M_bmi : 0 < M_eff_bmi)
     (h_M : M_eff_bmi < M_eff_height)
-    (h_c : 0 < c) (h_c_small : c < Real.sqrt M_eff_bmi) :
-    1 - c / Real.sqrt M_eff_bmi < 1 - c / Real.sqrt M_eff_height := by
-  have h1 : Real.sqrt M_eff_bmi < Real.sqrt M_eff_height :=
-    Real.sqrt_lt_sqrt (le_of_lt h_M_bmi) h_M
-  have h2 : 0 < Real.sqrt M_eff_bmi := Real.sqrt_pos.mpr h_M_bmi
-  linarith [div_lt_div_of_pos_left h_c h2 h1]
+    (h_signal : 0 < perLocusSignal)
+    (h_mismatch : 0 < perLocusMismatchSD) :
+    cltPolygenicPortabilityScore M_eff_bmi perLocusSignal perLocusMismatchSD <
+      cltPolygenicPortabilityScore M_eff_height perLocusSignal perLocusMismatchSD := by
+  let bmiModel : PolygenicCLTPortabilityModel :=
+    { M_eff := M_eff_bmi
+      perLocusSignal := perLocusSignal
+      perLocusMismatchSD := perLocusMismatchSD }
+  let heightModel : PolygenicCLTPortabilityModel :=
+    { M_eff := M_eff_height
+      perLocusSignal := perLocusSignal
+      perLocusMismatchSD := perLocusMismatchSD }
+  have h_loss :
+      heightModel.relativePortabilityLoss < bmiModel.relativePortabilityLoss := by
+    exact more_polygenic_more_portable
+      bmiModel heightModel h_M_bmi h_M_height h_M h_signal h_mismatch rfl rfl
+  dsimp [cltPolygenicPortabilityScore, bmiModel, heightModel,
+    PolygenicCLTPortabilityModel.portabilityScore] at h_loss ⊢
+  linarith
 
 /-- **Immune traits: moderate polygenicity but strong selection.**
     Immune traits have moderate M_eff but strong directional selection

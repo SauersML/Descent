@@ -35,25 +35,46 @@ section GWASDiscovery
 /- **GWAS power function.**
     Power = Φ(√NCP - z_α/2) where NCP = n × β² × 2p(1-p). -/
 
-/-- **Power increases with sample size.** -/
-theorem power_increases_with_n
-    (β p : ℝ) (n₁ n₂ : ℕ)
-    (hβ : β ≠ 0) (hp : 0 < p) (hp1 : p < 1) (h_n : n₁ < n₂) (hn₁ : 0 < n₁) :
-    -- NCP increases with n
-    (n₁ : ℝ) * β ^ 2 * (2 * p * (1 - p)) <
-      (n₂ : ℝ) * β ^ 2 * (2 * p * (1 - p)) := by
-  apply mul_lt_mul_of_pos_right
-  · apply mul_lt_mul_of_pos_right (Nat.cast_lt.mpr h_n) (sq_pos_of_ne_zero hβ)
-  · nlinarith
+/-- Noncentrality parameter for a GWAS tag SNP.
 
-/-- **GWAS finds different SNPs in different populations.**
-    Due to different LD and MAF, the set of genome-wide significant
-    SNPs can differ substantially. -/
+    The `ld` term captures attenuation of the causal effect by population-specific
+    LD tagging, and `2 * maf * (1 - maf)` is the genotype variance term from the
+    allele-frequency spectrum in the discovery population. -/
+def discoveryNCP (n β maf ld : ℝ) : ℝ :=
+  n * β ^ 2 * ld ^ 2 * (2 * maf * (1 - maf))
+
+/-- A locus is discovered when its test statistic crosses the genome-wide
+    `z`-threshold. In the one-degree-of-freedom Gaussian approximation this is
+    equivalent to `z^2 ≤ discoveryNCP`. -/
+def gwasDiscovered (n β maf ld z : ℝ) : Prop :=
+  z ^ 2 ≤ discoveryNCP n β maf ld
+
+/-- **The GWAS noncentrality parameter increases with sample size.** -/
+theorem discoveryNCP_increases_with_n
+    (β p ld : ℝ) (n₁ n₂ : ℕ)
+    (hβ : β ≠ 0) (hp : 0 < p) (hp1 : p < 1) (hld : ld ≠ 0) (h_n : n₁ < n₂) :
+    discoveryNCP (n₁ : ℝ) β p ld < discoveryNCP (n₂ : ℝ) β p ld := by
+  unfold discoveryNCP
+  have h_factor : 0 < β ^ 2 * ld ^ 2 * (2 * p * (1 - p)) := by
+    have hβ2 : 0 < β ^ 2 := sq_pos_of_ne_zero hβ
+    have hld2 : 0 < ld ^ 2 := sq_pos_of_ne_zero hld
+    have h_var : 0 < 2 * p * (1 - p) := by
+      nlinarith
+    exact mul_pos (mul_pos hβ2 hld2) h_var
+  simpa [mul_assoc] using mul_lt_mul_of_pos_right (Nat.cast_lt.mpr h_n) h_factor
+
+/-- **Different LD and MAF can produce population-specific GWAS hits.**
+    For the same causal effect size, sample size, and genome-wide threshold,
+    a locus is discovered in population 1 and missed in population 2 whenever
+    the population-specific NCP terms `ld^2` and `2p(1-p)` land on opposite
+    sides of the discovery threshold. -/
 theorem different_populations_different_hits
-    (n_shared n_pop1_only n_pop2_only : ℕ)
-    (h_not_all_shared : 0 < n_pop1_only ∨ 0 < n_pop2_only) :
-    n_shared < n_shared + n_pop1_only + n_pop2_only := by
-  rcases h_not_all_shared with h | h <;> omega
+    (n β z maf₁ maf₂ ld₁ ld₂ : ℝ)
+    (h_pop2_below : discoveryNCP n β maf₂ ld₂ < z ^ 2)
+    (h_pop1_above : z ^ 2 ≤ discoveryNCP n β maf₁ ld₁) :
+    gwasDiscovered n β maf₁ ld₁ z ∧ ¬ gwasDiscovered n β maf₂ ld₂ z := by
+  unfold gwasDiscovered
+  exact ⟨h_pop1_above, not_le_of_lt h_pop2_below⟩
 
 /-- **Winner's curse in GWAS.**
     The estimated effect size of a newly discovered variant is biased
@@ -254,16 +275,29 @@ theorem genetic_correlation_bounded
   rw [abs_of_pos (Real.sqrt_pos.mpr (by positivity))]
   exact (Real.le_sqrt (abs_nonneg _) (by positivity)).mpr (by nlinarith [sq_abs cov_g])
 
+/-- Effective portability of trait B under an additive cross-trait borrowing model.
+
+    `direct_B` is the component specific to trait B, while `rg^2 * port_A`
+    is the component borrowed from trait A through shared genetic architecture. -/
+def crossTraitPortability (port_A rg direct_B : ℝ) : ℝ :=
+  direct_B + rg ^ 2 * port_A
+
 /-- **Cross-trait portability leverages genetic correlation.**
-    If trait A has good portability and rg(A,B) is high,
-    trait B can borrow portability information from A.
-    Effective portability for B is at least rg² × portability(A). -/
+    In the additive model
+    `portability(B) = direct_B + rg² × portability(A)`,
+    any nonnegative trait-B-specific component implies that trait B's
+    effective portability is at least the borrowed component
+    `rg² × portability(A)`. -/
 theorem cross_trait_portability_gain
-    (port_A rg : ℝ)
-    (h_port : 0 < port_A) (h_port_le : port_A ≤ 1)
-    (h_rg : 0 ≤ rg) (h_rg_le : rg ≤ 1) :
-    0 ≤ rg ^ 2 * port_A := by
-  exact mul_nonneg (sq_nonneg _) (le_of_lt h_port)
+    (port_A rg direct_B : ℝ)
+    (h_port_A : 0 ≤ port_A)
+    (h_direct_B : 0 ≤ direct_B) :
+    0 ≤ rg ^ 2 * port_A ∧
+      rg ^ 2 * port_A ≤ crossTraitPortability port_A rg direct_B := by
+  constructor
+  · exact mul_nonneg (sq_nonneg _) h_port_A
+  · unfold crossTraitPortability
+    nlinarith [sq_nonneg rg]
 
 /-- **Multi-trait GWAS increases effective sample size.**
     MTAG and similar methods borrow information across traits,

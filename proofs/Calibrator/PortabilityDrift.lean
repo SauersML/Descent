@@ -133,7 +133,7 @@ noncomputable def twoDemeIMEquilibriumScalars (M : ℝ) : DemographicCoalescence
 noncomputable def twoDemeIMEquilibriumDelta (M : ℝ) : ℝ :=
   1 / (2 * M + 1)
 
-theorem twoDemeIMEquilibriumDelta_eq (M : ℝ) (_hM : M ≠ 0) (h2M1 : 2 * M + 1 ≠ 0) :
+theorem twoDemeIMEquilibriumDelta_eq (M : ℝ) (hM : M ≠ 0) (h2M1 : 2 * M + 1 ≠ 0) :
     (twoDemeIMEquilibriumScalars M).delta = twoDemeIMEquilibriumDelta M := by
   simp [DemographicCoalescenceScalars.delta, hudsonFstFromCoalescenceTimes,
     twoDemeIMEquilibriumScalars, twoDemeIMEquilibriumETss,

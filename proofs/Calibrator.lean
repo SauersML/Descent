@@ -50,7 +50,7 @@ namespace Calibrator
 
 local instance : Fact (2 ≤ 2) := ⟨by decide⟩
 
-/--
+/-
 Proof policy: do not add theorems whose conclusion merely repackages a premise
 by trivial algebra, rewriting, or conjunction-introduction. Such statements add
 noise without adding usable mathematical content and should be deleted rather
