@@ -120,20 +120,20 @@ theorem prevalence_shift_changes_calibration
     large but target prevalence differs, then absolute CITL is strictly larger
     in the target. -/
 theorem cross_ancestry_auc_and_citl_worsen
-    (aucLink : ℝ → ℝ) (hauc : StrictMono aucLink)
     (r2Source fstSource fstTarget mean_pred πSource πTarget : ℝ)
     (h_r2 : 0 < r2Source ∧ r2Source < 1)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (h_src_cal : calibrationInTheLarge πSource mean_pred = 0)
-    (h_prev_shift : πSource ≠ πTarget) :
-    targetAUCFromObservables aucLink r2Source fstSource fstTarget <
-      sourceAUCFromObservables aucLink r2Source ∧
+    (h_prev_shift : πSource ≠ πTarget)
+    (hPhiStrict : StrictMono Phi) :
+    targetExactLiabilityAUC r2Source fstSource fstTarget <
+      sourceExactLiabilityAUC r2Source ∧
     |calibrationInTheLarge πSource mean_pred| <
       |calibrationInTheLarge πTarget mean_pred| := by
   constructor
-  · exact targetAUC_lt_source_of_observables aucLink hauc
-      r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds
+  · exact targetLiabilityAUC_lt_source_of_observables
+      r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds hPhiStrict
   · have h_citl_shift :
         calibrationInTheLarge πTarget mean_pred -
           calibrationInTheLarge πSource mean_pred = πTarget - πSource :=
@@ -154,19 +154,19 @@ theorem cross_ancestry_auc_and_citl_worsen
     rule carried by the observable drift model. Under positive drift, the target
     AUC is strictly lower and the target Brier score is strictly higher. -/
 theorem cross_ancestry_auc_and_brier_worsen
-    (aucLink : ℝ → ℝ) (hauc : StrictMono aucLink)
     (π r2Source fstSource fstTarget : ℝ)
     (hπ0 : 0 < π) (hπ1 : π < 1)
     (h_r2 : 0 < r2Source ∧ r2Source < 1)
     (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    targetAUCFromObservables aucLink r2Source fstSource fstTarget <
-      sourceAUCFromObservables aucLink r2Source ∧
-    sourceBrierFromObservables π r2Source <
-      targetBrierFromObservables π r2Source fstSource fstTarget := by
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (hPhiStrict : StrictMono Phi) :
+    targetExactLiabilityAUC r2Source fstSource fstTarget <
+      sourceExactLiabilityAUC r2Source ∧
+    sourceExactCalibratedBrierRisk π r2Source <
+      targetExactCalibratedBrierRisk π r2Source fstSource fstTarget := by
   constructor
-  · exact targetAUC_lt_source_of_observables aucLink hauc
-      r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds
+  · exact targetLiabilityAUC_lt_source_of_observables
+      r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds hPhiStrict
   · exact targetBrier_strict_gt_source_of_observables π r2Source fstSource fstTarget
       hπ0 hπ1 h_r2 h_fst h_fst_bounds
 
@@ -642,10 +642,321 @@ theorem positive_nri_iff_reclassifiedBandEventPrevalence_below_cohort_prevalence
       nlinarith [h_cross]
     exact (mul_lt_mul_left h_scale_pos).mp (by simpa [mul_assoc] using h_scaled)
 
+/-- **Finite-horizon longitudinal treatment model.**
+    `discount t` encodes the time value of health at follow-up time `t`. -/
+structure LongitudinalTreatmentModel (T : ℕ) where
+  discount : Fin T → ℝ
+  discount_nonneg : ∀ t, 0 ≤ discount t
+
+/-- **Individual clinical pathway over a finite horizon.**
+    `followupWeight` can encode uncensoring, freedom from competing events,
+    adherence, or clinical eligibility at each follow-up time. Treatment
+    benefit and harm are allowed to vary across time. -/
+structure ClinicalPathway (T : ℕ) where
+  followupWeight : Fin T → ℝ
+  eventProb : Fin T → ℝ
+  treatmentBenefit : Fin T → ℝ
+  treatmentHarm : Fin T → ℝ
+  followupWeight_nonneg : ∀ t, 0 ≤ followupWeight t
+
+/-- **Per-time discounted QALY contribution under treatment.**
+    This is the exact contribution of a treated patient at time `t` under the
+    clinical pathway model. -/
+noncomputable def qalyContributionAtTime {T : ℕ}
+    (model : LongitudinalTreatmentModel T) (path : ClinicalPathway T) (t : Fin T) : ℝ :=
+  model.discount t * path.followupWeight t *
+    (path.eventProb t * path.treatmentBenefit t - path.treatmentHarm t)
+
+/-- **Net treatment margin of a clinical pathway.**
+    Positive margin means treatment is beneficial in expectation after exact
+    aggregation over discounted follow-up, treatment heterogeneity, and
+    censoring/eligibility weights. -/
+noncomputable def treatmentMargin {T : ℕ}
+    (model : LongitudinalTreatmentModel T) (path : ClinicalPathway T) : ℝ :=
+  Finset.univ.sum (fun t => qalyContributionAtTime model path t)
+
+/-- A deployed rule treats when the predicted pathway has positive net QALY
+    margin. -/
+def receivesTreatment {T : ℕ}
+    (model : LongitudinalTreatmentModel T) (path : ClinicalPathway T) : Prop :=
+  0 < treatmentMargin model path
+
+/-- **QALY gain under a predicted-pathway treatment decision.**
+    The deployed decision treats iff the predicted pathway implies positive
+    net benefit; realized utility is then evaluated under the true pathway. -/
+noncomputable def qalyGainUnderDecision {T : ℕ}
+    (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T) : ℝ :=
+  by
+    classical
+    exact if receivesTreatment model predictedPath then
+      treatmentMargin model truePath
+    else
+      0
+
+/-- **Per-individual QALY loss from using a predicted instead of true pathway.**
+    This is exact oracle regret relative to the decision that would be made
+    from the patient's true longitudinal pathway. -/
+noncomputable def qalyLoss {T : ℕ}
+    (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T) : ℝ :=
+  qalyGainUnderDecision model truePath truePath -
+    qalyGainUnderDecision model truePath predictedPath
+
+/-- **Decision-regret margin for longitudinal clinical utility.**
+    False positives pay the negative part of the true treatment margin, false
+    negatives pay the positive part, and correct decisions pay zero. -/
+noncomputable def qalyDecisionRegretMargin {T : ℕ}
+    (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T) : ℝ :=
+  by
+    classical
+    exact if receivesTreatment model predictedPath then
+        max (-treatmentMargin model truePath) 0
+      else
+        max (treatmentMargin model truePath) 0
+
+/-- Oracle self-decision recovers the positive part of the true treatment
+    margin. -/
+theorem qalyGainUnderDecision_self_eq_max_treatmentMargin
+    {T : ℕ} (model : LongitudinalTreatmentModel T) (path : ClinicalPathway T) :
+    qalyGainUnderDecision model path path = max (treatmentMargin model path) 0 := by
+  unfold qalyGainUnderDecision receivesTreatment
+  by_cases h : 0 < treatmentMargin model path
+  · rw [if_pos h, max_eq_left (le_of_lt h)]
+  · rw [if_neg h, max_eq_right (not_lt.mp h)]
+
+/-- **QALY loss equals the exact longitudinal decision-regret margin.** -/
+theorem qalyLoss_eq_qalyDecisionRegretMargin
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T) :
+    qalyLoss model truePath predictedPath =
+      qalyDecisionRegretMargin model truePath predictedPath := by
+  by_cases h_pred : receivesTreatment model predictedPath
+  · by_cases h_true : receivesTreatment model truePath
+    · have h_true_pos : 0 < treatmentMargin model truePath := h_true
+      have h_max : max (-treatmentMargin model truePath) 0 = 0 := by
+        exact max_eq_right (by linarith)
+      unfold qalyLoss qalyGainUnderDecision qalyDecisionRegretMargin
+      rw [if_pos h_true, if_pos h_pred, if_pos h_pred, h_max]
+      ring
+    · have h_true_nonpos : treatmentMargin model truePath ≤ 0 := not_lt.mp h_true
+      have h_max :
+          max (-treatmentMargin model truePath) 0 =
+            -treatmentMargin model truePath := by
+        exact max_eq_left (by linarith)
+      unfold qalyLoss qalyGainUnderDecision qalyDecisionRegretMargin
+      rw [if_neg h_true, if_pos h_pred, if_pos h_pred, h_max]
+      ring
+  · by_cases h_true : receivesTreatment model truePath
+    · have h_max :
+          max (treatmentMargin model truePath) 0 =
+            treatmentMargin model truePath := by
+        exact max_eq_left (le_of_lt h_true)
+      unfold qalyLoss qalyGainUnderDecision qalyDecisionRegretMargin
+      rw [if_pos h_true, if_neg h_pred, if_neg h_pred, h_max]
+      ring
+    · have h_true_nonpos : treatmentMargin model truePath ≤ 0 := not_lt.mp h_true
+      have h_max : max (treatmentMargin model truePath) 0 = 0 := by
+        exact max_eq_right h_true_nonpos
+      unfold qalyLoss qalyGainUnderDecision qalyDecisionRegretMargin
+      rw [if_neg h_true, if_neg h_pred, if_neg h_pred, h_max]
+      ring
+
+/-- QALY loss is always nonnegative under the longitudinal regret model. -/
+theorem qalyLoss_nonneg
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T) :
+    0 ≤ qalyLoss model truePath predictedPath := by
+  rw [qalyLoss_eq_qalyDecisionRegretMargin]
+  unfold qalyDecisionRegretMargin
+  by_cases h_pred : receivesTreatment model predictedPath
+  · rw [if_pos h_pred]
+    exact le_max_right _ _
+  · rw [if_neg h_pred]
+    exact le_max_right _ _
+
+/-- **Perfect pathway calibration implies zero QALY loss.**
+    If the predicted pathway induces the same net treatment margin as the true
+    pathway, then the deployed treatment decision matches the oracle decision. -/
+theorem qalyLoss_eq_zero_of_perfect_pathway_calibration
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T)
+    (h_cal :
+      treatmentMargin model predictedPath =
+        treatmentMargin model truePath) :
+    qalyLoss model truePath predictedPath = 0 := by
+  unfold qalyLoss qalyGainUnderDecision receivesTreatment
+  simp [h_cal]
+
+/-- If the deployed and oracle pathway margins induce the same treatment
+    decision, the exact QALY regret is zero. -/
+theorem qalyLoss_eq_zero_of_same_decision
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T)
+    (h_decision :
+      receivesTreatment model predictedPath ↔
+        receivesTreatment model truePath) :
+    qalyLoss model truePath predictedPath = 0 := by
+  unfold qalyLoss qalyGainUnderDecision
+  by_cases h_true : receivesTreatment model truePath
+  · have h_pred : receivesTreatment model predictedPath := h_decision.mpr h_true
+    rw [if_pos h_true, if_pos h_pred]
+    ring
+  · have h_pred : ¬ receivesTreatment model predictedPath := by
+      intro h_pred
+      exact h_true (h_decision.mp h_pred)
+    rw [if_neg h_true, if_neg h_pred]
+    ring
+
+/-- **A margin error smaller than the true decision margin preserves the
+    treatment decision.**
+    This is the exact finite-horizon decision-stability criterion under the
+    longitudinal pathway model. -/
+theorem receivesTreatment_iff_of_margin_error_lt_abs_true_margin
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T)
+    (h_margin :
+      |treatmentMargin model predictedPath - treatmentMargin model truePath| <
+        |treatmentMargin model truePath|) :
+    receivesTreatment model predictedPath ↔
+      receivesTreatment model truePath := by
+  unfold receivesTreatment
+  set mTrue : ℝ := treatmentMargin model truePath
+  set mPred : ℝ := treatmentMargin model predictedPath
+  change (0 < mPred ↔ 0 < mTrue)
+  by_cases h_true : 0 < mTrue
+  · have h_pred : 0 < mPred := by
+      by_cases h_pred_nonpos : mPred ≤ 0
+      · have h_abs_eq : |mPred - mTrue| = -(mPred - mTrue) := by
+          exact abs_of_nonpos (by linarith)
+        have h_true_abs : |mTrue| = mTrue := abs_of_pos h_true
+        rw [h_abs_eq, h_true_abs] at h_margin
+        linarith
+      · linarith
+    constructor
+    · intro _
+      exact h_true
+    · intro _
+      exact h_pred
+  · have h_true_nonpos : mTrue ≤ 0 := not_lt.mp h_true
+    have h_pred_nonpos : mPred ≤ 0 := by
+      by_cases h_pred : 0 < mPred
+      · have h_abs_eq : |mPred - mTrue| = mPred - mTrue := by
+          apply abs_of_nonneg
+          linarith
+        have h_true_abs : |mTrue| = -mTrue := abs_of_nonpos h_true_nonpos
+        rw [h_abs_eq, h_true_abs] at h_margin
+        linarith
+      · exact not_lt.mp h_pred
+    constructor
+    · intro h_pred
+      exact False.elim ((not_lt_of_ge h_pred_nonpos) h_pred)
+    · intro h_true'
+      exact False.elim ((not_lt_of_ge h_true_nonpos) h_true')
+
+/-- **Exact pathway-margin stability implies zero QALY regret.**
+    If the deployed pathway margin error is smaller than the absolute true
+    treatment margin, the deployed and oracle treatment decisions coincide. -/
+theorem qalyLoss_eq_zero_of_margin_error_lt_abs_true_margin
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T)
+    (h_margin :
+      |treatmentMargin model predictedPath - treatmentMargin model truePath| <
+        |treatmentMargin model truePath|) :
+    qalyLoss model truePath predictedPath = 0 := by
+  apply qalyLoss_eq_zero_of_same_decision
+  exact receivesTreatment_iff_of_margin_error_lt_abs_true_margin
+    model truePath predictedPath h_margin
+
+/-- **Exact longitudinal QALY regret is bounded by pathway-margin error.**
+    This converts miscalibration of the finite-horizon treatment margin into an
+    exact utility-loss bound with no surrogate risk approximation. -/
+theorem qalyLoss_le_abs_margin_error
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T) :
+    qalyLoss model truePath predictedPath ≤
+      |treatmentMargin model predictedPath - treatmentMargin model truePath| := by
+  rw [qalyLoss_eq_qalyDecisionRegretMargin]
+  set mTrue : ℝ := treatmentMargin model truePath
+  set mPred : ℝ := treatmentMargin model predictedPath
+  unfold qalyDecisionRegretMargin receivesTreatment
+  change (if 0 < mPred then max (-mTrue) 0 else max mTrue 0) ≤ |mPred - mTrue|
+  by_cases h_pred : 0 < mPred
+  · rw [if_pos h_pred]
+    by_cases h_true : 0 < mTrue
+    · have h_max : max (-mTrue) 0 = 0 := by
+        exact max_eq_right (by linarith)
+      rw [h_max]
+      exact abs_nonneg (mPred - mTrue)
+    · have h_true_nonpos : mTrue ≤ 0 := not_lt.mp h_true
+      have h_max : max (-mTrue) 0 = -mTrue := by
+        exact max_eq_left (by linarith)
+      have h_abs_eq : |mPred - mTrue| = mPred - mTrue := by
+        exact abs_of_nonneg (by linarith)
+      rw [h_max, h_abs_eq]
+      linarith
+  · rw [if_neg h_pred]
+    have h_pred_nonpos : mPred ≤ 0 := not_lt.mp h_pred
+    by_cases h_true : 0 < mTrue
+    · have h_max : max mTrue 0 = mTrue := by
+        exact max_eq_left (le_of_lt h_true)
+      have h_abs_eq : |mPred - mTrue| = -(mPred - mTrue) := by
+        exact abs_of_nonpos (by linarith)
+      rw [h_max, h_abs_eq]
+      linarith
+    · have h_true_nonpos : mTrue ≤ 0 := not_lt.mp h_true
+      have h_max : max mTrue 0 = 0 := by
+        exact max_eq_right h_true_nonpos
+      rw [h_max]
+      exact abs_nonneg (mPred - mTrue)
+
+/-- **Expected QALY loss from pathway miscalibration.**
+    This is the population expectation of exact oracle regret under the
+    longitudinal pathway model. -/
+noncomputable def expectedQalyLoss {Z : Type*} [MeasurableSpace Z] {T : ℕ}
+    (μ : Measure Z) (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : Z → ClinicalPathway T) : ℝ :=
+  ∫ z, qalyLoss model (truePath z) (predictedPath z) ∂μ
+
+/-- Perfect pathway calibration implies zero expected QALY loss. -/
+theorem expectedQalyLoss_eq_zero_of_perfect_pathway_calibration
+    {Z : Type*} [MeasurableSpace Z] {T : ℕ}
+    (μ : Measure Z) (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : Z → ClinicalPathway T)
+    (h_cal : ∀ z,
+      treatmentMargin model (predictedPath z) =
+        treatmentMargin model (truePath z)) :
+    expectedQalyLoss μ model truePath predictedPath = 0 := by
+  unfold expectedQalyLoss
+  have hfun :
+      (fun z => qalyLoss model (truePath z) (predictedPath z)) =
+        fun _ => (0 : ℝ) := by
+    funext z
+    exact qalyLoss_eq_zero_of_perfect_pathway_calibration
+      model (truePath z) (predictedPath z) (h_cal z)
+  rw [hfun]
+  simp
+
+/-- **Expected QALY loss equals expected longitudinal decision regret.** -/
+theorem expectedQalyLoss_eq_expected_qalyDecisionRegretMargin
+    {Z : Type*} [MeasurableSpace Z] {T : ℕ}
+    (μ : Measure Z) (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : Z → ClinicalPathway T) :
+    expectedQalyLoss μ model truePath predictedPath =
+      ∫ z, qalyDecisionRegretMargin model (truePath z) (predictedPath z) ∂μ := by
+  unfold expectedQalyLoss
+  refine integral_congr_ae ?_
+  exact Filter.Eventually.of_forall (fun z =>
+    qalyLoss_eq_qalyDecisionRegretMargin
+      model (truePath z) (predictedPath z))
+
 /-- **Clinical treatment model induced by a decision threshold.**
-    Treatment yields benefit `benefit × trueRisk` in expectation and incurs
-    harm `harm` whenever given. The clinically optimal threshold is therefore
-    `harm / benefit`; we encode this exactly as `harm = benefit × threshold`. -/
+    This is the exact one-time specialization of the longitudinal pathway model
+    in which treatment yields benefit `benefit × trueRisk` in expectation and
+    incurs harm `harm` whenever given. The clinically optimal threshold is
+    therefore `harm / benefit`; we encode this exactly as
+    `harm = benefit × threshold`. -/
 structure ThresholdTreatmentModel where
   threshold : ℝ
   benefit : ℝ
@@ -653,23 +964,66 @@ structure ThresholdTreatmentModel where
   benefit_pos : 0 < benefit
   harm_eq_threshold : harm = benefit * threshold
 
-/-- **QALY gain under a threshold-based treatment decision.**
+/-- One-step longitudinal model corresponding to a single threshold-based
+    treatment decision. -/
+noncomputable def thresholdLongitudinalModel
+    (_model : ThresholdTreatmentModel) : LongitudinalTreatmentModel 1 where
+  discount := fun _ => 1
+  discount_nonneg := by
+    intro _
+    norm_num
+
+/-- One-step clinical pathway induced by a scalar risk under the threshold
+    treatment model. -/
+noncomputable def thresholdClinicalPathway
+    (model : ThresholdTreatmentModel) (risk : ℝ) : ClinicalPathway 1 where
+  followupWeight := fun _ => 1
+  eventProb := fun _ => risk
+  treatmentBenefit := fun _ => model.benefit
+  treatmentHarm := fun _ => model.harm
+  followupWeight_nonneg := by
+    intro _
+    norm_num
+
+/-- The exact one-step treatment margin is benefit times risk above threshold. -/
+theorem treatmentMargin_thresholdClinicalPathway
+    (model : ThresholdTreatmentModel) (risk : ℝ) :
+    treatmentMargin (thresholdLongitudinalModel model)
+      (thresholdClinicalPathway model risk) =
+        model.benefit * (risk - model.threshold) := by
+  unfold treatmentMargin qalyContributionAtTime
+    thresholdLongitudinalModel thresholdClinicalPathway
+  rw [Fin1_sum_eq]
+  simp [model.harm_eq_threshold]
+  ring
+
+/-- In the one-step specialization, positive treatment margin is exactly the
+    high-risk classification event. -/
+theorem receivesTreatment_thresholdClinicalPathway_iff
+    (model : ThresholdTreatmentModel) (risk : ℝ) :
+    receivesTreatment (thresholdLongitudinalModel model)
+      (thresholdClinicalPathway model risk) ↔
+        classifiedHighRisk model.threshold risk := by
+  unfold receivesTreatment classifiedHighRisk
+  rw [treatmentMargin_thresholdClinicalPathway]
+  constructor <;> intro h <;> nlinarith [model.benefit_pos]
+
+/-- **Threshold-based QALY gain under a scalar risk decision.**
     The deployed system treats when the risk used for decision-making exceeds
     the clinical treatment threshold. -/
-noncomputable def qalyGainUnderDecision
+noncomputable def thresholdQalyGainUnderDecision
     (model : ThresholdTreatmentModel) (trueRisk decisionRisk : ℝ) : ℝ :=
   if _ : model.threshold < decisionRisk then
       model.benefit * trueRisk - model.harm
     else
       0
 
-/-- **Per-individual QALY loss from using predicted instead of true risk.**
-    This is the regret relative to the oracle threshold rule that would act on
-    the individual's true risk. -/
-noncomputable def qalyLoss
+/-- **Per-individual one-step QALY loss from using predicted instead of true
+    risk.** This is the threshold-rule specialization of `qalyLoss`. -/
+noncomputable def thresholdQalyLoss
     (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ :=
-  qalyGainUnderDecision model trueRisk trueRisk -
-    qalyGainUnderDecision model trueRisk predictedRisk
+  thresholdQalyGainUnderDecision model trueRisk trueRisk -
+    thresholdQalyGainUnderDecision model trueRisk predictedRisk
 
 /-- **Threshold-decision regret margin.**
     This is the clinically relevant risk margin by which the deployed decision
@@ -686,20 +1040,58 @@ noncomputable def thresholdDecisionRegretMargin
       else
         max (trueRisk - model.threshold) 0
 
+/-- The threshold one-step gain is exactly the general pathway gain under the
+    threshold specialization. -/
+theorem qalyGainUnderDecision_threshold_eq_thresholdQalyGainUnderDecision
+    (model : ThresholdTreatmentModel) (trueRisk decisionRisk : ℝ) :
+    qalyGainUnderDecision (thresholdLongitudinalModel model)
+      (thresholdClinicalPathway model trueRisk)
+      (thresholdClinicalPathway model decisionRisk) =
+        thresholdQalyGainUnderDecision model trueRisk decisionRisk := by
+  by_cases h : model.threshold < decisionRisk
+  · have h_treat :
+        receivesTreatment (thresholdLongitudinalModel model)
+          (thresholdClinicalPathway model decisionRisk) := by
+      exact (receivesTreatment_thresholdClinicalPathway_iff model decisionRisk).2 h
+    unfold qalyGainUnderDecision
+    rw [if_pos h_treat, treatmentMargin_thresholdClinicalPathway]
+    simp [thresholdQalyGainUnderDecision, h, model.harm_eq_threshold]
+    ring
+  · have h_not_treat :
+        ¬ receivesTreatment (thresholdLongitudinalModel model)
+          (thresholdClinicalPathway model decisionRisk) := by
+      exact fun h_treat =>
+        h ((receivesTreatment_thresholdClinicalPathway_iff model decisionRisk).1 h_treat)
+    unfold qalyGainUnderDecision
+    rw [if_neg h_not_treat]
+    simp [thresholdQalyGainUnderDecision, h]
+
+/-- The threshold one-step loss is exactly the general pathway loss under the
+    threshold specialization. -/
+theorem qalyLoss_threshold_eq_thresholdQalyLoss
+    (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) :
+    qalyLoss (thresholdLongitudinalModel model)
+      (thresholdClinicalPathway model trueRisk)
+      (thresholdClinicalPathway model predictedRisk) =
+        thresholdQalyLoss model trueRisk predictedRisk := by
+  unfold qalyLoss thresholdQalyLoss
+  rw [qalyGainUnderDecision_threshold_eq_thresholdQalyGainUnderDecision,
+    qalyGainUnderDecision_threshold_eq_thresholdQalyGainUnderDecision]
+
 /-- **Exact QALY loss for a false positive treatment decision.**
     If the patient's true risk is below threshold but the predicted risk is
     above threshold, the loss equals the treatment benefit scale times the
     distance from the true risk to the treatment threshold. -/
-theorem qalyLoss_false_positive_exact
+theorem thresholdQalyLoss_false_positive_exact
     (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ)
     (h_true_low : trueRisk ≤ model.threshold)
     (h_pred_high : classifiedHighRisk model.threshold predictedRisk) :
-    qalyLoss model trueRisk predictedRisk =
+    thresholdQalyLoss model trueRisk predictedRisk =
       model.benefit * (model.threshold - trueRisk) := by
   have h_true_not_high : ¬ model.threshold < trueRisk := not_lt.mpr h_true_low
   have h_pred_high' : model.threshold < predictedRisk := by
     simpa [classifiedHighRisk] using h_pred_high
-  unfold qalyLoss qalyGainUnderDecision
+  unfold thresholdQalyLoss thresholdQalyGainUnderDecision
   simp [h_true_not_high, h_pred_high', model.harm_eq_threshold]
   ring_nf
 
@@ -707,40 +1099,38 @@ theorem qalyLoss_false_positive_exact
     If the patient's true risk is above threshold but the predicted risk is
     at or below threshold, the loss equals the missed-treatment margin above
     threshold on the QALY-benefit scale. -/
-theorem qalyLoss_false_negative_exact
+theorem thresholdQalyLoss_false_negative_exact
     (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ)
     (h_true_high : model.threshold < trueRisk)
     (h_pred_not_high : ¬ classifiedHighRisk model.threshold predictedRisk) :
-    qalyLoss model trueRisk predictedRisk =
+    thresholdQalyLoss model trueRisk predictedRisk =
       model.benefit * (trueRisk - model.threshold) := by
   have h_pred_not_high' : ¬ model.threshold < predictedRisk := by
     simpa [classifiedHighRisk] using h_pred_not_high
-  unfold qalyLoss qalyGainUnderDecision
+  unfold thresholdQalyLoss thresholdQalyGainUnderDecision
   simp [h_true_high, h_pred_not_high', model.harm_eq_threshold]
   ring_nf
 
-/-- **QALY loss equals benefit-scaled threshold-decision regret.**
-    The QALY object above is exactly the regret of using the predicted-risk
-    threshold rule instead of the oracle true-risk threshold rule, scaled by the
-    treatment benefit. This gives a single exact piecewise formula covering
-    false positives, false negatives, and correct decisions. -/
-theorem qalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
+/-- **Threshold QALY loss equals benefit-scaled threshold-decision regret.**
+    This is the exact one-step specialization of the general longitudinal QALY
+    regret model. -/
+theorem thresholdQalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
     (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) :
-    qalyLoss model trueRisk predictedRisk =
+    thresholdQalyLoss model trueRisk predictedRisk =
       model.benefit * thresholdDecisionRegretMargin model trueRisk predictedRisk := by
   by_cases h_pred : classifiedHighRisk model.threshold predictedRisk
   · by_cases h_true_low : trueRisk ≤ model.threshold
     · unfold thresholdDecisionRegretMargin
       rw [if_pos h_pred]
-      rw [qalyLoss_false_positive_exact model trueRisk predictedRisk h_true_low h_pred]
+      rw [thresholdQalyLoss_false_positive_exact model trueRisk predictedRisk h_true_low h_pred]
       have hmax : max (model.threshold - trueRisk) 0 = model.threshold - trueRisk := by
         exact max_eq_left (by linarith)
       rw [hmax]
     · have h_true_high : model.threshold < trueRisk := by linarith
       have h_pred_high' : model.threshold < predictedRisk := by
         simpa [classifiedHighRisk] using h_pred
-      have h_zero : qalyLoss model trueRisk predictedRisk = 0 := by
-        unfold qalyLoss qalyGainUnderDecision
+      have h_zero : thresholdQalyLoss model trueRisk predictedRisk = 0 := by
+        unfold thresholdQalyLoss thresholdQalyGainUnderDecision
         simp [h_true_high, h_pred_high', model.harm_eq_threshold]
       unfold thresholdDecisionRegretMargin
       rw [if_pos h_pred]
@@ -752,16 +1142,16 @@ theorem qalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
   · by_cases h_true_high : model.threshold < trueRisk
     · unfold thresholdDecisionRegretMargin
       rw [if_neg h_pred]
-      rw [qalyLoss_false_negative_exact model trueRisk predictedRisk h_true_high h_pred]
+      rw [thresholdQalyLoss_false_negative_exact model trueRisk predictedRisk h_true_high h_pred]
       have hmax : max (trueRisk - model.threshold) 0 = trueRisk - model.threshold := by
         exact max_eq_left (by linarith)
       rw [hmax]
     · have h_true_low : trueRisk ≤ model.threshold := by linarith
       have h_pred_not_high' : ¬ model.threshold < predictedRisk := by
         simpa [classifiedHighRisk] using h_pred
-      have h_zero : qalyLoss model trueRisk predictedRisk = 0 := by
-        unfold qalyLoss qalyGainUnderDecision
-        simp [h_true_high, h_pred_not_high', model.harm_eq_threshold]
+      have h_zero : thresholdQalyLoss model trueRisk predictedRisk = 0 := by
+        unfold thresholdQalyLoss thresholdQalyGainUnderDecision
+        simp [h_true_high, h_pred_not_high']
       unfold thresholdDecisionRegretMargin
       rw [if_neg h_pred]
       rw [h_zero]
@@ -770,11 +1160,11 @@ theorem qalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
       rw [hmax]
       ring
 
-/-- QALY loss is always nonnegative under the threshold-decision regret model. -/
-theorem qalyLoss_nonneg
+/-- Threshold-specialized QALY loss is always nonnegative. -/
+theorem thresholdQalyLoss_nonneg
     (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) :
-    0 ≤ qalyLoss model trueRisk predictedRisk := by
-  rw [qalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin]
+    0 ≤ thresholdQalyLoss model trueRisk predictedRisk := by
+  rw [thresholdQalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin]
   have h_margin_nonneg :
       0 ≤ thresholdDecisionRegretMargin model trueRisk predictedRisk := by
     unfold thresholdDecisionRegretMargin
@@ -785,18 +1175,17 @@ theorem qalyLoss_nonneg
       exact le_max_right _ _
   exact mul_nonneg model.benefit_pos.le h_margin_nonneg
 
-/-- **QALY loss is zero under perfect calibration at the decision point.**
-    If the deployed decision uses the true risk itself, it matches the oracle
-    threshold rule and incurs no regret. -/
-theorem qalyLoss_eq_zero_of_perfect_calibration
+/-- **Threshold-specialized QALY loss is zero under perfect calibration at the
+    decision point.** -/
+theorem thresholdQalyLoss_eq_zero_of_perfect_calibration
     (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ)
     (h_cal : predictedRisk = trueRisk) :
-    qalyLoss model trueRisk predictedRisk = 0 := by
+    thresholdQalyLoss model trueRisk predictedRisk = 0 := by
   subst h_cal
-  unfold qalyLoss
+  unfold thresholdQalyLoss
   ring
 
-/-- **Miscalibration-induced overtreatment has an exact QALY cost.**
+/-- **Miscalibration-induced overtreatment has an exact threshold QALY cost.**
     A positive intercept shift that pushes a truly low-risk patient above the
     treatment threshold creates a false positive treatment decision, and the
     resulting regret is exactly the false-positive QALY loss. -/
@@ -804,50 +1193,65 @@ theorem miscalibration_induced_false_positive_qaly_loss
     (model : ThresholdTreatmentModel) (trueRisk c : ℝ)
     (h_truly_low : trueRisk < model.threshold)
     (h_miscal : model.threshold - trueRisk < c) :
-    qalyLoss model trueRisk (trueRisk + c) =
+    thresholdQalyLoss model trueRisk (trueRisk + c) =
       model.benefit * (model.threshold - trueRisk) := by
   have h_decision :=
     miscalibration_changes_decisions trueRisk model.threshold c h_truly_low h_miscal
-  exact qalyLoss_false_positive_exact model trueRisk (trueRisk + c) (le_of_lt h_truly_low) h_decision.2
+  exact thresholdQalyLoss_false_positive_exact
+    model trueRisk (trueRisk + c) (le_of_lt h_truly_low) h_decision.2
 
-/-- **Expected QALY loss from miscalibration.**
-    This is the population expectation of threshold-decision regret under the
-    joint law of true risk and predicted risk. -/
-noncomputable def expectedQalyLoss {Z : Type*} [MeasurableSpace Z]
+/-- **Expected threshold-specialized QALY loss from miscalibration.** -/
+noncomputable def expectedThresholdQalyLoss {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (model : ThresholdTreatmentModel)
     (trueRisk predictedRisk : Z → ℝ) : ℝ :=
-  ∫ z, qalyLoss model (trueRisk z) (predictedRisk z) ∂μ
+  ∫ z, thresholdQalyLoss model (trueRisk z) (predictedRisk z) ∂μ
 
-/-- Perfect calibration implies zero expected QALY loss. -/
-theorem expectedQalyLoss_eq_zero_of_perfect_calibration
+/-- The expected loss under the threshold specialization agrees exactly with
+    the general pathway expected loss. -/
+theorem expectedQalyLoss_threshold_eq_expectedThresholdQalyLoss
+    {Z : Type*} [MeasurableSpace Z]
+    (μ : Measure Z) (model : ThresholdTreatmentModel)
+    (trueRisk predictedRisk : Z → ℝ) :
+    expectedQalyLoss μ (thresholdLongitudinalModel model)
+      (fun z => thresholdClinicalPathway model (trueRisk z))
+      (fun z => thresholdClinicalPathway model (predictedRisk z)) =
+        expectedThresholdQalyLoss μ model trueRisk predictedRisk := by
+  unfold expectedQalyLoss expectedThresholdQalyLoss
+  refine integral_congr_ae ?_
+  exact Filter.Eventually.of_forall (fun z =>
+    qalyLoss_threshold_eq_thresholdQalyLoss
+      model (trueRisk z) (predictedRisk z))
+
+/-- Perfect calibration implies zero expected threshold-specialized QALY loss. -/
+theorem expectedThresholdQalyLoss_eq_zero_of_perfect_calibration
     {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (model : ThresholdTreatmentModel)
     (trueRisk predictedRisk : Z → ℝ)
     (h_cal : ∀ z, predictedRisk z = trueRisk z) :
-    expectedQalyLoss μ model trueRisk predictedRisk = 0 := by
-  unfold expectedQalyLoss
+    expectedThresholdQalyLoss μ model trueRisk predictedRisk = 0 := by
+  unfold expectedThresholdQalyLoss
   have hfun :
-      (fun z => qalyLoss model (trueRisk z) (predictedRisk z)) = fun _ => (0 : ℝ) := by
+      (fun z => thresholdQalyLoss model (trueRisk z) (predictedRisk z)) =
+        fun _ => (0 : ℝ) := by
     funext z
-    exact qalyLoss_eq_zero_of_perfect_calibration model (trueRisk z) (predictedRisk z) (h_cal z)
+    exact thresholdQalyLoss_eq_zero_of_perfect_calibration
+      model (trueRisk z) (predictedRisk z) (h_cal z)
   rw [hfun]
   simp
 
-/-- **Expected QALY loss is the expected threshold-decision regret.**
-    Population QALY loss is exactly the expected decision-regret margin scaled
-    by the treatment benefit. This makes the population-level clinical utility
-    object a direct consequence of the threshold treatment model above. -/
-theorem expectedQalyLoss_eq_expected_thresholdDecisionRegret
+/-- **Expected threshold-specialized QALY loss is the expected
+    threshold-decision regret.** -/
+theorem expectedThresholdQalyLoss_eq_expected_thresholdDecisionRegret
     {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (model : ThresholdTreatmentModel)
     (trueRisk predictedRisk : Z → ℝ) :
-    expectedQalyLoss μ model trueRisk predictedRisk =
+    expectedThresholdQalyLoss μ model trueRisk predictedRisk =
       ∫ z, model.benefit *
         thresholdDecisionRegretMargin model (trueRisk z) (predictedRisk z) ∂μ := by
-  unfold expectedQalyLoss
+  unfold expectedThresholdQalyLoss
   refine integral_congr_ae ?_
   exact Filter.Eventually.of_forall (fun z =>
-    qalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
+    thresholdQalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
       model (trueRisk z) (predictedRisk z))
 
 end DecisionImplications

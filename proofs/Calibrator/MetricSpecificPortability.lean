@@ -194,35 +194,48 @@ theorem R2DecompositionData.cal_loss_reduces_r2 (d : R2DecompositionData)
   unfold r2 discrimination
   exact div_lt_div_of_pos_right h_miscal d.hVarY_pos
 
-/-- Exact liability-threshold AUC attached to the discrimination component
-    of the `R² = discrimination × calibration` decomposition. -/
-noncomputable def R2DecompositionData.liabilityAUC (d : R2DecompositionData) : ℝ :=
-  sourceLiabilityAUCFromObservables d.discrimination
+/-- Exact literal population AUC attached to a concrete score/population pair
+    that realizes the `R² = discrimination × calibration` decomposition. -/
+noncomputable def R2DecompositionData.liabilityAUC
+    {Z : Type*} [MeasurableSpace Z]
+    (d : R2DecompositionData)
+    (pop : BinaryPopulation Z)
+    (score : Z → ℝ) : ℝ :=
+  let _ := d
+  ENNReal.toReal (populationAUC pop score)
 
 /-- **R² is less portable than true AUC when only calibration is lost.**
 
-    Assume the source and target have the same discrimination component
-    `Var(Ŷ) / Var(Y)`, so the exact liability-threshold AUC implied by that
-    discrimination is identical in both populations. If the source is perfectly
-    calibrated but the target loses calibration, then:
+    Assume source and target scores are evaluated on the same binary population
+    and differ only by a strictly increasing recalibration map, so the literal
+    population AUC is preserved exactly by rank invariance. If the source is
+    perfectly calibrated but the target loses calibration, then:
 
-    - the literal liability-threshold AUC is preserved exactly;
+    - the literal population AUC is preserved exactly;
     - the absolute AUC portability gap is exactly `0`;
     - the `R²` portability ratio equals the residual target calibration;
     - the `R²` portability loss `1 - R²_target / R²_source` is strictly positive.
 
-    This states the metric comparison directly on the true AUC object in this
-    file, not on a discrimination proxy. -/
+    This states the metric comparison directly on the repository's actual
+    population AUC functional, not on a liability-model surrogate. -/
 theorem r2_less_portable_than_auc_from_decomposition
+    {Z : Type*} [MeasurableSpace Z]
+    (pop : BinaryPopulation Z)
+    (scoreSource scoreTarget : Z → ℝ)
     (source target : R2DecompositionData)
+    (g : ℝ → ℝ)
+    (hg : StrictMono g)
+    (hScoreTarget : scoreTarget = g ∘ scoreSource)
     -- Calibration is strictly lost: Var(f(Ŷ))/Var(Ŷ) is lower in target
     (hCalLoss : target.calibration < source.calibration)
     -- Source is perfectly calibrated (f = id in source)
     (hSourceCal : source.varCondE = source.varYhat)
-    -- Discrimination transfers perfectly, so AUC should be preserved.
+    -- Discrimination transfers perfectly, so the only `R²` loss comes from
+    -- calibration.
     (hDiscPreserved : target.discrimination = source.discrimination) :
-    target.liabilityAUC = source.liabilityAUC ∧
-    |target.liabilityAUC - source.liabilityAUC| = 0 ∧
+    populationAUC pop scoreTarget = populationAUC pop scoreSource ∧
+    |ENNReal.toReal (populationAUC pop scoreTarget) -
+        ENNReal.toReal (populationAUC pop scoreSource)| = 0 ∧
     target.r2 / source.r2 = target.calibration ∧
     0 < 1 - target.r2 / source.r2 := by
   have h_src_r2 : source.r2 = source.discrimination * source.calibration :=
@@ -240,10 +253,13 @@ theorem r2_less_portable_than_auc_from_decomposition
   have h_r2_ratio : target.r2 / source.r2 = target.calibration := by
     rw [h_tgt_r2, h_src_r2_eq, hDiscPreserved]
     field_simp [ne_of_gt source.disc_pos]
-  have h_auc_eq : target.liabilityAUC = source.liabilityAUC := by
-    unfold R2DecompositionData.liabilityAUC
-    rw [hDiscPreserved]
-  have h_auc_gap_zero : |target.liabilityAUC - source.liabilityAUC| = 0 := by
+  have h_auc_eq : populationAUC pop scoreTarget = populationAUC pop scoreSource := by
+    rw [hScoreTarget]
+    simpa [Function.comp] using
+      (populationAUC_strictMono_invariant pop scoreSource g hg)
+  have h_auc_gap_zero :
+      |ENNReal.toReal (populationAUC pop scoreTarget) -
+          ENNReal.toReal (populationAUC pop scoreSource)| = 0 := by
     rw [h_auc_eq]
     simp
   have h_r2_gap_pos : 0 < 1 - target.r2 / source.r2 := by
@@ -299,14 +315,14 @@ theorem r2_sensitive_to_drift
   have h := drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT_le_one
   linarith
 
-/-- **`presentDayAUC` is exactly `aucLink` applied to the drifted SNR.**
-    This theorem is the structural identity built into the observable drift
-    model. Any invariance interpretation must be derived separately from this
-    formula. -/
-theorem presentDayAUC_formula
-    (aucLink : ℝ → ℝ) (V_A V_E fst : ℝ) :
-    presentDayAUC aucLink V_A V_E fst = aucLink (presentDaySignalToNoise V_A V_E fst) := by
-  unfold presentDayAUC; rfl
+/-- **Exact present-day liability AUC formula.**
+    Under the equal-variance Gaussian liability model, the present-day AUC is
+    exactly `Φ(√(SNR/2))`, where `SNR = presentDaySignalToNoise`. -/
+theorem presentDayLiabilityAUC_formula
+    (V_A V_E fst : ℝ) :
+    presentDayLiabilityAUC V_A V_E fst =
+      Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
+  simp [presentDayLiabilityAUC, presentDayAUC]
 
 /-- On `(0,1)`, the observable variance parameter `r2 / (1-r2)` is strictly
     increasing in `r2`. -/
@@ -334,7 +350,7 @@ theorem brier_depends_on_prevalence
     (h_r2_lt : r2 < 1)
     (h_order : π₁ < π₂) (h_half : π₂ ≤ 1/2) :
     brierFromR2 π₁ r2 < brierFromR2 π₂ r2 := by
-  unfold brierFromR2
+  unfold brierFromR2 exactCalibratedBrierRiskFromR2
   have h_factor : 0 < 1 - r2 := by linarith
   -- Need: π₁(1-π₁) < π₂(1-π₂) when 0 < π₁ < π₂ ≤ 1/2
   -- f(x) = x(1-x) is increasing on (0, 1/2)
@@ -350,8 +366,8 @@ theorem sourceLiabilityAUC_strictly_increases_with_r2
     (h_r2₁ : 0 < r2₁) (h_r2₂ : r2₂ < 1)
     (h_lt : r2₁ < r2₂)
     (hPhiStrict : StrictMono Phi) :
-    sourceLiabilityAUCFromObservables r2₁ <
-      sourceLiabilityAUCFromObservables r2₂ := by
+    sourceExactLiabilityAUC r2₁ <
+      sourceExactLiabilityAUC r2₂ := by
   have h_r2₁_range : 0 < r2₁ ∧ r2₁ < 1 := ⟨h_r2₁, lt_trans h_lt h_r2₂⟩
   have h_r2₂_pos : 0 < r2₂ := lt_trans h_r2₁ h_lt
   have h_r2₂_range : 0 < r2₂ ∧ r2₂ < 1 := ⟨h_r2₂_pos, h_r2₂⟩
@@ -363,7 +379,7 @@ theorem sourceLiabilityAUC_strictly_increases_with_r2
       sourceVarianceFromR2 r2₁ < sourceVarianceFromR2 r2₂ :=
     sourceVarianceFromR2_strictMono r2₁ r2₂ h_r2₂ h_lt
   have hmono := liabilityAUCFromSNR_strictMonoOn_nonneg hPhiStrict
-  unfold sourceLiabilityAUCFromObservables
+  unfold sourceExactLiabilityAUC
   exact hmono (by simpa using le_of_lt hv₁_pos) (by simpa using le_of_lt hv₂_pos) hv_lt
 
 /-- **Liability AUC is sensitive to drift in the observable transport model.**
@@ -376,8 +392,8 @@ theorem liability_auc_sensitive_to_drift
     (h_fst : fstS < fstT)
     (h_fst_bounds : 0 ≤ fstS ∧ fstT < 1)
     (hPhiStrict : StrictMono Phi) :
-    0 < sourceLiabilityAUCFromObservables r2Source -
-      targetLiabilityAUCFromObservables r2Source fstS fstT := by
+    0 < sourceExactLiabilityAUC r2Source -
+      targetExactLiabilityAUC r2Source fstS fstT := by
   have h_drop :=
     targetLiabilityAUC_lt_source_of_observables
       r2Source fstS fstT h_r2 h_fst h_fst_bounds hPhiStrict
@@ -397,7 +413,7 @@ theorem brier_worsens_when_r2_drops_and_prevalence_factor_grows
     (h_prev : π_source * (1 - π_source) ≤ π_target * (1 - π_target)) :
     -- Target Brier ≥ source Brier (higher = worse)
     brierFromR2 π_source r2_source ≤ brierFromR2 π_target r2_target := by
-  unfold brierFromR2
+  unfold brierFromR2 exactCalibratedBrierRiskFromR2
   have h1 : 0 < 1 - r2_source := by linarith
   have h2 : 0 < 1 - r2_target := by linarith
   -- (1 - r2_target) ≥ (1 - r2_source) and π_t(1-π_t) ≥ π_s(1-π_s)
@@ -416,30 +432,31 @@ across populations.
 
 section CalibrationVsDiscrimination
 
-/-- **At fixed drift, AUC is preserved while CITL shifts exactly with the mean-score offset.**
+/-- **At fixed drift, exact liability AUC is preserved while CITL shifts exactly
+with the mean-score offset.**
     This theorem formalizes the intended metric split on the repository's
     actual metrics:
 
-    - discrimination is measured by observable transport AUC;
+    - discrimination is measured by exact liability-threshold AUC;
     - calibration is measured by calibration-in-the-large (CITL).
 
-    If source and target have the same `fst`, then the observable transport map
-    gives exactly the same AUC. If the target mean prediction is shifted by an
+    If source and target have the same `fst`, then the exact liability transport
+    map gives exactly the same AUC. If the target mean prediction is shifted by an
     additive offset `δ`, then CITL shifts by exactly `-δ`. This is the precise
     fixed-`fst` statement behind "rank-based discrimination can be preserved
     while calibration is lost." -/
 theorem auc_preserved_citl_shift_at_fixed_fst
-    (aucLink : ℝ → ℝ)
     (r2Source fst mean_obs mean_pred δ : ℝ)
     (hfst : fst < 1) :
-    targetAUCFromObservables aucLink r2Source fst fst =
-      sourceAUCFromObservables aucLink r2Source ∧
+    targetExactLiabilityAUC r2Source fst fst =
+      sourceExactLiabilityAUC r2Source ∧
     calibrationInTheLarge mean_obs (mean_pred + δ) =
       calibrationInTheLarge mean_obs mean_pred - δ := by
   constructor
-  · unfold targetAUCFromObservables sourceAUCFromObservables targetVarianceFromSource
+  · unfold targetExactLiabilityAUC sourceExactLiabilityAUC
+      targetAUCFromObservables sourceAUCFromObservables aucFromR2
     have hden : (1 : ℝ) - fst ≠ 0 := by linarith
-    rw [div_self hden, mul_one]
+    simp [targetVarianceFromSource, sourceVarianceFromR2, hden]
   · unfold calibrationInTheLarge
     ring
 
@@ -453,16 +470,15 @@ theorem auc_preserved_citl_shift_at_fixed_fst
     AUC is preserved, while calibration loss is witnessed by a standard
     calibration metric rather than an `R²` surrogate. -/
 theorem discrimination_preserved_calibration_lost
-    (aucLink : ℝ → ℝ)
     (r2Source fst mean_obs mean_pred δ : ℝ)
     (hfst : fst < 1)
     (h_src_cal : calibrationInTheLarge mean_obs mean_pred = 0)
     (h_shift : δ ≠ 0) :
-    targetAUCFromObservables aucLink r2Source fst fst =
-      sourceAUCFromObservables aucLink r2Source ∧
+    targetExactLiabilityAUC r2Source fst fst =
+      sourceExactLiabilityAUC r2Source ∧
     |calibrationInTheLarge mean_obs mean_pred| <
       |calibrationInTheLarge mean_obs (mean_pred + δ)| := by
-  rcases auc_preserved_citl_shift_at_fixed_fst aucLink r2Source fst mean_obs mean_pred δ hfst with
+  rcases auc_preserved_citl_shift_at_fixed_fst r2Source fst mean_obs mean_pred δ hfst with
     ⟨h_auc, h_citl_shift⟩
   refine ⟨h_auc, ?_⟩
   rw [h_src_cal]
@@ -474,21 +490,58 @@ theorem discrimination_preserved_calibration_lost
   simp only [abs_zero]
   exact abs_pos.mpr h_shift_sub
 
-/-- Observable calibration slope induced by transporting a score from source
-    drift level `fstS` to target drift level `fstT` in the present-day `R²`
-    model. The source-calibrated baseline has slope `1`; deviations from `1`
-    quantify spread miscalibration after transport. -/
-noncomputable def driftCalibrationSlope (V_A V_E fstS fstT : ℝ) : ℝ :=
-  presentDayR2 V_A V_E fstT / presentDayR2 V_A V_E fstS
+/-- Literal linear calibration slope for a transported source-calibrated score.
+
+    Calibration slope is the population regression coefficient
+
+    `Cov(Y_target, Ŷ_source) / Var(Ŷ_source)`.
+
+    In the present-day additive drift model used here:
+
+    - the source-calibrated predictor variance is `presentDayPGSVariance V_A fstS`;
+    - the transported target covariance with the phenotype is
+      `presentDayPGSVariance V_A fstT`.
+
+    So this is a literal cov/var calibration slope, not an `R²` ratio surrogate. -/
+noncomputable def driftCalibrationSlope (V_A fstS fstT : ℝ) : ℝ :=
+  presentDayPGSVariance V_A fstT / presentDayPGSVariance V_A fstS
+
+/-- The literal transported calibration slope is exactly the core drift
+    transport ratio on genetic signal variance. This ties the metric-level
+    calibration statement directly back to the population-genetic transport
+    object used throughout `PortabilityDrift`. -/
+theorem driftCalibrationSlope_eq_driftTransportRatio
+    (V_A fstS fstT : ℝ)
+    (hVA : 0 < V_A)
+    (hfstS_lt_one : fstS < 1) :
+    driftCalibrationSlope V_A fstS fstT = driftTransportRatio fstS fstT := by
+  have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
+  have hden_ne : 1 - fstS ≠ 0 := by linarith
+  unfold driftCalibrationSlope driftTransportRatio presentDayPGSVariance
+  field_simp [hVA_ne, hden_ne]
+
+/-- Exact closed form of the transported calibration slope under drift. -/
+theorem driftCalibrationSlope_eq_fst_ratio
+    (V_A fstS fstT : ℝ)
+    (hVA : 0 < V_A)
+    (hfstS_lt_one : fstS < 1) :
+    driftCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) := by
+  have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
+  have hden_ne : 1 - fstS ≠ 0 := by linarith
+  unfold driftCalibrationSlope presentDayPGSVariance
+  field_simp [hVA_ne, hden_ne]
 
 /-- **Allele-frequency shift worsens calibration slope and Brier score.**
     In the observable drift model, a larger target `F_ST` produces a real
-    calibration degradation on actual metrics:
+    calibration degradation on actual metrics. The calibration statement here
+    uses the literal linear regression slope `Cov(Y_target, Ŷ_source) / Var(Ŷ_source)`
+    for the transported source-calibrated score.
 
     - the target calibration slope is strictly below the ideal source baseline
       `1`;
     - the calibration-slope deviation from perfect calibration is therefore
       strictly larger than the source value `0`, and equals exactly `1 - slope`;
+    - the slope itself has the exact drift formula `(1 - fstT) / (1 - fstS)`;
     - at any nondegenerate prevalence `π`, the observable target Brier score is
       strictly worse than the source Brier score.
 
@@ -500,14 +553,18 @@ theorem allele_freq_shift_disrupts_calibration
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
     (hfst_bounds : 0 ≤ fstS ∧ fstT < 1) :
-    driftCalibrationSlope V_A V_E fstS fstT < 1 ∧
+    driftCalibrationSlope V_A fstS fstT < 1 ∧
     calibrationSlopeDeviation 1 <
-      calibrationSlopeDeviation (driftCalibrationSlope V_A V_E fstS fstT) ∧
-    calibrationSlopeDeviation (driftCalibrationSlope V_A V_E fstS fstT) =
-      1 - driftCalibrationSlope V_A V_E fstS fstT ∧
-    sourceBrierFromObservables π (presentDayR2 V_A V_E fstS) <
-      targetBrierFromObservables π (presentDayR2 V_A V_E fstS) fstS fstT := by
+      calibrationSlopeDeviation (driftCalibrationSlope V_A fstS fstT) ∧
+    calibrationSlopeDeviation (driftCalibrationSlope V_A fstS fstT) =
+      1 - driftCalibrationSlope V_A fstS fstT ∧
+    driftCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) ∧
+    sourceExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) <
+      targetExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) fstS fstT := by
   have hfstS_lt_one : fstS < 1 := lt_trans hfst hfst_bounds.2
+  have hslope_eq :
+      driftCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) := by
+    exact driftCalibrationSlope_eq_fst_ratio V_A fstS fstT hVA hfstS_lt_one
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstS := by
     unfold presentDayR2 presentDayPGSVariance
     have h_num : 0 < (1 - fstS) * V_A := by
@@ -526,32 +583,33 @@ theorem allele_freq_shift_disrupts_calibration
   have hsrc_range : 0 < presentDayR2 V_A V_E fstS ∧ presentDayR2 V_A V_E fstS < 1 :=
     ⟨hsrc_pos, hsrc_lt_one⟩
   have hslope_lt :
-      driftCalibrationSlope V_A V_E fstS fstT < 1 := by
-    unfold driftCalibrationSlope
-    exact portability_ratio_lt_one_of_positive_drift
-      V_A V_E fstS fstT hVA hVE hfst (le_of_lt hfst_bounds.2) hsrc_pos
+      driftCalibrationSlope V_A fstS fstT < 1 := by
+    rw [hslope_eq]
+    have hden : 0 < 1 - fstS := by linarith
+    rw [div_lt_one hden]
+    linarith
   have hslope_dev_pos :
       calibrationSlopeDeviation 1 <
-        calibrationSlopeDeviation (driftCalibrationSlope V_A V_E fstS fstT) := by
+        calibrationSlopeDeviation (driftCalibrationSlope V_A fstS fstT) := by
     unfold calibrationSlopeDeviation
     rw [show (1 : ℝ) - 1 = 0 by ring, abs_zero]
-    have hneg : driftCalibrationSlope V_A V_E fstS fstT - 1 < 0 := by
+    have hneg : driftCalibrationSlope V_A fstS fstT - 1 < 0 := by
       linarith [hslope_lt]
     rw [abs_of_neg hneg]
     linarith
   have hslope_dev :
-      calibrationSlopeDeviation (driftCalibrationSlope V_A V_E fstS fstT) =
-        1 - driftCalibrationSlope V_A V_E fstS fstT := by
+      calibrationSlopeDeviation (driftCalibrationSlope V_A fstS fstT) =
+        1 - driftCalibrationSlope V_A fstS fstT := by
     unfold calibrationSlopeDeviation
     rw [abs_of_neg]
     · ring
     · linarith [hslope_lt]
   have hbrier :
-      sourceBrierFromObservables π (presentDayR2 V_A V_E fstS) <
-        targetBrierFromObservables π (presentDayR2 V_A V_E fstS) fstS fstT := by
+      sourceExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) <
+        targetExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) fstS fstT := by
     exact targetBrier_strict_gt_source_of_observables
       π (presentDayR2 V_A V_E fstS) fstS fstT hπ0 hπ1 hsrc_range hfst hfst_bounds
-  exact ⟨hslope_lt, hslope_dev_pos, hslope_dev, hbrier⟩
+  exact ⟨hslope_lt, hslope_dev_pos, hslope_dev, hslope_eq, hbrier⟩
 
 /-- **Dimension-to-information ratio for a target adaptation task.**
     In an orthogonal Fisher model with `d` target-specific parameters and
@@ -660,7 +718,7 @@ theorem brier_increases_with_portability_loss
     (h_π : 0 < π) (h_π' : π < 1)
     (h_drop : r2_target < r2_source) :
     brierFromR2 π r2_source < brierFromR2 π r2_target := by
-  unfold brierFromR2
+  unfold brierFromR2 exactCalibratedBrierRiskFromR2
   have h_prev : 0 < π * (1 - π) := by nlinarith
   nlinarith
 
@@ -673,7 +731,7 @@ theorem brier_bounded_by_prevalence
     (h_π : 0 < π) (h_π' : π < 1)
     (h_r2 : 0 < r2) :
     brierFromR2 π r2 < π * (1 - π) := by
-  unfold brierFromR2
+  unfold brierFromR2 exactCalibratedBrierRiskFromR2
   have h_prev : 0 < π * (1 - π) := by nlinarith
   nlinarith
 
@@ -695,16 +753,26 @@ theorem brierDiscriminationLoss_eq
     brierDiscriminationLoss πTarget r2Source fstSource fstTarget =
       πTarget * (1 - πTarget) *
         (r2Source - targetR2FromObservables r2Source fstSource fstTarget) := by
-  unfold brierDiscriminationLoss targetBrierFromObservables sourceBrierFromObservables brierFromR2
-  ring
+  unfold brierDiscriminationLoss targetBrierFromObservables sourceBrierFromObservables
+    targetExactCalibratedBrierRisk exactCalibratedBrierRiskFromR2
+  calc
+    πTarget * (1 - πTarget) * (1 - targetR2FromObservables r2Source fstSource fstTarget) -
+        πTarget * (1 - πTarget) * (1 - r2Source)
+      = πTarget * (1 - πTarget) *
+          ((1 - targetR2FromObservables r2Source fstSource fstTarget) - (1 - r2Source)) := by
+            ring
+    _ = πTarget * (1 - πTarget) *
+          (r2Source - targetR2FromObservables r2Source fstSource fstTarget) := by
+            ring
 
 /-- Exact formula for the calibration/prevalence contribution to Brier worsening. -/
 theorem brierCalibrationLoss_eq
     (πSource πTarget r2Source : ℝ) :
     brierCalibrationLoss πSource πTarget r2Source =
       (πTarget * (1 - πTarget) - πSource * (1 - πSource)) * (1 - r2Source) := by
-  unfold brierCalibrationLoss sourceBrierFromObservables brierFromR2
-  ring
+  unfold brierCalibrationLoss sourceBrierFromObservables
+    exactCalibratedBrierRiskFromR2
+  ring_nf
 
 /-- Exact decomposition of observable Brier worsening into discrimination and calibration terms. -/
 theorem observableBrier_change_decomposition
@@ -974,25 +1042,25 @@ theorem clinical_utility_threshold
   simp only [div_one]
   linarith
 
-/-- **R² and AUC can diverge under drift (derived from model structure).**
+/-- **R² and exact liability AUC can diverge under drift (derived from model structure).**
     Under drift, both R² and AUC degrade, but AUC degrades through SNR alone
     while R² = v/(v + V_E) depends on the variance ratio differently from
-    AUC = aucLink(v/V_E). For a strictly monotone aucLink, both degrade
-    (from `drift_degrades_R2` and `drift_degrades_AUC_of_strictMono`),
+    the exact liability-threshold map `AUC = Φ(√(v / (2 V_E)))`. Both degrade
+    (from `drift_degrades_R2` and `drift_degrades_liabilityAUC`),
     but their rates of degradation differ because R² is a saturating
-    function of variance while AUC's degradation depends on the link shape.
+    function of variance while AUC's degradation depends on the liability-threshold map.
 
     We demonstrate: at a common fst, AUC and R² both degrade, confirming
     that reporting only one metric is incomplete. -/
 theorem metrics_both_degrade_under_drift
-    (aucLink : ℝ → ℝ) (hauc : StrictMono aucLink)
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst : fstS < fstT) (hfstT : fstT ≤ 1) :
+    (hfst : fstS < fstT) (hfstT : fstT ≤ 1)
+    (hPhiStrict : StrictMono Phi) :
     presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS ∧
-    presentDayAUC aucLink V_A V_E fstT < presentDayAUC aucLink V_A V_E fstS :=
+    presentDayLiabilityAUC V_A V_E fstT < presentDayLiabilityAUC V_A V_E fstS :=
   ⟨drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT,
-   drift_degrades_AUC_of_strictMono aucLink hauc V_A V_E fstS fstT hVA hVE hfst⟩
+   drift_degrades_liabilityAUC V_A V_E fstS fstT hVA hVE hfst hfstT hPhiStrict⟩
 
 end MetricAndClinicalDecisions
 
@@ -1008,10 +1076,17 @@ section ProperScoringRules
 
 /-- **Brier score is a proper scoring rule.**
     Brier(p, y) = (p - y)². The unique minimizer is p = P(Y=1|X). -/
-noncomputable def brierScoreMetric (p y : ℝ) : ℝ := (p - y) ^ 2
+noncomputable abbrev brierScoreMetric (p y : ℝ) : ℝ := brierScore p y
+
+/-- The local metric surface is exactly the core Brier score object from
+    `Conclusions`. -/
+@[simp] theorem brierScoreMetric_eq_core (p y : ℝ) :
+    brierScoreMetric p y = brierScore p y := by
+  rfl
 
 /-- Brier score is nonneg. -/
-theorem brier_nonneg (p y : ℝ) : 0 ≤ brierScoreMetric p y := sq_nonneg _
+theorem brier_nonneg (p y : ℝ) : 0 ≤ brierScoreMetric p y := by
+  simpa [brierScoreMetric, brierScore] using sq_nonneg (y - p)
 
 /- **Log score (cross-entropy) is also proper.**
     Log(p, y) = -y log(p) - (1-y) log(1-p).
@@ -1027,7 +1102,7 @@ theorem brier_score_bounded
     (h_π : 0 ≤ π) (h_π' : π ≤ 1)
     (h_r2 : 0 ≤ r2) (h_r2' : r2 ≤ 1) :
     brierFromR2 π r2 ≤ 1/4 := by
-  unfold brierFromR2
+  unfold brierFromR2 exactCalibratedBrierRiskFromR2
   have h1 : π * (1 - π) ≤ 1/4 := by nlinarith [sq_nonneg (π - 1/2)]
   have h_one_minus_pi : 0 ≤ 1 - π := by linarith
   have h2 : 0 ≤ 1 - r2 := by linarith

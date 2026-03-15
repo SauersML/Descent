@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Mathlib.Algebra.Order.Chebyshev
 
 namespace Calibrator
 
@@ -953,103 +954,136 @@ theorem local_pc_removal_minimum_beats_adjacent_choices
     err_k ≤ min err_k_plus_1 err_k_minus_1 := by
   exact le_min h_local_min_right h_local_min_left
 
-/-- **A certified lower-divergence representation tightens the transfer bound.**
-    Compare two representation-learning strategies through the actual
-    domain-adaptation bound components they induce. If the new representation
-    has no larger source error, strictly smaller divergence, and no larger
-    `λ*`, then its Ben-David upper bound is strictly smaller.
-
-    This theorem does not formalize adversarial optimization itself. It gives
-    the rigorous consequence available once any method, adversarial or
-    otherwise, is certified to improve the bound components. -/
-theorem lower_divergence_representation_tightens_ben_david_bound
-    (err_source_standard err_source_new : ℝ)
-    (divergence_standard divergence_new : ℝ)
-    (lambda_standard lambda_new : ℝ)
-    (h_source : err_source_new ≤ err_source_standard)
-    (h_div : divergence_new < divergence_standard)
-    (h_lambda : lambda_new ≤ lambda_standard) :
-    benDavidUpperBound err_source_new divergence_new lambda_new <
-      benDavidUpperBound err_source_standard divergence_standard lambda_standard := by
-  unfold benDavidUpperBound
-  linarith
-
 /-- Information-bottleneck objective `I(φ(X); Y) - λ I(φ(X); A)`. -/
 def infoBottleneckObjective (I_phi_Y I_phi_A lam : ℝ) : ℝ :=
   I_phi_Y - lam * I_phi_A
 
-/-- **Improving the information-bottleneck objective tightens the transfer bound.**
-    Compare a standard representation and a new learned representation `φ`.
-    Suppose:
-    - more trait information lowers source error at rate `gainScale`;
-    - more ancestry information raises divergence at rate `gainScale * λ`;
-    - the irreducible `λ*` term does not worsen.
+/-- Exact normalized Gaussian source residual risk from mutual information.
+    For a jointly Gaussian source trait `Y` and representation `φ(X)` with
+    `Var(Y)=1`, the residual variance fraction is exactly `exp(-2 I(φ(X);Y))`. -/
+noncomputable def gaussianSourceResidualRisk (I_phi_Y : ℝ) : ℝ :=
+  Real.exp (-2 * I_phi_Y)
 
-    Then any strict improvement in the information-bottleneck objective yields
-    a strictly smaller Ben-David target-error upper bound. This is the
-    transport consequence of the representation objective, not just a restated
-    inequality. -/
-theorem higher_info_bottleneck_objective_tightens_ben_david_bound
-    (err_source_standard err_source_new : ℝ)
-    (divergence_standard divergence_new : ℝ)
-    (lambda_standard lambda_new : ℝ)
+/-- Pinsker-certified ancestry-divergence cap from mutual information.
+    This is the standard `√(2 I)` envelope obtained by combining binary-domain
+    total-variation control with Pinsker's inequality. -/
+noncomputable def pinskerAncestryDivergenceCap (I_phi_A : ℝ) : ℝ :=
+  Real.sqrt (2 * I_phi_A)
+
+/-- Information-certified Ben-David upper envelope built from:
+    - exact Gaussian source residual risk,
+    - a Pinsker ancestry-divergence cap,
+    - the irreducible `λ*` term. -/
+noncomputable def infoCertifiedBenDavidUpperBound
+    (I_phi_Y I_phi_A lambda_star : ℝ) : ℝ :=
+  gaussianSourceResidualRisk I_phi_Y +
+    pinskerAncestryDivergenceCap I_phi_A + lambda_star
+
+/-- More label information strictly lowers the exact Gaussian source residual term. -/
+theorem gaussianSourceResidualRisk_strictAnti
+    (I₁ I₂ : ℝ)
+    (hI : I₁ < I₂) :
+    gaussianSourceResidualRisk I₂ < gaussianSourceResidualRisk I₁ := by
+  unfold gaussianSourceResidualRisk
+  exact Real.exp_lt_exp.mpr (by linarith)
+
+/-- Less ancestry information weakly lowers the Pinsker divergence cap. -/
+theorem pinskerAncestryDivergenceCap_mono
+    (I₁ I₂ : ℝ)
+    (hI₂ : I₁ ≤ I₂) :
+    pinskerAncestryDivergenceCap I₁ ≤ pinskerAncestryDivergenceCap I₂ := by
+  unfold pinskerAncestryDivergenceCap
+  apply Real.sqrt_le_sqrt
+  nlinarith
+
+/-- Dominating a representation by increasing trait information and not
+    increasing ancestry leakage tightens the information-certified transfer
+    envelope. -/
+theorem more_label_info_less_ancestry_info_tightens_ben_david_bound
     (I_phi_Y_standard I_phi_Y_new I_phi_A_standard I_phi_A_new : ℝ)
-    (lam gainScale : ℝ)
-    (h_gainScale : 0 < gainScale)
-    (h_source :
-      err_source_new ≤ err_source_standard -
-        gainScale * (I_phi_Y_new - I_phi_Y_standard))
-    (h_div :
-      divergence_new ≤ divergence_standard +
-        gainScale * lam * (I_phi_A_new - I_phi_A_standard))
-    (h_lambda : lambda_new ≤ lambda_standard)
-    (h_obj :
-      infoBottleneckObjective I_phi_Y_new I_phi_A_new lam >
-        infoBottleneckObjective I_phi_Y_standard I_phi_A_standard lam) :
-    benDavidUpperBound err_source_new divergence_new lambda_new <
-      benDavidUpperBound err_source_standard divergence_standard lambda_standard := by
-  have h_obj_scaled :
-      gainScale * (I_phi_Y_new - I_phi_Y_standard) >
-        gainScale * lam * (I_phi_A_new - I_phi_A_standard) := by
-    unfold infoBottleneckObjective at h_obj
-    have hmul := mul_lt_mul_of_pos_left h_obj h_gainScale
-    nlinarith
-  unfold benDavidUpperBound
+    (lambda_standard lambda_new : ℝ)
+    (h_IY : I_phi_Y_standard < I_phi_Y_new)
+    (h_IA_standard : I_phi_A_new ≤ I_phi_A_standard)
+    (h_lambda : lambda_new ≤ lambda_standard) :
+    infoCertifiedBenDavidUpperBound I_phi_Y_new I_phi_A_new lambda_new <
+      infoCertifiedBenDavidUpperBound I_phi_Y_standard I_phi_A_standard lambda_standard := by
+  have h_source :
+      gaussianSourceResidualRisk I_phi_Y_new <
+        gaussianSourceResidualRisk I_phi_Y_standard :=
+    gaussianSourceResidualRisk_strictAnti I_phi_Y_standard I_phi_Y_new h_IY
+  have h_div :
+      pinskerAncestryDivergenceCap I_phi_A_new ≤
+        pinskerAncestryDivergenceCap I_phi_A_standard :=
+    pinskerAncestryDivergenceCap_mono
+      I_phi_A_new I_phi_A_standard h_IA_standard
+  unfold infoCertifiedBenDavidUpperBound
   linarith
 
+/-- An exact information certificate upper-bounds the Ben-David functional. -/
+theorem benDavidUpperBound_le_infoCertifiedBenDavidUpperBound
+    (err_source divergence lambda_star I_phi_Y I_phi_A : ℝ)
+    (h_source : err_source ≤ gaussianSourceResidualRisk I_phi_Y)
+    (h_div : divergence ≤ pinskerAncestryDivergenceCap I_phi_A) :
+    benDavidUpperBound err_source divergence lambda_star ≤
+      infoCertifiedBenDavidUpperBound I_phi_Y I_phi_A lambda_star := by
+  unfold benDavidUpperBound infoCertifiedBenDavidUpperBound
+  linarith
+
+/-- **Improving the information-bottleneck objective tightens the transfer bound.**
+    This is now an exact information-certified statement rather than an affine
+    calibration assumption. If ancestry leakage is held fixed, then a strict
+    gain in the bottleneck objective means strictly larger trait information.
+    Under the exact Gaussian residual-risk formula and the Pinsker ancestry
+    envelope, that strictly tightens the information-certified Ben-David
+    upper bound. -/
+theorem higher_info_bottleneck_objective_tightens_ben_david_bound
+    (I_phi_Y_standard I_phi_Y_new I_phi_A : ℝ)
+    (lambda_standard lambda_new lam : ℝ)
+    (h_lambda : lambda_new ≤ lambda_standard)
+    (h_obj :
+      infoBottleneckObjective I_phi_Y_new I_phi_A lam >
+        infoBottleneckObjective I_phi_Y_standard I_phi_A lam) :
+    infoCertifiedBenDavidUpperBound I_phi_Y_new I_phi_A lambda_new <
+      infoCertifiedBenDavidUpperBound I_phi_Y_standard I_phi_A lambda_standard := by
+  have h_IY : I_phi_Y_standard < I_phi_Y_new := by
+    unfold infoBottleneckObjective at h_obj
+    linarith
+  exact more_label_info_less_ancestry_info_tightens_ben_david_bound
+    I_phi_Y_standard I_phi_Y_new I_phi_A I_phi_A
+    lambda_standard lambda_new h_IY (le_rfl) h_lambda
+
 /-- **A better information-bottleneck representation certifies a lower target-error cap.**
-    If a learned representation `φ` comes with a Ben-David certificate and its
-    source error / divergence terms satisfy the calibrated information-to-bound
-    inequalities above, then a strict gain in the bottleneck objective gives a
-    strictly smaller certified cap on target prediction error than the standard
-    representation's bound. -/
+    If a learned representation `φ` comes with a Ben-David certificate whose
+    source error is bounded by the exact Gaussian residual-risk formula and
+    whose domain divergence is bounded by the Pinsker ancestry-leakage cap,
+    then improving the information-bottleneck objective at fixed ancestry
+    leakage strictly lowers the certified target-error cap. -/
 theorem higher_info_bottleneck_objective_lowers_target_error_cap
     (cert_new : PGSBenDavidCertificate)
-    (err_source_standard divergence_standard lambda_standard : ℝ)
-    (I_phi_Y_standard I_phi_Y_new I_phi_A_standard I_phi_A_new : ℝ)
-    (lam gainScale : ℝ)
-    (h_gainScale : 0 < gainScale)
+    (I_phi_Y_standard I_phi_Y_new I_phi_A : ℝ)
+    (lambda_standard lam : ℝ)
     (h_source :
-      cert_new.err_source ≤ err_source_standard -
-        gainScale * (I_phi_Y_new - I_phi_Y_standard))
+      cert_new.err_source ≤ gaussianSourceResidualRisk I_phi_Y_new)
     (h_div :
-      cert_new.divergence ≤ divergence_standard +
-        gainScale * lam * (I_phi_A_new - I_phi_A_standard))
+      cert_new.divergence ≤ pinskerAncestryDivergenceCap I_phi_A)
     (h_lambda : cert_new.lambda_star ≤ lambda_standard)
     (h_obj :
-      infoBottleneckObjective I_phi_Y_new I_phi_A_new lam >
-        infoBottleneckObjective I_phi_Y_standard I_phi_A_standard lam) :
+      infoBottleneckObjective I_phi_Y_new I_phi_A lam >
+        infoBottleneckObjective I_phi_Y_standard I_phi_A lam) :
     cert_new.err_target <
-      benDavidUpperBound err_source_standard divergence_standard lambda_standard := by
-  have h_bound :
-      benDavidUpperBound cert_new.err_source cert_new.divergence cert_new.lambda_star <
-        benDavidUpperBound err_source_standard divergence_standard lambda_standard := by
+      infoCertifiedBenDavidUpperBound I_phi_Y_standard I_phi_A lambda_standard := by
+  have h_cert_le :
+      benDavidUpperBound cert_new.err_source cert_new.divergence cert_new.lambda_star ≤
+        infoCertifiedBenDavidUpperBound I_phi_Y_new I_phi_A cert_new.lambda_star := by
+    exact benDavidUpperBound_le_infoCertifiedBenDavidUpperBound
+      cert_new.err_source cert_new.divergence cert_new.lambda_star
+      I_phi_Y_new I_phi_A h_source h_div
+  have h_info_lt :
+      infoCertifiedBenDavidUpperBound I_phi_Y_new I_phi_A cert_new.lambda_star <
+        infoCertifiedBenDavidUpperBound I_phi_Y_standard I_phi_A lambda_standard := by
     exact higher_info_bottleneck_objective_tightens_ben_david_bound
-      err_source_standard cert_new.err_source
-      divergence_standard cert_new.divergence
-      lambda_standard cert_new.lambda_star
-      I_phi_Y_standard I_phi_Y_new I_phi_A_standard I_phi_A_new
-      lam gainScale h_gainScale h_source h_div h_lambda h_obj
+      I_phi_Y_standard I_phi_Y_new I_phi_A
+      lambda_standard cert_new.lambda_star lam h_lambda h_obj
   have h_target :
       cert_new.err_target ≤
         benDavidUpperBound cert_new.err_source cert_new.divergence cert_new.lambda_star := by
@@ -1377,46 +1411,619 @@ theorem optimalSourceShrinkageWeight_le_half_iff_target_samples_dominate_gap
   · intro h
     exact (div_le_iff₀ h_denom_pos).2 (by nlinarith)
 
-/-- Residual source-target effect mismatch after learning a representation from
-    `k` source populations.
+/-- Squared coefficient mismatch between a transported source predictor and the
+    target-optimal linear predictor. This is the exact bias term appearing in
+    the source-shrinkage fine-tuning MSE. -/
+noncomputable def coefficientGapSq {p : ℕ}
+    (wSource wTarget : Fin p → ℝ) : ℝ :=
+  dotProduct (fun i => wSource i - wTarget i) (fun i => wSource i - wTarget i)
 
-    The irreducible transport gap `irreducibleGap` remains even with unlimited
-    source diversity, while the population-specific component
-    `populationSpecificGap` is averaged down by the shared representation and
-    scales as `1 / k`. -/
-noncomputable def metaLearnedTransferGapSq
-    (irreducibleGap populationSpecificGap : ℝ) (k : ℕ) : ℝ :=
-  irreducibleGap + populationSpecificGap / k
+/-- Sum of the first `k` population-specific deviations around a shared
+    representation center. -/
+noncomputable def populationDeviationSum {p : ℕ}
+    (deviation : ℕ → Fin p → ℝ) (k : ℕ) : Fin p → ℝ :=
+  fun i => Finset.sum (Finset.range k) (fun j => deviation j i)
 
-/-- More source populations strictly reduce the residual transfer gap in the
-    explicit shared-representation model above. -/
-theorem metaLearnedTransferGapSq_strictMono
-    (irreducibleGap populationSpecificGap : ℝ) (k₁ k₂ : ℕ)
+/-- Mean population-specific deviation after training on the first `k`
+    source populations. -/
+noncomputable def meanPopulationDeviation {p : ℕ}
+    (deviation : ℕ → Fin p → ℝ) (k : ℕ) : Fin p → ℝ :=
+  fun i => (k : ℝ)⁻¹ * populationDeviationSum deviation k i
+
+/-- Meta-learned source weights: a shared center plus the average
+    source-population-specific deviation. -/
+noncomputable def metaLearnedSourceWeights {p : ℕ}
+    (wShared : Fin p → ℝ)
+    (deviation : ℕ → Fin p → ℝ) (k : ℕ) : Fin p → ℝ :=
+  fun i => wShared i + meanPopulationDeviation deviation k i
+
+/-- Exact squared transfer gap of the meta-learned source weights. -/
+noncomputable def metaLearnedTransferGapSq {p : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (deviation : ℕ → Fin p → ℝ) (k : ℕ) : ℝ :=
+  coefficientGapSq (metaLearnedSourceWeights wShared deviation k) wTarget
+
+/-- Dot product distributes over addition in the left argument. -/
+theorem dotProduct_add_left {p : ℕ}
+    (u v w : Fin p → ℝ) :
+    dotProduct (fun i => u i + v i) w = dotProduct u w + dotProduct v w := by
+  simp [dotProduct, add_mul, Finset.sum_add_distrib]
+
+/-- Dot product distributes over addition in the right argument. -/
+theorem dotProduct_add_right {p : ℕ}
+    (u v w : Fin p → ℝ) :
+    dotProduct u (fun i => v i + w i) = dotProduct u v + dotProduct u w := by
+  simp [dotProduct, mul_add, Finset.sum_add_distrib]
+
+/-- Dot product is symmetric over `ℝ`. -/
+theorem dotProduct_comm {p : ℕ}
+    (u v : Fin p → ℝ) :
+    dotProduct u v = dotProduct v u := by
+  simp [dotProduct, mul_comm]
+
+/-- Pulling a scalar out of the left dot-product argument. -/
+theorem dotProduct_smul_left {p : ℕ}
+    (c : ℝ) (u v : Fin p → ℝ) :
+    dotProduct (fun i => c * u i) v = c * dotProduct u v := by
+  unfold dotProduct
+  rw [show (∑ i, (c * u i) * v i) = ∑ i, c * (u i * v i) by
+        apply Finset.sum_congr rfl
+        intro i hi
+        ring]
+  rw [← Finset.mul_sum]
+
+/-- Pulling a scalar out of the right dot-product argument. -/
+theorem dotProduct_smul_right {p : ℕ}
+    (u v : Fin p → ℝ) (c : ℝ) :
+    dotProduct u (fun i => c * v i) = c * dotProduct u v := by
+  unfold dotProduct
+  rw [show (∑ i, u i * (c * v i)) = ∑ i, c * (u i * v i) by
+        apply Finset.sum_congr rfl
+        intro i hi
+        ring]
+  rw [← Finset.mul_sum]
+
+/-- Dot product of a finite sum of vectors with a fixed vector. -/
+theorem dotProduct_sum_left {α : Type*} [DecidableEq α] {p : ℕ}
+    (s : Finset α)
+    (f : α → Fin p → ℝ)
+    (v : Fin p → ℝ) :
+    dotProduct (fun i => Finset.sum s (fun j => f j i)) v =
+      Finset.sum s (fun j => dotProduct (f j) v) := by
+  unfold dotProduct
+  rw [show (∑ i, (Finset.sum s (fun j => f j i)) * v i) =
+      ∑ i, Finset.sum s (fun j => f j i * v i) by
+        apply Finset.sum_congr rfl
+        intro i hi
+        rw [Finset.sum_mul]]
+  rw [Finset.sum_comm]
+
+/-- Dot product of a fixed vector with a finite sum of vectors. -/
+theorem dotProduct_sum_right {α : Type*} [DecidableEq α] {p : ℕ}
+    (s : Finset α)
+    (u : Fin p → ℝ)
+    (f : α → Fin p → ℝ) :
+    dotProduct u (fun i => Finset.sum s (fun j => f j i)) =
+      Finset.sum s (fun j => dotProduct u (f j)) := by
+  unfold dotProduct
+  rw [show (∑ i, u i * (Finset.sum s (fun j => f j i))) =
+      ∑ i, Finset.sum s (fun j => u i * f j i) by
+        apply Finset.sum_congr rfl
+        intro i hi
+        rw [Finset.mul_sum]]
+  rw [Finset.sum_comm]
+
+/-- Prefix-sum recursion for population-specific deviations. -/
+theorem populationDeviationSum_succ {p : ℕ}
+    (deviation : ℕ → Fin p → ℝ) (k : ℕ) :
+    populationDeviationSum deviation (k + 1) =
+      fun i => populationDeviationSum deviation k i + deviation k i := by
+  funext i
+  simp [populationDeviationSum, Finset.sum_range_succ]
+
+/-- If the new population-specific deviation is orthogonal to each earlier
+    deviation, then it is orthogonal to their sum. -/
+theorem dotProduct_populationDeviationSum_last_eq_zero {p : ℕ}
+    (deviation : ℕ → Fin p → ℝ) (k : ℕ)
+    (h_pair : ∀ j < k, dotProduct (deviation j) (deviation k) = 0) :
+    dotProduct (populationDeviationSum deviation k) (deviation k) = 0 := by
+  rw [show dotProduct (populationDeviationSum deviation k) (deviation k) =
+      Finset.sum (Finset.range k) (fun j => dotProduct (deviation j) (deviation k)) by
+      simpa [populationDeviationSum] using
+        dotProduct_sum_left (Finset.range k) deviation (deviation k)]
+  apply Finset.sum_eq_zero
+  intro j hj
+  exact h_pair j (Finset.mem_range.mp hj)
+
+/-- Exact norm growth of the summed population-specific deviations.
+    Under pairwise orthogonality and equal per-population squared norm, the
+    squared norm of the sum over `k` populations is exactly `k * gap`. -/
+theorem populationDeviationSum_squaredNorm_eq_mul {p : ℕ}
+    (deviation : ℕ → Fin p → ℝ)
+    (populationSpecificGap : ℝ) :
+    ∀ k : ℕ,
+      (∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap) →
+      (∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0) →
+      dotProduct (populationDeviationSum deviation k) (populationDeviationSum deviation k) =
+        k * populationSpecificGap
+  | 0, _, _ => by
+      simp [populationDeviationSum, dotProduct]
+  | k + 1, h_norm, h_pair => by
+      have h_norm_prev : ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap := by
+        intro j hj
+        exact h_norm j (lt_trans hj (Nat.lt_succ_self k))
+      have h_pair_prev :
+          ∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0 := by
+        intro j hj l hl hneq
+        exact h_pair j (lt_trans hj (Nat.lt_succ_self k))
+          l (lt_trans hl (Nat.lt_succ_self k)) hneq
+      have ih :=
+        populationDeviationSum_squaredNorm_eq_mul deviation populationSpecificGap k
+          h_norm_prev h_pair_prev
+      have h_last_norm :
+          dotProduct (deviation k) (deviation k) = populationSpecificGap := by
+        exact h_norm k (Nat.lt_succ_self k)
+      have h_cross_left :
+          dotProduct (populationDeviationSum deviation k) (deviation k) = 0 := by
+        apply dotProduct_populationDeviationSum_last_eq_zero
+        intro j hj
+        exact h_pair j (lt_trans hj (Nat.lt_succ_self k))
+          k (Nat.lt_succ_self k) (Nat.ne_of_lt hj)
+      calc
+        dotProduct (populationDeviationSum deviation (k + 1))
+            (populationDeviationSum deviation (k + 1))
+            =
+              dotProduct (populationDeviationSum deviation k) (populationDeviationSum deviation k) +
+                dotProduct (populationDeviationSum deviation k) (deviation k) +
+                (dotProduct (deviation k) (populationDeviationSum deviation k) +
+                  dotProduct (deviation k) (deviation k)) := by
+                rw [populationDeviationSum_succ, dotProduct_add_left,
+                  dotProduct_add_right, dotProduct_add_right]
+        _ = k * populationSpecificGap + 0 + (0 + populationSpecificGap) := by
+              rw [ih, h_cross_left, dotProduct_comm, h_cross_left, h_last_norm]
+        _ = (((k + 1 : ℕ) : ℝ) * populationSpecificGap) := by
+              rw [Nat.cast_add, Nat.cast_one]
+              ring_nf
+
+/-- Exact squared norm of the averaged population-specific deviation.
+    Under pairwise orthogonality and equal per-population squared norm, the
+    average deviation has squared norm exactly `gap / k`. -/
+theorem meanPopulationDeviation_squaredNorm_eq_populationSpecificGap_div_k {p : ℕ}
+    (deviation : ℕ → Fin p → ℝ)
+    (populationSpecificGap : ℝ)
+    (k : ℕ)
+    (h_k : 0 < k)
+    (h_norm : ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap)
+    (h_pair : ∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
+    dotProduct (meanPopulationDeviation deviation k) (meanPopulationDeviation deviation k) =
+      populationSpecificGap / k := by
+  have h_sumnorm :=
+    populationDeviationSum_squaredNorm_eq_mul deviation populationSpecificGap k h_norm h_pair
+  have hk_ne : (k : ℝ) ≠ 0 := by
+    exact_mod_cast (Nat.ne_of_gt h_k)
+  unfold meanPopulationDeviation
+  calc
+    dotProduct (fun i => (k : ℝ)⁻¹ * populationDeviationSum deviation k i)
+        (fun i => (k : ℝ)⁻¹ * populationDeviationSum deviation k i)
+        =
+          ((k : ℝ)⁻¹)^2 *
+            dotProduct (populationDeviationSum deviation k) (populationDeviationSum deviation k) := by
+              unfold dotProduct
+              rw [show (∑ i,
+                    ((k : ℝ)⁻¹ * populationDeviationSum deviation k i) *
+                      ((k : ℝ)⁻¹ * populationDeviationSum deviation k i))
+                  = ∑ i, ((k : ℝ)⁻¹)^2 *
+                      (populationDeviationSum deviation k i *
+                        populationDeviationSum deviation k i) by
+                    apply Finset.sum_congr rfl
+                    intro i hi
+                    ring]
+              rw [← Finset.mul_sum]
+    _ = ((k : ℝ)⁻¹)^2 * (k * populationSpecificGap) := by
+          rw [h_sumnorm]
+    _ = populationSpecificGap / k := by
+          field_simp [hk_ne]
+
+/-- If the shared representation residual is orthogonal to each population-
+    specific deviation, then it is orthogonal to their average. -/
+theorem dotProduct_meanPopulationDeviation_eq_zero {p : ℕ}
+    (u : Fin p → ℝ)
+    (deviation : ℕ → Fin p → ℝ)
+    (k : ℕ)
+    (h_orth : ∀ j < k, dotProduct u (deviation j) = 0) :
+    dotProduct u (meanPopulationDeviation deviation k) = 0 := by
+  unfold meanPopulationDeviation
+  rw [dotProduct_smul_right]
+  rw [show dotProduct u (populationDeviationSum deviation k) =
+      Finset.sum (Finset.range k) (fun j => dotProduct u (deviation j)) by
+      simpa [populationDeviationSum] using
+        dotProduct_sum_right (Finset.range k) u deviation]
+  have hsum :
+      Finset.sum (Finset.range k) (fun j => dotProduct u (deviation j)) = 0 := by
+    apply Finset.sum_eq_zero
+    intro j hj
+    exact h_orth j (Finset.mem_range.mp hj)
+  rw [hsum]
+  ring
+
+/-- Exact transfer-gap formula for the shared-feature meta-learning model.
+    If the shared center has residual gap `irreducibleGap`, each population-
+    specific deviation has squared norm `populationSpecificGap`, those
+    deviations are pairwise orthogonal, and each is orthogonal to the shared
+    residual, then averaging over `k` source populations yields the exact
+    residual gap `irreducibleGap + populationSpecificGap / k`. -/
+theorem metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k {p : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (deviation : ℕ → Fin p → ℝ)
+    (irreducibleGap populationSpecificGap : ℝ)
+    (k : ℕ)
+    (h_k : 0 < k)
+    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
+    (h_shared_orth :
+      ∀ j < k, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+    (h_norm :
+      ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap)
+    (h_pair :
+      ∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
+    metaLearnedTransferGapSq wShared wTarget deviation k =
+      irreducibleGap + populationSpecificGap / k := by
+  let sharedResidual : Fin p → ℝ := fun i => wShared i - wTarget i
+  have h_shared_norm : dotProduct sharedResidual sharedResidual = irreducibleGap := by
+    simpa [sharedResidual, coefficientGapSq] using h_shared
+  have h_mean_norm :
+      dotProduct (meanPopulationDeviation deviation k) (meanPopulationDeviation deviation k) =
+        populationSpecificGap / k := by
+    exact meanPopulationDeviation_squaredNorm_eq_populationSpecificGap_div_k
+      deviation populationSpecificGap k h_k h_norm h_pair
+  have h_cross :
+      dotProduct sharedResidual (meanPopulationDeviation deviation k) = 0 := by
+    exact dotProduct_meanPopulationDeviation_eq_zero
+      sharedResidual deviation k h_shared_orth
+  have h_sub :
+      (fun i =>
+        (metaLearnedSourceWeights wShared deviation k i) - wTarget i) =
+        fun i => sharedResidual i + meanPopulationDeviation deviation k i := by
+    funext i
+    unfold metaLearnedSourceWeights sharedResidual
+    ring
+  unfold metaLearnedTransferGapSq coefficientGapSq
+  rw [h_sub]
+  calc
+    dotProduct
+        (fun i => sharedResidual i + meanPopulationDeviation deviation k i)
+        (fun i => sharedResidual i + meanPopulationDeviation deviation k i)
+        =
+          dotProduct sharedResidual sharedResidual +
+            dotProduct sharedResidual (meanPopulationDeviation deviation k) +
+            (dotProduct (meanPopulationDeviation deviation k) sharedResidual +
+              dotProduct (meanPopulationDeviation deviation k)
+                (meanPopulationDeviation deviation k)) := by
+              rw [dotProduct_add_left, dotProduct_add_right, dotProduct_add_right]
+    _ = irreducibleGap + 0 + (0 + populationSpecificGap / k) := by
+          rw [h_shared_norm, h_cross, dotProduct_comm, h_cross, h_mean_norm]
+    _ = irreducibleGap + populationSpecificGap / k := by
+          ring
+
+/-- More source populations strictly reduce the exact residual transfer gap in
+    the shared-feature meta-learning model, because the averaged population-
+    specific deviation has exact squared norm `gap / k`. -/
+theorem metaLearnedTransferGapSq_strictMono {p : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (deviation : ℕ → Fin p → ℝ)
+    (irreducibleGap populationSpecificGap : ℝ)
+    (k₁ k₂ : ℕ)
     (h_pop : 0 < populationSpecificGap)
-    (h_k₁ : 0 < k₁) (h_more : k₁ < k₂) :
-    metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂ <
-      metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁ := by
+    (h_k₁ : 0 < k₁)
+    (h_more : k₁ < k₂)
+    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
+    (h_shared_orth :
+      ∀ j < k₂, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+    (h_norm :
+      ∀ j < k₂, dotProduct (deviation j) (deviation j) = populationSpecificGap)
+    (h_pair :
+      ∀ j < k₂, ∀ l < k₂, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
+    metaLearnedTransferGapSq wShared wTarget deviation k₂ <
+      metaLearnedTransferGapSq wShared wTarget deviation k₁ := by
+  have h_k₂ : 0 < k₂ := lt_trans h_k₁ h_more
+  have h_formula₂ :
+      metaLearnedTransferGapSq wShared wTarget deviation k₂ =
+        irreducibleGap + populationSpecificGap / k₂ := by
+    exact metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
+      wShared wTarget deviation irreducibleGap populationSpecificGap
+      k₂ h_k₂ h_shared h_shared_orth h_norm h_pair
+  have h_formula₁ :
+      metaLearnedTransferGapSq wShared wTarget deviation k₁ =
+        irreducibleGap + populationSpecificGap / k₁ := by
+    exact metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
+      wShared wTarget deviation irreducibleGap populationSpecificGap
+      k₁ h_k₁ h_shared
+      (by
+        intro j hj
+        exact h_shared_orth j (lt_trans hj h_more))
+      (by
+        intro j hj
+        exact h_norm j (lt_trans hj h_more))
+      (by
+        intro j hj l hl hneq
+        exact h_pair j (lt_trans hj h_more) l (lt_trans hl h_more) hneq)
+  rw [h_formula₂, h_formula₁]
   have hk₁ : 0 < (k₁ : ℝ) := Nat.cast_pos.mpr h_k₁
   have hcast : (k₁ : ℝ) < (k₂ : ℝ) := by
     exact_mod_cast h_more
-  unfold metaLearnedTransferGapSq
   have hdiv : populationSpecificGap / (k₂ : ℝ) < populationSpecificGap / (k₁ : ℝ) := by
     exact div_lt_div_of_pos_left h_pop hk₁ hcast
   linarith
 
-/-- The shared-representation transfer gap is positive when both the
-    irreducible and population-specific components are nonnegative and the
-    latter is nonzero. -/
-theorem metaLearnedTransferGapSq_pos
-    (irreducibleGap populationSpecificGap : ℝ) (k : ℕ)
+/-- Positivity of the exact shared-feature meta-learning transfer gap. -/
+theorem metaLearnedTransferGapSq_pos {p : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (deviation : ℕ → Fin p → ℝ)
+    (irreducibleGap populationSpecificGap : ℝ)
+    (k : ℕ)
     (h_irred : 0 ≤ irreducibleGap)
     (h_pop : 0 < populationSpecificGap)
-    (h_k : 0 < k) :
-    0 < metaLearnedTransferGapSq irreducibleGap populationSpecificGap k := by
+    (h_k : 0 < k)
+    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
+    (h_shared_orth :
+      ∀ j < k, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+    (h_norm :
+      ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap)
+    (h_pair :
+      ∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
+    0 < metaLearnedTransferGapSq wShared wTarget deviation k := by
+  rw [metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
+    wShared wTarget deviation irreducibleGap populationSpecificGap
+    k h_k h_shared h_shared_orth h_norm h_pair]
   have hk : 0 < (k : ℝ) := Nat.cast_pos.mpr h_k
-  unfold metaLearnedTransferGapSq
   have hdiv : 0 < populationSpecificGap / (k : ℝ) := by
     exact div_pos h_pop hk
+  linarith
+
+/-- Weighted population-specific deviation around the shared representation
+    center. This lets us compare the usual equal-weight meta average against
+    arbitrary affine aggregation of the first `k` source populations. -/
+noncomputable def weightedPopulationDeviation {p k : ℕ}
+    (deviation : Fin k → Fin p → ℝ)
+    (weight : Fin k → ℝ) : Fin p → ℝ :=
+  fun i => ∑ j : Fin k, weight j * deviation j i
+
+/-- Weighted meta-learned source weights built from an affine combination of
+    source-population-specific deviations around a shared center. -/
+noncomputable def weightedMetaSourceWeights {p k : ℕ}
+    (wShared : Fin p → ℝ)
+    (deviation : Fin k → Fin p → ℝ)
+    (weight : Fin k → ℝ) : Fin p → ℝ :=
+  fun i => wShared i + weightedPopulationDeviation deviation weight i
+
+/-- Exact transfer gap of a weighted affine meta-aggregator. -/
+noncomputable def weightedMetaTransferGapSq {p k : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (deviation : Fin k → Fin p → ℝ)
+    (weight : Fin k → ℝ) : ℝ :=
+  coefficientGapSq (weightedMetaSourceWeights wShared deviation weight) wTarget
+
+/-- Uniform affine weights on `k` source populations. -/
+noncomputable def uniformMetaWeight (k : ℕ) : Fin k → ℝ :=
+  fun _ => (k : ℝ)⁻¹
+
+/-- Exact squared norm of a weighted population-specific deviation. Under
+    pairwise orthogonality and equal per-population squared norm, the weighted
+    combination has squared norm `gap × Σ_j w_j²`. -/
+theorem weightedPopulationDeviation_squaredNorm_eq_populationSpecificGap_mul_sum_sq
+    {p k : ℕ}
+    (deviation : Fin k → Fin p → ℝ)
+    (weight : Fin k → ℝ)
+    (populationSpecificGap : ℝ)
+    (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
+    (h_pair : ∀ j l, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
+    dotProduct (weightedPopulationDeviation deviation weight)
+      (weightedPopulationDeviation deviation weight) =
+        populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
+  unfold weightedPopulationDeviation
+  rw [show
+      dotProduct
+          (fun i => ∑ j : Fin k, weight j * deviation j i)
+          (fun i => ∑ j : Fin k, weight j * deviation j i) =
+        ∑ j : Fin k,
+          dotProduct (fun i => weight j * deviation j i)
+            (fun i => ∑ l : Fin k, weight l * deviation l i) by
+      simpa using
+        dotProduct_sum_left (Finset.univ)
+          (fun j : Fin k => fun i => weight j * deviation j i)
+          (fun i => ∑ l : Fin k, weight l * deviation l i)]
+  calc
+    ∑ j : Fin k,
+        dotProduct (fun i => weight j * deviation j i)
+          (fun i => ∑ l : Fin k, weight l * deviation l i)
+      =
+        ∑ j : Fin k,
+          weight j *
+            dotProduct (deviation j)
+              (fun i => ∑ l : Fin k, weight l * deviation l i) := by
+            apply Finset.sum_congr rfl
+            intro j hj
+            rw [dotProduct_smul_left]
+    _ =
+        ∑ j : Fin k,
+          weight j *
+            (∑ l : Fin k, weight l * dotProduct (deviation j) (deviation l)) := by
+          apply Finset.sum_congr rfl
+          intro j hj
+          rw [show
+              dotProduct (deviation j)
+                (fun i => ∑ l : Fin k, weight l * deviation l i) =
+              ∑ l : Fin k,
+                dotProduct (deviation j) (fun i => weight l * deviation l i) by
+                simpa using
+                  dotProduct_sum_right (Finset.univ) (deviation j)
+                    (fun l : Fin k => fun i => weight l * deviation l i)]
+          congr 1
+          apply Finset.sum_congr rfl
+          intro l hl
+          rw [dotProduct_smul_right]
+    _ = ∑ j : Fin k, weight j * (weight j * populationSpecificGap) := by
+          apply Finset.sum_congr rfl
+          intro j hj
+          rw [Finset.sum_eq_single j]
+          · rw [h_norm]
+          · intro l hl hlj
+            rw [h_pair j l (Ne.symm hlj), mul_zero]
+          · intro hj_not_mem
+            exact (hj_not_mem (Finset.mem_univ j)).elim
+    _ = populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
+          rw [show
+              (∑ j : Fin k, weight j * (weight j * populationSpecificGap)) =
+                ∑ j : Fin k, populationSpecificGap * weight j ^ 2 by
+                apply Finset.sum_congr rfl
+                intro j hj
+                ring]
+          rw [Finset.mul_sum]
+
+/-- Exact transfer-gap formula for an affine weighted meta-aggregator. -/
+theorem weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_sum_sq
+    {p k : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (deviation : Fin k → Fin p → ℝ)
+    (weight : Fin k → ℝ)
+    (irreducibleGap populationSpecificGap : ℝ)
+    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
+    (h_shared_orth :
+      ∀ j, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+    (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
+    (h_pair : ∀ j l, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
+    weightedMetaTransferGapSq wShared wTarget deviation weight =
+      irreducibleGap + populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
+  let sharedResidual : Fin p → ℝ := fun i => wShared i - wTarget i
+  have h_shared_norm : dotProduct sharedResidual sharedResidual = irreducibleGap := by
+    simpa [sharedResidual, coefficientGapSq] using h_shared
+  have h_weighted_norm :
+      dotProduct (weightedPopulationDeviation deviation weight)
+        (weightedPopulationDeviation deviation weight) =
+          populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
+    exact weightedPopulationDeviation_squaredNorm_eq_populationSpecificGap_mul_sum_sq
+      deviation weight populationSpecificGap h_norm h_pair
+  have h_cross :
+      dotProduct sharedResidual (weightedPopulationDeviation deviation weight) = 0 := by
+    unfold weightedPopulationDeviation
+    rw [show
+        dotProduct sharedResidual
+          (fun i => ∑ j : Fin k, weight j * deviation j i) =
+          ∑ j : Fin k,
+            dotProduct sharedResidual (fun i => weight j * deviation j i) by
+          simpa using
+            dotProduct_sum_right (Finset.univ) sharedResidual
+              (fun j : Fin k => fun i => weight j * deviation j i)]
+    apply Finset.sum_eq_zero
+    intro j hj
+    rw [dotProduct_smul_right, h_shared_orth j, mul_zero]
+  have h_sub :
+      (fun i =>
+        weightedMetaSourceWeights wShared deviation weight i - wTarget i) =
+      fun i => sharedResidual i + weightedPopulationDeviation deviation weight i := by
+    funext i
+    unfold weightedMetaSourceWeights sharedResidual weightedPopulationDeviation
+    ring
+  unfold weightedMetaTransferGapSq coefficientGapSq
+  rw [h_sub]
+  calc
+    dotProduct
+        (fun i => sharedResidual i + weightedPopulationDeviation deviation weight i)
+        (fun i => sharedResidual i + weightedPopulationDeviation deviation weight i)
+        =
+          dotProduct sharedResidual sharedResidual +
+            dotProduct sharedResidual (weightedPopulationDeviation deviation weight) +
+            (dotProduct (weightedPopulationDeviation deviation weight) sharedResidual +
+              dotProduct (weightedPopulationDeviation deviation weight)
+                (weightedPopulationDeviation deviation weight)) := by
+              rw [dotProduct_add_left, dotProduct_add_right, dotProduct_add_right]
+    _ = irreducibleGap + 0 + (0 + populationSpecificGap * ∑ j : Fin k, weight j ^ 2) := by
+          rw [h_shared_norm, h_cross, dotProduct_comm, h_cross, h_weighted_norm]
+    _ = irreducibleGap + populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
+          ring
+
+/-- Among affine weights summing to one, the squared weight mass is minimized
+    by the uniform average. This is the exact Cauchy-Schwarz step behind the
+    `1 / k` decay of the shared-feature meta-learning transfer gap. -/
+theorem one_div_card_le_sum_sq_of_affine_weights
+    {k : ℕ}
+    (weight : Fin k → ℝ)
+    (h_k : 0 < k)
+    (h_sum : ∑ j : Fin k, weight j = 1) :
+    1 / (k : ℝ) ≤ ∑ j : Fin k, weight j ^ 2 := by
+  have h_sq :=
+    sq_sum_le_card_mul_sum_sq (s := (Finset.univ : Finset (Fin k))) (f := weight)
+  have h_card : ((#(Finset.univ : Finset (Fin k)) : ℕ) : ℝ) = k := by
+    simp
+  have h_key : 1 ≤ (k : ℝ) * ∑ j : Fin k, weight j ^ 2 := by
+    simpa [h_sum, h_card] using h_sq
+  have hk : 0 < (k : ℝ) := Nat.cast_pos.mpr h_k
+  by_contra h_contra
+  have hlt : ∑ j : Fin k, weight j ^ 2 < 1 / (k : ℝ) := by
+    exact not_le.mp h_contra
+  have hmul_lt : (k : ℝ) * ∑ j : Fin k, weight j ^ 2 < 1 := by
+    have := mul_lt_mul_of_pos_left hlt hk
+    simpa [div_eq_mul_inv, one_div, hk.ne'] using this
+  linarith
+
+/-- Exact uniform affine weighting formula. -/
+theorem weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k_of_uniform
+    {p k : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (deviation : Fin k → Fin p → ℝ)
+    (irreducibleGap populationSpecificGap : ℝ)
+    (h_k : 0 < k)
+    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
+    (h_shared_orth :
+      ∀ j, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+    (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
+    (h_pair : ∀ j l, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
+    weightedMetaTransferGapSq wShared wTarget deviation (uniformMetaWeight k) =
+      irreducibleGap + populationSpecificGap / k := by
+  rw [weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_sum_sq
+    wShared wTarget deviation (uniformMetaWeight k)
+    irreducibleGap populationSpecificGap h_shared h_shared_orth h_norm h_pair]
+  have hcard : (∑ j : Fin k, ((uniformMetaWeight k) j) ^ 2) = k * ((k : ℝ)⁻¹ ^ 2) := by
+    simp [uniformMetaWeight]
+  rw [hcard]
+  have hk_ne : (k : ℝ) ≠ 0 := by
+    exact_mod_cast (Nat.ne_of_gt h_k)
+  field_simp [hk_ne]
+
+/-- **Equal-weight meta-averaging is exactly optimal among affine source-model
+    aggregators under the shared-feature geometry.**
+    Under orthogonal population-specific deviations of equal squared norm,
+    every affine combination of the `k` source-specific models has exact
+    transfer gap `irreducibleGap + gap × Σ_j w_j²`, so the uniform average
+    minimizes the exact transfer gap because `Σ_j w_j² ≥ 1 / k`. -/
+theorem weightedMetaTransferGapSq_ge_uniform_of_affine_weights
+    {p k : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (deviation : Fin k → Fin p → ℝ)
+    (weight : Fin k → ℝ)
+    (irreducibleGap populationSpecificGap : ℝ)
+    (h_k : 0 < k)
+    (h_sum : ∑ j : Fin k, weight j = 1)
+    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
+    (h_shared_orth :
+      ∀ j, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+    (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
+    (h_pair : ∀ j l, j ≠ l → dotProduct (deviation j) (deviation l) = 0)
+    (h_pop : 0 ≤ populationSpecificGap) :
+    weightedMetaTransferGapSq wShared wTarget deviation (uniformMetaWeight k) ≤
+      weightedMetaTransferGapSq wShared wTarget deviation weight := by
+  rw [weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k_of_uniform
+      wShared wTarget deviation irreducibleGap populationSpecificGap
+      h_k h_shared h_shared_orth h_norm h_pair,
+    weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_sum_sq
+      wShared wTarget deviation weight irreducibleGap populationSpecificGap
+      h_shared h_shared_orth h_norm h_pair]
+  have h_sq_lb : 1 / (k : ℝ) ≤ ∑ j : Fin k, weight j ^ 2 := by
+    exact one_div_card_le_sum_sq_of_affine_weights weight h_k h_sum
+  have hmul :
+      populationSpecificGap / k ≤
+        populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
+    simpa [div_eq_mul_inv, one_div, mul_comm, mul_left_comm, mul_assoc] using
+      mul_le_mul_of_nonneg_left h_sq_lb h_pop
   linarith
 
 /-- Optimal fine-tuning MSE after choosing the source-shrinkage weight
@@ -1518,98 +2125,234 @@ theorem requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
     exact div_lt_div_of_pos_left h_noise h_gap₁ h_gap
   nlinarith
 
-/-- Representation-certified transfer gap obtained by scaling the Ben-David
-    target-error cap into the residual mismatch term used by the fine-tuning
-    sample-complexity model. -/
-noncomputable def representationCertifiedTransferGapSq
-    (irreducibleGap boundScale err_source divergence lambda_star : ℝ) : ℝ :=
-  irreducibleGap + boundScale * benDavidUpperBound err_source divergence lambda_star
+/-- Exact target excess quadratic risk of using `w` instead of the
+    target-optimal predictor `wStar`. -/
+noncomputable def targetLinearExcessRisk {p : ℕ}
+    (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ)
+    (crossTarget : Fin p → ℝ)
+    (noiseVar : ℝ)
+    (w wStar : Fin p → ℝ) : ℝ :=
+  targetLinearRisk sigmaObsTarget crossTarget noiseVar w -
+    targetLinearRisk sigmaObsTarget crossTarget noiseVar wStar
+
+/-- Symmetric target covariance swaps the bilinear cross-term exactly:
+    `uᵀΣv = vᵀΣu`. -/
+theorem dotProduct_mulVec_swap_of_isSymm
+    {p : ℕ}
+    (A : Matrix (Fin p) (Fin p) ℝ)
+    (hA : A.IsSymm)
+    (u v : Fin p → ℝ) :
+    dotProduct u (A.mulVec v) = dotProduct v (A.mulVec u) := by
+  have h := sum_mulVec_mul_eq_sum_mul_transpose_mulVec A v u
+  simpa [dotProduct, hA.eq, mul_comm] using h
+
+/-- Exact excess-risk decomposition for target quadratic risk.
+    If `wStar` solves the target normal equations, then the target excess risk
+    of any transported weight vector `w` is exactly the quadratic form of the
+    coefficient error under the target covariance geometry. -/
+theorem targetLinearExcessRisk_eq_quadratic_gap
+    {p : ℕ}
+    (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ)
+    (crossTarget : Fin p → ℝ)
+    (noiseVar : ℝ)
+    (w wStar : Fin p → ℝ)
+    (h_symm : sigmaObsTarget.IsSymm)
+    (h_opt : sigmaObsTarget.mulVec wStar = crossTarget) :
+    targetLinearExcessRisk sigmaObsTarget crossTarget noiseVar w wStar =
+      dotProduct (fun i => w i - wStar i)
+        (sigmaObsTarget.mulVec (fun i => w i - wStar i)) := by
+  let u : Fin p → ℝ := fun i => w i - wStar i
+  have hw : w = fun i => wStar i + u i := by
+    funext i
+    simp [u]
+  have hmul :
+      sigmaObsTarget.mulVec (fun i => wStar i + u i) =
+        sigmaObsTarget.mulVec wStar + sigmaObsTarget.mulVec u := by
+    simpa [u] using matrix_mulVec_add sigmaObsTarget wStar u
+  have hswap :
+      dotProduct wStar (sigmaObsTarget.mulVec u) =
+        dotProduct u crossTarget := by
+    calc
+      dotProduct wStar (sigmaObsTarget.mulVec u) =
+          dotProduct u (sigmaObsTarget.mulVec wStar) := by
+            exact dotProduct_mulVec_swap_of_isSymm sigmaObsTarget h_symm wStar u
+      _ = dotProduct u crossTarget := by simp [h_opt]
+  let a : ℝ := dotProduct wStar crossTarget
+  let b : ℝ := dotProduct wStar (sigmaObsTarget.mulVec u)
+  let c : ℝ := dotProduct u crossTarget
+  let d : ℝ := dotProduct u (sigmaObsTarget.mulVec u)
+  have hexpand1 :
+      dotProduct (fun i => wStar i + u i) (crossTarget + sigmaObsTarget.mulVec u) =
+        a + b + c + d := by
+    simp [a, b, c, d, dotProduct, Finset.sum_add_distrib, add_mul, mul_add]
+    ring
+  have hexpand2 :
+      dotProduct (fun i => wStar i + u i) crossTarget = a + c := by
+    simp [a, c, dotProduct, Finset.sum_add_distrib, add_mul]
+  have h_gap_rhs :
+      dotProduct (fun i => (fun j => wStar j + u j) i - wStar i)
+        (sigmaObsTarget.mulVec (fun i => (fun j => wStar j + u j) i - wStar i)) = d := by
+    simp [d]
+  unfold targetLinearExcessRisk targetLinearRisk
+  rw [hw, hmul, h_opt, hexpand1, hexpand2]
+  rw [h_gap_rhs]
+  rw [show b = c by
+    simpa [b, c] using hswap]
+  linarith
+
+/-- In the isotropic target-feature model (`Σ_T = I`), the exact target excess
+    quadratic risk is literally the squared coefficient mismatch. -/
+  theorem isotropic_targetLinearExcessRisk_eq_coefficientGapSq
+      {p : ℕ}
+      (crossTarget : Fin p → ℝ)
+      (noiseVar : ℝ)
+      (w wStar : Fin p → ℝ)
+      (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget) :
+      targetLinearExcessRisk (1 : Matrix (Fin p) (Fin p) ℝ) crossTarget noiseVar w wStar =
+        coefficientGapSq w wStar := by
+    have h_one_symm : (1 : Matrix (Fin p) (Fin p) ℝ).IsSymm :=
+      Matrix.isSymm_one
+    have h_excess :=
+      targetLinearExcessRisk_eq_quadratic_gap
+        (1 : Matrix (Fin p) (Fin p) ℝ) crossTarget noiseVar w wStar
+        h_one_symm h_opt
+    simpa using h_excess
+
+/-- Any upper bound on exact isotropic target excess risk is automatically an
+    upper bound on the fine-tuning bias term `coefficientGapSq`. -/
+theorem coefficientGapSq_le_of_targetLinearExcessRisk_le
+    {p : ℕ}
+    (crossTarget : Fin p → ℝ)
+    (noiseVar errCap : ℝ)
+    (w wStar : Fin p → ℝ)
+    (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget)
+    (h_excess :
+      targetLinearExcessRisk (1 : Matrix (Fin p) (Fin p) ℝ) crossTarget noiseVar w wStar ≤ errCap) :
+    coefficientGapSq w wStar ≤ errCap := by
+  rw [← isotropic_targetLinearExcessRisk_eq_coefficientGapSq
+    crossTarget noiseVar w wStar h_opt]
+  exact h_excess
 
 /-- **A better information-bottleneck representation lowers target sample needs.**
-    Combine the representation theorem in `FeatureRepresentation` with the exact
-    fine-tuning sample-size formula in this section. If a better bottleneck
-    representation strictly tightens the Ben-David bound, and residual transfer
-    mismatch is modeled as an affine function of that certified bound, then the
-    target sample size needed to hit any fixed fine-tuning MSE tolerance
-    strictly decreases. -/
+    This theorem no longer inserts an affine bridge from a domain-adaptation
+    bound into the fine-tuning gap. Instead it uses an exact estimator-level
+    model:
+
+    - target prediction risk is the literal quadratic risk
+      `targetLinearRisk Σ_T c_T σ²`;
+    - in the isotropic target design (`Σ_T = I`), the exact excess risk of the
+      transported source weights equals the squared coefficient mismatch
+      `coefficientGapSq`;
+    - the source-shrinkage fine-tuning MSE uses that exact squared mismatch as
+      its transfer-bias term.
+
+    Therefore, if the transported source predictor's exact target excess risk is
+    certified to lie below its Ben-David target-error certificate, then a better
+    information-bottleneck representation yields a strictly smaller exact target
+    sample requirement to hit any fixed fine-tuning MSE tolerance. -/
 theorem higher_info_bottleneck_objective_reduces_required_target_samples
+    {p : ℕ}
     (cert_new : PGSBenDavidCertificate)
-    (err_source_standard divergence_standard lambda_standard : ℝ)
-    (I_phi_Y_standard I_phi_Y_new I_phi_A_standard I_phi_A_new : ℝ)
-    (lam gainScale : ℝ)
-    (irreducibleGap boundScale noiseVar tau : ℝ)
-    (h_gainScale : 0 < gainScale)
-    (h_boundScale : 0 < boundScale)
+    (crossTarget wSourceNew wTarget : Fin p → ℝ)
+    (I_phi_Y_standard I_phi_Y_new I_phi_A : ℝ)
+    (lambda_standard lam : ℝ)
+    (targetNoiseVar noiseVar tau : ℝ)
     (h_noise : 0 < noiseVar)
     (h_tau : 0 < tau)
+    (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wTarget = crossTarget)
+    (h_excess :
+      targetLinearExcessRisk (1 : Matrix (Fin p) (Fin p) ℝ)
+        crossTarget targetNoiseVar wSourceNew wTarget ≤ cert_new.err_target)
     (h_source :
-      cert_new.err_source ≤ err_source_standard -
-        gainScale * (I_phi_Y_new - I_phi_Y_standard))
+      cert_new.err_source ≤ gaussianSourceResidualRisk I_phi_Y_new)
     (h_div :
-      cert_new.divergence ≤ divergence_standard +
-        gainScale * lam * (I_phi_A_new - I_phi_A_standard))
+      cert_new.divergence ≤ pinskerAncestryDivergenceCap I_phi_A)
     (h_lambda : cert_new.lambda_star ≤ lambda_standard)
     (h_obj :
-      infoBottleneckObjective I_phi_Y_new I_phi_A_new lam >
-        infoBottleneckObjective I_phi_Y_standard I_phi_A_standard lam)
+      infoBottleneckObjective I_phi_Y_new I_phi_A lam >
+        infoBottleneckObjective I_phi_Y_standard I_phi_A lam)
     (h_tau_small :
-      tau <
-        representationCertifiedTransferGapSq irreducibleGap boundScale
-          cert_new.err_source cert_new.divergence cert_new.lambda_star) :
+      tau < coefficientGapSq wSourceNew wTarget) :
+    0 <
+      requiredTargetSamplesForOptimalFineTuningMSE
+        (coefficientGapSq wSourceNew wTarget)
+        noiseVar tau ∧
     requiredTargetSamplesForOptimalFineTuningMSE
-        (representationCertifiedTransferGapSq irreducibleGap boundScale
-          cert_new.err_source cert_new.divergence cert_new.lambda_star)
+        (coefficientGapSq wSourceNew wTarget)
         noiseVar tau <
       requiredTargetSamplesForOptimalFineTuningMSE
-        (representationCertifiedTransferGapSq irreducibleGap boundScale
-          err_source_standard divergence_standard lambda_standard)
+        (infoCertifiedBenDavidUpperBound
+          I_phi_Y_standard I_phi_A lambda_standard)
         noiseVar tau := by
-  have h_bound_lt :
-      benDavidUpperBound cert_new.err_source cert_new.divergence cert_new.lambda_star <
-        benDavidUpperBound err_source_standard divergence_standard lambda_standard := by
-    exact higher_info_bottleneck_objective_tightens_ben_david_bound
-      err_source_standard cert_new.err_source
-      divergence_standard cert_new.divergence
-      lambda_standard cert_new.lambda_star
-      I_phi_Y_standard I_phi_Y_new I_phi_A_standard I_phi_A_new
-      lam gainScale h_gainScale h_source h_div h_lambda h_obj
+  have h_gap_le_err :
+      coefficientGapSq wSourceNew wTarget ≤ cert_new.err_target := by
+    exact coefficientGapSq_le_of_targetLinearExcessRisk_le
+      crossTarget targetNoiseVar cert_new.err_target wSourceNew wTarget h_opt h_excess
+  have h_target_cap_lt :
+      cert_new.err_target <
+        infoCertifiedBenDavidUpperBound I_phi_Y_standard I_phi_A lambda_standard := by
+    exact higher_info_bottleneck_objective_lowers_target_error_cap
+      cert_new I_phi_Y_standard I_phi_Y_new I_phi_A
+      lambda_standard lam h_source h_div h_lambda h_obj
   have h_gap_order :
-      representationCertifiedTransferGapSq irreducibleGap boundScale
-          cert_new.err_source cert_new.divergence cert_new.lambda_star <
-        representationCertifiedTransferGapSq irreducibleGap boundScale
-          err_source_standard divergence_standard lambda_standard := by
-    unfold representationCertifiedTransferGapSq
-    nlinarith
-  have h_gap_new_pos :
-      0 <
-        representationCertifiedTransferGapSq irreducibleGap boundScale
-          cert_new.err_source cert_new.divergence cert_new.lambda_star := by
+      coefficientGapSq wSourceNew wTarget <
+        infoCertifiedBenDavidUpperBound I_phi_Y_standard I_phi_A lambda_standard := by
     linarith
-  exact requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
-    (representationCertifiedTransferGapSq irreducibleGap boundScale
-      cert_new.err_source cert_new.divergence cert_new.lambda_star)
-    (representationCertifiedTransferGapSq irreducibleGap boundScale
-      err_source_standard divergence_standard lambda_standard)
-    noiseVar tau h_gap_new_pos h_gap_order h_noise h_tau
+  have h_gap_new_pos :
+      0 < coefficientGapSq wSourceNew wTarget := by
+    linarith
+  have h_required_new_pos :
+      0 <
+        requiredTargetSamplesForOptimalFineTuningMSE
+          (coefficientGapSq wSourceNew wTarget)
+          noiseVar tau := by
+    exact requiredTargetSamplesForOptimalFineTuningMSE_pos
+      (coefficientGapSq wSourceNew wTarget)
+      noiseVar tau h_noise h_tau h_tau_small
+  have h_required_lt :
+      requiredTargetSamplesForOptimalFineTuningMSE
+          (coefficientGapSq wSourceNew wTarget)
+          noiseVar tau <
+        requiredTargetSamplesForOptimalFineTuningMSE
+          (infoCertifiedBenDavidUpperBound
+            I_phi_Y_standard I_phi_A lambda_standard)
+          noiseVar tau := by
+    exact requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
+      (coefficientGapSq wSourceNew wTarget)
+      (infoCertifiedBenDavidUpperBound
+        I_phi_Y_standard I_phi_A lambda_standard)
+      noiseVar tau h_gap_new_pos h_gap_order h_noise h_tau
+  exact ⟨h_required_new_pos, h_required_lt⟩
 
 /-- **More source populations reduce the target fine-tuning burden.**
-    This is an explicit shared-representation model, not a bookkeeping
-    amortization identity. We assume:
+    This is an explicit shared-feature meta-learning theorem, not a hard-coded
+    `1 / k` law. We model the transported source weights learned from the first
+    `k` populations as
 
-    - residual source-target mismatch after pretraining on `k` source
-      populations is `irreducibleGap + populationSpecificGap / k`;
-    - fine-tuning then uses the optimal shrinkage estimator already solved above;
-    - adaptation burden is measured both by the resulting optimal MSE at a fixed
-      target sample size and by the target sample size required to hit a fixed
-      MSE tolerance `τ`.
+    - a shared center `wShared`,
+    - plus the average of `k` population-specific deviations.
 
-    Under that model, more source populations strictly reduce:
-    1. the residual transfer gap,
-    2. the optimal fine-tuning MSE at fixed `nTarget`, and
-    3. the target sample size needed to reach the same MSE tolerance. -/
+    The `1 / k` decay is then derived, not assumed: if the population-specific
+    deviations are pairwise orthogonal, each has the same squared norm
+    `populationSpecificGap`, and each is orthogonal to the shared residual
+    `wShared - wTarget`, then averaging over more source populations strictly
+    lowers the exact squared coefficient gap to the target optimum. Because the
+    optimal shrinkage fine-tuning MSE and the required target sample size are
+    already solved exactly as functions of that gap, they strictly decrease as
+    well. -/
 theorem amortized_per_population_adaptation_cost_falls_with_task_count
+    {p : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (deviation : ℕ → Fin p → ℝ)
     (irreducibleGap populationSpecificGap noiseVar nTarget tau : ℝ)
     (k₁ k₂ : ℕ)
+    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
+    (h_shared_orth :
+      ∀ j < k₂, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+    (h_norm :
+      ∀ j < k₂, dotProduct (deviation j) (deviation j) = populationSpecificGap)
+    (h_pair :
+      ∀ j < k₂, ∀ l < k₂, j ≠ l → dotProduct (deviation j) (deviation l) = 0)
     (h_irred : 0 ≤ irreducibleGap)
     (h_pop : 0 < populationSpecificGap)
     (h_noise : 0 < noiseVar)
@@ -1618,64 +2361,66 @@ theorem amortized_per_population_adaptation_cost_falls_with_task_count
     (h_k₁ : 0 < k₁)
     (h_more_tasks : k₁ < k₂)
     (h_tau_small :
-      tau < metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂) :
-    metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂ <
-      metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁ ∧
+      tau < metaLearnedTransferGapSq wShared wTarget deviation k₂) :
+    metaLearnedTransferGapSq wShared wTarget deviation k₂ <
+      metaLearnedTransferGapSq wShared wTarget deviation k₁ ∧
     optimalFineTuningMSE
-        (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+        (metaLearnedTransferGapSq wShared wTarget deviation k₂)
         noiseVar nTarget <
       optimalFineTuningMSE
-        (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+        (metaLearnedTransferGapSq wShared wTarget deviation k₁)
         noiseVar nTarget ∧
     0 <
       requiredTargetSamplesForOptimalFineTuningMSE
-        (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+        (metaLearnedTransferGapSq wShared wTarget deviation k₂)
         noiseVar tau ∧
     requiredTargetSamplesForOptimalFineTuningMSE
-        (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+        (metaLearnedTransferGapSq wShared wTarget deviation k₂)
         noiseVar tau <
       requiredTargetSamplesForOptimalFineTuningMSE
-        (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+        (metaLearnedTransferGapSq wShared wTarget deviation k₁)
         noiseVar tau := by
   have h_k₂ : 0 < k₂ := lt_trans h_k₁ h_more_tasks
   have h_gap_order :
-      metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂ <
-        metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁ := by
+      metaLearnedTransferGapSq wShared wTarget deviation k₂ <
+        metaLearnedTransferGapSq wShared wTarget deviation k₁ := by
     exact metaLearnedTransferGapSq_strictMono
-      irreducibleGap populationSpecificGap k₁ k₂ h_pop h_k₁ h_more_tasks
+      wShared wTarget deviation irreducibleGap populationSpecificGap
+      k₁ k₂ h_pop h_k₁ h_more_tasks h_shared h_shared_orth h_norm h_pair
   have h_gap₂_pos :
-      0 < metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂ := by
+      0 < metaLearnedTransferGapSq wShared wTarget deviation k₂ := by
     exact metaLearnedTransferGapSq_pos
-      irreducibleGap populationSpecificGap k₂ h_irred h_pop h_k₂
+      wShared wTarget deviation irreducibleGap populationSpecificGap
+      k₂ h_irred h_pop h_k₂ h_shared h_shared_orth h_norm h_pair
   have h_mse_order :
       optimalFineTuningMSE
-          (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+          (metaLearnedTransferGapSq wShared wTarget deviation k₂)
           noiseVar nTarget <
         optimalFineTuningMSE
-          (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+          (metaLearnedTransferGapSq wShared wTarget deviation k₁)
           noiseVar nTarget := by
     exact optimalFineTuningMSE_strictMono_in_gapSq
-      (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
-      (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+      (metaLearnedTransferGapSq wShared wTarget deviation k₂)
+      (metaLearnedTransferGapSq wShared wTarget deviation k₁)
       noiseVar nTarget (le_of_lt h_gap₂_pos) h_gap_order h_noise h_n
   have h_req_pos :
       0 <
         requiredTargetSamplesForOptimalFineTuningMSE
-          (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+          (metaLearnedTransferGapSq wShared wTarget deviation k₂)
           noiseVar tau := by
     exact requiredTargetSamplesForOptimalFineTuningMSE_pos
-      (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+      (metaLearnedTransferGapSq wShared wTarget deviation k₂)
       noiseVar tau h_noise h_tau h_tau_small
   have h_req_order :
       requiredTargetSamplesForOptimalFineTuningMSE
-          (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
+          (metaLearnedTransferGapSq wShared wTarget deviation k₂)
           noiseVar tau <
         requiredTargetSamplesForOptimalFineTuningMSE
-          (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+          (metaLearnedTransferGapSq wShared wTarget deviation k₁)
           noiseVar tau := by
     exact requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
-      (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₂)
-      (metaLearnedTransferGapSq irreducibleGap populationSpecificGap k₁)
+      (metaLearnedTransferGapSq wShared wTarget deviation k₂)
+      (metaLearnedTransferGapSq wShared wTarget deviation k₁)
       noiseVar tau h_gap₂_pos h_gap_order h_noise h_tau
   exact ⟨h_gap_order, h_mse_order, h_req_pos, h_req_order⟩
 

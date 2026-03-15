@@ -1,5 +1,6 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
+import Calibrator.ClinicalUtilityFairness
 import Calibrator.OpenQuestions
 
 namespace Calibrator
@@ -343,37 +344,52 @@ theorem validation_n_depends_on_r2
     PGS should only be used clinically when the expected benefit exceeds
     the expected harm from misclassification.
 
-    We model benefit and harm through R²-dependent sensitivity and specificity
-    via monotone link functions (from the liability-threshold model).  As R²
-    increases, sensitivity rises (more true positives treated) and specificity
-    rises (fewer false positives harmed).  There exists a critical R² above
-    which the benefit-harm tradeoff is favorable.
+    We model benefit and harm through the exact liability-threshold operating
+    metrics from `ClinicalUtilityFairness.lean`. As `R²` increases, exact
+    threshold sensitivity rises (more true positives treated) and exact
+    threshold specificity rises (fewer false positives harmed).
 
     Here we prove the structural result: if the target population's R² is
     strictly below the source's (portability loss), the net clinical value
     in the target is strictly less than in the source. This means populations
     with poor portability may violate the do-no-harm principle even when the
-    source population satisfies it.  This is derived from monotonicity, not
-    assumed. -/
+    source population satisfies it. This is derived from the exact operating
+    metric formulas, not assumed through an abstract link. -/
 theorem do_no_harm_principle
-    (sensLink specLink : ℝ → ℝ) (r2_source r2_target π benefit harm : ℝ)
-    (h_sens_mono : StrictMono sensLink)
-    (h_spec_mono : StrictMono specLink)
+    (m : LiabilityThresholdModel) (T' μ_control r2_source r2_target π benefit harm : ℝ)
     (h_r2_loss : r2_target < r2_source)
+    (h_r2_target : 0 ≤ r2_target)
+    (h_r2_source : r2_source ≤ 1)
+    (hPhi_mono : StrictMono Phi)
+    (hμ_control_neg : μ_control < 0)
+    (h_sens_num_nonneg :
+      0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
+    (h_spec_num_nonneg :
+      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control)
     (h_π : 0 < π) (h_π1 : π < 1)
-    (h_benefit : 0 < benefit) (h_harm : 0 < harm)
-    (h_sens_t : 0 ≤ sensLink r2_target) (h_spec_t : 0 ≤ specLink r2_target)
-    (h_spec_s1 : specLink r2_source ≤ 1) :
+    (h_benefit : 0 < benefit) (h_harm : 0 < harm) :
     -- Net value in target is strictly less than in source
-    sensLink r2_target * π * benefit - (1 - specLink r2_target) * (1 - π) * harm <
-      sensLink r2_source * π * benefit - (1 - specLink r2_source) * (1 - π) * harm := by
-  have h_sens : sensLink r2_target < sensLink r2_source := h_sens_mono h_r2_loss
-  have h_spec : specLink r2_target < specLink r2_source := h_spec_mono h_r2_loss
-  have h1 : sensLink r2_target * π * benefit < sensLink r2_source * π * benefit := by
+    sensFromR2 m r2_target T' * π * benefit -
+        (1 - specFromR2 m r2_target T' μ_control) * (1 - π) * harm <
+      sensFromR2 m r2_source T' * π * benefit -
+        (1 - specFromR2 m r2_source T' μ_control) * (1 - π) * harm := by
+  have h_sens :
+      sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
+    exact sensFromR2_strictMono m T' r2_target r2_source
+      hPhi_mono h_r2_target h_r2_source h_r2_loss h_sens_num_nonneg
+  have h_spec :
+      specFromR2 m r2_target T' μ_control <
+        specFromR2 m r2_source T' μ_control := by
+    exact specFromR2_strictMono m T' μ_control r2_target r2_source
+      hPhi_mono hμ_control_neg h_r2_target h_r2_source h_r2_loss h_spec_num_nonneg
+  have h1 :
+      sensFromR2 m r2_target T' * π * benefit <
+        sensFromR2 m r2_source T' * π * benefit := by
     apply mul_lt_mul_of_pos_right _ h_benefit
     exact mul_lt_mul_of_pos_right h_sens h_π
-  have h2 : (1 - specLink r2_source) * (1 - π) * harm <
-             (1 - specLink r2_target) * (1 - π) * harm := by
+  have h2 :
+      (1 - specFromR2 m r2_source T' μ_control) * (1 - π) * harm <
+        (1 - specFromR2 m r2_target T' μ_control) * (1 - π) * harm := by
     apply mul_lt_mul_of_pos_right _ h_harm
     apply mul_lt_mul_of_pos_right _ (by linarith)
     linarith
@@ -384,33 +400,51 @@ theorem do_no_harm_principle
     then expand as validation data becomes available.
 
     We model: the validated population has strictly higher R² than the
-    unvalidated population (portability gap).  By monotonicity of
-    sensitivity and specificity in R² (from the liability threshold model),
-    the validated population has strictly better discrimination.
+    unvalidated population (portability gap). By the exact liability-threshold
+    sensitivity and specificity formulas, the validated population has
+    strictly better discrimination.
 
     Phased deployment achieves the same clinical benefit for the validated
     population while avoiding the risk of deploying a poorly-performing
     PGS in the unvalidated population.  The benefit gap between
-    validated and unvalidated populations is derived from the R² gap. -/
+    validated and unvalidated populations is derived from the exact operating
+    metrics, not from an abstract link. -/
 theorem phased_deployment_reduces_risk
-    (sensLink specLink : ℝ → ℝ) (r2_validated r2_unvalidated π : ℝ)
-    (h_sens_mono : StrictMono sensLink)
-    (h_spec_mono : StrictMono specLink)
+    (m : LiabilityThresholdModel) (T' μ_control r2_validated r2_unvalidated π : ℝ)
     (h_r2_gap : r2_unvalidated < r2_validated)
+    (h_r2_unvalidated : 0 ≤ r2_unvalidated)
+    (h_r2_validated : r2_validated ≤ 1)
+    (hPhi_mono : StrictMono Phi)
+    (hμ_control_neg : μ_control < 0)
+    (h_sens_num_nonneg :
+      0 ≤ Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * m.case_mean - T')
+    (h_spec_num_nonneg :
+      0 ≤ T' - Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * μ_control)
     (h_π : 0 < π) (h_π1 : π < 1)
-    (h_sens_u : 0 ≤ sensLink r2_unvalidated)
-    (h_spec_u : 0 ≤ specLink r2_unvalidated)
-    (h_spec_v : specLink r2_validated ≤ 1) :
     -- The validated population has strictly better risk stratification
     -- (proportion correctly classified) than the unvalidated population,
-    -- derived from the R² gap via monotone links.
-    sensLink r2_unvalidated * π + specLink r2_unvalidated * (1 - π) <
-      sensLink r2_validated * π + specLink r2_validated * (1 - π) := by
-  have h_sens : sensLink r2_unvalidated < sensLink r2_validated := h_sens_mono h_r2_gap
-  have h_spec : specLink r2_unvalidated < specLink r2_validated := h_spec_mono h_r2_gap
-  have h1 : sensLink r2_unvalidated * π < sensLink r2_validated * π :=
+    -- derived from the R² gap via the exact liability-threshold metrics.
+    :
+    sensFromR2 m r2_unvalidated T' * π +
+        specFromR2 m r2_unvalidated T' μ_control * (1 - π) <
+      sensFromR2 m r2_validated T' * π +
+        specFromR2 m r2_validated T' μ_control * (1 - π) := by
+  have h_sens :
+      sensFromR2 m r2_unvalidated T' < sensFromR2 m r2_validated T' := by
+    exact sensFromR2_strictMono m T' r2_unvalidated r2_validated
+      hPhi_mono h_r2_unvalidated h_r2_validated h_r2_gap h_sens_num_nonneg
+  have h_spec :
+      specFromR2 m r2_unvalidated T' μ_control <
+        specFromR2 m r2_validated T' μ_control := by
+    exact specFromR2_strictMono m T' μ_control r2_unvalidated r2_validated
+      hPhi_mono hμ_control_neg h_r2_unvalidated h_r2_validated h_r2_gap h_spec_num_nonneg
+  have h1 :
+      sensFromR2 m r2_unvalidated T' * π <
+        sensFromR2 m r2_validated T' * π :=
     mul_lt_mul_of_pos_right h_sens h_π
-  have h2 : specLink r2_unvalidated * (1 - π) < specLink r2_validated * (1 - π) :=
+  have h2 :
+      specFromR2 m r2_unvalidated T' μ_control * (1 - π) <
+        specFromR2 m r2_validated T' μ_control * (1 - π) :=
     mul_lt_mul_of_pos_right h_spec (by linarith)
   linarith
 

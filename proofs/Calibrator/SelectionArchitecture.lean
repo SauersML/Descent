@@ -18,7 +18,7 @@ Key results:
 1. Stabilizing selection maintains genetic architecture → better portability
 2. Diversifying/balancing selection changes architecture → worse portability
 3. Polygenic adaptation creates coordinated allele frequency shifts
-4. Immune traits under fluctuating selection have fastest portability decay
+4. Rapidly varying selection regimes have fastest portability decay
 5. Relationship between GWAS effect sizes and selection coefficients
 
 Reference: Wang et al. (2026), Nature Communications 17:942.
@@ -176,9 +176,9 @@ section DiversifyingSelection
     relaxation time and W is a Wiener process. The autocorrelation function of
     an OU process is Cov(θ(t), θ(t+Δ)) = (σ²τ/2) exp(-Δ/τ), which after
     normalization gives the correlation exp(-Δ/τ). The parameter τ controls
-    how quickly the selective landscape decorrelates: small τ (e.g., pathogen-driven
-    immune selection) means rapid turnover, while τ → ∞ recovers stabilizing
-    selection with a fixed optimum. -/
+    how quickly the selective landscape decorrelates: small τ means rapid
+    turnover, while τ → ∞ recovers stabilizing selection with a fixed
+    optimum. -/
 noncomputable def fluctuatingEffectCorrelation (t τ : ℝ) : ℝ :=
   Real.exp (-t / τ)
 
@@ -204,17 +204,90 @@ theorem shorter_autocorrelation_faster_decay
   rw [neg_div, neg_div, neg_lt_neg_iff]
   exact div_lt_div_of_pos_left h_t (by linarith) h_shorter
 
-/-- **Immune traits have short autocorrelation times.**
-    Pathogen-driven selection creates fluctuating fitness landscapes
-    with τ ~ 100-1000 generations (vs τ → ∞ for stabilizing selection).
-    This explains why lymphocyte count portability decays so fast. -/
-theorem immune_short_autocorrelation
-    (τ_immune τ_neutral t : ℝ)
-    (h_immune : 0 < τ_immune) (h_neutral : 0 < τ_neutral)
-    (h_shorter : τ_immune < τ_neutral)
+/-- **Shorter autocorrelation times imply lower cross-population effect
+    correlation.** -/
+theorem short_autocorrelation_lower_correlation
+    (τ_short τ_long t : ℝ)
+    (h_short : 0 < τ_short) (h_long : 0 < τ_long)
+    (h_shorter : τ_short < τ_long)
     (h_t : 0 < t) :
-    fluctuatingEffectCorrelation t τ_immune < fluctuatingEffectCorrelation t τ_neutral :=
-  shorter_autocorrelation_faster_decay t τ_neutral τ_immune h_neutral h_immune h_shorter h_t
+    fluctuatingEffectCorrelation t τ_short < fluctuatingEffectCorrelation t τ_long :=
+  shorter_autocorrelation_faster_decay t τ_long τ_short h_long h_short h_shorter h_t
+
+/-- Selected-architecture variance under stabilizing selection. -/
+noncomputable def stabilizingSelectedArchitectureVariance (v_mutation s : ℝ) : ℝ :=
+  equilibriumEffectVariance v_mutation s
+
+/-- Stationary variance of a fluctuating optimum under the OU model. -/
+noncomputable def optimumOUVariance (sigmaTheta tau : ℝ) : ℝ :=
+  sigmaTheta ^ 2 * tau / 2
+
+/-- Selected-architecture variance under fluctuating selection: the baseline
+    mutation-selection variance plus the variance induced by a moving optimum. -/
+noncomputable def fluctuatingSelectedArchitectureVariance
+    (v_mutation s sigmaTheta tau : ℝ) : ℝ :=
+  equilibriumEffectVariance v_mutation s + optimumOUVariance sigmaTheta tau
+
+theorem effectCorrelationStabilizing_pos
+    (Ns : ℝ) (hNs : 1 < Ns) :
+    0 < effectCorrelationStabilizing Ns := by
+  unfold effectCorrelationStabilizing
+  have hden_pos : 0 < 2 * Ns := by linarith
+  have hfrac_lt_one : 1 / (2 * Ns) < 1 := by
+    rw [div_lt_iff₀ hden_pos]
+    linarith
+  linarith
+
+theorem effectCorrelationStabilizing_lt_one
+    (Ns : ℝ) (hNs : 1 < Ns) :
+    effectCorrelationStabilizing Ns < 1 := by
+  unfold effectCorrelationStabilizing
+  have hfrac_pos : 0 < 1 / (2 * Ns) := by
+    positivity
+  linarith
+
+theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
+    (v_mutation s sigmaTheta tau : ℝ)
+    (h_sigma : 0 < sigmaTheta) (h_tau : 0 < tau) :
+    stabilizingSelectedArchitectureVariance v_mutation s <
+      fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta tau := by
+  unfold stabilizingSelectedArchitectureVariance
+    fluctuatingSelectedArchitectureVariance optimumOUVariance
+    equilibriumEffectVariance
+  have h_extra : 0 < sigmaTheta ^ 2 * tau / 2 := by
+    have hsq : 0 < sigmaTheta ^ 2 := sq_pos_of_pos h_sigma
+    nlinarith
+  linarith
+
+/-- The fluctuating correlation drops below the stabilizing correlation once the
+    fluctuating autocorrelation time is below the exact threshold obtained by
+    matching `exp(-t/τ)` to `1 - 1/(2Ns)`. -/
+theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
+    (t tau Ns : ℝ)
+    (h_t : 0 < t) (h_tau : 0 < tau) (hNs : 1 < Ns)
+    (h_tau_lt : tau < t / (-Real.log (effectCorrelationStabilizing Ns))) :
+    fluctuatingEffectCorrelation t tau < effectCorrelationStabilizing Ns := by
+  have h_rho_pos : 0 < effectCorrelationStabilizing Ns :=
+    effectCorrelationStabilizing_pos Ns hNs
+  have h_rho_lt_one : effectCorrelationStabilizing Ns < 1 :=
+    effectCorrelationStabilizing_lt_one Ns hNs
+  have h_log_neg : Real.log (effectCorrelationStabilizing Ns) < 0 := by
+    have h_log_lt : Real.log (effectCorrelationStabilizing Ns) < Real.log 1 := by
+      exact Real.log_lt_log h_rho_pos h_rho_lt_one
+    simpa using h_log_lt
+  have h_neglog_pos : 0 < -Real.log (effectCorrelationStabilizing Ns) := by
+    linarith
+  have h_mul_lt : tau * (-Real.log (effectCorrelationStabilizing Ns)) < t := by
+    exact (lt_div_iff₀ h_neglog_pos).mp h_tau_lt
+  have h_neglog_lt_div : -Real.log (effectCorrelationStabilizing Ns) < t / tau := by
+    exact (lt_div_iff₀ h_tau).2 (by simpa [mul_comm] using h_mul_lt)
+  have h_exp_lt_log' : -(t / tau) < Real.log (effectCorrelationStabilizing Ns) := by
+    linarith
+  have h_exp_lt_log : -t / tau < Real.log (effectCorrelationStabilizing Ns) := by
+    simpa [neg_div] using h_exp_lt_log'
+  unfold fluctuatingEffectCorrelation
+  have h_exp_lt := Real.exp_lt_exp.mpr h_exp_lt_log
+  simpa [Real.exp_log h_rho_pos] using h_exp_lt
 
 /-- **Balancing selection maintains intermediate allele frequencies.**
     Under balancing selection (e.g., heterozygote advantage in HLA),
@@ -397,24 +470,20 @@ parameters for different trait classes.
 
 section ArchitecturePredictions
 
-/- **Trait classification by selection regime.**
-    Different trait classes have different expected portability patterns:
-    - Metabolic/anthropometric: stabilizing selection → slow decay
-    - Immune/inflammatory: fluctuating selection → fast decay
-    - Behavioral/psychiatric: complex selection → intermediate decay -/
+/- **Trait classes can be ranked by regime-specific portability parameters.** -/
 
-/-- Portability ordering across trait classes. -/
+/-- Portability ordering follows from any transitive ranking of regime-level
+    portability values. -/
 theorem portability_ordering
-    (r2_metabolic r2_behavioral r2_immune : ℝ)
-    (h_met_best : r2_behavioral < r2_metabolic)
-    (h_beh_mid : r2_immune < r2_behavioral) :
-    r2_immune < r2_metabolic := by linarith
+    (r2_high r2_mid r2_low : ℝ)
+    (h_high : r2_mid < r2_high)
+    (h_mid : r2_low < r2_mid) :
+    r2_low < r2_high := by linarith
 
 /-- **Selection coefficient determines portability timescale.**
     The characteristic timescale for portability decay is 1/(2s) generations,
     where s is the selection coefficient.
-    For neutral traits: s ≈ 0 → timescale → ∞ (drift only).
-    For immune traits: s ≈ 0.01 → timescale ≈ 50 generations. -/
+    Smaller `s` gives slower change; larger `s` gives faster change. -/
 theorem selection_determines_timescale
     (s₁ s₂ : ℝ) (h₁ : 0 < s₁) (h₂ : 0 < s₂)
     (h_stronger : s₁ < s₂) :

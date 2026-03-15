@@ -132,13 +132,13 @@ theorem chi_squared_nonneg {k : ℕ}
 theorem residual_sign_interpretation
     (r2_observed r2_predicted : ℝ)
     (h_positive_residual : r2_predicted < r2_observed) :
-    -- Model underestimates portability (e.g., for height)
+    -- Model underestimates portability
     0 < r2_observed - r2_predicted := by linarith
 
 theorem residual_negative_interpretation
     (r2_observed r2_predicted : ℝ)
     (h_negative_residual : r2_observed < r2_predicted) :
-    -- Model overestimates portability (e.g., for immune traits)
+    -- Model overestimates portability
     r2_observed - r2_predicted < 0 := by linarith
 
 end GoodnessOfFit
@@ -291,7 +291,7 @@ noncomputable def selectionModelLRT (model : SelectionValidationModel) : ℝ :=
     (gaussianProfileLogLik model.sampleSize (neutralResidualVariance model))
     (gaussianProfileLogLik model.sampleSize (selectionResidualVariance model))
 
-/-- A height-like validation model under stabilizing selection. -/
+/-- Validation model under stabilizing selection. -/
 noncomputable def stabilizingSelectionValidationModel
     (n baselineResidualVar selectedArchitectureVar Ns : ℝ) :
     SelectionValidationModel :=
@@ -300,7 +300,7 @@ noncomputable def stabilizingSelectionValidationModel
     selectedArchitectureVar := selectedArchitectureVar
     effectCorrelation := effectCorrelationStabilizing Ns }
 
-/-- An immune-like validation model under fluctuating selection. -/
+/-- Validation model under fluctuating selection. -/
 noncomputable def fluctuatingSelectionValidationModel
     (n baselineResidualVar selectedArchitectureVar t τ : ℝ) :
     SelectionValidationModel :=
@@ -370,101 +370,124 @@ theorem missedSelectedVariance_lt_of_variance_and_correlation
     exact mul_lt_mul_of_pos_left h_loss_lt h_v₂
   exact lt_of_le_of_lt h_left h_right
 
-/-- **Selection model preferred when it captures architecture-specific variance.**
-    Consider two held-out portability fits on the same sample and with the same
-    ancestry-neutral baseline residual variance. The neutral model misses a
-    selection-sensitive component of variance `V_sel * (1 - ρ^2)`, where `ρ`
-    is the cross-population effect correlation of that component. For a
-    height-like trait we use the stabilizing-selection correlation
-    `effectCorrelationStabilizing`; for an immune-like trait we use the
-    fluctuating-selection correlation `fluctuatingEffectCorrelation`.
+/-- **Selection model preferred when the fluctuating regime induces both lower
+    cross-population effect correlation and larger selected-architecture
+    variance than the stabilizing regime.**
 
-    If the immune-like trait carries at least as much selection-sensitive
-    variance and has strictly lower cross-population effect correlation, then
-    the exact Gaussian nested-model LRT for adding the selection term is
-    strictly larger for the immune-like trait. -/
+    This comparison is now fully model-derived. The stabilizing model uses
+    `equilibriumEffectVariance v_mutation s` and
+    `effectCorrelationStabilizing Ns`. The fluctuating model uses the same
+    mutation-selection baseline plus the exact OU optimum variance
+    `sigmaTheta^2 * tau / 2`, and the exact correlation
+    `exp(-t / tau)`. If `tau` is below the exact threshold where the
+    fluctuating correlation drops under the stabilizing correlation, then the
+    fluctuating regime has both:
+
+    - larger selected-architecture variance, and
+    - lower cross-population effect correlation.
+
+    Therefore the exact Gaussian nested-model LRT for adding the selection term
+    is strictly larger under the fluctuating regime. -/
 theorem selection_model_preferred_when_better_fit
-    (n sigma2_base v_mut_height s_height Ns_height immuneSelectedVar t τ_immune : ℝ)
+    (n sigma2_base v_mutation s Ns_stab sigmaTheta_fluct t_div tau_fluct : ℝ)
     (h_n : 0 < n)
     (h_sigma : 0 < sigma2_base)
-    (h_vmut_height : 0 ≤ v_mut_height)
-    (h_s_height : 0 < s_height)
-    (h_Ns_height : 1 < Ns_height)
-    (h_immuneVar : 0 < immuneSelectedVar)
-    (h_var :
-      equilibriumEffectVariance v_mut_height s_height ≤ immuneSelectedVar)
-    (h_corr :
-      fluctuatingEffectCorrelation t τ_immune <
-        effectCorrelationStabilizing Ns_height) :
+    (h_vmut : 0 ≤ v_mutation)
+    (h_s : 0 < s)
+    (h_Ns : 1 < Ns_stab)
+    (h_sigmaTheta : 0 < sigmaTheta_fluct)
+    (h_t_div : 0 < t_div)
+    (h_tau : 0 < tau_fluct)
+    (h_tau_threshold :
+      tau_fluct < t_div / (-Real.log (effectCorrelationStabilizing Ns_stab))) :
     selectionModelLRT
       (stabilizingSelectionValidationModel n sigma2_base
-        (equilibriumEffectVariance v_mut_height s_height) Ns_height) <
+        (stabilizingSelectedArchitectureVariance v_mutation s) Ns_stab) <
     selectionModelLRT
-      (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune) := by
-  have h_heightVar_nonneg : 0 ≤ equilibriumEffectVariance v_mut_height s_height := by
-    unfold equilibriumEffectVariance
-    exact div_nonneg h_vmut_height (le_of_lt h_s_height)
-  have h_heightCorr_nonneg : 0 ≤ effectCorrelationStabilizing Ns_height := by
-    unfold effectCorrelationStabilizing
-    have h_den_pos : 0 < 2 * Ns_height := by
-      linarith
-    have h_div_le_one : 1 / (2 * Ns_height) ≤ 1 := by
-      rw [div_le_iff₀ h_den_pos]
-      linarith
-    nlinarith
-  have h_heightCorr_lt_one : effectCorrelationStabilizing Ns_height < 1 := by
-    unfold effectCorrelationStabilizing
-    have h_div_pos : 0 < 1 / (2 * Ns_height) := by
-      positivity
-    nlinarith
-  have h_immuneCorr_nonneg : 0 ≤ fluctuatingEffectCorrelation t τ_immune := by
+      (fluctuatingSelectionValidationModel n sigma2_base
+        (fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta_fluct tau_fluct)
+        t_div tau_fluct) := by
+  have h_stabVar_nonneg : 0 ≤ stabilizingSelectedArchitectureVariance v_mutation s := by
+    unfold stabilizingSelectedArchitectureVariance equilibriumEffectVariance
+    exact div_nonneg h_vmut (le_of_lt h_s)
+  have h_stabCorr_nonneg : 0 ≤ effectCorrelationStabilizing Ns_stab := by
+    exact le_of_lt (effectCorrelationStabilizing_pos Ns_stab h_Ns)
+  have h_stabCorr_lt_one : effectCorrelationStabilizing Ns_stab < 1 := by
+    exact effectCorrelationStabilizing_lt_one Ns_stab h_Ns
+  have h_fluctCorr_nonneg : 0 ≤ fluctuatingEffectCorrelation t_div tau_fluct := by
     unfold fluctuatingEffectCorrelation
     exact le_of_lt (Real.exp_pos _)
-  have h_missed_height_nonneg :
+  have h_fluctVar_lt :
+      stabilizingSelectedArchitectureVariance v_mutation s <
+        fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta_fluct tau_fluct := by
+    exact fluctuatingSelectedArchitectureVariance_gt_stabilizing
+      v_mutation s sigmaTheta_fluct tau_fluct h_sigmaTheta h_tau
+  have h_fluctVar_pos :
+      0 < fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta_fluct tau_fluct := by
+    linarith
+  have h_var :
+      stabilizingSelectedArchitectureVariance v_mutation s ≤
+        fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta_fluct tau_fluct :=
+    le_of_lt h_fluctVar_lt
+  have h_corr :
+      fluctuatingEffectCorrelation t_div tau_fluct <
+        effectCorrelationStabilizing Ns_stab := by
+    exact fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
+      t_div tau_fluct Ns_stab h_t_div h_tau h_Ns h_tau_threshold
+  have h_missed_stab_nonneg :
       0 ≤ missedSelectedVariance
         (stabilizingSelectionValidationModel n sigma2_base
-          (equilibriumEffectVariance v_mut_height s_height) Ns_height) := by
+          (stabilizingSelectedArchitectureVariance v_mutation s) Ns_stab) := by
     unfold missedSelectedVariance stabilizingSelectionValidationModel
-    exact mul_nonneg h_heightVar_nonneg (by nlinarith [sq_nonneg (effectCorrelationStabilizing Ns_height)])
-  have h_missed_immune_nonneg :
+    exact mul_nonneg h_stabVar_nonneg
+      (by nlinarith [sq_nonneg (effectCorrelationStabilizing Ns_stab)])
+  have h_missed_fluct_nonneg :
       0 ≤ missedSelectedVariance
-        (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune) := by
+        (fluctuatingSelectionValidationModel n sigma2_base
+          (fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta_fluct tau_fluct)
+          t_div tau_fluct) := by
     unfold missedSelectedVariance fluctuatingSelectionValidationModel
-    exact mul_nonneg (le_of_lt h_immuneVar)
-      (by nlinarith [sq_nonneg (fluctuatingEffectCorrelation t τ_immune)])
+    exact mul_nonneg (le_of_lt h_fluctVar_pos)
+      (by nlinarith [sq_nonneg (fluctuatingEffectCorrelation t_div tau_fluct)])
   have h_missed_lt :
       missedSelectedVariance
           (stabilizingSelectionValidationModel n sigma2_base
-            (equilibriumEffectVariance v_mut_height s_height) Ns_height) <
+            (stabilizingSelectedArchitectureVariance v_mutation s) Ns_stab) <
         missedSelectedVariance
-          (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune) := by
+          (fluctuatingSelectionValidationModel n sigma2_base
+            (fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta_fluct tau_fluct)
+            t_div tau_fluct) := by
     unfold missedSelectedVariance stabilizingSelectionValidationModel
       fluctuatingSelectionValidationModel
     exact missedSelectedVariance_lt_of_variance_and_correlation
-      (equilibriumEffectVariance v_mut_height s_height)
-      immuneSelectedVar
-      (effectCorrelationStabilizing Ns_height)
-      (fluctuatingEffectCorrelation t τ_immune)
-      h_immuneVar
-      h_heightCorr_nonneg
-      h_heightCorr_lt_one
-      h_immuneCorr_nonneg
+      (stabilizingSelectedArchitectureVariance v_mutation s)
+      (fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta_fluct tau_fluct)
+      (effectCorrelationStabilizing Ns_stab)
+      (fluctuatingEffectCorrelation t_div tau_fluct)
+      h_fluctVar_pos
+      h_stabCorr_nonneg
+      h_stabCorr_lt_one
+      h_fluctCorr_nonneg
       h_corr
       h_var
   rw [selectionModelLRT_eq_sampleSize_mul_log_residual_gap
         (stabilizingSelectionValidationModel n sigma2_base
-          (equilibriumEffectVariance v_mut_height s_height) Ns_height)
-        h_sigma h_missed_height_nonneg]
+          (stabilizingSelectedArchitectureVariance v_mutation s) Ns_stab)
+        h_sigma h_missed_stab_nonneg]
   rw [selectionModelLRT_eq_sampleSize_mul_log_residual_gap
-        (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune)
-        h_sigma h_missed_immune_nonneg]
+        (fluctuatingSelectionValidationModel n sigma2_base
+          (fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta_fluct tau_fluct)
+          t_div tau_fluct)
+        h_sigma h_missed_fluct_nonneg]
   exact selectionModelLRT_strictMono_in_missedVariance n sigma2_base
     (missedSelectedVariance
       (stabilizingSelectionValidationModel n sigma2_base
-        (equilibriumEffectVariance v_mut_height s_height) Ns_height))
+        (stabilizingSelectedArchitectureVariance v_mutation s) Ns_stab))
     (missedSelectedVariance
-      (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune))
-    h_n h_sigma h_missed_height_nonneg h_missed_lt
+      (fluctuatingSelectionValidationModel n sigma2_base
+        (fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta_fluct tau_fluct)
+        t_div tau_fluct))
+    h_n h_sigma h_missed_stab_nonneg h_missed_lt
 
 end ModelComparison
 
@@ -820,190 +843,450 @@ that can be compared with Wang et al.'s findings.
 
 section GeneralPredictions
 
-/-- Observable portability-ratio prediction combining neutral drift, LD tagging,
-    and cross-population effect conservation.
+/-- Exact retained target signal fraction from LD tagging retention and
+    cross-population effect conservation. This is the squared transported
+    score/target-liability correlation in the standardized shared-signal model
+    below. -/
+noncomputable def crossPopulationSignalRetention
+    (ldFactor effectCorrelation : ℝ) : ℝ :=
+  ldFactor * effectCorrelation ^ 2
 
-    The first factor is the neutral-drift target/source `R²` ratio implied by
-    the source `R²` and source/target `F_ST`. The second factor, `ldFactor`,
-    accounts for LD tagging retention in the target population. The third
-    factor, `ρ²`, accounts for loss of portability from cross-population effect
-    decorrelation. -/
+/-- Exact variance of the present-day target genetic signal. -/
+noncomputable def targetSignalVariance
+    (V_A fstTarget : ℝ) : ℝ :=
+  presentDayPGSVariance V_A fstTarget
+
+/-- Exact variance of the target genetic signal component tagged by the
+    deployed source-trained score. `ldFactor` is the literal squared tagging
+    correlation, so it scales the target signal variance directly. -/
+noncomputable def taggedTargetSignalVariance
+    (V_A fstTarget ldFactor : ℝ) : ℝ :=
+  ldFactor * targetSignalVariance V_A fstTarget
+
+/-- Exact variance of the portable tagged component that survives
+    cross-population effect drift. This is the tagged-signal variance multiplied
+    by the exact squared cross-population effect correlation. -/
+noncomputable def transportedPortableComponentVariance
+    (V_A fstTarget ldFactor effectCorrelation : ℝ) : ℝ :=
+  effectCorrelation ^ 2 * taggedTargetSignalVariance V_A fstTarget ldFactor
+
+/-- Orthogonal nuisance variance added to keep the deployed score on the target
+    liability variance scale. This is the unretained portion of the target
+    genetic signal variance in the explicit transported-score model. -/
+noncomputable def transportedOrthogonalNuisanceVariance
+    (V_A fstTarget ldFactor effectCorrelation : ℝ) : ℝ :=
+  targetSignalVariance V_A fstTarget -
+    transportedPortableComponentVariance V_A fstTarget ldFactor effectCorrelation
+
+/-- Exact target score/phenotype covariance in the explicit LD-tagging plus
+    cross-population effect model.
+
+    The covariance is derived as correlation times product of standard
+    deviations between the portable tagged component and the target genetic
+    signal. This makes the attenuation law a consequence of the score model
+    rather than the definition of the metric. -/
+noncomputable def transportedScorePhenotypeCov
+    (V_A fstTarget ldFactor effectCorrelation : ℝ) : ℝ :=
+  effectCorrelation *
+    Real.sqrt
+      (taggedTargetSignalVariance V_A fstTarget ldFactor *
+        targetSignalVariance V_A fstTarget)
+
+/-- Exact transported score variance under the standardized target-liability
+    score scale. It is the sum of the retained portable component and the
+    orthogonal nuisance component. -/
+noncomputable def transportedScoreVariance
+    (V_A fstTarget ldFactor effectCorrelation : ℝ) : ℝ :=
+  transportedPortableComponentVariance V_A fstTarget ldFactor effectCorrelation +
+    transportedOrthogonalNuisanceVariance V_A fstTarget ldFactor effectCorrelation
+
+/-- Exact transported target outcome variance in the present-day drift model. -/
+noncomputable def transportedTargetOutcomeVariance
+    (V_A V_E fstTarget : ℝ) : ℝ :=
+  targetSignalVariance V_A fstTarget + V_E
+
+/-- Exact target `R²` under the standardized transported-score model:
+    `Cov(score, Y)^2 / (Var(score) Var(Y))`. -/
+noncomputable def empiricalTargetR2
+    (V_A V_E fstTarget ldFactor effectCorrelation : ℝ) : ℝ :=
+  let cov := transportedScorePhenotypeCov V_A fstTarget ldFactor effectCorrelation
+  let vScore := transportedScoreVariance V_A fstTarget ldFactor effectCorrelation
+  let vY := transportedTargetOutcomeVariance V_A V_E fstTarget
+  cov ^ 2 / (vScore * vY)
+
+/-- The portable component variance is exactly retained-signal fraction times
+    target signal variance. -/
+theorem transportedPortableComponentVariance_eq_retainedSignal_mul_targetSignalVariance
+    (V_A fstTarget ldFactor effectCorrelation : ℝ) :
+    transportedPortableComponentVariance V_A fstTarget ldFactor effectCorrelation =
+      crossPopulationSignalRetention ldFactor effectCorrelation *
+        targetSignalVariance V_A fstTarget := by
+  unfold transportedPortableComponentVariance crossPopulationSignalRetention
+    taggedTargetSignalVariance
+  ring
+
+/-- In the explicit transported-score model, the deployed score is standardized
+    to the target signal variance exactly by construction. -/
+theorem transportedScoreVariance_eq_targetSignalVariance
+    (V_A fstTarget ldFactor effectCorrelation : ℝ) :
+    transportedScoreVariance V_A fstTarget ldFactor effectCorrelation =
+      targetSignalVariance V_A fstTarget := by
+  unfold transportedScoreVariance transportedOrthogonalNuisanceVariance
+  ring
+
+/-- The exact transported score/phenotype covariance squared equals portable
+    component variance times target signal variance. This derives the key
+    covariance identity from the LD-tagging and effect-correlation model. -/
+theorem transportedScorePhenotypeCov_sq_eq_portableVariance_mul_targetSignalVariance
+    (V_A fstTarget ldFactor effectCorrelation : ℝ)
+    (hVA : 0 < V_A)
+    (hfstT_lt_one : fstTarget < 1)
+    (h_ld : 0 ≤ ldFactor) :
+    transportedScorePhenotypeCov V_A fstTarget ldFactor effectCorrelation ^ 2 =
+      transportedPortableComponentVariance V_A fstTarget ldFactor effectCorrelation *
+        targetSignalVariance V_A fstTarget := by
+  have hsig_pos : 0 < targetSignalVariance V_A fstTarget := by
+    unfold targetSignalVariance presentDayPGSVariance
+    have h_one_minus : 0 < 1 - fstTarget := by linarith
+    exact mul_pos h_one_minus hVA
+  have hsqrt :
+      0 ≤
+        taggedTargetSignalVariance V_A fstTarget ldFactor *
+          targetSignalVariance V_A fstTarget := by
+    unfold taggedTargetSignalVariance
+    exact mul_nonneg (mul_nonneg h_ld (le_of_lt hsig_pos)) (le_of_lt hsig_pos)
+  unfold transportedScorePhenotypeCov
+  have h_expand :
+      (effectCorrelation *
+          Real.sqrt
+            (taggedTargetSignalVariance V_A fstTarget ldFactor *
+              targetSignalVariance V_A fstTarget)) ^ 2 =
+        effectCorrelation ^ 2 *
+          (Real.sqrt
+            (taggedTargetSignalVariance V_A fstTarget ldFactor *
+              targetSignalVariance V_A fstTarget) ^ 2) := by
+    ring
+  rw [h_expand, Real.sq_sqrt hsqrt]
+  rw [transportedPortableComponentVariance_eq_retainedSignal_mul_targetSignalVariance]
+  unfold crossPopulationSignalRetention taggedTargetSignalVariance
+    targetSignalVariance
+  ring
+
+/-- In the standardized transported-score model, the exact transported target
+    `R²` equals retained signal fraction times the exact neutral present-day
+    target `R²`. The attenuation law is therefore a derived identity for the
+    exact metric, not part of the metric definition itself. -/
+theorem empiricalTargetR2_eq_retained_signal_mul_presentDayR2
+    (V_A V_E fstTarget ldFactor effectCorrelation : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstT_lt_one : fstTarget < 1)
+    (h_ld : 0 ≤ ldFactor) :
+    empiricalTargetR2 V_A V_E fstTarget ldFactor effectCorrelation =
+      crossPopulationSignalRetention ldFactor effectCorrelation *
+        presentDayR2 V_A V_E fstTarget := by
+  have hsig_pos : 0 < presentDayPGSVariance V_A fstTarget := by
+    unfold presentDayPGSVariance
+    have h_one_minus : 0 < 1 - fstTarget := by linarith
+    exact mul_pos h_one_minus hVA
+  have hsig_ne : targetSignalVariance V_A fstTarget ≠ 0 := ne_of_gt (by
+    simpa [targetSignalVariance] using hsig_pos)
+  have hvy_pos : 0 < transportedTargetOutcomeVariance V_A V_E fstTarget := by
+    unfold transportedTargetOutcomeVariance targetSignalVariance
+    linarith
+  have hvy_ne : transportedTargetOutcomeVariance V_A V_E fstTarget ≠ 0 := ne_of_gt hvy_pos
+  have h_cov_sq :
+      transportedScorePhenotypeCov V_A fstTarget ldFactor effectCorrelation ^ 2 =
+        transportedPortableComponentVariance V_A fstTarget ldFactor effectCorrelation *
+          targetSignalVariance V_A fstTarget := by
+    exact transportedScorePhenotypeCov_sq_eq_portableVariance_mul_targetSignalVariance
+      V_A fstTarget ldFactor effectCorrelation hVA hfstT_lt_one h_ld
+  have h_score_var :
+      transportedScoreVariance V_A fstTarget ldFactor effectCorrelation =
+        targetSignalVariance V_A fstTarget := by
+    exact transportedScoreVariance_eq_targetSignalVariance
+      V_A fstTarget ldFactor effectCorrelation
+  have h_portable :
+      transportedPortableComponentVariance V_A fstTarget ldFactor effectCorrelation =
+        crossPopulationSignalRetention ldFactor effectCorrelation *
+          targetSignalVariance V_A fstTarget := by
+    exact transportedPortableComponentVariance_eq_retainedSignal_mul_targetSignalVariance
+      V_A fstTarget ldFactor effectCorrelation
+  rw [empiricalTargetR2, h_cov_sq, h_score_var, h_portable]
+  unfold transportedTargetOutcomeVariance presentDayR2 targetSignalVariance
+  field_simp [hsig_ne, hvy_ne]
+
+/-- Exact bridge from the explicit LD-tagging/effect-correlation score model to
+    the observable-only population-genetic core transport theorem. When the
+    source score comes from the same `V_A, V_E, fstSource` drift model, the
+    transported target `R²` equals retained signal fraction times the core
+    observable transported target `R²`. -/
+theorem empiricalTargetR2_eq_retained_signal_mul_targetR2FromObservables
+    (V_A V_E fstSource fstTarget ldFactor effectCorrelation : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
+    (h_ld : 0 ≤ ldFactor) :
+    empiricalTargetR2 V_A V_E fstTarget ldFactor effectCorrelation =
+      crossPopulationSignalRetention ldFactor effectCorrelation *
+        targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget := by
+  rw [empiricalTargetR2_eq_retained_signal_mul_presentDayR2
+        V_A V_E fstTarget ldFactor effectCorrelation hVA hVE hfstT_lt_one h_ld]
+  rw [← targetR2FromObservables_eq_presentDayR2 V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one]
+
+/-- Exact target/source `R²` portability ratio under the explicit drift-plus-LD
+    score-covariance model. The denominator is exact source `R²`, and the
+    numerator is exact transported target `R²`. The attenuation factor
+    `ldFactor × effectCorrelation²` is recovered only as a theorem. -/
 noncomputable def empiricalPortabilityRatio
-    (r2Source fstSource fstTarget ldFactor rho : ℝ) : ℝ :=
-  (targetR2FromObservables r2Source fstSource fstTarget / r2Source) * (ldFactor * rho ^ 2)
+    (V_A V_E fstSource fstTarget ldFactor effectCorrelation : ℝ) : ℝ :=
+  empiricalTargetR2 V_A V_E fstTarget ldFactor effectCorrelation /
+    presentDayR2 V_A V_E fstSource
+
+/-- Exact target/source portability ratio under the standardized transported-
+    score model. The numerator is literal target `R²`, not a factorized proxy. -/
+theorem empiricalPortabilityRatio_eq_retained_signal_mul_neutral_ratio
+    (V_A V_E fstSource fstTarget ldFactor effectCorrelation : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
+    (h_ld : 0 ≤ ldFactor) :
+    empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor effectCorrelation =
+      crossPopulationSignalRetention ldFactor effectCorrelation *
+        (presentDayR2 V_A V_E fstTarget / presentDayR2 V_A V_E fstSource) := by
+  have h_src_pos : 0 < presentDayR2 V_A V_E fstSource := by
+    unfold presentDayR2
+    have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
+      unfold presentDayPGSVariance
+      have h_one_minus : 0 < 1 - fstSource := by linarith
+      exact mul_pos h_one_minus hVA
+    exact div_pos hv_pos (by linarith)
+  unfold empiricalPortabilityRatio
+  rw [empiricalTargetR2_eq_retained_signal_mul_presentDayR2
+        V_A V_E fstTarget ldFactor effectCorrelation hVA hVE hfstT_lt_one h_ld]
+  field_simp [ne_of_gt h_src_pos]
+
+/-- Exact target/source portability ratio in the explicit transported-score
+    model, written directly against the core observable-only transport ratio.
+    This is the cohesion theorem linking the validation layer back to the
+    population-genetic drift core. -/
+theorem empiricalPortabilityRatio_eq_retained_signal_mul_observableRatio
+    (V_A V_E fstSource fstTarget ldFactor effectCorrelation : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
+    (h_ld : 0 ≤ ldFactor) :
+    empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor effectCorrelation =
+      crossPopulationSignalRetention ldFactor effectCorrelation *
+        (targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget /
+          presentDayR2 V_A V_E fstSource) := by
+  rw [empiricalPortabilityRatio_eq_retained_signal_mul_neutral_ratio
+        V_A V_E fstSource fstTarget ldFactor effectCorrelation
+        hVA hVE hfstS_lt_one hfstT_lt_one h_ld]
+  rw [← targetR2FromObservables_eq_presentDayR2 V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one]
 
 /-- **Empirical portability prediction lies strictly below the neutral drift baseline.**
-    For a fixed source score and ancestry pair, any additional LD loss
-    (`ldFactor ≤ 1`) together with imperfect cross-population effect
-    conservation (`ρ < 1`) strictly attenuates the observable neutral-drift
-    portability ratio. This is a directly testable prediction: observed
-    target/source `R²` should fall below the `F_ST`-only neutral benchmark by a
-    multiplicative LD-and-effect-correlation factor. -/
+    For a fixed ancestry pair and source architecture, any retained-signal
+    fraction strictly below `1` yields an exact target/source `R²` ratio below
+    the exact drift-only baseline from the observable population-genetic core.
+    This is a statement about the actual transported `R²` metric in the
+    explicit variance model, not a product surrogate. -/
 theorem empirical_portability_ratio_lt_neutral_drift_prediction
-    (r2Source fstSource fstTarget ldFactor rho : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (V_A V_E fstSource fstTarget ldFactor rho : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (h_fstT_lt_one : fstTarget < 1)
     (h_ld : 0 < ldFactor) (h_ld_le : ldFactor ≤ 1)
-    (h_rho : 0 ≤ rho) (h_rho_lt : rho < 1) :
-    empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor rho <
-      targetR2FromObservables r2Source fstSource fstTarget / r2Source ∧
-    empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor rho < 1 := by
-  rcases h_r2 with ⟨hr2_pos, hr2_lt_one⟩
-  rcases h_fst_bounds with ⟨hfstS_nonneg, hfstT_lt_one⟩
-  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
-    sourceVarianceFromR2_pos r2Source ⟨hr2_pos, hr2_lt_one⟩
-  have hvT_pos :
-      0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget := by
-    exact targetVarianceFromSource_pos (sourceVarianceFromR2 r2Source)
-      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
-  have h_target_pos : 0 < targetR2FromObservables r2Source fstSource fstTarget := by
-    unfold targetR2FromObservables r2FromVarianceScaleOne
-    have hden : 0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget + 1 := by
-      linarith
-    exact div_pos hvT_pos hden
-  have h_neutral_pos :
-      0 < targetR2FromObservables r2Source fstSource fstTarget / r2Source := by
-    exact div_pos h_target_pos hr2_pos
-  have h_neutral_lt_one :
-      targetR2FromObservables r2Source fstSource fstTarget / r2Source < 1 := by
-    exact portability_ratio_from_observables r2Source fstSource fstTarget
-      ⟨hr2_pos, hr2_lt_one⟩ h_fst ⟨hfstS_nonneg, hfstT_lt_one⟩
-  have h_sq_lt_one : rho ^ 2 < 1 := by
-    nlinarith [sq_nonneg rho]
-  have h_atten_nonneg : 0 ≤ ldFactor * rho ^ 2 := by
-    exact mul_nonneg (le_of_lt h_ld) (sq_nonneg rho)
-  have h_attentuation_lt_one : ldFactor * rho ^ 2 < 1 := by
+    (h_rho : 0 < rho) (h_rho_lt : rho < 1) :
+    empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor rho <
+      targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget /
+        presentDayR2 V_A V_E fstSource ∧
+    empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor rho < 1 := by
+  have hfstS_lt_one : fstSource < 1 := lt_trans h_fst h_fstT_lt_one
+  have h_ret_pos : 0 < crossPopulationSignalRetention ldFactor rho := by
+    unfold crossPopulationSignalRetention
+    positivity
+  have h_ret_lt_one : crossPopulationSignalRetention ldFactor rho < 1 := by
+    unfold crossPopulationSignalRetention
+    have h_sq_lt_one : rho ^ 2 < 1 := by
+      nlinarith [sq_nonneg rho]
     have h_le : ldFactor * rho ^ 2 ≤ 1 * rho ^ 2 := by
       exact mul_le_mul_of_nonneg_right h_ld_le (sq_nonneg rho)
     have h_lt : 1 * rho ^ 2 < 1 := by
       simpa using h_sq_lt_one
     exact lt_of_le_of_lt h_le h_lt
-  have h_pred_lt_neutral :
-      empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor rho <
-        targetR2FromObservables r2Source fstSource fstTarget / r2Source := by
-    unfold empiricalPortabilityRatio
-    have hmul :=
-      mul_lt_mul_of_pos_left h_attentuation_lt_one h_neutral_pos
-    simpa [mul_assoc] using hmul
+  have h_ratio_eq :
+      empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor rho =
+        crossPopulationSignalRetention ldFactor rho *
+          (targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget /
+            presentDayR2 V_A V_E fstSource) := by
+    exact empiricalPortabilityRatio_eq_retained_signal_mul_observableRatio
+      V_A V_E fstSource fstTarget ldFactor rho
+      hVA hVE hfstS_lt_one h_fstT_lt_one (le_of_lt h_ld)
+  have h_src_pos : 0 < presentDayR2 V_A V_E fstSource := by
+    unfold presentDayR2
+    have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
+      unfold presentDayPGSVariance
+      have h_one_minus : 0 < 1 - fstSource := by linarith
+      exact mul_pos h_one_minus hVA
+    exact div_pos hv_pos (by linarith)
+  have h_ratio_lt_neutral :
+      empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor rho <
+        targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget /
+          presentDayR2 V_A V_E fstSource := by
+    rw [h_ratio_eq]
+    have h_neutral_pos :
+        0 <
+          targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget /
+            presentDayR2 V_A V_E fstSource := by
+      have h_tgt_pos :
+          0 < targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget := by
+        rw [targetR2FromObservables_eq_presentDayR2 V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one]
+        unfold presentDayR2
+        have hv_pos : 0 < presentDayPGSVariance V_A fstTarget := by
+          unfold presentDayPGSVariance
+          have h_one_minus : 0 < 1 - fstTarget := by linarith
+          exact mul_pos h_one_minus hVA
+        exact div_pos hv_pos (by linarith)
+      exact div_pos h_tgt_pos h_src_pos
+    simpa [mul_comm] using
+      (mul_lt_of_lt_one_right h_neutral_pos h_ret_lt_one)
+  have h_neutral_lt_one :
+      targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget /
+        presentDayR2 V_A V_E fstSource < 1 := by
+    rw [targetR2FromObservables_eq_presentDayR2 V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one]
+    exact portability_ratio_lt_one_of_positive_drift
+      V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fstT_lt_one) h_src_pos
   have h_pred_lt_one :
-      empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor rho < 1 := by
-    exact lt_trans h_pred_lt_neutral h_neutral_lt_one
-  exact ⟨h_pred_lt_neutral, h_pred_lt_one⟩
+      empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor rho < 1 := by
+    exact lt_trans h_ratio_lt_neutral h_neutral_lt_one
+  exact ⟨h_ratio_lt_neutral, h_pred_lt_one⟩
 
 /-- **Traits or target cohorts with better LD retention and more conserved effects
     are predicted to be more portable.**
-    At fixed source `R²` and source/target divergence, the empirical
-    portability ratio is strictly ordered by the product `ldFactor × ρ²`. This
-    is the comparative prediction relevant for simulation or held-out
-    validation: once the ancestry pair is fixed, better LD sharing and higher
-    cross-population effect correlation imply higher target/source `R²`. -/
+    At fixed source and target drift levels, the exact target/source `R²` ratio
+    is strictly ordered by the retained target signal fraction
+    `ldFactor × effectCorrelation²`. This is again an exact metric statement on
+    the transported `R²`, not a bookkeeping comparison of attenuation factors. -/
 theorem empirical_portability_ratio_strictly_orders_by_ld_and_effect_correlation
-    (r2Source fstSource fstTarget ldWorse ldBetter rhoWorse rhoBetter : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
-    (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (V_A V_E fstSource fstTarget ldWorse ldBetter rhoWorse rhoBetter : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
     (h_ldWorse : 0 < ldWorse)
     (h_ld_order : ldWorse ≤ ldBetter)
-    (h_rhoWorse : 0 ≤ rhoWorse)
+    (h_rhoWorse : 0 < rhoWorse)
     (h_rho_order : rhoWorse < rhoBetter) :
-    empiricalPortabilityRatio r2Source fstSource fstTarget ldWorse rhoWorse <
-      empiricalPortabilityRatio r2Source fstSource fstTarget ldBetter rhoBetter := by
-  rcases h_r2 with ⟨hr2_pos, hr2_lt_one⟩
-  rcases h_fst_bounds with ⟨hfstS_nonneg, hfstT_lt_one⟩
-  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
-    sourceVarianceFromR2_pos r2Source ⟨hr2_pos, hr2_lt_one⟩
-  have hvT_pos :
-      0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget := by
-    exact targetVarianceFromSource_pos (sourceVarianceFromR2 r2Source)
-      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
-  have h_target_pos : 0 < targetR2FromObservables r2Source fstSource fstTarget := by
-    unfold targetR2FromObservables r2FromVarianceScaleOne
-    have hden : 0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget + 1 := by
-      linarith
-    exact div_pos hvT_pos hden
-  have h_neutral_pos :
-      0 < targetR2FromObservables r2Source fstSource fstTarget / r2Source := by
-    exact div_pos h_target_pos hr2_pos
-  have h_sq_order : rhoWorse ^ 2 < rhoBetter ^ 2 := by
+    empiricalPortabilityRatio V_A V_E fstSource fstTarget ldWorse rhoWorse <
+      empiricalPortabilityRatio V_A V_E fstSource fstTarget ldBetter rhoBetter := by
+  have h_ret_order_sq : rhoWorse ^ 2 < rhoBetter ^ 2 := by
     nlinarith [sq_nonneg rhoWorse, sq_nonneg rhoBetter]
-  have h_worse_att_lt :
+  have h_ret_worse_lt :
       ldWorse * rhoWorse ^ 2 < ldWorse * rhoBetter ^ 2 := by
-    exact mul_lt_mul_of_pos_left h_sq_order h_ldWorse
-  have h_better_att_ge :
+    exact mul_lt_mul_of_pos_left h_ret_order_sq h_ldWorse
+  have h_ret_better_ge :
       ldWorse * rhoBetter ^ 2 ≤ ldBetter * rhoBetter ^ 2 := by
     exact mul_le_mul_of_nonneg_right h_ld_order (sq_nonneg rhoBetter)
-  have h_att_order :
+  have h_ret_order :
       ldWorse * rhoWorse ^ 2 < ldBetter * rhoBetter ^ 2 := by
-    exact lt_of_lt_of_le h_worse_att_lt h_better_att_ge
+    exact lt_of_lt_of_le h_ret_worse_lt h_ret_better_ge
+  have h_tgt_r2_eq_worse :
+      empiricalTargetR2 V_A V_E fstTarget ldWorse rhoWorse =
+        crossPopulationSignalRetention ldWorse rhoWorse *
+          presentDayR2 V_A V_E fstTarget := by
+    exact empiricalTargetR2_eq_retained_signal_mul_presentDayR2
+      V_A V_E fstTarget ldWorse rhoWorse hVA hVE hfstT_lt_one (le_of_lt h_ldWorse)
+  have h_tgt_r2_eq_better :
+      empiricalTargetR2 V_A V_E fstTarget ldBetter rhoBetter =
+        crossPopulationSignalRetention ldBetter rhoBetter *
+          presentDayR2 V_A V_E fstTarget := by
+    have h_ldBetter_nonneg : 0 ≤ ldBetter := le_trans (le_of_lt h_ldWorse) h_ld_order
+    exact empiricalTargetR2_eq_retained_signal_mul_presentDayR2
+      V_A V_E fstTarget ldBetter rhoBetter hVA hVE hfstT_lt_one h_ldBetter_nonneg
+  have h_source_pos : 0 < presentDayR2 V_A V_E fstSource := by
+    unfold presentDayR2
+    have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
+      unfold presentDayPGSVariance
+      have h_one_minus : 0 < 1 - fstSource := by linarith
+      exact mul_pos h_one_minus hVA
+    exact div_pos hv_pos (by linarith)
+  have h_target_base_pos : 0 < presentDayR2 V_A V_E fstTarget := by
+    unfold presentDayR2
+    have hv_pos : 0 < presentDayPGSVariance V_A fstTarget := by
+      unfold presentDayPGSVariance
+      have h_one_minus : 0 < 1 - fstTarget := by linarith
+      exact mul_pos h_one_minus hVA
+    exact div_pos hv_pos (by linarith)
+  have h_target_r2_lt :
+      empiricalTargetR2 V_A V_E fstTarget ldWorse rhoWorse <
+        empiricalTargetR2 V_A V_E fstTarget ldBetter rhoBetter := by
+    rw [h_tgt_r2_eq_worse, h_tgt_r2_eq_better]
+    exact mul_lt_mul_of_pos_right h_ret_order h_target_base_pos
   unfold empiricalPortabilityRatio
-  have hmul := mul_lt_mul_of_pos_left h_att_order h_neutral_pos
-  simpa [mul_assoc] using hmul
+  simpa [div_eq_mul_inv] using
+    mul_lt_mul_of_pos_right h_target_r2_lt (inv_pos.mpr h_source_pos)
 
-/-- **Selection predicts both lower portability and stronger evidence for a
-    selection-aware model.**
-    This theorem ties the empirical portability ratio in this section to the
-    explicit validation-model machinery proved above. For the same ancestry pair
-    and LD-retention factor, compare a height-like trait with stabilizing
-    cross-pop effect correlation `effectCorrelationStabilizing Ns_height` to an
-    immune-like trait with fluctuating-selection correlation
-    `fluctuatingEffectCorrelation t τ_immune`.
+/-- **A fluctuating regime predicts both lower portability and stronger evidence
+    for a selection-aware model than a stabilizing regime built from the same
+    baseline architecture.**
 
-    If the immune-like trait has strictly lower cross-pop effect correlation and
-    at least as much selection-sensitive architecture variance, then:
-    1. its predicted target/source `R²` ratio is strictly lower, and
-    2. the exact Gaussian held-out LRT in favor of a selection-aware model is
-       strictly larger.
-
-    So the same selection mechanism that worsens portability also strengthens
-    empirical evidence against a neutral portability model. -/
+    The portability comparison uses the exact target/source `R²` ratio, while
+    the validation comparison uses the exact Gaussian held-out LRT. Both are
+    derived from the regime formulas themselves: the fluctuating regime gets a
+    larger selected-architecture variance from OU optimum motion and a lower
+    effect correlation once `tau` drops below the exact stabilizing threshold. -/
 theorem selection_reduces_portability
-    (r2Source fstSource fstTarget ldFactor : ℝ)
-    (n sigma2_base v_mut_height s_height Ns_height immuneSelectedVar t τ_immune : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
-    (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (V_A V_E fstSource fstTarget ldFactor : ℝ)
+    (n sigma2_base v_mutation s Ns_stab sigmaTheta_fluct t_div tau_fluct : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
     (h_ld : 0 < ldFactor)
     (h_n : 0 < n)
     (h_sigma : 0 < sigma2_base)
-    (h_vmut_height : 0 ≤ v_mut_height)
-    (h_s_height : 0 < s_height)
-    (h_Ns_height : 1 < Ns_height)
-    (h_immuneVar : 0 < immuneSelectedVar)
-    (h_var :
-      equilibriumEffectVariance v_mut_height s_height ≤ immuneSelectedVar)
-    (h_corr :
-      fluctuatingEffectCorrelation t τ_immune <
-        effectCorrelationStabilizing Ns_height) :
-    empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor
-        (fluctuatingEffectCorrelation t τ_immune) <
-      empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor
-        (effectCorrelationStabilizing Ns_height) ∧
+    (h_vmut : 0 ≤ v_mutation)
+    (h_s : 0 < s)
+    (h_Ns : 1 < Ns_stab)
+    (h_sigmaTheta : 0 < sigmaTheta_fluct)
+    (h_t_div : 0 < t_div)
+    (h_tau : 0 < tau_fluct)
+    (h_tau_threshold :
+      tau_fluct < t_div / (-Real.log (effectCorrelationStabilizing Ns_stab))) :
+    empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor
+        (fluctuatingEffectCorrelation t_div tau_fluct) <
+      empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor
+        (effectCorrelationStabilizing Ns_stab) ∧
     selectionModelLRT
       (stabilizingSelectionValidationModel n sigma2_base
-        (equilibriumEffectVariance v_mut_height s_height) Ns_height) <
+        (stabilizingSelectedArchitectureVariance v_mutation s) Ns_stab) <
     selectionModelLRT
-      (fluctuatingSelectionValidationModel n sigma2_base immuneSelectedVar t τ_immune) := by
+      (fluctuatingSelectionValidationModel n sigma2_base
+        (fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta_fluct tau_fluct)
+        t_div tau_fluct) := by
+  have h_corr :
+      fluctuatingEffectCorrelation t_div tau_fluct <
+        effectCorrelationStabilizing Ns_stab := by
+    exact fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
+      t_div tau_fluct Ns_stab h_t_div h_tau h_Ns h_tau_threshold
   constructor
   · exact empirical_portability_ratio_strictly_orders_by_ld_and_effect_correlation
-      r2Source fstSource fstTarget ldFactor ldFactor
-      (fluctuatingEffectCorrelation t τ_immune)
-      (effectCorrelationStabilizing Ns_height)
-      h_r2 h_fst h_fst_bounds h_ld le_rfl
+      V_A V_E fstSource fstTarget ldFactor ldFactor
+      (fluctuatingEffectCorrelation t_div tau_fluct)
+      (effectCorrelationStabilizing Ns_stab)
+      hVA hVE hfstS_lt_one hfstT_lt_one h_ld le_rfl
       (by
         unfold fluctuatingEffectCorrelation
-        exact le_of_lt (Real.exp_pos _))
+        exact Real.exp_pos _)
       h_corr
   · exact selection_model_preferred_when_better_fit
-      n sigma2_base v_mut_height s_height Ns_height immuneSelectedVar t τ_immune
-      h_n h_sigma h_vmut_height h_s_height h_Ns_height h_immuneVar h_var h_corr
+      n sigma2_base v_mutation s Ns_stab sigmaTheta_fluct t_div tau_fluct
+      h_n h_sigma h_vmut h_s h_Ns h_sigmaTheta h_t_div h_tau h_tau_threshold
 
 /-- **Shorter selection autocorrelation predicts both lower portability and
     stronger held-out evidence for a selection-aware model.**
-    This is the mechanism-level corollary of the previous theorem for two traits
-    governed by fluctuating selection with the same ancestry pair, sample size,
-    and LD-retention factor. If one trait has a shorter selection
-    autocorrelation time, then `SelectionArchitecture.immune_short_autocorrelation`
+    This is the mechanism-level corollary of the previous theorem for two
+    fluctuating regimes with the same ancestry pair, sample size, and
+    LD-retention factor. If one regime has a shorter selection autocorrelation
+    time, then `SelectionArchitecture.short_autocorrelation_lower_correlation`
     gives a strictly lower cross-population effect correlation for the same
     divergence time. In that case:
     1. the predicted target/source `R²` portability ratio is strictly lower, and
@@ -1015,11 +1298,11 @@ theorem selection_reduces_portability
     fluctuating-selection mechanism already formalized elsewhere in the repo,
     rather than leaving the correlation ordering as a free assumption. -/
 theorem shorter_autocorrelation_reduces_portability_and_increases_selection_evidence
-    (r2Source fstSource fstTarget ldFactor : ℝ)
+    (V_A V_E fstSource fstTarget ldFactor : ℝ)
     (n sigma2_base selectedVar_long selectedVar_short t τ_long τ_short : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
-    (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
     (h_ld : 0 < ldFactor)
     (h_n : 0 < n)
     (h_sigma : 0 < sigma2_base)
@@ -1030,9 +1313,9 @@ theorem shorter_autocorrelation_reduces_portability_and_increases_selection_evid
     (h_tau_long : 0 < τ_long)
     (h_shorter : τ_short < τ_long)
     (h_t : 0 < t) :
-    empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor
+    empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor
         (fluctuatingEffectCorrelation t τ_short) <
-      empiricalPortabilityRatio r2Source fstSource fstTarget ldFactor
+      empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor
         (fluctuatingEffectCorrelation t τ_long) ∧
     selectionModelLRT
       (fluctuatingSelectionValidationModel n sigma2_base selectedVar_long t τ_long) <
@@ -1041,7 +1324,7 @@ theorem shorter_autocorrelation_reduces_portability_and_increases_selection_evid
   have h_corr :
       fluctuatingEffectCorrelation t τ_short <
         fluctuatingEffectCorrelation t τ_long := by
-    exact immune_short_autocorrelation τ_short τ_long t
+    exact short_autocorrelation_lower_correlation τ_short τ_long t
       h_tau_short h_tau_long h_shorter h_t
   have h_rho_long_nonneg : 0 ≤ fluctuatingEffectCorrelation t τ_long := by
     unfold fluctuatingEffectCorrelation
@@ -1082,13 +1365,13 @@ theorem shorter_autocorrelation_reduces_portability_and_increases_selection_evid
       h_corr h_var_order
   constructor
   · exact empirical_portability_ratio_strictly_orders_by_ld_and_effect_correlation
-      r2Source fstSource fstTarget ldFactor ldFactor
+      V_A V_E fstSource fstTarget ldFactor ldFactor
       (fluctuatingEffectCorrelation t τ_short)
       (fluctuatingEffectCorrelation t τ_long)
-      h_r2 h_fst h_fst_bounds h_ld le_rfl
+      hVA hVE hfstS_lt_one hfstT_lt_one h_ld le_rfl
       (by
         unfold fluctuatingEffectCorrelation
-        exact le_of_lt (Real.exp_pos _))
+        exact Real.exp_pos _)
       h_corr
   · rw [selectionModelLRT_eq_sampleSize_mul_log_residual_gap
           (fluctuatingSelectionValidationModel n sigma2_base selectedVar_long t τ_long)

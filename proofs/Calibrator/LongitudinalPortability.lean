@@ -1,5 +1,6 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
+import Calibrator.PGSCalibrationTheory
 import Calibrator.OpenQuestions
 
 namespace Calibrator
@@ -262,30 +263,34 @@ risk) drifts over time as disease incidence changes.
 
 section CalibrationDrift
 
-/-- **Calibration slope changes with prevalence shift.**
-    If disease prevalence changes from π₁ to π₂,
-    the calibration slope of a PGS changes. -/
-noncomputable def calibrationSlope (beta_log_or π : ℝ) : ℝ :=
-  beta_log_or * π * (1 - π)
+/-- Exact temporal calibration-in-the-large (CITL) for a cohort with observed
+prevalence `π_obs` and mean predicted risk `π_pred`. -/
+noncomputable def temporalCalibrationInTheLarge (π_obs π_pred : ℝ) : ℝ :=
+  calibrationInTheLarge π_obs π_pred
 
-/-- Calibration slope depends on prevalence. -/
-theorem calibration_slope_changes_with_prevalence
-    (beta π₁ π₂ : ℝ)
-    (h_beta : 0 < beta) (h_π₁ : 0 < π₁) (h_π₁_lt : π₁ < 1)
-    (h_π₂ : 0 < π₂) (h_π₂_lt : π₂ < 1)
-    (h_diff : π₁ ≠ π₂)
-    (h_not_complement : π₁ + π₂ ≠ 1) :
-    calibrationSlope beta π₁ ≠ calibrationSlope beta π₂ := by
-  unfold calibrationSlope
-  intro h
-  have : π₁ * (1 - π₁) = π₂ * (1 - π₂) := by
-    have h_beta_ne : beta ≠ 0 := h_beta.ne'
-    field_simp at h
-    linarith
-  have h_factor : (π₁ - π₂) * (1 - π₁ - π₂) = 0 := by nlinarith
-  rcases mul_eq_zero.mp h_factor with h1 | h2
-  · exact h_diff (by linarith)
-  · exact h_not_complement (by linarith)
+/-- Exact temporal calibration drift from a prevalence shift with fixed mean
+prediction. The temporal CITL shift equals the prevalence shift exactly. -/
+theorem temporal_calibration_changes_with_prevalence
+    (π₁ π₂ mean_pred : ℝ) :
+    temporalCalibrationInTheLarge π₂ mean_pred -
+      temporalCalibrationInTheLarge π₁ mean_pred = π₂ - π₁ := by
+  simpa [temporalCalibrationInTheLarge] using
+    prevalence_shift_changes_calibration mean_pred π₁ π₂
+
+/-- If the source cohort is CITL-calibrated, any temporal prevalence shift
+produces a nonzero temporal CITL in the target cohort. -/
+theorem temporal_calibration_drift_nonzero_of_prevalence_shift
+    (π₁ π₂ mean_pred : ℝ)
+    (h_src_cal : temporalCalibrationInTheLarge π₁ mean_pred = 0)
+    (h_shift : π₁ ≠ π₂) :
+    temporalCalibrationInTheLarge π₂ mean_pred ≠ 0 := by
+  have h_delta :
+      temporalCalibrationInTheLarge π₂ mean_pred -
+        temporalCalibrationInTheLarge π₁ mean_pred = π₂ - π₁ :=
+    temporal_calibration_changes_with_prevalence π₁ π₂ mean_pred
+  intro hzero
+  rw [hzero, h_src_cal] at h_delta
+  exact h_shift (by linarith)
 
 /-- **Recalibration restores accuracy.**
     Fitting an intercept adjustment on target data
@@ -293,15 +298,21 @@ theorem calibration_slope_changes_with_prevalence
 noncomputable def recalibratedRisk (original_risk intercept_adj : ℝ) : ℝ :=
   original_risk + intercept_adj
 
-/-- **Brier score decomposition shows calibration drift.**
-    Brier = Calibration + Refinement.
-    Under temporal drift, calibration component increases
-    while refinement (discrimination) may stay stable. -/
+/-- Exact temporal Brier risk under a calibrated Bernoulli model with
+prevalence `π` and explained-risk fraction `r2`. -/
+noncomputable def temporalExactBrierRisk (π r2 : ℝ) : ℝ :=
+  exactCalibratedBrierRiskFromR2 π r2
+
+/-- With discrimination held fixed, temporal prevalence changes that increase
+the Bernoulli variance factor strictly worsen exact Brier risk. -/
 theorem brier_calibration_worsens_discrimination_stable
-    (cal₁ cal₂ ref₁ ref₂ : ℝ)
-    (h_cal_worse : cal₁ < cal₂)
-    (h_ref_same : ref₁ = ref₂) :
-    cal₁ + ref₁ < cal₂ + ref₂ := by linarith
+    (π₁ π₂ r2 : ℝ)
+    (h_r2 : r2 < 1)
+    (h_prev : π₁ * (1 - π₁) < π₂ * (1 - π₂)) :
+    temporalExactBrierRisk π₁ r2 < temporalExactBrierRisk π₂ r2 := by
+  unfold temporalExactBrierRisk exactCalibratedBrierRiskFromR2
+  have h_factor : 0 < 1 - r2 := by linarith
+  nlinarith
 
 end CalibrationDrift
 

@@ -194,20 +194,31 @@ theorem calibration_in_large
   rw [← sub_ne_zero]
   rwa [← mean_shift_eq_diff]
 
-/-- **Calibration slope.**
-    A well-calibrated model has slope = 1 in the regression of
-    outcome on predicted risk. When R² drops by factor ρ < 1 in
-    the target, the calibration slope becomes ρ ≠ 1. The calibration
-    slope equals R²_target/R²_source, which deviates from 1 when
-    portability is imperfect. -/
+/-- Literal linear calibration slope for a transported source-calibrated score.
+In the additive drift model this is the population regression slope
+`Cov(Y_target, Ŷ_source) / Var(Ŷ_source)`, which equals the ratio of target to
+source score variance when effect sizes are fixed and only allele frequencies
+drift. -/
+noncomputable def transportedLinearCalibrationSlope
+    (V_A fst_source fst_target : ℝ) : ℝ :=
+  presentDayPGSVariance V_A fst_target / presentDayPGSVariance V_A fst_source
+
+/-- **Calibration slope drops below 1 under positive drift.**
+    This is a literal cov/var calibration slope result, not an `R²` ratio
+    surrogate. -/
 theorem calibration_slope_one
-    (r2_source r2_target : ℝ)
-    (h_source_pos : 0 < r2_source)
-    (h_target_pos : 0 < r2_target)
-    (h_loss : r2_target < r2_source) :
-    r2_target / r2_source < 1 := by
-  rw [div_lt_one h_source_pos]
-  exact h_loss
+    (V_A fst_source fst_target : ℝ)
+    (hVA : 0 < V_A)
+    (h_drift : fst_source < fst_target)
+    (h_target_le_one : fst_target ≤ 1) :
+    transportedLinearCalibrationSlope V_A fst_source fst_target < 1 := by
+  have h_source_lt_one : fst_source < 1 := lt_of_lt_of_le h_drift h_target_le_one
+  unfold transportedLinearCalibrationSlope presentDayPGSVariance
+  have h_den : 0 < (1 - fst_source) * V_A := by
+    have h_one_minus : 0 < 1 - fst_source := by linarith
+    exact mul_pos h_one_minus hVA
+  rw [div_lt_one h_den]
+  nlinarith [mul_lt_mul_of_pos_right h_drift hVA]
 
 /-- **Portability loss disrupts calibration (derived from drift model).**
     Under the drift model, when fstT > fstS:
@@ -218,20 +229,8 @@ theorem portability_disrupts_calibration
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT) (hfstT : fstT ≤ 1) :
-    -- Calibration slope = R²_target / R²_source < 1
-    presentDayR2 V_A V_E fstT / presentDayR2 V_A V_E fstS < 1 := by
-  have h_degrades := drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT
-  have h_source_pos : 0 < presentDayR2 V_A V_E fstS := by
-    have h_target_pos_or := le_of_lt h_degrades
-    unfold presentDayR2 presentDayPGSVariance at *
-    have h1fstT : 0 ≤ 1 - fstT := by linarith
-    have h_num_t : 0 ≤ (1 - fstT) * V_A := mul_nonneg h1fstT (le_of_lt hVA)
-    have h_denom_t : 0 < (1 - fstT) * V_A + V_E := by linarith
-    have h_nonneg_t : 0 ≤ (1 - fstT) * V_A / ((1 - fstT) * V_A + V_E) :=
-      div_nonneg h_num_t (le_of_lt h_denom_t)
-    linarith
-  rw [div_lt_one h_source_pos]
-  exact h_degrades
+    transportedLinearCalibrationSlope V_A fstS fstT < 1 := by
+  exact calibration_slope_one V_A fstS fstT hVA hfst hfstT
 
 /-- **Recalibration restores calibration-in-the-large.**
     If the PGS mean in the target is `pgsMean β p_target` while the

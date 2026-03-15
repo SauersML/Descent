@@ -50,8 +50,8 @@ from the liability threshold model, rather than assuming it axiomatically.
 
 5. **Key insight**: `Φ` is monotone increasing (from the standard normal CDF),
    and the argument to `Φ` is monotone increasing in `R`, so the composition
-   is monotone increasing. This justifies the monotone link functions used
-   in all subsequent theorems.
+   is monotone increasing. This justifies the exact sensitivity/specificity
+   curves used in all subsequent theorems.
 -/
 
 section LiabilityThresholdModel
@@ -186,8 +186,8 @@ theorem liabilitySensitivity_zScore_monotone_in_R
     argument is monotone increasing in R (hence R²), the composition
     `liabilitySensitivity` is monotone increasing in R².
 
-    This is the formal justification for the monotone link functions
-    `sensFromR2` used throughout the NRI and clinical utility theorems.
+    This is the formal justification for the exact operating-point sensitivity
+    curve `sensFromR2` used throughout the NRI and clinical utility theorems.
 
     The proof structure:
     1. `Φ` is strictly monotone (standard normal CDF property from Mathlib)
@@ -302,16 +302,14 @@ theorem liabilitySpecificity_monotone_in_R2
     mul_lt_mul_of_pos_right h_num_lt h_σ₁_pos
   linarith
 
-/-- **Derived monotone sensitivity link.**
-    From the liability threshold model, we can construct a concrete
-    sensitivity link function that is strictly monotone, justifying
-    the abstract `sensLink` parameter used in NRI and clinical utility
-    theorems.
+/-- **Derived monotone sensitivity curve.**
+    From the liability threshold model, we obtain an exact threshold
+    sensitivity curve that is strictly monotone in `R²`.
 
     Given a liability threshold model `m`, classification threshold `T'`,
-    and strictly monotone Φ, the function `R² ↦ liabilitySensitivity Φ m R² T'`
-    is a valid strictly monotone link on [0, 1]. -/
-theorem liability_model_provides_sensLink
+    and strictly monotone Φ, the function
+    `R² ↦ liabilitySensitivity Φ m R² T'` is strictly monotone on `[0, 1]`. -/
+theorem liability_model_provides_sensitivityCurve
     (Φ : ℝ → ℝ) (m : LiabilityThresholdModel) (T' : ℝ)
     (hΦ_mono : StrictMono Φ)
     -- Residual variance stays positive across [0,1]
@@ -328,9 +326,10 @@ theorem liability_model_provides_sensLink
     hR2₁.1 hR2₂.2 hlt (h_σ_pos R2₂ hR2₂.1 hR2₂.2)
     (h_T' R2₁ hR2₁.1 (le_trans (le_of_lt hlt) hR2₂.2))
 
-/-- **Derived monotone specificity link.**
-    Analogous to `liability_model_provides_sensLink` but for specificity. -/
-theorem liability_model_provides_specLink
+/-- **Derived monotone specificity curve.**
+    Analogous to `liability_model_provides_sensitivityCurve` but for
+    exact threshold specificity. -/
+theorem liability_model_provides_specificityCurve
     (Φ : ℝ → ℝ) (m : LiabilityThresholdModel) (T' μ_control : ℝ)
     (hΦ_mono : StrictMono Φ)
     (hμ_control_neg : μ_control < 0)
@@ -379,15 +378,10 @@ higher R² yields a score distribution with greater separation between cases
 and controls, so both sensitivity and specificity at any fixed classification
 threshold improve monotonically with R².
 
-The monotonicity of these link functions is now *derived* from the liability
-threshold model in the section above (see `liabilitySensitivity_monotone_in_R2`
-and `liabilitySpecificity_monotone_in_R2`), rather than axiomatised.
-
-We parametrise by abstract strictly-monotone "link" functions
-  `sensFromR2 : ℝ → ℝ`   and   `specFromR2 : ℝ → ℝ`
-that map R² to the operating-point sensitivity and specificity.
-Every NRI theorem then derives sens/spec improvements from R² improvements,
-rather than assuming them directly.
+The operating-point sensitivity and specificity are now written directly in
+their exact liability-threshold forms from the section above. Every NRI theorem
+below is therefore about literal threshold sensitivity/specificity, not an
+opaque helper abstraction.
 -/
 
 section NRI
@@ -400,79 +394,140 @@ noncomputable def netReclassificationImprovement
     (event_nri nonevent_nri : ℝ) : ℝ :=
   event_nri + nonevent_nri
 
-/-- **Sensitivity from R².**  Under a liability-threshold model the PGS score
-    mean-shift between cases and controls is proportional to √R²; at any fixed
-    classification threshold, sensitivity = Φ(μ₁ - τ) is monotone increasing
-    in R².  We take this as an opaque monotone link. -/
-noncomputable def sensFromR2 (link : ℝ → ℝ) (r2 : ℝ) : ℝ := link r2
+/-- Exact operating-point sensitivity under the liability-threshold model. -/
+noncomputable def sensFromR2
+    (m : LiabilityThresholdModel) (r2 T' : ℝ) : ℝ :=
+  liabilitySensitivity Phi m r2 T'
 
-/-- **Specificity from R².**  Analogous monotone link for specificity. -/
-noncomputable def specFromR2 (link : ℝ → ℝ) (r2 : ℝ) : ℝ := link r2
+/-- Exact operating-point specificity under the liability-threshold model. -/
+noncomputable def specFromR2
+    (m : LiabilityThresholdModel) (r2 T' μ_control : ℝ) : ℝ :=
+  liabilitySpecificity Phi m r2 T' μ_control
+
+/-- Exact liability-threshold sensitivity is strictly increasing in `R²`
+    on `[0,1]` under the clinically relevant threshold regime. -/
+theorem sensFromR2_strictMono
+    (m : LiabilityThresholdModel) (T' R2₁ R2₂ : ℝ)
+    (hPhi_mono : StrictMono Phi)
+    (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
+    (hR2 : R2₁ < R2₂)
+    (h_num_nonneg : 0 ≤ Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') :
+    sensFromR2 m R2₁ T' < sensFromR2 m R2₂ T' := by
+  unfold sensFromR2
+  exact liabilitySensitivity_monotone_in_R2 Phi m T' hPhi_mono
+    R2₁ R2₂ hR2₁ hR2₂ hR2 (sigmaResid_pos m R2₂ (le_trans hR2₁ (le_of_lt hR2)) hR2₂)
+    h_num_nonneg
+
+/-- Exact liability-threshold specificity is strictly increasing in `R²`
+    on `[0,1]` under the clinically relevant threshold regime. -/
+theorem specFromR2_strictMono
+    (m : LiabilityThresholdModel) (T' μ_control R2₁ R2₂ : ℝ)
+    (hPhi_mono : StrictMono Phi)
+    (hμ_control_neg : μ_control < 0)
+    (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
+    (hR2 : R2₁ < R2₂)
+    (h_num_nonneg : 0 ≤ T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) :
+    specFromR2 m R2₁ T' μ_control < specFromR2 m R2₂ T' μ_control := by
+  unfold specFromR2
+  exact liabilitySpecificity_monotone_in_R2 Phi m T' μ_control hPhi_mono hμ_control_neg
+    R2₁ R2₂ hR2₁ hR2₂ hR2
+    (sigmaResid_pos m R2₂ (le_trans hR2₁ (le_of_lt hR2)) hR2₂)
+    h_num_nonneg
 
 /-- **NRI is positive when PGS adds value.**
-    If a higher-R² model (r2_new > r2_old) has strictly monotone sensitivity
-    and specificity links, then both event NRI (= sens_new − sens_old) and
-    non-event NRI (= spec_new − spec_old) are positive, so total NRI > 0.
-    The sensitivity/specificity improvements are *derived* from R² ordering
-    via the monotone links, not assumed directly. -/
+    If a higher-`R²` model is evaluated at the same classification threshold in
+    the same liability-threshold population, then both the exact sensitivity
+    and the exact specificity increase, so total NRI is positive. -/
 theorem nri_positive_when_pgs_adds_value
-    (sensLink specLink : ℝ → ℝ) (r2_old r2_new : ℝ)
+    (m : LiabilityThresholdModel) (T' μ_control r2_old r2_new : ℝ)
     (h_r2_improves : r2_old < r2_new)
-    -- Monotonicity of the liability-threshold link functions
-    (h_sens_mono : StrictMono sensLink)
-    (h_spec_mono : StrictMono specLink) :
+    (h_r2_old : 0 ≤ r2_old)
+    (h_r2_new : r2_new ≤ 1)
+    (hPhi_mono : StrictMono Phi)
+    (hμ_control_neg : μ_control < 0)
+    (h_sens_num_nonneg : 0 ≤ Real.sqrt r2_old * Real.sqrt m.h_sq * m.case_mean - T')
+    (h_spec_num_nonneg : 0 ≤ T' - Real.sqrt r2_old * Real.sqrt m.h_sq * μ_control) :
     0 < netReclassificationImprovement
-      (sensFromR2 sensLink r2_new - sensFromR2 sensLink r2_old)
-      (specFromR2 specLink r2_new - specFromR2 specLink r2_old) := by
-  unfold netReclassificationImprovement sensFromR2 specFromR2
-  have h1 : sensLink r2_old < sensLink r2_new := h_sens_mono h_r2_improves
-  have h2 : specLink r2_old < specLink r2_new := h_spec_mono h_r2_improves
+      (sensFromR2 m r2_new T' - sensFromR2 m r2_old T')
+      (specFromR2 m r2_new T' μ_control - specFromR2 m r2_old T' μ_control) := by
+  unfold netReclassificationImprovement
+  have h1 :
+      sensFromR2 m r2_old T' < sensFromR2 m r2_new T' := by
+    exact sensFromR2_strictMono m T' r2_old r2_new
+      hPhi_mono h_r2_old h_r2_new h_r2_improves h_sens_num_nonneg
+  have h2 :
+      specFromR2 m r2_old T' μ_control <
+        specFromR2 m r2_new T' μ_control := by
+    exact specFromR2_strictMono m T' μ_control r2_old r2_new
+      hPhi_mono hμ_control_neg h_r2_old h_r2_new h_r2_improves h_spec_num_nonneg
   linarith
 
 /-- **NRI decreases with portability loss.**
-    If the target population's R² is strictly lower than the source's
-    (r2_target < r2_source), and both sensitivity and specificity links
-    are strictly monotone, then NRI in the target is strictly less than
-    NRI in the source.  The sensitivity/specificity gap is derived from
-    the R² gap, not assumed. -/
+    If the target population's `R²` is strictly lower than the source's, then
+    exact sensitivity and specificity are both lower at the same operating
+    threshold, so exact NRI is strictly lower in the target. -/
 theorem nri_decreases_with_portability_loss
-    (sensLink specLink : ℝ → ℝ) (r2_base r2_source r2_target : ℝ)
+    (m : LiabilityThresholdModel) (T' μ_control r2_base r2_source r2_target : ℝ)
     (h_r2_loss : r2_target < r2_source)
-    (h_sens_mono : StrictMono sensLink)
-    (h_spec_mono : StrictMono specLink) :
+    (h_r2_target : 0 ≤ r2_target)
+    (h_r2_source : r2_source ≤ 1)
+    (hPhi_mono : StrictMono Phi)
+    (hμ_control_neg : μ_control < 0)
+    (h_sens_num_nonneg :
+      0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
+    (h_spec_num_nonneg :
+      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control) :
     netReclassificationImprovement
-      (sensFromR2 sensLink r2_target - sensFromR2 sensLink r2_base)
-      (specFromR2 specLink r2_target - specFromR2 specLink r2_base) <
+      (sensFromR2 m r2_target T' - sensFromR2 m r2_base T')
+      (specFromR2 m r2_target T' μ_control - specFromR2 m r2_base T' μ_control) <
     netReclassificationImprovement
-      (sensFromR2 sensLink r2_source - sensFromR2 sensLink r2_base)
-      (specFromR2 specLink r2_source - specFromR2 specLink r2_base) := by
-  unfold netReclassificationImprovement sensFromR2 specFromR2
-  have h1 : sensLink r2_target < sensLink r2_source := h_sens_mono h_r2_loss
-  have h2 : specLink r2_target < specLink r2_source := h_spec_mono h_r2_loss
+      (sensFromR2 m r2_source T' - sensFromR2 m r2_base T')
+      (specFromR2 m r2_source T' μ_control - specFromR2 m r2_base T' μ_control) := by
+  unfold netReclassificationImprovement
+  have h1 :
+      sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
+    exact sensFromR2_strictMono m T' r2_target r2_source
+      hPhi_mono h_r2_target h_r2_source h_r2_loss h_sens_num_nonneg
+  have h2 :
+      specFromR2 m r2_target T' μ_control <
+        specFromR2 m r2_source T' μ_control := by
+    exact specFromR2_strictMono m T' μ_control r2_target r2_source
+      hPhi_mono hμ_control_neg h_r2_target h_r2_source h_r2_loss h_spec_num_nonneg
   linarith
 
 /-- **NRI can become negative in target populations.**
     If the target R² is strictly below the old model's R² (`r2_target < r2_old`),
-    and both sensitivity and specificity are strictly monotone functions of R²
-    (from the liability-threshold model), then the NRI is negative — PGS in the
-    target population makes classification worse than the old model.
+    then the exact liability-threshold sensitivity and specificity are both
+    lower, so the NRI is negative: the target-population PGS worsens threshold
+    classification relative to the old model.
 
     This is the mirror of `nri_positive_when_pgs_adds_value`: when portability
-    loss drives R² below the baseline, the same monotonicity that guarantees
-    improvement in the source guarantees degradation in the target. -/
+    loss drives R² below the baseline, the same exact metric derivation that
+    guarantees improvement in the source guarantees degradation in the target. -/
 theorem nri_can_be_negative
-    (sensLink specLink : ℝ → ℝ) (r2_old r2_target : ℝ)
-    -- The target R² is below the old model's R²
+    (m : LiabilityThresholdModel) (T' μ_control r2_old r2_target : ℝ)
     (h_r2_below : r2_target < r2_old)
-    -- Monotonicity of the liability-threshold link functions
-    (h_sens_mono : StrictMono sensLink)
-    (h_spec_mono : StrictMono specLink) :
+    (h_r2_target : 0 ≤ r2_target)
+    (h_r2_old : r2_old ≤ 1)
+    (hPhi_mono : StrictMono Phi)
+    (hμ_control_neg : μ_control < 0)
+    (h_sens_num_nonneg :
+      0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
+    (h_spec_num_nonneg :
+      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control) :
     netReclassificationImprovement
-      (sensFromR2 sensLink r2_target - sensFromR2 sensLink r2_old)
-      (specFromR2 specLink r2_target - specFromR2 specLink r2_old) < 0 := by
-  unfold netReclassificationImprovement sensFromR2 specFromR2
-  have h1 : sensLink r2_target < sensLink r2_old := h_sens_mono h_r2_below
-  have h2 : specLink r2_target < specLink r2_old := h_spec_mono h_r2_below
+      (sensFromR2 m r2_target T' - sensFromR2 m r2_old T')
+      (specFromR2 m r2_target T' μ_control - specFromR2 m r2_old T' μ_control) < 0 := by
+  unfold netReclassificationImprovement
+  have h1 :
+      sensFromR2 m r2_target T' < sensFromR2 m r2_old T' := by
+    exact sensFromR2_strictMono m T' r2_target r2_old
+      hPhi_mono h_r2_target h_r2_old h_r2_below h_sens_num_nonneg
+  have h2 :
+      specFromR2 m r2_target T' μ_control <
+        specFromR2 m r2_old T' μ_control := by
+    exact specFromR2_strictMono m T' μ_control r2_target r2_old
+      hPhi_mono hμ_control_neg h_r2_target h_r2_old h_r2_below h_spec_num_nonneg
   linarith
 
 end NRI
@@ -574,41 +629,55 @@ theorem pgs_useful_when_exceeds_treat_all
   nlinarith
 
 /-- **Portability loss narrows the useful threshold range.**
-    We derive sensitivity and specificity from R² via monotone links (as in the
-    NRI section).  If the target R² is strictly below the source R², both
-    sensitivity and specificity are lower (by strict monotonicity), and the net
-    benefit at any threshold t is reduced.
+    If the target `R²` is strictly below the source `R²`, then the exact
+    liability-threshold sensitivity and specificity are both lower at the same
+    classification threshold, and the net benefit at any treatment threshold
+    `t` is reduced.
 
     The net benefit formula NB = TP/N − FP/N × t/(1−t), with
     TP = sens(R²) × π and FP = (1 − spec(R²)) × (1 − π), is strictly
-    increasing in both sens and spec. -/
+    increasing in both the exact sensitivity and the exact specificity. -/
 theorem portability_narrows_useful_range
-    (sensLink specLink : ℝ → ℝ) (r2_source r2_target π t : ℝ)
+    (m : LiabilityThresholdModel) (T' μ_control r2_source r2_target π t : ℝ)
     (h_π : 0 < π) (h_π1 : π < 1)
     (ht : 0 < t) (ht1 : t < 1)
-    -- R² is strictly lower in the target
     (h_r2 : r2_target < r2_source)
-    -- Monotone link functions (from liability-threshold model)
-    (h_sens_mono : StrictMono sensLink)
-    (h_spec_mono : StrictMono specLink)
-    -- Range constraints on the links at target operating point
-    (h_sens_t : 0 ≤ sensLink r2_target) (h_spec_t : 0 ≤ specLink r2_target)
-    (h_spec_s1 : specLink r2_source ≤ 1) :
-    -- Net benefit in target is strictly less than in source at the same threshold
-    netBenefit (sensLink r2_target * π) ((1 - specLink r2_target) * (1 - π)) 1 t <
-      netBenefit (sensLink r2_source * π) ((1 - specLink r2_source) * (1 - π)) 1 t := by
-  -- Derive sens/spec ordering from R² ordering via monotonicity
-  have h_sens : sensLink r2_target < sensLink r2_source := h_sens_mono h_r2
-  have h_spec : specLink r2_target < specLink r2_source := h_spec_mono h_r2
+    (h_r2_target : 0 ≤ r2_target)
+    (h_r2_source : r2_source ≤ 1)
+    (hPhi_mono : StrictMono Phi)
+    (hμ_control_neg : μ_control < 0)
+    (h_sens_num_nonneg :
+      0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
+    (h_spec_num_nonneg :
+      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control)
+    (h_sens_t : 0 ≤ sensFromR2 m r2_target T')
+    (h_spec_t : 0 ≤ specFromR2 m r2_target T' μ_control)
+    (h_spec_s1 : specFromR2 m r2_source T' μ_control ≤ 1) :
+    netBenefit (sensFromR2 m r2_target T' * π)
+        ((1 - specFromR2 m r2_target T' μ_control) * (1 - π)) 1 t <
+      netBenefit (sensFromR2 m r2_source T' * π)
+        ((1 - specFromR2 m r2_source T' μ_control) * (1 - π)) 1 t := by
+  have h_sens :
+      sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
+    exact sensFromR2_strictMono m T' r2_target r2_source
+      hPhi_mono h_r2_target h_r2_source h_r2 h_sens_num_nonneg
+  have h_spec :
+      specFromR2 m r2_target T' μ_control <
+        specFromR2 m r2_source T' μ_control := by
+    exact specFromR2_strictMono m T' μ_control r2_target r2_source
+      hPhi_mono hμ_control_neg h_r2_target h_r2_source h_r2 h_spec_num_nonneg
   unfold netBenefit
   have htt : 0 < t / (1 - t) := div_pos ht (by linarith)
-  have h1 : sensLink r2_target * π < sensLink r2_source * π :=
+  have h1 : sensFromR2 m r2_target T' * π < sensFromR2 m r2_source T' * π :=
     mul_lt_mul_of_pos_right h_sens h_π
-  have h2 : (1 - specLink r2_source) * (1 - π) < (1 - specLink r2_target) * (1 - π) := by
+  have h2 :
+      (1 - specFromR2 m r2_source T' μ_control) * (1 - π) <
+        (1 - specFromR2 m r2_target T' μ_control) * (1 - π) := by
     apply mul_lt_mul_of_pos_right _ (by linarith)
     linarith
-  have h3 : (1 - specLink r2_source) * (1 - π) * (t / (1 - t)) <
-             (1 - specLink r2_target) * (1 - π) * (t / (1 - t)) :=
+  have h3 :
+      (1 - specFromR2 m r2_source T' μ_control) * (1 - π) * (t / (1 - t)) <
+        (1 - specFromR2 m r2_target T' μ_control) * (1 - π) * (t / (1 - t)) :=
     mul_lt_mul_of_pos_right h2 htt
   simp only [div_one]
   linarith
@@ -722,20 +791,22 @@ theorem fairness_impossibility
 
 /-- **Portability gap amplifies fairness violations.**
     If PGS R² differs across groups (r2_target < r2_source), and sensitivity
-    is a strictly monotone function of R² (from the liability-threshold model),
-    then the target group has strictly lower sensitivity — equalized odds
-    (equal TPR across groups) is violated.
-
-    The sensitivity gap is *derived* from the R² gap via the monotone link,
-    not assumed directly. -/
+    is evaluated through the exact liability-threshold sensitivity at a common
+    operating threshold, then the target group has strictly lower sensitivity.
+    Equalized odds (equal TPR across groups) is therefore violated. -/
 theorem portability_violates_equalized_odds
-    (sensLink : ℝ → ℝ) (r2_source r2_target : ℝ)
+    (m : LiabilityThresholdModel) (T' r2_source r2_target : ℝ)
     (h_r2_gap : r2_target < r2_source)
-    (h_sens_mono : StrictMono sensLink) :
-    sensLink r2_target ≠ sensLink r2_source := by
-  -- Derive the sensitivity ordering from R² ordering via monotonicity
-  have h_sens_lt : sensLink r2_target < sensLink r2_source :=
-    h_sens_mono h_r2_gap
+    (h_r2_target : 0 ≤ r2_target)
+    (h_r2_source : r2_source ≤ 1)
+    (hPhi_mono : StrictMono Phi)
+    (h_sens_num_nonneg :
+      0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T') :
+    sensFromR2 m r2_target T' ≠ sensFromR2 m r2_source T' := by
+  have h_sens_lt :
+      sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
+    exact sensFromR2_strictMono m T' r2_target r2_source
+      hPhi_mono h_r2_target h_r2_source h_r2_gap h_sens_num_nonneg
   linarith
 
 /-- **The fairness-accuracy tradeoff.**
