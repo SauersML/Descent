@@ -6838,6 +6838,152 @@ transported signal into deployed metrics (`R²`, AUC, Brier). The scalar
 target/source signal-variance ratio.
 -/
 
+/-! ### Canonical transported metric surface
+
+`TransportedMetrics` is the single canonical forward map from:
+
+- source `R²`
+- residual variance scale
+- transported signal-retention factor
+- prevalence
+
+to the deployed target metrics (`R²`, AUC, Brier). Other files should expose
+specialized observable or methodological wrappers only via exact specialization
+lemmas back to this namespace.
+-/
+
+namespace TransportedMetrics
+
+/-- Source signal variance recovered exactly from source `R²` and residual variance. -/
+noncomputable def sourceSignalVariance (vNoise r2Source : ℝ) : ℝ :=
+  vNoise * (r2Source / (1 - r2Source))
+
+/-- Exact transported target signal variance from the transported retention factor. -/
+noncomputable def targetSignalVariance
+    (vNoise r2Source transportFactor : ℝ) : ℝ :=
+  sourceSignalVariance vNoise r2Source * transportFactor
+
+/-- Exact conversion from signal variance to deployed `R²` at fixed residual scale. -/
+noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
+  vSignal / (vSignal + vNoise)
+
+/-- Exact equal-variance Gaussian liability AUC from signal and residual variances. -/
+noncomputable def aucFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
+  Phi (Real.sqrt (vSignal / (2 * vNoise)))
+
+/-- Exact calibrated Bernoulli Brier risk from prevalence and explained-risk fraction. -/
+def calibratedBrier (π r2 : ℝ) : ℝ :=
+  π * (1 - π) * (1 - r2)
+
+/-- Canonical transported target `R²` from source `R²` and signal retention. -/
+noncomputable def targetR2
+    (vNoise r2Source transportFactor : ℝ) : ℝ :=
+  r2FromSignalVariance
+    (targetSignalVariance vNoise r2Source transportFactor) vNoise
+
+/-- Canonical transported target AUC from source `R²` and signal retention. -/
+noncomputable def targetAUC
+    (vNoise r2Source transportFactor : ℝ) : ℝ :=
+  aucFromSignalVariance
+    (targetSignalVariance vNoise r2Source transportFactor) vNoise
+
+/-- Canonical source AUC recovered from source `R²` and residual variance. -/
+noncomputable def sourceAUC (vNoise r2Source : ℝ) : ℝ :=
+  aucFromSignalVariance (sourceSignalVariance vNoise r2Source) vNoise
+
+/-- Canonical transported target calibrated Brier risk. -/
+noncomputable def targetBrier
+    (π vNoise r2Source transportFactor : ℝ) : ℝ :=
+  calibratedBrier π (targetR2 vNoise r2Source transportFactor)
+
+/-- Canonical source calibrated Brier risk. -/
+noncomputable def sourceBrier (π r2Source : ℝ) : ℝ :=
+  calibratedBrier π r2Source
+
+/-- Canonical bundled transported deployment metrics. -/
+structure Profile where
+  r2 : ℝ
+  auc : ℝ
+  brier : ℝ
+
+/-- Canonical bundled transported deployment metrics from source transport inputs. -/
+noncomputable def profile
+    (π vNoise r2Source transportFactor : ℝ) : Profile where
+  r2 := targetR2 vNoise r2Source transportFactor
+  auc := targetAUC vNoise r2Source transportFactor
+  brier := targetBrier π vNoise r2Source transportFactor
+
+@[simp] theorem profile_r2
+    (π vNoise r2Source transportFactor : ℝ) :
+    (profile π vNoise r2Source transportFactor).r2 =
+      targetR2 vNoise r2Source transportFactor := by
+  rfl
+
+@[simp] theorem profile_auc
+    (π vNoise r2Source transportFactor : ℝ) :
+    (profile π vNoise r2Source transportFactor).auc =
+      targetAUC vNoise r2Source transportFactor := by
+  rfl
+
+@[simp] theorem profile_brier
+    (π vNoise r2Source transportFactor : ℝ) :
+    (profile π vNoise r2Source transportFactor).brier =
+      targetBrier π vNoise r2Source transportFactor := by
+  rfl
+
+/-- Source `R²` is recovered exactly from the canonical source signal variance. -/
+theorem sourceR2_eq_r2FromSignalVariance_sourceSignalVariance
+    (vNoise r2Source : ℝ)
+    (hvNoise : vNoise ≠ 0)
+    (h_r2 : r2Source ≠ 1) :
+    r2FromSignalVariance (sourceSignalVariance vNoise r2Source) vNoise = r2Source := by
+  unfold r2FromSignalVariance sourceSignalVariance
+  have h_one : (1 - r2Source) ≠ 0 := sub_ne_zero.mpr (Ne.symm h_r2)
+  field_simp [hvNoise, h_one]
+  ring_nf
+
+/-- Canonical transported target `R²` reduces to the standard closed form. -/
+theorem targetR2_eq_closed_form
+    (vNoise r2Source transportFactor : ℝ)
+    (hvNoise : vNoise ≠ 0)
+    (h_r2 : r2Source ≠ 1) :
+    targetR2 vNoise r2Source transportFactor =
+      (r2Source * transportFactor) /
+        (1 - r2Source + r2Source * transportFactor) := by
+  unfold targetR2 r2FromSignalVariance targetSignalVariance sourceSignalVariance
+  have h_one : (1 - r2Source) ≠ 0 := sub_ne_zero.mpr (Ne.symm h_r2)
+  field_simp [hvNoise, h_one]
+  ring_nf
+
+/-- Canonical source AUC reduces to the standard closed form. -/
+theorem sourceAUC_eq_closed_form
+    (vNoise r2Source : ℝ)
+    (hvNoise : vNoise ≠ 0)
+    (h_r2 : r2Source ≠ 1) :
+    sourceAUC vNoise r2Source =
+      Phi (Real.sqrt (r2Source / (2 * (1 - r2Source)))) := by
+  unfold sourceAUC aucFromSignalVariance sourceSignalVariance
+  apply congrArg
+  apply congrArg
+  have h_one : (1 - r2Source) ≠ 0 := sub_ne_zero.mpr (Ne.symm h_r2)
+  field_simp [hvNoise, h_one]
+
+/-- Canonical transported target AUC reduces to the standard closed form. -/
+theorem targetAUC_eq_closed_form
+    (vNoise r2Source transportFactor : ℝ)
+    (hvNoise : vNoise ≠ 0)
+    (h_r2 : r2Source ≠ 1) :
+    targetAUC vNoise r2Source transportFactor =
+      Phi (Real.sqrt
+        ((r2Source * transportFactor) / (2 * (1 - r2Source)))) := by
+  unfold targetAUC aucFromSignalVariance targetSignalVariance sourceSignalVariance
+  apply congrArg
+  apply congrArg
+  have h_one : (1 - r2Source) ≠ 0 := sub_ne_zero.mpr (Ne.symm h_r2)
+  field_simp [hvNoise, h_one]
+
+end TransportedMetrics
+
 /-- Exact multiplicative evolutionary transport factor for the genetic signal. -/
 noncomputable def PGSEvolutionaryModel.signalTransportFactor (m : PGSEvolutionaryModel) : ℝ :=
   (1 - m.fstTransient) * m.ldRetention * m.mutErosion * m.migBoost
@@ -6860,6 +7006,30 @@ noncomputable def PGSEvolutionaryModel.portabilityRatio (m : PGSEvolutionaryMode
 /-- Exact conversion from signal variance to deployed `R²` at fixed residual scale. -/
 noncomputable def PGSEvolutionaryModel.varianceToR2 (m : PGSEvolutionaryModel) (vSignal : ℝ) : ℝ :=
   vSignal / (vSignal + m.V_E)
+
+/-- The evolutionary source signal variance is the canonical transported-metric
+source signal variance specialized to the model's residual scale and source `R²`. -/
+theorem PGSEvolutionaryModel.sourceSignalVariance_eq_transportedMetrics
+    (m : PGSEvolutionaryModel) :
+    m.sourceSignalVariance =
+      TransportedMetrics.sourceSignalVariance m.V_E m.R2_source := by
+  rfl
+
+/-- The evolutionary target signal variance is the canonical transported-metric
+target signal variance specialized to the model's residual scale and transport factor. -/
+theorem PGSEvolutionaryModel.targetSignalVariance_eq_transportedMetrics
+    (m : PGSEvolutionaryModel) :
+    m.targetSignalVariance =
+      TransportedMetrics.targetSignalVariance m.V_E m.R2_source m.signalTransportFactor := by
+  rfl
+
+/-- The evolutionary variance-to-`R²` map is the canonical variance-to-`R²` map
+at the model's residual scale. -/
+theorem PGSEvolutionaryModel.varianceToR2_eq_transportedMetrics
+    (m : PGSEvolutionaryModel) (vSignal : ℝ) :
+    m.varianceToR2 vSignal =
+      TransportedMetrics.r2FromSignalVariance vSignal m.V_E := by
+  rfl
 
 /-- Source signal variance is strictly positive. -/
 theorem PGSEvolutionaryModel.sourceSignalVariance_pos (m : PGSEvolutionaryModel) :
@@ -6935,6 +7105,14 @@ core; the present section now derives it directly inside the evolutionary block.
 /-- Exact target `R²` obtained from transported target signal variance. -/
 noncomputable def PGSEvolutionaryModel.R2_target (m : PGSEvolutionaryModel) : ℝ :=
   m.varianceToR2 m.targetSignalVariance
+
+/-- The evolutionary target `R²` is the canonical transported metric specialized
+to the model's residual scale, source `R²`, and biological transport factor. -/
+theorem PGSEvolutionaryModel.R2_target_eq_transportedMetrics
+    (m : PGSEvolutionaryModel) :
+    m.R2_target =
+      TransportedMetrics.targetR2 m.V_E m.R2_source m.signalTransportFactor := by
+  rfl
 
 /-- Target `R²` is nonnegative when the transported signal variance is nonnegative. -/
 theorem PGSEvolutionaryModel.R2_target_nonneg (m : PGSEvolutionaryModel)
@@ -7032,6 +7210,22 @@ noncomputable def PGSEvolutionaryModel.AUC_target (m : PGSEvolutionaryModel) : �
 noncomputable def PGSEvolutionaryModel.AUC_source (m : PGSEvolutionaryModel) : ℝ :=
   Phi (Real.sqrt (m.sourceSignalVariance / (2 * m.V_E)))
 
+/-- The evolutionary target AUC is the canonical transported AUC specialized to
+the model's residual scale, source `R²`, and biological transport factor. -/
+theorem PGSEvolutionaryModel.AUC_target_eq_transportedMetrics
+    (m : PGSEvolutionaryModel) :
+    m.AUC_target =
+      TransportedMetrics.targetAUC m.V_E m.R2_source m.signalTransportFactor := by
+  rfl
+
+/-- The evolutionary source AUC is the canonical source AUC specialized to the
+model's residual scale and source `R²`. -/
+theorem PGSEvolutionaryModel.AUC_source_eq_transportedMetrics
+    (m : PGSEvolutionaryModel) :
+    m.AUC_source =
+      TransportedMetrics.sourceAUC m.V_E m.R2_source := by
+  rfl
+
 /-- Exact AUC degradation when transported signal retention is at most one. -/
 theorem PGSEvolutionaryModel.AUC_target_le_source (m : PGSEvolutionaryModel)
     (h_ratio_le : m.portabilityRatio ≤ 1)
@@ -7076,6 +7270,40 @@ noncomputable def PGSEvolutionaryModel.Brier_target (m : PGSEvolutionaryModel) :
 /-- **Source Brier score** for comparison. -/
 noncomputable def PGSEvolutionaryModel.Brier_source (m : PGSEvolutionaryModel) : ℝ :=
   m.prevalence * (1 - m.prevalence) * (1 - m.R2_source)
+
+/-- The evolutionary target Brier score is the canonical transported Brier score
+specialized to the model's prevalence, residual scale, source `R²`, and
+biological transport factor. -/
+theorem PGSEvolutionaryModel.Brier_target_eq_transportedMetrics
+    (m : PGSEvolutionaryModel) :
+    m.Brier_target =
+      TransportedMetrics.targetBrier
+        m.prevalence m.V_E m.R2_source m.signalTransportFactor := by
+  rfl
+
+/-- The evolutionary source Brier score is the canonical source Brier score
+specialized to the model's prevalence and source `R²`. -/
+theorem PGSEvolutionaryModel.Brier_source_eq_transportedMetrics
+    (m : PGSEvolutionaryModel) :
+    m.Brier_source = TransportedMetrics.sourceBrier m.prevalence m.R2_source := by
+  rfl
+
+/-- Canonical bundled deployment metrics for the evolutionary transport model. -/
+noncomputable def PGSEvolutionaryModel.metricProfile (m : PGSEvolutionaryModel) :
+    TransportedMetrics.Profile :=
+  TransportedMetrics.profile
+    m.prevalence m.V_E m.R2_source m.signalTransportFactor
+
+/-- The canonical bundled deployment metrics reproduce the evolutionary model's
+public `R²`, AUC, and Brier surfaces exactly. -/
+theorem PGSEvolutionaryModel.metricProfile_eq
+    (m : PGSEvolutionaryModel) :
+    m.metricProfile =
+      { r2 := m.R2_target, auc := m.AUC_target, brier := m.Brier_target } := by
+  unfold PGSEvolutionaryModel.metricProfile TransportedMetrics.profile
+  rw [m.R2_target_eq_transportedMetrics,
+    m.AUC_target_eq_transportedMetrics,
+    m.Brier_target_eq_transportedMetrics]
 
 /-- Exact target Brier degradation when transported signal retention is at most one. -/
 theorem PGSEvolutionaryModel.Brier_target_ge_source (m : PGSEvolutionaryModel)

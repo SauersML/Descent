@@ -1127,6 +1127,20 @@ theorem targetVarianceFromSource_eq_ratio_mul
   unfold targetVarianceFromSource driftTransportRatio
   ring
 
+/-- The observable transported `R²` surface is the canonical transported-metric
+specialization at residual scale `1` and drift transport factor. -/
+theorem targetR2FromObservables_eq_transportedMetrics
+    (r2Source fstSource fstTarget : ℝ) :
+    targetR2FromObservables r2Source fstSource fstTarget =
+      TransportedMetrics.targetR2 1 r2Source
+        (driftTransportRatio fstSource fstTarget) := by
+  unfold targetR2FromObservables TransportedMetrics.targetR2
+    TransportedMetrics.r2FromSignalVariance TransportedMetrics.targetSignalVariance
+    TransportedMetrics.sourceSignalVariance r2FromVarianceScaleOne
+  rw [targetVarianceFromSource_eq_ratio_mul]
+  unfold sourceVarianceFromR2
+  ring
+
 /-- The observable transported source-variance object coincides exactly with the
     present-day target signal-to-noise ratio when the source `R²` comes from the
     same drift model. This is the core cohesion theorem connecting observable
@@ -1163,19 +1177,10 @@ theorem targetR2FromObservables_closed_form
       ((driftTransportRatio fstSource fstTarget) * r2Source) /
         (1 - r2Source + (driftTransportRatio fstSource fstTarget) * r2Source) := by
   rcases h_r2 with ⟨_, h1⟩
-  set r : ℝ := driftTransportRatio fstSource fstTarget
-  have h_target :
-      targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget
-        = r * sourceVarianceFromR2 r2Source := by
-    simpa [r, mul_comm] using
-      (targetVarianceFromSource_eq_ratio_mul
-        (sourceVarianceFromR2 r2Source) fstSource fstTarget)
-  unfold targetR2FromObservables r2FromVarianceScaleOne
-  rw [h_target]
-  unfold sourceVarianceFromR2
-  have hden : 1 - r2Source ≠ 0 := by linarith
-  field_simp [hden]
-  ring_nf
+  rw [targetR2FromObservables_eq_transportedMetrics]
+  simpa [mul_comm, mul_left_comm, mul_assoc] using
+    (TransportedMetrics.targetR2_eq_closed_form
+      1 r2Source (driftTransportRatio fstSource fstTarget) one_ne_zero (by linarith : r2Source ≠ 1))
 
 /-- Exact identification of the observable-only transported `R²` with the
     literal present-day target `R²` when the source `R²` is instantiated from
@@ -1200,6 +1205,18 @@ noncomputable def aucFromR2 (r2 : ℝ) : ℝ :=
 transport model. -/
 noncomputable def sourceAUCFromObservables (r2Source : ℝ) : ℝ :=
   aucFromR2 r2Source
+
+/-- The observable source AUC is the canonical source AUC specialization at
+residual scale `1`. -/
+theorem sourceAUCFromObservables_eq_transportedMetrics
+    (r2Source : ℝ) :
+    sourceAUCFromObservables r2Source =
+      TransportedMetrics.sourceAUC 1 r2Source := by
+  unfold sourceAUCFromObservables aucFromR2 TransportedMetrics.sourceAUC
+    TransportedMetrics.aucFromSignalVariance TransportedMetrics.sourceSignalVariance
+  congr 2
+  unfold sourceVarianceFromR2
+  ring_nf
 
 /-- The observable-only source AUC equals the literal present-day liability AUC
     when the source `R²` is taken from the same drift model. -/
@@ -1235,6 +1252,21 @@ noncomputable def targetAUCFromObservables
     (Real.sqrt
       (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget / 2))
 
+/-- The observable transported AUC is the canonical transported AUC
+specialization at residual scale `1` and drift transport factor. -/
+theorem targetAUCFromObservables_eq_transportedMetrics
+    (r2Source fstSource fstTarget : ℝ) :
+    targetAUCFromObservables r2Source fstSource fstTarget =
+      TransportedMetrics.targetAUC 1 r2Source
+        (driftTransportRatio fstSource fstTarget) := by
+  unfold targetAUCFromObservables TransportedMetrics.targetAUC
+    TransportedMetrics.aucFromSignalVariance TransportedMetrics.targetSignalVariance
+    TransportedMetrics.sourceSignalVariance
+  rw [targetVarianceFromSource_eq_ratio_mul]
+  congr 2
+  unfold sourceVarianceFromR2 driftTransportRatio
+  ring_nf
+
 /-- The observable-only transported AUC equals the literal present-day AUC when
     the source `R²` is instantiated from the same drift model. -/
 theorem targetAUCFromObservables_eq_presentDayAUC
@@ -1255,6 +1287,14 @@ noncomputable def sourceExactCalibratedBrierRisk (π r2Source : ℝ) : ℝ :=
 noncomputable def sourceBrierFromObservables (π r2Source : ℝ) : ℝ :=
   exactCalibratedBrierRiskFromR2 π r2Source
 
+/-- The observable source Brier surface is the canonical source Brier
+specialization. -/
+theorem sourceBrierFromObservables_eq_transportedMetrics
+    (π r2Source : ℝ) :
+    sourceBrierFromObservables π r2Source =
+      TransportedMetrics.sourceBrier π r2Source := by
+  rfl
+
 /-- Exact target calibrated Brier risk under the Bernoulli-mixing model after
 drift-induced transport of `R²`. -/
 noncomputable def targetExactCalibratedBrierRisk
@@ -1266,6 +1306,36 @@ noncomputable def targetExactCalibratedBrierRisk
 noncomputable def targetBrierFromObservables
     (π r2Source fstSource fstTarget : ℝ) : ℝ :=
   targetExactCalibratedBrierRisk π r2Source fstSource fstTarget
+
+/-- The observable transported Brier surface is the canonical transported
+Brier specialization at residual scale `1` and drift transport factor. -/
+theorem targetBrierFromObservables_eq_transportedMetrics
+    (π r2Source fstSource fstTarget : ℝ) :
+    targetBrierFromObservables π r2Source fstSource fstTarget =
+      TransportedMetrics.targetBrier π 1 r2Source
+        (driftTransportRatio fstSource fstTarget) := by
+  unfold targetBrierFromObservables targetExactCalibratedBrierRisk
+    exactCalibratedBrierRiskFromR2 TransportedMetrics.targetBrier
+    TransportedMetrics.calibratedBrier
+  rw [targetR2FromObservables_eq_transportedMetrics]
+
+/-- Canonical bundled observable transport metrics under drift. -/
+noncomputable def observableTransportMetricProfile
+    (π r2Source fstSource fstTarget : ℝ) : TransportedMetrics.Profile :=
+  TransportedMetrics.profile π 1 r2Source (driftTransportRatio fstSource fstTarget)
+
+/-- The bundled observable drift metrics reproduce the file's public observable
+`R²`, AUC, and Brier surfaces exactly on the biologically valid `R² ≠ 1` domain. -/
+theorem observableTransportMetricProfile_eq
+    (π r2Source fstSource fstTarget : ℝ) :
+    observableTransportMetricProfile π r2Source fstSource fstTarget =
+      { r2 := targetR2FromObservables r2Source fstSource fstTarget
+      , auc := targetAUCFromObservables r2Source fstSource fstTarget
+      , brier := targetBrierFromObservables π r2Source fstSource fstTarget } := by
+  unfold observableTransportMetricProfile TransportedMetrics.profile
+  rw [targetR2FromObservables_eq_transportedMetrics,
+    targetAUCFromObservables_eq_transportedMetrics,
+    targetBrierFromObservables_eq_transportedMetrics]
 
 /- Exact observable target AUC is obtained by transporting the source variance
 and applying the liability-threshold AUC formula. -/

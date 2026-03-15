@@ -1,1169 +1,1616 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gnomon · PGS Portability Explorer</title>
-  <meta name="description"
-    content="Interactive explorer for polygenic score portability across populations, based on formally verified evolutionary theory.">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <title>Gnomon · Exact Proof Map</title>
+  <meta
+    name="description"
+    content="Exact proof map for the Lean portability model. This page shows named definitions, theorem hypotheses, and dependency paths without browser-side approximations."
+  >
   <style>
     :root {
-      --bg-primary: #0a0e1a;
-      --bg-secondary: #111827;
-      --bg-card: #1a2035;
-      --border: #2a3352;
-      --border-glow: rgba(99, 102, 241, 0.3);
-      --text-primary: #f0f2f8;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --accent-indigo: #6366f1;
-      --accent-violet: #8b5cf6;
-      --accent-cyan: #06b6d4;
-      --accent-emerald: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-rose: #f43f5e;
-      --gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6);
-      --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
-      --radius: 12px;
-      --radius-lg: 16px;
+      --paper: #f4efe4;
+      --paper-strong: #fffaf2;
+      --ink: #1e1a18;
+      --ink-soft: #5d5752;
+      --line: #d7ccbb;
+      --line-strong: #b9ab97;
+      --teal: #0f6d67;
+      --teal-soft: rgba(15, 109, 103, 0.1);
+      --rust: #9a4e28;
+      --rust-soft: rgba(154, 78, 40, 0.1);
+      --amber: #906400;
+      --amber-soft: rgba(144, 100, 0, 0.1);
+      --slate: #30444b;
+      --slate-soft: rgba(48, 68, 75, 0.1);
+      --shadow: 0 20px 60px rgba(38, 30, 20, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max-width: 1380px;
     }
 
     *,
     *::before,
     *::after {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(15, 109, 103, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(154, 78, 40, 0.08), transparent 24%),
+        linear-gradient(180deg, #f7f2e8 0%, var(--paper) 45%, #efe7d8 100%);
+      font-family: "Iowan Old Style", "Palatino Linotype", "URW Palladio L", serif;
       line-height: 1.6;
-      overflow-x: hidden;
+      min-height: 100vh;
     }
 
-    /* Hero */
-    .hero {
-      text-align: center;
-      padding: 3rem 1.5rem 2rem;
-      position: relative;
-      overflow: hidden;
+    a {
+      color: inherit;
     }
 
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99, 102, 241, 0.12), transparent);
-      pointer-events: none;
+    code,
+    .mono,
+    pre,
+    .pill,
+    .status,
+    .source-link,
+    .table-tag,
+    .formula-block,
+    nav a,
+    .small-label {
+      font-family: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
     }
 
-    .hero h1 {
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero p {
-      color: var(--text-secondary);
-      font-size: 1.1rem;
-      max-width: 700px;
-      margin: 0.75rem auto 0;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-top: 1rem;
-      padding: 0.35rem 1rem;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      background: rgba(99, 102, 241, 0.12);
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      color: var(--accent-indigo);
-    }
-
-    .badge svg {
-      width: 14px;
-      height: 14px;
-    }
-
-    /* Layout */
-    .container {
-      max-width: 1400px;
+    .page-shell {
+      width: min(100%, var(--max-width));
       margin: 0 auto;
-      padding: 0 1.5rem 4rem;
+      padding: 0 1.25rem 4rem;
     }
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
+    .hero {
+      padding: 4.5rem 0 2.5rem;
+      position: relative;
     }
 
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-    }
-
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-    }
-
-    @media (max-width: 1100px) {
-      .grid-2, .grid-3 { grid-template-columns: 1fr; }
-      .grid-4 { grid-template-columns: 1fr 1fr; }
-    }
-
-    @media (max-width: 600px) {
-      .grid-4 { grid-template-columns: 1fr; }
-    }
-
-    /* Cards */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-    }
-
-    .card-title {
-      font-size: 0.82rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-    }
-
-    /* Section headings */
-    .section-heading {
-      font-size: 1.3rem;
+    .eyebrow {
+      margin: 0 0 0.85rem;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 0.8rem;
       font-weight: 700;
-      margin: 2.5rem 0 1rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--teal);
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      line-height: 1.08;
       letter-spacing: -0.02em;
     }
 
-    /* Sliders */
-    .slider-group {
-      margin-bottom: 1.1rem;
+    h1 {
+      max-width: 14ch;
+      font-size: clamp(2.9rem, 6vw, 5.4rem);
     }
 
-    .slider-label {
+    .lead {
+      max-width: 68ch;
+      margin: 1.2rem 0 0;
+      font-size: 1.16rem;
+      color: var(--ink-soft);
+    }
+
+    .hero-grid,
+    .correction-grid,
+    .chain-grid,
+    .change-grid,
+    .theorem-grid,
+    .file-grid,
+    .boundary-grid,
+    .note-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .hero-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 2rem;
+    }
+
+    .hero-card,
+    .panel,
+    .correction-card,
+    .boundary-card,
+    .file-card,
+    .note-card {
+      background: rgba(255, 250, 242, 0.82);
+      border: 1px solid rgba(185, 171, 151, 0.72);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-card,
+    .correction-card,
+    .boundary-card,
+    .file-card,
+    .note-card {
+      padding: 1.15rem 1.15rem 1.1rem;
+    }
+
+    .hero-card p,
+    .boundary-card p,
+    .file-card p,
+    .note-card p,
+    .correction-card p {
+      margin: 0.65rem 0 0;
+      color: var(--ink-soft);
+      font-size: 0.96rem;
+    }
+
+    .pill-row,
+    .status-row {
       display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 0.3rem;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      align-items: center;
     }
 
-    .slider-label span:first-child {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--text-secondary);
+    .pill,
+    .status,
+    .table-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      border-radius: 999px;
+      padding: 0.22rem 0.62rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
     }
 
-    .slider-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: var(--accent-indigo);
+    .pill-definition,
+    .status-definition,
+    .table-tag-definition {
+      color: var(--teal);
+      background: var(--teal-soft);
+      border: 1px solid rgba(15, 109, 103, 0.22);
     }
 
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: var(--border);
+    .pill-theorem,
+    .status-theorem,
+    .table-tag-theorem {
+      color: var(--rust);
+      background: var(--rust-soft);
+      border: 1px solid rgba(154, 78, 40, 0.22);
+    }
+
+    .pill-boundary,
+    .status-boundary,
+    .table-tag-boundary {
+      color: var(--amber);
+      background: var(--amber-soft);
+      border: 1px solid rgba(144, 100, 0, 0.22);
+    }
+
+    .pill-dependency,
+    .status-dependency,
+    .table-tag-dependency {
+      color: var(--slate);
+      background: var(--slate-soft);
+      border: 1px solid rgba(48, 68, 75, 0.22);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 1rem;
+      padding: 1rem;
+    }
+
+    .toc h2 {
+      font-size: 0.92rem;
+      margin-bottom: 0.7rem;
+      color: var(--ink);
+    }
+
+    .toc ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .toc a {
+      display: block;
+      text-decoration: none;
+      color: var(--ink-soft);
+      border-radius: 10px;
+      padding: 0.5rem 0.6rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a:focus-visible {
+      background: rgba(15, 109, 103, 0.08);
+      color: var(--ink);
       outline: none;
     }
 
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--accent-indigo);
-      cursor: pointer;
-      border: 2px solid var(--bg-card);
-      box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
-    }
-
-    /* Metric cards */
-    .metric-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.2rem;
-      text-align: center;
-    }
-
-    .metric-card .label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-      margin-bottom: 0.3rem;
-    }
-
-    .metric-card .value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.6rem;
-      font-weight: 700;
-    }
-
-    .metric-card .sub {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      margin-top: 0.15rem;
-    }
-
-    .color-indigo { color: var(--accent-indigo); }
-    .color-cyan { color: var(--accent-cyan); }
-    .color-amber { color: var(--accent-amber); }
-    .color-emerald { color: var(--accent-emerald); }
-    .color-violet { color: var(--accent-violet); }
-    .color-rose { color: var(--accent-rose); }
-
-    /* Factor bar */
-    .factor-bar {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 0.65rem;
-    }
-
-    .factor-bar .factor-label {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      min-width: 120px;
-    }
-
-    .factor-bar .bar-track {
-      flex: 1;
-      height: 22px;
-      background: rgba(255,255,255,0.04);
-      border-radius: 4px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .factor-bar .bar-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding-right: 6px;
-    }
-
-    .factor-bar .bar-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: white;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-
-    /* Rate table */
-    .rate-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .rate-table th, .rate-table td {
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-      font-size: 0.82rem;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .rate-table th {
-      color: var(--text-muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-size: 0.72rem;
-    }
-
-    .rate-table td {
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .rate-table .dominant {
-      font-weight: 700;
-    }
-
-    .rate-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      margin-right: 6px;
-    }
-
-    /* Chart container */
-    .chart-wrap {
-      position: relative;
-      width: 100%;
-      height: 350px;
-    }
-
-    /* Proof links */
-    .proof-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      font-size: 0.75rem;
-      color: var(--accent-indigo);
-      text-decoration: none;
-      opacity: 0.8;
-      transition: opacity 0.2s;
-    }
-
-    .proof-link:hover {
-      opacity: 1;
-      text-decoration: underline;
-    }
-
-    /* Methodology */
-    .methodology {
-      background: rgba(99, 102, 241, 0.06);
-      border: 1px solid rgba(99, 102, 241, 0.15);
-      border-radius: var(--radius);
-      padding: 1.25rem 1.5rem;
-      margin-top: 2rem;
-      font-size: 0.88rem;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
-    .methodology strong {
-      color: var(--text-primary);
-    }
-
-    /* Glossary */
-    .glossary-grid {
+    .content {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+
+    section.panel {
+      padding: 1.3rem 1.3rem 1.45rem;
+    }
+
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.3rem);
+    }
+
+    .section-head p {
+      margin: 0;
+      max-width: 58ch;
+      color: var(--ink-soft);
+      font-size: 0.98rem;
+    }
+
+    .section-kicker {
+      margin: 0 0 0.35rem;
+      color: var(--teal);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .correction-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .correction-card {
+      display: grid;
       gap: 0.75rem;
     }
 
-    .glossary-item {
-      display: flex;
-      gap: 0.6rem;
-      padding: 0.6rem 0;
+    .correction-block {
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(185, 171, 151, 0.55);
     }
 
-    .glossary-item dt {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
-      color: var(--accent-violet);
-      min-width: 50px;
-      font-weight: 600;
+    .correction-label {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
     }
 
-    .glossary-item dd {
-      font-size: 0.82rem;
-      color: var(--text-secondary);
+    .correction-text {
+      margin: 0.3rem 0 0;
+      color: var(--ink);
+      font-size: 0.98rem;
     }
 
-    /* Formula block */
-    .formula-block {
-      background: rgba(0,0,0,0.25);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem 1.25rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      line-height: 1.8;
+    .table-wrap {
       overflow-x: auto;
-      margin: 0.75rem 0;
+      border: 1px solid rgba(185, 171, 151, 0.66);
+      border-radius: 16px;
     }
 
-    .formula-block .comment {
-      color: var(--text-muted);
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      background: rgba(255, 250, 242, 0.55);
+    }
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      padding: 0.85rem 0.9rem;
+      border-bottom: 1px solid rgba(185, 171, 151, 0.46);
+      font-size: 0.95rem;
+    }
+
+    th {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      background: rgba(240, 232, 220, 0.65);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .chain-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    details.step-card,
+    article.change-card,
+    article.theorem-card {
+      border: 1px solid rgba(185, 171, 151, 0.66);
+      border-radius: 16px;
+      background: rgba(255, 250, 242, 0.72);
+      overflow: hidden;
+    }
+
+    details.step-card[open] {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    }
+
+    details.step-card summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 1rem 1rem 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    details.step-card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .summary-title {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .summary-title h3 {
+      font-size: 1.15rem;
+    }
+
+    .summary-title p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.94rem;
+    }
+
+    .summary-caret {
+      font-size: 1.35rem;
+      color: var(--ink-soft);
+      transform: translateY(-1px);
+    }
+
+    details.step-card[open] .summary-caret {
+      transform: rotate(45deg) translateY(-1px);
+    }
+
+    .step-body,
+    .change-card,
+    .theorem-card {
+      padding: 0 1rem 1rem;
+    }
+
+    .change-card,
+    .theorem-card {
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .change-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .change-card h3,
+    .theorem-card h3,
+    .file-card h3,
+    .boundary-card h3,
+    .note-card h3 {
+      font-size: 1.08rem;
+    }
+
+    .field-block {
+      display: grid;
+      gap: 0.2rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid rgba(185, 171, 151, 0.42);
+    }
+
+    .field-block:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .field-block strong {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .field-block p,
+    .field-block ul,
+    .field-block li {
+      margin: 0;
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+
+    .field-block ul {
+      padding-left: 1.1rem;
+    }
+
+    .field-block li + li {
+      margin-top: 0.35rem;
+    }
+
+    .formula-block {
+      margin: 0;
+      padding: 0.9rem 1rem;
+      border-radius: 14px;
+      background: #fbf7ef;
+      border: 1px solid rgba(185, 171, 151, 0.66);
+      overflow-x: auto;
+      font-size: 0.88rem;
+      color: var(--ink);
+      line-height: 1.75;
+      white-space: pre-wrap;
+    }
+
+    .source-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      text-decoration: none;
+      font-size: 0.82rem;
+      color: var(--teal);
+      border-bottom: 1px solid transparent;
+      width: fit-content;
+    }
+
+    .source-link:hover,
+    .source-link:focus-visible {
+      border-bottom-color: currentColor;
+      outline: none;
+    }
+
+    .note-grid,
+    .boundary-grid,
+    .file-grid,
+    .theorem-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .note-card,
+    .boundary-card,
+    .file-card {
+      display: grid;
+      gap: 0.7rem;
+    }
+
+    .theorem-card .formula-block {
+      margin-top: 0;
+    }
+
+    .caption {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+    }
+
+    .callout {
+      padding: 1rem 1.05rem;
+      border-radius: 16px;
+      border: 1px solid rgba(154, 78, 40, 0.2);
+      background: rgba(154, 78, 40, 0.06);
+      color: var(--ink);
+    }
+
+    .callout p {
+      margin: 0;
+    }
+
+    .callout p + p {
+      margin-top: 0.65rem;
+    }
+
+    footer {
+      padding: 1.6rem 0 0.3rem;
+      color: var(--ink-soft);
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 1200px) {
+      .hero-grid,
+      .correction-grid,
+      .chain-grid,
+      .change-grid,
+      .theorem-grid,
+      .boundary-grid,
+      .file-grid,
+      .note-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+
+      .hero-grid,
+      .correction-grid,
+      .chain-grid,
+      .change-grid,
+      .theorem-grid,
+      .boundary-grid,
+      .file-grid,
+      .note-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        padding: 0 0.85rem 3rem;
+      }
+
+      .hero {
+        padding-top: 3rem;
+      }
+
+      section.panel,
+      .toc,
+      .hero-card,
+      .correction-card,
+      .boundary-card,
+      .file-card,
+      .note-card {
+        padding-left: 0.95rem;
+        padding-right: 0.95rem;
+      }
+
+      details.step-card summary,
+      .step-body,
+      .change-card,
+      .theorem-card {
+        padding-left: 0.9rem;
+        padding-right: 0.9rem;
+      }
     }
   </style>
 </head>
-
 <body>
+  <div class="page-shell">
+    <header class="hero" id="top">
+      <p class="eyebrow">Proof Dashboard</p>
+      <h1>Exact Proof Map for the Portability Model</h1>
+      <p class="lead">
+        This page is documentation, not a calculator. It only shows named Lean definitions,
+        named theorem hypotheses, and exact dependency paths. Live numeric controls were removed
+        because browser arithmetic would only yield floating-point approximations, and the old UI
+        implied stronger claims than the proofs actually expose.
+      </p>
 
-  <!-- Hero -->
-  <header class="hero">
-    <h1>Gnomon</h1>
-    <p>Unified evolutionary model for polygenic score portability across populations.
-       Drift, LD decay, mutation erosion, and migration &mdash; every formula formally verified.</p>
-    <div class="badge">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M9 12l2 2 4-4" /><circle cx="12" cy="12" r="10" />
-      </svg>
-      Formally verified in Lean 4 with Mathlib
+      <div class="hero-grid">
+        <article class="hero-card">
+          <div class="pill-row">
+            <span class="pill pill-definition">Exact Scope</span>
+          </div>
+          <p>
+            Only exact definitions and exact theorem-level consequences are surfaced here.
+            If a statement depends on hypotheses, those hypotheses are named next to the claim.
+          </p>
+        </article>
+
+        <article class="hero-card">
+          <div class="pill-row">
+            <span class="pill pill-boundary">Why No Sliders</span>
+          </div>
+          <p>
+            A slider would suggest measurable continuous control and a browser-side numeric answer.
+            This file now refuses that implication. Exact reals stay symbolic in the UI.
+          </p>
+        </article>
+
+        <article class="hero-card">
+          <div class="pill-row">
+            <span class="pill pill-theorem">Critical Correction</span>
+          </div>
+          <p>
+            <code>R²_target</code> is not presented as <code>R²_source × ρ</code>. The exact DGP theorem
+            gives a rational transport formula instead, and this page now uses that exact statement.
+          </p>
+        </article>
+
+        <article class="hero-card">
+          <div class="pill-row">
+            <span class="pill pill-dependency">UI Honesty Rule</span>
+          </div>
+          <p>
+            When the Lean files only show that one quantity feeds another, the UI says
+            “dependency only.” It does not invent a monotone direction or a biological estimate.
+          </p>
+        </article>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="panel toc" aria-label="Page sections">
+        <h2>Navigate</h2>
+        <ul>
+          <li><a href="#corrections">Corrections</a></li>
+          <li><a href="#records">Exact Records</a></li>
+          <li><a href="#chain">Exact Dependency Chain</a></li>
+          <li><a href="#changes">What Changes What</a></li>
+          <li><a href="#theorems">Exact Theorems Exposed</a></li>
+          <li><a href="#boundaries">Boundary Notes</a></li>
+          <li><a href="#files">File Map</a></li>
+        </ul>
+      </aside>
+
+      <main class="content">
+        <section class="panel" id="corrections">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">First Fixes</p>
+              <h2>Corrections to the Old Dashboard</h2>
+            </div>
+            <p>
+              These are the main places where the earlier page implied more than the Lean files
+              actually guarantee.
+            </p>
+          </div>
+
+          <div class="correction-grid">
+            <article class="correction-card">
+              <div class="pill-row">
+                <span class="pill pill-boundary">Removed Implication</span>
+              </div>
+              <div class="correction-block">
+                <p class="correction-label">Old UI implied</p>
+                <p class="correction-text">
+                  <code>ρ</code> was the direct “fraction of source <code>R²</code> retained,” so a big gauge for
+                  <code>ρ</code> looked like a direct clinical accuracy gauge.
+                </p>
+              </div>
+              <div class="correction-block">
+                <p class="correction-label">Exact replacement</p>
+                <p class="correction-text">
+                  In <code>PGSEvolutionaryModel</code>, <code>ρ</code> is derived as the exact
+                  target/source transported-signal variance ratio, and only then fed into deployed metrics.
+                </p>
+              </div>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>PGSEvolutionaryModel.portabilityRatio_eq_signalTransportFactor</code>
+              </a>
+            </article>
+
+            <article class="correction-card">
+              <div class="pill-row">
+                <span class="pill pill-boundary">Removed Implication</span>
+              </div>
+              <div class="correction-block">
+                <p class="correction-label">Old UI implied</p>
+                <p class="correction-text">
+                  <code>R²_target = R²_source × ρ</code>.
+                </p>
+              </div>
+              <div class="correction-block">
+                <p class="correction-label">Exact replacement</p>
+                <p class="correction-text">
+                  The exact theorem gives
+                  <code>R²_target = (R²_source × transportFactor) / (1 - R²_source + R²_source × transportFactor)</code>.
+                </p>
+              </div>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>PGSEvolutionaryModel.R2_target_eq_transportFactor</code>
+              </a>
+            </article>
+
+            <article class="correction-card">
+              <div class="pill-row">
+                <span class="pill pill-boundary">Removed Approximation</span>
+              </div>
+              <div class="correction-block">
+                <p class="correction-label">Old UI implied</p>
+                <p class="correction-text">
+                  A browser-side approximation to the normal CDF was “the exact AUC map.”
+                </p>
+              </div>
+              <div class="correction-block">
+                <p class="correction-label">Exact replacement</p>
+                <p class="correction-text">
+                  The page now shows the exact theorem formula for <code>AUC_target</code> and does not
+                  numerically evaluate <code>Phi</code> in JavaScript at all.
+                </p>
+              </div>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>PGSEvolutionaryModel.AUC_target_eq_transportFactor</code>
+              </a>
+            </article>
+
+            <article class="correction-card">
+              <div class="pill-row">
+                <span class="pill pill-boundary">Removed Overclaim</span>
+              </div>
+              <div class="correction-block">
+                <p class="correction-label">Old UI implied</p>
+                <p class="correction-text">
+                  The displayed decay-rate dashboard was exact.
+                </p>
+              </div>
+              <div class="correction-block">
+                <p class="correction-label">Exact replacement</p>
+                <p class="correction-text">
+                  <code>portabilityDecayRate</code> is omitted from the exact dashboard because its own docstring
+                  describes it as approximate.
+                </p>
+              </div>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>portabilityDecayRate</code> and <code>portabilityDecayRate_decomposition</code>
+              </a>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel" id="records">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Lean Inputs</p>
+              <h2>Exact Records and Their Declared Constraints</h2>
+            </div>
+            <p>
+              These tables are the actual parameter records behind the exact block shown on this page.
+              Every field listed here exists in Lean. The “used below” column makes the UI explicit
+              about what is and is not consumed by the displayed metric chain.
+            </p>
+          </div>
+
+          <div class="note-grid" style="margin-bottom: 1rem;">
+            <article class="note-card">
+              <div class="pill-row">
+                <span class="pill pill-definition">Base Record</span>
+              </div>
+              <h3><code>EvolutionaryParameters</code></h3>
+              <p>
+                Core evolutionary quantities plus positivity and range constraints.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>structure EvolutionaryParameters</code>
+              </a>
+            </article>
+
+            <article class="note-card">
+              <div class="pill-row">
+                <span class="pill pill-definition">Extended Record</span>
+              </div>
+              <h3><code>PGSEvolutionaryModel</code></h3>
+              <p>
+                Adds observational context: <code>R2_source</code>, <code>V_E</code>, and <code>prevalence</code>.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>structure PGSEvolutionaryModel</code>
+              </a>
+            </article>
+          </div>
+
+          <div class="table-wrap" style="margin-bottom: 1rem;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Meaning in Lean</th>
+                  <th>Declared constraint</th>
+                  <th>Used in exact metric chain below</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>Ne</code></td>
+                  <td>Effective population size.</td>
+                  <td><span class="table-tag table-tag-definition">0 &lt; Ne</span></td>
+                  <td>Yes.</td>
+                </tr>
+                <tr>
+                  <td><code>mu</code></td>
+                  <td>Mutation rate per generation.</td>
+                  <td><span class="table-tag table-tag-definition">0 ≤ mu</span></td>
+                  <td>Yes.</td>
+                </tr>
+                <tr>
+                  <td><code>mig</code></td>
+                  <td>Migration rate per generation.</td>
+                  <td><span class="table-tag table-tag-definition">0 ≤ mig</span></td>
+                  <td>Yes.</td>
+                </tr>
+                <tr>
+                  <td><code>t_div</code></td>
+                  <td>Divergence time.</td>
+                  <td><span class="table-tag table-tag-definition">0 ≤ t_div</span></td>
+                  <td>Yes. Mixed exact time semantics appear downstream.</td>
+                </tr>
+                <tr>
+                  <td><code>recomb</code></td>
+                  <td>Recombination rate.</td>
+                  <td><span class="table-tag table-tag-definition">0 ≤ recomb ≤ 1/2</span></td>
+                  <td>Yes.</td>
+                </tr>
+                <tr>
+                  <td><code>V_A</code></td>
+                  <td>Additive genetic variance in the ancestral population.</td>
+                  <td><span class="table-tag table-tag-definition">0 &lt; V_A</span></td>
+                  <td>No in the exact target-metric formulas shown here.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Added field</th>
+                  <th>Meaning in Lean</th>
+                  <th>Declared constraint</th>
+                  <th>Used in exact metric chain below</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>R2_source</code></td>
+                  <td>Source-population explained variance.</td>
+                  <td><span class="table-tag table-tag-definition">0 &lt; R2_source &lt; 1</span></td>
+                  <td>Yes.</td>
+                </tr>
+                <tr>
+                  <td><code>V_E</code></td>
+                  <td>Residual or environmental variance.</td>
+                  <td><span class="table-tag table-tag-definition">0 &lt; V_E</span></td>
+                  <td>Yes.</td>
+                </tr>
+                <tr>
+                  <td><code>prevalence</code></td>
+                  <td>Disease prevalence for Brier formulas.</td>
+                  <td><span class="table-tag table-tag-definition">0 &lt; prevalence &lt; 1</span></td>
+                  <td>Yes, for Brier only.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel" id="chain">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Dependency Chain</p>
+              <h2>Exact Definitions and Exact Formula Steps</h2>
+            </div>
+            <p>
+              Each card below names the Lean object directly. The page distinguishes definitions
+              from theorems, and it calls out where the DGP block itself mixes continuous time and
+              floored time.
+            </p>
+          </div>
+
+          <div class="chain-grid">
+            <details class="step-card" open>
+              <summary>
+                <div class="summary-title">
+                  <div class="pill-row">
+                    <span class="pill pill-definition">Definition</span>
+                  </div>
+                  <h3>Step 1. Scaled Parameters</h3>
+                  <p>The block first defines <code>tau</code>, <code>theta</code>, and <code>bigM</code>.</p>
+                </div>
+                <span class="summary-caret">+</span>
+              </summary>
+              <div class="step-body">
+                <pre class="formula-block">tau   = t_div / (2 * Ne)
+theta = 4 * Ne * mu
+bigM  = 4 * Ne * mig</pre>
+                <div class="field-block">
+                  <strong>Depends on</strong>
+                  <p><code>Ne</code>, <code>mu</code>, <code>mig</code>, <code>t_div</code>.</p>
+                </div>
+                <div class="field-block">
+                  <strong>Changes next</strong>
+                  <p>
+                    <code>fstEquilibrium</code>, <code>hetDecayFactor</code>, <code>mutErosion</code>,
+                    and <code>migBoost</code>.
+                  </p>
+                </div>
+                <a class="source-link" href="../Calibrator/DGP.lean">
+                  <code>EvolutionaryParameters.tau</code>, <code>theta</code>, <code>bigM</code>
+                </a>
+              </div>
+            </details>
+
+            <details class="step-card" open>
+              <summary>
+                <div class="summary-title">
+                  <div class="pill-row">
+                    <span class="pill pill-definition">Definition</span>
+                    <span class="pill pill-boundary">Mixed Time Semantics</span>
+                  </div>
+                  <h3>Step 2. Divergence Pieces</h3>
+                  <p>The exact DGP block uses both real time and <code>floor(t_div)</code>.</p>
+                </div>
+                <span class="summary-caret">+</span>
+              </summary>
+              <div class="step-body">
+                <pre class="formula-block">fstEquilibrium = 1 / (1 + theta + bigM)
+hetDecayFactor = (1 - 1 / (2 * Ne)) * (1 - theta / (2 * Ne))
+fstTransient   = fstEquilibrium * (1 - hetDecayFactor ^ floor(t_div))</pre>
+                <div class="field-block">
+                  <strong>Depends on</strong>
+                  <p><code>Ne</code>, <code>mu</code>, <code>mig</code>, <code>t_div</code>.</p>
+                </div>
+                <div class="field-block">
+                  <strong>Exact honesty note</strong>
+                  <p>
+                    <code>fstTransient</code> uses <code>Nat.floor t_div</code> exactly in this file.
+                    The UI now says that directly instead of implying a single continuous-time pipeline.
+                  </p>
+                </div>
+                <a class="source-link" href="../Calibrator/DGP.lean">
+                  <code>fstEquilibrium</code>, <code>PGSEvolutionaryModel.hetDecayFactor</code>, <code>fstTransient</code>
+                </a>
+              </div>
+            </details>
+
+            <details class="step-card" open>
+              <summary>
+                <div class="summary-title">
+                  <div class="pill-row">
+                    <span class="pill pill-definition">Definition</span>
+                    <span class="pill pill-boundary">Model-Level Note</span>
+                  </div>
+                  <h3>Step 3. Shared-Signal Factors</h3>
+                  <p>These are exact definitions in the DGP block.</p>
+                </div>
+                <span class="summary-caret">+</span>
+              </summary>
+              <div class="step-body">
+                <pre class="formula-block">ldRetention = exp(-2 * recomb * t_div)
+mutErosion = exp(-theta * tau)
+migBoost   = 1 + bigM * tau / (1 + bigM)</pre>
+                <div class="field-block">
+                  <strong>Depends on</strong>
+                  <p><code>recomb</code>, <code>t_div</code>, <code>theta</code>, <code>tau</code>, <code>bigM</code>.</p>
+                </div>
+                <div class="field-block">
+                  <strong>Exact honesty note</strong>
+                  <p>
+                    The formulas above are exact definitions in <code>DGP.lean</code>. Some surrounding comments
+                    describe them as continuous or low-parameter surrogates of deeper recurrences. This page
+                    therefore labels them as model definitions, not approximation-free biological laws.
+                  </p>
+                </div>
+                <a class="source-link" href="../Calibrator/DGP.lean">
+                  <code>sharedLDRetention</code>, <code>mutationLDErosion</code>, <code>migrationLDBoost</code>
+                </a>
+              </div>
+            </details>
+
+            <details class="step-card" open>
+              <summary>
+                <div class="summary-title">
+                  <div class="pill-row">
+                    <span class="pill pill-definition">Definition</span>
+                    <span class="pill pill-theorem">Theorem</span>
+                  </div>
+                  <h3>Step 4. Transported Signal</h3>
+                  <p><code>ρ</code> is derived from transported signal variance, not vice versa.</p>
+                </div>
+                <span class="summary-caret">+</span>
+              </summary>
+              <div class="step-body">
+                <pre class="formula-block">signalTransportFactor =
+  (1 - fstTransient) * ldRetention * mutErosion * migBoost
+
+portabilityRatio = targetSignalVariance / sourceSignalVariance
+portabilityRatio = signalTransportFactor</pre>
+                <div class="field-block">
+                  <strong>Depends on</strong>
+                  <p>
+                    <code>fstTransient</code>, <code>ldRetention</code>, <code>mutErosion</code>, <code>migBoost</code>.
+                  </p>
+                </div>
+                <div class="field-block">
+                  <strong>Changes next</strong>
+                  <p><code>targetSignalVariance</code>, then exact deployed metrics.</p>
+                </div>
+                <a class="source-link" href="../Calibrator/DGP.lean">
+                  <code>PGSEvolutionaryModel.signalTransportFactor</code> and <code>portabilityRatio_eq_signalTransportFactor</code>
+                </a>
+              </div>
+            </details>
+
+            <details class="step-card" open>
+              <summary>
+                <div class="summary-title">
+                  <div class="pill-row">
+                    <span class="pill pill-definition">Definition</span>
+                  </div>
+                  <h3>Step 5. Signal Variances</h3>
+                  <p>The page now shows the exact variance transport layer explicitly.</p>
+                </div>
+                <span class="summary-caret">+</span>
+              </summary>
+              <div class="step-body">
+                <pre class="formula-block">sourceSignalVariance = V_E * (R2_source / (1 - R2_source))
+targetSignalVariance = sourceSignalVariance * signalTransportFactor
+varianceToR2(v)      = v / (v + V_E)</pre>
+                <div class="field-block">
+                  <strong>Depends on</strong>
+                  <p><code>R2_source</code>, <code>V_E</code>, and <code>signalTransportFactor</code>.</p>
+                </div>
+                <div class="field-block">
+                  <strong>Changes next</strong>
+                  <p><code>R2_target</code>, <code>AUC_target</code>, and <code>Brier_target</code>.</p>
+                </div>
+                <a class="source-link" href="../Calibrator/DGP.lean">
+                  <code>sourceSignalVariance</code>, <code>targetSignalVariance</code>, <code>varianceToR2</code>
+                </a>
+              </div>
+            </details>
+
+            <details class="step-card" open>
+              <summary>
+                <div class="summary-title">
+                  <div class="pill-row">
+                    <span class="pill pill-theorem">Exact Formula</span>
+                  </div>
+                  <h3>Step 6. Deployed Metrics</h3>
+                  <p>The exact end-to-end target formulas replace the old calculator outputs.</p>
+                </div>
+                <span class="summary-caret">+</span>
+              </summary>
+              <div class="step-body">
+                <pre class="formula-block">R2_target =
+  (R2_source * signalTransportFactor) /
+  (1 - R2_source + R2_source * signalTransportFactor)
+
+AUC_target =
+  Phi(sqrt((R2_source * signalTransportFactor) / (2 * (1 - R2_source))))
+
+Brier_target =
+  prevalence * (1 - prevalence) * (1 - R2_target)</pre>
+                <div class="field-block">
+                  <strong>Depends on</strong>
+                  <p><code>R2_source</code>, <code>signalTransportFactor</code>, <code>prevalence</code>.</p>
+                </div>
+                <div class="field-block">
+                  <strong>Exact honesty note</strong>
+                  <p>
+                    The browser does not evaluate <code>Phi</code> or these formulas numerically.
+                    It only shows the theorem statements.
+                  </p>
+                </div>
+                <a class="source-link" href="../Calibrator/DGP.lean">
+                  <code>R2_target_eq_transportFactor</code>, <code>AUC_target_eq_transportFactor</code>, <code>Brier_target_explicit</code>
+                </a>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <section class="panel" id="changes">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Input Mapping</p>
+              <h2>What Changes What</h2>
+            </div>
+            <p>
+              Each card names exact downstream dependencies. If the repository surfaces a local monotone theorem,
+              that theorem is named. If it does not, the card says “dependency only.”
+            </p>
+          </div>
+
+          <div class="change-grid">
+            <article class="change-card">
+              <div class="status-row">
+                <span class="status status-dependency">Dependency Only</span>
+              </div>
+              <h3><code>Ne</code></h3>
+              <div class="field-block">
+                <strong>Exact downstream path</strong>
+                <p>
+                  <code>Ne → tau, theta, bigM → fstEquilibrium, hetDecayFactor, fstTransient, mutErosion, migBoost → signalTransportFactor → target metrics</code>
+                </p>
+              </div>
+              <div class="field-block">
+                <strong>Exact direction surfaced here</strong>
+                <p>No single final-metric monotone theorem is surfaced on this page.</p>
+              </div>
+              <div class="field-block">
+                <strong>Not claimed</strong>
+                <p>The UI does not claim that increasing <code>Ne</code> universally improves portability.</p>
+              </div>
+            </article>
+
+            <article class="change-card">
+              <div class="status-row">
+                <span class="status status-theorem">Named Local Theorem</span>
+              </div>
+              <h3><code>mu</code></h3>
+              <div class="field-block">
+                <strong>Exact downstream path</strong>
+                <p>
+                  <code>mu → theta → fstEquilibrium, mutErosion, hetDecayFactor → fstTransient → signalTransportFactor → target metrics</code>
+                </p>
+              </div>
+              <div class="field-block">
+                <strong>Exact direction surfaced here</strong>
+                <p>
+                  At fixed companion parameters, increasing <code>mu</code> decreases <code>fstEquilibrium</code>.
+                </p>
+              </div>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>fstEquilibrium_decreasing_in_theta</code>
+              </a>
+            </article>
+
+            <article class="change-card">
+              <div class="status-row">
+                <span class="status status-theorem">Named Local Theorem</span>
+              </div>
+              <h3><code>mig</code></h3>
+              <div class="field-block">
+                <strong>Exact downstream path</strong>
+                <p>
+                  <code>mig → bigM → fstEquilibrium, migBoost → signalTransportFactor → target metrics</code>
+                </p>
+              </div>
+              <div class="field-block">
+                <strong>Exact direction surfaced here</strong>
+                <p>
+                  At fixed companion parameters, increasing <code>mig</code> decreases <code>fstEquilibrium</code>.
+                </p>
+              </div>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>fstEquilibrium_decreasing_in_migration</code>
+              </a>
+            </article>
+
+            <article class="change-card">
+              <div class="status-row">
+                <span class="status status-theorem">Named Local Theorem</span>
+                <span class="status status-boundary">Mixed Time Semantics</span>
+              </div>
+              <h3><code>t_div</code></h3>
+              <div class="field-block">
+                <strong>Exact downstream path</strong>
+                <p>
+                  <code>t_div → tau</code>;
+                  <code>t_div → floor(t_div) → fstTransient</code>;
+                  <code>t_div → ldRetention</code>;
+                  <code>t_div → mutErosion</code>;
+                  <code>t_div → migBoost</code>.
+                </p>
+              </div>
+              <div class="field-block">
+                <strong>Exact direction surfaced here</strong>
+                <p>
+                  With positive recombination and fixed companions, longer divergence time lowers <code>sharedLDRetention</code>.
+                </p>
+              </div>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>sharedLDRetention_decreasing_in_time</code>
+              </a>
+            </article>
+
+            <article class="change-card">
+              <div class="status-row">
+                <span class="status status-dependency">Dependency Only</span>
+              </div>
+              <h3><code>recomb</code></h3>
+              <div class="field-block">
+                <strong>Exact downstream path</strong>
+                <p><code>recomb → ldRetention → signalTransportFactor → target metrics</code></p>
+              </div>
+              <div class="field-block">
+                <strong>Exact direction surfaced here</strong>
+                <p>
+                  The page states the exact definition <code>ldRetention = exp(-2 * recomb * t_div)</code>.
+                  It does not invent an extra theorem label that the file does not name in this block.
+                </p>
+              </div>
+              <div class="field-block">
+                <strong>Not claimed</strong>
+                <p>No extra monotone summary beyond the displayed dependency formula.</p>
+              </div>
+            </article>
+
+            <article class="change-card">
+              <div class="status-row">
+                <span class="status status-theorem">Exact Formula Layer</span>
+              </div>
+              <h3><code>R2_source</code></h3>
+              <div class="field-block">
+                <strong>Exact downstream path</strong>
+                <p>
+                  <code>R2_source → sourceSignalVariance → targetSignalVariance → R2_target, AUC_target, Brier_target</code>
+                </p>
+              </div>
+              <div class="field-block">
+                <strong>Exact direction surfaced here</strong>
+                <p>
+                  The page shows exact target formulas, not a simplified product law.
+                </p>
+              </div>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>R2_target_eq_transportFactor</code> and <code>AUC_target_eq_transportFactor</code>
+              </a>
+            </article>
+
+            <article class="change-card">
+              <div class="status-row">
+                <span class="status status-dependency">Dependency Only</span>
+              </div>
+              <h3><code>V_E</code></h3>
+              <div class="field-block">
+                <strong>Exact downstream path</strong>
+                <p>
+                  <code>V_E → sourceSignalVariance → targetSignalVariance</code> and
+                  <code>V_E → varianceToR2</code> and <code>AUC_target</code>.
+                </p>
+              </div>
+              <div class="field-block">
+                <strong>Exact direction surfaced here</strong>
+                <p>No standalone monotone theorem is surfaced on this page.</p>
+              </div>
+              <div class="field-block">
+                <strong>Not claimed</strong>
+                <p>The UI does not attach an unstated causal meaning beyond the exact formulas.</p>
+              </div>
+            </article>
+
+            <article class="change-card">
+              <div class="status-row">
+                <span class="status status-theorem">Named Metric Theorem</span>
+              </div>
+              <h3><code>prevalence</code></h3>
+              <div class="field-block">
+                <strong>Exact downstream path</strong>
+                <p><code>prevalence → Brier_source</code> and <code>Brier_target</code>. No effect on the displayed <code>R²</code> or AUC formulas.</p>
+              </div>
+              <div class="field-block">
+                <strong>Exact direction surfaced here</strong>
+                <p>
+                  Under the stated hypotheses, higher prevalence up to <code>1/2</code> increases the exact Brier value at fixed <code>r2</code>.
+                </p>
+              </div>
+              <a class="source-link" href="../Calibrator/MetricSpecificPortability.lean">
+                <code>brier_depends_on_prevalence</code>
+              </a>
+            </article>
+
+            <article class="change-card">
+              <div class="status-row">
+                <span class="status status-boundary">Stored But Not Used Here</span>
+              </div>
+              <h3><code>V_A</code></h3>
+              <div class="field-block">
+                <strong>Exact downstream path</strong>
+                <p>
+                  In the exact target-metric block displayed on this page, none. The field exists in
+                  <code>EvolutionaryParameters</code>, but the deployed formulas shown here do not consume it.
+                </p>
+              </div>
+              <div class="field-block">
+                <strong>Exact direction surfaced here</strong>
+                <p>None, because the displayed formula chain does not use this field.</p>
+              </div>
+              <div class="field-block">
+                <strong>Why the UI says this aloud</strong>
+                <p>
+                  Silence would imply relevance. The new page states non-use explicitly.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel" id="theorems">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Named Consequences</p>
+              <h2>Exact Theorems Exposed by the Page</h2>
+            </div>
+            <p>
+              These are the claims the UI is willing to present as actual theorem-level outcomes,
+              rather than as mere dependencies.
+            </p>
+          </div>
+
+          <div class="theorem-grid">
+            <article class="theorem-card">
+              <div class="status-row">
+                <span class="status status-theorem">Exact Equality</span>
+              </div>
+              <h3><code>portabilityRatio = signalTransportFactor</code></h3>
+              <pre class="formula-block">portabilityRatio = targetSignalVariance / sourceSignalVariance
+portabilityRatio = signalTransportFactor</pre>
+              <p class="caption">
+                This is the exact bridge between the public portability ratio and the transported-signal layer.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>PGSEvolutionaryModel.portabilityRatio_eq_signalTransportFactor</code>
+              </a>
+            </article>
+
+            <article class="theorem-card">
+              <div class="status-row">
+                <span class="status status-theorem">Exact Equality</span>
+              </div>
+              <h3><code>R2_target</code> exact transport formula</h3>
+              <pre class="formula-block">R2_target =
+  (R2_source * signalTransportFactor) /
+  (1 - R2_source + R2_source * signalTransportFactor)</pre>
+              <p class="caption">
+                This is the exact theorem that replaces the old product-style UI.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>PGSEvolutionaryModel.R2_target_eq_transportFactor</code>
+              </a>
+            </article>
+
+            <article class="theorem-card">
+              <div class="status-row">
+                <span class="status status-theorem">Exact Equality</span>
+              </div>
+              <h3><code>AUC_target</code> exact transport formula</h3>
+              <pre class="formula-block">AUC_target =
+  Phi(sqrt((R2_source * signalTransportFactor) / (2 * (1 - R2_source))))</pre>
+              <p class="caption">
+                The page names the theorem and leaves <code>Phi</code> symbolic.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>PGSEvolutionaryModel.AUC_target_eq_transportFactor</code>
+              </a>
+            </article>
+
+            <article class="theorem-card">
+              <div class="status-row">
+                <span class="status status-theorem">Exact Equality</span>
+              </div>
+              <h3><code>Brier_target</code> exact explicit formula</h3>
+              <pre class="formula-block">Brier_target =
+  prevalence * (1 - prevalence) * (1 - R2_target)</pre>
+              <p class="caption">
+                The page only shows the exact formula layer and its dependence on <code>prevalence</code>.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>PGSEvolutionaryModel.Brier_target_explicit</code>
+              </a>
+            </article>
+
+            <article class="theorem-card">
+              <div class="status-row">
+                <span class="status status-theorem">Exact Ordering</span>
+              </div>
+              <h3>When <code>0 ≤ portabilityRatio ≤ 1</code></h3>
+              <pre class="formula-block">R2_target ≤ R2_source
+AUC_target ≤ AUC_source
+Brier_source ≤ Brier_target</pre>
+              <p class="caption">
+                These are exact theorem-level monotone results under stated retention hypotheses.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>R2_target_le_source</code>, <code>AUC_target_le_source</code>, <code>Brier_target_ge_source</code>
+              </a>
+            </article>
+
+            <article class="theorem-card">
+              <div class="status-row">
+                <span class="status status-theorem">Exact Inverse</span>
+              </div>
+              <h3>Recover transport from an observed <code>R²</code> pair</h3>
+              <pre class="formula-block">transportFactorFromR2Pair(r2Source, r2Target) =
+  r2Target * (1 - r2Source) / (r2Source * (1 - r2Target))</pre>
+              <p class="caption">
+                Under nonnegativity of the internal ratio, this exact observable transport factor equals the model’s portability ratio.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>transportFactorFromR2Pair</code> and <code>portabilityRatio_eq_transportFactorFromR2Pair</code>
+              </a>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel" id="boundaries">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Boundaries</p>
+              <h2>What the Page Refuses to Imply</h2>
+            </div>
+            <p>
+              Deep honesty in this file means saying where the proofs stop, where the model block introduces
+              its own definitions, and where a browser cannot remain exact.
+            </p>
+          </div>
+
+          <div class="callout" style="margin-bottom: 1rem;">
+            <p>
+              The browser cannot evaluate real-valued exponentials, square roots, or <code>Phi</code> exactly.
+              That is why the page now shows formulas and theorem names instead of live numbers.
+            </p>
+            <p>
+              Exactness in this UI means exact symbolic statements that map directly to Lean names, not floating-point outputs.
+            </p>
+          </div>
+
+          <div class="boundary-grid">
+            <article class="boundary-card">
+              <div class="pill-row">
+                <span class="pill pill-boundary">Excluded</span>
+              </div>
+              <h3><code>portabilityDecayRate</code> is not surfaced as exact</h3>
+              <p>
+                The docstring in <code>DGP.lean</code> describes the decay-rate story as approximate.
+                The old dashboard promoted it anyway. This page does not.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>portabilityDecayRate</code>
+              </a>
+            </article>
+
+            <article class="boundary-card">
+              <div class="pill-row">
+                <span class="pill pill-boundary">Boundary Label</span>
+              </div>
+              <h3>Continuous-factor formulas are labeled as model definitions</h3>
+              <p>
+                <code>exp(-2 * recomb * t_div)</code> and <code>exp(-theta * tau)</code> are shown because they are exact
+                definitions in the DGP block. The page does not silently upgrade them into approximation-free
+                empirical laws.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>sharedLDRetention</code> and <code>mutationLDErosion</code>
+              </a>
+            </article>
+
+            <article class="boundary-card">
+              <div class="pill-row">
+                <span class="pill pill-boundary">No Hidden Relevance</span>
+              </div>
+              <h3><code>V_A</code> is not silently treated as active</h3>
+              <p>
+                The field is present in the base record, but the exact deployed metric formulas shown here do not use it.
+                The UI names that absence directly.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>EvolutionaryParameters</code> and <code>PGSEvolutionaryModel</code>
+              </a>
+            </article>
+
+            <article class="boundary-card">
+              <div class="pill-row">
+                <span class="pill pill-boundary">Hypotheses Matter</span>
+              </div>
+              <h3>Metric ordering is conditional</h3>
+              <p>
+                The page does not claim target metrics worsen unconditionally. It only presents the exact theorem
+                bundle under <code>0 ≤ portabilityRatio ≤ 1</code>.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>R2_target_le_source</code>, <code>AUC_target_le_source</code>, <code>Brier_target_ge_source</code>
+              </a>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel" id="files">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Source Files</p>
+              <h2>File Map for the Claims Above</h2>
+            </div>
+            <p>
+              The page links to files rather than frozen line numbers so the mapping stays truthful as proofs move.
+            </p>
+          </div>
+
+          <div class="file-grid">
+            <article class="file-card">
+              <div class="pill-row">
+                <span class="pill pill-definition">Primary File</span>
+              </div>
+              <h3><code>DGP.lean</code></h3>
+              <p>
+                Contains <code>EvolutionaryParameters</code>, <code>PGSEvolutionaryModel</code>, exact transport formulas,
+                metric ordering theorems, and the exact inverse transport factor from an <code>R²</code> pair.
+              </p>
+              <a class="source-link" href="../Calibrator/DGP.lean">
+                <code>../Calibrator/DGP.lean</code>
+              </a>
+            </article>
+
+            <article class="file-card">
+              <div class="pill-row">
+                <span class="pill pill-theorem">Metric File</span>
+              </div>
+              <h3><code>MetricSpecificPortability.lean</code></h3>
+              <p>
+                Provides exact metric-specific statements such as prevalence dependence of Brier and several AUC vs <code>R²</code> results.
+              </p>
+              <a class="source-link" href="../Calibrator/MetricSpecificPortability.lean">
+                <code>../Calibrator/MetricSpecificPortability.lean</code>
+              </a>
+            </article>
+
+            <article class="file-card">
+              <div class="pill-row">
+                <span class="pill pill-theorem">Foundations</span>
+              </div>
+              <h3><code>PopulationGeneticsFoundations.lean</code></h3>
+              <p>
+                Holds foundational recurrence results for heterozygosity and transient <code>Fst</code> that the DGP block refers back to in its comments.
+              </p>
+              <a class="source-link" href="../Calibrator/PopulationGeneticsFoundations.lean">
+                <code>../Calibrator/PopulationGeneticsFoundations.lean</code>
+              </a>
+            </article>
+
+            <article class="file-card">
+              <div class="pill-row">
+                <span class="pill pill-theorem">Metric Primitives</span>
+              </div>
+              <h3><code>Conclusions.lean</code></h3>
+              <p>
+                Contains exact Brier definitions and related metric identities that underpin the broader metric story.
+              </p>
+              <a class="source-link" href="../Calibrator/Conclusions.lean">
+                <code>../Calibrator/Conclusions.lean</code>
+              </a>
+            </article>
+          </div>
+        </section>
+
+        <footer>
+          This dashboard now prefers exact symbolic provenance over live numeric presentation.
+          If a future version adds interaction again, it should only do so with explicit labels for
+          “symbolic rewrite,” “proved theorem,” or “floating-point approximation.”
+        </footer>
+      </main>
     </div>
-  </header>
-
-  <div class="container">
-
-    <!-- Parameter Controls + Portability Ratio -->
-    <div class="grid-2">
-
-      <!-- Left: All sliders -->
-      <div class="card">
-        <div class="card-title">Evolutionary Parameters</div>
-
-        <div class="slider-group">
-          <div class="slider-label">
-            <span>N<sub>e</sub> &mdash; effective population size</span>
-            <span class="slider-value" id="val-Ne">10,000</span>
-          </div>
-          <input type="range" id="sl-Ne" min="500" max="100000" step="500" value="10000">
-        </div>
-
-        <div class="slider-group">
-          <div class="slider-label">
-            <span>&mu; &mdash; mutation rate / generation</span>
-            <span class="slider-value" id="val-mu">1.0e-8</span>
-          </div>
-          <input type="range" id="sl-mu" min="-9" max="-6" step="0.1" value="-8">
-        </div>
-
-        <div class="slider-group">
-          <div class="slider-label">
-            <span>m &mdash; migration rate / generation</span>
-            <span class="slider-value" id="val-m">0.001</span>
-          </div>
-          <input type="range" id="sl-m" min="-5" max="-1" step="0.1" value="-3">
-        </div>
-
-        <div class="slider-group">
-          <div class="slider-label">
-            <span>r &mdash; recombination rate</span>
-            <span class="slider-value" id="val-r">0.010</span>
-          </div>
-          <input type="range" id="sl-r" min="-3" max="-0.301" step="0.05" value="-2">
-        </div>
-
-        <div class="slider-group">
-          <div class="slider-label">
-            <span>t &mdash; divergence time (generations)</span>
-            <span class="slider-value" id="val-t">500</span>
-          </div>
-          <input type="range" id="sl-t" min="0" max="5000" step="10" value="500">
-        </div>
-
-        <div class="slider-group">
-          <div class="slider-label">
-            <span>R&sup2;<sub>source</sub> &mdash; source accuracy</span>
-            <span class="slider-value" id="val-R2">0.30</span>
-          </div>
-          <input type="range" id="sl-R2" min="0.01" max="0.95" step="0.01" value="0.30">
-        </div>
-
-        <div class="slider-group">
-          <div class="slider-label">
-            <span>&pi; &mdash; disease prevalence</span>
-            <span class="slider-value" id="val-pi">0.10</span>
-          </div>
-          <input type="range" id="sl-pi" min="0.01" max="0.50" step="0.01" value="0.10">
-        </div>
-
-        <div style="margin-top: 0.5rem;">
-          <a class="proof-link" href="https://github.com/SauersML/gnomon/blob/main/proofs/Calibrator/DGP.lean#L5068" target="_blank">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            EvolutionaryParameters &mdash; DGP.lean:5068
-          </a>
-        </div>
-      </div>
-
-      <!-- Right: Portability ratio + decomposition -->
-      <div class="card">
-        <div class="card-title">Portability Ratio &rho;(t)</div>
-
-        <div style="text-align:center; margin-bottom: 1.25rem;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size: 2.8rem; font-weight: 800;" id="rho-big" class="color-violet">0.000</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted);">fraction of source R&sup2; retained</div>
-        </div>
-
-        <div class="formula-block">
-          <span class="comment">-- DGP.lean:5601</span><br>
-          &rho;(t) = <span style="color:var(--accent-indigo)">(1 - F<sub>ST</sub>)</span>
-          &times; <span style="color:var(--accent-cyan)">exp(-2rt)</span>
-          &times; <span style="color:var(--accent-amber)">exp(-&theta;&tau;)</span>
-          &times; <span style="color:var(--accent-emerald)">(1 + M&tau;/(1+M))</span>
-        </div>
-
-        <!-- Factor bars -->
-        <div style="margin-top: 1rem;">
-          <div class="factor-bar">
-            <span class="factor-label"><span class="rate-dot" style="background:var(--accent-indigo)"></span>1 - F<sub>ST</sub>(t)</span>
-            <div class="bar-track"><div class="bar-fill" id="bar-drift" style="background:var(--accent-indigo); width:80%"><span class="bar-value" id="bv-drift">0.80</span></div></div>
-          </div>
-          <div class="factor-bar">
-            <span class="factor-label"><span class="rate-dot" style="background:var(--accent-cyan)"></span>LD retention</span>
-            <div class="bar-track"><div class="bar-fill" id="bar-ld" style="background:var(--accent-cyan); width:80%"><span class="bar-value" id="bv-ld">0.80</span></div></div>
-          </div>
-          <div class="factor-bar">
-            <span class="factor-label"><span class="rate-dot" style="background:var(--accent-amber)"></span>Mut. erosion</span>
-            <div class="bar-track"><div class="bar-fill" id="bar-mut" style="background:var(--accent-amber); width:80%"><span class="bar-value" id="bv-mut">0.80</span></div></div>
-          </div>
-          <div class="factor-bar">
-            <span class="factor-label"><span class="rate-dot" style="background:var(--accent-emerald)"></span>Mig. boost</span>
-            <div class="bar-track"><div class="bar-fill" id="bar-mig" style="background:var(--accent-emerald); width:100%"><span class="bar-value" id="bv-mig">1.00</span></div></div>
-          </div>
-        </div>
-
-        <div style="margin-top: 1rem;">
-          <a class="proof-link" href="https://github.com/SauersML/gnomon/blob/main/proofs/Calibrator/DGP.lean#L5601" target="_blank">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            portabilityRatio &mdash; DGP.lean:5601
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Metric Cards: Source vs Target -->
-    <h2 class="section-heading">Source vs. Target Metrics</h2>
-    <div class="grid-4" style="margin-bottom: 0.75rem;">
-      <div class="metric-card">
-        <div class="label">R&sup2; source</div>
-        <div class="value color-indigo" id="mc-r2s">0.300</div>
-      </div>
-      <div class="metric-card">
-        <div class="label">R&sup2; target</div>
-        <div class="value color-violet" id="mc-r2t">0.000</div>
-        <div class="sub" id="mc-r2drop"></div>
-      </div>
-      <div class="metric-card">
-        <div class="label">AUC source</div>
-        <div class="value color-cyan" id="mc-aucs">0.500</div>
-      </div>
-      <div class="metric-card">
-        <div class="label">AUC target</div>
-        <div class="value color-amber" id="mc-auct">0.500</div>
-        <div class="sub" id="mc-aucdrop"></div>
-      </div>
-    </div>
-    <div class="grid-4">
-      <div class="metric-card">
-        <div class="label">Brier source</div>
-        <div class="value color-emerald" id="mc-brs">0.000</div>
-      </div>
-      <div class="metric-card">
-        <div class="label">Brier target</div>
-        <div class="value color-rose" id="mc-brt">0.000</div>
-        <div class="sub" id="mc-brdrop"></div>
-      </div>
-      <div class="metric-card">
-        <div class="label">SNR source</div>
-        <div class="value" style="color:var(--text-secondary)" id="mc-snrs">0.000</div>
-      </div>
-      <div class="metric-card">
-        <div class="label">SNR target</div>
-        <div class="value" style="color:var(--text-secondary)" id="mc-snrt">0.000</div>
-      </div>
-    </div>
-
-    <!-- Temporal Evolution Chart -->
-    <h2 class="section-heading">Temporal Evolution of Portability</h2>
-    <div class="card">
-      <div class="card-title">R&sup2;, AUC, and Brier score over divergence time</div>
-      <div class="chart-wrap"><canvas id="chart-temporal"></canvas></div>
-      <div style="margin-top: 0.75rem;">
-        <a class="proof-link" href="https://github.com/SauersML/gnomon/blob/main/proofs/Calibrator/DGP.lean#L5472" target="_blank">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-          End-to-end pipeline &mdash; DGP.lean:5472
-        </a>
-      </div>
-    </div>
-
-    <!-- Decomposition + Decay Rates side by side -->
-    <h2 class="section-heading">Portability Decay Rate Decomposition</h2>
-    <div class="grid-2">
-
-      <!-- Decomposition chart -->
-      <div class="card">
-        <div class="card-title">Factor contributions (log scale)</div>
-        <div class="chart-wrap" style="height:280px;"><canvas id="chart-decomp"></canvas></div>
-      </div>
-
-      <!-- Decay rates table -->
-      <div class="card">
-        <div class="card-title">Instantaneous decay rates (per generation)</div>
-
-        <div class="formula-block" style="margin-bottom:1rem;">
-          <span class="comment">-- DGP.lean:5821</span><br>
-          d log(&rho;)/dt &asymp; -(drift + LD + mutation - migration)
-        </div>
-
-        <table class="rate-table">
-          <thead>
-            <tr><th>Force</th><th>Formula</th><th>Rate</th><th>Share</th></tr>
-          </thead>
-          <tbody>
-            <tr id="rate-drift">
-              <td><span class="rate-dot" style="background:var(--accent-indigo)"></span>Drift</td>
-              <td>1/(2N<sub>e</sub>(1+&theta;+M))</td>
-              <td class="rate-val">0</td>
-              <td class="rate-pct">0%</td>
-            </tr>
-            <tr id="rate-ld">
-              <td><span class="rate-dot" style="background:var(--accent-cyan)"></span>LD decay</td>
-              <td>2r</td>
-              <td class="rate-val">0</td>
-              <td class="rate-pct">0%</td>
-            </tr>
-            <tr id="rate-mut">
-              <td><span class="rate-dot" style="background:var(--accent-amber)"></span>Mutation</td>
-              <td>2&mu;</td>
-              <td class="rate-val">0</td>
-              <td class="rate-pct">0%</td>
-            </tr>
-            <tr id="rate-mig">
-              <td><span class="rate-dot" style="background:var(--accent-emerald)"></span>Migration</td>
-              <td>-M/(2N<sub>e</sub>(1+M))</td>
-              <td class="rate-val">0</td>
-              <td class="rate-pct">0%</td>
-            </tr>
-            <tr style="font-weight:700; border-top: 2px solid var(--border);">
-              <td colspan="2">Net decay rate</td>
-              <td class="rate-val" id="rate-net">0</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div style="margin-top: 0.75rem;">
-          <a class="proof-link" href="https://github.com/SauersML/gnomon/blob/main/proofs/Calibrator/DGP.lean#L5821" target="_blank">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            portabilityDecayRate &mdash; DGP.lean:5821
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Scaled Parameters -->
-    <h2 class="section-heading">Scaled Parameters</h2>
-    <div class="grid-4">
-      <div class="metric-card">
-        <div class="label">&theta; = 4N<sub>e</sub>&mu;</div>
-        <div class="value" style="color:var(--text-secondary); font-size:1.3rem;" id="mc-theta">0.000</div>
-        <div class="sub">scaled mutation</div>
-      </div>
-      <div class="metric-card">
-        <div class="label">&tau; = t/(2N<sub>e</sub>)</div>
-        <div class="value" style="color:var(--text-secondary); font-size:1.3rem;" id="mc-tau">0.000</div>
-        <div class="sub">scaled time</div>
-      </div>
-      <div class="metric-card">
-        <div class="label">M = 4N<sub>e</sub>m</div>
-        <div class="value" style="color:var(--text-secondary); font-size:1.3rem;" id="mc-bigM">0.000</div>
-        <div class="sub">scaled migration</div>
-      </div>
-      <div class="metric-card">
-        <div class="label">F<sub>ST</sub>(eq)</div>
-        <div class="value" style="color:var(--text-secondary); font-size:1.3rem;" id="mc-fsteq">0.000</div>
-        <div class="sub">1/(1+&theta;+M)</div>
-      </div>
-    </div>
-
-    <!-- Methodology -->
-    <div class="methodology">
-      <strong>Methodology.</strong>
-      All formulas displayed are computed using the unified evolutionary portability model formally proven in Lean 4 with Mathlib.
-      The model derives R&sup2;, AUC, and Brier score degradation from Wright-Fisher population genetics,
-      with every step verified by machine-checked proof. The four evolutionary forces &mdash; genetic drift,
-      LD decay via recombination, mutation erosion, and migration boost &mdash; compose multiplicatively because
-      they act on independent aspects of the PGS-phenotype covariance. The temporal dynamics follow from the
-      heterozygosity recurrence H(t+1) = (1-1/(2N<sub>e</sub>))(1-&theta;/(2N<sub>e</sub>)) H(t) and the LD
-      recurrence D(t+1) = (1-r) D(t). See
-      <a href="https://github.com/SauersML/gnomon/blob/main/proofs/Calibrator/DGP.lean" target="_blank" style="color:var(--accent-indigo)">DGP.lean</a>
-      for the complete end-to-end pipeline proof.
-    </div>
-
-    <!-- Glossary -->
-    <h2 class="section-heading">Glossary</h2>
-    <div class="card">
-      <dl class="glossary-grid">
-        <div class="glossary-item">
-          <dt>N<sub>e</sub></dt>
-          <dd>Effective population size (harmonic mean)</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>&mu;</dt>
-          <dd>Per-locus mutation rate per generation</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>m</dt>
-          <dd>Migration rate per generation (symmetric)</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>r</dt>
-          <dd>Recombination rate per locus per generation</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>t</dt>
-          <dd>Divergence time in generations</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>&theta;</dt>
-          <dd>Scaled mutation rate: 4N<sub>e</sub>&mu;</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>&tau;</dt>
-          <dd>Scaled divergence time: t / (2N<sub>e</sub>)</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>M</dt>
-          <dd>Scaled migration rate: 4N<sub>e</sub>m</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>F<sub>ST</sub></dt>
-          <dd>Fixation index measuring allele frequency divergence</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>&rho;(t)</dt>
-          <dd>Portability ratio: fraction of R&sup2; transferred</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>AUC</dt>
-          <dd>Area under ROC curve from liability threshold model</dd>
-        </div>
-        <div class="glossary-item">
-          <dt>Brier</dt>
-          <dd>Brier score: &pi;(1-&pi;)(1-R&sup2;)</dd>
-        </div>
-      </dl>
-    </div>
-
-  </div><!-- /container -->
-
-  <script>
-    // ================================================================
-    // UNIFIED EVOLUTIONARY PORTABILITY MODEL
-    // Matches DGP.lean PGSEvolutionaryModel exactly
-    // ================================================================
-
-    // Standard normal CDF approximation (Abramowitz & Stegun 26.2.17)
-    function phi(x) {
-      const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;
-      const a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
-      const sign = x < 0 ? -1 : 1;
-      const t = 1 / (1 + p * Math.abs(x));
-      const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x / 2);
-      return 0.5 * (1 + sign * y);
-    }
-
-    // SNR from R^2: DGP.lean:5667
-    function snrFromR2(r2) {
-      return r2 / (1 - r2);
-    }
-
-    // AUC from R^2: DGP.lean:5688
-    function aucFromR2(r2) {
-      if (r2 <= 0) return 0.5;
-      if (r2 >= 1) return 1.0;
-      return phi(Math.sqrt(snrFromR2(r2) / 2));
-    }
-
-    // Brier from R^2 and prevalence: DGP.lean:5738
-    function brierFromR2(r2, prev) {
-      return prev * (1 - prev) * (1 - r2);
-    }
-
-    // Compute all model quantities from raw parameters
-    function computeModel(Ne, mu, mig, r, t, R2_source, prev) {
-      // Scaled parameters: DGP.lean:5090-5099
-      const theta = 4 * Ne * mu;
-      const tau = t / (2 * Ne);
-      const bigM = 4 * Ne * mig;
-
-      // Fst equilibrium: DGP.lean:5137
-      const fstEq = 1 / (1 + theta + bigM);
-
-      // Heterozygosity decay factor: DGP.lean:5529
-      const lambda = (1 - 1 / (2 * Ne)) * (1 - theta / (2 * Ne));
-
-      // Transient Fst: DGP.lean:5541
-      const fstTransient = fstEq * (1 - Math.pow(lambda, Math.floor(t)));
-
-      // LD retention: DGP.lean:5553 (via sharedLDRetention at 5185)
-      const ldRetention = Math.exp(-2 * r * t);
-
-      // Mutation erosion: DGP.lean:5565 (via mutationLDErosion at 5216)
-      const mutErosion = Math.exp(-theta * tau);
-
-      // Migration boost: DGP.lean:5576 (via migrationLDBoost at 5234)
-      const migBoost = 1 + bigM * tau / (1 + bigM);
-
-      // Portability ratio: DGP.lean:5601
-      const rho = (1 - fstTransient) * ldRetention * mutErosion * migBoost;
-
-      // Target R^2: DGP.lean:5623
-      const R2_target = R2_source * Math.max(0, Math.min(1, rho));
-
-      // Decay rates: DGP.lean:5821-5848
-      const driftRate = 1 / (2 * Ne * (1 + theta + bigM));
-      const ldRate = 2 * r;
-      const mutRate = 2 * mu;
-      const migRate = bigM / (2 * Ne * (1 + bigM));
-      const netRate = driftRate + ldRate + mutRate - migRate;
-
-      return {
-        theta, tau, bigM, fstEq, fstTransient, lambda,
-        ldRetention, mutErosion, migBoost, rho,
-        R2_source, R2_target,
-        AUC_source: aucFromR2(R2_source),
-        AUC_target: aucFromR2(R2_target),
-        Brier_source: brierFromR2(R2_source, prev),
-        Brier_target: brierFromR2(R2_target, prev),
-        SNR_source: snrFromR2(R2_source),
-        SNR_target: snrFromR2(R2_target),
-        driftRate, ldRate, mutRate, migRate, netRate,
-        driftFactor: 1 - fstTransient,
-        prev
-      };
-    }
-
-    // Compute model at a given time (for temporal chart)
-    function computeAtTime(Ne, mu, mig, r, t, R2_source, prev) {
-      return computeModel(Ne, mu, mig, r, t, R2_source, prev);
-    }
-
-    // ================================================================
-    // DOM / CONTROLS
-    // ================================================================
-
-    const sliders = {
-      Ne:  document.getElementById('sl-Ne'),
-      mu:  document.getElementById('sl-mu'),
-      m:   document.getElementById('sl-m'),
-      r:   document.getElementById('sl-r'),
-      t:   document.getElementById('sl-t'),
-      R2:  document.getElementById('sl-R2'),
-      pi:  document.getElementById('sl-pi'),
-    };
-
-    function getParams() {
-      return {
-        Ne:  +sliders.Ne.value,
-        mu:  Math.pow(10, +sliders.mu.value),
-        m:   Math.pow(10, +sliders.m.value),
-        r:   Math.pow(10, +sliders.r.value),
-        t:   +sliders.t.value,
-        R2:  +sliders.R2.value,
-        pi:  +sliders.pi.value,
-      };
-    }
-
-    function fmtSci(x, digits) {
-      if (x === 0) return '0';
-      return x.toExponential(digits || 1);
-    }
-
-    function fmtNum(x, d) {
-      return x.toFixed(d === undefined ? 3 : d);
-    }
-
-    function fmtPct(x) {
-      return (x * 100).toFixed(1) + '%';
-    }
-
-    // ================================================================
-    // CHARTS
-    // ================================================================
-
-    const chartColors = {
-      r2: '#8b5cf6',
-      auc: '#06b6d4',
-      brier: '#f43f5e',
-      rho: '#6366f1',
-    };
-
-    const commonChartOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 } }
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 11 } },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-        },
-        y: {
-          ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 11 } },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-        }
-      }
-    };
-
-    // Temporal chart
-    const ctxTemporal = document.getElementById('chart-temporal').getContext('2d');
-    const temporalChart = new Chart(ctxTemporal, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: 'R\u00B2 target',
-            data: [],
-            borderColor: chartColors.r2,
-            backgroundColor: chartColors.r2 + '18',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 0,
-            borderWidth: 2,
-          },
-          {
-            label: 'AUC target',
-            data: [],
-            borderColor: chartColors.auc,
-            backgroundColor: 'transparent',
-            tension: 0.3,
-            pointRadius: 0,
-            borderWidth: 2,
-          },
-          {
-            label: 'Brier target',
-            data: [],
-            borderColor: chartColors.brier,
-            backgroundColor: 'transparent',
-            tension: 0.3,
-            pointRadius: 0,
-            borderWidth: 2,
-            borderDash: [6, 3],
-          },
-          {
-            label: '\u03C1(t)',
-            data: [],
-            borderColor: chartColors.rho,
-            backgroundColor: 'transparent',
-            tension: 0.3,
-            pointRadius: 0,
-            borderWidth: 2,
-            borderDash: [2, 2],
-          },
-        ]
-      },
-      options: {
-        ...commonChartOptions,
-        scales: {
-          ...commonChartOptions.scales,
-          x: {
-            ...commonChartOptions.scales.x,
-            title: { display: true, text: 'Generations', color: '#64748b' }
-          },
-          y: {
-            ...commonChartOptions.scales.y,
-            min: 0, max: 1,
-            title: { display: true, text: 'Value', color: '#64748b' }
-          }
-        },
-        plugins: {
-          ...commonChartOptions.plugins,
-          tooltip: {
-            callbacks: {
-              label: function(ctx) {
-                return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(4);
-              }
-            }
-          }
-        }
-      }
-    });
-
-    // Decomposition bar chart
-    const ctxDecomp = document.getElementById('chart-decomp').getContext('2d');
-    const decompChart = new Chart(ctxDecomp, {
-      type: 'bar',
-      data: {
-        labels: ['1 - Fst', 'LD retention', 'Mut. erosion', 'Mig. boost'],
-        datasets: [{
-          label: 'log contribution',
-          data: [0, 0, 0, 0],
-          backgroundColor: [
-            'rgba(99,102,241,0.7)',
-            'rgba(6,182,212,0.7)',
-            'rgba(245,158,11,0.7)',
-            'rgba(16,185,129,0.7)',
-          ],
-          borderColor: [
-            '#6366f1', '#06b6d4', '#f59e0b', '#10b981',
-          ],
-          borderWidth: 1,
-          borderRadius: 4,
-        }]
-      },
-      options: {
-        ...commonChartOptions,
-        indexAxis: 'y',
-        scales: {
-          x: {
-            ...commonChartOptions.scales.x,
-            title: { display: true, text: 'log\u2081\u2080(factor)', color: '#64748b' }
-          },
-          y: {
-            ...commonChartOptions.scales.y,
-          }
-        },
-        plugins: {
-          ...commonChartOptions.plugins,
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: function(ctx) {
-                return 'log\u2081\u2080 = ' + ctx.parsed.x.toFixed(4);
-              }
-            }
-          }
-        }
-      }
-    });
-
-    // ================================================================
-    // UPDATE
-    // ================================================================
-
-    function update() {
-      const p = getParams();
-
-      // Update slider value displays
-      document.getElementById('val-Ne').textContent = p.Ne.toLocaleString();
-      document.getElementById('val-mu').textContent = fmtSci(p.mu);
-      document.getElementById('val-m').textContent = fmtSci(p.m);
-      document.getElementById('val-r').textContent = fmtNum(p.r, 4);
-      document.getElementById('val-t').textContent = p.t.toLocaleString();
-      document.getElementById('val-R2').textContent = fmtNum(p.R2, 2);
-      document.getElementById('val-pi').textContent = fmtNum(p.pi, 2);
-
-      // Compute model
-      const m = computeModel(p.Ne, p.mu, p.m, p.r, p.t, p.R2, p.pi);
-
-      // Portability ratio
-      document.getElementById('rho-big').textContent = fmtNum(Math.max(0, m.rho), 4);
-
-      // Factor bars
-      const setBar = (id, vId, val) => {
-        // For factors <= 1, width is val*100%. For migration boost > 1, cap display at 120%
-        const pct = Math.min(Math.max(val, 0), 1.2) / 1.2 * 100;
-        document.getElementById(id).style.width = pct + '%';
-        document.getElementById(vId).textContent = fmtNum(val, 4);
-      };
-      setBar('bar-drift', 'bv-drift', m.driftFactor);
-      setBar('bar-ld', 'bv-ld', m.ldRetention);
-      setBar('bar-mut', 'bv-mut', m.mutErosion);
-      setBar('bar-mig', 'bv-mig', m.migBoost);
-
-      // Metric cards
-      document.getElementById('mc-r2s').textContent = fmtNum(m.R2_source);
-      document.getElementById('mc-r2t').textContent = fmtNum(m.R2_target);
-      document.getElementById('mc-r2drop').textContent = (m.R2_target < m.R2_source)
-        ? '\u2193 ' + fmtPct(1 - m.R2_target / m.R2_source) + ' drop'
-        : '';
-      document.getElementById('mc-aucs').textContent = fmtNum(m.AUC_source);
-      document.getElementById('mc-auct').textContent = fmtNum(m.AUC_target);
-      document.getElementById('mc-aucdrop').textContent = (m.AUC_target < m.AUC_source)
-        ? '\u2193 ' + fmtPct(1 - m.AUC_target / m.AUC_source) + ' drop'
-        : '';
-      document.getElementById('mc-brs').textContent = fmtNum(m.Brier_source);
-      document.getElementById('mc-brt').textContent = fmtNum(m.Brier_target);
-      document.getElementById('mc-brdrop').textContent = (m.Brier_target > m.Brier_source)
-        ? '\u2191 ' + fmtPct(m.Brier_target / m.Brier_source - 1) + ' increase'
-        : '';
-      document.getElementById('mc-snrs').textContent = fmtNum(m.SNR_source);
-      document.getElementById('mc-snrt').textContent = fmtNum(m.SNR_target);
-
-      // Scaled parameters
-      document.getElementById('mc-theta').textContent = fmtNum(m.theta, 4);
-      document.getElementById('mc-tau').textContent = fmtNum(m.tau, 5);
-      document.getElementById('mc-bigM').textContent = fmtNum(m.bigM, 4);
-      document.getElementById('mc-fsteq').textContent = fmtNum(m.fstEq, 5);
-
-      // Decay rates table
-      const totalPositive = m.driftRate + m.ldRate + m.mutRate;
-      const setRate = (rowId, rate, isNeg) => {
-        const row = document.getElementById(rowId);
-        const cells = row.querySelectorAll('td');
-        cells[2].textContent = (isNeg ? '-' : '') + fmtSci(rate, 2);
-        const pct = totalPositive > 0 ? (rate / totalPositive * 100) : 0;
-        cells[3].textContent = fmtPct(rate / totalPositive);
-        // Highlight dominant
-        const isDominant = rate === Math.max(m.driftRate, m.ldRate, m.mutRate);
-        cells[2].className = 'rate-val' + (isDominant && !isNeg ? ' dominant' : '');
-      };
-      setRate('rate-drift', m.driftRate, false);
-      setRate('rate-ld', m.ldRate, false);
-      setRate('rate-mut', m.mutRate, false);
-      setRate('rate-mig', m.migRate, true);
-      document.getElementById('rate-net').textContent = fmtSci(m.netRate, 2);
-
-      // Decomposition chart (log10 of each factor)
-      const safeLog = (x) => x > 0 ? Math.log10(x) : -6;
-      decompChart.data.datasets[0].data = [
-        safeLog(m.driftFactor),
-        safeLog(m.ldRetention),
-        safeLog(m.mutErosion),
-        Math.log10(m.migBoost),
-      ];
-      decompChart.update('none');
-
-      // Temporal chart
-      const tMax = Math.max(p.t, 100);
-      const nSteps = 200;
-      const labels = [];
-      const r2Data = [], aucData = [], brierData = [], rhoData = [];
-      for (let i = 0; i <= nSteps; i++) {
-        const ti = (tMax * i) / nSteps;
-        labels.push(Math.round(ti));
-        const mi = computeAtTime(p.Ne, p.mu, p.m, p.r, ti, p.R2, p.pi);
-        const r2t = Math.max(0, Math.min(1, mi.R2_target));
-        r2Data.push(r2t);
-        aucData.push(mi.AUC_target);
-        brierData.push(mi.Brier_target);
-        rhoData.push(Math.max(0, Math.min(1, mi.rho)));
-      }
-      temporalChart.data.labels = labels;
-      temporalChart.data.datasets[0].data = r2Data;
-      temporalChart.data.datasets[1].data = aucData;
-      temporalChart.data.datasets[2].data = brierData;
-      temporalChart.data.datasets[3].data = rhoData;
-
-      // Adjust Brier axis — it can be small
-      const maxBrier = Math.max(...brierData, 0.1);
-      temporalChart.options.scales.y.max = Math.min(1, Math.max(maxBrier * 1.2, p.R2 * 1.1, 0.5));
-
-      temporalChart.update('none');
-    }
-
-    // Bind all sliders
-    Object.values(sliders).forEach(s => s.addEventListener('input', update));
-
-    // Initial render
-    update();
-  </script>
-
+  </div>
 </body>
 </html>

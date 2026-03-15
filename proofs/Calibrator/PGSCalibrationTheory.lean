@@ -270,28 +270,44 @@ calibration drifts systematically.
 
 section PopulationCalibrationDrift
 
-/-- **Prevalence-driven miscalibration.**
-    If disease prevalence is π_source in training and π_target
-    in the target, the CITL shifts by log(π_target/π_source)
-    on the logistic scale. -/
+/-- Logistic-scale prevalence log-odds. -/
+noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
+  Real.log (pi / (1 - pi))
+
+/-- **Prevalence-driven logistic intercept shift.**
+    If disease prevalence is `π_source` in training and `π_target`
+    in the target, the exact intercept shift on the logistic linear-predictor
+    scale is
+    `logit(π_target) - logit(π_source) =
+      log(π_target / (1 - π_target)) - log(π_source / (1 - π_source))`.
+
+    This is the correct logistic-scale analogue of calibration-in-the-large
+    drift; it is not the simpler but incorrect ratio `log(π_target / π_source)`. -/
 noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
-  Real.log (pi_target / pi_source)
+  prevalenceLogit pi_target - prevalenceLogit pi_source
 
 /-- CITL shift is zero when prevalences match. -/
-theorem no_citl_shift_same_prevalence (pi : ℝ) (h_pi : 0 < pi) :
+theorem no_citl_shift_same_prevalence (pi : ℝ) :
     prevalenceCITLShift pi pi = 0 := by
-  unfold prevalenceCITLShift
-  rw [div_self (ne_of_gt h_pi), Real.log_one]
+  simp [prevalenceCITLShift]
 
 /-- CITL shift is positive when target has higher prevalence. -/
 theorem citl_shift_positive_higher_prevalence
     (pi_s pi_t : ℝ) (h_s : 0 < pi_s)
-    (h_higher : pi_s < pi_t) :
+    (h_higher : pi_s < pi_t)
+    (h_t : pi_t < 1) :
     0 < prevalenceCITLShift pi_s pi_t := by
-  unfold prevalenceCITLShift
-  apply Real.log_pos
-  rw [one_lt_div h_s]
-  exact h_higher
+  have h_t_pos : 0 < pi_t := lt_trans h_s h_higher
+  have h_den_s : 0 < 1 - pi_s := by linarith
+  have h_den_t : 0 < 1 - pi_t := by linarith
+  have h_odds_pos_s : 0 < pi_s / (1 - pi_s) := by
+    exact div_pos h_s h_den_s
+  have h_odds_lt : pi_s / (1 - pi_s) < pi_t / (1 - pi_t) := by
+    rw [div_lt_div_iff₀ h_den_s h_den_t]
+    nlinarith
+  unfold prevalenceCITLShift prevalenceLogit
+  apply sub_pos.mpr
+  exact Real.log_lt_log h_odds_pos_s h_odds_lt
 
 /-- **Environmental confounding shifts calibration.**
     If environmental risk factors change the population mean outcome by
@@ -394,6 +410,89 @@ theorem intercept_recal_corrects_citl
     but requires labeled target data. -/
 noncomputable def logisticRecalibrated (pgs a b : ℝ) : ℝ :=
   a + b * pgs
+
+/-- Exact CITL formula after logistic recalibration. -/
+theorem logistic_recalibration_shifts_citl
+    (mean_obs mean_pgs a b : ℝ) :
+    calibrationInTheLarge mean_obs (logisticRecalibrated mean_pgs a b) =
+      calibrationInTheLarge mean_obs mean_pgs - a - (b - 1) * mean_pgs := by
+  unfold calibrationInTheLarge logisticRecalibrated
+  ring
+
+/-- Choosing the fitted intercept `a = mean_obs - b * mean_pgs` makes the
+    recalibrated prediction match the observed mean exactly, so CITL becomes
+    zero for any chosen slope `b`. -/
+theorem logistic_recalibration_corrects_citl
+    (mean_obs mean_pgs b : ℝ) :
+    calibrationInTheLarge mean_obs
+      (logisticRecalibrated mean_pgs (mean_obs - b * mean_pgs) b) = 0 := by
+  rw [logistic_recalibration_shifts_citl]
+  unfold calibrationInTheLarge
+  ring
+
+/-- Effective calibration slope after logistic recalibration.
+    If the target linear predictor uses slope `targetSlope` on the original PGS
+    scale, and deployed predictions use fitted slope `fittedSlope`, then the
+    target linear predictor as a function of the deployed predictor has slope
+    `targetSlope / fittedSlope`. -/
+noncomputable def recalibratedCalibrationSlope
+    (targetSlope fittedSlope : ℝ) : ℝ :=
+  targetSlope / fittedSlope
+
+/-- Exact affine representation of the target linear predictor in terms of the
+    logistic-recalibrated predictor. -/
+theorem target_linear_predictor_eq_affine_in_logistic_recalibrated
+    (pgs targetIntercept targetSlope fittedIntercept fittedSlope : ℝ)
+    (h_fit_nonzero : fittedSlope ≠ 0) :
+    targetIntercept + targetSlope * pgs =
+      (targetIntercept -
+          recalibratedCalibrationSlope targetSlope fittedSlope * fittedIntercept) +
+        recalibratedCalibrationSlope targetSlope fittedSlope *
+          logisticRecalibrated pgs fittedIntercept fittedSlope := by
+  unfold recalibratedCalibrationSlope logisticRecalibrated
+  field_simp [h_fit_nonzero]
+  ring
+
+/-- If the fitted slope equals the target calibration slope, the recalibrated
+    predictor has exact calibration slope `1`. -/
+theorem logistic_recalibration_corrects_slope
+    (targetSlope : ℝ)
+    (h_slope_nonzero : targetSlope ≠ 0) :
+    recalibratedCalibrationSlope targetSlope targetSlope = 1 ∧
+      calibrationSlopeDeviation
+        (recalibratedCalibrationSlope targetSlope targetSlope) = 0 := by
+  constructor
+  · unfold recalibratedCalibrationSlope
+    exact div_self h_slope_nonzero
+  · unfold calibrationSlopeDeviation recalibratedCalibrationSlope
+    rw [div_self h_slope_nonzero, sub_self, abs_zero]
+
+/-- Logistic recalibration with the fitted intercept and fitted slope corrects
+    both calibration-in-the-large and slope deviation exactly. -/
+theorem logistic_recalibration_corrects_citl_and_slope
+    (mean_obs mean_pgs targetSlope : ℝ)
+    (h_slope_nonzero : targetSlope ≠ 0) :
+    calibrationInTheLarge mean_obs
+        (logisticRecalibrated mean_pgs (mean_obs - targetSlope * mean_pgs) targetSlope) = 0 ∧
+      calibrationSlopeDeviation
+        (recalibratedCalibrationSlope targetSlope targetSlope) = 0 := by
+  constructor
+  · exact logistic_recalibration_corrects_citl mean_obs mean_pgs targetSlope
+  · exact (logistic_recalibration_corrects_slope targetSlope h_slope_nonzero).2
+
+/-- Logistic recalibration preserves AUC because it is a strictly increasing
+    affine transform when the fitted slope is positive. -/
+theorem logistic_recalibration_preserves_auc
+    {Z : Type*} [MeasurableSpace Z]
+    (pop : BinaryPopulation Z) (score : Z → ℝ)
+    (a b : ℝ)
+    (h_b_pos : 0 < b) :
+    populationAUC pop (fun z => logisticRecalibrated (score z) a b) =
+      populationAUC pop score := by
+  simpa [logisticRecalibrated, Function.comp] using
+    (populationAUC_strictMono_invariant pop score (fun x => a + b * x) (by
+      intro x y hxy
+      linarith [mul_lt_mul_of_pos_left hxy h_b_pos]))
 
 /-- **Trace-MSE lower bound for target recalibration.**
     In an orthogonal Fisher model with `d` target calibration parameters and

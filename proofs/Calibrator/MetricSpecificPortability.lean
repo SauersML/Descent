@@ -194,16 +194,6 @@ theorem R2DecompositionData.cal_loss_reduces_r2 (d : R2DecompositionData)
   unfold r2 discrimination
   exact div_lt_div_of_pos_right h_miscal d.hVarY_pos
 
-/-- Exact literal population AUC attached to a concrete score/population pair
-    that realizes the `R² = discrimination × calibration` decomposition. -/
-noncomputable def R2DecompositionData.liabilityAUC
-    {Z : Type*} [MeasurableSpace Z]
-    (d : R2DecompositionData)
-    (pop : BinaryPopulation Z)
-    (score : Z → ℝ) : ℝ :=
-  let _ := d
-  ENNReal.toReal (populationAUC pop score)
-
 /-- **R² is less portable than true AUC when only calibration is lost.**
 
     Assume source and target scores are evaluated on the same binary population

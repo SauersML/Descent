@@ -402,6 +402,60 @@ noncomputable def targetBrierFromSourceTransport
     (π r2Source transportFactor : ℝ) : ℝ :=
   π * (1 - π) * (1 - targetR2FromSourceTransport r2Source transportFactor)
 
+/-- Methodological target `R²` is the canonical transported-metric specialization
+at residual scale `1`, with validity requiring the biologically meaningful
+source-domain constraint `r2Source ≠ 1`. -/
+theorem targetR2FromSourceTransport_eq_transportedMetrics
+    (r2Source transportFactor : ℝ)
+    (h_r2 : r2Source ≠ 1) :
+    targetR2FromSourceTransport r2Source transportFactor =
+      TransportedMetrics.targetR2 1 r2Source transportFactor := by
+  rw [TransportedMetrics.targetR2_eq_closed_form 1 r2Source transportFactor one_ne_zero h_r2]
+  rfl
+
+/-- Methodological target AUC is the canonical transported-metric specialization
+at residual scale `1`, with validity requiring the biologically meaningful
+source-domain constraint `r2Source ≠ 1`. -/
+theorem targetAUCFromSourceTransport_eq_transportedMetrics
+    (r2Source transportFactor : ℝ)
+    (h_r2 : r2Source ≠ 1) :
+    targetAUCFromSourceTransport r2Source transportFactor =
+      TransportedMetrics.targetAUC 1 r2Source transportFactor := by
+  rw [TransportedMetrics.targetAUC_eq_closed_form 1 r2Source transportFactor one_ne_zero h_r2]
+  rfl
+
+/-- Methodological target Brier is the canonical transported-metric specialization
+at residual scale `1`, with validity requiring the biologically meaningful
+source-domain constraint `r2Source ≠ 1`. -/
+theorem targetBrierFromSourceTransport_eq_transportedMetrics
+    (π r2Source transportFactor : ℝ)
+    (h_r2 : r2Source ≠ 1) :
+    targetBrierFromSourceTransport π r2Source transportFactor =
+      TransportedMetrics.targetBrier π 1 r2Source transportFactor := by
+  unfold targetBrierFromSourceTransport TransportedMetrics.targetBrier
+    TransportedMetrics.calibratedBrier
+  rw [targetR2FromSourceTransport_eq_transportedMetrics r2Source transportFactor h_r2]
+
+/-- Canonical bundled transported metrics for the uncertainty and methodology
+layer. -/
+noncomputable def sourceTransportMetricProfile
+    (π r2Source transportFactor : ℝ) : TransportedMetrics.Profile :=
+  TransportedMetrics.profile π 1 r2Source transportFactor
+
+/-- The bundled methodological metrics reproduce the file's public `R²`, AUC,
+and Brier surfaces exactly on the biologically valid `R² ≠ 1` domain. -/
+theorem sourceTransportMetricProfile_eq
+    (π r2Source transportFactor : ℝ)
+    (h_r2 : r2Source ≠ 1) :
+    sourceTransportMetricProfile π r2Source transportFactor =
+      { r2 := targetR2FromSourceTransport r2Source transportFactor
+      , auc := targetAUCFromSourceTransport r2Source transportFactor
+      , brier := targetBrierFromSourceTransport π r2Source transportFactor } := by
+  unfold sourceTransportMetricProfile TransportedMetrics.profile
+  rw [targetR2FromSourceTransport_eq_transportedMetrics _ _ h_r2,
+    targetAUCFromSourceTransport_eq_transportedMetrics _ _ h_r2,
+    targetBrierFromSourceTransport_eq_transportedMetrics _ _ _ h_r2]
+
 /-- Transport factor reconstructed from the four biological retention components. -/
 noncomputable def transportFactorFromComponents
     (alleleRet ldRet mutRet migBoost : ℝ) : ℝ :=
