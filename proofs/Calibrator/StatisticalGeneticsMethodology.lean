@@ -442,6 +442,24 @@ noncomputable def sourceTransportMetricProfile
     (π r2Source transportFactor : ℝ) : TransportedMetrics.Profile :=
   TransportedMetrics.profile π 1 r2Source transportFactor
 
+@[simp] theorem sourceTransportMetricProfile_r2
+    (π r2Source transportFactor : ℝ) :
+    (sourceTransportMetricProfile π r2Source transportFactor).r2 =
+      TransportedMetrics.targetR2 1 r2Source transportFactor := by
+  rfl
+
+@[simp] theorem sourceTransportMetricProfile_auc
+    (π r2Source transportFactor : ℝ) :
+    (sourceTransportMetricProfile π r2Source transportFactor).auc =
+      TransportedMetrics.targetAUC 1 r2Source transportFactor := by
+  rfl
+
+@[simp] theorem sourceTransportMetricProfile_brier
+    (π r2Source transportFactor : ℝ) :
+    (sourceTransportMetricProfile π r2Source transportFactor).brier =
+      TransportedMetrics.targetBrier π 1 r2Source transportFactor := by
+  rfl
+
 /-- The bundled methodological metrics reproduce the file's public `R²`, AUC,
 and Brier surfaces exactly on the biologically valid `R² ≠ 1` domain. -/
 theorem sourceTransportMetricProfile_eq
@@ -457,9 +475,36 @@ theorem sourceTransportMetricProfile_eq
     targetBrierFromSourceTransport_eq_transportedMetrics _ _ _ h_r2]
 
 /-- Transport factor reconstructed from the four biological retention components. -/
+noncomputable def componentPortabilityFactor
+    (alleleRet ldRet mutRet migBoost : ℝ) : PortabilityFactor :=
+  PortabilityFactor.fromComponents alleleRet ldRet mutRet migBoost
+
+/-- Transport factor reconstructed from the canonical four-component
+    portability-factor object. -/
 noncomputable def transportFactorFromComponents
     (alleleRet ldRet mutRet migBoost : ℝ) : ℝ :=
-  alleleRet * ldRet * mutRet * migBoost
+  (componentPortabilityFactor alleleRet ldRet mutRet migBoost).value
+
+@[simp] theorem componentPortabilityFactor_value
+    (alleleRet ldRet mutRet migBoost : ℝ) :
+    (componentPortabilityFactor alleleRet ldRet mutRet migBoost).value =
+      transportFactorFromComponents alleleRet ldRet mutRet migBoost := by
+  rfl
+
+/-- The methodological transport-factor product is exactly the canonical
+    evolutionary portability ratio when instantiated with the model's four
+    biological components. -/
+theorem transportFactorFromComponents_eq_unifiedPortabilityRatio
+    (p : EvolutionaryParameters) :
+    transportFactorFromComponents
+        (1 - fstEquilibrium p)
+        (sharedLDRetention p)
+        (mutationLDErosion p)
+        (migrationLDBoost p) =
+      unifiedPortabilityRatio p := by
+  simp [transportFactorFromComponents, componentPortabilityFactor,
+    unifiedPortabilityRatio, EvolutionaryParameters.portabilityFactor,
+    PortabilityFactor.value, PortabilityFactor.fromComponents]
 
 /-- Product bounds propagate exactly through the four-factor transport map. -/
 theorem transportFactorFromComponents_bounds

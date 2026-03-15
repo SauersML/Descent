@@ -133,12 +133,12 @@ noncomputable def twoDemeIMEquilibriumScalars (M : ℝ) : DemographicCoalescence
 noncomputable def twoDemeIMEquilibriumDelta (M : ℝ) : ℝ :=
   1 / (2 * M + 1)
 
-theorem twoDemeIMEquilibriumDelta_eq (M : ℝ) (hM : M ≠ 0) (h2M1 : 2 * M + 1 ≠ 0) :
+theorem twoDemeIMEquilibriumDelta_eq (M : ℝ) (h2M1 : 2 * M + 1 ≠ 0) :
     (twoDemeIMEquilibriumScalars M).delta = twoDemeIMEquilibriumDelta M := by
   simp [DemographicCoalescenceScalars.delta, hudsonFstFromCoalescenceTimes,
     twoDemeIMEquilibriumScalars, twoDemeIMEquilibriumETss,
     twoDemeIMEquilibriumETst, twoDemeIMEquilibriumDelta]
-  field_simp [hM, h2M1]
+  field_simp [h2M1]
   ring
 
 theorem twoDemeIMEquilibriumDelta_pos (M : ℝ) (hM : 0 < M) :
@@ -1117,7 +1117,7 @@ theorem targetR2_lt_source_from_observables
 
 /-- Drift transport ratio from observable source/target `F_ST`. -/
 noncomputable def driftTransportRatio (fstSource fstTarget : ℝ) : ℝ :=
-  (1 - fstTarget) / (1 - fstSource)
+  (PortabilityFactor.neutralDrift fstSource fstTarget).value
 
 /-- Exact transport identity: target signal variance equals ratio times source variance. -/
 theorem targetVarianceFromSource_eq_ratio_mul
@@ -1125,6 +1125,7 @@ theorem targetVarianceFromSource_eq_ratio_mul
     targetVarianceFromSource vSource fstSource fstTarget =
       driftTransportRatio fstSource fstTarget * vSource := by
   unfold targetVarianceFromSource driftTransportRatio
+  simp [PortabilityFactor.neutralDrift, PortabilityFactor.value]
   ring
 
 /-- The observable transported `R²` surface is the canonical transported-metric
@@ -1581,7 +1582,7 @@ theorem driftTransportRatio_nonneg
     (fstSource fstTarget : ℝ)
     (hS : fstSource < 1) (hT : fstTarget ≤ 1) :
     0 ≤ driftTransportRatio fstSource fstTarget := by
-  unfold driftTransportRatio
+  simp [driftTransportRatio, PortabilityFactor.neutralDrift, PortabilityFactor.value]
   exact div_nonneg (by linarith) (by linarith)
 
 /-- Drift transport ratio is strictly below 1 when target has more drift. -/
@@ -1590,14 +1591,14 @@ theorem driftTransportRatio_lt_one
     (hS : fstSource < 1)
     (hfst : fstSource < fstTarget) :
     driftTransportRatio fstSource fstTarget < 1 := by
-  unfold driftTransportRatio
+  simp [driftTransportRatio, PortabilityFactor.neutralDrift, PortabilityFactor.value]
   rw [div_lt_one (by linarith : (0 : ℝ) < 1 - fstSource)]
   linarith
 
 /-- At zero divergence, drift transport ratio equals 1 (no signal loss). -/
 @[simp] theorem driftTransportRatio_self (fst : ℝ) (hfst : fst < 1) :
     driftTransportRatio fst fst = 1 := by
-  unfold driftTransportRatio
+  simp [driftTransportRatio, PortabilityFactor.neutralDrift, PortabilityFactor.value]
   exact div_self (by linarith : (1 : ℝ) - fst ≠ 0)
 
 /-- At zero divergence, target R² equals source R². -/
@@ -2002,7 +2003,7 @@ theorem mutationDriftTransportRatio_pure_drift (fstSource fstTarget : ℝ) :
     mutationDriftTransportRatio fstSource fstTarget 1 1 =
       driftTransportRatio fstSource fstTarget := by
   unfold mutationDriftTransportRatio driftTransportRatio
-  ring_nf
+  simp [PortabilityFactor.neutralDrift, PortabilityFactor.value]
 
 /-- **Mutation-drift transport ratio is below drift-only transport ratio**
     when target shared LD is worse than source shared LD. -/
@@ -2015,6 +2016,7 @@ theorem mutationDrift_transport_lt_drift_transport
     mutationDriftTransportRatio fstSource fstTarget shared_ld_source shared_ld_target <
       driftTransportRatio fstSource fstTarget := by
   unfold mutationDriftTransportRatio driftTransportRatio
+  simp [PortabilityFactor.neutralDrift, PortabilityFactor.value]
   have h1 : 0 < 1 - fstSource := by linarith
   have h_den_pos : 0 < (1 - fstSource) * shared_ld_source := mul_pos h1 hldS
   rw [div_lt_div_iff₀ h_den_pos h1]

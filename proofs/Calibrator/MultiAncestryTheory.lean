@@ -40,35 +40,29 @@ section GWASDiversity
     when α > 0 and d₂ < d₁, and monotonicity of neutralPortabilityRatio. -/
 theorem multi_ancestry_reduces_fst
     (d₁ d₂ α : ℝ)
-    (h_d₁_pos : 0 < d₁) (h_d₁_lt : d₁ < 1)
-    (h_d₂_nn : 0 ≤ d₂) (h_d₂_closer : d₂ < d₁)
-    (h_α_pos : 0 < α) (h_α_le : α ≤ 1) :
+    (h_d₂_closer : d₂ < d₁)
+    (h_α_pos : 0 < α) :
     let fst_single := d₁
     let fst_multi := (1 - α) * d₁ + α * d₂
     neutralPortabilityRatio 0 fst_multi > neutralPortabilityRatio 0 fst_single := by
   simp only
-  unfold neutralPortabilityRatio
-  simp
-  -- Need: (1 - α) * d₁ + α * d₂ < d₁
-  -- i.e. d₁ - α * d₁ + α * d₂ < d₁
-  -- i.e. α * (d₂ - d₁) < 0, true since α > 0 and d₂ < d₁
-  nlinarith
+  have h_multi_lt_single : (1 - α) * d₁ + α * d₂ < d₁ := by
+    nlinarith
+  simpa using
+    (neutral_portability_decreasing_in_fstT
+      0 ((1 - α) * d₁ + α * d₂) d₁ (by norm_num) h_multi_lt_single)
 
 /-- **Diminishing returns from more similar samples.**
     At small Fst, the derivative d(R²)/d(Fst) is steep.
     At large Fst, it flattens. So adding diverse samples helps most
     for the most underserved populations. -/
 theorem portability_concave_in_fst_reduction
-    (fst₁ fst₂ Δ r2_0 : ℝ)
-    (hr2 : 0 < r2_0)
-    (hfst₁ : 0 < fst₁) (hfst₂ : fst₁ < fst₂)
-    (hΔ : 0 < Δ) (hfst₂_Δ : fst₂ - Δ > fst₁)
-    (hfst₁_bound : fst₁ + Δ < 1) (hfst₂_bound : fst₂ < 1) :
+    (fst₁ fst₂ Δ : ℝ) :
     -- Reducing Fst by Δ at high Fst gains more portability than at low Fst
     neutralPortabilityRatio 0 (fst₂ - Δ) - neutralPortabilityRatio 0 fst₂ =
     neutralPortabilityRatio 0 (fst₁ - Δ) - neutralPortabilityRatio 0 fst₁ := by
-  unfold neutralPortabilityRatio
-  simp
+  simp [neutralPortabilityRatio, driftTransportRatio,
+    PortabilityFactor.neutralDrift, PortabilityFactor.value]
 
 /-- **Optimal GWAS allocation.**
     Given a fixed total sample size N, how should samples be allocated
@@ -80,16 +74,14 @@ theorem portability_concave_in_fst_reduction
 
     This is a consequence of the concavity of the portability function. -/
 theorem maxmin_allocation_favors_diversity
-    (n_total n_source n_other : ℝ)
-    (h_sum : n_source + n_other = n_total)
     (fst_min_source fst_min_mixed : ℝ)
     -- Moving samples from overrepresented to other populations reduces max Fst
-    (h_mixed_better : fst_min_mixed < fst_min_source)
-    (h_nn : 0 ≤ fst_min_mixed) (h_lt : fst_min_source < 1) :
+    (h_mixed_better : fst_min_mixed < fst_min_source) :
     neutralPortabilityRatio 0 fst_min_mixed >
       neutralPortabilityRatio 0 fst_min_source := by
-  unfold neutralPortabilityRatio
-  simp; linarith
+  simpa using
+    (neutral_portability_decreasing_in_fstT
+      0 fst_min_mixed fst_min_source (by norm_num) h_mixed_better)
 
 end GWASDiversity
 
@@ -140,8 +132,6 @@ theorem more_correlated_more_informative
     given source effects. No algorithm can beat this limit. -/
 theorem fundamental_portability_limit
     (mse_transfer mse_oracle info_gap : ℝ)
-    -- Oracle MSE uses target-specific GWAS data
-    (h_oracle : 0 ≤ mse_oracle)
     -- Info gap from effect decorrelation
     (h_gap : 0 ≤ info_gap)
     -- Transfer MSE = oracle MSE + gap from missing information
@@ -192,7 +182,7 @@ theorem portability_gap_nonneg
 theorem portability_gap_increases_with_distance
     (V_A V_E fstS fstT₁ fstT₂ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst₁ : fstS < fstT₁) (hfst₂ : fstT₁ < fstT₂) (hfstT₂ : fstT₂ ≤ 1) :
+    (hfst₂ : fstT₁ < fstT₂) (hfstT₂ : fstT₂ ≤ 1) :
     portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fstT₁) <
       portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fstT₂) := by
   unfold portabilityGap
@@ -209,9 +199,7 @@ theorem portability_gap_increases_with_distance
 theorem diversity_reduces_max_gap
     (V_A V_E fstS fst_worst_single fst_worst_multi : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (h_fstS : 0 ≤ fstS)
-    (h_single : fstS < fst_worst_single) (h_single_bound : fst_worst_single ≤ 1)
-    (h_multi : fstS < fst_worst_multi) (h_multi_bound : fst_worst_multi ≤ 1)
+    (h_single_bound : fst_worst_single ≤ 1)
     (h_improvement : fst_worst_multi < fst_worst_single) :
     portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_multi) <
       portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_single) := by
@@ -226,7 +214,7 @@ theorem diversity_reduces_max_gap
 theorem diversity_doesnt_fix_environmental_gap
     (Vg Ve_source Ve_target : ℝ)
     (hVg : 0 < Vg)
-    (hVe_s : 0 < Ve_source) (hVe_t : 0 < Ve_target)
+    (hVe_s : 0 < Ve_source)
     (h_env_diff : Ve_source < Ve_target) :
     -- Even with zero genetic Fst gap, R² still differs
     Vg / (Vg + Ve_target) < Vg / (Vg + Ve_source) := by

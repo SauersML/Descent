@@ -6497,17 +6497,82 @@ theorem migrationLDBoost_ge_one (p : EvolutionaryParameters) :
     2. sharedLD: recombination breaks LD over divergence time
     3. mutationErosion: new mutations create unshared LD
     4. migrationBoost: gene flow restores shared variation (≥ 1, counteracts erosion) -/
+structure PortabilityFactor where
+  ancestryRetention : ℝ
+  ldRetention : ℝ
+  architectureRetention : ℝ
+  restorationBoost : ℝ
+
+namespace PortabilityFactor
+
+/-- Canonical multiplicative value of a portability-factor decomposition. -/
+noncomputable def value (f : PortabilityFactor) : ℝ :=
+  f.ancestryRetention * f.ldRetention * f.architectureRetention * f.restorationBoost
+
+@[simp] theorem value_eq_components (f : PortabilityFactor) :
+    f.value =
+      f.ancestryRetention * f.ldRetention * f.architectureRetention * f.restorationBoost := by
+  rfl
+
+/-- Generic constructor from the four portability components. -/
+noncomputable def fromComponents
+    (ancestryRetention ldRetention architectureRetention restorationBoost : ℝ) :
+    PortabilityFactor where
+  ancestryRetention := ancestryRetention
+  ldRetention := ldRetention
+  architectureRetention := architectureRetention
+  restorationBoost := restorationBoost
+
+@[simp] theorem fromComponents_value
+    (ancestryRetention ldRetention architectureRetention restorationBoost : ℝ) :
+    (fromComponents ancestryRetention ldRetention architectureRetention restorationBoost).value =
+      ancestryRetention * ldRetention * architectureRetention * restorationBoost := by
+  rfl
+
+/-- Neutral-drift specialization: only the ancestry-retention factor differs from `1`. -/
+noncomputable def neutralDrift (fstSource fstTarget : ℝ) : PortabilityFactor where
+  ancestryRetention := (1 - fstTarget) / (1 - fstSource)
+  ldRetention := 1
+  architectureRetention := 1
+  restorationBoost := 1
+
+@[simp] theorem neutralDrift_value (fstSource fstTarget : ℝ) :
+    (neutralDrift fstSource fstTarget).value = (1 - fstTarget) / (1 - fstSource) := by
+  unfold value neutralDrift
+  ring
+
+end PortabilityFactor
+
+/-- Canonical portability-factor decomposition for the full evolutionary model. -/
+noncomputable def EvolutionaryParameters.portabilityFactor
+    (p : EvolutionaryParameters) : PortabilityFactor :=
+  PortabilityFactor.fromComponents
+    (1 - fstEquilibrium p)
+    (sharedLDRetention p)
+    (mutationLDErosion p)
+    (migrationLDBoost p)
+
+/-- The public evolutionary portability ratio is the canonical portability-factor
+value specialized to the model's four biological components. -/
 noncomputable def unifiedPortabilityRatio (p : EvolutionaryParameters) : ℝ :=
-  (1 - fstEquilibrium p) *
-  sharedLDRetention p *
-  mutationLDErosion p *
-  migrationLDBoost p
+  p.portabilityFactor.value
+
+@[simp] theorem EvolutionaryParameters.portabilityFactor_value
+    (p : EvolutionaryParameters) :
+    p.portabilityFactor.value =
+      (1 - fstEquilibrium p) *
+        sharedLDRetention p *
+        mutationLDErosion p *
+        migrationLDBoost p := by
+  unfold EvolutionaryParameters.portabilityFactor
+    PortabilityFactor.value PortabilityFactor.fromComponents
+  rfl
 
 /-- The unified portability ratio is nonneg when θ + M > 0. -/
 theorem unifiedPortabilityRatio_nonneg (p : EvolutionaryParameters)
     (h_forces : 0 < p.theta + p.bigM) :
     0 ≤ unifiedPortabilityRatio p := by
-  unfold unifiedPortabilityRatio
+  rw [unifiedPortabilityRatio, EvolutionaryParameters.portabilityFactor_value]
   apply mul_nonneg
   · apply mul_nonneg
     · apply mul_nonneg
@@ -6881,6 +6946,12 @@ noncomputable def targetR2
   r2FromSignalVariance
     (targetSignalVariance vNoise r2Source transportFactor) vNoise
 
+/-- Canonical exact target/source deployed `R²` ratio induced by a signal
+transport factor. -/
+noncomputable def r2PortabilityRatio
+    (vNoise r2Source transportFactor : ℝ) : ℝ :=
+  targetR2 vNoise r2Source transportFactor / r2Source
+
 /-- Canonical transported target AUC from source `R²` and signal retention. -/
 noncomputable def targetAUC
     (vNoise r2Source transportFactor : ℝ) : ℝ :=
@@ -6929,6 +7000,12 @@ noncomputable def profile
     (π vNoise r2Source transportFactor : ℝ) :
     (profile π vNoise r2Source transportFactor).brier =
       targetBrier π vNoise r2Source transportFactor := by
+  rfl
+
+@[simp] theorem r2PortabilityRatio_eq
+    (vNoise r2Source transportFactor : ℝ) :
+    r2PortabilityRatio vNoise r2Source transportFactor =
+      targetR2 vNoise r2Source transportFactor / r2Source := by
   rfl
 
 /-- Source `R²` is recovered exactly from the canonical source signal variance. -/
@@ -6985,8 +7062,45 @@ theorem targetAUC_eq_closed_form
 end TransportedMetrics
 
 /-- Exact multiplicative evolutionary transport factor for the genetic signal. -/
+noncomputable def PGSEvolutionaryModel.portabilityFactor
+    (m : PGSEvolutionaryModel) : PortabilityFactor :=
+  PortabilityFactor.fromComponents
+    (1 - m.fstTransient)
+    m.ldRetention
+    m.mutErosion
+    m.migBoost
+
+/-- Exact multiplicative evolutionary transport factor for the genetic signal. -/
 noncomputable def PGSEvolutionaryModel.signalTransportFactor (m : PGSEvolutionaryModel) : ℝ :=
-  (1 - m.fstTransient) * m.ldRetention * m.mutErosion * m.migBoost
+  m.portabilityFactor.value
+
+@[simp] theorem PGSEvolutionaryModel.portabilityFactor_value
+    (m : PGSEvolutionaryModel) :
+    m.portabilityFactor.value =
+      (1 - m.fstTransient) * m.ldRetention * m.mutErosion * m.migBoost := by
+  rfl
+
+/-- The signal-transport factor is the canonical portability-factor value for
+the evolutionary model. -/
+theorem PGSEvolutionaryModel.signalTransportFactor_eq_components
+    (m : PGSEvolutionaryModel) :
+    m.signalTransportFactor =
+      (1 - m.fstTransient) * m.ldRetention * m.mutErosion * m.migBoost := by
+  rw [PGSEvolutionaryModel.signalTransportFactor, PGSEvolutionaryModel.portabilityFactor_value]
+
+/-- Fully expanded evolutionary signal-transport factor. -/
+theorem PGSEvolutionaryModel.signalTransportFactor_explicit
+    (m : PGSEvolutionaryModel) :
+    m.signalTransportFactor =
+      ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
+        Real.exp (-2 * m.recomb * m.t_div) *
+        Real.exp (-m.theta * m.tau) *
+        (1 + m.bigM * m.tau / (1 + m.bigM))) := by
+  rw [m.signalTransportFactor_eq_components]
+  simp [PGSEvolutionaryModel.fstTransient, PGSEvolutionaryModel.ldRetention,
+    PGSEvolutionaryModel.mutErosion, PGSEvolutionaryModel.migBoost,
+    PGSEvolutionaryModel.toEvo, sharedLDRetention, mutationLDErosion,
+    migrationLDBoost, fstEquilibrium]
 
 /-- Source signal variance recovered exactly from source `R²` and residual variance.
 
@@ -7554,11 +7668,7 @@ theorem PGSEvolutionaryModel.R2_target_explicit (m : PGSEvolutionaryModel) :
            Real.exp (-2 * m.recomb * m.t_div) *
              Real.exp (-m.theta * m.tau) *
              (1 + m.bigM * m.tau / (1 + m.bigM)))) := by
-  simpa [PGSEvolutionaryModel.signalTransportFactor, PGSEvolutionaryModel.fstTransient,
-    PGSEvolutionaryModel.ldRetention, PGSEvolutionaryModel.mutErosion,
-    PGSEvolutionaryModel.migBoost, PGSEvolutionaryModel.toEvo,
-    sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium] using
-    m.R2_target_eq_transportFactor
+  simpa [m.signalTransportFactor_explicit] using m.R2_target_eq_transportFactor
 
 /-- Exact end-to-end target AUC from transported signal variance. -/
 theorem PGSEvolutionaryModel.AUC_target_eq_transportFactor (m : PGSEvolutionaryModel) :
@@ -7584,11 +7694,7 @@ theorem PGSEvolutionaryModel.AUC_target_explicit (m : PGSEvolutionaryModel) :
                Real.exp (-m.theta * m.tau) *
                (1 + m.bigM * m.tau / (1 + m.bigM)))) /
             (2 * (1 - m.R2_source)))) := by
-  simpa [PGSEvolutionaryModel.signalTransportFactor, PGSEvolutionaryModel.fstTransient,
-    PGSEvolutionaryModel.ldRetention, PGSEvolutionaryModel.mutErosion,
-    PGSEvolutionaryModel.migBoost, PGSEvolutionaryModel.toEvo,
-    sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium] using
-    m.AUC_target_eq_transportFactor
+  simpa [m.signalTransportFactor_explicit] using m.AUC_target_eq_transportFactor
 
 /-- Exact end-to-end target Brier risk from transported signal variance. -/
 theorem PGSEvolutionaryModel.Brier_target_explicit (m : PGSEvolutionaryModel) :
@@ -7751,6 +7857,7 @@ theorem PGSEvolutionaryModel.alleleFreqRetention_eq_from_transportFactor
     apply h_other_ne
     simp [h]
   unfold signalTransportFactor
+  rw [PGSEvolutionaryModel.portabilityFactor_value]
   field_simp [hld_ne, hmut_ne, hmig_ne]
 
 /-- Recovery of LD retention from the observable transport factor and the other
@@ -7773,6 +7880,7 @@ theorem PGSEvolutionaryModel.ldRetention_eq_from_transportFactor
     apply h_other_ne
     simp [h]
   unfold signalTransportFactor
+  rw [PGSEvolutionaryModel.portabilityFactor_value]
   field_simp [hfst_ne, hmut_ne, hmig_ne]
 
 /-- Recovery of mutation erosion from the observable transport factor and the other
@@ -7795,6 +7903,7 @@ theorem PGSEvolutionaryModel.mutErosion_eq_from_transportFactor
     apply h_other_ne
     simp [h]
   unfold signalTransportFactor
+  rw [PGSEvolutionaryModel.portabilityFactor_value]
   field_simp [hfst_ne, hld_ne, hmig_ne]
 
 /-- Recovery of the migration boost factor from the observable transport factor and the other
@@ -7817,6 +7926,7 @@ theorem PGSEvolutionaryModel.migBoost_eq_from_transportFactor
     apply h_other_ne
     simp [h]
   unfold signalTransportFactor
+  rw [PGSEvolutionaryModel.portabilityFactor_value]
   field_simp [hfst_ne, hld_ne, hmut_ne]
 
 /-- Observable source/target `R²` plus three of the four evolutionary factors identify the

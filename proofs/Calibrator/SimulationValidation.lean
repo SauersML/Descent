@@ -1121,6 +1121,23 @@ theorem empiricalTargetR2_eq_retained_signal_mul_targetR2FromObservables
     score-covariance model. The denominator is exact source `R²`, and the
     numerator is exact transported target `R²`. The attenuation factor
     `ldFactor × effectCorrelation²` is recovered only as a theorem. -/
+noncomputable def empiricalPortabilityFactor
+    (fstSource fstTarget ldFactor effectCorrelation : ℝ) : PortabilityFactor :=
+  PortabilityFactor.fromComponents
+    (driftTransportRatio fstSource fstTarget)
+    ldFactor
+    (effectCorrelation ^ 2)
+    1
+
+@[simp] theorem empiricalPortabilityFactor_value
+    (fstSource fstTarget ldFactor effectCorrelation : ℝ) :
+    (empiricalPortabilityFactor fstSource fstTarget ldFactor effectCorrelation).value =
+      crossPopulationSignalRetention ldFactor effectCorrelation *
+        driftTransportRatio fstSource fstTarget := by
+  unfold empiricalPortabilityFactor crossPopulationSignalRetention
+  simp [PortabilityFactor.value, PortabilityFactor.fromComponents]
+  ring
+
 noncomputable def empiricalPortabilityRatio
     (V_A V_E fstSource fstTarget ldFactor effectCorrelation : ℝ) : ℝ :=
   empiricalTargetR2 V_A V_E fstTarget ldFactor effectCorrelation /
@@ -1173,8 +1190,43 @@ theorem empiricalPortabilityRatio_eq_retained_signal_mul_observableRatio
     cross-population effect decorrelation are applied. -/
 noncomputable def neutralObservablePortabilityRatio
     (V_A V_E fstSource fstTarget : ℝ) : ℝ :=
-  targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget /
-    presentDayR2 V_A V_E fstSource
+  TransportedMetrics.r2PortabilityRatio 1
+    (presentDayR2 V_A V_E fstSource)
+    (PortabilityFactor.neutralDrift fstSource fstTarget).value
+
+/-- The drift-only target/source `R²` ratio is the canonical transported-metric
+ratio under the ancestry-only neutral-drift portability-factor specialization. -/
+theorem neutralObservablePortabilityRatio_eq_transportedMetrics_ratio
+    (V_A V_E fstSource fstTarget : ℝ) :
+    neutralObservablePortabilityRatio V_A V_E fstSource fstTarget =
+      TransportedMetrics.r2PortabilityRatio 1
+        (presentDayR2 V_A V_E fstSource)
+        (PortabilityFactor.neutralDrift fstSource fstTarget).value := by
+  rfl
+
+/-- The empirical target/source `R²` ratio is an exact derived estimator from
+the canonical portability-factor decomposition plus the canonical transported-
+metric ratio attached to the ancestry-retention component. -/
+theorem empiricalPortabilityRatio_eq_factorEstimator
+    (V_A V_E fstSource fstTarget ldFactor effectCorrelation : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
+    (h_ld : 0 ≤ ldFactor) :
+    empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor effectCorrelation =
+      (empiricalPortabilityFactor fstSource fstTarget ldFactor effectCorrelation).ldRetention *
+        (empiricalPortabilityFactor fstSource fstTarget ldFactor effectCorrelation).architectureRetention *
+        TransportedMetrics.r2PortabilityRatio 1
+          (presentDayR2 V_A V_E fstSource)
+          (empiricalPortabilityFactor fstSource fstTarget ldFactor effectCorrelation).ancestryRetention := by
+  rw [empiricalPortabilityRatio_eq_retained_signal_mul_observableRatio
+        V_A V_E fstSource fstTarget ldFactor effectCorrelation
+        hVA hVE hfstS_lt_one hfstT_lt_one h_ld]
+  rw [targetR2FromObservables_eq_transportedMetrics]
+  simp [empiricalPortabilityFactor, crossPopulationSignalRetention,
+    TransportedMetrics.r2PortabilityRatio, driftTransportRatio,
+    PortabilityFactor.neutralDrift, PortabilityFactor.value,
+    PortabilityFactor.fromComponents]
 
 /-- The observable drift-only portability ratio is strictly positive in the
     nondegenerate present-day drift model. -/
@@ -1202,8 +1254,23 @@ theorem neutralObservablePortabilityRatio_pos
       have h_one_minus : 0 < 1 - fstTarget := by linarith
       exact mul_pos h_one_minus hVA
     exact div_pos hv_pos (by linarith)
-  unfold neutralObservablePortabilityRatio
-  exact div_pos h_tgt_pos h_src_pos
+  have h_tgt_core :
+      0 <
+        TransportedMetrics.targetR2 1
+          (presentDayR2 V_A V_E fstSource)
+          (driftTransportRatio fstSource fstTarget) := by
+    rw [← targetR2FromObservables_eq_transportedMetrics
+      (presentDayR2 V_A V_E fstSource) fstSource fstTarget]
+    exact h_tgt_pos
+  have h_tgt_core' :
+      0 <
+        TransportedMetrics.targetR2 1
+          (presentDayR2 V_A V_E fstSource)
+          (PortabilityFactor.neutralDrift fstSource fstTarget).value := by
+    simpa [driftTransportRatio, PortabilityFactor.neutralDrift, PortabilityFactor.value] using h_tgt_core
+  rw [neutralObservablePortabilityRatio_eq_transportedMetrics_ratio]
+  rw [TransportedMetrics.r2PortabilityRatio_eq]
+  exact div_pos h_tgt_core' h_src_pos
 
 /-- Recover the nonnegative cross-population effect correlation from an exact
     observed target/source portability ratio once the ancestry pair and LD-
@@ -1270,9 +1337,16 @@ theorem empiricalPortabilityRatio_eq_observed_of_recoveredEffectCorrelation
           (ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget) := by
     unfold effectCorrelationFromEmpiricalPortabilityRatio
     rw [Real.sq_sqrt h_arg_nonneg]
+  have h_neutral_obs :
+      neutralObservablePortabilityRatio V_A V_E fstSource fstTarget =
+        targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget /
+          presentDayR2 V_A V_E fstSource := by
+    rw [neutralObservablePortabilityRatio_eq_transportedMetrics_ratio]
+    rw [TransportedMetrics.r2PortabilityRatio_eq]
+    rw [targetR2FromObservables_eq_transportedMetrics]
+    simp [driftTransportRatio, PortabilityFactor.neutralDrift, PortabilityFactor.value]
   unfold crossPopulationSignalRetention
-  rw [h_sq]
-  unfold neutralObservablePortabilityRatio
+  rw [h_sq, h_neutral_obs]
   field_simp [ne_of_gt h_src_pos, ne_of_gt h_tgt_pos]
 
 /-- The recovered effect correlation is strictly positive whenever the observed

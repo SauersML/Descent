@@ -185,6 +185,47 @@ performance, even within the same population.
 
 section CohortEffects
 
+/-- Canonical transported deployment metrics indexed by a temporal or
+    phenotype-specific signal-retention factor. This is the shared longitudinal
+    specialization of the repo's core transported-metric map. -/
+noncomputable def temporalMetricProfile
+    (π r2Source transportFactor : ℝ) : TransportedMetrics.Profile :=
+  TransportedMetrics.profile π 1 r2Source transportFactor
+
+/-- Exact longitudinal `R²` surface induced by a time-indexed signal-retention
+    factor. -/
+noncomputable def temporalR2
+    (r2Source transportFactor : ℝ) : ℝ :=
+  TransportedMetrics.targetR2 1 r2Source transportFactor
+
+@[simp] theorem temporalMetricProfile_r2
+    (π r2Source transportFactor : ℝ) :
+    (temporalMetricProfile π r2Source transportFactor).r2 =
+      temporalR2 r2Source transportFactor := by
+  rfl
+
+/-- At unit retention, the longitudinal `R²` surface recovers the source `R²`
+    exactly on the biologically valid `R² ≠ 1` domain. -/
+theorem temporalR2_at_unit_transport
+    (r2Source : ℝ) (h_r2 : r2Source ≠ 1) :
+    temporalR2 r2Source 1 = r2Source := by
+  unfold temporalR2
+  rw [TransportedMetrics.targetR2_eq_closed_form 1 r2Source 1 one_ne_zero h_r2]
+  have h_one : 1 - r2Source ≠ 0 := sub_ne_zero.mpr (Ne.symm h_r2)
+  field_simp [h_one]
+  ring
+
+/-- Gaussian age-kernel transport factor for age-specific portability. -/
+noncomputable def ageDependentTransportFactor
+    (age age_peak width : ℝ) : ℝ :=
+  Real.exp (-(age - age_peak)^2 / (2 * width^2))
+
+/-- Canonical age-indexed transported deployment metrics. -/
+noncomputable def ageDependentMetricProfile
+    (π r2_peak age age_peak width : ℝ) : TransportedMetrics.Profile :=
+  temporalMetricProfile π r2_peak
+    (ageDependentTransportFactor age age_peak width)
+
 /-- **PGS effect sizes are cohort-dependent.**
     A PGS trained on one birth cohort may have different
     effect sizes in another due to changed environments.
@@ -202,16 +243,30 @@ theorem cohort_specific_effects
 /-- **Age-dependent PGS performance.**
     PGS for age-related traits (e.g., CAD, T2D) have different
     predictive power at different ages. This interacts with
-    cohort effects when comparing across time. -/
+    cohort effects when comparing across time. This public `R²` surface is
+    the `r2` field of the canonical age-indexed transported metric profile. -/
 noncomputable def ageDependentR2 (r2_peak age age_peak width : ℝ) : ℝ :=
-  r2_peak * Real.exp (-(age - age_peak)^2 / (2 * width^2))
+  temporalR2 r2_peak (ageDependentTransportFactor age age_peak width)
+
+@[simp] theorem ageDependentMetricProfile_r2
+    (π r2_peak age age_peak width : ℝ) :
+    (ageDependentMetricProfile π r2_peak age age_peak width).r2 =
+      ageDependentR2 r2_peak age age_peak width := by
+  rfl
+
+@[simp] theorem ageDependentTransportFactor_at_peak
+    (age_peak width : ℝ) :
+    ageDependentTransportFactor age_peak age_peak width = 1 := by
+  unfold ageDependentTransportFactor
+  simp [sub_self, Real.exp_zero]
 
 /-- Age-dependent R² peaks at the optimal age. -/
 theorem age_r2_peaks_at_optimal (r2_peak age_peak width : ℝ)
-    (h_r2 : 0 < r2_peak) (h_w : 0 < width) :
+    (h_r2 : r2_peak ≠ 1) :
     ageDependentR2 r2_peak age_peak age_peak width = r2_peak := by
   unfold ageDependentR2
-  simp [sub_self, zero_pow, mul_zero, zero_div, neg_zero, Real.exp_zero, mul_one]
+  rw [ageDependentTransportFactor_at_peak]
+  exact temporalR2_at_unit_transport r2_peak h_r2
 
 /-- **Education PGS and cohort effects.**
     Education PGS trained on older cohorts (where education access
@@ -299,19 +354,39 @@ noncomputable def recalibratedRisk (original_risk intercept_adj : ℝ) : ℝ :=
   original_risk + intercept_adj
 
 /-- Exact temporal Brier risk under a calibrated Bernoulli model with
-prevalence `π` and explained-risk fraction `r2`. -/
-noncomputable def temporalExactBrierRisk (π r2 : ℝ) : ℝ :=
-  exactCalibratedBrierRiskFromR2 π r2
+prevalence `π`, source explained-risk fraction `r2Source`, and temporal
+signal-retention factor. This is the `brier` field of the canonical
+time-indexed transported metric profile. -/
+noncomputable def temporalExactBrierRisk
+    (π r2Source transportFactor : ℝ) : ℝ :=
+  (temporalMetricProfile π r2Source transportFactor).brier
+
+@[simp] theorem temporalMetricProfile_brier
+    (π r2Source transportFactor : ℝ) :
+    (temporalMetricProfile π r2Source transportFactor).brier =
+      temporalExactBrierRisk π r2Source transportFactor := by
+  rfl
+
+/-- Exact temporal Brier risk is the canonical Bernoulli variance factor times
+    one minus the exact temporal `R²` from the same transported profile. -/
+theorem temporalExactBrierRisk_eq_prevalence_scale
+    (π r2Source transportFactor : ℝ) :
+    temporalExactBrierRisk π r2Source transportFactor =
+      π * (1 - π) * (1 - temporalR2 r2Source transportFactor) := by
+  rfl
 
 /-- With discrimination held fixed, temporal prevalence changes that increase
 the Bernoulli variance factor strictly worsen exact Brier risk. -/
 theorem brier_calibration_worsens_discrimination_stable
-    (π₁ π₂ r2 : ℝ)
-    (h_r2 : r2 < 1)
+    (π₁ π₂ r2Source transportFactor : ℝ)
+    (h_r2 : temporalR2 r2Source transportFactor < 1)
     (h_prev : π₁ * (1 - π₁) < π₂ * (1 - π₂)) :
-    temporalExactBrierRisk π₁ r2 < temporalExactBrierRisk π₂ r2 := by
-  unfold temporalExactBrierRisk exactCalibratedBrierRiskFromR2
-  have h_factor : 0 < 1 - r2 := by linarith
+    temporalExactBrierRisk π₁ r2Source transportFactor <
+      temporalExactBrierRisk π₂ r2Source transportFactor := by
+  rw [temporalExactBrierRisk_eq_prevalence_scale,
+    temporalExactBrierRisk_eq_prevalence_scale]
+  have h_factor : 0 < 1 - temporalR2 r2Source transportFactor := by
+    linarith
   nlinarith
 
 end CalibrationDrift

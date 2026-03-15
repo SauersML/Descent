@@ -26,16 +26,23 @@ section FstBounds
 
 /-- **Neutral portability ratio = drift transport.**
     Under pure neutral drift: R²_target/R²_source = (1-Fst_T)/(1-Fst_S).
-    This is exact when there is no selection, no LD change, and no
-    environmental variance change. -/
+    This is exactly the hub drift-transport ratio, exposed under the public
+    bounds name. -/
 noncomputable def neutralPortabilityRatio (fstS fstT : ℝ) : ℝ :=
-  (1 - fstT) / (1 - fstS)
+  driftTransportRatio fstS fstT
+
+/-- The public neutral portability bound is exactly the observable drift
+    transport ratio from the canonical portability-factor core. -/
+@[simp] theorem neutralPortabilityRatio_eq_driftTransportRatio
+    (fstS fstT : ℝ) :
+    neutralPortabilityRatio fstS fstT = driftTransportRatio fstS fstT := by
+  rfl
 
 /-- Neutral portability ratio at equal Fst is 1. -/
 theorem neutral_portability_at_equal_fst (fst : ℝ) (h : fst < 1) :
     neutralPortabilityRatio fst fst = 1 := by
-  unfold neutralPortabilityRatio
-  exact div_self (by linarith)
+  simpa [neutralPortabilityRatio_eq_driftTransportRatio] using
+    driftTransportRatio_self fst h
 
 /-- Neutral portability ratio is strictly decreasing in target Fst. -/
 theorem neutral_portability_decreasing_in_fstT
@@ -43,9 +50,10 @@ theorem neutral_portability_decreasing_in_fstT
     (h_fstS : fstS < 1)
     (h_order : fstT₁ < fstT₂) :
     neutralPortabilityRatio fstS fstT₂ < neutralPortabilityRatio fstS fstT₁ := by
-  unfold neutralPortabilityRatio
   have h_denom : 0 < 1 - fstS := by linarith
-  exact div_lt_div_of_pos_right (by linarith) h_denom
+  simpa [neutralPortabilityRatio, driftTransportRatio, PortabilityFactor.neutralDrift,
+    PortabilityFactor.value] using
+    (div_lt_div_of_pos_right (show 1 - fstT₂ < 1 - fstT₁ by linarith) h_denom)
 
 /-- **Under selection, actual portability ≤ neutral portability.**
     Selection only makes things worse (the effect factor ≤ 1). -/
@@ -57,8 +65,7 @@ theorem selection_worsens_portability
       neutralPortabilityRatio fstS fstT := by
   have h_sq_le : ρ_eff ^ 2 ≤ 1 := by nlinarith [sq_nonneg ρ_eff]
   have h_ratio_nonneg : 0 ≤ neutralPortabilityRatio fstS fstT := by
-    unfold neutralPortabilityRatio
-    exact div_nonneg (by linarith) (by linarith)
+    exact driftTransportRatio_nonneg fstS fstT h_fstS (le_of_lt h_fstT)
   calc neutralPortabilityRatio fstS fstT * ρ_eff ^ 2
       ≤ neutralPortabilityRatio fstS fstT * 1 :=
         mul_le_mul_of_nonneg_left h_sq_le h_ratio_nonneg
@@ -74,16 +81,17 @@ theorem selection_worsens_portability
     Observed R² drops are often larger, confirming non-neutral effects. -/
 theorem neutral_portability_bounded_by_fst
     (fstS fstT : ℝ)
-    (h_fstS : 0 ≤ fstS) (h_fstS_lt : fstS < 1)
-    (h_fstT : 0 ≤ fstT) (h_fstT_lt : fstT < 1)
+    (h_fstS_lt : fstS < 1)
+    (h_fstT_lt : fstT < 1)
     (h_diverged : fstS < fstT) :
     0 < neutralPortabilityRatio fstS fstT ∧
     neutralPortabilityRatio fstS fstT < 1 := by
-  unfold neutralPortabilityRatio
   constructor
-  · exact div_pos (by linarith) (by linarith)
-  · rw [div_lt_one (by linarith)]
-    linarith
+  · simpa [neutralPortabilityRatio, driftTransportRatio, PortabilityFactor.neutralDrift,
+      PortabilityFactor.value] using
+      (show 0 < (1 - fstT) / (1 - fstS) by exact div_pos (by linarith) (by linarith))
+  · simpa [neutralPortabilityRatio_eq_driftTransportRatio] using
+      driftTransportRatio_lt_one fstS fstT h_fstS_lt h_diverged
 
 end FstBounds
 
@@ -103,8 +111,7 @@ section BerryEsseenPortability
     R² from using the Gaussian formula is at most 2ε. -/
 theorem r2_error_from_gaussian_approximation
     (r2_exact r2_gaussian ε : ℝ)
-    (h_err : |r2_exact - r2_gaussian| ≤ ε)
-    (hε : 0 ≤ ε) :
+    (h_err : |r2_exact - r2_gaussian| ≤ ε) :
     r2_exact ∈ Set.Icc (r2_gaussian - ε) (r2_gaussian + ε) := by
   constructor <;> linarith [abs_le.mp h_err |>.1, abs_le.mp h_err |>.2]
 
@@ -116,8 +123,7 @@ theorem portability_ratio_approximation_error
     (h_rs : |r2s - r2s_approx| ≤ εs)
     (h_rt : |r2t - r2t_approx| ≤ εt)
     (h_rs_pos : 0 < r2s)
-    (h_rs_approx_pos : 0 < r2s_approx)
-    (hεs : 0 ≤ εs) (hεt : 0 ≤ εt) :
+    (h_rs_approx_pos : 0 < r2s_approx) :
     |r2t / r2s - r2t_approx / r2s_approx| ≤
       (εt * r2s_approx + εs * |r2t_approx|) / (r2s * r2s_approx) := by
   have h_denom_pos : 0 < r2s * r2s_approx := mul_pos h_rs_pos h_rs_approx_pos
@@ -166,7 +172,7 @@ theorem squared_error_expansion (μ μ_hat ε : ℝ) :
 /-- **Expected squared error given X = x.**
     E[(Y - Ŷ)² | X = x] = (μ(x) - μ̂(x))² + σ².
     The first term is the squared bias, the second is irreducible noise. -/
-theorem expected_squared_error_given_x (bias σ_sq : ℝ) (hσ : 0 ≤ σ_sq) :
+theorem expected_squared_error_given_x (bias σ_sq : ℝ) :
     bias ^ 2 + σ_sq ≥ σ_sq := by
   linarith [sq_nonneg bias]
 
@@ -201,8 +207,7 @@ theorem spline_r2_bounded_by_bias_variation
     (var_bias var_total δ : ℝ)
     (h_total_pos : 0 < var_total)
     (h_δ_nn : 0 ≤ δ)
-    (h_bias_small : var_bias ≤ δ * var_total)
-    (h_bias_nonneg : 0 ≤ var_bias) :
+    (h_bias_small : var_bias ≤ δ * var_total) :
     var_bias / var_total ≤ δ := by
   exact div_le_of_le_mul₀ (le_of_lt h_total_pos) h_δ_nn h_bias_small
 
@@ -255,7 +260,6 @@ theorem diversifying_lt_stabilizing
     (r2_0 fst lam_stab lam_turn : ℝ)
     (hr2 : 0 < r2_0)
     (hfst : 0 < fst) (hfst_small : 2 * fst < 1)
-    (hlams : 0 < lam_stab) (hlamt : 0 < lam_turn)
     -- Diversifying effect is stronger than stabilizing
     (h_stronger : 2 * lam_turn > lam_stab) :
     diversifyingPortability r2_0 fst lam_turn <
@@ -287,10 +291,11 @@ section ConcreteWitnesses
     retain more predictive accuracy (R² scales as ρ²). -/
 theorem higher_rho_better_portability
     (r2_A r2_B ρ_A ρ_B : ℝ)
-    (h_r2_A : 0 < r2_A) (h_r2_B : 0 < r2_B) (h_r2_le : r2_B ≤ r2_A)
-    (h_ρA : 0 ≤ ρ_A) (h_ρB : 0 ≤ ρ_B) (h_ρ : ρ_B < ρ_A) :
+    (h_r2_A : 0 < r2_A) (h_r2_le : r2_B ≤ r2_A)
+    (h_ρB : 0 ≤ ρ_B) (h_ρ : ρ_B < ρ_A) :
     r2_B * ρ_B ^ 2 < r2_A * ρ_A ^ 2 := by
-  have h_sq : ρ_B ^ 2 < ρ_A ^ 2 := by nlinarith [sq_nonneg ρ_A, sq_nonneg ρ_B]
+  have h_sq : ρ_B ^ 2 < ρ_A ^ 2 := by
+    nlinarith
   calc r2_B * ρ_B ^ 2 ≤ r2_A * ρ_B ^ 2 := by nlinarith [sq_nonneg ρ_B]
     _ < r2_A * ρ_A ^ 2 := by nlinarith
 
@@ -303,7 +308,6 @@ theorem higher_rho_better_portability
 theorem more_turnover_more_sign_flips
     (β σ ρ₁ ρ₂ : ℝ)
     (hβ : 0 < β) (hσ : 0 < σ)
-    (hρ₁ : 0 < ρ₁) (hρ₂ : 0 < ρ₂)
     (h_more_turnover : ρ₂ < ρ₁) :
     -- z-score for sign concordance is smaller with more turnover
     ρ₂ * β / σ < ρ₁ * β / σ := by

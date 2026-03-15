@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Calibrator.PGSCalibrationTheory
 
 namespace Calibrator
 
@@ -542,19 +543,14 @@ PGS portability determines the range of thresholds where PGS is useful.
 
 section DecisionCurve
 
-/-- **Net benefit of a risk prediction model.**
-    NB(t) = TP/N - FP/N × t/(1-t)
-    where t is the treatment threshold probability. -/
-noncomputable def netBenefit (tp fp n : ℝ) (t : ℝ) : ℝ :=
-  tp / n - fp / n * (t / (1 - t))
-
 /-- **Net benefit is zero for treat-all strategy.**
     If we treat everyone, TP = prevalence × N, FP = (1-prevalence) × N. -/
 theorem treat_all_net_benefit (π t : ℝ)
     (hπ : 0 < π) (hπ1 : π < 1)
     (ht : 0 < t) (ht1 : t < 1) :
-    netBenefit π (1 - π) 1 t = π - (1 - π) * (t / (1 - t)) := by
-  unfold netBenefit; simp
+    decisionCurveNetBenefit π (1 - π) 1 t = π - (1 - π) * (t / (1 - t)) := by
+  rw [decisionCurveNetBenefit_eq_formula]
+  simp
 
 /-- **PGS is useful when Youden's index is positive and threshold is moderate.**
     We derive TP and FP counts from sensitivity, specificity, prevalence, and
@@ -581,9 +577,9 @@ theorem pgs_useful_when_exceeds_treat_all
     -- Treatment threshold exceeds prevalence (selective-treatment regime)
     (h_threshold : π < t) :
     -- treat-all net benefit < PGS net benefit
-    netBenefit (π * n) ((1 - π) * n) n t <
-      netBenefit (sens * π * n) ((1 - spec) * (1 - π) * n) n t := by
-  unfold netBenefit
+    decisionCurveNetBenefit (π * n) ((1 - π) * n) n t <
+      decisionCurveNetBenefit (sens * π * n) ((1 - spec) * (1 - π) * n) n t := by
+  repeat rw [decisionCurveNetBenefit_eq_formula]
   have hn_ne : n ≠ 0 := ne_of_gt hn
   have h1 : π * n / n = π := by field_simp
   have h2 : (1 - π) * n / n = 1 - π := by field_simp
@@ -653,9 +649,9 @@ theorem portability_narrows_useful_range
     (h_sens_t : 0 ≤ sensFromR2 m r2_target T')
     (h_spec_t : 0 ≤ specFromR2 m r2_target T' μ_control)
     (h_spec_s1 : specFromR2 m r2_source T' μ_control ≤ 1) :
-    netBenefit (sensFromR2 m r2_target T' * π)
+    decisionCurveNetBenefit (sensFromR2 m r2_target T' * π)
         ((1 - specFromR2 m r2_target T' μ_control) * (1 - π)) 1 t <
-      netBenefit (sensFromR2 m r2_source T' * π)
+      decisionCurveNetBenefit (sensFromR2 m r2_source T' * π)
         ((1 - specFromR2 m r2_source T' μ_control) * (1 - π)) 1 t := by
   have h_sens :
       sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
@@ -666,7 +662,7 @@ theorem portability_narrows_useful_range
         specFromR2 m r2_source T' μ_control := by
     exact specFromR2_strictMono m T' μ_control r2_target r2_source
       hPhi_mono hμ_control_neg h_r2_target h_r2_source h_r2 h_spec_num_nonneg
-  unfold netBenefit
+  repeat rw [decisionCurveNetBenefit_eq_formula]
   have htt : 0 < t / (1 - t) := div_pos ht (by linarith)
   have h1 : sensFromR2 m r2_target T' * π < sensFromR2 m r2_source T' * π :=
     mul_lt_mul_of_pos_right h_sens h_π
@@ -822,8 +818,9 @@ theorem fairness_accuracy_tradeoff
     (h_sens_drop : sens_B_fair < sens_B_unconstrained)
     (hn : 0 < n) (ht : 0 < t) (ht1 : t < 1)
     (h_fp : 0 ≤ fp_B) :
-    netBenefit sens_B_fair fp_B n t < netBenefit sens_B_unconstrained fp_B n t := by
-  unfold netBenefit
+    decisionCurveNetBenefit sens_B_fair fp_B n t <
+      decisionCurveNetBenefit sens_B_unconstrained fp_B n t := by
+  repeat rw [decisionCurveNetBenefit_eq_formula]
   have h1 : sens_B_fair / n < sens_B_unconstrained / n := by
     rw [div_lt_div_iff₀ hn hn]
     nlinarith
@@ -903,13 +900,6 @@ on the portability of the PGS in the target clinical population.
 
 section CostEffectiveness
 
-/-- **Quality-Adjusted Life Year (QALY) gain from correct risk stratification.**
-    QALY_gain = sensitivity × prevalence × treatment_benefit
-              - (1 - specificity) × (1 - prevalence) × treatment_harm -/
-noncomputable def qalyGain
-    (sens spec π benefit harm : ℝ) : ℝ :=
-  sens * π * benefit - (1 - spec) * (1 - π) * harm
-
 /-- **QALY gain is positive when sensitivity-prevalence product dominates.**
     The QALY gain `sens × π × benefit − (1−spec) × (1−π) × harm` is positive
     under two independently meaningful conditions:
@@ -934,8 +924,8 @@ theorem qaly_gain_positive_condition
     (h_tp_dominates : (1 - spec) * (1 - π) < sens * π)
     -- Treatment benefit exceeds harm
     (h_bh : harm ≤ benefit) :
-    0 < qalyGain sens spec π benefit harm := by
-  unfold qalyGain
+    0 < screeningQalyGain sens spec π benefit harm := by
+  rw [screeningQalyGain_eq_formula]
   have h_prob_gap : 0 < sens * π - (1 - spec) * (1 - π) := by
     nlinarith
   have h_lower_pos : 0 < harm * (sens * π - (1 - spec) * (1 - π)) := by
@@ -944,8 +934,8 @@ theorem qaly_gain_positive_condition
     positivity
   have h_lower_le :
       harm * (sens * π - (1 - spec) * (1 - π)) ≤
-        qalyGain sens spec π benefit harm := by
-    unfold qalyGain
+        screeningQalyGain sens spec π benefit harm := by
+    rw [screeningQalyGain_eq_formula]
     have h_gain_term_nonneg : 0 ≤ sens * π * (benefit - harm) := by
       nlinarith
     nlinarith
@@ -962,9 +952,9 @@ theorem lower_portability_lower_cost_effectiveness
     (h_benefit : 0 < benefit) (h_harm : 0 < harm)
     (h_sens_t : 0 ≤ sens_t) (h_spec_t : 0 ≤ spec_t)
     (h_spec_s1 : spec_s ≤ 1) :
-    qalyGain sens_t spec_t π benefit harm <
-      qalyGain sens_s spec_s π benefit harm := by
-  unfold qalyGain
+    screeningQalyGain sens_t spec_t π benefit harm <
+      screeningQalyGain sens_s spec_s π benefit harm := by
+  repeat rw [screeningQalyGain_eq_formula]
   have h1 : sens_t * π * benefit < sens_s * π * benefit := by
     apply mul_lt_mul_of_pos_right _ h_benefit
     exact mul_lt_mul_of_pos_right h_sens h_π
@@ -981,8 +971,9 @@ theorem cost_effectiveness_threshold_exists
     (h_π : 0 < π) (h_π1 : π < 1)
     (h_benefit : 0 < benefit) (h_harm : 0 < harm) :
     -- At zero sensitivity, QALY gain is negative
-    qalyGain 0 0 π benefit harm < 0 := by
-  unfold qalyGain; nlinarith
+    screeningQalyGain 0 0 π benefit harm < 0 := by
+  rw [screeningQalyGain_eq_formula]
+  nlinarith
 
 end CostEffectiveness
 
@@ -1142,8 +1133,8 @@ theorem minimum_sample_for_clinical_pgs
     -- The key clinical condition: discrimination is too poor, so
     -- false positive harm exceeds true positive benefit
     (h_poor_disc : sens * π * benefit < (1 - spec) * (1 - π) * harm) :
-    qalyGain sens spec π benefit harm < 0 := by
-  unfold qalyGain
+    screeningQalyGain sens spec π benefit harm < 0 := by
+  rw [screeningQalyGain_eq_formula]
   linarith
 
 end Recommendations

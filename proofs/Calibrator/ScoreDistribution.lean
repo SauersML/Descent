@@ -1,5 +1,6 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
+import Calibrator.PGSCalibrationTheory
 import Calibrator.OpenQuestions
 
 namespace Calibrator
@@ -194,18 +195,9 @@ theorem calibration_in_large
   rw [← sub_ne_zero]
   rwa [← mean_shift_eq_diff]
 
-/-- Literal linear calibration slope for a transported source-calibrated score.
-In the additive drift model this is the population regression slope
-`Cov(Y_target, Ŷ_source) / Var(Ŷ_source)`, which equals the ratio of target to
-source score variance when effect sizes are fixed and only allele frequencies
-drift. -/
-noncomputable def transportedLinearCalibrationSlope
-    (V_A fst_source fst_target : ℝ) : ℝ :=
-  presentDayPGSVariance V_A fst_target / presentDayPGSVariance V_A fst_source
-
 /-- **Calibration slope drops below 1 under positive drift.**
-    This is a literal cov/var calibration slope result, not an `R²` ratio
-    surrogate. -/
+    This reuses the shared transported calibration surface from
+    `PGSCalibrationTheory`, rather than introducing a second local slope API. -/
 theorem calibration_slope_one
     (V_A fst_source fst_target : ℝ)
     (hVA : 0 < V_A)
@@ -213,12 +205,17 @@ theorem calibration_slope_one
     (h_target_le_one : fst_target ≤ 1) :
     transportedLinearCalibrationSlope V_A fst_source fst_target < 1 := by
   have h_source_lt_one : fst_source < 1 := lt_of_lt_of_le h_drift h_target_le_one
-  unfold transportedLinearCalibrationSlope presentDayPGSVariance
-  have h_den : 0 < (1 - fst_source) * V_A := by
-    have h_one_minus : 0 < 1 - fst_source := by linarith
-    exact mul_pos h_one_minus hVA
-  rw [div_lt_one h_den]
-  nlinarith [mul_lt_mul_of_pos_right h_drift hVA]
+  have h_profile :
+      (observableIdentityCalibrationProfile 0 0 fst_source fst_target).slope < 1 := by
+    simpa [observableIdentityCalibrationProfile] using
+      driftTransportRatio_lt_one fst_source fst_target h_source_lt_one h_drift
+  have h_bridge :
+      (observableIdentityCalibrationProfile 0 0 fst_source fst_target).slope =
+        transportedLinearCalibrationSlope V_A fst_source fst_target := by
+    simp [observableIdentityCalibrationProfile,
+      transportedLinearCalibrationSlope_eq_driftTransportRatio, hVA, h_source_lt_one]
+  rw [← h_bridge]
+  exact h_profile
 
 /-- **Portability loss disrupts calibration (derived from drift model).**
     Under the drift model, when fstT > fstS:

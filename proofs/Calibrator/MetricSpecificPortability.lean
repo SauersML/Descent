@@ -480,52 +480,12 @@ theorem discrimination_preserved_calibration_lost
   simp only [abs_zero]
   exact abs_pos.mpr h_shift_sub
 
-/-- Literal linear calibration slope for a transported source-calibrated score.
-
-    Calibration slope is the population regression coefficient
-
-    `Cov(Y_target, Ŷ_source) / Var(Ŷ_source)`.
-
-    In the present-day additive drift model used here:
-
-    - the source-calibrated predictor variance is `presentDayPGSVariance V_A fstS`;
-    - the transported target covariance with the phenotype is
-      `presentDayPGSVariance V_A fstT`.
-
-    So this is a literal cov/var calibration slope, not an `R²` ratio surrogate. -/
-noncomputable def driftCalibrationSlope (V_A fstS fstT : ℝ) : ℝ :=
-  presentDayPGSVariance V_A fstT / presentDayPGSVariance V_A fstS
-
-/-- The literal transported calibration slope is exactly the core drift
-    transport ratio on genetic signal variance. This ties the metric-level
-    calibration statement directly back to the population-genetic transport
-    object used throughout `PortabilityDrift`. -/
-theorem driftCalibrationSlope_eq_driftTransportRatio
-    (V_A fstS fstT : ℝ)
-    (hVA : 0 < V_A)
-    (hfstS_lt_one : fstS < 1) :
-    driftCalibrationSlope V_A fstS fstT = driftTransportRatio fstS fstT := by
-  have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
-  have hden_ne : 1 - fstS ≠ 0 := by linarith
-  unfold driftCalibrationSlope driftTransportRatio presentDayPGSVariance
-  field_simp [hVA_ne, hden_ne]
-
-/-- Exact closed form of the transported calibration slope under drift. -/
-theorem driftCalibrationSlope_eq_fst_ratio
-    (V_A fstS fstT : ℝ)
-    (hVA : 0 < V_A)
-    (hfstS_lt_one : fstS < 1) :
-    driftCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) := by
-  have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
-  have hden_ne : 1 - fstS ≠ 0 := by linarith
-  unfold driftCalibrationSlope presentDayPGSVariance
-  field_simp [hVA_ne, hden_ne]
-
 /-- **Allele-frequency shift worsens calibration slope and Brier score.**
     In the observable drift model, a larger target `F_ST` produces a real
     calibration degradation on actual metrics. The calibration statement here
-    uses the literal linear regression slope `Cov(Y_target, Ŷ_source) / Var(Ŷ_source)`
-    for the transported source-calibrated score.
+    uses the shared literal linear regression slope
+    `Cov(Y_target, Ŷ_source) / Var(Ŷ_source)` for the transported
+    source-calibrated score from `PGSCalibrationTheory`.
 
     - the target calibration slope is strictly below the ideal source baseline
       `1`;
@@ -543,18 +503,24 @@ theorem allele_freq_shift_disrupts_calibration
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
     (hfst_bounds : 0 ≤ fstS ∧ fstT < 1) :
-    driftCalibrationSlope V_A fstS fstT < 1 ∧
-    calibrationSlopeDeviation 1 <
-      calibrationSlopeDeviation (driftCalibrationSlope V_A fstS fstT) ∧
-    calibrationSlopeDeviation (driftCalibrationSlope V_A fstS fstT) =
-      1 - driftCalibrationSlope V_A fstS fstT ∧
-    driftCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) ∧
+    let profile := observableIdentityCalibrationProfile π π fstS fstT
+    profile.slope < 1 ∧
+    calibrationSlopeDeviation 1 < profile.slopeDeviation ∧
+    profile.slopeDeviation = 1 - profile.slope ∧
+    profile.slope = transportedLinearCalibrationSlope V_A fstS fstT ∧
+    profile.slope = (1 - fstT) / (1 - fstS) ∧
     sourceExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) <
       targetExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) fstS fstT := by
+  dsimp
   have hfstS_lt_one : fstS < 1 := lt_trans hfst hfst_bounds.2
   have hslope_eq :
-      driftCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) := by
-    exact driftCalibrationSlope_eq_fst_ratio V_A fstS fstT hVA hfstS_lt_one
+      transportedLinearCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) := by
+    exact transportedLinearCalibrationSlope_eq_fst_ratio V_A fstS fstT hVA hfstS_lt_one
+  have hprofile_eq_transport :
+      (observableIdentityCalibrationProfile π π fstS fstT).slope =
+        transportedLinearCalibrationSlope V_A fstS fstT := by
+    simp [observableIdentityCalibrationProfile,
+      transportedLinearCalibrationSlope_eq_driftTransportRatio, hVA, hfstS_lt_one]
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstS := by
     unfold presentDayR2 presentDayPGSVariance
     have h_num : 0 < (1 - fstS) * V_A := by
@@ -573,33 +539,34 @@ theorem allele_freq_shift_disrupts_calibration
   have hsrc_range : 0 < presentDayR2 V_A V_E fstS ∧ presentDayR2 V_A V_E fstS < 1 :=
     ⟨hsrc_pos, hsrc_lt_one⟩
   have hslope_lt :
-      driftCalibrationSlope V_A fstS fstT < 1 := by
-    rw [hslope_eq]
-    have hden : 0 < 1 - fstS := by linarith
-    rw [div_lt_one hden]
-    linarith
+      (observableIdentityCalibrationProfile π π fstS fstT).slope < 1 := by
+    rw [hprofile_eq_transport]
+    exact transportedLinearCalibrationSlope_lt_one V_A fstS fstT hVA hfst
+      (le_of_lt hfst_bounds.2)
   have hslope_dev_pos :
       calibrationSlopeDeviation 1 <
-        calibrationSlopeDeviation (driftCalibrationSlope V_A fstS fstT) := by
-    unfold calibrationSlopeDeviation
+        (observableIdentityCalibrationProfile π π fstS fstT).slopeDeviation := by
+    unfold CalibrationProfile.slopeDeviation calibrationSlopeDeviation
     rw [show (1 : ℝ) - 1 = 0 by ring, abs_zero]
-    have hneg : driftCalibrationSlope V_A fstS fstT - 1 < 0 := by
+    have hneg :
+        (observableIdentityCalibrationProfile π π fstS fstT).slope - 1 < 0 := by
       linarith [hslope_lt]
     rw [abs_of_neg hneg]
     linarith
   have hslope_dev :
-      calibrationSlopeDeviation (driftCalibrationSlope V_A fstS fstT) =
-        1 - driftCalibrationSlope V_A fstS fstT := by
-    unfold calibrationSlopeDeviation
-    rw [abs_of_neg]
-    · ring
-    · linarith [hslope_lt]
+      (observableIdentityCalibrationProfile π π fstS fstT).slopeDeviation =
+        1 - (observableIdentityCalibrationProfile π π fstS fstT).slope := by
+    exact calibrationSlopeDeviation_eq_one_sub_of_lt_one
+      (observableIdentityCalibrationProfile π π fstS fstT).slope hslope_lt
   have hbrier :
       sourceExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) <
         targetExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) fstS fstT := by
     exact targetBrier_strict_gt_source_of_observables
       π (presentDayR2 V_A V_E fstS) fstS fstT hπ0 hπ1 hsrc_range hfst hfst_bounds
-  exact ⟨hslope_lt, hslope_dev_pos, hslope_dev, hslope_eq, hbrier⟩
+  have hslope_eq_closed :
+      (observableIdentityCalibrationProfile π π fstS fstT).slope = (1 - fstT) / (1 - fstS) := by
+    rw [hprofile_eq_transport, hslope_eq]
+  exact ⟨hslope_lt, hslope_dev_pos, hslope_dev, hprofile_eq_transport, hslope_eq_closed, hbrier⟩
 
 /-- **Dimension-to-information ratio for a target adaptation task.**
     In an orthogonal Fisher model with `d` target-specific parameters and
@@ -1013,9 +980,9 @@ theorem clinical_utility_threshold
     (ht : 0 < t) (ht1 : t < 1)
     (h_sens : sens_target < sens_source)
     (h_spec : spec_target < spec_source) :
-    netBenefit (sens_target * π) ((1 - spec_target) * (1 - π)) 1 t <
-      netBenefit (sens_source * π) ((1 - spec_source) * (1 - π)) 1 t := by
-  unfold netBenefit
+    decisionCurveNetBenefit (sens_target * π) ((1 - spec_target) * (1 - π)) 1 t <
+      decisionCurveNetBenefit (sens_source * π) ((1 - spec_source) * (1 - π)) 1 t := by
+  rw [decisionCurveNetBenefit_eq_formula, decisionCurveNetBenefit_eq_formula]
   have h_threshold_weight_pos : 0 < t / (1 - t) := div_pos ht (by linarith)
   have h_tp : sens_target * π < sens_source * π := by
     exact mul_lt_mul_of_pos_right h_sens h_π

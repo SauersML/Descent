@@ -36,6 +36,18 @@ intended scale.
 
 section CalibrationDefinitions
 
+/-- Link scale on which calibration is interpreted. -/
+inductive CalibrationLink where
+  | identity
+  | logistic
+deriving DecidableEq, Repr
+
+/-- Shared calibration surface used across the codebase. -/
+structure CalibrationProfile where
+  citl : ℝ
+  slope : ℝ
+  link : CalibrationLink
+
 /-- **Calibration-in-the-large (CITL).**
     CITL = mean(observed) - mean(predicted).
     CITL = 0 means the average prediction matches the average outcome. -/
@@ -48,6 +60,93 @@ noncomputable def calibrationInTheLarge (mean_observed mean_predicted : ℝ) : �
     b < 1 means predictions are too extreme (overfitting).
     b > 1 means predictions are too conservative. -/
 noncomputable def calibrationSlopeDeviation (slope : ℝ) : ℝ := |slope - 1|
+
+/-- Shared calibration profile constructor. -/
+noncomputable def calibrationProfile
+    (link : CalibrationLink) (mean_observed mean_predicted slope : ℝ) :
+    CalibrationProfile where
+  citl := calibrationInTheLarge mean_observed mean_predicted
+  slope := slope
+  link := link
+
+/-- Identity-scale calibration profile. -/
+noncomputable def identityCalibrationProfile
+    (mean_observed mean_predicted slope : ℝ) : CalibrationProfile :=
+  calibrationProfile CalibrationLink.identity mean_observed mean_predicted slope
+
+/-- Logistic-scale calibration profile. -/
+noncomputable def logisticCalibrationProfile
+    (mean_observed mean_predicted slope : ℝ) : CalibrationProfile :=
+  calibrationProfile CalibrationLink.logistic mean_observed mean_predicted slope
+
+/-- Calibration-slope deviation attached to a shared calibration profile. -/
+noncomputable def CalibrationProfile.slopeDeviation (p : CalibrationProfile) : ℝ :=
+  calibrationSlopeDeviation p.slope
+
+@[simp] theorem calibrationProfile_citl
+    (link : CalibrationLink) (mean_observed mean_predicted slope : ℝ) :
+    (calibrationProfile link mean_observed mean_predicted slope).citl =
+      calibrationInTheLarge mean_observed mean_predicted := by
+  rfl
+
+@[simp] theorem calibrationProfile_slope
+    (link : CalibrationLink) (mean_observed mean_predicted slope : ℝ) :
+    (calibrationProfile link mean_observed mean_predicted slope).slope = slope := by
+  rfl
+
+@[simp] theorem calibrationProfile_link
+    (link : CalibrationLink) (mean_observed mean_predicted slope : ℝ) :
+    (calibrationProfile link mean_observed mean_predicted slope).link = link := by
+  rfl
+
+@[simp] theorem identityCalibrationProfile_citl
+    (mean_observed mean_predicted slope : ℝ) :
+    (identityCalibrationProfile mean_observed mean_predicted slope).citl =
+      calibrationInTheLarge mean_observed mean_predicted := by
+  rfl
+
+@[simp] theorem identityCalibrationProfile_slope
+    (mean_observed mean_predicted slope : ℝ) :
+    (identityCalibrationProfile mean_observed mean_predicted slope).slope = slope := by
+  rfl
+
+@[simp] theorem identityCalibrationProfile_link
+    (mean_observed mean_predicted slope : ℝ) :
+    (identityCalibrationProfile mean_observed mean_predicted slope).link =
+      CalibrationLink.identity := by
+  rfl
+
+@[simp] theorem logisticCalibrationProfile_citl
+    (mean_observed mean_predicted slope : ℝ) :
+    (logisticCalibrationProfile mean_observed mean_predicted slope).citl =
+      calibrationInTheLarge mean_observed mean_predicted := by
+  rfl
+
+@[simp] theorem logisticCalibrationProfile_slope
+    (mean_observed mean_predicted slope : ℝ) :
+    (logisticCalibrationProfile mean_observed mean_predicted slope).slope = slope := by
+  rfl
+
+@[simp] theorem logisticCalibrationProfile_link
+    (mean_observed mean_predicted slope : ℝ) :
+    (logisticCalibrationProfile mean_observed mean_predicted slope).link =
+      CalibrationLink.logistic := by
+  rfl
+
+@[simp] theorem calibrationProfile_slopeDeviation
+    (link : CalibrationLink) (mean_observed mean_predicted slope : ℝ) :
+    (calibrationProfile link mean_observed mean_predicted slope).slopeDeviation =
+      calibrationSlopeDeviation slope := by
+  rfl
+
+/-- Shared absolute-deviation identity for any subunit calibration slope. -/
+theorem calibrationSlopeDeviation_eq_one_sub_of_lt_one
+    (slope : ℝ) (h_slope : slope < 1) :
+    calibrationSlopeDeviation slope = 1 - slope := by
+  unfold calibrationSlopeDeviation
+  have hneg : slope - 1 < 0 := by linarith
+  rw [abs_of_neg hneg]
+  ring
 
 /-- **Hosmer-Lemeshow statistic.**
     Group predictions into deciles, compare observed vs expected
@@ -65,6 +164,80 @@ theorem hl_contrib_nonneg (obs exp n : ℝ)
   · exact mul_nonneg (le_of_lt h_exp) (by linarith)
 
 end CalibrationDefinitions
+
+/-- Logistic-scale prevalence log-odds. -/
+noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
+  Real.log (pi / (1 - pi))
+
+/-- **Prevalence-driven logistic intercept shift.**
+    If disease prevalence is `π_source` in training and `π_target`
+    in the target, the exact intercept shift on the logistic linear-predictor
+    scale is `logit(π_target) - logit(π_source)`. -/
+noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
+  prevalenceLogit pi_target - prevalenceLogit pi_source
+
+/-- Canonical identity-scale calibration profile for an observable transported
+deployment. The intercept component is measured on the observed outcome scale,
+while the slope is the exact observable drift transport ratio. -/
+noncomputable def observableIdentityCalibrationProfile
+    (mean_observed mean_predicted fst_source fst_target : ℝ) : CalibrationProfile :=
+  identityCalibrationProfile mean_observed mean_predicted
+    (driftTransportRatio fst_source fst_target)
+
+/-- Canonical logistic-scale calibration profile for an observable transported
+deployment. The intercept component is measured on the logistic linear-predictor
+scale, while the slope is the same exact observable drift transport ratio. -/
+noncomputable def observableLogisticCalibrationProfile
+    (pi_source pi_target fst_source fst_target : ℝ) : CalibrationProfile :=
+  logisticCalibrationProfile (prevalenceLogit pi_target) (prevalenceLogit pi_source)
+    (driftTransportRatio fst_source fst_target)
+
+@[simp] theorem observableIdentityCalibrationProfile_citl
+    (mean_observed mean_predicted fst_source fst_target : ℝ) :
+    (observableIdentityCalibrationProfile
+      mean_observed mean_predicted fst_source fst_target).citl =
+      calibrationInTheLarge mean_observed mean_predicted := by
+  rfl
+
+@[simp] theorem observableIdentityCalibrationProfile_slope
+    (mean_observed mean_predicted fst_source fst_target : ℝ) :
+    (observableIdentityCalibrationProfile
+      mean_observed mean_predicted fst_source fst_target).slope =
+      driftTransportRatio fst_source fst_target := by
+  rfl
+
+@[simp] theorem observableLogisticCalibrationProfile_citl
+    (pi_source pi_target fst_source fst_target : ℝ) :
+    (observableLogisticCalibrationProfile
+      pi_source pi_target fst_source fst_target).citl =
+      prevalenceCITLShift pi_source pi_target := by
+  unfold observableLogisticCalibrationProfile prevalenceCITLShift
+    logisticCalibrationProfile calibrationProfile prevalenceLogit
+    calibrationInTheLarge
+  ring
+
+@[simp] theorem observableLogisticCalibrationProfile_slope
+    (pi_source pi_target fst_source fst_target : ℝ) :
+    (observableLogisticCalibrationProfile
+      pi_source pi_target fst_source fst_target).slope =
+      driftTransportRatio fst_source fst_target := by
+  rfl
+
+theorem observableCalibrationProfiles_share_slope
+    (mean_observed mean_predicted pi_source pi_target fst_source fst_target : ℝ) :
+    (observableIdentityCalibrationProfile
+      mean_observed mean_predicted fst_source fst_target).slope =
+      (observableLogisticCalibrationProfile
+        pi_source pi_target fst_source fst_target).slope := by
+  rfl
+
+theorem observableCalibrationProfiles_share_slopeDeviation
+    (mean_observed mean_predicted pi_source pi_target fst_source fst_target : ℝ) :
+    (observableIdentityCalibrationProfile
+      mean_observed mean_predicted fst_source fst_target).slopeDeviation =
+      (observableLogisticCalibrationProfile
+        pi_source pi_target fst_source fst_target).slopeDeviation := by
+  rfl
 
 
 /-!
@@ -148,44 +321,74 @@ theorem cross_ancestry_exact_metric_profile
     (h_prev_shift : πSource ≠ πTarget)
     (hπT0 : 0 < πTarget) (hπT1 : πTarget < 1)
     (hPhiStrict : StrictMono Phi) :
+    let sourceProfile :=
+      observableIdentityCalibrationProfile πSource mean_pred fstSource fstSource
+    let targetProfile :=
+      observableIdentityCalibrationProfile πTarget mean_pred fstSource fstTarget
+    let targetLogisticProfile :=
+      observableLogisticCalibrationProfile πSource πTarget fstSource fstTarget
     targetExactLiabilityAUC r2Source fstSource fstTarget <
       sourceExactLiabilityAUC r2Source ∧
-    calibrationInTheLarge πTarget mean_pred = πTarget - πSource ∧
-    |calibrationInTheLarge πTarget mean_pred| = |πTarget - πSource| ∧
-    |calibrationInTheLarge πSource mean_pred| <
-      |calibrationInTheLarge πTarget mean_pred| ∧
+    targetProfile.citl = πTarget - πSource ∧
+    |targetProfile.citl| = |πTarget - πSource| ∧
+    |sourceProfile.citl| < |targetProfile.citl| ∧
+    targetLogisticProfile.citl = prevalenceCITLShift πSource πTarget ∧
+    targetLogisticProfile.slope = targetProfile.slope ∧
     sourceExactCalibratedBrierRisk πTarget r2Source <
       targetExactCalibratedBrierRisk πTarget r2Source fstSource fstTarget := by
+  dsimp
   have h_auc :
       targetExactLiabilityAUC r2Source fstSource fstTarget <
         sourceExactLiabilityAUC r2Source := by
     exact targetLiabilityAUC_lt_source_of_observables
       r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds hPhiStrict
   have h_citl_eq :
-      calibrationInTheLarge πTarget mean_pred = πTarget - πSource := by
-    exact source_calibrated_target_citl_eq_prevalence_shift
-      mean_pred πSource πTarget h_src_cal
+      (observableIdentityCalibrationProfile
+        πTarget mean_pred fstSource fstTarget).citl = πTarget - πSource := by
+    simpa [observableIdentityCalibrationProfile] using
+      source_calibrated_target_citl_eq_prevalence_shift
+        mean_pred πSource πTarget h_src_cal
   have h_abs_eq :
-      |calibrationInTheLarge πTarget mean_pred| = |πTarget - πSource| := by
-    exact source_calibrated_target_abs_citl_eq_abs_prevalence_shift
-      mean_pred πSource πTarget h_src_cal
-  have h_tgt_ne_zero : calibrationInTheLarge πTarget mean_pred ≠ 0 := by
+      |(observableIdentityCalibrationProfile
+        πTarget mean_pred fstSource fstTarget).citl| = |πTarget - πSource| := by
+    simpa [observableIdentityCalibrationProfile] using
+      source_calibrated_target_abs_citl_eq_abs_prevalence_shift
+        mean_pred πSource πTarget h_src_cal
+  have h_tgt_ne_zero :
+      (observableIdentityCalibrationProfile
+        πTarget mean_pred fstSource fstTarget).citl ≠ 0 := by
     rw [h_citl_eq]
     intro h_zero
     apply h_prev_shift
     linarith
   have h_abs_worse :
-      |calibrationInTheLarge πSource mean_pred| <
-        |calibrationInTheLarge πTarget mean_pred| := by
-    have h_tgt_abs_pos : 0 < |calibrationInTheLarge πTarget mean_pred| :=
+      |(observableIdentityCalibrationProfile
+          πSource mean_pred fstSource fstSource).citl| <
+        |(observableIdentityCalibrationProfile
+          πTarget mean_pred fstSource fstTarget).citl| := by
+    have h_tgt_abs_pos :
+        0 < |(observableIdentityCalibrationProfile
+          πTarget mean_pred fstSource fstTarget).citl| :=
       abs_pos.mpr h_tgt_ne_zero
-    simpa [h_src_cal] using h_tgt_abs_pos
+    simpa [observableIdentityCalibrationProfile_citl, h_src_cal] using h_tgt_abs_pos
+  have h_logit_citl :
+      (observableLogisticCalibrationProfile
+        πSource πTarget fstSource fstTarget).citl =
+        prevalenceCITLShift πSource πTarget := by
+    simp
+  have h_share_slope :
+      (observableLogisticCalibrationProfile
+        πSource πTarget fstSource fstTarget).slope =
+        (observableIdentityCalibrationProfile
+          πTarget mean_pred fstSource fstTarget).slope := by
+    exact (observableCalibrationProfiles_share_slope
+      πTarget mean_pred πSource πTarget fstSource fstTarget).symm
   have h_brier :
       sourceExactCalibratedBrierRisk πTarget r2Source <
         targetExactCalibratedBrierRisk πTarget r2Source fstSource fstTarget := by
     exact targetBrier_strict_gt_source_of_observables
       πTarget r2Source fstSource fstTarget hπT0 hπT1 h_r2 h_fst h_fst_bounds
-  exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse, h_brier⟩
+  exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse, h_logit_citl, h_share_slope, h_brier⟩
 
 /-- **Cross-ancestry AUC drops while calibration-in-the-large worsens.**
     This theorem states the claim on the repository's actual metrics:
@@ -205,36 +408,50 @@ theorem cross_ancestry_auc_and_citl_worsen
     (h_src_cal : calibrationInTheLarge πSource mean_pred = 0)
     (h_prev_shift : πSource ≠ πTarget)
     (hPhiStrict : StrictMono Phi) :
+    let sourceProfile :=
+      observableIdentityCalibrationProfile πSource mean_pred fstSource fstSource
+    let targetProfile :=
+      observableIdentityCalibrationProfile πTarget mean_pred fstSource fstTarget
     targetExactLiabilityAUC r2Source fstSource fstTarget <
       sourceExactLiabilityAUC r2Source ∧
-    calibrationInTheLarge πTarget mean_pred = πTarget - πSource ∧
-    |calibrationInTheLarge πTarget mean_pred| = |πTarget - πSource| ∧
-    |calibrationInTheLarge πSource mean_pred| <
-      |calibrationInTheLarge πTarget mean_pred| := by
+    targetProfile.citl = πTarget - πSource ∧
+    |targetProfile.citl| = |πTarget - πSource| ∧
+    |sourceProfile.citl| < |targetProfile.citl| := by
+  dsimp
   have h_auc :
       targetExactLiabilityAUC r2Source fstSource fstTarget <
         sourceExactLiabilityAUC r2Source := by
     exact targetLiabilityAUC_lt_source_of_observables
       r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds hPhiStrict
   have h_citl_eq :
-      calibrationInTheLarge πTarget mean_pred = πTarget - πSource := by
-    exact source_calibrated_target_citl_eq_prevalence_shift
-      mean_pred πSource πTarget h_src_cal
+      (observableIdentityCalibrationProfile
+        πTarget mean_pred fstSource fstTarget).citl = πTarget - πSource := by
+    simpa [observableIdentityCalibrationProfile] using
+      source_calibrated_target_citl_eq_prevalence_shift
+        mean_pred πSource πTarget h_src_cal
   have h_abs_eq :
-      |calibrationInTheLarge πTarget mean_pred| = |πTarget - πSource| := by
-    exact source_calibrated_target_abs_citl_eq_abs_prevalence_shift
-      mean_pred πSource πTarget h_src_cal
-  have h_tgt_ne_zero : calibrationInTheLarge πTarget mean_pred ≠ 0 := by
+      |(observableIdentityCalibrationProfile
+        πTarget mean_pred fstSource fstTarget).citl| = |πTarget - πSource| := by
+    simpa [observableIdentityCalibrationProfile] using
+      source_calibrated_target_abs_citl_eq_abs_prevalence_shift
+        mean_pred πSource πTarget h_src_cal
+  have h_tgt_ne_zero :
+      (observableIdentityCalibrationProfile
+        πTarget mean_pred fstSource fstTarget).citl ≠ 0 := by
     rw [h_citl_eq]
     intro h_zero
     apply h_prev_shift
     linarith
   have h_abs_worse :
-      |calibrationInTheLarge πSource mean_pred| <
-        |calibrationInTheLarge πTarget mean_pred| := by
-    have h_tgt_abs_pos : 0 < |calibrationInTheLarge πTarget mean_pred| :=
+      |(observableIdentityCalibrationProfile
+          πSource mean_pred fstSource fstSource).citl| <
+        |(observableIdentityCalibrationProfile
+          πTarget mean_pred fstSource fstTarget).citl| := by
+    have h_tgt_abs_pos :
+        0 < |(observableIdentityCalibrationProfile
+          πTarget mean_pred fstSource fstTarget).citl| :=
       abs_pos.mpr h_tgt_ne_zero
-    simpa [h_src_cal] using h_tgt_abs_pos
+    simpa [observableIdentityCalibrationProfile_citl, h_src_cal] using h_tgt_abs_pos
   exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩
 
 /-- **Cross-ancestry AUC drops while Brier worsens.**
@@ -270,26 +487,104 @@ calibration drifts systematically.
 
 section PopulationCalibrationDrift
 
-/-- Logistic-scale prevalence log-odds. -/
-noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
-  Real.log (pi / (1 - pi))
+/-- Shared logistic-scale calibration profile induced by a prevalence shift. -/
+noncomputable def prevalenceLogisticCalibrationProfile
+    (pi_source pi_target slope : ℝ) : CalibrationProfile :=
+  logisticCalibrationProfile (prevalenceLogit pi_target) (prevalenceLogit pi_source) slope
 
-/-- **Prevalence-driven logistic intercept shift.**
-    If disease prevalence is `π_source` in training and `π_target`
-    in the target, the exact intercept shift on the logistic linear-predictor
-    scale is
-    `logit(π_target) - logit(π_source) =
-      log(π_target / (1 - π_target)) - log(π_source / (1 - π_source))`.
+/-- Literal cov/var calibration slope for a transported source-calibrated score.
 
-    This is the correct logistic-scale analogue of calibration-in-the-large
-    drift; it is not the simpler but incorrect ratio `log(π_target / π_source)`. -/
-noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
-  prevalenceLogit pi_target - prevalenceLogit pi_source
+    This is the common drift-calibration slope used across the repo:
+
+    `Cov(Y_target, Ŷ_source) / Var(Ŷ_source)`.
+
+    Under the additive drift model with fixed effects and varying allele
+    frequencies, it is exactly the ratio of target to source score variance. -/
+noncomputable def transportedLinearCalibrationSlope
+    (V_A fst_source fst_target : ℝ) : ℝ :=
+  presentDayPGSVariance V_A fst_target / presentDayPGSVariance V_A fst_source
+
+/-- Shared identity-scale calibration profile for a transported score under
+drift. -/
+noncomputable def transportedIdentityCalibrationProfile
+    (mean_observed mean_predicted V_A fst_source fst_target : ℝ) : CalibrationProfile :=
+  identityCalibrationProfile mean_observed mean_predicted
+    (transportedLinearCalibrationSlope V_A fst_source fst_target)
+
+@[simp] theorem prevalenceLogisticCalibrationProfile_citl
+    (pi_source pi_target slope : ℝ) :
+    (prevalenceLogisticCalibrationProfile pi_source pi_target slope).citl =
+      prevalenceCITLShift pi_source pi_target := by
+  unfold prevalenceLogisticCalibrationProfile prevalenceCITLShift
+    logisticCalibrationProfile calibrationProfile prevalenceLogit
+    calibrationInTheLarge
+  ring
+
+@[simp] theorem prevalenceLogisticCalibrationProfile_slope
+    (pi_source pi_target slope : ℝ) :
+    (prevalenceLogisticCalibrationProfile pi_source pi_target slope).slope = slope := by
+  rfl
+
+@[simp] theorem transportedIdentityCalibrationProfile_citl
+    (mean_observed mean_predicted V_A fst_source fst_target : ℝ) :
+    (transportedIdentityCalibrationProfile
+      mean_observed mean_predicted V_A fst_source fst_target).citl =
+      calibrationInTheLarge mean_observed mean_predicted := by
+  rfl
+
+@[simp] theorem transportedIdentityCalibrationProfile_slope
+    (mean_observed mean_predicted V_A fst_source fst_target : ℝ) :
+    (transportedIdentityCalibrationProfile
+      mean_observed mean_predicted V_A fst_source fst_target).slope =
+      transportedLinearCalibrationSlope V_A fst_source fst_target := by
+  rfl
+
+/-- The shared transported linear calibration slope equals the core drift
+transport ratio. -/
+theorem transportedLinearCalibrationSlope_eq_driftTransportRatio
+    (V_A fstS fstT : ℝ)
+    (hVA : 0 < V_A)
+    (hfstS_lt_one : fstS < 1) :
+    transportedLinearCalibrationSlope V_A fstS fstT = driftTransportRatio fstS fstT := by
+  have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
+  have hden_ne : 1 - fstS ≠ 0 := by linarith
+  unfold transportedLinearCalibrationSlope driftTransportRatio presentDayPGSVariance
+  rw [PortabilityFactor.neutralDrift_value]
+  field_simp [hVA_ne, hden_ne]
+
+/-- Exact closed form of the shared transported linear calibration slope. -/
+theorem transportedLinearCalibrationSlope_eq_fst_ratio
+    (V_A fstS fstT : ℝ)
+    (hVA : 0 < V_A)
+    (hfstS_lt_one : fstS < 1) :
+    transportedLinearCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) := by
+  have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
+  have hden_ne : 1 - fstS ≠ 0 := by linarith
+  unfold transportedLinearCalibrationSlope presentDayPGSVariance
+  field_simp [hVA_ne, hden_ne]
+
+/-- Positive drift pushes the shared transported linear calibration slope below
+`1`. -/
+theorem transportedLinearCalibrationSlope_lt_one
+    (V_A fst_source fst_target : ℝ)
+    (hVA : 0 < V_A)
+    (h_drift : fst_source < fst_target)
+    (h_target_le_one : fst_target ≤ 1) :
+    transportedLinearCalibrationSlope V_A fst_source fst_target < 1 := by
+  have h_source_lt_one : fst_source < 1 := lt_of_lt_of_le h_drift h_target_le_one
+  unfold transportedLinearCalibrationSlope presentDayPGSVariance
+  have h_den : 0 < (1 - fst_source) * V_A := by
+    have h_one_minus : 0 < 1 - fst_source := by linarith
+    exact mul_pos h_one_minus hVA
+  rw [div_lt_one h_den]
+  nlinarith [mul_lt_mul_of_pos_right h_drift hVA]
 
 /-- CITL shift is zero when prevalences match. -/
 theorem no_citl_shift_same_prevalence (pi : ℝ) :
     prevalenceCITLShift pi pi = 0 := by
-  simp [prevalenceCITLShift]
+  rw [← prevalenceLogisticCalibrationProfile_citl pi pi (1 : ℝ)]
+  simp [prevalenceLogisticCalibrationProfile, logisticCalibrationProfile,
+    calibrationProfile, calibrationInTheLarge]
 
 /-- CITL shift is positive when target has higher prevalence. -/
 theorem citl_shift_positive_higher_prevalence
@@ -467,6 +762,21 @@ theorem logistic_recalibration_corrects_slope
   · unfold calibrationSlopeDeviation recalibratedCalibrationSlope
     rw [div_self h_slope_nonzero, sub_self, abs_zero]
 
+/-- Shared logistic calibration profile of the fully recalibrated predictor. -/
+theorem logistic_recalibrated_profile_corrects_citl_and_slope
+    (mean_obs mean_pgs targetSlope : ℝ)
+    (h_slope_nonzero : targetSlope ≠ 0) :
+    let profile :=
+      logisticCalibrationProfile
+        mean_obs
+        (logisticRecalibrated mean_pgs (mean_obs - targetSlope * mean_pgs) targetSlope)
+        (recalibratedCalibrationSlope targetSlope targetSlope)
+    profile.citl = 0 ∧ profile.slopeDeviation = 0 := by
+  dsimp
+  constructor
+  · exact logistic_recalibration_corrects_citl mean_obs mean_pgs targetSlope
+  · exact (logistic_recalibration_corrects_slope targetSlope h_slope_nonzero).2
+
 /-- Logistic recalibration with the fitted intercept and fitted slope corrects
     both calibration-in-the-large and slope deviation exactly. -/
 theorem logistic_recalibration_corrects_citl_and_slope
@@ -476,9 +786,9 @@ theorem logistic_recalibration_corrects_citl_and_slope
         (logisticRecalibrated mean_pgs (mean_obs - targetSlope * mean_pgs) targetSlope) = 0 ∧
       calibrationSlopeDeviation
         (recalibratedCalibrationSlope targetSlope targetSlope) = 0 := by
-  constructor
-  · exact logistic_recalibration_corrects_citl mean_obs mean_pgs targetSlope
-  · exact (logistic_recalibration_corrects_slope targetSlope h_slope_nonzero).2
+  simpa [CalibrationProfile.slopeDeviation] using
+    logistic_recalibrated_profile_corrects_citl_and_slope
+      mean_obs mean_pgs targetSlope h_slope_nonzero
 
 /-- Logistic recalibration preserves AUC because it is a strictly increasing
     affine transform when the fitted slope is positive. -/
@@ -599,7 +909,7 @@ theorem recalibration_needs_target_cohort
     h_events h_info h_target]
   unfold requiredTargetCohortSizeForRecalibration
   rw [div_le_iff₀ h_prev]
-  simpa [mul_comm, mul_left_comm, mul_assoc]
+  simp [mul_comm, mul_left_comm]
 
 /-- At fixed parameter count, per-event information, and target precision,
     lower event prevalence strictly increases the total target cohort size
@@ -827,7 +1137,11 @@ theorem positive_nri_iff_reclassifiedBandEventPrevalence_below_cohort_prevalence
         π * (1 - π) * thresholdBandRate μevent threshold δ <
           π * (1 - π) * thresholdBandRate μnonevent threshold δ := by
       nlinarith [h_cross]
-    exact (mul_lt_mul_left h_scale_pos).mp (by simpa [mul_assoc] using h_scaled)
+    have h_scaled' :
+        (π * (1 - π)) * thresholdBandRate μevent threshold δ <
+          (π * (1 - π)) * thresholdBandRate μnonevent threshold δ := by
+      simpa [mul_assoc] using h_scaled
+    exact lt_of_mul_lt_mul_left' h_scaled'
 
 /-- **Finite-horizon longitudinal treatment model.**
     `discount t` encodes the time value of health at follow-up time `t`. -/
@@ -1011,7 +1325,6 @@ theorem receivesTreatment_iff_of_margin_error_lt_abs_true_margin
   unfold receivesTreatment
   set mTrue : ℝ := treatmentMargin model truePath
   set mPred : ℝ := treatmentMargin model predictedPath
-  change (0 < mPred ↔ 0 < mTrue)
   by_cases h_true : 0 < mTrue
   · have h_pred : 0 < mPred := by
       by_cases h_pred_nonpos : mPred ≤ 0
@@ -1323,7 +1636,7 @@ theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
                       |truePath.treatmentHarm t - predictedPath.treatmentHarm t| =
                         |predictedPath.treatmentHarm t - truePath.treatmentHarm t| := by
                     exact abs_sub_comm _ _
-                  simpa [hharm]
+                  simp [hharm]
             _ ≤ εEvent t * benefitBound t +
                 eventBound t * εBenefit t + εHarm t := by
                   have h_term2a' :
@@ -1537,6 +1850,251 @@ theorem expectedQalyLoss_eq_expected_qalyDecisionRegretMargin
   exact Filter.Eventually.of_forall (fun z =>
     qalyLoss_eq_qalyDecisionRegretMargin
       model (truePath z) (predictedPath z))
+
+/-- Shared one-step screening decision interface.
+    `threshold` is the risk cutoff used by the policy, `benefit` is the utility
+    of a true-positive treatment, and `harm` is the utility cost of a
+    false-positive treatment. -/
+structure ScreeningDecisionModel where
+  threshold : ℝ
+  benefit : ℝ
+  harm : ℝ
+
+/-- One-step longitudinal embedding of the shared screening model. -/
+noncomputable def screeningLongitudinalModel
+    (_model : ScreeningDecisionModel) : LongitudinalTreatmentModel 1 where
+  discount := fun _ => 1
+  discount_nonneg := by
+    intro _
+    norm_num
+
+/-- One-step clinical pathway induced by a scalar event risk under the shared
+    screening model. A treated event yields utility `benefit`, a treated
+    non-event yields utility `-harm`, and no treatment yields `0`. -/
+noncomputable def screeningClinicalPathway
+    (model : ScreeningDecisionModel) (risk : ℝ) : ClinicalPathway 1 where
+  followupWeight := fun _ => 1
+  eventProb := fun _ => risk
+  treatmentBenefit := fun _ => model.benefit + model.harm
+  treatmentHarm := fun _ => model.harm
+  followupWeight_nonneg := by
+    intro _
+    norm_num
+
+/-- If the screening-model utility ratio matches the decision threshold, the
+    one-step treatment margin is exactly `(benefit + harm) × (risk - threshold)`.
+    This is the shared bridge from policy thresholding to exact pathway utility. -/
+theorem treatmentMargin_screeningClinicalPathway
+    (model : ScreeningDecisionModel) (risk : ℝ)
+    (h_threshold :
+      model.harm = model.threshold * (model.benefit + model.harm)) :
+    treatmentMargin (screeningLongitudinalModel model)
+      (screeningClinicalPathway model risk) =
+        (model.benefit + model.harm) * (risk - model.threshold) := by
+  unfold treatmentMargin qalyContributionAtTime
+    screeningLongitudinalModel screeningClinicalPathway
+  rw [Fin1_sum_eq]
+  dsimp
+  norm_num
+  nlinarith
+
+/-- Under the exact threshold/utility relation, the shared screening model
+    treats exactly when the input risk exceeds the policy threshold. -/
+theorem receivesTreatment_screeningClinicalPathway_iff
+    (model : ScreeningDecisionModel) (risk : ℝ)
+    (h_total_pos : 0 < model.benefit + model.harm)
+    (h_threshold :
+      model.harm = model.threshold * (model.benefit + model.harm)) :
+    receivesTreatment (screeningLongitudinalModel model)
+      (screeningClinicalPathway model risk) ↔
+        classifiedHighRisk model.threshold risk := by
+  unfold receivesTreatment classifiedHighRisk
+  rw [treatmentMargin_screeningClinicalPathway model risk h_threshold]
+  constructor <;> intro h <;> nlinarith
+
+/-- Count-based expected screening utility on a per-person scale. -/
+noncomputable def screeningUtilityFromCounts
+    (model : ScreeningDecisionModel) (tp fp n : ℝ) : ℝ :=
+  model.benefit * (tp / n) - model.harm * (fp / n)
+
+/-- Rate-based expected screening utility on a per-person scale. -/
+noncomputable def screeningUtilityFromRates
+    (model : ScreeningDecisionModel) (sens spec prevalence : ℝ) : ℝ :=
+  sens * prevalence * model.benefit -
+    (1 - spec) * (1 - prevalence) * model.harm
+
+/-- The count-based and rate-based screening utilities agree when true- and
+    false-positive counts are instantiated from sensitivity, specificity,
+    prevalence, and sample size. -/
+theorem screeningUtilityFromCounts_eq_screeningUtilityFromRates
+    (model : ScreeningDecisionModel)
+    (sens spec prevalence n : ℝ)
+    (h_n : 0 < n) :
+    screeningUtilityFromCounts model
+        (sens * prevalence * n)
+        ((1 - spec) * (1 - prevalence) * n) n =
+      screeningUtilityFromRates model sens spec prevalence := by
+  unfold screeningUtilityFromCounts screeningUtilityFromRates
+  field_simp [ne_of_gt h_n]
+
+/-- Treating an event under the shared screening model yields exactly the
+    model's true-positive utility. -/
+theorem qalyGainUnderDecision_screening_case_treat
+    (model : ScreeningDecisionModel) (decisionRisk : ℝ)
+    (h_total_pos : 0 < model.benefit + model.harm)
+    (h_threshold :
+      model.harm = model.threshold * (model.benefit + model.harm))
+    (h_decision : classifiedHighRisk model.threshold decisionRisk) :
+    qalyGainUnderDecision (screeningLongitudinalModel model)
+      (screeningClinicalPathway model 1)
+      (screeningClinicalPathway model decisionRisk) =
+        model.benefit := by
+  have h_treat :
+      receivesTreatment (screeningLongitudinalModel model)
+        (screeningClinicalPathway model decisionRisk) := by
+    exact (receivesTreatment_screeningClinicalPathway_iff
+      model decisionRisk h_total_pos h_threshold).2 h_decision
+  unfold qalyGainUnderDecision
+  rw [if_pos h_treat, treatmentMargin_screeningClinicalPathway model 1 h_threshold]
+  nlinarith
+
+/-- Treating a non-event under the shared screening model yields exactly the
+    model's false-positive utility cost. -/
+theorem qalyGainUnderDecision_screening_control_treat
+    (model : ScreeningDecisionModel) (decisionRisk : ℝ)
+    (h_total_pos : 0 < model.benefit + model.harm)
+    (h_threshold :
+      model.harm = model.threshold * (model.benefit + model.harm))
+    (h_decision : classifiedHighRisk model.threshold decisionRisk) :
+    qalyGainUnderDecision (screeningLongitudinalModel model)
+      (screeningClinicalPathway model 0)
+      (screeningClinicalPathway model decisionRisk) =
+        -model.harm := by
+  have h_treat :
+      receivesTreatment (screeningLongitudinalModel model)
+        (screeningClinicalPathway model decisionRisk) := by
+    exact (receivesTreatment_screeningClinicalPathway_iff
+      model decisionRisk h_total_pos h_threshold).2 h_decision
+  unfold qalyGainUnderDecision
+  rw [if_pos h_treat, treatmentMargin_screeningClinicalPathway model 0 h_threshold]
+  nlinarith
+
+/-- If the shared screening policy does not treat, realized utility is zero for
+    both events and non-events. -/
+theorem qalyGainUnderDecision_screening_no_treat
+    (model : ScreeningDecisionModel) (trueRisk decisionRisk : ℝ)
+    (h_total_pos : 0 < model.benefit + model.harm)
+    (h_threshold :
+      model.harm = model.threshold * (model.benefit + model.harm))
+    (h_not_decision : ¬ classifiedHighRisk model.threshold decisionRisk) :
+    qalyGainUnderDecision (screeningLongitudinalModel model)
+      (screeningClinicalPathway model trueRisk)
+      (screeningClinicalPathway model decisionRisk) =
+        0 := by
+  have h_not_treat :
+      ¬ receivesTreatment (screeningLongitudinalModel model)
+        (screeningClinicalPathway model decisionRisk) := by
+    intro h_treat
+    exact h_not_decision
+      ((receivesTreatment_screeningClinicalPathway_iff
+        model decisionRisk h_total_pos h_threshold).1 h_treat)
+  unfold qalyGainUnderDecision
+  simp [h_not_treat]
+
+/-- Canonical screening model behind the cost-effectiveness section:
+    the policy threshold is exactly `harm / (benefit + harm)`. -/
+noncomputable def qalyScreeningDecisionModel
+    (benefit harm : ℝ) : ScreeningDecisionModel where
+  threshold := harm / (benefit + harm)
+  benefit := benefit
+  harm := harm
+
+/-- The canonical cost-effectiveness screening model satisfies the exact
+    threshold/utility bridge equation. -/
+theorem qalyScreeningDecisionModel_harm_eq_threshold_scale
+    (benefit harm : ℝ)
+    (h_total : benefit + harm ≠ 0) :
+    (qalyScreeningDecisionModel benefit harm).harm =
+      (qalyScreeningDecisionModel benefit harm).threshold *
+        ((qalyScreeningDecisionModel benefit harm).benefit +
+          (qalyScreeningDecisionModel benefit harm).harm) := by
+  unfold qalyScreeningDecisionModel
+  field_simp [h_total]
+
+/-- The canonical QALY-style screening model has positive total utility scale
+    whenever benefit and harm are both positive. -/
+theorem qalyScreeningDecisionModel_total_pos
+    (benefit harm : ℝ)
+    (h_benefit : 0 < benefit) (h_harm : 0 < harm) :
+    0 <
+      (qalyScreeningDecisionModel benefit harm).benefit +
+        (qalyScreeningDecisionModel benefit harm).harm := by
+  unfold qalyScreeningDecisionModel
+  linarith
+
+/-- Canonical QALY-style screening utility on operating-point rates. -/
+noncomputable def screeningQalyGain
+    (sens spec prevalence benefit harm : ℝ) : ℝ :=
+  screeningUtilityFromRates (qalyScreeningDecisionModel benefit harm)
+    sens spec prevalence
+
+/-- The canonical screening-QALY utility is exactly the familiar
+    `sens × π × benefit − (1−spec) × (1−π) × harm` formula. -/
+theorem screeningQalyGain_eq_formula
+    (sens spec prevalence benefit harm : ℝ) :
+    screeningQalyGain sens spec prevalence benefit harm =
+      sens * prevalence * benefit -
+        (1 - spec) * (1 - prevalence) * harm := by
+  unfold screeningQalyGain screeningUtilityFromRates qalyScreeningDecisionModel
+  ring
+
+/-- Canonical decision-curve screening model: benefit is normalized to `1` and
+    false-positive harm is the usual decision-curve odds weight `t / (1-t)`. -/
+noncomputable def decisionCurveScreeningModel
+    (t : ℝ) : ScreeningDecisionModel where
+  threshold := t
+  benefit := 1
+  harm := t / (1 - t)
+
+/-- The decision-curve screening model satisfies the exact threshold/utility
+    bridge equation whenever `t ≠ 1`. -/
+theorem decisionCurveScreeningModel_harm_eq_threshold_scale
+    (t : ℝ) (h_t : t ≠ 1) :
+    (decisionCurveScreeningModel t).harm =
+      (decisionCurveScreeningModel t).threshold *
+        ((decisionCurveScreeningModel t).benefit +
+          (decisionCurveScreeningModel t).harm) := by
+  unfold decisionCurveScreeningModel
+  have h_one_sub : 1 - t ≠ 0 := sub_ne_zero.mpr (Ne.symm h_t)
+  field_simp [h_one_sub]
+  ring
+
+/-- The decision-curve screening model has positive total utility scale in the
+    standard regime `0 < t < 1`. -/
+theorem decisionCurveScreeningModel_total_pos
+    (t : ℝ) (ht : 0 < t) (ht1 : t < 1) :
+    0 <
+      (decisionCurveScreeningModel t).benefit +
+        (decisionCurveScreeningModel t).harm := by
+  unfold decisionCurveScreeningModel
+  have h_one_sub : 0 < 1 - t := by linarith
+  have h_div : 0 < t / (1 - t) := div_pos ht h_one_sub
+  linarith
+
+/-- Canonical decision-curve net benefit on a per-person scale. -/
+noncomputable def decisionCurveNetBenefit
+    (tp fp n t : ℝ) : ℝ :=
+  screeningUtilityFromCounts (decisionCurveScreeningModel t) tp fp n
+
+/-- The canonical decision-curve net benefit is exactly the usual
+    `TP/N − FP/N × t/(1−t)` expression. -/
+theorem decisionCurveNetBenefit_eq_formula
+    (tp fp n t : ℝ) :
+    decisionCurveNetBenefit tp fp n t =
+      tp / n - fp / n * (t / (1 - t)) := by
+  unfold decisionCurveNetBenefit screeningUtilityFromCounts
+    decisionCurveScreeningModel
+  ring
 
 /-- **Clinical treatment model induced by a decision threshold.**
     This is the exact one-time specialization of the longitudinal pathway model
