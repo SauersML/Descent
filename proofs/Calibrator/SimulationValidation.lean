@@ -370,6 +370,90 @@ theorem missedSelectedVariance_lt_of_variance_and_correlation
     exact mul_lt_mul_of_pos_left h_loss_lt h_v₂
   exact lt_of_le_of_lt h_left h_right
 
+/-- Exact held-out Gaussian LRT ordering from observable selected-architecture
+    variance and cross-population effect correlation alone. If one trait has at
+    least as much selection-sensitive variance and strictly lower effect
+    correlation, then the selection-aware model achieves a strictly larger
+    nested-model LRT on the same sample size and baseline residual variance. -/
+theorem selectionModelLRT_lt_of_variance_and_correlation
+    (n base v₁ v₂ ρ₁ ρ₂ : ℝ)
+    (h_n : 0 < n)
+    (h_base : 0 < base)
+    (h_v₁ : 0 ≤ v₁)
+    (h_v₂ : 0 < v₂)
+    (h_ρ₁ : 0 ≤ ρ₁)
+    (h_ρ₁_lt : ρ₁ < 1)
+    (h_ρ₂ : 0 ≤ ρ₂)
+    (h_corr : ρ₂ < ρ₁)
+    (h_var : v₁ ≤ v₂) :
+    selectionModelLRT
+      { sampleSize := n
+        baselineResidualVar := base
+        selectedArchitectureVar := v₁
+        effectCorrelation := ρ₁ } <
+    selectionModelLRT
+      { sampleSize := n
+        baselineResidualVar := base
+        selectedArchitectureVar := v₂
+        effectCorrelation := ρ₂ } := by
+  have h_miss₁_nonneg :
+      0 ≤
+        missedSelectedVariance
+          { sampleSize := n
+            baselineResidualVar := base
+            selectedArchitectureVar := v₁
+            effectCorrelation := ρ₁ } := by
+    unfold missedSelectedVariance
+    exact mul_nonneg h_v₁ (by nlinarith [sq_nonneg ρ₁])
+  have h_miss₂_nonneg :
+      0 ≤
+        missedSelectedVariance
+          { sampleSize := n
+            baselineResidualVar := base
+            selectedArchitectureVar := v₂
+            effectCorrelation := ρ₂ } := by
+    unfold missedSelectedVariance
+    exact mul_nonneg (le_of_lt h_v₂) (by nlinarith [sq_nonneg ρ₂])
+  have h_miss_lt :
+      missedSelectedVariance
+          { sampleSize := n
+            baselineResidualVar := base
+            selectedArchitectureVar := v₁
+            effectCorrelation := ρ₁ } <
+        missedSelectedVariance
+          { sampleSize := n
+            baselineResidualVar := base
+            selectedArchitectureVar := v₂
+            effectCorrelation := ρ₂ } := by
+    unfold missedSelectedVariance
+    exact missedSelectedVariance_lt_of_variance_and_correlation
+      v₁ v₂ ρ₁ ρ₂ h_v₂ h_ρ₁ h_ρ₁_lt h_ρ₂ h_corr h_var
+  rw [selectionModelLRT_eq_sampleSize_mul_log_residual_gap
+        { sampleSize := n
+          baselineResidualVar := base
+          selectedArchitectureVar := v₁
+          effectCorrelation := ρ₁ }
+        h_base h_miss₁_nonneg]
+  rw [selectionModelLRT_eq_sampleSize_mul_log_residual_gap
+        { sampleSize := n
+          baselineResidualVar := base
+          selectedArchitectureVar := v₂
+          effectCorrelation := ρ₂ }
+        h_base h_miss₂_nonneg]
+  exact selectionModelLRT_strictMono_in_missedVariance
+    n base
+    (missedSelectedVariance
+      { sampleSize := n
+        baselineResidualVar := base
+        selectedArchitectureVar := v₁
+        effectCorrelation := ρ₁ })
+    (missedSelectedVariance
+      { sampleSize := n
+        baselineResidualVar := base
+        selectedArchitectureVar := v₂
+        effectCorrelation := ρ₂ })
+    h_n h_base h_miss₁_nonneg h_miss_lt
+
 /-- **Selection model preferred when the fluctuating regime induces both lower
     cross-population effect correlation and larger selected-architecture
     variance than the stabilizing regime.**
@@ -1084,6 +1168,185 @@ theorem empiricalPortabilityRatio_eq_retained_signal_mul_observableRatio
         hVA hVE hfstS_lt_one hfstT_lt_one h_ld]
   rw [← targetR2FromObservables_eq_presentDayR2 V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one]
 
+/-- Exact drift-only target/source `R²` ratio from the observable population-
+    genetic core. This is the portability baseline before LD tagging loss and
+    cross-population effect decorrelation are applied. -/
+noncomputable def neutralObservablePortabilityRatio
+    (V_A V_E fstSource fstTarget : ℝ) : ℝ :=
+  targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget /
+    presentDayR2 V_A V_E fstSource
+
+/-- The observable drift-only portability ratio is strictly positive in the
+    nondegenerate present-day drift model. -/
+theorem neutralObservablePortabilityRatio_pos
+    (V_A V_E fstSource fstTarget : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1) :
+    0 < neutralObservablePortabilityRatio V_A V_E fstSource fstTarget := by
+  have h_src_pos : 0 < presentDayR2 V_A V_E fstSource := by
+    unfold presentDayR2
+    have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
+      unfold presentDayPGSVariance
+      have h_one_minus : 0 < 1 - fstSource := by linarith
+      exact mul_pos h_one_minus hVA
+    exact div_pos hv_pos (by linarith)
+  have h_tgt_pos :
+      0 <
+        targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget := by
+    rw [targetR2FromObservables_eq_presentDayR2
+          V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one]
+    unfold presentDayR2
+    have hv_pos : 0 < presentDayPGSVariance V_A fstTarget := by
+      unfold presentDayPGSVariance
+      have h_one_minus : 0 < 1 - fstTarget := by linarith
+      exact mul_pos h_one_minus hVA
+    exact div_pos hv_pos (by linarith)
+  unfold neutralObservablePortabilityRatio
+  exact div_pos h_tgt_pos h_src_pos
+
+/-- Recover the nonnegative cross-population effect correlation from an exact
+    observed target/source portability ratio once the ancestry pair and LD-
+    retention factor are fixed. -/
+noncomputable def effectCorrelationFromEmpiricalPortabilityRatio
+    (V_A V_E fstSource fstTarget ldFactor portabilityRatio : ℝ) : ℝ :=
+  Real.sqrt
+    (portabilityRatio /
+      (ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget))
+
+/-- Plugging the recovered effect correlation back into the exact transported
+    `R²` formula reproduces the observed portability ratio exactly. -/
+theorem empiricalPortabilityRatio_eq_observed_of_recoveredEffectCorrelation
+    (V_A V_E fstSource fstTarget ldFactor portabilityRatio : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
+    (h_ld : 0 < ldFactor)
+    (h_port_nonneg : 0 ≤ portabilityRatio) :
+    empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor
+        (effectCorrelationFromEmpiricalPortabilityRatio
+          V_A V_E fstSource fstTarget ldFactor portabilityRatio) =
+      portabilityRatio := by
+  have h_src_pos : 0 < presentDayR2 V_A V_E fstSource := by
+    unfold presentDayR2
+    have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
+      unfold presentDayPGSVariance
+      have h_one_minus : 0 < 1 - fstSource := by linarith
+      exact mul_pos h_one_minus hVA
+    exact div_pos hv_pos (by linarith)
+  have h_tgt_pos :
+      0 <
+        targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget := by
+    rw [targetR2FromObservables_eq_presentDayR2
+          V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one]
+    unfold presentDayR2
+    have hv_pos : 0 < presentDayPGSVariance V_A fstTarget := by
+      unfold presentDayPGSVariance
+      have h_one_minus : 0 < 1 - fstTarget := by linarith
+      exact mul_pos h_one_minus hVA
+    exact div_pos hv_pos (by linarith)
+  have h_neutral_pos :
+      0 < neutralObservablePortabilityRatio V_A V_E fstSource fstTarget :=
+    neutralObservablePortabilityRatio_pos
+      V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one hfstT_lt_one
+  have h_denom_pos :
+      0 <
+        ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget := by
+    exact mul_pos h_ld h_neutral_pos
+  have h_arg_nonneg :
+      0 ≤
+        portabilityRatio /
+          (ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget) := by
+    exact div_nonneg h_port_nonneg (le_of_lt h_denom_pos)
+  rw [empiricalPortabilityRatio_eq_retained_signal_mul_observableRatio
+        V_A V_E fstSource fstTarget ldFactor
+        (effectCorrelationFromEmpiricalPortabilityRatio
+          V_A V_E fstSource fstTarget ldFactor portabilityRatio)
+        hVA hVE hfstS_lt_one hfstT_lt_one (le_of_lt h_ld)]
+  have h_sq :
+      effectCorrelationFromEmpiricalPortabilityRatio
+          V_A V_E fstSource fstTarget ldFactor portabilityRatio ^ 2 =
+        portabilityRatio /
+          (ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget) := by
+    unfold effectCorrelationFromEmpiricalPortabilityRatio
+    rw [Real.sq_sqrt h_arg_nonneg]
+  unfold crossPopulationSignalRetention
+  rw [h_sq]
+  unfold neutralObservablePortabilityRatio
+  field_simp [ne_of_gt h_src_pos, ne_of_gt h_tgt_pos]
+
+/-- The recovered effect correlation is strictly positive whenever the observed
+    portability ratio is strictly positive. -/
+theorem effectCorrelationFromEmpiricalPortabilityRatio_pos
+    (V_A V_E fstSource fstTarget ldFactor portabilityRatio : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
+    (h_ld : 0 < ldFactor)
+    (h_port : 0 < portabilityRatio) :
+    0 <
+      effectCorrelationFromEmpiricalPortabilityRatio
+        V_A V_E fstSource fstTarget ldFactor portabilityRatio := by
+  have h_neutral_pos :
+      0 < neutralObservablePortabilityRatio V_A V_E fstSource fstTarget :=
+    neutralObservablePortabilityRatio_pos
+      V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one hfstT_lt_one
+  have h_denom_pos :
+      0 <
+        ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget := by
+    exact mul_pos h_ld h_neutral_pos
+  unfold effectCorrelationFromEmpiricalPortabilityRatio
+  apply Real.sqrt_pos.mpr
+  exact div_pos h_port h_denom_pos
+
+/-- The recovered effect correlation is strictly below one exactly when the
+    observed portability ratio lies below the LD-adjusted neutral baseline. -/
+theorem effectCorrelationFromEmpiricalPortabilityRatio_lt_one
+    (V_A V_E fstSource fstTarget ldFactor portabilityRatio : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
+    (h_ld : 0 < ldFactor)
+    (h_port_nonneg : 0 ≤ portabilityRatio)
+    (h_port_lt :
+      portabilityRatio <
+        ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget) :
+    effectCorrelationFromEmpiricalPortabilityRatio
+        V_A V_E fstSource fstTarget ldFactor portabilityRatio <
+      1 := by
+  have h_neutral_pos :
+      0 < neutralObservablePortabilityRatio V_A V_E fstSource fstTarget :=
+    neutralObservablePortabilityRatio_pos
+      V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one hfstT_lt_one
+  have h_denom_pos :
+      0 <
+        ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget := by
+    exact mul_pos h_ld h_neutral_pos
+  have h_arg_nonneg :
+      0 ≤
+        portabilityRatio /
+          (ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget) := by
+    exact div_nonneg h_port_nonneg (le_of_lt h_denom_pos)
+  have h_arg_lt :
+      portabilityRatio /
+          (ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget) <
+        1 := by
+    exact (div_lt_iff₀ h_denom_pos).2 (by simpa using h_port_lt)
+  have h_sq_lt :
+      effectCorrelationFromEmpiricalPortabilityRatio
+          V_A V_E fstSource fstTarget ldFactor portabilityRatio ^ 2 <
+        1 := by
+    unfold effectCorrelationFromEmpiricalPortabilityRatio
+    rw [Real.sq_sqrt h_arg_nonneg]
+    exact h_arg_lt
+  have h_nonneg :
+      0 ≤
+        effectCorrelationFromEmpiricalPortabilityRatio
+          V_A V_E fstSource fstTarget ldFactor portabilityRatio := by
+    unfold effectCorrelationFromEmpiricalPortabilityRatio
+    exact Real.sqrt_nonneg _
+  nlinarith
+
 /-- **Empirical portability prediction lies strictly below the neutral drift baseline.**
     For a fixed ancestry pair and source architecture, any retained-signal
     fraction strictly below `1` yields an exact target/source `R²` ratio below
@@ -1389,6 +1652,157 @@ theorem shorter_autocorrelation_reduces_portability_and_increases_selection_evid
       (missedSelectedVariance
         (fluctuatingSelectionValidationModel n sigma2_base selectedVar_short t τ_short))
       h_n h_sigma h_missed_long_nonneg h_missed_lt
+
+/-- **Observed portability data and selected-architecture summaries identify a
+    fluctuating regime and imply stronger selection evidence than a stabilizing
+    benchmark.**
+
+    This is the data-level evolutionary inference theorem for the selection
+    validation block. Starting from:
+    1. an exact observed target/source portability ratio,
+    2. an observed selected-architecture variance above the stabilizing
+       mutation-selection baseline, and
+    3. a stabilizing benchmark whose effect correlation exceeds the recovered
+       one,
+
+    the theorem recovers the nonnegative cross-population effect correlation
+    from the exact portability metric, recovers the OU parameters `(τ, σ_θ)`
+    matching the observed GWAS summary statistics, proves that no stabilizing
+    regime can match the same joint summary, and concludes that the observed
+    trait must have both lower portability and a larger exact Gaussian held-out
+    LRT than the stabilizing benchmark. -/
+theorem observedPortabilityAndSelectedVariance_identify_fluctuating_regime
+    (V_A V_E fstSource fstTarget ldFactor : ℝ)
+    (n sigma2_base v_mutation s Ns_stab t portabilityRatio observedSelectedVar : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
+    (hfstT_lt_one : fstTarget < 1)
+    (h_ld : 0 < ldFactor)
+    (h_n : 0 < n)
+    (h_sigma : 0 < sigma2_base)
+    (h_vmut : 0 ≤ v_mutation)
+    (h_s : 0 < s)
+    (h_Ns : 1 < Ns_stab)
+    (h_t : 0 < t)
+    (h_port : 0 < portabilityRatio)
+    (h_port_lt :
+      portabilityRatio <
+        ldFactor * neutralObservablePortabilityRatio V_A V_E fstSource fstTarget)
+    (h_var_gap : stabilizingSelectedArchitectureVariance v_mutation s < observedSelectedVar)
+    (h_rho_benchmark :
+      effectCorrelationFromEmpiricalPortabilityRatio
+          V_A V_E fstSource fstTarget ldFactor portabilityRatio <
+        effectCorrelationStabilizing Ns_stab) :
+    let rho_hat :=
+      effectCorrelationFromEmpiricalPortabilityRatio
+        V_A V_E fstSource fstTarget ldFactor portabilityRatio
+    let tau_hat := tauFromObservedEffectCorrelation t rho_hat
+    let sigma_hat :=
+      sigmaThetaFromObservedSelectedVariance observedSelectedVar v_mutation s t rho_hat
+    empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor rho_hat =
+      portabilityRatio ∧
+    0 < rho_hat ∧
+    0 < tau_hat ∧
+    0 < sigma_hat ∧
+    fluctuatingEffectCorrelation t tau_hat = rho_hat ∧
+    fluctuatingSelectedArchitectureVariance v_mutation s sigma_hat tau_hat =
+      observedSelectedVar ∧
+    portabilityRatio <
+      empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor
+        (effectCorrelationStabilizing Ns_stab) ∧
+    selectionModelLRT
+      (stabilizingSelectionValidationModel n sigma2_base
+        (stabilizingSelectedArchitectureVariance v_mutation s) Ns_stab) <
+    selectionModelLRT
+      (fluctuatingSelectionValidationModel n sigma2_base observedSelectedVar t tau_hat) ∧
+    ¬ ∃ Ns,
+        effectCorrelationStabilizing Ns = rho_hat ∧
+          stabilizingSelectedArchitectureVariance v_mutation s = observedSelectedVar := by
+  dsimp
+  let rho_hat :=
+    effectCorrelationFromEmpiricalPortabilityRatio
+      V_A V_E fstSource fstTarget ldFactor portabilityRatio
+  let tau_hat := tauFromObservedEffectCorrelation t rho_hat
+  let sigma_hat :=
+    sigmaThetaFromObservedSelectedVariance observedSelectedVar v_mutation s t rho_hat
+  have h_rho_pos : 0 < rho_hat := by
+    exact effectCorrelationFromEmpiricalPortabilityRatio_pos
+      V_A V_E fstSource fstTarget ldFactor portabilityRatio
+      hVA hVE hfstS_lt_one hfstT_lt_one h_ld h_port
+  have h_rho_lt_one : rho_hat < 1 := by
+    exact effectCorrelationFromEmpiricalPortabilityRatio_lt_one
+      V_A V_E fstSource fstTarget ldFactor portabilityRatio
+      hVA hVE hfstS_lt_one hfstT_lt_one h_ld (le_of_lt h_port) h_port_lt
+  have h_recovery :
+      (0 < tau_hat ∧
+        0 < sigma_hat ∧
+        fluctuatingEffectCorrelation t tau_hat = rho_hat ∧
+        fluctuatingSelectedArchitectureVariance v_mutation s sigma_hat tau_hat =
+          observedSelectedVar) ∧
+      ¬ ∃ Ns,
+          effectCorrelationStabilizing Ns = rho_hat ∧
+            stabilizingSelectedArchitectureVariance v_mutation s = observedSelectedVar := by
+    simpa [rho_hat, tau_hat, sigma_hat] using
+      observedSelectionSummary_identifies_fluctuating_not_stabilizing
+        v_mutation s t rho_hat observedSelectedVar h_t h_rho_pos h_rho_lt_one h_var_gap
+  rcases h_recovery with
+    ⟨⟨h_tau_pos, h_sigma_pos, h_rho_exact, h_var_exact⟩, h_not_stab⟩
+  have h_port_exact :
+      empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor rho_hat =
+        portabilityRatio := by
+    simpa [rho_hat] using
+      empiricalPortabilityRatio_eq_observed_of_recoveredEffectCorrelation
+        V_A V_E fstSource fstTarget ldFactor portabilityRatio
+        hVA hVE hfstS_lt_one hfstT_lt_one h_ld (le_of_lt h_port)
+  have h_portability_lt :
+      portabilityRatio <
+        empiricalPortabilityRatio V_A V_E fstSource fstTarget ldFactor
+          (effectCorrelationStabilizing Ns_stab) := by
+    rw [← h_port_exact]
+    exact empirical_portability_ratio_strictly_orders_by_ld_and_effect_correlation
+      V_A V_E fstSource fstTarget ldFactor ldFactor rho_hat
+      (effectCorrelationStabilizing Ns_stab)
+      hVA hVE hfstS_lt_one hfstT_lt_one h_ld le_rfl h_rho_pos h_rho_benchmark
+  have h_stabVar_nonneg :
+      0 ≤ stabilizingSelectedArchitectureVariance v_mutation s := by
+    unfold stabilizingSelectedArchitectureVariance equilibriumEffectVariance
+    exact div_nonneg h_vmut (le_of_lt h_s)
+  have h_stabCorr_nonneg : 0 ≤ effectCorrelationStabilizing Ns_stab := by
+    exact le_of_lt (effectCorrelationStabilizing_pos Ns_stab h_Ns)
+  have h_stabCorr_lt_one : effectCorrelationStabilizing Ns_stab < 1 := by
+    exact effectCorrelationStabilizing_lt_one Ns_stab h_Ns
+  have h_obsVar_pos : 0 < observedSelectedVar := by
+    linarith
+  have h_lrt_lt :
+      selectionModelLRT
+        (stabilizingSelectionValidationModel n sigma2_base
+          (stabilizingSelectedArchitectureVariance v_mutation s) Ns_stab) <
+      selectionModelLRT
+        (fluctuatingSelectionValidationModel n sigma2_base observedSelectedVar t tau_hat) := by
+    have h_generic :
+        selectionModelLRT
+          { sampleSize := n
+            baselineResidualVar := sigma2_base
+            selectedArchitectureVar := stabilizingSelectedArchitectureVariance v_mutation s
+            effectCorrelation := effectCorrelationStabilizing Ns_stab } <
+        selectionModelLRT
+          { sampleSize := n
+            baselineResidualVar := sigma2_base
+            selectedArchitectureVar := observedSelectedVar
+            effectCorrelation := rho_hat } := by
+      exact selectionModelLRT_lt_of_variance_and_correlation
+        n sigma2_base
+        (stabilizingSelectedArchitectureVariance v_mutation s)
+        observedSelectedVar
+        (effectCorrelationStabilizing Ns_stab)
+        rho_hat
+        h_n h_sigma h_stabVar_nonneg h_obsVar_pos
+        h_stabCorr_nonneg h_stabCorr_lt_one (le_of_lt h_rho_pos)
+        h_rho_benchmark (le_of_lt h_var_gap)
+    simpa [stabilizingSelectionValidationModel, fluctuatingSelectionValidationModel,
+      h_rho_exact] using h_generic
+  exact ⟨h_port_exact, h_rho_pos, h_tau_pos, h_sigma_pos, h_rho_exact, h_var_exact,
+    h_portability_lt, h_lrt_lt, h_not_stab⟩
 
 /-- **Within-group variance dominates between-group variance.**
     The R² of genetic distance on individual squared error is bounded

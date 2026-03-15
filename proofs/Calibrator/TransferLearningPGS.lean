@@ -1117,6 +1117,44 @@ def fineTunedTargetR2 (r2_source divergence_penalty adaptation_gain : ℝ) : ℝ
 def scratchTargetR2 (oracle_target_r2 estimation_penalty : ℝ) : ℝ :=
   oracle_target_r2 - estimation_penalty
 
+/-- Exact portability penalty induced by observable source-target drift. This is
+    the loss in target `R²` relative to the source baseline under the exact
+    observable transport theorem `targetR2FromObservables`. -/
+noncomputable def observableTransportPenalty
+    (r2Source fstSource fstTarget : ℝ) : ℝ :=
+  r2Source - targetR2FromObservables r2Source fstSource fstTarget
+
+/-- The additive fine-tuning model is exactly the observable transported target
+    `R²` plus any additional target-specific adaptation gain once the
+    portability penalty is instantiated by the exact drift transport map. -/
+theorem fineTunedTargetR2_eq_targetR2FromObservables_plus_adaptation
+    (r2Source fstSource fstTarget adaptationGain : ℝ) :
+    fineTunedTargetR2 r2Source
+        (observableTransportPenalty r2Source fstSource fstTarget)
+        adaptationGain =
+      targetR2FromObservables r2Source fstSource fstTarget + adaptationGain := by
+  unfold fineTunedTargetR2 observableTransportPenalty
+  ring
+
+/-- Exact target-only oracle `R²` in the diagonal-LD architecture model. This is
+    the target self-prediction ceiling, i.e. target additive heritability. -/
+noncomputable def targetOracleR2DiagonalLD {m : ℕ}
+    (β_target : Fin m → ℝ) (var_y : ℝ) : ℝ :=
+  sourceSelfR2DiagonalLD β_target var_y
+
+/-- The scratch-training scalar model becomes the exact target heritability
+    ceiling minus the chosen estimation penalty once the oracle target `R²` is
+    instantiated by the target architecture. -/
+theorem scratchTargetR2_eq_targetHeritability_minus_estimationPenalty_diagonalLD
+    {m : ℕ}
+    (β_target : Fin m → ℝ) (var_y estimation_penalty : ℝ)
+    (h_var_y : 0 < var_y)
+    (h_beta_nonzero : 0 < additiveGeneticVariance β_target) :
+    scratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) estimation_penalty =
+      additiveHeritability β_target var_y - estimation_penalty := by
+  unfold scratchTargetR2 targetOracleR2DiagonalLD
+  rw [sourceOptimalR2_eq_additiveHeritability β_target var_y h_var_y h_beta_nonzero]
+
 /-- **Fine-tuning wins in the explicit additive penalty model.**
     This theorem does not claim a universal fine-tuning advantage. It works in
     the two formal score models above:
@@ -1144,6 +1182,18 @@ theorem fine_tuned_target_r2_exceeds_scratch_of_penalty_gap
 noncomputable def sampleLimitedScratchTargetR2
     (oracle_target_r2 noiseVar nTarget : ℝ) : ℝ :=
   scratchTargetR2 oracle_target_r2 (noiseVar / nTarget)
+
+/-- Sample-limited scratch training is the exact target heritability ceiling
+    minus the explicit finite-sample estimation penalty `noiseVar / nTarget`. -/
+theorem sampleLimitedScratchTargetR2_eq_targetHeritability_minus_noise_over_n_diagonalLD
+    {m : ℕ}
+    (β_target : Fin m → ℝ) (var_y noiseVar nTarget : ℝ)
+    (h_var_y : 0 < var_y)
+    (h_beta_nonzero : 0 < additiveGeneticVariance β_target) :
+    sampleLimitedScratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) noiseVar nTarget =
+      additiveHeritability β_target var_y - noiseVar / nTarget := by
+  unfold sampleLimitedScratchTargetR2 scratchTargetR2 targetOracleR2DiagonalLD
+  rw [sourceOptimalR2_eq_additiveHeritability β_target var_y h_var_y h_beta_nonzero]
 
 /-- Exact target sample size at which scratch training matches fine-tuning in
     the explicit additive `R²` model above. -/
@@ -1437,11 +1487,71 @@ noncomputable def metaLearnedSourceWeights {p : ℕ}
     (deviation : ℕ → Fin p → ℝ) (k : ℕ) : Fin p → ℝ :=
   fun i => wShared i + meanPopulationDeviation deviation k i
 
+/-- Population-specific effect deviation around a shared ancestral-effect
+    center. This is the exact effect-architecture object whose average is used
+    by the meta-learning block below. -/
+noncomputable def centeredPopulationEffectDeviation {p : ℕ}
+    (wShared : Fin p → ℝ)
+    (wSource : ℕ → Fin p → ℝ) : ℕ → Fin p → ℝ :=
+  fun j i => wSource j i - wShared i
+
+/-- Exact mean effect vector over the first `k` source populations. -/
+noncomputable def sourcePopulationMeanWeights {p : ℕ}
+    (wSource : ℕ → Fin p → ℝ) (k : ℕ) : Fin p → ℝ :=
+  fun i => (k : ℝ)⁻¹ * (Finset.sum (Finset.range k) (fun j => wSource j i))
+
+/-- The meta-learned source weights are exactly the mean source-population
+    effect vector once the deviations are instantiated as centered effect
+    differences around the shared center. -/
+theorem metaLearnedSourceWeights_eq_sourcePopulationMeanWeights
+    {p : ℕ}
+    (wShared : Fin p → ℝ)
+    (wSource : ℕ → Fin p → ℝ)
+    (k : ℕ)
+    (h_k : 0 < k) :
+    metaLearnedSourceWeights wShared
+        (centeredPopulationEffectDeviation wShared wSource) k =
+      sourcePopulationMeanWeights wSource k := by
+  funext i
+  have hk_ne : (k : ℝ) ≠ 0 := by
+    exact_mod_cast (Nat.ne_of_gt h_k)
+  unfold metaLearnedSourceWeights meanPopulationDeviation populationDeviationSum
+    centeredPopulationEffectDeviation sourcePopulationMeanWeights
+  have hsum_const : Finset.sum (Finset.range k) (fun _ => wShared i) = (k : ℝ) * wShared i := by
+    simp
+  calc
+    wShared i + (k : ℝ)⁻¹ * (Finset.sum (Finset.range k) (fun j => wSource j i - wShared i))
+        = wShared i + (k : ℝ)⁻¹ *
+            (Finset.sum (Finset.range k) (fun j => wSource j i) -
+              Finset.sum (Finset.range k) (fun _ => wShared i)) := by
+              rw [Finset.sum_sub_distrib]
+    _ = wShared i + (k : ℝ)⁻¹ *
+            (Finset.sum (Finset.range k) (fun j => wSource j i) - (k : ℝ) * wShared i) := by
+              rw [hsum_const]
+    _ = (k : ℝ)⁻¹ * (Finset.sum (Finset.range k) (fun j => wSource j i)) := by
+          field_simp [hk_ne]
+          ring
+
 /-- Exact squared transfer gap of the meta-learned source weights. -/
 noncomputable def metaLearnedTransferGapSq {p : ℕ}
     (wShared wTarget : Fin p → ℝ)
     (deviation : ℕ → Fin p → ℝ) (k : ℕ) : ℝ :=
   coefficientGapSq (metaLearnedSourceWeights wShared deviation k) wTarget
+
+/-- The meta-learned exact transfer gap is literally the squared mismatch
+    between the mean source-population effect vector and the target-optimal
+    effect vector. -/
+theorem metaLearnedTransferGapSq_eq_sourcePopulationMeanEffectGapSq
+    {p : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (wSource : ℕ → Fin p → ℝ)
+    (k : ℕ)
+    (h_k : 0 < k) :
+    metaLearnedTransferGapSq wShared wTarget
+        (centeredPopulationEffectDeviation wShared wSource) k =
+      coefficientGapSq (sourcePopulationMeanWeights wSource k) wTarget := by
+  unfold metaLearnedTransferGapSq
+  rw [metaLearnedSourceWeights_eq_sourcePopulationMeanWeights wShared wSource k h_k]
 
 /-- Dot product distributes over addition in the left argument. -/
 theorem dotProduct_add_left {p : ℕ}
@@ -1704,6 +1814,37 @@ theorem metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
     _ = irreducibleGap + populationSpecificGap / k := by
           ring
 
+/-- Exact population-genetic bridge for meta-learning: if the source
+    population effect vectors decompose into a shared center plus orthogonal
+    centered deviations, then the mean source effect vector itself has exact
+    transfer gap `irreducibleGap + populationSpecificGap / k` to the target
+    optimum. -/
+theorem sourcePopulationMeanEffectGapSq_eq_irreducible_plus_populationSpecificGap_div_k
+    {p : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (wSource : ℕ → Fin p → ℝ)
+    (irreducibleGap populationSpecificGap : ℝ)
+    (k : ℕ)
+    (h_k : 0 < k)
+    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
+    (h_shared_orth :
+      ∀ j < k, dotProduct (fun i => wShared i - wTarget i)
+        (centeredPopulationEffectDeviation wShared wSource j) = 0)
+    (h_norm :
+      ∀ j < k, dotProduct (centeredPopulationEffectDeviation wShared wSource j)
+        (centeredPopulationEffectDeviation wShared wSource j) = populationSpecificGap)
+    (h_pair :
+      ∀ j < k, ∀ l < k, j ≠ l →
+        dotProduct (centeredPopulationEffectDeviation wShared wSource j)
+          (centeredPopulationEffectDeviation wShared wSource l) = 0) :
+    coefficientGapSq (sourcePopulationMeanWeights wSource k) wTarget =
+      irreducibleGap + populationSpecificGap / k := by
+  rw [← metaLearnedTransferGapSq_eq_sourcePopulationMeanEffectGapSq
+    wShared wTarget wSource k h_k]
+  exact metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
+    wShared wTarget (centeredPopulationEffectDeviation wShared wSource)
+    irreducibleGap populationSpecificGap k h_k h_shared h_shared_orth h_norm h_pair
+
 /-- More source populations strictly reduce the exact residual transfer gap in
     the shared-feature meta-learning model, because the averaged population-
     specific deviation has exact squared norm `gap / k`. -/
@@ -1805,6 +1946,83 @@ noncomputable def weightedMetaTransferGapSq {p k : ℕ}
 /-- Uniform affine weights on `k` source populations. -/
 noncomputable def uniformMetaWeight (k : ℕ) : Fin k → ℝ :=
   fun _ => (k : ℝ)⁻¹
+
+/-- Weighted average of source-population effect vectors. -/
+noncomputable def weightedPopulationEffectAverage {p k : ℕ}
+    (wSource : Fin k → Fin p → ℝ)
+    (weight : Fin k → ℝ) : Fin p → ℝ :=
+  fun i => ∑ j : Fin k, weight j * wSource j i
+
+/-- Centered finite-population effect deviations around a shared effect center. -/
+noncomputable def centeredPopulationEffectDeviationFin {p k : ℕ}
+    (wShared : Fin p → ℝ)
+    (wSource : Fin k → Fin p → ℝ) : Fin k → Fin p → ℝ :=
+  fun j i => wSource j i - wShared i
+
+/-- Any affine meta-aggregator is exactly the weighted average of the source
+    effect vectors once deviations are instantiated as centered source effects. -/
+theorem weightedMetaSourceWeights_eq_weightedPopulationEffectAverage
+    {p k : ℕ}
+    (wShared : Fin p → ℝ)
+    (wSource : Fin k → Fin p → ℝ)
+    (weight : Fin k → ℝ)
+    (h_sum : ∑ j : Fin k, weight j = 1) :
+    weightedMetaSourceWeights wShared
+        (centeredPopulationEffectDeviationFin wShared wSource) weight =
+      weightedPopulationEffectAverage wSource weight := by
+  funext i
+  unfold weightedMetaSourceWeights weightedPopulationDeviation
+    centeredPopulationEffectDeviationFin weightedPopulationEffectAverage
+  calc
+    wShared i + ∑ j : Fin k, weight j * (wSource j i - wShared i)
+        = wShared i + ((∑ j : Fin k, weight j * wSource j i) -
+            (∑ j : Fin k, weight j) * wShared i) := by
+              have hsplit :
+                  (∑ j : Fin k, weight j * (wSource j i - wShared i)) =
+                    (∑ j : Fin k, weight j * wSource j i) -
+                      ∑ j : Fin k, weight j * wShared i := by
+                    calc
+                      (∑ j : Fin k, weight j * (wSource j i - wShared i))
+                          = ∑ j : Fin k, (weight j * wSource j i - weight j * wShared i) := by
+                              apply Finset.sum_congr rfl
+                              intro j hj
+                              ring
+                      _ = (∑ j : Fin k, weight j * wSource j i) -
+                            ∑ j : Fin k, weight j * wShared i := by
+                              rw [Finset.sum_sub_distrib]
+              have hconst :
+                  (∑ j : Fin k, weight j * wShared i) =
+                    (∑ j : Fin k, weight j) * wShared i := by
+                    calc
+                      (∑ j : Fin k, weight j * wShared i)
+                          = ∑ j : Fin k, wShared i * weight j := by
+                              apply Finset.sum_congr rfl
+                              intro j hj
+                              ring
+                      _ = wShared i * ∑ j : Fin k, weight j := by
+                            rw [Finset.mul_sum]
+                      _ = (∑ j : Fin k, weight j) * wShared i := by
+                            ring
+              rw [hsplit, hconst]
+    _ = ∑ j : Fin k, weight j * wSource j i := by
+          rw [h_sum]
+          ring
+
+/-- The weighted meta-learning transfer gap is literally the squared mismatch
+    between the weighted average source effect vector and the target-optimal
+    effect vector. -/
+theorem weightedMetaTransferGapSq_eq_weightedPopulationEffectAverageGapSq
+    {p k : ℕ}
+    (wShared wTarget : Fin p → ℝ)
+    (wSource : Fin k → Fin p → ℝ)
+    (weight : Fin k → ℝ)
+    (h_sum : ∑ j : Fin k, weight j = 1) :
+    weightedMetaTransferGapSq wShared wTarget
+        (centeredPopulationEffectDeviationFin wShared wSource) weight =
+      coefficientGapSq (weightedPopulationEffectAverage wSource weight) wTarget := by
+  unfold weightedMetaTransferGapSq
+  rw [weightedMetaSourceWeights_eq_weightedPopulationEffectAverage
+    wShared wSource weight h_sum]
 
 /-- Exact squared norm of a weighted population-specific deviation. Under
     pairwise orthogonality and equal per-population squared norm, the weighted
@@ -2232,6 +2450,71 @@ theorem coefficientGapSq_le_of_targetLinearExcessRisk_le
   rw [← isotropic_targetLinearExcessRisk_eq_coefficientGapSq
     crossTarget noiseVar w wStar h_opt]
   exact h_excess
+
+/-- Exact target-specific adaptation gain: the reduction in literal target
+    excess quadratic risk achieved by moving from `wBefore` to `wAfter`. -/
+noncomputable def exactAdaptationGain {p : ℕ}
+    (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ)
+    (crossTarget : Fin p → ℝ)
+    (noiseVar : ℝ)
+    (wBefore wAfter wStar : Fin p → ℝ) : ℝ :=
+  targetLinearExcessRisk sigmaObsTarget crossTarget noiseVar wBefore wStar -
+    targetLinearExcessRisk sigmaObsTarget crossTarget noiseVar wAfter wStar
+
+/-- In the isotropic target design, exact adaptation gain is literally the drop
+    in squared coefficient mismatch to the target-optimal effect vector. -/
+theorem exactAdaptationGain_eq_coefficientGapDrop_isotropic
+    {p : ℕ}
+    (crossTarget : Fin p → ℝ)
+    (noiseVar : ℝ)
+    (wBefore wAfter wStar : Fin p → ℝ)
+    (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget) :
+    exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
+        crossTarget noiseVar wBefore wAfter wStar =
+      coefficientGapSq wBefore wStar - coefficientGapSq wAfter wStar := by
+  unfold exactAdaptationGain
+  rw [isotropic_targetLinearExcessRisk_eq_coefficientGapSq crossTarget noiseVar
+      wBefore wStar h_opt]
+  rw [isotropic_targetLinearExcessRisk_eq_coefficientGapSq crossTarget noiseVar
+      wAfter wStar h_opt]
+
+/-- The scalar fine-tuning `adaptation_gain` parameter is exactly the gain in
+    target `R²` obtained by reducing literal target excess risk, once the
+    baseline portability loss is instantiated by the exact observable drift
+    transport theorem. -/
+theorem fineTunedTargetR2_eq_observable_transport_plus_exact_excessRisk_reduction
+    {p : ℕ}
+    (r2Source fstSource fstTarget : ℝ)
+    (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ)
+    (crossTarget : Fin p → ℝ)
+    (noiseVar : ℝ)
+    (wBefore wAfter wStar : Fin p → ℝ) :
+    fineTunedTargetR2 r2Source
+        (observableTransportPenalty r2Source fstSource fstTarget)
+        (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar) =
+      targetR2FromObservables r2Source fstSource fstTarget +
+        exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar := by
+  rw [fineTunedTargetR2_eq_targetR2FromObservables_plus_adaptation]
+
+/-- In the isotropic target design, the scalar fine-tuning model is exactly the
+    observable transported baseline plus the drop in squared effect mismatch
+    from target adaptation. -/
+theorem fineTunedTargetR2_eq_observable_transport_plus_gap_drop_isotropic
+    {p : ℕ}
+    (r2Source fstSource fstTarget : ℝ)
+    (crossTarget : Fin p → ℝ)
+    (noiseVar : ℝ)
+    (wBefore wAfter wStar : Fin p → ℝ)
+    (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget) :
+    fineTunedTargetR2 r2Source
+        (observableTransportPenalty r2Source fstSource fstTarget)
+        (exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
+          crossTarget noiseVar wBefore wAfter wStar) =
+      targetR2FromObservables r2Source fstSource fstTarget +
+        (coefficientGapSq wBefore wStar - coefficientGapSq wAfter wStar) := by
+  rw [fineTunedTargetR2_eq_observable_transport_plus_exact_excessRisk_reduction]
+  rw [exactAdaptationGain_eq_coefficientGapDrop_isotropic crossTarget noiseVar
+    wBefore wAfter wStar h_opt]
 
 /-- **A better information-bottleneck representation lowers target sample needs.**
     This theorem no longer inserts an affine bridge from a domain-adaptation

@@ -109,6 +109,84 @@ theorem prevalence_shift_changes_calibration
   unfold calibrationInTheLarge
   ring
 
+/-- If the source model is calibrated in the large, then the target CITL under
+    a pure prevalence shift is exactly the prevalence difference. -/
+theorem source_calibrated_target_citl_eq_prevalence_shift
+    (mean_pred πSource πTarget : ℝ)
+    (h_src_cal : calibrationInTheLarge πSource mean_pred = 0) :
+    calibrationInTheLarge πTarget mean_pred = πTarget - πSource := by
+  have h_shift :=
+    prevalence_shift_changes_calibration mean_pred πSource πTarget
+  linarith
+
+/-- Under a source model calibrated in the large, the absolute target CITL is
+    exactly the absolute prevalence shift. -/
+theorem source_calibrated_target_abs_citl_eq_abs_prevalence_shift
+    (mean_pred πSource πTarget : ℝ)
+    (h_src_cal : calibrationInTheLarge πSource mean_pred = 0) :
+    |calibrationInTheLarge πTarget mean_pred| = |πTarget - πSource| := by
+  rw [source_calibrated_target_citl_eq_prevalence_shift mean_pred πSource πTarget h_src_cal]
+
+/-- **Exact cross-ancestry metric profile under drift and prevalence shift.**
+    This is the strongest metric-level theorem in this block:
+
+    - exact transported liability-threshold AUC strictly drops under positive drift;
+    - exact target CITL equals the prevalence shift when the source is CITL-calibrated;
+    - absolute target CITL equals the absolute prevalence shift;
+    - target absolute CITL is strictly worse when prevalence truly changes;
+    - exact calibrated target Brier is strictly worse than the source Brier at
+      the same target prevalence because transported `R²` drops.
+
+    The theorem keeps discrimination and calibration on literal metrics and
+    exposes the exact calibration formula instead of only an inequality. -/
+theorem cross_ancestry_exact_metric_profile
+    (r2Source fstSource fstTarget mean_pred πSource πTarget : ℝ)
+    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (h_src_cal : calibrationInTheLarge πSource mean_pred = 0)
+    (h_prev_shift : πSource ≠ πTarget)
+    (hπT0 : 0 < πTarget) (hπT1 : πTarget < 1)
+    (hPhiStrict : StrictMono Phi) :
+    targetExactLiabilityAUC r2Source fstSource fstTarget <
+      sourceExactLiabilityAUC r2Source ∧
+    calibrationInTheLarge πTarget mean_pred = πTarget - πSource ∧
+    |calibrationInTheLarge πTarget mean_pred| = |πTarget - πSource| ∧
+    |calibrationInTheLarge πSource mean_pred| <
+      |calibrationInTheLarge πTarget mean_pred| ∧
+    sourceExactCalibratedBrierRisk πTarget r2Source <
+      targetExactCalibratedBrierRisk πTarget r2Source fstSource fstTarget := by
+  have h_auc :
+      targetExactLiabilityAUC r2Source fstSource fstTarget <
+        sourceExactLiabilityAUC r2Source := by
+    exact targetLiabilityAUC_lt_source_of_observables
+      r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds hPhiStrict
+  have h_citl_eq :
+      calibrationInTheLarge πTarget mean_pred = πTarget - πSource := by
+    exact source_calibrated_target_citl_eq_prevalence_shift
+      mean_pred πSource πTarget h_src_cal
+  have h_abs_eq :
+      |calibrationInTheLarge πTarget mean_pred| = |πTarget - πSource| := by
+    exact source_calibrated_target_abs_citl_eq_abs_prevalence_shift
+      mean_pred πSource πTarget h_src_cal
+  have h_tgt_ne_zero : calibrationInTheLarge πTarget mean_pred ≠ 0 := by
+    rw [h_citl_eq]
+    intro h_zero
+    apply h_prev_shift
+    linarith
+  have h_abs_worse :
+      |calibrationInTheLarge πSource mean_pred| <
+        |calibrationInTheLarge πTarget mean_pred| := by
+    have h_tgt_abs_pos : 0 < |calibrationInTheLarge πTarget mean_pred| :=
+      abs_pos.mpr h_tgt_ne_zero
+    simpa [h_src_cal] using h_tgt_abs_pos
+  have h_brier :
+      sourceExactCalibratedBrierRisk πTarget r2Source <
+        targetExactCalibratedBrierRisk πTarget r2Source fstSource fstTarget := by
+    exact targetBrier_strict_gt_source_of_observables
+      πTarget r2Source fstSource fstTarget hπT0 hπT1 h_r2 h_fst h_fst_bounds
+  exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse, h_brier⟩
+
 /-- **Cross-ancestry AUC drops while calibration-in-the-large worsens.**
     This theorem states the claim on the repository's actual metrics:
 
@@ -129,25 +207,35 @@ theorem cross_ancestry_auc_and_citl_worsen
     (hPhiStrict : StrictMono Phi) :
     targetExactLiabilityAUC r2Source fstSource fstTarget <
       sourceExactLiabilityAUC r2Source ∧
+    calibrationInTheLarge πTarget mean_pred = πTarget - πSource ∧
+    |calibrationInTheLarge πTarget mean_pred| = |πTarget - πSource| ∧
     |calibrationInTheLarge πSource mean_pred| <
       |calibrationInTheLarge πTarget mean_pred| := by
-  constructor
-  · exact targetLiabilityAUC_lt_source_of_observables
+  have h_auc :
+      targetExactLiabilityAUC r2Source fstSource fstTarget <
+        sourceExactLiabilityAUC r2Source := by
+    exact targetLiabilityAUC_lt_source_of_observables
       r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds hPhiStrict
-  · have h_citl_shift :
-        calibrationInTheLarge πTarget mean_pred -
-          calibrationInTheLarge πSource mean_pred = πTarget - πSource :=
-      prevalence_shift_changes_calibration mean_pred πSource πTarget
-    have h_tgt_eq :
-        calibrationInTheLarge πTarget mean_pred = πTarget - πSource := by
-      linarith [h_citl_shift, h_src_cal]
-    have h_tgt_ne_zero : calibrationInTheLarge πTarget mean_pred ≠ 0 := by
-      intro h_tgt_zero
-      apply h_prev_shift
-      linarith [h_tgt_eq, h_tgt_zero]
+  have h_citl_eq :
+      calibrationInTheLarge πTarget mean_pred = πTarget - πSource := by
+    exact source_calibrated_target_citl_eq_prevalence_shift
+      mean_pred πSource πTarget h_src_cal
+  have h_abs_eq :
+      |calibrationInTheLarge πTarget mean_pred| = |πTarget - πSource| := by
+    exact source_calibrated_target_abs_citl_eq_abs_prevalence_shift
+      mean_pred πSource πTarget h_src_cal
+  have h_tgt_ne_zero : calibrationInTheLarge πTarget mean_pred ≠ 0 := by
+    rw [h_citl_eq]
+    intro h_zero
+    apply h_prev_shift
+    linarith
+  have h_abs_worse :
+      |calibrationInTheLarge πSource mean_pred| <
+        |calibrationInTheLarge πTarget mean_pred| := by
     have h_tgt_abs_pos : 0 < |calibrationInTheLarge πTarget mean_pred| :=
       abs_pos.mpr h_tgt_ne_zero
     simpa [h_src_cal] using h_tgt_abs_pos
+  exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩
 
 /-- **Cross-ancestry AUC drops while Brier worsens.**
     `AUC` measures discrimination, while `Brier` is the standard proper scoring
@@ -910,6 +998,406 @@ theorem qalyLoss_le_abs_margin_error
         exact max_eq_right h_true_nonpos
       rw [h_max]
       exact abs_nonneg (mPred - mTrue)
+
+/-- **Exact componentwise decomposition of longitudinal treatment-margin error.**
+    This separates the effect of miscalibrating censoring/follow-up weights,
+    event risk, heterogeneous treatment benefit, and treatment harm. -/
+theorem treatmentMargin_error_eq_componentwise_sum
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T) :
+    treatmentMargin model predictedPath - treatmentMargin model truePath =
+      Finset.univ.sum (fun t =>
+        model.discount t *
+          ((predictedPath.followupWeight t - truePath.followupWeight t) *
+              (truePath.eventProb t * truePath.treatmentBenefit t -
+                truePath.treatmentHarm t) +
+            predictedPath.followupWeight t *
+              ((predictedPath.eventProb t - truePath.eventProb t) *
+                  truePath.treatmentBenefit t +
+                predictedPath.eventProb t *
+                  (predictedPath.treatmentBenefit t -
+                    truePath.treatmentBenefit t) -
+                (predictedPath.treatmentHarm t - truePath.treatmentHarm t)))) := by
+  unfold treatmentMargin qalyContributionAtTime
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro t _
+  ring
+
+/-- **Componentwise calibration error bound for longitudinal treatment margin.**
+    If the deployed pathway approximates the true censoring/eligibility weights,
+    event probabilities, treatment-benefit heterogeneity, and treatment harm
+    with bounded error, then the exact finite-horizon treatment-margin error is
+    bounded by the corresponding weighted sum of those componentwise errors. -/
+theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T)
+    (εWeight εEvent εBenefit εHarm
+      weightBound eventBound benefitBound netBound : Fin T → ℝ)
+    (h_weight_err : ∀ t,
+      |predictedPath.followupWeight t - truePath.followupWeight t| ≤ εWeight t)
+    (h_event_err : ∀ t,
+      |predictedPath.eventProb t - truePath.eventProb t| ≤ εEvent t)
+    (h_benefit_err : ∀ t,
+      |predictedPath.treatmentBenefit t - truePath.treatmentBenefit t| ≤ εBenefit t)
+    (h_harm_err : ∀ t,
+      |predictedPath.treatmentHarm t - truePath.treatmentHarm t| ≤ εHarm t)
+    (h_weight_bound : ∀ t, |predictedPath.followupWeight t| ≤ weightBound t)
+    (h_event_bound : ∀ t, |predictedPath.eventProb t| ≤ eventBound t)
+    (h_benefit_bound : ∀ t, |truePath.treatmentBenefit t| ≤ benefitBound t)
+    (h_net_bound : ∀ t,
+      |truePath.eventProb t * truePath.treatmentBenefit t -
+          truePath.treatmentHarm t| ≤ netBound t) :
+    |treatmentMargin model predictedPath - treatmentMargin model truePath| ≤
+      Finset.univ.sum (fun t =>
+        model.discount t *
+          (εWeight t * netBound t +
+            weightBound t *
+              (εEvent t * benefitBound t +
+                eventBound t * εBenefit t + εHarm t))) := by
+  rw [treatmentMargin_error_eq_componentwise_sum]
+  calc
+    |∑ t,
+        model.discount t *
+          ((predictedPath.followupWeight t - truePath.followupWeight t) *
+              (truePath.eventProb t * truePath.treatmentBenefit t -
+                truePath.treatmentHarm t) +
+            predictedPath.followupWeight t *
+              ((predictedPath.eventProb t - truePath.eventProb t) *
+                  truePath.treatmentBenefit t +
+                predictedPath.eventProb t *
+                  (predictedPath.treatmentBenefit t -
+                    truePath.treatmentBenefit t) -
+                (predictedPath.treatmentHarm t - truePath.treatmentHarm t)))| ≤
+        ∑ t,
+          |model.discount t *
+            ((predictedPath.followupWeight t - truePath.followupWeight t) *
+                (truePath.eventProb t * truePath.treatmentBenefit t -
+                  truePath.treatmentHarm t) +
+              predictedPath.followupWeight t *
+                ((predictedPath.eventProb t - truePath.eventProb t) *
+                    truePath.treatmentBenefit t +
+                  predictedPath.eventProb t *
+                    (predictedPath.treatmentBenefit t -
+                      truePath.treatmentBenefit t) -
+                  (predictedPath.treatmentHarm t - truePath.treatmentHarm t)))| := by
+        simpa using Finset.abs_sum_le_sum_abs
+          (s := Finset.univ)
+          (f := fun t =>
+            model.discount t *
+              ((predictedPath.followupWeight t - truePath.followupWeight t) *
+                  (truePath.eventProb t * truePath.treatmentBenefit t -
+                    truePath.treatmentHarm t) +
+                predictedPath.followupWeight t *
+                  ((predictedPath.eventProb t - truePath.eventProb t) *
+                      truePath.treatmentBenefit t +
+                    predictedPath.eventProb t *
+                      (predictedPath.treatmentBenefit t -
+                        truePath.treatmentBenefit t) -
+                    (predictedPath.treatmentHarm t - truePath.treatmentHarm t))))
+    _ ≤ ∑ t,
+        model.discount t *
+          (εWeight t * netBound t +
+            weightBound t *
+              (εEvent t * benefitBound t +
+                eventBound t * εBenefit t + εHarm t)) := by
+        refine Finset.sum_le_sum ?_
+        intro t _
+        have hdisc : 0 ≤ model.discount t := model.discount_nonneg t
+        have hεWeight_nonneg : 0 ≤ εWeight t := by
+          exact le_trans (abs_nonneg _) (h_weight_err t)
+        have hεEvent_nonneg : 0 ≤ εEvent t := by
+          exact le_trans (abs_nonneg _) (h_event_err t)
+        have hεBenefit_nonneg : 0 ≤ εBenefit t := by
+          exact le_trans (abs_nonneg _) (h_benefit_err t)
+        have hεHarm_nonneg : 0 ≤ εHarm t := by
+          exact le_trans (abs_nonneg _) (h_harm_err t)
+        have hWeight_nonneg : 0 ≤ weightBound t := by
+          exact le_trans (abs_nonneg _) (h_weight_bound t)
+        have hEvent_nonneg : 0 ≤ eventBound t := by
+          exact le_trans (abs_nonneg _) (h_event_bound t)
+        have hBenefit_nonneg : 0 ≤ benefitBound t := by
+          exact le_trans (abs_nonneg _) (h_benefit_bound t)
+        have hNet_nonneg : 0 ≤ netBound t := by
+          exact le_trans (abs_nonneg _) (h_net_bound t)
+        have h_term1 :
+            |predictedPath.followupWeight t - truePath.followupWeight t| *
+                |truePath.eventProb t * truePath.treatmentBenefit t -
+                  truePath.treatmentHarm t| ≤
+              εWeight t * netBound t := by
+          exact mul_le_mul (h_weight_err t) (h_net_bound t)
+            (abs_nonneg _) hεWeight_nonneg
+        have h_term2a :
+            |predictedPath.eventProb t - truePath.eventProb t| *
+                |truePath.treatmentBenefit t| ≤
+              εEvent t * benefitBound t := by
+          exact mul_le_mul (h_event_err t) (h_benefit_bound t)
+            (abs_nonneg _) hεEvent_nonneg
+        have h_term2b :
+            |predictedPath.eventProb t| *
+                |predictedPath.treatmentBenefit t - truePath.treatmentBenefit t| ≤
+              eventBound t * εBenefit t := by
+          exact mul_le_mul (h_event_bound t) (h_benefit_err t)
+            (abs_nonneg _) hEvent_nonneg
+        have h_nested :
+            |(predictedPath.eventProb t - truePath.eventProb t) *
+                truePath.treatmentBenefit t +
+              predictedPath.eventProb t *
+                (predictedPath.treatmentBenefit t -
+                  truePath.treatmentBenefit t) -
+              (predictedPath.treatmentHarm t - truePath.treatmentHarm t)| ≤
+              εEvent t * benefitBound t +
+                eventBound t * εBenefit t + εHarm t := by
+          have h_split2 :
+              |(predictedPath.eventProb t - truePath.eventProb t) *
+                  truePath.treatmentBenefit t +
+                predictedPath.eventProb t *
+                  (predictedPath.treatmentBenefit t -
+                    truePath.treatmentBenefit t)| ≤
+                |(predictedPath.eventProb t - truePath.eventProb t) *
+                    truePath.treatmentBenefit t| +
+                  |predictedPath.eventProb t *
+                    (predictedPath.treatmentBenefit t -
+                      truePath.treatmentBenefit t)| := by
+            exact abs_add_le _ _
+          calc
+            |(predictedPath.eventProb t - truePath.eventProb t) *
+                truePath.treatmentBenefit t +
+              predictedPath.eventProb t *
+                (predictedPath.treatmentBenefit t -
+                  truePath.treatmentBenefit t) -
+              (predictedPath.treatmentHarm t - truePath.treatmentHarm t)| ≤
+                |(predictedPath.eventProb t - truePath.eventProb t) *
+                    truePath.treatmentBenefit t| +
+                  |predictedPath.eventProb t *
+                      (predictedPath.treatmentBenefit t -
+                        truePath.treatmentBenefit t)| +
+                  |truePath.treatmentHarm t - predictedPath.treatmentHarm t| := by
+                    calc
+                      |(predictedPath.eventProb t - truePath.eventProb t) *
+                          truePath.treatmentBenefit t +
+                        predictedPath.eventProb t *
+                          (predictedPath.treatmentBenefit t -
+                            truePath.treatmentBenefit t) -
+                        (predictedPath.treatmentHarm t - truePath.treatmentHarm t)| =
+                          |((predictedPath.eventProb t - truePath.eventProb t) *
+                              truePath.treatmentBenefit t +
+                            predictedPath.eventProb t *
+                              (predictedPath.treatmentBenefit t -
+                                truePath.treatmentBenefit t)) +
+                            (-(predictedPath.treatmentHarm t -
+                              truePath.treatmentHarm t))| := by ring
+                      _ ≤
+                          |(predictedPath.eventProb t - truePath.eventProb t) *
+                              truePath.treatmentBenefit t +
+                            predictedPath.eventProb t *
+                              (predictedPath.treatmentBenefit t -
+                                truePath.treatmentBenefit t)| +
+                          |truePath.treatmentHarm t -
+                              predictedPath.treatmentHarm t| := by
+                            simpa [abs_neg, sub_eq_add_neg, add_comm, add_left_comm,
+                              add_assoc] using
+                              (abs_add_le
+                                ((predictedPath.eventProb t - truePath.eventProb t) *
+                                  truePath.treatmentBenefit t +
+                                  predictedPath.eventProb t *
+                                    (predictedPath.treatmentBenefit t -
+                                      truePath.treatmentBenefit t))
+                                (-(predictedPath.treatmentHarm t -
+                                  truePath.treatmentHarm t)))
+                      _ ≤
+                          (|(predictedPath.eventProb t - truePath.eventProb t) *
+                              truePath.treatmentBenefit t| +
+                            |predictedPath.eventProb t *
+                                (predictedPath.treatmentBenefit t -
+                                  truePath.treatmentBenefit t)|) +
+                          |truePath.treatmentHarm t - predictedPath.treatmentHarm t| := by
+                            linarith
+            _ = |predictedPath.eventProb t - truePath.eventProb t| *
+                  |truePath.treatmentBenefit t| +
+                |predictedPath.eventProb t| *
+                  |predictedPath.treatmentBenefit t -
+                    truePath.treatmentBenefit t| +
+                |predictedPath.treatmentHarm t - truePath.treatmentHarm t| := by
+                  rw [abs_mul, abs_mul]
+                  have hharm :
+                      |truePath.treatmentHarm t - predictedPath.treatmentHarm t| =
+                        |predictedPath.treatmentHarm t - truePath.treatmentHarm t| := by
+                    exact abs_sub_comm _ _
+                  simpa [hharm]
+            _ ≤ εEvent t * benefitBound t +
+                eventBound t * εBenefit t + εHarm t := by
+                  have h_term2a' :
+                      |truePath.eventProb t - predictedPath.eventProb t| *
+                          |truePath.treatmentBenefit t| ≤
+                        εEvent t * benefitBound t := by
+                    simpa [abs_sub_comm] using h_term2a
+                  linarith [h_term2a', h_term2b, h_harm_err t]
+        have h_term2 :
+            |predictedPath.followupWeight t| *
+                |(predictedPath.eventProb t - truePath.eventProb t) *
+                    truePath.treatmentBenefit t +
+                  predictedPath.eventProb t *
+                    (predictedPath.treatmentBenefit t -
+                      truePath.treatmentBenefit t) -
+                  (predictedPath.treatmentHarm t - truePath.treatmentHarm t)| ≤
+              weightBound t *
+                (εEvent t * benefitBound t +
+                  eventBound t * εBenefit t + εHarm t) := by
+          have h_nested_nonneg :
+              0 ≤ εEvent t * benefitBound t +
+                eventBound t * εBenefit t + εHarm t := by
+            nlinarith
+              [hεEvent_nonneg, hBenefit_nonneg, hEvent_nonneg,
+                hεBenefit_nonneg, hεHarm_nonneg]
+          exact mul_le_mul (h_weight_bound t) h_nested
+            (abs_nonneg _) hWeight_nonneg
+        have h_inner_bound :
+            |predictedPath.followupWeight t - truePath.followupWeight t| *
+                |truePath.eventProb t * truePath.treatmentBenefit t -
+                  truePath.treatmentHarm t| +
+              |predictedPath.followupWeight t| *
+                |(predictedPath.eventProb t - truePath.eventProb t) *
+                    truePath.treatmentBenefit t +
+                  predictedPath.eventProb t *
+                    (predictedPath.treatmentBenefit t -
+                      truePath.treatmentBenefit t) -
+                  (predictedPath.treatmentHarm t - truePath.treatmentHarm t)| ≤
+              εWeight t * netBound t +
+                weightBound t *
+                  (εEvent t * benefitBound t +
+                    eventBound t * εBenefit t + εHarm t) := by
+          linarith [h_term1, h_term2]
+        calc
+          |model.discount t *
+            ((predictedPath.followupWeight t - truePath.followupWeight t) *
+                (truePath.eventProb t * truePath.treatmentBenefit t -
+                  truePath.treatmentHarm t) +
+              predictedPath.followupWeight t *
+                ((predictedPath.eventProb t - truePath.eventProb t) *
+                    truePath.treatmentBenefit t +
+                  predictedPath.eventProb t *
+                    (predictedPath.treatmentBenefit t -
+                      truePath.treatmentBenefit t) -
+                  (predictedPath.treatmentHarm t - truePath.treatmentHarm t)))| =
+              model.discount t *
+                |(predictedPath.followupWeight t - truePath.followupWeight t) *
+                    (truePath.eventProb t * truePath.treatmentBenefit t -
+                      truePath.treatmentHarm t) +
+                  predictedPath.followupWeight t *
+                    ((predictedPath.eventProb t - truePath.eventProb t) *
+                        truePath.treatmentBenefit t +
+                      predictedPath.eventProb t *
+                        (predictedPath.treatmentBenefit t -
+                          truePath.treatmentBenefit t) -
+                      (predictedPath.treatmentHarm t - truePath.treatmentHarm t))| := by
+                rw [abs_mul, abs_of_nonneg hdisc]
+          _ ≤ model.discount t *
+                (|(predictedPath.followupWeight t - truePath.followupWeight t) *
+                    (truePath.eventProb t * truePath.treatmentBenefit t -
+                      truePath.treatmentHarm t)| +
+                  |predictedPath.followupWeight t *
+                    ((predictedPath.eventProb t - truePath.eventProb t) *
+                        truePath.treatmentBenefit t +
+                      predictedPath.eventProb t *
+                        (predictedPath.treatmentBenefit t -
+                          truePath.treatmentBenefit t) -
+                      (predictedPath.treatmentHarm t - truePath.treatmentHarm t))|) := by
+                gcongr
+                exact abs_add_le _ _
+          _ = model.discount t *
+                (|predictedPath.followupWeight t - truePath.followupWeight t| *
+                    |truePath.eventProb t * truePath.treatmentBenefit t -
+                      truePath.treatmentHarm t| +
+                  |predictedPath.followupWeight t| *
+                    |(predictedPath.eventProb t - truePath.eventProb t) *
+                        truePath.treatmentBenefit t +
+                      predictedPath.eventProb t *
+                        (predictedPath.treatmentBenefit t -
+                          truePath.treatmentBenefit t) -
+                      (predictedPath.treatmentHarm t - truePath.treatmentHarm t)|) := by
+                rw [abs_mul, abs_mul]
+          _ ≤ model.discount t *
+                (εWeight t * netBound t +
+                  weightBound t *
+                    (εEvent t * benefitBound t +
+                      eventBound t * εBenefit t + εHarm t)) := by
+                exact mul_le_mul_of_nonneg_left h_inner_bound hdisc
+
+/-- **Exact longitudinal QALY-loss bound from calibration errors in the event
+    process, heterogeneous treatment effects, harms, and censoring weights.** -/
+theorem qalyLoss_le_componentwise_calibration_bound
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T)
+    (εWeight εEvent εBenefit εHarm
+      weightBound eventBound benefitBound netBound : Fin T → ℝ)
+    (h_weight_err : ∀ t,
+      |predictedPath.followupWeight t - truePath.followupWeight t| ≤ εWeight t)
+    (h_event_err : ∀ t,
+      |predictedPath.eventProb t - truePath.eventProb t| ≤ εEvent t)
+    (h_benefit_err : ∀ t,
+      |predictedPath.treatmentBenefit t - truePath.treatmentBenefit t| ≤ εBenefit t)
+    (h_harm_err : ∀ t,
+      |predictedPath.treatmentHarm t - truePath.treatmentHarm t| ≤ εHarm t)
+    (h_weight_bound : ∀ t, |predictedPath.followupWeight t| ≤ weightBound t)
+    (h_event_bound : ∀ t, |predictedPath.eventProb t| ≤ eventBound t)
+    (h_benefit_bound : ∀ t, |truePath.treatmentBenefit t| ≤ benefitBound t)
+    (h_net_bound : ∀ t,
+      |truePath.eventProb t * truePath.treatmentBenefit t -
+          truePath.treatmentHarm t| ≤ netBound t) :
+    qalyLoss model truePath predictedPath ≤
+      Finset.univ.sum (fun t =>
+        model.discount t *
+          (εWeight t * netBound t +
+            weightBound t *
+              (εEvent t * benefitBound t +
+                eventBound t * εBenefit t + εHarm t))) := by
+  exact le_trans (qalyLoss_le_abs_margin_error model truePath predictedPath)
+    (abs_treatmentMargin_error_le_componentwise_calibration_bound
+      model truePath predictedPath εWeight εEvent εBenefit εHarm
+      weightBound eventBound benefitBound netBound
+      h_weight_err h_event_err h_benefit_err h_harm_err
+      h_weight_bound h_event_bound h_benefit_bound h_net_bound)
+
+/-- **If componentwise pathway calibration error is smaller than the true
+    longitudinal treatment margin, the deployed and oracle clinical decisions
+    coincide exactly and QALY regret vanishes.** -/
+theorem qalyLoss_eq_zero_of_componentwise_calibration_bound_lt_abs_true_margin
+    {T : ℕ} (model : LongitudinalTreatmentModel T)
+    (truePath predictedPath : ClinicalPathway T)
+    (εWeight εEvent εBenefit εHarm
+      weightBound eventBound benefitBound netBound : Fin T → ℝ)
+    (h_weight_err : ∀ t,
+      |predictedPath.followupWeight t - truePath.followupWeight t| ≤ εWeight t)
+    (h_event_err : ∀ t,
+      |predictedPath.eventProb t - truePath.eventProb t| ≤ εEvent t)
+    (h_benefit_err : ∀ t,
+      |predictedPath.treatmentBenefit t - truePath.treatmentBenefit t| ≤ εBenefit t)
+    (h_harm_err : ∀ t,
+      |predictedPath.treatmentHarm t - truePath.treatmentHarm t| ≤ εHarm t)
+    (h_weight_bound : ∀ t, |predictedPath.followupWeight t| ≤ weightBound t)
+    (h_event_bound : ∀ t, |predictedPath.eventProb t| ≤ eventBound t)
+    (h_benefit_bound : ∀ t, |truePath.treatmentBenefit t| ≤ benefitBound t)
+    (h_net_bound : ∀ t,
+      |truePath.eventProb t * truePath.treatmentBenefit t -
+          truePath.treatmentHarm t| ≤ netBound t)
+    (h_small :
+      Finset.univ.sum (fun t =>
+        model.discount t *
+          (εWeight t * netBound t +
+            weightBound t *
+              (εEvent t * benefitBound t +
+                eventBound t * εBenefit t + εHarm t))) <
+        |treatmentMargin model truePath|) :
+    qalyLoss model truePath predictedPath = 0 := by
+  apply qalyLoss_eq_zero_of_margin_error_lt_abs_true_margin
+  exact lt_of_le_of_lt
+    (abs_treatmentMargin_error_le_componentwise_calibration_bound
+      model truePath predictedPath εWeight εEvent εBenefit εHarm
+      weightBound eventBound benefitBound netBound
+      h_weight_err h_event_err h_benefit_err h_harm_err
+      h_weight_bound h_event_bound h_benefit_bound h_net_bound)
+    h_small
 
 /-- **Expected QALY loss from pathway miscalibration.**
     This is the population expectation of exact oracle regret under the

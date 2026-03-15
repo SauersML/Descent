@@ -1,4 +1,5 @@
 import Calibrator.Probability
+import Calibrator.TransportIdentities
 
 namespace Calibrator
 
@@ -5100,6 +5101,337 @@ lemma risk_decomposition {k : ℕ} [Fintype (Fin k)]
     simp
   rw [h_risk_true, zero_add]
 
+/-! ### Exact Measure-Level Metric Identities
+
+This section instantiates the transport and metric algebra on an actual
+probability measure. Unlike `TransportIdentities.lean`, these theorems are
+proved directly with `MeasureTheory.integral` and can therefore be used inside
+the concrete biological DGPs without any abstract expectation wrapper.
+-/
+
+section ExactMeasureMetricIdentities
+
+variable {Ω : Type*} [MeasurableSpace Ω]
+
+/-- Exact mean of a real observable under a concrete probability measure. -/
+noncomputable def measureMean (μ : Measure Ω) (Z : Ω → ℝ) : ℝ :=
+  ∫ ω, Z ω ∂μ
+
+/-- Exact variance under a concrete probability measure. -/
+noncomputable def measureVariance (μ : Measure Ω) (Z : Ω → ℝ) : ℝ :=
+  ∫ ω, (Z ω - measureMean μ Z) ^ 2 ∂μ
+
+/-- Exact covariance under a concrete probability measure. -/
+noncomputable def measureCovariance (μ : Measure Ω) (X Y : Ω → ℝ) : ℝ :=
+  ∫ ω, (X ω - measureMean μ X) * (Y ω - measureMean μ Y) ∂μ
+
+/-- Exact mean squared prediction error under a concrete probability measure. -/
+noncomputable def measureExpMSE (μ : Measure Ω) (Y S : Ω → ℝ) : ℝ :=
+  ∫ ω, (Y ω - S ω) ^ 2 ∂μ
+
+/-- Exact bias of a predictor under a concrete probability measure. -/
+noncomputable def measureBias (μ : Measure Ω) (Y S : Ω → ℝ) : ℝ :=
+  measureMean μ S - measureMean μ Y
+
+theorem measureVariance_eq_expect_sq_sub_sq_mean
+    (μ : Measure Ω) [IsProbabilityMeasure μ]
+    (Z : Ω → ℝ)
+    (hZ_int : Integrable Z μ)
+    (hZsq_int : Integrable (fun ω => Z ω ^ 2) μ) :
+    measureVariance μ Z = (∫ ω, Z ω ^ 2 ∂μ) - (measureMean μ Z) ^ 2 := by
+  unfold measureVariance measureMean
+  set mZ : ℝ := ∫ ω, Z ω ∂μ
+  have hlin : Integrable (fun ω => (-2 * mZ) * Z ω) μ := hZ_int.const_mul (-2 * mZ)
+  have hconst : Integrable (fun _ : Ω => mZ ^ 2) μ := integrable_const (mZ ^ 2)
+  have h_expand :
+      (fun ω => (Z ω - mZ) ^ 2) =
+        (((fun ω => Z ω ^ 2) + fun ω => (-2 * mZ) * Z ω) + fun _ : Ω => mZ ^ 2) := by
+    funext ω
+    simp
+    ring_nf
+  rw [h_expand]
+  rw [show ∫ ω, (((fun ω => Z ω ^ 2) + fun ω => (-2 * mZ) * Z ω) + fun _ : Ω => mZ ^ 2) ω ∂μ
+        = ∫ ω, ((fun ω => Z ω ^ 2) + fun ω => (-2 * mZ) * Z ω) ω ∂μ
+            + ∫ ω, (fun _ : Ω => mZ ^ 2) ω ∂μ by
+        simpa using (integral_add (hZsq_int.add hlin) hconst)]
+  rw [show ∫ ω, ((fun ω => Z ω ^ 2) + fun ω => (-2 * mZ) * Z ω) ω ∂μ
+        = ∫ ω, (fun ω => Z ω ^ 2) ω ∂μ + ∫ ω, (fun ω => (-2 * mZ) * Z ω) ω ∂μ by
+        simpa using (integral_add hZsq_int hlin)]
+  rw [MeasureTheory.integral_const_mul, MeasureTheory.integral_const]
+  simp [mZ]
+  ring
+
+theorem measureCovariance_eq_expect_mul_sub_means
+    (μ : Measure Ω) [IsProbabilityMeasure μ]
+    (X Y : Ω → ℝ)
+    (hX_int : Integrable X μ)
+    (hY_int : Integrable Y μ)
+    (hXY_int : Integrable (fun ω => X ω * Y ω) μ) :
+    measureCovariance μ X Y =
+      (∫ ω, X ω * Y ω ∂μ) - (measureMean μ X) * (measureMean μ Y) := by
+  unfold measureCovariance measureMean
+  set mX : ℝ := ∫ ω, X ω ∂μ
+  set mY : ℝ := ∫ ω, Y ω ∂μ
+  have hXlin : Integrable (fun ω => (-mY) * X ω) μ := hX_int.const_mul (-mY)
+  have hYlin : Integrable (fun ω => (-mX) * Y ω) μ := hY_int.const_mul (-mX)
+  have hconst : Integrable (fun _ : Ω => mX * mY) μ := integrable_const (mX * mY)
+  have h_expand :
+      (fun ω => (X ω - mX) * (Y ω - mY)) =
+        ((((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) +
+          fun ω => (-mX) * Y ω) + fun _ : Ω => mX * mY) := by
+    funext ω
+    simp
+    ring_nf
+  rw [h_expand]
+  rw [show ∫ ω,
+        ((((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) + fun ω => (-mX) * Y ω) +
+          fun _ : Ω => mX * mY) ω ∂μ
+        =
+          ∫ ω, (((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) + fun ω => (-mX) * Y ω) ω ∂μ
+            + ∫ ω, (fun _ : Ω => mX * mY) ω ∂μ by
+        simpa using (integral_add ((hXY_int.add hXlin).add hYlin) hconst)]
+  rw [show ∫ ω, (((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) + fun ω => (-mX) * Y ω) ω ∂μ
+        = ∫ ω, ((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) ω ∂μ
+            + ∫ ω, (fun ω => (-mX) * Y ω) ω ∂μ by
+        simpa using (integral_add (hXY_int.add hXlin) hYlin)]
+  rw [show ∫ ω, ((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) ω ∂μ
+        = ∫ ω, (fun ω => X ω * Y ω) ω ∂μ + ∫ ω, (fun ω => (-mY) * X ω) ω ∂μ by
+        simpa using (integral_add hXY_int hXlin)]
+  rw [MeasureTheory.integral_const_mul, MeasureTheory.integral_const_mul,
+    MeasureTheory.integral_const]
+  simp [mX, mY]
+  ring
+
+theorem measureExpMSE_eq_variance_add_variance_sub_two_cov_add_bias_sq
+    (μ : Measure Ω) [IsProbabilityMeasure μ]
+    (Y S : Ω → ℝ)
+    (hY_int : Integrable Y μ)
+    (hS_int : Integrable S μ)
+    (hYsq_int : Integrable (fun ω => Y ω ^ 2) μ)
+    (hSsq_int : Integrable (fun ω => S ω ^ 2) μ)
+    (hYS_int : Integrable (fun ω => Y ω * S ω) μ) :
+    measureExpMSE μ Y S =
+      measureVariance μ Y + measureVariance μ S -
+        2 * measureCovariance μ Y S + (measureBias μ Y S) ^ 2 := by
+  rw [measureVariance_eq_expect_sq_sub_sq_mean μ Y hY_int hYsq_int]
+  rw [measureVariance_eq_expect_sq_sub_sq_mean μ S hS_int hSsq_int]
+  rw [measureCovariance_eq_expect_mul_sub_means μ Y S hY_int hS_int hYS_int]
+  unfold measureExpMSE measureBias measureMean
+  have hScaledYS : Integrable (fun ω => (-2 : ℝ) * (Y ω * S ω)) μ := hYS_int.const_mul (-2)
+  have h_expand :
+      (fun ω => (Y ω - S ω) ^ 2) =
+        (((fun ω => Y ω ^ 2) + fun ω => (-2 : ℝ) * (Y ω * S ω)) + fun ω => S ω ^ 2) := by
+    funext ω
+    simp
+    ring_nf
+  rw [h_expand]
+  rw [show ∫ ω, (((fun ω => Y ω ^ 2) + fun ω => (-2 : ℝ) * (Y ω * S ω)) + fun ω => S ω ^ 2) ω ∂μ
+        = ∫ ω, ((fun ω => Y ω ^ 2) + fun ω => (-2 : ℝ) * (Y ω * S ω)) ω ∂μ
+            + ∫ ω, (fun ω => S ω ^ 2) ω ∂μ by
+        simpa using (integral_add (hYsq_int.add hScaledYS) hSsq_int)]
+  rw [show ∫ ω, ((fun ω => Y ω ^ 2) + fun ω => (-2 : ℝ) * (Y ω * S ω)) ω ∂μ
+        = ∫ ω, (fun ω => Y ω ^ 2) ω ∂μ + ∫ ω, (fun ω => (-2 : ℝ) * (Y ω * S ω)) ω ∂μ by
+        simpa using (integral_add hYsq_int hScaledYS)]
+  rw [MeasureTheory.integral_const_mul]
+  ring
+
+theorem measureLinearPredictionRisk_transport_decomposition_of_orthogonality
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (μ : Measure Ω)
+    (X : Ω → ι → ℝ) (Y : Ω → ℝ)
+    (wStar w : ι → ℝ)
+    (hResidualSq_int : Integrable (fun ω => (Y ω - dot wStar (X ω)) ^ 2) μ)
+    (hCross_int :
+      Integrable
+        (fun ω => (Y ω - dot wStar (X ω)) * dot (fun i => w i - wStar i) (X ω)) μ)
+    (hDeltaSq_int :
+      Integrable (fun ω => (dot (fun i => w i - wStar i) (X ω)) ^ 2) μ)
+    (horth :
+      ∫ ω, (Y ω - dot wStar (X ω)) * dot (fun i => w i - wStar i) (X ω) ∂μ = 0) :
+    ∫ ω, (Y ω - dot w (X ω)) ^ 2 ∂μ =
+      ∫ ω, (Y ω - dot wStar (X ω)) ^ 2 ∂μ +
+        ∫ ω, (dot (fun i => w i - wStar i) (X ω)) ^ 2 ∂μ := by
+  let residual : Ω → ℝ := fun ω => Y ω - dot wStar (X ω)
+  let delta : Ω → ℝ := fun ω => dot (fun i => w i - wStar i) (X ω)
+  have hdot :
+      ∀ ω, dot w (X ω) = dot wStar (X ω) + dot (fun i => w i - wStar i) (X ω) := by
+    intro ω
+    calc
+      dot w (X ω) = ∑ i, (wStar i + (w i - wStar i)) * X ω i := by
+        unfold dot
+        refine Finset.sum_congr rfl ?_
+        intro i hi
+        ring
+      _ = ∑ i, (wStar i * X ω i + (w i - wStar i) * X ω i) := by
+        refine Finset.sum_congr rfl ?_
+        intro i hi
+        ring
+      _ = dot wStar (X ω) + dot (fun i => w i - wStar i) (X ω) := by
+        unfold dot
+        rw [Finset.sum_add_distrib]
+  have h_expand :
+      (fun ω => (Y ω - dot w (X ω)) ^ 2) =
+        (fun ω => residual ω ^ 2) +
+          ((-2 : ℝ) • fun ω => residual ω * delta ω) +
+          fun ω => delta ω ^ 2 := by
+    funext ω
+    rw [hdot ω]
+    simp [residual, delta, smul_eq_mul]
+    ring
+  rw [h_expand]
+  rw [show ∫ ω,
+        (((fun ω => residual ω ^ 2) + (-2 : ℝ) • fun ω => residual ω * delta ω) +
+          fun ω => delta ω ^ 2) ω ∂μ
+        =
+          ∫ ω, ((fun ω => residual ω ^ 2) + (-2 : ℝ) • fun ω => residual ω * delta ω) ω ∂μ
+            + ∫ ω, (fun ω => delta ω ^ 2) ω ∂μ by
+        simpa using (integral_add (hResidualSq_int.add (hCross_int.const_mul (-2))) hDeltaSq_int)]
+  rw [show ∫ ω, ((fun ω => residual ω ^ 2) + (-2 : ℝ) • fun ω => residual ω * delta ω) ω ∂μ
+        = ∫ ω, (fun ω => residual ω ^ 2) ω ∂μ
+            + ∫ ω, (((-2 : ℝ) • fun ω => residual ω * delta ω) ω) ∂μ by
+        simpa using (integral_add hResidualSq_int (hCross_int.const_mul (-2)))]
+  rw [show ∫ ω, (((-2 : ℝ) • fun ω => residual ω * delta ω) ω) ∂μ
+        = (-2 : ℝ) * ∫ ω, residual ω * delta ω ∂μ by
+        simpa [Pi.smul_apply] using
+          (MeasureTheory.integral_const_mul (-2 : ℝ) (fun ω => residual ω * delta ω))]
+  rw [horth]
+  ring
+
+/-- Irreducible risk in a conditional-mean DGP: exact Bayes risk under the joint law. -/
+noncomputable def irreduciblePredictionRisk {k : ℕ} [Fintype (Fin k)]
+    (cmdgp : ConditionalMeanDGP k) : ℝ :=
+  ∫ x, (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2 ∂cmdgp.μ
+
+/-- Approximation risk of a deployed predictor relative to the exact conditional mean. -/
+noncomputable def conditionalMeanApproximationRisk {k : ℕ} [Fintype (Fin k)]
+    (cmdgp : ConditionalMeanDGP k) (pred : Predictor k) : ℝ :=
+  ∫ x, (cmdgp.m x.1 x.2.1 - pred x.1 x.2.1) ^ 2 ∂cmdgp.μ
+
+theorem ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanApproximationRisk
+    {k : ℕ} [Fintype (Fin k)]
+    (cmdgp : ConditionalMeanDGP k) (pred : Predictor k)
+    (hResidualSq_int :
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ => (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2) cmdgp.μ)
+    (hGapSq_int :
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+        (cmdgp.m x.1 x.2.1 - pred x.1 x.2.1) ^ 2) cmdgp.μ)
+    (hOrth_int :
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+        (x.2.2 - cmdgp.m x.1 x.2.1) * (cmdgp.m x.1 x.2.1 - pred x.1 x.2.1)) cmdgp.μ) :
+    predictionRiskY cmdgp pred =
+      irreduciblePredictionRisk cmdgp + conditionalMeanApproximationRisk cmdgp pred := by
+  let residual : ℝ × (Fin k → ℝ) × ℝ → ℝ := fun x => x.2.2 - cmdgp.m x.1 x.2.1
+  let gap : ℝ × (Fin k → ℝ) × ℝ → ℝ := fun x => cmdgp.m x.1 x.2.1 - pred x.1 x.2.1
+  have horth : ∫ x, residual x * gap x ∂cmdgp.μ = 0 := by
+    simpa [residual, gap] using cmdgp.m_spec (fun pc => cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) hOrth_int
+  have h_expand :
+      (fun x : ℝ × (Fin k → ℝ) × ℝ => (x.2.2 - pred x.1 x.2.1) ^ 2) =
+        (((fun x => residual x ^ 2) +
+          ((2 : ℝ) • fun x => residual x * gap x)) +
+          fun x => gap x ^ 2) := by
+    funext x
+    simp [residual, gap, smul_eq_mul]
+    ring
+  unfold predictionRiskY irreduciblePredictionRisk conditionalMeanApproximationRisk
+  rw [h_expand]
+  rw [show ∫ x,
+        (((fun x => residual x ^ 2) + (2 : ℝ) • fun x => residual x * gap x) +
+          fun x => gap x ^ 2) x ∂cmdgp.μ
+        =
+          ∫ x, ((fun x => residual x ^ 2) + (2 : ℝ) • fun x => residual x * gap x) x ∂cmdgp.μ
+            + ∫ x, (fun x => gap x ^ 2) x ∂cmdgp.μ by
+        simpa using (integral_add (hResidualSq_int.add (hOrth_int.const_mul 2)) hGapSq_int)]
+  rw [show ∫ x, ((fun x => residual x ^ 2) + (2 : ℝ) • fun x => residual x * gap x) x ∂cmdgp.μ
+        = ∫ x, (fun x => residual x ^ 2) x ∂cmdgp.μ
+            + ∫ x, (((2 : ℝ) • fun x => residual x * gap x) x) ∂cmdgp.μ by
+        simpa using (integral_add hResidualSq_int (hOrth_int.const_mul 2))]
+  rw [show ∫ x, (((2 : ℝ) • fun x => residual x * gap x) x) ∂cmdgp.μ
+        = (2 : ℝ) * ∫ x, residual x * gap x ∂cmdgp.μ by
+        simpa [Pi.smul_apply] using
+          (MeasureTheory.integral_const_mul (2 : ℝ) (fun x => residual x * gap x))]
+  rw [horth]
+  ring
+
+theorem ConditionalMeanDGP.conditionalMeanApproximationRisk_eq_mseRisk_toDGP
+    {k : ℕ} [Fintype (Fin k)]
+    (cmdgp : ConditionalMeanDGP k) (pred : Predictor k)
+    (hGapSq_meas :
+      AEStronglyMeasurable
+        (fun pc : ℝ × (Fin k → ℝ) => (cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) ^ 2)
+        cmdgp.toDGP.jointMeasure) :
+    conditionalMeanApproximationRisk cmdgp pred = mseRisk cmdgp.toDGP pred := by
+  unfold conditionalMeanApproximationRisk mseRisk ConditionalMeanDGP.toDGP
+  simpa using
+    (MeasureTheory.integral_map
+      (μ := cmdgp.μ)
+      (φ := fun x : ℝ × (Fin k → ℝ) × ℝ => (x.1, x.2.1))
+      (f := fun pc : ℝ × (Fin k → ℝ) => (cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) ^ 2)
+      (by fun_prop) hGapSq_meas).symm
+
+theorem ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
+    {k : ℕ} [Fintype (Fin k)]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (cmdgp : ConditionalMeanDGP k)
+    (X : ℝ × (Fin k → ℝ) → ι → ℝ)
+    (wStar w : ι → ℝ)
+    (hm_linear : ∀ p c, cmdgp.m p c = dot wStar (X (p, c)))
+    (hResidualSq_int :
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ => (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2) cmdgp.μ)
+    (hOrth_int :
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+        (x.2.2 - cmdgp.m x.1 x.2.1) *
+          dot (fun i => w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ)
+    (hDeltaSq_int :
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+        (dot (fun i => w i - wStar i) (X (x.1, x.2.1))) ^ 2) cmdgp.μ) :
+    predictionRiskY cmdgp (fun p c => dot w (X (p, c))) =
+      irreduciblePredictionRisk cmdgp +
+        ∫ x, (dot (fun i => w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
+  have horth :
+      ∫ x, (x.2.2 - cmdgp.m x.1 x.2.1) *
+        dot (fun i => w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
+    simpa using
+      cmdgp.m_spec (fun pc => dot (fun i => w i - wStar i) (X pc)) hOrth_int
+  have hResidualSq_int_linear :
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+        (x.2.2 - dot wStar (X (x.1, x.2.1))) ^ 2) cmdgp.μ := by
+    refine hResidualSq_int.congr ?_
+    filter_upwards with x
+    rw [← hm_linear x.1 x.2.1]
+  have hbase :
+      ∫ x, (x.2.2 - dot wStar (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ =
+        irreduciblePredictionRisk cmdgp := by
+    unfold irreduciblePredictionRisk
+    refine integral_congr_ae ?_
+    filter_upwards with x
+    rw [← hm_linear x.1 x.2.1]
+  have hOrth_int_linear :
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+        (x.2.2 - dot wStar (X (x.1, x.2.1))) *
+          dot (fun i => w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ := by
+    refine hOrth_int.congr ?_
+    filter_upwards with x
+    rw [← hm_linear x.1 x.2.1]
+  have horth_linear :
+      ∫ x, (x.2.2 - dot wStar (X (x.1, x.2.1))) *
+        dot (fun i => w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
+    simpa [hm_linear] using horth
+  unfold predictionRiskY
+  calc
+    ∫ x, (x.2.2 - dot w (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ =
+        ∫ x, (x.2.2 - dot wStar (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ +
+          ∫ x, (dot (fun i => w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
+            exact measureLinearPredictionRisk_transport_decomposition_of_orthogonality
+              cmdgp.μ
+              (fun x : ℝ × (Fin k → ℝ) × ℝ => X (x.1, x.2.1))
+              (fun x : ℝ × (Fin k → ℝ) × ℝ => x.2.2)
+              wStar w hResidualSq_int_linear hOrth_int_linear hDeltaSq_int horth_linear
+    _ = irreduciblePredictionRisk cmdgp +
+          ∫ x, (dot (fun i => w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
+            rw [hbase]
+
+end ExactMeasureMetricIdentities
+
 /-- If a model class is capable of representing the truth, and a model is Bayes-optimal
     in that class, then the model recovers the truth almost everywhere. -/
 theorem optimal_recovers_truth_of_capable {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
@@ -6491,81 +6823,180 @@ noncomputable def PGSEvolutionaryModel.mutErosion (m : PGSEvolutionaryModel) : �
 noncomputable def PGSEvolutionaryModel.migBoost (m : PGSEvolutionaryModel) : ℝ :=
   migrationLDBoost m.toEvo
 
-/-! ### Step 2: Unified portability ratio ρ(t)
+/-! ### Step 2: Exact transported signal variance
 
-The four evolutionary factors compose multiplicatively because they
-act on INDEPENDENT aspects of the PGS-phenotype covariance:
+The four evolutionary factors act on the transported PGS signal variance:
 
-- (1 - Fst): allele frequency correlation between populations
-- LD retention: fraction of LD structure that is shared
-- Mutation erosion: fraction of variants that are ancestral (shared)
-- Migration boost: restoration of shared variation via gene flow
+- `(1 - Fst)`: allele-frequency retention
+- `LD_retention`: shared LD tagging
+- `mut_erosion`: ancestral/shared causal content
+- `mig_boost`: migration-restored shared signal
 
-DERIVED from the covariance decomposition:
-  Cov(PGS, Y_target) = Σᵢ βᵢ × E[Gᵢ_target × Y_target]
-  = (freq_correlation) × (LD_overlap) × (ancestral_fraction) × (migration_correction) × Cov_source
-
-See PortabilityDrift.lean: covarianceDivergenceFromRetention_eq and its derivation.
+We therefore transport the exact source signal variance and only then map that
+transported signal into deployed metrics (`R²`, AUC, Brier). The scalar
+`portabilityRatio` is no longer primitive; it is derived afterward as the exact
+target/source signal-variance ratio.
 -/
 
-/-- **The portability ratio**: ρ(t) = (1 - Fst(t)) × LD_ret(t) × mut_erosion(t) × mig_boost(t).
-
-    This is the fraction of source R² that transfers to the target population
-    after t generations of divergence. It captures ALL evolutionary forces
-    and evolves over time as populations diverge. -/
-noncomputable def PGSEvolutionaryModel.portabilityRatio (m : PGSEvolutionaryModel) : ℝ :=
+/-- Exact multiplicative evolutionary transport factor for the genetic signal. -/
+noncomputable def PGSEvolutionaryModel.signalTransportFactor (m : PGSEvolutionaryModel) : ℝ :=
   (1 - m.fstTransient) * m.ldRetention * m.mutErosion * m.migBoost
 
-/-! ### Step 3: Target R²(t)
+/-- Source signal variance recovered exactly from source `R²` and residual variance.
 
-R²_target = R²_source × ρ(t)
+    From `R² = V_signal / (V_signal + V_E)`, we obtain
+    `V_signal = V_E * R² / (1 - R²)`. -/
+noncomputable def PGSEvolutionaryModel.sourceSignalVariance (m : PGSEvolutionaryModel) : ℝ :=
+  m.V_E * (m.R2_source / (1 - m.R2_source))
 
-This is the central result: accuracy in the target population is the
-source accuracy attenuated by the evolutionary portability ratio.
+/-- Exact transported target signal variance from the evolutionary transport chain. -/
+noncomputable def PGSEvolutionaryModel.targetSignalVariance (m : PGSEvolutionaryModel) : ℝ :=
+  m.sourceSignalVariance * m.signalTransportFactor
 
-DERIVED from the Cauchy-Schwarz bound on cross-population covariance
-(TransferLearningPGS.lean) combined with the covariance divergence
-model (PortabilityDrift.lean).
+/-- The public portability ratio is the exact target/source signal-variance ratio. -/
+noncomputable def PGSEvolutionaryModel.portabilityRatio (m : PGSEvolutionaryModel) : ℝ :=
+  m.targetSignalVariance / m.sourceSignalVariance
+
+/-- Exact conversion from signal variance to deployed `R²` at fixed residual scale. -/
+noncomputable def PGSEvolutionaryModel.varianceToR2 (m : PGSEvolutionaryModel) (vSignal : ℝ) : ℝ :=
+  vSignal / (vSignal + m.V_E)
+
+/-- Source signal variance is strictly positive. -/
+theorem PGSEvolutionaryModel.sourceSignalVariance_pos (m : PGSEvolutionaryModel) :
+    0 < m.sourceSignalVariance := by
+  unfold sourceSignalVariance
+  have hden : 0 < 1 - m.R2_source := by linarith [m.R2_source_lt_one]
+  have hsnr_pos : 0 < m.R2_source / (1 - m.R2_source) := by
+    exact div_pos m.R2_source_pos hden
+  exact mul_pos m.V_E_pos hsnr_pos
+
+/-- Source signal variance is nonzero. -/
+theorem PGSEvolutionaryModel.sourceSignalVariance_ne (m : PGSEvolutionaryModel) :
+    m.sourceSignalVariance ≠ 0 := by
+  exact ne_of_gt m.sourceSignalVariance_pos
+
+/-- Exact recovery of the source `R²` from the source signal variance. -/
+theorem PGSEvolutionaryModel.sourceR2_eq_varianceToR2_sourceSignalVariance
+    (m : PGSEvolutionaryModel) :
+    m.varianceToR2 m.sourceSignalVariance = m.R2_source := by
+  unfold varianceToR2 sourceSignalVariance
+  have hVE_ne : m.V_E ≠ 0 := by exact ne_of_gt m.V_E_pos
+  have hden_ne : 1 - m.R2_source ≠ 0 := by linarith [m.R2_source_lt_one]
+  field_simp [hVE_ne, hden_ne]
+  ring
+
+/-- The derived portability ratio is exactly the evolutionary transport factor. -/
+theorem PGSEvolutionaryModel.portabilityRatio_eq_signalTransportFactor
+    (m : PGSEvolutionaryModel) :
+    m.portabilityRatio = m.signalTransportFactor := by
+  unfold portabilityRatio targetSignalVariance
+  field_simp [m.sourceSignalVariance_ne]
+
+/-- Transported target signal variance equals the portability ratio times source signal variance. -/
+theorem PGSEvolutionaryModel.targetSignalVariance_eq_portabilityRatio_mul_source
+    (m : PGSEvolutionaryModel) :
+    m.targetSignalVariance = m.portabilityRatio * m.sourceSignalVariance := by
+  rw [m.portabilityRatio_eq_signalTransportFactor]
+  unfold targetSignalVariance
+  ring
+
+/-- `v ↦ v/(v+V_E)` is monotone on nonnegative signal variances. -/
+theorem PGSEvolutionaryModel.varianceToR2_monotone
+    (m : PGSEvolutionaryModel) {x y : ℝ}
+    (hx : 0 ≤ x) (hxy : x ≤ y) :
+    m.varianceToR2 x ≤ m.varianceToR2 y := by
+  unfold varianceToR2
+  have hxden : 0 < x + m.V_E := by linarith [m.V_E_pos]
+  have hyden : 0 < y + m.V_E := by linarith [m.V_E_pos]
+  rw [div_le_div_iff₀ hxden hyden]
+  ring_nf
+  nlinarith [hxy, m.V_E_pos]
+
+/-- `v ↦ v/(v+V_E)` is strictly increasing on nonnegative signal variances. -/
+theorem PGSEvolutionaryModel.varianceToR2_strictMono
+    (m : PGSEvolutionaryModel) {x y : ℝ}
+    (hx : 0 ≤ x) (hxy : x < y) :
+    m.varianceToR2 x < m.varianceToR2 y := by
+  unfold varianceToR2
+  have hxden : 0 < x + m.V_E := by linarith [m.V_E_pos]
+  have hyden : 0 < y + m.V_E := by linarith [m.V_E_pos]
+  rw [div_lt_div_iff₀ hxden hyden]
+  ring_nf
+  nlinarith [hxy, m.V_E_pos]
+
+/-! ### Step 3: Exact target `R²(t)`
+
+The deployed `R²` is not defined by multiplying source `R²` by a scalar. We
+first transport signal variance, then apply the exact variance-to-`R²` map
+`v ↦ v / (v + V_E)`. This is the same exact mapping used elsewhere in the drift
+core; the present section now derives it directly inside the evolutionary block.
 -/
 
-/-- **Target R² as a function of evolutionary parameters.**
-    R²_target(t) = R²_source × portabilityRatio(t)
-
-    This is the core prediction: given a PGS with R² in the source population,
-    after t generations of divergence with mutation rate μ, migration rate m,
-    recombination rate r, and effective population size Ne, the R² in the
-    target population is exactly this quantity. -/
+/-- Exact target `R²` obtained from transported target signal variance. -/
 noncomputable def PGSEvolutionaryModel.R2_target (m : PGSEvolutionaryModel) : ℝ :=
-  m.R2_source * m.portabilityRatio
+  m.varianceToR2 m.targetSignalVariance
 
-/-- R²_target ≤ R²_source (portability ratio ≤ 1 at equilibrium). -/
-theorem PGSEvolutionaryModel.R2_target_le_source (m : PGSEvolutionaryModel)
-    (_h_forces : 0 < m.theta + m.bigM)
-    (h_ratio_le : m.portabilityRatio ≤ 1) :
-    m.R2_target ≤ m.R2_source := by
-  unfold R2_target
-  have := le_of_lt m.R2_source_pos
-  nlinarith
-
-/-- R²_target ≥ 0. -/
+/-- Target `R²` is nonnegative when the transported signal variance is nonnegative. -/
 theorem PGSEvolutionaryModel.R2_target_nonneg (m : PGSEvolutionaryModel)
-    (h_ratio : 0 ≤ m.portabilityRatio) :
+    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
     0 ≤ m.R2_target := by
+  have h_factor_nn : 0 ≤ m.signalTransportFactor := by
+    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
+  have h_target_nn : 0 ≤ m.targetSignalVariance := by
+    unfold targetSignalVariance
+    exact mul_nonneg (le_of_lt m.sourceSignalVariance_pos) h_factor_nn
   unfold R2_target
-  exact mul_nonneg (le_of_lt m.R2_source_pos) h_ratio
+  unfold varianceToR2
+  exact div_nonneg h_target_nn (by linarith [m.V_E_pos])
 
-/-! ### Step 4: Target AUC(t) via the liability threshold model
+/-- Exact target `R²` never exceeds source `R²` when transported signal retention is at most one. -/
+theorem PGSEvolutionaryModel.R2_target_le_source (m : PGSEvolutionaryModel)
+    (h_ratio_le : m.portabilityRatio ≤ 1)
+    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
+    m.R2_target ≤ m.R2_source := by
+  have h_factor_le : m.signalTransportFactor ≤ 1 := by
+    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_le
+  have h_factor_nn : 0 ≤ m.signalTransportFactor := by
+    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
+  have h_target_nn : 0 ≤ m.targetSignalVariance := by
+    unfold targetSignalVariance
+    exact mul_nonneg (le_of_lt m.sourceSignalVariance_pos) h_factor_nn
+  have h_target_le_source : m.targetSignalVariance ≤ m.sourceSignalVariance := by
+    unfold targetSignalVariance
+    nlinarith [m.sourceSignalVariance_pos]
+  calc
+    m.varianceToR2 m.targetSignalVariance ≤ m.varianceToR2 m.sourceSignalVariance :=
+      m.varianceToR2_monotone h_target_nn h_target_le_source
+    _ = m.R2_source := m.sourceR2_eq_varianceToR2_sourceSignalVariance
 
-For binary traits, the AUC (area under the ROC curve) is derived from
-the liability threshold model:
+/-- Exact strict target `R²` drop when retained target signal is strictly below source signal. -/
+theorem PGSEvolutionaryModel.R2_target_lt_source (m : PGSEvolutionaryModel)
+    (h_ratio_lt : m.portabilityRatio < 1)
+    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
+    m.R2_target < m.R2_source := by
+  have h_factor_lt : m.signalTransportFactor < 1 := by
+    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_lt
+  have h_factor_nn : 0 ≤ m.signalTransportFactor := by
+    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
+  have h_target_nn : 0 ≤ m.targetSignalVariance := by
+    unfold targetSignalVariance
+    exact mul_nonneg (le_of_lt m.sourceSignalVariance_pos) h_factor_nn
+  have h_target_lt_source : m.targetSignalVariance < m.sourceSignalVariance := by
+    unfold targetSignalVariance
+    nlinarith [m.sourceSignalVariance_pos]
+  calc
+    m.varianceToR2 m.targetSignalVariance < m.varianceToR2 m.sourceSignalVariance :=
+      m.varianceToR2_strictMono h_target_nn h_target_lt_source
+    _ = m.R2_source := m.sourceR2_eq_varianceToR2_sourceSignalVariance
 
-  Y_liability = G + E, disease when Y > T
+/-! ### Step 4: Exact target AUC(t) via transported signal variance
 
-The AUC = Φ(√(SNR/2)) where SNR = Var(G_predicted) / Var(E).
+For the equal-variance Gaussian liability model, the exact deployed AUC is
 
-DERIVED in ClinicalUtilityFairness.lean: sensitivity and specificity are
-monotone functions of R² through the normal CDF Φ (which is itself monotone).
-AUC integrates sensitivity over 1-specificity, giving Φ(√(SNR/2)).
+`AUC = Φ(√(Var(signal)/(2 V_E)))`.
+
+So after transporting the genetic signal variance through the evolutionary
+chain above, we plug that exact target variance directly into the AUC formula.
 -/
 
 /-- Phi is monotone increasing because it is the standard normal CDF. -/
@@ -6593,55 +7024,45 @@ theorem snrFromR2_strictMono : StrictMonoOn snrFromR2 (Set.Ico 0 1) := by
   rw [div_lt_div_iff₀ (by linarith : 0 < 1 - a) (by linarith : 0 < 1 - b)]
   nlinarith
 
-/-- **Target AUC from the liability threshold model.**
-    AUC(t) = Φ(√(SNR_target(t) / 2))
-
-    This is a FULLY evolutionary function: it takes the evolutionary model
-    and returns the AUC in the target population, with every intermediate
-    quantity derived from population genetics. -/
+/-- Exact target AUC from transported target signal variance. -/
 noncomputable def PGSEvolutionaryModel.AUC_target (m : PGSEvolutionaryModel) : ℝ :=
-  Phi (Real.sqrt (snrFromR2 m.R2_target / 2))
+  Phi (Real.sqrt (m.targetSignalVariance / (2 * m.V_E)))
 
-/-- **Source AUC** for comparison. -/
+/-- Exact source AUC from source signal variance. -/
 noncomputable def PGSEvolutionaryModel.AUC_source (m : PGSEvolutionaryModel) : ℝ :=
-  Phi (Real.sqrt (snrFromR2 m.R2_source / 2))
+  Phi (Real.sqrt (m.sourceSignalVariance / (2 * m.V_E)))
 
-/-- AUC_target ≤ AUC_source when portability ratio ≤ 1.
-    DERIVED: R²_target ≤ R²_source → SNR_target ≤ SNR_source → √(...) ≤ √(...)
-    → Φ(...) ≤ Φ(...) by monotonicity of Φ, √, SNR, and R². -/
+/-- Exact AUC degradation when transported signal retention is at most one. -/
 theorem PGSEvolutionaryModel.AUC_target_le_source (m : PGSEvolutionaryModel)
-    (h_forces : 0 < m.theta + m.bigM)
     (h_ratio_le : m.portabilityRatio ≤ 1)
     (h_ratio_nn : 0 ≤ m.portabilityRatio) :
     m.AUC_target ≤ m.AUC_source := by
   unfold AUC_target AUC_source
-  -- Monotonicity chain: R2 ≤ → SNR ≤ → √(·/2) ≤ → Φ(·) ≤
-  have h_r2_le := m.R2_target_le_source h_forces h_ratio_le
-  have h_r2_nn := m.R2_target_nonneg h_ratio_nn
-  have h_r2t_lt1 : m.R2_target < 1 := by
-    unfold R2_target; nlinarith [m.R2_source_lt_one, m.R2_source_pos]
-  -- Step 1: SNR monotone (a/(1-a) ≤ b/(1-b) when a ≤ b and both < 1)
-  have h_snr_le : snrFromR2 m.R2_target ≤ snrFromR2 m.R2_source := by
-    unfold snrFromR2
-    rw [div_le_div_iff₀ (by linarith : 0 < 1 - m.R2_target)
-      (by linarith [m.R2_source_lt_one] : 0 < 1 - m.R2_source)]
-    nlinarith
-  -- Step 2: √(SNR/2) monotone (√ is monotone, /2 preserves order)
-  have h_sqrt_le : Real.sqrt (snrFromR2 m.R2_target / 2) ≤
-      Real.sqrt (snrFromR2 m.R2_source / 2) :=
-    Real.sqrt_le_sqrt (by linarith)
-  -- Step 3: Φ is monotone
+  have h_factor_le : m.signalTransportFactor ≤ 1 := by
+    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_le
+  have h_factor_nn : 0 ≤ m.signalTransportFactor := by
+    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
+  have h_target_nn : 0 ≤ m.targetSignalVariance := by
+    unfold targetSignalVariance
+    exact mul_nonneg (le_of_lt m.sourceSignalVariance_pos) h_factor_nn
+  have h_target_le_source : m.targetSignalVariance ≤ m.sourceSignalVariance := by
+    unfold targetSignalVariance
+    nlinarith [m.sourceSignalVariance_pos]
+  have h_div_le :
+      m.targetSignalVariance / (2 * m.V_E) ≤ m.sourceSignalVariance / (2 * m.V_E) := by
+    have hden : 0 ≤ 2 * m.V_E := by linarith [m.V_E_pos]
+    exact div_le_div_of_nonneg_right h_target_le_source hden
+  have h_sqrt_le :
+      Real.sqrt (m.targetSignalVariance / (2 * m.V_E)) ≤
+        Real.sqrt (m.sourceSignalVariance / (2 * m.V_E)) := by
+    exact Real.sqrt_le_sqrt h_div_le
   exact Phi_monotone h_sqrt_le
 
-/-! ### Step 5: Target Brier score
+/-! ### Step 5: Exact target Brier risk
 
-Brier(t) = π(1-π)(1 - R²_target(t))
-
-where π is disease prevalence.
-
-DERIVED: Brier score = E[(Y - p̂)²]. For a calibrated predictor,
-Brier = Var(Y) - Var(p̂) = π(1-π) - π(1-π)R² = π(1-π)(1-R²).
-(Var(Y) = π(1-π) for a Bernoulli outcome.)
+For a calibrated Bernoulli predictor with prevalence `π` and explained-risk
+fraction `R²`, the exact population Brier risk is `π(1-π)(1-R²)`. We apply
+that exact closed form to the transported target `R²`.
 -/
 
 /-- **Target Brier score** as a function of evolutionary parameters.
@@ -6656,20 +7077,15 @@ noncomputable def PGSEvolutionaryModel.Brier_target (m : PGSEvolutionaryModel) :
 noncomputable def PGSEvolutionaryModel.Brier_source (m : PGSEvolutionaryModel) : ℝ :=
   m.prevalence * (1 - m.prevalence) * (1 - m.R2_source)
 
-/-- Brier_target ≥ Brier_source (target is worse) when portability ratio ≤ 1.
-    DERIVED: R²_target ≤ R²_source → (1 - R²_target) ≥ (1 - R²_source)
-    → π(1-π)(1 - R²_target) ≥ π(1-π)(1 - R²_source). -/
+/-- Exact target Brier degradation when transported signal retention is at most one. -/
 theorem PGSEvolutionaryModel.Brier_target_ge_source (m : PGSEvolutionaryModel)
-    (_h_forces : 0 < m.theta + m.bigM)
     (h_ratio_le : m.portabilityRatio ≤ 1)
-    (_h_ratio_nn : 0 ≤ m.portabilityRatio) :
+    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
     m.Brier_source ≤ m.Brier_target := by
-  unfold Brier_target Brier_source R2_target
+  have h_r2_le := m.R2_target_le_source h_ratio_le h_ratio_nn
+  unfold Brier_target Brier_source
   have h_prev : 0 < m.prevalence * (1 - m.prevalence) := by
     exact mul_pos m.prev_pos (by linarith [m.prev_lt_one])
-  have h_r2_pos := m.R2_source_pos
-  have h_rho_le := h_ratio_le
-  have h_prod_le : m.R2_source * m.portabilityRatio ≤ m.R2_source := by nlinarith
   nlinarith
 
 /-- Brier score is nonneg. -/
@@ -6833,27 +7249,31 @@ theorem nagelkerke_drops_faster_than_r2 (r2_target cal : ℝ)
 /-! ### Step 9: Complete end-to-end summary
 
 Given ONLY:
-  - Ne (effective population size)
-  - μ (mutation rate per generation)
-  - m (migration rate per generation)
-  - r (recombination rate)
-  - t (generations of divergence)
-  - R²_source (source population PGS accuracy)
-  - π (disease prevalence)
+  - `Ne` (effective population size)
+  - `μ` (mutation rate per generation)
+  - `m` (migration rate per generation)
+  - `r` (recombination rate)
+  - `t` (generations of divergence)
+  - `R²_source` (source population PGS accuracy)
+  - `V_E` (residual variance)
+  - `π` (disease prevalence)
 
-We can compute:
-  - R²_target(t) = R²_source × (1-Fst(t)) × exp(-2rt) × exp(-θτ) × (1+Mτ/(1+M))
-  - AUC_target(t) = Φ(√(R²_target/(2(1-R²_target))))
-  - Brier_target(t) = π(1-π)(1 - R²_target)
-  - Nagelkerke_target(t) = R²_target × cal(t)
+We compute exact transported signal variance first:
 
-With every component DERIVED from first principles:
-  - Fst(t) from Wright-Fisher heterozygosity recurrence with mutation
-  - LD retention from LD recurrence D(t+1) = (1-r)D(t)
-  - Mutation erosion from allele age distribution
-  - Migration boost from island model equilibrium
-  - SNR→AUC from liability threshold model + Φ monotonicity
-  - Brier from calibrated predictor MSE decomposition
+  `V_signal,target
+    = V_E * (R²_source / (1-R²_source))
+      * (1-Fst(t)) * exp(-2rt) * exp(-θτ) * (1+Mτ/(1+M))`
+
+and then exact deployed metrics:
+
+  - `R²_target(t) = V_signal,target / (V_signal,target + V_E)`
+  - `AUC_target(t) = Φ(√(V_signal,target / (2 V_E)))`
+  - `Brier_target(t) = π(1-π)(1 - R²_target(t))`
+  - `Nagelkerke_target(t) = R²_target(t) × cal(t)`
+
+Every component is therefore routed through the same transported
+population-genetic signal variance, rather than by reintroducing a scalar
+`R²` portability law as a definition.
 -/
 
 /-- **The complete model**: all three metrics computed from one structure. -/
@@ -6862,45 +7282,347 @@ noncomputable def PGSEvolutionaryModel.allMetrics (m : PGSEvolutionaryModel) :
   (m.R2_target, m.AUC_target, m.Brier_target)
 
 /-- **All metrics degrade together** when portability ratio < 1.
-    R² decreases, AUC decreases, Brier increases. -/
+    The exact target `R²` decreases, the exact target AUC does not improve,
+    and the exact target Brier risk increases. -/
 theorem PGSEvolutionaryModel.all_metrics_degrade (m : PGSEvolutionaryModel)
-    (_h_forces : 0 < m.theta + m.bigM)
-    (_h_ratio_le : m.portabilityRatio ≤ 1)
-    (_h_ratio_nn : 0 ≤ m.portabilityRatio)
+    (h_ratio_nn : 0 ≤ m.portabilityRatio)
     (h_ratio_lt : m.portabilityRatio < 1) :
     -- R² decreases
     m.R2_target < m.R2_source ∧
     -- Brier increases (worsens)
     m.Brier_source < m.Brier_target := by
   constructor
-  · -- R²_target = R²_source × ρ < R²_source × 1 = R²_source
-    unfold R2_target
-    have := m.R2_source_pos
-    nlinarith
+  · exact m.R2_target_lt_source h_ratio_lt h_ratio_nn
   · -- Brier_source < Brier_target follows from R²_target < R²_source
-    unfold Brier_target Brier_source R2_target
+    have h_r2_drop : m.R2_target < m.R2_source :=
+      m.R2_target_lt_source h_ratio_lt h_ratio_nn
+    unfold Brier_target Brier_source
     have h_prev : 0 < m.prevalence * (1 - m.prevalence) :=
       mul_pos m.prev_pos (by linarith [m.prev_lt_one])
-    have h_r2_pos := m.R2_source_pos
-    have h_prod_lt : m.R2_source * m.portabilityRatio < m.R2_source := by nlinarith
     nlinarith
 
-/-- **Explicit formula** expanding all definitions into a single expression.
-    R²_target = R²_source × (1 - Fst_eq × (1 - λ^⌊t⌋)) × exp(-2rt) × exp(-θτ) × (1 + Mτ/(1+M))
+/-- Exact end-to-end target `R²` formula from transported signal variance. -/
+theorem PGSEvolutionaryModel.R2_target_eq_transportFactor (m : PGSEvolutionaryModel) :
+    m.R2_target =
+      (m.R2_source * m.signalTransportFactor) /
+        (1 - m.R2_source + m.R2_source * m.signalTransportFactor) := by
+  unfold R2_target varianceToR2 targetSignalVariance sourceSignalVariance signalTransportFactor
+  have hVE_ne : m.V_E ≠ 0 := by exact ne_of_gt m.V_E_pos
+  have hden_ne : 1 - m.R2_source ≠ 0 := by linarith [m.R2_source_lt_one]
+  field_simp [hVE_ne, hden_ne]
+  ring_nf
 
-    This is the FULLY EXPLICIT end-to-end formula connecting population genetics
-    to predictive accuracy. -/
+/-- Exact end-to-end target `R²` formula with all evolutionary components expanded. -/
 theorem PGSEvolutionaryModel.R2_target_explicit (m : PGSEvolutionaryModel) :
     m.R2_target =
-      m.R2_source *
-      ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
-       Real.exp (-2 * m.recomb * m.t_div) *
-       Real.exp (-m.theta * m.tau) *
-       (1 + m.bigM * m.tau / (1 + m.bigM))) := by
-  unfold R2_target portabilityRatio fstTransient ldRetention mutErosion migBoost
-  unfold sharedLDRetention mutationLDErosion migrationLDBoost fstEquilibrium
-  unfold toEvo toEvolutionaryParameters
-  simp only [EvolutionaryParameters.theta, EvolutionaryParameters.bigM, EvolutionaryParameters.tau]
+      (m.R2_source *
+          ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
+           Real.exp (-2 * m.recomb * m.t_div) *
+           Real.exp (-m.theta * m.tau) *
+           (1 + m.bigM * m.tau / (1 + m.bigM)))) /
+        (1 - m.R2_source +
+          m.R2_source *
+            ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
+           Real.exp (-2 * m.recomb * m.t_div) *
+             Real.exp (-m.theta * m.tau) *
+             (1 + m.bigM * m.tau / (1 + m.bigM)))) := by
+  simpa [PGSEvolutionaryModel.signalTransportFactor, PGSEvolutionaryModel.fstTransient,
+    PGSEvolutionaryModel.ldRetention, PGSEvolutionaryModel.mutErosion,
+    PGSEvolutionaryModel.migBoost, PGSEvolutionaryModel.toEvo,
+    sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium] using
+    m.R2_target_eq_transportFactor
+
+/-- Exact end-to-end target AUC from transported signal variance. -/
+theorem PGSEvolutionaryModel.AUC_target_eq_transportFactor (m : PGSEvolutionaryModel) :
+    m.AUC_target =
+      Phi
+        (Real.sqrt
+          ((m.R2_source * m.signalTransportFactor) / (2 * (1 - m.R2_source)))) := by
+  unfold AUC_target targetSignalVariance sourceSignalVariance signalTransportFactor
+  have hVE_ne : m.V_E ≠ 0 := by exact ne_of_gt m.V_E_pos
+  have hden_ne : 1 - m.R2_source ≠ 0 := by linarith [m.R2_source_lt_one]
+  congr 1
+  congr 1
+  field_simp [hVE_ne, hden_ne]
+
+/-- Exact end-to-end target AUC with all evolutionary components expanded. -/
+theorem PGSEvolutionaryModel.AUC_target_explicit (m : PGSEvolutionaryModel) :
+    m.AUC_target =
+      Phi
+        (Real.sqrt
+          ((m.R2_source *
+              ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
+               Real.exp (-2 * m.recomb * m.t_div) *
+               Real.exp (-m.theta * m.tau) *
+               (1 + m.bigM * m.tau / (1 + m.bigM)))) /
+            (2 * (1 - m.R2_source)))) := by
+  simpa [PGSEvolutionaryModel.signalTransportFactor, PGSEvolutionaryModel.fstTransient,
+    PGSEvolutionaryModel.ldRetention, PGSEvolutionaryModel.mutErosion,
+    PGSEvolutionaryModel.migBoost, PGSEvolutionaryModel.toEvo,
+    sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium] using
+    m.AUC_target_eq_transportFactor
+
+/-- Exact end-to-end target Brier risk from transported signal variance. -/
+theorem PGSEvolutionaryModel.Brier_target_explicit (m : PGSEvolutionaryModel) :
+    m.Brier_target =
+      m.prevalence * (1 - m.prevalence) *
+        (1 -
+          (m.R2_source *
+              ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
+               Real.exp (-2 * m.recomb * m.t_div) *
+               Real.exp (-m.theta * m.tau) *
+               (1 + m.bigM * m.tau / (1 + m.bigM)))) /
+            (1 - m.R2_source +
+              m.R2_source *
+                ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
+                 Real.exp (-2 * m.recomb * m.t_div) *
+                 Real.exp (-m.theta * m.tau) *
+                 (1 + m.bigM * m.tau / (1 + m.bigM))))) := by
+  unfold Brier_target
+  rw [m.R2_target_explicit]
+
+/-! ### Step 10: Exact inverse theorems from deployed metrics
+
+The forward map from evolutionary parameters to deployed metrics is only
+scientifically useful if part of it can be inverted. The exact transport block
+above identifies the transported signal factor from observable source/target
+`R²`, and therefore from exact Brier risks as well. What remains
+underidentified is the decomposition of that factor into its separate
+evolutionary components unless extra side information is supplied.
+-/
+
+/-- Exact transported-signal factor recovered from source/target `R²`. -/
+noncomputable def transportFactorFromR2Pair (r2Source r2Target : ℝ) : ℝ :=
+  r2Target * (1 - r2Source) / (r2Source * (1 - r2Target))
+
+/-- Exact deployed `R²` is always strictly below `1` when target signal variance is nonnegative. -/
+theorem PGSEvolutionaryModel.R2_target_lt_one (m : PGSEvolutionaryModel)
+    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
+    m.R2_target < 1 := by
+  have h_factor_nn : 0 ≤ m.signalTransportFactor := by
+    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
+  have h_target_nn : 0 ≤ m.targetSignalVariance := by
+    unfold targetSignalVariance
+    exact mul_nonneg (le_of_lt m.sourceSignalVariance_pos) h_factor_nn
+  unfold R2_target varianceToR2
+  have hden : 0 < m.targetSignalVariance + m.V_E := by
+    linarith [h_target_nn, m.V_E_pos]
+  rw [div_lt_one hden]
+  linarith [m.V_E_pos]
+
+/-- Exact inverse theorem: the transported signal factor is identified by the source/target
+`R²` pair. -/
+theorem PGSEvolutionaryModel.signalTransportFactor_eq_transportFactorFromR2Pair
+    (m : PGSEvolutionaryModel)
+    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
+    transportFactorFromR2Pair m.R2_source m.R2_target = m.signalTransportFactor := by
+  unfold transportFactorFromR2Pair
+  rw [m.R2_target_eq_transportFactor]
+  have hsrc_ne : m.R2_source ≠ 0 := by linarith [m.R2_source_pos]
+  have hsrc1_ne : 1 - m.R2_source ≠ 0 := by linarith [m.R2_source_lt_one]
+  have hfac_nn : 0 ≤ m.signalTransportFactor := by
+    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
+  have hmix_pos : 0 < 1 - m.R2_source + m.R2_source * m.signalTransportFactor := by
+    nlinarith [m.R2_source_lt_one, m.R2_source_pos]
+  have hmix_ne : 1 - m.R2_source + m.R2_source * m.signalTransportFactor ≠ 0 := by
+    linarith
+  field_simp [hsrc_ne, hsrc1_ne, hmix_ne]
+  ring_nf
+
+/-- The observable portability ratio computed from source/target `R²` is exactly the
+derived target/source transported-signal ratio. -/
+theorem PGSEvolutionaryModel.portabilityRatio_eq_transportFactorFromR2Pair
+    (m : PGSEvolutionaryModel)
+    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
+    transportFactorFromR2Pair m.R2_source m.R2_target = m.portabilityRatio := by
+  rw [m.portabilityRatio_eq_signalTransportFactor]
+  exact m.signalTransportFactor_eq_transportFactorFromR2Pair h_ratio_nn
+
+/-- Exact inverse from calibrated Brier risk to `R²`. -/
+noncomputable def r2FromBrier (π brier : ℝ) : ℝ :=
+  1 - brier / (π * (1 - π))
+
+/-- Source `R²` is exactly recovered from the source calibrated Brier risk. -/
+theorem PGSEvolutionaryModel.r2FromBrier_source (m : PGSEvolutionaryModel) :
+    r2FromBrier m.prevalence m.Brier_source = m.R2_source := by
+  have hprev_ne : m.prevalence * (1 - m.prevalence) ≠ 0 := by
+    have hprev_pos : 0 < m.prevalence * (1 - m.prevalence) := by
+      exact mul_pos m.prev_pos (by linarith [m.prev_lt_one])
+    linarith
+  have hdiv : m.Brier_source / (m.prevalence * (1 - m.prevalence)) = 1 - m.R2_source := by
+    unfold Brier_source
+    rw [div_eq_mul_inv]
+    calc
+      (m.prevalence * (1 - m.prevalence) * (1 - m.R2_source)) *
+          (m.prevalence * (1 - m.prevalence))⁻¹
+        = (1 - m.R2_source) *
+            ((m.prevalence * (1 - m.prevalence)) *
+              (m.prevalence * (1 - m.prevalence))⁻¹) := by
+              ring
+      _ = 1 - m.R2_source := by
+        rw [mul_inv_cancel₀ hprev_ne, mul_one]
+  unfold r2FromBrier
+  rw [hdiv]
+  ring_nf
+
+/-- Target `R²` is exactly recovered from the target calibrated Brier risk. -/
+theorem PGSEvolutionaryModel.r2FromBrier_target (m : PGSEvolutionaryModel) :
+    r2FromBrier m.prevalence m.Brier_target = m.R2_target := by
+  have hprev_ne : m.prevalence * (1 - m.prevalence) ≠ 0 := by
+    have hprev_pos : 0 < m.prevalence * (1 - m.prevalence) := by
+      exact mul_pos m.prev_pos (by linarith [m.prev_lt_one])
+    linarith
+  have hdiv : m.Brier_target / (m.prevalence * (1 - m.prevalence)) = 1 - m.R2_target := by
+    unfold Brier_target
+    rw [div_eq_mul_inv]
+    calc
+      (m.prevalence * (1 - m.prevalence) * (1 - m.R2_target)) *
+          (m.prevalence * (1 - m.prevalence))⁻¹
+        = (1 - m.R2_target) *
+            ((m.prevalence * (1 - m.prevalence)) *
+              (m.prevalence * (1 - m.prevalence))⁻¹) := by
+              ring
+      _ = 1 - m.R2_target := by
+        rw [mul_inv_cancel₀ hprev_ne, mul_one]
+  unfold r2FromBrier
+  rw [hdiv]
+  ring_nf
+
+/-- Exact transported-signal factor recovered from source/target Brier risks. -/
+noncomputable def transportFactorFromBrierPair (π brierSource brierTarget : ℝ) : ℝ :=
+  transportFactorFromR2Pair (r2FromBrier π brierSource) (r2FromBrier π brierTarget)
+
+/-- Exact inverse theorem: the transported signal factor is identified by the source/target
+Brier pair when prevalence is known. -/
+theorem PGSEvolutionaryModel.signalTransportFactor_eq_transportFactorFromBrierPair
+    (m : PGSEvolutionaryModel)
+    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
+    transportFactorFromBrierPair m.prevalence m.Brier_source m.Brier_target =
+      m.signalTransportFactor := by
+  unfold transportFactorFromBrierPair
+  rw [m.r2FromBrier_source, m.r2FromBrier_target]
+  exact m.signalTransportFactor_eq_transportFactorFromR2Pair h_ratio_nn
+
+/-- Recovery of the allele-frequency retention factor from the observable transport factor
+and the other three evolutionary components. -/
+theorem PGSEvolutionaryModel.alleleFreqRetention_eq_from_transportFactor
+    (m : PGSEvolutionaryModel)
+    (h_other_ne : m.ldRetention * m.mutErosion * m.migBoost ≠ 0) :
+    1 - m.fstTransient =
+      m.signalTransportFactor / (m.ldRetention * m.mutErosion * m.migBoost) := by
+  have hld_ne : m.ldRetention ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  have hmut_ne : m.mutErosion ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  have hmig_ne : m.migBoost ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  unfold signalTransportFactor
+  field_simp [hld_ne, hmut_ne, hmig_ne]
+
+/-- Recovery of LD retention from the observable transport factor and the other
+three evolutionary components. -/
+theorem PGSEvolutionaryModel.ldRetention_eq_from_transportFactor
+    (m : PGSEvolutionaryModel)
+    (h_other_ne : (1 - m.fstTransient) * m.mutErosion * m.migBoost ≠ 0) :
+    m.ldRetention =
+      m.signalTransportFactor / ((1 - m.fstTransient) * m.mutErosion * m.migBoost) := by
+  have hfst_ne : 1 - m.fstTransient ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  have hmut_ne : m.mutErosion ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  have hmig_ne : m.migBoost ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  unfold signalTransportFactor
+  field_simp [hfst_ne, hmut_ne, hmig_ne]
+
+/-- Recovery of mutation erosion from the observable transport factor and the other
+three evolutionary components. -/
+theorem PGSEvolutionaryModel.mutErosion_eq_from_transportFactor
+    (m : PGSEvolutionaryModel)
+    (h_other_ne : (1 - m.fstTransient) * m.ldRetention * m.migBoost ≠ 0) :
+    m.mutErosion =
+      m.signalTransportFactor / ((1 - m.fstTransient) * m.ldRetention * m.migBoost) := by
+  have hfst_ne : 1 - m.fstTransient ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  have hld_ne : m.ldRetention ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  have hmig_ne : m.migBoost ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  unfold signalTransportFactor
+  field_simp [hfst_ne, hld_ne, hmig_ne]
+
+/-- Recovery of the migration boost factor from the observable transport factor and the other
+three evolutionary components. -/
+theorem PGSEvolutionaryModel.migBoost_eq_from_transportFactor
+    (m : PGSEvolutionaryModel)
+    (h_other_ne : (1 - m.fstTransient) * m.ldRetention * m.mutErosion ≠ 0) :
+    m.migBoost =
+      m.signalTransportFactor / ((1 - m.fstTransient) * m.ldRetention * m.mutErosion) := by
+  have hfst_ne : 1 - m.fstTransient ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  have hld_ne : m.ldRetention ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  have hmut_ne : m.mutErosion ≠ 0 := by
+    intro h
+    apply h_other_ne
+    simp [h]
+  unfold signalTransportFactor
+  field_simp [hfst_ne, hld_ne, hmut_ne]
+
+/-- Observable source/target `R²` plus three of the four evolutionary factors identify the
+remaining allele-frequency retention factor exactly. -/
+theorem PGSEvolutionaryModel.alleleFreqRetention_eq_from_R2_pair_and_other_factors
+    (m : PGSEvolutionaryModel)
+    (h_ratio_nn : 0 ≤ m.portabilityRatio)
+    (h_other_ne : m.ldRetention * m.mutErosion * m.migBoost ≠ 0) :
+    1 - m.fstTransient =
+      transportFactorFromR2Pair m.R2_source m.R2_target /
+        (m.ldRetention * m.mutErosion * m.migBoost) := by
+  rw [m.signalTransportFactor_eq_transportFactorFromR2Pair h_ratio_nn]
+  exact m.alleleFreqRetention_eq_from_transportFactor h_other_ne
+
+/-- The exact deployed metric triple depends on the evolutionary tuple only through
+`R²_source`, prevalence, and the transported signal factor. This is the precise
+underidentification statement for the full parameter tuple: without extra side
+information, the deployed metrics cannot distinguish models that share those
+observable quantities. -/
+theorem PGSEvolutionaryModel.allMetrics_eq_of_same_observableContext_and_transportFactor
+    (m₁ m₂ : PGSEvolutionaryModel)
+    (h_r2 : m₁.R2_source = m₂.R2_source)
+    (h_prev : m₁.prevalence = m₂.prevalence)
+    (h_transport : m₁.signalTransportFactor = m₂.signalTransportFactor) :
+    m₁.allMetrics = m₂.allMetrics := by
+  unfold PGSEvolutionaryModel.allMetrics
+  have hR2 : m₁.R2_target = m₂.R2_target := by
+    rw [m₁.R2_target_eq_transportFactor, m₂.R2_target_eq_transportFactor, h_r2, h_transport]
+  have hAUC : m₁.AUC_target = m₂.AUC_target := by
+    rw [m₁.AUC_target_eq_transportFactor, m₂.AUC_target_eq_transportFactor, h_r2, h_transport]
+  have hBrier : m₁.Brier_target = m₂.Brier_target := by
+    unfold PGSEvolutionaryModel.Brier_target
+    rw [h_prev, hR2]
+  simp [hR2, hAUC, hBrier]
 
 end EndToEndMetrics
 

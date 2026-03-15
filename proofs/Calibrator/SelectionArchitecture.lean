@@ -289,6 +289,156 @@ theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
   have h_exp_lt := Real.exp_lt_exp.mpr h_exp_lt_log
   simpa [Real.exp_log h_rho_pos] using h_exp_lt
 
+/-- Recover the stabilizing `Ns` parameter from an observed cross-population
+    effect correlation. -/
+noncomputable def stabilizingNsFromObservedCorrelation (rho : ℝ) : ℝ :=
+  1 / (2 * (1 - rho))
+
+/-- The inverse map for the stabilizing effect-correlation formula is exact on
+    the biologically relevant region `ρ < 1`. -/
+theorem effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs
+    (rho : ℝ) (h_rho_lt : rho < 1) :
+    effectCorrelationStabilizing (stabilizingNsFromObservedCorrelation rho) = rho := by
+  unfold effectCorrelationStabilizing stabilizingNsFromObservedCorrelation
+  have h_one_minus_ne : 1 - rho ≠ 0 := by linarith
+  field_simp [h_one_minus_ne]
+  ring
+
+/-- Recover the fluctuating-selection autocorrelation time `τ` from an observed
+    cross-population effect correlation measured at divergence time `t`. -/
+noncomputable def tauFromObservedEffectCorrelation (t rho : ℝ) : ℝ :=
+  -t / Real.log rho
+
+/-- The recovered OU autocorrelation time is positive for a genuine observed
+    effect correlation in `(0, 1)`. -/
+theorem tauFromObservedEffectCorrelation_pos
+    (t rho : ℝ)
+    (h_t : 0 < t) (h_rho : 0 < rho) (h_rho_lt : rho < 1) :
+    0 < tauFromObservedEffectCorrelation t rho := by
+  have h_log_neg : Real.log rho < 0 := by
+    have h_log_lt : Real.log rho < Real.log 1 := by
+      exact Real.log_lt_log h_rho h_rho_lt
+    simpa using h_log_lt
+  unfold tauFromObservedEffectCorrelation
+  exact div_pos_of_neg_of_neg (by linarith) h_log_neg
+
+/-- The inverse map for the fluctuating-selection effect-correlation formula is
+    exact on the biologically relevant region `ρ ∈ (0, 1)`. -/
+theorem fluctuatingEffectCorrelation_eq_observedCorrelation_of_recoveredTau
+    (t rho : ℝ)
+    (h_t : 0 < t) (h_rho : 0 < rho) (h_rho_lt : rho < 1) :
+    fluctuatingEffectCorrelation t (tauFromObservedEffectCorrelation t rho) = rho := by
+  have h_t_ne : t ≠ 0 := ne_of_gt h_t
+  have h_log_neg : Real.log rho < 0 := by
+    have h_log_lt : Real.log rho < Real.log 1 := by
+      exact Real.log_lt_log h_rho h_rho_lt
+    simpa using h_log_lt
+  have h_log_ne : Real.log rho ≠ 0 := ne_of_lt h_log_neg
+  unfold fluctuatingEffectCorrelation tauFromObservedEffectCorrelation
+  have h_ratio : -t / (-t / Real.log rho) = Real.log rho := by
+    field_simp [h_t_ne, h_log_ne]
+  rw [h_ratio, Real.exp_log h_rho]
+
+/-- Recover the fluctuating-selection optimum-diffusion scale `σ_θ` from an
+    observed selected-architecture variance once the fluctuation time scale has
+    been recovered from the effect correlation. -/
+noncomputable def sigmaThetaFromObservedSelectedVariance
+    (v_selected v_mutation s t rho : ℝ) : ℝ :=
+  Real.sqrt
+    (2 * (v_selected - stabilizingSelectedArchitectureVariance v_mutation s) /
+      tauFromObservedEffectCorrelation t rho)
+
+/-- The recovered optimum-diffusion scale is positive whenever the observed
+    selected-architecture variance strictly exceeds the stabilizing baseline. -/
+theorem sigmaThetaFromObservedSelectedVariance_pos
+    (v_selected v_mutation s t rho : ℝ)
+    (h_t : 0 < t) (h_rho : 0 < rho) (h_rho_lt : rho < 1)
+    (h_var_gap : stabilizingSelectedArchitectureVariance v_mutation s < v_selected) :
+    0 < sigmaThetaFromObservedSelectedVariance v_selected v_mutation s t rho := by
+  have h_tau_pos : 0 < tauFromObservedEffectCorrelation t rho :=
+    tauFromObservedEffectCorrelation_pos t rho h_t h_rho h_rho_lt
+  unfold sigmaThetaFromObservedSelectedVariance
+  apply Real.sqrt_pos.mpr
+  apply div_pos
+  · nlinarith
+  · exact h_tau_pos
+
+/-- The inverse map for the fluctuating selected-architecture variance is exact
+    once the observed effect correlation and observed selected variance are
+    plugged into the recovered OU parameters. -/
+theorem fluctuatingSelectedArchitectureVariance_eq_observed_of_recoveredSigmaTheta
+    (v_selected v_mutation s t rho : ℝ)
+    (h_t : 0 < t) (h_rho : 0 < rho) (h_rho_lt : rho < 1)
+    (h_var_gap : stabilizingSelectedArchitectureVariance v_mutation s < v_selected) :
+    fluctuatingSelectedArchitectureVariance v_mutation s
+        (sigmaThetaFromObservedSelectedVariance v_selected v_mutation s t rho)
+        (tauFromObservedEffectCorrelation t rho) =
+      v_selected := by
+  have h_tau_pos : 0 < tauFromObservedEffectCorrelation t rho :=
+    tauFromObservedEffectCorrelation_pos t rho h_t h_rho h_rho_lt
+  have h_arg_nonneg :
+      0 ≤
+        2 * (v_selected - stabilizingSelectedArchitectureVariance v_mutation s) /
+          tauFromObservedEffectCorrelation t rho := by
+    apply div_nonneg
+    · nlinarith
+    · exact le_of_lt h_tau_pos
+  unfold fluctuatingSelectedArchitectureVariance optimumOUVariance
+    sigmaThetaFromObservedSelectedVariance
+  rw [Real.sq_sqrt h_arg_nonneg]
+  field_simp [ne_of_gt h_tau_pos]
+  unfold stabilizingSelectedArchitectureVariance
+  ring_nf
+
+/-- **Observed summary statistics identify a fluctuating regime and exclude all
+    stabilizing regimes.**
+
+    If an observed trait-level summary exhibits:
+    1. a cross-population effect correlation `ρ_obs` strictly between `0` and `1`,
+       and
+    2. a selected-architecture variance strictly above the stabilizing
+       mutation-selection baseline,
+
+    then there is an exact fluctuating-selection regime matching both observed
+    summaries, obtained by recovering `τ` from `ρ_obs` and `σ_θ` from the
+    selected-variance excess. At the same time, no stabilizing regime can match
+    the same joint summary, because under stabilizing selection the selected
+    variance is fixed at the baseline `v_mutation / s` independently of `Ns`. -/
+theorem observedSelectionSummary_identifies_fluctuating_not_stabilizing
+    (v_mutation s t rho_obs v_selected_obs : ℝ)
+    (h_t : 0 < t)
+    (h_rho : 0 < rho_obs) (h_rho_lt : rho_obs < 1)
+    (h_var_gap : stabilizingSelectedArchitectureVariance v_mutation s < v_selected_obs) :
+    let tau_hat := tauFromObservedEffectCorrelation t rho_obs
+    let sigma_hat :=
+      sigmaThetaFromObservedSelectedVariance v_selected_obs v_mutation s t rho_obs
+    (0 < tau_hat ∧
+      0 < sigma_hat ∧
+      fluctuatingEffectCorrelation t tau_hat = rho_obs ∧
+      fluctuatingSelectedArchitectureVariance v_mutation s sigma_hat tau_hat =
+        v_selected_obs) ∧
+    ¬ ∃ Ns,
+        effectCorrelationStabilizing Ns = rho_obs ∧
+          stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
+  dsimp
+  have h_tau_pos : 0 < tauFromObservedEffectCorrelation t rho_obs :=
+    tauFromObservedEffectCorrelation_pos t rho_obs h_t h_rho h_rho_lt
+  have h_sigma_pos :
+      0 <
+        sigmaThetaFromObservedSelectedVariance
+          v_selected_obs v_mutation s t rho_obs :=
+    sigmaThetaFromObservedSelectedVariance_pos
+      v_selected_obs v_mutation s t rho_obs h_t h_rho h_rho_lt h_var_gap
+  constructor
+  · exact ⟨h_tau_pos, h_sigma_pos,
+      fluctuatingEffectCorrelation_eq_observedCorrelation_of_recoveredTau
+        t rho_obs h_t h_rho h_rho_lt,
+      fluctuatingSelectedArchitectureVariance_eq_observed_of_recoveredSigmaTheta
+        v_selected_obs v_mutation s t rho_obs h_t h_rho h_rho_lt h_var_gap⟩
+  · intro h_stab
+    rcases h_stab with ⟨Ns, _, h_var_eq⟩
+    linarith
+
 /-- **Balancing selection maintains intermediate allele frequencies.**
     Under balancing selection (e.g., heterozygote advantage in HLA),
     allele frequencies are maintained near 0.5 → high heterozygosity.
