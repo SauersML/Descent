@@ -2962,6 +2962,689 @@ lemma fit_in_model_class {p k sp n : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [F
   unfold fit unpackParams
   constructor <;> rfl
 
+/-- Generic existence theorem for penalized Gaussian objectives on a finite parameter space.
+    Full column rank of the design matrix makes the least-squares term coercive, so the
+    minimum exists even when the penalty is only nonnegative, not strictly coercive. -/
+lemma gaussianPenalizedLoss_exists_min_of_full_rank
+    {ι : Type*} {n : ℕ} [Fintype (Fin n)] [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (X : Matrix (Fin n) ι ℝ) (y : Fin n → ℝ) (S : Matrix ι ι ℝ) (lam : ℝ)
+    (h_n_pos : n > 0)
+    (h_lambda_nonneg : 0 ≤ lam)
+    (h_rank : Matrix.rank X = Fintype.card ι)
+    (h_pen_nonneg :
+      ∀ β : ι → ℝ, 0 ≤ lam * Finset.univ.sum (fun i => β i * (S.mulVec β) i)) :
+    ∃ βmin : ι → ℝ,
+      ∀ β : ι → ℝ, gaussianPenalizedLoss X y S lam βmin ≤ gaussianPenalizedLoss X y S lam β := by
+  let L : (ι → ℝ) → ℝ := fun β => gaussianPenalizedLoss X y S lam β
+  have h_cont : Continuous L := by
+    unfold L gaussianPenalizedLoss l2norm_sq
+    simpa using (by
+      fun_prop
+        : Continuous
+            (fun β : ι → ℝ =>
+              (1 / n) * Finset.univ.sum (fun i => (y i - X.mulVec β i) ^ 2) +
+                lam * Finset.univ.sum (fun i => β i * (S.mulVec β) i)))
+  have h_posdef : ∀ v : ι → ℝ, v ≠ 0 →
+      0 < dotProduct' ((Matrix.transpose X * X).mulVec v) v := by
+    exact transpose_mul_self_posDef X h_rank
+  have h_lam_pos : 0 < (1 / (2 * (n : ℝ))) := by
+    have hn : (0 : ℝ) < (n : ℝ) := by exact_mod_cast h_n_pos
+    have h2n : (0 : ℝ) < (2 : ℝ) * (n : ℝ) := by nlinarith
+    have hpos : 0 < (1 : ℝ) / (2 * (n : ℝ)) := by
+      exact one_div_pos.mpr h2n
+    simpa using hpos
+  have h_Q_tendsto :
+      Filter.Tendsto
+        (fun β => (1 / (2 * (n : ℝ))) *
+          Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i))
+        (Filter.cocompact _) Filter.atTop := by
+    simpa [dotProduct'] using
+      (penalty_quadratic_tendsto_proof
+        (S := (Matrix.transpose X * X))
+        (lam := (1 / (2 * (n : ℝ))))
+        (hlam := h_lam_pos)
+        (hS_posDef := h_posdef))
+  have h_coercive : Filter.Tendsto L (Filter.cocompact _) Filter.atTop := by
+    have h_lower : ∀ β, L β ≥
+        (1 / (2 * (n : ℝ))) *
+          Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i) -
+          (1 / (n : ℝ)) * l2norm_sq y := by
+      intro β
+      unfold L gaussianPenalizedLoss l2norm_sq
+      have h_term :
+          ∀ i, (y i - X.mulVec β i) ^ 2 ≥
+            (1 / (2 : ℝ)) * (X.mulVec β i) ^ 2 - (y i) ^ 2 := by
+        intro i
+        have h_sq : 0 ≤ (2 * y i - X.mulVec β i) ^ 2 := by
+          nlinarith
+        have h_id :
+            (1 / (2 : ℝ)) * (2 * y i - X.mulVec β i) ^ 2 =
+              (y i - X.mulVec β i) ^ 2 + (y i) ^ 2 -
+                (1 / (2 : ℝ)) * (X.mulVec β i) ^ 2 := by
+          ring
+        nlinarith [h_sq, h_id]
+      have h_sum :
+          Finset.univ.sum (fun i => (y i - X.mulVec β i) ^ 2) ≥
+            (1 / (2 : ℝ)) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
+              Finset.univ.sum (fun i => (y i) ^ 2) := by
+        calc
+          Finset.univ.sum (fun i => (y i - X.mulVec β i) ^ 2)
+              ≥ Finset.univ.sum (fun i =>
+                  (1 / (2 : ℝ)) * (X.mulVec β i) ^ 2 - (y i) ^ 2) := by
+                    refine Finset.sum_le_sum ?_
+                    intro i _
+                    exact h_term i
+          _ = (1 / (2 : ℝ)) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
+                Finset.univ.sum (fun i => (y i) ^ 2) := by
+                  simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg]
+      have h_scale :
+          (1 / (n : ℝ)) * Finset.univ.sum (fun i => (y i - X.mulVec β i) ^ 2)
+            ≥ (1 / (2 * (n : ℝ))) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
+              (1 / (n : ℝ)) * Finset.univ.sum (fun i => (y i) ^ 2) := by
+        have hn : (0 : ℝ) ≤ (1 / (n : ℝ)) := by
+          have hn' : (0 : ℝ) < (n : ℝ) := by exact_mod_cast h_n_pos
+          exact le_of_lt (one_div_pos.mpr hn')
+        have h' := mul_le_mul_of_nonneg_left h_sum hn
+        simpa [mul_sub, mul_add, mul_assoc, mul_left_comm, mul_comm] using h'
+      have h_XtX :
+          Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) =
+            Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i) := by
+        have h_left :
+            Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) =
+              dotProduct (X.mulVec β) (X.mulVec β) := by
+          simp [dotProduct, pow_two]
+        have h_right :
+            Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i) =
+              dotProduct β ((Matrix.transpose X * X).mulVec β) := by
+          simp [dotProduct]
+        have h_eq :
+            dotProduct β ((Matrix.transpose X * X).mulVec β) =
+              dotProduct (X.mulVec β) (X.mulVec β) := by
+          calc
+            dotProduct β ((Matrix.transpose X * X).mulVec β)
+                = dotProduct β ((Matrix.transpose X).mulVec (X.mulVec β)) := by
+                    simp [Matrix.mulVec_mulVec]
+            _ = dotProduct (Matrix.vecMul β (Matrix.transpose X)) (X.mulVec β) := by
+                    simp [Matrix.dotProduct_mulVec]
+            _ = dotProduct (X.mulVec β) (X.mulVec β) := by
+                    simp [Matrix.vecMul_transpose]
+        simpa [h_left, h_right] using h_eq.symm
+      have h_pen := h_pen_nonneg β
+      have hL1 :
+          (1 / (n : ℝ)) * Finset.univ.sum (fun i => (y i - X.mulVec β i) ^ 2) +
+            lam * Finset.univ.sum (fun i => β i * (S.mulVec β) i) ≥
+            (1 / (2 * (n : ℝ))) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
+              (1 / (n : ℝ)) * Finset.univ.sum (fun i => (y i) ^ 2) := by
+        have h1 :
+            (1 / (n : ℝ)) * Finset.univ.sum (fun i => (y i - X.mulVec β i) ^ 2) +
+              lam * Finset.univ.sum (fun i => β i * (S.mulVec β) i) ≥
+              (1 / (n : ℝ)) * Finset.univ.sum (fun i => (y i - X.mulVec β i) ^ 2) := by
+          linarith
+        exact le_trans h_scale h1
+      simpa [h_XtX] using hL1
+    refine (Filter.tendsto_atTop.2 ?_)
+    intro M
+    have hM :
+        ∀ᶠ β in Filter.cocompact _, M + (1 / (n : ℝ)) * l2norm_sq y ≤
+          (1 / (2 * (n : ℝ))) *
+            Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i) :=
+      (Filter.tendsto_atTop.1 h_Q_tendsto) (M + (1 / (n : ℝ)) * l2norm_sq y)
+    exact hM.mono (by
+      intro β hβ
+      have hL := h_lower β
+      linarith)
+  exact Continuous.exists_forall_le (β := ι → ℝ) (α := ℝ) h_cont h_coercive
+
+/-- Raw-score finite-sample parameter index: intercept plus PGS coefficients only. -/
+abbrev RawParamIx (p : ℕ) := Unit ⊕ Fin p
+
+/-- Raw-score parameter vector. -/
+abbrev RawParamVec (p : ℕ) := RawParamIx p → ℝ
+
+/-- Pack a raw-score model into its intercept-plus-PGS parameter vector. -/
+noncomputable def packRawParams {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (m : PhenotypeInformedGAM p k sp) : RawParamVec p
+  | Sum.inl _ => m.γ₀₀
+  | Sum.inr mIdx => m.γₘ₀ mIdx
+
+/-- Unpack raw-score parameters into a GAM with zero PC main effects and zero interactions. -/
+noncomputable def unpackRawParams {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp) (β : RawParamVec p) :
+    PhenotypeInformedGAM p k sp :=
+  { pgsBasis := pgsBasis
+    pcSplineBasis := splineBasis
+    γ₀₀ := β (Sum.inl ())
+    γₘ₀ := fun mIdx => β (Sum.inr mIdx)
+    f₀ₗ := fun _ _ => 0
+    fₘₗ := fun _ _ _ => 0
+    link := .identity
+    dist := .Gaussian }
+
+lemma packRawParams_unpackRawParams_eq {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp) (β : RawParamVec p) :
+    packRawParams (unpackRawParams (k := k) pgsBasis splineBasis β) = β := by
+  ext i
+  cases i <;> rfl
+
+lemma unpackRawParams_isRaw {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp) (β : RawParamVec p) :
+    IsRawScoreModel (unpackRawParams (k := k) pgsBasis splineBasis β) := by
+  constructor
+  · intro _ _
+    rfl
+  · intro _ _ _
+    rfl
+
+lemma unpackRawParams_in_class {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp) (β : RawParamVec p) :
+    InModelClass (unpackRawParams (k := k) pgsBasis splineBasis β) pgsBasis splineBasis := by
+  constructor <;> rfl
+
+/-- Raw-score design matrix: intercept plus PGS basis columns. -/
+noncomputable def rawDesignMatrix {n p k : ℕ} [Fintype (Fin n)] [Fintype (Fin p)]
+    (data : RealizedData n k) (pgsBasis : PGSBasis p) :
+    Matrix (Fin n) (RawParamIx p) ℝ :=
+  fun i j =>
+    match j with
+    | Sum.inl _ => 1
+    | Sum.inr mIdx => pgsBasis.B ⟨mIdx.val + 1, Nat.succ_lt_succ mIdx.isLt⟩ (data.p i)
+
+lemma linearPredictor_eq_rawDesignMatrix_mulVec {n p k sp : ℕ}
+    [Fintype (Fin n)] [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (data : RealizedData n k) (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
+    (m : PhenotypeInformedGAM p k sp)
+    (h_class : InModelClass m pgsBasis splineBasis)
+    (h_raw : IsRawScoreModel m) (i : Fin n) :
+    linearPredictor m (data.p i) (data.c i) =
+      (rawDesignMatrix data pgsBasis).mulVec (packRawParams m) i := by
+  rcases h_class with ⟨hbasis, hspline, _, _⟩
+  subst hbasis
+  subst hspline
+  have h_base_zero :
+      ∑ l, evalSmooth m.pcSplineBasis (m.f₀ₗ l) (data.c i l) = 0 := by
+    refine Finset.sum_eq_zero ?_
+    intro l _
+    unfold evalSmooth
+    refine Finset.sum_eq_zero ?_
+    intro s _
+    simp [h_raw.f₀ₗ_zero l s]
+  have h_inter_zero :
+      ∀ mIdx : Fin p, ∑ l, evalSmooth m.pcSplineBasis (m.fₘₗ mIdx l) (data.c i l) = 0 := by
+    intro mIdx
+    refine Finset.sum_eq_zero ?_
+    intro l _
+    unfold evalSmooth
+    refine Finset.sum_eq_zero ?_
+    intro s _
+    simp [h_raw.fₘₗ_zero mIdx l s]
+  calc
+    linearPredictor m (data.p i) (data.c i)
+        = m.γ₀₀ + ∑ mIdx : Fin p, m.pgsBasis.B ⟨mIdx.val + 1, Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) * m.γₘ₀ mIdx := by
+            unfold linearPredictor
+            simp [h_base_zero, h_inter_zero, mul_comm, add_assoc, add_left_comm, add_comm]
+    _ = (rawDesignMatrix data m.pgsBasis).mulVec (packRawParams m) i := by
+            simp [rawDesignMatrix, packRawParams, Matrix.mulVec, dotProduct, mul_comm, add_assoc]
+
+/-- Exact finite-sample raw-score fit: minimize empirical Gaussian loss over the raw class. -/
+noncomputable def fitRaw (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    [Fintype (Fin n)]
+    (data : RealizedData n k) (lambda : ℝ)
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
+    (h_n_pos : n > 0)
+    (h_lambda_nonneg : 0 ≤ lambda)
+    (h_rank : Matrix.rank (rawDesignMatrix data pgsBasis) = Fintype.card (RawParamIx p)) :
+    PhenotypeInformedGAM p k sp := by
+  let X := rawDesignMatrix data pgsBasis
+  let S : Matrix (RawParamIx p) (RawParamIx p) ℝ := 0
+  have h_pen_nonneg :
+      ∀ β : RawParamVec p, 0 ≤ lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) := by
+    intro β
+    simp [S]
+  exact
+    unpackRawParams (k := k) pgsBasis splineBasis
+      (Classical.choose
+        (gaussianPenalizedLoss_exists_min_of_full_rank
+          X data.y S lambda h_n_pos h_lambda_nonneg h_rank h_pen_nonneg))
+
+lemma fitRaw_isRaw {p k sp n : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] [Fintype (Fin n)]
+    (data : RealizedData n k) (lambda : ℝ)
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
+    (h_n_pos : n > 0)
+    (h_lambda_nonneg : 0 ≤ lambda)
+    (h_rank : Matrix.rank (rawDesignMatrix data pgsBasis) = Fintype.card (RawParamIx p)) :
+    IsRawScoreModel (fitRaw p k sp n data lambda pgsBasis splineBasis h_n_pos h_lambda_nonneg h_rank) := by
+  unfold fitRaw
+  simpa using
+    unpackRawParams_isRaw (k := k) pgsBasis splineBasis
+      (Classical.choose
+        (gaussianPenalizedLoss_exists_min_of_full_rank
+          (rawDesignMatrix data pgsBasis) data.y (0 : Matrix (RawParamIx p) (RawParamIx p) ℝ) lambda
+          h_n_pos h_lambda_nonneg h_rank (by
+            intro β
+            simp)))
+
+lemma fitRaw_in_model_class {p k sp n : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] [Fintype (Fin n)]
+    (data : RealizedData n k) (lambda : ℝ)
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
+    (h_n_pos : n > 0)
+    (h_lambda_nonneg : 0 ≤ lambda)
+    (h_rank : Matrix.rank (rawDesignMatrix data pgsBasis) = Fintype.card (RawParamIx p)) :
+    InModelClass (fitRaw p k sp n data lambda pgsBasis splineBasis h_n_pos h_lambda_nonneg h_rank)
+      pgsBasis splineBasis := by
+  unfold fitRaw
+  simpa using
+    unpackRawParams_in_class (k := k) pgsBasis splineBasis
+      (Classical.choose
+        (gaussianPenalizedLoss_exists_min_of_full_rank
+          (rawDesignMatrix data pgsBasis) data.y (0 : Matrix (RawParamIx p) (RawParamIx p) ℝ) lambda
+          h_n_pos h_lambda_nonneg h_rank (by
+            intro β
+            simp)))
+
+theorem fitRaw_minimizes_loss {p k sp n : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] [Fintype (Fin n)]
+    (data : RealizedData n k) (lambda : ℝ)
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
+    (h_n_pos : n > 0)
+    (h_lambda_nonneg : 0 ≤ lambda)
+    (h_rank : Matrix.rank (rawDesignMatrix data pgsBasis) = Fintype.card (RawParamIx p)) :
+    IsRawScoreModel (fitRaw p k sp n data lambda pgsBasis splineBasis h_n_pos h_lambda_nonneg h_rank) ∧
+    InModelClass (fitRaw p k sp n data lambda pgsBasis splineBasis h_n_pos h_lambda_nonneg h_rank)
+      pgsBasis splineBasis ∧
+    ∀ (m : PhenotypeInformedGAM p k sp), IsRawScoreModel m → InModelClass m pgsBasis splineBasis →
+      empiricalLoss (fitRaw p k sp n data lambda pgsBasis splineBasis h_n_pos h_lambda_nonneg h_rank) data lambda
+        ≤ empiricalLoss m data lambda := by
+  let X := rawDesignMatrix data pgsBasis
+  let S : Matrix (RawParamIx p) (RawParamIx p) ℝ := 0
+  have h_pen_nonneg :
+      ∀ β : RawParamVec p, 0 ≤ lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) := by
+    intro β
+    simp [S]
+  let h_exists :=
+    gaussianPenalizedLoss_exists_min_of_full_rank X data.y S lambda h_n_pos h_lambda_nonneg h_rank h_pen_nonneg
+  let βmin : RawParamVec p := Classical.choose h_exists
+  have h_min := Classical.choose_spec h_exists
+  let m_fit := unpackRawParams (k := k) pgsBasis splineBasis βmin
+  have h_fit_raw : IsRawScoreModel m_fit := unpackRawParams_isRaw (k := k) pgsBasis splineBasis βmin
+  have h_fit_class : InModelClass m_fit pgsBasis splineBasis := unpackRawParams_in_class (k := k) pgsBasis splineBasis βmin
+  have h_pack_fit : packRawParams m_fit = βmin := by
+    simpa [m_fit] using packRawParams_unpackRawParams_eq (k := k) pgsBasis splineBasis βmin
+  have h_emp :
+      ∀ m : PhenotypeInformedGAM p k sp, IsRawScoreModel m → InModelClass m pgsBasis splineBasis →
+        empiricalLoss m data lambda = gaussianPenalizedLoss X data.y S lambda (packRawParams m) := by
+    intro m h_raw h_class
+    have h_data :
+        (∑ i, pointwiseNLL m.dist (data.y i) (linearPredictor m (data.p i) (data.c i))) =
+          Finset.univ.sum (fun i => (data.y i - X.mulVec (packRawParams m) i) ^ 2) := by
+      refine Finset.sum_congr rfl ?_
+      intro i _
+      simp [X, pointwiseNLL, h_class.dist_gaussian,
+        linearPredictor_eq_rawDesignMatrix_mulVec data pgsBasis splineBasis m h_class h_raw i]
+    have h_penalty :
+        lambda * ((∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) + (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2)) = 0 := by
+      simp [h_raw.f₀ₗ_zero, h_raw.fₘₗ_zero]
+    have h_l2 :
+        Finset.univ.sum (fun i => (data.y i - X.mulVec (packRawParams m) i) ^ 2) =
+          l2norm_sq (data.y - X.mulVec (packRawParams m)) := by
+      rfl
+    calc
+      empiricalLoss m data lambda
+          = (1 / (n : ℝ)) *
+              Finset.univ.sum (fun i => pointwiseNLL m.dist (data.y i) (linearPredictor m (data.p i) (data.c i))) +
+              lambda * ((∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) + (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2)) := by
+                rfl
+      _ = (1 / (n : ℝ)) * l2norm_sq (data.y - X.mulVec (packRawParams m)) + 0 := by
+            rw [h_data, h_l2, h_penalty]
+      _ = gaussianPenalizedLoss X data.y S lambda (packRawParams m) := by
+            simp [gaussianPenalizedLoss, S]
+  have h_emp_fit := h_emp m_fit h_fit_raw h_fit_class
+  refine ⟨?_, ?_, ?_⟩
+  · simpa [fitRaw, X, S, h_exists, βmin, m_fit] using h_fit_raw
+  · simpa [fitRaw, X, S, h_exists, βmin, m_fit] using h_fit_class
+  · intro m h_raw h_class
+    have h_emp_m := h_emp m h_raw h_class
+    have h_min' :
+        gaussianPenalizedLoss X data.y S lambda βmin ≤
+          gaussianPenalizedLoss X data.y S lambda (packRawParams m) := by
+      simpa [βmin] using h_min (packRawParams m)
+    simpa [fitRaw, X, S, h_exists, βmin, m_fit, h_emp_fit, h_emp_m, h_pack_fit] using h_min'
+
+/-- Normalized-score finite-sample parameter index: intercept, PGS coefficients,
+    and PC main-effect spline coefficients. -/
+abbrev NormalizedParamIx (p k sp : ℕ) := Unit ⊕ (Fin p ⊕ (Fin k × Fin sp))
+
+/-- Normalized-score parameter vector. -/
+abbrev NormalizedParamVec (p k sp : ℕ) := NormalizedParamIx p k sp → ℝ
+
+/-- Pack a normalized-score model into intercept, PGS, and PC-spline coordinates. -/
+noncomputable def packNormalizedParams {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (m : PhenotypeInformedGAM p k sp) : NormalizedParamVec p k sp
+  | Sum.inl _ => m.γ₀₀
+  | Sum.inr (Sum.inl mIdx) => m.γₘ₀ mIdx
+  | Sum.inr (Sum.inr (l, j)) => m.f₀ₗ l j
+
+/-- Unpack normalized-score parameters into a GAM with zero interaction splines. -/
+noncomputable def unpackNormalizedParams {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp) (β : NormalizedParamVec p k sp) :
+    PhenotypeInformedGAM p k sp :=
+  { pgsBasis := pgsBasis
+    pcSplineBasis := splineBasis
+    γ₀₀ := β (Sum.inl ())
+    γₘ₀ := fun mIdx => β (Sum.inr (Sum.inl mIdx))
+    f₀ₗ := fun l j => β (Sum.inr (Sum.inr (l, j)))
+    fₘₗ := fun _ _ _ => 0
+    link := .identity
+    dist := .Gaussian }
+
+lemma packNormalizedParams_unpackNormalizedParams_eq {p k sp : ℕ}
+    [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp) (β : NormalizedParamVec p k sp) :
+    packNormalizedParams (unpackNormalizedParams pgsBasis splineBasis β) = β := by
+  ext i
+  cases i with
+  | inl u => cases u; rfl
+  | inr rest =>
+      cases rest with
+      | inl mIdx => rfl
+      | inr lj => cases lj; rfl
+
+lemma unpackNormalizedParams_isNormalized {p k sp : ℕ}
+    [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp) (β : NormalizedParamVec p k sp) :
+    IsNormalizedScoreModel (unpackNormalizedParams pgsBasis splineBasis β) := by
+  constructor
+  intro _ _ _
+  rfl
+
+lemma unpackNormalizedParams_in_class {p k sp : ℕ}
+    [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp) (β : NormalizedParamVec p k sp) :
+    InModelClass (unpackNormalizedParams pgsBasis splineBasis β) pgsBasis splineBasis := by
+  constructor <;> rfl
+
+/-- Normalized-score design matrix: intercept, PGS basis, and PC main-effect spline columns. -/
+noncomputable def normalizedDesignMatrix {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (Fin p)]
+    [Fintype (Fin k)] [Fintype (Fin sp)]
+    (data : RealizedData n k) (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp) :
+    Matrix (Fin n) (NormalizedParamIx p k sp) ℝ :=
+  fun i j =>
+    match j with
+    | Sum.inl _ => 1
+    | Sum.inr (Sum.inl mIdx) =>
+        pgsBasis.B ⟨mIdx.val + 1, Nat.succ_lt_succ mIdx.isLt⟩ (data.p i)
+    | Sum.inr (Sum.inr (l, s)) =>
+        splineBasis.b s (data.c i l)
+
+lemma linearPredictor_eq_normalizedDesignMatrix_mulVec {n p k sp : ℕ}
+    [Fintype (Fin n)] [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (data : RealizedData n k) (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
+    (m : PhenotypeInformedGAM p k sp)
+    (h_class : InModelClass m pgsBasis splineBasis)
+    (h_norm : IsNormalizedScoreModel m) (i : Fin n) :
+    linearPredictor m (data.p i) (data.c i) =
+      (normalizedDesignMatrix data pgsBasis splineBasis).mulVec (packNormalizedParams m) i := by
+  rcases h_class with ⟨hbasis, hspline, _, _⟩
+  subst hbasis
+  subst hspline
+  have h_inter_zero :
+      ∀ mIdx : Fin p, ∑ l, evalSmooth m.pcSplineBasis (m.fₘₗ mIdx l) (data.c i l) = 0 := by
+    intro mIdx
+    refine Finset.sum_eq_zero ?_
+    intro l _
+    unfold evalSmooth
+    refine Finset.sum_eq_zero ?_
+    intro s _
+    simp [h_norm.fₘₗ_zero mIdx l s]
+  have h_pc :
+      ∑ l, evalSmooth m.pcSplineBasis (m.f₀ₗ l) (data.c i l) =
+        ∑ x : Fin k × Fin sp, m.pcSplineBasis.b x.2 (data.c i x.1) * m.f₀ₗ x.1 x.2 := by
+    have hsum_pc :
+        (∑ x : Fin k × Fin sp, m.f₀ₗ x.1 x.2 * m.pcSplineBasis.b x.2 (data.c i x.1)) =
+          ∑ l, ∑ j, m.f₀ₗ l j * m.pcSplineBasis.b j (data.c i l) := by
+      simpa using
+        (Finset.sum_product (s := (Finset.univ : Finset (Fin k)))
+          (t := (Finset.univ : Finset (Fin sp)))
+          (f := fun lj => m.f₀ₗ lj.1 lj.2 * m.pcSplineBasis.b lj.2 (data.c i lj.1)))
+    calc
+      ∑ l, evalSmooth m.pcSplineBasis (m.f₀ₗ l) (data.c i l)
+          = ∑ l, ∑ j, m.f₀ₗ l j * m.pcSplineBasis.b j (data.c i l) := by
+              simp [evalSmooth, mul_comm]
+      _ = ∑ x : Fin k × Fin sp, m.f₀ₗ x.1 x.2 * m.pcSplineBasis.b x.2 (data.c i x.1) := by
+              exact hsum_pc.symm
+      _ = ∑ x : Fin k × Fin sp, m.pcSplineBasis.b x.2 (data.c i x.1) * m.f₀ₗ x.1 x.2 := by
+              refine Finset.sum_congr rfl ?_
+              intro x _
+              ring
+  calc
+    linearPredictor m (data.p i) (data.c i)
+        = m.γ₀₀ +
+            ∑ mIdx : Fin p, m.pgsBasis.B ⟨mIdx.val + 1, Nat.succ_lt_succ mIdx.isLt⟩ (data.p i) * m.γₘ₀ mIdx +
+            ∑ x : Fin k × Fin sp, m.pcSplineBasis.b x.2 (data.c i x.1) * m.f₀ₗ x.1 x.2 := by
+              unfold linearPredictor
+              rw [h_pc]
+              simp [h_inter_zero, mul_comm, add_assoc, add_left_comm, add_comm]
+    _ = (normalizedDesignMatrix data m.pgsBasis m.pcSplineBasis).mulVec (packNormalizedParams m) i := by
+            simp [normalizedDesignMatrix, packNormalizedParams, Matrix.mulVec, dotProduct,
+              mul_comm, add_assoc, add_left_comm, add_comm]
+
+/-- Penalty weights for the normalized class: only PC main-effect splines are penalized. -/
+def normalizedPenaltyWeights (p k sp : ℕ) : NormalizedParamIx p k sp → ℝ
+  | Sum.inl _ => 0
+  | Sum.inr (Sum.inl _) => 0
+  | Sum.inr (Sum.inr _) => 1
+
+/-- Penalty matrix for the normalized class. -/
+noncomputable def normalizedPenaltyMatrix (p k sp : ℕ) :
+    Matrix (NormalizedParamIx p k sp) (NormalizedParamIx p k sp) ℝ :=
+  Matrix.diagonal (normalizedPenaltyWeights p k sp)
+
+lemma normalizedPenalty_nonneg {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (beta : NormalizedParamVec p k sp) :
+    0 ≤ Finset.univ.sum
+      (fun i => beta i * ((normalizedPenaltyMatrix p k sp).mulVec beta) i) := by
+  refine Finset.sum_nonneg ?_
+  intro i _
+  have hdiag :
+      ((normalizedPenaltyMatrix p k sp).mulVec beta) i =
+        normalizedPenaltyWeights p k sp i * beta i := by
+    simp [normalizedPenaltyMatrix, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
+  cases i with
+  | inl u =>
+      cases u
+      simp [normalizedPenaltyWeights, hdiag]
+  | inr rest =>
+      cases rest with
+      | inl mIdx =>
+          simp [normalizedPenaltyWeights, hdiag]
+      | inr lj =>
+          cases lj
+          simp [normalizedPenaltyWeights, hdiag, mul_self_nonneg]
+
+lemma normalizedPenalty_quadratic_eq {p k sp : ℕ}
+    [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    (m : PhenotypeInformedGAM p k sp) :
+    Finset.univ.sum
+      (fun i => packNormalizedParams m i *
+        ((normalizedPenaltyMatrix p k sp).mulVec (packNormalizedParams m)) i) =
+      ∑ l, ∑ j, (m.f₀ₗ l j) ^ 2 := by
+  have hdiag :
+      ∀ i,
+        ((normalizedPenaltyMatrix p k sp).mulVec (packNormalizedParams m)) i =
+          normalizedPenaltyWeights p k sp i * packNormalizedParams m i := by
+    intro i
+    simp [normalizedPenaltyMatrix, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
+  calc
+    Finset.univ.sum
+      (fun i => packNormalizedParams m i *
+        ((normalizedPenaltyMatrix p k sp).mulVec (packNormalizedParams m)) i)
+        =
+      Finset.univ.sum
+        (fun i => normalizedPenaltyWeights p k sp i * (packNormalizedParams m i) ^ 2) := by
+          refine Finset.sum_congr rfl ?_
+          intro i _
+          rw [hdiag i]
+          ring
+    _ = ∑ l, ∑ j, (m.f₀ₗ l j) ^ 2 := by
+      have hsum_pc :
+          (∑ x : Fin k × Fin sp, (m.f₀ₗ x.1 x.2) ^ 2) =
+            ∑ l, ∑ j, (m.f₀ₗ l j) ^ 2 := by
+        simpa using
+          (Finset.sum_product (s := (Finset.univ : Finset (Fin k)))
+            (t := (Finset.univ : Finset (Fin sp)))
+            (f := fun lj => (m.f₀ₗ lj.1 lj.2) ^ 2))
+      simpa [normalizedPenaltyWeights, packNormalizedParams] using hsum_pc
+
+/-- Exact finite-sample normalized-score fit: minimize empirical Gaussian loss over the normalized class. -/
+noncomputable def fitNormalized (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    [Fintype (Fin n)]
+    (data : RealizedData n k) (lambda : ℝ)
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
+    (h_n_pos : n > 0)
+    (h_lambda_nonneg : 0 ≤ lambda)
+    (h_rank :
+      Matrix.rank (normalizedDesignMatrix data pgsBasis splineBasis) =
+        Fintype.card (NormalizedParamIx p k sp)) :
+    PhenotypeInformedGAM p k sp := by
+  let X := normalizedDesignMatrix data pgsBasis splineBasis
+  let S := normalizedPenaltyMatrix p k sp
+  have h_pen_nonneg :
+      ∀ β : NormalizedParamVec p k sp,
+        0 ≤ lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) := by
+    intro β
+    exact mul_nonneg h_lambda_nonneg (normalizedPenalty_nonneg β)
+  exact
+    unpackNormalizedParams pgsBasis splineBasis
+      (Classical.choose
+        (gaussianPenalizedLoss_exists_min_of_full_rank
+          X data.y S lambda h_n_pos h_lambda_nonneg h_rank h_pen_nonneg))
+
+lemma fitNormalized_isNormalized {p k sp n : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    [Fintype (Fin n)]
+    (data : RealizedData n k) (lambda : ℝ)
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
+    (h_n_pos : n > 0)
+    (h_lambda_nonneg : 0 ≤ lambda)
+    (h_rank :
+      Matrix.rank (normalizedDesignMatrix data pgsBasis splineBasis) =
+        Fintype.card (NormalizedParamIx p k sp)) :
+    IsNormalizedScoreModel
+      (fitNormalized p k sp n data lambda pgsBasis splineBasis h_n_pos h_lambda_nonneg h_rank) := by
+  unfold fitNormalized
+  simpa using
+    unpackNormalizedParams_isNormalized pgsBasis splineBasis
+      (Classical.choose
+        (gaussianPenalizedLoss_exists_min_of_full_rank
+          (normalizedDesignMatrix data pgsBasis splineBasis) data.y (normalizedPenaltyMatrix p k sp)
+          lambda h_n_pos h_lambda_nonneg h_rank (by
+            intro β
+            exact mul_nonneg h_lambda_nonneg (normalizedPenalty_nonneg β))))
+
+lemma fitNormalized_in_model_class {p k sp n : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    [Fintype (Fin n)]
+    (data : RealizedData n k) (lambda : ℝ)
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
+    (h_n_pos : n > 0)
+    (h_lambda_nonneg : 0 ≤ lambda)
+    (h_rank :
+      Matrix.rank (normalizedDesignMatrix data pgsBasis splineBasis) =
+        Fintype.card (NormalizedParamIx p k sp)) :
+    InModelClass
+      (fitNormalized p k sp n data lambda pgsBasis splineBasis h_n_pos h_lambda_nonneg h_rank)
+      pgsBasis splineBasis := by
+  unfold fitNormalized
+  simpa using
+    unpackNormalizedParams_in_class pgsBasis splineBasis
+      (Classical.choose
+        (gaussianPenalizedLoss_exists_min_of_full_rank
+          (normalizedDesignMatrix data pgsBasis splineBasis) data.y (normalizedPenaltyMatrix p k sp)
+          lambda h_n_pos h_lambda_nonneg h_rank (by
+            intro β
+            exact mul_nonneg h_lambda_nonneg (normalizedPenalty_nonneg β))))
+
+theorem fitNormalized_minimizes_loss {p k sp n : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)]
+    [Fintype (Fin n)]
+    (data : RealizedData n k) (lambda : ℝ)
+    (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
+    (h_n_pos : n > 0)
+    (h_lambda_nonneg : 0 ≤ lambda)
+    (h_rank :
+      Matrix.rank (normalizedDesignMatrix data pgsBasis splineBasis) =
+        Fintype.card (NormalizedParamIx p k sp)) :
+    IsNormalizedScoreModel
+      (fitNormalized p k sp n data lambda pgsBasis splineBasis h_n_pos h_lambda_nonneg h_rank) ∧
+    InModelClass
+      (fitNormalized p k sp n data lambda pgsBasis splineBasis h_n_pos h_lambda_nonneg h_rank)
+      pgsBasis splineBasis ∧
+    ∀ (m : PhenotypeInformedGAM p k sp), IsNormalizedScoreModel m → InModelClass m pgsBasis splineBasis →
+      empiricalLoss
+        (fitNormalized p k sp n data lambda pgsBasis splineBasis h_n_pos h_lambda_nonneg h_rank)
+        data lambda ≤ empiricalLoss m data lambda := by
+  let X := normalizedDesignMatrix data pgsBasis splineBasis
+  let S := normalizedPenaltyMatrix p k sp
+  have h_pen_nonneg :
+      ∀ β : NormalizedParamVec p k sp,
+        0 ≤ lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) := by
+    intro β
+    exact mul_nonneg h_lambda_nonneg (normalizedPenalty_nonneg β)
+  let h_exists :=
+    gaussianPenalizedLoss_exists_min_of_full_rank X data.y S lambda h_n_pos h_lambda_nonneg h_rank h_pen_nonneg
+  let βmin : NormalizedParamVec p k sp := Classical.choose h_exists
+  have h_min := Classical.choose_spec h_exists
+  let m_fit := unpackNormalizedParams pgsBasis splineBasis βmin
+  have h_fit_norm : IsNormalizedScoreModel m_fit := unpackNormalizedParams_isNormalized pgsBasis splineBasis βmin
+  have h_fit_class : InModelClass m_fit pgsBasis splineBasis := unpackNormalizedParams_in_class pgsBasis splineBasis βmin
+  have h_pack_fit : packNormalizedParams m_fit = βmin := by
+    simpa [m_fit] using packNormalizedParams_unpackNormalizedParams_eq pgsBasis splineBasis βmin
+  have h_emp :
+      ∀ m : PhenotypeInformedGAM p k sp, IsNormalizedScoreModel m → InModelClass m pgsBasis splineBasis →
+        empiricalLoss m data lambda = gaussianPenalizedLoss X data.y S lambda (packNormalizedParams m) := by
+    intro m h_norm h_class
+    have h_data :
+        (∑ i, pointwiseNLL m.dist (data.y i) (linearPredictor m (data.p i) (data.c i))) =
+          Finset.univ.sum (fun i => (data.y i - X.mulVec (packNormalizedParams m) i) ^ 2) := by
+      refine Finset.sum_congr rfl ?_
+      intro i _
+      simp [X, pointwiseNLL, h_class.dist_gaussian,
+        linearPredictor_eq_normalizedDesignMatrix_mulVec data pgsBasis splineBasis m h_class h_norm i]
+    have h_penalty :
+        lambda * ((∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) + (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2)) =
+          lambda * Finset.univ.sum
+            (fun i => packNormalizedParams m i * (S.mulVec (packNormalizedParams m)) i) := by
+      have h_int_zero : (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2) = 0 := by
+        simp [h_norm.fₘₗ_zero]
+      calc
+        lambda * ((∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) + (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2))
+            = lambda * (∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) := by rw [h_int_zero, add_zero]
+        _ = lambda * Finset.univ.sum
+              (fun i => packNormalizedParams m i * (S.mulVec (packNormalizedParams m)) i) := by
+              rw [← normalizedPenalty_quadratic_eq (m := m)]
+    have h_l2 :
+        Finset.univ.sum (fun i => (data.y i - X.mulVec (packNormalizedParams m) i) ^ 2) =
+          l2norm_sq (data.y - X.mulVec (packNormalizedParams m)) := by
+      rfl
+    calc
+      empiricalLoss m data lambda
+          = (1 / (n : ℝ)) *
+              Finset.univ.sum (fun i => pointwiseNLL m.dist (data.y i) (linearPredictor m (data.p i) (data.c i))) +
+              lambda * ((∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) + (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2)) := by
+                rfl
+      _ = (1 / (n : ℝ)) * l2norm_sq (data.y - X.mulVec (packNormalizedParams m)) +
+            lambda * Finset.univ.sum
+              (fun i => packNormalizedParams m i * (S.mulVec (packNormalizedParams m)) i) := by
+              rw [h_data, h_l2, h_penalty]
+      _ = gaussianPenalizedLoss X data.y S lambda (packNormalizedParams m) := by
+            simp [gaussianPenalizedLoss]
+  have h_emp_fit := h_emp m_fit h_fit_norm h_fit_class
+  refine ⟨?_, ?_, ?_⟩
+  · simpa [fitNormalized, X, S, h_exists, βmin, m_fit] using h_fit_norm
+  · simpa [fitNormalized, X, S, h_exists, βmin, m_fit] using h_fit_class
+  · intro m h_norm h_class
+    have h_emp_m := h_emp m h_norm h_class
+    have h_min' :
+        gaussianPenalizedLoss X data.y S lambda βmin ≤
+          gaussianPenalizedLoss X data.y S lambda (packNormalizedParams m) := by
+      simpa [βmin] using h_min (packNormalizedParams m)
+    simpa [fitNormalized, X, S, h_exists, βmin, m_fit, h_emp_fit, h_emp_m, h_pack_fit] using h_min'
+
 
 /-- The Gaussian penalized loss is strictly convex when X has full rank and lam > 0.
 
@@ -3486,21 +4169,23 @@ lemma gaussianPenalizedLoss_exists_min {ι : Type*} {n : ℕ} [Fintype (Fin n)] 
     - Unify empirical/theoretical loss via L²(μ) for different measures
     - Use abstract [InnerProductSpace ℝ P] instead of concrete ParamIx
     - Define constraint as LinearMap kernel for cleaner affine subspace handling -/
+/-
+Exact existence-and-uniqueness theorem for the penalized Gaussian fit on the
+identifiable model subspace.
+
+Existence is derived internally, not assumed: the objective is restricted to the closed
+identifiable parameter subtype, continuity is proved on that subtype, coercivity is
+inherited from the ambient penalized Gaussian loss, and Mathlib's Weierstrass theorem
+(`Continuous.exists_forall_le`) is applied there. Uniqueness is then obtained from the
+strict-convexity argument for the same objective.
+-/
 theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (Fin p)]
     [Fintype (Fin k)] [Fintype (Fin sp)]
     (data : RealizedData n k) (lambda : ℝ)
     (pgsBasis : PGSBasis p) (splineBasis : SplineBasis sp)
     (_hp : p > 0) (_hk : k > 0) (_hsp : sp > 0)
     (h_rank : Matrix.rank (designMatrix data pgsBasis splineBasis) = Fintype.card (ParamIx p k sp))
-    (h_lambda_pos : lambda > 0)
-    (h_exists_min :
-      ∃ (m : PhenotypeInformedGAM p k sp),
-        InModelClass m pgsBasis splineBasis ∧
-        IsIdentifiable m data ∧
-        ∀ (m' : PhenotypeInformedGAM p k sp),
-          InModelClass m' pgsBasis splineBasis →
-          IsIdentifiable m' data →
-          empiricalLoss m data lambda ≤ empiricalLoss m' data lambda) :
+    (h_lambda_pos : lambda > 0) :
   ∃! (m : PhenotypeInformedGAM p k sp),
     InModelClass m pgsBasis splineBasis ∧
     IsIdentifiable m data ∧
@@ -3519,83 +4204,365 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
   let ValidModels : Set (PhenotypeInformedGAM p k sp) :=
     {m | InModelClass m pgsBasis splineBasis ∧ IsIdentifiable m data}
 
-  -- Step 2: Prove existence using the helper lemmas
-  -- For Gaussian case, empiricalLoss reduces to gaussianPenalizedLoss
-  -- which has been shown to be coercive and continuous
-
-  -- First, we need to show the constraint set is non-empty
-  -- (This would require showing the constraints are consistent)
-  have h_nonempty : ValidModels.Nonempty := by
-    -- The zero model (all coefficients = 0) satisfies all constraints
-    -- Construct the zero model using unpackParams with the zero vector
-    let zero_vec : ParamVec p k sp := fun _ => 0
-    let zero_model := unpackParams pgsBasis splineBasis zero_vec
-    use zero_model
-    constructor
-    · -- InModelClass: by construction, unpackParams uses the given bases and Gaussian/identity
-      constructor <;> rfl
-    · -- IsIdentifiable: sum-to-zero constraints
-      -- All spline coefficients are 0, so evalSmooth gives 0, and sums are 0
-      constructor
-      · intro l
-        simp only [zero_model, unpackParams]
-        -- evalSmooth with all-zero coefficients = 0
-        -- Sum of zeros = 0
-        simp [zero_vec, evalSmooth]
-      · intro mIdx l
-        simp only [zero_model, unpackParams]
-        simp [zero_vec, evalSmooth]
-
-  -- The empiricalLoss function is coercive on ValidModels
-  -- This follows from the penalty term λ * ‖spline coefficients‖²
-  have h_coercive : ∀ (seq : ℕ → PhenotypeInformedGAM p k sp),
-      (∀ n, seq n ∈ ValidModels) →
-      (∀ M, ∃ N, ∀ n ≥ N, empiricalLoss (seq n) data lambda ≥ M) ∨
-      (∃ m ∈ ValidModels, ∃ (subseq : ℕ → PhenotypeInformedGAM p k sp), ∀ i, subseq i ∈ ValidModels) := by
-    -- For Gaussian models, empiricalLoss reduces to:
-    -- (1/n)Σᵢ(yᵢ - linearPredictor)² + λ·(spline penalty)
-    -- The penalty term grows unboundedly with coefficient magnitudes.
-    --
-    -- Via the parametrization, this corresponds to gaussianPenalizedLoss on the
-    -- parameter vector, which we've shown is coercive when the penalty matrix S
-    -- is positive definite.
-    --
-    -- Therefore either:
-    -- (a) The loss goes to ∞ along the sequence, or
-    -- (b) The parameter norms are bounded, so by compactness there's a convergent subseq
-    intro seq h_in_valid
-    -- The dichotomy: either unbounded loss or bounded parameters
-    -- If parameters are bounded, finite-dim compactness gives convergent subsequence
-    -- If parameters are unbounded, coercivity of the quadratic penalty implies loss → ∞
-    --
-    -- Formal proof uses that for InModelClass models (Gaussian, identity link),
-    -- empiricalLoss m data λ = (1/n)‖y - X·packParams(m)‖² + λ·‖spline coeffs‖²
-    -- which is exactly gaussianPenalizedLoss applied to packParams(m).
-    -- By gaussianPenalizedLoss_coercive, this tends to ∞ on cocompact filter.
-    right
-    obtain ⟨m₀, hm₀⟩ := h_nonempty
-    refine ⟨m₀, hm₀, seq, ?_⟩
-    intro i
-    exact h_in_valid i
-
-  -- By Weierstrass theorem, a continuous coercive function on a closed set
-  -- attains its minimum
-  have h_exists : ∃ m ∈ ValidModels, ∀ m' ∈ ValidModels,
-      empiricalLoss m data lambda ≤ empiricalLoss m' data lambda := by
-    rcases h_exists_min with ⟨m, hm_class, hm_ident, hm_min⟩
-    refine ⟨m, ⟨hm_class, hm_ident⟩, ?_⟩
-    intro m' hm'
-    exact hm_min m' hm'.1 hm'.2
-
-  -- Step 3: Prove uniqueness via strict convexity
-  -- For Gaussian models with full rank X and λ > 0, the loss is strictly convex
-
   -- The design matrix has full rank by hypothesis
   have h_full_rank : Matrix.rank X = Fintype.card (ParamIx p k sp) := h_rank
 
   -- Define penalty matrix S (ridge penalty on spline coefficients)
   -- In empiricalLoss, the penalty is λ * ‖f₀ₗ‖² + λ * ‖fₘₗ‖²
   -- This corresponds to a block-diagonal penalty matrix
+  let s : ParamIx p k sp → ℝ
+    | .intercept => 0
+    | .pgsCoeff _ => 0
+    | .pcSpline _ _ => 1
+    | .interaction _ _ _ => 1
+  let S : Matrix (ParamIx p k sp) (ParamIx p k sp) ℝ := Matrix.diagonal s
+
+  have hS_psd : IsPosSemidef S := by
+    intro v
+    unfold dotProduct'
+    refine Finset.sum_nonneg ?_
+    intro i _
+    have hmul : (S.mulVec v) i = s i * v i := by
+      classical
+      simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
+    cases i <;> simp [s, hmul, mul_self_nonneg]
+
+  have h_emp_eq :
+      ∀ m, InModelClass m pgsBasis splineBasis →
+        empiricalLoss m data lambda =
+          gaussianPenalizedLoss X data.y S lambda (packParams m) := by
+    intro m hm
+    have h_lin := linearPredictor_eq_designMatrix_mulVec data pgsBasis splineBasis m hm
+    have h_data :
+        (∑ i, pointwiseNLL m.dist (data.y i)
+            (linearPredictor m (data.p i) (data.c i))) =
+          l2norm_sq (data.y - X.mulVec (packParams m)) := by
+      classical
+      unfold l2norm_sq
+      refine Finset.sum_congr rfl ?_
+      intro i _
+      simp [X, pointwiseNLL, hm.dist_gaussian, Pi.sub_apply, h_lin]
+    have h_diag : ∀ i, (S.mulVec (packParams m)) i = s i * (packParams m) i := by
+      intro i
+      classical
+      simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
+    have h_penalty :
+        Finset.univ.sum (fun i => (packParams m) i * (S.mulVec (packParams m)) i) =
+          (∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) +
+            (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2) := by
+      classical
+      have hsum :
+          Finset.univ.sum (fun i => (packParams m) i * (S.mulVec (packParams m)) i) =
+            Finset.univ.sum (fun i => s i * (packParams m i) ^ 2) := by
+        refine Finset.sum_congr rfl ?_
+        intro i _
+        simp [h_diag, pow_two, mul_comm, mul_left_comm, mul_assoc]
+      let g : ParamIxSum p k sp → ℝ
+        | Sum.inl _ => 0
+        | Sum.inr (Sum.inl _) => 0
+        | Sum.inr (Sum.inr (Sum.inl (l, j))) => (m.f₀ₗ l j) ^ 2
+        | Sum.inr (Sum.inr (Sum.inr (mIdx, l, j))) => (m.fₘₗ mIdx l j) ^ 2
+      have hsum' :
+          (∑ i : ParamIx p k sp, s i * (packParams m i) ^ 2) =
+            ∑ x : ParamIxSum p k sp, g x := by
+        refine (Fintype.sum_equiv (ParamIx.equivSum p k sp) _ g ?_)
+        intro x
+        cases x <;> simp [g, s, packParams, ParamIx.equivSum]
+      have hsum_pc :
+          (∑ x : Fin k × Fin sp, (m.f₀ₗ x.1 x.2) ^ 2) =
+            ∑ l, ∑ j, (m.f₀ₗ l j) ^ 2 := by
+        simpa using
+          (Finset.sum_product (s := (Finset.univ : Finset (Fin k)))
+            (t := (Finset.univ : Finset (Fin sp)))
+            (f := fun lj => (m.f₀ₗ lj.1 lj.2) ^ 2))
+      have hsum_int :
+          (∑ x : Fin p × Fin k × Fin sp, (m.fₘₗ x.1 x.2.1 x.2.2) ^ 2) =
+            ∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2 := by
+        have hsum_int' :
+            (∑ x : Fin p × Fin k × Fin sp, (m.fₘₗ x.1 x.2.1 x.2.2) ^ 2) =
+              ∑ mIdx, ∑ lj : Fin k × Fin sp, (m.fₘₗ mIdx lj.1 lj.2) ^ 2 := by
+          simpa using
+            (Finset.sum_product (s := (Finset.univ : Finset (Fin p)))
+              (t := (Finset.univ : Finset (Fin k × Fin sp)))
+              (f := fun mIdx_lj => (m.fₘₗ mIdx_lj.1 mIdx_lj.2.1 mIdx_lj.2.2) ^ 2))
+        have hsum_int'' :
+            ∀ mIdx : Fin p,
+              (∑ lj : Fin k × Fin sp, (m.fₘₗ mIdx lj.1 lj.2) ^ 2) =
+                ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2 := by
+          intro mIdx
+          simpa using
+            (Finset.sum_product (s := (Finset.univ : Finset (Fin k)))
+              (t := (Finset.univ : Finset (Fin sp)))
+              (f := fun lj => (m.fₘₗ mIdx lj.1 lj.2) ^ 2))
+        calc
+          (∑ x : Fin p × Fin k × Fin sp, (m.fₘₗ x.1 x.2.1 x.2.2) ^ 2) =
+              ∑ mIdx, ∑ lj : Fin k × Fin sp, (m.fₘₗ mIdx lj.1 lj.2) ^ 2 := hsum_int'
+          _ = ∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2 := by
+            refine Finset.sum_congr rfl ?_
+            intro mIdx _
+            simpa using (hsum_int'' mIdx)
+      have hsum'' :
+          (∑ x : ParamIxSum p k sp, g x) =
+            (∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) +
+              (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2) := by
+        simp [ParamIxSum, g, hsum_pc, hsum_int]
+      simpa [hsum, hsum'] using hsum''
+    unfold empiricalLoss gaussianPenalizedLoss
+    simp [h_data, h_penalty]
+
+  -- Step 2: Derive existence internally by minimizing over the closed identifiable
+  -- parameter subtype. No external existence hypothesis is used.
+  let L : ParamVec p k sp → ℝ := fun β => gaussianPenalizedLoss X data.y S lambda β
+  let IdentifiableParams : Set (ParamVec p k sp) :=
+    {β | IsIdentifiable (unpackParams pgsBasis splineBasis β) data}
+
+  have h_identifiable_closed : IsClosed IdentifiableParams := by
+    classical
+    have h_pc_closed :
+        ∀ l : Fin k,
+          IsClosed {β : ParamVec p k sp |
+            ∑ i, evalSmooth splineBasis (fun j => β (ParamIx.pcSpline l j)) (data.c i l) = 0} := by
+      intro l
+      let f : ParamVec p k sp → ℝ := fun β =>
+        ∑ i, evalSmooth splineBasis (fun j => β (ParamIx.pcSpline l j)) (data.c i l)
+      have hf : Continuous f := by
+        classical
+        unfold f evalSmooth
+        simpa using (by
+          fun_prop
+            : Continuous
+                (fun β : ParamVec p k sp =>
+                  ∑ i, ∑ j, β (ParamIx.pcSpline l j) * splineBasis.b j (data.c i l)))
+      simpa [f] using isClosed_singleton.preimage hf
+    have h_int_closed :
+        ∀ mIdx : Fin p, ∀ l : Fin k,
+          IsClosed {β : ParamVec p k sp |
+            ∑ i, evalSmooth splineBasis (fun j => β (ParamIx.interaction mIdx l j)) (data.c i l) = 0} := by
+      intro mIdx l
+      let f : ParamVec p k sp → ℝ := fun β =>
+        ∑ i, evalSmooth splineBasis (fun j => β (ParamIx.interaction mIdx l j)) (data.c i l)
+      have hf : Continuous f := by
+        classical
+        unfold f evalSmooth
+        simpa using (by
+          fun_prop
+            : Continuous
+                (fun β : ParamVec p k sp =>
+                  ∑ i, ∑ j, β (ParamIx.interaction mIdx l j) * splineBasis.b j (data.c i l)))
+      simpa [f] using isClosed_singleton.preimage hf
+    have h_pc_all :
+        IsClosed {β : ParamVec p k sp |
+          ∀ l, ∑ i, evalSmooth splineBasis (fun j => β (ParamIx.pcSpline l j)) (data.c i l) = 0} := by
+      simpa [Set.setOf_forall] using isClosed_iInter h_pc_closed
+    have h_int_all_by_marker :
+        ∀ mIdx : Fin p,
+          IsClosed {β : ParamVec p k sp |
+            ∀ l, ∑ i, evalSmooth splineBasis (fun j => β (ParamIx.interaction mIdx l j)) (data.c i l) = 0} := by
+      intro mIdx
+      simpa [Set.setOf_forall] using isClosed_iInter (h_int_closed mIdx)
+    have h_int_all :
+        IsClosed {β : ParamVec p k sp |
+          ∀ mIdx l,
+            ∑ i, evalSmooth splineBasis (fun j => β (ParamIx.interaction mIdx l j)) (data.c i l) = 0} := by
+      simpa [Set.setOf_forall] using isClosed_iInter h_int_all_by_marker
+    have h_identifiable_eq :
+        IdentifiableParams =
+          {β : ParamVec p k sp |
+            ∀ l, ∑ i, evalSmooth splineBasis (fun j => β (ParamIx.pcSpline l j)) (data.c i l) = 0} ∩
+          {β : ParamVec p k sp |
+            ∀ mIdx l,
+              ∑ i, evalSmooth splineBasis (fun j => β (ParamIx.interaction mIdx l j)) (data.c i l) = 0} := by
+      ext β
+      simp [IdentifiableParams, IsIdentifiable, unpackParams]
+    rw [h_identifiable_eq]
+    exact h_pc_all.inter h_int_all
+
+  have h_zero_ident : (fun _ : ParamIx p k sp => 0) ∈ IdentifiableParams := by
+    simp [IdentifiableParams, IsIdentifiable, unpackParams, evalSmooth]
+
+  let IdentifiableVec := {β : ParamVec p k sp // β ∈ IdentifiableParams}
+  haveI : Nonempty IdentifiableVec := ⟨⟨fun _ => 0, h_zero_ident⟩⟩
+
+  have h_cont : Continuous L := by
+    unfold L gaussianPenalizedLoss l2norm_sq
+    simpa using (by
+      fun_prop
+        : Continuous
+            (fun β : ParamVec p k sp =>
+              (1 / n) * Finset.univ.sum (fun i => (data.y i - X.mulVec β i) ^ 2) +
+                lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i)))
+  have h_lambda_nonneg : 0 ≤ lambda := le_of_lt h_lambda_pos
+  have h_rank_pos : 0 < Matrix.rank X := by
+    rw [h_rank]
+    exact Fintype.card_pos_iff.mpr ⟨ParamIx.intercept⟩
+  have h_n_pos : 0 < n := by
+    have hn_ne : n ≠ 0 := by
+      intro hn0
+      subst hn0
+      have h_rank_zero : Matrix.rank X = 0 := by
+        apply Nat.eq_zero_of_le_zero
+        have hle : Matrix.rank X ≤ Fintype.card (Fin 0) := Matrix.rank_le_card_height X
+        simpa using hle
+      rw [h_rank_zero] at h_rank_pos
+      exact Nat.lt_irrefl 0 h_rank_pos
+    exact Nat.pos_of_ne_zero hn_ne
+  have h_posdef : ∀ v : ParamIx p k sp → ℝ, v ≠ 0 →
+      0 < dotProduct' ((Matrix.transpose X * X).mulVec v) v := by
+    exact transpose_mul_self_posDef X h_rank
+  haveI : Nonempty (ParamIx p k sp) := ⟨ParamIx.intercept⟩
+  have h_lam_pos : 0 < (1 / (2 * (n : ℝ))) := by
+    have hn : (0 : ℝ) < (n : ℝ) := by exact_mod_cast h_n_pos
+    have h2n : (0 : ℝ) < (2 : ℝ) * (n : ℝ) := by nlinarith
+    simpa using one_div_pos.mpr h2n
+  have h_Q_tendsto :
+      Filter.Tendsto
+        (fun β => (1 / (2 * (n : ℝ))) *
+          Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i))
+        (Filter.cocompact _) Filter.atTop := by
+    simpa [dotProduct'] using
+      (penalty_quadratic_tendsto_proof
+        (S := (Matrix.transpose X * X))
+        (lam := (1 / (2 * (n : ℝ))))
+        (hlam := h_lam_pos)
+        (hS_posDef := h_posdef))
+  have h_coercive :
+      Filter.Tendsto L (Filter.cocompact _) Filter.atTop := by
+    have h_lower : ∀ β, L β ≥
+        (1 / (2 * (n : ℝ))) *
+          Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i) -
+          (1 / (n : ℝ)) * l2norm_sq data.y := by
+      intro β
+      unfold L gaussianPenalizedLoss l2norm_sq
+      have h_term :
+          ∀ i, (data.y i - X.mulVec β i) ^ 2 ≥
+            (1 / (2 : ℝ)) * (X.mulVec β i) ^ 2 - (data.y i) ^ 2 := by
+        intro i
+        have h_sq : 0 ≤ (2 * data.y i - X.mulVec β i) ^ 2 := by
+          nlinarith
+        have h_id :
+            (1 / (2 : ℝ)) * (2 * data.y i - X.mulVec β i) ^ 2 =
+              (data.y i - X.mulVec β i) ^ 2 + (data.y i) ^ 2 -
+                (1 / (2 : ℝ)) * (X.mulVec β i) ^ 2 := by
+          ring
+        nlinarith [h_sq, h_id]
+      have h_sum :
+          Finset.univ.sum (fun i => (data.y i - X.mulVec β i) ^ 2) ≥
+            (1 / (2 : ℝ)) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
+              Finset.univ.sum (fun i => (data.y i) ^ 2) := by
+        calc
+          Finset.univ.sum (fun i => (data.y i - X.mulVec β i) ^ 2)
+              ≥ Finset.univ.sum (fun i =>
+                  (1 / (2 : ℝ)) * (X.mulVec β i) ^ 2 - (data.y i) ^ 2) := by
+                    refine Finset.sum_le_sum ?_
+                    intro i _; exact h_term i
+          _ = (1 / (2 : ℝ)) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
+                Finset.univ.sum (fun i => (data.y i) ^ 2) := by
+                    simp [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, sub_eq_add_neg]
+      have h_pen_nonneg :
+          0 ≤ lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) := by
+        have hsum_nonneg :
+            0 ≤ Finset.univ.sum (fun i => β i * (S.mulVec β) i) := by
+          refine Finset.sum_nonneg ?_
+          intro i _
+          have hSi : (S.mulVec β) i = s i * β i := by
+            classical
+            simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
+          cases i <;> simp [hSi, s, mul_self_nonneg]
+        exact mul_nonneg h_lambda_nonneg hsum_nonneg
+      have h_scale :
+          (1 / (n : ℝ)) * Finset.univ.sum (fun i => (data.y i - X.mulVec β i) ^ 2)
+            ≥ (1 / (2 * (n : ℝ))) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
+              (1 / (n : ℝ)) * Finset.univ.sum (fun i => (data.y i) ^ 2) := by
+        have hn : (0 : ℝ) ≤ (1 / (n : ℝ)) := by
+          have hn' : (0 : ℝ) < (n : ℝ) := by exact_mod_cast h_n_pos
+          exact le_of_lt (one_div_pos.mpr hn')
+        have h' := mul_le_mul_of_nonneg_left h_sum hn
+        simpa [mul_sub, mul_add, mul_assoc, mul_left_comm, mul_comm] using h'
+      have h_XtX :
+          Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) =
+            Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i) := by
+        classical
+        have h_left :
+            Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) =
+              dotProduct (X.mulVec β) (X.mulVec β) := by
+          simp [dotProduct, pow_two]
+        have h_right :
+            Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i) =
+              dotProduct β ((Matrix.transpose X * X).mulVec β) := by
+          simp [dotProduct]
+        have h_eq :
+            dotProduct β ((Matrix.transpose X * X).mulVec β) =
+              dotProduct (X.mulVec β) (X.mulVec β) := by
+          calc
+            dotProduct β ((Matrix.transpose X * X).mulVec β)
+                = dotProduct β ((Matrix.transpose X).mulVec (X.mulVec β)) := by
+                    simp [Matrix.mulVec_mulVec]
+            _ = dotProduct (Matrix.vecMul β (Matrix.transpose X)) (X.mulVec β) := by
+                    simp [Matrix.dotProduct_mulVec]
+            _ = dotProduct (X.mulVec β) (X.mulVec β) := by
+                    simp [Matrix.vecMul_transpose]
+        simpa [h_left, h_right] using h_eq.symm
+      have hL1 :
+          (1 / (n : ℝ)) * Finset.univ.sum (fun i => (data.y i - X.mulVec β i) ^ 2) +
+            lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) ≥
+            (1 / (2 * (n : ℝ))) * Finset.univ.sum (fun i => (X.mulVec β i) ^ 2) -
+              (1 / (n : ℝ)) * Finset.univ.sum (fun i => (data.y i) ^ 2) := by
+        have h1 :
+            (1 / (n : ℝ)) * Finset.univ.sum (fun i => (data.y i - X.mulVec β i) ^ 2) +
+              lambda * Finset.univ.sum (fun i => β i * (S.mulVec β) i) ≥
+              (1 / (n : ℝ)) * Finset.univ.sum (fun i => (data.y i - X.mulVec β i) ^ 2) := by
+          linarith [h_pen_nonneg]
+        exact le_trans h_scale h1
+      simpa [h_XtX] using hL1
+    refine (Filter.tendsto_atTop.2 ?_)
+    intro M
+    have hM :
+        ∀ᶠ β in Filter.cocompact _, M + (1 / (n : ℝ)) * l2norm_sq data.y ≤
+          (1 / (2 * (n : ℝ))) *
+            Finset.univ.sum (fun i => β i * ((Matrix.transpose X * X).mulVec β) i) :=
+      (Filter.tendsto_atTop.1 h_Q_tendsto) (M + (1 / (n : ℝ)) * l2norm_sq data.y)
+    exact hM.mono (by
+      intro β hβ
+      have hL := h_lower β
+      linarith)
+
+  have h_cont_ident : Continuous (fun β : IdentifiableVec => L β.1) :=
+    h_cont.comp continuous_subtype_val
+  have h_coercive_ident :
+      Filter.Tendsto (fun β : IdentifiableVec => L β.1) (Filter.cocompact _) Filter.atTop := by
+    simpa [IdentifiableVec, L] using
+      h_coercive.comp h_identifiable_closed.isClosedEmbedding_subtypeVal.tendsto_cocompact
+
+  let h_exists_ident :
+      ∃ β : IdentifiableVec, ∀ β' : IdentifiableVec, L β.1 ≤ L β'.1 :=
+    Continuous.exists_forall_le (β := IdentifiableVec) (α := ℝ) h_cont_ident h_coercive_ident
+  let βmin : IdentifiableVec := Classical.choose h_exists_ident
+  have hβmin : ∀ β' : IdentifiableVec, L βmin.1 ≤ L β'.1 := by
+    exact Classical.choose_spec h_exists_ident
+
+  have h_exists : ∃ m ∈ ValidModels, ∀ m' ∈ ValidModels,
+      empiricalLoss m data lambda ≤ empiricalLoss m' data lambda := by
+    let m_opt := unpackParams pgsBasis splineBasis βmin.1
+    have hm_opt : m_opt ∈ ValidModels := by
+      constructor
+      · exact unpackParams_in_class pgsBasis splineBasis βmin.1
+      · exact βmin.2
+    refine ⟨m_opt, hm_opt, ?_⟩
+    intro m' hm'
+    have h_pack_ident : packParams m' ∈ IdentifiableParams := by
+      dsimp [IdentifiableParams]
+      simpa [unpack_pack_eq m' pgsBasis splineBasis hm'.1] using hm'.2
+    let β' : IdentifiableVec := ⟨packParams m', h_pack_ident⟩
+    have h_opt_le : L βmin.1 ≤ L β'.1 := hβmin β'
+    have h_emp_opt := h_emp_eq m_opt hm_opt.1
+    have h_emp' := h_emp_eq m' hm'.1
+    have h_pack_opt : packParams m_opt = βmin.1 := by
+      simpa [m_opt] using (packParams_unpackParams_eq pgsBasis splineBasis βmin.1)
+    simpa [L, β', h_emp_opt, h_emp', h_pack_opt]
+      using h_opt_le
+
+  -- Step 3: Prove uniqueness via strict convexity
+  -- For Gaussian models with full rank X and λ > 0, the loss is strictly convex
 
   -- For models satisfying the constraints (IsIdentifiable),
   -- the penalized loss is strictly convex in the parameter space
@@ -3783,109 +4750,6 @@ theorem parameter_identifiability {n p k sp : ℕ} [Fintype (Fin n)] [Fintype (F
     refine ⟨hm_interp, ?_⟩
     -- Show strict convexity inequality
     classical
-    -- Penalty mask: only spline and interaction coefficients are penalized.
-    let s : ParamIx p k sp → ℝ
-      | .intercept => 0
-      | .pgsCoeff _ => 0
-      | .pcSpline _ _ => 1
-      | .interaction _ _ _ => 1
-    let S : Matrix (ParamIx p k sp) (ParamIx p k sp) ℝ := Matrix.diagonal s
-
-    have hS_psd : IsPosSemidef S := by
-      intro v
-      unfold dotProduct'
-      refine Finset.sum_nonneg ?_
-      intro i _
-      have hmul : (S.mulVec v) i = s i * v i := by
-        classical
-        simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
-      cases i <;> simp [s, hmul, mul_self_nonneg]
-
-    have h_emp_eq :
-        ∀ m, InModelClass m pgsBasis splineBasis →
-          empiricalLoss m data lambda =
-            gaussianPenalizedLoss X data.y S lambda (packParams m) := by
-      intro m hm
-      have h_lin := linearPredictor_eq_designMatrix_mulVec data pgsBasis splineBasis m hm
-      -- data term (Gaussian)
-      have h_data :
-          (∑ i, pointwiseNLL m.dist (data.y i)
-              (linearPredictor m (data.p i) (data.c i))) =
-            l2norm_sq (data.y - X.mulVec (packParams m)) := by
-        classical
-        unfold l2norm_sq
-        refine Finset.sum_congr rfl ?_
-        intro i _
-        simp [X, pointwiseNLL, hm.dist_gaussian, Pi.sub_apply, h_lin]
-      -- penalty term (diagonal mask)
-      have h_diag : ∀ i, (S.mulVec (packParams m)) i = s i * (packParams m) i := by
-        intro i
-        classical
-        simp [S, Matrix.mulVec, dotProduct, Matrix.diagonal_apply]
-      have h_penalty :
-          Finset.univ.sum (fun i => (packParams m) i * (S.mulVec (packParams m)) i) =
-            (∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) +
-              (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2) := by
-        classical
-        have hsum :
-            Finset.univ.sum (fun i => (packParams m) i * (S.mulVec (packParams m)) i) =
-              Finset.univ.sum (fun i => s i * (packParams m i) ^ 2) := by
-          refine Finset.sum_congr rfl ?_
-          intro i _
-          simp [h_diag, pow_two, mul_comm, mul_left_comm, mul_assoc]
-        let g : ParamIxSum p k sp → ℝ
-          | Sum.inl _ => 0
-          | Sum.inr (Sum.inl _) => 0
-          | Sum.inr (Sum.inr (Sum.inl (l, j))) => (m.f₀ₗ l j) ^ 2
-          | Sum.inr (Sum.inr (Sum.inr (mIdx, l, j))) => (m.fₘₗ mIdx l j) ^ 2
-        have hsum' :
-            (∑ i : ParamIx p k sp, s i * (packParams m i) ^ 2) =
-              ∑ x : ParamIxSum p k sp, g x := by
-          refine (Fintype.sum_equiv (ParamIx.equivSum p k sp) _ g ?_)
-          intro x
-          cases x <;> simp [g, s, packParams, ParamIx.equivSum]
-        have hsum_pc :
-            (∑ x : Fin k × Fin sp, (m.f₀ₗ x.1 x.2) ^ 2) =
-              ∑ l, ∑ j, (m.f₀ₗ l j) ^ 2 := by
-          simpa using
-            (Finset.sum_product (s := (Finset.univ : Finset (Fin k)))
-              (t := (Finset.univ : Finset (Fin sp)))
-              (f := fun lj => (m.f₀ₗ lj.1 lj.2) ^ 2))
-        have hsum_int :
-            (∑ x : Fin p × Fin k × Fin sp, (m.fₘₗ x.1 x.2.1 x.2.2) ^ 2) =
-              ∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2 := by
-          have hsum_int' :
-              (∑ x : Fin p × Fin k × Fin sp, (m.fₘₗ x.1 x.2.1 x.2.2) ^ 2) =
-                ∑ mIdx, ∑ lj : Fin k × Fin sp, (m.fₘₗ mIdx lj.1 lj.2) ^ 2 := by
-            simpa using
-              (Finset.sum_product (s := (Finset.univ : Finset (Fin p)))
-                (t := (Finset.univ : Finset (Fin k × Fin sp)))
-                (f := fun mIdx_lj => (m.fₘₗ mIdx_lj.1 mIdx_lj.2.1 mIdx_lj.2.2) ^ 2))
-          have hsum_int'' :
-              ∀ mIdx : Fin p,
-                (∑ lj : Fin k × Fin sp, (m.fₘₗ mIdx lj.1 lj.2) ^ 2) =
-                  ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2 := by
-            intro mIdx
-            simpa using
-              (Finset.sum_product (s := (Finset.univ : Finset (Fin k)))
-                (t := (Finset.univ : Finset (Fin sp)))
-                (f := fun lj => (m.fₘₗ mIdx lj.1 lj.2) ^ 2))
-          calc
-            (∑ x : Fin p × Fin k × Fin sp, (m.fₘₗ x.1 x.2.1 x.2.2) ^ 2) =
-                ∑ mIdx, ∑ lj : Fin k × Fin sp, (m.fₘₗ mIdx lj.1 lj.2) ^ 2 := hsum_int'
-            _ = ∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2 := by
-              refine Finset.sum_congr rfl ?_
-              intro mIdx _
-              simpa using (hsum_int'' mIdx)
-        have hsum'' :
-            (∑ x : ParamIxSum p k sp, g x) =
-              (∑ l, ∑ j, (m.f₀ₗ l j) ^ 2) +
-                (∑ mIdx, ∑ l, ∑ j, (m.fₘₗ mIdx l j) ^ 2) := by
-          simp [ParamIxSum, g, hsum_pc, hsum_int]
-        simpa [hsum, hsum'] using hsum''
-      unfold empiricalLoss gaussianPenalizedLoss
-      simp [h_data, h_penalty]
-
     have h_pack_interp : packParams m_interp = β_interp := by
       ext j
       cases j <;> simp [m_interp, β_interp, packParams, unpackParams]

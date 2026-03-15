@@ -892,62 +892,22 @@ structure IsRawScoreModel {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fi
 structure IsNormalizedScoreModel {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] (m : PhenotypeInformedGAM p k sp) : Prop where
   fₘₗ_zero : ∀ (i : Fin p) (l : Fin k) (s : Fin sp), m.fₘₗ i l s = 0
 
-/-- Oracle specification for the raw-class minimizer: selects a global minimizer
-    of empirical loss among raw score models, given that one exists.
+/-!
+`IsRawScoreModel` and `IsNormalizedScoreModel` are structural subclasses of the GAM
+parameterization. This foundational file intentionally does not expose finite-sample
+`argmin` selectors for these subclasses.
 
-    **Important**: This is a `Classical.choose` from an *assumed* existence hypothesis,
-    not a constructive algorithm. Downstream theorems (`fitRaw_minimizes_loss`) are
-    therefore conditional on the caller supplying a proof that a minimizer exists.
-
-    The later definition `fit` (which uses Weierstrass: continuity + coercivity → minimum exists)
-    proves existence internally and is therefore unconditional. Prefer `fit` for
-    end-to-end theorems. -/
-noncomputable def fitRaw (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] [Fintype (Fin n)]
-    (data : RealizedData n k) (lambda : ℝ)
-    (h_fitRaw_exists :
-      ∃ (m : PhenotypeInformedGAM p k sp),
-        IsRawScoreModel m ∧
-        ∀ (m' : PhenotypeInformedGAM p k sp), IsRawScoreModel m' →
-          empiricalLoss m data lambda ≤ empiricalLoss m' data lambda) : PhenotypeInformedGAM p k sp :=
-  Classical.choose h_fitRaw_exists
-
-theorem fitRaw_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] [Fintype (Fin n)]
-    (data : RealizedData n k) (lambda : ℝ)
-    (h_fitRaw_exists :
-      ∃ (m : PhenotypeInformedGAM p k sp),
-        IsRawScoreModel m ∧
-        ∀ (m' : PhenotypeInformedGAM p k sp), IsRawScoreModel m' →
-          empiricalLoss m data lambda ≤ empiricalLoss m' data lambda) :
-  IsRawScoreModel (fitRaw p k sp n data lambda h_fitRaw_exists) ∧
-  ∀ (m : PhenotypeInformedGAM p k sp) (_h_m : IsRawScoreModel m),
-    empiricalLoss (fitRaw p k sp n data lambda h_fitRaw_exists) data lambda ≤ empiricalLoss m data lambda := by
-  have h := Classical.choose_spec h_fitRaw_exists
-  exact ⟨h.1, fun m hm => h.2 m hm⟩
-
-/-- Oracle specification for the normalized-class minimizer: analogous to `fitRaw`
-    but restricted to models where interaction spline coefficients (fₘₗ) are all zero.
-    See the docstring on `fitRaw` for limitations of this approach. -/
-noncomputable def fitNormalized (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] [Fintype (Fin n)]
-    (data : RealizedData n k) (lambda : ℝ)
-    (h_fitNormalized_exists :
-      ∃ (m : PhenotypeInformedGAM p k sp),
-        IsNormalizedScoreModel m ∧
-        ∀ (m' : PhenotypeInformedGAM p k sp), IsNormalizedScoreModel m' →
-          empiricalLoss m data lambda ≤ empiricalLoss m' data lambda) : PhenotypeInformedGAM p k sp :=
-  Classical.choose h_fitNormalized_exists
-
-theorem fitNormalized_minimizes_loss (p k sp n : ℕ) [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] [Fintype (Fin n)]
-    (data : RealizedData n k) (lambda : ℝ)
-    (h_fitNormalized_exists :
-      ∃ (m : PhenotypeInformedGAM p k sp),
-        IsNormalizedScoreModel m ∧
-        ∀ (m' : PhenotypeInformedGAM p k sp), IsNormalizedScoreModel m' →
-          empiricalLoss m data lambda ≤ empiricalLoss m' data lambda) :
-  IsNormalizedScoreModel (fitNormalized p k sp n data lambda h_fitNormalized_exists) ∧
-  ∀ (m : PhenotypeInformedGAM p k sp) (_h_m : IsNormalizedScoreModel m),
-    empiricalLoss (fitNormalized p k sp n data lambda h_fitNormalized_exists) data lambda ≤ empiricalLoss m data lambda := by
-  have h := Classical.choose_spec h_fitNormalized_exists
-  exact ⟨h.1, fun m hm => h.2 m hm⟩
+An unconditional optimizer theorem would need to fix the basis functions, link, and
+distribution family, and then prove actual attainment of the corresponding objective.
+The previous oracle-style `Classical.choose` wrappers only repackaged an assumed
+existence hypothesis and have been removed rather than preserved as a fake fitting API.
+Exact finite-sample procedures are derived downstream in `DGP.lean`, where the design
+matrix, restricted parameterizations, and Weierstrass/coercivity machinery are all available.
+Concretely, the exact existence theorem is
+`gaussianPenalizedLoss_exists_min_of_full_rank`, and the downstream restricted fits are
+`fitRaw`, `fitRaw_minimizes_loss`, `fitNormalized`, and
+`fitNormalized_minimizes_loss`.
+-/
 
 /-!
 =================================================================
