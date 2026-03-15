@@ -380,6 +380,13 @@ end RecentExpansion
 
 section ArchaicIntrogression
 
+/-- **Cumulative introgressed variants.**
+    Given an ancestral variant mass `N₀` and a constant introgression rate `r`,
+    the cumulative introgressed contribution after time `t` is
+    `N₀ * (1 - exp(-r * t))`. -/
+noncomputable def introgressionVariants (N₀ introgressionRate t : ℝ) : ℝ :=
+  N₀ * (1 - Real.exp (-introgressionRate * t))
+
 /-- **Differential introgression creates population-specific variants.**
     When one population has a higher archaic introgression fraction than
     another, the resulting population-specific variants contribute to
@@ -388,10 +395,19 @@ section ArchaicIntrogression
     Worked example: European/Asian ~2% Neanderthal, Melanesian ~2%
     Neanderthal + ~3-5% Denisovan, African ~0-0.3% archaic. -/
 theorem introgression_creates_population_specific_variants
-    (pct_high pct_low : ℝ)
-    (h_low_nn : 0 ≤ pct_low)
-    (h_diff : pct_low < pct_high) :
-    pct_low < pct_high := by linarith
+    (N₀ t rHigh rLow : ℝ)
+    (hN : 0 < N₀)
+    (ht : 0 < t)
+    (h_diff : rLow < rHigh) :
+    introgressionVariants N₀ rLow t < introgressionVariants N₀ rHigh t := by
+  unfold introgressionVariants
+  have h_exp_arg : -rHigh * t < -rLow * t := by
+    nlinarith
+  have h_exp_lt : Real.exp (-rHigh * t) < Real.exp (-rLow * t) := by
+    exact Real.exp_lt_exp.mpr h_exp_arg
+  have h_inner : 1 - Real.exp (-rLow * t) < 1 - Real.exp (-rHigh * t) := by
+    linarith
+  exact mul_lt_mul_of_pos_left h_inner hN
 
 /-- **Introgression fraction of heritability is bounded.**
     When introgressed heritability is at most a fraction δ of total
@@ -402,11 +418,9 @@ theorem introgression_creates_population_specific_variants
 theorem introgression_gap_bounded
     (h2_total h2_intro δ : ℝ)
     (h_total : 0 < h2_total)
-    (h_δ_nn : 0 ≤ δ)
-    (h_small : h2_intro ≤ δ * h2_total)
-    (h_intro_nn : 0 ≤ h2_intro) :
+    (h_small : h2_intro ≤ δ * h2_total) :
     h2_intro / h2_total ≤ δ := by
-  exact div_le_of_le_mul₀ (le_of_lt h_total) h_δ_nn h_small
+  exact (div_le_iff₀ h_total).mpr h_small
 
 end ArchaicIntrogression
 

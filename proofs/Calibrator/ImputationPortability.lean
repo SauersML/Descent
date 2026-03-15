@@ -240,16 +240,40 @@ section ArrayAscertainment
     These variants have higher MAF in EUR → better imputation
     → higher PGS signal in EUR. -/
 
+/-- Difference in `R²` corresponding to apparent portability loss relative
+    to the source-population score performance. -/
+noncomputable def apparent_portability_loss
+    (r2_source r2_target_array : ℝ) : ℝ :=
+  r2_source - r2_target_array
+
+/-- Difference in `R²` corresponding to true biological portability loss,
+    as measured with an ideal non-ascertained array or sequencing design. -/
+noncomputable def true_portability_loss
+    (r2_source r2_target_ideal : ℝ) : ℝ :=
+  r2_source - r2_target_ideal
+
 /-- **Ascertainment creates artificial portability loss.**
     Even with identical genetic architecture, the PGS computed
     from an EUR-ascertained array has lower R² in non-EUR
     populations because the array misses non-EUR causal variants. -/
 theorem ascertainment_artificial_loss
-    (r2_eur r2_afr_array r2_afr_ideal : ℝ)
-    (h_array_worse : r2_afr_array < r2_afr_ideal)
-    (h_ideal_good : 0 < r2_afr_ideal) :
-    -- Some of the apparent portability loss is an array artifact
-    0 < r2_afr_ideal - r2_afr_array := by linarith
+    (r2_source r2_target_array r2_target_ideal : ℝ)
+    (h_array_worse : r2_target_array < r2_target_ideal) :
+    apparent_portability_loss r2_source r2_target_array =
+        true_portability_loss r2_source r2_target_ideal +
+          (r2_target_ideal - r2_target_array) ∧
+      0 <
+        apparent_portability_loss r2_source r2_target_array -
+          true_portability_loss r2_source r2_target_ideal := by
+  constructor
+  · dsimp [apparent_portability_loss, true_portability_loss]
+    ring
+  · dsimp [apparent_portability_loss, true_portability_loss]
+    linarith
+
+/-- Ascertainment loss from incompletely tagged causal variation. -/
+noncomputable def ascertainment_loss (coverage v_causal : ℝ) : ℝ :=
+  (1 - coverage) * v_causal
 
 /-- **Multi-ethnic arrays reduce ascertainment bias.**
     Arrays designed with variants from multiple populations
@@ -262,18 +286,33 @@ theorem multi_ethnic_arrays_reduce_bias
     (h_V : 0 < V_causal) (h_cs : 0 ≤ cover_std) (h_cm : 0 ≤ cover_multi)
     (h_cs_le : cover_std ≤ 1) (h_cm_le : cover_multi ≤ 1)
     (h_better : cover_std < cover_multi) :
-    (1 - cover_multi) * V_causal < (1 - cover_std) * V_causal := by
+    ascertainment_loss cover_multi V_causal <
+      ascertainment_loss cover_std V_causal := by
+  dsimp [ascertainment_loss]
   exact mul_lt_mul_of_pos_right (by linarith) h_V
+
+/-- Total portability loss as the sum of biological and technical components. -/
+noncomputable def total_portability_loss (loss_genetic loss_technical : ℝ) : ℝ :=
+  loss_genetic + loss_technical
 
 /-- **Decomposing portability loss: genetic vs technical.**
     Total portability loss = genetic loss + technical loss.
     Genetic: LD mismatch, effect differences, selection.
     Technical: imputation error, array ascertainment. -/
 theorem portability_loss_decomposition
-    (loss_total loss_genetic loss_technical : ℝ)
-    (h_decomp : loss_total = loss_genetic + loss_technical)
+    (loss_genetic loss_technical : ℝ)
     (h_gen_nn : 0 ≤ loss_genetic) (h_tech_nn : 0 ≤ loss_technical) :
-    loss_genetic ≤ loss_total := by linarith
+    total_portability_loss loss_genetic loss_technical =
+        loss_genetic + loss_technical ∧
+      loss_genetic ≤ total_portability_loss loss_genetic loss_technical ∧
+      loss_technical ≤ total_portability_loss loss_genetic loss_technical := by
+  constructor
+  · rfl
+  constructor
+  · dsimp [total_portability_loss]
+    linarith
+  · dsimp [total_portability_loss]
+    linarith
 
 /-- **Technical loss is fixable; genetic loss is fundamental.**
     WGS + diverse reference panels can eliminate technical loss.

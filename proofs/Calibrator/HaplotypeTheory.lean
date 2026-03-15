@@ -209,11 +209,32 @@ theorem cis_differs_from_additive (beta1 beta2 delta_cis : ℝ)
     Having different damaging alleles on each copy (trans)
     can be pathogenic even when each allele alone is benign.
     This is a phase-dependent effect that PGS misses. -/
+noncomputable def riskCis (base_risk interaction_cis : ℝ) : ℝ :=
+  base_risk + interaction_cis
+
+/-- Phase-dependent risk under a trans configuration. -/
+noncomputable def riskTrans (base_risk interaction_trans : ℝ) : ℝ :=
+  base_risk + interaction_trans
+
+/-- Exact phase-dependent risk gap between trans and cis configurations. -/
+theorem trans_minus_cis_risk_eq_interaction_gap
+    (base_risk interaction_cis interaction_trans : ℝ) :
+    riskTrans base_risk interaction_trans - riskCis base_risk interaction_cis =
+      interaction_trans - interaction_cis := by
+  dsimp [riskTrans, riskCis]
+  ring
+
 theorem compound_het_not_captured_by_dosage
-    (risk_cis risk_trans risk_dosage : ℝ)
-    (h_trans_pathogenic : risk_dosage < risk_trans)
-    (h_cis_benign : risk_cis < risk_dosage) :
-    risk_cis < risk_trans := by linarith
+    (base_risk interaction_cis interaction_trans : ℝ)
+    (h_cis_benign : interaction_cis ≤ 0)
+    (h_trans_pathogenic : 0 < interaction_trans) :
+    riskCis base_risk interaction_cis <
+      riskTrans base_risk interaction_trans := by
+  have h_gap :
+      0 < riskTrans base_risk interaction_trans - riskCis base_risk interaction_cis := by
+    rw [trans_minus_cis_risk_eq_interaction_gap]
+    linarith
+  linarith
 
 /-- **Phase effects are population-specific.**
     Haplotype frequencies differ → phase configuration frequencies

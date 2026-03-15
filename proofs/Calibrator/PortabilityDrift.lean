@@ -667,7 +667,7 @@ def crossSource : Fin 2 → ℝ :=
 
 /-- Target cross-covariance vector paired with `sigmaObsTarget`. -/
 def crossTarget : Fin 2 → ℝ :=
-  ![0.8, 0.0]
+  ![0.8, 0.4]
 
 /-- Exact source OLS solution for the dense witness system. -/
 noncomputable def wSource_opt : Fin 2 → ℝ :=
@@ -675,7 +675,7 @@ noncomputable def wSource_opt : Fin 2 → ℝ :=
 
 /-- Exact target OLS solution for the dense witness system. -/
 noncomputable def wTarget_opt : Fin 2 → ℝ :=
-  ![80 / 99, -8 / 99]
+  ![76 / 99, 32 / 99]
 
 /-- A concrete proof that ERM mismatch occurs under LD shift, without relying on
     the abstract `hConflict` hypothesis, using dense 2x2 witnesses. -/

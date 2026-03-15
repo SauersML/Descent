@@ -332,16 +332,20 @@ theorem het_strict_mono_on_lower_half (p q : ℝ)
     meaning p_EUR cannot be too small. After drift, E[p_AFR] ≈ p_EUR
     but Var[p_AFR] ∝ Fst, so some variants become rarer in AFR.
 
-    We derive: when MAF drifts downward (p_afr < p_eur) and both are
-    in (0, 1/2), heterozygosity is strictly lower in AFR. This follows
-    from het being strictly increasing on (0, 1/2). -/
+    We derive the stronger statement that this directly lowers the expected
+    additive variance contribution `2p(1-p)β²` for any nonzero effect size. -/
 theorem discovered_variants_eur_biased
-    (p_eur p_afr : ℝ)
+    (p_eur p_afr β : ℝ)
     (h_eur : 0 < p_eur) (h_eur_lt : p_eur < 1/2)
     (h_afr : 0 < p_afr) (h_afr_lt : p_afr < 1/2)
-    (h_drift_down : p_afr < p_eur) :
-    ancestryHeterozygosity p_afr < ancestryHeterozygosity p_eur :=
-  het_strict_mono_on_lower_half p_afr p_eur h_afr h_afr_lt h_eur h_eur_lt h_drift_down
+    (h_drift_down : p_afr < p_eur)
+    (h_β_ne : β ≠ 0) :
+    ancestryHeterozygosity p_afr * β ^ 2 <
+      ancestryHeterozygosity p_eur * β ^ 2 := by
+  have h_het_lt :=
+    het_strict_mono_on_lower_half p_afr p_eur h_afr h_afr_lt h_eur h_eur_lt h_drift_down
+  have h_β_sq_pos : 0 < β ^ 2 := sq_pos_of_ne_zero h_β_ne
+  exact mul_lt_mul_of_pos_right h_het_lt h_β_sq_pos
 
 /-- **Discovery bias inflates apparent portability gap.**
     Model definitions (let-bindings below):

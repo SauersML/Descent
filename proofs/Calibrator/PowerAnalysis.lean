@@ -541,13 +541,31 @@ theorem invest_in_undersampled (n_large n_small delta C : ℝ)
   diminishing_returns n_small n_large delta C h_C h_small h_large h_delta h_gap
 
 /-- **Multi-ancestry GWAS sum of R² is maximized by balanced allocation.**
-    Total utility = Σ_pop w_pop × R²_pop.
-    With equal weights and diminishing returns, balanced allocation
-    maximizes total utility. -/
+    For two populations with equal weights and a fixed total budget `2n`,
+    the imbalanced allocation `(n - δ, n + δ)` is strictly worse than the
+    balanced allocation `(n, n)` under the exact scaling law
+    `R²(n) = n / (n + C)`. This is the concrete concavity statement the
+    section needs, not a generic monotonicity sum. -/
 theorem balanced_allocation_maximizes_total_utility
-    (r2_A r2_B r2_A' r2_B' : ℝ)
-    (h_A_improves : r2_A ≤ r2_A') (h_B_improves : r2_B ≤ r2_B') :
-    r2_A + r2_B ≤ r2_A' + r2_B' := by linarith
+    (n delta C : ℝ)
+    (h_C : 0 < C) (h_delta : 0 < delta) (h_n : delta < n) :
+    r2ScalingModel (n - delta) C + r2ScalingModel (n + delta) C <
+      2 * r2ScalingModel n C := by
+  have h_n_nonneg : 0 ≤ n := by
+    linarith
+  have h_n_minus_delta_nonneg : 0 ≤ n - delta := by
+    linarith
+  have h_marginal :
+      r2ScalingModel (n + delta) C - r2ScalingModel n C <
+        r2ScalingModel n C - r2ScalingModel (n - delta) C := by
+    simpa [sub_eq_add_neg, add_assoc, add_comm, add_left_comm] using
+      (diminishing_returns (n - delta) n delta C h_C
+        h_n_minus_delta_nonneg h_n_nonneg h_delta (by linarith))
+  have h_sum :
+      r2ScalingModel (n - delta) C + r2ScalingModel (n + delta) C <
+        r2ScalingModel n C + r2ScalingModel n C := by
+    linarith
+  simpa [two_mul] using h_sum
 
 end OptimalAllocation
 

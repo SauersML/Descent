@@ -263,15 +263,29 @@ theorem greml_ld_sensitive
   rw [h_bias]; intro h; apply h_ld_nonzero; linarith
 
 /-- **GREML underestimates h² when causal variants are poorly tagged.**
-    If tag-causal r² < 1, GREML underestimates V_A. -/
+    The true SNP heritability is `V_A / V_P`, while GREML only captures
+    the tagged additive variance `(mean_tag_r2 * V_A) / V_P`. If tagging is
+    imperfect, the underestimation gap is exactly
+    `((1 - mean_tag_r2) * V_A) / V_P > 0`. -/
 theorem greml_underestimates_with_poor_tagging
-    (h2_true h2_greml mean_tag_r2 : ℝ)
-    (h_relation : h2_greml = h2_true * mean_tag_r2)
+    (V_A V_P mean_tag_r2 : ℝ)
     (h_imperfect : mean_tag_r2 < 1)
-    (h_true_pos : 0 < h2_true) (h_tag_pos : 0 < mean_tag_r2) :
-    h2_greml < h2_true := by
-  rw [h_relation]
-  exact mul_lt_of_lt_one_right h_true_pos h_imperfect
+    (h_VA_pos : 0 < V_A) (h_VP_pos : 0 < V_P) :
+    let h2_true := V_A / V_P
+    let h2_greml := (mean_tag_r2 * V_A) / V_P
+    h2_true - h2_greml = ((1 - mean_tag_r2) * V_A) / V_P ∧
+      0 < h2_true - h2_greml := by
+  simp only
+  rw [← sub_div]
+  have h_gap :
+      V_A - mean_tag_r2 * V_A = (1 - mean_tag_r2) * V_A := by
+    ring
+  rw [h_gap]
+  constructor
+  · rfl
+  · apply div_pos
+    · nlinarith
+    · exact h_VP_pos
 
 /-- **Population structure inflates GREML h² estimate.**
     Cryptic stratification in the GWAS sample creates a positive bias

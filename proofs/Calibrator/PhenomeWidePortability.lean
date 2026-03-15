@@ -527,10 +527,16 @@ theorem portability_predictable_from_characteristics
     2. Different disease prevalence across populations (δ_prev)
     3. Liability threshold model nonlinearity (δ_threshold)
     These additive losses degrade disease portability below risk factor portability. -/
+noncomputable def diseasePortability
+    (port_rf δ_ascertain δ_prev δ_threshold : ℝ) : ℝ :=
+  port_rf - (δ_ascertain + δ_prev + δ_threshold)
+
 theorem disease_worse_portability_than_risk_factor
     (port_rf δ_ascertain δ_prev δ_threshold : ℝ)
     (h_asc : 0 < δ_ascertain) (h_prev : 0 < δ_prev) (h_thresh : 0 < δ_threshold) :
-    port_rf - (δ_ascertain + δ_prev + δ_threshold) < port_rf := by linarith
+    diseasePortability port_rf δ_ascertain δ_prev δ_threshold < port_rf := by
+  dsimp [diseasePortability]
+  linarith
 
 /-- **Rank correlation is preserved under monotone transforms.**
     Spearman's ρ (rank correlation) is invariant to monotone transforms

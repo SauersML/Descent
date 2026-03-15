@@ -384,12 +384,34 @@ theorem negative_selection_constraint
 /-- **The α model: E[β²] ∝ [p(1-p)]^(1+α).**
     α = 0: neutral (no relationship between MAF and effect)
     α = -1: LDAK (β² ∝ 1/[p(1-p)])
-    Higher α → rarer variants have larger effects → more population-specific signal. -/
+    When `α < -1`, the exponent `1 + α` is negative, so lower heterozygosity
+    implies a larger expected effect-size multiplier. This makes rarer variants
+    more population-specific and therefore less portable. -/
+noncomputable def expectedEffectMultiplier (p α : ℝ) : ℝ :=
+  (p * (1 - p)) ^ (1 + α)
+
 theorem alpha_model_portability_impact
-    (α port : ℝ)
-    (h_relation : α < 0 → port < 1)
-    (h_negative : α < 0) :
-    port < 1 := h_relation h_negative
+    (p_rare p_common α : ℝ)
+    (h_rare_pos : 0 < p_rare)
+    (h_rare_lt : p_rare < p_common)
+    (h_common_le : p_common ≤ 1 / 2)
+    (h_alpha : α < -1) :
+    expectedEffectMultiplier p_common α < expectedEffectMultiplier p_rare α := by
+  unfold expectedEffectMultiplier
+  have h_common_pos : 0 < p_common := by
+    exact lt_trans h_rare_pos h_rare_lt
+  have h_common_lt_one : p_common < 1 := by
+    linarith
+  have h_rare_lt_half : p_rare < 1 / 2 := by
+    exact lt_of_lt_of_le h_rare_lt h_common_le
+  have h_rare_het_pos : 0 < p_rare * (1 - p_rare) := by
+    apply mul_pos h_rare_pos
+    linarith
+  have h_het_lt : p_rare * (1 - p_rare) < p_common * (1 - p_common) := by
+    nlinarith [sq_nonneg (p_common - 1 / 2), sq_nonneg (p_rare - 1 / 2)]
+  have h_exp_neg : 1 + α < 0 := by
+    linarith
+  exact Real.rpow_lt_rpow_of_neg h_rare_het_pos h_het_lt h_exp_neg
 
 /-- **Rare variant PGS R² increases slowly with sample size.**
     For rare variants, R²_rare ∝ n × MAF × β².

@@ -346,13 +346,22 @@ theorem conformal_coverage_guarantee
     0 < 1 / ((n : ℝ) + 1) := by
   positivity
 
-/-- **Conformal coverage gap vanishes with larger calibration set.** -/
+/-- Expected finite-sample conformal coverage lower bound for calibration size `n`.
+    This uses the standard distribution-free bound `1 - α - 1/(n+1)`. -/
+noncomputable def conformal_coverage_bound (α : ℝ) (n : ℕ) : ℝ :=
+  1 - α - 1 / ((n : ℝ) + 1)
+
+/-- **Conformal coverage bound strictly increases with larger calibration set.** -/
 theorem conformal_gap_decreases
-    (n₁ n₂ : ℕ) (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂) (h_more : n₁ < n₂) :
-    1 / ((n₂ : ℝ) + 1) < 1 / ((n₁ : ℝ) + 1) := by
-  apply div_lt_div_of_pos_left one_pos
-  · positivity
-  · exact_mod_cast Nat.add_lt_add_right h_more 1
+    (α : ℝ) (n₁ n₂ : ℕ)
+    (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂) (h_more : n₁ < n₂) :
+    conformal_coverage_bound α n₁ < conformal_coverage_bound α n₂ := by
+  unfold conformal_coverage_bound
+  have h_gap : 1 / ((n₂ : ℝ) + 1) < 1 / ((n₁ : ℝ) + 1) := by
+    apply div_lt_div_of_pos_left one_pos
+    · positivity
+    · exact_mod_cast Nat.add_lt_add_right h_more 1
+  linarith
 
 /-- **Conformal score quantile yields adaptive width.**
     The conformal prediction interval at level (1-α) has halfwidth equal to

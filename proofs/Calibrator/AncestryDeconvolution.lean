@@ -285,20 +285,27 @@ theorem r2_decreases_with_distance
   nlinarith
 
 /-- **Within-group variation dominates between-group variation.**
-    When the R² of between-group signal is small relative to the
-    within-group coefficient of variation squared (cv²), the between-group
-    signal is overwhelmed. For any trait where R²_between < 1/cv²,
-    within-group noise dominates.
+    When the variance explained by between-group signal is small relative to the
+    within-group variance scale `cv²`, the between-group signal is overwhelmed.
+    If the between-group variance is strictly below `var_total / cv²`, then the
+    resulting between-group `R² = var_between / var_total` is strictly below
+    `1 / cv²`.
 
     Worked example: Wang et al. find R² ≈ 0.5% for distance-on-error,
     far below the χ²₁ cv² = 2. -/
 theorem individual_variation_dominates
-    (r2_between_group cv_squared_within : ℝ)
+    (var_between_group var_total cv_squared_within : ℝ)
+    (h_total_pos : 0 < var_total)
     (h_cv_pos : 0 < cv_squared_within)
-    (h_r2_small : r2_between_group < 1 / cv_squared_within) :
-    -- Even if between-group trend is real, it's overwhelmed by within-group noise
-    r2_between_group < 1 / cv_squared_within := by
-  exact h_r2_small
+    (h_var_small : var_between_group < var_total / cv_squared_within) :
+    var_between_group / var_total < 1 / cv_squared_within := by
+  rw [div_lt_div_iff₀ h_total_pos h_cv_pos]
+  calc
+    var_between_group * cv_squared_within
+      < (var_total / cv_squared_within) * cv_squared_within := by
+        exact mul_lt_mul_of_pos_right h_var_small h_cv_pos
+    _ = var_total := div_mul_cancel₀ var_total (ne_of_gt h_cv_pos)
+    _ = 1 * var_total := (one_mul var_total).symm
 
 /-- **Optimal ancestry granularity for PGS application.**
     Too coarse (continental groups) loses information.
