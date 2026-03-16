@@ -6488,11 +6488,14 @@ theorem migrationLDBoost_ge_one (p : EvolutionaryParameters) :
     · linarith [p.bigM_nonneg]
   linarith
 
-/-- **Unified portability ratio**: combines all four evolutionary forces.
+/-- **Unified scalar transport factor**: combines all four evolutionary forces.
 
-    R²_target / R²_source ≈ (1 - Fst_eq) × sharedLD × mutationErosion × migrationBoost
+    This is the four-factor signal-retention product used later in the scalar
+    deployment summary. It should not be read as a literal theorem that
+    `R²_target / R²_source` equals this product; the deployed `R²` ratio is a
+    separate nonlinear coordinate map on transported signal variance.
 
-    This decomposes portability into:
+    This decomposes scalar signal retention into:
     1. (1 - Fst_eq): drift component (reduced by mutation + migration at equilibrium)
     2. sharedLD: recombination breaks LD over divergence time
     3. mutationErosion: new mutations create unshared LD
@@ -6552,8 +6555,8 @@ noncomputable def EvolutionaryParameters.portabilityFactor
     (mutationLDErosion p)
     (migrationLDBoost p)
 
-/-- The public evolutionary portability ratio is the canonical portability-factor
-value specialized to the model's four biological components. -/
+/-- The public evolutionary scalar transport factor is the canonical
+portability-factor value specialized to the model's four biological components. -/
 noncomputable def unifiedPortabilityRatio (p : EvolutionaryParameters) : ℝ :=
   p.portabilityFactor.value
 
@@ -6568,7 +6571,7 @@ noncomputable def unifiedPortabilityRatio (p : EvolutionaryParameters) : ℝ :=
     PortabilityFactor.value PortabilityFactor.fromComponents
   rfl
 
-/-- The unified portability ratio is nonneg when θ + M > 0. -/
+/-- The unified scalar transport factor is nonnegative when θ + M > 0. -/
 theorem unifiedPortabilityRatio_nonneg (p : EvolutionaryParameters)
     (h_forces : 0 < p.theta + p.bigM) :
     0 ≤ unifiedPortabilityRatio p := by
@@ -6618,8 +6621,8 @@ theorem fstEquilibrium_decreasing_in_migration
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₁)]
   nlinarith
 
-/-- **Portability is bounded by the drift-only bound.**
-    Adding mutation and migration can only improve portability
+/-- **The drift component is bounded by the drift-only bound.**
+    Adding mutation and migration can only improve the ancestry-retention term
     relative to the pure drift case, because Fst is lower at equilibrium.
     Derived: fstEquilibrium uses θ + M in the denominator,
     so when θ + M > 0, the denominator > 1, hence Fst < 1. -/
@@ -6630,8 +6633,8 @@ theorem unified_portability_drift_component_improves
   rw [div_lt_one (by linarith [p.theta_nonneg, p.bigM_nonneg] : 0 < 1 + p.theta + p.bigM)]
   linarith
 
-/-- **Portability loss decomposition into four components.**
-    Derived from the unified model: total portability loss decomposes as
+/-- **Scalar transport-loss decomposition into four components.**
+    Derived from the unified model: total scalar transport loss decomposes as
     1 - unifiedPortabilityRatio, which factors into drift, LD, mutation, and migration terms.
     Here we show: the drift component alone (fstEquilibrium) is bounded by
     fstDriftMutation, which in turn is bounded by 1. Each additional force
@@ -6655,7 +6658,8 @@ theorem portability_loss_decomposition_from_model
 
 /-- **Migration gain is bounded by the drift loss it counteracts.**
     Derived from the model: migration reduces Fst from 1/(1+θ) to 1/(1+θ+M).
-    The migration "gain" in portability is the difference (1 - Fst_full) - (1 - Fst_mutation),
+    The migration gain in the scalar ancestry-retention term is the difference
+    `(1 - Fst_full) - (1 - Fst_mutation)`,
     which equals fstDriftMutation - fstEquilibrium. This is strictly positive but bounded
     by fstDriftMutation (the total drift+mutation loss). -/
 theorem migration_gain_bounded_by_model
@@ -6787,18 +6791,21 @@ in a target population, fully as a function of time since divergence.
 1. Evolutionary parameters → Fst(t), LD_retention(t), mutation_erosion(t), migration_boost(t)
 2. These four factors → unified portability ratio ρ(t)
 3. Source R² × ρ(t) → target R²(t)
-4. Target R²(t) → target AUC(t) via liability threshold model
-5. Target R²(t) → target Brier(t) = π(1-π)(1 - R²_target)
+4. Scalar transported signal summary → target AUC(t) via liability threshold model
+5. Scalar transported signal summary → target Brier(t) = π(1-π)(1 - R²_target)
 
-Everything evolves over time. As t increases: Fst grows, LD decays,
-mutation erodes shared signal, migration partially counteracts.
-The clinical metrics degrade accordingly.
+Everything evolves over time through a scalar transported-signal summary.
+As t increases: Fst grows, LD decays, mutation erodes shared signal, and
+migration partially counteracts. The deployed metrics in this section are then
+read off from exact coordinate maps applied to that scalar summary.
 
-### Key insight
-A single `EvolutionaryParameters` structure, plus source R² and disease
-prevalence, fully determines ALL accuracy metrics in any target population.
-No population-genetic or statistical-genetic fact is assumed — every
-component is derived from the recurrences proved in earlier files.
+### Key scope note
+An `EvolutionaryParameters` structure, plus source `R²` and disease prevalence,
+fully determines the scalar deployment summary in this file. That is enough for
+exact algebra on the chosen summary coordinates, but it is not by itself a full
+SNP/LD state-space model of transport. The more mechanistic transport objects
+live downstream in `PortabilityDrift.targetR2FromSourceWeights` and
+`TransferLearningPGS.transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD`.
 -/
 
 section EndToEndMetrics
@@ -6888,19 +6895,41 @@ noncomputable def PGSEvolutionaryModel.mutErosion (m : PGSEvolutionaryModel) : �
 noncomputable def PGSEvolutionaryModel.migBoost (m : PGSEvolutionaryModel) : ℝ :=
   migrationLDBoost m.toEvo
 
-/-! ### Step 2: Exact transported signal variance
+/-! ### Step 2: Scalar transport factor
 
-The four evolutionary factors act on the transported PGS signal variance:
+The four evolutionary factors decompose a scalar signal-retention factor:
 
 - `(1 - Fst)`: allele-frequency retention
 - `LD_retention`: shared LD tagging
 - `mut_erosion`: ancestral/shared causal content
 - `mig_boost`: migration-restored shared signal
 
-We therefore transport the exact source signal variance and only then map that
-transported signal into deployed metrics (`R²`, AUC, Brier). The scalar
-`portabilityRatio` is no longer primitive; it is derived afterward as the exact
-target/source signal-variance ratio.
+This block stops at that scalar factor. It does not reconstruct source signal
+from source `R²`, and it does not derive target deployed metrics from source
+`R²` plus scalar retention alone.
+-/
+
+/-! ### Scope of this scalar deployment block
+
+The next definitions intentionally stop short of an end-to-end portability law.
+They provide:
+
+- a scalar evolutionary transport factor; and
+- generic metric coordinate maps once an explicit target signal variance is
+  supplied.
+
+They do **not** evolve SNP weights, tag/causal covariance matrices, or target
+effect-size vectors directly. The lower-level SNP/LD-aware transport objects
+live in:
+
+- `PortabilityDrift.targetR2FromSourceWeights`, where transported source weights
+  are evaluated against target LD geometry; and
+- `TransferLearningPGS.transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD`,
+  where transport is expressed in source/target effect vectors under a shared
+  LD kernel.
+
+Those mechanistic theorems are now the required route for any biological claim
+about target `R²`, AUC, or Brier.
 -/
 
 /-! ### Canonical transported metric surface
@@ -6919,15 +6948,6 @@ lemmas back to this namespace.
 
 namespace TransportedMetrics
 
-/-- Source signal variance recovered exactly from source `R²` and residual variance. -/
-noncomputable def sourceSignalVariance (vNoise r2Source : ℝ) : ℝ :=
-  vNoise * (r2Source / (1 - r2Source))
-
-/-- Exact transported target signal variance from the transported retention factor. -/
-noncomputable def targetSignalVariance
-    (vNoise r2Source transportFactor : ℝ) : ℝ :=
-  sourceSignalVariance vNoise r2Source * transportFactor
-
 /-- Exact conversion from signal variance to deployed `R²` at fixed residual scale. -/
 noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   vSignal / (vSignal + vNoise)
@@ -6940,124 +6960,48 @@ noncomputable def aucFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
 def calibratedBrier (π r2 : ℝ) : ℝ :=
   π * (1 - π) * (1 - r2)
 
-/-- Canonical transported target `R²` from source `R²` and signal retention. -/
-noncomputable def targetR2
-    (vNoise r2Source transportFactor : ℝ) : ℝ :=
-  r2FromSignalVariance
-    (targetSignalVariance vNoise r2Source transportFactor) vNoise
-
-/-- Canonical exact target/source deployed `R²` ratio induced by a signal
-transport factor. -/
-noncomputable def r2PortabilityRatio
-    (vNoise r2Source transportFactor : ℝ) : ℝ :=
-  targetR2 vNoise r2Source transportFactor / r2Source
-
-/-- Canonical transported target AUC from source `R²` and signal retention. -/
-noncomputable def targetAUC
-    (vNoise r2Source transportFactor : ℝ) : ℝ :=
-  aucFromSignalVariance
-    (targetSignalVariance vNoise r2Source transportFactor) vNoise
-
-/-- Canonical source AUC recovered from source `R²` and residual variance. -/
-noncomputable def sourceAUC (vNoise r2Source : ℝ) : ℝ :=
-  aucFromSignalVariance (sourceSignalVariance vNoise r2Source) vNoise
-
-/-- Canonical transported target calibrated Brier risk. -/
-noncomputable def targetBrier
-    (π vNoise r2Source transportFactor : ℝ) : ℝ :=
-  calibratedBrier π (targetR2 vNoise r2Source transportFactor)
-
-/-- Canonical source calibrated Brier risk. -/
-noncomputable def sourceBrier (π r2Source : ℝ) : ℝ :=
-  calibratedBrier π r2Source
-
-/-- Canonical bundled transported deployment metrics. -/
+/-- Canonical bundled deployed metrics from an explicit target signal variance. -/
 structure Profile where
   r2 : ℝ
   auc : ℝ
   brier : ℝ
 
-/-- Canonical bundled transported deployment metrics from source transport inputs. -/
-noncomputable def profile
-    (π vNoise r2Source transportFactor : ℝ) : Profile where
-  r2 := targetR2 vNoise r2Source transportFactor
-  auc := targetAUC vNoise r2Source transportFactor
-  brier := targetBrier π vNoise r2Source transportFactor
+@[ext] theorem Profile.ext {p q : Profile}
+    (hr2 : p.r2 = q.r2) (hauc : p.auc = q.auc) (hbrier : p.brier = q.brier) :
+    p = q := by
+  cases p
+  cases q
+  simp_all
 
-@[simp] theorem profile_r2
-    (π vNoise r2Source transportFactor : ℝ) :
-    (profile π vNoise r2Source transportFactor).r2 =
-      targetR2 vNoise r2Source transportFactor := by
+/-- Canonical bundled deployed metrics from explicit target signal and residual
+    variances.
+
+    This namespace intentionally stops at coordinate maps. It does not infer a
+    target signal variance from source `R²` plus a scalar transport factor;
+    that target signal must come from a separate mechanistic theorem. -/
+noncomputable def profileFromSignalVariance
+    (π vNoise vSignal : ℝ) : Profile where
+  r2 := r2FromSignalVariance vSignal vNoise
+  auc := aucFromSignalVariance vSignal vNoise
+  brier := calibratedBrier π (r2FromSignalVariance vSignal vNoise)
+
+@[simp] theorem profileFromSignalVariance_r2
+    (π vNoise vSignal : ℝ) :
+    (profileFromSignalVariance π vNoise vSignal).r2 =
+      r2FromSignalVariance vSignal vNoise := by
   rfl
 
-@[simp] theorem profile_auc
-    (π vNoise r2Source transportFactor : ℝ) :
-    (profile π vNoise r2Source transportFactor).auc =
-      targetAUC vNoise r2Source transportFactor := by
+@[simp] theorem profileFromSignalVariance_auc
+    (π vNoise vSignal : ℝ) :
+    (profileFromSignalVariance π vNoise vSignal).auc =
+      aucFromSignalVariance vSignal vNoise := by
   rfl
 
-@[simp] theorem profile_brier
-    (π vNoise r2Source transportFactor : ℝ) :
-    (profile π vNoise r2Source transportFactor).brier =
-      targetBrier π vNoise r2Source transportFactor := by
+@[simp] theorem profileFromSignalVariance_brier
+    (π vNoise vSignal : ℝ) :
+    (profileFromSignalVariance π vNoise vSignal).brier =
+      calibratedBrier π (r2FromSignalVariance vSignal vNoise) := by
   rfl
-
-@[simp] theorem r2PortabilityRatio_eq
-    (vNoise r2Source transportFactor : ℝ) :
-    r2PortabilityRatio vNoise r2Source transportFactor =
-      targetR2 vNoise r2Source transportFactor / r2Source := by
-  rfl
-
-/-- Source `R²` is recovered exactly from the canonical source signal variance. -/
-theorem sourceR2_eq_r2FromSignalVariance_sourceSignalVariance
-    (vNoise r2Source : ℝ)
-    (hvNoise : vNoise ≠ 0)
-    (h_r2 : r2Source ≠ 1) :
-    r2FromSignalVariance (sourceSignalVariance vNoise r2Source) vNoise = r2Source := by
-  unfold r2FromSignalVariance sourceSignalVariance
-  have h_one : (1 - r2Source) ≠ 0 := sub_ne_zero.mpr (Ne.symm h_r2)
-  field_simp [hvNoise, h_one]
-  ring_nf
-
-/-- Canonical transported target `R²` reduces to the standard closed form. -/
-theorem targetR2_eq_closed_form
-    (vNoise r2Source transportFactor : ℝ)
-    (hvNoise : vNoise ≠ 0)
-    (h_r2 : r2Source ≠ 1) :
-    targetR2 vNoise r2Source transportFactor =
-      (r2Source * transportFactor) /
-        (1 - r2Source + r2Source * transportFactor) := by
-  unfold targetR2 r2FromSignalVariance targetSignalVariance sourceSignalVariance
-  have h_one : (1 - r2Source) ≠ 0 := sub_ne_zero.mpr (Ne.symm h_r2)
-  field_simp [hvNoise, h_one]
-  ring_nf
-
-/-- Canonical source AUC reduces to the standard closed form. -/
-theorem sourceAUC_eq_closed_form
-    (vNoise r2Source : ℝ)
-    (hvNoise : vNoise ≠ 0)
-    (h_r2 : r2Source ≠ 1) :
-    sourceAUC vNoise r2Source =
-      Phi (Real.sqrt (r2Source / (2 * (1 - r2Source)))) := by
-  unfold sourceAUC aucFromSignalVariance sourceSignalVariance
-  apply congrArg
-  apply congrArg
-  have h_one : (1 - r2Source) ≠ 0 := sub_ne_zero.mpr (Ne.symm h_r2)
-  field_simp [hvNoise, h_one]
-
-/-- Canonical transported target AUC reduces to the standard closed form. -/
-theorem targetAUC_eq_closed_form
-    (vNoise r2Source transportFactor : ℝ)
-    (hvNoise : vNoise ≠ 0)
-    (h_r2 : r2Source ≠ 1) :
-    targetAUC vNoise r2Source transportFactor =
-      Phi (Real.sqrt
-        ((r2Source * transportFactor) / (2 * (1 - r2Source)))) := by
-  unfold targetAUC aucFromSignalVariance targetSignalVariance sourceSignalVariance
-  apply congrArg
-  apply congrArg
-  have h_one : (1 - r2Source) ≠ 0 := sub_ne_zero.mpr (Ne.symm h_r2)
-  field_simp [hvNoise, h_one]
 
 end TransportedMetrics
 
@@ -7081,7 +7025,11 @@ noncomputable def PGSEvolutionaryModel.signalTransportFactor (m : PGSEvolutionar
   rfl
 
 /-- The signal-transport factor is the canonical portability-factor value for
-the evolutionary model. -/
+the evolutionary model.
+
+It depends only on the evolutionary components and not on source `R²`; any
+source-`R²` dependence in deployed target metrics appears only after mapping
+transported signal variance back to bounded observables. -/
 theorem PGSEvolutionaryModel.signalTransportFactor_eq_components
     (m : PGSEvolutionaryModel) :
     m.signalTransportFactor =
@@ -7102,382 +7050,77 @@ theorem PGSEvolutionaryModel.signalTransportFactor_explicit
     PGSEvolutionaryModel.toEvo, sharedLDRetention, mutationLDErosion,
     migrationLDBoost, fstEquilibrium]
 
-/-- Source signal variance recovered exactly from source `R²` and residual variance.
-
-    From `R² = V_signal / (V_signal + V_E)`, we obtain
-    `V_signal = V_E * R² / (1 - R²)`. -/
-noncomputable def PGSEvolutionaryModel.sourceSignalVariance (m : PGSEvolutionaryModel) : ℝ :=
-  m.V_E * (m.R2_source / (1 - m.R2_source))
-
-/-- Exact transported target signal variance from the evolutionary transport chain. -/
-noncomputable def PGSEvolutionaryModel.targetSignalVariance (m : PGSEvolutionaryModel) : ℝ :=
-  m.sourceSignalVariance * m.signalTransportFactor
-
-/-- The public portability ratio is the exact target/source signal-variance ratio. -/
-noncomputable def PGSEvolutionaryModel.portabilityRatio (m : PGSEvolutionaryModel) : ℝ :=
-  m.targetSignalVariance / m.sourceSignalVariance
-
-/-- Exact conversion from signal variance to deployed `R²` at fixed residual scale. -/
-noncomputable def PGSEvolutionaryModel.varianceToR2 (m : PGSEvolutionaryModel) (vSignal : ℝ) : ℝ :=
-  vSignal / (vSignal + m.V_E)
-
-/-- The evolutionary source signal variance is the canonical transported-metric
-source signal variance specialized to the model's residual scale and source `R²`. -/
-theorem PGSEvolutionaryModel.sourceSignalVariance_eq_transportedMetrics
-    (m : PGSEvolutionaryModel) :
-    m.sourceSignalVariance =
-      TransportedMetrics.sourceSignalVariance m.V_E m.R2_source := by
-  rfl
-
-/-- The evolutionary target signal variance is the canonical transported-metric
-target signal variance specialized to the model's residual scale and transport factor. -/
-theorem PGSEvolutionaryModel.targetSignalVariance_eq_transportedMetrics
-    (m : PGSEvolutionaryModel) :
-    m.targetSignalVariance =
-      TransportedMetrics.targetSignalVariance m.V_E m.R2_source m.signalTransportFactor := by
-  rfl
-
-/-- The evolutionary variance-to-`R²` map is the canonical variance-to-`R²` map
-at the model's residual scale. -/
-theorem PGSEvolutionaryModel.varianceToR2_eq_transportedMetrics
-    (m : PGSEvolutionaryModel) (vSignal : ℝ) :
-    m.varianceToR2 vSignal =
-      TransportedMetrics.r2FromSignalVariance vSignal m.V_E := by
-  rfl
-
-/-- Source signal variance is strictly positive. -/
-theorem PGSEvolutionaryModel.sourceSignalVariance_pos (m : PGSEvolutionaryModel) :
-    0 < m.sourceSignalVariance := by
-  unfold sourceSignalVariance
-  have hden : 0 < 1 - m.R2_source := by linarith [m.R2_source_lt_one]
-  have hsnr_pos : 0 < m.R2_source / (1 - m.R2_source) := by
-    exact div_pos m.R2_source_pos hden
-  exact mul_pos m.V_E_pos hsnr_pos
-
-/-- Source signal variance is nonzero. -/
-theorem PGSEvolutionaryModel.sourceSignalVariance_ne (m : PGSEvolutionaryModel) :
-    m.sourceSignalVariance ≠ 0 := by
-  exact ne_of_gt m.sourceSignalVariance_pos
-
-/-- Exact recovery of the source `R²` from the source signal variance. -/
-theorem PGSEvolutionaryModel.sourceR2_eq_varianceToR2_sourceSignalVariance
-    (m : PGSEvolutionaryModel) :
-    m.varianceToR2 m.sourceSignalVariance = m.R2_source := by
-  unfold varianceToR2 sourceSignalVariance
-  have hVE_ne : m.V_E ≠ 0 := by exact ne_of_gt m.V_E_pos
-  have hden_ne : 1 - m.R2_source ≠ 0 := by linarith [m.R2_source_lt_one]
-  field_simp [hVE_ne, hden_ne]
-  ring
-
-/-- The derived portability ratio is exactly the evolutionary transport factor. -/
-theorem PGSEvolutionaryModel.portabilityRatio_eq_signalTransportFactor
-    (m : PGSEvolutionaryModel) :
-    m.portabilityRatio = m.signalTransportFactor := by
-  unfold portabilityRatio targetSignalVariance
-  field_simp [m.sourceSignalVariance_ne]
-
-/-- Transported target signal variance equals the portability ratio times source signal variance. -/
-theorem PGSEvolutionaryModel.targetSignalVariance_eq_portabilityRatio_mul_source
-    (m : PGSEvolutionaryModel) :
-    m.targetSignalVariance = m.portabilityRatio * m.sourceSignalVariance := by
-  rw [m.portabilityRatio_eq_signalTransportFactor]
-  unfold targetSignalVariance
-  ring
-
-/-- `v ↦ v/(v+V_E)` is monotone on nonnegative signal variances. -/
-theorem PGSEvolutionaryModel.varianceToR2_monotone
-    (m : PGSEvolutionaryModel) {x y : ℝ}
-    (hx : 0 ≤ x) (hxy : x ≤ y) :
-    m.varianceToR2 x ≤ m.varianceToR2 y := by
-  unfold varianceToR2
-  have hxden : 0 < x + m.V_E := by linarith [m.V_E_pos]
-  have hyden : 0 < y + m.V_E := by linarith [m.V_E_pos]
-  rw [div_le_div_iff₀ hxden hyden]
-  ring_nf
-  nlinarith [hxy, m.V_E_pos]
-
-/-- `v ↦ v/(v+V_E)` is strictly increasing on nonnegative signal variances. -/
-theorem PGSEvolutionaryModel.varianceToR2_strictMono
-    (m : PGSEvolutionaryModel) {x y : ℝ}
-    (hx : 0 ≤ x) (hxy : x < y) :
-    m.varianceToR2 x < m.varianceToR2 y := by
-  unfold varianceToR2
-  have hxden : 0 < x + m.V_E := by linarith [m.V_E_pos]
-  have hyden : 0 < y + m.V_E := by linarith [m.V_E_pos]
-  rw [div_lt_div_iff₀ hxden hyden]
-  ring_nf
-  nlinarith [hxy, m.V_E_pos]
-
-/-! ### Step 3: Exact target `R²(t)`
-
-The deployed `R²` is not defined by multiplying source `R²` by a scalar. We
-first transport signal variance, then apply the exact variance-to-`R²` map
-`v ↦ v / (v + V_E)`. This is the same exact mapping used elsewhere in the drift
-core; the present section now derives it directly inside the evolutionary block.
--/
-
-/-- Exact target `R²` obtained from transported target signal variance. -/
-noncomputable def PGSEvolutionaryModel.R2_target (m : PGSEvolutionaryModel) : ℝ :=
-  m.varianceToR2 m.targetSignalVariance
-
-/-- The evolutionary target `R²` is the canonical transported metric specialized
-to the model's residual scale, source `R²`, and biological transport factor. -/
-theorem PGSEvolutionaryModel.R2_target_eq_transportedMetrics
-    (m : PGSEvolutionaryModel) :
-    m.R2_target =
-      TransportedMetrics.targetR2 m.V_E m.R2_source m.signalTransportFactor := by
-  rfl
-
-/-- Target `R²` is nonnegative when the transported signal variance is nonnegative. -/
-theorem PGSEvolutionaryModel.R2_target_nonneg (m : PGSEvolutionaryModel)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
-    0 ≤ m.R2_target := by
-  have h_factor_nn : 0 ≤ m.signalTransportFactor := by
-    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
-  have h_target_nn : 0 ≤ m.targetSignalVariance := by
-    unfold targetSignalVariance
-    exact mul_nonneg (le_of_lt m.sourceSignalVariance_pos) h_factor_nn
-  unfold R2_target
-  unfold varianceToR2
-  exact div_nonneg h_target_nn (by linarith [m.V_E_pos])
-
-/-- Exact target `R²` never exceeds source `R²` when transported signal retention is at most one. -/
-theorem PGSEvolutionaryModel.R2_target_le_source (m : PGSEvolutionaryModel)
-    (h_ratio_le : m.portabilityRatio ≤ 1)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
-    m.R2_target ≤ m.R2_source := by
-  have h_factor_le : m.signalTransportFactor ≤ 1 := by
-    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_le
-  have h_factor_nn : 0 ≤ m.signalTransportFactor := by
-    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
-  have h_target_nn : 0 ≤ m.targetSignalVariance := by
-    unfold targetSignalVariance
-    exact mul_nonneg (le_of_lt m.sourceSignalVariance_pos) h_factor_nn
-  have h_target_le_source : m.targetSignalVariance ≤ m.sourceSignalVariance := by
-    unfold targetSignalVariance
-    nlinarith [m.sourceSignalVariance_pos]
-  calc
-    m.varianceToR2 m.targetSignalVariance ≤ m.varianceToR2 m.sourceSignalVariance :=
-      m.varianceToR2_monotone h_target_nn h_target_le_source
-    _ = m.R2_source := m.sourceR2_eq_varianceToR2_sourceSignalVariance
-
-/-- Exact strict target `R²` drop when retained target signal is strictly below source signal. -/
-theorem PGSEvolutionaryModel.R2_target_lt_source (m : PGSEvolutionaryModel)
-    (h_ratio_lt : m.portabilityRatio < 1)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
-    m.R2_target < m.R2_source := by
-  have h_factor_lt : m.signalTransportFactor < 1 := by
-    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_lt
-  have h_factor_nn : 0 ≤ m.signalTransportFactor := by
-    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
-  have h_target_nn : 0 ≤ m.targetSignalVariance := by
-    unfold targetSignalVariance
-    exact mul_nonneg (le_of_lt m.sourceSignalVariance_pos) h_factor_nn
-  have h_target_lt_source : m.targetSignalVariance < m.sourceSignalVariance := by
-    unfold targetSignalVariance
-    nlinarith [m.sourceSignalVariance_pos]
-  calc
-    m.varianceToR2 m.targetSignalVariance < m.varianceToR2 m.sourceSignalVariance :=
-      m.varianceToR2_strictMono h_target_nn h_target_lt_source
-    _ = m.R2_source := m.sourceR2_eq_varianceToR2_sourceSignalVariance
-
-/-! ### Step 4: Exact target AUC(t) via transported signal variance
-
-For the equal-variance Gaussian liability model, the exact deployed AUC is
-
-`AUC = Φ(√(Var(signal)/(2 V_E)))`.
-
-So after transporting the genetic signal variance through the evolutionary
-chain above, we plug that exact target variance directly into the AUC formula.
--/
+/-- Exact coordinate map from explicit signal variance to deployed `R²` at the
+    model's residual scale. -/
+noncomputable def PGSEvolutionaryModel.varianceToR2
+    (m : PGSEvolutionaryModel) (vSignal : ℝ) : ℝ :=
+  TransportedMetrics.r2FromSignalVariance vSignal m.V_E
 
 /-- Phi is monotone increasing because it is the standard normal CDF. -/
 theorem Phi_monotone : Monotone Phi := by
   simpa [Phi] using
     (ProbabilityTheory.monotone_cdf (μ := ProbabilityTheory.gaussianReal 0 1))
 
-/-- **Signal-to-noise ratio** from R².
-    SNR = R² / (1 - R²) = Var(predicted_genetic) / Var(residual).
+/-- **Signal-to-noise ratio** from `R²`.
 
-    DERIVED from the definition of R²: if Y = Ŷ + ε where Var(ε) = V_E,
-    then R² = Var(Ŷ)/(Var(Ŷ)+V_E), so SNR = Var(Ŷ)/V_E = R²/(1-R²). -/
+    This is a coordinate identity for a fixed residual scale, not a biological
+    transport variable. -/
 noncomputable def snrFromR2 (r2 : ℝ) : ℝ := r2 / (1 - r2)
 
-/-- SNR is nonneg for valid R². -/
+/-- SNR is nonneg for valid `R²`. -/
 theorem snrFromR2_nonneg (r2 : ℝ) (h0 : 0 ≤ r2) (h1 : r2 < 1) :
     0 ≤ snrFromR2 r2 := by
   unfold snrFromR2
   exact div_nonneg h0 (by linarith)
 
-/-- SNR is monotone increasing in R². -/
+/-- SNR is monotone increasing in `R²`. -/
 theorem snrFromR2_strictMono : StrictMonoOn snrFromR2 (Set.Ico 0 1) := by
   intro a ⟨ha0, ha1⟩ b ⟨_, hb1⟩ hab
   unfold snrFromR2
   rw [div_lt_div_iff₀ (by linarith : 0 < 1 - a) (by linarith : 0 < 1 - b)]
   nlinarith
 
-/-- Exact target AUC from transported target signal variance. -/
-noncomputable def PGSEvolutionaryModel.AUC_target (m : PGSEvolutionaryModel) : ℝ :=
-  Phi (Real.sqrt (m.targetSignalVariance / (2 * m.V_E)))
+/-! ### Step 3: Metric evaluation from explicit target signal
 
-/-- Exact source AUC from source signal variance. -/
-noncomputable def PGSEvolutionaryModel.AUC_source (m : PGSEvolutionaryModel) : ℝ :=
-  Phi (Real.sqrt (m.sourceSignalVariance / (2 * m.V_E)))
+The rigorous interface now stops at the scalar retention factor above. This
+file does not derive a target signal variance from source `R²`; any target
+metric claim must supply an explicit target signal variance from a separate
+mechanistic transport theorem. -/
 
-/-- The evolutionary target AUC is the canonical transported AUC specialized to
-the model's residual scale, source `R²`, and biological transport factor. -/
-theorem PGSEvolutionaryModel.AUC_target_eq_transportedMetrics
-    (m : PGSEvolutionaryModel) :
-    m.AUC_target =
-      TransportedMetrics.targetAUC m.V_E m.R2_source m.signalTransportFactor := by
-  rfl
-
-/-- The evolutionary source AUC is the canonical source AUC specialized to the
-model's residual scale and source `R²`. -/
-theorem PGSEvolutionaryModel.AUC_source_eq_transportedMetrics
-    (m : PGSEvolutionaryModel) :
-    m.AUC_source =
-      TransportedMetrics.sourceAUC m.V_E m.R2_source := by
-  rfl
-
-/-- Exact AUC degradation when transported signal retention is at most one. -/
-theorem PGSEvolutionaryModel.AUC_target_le_source (m : PGSEvolutionaryModel)
-    (h_ratio_le : m.portabilityRatio ≤ 1)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
-    m.AUC_target ≤ m.AUC_source := by
-  unfold AUC_target AUC_source
-  have h_factor_le : m.signalTransportFactor ≤ 1 := by
-    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_le
-  have h_factor_nn : 0 ≤ m.signalTransportFactor := by
-    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
-  have h_target_nn : 0 ≤ m.targetSignalVariance := by
-    unfold targetSignalVariance
-    exact mul_nonneg (le_of_lt m.sourceSignalVariance_pos) h_factor_nn
-  have h_target_le_source : m.targetSignalVariance ≤ m.sourceSignalVariance := by
-    unfold targetSignalVariance
-    nlinarith [m.sourceSignalVariance_pos]
-  have h_div_le :
-      m.targetSignalVariance / (2 * m.V_E) ≤ m.sourceSignalVariance / (2 * m.V_E) := by
-    have hden : 0 ≤ 2 * m.V_E := by linarith [m.V_E_pos]
-    exact div_le_div_of_nonneg_right h_target_le_source hden
-  have h_sqrt_le :
-      Real.sqrt (m.targetSignalVariance / (2 * m.V_E)) ≤
-        Real.sqrt (m.sourceSignalVariance / (2 * m.V_E)) := by
-    exact Real.sqrt_le_sqrt h_div_le
-  exact Phi_monotone h_sqrt_le
-
-/-! ### Step 5: Exact target Brier risk
-
-For a calibrated Bernoulli predictor with prevalence `π` and explained-risk
-fraction `R²`, the exact population Brier risk is `π(1-π)(1-R²)`. We apply
-that exact closed form to the transported target `R²`.
--/
-
-/-- **Target Brier score** as a function of evolutionary parameters.
-    Brier(t) = π(1-π)(1 - R²_target(t))
-
-    Lower is better. As populations diverge, R²_target decreases,
-    so Brier score increases (worsens). -/
-noncomputable def PGSEvolutionaryModel.Brier_target (m : PGSEvolutionaryModel) : ℝ :=
-  m.prevalence * (1 - m.prevalence) * (1 - m.R2_target)
-
-/-- **Source Brier score** for comparison. -/
-noncomputable def PGSEvolutionaryModel.Brier_source (m : PGSEvolutionaryModel) : ℝ :=
-  m.prevalence * (1 - m.prevalence) * (1 - m.R2_source)
-
-/-- The evolutionary target Brier score is the canonical transported Brier score
-specialized to the model's prevalence, residual scale, source `R²`, and
-biological transport factor. -/
-theorem PGSEvolutionaryModel.Brier_target_eq_transportedMetrics
-    (m : PGSEvolutionaryModel) :
-    m.Brier_target =
-      TransportedMetrics.targetBrier
-        m.prevalence m.V_E m.R2_source m.signalTransportFactor := by
-  rfl
-
-/-- The evolutionary source Brier score is the canonical source Brier score
-specialized to the model's prevalence and source `R²`. -/
-theorem PGSEvolutionaryModel.Brier_source_eq_transportedMetrics
-    (m : PGSEvolutionaryModel) :
-    m.Brier_source = TransportedMetrics.sourceBrier m.prevalence m.R2_source := by
-  rfl
-
-/-- Canonical bundled deployment metrics for the evolutionary transport model. -/
-noncomputable def PGSEvolutionaryModel.metricProfile (m : PGSEvolutionaryModel) :
+/-- Canonical deployed metric profile from an explicit target signal variance. -/
+noncomputable def PGSEvolutionaryModel.metricProfileFromTargetSignal
+    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ) :
     TransportedMetrics.Profile :=
-  TransportedMetrics.profile
-    m.prevalence m.V_E m.R2_source m.signalTransportFactor
+  TransportedMetrics.profileFromSignalVariance
+    m.prevalence m.V_E vSignalTarget
 
-/-- The canonical bundled deployment metrics reproduce the evolutionary model's
-public `R²`, AUC, and Brier surfaces exactly. -/
-theorem PGSEvolutionaryModel.metricProfile_eq
-    (m : PGSEvolutionaryModel) :
-    m.metricProfile =
-      { r2 := m.R2_target, auc := m.AUC_target, brier := m.Brier_target } := by
-  unfold PGSEvolutionaryModel.metricProfile TransportedMetrics.profile
-  rw [m.R2_target_eq_transportedMetrics,
-    m.AUC_target_eq_transportedMetrics,
-    m.Brier_target_eq_transportedMetrics]
+@[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignal_r2
+    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ) :
+    (m.metricProfileFromTargetSignal vSignalTarget).r2 =
+      TransportedMetrics.r2FromSignalVariance vSignalTarget m.V_E := by
+  rfl
 
-/-- Exact target Brier degradation when transported signal retention is at most one. -/
-theorem PGSEvolutionaryModel.Brier_target_ge_source (m : PGSEvolutionaryModel)
-    (h_ratio_le : m.portabilityRatio ≤ 1)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
-    m.Brier_source ≤ m.Brier_target := by
-  have h_r2_le := m.R2_target_le_source h_ratio_le h_ratio_nn
-  unfold Brier_target Brier_source
-  have h_prev : 0 < m.prevalence * (1 - m.prevalence) := by
-    exact mul_pos m.prev_pos (by linarith [m.prev_lt_one])
-  nlinarith
+@[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignal_auc
+    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ) :
+    (m.metricProfileFromTargetSignal vSignalTarget).auc =
+      TransportedMetrics.aucFromSignalVariance vSignalTarget m.V_E := by
+  rfl
 
-/-- Brier score is nonneg. -/
-theorem PGSEvolutionaryModel.Brier_target_nonneg (m : PGSEvolutionaryModel)
-    (h_r2_le : m.R2_target ≤ 1) :
-    0 ≤ m.Brier_target := by
-  unfold Brier_target
-  apply mul_nonneg
-  · exact mul_nonneg (le_of_lt m.prev_pos) (by linarith [m.prev_lt_one])
-  · linarith
+@[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignal_brier
+    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ) :
+    (m.metricProfileFromTargetSignal vSignalTarget).brier =
+      TransportedMetrics.calibratedBrier m.prevalence
+        (TransportedMetrics.r2FromSignalVariance vSignalTarget m.V_E) := by
+  rfl
 
-/-! ### Step 6: Nagelkerke R² (pseudo-R² for logistic regression)
+/-! ### Step 4: Temporal dynamics of the scalar signal-retention summary
 
-Nagelkerke R² adjusts the Cox-Snell R² to have maximum 1.
-For a model with true R² on the liability scale:
+The multiplicative signal-transport factor is a decomposition of evolutionary
+forces only. It is no longer promoted to a standalone theorem about deployed
+target metrics. -/
 
-  R²_Nagelkerke = 1 - (1 - R²_liability)^(correction)
-
-In practice, Nagelkerke R² degrades faster than R² or AUC because
-it is sensitive to both discrimination AND calibration.
--/
-
-/-- **Nagelkerke pseudo-R²** from liability R².
-    R²_N = R²_liability × calibration_factor.
-
-    When calibration degrades across populations (calibration_factor < 1),
-    Nagelkerke drops faster than the liability R². -/
-noncomputable def PGSEvolutionaryModel.NagelkerkeR2_target
-    (m : PGSEvolutionaryModel)
-    (calibration_factor : ℝ) : ℝ :=
-  m.R2_target * calibration_factor
-
-/-! ### Step 7: Temporal dynamics — how metrics evolve over time
-
-All metrics are functions of t_div (divergence time). We can characterize
-the RATE at which accuracy degrades with time.
-
-Key results:
-- R² decays approximately exponentially with a rate determined by
-  (drift rate + LD decay rate + mutation rate - migration rate)
-- AUC decays slower than R² (because AUC depends only on discrimination,
-  while R² also requires calibration)
-- Brier degrades linearly with R² loss
-
-The "half-life" of portability is the divergence time at which
-R²_target = R²_source / 2, i.e., portabilityRatio = 1/2.
--/
-
-/-- **Portability ratio decomposition into rates.**
-    Taking the log of the portability ratio gives an additive decomposition:
+/-- **Signal-transport decomposition into rates.**
+    Taking the log of the signal-variance ratio gives an additive decomposition:
 
     log(ρ) = log(1 - Fst) + log(LD_ret) + log(mut_erosion) + log(mig_boost)
 
@@ -7553,289 +7196,33 @@ theorem ld_decay_dominates_drift
         nlinarith
     _ < 2 * r := h_ld_fast
 
-/-! ### Step 8: Metric ordering — which metrics degrade fastest?
+/-! ### Step 8: Coordinate comparisons inside the scalar deployment summary
 
-From the R² decomposition (MetricSpecificPortability.lean):
-  R² = discrimination × calibration
+Within this scalar block, deployed `R²`, AUC, and Nagelkerke-style quantities
+are different coordinates on transported signal plus any explicitly supplied
+calibration factor. The theorems below are therefore coordinate facts, not a
+general ranking theorem for real-world portability across distinct metrics. -/
 
-AUC depends only on discrimination (rank-ordering ability).
-R² requires BOTH discrimination AND calibration.
-Brier = π(1-π)(1-R²), so it moves with R².
-Nagelkerke R² ∝ R² × calibration, so it drops fastest.
-
-Ordering of portability: AUC ≥ R² ≥ Nagelkerke R²
-
-DERIVED from the multiplicative decomposition. -/
-
-/-- **AUC is more portable than R².**
-    DERIVED: AUC depends only on discrimination (Φ(√(SNR/2))).
-    When calibration degrades (cal < 1), R² = disc × cal drops but
-    AUC (which depends on disc alone) is less affected.
-    Here we show: if R²_target < R²_source and both are in [0,1),
-    the SNR ratio is strictly less than the discrimination ratio. -/
-theorem r2_drops_faster_than_snr (r2_s r2_t : ℝ)
+/-- `snrFromR2` preserves strict order on valid deployed `R²` values. -/
+theorem snrFromR2_preserves_strict_order (r2_s r2_t : ℝ)
     (hs : 0 < r2_s) (hs1 : r2_s < 1)
     (ht : 0 < r2_t) (ht1 : r2_t < 1)
     (h_drop : r2_t < r2_s) :
     snrFromR2 r2_t < snrFromR2 r2_s := by
   exact snrFromR2_strictMono ⟨le_of_lt ht, ht1⟩ ⟨le_of_lt hs, hs1⟩ h_drop
 
-/-- **Nagelkerke R² drops fastest.**
-    Nagelkerke = R² × calibration_factor, and both R² and calibration
-    degrade across populations, so the product drops faster than either alone. -/
-theorem nagelkerke_drops_faster_than_r2 (r2_target cal : ℝ)
+/-- A Nagelkerke-style score is strictly below the deployed `R²` coordinate when
+    the supplied calibration factor lies in `(0, 1)`. -/
+theorem nagelkerke_lt_r2_when_calibration_factor_lt_one (r2_target cal : ℝ)
     (h_r2 : 0 < r2_target) (_h_cal : 0 < cal) (h_cal_lt : cal < 1) :
     r2_target * cal < r2_target := by
   nlinarith
 
-/-! ### Step 9: Complete end-to-end summary
+/-! ### Step 5: What remains identifiable from the scalar factor
 
-Given ONLY:
-  - `Ne` (effective population size)
-  - `μ` (mutation rate per generation)
-  - `m` (migration rate per generation)
-  - `r` (recombination rate)
-  - `t` (generations of divergence)
-  - `R²_source` (source population PGS accuracy)
-  - `V_E` (residual variance)
-  - `π` (disease prevalence)
-
-We compute exact transported signal variance first:
-
-  `V_signal,target
-    = V_E * (R²_source / (1-R²_source))
-      * (1-Fst(t)) * exp(-2rt) * exp(-θτ) * (1+Mτ/(1+M))`
-
-and then exact deployed metrics:
-
-  - `R²_target(t) = V_signal,target / (V_signal,target + V_E)`
-  - `AUC_target(t) = Φ(√(V_signal,target / (2 V_E)))`
-  - `Brier_target(t) = π(1-π)(1 - R²_target(t))`
-  - `Nagelkerke_target(t) = R²_target(t) × cal(t)`
-
-Every component is therefore routed through the same transported
-population-genetic signal variance, rather than by reintroducing a scalar
-`R²` portability law as a definition.
--/
-
-/-- **The complete model**: all three metrics computed from one structure. -/
-noncomputable def PGSEvolutionaryModel.allMetrics (m : PGSEvolutionaryModel) :
-    ℝ × ℝ × ℝ :=
-  (m.R2_target, m.AUC_target, m.Brier_target)
-
-/-- **All metrics degrade together** when portability ratio < 1.
-    The exact target `R²` decreases, the exact target AUC does not improve,
-    and the exact target Brier risk increases. -/
-theorem PGSEvolutionaryModel.all_metrics_degrade (m : PGSEvolutionaryModel)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio)
-    (h_ratio_lt : m.portabilityRatio < 1) :
-    -- R² decreases
-    m.R2_target < m.R2_source ∧
-    -- Brier increases (worsens)
-    m.Brier_source < m.Brier_target := by
-  constructor
-  · exact m.R2_target_lt_source h_ratio_lt h_ratio_nn
-  · -- Brier_source < Brier_target follows from R²_target < R²_source
-    have h_r2_drop : m.R2_target < m.R2_source :=
-      m.R2_target_lt_source h_ratio_lt h_ratio_nn
-    unfold Brier_target Brier_source
-    have h_prev : 0 < m.prevalence * (1 - m.prevalence) :=
-      mul_pos m.prev_pos (by linarith [m.prev_lt_one])
-    nlinarith
-
-/-- Exact end-to-end target `R²` formula from transported signal variance. -/
-theorem PGSEvolutionaryModel.R2_target_eq_transportFactor (m : PGSEvolutionaryModel) :
-    m.R2_target =
-      (m.R2_source * m.signalTransportFactor) /
-        (1 - m.R2_source + m.R2_source * m.signalTransportFactor) := by
-  unfold R2_target varianceToR2 targetSignalVariance sourceSignalVariance signalTransportFactor
-  have hVE_ne : m.V_E ≠ 0 := by exact ne_of_gt m.V_E_pos
-  have hden_ne : 1 - m.R2_source ≠ 0 := by linarith [m.R2_source_lt_one]
-  field_simp [hVE_ne, hden_ne]
-  ring_nf
-
-/-- Exact end-to-end target `R²` formula with all evolutionary components expanded. -/
-theorem PGSEvolutionaryModel.R2_target_explicit (m : PGSEvolutionaryModel) :
-    m.R2_target =
-      (m.R2_source *
-          ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
-           Real.exp (-2 * m.recomb * m.t_div) *
-           Real.exp (-m.theta * m.tau) *
-           (1 + m.bigM * m.tau / (1 + m.bigM)))) /
-        (1 - m.R2_source +
-          m.R2_source *
-            ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
-           Real.exp (-2 * m.recomb * m.t_div) *
-             Real.exp (-m.theta * m.tau) *
-             (1 + m.bigM * m.tau / (1 + m.bigM)))) := by
-  simpa [m.signalTransportFactor_explicit] using m.R2_target_eq_transportFactor
-
-/-- Exact end-to-end target AUC from transported signal variance. -/
-theorem PGSEvolutionaryModel.AUC_target_eq_transportFactor (m : PGSEvolutionaryModel) :
-    m.AUC_target =
-      Phi
-        (Real.sqrt
-          ((m.R2_source * m.signalTransportFactor) / (2 * (1 - m.R2_source)))) := by
-  unfold AUC_target targetSignalVariance sourceSignalVariance signalTransportFactor
-  have hVE_ne : m.V_E ≠ 0 := by exact ne_of_gt m.V_E_pos
-  have hden_ne : 1 - m.R2_source ≠ 0 := by linarith [m.R2_source_lt_one]
-  congr 1
-  congr 1
-  field_simp [hVE_ne, hden_ne]
-
-/-- Exact end-to-end target AUC with all evolutionary components expanded. -/
-theorem PGSEvolutionaryModel.AUC_target_explicit (m : PGSEvolutionaryModel) :
-    m.AUC_target =
-      Phi
-        (Real.sqrt
-          ((m.R2_source *
-              ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
-               Real.exp (-2 * m.recomb * m.t_div) *
-               Real.exp (-m.theta * m.tau) *
-               (1 + m.bigM * m.tau / (1 + m.bigM)))) /
-            (2 * (1 - m.R2_source)))) := by
-  simpa [m.signalTransportFactor_explicit] using m.AUC_target_eq_transportFactor
-
-/-- Exact end-to-end target Brier risk from transported signal variance. -/
-theorem PGSEvolutionaryModel.Brier_target_explicit (m : PGSEvolutionaryModel) :
-    m.Brier_target =
-      m.prevalence * (1 - m.prevalence) *
-        (1 -
-          (m.R2_source *
-              ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
-               Real.exp (-2 * m.recomb * m.t_div) *
-               Real.exp (-m.theta * m.tau) *
-               (1 + m.bigM * m.tau / (1 + m.bigM)))) /
-            (1 - m.R2_source +
-              m.R2_source *
-                ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
-                 Real.exp (-2 * m.recomb * m.t_div) *
-                 Real.exp (-m.theta * m.tau) *
-                 (1 + m.bigM * m.tau / (1 + m.bigM))))) := by
-  unfold Brier_target
-  rw [m.R2_target_explicit]
-
-/-! ### Step 10: Exact inverse theorems from deployed metrics
-
-The forward map from evolutionary parameters to deployed metrics is only
-scientifically useful if part of it can be inverted. The exact transport block
-above identifies the transported signal factor from observable source/target
-`R²`, and therefore from exact Brier risks as well. What remains
-underidentified is the decomposition of that factor into its separate
-evolutionary components unless extra side information is supplied.
--/
-
-/-- Exact transported-signal factor recovered from source/target `R²`. -/
-noncomputable def transportFactorFromR2Pair (r2Source r2Target : ℝ) : ℝ :=
-  r2Target * (1 - r2Source) / (r2Source * (1 - r2Target))
-
-/-- Exact deployed `R²` is always strictly below `1` when target signal variance is nonnegative. -/
-theorem PGSEvolutionaryModel.R2_target_lt_one (m : PGSEvolutionaryModel)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
-    m.R2_target < 1 := by
-  have h_factor_nn : 0 ≤ m.signalTransportFactor := by
-    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
-  have h_target_nn : 0 ≤ m.targetSignalVariance := by
-    unfold targetSignalVariance
-    exact mul_nonneg (le_of_lt m.sourceSignalVariance_pos) h_factor_nn
-  unfold R2_target varianceToR2
-  have hden : 0 < m.targetSignalVariance + m.V_E := by
-    linarith [h_target_nn, m.V_E_pos]
-  rw [div_lt_one hden]
-  linarith [m.V_E_pos]
-
-/-- Exact inverse theorem: the transported signal factor is identified by the source/target
-`R²` pair. -/
-theorem PGSEvolutionaryModel.signalTransportFactor_eq_transportFactorFromR2Pair
-    (m : PGSEvolutionaryModel)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
-    transportFactorFromR2Pair m.R2_source m.R2_target = m.signalTransportFactor := by
-  unfold transportFactorFromR2Pair
-  rw [m.R2_target_eq_transportFactor]
-  have hsrc_ne : m.R2_source ≠ 0 := by linarith [m.R2_source_pos]
-  have hsrc1_ne : 1 - m.R2_source ≠ 0 := by linarith [m.R2_source_lt_one]
-  have hfac_nn : 0 ≤ m.signalTransportFactor := by
-    simpa [m.portabilityRatio_eq_signalTransportFactor] using h_ratio_nn
-  have hmix_pos : 0 < 1 - m.R2_source + m.R2_source * m.signalTransportFactor := by
-    nlinarith [m.R2_source_lt_one, m.R2_source_pos]
-  have hmix_ne : 1 - m.R2_source + m.R2_source * m.signalTransportFactor ≠ 0 := by
-    linarith
-  field_simp [hsrc_ne, hsrc1_ne, hmix_ne]
-  ring_nf
-
-/-- The observable portability ratio computed from source/target `R²` is exactly the
-derived target/source transported-signal ratio. -/
-theorem PGSEvolutionaryModel.portabilityRatio_eq_transportFactorFromR2Pair
-    (m : PGSEvolutionaryModel)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
-    transportFactorFromR2Pair m.R2_source m.R2_target = m.portabilityRatio := by
-  rw [m.portabilityRatio_eq_signalTransportFactor]
-  exact m.signalTransportFactor_eq_transportFactorFromR2Pair h_ratio_nn
-
-/-- Exact inverse from calibrated Brier risk to `R²`. -/
-noncomputable def r2FromBrier (π brier : ℝ) : ℝ :=
-  1 - brier / (π * (1 - π))
-
-/-- Source `R²` is exactly recovered from the source calibrated Brier risk. -/
-theorem PGSEvolutionaryModel.r2FromBrier_source (m : PGSEvolutionaryModel) :
-    r2FromBrier m.prevalence m.Brier_source = m.R2_source := by
-  have hprev_ne : m.prevalence * (1 - m.prevalence) ≠ 0 := by
-    have hprev_pos : 0 < m.prevalence * (1 - m.prevalence) := by
-      exact mul_pos m.prev_pos (by linarith [m.prev_lt_one])
-    linarith
-  have hdiv : m.Brier_source / (m.prevalence * (1 - m.prevalence)) = 1 - m.R2_source := by
-    unfold Brier_source
-    rw [div_eq_mul_inv]
-    calc
-      (m.prevalence * (1 - m.prevalence) * (1 - m.R2_source)) *
-          (m.prevalence * (1 - m.prevalence))⁻¹
-        = (1 - m.R2_source) *
-            ((m.prevalence * (1 - m.prevalence)) *
-              (m.prevalence * (1 - m.prevalence))⁻¹) := by
-              ring
-      _ = 1 - m.R2_source := by
-        rw [mul_inv_cancel₀ hprev_ne, mul_one]
-  unfold r2FromBrier
-  rw [hdiv]
-  ring_nf
-
-/-- Target `R²` is exactly recovered from the target calibrated Brier risk. -/
-theorem PGSEvolutionaryModel.r2FromBrier_target (m : PGSEvolutionaryModel) :
-    r2FromBrier m.prevalence m.Brier_target = m.R2_target := by
-  have hprev_ne : m.prevalence * (1 - m.prevalence) ≠ 0 := by
-    have hprev_pos : 0 < m.prevalence * (1 - m.prevalence) := by
-      exact mul_pos m.prev_pos (by linarith [m.prev_lt_one])
-    linarith
-  have hdiv : m.Brier_target / (m.prevalence * (1 - m.prevalence)) = 1 - m.R2_target := by
-    unfold Brier_target
-    rw [div_eq_mul_inv]
-    calc
-      (m.prevalence * (1 - m.prevalence) * (1 - m.R2_target)) *
-          (m.prevalence * (1 - m.prevalence))⁻¹
-        = (1 - m.R2_target) *
-            ((m.prevalence * (1 - m.prevalence)) *
-              (m.prevalence * (1 - m.prevalence))⁻¹) := by
-              ring
-      _ = 1 - m.R2_target := by
-        rw [mul_inv_cancel₀ hprev_ne, mul_one]
-  unfold r2FromBrier
-  rw [hdiv]
-  ring_nf
-
-/-- Exact transported-signal factor recovered from source/target Brier risks. -/
-noncomputable def transportFactorFromBrierPair (π brierSource brierTarget : ℝ) : ℝ :=
-  transportFactorFromR2Pair (r2FromBrier π brierSource) (r2FromBrier π brierTarget)
-
-/-- Exact inverse theorem: the transported signal factor is identified by the source/target
-Brier pair when prevalence is known. -/
-theorem PGSEvolutionaryModel.signalTransportFactor_eq_transportFactorFromBrierPair
-    (m : PGSEvolutionaryModel)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio) :
-    transportFactorFromBrierPair m.prevalence m.Brier_source m.Brier_target =
-      m.signalTransportFactor := by
-  unfold transportFactorFromBrierPair
-  rw [m.r2FromBrier_source, m.r2FromBrier_target]
-  exact m.signalTransportFactor_eq_transportFactorFromR2Pair h_ratio_nn
+The rigorous scalar output of this block is the transport factor itself. DGP no
+longer claims that source/target deployed metrics determine that factor without
+an explicit target-signal theorem. -/
 
 /-- Recovery of the allele-frequency retention factor from the observable transport factor
 and the other three evolutionary components. -/
@@ -7928,39 +7315,6 @@ theorem PGSEvolutionaryModel.migBoost_eq_from_transportFactor
   unfold signalTransportFactor
   rw [PGSEvolutionaryModel.portabilityFactor_value]
   field_simp [hfst_ne, hld_ne, hmut_ne]
-
-/-- Observable source/target `R²` plus three of the four evolutionary factors identify the
-remaining allele-frequency retention factor exactly. -/
-theorem PGSEvolutionaryModel.alleleFreqRetention_eq_from_R2_pair_and_other_factors
-    (m : PGSEvolutionaryModel)
-    (h_ratio_nn : 0 ≤ m.portabilityRatio)
-    (h_other_ne : m.ldRetention * m.mutErosion * m.migBoost ≠ 0) :
-    1 - m.fstTransient =
-      transportFactorFromR2Pair m.R2_source m.R2_target /
-        (m.ldRetention * m.mutErosion * m.migBoost) := by
-  rw [m.signalTransportFactor_eq_transportFactorFromR2Pair h_ratio_nn]
-  exact m.alleleFreqRetention_eq_from_transportFactor h_other_ne
-
-/-- The exact deployed metric triple depends on the evolutionary tuple only through
-`R²_source`, prevalence, and the transported signal factor. This is the precise
-underidentification statement for the full parameter tuple: without extra side
-information, the deployed metrics cannot distinguish models that share those
-observable quantities. -/
-theorem PGSEvolutionaryModel.allMetrics_eq_of_same_observableContext_and_transportFactor
-    (m₁ m₂ : PGSEvolutionaryModel)
-    (h_r2 : m₁.R2_source = m₂.R2_source)
-    (h_prev : m₁.prevalence = m₂.prevalence)
-    (h_transport : m₁.signalTransportFactor = m₂.signalTransportFactor) :
-    m₁.allMetrics = m₂.allMetrics := by
-  unfold PGSEvolutionaryModel.allMetrics
-  have hR2 : m₁.R2_target = m₂.R2_target := by
-    rw [m₁.R2_target_eq_transportFactor, m₂.R2_target_eq_transportFactor, h_r2, h_transport]
-  have hAUC : m₁.AUC_target = m₂.AUC_target := by
-    rw [m₁.AUC_target_eq_transportFactor, m₂.AUC_target_eq_transportFactor, h_r2, h_transport]
-  have hBrier : m₁.Brier_target = m₂.Brier_target := by
-    unfold PGSEvolutionaryModel.Brier_target
-    rw [h_prev, hR2]
-  simp [hR2, hAUC, hBrier]
 
 end EndToEndMetrics
 

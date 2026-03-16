@@ -507,25 +507,24 @@ theorem ld_decay_implies_nonlinear_calibration_proved {k : ℕ} [Fintype (Fin k)
 
 end NoAxioms
 
-/-- Top-level: at zero divergence, target R² equals source R². -/
+/-- Top-level: at zero divergence, the observable target `R²` is the same
+present-day `R²` evaluated at that state. -/
 theorem targetR2_eq_source_at_zero_drift_proved
-    (r2Source fst : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
-    (hfst : fst < 1) :
-    targetR2FromObservables r2Source fst fst = r2Source :=
-  targetR2FromObservables_self r2Source fst h_r2 hfst
+    (V_A V_E fst : ℝ) :
+    targetR2FromDriftState V_A V_E fst = presentDayR2 V_A V_E fst :=
+  targetR2FromDriftState_self V_A V_E fst
 
 /-- Top-level: strict Brier degradation under positive drift and non-degenerate prevalence. -/
 theorem targetBrier_strict_gt_source_proved
-    (π r2Source fstSource fstTarget : ℝ)
+    (π V_A V_E fstSource fstTarget : ℝ)
     (hπ0 : 0 < π) (hπ1 : π < 1)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    sourceBrierFromObservables π r2Source <
-      targetBrierFromObservables π r2Source fstSource fstTarget :=
-  targetBrier_strict_gt_source_of_observables π r2Source fstSource fstTarget
-    hπ0 hπ1 h_r2 h_fst h_fst_bounds
+    sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
+      targetBrierFromDriftState π V_A V_E fstTarget :=
+  targetBrier_strict_gt_source_of_drift_state π V_A V_E fstSource fstTarget
+    hπ0 hπ1 hVA hVE h_fst h_fst_bounds
 
 /-- Top-level: increasing migration strictly reduces IM equilibrium differentiation
     on the biologically relevant domain of positive migration rates. -/

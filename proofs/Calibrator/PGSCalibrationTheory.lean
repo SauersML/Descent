@@ -176,66 +176,66 @@ noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
 noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
   prevalenceLogit pi_target - prevalenceLogit pi_source
 
-/-- Canonical identity-scale calibration profile for an observable transported
-deployment. The intercept component is measured on the observed outcome scale,
-while the slope is the exact observable drift transport ratio. -/
-noncomputable def observableIdentityCalibrationProfile
+/-- Canonical identity-scale calibration profile for a drift-state deployment.
+The intercept component is measured on the observed outcome scale, while the
+slope is the exact drift-state transport ratio. -/
+noncomputable def driftIdentityCalibrationProfile
     (mean_observed mean_predicted fst_source fst_target : ℝ) : CalibrationProfile :=
   identityCalibrationProfile mean_observed mean_predicted
     (driftTransportRatio fst_source fst_target)
 
-/-- Canonical logistic-scale calibration profile for an observable transported
-deployment. The intercept component is measured on the logistic linear-predictor
-scale, while the slope is the same exact observable drift transport ratio. -/
-noncomputable def observableLogisticCalibrationProfile
+/-- Canonical logistic-scale calibration profile for a drift-state deployment.
+The intercept component is measured on the logistic linear-predictor scale,
+while the slope is the same exact drift-state transport ratio. -/
+noncomputable def driftLogisticCalibrationProfile
     (pi_source pi_target fst_source fst_target : ℝ) : CalibrationProfile :=
   logisticCalibrationProfile (prevalenceLogit pi_target) (prevalenceLogit pi_source)
     (driftTransportRatio fst_source fst_target)
 
-@[simp] theorem observableIdentityCalibrationProfile_citl
+@[simp] theorem driftIdentityCalibrationProfile_citl
     (mean_observed mean_predicted fst_source fst_target : ℝ) :
-    (observableIdentityCalibrationProfile
+    (driftIdentityCalibrationProfile
       mean_observed mean_predicted fst_source fst_target).citl =
       calibrationInTheLarge mean_observed mean_predicted := by
   rfl
 
-@[simp] theorem observableIdentityCalibrationProfile_slope
+@[simp] theorem driftIdentityCalibrationProfile_slope
     (mean_observed mean_predicted fst_source fst_target : ℝ) :
-    (observableIdentityCalibrationProfile
+    (driftIdentityCalibrationProfile
       mean_observed mean_predicted fst_source fst_target).slope =
       driftTransportRatio fst_source fst_target := by
   rfl
 
-@[simp] theorem observableLogisticCalibrationProfile_citl
+@[simp] theorem driftLogisticCalibrationProfile_citl
     (pi_source pi_target fst_source fst_target : ℝ) :
-    (observableLogisticCalibrationProfile
+    (driftLogisticCalibrationProfile
       pi_source pi_target fst_source fst_target).citl =
       prevalenceCITLShift pi_source pi_target := by
-  unfold observableLogisticCalibrationProfile prevalenceCITLShift
+  unfold driftLogisticCalibrationProfile prevalenceCITLShift
     logisticCalibrationProfile calibrationProfile prevalenceLogit
     calibrationInTheLarge
   ring
 
-@[simp] theorem observableLogisticCalibrationProfile_slope
+@[simp] theorem driftLogisticCalibrationProfile_slope
     (pi_source pi_target fst_source fst_target : ℝ) :
-    (observableLogisticCalibrationProfile
+    (driftLogisticCalibrationProfile
       pi_source pi_target fst_source fst_target).slope =
       driftTransportRatio fst_source fst_target := by
   rfl
 
-theorem observableCalibrationProfiles_share_slope
+theorem driftCalibrationProfiles_share_slope
     (mean_observed mean_predicted pi_source pi_target fst_source fst_target : ℝ) :
-    (observableIdentityCalibrationProfile
+    (driftIdentityCalibrationProfile
       mean_observed mean_predicted fst_source fst_target).slope =
-      (observableLogisticCalibrationProfile
+      (driftLogisticCalibrationProfile
         pi_source pi_target fst_source fst_target).slope := by
   rfl
 
-theorem observableCalibrationProfiles_share_slopeDeviation
+theorem driftCalibrationProfiles_share_slopeDeviation
     (mean_observed mean_predicted pi_source pi_target fst_source fst_target : ℝ) :
-    (observableIdentityCalibrationProfile
+    (driftIdentityCalibrationProfile
       mean_observed mean_predicted fst_source fst_target).slopeDeviation =
-      (observableLogisticCalibrationProfile
+      (driftLogisticCalibrationProfile
         pi_source pi_target fst_source fst_target).slopeDeviation := by
   rfl
 
@@ -313,8 +313,8 @@ theorem source_calibrated_target_abs_citl_eq_abs_prevalence_shift
     The theorem keeps discrimination and calibration on literal metrics and
     exposes the exact calibration formula instead of only an inequality. -/
 theorem cross_ancestry_exact_metric_profile
-    (r2Source fstSource fstTarget mean_pred πSource πTarget : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (V_A V_E fstSource fstTarget mean_pred πSource πTarget : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (h_src_cal : calibrationInTheLarge πSource mean_pred = 0)
@@ -322,158 +322,164 @@ theorem cross_ancestry_exact_metric_profile
     (hπT0 : 0 < πTarget) (hπT1 : πTarget < 1)
     (hPhiStrict : StrictMono Phi) :
     let sourceProfile :=
-      observableIdentityCalibrationProfile πSource mean_pred fstSource fstSource
+      driftIdentityCalibrationProfile πSource mean_pred fstSource fstSource
     let targetProfile :=
-      observableIdentityCalibrationProfile πTarget mean_pred fstSource fstTarget
+      driftIdentityCalibrationProfile πTarget mean_pred fstSource fstTarget
     let targetLogisticProfile :=
-      observableLogisticCalibrationProfile πSource πTarget fstSource fstTarget
-    targetExactLiabilityAUC r2Source fstSource fstTarget <
-      sourceExactLiabilityAUC r2Source ∧
+      driftLogisticCalibrationProfile πSource πTarget fstSource fstTarget
+    targetExactLiabilityAUC V_A V_E fstTarget <
+      presentDayLiabilityAUC V_A V_E fstSource ∧
     targetProfile.citl = πTarget - πSource ∧
     |targetProfile.citl| = |πTarget - πSource| ∧
     |sourceProfile.citl| < |targetProfile.citl| ∧
     targetLogisticProfile.citl = prevalenceCITLShift πSource πTarget ∧
     targetLogisticProfile.slope = targetProfile.slope ∧
-    sourceExactCalibratedBrierRisk πTarget r2Source <
-      targetExactCalibratedBrierRisk πTarget r2Source fstSource fstTarget := by
+    sourceBrierFromR2 πTarget (presentDayR2 V_A V_E fstSource) <
+      targetExactCalibratedBrierRisk πTarget V_A V_E fstTarget := by
   dsimp
   have h_auc :
-      targetExactLiabilityAUC r2Source fstSource fstTarget <
-        sourceExactLiabilityAUC r2Source := by
-    exact targetLiabilityAUC_lt_source_of_observables
-      r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds hPhiStrict
+      targetExactLiabilityAUC V_A V_E fstTarget <
+        presentDayLiabilityAUC V_A V_E fstSource := by
+    exact targetLiabilityAUC_lt_source_of_drift_state
+      V_A V_E fstSource fstTarget hVA hVE h_fst h_fst_bounds hPhiStrict
   have h_citl_eq :
-      (observableIdentityCalibrationProfile
+      (driftIdentityCalibrationProfile
         πTarget mean_pred fstSource fstTarget).citl = πTarget - πSource := by
-    simpa [observableIdentityCalibrationProfile] using
+    simpa [driftIdentityCalibrationProfile] using
       source_calibrated_target_citl_eq_prevalence_shift
         mean_pred πSource πTarget h_src_cal
   have h_abs_eq :
-      |(observableIdentityCalibrationProfile
+      |(driftIdentityCalibrationProfile
         πTarget mean_pred fstSource fstTarget).citl| = |πTarget - πSource| := by
-    simpa [observableIdentityCalibrationProfile] using
+    simpa [driftIdentityCalibrationProfile] using
       source_calibrated_target_abs_citl_eq_abs_prevalence_shift
         mean_pred πSource πTarget h_src_cal
   have h_tgt_ne_zero :
-      (observableIdentityCalibrationProfile
+      (driftIdentityCalibrationProfile
         πTarget mean_pred fstSource fstTarget).citl ≠ 0 := by
     rw [h_citl_eq]
     intro h_zero
     apply h_prev_shift
     linarith
   have h_abs_worse :
-      |(observableIdentityCalibrationProfile
+      |(driftIdentityCalibrationProfile
           πSource mean_pred fstSource fstSource).citl| <
-        |(observableIdentityCalibrationProfile
+        |(driftIdentityCalibrationProfile
           πTarget mean_pred fstSource fstTarget).citl| := by
     have h_tgt_abs_pos :
-        0 < |(observableIdentityCalibrationProfile
+        0 < |(driftIdentityCalibrationProfile
           πTarget mean_pred fstSource fstTarget).citl| :=
       abs_pos.mpr h_tgt_ne_zero
-    simpa [observableIdentityCalibrationProfile_citl, h_src_cal] using h_tgt_abs_pos
+    simpa [driftIdentityCalibrationProfile_citl, h_src_cal] using h_tgt_abs_pos
   have h_logit_citl :
-      (observableLogisticCalibrationProfile
+      (driftLogisticCalibrationProfile
         πSource πTarget fstSource fstTarget).citl =
         prevalenceCITLShift πSource πTarget := by
     simp
   have h_share_slope :
-      (observableLogisticCalibrationProfile
+      (driftLogisticCalibrationProfile
         πSource πTarget fstSource fstTarget).slope =
-        (observableIdentityCalibrationProfile
+        (driftIdentityCalibrationProfile
           πTarget mean_pred fstSource fstTarget).slope := by
-    exact (observableCalibrationProfiles_share_slope
+    exact (driftCalibrationProfiles_share_slope
       πTarget mean_pred πSource πTarget fstSource fstTarget).symm
   have h_brier :
-      sourceExactCalibratedBrierRisk πTarget r2Source <
-        targetExactCalibratedBrierRisk πTarget r2Source fstSource fstTarget := by
-    exact targetBrier_strict_gt_source_of_observables
-      πTarget r2Source fstSource fstTarget hπT0 hπT1 h_r2 h_fst h_fst_bounds
+      sourceBrierFromR2 πTarget (presentDayR2 V_A V_E fstSource) <
+        targetExactCalibratedBrierRisk πTarget V_A V_E fstTarget := by
+    exact targetBrier_strict_gt_source_of_drift_state
+      πTarget V_A V_E fstSource fstTarget hπT0 hπT1 hVA hVE h_fst h_fst_bounds
   exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse, h_logit_citl, h_share_slope, h_brier⟩
 
-/-- **Cross-ancestry AUC drops while calibration-in-the-large worsens.**
-    This theorem states the claim on the repository's actual metrics:
+/-- **Cross-ancestry AUC drops while prevalence-shift CITL worsens.**
+    This theorem states a deliberately split claim on the repository's actual
+    metrics:
 
     - discrimination is measured by observable transport AUC;
-    - calibration is measured by absolute calibration-in-the-large.
+    - calibration is measured by absolute calibration-in-the-large under a
+      fixed mean prediction and changed prevalence.
 
     Under positive drift (`fstTarget > fstSource`), the transported target
     AUC is strictly below the source AUC. If the source is calibrated in the
     large but target prevalence differs, then absolute CITL is strictly larger
-    in the target. -/
-theorem cross_ancestry_auc_and_citl_worsen
-    (r2Source fstSource fstTarget mean_pred πSource πTarget : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    in the target.
+
+    This theorem does **not** claim that drift alone determines CITL. The CITL
+    term here comes entirely from the prevalence-shift calibration profile
+    formalized above. -/
+theorem cross_ancestry_auc_drops_and_prevalence_citl_worsens
+    (V_A V_E fstSource fstTarget mean_pred πSource πTarget : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (h_src_cal : calibrationInTheLarge πSource mean_pred = 0)
     (h_prev_shift : πSource ≠ πTarget)
     (hPhiStrict : StrictMono Phi) :
     let sourceProfile :=
-      observableIdentityCalibrationProfile πSource mean_pred fstSource fstSource
+      driftIdentityCalibrationProfile πSource mean_pred fstSource fstSource
     let targetProfile :=
-      observableIdentityCalibrationProfile πTarget mean_pred fstSource fstTarget
-    targetExactLiabilityAUC r2Source fstSource fstTarget <
-      sourceExactLiabilityAUC r2Source ∧
+      driftIdentityCalibrationProfile πTarget mean_pred fstSource fstTarget
+    targetExactLiabilityAUC V_A V_E fstTarget <
+      presentDayLiabilityAUC V_A V_E fstSource ∧
     targetProfile.citl = πTarget - πSource ∧
     |targetProfile.citl| = |πTarget - πSource| ∧
     |sourceProfile.citl| < |targetProfile.citl| := by
   dsimp
   have h_auc :
-      targetExactLiabilityAUC r2Source fstSource fstTarget <
-        sourceExactLiabilityAUC r2Source := by
-    exact targetLiabilityAUC_lt_source_of_observables
-      r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds hPhiStrict
+      targetExactLiabilityAUC V_A V_E fstTarget <
+        presentDayLiabilityAUC V_A V_E fstSource := by
+    exact targetLiabilityAUC_lt_source_of_drift_state
+      V_A V_E fstSource fstTarget hVA hVE h_fst h_fst_bounds hPhiStrict
   have h_citl_eq :
-      (observableIdentityCalibrationProfile
+      (driftIdentityCalibrationProfile
         πTarget mean_pred fstSource fstTarget).citl = πTarget - πSource := by
-    simpa [observableIdentityCalibrationProfile] using
+    simpa [driftIdentityCalibrationProfile] using
       source_calibrated_target_citl_eq_prevalence_shift
         mean_pred πSource πTarget h_src_cal
   have h_abs_eq :
-      |(observableIdentityCalibrationProfile
+      |(driftIdentityCalibrationProfile
         πTarget mean_pred fstSource fstTarget).citl| = |πTarget - πSource| := by
-    simpa [observableIdentityCalibrationProfile] using
+    simpa [driftIdentityCalibrationProfile] using
       source_calibrated_target_abs_citl_eq_abs_prevalence_shift
         mean_pred πSource πTarget h_src_cal
   have h_tgt_ne_zero :
-      (observableIdentityCalibrationProfile
+      (driftIdentityCalibrationProfile
         πTarget mean_pred fstSource fstTarget).citl ≠ 0 := by
     rw [h_citl_eq]
     intro h_zero
     apply h_prev_shift
     linarith
   have h_abs_worse :
-      |(observableIdentityCalibrationProfile
+      |(driftIdentityCalibrationProfile
           πSource mean_pred fstSource fstSource).citl| <
-        |(observableIdentityCalibrationProfile
+        |(driftIdentityCalibrationProfile
           πTarget mean_pred fstSource fstTarget).citl| := by
     have h_tgt_abs_pos :
-        0 < |(observableIdentityCalibrationProfile
+        0 < |(driftIdentityCalibrationProfile
           πTarget mean_pred fstSource fstTarget).citl| :=
       abs_pos.mpr h_tgt_ne_zero
-    simpa [observableIdentityCalibrationProfile_citl, h_src_cal] using h_tgt_abs_pos
+    simpa [driftIdentityCalibrationProfile_citl, h_src_cal] using h_tgt_abs_pos
   exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩
 
-/-- **Cross-ancestry AUC drops while Brier worsens.**
+/-- **Cross-ancestry AUC drops while observable calibrated Brier worsens.**
     `AUC` measures discrimination, while `Brier` is the standard proper scoring
     rule carried by the observable drift model. Under positive drift, the target
     AUC is strictly lower and the target Brier score is strictly higher. -/
-theorem cross_ancestry_auc_and_brier_worsen
-    (π r2Source fstSource fstTarget : ℝ)
+theorem cross_ancestry_auc_drops_and_observable_brier_worsens
+    (π V_A V_E fstSource fstTarget : ℝ)
     (hπ0 : 0 < π) (hπ1 : π < 1)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetExactLiabilityAUC r2Source fstSource fstTarget <
-      sourceExactLiabilityAUC r2Source ∧
-    sourceExactCalibratedBrierRisk π r2Source <
-      targetExactCalibratedBrierRisk π r2Source fstSource fstTarget := by
+    targetExactLiabilityAUC V_A V_E fstTarget <
+      presentDayLiabilityAUC V_A V_E fstSource ∧
+    sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
+      targetExactCalibratedBrierRisk π V_A V_E fstTarget := by
   constructor
-  · exact targetLiabilityAUC_lt_source_of_observables
-      r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds hPhiStrict
-  · exact targetBrier_strict_gt_source_of_observables π r2Source fstSource fstTarget
-      hπ0 hπ1 h_r2 h_fst h_fst_bounds
+  · exact targetLiabilityAUC_lt_source_of_drift_state
+      V_A V_E fstSource fstTarget hVA hVE h_fst h_fst_bounds hPhiStrict
+  · exact targetBrier_strict_gt_source_of_drift_state π V_A V_E fstSource fstTarget
+      hπ0 hπ1 hVA hVE h_fst h_fst_bounds
 
 end CalibrationVsDiscrimination
 
@@ -1141,7 +1147,7 @@ theorem positive_nri_iff_reclassifiedBandEventPrevalence_below_cohort_prevalence
         (π * (1 - π)) * thresholdBandRate μevent threshold δ <
           (π * (1 - π)) * thresholdBandRate μnonevent threshold δ := by
       simpa [mul_assoc] using h_scaled
-    exact lt_of_mul_lt_mul_left' h_scaled'
+    nlinarith [h_scaled', h_scale_pos]
 
 /-- **Finite-horizon longitudinal treatment model.**
     `discount t` encodes the time value of health at follow-up time `t`. -/

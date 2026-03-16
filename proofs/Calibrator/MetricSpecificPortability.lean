@@ -314,21 +314,6 @@ theorem presentDayLiabilityAUC_formula
       Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
   simp [presentDayLiabilityAUC, presentDayAUC]
 
-/-- On `(0,1)`, the observable variance parameter `r2 / (1-r2)` is strictly
-    increasing in `r2`. -/
-theorem sourceVarianceFromR2_strictMono
-    (r2₁ r2₂ : ℝ)
-    (h_r2₂ : r2₂ < 1)
-    (h_lt : r2₁ < r2₂) :
-    sourceVarianceFromR2 r2₁ < sourceVarianceFromR2 r2₂ := by
-  unfold sourceVarianceFromR2
-  have h_d1 : 0 < 1 - r2₁ := by linarith
-  have h_d2 : 0 < 1 - r2₂ := by linarith
-  have h_d1_ne : 1 - r2₁ ≠ 0 := ne_of_gt h_d1
-  have h_d2_ne : 1 - r2₂ ≠ 0 := ne_of_gt h_d2
-  field_simp [h_d1_ne, h_d2_ne]
-  nlinarith
-
 /-- **Brier score depends on prevalence (derived from Brier definition).**
     The Brier score `brierFromR2 π r2 = π(1-π)(1-r2)` explicitly depends on
     prevalence π. Higher prevalence (up to 0.5) gives higher Brier score
@@ -358,35 +343,36 @@ theorem sourceLiabilityAUC_strictly_increases_with_r2
     (hPhiStrict : StrictMono Phi) :
     sourceExactLiabilityAUC r2₁ <
       sourceExactLiabilityAUC r2₂ := by
-  have h_r2₁_range : 0 < r2₁ ∧ r2₁ < 1 := ⟨h_r2₁, lt_trans h_lt h_r2₂⟩
   have h_r2₂_pos : 0 < r2₂ := lt_trans h_r2₁ h_lt
-  have h_r2₂_range : 0 < r2₂ ∧ r2₂ < 1 := ⟨h_r2₂_pos, h_r2₂⟩
-  have hv₁_pos : 0 < sourceVarianceFromR2 r2₁ :=
-    sourceVarianceFromR2_pos r2₁ h_r2₁_range
-  have hv₂_pos : 0 < sourceVarianceFromR2 r2₂ :=
-    sourceVarianceFromR2_pos r2₂ h_r2₂_range
+  have hv₁_nonneg : 0 ≤ snrFromR2 r2₁ :=
+    snrFromR2_nonneg r2₁ (le_of_lt h_r2₁) (lt_trans h_lt h_r2₂)
+  have hv₂_nonneg : 0 ≤ snrFromR2 r2₂ :=
+    snrFromR2_nonneg r2₂ (le_of_lt h_r2₂_pos) h_r2₂
   have hv_lt :
-      sourceVarianceFromR2 r2₁ < sourceVarianceFromR2 r2₂ :=
-    sourceVarianceFromR2_strictMono r2₁ r2₂ h_r2₂ h_lt
+      snrFromR2 r2₁ < snrFromR2 r2₂ :=
+    snrFromR2_strictMono
+      ⟨le_of_lt h_r2₁, lt_trans h_lt h_r2₂⟩
+      ⟨le_of_lt h_r2₂_pos, h_r2₂⟩
+      h_lt
   have hmono := liabilityAUCFromSNR_strictMonoOn_nonneg hPhiStrict
   unfold sourceExactLiabilityAUC
-  exact hmono (by simpa using le_of_lt hv₁_pos) (by simpa using le_of_lt hv₂_pos) hv_lt
+  exact hmono hv₁_nonneg hv₂_nonneg hv_lt
 
 /-- **Liability AUC is sensitive to drift in the observable transport model.**
     With fixed source `R²`, increasing drift strictly lowers the transported
     liability-threshold AUC. This is the exact metric-level AUC analogue of the
     observable `R²` drift result. -/
 theorem liability_auc_sensitive_to_drift
-    (r2Source fstS fstT : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (V_A V_E fstS fstT : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstS < fstT)
     (h_fst_bounds : 0 ≤ fstS ∧ fstT < 1)
     (hPhiStrict : StrictMono Phi) :
-    0 < sourceExactLiabilityAUC r2Source -
-      targetExactLiabilityAUC r2Source fstS fstT := by
+    0 < presentDayLiabilityAUC V_A V_E fstS -
+      targetExactLiabilityAUC V_A V_E fstT := by
   have h_drop :=
-    targetLiabilityAUC_lt_source_of_observables
-      r2Source fstS fstT h_r2 h_fst h_fst_bounds hPhiStrict
+    targetLiabilityAUC_lt_source_of_drift_state
+      V_A V_E fstS fstT hVA hVE h_fst h_fst_bounds hPhiStrict
   linarith
 
 /-- **Brier worsens when R² drops and the prevalence factor weakly increases.**
@@ -436,17 +422,13 @@ with the mean-score offset.**
     fixed-`fst` statement behind "rank-based discrimination can be preserved
     while calibration is lost." -/
 theorem auc_preserved_citl_shift_at_fixed_fst
-    (r2Source fst mean_obs mean_pred δ : ℝ)
-    (hfst : fst < 1) :
-    targetExactLiabilityAUC r2Source fst fst =
-      sourceExactLiabilityAUC r2Source ∧
+    (V_A V_E fst mean_obs mean_pred δ : ℝ) :
+    targetExactLiabilityAUC V_A V_E fst =
+      presentDayLiabilityAUC V_A V_E fst ∧
     calibrationInTheLarge mean_obs (mean_pred + δ) =
       calibrationInTheLarge mean_obs mean_pred - δ := by
   constructor
-  · unfold targetExactLiabilityAUC sourceExactLiabilityAUC
-      targetAUCFromObservables sourceAUCFromObservables aucFromR2
-    have hden : (1 : ℝ) - fst ≠ 0 := by linarith
-    simp [targetVarianceFromSource, sourceVarianceFromR2, hden]
+  · rfl
   · unfold calibrationInTheLarge
     ring
 
@@ -460,15 +442,14 @@ theorem auc_preserved_citl_shift_at_fixed_fst
     AUC is preserved, while calibration loss is witnessed by a standard
     calibration metric rather than an `R²` surrogate. -/
 theorem discrimination_preserved_calibration_lost
-    (r2Source fst mean_obs mean_pred δ : ℝ)
-    (hfst : fst < 1)
+    (V_A V_E fst mean_obs mean_pred δ : ℝ)
     (h_src_cal : calibrationInTheLarge mean_obs mean_pred = 0)
     (h_shift : δ ≠ 0) :
-    targetExactLiabilityAUC r2Source fst fst =
-      sourceExactLiabilityAUC r2Source ∧
+    targetExactLiabilityAUC V_A V_E fst =
+      presentDayLiabilityAUC V_A V_E fst ∧
     |calibrationInTheLarge mean_obs mean_pred| <
       |calibrationInTheLarge mean_obs (mean_pred + δ)| := by
-  rcases auc_preserved_citl_shift_at_fixed_fst r2Source fst mean_obs mean_pred δ hfst with
+  rcases auc_preserved_citl_shift_at_fixed_fst V_A V_E fst mean_obs mean_pred δ with
     ⟨h_auc, h_citl_shift⟩
   refine ⟨h_auc, ?_⟩
   rw [h_src_cal]
@@ -503,68 +484,51 @@ theorem allele_freq_shift_disrupts_calibration
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
     (hfst_bounds : 0 ≤ fstS ∧ fstT < 1) :
-    let profile := observableIdentityCalibrationProfile π π fstS fstT
+    let profile := driftIdentityCalibrationProfile π π fstS fstT
     profile.slope < 1 ∧
     calibrationSlopeDeviation 1 < profile.slopeDeviation ∧
     profile.slopeDeviation = 1 - profile.slope ∧
     profile.slope = transportedLinearCalibrationSlope V_A fstS fstT ∧
     profile.slope = (1 - fstT) / (1 - fstS) ∧
-    sourceExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) <
-      targetExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) fstS fstT := by
+    sourceBrierFromR2 π (presentDayR2 V_A V_E fstS) <
+      targetBrierFromDriftState π V_A V_E fstT := by
   dsimp
   have hfstS_lt_one : fstS < 1 := lt_trans hfst hfst_bounds.2
   have hslope_eq :
       transportedLinearCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) := by
     exact transportedLinearCalibrationSlope_eq_fst_ratio V_A fstS fstT hVA hfstS_lt_one
   have hprofile_eq_transport :
-      (observableIdentityCalibrationProfile π π fstS fstT).slope =
+      (driftIdentityCalibrationProfile π π fstS fstT).slope =
         transportedLinearCalibrationSlope V_A fstS fstT := by
-    simp [observableIdentityCalibrationProfile,
+    simp [driftIdentityCalibrationProfile,
       transportedLinearCalibrationSlope_eq_driftTransportRatio, hVA, hfstS_lt_one]
-  have hsrc_pos : 0 < presentDayR2 V_A V_E fstS := by
-    unfold presentDayR2 presentDayPGSVariance
-    have h_num : 0 < (1 - fstS) * V_A := by
-      have h_one_minus : 0 < 1 - fstS := by linarith
-      exact mul_pos h_one_minus hVA
-    have h_den : 0 < (1 - fstS) * V_A + V_E := by linarith
-    exact div_pos h_num h_den
-  have hsrc_lt_one : presentDayR2 V_A V_E fstS < 1 := by
-    unfold presentDayR2 presentDayPGSVariance
-    have h_num : 0 < (1 - fstS) * V_A := by
-      have h_one_minus : 0 < 1 - fstS := by linarith
-      exact mul_pos h_one_minus hVA
-    have h_den : 0 < (1 - fstS) * V_A + V_E := by linarith
-    rw [div_lt_one h_den]
-    linarith
-  have hsrc_range : 0 < presentDayR2 V_A V_E fstS ∧ presentDayR2 V_A V_E fstS < 1 :=
-    ⟨hsrc_pos, hsrc_lt_one⟩
   have hslope_lt :
-      (observableIdentityCalibrationProfile π π fstS fstT).slope < 1 := by
+      (driftIdentityCalibrationProfile π π fstS fstT).slope < 1 := by
     rw [hprofile_eq_transport]
     exact transportedLinearCalibrationSlope_lt_one V_A fstS fstT hVA hfst
       (le_of_lt hfst_bounds.2)
   have hslope_dev_pos :
       calibrationSlopeDeviation 1 <
-        (observableIdentityCalibrationProfile π π fstS fstT).slopeDeviation := by
+        (driftIdentityCalibrationProfile π π fstS fstT).slopeDeviation := by
     unfold CalibrationProfile.slopeDeviation calibrationSlopeDeviation
     rw [show (1 : ℝ) - 1 = 0 by ring, abs_zero]
     have hneg :
-        (observableIdentityCalibrationProfile π π fstS fstT).slope - 1 < 0 := by
+        (driftIdentityCalibrationProfile π π fstS fstT).slope - 1 < 0 := by
       linarith [hslope_lt]
     rw [abs_of_neg hneg]
     linarith
   have hslope_dev :
-      (observableIdentityCalibrationProfile π π fstS fstT).slopeDeviation =
-        1 - (observableIdentityCalibrationProfile π π fstS fstT).slope := by
+      (driftIdentityCalibrationProfile π π fstS fstT).slopeDeviation =
+        1 - (driftIdentityCalibrationProfile π π fstS fstT).slope := by
     exact calibrationSlopeDeviation_eq_one_sub_of_lt_one
-      (observableIdentityCalibrationProfile π π fstS fstT).slope hslope_lt
+      (driftIdentityCalibrationProfile π π fstS fstT).slope hslope_lt
   have hbrier :
-      sourceExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) <
-        targetExactCalibratedBrierRisk π (presentDayR2 V_A V_E fstS) fstS fstT := by
-    exact targetBrier_strict_gt_source_of_observables
-      π (presentDayR2 V_A V_E fstS) fstS fstT hπ0 hπ1 hsrc_range hfst hfst_bounds
+      sourceBrierFromR2 π (presentDayR2 V_A V_E fstS) <
+        targetBrierFromDriftState π V_A V_E fstT := by
+    exact targetBrier_strict_gt_source_of_drift_state
+      π V_A V_E fstS fstT hπ0 hπ1 hVA hVE hfst hfst_bounds
   have hslope_eq_closed :
-      (observableIdentityCalibrationProfile π π fstS fstT).slope = (1 - fstT) / (1 - fstS) := by
+      (driftIdentityCalibrationProfile π π fstS fstT).slope = (1 - fstT) / (1 - fstS) := by
     rw [hprofile_eq_transport, hslope_eq]
   exact ⟨hslope_lt, hslope_dev_pos, hslope_dev, hprofile_eq_transport, hslope_eq_closed, hbrier⟩
 
@@ -694,77 +658,89 @@ theorem brier_bounded_by_prevalence
 
 /-- Brier worsening caused by discrimination loss alone, holding target prevalence fixed. -/
 noncomputable def brierDiscriminationLoss
-    (πTarget r2Source fstSource fstTarget : ℝ) : ℝ :=
-  targetBrierFromObservables πTarget r2Source fstSource fstTarget -
-    sourceBrierFromObservables πTarget r2Source
+    (πTarget V_A V_E fstSource fstTarget : ℝ) : ℝ :=
+  targetBrierFromDriftState πTarget V_A V_E fstTarget -
+    sourceBrierFromR2 πTarget (presentDayR2 V_A V_E fstSource)
 
 /-- Brier worsening caused by calibration/prevalence shift alone, holding source `R²` fixed. -/
 noncomputable def brierCalibrationLoss
-    (πSource πTarget r2Source : ℝ) : ℝ :=
-  sourceBrierFromObservables πTarget r2Source -
-    sourceBrierFromObservables πSource r2Source
+    (πSource πTarget V_A V_E fstSource : ℝ) : ℝ :=
+  sourceBrierFromR2 πTarget (presentDayR2 V_A V_E fstSource) -
+    sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource)
 
 /-- Exact formula for the discrimination-loss contribution to Brier worsening. -/
 theorem brierDiscriminationLoss_eq
-    (πTarget r2Source fstSource fstTarget : ℝ) :
-    brierDiscriminationLoss πTarget r2Source fstSource fstTarget =
+    (πTarget V_A V_E fstSource fstTarget : ℝ) :
+    brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget =
       πTarget * (1 - πTarget) *
-        (r2Source - targetR2FromObservables r2Source fstSource fstTarget) := by
-  unfold brierDiscriminationLoss targetBrierFromObservables sourceBrierFromObservables
+        (presentDayR2 V_A V_E fstSource - targetR2FromDriftState V_A V_E fstTarget) := by
+  unfold brierDiscriminationLoss targetBrierFromDriftState sourceBrierFromR2
     targetExactCalibratedBrierRisk exactCalibratedBrierRiskFromR2
   calc
-    πTarget * (1 - πTarget) * (1 - targetR2FromObservables r2Source fstSource fstTarget) -
-        πTarget * (1 - πTarget) * (1 - r2Source)
+    πTarget * (1 - πTarget) * (1 - targetR2FromDriftState V_A V_E fstTarget) -
+        πTarget * (1 - πTarget) * (1 - presentDayR2 V_A V_E fstSource)
       = πTarget * (1 - πTarget) *
-          ((1 - targetR2FromObservables r2Source fstSource fstTarget) - (1 - r2Source)) := by
+          ((1 - targetR2FromDriftState V_A V_E fstTarget) -
+            (1 - presentDayR2 V_A V_E fstSource)) := by
             ring
     _ = πTarget * (1 - πTarget) *
-          (r2Source - targetR2FromObservables r2Source fstSource fstTarget) := by
+          (presentDayR2 V_A V_E fstSource -
+            targetR2FromDriftState V_A V_E fstTarget) := by
             ring
 
 /-- Exact formula for the calibration/prevalence contribution to Brier worsening. -/
 theorem brierCalibrationLoss_eq
-    (πSource πTarget r2Source : ℝ) :
-    brierCalibrationLoss πSource πTarget r2Source =
-      (πTarget * (1 - πTarget) - πSource * (1 - πSource)) * (1 - r2Source) := by
-  unfold brierCalibrationLoss sourceBrierFromObservables
+    (πSource πTarget V_A V_E fstSource : ℝ) :
+    brierCalibrationLoss πSource πTarget V_A V_E fstSource =
+      (πTarget * (1 - πTarget) - πSource * (1 - πSource)) *
+        (1 - presentDayR2 V_A V_E fstSource) := by
+  unfold brierCalibrationLoss sourceBrierFromR2
     exactCalibratedBrierRiskFromR2
   ring_nf
 
 /-- Exact decomposition of observable Brier worsening into discrimination and calibration terms. -/
 theorem observableBrier_change_decomposition
-    (πSource πTarget r2Source fstSource fstTarget : ℝ) :
-    targetBrierFromObservables πTarget r2Source fstSource fstTarget -
-      sourceBrierFromObservables πSource r2Source =
-      brierDiscriminationLoss πTarget r2Source fstSource fstTarget +
-      brierCalibrationLoss πSource πTarget r2Source := by
+    (πSource πTarget V_A V_E fstSource fstTarget : ℝ) :
+    targetBrierFromDriftState πTarget V_A V_E fstTarget -
+      sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource) =
+      brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget +
+      brierCalibrationLoss πSource πTarget V_A V_E fstSource := by
   unfold brierDiscriminationLoss brierCalibrationLoss
   ring
 
 /-- Positive drift makes the discrimination-loss contribution to Brier worsening positive. -/
 theorem brierDiscriminationLoss_pos_of_drift
-    (πTarget r2Source fstSource fstTarget : ℝ)
+    (πTarget V_A V_E fstSource fstTarget : ℝ)
     (hπ0 : 0 < πTarget) (hπ1 : πTarget < 1)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    0 < brierDiscriminationLoss πTarget r2Source fstSource fstTarget := by
+    0 < brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget := by
   unfold brierDiscriminationLoss
   exact sub_pos.mpr
-    (targetBrier_strict_gt_source_of_observables πTarget r2Source fstSource fstTarget
-      hπ0 hπ1 h_r2 h_fst h_fst_bounds)
+    (targetBrier_strict_gt_source_of_drift_state πTarget V_A V_E fstSource fstTarget
+      hπ0 hπ1 hVA hVE h_fst h_fst_bounds)
 
 /-- If the prevalence factor increases, the calibration/prevalence contribution is positive. -/
 theorem brierCalibrationLoss_pos_of_prevalence_factor_increase
-    (πSource πTarget r2Source : ℝ)
-    (h_r2_lt : r2Source < 1)
+    (πSource πTarget V_A V_E fstSource : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfstS_lt_one : fstSource < 1)
     (h_prev_factor :
       πSource * (1 - πSource) < πTarget * (1 - πTarget)) :
-    0 < brierCalibrationLoss πSource πTarget r2Source := by
+    0 < brierCalibrationLoss πSource πTarget V_A V_E fstSource := by
   rw [brierCalibrationLoss_eq]
   have h_prev_gap : 0 < πTarget * (1 - πTarget) - πSource * (1 - πSource) := by
     linarith
-  have h_one_minus_r2 : 0 < 1 - r2Source := by
+  have h_source_r2_lt_one : presentDayR2 V_A V_E fstSource < 1 := by
+    unfold presentDayR2 presentDayPGSVariance
+    have h_num : 0 < (1 - fstSource) * V_A := by
+      have h_one_minus : 0 < 1 - fstSource := by linarith
+      exact mul_pos h_one_minus hVA
+    have h_den : 0 < (1 - fstSource) * V_A + V_E := by linarith
+    rw [div_lt_one h_den]
+    linarith
+  have h_one_minus_r2 : 0 < 1 - presentDayR2 V_A V_E fstSource := by
     linarith
   exact mul_pos h_prev_gap h_one_minus_r2
 
@@ -780,37 +756,40 @@ theorem brierCalibrationLoss_pos_of_prevalence_factor_increase
     If the prevalence-linked calibration term exceeds the discrimination term,
     then it contributes more than half of the total Brier worsening. -/
 theorem brier_increase_mainly_calibration
-    (πSource πTarget r2Source fstSource fstTarget : ℝ)
+    (πSource πTarget V_A V_E fstSource fstTarget : ℝ)
     (hπ0 : 0 < πTarget) (hπ1 : πTarget < 1)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (h_prev_factor :
       πSource * (1 - πSource) < πTarget * (1 - πTarget))
     (h_cal_dom :
       πTarget * (1 - πTarget) *
-          (r2Source - targetR2FromObservables r2Source fstSource fstTarget) <
-        (πTarget * (1 - πTarget) - πSource * (1 - πSource)) * (1 - r2Source)) :
-    targetBrierFromObservables πTarget r2Source fstSource fstTarget -
-      sourceBrierFromObservables πSource r2Source =
-        brierDiscriminationLoss πTarget r2Source fstSource fstTarget +
-        brierCalibrationLoss πSource πTarget r2Source ∧
-    0 < brierDiscriminationLoss πTarget r2Source fstSource fstTarget ∧
-    0 < brierCalibrationLoss πSource πTarget r2Source ∧
-    brierDiscriminationLoss πTarget r2Source fstSource fstTarget <
-      brierCalibrationLoss πSource πTarget r2Source ∧
-    (targetBrierFromObservables πTarget r2Source fstSource fstTarget -
-        sourceBrierFromObservables πSource r2Source) / 2 <
-      brierCalibrationLoss πSource πTarget r2Source := by
+          (presentDayR2 V_A V_E fstSource -
+            targetR2FromDriftState V_A V_E fstTarget) <
+        (πTarget * (1 - πTarget) - πSource * (1 - πSource)) *
+          (1 - presentDayR2 V_A V_E fstSource)) :
+    targetBrierFromDriftState πTarget V_A V_E fstTarget -
+      sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource) =
+        brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget +
+        brierCalibrationLoss πSource πTarget V_A V_E fstSource ∧
+    0 < brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget ∧
+    0 < brierCalibrationLoss πSource πTarget V_A V_E fstSource ∧
+    brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget <
+      brierCalibrationLoss πSource πTarget V_A V_E fstSource ∧
+    (targetBrierFromDriftState πTarget V_A V_E fstTarget -
+        sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource)) / 2 <
+      brierCalibrationLoss πSource πTarget V_A V_E fstSource := by
   have h_decomp := observableBrier_change_decomposition
-    πSource πTarget r2Source fstSource fstTarget
+    πSource πTarget V_A V_E fstSource fstTarget
   have h_disc_pos := brierDiscriminationLoss_pos_of_drift
-    πTarget r2Source fstSource fstTarget hπ0 hπ1 h_r2 h_fst h_fst_bounds
+    πTarget V_A V_E fstSource fstTarget hπ0 hπ1 hVA hVE h_fst h_fst_bounds
+  have hfstS_lt_one : fstSource < 1 := lt_trans h_fst h_fst_bounds.2
   have h_cal_pos := brierCalibrationLoss_pos_of_prevalence_factor_increase
-    πSource πTarget r2Source h_r2.2 h_prev_factor
+    πSource πTarget V_A V_E fstSource hVA hVE hfstS_lt_one h_prev_factor
   have h_cal_dom' :
-      brierDiscriminationLoss πTarget r2Source fstSource fstTarget <
-        brierCalibrationLoss πSource πTarget r2Source := by
+      brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget <
+        brierCalibrationLoss πSource πTarget V_A V_E fstSource := by
     rw [brierDiscriminationLoss_eq, brierCalibrationLoss_eq]
     exact h_cal_dom
   refine ⟨h_decomp, h_disc_pos, h_cal_pos, h_cal_dom', ?_⟩
@@ -1075,27 +1054,29 @@ theorem brier_score_bounded
     term dominates, then it contributes more than half of the total Brier
     worsening. -/
 theorem brier_proper_score_portability_decomposition
-    (πSource πTarget r2Source fstSource fstTarget : ℝ)
+    (πSource πTarget V_A V_E fstSource fstTarget : ℝ)
     (hπ0 : 0 < πTarget) (hπ1 : πTarget < 1)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (h_prev_factor :
       πSource * (1 - πSource) < πTarget * (1 - πTarget))
     (h_cal_dom :
       πTarget * (1 - πTarget) *
-          (r2Source - targetR2FromObservables r2Source fstSource fstTarget) <
-        (πTarget * (1 - πTarget) - πSource * (1 - πSource)) * (1 - r2Source)) :
-    targetBrierFromObservables πTarget r2Source fstSource fstTarget -
-      sourceBrierFromObservables πSource r2Source =
-        brierDiscriminationLoss πTarget r2Source fstSource fstTarget +
-        brierCalibrationLoss πSource πTarget r2Source ∧
-    (targetBrierFromObservables πTarget r2Source fstSource fstTarget -
-        sourceBrierFromObservables πSource r2Source) / 2 <
-      brierCalibrationLoss πSource πTarget r2Source := by
+          (presentDayR2 V_A V_E fstSource -
+            targetR2FromDriftState V_A V_E fstTarget) <
+        (πTarget * (1 - πTarget) - πSource * (1 - πSource)) *
+          (1 - presentDayR2 V_A V_E fstSource)) :
+    targetBrierFromDriftState πTarget V_A V_E fstTarget -
+      sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource) =
+        brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget +
+        brierCalibrationLoss πSource πTarget V_A V_E fstSource ∧
+    (targetBrierFromDriftState πTarget V_A V_E fstTarget -
+        sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource)) / 2 <
+      brierCalibrationLoss πSource πTarget V_A V_E fstSource := by
   rcases brier_increase_mainly_calibration
-      πSource πTarget r2Source fstSource fstTarget
-      hπ0 hπ1 h_r2 h_fst h_fst_bounds h_prev_factor h_cal_dom with
+      πSource πTarget V_A V_E fstSource fstTarget
+      hπ0 hπ1 hVA hVE h_fst h_fst_bounds h_prev_factor h_cal_dom with
     ⟨h_decomp, _h_disc_pos, _h_cal_pos, _h_dom, h_half⟩
   exact ⟨h_decomp, h_half⟩
 

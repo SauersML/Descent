@@ -185,45 +185,43 @@ performance, even within the same population.
 
 section CohortEffects
 
-/-- Canonical transported deployment metrics indexed by a temporal or
-    phenotype-specific signal-retention factor. This is the shared longitudinal
-    specialization of the repo's core transported-metric map. -/
+/-- Canonical signal-indexed deployment metrics indexed by a temporal or
+    phenotype-specific retention factor. This is the shared longitudinal
+    specialization of the repo's signal-variance metric map. -/
 noncomputable def temporalMetricProfile
-    (π r2Source transportFactor : ℝ) : TransportedMetrics.Profile :=
-  TransportedMetrics.profile π 1 r2Source transportFactor
+    (π sourceSignal transportFactor : ℝ) : TransportedMetrics.Profile :=
+  TransportedMetrics.profileFromSignalVariance π 1 (sourceSignal * transportFactor)
 
 /-- Exact longitudinal `R²` surface induced by a time-indexed signal-retention
     factor. -/
 noncomputable def temporalR2
-    (r2Source transportFactor : ℝ) : ℝ :=
-  TransportedMetrics.targetR2 1 r2Source transportFactor
+    (sourceSignal transportFactor : ℝ) : ℝ :=
+  TransportedMetrics.r2FromSignalVariance (sourceSignal * transportFactor) 1
 
 @[simp] theorem temporalMetricProfile_r2
-    (π r2Source transportFactor : ℝ) :
-    (temporalMetricProfile π r2Source transportFactor).r2 =
-      temporalR2 r2Source transportFactor := by
+    (π sourceSignal transportFactor : ℝ) :
+    (temporalMetricProfile π sourceSignal transportFactor).r2 =
+      temporalR2 sourceSignal transportFactor := by
   rfl
 
-/-- At unit retention, the longitudinal `R²` surface recovers the source `R²`
-    exactly on the biologically valid `R² ≠ 1` domain. -/
+/-- At unit retention, the longitudinal `R²` surface is the unit-noise
+    `R²` coordinate of the supplied source signal variance. -/
 theorem temporalR2_at_unit_transport
-    (r2Source : ℝ) (h_r2 : r2Source ≠ 1) :
-    temporalR2 r2Source 1 = r2Source := by
+    (sourceSignal : ℝ) :
+    temporalR2 sourceSignal 1 =
+      TransportedMetrics.r2FromSignalVariance sourceSignal 1 := by
   unfold temporalR2
-  rw [TransportedMetrics.targetR2_eq_closed_form 1 r2Source 1 one_ne_zero h_r2]
-  have h_one : 1 - r2Source ≠ 0 := sub_ne_zero.mpr (Ne.symm h_r2)
-  field_simp [h_one]
-  ring
+  simp
 
 /-- Gaussian age-kernel transport factor for age-specific portability. -/
 noncomputable def ageDependentTransportFactor
     (age age_peak width : ℝ) : ℝ :=
   Real.exp (-(age - age_peak)^2 / (2 * width^2))
 
-/-- Canonical age-indexed transported deployment metrics. -/
+/-- Canonical age-indexed signal-retention deployment metrics. -/
 noncomputable def ageDependentMetricProfile
-    (π r2_peak age age_peak width : ℝ) : TransportedMetrics.Profile :=
-  temporalMetricProfile π r2_peak
+    (π sourceSignalPeak age age_peak width : ℝ) : TransportedMetrics.Profile :=
+  temporalMetricProfile π sourceSignalPeak
     (ageDependentTransportFactor age age_peak width)
 
 /-- **PGS effect sizes are cohort-dependent.**
@@ -245,13 +243,13 @@ theorem cohort_specific_effects
     predictive power at different ages. This interacts with
     cohort effects when comparing across time. This public `R²` surface is
     the `r2` field of the canonical age-indexed transported metric profile. -/
-noncomputable def ageDependentR2 (r2_peak age age_peak width : ℝ) : ℝ :=
-  temporalR2 r2_peak (ageDependentTransportFactor age age_peak width)
+noncomputable def ageDependentR2 (sourceSignalPeak age age_peak width : ℝ) : ℝ :=
+  temporalR2 sourceSignalPeak (ageDependentTransportFactor age age_peak width)
 
 @[simp] theorem ageDependentMetricProfile_r2
-    (π r2_peak age age_peak width : ℝ) :
-    (ageDependentMetricProfile π r2_peak age age_peak width).r2 =
-      ageDependentR2 r2_peak age age_peak width := by
+    (π sourceSignalPeak age age_peak width : ℝ) :
+    (ageDependentMetricProfile π sourceSignalPeak age age_peak width).r2 =
+      ageDependentR2 sourceSignalPeak age age_peak width := by
   rfl
 
 @[simp] theorem ageDependentTransportFactor_at_peak
@@ -261,12 +259,12 @@ noncomputable def ageDependentR2 (r2_peak age age_peak width : ℝ) : ℝ :=
   simp [sub_self, Real.exp_zero]
 
 /-- Age-dependent R² peaks at the optimal age. -/
-theorem age_r2_peaks_at_optimal (r2_peak age_peak width : ℝ)
-    (h_r2 : r2_peak ≠ 1) :
-    ageDependentR2 r2_peak age_peak age_peak width = r2_peak := by
+theorem age_r2_peaks_at_optimal (sourceSignalPeak age_peak width : ℝ) :
+    ageDependentR2 sourceSignalPeak age_peak age_peak width =
+      TransportedMetrics.r2FromSignalVariance sourceSignalPeak 1 := by
   unfold ageDependentR2
   rw [ageDependentTransportFactor_at_peak]
-  exact temporalR2_at_unit_transport r2_peak h_r2
+  exact temporalR2_at_unit_transport sourceSignalPeak
 
 /-- **Education PGS and cohort effects.**
     Education PGS trained on older cohorts (where education access

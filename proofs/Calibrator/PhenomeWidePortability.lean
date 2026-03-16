@@ -31,10 +31,12 @@ genetic distance. This classification reflects underlying biology.
 
 section TraitClassification
 
-/-- **Neutral portability baseline.**
-    Under pure neutral drift with no selection or GxE:
-    R²_target / R²_source ≈ (1 - Fst_additional)
-    accounting for LD tagging loss. -/
+/-- **Neutral scalar transport baseline.**
+    Under pure neutral drift with no selection or GxE, this file uses the
+    coarse transport summary `(1 - Fst_additional) * ld_factor`.
+
+    This is a trait-level scalar baseline for downstream comparisons, not a
+    literal theorem that the deployed `R²` ratio equals this product. -/
 noncomputable def neutralPortabilityRatioLD (fst_additional ld_factor : ℝ) : ℝ :=
   (1 - fst_additional) * ld_factor
 

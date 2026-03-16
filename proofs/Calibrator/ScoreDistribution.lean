@@ -206,13 +206,13 @@ theorem calibration_slope_one
     transportedLinearCalibrationSlope V_A fst_source fst_target < 1 := by
   have h_source_lt_one : fst_source < 1 := lt_of_lt_of_le h_drift h_target_le_one
   have h_profile :
-      (observableIdentityCalibrationProfile 0 0 fst_source fst_target).slope < 1 := by
-    simpa [observableIdentityCalibrationProfile] using
+      (driftIdentityCalibrationProfile 0 0 fst_source fst_target).slope < 1 := by
+    simpa [driftIdentityCalibrationProfile] using
       driftTransportRatio_lt_one fst_source fst_target h_source_lt_one h_drift
   have h_bridge :
-      (observableIdentityCalibrationProfile 0 0 fst_source fst_target).slope =
+      (driftIdentityCalibrationProfile 0 0 fst_source fst_target).slope =
         transportedLinearCalibrationSlope V_A fst_source fst_target := by
-    simp [observableIdentityCalibrationProfile,
+    simp [driftIdentityCalibrationProfile,
       transportedLinearCalibrationSlope_eq_driftTransportRatio, hVA, h_source_lt_one]
   rw [← h_bridge]
   exact h_profile

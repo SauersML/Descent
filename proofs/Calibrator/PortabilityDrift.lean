@@ -941,19 +941,14 @@ theorem portability_ratio_lt_one_of_positive_drift
   exact portability_ratio_lt_one_of_drop (presentDayR2 V_A V_E fstS)
     (presentDayR2 V_A V_E fstT) hsrc_pos hdrop
 
-/-- Source variance implied by present-day source `R²` after fixing noise scale to `1`. -/
-noncomputable def sourceVarianceFromR2 (r2Source : ℝ) : ℝ :=
-  r2Source / (1 - r2Source)
-
-/-- Exact recovery of source signal-to-noise from the literal present-day source
-    `R²` in the core drift model. This is the algebraic inverse of
-    `presentDayR2 = v / (v + V_E)`, so the observable-only transport formulas
-    and the variance-based drift formulas talk about the same quantity. -/
-theorem sourceVarianceFromR2_eq_presentDaySignalToNoise
+/-- Exact recovery of present-day signal-to-noise from the literal present-day
+    source `R²` in the core drift model. This is only a coordinate identity
+    for the fixed residual scale, not a biological transport theorem. -/
+theorem snrFromR2_eq_presentDaySignalToNoise
     (V_A V_E fst : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst_lt_one : fst < 1) :
-    sourceVarianceFromR2 (presentDayR2 V_A V_E fst) =
+    snrFromR2 (presentDayR2 V_A V_E fst) =
       presentDaySignalToNoise V_A V_E fst := by
   have hv_pos : 0 < presentDayPGSVariance V_A fst := by
     unfold presentDayPGSVariance
@@ -961,274 +956,57 @@ theorem sourceVarianceFromR2_eq_presentDaySignalToNoise
     exact mul_pos h_one_minus hVA
   have hsum_ne : presentDayPGSVariance V_A fst + V_E ≠ 0 := by
     linarith
-  unfold sourceVarianceFromR2 presentDayR2 presentDaySignalToNoise
+  unfold snrFromR2 presentDayR2 presentDaySignalToNoise
   field_simp [hsum_ne, ne_of_gt hVE]
   ring
 
-/-- Drift transport written purely from present-day source variance and observable `F_ST`s. -/
-noncomputable def targetVarianceFromSource
-    (vSource fstSource fstTarget : ℝ) : ℝ :=
-  vSource * ((1 - fstTarget) / (1 - fstSource))
+/-- Present-day target `R²` from explicit drift state. -/
+noncomputable def targetR2FromDriftState
+    (V_A V_E fstTarget : ℝ) : ℝ :=
+  presentDayR2 V_A V_E fstTarget
 
-/-- `R²` induced by a variance ratio after fixing environmental scale to `1`. -/
-noncomputable def r2FromVarianceScaleOne (v : ℝ) : ℝ :=
-  v / (v + 1)
-
-/-- On nonnegative variances, `v ↦ v/(v+1)` is strictly increasing. -/
-theorem r2FromVarianceScaleOne_strictMono_nonneg
-    (x y : ℝ) (hx : 0 ≤ x) (hxy : x < y) :
-    r2FromVarianceScaleOne x < r2FromVarianceScaleOne y := by
-  -- r2FromVarianceScaleOne v = v/(v+1) = expectedR2 v 1
-  show r2FromVarianceScaleOne x < r2FromVarianceScaleOne y
-  have : expectedR2 x 1 < expectedR2 y 1 :=
-    expectedR2_strictMono_nonneg 1 x y one_pos hx hxy
-  simpa [expectedR2, r2FromVarianceScaleOne] using this
-
-/-- Present-day target `R²` written only from source `R²` and source/target `F_ST`. -/
-noncomputable def targetR2FromObservables
-    (r2Source fstSource fstTarget : ℝ) : ℝ :=
-  r2FromVarianceScaleOne
-    (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
-
-/-- Source `R²` represented through the scale-one variance map. -/
-theorem sourceR2_eq_r2FromVarianceScaleOne (r2Source : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1) :
-    r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) = r2Source := by
-  rcases h_r2 with ⟨h0, h1⟩
-  unfold r2FromVarianceScaleOne sourceVarianceFromR2
-  have hden : 1 - r2Source ≠ 0 := by linarith
-  field_simp [hden]
-  ring
-
-/-- Positivity of source variance induced by `0 < R²_source < 1`. -/
-theorem sourceVarianceFromR2_pos (r2Source : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1) :
-    0 < sourceVarianceFromR2 r2Source := by
-  rcases h_r2 with ⟨h0, h1⟩
-  unfold sourceVarianceFromR2
-  have hden : 0 < 1 - r2Source := by linarith
-  exact div_pos h0 hden
-
-/-- Under `fstSource < fstTarget < 1`, target variance is strictly below source variance. -/
-theorem targetVarianceFromSource_lt_source
-    (vSource fstSource fstTarget : ℝ)
-    (hv : 0 < vSource)
-    (hfst : fstSource < fstTarget)
-    (hfstBound : fstTarget < 1) :
-    targetVarianceFromSource vSource fstSource fstTarget < vSource := by
-  unfold targetVarianceFromSource
-  have hden : 0 < 1 - fstSource := by
-    have : fstSource < 1 := lt_trans hfst hfstBound
-    linarith
-  have hratio : ((1 - fstTarget) / (1 - fstSource)) < 1 := by
-    rw [div_lt_one hden]
-    linarith
-  have hmul : vSource * ((1 - fstTarget) / (1 - fstSource)) < vSource * 1 :=
-    mul_lt_mul_of_pos_left hratio hv
-  simpa using hmul
-
-/-- Under `fstSource < fstTarget < 1`, transported target variance stays positive. -/
-theorem targetVarianceFromSource_pos
-    (vSource fstSource fstTarget : ℝ)
-    (hv : 0 < vSource)
-    (hfst : fstSource < fstTarget)
-    (hfstBound : fstTarget < 1) :
-    0 < targetVarianceFromSource vSource fstSource fstTarget := by
-  unfold targetVarianceFromSource
-  have hden : 0 < 1 - fstSource := by
-    have : fstSource < 1 := lt_trans hfst hfstBound
-    linarith
-  have hnum : 0 < 1 - fstTarget := by linarith
-  have hratio : 0 < (1 - fstTarget) / (1 - fstSource) := div_pos hnum hden
-  exact mul_pos hv hratio
-
-/-- Observable-only portability theorem: target/source `R²` ratio is strictly below `1`. -/
-theorem portability_ratio_from_observables
-    (r2Source fstSource fstTarget : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+/-- Drift-state portability theorem: target/source `R²` ratio is strictly below `1`. -/
+theorem portability_ratio_from_drift_state
+    (V_A V_E fstSource fstTarget : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    targetR2FromObservables r2Source fstSource fstTarget / r2Source < 1 := by
-  rcases h_fst_bounds with ⟨_, hfstT_lt_one⟩
-  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
-    sourceVarianceFromR2_pos r2Source h_r2
-  have hvT_lt : targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget
-      < sourceVarianceFromR2 r2Source :=
-    targetVarianceFromSource_lt_source (sourceVarianceFromR2 r2Source)
-      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
-  have hr2_drop :
-      r2FromVarianceScaleOne
-          (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
-        < r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) := by
-    have hvT_nonneg :
-        0 ≤ targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget := by
-      exact le_of_lt (targetVarianceFromSource_pos
-        (sourceVarianceFromR2 r2Source) fstSource fstTarget hvS_pos h_fst hfstT_lt_one)
-    exact r2FromVarianceScaleOne_strictMono_nonneg
-      (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
-      (sourceVarianceFromR2 r2Source) hvT_nonneg hvT_lt
-  have hr2S_pos : 0 < r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) := by
-    unfold r2FromVarianceScaleOne
-    have hden : 0 < sourceVarianceFromR2 r2Source + 1 := by linarith [hvS_pos]
-    exact div_pos hvS_pos hden
-  have hratio :
-      (r2FromVarianceScaleOne
-          (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget))
-        / (r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source)) < 1 :=
-    portability_ratio_lt_one_of_drop
-      (r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source))
-      (r2FromVarianceScaleOne
-        (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget))
-      hr2S_pos hr2_drop
-  have hsrc_eq : r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) = r2Source :=
-    sourceR2_eq_r2FromVarianceScaleOne r2Source h_r2
-  unfold targetR2FromObservables
-  simpa [hsrc_eq] using hratio
+    targetR2FromDriftState V_A V_E fstTarget / presentDayR2 V_A V_E fstSource < 1 := by
+  have hsrc_pos : 0 < presentDayR2 V_A V_E fstSource := by
+    unfold presentDayR2
+    have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
+      unfold presentDayPGSVariance
+      have h_one_minus : 0 < 1 - fstSource := by linarith [h_fst_bounds.2, h_fst]
+      exact mul_pos h_one_minus hVA
+    exact div_pos hv_pos (by linarith)
+  have hdrop : targetR2FromDriftState V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
+    simpa [targetR2FromDriftState] using
+      drift_degrades_R2 V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
+  exact portability_ratio_lt_one_of_drop
+    (presentDayR2 V_A V_E fstSource)
+    (targetR2FromDriftState V_A V_E fstTarget)
+    hsrc_pos hdrop
 
-/-- Observable-only strict `R²` drop: target `R²` is below source `R²`. -/
-theorem targetR2_lt_source_from_observables
-    (r2Source fstSource fstTarget : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+/-- Drift-state strict `R²` drop: target `R²` is below source `R²`. -/
+theorem targetR2_lt_source_from_drift_state
+    (V_A V_E fstSource fstTarget : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    targetR2FromObservables r2Source fstSource fstTarget < r2Source := by
-  rcases h_fst_bounds with ⟨_, hfstT_lt_one⟩
-  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
-    sourceVarianceFromR2_pos r2Source h_r2
-  have hvT_lt : targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget
-      < sourceVarianceFromR2 r2Source :=
-    targetVarianceFromSource_lt_source (sourceVarianceFromR2 r2Source)
-      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
-  have hr2_drop :
-      r2FromVarianceScaleOne
-          (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
-        < r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) := by
-    have hvT_nonneg :
-        0 ≤ targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget := by
-      exact le_of_lt (targetVarianceFromSource_pos
-        (sourceVarianceFromR2 r2Source) fstSource fstTarget hvS_pos h_fst hfstT_lt_one)
-    exact r2FromVarianceScaleOne_strictMono_nonneg
-      (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget)
-      (sourceVarianceFromR2 r2Source) hvT_nonneg hvT_lt
-  have hsrc_eq : r2FromVarianceScaleOne (sourceVarianceFromR2 r2Source) = r2Source :=
-    sourceR2_eq_r2FromVarianceScaleOne r2Source h_r2
-  unfold targetR2FromObservables
-  simpa [hsrc_eq] using hr2_drop
+    targetR2FromDriftState V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
+  simpa [targetR2FromDriftState] using
+    drift_degrades_R2 V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
 
 /-- Drift transport ratio from observable source/target `F_ST`. -/
 noncomputable def driftTransportRatio (fstSource fstTarget : ℝ) : ℝ :=
   (PortabilityFactor.neutralDrift fstSource fstTarget).value
 
-/-- Exact transport identity: target signal variance equals ratio times source variance. -/
-theorem targetVarianceFromSource_eq_ratio_mul
-    (vSource fstSource fstTarget : ℝ) :
-    targetVarianceFromSource vSource fstSource fstTarget =
-      driftTransportRatio fstSource fstTarget * vSource := by
-  unfold targetVarianceFromSource driftTransportRatio
-  simp [PortabilityFactor.neutralDrift, PortabilityFactor.value]
-  ring
-
-/-- The observable transported `R²` surface is the canonical transported-metric
-specialization at residual scale `1` and drift transport factor. -/
-theorem targetR2FromObservables_eq_transportedMetrics
-    (r2Source fstSource fstTarget : ℝ) :
-    targetR2FromObservables r2Source fstSource fstTarget =
-      TransportedMetrics.targetR2 1 r2Source
-        (driftTransportRatio fstSource fstTarget) := by
-  unfold targetR2FromObservables TransportedMetrics.targetR2
-    TransportedMetrics.r2FromSignalVariance TransportedMetrics.targetSignalVariance
-    TransportedMetrics.sourceSignalVariance r2FromVarianceScaleOne
-  rw [targetVarianceFromSource_eq_ratio_mul]
-  unfold sourceVarianceFromR2
-  ring
-
-/-- The observable transported source-variance object coincides exactly with the
-    present-day target signal-to-noise ratio when the source `R²` comes from the
-    same drift model. This is the core cohesion theorem connecting observable
-    transport back to the population-genetic variance transport chain. -/
-theorem targetVarianceFromSource_eq_presentDaySignalToNoise
-    (V_A V_E fstSource fstTarget : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfstS_lt_one : fstSource < 1) :
-    targetVarianceFromSource
-        (sourceVarianceFromR2 (presentDayR2 V_A V_E fstSource))
-        fstSource fstTarget =
-      presentDaySignalToNoise V_A V_E fstTarget := by
-  rw [sourceVarianceFromR2_eq_presentDaySignalToNoise V_A V_E fstSource hVA hVE hfstS_lt_one]
-  unfold targetVarianceFromSource presentDaySignalToNoise presentDayPGSVariance
-  have hden_ne : 1 - fstSource ≠ 0 := by linarith
-  field_simp [ne_of_gt hVE, hden_ne]
-
-/-- Converting present-day target signal-to-noise through the scale-one `R²`
-    map recovers the literal present-day target `R²`. -/
-theorem r2FromVarianceScaleOne_eq_presentDayR2_from_signalToNoise
-    (V_A V_E fst : ℝ)
-    (hVE : 0 < V_E) :
-    r2FromVarianceScaleOne (presentDaySignalToNoise V_A V_E fst) =
-      presentDayR2 V_A V_E fst := by
-  unfold r2FromVarianceScaleOne presentDaySignalToNoise presentDayR2
-    presentDayPGSVariance
-  field_simp [ne_of_gt hVE]
-
-/-- Exact closed form for target `R²` from source `R²` and drift ratio `r`. -/
-theorem targetR2FromObservables_closed_form
-    (r2Source fstSource fstTarget : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1) :
-    targetR2FromObservables r2Source fstSource fstTarget =
-      ((driftTransportRatio fstSource fstTarget) * r2Source) /
-        (1 - r2Source + (driftTransportRatio fstSource fstTarget) * r2Source) := by
-  rcases h_r2 with ⟨_, h1⟩
-  rw [targetR2FromObservables_eq_transportedMetrics]
-  simpa [mul_comm, mul_left_comm, mul_assoc] using
-    (TransportedMetrics.targetR2_eq_closed_form
-      1 r2Source (driftTransportRatio fstSource fstTarget) one_ne_zero (by linarith : r2Source ≠ 1))
-
-/-- Exact identification of the observable-only transported `R²` with the
-    literal present-day target `R²` when the source `R²` is instantiated from
-    the same core drift model. -/
-theorem targetR2FromObservables_eq_presentDayR2
-    (V_A V_E fstSource fstTarget : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfstS_lt_one : fstSource < 1) :
-    targetR2FromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget =
+/-- The drift-state target `R²` is definitionally the literal present-day target `R²`. -/
+theorem targetR2FromDriftState_eq_presentDayR2
+    (V_A V_E fstTarget : ℝ) :
+    targetR2FromDriftState V_A V_E fstTarget =
       presentDayR2 V_A V_E fstTarget := by
-  unfold targetR2FromObservables
-  rw [targetVarianceFromSource_eq_presentDaySignalToNoise
-        V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one]
-  exact r2FromVarianceScaleOne_eq_presentDayR2_from_signalToNoise V_A V_E fstTarget hVE
-
-/-- Exact liability-threshold AUC from source `R²` in the observable
-equal-variance model. -/
-noncomputable def aucFromR2 (r2 : ℝ) : ℝ :=
-  Phi (Real.sqrt (sourceVarianceFromR2 r2 / 2))
-
-/-- Exact observable source AUC under the equal-variance Gaussian liability
-transport model. -/
-noncomputable def sourceAUCFromObservables (r2Source : ℝ) : ℝ :=
-  aucFromR2 r2Source
-
-/-- The observable source AUC is the canonical source AUC specialization at
-residual scale `1`. -/
-theorem sourceAUCFromObservables_eq_transportedMetrics
-    (r2Source : ℝ) :
-    sourceAUCFromObservables r2Source =
-      TransportedMetrics.sourceAUC 1 r2Source := by
-  unfold sourceAUCFromObservables aucFromR2 TransportedMetrics.sourceAUC
-    TransportedMetrics.aucFromSignalVariance TransportedMetrics.sourceSignalVariance
-  congr 2
-  unfold sourceVarianceFromR2
-  ring_nf
-
-/-- The observable-only source AUC equals the literal present-day liability AUC
-    when the source `R²` is taken from the same drift model. -/
-theorem sourceAUCFromObservables_eq_presentDayAUC
-    (V_A V_E fst : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst_lt_one : fst < 1) :
-    sourceAUCFromObservables (presentDayR2 V_A V_E fst) =
-      presentDayAUC V_A V_E fst := by
-  unfold sourceAUCFromObservables aucFromR2 presentDayAUC
-  rw [sourceVarianceFromR2_eq_presentDaySignalToNoise V_A V_E fst hVA hVE hfst_lt_one]
+  rfl
 
 /-- Exact calibrated Bernoulli Brier risk as a function of prevalence and
 explained-variance fraction.
@@ -1245,140 +1023,99 @@ explained-risk coordinates. -/
 abbrev brierFromR2 (π r2 : ℝ) : ℝ :=
   exactCalibratedBrierRiskFromR2 π r2
 
-/-- Exact observable target AUC after drift transport in the equal-variance
-Gaussian liability model. -/
-noncomputable def targetAUCFromObservables
-    (r2Source fstSource fstTarget : ℝ) : ℝ :=
-  Phi
-    (Real.sqrt
-      (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget / 2))
+/-- Exact target AUC from explicit drift state. -/
+noncomputable def targetAUCFromDriftState
+    (V_A V_E fstTarget : ℝ) : ℝ :=
+  presentDayAUC V_A V_E fstTarget
 
-/-- The observable transported AUC is the canonical transported AUC
-specialization at residual scale `1` and drift transport factor. -/
-theorem targetAUCFromObservables_eq_transportedMetrics
-    (r2Source fstSource fstTarget : ℝ) :
-    targetAUCFromObservables r2Source fstSource fstTarget =
-      TransportedMetrics.targetAUC 1 r2Source
-        (driftTransportRatio fstSource fstTarget) := by
-  unfold targetAUCFromObservables TransportedMetrics.targetAUC
-    TransportedMetrics.aucFromSignalVariance TransportedMetrics.targetSignalVariance
-    TransportedMetrics.sourceSignalVariance
-  rw [targetVarianceFromSource_eq_ratio_mul]
-  congr 2
-  unfold sourceVarianceFromR2 driftTransportRatio
-  ring_nf
+/-- The drift-state target AUC is definitionally the literal present-day AUC. -/
+theorem targetAUCFromDriftState_eq_presentDayAUC
+    (V_A V_E fstTarget : ℝ) :
+    targetAUCFromDriftState V_A V_E fstTarget =
+      presentDayAUC V_A V_E fstTarget := by
+  rfl
 
-/-- The observable-only transported AUC equals the literal present-day AUC when
-    the source `R²` is instantiated from the same drift model. -/
-theorem targetAUCFromObservables_eq_presentDayAUC
+/-- Source Brier chart as a function of prevalence and source `R²`. -/
+noncomputable def sourceBrierFromR2 (π r2Source : ℝ) : ℝ :=
+  exactCalibratedBrierRiskFromR2 π r2Source
+
+/-- The source Brier chart is the canonical source Brier
+specialization. -/
+theorem sourceBrierFromR2_eq_transportedMetrics
+    (π r2Source : ℝ) :
+    sourceBrierFromR2 π r2Source =
+      TransportedMetrics.calibratedBrier π r2Source := by
+  rfl
+
+/-- Exact target calibrated Brier risk under the Bernoulli-mixing model from
+explicit target state. -/
+noncomputable def targetExactCalibratedBrierRisk
+    (π V_A V_E fstTarget : ℝ) : ℝ :=
+  exactCalibratedBrierRiskFromR2 π
+    (targetR2FromDriftState V_A V_E fstTarget)
+
+/-- Drift-state target Brier map used by the dashboard (`Brier(R²_target)`). -/
+noncomputable def targetBrierFromDriftState
+    (π V_A V_E fstTarget : ℝ) : ℝ :=
+  targetExactCalibratedBrierRisk π V_A V_E fstTarget
+
+/-- Canonical bundled deployed metrics under the explicit drift state. -/
+noncomputable def driftMetricProfile
+    (π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile :=
+  TransportedMetrics.profileFromSignalVariance π V_E (presentDayPGSVariance V_A fstTarget)
+
+/-- The bundled drift-state metrics reproduce the file's public
+`R²`, AUC, and Brier surfaces exactly. -/
+theorem driftMetricProfile_eq
+    (π V_A V_E fstTarget : ℝ) :
+    driftMetricProfile π V_A V_E fstTarget =
+      { r2 := targetR2FromDriftState V_A V_E fstTarget
+      , auc := targetAUCFromDriftState V_A V_E fstTarget
+      , brier := targetBrierFromDriftState π V_A V_E fstTarget } := by
+  ext
+  · change
+      TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
+        targetR2FromDriftState V_A V_E fstTarget
+    unfold targetR2FromDriftState TransportedMetrics.r2FromSignalVariance presentDayR2
+    rfl
+  · change
+      TransportedMetrics.aucFromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
+        targetAUCFromDriftState V_A V_E fstTarget
+    unfold targetAUCFromDriftState TransportedMetrics.aucFromSignalVariance
+      presentDayAUC presentDaySignalToNoise
+    congr 1
+    congr 1
+    ring_nf
+  · change
+      TransportedMetrics.calibratedBrier π
+        (TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E) =
+        targetBrierFromDriftState π V_A V_E fstTarget
+    unfold targetBrierFromDriftState targetExactCalibratedBrierRisk
+      exactCalibratedBrierRiskFromR2 targetR2FromDriftState
+      TransportedMetrics.calibratedBrier TransportedMetrics.r2FromSignalVariance
+      presentDayR2
+    rfl
+
+/-- Exact drift-state target AUC is definitionally the literal present-day AUC. -/
+@[simp] theorem targetAUCFromDriftState_eq
+    (V_A V_E fstTarget : ℝ) :
+    targetAUCFromDriftState V_A V_E fstTarget =
+      presentDayAUC V_A V_E fstTarget := by
+  rfl
+
+/-- Full drift-state AUC degradation theorem:
+strictly higher drift implies strictly lower exact target AUC. -/
+theorem targetAUC_lt_source_of_drift_state
     (V_A V_E fstSource fstTarget : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfstS_lt_one : fstSource < 1) :
-    targetAUCFromObservables (presentDayR2 V_A V_E fstSource) fstSource fstTarget =
-      presentDayAUC V_A V_E fstTarget := by
-  unfold targetAUCFromObservables presentDayAUC
-  rw [targetVarianceFromSource_eq_presentDaySignalToNoise
-        V_A V_E fstSource fstTarget hVA hVE hfstS_lt_one]
-
-/-- Observable source Brier map used by the dashboard. -/
-noncomputable def sourceExactCalibratedBrierRisk (π r2Source : ℝ) : ℝ :=
-  exactCalibratedBrierRiskFromR2 π r2Source
-
-/-- Observable source Brier map used by the dashboard. -/
-noncomputable def sourceBrierFromObservables (π r2Source : ℝ) : ℝ :=
-  exactCalibratedBrierRiskFromR2 π r2Source
-
-/-- The observable source Brier surface is the canonical source Brier
-specialization. -/
-theorem sourceBrierFromObservables_eq_transportedMetrics
-    (π r2Source : ℝ) :
-    sourceBrierFromObservables π r2Source =
-      TransportedMetrics.sourceBrier π r2Source := by
-  rfl
-
-/-- Exact target calibrated Brier risk under the Bernoulli-mixing model after
-drift-induced transport of `R²`. -/
-noncomputable def targetExactCalibratedBrierRisk
-    (π r2Source fstSource fstTarget : ℝ) : ℝ :=
-  exactCalibratedBrierRiskFromR2 π
-    (targetR2FromObservables r2Source fstSource fstTarget)
-
-/-- Observable target Brier map used by the dashboard (`Brier(R²_target)`). -/
-noncomputable def targetBrierFromObservables
-    (π r2Source fstSource fstTarget : ℝ) : ℝ :=
-  targetExactCalibratedBrierRisk π r2Source fstSource fstTarget
-
-/-- The observable transported Brier surface is the canonical transported
-Brier specialization at residual scale `1` and drift transport factor. -/
-theorem targetBrierFromObservables_eq_transportedMetrics
-    (π r2Source fstSource fstTarget : ℝ) :
-    targetBrierFromObservables π r2Source fstSource fstTarget =
-      TransportedMetrics.targetBrier π 1 r2Source
-        (driftTransportRatio fstSource fstTarget) := by
-  unfold targetBrierFromObservables targetExactCalibratedBrierRisk
-    exactCalibratedBrierRiskFromR2 TransportedMetrics.targetBrier
-    TransportedMetrics.calibratedBrier
-  rw [targetR2FromObservables_eq_transportedMetrics]
-
-/-- Canonical bundled observable transport metrics under drift. -/
-noncomputable def observableTransportMetricProfile
-    (π r2Source fstSource fstTarget : ℝ) : TransportedMetrics.Profile :=
-  TransportedMetrics.profile π 1 r2Source (driftTransportRatio fstSource fstTarget)
-
-/-- The bundled observable drift metrics reproduce the file's public observable
-`R²`, AUC, and Brier surfaces exactly on the biologically valid `R² ≠ 1` domain. -/
-theorem observableTransportMetricProfile_eq
-    (π r2Source fstSource fstTarget : ℝ) :
-    observableTransportMetricProfile π r2Source fstSource fstTarget =
-      { r2 := targetR2FromObservables r2Source fstSource fstTarget
-      , auc := targetAUCFromObservables r2Source fstSource fstTarget
-      , brier := targetBrierFromObservables π r2Source fstSource fstTarget } := by
-  unfold observableTransportMetricProfile TransportedMetrics.profile
-  rw [targetR2FromObservables_eq_transportedMetrics,
-    targetAUCFromObservables_eq_transportedMetrics,
-    targetBrierFromObservables_eq_transportedMetrics]
-
-/- Exact observable target AUC is obtained by transporting the source variance
-and applying the liability-threshold AUC formula. -/
-@[simp] theorem targetAUCFromObservables_eq
-    (r2Source fstSource fstTarget : ℝ) :
-    targetAUCFromObservables r2Source fstSource fstTarget =
-      Phi
-        (Real.sqrt
-          (targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget / 2)) := by
-  rfl
-
-/-- Full observable AUC degradation theorem:
-strictly higher drift implies strictly lower exact target AUC. -/
-theorem targetAUC_lt_source_of_observables
-    (r2Source fstSource fstTarget : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetAUCFromObservables r2Source fstSource fstTarget <
-      sourceAUCFromObservables r2Source := by
-  rcases h_fst_bounds with ⟨_, hfstT_lt_one⟩
-  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
-    sourceVarianceFromR2_pos r2Source h_r2
-  have hvT_pos :
-      0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget :=
-    targetVarianceFromSource_pos (sourceVarianceFromR2 r2Source)
-      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
-  have hvT_lt : targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget
-      < sourceVarianceFromR2 r2Source :=
-    targetVarianceFromSource_lt_source (sourceVarianceFromR2 r2Source)
-      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
-  unfold targetAUCFromObservables sourceAUCFromObservables aucFromR2
-  apply hPhiStrict
-  have hhalf_nonneg : 0 ≤
-      targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget / 2 := by
-    exact div_nonneg (le_of_lt hvT_pos) (by positivity)
-  have hhalf_lt :
-      targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget / 2 <
-        sourceVarianceFromR2 r2Source / 2 := by
-    nlinarith
-  exact Real.sqrt_lt_sqrt hhalf_nonneg hhalf_lt
+    targetAUCFromDriftState V_A V_E fstTarget <
+      presentDayAUC V_A V_E fstSource := by
+  simpa [targetAUCFromDriftState] using
+    drift_degrades_AUC_of_strictMono
+      V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
 /-- Exact liability-threshold AUC as a function of SNR:
 `AUC = Φ(√(snr/2))`. -/
@@ -1409,60 +1146,48 @@ theorem liabilityAUCFromSNR_strictMonoOn_nonneg
   exact Real.sqrt_lt_sqrt hx2 hxy2
 
 /-- Exact source liability-threshold AUC under the equal-variance Gaussian
-liability model. -/
+liability model, written in the `R²` chart coordinate. -/
 noncomputable def sourceExactLiabilityAUC (r2Source : ℝ) : ℝ :=
-  sourceAUCFromObservables r2Source
+  liabilityAUCFromSNR (snrFromR2 r2Source)
 
 /-- Exact target liability-threshold AUC under drift transport in the
 equal-variance Gaussian liability model. -/
 noncomputable def targetExactLiabilityAUC
-    (r2Source fstSource fstTarget : ℝ) : ℝ :=
-  targetAUCFromObservables r2Source fstSource fstTarget
+    (V_A V_E fstTarget : ℝ) : ℝ :=
+  targetAUCFromDriftState V_A V_E fstTarget
 
-/-- Exact observable source AUC under the equal-variance Gaussian liability
-transport model. -/
-noncomputable def sourceLiabilityAUCFromObservables (r2Source : ℝ) : ℝ :=
-  sourceAUCFromObservables r2Source
+/-- The `R²`-chart source liability AUC agrees with the literal present-day
+    liability AUC when the source `R²` comes from the same drift model. -/
+theorem sourceExactLiabilityAUC_eq_presentDayAUC
+    (V_A V_E fst : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst_lt_one : fst < 1) :
+    sourceExactLiabilityAUC (presentDayR2 V_A V_E fst) =
+      presentDayAUC V_A V_E fst := by
+  unfold sourceExactLiabilityAUC liabilityAUCFromSNR presentDayAUC
+  rw [snrFromR2_eq_presentDaySignalToNoise V_A V_E fst hVA hVE hfst_lt_one]
 
-/-- Exact observable target AUC under the equal-variance Gaussian liability
-transport model. -/
-noncomputable def targetLiabilityAUCFromObservables
-    (r2Source fstSource fstTarget : ℝ) : ℝ :=
-  targetAUCFromObservables r2Source fstSource fstTarget
-
-/-- Full observable liability-AUC degradation theorem (exact LTM formula):
+/-- Full drift-state liability-AUC degradation theorem (exact LTM formula):
 if drift increases (`fstTarget > fstSource`), target AUC is strictly lower than source AUC. -/
-theorem targetLiabilityAUC_lt_source_of_observables
-    (r2Source fstSource fstTarget : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+theorem targetLiabilityAUC_lt_source_of_drift_state
+    (V_A V_E fstSource fstTarget : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetExactLiabilityAUC r2Source fstSource fstTarget <
-      sourceExactLiabilityAUC r2Source := by
-  rcases h_fst_bounds with ⟨_, hfstT_lt_one⟩
-  have hvS_pos : 0 < sourceVarianceFromR2 r2Source :=
-    sourceVarianceFromR2_pos r2Source h_r2
-  have hvT_pos :
-      0 < targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget :=
-    targetVarianceFromSource_pos (sourceVarianceFromR2 r2Source)
-      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
-  have hvT_lt :
-      targetVarianceFromSource (sourceVarianceFromR2 r2Source) fstSource fstTarget
-        < sourceVarianceFromR2 r2Source :=
-    targetVarianceFromSource_lt_source (sourceVarianceFromR2 r2Source)
-      fstSource fstTarget hvS_pos h_fst hfstT_lt_one
-  have hmono := liabilityAUCFromSNR_strictMonoOn_nonneg hPhiStrict
-  unfold targetExactLiabilityAUC sourceExactLiabilityAUC
-  exact hmono (by exact le_of_lt hvT_pos) (by exact le_of_lt hvS_pos) hvT_lt
+    targetExactLiabilityAUC V_A V_E fstTarget <
+      presentDayLiabilityAUC V_A V_E fstSource := by
+  simpa [targetExactLiabilityAUC] using
+    drift_degrades_liabilityAUC
+      V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
 /-- The exact target calibrated Brier risk is `exactCalibratedBrierRiskFromR2`
-evaluated at transported target `R²` by definition. -/
-@[simp] theorem targetBrierFromObservables_eq
-    (π r2Source fstSource fstTarget : ℝ) :
-    targetExactCalibratedBrierRisk π r2Source fstSource fstTarget =
+evaluated at the explicit target `R²` by definition. -/
+@[simp] theorem targetBrierFromDriftState_eq
+    (π V_A V_E fstTarget : ℝ) :
+    targetExactCalibratedBrierRisk π V_A V_E fstTarget =
       exactCalibratedBrierRiskFromR2 π
-        (targetR2FromObservables r2Source fstSource fstTarget) := by
+        (targetR2FromDriftState V_A V_E fstTarget) := by
   rfl
 
 /-- Exact calibrated Bernoulli Brier risk from prevalence and explained-risk
@@ -1510,23 +1235,27 @@ theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
             unfold exactCalibratedBrierRiskFromR2
             ring
 
-/-- Full observable Brier degradation theorem:
+/-- Full drift-state Brier degradation theorem:
 if target `R²` drops and `0 ≤ π ≤ 1`, target Brier is at least source Brier. -/
-theorem targetBrier_ge_source_of_observables
-    (π r2Source fstSource fstTarget : ℝ)
+theorem targetBrier_ge_source_of_drift_state
+    (π V_A V_E fstSource fstTarget : ℝ)
     (h_pi : 0 ≤ π ∧ π ≤ 1)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    sourceBrierFromObservables π r2Source ≤
-      targetBrierFromObservables π r2Source fstSource fstTarget := by
+    sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) ≤
+      targetBrierFromDriftState π V_A V_E fstTarget := by
   rcases h_pi with ⟨hpi0, hpi1⟩
-  have hr2_drop : targetR2FromObservables r2Source fstSource fstTarget < r2Source :=
-    targetR2_lt_source_from_observables r2Source fstSource fstTarget h_r2 h_fst h_fst_bounds
+  have hr2_drop :
+      targetR2FromDriftState V_A V_E fstTarget < presentDayR2 V_A V_E fstSource :=
+    targetR2_lt_source_from_drift_state V_A V_E fstSource fstTarget
+      hVA hVE h_fst h_fst_bounds
   have hcoef_nonneg : 0 ≤ π * (1 - π) := by nlinarith
-  unfold sourceBrierFromObservables targetBrierFromObservables
+  unfold sourceBrierFromR2 targetBrierFromDriftState
     targetExactCalibratedBrierRisk exactCalibratedBrierRiskFromR2
-  have hbase : 1 - r2Source ≤ 1 - targetR2FromObservables r2Source fstSource fstTarget := by linarith
+  have hbase :
+      1 - presentDayR2 V_A V_E fstSource ≤ 1 - targetR2FromDriftState V_A V_E fstTarget := by
+    linarith
   exact mul_le_mul_of_nonneg_left hbase hcoef_nonneg
 
 /-- Pointwise Brier regret relative to the true Bernoulli probability. -/
@@ -1601,16 +1330,11 @@ theorem driftTransportRatio_lt_one
   simp [driftTransportRatio, PortabilityFactor.neutralDrift, PortabilityFactor.value]
   exact div_self (by linarith : (1 : ℝ) - fst ≠ 0)
 
-/-- At zero divergence, target R² equals source R². -/
-theorem targetR2FromObservables_self (r2Source fst : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
-    (hfst : fst < 1) :
-    targetR2FromObservables r2Source fst fst = r2Source := by
-  unfold targetR2FromObservables targetVarianceFromSource
-  have hden : (1 : ℝ) - fst ≠ 0 := by linarith
-  have hratio : (1 - fst) / (1 - fst) = 1 := div_self hden
-  rw [hratio, mul_one]
-  exact sourceR2_eq_r2FromVarianceScaleOne r2Source h_r2
+/-- At zero divergence, the drift-state target `R²` is the literal present-day
+`R²` evaluated at the same population state. -/
+theorem targetR2FromDriftState_self (V_A V_E fst : ℝ) :
+    targetR2FromDriftState V_A V_E fst = presentDayR2 V_A V_E fst := by
+  rfl
 
 /-- For valid prevalence `0 < π < 1`, the linear Brier approximation `π(1-π)(1-R²)`
 is strictly decreasing in `R²`. -/
@@ -1624,17 +1348,18 @@ theorem brierFromR2_strictAnti (π : ℝ) (hπ0 : 0 < π) (hπ1 : π < 1) :
 
 /-- Strict Brier degradation: under positive drift and non-degenerate prevalence,
 target Brier is strictly worse than source Brier. -/
-theorem targetBrier_strict_gt_source_of_observables
-    (π r2Source fstSource fstTarget : ℝ)
+theorem targetBrier_strict_gt_source_of_drift_state
+    (π V_A V_E fstSource fstTarget : ℝ)
     (hπ0 : 0 < π) (hπ1 : π < 1)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    sourceBrierFromObservables π r2Source <
-      targetBrierFromObservables π r2Source fstSource fstTarget := by
-  have hr2_drop := targetR2_lt_source_from_observables r2Source fstSource fstTarget
-    h_r2 h_fst h_fst_bounds
-  unfold sourceBrierFromObservables targetBrierFromObservables
+    sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
+      targetBrierFromDriftState π V_A V_E fstTarget := by
+  have hr2_drop :=
+    targetR2_lt_source_from_drift_state V_A V_E fstSource fstTarget
+      hVA hVE h_fst h_fst_bounds
+  unfold sourceBrierFromR2 targetBrierFromDriftState
   exact brierFromR2_strictAnti π hπ0 hπ1 hr2_drop
 
 /-- Squared mean PGS difference under the pure split model. -/

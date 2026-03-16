@@ -374,140 +374,105 @@ theorem common_variants_higher_correlation
 end GeneticCorrelationMethods
 
 /-!
-## Exact Uncertainty Propagation for Evolutionary Portability Metrics
+## Exact Uncertainty Propagation on a Scalar Transport Chart
 
-The evolutionary theory files now give exact forward maps from source `R²` and
-transported signal retention to deployed target `R²`, AUC, and Brier risk.
-For practical use we also need exact deterministic uncertainty propagation:
-intervals or error radii on source performance and evolutionary components
-should induce certified intervals on the deployed metrics.
+This section treats `(r2Source, transportFactor)` as coordinates on a scalar
+transport chart and propagates uncertainty through those algebraic maps. These
+objects are deterministic chart quantities, not first-principles deployed
+cross-population metrics derived from SNP-level biology.
 -/
 
 section EvolutionaryMetricUncertainty
 
-/-- Exact target `R²` as a function of source `R²` and transported signal factor. -/
-noncomputable def targetR2FromSourceTransport
+/-- Scalar-chart `R²` coordinate as a function of source `R²` and a transported
+signal factor. -/
+noncomputable def chartTargetR2FromSourceTransport
     (r2Source transportFactor : ℝ) : ℝ :=
   (r2Source * transportFactor) /
     (1 - r2Source + r2Source * transportFactor)
 
-/-- Exact target AUC as a function of source `R²` and transported signal factor. -/
-noncomputable def targetAUCFromSourceTransport
+/-- Scalar-chart AUC coordinate as a function of source `R²` and a transported
+signal factor. -/
+noncomputable def chartTargetAUCFromSourceTransport
     (r2Source transportFactor : ℝ) : ℝ :=
   Phi (Real.sqrt ((r2Source * transportFactor) / (2 * (1 - r2Source))))
 
-/-- Exact target calibrated Brier risk as a function of prevalence, source `R²`,
-and transported signal factor. -/
-noncomputable def targetBrierFromSourceTransport
+/-- Scalar-chart calibrated Brier coordinate as a function of prevalence,
+source `R²`, and a transported signal factor. -/
+noncomputable def chartTargetBrierFromSourceTransport
     (π r2Source transportFactor : ℝ) : ℝ :=
-  π * (1 - π) * (1 - targetR2FromSourceTransport r2Source transportFactor)
+  π * (1 - π) * (1 - chartTargetR2FromSourceTransport r2Source transportFactor)
 
-/-- Methodological target `R²` is the canonical transported-metric specialization
-at residual scale `1`, with validity requiring the biologically meaningful
-source-domain constraint `r2Source ≠ 1`. -/
-theorem targetR2FromSourceTransport_eq_transportedMetrics
-    (r2Source transportFactor : ℝ)
-    (h_r2 : r2Source ≠ 1) :
-    targetR2FromSourceTransport r2Source transportFactor =
-      TransportedMetrics.targetR2 1 r2Source transportFactor := by
-  rw [TransportedMetrics.targetR2_eq_closed_form 1 r2Source transportFactor one_ne_zero h_r2]
-  rfl
-
-/-- Methodological target AUC is the canonical transported-metric specialization
-at residual scale `1`, with validity requiring the biologically meaningful
-source-domain constraint `r2Source ≠ 1`. -/
-theorem targetAUCFromSourceTransport_eq_transportedMetrics
-    (r2Source transportFactor : ℝ)
-    (h_r2 : r2Source ≠ 1) :
-    targetAUCFromSourceTransport r2Source transportFactor =
-      TransportedMetrics.targetAUC 1 r2Source transportFactor := by
-  rw [TransportedMetrics.targetAUC_eq_closed_form 1 r2Source transportFactor one_ne_zero h_r2]
-  rfl
-
-/-- Methodological target Brier is the canonical transported-metric specialization
-at residual scale `1`, with validity requiring the biologically meaningful
-source-domain constraint `r2Source ≠ 1`. -/
-theorem targetBrierFromSourceTransport_eq_transportedMetrics
-    (π r2Source transportFactor : ℝ)
-    (h_r2 : r2Source ≠ 1) :
-    targetBrierFromSourceTransport π r2Source transportFactor =
-      TransportedMetrics.targetBrier π 1 r2Source transportFactor := by
-  unfold targetBrierFromSourceTransport TransportedMetrics.targetBrier
-    TransportedMetrics.calibratedBrier
-  rw [targetR2FromSourceTransport_eq_transportedMetrics r2Source transportFactor h_r2]
-
-/-- Canonical bundled transported metrics for the uncertainty and methodology
+/-- Canonical bundled scalar-chart metrics for the uncertainty and methodology
 layer. -/
-noncomputable def sourceTransportMetricProfile
-    (π r2Source transportFactor : ℝ) : TransportedMetrics.Profile :=
-  TransportedMetrics.profile π 1 r2Source transportFactor
+noncomputable def scalarTransportMetricProfile
+  (π r2Source transportFactor : ℝ) : TransportedMetrics.Profile :=
+  { r2 := chartTargetR2FromSourceTransport r2Source transportFactor
+  , auc := chartTargetAUCFromSourceTransport r2Source transportFactor
+  , brier := chartTargetBrierFromSourceTransport π r2Source transportFactor }
 
-@[simp] theorem sourceTransportMetricProfile_r2
+@[simp] theorem scalarTransportMetricProfile_r2
     (π r2Source transportFactor : ℝ) :
-    (sourceTransportMetricProfile π r2Source transportFactor).r2 =
-      TransportedMetrics.targetR2 1 r2Source transportFactor := by
+    (scalarTransportMetricProfile π r2Source transportFactor).r2 =
+      chartTargetR2FromSourceTransport r2Source transportFactor := by
   rfl
 
-@[simp] theorem sourceTransportMetricProfile_auc
+@[simp] theorem scalarTransportMetricProfile_auc
     (π r2Source transportFactor : ℝ) :
-    (sourceTransportMetricProfile π r2Source transportFactor).auc =
-      TransportedMetrics.targetAUC 1 r2Source transportFactor := by
+    (scalarTransportMetricProfile π r2Source transportFactor).auc =
+      chartTargetAUCFromSourceTransport r2Source transportFactor := by
   rfl
 
-@[simp] theorem sourceTransportMetricProfile_brier
+@[simp] theorem scalarTransportMetricProfile_brier
     (π r2Source transportFactor : ℝ) :
-    (sourceTransportMetricProfile π r2Source transportFactor).brier =
-      TransportedMetrics.targetBrier π 1 r2Source transportFactor := by
+    (scalarTransportMetricProfile π r2Source transportFactor).brier =
+      chartTargetBrierFromSourceTransport π r2Source transportFactor := by
   rfl
 
-/-- The bundled methodological metrics reproduce the file's public `R²`, AUC,
-and Brier surfaces exactly on the biologically valid `R² ≠ 1` domain. -/
-theorem sourceTransportMetricProfile_eq
-    (π r2Source transportFactor : ℝ)
-    (h_r2 : r2Source ≠ 1) :
-    sourceTransportMetricProfile π r2Source transportFactor =
-      { r2 := targetR2FromSourceTransport r2Source transportFactor
-      , auc := targetAUCFromSourceTransport r2Source transportFactor
-      , brier := targetBrierFromSourceTransport π r2Source transportFactor } := by
-  unfold sourceTransportMetricProfile TransportedMetrics.profile
-  rw [targetR2FromSourceTransport_eq_transportedMetrics _ _ h_r2,
-    targetAUCFromSourceTransport_eq_transportedMetrics _ _ h_r2,
-    targetBrierFromSourceTransport_eq_transportedMetrics _ _ _ h_r2]
+/-- The bundled scalar-chart metrics reproduce the file's public `R²`, AUC,
+and Brier coordinate surfaces exactly. -/
+theorem scalarTransportMetricProfile_eq
+    (π r2Source transportFactor : ℝ) :
+    scalarTransportMetricProfile π r2Source transportFactor =
+      { r2 := chartTargetR2FromSourceTransport r2Source transportFactor
+      , auc := chartTargetAUCFromSourceTransport r2Source transportFactor
+      , brier := chartTargetBrierFromSourceTransport π r2Source transportFactor } := by
+  rfl
 
 /-- Transport factor reconstructed from the four biological retention components. -/
-noncomputable def componentPortabilityFactor
+noncomputable def chartComponentPortabilityFactor
     (alleleRet ldRet mutRet migBoost : ℝ) : PortabilityFactor :=
   PortabilityFactor.fromComponents alleleRet ldRet mutRet migBoost
 
 /-- Transport factor reconstructed from the canonical four-component
     portability-factor object. -/
-noncomputable def transportFactorFromComponents
+noncomputable def chartTransportFactorFromComponents
     (alleleRet ldRet mutRet migBoost : ℝ) : ℝ :=
-  (componentPortabilityFactor alleleRet ldRet mutRet migBoost).value
+  (chartComponentPortabilityFactor alleleRet ldRet mutRet migBoost).value
 
-@[simp] theorem componentPortabilityFactor_value
+@[simp] theorem chartComponentPortabilityFactor_value
     (alleleRet ldRet mutRet migBoost : ℝ) :
-    (componentPortabilityFactor alleleRet ldRet mutRet migBoost).value =
-      transportFactorFromComponents alleleRet ldRet mutRet migBoost := by
+    (chartComponentPortabilityFactor alleleRet ldRet mutRet migBoost).value =
+      chartTransportFactorFromComponents alleleRet ldRet mutRet migBoost := by
   rfl
 
 /-- The methodological transport-factor product is exactly the canonical
-    evolutionary portability ratio when instantiated with the model's four
-    biological components. -/
-theorem transportFactorFromComponents_eq_unifiedPortabilityRatio
+    evolutionary scalar transport factor when instantiated with the model's
+    four biological components. -/
+theorem chartTransportFactorFromComponents_eq_unifiedPortabilityRatio
     (p : EvolutionaryParameters) :
-    transportFactorFromComponents
+    chartTransportFactorFromComponents
         (1 - fstEquilibrium p)
         (sharedLDRetention p)
         (mutationLDErosion p)
         (migrationLDBoost p) =
       unifiedPortabilityRatio p := by
-  simp [transportFactorFromComponents, componentPortabilityFactor,
+  simp [chartTransportFactorFromComponents, chartComponentPortabilityFactor,
     unifiedPortabilityRatio, EvolutionaryParameters.portabilityFactor,
     PortabilityFactor.value, PortabilityFactor.fromComponents]
 
 /-- Product bounds propagate exactly through the four-factor transport map. -/
-theorem transportFactorFromComponents_bounds
+theorem chartTransportFactorFromComponents_bounds
     {alleleRet ldRet mutRet migBoost
       alleleRetL alleleRetU ldRetL ldRetU mutRetL mutRetU migBoostL migBoostU : ℝ}
     (h_alleleL : alleleRetL ≤ alleleRet) (h_alleleU : alleleRet ≤ alleleRetU)
@@ -516,10 +481,10 @@ theorem transportFactorFromComponents_bounds
     (h_migL : migBoostL ≤ migBoost) (h_migU : migBoost ≤ migBoostU)
     (h_alleleL_nonneg : 0 ≤ alleleRetL) (h_ldL_nonneg : 0 ≤ ldRetL)
     (h_mutL_nonneg : 0 ≤ mutRetL) (h_migL_nonneg : 0 ≤ migBoostL) :
-    transportFactorFromComponents alleleRetL ldRetL mutRetL migBoostL ≤
-      transportFactorFromComponents alleleRet ldRet mutRet migBoost ∧
-    transportFactorFromComponents alleleRet ldRet mutRet migBoost ≤
-      transportFactorFromComponents alleleRetU ldRetU mutRetU migBoostU := by
+    chartTransportFactorFromComponents alleleRetL ldRetL mutRetL migBoostL ≤
+      chartTransportFactorFromComponents alleleRet ldRet mutRet migBoost ∧
+    chartTransportFactorFromComponents alleleRet ldRet mutRet migBoost ≤
+      chartTransportFactorFromComponents alleleRetU ldRetU mutRetU migBoostU := by
   have h_allele_nonneg : 0 ≤ alleleRet := le_trans h_alleleL_nonneg h_alleleL
   have h_ld_nonneg : 0 ≤ ldRet := le_trans h_ldL_nonneg h_ldL
   have h_mut_nonneg : 0 ≤ mutRet := le_trans h_mutL_nonneg h_mutL
@@ -552,17 +517,17 @@ theorem transportFactorFromComponents_bounds
       h_mig_nonneg
       (mul_nonneg (mul_nonneg h_alleleU_nonneg h_ldU_nonneg) h_mutU_nonneg)
   constructor
-  · simpa [transportFactorFromComponents, mul_assoc, mul_left_comm, mul_comm] using h_lower
-  · simpa [transportFactorFromComponents, mul_assoc, mul_left_comm, mul_comm] using h_upper
+  · simpa [chartTransportFactorFromComponents, mul_assoc, mul_left_comm, mul_comm] using h_lower
+  · simpa [chartTransportFactorFromComponents, mul_assoc, mul_left_comm, mul_comm] using h_upper
 
 /-- Target `R²` is monotone in the transported signal factor. -/
-theorem targetR2FromSourceTransport_monotone_transport
+theorem chartTargetR2FromSourceTransport_monotone_transport
     {r2Source transport₁ transport₂ : ℝ}
     (h_r2_nonneg : 0 ≤ r2Source) (h_r2_lt_one : r2Source < 1)
     (h_transport_nonneg : 0 ≤ transport₁) (h_transport_le : transport₁ ≤ transport₂) :
-    targetR2FromSourceTransport r2Source transport₁ ≤
-      targetR2FromSourceTransport r2Source transport₂ := by
-  unfold targetR2FromSourceTransport
+    chartTargetR2FromSourceTransport r2Source transport₁ ≤
+      chartTargetR2FromSourceTransport r2Source transport₂ := by
+  unfold chartTargetR2FromSourceTransport
   have h_transport₂_nonneg : 0 ≤ transport₂ := le_trans h_transport_nonneg h_transport_le
   have hden₁ : 0 < 1 - r2Source + r2Source * transport₁ := by
     nlinarith
@@ -583,13 +548,13 @@ theorem targetR2FromSourceTransport_monotone_transport
   nlinarith [hmain, hprod_nonneg]
 
 /-- Target `R²` is monotone in the source `R²`. -/
-theorem targetR2FromSourceTransport_monotone_source
+theorem chartTargetR2FromSourceTransport_monotone_source
     {r2Source₁ r2Source₂ transport : ℝ}
     (h_source₁_nonneg : 0 ≤ r2Source₁) (h_source_le : r2Source₁ ≤ r2Source₂)
     (h_source₂_lt_one : r2Source₂ < 1) (h_transport_nonneg : 0 ≤ transport) :
-    targetR2FromSourceTransport r2Source₁ transport ≤
-      targetR2FromSourceTransport r2Source₂ transport := by
-  unfold targetR2FromSourceTransport
+    chartTargetR2FromSourceTransport r2Source₁ transport ≤
+      chartTargetR2FromSourceTransport r2Source₂ transport := by
+  unfold chartTargetR2FromSourceTransport
   have h_source₁_lt_one : r2Source₁ < 1 := lt_of_le_of_lt h_source_le h_source₂_lt_one
   have hden₁ : 0 < 1 - r2Source₁ + r2Source₁ * transport := by
     nlinarith
@@ -600,17 +565,17 @@ theorem targetR2FromSourceTransport_monotone_source
   nlinarith [h_source_le, h_transport_nonneg]
 
 /-- Exact target `R²` interval induced by source-`R²` and transport-factor intervals. -/
-theorem targetR2FromSourceTransport_interval
+theorem chartTargetR2FromSourceTransport_interval
     {r2SourceL r2Source r2SourceU transportL transport transportU : ℝ}
     (h_sourceL_nonneg : 0 ≤ r2SourceL)
     (h_sourceL : r2SourceL ≤ r2Source) (h_sourceU : r2Source ≤ r2SourceU)
     (h_sourceU_lt_one : r2SourceU < 1)
     (h_transportL_nonneg : 0 ≤ transportL)
     (h_transportL : transportL ≤ transport) (h_transportU : transport ≤ transportU) :
-    targetR2FromSourceTransport r2SourceL transportL ≤
-      targetR2FromSourceTransport r2Source transport ∧
-    targetR2FromSourceTransport r2Source transport ≤
-      targetR2FromSourceTransport r2SourceU transportU := by
+    chartTargetR2FromSourceTransport r2SourceL transportL ≤
+      chartTargetR2FromSourceTransport r2Source transport ∧
+    chartTargetR2FromSourceTransport r2Source transport ≤
+      chartTargetR2FromSourceTransport r2SourceU transportU := by
   have h_source_nonneg : 0 ≤ r2Source := le_trans h_sourceL_nonneg h_sourceL
   have h_source_lt_one : r2Source < 1 := lt_of_le_of_lt h_sourceU h_sourceU_lt_one
   have h_sourceU_nonneg : 0 ≤ r2SourceU := le_trans h_sourceL_nonneg (le_trans h_sourceL h_sourceU)
@@ -618,42 +583,42 @@ theorem targetR2FromSourceTransport_interval
   have h_transportU_nonneg : 0 ≤ transportU := le_trans h_transportL_nonneg (le_trans h_transportL h_transportU)
   constructor
   · calc
-      targetR2FromSourceTransport r2SourceL transportL ≤
-          targetR2FromSourceTransport r2Source transportL := by
-            exact targetR2FromSourceTransport_monotone_source
+      chartTargetR2FromSourceTransport r2SourceL transportL ≤
+          chartTargetR2FromSourceTransport r2Source transportL := by
+            exact chartTargetR2FromSourceTransport_monotone_source
               h_sourceL_nonneg h_sourceL h_source_lt_one h_transportL_nonneg
-      _ ≤ targetR2FromSourceTransport r2Source transport := by
-            exact targetR2FromSourceTransport_monotone_transport
+      _ ≤ chartTargetR2FromSourceTransport r2Source transport := by
+            exact chartTargetR2FromSourceTransport_monotone_transport
               h_source_nonneg h_source_lt_one h_transportL_nonneg h_transportL
   · calc
-      targetR2FromSourceTransport r2Source transport ≤
-          targetR2FromSourceTransport r2SourceU transport := by
-            exact targetR2FromSourceTransport_monotone_source
+      chartTargetR2FromSourceTransport r2Source transport ≤
+          chartTargetR2FromSourceTransport r2SourceU transport := by
+            exact chartTargetR2FromSourceTransport_monotone_source
               h_source_nonneg h_sourceU h_sourceU_lt_one h_transport_nonneg
-      _ ≤ targetR2FromSourceTransport r2SourceU transportU := by
-            exact targetR2FromSourceTransport_monotone_transport
+      _ ≤ chartTargetR2FromSourceTransport r2SourceU transportU := by
+            exact chartTargetR2FromSourceTransport_monotone_transport
               h_sourceU_nonneg h_sourceU_lt_one h_transport_nonneg h_transportU
 
 /-- Exact target `R²` interval induced by absolute estimation or misspecification
 error bounds on source `R²` and the transport factor. -/
-theorem targetR2FromSourceTransport_interval_of_error_bounds
+theorem chartTargetR2FromSourceTransport_interval_of_error_bounds
     {r2SourceHat r2Source transportHat transport εSource εTransport : ℝ}
     (h_source_err : |r2SourceHat - r2Source| ≤ εSource)
     (h_transport_err : |transportHat - transport| ≤ εTransport)
     (h_source_lower_nonneg : 0 ≤ r2SourceHat - εSource)
     (h_source_upper_lt_one : r2SourceHat + εSource < 1)
     (h_transport_lower_nonneg : 0 ≤ transportHat - εTransport) :
-    targetR2FromSourceTransport (r2SourceHat - εSource) (transportHat - εTransport) ≤
-      targetR2FromSourceTransport r2Source transport ∧
-    targetR2FromSourceTransport r2Source transport ≤
-      targetR2FromSourceTransport (r2SourceHat + εSource) (transportHat + εTransport) := by
+    chartTargetR2FromSourceTransport (r2SourceHat - εSource) (transportHat - εTransport) ≤
+      chartTargetR2FromSourceTransport r2Source transport ∧
+    chartTargetR2FromSourceTransport r2Source transport ≤
+      chartTargetR2FromSourceTransport (r2SourceHat + εSource) (transportHat + εTransport) := by
   have h_source_err' : |r2Source - r2SourceHat| ≤ εSource := by
     simpa [abs_sub_comm] using h_source_err
   have h_transport_err' : |transport - transportHat| ≤ εTransport := by
     simpa [abs_sub_comm] using h_transport_err
   have h_source_bounds := abs_le.mp h_source_err'
   have h_transport_bounds := abs_le.mp h_transport_err'
-  exact targetR2FromSourceTransport_interval
+  exact chartTargetR2FromSourceTransport_interval
     h_source_lower_nonneg
     (by linarith) (by linarith)
     h_source_upper_lt_one
@@ -661,18 +626,18 @@ theorem targetR2FromSourceTransport_interval_of_error_bounds
     (by linarith) (by linarith)
 
 /-- Auxiliary exact AUC separation term from source `R²` and transported signal factor. -/
-noncomputable def aucSeparationFromSourceTransport
+noncomputable def chartAUCSeparationFromSourceTransport
     (r2Source transportFactor : ℝ) : ℝ :=
   (r2Source * transportFactor) / (2 * (1 - r2Source))
 
 /-- The exact AUC separation term is monotone in the transported signal factor. -/
-theorem aucSeparationFromSourceTransport_monotone_transport
+theorem chartAUCSeparationFromSourceTransport_monotone_transport
     {r2Source transport₁ transport₂ : ℝ}
     (h_r2_nonneg : 0 ≤ r2Source) (h_r2_lt_one : r2Source < 1)
     (h_transport_le : transport₁ ≤ transport₂) :
-    aucSeparationFromSourceTransport r2Source transport₁ ≤
-      aucSeparationFromSourceTransport r2Source transport₂ := by
-  unfold aucSeparationFromSourceTransport
+    chartAUCSeparationFromSourceTransport r2Source transport₁ ≤
+      chartAUCSeparationFromSourceTransport r2Source transport₂ := by
+  unfold chartAUCSeparationFromSourceTransport
   have hden : 0 < 2 * (1 - r2Source) := by nlinarith
   rw [div_le_div_iff₀ hden hden]
   have hbase : r2Source * transport₁ ≤ r2Source * transport₂ :=
@@ -681,13 +646,13 @@ theorem aucSeparationFromSourceTransport_monotone_transport
   exact mul_le_mul_of_nonneg_right hbase hden_nonneg
 
 /-- The exact AUC separation term is monotone in the source `R²`. -/
-theorem aucSeparationFromSourceTransport_monotone_source
+theorem chartAUCSeparationFromSourceTransport_monotone_source
     {r2Source₁ r2Source₂ transport : ℝ}
     (h_source₁_nonneg : 0 ≤ r2Source₁) (h_source_le : r2Source₁ ≤ r2Source₂)
     (h_source₂_lt_one : r2Source₂ < 1) (h_transport_nonneg : 0 ≤ transport) :
-    aucSeparationFromSourceTransport r2Source₁ transport ≤
-      aucSeparationFromSourceTransport r2Source₂ transport := by
-  unfold aucSeparationFromSourceTransport
+    chartAUCSeparationFromSourceTransport r2Source₁ transport ≤
+      chartAUCSeparationFromSourceTransport r2Source₂ transport := by
+  unfold chartAUCSeparationFromSourceTransport
   have hden₁ : 0 < 2 * (1 - r2Source₁) := by
     have h_source₁_lt_one : r2Source₁ < 1 := lt_of_le_of_lt h_source_le h_source₂_lt_one
     nlinarith
@@ -697,84 +662,84 @@ theorem aucSeparationFromSourceTransport_monotone_source
   nlinarith [h_source_le, h_transport_nonneg]
 
 /-- Exact target AUC interval induced by source-`R²` and transport-factor intervals. -/
-theorem targetAUCFromSourceTransport_interval
+theorem chartTargetAUCFromSourceTransport_interval
     {r2SourceL r2Source r2SourceU transportL transport transportU : ℝ}
     (h_sourceL_nonneg : 0 ≤ r2SourceL)
     (h_sourceL : r2SourceL ≤ r2Source) (h_sourceU : r2Source ≤ r2SourceU)
     (h_sourceU_lt_one : r2SourceU < 1)
     (h_transportL_nonneg : 0 ≤ transportL)
     (h_transportL : transportL ≤ transport) (h_transportU : transport ≤ transportU) :
-    targetAUCFromSourceTransport r2SourceL transportL ≤
-      targetAUCFromSourceTransport r2Source transport ∧
-    targetAUCFromSourceTransport r2Source transport ≤
-      targetAUCFromSourceTransport r2SourceU transportU := by
+    chartTargetAUCFromSourceTransport r2SourceL transportL ≤
+      chartTargetAUCFromSourceTransport r2Source transport ∧
+    chartTargetAUCFromSourceTransport r2Source transport ≤
+      chartTargetAUCFromSourceTransport r2SourceU transportU := by
   have h_source_nonneg : 0 ≤ r2Source := le_trans h_sourceL_nonneg h_sourceL
   have h_sourceU_nonneg : 0 ≤ r2SourceU := le_trans h_sourceL_nonneg (le_trans h_sourceL h_sourceU)
   have h_transport_nonneg : 0 ≤ transport := le_trans h_transportL_nonneg h_transportL
   have h_transportU_nonneg : 0 ≤ transportU := le_trans h_transportL_nonneg (le_trans h_transportL h_transportU)
   have h_arg_lower :
-      aucSeparationFromSourceTransport r2SourceL transportL ≤
-        aucSeparationFromSourceTransport r2Source transport := by
+      chartAUCSeparationFromSourceTransport r2SourceL transportL ≤
+        chartAUCSeparationFromSourceTransport r2Source transport := by
     calc
-      aucSeparationFromSourceTransport r2SourceL transportL ≤
-          aucSeparationFromSourceTransport r2Source transportL := by
-            exact aucSeparationFromSourceTransport_monotone_source
+      chartAUCSeparationFromSourceTransport r2SourceL transportL ≤
+          chartAUCSeparationFromSourceTransport r2Source transportL := by
+            exact chartAUCSeparationFromSourceTransport_monotone_source
               h_sourceL_nonneg h_sourceL (lt_of_le_of_lt h_sourceU h_sourceU_lt_one) h_transportL_nonneg
-      _ ≤ aucSeparationFromSourceTransport r2Source transport := by
-            exact aucSeparationFromSourceTransport_monotone_transport
+      _ ≤ chartAUCSeparationFromSourceTransport r2Source transport := by
+            exact chartAUCSeparationFromSourceTransport_monotone_transport
               h_source_nonneg (lt_of_le_of_lt h_sourceU h_sourceU_lt_one) h_transportL
   have h_arg_upper :
-      aucSeparationFromSourceTransport r2Source transport ≤
-        aucSeparationFromSourceTransport r2SourceU transportU := by
+      chartAUCSeparationFromSourceTransport r2Source transport ≤
+        chartAUCSeparationFromSourceTransport r2SourceU transportU := by
     calc
-      aucSeparationFromSourceTransport r2Source transport ≤
-          aucSeparationFromSourceTransport r2SourceU transport := by
-            exact aucSeparationFromSourceTransport_monotone_source
+      chartAUCSeparationFromSourceTransport r2Source transport ≤
+          chartAUCSeparationFromSourceTransport r2SourceU transport := by
+            exact chartAUCSeparationFromSourceTransport_monotone_source
               h_source_nonneg h_sourceU h_sourceU_lt_one h_transport_nonneg
-      _ ≤ aucSeparationFromSourceTransport r2SourceU transportU := by
-            exact aucSeparationFromSourceTransport_monotone_transport
+      _ ≤ chartAUCSeparationFromSourceTransport r2SourceU transportU := by
+            exact chartAUCSeparationFromSourceTransport_monotone_transport
               h_sourceU_nonneg h_sourceU_lt_one h_transportU
-  have h_arg_lower_nonneg : 0 ≤ aucSeparationFromSourceTransport r2SourceL transportL := by
-    unfold aucSeparationFromSourceTransport
+  have h_arg_lower_nonneg : 0 ≤ chartAUCSeparationFromSourceTransport r2SourceL transportL := by
+    unfold chartAUCSeparationFromSourceTransport
     apply div_nonneg
     · exact mul_nonneg h_sourceL_nonneg h_transportL_nonneg
     · linarith
-  have h_arg_nonneg : 0 ≤ aucSeparationFromSourceTransport r2Source transport := by
-    unfold aucSeparationFromSourceTransport
+  have h_arg_nonneg : 0 ≤ chartAUCSeparationFromSourceTransport r2Source transport := by
+    unfold chartAUCSeparationFromSourceTransport
     apply div_nonneg
     · exact mul_nonneg h_source_nonneg h_transport_nonneg
     · linarith
-  have h_arg_upper_nonneg : 0 ≤ aucSeparationFromSourceTransport r2SourceU transportU := by
-    unfold aucSeparationFromSourceTransport
+  have h_arg_upper_nonneg : 0 ≤ chartAUCSeparationFromSourceTransport r2SourceU transportU := by
+    unfold chartAUCSeparationFromSourceTransport
     apply div_nonneg
     · exact mul_nonneg h_sourceU_nonneg h_transportU_nonneg
     · linarith
   constructor
-  · unfold targetAUCFromSourceTransport
+  · unfold chartTargetAUCFromSourceTransport
     exact Phi_monotone (Real.sqrt_le_sqrt h_arg_lower)
-  · unfold targetAUCFromSourceTransport
+  · unfold chartTargetAUCFromSourceTransport
     exact Phi_monotone (Real.sqrt_le_sqrt h_arg_upper)
 
 /-- Exact target AUC interval induced by absolute estimation or misspecification
 error bounds on source `R²` and the transport factor. -/
-theorem targetAUCFromSourceTransport_interval_of_error_bounds
+theorem chartTargetAUCFromSourceTransport_interval_of_error_bounds
     {r2SourceHat r2Source transportHat transport εSource εTransport : ℝ}
     (h_source_err : |r2SourceHat - r2Source| ≤ εSource)
     (h_transport_err : |transportHat - transport| ≤ εTransport)
     (h_source_lower_nonneg : 0 ≤ r2SourceHat - εSource)
     (h_source_upper_lt_one : r2SourceHat + εSource < 1)
     (h_transport_lower_nonneg : 0 ≤ transportHat - εTransport) :
-    targetAUCFromSourceTransport (r2SourceHat - εSource) (transportHat - εTransport) ≤
-      targetAUCFromSourceTransport r2Source transport ∧
-    targetAUCFromSourceTransport r2Source transport ≤
-      targetAUCFromSourceTransport (r2SourceHat + εSource) (transportHat + εTransport) := by
+    chartTargetAUCFromSourceTransport (r2SourceHat - εSource) (transportHat - εTransport) ≤
+      chartTargetAUCFromSourceTransport r2Source transport ∧
+    chartTargetAUCFromSourceTransport r2Source transport ≤
+      chartTargetAUCFromSourceTransport (r2SourceHat + εSource) (transportHat + εTransport) := by
   have h_source_err' : |r2Source - r2SourceHat| ≤ εSource := by
     simpa [abs_sub_comm] using h_source_err
   have h_transport_err' : |transport - transportHat| ≤ εTransport := by
     simpa [abs_sub_comm] using h_transport_err
   have h_source_bounds := abs_le.mp h_source_err'
   have h_transport_bounds := abs_le.mp h_transport_err'
-  exact targetAUCFromSourceTransport_interval
+  exact chartTargetAUCFromSourceTransport_interval
     h_source_lower_nonneg
     (by linarith) (by linarith)
     h_source_upper_lt_one
@@ -783,7 +748,7 @@ theorem targetAUCFromSourceTransport_interval_of_error_bounds
 
 /-- Exact target Brier interval induced by source-`R²` and transport-factor intervals
 at known prevalence. -/
-theorem targetBrierFromSourceTransport_interval
+theorem chartTargetBrierFromSourceTransport_interval
     {π r2SourceL r2Source r2SourceU transportL transport transportU : ℝ}
     (h_pi_nonneg : 0 ≤ π) (h_pi_le_one : π ≤ 1)
     (h_sourceL_nonneg : 0 ≤ r2SourceL)
@@ -791,28 +756,28 @@ theorem targetBrierFromSourceTransport_interval
     (h_sourceU_lt_one : r2SourceU < 1)
     (h_transportL_nonneg : 0 ≤ transportL)
     (h_transportL : transportL ≤ transport) (h_transportU : transport ≤ transportU) :
-    targetBrierFromSourceTransport π r2SourceU transportU ≤
-      targetBrierFromSourceTransport π r2Source transport ∧
-    targetBrierFromSourceTransport π r2Source transport ≤
-      targetBrierFromSourceTransport π r2SourceL transportL := by
+    chartTargetBrierFromSourceTransport π r2SourceU transportU ≤
+      chartTargetBrierFromSourceTransport π r2Source transport ∧
+    chartTargetBrierFromSourceTransport π r2Source transport ≤
+      chartTargetBrierFromSourceTransport π r2SourceL transportL := by
   have h_scale_nonneg : 0 ≤ π * (1 - π) := by
     apply mul_nonneg h_pi_nonneg
     linarith
   have h_r2_interval :=
-    targetR2FromSourceTransport_interval h_sourceL_nonneg h_sourceL h_sourceU
+    chartTargetR2FromSourceTransport_interval h_sourceL_nonneg h_sourceL h_sourceU
       h_sourceU_lt_one h_transportL_nonneg h_transportL h_transportU
   constructor
   · rcases h_r2_interval with ⟨_, h_upper⟩
-    unfold targetBrierFromSourceTransport
+    unfold chartTargetBrierFromSourceTransport
     nlinarith
   · rcases h_r2_interval with ⟨h_lower, _⟩
-    unfold targetBrierFromSourceTransport
+    unfold chartTargetBrierFromSourceTransport
     nlinarith
 
 /-- Exact target Brier interval induced by absolute estimation or misspecification
 error bounds on prevalence, source `R²`, and the transport factor, when prevalence
 is treated as known exactly at the point estimate. -/
-theorem targetBrierFromSourceTransport_interval_of_error_bounds
+theorem chartTargetBrierFromSourceTransport_interval_of_error_bounds
     {π r2SourceHat r2Source transportHat transport εSource εTransport : ℝ}
     (h_pi_nonneg : 0 ≤ π) (h_pi_le_one : π ≤ 1)
     (h_source_err : |r2SourceHat - r2Source| ≤ εSource)
@@ -820,17 +785,17 @@ theorem targetBrierFromSourceTransport_interval_of_error_bounds
     (h_source_lower_nonneg : 0 ≤ r2SourceHat - εSource)
     (h_source_upper_lt_one : r2SourceHat + εSource < 1)
     (h_transport_lower_nonneg : 0 ≤ transportHat - εTransport) :
-    targetBrierFromSourceTransport π (r2SourceHat + εSource) (transportHat + εTransport) ≤
-      targetBrierFromSourceTransport π r2Source transport ∧
-    targetBrierFromSourceTransport π r2Source transport ≤
-      targetBrierFromSourceTransport π (r2SourceHat - εSource) (transportHat - εTransport) := by
+    chartTargetBrierFromSourceTransport π (r2SourceHat + εSource) (transportHat + εTransport) ≤
+      chartTargetBrierFromSourceTransport π r2Source transport ∧
+    chartTargetBrierFromSourceTransport π r2Source transport ≤
+      chartTargetBrierFromSourceTransport π (r2SourceHat - εSource) (transportHat - εTransport) := by
   have h_source_err' : |r2Source - r2SourceHat| ≤ εSource := by
     simpa [abs_sub_comm] using h_source_err
   have h_transport_err' : |transport - transportHat| ≤ εTransport := by
     simpa [abs_sub_comm] using h_transport_err
   have h_source_bounds := abs_le.mp h_source_err'
   have h_transport_bounds := abs_le.mp h_transport_err'
-  exact targetBrierFromSourceTransport_interval
+  exact chartTargetBrierFromSourceTransport_interval
     h_pi_nonneg h_pi_le_one
     h_source_lower_nonneg
     (by linarith) (by linarith)
@@ -838,11 +803,11 @@ theorem targetBrierFromSourceTransport_interval_of_error_bounds
     h_transport_lower_nonneg
     (by linarith) (by linarith)
 
-/-- Exact deployed metric intervals induced by uncertainty in the biological transport
-components and in source `R²`. This is the fully mechanistic uncertainty theorem:
-componentwise uncertainty in evolutionary retention factors propagates to certified
-intervals for target `R²`, AUC, and Brier risk. -/
-theorem headlineMetricIntervals_of_component_and_source_uncertainty
+/-- Exact scalar-chart metric intervals induced by uncertainty in the biological
+components and in source `R²`. This is a deterministic chart-level uncertainty
+theorem: componentwise uncertainty in evolutionary retention factors propagates
+to certified intervals for the chart coordinates `R²`, AUC, and Brier risk. -/
+theorem chartMetricIntervals_of_component_and_source_uncertainty
     {π
       alleleRet ldRet mutRet migBoost
       alleleRetL alleleRetU ldRetL ldRetU mutRetL mutRetU migBoostL migBoostU
@@ -858,40 +823,40 @@ theorem headlineMetricIntervals_of_component_and_source_uncertainty
     (h_sourceL : r2SourceL ≤ r2Source) (h_sourceU : r2Source ≤ r2SourceU)
     (h_sourceU_lt_one : r2SourceU < 1) :
     let transportL :=
-      transportFactorFromComponents alleleRetL ldRetL mutRetL migBoostL
-    let transport := transportFactorFromComponents alleleRet ldRet mutRet migBoost
+      chartTransportFactorFromComponents alleleRetL ldRetL mutRetL migBoostL
+    let transport := chartTransportFactorFromComponents alleleRet ldRet mutRet migBoost
     let transportU :=
-      transportFactorFromComponents alleleRetU ldRetU mutRetU migBoostU
-    targetR2FromSourceTransport r2SourceL transportL ≤
-      targetR2FromSourceTransport r2Source transport ∧
-    targetR2FromSourceTransport r2Source transport ≤
-      targetR2FromSourceTransport r2SourceU transportU ∧
-    targetAUCFromSourceTransport r2SourceL transportL ≤
-      targetAUCFromSourceTransport r2Source transport ∧
-    targetAUCFromSourceTransport r2Source transport ≤
-      targetAUCFromSourceTransport r2SourceU transportU ∧
-    targetBrierFromSourceTransport π r2SourceU transportU ≤
-      targetBrierFromSourceTransport π r2Source transport ∧
-    targetBrierFromSourceTransport π r2Source transport ≤
-      targetBrierFromSourceTransport π r2SourceL transportL := by
+      chartTransportFactorFromComponents alleleRetU ldRetU mutRetU migBoostU
+    chartTargetR2FromSourceTransport r2SourceL transportL ≤
+      chartTargetR2FromSourceTransport r2Source transport ∧
+    chartTargetR2FromSourceTransport r2Source transport ≤
+      chartTargetR2FromSourceTransport r2SourceU transportU ∧
+    chartTargetAUCFromSourceTransport r2SourceL transportL ≤
+      chartTargetAUCFromSourceTransport r2Source transport ∧
+    chartTargetAUCFromSourceTransport r2Source transport ≤
+      chartTargetAUCFromSourceTransport r2SourceU transportU ∧
+    chartTargetBrierFromSourceTransport π r2SourceU transportU ≤
+      chartTargetBrierFromSourceTransport π r2Source transport ∧
+    chartTargetBrierFromSourceTransport π r2Source transport ≤
+      chartTargetBrierFromSourceTransport π r2SourceL transportL := by
   dsimp
-  rcases transportFactorFromComponents_bounds
+  rcases chartTransportFactorFromComponents_bounds
     h_alleleL h_alleleU h_ldL h_ldU h_mutL h_mutU h_migL h_migU
     h_alleleL_nonneg h_ldL_nonneg h_mutL_nonneg h_migL_nonneg with
     ⟨h_transportL, h_transportU⟩
   have h_transportL_nonneg :
-      0 ≤ transportFactorFromComponents alleleRetL ldRetL mutRetL migBoostL := by
-    unfold transportFactorFromComponents
+      0 ≤ chartTransportFactorFromComponents alleleRetL ldRetL mutRetL migBoostL := by
+    unfold chartTransportFactorFromComponents
     have hleft : 0 ≤ alleleRetL * ldRetL := mul_nonneg h_alleleL_nonneg h_ldL_nonneg
     have hright : 0 ≤ mutRetL * migBoostL := mul_nonneg h_mutL_nonneg h_migL_nonneg
     simpa [mul_assoc] using mul_nonneg hleft hright
-  rcases targetR2FromSourceTransport_interval
+  rcases chartTargetR2FromSourceTransport_interval
     h_sourceL_nonneg h_sourceL h_sourceU h_sourceU_lt_one
     h_transportL_nonneg h_transportL h_transportU with ⟨h_r2L, h_r2U⟩
-  rcases targetAUCFromSourceTransport_interval
+  rcases chartTargetAUCFromSourceTransport_interval
     h_sourceL_nonneg h_sourceL h_sourceU h_sourceU_lt_one
     h_transportL_nonneg h_transportL h_transportU with ⟨h_aucL, h_aucU⟩
-  rcases targetBrierFromSourceTransport_interval
+  rcases chartTargetBrierFromSourceTransport_interval
     h_pi_nonneg h_pi_le_one
     h_sourceL_nonneg h_sourceL h_sourceU h_sourceU_lt_one
     h_transportL_nonneg h_transportL h_transportU with ⟨h_brierL, h_brierU⟩

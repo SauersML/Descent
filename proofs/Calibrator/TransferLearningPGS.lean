@@ -1118,53 +1118,48 @@ def scratchTargetR2 (oracle_target_r2 estimation_penalty : ℝ) : ℝ :=
   oracle_target_r2 - estimation_penalty
 
 /-- Canonical deployed target `R²` for transfer/adaptation methods: start from
-    the exact core transported target `R²`, add any target-specific adaptation
+    an explicit transported target baseline, add any target-specific adaptation
     gain, and subtract any finite-sample estimation penalty. This is the shared
     target-metric surface that both fine-tuning and scratch training reduce to. -/
 def deployedTransferTargetR2
     (transported_r2 adaptation_gain estimation_penalty : ℝ) : ℝ :=
   transported_r2 + adaptation_gain - estimation_penalty
 
-/-- The target-only oracle gap above the exact transported target baseline. This
-    is the amount of target-specific gain available beyond the core transported
+/-- The target-only oracle gap above an explicit transported target baseline. This
+    is the amount of target-specific gain available beyond that transported
     `R²` before any estimation penalty is paid. -/
 def oracleTransportAdaptationGain
     (transported_r2 oracle_target_r2 : ℝ) : ℝ :=
   oracle_target_r2 - transported_r2
 
-/-- Exact portability penalty induced by observable source-target drift. This is
-    the loss in target `R²` relative to the source baseline under the exact
-    observable transport theorem `targetR2FromObservables`. -/
-noncomputable def observableTransportPenalty
-    (r2Source fstSource fstTarget : ℝ) : ℝ :=
-  r2Source - targetR2FromObservables r2Source fstSource fstTarget
+/-- Portability penalty as the literal gap between a source baseline and an
+    explicitly supplied transported target baseline. -/
+noncomputable def transportPenalty
+    (source_r2 transported_r2 : ℝ) : ℝ :=
+  source_r2 - transported_r2
 
-/-- The additive fine-tuning model is exactly the observable transported target
-    `R²` plus any additional target-specific adaptation gain once the
-    portability penalty is instantiated by the exact drift transport map. -/
-theorem fineTunedTargetR2_eq_targetR2FromObservables_plus_adaptation
-    (r2Source fstSource fstTarget adaptationGain : ℝ) :
-    fineTunedTargetR2 r2Source
-        (observableTransportPenalty r2Source fstSource fstTarget)
+/-- The additive fine-tuning model is exactly the transported target baseline
+    plus any additional target-specific adaptation gain once the portability
+    penalty is instantiated by the literal source-minus-transported gap. -/
+theorem fineTunedTargetR2_eq_transportedR2_plus_adaptation
+    (source_r2 transported_r2 adaptationGain : ℝ) :
+    fineTunedTargetR2 source_r2
+        (transportPenalty source_r2 transported_r2)
         adaptationGain =
-      targetR2FromObservables r2Source fstSource fstTarget + adaptationGain := by
-  unfold fineTunedTargetR2 observableTransportPenalty
+      transported_r2 + adaptationGain := by
+  unfold fineTunedTargetR2 transportPenalty
   ring
 
-/-- Fine-tuning is exactly the canonical deployed-transfer target `R²` with the
-    core transported baseline from `TransportedMetrics`, target-specific
-    adaptation gain, and zero estimation penalty. -/
+/-- Fine-tuning is exactly the canonical deployed-transfer target `R²` with an
+    explicit transported baseline, target-specific adaptation gain, and zero
+    estimation penalty. -/
 theorem fineTunedTargetR2_eq_deployedTransferTargetR2
-    (r2Source fstSource fstTarget adaptationGain : ℝ) :
-    fineTunedTargetR2 r2Source
-        (observableTransportPenalty r2Source fstSource fstTarget)
+    (source_r2 transported_r2 adaptationGain : ℝ) :
+    fineTunedTargetR2 source_r2
+        (transportPenalty source_r2 transported_r2)
         adaptationGain =
-      deployedTransferTargetR2
-        (TransportedMetrics.targetR2 1 r2Source
-          (driftTransportRatio fstSource fstTarget))
-        adaptationGain 0 := by
-  rw [fineTunedTargetR2_eq_targetR2FromObservables_plus_adaptation,
-    targetR2FromObservables_eq_transportedMetrics]
+      deployedTransferTargetR2 transported_r2 adaptationGain 0 := by
+  rw [fineTunedTargetR2_eq_transportedR2_plus_adaptation]
   unfold deployedTransferTargetR2
   ring
 
@@ -1254,44 +1249,40 @@ theorem sampleLimitedScratchTargetR2_eq_targetHeritability_minus_noise_over_n_di
   rw [sourceOptimalR2_eq_additiveHeritability β_target var_y h_var_y h_beta_nonzero]
 
 /-- Sample-limited scratch training is the canonical deployed-transfer target
-    `R²` with the exact core transported baseline, the oracle target gap above
+    `R²` with an explicit transported baseline, the oracle target gap above
     that baseline, and the explicit finite-sample penalty `noiseVar / nTarget`. -/
 theorem sampleLimitedScratchTargetR2_eq_deployedTransferTargetR2
     {m : ℕ}
     (β_target : Fin m → ℝ)
-    (var_y r2Source fstSource fstTarget noiseVar nTarget : ℝ) :
+    (var_y transported_r2 noiseVar nTarget : ℝ) :
     sampleLimitedScratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) noiseVar nTarget =
       deployedTransferTargetR2
-        (TransportedMetrics.targetR2 1 r2Source
-          (driftTransportRatio fstSource fstTarget))
+        transported_r2
         (oracleTransportAdaptationGain
-          (TransportedMetrics.targetR2 1 r2Source
-            (driftTransportRatio fstSource fstTarget))
+          transported_r2
           (targetOracleR2DiagonalLD β_target var_y))
         (noiseVar / nTarget) := by
   unfold sampleLimitedScratchTargetR2
   simpa using scratchTargetR2_eq_deployedTransferTargetR2
-    (TransportedMetrics.targetR2 1 r2Source (driftTransportRatio fstSource fstTarget))
+    transported_r2
     (targetOracleR2DiagonalLD β_target var_y)
     (noiseVar / nTarget)
 
 /-- In the diagonal-LD target architecture model, sample-limited scratch
-    training is exactly the core transported target `R²` plus the target
+    training is exactly an explicit transported target baseline plus the target
     heritability gap above that transported baseline, minus the finite-sample
     estimation penalty. -/
 theorem sampleLimitedScratchTargetR2_eq_coreTransport_plus_targetHeritabilityGap_minus_noise
     {m : ℕ}
     (β_target : Fin m → ℝ)
-    (var_y r2Source fstSource fstTarget noiseVar nTarget : ℝ)
+    (var_y transported_r2 noiseVar nTarget : ℝ)
     (h_var_y : 0 < var_y)
     (h_beta_nonzero : 0 < additiveGeneticVariance β_target) :
     sampleLimitedScratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) noiseVar nTarget =
       deployedTransferTargetR2
-        (TransportedMetrics.targetR2 1 r2Source
-          (driftTransportRatio fstSource fstTarget))
+        transported_r2
         (additiveHeritability β_target var_y -
-          TransportedMetrics.targetR2 1 r2Source
-            (driftTransportRatio fstSource fstTarget))
+          transported_r2)
         (noiseVar / nTarget) := by
   rw [sampleLimitedScratchTargetR2_eq_targetHeritability_minus_noise_over_n_diagonalLD
     β_target var_y noiseVar nTarget h_var_y h_beta_nonzero]
@@ -2583,61 +2574,58 @@ theorem exactAdaptationGain_eq_coefficientGapDrop_isotropic
 
 /-- The scalar fine-tuning `adaptation_gain` parameter is exactly the gain in
     target `R²` obtained by reducing literal target excess risk, once the
-    baseline portability loss is instantiated by the exact observable drift
-    transport theorem. -/
-theorem fineTunedTargetR2_eq_observable_transport_plus_exact_excessRisk_reduction
+    baseline portability loss is instantiated by an explicit transported
+    baseline. -/
+theorem fineTunedTargetR2_eq_transportedBaseline_plus_exact_excessRisk_reduction
     {p : ℕ}
-    (r2Source fstSource fstTarget : ℝ)
+    (source_r2 transported_r2 : ℝ)
     (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ)
     (crossTarget : Fin p → ℝ)
     (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ) :
-    fineTunedTargetR2 r2Source
-        (observableTransportPenalty r2Source fstSource fstTarget)
+    fineTunedTargetR2 source_r2
+        (transportPenalty source_r2 transported_r2)
         (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar) =
-      targetR2FromObservables r2Source fstSource fstTarget +
+      transported_r2 +
         exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar := by
-  rw [fineTunedTargetR2_eq_targetR2FromObservables_plus_adaptation]
+  rw [fineTunedTargetR2_eq_transportedR2_plus_adaptation]
 
 /-- The exact excess-risk fine-tuning theorem is an instance of the canonical
-    deployed-transfer target `R²` surface with the core transported baseline,
+    deployed-transfer target `R²` surface with an explicit transported baseline,
     exact target-specific adaptation gain, and zero estimation penalty. -/
 theorem fineTunedTargetR2_eq_deployedTransferTargetR2_exactAdaptationGain
     {p : ℕ}
-    (r2Source fstSource fstTarget : ℝ)
+    (source_r2 transported_r2 : ℝ)
     (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ)
     (crossTarget : Fin p → ℝ)
     (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ) :
-    fineTunedTargetR2 r2Source
-        (observableTransportPenalty r2Source fstSource fstTarget)
+    fineTunedTargetR2 source_r2
+        (transportPenalty source_r2 transported_r2)
         (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar) =
-      deployedTransferTargetR2
-        (TransportedMetrics.targetR2 1 r2Source
-          (driftTransportRatio fstSource fstTarget))
-        (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar)
-        0 := by
+      deployedTransferTargetR2 transported_r2
+        (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar) 0 := by
   simpa using fineTunedTargetR2_eq_deployedTransferTargetR2
-    r2Source fstSource fstTarget
+    source_r2 transported_r2
     (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar)
 
 /-- In the isotropic target design, the scalar fine-tuning model is exactly the
-    observable transported baseline plus the drop in squared effect mismatch
+    transported baseline plus the drop in squared effect mismatch
     from target adaptation. -/
-theorem fineTunedTargetR2_eq_observable_transport_plus_gap_drop_isotropic
+theorem fineTunedTargetR2_eq_transportedBaseline_plus_gap_drop_isotropic
     {p : ℕ}
-    (r2Source fstSource fstTarget : ℝ)
+    (source_r2 transported_r2 : ℝ)
     (crossTarget : Fin p → ℝ)
     (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ)
     (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget) :
-    fineTunedTargetR2 r2Source
-        (observableTransportPenalty r2Source fstSource fstTarget)
+    fineTunedTargetR2 source_r2
+        (transportPenalty source_r2 transported_r2)
         (exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
           crossTarget noiseVar wBefore wAfter wStar) =
-      targetR2FromObservables r2Source fstSource fstTarget +
+      transported_r2 +
         (coefficientGapSq wBefore wStar - coefficientGapSq wAfter wStar) := by
-  rw [fineTunedTargetR2_eq_observable_transport_plus_exact_excessRisk_reduction]
+  rw [fineTunedTargetR2_eq_transportedBaseline_plus_exact_excessRisk_reduction]
   rw [exactAdaptationGain_eq_coefficientGapDrop_isotropic crossTarget noiseVar
     wBefore wAfter wStar h_opt]
 
@@ -2646,23 +2634,19 @@ theorem fineTunedTargetR2_eq_observable_transport_plus_gap_drop_isotropic
     squared coefficient mismatch, with zero estimation penalty. -/
 theorem fineTunedTargetR2_eq_deployedTransferTargetR2_gapDrop_isotropic
     {p : ℕ}
-    (r2Source fstSource fstTarget : ℝ)
+    (source_r2 transported_r2 : ℝ)
     (crossTarget : Fin p → ℝ)
     (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ)
     (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget) :
-    fineTunedTargetR2 r2Source
-        (observableTransportPenalty r2Source fstSource fstTarget)
+    fineTunedTargetR2 source_r2
+        (transportPenalty source_r2 transported_r2)
         (exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
           crossTarget noiseVar wBefore wAfter wStar) =
-      deployedTransferTargetR2
-        (TransportedMetrics.targetR2 1 r2Source
-          (driftTransportRatio fstSource fstTarget))
-        (coefficientGapSq wBefore wStar - coefficientGapSq wAfter wStar)
-        0 := by
-  rw [fineTunedTargetR2_eq_observable_transport_plus_gap_drop_isotropic
-    r2Source fstSource fstTarget crossTarget noiseVar wBefore wAfter wStar h_opt,
-    targetR2FromObservables_eq_transportedMetrics]
+      deployedTransferTargetR2 transported_r2
+        (coefficientGapSq wBefore wStar - coefficientGapSq wAfter wStar) 0 := by
+  rw [fineTunedTargetR2_eq_transportedBaseline_plus_gap_drop_isotropic
+    source_r2 transported_r2 crossTarget noiseVar wBefore wAfter wStar h_opt]
   unfold deployedTransferTargetR2
   ring
 
@@ -2673,22 +2657,20 @@ theorem fineTunedTargetR2_eq_deployedTransferTargetR2_gapDrop_isotropic
     deployed-transfer theorem. -/
 theorem fineTunedTargetR2_eq_oracle_minus_postGap_isotropic
     {p : ℕ}
-    (r2Source fstSource fstTarget oracle_target_r2 : ℝ)
+    (source_r2 transported_r2 oracle_target_r2 : ℝ)
     (crossTarget : Fin p → ℝ)
     (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ)
     (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget)
     (h_transport :
-      TransportedMetrics.targetR2 1 r2Source
-          (driftTransportRatio fstSource fstTarget) =
-        oracle_target_r2 - coefficientGapSq wBefore wStar) :
-    fineTunedTargetR2 r2Source
-        (observableTransportPenalty r2Source fstSource fstTarget)
+      transported_r2 = oracle_target_r2 - coefficientGapSq wBefore wStar) :
+    fineTunedTargetR2 source_r2
+        (transportPenalty source_r2 transported_r2)
         (exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
           crossTarget noiseVar wBefore wAfter wStar) =
       oracle_target_r2 - coefficientGapSq wAfter wStar := by
   rw [fineTunedTargetR2_eq_deployedTransferTargetR2_gapDrop_isotropic
-    r2Source fstSource fstTarget crossTarget noiseVar wBefore wAfter wStar h_opt]
+    source_r2 transported_r2 crossTarget noiseVar wBefore wAfter wStar h_opt]
   rw [h_transport]
   have h_oracle_gap :
       oracleTransportAdaptationGain
@@ -3053,13 +3035,13 @@ theorem private_causal_fraction_lowers_transfer_ceiling
     `R²`. This rules out a universally optimal score within that model, without
     overclaiming a general no-free-lunch theorem over all predictors. -/
 theorem transported_source_pgs_loses_r2_with_positive_drift
-    (r2Source fstSource fstTarget : ℝ)
-    (h_r2 : 0 < r2Source ∧ r2Source < 1)
+    (V_A V_E fstSource fstTarget : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    targetR2FromObservables r2Source fstSource fstTarget < r2Source := by
-  exact targetR2_lt_source_from_observables r2Source fstSource fstTarget
-    h_r2 h_fst h_fst_bounds
+    targetR2FromDriftState V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
+  exact targetR2_lt_source_from_drift_state V_A V_E fstSource fstTarget
+    hVA hVE h_fst h_fst_bounds
 
 end TransferLimits
 
