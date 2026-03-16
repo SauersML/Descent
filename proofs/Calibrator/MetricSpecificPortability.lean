@@ -453,14 +453,13 @@ theorem discrimination_preserved_calibration_lost
   simp only [abs_zero]
   exact abs_pos.mpr h_shift_sub
 
-/-- **Allele-frequency shift worsens calibration slope and Brier score.**
-    In the observable drift model, a larger target `F_ST` produces a real
-    calibration degradation on actual metrics. The calibration statement here
-    uses the shared literal linear regression slope
+/-- **Allele-frequency shift worsens the benchmark calibration slope and Brier score.**
+    In the observable drift benchmark, a larger target `F_ST` lowers the shared
+    linear regression slope coordinate
     `Cov(Y_target, Ŷ_source) / Var(Ŷ_source)` for the transported
     source-calibrated score from `PGSCalibrationTheory`.
 
-    - the target calibration slope is strictly below the ideal source baseline
+    - the benchmark target calibration slope is strictly below the ideal source baseline
       `1`;
     - the calibration-slope deviation from perfect calibration is therefore
       strictly larger than the source value `0`, and equals exactly `1 - slope`;
@@ -468,9 +467,9 @@ theorem discrimination_preserved_calibration_lost
     - at any nondegenerate prevalence `π`, the observable target Brier score is
       strictly worse than the source Brier score.
 
-    This is the metric-level calibration statement the surrounding prose needs,
-    not just an `R²` drop. -/
-theorem allele_freq_shift_disrupts_calibration
+    This remains a benchmark slope/Brier theorem, not a complete mechanistic
+    SNP-level calibration law. -/
+theorem allele_freq_shift_disrupts_benchmark_calibration_slope_and_brier
     (π V_A V_E fstS fstT : ℝ)
     (hπ0 : 0 < π) (hπ1 : π < 1)
     (hVA : 0 < V_A) (hVE : 0 < V_E)

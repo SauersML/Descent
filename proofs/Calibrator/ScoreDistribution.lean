@@ -95,9 +95,9 @@ individuals fall in extreme categories.
 section TailProbabilities
 
 /-- **Standardized score shift.**
-    When score mean shifts by Δμ and variance changes from σ²_S to σ²_T,
+    When score mean shifts by Δμ and the target standard deviation is `σ_T`,
     the standardized score changes. This affects tail probabilities. -/
-noncomputable def standardizedScoreShift (Δμ σ_S σ_T : ℝ) : ℝ :=
+noncomputable def standardizedScoreShift (Δμ σ_T : ℝ) : ℝ :=
   Δμ / σ_T
 
 /-- **Tail probability increases with mean shift toward the tail.**
@@ -115,7 +115,7 @@ theorem mean_shift_increases_tail
     Larger variance → more probability in both tails → more individuals
     in extreme risk categories. -/
 theorem variance_increase_thickens_tails
-    (x σ₁ σ₂ : ℝ) (h₁ : 0 < σ₁) (h₂ : 0 < σ₂)
+    (x σ₁ σ₂ : ℝ) (h₁ : 0 < σ₁)
     (h_larger : σ₁ < σ₂) (h_x : 0 < x) :
     -- z-score of x decreases with larger variance
     x / σ₂ < x / σ₁ := by
@@ -195,10 +195,12 @@ theorem calibration_in_large
   rw [← sub_ne_zero]
   rwa [← mean_shift_eq_diff]
 
-/-- **Calibration slope drops below 1 under positive drift.**
-    This reuses the shared transported calibration surface from
-    `PGSCalibrationTheory`, rather than introducing a second local slope API. -/
-theorem calibration_slope_one
+/-- **Benchmark calibration slope drops below `1` under positive drift.**
+    This theorem is only about the shared benchmark slope coordinate
+    `Cov(Y_target, Ŷ_source) / Var(Ŷ_source)` from `PGSCalibrationTheory`.
+    It does not claim that the full deployed calibration surface is completely
+    characterized by this single scalar. -/
+theorem benchmark_calibration_slope_lt_one_under_drift
     (V_A fst_source fst_target : ℝ)
     (hVA : 0 < V_A)
     (h_drift : fst_source < fst_target)
@@ -217,17 +219,17 @@ theorem calibration_slope_one
   rw [← h_bridge]
   exact h_profile
 
-/-- **Portability loss disrupts calibration (derived from drift model).**
-    Under the drift model, when fstT > fstS:
-    - R² drops (from `drift_degrades_R2`), so calibration slope < 1
-    - Score mean shifts (from `pgsMeanShift`), so intercept is wrong
-    Both disruptions follow from the structural model, not assumed. -/
-theorem portability_disrupts_calibration
-    (V_A V_E fstS fstT : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
+/-- **Drift lowers the benchmark calibration slope.**
+    This is the limited statement actually proved here: under the shared drift
+    benchmark, positive divergence pushes the benchmark transported calibration
+    slope below `1`. It is not a complete theorem about every component of
+    cross-population calibration. -/
+theorem drift_lowers_benchmark_calibration_slope
+    (V_A fstS fstT : ℝ)
+    (hVA : 0 < V_A)
     (hfst : fstS < fstT) (hfstT : fstT ≤ 1) :
     transportedLinearCalibrationSlope V_A fstS fstT < 1 := by
-  exact calibration_slope_one V_A fstS fstT hVA hfst hfstT
+  exact benchmark_calibration_slope_lt_one_under_drift V_A fstS fstT hVA hfst hfstT
 
 /-- **Recalibration restores calibration-in-the-large.**
     If the PGS mean in the target is `pgsMean β p_target` while the
@@ -290,7 +292,7 @@ section GaussianApproximation
 theorem berry_esseen_error_decreases_with_snps
     (C ρ_per_snp σ_sq_per_snp : ℝ) (m₁ m₂ : ℕ)
     (h_C : 0 < C) (h_ρ : 0 < ρ_per_snp) (h_σ : 0 < σ_sq_per_snp)
-    (h_m₁ : 0 < m₁) (h_m₂ : 0 < m₂)
+    (h_m₁ : 0 < m₁)
     (h_more : m₁ < m₂) :
     -- Total ρ = m × ρ_per_snp, σ³ = (m × σ²_per_snp)^(3/2)
     -- Error ∝ m × ρ / (m × σ²)^(3/2) = ρ / (σ² × √m)
@@ -313,10 +315,10 @@ theorem berry_esseen_error_decreases_with_snps
 theorem highly_polygenic_better_gaussian
     (C ρ σ_sq : ℝ) (m_oligo m_poly : ℕ)
     (h_C : 0 < C) (h_ρ : 0 < ρ) (h_σ : 0 < σ_sq)
-    (h_oligo : 0 < m_oligo) (h_poly : 0 < m_poly)
+    (h_oligo : 0 < m_oligo)
     (h_more : m_oligo < m_poly) :
     C * ρ / (σ_sq * Real.sqrt m_poly) < C * ρ / (σ_sq * Real.sqrt m_oligo) :=
-  berry_esseen_error_decreases_with_snps C ρ σ_sq m_oligo m_poly h_C h_ρ h_σ h_oligo h_poly h_more
+  berry_esseen_error_decreases_with_snps C ρ σ_sq m_oligo m_poly h_C h_ρ h_σ h_oligo h_more
 
 end GaussianApproximation
 
@@ -400,7 +402,7 @@ theorem external_vs_internal_differ
     The percentile of an individual is the same regardless of
     standardization choice (it's a monotone transformation). -/
 theorem percentile_invariant_to_standardization
-    (pgs μ σ : ℝ) (h_σ : 0 < σ) :
+    (μ σ : ℝ) (h_σ : 0 < σ) :
     -- Standardization is strictly increasing → preserves order
     ∀ pgs₁ pgs₂ : ℝ, pgs₁ < pgs₂ →
       externallyStandardized pgs₁ μ σ < externallyStandardized pgs₂ μ σ := by
