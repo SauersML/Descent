@@ -135,23 +135,14 @@ noncomputable def relativePortabilityLoss (model : PolygenicCLTPortabilityModel)
 noncomputable def lossConstant (model : PolygenicCLTPortabilityModel) : ℝ :=
   model.perLocusMismatchSD / model.perLocusSignal
 
-/-- Canonical portability-factor specialization for the CLT architecture model:
-only the architecture-retention component differs from `1`. -/
-noncomputable def portabilityFactor (model : PolygenicCLTPortabilityModel) : PortabilityFactor :=
-  PortabilityFactor.fromComponents 1 1 (1 - model.relativePortabilityLoss) 1
-
 /-- A simple portability score obtained by subtracting relative loss from `1`. -/
 noncomputable def portabilityScore (model : PolygenicCLTPortabilityModel) : ℝ :=
-  model.portabilityFactor.value
+  1 - model.relativePortabilityLoss
 
-@[simp] theorem portabilityScore_eq_portabilityFactor_value
+@[simp] theorem portabilityScore_eq_one_sub_relativePortabilityLoss
     (model : PolygenicCLTPortabilityModel) :
-    model.portabilityScore = model.portabilityFactor.value := by
+    model.portabilityScore = 1 - model.relativePortabilityLoss := by
   rfl
-
-@[simp] theorem portabilityFactor_value (model : PolygenicCLTPortabilityModel) :
-    model.portabilityFactor.value = 1 - model.relativePortabilityLoss := by
-  simp [portabilityFactor, PortabilityFactor.value, PortabilityFactor.fromComponents]
 
 /-- The `1 / √M_eff` loss law is derived from the CLT scaling assumptions above,
     not assumed as a theorem premise. -/
@@ -184,30 +175,17 @@ noncomputable def cltPolygenicPortabilityScore
       perLocusMismatchSD := perLocusMismatchSD }
   model.portabilityScore
 
-/-- Canonical portability-factor specialization adding cross-population
-effect-correlation and LD-retention penalties to the CLT architecture core. -/
-noncomputable def selectionAdjustedPortabilityFactor
-    (model : PolygenicCLTPortabilityModel) (rg ld_factor : ℝ) : PortabilityFactor :=
-  PortabilityFactor.fromComponents 1 ld_factor (rg ^ 2 * model.portabilityScore) 1
-
 /-- Overall portability after multiplying the polygenicity-only score by a
     cross-population effect-correlation penalty `rg²` and an LD-retention factor. -/
 noncomputable def selectionAdjustedPortability
     (model : PolygenicCLTPortabilityModel) (rg ld_factor : ℝ) : ℝ :=
-  (selectionAdjustedPortabilityFactor model rg ld_factor).value
+  ld_factor * (rg ^ 2 * model.portabilityScore)
 
-@[simp] theorem selectionAdjustedPortability_eq_factor_value
+@[simp] theorem selectionAdjustedPortability_eq_formula
     (model : PolygenicCLTPortabilityModel) (rg ld_factor : ℝ) :
     selectionAdjustedPortability model rg ld_factor =
-      (selectionAdjustedPortabilityFactor model rg ld_factor).value := by
-  rfl
-
-@[simp] theorem selectionAdjustedPortabilityFactor_value
-    (model : PolygenicCLTPortabilityModel) (rg ld_factor : ℝ) :
-    (selectionAdjustedPortabilityFactor model rg ld_factor).value =
       ld_factor * (rg ^ 2 * model.portabilityScore) := by
-  simp [selectionAdjustedPortabilityFactor, PortabilityFactor.value,
-    PortabilityFactor.fromComponents]
+  rfl
 
 /-- **More polygenic → more portable (from the formal CLT model).**
     If two traits share the same per-locus signal and per-locus LD-mismatch scale,
@@ -260,9 +238,8 @@ theorem height_polygenic_good_portability
     exact more_polygenic_more_portable
       bmiModel heightModel h_M_bmi h_M_height h_M h_signal h_mismatch rfl rfl
   dsimp [cltPolygenicPortabilityScore, bmiModel, heightModel] at ⊢
-  unfold PolygenicCLTPortabilityModel.portabilityScore
-  rw [PolygenicCLTPortabilityModel.portabilityFactor_value,
-    PolygenicCLTPortabilityModel.portabilityFactor_value]
+  rw [PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss,
+    PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss]
   linarith
 
 /-- The CLT portability score has the explicit closed form
@@ -272,8 +249,7 @@ theorem PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_lossConstant_di
     (h_M : 0 < model.M_eff)
     (h_signal : 0 < model.perLocusSignal) :
     model.portabilityScore = 1 - model.lossConstant / Real.sqrt model.M_eff := by
-  unfold PolygenicCLTPortabilityModel.portabilityScore
-  rw [PolygenicCLTPortabilityModel.portabilityFactor_value,
+  rw [PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss,
     PolygenicCLTPortabilityModel.relativePortabilityLoss_eq_lossConstant_div_sqrt
     model h_M h_signal]
 
@@ -299,8 +275,7 @@ theorem PolygenicCLTPortabilityModel.portabilityScore_le_one
     (h_signal : 0 < model.perLocusSignal)
     (h_mismatch : 0 ≤ model.perLocusMismatchSD) :
     model.portabilityScore ≤ 1 := by
-  unfold PolygenicCLTPortabilityModel.portabilityScore
-  rw [PolygenicCLTPortabilityModel.portabilityFactor_value]
+  rw [PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss]
   have h_loss_nn :=
     PolygenicCLTPortabilityModel.relativePortabilityLoss_nonneg model h_M h_signal h_mismatch
   linarith
@@ -336,9 +311,8 @@ theorem selection_overrides_polygenicity
       h_signal h_mismatch h_same_signal h_same_mismatch
   have h_poly_score :
       neutralModel.portabilityScore < selectedModel.portabilityScore := by
-    unfold PolygenicCLTPortabilityModel.portabilityScore
-    rw [PolygenicCLTPortabilityModel.portabilityFactor_value,
-      PolygenicCLTPortabilityModel.portabilityFactor_value]
+    rw [PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss,
+      PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss]
     linarith
   have h_selected_signal : 0 < selectedModel.perLocusSignal := by
     simpa [h_same_signal] using h_signal
@@ -374,9 +348,7 @@ theorem selection_overrides_polygenicity
         (rg_neutral ^ 2 * neutralModel.portabilityScore) * ld_factor := by
     exact mul_lt_mul_of_pos_right h_core_lt h_ld
   refine ⟨h_poly_score, ?_⟩
-  simpa [selectionAdjustedPortability, selectionAdjustedPortabilityFactor,
-    PortabilityFactor.value, PortabilityFactor.fromComponents,
-    mul_assoc, mul_left_comm, mul_comm] using h_adjusted_lt
+  simpa [selectionAdjustedPortability, mul_assoc, mul_left_comm, mul_comm] using h_adjusted_lt
 
 end PolygenicityAndPortability
 

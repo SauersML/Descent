@@ -15,7 +15,10 @@ import Calibrator.DemographicHistory
 import Calibrator.ClinicalUtilityFairness
 import Calibrator.VarianceComponents
 import Calibrator.ScoreDistribution
+import Calibrator.ValidationStatistics
+import Calibrator.CrossValidationTheory
 import Calibrator.SimulationValidation
+import Calibrator.SelectionValidation
 import Calibrator.GeneticArchitectureDiscovery
 import Calibrator.PredictionIntervalTheory
 import Calibrator.BayesianPGSTheory
@@ -507,14 +510,15 @@ theorem ld_decay_implies_nonlinear_calibration_proved {k : ℕ} [Fintype (Fin k)
 
 end NoAxioms
 
-/-- Top-level: at zero divergence, the observable target `R²` is the same
-present-day `R²` evaluated at that state. -/
+/-- Top-level: at zero divergence, the neutral allele-frequency benchmark
+target `R²` is the same present-day `R²` evaluated at that state. -/
 theorem targetR2_eq_source_at_zero_drift_proved
     (V_A V_E fst : ℝ) :
-    targetR2FromDriftState V_A V_E fst = presentDayR2 V_A V_E fst :=
-  targetR2FromDriftState_self V_A V_E fst
+    targetR2FromNeutralAFBenchmark V_A V_E fst = presentDayR2 V_A V_E fst :=
+  targetR2FromNeutralAFBenchmark_self V_A V_E fst
 
-/-- Top-level: strict Brier degradation under positive drift and non-degenerate prevalence. -/
+/-- Top-level: strict neutral allele-frequency benchmark Brier degradation
+under positive drift and non-degenerate prevalence. -/
 theorem targetBrier_strict_gt_source_proved
     (π V_A V_E fstSource fstTarget : ℝ)
     (hπ0 : 0 < π) (hπ1 : π < 1)
@@ -522,8 +526,8 @@ theorem targetBrier_strict_gt_source_proved
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
     sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
-      targetBrierFromDriftState π V_A V_E fstTarget :=
-  targetBrier_strict_gt_source_of_drift_state π V_A V_E fstSource fstTarget
+      targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget :=
+  targetBrier_strict_gt_source_of_neutralAF_benchmark π V_A V_E fstSource fstTarget
     hπ0 hπ1 hVA hVE h_fst h_fst_bounds
 
 /-- Top-level: increasing migration strictly reduces IM equilibrium differentiation

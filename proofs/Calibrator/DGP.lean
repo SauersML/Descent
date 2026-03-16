@@ -207,6 +207,62 @@ theorem frobeniusNormSq_pos_of_exists_ne_zero {t : ℕ}
 noncomputable def r2FromMSE (mse varY : ℝ) : ℝ :=
   1 - mse / varY
 
+/-- Explained-variance fraction from score/outcome covariance, score variance,
+and total outcome variance. This is the exact moment-level coordinate used for
+explicit source/target transport witnesses. -/
+noncomputable def explainedR2FromTransportMoments
+    (scoreOutcomeCov scoreVariance outcomeVariance : ℝ) : ℝ :=
+  scoreOutcomeCov ^ 2 / (scoreVariance * outcomeVariance)
+
+/-- Source tagged moments for the explicit LD witness. -/
+def ldWitnessSourceMoments : SourceTaggedMoments 2 2 where
+  sigmaTagSource := 1
+  sigmaTagCausalSource := 1
+
+/-- Source causal effects for the explicit LD witness. -/
+def ldWitnessBeta : CausalVec 2 := ![1, 1]
+
+/-- Source-learned weights for the explicit LD witness. -/
+noncomputable def ldWitnessSourceWeights : TagVec 2 :=
+  sourceBestLinearWeightsFromLD ldWitnessSourceMoments ldWitnessBeta
+
+/-- Target cross-covariance witness shared across the two target LD states. -/
+def ldWitnessTargetCross : TagVec 2 := ![1, 1]
+
+/-- Target LD witness with independent scored SNPs. -/
+def ldWitnessSigmaTargetIndependent : Matrix (Fin 2) (Fin 2) ℝ :=
+  !![1, 0; 0, 1]
+
+/-- Target LD witness with perfect correlation between the scored SNPs. -/
+def ldWitnessSigmaTargetCorrelated : Matrix (Fin 2) (Fin 2) ℝ :=
+  !![1, 1; 1, 1]
+
+@[simp] theorem ldWitnessSourceWeights_eq :
+    ldWitnessSourceWeights = ![1, 1] := by
+  ext i
+  fin_cases i <;>
+    simp [ldWitnessSourceWeights, sourceBestLinearWeightsFromLD, ldWitnessSourceMoments,
+      ldWitnessBeta, Matrix.mulVec, dotProduct]
+
+/-- Concrete witness that target LD structure changes target explained variance
+even when the source weights and target predictor/outcome cross-covariance are
+held fixed. This is why DGP does not expose a single trait-level transport
+scalar as a sufficient biological summary. -/
+theorem target_ld_shift_changes_explainedR2_under_fixed_source_weights :
+    explainedR2FromTransportMoments
+        (dotProduct ldWitnessSourceWeights ldWitnessTargetCross)
+        (dotProduct ldWitnessSourceWeights
+          (ldWitnessSigmaTargetCorrelated.mulVec ldWitnessSourceWeights))
+        4 <
+      explainedR2FromTransportMoments
+        (dotProduct ldWitnessSourceWeights ldWitnessTargetCross)
+        (dotProduct ldWitnessSourceWeights
+          (ldWitnessSigmaTargetIndependent.mulVec ldWitnessSourceWeights))
+        4 := by
+  rw [ldWitnessSourceWeights_eq]
+  norm_num [explainedR2FromTransportMoments, ldWitnessTargetCross, ldWitnessSigmaTargetCorrelated,
+    ldWitnessSigmaTargetIndependent, Matrix.mulVec, dotProduct]
+
 /-- Core mismatch theorem:
 if target excess MSE is lower-bounded by `λ * ‖ΣS-ΣT‖_F²` with `λ>0`
 and covariance mismatch is nonzero, then target MSE is strictly larger. -/
@@ -6488,104 +6544,86 @@ theorem migrationLDBoost_ge_one (p : EvolutionaryParameters) :
     · linarith [p.bigM_nonneg]
   linarith
 
-/-- **Unified scalar transport factor**: combines all four evolutionary forces.
+/-- Component-wise evolutionary summary. These coordinates record separate
+population-genetic drivers and are deliberately **not** collapsed into a single
+trait-level portability scalar. Any target portability claim must still go
+through explicit source weights and target covariance structure. -/
+structure EvolutionaryComponentSummary where
+  alleleFreqRetention : ℝ
+  sharedLD : ℝ
+  ancestralVariantRetention : ℝ
+  migrationRestoration : ℝ
 
-    This is the four-factor signal-retention product used later in the scalar
-    deployment summary. It should not be read as a literal theorem that
-    `R²_target / R²_source` equals this product; the deployed `R²` ratio is a
-    separate nonlinear coordinate map on transported signal variance.
+@[ext] theorem EvolutionaryComponentSummary.ext
+    {a b : EvolutionaryComponentSummary}
+    (h₁ : a.alleleFreqRetention = b.alleleFreqRetention)
+    (h₂ : a.sharedLD = b.sharedLD)
+    (h₃ : a.ancestralVariantRetention = b.ancestralVariantRetention)
+    (h₄ : a.migrationRestoration = b.migrationRestoration) :
+    a = b := by
+  cases a
+  cases b
+  simp_all
 
-    This decomposes scalar signal retention into:
-    1. (1 - Fst_eq): drift component (reduced by mutation + migration at equilibrium)
-    2. sharedLD: recombination breaks LD over divergence time
-    3. mutationErosion: new mutations create unshared LD
-    4. migrationBoost: gene flow restores shared variation (≥ 1, counteracts erosion) -/
-structure PortabilityFactor where
-  ancestryRetention : ℝ
-  ldRetention : ℝ
-  architectureRetention : ℝ
-  restorationBoost : ℝ
+/-- Canonical component-wise evolutionary summary for the full model. -/
+noncomputable def EvolutionaryParameters.componentSummary
+    (p : EvolutionaryParameters) : EvolutionaryComponentSummary where
+  alleleFreqRetention := 1 - fstEquilibrium p
+  sharedLD := sharedLDRetention p
+  ancestralVariantRetention := mutationLDErosion p
+  migrationRestoration := migrationLDBoost p
 
-namespace PortabilityFactor
-
-/-- Canonical multiplicative value of a portability-factor decomposition. -/
-noncomputable def value (f : PortabilityFactor) : ℝ :=
-  f.ancestryRetention * f.ldRetention * f.architectureRetention * f.restorationBoost
-
-@[simp] theorem value_eq_components (f : PortabilityFactor) :
-    f.value =
-      f.ancestryRetention * f.ldRetention * f.architectureRetention * f.restorationBoost := by
-  rfl
-
-/-- Generic constructor from the four portability components. -/
-noncomputable def fromComponents
-    (ancestryRetention ldRetention architectureRetention restorationBoost : ℝ) :
-    PortabilityFactor where
-  ancestryRetention := ancestryRetention
-  ldRetention := ldRetention
-  architectureRetention := architectureRetention
-  restorationBoost := restorationBoost
-
-@[simp] theorem fromComponents_value
-    (ancestryRetention ldRetention architectureRetention restorationBoost : ℝ) :
-    (fromComponents ancestryRetention ldRetention architectureRetention restorationBoost).value =
-      ancestryRetention * ldRetention * architectureRetention * restorationBoost := by
-  rfl
-
-/-- Neutral-drift specialization: only the ancestry-retention factor differs from `1`. -/
-noncomputable def neutralDrift (fstSource fstTarget : ℝ) : PortabilityFactor where
-  ancestryRetention := (1 - fstTarget) / (1 - fstSource)
-  ldRetention := 1
-  architectureRetention := 1
-  restorationBoost := 1
-
-@[simp] theorem neutralDrift_value (fstSource fstTarget : ℝ) :
-    (neutralDrift fstSource fstTarget).value = (1 - fstTarget) / (1 - fstSource) := by
-  unfold value neutralDrift
-  ring
-
-end PortabilityFactor
-
-/-- Canonical portability-factor decomposition for the full evolutionary model. -/
-noncomputable def EvolutionaryParameters.portabilityFactor
-    (p : EvolutionaryParameters) : PortabilityFactor :=
-  PortabilityFactor.fromComponents
-    (1 - fstEquilibrium p)
-    (sharedLDRetention p)
-    (mutationLDErosion p)
-    (migrationLDBoost p)
-
-/-- The public evolutionary scalar transport factor is the canonical
-portability-factor value specialized to the model's four biological components. -/
-noncomputable def unifiedPortabilityRatio (p : EvolutionaryParameters) : ℝ :=
-  p.portabilityFactor.value
-
-@[simp] theorem EvolutionaryParameters.portabilityFactor_value
+@[simp] theorem EvolutionaryParameters.componentSummary_alleleFreqRetention
     (p : EvolutionaryParameters) :
-    p.portabilityFactor.value =
-      (1 - fstEquilibrium p) *
-        sharedLDRetention p *
-        mutationLDErosion p *
-        migrationLDBoost p := by
-  unfold EvolutionaryParameters.portabilityFactor
-    PortabilityFactor.value PortabilityFactor.fromComponents
+    p.componentSummary.alleleFreqRetention = 1 - fstEquilibrium p := by
   rfl
 
-/-- The unified scalar transport factor is nonnegative when θ + M > 0. -/
-theorem unifiedPortabilityRatio_nonneg (p : EvolutionaryParameters)
-    (h_forces : 0 < p.theta + p.bigM) :
-    0 ≤ unifiedPortabilityRatio p := by
-  rw [unifiedPortabilityRatio, EvolutionaryParameters.portabilityFactor_value]
-  apply mul_nonneg
-  · apply mul_nonneg
-    · apply mul_nonneg
-      · have h_fst_lt := fstEquilibrium_lt_one p h_forces
-        have h_fst_pos := fstEquilibrium_pos p
-        linarith
-      · -- sharedLDRetention = exp(-2rt) > 0
-        exact le_of_lt (by unfold sharedLDRetention; exact Real.exp_pos _)
-    · exact le_of_lt (mutationLDErosion_pos p)
-  · linarith [migrationLDBoost_ge_one p]
+@[simp] theorem EvolutionaryParameters.componentSummary_sharedLD
+    (p : EvolutionaryParameters) :
+    p.componentSummary.sharedLD = sharedLDRetention p := by
+  rfl
+
+@[simp] theorem EvolutionaryParameters.componentSummary_ancestralVariantRetention
+    (p : EvolutionaryParameters) :
+    p.componentSummary.ancestralVariantRetention = mutationLDErosion p := by
+  rfl
+
+@[simp] theorem EvolutionaryParameters.componentSummary_migrationRestoration
+    (p : EvolutionaryParameters) :
+    p.componentSummary.migrationRestoration = migrationLDBoost p := by
+  rfl
+
+/-- The allele-frequency retention component is nonnegative when mutation and
+migration keep equilibrium `F_ST` below one. -/
+theorem EvolutionaryParameters.componentSummary_alleleFreqRetention_nonneg
+    (p : EvolutionaryParameters) (h_forces : 0 < p.theta + p.bigM) :
+    0 ≤ p.componentSummary.alleleFreqRetention := by
+  rw [EvolutionaryParameters.componentSummary_alleleFreqRetention]
+  have h_fst_lt := fstEquilibrium_lt_one p h_forces
+  have h_fst_pos := fstEquilibrium_pos p
+  linarith
+
+/-- The shared-LD component is strictly positive. -/
+theorem EvolutionaryParameters.componentSummary_sharedLD_pos
+    (p : EvolutionaryParameters) :
+    0 < p.componentSummary.sharedLD := by
+  rw [EvolutionaryParameters.componentSummary_sharedLD]
+  unfold sharedLDRetention
+  exact Real.exp_pos _
+
+/-- The ancestral-variant retention component is strictly positive. -/
+theorem EvolutionaryParameters.componentSummary_ancestralVariantRetention_pos
+    (p : EvolutionaryParameters) :
+    0 < p.componentSummary.ancestralVariantRetention := by
+  rw [EvolutionaryParameters.componentSummary_ancestralVariantRetention]
+  exact mutationLDErosion_pos p
+
+/-- The migration-restoration component is at least one. -/
+theorem EvolutionaryParameters.componentSummary_migrationRestoration_ge_one
+    (p : EvolutionaryParameters) :
+    1 ≤ p.componentSummary.migrationRestoration := by
+  rw [EvolutionaryParameters.componentSummary_migrationRestoration]
+  exact migrationLDBoost_ge_one p
 
 /-- **Each force's marginal effect on Fst.**
     Increasing any counterbalancing force (θ or M) strictly decreases Fst. -/
@@ -6633,12 +6671,11 @@ theorem unified_portability_drift_component_improves
   rw [div_lt_one (by linarith [p.theta_nonneg, p.bigM_nonneg] : 0 < 1 + p.theta + p.bigM)]
   linarith
 
-/-- **Scalar transport-loss decomposition into four components.**
-    Derived from the unified model: total scalar transport loss decomposes as
-    1 - unifiedPortabilityRatio, which factors into drift, LD, mutation, and migration terms.
-    Here we show: the drift component alone (fstEquilibrium) is bounded by
-    fstDriftMutation, which in turn is bounded by 1. Each additional force
-    reduces the loss from what it would be under drift alone. -/
+/-- **Component-wise comparison of drift, mutation, and migration effects.**
+    Here we show: the drift component alone (`fstEquilibrium`) is bounded by
+    `fstDriftMutation`, which in turn is bounded by `1`. Each additional force
+    reduces the allele-frequency divergence from what it would be under drift
+    alone. -/
 theorem portability_loss_decomposition_from_model
     (p : EvolutionaryParameters) (h_theta : 0 < p.theta) (h_mig : 0 < p.bigM) :
     -- The full equilibrium Fst is strictly less than the mutation-only Fst
@@ -6783,44 +6820,44 @@ end UnifiedEvolutionaryPortability
 
 /-! ## End-to-End: From Population Genetics to Clinical Accuracy Metrics
 
-This section builds the complete pipeline from evolutionary primitives
-(Ne, μ, m, r, t) to clinical accuracy metrics (R², AUC, Brier score)
-in a target population, fully as a function of time since divergence.
+This section builds the evolutionary side of the deployment pipeline from
+evolutionary primitives (Ne, μ, m, r, t) to clinical accuracy coordinates
+(`R²`, AUC, Brier score) once an explicit target signal variance is supplied.
+Time since divergence enters through the evolutionary components only.
 
 **The chain:**
 1. Evolutionary parameters → Fst(t), LD_retention(t), mutation_erosion(t), migration_boost(t)
-2. These four factors → unified portability ratio ρ(t)
-3. Source R² × ρ(t) → target R²(t)
-4. Scalar transported signal summary → target AUC(t) via liability threshold model
-5. Scalar transported signal summary → target Brier(t) = π(1-π)(1 - R²_target)
+2. These four components remain separate summaries; DGP does not multiply them into a
+   single biological portability law
+3. A separate mechanistic transport theorem supplies explicit target signal variance
+4. That target signal variance maps to target `R²(t)`, AUC(t), and Brier(t)
 
-Everything evolves over time through a scalar transported-signal summary.
-As t increases: Fst grows, LD decays, mutation erodes shared signal, and
-migration partially counteracts. The deployed metrics in this section are then
-read off from exact coordinate maps applied to that scalar summary.
+The evolutionary component summaries change over time as Fst grows, LD decays,
+mutation erodes shared signal, and migration partially counteracts. The
+deployed metrics in this section are then read off from exact coordinate maps
+applied to an explicit target signal variance.
 
 ### Key scope note
-An `EvolutionaryParameters` structure, plus source `R²` and disease prevalence,
-fully determines the scalar deployment summary in this file. That is enough for
-exact algebra on the chosen summary coordinates, but it is not by itself a full
-SNP/LD state-space model of transport. The more mechanistic transport objects
-live downstream in `PortabilityDrift.targetR2FromSourceWeights` and
+An `EvolutionaryParameters` structure determines only the component-wise
+evolutionary summaries in this file, and an observational context adds residual
+scale and disease prevalence for metric evaluation. That is enough for exact
+algebra on the chosen coordinates, but it is not by itself a full SNP/LD
+state-space model of transport. The mechanistic transport objects live
+downstream in
+`PortabilityDrift.CrossPopulationMetricModel`,
+`PortabilityDrift.targetR2FromSourceWeights`, and
 `TransferLearningPGS.transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD`.
 -/
 
 section EndToEndMetrics
 
 /-- Extended evolutionary parameters that include the observational context:
-    source R², environmental variance, and disease prevalence. -/
+    residual variance and disease prevalence for metric evaluation. -/
 structure PGSEvolutionaryModel extends EvolutionaryParameters where
-  /-- Source-population R² (proportion of phenotypic variance explained). -/
-  R2_source : ℝ
   /-- Environmental (non-genetic) variance. -/
   V_E : ℝ
   /-- Disease prevalence (for binary trait metrics). -/
   prevalence : ℝ
-  R2_source_pos : 0 < R2_source
-  R2_source_lt_one : R2_source < 1
   V_E_pos : 0 < V_E
   prev_pos : 0 < prevalence
   prev_lt_one : prevalence < 1
@@ -6895,26 +6932,26 @@ noncomputable def PGSEvolutionaryModel.mutErosion (m : PGSEvolutionaryModel) : �
 noncomputable def PGSEvolutionaryModel.migBoost (m : PGSEvolutionaryModel) : ℝ :=
   migrationLDBoost m.toEvo
 
-/-! ### Step 2: Scalar transport factor
+/-! ### Step 2: Component-wise evolutionary summaries
 
-The four evolutionary factors decompose a scalar signal-retention factor:
+The four evolutionary factors are kept separate:
 
 - `(1 - Fst)`: allele-frequency retention
 - `LD_retention`: shared LD tagging
 - `mut_erosion`: ancestral/shared causal content
 - `mig_boost`: migration-restored shared signal
 
-This block stops at that scalar factor. It does not reconstruct source signal
-from source `R²`, and it does not derive target deployed metrics from source
-`R²` plus scalar retention alone.
+This block does not multiply them into a single trait-level transport scalar.
+It does not reconstruct source signal from source `R²`, and it does not derive
+target deployed metrics from source `R²` plus a global retention factor.
 -/
 
-/-! ### Scope of this scalar deployment block
+/-! ### Scope of this deployment block
 
 The next definitions intentionally stop short of an end-to-end portability law.
 They provide:
 
-- a scalar evolutionary transport factor; and
+- component-wise evolutionary summaries; and
 - generic metric coordinate maps once an explicit target signal variance is
   supplied.
 
@@ -6922,8 +6959,13 @@ They do **not** evolve SNP weights, tag/causal covariance matrices, or target
 effect-size vectors directly. The lower-level SNP/LD-aware transport objects
 live in:
 
+- `PortabilityDrift.CrossPopulationMetricModel`, where the named drivers are
+  source/target tag LD, tag-causal alignment, source/target effect vectors,
+  source/target context cross-covariances, and explicit additive target-side
+  residual losses for broken tagging, ancestry-specific LD distortion, and
+  source-specific overfit;
 - `PortabilityDrift.targetR2FromSourceWeights`, where transported source weights
-  are evaluated against target LD geometry; and
+  are evaluated against that full explicit state; and
 - `TransferLearningPGS.transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD`,
   where transport is expressed in source/target effect vectors under a shared
   LD kernel.
@@ -6936,9 +6978,9 @@ about target `R²`, AUC, or Brier.
 
 `TransportedMetrics` is the single canonical forward map from:
 
-- source `R²`
-- residual variance scale
-- transported signal-retention factor
+- explicit target signal variance
+- baseline residual variance scale
+- explicit additive target-side penalty budget
 - prevalence
 
 to the deployed target metrics (`R²`, AUC, Brier). Other files should expose
@@ -6960,6 +7002,32 @@ noncomputable def aucFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
 def calibratedBrier (π r2 : ℝ) : ℝ :=
   π * (1 - π) * (1 - r2)
 
+/-- Explicit additive irreducible target-side residual-loss budget.
+These penalties are not compressed into a single multiplicative transport
+factor. They represent irreducible degradation from broken tagging,
+ancestry-specific LD distortion, and source-specific overfit. -/
+structure IrreducibleTargetPenalty where
+  brokenTagging : ℝ
+  ancestrySpecificLD : ℝ
+  sourceSpecificOverfit : ℝ
+  brokenTagging_nonneg : 0 ≤ brokenTagging
+  ancestrySpecificLD_nonneg : 0 ≤ ancestrySpecificLD
+  sourceSpecificOverfit_nonneg : 0 ≤ sourceSpecificOverfit
+
+/-- Total additive target-side residual-loss budget. -/
+noncomputable def IrreducibleTargetPenalty.total
+    (penalty : IrreducibleTargetPenalty) : ℝ :=
+  penalty.brokenTagging +
+    penalty.ancestrySpecificLD +
+    penalty.sourceSpecificOverfit
+
+theorem IrreducibleTargetPenalty.total_nonneg
+    (penalty : IrreducibleTargetPenalty) :
+    0 ≤ penalty.total := by
+  unfold IrreducibleTargetPenalty.total
+  linarith [penalty.brokenTagging_nonneg, penalty.ancestrySpecificLD_nonneg,
+    penalty.sourceSpecificOverfit_nonneg]
+
 /-- Canonical bundled deployed metrics from an explicit target signal variance. -/
 structure Profile where
   r2 : ℝ
@@ -6977,8 +7045,10 @@ structure Profile where
     variances.
 
     This namespace intentionally stops at coordinate maps. It does not infer a
-    target signal variance from source `R²` plus a scalar transport factor;
-    that target signal must come from a separate mechanistic theorem. -/
+    target signal variance from source `R²` plus any global transport scalar;
+    that target signal must come from a separate mechanistic theorem, and any
+    irreducible target-side loss must be supplied explicitly as an additive
+    penalty budget. -/
 noncomputable def profileFromSignalVariance
     (π vNoise vSignal : ℝ) : Profile where
   r2 := r2FromSignalVariance vSignal vNoise
@@ -7003,190 +7073,159 @@ noncomputable def profileFromSignalVariance
       calibratedBrier π (r2FromSignalVariance vSignal vNoise) := by
   rfl
 
-end TransportedMetrics
+/-- Canonical bundled deployed metrics from explicit target signal variance,
+baseline residual scale, and an explicit additive target-side penalty budget. -/
+noncomputable def profileFromSignalVarianceWithPenalty
+    (π vNoise vSignal : ℝ) (penalty : IrreducibleTargetPenalty) : Profile :=
+  profileFromSignalVariance π (vNoise + penalty.total) vSignal
 
-/-- Exact multiplicative evolutionary transport factor for the genetic signal. -/
-noncomputable def PGSEvolutionaryModel.portabilityFactor
-    (m : PGSEvolutionaryModel) : PortabilityFactor :=
-  PortabilityFactor.fromComponents
-    (1 - m.fstTransient)
-    m.ldRetention
-    m.mutErosion
-    m.migBoost
-
-/-- Exact multiplicative evolutionary transport factor for the genetic signal. -/
-noncomputable def PGSEvolutionaryModel.signalTransportFactor (m : PGSEvolutionaryModel) : ℝ :=
-  m.portabilityFactor.value
-
-@[simp] theorem PGSEvolutionaryModel.portabilityFactor_value
-    (m : PGSEvolutionaryModel) :
-    m.portabilityFactor.value =
-      (1 - m.fstTransient) * m.ldRetention * m.mutErosion * m.migBoost := by
+@[simp] theorem profileFromSignalVarianceWithPenalty_r2
+    (π vNoise vSignal : ℝ) (penalty : IrreducibleTargetPenalty) :
+    (profileFromSignalVarianceWithPenalty π vNoise vSignal penalty).r2 =
+      r2FromSignalVariance vSignal (vNoise + penalty.total) := by
   rfl
 
-/-- The signal-transport factor is the canonical portability-factor value for
-the evolutionary model.
+@[simp] theorem profileFromSignalVarianceWithPenalty_auc
+    (π vNoise vSignal : ℝ) (penalty : IrreducibleTargetPenalty) :
+    (profileFromSignalVarianceWithPenalty π vNoise vSignal penalty).auc =
+      aucFromSignalVariance vSignal (vNoise + penalty.total) := by
+  rfl
 
-It depends only on the evolutionary components and not on source `R²`; any
-source-`R²` dependence in deployed target metrics appears only after mapping
-transported signal variance back to bounded observables. -/
-theorem PGSEvolutionaryModel.signalTransportFactor_eq_components
+@[simp] theorem profileFromSignalVarianceWithPenalty_brier
+    (π vNoise vSignal : ℝ) (penalty : IrreducibleTargetPenalty) :
+    (profileFromSignalVarianceWithPenalty π vNoise vSignal penalty).brier =
+      calibratedBrier π (r2FromSignalVariance vSignal (vNoise + penalty.total)) := by
+  rfl
+
+end TransportedMetrics
+
+/-- Canonical component-wise evolutionary summary for the observationally
+augmented model. DGP records these four coordinates separately and does not
+collapse them into a single trait-level transport scalar. -/
+noncomputable def PGSEvolutionaryModel.componentSummary
+    (m : PGSEvolutionaryModel) : EvolutionaryComponentSummary where
+  alleleFreqRetention := 1 - m.fstTransient
+  sharedLD := m.ldRetention
+  ancestralVariantRetention := m.mutErosion
+  migrationRestoration := m.migBoost
+
+@[simp] theorem PGSEvolutionaryModel.componentSummary_alleleFreqRetention
     (m : PGSEvolutionaryModel) :
-    m.signalTransportFactor =
-      (1 - m.fstTransient) * m.ldRetention * m.mutErosion * m.migBoost := by
-  rw [PGSEvolutionaryModel.signalTransportFactor, PGSEvolutionaryModel.portabilityFactor_value]
+    m.componentSummary.alleleFreqRetention = 1 - m.fstTransient := by
+  rfl
 
-/-- Fully expanded evolutionary signal-transport factor. -/
-theorem PGSEvolutionaryModel.signalTransportFactor_explicit
+@[simp] theorem PGSEvolutionaryModel.componentSummary_sharedLD
     (m : PGSEvolutionaryModel) :
-    m.signalTransportFactor =
-      ((1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))) *
-        Real.exp (-2 * m.recomb * m.t_div) *
-        Real.exp (-m.theta * m.tau) *
-        (1 + m.bigM * m.tau / (1 + m.bigM))) := by
-  rw [m.signalTransportFactor_eq_components]
-  simp [PGSEvolutionaryModel.fstTransient, PGSEvolutionaryModel.ldRetention,
-    PGSEvolutionaryModel.mutErosion, PGSEvolutionaryModel.migBoost,
-    PGSEvolutionaryModel.toEvo, sharedLDRetention, mutationLDErosion,
-    migrationLDBoost, fstEquilibrium]
+    m.componentSummary.sharedLD = m.ldRetention := by
+  rfl
 
-/-- Exact coordinate map from explicit signal variance to deployed `R²` at the
-    model's residual scale. -/
-noncomputable def PGSEvolutionaryModel.varianceToR2
-    (m : PGSEvolutionaryModel) (vSignal : ℝ) : ℝ :=
-  TransportedMetrics.r2FromSignalVariance vSignal m.V_E
+@[simp] theorem PGSEvolutionaryModel.componentSummary_ancestralVariantRetention
+    (m : PGSEvolutionaryModel) :
+    m.componentSummary.ancestralVariantRetention = m.mutErosion := by
+  rfl
+
+@[simp] theorem PGSEvolutionaryModel.componentSummary_migrationRestoration
+    (m : PGSEvolutionaryModel) :
+    m.componentSummary.migrationRestoration = m.migBoost := by
+  rfl
+
+/-- Fully expanded evolutionary component summary. Each field is a separate
+population-genetic coordinate, not a joint portability law. -/
+theorem PGSEvolutionaryModel.componentSummary_explicit
+    (m : PGSEvolutionaryModel) :
+    m.componentSummary =
+      { alleleFreqRetention :=
+          1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))
+        sharedLD := Real.exp (-2 * m.recomb * m.t_div)
+        ancestralVariantRetention := Real.exp (-m.theta * m.tau)
+        migrationRestoration := 1 + m.bigM * m.tau / (1 + m.bigM) } := by
+  ext <;>
+    simp [PGSEvolutionaryModel.componentSummary, PGSEvolutionaryModel.fstTransient,
+      PGSEvolutionaryModel.ldRetention, PGSEvolutionaryModel.mutErosion,
+      PGSEvolutionaryModel.migBoost, PGSEvolutionaryModel.toEvo,
+      sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium]
 
 /-- Phi is monotone increasing because it is the standard normal CDF. -/
 theorem Phi_monotone : Monotone Phi := by
   simpa [Phi] using
     (ProbabilityTheory.monotone_cdf (μ := ProbabilityTheory.gaussianReal 0 1))
 
-/-- **Signal-to-noise ratio** from `R²`.
+/-! ### Step 3: Metric evaluation from explicit target signal and additive losses
 
-    This is a coordinate identity for a fixed residual scale, not a biological
-    transport variable. -/
-noncomputable def snrFromR2 (r2 : ℝ) : ℝ := r2 / (1 - r2)
+The rigorous interface now stops at the component summaries above. This file
+does not derive a target signal variance from source `R²`; any target metric
+claim must supply:
 
-/-- SNR is nonneg for valid `R²`. -/
-theorem snrFromR2_nonneg (r2 : ℝ) (h0 : 0 ≤ r2) (h1 : r2 < 1) :
-    0 ≤ snrFromR2 r2 := by
-  unfold snrFromR2
-  exact div_nonneg h0 (by linarith)
+- an explicit target signal variance from a separate mechanistic transport
+  theorem; and
+- an explicit additive target-side penalty budget for broken tagging,
+  ancestry-specific LD distortion, and source-specific overfit. -/
 
-/-- SNR is monotone increasing in `R²`. -/
-theorem snrFromR2_strictMono : StrictMonoOn snrFromR2 (Set.Ico 0 1) := by
-  intro a ⟨ha0, ha1⟩ b ⟨_, hb1⟩ hab
-  unfold snrFromR2
-  rw [div_lt_div_iff₀ (by linarith : 0 < 1 - a) (by linarith : 0 < 1 - b)]
-  nlinarith
-
-/-! ### Step 3: Metric evaluation from explicit target signal
-
-The rigorous interface now stops at the scalar retention factor above. This
-file does not derive a target signal variance from source `R²`; any target
-metric claim must supply an explicit target signal variance from a separate
-mechanistic transport theorem. -/
-
-/-- Canonical deployed metric profile from an explicit target signal variance. -/
-noncomputable def PGSEvolutionaryModel.metricProfileFromTargetSignal
-    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ) :
+/-- Canonical deployed metric profile from an explicit target signal variance
+and an explicit additive target-side penalty budget. -/
+noncomputable def PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty
+    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ)
+    (penalty : TransportedMetrics.IrreducibleTargetPenalty) :
     TransportedMetrics.Profile :=
-  TransportedMetrics.profileFromSignalVariance
-    m.prevalence m.V_E vSignalTarget
+  TransportedMetrics.profileFromSignalVarianceWithPenalty
+    m.prevalence m.V_E vSignalTarget penalty
 
-@[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignal_r2
-    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ) :
-    (m.metricProfileFromTargetSignal vSignalTarget).r2 =
-      TransportedMetrics.r2FromSignalVariance vSignalTarget m.V_E := by
+@[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty_r2
+    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ)
+    (penalty : TransportedMetrics.IrreducibleTargetPenalty) :
+    (m.metricProfileFromTargetSignalWithPenalty vSignalTarget penalty).r2 =
+      TransportedMetrics.r2FromSignalVariance vSignalTarget (m.V_E + penalty.total) := by
   rfl
 
-@[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignal_auc
-    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ) :
-    (m.metricProfileFromTargetSignal vSignalTarget).auc =
-      TransportedMetrics.aucFromSignalVariance vSignalTarget m.V_E := by
+@[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty_auc
+    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ)
+    (penalty : TransportedMetrics.IrreducibleTargetPenalty) :
+    (m.metricProfileFromTargetSignalWithPenalty vSignalTarget penalty).auc =
+      TransportedMetrics.aucFromSignalVariance vSignalTarget (m.V_E + penalty.total) := by
   rfl
 
-@[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignal_brier
-    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ) :
-    (m.metricProfileFromTargetSignal vSignalTarget).brier =
+@[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty_brier
+    (m : PGSEvolutionaryModel) (vSignalTarget : ℝ)
+    (penalty : TransportedMetrics.IrreducibleTargetPenalty) :
+    (m.metricProfileFromTargetSignalWithPenalty vSignalTarget penalty).brier =
       TransportedMetrics.calibratedBrier m.prevalence
-        (TransportedMetrics.r2FromSignalVariance vSignalTarget m.V_E) := by
+        (TransportedMetrics.r2FromSignalVariance vSignalTarget (m.V_E + penalty.total)) := by
   rfl
 
-/-! ### Step 4: Temporal dynamics of the scalar signal-retention summary
+/-! ### Step 4: Component-wise temporal summaries
 
-The multiplicative signal-transport factor is a decomposition of evolutionary
-forces only. It is no longer promoted to a standalone theorem about deployed
-target metrics. -/
+The evolutionary block records per-force rate coordinates only. These rates are
+useful for comparing the timescales of distinct population-genetic drivers, but
+they are not added or multiplied into a single portability law. -/
 
-/-- **Signal-transport decomposition into rates.**
-    Taking the log of the signal-variance ratio gives an additive decomposition:
-
-    log(ρ) = log(1 - Fst) + log(LD_ret) + log(mut_erosion) + log(mig_boost)
-
-    For small Fst: log(1-Fst) ≈ -Fst ≈ -τ·(1+θ+M)⁻¹
-    log(LD_ret) = -2rt
-    log(mut_erosion) = -θτ
-    log(mig_boost) ≈ Mτ/(1+M) for small Mτ
-
-    So the total "decay rate" is approximately:
-    dlog(ρ)/dt ≈ -(1/(2Ne(1+θ+M)) + 2r + θ/(2Ne) - M/(2Ne(1+M)))
-
-    This reveals the RELATIVE contribution of each force to portability loss. -/
-noncomputable def portabilityDecayRate (Ne mu m_rate r : ℝ) : ℝ :=
-  let theta := 4 * Ne * mu
-  let bigM := 4 * Ne * m_rate
-  -- Drift contribution: Fst growth rate
-  1 / (2 * Ne * (1 + theta + bigM)) +
-  -- LD decay contribution: recombination
-  2 * r +
-  -- Mutation erosion contribution
-  theta / (2 * Ne) -
-  -- Migration counteracts (negative contribution to decay)
-  bigM / (2 * Ne * (1 + bigM))
-
-/-- The drift contribution to portability decay rate. -/
-noncomputable def driftDecayRate (Ne mu m_rate : ℝ) : ℝ :=
+/-- Allele-frequency divergence rate summary from the transient `F_ST`
+coordinate. -/
+noncomputable def alleleFreqDivergenceRate (Ne mu m_rate : ℝ) : ℝ :=
   let theta := 4 * Ne * mu
   let bigM := 4 * Ne * m_rate
   1 / (2 * Ne * (1 + theta + bigM))
 
-/-- The LD decay contribution to portability decay rate. -/
-noncomputable def ldDecayRate (r : ℝ) : ℝ := 2 * r
+/-- LD breakage rate from recombination. -/
+noncomputable def ldBreakageRate (r : ℝ) : ℝ := 2 * r
 
-/-- The mutation erosion contribution to portability decay rate. -/
-noncomputable def mutationDecayRate (mu : ℝ) : ℝ := 2 * mu
+/-- Novel-variant arrival rate from mutation. -/
+noncomputable def novelVariantArrivalRate (mu : ℝ) : ℝ := 2 * mu
 
-/-- The migration restoration rate (counteracts decay). -/
+/-- Migration restoration rate, reported separately because it counteracts
+divergence rather than adding to it. -/
 noncomputable def migrationRestorationRate (Ne m_rate : ℝ) : ℝ :=
   let bigM := 4 * Ne * m_rate
   bigM / (2 * Ne * (1 + bigM))
 
-/-- The decay rate decomposes additively. -/
-theorem portabilityDecayRate_decomposition (Ne mu m_rate r : ℝ)
-    (hNe : Ne ≠ 0) (_hM : 1 + 4 * Ne * m_rate ≠ 0)
-    (_hTM : 1 + 4 * Ne * mu + 4 * Ne * m_rate ≠ 0) :
-    portabilityDecayRate Ne mu m_rate r =
-      driftDecayRate Ne mu m_rate + ldDecayRate r +
-      mutationDecayRate mu - migrationRestorationRate Ne m_rate := by
-  unfold portabilityDecayRate driftDecayRate ldDecayRate mutationDecayRate migrationRestorationRate
-  dsimp only
-  field_simp
-  ring
-
-/-- **LD decay dominates** when recombination rate exceeds drift rate.
-    For typical human parameters (r ~ 0.01, Ne ~ 10000),
-    2r ~ 0.02 >> 1/(2Ne) ~ 0.00005, so LD decay is ~400× faster than drift.
-
-    DERIVED: pure comparison of rates. -/
-theorem ld_decay_dominates_drift
+/-- LD breakage dominates the allele-frequency divergence rate when
+recombination exceeds the drift timescale. This is a comparison of component
+rates only, not a theorem about total portability. -/
+theorem ld_breakage_dominates_alleleFreq_divergence
     (Ne mu m_rate r : ℝ)
     (hNe : 0 < Ne) (hmu : 0 ≤ mu) (hm : 0 ≤ m_rate)
     (h_ld_fast : 1 / (2 * Ne) < 2 * r) :
-    driftDecayRate Ne mu m_rate < ldDecayRate r := by
-  unfold driftDecayRate ldDecayRate
-  have theta_nn : 0 ≤ 4 * Ne * mu := by positivity
-  have bigM_nn : 0 ≤ 4 * Ne * m_rate := by positivity
+    alleleFreqDivergenceRate Ne mu m_rate < ldBreakageRate r := by
+  unfold alleleFreqDivergenceRate ldBreakageRate
   have denom_pos : 0 < 2 * Ne * (1 + 4 * Ne * mu + 4 * Ne * m_rate) := by positivity
   calc 1 / (2 * Ne * (1 + 4 * Ne * mu + 4 * Ne * m_rate))
       ≤ 1 / (2 * Ne) := by
@@ -7196,20 +7235,12 @@ theorem ld_decay_dominates_drift
         nlinarith
     _ < 2 * r := h_ld_fast
 
-/-! ### Step 8: Coordinate comparisons inside the scalar deployment summary
+/-! ### Step 8: Coordinate comparisons inside the deployment summary
 
-Within this scalar block, deployed `R²`, AUC, and Nagelkerke-style quantities
-are different coordinates on transported signal plus any explicitly supplied
-calibration factor. The theorems below are therefore coordinate facts, not a
-general ranking theorem for real-world portability across distinct metrics. -/
-
-/-- `snrFromR2` preserves strict order on valid deployed `R²` values. -/
-theorem snrFromR2_preserves_strict_order (r2_s r2_t : ℝ)
-    (hs : 0 < r2_s) (hs1 : r2_s < 1)
-    (ht : 0 < r2_t) (ht1 : r2_t < 1)
-    (h_drop : r2_t < r2_s) :
-    snrFromR2 r2_t < snrFromR2 r2_s := by
-  exact snrFromR2_strictMono ⟨le_of_lt ht, ht1⟩ ⟨le_of_lt hs, hs1⟩ h_drop
+Within this block, deployed `R²` and Nagelkerke-style quantities are different
+coordinates on transported signal plus any explicitly supplied calibration
+factor. The theorems below are therefore coordinate facts, not a general
+ranking theorem for real-world portability across distinct metrics. -/
 
 /-- A Nagelkerke-style score is strictly below the deployed `R²` coordinate when
     the supplied calibration factor lies in `(0, 1)`. -/
@@ -7217,104 +7248,6 @@ theorem nagelkerke_lt_r2_when_calibration_factor_lt_one (r2_target cal : ℝ)
     (h_r2 : 0 < r2_target) (_h_cal : 0 < cal) (h_cal_lt : cal < 1) :
     r2_target * cal < r2_target := by
   nlinarith
-
-/-! ### Step 5: What remains identifiable from the scalar factor
-
-The rigorous scalar output of this block is the transport factor itself. DGP no
-longer claims that source/target deployed metrics determine that factor without
-an explicit target-signal theorem. -/
-
-/-- Recovery of the allele-frequency retention factor from the observable transport factor
-and the other three evolutionary components. -/
-theorem PGSEvolutionaryModel.alleleFreqRetention_eq_from_transportFactor
-    (m : PGSEvolutionaryModel)
-    (h_other_ne : m.ldRetention * m.mutErosion * m.migBoost ≠ 0) :
-    1 - m.fstTransient =
-      m.signalTransportFactor / (m.ldRetention * m.mutErosion * m.migBoost) := by
-  have hld_ne : m.ldRetention ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  have hmut_ne : m.mutErosion ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  have hmig_ne : m.migBoost ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  unfold signalTransportFactor
-  rw [PGSEvolutionaryModel.portabilityFactor_value]
-  field_simp [hld_ne, hmut_ne, hmig_ne]
-
-/-- Recovery of LD retention from the observable transport factor and the other
-three evolutionary components. -/
-theorem PGSEvolutionaryModel.ldRetention_eq_from_transportFactor
-    (m : PGSEvolutionaryModel)
-    (h_other_ne : (1 - m.fstTransient) * m.mutErosion * m.migBoost ≠ 0) :
-    m.ldRetention =
-      m.signalTransportFactor / ((1 - m.fstTransient) * m.mutErosion * m.migBoost) := by
-  have hfst_ne : 1 - m.fstTransient ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  have hmut_ne : m.mutErosion ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  have hmig_ne : m.migBoost ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  unfold signalTransportFactor
-  rw [PGSEvolutionaryModel.portabilityFactor_value]
-  field_simp [hfst_ne, hmut_ne, hmig_ne]
-
-/-- Recovery of mutation erosion from the observable transport factor and the other
-three evolutionary components. -/
-theorem PGSEvolutionaryModel.mutErosion_eq_from_transportFactor
-    (m : PGSEvolutionaryModel)
-    (h_other_ne : (1 - m.fstTransient) * m.ldRetention * m.migBoost ≠ 0) :
-    m.mutErosion =
-      m.signalTransportFactor / ((1 - m.fstTransient) * m.ldRetention * m.migBoost) := by
-  have hfst_ne : 1 - m.fstTransient ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  have hld_ne : m.ldRetention ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  have hmig_ne : m.migBoost ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  unfold signalTransportFactor
-  rw [PGSEvolutionaryModel.portabilityFactor_value]
-  field_simp [hfst_ne, hld_ne, hmig_ne]
-
-/-- Recovery of the migration boost factor from the observable transport factor and the other
-three evolutionary components. -/
-theorem PGSEvolutionaryModel.migBoost_eq_from_transportFactor
-    (m : PGSEvolutionaryModel)
-    (h_other_ne : (1 - m.fstTransient) * m.ldRetention * m.mutErosion ≠ 0) :
-    m.migBoost =
-      m.signalTransportFactor / ((1 - m.fstTransient) * m.ldRetention * m.mutErosion) := by
-  have hfst_ne : 1 - m.fstTransient ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  have hld_ne : m.ldRetention ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  have hmut_ne : m.mutErosion ≠ 0 := by
-    intro h
-    apply h_other_ne
-    simp [h]
-  unfold signalTransportFactor
-  rw [PGSEvolutionaryModel.portabilityFactor_value]
-  field_simp [hfst_ne, hld_ne, hmut_ne]
 
 end EndToEndMetrics
 

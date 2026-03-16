@@ -293,7 +293,7 @@ These metrics respond differently to distribution shifts.
 
 section R2VsAUC
 
-/-- **R² is sensitive to drift in the observable transport model.**
+/-- **R² is sensitive to drift in the neutral allele-frequency benchmark.**
     When drift increases (`fstS < fstT`), `presentDayR2` strictly decreases, so
     the source-to-target R² drop is positive. -/
 theorem r2_sensitive_to_drift
@@ -333,35 +333,27 @@ theorem brier_depends_on_prevalence
   nlinarith
 
 /-- **Source liability AUC is strictly increasing in source `R²`.**
-    Under the exact liability-threshold map `AUC = Φ(√(SNR/2))` with
-    `SNR = r2 / (1-r2)`, higher source `R²` yields higher source liability AUC.
+    Under the exact liability-threshold chart
+    `AUC = Φ(√(r2 / (2(1-r2))))`, higher source `R²` yields higher source
+    liability AUC.
     This is a true metric comparison, not just a formula expansion. -/
 theorem sourceLiabilityAUC_strictly_increases_with_r2
     (r2₁ r2₂ : ℝ)
     (h_r2₁ : 0 < r2₁) (h_r2₂ : r2₂ < 1)
     (h_lt : r2₁ < r2₂)
     (hPhiStrict : StrictMono Phi) :
-    sourceExactLiabilityAUC r2₁ <
-      sourceExactLiabilityAUC r2₂ := by
+    liabilityAUCFromExplainedR2 r2₁ <
+      liabilityAUCFromExplainedR2 r2₂ := by
   have h_r2₂_pos : 0 < r2₂ := lt_trans h_r2₁ h_lt
-  have hv₁_nonneg : 0 ≤ snrFromR2 r2₁ :=
-    snrFromR2_nonneg r2₁ (le_of_lt h_r2₁) (lt_trans h_lt h_r2₂)
-  have hv₂_nonneg : 0 ≤ snrFromR2 r2₂ :=
-    snrFromR2_nonneg r2₂ (le_of_lt h_r2₂_pos) h_r2₂
-  have hv_lt :
-      snrFromR2 r2₁ < snrFromR2 r2₂ :=
-    snrFromR2_strictMono
-      ⟨le_of_lt h_r2₁, lt_trans h_lt h_r2₂⟩
-      ⟨le_of_lt h_r2₂_pos, h_r2₂⟩
-      h_lt
-  have hmono := liabilityAUCFromSNR_strictMonoOn_nonneg hPhiStrict
-  unfold sourceExactLiabilityAUC
-  exact hmono hv₁_nonneg hv₂_nonneg hv_lt
+  exact liabilityAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+    ⟨le_of_lt h_r2₁, lt_trans h_lt h_r2₂⟩
+    ⟨le_of_lt h_r2₂_pos, h_r2₂⟩
+    h_lt
 
-/-- **Liability AUC is sensitive to drift in the observable transport model.**
-    With fixed source `R²`, increasing drift strictly lowers the transported
+/-- **Liability AUC is sensitive to the neutral allele-frequency benchmark.**
+    With fixed source `R²`, increasing drift strictly lowers the benchmark
     liability-threshold AUC. This is the exact metric-level AUC analogue of the
-    observable `R²` drift result. -/
+    benchmark `R²` drift result. -/
 theorem liability_auc_sensitive_to_drift
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
@@ -369,9 +361,9 @@ theorem liability_auc_sensitive_to_drift
     (h_fst_bounds : 0 ≤ fstS ∧ fstT < 1)
     (hPhiStrict : StrictMono Phi) :
     0 < presentDayLiabilityAUC V_A V_E fstS -
-      targetExactLiabilityAUC V_A V_E fstT := by
+      targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fstT := by
   have h_drop :=
-    targetLiabilityAUC_lt_source_of_drift_state
+    targetLiabilityAUC_lt_source_of_neutralAF_benchmark
       V_A V_E fstS fstT hVA hVE h_fst h_fst_bounds hPhiStrict
   linarith
 
@@ -423,7 +415,7 @@ with the mean-score offset.**
     while calibration is lost." -/
 theorem auc_preserved_citl_shift_at_fixed_fst
     (V_A V_E fst mean_obs mean_pred δ : ℝ) :
-    targetExactLiabilityAUC V_A V_E fst =
+    targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fst =
       presentDayLiabilityAUC V_A V_E fst ∧
     calibrationInTheLarge mean_obs (mean_pred + δ) =
       calibrationInTheLarge mean_obs mean_pred - δ := by
@@ -433,7 +425,7 @@ theorem auc_preserved_citl_shift_at_fixed_fst
     ring
 
 /-- **Discrimination preserved while calibration is lost at fixed drift.**
-    In the observable transport model, if source and target share the same
+    In the neutral allele-frequency benchmark, if source and target share the same
     drift level `fst`, then AUC is unchanged. If the source is calibrated in
     the large and the target mean prediction is shifted by a nonzero offset
     `δ`, then target absolute CITL becomes strictly worse.
@@ -445,7 +437,7 @@ theorem discrimination_preserved_calibration_lost
     (V_A V_E fst mean_obs mean_pred δ : ℝ)
     (h_src_cal : calibrationInTheLarge mean_obs mean_pred = 0)
     (h_shift : δ ≠ 0) :
-    targetExactLiabilityAUC V_A V_E fst =
+    targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fst =
       presentDayLiabilityAUC V_A V_E fst ∧
     |calibrationInTheLarge mean_obs mean_pred| <
       |calibrationInTheLarge mean_obs (mean_pred + δ)| := by
@@ -484,51 +476,51 @@ theorem allele_freq_shift_disrupts_calibration
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
     (hfst_bounds : 0 ≤ fstS ∧ fstT < 1) :
-    let profile := driftIdentityCalibrationProfile π π fstS fstT
+    let profile := neutralAFIdentityCalibrationProfile π π fstS fstT
     profile.slope < 1 ∧
     calibrationSlopeDeviation 1 < profile.slopeDeviation ∧
     profile.slopeDeviation = 1 - profile.slope ∧
     profile.slope = transportedLinearCalibrationSlope V_A fstS fstT ∧
     profile.slope = (1 - fstT) / (1 - fstS) ∧
     sourceBrierFromR2 π (presentDayR2 V_A V_E fstS) <
-      targetBrierFromDriftState π V_A V_E fstT := by
+      targetBrierFromNeutralAFBenchmark π V_A V_E fstT := by
   dsimp
   have hfstS_lt_one : fstS < 1 := lt_trans hfst hfst_bounds.2
   have hslope_eq :
       transportedLinearCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) := by
     exact transportedLinearCalibrationSlope_eq_fst_ratio V_A fstS fstT hVA hfstS_lt_one
   have hprofile_eq_transport :
-      (driftIdentityCalibrationProfile π π fstS fstT).slope =
+      (neutralAFIdentityCalibrationProfile π π fstS fstT).slope =
         transportedLinearCalibrationSlope V_A fstS fstT := by
-    simp [driftIdentityCalibrationProfile,
-      transportedLinearCalibrationSlope_eq_driftTransportRatio, hVA, hfstS_lt_one]
+    simp [neutralAFIdentityCalibrationProfile,
+      transportedLinearCalibrationSlope_eq_neutralAFBenchmarkRatio, hVA, hfstS_lt_one]
   have hslope_lt :
-      (driftIdentityCalibrationProfile π π fstS fstT).slope < 1 := by
+      (neutralAFIdentityCalibrationProfile π π fstS fstT).slope < 1 := by
     rw [hprofile_eq_transport]
     exact transportedLinearCalibrationSlope_lt_one V_A fstS fstT hVA hfst
       (le_of_lt hfst_bounds.2)
   have hslope_dev_pos :
       calibrationSlopeDeviation 1 <
-        (driftIdentityCalibrationProfile π π fstS fstT).slopeDeviation := by
+        (neutralAFIdentityCalibrationProfile π π fstS fstT).slopeDeviation := by
     unfold CalibrationProfile.slopeDeviation calibrationSlopeDeviation
     rw [show (1 : ℝ) - 1 = 0 by ring, abs_zero]
     have hneg :
-        (driftIdentityCalibrationProfile π π fstS fstT).slope - 1 < 0 := by
+        (neutralAFIdentityCalibrationProfile π π fstS fstT).slope - 1 < 0 := by
       linarith [hslope_lt]
     rw [abs_of_neg hneg]
     linarith
   have hslope_dev :
-      (driftIdentityCalibrationProfile π π fstS fstT).slopeDeviation =
-        1 - (driftIdentityCalibrationProfile π π fstS fstT).slope := by
+      (neutralAFIdentityCalibrationProfile π π fstS fstT).slopeDeviation =
+        1 - (neutralAFIdentityCalibrationProfile π π fstS fstT).slope := by
     exact calibrationSlopeDeviation_eq_one_sub_of_lt_one
-      (driftIdentityCalibrationProfile π π fstS fstT).slope hslope_lt
+      (neutralAFIdentityCalibrationProfile π π fstS fstT).slope hslope_lt
   have hbrier :
       sourceBrierFromR2 π (presentDayR2 V_A V_E fstS) <
-        targetBrierFromDriftState π V_A V_E fstT := by
-    exact targetBrier_strict_gt_source_of_drift_state
+        targetBrierFromNeutralAFBenchmark π V_A V_E fstT := by
+    exact targetBrier_strict_gt_source_of_neutralAF_benchmark
       π V_A V_E fstS fstT hπ0 hπ1 hVA hVE hfst hfst_bounds
   have hslope_eq_closed :
-      (driftIdentityCalibrationProfile π π fstS fstT).slope = (1 - fstT) / (1 - fstS) := by
+      (neutralAFIdentityCalibrationProfile π π fstS fstT).slope = (1 - fstT) / (1 - fstS) := by
     rw [hprofile_eq_transport, hslope_eq]
   exact ⟨hslope_lt, hslope_dev_pos, hslope_dev, hprofile_eq_transport, hslope_eq_closed, hbrier⟩
 
@@ -659,7 +651,7 @@ theorem brier_bounded_by_prevalence
 /-- Brier worsening caused by discrimination loss alone, holding target prevalence fixed. -/
 noncomputable def brierDiscriminationLoss
     (πTarget V_A V_E fstSource fstTarget : ℝ) : ℝ :=
-  targetBrierFromDriftState πTarget V_A V_E fstTarget -
+  targetBrierFromNeutralAFBenchmark πTarget V_A V_E fstTarget -
     sourceBrierFromR2 πTarget (presentDayR2 V_A V_E fstSource)
 
 /-- Brier worsening caused by calibration/prevalence shift alone, holding source `R²` fixed. -/
@@ -673,19 +665,19 @@ theorem brierDiscriminationLoss_eq
     (πTarget V_A V_E fstSource fstTarget : ℝ) :
     brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget =
       πTarget * (1 - πTarget) *
-        (presentDayR2 V_A V_E fstSource - targetR2FromDriftState V_A V_E fstTarget) := by
-  unfold brierDiscriminationLoss targetBrierFromDriftState sourceBrierFromR2
+        (presentDayR2 V_A V_E fstSource - targetR2FromNeutralAFBenchmark V_A V_E fstTarget) := by
+  unfold brierDiscriminationLoss targetBrierFromNeutralAFBenchmark sourceBrierFromR2
     targetExactCalibratedBrierRisk exactCalibratedBrierRiskFromR2
   calc
-    πTarget * (1 - πTarget) * (1 - targetR2FromDriftState V_A V_E fstTarget) -
+    πTarget * (1 - πTarget) * (1 - targetR2FromNeutralAFBenchmark V_A V_E fstTarget) -
         πTarget * (1 - πTarget) * (1 - presentDayR2 V_A V_E fstSource)
       = πTarget * (1 - πTarget) *
-          ((1 - targetR2FromDriftState V_A V_E fstTarget) -
+          ((1 - targetR2FromNeutralAFBenchmark V_A V_E fstTarget) -
             (1 - presentDayR2 V_A V_E fstSource)) := by
             ring
     _ = πTarget * (1 - πTarget) *
           (presentDayR2 V_A V_E fstSource -
-            targetR2FromDriftState V_A V_E fstTarget) := by
+            targetR2FromNeutralAFBenchmark V_A V_E fstTarget) := by
             ring
 
 /-- Exact formula for the calibration/prevalence contribution to Brier worsening. -/
@@ -701,7 +693,7 @@ theorem brierCalibrationLoss_eq
 /-- Exact decomposition of observable Brier worsening into discrimination and calibration terms. -/
 theorem observableBrier_change_decomposition
     (πSource πTarget V_A V_E fstSource fstTarget : ℝ) :
-    targetBrierFromDriftState πTarget V_A V_E fstTarget -
+    targetBrierFromNeutralAFBenchmark πTarget V_A V_E fstTarget -
       sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource) =
       brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget +
       brierCalibrationLoss πSource πTarget V_A V_E fstSource := by
@@ -718,7 +710,7 @@ theorem brierDiscriminationLoss_pos_of_drift
     0 < brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget := by
   unfold brierDiscriminationLoss
   exact sub_pos.mpr
-    (targetBrier_strict_gt_source_of_drift_state πTarget V_A V_E fstSource fstTarget
+    (targetBrier_strict_gt_source_of_neutralAF_benchmark πTarget V_A V_E fstSource fstTarget
       hπ0 hπ1 hVA hVE h_fst h_fst_bounds)
 
 /-- If the prevalence factor increases, the calibration/prevalence contribution is positive. -/
@@ -766,10 +758,10 @@ theorem brier_increase_mainly_calibration
     (h_cal_dom :
       πTarget * (1 - πTarget) *
           (presentDayR2 V_A V_E fstSource -
-            targetR2FromDriftState V_A V_E fstTarget) <
+            targetR2FromNeutralAFBenchmark V_A V_E fstTarget) <
         (πTarget * (1 - πTarget) - πSource * (1 - πSource)) *
           (1 - presentDayR2 V_A V_E fstSource)) :
-    targetBrierFromDriftState πTarget V_A V_E fstTarget -
+    targetBrierFromNeutralAFBenchmark πTarget V_A V_E fstTarget -
       sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource) =
         brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget +
         brierCalibrationLoss πSource πTarget V_A V_E fstSource ∧
@@ -777,7 +769,7 @@ theorem brier_increase_mainly_calibration
     0 < brierCalibrationLoss πSource πTarget V_A V_E fstSource ∧
     brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget <
       brierCalibrationLoss πSource πTarget V_A V_E fstSource ∧
-    (targetBrierFromDriftState πTarget V_A V_E fstTarget -
+    (targetBrierFromNeutralAFBenchmark πTarget V_A V_E fstTarget -
         sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource)) / 2 <
       brierCalibrationLoss πSource πTarget V_A V_E fstSource := by
   have h_decomp := observableBrier_change_decomposition
@@ -1064,14 +1056,14 @@ theorem brier_proper_score_portability_decomposition
     (h_cal_dom :
       πTarget * (1 - πTarget) *
           (presentDayR2 V_A V_E fstSource -
-            targetR2FromDriftState V_A V_E fstTarget) <
+            targetR2FromNeutralAFBenchmark V_A V_E fstTarget) <
         (πTarget * (1 - πTarget) - πSource * (1 - πSource)) *
           (1 - presentDayR2 V_A V_E fstSource)) :
-    targetBrierFromDriftState πTarget V_A V_E fstTarget -
+    targetBrierFromNeutralAFBenchmark πTarget V_A V_E fstTarget -
       sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource) =
         brierDiscriminationLoss πTarget V_A V_E fstSource fstTarget +
         brierCalibrationLoss πSource πTarget V_A V_E fstSource ∧
-    (targetBrierFromDriftState πTarget V_A V_E fstTarget -
+    (targetBrierFromNeutralAFBenchmark πTarget V_A V_E fstTarget -
         sourceBrierFromR2 πSource (presentDayR2 V_A V_E fstSource)) / 2 <
       brierCalibrationLoss πSource πTarget V_A V_E fstSource := by
   rcases brier_increase_mainly_calibration

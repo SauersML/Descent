@@ -566,30 +566,40 @@ theorem drift_degrades_liabilityAUC
 noncomputable def realWorldPGSVariance (V_A fst rhoSq : ℝ) : ℝ :=
   rhoSq * (1 - fst) * V_A
 
-/-- Causal-vs-observed architecture split:
-`betaCausal` and `sigmaCausal*` describe biology, while `tagging*` describes array-level observability. -/
-structure CausalObservableArchitecture (p : ℕ) where
-  betaCausal : Fin p → ℝ
-  sigmaCausalSource : Matrix (Fin p) (Fin p) ℝ
-  sigmaCausalTarget : Matrix (Fin p) (Fin p) ℝ
-  taggingSource : Matrix (Fin p) (Fin p) ℝ
-  taggingTarget : Matrix (Fin p) (Fin p) ℝ
+/-- Explicit cross-population biological and observational state that can
+change deployed portability metrics.
 
-/-- Observable covariance induced by causal covariance and a tagging map. -/
-noncomputable def observableCovariance {p : ℕ}
-    (tag : Matrix (Fin p) (Fin p) ℝ) (sigmaCausal : Matrix (Fin p) (Fin p) ℝ) :
-    Matrix (Fin p) (Fin p) ℝ :=
-  tag * sigmaCausal * tag.transpose
+The fields record the named drivers that can change metrics:
 
-/-- Source observable LD architecture. -/
-noncomputable def sourceObservableCovariance {p : ℕ}
-    (arch : CausalObservableArchitecture p) : Matrix (Fin p) (Fin p) ℝ :=
-  observableCovariance arch.taggingSource arch.sigmaCausalSource
+- SNP-level tagging structure via `sigmaTagCausalSource/Target`
+- causal-vs-tag distinction via separate tag and causal dimensions
+- source and target LD among scored SNPs via `sigmaTagSource/Target`
+- effect-size architecture across loci via `betaSource/Target`
+- ancestry-specific or environment-specific cross-covariance shifts via
+  `contextCrossSource/Target`
+- additive irreducible target-side losses derived from:
+  broken tagging, ancestry-specific LD distortion, and source-specific
+  overfit/context mismatch
+- source/target outcome scales and target prevalence for deployed metrics
 
-/-- Target observable LD architecture. -/
-noncomputable def targetObservableCovariance {p : ℕ}
-    (arch : CausalObservableArchitecture p) : Matrix (Fin p) (Fin p) ℝ :=
-  observableCovariance arch.taggingTarget arch.sigmaCausalTarget
+No source `R²` summary appears here because it is not a sufficient biological
+state variable for transport. -/
+structure CrossPopulationMetricModel (p q : ℕ) where
+  betaSource : Fin q → ℝ
+  betaTarget : Fin q → ℝ
+  sigmaTagSource : Matrix (Fin p) (Fin p) ℝ
+  sigmaTagTarget : Matrix (Fin p) (Fin p) ℝ
+  sigmaTagCausalSource : Matrix (Fin p) (Fin q) ℝ
+  sigmaTagCausalTarget : Matrix (Fin p) (Fin q) ℝ
+  contextCrossSource : Fin p → ℝ
+  contextCrossTarget : Fin p → ℝ
+  sourceOutcomeVariance : ℝ
+  targetOutcomeVariance : ℝ
+  targetPrevalence : ℝ
+  sourceOutcomeVariance_pos : 0 < sourceOutcomeVariance
+  targetOutcomeVariance_pos : 0 < targetOutcomeVariance
+  targetPrevalence_pos : 0 < targetPrevalence
+  targetPrevalence_lt_one : targetPrevalence < 1
 
 /-- Source ERM weights in closed form (normal equations) under invertible source covariance. -/
 noncomputable def sourceERMWeights {p : ℕ}
@@ -636,22 +646,6 @@ theorem source_target_erm_differ_of_ld_system_conflict
   have hNotTargetAtSource : sigmaObsTarget.mulVec wSource ≠ crossTarget := hConflict wSource hSource
   have hTargetAtSource : sigmaObsTarget.mulVec wSource = crossTarget := by simpa [hEq] using hTarget
   exact hNotTargetAtSource hTargetAtSource
-
-/-- Multi-locus tag/causal architecture used in statistical genetics portability formulas. -/
-structure MultiLocusTagModel (p q : ℕ) where
-  betaCausal : Fin q → ℝ
-  sigmaTagSource : Matrix (Fin p) (Fin p) ℝ
-  sigmaTagTarget : Matrix (Fin p) (Fin p) ℝ
-  sigmaTagCausalSource : Matrix (Fin p) (Fin q) ℝ
-  sigmaTagCausalTarget : Matrix (Fin p) (Fin q) ℝ
-
-/-- Minimal `1 × 1` tag/causal fixture for tests of OLS weight transport under LD shift. -/
-def concreteTagModel (rS rT : ℝ) : MultiLocusTagModel 1 1 :=
-  { betaCausal := ![1]
-    sigmaTagSource := !![1]
-    sigmaTagTarget := !![1]
-    sigmaTagCausalSource := !![rS]
-    sigmaTagCausalTarget := !![rT] }
 
 /-- Dense source covariance witness for non-degenerate ERM-transport tests. -/
 def sigmaObsSource : Matrix (Fin 2) (Fin 2) ℝ :=
@@ -702,37 +696,209 @@ theorem source_target_erm_differ_dense_witness_proved :
     simp [wSource_opt, wTarget_opt]
     norm_num
 
-/-- Source OLS-style weights: `w_S = Σ_S^{-1} Σ_tc,S β_c`. -/
-noncomputable def sourceOLSWeights {p q : ℕ}
-    (m : MultiLocusTagModel p q) : Fin p → ℝ :=
-  m.sigmaTagSource⁻¹.mulVec (m.sigmaTagCausalSource.mulVec m.betaCausal)
+/-- Source predictor/outcome cross-covariance from explicit biological and
+observational drivers. -/
+noncomputable def sourceCrossCovariance {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
+  m.sigmaTagCausalSource.mulVec m.betaSource + m.contextCrossSource
 
-/-- Target quadratic form for the transported source score:
-`w_S^T Σ_T w_S`. -/
-noncomputable def targetScoreQuadraticFormFromSource {p q : ℕ}
-    (m : MultiLocusTagModel p q) : ℝ :=
-  let wS := sourceOLSWeights m
+/-- Target predictor/outcome cross-covariance from explicit biological and
+observational drivers. -/
+noncomputable def targetCrossCovariance {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
+  m.sigmaTagCausalTarget.mulVec m.betaTarget + m.contextCrossTarget
+
+/-- Source-learned linear weights from the full source state, including any
+context-dependent source cross-covariance term. -/
+noncomputable def sourceWeightsFromExplicitDrivers {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
+  sourceERMWeights m.sigmaTagSource (sourceCrossCovariance m)
+
+/-- Exact score variance in the source population under the learned source
+weights. -/
+noncomputable def sourceScoreVarianceFromExplicitDrivers {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  let wS := sourceWeightsFromExplicitDrivers m
+  dotProduct wS (m.sigmaTagSource.mulVec wS)
+
+/-- Exact score variance in the target population when transporting the
+source-learned weights. This captures changes in the target LD matrix even
+when the source weights are held fixed. -/
+noncomputable def targetScoreVarianceFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  let wS := sourceWeightsFromExplicitDrivers m
   dotProduct wS (m.sigmaTagTarget.mulVec wS)
 
-/-- Target tag-causal alignment term for transported source score:
-`w_S^T Σ_tc,T β_c`. -/
-noncomputable def targetTagCausalAlignmentFromSource {p q : ℕ}
-    (m : MultiLocusTagModel p q) : ℝ :=
-  let wS := sourceOLSWeights m
-  dotProduct wS (m.sigmaTagCausalTarget.mulVec m.betaCausal)
+/-- Exact source score/outcome covariance under the learned source weights. -/
+noncomputable def sourcePredictiveCovarianceFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  let wS := sourceWeightsFromExplicitDrivers m
+  dotProduct wS (sourceCrossCovariance m)
 
-/-- Exact present-day target `R²` induced by source-trained weights and target
-    LD geometry in the linear score-variance model. -/
+/-- Exact target score/outcome covariance under transported source weights.
+This is where target-side effect changes, target tag-causal alignment, and
+target context/environment shifts enter directly. -/
+noncomputable def targetPredictiveCovarianceFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  let wS := sourceWeightsFromExplicitDrivers m
+  dotProduct wS (targetCrossCovariance m)
+
+/-- Exact explained-variance fraction from cross moments:
+`Cov(score, Y)^2 / (Var(score) Var(Y))`. -/
+noncomputable def explainedR2FromMoments
+    (scoreOutcomeCov scoreVariance outcomeVariance : ℝ) : ℝ :=
+  scoreOutcomeCov ^ 2 / (scoreVariance * outcomeVariance)
+
+/-- Additive irreducible loss from broken source-to-target tagging.
+This is the squared target-effect distortion induced by the gap between the
+source and target tag-to-causal alignment matrices. -/
+noncomputable def brokenTaggingResidual {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  let delta := (m.sigmaTagCausalSource - m.sigmaTagCausalTarget).mulVec m.betaTarget
+  dotProduct delta delta
+
+theorem brokenTaggingResidual_nonneg {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    0 ≤ brokenTaggingResidual m := by
+  unfold brokenTaggingResidual
+  classical
+  simp [dotProduct]
+  exact Finset.sum_nonneg (fun _ _ => mul_self_nonneg _)
+
+/-- Additive irreducible loss from ancestry-specific LD distortion.
+This is the squared source-score covariance distortion induced by the gap
+between the source and target scored-SNP LD matrices. -/
+noncomputable def ancestrySpecificLDResidual {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  let wS := sourceWeightsFromExplicitDrivers m
+  let delta := (m.sigmaTagSource - m.sigmaTagTarget).mulVec wS
+  dotProduct delta delta
+
+theorem ancestrySpecificLDResidual_nonneg {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    0 ≤ ancestrySpecificLDResidual m := by
+  unfold ancestrySpecificLDResidual
+  classical
+  simp [dotProduct]
+  exact Finset.sum_nonneg (fun _ _ => mul_self_nonneg _)
+
+/-- Additive irreducible loss from source-specific overfit or context mismatch.
+This is the squared gap between source-only and target score/outcome
+cross-covariance structure. -/
+noncomputable def sourceSpecificOverfitResidual {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  let delta := m.contextCrossSource - m.contextCrossTarget
+  dotProduct delta delta
+
+theorem sourceSpecificOverfitResidual_nonneg {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    0 ≤ sourceSpecificOverfitResidual m := by
+  unfold sourceSpecificOverfitResidual
+  classical
+  simp [dotProduct]
+  exact Finset.sum_nonneg (fun _ _ => mul_self_nonneg _)
+
+/-- Total additive irreducible target-side residual burden from the explicit
+biological state. Unlike the deleted scalar model, these losses are not folded
+into a single multiplicative retention factor. -/
+noncomputable def irreducibleTargetResidualBurden {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  brokenTaggingResidual m +
+    ancestrySpecificLDResidual m +
+    sourceSpecificOverfitResidual m
+
+theorem irreducibleTargetResidualBurden_nonneg {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    0 ≤ irreducibleTargetResidualBurden m := by
+  unfold irreducibleTargetResidualBurden
+  linarith [brokenTaggingResidual_nonneg m, ancestrySpecificLDResidual_nonneg m,
+    sourceSpecificOverfitResidual_nonneg m]
+
+/-- Canonical additive target-side penalty bundle induced by the explicit
+cross-population state. This is the exact bridge back to the generic deployed
+metric surface in `DGP.TransportedMetrics`. -/
+noncomputable def targetIrreduciblePenaltyProfile {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    TransportedMetrics.IrreducibleTargetPenalty where
+  brokenTagging := brokenTaggingResidual m
+  ancestrySpecificLD := ancestrySpecificLDResidual m
+  sourceSpecificOverfit := sourceSpecificOverfitResidual m
+  brokenTagging_nonneg := brokenTaggingResidual_nonneg m
+  ancestrySpecificLD_nonneg := ancestrySpecificLDResidual_nonneg m
+  sourceSpecificOverfit_nonneg := sourceSpecificOverfitResidual_nonneg m
+
+@[simp] theorem targetIrreduciblePenaltyProfile_total {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    (targetIrreduciblePenaltyProfile m).total =
+      irreducibleTargetResidualBurden m := by
+  rfl
+
+/-- Effective target outcome variance after adding an irreducible
+target-specific residual burden from broken tagging, ancestry-specific LD, and
+source-specific overfit. -/
+noncomputable def effectiveTargetOutcomeVariance {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  m.targetOutcomeVariance + irreducibleTargetResidualBurden m
+
+/-- The effective target outcome variance dominates the baseline target outcome
+variance because the additive residual burden is nonnegative. -/
+theorem effectiveTargetOutcomeVariance_ge_targetOutcomeVariance {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    m.targetOutcomeVariance ≤ effectiveTargetOutcomeVariance m := by
+  unfold effectiveTargetOutcomeVariance
+  linarith [irreducibleTargetResidualBurden_nonneg m]
+
+/-- Exact decomposition of the effective target outcome variance into the base
+target scale plus the three named additive residual-loss terms. -/
+theorem effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    effectiveTargetOutcomeVariance m =
+      m.targetOutcomeVariance +
+        brokenTaggingResidual m +
+        ancestrySpecificLDResidual m +
+        sourceSpecificOverfitResidual m := by
+  simp [effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden, add_assoc]
+
+/-- Exact source `R²` under the full source-side driver state. -/
+noncomputable def sourceR2FromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  explainedR2FromMoments
+    (sourcePredictiveCovarianceFromSourceWeights m)
+    (sourceScoreVarianceFromExplicitDrivers m)
+    m.sourceOutcomeVariance
+
+/-- Exact target `R²` under transported source weights and the full target-side
+driver state.
+
+Unlike the deleted scalar model, this depends explicitly on:
+- source and target tag LD,
+- source and target tag-causal alignment,
+- source and target effect vectors,
+- source and target context/environment cross-covariances, and
+- additive irreducible target-side losses from broken tagging,
+  ancestry-specific LD distortion, and source-specific overfit. -/
 noncomputable def targetR2FromSourceWeights {p q : ℕ}
-    (m : MultiLocusTagModel p q) (V_E : ℝ) : ℝ :=
-  targetScoreQuadraticFormFromSource m / (targetScoreQuadraticFormFromSource m + V_E)
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  explainedR2FromMoments
+    (targetPredictiveCovarianceFromSourceWeights m)
+    (targetScoreVarianceFromSourceWeights m)
+    (effectiveTargetOutcomeVariance m)
 
-/-- The target variance term is exactly the target quadratic form `w_S^T Σ_T w_S`. -/
-theorem target_score_quadratic_form_identity {p q : ℕ}
-    (m : MultiLocusTagModel p q) :
-    targetScoreQuadraticFormFromSource m =
-      dotProduct (sourceOLSWeights m) (m.sigmaTagTarget.mulVec (sourceOLSWeights m)) := by
-  simp [targetScoreQuadraticFormFromSource]
+/-- Exact target calibrated Brier coordinate from the full explicit driver
+state. Prevalence enters here, so Brier can change even when the score moments
+are held fixed. -/
+noncomputable def targetCalibratedBrierFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  m.targetPrevalence * (1 - m.targetPrevalence) * (1 - targetR2FromSourceWeights m)
+
+/-- The target score variance is exactly the target quadratic form
+`w_Sᵀ Σ_T w_S`. -/
+theorem target_score_variance_from_source_weights_identity {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    targetScoreVarianceFromSourceWeights m =
+      dotProduct (sourceWeightsFromExplicitDrivers m)
+        (m.sigmaTagTarget.mulVec (sourceWeightsFromExplicitDrivers m)) := by
+  simp [targetScoreVarianceFromSourceWeights]
 
 /-- Ohta-Kimura-style exact LD-correlation decay law across populations:
 correlation decays exponentially with recombination distance and divergence. -/
@@ -763,56 +929,222 @@ theorem ldCorrelationDecay_strictAnti_fst
     mul_lt_mul_of_pos_right hFst h_pos
   linarith
 
-/-- Drift-only transport multiplier on observed signal variance. -/
-noncomputable def alleleFreqTransport (fstSource fstTarget : ℝ) : ℝ :=
-  (1 - fstTarget) / (1 - fstSource)
+/-- Generation-indexed population-genetic parameters that drive explicit
+time-varying portability state. These parameters govern drift, mutation,
+migration, and recombination without compressing transport into source `R²`. -/
+structure GenerationalPopGenParameters where
+  Ne : ℝ
+  μ : ℝ
+  mig : ℝ
+  recomb : ℝ
+  V_A : ℝ
+  Ne_pos : 0 < Ne
+  μ_nonneg : 0 ≤ μ
+  mig_nonneg : 0 ≤ mig
+  recomb_nonneg : 0 ≤ recomb
+  recomb_le_half : recomb ≤ 1 / 2
+  V_A_pos : 0 < V_A
 
-/-- LD-only transport multiplier (tagging transfer). -/
-noncomputable def ldTransport (rhoSource rhoTarget : ℝ) : ℝ :=
-  rhoTarget / rhoSource
+namespace GenerationalPopGenParameters
 
-/-- Total signal transport from source to target decomposes into AF and LD factors. -/
-noncomputable def totalSignalTransport
-    (fstSource fstTarget rhoSource rhoTarget : ℝ) : ℝ :=
-  alleleFreqTransport fstSource fstTarget * ldTransport rhoSource rhoTarget
+/-- Scaled mutation rate `θ = 4Neμ`. -/
+noncomputable def theta (g : GenerationalPopGenParameters) : ℝ :=
+  4 * g.Ne * g.μ
 
-/-- Exact decomposition identity for transport multipliers. -/
-theorem totalSignalTransport_decomposes
-    (fstSource fstTarget rhoSource rhoTarget : ℝ) :
-    totalSignalTransport fstSource fstTarget rhoSource rhoTarget =
-      alleleFreqTransport fstSource fstTarget * ldTransport rhoSource rhoTarget := by
+/-- Scaled migration rate `M = 4Nem`. -/
+noncomputable def bigM (g : GenerationalPopGenParameters) : ℝ :=
+  4 * g.Ne * g.mig
+
+/-- Coalescent time coordinate at generation `t`. -/
+noncomputable def tauAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
+  (t : ℝ) / (2 * g.Ne)
+
+/-- Per-generation heterozygosity retention factor under drift + mutation. -/
+noncomputable def hetDecayFactor (g : GenerationalPopGenParameters) : ℝ :=
+  (1 - 1 / (2 * g.Ne)) * (1 - g.theta / (2 * g.Ne))
+
+/-- Transient differentiation after `t` generations. This is the same
+discrete-time drift/mutation/migration coordinate used in the evolutionary
+layer, but now exposed directly to the mechanistic SNP/LD state. -/
+noncomputable def fstTransientAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
+  (1 / (1 + g.theta + g.bigM)) * (1 - g.hetDecayFactor ^ t)
+
+/-- Mutation-driven retention of shared ancestral variation after `t`
+generations. -/
+noncomputable def mutationSharedRetentionAt
+    (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
+  Real.exp (-g.theta * g.tauAt t)
+
+/-- Migration-driven restoration of shared variation after `t` generations. -/
+noncomputable def migrationSharedBoostAt
+    (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
+  1 + g.bigM * g.tauAt t / (1 + g.bigM)
+
+@[simp] theorem tauAt_zero (g : GenerationalPopGenParameters) :
+    g.tauAt 0 = 0 := by
+  simp [tauAt]
+
+@[simp] theorem fstTransientAt_zero (g : GenerationalPopGenParameters) :
+    g.fstTransientAt 0 = 0 := by
+  simp [fstTransientAt, hetDecayFactor]
+
+@[simp] theorem mutationSharedRetentionAt_zero (g : GenerationalPopGenParameters) :
+    g.mutationSharedRetentionAt 0 = 1 := by
+  simp [mutationSharedRetentionAt, tauAt]
+
+@[simp] theorem migrationSharedBoostAt_zero (g : GenerationalPopGenParameters) :
+    g.migrationSharedBoostAt 0 = 1 := by
+  simp [migrationSharedBoostAt, tauAt, bigM]
+
+end GenerationalPopGenParameters
+
+/-- Allele-frequency mismatch penalty. This penalizes transport when target
+allele frequencies drift away from the source frequencies, even if the source
+score itself is unchanged. -/
+noncomputable def alleleFreqMismatchPenalty (pSource pTarget : ℝ) : ℝ :=
+  Real.exp (-|pTarget - pSource|)
+
+@[simp] theorem alleleFreqMismatchPenalty_self (p : ℝ) :
+    alleleFreqMismatchPenalty p p = 1 := by
+  simp [alleleFreqMismatchPenalty]
+
+/-- Generation-indexed cross-population state. Source quantities are fixed at
+training time; target quantities are explicit functions of generation. The
+time-varying target LD and tagging state is derived from:
+
+- source LD / source tag-causal alignment,
+- recombination and transient `F_ST`,
+- mutation- and migration-driven sharing terms, and
+- explicit target allele-frequency trajectories. -/
+structure CrossPopulationGenerationalModel (p q : ℕ) where
+  popGen : GenerationalPopGenParameters
+  betaSource : Fin q → ℝ
+  betaTargetAt : ℕ → Fin q → ℝ
+  sigmaTagSource : Matrix (Fin p) (Fin p) ℝ
+  sigmaTagCausalSource : Matrix (Fin p) (Fin q) ℝ
+  tagDistance : Matrix (Fin p) (Fin p) ℝ
+  tagCausalDistance : Matrix (Fin p) (Fin q) ℝ
+  tagAlleleFreqSource : Fin p → ℝ
+  tagAlleleFreqTargetAt : ℕ → Fin p → ℝ
+  causalAlleleFreqSource : Fin q → ℝ
+  causalAlleleFreqTargetAt : ℕ → Fin q → ℝ
+  contextCrossSource : Fin p → ℝ
+  contextCrossTargetAt : ℕ → Fin p → ℝ
+  sourceOutcomeVariance : ℝ
+  targetOutcomeVarianceAt : ℕ → ℝ
+  targetPrevalenceAt : ℕ → ℝ
+  sourceOutcomeVariance_pos : 0 < sourceOutcomeVariance
+  targetOutcomeVariance_pos : ∀ t, 0 < targetOutcomeVarianceAt t
+  targetPrevalence_pos : ∀ t, 0 < targetPrevalenceAt t
+  targetPrevalence_lt_one : ∀ t, targetPrevalenceAt t < 1
+
+/-- Per-tag allele-frequency retention at generation `t`. -/
+noncomputable def tagAlleleFreqRetentionAt {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ :=
+  alleleFreqMismatchPenalty (m.tagAlleleFreqSource i) (m.tagAlleleFreqTargetAt t i)
+
+/-- Per-causal-variant allele-frequency retention at generation `t`. -/
+noncomputable def causalAlleleFreqRetentionAt {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ :=
+  alleleFreqMismatchPenalty (m.causalAlleleFreqSource j) (m.causalAlleleFreqTargetAt t j)
+
+/-- Time-varying target LD among scored SNPs. This incorporates recombination,
+drift (`F_ST`), mutation/migration-driven shared variation, and explicit target
+tag-SNP allele-frequency drift. -/
+noncomputable def sigmaTagTargetAt {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
+    Matrix (Fin p) (Fin p) ℝ :=
+  fun i j =>
+    m.sigmaTagSource i j *
+      ldCorrelationDecay (m.tagDistance i j)
+        (m.popGen.fstTransientAt t) m.popGen.recomb *
+      m.popGen.mutationSharedRetentionAt t *
+      m.popGen.migrationSharedBoostAt t *
+      tagAlleleFreqRetentionAt m t i *
+      tagAlleleFreqRetentionAt m t j
+
+/-- Time-varying target tag-to-causal alignment. This is the explicit tagging
+quality surface, driven by LD decay, allele-frequency divergence, mutation,
+migration, and the underlying source tag-causal alignment. -/
+noncomputable def sigmaTagCausalTargetAt {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
+    Matrix (Fin p) (Fin q) ℝ :=
+  fun i j =>
+    m.sigmaTagCausalSource i j *
+      ldCorrelationDecay (m.tagCausalDistance i j)
+        (m.popGen.fstTransientAt t) m.popGen.recomb *
+      m.popGen.mutationSharedRetentionAt t *
+      m.popGen.migrationSharedBoostAt t *
+      tagAlleleFreqRetentionAt m t i *
+      causalAlleleFreqRetentionAt m t j
+
+/-- The static exact metric model obtained by slicing the generational state at
+generation `t`. This is the canonical bridge from explicit population-genetic
+dynamics to deployed metrics. -/
+noncomputable def CrossPopulationGenerationalModel.toMetricModelAt {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
+    CrossPopulationMetricModel p q where
+  betaSource := m.betaSource
+  betaTarget := m.betaTargetAt t
+  sigmaTagSource := m.sigmaTagSource
+  sigmaTagTarget := sigmaTagTargetAt m t
+  sigmaTagCausalSource := m.sigmaTagCausalSource
+  sigmaTagCausalTarget := sigmaTagCausalTargetAt m t
+  contextCrossSource := m.contextCrossSource
+  contextCrossTarget := m.contextCrossTargetAt t
+  sourceOutcomeVariance := m.sourceOutcomeVariance
+  targetOutcomeVariance := m.targetOutcomeVarianceAt t
+  targetPrevalence := m.targetPrevalenceAt t
+  sourceOutcomeVariance_pos := m.sourceOutcomeVariance_pos
+  targetOutcomeVariance_pos := m.targetOutcomeVariance_pos t
+  targetPrevalence_pos := m.targetPrevalence_pos t
+  targetPrevalence_lt_one := m.targetPrevalence_lt_one t
+
+/-- Exact target `R²` after `t` generations under the full time-varying
+mechanistic state. -/
+noncomputable def targetR2AtGeneration {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
+  targetR2FromSourceWeights (m.toMetricModelAt t)
+
+/-- Exact target calibrated Brier coordinate after `t` generations. -/
+noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
+  targetCalibratedBrierFromSourceWeights (m.toMetricModelAt t)
+
+@[simp] theorem sigmaTagTargetAt_uses_ld_af_mutation_migration {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) :
+    sigmaTagTargetAt m t i j =
+      m.sigmaTagSource i j *
+        ldCorrelationDecay (m.tagDistance i j)
+          (m.popGen.fstTransientAt t) m.popGen.recomb *
+        m.popGen.mutationSharedRetentionAt t *
+        m.popGen.migrationSharedBoostAt t *
+        tagAlleleFreqRetentionAt m t i *
+        tagAlleleFreqRetentionAt m t j := by
   rfl
 
-/-- Exact AF-only transport loss, defined as one minus the AF transport
-    multiplier. -/
-noncomputable def afTransportLoss (fstSource fstTarget : ℝ) : ℝ :=
-  1 - alleleFreqTransport fstSource fstTarget
-
-/-- Exact LD-only transport loss, defined as one minus the LD transport
-    multiplier. -/
-noncomputable def ldTransportLoss (rhoSource rhoTarget : ℝ) : ℝ :=
-  1 - ldTransport rhoSource rhoTarget
-
-/-- Exact joint transport loss decomposes additively into AF and LD parts. -/
-noncomputable def jointTransportLoss
-    (fstSource fstTarget rhoSource rhoTarget : ℝ) : ℝ :=
-  afTransportLoss fstSource fstTarget + ldTransportLoss rhoSource rhoTarget
-
-/-- AF+LD decomposition identity. -/
-theorem jointTransportLoss_decomposes
-    (fstSource fstTarget rhoSource rhoTarget : ℝ) :
-    jointTransportLoss fstSource fstTarget rhoSource rhoTarget =
-      afTransportLoss fstSource fstTarget + ldTransportLoss rhoSource rhoTarget := by
+@[simp] theorem sigmaTagCausalTargetAt_uses_ld_tagging_af_mutation_migration {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
+    sigmaTagCausalTargetAt m t i j =
+      m.sigmaTagCausalSource i j *
+        ldCorrelationDecay (m.tagCausalDistance i j)
+          (m.popGen.fstTransientAt t) m.popGen.recomb *
+        m.popGen.mutationSharedRetentionAt t *
+        m.popGen.migrationSharedBoostAt t *
+        tagAlleleFreqRetentionAt m t i *
+        causalAlleleFreqRetentionAt m t j := by
   rfl
 
-/-- LD dominance criterion: if LD loss exceeds AF loss, joint loss is strictly closer to LD. -/
-theorem ld_strictly_dominates_af_in_joint_loss
-    (fstSource fstTarget rhoSource rhoTarget : ℝ)
-    (hDom : afTransportLoss fstSource fstTarget < ldTransportLoss rhoSource rhoTarget) :
-    jointTransportLoss fstSource fstTarget rhoSource rhoTarget >
-      2 * afTransportLoss fstSource fstTarget := by
-  unfold jointTransportLoss
-  linarith
+@[simp] theorem targetR2AtGeneration_eq_targetR2From_slice {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
+    targetR2AtGeneration m t = targetR2FromSourceWeights (m.toMetricModelAt t) := by
+  rfl
+
+@[simp] theorem targetCalibratedBrierAtGeneration_eq_slice {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
+    targetCalibratedBrierAtGeneration m t =
+      targetCalibratedBrierFromSourceWeights (m.toMetricModelAt t) := by
+  rfl
 
 /-- With any imperfect source tagging (`ρS > 0`), worsening target tagging (`ρT < ρS`)
 strictly lowers portability when drift terms are fixed. -/
@@ -941,37 +1273,24 @@ theorem portability_ratio_lt_one_of_positive_drift
   exact portability_ratio_lt_one_of_drop (presentDayR2 V_A V_E fstS)
     (presentDayR2 V_A V_E fstT) hsrc_pos hdrop
 
-/-- Exact recovery of present-day signal-to-noise from the literal present-day
-    source `R²` in the core drift model. This is only a coordinate identity
-    for the fixed residual scale, not a biological transport theorem. -/
-theorem snrFromR2_eq_presentDaySignalToNoise
-    (V_A V_E fst : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst_lt_one : fst < 1) :
-    snrFromR2 (presentDayR2 V_A V_E fst) =
-      presentDaySignalToNoise V_A V_E fst := by
-  have hv_pos : 0 < presentDayPGSVariance V_A fst := by
-    unfold presentDayPGSVariance
-    have h_one_minus : 0 < 1 - fst := by linarith
-    exact mul_pos h_one_minus hVA
-  have hsum_ne : presentDayPGSVariance V_A fst + V_E ≠ 0 := by
-    linarith
-  unfold snrFromR2 presentDayR2 presentDaySignalToNoise
-  field_simp [hsum_ne, ne_of_gt hVE]
-  ring
+/-- Neutral allele-frequency benchmark `R²`.
 
-/-- Present-day target `R²` from explicit drift state. -/
-noncomputable def targetR2FromDriftState
+This section is intentionally limited to the coarse heterozygosity/F_ST chart.
+It is a neutral allele-frequency benchmark, not a mechanistic cross-population
+portability law. Claims about deployed portability must instead use the
+explicit SNP/LD/alignment state in `CrossPopulationMetricModel`. -/
+noncomputable def targetR2FromNeutralAFBenchmark
     (V_A V_E fstTarget : ℝ) : ℝ :=
   presentDayR2 V_A V_E fstTarget
 
-/-- Drift-state portability theorem: target/source `R²` ratio is strictly below `1`. -/
-theorem portability_ratio_from_drift_state
+/-- Within the neutral allele-frequency benchmark, the target/source `R²` ratio
+is strictly below `1` when target `F_ST` exceeds source `F_ST`. -/
+theorem neutralAFBenchmarkRatio_from_state
     (V_A V_E fstSource fstTarget : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    targetR2FromDriftState V_A V_E fstTarget / presentDayR2 V_A V_E fstSource < 1 := by
+    targetR2FromNeutralAFBenchmark V_A V_E fstTarget / presentDayR2 V_A V_E fstSource < 1 := by
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstSource := by
     unfold presentDayR2
     have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
@@ -979,32 +1298,37 @@ theorem portability_ratio_from_drift_state
       have h_one_minus : 0 < 1 - fstSource := by linarith [h_fst_bounds.2, h_fst]
       exact mul_pos h_one_minus hVA
     exact div_pos hv_pos (by linarith)
-  have hdrop : targetR2FromDriftState V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
-    simpa [targetR2FromDriftState] using
+  have hdrop :
+      targetR2FromNeutralAFBenchmark V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
+    simpa [targetR2FromNeutralAFBenchmark] using
       drift_degrades_R2 V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
   exact portability_ratio_lt_one_of_drop
     (presentDayR2 V_A V_E fstSource)
-    (targetR2FromDriftState V_A V_E fstTarget)
+    (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)
     hsrc_pos hdrop
 
-/-- Drift-state strict `R²` drop: target `R²` is below source `R²`. -/
-theorem targetR2_lt_source_from_drift_state
+/-- Within the neutral allele-frequency benchmark, target `R²` is below source
+`R²` once target `F_ST` exceeds source `F_ST`. -/
+theorem targetR2_lt_source_from_neutralAF_benchmark
     (V_A V_E fstSource fstTarget : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    targetR2FromDriftState V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
-  simpa [targetR2FromDriftState] using
+    targetR2FromNeutralAFBenchmark V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
+  simpa [targetR2FromNeutralAFBenchmark] using
     drift_degrades_R2 V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
 
-/-- Drift transport ratio from observable source/target `F_ST`. -/
-noncomputable def driftTransportRatio (fstSource fstTarget : ℝ) : ℝ :=
-  (PortabilityFactor.neutralDrift fstSource fstTarget).value
+/-- Neutral allele-frequency benchmark ratio from observable source/target
+`F_ST`. This is a coarse heterozygosity benchmark only, not a mechanistic law
+for cross-population tagging fidelity. -/
+noncomputable def neutralAFBenchmarkRatio (fstSource fstTarget : ℝ) : ℝ :=
+  (1 - fstTarget) / (1 - fstSource)
 
-/-- The drift-state target `R²` is definitionally the literal present-day target `R²`. -/
-theorem targetR2FromDriftState_eq_presentDayR2
+/-- The neutral allele-frequency benchmark target `R²` is definitionally the
+literal present-day target `R²` in this coarse chart. -/
+theorem targetR2FromNeutralAFBenchmark_eq_presentDayR2
     (V_A V_E fstTarget : ℝ) :
-    targetR2FromDriftState V_A V_E fstTarget =
+    targetR2FromNeutralAFBenchmark V_A V_E fstTarget =
       presentDayR2 V_A V_E fstTarget := by
   rfl
 
@@ -1023,15 +1347,16 @@ explained-risk coordinates. -/
 abbrev brierFromR2 (π r2 : ℝ) : ℝ :=
   exactCalibratedBrierRiskFromR2 π r2
 
-/-- Exact target AUC from explicit drift state. -/
-noncomputable def targetAUCFromDriftState
+/-- Exact target AUC from the neutral allele-frequency benchmark state. -/
+noncomputable def targetAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget : ℝ) : ℝ :=
   presentDayAUC V_A V_E fstTarget
 
-/-- The drift-state target AUC is definitionally the literal present-day AUC. -/
-theorem targetAUCFromDriftState_eq_presentDayAUC
+/-- The neutral allele-frequency benchmark target AUC is definitionally the
+literal present-day AUC in this coarse chart. -/
+theorem targetAUCFromNeutralAFBenchmark_eq_presentDayAUC
     (V_A V_E fstTarget : ℝ) :
-    targetAUCFromDriftState V_A V_E fstTarget =
+    targetAUCFromNeutralAFBenchmark V_A V_E fstTarget =
       presentDayAUC V_A V_E fstTarget := by
   rfl
 
@@ -1052,36 +1377,38 @@ explicit target state. -/
 noncomputable def targetExactCalibratedBrierRisk
     (π V_A V_E fstTarget : ℝ) : ℝ :=
   exactCalibratedBrierRiskFromR2 π
-    (targetR2FromDriftState V_A V_E fstTarget)
+    (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)
 
-/-- Drift-state target Brier map used by the dashboard (`Brier(R²_target)`). -/
-noncomputable def targetBrierFromDriftState
+/-- Neutral allele-frequency benchmark target Brier map used by the dashboard
+(`Brier(R²_target)`). -/
+noncomputable def targetBrierFromNeutralAFBenchmark
     (π V_A V_E fstTarget : ℝ) : ℝ :=
   targetExactCalibratedBrierRisk π V_A V_E fstTarget
 
-/-- Canonical bundled deployed metrics under the explicit drift state. -/
-noncomputable def driftMetricProfile
+/-- Canonical bundled deployed metrics under the neutral allele-frequency
+benchmark state. -/
+noncomputable def neutralAFBenchmarkMetricProfile
     (π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile :=
   TransportedMetrics.profileFromSignalVariance π V_E (presentDayPGSVariance V_A fstTarget)
 
-/-- The bundled drift-state metrics reproduce the file's public
+/-- The bundled neutral allele-frequency benchmark metrics reproduce the file's public
 `R²`, AUC, and Brier surfaces exactly. -/
-theorem driftMetricProfile_eq
+theorem neutralAFBenchmarkMetricProfile_eq
     (π V_A V_E fstTarget : ℝ) :
-    driftMetricProfile π V_A V_E fstTarget =
-      { r2 := targetR2FromDriftState V_A V_E fstTarget
-      , auc := targetAUCFromDriftState V_A V_E fstTarget
-      , brier := targetBrierFromDriftState π V_A V_E fstTarget } := by
+    neutralAFBenchmarkMetricProfile π V_A V_E fstTarget =
+      { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
+      , auc := targetAUCFromNeutralAFBenchmark V_A V_E fstTarget
+      , brier := targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget } := by
   ext
   · change
       TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
-        targetR2FromDriftState V_A V_E fstTarget
-    unfold targetR2FromDriftState TransportedMetrics.r2FromSignalVariance presentDayR2
+        targetR2FromNeutralAFBenchmark V_A V_E fstTarget
+    unfold targetR2FromNeutralAFBenchmark TransportedMetrics.r2FromSignalVariance presentDayR2
     rfl
   · change
       TransportedMetrics.aucFromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
-        targetAUCFromDriftState V_A V_E fstTarget
-    unfold targetAUCFromDriftState TransportedMetrics.aucFromSignalVariance
+        targetAUCFromNeutralAFBenchmark V_A V_E fstTarget
+    unfold targetAUCFromNeutralAFBenchmark TransportedMetrics.aucFromSignalVariance
       presentDayAUC presentDaySignalToNoise
     congr 1
     congr 1
@@ -1089,31 +1416,32 @@ theorem driftMetricProfile_eq
   · change
       TransportedMetrics.calibratedBrier π
         (TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E) =
-        targetBrierFromDriftState π V_A V_E fstTarget
-    unfold targetBrierFromDriftState targetExactCalibratedBrierRisk
-      exactCalibratedBrierRiskFromR2 targetR2FromDriftState
+        targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget
+    unfold targetBrierFromNeutralAFBenchmark targetExactCalibratedBrierRisk
+      exactCalibratedBrierRiskFromR2 targetR2FromNeutralAFBenchmark
       TransportedMetrics.calibratedBrier TransportedMetrics.r2FromSignalVariance
       presentDayR2
     rfl
 
-/-- Exact drift-state target AUC is definitionally the literal present-day AUC. -/
-@[simp] theorem targetAUCFromDriftState_eq
+/-- Exact neutral allele-frequency benchmark target AUC is definitionally the
+literal present-day AUC. -/
+@[simp] theorem targetAUCFromNeutralAFBenchmark_eq
     (V_A V_E fstTarget : ℝ) :
-    targetAUCFromDriftState V_A V_E fstTarget =
+    targetAUCFromNeutralAFBenchmark V_A V_E fstTarget =
       presentDayAUC V_A V_E fstTarget := by
   rfl
 
-/-- Full drift-state AUC degradation theorem:
+/-- Full neutral allele-frequency benchmark AUC degradation theorem:
 strictly higher drift implies strictly lower exact target AUC. -/
-theorem targetAUC_lt_source_of_drift_state
+theorem targetAUC_lt_source_of_neutralAF_benchmark
     (V_A V_E fstSource fstTarget : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetAUCFromDriftState V_A V_E fstTarget <
+    targetAUCFromNeutralAFBenchmark V_A V_E fstTarget <
       presentDayAUC V_A V_E fstSource := by
-  simpa [targetAUCFromDriftState] using
+  simpa [targetAUCFromNeutralAFBenchmark] using
     drift_degrades_AUC_of_strictMono
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
@@ -1145,49 +1473,112 @@ theorem liabilityAUCFromSNR_strictMonoOn_nonneg
   have hxy2 : x / 2 < y / 2 := by nlinarith
   exact Real.sqrt_lt_sqrt hx2 hxy2
 
-/-- Exact source liability-threshold AUC under the equal-variance Gaussian
-liability model, written in the `R²` chart coordinate. -/
-noncomputable def sourceExactLiabilityAUC (r2Source : ℝ) : ℝ :=
-  liabilityAUCFromSNR (snrFromR2 r2Source)
+/-- Exact liability-threshold AUC as a direct chart map on an already-specified
+deployed `R²`.
 
-/-- Exact target liability-threshold AUC under drift transport in the
+This is not a transport law and does not recover a latent biological signal
+from source `R²`; it is just the closed-form coordinate map induced by the
 equal-variance Gaussian liability model. -/
-noncomputable def targetExactLiabilityAUC
-    (V_A V_E fstTarget : ℝ) : ℝ :=
-  targetAUCFromDriftState V_A V_E fstTarget
+noncomputable def liabilityAUCFromExplainedR2 (r2 : ℝ) : ℝ :=
+  Phi (Real.sqrt (r2 / (2 * (1 - r2))))
 
-/-- The `R²`-chart source liability AUC agrees with the literal present-day
-    liability AUC when the source `R²` comes from the same drift model. -/
-theorem sourceExactLiabilityAUC_eq_presentDayAUC
+/-- On valid deployed `R²` values, the liability-threshold AUC chart is strictly
+increasing whenever `Phi` is strictly increasing. -/
+theorem liabilityAUCFromExplainedR2_strictMonoOn_unitInterval
+    (hPhiStrict : StrictMono Phi) :
+    StrictMonoOn liabilityAUCFromExplainedR2 (Set.Ico 0 1) := by
+  intro x hx y hy hxy
+  unfold liabilityAUCFromExplainedR2
+  apply hPhiStrict
+  have hx_one_sub : 0 < 1 - x := by linarith [hx.2]
+  have hy_one_sub : 0 < 1 - y := by linarith [hy.2]
+  have hx_den : 0 < 2 * (1 - x) := by
+    exact mul_pos (by norm_num) hx_one_sub
+  have hy_den : 0 < 2 * (1 - y) := by
+    exact mul_pos (by norm_num) hy_one_sub
+  have hx_arg_nonneg : 0 ≤ x / (2 * (1 - x)) := by
+    exact div_nonneg hx.1 (le_of_lt hx_den)
+  have harg_lt : x / (2 * (1 - x)) < y / (2 * (1 - y)) := by
+    rw [div_lt_div_iff₀ hx_den hy_den]
+    nlinarith
+  exact Real.sqrt_lt_sqrt hx_arg_nonneg harg_lt
+
+/-- Liability-threshold AUC coordinate induced by the full explicit
+cross-population driver state.
+
+Under the equal-variance Gaussian liability coordinate map, AUC changes
+whenever the explicit target `R²` changes; the upstream drivers are therefore
+exactly the fields of `CrossPopulationMetricModel`, not a scalar source `R²`
+summary. -/
+noncomputable def targetLiabilityAUCFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  liabilityAUCFromExplainedR2 (targetR2FromSourceWeights m)
+
+/-- Exact liability-threshold AUC after `t` generations under the full
+time-varying mechanistic state. -/
+noncomputable def targetLiabilityAUCAtGeneration {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
+  targetLiabilityAUCFromSourceWeights (m.toMetricModelAt t)
+
+@[simp] theorem targetLiabilityAUCAtGeneration_eq_slice {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
+    targetLiabilityAUCAtGeneration m t =
+      targetLiabilityAUCFromSourceWeights (m.toMetricModelAt t) := by
+  rfl
+
+/-- Exact target liability-threshold AUC under the neutral allele-frequency
+benchmark in the equal-variance Gaussian liability model. -/
+noncomputable def targetExactLiabilityAUCFromNeutralAFBenchmark
+    (V_A V_E fstTarget : ℝ) : ℝ :=
+  targetAUCFromNeutralAFBenchmark V_A V_E fstTarget
+
+/-- The direct `R²`-chart liability AUC agrees with the literal present-day
+liability AUC when the deployed `R²` comes from the same neutral benchmark
+chart. -/
+theorem liabilityAUCFromExplainedR2_eq_presentDayAUC
     (V_A V_E fst : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst_lt_one : fst < 1) :
-    sourceExactLiabilityAUC (presentDayR2 V_A V_E fst) =
+    liabilityAUCFromExplainedR2 (presentDayR2 V_A V_E fst) =
       presentDayAUC V_A V_E fst := by
-  unfold sourceExactLiabilityAUC liabilityAUCFromSNR presentDayAUC
-  rw [snrFromR2_eq_presentDaySignalToNoise V_A V_E fst hVA hVE hfst_lt_one]
+  have hv_pos : 0 < presentDayPGSVariance V_A fst := by
+    unfold presentDayPGSVariance
+    have h_one_minus : 0 < 1 - fst := by linarith
+    exact mul_pos h_one_minus hVA
+  have hsum_ne : presentDayPGSVariance V_A fst + V_E ≠ 0 := by
+    linarith
+  have hve_ne : V_E ≠ 0 := ne_of_gt hVE
+  have hchart :
+      presentDayR2 V_A V_E fst / (2 * (1 - presentDayR2 V_A V_E fst)) =
+        presentDaySignalToNoise V_A V_E fst / 2 := by
+    unfold presentDayR2 presentDaySignalToNoise
+    field_simp [hsum_ne, hve_ne]
+    ring
+  unfold liabilityAUCFromExplainedR2 presentDayAUC
+  rw [hchart]
 
-/-- Full drift-state liability-AUC degradation theorem (exact LTM formula):
-if drift increases (`fstTarget > fstSource`), target AUC is strictly lower than source AUC. -/
-theorem targetLiabilityAUC_lt_source_of_drift_state
+/-- Full neutral allele-frequency benchmark liability-AUC degradation theorem
+(exact LTM formula): if drift increases (`fstTarget > fstSource`), target AUC
+is strictly lower than source AUC within this benchmark. -/
+theorem targetLiabilityAUC_lt_source_of_neutralAF_benchmark
     (V_A V_E fstSource fstTarget : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetExactLiabilityAUC V_A V_E fstTarget <
+    targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget <
       presentDayLiabilityAUC V_A V_E fstSource := by
-  simpa [targetExactLiabilityAUC] using
+  simpa [targetExactLiabilityAUCFromNeutralAFBenchmark] using
     drift_degrades_liabilityAUC
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
 /-- The exact target calibrated Brier risk is `exactCalibratedBrierRiskFromR2`
 evaluated at the explicit target `R²` by definition. -/
-@[simp] theorem targetBrierFromDriftState_eq
+@[simp] theorem targetBrierFromNeutralAFBenchmark_eq
     (π V_A V_E fstTarget : ℝ) :
     targetExactCalibratedBrierRisk π V_A V_E fstTarget =
       exactCalibratedBrierRiskFromR2 π
-        (targetR2FromDriftState V_A V_E fstTarget) := by
+        (targetR2FromNeutralAFBenchmark V_A V_E fstTarget) := by
   rfl
 
 /-- Exact calibrated Bernoulli Brier risk from prevalence and explained-risk
@@ -1235,26 +1626,28 @@ theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
             unfold exactCalibratedBrierRiskFromR2
             ring
 
-/-- Full drift-state Brier degradation theorem:
-if target `R²` drops and `0 ≤ π ≤ 1`, target Brier is at least source Brier. -/
-theorem targetBrier_ge_source_of_drift_state
+/-- Full neutral allele-frequency benchmark Brier degradation theorem: if
+target `R²` drops and `0 ≤ π ≤ 1`, target Brier is at least source Brier
+within this benchmark. -/
+theorem targetBrier_ge_source_of_neutralAF_benchmark
     (π V_A V_E fstSource fstTarget : ℝ)
     (h_pi : 0 ≤ π ∧ π ≤ 1)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
     sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) ≤
-      targetBrierFromDriftState π V_A V_E fstTarget := by
+      targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget := by
   rcases h_pi with ⟨hpi0, hpi1⟩
   have hr2_drop :
-      targetR2FromDriftState V_A V_E fstTarget < presentDayR2 V_A V_E fstSource :=
-    targetR2_lt_source_from_drift_state V_A V_E fstSource fstTarget
+      targetR2FromNeutralAFBenchmark V_A V_E fstTarget < presentDayR2 V_A V_E fstSource :=
+    targetR2_lt_source_from_neutralAF_benchmark V_A V_E fstSource fstTarget
       hVA hVE h_fst h_fst_bounds
   have hcoef_nonneg : 0 ≤ π * (1 - π) := by nlinarith
-  unfold sourceBrierFromR2 targetBrierFromDriftState
+  unfold sourceBrierFromR2 targetBrierFromNeutralAFBenchmark
     targetExactCalibratedBrierRisk exactCalibratedBrierRiskFromR2
   have hbase :
-      1 - presentDayR2 V_A V_E fstSource ≤ 1 - targetR2FromDriftState V_A V_E fstTarget := by
+      1 - presentDayR2 V_A V_E fstSource ≤
+        1 - targetR2FromNeutralAFBenchmark V_A V_E fstTarget := by
     linarith
   exact mul_le_mul_of_nonneg_left hbase hcoef_nonneg
 
@@ -1306,34 +1699,36 @@ theorem logLossRegretRatio_eq_kl_ratio (η qSource qTarget : ℝ)
   rw [logLossRegretPoint_eq_kl η qTarget hη0 hη1 hqT0 hqT1,
     logLossRegretPoint_eq_kl η qSource hη0 hη1 hqS0 hqS1]
 
-/-- Drift transport ratio is nonneg when both drifts are below 1. -/
-theorem driftTransportRatio_nonneg
+/-- Neutral allele-frequency benchmark ratio is nonnegative when both `F_ST`
+values are at most `1`. -/
+theorem neutralAFBenchmarkRatio_nonneg
     (fstSource fstTarget : ℝ)
     (hS : fstSource < 1) (hT : fstTarget ≤ 1) :
-    0 ≤ driftTransportRatio fstSource fstTarget := by
-  simp [driftTransportRatio, PortabilityFactor.neutralDrift, PortabilityFactor.value]
+    0 ≤ neutralAFBenchmarkRatio fstSource fstTarget := by
+  simp [neutralAFBenchmarkRatio]
   exact div_nonneg (by linarith) (by linarith)
 
-/-- Drift transport ratio is strictly below 1 when target has more drift. -/
-theorem driftTransportRatio_lt_one
+/-- Neutral allele-frequency benchmark ratio is strictly below `1` when target
+has more drift. -/
+theorem neutralAFBenchmarkRatio_lt_one
     (fstSource fstTarget : ℝ)
     (hS : fstSource < 1)
     (hfst : fstSource < fstTarget) :
-    driftTransportRatio fstSource fstTarget < 1 := by
-  simp [driftTransportRatio, PortabilityFactor.neutralDrift, PortabilityFactor.value]
+    neutralAFBenchmarkRatio fstSource fstTarget < 1 := by
+  simp [neutralAFBenchmarkRatio]
   rw [div_lt_one (by linarith : (0 : ℝ) < 1 - fstSource)]
   linarith
 
-/-- At zero divergence, drift transport ratio equals 1 (no signal loss). -/
-@[simp] theorem driftTransportRatio_self (fst : ℝ) (hfst : fst < 1) :
-    driftTransportRatio fst fst = 1 := by
-  simp [driftTransportRatio, PortabilityFactor.neutralDrift, PortabilityFactor.value]
+/-- At zero divergence, the neutral allele-frequency benchmark ratio equals `1`. -/
+@[simp] theorem neutralAFBenchmarkRatio_self (fst : ℝ) (hfst : fst < 1) :
+    neutralAFBenchmarkRatio fst fst = 1 := by
+  simp [neutralAFBenchmarkRatio]
   exact div_self (by linarith : (1 : ℝ) - fst ≠ 0)
 
-/-- At zero divergence, the drift-state target `R²` is the literal present-day
-`R²` evaluated at the same population state. -/
-theorem targetR2FromDriftState_self (V_A V_E fst : ℝ) :
-    targetR2FromDriftState V_A V_E fst = presentDayR2 V_A V_E fst := by
+/-- At zero divergence, the neutral allele-frequency benchmark target `R²` is
+the literal present-day `R²` evaluated at the same population state. -/
+theorem targetR2FromNeutralAFBenchmark_self (V_A V_E fst : ℝ) :
+    targetR2FromNeutralAFBenchmark V_A V_E fst = presentDayR2 V_A V_E fst := by
   rfl
 
 /-- For valid prevalence `0 < π < 1`, the linear Brier approximation `π(1-π)(1-R²)`
@@ -1346,20 +1741,21 @@ theorem brierFromR2_strictAnti (π : ℝ) (hπ0 : 0 < π) (hπ1 : π < 1) :
   have hdrop : 1 - r2b < 1 - r2a := by linarith
   exact mul_lt_mul_of_pos_left hdrop hcoef
 
-/-- Strict Brier degradation: under positive drift and non-degenerate prevalence,
-target Brier is strictly worse than source Brier. -/
-theorem targetBrier_strict_gt_source_of_drift_state
+/-- Strict neutral allele-frequency benchmark Brier degradation: under
+positive drift and non-degenerate prevalence, target Brier is strictly worse
+than source Brier within this benchmark. -/
+theorem targetBrier_strict_gt_source_of_neutralAF_benchmark
     (π V_A V_E fstSource fstTarget : ℝ)
     (hπ0 : 0 < π) (hπ1 : π < 1)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
     sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
-      targetBrierFromDriftState π V_A V_E fstTarget := by
+      targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget := by
   have hr2_drop :=
-    targetR2_lt_source_from_drift_state V_A V_E fstSource fstTarget
+    targetR2_lt_source_from_neutralAF_benchmark V_A V_E fstSource fstTarget
       hVA hVE h_fst h_fst_bounds
-  unfold sourceBrierFromR2 targetBrierFromDriftState
+  unfold sourceBrierFromR2 targetBrierFromNeutralAFBenchmark
   exact brierFromR2_strictAnti π hπ0 hπ1 hr2_drop
 
 /-- Squared mean PGS difference under the pure split model. -/
@@ -1716,32 +2112,32 @@ theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
     (presentDayPGSVariance V_A fst_drift)
     hVE h_md_nonneg h_sig_lt
 
-/-- **Mutation-drift transport ratio.**
-    The generalized transport ratio includes both allele frequency divergence
-    and LD tagging decay from mutation. -/
-noncomputable def mutationDriftTransportRatio
+/-- Scalar neutral benchmark that combines allele-frequency retention with a
+shared-LD retention coordinate. This remains a coarse benchmark, not a
+mechanistic SNP-level transport law. -/
+noncomputable def neutralAFSharedLDBenchmarkRatio
     (fstSource fstTarget shared_ld_source shared_ld_target : ℝ) : ℝ :=
   ((1 - fstTarget) * shared_ld_target) / ((1 - fstSource) * shared_ld_source)
 
-/-- Mutation-drift transport ratio reduces to drift transport ratio when LD is perfect. -/
-theorem mutationDriftTransportRatio_pure_drift (fstSource fstTarget : ℝ) :
-    mutationDriftTransportRatio fstSource fstTarget 1 1 =
-      driftTransportRatio fstSource fstTarget := by
-  unfold mutationDriftTransportRatio driftTransportRatio
-  simp [PortabilityFactor.neutralDrift, PortabilityFactor.value]
+/-- The shared-LD benchmark reduces to the neutral allele-frequency benchmark
+when shared LD is perfect in both populations. -/
+theorem neutralAFSharedLDBenchmarkRatio_pure_drift (fstSource fstTarget : ℝ) :
+    neutralAFSharedLDBenchmarkRatio fstSource fstTarget 1 1 =
+      neutralAFBenchmarkRatio fstSource fstTarget := by
+  unfold neutralAFSharedLDBenchmarkRatio neutralAFBenchmarkRatio
+  ring
 
-/-- **Mutation-drift transport ratio is below drift-only transport ratio**
-    when target shared LD is worse than source shared LD. -/
-theorem mutationDrift_transport_lt_drift_transport
+/-- The shared-LD benchmark is below the pure neutral allele-frequency
+benchmark when target shared LD is worse than source shared LD. -/
+theorem neutralAFSharedLDBenchmarkRatio_lt_neutralAFBenchmarkRatio
     (fstSource fstTarget shared_ld_source shared_ld_target : ℝ)
     (hfstS : fstSource < 1) (hfstT : fstTarget < 1)
     (hldS : 0 < shared_ld_source) (_hldS_le : shared_ld_source ≤ 1)
     (_hldT : 0 < shared_ld_target)
     (hld_decay : shared_ld_target / shared_ld_source < 1) :
-    mutationDriftTransportRatio fstSource fstTarget shared_ld_source shared_ld_target <
-      driftTransportRatio fstSource fstTarget := by
-  unfold mutationDriftTransportRatio driftTransportRatio
-  simp [PortabilityFactor.neutralDrift, PortabilityFactor.value]
+    neutralAFSharedLDBenchmarkRatio fstSource fstTarget shared_ld_source shared_ld_target <
+      neutralAFBenchmarkRatio fstSource fstTarget := by
+  unfold neutralAFSharedLDBenchmarkRatio neutralAFBenchmarkRatio
   have h1 : 0 < 1 - fstSource := by linarith
   have h_den_pos : 0 < (1 - fstSource) * shared_ld_source := mul_pos h1 hldS
   rw [div_lt_div_iff₀ h_den_pos h1]
@@ -1795,11 +2191,11 @@ theorem equilibrium_drift_component_improves_with_theta
     nlinarith
   exact mul_lt_mul_of_pos_right h_ratio_lt hVA
 
-/-- **Pure drift model overestimates portability.**
-    The drift-only model (which sets `negligibleMutation` = True) always
-    overestimates signal retention compared to the mutation-drift model.
+/-- **Pure drift benchmark overestimates retained variance.**
+    The drift-only benchmark (which sets `negligibleMutation` = True) always
+    overestimates retained variance compared to the mutation-drift model.
     This theorem quantifies the gap: the ratio of mutation-drift variance
-    to drift-only variance is exactly shared_ld. -/
+    to drift-only variance is exactly `shared_ld`. -/
 theorem mutationDrift_variance_ratio (V_A fst shared_ld : ℝ)
     (hVA : 0 < V_A) (hfst : fst < 1)
     (hld : 0 < shared_ld) :
@@ -1811,10 +2207,11 @@ theorem mutationDrift_variance_ratio (V_A fst shared_ld : ℝ)
   have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
   field_simp [hfst_ne, hVA_ne]
 
-/-- **Correction factor for the drift-only model.**
-    To convert drift-only portability predictions to mutation-drift predictions,
-    multiply by the shared LD fraction. This gives the exact correction. -/
-theorem portability_correction_factor (V_A V_E fst_target shared_ld : ℝ)
+/-- **Correction factor for the drift-only benchmark.**
+    To convert drift-only neutral-benchmark predictions to mutation-drift
+    predictions, multiply by the shared LD fraction. This gives the exact
+    correction. -/
+theorem neutral_af_benchmark_correction_factor (V_A V_E fst_target shared_ld : ℝ)
     (_hVA : 0 < V_A) (_hVE : 0 < V_E)
     (_hfst : 0 ≤ fst_target) (_hfst_lt : fst_target < 1)
     (_hld : 0 < shared_ld) (_hld_le : shared_ld ≤ 1) :
@@ -2483,59 +2880,61 @@ noncomputable def fstMigDriftEquilFull (Ne m : ℝ) : ℝ :=
   let b := 1 / (2 * Ne)
   b / (1 - a + b)
 
-/-! ### 7. Migration-to-portability connection derived from the recurrence -/
+/-! ### 7. Migration-to-neutral-benchmark connection derived from the recurrence -/
 
-/-- **Portability ratio from the derived Fst formula.**
-    The portability ratio is 1 - Fst = 1 - 1/(4Nm + 1) = 4Nm/(4Nm + 1).
-    This shows portability is directly determined by scaled migration 4Nm. -/
-noncomputable def portabilityFromRecurrence (Ne m : ℝ) : ℝ :=
+/-- **Neutral allele-frequency benchmark ratio from the derived Fst formula.**
+    The benchmark ratio is `1 - Fst = 1 - 1/(4Nm + 1) = 4Nm/(4Nm + 1)`.
+    This is still only the recurrence's coarse allele-frequency benchmark,
+    not a mechanistic portability law. -/
+noncomputable def neutralAFBenchmarkFromRecurrence (Ne m : ℝ) : ℝ :=
   1 - fstMigDriftEquil Ne m
 
-/-- Portability ratio equals 4Nm / (4Nm + 1). -/
-theorem portabilityFromRecurrence_eq (Ne m : ℝ)
+/-- The recurrence-derived neutral allele-frequency benchmark equals
+`4Nm / (4Nm + 1)`. -/
+theorem neutralAFBenchmarkFromRecurrence_eq (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    portabilityFromRecurrence Ne m = 4 * Ne * m / (4 * Ne * m + 1) := by
-  unfold portabilityFromRecurrence fstMigDriftEquil
+    neutralAFBenchmarkFromRecurrence Ne m = 4 * Ne * m / (4 * Ne * m + 1) := by
+  unfold neutralAFBenchmarkFromRecurrence fstMigDriftEquil
   have hden : 4 * Ne * m + 1 ≠ 0 := by nlinarith
   field_simp [hden]
   ring_nf
 
-/-- **Portability increases with migration rate.**
-    From the derived formula portability = 4Nm/(4Nm+1), increasing m
-    increases the ratio. This connects the recurrence derivation to
-    the portability prediction. -/
-theorem portabilityFromRecurrence_increasing_in_m (Ne m₁ m₂ : ℝ)
+/-- **The recurrence-derived neutral benchmark improves with migration rate.**
+    From the derived formula `4Nm/(4Nm+1)`, increasing `m` increases the
+    recurrence-derived benchmark ratio. -/
+theorem neutralAFBenchmarkFromRecurrence_increasing_in_m (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
     (h_more : m₁ < m₂) :
-    portabilityFromRecurrence Ne m₁ < portabilityFromRecurrence Ne m₂ := by
-  rw [portabilityFromRecurrence_eq Ne m₁ hNe (le_of_lt hm₁),
-      portabilityFromRecurrence_eq Ne m₂ hNe (le_of_lt hm₂)]
+    neutralAFBenchmarkFromRecurrence Ne m₁ < neutralAFBenchmarkFromRecurrence Ne m₂ := by
+  rw [neutralAFBenchmarkFromRecurrence_eq Ne m₁ hNe (le_of_lt hm₁),
+      neutralAFBenchmarkFromRecurrence_eq Ne m₂ hNe (le_of_lt hm₂)]
   rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
   nlinarith
 
-/-- **Portability is nonneg.** -/
-theorem portabilityFromRecurrence_nonneg (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    0 ≤ portabilityFromRecurrence Ne m := by
-  rw [portabilityFromRecurrence_eq Ne m hNe hm]
+/-- **The recurrence-derived neutral benchmark is nonnegative.** -/
+theorem neutralAFBenchmarkFromRecurrence_nonneg (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    0 ≤ neutralAFBenchmarkFromRecurrence Ne m := by
+  rw [neutralAFBenchmarkFromRecurrence_eq Ne m hNe hm]
   exact div_nonneg (by nlinarith) (by nlinarith)
 
-/-- **Portability is strictly positive with migration.** -/
-theorem portabilityFromRecurrence_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
-    0 < portabilityFromRecurrence Ne m := by
-  rw [portabilityFromRecurrence_eq Ne m hNe (le_of_lt hm)]
+/-- **The recurrence-derived neutral benchmark is strictly positive with migration.** -/
+theorem neutralAFBenchmarkFromRecurrence_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
+    0 < neutralAFBenchmarkFromRecurrence Ne m := by
+  rw [neutralAFBenchmarkFromRecurrence_eq Ne m hNe (le_of_lt hm)]
   exact div_pos (by nlinarith) (by nlinarith)
 
-/-- **Portability is strictly less than 1 (some signal always lost to drift).** -/
-theorem portabilityFromRecurrence_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    portabilityFromRecurrence Ne m < 1 := by
-  rw [portabilityFromRecurrence_eq Ne m hNe hm]
+/-- **The recurrence-derived neutral benchmark is strictly less than `1`.** -/
+theorem neutralAFBenchmarkFromRecurrence_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    neutralAFBenchmarkFromRecurrence Ne m < 1 := by
+  rw [neutralAFBenchmarkFromRecurrence_eq Ne m hNe hm]
   rw [div_lt_one (by nlinarith : 0 < 4 * Ne * m + 1)]
   linarith
 
-/-- **The derived portability connects back to the R² portability ratio.**
-    Using the derived Fst from the recurrence, the R² in the target population
-    is presentDayR2 with Fst = fstMigDriftEquil. More migration yields
-    higher R². -/
+/-- **The recurrence-derived benchmark connects back to the file's coarse `R²`
+benchmark.**
+    Using the recurrence-derived `F_ST`, the benchmark target `R²` is the
+    present-day `R²` at `fstMigDriftEquil`. More migration yields higher
+    benchmark `R²`. -/
 theorem recurrence_derived_R2_increases_with_m (V_A V_E Ne m₁ m₂ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E) (hNe : 0 < Ne)
     (hm₁ : 0 < m₁) (hm₂ : 0 < m₂) (h_more : m₁ < m₂) :

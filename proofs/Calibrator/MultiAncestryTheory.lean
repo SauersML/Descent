@@ -37,19 +37,20 @@ section GWASDiversity
     the mixture Fst is lower, yielding higher portability.
 
     Derived from: the convex combination (1-α)·d₁ + α·d₂ < d₁
-    when α > 0 and d₂ < d₁, and monotonicity of neutralPortabilityRatio. -/
+    when α > 0 and d₂ < d₁, and monotonicity of the neutral
+    allele-frequency benchmark. -/
 theorem multi_ancestry_reduces_fst
     (d₁ d₂ α : ℝ)
     (h_d₂_closer : d₂ < d₁)
     (h_α_pos : 0 < α) :
     let fst_single := d₁
     let fst_multi := (1 - α) * d₁ + α * d₂
-    neutralPortabilityRatio 0 fst_multi > neutralPortabilityRatio 0 fst_single := by
+    neutralAFBenchmarkRatio 0 fst_multi > neutralAFBenchmarkRatio 0 fst_single := by
   simp only
   have h_multi_lt_single : (1 - α) * d₁ + α * d₂ < d₁ := by
     nlinarith
   simpa using
-    (neutral_portability_decreasing_in_fstT
+    (neutral_af_benchmark_decreasing_in_fstT
       0 ((1 - α) * d₁ + α * d₂) d₁ (by norm_num) h_multi_lt_single)
 
 /-- **Diminishing returns from more similar samples.**
@@ -59,10 +60,9 @@ theorem multi_ancestry_reduces_fst
 theorem portability_concave_in_fst_reduction
     (fst₁ fst₂ Δ : ℝ) :
     -- Reducing Fst by Δ at high Fst gains more portability than at low Fst
-    neutralPortabilityRatio 0 (fst₂ - Δ) - neutralPortabilityRatio 0 fst₂ =
-    neutralPortabilityRatio 0 (fst₁ - Δ) - neutralPortabilityRatio 0 fst₁ := by
-  simp [neutralPortabilityRatio, driftTransportRatio,
-    PortabilityFactor.neutralDrift, PortabilityFactor.value]
+    neutralAFBenchmarkRatio 0 (fst₂ - Δ) - neutralAFBenchmarkRatio 0 fst₂ =
+    neutralAFBenchmarkRatio 0 (fst₁ - Δ) - neutralAFBenchmarkRatio 0 fst₁ := by
+  simp [neutralAFBenchmarkRatio]
 
 /-- **Optimal GWAS allocation.**
     Given a fixed total sample size N, how should samples be allocated
@@ -77,10 +77,10 @@ theorem maxmin_allocation_favors_diversity
     (fst_min_source fst_min_mixed : ℝ)
     -- Moving samples from overrepresented to other populations reduces max Fst
     (h_mixed_better : fst_min_mixed < fst_min_source) :
-    neutralPortabilityRatio 0 fst_min_mixed >
-      neutralPortabilityRatio 0 fst_min_source := by
+    neutralAFBenchmarkRatio 0 fst_min_mixed >
+      neutralAFBenchmarkRatio 0 fst_min_source := by
   simpa using
-    (neutral_portability_decreasing_in_fstT
+    (neutral_af_benchmark_decreasing_in_fstT
       0 fst_min_mixed fst_min_source (by norm_num) h_mixed_better)
 
 end GWASDiversity

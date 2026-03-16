@@ -3028,19 +3028,18 @@ theorem private_causal_fraction_lowers_transfer_ceiling
     lt_trans h_r2_lt_no_private h_no_private_lt_h2
   exact ⟨h_ceiling_lt_no_private, h_r2_lt_no_private, h_r2_lt_h2⟩
 
-/-- **Transporting a source-optimized PGS to a more diverged target lowers `R²`.**
-    This is the honest transfer-limit statement available from the core drift
-    transport model: once the target population is strictly farther in `F_ST`
-    than the source, the transported target `R²` is strictly below the source
-    `R²`. This rules out a universally optimal score within that model, without
-    overclaiming a general no-free-lunch theorem over all predictors. -/
-theorem transported_source_pgs_loses_r2_with_positive_drift
+/-- **In the neutral allele-frequency benchmark, a more diverged target lowers
+`R²`.** Once the target population is strictly farther in `F_ST` than the
+source, the benchmark target `R²` is strictly below the source `R²`. This is a
+statement inside the benchmark chart only; it is not a general mechanistic
+no-free-lunch theorem over all predictors. -/
+theorem neutral_af_benchmark_lowers_r2_with_positive_drift
     (V_A V_E fstSource fstTarget : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    targetR2FromDriftState V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
-  exact targetR2_lt_source_from_drift_state V_A V_E fstSource fstTarget
+    targetR2FromNeutralAFBenchmark V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
+  exact targetR2_lt_source_from_neutralAF_benchmark V_A V_E fstSource fstTarget
     hVA hVE h_fst h_fst_bounds
 
 end TransferLimits

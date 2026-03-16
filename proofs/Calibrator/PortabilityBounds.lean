@@ -16,82 +16,68 @@ Reference: Wang et al. (2026), Nature Communications 17:942.
 -/
 
 /-!
-## Fst-Based Portability Bounds
+## Fst-Based Neutral Benchmarks
 
-Under neutral evolution, the portability ratio is exactly determined by Fst.
-Under selection, Fst provides only an upper bound.
+Under neutral evolution, the coarse allele-frequency benchmark ratio is exactly
+determined by `F_ST`. Under selection, that benchmark provides only an upper
+bound and is not a mechanistic portability law.
 -/
 
 section FstBounds
 
-/-- **Neutral portability ratio = drift transport.**
-    Under pure neutral drift: R²_target/R²_source = (1-Fst_T)/(1-Fst_S).
-    This is exactly the hub drift-transport ratio, exposed under the public
-    bounds name. -/
-noncomputable def neutralPortabilityRatio (fstS fstT : ℝ) : ℝ :=
-  driftTransportRatio fstS fstT
+/-- Neutral allele-frequency benchmark ratio at equal `F_ST` is `1`. -/
+theorem neutral_af_benchmark_at_equal_fst (fst : ℝ) (h : fst < 1) :
+    neutralAFBenchmarkRatio fst fst = 1 := by
+  simpa using neutralAFBenchmarkRatio_self fst h
 
-/-- The public neutral portability bound is exactly the observable drift
-    transport ratio from the canonical portability-factor core. -/
-@[simp] theorem neutralPortabilityRatio_eq_driftTransportRatio
-    (fstS fstT : ℝ) :
-    neutralPortabilityRatio fstS fstT = driftTransportRatio fstS fstT := by
-  rfl
-
-/-- Neutral portability ratio at equal Fst is 1. -/
-theorem neutral_portability_at_equal_fst (fst : ℝ) (h : fst < 1) :
-    neutralPortabilityRatio fst fst = 1 := by
-  simpa [neutralPortabilityRatio_eq_driftTransportRatio] using
-    driftTransportRatio_self fst h
-
-/-- Neutral portability ratio is strictly decreasing in target Fst. -/
-theorem neutral_portability_decreasing_in_fstT
+/-- Neutral allele-frequency benchmark ratio is strictly decreasing in target
+`F_ST`. -/
+theorem neutral_af_benchmark_decreasing_in_fstT
     (fstS fstT₁ fstT₂ : ℝ)
     (h_fstS : fstS < 1)
     (h_order : fstT₁ < fstT₂) :
-    neutralPortabilityRatio fstS fstT₂ < neutralPortabilityRatio fstS fstT₁ := by
+    neutralAFBenchmarkRatio fstS fstT₂ < neutralAFBenchmarkRatio fstS fstT₁ := by
   have h_denom : 0 < 1 - fstS := by linarith
-  simpa [neutralPortabilityRatio, driftTransportRatio, PortabilityFactor.neutralDrift,
-    PortabilityFactor.value] using
+  simpa [neutralAFBenchmarkRatio] using
     (div_lt_div_of_pos_right (show 1 - fstT₂ < 1 - fstT₁ by linarith) h_denom)
 
-/-- **Under selection, actual portability ≤ neutral portability.**
-    Selection only makes things worse (the effect factor ≤ 1). -/
-theorem selection_worsens_portability
+/-- Under selection, the scalar effect factor can only shrink the neutral
+allele-frequency benchmark. -/
+theorem selection_worsens_neutral_af_benchmark
     (fstS fstT ρ_eff : ℝ)
     (h_fstS : fstS < 1) (h_fstT : fstT < 1)
     (hρ : 0 ≤ ρ_eff) (hρ_le : ρ_eff ≤ 1) :
-    neutralPortabilityRatio fstS fstT * ρ_eff ^ 2 ≤
-      neutralPortabilityRatio fstS fstT := by
+    neutralAFBenchmarkRatio fstS fstT * ρ_eff ^ 2 ≤
+      neutralAFBenchmarkRatio fstS fstT := by
   have h_sq_le : ρ_eff ^ 2 ≤ 1 := by nlinarith [sq_nonneg ρ_eff]
-  have h_ratio_nonneg : 0 ≤ neutralPortabilityRatio fstS fstT := by
-    exact driftTransportRatio_nonneg fstS fstT h_fstS (le_of_lt h_fstT)
-  calc neutralPortabilityRatio fstS fstT * ρ_eff ^ 2
-      ≤ neutralPortabilityRatio fstS fstT * 1 :=
+  have h_ratio_nonneg : 0 ≤ neutralAFBenchmarkRatio fstS fstT := by
+    exact neutralAFBenchmarkRatio_nonneg fstS fstT h_fstS (le_of_lt h_fstT)
+  calc neutralAFBenchmarkRatio fstS fstT * ρ_eff ^ 2
+      ≤ neutralAFBenchmarkRatio fstS fstT * 1 :=
         mul_le_mul_of_nonneg_left h_sq_le h_ratio_nonneg
-    _ = neutralPortabilityRatio fstS fstT := mul_one _
+    _ = neutralAFBenchmarkRatio fstS fstT := mul_one _
 
-/-- **General neutral portability bound.**
-    For any target population with Fst_T > Fst_S (both < 1),
-    the neutral portability ratio is strictly between 0 and 1,
-    and decreasing in (Fst_T - Fst_S). The ratio equals (1 - Fst_T)/(1 - Fst_S).
+/-- **General neutral allele-frequency benchmark bound.**
+    For any target population with `Fst_T > Fst_S` (both < `1`),
+    the neutral benchmark ratio is strictly between `0` and `1`,
+    and decreasing in `(Fst_T - Fst_S)`. The ratio equals
+    `(1 - Fst_T)/(1 - Fst_S)`.
 
     Worked example: With Fst ≈ 0.12 (EUR→EAS), ratio ≈ 0.88.
     Worked example: With Fst ≈ 0.15 (EUR→YRI), ratio ≈ 0.85.
     Observed R² drops are often larger, confirming non-neutral effects. -/
-theorem neutral_portability_bounded_by_fst
+theorem neutral_af_benchmark_bounded_by_fst
     (fstS fstT : ℝ)
     (h_fstS_lt : fstS < 1)
     (h_fstT_lt : fstT < 1)
     (h_diverged : fstS < fstT) :
-    0 < neutralPortabilityRatio fstS fstT ∧
-    neutralPortabilityRatio fstS fstT < 1 := by
+    0 < neutralAFBenchmarkRatio fstS fstT ∧
+    neutralAFBenchmarkRatio fstS fstT < 1 := by
   constructor
-  · simpa [neutralPortabilityRatio, driftTransportRatio, PortabilityFactor.neutralDrift,
-      PortabilityFactor.value] using
+  · simpa [neutralAFBenchmarkRatio] using
       (show 0 < (1 - fstT) / (1 - fstS) by exact div_pos (by linarith) (by linarith))
-  · simpa [neutralPortabilityRatio_eq_driftTransportRatio] using
-      driftTransportRatio_lt_one fstS fstT h_fstS_lt h_diverged
+  · simpa using
+      neutralAFBenchmarkRatio_lt_one fstS fstT h_fstS_lt h_diverged
 
 end FstBounds
 
