@@ -161,10 +161,21 @@ noncomputable def observableTaggedRisk {c t : ℕ}
     (betaCausal : CausalVec c) (wTag : TagVec t) : ℝ :=
   ∫ x, taggedSquaredLoss betaCausal wTag x ∂dgp.jointMeasureCT
 
-/-- Source tagged second moments for best linear prediction from tags. -/
+/-- Source tagged second moments for best linear prediction from tags.
+
+The scored-to-causal alignment is decomposed into directly observed causal
+variants and proxy tagging of unscored causal variants. This makes the
+causal-vs-tag distinction explicit at the moment level. -/
 structure SourceTaggedMoments (c t : ℕ) where
   sigmaTagSource : Matrix (Fin t) (Fin t) ℝ
-  sigmaTagCausalSource : Matrix (Fin t) (Fin c) ℝ
+  directCausalSource : Matrix (Fin t) (Fin c) ℝ
+  proxyTaggingSource : Matrix (Fin t) (Fin c) ℝ
+
+/-- Aggregate source scored-to-causal alignment is the sum of directly scored
+causal variants and proxy tagging. -/
+noncomputable def SourceTaggedMoments.sigmaTagCausalSource {c t : ℕ}
+    (mom : SourceTaggedMoments c t) : Matrix (Fin t) (Fin c) ℝ :=
+  mom.directCausalSource + mom.proxyTaggingSource
 
 /-- Closed-form source best linear predictor weights:
 `w*_S = Σ_tag,S^{-1} Σ_tc,S β_c`. -/
@@ -217,7 +228,8 @@ noncomputable def explainedR2FromTransportMoments
 /-- Source tagged moments for the explicit LD witness. -/
 def ldWitnessSourceMoments : SourceTaggedMoments 2 2 where
   sigmaTagSource := 1
-  sigmaTagCausalSource := 1
+  directCausalSource := 1
+  proxyTaggingSource := 0
 
 /-- Source causal effects for the explicit LD witness. -/
 def ldWitnessBeta : CausalVec 2 := ![1, 1]
@@ -242,7 +254,7 @@ def ldWitnessSigmaTargetCorrelated : Matrix (Fin 2) (Fin 2) ℝ :=
   ext i
   fin_cases i <;>
     simp [ldWitnessSourceWeights, sourceBestLinearWeightsFromLD, ldWitnessSourceMoments,
-      ldWitnessBeta, Matrix.mulVec, dotProduct]
+      SourceTaggedMoments.sigmaTagCausalSource, ldWitnessBeta, Matrix.mulVec, dotProduct]
 
 /-- Concrete witness that target LD structure changes target explained variance
 even when the source weights and target predictor/outcome cross-covariance are
@@ -6845,6 +6857,7 @@ algebra on the chosen coordinates, but it is not by itself a full SNP/LD
 state-space model of transport. The mechanistic transport objects live
 downstream in
 `PortabilityDrift.CrossPopulationMetricModel`,
+`PortabilityDrift.sourceWeightedTagScore`,
 `PortabilityDrift.targetR2FromSourceWeights`, and
 `TransferLearningPGS.transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD`.
 -/
@@ -6964,8 +6977,25 @@ live in:
   source/target context cross-covariances, and explicit additive target-side
   residual losses for broken tagging, ancestry-specific LD distortion, and
   source-specific overfit;
+- `PortabilityDrift.targetEffectHeterogeneity`, where cross-population effect
+  mismatch is a locus-resolved vector `β_target - β_source`, not a scalar
+  retention coordinate;
+- `PortabilityDrift.targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity`,
+  where the transported target signal is decomposed into the part induced by
+  source-stable effects plus the separate projection of target-effect
+  heterogeneity;
+- `PortabilityDrift.betaTargetAt`, where time-varying target effects are
+  generated from source effects plus an explicit generation-indexed
+  heterogeneity path;
+- `PortabilityDrift.sourceWeightedTagScore`, which is the explicit SNP-level
+  score equation applying source-learned weights to any source or target
+  tag-genotype state;
 - `PortabilityDrift.targetR2FromSourceWeights`, where transported source weights
-  are evaluated against that full explicit state; and
+  are evaluated against that full explicit state through the target LD and
+  target tag-to-causal covariance operators; and
+- `PortabilityDrift.targetMetricProfileFromSourceWeights`, where the deployed
+  `R²`/AUC/Brier profile is bundled directly from that mechanistic score
+  equation; and
 - `TransferLearningPGS.transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD`,
   where transport is expressed in source/target effect vectors under a shared
   LD kernel.
