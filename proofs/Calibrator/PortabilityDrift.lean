@@ -1215,6 +1215,113 @@ noncomputable def migrationSharedBoostAt
 
 end GenerationalPopGenParameters
 
+/-- Exact bridge from the coarse DGP evolutionary block to the
+generation-indexed population-genetic parameter block used by the mechanistic
+transport model. This carries only the shared popgen primitives; the
+SNP/LD-aware state still lives in `CrossPopulationGenerationalModel`. -/
+noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
+    (m : PGSEvolutionaryModel) : GenerationalPopGenParameters where
+  Ne := m.Ne
+  μ := m.mu
+  mig := m.mig
+  recomb := m.recomb
+  V_A := m.V_A
+  Ne_pos := m.Ne_pos
+  μ_nonneg := m.mu_nonneg
+  mig_nonneg := m.mig_nonneg
+  recomb_nonneg := m.recomb_nonneg
+  recomb_le_half := m.recomb_le_half
+  V_A_pos := m.V_A_pos
+
+@[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_theta
+    (m : PGSEvolutionaryModel) :
+    (m.toGenerationalPopGenParameters).theta = m.theta := by
+  simp [PGSEvolutionaryModel.toGenerationalPopGenParameters,
+    GenerationalPopGenParameters.theta, EvolutionaryParameters.theta]
+
+@[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM
+    (m : PGSEvolutionaryModel) :
+    (m.toGenerationalPopGenParameters).bigM = m.bigM := by
+  simp [PGSEvolutionaryModel.toGenerationalPopGenParameters,
+    GenerationalPopGenParameters.bigM, EvolutionaryParameters.bigM]
+
+@[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
+    (m : PGSEvolutionaryModel) :
+    (m.toGenerationalPopGenParameters).hetDecayFactor = m.hetDecayFactor := by
+  unfold GenerationalPopGenParameters.hetDecayFactor PGSEvolutionaryModel.hetDecayFactor
+  rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
+  rfl
+
+/-- The transient `F_ST` coordinate in the coarse DGP block agrees exactly with
+the generation-indexed popgen bridge at `⌊t_div⌋`, because both use the same
+discrete heterozygosity recursion. -/
+@[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor
+    (m : PGSEvolutionaryModel) :
+    (m.toGenerationalPopGenParameters).fstTransientAt (Nat.floor m.t_div) =
+      m.fstTransient := by
+  unfold GenerationalPopGenParameters.fstTransientAt PGSEvolutionaryModel.fstTransient
+  rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor,
+    PGSEvolutionaryModel.toGenerationalPopGenParameters_theta,
+    PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
+  simp [fstEquilibrium, PGSEvolutionaryModel.toEvo,
+    EvolutionaryParameters.theta, EvolutionaryParameters.bigM]
+
+/-- When divergence time is an integer number of generations, the coarse
+mutation-history coordinate agrees exactly with the generational popgen bridge
+at that generation. -/
+theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
+    (m : PGSEvolutionaryModel)
+    (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
+    (m.toGenerationalPopGenParameters).mutationSharedRetentionAt (Nat.floor m.t_div) =
+      m.mutErosion := by
+  unfold GenerationalPopGenParameters.mutationSharedRetentionAt
+    PGSEvolutionaryModel.mutErosion mutationLDErosion
+  rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
+  simp only [GenerationalPopGenParameters.tauAt,
+    PGSEvolutionaryModel.toGenerationalPopGenParameters,
+    PGSEvolutionaryModel.toEvo, EvolutionaryParameters.theta, EvolutionaryParameters.tau]
+  rw [h_disc, Nat.floor_natCast]
+
+/-- When divergence time is an integer number of generations, the coarse
+migration-history coordinate agrees exactly with the generational popgen bridge
+at that generation. -/
+theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoostAt_floor
+    (m : PGSEvolutionaryModel)
+    (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
+    (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) =
+      m.migBoost := by
+  unfold GenerationalPopGenParameters.migrationSharedBoostAt
+    PGSEvolutionaryModel.migBoost migrationLDBoost
+  rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
+  simp only [GenerationalPopGenParameters.tauAt,
+    PGSEvolutionaryModel.toGenerationalPopGenParameters,
+    PGSEvolutionaryModel.toEvo, EvolutionaryParameters.bigM, EvolutionaryParameters.tau]
+  rw [h_disc, Nat.floor_natCast]
+
+/-- Exact bridge from the DGP coordinate summary to the generational popgen
+coordinates for the fields that genuinely match. The LD coordinate is
+deliberately excluded here because the mechanistic model uses a joint
+locus-specific kernel rather than a single global LD scalar. -/
+theorem PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_floor
+    (m : PGSEvolutionaryModel)
+    (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
+    m.coordinateSummary.alleleFreqCoordinate =
+      1 - (m.toGenerationalPopGenParameters).fstTransientAt (Nat.floor m.t_div) ∧
+    m.coordinateSummary.ancestralVariantCoordinate =
+      (m.toGenerationalPopGenParameters).mutationSharedRetentionAt (Nat.floor m.t_div) ∧
+    m.coordinateSummary.migrationCoordinate =
+      (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) := by
+  refine ⟨?_, ?_, ?_⟩
+  · simpa [PGSEvolutionaryModel.coordinateSummary_alleleFreqCoordinate] using
+      congrArg (fun x => 1 - x)
+        (PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor m)
+  · rw [PGSEvolutionaryModel.coordinateSummary_ancestralVariantCoordinate]
+    exact (PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
+      m h_disc).symm
+  · rw [PGSEvolutionaryModel.coordinateSummary_migrationCoordinate]
+    exact (PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoostAt_floor
+      m h_disc).symm
+
 /-- Allele-frequency mismatch penalty. This penalizes transport when target
 allele frequencies drift away from the source frequencies, even if the source
 score itself is unchanged. -/
@@ -1282,6 +1389,72 @@ noncomputable def causalAlleleFreqRetentionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ :=
   alleleFreqMismatchPenalty (m.causalAlleleFreqSource j) (m.causalAlleleFreqTargetAt t j)
 
+/-- Joint locus-level transport kernel for LD among scored SNPs at generation
+`t`. This is where drift, recombination, mutation history, migration history,
+and tag-SNP allele-frequency drift meet; the mechanistic model does not treat
+them as independent global scalars. -/
+noncomputable def jointTagLDKernelAt {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) : ℝ :=
+  ldCorrelationDecay (m.tagDistance i j)
+      (m.popGen.fstTransientAt t) m.popGen.recomb *
+    m.popGen.mutationSharedRetentionAt t *
+    m.popGen.migrationSharedBoostAt t *
+    tagAlleleFreqRetentionAt m t i *
+    tagAlleleFreqRetentionAt m t j
+
+@[simp] theorem jointTagLDKernelAt_uses_ld_af_mutation_migration {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) :
+    jointTagLDKernelAt m t i j =
+      ldCorrelationDecay (m.tagDistance i j)
+          (m.popGen.fstTransientAt t) m.popGen.recomb *
+        m.popGen.mutationSharedRetentionAt t *
+        m.popGen.migrationSharedBoostAt t *
+        tagAlleleFreqRetentionAt m t i *
+        tagAlleleFreqRetentionAt m t j := by
+  simp [jointTagLDKernelAt]
+
+/-- Joint locus-level transport kernel for directly scored causal variants.
+This omits the LD-decay term because the scored variant is itself causal, but
+it still carries mutation, migration, and AF-history interactions. -/
+noncomputable def jointDirectCausalKernelAt {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ :=
+  m.popGen.mutationSharedRetentionAt t *
+    m.popGen.migrationSharedBoostAt t *
+    tagAlleleFreqRetentionAt m t i *
+    causalAlleleFreqRetentionAt m t j
+
+@[simp] theorem jointDirectCausalKernelAt_uses_af_mutation_migration {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
+    jointDirectCausalKernelAt m t i j =
+      m.popGen.mutationSharedRetentionAt t *
+        m.popGen.migrationSharedBoostAt t *
+        tagAlleleFreqRetentionAt m t i *
+        causalAlleleFreqRetentionAt m t j := by
+  simp [jointDirectCausalKernelAt]
+
+/-- Joint locus-level transport kernel for ancestry-specific proxy tagging.
+This carries the full interaction between LD decay, mutation/migration sharing,
+and source/target allele-frequency history. -/
+noncomputable def jointProxyTaggingKernelAt {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ :=
+  ldCorrelationDecay (m.tagCausalDistance i j)
+      (m.popGen.fstTransientAt t) m.popGen.recomb *
+    m.popGen.mutationSharedRetentionAt t *
+    m.popGen.migrationSharedBoostAt t *
+    tagAlleleFreqRetentionAt m t i *
+    causalAlleleFreqRetentionAt m t j
+
+@[simp] theorem jointProxyTaggingKernelAt_uses_ld_tagging_af_mutation_migration {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
+    jointProxyTaggingKernelAt m t i j =
+      ldCorrelationDecay (m.tagCausalDistance i j)
+          (m.popGen.fstTransientAt t) m.popGen.recomb *
+        m.popGen.mutationSharedRetentionAt t *
+        m.popGen.migrationSharedBoostAt t *
+        tagAlleleFreqRetentionAt m t i *
+        causalAlleleFreqRetentionAt m t j := by
+  simp [jointProxyTaggingKernelAt]
+
 /-- Time-varying target LD among scored SNPs. This incorporates recombination,
 drift (`F_ST`), mutation/migration-driven shared variation, and explicit target
 tag-SNP allele-frequency drift. -/
@@ -1289,13 +1462,7 @@ noncomputable def sigmaTagTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin p) ℝ :=
   fun i j =>
-    m.sigmaTagSource i j *
-      ldCorrelationDecay (m.tagDistance i j)
-        (m.popGen.fstTransientAt t) m.popGen.recomb *
-      m.popGen.mutationSharedRetentionAt t *
-      m.popGen.migrationSharedBoostAt t *
-      tagAlleleFreqRetentionAt m t i *
-      tagAlleleFreqRetentionAt m t j
+    m.sigmaTagSource i j * jointTagLDKernelAt m t i j
 
 /-- Time-varying target tag-to-causal alignment. This is the explicit tagging
 quality surface, driven by LD decay, allele-frequency divergence, mutation,
@@ -1304,11 +1471,7 @@ noncomputable def directCausalTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin q) ℝ :=
   fun i j =>
-    m.directCausalSource i j *
-      m.popGen.mutationSharedRetentionAt t *
-      m.popGen.migrationSharedBoostAt t *
-      tagAlleleFreqRetentionAt m t i *
-      causalAlleleFreqRetentionAt m t j
+    m.directCausalSource i j * jointDirectCausalKernelAt m t i j
 
 /-- Time-varying proxy-tagging alignment. Unlike directly scored causal
 variants, this channel is degraded by LD decay between the scored tag and the
@@ -1317,13 +1480,7 @@ noncomputable def proxyTaggingTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin q) ℝ :=
   fun i j =>
-    m.proxyTaggingSource i j *
-      ldCorrelationDecay (m.tagCausalDistance i j)
-        (m.popGen.fstTransientAt t) m.popGen.recomb *
-      m.popGen.mutationSharedRetentionAt t *
-      m.popGen.migrationSharedBoostAt t *
-      tagAlleleFreqRetentionAt m t i *
-      causalAlleleFreqRetentionAt m t j
+    m.proxyTaggingSource i j * jointProxyTaggingKernelAt m t i j
 
 /-- Time-varying target tag-to-causal alignment is the sum of a direct-causal
 channel and a proxy-tagging channel. Only the proxy channel carries LD-decay
@@ -1391,7 +1548,7 @@ noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
         m.popGen.migrationSharedBoostAt t *
         tagAlleleFreqRetentionAt m t i *
         tagAlleleFreqRetentionAt m t j := by
-  rfl
+  simp [sigmaTagTargetAt, jointTagLDKernelAt, mul_assoc]
 
 @[simp] theorem directCausalTargetAt_uses_af_mutation_migration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
@@ -1401,7 +1558,7 @@ noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
         m.popGen.migrationSharedBoostAt t *
         tagAlleleFreqRetentionAt m t i *
         causalAlleleFreqRetentionAt m t j := by
-  rfl
+  simp [directCausalTargetAt, jointDirectCausalKernelAt, mul_assoc]
 
 @[simp] theorem proxyTaggingTargetAt_uses_ld_tagging_af_mutation_migration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
@@ -1413,7 +1570,7 @@ noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
         m.popGen.migrationSharedBoostAt t *
         tagAlleleFreqRetentionAt m t i *
         causalAlleleFreqRetentionAt m t j := by
-  rfl
+  simp [proxyTaggingTargetAt, jointProxyTaggingKernelAt, mul_assoc]
 
 @[simp] theorem sigmaTagCausalTargetAt_uses_ld_tagging_af_mutation_migration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
@@ -1430,7 +1587,8 @@ noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
         m.popGen.migrationSharedBoostAt t *
         tagAlleleFreqRetentionAt m t i *
         causalAlleleFreqRetentionAt m t j := by
-  simp [sigmaTagCausalTargetAt, directCausalTargetAt, proxyTaggingTargetAt]
+  simp [sigmaTagCausalTargetAt, directCausalTargetAt, proxyTaggingTargetAt,
+    jointDirectCausalKernelAt, jointProxyTaggingKernelAt, mul_assoc]
 
 /-- At each generation, the target tagging projection splits into the part that
 would be obtained under source-stable effects plus a separate projection of the

@@ -6359,26 +6359,22 @@ theorem mse_pointwise_larger_for_distant {k : ℕ} [Fintype (Fin k)]
   -- (a² < b²) and (p² ≥ 0) implies a²p² ≤ b²p²
   nlinarith [sq_nonneg p]
 
-/-! ### Unified Evolutionary Portability Model
+/-! ### Evolutionary Coordinate Library
 
-All four evolutionary forces — drift, mutation, migration, and variable population size —
-jointly determine PGS portability. This section ties them together into a single framework
-where each force contributes to covariance divergence between populations, and hence to
-portability loss.
+This block records coarse population-genetic coordinates derived from drift,
+mutation, migration, divergence time, and recombination. These coordinates are
+useful as primitives, but they are **not** treated here as an independent or
+multiplicatively separable transport law for PGS portability.
 
-**Key insight**: Portability loss = f(ΔΣ), where ΔΣ is the covariance divergence between
-source and target populations. Each evolutionary force affects ΔΣ differently:
-- Drift increases ΔΣ proportionally to t/(2Ne)
-- Mutation increases ΔΣ by introducing population-specific variants
-- Migration decreases ΔΣ by homogenizing allele frequencies
-- Variable Ne modulates drift rate over time
+Biologically, LD decay, allele-frequency change, mutation history, and
+migration history interact through locus-specific state. This file therefore
+stops at coordinate extraction. Any mechanistic portability claim must proceed
+through the explicit SNP/LD-aware state space downstream in
+`PortabilityDrift`. -/
 
-The unified model shows these forces compose multiplicatively on the survival/retention
-of shared genetic architecture. -/
+section EvolutionaryCoordinates
 
-section UnifiedEvolutionaryPortability
-
-/-- Parameters of a unified evolutionary model with all four forces. -/
+/-- Parameters of a coarse evolutionary coordinate model with all four forces. -/
 structure EvolutionaryParameters where
   /-- Effective population size (harmonic mean over history). -/
   Ne : ℝ
@@ -6556,85 +6552,85 @@ theorem migrationLDBoost_ge_one (p : EvolutionaryParameters) :
     · linarith [p.bigM_nonneg]
   linarith
 
-/-- Component-wise evolutionary summary. These coordinates record separate
-population-genetic drivers and are deliberately **not** collapsed into a single
-trait-level portability scalar. Any target portability claim must still go
-through explicit source weights and target covariance structure. -/
-structure EvolutionaryComponentSummary where
-  alleleFreqRetention : ℝ
-  sharedLD : ℝ
-  ancestralVariantRetention : ℝ
-  migrationRestoration : ℝ
+/-- Primitive coordinate record extracted from the coarse evolutionary block.
+These coordinates are stored side by side, but this file does not assert that
+they act independently, are jointly sufficient for transport, or combine into a
+closed-form portability law. -/
+structure EvolutionaryCoordinateSummary where
+  alleleFreqCoordinate : ℝ
+  sharedLDCoordinate : ℝ
+  ancestralVariantCoordinate : ℝ
+  migrationCoordinate : ℝ
 
-@[ext] theorem EvolutionaryComponentSummary.ext
-    {a b : EvolutionaryComponentSummary}
-    (h₁ : a.alleleFreqRetention = b.alleleFreqRetention)
-    (h₂ : a.sharedLD = b.sharedLD)
-    (h₃ : a.ancestralVariantRetention = b.ancestralVariantRetention)
-    (h₄ : a.migrationRestoration = b.migrationRestoration) :
+@[ext] theorem EvolutionaryCoordinateSummary.ext
+    {a b : EvolutionaryCoordinateSummary}
+    (h₁ : a.alleleFreqCoordinate = b.alleleFreqCoordinate)
+    (h₂ : a.sharedLDCoordinate = b.sharedLDCoordinate)
+    (h₃ : a.ancestralVariantCoordinate = b.ancestralVariantCoordinate)
+    (h₄ : a.migrationCoordinate = b.migrationCoordinate) :
     a = b := by
   cases a
   cases b
   simp_all
 
-/-- Canonical component-wise evolutionary summary for the full model. -/
-noncomputable def EvolutionaryParameters.componentSummary
-    (p : EvolutionaryParameters) : EvolutionaryComponentSummary where
-  alleleFreqRetention := 1 - fstEquilibrium p
-  sharedLD := sharedLDRetention p
-  ancestralVariantRetention := mutationLDErosion p
-  migrationRestoration := migrationLDBoost p
+/-- Canonical primitive evolutionary coordinate summary for the coarse model. -/
+noncomputable def EvolutionaryParameters.coordinateSummary
+    (p : EvolutionaryParameters) : EvolutionaryCoordinateSummary where
+  alleleFreqCoordinate := 1 - fstEquilibrium p
+  sharedLDCoordinate := sharedLDRetention p
+  ancestralVariantCoordinate := mutationLDErosion p
+  migrationCoordinate := migrationLDBoost p
 
-@[simp] theorem EvolutionaryParameters.componentSummary_alleleFreqRetention
+@[simp] theorem EvolutionaryParameters.coordinateSummary_alleleFreqCoordinate
     (p : EvolutionaryParameters) :
-    p.componentSummary.alleleFreqRetention = 1 - fstEquilibrium p := by
+    p.coordinateSummary.alleleFreqCoordinate = 1 - fstEquilibrium p := by
   rfl
 
-@[simp] theorem EvolutionaryParameters.componentSummary_sharedLD
+@[simp] theorem EvolutionaryParameters.coordinateSummary_sharedLDCoordinate
     (p : EvolutionaryParameters) :
-    p.componentSummary.sharedLD = sharedLDRetention p := by
+    p.coordinateSummary.sharedLDCoordinate = sharedLDRetention p := by
   rfl
 
-@[simp] theorem EvolutionaryParameters.componentSummary_ancestralVariantRetention
+@[simp] theorem EvolutionaryParameters.coordinateSummary_ancestralVariantCoordinate
     (p : EvolutionaryParameters) :
-    p.componentSummary.ancestralVariantRetention = mutationLDErosion p := by
+    p.coordinateSummary.ancestralVariantCoordinate = mutationLDErosion p := by
   rfl
 
-@[simp] theorem EvolutionaryParameters.componentSummary_migrationRestoration
+@[simp] theorem EvolutionaryParameters.coordinateSummary_migrationCoordinate
     (p : EvolutionaryParameters) :
-    p.componentSummary.migrationRestoration = migrationLDBoost p := by
+    p.coordinateSummary.migrationCoordinate = migrationLDBoost p := by
   rfl
 
-/-- The allele-frequency retention component is nonnegative when mutation and
+/-- The allele-frequency coordinate is nonnegative when mutation and
 migration keep equilibrium `F_ST` below one. -/
-theorem EvolutionaryParameters.componentSummary_alleleFreqRetention_nonneg
+theorem EvolutionaryParameters.coordinateSummary_alleleFreqCoordinate_nonneg
     (p : EvolutionaryParameters) (h_forces : 0 < p.theta + p.bigM) :
-    0 ≤ p.componentSummary.alleleFreqRetention := by
-  rw [EvolutionaryParameters.componentSummary_alleleFreqRetention]
+    0 ≤ p.coordinateSummary.alleleFreqCoordinate := by
+  rw [EvolutionaryParameters.coordinateSummary_alleleFreqCoordinate]
   have h_fst_lt := fstEquilibrium_lt_one p h_forces
   have h_fst_pos := fstEquilibrium_pos p
   linarith
 
-/-- The shared-LD component is strictly positive. -/
-theorem EvolutionaryParameters.componentSummary_sharedLD_pos
+/-- The shared-LD coordinate is strictly positive. -/
+theorem EvolutionaryParameters.coordinateSummary_sharedLDCoordinate_pos
     (p : EvolutionaryParameters) :
-    0 < p.componentSummary.sharedLD := by
-  rw [EvolutionaryParameters.componentSummary_sharedLD]
+    0 < p.coordinateSummary.sharedLDCoordinate := by
+  rw [EvolutionaryParameters.coordinateSummary_sharedLDCoordinate]
   unfold sharedLDRetention
   exact Real.exp_pos _
 
-/-- The ancestral-variant retention component is strictly positive. -/
-theorem EvolutionaryParameters.componentSummary_ancestralVariantRetention_pos
+/-- The ancestral-variant coordinate is strictly positive. -/
+theorem EvolutionaryParameters.coordinateSummary_ancestralVariantCoordinate_pos
     (p : EvolutionaryParameters) :
-    0 < p.componentSummary.ancestralVariantRetention := by
-  rw [EvolutionaryParameters.componentSummary_ancestralVariantRetention]
+    0 < p.coordinateSummary.ancestralVariantCoordinate := by
+  rw [EvolutionaryParameters.coordinateSummary_ancestralVariantCoordinate]
   exact mutationLDErosion_pos p
 
-/-- The migration-restoration component is at least one. -/
-theorem EvolutionaryParameters.componentSummary_migrationRestoration_ge_one
+/-- The migration coordinate is at least one. -/
+theorem EvolutionaryParameters.coordinateSummary_migrationCoordinate_ge_one
     (p : EvolutionaryParameters) :
-    1 ≤ p.componentSummary.migrationRestoration := by
-  rw [EvolutionaryParameters.componentSummary_migrationRestoration]
+    1 ≤ p.coordinateSummary.migrationCoordinate := by
+  rw [EvolutionaryParameters.coordinateSummary_migrationCoordinate]
   exact migrationLDBoost_ge_one p
 
 /-- **Each force's marginal effect on Fst.**
@@ -6670,86 +6666,6 @@ theorem fstEquilibrium_decreasing_in_migration
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₂)
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₁)]
   nlinarith
-
-/-- **The drift component is bounded by the drift-only bound.**
-    Adding mutation and migration can only improve the ancestry-retention term
-    relative to the pure drift case, because Fst is lower at equilibrium.
-    Derived: fstEquilibrium uses θ + M in the denominator,
-    so when θ + M > 0, the denominator > 1, hence Fst < 1. -/
-theorem unified_portability_drift_component_improves
-    (p : EvolutionaryParameters) (h : 0 < p.theta + p.bigM) :
-    fstEquilibrium p < 1 := by
-  unfold fstEquilibrium
-  rw [div_lt_one (by linarith [p.theta_nonneg, p.bigM_nonneg] : 0 < 1 + p.theta + p.bigM)]
-  linarith
-
-/-- **Component-wise comparison of drift, mutation, and migration effects.**
-    Here we show: the drift component alone (`fstEquilibrium`) is bounded by
-    `fstDriftMutation`, which in turn is bounded by `1`. Each additional force
-    reduces the allele-frequency divergence from what it would be under drift
-    alone. -/
-theorem portability_loss_decomposition_from_model
-    (p : EvolutionaryParameters) (h_theta : 0 < p.theta) (h_mig : 0 < p.bigM) :
-    -- The full equilibrium Fst is strictly less than the mutation-only Fst
-    -- which is strictly less than 1 (drift-only limit)
-    fstEquilibrium p < fstDriftMutation p ∧ fstDriftMutation p < 1 := by
-  constructor
-  · -- fstEquilibrium < fstDriftMutation because migration adds to denominator
-    unfold fstEquilibrium fstDriftMutation
-    rw [div_lt_div_iff₀
-      (by linarith [p.theta_nonneg, p.bigM_nonneg] : 0 < 1 + p.theta + p.bigM)
-      (by linarith : 0 < 1 + p.theta)]
-    nlinarith
-  · -- fstDriftMutation < 1 because theta > 0
-    unfold fstDriftMutation
-    rw [div_lt_one (by linarith : 0 < 1 + p.theta)]
-    linarith
-
-/-- **Migration gain is bounded by the drift loss it counteracts.**
-    Derived from the model: migration reduces Fst from 1/(1+θ) to 1/(1+θ+M).
-    The migration gain in the scalar ancestry-retention term is the difference
-    `(1 - Fst_full) - (1 - Fst_mutation)`,
-    which equals fstDriftMutation - fstEquilibrium. This is strictly positive but bounded
-    by fstDriftMutation (the total drift+mutation loss). -/
-theorem migration_gain_bounded_by_model
-    (p : EvolutionaryParameters) (_h_theta : 0 < p.theta) (_h_mig : 0 < p.bigM) :
-    fstDriftMutation p - fstEquilibrium p < fstDriftMutation p := by
-  have := fstEquilibrium_pos p
-  linarith
-
-/-- **Timescale hierarchy derived from the model.**
-    LD decay rate = 2r per generation (from sharedLDRetention = exp(-2rt)).
-    Drift rate = 1/(2Ne) per generation (from Fst recurrence).
-    Mutation rate = θ·τ combined scaling.
-    When r > 1/(2Ne) (recombination faster than drift), LD decays faster. -/
-theorem timescale_hierarchy_from_rates
-    (p : EvolutionaryParameters)
-    (h_ld_faster : 1 / (2 * p.Ne) < 2 * p.recomb) :
-    -- After one "drift unit" of time (t = 2Ne generations), LD retention
-    -- is exp(-2r·2Ne) = exp(-4rNe) which is much less than the drift
-    -- retention (1 - Fst) ≈ exp(-1) ≈ 0.37 when 4rNe >> 1
-    2 * p.recomb * (2 * p.Ne) > 1 := by
-  have hNe := p.Ne_pos
-  have h2Ne : 0 < 2 * p.Ne := by linarith
-  rw [gt_iff_lt, ← div_lt_iff₀ h2Ne]
-  exact h_ld_faster
-
-/-- **Sensitivity: Fst has larger effect than mutation on portability.**
-    Derived from the unified model: increasing Fst (by increasing θ+M denominator)
-    vs increasing mutation erosion. The drift/Fst component (1-Fst) multiplies
-    the entire portability ratio, while mutation erosion is a sub-multiplicative factor.
-    Concretely: halving (1-Fst) halves portability, while halving mutationLDErosion
-    also halves it — but Fst moves faster with divergence than mutation erosion does. -/
-theorem drift_component_dominates_ratio
-    (p : EvolutionaryParameters)
-    (_h_forces : 0 < p.theta + p.bigM) :
-    -- (1 - Fst) ≤ 1 and mutationLDErosion ≤ 1, but Fst can be large
-    -- while mutation erosion is slow (θτ is small for reasonable parameters).
-    -- We prove: if θτ < Fst (mutation hasn't had time to erode much LD
-    -- compared to the Fst accumulated), then mutation erosion > (1 - Fst),
-    -- meaning the drift factor is the tighter bottleneck.
-    fstEquilibrium p < 1 ∧ 0 < mutationLDErosion p := by
-  exact ⟨fstEquilibrium_lt_one p _h_forces, mutationLDErosion_pos p⟩
 
 /-- **Connecting to the DGP framework**: The unified Fst maps to the demographic
     covariance gap. Higher Fst → larger covariance mismatch → worse portability. -/
@@ -6828,30 +6744,32 @@ theorem unified_portability_between_zero_and_one
   · exact fstEquilibrium_pos p
   · exact fstEquilibrium_lt_one p (by linarith)
 
-end UnifiedEvolutionaryPortability
+end EvolutionaryCoordinates
 
 /-! ## End-to-End: From Population Genetics to Clinical Accuracy Metrics
 
 This section builds the evolutionary side of the deployment pipeline from
 evolutionary primitives (Ne, μ, m, r, t) to clinical accuracy coordinates
 (`R²`, AUC, Brier score) once an explicit target signal variance is supplied.
-Time since divergence enters through the evolutionary components only.
+Time since divergence enters through the evolutionary coordinates only.
 
 **The chain:**
-1. Evolutionary parameters → Fst(t), LD_retention(t), mutation_erosion(t), migration_boost(t)
-2. These four components remain separate summaries; DGP does not multiply them into a
-   single biological portability law
+1. Evolutionary parameters expose primitive divergence/sharing coordinates
+   (`Fst(t)`, LD, mutation-history, migration-history)
+2. These coordinates remain a coarse record only; DGP does not assume that they
+   are independent, multiplicatively separable, or jointly sufficient for a
+   biological portability law
 3. A separate mechanistic transport theorem supplies explicit target signal variance
 4. That target signal variance maps to target `R²(t)`, AUC(t), and Brier(t)
 
-The evolutionary component summaries change over time as Fst grows, LD decays,
-mutation erodes shared signal, and migration partially counteracts. The
+These coarse coordinates change over time as Fst grows, LD changes, mutation
+changes shared ancestral content, and migration changes sharing history. The
 deployed metrics in this section are then read off from exact coordinate maps
-applied to an explicit target signal variance.
+applied to an explicit target signal variance supplied elsewhere.
 
 ### Key scope note
-An `EvolutionaryParameters` structure determines only the component-wise
-evolutionary summaries in this file, and an observational context adds residual
+An `EvolutionaryParameters` structure determines only the primitive
+evolutionary coordinates in this file, and an observational context adds residual
 scale and disease prevalence for metric evaluation. That is enough for exact
 algebra on the chosen coordinates, but it is not by itself a full SNP/LD
 state-space model of transport. The mechanistic transport objects live
@@ -6945,18 +6863,19 @@ noncomputable def PGSEvolutionaryModel.mutErosion (m : PGSEvolutionaryModel) : �
 noncomputable def PGSEvolutionaryModel.migBoost (m : PGSEvolutionaryModel) : ℝ :=
   migrationLDBoost m.toEvo
 
-/-! ### Step 2: Component-wise evolutionary summaries
+/-! ### Step 2: Primitive evolutionary coordinate summaries
 
-The four evolutionary factors are kept separate:
+The four coarse coordinates are kept side by side:
 
-- `(1 - Fst)`: allele-frequency retention
-- `LD_retention`: shared LD tagging
-- `mut_erosion`: ancestral/shared causal content
-- `mig_boost`: migration-restored shared signal
+- allele-frequency divergence/sharing coordinate
+- LD-history coordinate
+- mutation-history coordinate
+- migration-history coordinate
 
-This block does not multiply them into a single trait-level transport scalar.
-It does not reconstruct source signal from source `R²`, and it does not derive
-target deployed metrics from source `R²` plus a global retention factor.
+This block does not multiply them into a single trait-level transport scalar,
+does not treat them as independent mechanisms, does not reconstruct source
+signal from source `R²`, and does not derive target deployed metrics from
+source `R²` plus any global retention factor.
 -/
 
 /-! ### Scope of this deployment block
@@ -6964,7 +6883,7 @@ target deployed metrics from source `R²` plus a global retention factor.
 The next definitions intentionally stop short of an end-to-end portability law.
 They provide:
 
-- component-wise evolutionary summaries; and
+- primitive evolutionary coordinate summaries; and
 - generic metric coordinate maps once an explicit target signal variance is
   supplied.
 
@@ -7129,48 +7048,48 @@ noncomputable def profileFromSignalVarianceWithPenalty
 
 end TransportedMetrics
 
-/-- Canonical component-wise evolutionary summary for the observationally
-augmented model. DGP records these four coordinates separately and does not
-collapse them into a single trait-level transport scalar. -/
-noncomputable def PGSEvolutionaryModel.componentSummary
-    (m : PGSEvolutionaryModel) : EvolutionaryComponentSummary where
-  alleleFreqRetention := 1 - m.fstTransient
-  sharedLD := m.ldRetention
-  ancestralVariantRetention := m.mutErosion
-  migrationRestoration := m.migBoost
+/-- Canonical primitive evolutionary coordinate summary for the observationally
+augmented model. DGP records these coordinates separately and does not collapse
+them into a single transport law. -/
+noncomputable def PGSEvolutionaryModel.coordinateSummary
+    (m : PGSEvolutionaryModel) : EvolutionaryCoordinateSummary where
+  alleleFreqCoordinate := 1 - m.fstTransient
+  sharedLDCoordinate := m.ldRetention
+  ancestralVariantCoordinate := m.mutErosion
+  migrationCoordinate := m.migBoost
 
-@[simp] theorem PGSEvolutionaryModel.componentSummary_alleleFreqRetention
+@[simp] theorem PGSEvolutionaryModel.coordinateSummary_alleleFreqCoordinate
     (m : PGSEvolutionaryModel) :
-    m.componentSummary.alleleFreqRetention = 1 - m.fstTransient := by
+    m.coordinateSummary.alleleFreqCoordinate = 1 - m.fstTransient := by
   rfl
 
-@[simp] theorem PGSEvolutionaryModel.componentSummary_sharedLD
+@[simp] theorem PGSEvolutionaryModel.coordinateSummary_sharedLDCoordinate
     (m : PGSEvolutionaryModel) :
-    m.componentSummary.sharedLD = m.ldRetention := by
+    m.coordinateSummary.sharedLDCoordinate = m.ldRetention := by
   rfl
 
-@[simp] theorem PGSEvolutionaryModel.componentSummary_ancestralVariantRetention
+@[simp] theorem PGSEvolutionaryModel.coordinateSummary_ancestralVariantCoordinate
     (m : PGSEvolutionaryModel) :
-    m.componentSummary.ancestralVariantRetention = m.mutErosion := by
+    m.coordinateSummary.ancestralVariantCoordinate = m.mutErosion := by
   rfl
 
-@[simp] theorem PGSEvolutionaryModel.componentSummary_migrationRestoration
+@[simp] theorem PGSEvolutionaryModel.coordinateSummary_migrationCoordinate
     (m : PGSEvolutionaryModel) :
-    m.componentSummary.migrationRestoration = m.migBoost := by
+    m.coordinateSummary.migrationCoordinate = m.migBoost := by
   rfl
 
-/-- Fully expanded evolutionary component summary. Each field is a separate
-population-genetic coordinate, not a joint portability law. -/
-theorem PGSEvolutionaryModel.componentSummary_explicit
+/-- Fully expanded evolutionary coordinate summary. Each field is a separate
+coarse coordinate, not a joint portability law. -/
+theorem PGSEvolutionaryModel.coordinateSummary_explicit
     (m : PGSEvolutionaryModel) :
-    m.componentSummary =
-      { alleleFreqRetention :=
+    m.coordinateSummary =
+      { alleleFreqCoordinate :=
           1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))
-        sharedLD := Real.exp (-2 * m.recomb * m.t_div)
-        ancestralVariantRetention := Real.exp (-m.theta * m.tau)
-        migrationRestoration := 1 + m.bigM * m.tau / (1 + m.bigM) } := by
+        sharedLDCoordinate := Real.exp (-2 * m.recomb * m.t_div)
+        ancestralVariantCoordinate := Real.exp (-m.theta * m.tau)
+        migrationCoordinate := 1 + m.bigM * m.tau / (1 + m.bigM) } := by
   ext <;>
-    simp [PGSEvolutionaryModel.componentSummary, PGSEvolutionaryModel.fstTransient,
+    simp [PGSEvolutionaryModel.coordinateSummary, PGSEvolutionaryModel.fstTransient,
       PGSEvolutionaryModel.ldRetention, PGSEvolutionaryModel.mutErosion,
       PGSEvolutionaryModel.migBoost, PGSEvolutionaryModel.toEvo,
       sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium]
@@ -7222,7 +7141,7 @@ noncomputable def PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty
         (TransportedMetrics.r2FromSignalVariance vSignalTarget (m.V_E + penalty.total)) := by
   rfl
 
-/-! ### Step 4: Component-wise temporal summaries
+/-! ### Step 4: Coordinate-Rate Summaries
 
 The evolutionary block records per-force rate coordinates only. These rates are
 useful for comparing the timescales of distinct population-genetic drivers, but

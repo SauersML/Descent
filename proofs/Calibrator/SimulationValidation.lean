@@ -533,7 +533,7 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       rw [← Real.exp_add]
       congr 1
       norm_num
-    simp [h_ret]
+    rw [h_ret]
     have h_loss :
         2 +
             ((1 - Real.exp (-(2⁻¹ : ℝ))) * (1 - Real.exp (-(2⁻¹ : ℝ))) +
