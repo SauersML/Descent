@@ -6,7 +6,7 @@
   <title>Gnomon · Portability Metrics Dashboard</title>
   <meta
     name="description"
-    content="Interactive dashboard for portability metrics with live controls, time-based graphs, summary metrics, and model flowcharts."
+    content="Interactive benchmark dashboard for portability metrics with live controls, time-based graphs, summary metrics, and model flowcharts."
   >
   <style>
     :root {
@@ -767,7 +767,7 @@
       <div class="hero-stage rise-in">
         <div class="hero-copy">
           <h1>Portability Metrics Dashboard</h1>
-          <p class="lead">Set the population, mutation, migration, recombination, source explained variance, prevalence, and generations since population split to see how predictive performance changes across populations.</p>
+          <p class="lead">Set the population-genetic benchmark inputs, deployed source explained variance, prevalence, and generations since population split to inspect the dashboard's coarse benchmark charts for explained variance, ROC area, and Brier score.</p>
           <div class="hero-actions">
             <a class="hero-link" href="#graphs">Graphs</a>
             <a class="hero-link hero-link-secondary" href="#figures">Flowcharts</a>
@@ -783,7 +783,7 @@
               <p class="section-kicker">Dashboard</p>
               <h2>Portability Dashboard</h2>
             </div>
-            <p>Retained signal, explained variance, AUC, and Brier score under the chosen parameter values.</p>
+            <p>Coarse benchmark transport coordinates and the resulting explained variance, ROC area, and Brier score under the chosen parameter values.</p>
           </div>
 
           <div class="graph-layout" id="graph-form">
@@ -814,7 +814,7 @@
                 <h3>Performance Inputs</h3>
                 <div class="control-grid">
                   <label class="control-field">
-                    <span>Source explained variance</span>
+                    <span>Deployed source explained variance</span>
                     <input id="input-source-explained-variance" type="number" min="0.0001" max="0.9999" step="0.001" value="0.3">
                   </label>
                   <label class="control-field">
@@ -832,7 +832,11 @@
                     <input id="input-environmental-variance" type="number" min="0.0001" step="0.01" value="1">
                   </label>
                 </div>
-                <p class="control-note">Environmental variance rescales signal variance only. It does not change explained variance, AUC, or Brier score.</p>
+                <p class="control-note">This page is a coarse benchmark dashboard. Environmental variance only rescales the signal-variance chart coordinate; with deployed source explained variance held fixed, it does not change the benchmark explained variance, ROC area, or Brier score.</p>
+              </div>
+
+              <div class="warning">
+                This dashboard is intentionally benchmark-only. It does not implement the repo's mechanistic SNP/LD/tagging calibration model; it visualizes the coarse scalar drift chart with explicit metric maps on top.
               </div>
 
               <div class="control-actions">
@@ -845,29 +849,29 @@
             <div class="graph-main">
               <div class="metric-grid">
                 <article class="metric-card">
-                  <p class="metric-label">Source Signal Variance</p>
+                  <p class="metric-label">Source Signal Coordinate</p>
                   <p class="metric-value" id="stat-source-signal">0</p>
-                  <p class="metric-subtitle">Latent predictor variance implied by the chosen source explained variance and environmental variance.</p>
+                  <p class="metric-subtitle">Benchmark signal-variance coordinate implied by the chosen deployed source explained variance and environmental variance.</p>
                 </article>
                 <article class="metric-card">
-                  <p class="metric-label">Retained Signal Fraction</p>
+                  <p class="metric-label">Transport Coordinate</p>
                   <p class="metric-value" id="stat-transport">0</p>
-                  <p class="metric-subtitle">Ratio of target signal variance to source signal variance at the chosen generation count since population split.</p>
+                  <p class="metric-subtitle">Coarse scalar transport coordinate used by this benchmark chart at the chosen generation count since population split.</p>
                 </article>
                 <article class="metric-card">
-                  <p class="metric-label">Target Explained Variance</p>
+                  <p class="metric-label">Benchmark Target Explained Variance</p>
                   <p class="metric-value" id="stat-r2-target">0</p>
-                  <p class="metric-subtitle">Source explained variance: <span id="stat-r2-source">0</span></p>
+                  <p class="metric-subtitle">Deployed source explained variance: <span id="stat-r2-source">0</span></p>
                 </article>
                 <article class="metric-card">
-                  <p class="metric-label">Target ROC Area</p>
+                  <p class="metric-label">Benchmark Target ROC Area</p>
                   <p class="metric-value" id="stat-auc-target">0</p>
-                  <p class="metric-subtitle">Area under the ROC curve. Source ROC area: <span id="stat-auc-source">0</span></p>
+                  <p class="metric-subtitle">Computed from explicit target signal and residual variance in the benchmark chart. Source ROC area: <span id="stat-auc-source">0</span></p>
                 </article>
                 <article class="metric-card">
-                  <p class="metric-label">Target Brier Score</p>
+                  <p class="metric-label">Benchmark Target Brier Score</p>
                   <p class="metric-value" id="stat-brier-target">0</p>
-                  <p class="metric-subtitle">Prediction error summary. Source Brier score: <span id="stat-brier-source">0</span></p>
+                  <p class="metric-subtitle">Benchmark prediction-error summary. Source Brier score: <span id="stat-brier-source">0</span></p>
                 </article>
               </div>
 
@@ -875,8 +879,8 @@
                 <article class="chart-card">
                   <div class="chart-head">
                     <div>
-                      <h3>Target Metrics Across Generations Since Population Split</h3>
-                      <p>Target explained variance, target ROC area, and target Brier score for the current parameter values.</p>
+                      <h3>Benchmark Target Metrics Across Generations Since Population Split</h3>
+                      <p>Benchmark target explained variance, ROC area, and Brier score for the current parameter values.</p>
                     </div>
                   </div>
                   <div class="chart-controls">
@@ -903,8 +907,8 @@
                 <article class="chart-card">
                   <div class="chart-head">
                     <div>
-                      <h3>Target Metrics as One Input Changes</h3>
-                      <p>Target explained variance, target ROC area, and target Brier score as one input varies while the others remain fixed.</p>
+                      <h3>Benchmark Target Metrics as One Input Changes</h3>
+                      <p>Benchmark target explained variance, ROC area, and Brier score as one input varies while the others remain fixed.</p>
                     </div>
                   </div>
                   <div class="chart-controls">
@@ -949,7 +953,7 @@
               <p class="section-kicker">Flowcharts</p>
               <h2>Model Flowcharts</h2>
             </div>
-            <p>Relationships among model inputs, retained signal, and target performance.</p>
+            <p>Relationships among benchmark inputs, coarse transport coordinates, and benchmark target performance.</p>
           </div>
 
           <div class="figure-grid">
@@ -958,7 +962,7 @@
                 <span class="pill pill-definition">Figure 1</span>
                 <span class="pill pill-theorem">Performance Map</span>
               </div>
-              <h3>Relationships among inputs, retained signal, and target performance</h3>
+              <h3>Relationships among benchmark inputs, transport coordinates, and target performance</h3>
               <div class="paper-figure">
                 <svg viewBox="0 0 720 430" role="img" aria-label="Signal flow from inputs to target performance">
                   <defs>
@@ -966,31 +970,31 @@
                       <path d="M0,0 L10,4 L0,8 z" fill="rgba(30, 26, 24, 0.62)"></path>
                     </marker>
                   </defs>
-                  <text class="svg-label" x="34" y="42">Performance Inputs</text>
+                  <text class="svg-label" x="34" y="42">Benchmark Inputs</text>
                   <rect class="svg-node" x="26" y="62" rx="14" ry="14" width="194" height="96"></rect>
-                  <text x="123" y="94" text-anchor="middle">Source explained variance</text>
+                  <text x="123" y="94" text-anchor="middle">Deployed source explained variance</text>
                   <text x="123" y="118" text-anchor="middle">Environmental variance</text>
                   <text x="123" y="142" text-anchor="middle">Disease prevalence</text>
 
                   <rect class="svg-node-strong" x="260" y="54" rx="16" ry="16" width="214" height="96"></rect>
-                  <text class="svg-label" x="286" y="80">Signal Variance</text>
-                  <text x="367" y="108" text-anchor="middle">Source signal variance</text>
-                  <text x="367" y="132" text-anchor="middle">Target signal variance</text>
+                  <text class="svg-label" x="286" y="80">Signal Coordinates</text>
+                  <text x="367" y="108" text-anchor="middle">Source signal coordinate</text>
+                  <text x="367" y="132" text-anchor="middle">Target signal coordinate</text>
 
                   <rect class="svg-node-warm" x="260" y="206" rx="16" ry="16" width="214" height="140"></rect>
-                  <text class="svg-label" x="286" y="242">Signal Retention</text>
+                  <text class="svg-label" x="286" y="242">Transport Coordinates</text>
                   <text x="367" y="268" text-anchor="middle">Population differentiation</text>
                   <text x="367" y="292" text-anchor="middle">Linkage retention</text>
                   <text x="367" y="316" text-anchor="middle">Mutation retention</text>
                   <text x="367" y="340" text-anchor="middle">Migration effect</text>
 
                   <rect class="svg-node-strong" x="502" y="54" rx="16" ry="16" width="192" height="110"></rect>
-                  <text class="svg-label" x="522" y="80">Retained Signal</text>
-                  <text x="598" y="110" text-anchor="middle">Retained signal fraction</text>
-                  <text x="598" y="136" text-anchor="middle">Target signal variance</text>
+                  <text class="svg-label" x="522" y="80">Benchmark Transport</text>
+                  <text x="598" y="110" text-anchor="middle">Transport coordinate</text>
+                  <text x="598" y="136" text-anchor="middle">Target signal coordinate</text>
 
                   <rect class="svg-node" x="502" y="216" rx="16" ry="16" width="192" height="136"></rect>
-                  <text class="svg-label" x="522" y="242">Performance Metrics</text>
+                  <text class="svg-label" x="522" y="242">Benchmark Metrics</text>
                   <text x="598" y="270" text-anchor="middle">
                     <tspan x="598" dy="0">Target explained</tspan>
                     <tspan x="598" dy="18">variance</tspan>
@@ -1006,7 +1010,7 @@
                 </svg>
               </div>
               <p class="figure-caption">
-                Relationships among model inputs, retained signal, and target performance.
+                Relationships among benchmark inputs, transport coordinates, and target performance.
               </p>
             </article>
 
@@ -1015,7 +1019,7 @@
                 <span class="pill pill-definition">Figure 2</span>
                 <span class="pill pill-dependency">Performance Drivers</span>
               </div>
-              <h3>Input dependence of retained signal and target performance</h3>
+              <h3>Input dependence of transport coordinates and benchmark target performance</h3>
               <div class="paper-figure">
                 <svg viewBox="0 0 720 430" role="img" aria-label="Parameter dependence graph">
                   <defs>
@@ -1053,8 +1057,8 @@
                   <text x="321" y="316" text-anchor="middle">Migration boost</text>
 
                   <rect class="svg-node-warm" x="468" y="108" rx="16" ry="16" width="214" height="92"></rect>
-                  <text x="575" y="142" text-anchor="middle">Retained signal fraction</text>
-                  <text x="575" y="190" text-anchor="middle">Target signal variance</text>
+                  <text x="575" y="142" text-anchor="middle">Transport coordinate</text>
+                  <text x="575" y="190" text-anchor="middle">Target signal coordinate</text>
 
                   <rect class="svg-node" x="468" y="230" rx="16" ry="16" width="214" height="108"></rect>
                   <text x="575" y="262" text-anchor="middle">Target explained variance</text>
@@ -1073,7 +1077,7 @@
                 </svg>
               </div>
               <p class="figure-caption">
-                Input dependence of retained signal and target performance.
+                Input dependence of transport coordinates and benchmark target performance.
               </p>
             </article>
           </div>
@@ -1158,20 +1162,20 @@
         mutationRate: "mutation rate",
         migrationRate: "migration rate",
         recombinationRate: "recombination rate",
-        sourceExplainedVariance: "source explained variance",
+        sourceExplainedVariance: "deployed source explained variance",
         diseasePrevalence: "disease prevalence"
       };
 
       const metricLegend = [
-        { name: "target explained variance", color: colors.teal },
-        { name: "target area under the ROC curve", color: colors.rust },
-        { name: "target Brier score", color: colors.amber }
+        { name: "benchmark target explained variance", color: colors.teal },
+        { name: "benchmark target area under the ROC curve", color: colors.rust },
+        { name: "benchmark target Brier score", color: colors.amber }
       ];
 
       const variedParameterLegend = [
-        { name: "target explained variance", color: colors.teal },
-        { name: "target area under the ROC curve", color: colors.rust },
-        { name: "target Brier score", color: colors.amber }
+        { name: "benchmark target explained variance", color: colors.teal },
+        { name: "benchmark target area under the ROC curve", color: colors.rust },
+        { name: "benchmark target Brier score", color: colors.amber }
       ];
 
       function renderLegend(targetId, entries) {
@@ -1359,6 +1363,14 @@
         return computeSourceSignalVariance(cfg) * retainedSignalFactor(timeValue, cfg);
       }
 
+      function computeSourceResidualVariance(cfg) {
+        return cfg.environmentalVariance;
+      }
+
+      function computeTargetResidualVariance(cfg) {
+        return cfg.environmentalVariance;
+      }
+
       function explainedVarianceFromSignalVariance(signalVariance, cfg) {
         return signalVariance / (signalVariance + cfg.environmentalVariance);
       }
@@ -1368,19 +1380,23 @@
       }
 
       function computeSourceAuc(cfg) {
-        return phi(Math.sqrt(cfg.sourceExplainedVariance / (2 * (1 - cfg.sourceExplainedVariance))));
+        return phi(Math.sqrt(computeSourceSignalVariance(cfg) / (2 * computeSourceResidualVariance(cfg))));
       }
 
       function computeTargetAuc(timeValue, cfg) {
-        return phi(Math.sqrt((cfg.sourceExplainedVariance * retainedSignalFactor(timeValue, cfg)) / (2 * (1 - cfg.sourceExplainedVariance))));
+        return phi(Math.sqrt(computeTargetSignalVariance(timeValue, cfg) / (2 * computeTargetResidualVariance(cfg))));
       }
 
       function computeSourceBrier(cfg) {
-        return cfg.diseasePrevalence * (1 - cfg.diseasePrevalence) * (1 - cfg.sourceExplainedVariance);
+        return cfg.diseasePrevalence *
+          (1 - cfg.diseasePrevalence) *
+          (1 - explainedVarianceFromSignalVariance(computeSourceSignalVariance(cfg), cfg));
       }
 
       function computeTargetBrier(timeValue, cfg) {
-        return cfg.diseasePrevalence * (1 - cfg.diseasePrevalence) * (1 - computeTargetExplainedVariance(timeValue, cfg));
+        return cfg.diseasePrevalence *
+          (1 - cfg.diseasePrevalence) *
+          (1 - explainedVarianceFromSignalVariance(computeTargetSignalVariance(timeValue, cfg), cfg));
       }
 
       function sampleRange(min, max, count, fn) {
@@ -1546,7 +1562,7 @@
         renderLegend("legend-metrics", metricLegend);
         renderLineChart("chart-metrics", {
           xLabel: "generations since population split",
-          yLabel: "explained variance, ROC area, or Brier score",
+          yLabel: "benchmark explained variance, ROC area, or Brier score",
           referenceX: cfg.selectedDivergenceTime,
           yMin: 0,
           yMax: 1,
@@ -1570,7 +1586,7 @@
 
         renderLineChart("chart-sweep", {
           xLabel: parameterLabels[cfg.variedParameter] ?? cfg.variedParameter,
-          yLabel: "explained variance, ROC area, or Brier score",
+          yLabel: "benchmark explained variance, ROC area, or Brier score",
           yMin: 0,
           yMax: 1,
           series: [
