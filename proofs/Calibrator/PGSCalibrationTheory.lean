@@ -83,6 +83,11 @@ noncomputable def logisticCalibrationProfile
 noncomputable def CalibrationProfile.slopeDeviation (p : CalibrationProfile) : ℝ :=
   calibrationSlopeDeviation p.slope
 
+/-- The simp lemmas immediately below are definitional facts about the shared
+calibration-profile container. They do not encode any cross-population
+transport model. The biologically meaningful cross-ancestry calibration state
+starts later in `CrossPopulationCalibrationShiftModel`. -/
+
 @[simp] theorem calibrationProfile_citl
     (link : CalibrationLink) (mean_observed mean_predicted slope : ℝ) :
     (calibrationProfile link mean_observed mean_predicted slope).citl =
@@ -176,18 +181,24 @@ noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
 noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
   prevalenceLogit pi_target - prevalenceLogit pi_source
 
-/-- Canonical identity-scale calibration profile for the neutral
-allele-frequency benchmark deployment. The intercept component is measured on
-the observed outcome scale, while the slope is the benchmark ratio. -/
+/-- Benchmark-only identity-scale calibration profile for the neutral
+allele-frequency deployment surrogate.
+
+This object is intentionally coarse: its CITL component is just the supplied
+`mean_observed - mean_predicted`, and its slope component is the neutral-AF
+benchmark ratio. It is useful for benchmark slope algebra, but it is not a
+full SNP-level model of cross-ancestry calibration degradation. -/
 noncomputable def neutralAFIdentityCalibrationProfile
     (mean_observed mean_predicted fst_source fst_target : ℝ) : CalibrationProfile :=
   identityCalibrationProfile mean_observed mean_predicted
     (neutralAFBenchmarkRatio fst_source fst_target)
 
-/-- Canonical logistic-scale calibration profile for the neutral
-allele-frequency benchmark deployment. The intercept component is measured on
-the logistic linear-predictor scale, while the slope is the same benchmark
-ratio. -/
+/-- Benchmark-only logistic-scale calibration profile for the neutral
+allele-frequency deployment surrogate.
+
+Like `neutralAFIdentityCalibrationProfile`, this packages a benchmark
+intercept/slope pair but is not itself a mechanistic SNP-level transport law
+for deployed cross-ancestry calibration. -/
 noncomputable def neutralAFLogisticCalibrationProfile
     (pi_source pi_target fst_source fst_target : ℝ) : CalibrationProfile :=
   logisticCalibrationProfile (prevalenceLogit pi_target) (prevalenceLogit pi_source)
@@ -283,60 +294,193 @@ theorem prevalence_shift_changes_calibration
   unfold calibrationInTheLarge
   ring
 
-/-- If the source model is calibrated in the large, then the target CITL under
-    a pure prevalence shift is exactly the prevalence difference. -/
-theorem source_calibrated_target_citl_eq_prevalence_shift
-    (mean_pred πSource πTarget : ℝ)
-    (h_src_cal : calibrationInTheLarge πSource mean_pred = 0) :
-    calibrationInTheLarge πTarget mean_pred = πTarget - πSource := by
-  have h_shift :=
-    prevalence_shift_changes_calibration mean_pred πSource πTarget
-  linarith
+/-- Explicit cross-population calibration-shift budget.
 
-/-- Under a source model calibrated in the large, the absolute target CITL is
-    exactly the absolute prevalence shift. -/
-theorem source_calibrated_target_abs_citl_eq_abs_prevalence_shift
-    (mean_pred πSource πTarget : ℝ)
-    (h_src_cal : calibrationInTheLarge πSource mean_pred = 0) :
-    |calibrationInTheLarge πTarget mean_pred| = |πTarget - πSource| := by
-  rw [source_calibrated_target_citl_eq_prevalence_shift mean_pred πSource πTarget h_src_cal]
+This state separates the distinct reasons why identity-scale calibration can
+change after transport:
 
-/-- **Exact cross-ancestry metric profile under drift and prevalence shift.**
-    This is the strongest metric-level theorem in this block:
+- prevalence / mean outcome shift,
+- environmental mean-outcome shift,
+- genetic mean-outcome shift not captured by prevalence alone,
+- score-mean transport shift from changed target genetic architecture, and
+- any deployment intercept offset applied to the transported score.
 
-    - exact transported liability-threshold AUC strictly drops under positive drift;
-    - exact target CITL equals the prevalence shift when the source is CITL-calibrated;
-    - absolute target CITL equals the absolute prevalence shift;
-    - target absolute CITL is strictly worse when prevalence truly changes;
-    - exact calibrated target Brier is strictly worse than the source Brier at
-      the same target prevalence because transported `R²` drops.
+Unlike the deleted prevalence-only headline theorem, this does not treat target
+calibration drift as a function of prevalence alone. -/
+structure CrossPopulationCalibrationShiftModel where
+  sourceObservedMean : ℝ
+  sourcePredictedMean : ℝ
+  prevalenceShift : ℝ
+  environmentalObservedShift : ℝ
+  geneticObservedShift : ℝ
+  scoreMeanShift : ℝ
+  deploymentInterceptShift : ℝ
+  sourceSlope : ℝ
+  targetSlope : ℝ
 
-    The theorem keeps discrimination and calibration on literal metrics and
-    exposes the exact calibration formula instead of only an inequality. -/
+/-- Total target observed-mean shift relative to source. -/
+noncomputable def CrossPopulationCalibrationShiftModel.observedMeanShift
+    (m : CrossPopulationCalibrationShiftModel) : ℝ :=
+  m.prevalenceShift + m.environmentalObservedShift + m.geneticObservedShift
+
+/-- Total target predicted-mean shift relative to source. -/
+noncomputable def CrossPopulationCalibrationShiftModel.predictedMeanShift
+    (m : CrossPopulationCalibrationShiftModel) : ℝ :=
+  m.scoreMeanShift + m.deploymentInterceptShift
+
+/-- Source observed mean under the explicit calibration-shift state. -/
+noncomputable def CrossPopulationCalibrationShiftModel.targetObservedMean
+    (m : CrossPopulationCalibrationShiftModel) : ℝ :=
+  m.sourceObservedMean + m.observedMeanShift
+
+/-- Target deployed mean prediction under the explicit calibration-shift state. -/
+noncomputable def CrossPopulationCalibrationShiftModel.targetPredictedMean
+    (m : CrossPopulationCalibrationShiftModel) : ℝ :=
+  m.sourcePredictedMean + m.predictedMeanShift
+
+/-- Source identity-scale calibration profile under the explicit shift state. -/
+noncomputable def CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile
+    (m : CrossPopulationCalibrationShiftModel) : CalibrationProfile :=
+  identityCalibrationProfile m.sourceObservedMean m.sourcePredictedMean m.sourceSlope
+
+/-- Target identity-scale calibration profile under the explicit shift state. -/
+noncomputable def CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile
+    (m : CrossPopulationCalibrationShiftModel) : CalibrationProfile :=
+  identityCalibrationProfile m.targetObservedMean m.targetPredictedMean m.targetSlope
+
+@[simp] theorem CrossPopulationCalibrationShiftModel.targetObservedMean_eq
+    (m : CrossPopulationCalibrationShiftModel) :
+    m.targetObservedMean =
+      m.sourceObservedMean +
+        m.prevalenceShift + m.environmentalObservedShift + m.geneticObservedShift := by
+  simp [CrossPopulationCalibrationShiftModel.targetObservedMean,
+    CrossPopulationCalibrationShiftModel.observedMeanShift, add_left_comm,
+    add_comm]
+
+@[simp] theorem CrossPopulationCalibrationShiftModel.targetPredictedMean_eq
+    (m : CrossPopulationCalibrationShiftModel) :
+    m.targetPredictedMean =
+      m.sourcePredictedMean + m.scoreMeanShift + m.deploymentInterceptShift := by
+  simp [CrossPopulationCalibrationShiftModel.targetPredictedMean,
+    CrossPopulationCalibrationShiftModel.predictedMeanShift, add_assoc]
+
+/-- Exact CITL decomposition under the explicit calibration-shift budget. -/
+theorem CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget
+    (m : CrossPopulationCalibrationShiftModel) :
+    (m.targetIdentityCalibrationProfile).citl =
+      (m.sourceIdentityCalibrationProfile).citl +
+        m.observedMeanShift - m.predictedMeanShift := by
+  unfold CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile
+    CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile
+    CrossPopulationCalibrationShiftModel.targetObservedMean
+    CrossPopulationCalibrationShiftModel.targetPredictedMean
+    CrossPopulationCalibrationShiftModel.observedMeanShift
+    CrossPopulationCalibrationShiftModel.predictedMeanShift
+    identityCalibrationProfile calibrationProfile calibrationInTheLarge
+  ring
+
+/-- Under a source model calibrated in the large, target CITL is exactly the
+full explicit shift budget: observed-mean drift minus predicted-mean drift. -/
+theorem source_calibrated_target_citl_eq_shift_budget
+    (m : CrossPopulationCalibrationShiftModel)
+    (h_src_cal : (m.sourceIdentityCalibrationProfile).citl = 0) :
+    (m.targetIdentityCalibrationProfile).citl =
+      m.observedMeanShift - m.predictedMeanShift := by
+  rw [m.target_citl_eq_source_citl_add_shift_budget, h_src_cal]
+  ring
+
+/-- Under a source model calibrated in the large, absolute target CITL is the
+absolute explicit shift budget. -/
+theorem source_calibrated_target_abs_citl_eq_abs_shift_budget
+    (m : CrossPopulationCalibrationShiftModel)
+    (h_src_cal : (m.sourceIdentityCalibrationProfile).citl = 0) :
+    |(m.targetIdentityCalibrationProfile).citl| =
+      |m.observedMeanShift - m.predictedMeanShift| := by
+  rw [source_calibrated_target_citl_eq_shift_budget m h_src_cal]
+
+/-- With no environmental, genetic, score-mean, or deployment-intercept shifts,
+the explicit calibration budget reduces to pure prevalence shift. This is a
+special case, not the general cross-population calibration law. -/
+theorem source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts
+    (m : CrossPopulationCalibrationShiftModel)
+    (h_src_cal : (m.sourceIdentityCalibrationProfile).citl = 0)
+    (h_env : m.environmentalObservedShift = 0)
+    (h_genetic : m.geneticObservedShift = 0)
+    (h_score : m.scoreMeanShift = 0)
+    (h_intercept : m.deploymentInterceptShift = 0) :
+    (m.targetIdentityCalibrationProfile).citl = m.prevalenceShift := by
+  rw [source_calibrated_target_citl_eq_shift_budget m h_src_cal]
+  simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
+    CrossPopulationCalibrationShiftModel.predictedMeanShift,
+    h_env, h_genetic, h_score, h_intercept]
+
+/-- The absolute pure-prevalence formula is likewise only a zero-other-shifts
+special case of the full calibration budget. -/
+theorem source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts
+    (m : CrossPopulationCalibrationShiftModel)
+    (h_src_cal : (m.sourceIdentityCalibrationProfile).citl = 0)
+    (h_env : m.environmentalObservedShift = 0)
+    (h_genetic : m.geneticObservedShift = 0)
+    (h_score : m.scoreMeanShift = 0)
+    (h_intercept : m.deploymentInterceptShift = 0) :
+    |(m.targetIdentityCalibrationProfile).citl| = |m.prevalenceShift| := by
+  rw [source_calibrated_target_abs_citl_eq_abs_shift_budget m h_src_cal]
+  simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
+    CrossPopulationCalibrationShiftModel.predictedMeanShift,
+    h_env, h_genetic, h_score, h_intercept]
+
+/-- Prevalence equality does not force zero target CITL. If the source is
+calibrated and non-prevalence calibration shifts remain, then target CITL
+still changes even when prevalence itself is unchanged. -/
+theorem source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved
+    (m : CrossPopulationCalibrationShiftModel)
+    (h_src_cal : (m.sourceIdentityCalibrationProfile).citl = 0)
+    (h_prev : m.prevalenceShift = 0) :
+    (m.targetIdentityCalibrationProfile).citl =
+      m.environmentalObservedShift + m.geneticObservedShift -
+        m.scoreMeanShift - m.deploymentInterceptShift := by
+  rw [source_calibrated_target_citl_eq_shift_budget m h_src_cal]
+  simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
+    CrossPopulationCalibrationShiftModel.predictedMeanShift, h_prev]
+  ring
+
+/-- **Exact cross-ancestry metric profile under drift and an explicit target
+calibration-shift budget.**
+
+This is the headline mechanistic theorem for the calibration block:
+
+- exact transported liability-threshold AUC strictly drops under positive drift;
+- exact target CITL equals the full explicit target shift budget, not just
+  prevalence shift;
+- absolute target CITL equals the absolute value of that same full shift budget;
+- target absolute CITL is strictly worse whenever the explicit shift budget is
+  nonzero; and
+- exact calibrated target Brier is strictly worse than the source Brier at the
+  same target observed mean because transported `R²` drops.
+
+The calibration term is therefore driven by explicit observed-mean and
+predicted-mean transport changes, not by prevalence alone. -/
 theorem cross_ancestry_exact_metric_profile
-    (V_A V_E fstSource fstTarget mean_pred πSource πTarget : ℝ)
+    (V_A V_E fstSource fstTarget : ℝ)
+    (cal : CrossPopulationCalibrationShiftModel)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
-    (h_src_cal : calibrationInTheLarge πSource mean_pred = 0)
-    (h_prev_shift : πSource ≠ πTarget)
-    (hπT0 : 0 < πTarget) (hπT1 : πTarget < 1)
+    (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
+    (h_shift_nonzero :
+      cal.observedMeanShift - cal.predictedMeanShift ≠ 0)
+    (hπT0 : 0 < cal.targetObservedMean)
+    (hπT1 : cal.targetObservedMean < 1)
     (hPhiStrict : StrictMono Phi) :
-    let sourceProfile :=
-      neutralAFIdentityCalibrationProfile πSource mean_pred fstSource fstSource
-    let targetProfile :=
-      neutralAFIdentityCalibrationProfile πTarget mean_pred fstSource fstTarget
-    let targetLogisticProfile :=
-      neutralAFLogisticCalibrationProfile πSource πTarget fstSource fstTarget
+    let sourceProfile := cal.sourceIdentityCalibrationProfile
+    let targetProfile := cal.targetIdentityCalibrationProfile
     targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget <
       presentDayLiabilityAUC V_A V_E fstSource ∧
-    targetProfile.citl = πTarget - πSource ∧
-    |targetProfile.citl| = |πTarget - πSource| ∧
+    targetProfile.citl = cal.observedMeanShift - cal.predictedMeanShift ∧
+    |targetProfile.citl| = |cal.observedMeanShift - cal.predictedMeanShift| ∧
     |sourceProfile.citl| < |targetProfile.citl| ∧
-    targetLogisticProfile.citl = prevalenceCITLShift πSource πTarget ∧
-    targetLogisticProfile.slope = targetProfile.slope ∧
-    sourceBrierFromR2 πTarget (presentDayR2 V_A V_E fstSource) <
-      targetExactCalibratedBrierRisk πTarget V_A V_E fstTarget := by
+    sourceBrierFromR2 cal.targetObservedMean (presentDayR2 V_A V_E fstSource) <
+      targetExactCalibratedBrierRisk cal.targetObservedMean V_A V_E fstTarget := by
   dsimp
   have h_auc :
       targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget <
@@ -344,85 +488,54 @@ theorem cross_ancestry_exact_metric_profile
     exact targetLiabilityAUC_lt_source_of_neutralAF_benchmark
       V_A V_E fstSource fstTarget hVA hVE h_fst h_fst_bounds hPhiStrict
   have h_citl_eq :
-      (neutralAFIdentityCalibrationProfile
-        πTarget mean_pred fstSource fstTarget).citl = πTarget - πSource := by
-    simpa [neutralAFIdentityCalibrationProfile] using
-      source_calibrated_target_citl_eq_prevalence_shift
-        mean_pred πSource πTarget h_src_cal
+      (cal.targetIdentityCalibrationProfile).citl =
+        cal.observedMeanShift - cal.predictedMeanShift := by
+    exact source_calibrated_target_citl_eq_shift_budget cal h_src_cal
   have h_abs_eq :
-      |(neutralAFIdentityCalibrationProfile
-        πTarget mean_pred fstSource fstTarget).citl| = |πTarget - πSource| := by
-    simpa [neutralAFIdentityCalibrationProfile] using
-      source_calibrated_target_abs_citl_eq_abs_prevalence_shift
-        mean_pred πSource πTarget h_src_cal
-  have h_tgt_ne_zero :
-      (neutralAFIdentityCalibrationProfile
-        πTarget mean_pred fstSource fstTarget).citl ≠ 0 := by
+      |(cal.targetIdentityCalibrationProfile).citl| =
+        |cal.observedMeanShift - cal.predictedMeanShift| := by
+    exact source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal
+  have h_tgt_ne_zero : (cal.targetIdentityCalibrationProfile).citl ≠ 0 := by
     rw [h_citl_eq]
-    intro h_zero
-    apply h_prev_shift
-    linarith
+    exact h_shift_nonzero
   have h_abs_worse :
-      |(neutralAFIdentityCalibrationProfile
-          πSource mean_pred fstSource fstSource).citl| <
-        |(neutralAFIdentityCalibrationProfile
-          πTarget mean_pred fstSource fstTarget).citl| := by
+      |(cal.sourceIdentityCalibrationProfile).citl| <
+        |(cal.targetIdentityCalibrationProfile).citl| := by
     have h_tgt_abs_pos :
-        0 < |(neutralAFIdentityCalibrationProfile
-          πTarget mean_pred fstSource fstTarget).citl| :=
+        0 < |(cal.targetIdentityCalibrationProfile).citl| :=
       abs_pos.mpr h_tgt_ne_zero
-    simpa [neutralAFIdentityCalibrationProfile_citl, h_src_cal] using h_tgt_abs_pos
-  have h_logit_citl :
-      (neutralAFLogisticCalibrationProfile
-        πSource πTarget fstSource fstTarget).citl =
-        prevalenceCITLShift πSource πTarget := by
-    simp
-  have h_share_slope :
-      (neutralAFLogisticCalibrationProfile
-        πSource πTarget fstSource fstTarget).slope =
-        (neutralAFIdentityCalibrationProfile
-          πTarget mean_pred fstSource fstTarget).slope := by
-    exact (neutralAFCalibrationProfiles_share_slope
-      πTarget mean_pred πSource πTarget fstSource fstTarget).symm
+    simpa [h_src_cal] using h_tgt_abs_pos
   have h_brier :
-      sourceBrierFromR2 πTarget (presentDayR2 V_A V_E fstSource) <
-        targetExactCalibratedBrierRisk πTarget V_A V_E fstTarget := by
+      sourceBrierFromR2 cal.targetObservedMean (presentDayR2 V_A V_E fstSource) <
+        targetExactCalibratedBrierRisk cal.targetObservedMean V_A V_E fstTarget := by
     exact targetBrier_strict_gt_source_of_neutralAF_benchmark
-      πTarget V_A V_E fstSource fstTarget hπT0 hπT1 hVA hVE h_fst h_fst_bounds
-  exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse, h_logit_citl, h_share_slope, h_brier⟩
+      cal.targetObservedMean V_A V_E fstSource fstTarget
+      hπT0 hπT1 hVA hVE h_fst h_fst_bounds
+  exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse, h_brier⟩
 
-/-- **Cross-ancestry AUC drops while prevalence-shift CITL worsens.**
-    This theorem states a deliberately split claim on the repository's actual
-    metrics:
+/-- **Cross-ancestry AUC drops while CITL worsens from an explicit target shift
+budget.**
 
-    - discrimination is measured by observable transport AUC;
-    - calibration is measured by absolute calibration-in-the-large under a
-      fixed mean prediction and changed prevalence.
-
-    Under positive drift (`fstTarget > fstSource`), the transported target
-    AUC is strictly below the source AUC. If the source is calibrated in the
-    large but target prevalence differs, then absolute CITL is strictly larger
-    in the target.
-
-    This theorem does **not** claim that drift alone determines CITL. The CITL
-    term here comes entirely from the prevalence-shift calibration profile
-    formalized above. -/
-theorem cross_ancestry_auc_drops_and_prevalence_citl_worsens
-    (V_A V_E fstSource fstTarget mean_pred πSource πTarget : ℝ)
+This theorem is the calibration analogue of the mechanistic portability
+results elsewhere in the repo: discrimination worsens under drift, while CITL
+is governed by the full observed-minus-predicted target shift budget rather
+than by prevalence alone. -/
+theorem cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget
+    (V_A V_E fstSource fstTarget : ℝ)
+    (cal : CrossPopulationCalibrationShiftModel)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
-    (h_src_cal : calibrationInTheLarge πSource mean_pred = 0)
-    (h_prev_shift : πSource ≠ πTarget)
+    (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
+    (h_shift_nonzero :
+      cal.observedMeanShift - cal.predictedMeanShift ≠ 0)
     (hPhiStrict : StrictMono Phi) :
-    let sourceProfile :=
-      neutralAFIdentityCalibrationProfile πSource mean_pred fstSource fstSource
-    let targetProfile :=
-      neutralAFIdentityCalibrationProfile πTarget mean_pred fstSource fstTarget
+    let sourceProfile := cal.sourceIdentityCalibrationProfile
+    let targetProfile := cal.targetIdentityCalibrationProfile
     targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget <
       presentDayLiabilityAUC V_A V_E fstSource ∧
-    targetProfile.citl = πTarget - πSource ∧
-    |targetProfile.citl| = |πTarget - πSource| ∧
+    targetProfile.citl = cal.observedMeanShift - cal.predictedMeanShift ∧
+    |targetProfile.citl| = |cal.observedMeanShift - cal.predictedMeanShift| ∧
     |sourceProfile.citl| < |targetProfile.citl| := by
   dsimp
   have h_auc :
@@ -431,35 +544,65 @@ theorem cross_ancestry_auc_drops_and_prevalence_citl_worsens
     exact targetLiabilityAUC_lt_source_of_neutralAF_benchmark
       V_A V_E fstSource fstTarget hVA hVE h_fst h_fst_bounds hPhiStrict
   have h_citl_eq :
-      (neutralAFIdentityCalibrationProfile
-        πTarget mean_pred fstSource fstTarget).citl = πTarget - πSource := by
-    simpa [neutralAFIdentityCalibrationProfile] using
-      source_calibrated_target_citl_eq_prevalence_shift
-        mean_pred πSource πTarget h_src_cal
+      (cal.targetIdentityCalibrationProfile).citl =
+        cal.observedMeanShift - cal.predictedMeanShift := by
+    exact source_calibrated_target_citl_eq_shift_budget cal h_src_cal
   have h_abs_eq :
-      |(neutralAFIdentityCalibrationProfile
-        πTarget mean_pred fstSource fstTarget).citl| = |πTarget - πSource| := by
-    simpa [neutralAFIdentityCalibrationProfile] using
-      source_calibrated_target_abs_citl_eq_abs_prevalence_shift
-        mean_pred πSource πTarget h_src_cal
-  have h_tgt_ne_zero :
-      (neutralAFIdentityCalibrationProfile
-        πTarget mean_pred fstSource fstTarget).citl ≠ 0 := by
+      |(cal.targetIdentityCalibrationProfile).citl| =
+        |cal.observedMeanShift - cal.predictedMeanShift| := by
+    exact source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal
+  have h_tgt_ne_zero : (cal.targetIdentityCalibrationProfile).citl ≠ 0 := by
     rw [h_citl_eq]
-    intro h_zero
-    apply h_prev_shift
-    linarith
+    exact h_shift_nonzero
   have h_abs_worse :
-      |(neutralAFIdentityCalibrationProfile
-          πSource mean_pred fstSource fstSource).citl| <
-        |(neutralAFIdentityCalibrationProfile
-          πTarget mean_pred fstSource fstTarget).citl| := by
+      |(cal.sourceIdentityCalibrationProfile).citl| <
+        |(cal.targetIdentityCalibrationProfile).citl| := by
     have h_tgt_abs_pos :
-        0 < |(neutralAFIdentityCalibrationProfile
-          πTarget mean_pred fstSource fstTarget).citl| :=
+        0 < |(cal.targetIdentityCalibrationProfile).citl| :=
       abs_pos.mpr h_tgt_ne_zero
-    simpa [neutralAFIdentityCalibrationProfile_citl, h_src_cal] using h_tgt_abs_pos
+    simpa [h_src_cal] using h_tgt_abs_pos
   exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩
+
+/-- **Prevalence-only cross-ancestry CITL worsening is just a special case.**
+When every non-prevalence calibration shift vanishes, the full explicit shift
+budget reduces to prevalence shift alone. This theorem is deliberately scoped
+as a benchmark special case rather than a general SNP-level deployment law. -/
+theorem cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case
+    (V_A V_E fstSource fstTarget : ℝ)
+    (cal : CrossPopulationCalibrationShiftModel)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (h_fst : fstSource < fstTarget)
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
+    (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
+    (h_env : cal.environmentalObservedShift = 0)
+    (h_genetic : cal.geneticObservedShift = 0)
+    (h_score : cal.scoreMeanShift = 0)
+    (h_intercept : cal.deploymentInterceptShift = 0)
+    (h_prev_shift : cal.prevalenceShift ≠ 0)
+    (hPhiStrict : StrictMono Phi) :
+    let sourceProfile := cal.sourceIdentityCalibrationProfile
+    let targetProfile := cal.targetIdentityCalibrationProfile
+    targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget <
+      presentDayLiabilityAUC V_A V_E fstSource ∧
+    targetProfile.citl = cal.prevalenceShift ∧
+    |targetProfile.citl| = |cal.prevalenceShift| ∧
+    |sourceProfile.citl| < |targetProfile.citl| := by
+  have h_shift_nonzero :
+      cal.observedMeanShift - cal.predictedMeanShift ≠ 0 := by
+    simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
+      CrossPopulationCalibrationShiftModel.predictedMeanShift,
+      h_env, h_genetic, h_score, h_intercept, h_prev_shift]
+  have h_main :=
+    cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget
+      V_A V_E fstSource fstTarget cal hVA hVE h_fst h_fst_bounds
+      h_src_cal h_shift_nonzero hPhiStrict
+  dsimp at h_main ⊢
+  rcases h_main with ⟨h_auc, h_citl, h_abs, h_worse⟩
+  refine ⟨h_auc, ?_, ?_, h_worse⟩
+  · rw [source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts
+      cal h_src_cal h_env h_genetic h_score h_intercept]
+  · rw [source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts
+      cal h_src_cal h_env h_genetic h_score h_intercept]
 
 /-- **Cross-ancestry AUC drops while observable calibrated Brier worsens.**
     `AUC` measures discrimination, while `Brier` is the standard proper scoring
@@ -511,8 +654,13 @@ noncomputable def transportedLinearCalibrationSlope
     (V_A fst_source fst_target : ℝ) : ℝ :=
   presentDayPGSVariance V_A fst_target / presentDayPGSVariance V_A fst_source
 
-/-- Shared identity-scale calibration profile for a transported score under
-drift. -/
+/-- Coarse identity-scale calibration profile for a transported score under the
+observable drift benchmark.
+
+This packages literal CITL and the benchmark regression slope
+`Cov(Y_target, Ŷ_source) / Var(Ŷ_source)`. It is useful as a slope coordinate,
+but it is not a sufficient mechanistic description of SNP-level calibration
+degradation by itself. -/
 noncomputable def transportedIdentityCalibrationProfile
     (mean_observed mean_predicted V_A fst_source fst_target : ℝ) : CalibrationProfile :=
   identityCalibrationProfile mean_observed mean_predicted
@@ -915,7 +1063,7 @@ theorem recalibration_needs_target_cohort
     h_events h_info h_target]
   unfold requiredTargetCohortSizeForRecalibration
   rw [div_le_iff₀ h_prev]
-  simp [mul_comm, mul_left_comm]
+  ring_nf
 
 /-- At fixed parameter count, per-event information, and target precision,
     lower event prevalence strictly increases the total target cohort size
