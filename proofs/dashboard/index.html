@@ -6,7 +6,7 @@
   <title>Gnomon · Portability Metrics Dashboard</title>
   <meta
     name="description"
-    content="Interactive mechanistic dashboard for exact portability laws using transported score moments, covariance channels, and explicit biological loss budgets."
+    content="Interactive mechanistic dashboard for exact portability laws using transported score moments, covariance channels, explicit biological loss budgets, and calibration-slope laws."
   >
   <style>
     :root {
@@ -398,6 +398,20 @@
       font-size: 0.94rem;
     }
 
+    .equation-list {
+      display: grid;
+      gap: 0.5rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .equation-list li {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.93rem;
+    }
+
     .graph-layout {
       display: grid;
       grid-template-columns: 300px minmax(0, 1fr);
@@ -767,7 +781,7 @@
       <div class="hero-stage rise-in">
         <div class="hero-copy">
           <h1>Portability Metrics Dashboard</h1>
-          <p class="lead">Inspect exact mechanistic portability laws from transported source-weight score moments, explicit SNP-level covariance channels, and additive target-side biological loss terms.</p>
+          <p class="lead">Inspect exact mechanistic portability laws for explained variance, calibration slope, liability ROC area, and calibrated Brier score from transported source-weight score moments, explicit SNP-level covariance channels, and additive target-side biological loss terms.</p>
           <div class="hero-actions">
             <a class="hero-link" href="#graphs">Graphs</a>
             <a class="hero-link hero-link-secondary" href="#figures">Flowcharts</a>
@@ -783,7 +797,7 @@
               <p class="section-kicker">Dashboard</p>
               <h2>Portability Dashboard</h2>
             </div>
-            <p>Exact mechanistic law explorer for explained variance, liability ROC area, and calibrated Brier score on the transported source-weight score equation.</p>
+            <p>Exact mechanistic law explorer for explained variance, calibration slope, liability ROC area, and calibrated Brier score on the transported source-weight score equation.</p>
           </div>
 
           <div class="graph-layout" id="graph-form">
@@ -865,10 +879,11 @@
                 <code>Cov_T(score_S, Y_T) = score_S(direct_T) + score_S(proxy_T) + score_S(context_T)</code>,
                 <code>signal = Cov(score, Y)^2 / Var(score)</code>,
                 <code>R² = signal / V_eff</code>,
+                <code>slope_T = Cov_T(score_S, Y_T) / Var_T(score_S)</code>,
                 <code>AUC = Φ(√(signal / (2 residual)))</code>,
                 <code>Brier = π(1-π)(1-R²)</code>,
                 with <code>V_eff = V_target + broken tagging + ancestry-specific LD + source-specific overfit + novel untaggable phenotype</code>.
-                The displayed source Brier reference is evaluated on the same target prevalence scale so the source/target Brier comparison stays on one deployment coordinate.
+                The displayed source Brier reference is evaluated on the same target prevalence scale so the source/target Brier comparison stays on one deployment coordinate. CITL needs mean-shift inputs and is therefore shown later in the exact-law section rather than parameterized in this live slice.
               </div>
 
               <div class="control-actions">
@@ -903,7 +918,7 @@
                 <article class="metric-card">
                   <p class="metric-label">Exact Target Explained Variance</p>
                   <p class="metric-value" id="stat-r2-target">0</p>
-                  <p class="metric-subtitle">Exact source explained variance: <span id="stat-r2-source">0</span></p>
+                  <p class="metric-subtitle">Exact source explained variance (`R²`): <span id="stat-r2-source">0</span></p>
                 </article>
                 <article class="metric-card">
                   <p class="metric-label">Exact R² Portability Ratio</p>
@@ -911,16 +926,78 @@
                   <p class="metric-subtitle">Target explained variance divided by source explained variance.</p>
                 </article>
                 <article class="metric-card">
+                  <p class="metric-label">Change In Explained Variance</p>
+                  <p class="metric-value" id="stat-delta-r2">0</p>
+                  <p class="metric-subtitle">Exact target <code>R²</code> minus exact source <code>R²</code>.</p>
+                </article>
+                <article class="metric-card">
                   <p class="metric-label">Exact Target Liability ROC Area</p>
                   <p class="metric-value" id="stat-auc-target">0</p>
                   <p class="metric-subtitle">Computed from explicit target signal and residual variance. Source liability ROC area: <span id="stat-auc-source">0</span></p>
+                </article>
+                <article class="metric-card">
+                  <p class="metric-label">Change In Liability ROC Area</p>
+                  <p class="metric-value" id="stat-delta-auc">0</p>
+                  <p class="metric-subtitle">Exact target AUC minus exact source AUC.</p>
+                </article>
+                <article class="metric-card">
+                  <p class="metric-label">Exact Source Calibration Slope</p>
+                  <p class="metric-value" id="stat-slope-source">0</p>
+                  <p class="metric-subtitle">Literal source law: <code>Cov_S(score_S, Y_S) / Var_S(score_S)</code></p>
+                </article>
+                <article class="metric-card">
+                  <p class="metric-label">Exact Target Calibration Slope</p>
+                  <p class="metric-value" id="stat-slope-target">0</p>
+                  <p class="metric-subtitle">Literal transported law: <code>Cov_T(score_S, Y_T) / Var_T(score_S)</code></p>
+                </article>
+                <article class="metric-card">
+                  <p class="metric-label">Target Slope Deviation</p>
+                  <p class="metric-value" id="stat-slope-deviation">0</p>
+                  <p class="metric-subtitle">Absolute deviation from ideal slope <code>1</code>.</p>
+                </article>
+                <article class="metric-card">
+                  <p class="metric-label">Change In Calibration Slope</p>
+                  <p class="metric-value" id="stat-delta-slope">0</p>
+                  <p class="metric-subtitle">Exact target slope minus exact source slope.</p>
+                </article>
+                <article class="metric-card">
+                  <p class="metric-label">Dominant Score Channel</p>
+                  <p class="metric-value" id="stat-dominant-score-channel">0</p>
+                  <p class="metric-subtitle">Largest-magnitude biological contribution in the current transported predictive-covariance law.</p>
+                </article>
+                <article class="metric-card">
+                  <p class="metric-label">Dominant Loss Term</p>
+                  <p class="metric-value" id="stat-dominant-loss-term">0</p>
+                  <p class="metric-subtitle">Largest additive target-side biological loss term in the current effective-variance budget.</p>
                 </article>
                 <article class="metric-card">
                   <p class="metric-label">Exact Target Brier Score</p>
                   <p class="metric-value" id="stat-brier-target">0</p>
                   <p class="metric-subtitle">Calibrated Brier score on the target prevalence scale. Source Brier on the same target prevalence scale: <span id="stat-brier-source">0</span></p>
                 </article>
+                <article class="metric-card">
+                  <p class="metric-label">Change In Brier Score</p>
+                  <p class="metric-value" id="stat-delta-brier">0</p>
+                  <p class="metric-subtitle">Exact target Brier minus source Brier on the same target prevalence scale.</p>
+                </article>
               </div>
+
+              <article class="figure-card">
+                <div class="pill-row">
+                  <span class="pill pill-theorem">Live Law Slice</span>
+                  <span class="pill pill-dependency">Current Inputs</span>
+                </div>
+                <h3>Current instantiated mechanistic law</h3>
+                <ul class="equation-list">
+                  <li id="law-current-covariance"></li>
+                  <li id="law-current-signal"></li>
+                  <li id="law-current-slope"></li>
+                  <li id="law-current-effective-variance"></li>
+                  <li id="law-current-r2"></li>
+                  <li id="law-current-auc"></li>
+                  <li id="law-current-brier"></li>
+                </ul>
+              </article>
 
               <div class="chart-grid">
                 <article class="chart-card">
@@ -944,6 +1021,34 @@
                   <div class="chart-legend" id="legend-metrics"></div>
                   <div class="chart-shell">
                     <svg class="chart-svg" id="chart-metrics" viewBox="0 0 960 440" role="img" aria-label="Target performance chart"></svg>
+                  </div>
+                </article>
+
+                <article class="chart-card">
+                  <div class="chart-head">
+                    <div>
+                      <h3>Exact Metric Changes Across Transported Predictive Covariance</h3>
+                      <p>The exact change in each deployed metric relative to the source baseline as total transported predictive covariance varies. Negative <code>ΔR²</code>, <code>ΔAUC</code>, and <code>Δslope</code> indicate degradation; positive <code>ΔBrier</code> indicates worsening.</p>
+                    </div>
+                  </div>
+                  <p class="chart-note">The horizontal guide at <code>0</code> is the source baseline. Each curve is the exact target metric minus its exact source reference on the correct comparison scale.</p>
+                  <div class="chart-legend" id="legend-delta"></div>
+                  <div class="chart-shell">
+                    <svg class="chart-svg" id="chart-delta" viewBox="0 0 960 440" role="img" aria-label="Target metric change chart"></svg>
+                  </div>
+                </article>
+
+                <article class="chart-card">
+                  <div class="chart-head">
+                    <div>
+                      <h3>Exact Target Calibration Slope Across Transported Predictive Covariance</h3>
+                      <p>The exact transported calibration slope as total target predictive covariance varies while target score variance stays fixed. The horizontal guide at <code>1</code> marks the ideal calibration-slope baseline.</p>
+                    </div>
+                  </div>
+                  <p class="chart-note">This chart uses the same mechanistic predictive-covariance law as the metric cards, but reads out the literal transported <code>Cov/Var</code> slope coordinate instead of <code>R²</code>, AUC, or Brier.</p>
+                  <div class="chart-legend" id="legend-slope"></div>
+                  <div class="chart-shell">
+                    <svg class="chart-svg" id="chart-slope" viewBox="0 0 960 440" role="img" aria-label="Target calibration slope chart"></svg>
                   </div>
                 </article>
 
@@ -1000,7 +1105,7 @@
               <p class="section-kicker">Exact Laws</p>
               <h2>Metric Portability Laws</h2>
             </div>
-            <p>Exact deployed metric laws on the biological transport state, with the predictive covariance tied directly to direct-causal, proxy-tagging, and context channels and the denominator tied to the explicit target loss budget.</p>
+            <p>Exact deployed metric and calibration laws on the biological transport state, with the predictive covariance tied directly to direct-causal, proxy-tagging, and context channels and the denominator tied to the explicit target loss budget.</p>
           </div>
 
           <div class="figure-grid">
@@ -1027,6 +1132,18 @@
               <p class="figure-caption"><code>R²_T = signal_T / V_eff,T</code></p>
               <p class="figure-caption"><code>AUC_T = Φ(√(signal_T / (2 (V_eff,T - signal_T))))</code></p>
               <p class="figure-caption"><code>Brier_T = π_T (1-π_T) (1-R²_T)</code></p>
+            </article>
+
+            <article class="figure-card">
+              <div class="pill-row">
+                <span class="pill pill-theorem">Calibration Laws</span>
+                <span class="pill pill-dependency">Mechanistic</span>
+              </div>
+              <h3>Exact deployed calibration laws</h3>
+              <p class="figure-caption"><code>slope_S = Cov_S(score_S, Y_S) / Var_S(score_S)</code></p>
+              <p class="figure-caption"><code>slope_T = Cov_T(score_S, Y_T) / Var_T(score_S)</code></p>
+              <p class="figure-caption"><code>CITL_T = CITL_S + observedMeanShift - predictedMeanShift</code></p>
+              <p class="figure-caption">The live controls on this page parameterize the slope law directly from the transported covariance slice. The CITL law is exact too, but it needs mean-shift inputs that are not part of this narrower metric dashboard.</p>
             </article>
 
             <article class="figure-card">
@@ -1219,9 +1336,28 @@
         r2Ratio: $("stat-r2-ratio"),
         aucTarget: $("stat-auc-target"),
         brierTarget: $("stat-brier-target"),
+        deltaR2: $("stat-delta-r2"),
+        deltaAuc: $("stat-delta-auc"),
+        deltaBrier: $("stat-delta-brier"),
+        slopeSource: $("stat-slope-source"),
+        slopeTarget: $("stat-slope-target"),
+        slopeDeviation: $("stat-slope-deviation"),
+        deltaSlope: $("stat-delta-slope"),
+        dominantScoreChannel: $("stat-dominant-score-channel"),
+        dominantLossTerm: $("stat-dominant-loss-term"),
         r2Source: $("stat-r2-source"),
         aucSource: $("stat-auc-source"),
         brierSource: $("stat-brier-source")
+      };
+
+      const lawLines = {
+        covariance: $("law-current-covariance"),
+        signal: $("law-current-signal"),
+        slope: $("law-current-slope"),
+        effectiveVariance: $("law-current-effective-variance"),
+        r2: $("law-current-r2"),
+        auc: $("law-current-auc"),
+        brier: $("law-current-brier")
       };
 
       const defaults = {
@@ -1294,6 +1430,17 @@
         { name: "exact target Brier score", color: colors.amber }
       ];
 
+      const slopeLegend = [
+        { name: "exact target calibration slope", color: colors.slate }
+      ];
+
+      const deltaLegend = [
+        { name: "ΔR² = target − source", color: colors.teal },
+        { name: "ΔAUC = target − source", color: colors.rust },
+        { name: "ΔBrier = target − source", color: colors.amber },
+        { name: "Δslope = target − source", color: colors.slate }
+      ];
+
       function renderLegend(targetId, entries) {
         const host = $(targetId);
         host.innerHTML = "";
@@ -1349,6 +1496,10 @@
           return value.toFixed(3);
         }
         return value.toExponential(1);
+      }
+
+      function htmlCode(text) {
+        return `<code>${escapeXml(text)}</code>`;
       }
 
       function erfApprox(x) {
@@ -1419,6 +1570,21 @@
         return square(targetPredictiveCovariance) / cfg.targetScoreVariance;
       }
 
+      function computeSourceCalibrationSlope(cfg) {
+        return cfg.sourcePredictiveCovariance / cfg.sourceScoreVariance;
+      }
+
+      function computeTargetCalibrationSlope(targetPredictiveCovariance, cfg) {
+        return targetPredictiveCovariance / cfg.targetScoreVariance;
+      }
+
+      function dominantEntry(entries) {
+        return entries.reduce((best, entry) => {
+          if (!best) return entry;
+          return Math.abs(entry.value) > Math.abs(best.value) ? entry : best;
+        }, null);
+      }
+
       function brierFromR2(prevalence, explainedVariance) {
         return prevalence * (1 - prevalence) * (1 - explainedVariance);
       }
@@ -1427,6 +1593,7 @@
         const sourceSignal = computeSourceSignalVariance(cfg);
         const sourceResidual = cfg.sourceOutcomeVariance - sourceSignal;
         const sourceR2 = sourceSignal / cfg.sourceOutcomeVariance;
+        const sourceCalibrationSlope = computeSourceCalibrationSlope(cfg);
         const sourceAuc = sourceResidual > 0
           ? phi(Math.sqrt(sourceSignal / (2 * sourceResidual)))
           : Number.NaN;
@@ -1436,6 +1603,8 @@
         const targetSignal = computeTargetSignalVarianceFromCovariance(targetPredictiveCovariance, cfg);
         const effectiveTargetVariance = computeEffectiveTargetOutcomeVariance(cfg);
         const targetResidual = effectiveTargetVariance - targetSignal;
+        const targetCalibrationSlope = computeTargetCalibrationSlope(targetPredictiveCovariance, cfg);
+        const targetSlopeDeviation = Math.abs(targetCalibrationSlope - 1);
         const targetR2 = targetResidual > 0
           ? targetSignal / effectiveTargetVariance
           : Number.NaN;
@@ -1448,21 +1617,52 @@
         const r2Ratio = sourceR2 > 0 && Number.isFinite(targetR2)
           ? targetR2 / sourceR2
           : Number.NaN;
+        const deltaR2 = Number.isFinite(targetR2) ? targetR2 - sourceR2 : Number.NaN;
+        const deltaAuc = Number.isFinite(targetAuc) ? targetAuc - sourceAuc : Number.NaN;
+        const deltaBrier = Number.isFinite(targetBrier) ? targetBrier - sourceBrier : Number.NaN;
+        const deltaSlope = Number.isFinite(targetCalibrationSlope)
+          ? targetCalibrationSlope - sourceCalibrationSlope
+          : Number.NaN;
+
+        const scoreChannels = [
+          { label: "direct", value: cfg.targetDirectCausalScore },
+          { label: "proxy", value: cfg.targetProxyTaggingScore },
+          { label: "context", value: cfg.targetContextScore }
+        ];
+        const lossTerms = [
+          { label: "broken tagging", value: cfg.brokenTaggingResidual },
+          { label: "ancestry-specific LD", value: cfg.ancestrySpecificLDResidual },
+          { label: "source-specific overfit", value: cfg.sourceSpecificOverfitResidual },
+          { label: "novel untaggable phenotype", value: cfg.novelUntaggablePhenotypeResidual }
+        ];
+        const dominantScoreChannel = dominantEntry(scoreChannels);
+        const dominantLossTerm = dominantEntry(lossTerms);
 
         return {
           sourceSignal,
           sourceResidual,
           sourceR2,
+          sourceCalibrationSlope,
           sourceAuc,
           sourceBrier,
           targetPredictiveCovariance,
           targetSignal,
           effectiveTargetVariance,
           targetResidual,
+          targetCalibrationSlope,
+          targetSlopeDeviation,
           targetR2,
           targetAuc,
           targetBrier,
-          r2Ratio
+          r2Ratio,
+          deltaR2,
+          deltaAuc,
+          deltaBrier,
+          deltaSlope,
+          scoreChannels,
+          lossTerms,
+          dominantScoreChannel,
+          dominantLossTerm
         };
       }
 
@@ -1484,8 +1684,6 @@
         if (!(cfg.variedParameterMin < cfg.variedParameterMax)) problems.push("The lowest value for the chosen parameter must be less than the highest value.");
 
         switch (cfg.variedParameter) {
-          case "sourceScoreVariance":
-          case "sourceOutcomeVariance":
           case "targetScoreVariance":
           case "targetOutcomeVariance":
             if (!(cfg.variedParameterMin > 0)) problems.push(`The plotted range for ${parameterLabels[cfg.variedParameter]} must stay positive.`);
@@ -1540,6 +1738,15 @@
         stats.r2Ratio.textContent = formatValue(values.r2Ratio);
         stats.aucTarget.textContent = formatValue(values.aucTarget);
         stats.brierTarget.textContent = formatValue(values.brierTarget);
+        stats.deltaR2.textContent = formatValue(values.deltaR2);
+        stats.deltaAuc.textContent = formatValue(values.deltaAuc);
+        stats.deltaBrier.textContent = formatValue(values.deltaBrier);
+        stats.slopeSource.textContent = formatValue(values.slopeSource);
+        stats.slopeTarget.textContent = formatValue(values.slopeTarget);
+        stats.slopeDeviation.textContent = formatValue(values.slopeDeviation);
+        stats.deltaSlope.textContent = formatValue(values.deltaSlope);
+        stats.dominantScoreChannel.textContent = values.dominantScoreChannel;
+        stats.dominantLossTerm.textContent = values.dominantLossTerm;
         stats.r2Source.textContent = formatValue(values.r2Source);
         stats.aucSource.textContent = formatValue(values.aucSource);
         stats.brierSource.textContent = formatValue(values.brierSource);
@@ -1555,10 +1762,53 @@
           r2Ratio: Number.NaN,
           aucTarget: Number.NaN,
           brierTarget: Number.NaN,
+          deltaR2: Number.NaN,
+          deltaAuc: Number.NaN,
+          deltaBrier: Number.NaN,
+          slopeSource: Number.NaN,
+          slopeTarget: Number.NaN,
+          slopeDeviation: Number.NaN,
+          deltaSlope: Number.NaN,
+          dominantScoreChannel: "—",
+          dominantLossTerm: "—",
           r2Source: Number.NaN,
           aucSource: Number.NaN,
           brierSource: Number.NaN
         });
+        for (const node of Object.values(lawLines)) {
+          node.textContent = "—";
+        }
+      }
+
+      function setLawTexts(cfg, state) {
+        lawLines.covariance.innerHTML =
+          `${htmlCode("Cov_T(score_S, Y_T)")}: ${htmlCode(
+            `${formatValue(cfg.targetDirectCausalScore)} + ${formatValue(cfg.targetProxyTaggingScore)} + ${formatValue(cfg.targetContextScore)} = ${formatValue(state.targetPredictiveCovariance)}`
+          )}`;
+        lawLines.signal.innerHTML =
+          `${htmlCode("signal_T = Cov_T^2 / Var_T(score_S)")}: ${htmlCode(
+            `${formatValue(state.targetPredictiveCovariance)}^2 / ${formatValue(cfg.targetScoreVariance)} = ${formatValue(state.targetSignal)}`
+          )}`;
+        lawLines.slope.innerHTML =
+          `${htmlCode("slope_T = Cov_T(score_S, Y_T) / Var_T(score_S)")}: ${htmlCode(
+            `${formatValue(state.targetPredictiveCovariance)} / ${formatValue(cfg.targetScoreVariance)} = ${formatValue(state.targetCalibrationSlope)}`
+          )}`;
+        lawLines.effectiveVariance.innerHTML =
+          `${htmlCode("V_eff,T")}: ${htmlCode(
+            `${formatValue(cfg.targetOutcomeVariance)} + ${formatValue(cfg.brokenTaggingResidual)} + ${formatValue(cfg.ancestrySpecificLDResidual)} + ${formatValue(cfg.sourceSpecificOverfitResidual)} + ${formatValue(cfg.novelUntaggablePhenotypeResidual)} = ${formatValue(state.effectiveTargetVariance)}`
+          )}`;
+        lawLines.r2.innerHTML =
+          `${htmlCode("R²_T = signal_T / V_eff,T")}: ${htmlCode(
+            `${formatValue(state.targetSignal)} / ${formatValue(state.effectiveTargetVariance)} = ${formatValue(state.targetR2)}`
+          )}`;
+        lawLines.auc.innerHTML =
+          `${htmlCode("AUC_T = Φ(√(signal_T / (2 residual_T)))")}: ${htmlCode(
+            `residual_T = ${formatValue(state.targetResidual)}, AUC_T = ${formatValue(state.targetAuc)}`
+          )}`;
+        lawLines.brier.innerHTML =
+          `${htmlCode("Brier_T = π_T (1-π_T) (1-R²_T)")}: ${htmlCode(
+            `${formatValue(cfg.targetPrevalence)} × (1-${formatValue(cfg.targetPrevalence)}) × (1-${formatValue(state.targetR2)}) = ${formatValue(state.targetBrier)}`
+          )}`;
       }
 
       function renderEmptyChart(svgId, message) {
@@ -1634,6 +1884,9 @@
         const marker = options.referenceX !== undefined
           ? `<line x1="${xScale(options.referenceX)}" y1="${pad.top}" x2="${xScale(options.referenceX)}" y2="${height - pad.bottom}" stroke="rgba(30, 26, 24, 0.35)" stroke-width="1.5" stroke-dasharray="5 5"></line>`
           : "";
+        const horizontalMarker = options.referenceY !== undefined && Number.isFinite(options.referenceY)
+          ? `<line x1="${pad.left}" y1="${yScale(options.referenceY)}" x2="${width - pad.right}" y2="${yScale(options.referenceY)}" stroke="rgba(48, 68, 75, 0.45)" stroke-width="1.5" stroke-dasharray="8 5"></line>`
+          : "";
 
         const axis = `
           <line x1="${pad.left}" y1="${height - pad.bottom}" x2="${width - pad.right}" y2="${height - pad.bottom}" stroke="rgba(30, 26, 24, 0.7)" stroke-width="1.4"></line>
@@ -1646,6 +1899,7 @@
           <rect x="0" y="0" width="${width}" height="${height}" fill="rgba(252, 248, 239, 0.98)"></rect>
           ${grid.join("")}
           ${marker}
+          ${horizontalMarker}
           ${paths}
           ${axis}
         `;
@@ -1666,6 +1920,7 @@
           warningEl.innerHTML = issues.join(" ");
           clearMetricTexts();
           renderEmptyChart("chart-metrics", "Enter a valid configuration to draw this graph");
+          renderEmptyChart("chart-slope", "Enter a valid configuration to draw this graph");
           renderEmptyChart("chart-sweep", "Enter a valid configuration to draw this graph");
           return;
         }
@@ -1681,13 +1936,27 @@
           targetResidual: currentState.targetResidual,
           r2Target: currentState.targetR2,
           r2Ratio: currentState.r2Ratio,
+          deltaR2: currentState.deltaR2,
+          deltaAuc: currentState.deltaAuc,
+          deltaBrier: currentState.deltaBrier,
           aucTarget: currentState.targetAuc,
           brierTarget: currentState.targetBrier,
+          slopeSource: currentState.sourceCalibrationSlope,
+          slopeTarget: currentState.targetCalibrationSlope,
+          slopeDeviation: currentState.targetSlopeDeviation,
+          deltaSlope: currentState.deltaSlope,
+          dominantScoreChannel: currentState.dominantScoreChannel
+            ? `${currentState.dominantScoreChannel.label} (${formatValue(currentState.dominantScoreChannel.value)})`
+            : "—",
+          dominantLossTerm: currentState.dominantLossTerm
+            ? `${currentState.dominantLossTerm.label} (${formatValue(currentState.dominantLossTerm.value)})`
+            : "—",
           r2Source: currentState.sourceR2,
           aucSource: currentState.sourceAuc,
           brierSource: currentState.sourceBrier
         };
         setMetricTexts(current);
+        setLawTexts(cfg, currentState);
 
         const covarianceSweep = sampleRange(-cfg.covarianceMaxAbs, cfg.covarianceMaxAbs, cfg.covariancePlotPoints, (targetPredictiveCovariance) => {
           const state = buildMetricState(cfg, targetPredictiveCovariance);
@@ -1710,6 +1979,63 @@
             { color: colors.teal, points: covarianceSweep.map((point) => ({ x: point.targetPredictiveCovariance, y: point.r2 })) },
             { color: colors.rust, points: covarianceSweep.map((point) => ({ x: point.targetPredictiveCovariance, y: point.auc })) },
             { color: colors.amber, points: covarianceSweep.map((point) => ({ x: point.targetPredictiveCovariance, y: point.brier })) }
+          ]
+        });
+
+        renderLegend("legend-delta", deltaLegend);
+        renderLineChart("chart-delta", {
+          xLabel: "target predictive covariance under source weights",
+          yLabel: "exact change from source baseline",
+          referenceX: currentState.targetPredictiveCovariance,
+          referenceY: 0,
+          series: [
+            {
+              color: colors.teal,
+              points: covarianceSweep.map((point) => ({
+                x: point.targetPredictiveCovariance,
+                y: Number.isFinite(point.r2) ? point.r2 - currentState.sourceR2 : Number.NaN
+              }))
+            },
+            {
+              color: colors.rust,
+              points: covarianceSweep.map((point) => ({
+                x: point.targetPredictiveCovariance,
+                y: Number.isFinite(point.auc) ? point.auc - currentState.sourceAuc : Number.NaN
+              }))
+            },
+            {
+              color: colors.amber,
+              points: covarianceSweep.map((point) => ({
+                x: point.targetPredictiveCovariance,
+                y: Number.isFinite(point.brier) ? point.brier - currentState.sourceBrier : Number.NaN
+              }))
+            },
+            {
+              color: colors.slate,
+              points: covarianceSweep.map((point) => ({
+                x: point.targetPredictiveCovariance,
+                y: point.targetPredictiveCovariance / cfg.targetScoreVariance - currentState.sourceCalibrationSlope
+              }))
+            }
+          ]
+        });
+
+        renderLegend("legend-slope", slopeLegend);
+        renderLineChart("chart-slope", {
+          xLabel: "target predictive covariance under source weights",
+          yLabel: "exact target calibration slope",
+          referenceX: currentState.targetPredictiveCovariance,
+          referenceY: 1,
+          yMin: Math.min(0, 1, ...covarianceSweep.map((point) => point.targetPredictiveCovariance / cfg.targetScoreVariance)),
+          yMax: Math.max(1, ...covarianceSweep.map((point) => point.targetPredictiveCovariance / cfg.targetScoreVariance)),
+          series: [
+            {
+              color: colors.slate,
+              points: covarianceSweep.map((point) => ({
+                x: point.targetPredictiveCovariance,
+                y: point.targetPredictiveCovariance / cfg.targetScoreVariance
+              }))
+            }
           ]
         });
 
@@ -1776,6 +2102,8 @@
       inputs.reset.addEventListener("click", resetDefaults);
 
       renderLegend("legend-metrics", metricLegend);
+      renderLegend("legend-delta", deltaLegend);
+      renderLegend("legend-slope", slopeLegend);
       renderLegend("legend-sweep", variedParameterLegend);
       resetDefaults();
     })();
