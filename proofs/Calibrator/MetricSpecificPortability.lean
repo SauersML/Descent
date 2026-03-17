@@ -293,10 +293,10 @@ These metrics respond differently to distribution shifts.
 
 section R2VsAUC
 
-/-- **R² is sensitive to drift in the neutral allele-frequency benchmark.**
+/-- **Neutral-benchmark `R²` is sensitive to drift.**
     When drift increases (`fstS < fstT`), `presentDayR2` strictly decreases, so
     the source-to-target R² drop is positive. -/
-theorem r2_sensitive_to_drift
+theorem neutralAF_benchmark_r2_sensitive_to_drift
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
@@ -350,11 +350,11 @@ theorem sourceLiabilityAUC_strictly_increases_with_r2
     ⟨le_of_lt h_r2₂_pos, h_r2₂⟩
     h_lt
 
-/-- **Liability AUC is sensitive to the neutral allele-frequency benchmark.**
+/-- **Neutral-benchmark liability AUC is sensitive to drift.**
     With fixed source `R²`, increasing drift strictly lowers the benchmark
     liability-threshold AUC. This is the exact metric-level AUC analogue of the
     benchmark `R²` drift result. -/
-theorem liability_auc_sensitive_to_drift
+theorem neutralAF_benchmark_liability_auc_sensitive_to_drift
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstS < fstT)
@@ -400,8 +400,8 @@ across populations.
 
 section CalibrationVsDiscrimination
 
-/-- **At fixed drift, exact liability AUC is preserved while CITL shifts exactly
-with the mean-score offset.**
+/-- **At fixed drift in the neutral benchmark, exact liability AUC is preserved
+while CITL shifts exactly with the mean-score offset.**
     This theorem formalizes the intended metric split on the repository's
     actual metrics:
 
@@ -413,7 +413,7 @@ with the mean-score offset.**
     additive offset `δ`, then CITL shifts by exactly `-δ`. This is the precise
     fixed-`fst` statement behind "rank-based discrimination can be preserved
     while calibration is lost." -/
-theorem auc_preserved_citl_shift_at_fixed_fst
+theorem neutralAF_benchmark_auc_preserved_citl_shift_at_fixed_fst
     (V_A V_E fst mean_obs mean_pred δ : ℝ) :
     targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fst =
       presentDayLiabilityAUC V_A V_E fst ∧
@@ -424,7 +424,8 @@ theorem auc_preserved_citl_shift_at_fixed_fst
   · unfold calibrationInTheLarge
     ring
 
-/-- **Discrimination preserved while calibration is lost at fixed drift.**
+/-- **Benchmark discrimination can be preserved while calibration is lost at
+fixed drift.**
     In the neutral allele-frequency benchmark, if source and target share the same
     drift level `fst`, then AUC is unchanged. If the source is calibrated in
     the large and the target mean prediction is shifted by a nonzero offset
@@ -433,7 +434,7 @@ theorem auc_preserved_citl_shift_at_fixed_fst
     This is the actual fixed-`fst` result the surrounding prose was aiming at:
     AUC is preserved, while calibration loss is witnessed by a standard
     calibration metric rather than an `R²` surrogate. -/
-theorem discrimination_preserved_calibration_lost
+theorem neutralAF_benchmark_discrimination_preserved_calibration_lost
     (V_A V_E fst mean_obs mean_pred δ : ℝ)
     (h_src_cal : calibrationInTheLarge mean_obs mean_pred = 0)
     (h_shift : δ ≠ 0) :
@@ -441,7 +442,8 @@ theorem discrimination_preserved_calibration_lost
       presentDayLiabilityAUC V_A V_E fst ∧
     |calibrationInTheLarge mean_obs mean_pred| <
       |calibrationInTheLarge mean_obs (mean_pred + δ)| := by
-  rcases auc_preserved_citl_shift_at_fixed_fst V_A V_E fst mean_obs mean_pred δ with
+  rcases neutralAF_benchmark_auc_preserved_citl_shift_at_fixed_fst
+      V_A V_E fst mean_obs mean_pred δ with
     ⟨h_auc, h_citl_shift⟩
   refine ⟨h_auc, ?_⟩
   rw [h_src_cal]
@@ -453,75 +455,75 @@ theorem discrimination_preserved_calibration_lost
   simp only [abs_zero]
   exact abs_pos.mpr h_shift_sub
 
-/-- **Allele-frequency shift worsens the benchmark calibration slope and Brier score.**
-    In the observable drift benchmark, a larger target `F_ST` lowers the shared
-    linear regression slope coordinate
-    `Cov(Y_target, Ŷ_source) / Var(Ŷ_source)` for the transported
-    source-calibrated score from `PGSCalibrationTheory`.
+/-- **Mechanistic transport can jointly worsen calibration slope and Brier.**
+    This theorem is stated on the explicit SNP-level transport model rather
+    than on the deleted neutral-AF slope benchmark.
 
-    - the benchmark target calibration slope is strictly below the ideal source baseline
-      `1`;
-    - the calibration-slope deviation from perfect calibration is therefore
-      strictly larger than the source value `0`, and equals exactly `1 - slope`;
-    - the slope itself has the exact drift formula `(1 - fstT) / (1 - fstS)`;
-    - at any nondegenerate prevalence `π`, the observable target Brier score is
-      strictly worse than the source Brier score.
+    If the transported source score has calibration slope below `1` in the
+    target population and its transported `R²` drops, then:
 
-    This remains a benchmark slope/Brier theorem, not a complete mechanistic
-    SNP-level calibration law. -/
-theorem allele_freq_shift_disrupts_benchmark_calibration_slope_and_brier
-    (π V_A V_E fstS fstT : ℝ)
-    (hπ0 : 0 < π) (hπ1 : π < 1)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst : fstS < fstT)
-    (hfst_bounds : 0 ≤ fstS ∧ fstT < 1) :
-    let profile := neutralAFIdentityCalibrationProfile π π fstS fstT
+    - the deployed target identity-link calibration profile has slope below `1`;
+    - the slope deviation from perfect calibration is exactly `1 - slope`;
+    - the slope itself is the exact direct-causal + proxy-tagging + context
+      law from the mechanistic portability model; and
+    - exact target calibrated Brier is strictly worse than the source score
+      evaluated on the same target prevalence scale. -/
+theorem mechanistic_transport_disrupts_calibration_slope_and_brier
+    {p q : ℕ} (cal : CrossPopulationMechanisticCalibrationModel p q)
+    (h_target_slope_lt : targetCalibrationSlopeFromSourceWeights cal.metric < 1)
+    (h_r2_drop :
+      targetR2FromSourceWeights cal.metric < sourceR2FromSourceWeights cal.metric) :
+    let profile := cal.targetIdentityCalibrationProfile
     profile.slope < 1 ∧
     calibrationSlopeDeviation 1 < profile.slopeDeviation ∧
     profile.slopeDeviation = 1 - profile.slope ∧
-    profile.slope = transportedLinearCalibrationSlope V_A fstS fstT ∧
-    profile.slope = (1 - fstT) / (1 - fstS) ∧
-    sourceBrierFromR2 π (presentDayR2 V_A V_E fstS) <
-      targetBrierFromNeutralAFBenchmark π V_A V_E fstT := by
+    profile.slope =
+      (sourceWeightedTagScore cal.metric (targetDirectCausalProjection cal.metric) +
+        sourceWeightedTagScore cal.metric (targetProxyTaggingProjection cal.metric) +
+        sourceWeightedTagScore cal.metric cal.metric.contextCrossTarget) /
+          targetScoreVarianceFromSourceWeights cal.metric ∧
+    sourceCalibratedBrierFromSourceWeightsAtPrevalence
+        cal.metric cal.metric.targetPrevalence <
+      targetCalibratedBrierFromSourceWeights cal.metric := by
   dsimp
-  have hfstS_lt_one : fstS < 1 := lt_trans hfst hfst_bounds.2
-  have hslope_eq :
-      transportedLinearCalibrationSlope V_A fstS fstT = (1 - fstT) / (1 - fstS) := by
-    exact transportedLinearCalibrationSlope_eq_fst_ratio V_A fstS fstT hVA hfstS_lt_one
-  have hprofile_eq_transport :
-      (neutralAFIdentityCalibrationProfile π π fstS fstT).slope =
-        transportedLinearCalibrationSlope V_A fstS fstT := by
-    simp [neutralAFIdentityCalibrationProfile,
-      transportedLinearCalibrationSlope_eq_neutralAFBenchmarkRatio, hVA, hfstS_lt_one]
-  have hslope_lt :
-      (neutralAFIdentityCalibrationProfile π π fstS fstT).slope < 1 := by
-    rw [hprofile_eq_transport]
-    exact transportedLinearCalibrationSlope_lt_one V_A fstS fstT hVA hfst
-      (le_of_lt hfst_bounds.2)
+  have hslope_lt : (cal.targetIdentityCalibrationProfile).slope < 1 := by
+    simpa [CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
+      CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile] using
+      h_target_slope_lt
   have hslope_dev_pos :
       calibrationSlopeDeviation 1 <
-        (neutralAFIdentityCalibrationProfile π π fstS fstT).slopeDeviation := by
+        (cal.targetIdentityCalibrationProfile).slopeDeviation := by
     unfold CalibrationProfile.slopeDeviation calibrationSlopeDeviation
     rw [show (1 : ℝ) - 1 = 0 by ring, abs_zero]
-    have hneg :
-        (neutralAFIdentityCalibrationProfile π π fstS fstT).slope - 1 < 0 := by
-      linarith [hslope_lt]
+    have hneg : (cal.targetIdentityCalibrationProfile).slope - 1 < 0 := by
+      linarith
     rw [abs_of_neg hneg]
     linarith
   have hslope_dev :
-      (neutralAFIdentityCalibrationProfile π π fstS fstT).slopeDeviation =
-        1 - (neutralAFIdentityCalibrationProfile π π fstS fstT).slope := by
+      (cal.targetIdentityCalibrationProfile).slopeDeviation =
+        1 - (cal.targetIdentityCalibrationProfile).slope := by
     exact calibrationSlopeDeviation_eq_one_sub_of_lt_one
-      (neutralAFIdentityCalibrationProfile π π fstS fstT).slope hslope_lt
+      (cal.targetIdentityCalibrationProfile).slope hslope_lt
+  have hslope_eq :
+      (cal.targetIdentityCalibrationProfile).slope =
+        (sourceWeightedTagScore cal.metric (targetDirectCausalProjection cal.metric) +
+          sourceWeightedTagScore cal.metric (targetProxyTaggingProjection cal.metric) +
+          sourceWeightedTagScore cal.metric cal.metric.contextCrossTarget) /
+            targetScoreVarianceFromSourceWeights cal.metric := by
+    simpa [CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
+      CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile] using
+      CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law
+        cal CalibrationLink.identity
   have hbrier :
-      sourceBrierFromR2 π (presentDayR2 V_A V_E fstS) <
-        targetBrierFromNeutralAFBenchmark π V_A V_E fstT := by
-    exact targetBrier_strict_gt_source_of_neutralAF_benchmark
-      π V_A V_E fstS fstT hπ0 hπ1 hVA hVE hfst hfst_bounds
-  have hslope_eq_closed :
-      (neutralAFIdentityCalibrationProfile π π fstS fstT).slope = (1 - fstT) / (1 - fstS) := by
-    rw [hprofile_eq_transport, hslope_eq]
-  exact ⟨hslope_lt, hslope_dev_pos, hslope_dev, hprofile_eq_transport, hslope_eq_closed, hbrier⟩
+      sourceCalibratedBrierFromSourceWeightsAtPrevalence
+          cal.metric cal.metric.targetPrevalence <
+        targetCalibratedBrierFromSourceWeights cal.metric := by
+    rw [sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart,
+      targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart]
+    simpa [brierFromR2, sourceBrierFromR2, TransportedMetrics.calibratedBrier] using
+      brierFromR2_strictAnti cal.metric.targetPrevalence
+        cal.metric.targetPrevalence_pos cal.metric.targetPrevalence_lt_one h_r2_drop
+  exact ⟨hslope_lt, hslope_dev_pos, hslope_dev, hslope_eq, hbrier⟩
 
 /-- **Dimension-to-information ratio for a target adaptation task.**
     In an orthogonal Fisher model with `d` target-specific parameters and

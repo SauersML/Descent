@@ -6,7 +6,7 @@
   <title>Gnomon · Portability Metrics Dashboard</title>
   <meta
     name="description"
-    content="Interactive benchmark dashboard for portability metrics with live controls, time-based graphs, summary metrics, and model flowcharts."
+    content="Interactive mechanistic dashboard for exact portability laws using transported score moments, covariance channels, and explicit biological loss budgets."
   >
   <style>
     :root {
@@ -767,7 +767,7 @@
       <div class="hero-stage rise-in">
         <div class="hero-copy">
           <h1>Portability Metrics Dashboard</h1>
-          <p class="lead">Set the population-genetic benchmark inputs, deployed source explained variance, prevalence, and generations since population split to inspect the dashboard's coarse benchmark charts for explained variance, ROC area, and Brier score.</p>
+          <p class="lead">Inspect exact mechanistic portability laws from transported source-weight score moments, explicit SNP-level covariance channels, and additive target-side biological loss terms.</p>
           <div class="hero-actions">
             <a class="hero-link" href="#graphs">Graphs</a>
             <a class="hero-link hero-link-secondary" href="#figures">Flowcharts</a>
@@ -783,60 +783,92 @@
               <p class="section-kicker">Dashboard</p>
               <h2>Portability Dashboard</h2>
             </div>
-            <p>Coarse benchmark transport coordinates and the resulting explained variance, ROC area, and Brier score under the chosen parameter values.</p>
+            <p>Exact mechanistic law explorer for explained variance, liability ROC area, and calibrated Brier score on the transported source-weight score equation.</p>
           </div>
 
           <div class="graph-layout" id="graph-form">
             <div class="control-panel">
               <div class="control-group">
-                <h3>Evolutionary Inputs</h3>
+                <h3>Source Score Law Inputs</h3>
                 <div class="control-grid">
                   <label class="control-field">
-                    <span>Effective population size</span>
-                    <input id="input-population-size" type="number" min="1" step="1" value="1000">
+                    <span>Source predictive covariance</span>
+                    <input id="input-source-predictive-covariance" type="number" step="0.01" value="0.30">
                   </label>
                   <label class="control-field">
-                    <span>Mutation rate per generation</span>
-                    <input id="input-mutation-rate" type="number" min="0" max="0.5" step="0.0001" value="0.0002">
+                    <span>Source score variance</span>
+                    <input id="input-source-score-variance" type="number" min="0.0001" step="0.01" value="0.45">
                   </label>
                   <label class="control-field">
-                    <span>Migration rate per generation</span>
-                    <input id="input-migration-rate" type="number" min="0" step="0.0001" value="0.0005">
-                  </label>
-                  <label class="control-field">
-                    <span>Recombination rate</span>
-                    <input id="input-recombination-rate" type="number" min="0" max="0.5" step="0.0001" value="0.002">
+                    <span>Source outcome variance</span>
+                    <input id="input-source-outcome-variance" type="number" min="0.0001" step="0.01" value="0.60">
                   </label>
                 </div>
               </div>
 
               <div class="control-group">
-                <h3>Performance Inputs</h3>
+                <h3>Target Biological Score Contributions</h3>
                 <div class="control-grid">
                   <label class="control-field">
-                    <span>Deployed source explained variance</span>
-                    <input id="input-source-explained-variance" type="number" min="0.0001" max="0.9999" step="0.001" value="0.3">
+                    <span>Target direct-causal score contribution</span>
+                    <input id="input-target-direct-causal-score" type="number" step="0.01" value="0.14">
                   </label>
                   <label class="control-field">
-                    <span>Disease prevalence</span>
-                    <input id="input-disease-prevalence" type="number" min="0.0001" max="0.9999" step="0.001" value="0.1">
+                    <span>Target proxy-tagging score contribution</span>
+                    <input id="input-target-proxy-tagging-score" type="number" step="0.01" value="0.05">
+                  </label>
+                  <label class="control-field">
+                    <span>Target context channel</span>
+                    <input id="input-target-context-score" type="number" step="0.01" value="-0.02">
+                  </label>
+                  <label class="control-field">
+                    <span>Target score variance</span>
+                    <input id="input-target-score-variance" type="number" min="0.0001" step="0.01" value="0.42">
                   </label>
                 </div>
+                <p class="control-note">This dashboard uses the exact direct/proxy/context predictive-covariance law: target predictive covariance is the sum of the direct-causal score contribution, the proxy-tagging score contribution, and the target context contribution. Target-only novel effects can enter through the direct-causal or proxy-tagging contribution, depending on whether they are directly scored or only tagged.</p>
               </div>
 
               <div class="control-group">
-                <h3>Signal Scale</h3>
+                <h3>Target Loss Budget And Deployment Scale</h3>
                 <div class="control-grid">
                   <label class="control-field">
-                    <span>Environmental variance</span>
-                    <input id="input-environmental-variance" type="number" min="0.0001" step="0.01" value="1">
+                    <span>Target baseline outcome variance</span>
+                    <input id="input-target-outcome-variance" type="number" min="0.0001" step="0.01" value="0.62">
+                  </label>
+                  <label class="control-field">
+                    <span>Broken tagging residual</span>
+                    <input id="input-broken-tagging-residual" type="number" min="0" step="0.001" value="0.03">
+                  </label>
+                  <label class="control-field">
+                    <span>Ancestry-specific LD residual</span>
+                    <input id="input-ancestry-specific-ld-residual" type="number" min="0" step="0.001" value="0.02">
+                  </label>
+                  <label class="control-field">
+                    <span>Source-specific overfit residual</span>
+                    <input id="input-source-specific-overfit-residual" type="number" min="0" step="0.001" value="0.015">
+                  </label>
+                  <label class="control-field">
+                    <span>Novel untaggable phenotype residual</span>
+                    <input id="input-novel-untaggable-phenotype-residual" type="number" min="0" step="0.001" value="0.025">
+                  </label>
+                  <label class="control-field">
+                    <span>Target prevalence</span>
+                    <input id="input-target-prevalence" type="number" min="0.0001" max="0.9999" step="0.001" value="0.1">
                   </label>
                 </div>
-                <p class="control-note">This page is a coarse benchmark dashboard. Environmental variance only rescales the signal-variance chart coordinate; with deployed source explained variance held fixed, it does not change the benchmark explained variance, ROC area, or Brier score.</p>
+                <p class="control-note">The effective target outcome variance used by the law is the baseline target outcome variance plus the four explicit nonnegative biological loss terms.</p>
               </div>
 
               <div class="warning">
-                This dashboard is intentionally benchmark-only. It does not implement the repo's mechanistic SNP/LD/tagging calibration model; it visualizes the coarse scalar drift chart with explicit metric maps on top.
+                Exact law explorer. This page implements the mechanistic law surface from the proof tree:
+                <code>Cov_T(score_S, Y_T) = score_S(direct_T) + score_S(proxy_T) + score_S(context_T)</code>,
+                <code>signal = Cov(score, Y)^2 / Var(score)</code>,
+                <code>R² = signal / V_eff</code>,
+                <code>AUC = Φ(√(signal / (2 residual)))</code>,
+                <code>Brier = π(1-π)(1-R²)</code>,
+                with <code>V_eff = V_target + broken tagging + ancestry-specific LD + source-specific overfit + novel untaggable phenotype</code>.
+                The displayed source Brier reference is evaluated on the same target prevalence scale so the source/target Brier comparison stays on one deployment coordinate.
               </div>
 
               <div class="control-actions">
@@ -849,29 +881,44 @@
             <div class="graph-main">
               <div class="metric-grid">
                 <article class="metric-card">
-                  <p class="metric-label">Source Signal Coordinate</p>
+                  <p class="metric-label">Source Signal Variance</p>
                   <p class="metric-value" id="stat-source-signal">0</p>
-                  <p class="metric-subtitle">Benchmark signal-variance coordinate implied by the chosen deployed source explained variance and environmental variance.</p>
+                  <p class="metric-subtitle">Exact source signal variance from the source score law.</p>
                 </article>
                 <article class="metric-card">
-                  <p class="metric-label">Transport Coordinate</p>
-                  <p class="metric-value" id="stat-transport">0</p>
-                  <p class="metric-subtitle">Coarse scalar transport coordinate used by this benchmark chart at the chosen generation count since population split.</p>
+                  <p class="metric-label">Target Predictive Covariance</p>
+                  <p class="metric-value" id="stat-target-covariance">0</p>
+                  <p class="metric-subtitle">Sum of the exact direct-causal, proxy-tagging, and context score contributions under the transported source weights.</p>
                 </article>
                 <article class="metric-card">
-                  <p class="metric-label">Benchmark Target Explained Variance</p>
+                  <p class="metric-label">Effective Target Outcome Variance</p>
+                  <p class="metric-value" id="stat-effective-target-variance">0</p>
+                  <p class="metric-subtitle">Baseline target outcome variance plus the explicit additive biological loss budget.</p>
+                </article>
+                <article class="metric-card">
+                  <p class="metric-label">Target Residual Variance</p>
+                  <p class="metric-value" id="stat-target-residual">0</p>
+                  <p class="metric-subtitle">Residual used by the liability ROC area law: effective target variance minus target signal variance.</p>
+                </article>
+                <article class="metric-card">
+                  <p class="metric-label">Exact Target Explained Variance</p>
                   <p class="metric-value" id="stat-r2-target">0</p>
-                  <p class="metric-subtitle">Deployed source explained variance: <span id="stat-r2-source">0</span></p>
+                  <p class="metric-subtitle">Exact source explained variance: <span id="stat-r2-source">0</span></p>
                 </article>
                 <article class="metric-card">
-                  <p class="metric-label">Benchmark Target ROC Area</p>
+                  <p class="metric-label">Exact R² Portability Ratio</p>
+                  <p class="metric-value" id="stat-r2-ratio">0</p>
+                  <p class="metric-subtitle">Target explained variance divided by source explained variance.</p>
+                </article>
+                <article class="metric-card">
+                  <p class="metric-label">Exact Target Liability ROC Area</p>
                   <p class="metric-value" id="stat-auc-target">0</p>
-                  <p class="metric-subtitle">Computed from explicit target signal and residual variance in the benchmark chart. Source ROC area: <span id="stat-auc-source">0</span></p>
+                  <p class="metric-subtitle">Computed from explicit target signal and residual variance. Source liability ROC area: <span id="stat-auc-source">0</span></p>
                 </article>
                 <article class="metric-card">
-                  <p class="metric-label">Benchmark Target Brier Score</p>
+                  <p class="metric-label">Exact Target Brier Score</p>
                   <p class="metric-value" id="stat-brier-target">0</p>
-                  <p class="metric-subtitle">Benchmark prediction-error summary. Source Brier score: <span id="stat-brier-source">0</span></p>
+                  <p class="metric-subtitle">Calibrated Brier score on the target prevalence scale. Source Brier on the same target prevalence scale: <span id="stat-brier-source">0</span></p>
                 </article>
               </div>
 
@@ -879,25 +926,21 @@
                 <article class="chart-card">
                   <div class="chart-head">
                     <div>
-                      <h3>Benchmark Target Metrics Across Generations Since Population Split</h3>
-                      <p>Benchmark target explained variance, ROC area, and Brier score for the current parameter values.</p>
+                      <h3>Exact Target Metrics Across Transported Predictive Covariance</h3>
+                      <p>The exact law response of target explained variance, liability ROC area, and Brier score as total direct-causal plus proxy-tagging plus context predictive covariance varies while target score variance and the loss budget stay fixed.</p>
                     </div>
                   </div>
                   <div class="chart-controls">
                     <label class="control-field chart-control-field">
-                      <span>Generations since population split used in this graph</span>
-                      <input id="input-selected-divergence-time" type="number" min="0" step="1" value="250">
-                    </label>
-                    <label class="control-field chart-control-field">
-                      <span>Maximum generations shown in this graph</span>
-                      <input id="input-maximum-divergence-time" type="number" min="1" step="1" value="1000">
+                      <span>Maximum absolute predictive covariance shown</span>
+                      <input id="input-covariance-max-abs" type="number" min="0.0001" step="0.01" value="0.35">
                     </label>
                     <label class="control-field chart-control-field">
                       <span>Points used in this graph</span>
-                      <input id="input-time-plot-points" type="number" min="40" max="600" step="10" value="200">
+                      <input id="input-covariance-plot-points" type="number" min="40" max="600" step="10" value="240">
                     </label>
                   </div>
-                  <p class="chart-note">The vertical guide marks the generation count used in the summary values and in the comparison graph.</p>
+                  <p class="chart-note">The vertical guide marks the current total target predictive covariance implied by the direct-causal, proxy-tagging, and context score contributions.</p>
                   <div class="chart-legend" id="legend-metrics"></div>
                   <div class="chart-shell">
                     <svg class="chart-svg" id="chart-metrics" viewBox="0 0 960 440" role="img" aria-label="Target performance chart"></svg>
@@ -907,20 +950,24 @@
                 <article class="chart-card">
                   <div class="chart-head">
                     <div>
-                      <h3>Benchmark Target Metrics as One Input Changes</h3>
-                      <p>Benchmark target explained variance, ROC area, and Brier score as one input varies while the others remain fixed.</p>
+                      <h3>Exact Target Metrics As One Mechanistic Input Changes</h3>
+                      <p>Exact target explained variance, liability ROC area, and Brier score as one explicit mechanistic law input varies while the others remain fixed.</p>
                     </div>
                   </div>
                   <div class="chart-controls">
                     <label class="control-field chart-control-field">
                       <span>Input varied in this graph</span>
                       <select id="input-varied-parameter">
-                        <option value="populationSize">Effective population size</option>
-                        <option value="mutationRate">Mutation rate</option>
-                        <option value="migrationRate">Migration rate</option>
-                        <option value="recombinationRate" selected>Recombination rate</option>
-                        <option value="sourceExplainedVariance">Source explained variance</option>
-                        <option value="diseasePrevalence">Disease prevalence</option>
+                        <option value="targetDirectCausalScore">Target direct-causal score contribution</option>
+                        <option value="targetProxyTaggingScore">Target proxy-tagging score contribution</option>
+                        <option value="targetContextScore">Target context channel</option>
+                        <option value="targetScoreVariance">Target score variance</option>
+                        <option value="targetOutcomeVariance">Target outcome variance</option>
+                        <option value="brokenTaggingResidual" selected>Broken tagging residual</option>
+                        <option value="ancestrySpecificLDResidual">Ancestry-specific LD residual</option>
+                        <option value="sourceSpecificOverfitResidual">Source-specific overfit residual</option>
+                        <option value="novelUntaggablePhenotypeResidual">Novel untaggable phenotype residual</option>
+                        <option value="targetPrevalence">Target prevalence</option>
                       </select>
                     </label>
                     <label class="control-field chart-control-field">
@@ -936,7 +983,7 @@
                       <input id="input-comparison-plot-points" type="number" min="40" max="600" step="10" value="200">
                     </label>
                   </div>
-                  <p class="chart-note">All other inputs remain fixed at the values in the model-input panel. The generation count from the first graph is used here.</p>
+                  <p class="chart-note">All other inputs remain fixed at the values in the law-input panel. The direct and proxy contributions are the exact score-level biological channels in the deployed predictive-covariance law.</p>
                   <div class="chart-legend" id="legend-sweep"></div>
                   <div class="chart-shell">
                     <svg class="chart-svg" id="chart-sweep" viewBox="0 0 960 440" role="img" aria-label="One-input sensitivity chart"></svg>
@@ -947,13 +994,60 @@
           </div>
         </section>
 
+        <section class="panel" id="laws">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Exact Laws</p>
+              <h2>Metric Portability Laws</h2>
+            </div>
+            <p>Exact deployed metric laws on the biological transport state, with the predictive covariance tied directly to direct-causal, proxy-tagging, and context channels and the denominator tied to the explicit target loss budget.</p>
+          </div>
+
+          <div class="figure-grid">
+            <article class="figure-card">
+              <div class="pill-row">
+                <span class="pill pill-theorem">Covariance Law</span>
+                <span class="pill pill-definition">Biology First</span>
+              </div>
+              <h3>Exact target predictive-covariance law</h3>
+              <p class="figure-caption"><code>Cov_T(score_S, Y_T) = score_S(direct_T) + score_S(proxy_T) + score_S(context_T)</code></p>
+              <p class="figure-caption"><code>direct_T = (directCausalTarget + novelDirectCausalTarget) · β_T</code></p>
+              <p class="figure-caption"><code>proxy_T = (proxyTaggingTarget + novelProxyTaggingTarget) · β_T</code></p>
+              <p class="figure-caption">This is the deployed score law closest to base biology: the source-learned weight vector acts directly on the target direct-causal channel, the target proxy-tagging channel, and the target context channel.</p>
+            </article>
+
+            <article class="figure-card">
+              <div class="pill-row">
+                <span class="pill pill-theorem">Metric Laws</span>
+                <span class="pill pill-dependency">Exact Coordinates</span>
+              </div>
+              <h3>Exact deployed metric laws</h3>
+              <p class="figure-caption"><code>signal_T = Cov_T(score_S, Y_T)^2 / Var_T(score_S)</code></p>
+              <p class="figure-caption"><code>V_eff,T = V_target + broken tagging + ancestry-specific LD + source-specific overfit + novel untaggable phenotype</code></p>
+              <p class="figure-caption"><code>R²_T = signal_T / V_eff,T</code></p>
+              <p class="figure-caption"><code>AUC_T = Φ(√(signal_T / (2 (V_eff,T - signal_T))))</code></p>
+              <p class="figure-caption"><code>Brier_T = π_T (1-π_T) (1-R²_T)</code></p>
+            </article>
+
+            <article class="figure-card">
+              <div class="pill-row">
+                <span class="pill pill-theorem">Popgen Law</span>
+                <span class="pill pill-dependency">Generation Indexed</span>
+              </div>
+              <h3>Generation-indexed biological transport law</h3>
+              <p class="figure-caption"><code>sigmaTagTargetAt</code>, <code>directCausalTargetAt</code>, and <code>proxyTaggingTargetAt</code> are generated from recombination, transient <code>F_ST</code>, mutation sharing, migration sharing, and allele-frequency mismatch.</p>
+              <p class="figure-caption">At generation <code>t</code>, the exported deployed metric profile is exactly the same law applied to the slice <code>toMetricModelAt(t)</code>. The page uses a single-time law slice rather than a fake retained-signal scalar.</p>
+            </article>
+          </div>
+        </section>
+
         <section class="panel" id="figures">
           <div class="section-head">
             <div>
               <p class="section-kicker">Flowcharts</p>
               <h2>Model Flowcharts</h2>
             </div>
-            <p>Relationships among benchmark inputs, coarse transport coordinates, and benchmark target performance.</p>
+            <p>Relationships among the exact mechanistic law inputs, transported score moments, and the deployed target metrics.</p>
           </div>
 
           <div class="figure-grid">
@@ -962,7 +1056,7 @@
                 <span class="pill pill-definition">Figure 1</span>
                 <span class="pill pill-theorem">Performance Map</span>
               </div>
-              <h3>Relationships among benchmark inputs, transport coordinates, and target performance</h3>
+              <h3>Relationships among mechanistic law inputs, transported score moments, and target performance</h3>
               <div class="paper-figure">
                 <svg viewBox="0 0 720 430" role="img" aria-label="Signal flow from inputs to target performance">
                   <defs>
@@ -970,36 +1064,36 @@
                       <path d="M0,0 L10,4 L0,8 z" fill="rgba(30, 26, 24, 0.62)"></path>
                     </marker>
                   </defs>
-                  <text class="svg-label" x="34" y="42">Benchmark Inputs</text>
+                  <text class="svg-label" x="34" y="42">Mechanistic Inputs</text>
                   <rect class="svg-node" x="26" y="62" rx="14" ry="14" width="194" height="96"></rect>
-                  <text x="123" y="94" text-anchor="middle">Deployed source explained variance</text>
-                  <text x="123" y="118" text-anchor="middle">Environmental variance</text>
-                  <text x="123" y="142" text-anchor="middle">Disease prevalence</text>
+                  <text x="123" y="94" text-anchor="middle">Source predictive covariance</text>
+                  <text x="123" y="118" text-anchor="middle">Source and target score variance</text>
+                  <text x="123" y="142" text-anchor="middle">Source and target outcome scale</text>
 
                   <rect class="svg-node-strong" x="260" y="54" rx="16" ry="16" width="214" height="96"></rect>
-                  <text class="svg-label" x="286" y="80">Signal Coordinates</text>
-                  <text x="367" y="108" text-anchor="middle">Source signal coordinate</text>
-                  <text x="367" y="132" text-anchor="middle">Target signal coordinate</text>
+                  <text class="svg-label" x="286" y="80">Predictive-Covariance Law</text>
+                  <text x="367" y="108" text-anchor="middle">Cov_T = direct + proxy + context</text>
+                  <text x="367" y="132" text-anchor="middle">Signal variance = Cov² / Var(score)</text>
 
                   <rect class="svg-node-warm" x="260" y="206" rx="16" ry="16" width="214" height="140"></rect>
-                  <text class="svg-label" x="286" y="242">Transport Coordinates</text>
-                  <text x="367" y="268" text-anchor="middle">Population differentiation</text>
-                  <text x="367" y="292" text-anchor="middle">Linkage retention</text>
-                  <text x="367" y="316" text-anchor="middle">Mutation retention</text>
-                  <text x="367" y="340" text-anchor="middle">Migration effect</text>
+                  <text class="svg-label" x="286" y="242">Explicit Loss Budget</text>
+                  <text x="367" y="268" text-anchor="middle">Broken tagging residual</text>
+                  <text x="367" y="292" text-anchor="middle">Ancestry-specific LD residual</text>
+                  <text x="367" y="316" text-anchor="middle">Source-specific overfit residual</text>
+                  <text x="367" y="340" text-anchor="middle">Novel untaggable phenotype residual</text>
 
                   <rect class="svg-node-strong" x="502" y="54" rx="16" ry="16" width="192" height="110"></rect>
-                  <text class="svg-label" x="522" y="80">Benchmark Transport</text>
-                  <text x="598" y="110" text-anchor="middle">Transport coordinate</text>
-                  <text x="598" y="136" text-anchor="middle">Target signal coordinate</text>
+                  <text class="svg-label" x="522" y="80">Exact Metric Coordinates</text>
+                  <text x="598" y="110" text-anchor="middle">Effective target variance</text>
+                  <text x="598" y="136" text-anchor="middle">Residual = V_eff - signal</text>
 
                   <rect class="svg-node" x="502" y="216" rx="16" ry="16" width="192" height="136"></rect>
-                  <text class="svg-label" x="522" y="242">Benchmark Metrics</text>
+                  <text class="svg-label" x="522" y="242">Exact Metrics</text>
                   <text x="598" y="270" text-anchor="middle">
                     <tspan x="598" dy="0">Target explained</tspan>
                     <tspan x="598" dy="18">variance</tspan>
                   </text>
-                  <text x="598" y="312" text-anchor="middle">Target ROC area</text>
+                  <text x="598" y="312" text-anchor="middle">Target liability ROC area</text>
                   <text x="598" y="336" text-anchor="middle">Target Brier score</text>
 
                   <path class="svg-arrow" d="M220 110 C238 110, 242 110, 260 110"></path>
@@ -1010,7 +1104,7 @@
                 </svg>
               </div>
               <p class="figure-caption">
-                Relationships among benchmark inputs, transport coordinates, and target performance.
+                Relationships among exact mechanistic law inputs, transported score moments, and target performance.
               </p>
             </article>
 
@@ -1019,7 +1113,7 @@
                 <span class="pill pill-definition">Figure 2</span>
                 <span class="pill pill-dependency">Performance Drivers</span>
               </div>
-              <h3>Input dependence of transport coordinates and benchmark target performance</h3>
+              <h3>Input dependence of transported score moments, explicit loss terms, and exact target metrics</h3>
               <div class="paper-figure">
                 <svg viewBox="0 0 720 430" role="img" aria-label="Parameter dependence graph">
                   <defs>
@@ -1028,48 +1122,48 @@
                     </marker>
                   </defs>
                   <text class="svg-label" x="32" y="40">Inputs</text>
-                  <text class="svg-label" x="250" y="40">Intermediate Quantities</text>
-                  <text class="svg-label" x="486" y="40">Retention and Metrics</text>
+                  <text class="svg-label" x="250" y="40">Exact Intermediate Quantities</text>
+                  <text class="svg-label" x="486" y="40">Exact Metrics</text>
 
-                  <rect class="svg-node" x="30" y="64" rx="12" ry="12" width="120" height="42"></rect>
-                  <text x="48" y="84">Population size</text>
-                  <rect class="svg-node" x="30" y="122" rx="12" ry="12" width="120" height="42"></rect>
-                  <text x="56" y="149">Mutation rate</text>
-                  <rect class="svg-node" x="30" y="180" rx="12" ry="12" width="120" height="42"></rect>
-                  <text x="56" y="207">Migration rate</text>
-                  <rect class="svg-node" x="30" y="238" rx="12" ry="12" width="120" height="42"></rect>
-                  <text x="22" y="265">Generations since split</text>
-                  <rect class="svg-node" x="30" y="296" rx="12" ry="12" width="120" height="42"></rect>
-                  <text x="46" y="323">Recombination</text>
+                  <rect class="svg-node" x="20" y="64" rx="12" ry="12" width="148" height="42"></rect>
+                  <text x="94" y="90" text-anchor="middle">Direct-causal score term</text>
+                  <rect class="svg-node" x="20" y="122" rx="12" ry="12" width="148" height="42"></rect>
+                  <text x="94" y="148" text-anchor="middle">Proxy-tagging score term</text>
+                  <rect class="svg-node" x="20" y="180" rx="12" ry="12" width="148" height="42"></rect>
+                  <text x="94" y="206" text-anchor="middle">Context score term</text>
+                  <rect class="svg-node" x="20" y="238" rx="12" ry="12" width="148" height="42"></rect>
+                  <text x="94" y="264" text-anchor="middle">Loss budget</text>
+                  <rect class="svg-node" x="20" y="296" rx="12" ry="12" width="148" height="42"></rect>
+                  <text x="94" y="322" text-anchor="middle">Target prevalence</text>
 
                   <rect class="svg-node-strong" x="226" y="58" rx="14" ry="14" width="190" height="64"></rect>
-                  <text x="321" y="90" text-anchor="middle">Scaled generations since split</text>
-                  <text x="321" y="112" text-anchor="middle">Mutation and migration pressure</text>
+                  <text x="321" y="90" text-anchor="middle">Target predictive covariance</text>
+                  <text x="321" y="112" text-anchor="middle">Target score variance</text>
 
                   <rect class="svg-node-strong" x="226" y="144" rx="14" ry="14" width="190" height="74"></rect>
-                  <text x="321" y="176" text-anchor="middle">Equilibrium differentiation</text>
-                  <text x="321" y="198" text-anchor="middle">Heterozygosity retention</text>
-                  <text x="321" y="220" text-anchor="middle">Transient differentiation</text>
+                  <text x="321" y="176" text-anchor="middle">Signal variance = Cov² / Var(score)</text>
+                  <text x="321" y="198" text-anchor="middle">Effective target outcome variance</text>
+                  <text x="321" y="220" text-anchor="middle">Residual variance</text>
 
                   <rect class="svg-node-strong" x="226" y="242" rx="14" ry="14" width="190" height="88"></rect>
-                  <text x="321" y="272" text-anchor="middle">Linkage retention</text>
-                  <text x="321" y="294" text-anchor="middle">Mutation retention</text>
-                  <text x="321" y="316" text-anchor="middle">Migration boost</text>
+                  <text x="321" y="272" text-anchor="middle">Broken tagging</text>
+                  <text x="321" y="294" text-anchor="middle">Ancestry-specific LD and overfit</text>
+                  <text x="321" y="316" text-anchor="middle">Novel untaggable phenotype</text>
 
                   <rect class="svg-node-warm" x="468" y="108" rx="16" ry="16" width="214" height="92"></rect>
-                  <text x="575" y="142" text-anchor="middle">Transport coordinate</text>
-                  <text x="575" y="190" text-anchor="middle">Target signal coordinate</text>
+                  <text x="575" y="142" text-anchor="middle">Target explained variance</text>
+                  <text x="575" y="190" text-anchor="middle">Target/source R² ratio</text>
 
                   <rect class="svg-node" x="468" y="230" rx="16" ry="16" width="214" height="108"></rect>
-                  <text x="575" y="262" text-anchor="middle">Target explained variance</text>
-                  <text x="575" y="286" text-anchor="middle">Target ROC area</text>
-                  <text x="575" y="310" text-anchor="middle">Target Brier score</text>
+                  <text x="575" y="262" text-anchor="middle">Target liability ROC area</text>
+                  <text x="575" y="286" text-anchor="middle">Target Brier score</text>
+                  <text x="575" y="310" text-anchor="middle">Sensitivity sweeps</text>
 
-                  <path d="M150 85 C182 85, 192 85, 226 85" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
-                  <path d="M150 143 C182 143, 192 96, 226 96" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
-                  <path d="M150 201 C182 201, 192 110, 226 110" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
-                  <path d="M150 259 C182 259, 192 176, 226 176" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
-                  <path d="M150 317 C182 317, 192 286, 226 286" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
+                  <path d="M168 85 C190 85, 198 85, 226 85" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
+                  <path d="M168 143 C190 143, 198 96, 226 96" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
+                  <path d="M168 201 C190 201, 198 110, 226 110" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
+                  <path d="M168 259 C190 259, 198 176, 226 176" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
+                  <path d="M168 317 C190 317, 198 286, 226 286" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
                   <path d="M416 90 C442 90, 446 126, 468 126" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
                   <path d="M416 182 C442 182, 446 154, 468 154" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
                   <path d="M416 286 C442 286, 446 182, 468 182" stroke="rgba(30, 26, 24, 0.62)" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-b)"></path>
@@ -1077,7 +1171,7 @@
                 </svg>
               </div>
               <p class="figure-caption">
-                Input dependence of transport coordinates and benchmark target performance.
+                Input dependence of transported score moments, explicit loss terms, and exact target metrics.
               </p>
             </article>
           </div>
@@ -1093,16 +1187,21 @@
       const $ = (id) => document.getElementById(id);
 
       const inputs = {
-        populationSize: $("input-population-size"),
-        mutationRate: $("input-mutation-rate"),
-        migrationRate: $("input-migration-rate"),
-        recombinationRate: $("input-recombination-rate"),
-        sourceExplainedVariance: $("input-source-explained-variance"),
-        environmentalVariance: $("input-environmental-variance"),
-        diseasePrevalence: $("input-disease-prevalence"),
-        selectedDivergenceTime: $("input-selected-divergence-time"),
-        maximumDivergenceTime: $("input-maximum-divergence-time"),
-        timePlotPoints: $("input-time-plot-points"),
+        sourcePredictiveCovariance: $("input-source-predictive-covariance"),
+        sourceScoreVariance: $("input-source-score-variance"),
+        sourceOutcomeVariance: $("input-source-outcome-variance"),
+        targetDirectCausalScore: $("input-target-direct-causal-score"),
+        targetProxyTaggingScore: $("input-target-proxy-tagging-score"),
+        targetContextScore: $("input-target-context-score"),
+        targetScoreVariance: $("input-target-score-variance"),
+        targetOutcomeVariance: $("input-target-outcome-variance"),
+        brokenTaggingResidual: $("input-broken-tagging-residual"),
+        ancestrySpecificLDResidual: $("input-ancestry-specific-ld-residual"),
+        sourceSpecificOverfitResidual: $("input-source-specific-overfit-residual"),
+        novelUntaggablePhenotypeResidual: $("input-novel-untaggable-phenotype-residual"),
+        targetPrevalence: $("input-target-prevalence"),
+        covarianceMaxAbs: $("input-covariance-max-abs"),
+        covariancePlotPoints: $("input-covariance-plot-points"),
         variedParameter: $("input-varied-parameter"),
         variedParameterMin: $("input-varied-parameter-min"),
         variedParameterMax: $("input-varied-parameter-max"),
@@ -1113,8 +1212,11 @@
       const warningEl = $("graph-warning");
       const stats = {
         sourceSignal: $("stat-source-signal"),
-        transport: $("stat-transport"),
+        targetCovariance: $("stat-target-covariance"),
+        effectiveTargetVariance: $("stat-effective-target-variance"),
+        targetResidual: $("stat-target-residual"),
         r2Target: $("stat-r2-target"),
+        r2Ratio: $("stat-r2-ratio"),
         aucTarget: $("stat-auc-target"),
         brierTarget: $("stat-brier-target"),
         r2Source: $("stat-r2-source"),
@@ -1123,29 +1225,38 @@
       };
 
       const defaults = {
-        populationSize: 1000,
-        mutationRate: 0.0002,
-        migrationRate: 0.0005,
-        recombinationRate: 0.002,
-        sourceExplainedVariance: 0.3,
-        environmentalVariance: 1,
-        diseasePrevalence: 0.1,
-        selectedDivergenceTime: 250,
-        maximumDivergenceTime: 1000,
-        timePlotPoints: 200,
-        variedParameter: "recombinationRate",
-        variedParameterMin: 0.0005,
-        variedParameterMax: 0.02,
+        sourcePredictiveCovariance: 0.30,
+        sourceScoreVariance: 0.45,
+        sourceOutcomeVariance: 0.60,
+        targetDirectCausalScore: 0.14,
+        targetProxyTaggingScore: 0.05,
+        targetContextScore: -0.02,
+        targetScoreVariance: 0.42,
+        targetOutcomeVariance: 0.62,
+        brokenTaggingResidual: 0.03,
+        ancestrySpecificLDResidual: 0.02,
+        sourceSpecificOverfitResidual: 0.015,
+        novelUntaggablePhenotypeResidual: 0.025,
+        targetPrevalence: 0.1,
+        covarianceMaxAbs: 0.35,
+        covariancePlotPoints: 240,
+        variedParameter: "brokenTaggingResidual",
+        variedParameterMin: 0,
+        variedParameterMax: 0.08,
         comparisonPlotPoints: 200
       };
 
       const variedParameterDefaults = {
-        populationSize: [100, 5000],
-        mutationRate: [0, 0.01],
-        migrationRate: [0, 0.01],
-        recombinationRate: [0.0005, 0.02],
-        sourceExplainedVariance: [0.05, 0.8],
-        diseasePrevalence: [0.01, 0.5]
+        targetDirectCausalScore: [-0.6, 0.6],
+        targetProxyTaggingScore: [-0.4, 0.4],
+        targetContextScore: [-0.4, 0.4],
+        targetScoreVariance: [0.1, 1.2],
+        targetOutcomeVariance: [0.2, 1.5],
+        brokenTaggingResidual: [0, 0.2],
+        ancestrySpecificLDResidual: [0, 0.2],
+        sourceSpecificOverfitResidual: [0, 0.2],
+        novelUntaggablePhenotypeResidual: [0, 0.2],
+        targetPrevalence: [0.01, 0.5]
       };
 
       const colors = {
@@ -1154,28 +1265,33 @@
         amber: "#906400",
         slate: "#30444b",
         ink: "#1e1a18",
-        stone: "#8a8177"
+        stone: "#8a8177",
+        inkSoft: "#5d5752"
       };
 
       const parameterLabels = {
-        populationSize: "effective population size",
-        mutationRate: "mutation rate",
-        migrationRate: "migration rate",
-        recombinationRate: "recombination rate",
-        sourceExplainedVariance: "deployed source explained variance",
-        diseasePrevalence: "disease prevalence"
+        targetDirectCausalScore: "target direct-causal score contribution",
+        targetProxyTaggingScore: "target proxy-tagging score contribution",
+        targetContextScore: "target context channel",
+        targetScoreVariance: "target score variance",
+        targetOutcomeVariance: "target outcome variance",
+        brokenTaggingResidual: "broken tagging residual",
+        ancestrySpecificLDResidual: "ancestry-specific LD residual",
+        sourceSpecificOverfitResidual: "source-specific overfit residual",
+        novelUntaggablePhenotypeResidual: "novel untaggable phenotype residual",
+        targetPrevalence: "target prevalence"
       };
 
       const metricLegend = [
-        { name: "benchmark target explained variance", color: colors.teal },
-        { name: "benchmark target area under the ROC curve", color: colors.rust },
-        { name: "benchmark target Brier score", color: colors.amber }
+        { name: "exact target explained variance", color: colors.teal },
+        { name: "exact target liability ROC area", color: colors.rust },
+        { name: "exact target Brier score", color: colors.amber }
       ];
 
       const variedParameterLegend = [
-        { name: "benchmark target explained variance", color: colors.teal },
-        { name: "benchmark target area under the ROC curve", color: colors.rust },
-        { name: "benchmark target Brier score", color: colors.amber }
+        { name: "exact target explained variance", color: colors.teal },
+        { name: "exact target liability ROC area", color: colors.rust },
+        { name: "exact target Brier score", color: colors.amber }
       ];
 
       function renderLegend(targetId, entries) {
@@ -1253,18 +1369,27 @@
         return 0.5 * (1 + erfApprox(x / Math.SQRT2));
       }
 
+      function square(value) {
+        return value * value;
+      }
+
       function readConfig() {
         return {
-          populationSize: Number(inputs.populationSize.value),
-          mutationRate: Number(inputs.mutationRate.value),
-          migrationRate: Number(inputs.migrationRate.value),
-          recombinationRate: Number(inputs.recombinationRate.value),
-          sourceExplainedVariance: Number(inputs.sourceExplainedVariance.value),
-          environmentalVariance: Number(inputs.environmentalVariance.value),
-          diseasePrevalence: Number(inputs.diseasePrevalence.value),
-          selectedDivergenceTime: Number(inputs.selectedDivergenceTime.value),
-          maximumDivergenceTime: Number(inputs.maximumDivergenceTime.value),
-          timePlotPoints: Number(inputs.timePlotPoints.value),
+          sourcePredictiveCovariance: Number(inputs.sourcePredictiveCovariance.value),
+          sourceScoreVariance: Number(inputs.sourceScoreVariance.value),
+          sourceOutcomeVariance: Number(inputs.sourceOutcomeVariance.value),
+          targetDirectCausalScore: Number(inputs.targetDirectCausalScore.value),
+          targetProxyTaggingScore: Number(inputs.targetProxyTaggingScore.value),
+          targetContextScore: Number(inputs.targetContextScore.value),
+          targetScoreVariance: Number(inputs.targetScoreVariance.value),
+          targetOutcomeVariance: Number(inputs.targetOutcomeVariance.value),
+          brokenTaggingResidual: Number(inputs.brokenTaggingResidual.value),
+          ancestrySpecificLDResidual: Number(inputs.ancestrySpecificLDResidual.value),
+          sourceSpecificOverfitResidual: Number(inputs.sourceSpecificOverfitResidual.value),
+          novelUntaggablePhenotypeResidual: Number(inputs.novelUntaggablePhenotypeResidual.value),
+          targetPrevalence: Number(inputs.targetPrevalence.value),
+          covarianceMaxAbs: Number(inputs.covarianceMaxAbs.value),
+          covariancePlotPoints: Number(inputs.covariancePlotPoints.value),
           variedParameter: inputs.variedParameter.value,
           variedParameterMin: Number(inputs.variedParameterMin.value),
           variedParameterMax: Number(inputs.variedParameterMax.value),
@@ -1272,131 +1397,128 @@
         };
       }
 
+      function computeTargetPredictiveCovariance(cfg) {
+        return cfg.targetDirectCausalScore +
+          cfg.targetProxyTaggingScore +
+          cfg.targetContextScore;
+      }
+
+      function computeSourceSignalVariance(cfg) {
+        return square(cfg.sourcePredictiveCovariance) / cfg.sourceScoreVariance;
+      }
+
+      function computeEffectiveTargetOutcomeVariance(cfg) {
+        return cfg.targetOutcomeVariance +
+          cfg.brokenTaggingResidual +
+          cfg.ancestrySpecificLDResidual +
+          cfg.sourceSpecificOverfitResidual +
+          cfg.novelUntaggablePhenotypeResidual;
+      }
+
+      function computeTargetSignalVarianceFromCovariance(targetPredictiveCovariance, cfg) {
+        return square(targetPredictiveCovariance) / cfg.targetScoreVariance;
+      }
+
+      function brierFromR2(prevalence, explainedVariance) {
+        return prevalence * (1 - prevalence) * (1 - explainedVariance);
+      }
+
+      function buildMetricState(cfg, overriddenTargetPredictiveCovariance = null) {
+        const sourceSignal = computeSourceSignalVariance(cfg);
+        const sourceResidual = cfg.sourceOutcomeVariance - sourceSignal;
+        const sourceR2 = sourceSignal / cfg.sourceOutcomeVariance;
+        const sourceAuc = sourceResidual > 0
+          ? phi(Math.sqrt(sourceSignal / (2 * sourceResidual)))
+          : Number.NaN;
+        const sourceBrier = brierFromR2(cfg.targetPrevalence, sourceR2);
+
+        const targetPredictiveCovariance = overriddenTargetPredictiveCovariance ?? computeTargetPredictiveCovariance(cfg);
+        const targetSignal = computeTargetSignalVarianceFromCovariance(targetPredictiveCovariance, cfg);
+        const effectiveTargetVariance = computeEffectiveTargetOutcomeVariance(cfg);
+        const targetResidual = effectiveTargetVariance - targetSignal;
+        const targetR2 = targetResidual > 0
+          ? targetSignal / effectiveTargetVariance
+          : Number.NaN;
+        const targetAuc = targetResidual > 0
+          ? phi(Math.sqrt(targetSignal / (2 * targetResidual)))
+          : Number.NaN;
+        const targetBrier = Number.isFinite(targetR2)
+          ? brierFromR2(cfg.targetPrevalence, targetR2)
+          : Number.NaN;
+        const r2Ratio = sourceR2 > 0 && Number.isFinite(targetR2)
+          ? targetR2 / sourceR2
+          : Number.NaN;
+
+        return {
+          sourceSignal,
+          sourceResidual,
+          sourceR2,
+          sourceAuc,
+          sourceBrier,
+          targetPredictiveCovariance,
+          targetSignal,
+          effectiveTargetVariance,
+          targetResidual,
+          targetR2,
+          targetAuc,
+          targetBrier,
+          r2Ratio
+        };
+      }
+
       function validateConfig(cfg) {
         const problems = [];
-        if (!(cfg.populationSize >= 1)) problems.push("Effective population size must be at least 1.");
-        if (!(cfg.mutationRate >= 0 && cfg.mutationRate < 0.5)) problems.push("Mutation rate must be in [0, 0.5).");
-        if (!(cfg.migrationRate >= 0)) problems.push("Migration rate must be nonnegative.");
-        if (!(cfg.recombinationRate >= 0 && cfg.recombinationRate <= 0.5)) problems.push("Recombination rate must be in [0, 0.5].");
-        if (!(cfg.sourceExplainedVariance > 0 && cfg.sourceExplainedVariance < 1)) problems.push("Source explained variance must be in (0, 1).");
-        if (!(cfg.environmentalVariance > 0)) problems.push("Environmental variance must be positive.");
-        if (!(cfg.diseasePrevalence > 0 && cfg.diseasePrevalence < 1)) problems.push("Disease prevalence must be in (0, 1).");
-        if (!(cfg.selectedDivergenceTime >= 0)) problems.push("Generations since population split must be nonnegative.");
-        if (!(cfg.maximumDivergenceTime > 0)) problems.push("The maximum number of generations since population split must be positive.");
-        if (!(cfg.selectedDivergenceTime <= cfg.maximumDivergenceTime)) problems.push("Generations since population split must not exceed the maximum number of generations shown.");
-        if (!(cfg.timePlotPoints >= 40 && cfg.timePlotPoints <= 600)) problems.push("The number of points in the generations plot must be between 40 and 600.");
-        if (!(cfg.comparisonPlotPoints >= 40 && cfg.comparisonPlotPoints <= 600)) problems.push("The number of points in the comparison plot must be between 40 and 600.");
+        if (!(cfg.sourceScoreVariance > 0)) problems.push("Source score variance must be positive.");
+        if (!(cfg.sourceOutcomeVariance > 0)) problems.push("Source outcome variance must be positive.");
+        if (!(cfg.targetScoreVariance > 0)) problems.push("Target score variance must be positive.");
+        if (!(cfg.targetOutcomeVariance > 0)) problems.push("Target outcome variance must be positive.");
+        if (!(cfg.brokenTaggingResidual >= 0)) problems.push("Broken tagging residual must be nonnegative.");
+        if (!(cfg.ancestrySpecificLDResidual >= 0)) problems.push("Ancestry-specific LD residual must be nonnegative.");
+        if (!(cfg.sourceSpecificOverfitResidual >= 0)) problems.push("Source-specific overfit residual must be nonnegative.");
+        if (!(cfg.novelUntaggablePhenotypeResidual >= 0)) problems.push("Novel untaggable phenotype residual must be nonnegative.");
+        if (!(cfg.targetPrevalence > 0 && cfg.targetPrevalence < 1)) problems.push("Target prevalence must be in (0, 1).");
+        if (!(cfg.sourcePredictiveCovariance !== 0)) problems.push("Source predictive covariance must be nonzero so the portability ratio is defined.");
+        if (!(cfg.covarianceMaxAbs > 0)) problems.push("The maximum absolute predictive covariance shown must be positive.");
+        if (!(cfg.covariancePlotPoints >= 40 && cfg.covariancePlotPoints <= 600)) problems.push("The number of points in the covariance plot must be between 40 and 600.");
+        if (!(cfg.comparisonPlotPoints >= 40 && cfg.comparisonPlotPoints <= 600)) problems.push("The number of points in the sensitivity plot must be between 40 and 600.");
         if (!(cfg.variedParameterMin < cfg.variedParameterMax)) problems.push("The lowest value for the chosen parameter must be less than the highest value.");
 
         switch (cfg.variedParameter) {
-          case "populationSize":
-            if (!(cfg.variedParameterMin >= 1)) problems.push("The plotted range for effective population size must stay at or above 1.");
+          case "sourceScoreVariance":
+          case "sourceOutcomeVariance":
+          case "targetScoreVariance":
+          case "targetOutcomeVariance":
+            if (!(cfg.variedParameterMin > 0)) problems.push(`The plotted range for ${parameterLabels[cfg.variedParameter]} must stay positive.`);
             break;
-          case "mutationRate":
-            if (!(cfg.variedParameterMin >= 0 && cfg.variedParameterMax < 0.5)) problems.push("The plotted range for mutation rate must stay in [0, 0.5).");
+          case "brokenTaggingResidual":
+          case "ancestrySpecificLDResidual":
+          case "sourceSpecificOverfitResidual":
+          case "novelUntaggablePhenotypeResidual":
+            if (!(cfg.variedParameterMin >= 0)) problems.push(`The plotted range for ${parameterLabels[cfg.variedParameter]} must stay nonnegative.`);
             break;
-          case "migrationRate":
-            if (!(cfg.variedParameterMin >= 0)) problems.push("The plotted range for migration rate must be nonnegative.");
-            break;
-          case "recombinationRate":
-            if (!(cfg.variedParameterMin >= 0 && cfg.variedParameterMax <= 0.5)) problems.push("The plotted range for recombination rate must stay in [0, 0.5].");
-            break;
-          case "sourceExplainedVariance":
-            if (!(cfg.variedParameterMin > 0 && cfg.variedParameterMax < 1)) problems.push("The plotted range for source explained variance must stay in (0, 1).");
-            break;
-          case "diseasePrevalence":
-            if (!(cfg.variedParameterMin > 0 && cfg.variedParameterMax < 1)) problems.push("The plotted range for disease prevalence must stay in (0, 1).");
+          case "targetPrevalence":
+            if (!(cfg.variedParameterMin > 0 && cfg.variedParameterMax < 1)) problems.push("The plotted range for target prevalence must stay in (0, 1).");
             break;
           default:
             break;
         }
 
+        if (problems.length > 0) {
+          return problems;
+        }
+
+        const state = buildMetricState(cfg);
+        if (!(state.sourceSignal < cfg.sourceOutcomeVariance)) {
+          problems.push("The source state is invalid: source explained signal variance must stay strictly below source outcome variance.");
+        }
+        if (!(state.effectiveTargetVariance > 0)) {
+          problems.push("The effective target outcome variance must be positive.");
+        }
+        if (!(state.targetSignal < state.effectiveTargetVariance)) {
+          problems.push("The target state is invalid: transported target signal variance must stay strictly below effective target outcome variance.");
+        }
+
         return problems;
-      }
-
-      function mutationPressure(cfg) {
-        return 4 * cfg.populationSize * cfg.mutationRate;
-      }
-
-      function migrationPressure(cfg) {
-        return 4 * cfg.populationSize * cfg.migrationRate;
-      }
-
-      function scaledDivergenceTime(timeValue, cfg) {
-        return timeValue / (2 * cfg.populationSize);
-      }
-
-      function equilibriumDifferentiation(cfg) {
-        return 1 / (1 + mutationPressure(cfg) + migrationPressure(cfg));
-      }
-
-      function heterozygosityRetentionFactor(cfg) {
-        return (1 - 1 / (2 * cfg.populationSize)) * (1 - mutationPressure(cfg) / (2 * cfg.populationSize));
-      }
-
-      function transientDifferentiation(timeValue, cfg) {
-        return equilibriumDifferentiation(cfg) * (1 - Math.pow(heterozygosityRetentionFactor(cfg), Math.floor(timeValue)));
-      }
-
-      function linkageRetention(timeValue, cfg) {
-        return Math.exp(-2 * cfg.recombinationRate * timeValue);
-      }
-
-      function mutationRetention(timeValue, cfg) {
-        return Math.exp(-mutationPressure(cfg) * scaledDivergenceTime(timeValue, cfg));
-      }
-
-      function migrationBoost(timeValue, cfg) {
-        const pressure = migrationPressure(cfg);
-        return 1 + (pressure * scaledDivergenceTime(timeValue, cfg)) / (1 + pressure);
-      }
-
-      function retainedSignalFactor(timeValue, cfg) {
-        return (1 - transientDifferentiation(timeValue, cfg)) * linkageRetention(timeValue, cfg) * mutationRetention(timeValue, cfg) * migrationBoost(timeValue, cfg);
-      }
-
-      function computeSourceSignalVariance(cfg) {
-        return cfg.environmentalVariance * (cfg.sourceExplainedVariance / (1 - cfg.sourceExplainedVariance));
-      }
-
-      function computeTargetSignalVariance(timeValue, cfg) {
-        return computeSourceSignalVariance(cfg) * retainedSignalFactor(timeValue, cfg);
-      }
-
-      function computeSourceResidualVariance(cfg) {
-        return cfg.environmentalVariance;
-      }
-
-      function computeTargetResidualVariance(cfg) {
-        return cfg.environmentalVariance;
-      }
-
-      function explainedVarianceFromSignalVariance(signalVariance, cfg) {
-        return signalVariance / (signalVariance + cfg.environmentalVariance);
-      }
-
-      function computeTargetExplainedVariance(timeValue, cfg) {
-        return explainedVarianceFromSignalVariance(computeTargetSignalVariance(timeValue, cfg), cfg);
-      }
-
-      function computeSourceAuc(cfg) {
-        return phi(Math.sqrt(computeSourceSignalVariance(cfg) / (2 * computeSourceResidualVariance(cfg))));
-      }
-
-      function computeTargetAuc(timeValue, cfg) {
-        return phi(Math.sqrt(computeTargetSignalVariance(timeValue, cfg) / (2 * computeTargetResidualVariance(cfg))));
-      }
-
-      function computeSourceBrier(cfg) {
-        return cfg.diseasePrevalence *
-          (1 - cfg.diseasePrevalence) *
-          (1 - explainedVarianceFromSignalVariance(computeSourceSignalVariance(cfg), cfg));
-      }
-
-      function computeTargetBrier(timeValue, cfg) {
-        return cfg.diseasePrevalence *
-          (1 - cfg.diseasePrevalence) *
-          (1 - explainedVarianceFromSignalVariance(computeTargetSignalVariance(timeValue, cfg), cfg));
       }
 
       function sampleRange(min, max, count, fn) {
@@ -1411,8 +1533,11 @@
 
       function setMetricTexts(values) {
         stats.sourceSignal.textContent = formatValue(values.sourceSignal);
-        stats.transport.textContent = formatValue(values.transport);
+        stats.targetCovariance.textContent = formatValue(values.targetCovariance);
+        stats.effectiveTargetVariance.textContent = formatValue(values.effectiveTargetVariance);
+        stats.targetResidual.textContent = formatValue(values.targetResidual);
         stats.r2Target.textContent = formatValue(values.r2Target);
+        stats.r2Ratio.textContent = formatValue(values.r2Ratio);
         stats.aucTarget.textContent = formatValue(values.aucTarget);
         stats.brierTarget.textContent = formatValue(values.brierTarget);
         stats.r2Source.textContent = formatValue(values.r2Source);
@@ -1423,8 +1548,11 @@
       function clearMetricTexts() {
         setMetricTexts({
           sourceSignal: Number.NaN,
-          transport: Number.NaN,
+          targetCovariance: Number.NaN,
+          effectiveTargetVariance: Number.NaN,
+          targetResidual: Number.NaN,
           r2Target: Number.NaN,
+          r2Ratio: Number.NaN,
           aucTarget: Number.NaN,
           brierTarget: Number.NaN,
           r2Source: Number.NaN,
@@ -1545,48 +1673,62 @@
         warningEl.hidden = true;
         warningEl.textContent = "";
 
+        const currentState = buildMetricState(cfg);
         const current = {
-          sourceSignal: computeSourceSignalVariance(cfg),
-          transport: retainedSignalFactor(cfg.selectedDivergenceTime, cfg),
-          r2Target: computeTargetExplainedVariance(cfg.selectedDivergenceTime, cfg),
-          aucTarget: computeTargetAuc(cfg.selectedDivergenceTime, cfg),
-          brierTarget: computeTargetBrier(cfg.selectedDivergenceTime, cfg),
-          r2Source: cfg.sourceExplainedVariance,
-          aucSource: computeSourceAuc(cfg),
-          brierSource: computeSourceBrier(cfg)
+          sourceSignal: currentState.sourceSignal,
+          targetCovariance: currentState.targetPredictiveCovariance,
+          effectiveTargetVariance: currentState.effectiveTargetVariance,
+          targetResidual: currentState.targetResidual,
+          r2Target: currentState.targetR2,
+          r2Ratio: currentState.r2Ratio,
+          aucTarget: currentState.targetAuc,
+          brierTarget: currentState.targetBrier,
+          r2Source: currentState.sourceR2,
+          aucSource: currentState.sourceAuc,
+          brierSource: currentState.sourceBrier
         };
         setMetricTexts(current);
 
-        const times = sampleRange(0, cfg.maximumDivergenceTime, cfg.timePlotPoints, (timeValue) => ({ timeValue }));
+        const covarianceSweep = sampleRange(-cfg.covarianceMaxAbs, cfg.covarianceMaxAbs, cfg.covariancePlotPoints, (targetPredictiveCovariance) => {
+          const state = buildMetricState(cfg, targetPredictiveCovariance);
+          return {
+            targetPredictiveCovariance,
+            r2: state.targetR2,
+            auc: state.targetAuc,
+            brier: state.targetBrier
+          };
+        });
 
         renderLegend("legend-metrics", metricLegend);
         renderLineChart("chart-metrics", {
-          xLabel: "generations since population split",
-          yLabel: "benchmark explained variance, ROC area, or Brier score",
-          referenceX: cfg.selectedDivergenceTime,
+          xLabel: "target predictive covariance under source weights",
+          yLabel: "exact target explained variance, liability ROC area, or Brier score",
+          referenceX: currentState.targetPredictiveCovariance,
           yMin: 0,
           yMax: 1,
           series: [
-            { color: colors.teal, points: times.map(({ timeValue }) => ({ x: timeValue, y: computeTargetExplainedVariance(timeValue, cfg) })) },
-            { color: colors.rust, points: times.map(({ timeValue }) => ({ x: timeValue, y: computeTargetAuc(timeValue, cfg) })) },
-            { color: colors.amber, points: times.map(({ timeValue }) => ({ x: timeValue, y: computeTargetBrier(timeValue, cfg) })) }
+            { color: colors.teal, points: covarianceSweep.map((point) => ({ x: point.targetPredictiveCovariance, y: point.r2 })) },
+            { color: colors.rust, points: covarianceSweep.map((point) => ({ x: point.targetPredictiveCovariance, y: point.auc })) },
+            { color: colors.amber, points: covarianceSweep.map((point) => ({ x: point.targetPredictiveCovariance, y: point.brier })) }
           ]
         });
 
         renderLegend("legend-sweep", variedParameterLegend);
         const variedParameterPoints = sampleRange(cfg.variedParameterMin, cfg.variedParameterMax, cfg.comparisonPlotPoints, (value) => {
           const nextCfg = { ...cfg, [cfg.variedParameter]: value };
+          const nextIssues = validateConfig(nextCfg);
+          const nextState = nextIssues.length === 0 ? buildMetricState(nextCfg) : null;
           return {
             value,
-            r2: computeTargetExplainedVariance(cfg.selectedDivergenceTime, nextCfg),
-            auc: computeTargetAuc(cfg.selectedDivergenceTime, nextCfg),
-            brier: computeTargetBrier(cfg.selectedDivergenceTime, nextCfg)
+            r2: nextState ? nextState.targetR2 : Number.NaN,
+            auc: nextState ? nextState.targetAuc : Number.NaN,
+            brier: nextState ? nextState.targetBrier : Number.NaN
           };
         });
 
         renderLineChart("chart-sweep", {
           xLabel: parameterLabels[cfg.variedParameter] ?? cfg.variedParameter,
-          yLabel: "benchmark explained variance, ROC area, or Brier score",
+          yLabel: "exact target explained variance, liability ROC area, or Brier score",
           yMin: 0,
           yMax: 1,
           series: [
@@ -1598,16 +1740,21 @@
       }
 
       function resetDefaults() {
-        inputs.populationSize.value = String(defaults.populationSize);
-        inputs.mutationRate.value = String(defaults.mutationRate);
-        inputs.migrationRate.value = String(defaults.migrationRate);
-        inputs.recombinationRate.value = String(defaults.recombinationRate);
-        inputs.sourceExplainedVariance.value = String(defaults.sourceExplainedVariance);
-        inputs.environmentalVariance.value = String(defaults.environmentalVariance);
-        inputs.diseasePrevalence.value = String(defaults.diseasePrevalence);
-        inputs.selectedDivergenceTime.value = String(defaults.selectedDivergenceTime);
-        inputs.maximumDivergenceTime.value = String(defaults.maximumDivergenceTime);
-        inputs.timePlotPoints.value = String(defaults.timePlotPoints);
+        inputs.sourcePredictiveCovariance.value = String(defaults.sourcePredictiveCovariance);
+        inputs.sourceScoreVariance.value = String(defaults.sourceScoreVariance);
+        inputs.sourceOutcomeVariance.value = String(defaults.sourceOutcomeVariance);
+        inputs.targetDirectCausalScore.value = String(defaults.targetDirectCausalScore);
+        inputs.targetProxyTaggingScore.value = String(defaults.targetProxyTaggingScore);
+        inputs.targetContextScore.value = String(defaults.targetContextScore);
+        inputs.targetScoreVariance.value = String(defaults.targetScoreVariance);
+        inputs.targetOutcomeVariance.value = String(defaults.targetOutcomeVariance);
+        inputs.brokenTaggingResidual.value = String(defaults.brokenTaggingResidual);
+        inputs.ancestrySpecificLDResidual.value = String(defaults.ancestrySpecificLDResidual);
+        inputs.sourceSpecificOverfitResidual.value = String(defaults.sourceSpecificOverfitResidual);
+        inputs.novelUntaggablePhenotypeResidual.value = String(defaults.novelUntaggablePhenotypeResidual);
+        inputs.targetPrevalence.value = String(defaults.targetPrevalence);
+        inputs.covarianceMaxAbs.value = String(defaults.covarianceMaxAbs);
+        inputs.covariancePlotPoints.value = String(defaults.covariancePlotPoints);
         inputs.variedParameter.value = defaults.variedParameter;
         inputs.variedParameterMin.value = String(defaults.variedParameterMin);
         inputs.variedParameterMax.value = String(defaults.variedParameterMax);

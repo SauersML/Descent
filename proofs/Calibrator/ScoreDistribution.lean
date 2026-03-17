@@ -1,11 +1,8 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.PGSCalibrationTheory
-import Calibrator.OpenQuestions
 
 namespace Calibrator
-
-open MeasureTheory
 
 /-!
 # PGS Score Distribution Theory
@@ -278,41 +275,29 @@ theorem identity_citl_changes_of_nonzero_pgsMeanShift
   rw [identity_citl_shift_eq_neg_pgsMeanShift]
   exact neg_ne_zero.mpr h_shift
 
-/-- **Benchmark calibration slope drops below `1` under positive drift.**
-    This theorem is only about the shared benchmark slope coordinate
-    `Cov(Y_target, Ŷ_source) / Var(Ŷ_source)` from `PGSCalibrationTheory`.
-    It does not claim that the full deployed calibration surface is completely
-    characterized by this single scalar. -/
-theorem benchmark_calibration_slope_lt_one_under_drift
-    (V_A fst_source fst_target : ℝ)
-    (hVA : 0 < V_A)
-    (h_drift : fst_source < fst_target)
-    (h_target_le_one : fst_target ≤ 1) :
-    transportedLinearCalibrationSlope V_A fst_source fst_target < 1 := by
-  have h_source_lt_one : fst_source < 1 := lt_of_lt_of_le h_drift h_target_le_one
-  have h_profile :
-      (neutralAFIdentityCalibrationProfile 0 0 fst_source fst_target).slope < 1 := by
-    simpa [neutralAFIdentityCalibrationProfile] using
-      neutralAFBenchmarkRatio_lt_one fst_source fst_target h_source_lt_one h_drift
-  have h_bridge :
-      (neutralAFIdentityCalibrationProfile 0 0 fst_source fst_target).slope =
-        transportedLinearCalibrationSlope V_A fst_source fst_target := by
-    simp [neutralAFIdentityCalibrationProfile,
-      transportedLinearCalibrationSlope_eq_neutralAFBenchmarkRatio, hVA, h_source_lt_one]
-  rw [← h_bridge]
-  exact h_profile
+/-- **Mechanistic target calibration slope is below `1` exactly when the
+transported SNP-level score law says so.**
+    This is the honest score-distribution statement: the target identity-link
+    profile uses the literal transported `Cov/Var` slope from the mechanistic
+    calibration model, not a neutral-AF benchmark surrogate. -/
+theorem mechanistic_target_identity_calibration_slope_lt_one
+    {p q : ℕ} (cal : CrossPopulationMechanisticCalibrationModel p q)
+    (h_target_slope_lt : targetCalibrationSlopeFromSourceWeights cal.metric < 1) :
+    (cal.targetIdentityCalibrationProfile).slope < 1 := by
+  simpa [CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
+    CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile] using
+    h_target_slope_lt
 
-/-- **Drift lowers the benchmark calibration slope.**
-    This is the limited statement actually proved here: under the shared drift
-    benchmark, positive divergence pushes the benchmark transported calibration
-    slope below `1`. It is not a complete theorem about every component of
-    cross-population calibration. -/
-theorem drift_lowers_benchmark_calibration_slope
-    (V_A fstS fstT : ℝ)
-    (hVA : 0 < V_A)
-    (hfst : fstS < fstT) (hfstT : fstT ≤ 1) :
-    transportedLinearCalibrationSlope V_A fstS fstT < 1 := by
-  exact benchmark_calibration_slope_lt_one_under_drift V_A fstS fstT hVA hfst hfstT
+/-- **Under mechanistic transport, slope deviation is exactly `1 - slope`
+when the deployed target slope lies below `1`.** -/
+theorem mechanistic_target_identity_calibration_slopeDeviation_eq_one_sub
+    {p q : ℕ} (cal : CrossPopulationMechanisticCalibrationModel p q)
+    (h_target_slope_lt : targetCalibrationSlopeFromSourceWeights cal.metric < 1) :
+    (cal.targetIdentityCalibrationProfile).slopeDeviation =
+      1 - (cal.targetIdentityCalibrationProfile).slope := by
+  exact calibrationSlopeDeviation_eq_one_sub_of_lt_one
+    (cal.targetIdentityCalibrationProfile).slope
+    (mechanistic_target_identity_calibration_slope_lt_one cal h_target_slope_lt)
 
 /-- **Recalibration restores calibration-in-the-large.**
     If the PGS mean in the target is `pgsMean β p_target` while the

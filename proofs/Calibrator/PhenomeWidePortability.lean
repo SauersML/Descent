@@ -320,12 +320,14 @@ theorem worse_than_neutral_implies_diversifying_selection
 noncomputable def effectCorrelationPortability (rho ld_factor : ℝ) : ℝ :=
   rho ^ 2 * ld_factor
 
-/-- **Portability decomposition: drift × effect correlation × LD.**
-    R²_target = R²_source × (1 - Fst) × ρ² × ld_factor.
-    Each factor captures a different biological mechanism. -/
-theorem portability_three_factor_decomposition
+/-- **Scalar three-factor portability upper bound.**
+    This is only the coarse scalar inequality
+    `r2_source × (1 - fst) × ρ² × ld_factor ≤ r2_source`
+    under unit-bounded factors. It is not the file's mechanistic SNP-level
+    portability law. -/
+theorem scalar_three_factor_portability_upper_bound
     (r2_source fst rho ld_factor : ℝ)
-    (h_r2 : 0 < r2_source) (h_r2_le : r2_source ≤ 1)
+    (h_r2 : 0 < r2_source)
     (h_fst : 0 ≤ fst) (h_fst_le : fst ≤ 1)
     (h_rho : 0 ≤ rho) (h_rho_le : rho ≤ 1)
     (h_ld : 0 ≤ ld_factor) (h_ld_le : ld_factor ≤ 1) :
@@ -361,46 +363,39 @@ theorem region_disproportionate_variance
     (r2_region r2_genome_wide n_region_snps n_total_snps bound : ℝ)
     (h_snp_fraction : n_region_snps / n_total_snps < bound)
     (h_var_fraction : bound < r2_region / r2_genome_wide)
-    (h_r2_gw : 0 < r2_genome_wide) (h_snps : 0 < n_total_snps) :
+    (_h_r2_gw : 0 < r2_genome_wide) (_h_snps : 0 < n_total_snps) :
     -- Region contributes more variance per SNP than genome average
     n_region_snps / n_total_snps < r2_region / r2_genome_wide := by
   linarith
 
-/-- **Trait portability is bounded by effect correlation.**
-    For any trait under population-specific selection (e.g., pathogen-driven
-    for immune traits), the cross-population effect correlation ρ
-    is reduced from a baseline by δ_selection > 0. Given any baseline ρ₀,
-    the post-selection correlation ρ₀ - δ is strictly less than ρ₀.
-
-    Worked example: For immune traits, ρ_baseline > 0.9 but pathogen-driven
-    selection can reduce it substantially (e.g., WBC, lymphocyte count). -/
-theorem selection_reduces_effect_correlation
+/-- **Subtracting a positive selection shift lowers a scalar effect-correlation
+coordinate.**
+    This is the exact scalar inequality `ρ₀ - δ < ρ₀` when `δ > 0`. It is a
+    bookkeeping lemma for downstream biological interpretations, not by itself
+    a mechanistic selection theorem. -/
+theorem positive_selection_shift_lowers_scalar_effect_correlation
     (rho_baseline δ_selection : ℝ)
     (h_selection : 0 < δ_selection) :
     rho_baseline - δ_selection < rho_baseline := by linarith
 
-/-- **Selection-driven portability falls below neutral expectation.**
-    For any trait where observed portability is below a threshold and the
-    neutral prediction exceeds that threshold, the trait's portability is
-    strictly below the neutral expectation. This gap indicates the presence
-    of non-neutral forces (e.g., directional selection, GxE interactions).
-
-    Worked example: WBC portability EUR→AFR is ~20-30% of source R²,
-    while neutral prediction gives ~85%. The gap is from the Duffy null
-    variant (DARC/ACKR1) with large frequency differences due to malaria selection. -/
-theorem observed_portability_below_neutral
+/-- **A threshold sandwich implies observed portability is below neutral.**
+    This is the literal transitivity fact `port_observed < threshold < port_neutral
+    -> port_observed < port_neutral`. It is useful as a small inference step,
+    but it is not by itself a mechanistic theorem about why the gap exists. -/
+theorem threshold_sandwich_implies_observed_portability_below_neutral
     (port_observed port_neutral threshold : ℝ)
     (h_observed : port_observed < threshold)
     (h_neutral : threshold < port_neutral) :
     port_observed < port_neutral := by linarith
 
-/-- **Allele under selection contributes disproportionally to portability loss.**
-    If a selected allele explains a fraction f of genetic variance
-    but has portability 0, the trait-level portability drops by f. -/
-theorem selected_allele_portability_impact
+/-- **A zero-portability component lowers a weighted portability average.**
+    If a trait keeps only the `(1 - f)` fraction of its remaining portable
+    signal, then the resulting weighted average is strictly below the residual
+    portability level whenever `0 < f < 1`. -/
+theorem zero_portability_component_lowers_weighted_average
     (f port_rest : ℝ)
-    (h_f : 0 < f) (h_f_le : f < 1)
-    (h_port : 0 < port_rest) (h_port_le : port_rest ≤ 1) :
+    (h_f : 0 < f) (_h_f_le : f < 1)
+    (h_port : 0 < port_rest) (_h_port_le : port_rest ≤ 1) :
     (1 - f) * port_rest < port_rest := by
   have : 0 < f * port_rest := mul_pos h_f h_port
   linarith [mul_comm f port_rest]
@@ -448,19 +443,12 @@ theorem gxe_reduces_effect_correlation
   rw [div_lt_one (by linarith)]
   linarith
 
-/-- **Lipid trait portability varies by lipid type.**
-    LDL: good portability (low GxE → σ²_δ small)
-    HDL: moderate (moderate GxE with diet)
-    Triglycerides: poor (strong dietary influence → σ²_δ large)
-
-    Model: Each lipid trait has the same genetic variance σ²_β
-    but different GxE variance. Portability is proportional to
-    the effect correlation squared:
-      port ∝ σ²_β / (σ²_β + σ²_δ)
-
-    When σ²_δ_trig > σ²_δ_hdl > σ²_δ_ldl, we get
-    port_trig < port_hdl < port_ldl. -/
-theorem lipid_portability_heterogeneity
+/-- **Larger GxE variance lowers the scalar portability fraction.**
+    In the scalar chart `port(delta) = σ²_β / (σ²_β + delta)`, a larger
+    environmental perturbation variance yields a smaller portability fraction.
+    This theorem proves the extreme comparison `port_trig < port_ldl` from that
+    denominator ordering. -/
+theorem larger_gxe_variance_lowers_scalar_portability_fraction
     (sigma2_beta sigma2_delta_ldl sigma2_delta_hdl sigma2_delta_trig : ℝ)
     (h_beta_pos : 0 < sigma2_beta)
     (h_ldl_nn : 0 ≤ sigma2_delta_ldl)
@@ -500,7 +488,7 @@ section AnthropometricTraits
     For large n, this gap is small. -/
 theorem near_neutral_portability_highly_polygenic
     (c : ℝ) (n : ℕ)
-    (h_c_pos : 0 < c) (h_c_le : c ≤ 1)
+    (h_c_pos : 0 < c) (_h_c_le : c ≤ 1)
     (h_n_large : 1 < n) :
     let delta := c / n
     let rho := 1 - delta
@@ -515,14 +503,13 @@ theorem near_neutral_portability_highly_polygenic
   have : 0 < (c / ↑n) ^ 2 := by positivity
   linarith
 
-/-- **High polygenicity aids portability.**
-    When a trait has many contributing loci (n_loci > n_threshold),
-    no single locus dominates. Population-specific effects average out.
-    By CLT, the sum of many small contributions is robust.
-    Each locus contributes < 1/n_threshold of total variance.
-
-    Worked example: Height (~10000 loci) has per-locus contribution < 0.01%. -/
-theorem polygenicity_stabilizes_portability
+/-- **Per-locus variance share is bounded by locus count in the equal-effect
+chart.**
+    If total variance is `n_loci * per_locus_var`, then each locus contributes
+    exactly `1 / n_loci` of the total, hence strictly less than `1 / n_threshold`
+    whenever `n_threshold < n_loci`. This is a counting identity, not by itself
+    a mechanistic portability theorem. -/
+theorem per_locus_variance_share_bounded_by_locus_count
     (n_loci n_threshold : ℕ) (per_locus_var total_var : ℝ)
     (h_many : n_threshold < n_loci) (h_thresh_pos : 0 < n_threshold)
     (h_total : total_var = n_loci * per_locus_var)
@@ -538,15 +525,10 @@ theorem polygenicity_stabilizes_portability
   have : (n_threshold : ℝ) < (n_loci : ℝ) := by exact_mod_cast h_many
   linarith
 
-/-- **Traits under divergent selection have poor portability.**
-    When a trait's portability is a fraction α < 1 of another trait's
-    portability (due to divergent selection reducing effect correlation),
-    its portability is strictly lower.
-
-    Worked example: Skin pigmentation portability is much less than
-    half of height portability, despite both being anthropometric traits,
-    because pigmentation is under strong divergent selection. -/
-theorem selected_trait_poor_portability
+/-- **An `α < 1` upper bound forces portability below the reference trait.**
+    If `port_selected < α * port_reference` with `0 < α < 1`, then the selected
+    trait's portability is strictly below the reference portability. -/
+theorem alpha_bound_forces_portability_below_reference
     (port_reference port_selected α : ℝ)
     (h_much_worse : port_selected < α * port_reference)
     (h_ref_pos : 0 < port_reference) (h_α_lt : α < 1) (h_α_pos : 0 < α) :
@@ -564,34 +546,33 @@ genetic architecture show similar portability patterns.
 
 section PhenomeWideStructure
 
-/-- **Portability correlation between traits.**
-    Traits with correlated genetic architecture have correlated
-    portability loss. This can be predicted from genetic correlation. -/
-theorem correlated_architecture_correlated_portability
+/-- **A bounded portability-correlation coordinate stays in `[-1,1]`.**
+    If `|port_corr| ≤ |rg|` and `|rg| ≤ 1`, then `|port_corr| ≤ 1`. This is the
+    exact boundedness fact used by any downstream interpretation. -/
+theorem bounded_portability_correlation_stays_within_unit_interval
     (rg port_corr : ℝ)
     (h_relation : |port_corr| ≤ |rg|)
     (h_rg_bounded : |rg| ≤ 1) :
     |port_corr| ≤ 1 := le_trans h_relation h_rg_bounded
 
-/-- **Factor analysis of portability across traits.**
-    The first factor captures overall genetic divergence (Fst).
-    The second factor captures effect-size divergence.
-    Together they explain >80% of portability variance across traits. -/
-theorem two_factor_model_of_portability
+/-- **Lower bounds on two factor contributions imply a lower bound on their
+sum.**
+    This is the exact additive lower-bound step `lb₁ < f₁` and `lb₂ < f₂`
+    imply `lb₁ + lb₂ < f₁ + f₂`. -/
+theorem factor_lower_bounds_sum_strictly_below_total
     (var_explained_f1 var_explained_f2 lb₁ lb₂ : ℝ)
     (h_f1 : lb₁ < var_explained_f1)
     (h_f2 : lb₂ < var_explained_f2)
-    (h_total : var_explained_f1 + var_explained_f2 ≤ 1)
-    (h_f1_nn : 0 ≤ var_explained_f1) (h_f2_nn : 0 ≤ var_explained_f2) :
+    (_h_total : var_explained_f1 + var_explained_f2 ≤ 1)
+    (_h_f1_nn : 0 ≤ var_explained_f1) (_h_f2_nn : 0 ≤ var_explained_f2) :
     lb₁ + lb₂ < var_explained_f1 + var_explained_f2 := by linarith
 
-/-- **Portability prediction from trait characteristics.**
-    Given: polygenicity, heritability, and selection signal,
-    we can predict portability rank across traits.
-    High polygenicity + low selection → good portability.
-    Low polygenicity + high selection → poor portability. -/
-theorem portability_predictable_from_characteristics
-    (polygenicity selection_signal predicted_port actual_port ε bound : ℝ)
+/-- **A prediction error bound implies any looser tolerance bound.**
+    If `|actual - predicted| ≤ ε` and `ε < bound`, then the prediction error is
+    strictly below `bound`. This is only the final inequality step, not the
+    derivation of the predictor itself. -/
+theorem prediction_error_bounded_by_looser_tolerance
+    (_polygenicity _selection_signal predicted_port actual_port ε bound : ℝ)
     (h_prediction : |actual_port - predicted_port| ≤ ε)
     (h_small_error : ε < bound) :
     |actual_port - predicted_port| < bound := by linarith
@@ -607,33 +588,23 @@ noncomputable def diseasePortability
     (port_rf δ_ascertain δ_prev δ_threshold : ℝ) : ℝ :=
   port_rf - (δ_ascertain + δ_prev + δ_threshold)
 
-theorem disease_worse_portability_than_risk_factor
+/-- **Additive disease-specific loss lowers portability below the risk-factor
+baseline.** -/
+theorem additive_disease_loss_lowers_portability
     (port_rf δ_ascertain δ_prev δ_threshold : ℝ)
     (h_asc : 0 < δ_ascertain) (h_prev : 0 < δ_prev) (h_thresh : 0 < δ_threshold) :
     diseasePortability port_rf δ_ascertain δ_prev δ_threshold < port_rf := by
   dsimp [diseasePortability]
   linarith
 
-/-- **Rank correlation is preserved under monotone transforms.**
-    Spearman's ρ (rank correlation) is invariant to monotone transforms
-    of the marginals. PGS portability loss acts as a noisy monotone
-    transform: scores shrink toward the mean but preserve ordering
-    for most individuals.
-
-    Model: Let X be the true PGS and Y = aX + ε be the cross-population
-    prediction, where a is the attenuation factor (0 < a ≤ 1) and ε is
-    noise uncorrelated with X.
-
-    Pearson r² = a²σ²_X / (a²σ²_X + σ²_ε)
-    This is strictly less than 1 (information loss in R² metric).
-
-    Under monotone-plus-noise, rank correlation ≥ Pearson r because
-    rank correlation is invariant to monotone marginal transforms,
-    capturing the full monotone signal that Pearson partially misses.
-    Full proof requires copula theory (Kruskal 1958). -/
-theorem rank_more_portable_than_r2
+/-- **Pearson `R²` is strictly below `1` under additive prediction noise.**
+    For the scalar model `Y = aX + ε` with `σ²_ε > 0`, the induced
+    `pearson_r2 = (aσ_X)^2 / ((aσ_X)^2 + σ²_ε)` is strictly below `1`.
+    This file does not prove a separate rank-correlation theorem here; it only
+    proves the Pearson bound. -/
+theorem pearson_r2_below_one_under_additive_noise
     (a sigma_x sigma_eps : ℝ)
-    (h_a_pos : 0 < a) (h_a_le : a ≤ 1)
+    (h_a_pos : 0 < a) (_h_a_le : a ≤ 1)
     (h_sx_pos : 0 < sigma_x) (h_se_pos : 0 < sigma_eps) :
     -- Pearson r² for Y = aX + ε is a²σ²_X / (a²σ²_X + σ²_ε) < 1
     let pearson_r2 := (a * sigma_x) ^ 2 / ((a * sigma_x) ^ 2 + sigma_eps ^ 2)
