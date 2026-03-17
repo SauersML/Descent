@@ -80,40 +80,6 @@ theorem expectedDistinctHaplotypes_strictMono
       < expectedDistinctHaplotypes k n + (1 - 1 / m) ^ n := by linarith
     _ = expectedDistinctHaplotypes k (n + 1) := h_step.symm
 
-/-- **African populations have more haplotypes.**
-    More recombination cycles → more distinct haplotypes.
-    This means European haplotype-based PGS may miss
-    African-specific haplotypes.
-    Model: with k SNPs, expected distinct haplotypes H(n) = 2^k × (1 - (1 - 1/2^k)^n).
-    More sampled haplotypes n → more distinct haplotypes H(n), so populations
-    with larger effective size (more independent haplotypes sampled) have more diversity. -/
-theorem more_haplotypes_in_afr
-    (n_eur n_afr k : ℕ)
-    (h_k : 0 < k)
-    (h_eur_smaller : n_eur < n_afr) :
-    expectedDistinctHaplotypes k n_eur < expectedDistinctHaplotypes k n_afr := by
-  exact expectedDistinctHaplotypes_strictMono k h_k h_eur_smaller
-
-/-- **Haplotype frequency spectrum differs.**
-    In EUR, common haplotypes account for a larger fraction
-    of the population due to bottleneck effects.
-    In AFR, the frequency spectrum is more uniform.
-    Model: bottleneck reduces effective number of haplotypes, concentrating
-    frequency onto fewer haplotypes. If EUR has n_eur distinct haplotypes
-    and AFR has n_afr > n_eur, then the max frequency in EUR (≥ 1/n_eur)
-    exceeds the max frequency in AFR (= 1/n_afr under uniformity). -/
-theorem haplotype_frequency_more_uniform_afr
-    (n_eur n_afr : ℝ)
-    (h_eur_pos : 0 < n_eur)
-    (h_afr_pos : 0 < n_afr)
-    (h_more_diverse : n_eur < n_afr)
-    (max_freq_eur max_freq_afr : ℝ)
-    (h_afr_uniform : max_freq_afr = 1 / n_afr)
-    (h_eur_concentrated : 1 / n_eur ≤ max_freq_eur) :
-    max_freq_afr < max_freq_eur := by
-  have h1 : 1 / n_afr < 1 / n_eur := div_lt_div_of_pos_left one_pos h_eur_pos h_more_diverse
-  linarith
-
 /-- **Haplotype homozygosity.**
     H = Σ f_i² where f_i are haplotype frequencies.
     Lower in more diverse populations → more unique haplotypes.
@@ -179,6 +145,43 @@ theorem uniform_homozygosity_decreases_with_diversity (n₁ n₂ : ℕ)
     (Nat.cast_pos.mpr (Nat.succ_le_iff.mp h₁))
     (Nat.cast_lt.mpr h_lt)
 
+/-- Inverse homozygosity (Hill number of order 2), a standard effective-number
+summary of haplotype diversity. Larger values correspond to more evenly spread
+haplotype mass across more distinct haplotypes. -/
+noncomputable def effectiveHaplotypeNumber {α : Type*} [Fintype α]
+    (freq : α → ℝ) : ℝ :=
+  1 / haplotypeHomozygosity freq
+
+/-- Lower homozygosity implies a larger effective number of haplotypes. This is
+the biologically relevant diversity statement: populations with more even
+haplotype frequency spectra carry more effective haplotypic states. -/
+theorem more_haplotypes_in_afr
+    {α β : Type*} [Fintype α] [Fintype β]
+    (freq_eur : α → ℝ) (freq_afr : β → ℝ)
+    (h_afr_nonneg : ∀ i, 0 ≤ freq_afr i)
+    (h_afr_sum : ∑ i, freq_afr i = 1)
+    (h_hom : haplotypeHomozygosity freq_afr < haplotypeHomozygosity freq_eur) :
+    effectiveHaplotypeNumber freq_eur < effectiveHaplotypeNumber freq_afr := by
+  have h_hom_afr_pos :
+      0 < haplotypeHomozygosity freq_afr := (homozygosity_bounded freq_afr h_afr_nonneg h_afr_sum).1
+  unfold effectiveHaplotypeNumber
+  exact div_lt_div_of_pos_left one_pos h_hom_afr_pos h_hom
+
+/-- A more uniform haplotype frequency spectrum corresponds to lower
+homozygosity and therefore a larger effective haplotype number. This theorem
+states that connection directly on the population frequency distributions,
+rather than via a hand-written inverse-count surrogate. -/
+theorem haplotype_frequency_more_uniform_afr
+    {α β : Type*} [Fintype α] [Fintype β]
+    (freq_eur : α → ℝ) (freq_afr : β → ℝ)
+    (h_afr_nonneg : ∀ i, 0 ≤ freq_afr i)
+    (h_afr_sum : ∑ i, freq_afr i = 1)
+    (h_hom : haplotypeHomozygosity freq_afr < haplotypeHomozygosity freq_eur) :
+    haplotypeHomozygosity freq_afr < haplotypeHomozygosity freq_eur ∧
+      effectiveHaplotypeNumber freq_eur < effectiveHaplotypeNumber freq_afr := by
+  exact ⟨h_hom, more_haplotypes_in_afr freq_eur freq_afr
+    h_afr_nonneg h_afr_sum h_hom⟩
+
 end HaplotypeDiversity
 
 
@@ -224,17 +227,75 @@ theorem trans_minus_cis_risk_eq_interaction_gap
   dsimp [riskTrans, riskCis]
   ring
 
+/-- Average interaction contribution when a population has cis-configuration
+frequency `freq_cis` and trans frequency `1 - freq_cis`. -/
+noncomputable def averagePhaseInteraction
+    (freq_cis interaction_cis interaction_trans : ℝ) : ℝ :=
+  freq_cis * interaction_cis + (1 - freq_cis) * interaction_trans
+
+/-- Structural error from using a dosage-only predictor that cannot distinguish
+cis from trans configurations. The best dosage-only predictor within a fixed
+dosage class uses the population-average interaction, leaving this residual
+phase-misspecification error. -/
+noncomputable def dosagePhaseMisspecificationError
+    (freq_cis interaction_cis interaction_trans : ℝ) : ℝ :=
+  freq_cis * (interaction_cis - averagePhaseInteraction freq_cis interaction_cis interaction_trans) ^ 2 +
+    (1 - freq_cis) *
+      (interaction_trans - averagePhaseInteraction freq_cis interaction_cis interaction_trans) ^ 2
+
+/-- A phase-aware haplotype predictor that tracks cis/trans configuration has no
+structural phase-misspecification error. -/
+noncomputable def haplotypePhasePredictionError : ℝ :=
+  0
+
+/-- Transport bias from carrying a source-trained dosage approximation into a
+target population whose cis/trans configuration frequency differs. -/
+noncomputable def dosageTransportBias
+    (freq_cis_source freq_cis_target interaction_cis interaction_trans : ℝ) : ℝ :=
+  |averagePhaseInteraction freq_cis_target interaction_cis interaction_trans -
+    averagePhaseInteraction freq_cis_source interaction_cis interaction_trans|
+
+/-- A phase-aware haplotype model transports without this structural bias when
+the cis/trans effects themselves are portable and only configuration
+frequencies differ. -/
+noncomputable def haplotypeTransportBias : ℝ :=
+  0
+
+/-- The dosage-only phase-misspecification error has the exact variance form
+`f(1-f)(δ_cis - δ_trans)^2`. -/
+theorem dosagePhaseMisspecificationError_eq
+    (freq_cis interaction_cis interaction_trans : ℝ) :
+    dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans =
+      freq_cis * (1 - freq_cis) * (interaction_cis - interaction_trans) ^ 2 := by
+  unfold dosagePhaseMisspecificationError averagePhaseInteraction
+  ring
+
+/-- The structural dosage transport bias is exactly the shift in phase
+configuration frequency times the cis/trans interaction gap. -/
+theorem dosageTransportBias_eq
+    (freq_cis_source freq_cis_target interaction_cis interaction_trans : ℝ) :
+    dosageTransportBias freq_cis_source freq_cis_target interaction_cis interaction_trans =
+      |freq_cis_target - freq_cis_source| * |interaction_cis - interaction_trans| := by
+  unfold dosageTransportBias averagePhaseInteraction
+  have h_factor :
+      freq_cis_target * interaction_cis + (1 - freq_cis_target) * interaction_trans -
+        (freq_cis_source * interaction_cis + (1 - freq_cis_source) * interaction_trans) =
+        (freq_cis_target - freq_cis_source) * (interaction_cis - interaction_trans) := by
+    ring
+  rw [h_factor, abs_mul]
+
 theorem compound_het_not_captured_by_dosage
-    (base_risk interaction_cis interaction_trans : ℝ)
-    (h_cis_benign : interaction_cis ≤ 0)
-    (h_trans_pathogenic : 0 < interaction_trans) :
-    riskCis base_risk interaction_cis <
-      riskTrans base_risk interaction_trans := by
-  have h_gap :
-      0 < riskTrans base_risk interaction_trans - riskCis base_risk interaction_cis := by
-    rw [trans_minus_cis_risk_eq_interaction_gap]
-    linarith
-  linarith
+    (freq_cis interaction_cis interaction_trans : ℝ)
+    (h_freq : 0 < freq_cis ∧ freq_cis < 1)
+    (h_phase_gap : interaction_cis ≠ interaction_trans) :
+    haplotypePhasePredictionError < dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans := by
+  rcases h_freq with ⟨h_freq_pos, h_freq_lt_one⟩
+  rw [dosagePhaseMisspecificationError_eq, haplotypePhasePredictionError]
+  have h_gap_sq : 0 < (interaction_cis - interaction_trans) ^ 2 := by
+    exact sq_pos_of_ne_zero (sub_ne_zero.mpr h_phase_gap)
+  have h_mix : 0 < freq_cis * (1 - freq_cis) := by
+    exact mul_pos h_freq_pos (sub_pos.mpr h_freq_lt_one)
+  exact mul_pos h_mix h_gap_sq
 
 /-- **Phase effects are population-specific.**
     Haplotype frequencies differ → phase configuration frequencies
@@ -265,44 +326,68 @@ section HaplotypePGS
     This captures within-block interactions automatically. -/
 
 /-- **Haplotype PGS captures more variance than SNP PGS.**
-    Within each block, the haplotype effect includes:
-    additive + dominance + epistatic components.
-    R²_hap = R²_SNP + V_dom + V_epi where V_dom, V_epi ≥ 0.
-    Therefore R²_hap ≥ R²_SNP. -/
+    Here the comparison is made on the explicit phase-misspecification error
+    surface from the previous section: a phase-aware haplotype score has zero
+    structural error, while a dosage-only SNP score has nonnegative error, and
+    strictly positive error whenever both cis and trans states occur and their
+    effects differ. -/
 theorem haplotype_pgs_at_least_snp
-    (r2_snp V_dom V_epi : ℝ)
-    (h_dom : 0 ≤ V_dom) (h_epi : 0 ≤ V_epi) :
-    r2_snp ≤ r2_snp + V_dom + V_epi := by linarith
+    (freq_cis interaction_cis interaction_trans : ℝ)
+    (h_freq_nonneg : 0 ≤ freq_cis) (h_freq_le_one : freq_cis ≤ 1) :
+    haplotypePhasePredictionError ≤
+      dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans := by
+  rw [dosagePhaseMisspecificationError_eq, haplotypePhasePredictionError]
+  have h_mix_nonneg : 0 ≤ freq_cis * (1 - freq_cis) := by
+    exact mul_nonneg h_freq_nonneg (sub_nonneg.mpr h_freq_le_one)
+  exact mul_nonneg h_mix_nonneg (sq_nonneg _)
 
 /-- **Haplotype PGS portability can be better.**
-    If the causal mechanism acts through haplotypes (cis effects),
-    using the correct haplotype effect is more portable than
-    using individual SNP effects that approximate the haplotype.
-    Model: SNP PGS portability = base × r²_tag, haplotype PGS portability
-    = base × r²_hap_tag, where r²_hap_tag > r²_tag because haplotypes
-    directly capture the cis interaction. -/
+    If the causal mechanism acts through cis/trans haplotype configuration,
+    transporting a dosage-only approximation incurs structural bias whenever
+    the target phase-configuration frequency differs from the source. A
+    phase-aware haplotype model avoids this bias. -/
 theorem haplotype_pgs_more_portable_for_cis
-    (base r2_tag r2_hap_tag : ℝ)
-    (h_base : 0 < base)
-    (h_tag_pos : 0 < r2_tag)
-    (h_hap_better : r2_tag < r2_hap_tag) :
-    base * r2_tag < base * r2_hap_tag := by
-  exact mul_lt_mul_of_pos_left h_hap_better h_base
+    (freq_cis_source freq_cis_target interaction_cis interaction_trans : ℝ)
+    (h_freq_shift : freq_cis_source ≠ freq_cis_target)
+    (h_phase_gap : interaction_cis ≠ interaction_trans) :
+    haplotypeTransportBias < dosageTransportBias
+      freq_cis_source freq_cis_target interaction_cis interaction_trans := by
+  rw [dosageTransportBias_eq, haplotypeTransportBias]
+  exact mul_pos
+    (abs_pos.mpr (sub_ne_zero.mpr h_freq_shift.symm))
+    (abs_pos.mpr (sub_ne_zero.mpr h_phase_gap))
 
 /-- **But haplotype PGS can overfit in training population.**
-    With many rare haplotypes, the haplotype effects may be
-    poorly estimated and population-specific.
-    Model: overfitting penalty is proportional to the number of free parameters p.
-    Haplotype PGS has more parameters (p_hap > p_snp), so the cross-population
-    gap (same - cross) is larger for haplotype PGS.
-    gap = α × p where α > 0 is the per-parameter overfitting rate. -/
+    Rare haplotypes have fewer observed carriers, so their effect estimates are
+    noisier. This theorem states the actual carrier-count mechanism: estimation
+    variance scales like `σ² / (n × f)` where `f` is haplotype frequency in a
+    sample of size `n`. Adding a rarer haplotype strictly increases the total
+    estimation-noise burden. -/
+noncomputable def haplotypeEffectEstimationVariance
+    (σ2 n freq : ℝ) : ℝ :=
+  σ2 / (n * freq)
+
 theorem haplotype_pgs_overfitting_risk
-    (alpha : ℝ) (p_snp p_hap : ℕ)
-    (h_alpha : 0 < alpha)
-    (h_more_params : p_snp < p_hap) :
-    alpha * p_snp < alpha * p_hap := by
-  have : (p_snp : ℝ) < (p_hap : ℝ) := Nat.cast_lt.mpr h_more_params
-  exact mul_lt_mul_of_pos_left this h_alpha
+    (σ2 n freq_common freq_rare : ℝ)
+    (h_sigma : 0 < σ2)
+    (h_n : 0 < n)
+    (h_rare : 0 < freq_rare)
+    (h_rarer : freq_rare < freq_common) :
+    haplotypeEffectEstimationVariance σ2 n freq_common <
+      haplotypeEffectEstimationVariance σ2 n freq_rare ∧
+    haplotypeEffectEstimationVariance σ2 n freq_common <
+      haplotypeEffectEstimationVariance σ2 n freq_common +
+        haplotypeEffectEstimationVariance σ2 n freq_rare := by
+  unfold haplotypeEffectEstimationVariance
+  have h_common_var_lt_rare :
+      σ2 / (n * freq_common) < σ2 / (n * freq_rare) := by
+    exact div_lt_div_of_pos_left h_sigma (mul_pos h_n h_rare)
+      (by nlinarith [mul_pos h_n h_rare])
+  have h_rare_var_pos : 0 < σ2 / (n * freq_rare) := by
+    exact div_pos h_sigma (mul_pos h_n h_rare)
+  constructor
+  · exact h_common_var_lt_rare
+  · linarith
 
 end HaplotypePGS
 
@@ -341,8 +426,7 @@ theorem phase_attenuation_bounded (s : ℝ)
 
 /-- Phase attenuation decreases with higher error rate. -/
 theorem more_errors_more_attenuation (s₁ s₂ : ℝ)
-    (h_s₁ : 0 ≤ s₁) (h_s₁_le : s₁ ≤ 1 / 2)
-    (h_s₂ : 0 ≤ s₂) (h_s₂_le : s₂ ≤ 1 / 2)
+    (h_s₂_le : s₂ ≤ 1 / 2)
     (h_lt : s₁ < s₂) :
     phaseAttenuation s₂ < phaseAttenuation s₁ := by
   unfold phaseAttenuation
@@ -357,9 +441,9 @@ theorem more_errors_more_attenuation (s₁ s₂ : ℝ)
 theorem phasing_worse_for_underrepresented
     (s_source s_target : ℝ)
     (h_worse : s_source < s_target)
-    (h_nn : 0 ≤ s_source) (h_target_le : s_target ≤ 1 / 2) :
+    (h_target_le : s_target ≤ 1 / 2) :
     phaseAttenuation s_target < phaseAttenuation s_source := by
-  exact more_errors_more_attenuation s_source s_target h_nn (by linarith) (by linarith) h_target_le h_worse
+  exact more_errors_more_attenuation s_source s_target h_target_le h_worse
 
 end PhasingErrors
 
@@ -388,18 +472,48 @@ theorem ancestry_effect_between_pops (beta₁ beta₂ alpha : ℝ)
   unfold ancestrySpecificEffect
   constructor <;> nlinarith
 
+/-- Single-effect predictor obtained by averaging ancestry-specific effects
+according to the admixture proportion `alpha`. -/
+noncomputable def globalAncestryAveragedEffect
+    (beta₁ beta₂ alpha : ℝ) : ℝ :=
+  ancestrySpecificEffect beta₁ beta₂ alpha
+
+/-- Structural prediction error from using a single ancestry-averaged effect in
+an admixed population whose local ancestry really switches between ancestry 1
+and ancestry 2. -/
+noncomputable def localAncestryMisspecification
+    (beta₁ beta₂ alpha : ℝ) : ℝ :=
+  alpha * (beta₁ - globalAncestryAveragedEffect beta₁ beta₂ alpha) ^ 2 +
+    (1 - alpha) * (beta₂ - globalAncestryAveragedEffect beta₁ beta₂ alpha) ^ 2
+
+/-- The misspecification from ignoring local ancestry is exactly the weighted
+squared effect-difference term `α(1-α)(β₁-β₂)^2`. -/
+theorem localAncestryMisspecification_eq
+    (beta₁ beta₂ alpha : ℝ) :
+    localAncestryMisspecification beta₁ beta₂ alpha =
+      alpha * (1 - alpha) * (beta₁ - beta₂) ^ 2 := by
+  unfold localAncestryMisspecification globalAncestryAveragedEffect ancestrySpecificEffect
+  ring
+
 /-- **Local ancestry deconvolution for haplotypes.**
-    By identifying the ancestry of each haplotype segment,
-    we can apply ancestry-appropriate effects.
-    Model: global PGS uses a single effect β_global, while local ancestry
-    PGS uses ancestry-specific effects β₁, β₂. The local ancestry PGS
-    captures additional variance V_ancestry > 0 from effect heterogeneity.
-    R²_local = R²_global + V_ancestry / V_total. -/
+    By identifying the ancestry of each haplotype segment, the model can apply
+    the ancestry-appropriate effect instead of a single ancestry-averaged
+    effect. The gain is exactly the local-ancestry misspecification variance
+    removed by deconvolution. -/
 theorem la_deconvolution_improves_pgs
-    (r2_global V_ancestry V_total : ℝ)
-    (h_anc : 0 < V_ancestry) (h_total : 0 < V_total) :
-    r2_global < r2_global + V_ancestry / V_total := by
-  linarith [div_pos h_anc h_total]
+    (r2_global beta₁ beta₂ alpha V_total : ℝ)
+    (h_alpha : 0 < alpha)
+    (h_alpha_lt : alpha < 1)
+    (h_beta : beta₁ ≠ beta₂)
+    (h_total : 0 < V_total) :
+    r2_global <
+      r2_global + localAncestryMisspecification beta₁ beta₂ alpha / V_total := by
+  rw [localAncestryMisspecification_eq]
+  have h_mix : 0 < alpha * (1 - alpha) := mul_pos h_alpha (sub_pos.mpr h_alpha_lt)
+  have h_gap : 0 < (beta₁ - beta₂) ^ 2 := sq_pos_of_ne_zero (sub_ne_zero.mpr h_beta)
+  have h_gain : 0 < alpha * (1 - alpha) * (beta₁ - beta₂) ^ 2 / V_total := by
+    exact div_pos (mul_pos h_mix h_gap) h_total
+  linarith
 
 /-- **Recombination since admixture determines segment length.**
     Average segment length ∝ 1/(g × r_total)

@@ -99,256 +99,188 @@ noncomputable def effectivePolygenicity (sum_beta_sq sum_beta_fourth : ℝ) : �
 /-- Effective polygenicity ≥ 1. -/
 theorem effective_polygenicity_ge_one
     (sum_sq sum_fourth : ℝ)
-    (h_sq : 0 < sum_sq) (h_fourth : 0 < sum_fourth)
+    (h_fourth : 0 < sum_fourth)
     (h_cs : sum_fourth ≤ sum_sq^2) :
     1 ≤ effectivePolygenicity sum_sq sum_fourth := by
   unfold effectivePolygenicity
   rw [le_div_iff₀ h_fourth]
   linarith
 
-/-- **CLT-based portability model for polygenic traits.**
-    `M_eff` is the effective number of approximately independent causal loci.
-    `perLocusSignal` is the mean signal contribution per locus, and
-    `perLocusMismatchSD` is the standard deviation of the per-locus LD-mismatch
-    contribution. Under variance aggregation, total mismatch SD grows like `√M_eff`
-    while total signal grows like `M_eff`. -/
-structure PolygenicCLTPortabilityModel where
-  M_eff : ℝ
-  perLocusSignal : ℝ
-  perLocusMismatchSD : ℝ
+/-- Explicit SNP-level portability model.
 
-namespace PolygenicCLTPortabilityModel
+Each causal SNP contributes a source squared-effect mass
+`sourceSquaredEffect j = β_source,j²`, and the target retains some portion of
+that mass after LD mismatch, allele-frequency drift, effect-size drift, and
+other transport losses. The retained mass is modeled directly at each SNP,
+rather than through a single `√M` ansatz. -/
+structure SNPArchitecturePortabilityModel (q : ℕ) where
+  sourceSquaredEffect : Fin q → ℝ
+  targetRetainedSquaredEffect : Fin q → ℝ
+  sourceSquaredEffect_nonneg : ∀ j, 0 ≤ sourceSquaredEffect j
+  targetRetained_nonneg : ∀ j, 0 ≤ targetRetainedSquaredEffect j
+  targetRetained_le_source : ∀ j, targetRetainedSquaredEffect j ≤ sourceSquaredEffect j
 
-/-- Aggregate signal scales linearly with the effective number of loci. -/
-def aggregateSignal (model : PolygenicCLTPortabilityModel) : ℝ :=
-  model.M_eff * model.perLocusSignal
+namespace SNPArchitecturePortabilityModel
 
-/-- Independent per-locus mismatch contributions aggregate with `√M_eff` scaling. -/
-noncomputable def aggregateMismatchSD (model : PolygenicCLTPortabilityModel) : ℝ :=
-  Real.sqrt model.M_eff * model.perLocusMismatchSD
+/-- Total causal signal mass in the source architecture. -/
+noncomputable def sourceEffectMass {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) : ℝ :=
+  ∑ j, model.sourceSquaredEffect j
 
-/-- Relative portability loss is mismatch SD divided by aggregate signal. -/
-noncomputable def relativePortabilityLoss (model : PolygenicCLTPortabilityModel) : ℝ :=
-  model.aggregateMismatchSD / model.aggregateSignal
+/-- Total causal signal mass still retained in the target architecture. -/
+noncomputable def targetRetainedEffectMass {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) : ℝ :=
+  ∑ j, model.targetRetainedSquaredEffect j
 
-/-- The part of the loss scale that does not depend on `M_eff`. -/
-noncomputable def lossConstant (model : PolygenicCLTPortabilityModel) : ℝ :=
-  model.perLocusMismatchSD / model.perLocusSignal
+/-- Total signal mass lost across SNPs when transporting to the target. -/
+noncomputable def lostEffectMass {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) : ℝ :=
+  model.sourceEffectMass - model.targetRetainedEffectMass
 
-/-- A simple portability score obtained by subtracting relative loss from `1`. -/
-noncomputable def portabilityScore (model : PolygenicCLTPortabilityModel) : ℝ :=
-  1 - model.relativePortabilityLoss
+/-- Relative portability loss: lost causal signal mass as a fraction of the
+source causal signal mass. -/
+noncomputable def relativePortabilityLoss {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) : ℝ :=
+  model.lostEffectMass / model.sourceEffectMass
 
-@[simp] theorem portabilityScore_eq_one_sub_relativePortabilityLoss
-    (model : PolygenicCLTPortabilityModel) :
+/-- Retained portability score: retained target causal signal mass as a
+fraction of the source causal signal mass. -/
+noncomputable def portabilityScore {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) : ℝ :=
+  model.targetRetainedEffectMass / model.sourceEffectMass
+
+theorem sourceEffectMass_nonneg {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) :
+    0 ≤ model.sourceEffectMass := by
+  unfold sourceEffectMass
+  exact Fintype.sum_nonneg fun j => model.sourceSquaredEffect_nonneg j
+
+theorem targetRetainedEffectMass_nonneg {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) :
+    0 ≤ model.targetRetainedEffectMass := by
+  unfold targetRetainedEffectMass
+  exact Fintype.sum_nonneg fun j => model.targetRetained_nonneg j
+
+theorem targetRetainedEffectMass_le_sourceEffectMass {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) :
+    model.targetRetainedEffectMass ≤ model.sourceEffectMass := by
+  unfold targetRetainedEffectMass sourceEffectMass
+  exact Finset.sum_le_sum fun j _ => model.targetRetained_le_source j
+
+/-- The relative portability loss is exactly the locuswise lost-effect mass
+fraction. This is the explicit SNP-level replacement for the deleted CLT
+`1 / √M` law. -/
+theorem relativePortabilityLoss_eq_locuswise_loss_fraction {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) :
+    model.relativePortabilityLoss =
+      (∑ j, (model.sourceSquaredEffect j - model.targetRetainedSquaredEffect j)) /
+        model.sourceEffectMass := by
+  unfold relativePortabilityLoss lostEffectMass sourceEffectMass targetRetainedEffectMass
+  congr 1
+  rw [← Finset.sum_sub_distrib]
+
+@[simp] theorem portabilityScore_eq_one_sub_relativePortabilityLoss {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (h_source : 0 < model.sourceEffectMass) :
     model.portabilityScore = 1 - model.relativePortabilityLoss := by
-  rfl
+  unfold portabilityScore relativePortabilityLoss lostEffectMass
+  field_simp [ne_of_gt h_source]
+  ring
 
-/-- The `1 / √M_eff` loss law is derived from the CLT scaling assumptions above,
-    not assumed as a theorem premise. -/
-theorem relativePortabilityLoss_eq_lossConstant_div_sqrt
-    (model : PolygenicCLTPortabilityModel)
-    (h_M : 0 < model.M_eff)
-    (h_signal : 0 < model.perLocusSignal) :
-    model.relativePortabilityLoss = model.lossConstant / Real.sqrt model.M_eff := by
-  unfold relativePortabilityLoss aggregateMismatchSD aggregateSignal lossConstant
-  have h_sqrt_ne : Real.sqrt model.M_eff ≠ 0 := Real.sqrt_ne_zero'.mpr h_M
-  have h_signal_ne : model.perLocusSignal ≠ 0 := h_signal.ne'
-  calc
-    (Real.sqrt model.M_eff * model.perLocusMismatchSD) / (model.M_eff * model.perLocusSignal)
-      = (Real.sqrt model.M_eff * model.perLocusMismatchSD) /
-          ((Real.sqrt model.M_eff * Real.sqrt model.M_eff) * model.perLocusSignal) := by
-            congr 1
-            nlinarith [Real.sq_sqrt (le_of_lt h_M)]
-    _ = (model.perLocusMismatchSD / model.perLocusSignal) / Real.sqrt model.M_eff := by
-          field_simp [h_sqrt_ne, h_signal_ne]
-
-end PolygenicCLTPortabilityModel
-
-/-- Portability score from the CLT portability model, written directly in terms of the
-    effective number of loci and per-locus parameters. -/
-noncomputable def cltPolygenicPortabilityScore
-    (M_eff perLocusSignal perLocusMismatchSD : ℝ) : ℝ :=
-  let model : PolygenicCLTPortabilityModel :=
-    { M_eff := M_eff
-      perLocusSignal := perLocusSignal
-      perLocusMismatchSD := perLocusMismatchSD }
-  model.portabilityScore
-
-/-- Overall portability after multiplying the polygenicity-only score by a
-    cross-population effect-correlation penalty `rg²` and an LD-retention factor. -/
-noncomputable def selectionAdjustedPortability
-    (model : PolygenicCLTPortabilityModel) (rg ld_factor : ℝ) : ℝ :=
-  ld_factor * (rg ^ 2 * model.portabilityScore)
-
-@[simp] theorem selectionAdjustedPortability_eq_formula
-    (model : PolygenicCLTPortabilityModel) (rg ld_factor : ℝ) :
-    selectionAdjustedPortability model rg ld_factor =
-      ld_factor * (rg ^ 2 * model.portabilityScore) := by
-  rfl
-
-/-- **More polygenic → more portable (from the formal CLT model).**
-    If two traits share the same per-locus signal and per-locus LD-mismatch scale,
-    then the trait with larger `M_eff` has smaller relative portability loss because
-    aggregate mismatch grows like `√M_eff` while aggregate signal grows like `M_eff`. -/
-theorem more_polygenic_more_portable
-    (model₁ model₂ : PolygenicCLTPortabilityModel)
-    (h_M₁ : 0 < model₁.M_eff) (h_M₂ : 0 < model₂.M_eff)
-    (h_M : model₁.M_eff < model₂.M_eff)
-    (h_signal : 0 < model₁.perLocusSignal)
-    (h_mismatch : 0 < model₁.perLocusMismatchSD)
-    (h_same_signal : model₁.perLocusSignal = model₂.perLocusSignal)
-    (h_same_mismatch : model₁.perLocusMismatchSD = model₂.perLocusMismatchSD) :
-    model₂.relativePortabilityLoss < model₁.relativePortabilityLoss := by
-  rw [PolygenicCLTPortabilityModel.relativePortabilityLoss_eq_lossConstant_div_sqrt
-      model₂ h_M₂]
-  · rw [PolygenicCLTPortabilityModel.relativePortabilityLoss_eq_lossConstant_div_sqrt
-      model₁ h_M₁ h_signal]
-    unfold PolygenicCLTPortabilityModel.lossConstant
-    rw [← h_same_signal, ← h_same_mismatch]
-    have h_const_pos : 0 < model₁.perLocusMismatchSD / model₁.perLocusSignal := by
-      exact div_pos h_mismatch h_signal
-    exact div_lt_div_of_pos_left h_const_pos
-      (Real.sqrt_pos.mpr h_M₁)
-      (Real.sqrt_lt_sqrt (le_of_lt h_M₁) h_M)
-  · simpa [h_same_signal] using h_signal
-
-/-- **Higher polygenicity → better portability.**
-    For two traits with the same per-locus signal and LD-mismatch scale, the more
-    polygenic trait has the higher CLT portability score because its derived
-    relative loss is smaller. -/
-theorem height_polygenic_good_portability
-    (M_eff_height M_eff_bmi perLocusSignal perLocusMismatchSD : ℝ)
-    (h_M_height : 0 < M_eff_height) (h_M_bmi : 0 < M_eff_bmi)
-    (h_M : M_eff_bmi < M_eff_height)
-    (h_signal : 0 < perLocusSignal)
-    (h_mismatch : 0 < perLocusMismatchSD) :
-    cltPolygenicPortabilityScore M_eff_bmi perLocusSignal perLocusMismatchSD <
-      cltPolygenicPortabilityScore M_eff_height perLocusSignal perLocusMismatchSD := by
-  let bmiModel : PolygenicCLTPortabilityModel :=
-    { M_eff := M_eff_bmi
-      perLocusSignal := perLocusSignal
-      perLocusMismatchSD := perLocusMismatchSD }
-  let heightModel : PolygenicCLTPortabilityModel :=
-    { M_eff := M_eff_height
-      perLocusSignal := perLocusSignal
-      perLocusMismatchSD := perLocusMismatchSD }
-  have h_loss :
-      heightModel.relativePortabilityLoss < bmiModel.relativePortabilityLoss := by
-    exact more_polygenic_more_portable
-      bmiModel heightModel h_M_bmi h_M_height h_M h_signal h_mismatch rfl rfl
-  dsimp [cltPolygenicPortabilityScore, bmiModel, heightModel] at ⊢
-  rw [PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss,
-    PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss]
-  linarith
-
-/-- The CLT portability score has the explicit closed form
-    `1 - lossConstant / √M_eff`. -/
-theorem PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_lossConstant_div_sqrt
-    (model : PolygenicCLTPortabilityModel)
-    (h_M : 0 < model.M_eff)
-    (h_signal : 0 < model.perLocusSignal) :
-    model.portabilityScore = 1 - model.lossConstant / Real.sqrt model.M_eff := by
-  rw [PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss,
-    PolygenicCLTPortabilityModel.relativePortabilityLoss_eq_lossConstant_div_sqrt
-    model h_M h_signal]
-
-/-- Relative portability loss is nonnegative under positive signal and
-    nonnegative mismatch scale. -/
-theorem PolygenicCLTPortabilityModel.relativePortabilityLoss_nonneg
-    (model : PolygenicCLTPortabilityModel)
-    (h_M : 0 < model.M_eff)
-    (h_signal : 0 < model.perLocusSignal)
-    (h_mismatch : 0 ≤ model.perLocusMismatchSD) :
+theorem relativePortabilityLoss_nonneg {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (h_source : 0 < model.sourceEffectMass) :
     0 ≤ model.relativePortabilityLoss := by
-  rw [PolygenicCLTPortabilityModel.relativePortabilityLoss_eq_lossConstant_div_sqrt
-    model h_M h_signal]
-  unfold PolygenicCLTPortabilityModel.lossConstant
-  exact div_nonneg
-    (div_nonneg h_mismatch (le_of_lt h_signal))
-    (le_of_lt (Real.sqrt_pos.mpr h_M))
+  rw [relativePortabilityLoss_eq_locuswise_loss_fraction model]
+  apply div_nonneg
+  · exact Fintype.sum_nonneg fun j => sub_nonneg.mpr (model.targetRetained_le_source j)
+  · exact le_of_lt h_source
 
-/-- The CLT portability score is always at most `1`. -/
-theorem PolygenicCLTPortabilityModel.portabilityScore_le_one
-    (model : PolygenicCLTPortabilityModel)
-    (h_M : 0 < model.M_eff)
-    (h_signal : 0 < model.perLocusSignal)
-    (h_mismatch : 0 ≤ model.perLocusMismatchSD) :
+theorem portabilityScore_le_one {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (h_source : 0 < model.sourceEffectMass) :
     model.portabilityScore ≤ 1 := by
-  rw [PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss]
-  have h_loss_nn :=
-    PolygenicCLTPortabilityModel.relativePortabilityLoss_nonneg model h_M h_signal h_mismatch
+  rw [portabilityScore_eq_one_sub_relativePortabilityLoss model h_source]
+  have h_loss_nn := relativePortabilityLoss_nonneg model h_source
   linarith
+
+end SNPArchitecturePortabilityModel
+
+/-- Equal-effect portability score under a catastrophic-mismatch architecture:
+all `M` causal SNPs have equal source squared effect, and SNPs in the explicit
+set `mismatched` retain zero target signal. The retained fraction is therefore
+the surviving SNP fraction. -/
+noncomputable def uniformCatastrophicPortabilityScore
+    (M : ℕ) (mismatched : Finset (Fin M)) : ℝ :=
+  1 - (mismatched.card : ℝ) / (M : ℝ)
+
+/-- **More polygenic architectures are more robust to the same number of badly
+mismatched causal SNPs.**
+
+This theorem is now stated on an explicit causal-SNP architecture: both traits
+have equal per-SNP source effect mass, and both lose the same number of causal
+SNPs in the target. The trait with more causal SNPs loses a smaller fraction of
+its total causal signal mass. -/
+theorem more_polygenic_more_portable
+    {M₁ M₂ : ℕ}
+    (mismatched₁ : Finset (Fin M₁))
+    (mismatched₂ : Finset (Fin M₂))
+    (h_M : M₁ < M₂)
+    (h_same_card : mismatched₁.card = mismatched₂.card)
+    (h_loss : 0 < mismatched₁.card) :
+    uniformCatastrophicPortabilityScore M₁ mismatched₁ <
+      uniformCatastrophicPortabilityScore M₂ mismatched₂ := by
+  unfold uniformCatastrophicPortabilityScore
+  have h_k_pos : 0 < (mismatched₁.card : ℝ) := Nat.cast_pos.mpr h_loss
+  have h_M₁_pos_nat : 0 < M₁ := lt_of_lt_of_le h_loss (by
+    simpa [Fintype.card_fin] using mismatched₁.card_le_univ)
+  have h_M₂_pos_nat : 0 < M₂ := lt_trans h_M₁_pos_nat h_M
+  have h_M₁_pos : 0 < (M₁ : ℝ) := Nat.cast_pos.mpr h_M₁_pos_nat
+  have h_M₂_pos : 0 < (M₂ : ℝ) := Nat.cast_pos.mpr h_M₂_pos_nat
+  have h_div :
+      (mismatched₁.card : ℝ) / (M₂ : ℝ) <
+        (mismatched₁.card : ℝ) / (M₁ : ℝ) := by
+    exact (div_lt_div_iff_of_pos_left h_k_pos h_M₂_pos h_M₁_pos).2 (by exact_mod_cast h_M)
+  have h_same_card_cast : (mismatched₂.card : ℝ) = (mismatched₁.card : ℝ) := by
+    exact_mod_cast h_same_card.symm
+  rw [h_same_card_cast]
+  linarith
+
+/-- Height-like traits can be more portable than BMI-like traits when the same
+number of causal SNPs are catastrophically mismatched, because a larger set of
+causal SNPs dilutes the lost fraction. -/
+theorem height_polygenic_good_portability
+    {M_height M_bmi : ℕ}
+    (mismatchedHeight : Finset (Fin M_height))
+    (mismatchedBMI : Finset (Fin M_bmi))
+    (h_M : M_bmi < M_height)
+    (h_same_card : mismatchedBMI.card = mismatchedHeight.card)
+    (h_loss : 0 < mismatchedBMI.card) :
+    uniformCatastrophicPortabilityScore M_bmi mismatchedBMI <
+      uniformCatastrophicPortabilityScore M_height mismatchedHeight := by
+  exact more_polygenic_more_portable mismatchedBMI mismatchedHeight h_M h_same_card h_loss
 
 /-- **Selection can outweigh a polygenicity advantage.**
-    In the CLT model, larger `M_eff` improves the polygenicity-only portability
-    score. But overall portability also multiplies by the cross-population
-    effect-correlation factor `rg²`. So a selected trait can be more polygenic
-    than a neutral trait and still have worse total portability if selection
-    depresses `rg` enough. -/
+
+Even if the selected trait has more causal SNPs, it can still have worse
+portability when the fraction of causal SNPs that lose target signal is larger.
+This is the explicit-SNP replacement for the deleted `rg² × portabilityScore`
+product theorem. -/
 theorem selection_overrides_polygenicity
-    (neutralModel selectedModel : PolygenicCLTPortabilityModel)
-    (rg_neutral rg_selected ld_factor : ℝ)
-    (h_M_neutral : 0 < neutralModel.M_eff)
-    (h_M_selected : 0 < selectedModel.M_eff)
-    (h_more_polygenic : neutralModel.M_eff < selectedModel.M_eff)
-    (h_signal : 0 < neutralModel.perLocusSignal)
-    (h_mismatch : 0 < neutralModel.perLocusMismatchSD)
-    (h_same_signal : neutralModel.perLocusSignal = selectedModel.perLocusSignal)
-    (h_same_mismatch : neutralModel.perLocusMismatchSD = selectedModel.perLocusMismatchSD)
-    (h_ld : 0 < ld_factor)
-    (h_selection_dominates :
-      rg_selected ^ 2 <
-        rg_neutral ^ 2 *
-          (1 - neutralModel.lossConstant / Real.sqrt neutralModel.M_eff)) :
-    neutralModel.portabilityScore < selectedModel.portabilityScore ∧
-      selectionAdjustedPortability selectedModel rg_selected ld_factor <
-        selectionAdjustedPortability neutralModel rg_neutral ld_factor := by
-  have h_poly_loss :
-      selectedModel.relativePortabilityLoss < neutralModel.relativePortabilityLoss := by
-    exact more_polygenic_more_portable
-      neutralModel selectedModel h_M_neutral h_M_selected h_more_polygenic
-      h_signal h_mismatch h_same_signal h_same_mismatch
-  have h_poly_score :
-      neutralModel.portabilityScore < selectedModel.portabilityScore := by
-    rw [PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss,
-      PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_relativePortabilityLoss]
-    linarith
-  have h_selected_signal : 0 < selectedModel.perLocusSignal := by
-    simpa [h_same_signal] using h_signal
-  have h_selected_mismatch_nn : 0 ≤ selectedModel.perLocusMismatchSD := by
-    simpa [h_same_mismatch] using (le_of_lt h_mismatch)
-  have h_selected_score_le_one :
-      selectedModel.portabilityScore ≤ 1 := by
-    exact PolygenicCLTPortabilityModel.portabilityScore_le_one
-      selectedModel h_M_selected h_selected_signal h_selected_mismatch_nn
-  have h_neutral_score_eq :
-      neutralModel.portabilityScore =
-        1 - neutralModel.lossConstant / Real.sqrt neutralModel.M_eff := by
-    exact PolygenicCLTPortabilityModel.portabilityScore_eq_one_sub_lossConstant_div_sqrt
-      neutralModel h_M_neutral h_signal
-  have h_selection_dominates' :
-      rg_selected ^ 2 < rg_neutral ^ 2 * neutralModel.portabilityScore := by
-    rw [h_neutral_score_eq]
-    exact h_selection_dominates
-  have h_selected_core_le :
-      rg_selected ^ 2 * selectedModel.portabilityScore ≤ rg_selected ^ 2 := by
-    have h_sq_nn : 0 ≤ rg_selected ^ 2 := sq_nonneg rg_selected
-    have h_mul :
-        rg_selected ^ 2 * selectedModel.portabilityScore ≤
-          rg_selected ^ 2 * 1 := by
-      exact mul_le_mul_of_nonneg_left h_selected_score_le_one h_sq_nn
-    simpa using h_mul
-  have h_core_lt :
-      rg_selected ^ 2 * selectedModel.portabilityScore <
-        rg_neutral ^ 2 * neutralModel.portabilityScore := by
-    exact lt_of_le_of_lt h_selected_core_le h_selection_dominates'
-  have h_adjusted_lt :
-      (rg_selected ^ 2 * selectedModel.portabilityScore) * ld_factor <
-        (rg_neutral ^ 2 * neutralModel.portabilityScore) * ld_factor := by
-    exact mul_lt_mul_of_pos_right h_core_lt h_ld
-  refine ⟨h_poly_score, ?_⟩
-  simpa [selectionAdjustedPortability, mul_assoc, mul_left_comm, mul_comm] using h_adjusted_lt
+    {M_neutral M_selected : ℕ}
+    (neutralMismatch : Finset (Fin M_neutral))
+    (selectedMismatch : Finset (Fin M_selected))
+    (h_more_polygenic : M_neutral < M_selected)
+    (h_selected_worse_fraction :
+      (neutralMismatch.card : ℝ) / (M_neutral : ℝ) <
+        (selectedMismatch.card : ℝ) / (M_selected : ℝ)) :
+    M_neutral < M_selected ∧
+      uniformCatastrophicPortabilityScore M_selected selectedMismatch <
+        uniformCatastrophicPortabilityScore M_neutral neutralMismatch := by
+  unfold uniformCatastrophicPortabilityScore
+  constructor
+  · exact h_more_polygenic
+  · linarith
 
 end PolygenicityAndPortability
 
@@ -371,7 +303,6 @@ noncomputable def heritabilityEnrichment (h2_cat M_cat h2_total M_total : ℝ) :
 
 /-- Enrichment > 1 means more heritability per variant. -/
 theorem enrichment_interpretation (h2_c M_c h2_t M_t : ℝ)
-    (h_hc : 0 < h2_c) (h_Mc : 0 < M_c)
     (h_ht : 0 < h2_t) (h_Mt : 0 < M_t)
     (h_enriched : h2_c / M_c > h2_t / M_t) :
     1 < heritabilityEnrichment h2_c M_c h2_t M_t := by
@@ -391,7 +322,7 @@ theorem region_heritability_enrichment
     (h_prop_variants : M_region / M_total < α)
     (h_prop_h2 : β < h2_region / h2_total)
     (h_all_pos : 0 < h2_region ∧ 0 < h2_total ∧ 0 < M_region ∧ 0 < M_total)
-    (h_α_pos : 0 < α) (h_β_pos : 0 < β) :
+    (h_α_pos : 0 < α) :
     β / α < heritabilityEnrichment h2_region M_region h2_total M_total := by
   obtain ⟨h_hc, h_ht, h_mc, h_mt⟩ := h_all_pos
   have hv : M_region < α * M_total := by rwa [div_lt_iff₀ h_mt] at h_prop_variants
@@ -417,7 +348,8 @@ theorem coding_more_portable_than_regulatory
     (h_coding_higher : rg_regulatory < rg_coding) :
     rg_regulatory ^ 2 < rg_coding ^ 2 := by
   -- x² is strictly monotone on [0, ∞): if 0 ≤ a < b then a² < b²
-  nlinarith [sq_nonneg (rg_coding - rg_regulatory)]
+  have h_sum_nonneg : 0 ≤ rg_coding + rg_regulatory := add_nonneg h_coding_nn h_reg_nn
+  nlinarith
 
 /- **LDSC-SEG for partitioned heritability.**
     h²_c = M_c × (Σ_j∈c l_j × τ_c) / (N × Σ_j l_j)
@@ -435,59 +367,115 @@ expected portability for a trait across ancestries.
 
 section ArchitecturePredictions
 
-/-- **Portability prediction from architecture.**
-    R²_target ≈ R²_source × r_g² × (1 - FST_LD) × (1 - bias_technical)
-    where r_g is genetic correlation and FST_LD captures LD decay. -/
-noncomputable def predictedPortability (r2_source rg fst_ld bias_tech : ℝ) : ℝ :=
-  r2_source * rg^2 * (1 - fst_ld) * (1 - bias_tech)
+open SNPArchitecturePortabilityModel
 
-/-- Predicted portability ≤ source R². -/
-theorem predicted_le_source (r2_source rg fst_ld bias_tech : ℝ)
-    (h_r2 : 0 ≤ r2_source) (h_rg : |rg| ≤ 1)
-    (h_fst : 0 ≤ fst_ld) (h_fst_le : fst_ld ≤ 1)
-    (h_tech : 0 ≤ bias_tech) (h_tech_le : bias_tech ≤ 1) :
-    predictedPortability r2_source rg fst_ld bias_tech ≤ r2_source := by
-  unfold predictedPortability
-  have h_rg_sq : rg^2 ≤ 1 := by nlinarith [sq_abs rg, abs_nonneg rg]
-  have h1 : 0 ≤ (1 - fst_ld) := by linarith
-  have h2 : 0 ≤ (1 - bias_tech) := by linarith
-  have h3 : rg ^ 2 * (1 - fst_ld) ≤ 1 := by nlinarith
-  have h4 : rg ^ 2 * (1 - fst_ld) * (1 - bias_tech) ≤ 1 := by nlinarith
-  nlinarith
+/-- **Portability prediction from explicit causal-SNP architecture.**
+
+The predicted portability is the fraction of source causal squared-effect mass
+that remains transportable in the target after aggregating over causal SNPs.
+This keeps the prediction surface at the SNP architecture level rather than
+collapsing it into a single trait-wide `r_g² × (1 - FST)` product. -/
+noncomputable def predictedPortability {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) : ℝ :=
+  model.portabilityScore
+
+/-- Predicted portability is at most the full source causal signal mass. -/
+theorem predicted_le_source {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (h_source : 0 < model.sourceEffectMass) :
+    predictedPortability model ≤ 1 := by
+  simpa [predictedPortability] using portabilityScore_le_one model h_source
+
+/-- Source-effect-weighted average of per-SNP retention upper envelopes.
+
+Each `retentionUpper j` is an explicit SNP-level upper bound on the fraction of
+source squared-effect mass that can survive in the target at causal SNP `j`. -/
+noncomputable def weightedRetentionUpperBound {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (retentionUpper : Fin q → ℝ) : ℝ :=
+  (∑ j, retentionUpper j * model.sourceSquaredEffect j) /
+    model.sourceEffectMass
+
+/-- Any locuswise retention upper envelope induces a global portability upper
+bound after weighting by source causal effect mass. -/
+theorem predicted_le_weightedRetentionUpperBound {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (retentionUpper : Fin q → ℝ)
+    (h_source : 0 < model.sourceEffectMass)
+    (h_bound : ∀ j,
+      model.targetRetainedSquaredEffect j ≤
+        retentionUpper j * model.sourceSquaredEffect j) :
+    predictedPortability model ≤ weightedRetentionUpperBound model retentionUpper := by
+  unfold predictedPortability weightedRetentionUpperBound portabilityScore
+  have h_sum :
+      model.targetRetainedEffectMass ≤
+        ∑ j, retentionUpper j * model.sourceSquaredEffect j := by
+    unfold targetRetainedEffectMass
+    exact Finset.sum_le_sum fun j _ => h_bound j
+  exact (div_le_div_iff_of_pos_right h_source).2 h_sum
 
 /-- **Architecture-based trait classification.**
-    Traits can be classified by their architecture:
-    - Highly polygenic, no selection → best portability
-    - Moderately polygenic, weak selection → moderate portability
-    - Oligogenic or strong selection → poor portability -/
+
+Traits are ranked by their explicit causal-SNP loss fractions, not by a bare
+scalar portability label. A trait with a smaller fraction of lost causal signal
+has a larger retained portability score. -/
 theorem architecture_classification
-    (port_high_poly port_moderate port_oligo : ℝ)
-    (h₁ : port_oligo < port_moderate)
-    (h₂ : port_moderate < port_high_poly) :
-    port_oligo < port_high_poly := by linarith
+    {q_high q_moderate q_oligo : ℕ}
+    (highPoly : SNPArchitecturePortabilityModel q_high)
+    (moderate : SNPArchitecturePortabilityModel q_moderate)
+    (oligo : SNPArchitecturePortabilityModel q_oligo)
+    (h_high_source : 0 < highPoly.sourceEffectMass)
+    (h_moderate_source : 0 < moderate.sourceEffectMass)
+    (h_oligo_source : 0 < oligo.sourceEffectMass)
+    (h_loss_order :
+      highPoly.relativePortabilityLoss < moderate.relativePortabilityLoss ∧
+        moderate.relativePortabilityLoss < oligo.relativePortabilityLoss) :
+    predictedPortability oligo < predictedPortability moderate ∧
+      predictedPortability moderate < predictedPortability highPoly := by
+  rcases h_loss_order with ⟨h_high_moderate, h_moderate_oligo⟩
+  constructor
+  · rw [predictedPortability,
+      portabilityScore_eq_one_sub_relativePortabilityLoss oligo h_oligo_source,
+      predictedPortability,
+      portabilityScore_eq_one_sub_relativePortabilityLoss moderate h_moderate_source]
+    linarith
+  · rw [predictedPortability,
+      portabilityScore_eq_one_sub_relativePortabilityLoss moderate h_moderate_source,
+      predictedPortability,
+      portabilityScore_eq_one_sub_relativePortabilityLoss highPoly h_high_source]
+    linarith
 
-/-- **General portability upper bound from rg and Fst.**
-    Traits with: (1) low r_g, (2) high FST at causal loci,
-    (3) low polygenicity have the worst portability.
-    Portability ≈ rg² × (1 - fst). For any thresholds rg_ub and fst_lb,
-    the bound rg_ub² × (1 - fst_lb) follows.
+/-- Locuswise `r_g² × (1 - FST)` upper envelope for retained causal signal.
 
-    Worked example: When rg < 0.5 and fst > 0.2,
-    portability < 0.25 × 0.8 = 0.2. -/
+This is not a single trait-wide multiplicative law. Instead, each causal SNP
+gets its own upper envelope from a locus-specific effect-correlation bound
+`rgUpper j` and a locus-specific divergence lower bound `fstLower j`, and the
+global portability bound is their source-effect-weighted average. -/
+noncomputable def rgFstWeightedUpperBound {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (rgUpper fstLower : Fin q → ℝ) : ℝ :=
+  weightedRetentionUpperBound model
+    (fun j => (rgUpper j) ^ 2 * (1 - fstLower j))
+
+/-- **Explicit SNP-level portability upper bound from locuswise effect
+correlation and causal divergence.**
+
+If each causal SNP retains at most `rgUpper(j)^2 * (1 - fstLower(j))` of its
+source squared-effect mass in the target, then total portability is bounded by
+the source-effect-weighted average of those locuswise envelopes. -/
 theorem portability_upper_bound_from_rg_fst
-    (rg fst rg_ub fst_lb : ℝ)
-    (h_rg_nn : 0 ≤ rg) (h_rg_ub_nn : 0 ≤ rg_ub)
-    (h_low_rg : rg < rg_ub) (h_high_fst : fst_lb < fst)
-    (h_fst_le : fst ≤ 1) (h_fst_lb_nn : 0 ≤ fst_lb) :
-    rg ^ 2 * (1 - fst) < rg_ub ^ 2 * (1 - fst_lb) := by
-  have h_rg_sq : rg ^ 2 < rg_ub ^ 2 := by nlinarith [sq_nonneg (rg_ub - rg)]
-  have h_fst_diff : 1 - fst < 1 - fst_lb := by linarith
-  have h_1_fst_lb_pos : 0 < 1 - fst_lb := by linarith
-  have h_1_fst_nn : 0 ≤ 1 - fst := by linarith
-  have h_rg_sq_nn : 0 ≤ rg ^ 2 := sq_nonneg rg
-  calc rg ^ 2 * (1 - fst)
-      ≤ rg ^ 2 * (1 - fst_lb) := by nlinarith
-    _ < rg_ub ^ 2 * (1 - fst_lb) := by nlinarith
+    {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (rgUpper fstLower : Fin q → ℝ)
+    (h_source : 0 < model.sourceEffectMass)
+    (h_locuswise_bound : ∀ j,
+      model.targetRetainedSquaredEffect j ≤
+        (rgUpper j) ^ 2 * (1 - fstLower j) * model.sourceSquaredEffect j) :
+    predictedPortability model ≤ rgFstWeightedUpperBound model rgUpper fstLower := by
+  unfold rgFstWeightedUpperBound
+  exact predicted_le_weightedRetentionUpperBound model
+    (fun j => (rgUpper j) ^ 2 * (1 - fstLower j))
+    h_source h_locuswise_bound
 
 end ArchitecturePredictions
 

@@ -100,6 +100,18 @@ section TailProbabilities
 noncomputable def standardizedScoreShift (Δμ σ_T : ℝ) : ℝ :=
   Δμ / σ_T
 
+/-- Standardized benchmark threshold coordinate for a Gaussian score law with
+mean `μ` and standard deviation `σ`. This is a score-summary object, not by
+itself a clinical decision or misclassification theorem. -/
+noncomputable def thresholdStandardizedCoordinate (threshold μ σ : ℝ) : ℝ :=
+  (threshold - μ) / σ
+
+/-- Gaussian benchmark fraction of scores above a raw threshold. This is the
+deployment-relevant tail-rate object associated with the standardized
+coordinate, but it is still only a benchmark score-distribution quantity. -/
+noncomputable def benchmarkHighScoreRate (threshold μ σ : ℝ) : ℝ :=
+  1 - Phi (thresholdStandardizedCoordinate threshold μ σ)
+
 /-- **Tail probability increases with mean shift toward the tail.**
     If the score distribution shifts right, more individuals
     exceed a fixed threshold → higher tail probability. -/
@@ -121,50 +133,96 @@ theorem variance_increase_thickens_tails
     x / σ₂ < x / σ₁ := by
   exact div_lt_div_of_pos_left h_x h₁ h_larger
 
-/-- **Population-specific thresholds: mean shift case.**
-    When population means differ, z-scores at any threshold differ
-    (given equal standard deviations). -/
-theorem source_threshold_misclassifies_mean_shift
+/-- **Threshold standardized coordinate changes under mean shift.**
+    When population means differ, the standardized location of a fixed raw
+    threshold differs as long as the standard deviation is shared. This is a
+    score-coordinate fact, not yet a theorem about outcomes or decisions. -/
+theorem threshold_standardized_coordinate_diff_of_mean_shift
     (threshold μ_S μ_T σ : ℝ)
     (h_σ : 0 < σ)
     (h_shift : μ_S ≠ μ_T) :
-    (threshold - μ_S) / σ ≠ (threshold - μ_T) / σ := by
+    thresholdStandardizedCoordinate threshold μ_S σ ≠
+      thresholdStandardizedCoordinate threshold μ_T σ := by
   intro h
   apply h_shift
   have h_ne : σ ≠ 0 := h_σ.ne'
   have : (threshold - μ_S) * σ = (threshold - μ_T) * σ := by
-    rwa [div_eq_div_iff h_ne h_ne] at h
+    simpa [thresholdStandardizedCoordinate] using
+      (div_eq_div_iff h_ne h_ne).mp h
   linarith [mul_right_cancel₀ h_ne this]
 
-/-- **Population-specific thresholds: variance change case.**
-    When standard deviations differ, z-scores differ for any threshold
-    not equal to the common mean. -/
-theorem source_threshold_misclassifies_variance_change
+/-- **Threshold standardized coordinate changes under variance change.**
+    When the standard deviations differ, the standardized location of a fixed
+    raw threshold differs as long as the threshold is not equal to the common
+    mean. This is still a score-coordinate fact rather than a full decision
+    theorem. -/
+theorem threshold_standardized_coordinate_diff_of_variance_change
     (threshold μ σ_S σ_T : ℝ)
     (h_σS : 0 < σ_S) (h_σT : 0 < σ_T)
     (h_σ_ne : σ_S ≠ σ_T)
     (h_thr : threshold ≠ μ) :
-    (threshold - μ) / σ_S ≠ (threshold - μ) / σ_T := by
+    thresholdStandardizedCoordinate threshold μ σ_S ≠
+      thresholdStandardizedCoordinate threshold μ σ_T := by
   intro h
   apply h_σ_ne
   have h_ne : threshold - μ ≠ 0 := sub_ne_zero.mpr h_thr
   have h1 : (threshold - μ) * σ_T = (threshold - μ) * σ_S := by
-    rwa [div_eq_div_iff h_σS.ne' h_σT.ne'] at h
+    simpa [thresholdStandardizedCoordinate] using
+      (div_eq_div_iff h_σS.ne' h_σT.ne').mp h
   exact (mul_left_cancel₀ h_ne h1).symm
 
-/-- **Population-specific thresholds are necessary (combined).**
-    Using source-population thresholds in the target population
-    misclassifies individuals because the score distribution has shifted.
-    When both mean and variance may differ with equal standard deviations,
-    z-scores differ. More generally, when σ differs, z-scores differ
-    at thresholds away from the mean. These two lemmas above cover
-    the key cases; we state the combined version for equal-σ. -/
-theorem source_threshold_misclassifies_target
+/-- **Source threshold changes the target standardized coordinate.**
+    This is the combined equal-variance coordinate statement: if the target mean
+    shifts, the source raw threshold lands at a different standardized location
+    in the target score law. Actual clinical threshold consequences should be
+    routed through an explicit decision rule elsewhere. -/
+theorem source_threshold_changes_standardized_coordinate
     (threshold μ_S μ_T σ : ℝ)
     (h_σ : 0 < σ)
     (h_shift : μ_S ≠ μ_T) :
-    (threshold - μ_S) / σ ≠ (threshold - μ_T) / σ :=
-  source_threshold_misclassifies_mean_shift threshold μ_S μ_T σ h_σ h_shift
+    thresholdStandardizedCoordinate threshold μ_S σ ≠
+      thresholdStandardizedCoordinate threshold μ_T σ :=
+  threshold_standardized_coordinate_diff_of_mean_shift
+    threshold μ_S μ_T σ h_σ h_shift
+
+/-- **Mean shift changes the benchmark high-score rate.**
+    Under the Gaussian benchmark score law, a rightward mean shift strictly
+    increases the fraction of scores above a fixed raw threshold. This is the
+    deployment-relevant tail-rate statement corresponding to the raw
+    standardized-coordinate algebra above. -/
+theorem mean_shift_changes_benchmark_high_score_rate
+    (threshold μ_S μ_T σ : ℝ)
+    (h_σ : 0 < σ)
+    (h_shift : μ_S < μ_T)
+    (hPhiStrict : StrictMono Phi) :
+    benchmarkHighScoreRate threshold μ_S σ <
+      benchmarkHighScoreRate threshold μ_T σ := by
+  unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
+  have hz : (threshold - μ_T) / σ < (threshold - μ_S) / σ := by
+    exact mean_shift_increases_tail threshold μ_S μ_T σ h_σ h_shift
+  have hphi : Phi ((threshold - μ_T) / σ) < Phi ((threshold - μ_S) / σ) := by
+    exact hPhiStrict hz
+  linarith
+
+/-- **Variance change changes the benchmark high-score rate.**
+    If the threshold lies above the common mean, increasing the benchmark score
+    standard deviation strictly increases the fraction of scores above that raw
+    threshold. -/
+theorem variance_change_changes_benchmark_high_score_rate
+    (threshold μ σ_S σ_T : ℝ)
+    (h_σS : 0 < σ_S)
+    (_h_σT : 0 < σ_T)
+    (h_larger : σ_S < σ_T)
+    (h_thr : 0 < threshold - μ)
+    (hPhiStrict : StrictMono Phi) :
+    benchmarkHighScoreRate threshold μ σ_S <
+      benchmarkHighScoreRate threshold μ σ_T := by
+  unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
+  have hz : (threshold - μ) / σ_T < (threshold - μ) / σ_S := by
+    exact variance_increase_thickens_tails (threshold - μ) σ_S σ_T h_σS h_larger h_thr
+  have hphi : Phi ((threshold - μ) / σ_T) < Phi ((threshold - μ) / σ_S) := by
+    exact hPhiStrict hz
+  linarith
 
 end TailProbabilities
 
@@ -182,18 +240,43 @@ section Calibration
     A score is calibrated if E[Y | PGS = s] = g(s) for the specified
     link function g. -/
 
-/-- **Calibration-in-the-large (intercept) from score mean shift.**
-    When allele frequencies change from source to target, the PGS mean
-    shifts by `pgsMeanShift`. If the mean shift is nonzero (which occurs
-    whenever at least one allele frequency changes for a nonzero-effect SNP),
-    the target mean prediction differs from the source mean prediction.
-    Derived from the `pgsMeanShift` / `pgsMean` structural definitions. -/
-theorem calibration_in_large
+/-- **Nonzero PGS mean shift changes the benchmark mean prediction.**
+    This is only the score-summary statement that the benchmark mean prediction
+    changes when `pgsMeanShift` is nonzero. It is not itself yet a theorem about
+    target calibration without specifying an observed-mean model. -/
+theorem pgs_mean_shift_changes_mean_prediction
     {m : ℕ} (β : Fin m → ℝ) (p_source p_target : Fin m → ℝ)
     (h_shift : pgsMeanShift β p_source p_target ≠ 0) :
     pgsMean β p_target ≠ pgsMean β p_source := by
   rw [← sub_ne_zero]
   rwa [← mean_shift_eq_diff]
+
+/-- **Identity-link CITL shift equals the negative benchmark mean shift.**
+    Holding the observed mean fixed, the change in calibration-in-the-large is
+    exactly the negative of the benchmark score-mean shift. This upgrades the
+    pure mean-prediction fact to an exact CITL identity. -/
+theorem identity_citl_shift_eq_neg_pgsMeanShift
+    {m : ℕ} (β : Fin m → ℝ) (p_source p_target : Fin m → ℝ)
+    (mean_observed : ℝ) :
+    calibrationInTheLarge mean_observed (pgsMean β p_target) -
+      calibrationInTheLarge mean_observed (pgsMean β p_source) =
+        -pgsMeanShift β p_source p_target := by
+  unfold calibrationInTheLarge
+  rw [mean_shift_eq_diff]
+  ring
+
+/-- **Nonzero PGS mean shift changes identity-link CITL.**
+    If the benchmark score mean changes while the observed mean is held fixed,
+    the corresponding identity-link calibration-in-the-large changes as well. -/
+theorem identity_citl_changes_of_nonzero_pgsMeanShift
+    {m : ℕ} (β : Fin m → ℝ) (p_source p_target : Fin m → ℝ)
+    (mean_observed : ℝ)
+    (h_shift : pgsMeanShift β p_source p_target ≠ 0) :
+    calibrationInTheLarge mean_observed (pgsMean β p_target) ≠
+      calibrationInTheLarge mean_observed (pgsMean β p_source) := by
+  rw [← sub_ne_zero]
+  rw [identity_citl_shift_eq_neg_pgsMeanShift]
+  exact neg_ne_zero.mpr h_shift
 
 /-- **Benchmark calibration slope drops below `1` under positive drift.**
     This theorem is only about the shared benchmark slope coordinate

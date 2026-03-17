@@ -1,10 +1,7 @@
-import Calibrator.Probability
 import Calibrator.PortabilityDrift
-import Calibrator.OpenQuestions
+import Calibrator.SelectionArchitecture
 
 namespace Calibrator
-
-open MeasureTheory
 
 /-!
 # Phenome-Wide Portability and Trait-Specific Patterns
@@ -113,9 +110,7 @@ noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
     higher for selected loci, and raising to the t-th power preserves
     the strict inequality (for t ≥ 1). -/
 theorem selected_drift_factor_gt_neutral (Ne : ℝ) (t : ℕ) (s_correction : ℝ)
-    (h_Ne_pos : 0 < Ne)
     (h_s_pos : 0 < s_correction)
-    (h_s_small : s_correction < 1 / (2 * Ne))
     -- ensures the per-generation factor is in (0, 1)
     (h_t_pos : 1 ≤ t)
     -- the neutral per-generation factor is positive
@@ -134,16 +129,14 @@ theorem selected_drift_factor_gt_neutral (Ne : ℝ) (t : ℕ) (s_correction : �
     maintains shared polymorphism across populations, reducing divergence
     at causal loci relative to neutral sites. -/
 theorem stabilizing_selection_reduces_fst (Ne : ℝ) (t : ℕ) (s_correction : ℝ)
-    (h_Ne_pos : 0 < Ne)
     (h_s_pos : 0 < s_correction)
-    (h_s_small : s_correction < 1 / (2 * Ne))
     (h_t_pos : 1 ≤ t)
     (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
     fstFromDriftFactor (selectedDriftFactor Ne t s_correction) <
       fstFromDriftFactor (neutralDriftFactor Ne t) := by
   unfold fstFromDriftFactor
   linarith [selected_drift_factor_gt_neutral Ne t s_correction
-    h_Ne_pos h_s_pos h_s_small h_t_pos h_base_pos]
+    h_s_pos h_t_pos h_base_pos]
 
 /-- **Corollary: Fst at causal loci is strictly less than Fst at neutral loci.**
     This is the exact condition needed by the portability theorem below.
@@ -151,94 +144,175 @@ theorem stabilizing_selection_reduces_fst (Ne : ℝ) (t : ℕ) (s_correction : �
     the Wright-Fisher derivation to the portability framework. -/
 theorem fst_causal_lt_fst_neutral_of_stabilizing_selection
     (Ne : ℝ) (t : ℕ) (s_correction : ℝ)
-    (h_Ne_pos : 0 < Ne)
     (h_s_pos : 0 < s_correction)
-    (h_s_small : s_correction < 1 / (2 * Ne))
     (h_t_pos : 1 ≤ t)
     (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
     let fst_causal := fstFromDriftFactor (selectedDriftFactor Ne t s_correction)
     let fst_neutral := fstFromDriftFactor (neutralDriftFactor Ne t)
     fst_causal < fst_neutral := by
   exact stabilizing_selection_reduces_fst Ne t s_correction
-    h_Ne_pos h_s_pos h_s_small h_t_pos h_base_pos
+    h_s_pos h_t_pos h_base_pos
 
-/-- **Stabilizing selection model.**
-    Under stabilizing selection toward the same optimum in both populations,
-    the cross-population genetic correlation r_g exceeds the neutral expectation
-    (1 - Fst), because selection purges divergent alleles.
+/-- Effect-size-weighted retained causal portability from a locus-specific
+causal-`F_ST` profile. This is the direct SNP-level replacement for the old
+trait-wide `fst_causal` scalar. -/
+noncomputable def causalPortabilityFromLocalFst {m : ℕ}
+    (sourceSquaredEffect fstCausal : Fin m → ℝ) : ℝ :=
+  (∑ i, sourceSquaredEffect i * (1 - fstCausal i)) /
+    (∑ i, sourceSquaredEffect i)
 
-    Parameters:
-    - r_g: cross-population genetic correlation under stabilizing selection
-    - fst: population divergence measure
-    - ld_factor: LD tagging correction
-    - r2_source: source-population PGS R²
+/-- The locus-level causal portability chart is exactly one minus the
+effect-size-weighted average causal `F_ST`. -/
+private theorem causalPortabilityFromLocalFst_eq_one_sub_weightedLocalFst {m : ℕ}
+    (sourceSquaredEffect fstCausal : Fin m → ℝ)
+    (h_weight_pos : 0 < ∑ i, sourceSquaredEffect i) :
+    causalPortabilityFromLocalFst sourceSquaredEffect fstCausal =
+      1 - (∑ i, sourceSquaredEffect i * fstCausal i) /
+        (∑ i, sourceSquaredEffect i) := by
+  unfold causalPortabilityFromLocalFst
+  have hW_ne : (∑ i, sourceSquaredEffect i) ≠ 0 := ne_of_gt h_weight_pos
+  calc
+    (∑ i, sourceSquaredEffect i * (1 - fstCausal i)) /
+        (∑ i, sourceSquaredEffect i)
+        =
+          ((∑ i, sourceSquaredEffect i) -
+            ∑ i, sourceSquaredEffect i * fstCausal i) /
+            (∑ i, sourceSquaredEffect i) := by
+              congr 1
+              calc
+                ∑ i, sourceSquaredEffect i * (1 - fstCausal i)
+                    = ∑ i, (sourceSquaredEffect i - sourceSquaredEffect i * fstCausal i) := by
+                        apply Finset.sum_congr rfl
+                        intro i hi
+                        ring
+                _ = (∑ i, sourceSquaredEffect i) -
+                      ∑ i, sourceSquaredEffect i * fstCausal i := by
+                        rw [Finset.sum_sub_distrib]
+    _ = 1 - (∑ i, sourceSquaredEffect i * fstCausal i) /
+          (∑ i, sourceSquaredEffect i) := by
+          field_simp [hW_ne]
 
-    Portability = r2_source * (1 - fst) * r_g² * ld_factor
-    Neutral portability = r2_source * (1 - fst) * 1² * ld_factor  (since ρ = 1 under neutrality)
+/-- If no effect-bearing causal locus is less differentiated than the neutral
+background, then the locus-level causal portability chart cannot exceed the
+neutral expectation. -/
+private theorem causalPortabilityFromLocalFst_le_neutral_of_no_subneutral_effect_locus
+    {m : ℕ}
+    (sourceSquaredEffect fstCausal : Fin m → ℝ)
+    (fst_neutral : ℝ)
+    (h_nonneg : ∀ i, 0 ≤ sourceSquaredEffect i)
+    (h_weight_pos : 0 < ∑ i, sourceSquaredEffect i)
+    (h_no_subneutral : ∀ i, 0 < sourceSquaredEffect i → fst_neutral ≤ fstCausal i) :
+    causalPortabilityFromLocalFst sourceSquaredEffect fstCausal ≤ 1 - fst_neutral := by
+  have hsum :
+      fst_neutral * (∑ i, sourceSquaredEffect i) ≤
+        ∑ i, sourceSquaredEffect i * fstCausal i := by
+    calc
+      fst_neutral * (∑ i, sourceSquaredEffect i)
+          = ∑ i, sourceSquaredEffect i * fst_neutral := by
+              rw [Finset.mul_sum]
+              apply Finset.sum_congr rfl
+              intro i hi
+              ring
+      _ ≤ ∑ i, sourceSquaredEffect i * fstCausal i := by
+            apply Finset.sum_le_sum
+            intro i hi
+            by_cases hpos : 0 < sourceSquaredEffect i
+            · exact mul_le_mul_of_nonneg_left (h_no_subneutral i hpos) (le_of_lt hpos)
+            · have hzero : sourceSquaredEffect i = 0 := by
+                have hnn := h_nonneg i
+                linarith
+              simp [hzero]
+  have hweighted :
+      fst_neutral ≤
+        (∑ i, sourceSquaredEffect i * fstCausal i) /
+          (∑ i, sourceSquaredEffect i) := by
+    exact (le_div_iff₀ h_weight_pos).2 hsum
+  rw [causalPortabilityFromLocalFst_eq_one_sub_weightedLocalFst
+    sourceSquaredEffect fstCausal h_weight_pos]
+  linarith
 
-    When stabilizing selection keeps r_g > 1 is impossible, but the mechanism
-    is that stabilizing selection *maintains* shared architecture better than
-    drift alone. We model this as: under stabilizing selection, the effective
-    Fst for causal variants is reduced (Fst_causal < Fst_neutral).
-
-    The hypothesis `h_stabilizing : fst_causal < fst_neutral` is now derived
-    from first principles in `fst_causal_lt_fst_neutral_of_stabilizing_selection`
-    above, via the Wright-Fisher drift model with stabilizing selection correction. -/
+/-- **Above-neutral portability forces a stabilizing-like causal locus signature.**
+    If the observed portability for a trait exceeds the neutral expectation on
+    the exact locus-level causal-`F_ST` chart, then some effect-bearing causal
+    locus must have lower-than-neutral divergence. This connects the phenome-
+    wide "better than neutral" pattern to a concrete SNP-level signature. -/
 theorem better_than_neutral_implies_stabilizing_selection
-    (fst_neutral fst_causal ld_factor r2_source : ℝ)
-    (h_stabilizing : fst_causal < fst_neutral)
-    -- Stabilizing selection reduces effective divergence at causal loci
-    (h_fst_nn : 0 ≤ fst_causal) (h_fst_le : fst_neutral ≤ 1)
-    (h_ld_pos : 0 < ld_factor) (h_ld_le : ld_factor ≤ 1)
-    (h_r2_pos : 0 < r2_source) :
-    -- Portability under stabilizing selection exceeds neutral portability
-    let port_observed := r2_source * (1 - fst_causal) * ld_factor
-    let port_neutral := r2_source * (1 - fst_neutral) * ld_factor
-    0 < port_observed - port_neutral := by
-  simp only
-  have h1 : 0 < r2_source * ld_factor := mul_pos h_r2_pos h_ld_pos
-  nlinarith
+    {m : ℕ}
+    (sourceSquaredEffect fstCausal : Fin m → ℝ)
+    (fst_neutral : ℝ)
+    (h_nonneg : ∀ i, 0 ≤ sourceSquaredEffect i)
+    (h_weight_pos : 0 < ∑ i, sourceSquaredEffect i)
+    (h_better :
+      1 - fst_neutral < causalPortabilityFromLocalFst sourceSquaredEffect fstCausal) :
+    ∃ i : Fin m, 0 < sourceSquaredEffect i ∧ fstCausal i < fst_neutral := by
+  by_contra h_no
+  push_neg at h_no
+  have h_le :
+      causalPortabilityFromLocalFst sourceSquaredEffect fstCausal ≤ 1 - fst_neutral := by
+    exact causalPortabilityFromLocalFst_le_neutral_of_no_subneutral_effect_locus
+      sourceSquaredEffect fstCausal fst_neutral h_nonneg h_weight_pos h_no
+  linarith
 
-/-- **Diversifying selection model.**
-    Under diversifying (balancing/pathogen-driven) selection, the
-    cross-population effect correlation ρ < 1 because selection
-    pushes allele frequencies and effect sizes apart.
-
-    The key structural parameter is ρ (effect correlation).
-    Neutral model: ρ = 1 (effects identical across populations).
-    Diversifying selection: ρ < 1 (effects diverge).
-
-    Portability_observed = r2_source * (1 - fst) * ρ² * ld_factor
-    Portability_neutral  = r2_source * (1 - fst) * 1  * ld_factor
-
-    Since ρ < 1, we derive ρ² < 1, hence observed < neutral. -/
+/-- **Below-neutral portability plus selected-variance excess identifies a
+fluctuating/diversifying selection regime.**
+    A subunit observed cross-population effect correlation by itself is not yet
+    a regime label. But if the same trait also has selected-architecture
+    variance above the stabilizing mutation-selection baseline, then the
+    observed summary is matched by a fluctuating-selection regime and by no
+    stabilizing regime. For fixed drift coordinates, that same observed effect
+    correlation forces the portability ratio below the neutral drift baseline. -/
 theorem worse_than_neutral_implies_diversifying_selection
-    (rho fst ld_factor r2_source : ℝ)
-    (h_rho_lt : rho < 1) (h_rho_nn : 0 ≤ rho)
-    -- Diversifying selection makes ρ < 1
-    (h_fst_nn : 0 ≤ fst) (h_fst_le : fst ≤ 1)
-    (h_ld_pos : 0 < ld_factor) (h_ld_le : ld_factor ≤ 1)
-    (h_r2_pos : 0 < r2_source) :
-    let port_observed := r2_source * (1 - fst) * rho ^ 2 * ld_factor
-    let port_neutral := r2_source * (1 - fst) * ld_factor
-    0 ≤ port_neutral - port_observed := by
-  simp only
-  have h_rho_sq_lt : rho ^ 2 < 1 := by nlinarith
-  have h_prefactor : 0 ≤ r2_source * (1 - fst) * ld_factor := by
-    apply mul_nonneg
-    · apply mul_nonneg
-      · exact le_of_lt h_r2_pos
-      · exact sub_nonneg.mpr h_fst_le
-    · exact le_of_lt h_ld_pos
-  have h_one_minus_rho_sq : 0 ≤ 1 - rho ^ 2 := by
-    nlinarith
-  have hdiff :
-      r2_source * (1 - fst) * ld_factor -
-        r2_source * (1 - fst) * rho ^ 2 * ld_factor =
-      r2_source * (1 - fst) * ld_factor * (1 - rho ^ 2) := by
-    ring
-  rw [hdiff]
-  exact mul_nonneg h_prefactor h_one_minus_rho_sq
+    (v_mutation s t rho_obs v_selected_obs V_A V_E fstS fstT : ℝ)
+    (h_t : 0 < t)
+    (h_rho : 0 < rho_obs) (h_rho_lt : rho_obs < 1)
+    (h_var_gap : stabilizingSelectedArchitectureVariance v_mutation s < v_selected_obs)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst : fstS < fstT) (hfstT_lt_one : fstT < 1) :
+    let tau_hat := tauFromObservedEffectCorrelation t rho_obs
+    let sigma_hat :=
+      sigmaThetaFromObservedSelectedVariance v_selected_obs v_mutation s t rho_obs
+    let observed_ratio :=
+      expectedR2 (realWorldPGSVariance V_A fstT rho_obs) V_E /
+        expectedR2 (presentDayPGSVariance V_A fstS) V_E
+    let neutral_ratio :=
+      expectedR2 (presentDayPGSVariance V_A fstT) V_E /
+        expectedR2 (presentDayPGSVariance V_A fstS) V_E
+    (0 < tau_hat ∧
+      0 < sigma_hat ∧
+      fluctuatingEffectCorrelation t tau_hat = rho_obs ∧
+      fluctuatingSelectedArchitectureVariance v_mutation s sigma_hat tau_hat =
+        v_selected_obs) ∧
+      observed_ratio < neutral_ratio ∧
+      ¬ ∃ Ns,
+        effectCorrelationStabilizing Ns = rho_obs ∧
+          stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
+  dsimp
+  have h_selection :
+      (0 < tauFromObservedEffectCorrelation t rho_obs ∧
+        0 <
+          sigmaThetaFromObservedSelectedVariance
+            v_selected_obs v_mutation s t rho_obs ∧
+        fluctuatingEffectCorrelation t
+            (tauFromObservedEffectCorrelation t rho_obs) = rho_obs ∧
+        fluctuatingSelectedArchitectureVariance v_mutation s
+            (sigmaThetaFromObservedSelectedVariance
+              v_selected_obs v_mutation s t rho_obs)
+            (tauFromObservedEffectCorrelation t rho_obs) = v_selected_obs) ∧
+      ¬ ∃ Ns,
+        effectCorrelationStabilizing Ns = rho_obs ∧
+          stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
+    exact observedSelectionSummary_identifies_fluctuating_not_stabilizing
+      v_mutation s t rho_obs v_selected_obs h_t h_rho h_rho_lt h_var_gap
+  rcases h_selection with ⟨h_match, h_not_stab⟩
+  have h_port :
+      expectedR2 (realWorldPGSVariance V_A fstT rho_obs) V_E /
+          expectedR2 (presentDayPGSVariance V_A fstS) V_E <
+        expectedR2 (presentDayPGSVariance V_A fstT) V_E /
+          expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
+    simpa [realWorldPGSVariance, presentDayPGSVariance] using
+      portability_ratio_with_ld_decay V_A V_E fstS fstT 1 rho_obs
+        hVA hVE hfst hfstT_lt_one rfl ⟨h_rho, h_rho_lt⟩
+  exact ⟨h_match, h_port, h_not_stab⟩
 
 /-- **Effect size correlation between populations.**
     ρ(β_pop1, β_pop2) captures how similar genetic effects are.

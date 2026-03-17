@@ -1120,6 +1120,67 @@ noncomputable def sourceR2FromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   sourceExplainedSignalVarianceFromSourceWeights m / m.sourceOutcomeVariance
 
+/-- Exact unexplained source-side liability variance under the full explicit
+source-state score equation. This is the residual variance paired with the
+source explained signal when constructing exact source AUC and source Brier
+coordinates from the same mechanistic SNP-level state. -/
+noncomputable def sourceResidualVarianceFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  m.sourceOutcomeVariance - sourceExplainedSignalVarianceFromSourceWeights m
+
+@[simp] theorem sourceResidualVarianceFromSourceWeights_eq_outcome_minus_signal {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    sourceResidualVarianceFromSourceWeights m =
+      m.sourceOutcomeVariance - sourceExplainedSignalVarianceFromSourceWeights m := by
+  rfl
+
+/-- Exact source calibrated Brier coordinate from the full explicit
+source-state score equation, evaluated at an arbitrary observed prevalence
+coordinate `π`. This lets downstream theory compare source and target Brier on
+the same target-population outcome scale without falling back to a benchmark
+`R²` surrogate. -/
+noncomputable def sourceCalibratedBrierFromSourceWeightsAtPrevalence {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (π : ℝ) : ℝ :=
+  TransportedMetrics.calibratedBrierFromVariances
+    π
+    (sourceExplainedSignalVarianceFromSourceWeights m)
+    (sourceResidualVarianceFromSourceWeights m)
+
+/-- The mechanistic source calibrated Brier coordinate is built directly from
+source explained signal variance and source residual variance. -/
+theorem sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances
+    {p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) :
+    sourceCalibratedBrierFromSourceWeightsAtPrevalence m π =
+      TransportedMetrics.calibratedBrierFromVariances
+        π
+        (sourceExplainedSignalVarianceFromSourceWeights m)
+        (sourceResidualVarianceFromSourceWeights m) := by
+  rfl
+
+/-- The direct mechanistic source calibrated Brier coordinate agrees with the
+`R²` chart induced by the same explicit source explained-signal and
+total-variance decomposition. This is a derived identity, not the defining
+construction of source Brier. -/
+@[simp] theorem sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart
+    {p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) :
+    sourceCalibratedBrierFromSourceWeightsAtPrevalence m π =
+      TransportedMetrics.calibratedBrier π (sourceR2FromSourceWeights m) := by
+  rw [sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances]
+  rw [TransportedMetrics.calibratedBrierFromVariances_eq_chart]
+  have h_source_ne : m.sourceOutcomeVariance ≠ 0 := by
+    exact ne_of_gt m.sourceOutcomeVariance_pos
+  have hr2 :
+      TransportedMetrics.r2FromSignalVariance
+          (sourceExplainedSignalVarianceFromSourceWeights m)
+          (sourceResidualVarianceFromSourceWeights m) =
+        sourceR2FromSourceWeights m := by
+    unfold TransportedMetrics.r2FromSignalVariance sourceResidualVarianceFromSourceWeights
+      sourceR2FromSourceWeights
+    field_simp [h_source_ne]
+    ring
+  rw [hr2]
+
+
 /-- Exact target `R²` under transported source weights and the full target-side
 driver state.
 
@@ -2256,6 +2317,44 @@ theorem liabilityAUCFromExplainedR2_strictMonoOn_unitInterval
     nlinarith
   exact Real.sqrt_lt_sqrt hx_arg_nonneg harg_lt
 
+/-- Liability-threshold AUC induced by the full explicit source-side driver
+state. Like the target-side exported AUC, this is built directly from source
+explained signal and source residual variance under the source-learned score
+equation. -/
+noncomputable def sourceLiabilityAUCFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : ℝ :=
+  liabilityAUCFromVariances
+    (sourceExplainedSignalVarianceFromSourceWeights m)
+    (sourceResidualVarianceFromSourceWeights m)
+
+/-- The mechanistic source AUC is exactly the explicit liability-threshold map
+applied to source explained signal and source residual variance. -/
+theorem sourceLiabilityAUCFromSourceWeights_eq_explicit_source_variances
+    {p q : ℕ} (m : CrossPopulationMetricModel p q) :
+    sourceLiabilityAUCFromSourceWeights m =
+      liabilityAUCFromVariances
+        (sourceExplainedSignalVarianceFromSourceWeights m)
+        (sourceResidualVarianceFromSourceWeights m) := by
+  rfl
+
+/-- The direct mechanistic source AUC agrees with the `R²` chart induced by the
+same source explained-signal and total-variance decomposition.
+
+This is only a derived coordinate identity; it is not the defining
+construction of source AUC. -/
+theorem sourceLiabilityAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    sourceLiabilityAUCFromSourceWeights m =
+      liabilityAUCFromExplainedR2 (sourceR2FromSourceWeights m) := by
+  have h_source_ne : m.sourceOutcomeVariance ≠ 0 := by
+    exact ne_of_gt m.sourceOutcomeVariance_pos
+  unfold sourceLiabilityAUCFromSourceWeights liabilityAUCFromVariances
+    sourceResidualVarianceFromSourceWeights liabilityAUCFromExplainedR2
+    sourceR2FromSourceWeights
+  congr 1
+  congr 1
+  field_simp [h_source_ne]
+
 /-- Liability-threshold AUC induced by the full explicit cross-population
 driver state.
 
@@ -2296,6 +2395,59 @@ theorem targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
   congr 1
   congr 1
   field_simp [h_eff_ne]
+
+/-- Canonical mechanistic deployed source metric profile evaluated at an
+arbitrary observed prevalence coordinate `π`. This is the source-side analogue
+of `targetMetricProfileFromSourceWeights`, and it lets downstream calibration
+theory compare source and target Brier on the same target-population
+prevalence scale. -/
+noncomputable def sourceMetricProfileFromSourceWeightsAtPrevalence {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (π : ℝ) : TransportedMetrics.Profile where
+  r2 := sourceR2FromSourceWeights m
+  auc := sourceLiabilityAUCFromSourceWeights m
+  brier := sourceCalibratedBrierFromSourceWeightsAtPrevalence m π
+
+@[simp] theorem sourceMetricProfileFromSourceWeightsAtPrevalence_r2 {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (π : ℝ) :
+    (sourceMetricProfileFromSourceWeightsAtPrevalence m π).r2 =
+      sourceR2FromSourceWeights m := by
+  rfl
+
+@[simp] theorem sourceMetricProfileFromSourceWeightsAtPrevalence_auc {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (π : ℝ) :
+    (sourceMetricProfileFromSourceWeightsAtPrevalence m π).auc =
+      sourceLiabilityAUCFromSourceWeights m := by
+  rfl
+
+@[simp] theorem sourceMetricProfileFromSourceWeightsAtPrevalence_brier {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (π : ℝ) :
+    (sourceMetricProfileFromSourceWeightsAtPrevalence m π).brier =
+      sourceCalibratedBrierFromSourceWeightsAtPrevalence m π := by
+  rfl
+
+/-- The source metric profile evaluated on the target-population observed
+prevalence scale carried by the mechanistic target state. -/
+noncomputable def sourceMetricProfileFromSourceWeightsAtTargetPrevalence {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile :=
+  sourceMetricProfileFromSourceWeightsAtPrevalence m m.targetPrevalence
+
+@[simp] theorem sourceMetricProfileFromSourceWeightsAtTargetPrevalence_r2 {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).r2 =
+      sourceR2FromSourceWeights m := by
+  rfl
+
+@[simp] theorem sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).auc =
+      sourceLiabilityAUCFromSourceWeights m := by
+  rfl
+
+@[simp] theorem sourceMetricProfileFromSourceWeightsAtTargetPrevalence_brier {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).brier =
+      sourceCalibratedBrierFromSourceWeightsAtPrevalence m m.targetPrevalence := by
+  rfl
 
 /-- Canonical mechanistic deployed metric profile induced by the explicit
 SNP-level transported score equation. The upstream state is the full
