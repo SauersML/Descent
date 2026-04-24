@@ -6,7 +6,7 @@
   <title>Gnomon · Generational Portability Dashboard</title>
   <meta
     name="description"
-    content="Generation-indexed mechanistic portability dashboard for exact R², calibration slope, liability AUC, and Brier laws driven by popgen coordinates and SNP-level transport channels."
+    content="Generation-indexed scalarized portability dashboard for illustrative R², calibration slope, liability AUC, and Brier curves driven by popgen coordinates and transport channels."
   >
   <style>
     :root {
@@ -502,13 +502,13 @@
     <header class="hero">
       <h1>Generational Portability Dashboard</h1>
       <p class="lead">
-        Exact portability laws should be read across generations, not across arbitrary covariance sweeps.
+        Scalarized portability curves should be read across generations, not across arbitrary covariance sweeps.
         This page shows how <code>R²</code>, calibration slope, liability ROC area, and Brier score change as divergence,
         LD decay, mutation, migration, allele-frequency mismatch, direct causal transport, proxy tagging, and target-only novelty evolve over time.
       </p>
       <div class="hero-actions">
         <a class="button-link" href="#dashboard">Dashboard</a>
-        <a class="button-link secondary" href="#laws">Exact Laws</a>
+        <a class="button-link secondary" href="#laws">Model Notes</a>
       </div>
     </header>
 
@@ -559,7 +559,7 @@
                 </label>
                 <label class="control-field">
                   <span>Migration rate <code>m</code></span>
-                  <input id="input-mig" type="number" min="0" step="0.0001" value="0.002">
+                  <input id="input-mig" type="number" min="0" step="0.0001" value="0">
                 </label>
                 <label class="control-field">
                   <span>Recombination scale <code>λ</code></span>
@@ -575,7 +575,7 @@
                 </label>
               </div>
               <p class="control-note">
-                These drive the exact generation-indexed coordinates from the proof surface:
+                These drive the generation-indexed helper coordinates mirrored from the proof surface:
                 <code>τ(t)</code>, <code>F_ST(t)</code>, mutation-shared retention, migration-shared boost, and LD correlation decay.
               </p>
             </div>
@@ -596,8 +596,8 @@
                   <input id="input-source-context-score" type="number" step="0.01" value="-0.01">
                 </label>
                 <label class="control-field">
-                  <span>Source score variance</span>
-                  <input id="input-source-score-variance" type="number" min="0.0001" step="0.01" value="0.46">
+                  <span>Source ERM score variance (derived)</span>
+                  <input id="input-source-score-variance" type="number" min="0.0001" step="0.01" value="0.33" readonly>
                 </label>
                 <label class="control-field">
                   <span>Source outcome variance</span>
@@ -638,6 +638,10 @@
                   <input id="input-mutation-causal-shift" type="number" step="0.01" value="0.06">
                 </label>
                 <label class="control-field">
+                  <span>Standing effect shift per unit <code>F_ST</code></span>
+                  <input id="input-standing-effect-fst-shift" type="number" step="0.01" value="0">
+                </label>
+                <label class="control-field">
                   <span>Context drift per unit <code>F_ST</code></span>
                   <input id="input-context-fst-shift" type="number" step="0.01" value="-0.18">
                 </label>
@@ -659,8 +663,10 @@
                 </label>
               </div>
               <p class="control-note">
-                These are not arbitrary covariance sliders. They are generation-indexed trajectory coefficients for AF mismatch,
-                context drift, outcome-scale drift, prevalence drift, and target-only novelty.
+                The source weights are source ERM weights, so the source score variance is derived from the
+                source direct, proxy, and context score channels. The target controls specify generation-indexed
+                trajectories for AF mismatch, standing-effect drift, context drift, outcome-scale drift,
+                prevalence drift, and target-only novelty.
               </p>
             </div>
 
@@ -676,8 +682,8 @@
                   <input id="input-ancestry-ld-scale" type="number" min="0" step="0.001" value="0.05">
                 </label>
                 <label class="control-field">
-                  <span>Source-specific overfit residual</span>
-                  <input id="input-source-overfit" type="number" min="0" step="0.001" value="0.015">
+                  <span>Source-context mismatch scale</span>
+                  <input id="input-source-overfit" type="number" min="0" step="0.001" value="0.5">
                 </label>
                 <label class="control-field">
                   <span>Novel untaggable phenotype scale</span>
@@ -685,18 +691,19 @@
                 </label>
               </div>
               <p class="control-note">
-                These feed the exact effective target outcome variance law:
-                baseline target outcome variance plus broken tagging, ancestry-specific LD, source-specific overfit, and novel untaggable phenotype variance.
+                These feed the scalarized effective target outcome variance rule:
+                baseline target outcome variance plus squared-gap tagging, LD, context-mismatch, and novel untaggable phenotype penalties.
               </p>
             </div>
 
             <div class="warning">
-              This page is built around the exact generational law surface:
+              This page is a scalarized illustration of the mechanistic law surface, not a literal evaluator of the full matrix-valued theorem state:
               <code>Cov_T(t) = direct_T(t) + proxy_T(t) + context_T(t)</code>,
               <code>R²_T(t) = Cov_T(t)^2 / (Var_T(score_S,t) · V_eff,T(t))</code>,
               <code>slope_T(t) = Cov_T(t) / Var_T(score_S,t)</code>,
               <code>AUC_T(t) = Φ(√(signal_T(t) / (2 residual_T(t))))</code>,
               <code>Brier_T(t) = π_T(t)(1-π_T(t))(1-R²_T(t))</code>.
+              The defaults are chosen to satisfy the basic sanity checks <code>target = source</code> at generation <code>0</code> and worsening transport under continued divergence.
             </div>
 
             <div>
@@ -716,22 +723,22 @@
               <article class="metric-card">
                 <p class="metric-label">Transient Fst</p>
                 <p class="metric-value" id="stat-fst">0</p>
-                <p class="metric-subtitle">Exact <code>F_ST(t)</code> from the discrete drift-mutation-migration coordinate.</p>
+                <p class="metric-subtitle">Scalarized <code>F_ST(t)</code> helper coordinate from the discrete drift-mutation-migration recurrence.</p>
               </article>
               <article class="metric-card">
                 <p class="metric-label">Mutation-Shared Retention</p>
                 <p class="metric-value" id="stat-mutation-retention">0</p>
-                <p class="metric-subtitle">Exact <code>exp(-θτ(t))</code> shared-variation retention.</p>
+                <p class="metric-subtitle">Scalarized <code>exp(-θτ(t))</code> shared-variation retention.</p>
               </article>
               <article class="metric-card">
                 <p class="metric-label">Migration-Shared Boost</p>
                 <p class="metric-value" id="stat-migration-boost">0</p>
-                <p class="metric-subtitle">Exact migration-restoration factor in the generational kernel.</p>
+                <p class="metric-subtitle">Scalarized migration-restoration factor in the generational kernel.</p>
               </article>
               <article class="metric-card">
                 <p class="metric-label">Target Predictive Covariance</p>
                 <p class="metric-value" id="stat-target-covariance">0</p>
-                <p class="metric-subtitle">Exact sum of direct, proxy, and context score channels at the focused generation.</p>
+                <p class="metric-subtitle">Scalarized sum of direct, proxy, and context score channels at the focused generation.</p>
               </article>
               <article class="metric-card">
                 <p class="metric-label">Target Score Variance</p>
@@ -744,24 +751,24 @@
                 <p class="metric-subtitle">Baseline target outcome variance plus the explicit target-side loss budget.</p>
               </article>
               <article class="metric-card">
-                <p class="metric-label">Exact Target R²</p>
+                <p class="metric-label">Target R²</p>
                 <p class="metric-value" id="stat-r2-target">0</p>
                 <p class="metric-subtitle">Source <code>R²</code>: <span id="stat-r2-source">0</span> · Change: <span id="stat-delta-r2">0</span></p>
               </article>
               <article class="metric-card">
-                <p class="metric-label">Exact Target Calibration Slope</p>
+                <p class="metric-label">Target Calibration Slope</p>
                 <p class="metric-value" id="stat-slope-target">0</p>
-                <p class="metric-subtitle">Source slope: <span id="stat-slope-source">0</span> · Change: <span id="stat-delta-slope">0</span></p>
+                <p class="metric-subtitle">Source ERM slope is fixed at <span id="stat-slope-source">0</span> · Change: <span id="stat-delta-slope">0</span></p>
               </article>
               <article class="metric-card">
-                <p class="metric-label">Exact Target Liability AUC</p>
+                <p class="metric-label">Target Liability AUC</p>
                 <p class="metric-value" id="stat-auc-target">0</p>
                 <p class="metric-subtitle">Source AUC: <span id="stat-auc-source">0</span> · Change: <span id="stat-delta-auc">0</span></p>
               </article>
               <article class="metric-card">
-                <p class="metric-label">Exact Target Brier Score</p>
+                <p class="metric-label">Target Brier Score</p>
                 <p class="metric-value" id="stat-brier-target">0</p>
-                <p class="metric-subtitle">Source Brier on the same target prevalence scale: <span id="stat-brier-source">0</span> · Change: <span id="stat-delta-brier">0</span></p>
+                <p class="metric-subtitle">Comparable source Brier on the target prevalence scale: <span id="stat-brier-source">0</span> · Change: <span id="stat-delta-brier">0</span></p>
               </article>
               <article class="metric-card">
                 <p class="metric-label">Dominant Channel / Loss</p>
@@ -772,10 +779,10 @@
 
             <article class="figure-card">
               <div class="pill-row">
-                <span class="pill pill-theorem">Live Law Slice</span>
-                <span class="pill pill-definition">Generation Indexed</span>
+                <span class="pill pill-theorem">Live Slice</span>
+                <span class="pill pill-definition">Scalarized</span>
               </div>
-              <h3>Current instantiated law at the focused generation</h3>
+              <h3>Current instantiated scalarized law at the focused generation</h3>
               <ul class="equation-list">
                 <li id="law-fst"></li>
                 <li id="law-af"></li>
@@ -793,9 +800,9 @@
               <article class="chart-card">
                 <div class="chart-head">
                   <div>
-                    <h3>Exact Target Metrics Over Generations</h3>
+                    <h3>Target Metrics Over Generations</h3>
                     <p>
-                      Exact deployed target <code>R²</code>, calibration slope, liability ROC area, and Brier score
+                      Scalarized target <code>R²</code>, calibration slope, liability ROC area, and Brier score
                       as divergence accumulates over generations.
                     </p>
                   </div>
@@ -809,9 +816,9 @@
               <article class="chart-card">
                 <div class="chart-head">
                   <div>
-                    <h3>Exact Metric Changes From The Source Baseline</h3>
+                    <h3>Metric Changes From The Source Baseline</h3>
                     <p>
-                      Exact target minus source change for each metric across generations. Negative
+                      Scalarized target minus source change for each metric across generations. Negative
                       <code>ΔR²</code>, <code>Δslope</code>, and <code>ΔAUC</code> indicate loss; positive <code>ΔBrier</code> indicates worsening.
                     </p>
                   </div>
@@ -825,9 +832,43 @@
               <article class="chart-card">
                 <div class="chart-head">
                   <div>
+                    <h3>Target To Source Metric Ratios</h3>
+                    <p>
+                      Scalarized transported-to-source ratios for the bundled metric profile.
+                      Ratios below 1 mean loss for <code>R²</code> and AUC; ratios above 1 mean worsening for Brier.
+                      The Brier denominator uses the source profile evaluated on the target prevalence scale.
+                    </p>
+                  </div>
+                </div>
+                <div class="chart-legend" id="legend-ratios"></div>
+                <div class="chart-shell">
+                  <svg class="chart-svg" id="chart-ratios" viewBox="0 0 960 440" role="img" aria-label="Target to source metric ratios across generations"></svg>
+                </div>
+              </article>
+
+              <article class="chart-card">
+                <div class="chart-head">
+                  <div>
+                    <h3>Source And Target Metric Curves</h3>
+                    <p>
+                      Raw scalarized source and target trajectories for <code>R²</code>, AUC, and Brier across generations.
+                      This plot uses the raw source Brier on the source prevalence scale, while the target Brier
+                      stays on the generation-indexed target prevalence scale.
+                    </p>
+                  </div>
+                </div>
+                <div class="chart-legend" id="legend-raw-metrics"></div>
+                <div class="chart-shell">
+                  <svg class="chart-svg" id="chart-raw-metrics" viewBox="0 0 960 440" role="img" aria-label="Source and target metric curves across generations"></svg>
+                </div>
+              </article>
+
+              <article class="chart-card">
+                <div class="chart-head">
+                  <div>
                     <h3>Popgen Drivers Over Generations</h3>
                     <p>
-                      The exact driver coordinates from the mechanistic proof surface: transient <code>F_ST</code>, mutation sharing,
+                      The helper coordinates from the mechanistic proof surface: transient <code>F_ST</code>, mutation sharing,
                       migration boost, LD decay, and AF-mismatch retention.
                     </p>
                   </div>
@@ -861,11 +902,11 @@
       <section class="panel" id="laws">
         <div class="section-head">
           <div>
-            <p class="section-kicker">Exact Laws</p>
+            <p class="section-kicker">Model Notes</p>
             <h2>What The Page Is Plotting</h2>
           </div>
           <p>
-            The plots are not arbitrary summaries. They are a scalarized generation-indexed slice of the exact proof-side law surface:
+            The plots are not arbitrary summaries. They are a scalarized generation-indexed slice of the proof-side law surface:
             popgen coordinates drive LD, AF mismatch, direct transport, proxy transport, novelty, and the exported metric laws.
           </p>
         </div>
@@ -899,12 +940,12 @@
 
           <article class="figure-card">
             <div class="pill-row">
-              <span class="pill pill-theorem">Exact Metrics</span>
-              <span class="pill pill-dependency">Deployed Laws</span>
+              <span class="pill pill-theorem">Scalarized Metrics</span>
+              <span class="pill pill-dependency">Deployed Rules</span>
             </div>
-            <h3>Metric laws over generations</h3>
+            <h3>Metric rules over generations</h3>
             <p class="figure-caption"><code>signal_T(t) = Cov_T(t)^2 / Var_T(score_S, t)</code></p>
-            <p class="figure-caption"><code>V_eff,T(t) = V_target(t) + brokenTagging(t) + ancestryLD(t) + sourceOverfit + novelUntaggable(t)</code></p>
+            <p class="figure-caption"><code>V_eff,T(t) = V_target(t) + brokenTagging(t) + ancestryLD(t) + contextMismatch(t) + novelUntaggable(t)</code></p>
             <p class="figure-caption"><code>R²_T(t) = signal_T(t) / V_eff,T(t)</code></p>
             <p class="figure-caption"><code>slope_T(t) = Cov_T(t) / Var_T(score_S, t)</code></p>
             <p class="figure-caption"><code>AUC_T(t) = Φ(√(signal_T(t) / (2 residual_T(t))))</code></p>
@@ -945,6 +986,7 @@
         mutationTagShift: $("input-mutation-tag-shift"),
         standingCausalShift: $("input-standing-causal-shift"),
         mutationCausalShift: $("input-mutation-causal-shift"),
+        standingEffectFstShift: $("input-standing-effect-fst-shift"),
         contextFstShift: $("input-context-fst-shift"),
         outcomeVarianceFstShift: $("input-outcome-variance-fst-shift"),
         prevalenceFstShift: $("input-prevalence-fst-shift"),
@@ -1001,7 +1043,7 @@
         plotPoints: 240,
         ne: 10000,
         mu: 0.00001,
-        mig: 0.002,
+        mig: 0,
         recomb: 0.02,
         tagDistance: 8,
         tagCausalDistance: 12,
@@ -1017,6 +1059,7 @@
         mutationTagShift: 0.08,
         standingCausalShift: 0.28,
         mutationCausalShift: 0.06,
+        standingEffectFstShift: 0,
         contextFstShift: -0.18,
         outcomeVarianceFstShift: 0.20,
         prevalenceFstShift: 0.15,
@@ -1024,7 +1067,7 @@
         novelProxyScore: 0.04,
         brokenTaggingScale: 0.06,
         ancestryLdScale: 0.05,
-        sourceOverfit: 0.015,
+        sourceOverfit: 0.5,
         novelUntaggableScale: 0.035
       };
 
@@ -1036,7 +1079,9 @@
         ink: "#1f1a17",
         stone: "#8a8177",
         softTeal: "#1a8f86",
-        mauve: "#7b5877"
+        mauve: "#7b5877",
+        clay: "#c06b42",
+        brass: "#b88711"
       };
 
       const legends = {
@@ -1051,6 +1096,19 @@
           { name: "Δslope", color: colors.slate },
           { name: "ΔAUC", color: colors.rust },
           { name: "ΔBrier", color: colors.amber }
+        ],
+        ratios: [
+          { name: "R² ratio (target/source)", color: colors.teal },
+          { name: "AUC ratio (target/source)", color: colors.rust },
+          { name: "Brier ratio (target/source)", color: colors.amber }
+        ],
+        rawMetrics: [
+          { name: "target R²", color: colors.teal },
+          { name: "source R²", color: colors.softTeal },
+          { name: "target AUC", color: colors.rust },
+          { name: "source AUC", color: colors.clay },
+          { name: "target Brier", color: colors.amber },
+          { name: "source Brier", color: colors.brass }
         ],
         drivers: [
           { name: "transient Fst", color: colors.teal },
@@ -1119,6 +1177,13 @@
         return value.toExponential(1);
       }
 
+      function ratioOrNaN(numerator, denominator) {
+        if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+          return Number.NaN;
+        }
+        return numerator / denominator;
+      }
+
       function erfApprox(x) {
         const sign = x < 0 ? -1 : 1;
         const ax = Math.abs(x);
@@ -1146,6 +1211,10 @@
       }
 
       function readConfig() {
+        const sourceScoreVariance =
+          Number(inputs.sourceDirectScore.value) +
+          Number(inputs.sourceProxyScore.value) +
+          Number(inputs.sourceContextScore.value);
         return {
           maxGenerations: Number(inputs.maxGenerations.value),
           focusGeneration: Number(inputs.focusGeneration.value),
@@ -1159,7 +1228,7 @@
           sourceDirectScore: Number(inputs.sourceDirectScore.value),
           sourceProxyScore: Number(inputs.sourceProxyScore.value),
           sourceContextScore: Number(inputs.sourceContextScore.value),
-          sourceScoreVariance: Number(inputs.sourceScoreVariance.value),
+          sourceScoreVariance,
           sourceOutcomeVariance: Number(inputs.sourceOutcomeVariance.value),
           sourceTagAf: Number(inputs.sourceTagAf.value),
           sourceCausalAf: Number(inputs.sourceCausalAf.value),
@@ -1168,6 +1237,7 @@
           mutationTagShift: Number(inputs.mutationTagShift.value),
           standingCausalShift: Number(inputs.standingCausalShift.value),
           mutationCausalShift: Number(inputs.mutationCausalShift.value),
+          standingEffectFstShift: Number(inputs.standingEffectFstShift.value),
           contextFstShift: Number(inputs.contextFstShift.value),
           outcomeVarianceFstShift: Number(inputs.outcomeVarianceFstShift.value),
           prevalenceFstShift: Number(inputs.prevalenceFstShift.value),
@@ -1204,12 +1274,16 @@
         if (!(cfg.sourcePrevalence > 0 && cfg.sourcePrevalence < 1)) problems.push("Source prevalence must lie in (0, 1).");
         if (!(cfg.brokenTaggingScale >= 0)) problems.push("Broken-tagging residual scale must be nonnegative.");
         if (!(cfg.ancestryLdScale >= 0)) problems.push("Ancestry-specific LD residual scale must be nonnegative.");
-        if (!(cfg.sourceOverfit >= 0)) problems.push("Source-specific overfit residual must be nonnegative.");
+        if (!(cfg.sourceOverfit >= 0)) problems.push("Source-context mismatch scale must be nonnegative.");
         if (!(cfg.novelUntaggableScale >= 0)) problems.push("Novel untaggable phenotype scale must be nonnegative.");
         if (cfg.focusGeneration > cfg.maxGenerations) {
           problems.push("Focused generation cannot exceed the maximum generations shown.");
         }
         return problems;
+      }
+
+      function syncDerivedInputs(cfg) {
+        inputs.sourceScoreVariance.value = formatValue(cfg.sourceScoreVariance);
       }
 
       function computePopgenCoordinates(cfg, t) {
@@ -1246,8 +1320,7 @@
 
       function stateAt(cfg, t) {
         const pop = computePopgenCoordinates(cfg, t);
-        const sourcePredictiveCovariance =
-          cfg.sourceDirectScore + cfg.sourceProxyScore + cfg.sourceContextScore;
+        const sourcePredictiveCovariance = cfg.sourceScoreVariance;
         const sourceSignal = square(sourcePredictiveCovariance) / cfg.sourceScoreVariance;
         const sourceResidual = cfg.sourceOutcomeVariance - sourceSignal;
 
@@ -1277,6 +1350,8 @@
 
         const tagRetention = Math.exp(-Math.abs(targetTagAf - cfg.sourceTagAf));
         const causalRetention = Math.exp(-Math.abs(targetCausalAf - cfg.sourceCausalAf));
+        const standingEffectMultiplier =
+          1 + cfg.standingEffectFstShift * pop.fst;
 
         const sharedDirectKernel =
           pop.mutationSharedRetention *
@@ -1305,11 +1380,11 @@
           causalRetention;
 
         const targetDirectChannel =
-          cfg.sourceDirectScore * sharedDirectKernel +
+          cfg.sourceDirectScore * sharedDirectKernel * standingEffectMultiplier +
           cfg.novelDirectScore * novelDirectKernel;
 
         const targetProxyChannel =
-          cfg.sourceProxyScore * sharedProxyKernel +
+          cfg.sourceProxyScore * sharedProxyKernel * standingEffectMultiplier +
           cfg.novelProxyScore * novelProxyKernel;
 
         const targetContextChannel =
@@ -1338,10 +1413,11 @@
         }
 
         const brokenTaggingResidual =
-          cfg.brokenTaggingScale * (1 - sharedProxyKernel);
+          cfg.brokenTaggingScale * square(1 - sharedProxyKernel);
         const ancestryLdResidual =
-          cfg.ancestryLdScale * (1 - pop.ldTagDecay);
-        const sourceOverfitResidual = cfg.sourceOverfit;
+          cfg.ancestryLdScale * square(1 - pop.ldTagDecay);
+        const sourceOverfitResidual =
+          cfg.sourceOverfit * square(targetContextChannel - cfg.sourceContextScore);
         const novelUntaggableResidual =
           cfg.novelUntaggableScale * pop.novelInnovation;
 
@@ -1365,9 +1441,12 @@
         }
 
         const sourceR2 = sourceSignal / cfg.sourceOutcomeVariance;
-        const sourceSlope = sourcePredictiveCovariance / cfg.sourceScoreVariance;
+        const sourceSlope = 1;
         const sourceAuc = phi(Math.sqrt(sourceSignal / (2 * sourceResidual)));
-        const sourceBrier = targetPrevalence * (1 - targetPrevalence) * (1 - sourceR2);
+        const sourceComparableBrier =
+          targetPrevalence * (1 - targetPrevalence) * (1 - sourceR2);
+        const sourceRawBrier =
+          cfg.sourcePrevalence * (1 - cfg.sourcePrevalence) * (1 - sourceR2);
 
         const targetR2 = targetSignal / effectiveTargetOutcomeVariance;
         const targetSlope = targetPredictiveCovariance / targetScoreVariance;
@@ -1383,7 +1462,7 @@
         const losses = [
           { label: "broken tagging", value: brokenTaggingResidual },
           { label: "ancestry-specific LD", value: ancestryLdResidual },
-          { label: "source-specific overfit", value: sourceOverfitResidual },
+          { label: "context mismatch", value: sourceOverfitResidual },
           { label: "novel untaggable phenotype", value: novelUntaggableResidual }
         ];
 
@@ -1397,7 +1476,8 @@
           sourceR2,
           sourceSlope,
           sourceAuc,
-          sourceBrier,
+          sourceComparableBrier,
+          sourceRawBrier,
           targetTagAf,
           targetCausalAf,
           targetPrevalence,
@@ -1424,10 +1504,13 @@
           targetSlope,
           targetAuc,
           targetBrier,
+          ratioR2: ratioOrNaN(targetR2, sourceR2),
+          ratioAuc: ratioOrNaN(targetAuc, sourceAuc),
+          ratioBrier: ratioOrNaN(targetBrier, sourceComparableBrier),
           deltaR2: targetR2 - sourceR2,
           deltaSlope: targetSlope - sourceSlope,
           deltaAuc: targetAuc - sourceAuc,
-          deltaBrier: targetBrier - sourceBrier,
+          deltaBrier: targetBrier - sourceComparableBrier,
           dominantChannel: dominantEntry(channels),
           dominantLoss: dominantEntry(losses)
         };
@@ -1467,7 +1550,7 @@
         stats.aucSource.textContent = formatValue(state.sourceAuc);
         stats.deltaAuc.textContent = formatSigned(state.deltaAuc);
         stats.brierTarget.textContent = formatValue(state.targetBrier);
-        stats.brierSource.textContent = formatValue(state.sourceBrier);
+        stats.brierSource.textContent = formatValue(state.sourceComparableBrier);
         stats.deltaBrier.textContent = formatSigned(state.deltaBrier);
         stats.dominantChannel.textContent = state.dominantChannel
           ? `${state.dominantChannel.label} (${formatValue(state.dominantChannel.value)})`
@@ -1617,6 +1700,7 @@
 
       function render() {
         const cfg = readConfig();
+        syncDerivedInputs(cfg);
         const scalarProblems = validateScalarInputs(cfg);
 
         if (scalarProblems.length > 0) {
@@ -1626,6 +1710,8 @@
           clearLawTexts();
           renderEmptyChart("chart-metrics", "Enter a valid configuration to draw this graph");
           renderEmptyChart("chart-deltas", "Enter a valid configuration to draw this graph");
+          renderEmptyChart("chart-ratios", "Enter a valid configuration to draw this graph");
+          renderEmptyChart("chart-raw-metrics", "Enter a valid configuration to draw this graph");
           renderEmptyChart("chart-drivers", "Enter a valid configuration to draw this graph");
           renderEmptyChart("chart-channels", "Enter a valid configuration to draw this graph");
           return;
@@ -1642,6 +1728,8 @@
             clearLawTexts();
             renderEmptyChart("chart-metrics", "Adjust the biological inputs to keep the generational state valid");
             renderEmptyChart("chart-deltas", "Adjust the biological inputs to keep the generational state valid");
+            renderEmptyChart("chart-ratios", "Adjust the biological inputs to keep the generational state valid");
+            renderEmptyChart("chart-raw-metrics", "Adjust the biological inputs to keep the generational state valid");
             renderEmptyChart("chart-drivers", "Adjust the biological inputs to keep the generational state valid");
             renderEmptyChart("chart-channels", "Adjust the biological inputs to keep the generational state valid");
             return;
@@ -1657,6 +1745,8 @@
           clearLawTexts();
           renderEmptyChart("chart-metrics", "Adjust the biological inputs to keep the focused generation valid");
           renderEmptyChart("chart-deltas", "Adjust the biological inputs to keep the focused generation valid");
+          renderEmptyChart("chart-ratios", "Adjust the biological inputs to keep the focused generation valid");
+          renderEmptyChart("chart-raw-metrics", "Adjust the biological inputs to keep the focused generation valid");
           renderEmptyChart("chart-drivers", "Adjust the biological inputs to keep the focused generation valid");
           renderEmptyChart("chart-channels", "Adjust the biological inputs to keep the focused generation valid");
           return;
@@ -1670,7 +1760,7 @@
 
         renderLineChart("chart-metrics", {
           xLabel: "generations since divergence",
-          yLabel: "exact target metric value",
+          yLabel: "scalarized target metric value",
           referenceX: focused.generation,
           series: [
             { color: colors.teal, points: states.map((state) => ({ x: state.generation, y: state.targetR2 })) },
@@ -1682,7 +1772,7 @@
 
         renderLineChart("chart-deltas", {
           xLabel: "generations since divergence",
-          yLabel: "exact target minus source change",
+          yLabel: "scalarized target minus source change",
           referenceX: focused.generation,
           referenceY: 0,
           series: [
@@ -1690,6 +1780,32 @@
             { color: colors.slate, points: states.map((state) => ({ x: state.generation, y: state.deltaSlope })) },
             { color: colors.rust, points: states.map((state) => ({ x: state.generation, y: state.deltaAuc })) },
             { color: colors.amber, points: states.map((state) => ({ x: state.generation, y: state.deltaBrier })) }
+          ]
+        });
+
+        renderLineChart("chart-ratios", {
+          xLabel: "generations since divergence",
+          yLabel: "scalarized target/source ratio",
+          referenceX: focused.generation,
+          referenceY: 1,
+          series: [
+            { color: colors.teal, points: states.map((state) => ({ x: state.generation, y: state.ratioR2 })) },
+            { color: colors.rust, points: states.map((state) => ({ x: state.generation, y: state.ratioAuc })) },
+            { color: colors.amber, points: states.map((state) => ({ x: state.generation, y: state.ratioBrier })) }
+          ]
+        });
+
+        renderLineChart("chart-raw-metrics", {
+          xLabel: "generations since divergence",
+          yLabel: "scalarized source and target metric value",
+          referenceX: focused.generation,
+          series: [
+            { color: colors.teal, points: states.map((state) => ({ x: state.generation, y: state.targetR2 })) },
+            { color: colors.softTeal, points: states.map((state) => ({ x: state.generation, y: state.sourceR2 })) },
+            { color: colors.rust, points: states.map((state) => ({ x: state.generation, y: state.targetAuc })) },
+            { color: colors.clay, points: states.map((state) => ({ x: state.generation, y: state.sourceAuc })) },
+            { color: colors.amber, points: states.map((state) => ({ x: state.generation, y: state.targetBrier })) },
+            { color: colors.brass, points: states.map((state) => ({ x: state.generation, y: state.sourceRawBrier })) }
           ]
         });
 
@@ -1749,6 +1865,8 @@
 
       renderLegend("legend-metrics", legends.metrics);
       renderLegend("legend-deltas", legends.deltas);
+      renderLegend("legend-ratios", legends.ratios);
+      renderLegend("legend-raw-metrics", legends.rawMetrics);
       renderLegend("legend-drivers", legends.drivers);
       renderLegend("legend-channels", legends.channels);
       resetDefaults();

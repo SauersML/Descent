@@ -2970,6 +2970,37 @@ theorem targetR2AtGeneration_exact_mechanistic_popgen_portability_law
   simp [targetPredictiveCovarianceAtGeneration, targetScoreVarianceAtGeneration,
     effectiveTargetOutcomeVarianceAtGeneration]
 
+/-- Display-normalized target `R²` after `t` generations.
+
+This preserves the exact mechanistic portability ratio while anchoring the
+source baseline at a chosen display value, instead of rescaling the biological
+state. -/
+noncomputable def sourceNormalizedTargetR2AtGeneration {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (sourceBaseline : ℝ) (t : ℕ) : ℝ :=
+  sourceBaseline *
+    (targetR2AtGeneration m t / sourceR2FromSourceWeights (m.toMetricModelAt t))
+
+/-- Exact mechanistic law for display-normalized target `R²` at generation `t`.
+
+This is the correct way to draw a source-anchored `R²` curve for visualization:
+it rescales the exact portability ratio, not the underlying biological state. -/
+theorem sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portability_law
+    {p q : ℕ} (m : CrossPopulationGenerationalModel p q)
+    (sourceBaseline : ℝ) (t : ℕ) :
+    sourceNormalizedTargetR2AtGeneration m sourceBaseline t =
+      sourceBaseline *
+        (((targetPredictiveCovarianceAtGeneration m t) ^ 2 *
+            sourceScoreVarianceFromExplicitDrivers (m.toMetricModelAt t) *
+            (m.toMetricModelAt t).sourceOutcomeVariance) /
+          ((sourcePredictiveCovarianceFromSourceWeights (m.toMetricModelAt t)) ^ 2 *
+            targetScoreVarianceAtGeneration m t *
+            effectiveTargetOutcomeVarianceAtGeneration m t)) := by
+  unfold sourceNormalizedTargetR2AtGeneration
+  rw [targetR2AtGeneration_eq_targetR2From_slice,
+    exactR2PortabilityRatio_mechanistic_law]
+  simp [targetPredictiveCovarianceAtGeneration, targetScoreVarianceAtGeneration,
+    effectiveTargetOutcomeVarianceAtGeneration]
+
 /-- Exact generation-indexed target Brier portability law on the mechanistic
 population-genetic state slice at generation `t`. -/
 theorem targetCalibratedBrierAtGeneration_exact_mechanistic_popgen_portability_law
