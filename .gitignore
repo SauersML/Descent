@@ -58,6 +58,7 @@ gh_*/
 /sims/.cache/
 /tmp/
 /rust_digest.txt
+/rustc-ice-*.txt
 
 # Python bytecode cache (generated, interpreter-version specific)
 /scripts/__pycache__/
