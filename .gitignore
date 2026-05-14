@@ -1,5 +1,4 @@
 target/
-Cargo.lock
 model.toml
 build
 *.rds
@@ -64,7 +63,6 @@ gh_*/
 /scripts/__pycache__/
 
 # Local experiment outputs in repo root (analysis scratch, not canonical inputs)
-/Cargo.lock
 /confounding.tsv
 /divergence_g20.tsv
 
