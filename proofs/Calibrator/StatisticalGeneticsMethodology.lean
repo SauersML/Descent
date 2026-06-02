@@ -1,6 +1,8 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+open scoped BigOperators
+
 
 namespace Calibrator
 
@@ -234,17 +236,57 @@ theorem effective_n_pos (se : ℝ) (h_se : 0 < se) :
     β̂_meta = Σ_k w_k β̂_k / Σ_k w_k where w_k = 1/SE_k².
     This combines information across ancestries. -/
 
+/-- **Meta-analysis model definition.**
+    Contains properties of the model, specifically:
+    k (number of studies), variances (of individual studies), and tau_sq (heterogeneity variance). -/
+structure MetaAnalysisModel where
+  k : ℕ
+  variances : Fin k → ℝ
+  tau_sq : ℝ
+  h_k : 0 < k
+  h_tau_sq : 0 < tau_sq
+  h_variances : ∀ i, 0 < variances i
+
+noncomputable def fixed_weights (m : MetaAnalysisModel) (i : Fin m.k) : ℝ :=
+  1 / m.variances i
+
+noncomputable def random_weights (m : MetaAnalysisModel) (i : Fin m.k) : ℝ :=
+  1 / (m.variances i + m.tau_sq)
+
+noncomputable def fixed_se_sq (m : MetaAnalysisModel) : ℝ :=
+  1 / (∑ i, fixed_weights m i)
+
+noncomputable def random_se_sq (m : MetaAnalysisModel) : ℝ :=
+  1 / (∑ i, random_weights m i)
+
 /-- **Fixed vs random effects meta-analysis.**
     Fixed effects: assumes same β across populations (tau² = 0).
     Random effects: allows β to vary with between-population variance tau².
     When tau² > 0, the random effects SE is larger (wider CI) because
     it adds tau² to the within-study variance. -/
-theorem random_effects_captures_heterogeneity
-    (se_fixed tau_sq : ℝ) -- fixed-effects SE and between-population variance
-    (h_se : 0 < se_fixed) (h_heterogeneous : 0 < tau_sq) :
-    -- Random effects SE² = fixed SE² + tau² > fixed SE²
-    se_fixed ^ 2 < se_fixed ^ 2 + tau_sq := by
-  linarith
+theorem random_effects_captures_heterogeneity (m : MetaAnalysisModel) :
+    fixed_se_sq m < random_se_sq m := by
+  unfold fixed_se_sq random_se_sq
+  apply one_div_lt_one_div_of_lt
+  · apply Finset.sum_pos
+    · intro i _
+      unfold random_weights
+      apply one_div_pos.mpr
+      linarith [m.h_variances i, m.h_tau_sq]
+    · have hw : Fin m.k := ⟨0, m.h_k⟩
+      exact ⟨hw, Finset.mem_univ hw⟩
+  · apply Finset.sum_lt_sum
+    · intro i _
+      unfold random_weights fixed_weights
+      apply le_of_lt
+      apply one_div_lt_one_div_of_lt (m.h_variances i)
+      linarith [m.h_tau_sq]
+    · have hw : Fin m.k := ⟨0, m.h_k⟩
+      use hw
+      use Finset.mem_univ hw
+      unfold random_weights fixed_weights
+      apply one_div_lt_one_div_of_lt (m.h_variances hw)
+      linarith [m.h_tau_sq]
 
 end SummaryStatPGS
 
