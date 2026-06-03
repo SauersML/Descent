@@ -1,4 +1,9 @@
 import Calibrator.Probability
+import Mathlib.Data.Real.Basic
+import Mathlib.Algebra.Order.Chebyshev
+import Mathlib.Analysis.SpecialFunctions.Sqrt
+import Mathlib.Data.Real.Sqrt
+
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
 open scoped BigOperators
@@ -7,6 +12,9 @@ open scoped BigOperators
 namespace Calibrator
 
 open MeasureTheory
+open Finset
+open scoped BigOperators
+
 
 /-!
 # Statistical Genetics Methodology for Portability Assessment
@@ -315,22 +323,68 @@ section LDScoreRegression
     This directly estimates the genetic correlation
     that predicts PGS portability. -/
 
+structure LDSCModel (m : ℕ) where
+  -- Effect sizes in source and target populations
+  beta_s : Fin m → ℝ
+  beta_t : Fin m → ℝ
+  -- LD adjustment for the target population
+  ld_adj : Fin m → ℝ
+  h_ld_adj_pos : ∀ i, 0 ≤ ld_adj i
+  h_ld_adj_le_one : ∀ i, ld_adj i ≤ 1
+
+/-- Genetic correlation is defined by the inner product of effects. -/
+noncomputable def geneticCorrelationLDSC {m : ℕ} (model : LDSCModel m) : ℝ :=
+  (∑ i, model.beta_s i * model.beta_t i) /
+    Real.sqrt ((∑ i, model.beta_s i ^ 2) * (∑ i, model.beta_t i ^ 2))
+
 /-- **Genetic correlation bounds portability ratio.**
     The portability ratio R²_target / R²_source is bounded by ρ_g² × ld_adj.
     Since |ρ_g| ≤ 1 implies ρ_g² ≤ 1, and ld_adj ∈ [0,1], the product
     is at most 1. This gives the rg-based bound on portability.
+    We formally define this using a rigorous structure. -/
+theorem genetic_correlation_predicts_portability {m : ℕ} (hm : 0 < m)
+    (model : LDSCModel m)
+    (h_pos_s : 0 < ∑ i, model.beta_s i ^ 2)
+    (h_pos_t : 0 < ∑ i, model.beta_t i ^ 2) :
+    (geneticCorrelationLDSC model) ^ 2 * ((∑ i, model.ld_adj i) / m) ≤ 1 := by
+  have hm_pos : 0 < (m : ℝ) := Nat.cast_pos.mpr hm
 
-    Derived from: ρ_g² ≤ 1 (since |ρ_g| ≤ 1) and ld_adj ≤ 1,
-    so the product ρ_g² × ld_adj ≤ 1. -/
-theorem genetic_correlation_predicts_portability
-    (rho_g ld_adj : ℝ)
-    (h_rho : 0 ≤ rho_g) (h_rho_le : rho_g ≤ 1)
-    (h_ld : 0 ≤ ld_adj) (h_ld_le : ld_adj ≤ 1) :
-    rho_g ^ 2 * ld_adj ≤ 1 := by
-  have h_sq : rho_g ^ 2 ≤ 1 := by nlinarith [sq_nonneg rho_g]
-  calc rho_g ^ 2 * ld_adj
-      ≤ 1 * 1 := mul_le_mul h_sq h_ld_le h_ld (by positivity)
-    _ = 1 := one_mul 1
+  have h_cauchy : (∑ i, model.beta_s i * model.beta_t i) ^ 2 ≤
+      (∑ i, model.beta_s i ^ 2) * (∑ i, model.beta_t i ^ 2) := by
+    exact sum_mul_sq_le_sq_mul_sq univ model.beta_s model.beta_t
+
+  have h_rho_sq_le_one : (geneticCorrelationLDSC model) ^ 2 ≤ 1 := by
+    unfold geneticCorrelationLDSC
+    rw [div_pow]
+    have h_sqrt_sq : (Real.sqrt ((∑ i, model.beta_s i ^ 2) * (∑ i, model.beta_t i ^ 2))) ^ 2 =
+        (∑ i, model.beta_s i ^ 2) * (∑ i, model.beta_t i ^ 2) := by
+      apply Real.sq_sqrt
+      positivity
+    rw [h_sqrt_sq]
+    rw [div_le_one]
+    · exact h_cauchy
+    · positivity
+
+  have h_ld_sum_le_m : ∑ i, model.ld_adj i ≤ m := by
+    calc ∑ i, model.ld_adj i
+      _ ≤ ∑ _i : Fin m, (1 : ℝ) := sum_le_sum (fun i _ => model.h_ld_adj_le_one i)
+      _ = m := by simp
+
+  have h_ld_avg_le_one : (∑ i, model.ld_adj i) / m ≤ 1 := by
+    rw [div_le_one hm_pos]
+    exact h_ld_sum_le_m
+
+  have h_ld_avg_nonneg : 0 ≤ (∑ i, model.ld_adj i) / m := by
+    apply div_nonneg
+    · apply sum_nonneg
+      intro i _
+      exact model.h_ld_adj_pos i
+    · positivity
+
+  calc (geneticCorrelationLDSC model) ^ 2 * ((∑ i, model.ld_adj i) / m)
+    _ ≤ 1 * ((∑ i, model.ld_adj i) / m) := mul_le_mul_of_nonneg_right h_rho_sq_le_one h_ld_avg_nonneg
+    _ = (∑ i, model.ld_adj i) / m := one_mul _
+    _ ≤ 1 := h_ld_avg_le_one
 
 /-- **LDSC standard error for ρ_g.**
     SE(ρ̂_g) depends on sample sizes, LD structure, and polygenicity.
