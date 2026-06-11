@@ -94,3 +94,6 @@ proofs/.lake/
 **/._*
 # Python bytecode (has a dot, so the whitelist re-includes it without this):
 *.pyc
+
+# maturin-built native extension (build artifact)
+python/gnomon/_gnomon*.so
