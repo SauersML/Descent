@@ -97,3 +97,10 @@ proofs/.lake/
 
 # maturin-built native extension (build artifact)
 python/gnomon/_gnomon*.so
+
+# Test fixtures: the PLINK 1.9 side of the pgen parity fixture is the ground
+# truth those tests compare against, so it has to be tracked despite the
+# blanket genotype-file ignores above.
+!data/testdata/*.bed
+!data/testdata/*.bim
+!data/testdata/*.fam
