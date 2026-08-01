@@ -62,6 +62,9 @@ theorem dot_weightedResidualMoment
           intro i _
           simp only [smul_eq_mul]
           ring
+      _ = (∑ i, (direction i) •
+            (fun ω => X ω i * ((densityRatio ω - 1) * residual ω))) ω := by
+          simp only [Finset.sum_apply]
   rw [hexpand, ExpFunctional.eval_sum]
   apply Finset.sum_congr rfl
   intro i _
@@ -88,7 +91,7 @@ def coefficientEnergy (B : Matrix ι ι ℝ) (x : ι → ℝ) : ℝ :=
   dot x (B.mulVec x)
 
 theorem dot_add_right_shift (x y z : ι → ℝ) :
-    dot x (fun i => y i + z i) = dot x y + dot x z := by
+    dot x (y + z) = dot x y + dot x z := by
   simp [dot, mul_add, Finset.sum_add_distrib]
 
 /-- Sharp discrepancy--curvature product bound for projection artifacts.
