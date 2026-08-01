@@ -1,5 +1,7 @@
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Algebra.Module.Submodule.Basic
+import Mathlib.Algebra.Module.Pi
+import Mathlib.Data.Real.Basic
 
 namespace Calibrator
 

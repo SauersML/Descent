@@ -345,4 +345,44 @@ mod tests {
         assert!(class.standardized_bias.expect("application output") > 0.0);
         assert!(class.critical_confounding.expect("application output") > 0.0);
     }
+
+    #[test]
+    fn balanced_contrast_and_overlap_match_the_rank_one_formulas() {
+        let input = CorrectabilityInput {
+            sample_size: 1_000.0,
+            subgroup_size: 500.0,
+            fitted_pcs: 2,
+            marker_classes: vec![MarkerClassInput {
+                name: "channel".to_owned(),
+                effective_markers: 4_000.0,
+                differentiation: 0.01,
+                theoretical_pc_rank: 3,
+            }],
+            application: None,
+        };
+
+        let report = calculate(&input).expect("valid design");
+        let class = &report.marker_classes[0];
+        let expected_spike: f64 = 2.0 * 0.01 * 250.0;
+        let expected_aspect_ratio: f64 = 1_000.0 / 4_000.0;
+
+        assert_eq!(report.effective_subgroup_size, 250.0);
+        assert_eq!(class.bbp_spike, expected_spike);
+        assert_eq!(class.bbp_threshold, expected_aspect_ratio.sqrt());
+        assert!(class.detectable_by_sample_pca);
+        assert!(!class.included_by_fitted_pcs);
+        assert_eq!(class.minimum_pcs_to_include_axis, Some(3));
+        assert!(!class.no_pc_count_suffices);
+        assert_eq!(class.eigenvector_overlap_squared, 0.0);
+
+        let mut included_input = input;
+        included_input.fitted_pcs = 3;
+        let included = calculate(&included_input).expect("valid design");
+        let included_class = &included.marker_classes[0];
+        let expected_overlap = (1.0 - expected_aspect_ratio / expected_spike.powi(2))
+            / (1.0 + expected_aspect_ratio / expected_spike);
+
+        assert!((included_class.eigenvector_overlap_squared - expected_overlap).abs() < 1e-15);
+        assert!((included_class.residual_axis_fraction - (1.0 - expected_overlap)).abs() < 1e-15);
+    }
 }
