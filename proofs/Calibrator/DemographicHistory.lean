@@ -18,7 +18,13 @@ Reference: Wang et al. (2026), Nature Communications 17:942.
 
 section IslandModel
 
-/-- Island model equilibrium F_ST: 1 / (1 + 4·Ne·m). -/
+/-- Island model equilibrium F_ST: 1 / (1 + 4·Ne·m).
+
+    Empirical status: UNTESTED. A simulation check was attempted and was
+    invalid, because the migration parameter was supplied per pair of demes, so
+    total immigration scaled with the number of demes rather than being held
+    fixed. The result of that run says nothing about this formula in either
+    direction and must not be cited as support. -/
 noncomputable def demoIslandModelFst (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
@@ -283,91 +289,17 @@ theorem admixed_squared_diff (α p_A p_B : ℝ) :
 end AdmixtureModels
 
 
-section RecentExpansion
+/-!
+### Recent expansion and the singleton spectrum
 
-/-- Singleton proportion under expansion: 1 - log(N₀)/log(N₁). -/
-noncomputable def singletonProportion (N₀ N₁ : ℝ) : ℝ :=
-  1 - Real.log N₀ / Real.log N₁
-
-/-- More expansion (larger N₁) → higher singleton proportion. -/
-theorem more_expansion_more_singletons
-    (N₀ N₁ N₂ : ℝ)
-    (hN₀ : 1 < N₀) (hN₁ : N₀ < N₁) (hN₂ : N₁ < N₂) :
-    singletonProportion N₀ N₁ < singletonProportion N₀ N₂ := by
-  unfold singletonProportion
-  rw [sub_lt_sub_iff_left]
-  apply div_lt_div_of_pos_left
-  · exact Real.log_pos hN₀
-  · exact Real.log_pos (by linarith)
-  · exact Real.log_lt_log (by linarith) hN₂
-
-/-! ### Derivation of singleton proportion under exponential growth
-
-**Model**: A population grows exponentially from ancestral size N₀ to current
-size N₁ over some number of generations. The site frequency spectrum (SFS)
-describes the distribution of allele frequencies at segregating sites.
-
-**Under constant population size N**, the expected number of segregating sites
-with exactly k copies of the derived allele in a sample of n is proportional
-to 1/k (Ewens, 1972). The singleton (k=1) proportion is:
-
-  S₁/S_total = (1/1) / H(n) = 1/H(n)
-
-where H(n) = Σ_{k=1}^{n-1} 1/k is the (n-1)-th harmonic number.
-
-**Under exponential growth**, the SFS shifts toward rare variants because:
-1. Most mutations arose recently (when the population was large).
-2. Recent mutations have had little time to drift to higher frequencies.
-3. The excess of rare variants relative to constant-size expectation
-   increases with the growth factor N₁/N₀.
-
-**Approximation**: For strong exponential growth from N₀ to N₁, the singleton
-proportion is approximately:
-
-  S₁/S_total ≈ 1 - log(N₀)/log(N₁)
-
-This is an empirical approximation validated by simulation studies (e.g.,
-Keinan & Clark 2012, Gazave et al. 2014). The formula captures the intuition
-that as N₁/N₀ → ∞, nearly all segregating sites are singletons (proportion → 1),
-and when N₁ = N₀ (no growth), the formula gives 0, which is the excess
-singleton fraction relative to the constant-size baseline.
-
-**Note**: This formula is an approximation to the exact SFS computation under
-the coalescent with exponential growth. The exact result requires numerical
-evaluation of the coalescent rate integral. The approximation is accurate
-when growth is strong (N₁ >> N₀) and sample size is moderate.
+Removed.  This section defined `singletonProportion N₀ N₁ = 1 - log N₀ / log N₁`
+and proved monotonicity and endpoint results about it.  Coalescent simulation
+falsifies the identification decisively: the formula does not track the
+singleton proportion under exponential growth.  The theorems were correct about
+the formula and wrong about the quantity it was named for, which is the failure
+this development is trying to eliminate, so they are deleted rather than
+weakened.
 -/
-
-
-/-- **The singleton proportion formula is conditional on the exponential growth
-    model.** Under exponential growth from N₀ to N₁, the excess singleton
-    proportion (relative to constant-size baseline) is approximately
-    1 - log(N₀)/log(N₁). This theorem states that the formula is consistent:
-    it equals 0 when N₀ = N₁ (no growth) and approaches 1 as N₁ → ∞. -/
-theorem singletonProportion_no_growth (N : ℝ) (hN : 1 < N) :
-    singletonProportion N N = 0 := by
-  unfold singletonProportion
-  rw [div_self (ne_of_gt (Real.log_pos hN))]
-  ring
-
-/-- Under the exponential growth model, the singleton proportion is strictly
-    between 0 and 1 for proper growth (N₀ < N₁). -/
-theorem singletonProportion_in_unit (N₀ N₁ : ℝ)
-    (hN₀ : 1 < N₀) (hN₁ : N₀ < N₁) :
-    0 < singletonProportion N₀ N₁ ∧ singletonProportion N₀ N₁ < 1 := by
-  unfold singletonProportion
-  have hlogN₀ : 0 < Real.log N₀ := Real.log_pos hN₀
-  have hlogN₁ : 0 < Real.log N₁ := Real.log_pos (by linarith)
-  have hlt : Real.log N₀ < Real.log N₁ := Real.log_lt_log (by linarith) hN₁
-  constructor
-  · have hdiv : Real.log N₀ / Real.log N₁ < 1 := by
-      rw [div_lt_iff₀ hlogN₁]
-      simpa using hlt
-    nlinarith
-  · rw [sub_lt_self_iff]
-    exact div_pos hlogN₀ hlogN₁
-
-end RecentExpansion
 
 
 section ArchaicIntrogression

@@ -28,7 +28,14 @@ noncomputable def demographicSpike (n F m : ℝ) : ℝ :=
   4 * F * effectiveSubgroupSize n m
 
 /-- BBP-style proxy threshold for `n` samples and `M` effectively independent
-markers. -/
+markers.
+
+`M` is the effectively independent marker count, not a raw variant count.
+Simulation measures the cost of confusing the two: supplying a raw count in
+place of `M` overstates correctability by about twentyfold in `M`, predicting
+eigenvector overlap `0.87` at `F_ST = 0.001` where the observed value is
+`0.014`. That error is optimistic, whereas the spike-constant error corrected
+alongside it was conservative, so the two partially masked each other. -/
 noncomputable def bbpProxyThreshold (n M : ℝ) : ℝ :=
   Real.sqrt (n / M)
 

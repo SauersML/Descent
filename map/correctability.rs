@@ -6,7 +6,14 @@ use std::path::Path;
 #[derive(Debug, Clone, Deserialize)]
 pub struct MarkerClassInput {
     pub name: String,
-    pub effective_markers: f64,
+    /// Effectively independent marker count for this class, after accounting for
+    /// linkage disequilibrium. This is NOT a raw SNP count. Feeding a raw count
+    /// is measured to overstate correctability by roughly twentyfold in M: at
+    /// Fst = 0.001 the raw count predicts eigenvector overlap 0.87 where the
+    /// simulated truth is 0.014. The field is named unambiguously, and the
+    /// rename is deliberately breaking, so that existing inputs supplying a raw
+    /// count fail to parse rather than silently producing an optimistic answer.
+    pub effective_independent_markers: f64,
     pub differentiation: f64,
     pub theoretical_pc_rank: usize,
 }
@@ -145,7 +152,7 @@ fn validate(input: &CorrectabilityInput) -> Result<(), CorrectabilityError> {
                 "marker class names must not be empty".to_owned(),
             ));
         }
-        require_finite_positive(marker_class.effective_markers, "effective_markers")?;
+        require_finite_positive(marker_class.effective_independent_markers, "effective_independent_markers")?;
         require_finite_nonnegative(marker_class.differentiation, "differentiation")?;
         if marker_class.theoretical_pc_rank == 0 {
             return Err(CorrectabilityError::InvalidInput(
@@ -191,19 +198,19 @@ pub fn calculate(input: &CorrectabilityInput) -> Result<CorrectabilityReport, Co
     let total_frequency_information = input
         .marker_classes
         .iter()
-        .map(|class| class.effective_markers * class.differentiation.powi(2))
+        .map(|class| class.effective_independent_markers * class.differentiation.powi(2))
         .sum::<f64>();
     let total_matched_weight = input
         .marker_classes
         .iter()
-        .map(|class| class.effective_markers * class.differentiation)
+        .map(|class| class.effective_independent_markers * class.differentiation)
         .sum::<f64>();
 
     let marker_classes = input
         .marker_classes
         .iter()
         .map(|class| {
-            let aspect_ratio = input.sample_size / class.effective_markers;
+            let aspect_ratio = input.sample_size / class.effective_independent_markers;
             let bbp_threshold = aspect_ratio.sqrt();
             let bbp_spike = 4.0 * class.differentiation * effective_subgroup_size;
             let detectable_by_sample_pca = bbp_spike > bbp_threshold;
@@ -216,8 +223,8 @@ pub fn calculate(input: &CorrectabilityInput) -> Result<CorrectabilityReport, Co
             };
             let residual_axis_fraction = 1.0 - eigenvector_overlap_squared;
             let matched_weight =
-                class.effective_markers * class.differentiation / total_matched_weight;
-            let information = class.effective_markers * class.differentiation.powi(2);
+                class.effective_independent_markers * class.differentiation / total_matched_weight;
+            let information = class.effective_independent_markers * class.differentiation.powi(2);
 
             let (residual_susceptibility, standardized_bias, critical_confounding) = match &input
                 .application
@@ -296,13 +303,13 @@ mod tests {
             marker_classes: vec![
                 MarkerClassInput {
                     name: "common".to_owned(),
-                    effective_markers: 100_000.0,
+                    effective_independent_markers: 100_000.0,
                     differentiation: 0.0001,
                     theoretical_pc_rank: 1,
                 },
                 MarkerClassInput {
                     name: "rare".to_owned(),
-                    effective_markers: 1_000_000.0,
+                    effective_independent_markers: 1_000_000.0,
                     differentiation: 0.001,
                     theoretical_pc_rank: 1,
                 },
@@ -324,7 +331,7 @@ mod tests {
             fitted_pcs: 40,
             marker_classes: vec![MarkerClassInput {
                 name: "common".to_owned(),
-                effective_markers: 100_000.0,
+                effective_independent_markers: 100_000.0,
                 differentiation: 0.0001,
                 theoretical_pc_rank: 1,
             }],
@@ -354,7 +361,7 @@ mod tests {
             fitted_pcs: 2,
             marker_classes: vec![MarkerClassInput {
                 name: "channel".to_owned(),
-                effective_markers: 4_000.0,
+                effective_independent_markers: 4_000.0,
                 differentiation: 0.01,
                 theoretical_pc_rank: 3,
             }],
