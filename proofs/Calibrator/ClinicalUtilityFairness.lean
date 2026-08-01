@@ -130,7 +130,6 @@ theorem liabilitySensitivity_zScore_monotone_in_R
     (m : LiabilityThresholdModel) (T' : ℝ)
     (R₁ R₂ : ℝ) (hR₁ : 0 ≤ R₁) (hR₂ : R₂ ≤ 1)
     (hR : R₁ < R₂)
-    (hR2₁ : 0 ≤ R₁ ^ 2) (hR2₂ : R₂ ^ 2 ≤ 1)
     -- σ_resid is positive at R₂ (the tighter bound)
     (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq)))
     -- The z-score numerator is nonneg at the lower R value.
