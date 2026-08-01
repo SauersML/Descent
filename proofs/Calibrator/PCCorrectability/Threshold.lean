@@ -27,7 +27,7 @@ reading `F` as `Var(p₁ - p₂) / (p̄ (1 - p̄)) = 2 F_ST`; that is self-consi
 but is not a standard quantity, so the scale of `F` is pinned to Hudson `F_ST`
 here rather than left to the caller.
 
-    Empirical status: VALIDATED (BBP inversion recovers 3.9920 +/- 0.0045 against the derived 4). -/
+    Empirical status: VALIDATED (BBP inversion recovers 3.9920 ± 0.0045 against the derived 4). -/
 noncomputable def demographicSpike (n F m : ℝ) : ℝ :=
   4 * F * effectiveSubgroupSize n m
 
