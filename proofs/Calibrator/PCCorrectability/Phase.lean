@@ -42,6 +42,49 @@ value is the detectable side of the phase diagram. -/
 noncomputable def pcCorrectabilityMargin (n M F m : ℝ) : ℝ :=
   demographicSpike n F m - bbpProxyThreshold n M
 
+/-- Among all real subgroup sizes, the effective contrast size is maximized by
+the balanced split. -/
+theorem effectiveSubgroupSize_le_balanced (n m : ℝ) (hn : 0 < n) :
+    effectiveSubgroupSize n m ≤ n / 4 := by
+  unfold effectiveSubgroupSize
+  rw [div_le_iff₀ hn]
+  nlinarith [sq_nonneg (2 * m - n)]
+
+/-- The balanced split attains the sharp effective-size upper bound. -/
+theorem effectiveSubgroupSize_balanced (n : ℝ) (hn : 0 < n) :
+    effectiveSubgroupSize n (n / 2) = n / 4 := by
+  unfold effectiveSubgroupSize
+  field_simp [hn.ne']
+  ring
+
+/-- For nonnegative differentiation, no subgroup contrast has a larger
+rank-one spike than the balanced split. -/
+theorem demographicSpike_le_balanced (n F m : ℝ) (hn : 0 < n) (hF : 0 ≤ F) :
+    demographicSpike n F m ≤ F * n / 2 := by
+  unfold demographicSpike
+  calc
+    2 * F * effectiveSubgroupSize n m ≤ 2 * F * (n / 4) :=
+      mul_le_mul_of_nonneg_left (effectiveSubgroupSize_le_balanced n m hn)
+        (mul_nonneg (by norm_num) hF)
+    _ = F * n / 2 := by ring
+
+/-- A valid subgroup can cross the spectral edge exactly when the balanced
+contrast crosses it.  Thus `F * n / 2` is the sharp feasibility boundary for
+the rank-one demographic model, rather than merely a convenient sufficient
+condition. -/
+theorem exists_superthreshold_subgroup_iff_balanced
+    (n M F : ℝ) (hn : 0 < n) (hF : 0 ≤ F) :
+    (∃ m : ℝ, 0 < m ∧ m < n ∧
+        bbpProxyThreshold n M < demographicSpike n F m) ↔
+      bbpProxyThreshold n M < F * n / 2 := by
+  constructor
+  · rintro ⟨m, _hm_pos, _hm_lt, hm_detectable⟩
+    exact lt_of_lt_of_le hm_detectable (demographicSpike_le_balanced n F m hn hF)
+  · intro hbalanced
+    refine ⟨n / 2, by linarith, by linarith, ?_⟩
+    rw [demographicSpike, effectiveSubgroupSize_balanced n hn]
+    convert hbalanced using 1; ring
+
 /-- `F_ST` alone cannot determine PC correctability: at fixed positive `F`,
 sample size, and marker count, two valid subgroup sizes lie on opposite sides
 of the spectral threshold whenever the balanced contrast is detectable. -/
