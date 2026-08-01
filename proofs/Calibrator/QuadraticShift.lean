@@ -36,7 +36,7 @@ theorem matrix_mulVec_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ) :
 theorem matrix_mulVec_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
     B.mulVec (c • x) = c • B.mulVec x := by
   ext i
-  simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_comm, mul_left_comm]
+  simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_comm]
 
 theorem dot_sub_right (x y z : ι → ℝ) :
     dot x (fun i => y i - z i) = dot x y - dot x z := by
@@ -48,7 +48,7 @@ theorem dot_smul_left (c : ℝ) (x y : ι → ℝ) :
 
 theorem dot_smul_right (c : ℝ) (x y : ι → ℝ) :
     dot x (c • y) = c * dot x y := by
-  simp [dot, Finset.mul_sum, mul_assoc, mul_comm, mul_left_comm]
+  simp [dot, Finset.mul_sum, mul_left_comm]
 
 /-- The usual excess-risk identity remains exact for singular `B`.  The only
 needed fact is range compatibility, expressed directly as `B v = b`. -/

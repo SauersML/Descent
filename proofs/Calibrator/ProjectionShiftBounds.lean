@@ -148,6 +148,24 @@ theorem projection_artifact_energy_le_chiSquare_mul_curvature
       lt_of_le_of_ne henergy (Ne.symm hzero)
     nlinarith
 
+/-- Under identifiability of the target second-moment operator, the moment-level
+genuine/artifact decomposition uniquely lifts to coefficient space.  This is
+the precise point at which nonsingularity is required: all preceding moment and
+risk identities remain valid without it. -/
+theorem projection_shift_eq_genuine_add_artifact
+    (Q : ExpFunctional Ω) (X : Ω → ι → ℝ)
+    (hOld hNew : Ω → ℝ) (u v genuine artifact : ι → ℝ)
+    (htarget : residualScoreMoment Q X hNew v = 0)
+    (hgenuine : (secondMomentMatrix Q X).mulVec genuine =
+      rawCrossMoment Q X (fun ω => hNew ω - hOld ω))
+    (hartifact : (secondMomentMatrix Q X).mulVec artifact =
+      residualScoreMoment Q X hOld u)
+    (hinjective : Function.Injective (secondMomentMatrix Q X).mulVec) :
+    (fun i => v i - u i) = fun i => genuine i + artifact i := by
+  apply hinjective
+  rw [projection_shift_genuine_artifact_decomposition Q X hOld hNew u v htarget]
+  rw [matrix_mulVec_add, hgenuine, hartifact]
+
 /-- Exact energy expansion for the sum of a genuine component and a projection
 artifact. -/
 theorem coefficientEnergy_add

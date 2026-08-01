@@ -42,7 +42,7 @@ theorem rawCrossMoment_linScore
       (fun ω => X ω i * dot w (X ω)) =
         ∑ j, (w j) • (fun ω => X ω i * X ω j) := by
     funext ω
-    simp [dot, Finset.mul_sum, smul_eq_mul, mul_assoc, mul_left_comm, mul_comm]
+    simp [dot, Finset.mul_sum, smul_eq_mul, mul_left_comm, mul_comm]
   rw [hexpand, ExpFunctional.eval_sum]
   simp [Matrix.mulVec, dotProduct, E.smul_eval, mul_comm]
 
