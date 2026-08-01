@@ -4,6 +4,9 @@ import Calibrator.AncestrySpecificArchitecture
 import Calibrator.PCCorrectability.Threshold
 import Calibrator.Identification
 import Calibrator.AssortativeMatingPGS
+import Calibrator.CovarianceStructure
+import Calibrator.AncestrySpecificPower
+import Calibrator.GeneticArchitectureDiscovery
 
 namespace Calibrator
 
@@ -222,6 +225,56 @@ theorem amEquilibrium_then_drift (V_A r h2 fst : ℝ) :
       (1 - fst) * (V_A / (1 - r * h2)) := by
   unfold presentDayPGSVariance amEquilibriumVariance
   ring
+
+/-! ### Tying the inlined genotype-variance restatements back to `ploidy`
+
+Five definitions across five modules spell out `2 p (1 - p)` independently.
+Each is Hardy-Weinberg genotype variance, and none was related to any other,
+so a change to the ploidy convention in one would have left the others
+silently disagreeing. These theorems make that disagreement a failed proof. -/
+
+theorem allelicVariance_eq_hwe (p : ℝ) :
+    allelicVariance p = hweGenotypeVariance p := by
+  unfold allelicVariance hweGenotypeVariance ploidy; ring
+
+theorem heterozygosity_eq_hwe (p : ℝ) :
+    heterozygosity p = hweGenotypeVariance p := by
+  unfold heterozygosity hweGenotypeVariance ploidy; ring
+
+theorem genotypeVarianceHWE_eq_hwe (p : ℝ) :
+    genotypeVarianceHWE p = hweGenotypeVariance p := by
+  unfold genotypeVarianceHWE hweGenotypeVariance ploidy; ring
+
+theorem ancestryHeterozygosity_eq_hwe (p : ℝ) :
+    ancestryHeterozygosity p = hweGenotypeVariance p := by
+  unfold ancestryHeterozygosity hweGenotypeVariance ploidy; ring
+
+theorem tagGenotypeVariance_eq_hwe (maf : ℝ) :
+    tagGenotypeVariance maf = hweGenotypeVariance maf := by
+  unfold tagGenotypeVariance hweGenotypeVariance ploidy; ring
+
+/-! ### Tying the inlined island-model restatements back to the scaled rate
+
+Five definitions across five modules spell out `1 / (1 + 4 Nₑ m)`. Each is the
+migration-drift equilibrium at the scaled migration rate. -/
+
+theorem fstMigrationDriftEquilibrium_eq_scaled (Ne m : ℝ) :
+    fstMigrationDriftEquilibrium Ne m =
+      fstMutationDriftEquilibrium (scaledMigrationRate Ne m) := by
+  unfold fstMigrationDriftEquilibrium fstMutationDriftEquilibrium
+  rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
+
+theorem islandModelFst_eq_scaled (Ne m : ℝ) :
+    islandModelFst Ne m =
+      fstMutationDriftEquilibrium (scaledMigrationRate Ne m) := by
+  unfold islandModelFst fstMutationDriftEquilibrium
+  rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
+
+theorem equilibriumFst_eq_scaled (Ne m : ℝ) :
+    equilibriumFst m Ne =
+      fstMutationDriftEquilibrium (scaledMigrationRate Ne m) := by
+  unfold equilibriumFst fstMutationDriftEquilibrium
+  rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
 
 end EquilibriumAgreements
 
