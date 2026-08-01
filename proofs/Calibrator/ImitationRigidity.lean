@@ -1,5 +1,8 @@
 import Calibrator.TransportIdentities
+import Calibrator.LDDecayTheory
 import Mathlib.LinearAlgebra.Matrix.Trace
+import Mathlib.LinearAlgebra.Matrix.Symmetric
+import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 namespace Calibrator
 
@@ -295,12 +298,14 @@ the bumped background stays legal exactly when
 
     scale² · vᵀ (C₀ I - K)⁻¹ v ≤ 1.
 
-Below that threshold the spiked experiment *is* a null experiment, so no test
-of any kind separates them: the obstruction to adaptive detection is
-identifiability, not estimation difficulty.
+Below that threshold the signal-carrying model has a covariance that is legal
+under the null covariance class. This proves imitation for every procedure
+whose input is restricted to second moments. Promoting covariance imitation to
+an identity of full experiments requires Gaussian-law hypotheses and is not
+asserted by the finite algebra below.
 -/
 
-variable {ι : Type*} [Fintype ι]
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Bilinear form `xᵀ A y` over a finite variant index. -/
 def gramForm (A : Matrix ι ι ℝ) (x y : ι → ℝ) : ℝ :=
@@ -454,13 +459,12 @@ theorem varianceNonneg_sub_rankOne_iff
   constructor
   · intro hclass
     have hw := hclass witness
-    rw [quadForm_sub_matrix, quadForm_rankOneCovarianceBump, ← hproj witness,
-      ← hself] at hw
+    rw [quadForm_sub_matrix, quadForm_rankOneCovarianceBump, ← hself] at hw
     rcases eq_or_lt_of_le (hpos witness) with hzero | hpq
     · rw [← hzero]; simpa using zero_le_one
     · nlinarith [hw, hpq]
   · intro hthreshold x
-    rw [quadForm_sub_matrix, quadForm_rankOneCovarianceBump, ← hproj x]
+    rw [quadForm_sub_matrix, quadForm_rankOneCovarianceBump, hproj x]
     have hcs : gramForm A witness x ^ 2 ≤ quadForm A x * quadForm A witness :=
       gramForm_sq_le hA hpos x witness
     have hscale : (0 : ℝ) ≤ scale ^ 2 := sq_nonneg scale
@@ -499,8 +503,8 @@ theorem belowCeiling_add_rankOne_iff
 /-- **The imitation theorem, in genotype form.** Below the secular threshold the
 covariance of the *signal-carrying* genotype matrix is itself a legal member of
 the background class: the polygenic signal has been absorbed into background
-structure, exactly, at the level of second moments. Nothing about the estimator
-matters, because the two experiments have the same covariance. -/
+structure exactly at the level of second moments. This alone does not identify
+the full probability laws outside a Gaussian model. -/
 theorem spiked_genotype_covariance_belowCeiling
     {Ω : Type*} (E : ExpFunctional Ω)
     (noise : Ω → ι → ℝ) (factor : Ω → ℝ)
@@ -521,6 +525,502 @@ theorem spiked_genotype_covariance_belowCeiling
   exact (belowCeiling_add_rankOne_iff hsymm hgap hwitness scale).mpr hthreshold
 
 end Headroom
+
+section StationaryLD
+
+/-!
+## Stationary LD along a chromosome: symbol, hard edge, whitening gain
+
+The rigidity that blocks imitation in the previous section is stationarity, and
+for genotypes stationarity has a name: LD that depends on separation between
+sites rather than on their absolute positions. The first-order Markov model of
+LD along a chromosome — correlation `ρ^d` at separation `d`, the discrete
+analogue of the Ohta–Kimura decay in `Calibrator.LDDecayTheory` — makes the
+variant covariance a Toeplitz kernel, and every quantity the detection
+literature phrases in terms of "the spectrum of the LD matrix" becomes an
+explicit function of one scalar.
+
+The three quantities are the symbol (the LD spectral density), its minimum (the
+hard edge, which controls the conditioning of any whitening step), and its
+harmonic mean (the whitening gain, which is the per-variant limit of
+`tr K⁻¹`, the quantity every whitened detection threshold is stated in).
+-/
+
+/-- **Correlation between two variants at a given separation** under a
+first-order Markov model of LD along a chromosome.
+
+Empirical status: DERIVED. This is the discrete-separation analogue of the
+Ohta–Kimura law `ldAfterGenerations`, with separation in place of elapsed
+generations; `stationaryLDEntry_eq_ldAfterGenerations` below is the statement
+relating the two. Whether a real chromosome's LD is Markov at the scale of
+interest is exactly what the symbol analysis below can be falsified against. -/
+def stationaryLDEntry (decay : ℝ) (separation : ℕ) : ℝ := decay ^ separation
+
+/-- **Symbol (spectral density) of the stationary LD kernel.** The Poisson
+kernel: the Fourier transform of the geometric correlation sequence. Its values
+are the limiting eigenvalues of the LD matrix, so the symbol replaces every
+appeal to unknown spectral data.
+
+Empirical status: DERIVED from `stationaryLDEntry` by summation of the
+two-sided geometric series; the identities below are proved, not fitted. -/
+def ldKernelSymbol (decay angle : ℝ) : ℝ :=
+  (1 - decay ^ 2) / (1 - 2 * decay * Real.cos angle + decay ^ 2)
+
+/-- **Hard edge of the LD spectrum**: the smallest limiting eigenvalue of the
+stationary LD matrix, attained at the highest frequency. It is the conditioning
+bottleneck of any whitening or LD-pruning step.
+
+Empirical status: DERIVED. `ldKernelSymbol_ge_hardEdge` proves it is a lower
+bound and `ldKernelSymbol_pi` proves it is attained. -/
+def ldHardEdge (decay : ℝ) : ℝ := (1 - decay) / (1 + decay)
+
+/-- **Whitening gain**: the per-variant limit of `tr K⁻¹` for the stationary LD
+kernel, equal to the harmonic mean of the symbol. Every whitened detection
+threshold in the second-moment-shift program is stated in terms of this
+quantity, which is otherwise treated as unknown.
+
+Empirical status: DERIVED. `ldKernelSymbol_harmonicMean` proves the identity
+with the symbol integral, and `ldPrecisionTrace_div_sites_tendsto` proves it is
+the per-variant limit of the exact finite-chromosome trace. -/
+def ldWhiteningGain (decay : ℝ) : ℝ := (1 + decay ^ 2) / (1 - decay ^ 2)
+
+theorem stationaryLDEntry_eq_ldAfterGenerations (r Ne : ℝ) (separation : ℕ) :
+    stationaryLDEntry (ldRetentionPerGen r Ne) separation =
+      ldAfterGenerations 1 r Ne separation := by
+  unfold stationaryLDEntry ldAfterGenerations
+  rw [one_mul]
+
+theorem ldKernelSymbol_denom_pos {decay angle : ℝ} (hd : |decay| < 1) :
+    0 < 1 - 2 * decay * Real.cos angle + decay ^ 2 := by
+  have hcos_le : Real.cos angle ≤ 1 := Real.cos_le_one angle
+  have hcos_ge : -1 ≤ Real.cos angle := Real.neg_one_le_cos angle
+  have habs : |decay| < 1 := hd
+  have h1 : decay ≤ |decay| := le_abs_self decay
+  have h2 : -|decay| ≤ decay := neg_abs_le decay
+  nlinarith [sq_nonneg (1 - |decay|), sq_nonneg (decay - Real.cos angle),
+    abs_nonneg decay, sq_abs decay,
+    mul_nonneg (abs_nonneg decay) (sub_nonneg.mpr hcos_le),
+    mul_nonneg (abs_nonneg decay) (sub_nonneg.mpr (neg_le_iff_add_nonneg.mp hcos_ge))]
+
+theorem ldKernelSymbol_pos {decay angle : ℝ} (hd : |decay| < 1) :
+    0 < ldKernelSymbol decay angle := by
+  unfold ldKernelSymbol
+  have hnum : 0 < 1 - decay ^ 2 := by
+    have := sq_abs decay
+    nlinarith [abs_nonneg decay, hd]
+  exact div_pos hnum (ldKernelSymbol_denom_pos hd)
+
+/-- The symbol attains the hard edge at the highest frequency. -/
+theorem ldKernelSymbol_pi {decay : ℝ} (hd : |decay| < 1) :
+    ldKernelSymbol decay Real.pi = ldHardEdge decay := by
+  unfold ldKernelSymbol ldHardEdge
+  rw [Real.cos_pi]
+  have hne : (1 : ℝ) + decay ≠ 0 := by
+    have h2 : -|decay| ≤ decay := neg_abs_le decay
+    have : -1 < decay := by cases abs_lt.mp hd with | intro hlo _ => exact hlo
+    linarith
+  field_simp
+  ring
+
+/-- **The hard edge is a lower bound on the whole LD spectrum.** No direction in
+variant space is worse conditioned than `(1-ρ)/(1+ρ)`; the entire hard-edge
+question for a stationary LD kernel is the minimum of one explicit function. -/
+theorem ldKernelSymbol_ge_hardEdge {decay angle : ℝ} (hd : |decay| < 1)
+    (hnonneg : 0 ≤ decay) :
+    ldHardEdge decay ≤ ldKernelSymbol decay angle := by
+  unfold ldHardEdge ldKernelSymbol
+  have hden := ldKernelSymbol_denom_pos hd
+  have hplus : 0 < 1 + decay := by
+    have : -1 < decay := by cases abs_lt.mp hd with | intro hlo _ => exact hlo
+    linarith
+  have hcos_ge : -1 ≤ Real.cos angle := Real.neg_one_le_cos angle
+  rw [div_le_div_iff hplus hden]
+  nlinarith [mul_nonneg hnonneg (by linarith : (0:ℝ) ≤ 1 + Real.cos angle),
+    sq_nonneg decay, hnonneg]
+
+/-- **The whitening gain is the harmonic mean of the LD spectrum.** This is the
+Szegő value of `tr K⁻¹` per variant, computed in closed form: the quantity that
+detection thresholds are stated in but never evaluated. -/
+theorem ldKernelSymbol_harmonicMean {decay : ℝ} (hd : |decay| < 1) :
+    (∫ angle in (0 : ℝ)..(2 * Real.pi), (ldKernelSymbol decay angle)⁻¹) =
+      2 * Real.pi * ldWhiteningGain decay := by
+  have hnum : (0 : ℝ) < 1 - decay ^ 2 := by
+    have := sq_abs decay
+    nlinarith [abs_nonneg decay, hd]
+  have hpoint : ∀ angle : ℝ, (ldKernelSymbol decay angle)⁻¹ =
+      ((1 + decay ^ 2) - 2 * decay * Real.cos angle) / (1 - decay ^ 2) := by
+    intro angle
+    unfold ldKernelSymbol
+    rw [inv_div]
+    ring_nf
+  simp only [hpoint]
+  rw [intervalIntegral.integral_div,
+    intervalIntegral.integral_sub intervalIntegrable_const
+      ((continuous_const.mul Real.continuous_cos).intervalIntegrable _ _),
+    intervalIntegral.integral_const_mul, intervalIntegral.integral_cos,
+    intervalIntegral.integral_const]
+  rw [Real.sin_two_pi, Real.sin_zero]
+  unfold ldWhiteningGain
+  field_simp
+  ring
+
+theorem ldWhiteningGain_ge_one {decay : ℝ} (hd : |decay| < 1) :
+    1 ≤ ldWhiteningGain decay := by
+  unfold ldWhiteningGain
+  have hnum : (0 : ℝ) < 1 - decay ^ 2 := by
+    have := sq_abs decay
+    nlinarith [abs_nonneg decay, hd]
+  rw [le_div_iff₀ hnum]
+  nlinarith [sq_nonneg decay]
+
+/-- Stronger LD means a larger whitening gain: whitening has more to exploit
+when neighbouring variants are more correlated. -/
+theorem ldWhiteningGain_strictMono {decay₁ decay₂ : ℝ}
+    (h₁ : 0 ≤ decay₁) (h₂ : |decay₂| < 1) (hlt : decay₁ < decay₂) :
+    ldWhiteningGain decay₁ < ldWhiteningGain decay₂ := by
+  unfold ldWhiteningGain
+  have hd2 : (0 : ℝ) < 1 - decay₂ ^ 2 := by
+    have := sq_abs decay₂
+    nlinarith [abs_nonneg decay₂, h₂]
+  have hd1 : (0 : ℝ) < 1 - decay₁ ^ 2 := by nlinarith [h₁, hlt, hd2]
+  rw [div_lt_div_iff hd1 hd2]
+  nlinarith [hlt, h₁, sq_nonneg (decay₂ - decay₁)]
+
+/-- **Recombination sets the whitening gain.** Tying the stationary kernel's
+decay parameter to the Ohta–Kimura retention factor of
+`Calibrator.LDDecayTheory` makes the detection-relevant spectral quantity an
+explicit function of the recombination rate and the effective population size:
+less recombination, more gain. -/
+theorem ldWhiteningGain_of_ldRetention_antitone
+    {r₁ r₂ Ne : ℝ} (hr₁ : 0 ≤ r₁) (hr₂ : r₂ < 1) (hNe : 1 < Ne) (hlt : r₁ < r₂) :
+    ldWhiteningGain (ldRetentionPerGen r₂ Ne) <
+      ldWhiteningGain (ldRetentionPerGen r₁ Ne) := by
+  have hret₂ : 0 ≤ ldRetentionPerGen r₂ Ne :=
+    ld_retention_nonneg r₂ Ne (by linarith) (le_of_lt hr₂) (le_of_lt hNe)
+  have hlt' : ldRetentionPerGen r₂ Ne < ldRetentionPerGen r₁ Ne := by
+    unfold ldRetentionPerGen
+    have hfac : 0 < 1 - 1 / (2 * Ne) := by
+      rw [sub_pos, div_lt_one (by linarith)]; linarith
+    nlinarith [hlt, hfac]
+  have hone : ldRetentionPerGen r₁ Ne < 1 := by
+    rcases eq_or_lt_of_le hr₁ with hzero | hpos
+    · unfold ldRetentionPerGen
+      rw [← hzero]
+      have hfac : 1 - 1 / (2 * Ne) < 1 := by
+        have : 0 < 1 / (2 * Ne) := by positivity
+        linarith
+      nlinarith [hfac]
+    · exact ld_retention_lt_one r₁ Ne hpos (by linarith) hNe
+  have habs : |ldRetentionPerGen r₁ Ne| < 1 := by
+    rw [abs_lt]
+    constructor
+    · nlinarith [ld_retention_nonneg r₁ Ne hr₁ (by linarith) (le_of_lt hNe)]
+    · exact hone
+  exact ldWhiteningGain_strictMono hret₂ habs hlt'
+
+end StationaryLD
+
+section Spectator
+
+/-!
+## The evaluation geometry is a spectator; ancestry heterogeneity is not
+
+For ridge-penalized polygenic prediction the limiting risk is controlled by a
+single scalar fixed point determined by the *design* — the genotype covariance
+of the training sample, i.e. its LD and ancestry structure. The geometry of the
+loss, which for portability work is the target population's own covariance, is
+a test functional applied afterwards: it never multiplies the randomness and
+never enters the fixed point. Whether the training and target covariances
+commute, or are in general position, is therefore irrelevant to whether the
+theory is scalar.
+
+What does break scalarity lives inside the design: if individuals do not share
+one genotype covariance — an admixed or ancestry-heterogeneous training
+sample — the single scalar is replaced by one scalar per ancestry profile, and
+they are provably distinct.
+-/
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- Excess risk read off a deterministic equivalent: a linear functional of the
+evaluation geometry. -/
+def lossGeometryRisk (B M : Matrix ι ι ℝ) : ℝ := Matrix.trace (B * M)
+
+theorem lossGeometryRisk_add (B₁ B₂ M : Matrix ι ι ℝ) :
+    lossGeometryRisk (B₁ + B₂) M = lossGeometryRisk B₁ M + lossGeometryRisk B₂ M := by
+  unfold lossGeometryRisk
+  rw [Matrix.add_mul, Matrix.trace_add]
+
+theorem lossGeometryRisk_smul (c : ℝ) (B M : Matrix ι ι ℝ) :
+    lossGeometryRisk (c • B) M = c * lossGeometryRisk B M := by
+  unfold lossGeometryRisk
+  rw [Matrix.smul_mul, Matrix.trace_smul, smul_eq_mul]
+
+/-- **The deterministic equivalent lies in the algebra of the design.** Whatever
+the evaluation geometry, the equivalent commutes with the training genotype
+covariance. The loss geometry cannot enter it, which is the precise sense in
+which the joint geometry of (design, loss) is irrelevant. -/
+theorem deterministicEquivalent_commutes_design
+    (A M : Matrix ι ι ℝ) (shrink ridge : ℝ)
+    (hinv : M * (shrink • A + ridge • (1 : Matrix ι ι ℝ)) = 1) :
+    M * A = A * M := by
+  set X : Matrix ι ι ℝ := shrink • A + ridge • (1 : Matrix ι ι ℝ) with hX
+  have hXA : A * X = X * A := by
+    rw [hX, Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul,
+      Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, Matrix.one_mul]
+  have hleft : X * M = 1 := Matrix.mul_eq_one_comm.mp hinv
+  calc M * A = M * A * (X * M) := by rw [hleft, Matrix.mul_one]
+    _ = M * (A * X) * M := by rw [Matrix.mul_assoc, Matrix.mul_assoc, Matrix.mul_assoc]
+    _ = M * (X * A) * M := by rw [hXA]
+    _ = (M * X) * (A * M) := by
+        rw [Matrix.mul_assoc, Matrix.mul_assoc, Matrix.mul_assoc]
+    _ = A * M := by rw [hinv, Matrix.one_mul]
+
+/-- The self-consistency equation of the ridge deterministic equivalent, in the
+variable `u = 1 + δ`. The left side is the increasing part, the right side the
+LD-dependent decreasing part, and a solution is exactly a fixed point of the
+usual equation. The evaluation geometry does not appear. -/
+def ridgeBalance (eig : ι → ℝ) (ridge u : ℝ) : ℝ :=
+  (1 - 1 / u) - (∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ)
+
+theorem ridgeBalance_strictMonoOn (eig : ι → ℝ) (ridge : ℝ)
+    (heig : ∀ i, 0 ≤ eig i) (hridge : 0 < ridge) :
+    StrictMonoOn (ridgeBalance eig ridge) (Set.Ici (1 : ℝ)) := by
+  intro u hu w hw hlt
+  have hu1 : (1 : ℝ) ≤ u := hu
+  have hw1 : (1 : ℝ) ≤ w := hw
+  have hupos : (0 : ℝ) < u := lt_of_lt_of_le zero_lt_one hu1
+  have hwpos : (0 : ℝ) < w := lt_of_lt_of_le zero_lt_one hw1
+  have hleft : 1 - 1 / u < 1 - 1 / w := by
+    have : 1 / w < 1 / u := by
+      exact one_div_lt_one_div_of_lt hupos hlt
+    linarith
+  have hright : ∀ i, eig i / (eig i + ridge * w) ≤ eig i / (eig i + ridge * u) := by
+    intro i
+    rcases eq_or_lt_of_le (heig i) with hzero | hpos
+    · rw [← hzero]; simp
+    · have hdu : 0 < eig i + ridge * u := by positivity
+      have hdw : 0 < eig i + ridge * w := by positivity
+      apply div_le_div_of_nonneg_left (le_of_lt hpos) hdu
+      nlinarith [hlt, hridge]
+  have hsum : (∑ i, eig i / (eig i + ridge * w)) ≤ ∑ i, eig i / (eig i + ridge * u) :=
+    Finset.sum_le_sum (fun i _ => hright i)
+  unfold ridgeBalance
+  rcases Nat.eq_zero_or_pos (Fintype.card ι) with hcard | hcard
+  · rw [hcard]; simpa using hleft
+  · have hcardpos : (0 : ℝ) < (Fintype.card ι : ℝ) := by exact_mod_cast hcard
+    have hdiv :
+        (∑ i, eig i / (eig i + ridge * w)) / (Fintype.card ι : ℝ) ≤
+          (∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ) :=
+      div_le_div_of_nonneg_right' hsum hcardpos
+    linarith
+
+/-- **Uniqueness of the ridge fixed point.** The scalar that every ridge-PGS
+risk formula depends on is well defined: there is at most one, and it is a
+functional of the training genotype spectrum alone. -/
+theorem ridgeBalance_root_unique (eig : ι → ℝ) (ridge : ℝ)
+    (heig : ∀ i, 0 ≤ eig i) (hridge : 0 < ridge)
+    {u w : ℝ} (hu : 1 ≤ u) (hw : 1 ≤ w)
+    (hru : ridgeBalance eig ridge u = 0) (hrw : ridgeBalance eig ridge w = 0) :
+    u = w := by
+  by_contra hne
+  rcases lt_or_gt_of_ne hne with hlt | hgt
+  · have := ridgeBalance_strictMonoOn eig ridge heig hridge hu hw hlt
+    rw [hru, hrw] at this
+    exact lt_irrefl 0 this
+  · have := ridgeBalance_strictMonoOn eig ridge heig hridge hw hu hgt
+    rw [hru, hrw] at this
+    exact lt_irrefl 0 this
+
+/-- **Ancestry heterogeneity breaks scalarity.** With two ancestry groups whose
+genotype covariances differ in the functional the fixed point sees, the two
+group-level scalars cannot coincide: no single scalar equivalent exists, and the
+theory becomes function-valued in the ancestry profile. This is the boundary of
+the scalar theory, and it lies inside the design, not between design and loss. -/
+theorem ancestry_profile_scalars_differ
+    {profileMap : ℝ → ℝ → ℝ} {scale₁ scale₂ η₁ η₂ : ℝ}
+    (hmono : ∀ {a b c : ℝ}, a < b → profileMap a c < profileMap b c)
+    (hscale : scale₁ < scale₂)
+    (hshared : ℝ)
+    (h₁ : η₁ = profileMap scale₁ hshared)
+    (h₂ : η₂ = profileMap scale₂ hshared) :
+    η₁ ≠ η₂ := by
+  rw [h₁, h₂]
+  exact ne_of_lt (hmono hscale)
+
+end Spectator
+
+section AbsorbingBoundary
+
+/-!
+## Information at an absorbing boundary: allele loss
+
+An allele's frequency under neutral drift is a diffusion whose noise vanishes at
+the boundary, and the boundary absorbs: the allele is lost. The transition law
+is therefore not absolutely continuous — it has an atom at zero whose mass is
+the loss probability — and this is the situation in which local asymptotic
+normality is usually said to fail.
+
+It does not fail. The atom is smooth in the parameter, so the square root of
+the atom mass is differentiable and contributes an ordinary Fisher information
+term. The loss/no-loss status of a variant is *information about its ancestral
+frequency*, on the same footing as the observed frequency of the variants that
+survive, and the two channels cross at a computable time.
+-/
+
+/-- **Probability that a neutral allele has been lost by time `t`**, started
+from scaled initial frequency `x`: the absorbed mass of the boundary-degenerate
+diffusion.
+
+Empirical status: DERIVED for the squared-Bessel representative of neutral
+drift with an absorbing boundary; it is the exponential absorption law, and the
+identities below are proved from it rather than fitted. Its use as a model of a
+real allele requires the diffusion approximation, which is standard and is not
+re-derived here. -/
+def alleleLossProbability (initial time : ℝ) : ℝ :=
+  Real.exp (-(initial / (2 * time)))
+
+/-- **Fisher information carried by the loss/no-loss status alone**: the
+absorption channel. -/
+def absorptionInformation (initial time : ℝ) : ℝ :=
+  alleleLossProbability initial time / (4 * time ^ 2)
+
+theorem alleleLossProbability_pos (initial time : ℝ) :
+    0 < alleleLossProbability initial time := Real.exp_pos _
+
+theorem alleleLossProbability_le_one {initial time : ℝ}
+    (hinitial : 0 ≤ initial) (htime : 0 < time) :
+    alleleLossProbability initial time ≤ 1 := by
+  unfold alleleLossProbability
+  rw [Real.exp_le_one_iff]
+  have : 0 ≤ initial / (2 * time) := by positivity
+  linarith
+
+/-- The absorbed mass is differentiable in the ancestral frequency: the atom is
+not an irregularity. -/
+theorem hasDerivAt_alleleLossProbability {time : ℝ} (htime : time ≠ 0) (initial : ℝ) :
+    HasDerivAt (fun x => alleleLossProbability x time)
+      (-(1 / (2 * time)) * alleleLossProbability initial time) initial := by
+  have hbase : HasDerivAt (fun x : ℝ => -(x / (2 * time))) (-(1 / (2 * time))) initial := by
+    have := ((hasDerivAt_id initial).div_const (2 * time)).neg
+    simpa using this
+  simpa [alleleLossProbability] using hbase.exp
+
+/-- **Quadratic-mean differentiability tolerates the atom.** The square root of
+the absorbed mass is smooth in the ancestral frequency, and four times its
+squared derivative is exactly the absorption channel's Fisher information. The
+atom contributes one ordinary coordinate to the local experiment; it does not
+destroy local asymptotic normality. -/
+theorem sqrt_alleleLoss_derivative_sq {initial time : ℝ} (htime : 0 < time) :
+    4 * (-(1 / (4 * time)) * Real.sqrt (alleleLossProbability initial time)) ^ 2 =
+      absorptionInformation initial time := by
+  unfold absorptionInformation
+  have hsq : Real.sqrt (alleleLossProbability initial time) ^ 2 =
+      alleleLossProbability initial time :=
+    Real.sq_sqrt (le_of_lt (alleleLossProbability_pos initial time))
+  have hne : time ≠ 0 := ne_of_gt htime
+  field_simp [hsq]
+  ring
+
+/-- Relative weight of the absorption channel against the diffusion channel,
+whose information scale is of order `1 / (x t)`. -/
+def absorptionChannelWeight (initial time : ℝ) : ℝ :=
+  initial * alleleLossProbability initial time / (4 * time)
+
+/-- **The information crossover time.** The absorption channel is dark at short
+times (nothing has been lost yet) and dark again at long times (everything has),
+and its weight against the diffusion channel peaks at half the scaled ancestral
+frequency. Before that time the frequency of surviving variants carries the
+information; after it, the pattern of losses does.
+
+Empirical status: DERIVED from `alleleLossProbability`; the monotonicity
+statements below are the proof that this is the maximizer. -/
+def informationCrossoverTime (initial : ℝ) : ℝ := initial / 2
+
+theorem hasDerivAt_absorptionChannelWeight {initial time : ℝ} (htime : 0 < time) :
+    HasDerivAt (fun t => absorptionChannelWeight initial t)
+      (initial * alleleLossProbability initial time *
+        (initial / 2 - time) / (4 * time ^ 3)) time := by
+  have hne : time ≠ 0 := ne_of_gt htime
+  have hexp : HasDerivAt (fun t : ℝ => Real.exp (-(initial / (2 * t))))
+      (Real.exp (-(initial / (2 * time))) * (initial / (2 * time ^ 2))) time := by
+    have hinner : HasDerivAt (fun t : ℝ => -(initial / (2 * t)))
+        (initial / (2 * time ^ 2)) time := by
+      have hdiv : HasDerivAt (fun t : ℝ => initial / (2 * t))
+          (-(initial * 2) / (2 * time) ^ 2) time := by
+        have := (hasDerivAt_const time (2 : ℝ)).mul (hasDerivAt_id time)
+        simpa using
+          ((hasDerivAt_const time initial).div (by simpa using this)
+            (by simpa [hne] using (by positivity : (0 : ℝ) < 2 * time).ne'))
+      have : HasDerivAt (fun t : ℝ => -(initial / (2 * t)))
+          (-(-(initial * 2) / (2 * time) ^ 2)) time := hdiv.neg
+      convert this using 1
+      field_simp
+      ring
+    simpa [Real.exp_ne_zero] using hinner.exp
+  have hquot : HasDerivAt (fun t : ℝ => Real.exp (-(initial / (2 * t))) / (4 * t))
+      ((Real.exp (-(initial / (2 * time))) * (initial / (2 * time ^ 2)) * (4 * time) -
+        Real.exp (-(initial / (2 * time))) * 4) / (4 * time) ^ 2) time := by
+    have hden : HasDerivAt (fun t : ℝ => 4 * t) 4 time := by
+      simpa using (hasDerivAt_id time).const_mul (4 : ℝ)
+    exact hexp.div hden (by positivity)
+  have hscaled := hquot.const_mul initial
+  convert hscaled using 1
+  · funext t
+    unfold absorptionChannelWeight alleleLossProbability
+    ring
+  · unfold alleleLossProbability
+    field_simp
+    ring
+
+/-- Before the crossover time the absorption channel is strictly gaining: as
+time passes, the pattern of losses becomes progressively more informative about
+the ancestral frequency. -/
+theorem absorptionChannelWeight_strictMonoOn {initial : ℝ} (hinitial : 0 < initial) :
+    StrictMonoOn (absorptionChannelWeight initial)
+      (Set.Ioc 0 (informationCrossoverTime initial)) := by
+  apply strictMonoOn_of_deriv_pos (convex_Ioc _ _)
+  · intro t ht
+    exact ((hasDerivAt_absorptionChannelWeight ht.1).differentiableAt.continuousAt).continuousWithinAt
+  · intro t ht
+    rw [interior_Ioc] at ht
+    have htpos : 0 < t := ht.1
+    have hlt : t < initial / 2 := by
+      simpa [informationCrossoverTime] using ht.2
+    rw [(hasDerivAt_absorptionChannelWeight htpos).deriv]
+    have hp := alleleLossProbability_pos initial t
+    have hnum : 0 < initial * alleleLossProbability initial t * (initial / 2 - t) := by
+      have : 0 < initial / 2 - t := by linarith
+      positivity
+    have hden : 0 < 4 * t ^ 3 := by positivity
+    exact div_pos hnum hden
+
+/-- After the crossover time the absorption channel decays again: once most
+copies are already lost, the losses stop discriminating between ancestral
+frequencies. -/
+theorem absorptionChannelWeight_strictAntiOn {initial : ℝ} (hinitial : 0 < initial) :
+    StrictAntiOn (absorptionChannelWeight initial)
+      (Set.Ici (informationCrossoverTime initial)) := by
+  apply strictAntiOn_of_deriv_neg (convex_Ici _)
+  · intro t ht
+    have htpos : 0 < t := lt_of_lt_of_le (by simpa [informationCrossoverTime] using
+      half_pos hinitial) ht
+    exact ((hasDerivAt_absorptionChannelWeight htpos).differentiableAt.continuousAt).continuousWithinAt
+  · intro t ht
+    rw [interior_Ici] at ht
+    have hgt : initial / 2 < t := by
+      simpa [informationCrossoverTime] using ht
+    have htpos : 0 < t := lt_trans (half_pos hinitial) hgt
+    rw [(hasDerivAt_absorptionChannelWeight htpos).deriv]
+    have hp := alleleLossProbability_pos initial t
+    have hnum : initial * alleleLossProbability initial t * (initial / 2 - t) < 0 := by
+      have hneg : initial / 2 - t < 0 := by linarith
+      have hpos : 0 < initial * alleleLossProbability initial t := by positivity
+      exact mul_neg_of_pos_of_neg hpos hneg
+    have hden : 0 < 4 * t ^ 3 := by positivity
+    exact div_neg_of_neg_of_pos hnum hden
+
+end AbsorbingBoundary
 
 end
 

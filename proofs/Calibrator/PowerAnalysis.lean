@@ -345,6 +345,12 @@ section OptimalAllocation
     This is a concave function of n, giving diminishing returns. -/
 noncomputable def r2ScalingModel (n C : ℝ) : ℝ := n / (n + C)
 
+/-! `r2ScalingModel` is the saturating fraction `n / (n + C)` with `C = M/h²`,
+not an `R²`. It carries no heritability prefactor, so it saturates at one where
+`R²` must cap at `h²`; the same defect that
+`Calibrator.expectedR2FromN` carried before correction. It is kept as the
+shape, and anything reading it as a predicted `R²` must multiply by `h²`. -/
+
 /-- R² scaling model is increasing in n. -/
 theorem r2_scaling_increasing (n₁ n₂ C : ℝ)
     (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n₂ : 0 ≤ n₂) (h_n : n₁ < n₂) :
