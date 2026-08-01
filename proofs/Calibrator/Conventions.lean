@@ -18,6 +18,7 @@ import Calibrator.PowerAnalysis
 import Calibrator.SelectionArchitecture
 import Calibrator.PolygenicAdaptation
 import Calibrator.AncestryCalibration
+import Calibrator.PortabilityBounds
 import Calibrator.PortabilityDrift
 import Calibrator.StratificationConfounding
 
@@ -464,6 +465,69 @@ ploidy factor as `Var_Delta_Mu`. -/
 theorem expectedPGSDiffVariance_eq_ploidy_form (V_A fst : ℝ) :
     expectedPGSDiffVariance V_A fst = ploidy * fst * V_A := by
   unfold expectedPGSDiffVariance ploidy; ring
+
+/-! ### The remaining singletons
+
+Each of these uses the ploidy convention once, with no sibling to disagree
+with, so only a derivation from `ploidy` ties them down. -/
+
+theorem ldHalfLife_uses_timeScale (Ne : ℝ) :
+    ldHalfLife Ne = coalescentTimeScale Ne * Real.log 2 := by
+  unfold ldHalfLife; rw [coalescentTimeScale_eq]
+
+theorem steppingStoneCharacteristicLength_uses_timeScale (Ne m : ℝ) :
+    steppingStoneCharacteristicLength Ne m
+      = Real.sqrt (coalescentTimeScale Ne * m) := by
+  unfold steppingStoneCharacteristicLength; rw [coalescentTimeScale_eq]
+
+theorem cumulativeDrift_uses_timeScale {T : ℕ} (Ne : Fin T → ℝ) :
+    cumulativeDrift Ne = ∑ i, 1 / coalescentTimeScale (Ne i) := by
+  unfold cumulativeDrift
+  simp only [coalescentTimeScale_eq]
+
+theorem ldRetentionPerGen_uses_timeScale (r Ne : ℝ) :
+    ldRetentionPerGen r Ne = (1 - r) * (1 - 1 / coalescentTimeScale Ne) := by
+  unfold ldRetentionPerGen; rw [coalescentTimeScale_eq]
+
+theorem hetDecayFactor_uses_timeScale (Ne θ : ℝ) :
+    hetDecayFactor Ne θ
+      = (1 - 1 / coalescentTimeScale Ne) * (1 - θ / coalescentTimeScale Ne) := by
+  unfold hetDecayFactor; rw [coalescentTimeScale_eq]
+
+theorem asymmetricFst_eq_scaled (Ne m_into : ℝ) :
+    asymmetricFst Ne m_into
+      = fstMutationDriftEquilibrium (scaledMigrationRate Ne m_into) := by
+  unfold asymmetricFst fstMutationDriftEquilibrium
+  rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
+
+theorem fstMigDriftEquil_eq_scaled (Ne m : ℝ) :
+    fstMigDriftEquil Ne m
+      = fstMutationDriftEquilibrium (scaledMigrationRate Ne m) := by
+  unfold fstMigDriftEquil fstMutationDriftEquilibrium
+  rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
+
+theorem fstMigrationMutationEquilibrium_eq_scaled (Ne m μ : ℝ) :
+    fstMigrationMutationEquilibrium Ne m μ
+      = 1 / (1 + scaledMigrationRate Ne m + scaledMutationRate Ne μ) := by
+  unfold fstMigrationMutationEquilibrium
+  rw [scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
+  unfold ploidy; ring_nf
+
+theorem expectedFreqDiffSq_uses_hwe (fst p0 : ℝ) :
+    expectedFreqDiffSq fst p0 = fst * hweGenotypeVariance p0 := by
+  unfold expectedFreqDiffSq hweGenotypeVariance ploidy; ring
+
+theorem pgsMean_uses_ploidy {m : ℕ} (β p : Fin m → ℝ) :
+    pgsMean β p = ∑ i, β i * (ploidy * p i) := by
+  unfold pgsMean ploidy; ring_nf
+
+theorem fisherAverageEffect_uses_ploidy (a d p : ℝ) :
+    fisherAverageEffect a d p = a + d * (1 - ploidy * p) := by
+  unfold fisherAverageEffect ploidy; ring
+
+theorem neutralPortability_uses_ploidy (r2_0 fst : ℝ) :
+    neutralPortability r2_0 fst = r2_0 * (1 - ploidy * fst) := by
+  unfold neutralPortability ploidy; ring
 
 end EquilibriumAgreements
 

@@ -61,6 +61,17 @@ def addRankOneSignal
 def rankOneCovarianceBump (scale : ℝ) (loading : ι → ℝ) : Matrix ι ι ℝ :=
   fun i j => scale ^ 2 * loading i * loading j
 
+/-- Under the usual sample normalization, the covariance bump has coefficient
+`signal² / sampleSize`. This is the exact finite-sample normalization used by
+the imitation threshold calculation. -/
+theorem rankOneCovarianceBump_sampleNormalized
+    (signal sampleSize : ℝ) (loading : ι → ℝ) (i j : ι)
+    (hsampleSize : 0 < sampleSize) :
+    rankOneCovarianceBump (signal / Real.sqrt sampleSize) loading i j =
+      (signal ^ 2 / sampleSize) * loading i * loading j := by
+  unfold rankOneCovarianceBump
+  rw [div_pow, Real.sq_sqrt (le_of_lt hsampleSize)]
+
 /-- **Exact covariance imitation identity.** A centered unit-variance factor
 uncorrelated with the noise changes the covariance by precisely the rank-one
 bump `scale² vvᵀ`. No distributional or asymptotic assumption is used. -/
@@ -138,6 +149,11 @@ matrix and is enough to expose generic rank-one imitation failure. -/
 def ConstantDiagonal (A : Matrix ι ι ℝ) : Prop :=
   ∀ i j, A i i = A j j
 
+/-- Invariance of a matrix under simultaneous application of an index shift.
+Toeplitz and stationary covariance classes are instances of this condition. -/
+def ShiftInvariant (shift : ι → ι) (A : Matrix ι ι ℝ) : Prop :=
+  ∀ i j, A (shift i) (shift j) = A i j
+
 /-- A rank-one bump with nonconstant squared loadings leaves the
 constant-diagonal class. This is the finite-dimensional rigidity mechanism
 behind the failure of stationary nuisance classes to absorb a generic spike. -/
@@ -164,6 +180,42 @@ theorem constantDiagonal_class_is_rankOne_rigid
     (hloading : loading i ^ 2 ≠ loading j ^ 2) :
     K + rankOneCovarianceBump scale loading ∉ {A | ConstantDiagonal A} :=
   add_rankOneBump_not_constantDiagonal K scale loading i j hK hscale hloading
+
+/-- **Stationary rigidity.** A shift-invariant covariance cannot absorb a
+rank-one bump whose pairwise loading products are changed by the shift. Unlike
+the diagonal corollary above, this detects nonstationarity in off-diagonal
+entries as well. -/
+theorem add_rankOneBump_not_shiftInvariant
+    (shift : ι → ι) (K : Matrix ι ι ℝ)
+    (scale : ℝ) (loading : ι → ℝ) (i j : ι)
+    (hK : ShiftInvariant shift K)
+    (hscale : scale ≠ 0)
+    (hloading :
+      loading (shift i) * loading (shift j) ≠ loading i * loading j) :
+    ¬ ShiftInvariant shift (K + rankOneCovarianceBump scale loading) := by
+  intro hinvariant
+  have hbump := hinvariant i j
+  have hbase := hK i j
+  simp only [Matrix.add_apply, rankOneCovarianceBump] at hbump
+  apply hloading
+  have hscaled :
+      scale ^ 2 * (loading (shift i) * loading (shift j)) =
+        scale ^ 2 * (loading i * loading j) := by
+    nlinarith [hbump, hbase]
+  exact mul_left_cancel₀ (pow_ne_zero 2 hscale) hscaled
+
+/-- The whole shift-invariant nuisance class is therefore rigid against a
+generic rank-one covariance bump. -/
+theorem shiftInvariant_class_is_rankOne_rigid
+    (shift : ι → ι) (K : Matrix ι ι ℝ)
+    (scale : ℝ) (loading : ι → ℝ) (i j : ι)
+    (hK : ShiftInvariant shift K)
+    (hscale : scale ≠ 0)
+    (hloading :
+      loading (shift i) * loading (shift j) ≠ loading i * loading j) :
+    K + rankOneCovarianceBump scale loading ∉ {A | ShiftInvariant shift A} :=
+  add_rankOneBump_not_shiftInvariant shift K scale loading i j
+    hK hscale hloading
 
 end Rigidity
 
