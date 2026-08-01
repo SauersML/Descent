@@ -81,7 +81,11 @@ theorem residual_score_identifies_projection_shift
     exact sub_eq_zero.mp hnormal
   rw [hcross]
   ext i
-  simp [Matrix.mulVec, dotProduct, Finset.sum_sub_distrib]
+  simp only [Matrix.mulVec, dotProduct]
+  rw [← Finset.sum_sub_distrib]
+  apply Finset.sum_congr rfl
+  intro j _
+  ring
 
 /-- Projection movement under a change of expectation.  The target residual
 score at the old coefficient is exactly the target second-moment matrix applied

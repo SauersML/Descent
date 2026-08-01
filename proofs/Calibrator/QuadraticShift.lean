@@ -140,9 +140,17 @@ theorem scalar_correction_completed_square
     dot_smul_left c u (B.mulVec v)
   have hrightScaled : dot v (c • B.mulVec u) = c * dot v (B.mulVec u) :=
     dot_smul_right c v (B.mulVec u)
+  have hbothScaled :
+      dot (c • u) (c • B.mulVec u) = c ^ 2 * dot u (B.mulVec u) := by
+    calc
+      dot (c • u) (c • B.mulVec u)
+          = c * dot u (c • B.mulVec u) := dot_smul_left c u _
+      _ = c * (c * dot u (B.mulVec u)) := by
+        rw [dot_smul_right]
+      _ = c ^ 2 * dot u (B.mulVec u) := by ring
   unfold quadraticCoefficientDistance scalarCorrectionFloor bestScalarCorrection
   rw [matrix_mulVec_sub, matrix_mulVec_smul, dot_sub_left,
-    dot_sub_right, dot_sub_right, hleftScaled, hrightScaled, hcross]
+    dot_sub_right, dot_sub_right, hleftScaled, hrightScaled, hbothScaled, hcross]
   field_simp [hu]
   ring
 
@@ -158,7 +166,7 @@ theorem best_scalar_correction_attains_floor
       ∀ c, scalarCorrectionFloor B u v ≤
         quadraticCoefficientDistance B (c • u) v := by
   have hidentity := scalar_correction_completed_square B u v
-    (bestScalarCorrection B u v) hsymmetric hu.ne'
+    (bestScalarCorrection B u v : ℝ) hsymmetric hu.ne'
   constructor
   · simpa using hidentity
   · intro c
