@@ -276,6 +276,252 @@ theorem deadSensor_resolvent_variance_pos
 
 end DeadSensors
 
+section Headroom
+
+/-!
+## Headroom: exactly how large a polygenic signal a background class can imitate
+
+The rank-one bump of the previous section is what a polygenic signal looks like
+to a second-moment analysis: mixing the per-individual signal factor over its
+own prior — the infinitesimal model — leaves a genotype covariance inflated by
+`scale² vvᵀ`, where `v` is the direction of the effect vector. Whether that is
+an *imitation* rather than a *signal* depends on one thing: whether the
+inflated covariance is still a legal member of the background class.
+
+For the class used by adaptive-detection formulations — every covariance whose
+score variance is bounded by a ceiling `C₀` — the answer is a secular equation,
+proved here exactly, with no asymptotics, no invertibility, and no eigenvalues:
+the bumped background stays legal exactly when
+
+    scale² · vᵀ (C₀ I - K)⁻¹ v ≤ 1.
+
+Below that threshold the spiked experiment *is* a null experiment, so no test
+of any kind separates them: the obstruction to adaptive detection is
+identifiability, not estimation difficulty.
+-/
+
+variable {ι : Type*} [Fintype ι]
+
+/-- Bilinear form `xᵀ A y` over a finite variant index. -/
+def gramForm (A : Matrix ι ι ℝ) (x y : ι → ℝ) : ℝ :=
+  ∑ i, ∑ j, x i * A i j * y j
+
+/-- Quadratic form `xᵀ A x`. When `A` is a genotype second-moment matrix this
+is the variance of the polygenic score with weights `x`, so every statement in
+this section is a statement about score variances. -/
+def quadForm (A : Matrix ι ι ℝ) (x : ι → ℝ) : ℝ := gramForm A x x
+
+/-- A matrix is variance-nonnegative when no weighting of the variants produces
+a negative score variance: positive semidefiniteness, in the form the genetics
+uses it. -/
+def VarianceNonneg (A : Matrix ι ι ℝ) : Prop := ∀ x : ι → ℝ, 0 ≤ quadForm A x
+
+theorem gramForm_symm {A : Matrix ι ι ℝ} (hA : A.IsSymm) (x y : ι → ℝ) :
+    gramForm A x y = gramForm A y x := by
+  unfold gramForm
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+  have hsym : A j i = A i j := by
+    have := congrFun (congrFun hA i) j
+    simpa [Matrix.transpose_apply] using this.symm
+  rw [hsym]; ring
+
+theorem gramForm_sub_left (A : Matrix ι ι ℝ) (x y z : ι → ℝ) :
+    gramForm A (x - y) z = gramForm A x z - gramForm A y z := by
+  unfold gramForm
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [← Finset.sum_sub_distrib]
+  exact Finset.sum_congr rfl (fun j _ => by simp [sub_mul])
+
+theorem gramForm_smul_left (A : Matrix ι ι ℝ) (c : ℝ) (x y : ι → ℝ) :
+    gramForm A (c • x) y = c * gramForm A x y := by
+  unfold gramForm
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [Finset.mul_sum]
+  exact Finset.sum_congr rfl (fun j _ => by simp [Pi.smul_apply, smul_eq_mul]; ring)
+
+theorem gramForm_sub_matrix (A B : Matrix ι ι ℝ) (x y : ι → ℝ) :
+    gramForm (A - B) x y = gramForm A x y - gramForm B x y := by
+  unfold gramForm
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [← Finset.sum_sub_distrib]
+  exact Finset.sum_congr rfl (fun j _ => by simp [Matrix.sub_apply, mul_sub, sub_mul])
+
+theorem quadForm_sub_matrix (A B : Matrix ι ι ℝ) (x : ι → ℝ) :
+    quadForm (A - B) x = quadForm A x - quadForm B x :=
+  gramForm_sub_matrix A B x x
+
+/-- Expansion of a score variance along a line: the only analytic input the
+Cauchy–Schwarz step needs. -/
+theorem quadForm_sub_smul {A : Matrix ι ι ℝ} (hA : A.IsSymm) (x y : ι → ℝ) (s : ℝ) :
+    quadForm A (x - s • y) =
+      quadForm A x - 2 * s * gramForm A y x + s ^ 2 * quadForm A y := by
+  unfold quadForm
+  have h1 : gramForm A x (x - s • y) = gramForm A x x - s * gramForm A y x := by
+    rw [gramForm_symm hA x (x - s • y), gramForm_sub_left, gramForm_smul_left,
+      gramForm_symm hA x x]
+  have h2 : gramForm A y (x - s • y) = gramForm A y x - s * gramForm A y y := by
+    rw [gramForm_symm hA y (x - s • y), gramForm_sub_left, gramForm_smul_left,
+      gramForm_symm hA x y, gramForm_symm hA y y]
+  rw [gramForm_sub_left, gramForm_smul_left, h1, h2]
+  ring
+
+/-- **Cauchy–Schwarz in the metric of a genotype covariance.** The covariance
+between two polygenic scores is at most the geometric mean of their variances.
+No invertibility is assumed, so a singular genotype second-moment matrix — the
+normal case, more variants than individuals — is admissible. -/
+theorem gramForm_sq_le {A : Matrix ι ι ℝ} (hA : A.IsSymm) (hpos : VarianceNonneg A)
+    (x y : ι → ℝ) :
+    gramForm A y x ^ 2 ≤ quadForm A x * quadForm A y := by
+  rcases eq_or_lt_of_le (hpos y) with hzero | hposy
+  · have hall : ∀ s : ℝ, 0 ≤ quadForm A x - 2 * s * gramForm A y x := by
+      intro s
+      have hs := hpos (x - s • y)
+      rw [quadForm_sub_smul hA x y s, ← hzero] at hs
+      simpa using hs
+    have hb : gramForm A y x = 0 := by
+      by_contra hne
+      have hbig := hall ((quadForm A x + 1) / (2 * gramForm A y x))
+      rw [mul_div_assoc'] at hbig
+      have h2 : (2 : ℝ) * gramForm A y x ≠ 0 := by
+        simpa using hne
+      field_simp at hbig
+      linarith
+    rw [hb, ← hzero]; simp
+  · have h := hpos (x - (gramForm A y x / quadForm A y) • y)
+    rw [quadForm_sub_smul hA x y] at h
+    have hq : quadForm A y ≠ 0 := ne_of_gt hposy
+    field_simp at h
+    nlinarith [h, hposy]
+
+/-- The score variance contributed by a rank-one covariance bump is the squared
+projection of the weights on the signal direction. -/
+theorem quadForm_rankOneCovarianceBump (scale : ℝ) (loading x : ι → ℝ) :
+    quadForm (rankOneCovarianceBump scale loading) x =
+      scale ^ 2 * dot loading x ^ 2 := by
+  unfold quadForm gramForm rankOneCovarianceBump dot
+  have hrow : ∀ i : ι,
+      (∑ j, x i * (scale ^ 2 * loading i * loading j) * x j) =
+        (scale ^ 2 * (x i * loading i)) * ∑ j, loading j * x j := by
+    intro i
+    rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl (fun j _ => by ring)
+  simp_rw [hrow]
+  rw [← Finset.sum_mul, ← Finset.mul_sum]
+  have hswap : (∑ i, x i * loading i) = ∑ i, loading i * x i :=
+    Finset.sum_congr rfl (fun i _ => mul_comm _ _)
+  rw [hswap]
+  ring
+
+/-- A vector that the covariance maps onto the signal direction — the solution
+of `A w = v`, written without ever forming an inverse — reproduces the signal
+functional. -/
+theorem gramForm_witness {A : Matrix ι ι ℝ} (hA : A.IsSymm)
+    {loading witness : ι → ℝ} (hwitness : A.mulVec witness = loading) (x : ι → ℝ) :
+    gramForm A witness x = dot loading x := by
+  have hexpand : gramForm A witness x = ∑ j, (A.mulVec witness) j * x j := by
+    unfold gramForm
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl (fun j _ => ?_)
+    simp only [Matrix.mulVec, dotProduct, Finset.sum_mul]
+    refine Finset.sum_congr rfl (fun i _ => ?_)
+    have hsym : A j i = A i j := by
+      have := congrFun (congrFun hA i) j
+      simpa [Matrix.transpose_apply] using this.symm
+    rw [hsym]; ring
+  rw [hexpand, hwitness]
+  rfl
+
+/-- **The secular criterion for imitation.** A background covariance `A`
+(read: the headroom `C₀ I - K` left by the class ceiling) absorbs a rank-one
+polygenic bump of size `scale²` in the direction `v` exactly when
+`scale² · vᵀ A⁻¹ v ≤ 1`, with `A⁻¹ v` supplied as a witness rather than an
+inverse. This is an exact finite-dimensional equivalence: no eigenvalues, no
+proportional regime, no moment assumptions. -/
+theorem varianceNonneg_sub_rankOne_iff
+    {A : Matrix ι ι ℝ} (hA : A.IsSymm) (hpos : VarianceNonneg A)
+    {loading witness : ι → ℝ} (hwitness : A.mulVec witness = loading)
+    (scale : ℝ) :
+    VarianceNonneg (A - rankOneCovarianceBump scale loading) ↔
+      scale ^ 2 * quadForm A witness ≤ 1 := by
+  have hproj : ∀ x, dot loading x = gramForm A witness x := fun x =>
+    (gramForm_witness hA hwitness x).symm
+  have hself : quadForm A witness = dot loading witness :=
+    (gramForm_witness hA hwitness witness).symm ▸ rfl
+  constructor
+  · intro hclass
+    have hw := hclass witness
+    rw [quadForm_sub_matrix, quadForm_rankOneCovarianceBump, ← hproj witness,
+      ← hself] at hw
+    rcases eq_or_lt_of_le (hpos witness) with hzero | hpq
+    · rw [← hzero]; simpa using zero_le_one
+    · nlinarith [hw, hpq]
+  · intro hthreshold x
+    rw [quadForm_sub_matrix, quadForm_rankOneCovarianceBump, ← hproj x]
+    have hcs : gramForm A witness x ^ 2 ≤ quadForm A x * quadForm A witness :=
+      gramForm_sq_le hA hpos x witness
+    have hscale : (0 : ℝ) ≤ scale ^ 2 := sq_nonneg scale
+    have hx : 0 ≤ quadForm A x := hpos x
+    nlinarith [hcs, hscale, hx, hthreshold]
+
+/-- The spectral-ceiling background class: every polygenic score built from the
+background has variance at most `ceiling`. This is the class that adaptive
+detection formulations range over when only spectral bounds on the background
+are assumed. -/
+def BelowCeiling (ceiling : ℝ) (K : Matrix ι ι ℝ) : Prop :=
+  VarianceNonneg (ceiling • (1 : Matrix ι ι ℝ) - K)
+
+/-- **Imitation threshold for a spectral-ceiling class.** With `gap` the
+headroom `C₀ I - K` left by the ceiling, a polygenic bump of size `scale²` in
+direction `v` keeps the background inside its own class exactly when
+`scale² vᵀ gap⁻¹ v ≤ 1`. Above the threshold the inflated background leaves the
+class and the signal becomes, in principle, detectable. -/
+theorem belowCeiling_add_rankOne_iff
+    {ceiling : ℝ} {K : Matrix ι ι ℝ}
+    (hsymm : (ceiling • (1 : Matrix ι ι ℝ) - K).IsSymm)
+    (hgap : VarianceNonneg (ceiling • (1 : Matrix ι ι ℝ) - K))
+    {loading witness : ι → ℝ}
+    (hwitness : (ceiling • (1 : Matrix ι ι ℝ) - K).mulVec witness = loading)
+    (scale : ℝ) :
+    BelowCeiling ceiling (K + rankOneCovarianceBump scale loading) ↔
+      scale ^ 2 * quadForm (ceiling • (1 : Matrix ι ι ℝ) - K) witness ≤ 1 := by
+  have hrewrite :
+      ceiling • (1 : Matrix ι ι ℝ) - (K + rankOneCovarianceBump scale loading) =
+        (ceiling • (1 : Matrix ι ι ℝ) - K) - rankOneCovarianceBump scale loading := by
+    ext i j; simp [Matrix.sub_apply, Matrix.add_apply]; ring
+  unfold BelowCeiling
+  rw [hrewrite]
+  exact varianceNonneg_sub_rankOne_iff hsymm hgap hwitness scale
+
+/-- **The imitation theorem, in genotype form.** Below the secular threshold the
+covariance of the *signal-carrying* genotype matrix is itself a legal member of
+the background class: the polygenic signal has been absorbed into background
+structure, exactly, at the level of second moments. Nothing about the estimator
+matters, because the two experiments have the same covariance. -/
+theorem spiked_genotype_covariance_belowCeiling
+    {Ω : Type*} (E : ExpFunctional Ω)
+    (noise : Ω → ι → ℝ) (factor : Ω → ℝ)
+    (scale : ℝ) (loading witness : ι → ℝ) (ceiling : ℝ)
+    (hsymm : (ceiling • (1 : Matrix ι ι ℝ) - covarianceMatrix E noise).IsSymm)
+    (hgap : VarianceNonneg (ceiling • (1 : Matrix ι ι ℝ) - covarianceMatrix E noise))
+    (hwitness :
+      (ceiling • (1 : Matrix ι ι ℝ) - covarianceMatrix E noise).mulVec witness = loading)
+    (hfactor : covariance E factor factor = 1)
+    (hleft : ∀ i, covariance E (fun ω => noise ω i) factor = 0)
+    (hright : ∀ i, covariance E factor (fun ω => noise ω i) = 0)
+    (hthreshold :
+      scale ^ 2 *
+        quadForm (ceiling • (1 : Matrix ι ι ℝ) - covarianceMatrix E noise) witness ≤ 1) :
+    BelowCeiling ceiling
+      (covarianceMatrix E (addRankOneSignal noise factor scale loading)) := by
+  rw [covarianceMatrix_addRankOneSignal E noise factor scale loading hfactor hleft hright]
+  exact (belowCeiling_add_rankOne_iff hsymm hgap hwitness scale).mpr hthreshold
+
+end Headroom
+
 end
 
 end Calibrator

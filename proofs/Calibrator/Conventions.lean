@@ -573,6 +573,67 @@ theorem demoSteppingStoneFst_eq_scaled (d Ne m σ_sq : ℝ) :
   unfold demoSteppingStoneFst
   rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
 
+/-! ### The last seven
+
+Each carries the convention in its own shape: inside a `let`, in a recursion
+step, or under two nested decay factors. A relation reaches all of them. -/
+
+theorem tauAt_uses_timeScale (g : GenerationalPopGenParameters) (t : ℕ) :
+    GenerationalPopGenParameters.tauAt g t
+      = (t : ℝ) / coalescentTimeScale g.Ne := by
+  unfold GenerationalPopGenParameters.tauAt; rw [coalescentTimeScale_eq]
+
+theorem diversifyingPortability_uses_ploidy (r2_0 fst lam_turn : ℝ) :
+    diversifyingPortability r2_0 fst lam_turn
+      = r2_0 * (1 - ploidy * fst) * (Real.exp (-lam_turn * fst)) ^ 2 := by
+  unfold diversifyingPortability ploidy; ring_nf
+
+theorem alleleFreqDivergenceRate_eq_scaled (Ne mu m_rate : ℝ) :
+    alleleFreqDivergenceRate Ne mu m_rate
+      = 1 / (coalescentTimeScale Ne *
+          (1 + scaledMutationRate Ne mu + scaledMigrationRate Ne m_rate)) := by
+  unfold alleleFreqDivergenceRate
+  rw [coalescentTimeScale_eq, scaledMutationRate_eq_ploidy_form,
+    scaledMigrationRate_eq_ploidy_form]
+  unfold ploidy; ring_nf
+
+theorem excessLDAfterBottleneck_uses_timeScale (N_b N_r : ℝ) (t_b t_r : ℕ) :
+    excessLDAfterBottleneck N_b N_r t_b t_r
+      = (1 - (1 - 1 / coalescentTimeScale N_b) ^ t_b)
+        * (1 - 1 / coalescentTimeScale N_r) ^ t_r := by
+  unfold excessLDAfterBottleneck; rw [coalescentTimeScale_eq, coalescentTimeScale_eq]
+
+theorem fstMutationDriftTransient_uses_timeScale (θ t Ne : ℝ) :
+    fstMutationDriftTransient θ t Ne
+      = fstMutationDriftEquilibrium θ *
+          (1 - Real.exp (-(1 + θ) * t / coalescentTimeScale Ne)) := by
+  unfold fstMutationDriftTransient; rw [coalescentTimeScale_eq]
+
+theorem MutationDriftModelAssumptions_fstTransient_uses_timeScale
+    (m : MutationDriftModelAssumptions) :
+    MutationDriftModelAssumptions.fstTransient m
+      = m.fstEquilibrium *
+          (1 - Real.exp (-(1 + m.theta) * m.t / coalescentTimeScale m.Ne)) := by
+  unfold MutationDriftModelAssumptions.fstTransient
+  rw [coalescentTimeScale_eq]
+
+theorem hetMutationDriftRecurrence_step_uses_timeScale
+    (Ne mu H₀ : ℝ) (t : ℕ) :
+    hetMutationDriftRecurrence Ne mu H₀ (t + 1)
+      = (1 - 1 / coalescentTimeScale Ne) * hetMutationDriftRecurrence Ne mu H₀ t
+        + ploidy * mu * (1 - hetMutationDriftRecurrence Ne mu H₀ t) := by
+  unfold hetMutationDriftRecurrence ploidy
+  rw [coalescentTimeScale_eq]
+
+/-- Equilibrium heterozygosity under mutation-drift balance, `θ/(1 + θ)`,
+written out with its own four. This is the last inline restatement of the
+ploidy convention in the development. -/
+theorem hetEquilibrium_eq_scaled (Ne mu : ℝ) :
+    hetEquilibrium Ne mu
+      = scaledMutationRate Ne mu / (1 + scaledMutationRate Ne mu) := by
+  unfold hetEquilibrium
+  rw [scaledMutationRate_eq_ploidy_form]; unfold ploidy; ring_nf
+
 end EquilibriumAgreements
 
 end Calibrator
