@@ -1,4 +1,4 @@
-import Mathlib.Data.Matrix.Basic
+import Mathlib.LinearAlgebra.Matrix.DotProduct
 
 namespace Calibrator
 
