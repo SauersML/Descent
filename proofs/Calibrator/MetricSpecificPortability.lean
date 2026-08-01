@@ -333,10 +333,10 @@ theorem sourceLiabilityAUC_strictly_increases_with_r2
     (h_r2₁ : 0 < r2₁) (h_r2₂ : r2₂ < 1)
     (h_lt : r2₁ < r2₂)
     (hPhiStrict : StrictMono Phi) :
-    liabilityAUCFromExplainedR2 r2₁ <
-      liabilityAUCFromExplainedR2 r2₂ := by
+    equalVarianceGaussianAUCFromExplainedR2 r2₁ <
+      equalVarianceGaussianAUCFromExplainedR2 r2₂ := by
   have h_r2₂_pos : 0 < r2₂ := lt_trans h_r2₁ h_lt
-  exact liabilityAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+  exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
     ⟨le_of_lt h_r2₁, lt_trans h_lt h_r2₂⟩
     ⟨le_of_lt h_r2₂_pos, h_r2₂⟩
     h_lt
@@ -988,7 +988,7 @@ theorem metrics_both_degrade_under_drift
       sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
       targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart,
       sourceLiabilityAUCFromSourceWeights_eq_explainedR2_chart]
-    exact liabilityAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_brier :
       (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).brier <

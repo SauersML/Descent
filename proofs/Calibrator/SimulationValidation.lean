@@ -522,7 +522,7 @@ variance; no source-`R²` transport summary appears in the definition. -/
 theorem target_metric_profile_auc_uses_explicit_target_moments {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     (targetMetricProfileFromSourceWeights m).auc =
-      liabilityAUCFromVariances
+      equalVarianceGaussianAUCFromVariances
         (targetExplainedSignalVarianceFromSourceWeights m)
         (targetResidualVarianceFromSourceWeights m) := by
   simp [targetMetricProfileFromSourceWeights, targetLiabilityAUCFromSourceWeights]
@@ -533,7 +533,7 @@ derived chart identity, not the definition of transported AUC. -/
 theorem target_liability_auc_eq_explainedR2_chart {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     targetLiabilityAUCFromSourceWeights m =
-      liabilityAUCFromExplainedR2 (targetR2FromSourceWeights m) := by
+      equalVarianceGaussianAUCFromExplainedR2 (targetR2FromSourceWeights m) := by
   simpa using targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart m
 
 /-- When target LD among scored SNPs changes, the deployed liability-threshold
@@ -548,7 +548,7 @@ theorem target_ld_shift_changes_liability_auc
   rw [target_liability_auc_eq_explainedR2_chart,
     target_liability_auc_eq_explainedR2_chart,
     h_target_shift, h_target_base]
-  exact liabilityAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+  exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
     ⟨by norm_num, by norm_num⟩
     ⟨by norm_num, by norm_num⟩
     (by norm_num)

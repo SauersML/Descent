@@ -1,0 +1,165 @@
+"""Check the PGS portability definitions against an end-to-end simulation.
+
+Pipeline: msprime two-population split -> additive causal architecture ->
+phenotype in the source population -> marginal GWAS in the source -> clump+
+threshold PGS -> evaluate R^2 in source and target.  Sweeping the split time
+sweeps F_ST, which is the argument the Lean portability definitions take.
+
+Definitions under test:
+
+  PortabilityBounds.lean:223  stabilizingPortability r2_0 fst strength
+                                = r2_0 * (1 - 2*fst) * exp(-strength*fst)
+  PortabilityBounds.lean:246  diversifyingPortability r2_0 fst lam
+                                = r2_0 * (1 - 2*fst) * (exp(-lam*fst))^2
+  ScoreDistribution.lean:42   pgsVariance = sum beta^2 * 2p(1-p)
+                                (exact only under linkage equilibrium)
+  PortabilityDrift.lean:252   Expected_Abs_Shift = sqrt(Var_Delta_Mu)*sqrt(2/pi)
+"""
+from __future__ import annotations
+
+import json
+import os
+import sys
+from concurrent.futures import ProcessPoolExecutor
+
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+           "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+    os.environ[_v] = "1"
+
+import numpy as np  # noqa: E402
+
+NE = 10000
+MU = 1.25e-8
+RHO = 1e-8
+
+
+def lean_stabilizingPortability(r2_0, fst, strength):
+    """PortabilityBounds.lean:223"""
+    return r2_0 * (1 - 2 * fst) * np.exp(-strength * fst)
+
+
+def lean_pgsVariance(beta, p):
+    """ScoreDistribution.lean:42  `∑ i, β i ^ 2 * (2 * p i * (1 - p i))`"""
+    return float(np.sum(beta**2 * 2 * p * (1 - p)))
+
+
+def hudson_fst(c1, c2, n1, n2):
+    p1, p2 = c1 / n1, c2 / n2
+    num = (p1 - p2) ** 2 - p1 * (1 - p1) / (n1 - 1) - p2 * (1 - p2) / (n2 - 1)
+    den = p1 * (1 - p2) + p2 * (1 - p1)
+    ok = den > 0
+    return float(num[ok].sum() / den[ok].sum())
+
+
+def standardize(X):
+    p = X.mean(axis=0) / 2.0
+    keep = (p > 0.01) & (p < 0.99)
+    X = np.ascontiguousarray(X[:, keep])
+    p = p[keep]
+    Z = (X - 2 * p) / np.sqrt(2 * p * (1 - p))
+    return Z.astype(np.float32), p, keep
+
+
+def one_rep(args):
+    import msprime
+    split_t, n_dip, length, n_causal, h2, seed = args
+    dem = msprime.Demography()
+    for name in ("A", "B", "ANC"):
+        dem.add_population(name=name, initial_size=NE)
+    dem.add_population_split(time=split_t, derived=["A", "B"], ancestral="ANC")
+    ts = msprime.sim_ancestry(samples={"A": n_dip, "B": n_dip}, demography=dem,
+                              sequence_length=length, recombination_rate=RHO,
+                              random_seed=seed)
+    ts = msprime.sim_mutations(ts, rate=MU, random_seed=seed + 1)
+
+    G = ts.genotype_matrix()                      # sites x haploids
+    D = (G[:, 0::2] + G[:, 1::2]).T.astype(np.float64)   # individuals x sites
+    del G
+    A, B = D[:n_dip], D[n_dip:]
+
+    # F_ST from the data
+    fst = hudson_fst(A.sum(axis=0), B.sum(axis=0), 2 * n_dip, 2 * n_dip)
+
+    # common variants in the SOURCE population define the analysis panel
+    pA = A.mean(axis=0) / 2.0
+    panel = np.where((pA > 0.05) & (pA < 0.95))[0]
+    A, B = np.ascontiguousarray(A[:, panel]), np.ascontiguousarray(B[:, panel])
+
+    ZA, pA, keepA = standardize(A)
+    # standardize the target with the SOURCE allele frequencies, as a deployed
+    # score must (the model ships fixed centering/scaling)
+    pB_used = pA
+    Bk = B[:, keepA]
+    ZB = ((Bk - 2 * pB_used) / np.sqrt(2 * pB_used * (1 - pB_used))).astype(np.float32)
+
+    rng = np.random.default_rng(seed + 7)
+    M = ZA.shape[1]
+    if M < n_causal * 3:
+        return None
+    causal = rng.choice(M, size=n_causal, replace=False)
+    beta = rng.standard_normal(n_causal)
+
+    gA = ZA[:, causal] @ beta
+    gA_scaled = gA / gA.std()
+    eA = rng.standard_normal(n_dip)
+    y = np.sqrt(h2) * gA_scaled + np.sqrt(1 - h2) * eA
+    y -= y.mean()
+
+    gB = ZB[:, causal] @ beta
+    gB_scaled = gB / gA.std()          # same scaling as deployed
+    eB = rng.standard_normal(n_dip)
+    yB = np.sqrt(h2) * gB_scaled + np.sqrt(1 - h2) * eB
+    yB -= yB.mean()
+
+    # marginal GWAS in the source
+    n = n_dip
+    bhat = (ZA.T @ y) / n
+    se = np.sqrt((1 - bhat**2).clip(1e-12) / n)
+    z = bhat / se
+
+    out = dict(split_t=split_t, fst=fst, n_causal=n_causal, h2=h2,
+               n_snps=int(M), seed=seed)
+
+    # clump+threshold PGS at several z thresholds
+    for zt, tag in ((0.0, "all"), (2.0, "z2"), (4.0, "z4")):
+        sel = np.where(np.abs(z) > zt)[0]
+        if len(sel) < 5:
+            out[f"r2A_{tag}"] = out[f"r2B_{tag}"] = float("nan")
+            continue
+        w = bhat[sel]
+        sA = ZA[:, sel] @ w
+        sB = ZB[:, sel] @ w
+        out[f"r2A_{tag}"] = float(np.corrcoef(sA, y)[0, 1] ** 2)
+        out[f"r2B_{tag}"] = float(np.corrcoef(sB, yB)[0, 1] ** 2)
+        out[f"nsnp_{tag}"] = int(len(sel))
+
+    # pgsVariance: sum beta^2 2p(1-p) vs the actual variance of the score,
+    # using the causal weights on raw dosages (linkage equilibrium assumption)
+    braw = np.zeros(M)
+    braw[causal] = beta / np.sqrt(2 * pA[causal] * (1 - pA[causal]))
+    score_raw = A @ braw
+    out["pgsVar_actual"] = float(score_raw.var())
+    out["pgsVar_lean_LE"] = lean_pgsVariance(braw[causal], pA[causal])
+    return out
+
+
+def main():
+    n_dip = int(os.environ.get("NDIP", "3000"))
+    length = float(os.environ.get("LEN", "3e7"))
+    n_causal = int(os.environ.get("NCAUSAL", "300"))
+    reps = int(os.environ.get("REPS", "3"))
+    jobs = []
+    for split_t in (200, 500, 1000, 2000, 4000, 8000):
+        for r in range(reps):
+            jobs.append((split_t, n_dip, length, n_causal, 0.5,
+                         1000 + 37 * r + split_t))
+    with ProcessPoolExecutor(max_workers=int(os.environ.get("NPROC", "18"))) as ex:
+        out = [f.result() for f in [ex.submit(one_rep, a) for a in jobs]]
+    out = [o for o in out if o]
+    with open(sys.argv[1] if len(sys.argv) > 1 else "port.json", "w") as fh:
+        json.dump(out, fh)
+    print(f"wrote {len(out)} records")
+
+
+if __name__ == "__main__":
+    main()

@@ -821,7 +821,7 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
       sourceMetricProfileFromSourceWeightsAtPrevalence_auc,
       targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart,
       sourceLiabilityAUCFromSourceWeights_eq_explainedR2_chart]
-    exact liabilityAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
       (cal.targetIdentityCalibrationProfile).citl =
@@ -1112,7 +1112,7 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
             (targetScoreVarianceAtGeneration m.metric t *
               effectiveTargetOutcomeVarianceAtGeneration m.metric t)
       , auc :=
-          liabilityAUCFromVariances
+          equalVarianceGaussianAUCFromVariances
             ((targetPredictiveCovarianceAtGeneration m.metric t) ^ 2 /
               targetScoreVarianceAtGeneration m.metric t)
             (effectiveTargetOutcomeVarianceAtGeneration m.metric t -
@@ -1173,7 +1173,7 @@ theorem cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget
       sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
       targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart,
       sourceLiabilityAUCFromSourceWeights_eq_explainedR2_chart]
-    exact liabilityAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
       (cal.targetIdentityCalibrationProfile).citl =
