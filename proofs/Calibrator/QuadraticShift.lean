@@ -25,6 +25,7 @@ def quadraticRisk (outcomeSecondMoment : ℝ) (B : Matrix ι ι ℝ)
 def IsSymmetricBilinearMatrix (B : Matrix ι ι ℝ) : Prop :=
   ∀ x y : ι → ℝ, dot x (B.mulVec y) = dot y (B.mulVec x)
 
+omit [DecidableEq ι] in
 theorem matrix_mulVec_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ) :
     B.mulVec (fun i => x i - y i) =
       fun i => B.mulVec x i - B.mulVec y i := by
@@ -33,19 +34,23 @@ theorem matrix_mulVec_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ) :
   simp_rw [mul_sub]
   rw [Finset.sum_sub_distrib]
 
+omit [DecidableEq ι] in
 theorem matrix_mulVec_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
     B.mulVec (c • x) = c • B.mulVec x := by
   ext i
   simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_comm]
 
+omit [DecidableEq ι] in
 theorem dot_sub_right (x y z : ι → ℝ) :
     dot x (fun i => y i - z i) = dot x y - dot x z := by
   simp [dot, mul_sub, Finset.sum_sub_distrib]
 
+omit [DecidableEq ι] in
 theorem dot_smul_left (c : ℝ) (x y : ι → ℝ) :
     dot (c • x) y = c * dot x y := by
   simp [dot, Finset.mul_sum, mul_assoc]
 
+omit [DecidableEq ι] in
 theorem dot_smul_right (c : ℝ) (x y : ι → ℝ) :
     dot x (c • y) = c * dot x y := by
   simp [dot, Finset.mul_sum, mul_left_comm]
