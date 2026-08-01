@@ -1,56 +1,83 @@
-# Simulation checks of Calibrator population-genetics definitions
+# Simulation checks of Calibrator definitions
 
 `proofs/Calibrator` contains ~1500 theorems and no `sorry`s, so no theorem in it
 can be false. A wrong *result* can therefore enter only through a definition
-whose name claims a population-genetic meaning that its formula does not have.
-Downstream theorems are then machine-checked and still misleading — this is
-exactly how the factor-of-two in `demographicSpike` survived review.
+whose name claims a meaning that its formula does not have. Downstream theorems
+are then machine-checked and still misleading — this is how the factor-of-two in
+`demographicSpike` survived review.
 
 These scripts transcribe each Lean definition literally (the Lean file and line
 are quoted in each Python docstring) and compare it against a simulation of the
-quantity the *name* refers to. Ground truth is msprime for coalescent
-quantities and exact vectorized Wright-Fisher forward simulation for the
-two-locus LD and assortative-mating quantities.
+quantity the *name* refers to.
 
-## Running
+## Ground truth used
 
-```
-NPROC=24 python3 check_defs.py  all defs.json   && python3 report.py  defs.json
-NPROC=24 python3 check_defs2.py all defs2.json  && python3 report2.py defs2.json
-```
+| Tool | Used for |
+| --- | --- |
+| msprime | coalescent quantities: F_ST, island/stepping-stone models, admixture, singleton spectra |
+| tskit branch-mode statistics | divergence/diversity without mutational noise |
+| exact vectorized Wright–Fisher (this repo) | two-locus LD, assortative mating — forward-time phenomena the coalescent cannot represent |
+| exact numerical integration | truncated-normal and liability-threshold quantities |
+| Monte Carlo (10⁶–10⁷ draws) | cross-checks on every closed form above |
 
-Round 1 is ~1 minute on 24 cores; round 2 is a few minutes (branch-mode
-statistics over 20 Mb).
+A definition is only reported as falsified when the harness reproduces standard
+theory at a null or control point in the same run.
 
-## Findings
+## Falsified
 
-| Definition | Source | Verdict |
+| Definition | Source | Error |
 | --- | --- | --- |
-| `ldRetentionPerGen`, `ldAfterGenerations` | `LDDecayTheory.lean:38,67` | **Validated.** `(1-r)(1-1/2Ne)` tracks `E[D]/D₀` to 3–4 digits over N ∈ {500, 2000}, r ∈ {0, 10⁻³, 10⁻²}, t ≤ 100. It describes `E[D]`, not `E[D²]`, which decays about twice as fast. |
-| `singletonProportion` | `DemographicHistory.lean:289` | **Falsified.** See below. |
-| `demographicSpike` | `PCCorrectability/Threshold.lean` | **Falsified and fixed** (constant 2 → 4); see `../pc_correctability/`. |
+| `demographicSpike` | `PCCorrectability/Threshold.lean` | constant 2 should be 4; sharp threshold is `MF²n > 1`, not `> 4` (fixed) |
+| `singletonProportion` | `DemographicHistory.lean:289` | returns 0 at the no-growth null where truth is `1/H_{n-1}`; no sample-size argument; 40–70% off |
+| `truncationBias` | `PowerAnalysis.lean:215` | ~2×10⁵ too small at genome-wide significance; *increases* in β/SE where the true bias decreases; quoted one-sided formula contradicts the two-sided `isSelected` |
+| `winnersCurseInflation` | `PowerAnalysis.lean:389` | no threshold parameter; −73% to +23%, sign-flipping |
+| `approxPower` | `PowerAnalysis.lean:74` | no α; 99.3% vs 1.1% true power at GWAS significance |
+| `amInflationFactor` | `StratificationConfounding.lean:138` | `1/(1−r)` overstates by up to +82%; no h² argument though the truth depends strongly on h² |
+| `fstFromDrift` | `PopulationGeneticsFoundations.lean:283` | documented as split F_ST but is within-population heterozygosity loss; +15–28% biased upward in 11/12 cells |
+| `liabilityAUCFromSNR`, `liabilityAUCFromVariances`, `liabilityAUCFromExplainedR2` | `PortabilityDrift.lean:2544,2548,2578` | documented "Exact"; no prevalence argument; −3% to −26% |
+| `admixedFst` | `DemographicHistory.lean:173` | `(1−α)²` scaling ignores that F_ST is a ratio; −2% to −91%, worst at high α |
+| `partialOverlapR2` | `SampleOverlapBias.lean:54` | spurious `/n_gwas` makes overlap inflation ~2000× too small; truth is `(1−f)R²_out + f·R²_in` |
+| `bottleneckLDAmplification` | `LDDecayTheory.lean:192` | no recombination rate; rises to 1 instead of saturating at `1/(1+4Nc)`; up to 3.3× too high |
 
-### `singletonProportion` is wrong
+## Validated
 
-`1 - log N₀ / log N₁` fails in three independent ways:
+| Definition | Agreement |
+| --- | --- |
+| `ldRetentionPerGen`, `ldAfterGenerations` | 3–4 digits vs `E[D]/D₀` (describes `E[D]`, not `E[D²]`) |
+| `r2EstimatorVariance` | 0.99–1.01 of Monte Carlo variance for n ≥ 1000 |
+| `noncentralityParam` | 0.99–1.01 vs mean Wald χ² from simulated genotype regressions |
+| `amEquilibriumVariance` | −5%…+1% across r ∈ [0.1,0.5], h² ∈ [0.2,0.8] |
+| `coalFst` | unbiased; errors scatter both signs within a few SE |
+| `admixtureLD` | ≤0.2% |
+| `Expected_Abs_Shift` | ≤0.1% (correct half-normal mean) |
 
-1. **Wrong at the null.** With no growth (`N₀ = N₁`) it returns exactly 0, but a
-   constant-size neutral population has singleton proportion `1/H_{n-1}`:
-   simulation gives 0.187 (n=50) and 0.140 (n=200), matching the neutral
-   prediction 0.193 / 0.152. The harness reproduces standard theory at the
-   null, so the disagreement is in the definition.
-2. **No sample-size dependence.** The singleton proportion depends strongly on
-   sample size (0.427 vs 0.368 at N₁=10⁴; 0.693 vs 0.745 at N₁=10⁶), but the
-   formula cannot express that — it has no `n` argument.
-3. **Numerically off throughout**: 0.25 vs 0.43, 0.40 vs 0.61, 0.50 vs 0.69.
+## Recurring defect: the missing parameter
 
-Any theorem quantifying expansion through this definition inherits the error.
+Six of the eleven falsified definitions fail the same way — the quantity depends
+on a parameter the definition does not take, so no choice of constants can
+repair them:
+
+* `approxPower` — no significance threshold α
+* `winnersCurseInflation` — no selection threshold
+* `liabilityAUCFrom*` — no prevalence
+* `singletonProportion` — no sample size
+* `amInflationFactor` — no heritability
+* `bottleneckLDAmplification` — no recombination rate
+
+A cheap mechanical screen for the rest of the development: for each definition,
+ask which arguments the named quantity is known to depend on, and flag any that
+are absent from the signature. That is a static check — it needs no simulation.
 
 ## Harness caveats found the hard way
 
-Round 1's island-model check was **invalid**: it set msprime's *pairwise*
-migration rate, so total immigration per deme scaled with the number of demes
-and produced a spurious deme-count trend. `check_defs2.py` holds total
-immigration fixed. Round 1's split-Fst check used site statistics from a single
-2 Mb region at 2 replicates and was too noisy to call; round 2 uses tskit
-branch-mode divergence, which averages over mutational noise analytically.
+* Round 1's island-model check was **invalid**: it set msprime's *pairwise*
+  migration rate, so total immigration scaled with deme count and produced a
+  spurious deme-count trend. `check_defs2.py` holds total immigration fixed.
+* Round 1's split-F_ST check used site statistics from one 2 Mb region at 2
+  replicates — too noisy to call. Round 4a uses branch-mode statistics with 6
+  replicates and reports standard errors.
+* The first portability run measured source R² *in the GWAS sample itself*, so
+  the "portability ratio" confounded overfitting with portability.
+  `check_portability.py` now holds out half the source population.
+* `demoSteppingStoneFst` looked 30–123% wrong, but σ² is a free dispersal
+  parameter that was fixed to 1 arbitrarily. **Not reported as a finding.**
