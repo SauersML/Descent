@@ -132,10 +132,13 @@ theorem scalar_correction_completed_square
     (B : Matrix ι ι ℝ) (u v : ι → ℝ) (c : ℝ)
     (hsymmetric : IsSymmetricBilinearMatrix B)
     (hu : dot u (B.mulVec u) ≠ 0) :
-    quadraticCoefficientDistance B (c • u) v =
+    quadraticCoefficientDistance B (fun i => c * u i) v =
       scalarCorrectionFloor B u v +
         dot u (B.mulVec u) * (c - bestScalarCorrection B u v) ^ 2 := by
   have hcross : dot v (B.mulVec u) = dot u (B.mulVec v) := hsymmetric v u
+  have hscaled : (fun i => c * u i) = c • u := by
+    funext i
+    simp
   have hleftScaled : dot (c • u) (B.mulVec v) = c * dot u (B.mulVec v) :=
     dot_smul_left c u (B.mulVec v)
   have hrightScaled : dot v (c • B.mulVec u) = c * dot v (B.mulVec u) :=
@@ -149,6 +152,7 @@ theorem scalar_correction_completed_square
         rw [dot_smul_right]
       _ = c ^ 2 * dot u (B.mulVec u) := by ring
   unfold quadraticCoefficientDistance scalarCorrectionFloor bestScalarCorrection
+  rw [hscaled]
   rw [matrix_mulVec_sub, matrix_mulVec_smul, dot_sub_left,
     dot_sub_right, dot_sub_right, hleftScaled, hrightScaled, hbothScaled, hcross]
   field_simp [hu]
@@ -161,7 +165,7 @@ theorem best_scalar_correction_attains_floor
     (hsymmetric : IsSymmetricBilinearMatrix B)
     (hu : 0 < dot u (B.mulVec u)) :
     quadraticCoefficientDistance B
-        ((bestScalarCorrection B u v) • u : ι → ℝ) v =
+        (fun i => bestScalarCorrection B u v * u i) v =
         scalarCorrectionFloor B u v ∧
       ∀ c, scalarCorrectionFloor B u v ≤
         quadraticCoefficientDistance B (c • u) v := by

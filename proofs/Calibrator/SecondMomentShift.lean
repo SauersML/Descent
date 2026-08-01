@@ -81,7 +81,10 @@ theorem residual_score_identifies_projection_shift
     exact sub_eq_zero.mp hnormal
   rw [hcross]
   ext i
-  simp only [Matrix.mulVec, dotProduct]
+  change
+    (∑ j, secondMomentMatrix E X i j * v j) -
+        (∑ j, secondMomentMatrix E X i j * w j) =
+      ∑ j, secondMomentMatrix E X i j * (v j - w j)
   rw [← Finset.sum_sub_distrib]
   apply Finset.sum_congr rfl
   intro j _
