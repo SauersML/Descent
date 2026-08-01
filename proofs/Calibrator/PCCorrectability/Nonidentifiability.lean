@@ -48,7 +48,6 @@ theorem fst_does_not_determine_pc_correctability
   have hfour_below : 4 * F * mBelow = t := by
     unfold mBelow
     field_simp [hF.ne']
-    norm_num
   have hspike_below : demographicSpike n F mBelow < t := by
     unfold demographicSpike
     calc

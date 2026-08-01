@@ -126,12 +126,15 @@ theorem samplePCResidualAxisFraction_strictAntiOn_superthreshold
   have hdenominator₂ : 0 < spike₂ * (spike₂ + n / M) :=
     mul_pos hspike₂ (add_pos hspike₂ hratio)
   rw [div_lt_div_iff₀ hdenominator₂ hdenominator₁]
-  apply mul_lt_mul_of_pos_left _ hratio
   have hfactor :
       0 < (spike₂ - spike₁) *
         (spike₁ * spike₂ + spike₁ + spike₂ + n / M) := by
     apply mul_pos (sub_pos.mpr h₂)
     positivity
-  nlinarith
+  have hcore :
+      (spike₂ + 1) * (spike₁ * (spike₁ + n / M)) <
+        (spike₁ + 1) * (spike₂ * (spike₂ + n / M)) := by
+    nlinarith
+  simpa only [mul_assoc] using mul_lt_mul_of_pos_left hcore hratio
 
 end Calibrator
