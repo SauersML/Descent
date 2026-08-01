@@ -181,6 +181,33 @@ theorem constantDiagonal_class_is_rankOne_rigid
     K + rankOneCovarianceBump scale loading ∉ {A | ConstantDiagonal A} :=
   add_rankOneBump_not_constantDiagonal K scale loading i j hK hscale hloading
 
+/-- **Exact classification of stationary imitation.** For a nonzero signal,
+adding its covariance bump preserves shift invariance exactly when the loading's
+entire rank-one outer product is itself shift invariant. Thus the nuisance
+geometry can imitate precisely the loadings satisfying this algebraic rigidity
+condition, and no others. -/
+theorem add_rankOneBump_shiftInvariant_iff_of_ne
+    (shift : ι → ι) (K : Matrix ι ι ℝ)
+    (scale : ℝ) (loading : ι → ℝ)
+    (hK : ShiftInvariant shift K)
+    (hscale : scale ≠ 0) :
+    ShiftInvariant shift (K + rankOneCovarianceBump scale loading) ↔
+      ∀ i j, loading (shift i) * loading (shift j) = loading i * loading j := by
+  constructor
+  · intro hinvariant i j
+    have hbump := hinvariant i j
+    have hbase := hK i j
+    simp only [Matrix.add_apply, rankOneCovarianceBump] at hbump
+    have hscaled :
+        scale ^ 2 * (loading (shift i) * loading (shift j)) =
+          scale ^ 2 * (loading i * loading j) := by
+      nlinarith [hbump, hbase]
+    exact mul_left_cancel₀ (pow_ne_zero 2 hscale) hscaled
+  · intro hloading i j
+    simp only [Matrix.add_apply, rankOneCovarianceBump]
+    rw [hK i j]
+    nlinarith [hloading i j]
+
 /-- **Stationary rigidity.** A shift-invariant covariance cannot absorb a
 rank-one bump whose pairwise loading products are changed by the shift. Unlike
 the diagonal corollary above, this detects nonstationarity in off-diagonal
@@ -193,16 +220,8 @@ theorem add_rankOneBump_not_shiftInvariant
     (hloading :
       loading (shift i) * loading (shift j) ≠ loading i * loading j) :
     ¬ ShiftInvariant shift (K + rankOneCovarianceBump scale loading) := by
-  intro hinvariant
-  have hbump := hinvariant i j
-  have hbase := hK i j
-  simp only [Matrix.add_apply, rankOneCovarianceBump] at hbump
-  apply hloading
-  have hscaled :
-      scale ^ 2 * (loading (shift i) * loading (shift j)) =
-        scale ^ 2 * (loading i * loading j) := by
-    nlinarith [hbump, hbase]
-  exact mul_left_cancel₀ (pow_ne_zero 2 hscale) hscaled
+  rw [add_rankOneBump_shiftInvariant_iff_of_ne shift K scale loading hK hscale]
+  exact not_forall_of_exists_not ⟨i, not_forall_of_exists_not ⟨j, hloading⟩⟩
 
 /-- The whole shift-invariant nuisance class is therefore rigid against a
 generic rank-one covariance bump. -/
