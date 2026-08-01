@@ -10,6 +10,7 @@ import Calibrator.GeneticArchitectureDiscovery
 import Calibrator.LongitudinalPortability
 import Calibrator.LDDecayTheory
 import Calibrator.MetricSpecificPortability
+import Calibrator.StratificationConfounding
 
 namespace Calibrator
 
@@ -122,8 +123,9 @@ theorem hudsonFst_eq_varianceRatio (p₁ p₂ : ℝ)
         (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
   have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
   have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
-  unfold hudsonFst betweenSubgroupVariance meanAlleleFreq ploidy
+  unfold hudsonFst betweenSubgroupVariance ploidy
   field_simp
+  unfold meanAlleleFreq
   ring
 
 /-- **Cross-check: `simpleFst`, written separately in
@@ -132,7 +134,11 @@ theorem simpleFst_eq_hudsonFst (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
     simpleFst p₁ p₂ = hudsonFst p₁ p₂ := by
   rw [hudsonFst_eq_varianceRatio p₁ p₂ h]
-  unfold simpleFst betweenSubgroupVariance meanAlleleFreq
+  change (p₁ - p₂) ^ 2 /
+      (4 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) =
+    ((p₁ - p₂) ^ 2 / 4) /
+      (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
+  field_simp [h]
   ring
 
 /-- **The spike constant is forced, not chosen.**
@@ -316,6 +322,33 @@ them. -/
 theorem f1ScoreMetric_eq_f1Score (precision sens : ℝ) :
     f1ScoreMetric precision sens = f1Score precision sens := by
   unfold f1ScoreMetric f1Score; ring_nf
+
+/-! ### Three more quantities written out in two modules each
+
+Each pair below is the same expression under two names in two files, with no
+theorem relating them. These are the configurations in which a divergence goes
+unnoticed, which is how `amInflationFactor` and `fstFromDrift` survived. -/
+
+theorem effectiveSymmetricMigration_eq_effectiveMigration (m₁₂ m₂₁ : ℝ) :
+    effectiveSymmetricMigration m₁₂ m₂₁ = effectiveMigration m₁₂ m₂₁ := by
+  unfold effectiveSymmetricMigration effectiveMigration; ring_nf
+
+/-- The AUC map of the equal-variance Gaussian model appears in `DGP` under a
+name that does not mention a model at all. Both were falsified as
+liability-threshold AUCs and both are exact for the equal-variance model, so
+they must agree. -/
+theorem equalVarianceGaussianAUCFromVariances_eq_aucFromSignalVariance
+    (vSignal vNoise : ℝ) :
+    equalVarianceGaussianAUCFromVariances vSignal vNoise =
+      aucFromSignalVariance vSignal vNoise := by
+  unfold equalVarianceGaussianAUCFromVariances aucFromSignalVariance; ring_nf
+
+/-- Wright's compounding identity: one minus the product of retentions. It is
+written once for the two branches of a split and once for the two levels of
+the `F`-statistic hierarchy. -/
+theorem pairwiseFstFromBranches_eq_wrightFIT (a b : ℝ) :
+    pairwiseFstFromBranches a b = wrightFIT a b := by
+  unfold pairwiseFstFromBranches wrightFIT; ring_nf
 
 end EquilibriumAgreements
 
