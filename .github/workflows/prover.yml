@@ -7,6 +7,7 @@ on:
     branches: [ "main" ]
     paths:
       - 'proofs/**'
+      - 'map/correctability.rs'
       - 'lakefile.lean'
       - 'lean-toolchain'
       - '.github/workflows/prover.yml'
@@ -14,6 +15,7 @@ on:
     branches: [ "main" ]
     paths:
       - 'proofs/**'
+      - 'map/correctability.rs'
       - 'lakefile.lean'
       - 'lean-toolchain'
       - '.github/workflows/prover.yml'
@@ -102,6 +104,9 @@ jobs:
 
       - name: Structural guards
         run: python3 scripts/check-identifications.py
+
+      - name: Executable correctability contract
+        run: cargo test --manifest-path proofs/validation/correctability_calculator/Cargo.toml
 
       - name: Build project
         run: lake build Calibrator
