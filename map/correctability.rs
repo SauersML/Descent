@@ -3,6 +3,9 @@ use std::fmt;
 use std::fs;
 use std::path::Path;
 
+pub const CORRECTABILITY_FORMULA_CONTRACT: &str =
+    "rank_one_hudson_fst_independent_markers_v2";
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct MarkerClassInput {
     pub name: String,
@@ -49,7 +52,12 @@ pub struct MarkerClassReport {
     pub included_by_fitted_pcs: bool,
     pub minimum_pcs_to_include_axis: Option<usize>,
     pub no_pc_count_suffices: bool,
-    pub eigenvector_overlap_squared: f64,
+    /// Intrinsic sample/population eigenvector overlap in the rank-one model.
+    /// This does not depend on how many PCs the analyst chooses to include.
+    pub sample_pc_overlap_squared: f64,
+    /// Fraction of the target axis actually removed by the requested PC set.
+    /// This is zero when the relevant sample PC exists but is not included.
+    pub removed_axis_fraction: f64,
     pub residual_axis_fraction: f64,
     pub matched_weight: f64,
     pub information: f64,
@@ -60,12 +68,16 @@ pub struct MarkerClassReport {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct CorrectabilityReport {
+    pub formula_contract: &'static str,
     pub sample_size: f64,
     pub subgroup_size: f64,
     pub fitted_pcs: usize,
     pub effective_subgroup_size: f64,
     pub total_frequency_information: f64,
-    pub combined_signal_to_threshold_ratio: f64,
+    /// Optimal independent-class information index. This is not reported as a
+    /// combined BBP overlap because the single-spike overlap theorem does not
+    /// identify that quantity for heterogeneous marker classes.
+    pub combined_information_index: f64,
     pub any_single_class_detectable: bool,
     pub marker_classes: Vec<MarkerClassReport>,
 }
@@ -154,6 +166,11 @@ fn validate(input: &CorrectabilityInput) -> Result<(), CorrectabilityError> {
         }
         require_finite_positive(marker_class.effective_independent_markers, "effective_independent_markers")?;
         require_finite_nonnegative(marker_class.differentiation, "differentiation")?;
+        if marker_class.differentiation > 1.0 {
+            return Err(CorrectabilityError::InvalidInput(
+                "differentiation must be on the Hudson F_ST scale in [0, 1]".to_owned(),
+            ));
+        }
         if marker_class.theoretical_pc_rank == 0 {
             return Err(CorrectabilityError::InvalidInput(
                 "theoretical_pc_rank is one-based and must be positive".to_owned(),
@@ -216,12 +233,17 @@ pub fn calculate(input: &CorrectabilityInput) -> Result<CorrectabilityReport, Co
             let detectable_by_sample_pca = bbp_spike > bbp_threshold;
             let included_by_fitted_pcs =
                 detectable_by_sample_pca && class.theoretical_pc_rank <= input.fitted_pcs;
-            let eigenvector_overlap_squared = if included_by_fitted_pcs {
+            let sample_pc_overlap_squared = if detectable_by_sample_pca {
                 (1.0 - aspect_ratio / bbp_spike.powi(2)) / (1.0 + aspect_ratio / bbp_spike)
             } else {
                 0.0
             };
-            let residual_axis_fraction = 1.0 - eigenvector_overlap_squared;
+            let removed_axis_fraction = if included_by_fitted_pcs {
+                sample_pc_overlap_squared
+            } else {
+                0.0
+            };
+            let residual_axis_fraction = 1.0 - removed_axis_fraction;
             let matched_weight =
                 class.effective_independent_markers * class.differentiation / total_matched_weight;
             let information = class.effective_independent_markers * class.differentiation.powi(2);
@@ -257,7 +279,8 @@ pub fn calculate(input: &CorrectabilityInput) -> Result<CorrectabilityReport, Co
                 minimum_pcs_to_include_axis: detectable_by_sample_pca
                     .then_some(class.theoretical_pc_rank),
                 no_pc_count_suffices: !detectable_by_sample_pca,
-                eigenvector_overlap_squared,
+                sample_pc_overlap_squared,
+                removed_axis_fraction,
                 residual_axis_fraction,
                 matched_weight,
                 information,
@@ -269,12 +292,13 @@ pub fn calculate(input: &CorrectabilityInput) -> Result<CorrectabilityReport, Co
         .collect::<Vec<_>>();
 
     Ok(CorrectabilityReport {
+        formula_contract: CORRECTABILITY_FORMULA_CONTRACT,
         sample_size: input.sample_size,
         subgroup_size: input.subgroup_size,
         fitted_pcs: input.fitted_pcs,
         effective_subgroup_size,
         total_frequency_information,
-        combined_signal_to_threshold_ratio: 4.0
+        combined_information_index: 4.0
             * effective_subgroup_size
             * (total_frequency_information / input.sample_size).sqrt(),
         any_single_class_detectable: marker_classes
@@ -380,7 +404,9 @@ mod tests {
         assert!(!class.included_by_fitted_pcs);
         assert_eq!(class.minimum_pcs_to_include_axis, Some(3));
         assert!(!class.no_pc_count_suffices);
-        assert_eq!(class.eigenvector_overlap_squared, 0.0);
+        assert!(class.sample_pc_overlap_squared > 0.0);
+        assert_eq!(class.removed_axis_fraction, 0.0);
+        assert_eq!(class.residual_axis_fraction, 1.0);
 
         let mut included_input = input;
         included_input.fitted_pcs = 3;
@@ -389,7 +415,26 @@ mod tests {
         let expected_overlap = (1.0 - expected_aspect_ratio / expected_spike.powi(2))
             / (1.0 + expected_aspect_ratio / expected_spike);
 
-        assert!((included_class.eigenvector_overlap_squared - expected_overlap).abs() < 1e-15);
+        assert!((included_class.sample_pc_overlap_squared - expected_overlap).abs() < 1e-15);
+        assert!((included_class.removed_axis_fraction - expected_overlap).abs() < 1e-15);
         assert!((included_class.residual_axis_fraction - (1.0 - expected_overlap)).abs() < 1e-15);
+    }
+
+    #[test]
+    fn rejects_differentiation_outside_the_hudson_fst_scale() {
+        let input = CorrectabilityInput {
+            sample_size: 1_000.0,
+            subgroup_size: 100.0,
+            fitted_pcs: 1,
+            marker_classes: vec![MarkerClassInput {
+                name: "invalid".to_owned(),
+                effective_independent_markers: 10_000.0,
+                differentiation: 1.01,
+                theoretical_pc_rank: 1,
+            }],
+            application: None,
+        };
+
+        assert!(matches!(calculate(&input), Err(CorrectabilityError::InvalidInput(_))));
     }
 }
