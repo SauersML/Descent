@@ -691,113 +691,6 @@ theorem etaLiabilityThreshold_eq_gaussian_threshold {k : ℕ} (hN : GaussianNois
         (ProbabilityTheory.gaussianReal s (hN.sigma2 x)) (T x) := by
   exact liability_threshold_probit_real hN T x s
 
-structure PGSBasis (p : ℕ) where
-  B : Fin (p + 1) → (ℝ → ℝ)
-  B_zero_is_one : B 0 = fun _ => 1
-
-structure SplineBasis (n : ℕ) where
-  b : Fin n → (ℝ → ℝ)
-
-def linearPGSBasis : PGSBasis 1 where
-  B := fun m => if h : m = 0 then (fun _ => 1) else (fun p_val => p_val)
-  B_zero_is_one := by simp
-
-def polynomialSplineBasis (num_basis_funcs : ℕ) : SplineBasis num_basis_funcs where
-  b := fun i x => x ^ (i.val + 1)
-
-def SmoothFunction (n : ℕ) := Fin n → ℝ
-
-def evalSmooth {n : ℕ} [Fintype (Fin n)] (s : SplineBasis n) (coeffs : SmoothFunction n) (x : ℝ) : ℝ :=
-  ∑ i : Fin n, coeffs i * s.b i x
-
-inductive LinkFunction | logit | identity
-inductive DistributionFamily | Bernoulli | Gaussian
-
-structure PhenotypeInformedGAM (p k sp : ℕ) where
-  pgsBasis : PGSBasis p
-  pcSplineBasis : SplineBasis sp
-  γ₀₀ : ℝ
-  γₘ₀ : Fin p → ℝ
-  f₀ₗ : Fin k → SmoothFunction sp
-  fₘₗ : Fin p → Fin k → SmoothFunction sp
-  link : LinkFunction
-  dist : DistributionFamily
-
-noncomputable def linearPredictor {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] (model : PhenotypeInformedGAM p k sp) (pgs_val : ℝ) (pc_val : Fin k → ℝ) : ℝ :=
-  let baseline_effect := model.γ₀₀ + ∑ l, evalSmooth model.pcSplineBasis (model.f₀ₗ l) (pc_val l)
-  let pgs_related_effects := ∑ m : Fin p,
-    let pgs_basis_val := model.pgsBasis.B ⟨m.val + 1, by linarith [m.isLt]⟩ pgs_val
-    let pgs_coeff := model.γₘ₀ m + ∑ l, evalSmooth model.pcSplineBasis (model.fₘₗ m l) (pc_val l)
-    pgs_coeff * pgs_basis_val
-  baseline_effect + pgs_related_effects
-
-/-! ### Predictor Decomposition for p=1 Models
-
-For models with a single PGS basis function (p=1), we can decompose the linear predictor
-into `base(c) + slope(c) * p`, which is the natural form for L² projection / normal equations.
-This decomposition is the gateway to proving shrinkage_effect and raw_score_bias theorems. -/
-
-/-- The intercept term of the predictor (not multiplied by p).
-    For a p=1 model: base(c) = γ₀₀ + Σₗ evalSmooth(f₀ₗ[l], c[l]) -/
-noncomputable def predictorBase {k sp : ℕ} [Fintype (Fin k)] [Fintype (Fin sp)]
-    (model : PhenotypeInformedGAM 1 k sp) (pc_val : Fin k → ℝ) : ℝ :=
-  model.γ₀₀ + ∑ l, evalSmooth model.pcSplineBasis (model.f₀ₗ l) (pc_val l)
-
-/-- The slope coefficient in front of p.
-    For a p=1 model with linear PGS basis: slope(c) = γₘ₀[0] + Σₗ evalSmooth(fₘₗ[0,l], c[l]) -/
-noncomputable def predictorSlope {k sp : ℕ} [Fintype (Fin k)] [Fintype (Fin sp)]
-    (model : PhenotypeInformedGAM 1 k sp) (pc_val : Fin k → ℝ) : ℝ :=
-  model.γₘ₀ 0 + ∑ l, evalSmooth model.pcSplineBasis (model.fₘₗ 0 l) (pc_val l)
-
-/-- Helper: sum over Fin 1 collapses to the single term. -/
-lemma Fin1_sum_eq {α : Type*} [AddCommMonoid α] (f : Fin 1 → α) :
-    ∑ m : Fin 1, f m = f 0 := by
-  simp
-
-/-- **Predictor Decomposition Lemma**: For a p=1 model with linear PGS basis (B[1] = id),
-    the linear predictor decomposes as: linearPredictor(p, c) = base(c) + slope(c) * p.
-
-    This is the key lemma that reduces the GAM structure to a 2-parameter linear form in p,
-    enabling L² projection / normal equations analysis. -/
-theorem linearPredictor_decomp {k sp : ℕ} [Fintype (Fin k)] [Fintype (Fin sp)]
-    (model : PhenotypeInformedGAM 1 k sp)
-    (h_linear_basis : model.pgsBasis.B ⟨1, by norm_num⟩ = id) :
-  ∀ pgs_val pc_val, linearPredictor model pgs_val pc_val =
-    predictorBase model pc_val + predictorSlope model pc_val * pgs_val := by
-  classical
-  intro pgs_val pc_val
-  unfold linearPredictor predictorBase predictorSlope
-  -- Expand the `let`s and rewrite the `Fin 1` sum to the single `m = 0` term.
-  dsimp
-  have hsum :
-      (∑ m : Fin 1,
-          let pgs_basis_val := model.pgsBasis.B ⟨m.val + 1, by linarith [m.isLt]⟩ pgs_val
-          let pgs_coeff :=
-            model.γₘ₀ m + ∑ l, evalSmooth model.pcSplineBasis (model.fₘₗ m l) (pc_val l)
-          pgs_coeff * pgs_basis_val) =
-        (let m0 : Fin 1 := 0
-         let pgs_basis_val := model.pgsBasis.B ⟨m0.val + 1, by linarith [m0.isLt]⟩ pgs_val
-         let pgs_coeff :=
-           model.γₘ₀ m0 + ∑ l, evalSmooth model.pcSplineBasis (model.fₘₗ m0 l) (pc_val l)
-         pgs_coeff * pgs_basis_val) := by
-    simp
-  rw [hsum]
-  -- Simplify the remaining `let`s, then use the linear-basis hypothesis to rewrite the basis evaluation.
-  dsimp
-  have hB : model.pgsBasis.B (1 : Fin 2) pgs_val = pgs_val := by
-    have hidx1 : (1 : Fin 2) = ⟨1, by norm_num⟩ := by
-      ext; simp
-    rw [hidx1, h_linear_basis]
-    rfl
-  -- Replace `B[1] p` by `p`; the remaining goal is definitional.
-  rw [hB]
-
-
-noncomputable def predict {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] (model : PhenotypeInformedGAM p k sp) (pgs_val : ℝ) (pc_val : Fin k → ℝ) : ℝ :=
-  let η := linearPredictor model pgs_val pc_val
-  match model.link with
-  | .logit => 1 / (1 + Real.exp (-η))
-  | .identity => η
 /-- A data generating process parametrized by k principal components.
 
     `trueExpectation` stores E[Y|P,C], and `jointMeasure` stores the marginal
@@ -811,10 +704,9 @@ instance dgp_is_prob {k : ℕ} (dgp : DataGeneratingProcess k) : IsProbabilityMe
 
 /-! ### Predictor Abstraction and Proper Risk
 
-Working with predictors (functions ℝ → (Fin k → ℝ) → ℝ) rather than model records
-avoids identifiability/representation issues: two different `PhenotypeInformedGAM`
-parameterizations can yield the same predictor function, but risk depends only on
-the predictor. -/
+Working directly with predictors (functions ℝ → (Fin k → ℝ) → ℝ) avoids
+parameterization-dependent statements: risk depends on the predictor function,
+not on how it is represented. -/
 
 /-- A predictor is a function from (PGS, PCs) → ℝ. Bayes optimality and risk
     should be stated at this level to avoid representation dependence. -/
@@ -864,51 +756,6 @@ noncomputable def ConditionalMeanDGP.toDGP {k : ℕ} (cmdgp : ConditionalMeanDGP
         (f := fun x : ℝ × (Fin k → ℝ) × ℝ => (x.1, x.2.1))
         (by fun_prop))
 
-/-- Predicate for Bernoulli response data: all y values are in {0, 1}.
-    Required for well-posedness of logistic likelihood. Without this,
-    `pointwiseNLL .Bernoulli y η` is defined for arbitrary y ∈ ℝ, which
-    breaks convexity and proper scoring properties. -/
-def IsBinaryResponse {n : ℕ} (y : Fin n → ℝ) : Prop :=
-  ∀ i, y i = 0 ∨ y i = 1
-
-noncomputable def pointwiseNLL (dist : DistributionFamily) (y_obs : ℝ) (η : ℝ) : ℝ :=
-  match dist with
-  | .Gaussian => (y_obs - η)^2
-  | .Bernoulli => Real.log (1 + Real.exp η) - y_obs * η
-
-noncomputable def empiricalLoss {p k sp n : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] [Fintype (Fin n)] (model : PhenotypeInformedGAM p k sp) (data : RealizedData n k) (lambda : ℝ) : ℝ :=
-  (1 / (n : ℝ)) * (∑ i, pointwiseNLL model.dist (data.y i) (linearPredictor model (data.p i) (data.c i)))
-  + lambda * ((∑ l, ∑ j, (model.f₀ₗ l j)^2) + (∑ m, ∑ l, ∑ j, (model.fₘₗ m l j)^2))
-
-def IsIdentifiable {p k sp n : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] [Fintype (Fin n)] (m : PhenotypeInformedGAM p k sp) (data : RealizedData n k) : Prop :=
-  (∀ l, (∑ i, evalSmooth m.pcSplineBasis (m.f₀ₗ l) (data.c i l)) = 0) ∧
-  (∀ mIdx l, (∑ i, evalSmooth m.pcSplineBasis (m.fₘₗ mIdx l) (data.c i l)) = 0)
-
-
-structure IsRawScoreModel {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] (m : PhenotypeInformedGAM p k sp) : Prop where
-  f₀ₗ_zero : ∀ (l : Fin k) (s : Fin sp), m.f₀ₗ l s = 0
-  fₘₗ_zero : ∀ (i : Fin p) (l : Fin k) (s : Fin sp), m.fₘₗ i l s = 0
-
-structure IsNormalizedScoreModel {p k sp : ℕ} [Fintype (Fin p)] [Fintype (Fin k)] [Fintype (Fin sp)] (m : PhenotypeInformedGAM p k sp) : Prop where
-  fₘₗ_zero : ∀ (i : Fin p) (l : Fin k) (s : Fin sp), m.fₘₗ i l s = 0
-
-/-!
-`IsRawScoreModel` and `IsNormalizedScoreModel` are structural subclasses of the GAM
-parameterization. This foundational file intentionally does not expose finite-sample
-`argmin` selectors for these subclasses.
-
-An unconditional optimizer theorem would need to fix the basis functions, link, and
-distribution family, and then prove actual attainment of the corresponding objective.
-The previous oracle-style `Classical.choose` wrappers only repackaged an assumed
-existence hypothesis and have been removed rather than preserved as a fake fitting API.
-Exact finite-sample procedures are derived downstream in `DGP.lean`, where the design
-matrix, restricted parameterizations, and Weierstrass/coercivity machinery are all available.
-Concretely, the exact existence theorem is
-`gaussianPenalizedLoss_exists_min_of_full_rank`, and the downstream restricted fits are
-`fitRaw`, `fitRaw_minimizes_loss`, `fitNormalized`, and
-`fitNormalized_minimizes_loss`.
--/
-
 /-!
 =================================================================
 ## Part 2: Fully Formalized Theorems and Proofs
@@ -924,9 +771,8 @@ lemma gaussian_moments_integrable (n : ℕ) :
 
 /-! ### Gaussian Moment Facts
 
-These lemmas derive standard moments of N(0,1) from the integrability infrastructure.
-They let downstream proofs (raw_score_bias_general, optimal_coefficients_for_additive_dgp, etc.)
-avoid threading explicit moment hypotheses (hP0, hP2, hPC0) through every theorem statement. -/
+These lemmas derive standard moments of N(0,1) from the integrability
+infrastructure so population-level DGP proofs can use canonical moment facts. -/
 
 /-- E[P] = 0 under the standard Gaussian. -/
 theorem gaussian_mean_zero :
@@ -985,11 +831,24 @@ theorem independent_product_mean_zero {k : ℕ} [Fintype (Fin k)] (l : Fin k) :
     _ = (∫ p, p ∂μP) * (∫ c, c l ∂μC) := hPC
     _ = 0 := by simp [hC0]
 
+/-- Transpose-dot identity: `(A u) ⬝ v = u ⬝ (Aᵀ v)`. -/
+lemma sum_mulVec_mul_eq_sum_mul_transpose_mulVec {p : ℕ}
+    (A : Matrix (Fin p) (Fin p) ℝ) (u v : Fin p → ℝ) :
+    ∑ i, (A.mulVec u) i * v i = ∑ i, u i * ((Matrix.transpose A).mulVec v) i := by
+  simp only [Matrix.mulVec, dotProduct, Matrix.transpose_apply]
+  simp only [Finset.sum_mul, Finset.mul_sum]
+  simp only [← Finset.sum_product']
+  refine Finset.sum_equiv (Equiv.prodComm (Fin p) (Fin p)) ?_ ?_
+  · intro _
+    simp
+  · intro ⟨i, j⟩ _
+    simp only [Equiv.prodComm_apply, Prod.swap_prod_mk]
+    ring
+
 /-! ### Standardized a.e. → Pointwise Upgrade
 
-For continuous functions on a measure with full support (IsOpenPosMeasure),
-a.e. equality implies pointwise equality. This is used repeatedly in
-`shrinkage_effect`, `multiplicative_bias_correction`, etc. -/
+For continuous functions on a measure with full support (`IsOpenPosMeasure`),
+a.e. equality implies pointwise equality. -/
 
 /-- If two continuous functions agree a.e. on a measure with `IsOpenPosMeasure`,
     they agree everywhere. This replaces ad-hoc upgrades throughout the file. -/
