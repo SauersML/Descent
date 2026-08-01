@@ -382,6 +382,40 @@ theorem coalescentTau_uses_timeScale (t Ne : ℝ) :
     coalescentTau t Ne = t / coalescentTimeScale Ne := by
   unfold coalescentTau; rw [coalescentTimeScale_eq]
 
+/-! ### The scaled rates, written out on three parameter records
+
+`θ = 4 Nₑ μ` and `M = 4 Nₑ m` appear as fields of
+`GenerationalPopGenParameters` in `PortabilityDrift` and of
+`EvolutionaryParameters` in `DGP`, each spelling out its own four. -/
+
+theorem GenerationalPopGenParameters_theta_eq_ploidy_form
+    (g : GenerationalPopGenParameters) :
+    GenerationalPopGenParameters.theta g = 2 * ploidy * g.Ne * g.μ := by
+  unfold GenerationalPopGenParameters.theta ploidy; ring
+
+theorem GenerationalPopGenParameters_bigM_eq_ploidy_form
+    (g : GenerationalPopGenParameters) :
+    GenerationalPopGenParameters.bigM g = 2 * ploidy * g.Ne * g.mig := by
+  unfold GenerationalPopGenParameters.bigM ploidy; ring
+
+theorem EvolutionaryParameters_theta_eq_ploidy_form (p : EvolutionaryParameters) :
+    EvolutionaryParameters.theta p = 2 * ploidy * p.Ne * p.mu := by
+  unfold EvolutionaryParameters.theta ploidy; ring
+
+theorem EvolutionaryParameters_bigM_eq_ploidy_form (p : EvolutionaryParameters) :
+    EvolutionaryParameters.bigM p = 2 * ploidy * p.Ne * p.mig := by
+  unfold EvolutionaryParameters.bigM ploidy; ring
+
+/-- **The between-population variance of the mean breeding value is
+`ploidy · F_ST · V_A`.**
+
+Two independently drifting populations each contribute `F_ST V_A`, so the
+variance of their difference carries the ploidy factor. Writing `2` here is
+the same convention as everywhere else and is now tied to it. -/
+theorem Var_Delta_Mu_eq_ploidy_form (V_A fst : ℝ) :
+    Var_Delta_Mu V_A fst = ploidy * fst * V_A := by
+  unfold Var_Delta_Mu ploidy; ring
+
 end EquilibriumAgreements
 
 end Calibrator

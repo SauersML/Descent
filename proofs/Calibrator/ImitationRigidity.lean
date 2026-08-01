@@ -74,9 +74,13 @@ theorem covarianceMatrix_addRankOneSignal
     covarianceMatrix E (addRankOneSignal noise factor scale loading) =
       covarianceMatrix E noise + rankOneCovarianceBump scale loading := by
   ext i j
+  simp only [covarianceMatrix, addRankOneSignal, Matrix.add_apply,
+    rankOneCovarianceBump]
   change covariance E
       (fun ω => noise ω i + (scale * loading i) * factor ω)
-      (fun ω => noise ω j + (scale * loading j) * factor ω) = _
+      (fun ω => noise ω j + (scale * loading j) * factor ω) =
+    covariance E (fun ω => noise ω i) (fun ω => noise ω j) +
+      scale ^ 2 * loading i * loading j
   rw [covariance_add_left_exp, covariance_add_right, covariance_add_right]
   have hscaledLeft :
       covariance E (fun ω => (scale * loading i) * factor ω)
@@ -97,24 +101,25 @@ theorem covarianceMatrix_addRankOneSignal
     rw [covariance_smul_left_exp, covariance_smul_right, hfactor]
     ring
   rw [hscaledLeft, hscaledRight, hscaledBoth]
-  simp [covarianceMatrix, rankOneCovarianceBump]
+  ring
 
 /-- A covariance nuisance class can imitate a rank-one signal whenever it is
 closed under the corresponding covariance bump. -/
 theorem covariance_imitation_of_rankOne_closed
-    (class : Set (Matrix ι ι ℝ))
+    (nuisanceClass : Set (Matrix ι ι ℝ))
     (E : ExpFunctional Ω)
     (noise : Ω → ι → ℝ) (factor : Ω → ℝ)
     (scale : ℝ) (loading : ι → ℝ)
-    (hnoise : covarianceMatrix E noise ∈ class)
-    (hclosed : covarianceMatrix E noise + rankOneCovarianceBump scale loading ∈ class)
+    (hnoise : covarianceMatrix E noise ∈ nuisanceClass)
+    (hclosed : ∀ A ∈ nuisanceClass,
+      A + rankOneCovarianceBump scale loading ∈ nuisanceClass)
     (hfactor : covariance E factor factor = 1)
     (hleft : ∀ i, covariance E (fun ω => noise ω i) factor = 0)
     (hright : ∀ i, covariance E factor (fun ω => noise ω i) = 0) :
-    covarianceMatrix E (addRankOneSignal noise factor scale loading) ∈ class := by
+    covarianceMatrix E (addRankOneSignal noise factor scale loading) ∈ nuisanceClass := by
   rw [covarianceMatrix_addRankOneSignal E noise factor scale loading
     hfactor hleft hright]
-  exact hclosed
+  exact hclosed _ hnoise
 
 end CovarianceAlgebra
 
