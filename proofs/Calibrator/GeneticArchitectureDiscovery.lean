@@ -2,6 +2,7 @@ import Calibrator.Probability
 import Calibrator.BayesianPGSTheory
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Mathlib.LinearAlgebra.Matrix.DotProduct
 
 namespace Calibrator
 

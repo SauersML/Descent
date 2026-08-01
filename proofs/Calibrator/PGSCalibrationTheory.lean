@@ -2606,7 +2606,7 @@ theorem treatmentMargin_screeningClinicalPathway
         (model.benefit + model.harm) * (risk - model.threshold) := by
   unfold treatmentMargin qalyContributionAtTime
     screeningLongitudinalModel screeningClinicalPathway
-  rw [Fin1_sum_eq]
+  rw [Fin.sum_univ_one]
   dsimp
   norm_num
   nlinarith
@@ -2851,7 +2851,7 @@ theorem treatmentMargin_thresholdClinicalPathway
         model.benefit * (risk - model.threshold) := by
   unfold treatmentMargin qalyContributionAtTime
     thresholdLongitudinalModel thresholdClinicalPathway
-  rw [Fin1_sum_eq]
+  rw [Fin.sum_univ_one]
   simp [model.harm_eq_threshold]
   ring
 

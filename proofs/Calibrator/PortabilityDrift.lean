@@ -327,7 +327,9 @@ theorem expected_abs_mean_shift_bound_proved
   rw [h5]
   have h4_nonneg : (0 : ℝ) ≤ 4 := by norm_num
   rw [Real.sqrt_mul h4_nonneg]
-  norm_num
+  have hsqrt_four : Real.sqrt (4 : ℝ) = 2 := by
+    exact (Real.sqrt_eq_iff_eq_sq (by norm_num) (by norm_num)).2 (by norm_num)
+  rw [hsqrt_four]
 
 /-- Exact discrete Wright-Fisher mean-shift formula in source-standard-deviation units. -/
 theorem expected_abs_mean_shift_of_wrightFisher

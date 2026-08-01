@@ -1,64 +1,12 @@
-import Mathlib.Tactic
-import Mathlib.Analysis.Calculus.Deriv.Basic
-import Mathlib.Analysis.Calculus.Deriv.Mul
-import Mathlib.Analysis.Calculus.Deriv.Inv
-import Mathlib.Analysis.Convex.Strict
-import Mathlib.Analysis.Convex.Jensen
-import Mathlib.Analysis.Convex.SpecificFunctions.Basic
-import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Analysis.InnerProductSpace.Projection.Basic
-import Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional
-import Mathlib.Analysis.InnerProductSpace.Projection.Minimal
-import Mathlib.Analysis.InnerProductSpace.Projection.Reflection
-import Mathlib.Analysis.InnerProductSpace.Projection.Submodule
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import Mathlib.Data.Fin.Basic
-import Mathlib.LinearAlgebra.Matrix.Rank
-import Mathlib.LinearAlgebra.Matrix.PosDef
-import Mathlib.LinearAlgebra.Matrix.ToLin
-import Mathlib.Data.Matrix.Basic
-import Mathlib.LinearAlgebra.Matrix.DotProduct
-import Mathlib.Topology.MetricSpace.Lipschitz
-import Mathlib.Data.NNReal.Basic
-import Mathlib.Data.ENNReal.Basic
-import Mathlib.Topology.Compactness.Compact
-import Mathlib.Data.Matrix.Reflection
-import Mathlib.Data.Matrix.Mul
-import Mathlib.LinearAlgebra.Matrix.Trace
-import Mathlib.MeasureTheory.Function.L2Space
-import Mathlib.MeasureTheory.Constructions.Pi
-import Mathlib.MeasureTheory.Integral.Prod
-import Mathlib.Probability.ConditionalExpectation
-import Mathlib.Probability.ConditionalProbability
+import Init.Data.ULift
+import Init.GrindInstances.Nat
+import Init.GrindInstances.Ring.Fin
+import Init.GrindInstances.Ring.Nat
+import Init.Data.List.Nat.Pairwise
 import Mathlib.Probability.CDF
 import Mathlib.Probability.Distributions.Gaussian.Real
 import Mathlib.InformationTheory.KullbackLeibler.Basic
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
-
-import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
-import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-import Mathlib.Probability.Independence.Basic
-import Mathlib.Analysis.SpecialFunctions.ExpDeriv
-import Mathlib.Analysis.Convex.Deriv
-import Mathlib.Analysis.Convex.Integral
-import Mathlib.Probability.Independence.Integration
-import Mathlib.Probability.Moments.Variance
-import Mathlib.Probability.Notation
-import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
-import Mathlib.Topology.Algebra.Module.FiniteDimension
-import Mathlib.Topology.Order.Compact
-import Mathlib.Topology.MetricSpace.HausdorffDistance
-import Mathlib.Topology.MetricSpace.ProperSpace
-import Mathlib.MeasureTheory.Measure.OpenPos
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Algebra.Polynomial.Basic
-import Mathlib.Algebra.Polynomial.Eval.Defs
-import Mathlib.Algebra.Polynomial.Roots
-import Mathlib.Analysis.Calculus.Deriv.Add
-import Mathlib.Analysis.Calculus.Deriv.Pi
-import Mathlib.Analysis.Calculus.Deriv.Comp
-import Mathlib.Logic.Function.Basic
 
 open scoped InnerProductSpace
 open InnerProductSpace
@@ -67,6 +15,9 @@ open MeasureTheory
 open scoped ENNReal
 
 namespace Calibrator
+
+/-- Unit interval as a subtype, used for Bernoulli probabilities. -/
+abbrev UnitProb := Set.Icc (0 : ℝ) 1
 
 namespace InformationTheoryBridge
 
@@ -93,9 +44,6 @@ theorem bernoulliKL_eq_zero_iff (p q : NNReal) (hp : p ≤ 1) (hq : q ≤ 1)
   simpa [bernoulliKL] using
     (InformationTheory.klDiv_eq_zero_iff
       (μ := bernoulliMeasure p hp) (ν := bernoulliMeasure q hq))
-
-/-- Unit interval as a subtype, used for Bernoulli probabilities. -/
-abbrev UnitProb := Set.Icc (0 : ℝ) 1
 
 /-- Coercion helper from `[0,1]` real probabilities to `NNReal`. -/
 def unitProbToNNReal (p : UnitProb) : NNReal :=
