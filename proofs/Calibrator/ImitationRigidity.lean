@@ -27,7 +27,7 @@ identities and are intentionally not asserted here.
 
 section CovarianceAlgebra
 
-variable {Ω ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {Ω ι : Type*}
 
 theorem covariance_comm_exp (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
     covariance E X Y = covariance E Y X := by
@@ -74,13 +74,19 @@ theorem covarianceMatrix_addRankOneSignal
     covarianceMatrix E (addRankOneSignal noise factor scale loading) =
       covarianceMatrix E noise + rankOneCovarianceBump scale loading := by
   ext i j
-  simp only [covarianceMatrix, addRankOneSignal, Matrix.add_apply,
-    rankOneCovarianceBump]
-  change covariance E
-      (fun ω => noise ω i + (scale * loading i) * factor ω)
-      (fun ω => noise ω j + (scale * loading j) * factor ω) =
-    covariance E (fun ω => noise ω i) (fun ω => noise ω j) +
-      scale ^ 2 * loading i * loading j
+  simp only [covarianceMatrix, Matrix.of_apply, addRankOneSignal,
+    Matrix.add_apply, rankOneCovarianceBump]
+  have hi :
+      (fun ω => noise ω i + scale * factor ω * loading i) =
+        fun ω => noise ω i + (scale * loading i) * factor ω := by
+    funext ω
+    ring
+  have hj :
+      (fun ω => noise ω j + scale * factor ω * loading j) =
+        fun ω => noise ω j + (scale * loading j) * factor ω := by
+    funext ω
+    ring
+  rw [hi, hj]
   rw [covariance_add_left_exp, covariance_add_right, covariance_add_right]
   have hscaledLeft :
       covariance E (fun ω => (scale * loading i) * factor ω)
@@ -125,7 +131,7 @@ end CovarianceAlgebra
 
 section Rigidity
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type*}
 
 /-- Constant diagonal is a necessary condition for every Toeplitz covariance
 matrix and is enough to expose generic rank-one imitation failure. -/

@@ -11,6 +11,13 @@ import Calibrator.LongitudinalPortability
 import Calibrator.LDDecayTheory
 import Calibrator.MetricSpecificPortability
 import Calibrator.PhenomeWidePortability
+import Calibrator.ScoreDistribution
+import Calibrator.EpistasisAndNonAdditivity
+import Calibrator.VarianceComponents
+import Calibrator.PowerAnalysis
+import Calibrator.SelectionArchitecture
+import Calibrator.PolygenicAdaptation
+import Calibrator.AncestryCalibration
 import Calibrator.PortabilityDrift
 import Calibrator.StratificationConfounding
 
@@ -415,6 +422,48 @@ the same convention as everywhere else and is now tied to it. -/
 theorem Var_Delta_Mu_eq_ploidy_form (V_A fst : ℝ) :
     Var_Delta_Mu V_A fst = ploidy * fst * V_A := by
   unfold Var_Delta_Mu ploidy; ring
+
+/-! ### Genotype variance inside sums and products
+
+Eight further definitions carry `2 p (1 - p)` as a factor rather than as their
+whole body: score means and variances, Fisher's average effect, dominance and
+additive variance, two noncentrality parameters, and a pairwise epistatic
+variance. Each is now written against `hweGenotypeVariance`. -/
+
+theorem pgsVariance_uses_hwe {m : ℕ} (β p : Fin m → ℝ) :
+    pgsVariance β p = ∑ i, β i ^ 2 * hweGenotypeVariance (p i) := by
+  unfold pgsVariance hweGenotypeVariance ploidy; ring_nf
+
+theorem dominanceVariance_uses_hwe {m : ℕ} (p d : Fin m → ℝ) :
+    dominanceVariance p d = ∑ i, (hweGenotypeVariance (p i) * d i) ^ 2 := by
+  unfold dominanceVariance hweGenotypeVariance ploidy; ring_nf
+
+theorem additiveVariance_uses_hwe {m : ℕ} (p α : Fin m → ℝ) :
+    additiveVariance p α = ∑ i, hweGenotypeVariance (p i) * (α i) ^ 2 := by
+  unfold additiveVariance hweGenotypeVariance ploidy; ring_nf
+
+theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
+    noncentralityParam n beta p = n * beta ^ 2 * hweGenotypeVariance p := by
+  unfold noncentralityParam hweGenotypeVariance ploidy; ring_nf
+
+theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
+    gwasNCP n β p = n * β ^ 2 * hweGenotypeVariance p := by
+  unfold gwasNCP hweGenotypeVariance ploidy; ring_nf
+
+theorem effectiveSampleSize_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
+    effectiveSampleSize n p r2_ld = n * hweGenotypeVariance p * r2_ld := by
+  unfold effectiveSampleSize hweGenotypeVariance ploidy; ring_nf
+
+theorem epistaticVariancePairwise_uses_hwe (γ p₁ p₂ : ℝ) :
+    epistaticVariancePairwise γ p₁ p₂ =
+      γ ^ 2 * hweGenotypeVariance p₁ * hweGenotypeVariance p₂ := by
+  unfold epistaticVariancePairwise hweGenotypeVariance ploidy; ring_nf
+
+/-- The between-population drift variance of the score, carrying the same
+ploidy factor as `Var_Delta_Mu`. -/
+theorem expectedPGSDiffVariance_eq_ploidy_form (V_A fst : ℝ) :
+    expectedPGSDiffVariance V_A fst = ploidy * fst * V_A := by
+  unfold expectedPGSDiffVariance ploidy; ring
 
 end EquilibriumAgreements
 
