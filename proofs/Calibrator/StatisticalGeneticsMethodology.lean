@@ -275,7 +275,7 @@ theorem genetic_correlation_predicts_portability {m : ℕ} (hm : 0 < m)
     For well-powered GWAS: SE ∝ 1/√n, so larger n yields smaller SE. -/
 theorem ldsc_se_decreases_with_n
     (c : ℝ) (n₁ n₂ : ℝ)
- (h_c : 0 < c) (h_n₁ : 0 < n₁)
+    (h_c : 0 < c) (h_n₁ : 0 < n₁)
     (h_more : n₁ < n₂) :
     c / Real.sqrt n₂ < c / Real.sqrt n₁ := by
   apply div_lt_div_of_pos_left h_c
@@ -288,7 +288,7 @@ theorem ldsc_se_decreases_with_n
     yielding a smaller SE (fewer parameters → tighter estimate). -/
 theorem constrained_intercept_more_powerful
     (se_per_param : ℝ) (k : ℕ)
- (h_se : 0 < se_per_param) :
+    (h_se : 0 < se_per_param) :
     se_per_param * k < se_per_param * (k + 1) := by
   have : (k : ℝ) < (k : ℝ) + 1 := lt_add_one _
   exact mul_lt_mul_of_pos_left this h_se

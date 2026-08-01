@@ -105,7 +105,7 @@ theorem ld_decay_in_unit (r : ℝ) (t : ℕ)
 
 /-- LD decays faster with higher recombination rate. -/
 theorem ld_decay_faster_with_higher_r (r₁ r₂ : ℝ) (t : ℕ)
- (h_r₂ : r₂ ≤ 1)
+    (h_r₂ : r₂ ≤ 1)
     (h_lt : r₁ < r₂) (h_t : 0 < t) :
     ldDecayPerGeneration r₂ t < ldDecayPerGeneration r₁ t := by
   unfold ldDecayPerGeneration
@@ -159,7 +159,7 @@ theorem changing_env_variance_changes_h2
     PGS trained on modern cohorts may not apply to historical ones. -/
 theorem heritability_increases_when_env_equalizes
     (V_A V_E_before V_E_after : ℝ)
- (h_VA : 0 < V_A) (h_VE_a : 0 < V_E_after)
+    (h_VA : 0 < V_A) (h_VE_a : 0 < V_E_after)
     (h_reduced : V_E_after < V_E_before) :
     V_A / (V_A + V_E_before) < V_A / (V_A + V_E_after) := by
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
@@ -278,7 +278,7 @@ theorem age_r2_peaks_at_optimal (sourceSignalPeak age_peak width : ℝ) :
     so R²_old < R²_young. -/
 theorem education_cohort_effect
     (V_A V_E_old V_E_young : ℝ)
- (h_VA : 0 < V_A) (h_VE_young : 0 < V_E_young)
+    (h_VA : 0 < V_A) (h_VE_young : 0 < V_E_young)
     (h_more_barriers : V_E_young < V_E_old) :
     V_A / (V_A + V_E_old) ≠ V_A / (V_A + V_E_young) := by
   intro h

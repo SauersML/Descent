@@ -105,7 +105,7 @@ theorem spline_r2_upper_bound
     (var_signal var_noise var_total : ℝ)
     (h_total : var_total = var_signal + var_noise)
     (h_total_pos : 0 < var_total)
- (h_noise_nn : 0 ≤ var_noise) :
+    (h_noise_nn : 0 ≤ var_noise) :
     var_signal / var_total ≤ 1 := by
   rw [div_le_one h_total_pos, h_total]; linarith
 
@@ -126,7 +126,7 @@ section TransferLearning
 theorem more_target_data_reduces_mse
     (σ_sq gap : ℝ) (n₁ n₂ : ℕ)
     (h_σ : 0 < σ_sq) (h_gap : 0 < gap)
- (h_n₁ : 0 < n₁)
+    (h_n₁ : 0 < n₁)
     (h_more : n₁ < n₂) :
     gap * σ_sq / (n₂ : ℝ) < gap * σ_sq / (n₁ : ℝ) := by
   apply div_lt_div_of_pos_left (mul_pos h_gap h_σ)
@@ -147,8 +147,8 @@ theorem more_target_data_reduces_mse
     As n_T → ∞, σ²_extra/n_T → 0, so target-only wins (bias² > 0). -/
 theorem transfer_beats_target_only
     (σ_sq bias_sq σ_extra_sq : ℝ) (n_T : ℝ)
- (h_bias : 0 < bias_sq)
- (h_n : 0 < n_T)
+    (h_bias : 0 < bias_sq)
+    (h_n : 0 < n_T)
     (h_small_n : n_T < σ_extra_sq / bias_sq) :
     let mse_transfer := σ_sq / n_T + bias_sq
     let mse_target := (σ_sq + σ_extra_sq) / n_T
@@ -175,7 +175,7 @@ theorem transfer_beats_target_only
     in between. -/
 theorem critical_sample_size_exists
     (mse_transfer mse_target : ℝ → ℝ) (n_lo n_hi : ℝ)
- (h_range : n_lo < n_hi) :
+    (h_range : n_lo < n_hi) :
     -- There exists a crossover point
     ∃ n_crit : ℝ, n_lo < n_crit ∧ n_crit < n_hi := by
   exact ⟨(n_lo + n_hi) / 2, by linarith, by linarith⟩
@@ -210,7 +210,7 @@ section PhenotypeHeterogeneity
     If the phenotype Y is measured with different scales or thresholds
     across populations, R² comparisons are invalid. -/
 theorem measurement_invariance_violation
- (r2₁ : ℝ) (scale : ℝ)
+    (r2₁ : ℝ) (scale : ℝ)
     (h_scale : scale ≠ 1) (h_scale_pos : 0 < scale)
     (h_r2₁ : 0 < r2₁) (h_r2₁_le : r2₁ ≤ 1) :
     -- Scaling the phenotype changes R² when there's additive noise

@@ -1,4 +1,4 @@
-import Calibrator.PCCorrectability.Phase
+import Calibrator.PCCorrectability.Threshold
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Ring

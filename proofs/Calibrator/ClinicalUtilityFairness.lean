@@ -566,7 +566,7 @@ theorem treat_all_net_benefit (π t : ℝ) :
 theorem pgs_useful_when_exceeds_treat_all
     (sens spec π n t : ℝ)
     (hn : 0 < n) (ht : 0 < t) (ht1 : t < 1)
- (h_π : 0 < π)
+    (h_π : 0 < π)
     (h_sens : 0 < sens) (h_sens1 : sens ≤ 1)
     -- Positive Youden's index: classifier is better than random
     (h_youden : 1 < sens + spec)
@@ -767,7 +767,7 @@ theorem portability_violates_equalized_odds
 theorem fairness_accuracy_tradeoff
     (sens_B_unconstrained sens_B_fair fp_B n t : ℝ)
     (h_sens_drop : sens_B_fair < sens_B_unconstrained)
- (hn : 0 < n) :
+    (hn : 0 < n) :
     decisionCurveNetBenefit sens_B_fair fp_B n t <
       decisionCurveNetBenefit sens_B_unconstrained fp_B n t := by
   repeat rw [decisionCurveNetBenefit_eq_formula]
@@ -797,8 +797,8 @@ noncomputable def proportionCorrectlyClassified
 
 /-- PCC is bounded by max(prevalence, 1-prevalence) from below. -/
 theorem pcc_lower_bound (sens spec π : ℝ)
- (h_sens : 0 ≤ sens)
- (h_spec : 0 ≤ spec)
+    (h_sens : 0 ≤ sens)
+    (h_spec : 0 ≤ spec)
     (h_π : 0 < π) (h_π1 : π < 1) :
     0 ≤ proportionCorrectlyClassified sens spec π := by
   unfold proportionCorrectlyClassified
@@ -862,8 +862,8 @@ section CostEffectiveness
 theorem qaly_gain_positive_condition
     (sens spec π benefit harm : ℝ)
     (h_π : 0 < π) (h_π1 : π < 1)
- (h_sens : 0 < sens)
- (h_harm : 0 < harm)
+    (h_sens : 0 < sens)
+    (h_harm : 0 < harm)
     -- True positive probability exceeds false positive probability
     -- (equivalent to positive predictive value > 50%, or LR+ × prevalence odds > 1)
     (h_tp_dominates : (1 - spec) * (1 - π) < sens * π)
@@ -911,8 +911,8 @@ theorem lower_portability_lower_cost_effectiveness
     If the R² is too low, the QALY gain is negative (more harm than benefit). -/
 theorem cost_effectiveness_threshold_exists
     (π benefit harm : ℝ)
- (h_π1 : π < 1)
- (h_harm : 0 < harm) :
+    (h_π1 : π < 1)
+    (h_harm : 0 < harm) :
     -- At zero sensitivity, QALY gain is negative
     screeningQalyGain 0 0 π benefit harm < 0 := by
   rw [screeningQalyGain_eq_formula]
@@ -940,7 +940,7 @@ noncomputable def numberNeededToScreen (sens π : ℝ) : ℝ :=
 /-- NNS is higher in the target population. -/
 theorem nns_higher_in_target
     (sens_s sens_t π : ℝ)
- (h_sens_t : 0 < sens_t)
+    (h_sens_t : 0 < sens_t)
     (h_π : 0 < π)
     (h_lower : sens_t < sens_s) :
     numberNeededToScreen sens_s π < numberNeededToScreen sens_t π := by
@@ -1004,7 +1004,7 @@ section Recommendations
     then NNS strictly decreases in the target population. -/
 theorem diversification_is_optimal_equity_intervention
     (sens_t sens_t' π : ℝ)
- (h_sens_t : 0 < sens_t)
+    (h_sens_t : 0 < sens_t)
     (h_π : 0 < π)
     (h_improves : sens_t < sens_t') :
     numberNeededToScreen sens_t' π < numberNeededToScreen sens_t π := by

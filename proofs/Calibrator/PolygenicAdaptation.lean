@@ -217,7 +217,7 @@ theorem directional_selection_shifts_pgs
     ρ_stab = 1 - d/(1 + s·N) > 1 - d = ρ_neutral. -/
 theorem stabilizing_maintains_architecture
     (d s N : ℝ)
- (h_d_pos : 0 < d)
+    (h_d_pos : 0 < d)
     (h_s : 0 < s) (h_N : 0 < N) :
     let rho_neutral := 1 - d
     let rho_stab := 1 - d / (1 + s * N)
@@ -242,7 +242,7 @@ theorem stabilizing_maintains_architecture
     We derive the full ordering: ρ_fluctuating < ρ_neutral < ρ_stabilizing. -/
 theorem fluctuating_selection_worst_portability
     (d s f N : ℝ)
- (h_d_pos : 0 < d)
+    (h_d_pos : 0 < d)
     (h_s : 0 < s) (h_f : 0 < f) (h_N : 0 < N) :
     let rho_stab := 1 - d / (1 + s * N)
     let rho_neutral := 1 - d
@@ -292,7 +292,7 @@ section DetectingAdaptation
     After correction, the signal was greatly reduced. -/
 theorem stratification_reduces_adaptation_signal
     (signal_raw strat_bias : ℝ)
- (h_bias_pos : 0 < strat_bias)
+    (h_bias_pos : 0 < strat_bias)
     (h_partial : strat_bias < signal_raw) :
     -- After removing stratification bias, signal is reduced but not eliminated
     0 < signal_raw - strat_bias ∧ signal_raw - strat_bias < signal_raw := by

@@ -208,7 +208,7 @@ noncomputable def gwasHeritability (h2_true avg_r2_tag : ℝ) : ℝ :=
 
 /-- GWAS heritability ≤ true heritability. -/
 theorem gwas_h2_le_true (h2_true avg_r2_tag : ℝ)
- (h_h2 : 0 ≤ h2_true) (h_r2_le : avg_r2_tag ≤ 1) :
+    (h_h2 : 0 ≤ h2_true) (h_r2_le : avg_r2_tag ≤ 1) :
     gwasHeritability h2_true avg_r2_tag ≤ h2_true := by
   unfold gwasHeritability
   nlinarith
@@ -238,8 +238,8 @@ section AllelicHeterogeneity
     strictly reduces it. -/
 theorem allelic_heterogeneity_reduces_portability
     (r2_causal r2_tag ρ : ℝ)
- (h_causal : 0 < r2_causal) (h_tag : 0 < r2_tag)
- (h_ρ_lt : ρ < 1) :
+    (h_causal : 0 < r2_causal) (h_tag : 0 < r2_tag)
+    (h_ρ_lt : ρ < 1) :
     r2_causal * r2_tag * ρ < r2_causal * r2_tag := by
   have h_prod_pos : 0 < r2_causal * r2_tag := mul_pos h_causal h_tag
   calc r2_causal * r2_tag * ρ
@@ -447,7 +447,7 @@ theorem portabilityFromArchitecture_from_divergence
 /-- Portability is bounded by rg². -/
 theorem portability_bounded_by_rg_sq
     (rg fst tagging_ratio : ℝ)
- (h_fst : 0 ≤ fst)
+    (h_fst : 0 ≤ fst)
     (h_tag : 0 ≤ tagging_ratio) (h_tag_le : tagging_ratio ≤ 1) :
     portabilityFromArchitecture rg fst tagging_ratio ≤ rg^2 := by
   unfold portabilityFromArchitecture

@@ -40,7 +40,7 @@ section AdditiveApproximation
 theorem additive_dominates_genetic_variance
     (V_A V_D V_I V_G : ℝ)
     (h_A_large : V_A ≥ V_G / 2)
- (h_G : 0 < V_G) :
+    (h_G : 0 < V_G) :
     V_A / V_G ≥ 1 / 2 := by
   rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 2) h_G]
   linarith
@@ -298,7 +298,7 @@ theorem epistatic_kernel_improves_within_pop
 theorem regularization_controls_portability
     (k_NA n lam_weak lam_strong : ℝ)
     (h_k : 0 < k_NA) (h_n : 0 < n)
- (h_lw : 0 < lam_weak)
+    (h_lw : 0 < lam_weak)
     (h_stronger : lam_weak < lam_strong) :
     -- Stronger regularization → fewer effective parameters → less overfit
     k_NA / (1 + lam_strong) / n < k_NA / (1 + lam_weak) / n := by

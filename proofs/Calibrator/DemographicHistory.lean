@@ -34,7 +34,7 @@ theorem island_fst_in_unit_interval (Ne m : ℝ)
 
 /-- More migration → lower equilibrium F_ST. -/
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
- (hNe : 0 < Ne) (hm₁ : 0 < m₁)
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁)
     (h_more : m₁ < m₂) :
     demoIslandModelFst Ne m₂ < demoIslandModelFst Ne m₁ := by
   unfold demoIslandModelFst
@@ -425,7 +425,7 @@ noncomputable def founderFst (k : ℕ) (t : ℕ) : ℝ :=
 /-- Smaller founding population → larger F_ST (more drift). -/
 theorem smaller_founder_larger_fst
     (k₁ k₂ : ℕ) (t : ℕ)
- (hk₂ : 2 < k₂)
+    (hk₂ : 2 < k₂)
     (h_smaller : k₂ < k₁) (ht : 0 < t) :
     founderFst k₁ t < founderFst k₂ t := by
   unfold founderFst
@@ -514,7 +514,7 @@ theorem more_drift_higher_fst {T : ℕ}
 /-- Population with uniformly smaller Ne accumulates more drift. -/
 theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
     (Ne₁ Ne₂ : Fin T → ℝ)
- (hNe₂ : ∀ i, 0 < Ne₂ i)
+    (hNe₂ : ∀ i, 0 < Ne₂ i)
     (h_smaller : ∀ i, Ne₂ i < Ne₁ i) :
     cumulativeDrift Ne₁ < cumulativeDrift Ne₂ := by
   unfold cumulativeDrift
@@ -528,7 +528,7 @@ theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
 /-- A bottleneck generation contributes more to cumulative drift than a
     normal-sized generation. -/
 theorem bottleneck_gen_contributes_more_drift (Ne_b Ne_n : ℝ)
- (hb : 0 < Ne_b)
+    (hb : 0 < Ne_b)
     (h_bottle : Ne_b < Ne_n) :
     1 / (2 * Ne_n) < 1 / (2 * Ne_b) := by
   exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
@@ -593,7 +593,7 @@ noncomputable def excessDriftRate (Ne_b Ne_stable : ℝ) : ℝ :=
 
 /-- The excess drift rate is positive when Ne_b < Ne_stable. -/
 theorem excessDriftRate_pos (Ne_b Ne_stable : ℝ)
- (hNb : 0 < Ne_b) (h_bottle : Ne_b < Ne_stable) :
+    (hNb : 0 < Ne_b) (h_bottle : Ne_b < Ne_stable) :
     0 < excessDriftRate Ne_b Ne_stable := by
   unfold excessDriftRate driftLDCreationRate
   rw [sub_pos]
@@ -711,7 +711,7 @@ theorem bottleneck_excess_ld_pos (Ne_b Ne_stable : ℝ) (t_b : ℕ)
 theorem bottleneck_worsens_portability
     (Ne_b Ne_stable : ℝ) (t_b : ℕ)
     (hNb : 2 < Ne_b) (hNs : 2 < Ne_stable) (h_bottle : Ne_b < Ne_stable)
- (ht : 0 < t_b) (fst_mismatch : ℝ) :
+    (ht : 0 < t_b) (fst_mismatch : ℝ) :
     fst_mismatch < fst_mismatch + bottleneckExcessLD Ne_b Ne_stable t_b := by
   linarith [bottleneck_excess_ld_pos Ne_b Ne_stable t_b hNb hNs h_bottle ht]
 

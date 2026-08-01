@@ -133,7 +133,7 @@ theorem spectral_bound_tighter_for_sparse
     (frob_loss spectral_loss sparsity : ℝ)
     (h_spectral_nn : 0 ≤ spectral_loss)
     (h_spectral : spectral_loss ≤ frob_loss)
- (h_sparse_le : sparsity ≤ 1) :
+    (h_sparse_le : sparsity ≤ 1) :
     spectral_loss * sparsity ≤ frob_loss := by
   calc spectral_loss * sparsity
       ≤ spectral_loss * 1 := by nlinarith
@@ -205,7 +205,7 @@ theorem smaller_blocks_more_segments
 theorem total_portability_from_blocks
     (total_signal n₁ n₂ : ℝ)
     (h_signal : 0 < total_signal)
- (h_n₁ : 0 < n₁)
+    (h_n₁ : 0 < n₁)
     (h_more_blocks : n₁ < n₂) :
     total_signal / n₂ < total_signal / n₁ := by
   exact div_lt_div_of_pos_left h_signal h_n₁ (by linarith)
@@ -219,7 +219,7 @@ theorem total_portability_from_blocks
 theorem hotspot_density_affects_blocks
     (L n_hotspots_afr n_hotspots_eur : ℝ)
     (hL : 0 < L)
- (h_eur_pos : 0 < n_hotspots_eur)
+    (h_eur_pos : 0 < n_hotspots_eur)
     (h_more_hotspots : n_hotspots_eur < n_hotspots_afr) :
     -- AFR has smaller mean block size than EUR
     L / n_hotspots_afr < L / n_hotspots_eur :=
@@ -485,7 +485,7 @@ theorem admixture_ld_specializes_to_magnitude (alpha p_A p_B r : ℝ) (g : ℕ)
 /-- Admixture LD is nonneg. -/
 theorem admixture_ld_nonneg (alpha p_A p_B r : ℝ) (g : ℕ)
     (h_alpha : 0 ≤ alpha) (h_alpha_le : alpha ≤ 1)
- (h_r_le : r ≤ 1) :
+    (h_r_le : r ≤ 1) :
     0 ≤ admixtureLDMagnitude alpha p_A p_B r g := by
   unfold admixtureLDMagnitude
   apply mul_nonneg
@@ -494,7 +494,7 @@ theorem admixture_ld_nonneg (alpha p_A p_B r : ℝ) (g : ℕ)
 
 /-- Admixture LD is maximized at α = 0.5. -/
 theorem admixture_ld_max_at_half (alpha p_A p_B r : ℝ) (g : ℕ)
- (h_r_le : r ≤ 1) :
+    (h_r_le : r ≤ 1) :
     admixtureLDMagnitude alpha p_A p_B r g ≤
       admixtureLDMagnitude (1/2) p_A p_B r g := by
   unfold admixtureLDMagnitude
@@ -537,7 +537,7 @@ theorem admixture_ld_confounds_pgs
     (alpha p_A p_B r β γ : ℝ) (g : ℕ)
     (h_alpha : 0 < alpha) (h_alpha_lt : alpha < 1)
     (h_diff : p_A ≠ p_B)
- (h_r_lt : r < 1)
+    (h_r_lt : r < 1)
     (h_γ : γ ≠ 0) :
     -- The confounding bias = γ × D is nonzero
     let D := admixtureLDMagnitude alpha p_A p_B r g

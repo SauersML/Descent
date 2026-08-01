@@ -1,5 +1,7 @@
 import Calibrator.PCCorrectability.Diagnostic
 import Calibrator.PCCorrectability.Frequency
+import Calibrator.PCCorrectability.Geometry
+import Calibrator.PCCorrectability.Nonidentifiability
 import Calibrator.PCCorrectability.Overlap
 
 /-!

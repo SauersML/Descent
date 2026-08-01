@@ -72,7 +72,7 @@ theorem ld_dominant_pathway
 theorem selection_dominant_for_immune
     (V_A V_E fst ρ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
- (hfst_lt : fst < 1)
+    (hfst_lt : fst < 1)
     (hρ_pos : 0 < ρ) (hρ_lt : ρ < 1) :
     -- Immune R² (with effect turnover ρ) is strictly less than
     -- drift-only R² (no effect turnover), showing the selection

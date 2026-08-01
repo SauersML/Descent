@@ -312,7 +312,7 @@ theorem bottleneck_dominates_harmonic_mean (T : ℕ) (hT : 0 < T)
     Specifically: if Ne_b < Ne_normal, then 1/Ne_b > 1/Ne_normal,
     so the sum of reciprocals is dominated by bottleneck terms. -/
 theorem bottleneck_reciprocal_dominance (Ne_b Ne_normal : ℝ)
- (hb : 0 < Ne_b)
+    (hb : 0 < Ne_b)
     (h_bottle : Ne_b < Ne_normal) :
     1 / Ne_normal < 1 / Ne_b := by
   exact div_lt_div_of_pos_left one_pos hb h_bottle
@@ -352,7 +352,7 @@ theorem excess_ld_nonneg (N_b N_r : ℝ) (t_b t_r : ℕ)
 
 /-- More severe bottleneck (smaller N_b) produces more excess LD. -/
 theorem more_severe_bottleneck_more_ld (N₁ N₂ N_r : ℝ) (t_b t_r : ℕ)
- (hN₂ : 2 < N₂) (hNr : 2 < N_r)
+    (hN₂ : 2 < N₂) (hNr : 2 < N_r)
     (h_smaller : N₂ < N₁) (ht_b : 0 < t_b) :
     excessLDAfterBottleneck N₁ N_r t_b t_r <
       excessLDAfterBottleneck N₂ N_r t_b t_r := by
@@ -413,7 +413,7 @@ noncomputable def ldDecayRatePerGen (Ne : ℝ) : ℝ :=
 
 /-- Larger population has slower LD decay rate. -/
 theorem larger_pop_slower_ld_decay (Ne₁ Ne₂ : ℝ)
- (hNe₁ : 0 < Ne₁) (h_larger : Ne₁ < Ne₂) :
+    (hNe₁ : 0 < Ne₁) (h_larger : Ne₁ < Ne₂) :
     ldDecayRatePerGen Ne₂ < ldDecayRatePerGen Ne₁ := by
   unfold ldDecayRatePerGen
   exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
@@ -426,7 +426,7 @@ noncomputable def ldHalfLife (Ne : ℝ) : ℝ :=
 
 /-- LD half-life increases with population size. -/
 theorem ld_half_life_increasing (Ne₁ Ne₂ : ℝ)
- (h_larger : Ne₁ < Ne₂) :
+    (h_larger : Ne₁ < Ne₂) :
     ldHalfLife Ne₁ < ldHalfLife Ne₂ := by
   unfold ldHalfLife
   have hln2 : 0 < Real.log 2 := Real.log_pos (by norm_num)

@@ -117,7 +117,7 @@ theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :
 
 /-- Information loss from imperfect tagging: effective info ≤ full info. -/
 theorem information_loss_from_tagging (n : ℕ) (p r2_ld : ℝ)
- (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2_le : r2_ld ≤ 1) :
+    (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2_le : r2_ld ≤ 1) :
     effectiveFisherInformation n p r2_ld ≤ fisherInformation n (genotypeVarianceHWE p) := by
   unfold effectiveFisherInformation
   have h_info_nonneg : 0 ≤ fisherInformation n (genotypeVarianceHWE p) := by
@@ -403,7 +403,7 @@ section PowerPortabilityTradeoff
 theorem multi_ancestry_tradeoff
     (N c₁ c₂ α : ℝ)
     (h_N : 0 < N) (h_c₁ : 0 < c₁) (h_c₂ : 0 < c₂)
- (h_α_lt : α < 1) :
+    (h_α_lt : α < 1) :
     -- Multi-ancestry reduces best-pop R² (pop1 gets αN < N)
     α * N * c₁ < N * c₁ ∧
     -- Multi-ancestry creates nonzero worst-pop R² (pop2 gets (1-α)N > 0)
@@ -428,7 +428,7 @@ theorem multi_ancestry_tradeoff
     Proof: multiply out to get 2ρ² < 1 + ρ², i.e., ρ² < 1. -/
 theorem minimax_favors_multi_ancestry
     (R2 ρ_sq : ℝ)
- (h_R2 : 0 < R2) (h_ρ_lt : ρ_sq < 1) :
+    (h_R2 : 0 < R2) (h_ρ_lt : ρ_sq < 1) :
     -- single-ancestry worst-case < multi-ancestry worst-case
     ρ_sq * R2 < R2 * (1 + ρ_sq) / 2 := by
   -- Equivalent to: 2 * ρ_sq * R2 < R2 * (1 + ρ_sq)
@@ -490,7 +490,7 @@ theorem proportional_sums_to_total
     This proves that EUR-maximizing and equity-maximizing allocations
     diverge whenever marginal returns differ. -/
 theorem optimal_depends_on_objective
- (Δ c₁ c₂ : ℝ)
+    (Δ c₁ c₂ : ℝ)
     (h_Δ : 0 < Δ) (_h_c₁ : 0 < c₁) (_h_c₂ : 0 < c₂)
     (h_c₂_gt : c₁ < c₂) :
     -- Rebalancing toward pop2 increases pop2 R² more than it decreases pop1 R²

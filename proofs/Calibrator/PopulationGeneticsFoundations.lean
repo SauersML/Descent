@@ -108,7 +108,7 @@ theorem expected_het_in_unit (θ : ℝ) (h_θ : 0 ≤ θ) :
 /-- **Heterozygosity increases with effective population size.**
     Larger Ne → more mutations retained → higher diversity. -/
 theorem het_increases_with_ne
- (θ₁ θ₂ : ℝ) (h₁ : 0 < θ₁) (h_more : θ₁ < θ₂) :
+    (θ₁ θ₂ : ℝ) (h₁ : 0 < θ₁) (h_more : θ₁ < θ₂) :
     expectedHeterozygosity θ₁ < expectedHeterozygosity θ₂ := by
   unfold expectedHeterozygosity
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
@@ -130,7 +130,7 @@ theorem coal_fst_nonneg (t Ne : ℝ) (h_t : 0 ≤ t) (h_Ne : 0 < Ne) :
 /-- Coalescent Fst increases with separation time. -/
 theorem coal_fst_increases_with_time
     (Ne : ℝ) (t₁ t₂ : ℝ) (h_Ne : 0 < Ne)
- (h_t₁ : 0 ≤ t₁) (h_more : t₁ < t₂) :
+    (h_t₁ : 0 ≤ t₁) (h_more : t₁ < t₂) :
     coalFst t₁ Ne < coalFst t₂ Ne := by
   unfold coalFst
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
@@ -138,7 +138,7 @@ theorem coal_fst_increases_with_time
 
 /-- Coalescent Fst approaches 1 as t → ∞ (relative to Ne). -/
 theorem coal_fst_approaches_one
- (Ne t : ℝ) (h_Ne : 0 < Ne)
+    (Ne t : ℝ) (h_Ne : 0 < Ne)
     (h_large : 100 * Ne < t) :
     49 / 50 < coalFst t Ne := by
   unfold coalFst
@@ -164,7 +164,7 @@ section EffectivePopulationSize
 theorem ne_affects_pgs_variance
     (V_A t Ne₁ Ne₂ : ℝ)
     (h_VA : 0 < V_A) (h_t : 0 < t)
- (h_Ne₁ : 0 < Ne₁)
+    (h_Ne₁ : 0 < Ne₁)
     (h_smaller : Ne₁ < Ne₂) :
     V_A * t / (2 * Ne₂) < V_A * t / (2 * Ne₁) := by
   exact div_lt_div_of_pos_left (mul_pos h_VA h_t) (by positivity) (by nlinarith)
@@ -203,7 +203,7 @@ theorem sel_mig_eq_in_unit (s m : ℝ)
     When s >> m, differentiation is maintained (Fst_locus → 1).
     This creates population-specific genetic architecture. -/
 theorem strong_selection_high_differentiation
- (s m : ℝ) (h_m : 0 < m) (h_strong : 10 * m < s) :
+    (s m : ℝ) (h_m : 0 < m) (h_strong : 10 * m < s) :
     9 / 10 < selectionMigrationEquilibrium s m := by
   unfold selectionMigrationEquilibrium
   rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 10) (by linarith)]
@@ -213,7 +213,7 @@ theorem strong_selection_high_differentiation
     When s << m, allele frequencies homogenize (Fst_locus → 0).
     These loci contribute to portable genetic architecture. -/
 theorem weak_selection_low_differentiation
- (s m : ℝ) (h_s : 0 < s) (h_weak : s < (1 / 10) * m) :
+    (s m : ℝ) (h_s : 0 < s) (h_weak : s < (1 / 10) * m) :
     selectionMigrationEquilibrium s m < 1 / 10 := by
   unfold selectionMigrationEquilibrium
   rw [div_lt_iff₀ (by linarith)]
@@ -243,7 +243,7 @@ theorem genome_wide_fst_neutral_dominated
     (h_gw : fst_gw = (1 - f_sel) * fst_neutral + f_sel * fst_selected)
     (h_small : f_sel < 1 / 100)
     (h_pos : 0 < f_sel)
- (h_neutral_nn : 0 ≤ fst_neutral)
+    (h_neutral_nn : 0 ≤ fst_neutral)
     (h_sel_higher : fst_neutral < fst_selected) :
     |fst_gw - fst_neutral| < (1 / 100) * fst_selected := by
   rw [h_gw]
@@ -367,7 +367,7 @@ theorem fstMutationDriftEquilibrium_strictAnti (a b : ℝ)
 
 /-- Equilibrium Fst decreases when Ne increases (with μ fixed). -/
 theorem fstEquilibrium_decreases_with_Ne (μ Ne₁ Ne₂ : ℝ)
- (hμ : 0 < μ) (hNe₁ : 0 < Ne₁)
+    (hμ : 0 < μ) (hNe₁ : 0 < Ne₁)
     (h_more : Ne₁ < Ne₂) :
     fstMutationDriftEquilibrium (scaledMutationRate Ne₂ μ) <
       fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ) := by
@@ -379,7 +379,7 @@ theorem fstEquilibrium_decreases_with_Ne (μ Ne₁ Ne₂ : ℝ)
 
 /-- Equilibrium Fst decreases when μ increases (with Ne fixed). -/
 theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
- (hNe : 0 < Ne) (hμ₁ : 0 < μ₁)
+    (hNe : 0 < Ne) (hμ₁ : 0 < μ₁)
     (h_more : μ₁ < μ₂) :
     fstMutationDriftEquilibrium (scaledMutationRate Ne μ₂) <
       fstMutationDriftEquilibrium (scaledMutationRate Ne μ₁) := by
@@ -460,7 +460,7 @@ theorem fstEquilibrium_eq_one_minus_het (θ : ℝ) (hθ : 0 ≤ θ) :
     Mutation introduces new variants on timescale ~1/μ generations.
     When θ > 2, mutation acts faster than drift, so 1/μ < 2Ne. -/
 theorem mutation_timescale_exceeds_drift (Ne μ : ℝ)
- (hμ : 0 < μ)
+    (hμ : 0 < μ)
     (hθ_large : 2 < scaledMutationRate Ne μ) :
     1 / μ < 2 * Ne := by
   unfold scaledMutationRate at hθ_large
@@ -503,7 +503,7 @@ theorem fstMutationDriftTransient_nonneg (θ t Ne : ℝ)
 
 /-- Transient Fst is bounded above by the equilibrium Fst. -/
 theorem fstMutationDriftTransient_le_equilibrium (θ t Ne : ℝ)
- (hθ : 0 ≤ θ) :
+    (hθ : 0 ≤ θ) :
     fstMutationDriftTransient θ t Ne ≤ fstMutationDriftEquilibrium θ := by
   unfold fstMutationDriftTransient
   have hfeq_pos : 0 < fstMutationDriftEquilibrium θ :=
@@ -518,7 +518,7 @@ theorem fstMutationDriftTransient_le_equilibrium (θ t Ne : ℝ)
 
 /-- Transient Fst increases with time toward equilibrium. -/
 theorem fstMutationDriftTransient_increases_with_time (θ Ne t₁ t₂ : ℝ)
- (hθ : 0 < θ) (hNe : 0 < Ne)
+    (hθ : 0 < θ) (hNe : 0 < Ne)
     (h_more : t₁ < t₂) :
     fstMutationDriftTransient θ t₁ Ne < fstMutationDriftTransient θ t₂ Ne := by
   unfold fstMutationDriftTransient
@@ -564,7 +564,7 @@ theorem expectedNewMutations_nonneg (θ t : ℝ) (hθ : 0 ≤ θ) (ht : 0 ≤ t)
 
 /-- More mutations accumulate with larger θ (fixed t). -/
 theorem expectedNewMutations_increases_with_theta (t θ₁ θ₂ : ℝ)
- (ht : 0 < t) (h_more : θ₁ < θ₂) :
+    (ht : 0 < t) (h_more : θ₁ < θ₂) :
     expectedNewMutations θ₁ t < expectedNewMutations θ₂ t := by
   unfold expectedNewMutations
   nlinarith
@@ -687,7 +687,7 @@ theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ)
 
 /-- **When 4Nm ≫ 1, Fst ≈ 0.** Specifically, 4Nm > k implies Fst < 1/(1+k). -/
 theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
- (hk : 0 < k)
+    (hk : 0 < k)
     (h_large : k < 4 * Ne * m) :
     islandModelFst Ne m < 1 / (1 + k) := by
   unfold islandModelFst
@@ -760,7 +760,7 @@ theorem continuousSteppingStoneFst_nonneg (L d : ℝ)
 
 /-- **Stepping-stone Fst is strictly increasing in distance.** -/
 theorem continuousSteppingStoneFst_increases (L d₁ d₂ : ℝ)
- (hL : 0 < L) (h_more : d₁ < d₂) :
+    (hL : 0 < L) (h_more : d₁ < d₂) :
     continuousSteppingStoneFst L d₁ < continuousSteppingStoneFst L d₂ := by
   unfold continuousSteppingStoneFst
   have h_exp_lt : Real.exp (-(d₂ / L)) < Real.exp (-(d₁ / L)) := by
@@ -773,7 +773,7 @@ theorem continuousSteppingStoneFst_increases (L d₁ d₂ : ℝ)
     More migration increases the characteristic length, which means at any
     fixed distance d, Fst is lower (i.e., increasing L decreases Fst). -/
 theorem continuousSteppingStoneFst_decreases_with_L (L₁ L₂ d : ℝ)
- (hL₁ : 0 < L₁) (hd : 0 < d) (h_more : L₁ < L₂) :
+    (hL₁ : 0 < L₁) (hd : 0 < d) (h_more : L₁ < L₂) :
     continuousSteppingStoneFst L₂ d < continuousSteppingStoneFst L₁ d := by
   unfold continuousSteppingStoneFst
   have h_ratio_lt : d / L₂ < d / L₁ := by
@@ -840,7 +840,7 @@ theorem effectiveMigration_symmetric (m : ℝ) :
     The population receiving more migrants has lower Fst (from its perspective).
     We prove the Fst difference is proportional to the migration asymmetry. -/
 theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
- (hNe : 0 < Ne) (hm₂₁ : 0 < m₂₁)
+    (hNe : 0 < Ne) (hm₂₁ : 0 < m₂₁)
     (h_asym : m₂₁ < m₁₂) :
     islandModelFst Ne m₁₂ < islandModelFst Ne m₂₁ := by
   exact islandModelFst_strictAnti_m Ne m₂₁ m₁₂ hNe (le_of_lt hm₂₁) h_asym
@@ -870,7 +870,7 @@ theorem ldCorrelationFromMigration_le_one (M : ℝ) (hM : 0 ≤ M) :
 
 /-- **LD correlation increases with migration rate.** -/
 theorem ldCorrelationFromMigration_increases (M₁ M₂ : ℝ)
- (hM₁ : 0 < M₁) (h_more : M₁ < M₂) :
+    (hM₁ : 0 < M₁) (hM₂ : 0 < M₂) (h_more : M₁ < M₂) :
     ldCorrelationFromMigration M₁ < ldCorrelationFromMigration M₂ := by
   unfold ldCorrelationFromMigration
   have h1M₁ : 0 < 1 + M₁ := by linarith

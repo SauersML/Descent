@@ -147,7 +147,7 @@ theorem frequency_change_affects_va
     If Ve differs, h² differs even with identical genetic architecture. -/
 theorem env_variance_changes_h2
     (V_A Ve₁ Ve₂ : ℝ)
- (hVA : 0 < V_A) (hVe₁ : 0 < Ve₁)
+    (hVA : 0 < V_A) (hVe₁ : 0 < Ve₁)
     (h_diff : Ve₁ < Ve₂) :
     V_A / (V_A + Ve₂) < V_A / (V_A + Ve₁) := by
   exact div_lt_div_of_pos_left hVA (by linarith) (by linarith)
@@ -188,7 +188,7 @@ section PGSCeiling
 theorem pgs_r2_ceiling_from_h2
     (h2_snp f : ℝ)
     (h_h2 : 0 < h2_snp)
- (h_f_le : f ≤ 1) :
+    (h_f_le : f ≤ 1) :
     h2_snp * f ≤ h2_snp := by
   exact mul_le_of_le_one_right (le_of_lt h_h2) h_f_le
 
@@ -198,8 +198,8 @@ theorem pgs_r2_ceiling_from_h2
     With finite sample size, not all SNPs are discovered. -/
 theorem pgs_r2_ceiling_from_gwas_power
     (h2_snp power_fraction : ℝ)
- (h_h2 : 0 < h2_snp)
- (h_power_le : power_fraction ≤ 1) :
+    (h_h2 : 0 < h2_snp)
+    (h_power_le : power_fraction ≤ 1) :
     h2_snp * power_fraction ≤ h2_snp := by
   exact mul_le_of_le_one_right (le_of_lt h_h2) h_power_le
 
@@ -207,7 +207,7 @@ theorem pgs_r2_ceiling_from_gwas_power
     R²_PGS_target ≤ h²_SNP × power_fraction × portability_ratio. -/
 theorem portability_reduces_ceiling
     (h2_snp power_frac port_ratio : ℝ)
- (h_h2 : 0 < h2_snp) (h_port : 0 < port_ratio)
+    (h_h2 : 0 < h2_snp) (h_port : 0 < port_ratio)
     (h_power_le : power_frac ≤ 1) (h_port_le : port_ratio ≤ 1) :
     h2_snp * power_frac * port_ratio ≤ h2_snp := by
   calc h2_snp * power_frac * port_ratio
@@ -226,7 +226,7 @@ theorem three_way_ceiling
     (h2 gwas_power port_ratio target_r2 : ℝ)
     (h_h2_le : h2 ≤ 1) (h_power_le : gwas_power ≤ 1)
     (h_port_le : port_ratio ≤ 1)
- (h_h2_nn : 0 ≤ h2) (h_power_nn : 0 ≤ gwas_power)
+    (h_h2_nn : 0 ≤ h2) (h_power_nn : 0 ≤ gwas_power)
     (h_bound : target_r2 ≤ h2 * gwas_power * port_ratio) :
     target_r2 ≤ 1 := by
   have : h2 * gwas_power * port_ratio ≤ 1 := by
@@ -298,7 +298,7 @@ theorem greml_underestimates_with_poor_tagging
     (V_A + V_strat)/V_P > V_A/V_P when V_P > 0. -/
 theorem stratification_inflates_greml
     (V_A V_strat V_E : ℝ)
- (h_strat_pos : 0 < V_strat)
+    (h_strat_pos : 0 < V_strat)
     (h_total : 0 < V_A + V_strat + V_E) :
     let V_P := V_A + V_strat + V_E
     let h2_true := V_A / V_P
