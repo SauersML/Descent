@@ -349,8 +349,10 @@ they must agree. -/
 theorem equalVarianceGaussianAUCFromVariances_eq_aucFromSignalVariance
     (vSignal vNoise : ℝ) :
     equalVarianceGaussianAUCFromVariances vSignal vNoise =
-      gaussianAUCFromSignalVariance vSignal vNoise := by
-  unfold equalVarianceGaussianAUCFromVariances gaussianAUCFromSignalVariance; ring_nf
+      TransportedMetrics.gaussianAUCFromSignalVariance vSignal vNoise := by
+  unfold equalVarianceGaussianAUCFromVariances
+    TransportedMetrics.gaussianAUCFromSignalVariance
+  ring_nf
 
 /-- Wright's compounding identity: one minus the product of retentions. It is
 written once for the two branches of a split and once for the two levels of
@@ -622,8 +624,12 @@ theorem hetMutationDriftRecurrence_step_uses_timeScale
     hetMutationDriftRecurrence Ne mu H₀ (t + 1)
       = (1 - 1 / coalescentTimeScale Ne) * hetMutationDriftRecurrence Ne mu H₀ t
         + ploidy * mu * (1 - hetMutationDriftRecurrence Ne mu H₀ t) := by
-  unfold hetMutationDriftRecurrence ploidy
+  change
+    (1 - 1 / (2 * Ne)) * hetMutationDriftRecurrence Ne mu H₀ t +
+        2 * mu * (1 - hetMutationDriftRecurrence Ne mu H₀ t) = _
   rw [coalescentTimeScale_eq]
+  unfold ploidy
+  rfl
 
 /-- Equilibrium heterozygosity under mutation-drift balance, `θ/(1 + θ)`,
 written out with its own four. This is the last inline restatement of the
