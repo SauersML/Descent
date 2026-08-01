@@ -49,13 +49,23 @@ theorem dot_weightedResidualMoment
         ∑ i, (direction i) •
           (fun ω => X ω i * ((densityRatio ω - 1) * residual ω)) := by
     funext ω
-    simp [Finset.mul_sum, smul_eq_mul]
-    ring
+    calc
+      (densityRatio ω - 1) *
+          ((∑ i, direction i * X ω i) * residual ω) =
+          ((densityRatio ω - 1) * residual ω) *
+            ∑ i, direction i * X ω i := by ring
+      _ = ∑ i, ((densityRatio ω - 1) * residual ω) *
+            (direction i * X ω i) := by rw [Finset.mul_sum]
+      _ = ∑ i, (direction i) •
+            (fun ω => X ω i * ((densityRatio ω - 1) * residual ω)) ω := by
+          apply Finset.sum_congr rfl
+          intro i _
+          simp only [smul_eq_mul]
+          ring
   rw [hexpand, ExpFunctional.eval_sum]
   apply Finset.sum_congr rfl
   intro i _
   rw [P.smul_eval]
-  ring
 
 /-- Directional chi-square bound.  This is the exact product of distributional
 discrepancy and residual nonlinearity before optimizing over directions. -/
@@ -144,7 +154,8 @@ theorem coefficientEnergy_add
       coefficientEnergy B x + coefficientEnergy B y +
         2 * dot x (B.mulVec y) := by
   unfold coefficientEnergy
-  rw [matrix_mulVec_add, dot_add_left, dot_add_right_shift]
+  rw [matrix_mulVec_add, dot_add_left]
+  rw [dot_add_right_shift, dot_add_right_shift]
   rw [hsymmetric y x]
   ring
 
