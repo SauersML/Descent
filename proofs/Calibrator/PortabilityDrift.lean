@@ -144,7 +144,9 @@ section PresentDayMetrics
 Under an additive genetic model with Hardy-Weinberg equilibrium,
 PGS variance = Σᵢ βᵢ² × 2pᵢ(1-pᵢ), i.e. the sum of squared effect sizes
 weighted by per-locus heterozygosity. Here `β_sq_sum` is Σᵢ βᵢ² and `het` is
-the average heterozygosity 2p(1-p) (or its sum, depending on normalisation). -/
+the average heterozygosity 2p(1-p) (or its sum, depending on normalisation).
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
   β_sq_sum * het
 
@@ -153,7 +155,9 @@ Fst is DEFINED as 1 - E[H_target]/H_source (the proportional reduction in
 expected heterozygosity due to drift), so E[H_target] = H_source × (1 - Fst).
 This connects to the heterozygosity recurrence `hetPostDrift` proved elsewhere:
 after `t` generations of Wright-Fisher drift with effective size N,
-H_t = H_0 × (1 - 1/(2N))^t, giving Fst = 1 - (1 - 1/(2N))^t. -/
+H_t = H_0 × (1 - 1/(2N))^t, giving Fst = 1 - (1 - 1/(2N))^t.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
   het_source * (1 - fst)
 
@@ -557,7 +561,9 @@ theorem drift_degrades_liabilityAUC
     nlinarith
   exact Real.sqrt_lt_sqrt hhalf_nonneg hhalf_lt
 
-/-- Real-world PGS variance with both drift and LD tagging efficiency. -/
+/-- Real-world PGS variance with both drift and LD tagging efficiency.
+
+    Empirical status: UNTESTED. -/
 noncomputable def realWorldPGSVariance (V_A fst rhoSq : ℝ) : ℝ :=
   rhoSq * (1 - fst) * V_A
 
@@ -759,7 +765,9 @@ noncomputable def targetTaggingProjection {p q : ℕ}
 
 /-- Locus-resolved target effect heterogeneity relative to the source effect
 vector. This is the exact biological object behind claims that
-`β_source ≠ β_target`; it is not a scalar retention factor. -/
+`β_source ≠ β_target`; it is not a scalar retention factor.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetEffectHeterogeneity {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin q → ℝ :=
   targetTotalEffect m - m.betaSource
@@ -775,13 +783,17 @@ theorem targetTotalEffect_eq_betaSource_plus_targetEffectHeterogeneity {p q : �
 
 /-- Target tagging projection of the source effect vector through the target
 tagging surface. This isolates what would transport if target effects were
-identical to source effects. -/
+identical to source effects.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetSourceEffectProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
   (sigmaTagCausalTarget m).mulVec m.betaSource
 
 /-- Incremental target-side projection induced purely by effect-size
-heterogeneity relative to the source effect vector. -/
+heterogeneity relative to the source effect vector.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetEffectHeterogeneityProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
   (sigmaTagCausalTarget m).mulVec (targetEffectHeterogeneity m)
@@ -1193,7 +1205,9 @@ noncomputable def targetIrreduciblePenaltyProfile {p q : ℕ}
 
 /-- Effective target outcome variance after adding an irreducible
 target-specific residual burden from broken tagging, ancestry-specific LD, and
-source-specific overfit, plus target-only untagged novel-mutation variance. -/
+source-specific overfit, plus target-only untagged novel-mutation variance.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectiveTargetOutcomeVariance {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   m.targetOutcomeVariance + irreducibleTargetResidualBurden m
@@ -1875,7 +1889,9 @@ noncomputable def tagAlleleFreqRetentionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ :=
   alleleFreqMismatchPenalty (m.tagAlleleFreqSource i) (tagAlleleFreqTargetAt m t i)
 
-/-- Per-causal-variant allele-frequency retention at generation `t`. -/
+/-- Per-causal-variant allele-frequency retention at generation `t`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def causalAlleleFreqRetentionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ :=
   alleleFreqMismatchPenalty (m.causalAlleleFreqSource j) (causalAlleleFreqTargetAt m t j)
@@ -2058,7 +2074,9 @@ noncomputable def sigmaTagCausalTargetAt {p q : ℕ}
 
 /-- Projection of the source effect vector through the generation-indexed
 target tagging surface. This isolates what would transport if target causal
-effects were identical to source effects. -/
+effects were identical to source effects.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetSourceEffectProjectionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin p → ℝ :=
   (sigmaTagCausalTargetAt m t).mulVec m.betaSource
@@ -2860,7 +2878,9 @@ noncomputable def targetScoreVarianceAtGeneration {p q : ℕ}
   targetScoreVarianceFromSourceWeights (m.toMetricModelAt t)
 
 /-- Effective target outcome variance after `t` generations, including the full
-additive biological loss budget induced by the time-varying state. -/
+additive biological loss budget induced by the time-varying state.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectiveTargetOutcomeVarianceAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
   effectiveTargetOutcomeVariance (m.toMetricModelAt t)
@@ -3068,7 +3088,9 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
       CrossPopulationGenerationalModel.toMetricModelAt]
 
 /-- Exact target liability-threshold AUC under the neutral allele-frequency
-benchmark in the equal-variance Gaussian liability model. -/
+benchmark in the equal-variance Gaussian liability model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetExactLiabilityAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget : ℝ) : ℝ :=
   targetAUCFromNeutralAFBenchmark V_A V_E fstTarget
@@ -3639,7 +3661,9 @@ theorem mutationDrift_signal_lt_puredrift (V_A fst_drift shared_ld : ℝ)
     exact mul_lt_mul_of_pos_left hld_lt h1
   nlinarith
 
-/-- **R² under mutation-drift balance.** -/
+/-- **R² under mutation-drift balance.**
+
+    Empirical status: UNTESTED. -/
 noncomputable def presentDayR2MutationDrift (V_A V_E fst_drift shared_ld : ℝ) : ℝ :=
   let v := presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld
   v / (v + V_E)
@@ -3667,7 +3691,9 @@ theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
 
 /-- Scalar neutral benchmark that combines allele-frequency retention with a
 shared-LD retention coordinate. This remains a coarse benchmark, not a
-mechanistic SNP-level transport law. -/
+mechanistic SNP-level transport law.
+
+    Empirical status: UNTESTED. -/
 noncomputable def neutralAFSharedLDBenchmarkRatio
     (fstSource fstTarget shared_ld_source shared_ld_target : ℝ) : ℝ :=
   ((1 - fstTarget) * shared_ld_target) / ((1 - fstSource) * shared_ld_source)
@@ -3984,7 +4010,9 @@ already-derived `fstMigrationDriftEquilibrium`. -/
 
 /-- **Shared LD derived from Fst equilibrium.**
     Defined as `1 - fstMigrationDriftEquilibrium Ne m`, i.e., the complement
-    of the between-population divergence under migration-drift balance. -/
+    of the between-population divergence under migration-drift balance.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sharedLD_from_equilibrium (Ne m : ℝ) : ℝ :=
   1 - fstMigrationDriftEquilibrium Ne m
 
@@ -4008,7 +4036,9 @@ theorem sharedLD_from_equilibrium_eq (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) 
     `fstMigrationDriftEquilibrium`), the shared fraction is
     1 - Fst = 1 - 1/(1+M) = M/(1+M). See `sharedLD_from_equilibrium_eq`
     and `sharedLD_from_equilibrium_eq_sharedLDFromMigration` for the
-    formal algebraic derivation. -/
+    formal algebraic derivation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sharedLDFromMigration (M : ℝ) : ℝ :=
   M / (1 + M)
 
