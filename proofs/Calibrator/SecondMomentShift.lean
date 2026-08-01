@@ -59,6 +59,8 @@ theorem residualScoreMoment_eq_cross_sub_secondMoment
       (fun ω => X ω i * (Y ω - dot w (X ω))) =
         (fun ω => X ω i * Y ω) - (fun ω => X ω i * dot w (X ω)) := by
     funext ω
+    change X ω i * (Y ω - dot w (X ω)) =
+      X ω i * Y ω - X ω i * dot w (X ω)
     ring
   rw [hexpand, E.eval_sub]
   have hlinear := congrFun (rawCrossMoment_linScore E X w) i
@@ -73,8 +75,8 @@ theorem residual_score_identifies_projection_shift
     (hnormal : residualScoreMoment E X Y v = 0) :
     residualScoreMoment E X Y w =
       (secondMomentMatrix E X).mulVec (fun i => v i - w i) := by
-  rw [residualScoreMoment_eq_cross_sub_secondMoment,
-    residualScoreMoment_eq_cross_sub_secondMoment at hnormal]
+  rw [residualScoreMoment_eq_cross_sub_secondMoment]
+  rw [residualScoreMoment_eq_cross_sub_secondMoment] at hnormal
   have hcross : rawCrossMoment E X Y = (secondMomentMatrix E X).mulVec v := by
     exact sub_eq_zero.mp hnormal
   rw [hcross]
@@ -109,8 +111,12 @@ theorem residualScoreMoment_outcome_change
         (fun ω => X ω i * (hOld ω - dot w (X ω))) +
           (fun ω => X ω i * (hNew ω - hOld ω)) := by
     funext ω
+    change X ω i * (hNew ω - dot w (X ω)) =
+      X ω i * (hOld ω - dot w (X ω)) +
+        X ω i * (hNew ω - hOld ω)
     ring
   rw [hexpand, E.add_eval]
+  rfl
 
 /-- Exact genuine-change/artifact decomposition.  The total target
 coefficient movement solves a moment equation whose two summands are the

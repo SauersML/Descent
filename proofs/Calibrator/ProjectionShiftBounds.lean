@@ -1,7 +1,6 @@
 import Calibrator.SecondMomentShift
 import Calibrator.QuadraticShift
 import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Nlinarith
 import Mathlib.Tactic.Ring
 
 namespace Calibrator

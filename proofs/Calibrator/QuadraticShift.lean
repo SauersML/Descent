@@ -29,7 +29,9 @@ theorem matrix_mulVec_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ) :
     B.mulVec (fun i => x i - y i) =
       fun i => B.mulVec x i - B.mulVec y i := by
   ext i
-  simp [Matrix.mulVec, dotProduct, Finset.sum_sub_distrib]
+  simp only [Matrix.mulVec, dotProduct]
+  simp_rw [mul_sub]
+  rw [Finset.sum_sub_distrib]
 
 theorem matrix_mulVec_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
     B.mulVec (c • x) = c • B.mulVec x := by
@@ -93,8 +95,8 @@ theorem singular_minimizer_kernel_invariance
       quadraticRisk outcomeSecondMoment B b (fun i => v i + k i) =
         quadraticRisk outcomeSecondMoment B b v := by
   have hnormalShift : B.mulVec (fun i => v i + k i) = b := by
-    ext i
-    simp [Matrix.mulVec, dotProduct, Finset.sum_add_distrib, hnormal, hkernel]
+    rw [matrix_mulVec_add, hnormal, hkernel]
+    simp
   refine ⟨hnormalShift, ?_⟩
   have hid := singular_quadratic_excess_risk_identity
     outcomeSecondMoment B b (fun i => v i + k i) v hsymmetric hnormal
@@ -134,9 +136,13 @@ theorem scalar_correction_completed_square
       scalarCorrectionFloor B u v +
         dot u (B.mulVec u) * (c - bestScalarCorrection B u v) ^ 2 := by
   have hcross : dot v (B.mulVec u) = dot u (B.mulVec v) := hsymmetric v u
+  have hleftScaled : dot (c • u) (B.mulVec v) = c * dot u (B.mulVec v) :=
+    dot_smul_left c u (B.mulVec v)
+  have hrightScaled : dot v (c • B.mulVec u) = c * dot v (B.mulVec u) :=
+    dot_smul_right c v (B.mulVec u)
   unfold quadraticCoefficientDistance scalarCorrectionFloor bestScalarCorrection
   rw [matrix_mulVec_sub, matrix_mulVec_smul, dot_sub_left,
-    dot_sub_right, dot_sub_right, dot_smul_left, dot_smul_right, hcross]
+    dot_sub_right, dot_sub_right, hleftScaled, hrightScaled, hcross]
   field_simp [hu]
   ring
 
@@ -146,7 +152,8 @@ theorem best_scalar_correction_attains_floor
     (B : Matrix ι ι ℝ) (u v : ι → ℝ)
     (hsymmetric : IsSymmetricBilinearMatrix B)
     (hu : 0 < dot u (B.mulVec u)) :
-    quadraticCoefficientDistance B (bestScalarCorrection B u v • u) v =
+    quadraticCoefficientDistance B
+        ((bestScalarCorrection B u v) • u : ι → ℝ) v =
         scalarCorrectionFloor B u v ∧
       ∀ c, scalarCorrectionFloor B u v ≤
         quadraticCoefficientDistance B (c • u) v := by
