@@ -16,7 +16,7 @@ not an asymptotic approximation beyond the BBP proxy already isolated in
 -/
 
 /-- The balanced contrast crosses the spectral edge exactly when the
-dimensionless information product `M F² n` exceeds four. -/
+dimensionless information product `M F² n` exceeds one. -/
 theorem balanced_superthreshold_iff_information
     (n M F : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 < F) :
     bbpProxyThreshold n M < F * n ↔ 1 < M * F ^ 2 * n := by

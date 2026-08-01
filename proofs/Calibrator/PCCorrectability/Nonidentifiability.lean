@@ -16,7 +16,7 @@ subgroup sizes lie on opposite sides of the spectral threshold whenever the
 balanced contrast is detectable. -/
 theorem fst_does_not_determine_pc_correctability
     (n M F : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 < F) :
-    bbpProxyThreshold n M < F * n / 2 →
+    bbpProxyThreshold n M < F * n →
       ∃ mBelow mAbove : ℝ,
         0 < mBelow ∧ mBelow < n ∧
         0 < mAbove ∧ mAbove < n ∧
@@ -45,19 +45,18 @@ theorem fst_does_not_determine_pc_correctability
     unfold effectiveSubgroupSize
     rw [div_lt_iff₀ hn]
     nlinarith
-  have htwice_below : 2 * F * mBelow = t / 2 := by
+  have hfour_below : 4 * F * mBelow = t := by
     unfold mBelow
     field_simp [hF.ne']
     norm_num
   have hspike_below : demographicSpike n F mBelow < t := by
     unfold demographicSpike
     calc
-      2 * F * effectiveSubgroupSize n mBelow < 2 * F * mBelow :=
+      4 * F * effectiveSubgroupSize n mBelow < 4 * F * mBelow :=
         mul_lt_mul_of_pos_left heffective_below_lt (mul_pos (by norm_num) hF)
-      _ = t / 2 := htwice_below
-      _ < t := half_lt_self ht
+      _ = t := hfour_below
   have hspike_above : t < demographicSpike n F mAbove := by
-    have hidentity : demographicSpike n F mAbove = F * n / 2 := by
+    have hidentity : demographicSpike n F mAbove = F * n := by
       unfold demographicSpike effectiveSubgroupSize mAbove
       field_simp [hn.ne']
       ring
