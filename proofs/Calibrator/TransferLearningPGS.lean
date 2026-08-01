@@ -53,7 +53,7 @@ section PGSPortabilityDerivation
 /-- Covariance between PGS (using source weights) and the genetic component
     of the phenotype in a given population:
     Cov(PGS, Y_genetic) = Σᵢ Σⱼ β_source_i × Σᵢⱼ × β_causal_j
-    where β_causal are the true causal effects in that population.
+    where β_causal are the modelled causal effects in that population.
 
     Empirical status: UNTESTED. -/
 noncomputable def pgsPhenoCov {m : ℕ} (β_weights β_causal : Fin m → ℝ)
@@ -953,9 +953,9 @@ theorem local_pc_removal_minimum_beats_adjacent_choices
 def infoBottleneckObjective (I_phi_Y I_phi_A lam : ℝ) : ℝ :=
   I_phi_Y - lam * I_phi_A
 
-/-- Exact normalized Gaussian source residual risk from mutual information.
+/-- Closed-form normalized Gaussian source residual risk from mutual information.
     For a jointly Gaussian source trait `Y` and representation `φ(X)` with
-    `Var(Y)=1`, the residual variance fraction is exactly `exp(-2 I(φ(X);Y))`.
+    `Var(Y)=1`, the residual variance fraction is under this model `exp(-2 I(φ(X);Y))`.
 
     Empirical status: UNTESTED. -/
 noncomputable def gaussianSourceResidualRisk (I_phi_Y : ℝ) : ℝ :=
@@ -1568,7 +1568,7 @@ noncomputable def metaLearnedSourceWeights {p : ℕ}
   fun i => wShared i + meanPopulationDeviation deviation k i
 
 /-- Population-specific effect deviation around a shared ancestral-effect
-    center. This is the exact effect-architecture object whose average is used
+    center. This is the closed-form effect-architecture object whose average is used
     by the meta-learning block below.
 
     Empirical status: UNTESTED. -/

@@ -534,7 +534,7 @@ noncomputable def fisherTraceMSELowerBound
   adaptationDifficultyIndex nParams infoPerSample / nEff
 
 /-- **Effective sample size needed to beat a target trace-MSE threshold.**
-    Solving `(d / I) / n_eff ≤ τ` for `n_eff` gives the exact threshold
+    Solving `(d / I) / n_eff ≤ τ` for `n_eff` gives the closed-form threshold
     `(d / I) / τ` in the orthogonal Fisher model.
 
     Empirical status: UNTESTED. -/

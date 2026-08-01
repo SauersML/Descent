@@ -2034,7 +2034,7 @@ lemmas back to this namespace.
 
 namespace TransportedMetrics
 
-/-- Exact conversion from signal variance to deployed `R²` at fixed residual scale.
+/-- Closed-form conversion from signal variance to deployed `R²` at fixed residual scale.
 
     Empirical status: UNTESTED. -/
 noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=

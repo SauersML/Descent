@@ -194,7 +194,7 @@ theorem targetPGSVariance_eq_presentDay (V_A fst : ℝ) :
   unfold targetPGSVariance pgsVarianceFromHet presentDayPGSVariance
   ring
 
-/-- The exact discrete Wright-Fisher retention factor after `t` generations.
+/-- The closed-form discrete Wright-Fisher retention factor after `t` generations.
 
     Empirical status: UNTESTED. -/
 noncomputable def wrightFisherDriftRetention (N t : ℕ) : ℝ :=
@@ -416,9 +416,9 @@ If case/control scores differ only by a mean shift with common residual variance
 noncomputable def presentDayGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
   Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2))
 
-/-- Exact present-day AUC under the equal-variance Gaussian liability model.
+/-- Closed-form present-day AUC under the equal-variance Gaussian liability model.
 If case/control scores differ only by a mean shift with common residual variance
-`V_E`, then the population AUC is exactly `Φ(√(SNR/2))`, where
+`V_E`, then the population AUC is under this model `Φ(√(SNR/2))`, where
 `SNR = presentDayPGSVariance / V_E`.
 
     Empirical status: UNTESTED. -/
@@ -764,7 +764,7 @@ noncomputable def targetTaggingProjection {p q : ℕ}
   (sigmaTagCausalTarget m).mulVec (targetTotalEffect m)
 
 /-- Locus-resolved target effect heterogeneity relative to the source effect
-vector. This is the exact biological object behind claims that
+vector. This is the closed-form biological object behind claims that
 `β_source ≠ β_target`; it is not a scalar retention factor.
 
     Empirical status: UNTESTED. -/
@@ -1266,7 +1266,7 @@ noncomputable def sourceResidualVarianceFromSourceWeights {p q : ℕ}
       m.sourceOutcomeVariance - sourceExplainedSignalVarianceFromSourceWeights m := by
   rfl
 
-/-- Exact source calibrated Brier coordinate from the full explicit
+/-- Closed-form source calibrated Brier coordinate from the full explicit
 source-state score equation, evaluated at an arbitrary observed prevalence
 coordinate `π`. This lets downstream theory compare source and target Brier on
 the same target-population outcome scale without falling back to a benchmark
@@ -1572,7 +1572,7 @@ theorem targetR2FromSourceWeights_exact_effect_heterogeneity_law {p q : ℕ}
   rw [targetR2FromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores]
 
-/-- Ohta-Kimura-style exact LD-correlation decay law across populations:
+/-- Ohta-Kimura-style closed-form LD-correlation decay law across populations:
 correlation decays exponentially with recombination distance and divergence.
 
     Empirical status: UNTESTED. -/
@@ -2876,7 +2876,7 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
   · rw [targetMetricProfileFromSourceWeights_brier,
       targetCalibratedBrierFromSourceWeights_exact_metric_portability_law]
 
-/-- Exact liability-threshold AUC after `t` generations under the full
+/-- Closed-form liability-threshold AUC after `t` generations under the full
 time-varying mechanistic state.
 
     Empirical status: UNTESTED. -/
@@ -3124,7 +3124,7 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
       effectiveTargetOutcomeVarianceAtGeneration,
       CrossPopulationGenerationalModel.toMetricModelAt]
 
-/-- Exact target liability-threshold AUC under the neutral allele-frequency
+/-- Closed-form target liability-threshold AUC under the neutral allele-frequency
 benchmark in the equal-variance Gaussian liability model.
 
     Empirical status: UNTESTED. -/
@@ -3985,7 +3985,7 @@ theorem splitMigration_more_migration_less_fst
     Fst between demes separated by d steps is approximately:
     Fst(d) ≈ Fst_neighbor × (1 + α × (d - 1))
     where α controls the rate of increase with distance (isolation by distance).
-    This is a linear approximation to the exact result.
+    This is a linear approximation to the closed-form result.
 
     Empirical status: UNTESTED. -/
 noncomputable def steppingStoneFst (fst_neighbor α : ℝ) (d : ℕ) : ℝ :=
@@ -4411,7 +4411,7 @@ theorem fstMigDriftNext_no_migration_fixedpoint_one (Ne : ℝ) (hNe : Ne ≠ 0) 
       Fst* * (2m + 1/(2Ne)) = 1/(2Ne)
       Fst* = (1/(2Ne)) / (2m + 1/(2Ne))
             = 1 / (4*Ne*m + 1)
-    This is the exact solution of the linearized recurrence.
+    This is the closed-form solution of the linearized recurrence.
 
     Empirical status: UNTESTED. -/
 noncomputable def fstMigDriftEquil (Ne m : ℝ) : ℝ :=

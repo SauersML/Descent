@@ -1273,7 +1273,7 @@ theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
 
 /-- **Discrete transient Fst under mutation and drift.**
     Fst(t) = [1/(1+θ)] × (1 - λ^t) where λ = (1-1/(2N))(1-θ/(2N)).
-    This is the exact discrete-time formula. The continuous version
+    This is the closed-form discrete-time formula. The continuous version
     `fstMutationDriftTransient` (using exp) is the large-Ne approximation.
 
     Empirical status: UNTESTED. -/

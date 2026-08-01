@@ -265,7 +265,7 @@ theorem source_higher_effective_n
     linarith
 
 /-- **Non-centrality parameter (NCP) for association test.**
-    NCP = n_eff × β² where β is the true effect size.
+    NCP = n_eff × β² where β is the modelled effect size.
     Power is Φ(√NCP - z_α) for threshold z_α.
 
     Empirical status: UNTESTED. -/

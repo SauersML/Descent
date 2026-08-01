@@ -1730,7 +1730,7 @@ theorem down_reclassified_after_downward_shift_iff_mem_band
 /-- **Threshold-band reclassification rate.**
     Under a downward intercept correction by `δ > 0`, this is the fraction of
     a class-specific score law lying in the band `(threshold, threshold + δ]`.
-    It is exactly the reclassification rate for that class.
+    It is under this model the reclassification rate for that class.
 
     Empirical status: UNTESTED. -/
 noncomputable def thresholdBandRate
