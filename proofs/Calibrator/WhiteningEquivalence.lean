@@ -2,6 +2,8 @@ import Mathlib.Data.Matrix.Basic
 
 namespace Calibrator
 
+open scoped Matrix
+
 /-!
 # Exact right-whitening equivalence
 
