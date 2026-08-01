@@ -164,15 +164,15 @@ theorem best_scalar_correction_attains_floor
     (B : Matrix ι ι ℝ) (u v : ι → ℝ)
     (hsymmetric : IsSymmetricBilinearMatrix B)
     (hu : 0 < dot u (B.mulVec u)) :
-    quadraticCoefficientDistance B
+      quadraticCoefficientDistance B
         (fun i => bestScalarCorrection B u v * u i) v =
         scalarCorrectionFloor B u v ∧
-      ∀ c, scalarCorrectionFloor B u v ≤
-        quadraticCoefficientDistance B (c • u) v := by
-  have hidentity := scalar_correction_completed_square B u v
-    (bestScalarCorrection B u v : ℝ) hsymmetric hu.ne'
+      ∀ c : ℝ, scalarCorrectionFloor B u v ≤
+        quadraticCoefficientDistance B (fun i => c * u i) v := by
   constructor
-  · simpa using hidentity
+  · rw [scalar_correction_completed_square B u v
+      (bestScalarCorrection B u v) hsymmetric hu.ne']
+    ring
   · intro c
     rw [scalar_correction_completed_square B u v c hsymmetric hu.ne']
     exact le_add_of_nonneg_right (mul_nonneg (le_of_lt hu) (sq_nonneg _))
