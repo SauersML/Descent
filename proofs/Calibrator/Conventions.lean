@@ -2,6 +2,7 @@ import Calibrator.PopulationGeneticsFoundations
 import Calibrator.DemographicHistory
 import Calibrator.AncestrySpecificArchitecture
 import Calibrator.PCCorrectability.Threshold
+import Calibrator.Identification
 
 namespace Calibrator
 
@@ -152,6 +153,24 @@ theorem demographicSpike_eq_contrastVariance_mul_effectiveSize
         effectiveSubgroupSize n m := by
   unfold demographicSpike
   rw [← four_hudsonFst_eq_standardizedContrastVariance p₁ p₂ h]
+
+/-- **The spike, as an identification rather than a definition.**
+
+This is the mechanism of `Calibrator.Identification` applied to the quantity
+that motivated it. `formula` is what the calculator computes, `observable` is
+the standardized contrast variance times the effective subgroup size, defined
+without reference to the formula, and `derivation` is discharged. The old
+constant cannot be substituted here, because the resulting field would not
+typecheck. -/
+noncomputable def spikeIdentification (n m p₁ p₂ : ℝ)
+    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    Identification ℝ where
+  formula := demographicSpike n (hudsonFst p₁ p₂) m
+  observable :=
+    ((p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))) *
+      effectiveSubgroupSize n m
+  derivation := demographicSpike_eq_contrastVariance_mul_effectiveSize n m p₁ p₂ h
+  evidence := Evidence.derived
 
 end Differentiation
 

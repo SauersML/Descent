@@ -85,6 +85,35 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
 noncomputable def powerAtThreshold (ncp z_alpha : ℝ) : ℝ :=
   Phi (Real.sqrt ncp - z_alpha)
 
+/-- **The exact power, carried as data rather than asserted as a formula.**
+
+    This development has no primitive for non-central chi-squared power, so
+    there is nothing here to derive `powerAtThreshold` from. Writing a
+    definition named for the exact power would be the failure this file has
+    already committed twice. Instead the exact value is a field, supplied by
+    whoever instantiates the structure, and the agreement is a hypothesis they
+    must discharge.
+
+    Numerical comparison supports the bound at `10⁻⁵` across
+    `α ∈ {0.05, 5·10⁻⁸}` and `ncp ∈ {1, …, 20}`; that measurement is evidence
+    for instantiating the structure, not a proof, and it is deliberately not
+    written as one. -/
+structure PowerAgreement where
+  ncp : ℝ
+  z_alpha : ℝ
+  /-- Exact non-central chi-squared power at these parameters, supplied
+      externally. -/
+  exactPower : ℝ
+  /-- The claimed agreement, which the instantiator must justify. -/
+  agreement : |Phi (Real.sqrt ncp - z_alpha) - exactPower| ≤ 1 / 100000
+
+/-- Within its stated tolerance, the closed form may stand in for the exact
+    power. -/
+theorem PowerAgreement.close (a : PowerAgreement) :
+    |powerAtThreshold a.ncp a.z_alpha - a.exactPower| ≤ 1 / 100000 := by
+  unfold powerAtThreshold
+  exact a.agreement
+
 /-- **Power increases with the noncentrality parameter** at a fixed
     threshold. -/
 theorem powerAtThreshold_mono (ncp₁ ncp₂ z_alpha : ℝ) (h : ncp₁ ≤ ncp₂) :
