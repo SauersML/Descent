@@ -11,7 +11,7 @@ row by `K` is `Kᵀ.mulVec`.  This formulation states the experiment equivalence
 without relying on overloaded rectangular-matrix notation.
 -/
 
-variable {rows cols : Type*} [Fintype cols] [DecidableEq cols]
+variable {rows cols : Type*} [Fintype cols]
 
 /-- Apply a right-side linear transformation independently to every data row. -/
 def rightTransform (transform : Matrix cols cols ℝ)
