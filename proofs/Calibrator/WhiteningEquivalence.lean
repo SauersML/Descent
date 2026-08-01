@@ -2,73 +2,97 @@ import Mathlib.LinearAlgebra.Matrix.DotProduct
 
 namespace Calibrator
 
-open scoped Matrix
-
 /-!
 # Exact right-whitening equivalence
 
-The results here are deterministic matrix identities.  They justify treating
-right-whitening as an equivalence of statistical experiments whenever the
-coloring matrix is invertible; no distributional assumption on the noise is
-used.
+Right multiplication of a data matrix is represented rowwise: transforming a
+row by `K` is `Kᵀ.mulVec`.  This formulation states the experiment equivalence
+without relying on overloaded rectangular-matrix notation.
 -/
 
-variable {rows cols : Type*}
-  [Fintype rows] [DecidableEq rows] [Fintype cols] [DecidableEq cols]
+variable {rows cols : Type*} [Fintype cols] [DecidableEq cols]
 
-/-- Right-whiten every row of a rectangular data matrix. -/
+/-- Apply a right-side linear transformation independently to every data row. -/
+def rightTransform (transform : Matrix cols cols ℝ)
+    (data : Matrix rows cols ℝ) : Matrix rows cols ℝ :=
+  fun row => transform.transpose.mulVec (data row)
+
+/-- Right-whitening is the row transformation induced by the inverse coloring
+operator. -/
 def rightWhiten (inverseColor : Matrix cols cols ℝ)
     (data : Matrix rows cols ℝ) : Matrix rows cols ℝ :=
-  data * inverseColor
+  rightTransform inverseColor data
 
 /-- Restore the original right-side coloring. -/
 def rightColor (color : Matrix cols cols ℝ)
     (data : Matrix rows cols ℝ) : Matrix rows cols ℝ :=
-  data * color
+  rightTransform color data
 
-/-- Coloring followed by whitening removes the correlated-noise factor
-exactly and transports the signal by the same invertible coordinate change. -/
+theorem rightTransform_add
+    (transform : Matrix cols cols ℝ) (x y : Matrix rows cols ℝ) :
+    rightTransform transform (x + y) =
+      rightTransform transform x + rightTransform transform y := by
+  ext row col
+  simp [rightTransform, Matrix.mulVec, dotProduct, Finset.sum_add_distrib,
+    mul_add]
+
+/-- Coloring followed by whitening removes the noise coloring exactly and
+transports the signal by the same invertible coordinate change. -/
 theorem right_whitening_removes_coloring
     (signal noise : Matrix rows cols ℝ)
     (color inverseColor : Matrix cols cols ℝ)
-    (hrightInverse : color * inverseColor = 1) :
-    rightWhiten inverseColor (signal + noise * color) =
+    (hremove : Function.LeftInverse
+      (fun x => inverseColor.transpose.mulVec x)
+      (fun x => color.transpose.mulVec x)) :
+    rightWhiten inverseColor (signal + rightColor color noise) =
       rightWhiten inverseColor signal + noise := by
-  unfold rightWhiten
-  rw [Matrix.add_mul, Matrix.mul_assoc, hrightInverse, Matrix.mul_one]
+  rw [rightWhiten, rightTransform_add]
+  congr 1
+  ext row col
+  exact congrFun (hremove (noise row)) col
 
-/-- Whitening and recoloring are inverse operations in one direction. -/
+/-- Recoloring is a left inverse of whitening whenever the corresponding row
+maps are inverse in that direction. -/
 theorem rightColor_leftInverse_rightWhiten
     (color inverseColor : Matrix cols cols ℝ)
-    (hleftInverse : inverseColor * color = 1) :
+    (hleft : Function.LeftInverse
+      (fun x => color.transpose.mulVec x)
+      (fun x => inverseColor.transpose.mulVec x)) :
     Function.LeftInverse (rightColor color : Matrix rows cols ℝ → Matrix rows cols ℝ)
       (rightWhiten inverseColor) := by
   intro data
-  unfold rightColor rightWhiten
-  rw [Matrix.mul_assoc, hleftInverse, Matrix.mul_one]
+  ext row col
+  exact congrFun (hleft (data row)) col
 
-/-- Whitening and recoloring are inverse operations in the other direction. -/
+/-- Recoloring is a right inverse of whitening whenever the corresponding row
+maps are inverse in the other direction. -/
 theorem rightColor_rightInverse_rightWhiten
     (color inverseColor : Matrix cols cols ℝ)
-    (hrightInverse : color * inverseColor = 1) :
+    (hright : Function.RightInverse
+      (fun x => color.transpose.mulVec x)
+      (fun x => inverseColor.transpose.mulVec x)) :
     Function.RightInverse (rightColor color : Matrix rows cols ℝ → Matrix rows cols ℝ)
       (rightWhiten inverseColor) := by
   intro data
-  unfold rightColor rightWhiten
-  rw [Matrix.mul_assoc, hrightInverse, Matrix.mul_one]
+  ext row col
+  exact congrFun (hright (data row)) col
 
-/-- An invertible right-whitening map is a measurable-model-independent
-bijection of data spaces, with recoloring as its explicit inverse. -/
+/-- An invertible right-whitening map is a distribution-independent bijection
+of data spaces, with recoloring as its explicit inverse. -/
 theorem rightWhiten_bijective
     (color inverseColor : Matrix cols cols ℝ)
-    (hleftInverse : inverseColor * color = 1)
-    (hrightInverse : color * inverseColor = 1) :
+    (hleft : Function.LeftInverse
+      (fun x => color.transpose.mulVec x)
+      (fun x => inverseColor.transpose.mulVec x))
+    (hright : Function.RightInverse
+      (fun x => color.transpose.mulVec x)
+      (fun x => inverseColor.transpose.mulVec x)) :
     Function.Bijective (rightWhiten inverseColor :
       Matrix rows cols ℝ → Matrix rows cols ℝ) := by
-  have hleft := rightColor_leftInverse_rightWhiten
-    (rows := rows) color inverseColor hleftInverse
-  have hright := rightColor_rightInverse_rightWhiten
-    (rows := rows) color inverseColor hrightInverse
-  exact ⟨hleft.injective, hright.surjective⟩
+  have hmatrixLeft := rightColor_leftInverse_rightWhiten
+    (rows := rows) color inverseColor hleft
+  have hmatrixRight := rightColor_rightInverse_rightWhiten
+    (rows := rows) color inverseColor hright
+  exact ⟨hmatrixLeft.injective, hmatrixRight.surjective⟩
 
 end Calibrator
