@@ -1,6 +1,5 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
-import Calibrator.OpenQuestions
 import Mathlib.Algebra.Order.Chebyshev
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 

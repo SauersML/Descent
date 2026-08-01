@@ -2,7 +2,6 @@ import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.PGSCalibrationTheory
 import Calibrator.ClinicalUtilityFairness
-import Calibrator.OpenQuestions
 
 namespace Calibrator
 

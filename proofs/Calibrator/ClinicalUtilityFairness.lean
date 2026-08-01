@@ -1,6 +1,5 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
-import Calibrator.OpenQuestions
 import Calibrator.PGSCalibrationTheory
 
 namespace Calibrator
