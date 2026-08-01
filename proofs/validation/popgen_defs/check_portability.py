@@ -52,12 +52,14 @@ def hudson_fst(c1, c2, n1, n2):
 
 
 def standardize(X):
-    p = X.mean(axis=0) / 2.0
+    p = (X.mean(axis=0) / 2.0).astype(np.float64)
     keep = (p > 0.01) & (p < 0.99)
     X = np.ascontiguousarray(X[:, keep])
     p = p[keep]
-    Z = (X - 2 * p) / np.sqrt(2 * p * (1 - p))
-    return Z.astype(np.float32), p, keep
+    scale = (1.0 / np.sqrt(2 * p * (1 - p))).astype(np.float32)
+    X -= (2 * p).astype(np.float32)
+    X *= scale
+    return X, p, keep
 
 
 def one_rep(args):
@@ -72,18 +74,23 @@ def one_rep(args):
                               random_seed=seed)
     ts = msprime.sim_mutations(ts, rate=MU, random_seed=seed + 1)
 
-    G = ts.genotype_matrix()                      # sites x haploids
-    D = (G[:, 0::2] + G[:, 1::2]).T.astype(np.float64)   # individuals x sites
+    # Keep dosages as int8 until the panel is selected: a float64 copy of the
+    # full site set is ~14 GB per worker at n_dip=6000 and OOM-kills the node.
+    G = ts.genotype_matrix()                            # sites x haploids, int8
+    D = (G[:, 0::2] + G[:, 1::2]).T                     # individuals x sites
     del G
-    A, B = D[:n_dip], D[n_dip:]
+    D = np.ascontiguousarray(D, dtype=np.int8)
 
-    # F_ST from the data
-    fst = hudson_fst(A.sum(axis=0), B.sum(axis=0), 2 * n_dip, 2 * n_dip)
+    cA = D[:n_dip].sum(axis=0, dtype=np.int64).astype(float)
+    cB = D[n_dip:].sum(axis=0, dtype=np.int64).astype(float)
+    fst = hudson_fst(cA, cB, 2 * n_dip, 2 * n_dip)
 
     # common variants in the SOURCE population define the analysis panel
-    pA = A.mean(axis=0) / 2.0
+    pA = cA / (2.0 * n_dip)
     panel = np.where((pA > 0.05) & (pA < 0.95))[0]
-    A, B = np.ascontiguousarray(A[:, panel]), np.ascontiguousarray(B[:, panel])
+    A = np.ascontiguousarray(D[:n_dip][:, panel], dtype=np.float32)
+    B = np.ascontiguousarray(D[n_dip:][:, panel], dtype=np.float32)
+    del D
 
     ZA, pA, keepA = standardize(A)
     # standardize the target with the SOURCE allele frequencies, as a deployed

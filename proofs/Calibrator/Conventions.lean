@@ -10,6 +10,7 @@ import Calibrator.GeneticArchitectureDiscovery
 import Calibrator.LongitudinalPortability
 import Calibrator.LDDecayTheory
 import Calibrator.MetricSpecificPortability
+import Calibrator.PhenomeWidePortability
 import Calibrator.PortabilityDrift
 import Calibrator.StratificationConfounding
 
@@ -349,6 +350,37 @@ the `F`-statistic hierarchy. -/
 theorem pairwiseFstFromBranches_eq_wrightFIT (a b : ℝ) :
     pairwiseFstFromBranches a b = wrightFIT a b := by
   unfold pairwiseFstFromBranches wrightFIT; ring_nf
+
+/-! ### The per-generation retention factor, written out in four modules
+
+`1 - 1/(2 Nₑ)` is the probability that two lineages fail to coalesce in one
+generation. It is spelled out independently in `PhenomeWidePortability`,
+`LDDecayTheory`, `PopulationGeneticsFoundations` and `PortabilityDrift`. -/
+
+theorem neutralDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) :
+    neutralDriftFactor Ne t = (1 - 1 / coalescentTimeScale Ne) ^ t := by
+  unfold neutralDriftFactor; rw [coalescentTimeScale_eq]
+
+theorem ldRetainedFraction_uses_timeScale (Ne : ℝ) (t : ℕ) :
+    ldRetainedFraction Ne t = (1 - 1 / coalescentTimeScale Ne) ^ t := by
+  unfold ldRetainedFraction; rw [coalescentTimeScale_eq]
+
+theorem fstDerived_uses_timeScale (Ne : ℝ) (t : ℕ) :
+    fstDerived Ne t = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
+  unfold fstDerived; rw [coalescentTimeScale_eq]
+
+theorem wrightFisherDriftRetention_uses_timeScale (N : ℕ) (t : ℕ) :
+    wrightFisherDriftRetention N t
+      = (1 - 1 / coalescentTimeScale (N : ℝ)) ^ t := by
+  unfold wrightFisherDriftRetention; rw [coalescentTimeScale_eq]
+
+/-! ### The coalescent time coordinate, written out twice
+
+`t / (2 Nₑ)` is time in coalescent units, in `PortabilityDrift` and in `DGP`. -/
+
+theorem coalescentTau_uses_timeScale (t Ne : ℝ) :
+    coalescentTau t Ne = t / coalescentTimeScale Ne := by
+  unfold coalescentTau; rw [coalescentTimeScale_eq]
 
 end EquilibriumAgreements
 

@@ -5,6 +5,7 @@ import Calibrator.PortabilityDrift
 import Calibrator.HumanDemography
 import Calibrator.AdditiveInvariance
 import Calibrator.Identification
+import Calibrator.ImitationRigidity
 import Calibrator.Conventions
 import Calibrator.OpenQuestions
 import Calibrator.TransportIdentities
