@@ -156,4 +156,75 @@ theorem neutral_floor_shortfall_pos
 
 end NeutralDriftFloor
 
+section AttributionToTagging
+
+/-!
+### Attributing the gap to preserved tagging
+
+`presentDayPGSVarianceMutationDrift` already splits retained signal into two
+multiplicative channels, `(1 - F_ST)` from allele-frequency divergence and
+`shared_ld` for the fraction of tagging that survives the change in linkage
+disequilibrium. The previous section showed the first channel is bounded below
+by `1 - F_ST`. Here the same argument run on the product turns a measured
+accuracy ratio into an upper bound on the second channel, which is the
+quantitative form of "the loss is in the linkage disequilibrium".
+-/
+
+/-- Ratio of target to source `R²` when both allele-frequency divergence and
+loss of shared tagging act. -/
+noncomputable def taggedDriftR2Ratio (V_A V_E fst shared_ld : ℝ) : ℝ :=
+  presentDayR2MutationDrift V_A V_E fst shared_ld / presentDayR2 V_A V_E 0
+
+/-- The accuracy ratio is at least the product of the two retention channels.
+Same computation as the neutral case, with `1 - F_ST` replaced by
+`(1 - F_ST) * shared_ld`. -/
+theorem taggedDriftR2Ratio_ge_retention (V_A V_E fst shared_ld : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst1 : fst < 1) (hs0 : 0 < shared_ld)
+    (hk1 : (1 - fst) * shared_ld ≤ 1) :
+    (1 - fst) * shared_ld ≤ taggedDriftR2Ratio V_A V_E fst shared_ld := by
+  have h1f : 0 < 1 - fst := by linarith
+  have hk0 : 0 < (1 - fst) * shared_ld := mul_pos h1f hs0
+  have hden : 0 < (1 - fst) * shared_ld * V_A + V_E :=
+    add_pos (mul_pos hk0 hVA) hVE
+  have hsum : V_A + V_E ≠ 0 := ne_of_gt (add_pos hVA hVE)
+  have hVA' : V_A ≠ 0 := ne_of_gt hVA
+  have key : taggedDriftR2Ratio V_A V_E fst shared_ld =
+      (1 - fst) * shared_ld * (V_A + V_E) /
+        ((1 - fst) * shared_ld * V_A + V_E) := by
+    unfold taggedDriftR2Ratio presentDayR2MutationDrift presentDayR2
+      presentDayPGSVariance
+    rw [presentDayPGSVarianceMutationDrift_eq]
+    field_simp
+    ring
+  rw [key, le_div_iff₀ hden]
+  nlinarith [mul_nonneg hk0.le (mul_nonneg (by linarith : (0:ℝ) ≤ 1 - (1 - fst) * shared_ld) hVA.le)]
+
+/-- **A measured accuracy ratio caps how much tagging can have survived.**
+
+If the observed target-to-source `R²` ratio is `observed`, then preserved
+tagging satisfies `shared_ld ≤ observed / (1 - F_ST)`. With continental
+`F_ST = 0.12` and a measured ratio of `0.3`, at most `0.34` of the tagging
+carries over, so roughly two thirds of the score's predictive structure is
+lost to linkage-disequilibrium mismatch rather than to allele frequencies.
+
+This is the complement of `observed_ratio_below_neutral_floor_needs_other_mechanism`:
+that result says drift cannot produce the gap, this one says how small the
+tagging channel has to be for the gap to appear at all. -/
+theorem sharedLD_le_observed_div_driftRetention
+    (V_A V_E fst shared_ld observed : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst1 : fst < 1) (hs0 : 0 < shared_ld)
+    (hk1 : (1 - fst) * shared_ld ≤ 1)
+    (h_match : taggedDriftR2Ratio V_A V_E fst shared_ld = observed) :
+    shared_ld ≤ observed / (1 - fst) := by
+  have h1f : 0 < 1 - fst := by linarith
+  have hge := taggedDriftR2Ratio_ge_retention V_A V_E fst shared_ld hVA hVE
+    hfst1 hs0 hk1
+  rw [h_match] at hge
+  rw [le_div_iff₀ h1f]
+  linarith [hge]
+
+end AttributionToTagging
+
 end Calibrator
