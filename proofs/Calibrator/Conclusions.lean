@@ -331,20 +331,6 @@ lemma sigmoid_strictConcaveOn_Ici : StrictConcaveOn ℝ (Set.Ici 0) sigmoid := b
     · have h := sigmoid_gt_half hx
       linarith
 
-/- **Jensen's Gap for Logistic Regression**
-
-    For a random variable η with E[η] = μ and Var(η) = σ² > 0:
-    - If μ > 0: E[sigmoid(η)] < sigmoid(μ)  (sigmoid is concave for x > 0)
-    - If μ < 0: E[sigmoid(η)] > sigmoid(μ)  (sigmoid is convex for x < 0)
-    - If μ = 0: E[sigmoid(η)] = sigmoid(μ) = 0.5  (by symmetry)
-
-    **Note**: The direction of shrinkage is toward 0.5, but with large variance
-    the expectation can overshoot past 0.5. The core Jensen inequality is just
-    about the relationship to sigmoid(μ), not about staying on the same side of 0.5.
-
-    A full proof requires:
-    1. Proving sigmoid is strictly concave on (0, ∞) and convex on (-∞, 0)
-    2. Measure-theoretic integration showing E[f(X)] < f(E[X]) for concave f -/
 /-- Calibration Shrinkage (Via Jensen's Inequality):
     The sigmoid function is strictly concave on (0, ∞).
     Therefore, for any random variable X with support in (0, ∞) (and non-degenerate),
@@ -466,17 +452,6 @@ theorem BayesRisk_mono {α : Type u} (R : α → ℝ) (F G : Set α)
 
 /-! ### Magnitude Certificates: Log Loss (KL) and Brier (L²) -/
 
-/-- Bernoulli log-loss with Boolean outcome, valued in `ℝ≥0∞`.
-    Outside the open interval `(0,1)` for `p̂`, the loss is set to `∞`. -/
-noncomputable def LogLoss (pHat : ℝ) (y : Bool) : ENNReal :=
-  if _h : 0 < pHat ∧ pHat < 1 then
-    ENNReal.ofReal (if y then -Real.log pHat else -Real.log (1 - pHat))
-  else
-    ⊤
-
-/-- Brier loss with Boolean outcome. -/
-noncomputable def BrierLoss (pHat : ℝ) (y : Bool) : ℝ :=
-  ((if y then (1 : ℝ) else 0) - pHat) ^ 2
 
 /-- Bernoulli log-loss (cross-entropy) at truth `p` and prediction `q`. -/
 noncomputable def bernoulliLogLoss (p q : ℝ) : ℝ :=
@@ -907,15 +882,6 @@ theorem logBernoulliRisk_eq_iff (η q : ℝ)
     subst hq
     ring
 
-/-- Population log-risk alias: `R_log(q) = E[ℓ_log(Y,q(Z))]` with Bernoulli truth `η(Z)`. -/
-noncomputable def Rlog {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
-    (η q : ProbPredictor Z) : ℝ :=
-  logRisk μ η q
-
-/-- Population Brier-risk alias: `R_brier(q) = E[ℓ_brier(Y,q(Z))]`. -/
-noncomputable def Rbrier {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
-    (η q : ProbPredictor Z) : ℝ :=
-  brierRisk μ η q
 
 /-! ### Population AUC (Conditional-Law Form) -/
 

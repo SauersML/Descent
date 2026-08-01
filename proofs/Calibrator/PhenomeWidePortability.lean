@@ -313,11 +313,6 @@ theorem worse_than_neutral_implies_diversifying_selection
         hVA hVE hfst hfstT_lt_one rfl ⟨h_rho, h_rho_lt⟩
   exact ⟨h_match, h_port, h_not_stab⟩
 
-/-- **Effect size correlation between populations.**
-    ρ(β_pop1, β_pop2) captures how similar genetic effects are.
-    ρ = 1 for neutral evolution, ρ < 1 for divergent selection. -/
-noncomputable def effectCorrelationPortability (rho ld_factor : ℝ) : ℝ :=
-  rho ^ 2 * ld_factor
 
 /-- **Scalar three-factor portability upper bound.**
     This is only the coarse scalar inequality
@@ -401,12 +396,6 @@ dietary adaptation across populations.
 -/
 
 section MetabolicTraits
-
-/- **Lactase persistence as a portability example.**
-    The LCT locus (2q21) has dramatically different frequencies
-    across populations due to dairy farming adaptation.
-    This creates a large portability loss for any trait where
-    LCT is a significant locus. -/
 
 /-- **GxE reduces cross-population effect correlation.**
     Model: In pop1, effect of variant i is β_i.

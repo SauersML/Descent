@@ -35,10 +35,6 @@ diversity. This affects PGS portability.
 
 section HaplotypeDiversity
 
-/- **Number of distinct haplotypes in a region.**
-    With k SNPs and n haplotypes sampled, the expected number
-    of distinct haplotypes H ≈ 2^k × (1 - (1-1/2^k)^n). -/
-
 noncomputable def expectedDistinctHaplotypes (k n : ℕ) : ℝ :=
   (2 : ℝ) ^ k * (1 - (1 - 1 / ((2 : ℝ) ^ k)) ^ n)
 
@@ -321,10 +317,6 @@ PGS accuracy and portability.
 
 section HaplotypePGS
 
-/- **Haplotype PGS is sum of haplotype effects.**
-    PGS_hap = Σ_b (effect of haplotype at block b).
-    This captures within-block interactions automatically. -/
-
 /-- **Haplotype PGS captures more variance than SNP PGS.**
     Here the comparison is made on the explicit phase-misspecification error
     surface from the previous section: a phase-aware haplotype score has zero
@@ -401,12 +393,6 @@ haplotype-based analyses and PGS.
 
 section PhasingErrors
 
-/-- **Switch error rate.**
-    Statistical phasing has a switch error rate s, where
-    each heterozygous site has probability s of being phased
-    to the wrong haplotype. -/
-noncomputable def switchErrorRate (n_switches n_het : ℕ) : ℝ :=
-  n_switches / n_het
 
 /-- **Phasing error introduces noise.**
     With switch error rate s, the phase-dependent signal

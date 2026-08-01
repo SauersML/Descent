@@ -148,10 +148,6 @@ def Phenotype := Ω → ℝ
 def PGS := Ω → ℝ
 def PC (k : ℕ) := Ω → (Fin k → ℝ)
 
-structure RealizedData (n k : ℕ) where
-  y : Fin n → ℝ
-  p : Fin n → ℝ
-  c : Fin n → (Fin k → ℝ)
 
 /-! ### Discrete Genotypes, Hardy-Weinberg Equilibrium, and Score Approximation
 
@@ -342,13 +338,6 @@ theorem HardyWeinbergModel.genotypeThirdAbsMoment_nonneg
   intro g _
   exact mul_nonneg (h.genotypeProb_nonneg g) (by positivity)
 
-/-- A diploid genome over `m` loci. -/
-abbrev DiscreteGenome (m : ℕ) := Fin m → DiploidGenotype
-
-/-- Polygenic score as a weighted sum of discrete allele counts. -/
-noncomputable def polygenicScoreOfGenome {m : ℕ} [Fintype (Fin m)]
-    (beta : Fin m → ℝ) (genome : DiscreteGenome m) : ℝ :=
-  ∑ i : Fin m, beta i * altAlleleCount (genome i)
 
 /-- Locuswise Hardy-Weinberg panel for a polygenic score architecture. -/
 structure HWEScoreModel (m : ℕ) where
@@ -482,17 +471,6 @@ The key assumption is heteroscedastic Gaussian noise:
 `E | x ~ N(0, σ²(x))`.
 Integrating out `E` then yields conditional probabilities through Gaussian CDFs (`Φ`). -/
 
-/-- Canonical sample space with score `S`, PCs `x`, and environmental noise `E`. -/
-abbrev OmegaRV (k : ℕ) := ℝ × (Fin k → ℝ) × ℝ
-
-/-- Score coordinate on `Ω_k`. -/
-def scoreRV {k : ℕ} (ω : OmegaRV k) : ℝ := ω.1
-
-/-- PC-coordinate vector on `Ω_k`. -/
-def pcRV {k : ℕ} (ω : OmegaRV k) : Fin k → ℝ := ω.2.1
-
-/-- Environmental noise coordinate on `Ω_k`. -/
-def envNoiseRV {k : ℕ} (ω : OmegaRV k) : ℝ := ω.2.2
 
 /-- Standard normal CDF, written as `Φ`. -/
 noncomputable def Phi : ℝ → ℝ := ProbabilityTheory.cdf (ProbabilityTheory.gaussianReal 0 1)
@@ -550,10 +528,6 @@ def latentLiability (s e : ℝ) : ℝ := s + e
 def diseaseEvent {k : ℕ} (T : (Fin k → ℝ) → ℝ) (x : Fin k → ℝ) (s : ℝ) : Set ℝ :=
   {e : ℝ | latentLiability s e > T x}
 
-/-- Indicator form of the binary disease outcome:
-`Y = 𝟙(L > T(x))`. -/
-noncomputable def diseaseIndicator {k : ℕ} (T : (Fin k → ℝ) → ℝ) (x : Fin k → ℝ) (s e : ℝ) : ℝ :=
-  if latentLiability s e > T x then 1 else 0
 
 /-- Exact threshold-event probability after integrating Gaussian environmental noise:
 `P(Y=1 | S=s, x) = 1 - P(L ≤ T(x) | S=s, x)`. -/

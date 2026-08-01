@@ -691,48 +691,6 @@ simultaneously satisfied when base rates differ.
 
 section Fairness
 
-/- **Calibration (sufficiency).**
-    A model is calibrated if E[Y | Ŷ = s] = s for all scores s.
-    Calibration within groups: E[Y | Ŷ = s, G = g] = s for each group g. -/
-
-/- **Equalized odds (separation).**
-    TPR and FPR are equal across groups.
-    TPR(g) = P(Ŷ = 1 | Y = 1, G = g) is the same for all g. -/
-
-/- **Demographic parity (independence).**
-    P(Ŷ = 1 | G = g) is the same for all groups g. -/
-
-/- **Derivation: PPV from Bayes' theorem.**
-
-    The positive predictive value PPV = P(D+ | T+) is derived directly
-    from Bayes' theorem on conditional probability.
-
-    **Setup.** Let D+ denote having the disease and T+ denote testing
-    positive. Define:
-    - prev  = P(D+)           — disease prevalence (prior probability)
-    - sens  = P(T+ | D+)      — sensitivity (true positive rate, TPR)
-    - spec  = P(T- | D-)      — specificity, so 1-spec = P(T+ | D-) = FPR
-
-    **Step 1: Bayes' theorem.**
-        PPV = P(D+ | T+) = P(T+ | D+) × P(D+) / P(T+)
-
-    **Step 2: Law of total probability for P(T+).**
-    Partition on disease status {D+, D-}:
-        P(T+) = P(T+ | D+) × P(D+) + P(T+ | D-) × P(D-)
-               = sens × prev + (1 - spec) × (1 - prev)
-
-    **Step 3: Substitution.**
-        PPV = sens × prev / (sens × prev + (1 - spec) × (1 - prev))
-
-    In our notation TPR = sens and FPR = 1 - spec, giving:
-        **PPV = prev × tpr / (prev × tpr + (1 - prev) × fpr)**
-
-    This is a direct application of Bayes' theorem (available in Mathlib as
-    `ProbabilityTheory.cond_eq_div` and related lemmas on conditional
-    probability). The formula shows that PPV depends critically on
-    prevalence: even with high sensitivity and specificity, PPV is low
-    when prevalence is low (the "base rate fallacy"). -/
-
 /-- **PPV definition.** Positive predictive value via Bayes' theorem:
     PPV = prev * tpr / (prev * tpr + (1 - prev) * fpr). -/
 noncomputable def ppv (prev tpr fpr : ℝ) : ℝ :=
@@ -837,10 +795,6 @@ Portability determines how accurate these categories are.
 -/
 
 section RiskStratification
-
-/- **Risk category assignment from PGS.**
-    Individuals with PGS > threshold t are placed in "high risk" category.
-    True positive rate depends on PGS accuracy. -/
 
 /-- **Proportion correctly classified.**
     PCC = P(high risk | truly high risk) × P(truly high risk)

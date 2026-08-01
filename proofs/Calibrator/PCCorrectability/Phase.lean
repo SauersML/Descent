@@ -1,4 +1,9 @@
 import Calibrator.PCCorrectability.Core
+import Mathlib.Data.Real.Sqrt
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
 
 namespace Calibrator
 
@@ -11,51 +16,136 @@ namespace Calibrator
 
 The following definitions isolate the finite-dimensional algebra from the
 random-matrix input.  `bbpProxyThreshold` is the usual rank-one proxy
-`(1/2)√(n/M)`, while the demographic spike is `F · m`.  A theorem connecting a
-particular genotype ensemble to this proxy must supply an eigenvector-overlap
-bound; that probabilistic theorem is deliberately not assumed here.
+`√(n/M)`, while the rank-one demographic spike is `2 F m_eff`, with
+`m_eff = m(n-m)/n`.  This is the same parameterization used by the executable
+calculator.  A theorem connecting a non-i.i.d. genotype ensemble to this model
+must still justify its effective marker count; the spiked-covariance algebra
+itself is completed below.
 -/
 
-/-- Rank-one signal contributed by a subgroup of effective size `m` and
-differentiation `F`. -/
-noncomputable def demographicSpike (F m : ℝ) : ℝ := F * m
+/-- Effective size of a subgroup contrast with subgroup size `m` in a panel of
+size `n`. -/
+noncomputable def effectiveSubgroupSize (n m : ℝ) : ℝ := m * (n - m) / n
+
+/-- Rank-one signal contributed by a subgroup contrast with differentiation
+`F`. -/
+noncomputable def demographicSpike (n F m : ℝ) : ℝ :=
+  2 * F * effectiveSubgroupSize n m
 
 /-- BBP-style proxy threshold for `n` samples and `M` effectively independent
 markers. -/
 noncomputable def bbpProxyThreshold (n M : ℝ) : ℝ :=
-  (1 / 2 : ℝ) * Real.sqrt (n / M)
+  Real.sqrt (n / M)
 
 /-- Signed distance from the spike to the spectral proxy threshold.  A positive
 value is the detectable side of the phase diagram. -/
 noncomputable def pcCorrectabilityMargin (n M F m : ℝ) : ℝ :=
-  demographicSpike F m - bbpProxyThreshold n M
+  demographicSpike n F m - bbpProxyThreshold n M
 
 /-- `F_ST` alone cannot determine PC correctability: at fixed positive `F`,
-sample size, and marker count, two subgroup sizes lie on opposite sides of the
-spectral threshold. -/
+sample size, and marker count, two valid subgroup sizes lie on opposite sides
+of the spectral threshold whenever the balanced contrast is detectable. -/
 theorem fst_does_not_determine_pc_correctability
     (n M F : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 < F) :
-    ∃ mBelow mAbove : ℝ,
-      0 < mBelow ∧ 0 < mAbove ∧
-      demographicSpike F mBelow < bbpProxyThreshold n M ∧
-      bbpProxyThreshold n M < demographicSpike F mAbove := by
+    bbpProxyThreshold n M < F * n / 2 →
+      ∃ mBelow mAbove : ℝ,
+        0 < mBelow ∧ mBelow < n ∧
+        0 < mAbove ∧ mAbove < n ∧
+        demographicSpike n F mBelow < bbpProxyThreshold n M ∧
+        bbpProxyThreshold n M < demographicSpike n F mAbove := by
+  intro hdetectable
   let t := bbpProxyThreshold n M
   have ht : 0 < t := by
     unfold t bbpProxyThreshold
-    exact mul_pos (by norm_num) (Real.sqrt_pos.2 (div_pos hn hM))
-  refine ⟨t / (2 * F), 2 * t / F, ?_, ?_, ?_, ?_⟩
-  · exact div_pos ht (mul_pos (by norm_num) hF)
-  · exact div_pos (mul_pos (by norm_num) ht) hF
-  · have hidentity : demographicSpike F (t / (2 * F)) = t / 2 := by
-      unfold demographicSpike
-      field_simp [hF.ne']
-    rw [hidentity]
-    exact half_lt_self ht
-  · have hidentity : demographicSpike F (2 * t / F) = 2 * t := by
-      unfold demographicSpike
-      field_simp [hF.ne']
-    rw [hidentity]
+    exact Real.sqrt_pos.2 (div_pos hn hM)
+  let mBelow := t / (4 * F)
+  let mAbove := n / 2
+  have hmBelow_pos : 0 < mBelow := by
+    exact div_pos ht (mul_pos (by norm_num) hF)
+  have hmBelow_lt : mBelow < n := by
+    unfold mBelow
+    rw [div_lt_iff₀ (mul_pos (by norm_num) hF)]
+    nlinarith [hdetectable]
+  have hmAbove_pos : 0 < mAbove := by
+    unfold mAbove
     linarith
+  have hmAbove_lt : mAbove < n := by
+    unfold mAbove
+    linarith
+  have heffective_below_lt : effectiveSubgroupSize n mBelow < mBelow := by
+    unfold effectiveSubgroupSize
+    rw [div_lt_iff₀ hn]
+    nlinarith
+  have htwice_below : 2 * F * mBelow = t / 2 := by
+    unfold mBelow
+    field_simp [hF.ne']
+  have hspike_below : demographicSpike n F mBelow < t := by
+    unfold demographicSpike
+    calc
+      2 * F * effectiveSubgroupSize n mBelow < 2 * F * mBelow :=
+        mul_lt_mul_of_pos_left heffective_below_lt (mul_pos (by norm_num) hF)
+      _ = t / 2 := htwice_below
+      _ < t := half_lt_self ht
+  have hspike_above : t < demographicSpike n F mAbove := by
+    have hidentity : demographicSpike n F mAbove = F * n / 2 := by
+      unfold demographicSpike effectiveSubgroupSize mAbove
+      field_simp [hn.ne']
+      ring
+    rw [hidentity]
+    exact hdetectable
+  exact ⟨mBelow, mAbove, hmBelow_pos, hmBelow_lt, hmAbove_pos, hmAbove_lt,
+    hspike_below, hspike_above⟩
+
+/-!
+### Johnstone--Paul overlap curve
+
+Writing `c = n/M` and `s = λ - 1` for the population spike above the noise
+eigenvalue, the asymptotic squared overlap is
+`(1 - c/s²) / (1 + c/s)` above `s = √c`, and zero below it.
+-/
+
+/-- Squared sample/population eigenvector overlap in the rank-one
+spiked-covariance model. -/
+noncomputable def samplePCOverlapSq (n M spike : ℝ) : ℝ :=
+  if bbpProxyThreshold n M < spike then
+    (1 - (n / M) / spike ^ 2) / (1 + (n / M) / spike)
+  else 0
+
+/-- Below the BBP edge, the modeled eigenvector overlap is exactly zero. -/
+theorem samplePCOverlapSq_eq_zero_of_subthreshold
+    (n M spike : ℝ) (h : spike ≤ bbpProxyThreshold n M) :
+    samplePCOverlapSq n M spike = 0 := by
+  simp [samplePCOverlapSq, not_lt.mpr h]
+
+/-- Above the BBP edge, the implementation uses the Johnstone--Paul overlap
+formula exactly. -/
+theorem samplePCOverlapSq_eq_of_superthreshold
+    (n M spike : ℝ) (h : bbpProxyThreshold n M < spike) :
+    samplePCOverlapSq n M spike =
+      (1 - (n / M) / spike ^ 2) / (1 + (n / M) / spike) := by
+  simp [samplePCOverlapSq, h]
+
+/-- Fraction of the target ancestry axis left after projection onto the modeled
+sample PC. -/
+noncomputable def samplePCResidualAxisFraction (n M spike : ℝ) : ℝ :=
+  1 - samplePCOverlapSq n M spike
+
+/-- A sub-threshold sample PC leaves the entire target axis unresolved.  Thus,
+in the rank-one model, increasing the requested PC count cannot recover an axis
+whose empirical eigenvector has zero overlap with its population direction. -/
+theorem subthreshold_sample_pc_leaves_full_axis
+    (n M spike : ℝ) (h : spike ≤ bbpProxyThreshold n M) :
+    samplePCResidualAxisFraction n M spike = 1 := by
+  rw [samplePCResidualAxisFraction, samplePCOverlapSq_eq_zero_of_subthreshold n M spike h]
+  ring
+
+/-- Above the edge, the residual fraction is exactly one minus the
+Johnstone--Paul overlap used by the executable calculator. -/
+theorem superthreshold_sample_pc_residual_fraction
+    (n M spike : ℝ) (h : bbpProxyThreshold n M < spike) :
+    samplePCResidualAxisFraction n M spike =
+      1 - (1 - (n / M) / spike ^ 2) / (1 + (n / M) / spike) := by
+  rw [samplePCResidualAxisFraction, samplePCOverlapSq_eq_of_superthreshold n M spike h]
 
 /-- Empirical-PC overlap summary.  `overlapSq i` is the squared overlap between
 the `i`th fitted PC and the true confounding direction. -/
@@ -100,7 +190,7 @@ structure SubthresholdPCCertificate extends EmpiricalPCOverlapModel where
   differentiation_pos : 0 < differentiation
   subgroupSize_pos : 0 < subgroupSize
   belowThreshold :
-    demographicSpike differentiation subgroupSize ≤ bbpProxyThreshold n markers
+    demographicSpike n differentiation subgroupSize ≤ bbpProxyThreshold n markers
   overlapEnvelope : ℝ
   overlap_bound : ∀ i, overlapSq i ≤ overlapEnvelope ^ 2
 

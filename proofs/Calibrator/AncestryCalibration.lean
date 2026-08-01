@@ -26,13 +26,6 @@ recalibration (a + b × PGS) for population T?
 
 section LinearRecalibration
 
-/-- **Optimal recalibration slope.**
-    b* = Cov(Y_T, PGS_T) / Var(PGS_T).
-    Under drift, this differs from the source slope by the
-    portability ratio. -/
-noncomputable def optimalRecalibrationSlope
-    (cov_y_pgs var_pgs : ℝ) : ℝ :=
-  cov_y_pgs / var_pgs
 
 /-- **Recalibration slope under drift model.**
     If effects change by factor ρ and variance changes by factor α,
@@ -132,12 +125,6 @@ of transfer learning for PGS.
 -/
 
 section TransferLearning
-
-/- **Transfer learning decomposition.**
-    With n_T target samples, the transferred estimator has:
-    MSE = MSE_oracle + gap(ρ) × σ²/n_T + bias²(ρ)
-    where ρ is the effect correlation and gap(ρ) captures
-    the transfer efficiency. -/
 
 /-- **More target data reduces MSE monotonically.** -/
 theorem more_target_data_reduces_mse

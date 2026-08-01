@@ -348,10 +348,6 @@ theorem coding_more_portable_than_regulatory
   have h_sum_nonneg : 0 ≤ rg_coding + rg_regulatory := add_nonneg h_coding_nn h_reg_nn
   nlinarith
 
-/- **LDSC-SEG for partitioned heritability.**
-    h²_c = M_c × (Σ_j∈c l_j × τ_c) / (N × Σ_j l_j)
-    where τ_c is the per-SNP heritability coefficient for category c. -/
-
 end HeritabilityPartitioning
 
 

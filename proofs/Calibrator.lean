@@ -18,10 +18,8 @@ import Calibrator.ValidationStatistics
 import Calibrator.SimulationValidation
 import Calibrator.SelectionValidation
 import Calibrator.GeneticArchitectureDiscovery
-import Calibrator.PredictionIntervalTheory
 import Calibrator.BayesianPGSTheory
 import Calibrator.PhenomeWidePortability
-import Calibrator.AncestryDeconvolution
 import Calibrator.TransferLearningPGS
 import Calibrator.MetricSpecificPortability
 import Calibrator.PopulationGeneticsFoundations
@@ -37,7 +35,6 @@ import Calibrator.LongitudinalPortability
 import Calibrator.PowerAnalysis
 import Calibrator.CovarianceStructure
 import Calibrator.CausalInference
-import Calibrator.FineMapping
 import Calibrator.PolygenicArchitecture
 import Calibrator.SampleOverlapBias
 import Calibrator.HaplotypeTheory

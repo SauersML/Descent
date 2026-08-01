@@ -33,10 +33,6 @@ correlation between imputed and true genotypes.
 
 section ImputationQuality
 
-/- **Imputation r² (INFO score).**
-    r²_imp = Var(E[g|observed]) / Var(g_true).
-    This measures how well the imputed dosage captures the true genotype. -/
-
 /-- **Imputation r² reduces effective PGS signal.**
     When a PGS variant has imputation r²_imp < 1, the contribution
     to PGS variance is attenuated by r²_imp. -/
@@ -102,10 +98,6 @@ theorem matched_panel_optimal
   calc r2_LD * panel_match ≤ r2_LD * 1 := by
         exact mul_le_mul_of_nonneg_left h_pm_le h_r2
     _ = r2_LD := mul_one _
-
-/- **Imputation quality at a variant depends on local LD.**
-    r²_imp(j) ≈ r²_LD(j, best_tag) where best_tag is the genotyped
-    variant in highest LD with j. -/
 
 /-- **LD-dependent imputation creates systematic bias.**
     In populations with shorter LD (e.g., AFR), tagging is worse,
@@ -194,11 +186,6 @@ This creates systematic bias in cross-population PGS.
 -/
 
 section ArrayAscertainment
-
-/- **SNP ascertainment on arrays is EUR-biased.**
-    Most array variants were discovered in European GWAS.
-    These variants have higher MAF in EUR → better imputation
-    → higher PGS signal in EUR. -/
 
 /-- Difference in `R²` corresponding to apparent portability loss relative
     to the source-population score performance. -/

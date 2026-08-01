@@ -30,18 +30,6 @@ structure SelectionModelSummary where
   predictedEffectCorrelation : ℝ
   predictedSelectedVariance : ℝ
 
-/-- Stabilizing-selection summary induced by the explicit architecture model. -/
-noncomputable def stabilizingSelectionSummary
-    (Ns vMutation s : ℝ) : SelectionModelSummary where
-  predictedEffectCorrelation := effectCorrelationStabilizing Ns
-  predictedSelectedVariance := stabilizingSelectedArchitectureVariance vMutation s
-
-/-- Fluctuating-selection summary induced by the explicit architecture model. -/
-noncomputable def fluctuatingSelectionSummary
-    (t tau vMutation s sigmaTheta : ℝ) : SelectionModelSummary where
-  predictedEffectCorrelation := fluctuatingEffectCorrelation t tau
-  predictedSelectedVariance :=
-    fluctuatingSelectedArchitectureVariance vMutation s sigmaTheta tau
 
 /-- Validation log-likelihood of a candidate summary under Gaussian measurement
 noise on the observed effect-correlation and selected-variance summaries. -/

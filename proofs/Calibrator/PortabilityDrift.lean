@@ -7,7 +7,6 @@ open MeasureTheory
 
 section PortabilityDrift
 
-abbrev DriftIndex := ℝ
 
 noncomputable def integratedCoalescentHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   ∫ s in (0)..t, hazard s
@@ -58,23 +57,6 @@ theorem fst_from_tau_lt_one (tau : ℝ) : fstFromTau tau < 1 := by
   have hpos : 0 < Real.exp (-tau) := Real.exp_pos (-tau)
   linarith
 
-structure DivergenceModelAssumptions where
-  pureDivergence : Prop
-  constantSize : Prop
-  noMigration : Prop
-  negligibleMutation : Prop
-
-abbrev GenoVec (p : ℕ) := Fin p → ℝ
-
-structure TwoPopulationGaussianDrift (p : ℕ) where
-  SigmaS : DriftIndex → Matrix (Fin p) (Fin p) ℝ
-  SigmaT : DriftIndex → Matrix (Fin p) (Fin p) ℝ
-  gaussianLaw : Matrix (Fin p) (Fin p) ℝ → Measure (GenoVec p)
-  sourceLaw : DriftIndex → Measure (GenoVec p)
-  targetLaw : DriftIndex → Measure (GenoVec p)
-  d_nonneg : ∀ d, 0 ≤ d
-  source_is_gaussian : ∀ d, sourceLaw d = gaussianLaw (SigmaS d)
-  target_is_gaussian : ∀ d, targetLaw d = gaussianLaw (SigmaT d)
 
 structure PureSplitModel where
   t : ℝ
@@ -405,7 +387,6 @@ theorem presentDayR2_eq_statistical_rsquared
   rw [h_rs]
   unfold presentDayR2
   field_simp [h_vsig_ne, h_vtrue_ne]
-
 
 
 /-- Expected `R²` from signal variance and environmental variance. -/
@@ -2050,11 +2031,6 @@ noncomputable def targetEffectHeterogeneityProjectionAt {p q : ℕ}
   (sigmaTagCausalTargetAt m t).mulVec
     (m.targetEffectHeterogeneityAt t + m.novelCausalEffectTargetAt t)
 
-/-- Projection induced purely by target-only novel causal effects at generation
-`t`. -/
-noncomputable def targetNovelCausalEffectProjectionAt {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin p → ℝ :=
-  (sigmaTagCausalTargetAt m t).mulVec (m.novelCausalEffectTargetAt t)
 
 /-- The static exact metric model obtained by slicing the generational state at
 generation `t`. This is the canonical bridge from explicit population-genetic
@@ -3667,17 +3643,6 @@ theorem neutralAFSharedLDBenchmarkRatio_lt_neutralAFBenchmarkRatio
     exact mul_lt_mul_of_pos_left h_ld_ratio (mul_pos h1 (by linarith))
   simpa [mul_assoc, mul_left_comm, mul_comm] using hnum_lt
 
-/-- **Equilibrium portability bound.**
-    Under mutation-drift equilibrium (where Fst = 1/(1+θ)), the portability
-    ratio has a finite lower bound that depends on θ. Larger θ (more mutation
-    relative to drift) means lower equilibrium Fst and thus better portability
-    from the drift component, but worse from the mutation/LD component. -/
-noncomputable def equilibriumPortabilityR2
-    (V_A V_E θ_source θ_target shared_ld : ℝ) : ℝ :=
-  let fst_target := 1 / (1 + θ_target)
-  let fst_source := 1 / (1 + θ_source)
-  presentDayR2MutationDrift V_A V_E fst_target shared_ld /
-    presentDayR2MutationDrift V_A V_E fst_source 1
 
 /-- **At equilibrium, larger θ means lower Fst and thus the drift component
     of portability improves.**
@@ -4378,25 +4343,6 @@ theorem fstMigDriftEquil_decreasing_in_Ne (Ne₁ Ne₂ m : ℝ)
 
 /-! ### 6. The full (non-linearized) recurrence and its fixed point -/
 
-/-- **Full migration-drift recurrence (non-linearized).**
-    Without the (1-m)² ≈ 1-2m approximation, the exact one-generation
-    update is:
-      Fst_{t+1} = (1-m)² * (1 - 1/(2Ne)) * Fst_t + (1 - Fst_t)/(2Ne)
-    This retains the quadratic term m². -/
-noncomputable def fstMigDriftNextFull (Ne m Fst : ℝ) : ℝ :=
-  (1 - m) ^ 2 * (1 - 1 / (2 * Ne)) * Fst + (1 - Fst) / (2 * Ne)
-
-/-- **Exact fixed point of the full recurrence.**
-    Solving Fst* = (1-m)²(1 - 1/(2N)) Fst* + (1 - Fst*)/(2N):
-    Let a = (1-m)²(1 - 1/(2N)), b = 1/(2N). Then:
-      Fst* = a * Fst* + b - b * Fst*
-      Fst*(1 - a + b) = b
-      Fst* = b / (1 - a + b)
-           = 1/(2N) / (1 - (1-m)²(1-1/(2N)) + 1/(2N)) -/
-noncomputable def fstMigDriftEquilFull (Ne m : ℝ) : ℝ :=
-  let a := (1 - m) ^ 2 * (1 - 1 / (2 * Ne))
-  let b := 1 / (2 * Ne)
-  b / (1 - a + b)
 
 /-! ### 7. Migration-to-neutral-benchmark connection derived from the recurrence -/
 

@@ -340,12 +340,6 @@ evaluation of the coalescent rate integral. The approximation is accurate
 when growth is strong (N₁ >> N₀) and sample size is moderate.
 -/
 
-/-- **Constant-size singleton proportion (reciprocal harmonic number).**
-    Under constant population size, the proportion of segregating sites
-    that are singletons in a sample of n is 1/H(n-1) where H is the
-    harmonic number. -/
-noncomputable def constantSizeSingletonProp (n : ℕ) : ℝ :=
-  1 / ((Finset.range (n - 1)).sum fun k => (1 : ℝ) / ((k : ℝ) + 1))
 
 /-- **The singleton proportion formula is conditional on the exponential growth
     model.** Under exponential growth from N₀ to N₁, the excess singleton

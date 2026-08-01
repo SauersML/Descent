@@ -36,9 +36,6 @@ LD structure and allele frequency spectrum.
 
 section GWASDiscovery
 
-/- **GWAS power function.**
-    Power = Φ(√NCP - z_α/2) where NCP = n × β² × 2p(1-p). -/
-
 /-- Genotype variance of an additive tag SNP under Hardy-Weinberg equilibrium. -/
 def tagGenotypeVariance (maf : ℝ) : ℝ :=
   2 * maf * (1 - maf)
@@ -175,10 +172,6 @@ why the method matters for portability.
 -/
 
 section PGSMethods
-
-/- **C+T selects independent SNPs above a p-value threshold.**
-    This discards information from sub-threshold SNPs and
-    from LD between SNPs. -/
 
 /-- Target score-estimation risk from locus-specific effect-estimation MSE and
 target tag-variance weights. This is the biologically relevant quantity for a

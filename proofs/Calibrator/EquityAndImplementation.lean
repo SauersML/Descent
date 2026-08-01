@@ -196,10 +196,6 @@ to minimize the maximum portability gap.
 
 section ResourceAllocation
 
-/- **Minimax allocation minimizes the maximum disparity.**
-    Instead of maximizing average R², allocate resources to
-    minimize max_pop(R²_source - R²_pop). -/
-
 /-- **Diminishing returns per additional sample in the source.**
     R² ∝ n × h² / (n × h² + M) where M is effective number
     of independent causal loci. As n → ∞, R² → h². -/
@@ -304,10 +300,6 @@ theorem r2_threshold_for_utility
   have : r2 * α < cost := by rwa [lt_div_iff₀ h_α] at h_below
   linarith [mul_comm α r2]
 
-/- **Population-specific PGS report cards.**
-    For each PGS, report: R², AUC, calibration, and portability ratio
-    for each clinically relevant population. -/
-
 /-- **Relative precision of R² estimate is worse for smaller R².**
     To estimate R² with SE < δ, need approximately n > 4R²(1-R²)²/δ².
     The *relative* standard error SE/R² = (1-R²)/√(nR²) × 2/δ grows as R²
@@ -333,12 +325,6 @@ theorem validation_n_depends_on_r2
   apply sq_lt_sq'
   · linarith
   · linarith
-
-/- **Population-aware clinical decision support.**
-    The clinical decision system should:
-    1. Report population-specific PGS performance
-    2. Adjust confidence intervals for portability
-    3. Flag when PGS may be unreliable for the patient's population -/
 
 /-- **Do-no-harm principle for PGS deployment.**
     PGS should only be used clinically when the expected benefit exceeds

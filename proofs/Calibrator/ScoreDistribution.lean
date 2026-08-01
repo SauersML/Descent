@@ -91,11 +91,6 @@ individuals fall in extreme categories.
 
 section TailProbabilities
 
-/-- **Standardized score shift.**
-    When score mean shifts by Δμ and the target standard deviation is `σ_T`,
-    the standardized score changes. This affects tail probabilities. -/
-noncomputable def standardizedScoreShift (Δμ σ_T : ℝ) : ℝ :=
-  Δμ / σ_T
 
 /-- Standardized benchmark threshold coordinate for a Gaussian score law with
 mean `μ` and standard deviation `σ`. This is a score-summary object, not by
@@ -233,10 +228,6 @@ Calibration in the source does not imply calibration in the target.
 
 section Calibration
 
-/- **Calibration definition.**
-    A score is calibrated if E[Y | PGS = s] = g(s) for the specified
-    link function g. -/
-
 /-- **Nonzero PGS mean shift changes the benchmark mean prediction.**
     This is only the score-summary statement that the benchmark mean prediction
     changes when `pgsMeanShift` is nonzero. It is not itself yet a theorem about
@@ -349,10 +340,6 @@ The Gaussian approximation error affects tail probability estimates.
 -/
 
 section GaussianApproximation
-
-/- **Berry-Esseen bound for PGS.**
-    sup_x |F_PGS(x) - Φ((x-μ)/σ)| ≤ C × ρ / σ³
-    where ρ = Σᵢ E[|Xᵢ - E[Xᵢ]|³] and σ² = Var(PGS). -/
 
 /-- **Berry-Esseen error decreases with more SNPs.**
     As the number of SNPs m increases, ρ/σ³ decreases as 1/√m

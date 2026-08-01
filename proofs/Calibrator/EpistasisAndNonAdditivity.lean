@@ -34,11 +34,6 @@ This is optimal under additivity but misses non-additive effects.
 
 section AdditiveApproximation
 
-/- **Fisher's average effect.**
-    The average effect αᵢ of allele i is defined as the slope
-    of the regression of genotypic value on allele count.
-    This captures additive effects even in the presence of dominance. -/
-
 /-- **Additive variance captures most genetic variance.**
     For most quantitative traits: V_A / V_G ≥ 0.5.
     This is why additive PGS works reasonably well. -/
@@ -181,11 +176,6 @@ average of the two homozygotes.
 -/
 
 section DominanceEffects
-
-/- **Dominance deviation.**
-    For genotype Aa at a locus:
-    Genetic value = a + d (additive + dominance).
-    d = 0 means no dominance (purely additive). -/
 
 /-- **Dominance variance.**
     V_D = Σ (2pq d)² where d is the dominance deviation.

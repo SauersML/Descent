@@ -348,11 +348,6 @@ theorem temporal_calibration_drift_nonzero_of_prevalence_shift
   rw [hzero, h_src_cal] at h_delta
   exact h_shift (by linarith)
 
-/-- **Recalibration restores accuracy.**
-    Fitting an intercept adjustment on target data
-    corrects for prevalence shifts. -/
-noncomputable def recalibratedRisk (original_risk intercept_adj : ℝ) : ℝ :=
-  original_risk + intercept_adj
 
 /-- Exact temporal Brier risk under a calibrated Bernoulli model with
 prevalence `π` and explicit time-indexed signal variance. This is the `brier`
@@ -440,11 +435,6 @@ theorem ensemble_at_least_min (r2_old r2_new : ℝ)
   · simp [min_eq_left h]; linarith
   · simp [min_eq_right h]; linarith
 
-/-- **Cost of retraining vs cost of inaccuracy.**
-    Optimal retraining interval balances the cost of a new GWAS
-    against the cost of inaccurate predictions. -/
-noncomputable def totalCost (c_retrain c_inaccuracy lambda T t_retrain : ℝ) : ℝ :=
-  c_retrain * (T / t_retrain) + c_inaccuracy * modelStaleness lambda (t_retrain / 2) * T
 
 /-- **Transfer learning reduces retraining cost.**
     Using the old PGS as a starting point (warm start) reduces

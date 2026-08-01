@@ -251,11 +251,6 @@ match the GWAS sample or target population, performance degrades.
 
 section LDReferenceMismatch
 
-/- **LD mismatch error in posterior estimates.**
-    When the LD reference Σ_ref ≠ Σ_true, the posterior mean is biased:
-    β̂ = (n × Σ_ref + τ⁻¹I)⁻¹ × n × Σ_ref × β̂_marginal
-    but the true posterior uses Σ_true. -/
-
 /-- **Shrinkage function for a single SNP.**
     f(σ) = σ/(σ+τ) maps the LD diagonal entry to the shrinkage factor.
     This is the key quantity affected by LD mismatch. -/
@@ -365,10 +360,6 @@ genetic architecture may differ across populations.
 
 section PriorSpecification
 
-/- **Gaussian prior assumes infinitesimal architecture.**
-    All SNPs have small, normally distributed effects.
-    Good for highly polygenic traits (height). -/
-
 /-- **Spike-and-slab prior allows variable sparsity.**
     A proportion π of SNPs are causal with effects from a slab distribution,
     and (1-π) are null. -/
@@ -381,24 +372,6 @@ theorem spike_slab_variance_nonneg (π σ_slab : ℝ)
     0 ≤ spikeAndSlabPriorVariance π σ_slab := by
   unfold spikeAndSlabPriorVariance
   exact mul_nonneg h_π (sq_nonneg _)
-
-/- **Bayes risk under correct vs misspecified prior.**
-    Under a spike-and-slab truth with causal proportion π and per-SNP
-    effect variance σ²_β, the oracle Bayes risk (correct prior) applies
-    optimal shrinkage only to causal SNPs. The misspecified Gaussian
-    prior applies uniform shrinkage to all M SNPs.
-
-    Oracle risk (per-SNP, causal): σ²_ε/(n·σ²_β + σ²_ε) (optimal shrinkage)
-    Oracle risk (per-SNP, null): 0 (correctly zeroed out)
-    Total oracle risk: π·M · σ²_ε/(n·σ²_β + σ²_ε)
-
-    Misspecified Gaussian risk: each SNP gets shrinkage based on
-    σ²_prior = π·σ²_β (the marginal variance). For causal SNPs, this
-    overshrinks (prior variance too small). For null SNPs, this undershrinks
-    (nonzero posterior mean). The excess risk is proportional to (1-π).
-
-    We define the Bayes risk ratio (misspecified/oracle) and show it
-    exceeds 1 by a factor that grows with sparsity (1-π). -/
 
 /-- **Misspecification excess risk.**
     The excess MSE from using a Gaussian prior when the true architecture
@@ -576,10 +549,6 @@ theorem global_shrinkage_controls_sparsity
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
-/- **PRS-CS automatically adapts to genetic architecture.**
-    The continuous shrinkage prior adapts the effective number of
-    nonzero effects based on the data, without specifying π directly. -/
-
 /-- **PRS-CS performance relative to C+T.**
     PRS-CS uniformly dominates C+T in in-sample prediction.
     The advantage is largest for polygenic traits.
@@ -630,10 +599,6 @@ framework to improve portability.
 -/
 
 section MultiAncestryBayesian
-
-/- **Joint posterior from multi-ancestry GWAS.**
-    P(β | data_EUR, data_AFR, ...) combines information across
-    ancestries, weighted by sample size and genetic correlation. -/
 
 /-- **Genetic correlation determines information borrowing.**
     If rg = 1 (same effects), full information is shared.

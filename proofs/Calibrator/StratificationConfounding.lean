@@ -35,10 +35,6 @@ This bias is a form of confounding.
 
 section StratificationBias
 
-/- **Stratification bias model.**
-    True effect: β. Stratification inflates to β̂ = β + b_confound.
-    b_confound = Cov(ancestry, phenotype) * Cov(ancestry, genotype) / Var(genotype). -/
-
 /-- Stratification bias is nonzero when ancestry correlates with both
     phenotype and genotype. -/
 theorem stratification_bias_nonzero
@@ -265,12 +261,6 @@ the environmental mediation may differ across populations.
 -/
 
 section GeneEnvironmentCorrelation
-
-/- **rGE decomposition of PGS prediction.**
-    PGS predicts outcome through two pathways:
-    1. Direct genetic effect: β_direct
-    2. Indirect (rGE-mediated) effect: β_indirect = β_genetic × r_GE × β_env
-    Total prediction: β_total = β_direct + β_indirect -/
 
 /-- **rGE model.**
     Genetic effects on an outcome are mediated through both a direct

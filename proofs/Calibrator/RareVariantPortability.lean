@@ -33,11 +33,6 @@ This has direct implications for PGS portability.
 
 section RareVariantSpecificity
 
-/-- **Variant sharing decreases with MAF.**
-    The probability that a variant is shared between two populations
-    decreases with decreasing MAF. -/
-noncomputable def variantSharingProb (fst maf : ℝ) : ℝ :=
-  1 - (1 - maf) ^ (1 / fst)
 
 /-- **Ultra-rare variants are almost never shared.**
     Under the coalescent, a variant at frequency p in one population
@@ -120,10 +115,6 @@ and can improve portability.
 
 section BurdenTests
 
-/- **Burden test aggregates rare variants per gene.**
-    Gene-level score = Σ_i w_i × g_i for rare variants i in the gene.
-    This improves power by reducing the multiple testing burden. -/
-
 /-- **Gene-level scores are more portable than variant-level.**
     Even if specific rare variants differ, the gene-level burden
     may be similar across populations. If variant sharing rate is s < 1
@@ -198,11 +189,6 @@ but the portability implications are complex.
 
 section WGSBasedPGS
 
-/-- **WGS PGS = common + rare components.**
-    PGS_WGS = PGS_common + PGS_rare.
-    The portability of each component differs dramatically. -/
-noncomputable def wgsPGS (pgs_common pgs_rare : ℝ) : ℝ :=
-  pgs_common + pgs_rare
 
 /-- **Common variant component ports better.**
     PGS_common has moderate portability (shared variants, LD issues).

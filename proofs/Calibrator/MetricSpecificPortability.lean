@@ -810,10 +810,6 @@ noncomputable def ppvPortabilityGap
   |metricPPV sensitivity specificity prevalenceTarget -
     metricPPV sensitivity specificity prevalenceSource|
 
-/- **Recall (sensitivity) of high-risk classification.**
-    Sensitivity = P(PGS says high risk | actually high risk).
-    Depends on the PGS's discriminative ability. -/
-
 /-- **PPV is strictly increasing in prevalence.**
     At fixed sensitivity and specificity, higher prevalence yields higher PPV.
     This is the concrete base-rate sensitivity of PPV. -/
@@ -1036,10 +1032,6 @@ noncomputable abbrev brierScoreMetric (p y : ℝ) : ℝ := brierScore p y
 /-- Brier score is nonneg. -/
 theorem brier_nonneg (p y : ℝ) : 0 ≤ brierScoreMetric p y := by
   simpa [brierScoreMetric, brierScore] using sq_nonneg (y - p)
-
-/- **Log score (cross-entropy) is also proper.**
-    Log(p, y) = -y log(p) - (1-y) log(1-p).
-    Log score is more sensitive to calibration than Brier. -/
 
 /-- **Brier score is bounded above by 1 (derived from definition).**
     Since `brierFromR2 π r2 = π(1-π)(1-r2)`, and π(1-π) ≤ 1/4 (AM-GM)

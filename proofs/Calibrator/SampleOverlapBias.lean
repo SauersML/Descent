@@ -162,11 +162,6 @@ independent samples.
 
 section LOOCorrections
 
-/- **Leave-one-out PGS.**
-    For each individual i, compute PGS using GWAS that
-    excludes individual i. This eliminates overfitting
-    but is computationally expensive. -/
-
 /-- **Approximate LOO using linear algebra.**
     PGS_LOO_i ≈ PGS_full_i - leverage_i × residual_i
     where leverage_i = X_i'(X'X)⁻¹X_i. -/

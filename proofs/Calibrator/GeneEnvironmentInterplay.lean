@@ -131,11 +131,6 @@ PGS partially captures environmental effects.
 
 section GeneEnvironmentCorrelation
 
-/- **Three types of rGE.**
-    1. Passive: shared family genetics and environment
-    2. Evocative: genetic traits elicit environmental responses
-    3. Active: genetic predispositions guide environmental choices -/
-
 /-- **rGE inflates PGS R² in the source population.**
     If PGS captures environmental effects via rGE, and rGE
     differs across populations, the PGS R² inflation is
@@ -333,12 +328,6 @@ measures and what it doesn't.
 -/
 
 section CounterfactualFramework
-
-/- **Counterfactual PGS interpretation.**
-    PGS predicts: "if this person had grown up in the average
-    environment of the discovery population, their expected
-    phenotype would be..."
-    Cross-population: this counterfactual is less relevant. -/
 
 /-- **Average treatment effect of ancestry on PGS accuracy.**
     ATE = E[R²(own ancestry) - R²(other ancestry)].

@@ -619,14 +619,6 @@ between source and target populations by reweighting individuals.
 
 section ImportanceWeighting
 
-/- **Importance weights for genetic ancestry.**
-    w(x) = P_target(x) / P_source(x) for genotype x.
-    In practice, estimated from allele frequency ratios. -/
-
-/- **IW-corrected PGS.**
-    β̂_IW = argmin Σᵢ wᵢ (yᵢ - x'ᵢ β)²
-    This gives unbiased estimates for the target population. -/
-
 /-- **IW effective sample size.**
     n_eff = (Σ wᵢ)² / (Σ wᵢ²) ≤ n.
     The effective sample size decreases with the divergence
@@ -751,10 +743,6 @@ while preserving trait-relevant information.
 -/
 
 section FeatureRepresentation
-
-/- **Ancestry-invariant representations.**
-    Find a mapping φ(x) such that P_S(φ(x)) ≈ P_T(φ(x))
-    while preserving Y = f(φ(x)) + ε. -/
 
 /-- **PCA projection as a simple representation.**
     Projecting genotypes onto top PCs separates ancestry from
@@ -1103,13 +1091,6 @@ limited target-population data.
 
 section FineTuning
 
-/- **Sample complexity for PGS fine-tuning.**
-    The number of target-population samples needed to improve
-    upon the source PGS depends on:
-    1. The divergence (Fst) between source and target
-    2. The genetic architecture complexity
-    3. The source PGS quality -/
-
 /-- Fine-tuned target `R²` in a simple additive penalty model. -/
 def fineTunedTargetR2 (r2_source divergence_penalty adaptation_gain : ℝ) : ℝ :=
   r2_source - divergence_penalty + adaptation_gain
@@ -1375,10 +1356,6 @@ theorem scratch_beats_fine_tuning_iff_target_sample_exceeds_critical
       rw [div_lt_iff₀ h_n]
       simpa [mul_comm, mul_left_comm, mul_assoc] using hcross
     linarith
-
-/- **Regularized fine-tuning shrinks toward source PGS.**
-    β̂_target = argmin Σ wᵢ(yᵢ - x'ᵢβ)² + λ‖β - β̂_source‖²
-    The regularization λ controls how much to trust the source PGS. -/
 
 /-- **Target fine-tuning shrinkage MSE.**
     We model the fine-tuned estimator as a convex combination of the unbiased

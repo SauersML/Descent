@@ -494,11 +494,6 @@ theorem proportional_sums_to_total
   unfold proportionalAllocation
   field_simp
 
-/-- **Equal allocation.**
-    Give each ancestry group the same sample size.
-    Better for portability when groups have very different sizes. -/
-noncomputable def equalAllocation (total_n : ℝ) (k : ℕ) : ℝ :=
-  total_n / k
 
 /-- **Optimal allocation depends on objective.**
     With two pops and R² ∝ n_pop × c_pop, moving Δ samples from pop1

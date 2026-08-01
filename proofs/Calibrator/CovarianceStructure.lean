@@ -109,10 +109,6 @@ of this mismatch directly predicts PGS portability loss.
 
 section LDMismatch
 
-/- **Frobenius norm of LD difference.**
-    ||Σ_source - Σ_target||²_F = Σ_ij (r_ij^source - r_ij^target)²
-    This quantifies the total LD mismatch. -/
-
 /-- **PGS R² loss is bounded by LD mismatch.**
     When R²_target = R²_source × (1 - c × frob_sq) for LD mismatch
     frob_sq and coupling constant c, the R² loss equals R²_source × c × frob_sq,
@@ -244,11 +240,6 @@ variant has with its neighbors. This is crucial for PGS weighting.
 -/
 
 section LDScore
-
-/- **LD score definition.**
-    ℓ_j = Σ_k r²_jk where sum is over all variants within
-    a window. Higher LD score → more tagging → more signal
-    but also more noise in GWAS. -/
 
 /-!
 ### Derivation of ldsrExpectedChi2 = N·h²/M·ℓ_j + N·a/M + 1

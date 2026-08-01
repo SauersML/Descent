@@ -52,13 +52,6 @@ theorem qst_in_unit (V_b V_w : ℝ)
   · exact div_nonneg h_b (le_of_lt h_denom)
   · rw [div_le_one h_denom]; linarith
 
-/- **QST >> FST indicates directional selection.**
-   When QST exceeds FST by a margin δ > 0, this indicates
-   directional selection has driven trait divergence beyond
-   what neutral drift (FST) would predict.
-
-   Worked example: For immune traits, QST greatly exceeds FST due to
-   pathogen-driven selection that disrupts genetic architecture. -/
 end QSTFSTTest
 
 
@@ -138,12 +131,6 @@ theorem expected_pgs_diff_var_nonneg (V_A fst : ℝ)
     0 ≤ expectedPGSDiffVariance V_A fst := by
   unfold expectedPGSDiffVariance; positivity
 
-/-- **Overdispersion test.**
-    If the observed PGS difference is significantly larger than
-    expected under drift, there is evidence of polygenic adaptation.
-    Test statistic: χ² = (ΔPGS)² / (V_A × 2FST). -/
-noncomputable def overdispersionStatistic (delta_pgs V_A fst : ℝ) : ℝ :=
-  delta_pgs ^ 2 / expectedPGSDiffVariance V_A fst
 
 /-- **Population stratification confounds overdispersion tests.**
     Cryptic stratification in the GWAS discovery sample can
@@ -300,15 +287,6 @@ GWAS effect sizes and allele frequencies.
 -/
 
 section DetectingAdaptation
-
-/- **Turchin et al. height signal.**
-    Height-increasing alleles are systematically more common
-    in Northern Europeans. This was initially interpreted as
-    evidence of directional selection for height. -/
-
-/- **Berg-Coop test for polygenic adaptation.**
-    Tests whether the variance of trait-associated allele frequencies
-    exceeds neutral expectation, accounting for population structure. -/
 
 /-- **The height adaptation signal partially confounded.**
     Sohail et al. (2019) showed that much of the apparent height

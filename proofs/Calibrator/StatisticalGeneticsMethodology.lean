@@ -93,10 +93,6 @@ estimation of PGS portability.
 
 section CrossValidation
 
-/- **Independent GWAS and validation sets.**
-    The PGS weights must be estimated in a separate sample from
-    the one used for R² evaluation. Overlap creates bias. -/
-
 /-- **Overfitting bias from sample overlap.**
     If the GWAS sample overlaps with the evaluation sample,
     R² is biased upward by approximately p/n where p is the
@@ -109,10 +105,6 @@ theorem overlap_bias
   constructor
   · exact div_pos h_p h_n
   · rw [div_lt_one h_n]; exact h_n_large
-
-/- **Portability assessment requires population-specific validation.**
-    R² must be evaluated in each target population separately.
-    A single combined evaluation mixes portability with demographics. -/
 
 /-- **Blocked cross-validation for family structure.**
     When evaluating PGS in populations with family structure,
@@ -128,10 +120,6 @@ theorem blocked_cv_less_biased
   rw [abs_of_nonneg (by linarith), abs_of_nonneg (by linarith)]
   linarith
 
-/- **Time-split validation for discovery bias.**
-    If the PGS discovery includes newer data, temporal validation
-    (train on older data, test on newer) avoids temporal confounding. -/
-
 end CrossValidation
 
 
@@ -144,20 +132,6 @@ individual-level data. This introduces specific challenges.
 
 section SummaryStatPGS
 
-/- **Summary statistics: effect size and standard error.**
-    For SNP j: β̂_j and SE_j from the GWAS.
-    P-value: p_j = 2Φ(-|β̂_j/SE_j|). -/
-
-/-- **Z-score standardization.**
-    z_j = β̂_j / SE_j ≈ β̂_j × √n (for standardized genotypes).
-    Different GWAS may report β̂ or z-scores. -/
-noncomputable def zScore (beta se : ℝ) : ℝ := beta / se
-
-/- **PGS from summary stats.**
-    PGS = Σ_j w_j × g_j where w_j depends on the method:
-    - C+T: w_j = β̂_j × I(p_j < threshold)
-    - PRS-CS: w_j = E[β_j | summary stats, LD]
-    - LDpred: w_j = posterior mean from Bayesian model -/
 
 /-- **Effective sample size from summary stats.**
     n_eff_j = (Z_j / β_true_j)² if β_true_j were known.
@@ -170,10 +144,6 @@ theorem effective_n_pos (se : ℝ) (h_se : 0 < se) :
     0 < effectiveSampleSizeSE se := by
   unfold effectiveSampleSizeSE
   exact div_pos one_pos (sq_pos_of_pos h_se)
-
-/- **Multi-ancestry meta-analysis of summary statistics.**
-    β̂_meta = Σ_k w_k β̂_k / Σ_k w_k where w_k = 1/SE_k².
-    This combines information across ancestries. -/
 
 /-- **Meta-analysis model definition.**
     Contains properties of the model, specifically:
@@ -238,21 +208,6 @@ which is a key predictor of PGS portability.
 -/
 
 section LDScoreRegression
-
-/- **LD score definition.**
-    ℓ_j = Σ_k r²_jk where the sum is over SNPs k in a window around j.
-    This captures the local LD structure. -/
-
-/- **LDSC regression equation.**
-    E[χ²_j] = N × h² × ℓ_j / M + N × a + 1
-    where h² is heritability, M is SNPs, a is intercept.
-    The slope gives h² × N / M. -/
-
-/- **Cross-population LDSC.**
-    E[z₁_j × z₂_j] = √(n₁n₂) × ρ_g × ℓ_j / M + intercept
-    where ρ_g is genetic correlation.
-    This directly estimates the genetic correlation
-    that predicts PGS portability. -/
 
 structure LDSCModel (m : ℕ) where
   -- Effect sizes in source and target populations
@@ -351,15 +306,6 @@ with different properties for portability prediction.
 -/
 
 section GeneticCorrelationMethods
-
-/- **Popcorn (trans-ethnic genetic correlation).**
-    Extends LDSC for cross-population genetic correlation
-    estimation using population-specific LD scores. -/
-
-/- **SumHer (LDAK-based genetic correlation).**
-    Uses the LDAK model for LD-dependent architecture
-    and may give different ρ_g estimates than LDSC. -/
-
 
 /-- **Genetic correlation varies across the genome.**
     ρ_g estimated from different genomic regions can vary,

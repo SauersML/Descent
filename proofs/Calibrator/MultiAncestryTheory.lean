@@ -22,9 +22,6 @@ GWAS diversity affects portability bounds.
 
 section GWASDiversity
 
-/- **GWAS sample genetic distance from target.**
-    d_GWAS(target) = weighted distance from target individual to GWAS centroid. -/
-
 /-- **Multi-ancestry GWAS reduces effective Fst.**
     A multi-ancestry GWAS with fraction α from a second ancestry
     at Fst distance d₂ from the target (and the primary ancestry at

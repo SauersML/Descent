@@ -112,54 +112,12 @@ noncomputable def crossCovEntry {c t : ℕ}
   ∫ x : CausalVec c × TagVec t,
       (x.1 i - causalMean dgp i) * (x.2 j - tagMean dgp j) ∂dgp.jointMeasureCT
 
-/-- Causal variance entry `Var(X_causal[i])`. -/
-noncomputable def causalVarEntry {c t : ℕ}
-    (dgp : TaggedDataGeneratingProcess c t) (i : Fin c) : ℝ :=
-  ∫ x : CausalVec c × TagVec t, (x.1 i - causalMean dgp i) ^ 2 ∂dgp.jointMeasureCT
-
-/-- Tag variance entry `Var(X_tag[j])`. -/
-noncomputable def tagVarEntry {c t : ℕ}
-    (dgp : TaggedDataGeneratingProcess c t) (j : Fin t) : ℝ :=
-  ∫ x : CausalVec c × TagVec t, (x.2 j - tagMean dgp j) ^ 2 ∂dgp.jointMeasureCT
 
 /-- Cross-covariance matrix `Σ_tc` between tag and causal coordinates. -/
 noncomputable def sigmaTagCausal {c t : ℕ}
     (dgp : TaggedDataGeneratingProcess c t) : Matrix (Fin t) (Fin c) ℝ :=
   Matrix.of fun j i => crossCovEntry dgp i j
 
-/-- LD correlation entry `Corr(X_causal[i], X_tag[j])`.
-If either marginal variance is zero, we set the entry to `0`. -/
-noncomputable def ldCorrelationEntry {c t : ℕ}
-    (dgp : TaggedDataGeneratingProcess c t) (i : Fin c) (j : Fin t) : ℝ :=
-  let denom := Real.sqrt (causalVarEntry dgp i) * Real.sqrt (tagVarEntry dgp j)
-  if denom = 0 then 0 else crossCovEntry dgp i j / denom
-
-/-- LD parameter matrix between causal and tag spaces (correlation form). -/
-noncomputable def ldCorrelationMatrix {c t : ℕ}
-    (dgp : TaggedDataGeneratingProcess c t) : Matrix (Fin t) (Fin c) ℝ :=
-  Matrix.of fun j i => ldCorrelationEntry dgp i j
-
-/-- Linear causal outcome map `y = β_cᵀ x_causal`. -/
-noncomputable def causalLinearOutcome {c : ℕ}
-    (betaCausal : CausalVec c) (xCausal : CausalVec c) : ℝ :=
-  dotProduct betaCausal xCausal
-
-/-- Observable ML predictor restricted to tag-space input `x_tag ↦ wᵀ x_tag`. -/
-noncomputable def tagLinearPredictor {t : ℕ}
-    (wTag : TagVec t) (xTag : TagVec t) : ℝ :=
-  dotProduct wTag xTag
-
-/-- Tagged squared loss: predictor only sees `X_tag`, while target is causal outcome from `X_causal`. -/
-noncomputable def taggedSquaredLoss {c t : ℕ}
-    (betaCausal : CausalVec c) (wTag : TagVec t)
-    (x : CausalVec c × TagVec t) : ℝ :=
-  (causalLinearOutcome betaCausal x.1 - tagLinearPredictor wTag x.2) ^ 2
-
-/-- Observable risk in tagged setting: expectation over the joint causal-tag population law. -/
-noncomputable def observableTaggedRisk {c t : ℕ}
-    (dgp : TaggedDataGeneratingProcess c t)
-    (betaCausal : CausalVec c) (wTag : TagVec t) : ℝ :=
-  ∫ x, taggedSquaredLoss betaCausal wTag x ∂dgp.jointMeasureCT
 
 /-- Source tagged second moments for best linear prediction from tags.
 
@@ -699,14 +657,6 @@ They capture the two essential mechanisms:
 2) LD decay reduces tagging efficiency with genetic distance
 -/
 
-structure DriftPhysics (k : ℕ) where
-  /-- Genic variance as a function of ancestry coordinates. -/
-  genic_variance : (Fin k → ℝ) → ℝ
-  /-- Tagging efficiency (squared correlation between score and causal liability). -/
-  tagging_efficiency : (Fin k → ℝ) → ℝ
-
-def optimalSlopeDrift {k : ℕ} (phys : DriftPhysics k) (c : Fin k → ℝ) : ℝ :=
-  phys.tagging_efficiency c
 
 /-! ### Linear Noise ⇒ Nonlinear Optimal Slope
 
@@ -880,14 +830,6 @@ theorem normalization_erases_heritability {k : ℕ} [Fintype (Fin k)]
 The score drifts with ancestry while true liability does not.
 The calibrator must subtract the drift term (PC main effects). -/
 
-structure NeutralScoreDrift (k : ℕ) where
-  /-- True genetic liability (ancestry-invariant in this mechanism). -/
-  true_liability : ℝ
-  /-- Artifactual drift in the observed score. -/
-  drift_artifact : (Fin k → ℝ) → ℝ
-
-def driftedScore {k : ℕ} (mech : NeutralScoreDrift k) (c : Fin k → ℝ) : ℝ :=
-  mech.true_liability + mech.drift_artifact c
 
 /-! ### Biological Mechanisms → Statistical DGPs
 
@@ -898,36 +840,22 @@ structure DifferentialTagging (k : ℕ) where
   /-- Tagging efficiency as a function of ancestry (LD decay). -/
   tagging_efficiency : (Fin k → ℝ) → ℝ
 
-noncomputable def taggingDGP {k : ℕ} [Fintype (Fin k)] (mech : DifferentialTagging k) : DataGeneratingProcess k := {
-  trueExpectation := fun p c => mech.tagging_efficiency c * p
-  jointMeasure := stdNormalProdMeasure k
-}
 
 structure StratifiedEnvironment (k : ℕ) where
   /-- Additive environmental bias correlated with ancestry. -/
   beta_env : ℝ
 
-noncomputable def stratifiedDGP {k : ℕ} [Fintype (Fin k)] (mech : StratifiedEnvironment k) : DataGeneratingProcess k :=
-  dgpAdditiveBias k mech.beta_env
 
 structure BiologicalGxE (k : ℕ) where
   /-- Multiplicative environmental scaling of genetic effect. -/
   scaling : (Fin k → ℝ) → ℝ
 
-noncomputable def gxeDGP {k : ℕ} [Fintype (Fin k)] (mech : BiologicalGxE k) : DataGeneratingProcess k := {
-  trueExpectation := fun p c => mech.scaling c * p
-  jointMeasure := stdNormalProdMeasure k
-}
 
 inductive BiologicalMechanism (k : ℕ)
   | taggingDecay (m : DifferentialTagging k)
   | stratifiedEnv (m : StratifiedEnvironment k)
   | gxe (m : BiologicalGxE k)
 
-noncomputable def realize_mechanism {k : ℕ} [Fintype (Fin k)] : BiologicalMechanism k → DataGeneratingProcess k
-  | .taggingDecay m => taggingDGP m
-  | .stratifiedEnv m => stratifiedDGP m
-  | .gxe m => gxeDGP m
 
 /-! ### Normalization-Prevalence Bias (Cross-Ancestry Calibration)
 
@@ -1580,9 +1508,6 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
   unfold tau
   exact div_nonneg p.t_div_nonneg (by linarith [p.Ne_pos])
 
-/-- **Drift-only Fst**: Fst = 1 - exp(-τ). -/
-noncomputable def fstDriftOnly (p : EvolutionaryParameters) : ℝ :=
-  1 - Real.exp (-p.tau)
 
 /-- **Drift-mutation equilibrium Fst**: Fst = 1/(1 + θ).
     Mutation prevents Fst from reaching 1 by introducing shared variation. -/
@@ -2343,14 +2268,6 @@ noncomputable def alleleFreqDivergenceRate (Ne mu m_rate : ℝ) : ℝ :=
 /-- LD breakage rate from recombination. -/
 noncomputable def ldBreakageRate (r : ℝ) : ℝ := 2 * r
 
-/-- Novel-variant arrival rate from mutation. -/
-noncomputable def novelVariantArrivalRate (mu : ℝ) : ℝ := 2 * mu
-
-/-- Migration restoration rate, reported separately because it counteracts
-divergence rather than adding to it. -/
-noncomputable def migrationRestorationRate (Ne m_rate : ℝ) : ℝ :=
-  let bigM := 4 * Ne * m_rate
-  bigM / (2 * Ne * (1 + bigM))
 
 /-- LD breakage dominates the allele-frequency divergence rate when
 recombination exceeds the drift timescale. This is a comparison of component

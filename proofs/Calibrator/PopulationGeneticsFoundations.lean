@@ -49,11 +49,6 @@ theorem nei_fst_in_unit (H_T H_S : ℝ)
   · exact div_nonneg (by linarith) (le_of_lt h_HT)
   · rw [div_le_one h_HT]; linarith
 
-/-- **Hudson's Fst for two populations.**
-    Fst = 1 - (p₁(1-p₁) + p₂(1-p₂)) / ((p₁+p₂)/2 × (1-(p₁+p₂)/2) × 2). -/
-noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
-  let p_bar := (p₁ + p₂) / 2
-  1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) / (2 * p_bar * (1 - p_bar))
 
 /-- **Fst from allele frequency difference (simplified).**
     For biallelic loci: Fst ≈ (p₁ - p₂)² / (p̄(1-p̄))
@@ -83,13 +78,6 @@ theorem simple_fst_symmetric (p₁ p₂ : ℝ) :
   unfold simpleFst
   ring_nf
 
-/-- **Multi-locus Fst is an average over loci.**
-    Genome-wide Fst = (Σᵢ Fst_i × H_i) / (Σᵢ H_i)
-    weighted by locus-specific heterozygosity. -/
-noncomputable def multiLocusFst {m : ℕ}
-    (fst_per_locus het_per_locus : Fin m → ℝ) : ℝ :=
-  ∑ i, fst_per_locus i * het_per_locus i /
-    ∑ i, het_per_locus i
 
 end FstDefinitions
 
@@ -169,10 +157,6 @@ variation. It is central to predicting portability.
 
 section EffectivePopulationSize
 
-/-- **Ne from genetic diversity.**
-    Ne = π / (4μ) where π is nucleotide diversity and μ is mutation rate. -/
-noncomputable def neFromDiversity (π μ : ℝ) : ℝ :=
-  π / (4 * μ)
 
 /-- **Ne affects PGS variance.**
     Var(PGS_drift) = V_A × Fst = V_A × t / (2Ne).
