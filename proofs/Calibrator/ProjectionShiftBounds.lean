@@ -64,7 +64,7 @@ theorem dot_weightedResidualMoment
           ring
       _ = (∑ i, (direction i) •
             (fun ω => X ω i * ((densityRatio ω - 1) * residual ω))) ω := by
-          simp only [Finset.sum_apply]
+          simp only [Finset.sum_apply, Pi.smul_apply]
   rw [hexpand, ExpFunctional.eval_sum]
   apply Finset.sum_congr rfl
   intro i _
