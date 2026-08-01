@@ -32,15 +32,15 @@ theorem balanced_superthreshold_iff_information
     have hsquares : bbpProxyThreshold n M ^ 2 < (F * n / 2) ^ 2 :=
       (sq_lt_sq₀ (le_of_lt hedge) (le_of_lt hbalanced)).2 hcross
     rw [hedge_sq] at hsquares
-    have hcleared : n < M * (F * n / 2) ^ 2 :=
-      (div_lt_iff₀ hM).1 hsquares
+    have hcleared : n < M * (F * n / 2) ^ 2 := by
+      simpa [mul_comm] using (div_lt_iff₀ hM).1 hsquares
     nlinarith [hn]
   · intro hinformation
     have hcleared : n < M * (F * n / 2) ^ 2 := by
       nlinarith [hn]
     have hsquares : bbpProxyThreshold n M ^ 2 < (F * n / 2) ^ 2 := by
       rw [hedge_sq]
-      exact (div_lt_iff₀ hM).2 hcleared
+      exact (div_lt_iff₀ hM).2 (by simpa [mul_comm] using hcleared)
     exact (sq_lt_sq₀ (le_of_lt hedge) (le_of_lt hbalanced)).1 hsquares
 
 /-- A detectable valid subgroup exists exactly above the sharp information
@@ -63,7 +63,7 @@ theorem exists_superthreshold_subgroup_iff_marker_requirement
   rw [exists_superthreshold_subgroup_iff_information n M F hn hM hF]
   have hdenominator : 0 < F ^ 2 * n := mul_pos (sq_pos_of_pos hF) hn
   rw [div_lt_iff₀ hdenominator]
-  ring
+  ring_nf
 
 /-- Equivalent calculator form: the sample size must exceed
 `4 / (M F²)`. -/
@@ -75,7 +75,7 @@ theorem exists_superthreshold_subgroup_iff_sample_requirement
   rw [exists_superthreshold_subgroup_iff_information n M F hn hM hF]
   have hdenominator : 0 < M * F ^ 2 := mul_pos hM (sq_pos_of_pos hF)
   rw [div_lt_iff₀ hdenominator]
-  ring
+  ring_nf
 
 /-- The balanced subgroup maximizes the signed correctability margin over all
 real subgroup sizes. -/
@@ -85,7 +85,12 @@ theorem pcCorrectabilityMargin_le_balanced
       pcCorrectabilityMargin n M F (n / 2) := by
   unfold pcCorrectabilityMargin
   apply sub_le_sub_right
-  rw [demographicSpike, effectiveSubgroupSize_balanced n hn]
-  convert demographicSpike_le_balanced n F m hn hF using 1 <;> ring
+  calc
+    demographicSpike n F m ≤ F * n / 2 :=
+      demographicSpike_le_balanced n F m hn hF
+    _ = demographicSpike n F (n / 2) := by
+      unfold demographicSpike
+      rw [effectiveSubgroupSize_balanced n hn]
+      ring
 
 end Calibrator
