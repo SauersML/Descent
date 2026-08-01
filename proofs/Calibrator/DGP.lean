@@ -9,7 +9,7 @@ open MeasureTheory
 
 section AllClaims
 
-variable {p k sp n : ℕ}
+variable {p k : ℕ}
 
 abbrev CausalVec (c : ℕ) := Fin c → ℝ
 abbrev TagVec (t : ℕ) := Fin t → ℝ
@@ -295,12 +295,6 @@ private def twoLocusIdx0 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
 
 private def twoLocusIdx1 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
   ⟨1, lt_of_lt_of_le (by decide : 1 < 2) Fact.out⟩
-
-private theorem twoLocusIdx0_ne_twoLocusIdx1 {t : ℕ} [Fact (2 ≤ t)] :
-    twoLocusIdx0 (t := t) ≠ twoLocusIdx1 (t := t) := by
-  intro h
-  have hval := congrArg Fin.val h
-  simp [twoLocusIdx0, twoLocusIdx1] at hval
 
 /-- Survival of two linked loci to the MRCA under discrete recombination. -/
 noncomputable def discreteRecombinationSurvival (recombRate : ℝ) (tmrca : ℕ) : ℝ :=
