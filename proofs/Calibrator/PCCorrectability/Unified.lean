@@ -38,7 +38,7 @@ theorem modeledPCResidualSusceptibility_eq_uncorrected_of_subthreshold
       ancestryGradientSusceptibility markerAxisVariance ancestryVariance := by
   unfold modeledPCResidualSusceptibility
   rw [subthreshold_sample_pc_leaves_full_axis n markers spike hsubthreshold]
-  ring
+  ring_nf
 
 /-- Above the spectral edge a finite positive spike strictly reduces, but does
 not eliminate, susceptibility.  This is the precise risk-level consequence of
@@ -99,7 +99,7 @@ theorem standardizedResidualPGSBias_mono_susceptibility
       hconfounding
   have hscaled := mul_le_mul_of_nonneg_right hsqrt hscale
   unfold standardizedResidualPGSBias pgsStratificationRiskCoefficient
-  simpa only [mul_assoc] using hscaled
+  convert hscaled using 1 <;> ring
 
 /-- Distribution-free end-to-end protection theorem.  A chi-square
 distribution-shift budget times a residual-curvature budget bounds coefficient
