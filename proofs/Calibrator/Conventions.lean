@@ -19,6 +19,9 @@ import Calibrator.SelectionArchitecture
 import Calibrator.PolygenicAdaptation
 import Calibrator.AncestryCalibration
 import Calibrator.PortabilityBounds
+import Calibrator.CovarianceStructure
+import Calibrator.HaplotypeTheory
+import Calibrator.LongitudinalPortability
 import Calibrator.PortabilityDrift
 import Calibrator.StratificationConfounding
 
@@ -639,6 +642,62 @@ theorem hetEquilibrium_eq_scaled (Ne mu : ℝ) :
       = scaledMutationRate Ne mu / (1 + scaledMutationRate Ne mu) := by
   unfold hetEquilibrium
   rw [scaledMutationRate_eq_ploidy_form]; unfold ploidy; ring_nf
+
+/-! ### Shared primitives
+
+Several groups of definitions across the development are the same map applied
+to different quantities. Left unrelated, each is free to drift from the others;
+naming the map once and relating them makes a divergence a failed proof. This
+is the same device as `ploidy`, applied to structure rather than to a
+constant. -/
+
+/-- Convex combination, `α x + (1 - α) y`. -/
+noncomputable def convexMix (α x y : ℝ) : ℝ := α * x + (1 - α) * y
+
+theorem spikeAndSlabVariance_eq_convexMix (pi sl sm : ℝ) :
+    spikeAndSlabVariance pi sl sm = convexMix pi sl sm := by
+  unfold spikeAndSlabVariance convexMix; ring
+
+theorem admixedAlleleFreq1_eq_convexMix (alpha p_A p_B : ℝ) :
+    admixedAlleleFreq1 alpha p_A p_B = convexMix alpha p_A p_B := by
+  unfold admixedAlleleFreq1 convexMix; ring
+
+theorem ancestrySpecificEffect_eq_convexMix (b1 b2 alpha : ℝ) :
+    ancestrySpecificEffect b1 b2 alpha = convexMix alpha b1 b2 := by
+  unfold ancestrySpecificEffect convexMix; ring
+
+/-- Geometric decay, `(1 - r)^t`: LD across generations, recombination
+survival along a genealogy, and admixture-LD decay are one map. -/
+noncomputable def geometricDecay (r : ℝ) (t : ℕ) : ℝ := (1 - r) ^ t
+
+theorem ldDecayPerGeneration_eq_geometricDecay (r : ℝ) (t : ℕ) :
+    ldDecayPerGeneration r t = geometricDecay r t := by
+  unfold ldDecayPerGeneration geometricDecay; ring_nf
+
+theorem admixtureLDDecay_eq_geometricDecay (r : ℝ) (t : ℕ) :
+    admixtureLDDecay r t = geometricDecay r t := by
+  unfold admixtureLDDecay geometricDecay; ring_nf
+
+theorem discreteRecombinationSurvival_eq_geometricDecay (r : ℝ) (t : ℕ) :
+    discreteRecombinationSurvival r t = geometricDecay r t := by
+  unfold discreteRecombinationSurvival geometricDecay; ring_nf
+
+/-- One minus a ratio, `1 - a / b`: `F_ST` from a heterozygosity ratio, `F_ST`
+from coalescence times, `R²` from a mean squared error, and residual efficacy
+are one map. -/
+noncomputable def oneMinusRatio (a b : ℝ) : ℝ := 1 - a / b
+
+theorem fstFromHetRatio_eq_oneMinusRatio (H H₀ : ℝ) :
+    fstFromHetRatio H H₀ = oneMinusRatio H H₀ := by
+  unfold fstFromHetRatio oneMinusRatio; ring_nf
+
+theorem hudsonFstFromCoalescenceTimes_eq_oneMinusRatio (ETss ETst : ℝ) :
+    hudsonFstFromCoalescenceTimes ETss ETst = oneMinusRatio ETss ETst := by
+  unfold hudsonFstFromCoalescenceTimes oneMinusRatio; ring_nf
+
+theorem r2FromMSE_eq_oneMinusRatio (mse varY : ℝ) :
+    r2FromMSE mse varY = oneMinusRatio mse varY := by
+  unfold r2FromMSE oneMinusRatio; ring_nf
 
 end EquilibriumAgreements
 

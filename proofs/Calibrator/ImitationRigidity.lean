@@ -326,9 +326,7 @@ theorem gramForm_symm {A : Matrix ι ι ℝ} (hA : A.IsSymm) (x y : ι → ℝ) 
   unfold gramForm
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-  have hsym : A j i = A i j := by
-    have := congrFun (congrFun hA i) j
-    simpa [Matrix.transpose_apply] using this.symm
+  have hsym : A j i = A i j := hA.apply i j
   rw [hsym]; ring
 
 theorem gramForm_sub_left (A : Matrix ι ι ℝ) (x y z : ι → ℝ) :
@@ -433,9 +431,7 @@ theorem gramForm_witness {A : Matrix ι ι ℝ} (hA : A.IsSymm)
     refine Finset.sum_congr rfl (fun j _ => ?_)
     simp only [Matrix.mulVec, dotProduct, Finset.sum_mul]
     refine Finset.sum_congr rfl (fun i _ => ?_)
-    have hsym : A j i = A i j := by
-      have := congrFun (congrFun hA i) j
-      simpa [Matrix.transpose_apply] using this.symm
+    have hsym : A j i = A i j := hA.apply i j
     rw [hsym]; ring
   rw [hexpand, hwitness]
   rfl
@@ -619,7 +615,9 @@ theorem ldKernelSymbol_pi {decay : ℝ} (hd : |decay| < 1) :
     have h2 : -|decay| ≤ decay := neg_abs_le decay
     have : -1 < decay := by cases abs_lt.mp hd with | intro hlo _ => exact hlo
     linarith
-  field_simp
+  have hden : 1 - 2 * decay * (-1) + decay ^ 2 = (1 + decay) ^ 2 := by ring
+  rw [hden]
+  field_simp [hne]
   ring
 
 /-- **The hard edge is a lower bound on the whole LD spectrum.** No direction in
@@ -629,12 +627,13 @@ theorem ldKernelSymbol_ge_hardEdge {decay angle : ℝ} (hd : |decay| < 1)
     (hnonneg : 0 ≤ decay) :
     ldHardEdge decay ≤ ldKernelSymbol decay angle := by
   unfold ldHardEdge ldKernelSymbol
-  have hden := ldKernelSymbol_denom_pos hd
+  have hden : 0 < 1 - 2 * decay * Real.cos angle + decay ^ 2 :=
+    ldKernelSymbol_denom_pos (decay := decay) (angle := angle) hd
   have hplus : 0 < 1 + decay := by
     have : -1 < decay := by cases abs_lt.mp hd with | intro hlo _ => exact hlo
     linarith
   have hcos_ge : -1 ≤ Real.cos angle := Real.neg_one_le_cos angle
-  rw [div_le_div_iff hplus hden]
+  rw [div_le_div_iff₀ hplus hden]
   nlinarith [mul_nonneg hnonneg (by linarith : (0:ℝ) ≤ 1 + Real.cos angle),
     sq_nonneg decay, hnonneg]
 
@@ -657,11 +656,12 @@ theorem ldKernelSymbol_harmonicMean {decay : ℝ} (hd : |decay| < 1) :
   rw [intervalIntegral.integral_div,
     intervalIntegral.integral_sub intervalIntegrable_const
       ((continuous_const.mul Real.continuous_cos).intervalIntegrable _ _),
-    intervalIntegral.integral_const_mul, intervalIntegral.integral_cos,
+    intervalIntegral.integral_const_mul, integral_cos,
     intervalIntegral.integral_const]
   rw [Real.sin_two_pi, Real.sin_zero]
   unfold ldWhiteningGain
   field_simp
+  simp [smul_eq_mul]
   ring
 
 theorem ldWhiteningGain_ge_one {decay : ℝ} (hd : |decay| < 1) :
@@ -683,7 +683,7 @@ theorem ldWhiteningGain_strictMono {decay₁ decay₂ : ℝ}
     have := sq_abs decay₂
     nlinarith [abs_nonneg decay₂, h₂]
   have hd1 : (0 : ℝ) < 1 - decay₁ ^ 2 := by nlinarith [h₁, hlt, hd2]
-  rw [div_lt_div_iff hd1 hd2]
+  rw [div_lt_div_iff₀ hd1 hd2]
   nlinarith [hlt, h₁, sq_nonneg (decay₂ - decay₁)]
 
 /-- **Recombination sets the whitening gain.** Tying the stationary kernel's
@@ -812,7 +812,7 @@ theorem ridgeBalance_strictMonoOn (eig : ι → ℝ) (ridge : ℝ)
     have hdiv :
         (∑ i, eig i / (eig i + ridge * w)) / (Fintype.card ι : ℝ) ≤
           (∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ) :=
-      div_le_div_of_nonneg_right' hsum hcardpos
+      div_le_div_of_nonneg_right hsum hcardpos.le
     linarith
 
 /-- **Uniqueness of the ridge fixed point.** The scalar that every ridge-PGS
@@ -904,7 +904,7 @@ theorem hasDerivAt_alleleLossProbability {time : ℝ} (htime : time ≠ 0) (init
   have hbase : HasDerivAt (fun x : ℝ => -(x / (2 * time))) (-(1 / (2 * time))) initial := by
     have := ((hasDerivAt_id initial).div_const (2 * time)).neg
     simpa using this
-  simpa [alleleLossProbability] using hbase.exp
+  simpa [alleleLossProbability, one_div, mul_comm, mul_left_comm, mul_assoc] using hbase.exp
 
 /-- **Quadratic-mean differentiability tolerates the atom.** The square root of
 the absorbed mass is smooth in the ancestral frequency, and four times its
@@ -919,8 +919,12 @@ theorem sqrt_alleleLoss_derivative_sq {initial time : ℝ} (htime : 0 < time) :
       alleleLossProbability initial time :=
     Real.sq_sqrt (le_of_lt (alleleLossProbability_pos initial time))
   have hne : time ≠ 0 := ne_of_gt htime
-  field_simp [hsq]
-  ring
+  calc
+    4 * (-(1 / (4 * time)) * Real.sqrt (alleleLossProbability initial time)) ^ 2 =
+        Real.sqrt (alleleLossProbability initial time) ^ 2 / (4 * time ^ 2) := by
+          field_simp [hne]
+          ring
+    _ = alleleLossProbability initial time / (4 * time ^ 2) := by rw [hsq]
 
 /-- Relative weight of the absorption channel against the diffusion channel,
 whose information scale is of order `1 / (x t)`. -/
@@ -956,7 +960,6 @@ theorem hasDerivAt_absorptionChannelWeight {initial time : ℝ} (htime : 0 < tim
           (-(-(initial * 2) / (2 * time) ^ 2)) time := hdiv.neg
       convert this using 1
       field_simp
-      ring
     simpa [Real.exp_ne_zero] using hinner.exp
   have hquot : HasDerivAt (fun t : ℝ => Real.exp (-(initial / (2 * t))) / (4 * t))
       ((Real.exp (-(initial / (2 * time))) * (initial / (2 * time ^ 2)) * (4 * time) -
@@ -971,7 +974,6 @@ theorem hasDerivAt_absorptionChannelWeight {initial time : ℝ} (htime : 0 < tim
     ring
   · unfold alleleLossProbability
     field_simp
-    ring
 
 /-- Before the crossover time the absorption channel is strictly gaining: as
 time passes, the pattern of losses becomes progressively more informative about
@@ -1003,8 +1005,9 @@ theorem absorptionChannelWeight_strictAntiOn {initial : ℝ} (hinitial : 0 < ini
       (Set.Ici (informationCrossoverTime initial)) := by
   apply strictAntiOn_of_deriv_neg (convex_Ici _)
   · intro t ht
-    have htpos : 0 < t := lt_of_lt_of_le (by simpa [informationCrossoverTime] using
-      half_pos hinitial) ht
+    have hcrossover : 0 < informationCrossoverTime initial := by
+      simpa [informationCrossoverTime] using half_pos hinitial
+    have htpos : 0 < t := lt_of_lt_of_le hcrossover ht
     exact ((hasDerivAt_absorptionChannelWeight htpos).differentiableAt.continuousAt).continuousWithinAt
   · intro t ht
     rw [interior_Ici] at ht
