@@ -1,4 +1,5 @@
 import Calibrator.PCCorrectability.Diagnostic
+import Calibrator.PCCorrectability.Design
 import Calibrator.PCCorrectability.Frequency
 import Calibrator.PCCorrectability.Geometry
 import Calibrator.PCCorrectability.Nonidentifiability
