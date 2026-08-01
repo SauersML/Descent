@@ -42,7 +42,7 @@ noncomputable def attenuatedVariance (beta_sq het r2_imp : ℝ) : ℝ :=
 /-- Attenuated ≤ true variance. -/
 theorem attenuated_le_true (beta_sq het r2_imp : ℝ)
     (h_bsq : 0 ≤ beta_sq) (h_het : 0 ≤ het)
-    (h_r2 : 0 ≤ r2_imp) (h_r2_le : r2_imp ≤ 1) :
+ (h_r2_le : r2_imp ≤ 1) :
     attenuatedVariance beta_sq het r2_imp ≤ beta_sq * het := by
   unfold attenuatedVariance
   calc beta_sq * het * r2_imp ≤ beta_sq * het * 1 :=
@@ -59,7 +59,7 @@ noncomputable def imputationErrorVariance (beta_sq het r2_imp : ℝ) : ℝ :=
 /-- Imputation error variance is nonneg. -/
 theorem imputation_error_nonneg (beta_sq het r2_imp : ℝ)
     (h_bsq : 0 ≤ beta_sq) (h_het : 0 ≤ het)
-    (h_r2 : 0 ≤ r2_imp) (h_r2_le : r2_imp ≤ 1) :
+ (h_r2_le : r2_imp ≤ 1) :
     0 ≤ imputationErrorVariance beta_sq het r2_imp := by
   unfold imputationErrorVariance
   exact mul_nonneg (mul_nonneg h_bsq h_het) (by linarith)
@@ -93,7 +93,7 @@ section ReferencePanel
     Matched panels have panel_match = 1; unmatched have panel_match < 1. -/
 theorem matched_panel_optimal
     (r2_LD panel_match : ℝ)
-    (h_r2 : 0 ≤ r2_LD) (h_pm_pos : 0 < panel_match) (h_pm_le : panel_match ≤ 1) :
+ (h_r2 : 0 ≤ r2_LD) (h_pm_le : panel_match ≤ 1) :
     r2_LD * panel_match ≤ r2_LD := by
   calc r2_LD * panel_match ≤ r2_LD * 1 := by
         exact mul_le_mul_of_nonneg_left h_pm_le h_r2
@@ -108,7 +108,7 @@ theorem matched_panel_optimal
     Specifically, mean_r2 = 1 - c/LD_extent for constant c > 0. -/
 theorem shorter_ld_worse_imputation
     (c ld_extent_long ld_extent_short : ℝ)
-    (h_c : 0 < c) (h_long : c < ld_extent_long) (h_short : c < ld_extent_short)
+ (h_c : 0 < c) (h_short : c < ld_extent_short)
     (h_shorter : ld_extent_short < ld_extent_long) :
     1 - c / ld_extent_short < 1 - c / ld_extent_long := by
   have h1 : c / ld_extent_long < c / ld_extent_short :=
@@ -168,7 +168,7 @@ theorem wgs_perfect_imputation
     despite r²_imp < 1, because the sample size advantage compensates. -/
 theorem wgs_vs_array_tradeoff
     (h2 r2_imp n_wgs n_array C : ℝ)
-    (h_h2 : 0 < h2) (h_imp : 0 < r2_imp) (h_imp_le : r2_imp ≤ 1)
+ (h_h2 : 0 < h2)
     (h_nw : 0 < n_wgs) (h_na : 0 < n_array) (h_C : 0 < C)
     (h_sample_advantage : r2_imp * n_array * (n_wgs + C) > n_wgs * (n_array + C)) :
     h2 * n_wgs / (n_wgs + C) < h2 * r2_imp * n_array / (n_array + C) := by
@@ -230,8 +230,7 @@ noncomputable def ascertainment_loss (coverage v_causal : ℝ) : ℝ :=
     arrays have higher coverage (cover_multi > cover_std). -/
 theorem multi_ethnic_arrays_reduce_bias
     (V_causal cover_std cover_multi : ℝ)
-    (h_V : 0 < V_causal) (h_cs : 0 ≤ cover_std) (h_cm : 0 ≤ cover_multi)
-    (h_cs_le : cover_std ≤ 1) (h_cm_le : cover_multi ≤ 1)
+ (h_V : 0 < V_causal)
     (h_better : cover_std < cover_multi) :
     ascertainment_loss cover_multi V_causal <
       ascertainment_loss cover_std V_causal := by

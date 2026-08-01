@@ -756,8 +756,7 @@ theorem wgs_eliminates_ld_mismatch
     common-only score because the source-specific rare variant helps within the
     discovery population. But in the target population the rare component does
     not contribute, so the portability ratio drops from `1` to `1/4`. -/
-theorem rare_variant_pgs_poor_portability
-    :
+theorem rare_variant_pgs_poor_portability :
     sourceTargetPortabilityRatio commonAndRarePortableModel <
       sourceTargetPortabilityRatio commonOnlyPortableModel := by
   unfold sourceTargetPortabilityRatio
@@ -771,8 +770,7 @@ theorem rare_variant_pgs_poor_portability
     `R²`, and in this witness it strictly worsens target `R²`. This formalizes
     the idea that rare variation helps local prediction without improving
     cross-population transport. -/
-theorem combined_strategy_optimal
-    :
+theorem combined_strategy_optimal :
     sourceR2FromSourceWeights commonOnlyPortableModel <
       sourceR2FromSourceWeights commonAndRarePortableModel ∧
     targetR2FromSourceWeights commonAndRarePortableModel <

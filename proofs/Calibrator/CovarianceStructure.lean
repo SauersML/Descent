@@ -69,8 +69,6 @@ theorem allelic_variance_zero_at_fixation_one :
     We prove the weaker statement: |D| ≤ p_i·p_j when D² ≤ p_i·p_j·(1-p_i)·(1-p_j)
     (which is the requirement that r² ≤ 1). -/
 theorem ld_bounded_by_freq (D p_i p_j : ℝ)
-    (h_pi : 0 < p_i) (h_pi1 : p_i < 1)
-    (h_pj : 0 < p_j) (h_pj1 : p_j < 1)
     (h_r2_le_one : D ^ 2 ≤ p_i * p_j * ((1 - p_i) * (1 - p_j))) :
     |D| ≤ Real.sqrt (p_i * p_j * ((1 - p_i) * (1 - p_j))) := by
   have h_rhs_nonneg : 0 ≤ p_i * p_j * ((1 - p_i) * (1 - p_j)) := by
@@ -115,8 +113,7 @@ section LDMismatch
     and this loss is strictly positive when all parameters are positive. -/
 theorem r2_loss_bounded_by_ld_mismatch
     (r2_source c frob_sq : ℝ)
-    (h_r2 : 0 < r2_source) (h_c : 0 < c) (h_frob : 0 < frob_sq)
-    (h_product_lt : c * frob_sq < 1) :
+    (h_r2 : 0 < r2_source) (h_c : 0 < c) (h_frob : 0 < frob_sq) :
     let r2_target := r2_source * (1 - c * frob_sq)
     r2_target < r2_source ∧ r2_source - r2_target = r2_source * c * frob_sq := by
   constructor
@@ -134,10 +131,9 @@ theorem r2_loss_bounded_by_ld_mismatch
     spectral bound is tighter for sparse models. -/
 theorem spectral_bound_tighter_for_sparse
     (frob_loss spectral_loss sparsity : ℝ)
-    (h_frob : 0 < frob_loss)
     (h_spectral_nn : 0 ≤ spectral_loss)
     (h_spectral : spectral_loss ≤ frob_loss)
-    (h_sparse : 0 < sparsity) (h_sparse_le : sparsity ≤ 1) :
+ (h_sparse_le : sparsity ≤ 1) :
     spectral_loss * sparsity ≤ frob_loss := by
   calc spectral_loss * sparsity
       ≤ spectral_loss * 1 := by nlinarith
@@ -209,7 +205,7 @@ theorem smaller_blocks_more_segments
 theorem total_portability_from_blocks
     (total_signal n₁ n₂ : ℝ)
     (h_signal : 0 < total_signal)
-    (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
+ (h_n₁ : 0 < n₁)
     (h_more_blocks : n₁ < n₂) :
     total_signal / n₂ < total_signal / n₁ := by
   exact div_lt_div_of_pos_left h_signal h_n₁ (by linarith)
@@ -223,7 +219,7 @@ theorem total_portability_from_blocks
 theorem hotspot_density_affects_blocks
     (L n_hotspots_afr n_hotspots_eur : ℝ)
     (hL : 0 < L)
-    (h_afr_pos : 0 < n_hotspots_afr) (h_eur_pos : 0 < n_hotspots_eur)
+ (h_eur_pos : 0 < n_hotspots_eur)
     (h_more_hotspots : n_hotspots_eur < n_hotspots_afr) :
     -- AFR has smaller mean block size than EUR
     L / n_hotspots_afr < L / n_hotspots_eur :=
@@ -489,7 +485,7 @@ theorem admixture_ld_specializes_to_magnitude (alpha p_A p_B r : ℝ) (g : ℕ)
 /-- Admixture LD is nonneg. -/
 theorem admixture_ld_nonneg (alpha p_A p_B r : ℝ) (g : ℕ)
     (h_alpha : 0 ≤ alpha) (h_alpha_le : alpha ≤ 1)
-    (h_r : 0 ≤ r) (h_r_le : r ≤ 1) :
+ (h_r_le : r ≤ 1) :
     0 ≤ admixtureLDMagnitude alpha p_A p_B r g := by
   unfold admixtureLDMagnitude
   apply mul_nonneg
@@ -498,9 +494,7 @@ theorem admixture_ld_nonneg (alpha p_A p_B r : ℝ) (g : ℕ)
 
 /-- Admixture LD is maximized at α = 0.5. -/
 theorem admixture_ld_max_at_half (alpha p_A p_B r : ℝ) (g : ℕ)
-    (h_alpha : 0 ≤ alpha) (h_alpha_le : alpha ≤ 1)
-    (h_r : 0 ≤ r) (h_r_le : r ≤ 1)
-    (h_diff : p_A ≠ p_B) :
+ (h_r_le : r ≤ 1) :
     admixtureLDMagnitude alpha p_A p_B r g ≤
       admixtureLDMagnitude (1/2) p_A p_B r g := by
   unfold admixtureLDMagnitude
@@ -543,7 +537,7 @@ theorem admixture_ld_confounds_pgs
     (alpha p_A p_B r β γ : ℝ) (g : ℕ)
     (h_alpha : 0 < alpha) (h_alpha_lt : alpha < 1)
     (h_diff : p_A ≠ p_B)
-    (h_r : 0 ≤ r) (h_r_lt : r < 1)
+ (h_r_lt : r < 1)
     (h_γ : γ ≠ 0) :
     -- The confounding bias = γ × D is nonzero
     let D := admixtureLDMagnitude alpha p_A p_B r g

@@ -73,7 +73,7 @@ theorem equilibriumEffectVariance_is_fixedPoint
 theorem stronger_stabilizing_smaller_effects
     (v_mutation s₁ s₂ : ℝ)
     (h_vm : 0 < v_mutation)
-    (h_s₁ : 0 < s₁) (h_s₂ : 0 < s₂)
+ (h_s₁ : 0 < s₁)
     (h_stronger : s₁ < s₂) :
     equilibriumEffectVariance v_mutation s₂ < equilibriumEffectVariance v_mutation s₁ := by
   unfold equilibriumEffectVariance
@@ -89,7 +89,7 @@ noncomputable def effectCorrelationStabilizing (Ns : ℝ) : ℝ :=
 /-- Effect correlation increases with stronger selection (relative to drift). -/
 theorem effect_correlation_increases_with_Ns
     (Ns₁ Ns₂ : ℝ)
-    (h₁ : 1 < Ns₁) (h₂ : 1 < Ns₂) (h_more : Ns₁ < Ns₂) :
+ (h₁ : 1 < Ns₁) (h_more : Ns₁ < Ns₂) :
     effectCorrelationStabilizing Ns₁ < effectCorrelationStabilizing Ns₂ := by
   unfold effectCorrelationStabilizing
   rw [sub_lt_sub_iff_left]
@@ -101,7 +101,7 @@ theorem effect_correlation_increases_with_Ns
     This is essentially a law of large numbers argument. -/
 theorem polygenicity_improves_portability
     (m₁ m₂ : ℕ) (var_per_locus : ℝ)
-    (h_m₁ : 0 < m₁) (h_m₂ : 0 < m₂) (h_more : m₁ < m₂)
+ (h_m₁ : 0 < m₁) (h_more : m₁ < m₂)
     (h_var : 0 < var_per_locus) :
     -- Variance of portability ratio estimate ∝ 1/m
     var_per_locus / (m₂ : ℝ) < var_per_locus / (m₁ : ℝ) := by
@@ -145,7 +145,7 @@ noncomputable def fluctuatingEffectCorrelation (t τ : ℝ) : ℝ :=
 /-- Effect correlation decays with divergence time. -/
 theorem fluctuating_correlation_decays
     (t₁ t₂ τ : ℝ)
-    (h_τ : 0 < τ) (h_t₁ : 0 < t₁) (h_more : t₁ < t₂) :
+ (h_τ : 0 < τ) (h_more : t₁ < t₂) :
     fluctuatingEffectCorrelation t₂ τ < fluctuatingEffectCorrelation t₁ τ := by
   unfold fluctuatingEffectCorrelation
   apply Real.exp_lt_exp.mpr
@@ -224,7 +224,7 @@ theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
     matching `exp(-t/τ)` to `1 - 1/(2Ns)`. -/
 theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
     (t tau Ns : ℝ)
-    (h_t : 0 < t) (h_tau : 0 < tau) (hNs : 1 < Ns)
+ (h_tau : 0 < tau) (hNs : 1 < Ns)
     (h_tau_lt : tau < t / (-Real.log (effectCorrelationStabilizing Ns))) :
     fluctuatingEffectCorrelation t tau < effectCorrelationStabilizing Ns := by
   have h_rho_pos : 0 < effectCorrelationStabilizing Ns :=
@@ -406,9 +406,8 @@ theorem observedSelectionSummary_identifies_fluctuating_not_stabilizing
 theorem balancing_selection_high_het
     (p_neutral p_balanced lo hi : ℝ)
     (h_neutral_low : p_neutral < lo)
-    (h_neutral_pos : 0 < p_neutral)
     (h_balanced : hi < p_balanced) (h_balanced_lt : p_balanced < 1/2)
-    (h_lo_le_hi : lo ≤ hi) (h_lo_pos : 0 < lo) :
+ (h_lo_le_hi : lo ≤ hi) :
     2 * p_neutral * (1 - p_neutral) < 2 * p_balanced * (1 - p_balanced) := by
   nlinarith [sq_nonneg (p_balanced - 1/2), sq_nonneg (p_neutral - 1/2)]
 
@@ -495,7 +494,7 @@ theorem adaptation_shift_recoverable
     Q_ST << F_ST indicates stabilizing selection. -/
 theorem qst_fst_comparison_directional
     (qst fst : ℝ)
-    (h_qst : 0 < qst) (h_fst : 0 < fst)
+ (h_fst : 0 < fst)
     (h_directional : fst < qst) :
     -- Q_ST / F_ST > 1 indicates directional selection
     1 < qst / fst := by
@@ -503,7 +502,7 @@ theorem qst_fst_comparison_directional
 
 theorem qst_fst_comparison_stabilizing
     (qst fst : ℝ)
-    (h_qst : 0 < qst) (h_fst : 0 < fst)
+ (h_fst : 0 < fst)
     (h_stabilizing : qst < fst) :
     -- Q_ST / F_ST < 1 indicates stabilizing selection
     qst / fst < 1 := by
@@ -545,8 +544,6 @@ theorem gwas_ncp_pos (n : ℕ) (β p : ℝ)
 theorem ncp_ratio_from_maf
     (n : ℕ) (β p₁ p₂ : ℝ)
     (hn : 0 < n) (hβ : 0 < β)
-    (hp₁ : 0 < p₁) (hp₁1 : p₁ < 1)
-    (hp₂ : 0 < p₂) (hp₂1 : p₂ < 1)
     (h_maf : p₁ < p₂) (h_half : p₂ ≤ 1/2) :
     gwasNCP n β p₁ < gwasNCP n β p₂ := by
   unfold gwasNCP
@@ -572,7 +569,7 @@ section ArchitecturePredictions
     where s is the selection coefficient.
     Smaller `s` gives slower change; larger `s` gives faster change. -/
 theorem selection_determines_timescale
-    (s₁ s₂ : ℝ) (h₁ : 0 < s₁) (h₂ : 0 < s₂)
+ (s₁ s₂ : ℝ) (h₁ : 0 < s₁)
     (h_stronger : s₁ < s₂) :
     1 / (2 * s₂) < 1 / (2 * s₁) := by
   apply div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
@@ -585,7 +582,7 @@ theorem selection_determines_timescale
 theorem polygenic_more_portable_than_oligogenic
     (h2 : ℝ) (m_oligo m_poly : ℕ)
     (h_h2 : 0 < h2)
-    (h_oligo : 0 < m_oligo) (h_poly : 0 < m_poly)
+ (h_oligo : 0 < m_oligo)
     (h_more_loci : m_oligo < m_poly) :
     -- Per-locus contribution is smaller for polygenic traits
     h2 / (m_poly : ℝ) < h2 / (m_oligo : ℝ) := by
@@ -610,7 +607,7 @@ section Pleiotropy
     the shared loci, both traits suffer. -/
 theorem shared_pleiotropy_correlated_portability
     (r2_t1_source r2_t1_target r2_t2_source r2_t2_target ρ_shared : ℝ)
-    (h_shared : 0 < ρ_shared) (h_shared_le : ρ_shared ≤ 1)
+ (h_shared : 0 < ρ_shared)
     -- Both traits drop proportionally to the shared component
     (d₁ d₂ : ℝ) (h_d₁ : 0 < d₁) (h_d₂ : 0 < d₂)
     (h_t1_drop : r2_t1_target = r2_t1_source * (1 - ρ_shared * d₁))
@@ -632,7 +629,7 @@ theorem shared_pleiotropy_correlated_portability
     (2) portability of each trait individually -/
 theorem cross_trait_portability_bound
     (rg port₁ port₂ : ℝ)
-    (h_rg : 0 ≤ rg) (h_rg_le : rg ≤ 1)
+ (h_rg_le : rg ≤ 1)
     (h_p₁ : 0 ≤ port₁) (h_p₁_le : port₁ ≤ 1)
     (h_p₂ : 0 ≤ port₂) (h_p₂_le : port₂ ≤ 1) :
     rg * port₁ * port₂ ≤ 1 := by

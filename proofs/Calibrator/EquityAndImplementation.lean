@@ -53,8 +53,7 @@ theorem clinical_benefit_increases_with_r2
 theorem portability_creates_benefit_gap
     (α r2_eur r2_afr : ℝ)
     (h_α : 0 < α)
-    (h_r2_gap : r2_afr < r2_eur)
-    (h_nn : 0 ≤ r2_afr) :
+    (h_r2_gap : r2_afr < r2_eur) :
     0 < α * r2_eur - α * r2_afr := by
   have : r2_eur - r2_afr > 0 := by linarith
   nlinarith
@@ -67,8 +66,8 @@ theorem portability_creates_benefit_gap
 theorem disparity_increases_with_distance
     (R2_source fst₁ fst₂ : ℝ)
     (h_R2 : 0 < R2_source)
-    (h_fst₁_pos : 0 < fst₁) (h_fst₁_lt : fst₁ < 1)
-    (h_fst₂_pos : 0 < fst₂) (h_fst₂_lt : fst₂ < 1)
+ (h_fst₁_lt : fst₁ < 1)
+ (h_fst₂_lt : fst₂ < 1)
     (h_fst : fst₁ < fst₂) :
     -- R² loss at fst₁ < R² loss at fst₂
     R2_source * (1 - (1 - fst₁) ^ 2) < R2_source * (1 - (1 - fst₂) ^ 2) := by
@@ -83,7 +82,6 @@ theorem disparity_increases_with_distance
     to d₀ + α × R²_eur. -/
 theorem deployment_amplifies_disparity
     (d₀ α r2_eur : ℝ)
-    (h_nn : 0 ≤ d₀)
     (h_α : 0 < α) (h_r2 : 0 < r2_eur) :
     d₀ < d₀ + α * r2_eur := by
   linarith [mul_pos h_α h_r2]
@@ -125,7 +123,6 @@ theorem chouldechova_impossibility
     (h_K₁ : 0 < K₁) (h_K₁' : K₁ < 1)
     (h_K₂ : 0 < K₂) (h_K₂' : K₂ < 1)
     (h_fpr : 0 < fpr) (h_fnr_lt : fnr < 1)
-    (h_fnr_nn : 0 ≤ fnr)
     -- PPV = K × (1-FNR) / (K × (1-FNR) + (1-K) × FPR)
     (h_ppv₁_def : ppv₁ = K₁ * (1 - fnr) / (K₁ * (1 - fnr) + (1 - K₁) * fpr))
     (h_ppv₂_def : ppv₂ = K₂ * (1 - fnr) / (K₂ * (1 - fnr) + (1 - K₂) * fpr)) :
@@ -151,7 +148,7 @@ theorem chouldechova_impossibility
 theorem equal_fpr_requires_different_thresholds
     (mu₁ mu₂ sigma₁ sigma₂ threshold₁ threshold₂ : ℝ)
     (h_mu_diff : mu₁ ≠ mu₂)
-    (h_sigma₁ : 0 < sigma₁) (h_sigma₂ : 0 < sigma₂)
+ (h_sigma₂ : 0 < sigma₂)
     -- Equal FPR ↔ equal z-scores
     (h_equal_z : (threshold₁ - mu₁) / sigma₁ = (threshold₂ - mu₂) / sigma₂)
     (h_sigma_eq : sigma₁ = sigma₂) :
@@ -292,8 +289,7 @@ section ClinicalImplementation
     (R² < cost / α), the net value is negative. -/
 theorem r2_threshold_for_utility
     (r2 α cost : ℝ)
-    (h_α : 0 < α) (h_cost : 0 < cost)
-    (h_r2_nn : 0 ≤ r2)
+ (h_α : 0 < α)
     (h_below : r2 < cost / α) :
     -- PGS net value is negative in this population
     α * r2 - cost < 0 := by
@@ -313,9 +309,8 @@ theorem r2_threshold_for_utility
 theorem validation_n_depends_on_r2
     (r2_source r2_target delta : ℝ)
     (h_r2_target_smaller : r2_target < r2_source)
-    (h_r2_source : 0 < r2_source) (h_r2_target : 0 < r2_target)
     (h_delta : 0 < delta)
-    (h_r2_source_lt : r2_source < 1) (h_r2_target_lt : r2_target < 1) :
+ (h_r2_source_lt : r2_source < 1) :
     -- n/R² = 4(1-R²)²/δ² is larger for the target (smaller R²)
     4 * (1 - r2_source) ^ 2 / delta ^ 2 <
       4 * (1 - r2_target) ^ 2 / delta ^ 2 := by
@@ -409,8 +404,7 @@ theorem phased_deployment_reduces_risk
     (h_π : 0 < π) (h_π1 : π < 1)
     -- The validated population has strictly better risk stratification
     -- (proportion correctly classified) than the unvalidated population,
-    -- derived from the R² gap via the exact liability-threshold metrics.
-    :
+    -- derived from the R² gap via the exact liability-threshold metrics. :
     sensFromR2 m r2_unvalidated T' * π +
         specFromR2 m r2_unvalidated T' μ_control * (1 - π) <
       sensFromR2 m r2_validated T' * π +

@@ -90,8 +90,7 @@ theorem approx_power_in_range (ncp : ℝ) (h : 0 ≤ ncp) :
     For a fixed effect size, the NCP scales with p(1-p).
     At MAF 1% vs 30%, need ~25× more samples. -/
 theorem rare_variant_lower_power (n : ℕ) (beta p_rare p_common : ℝ)
-    (h_beta : beta ≠ 0) (h_rare : 0 < p_rare)
-    (h_common : 0 < p_common) (h_common_lt : p_common < 1)
+ (h_beta : beta ≠ 0)
     (h_rare_lt : p_rare < p_common)
     (h_sym : p_common ≤ 1/2) (hn : 0 < n) :
     noncentralityParam n beta p_rare < noncentralityParam n beta p_common := by
@@ -219,7 +218,7 @@ noncomputable def truncationBias (se beta z_alpha : ℝ) : ℝ :=
 /-- **Truncation bias is nonneg for positive SE.**
     The truncation bias E[ε | selected] ≥ 0 because the selection
     event preferentially retains positive noise realizations (when β > 0). -/
-theorem truncationBias_nonneg (se beta z_alpha : ℝ) (h_se : 0 < se) (h_beta : 0 < beta) :
+theorem truncationBias_nonneg (se beta z_alpha : ℝ) (h_se : 0 < se) :
     0 ≤ truncationBias se beta z_alpha := by
   unfold truncationBias
   apply div_nonneg
@@ -456,7 +455,7 @@ theorem winners_curse_overestimates_r2 (true_beta sigma : ℝ) (n : ℕ)
     deviates more from truth than the inflated estimate in the source. -/
 theorem cross_population_winners_curse_compounds
     (true_beta sigma : ℝ) (n_source n_target : ℕ)
-    (h_beta : 0 < true_beta) (h_sigma : 0 < sigma)
+ (h_sigma : 0 < sigma)
     (h_ns : 0 < n_source) (h_nt : 0 < n_target)
     (h_gap : n_source > n_target) :
     winnersCurseInflation true_beta sigma n_source <
@@ -485,7 +484,7 @@ noncomputable def r2ScalingModel (n C : ℝ) : ℝ := n / (n + C)
 
 /-- R² scaling model is increasing in n. -/
 theorem r2_scaling_increasing (n₁ n₂ C : ℝ)
-    (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n₂ : 0 ≤ n₂) (h_n : n₁ < n₂) :
+ (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n : n₁ < n₂) :
     r2ScalingModel n₁ C < r2ScalingModel n₂ C := by
   unfold r2ScalingModel
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
@@ -596,7 +595,7 @@ theorem genetic_correlation_bounds_portability
     genetic architecture is shared. -/
 theorem high_rg_implies_good_portability
     (rg lb r2_source : ℝ)
-    (h_rg : lb < rg) (h_lb_nn : 0 ≤ lb) (h_rg_le : rg ≤ 1)
+ (h_rg : lb < rg) (h_lb_nn : 0 ≤ lb)
     (h_r2 : 0 < r2_source) :
     lb^2 * r2_source < rg^2 * r2_source := by
   have : lb ^ 2 < rg ^ 2 := by nlinarith [sq_nonneg (rg - lb)]
@@ -607,7 +606,7 @@ theorem high_rg_implies_good_portability
     cross-population PGS for the affected traits. -/
 theorem low_rg_limits_portability
     (rg ub r2_source : ℝ)
-    (h_rg : rg < ub) (h_rg_nn : 0 ≤ rg) (h_ub_nn : 0 ≤ ub)
+ (h_rg : rg < ub) (h_rg_nn : 0 ≤ rg)
     (h_r2 : 0 < r2_source) :
     rg^2 * r2_source < ub^2 * r2_source := by
   have : rg ^ 2 < ub ^ 2 := by nlinarith [sq_nonneg (rg - ub)]

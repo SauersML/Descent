@@ -156,7 +156,6 @@ theorem freq_change_alters_pgs_variance
 theorem rare_variants_drift_more
     (p_rare p_common fst : ℝ)
     (h_rare : 0 < p_rare) (h_rare_lt : p_rare < p_common)
-    (h_common_lt : p_common < 1/2)
     (h_fst : 0 < fst) :
     -- Coefficient of variation of frequency is larger for rare
     expectedFreqDiffSq fst p_rare / p_rare^2 >
@@ -194,7 +193,6 @@ section LDTagging
 theorem different_tags_different_weights
     (beta_causal r2_tag_source r2_tag_target : ℝ)
     (h_beta : 0 < beta_causal)
-    (h_source : 0 < r2_tag_source) (h_target : 0 < r2_tag_target)
     (h_diff : r2_tag_source ≠ r2_tag_target) :
     -- The apparent effect at the tag differs
     beta_causal * r2_tag_source ≠ beta_causal * r2_tag_target := by
@@ -210,7 +208,7 @@ noncomputable def gwasHeritability (h2_true avg_r2_tag : ℝ) : ℝ :=
 
 /-- GWAS heritability ≤ true heritability. -/
 theorem gwas_h2_le_true (h2_true avg_r2_tag : ℝ)
-    (h_h2 : 0 ≤ h2_true) (h_r2 : 0 ≤ avg_r2_tag) (h_r2_le : avg_r2_tag ≤ 1) :
+ (h_h2 : 0 ≤ h2_true) (h_r2_le : avg_r2_tag ≤ 1) :
     gwasHeritability h2_true avg_r2_tag ≤ h2_true := by
   unfold gwasHeritability
   nlinarith
@@ -240,8 +238,8 @@ section AllelicHeterogeneity
     strictly reduces it. -/
 theorem allelic_heterogeneity_reduces_portability
     (r2_causal r2_tag ρ : ℝ)
-    (h_causal : 0 < r2_causal) (h_tag : 0 < r2_tag) (h_tag_le : r2_tag ≤ 1)
-    (h_ρ : 0 < ρ) (h_ρ_lt : ρ < 1) :
+ (h_causal : 0 < r2_causal) (h_tag : 0 < r2_tag)
+ (h_ρ_lt : ρ < 1) :
     r2_causal * r2_tag * ρ < r2_causal * r2_tag := by
   have h_prod_pos : 0 < r2_causal * r2_tag := mul_pos h_causal h_tag
   calc r2_causal * r2_tag * ρ
@@ -292,7 +290,6 @@ theorem gene_shared_variants_specific
 theorem conditional_reveals_heterogeneity
     (n_signals_eur n_signals_afr n_shared : ℕ)
     (h_eur : 0 < n_signals_eur) (h_afr : 0 < n_signals_afr)
-    (h_some_shared : 0 < n_shared)
     (h_shared_le_eur : n_shared ≤ n_signals_eur)
     (h_shared_le_afr : n_shared ≤ n_signals_afr) :
     -- The union of distinct signals exceeds either population alone
@@ -450,7 +447,7 @@ theorem portabilityFromArchitecture_from_divergence
 /-- Portability is bounded by rg². -/
 theorem portability_bounded_by_rg_sq
     (rg fst tagging_ratio : ℝ)
-    (h_fst : 0 ≤ fst) (h_fst_le : fst ≤ 1)
+ (h_fst : 0 ≤ fst)
     (h_tag : 0 ≤ tagging_ratio) (h_tag_le : tagging_ratio ≤ 1) :
     portabilityFromArchitecture rg fst tagging_ratio ≤ rg^2 := by
   unfold portabilityFromArchitecture

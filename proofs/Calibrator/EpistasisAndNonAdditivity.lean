@@ -39,9 +39,8 @@ section AdditiveApproximation
     This is why additive PGS works reasonably well. -/
 theorem additive_dominates_genetic_variance
     (V_A V_D V_I V_G : ℝ)
-    (h_total : V_G = V_A + V_D + V_I)
     (h_A_large : V_A ≥ V_G / 2)
-    (h_D : 0 ≤ V_D) (h_I : 0 ≤ V_I) (h_G : 0 < V_G) :
+ (h_G : 0 < V_G) :
     V_A / V_G ≥ 1 / 2 := by
   rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 2) h_G]
   linarith
@@ -145,10 +144,6 @@ theorem epistatic_variance_nonneg
 theorem epistasis_portability_loss
     (beta12 p1_src p2_src p1_tgt p2_tgt : ℝ)
     (h_beta : beta12 ≠ 0)
-    (h_p1s : 0 < p1_src) (h_p1s' : p1_src < 1)
-    (h_p2s : 0 < p2_src) (h_p2s' : p2_src < 1)
-    (h_p1t : 0 < p1_tgt) (h_p1t' : p1_tgt < 1)
-    (h_p2t : 0 < p2_tgt) (h_p2t' : p2_tgt < 1)
     (h_freq_diff : p1_src * (1 - p1_src) * p2_src * (1 - p2_src) ≠
                    p1_tgt * (1 - p1_tgt) * p2_tgt * (1 - p2_tgt)) :
     epistaticVariance beta12 p1_src p2_src ≠
@@ -256,11 +251,8 @@ theorem ml_pgs_captures_more_variance
     so its cross-population prediction degrades more. -/
 theorem ml_pgs_worse_portability
     (r2_train k_linear k_ml n : ℝ)
-    (h_r2 : 0 < r2_train)
-    (h_kl : 0 < k_linear) (h_km : 0 < k_ml)
     (h_n : 0 < n)
-    (h_more_params : k_linear < k_ml)
-    (h_valid : k_ml < n) :
+    (h_more_params : k_linear < k_ml) :
     -- ML has larger overfitting penalty k/n
     r2_train - k_ml / n < r2_train - k_linear / n := by
   have : k_linear / n < k_ml / n := div_lt_div_of_pos_right h_more_params h_n
@@ -306,7 +298,7 @@ theorem epistatic_kernel_improves_within_pop
 theorem regularization_controls_portability
     (k_NA n lam_weak lam_strong : ℝ)
     (h_k : 0 < k_NA) (h_n : 0 < n)
-    (h_lw : 0 < lam_weak) (h_ls : 0 < lam_strong)
+ (h_lw : 0 < lam_weak)
     (h_stronger : lam_weak < lam_strong) :
     -- Stronger regularization → fewer effective parameters → less overfit
     k_NA / (1 + lam_strong) / n < k_NA / (1 + lam_weak) / n := by

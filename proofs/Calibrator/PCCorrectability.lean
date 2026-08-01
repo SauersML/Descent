@@ -1,5 +1,6 @@
 import Calibrator.PCCorrectability.Diagnostic
 import Calibrator.PCCorrectability.Frequency
+import Calibrator.PCCorrectability.Overlap
 
 /-!
 # Population-structure correctability for PC and mixed-model adjustment

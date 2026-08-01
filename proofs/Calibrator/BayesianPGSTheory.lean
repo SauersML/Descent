@@ -315,7 +315,6 @@ theorem cross_ancestry_ld_bias
     populations, so cross-population bias strictly exceeds in-sample bias. -/
 theorem in_sample_ld_optimal
     (base_bias c fst : ℝ)
-    (h_base_nn : 0 ≤ base_bias)
     (h_c_pos : 0 < c) (h_fst_pos : 0 < fst) :
     base_bias ≤ base_bias + c * fst := by
   linarith [mul_pos h_c_pos h_fst_pos]
@@ -329,7 +328,7 @@ theorem in_sample_ld_optimal
 theorem multi_ancestry_reference_reduces_bias
     (c fst α : ℝ)
     (h_c : 0 < c) (h_fst : 0 < fst)
-    (h_α_pos : 0 < α) (h_α_lt : α < 1) :
+ (h_α_lt : α < 1) :
     c * α * fst ≤ c * fst := by
   have h_cf : 0 < c * fst := mul_pos h_c h_fst
   nlinarith
@@ -342,7 +341,6 @@ theorem multi_ancestry_reference_reduces_bias
 theorem long_range_ld_worse_mismatch
     (c fst n_short n_long : ℝ)
     (h_c : 0 < c) (h_fst : 0 < fst)
-    (h_short_pos : 0 < n_short)
     (h_more_snps : n_short < n_long) :
     c * n_short * fst < c * n_long * fst := by
   have h_cf : 0 < c * fst := mul_pos h_c h_fst
@@ -406,8 +404,6 @@ theorem misspec_excess_risk_nonneg (π σ_β_sq : ℝ)
 theorem prior_misspec_worse_for_sparse
     (σ_β_sq π_sparse π_poly : ℝ)
     (h_σ : 0 < σ_β_sq)
-    (h_sparse_pos : 0 < π_sparse)
-    (h_poly_pos : 0 < π_poly)
     (h_sparse_lt_half : π_sparse < 1/2)
     (h_poly_lt_half : π_poly ≤ 1/2)
     (h_sparser : π_sparse < π_poly) :
@@ -441,8 +437,8 @@ theorem prior_misspec_worse_for_sparse
 theorem portability_prior_interaction
     (σ_β_sq π_sparse π_poly : ℝ)
     (h_σ : 0 < σ_β_sq)
-    (h_sparse_pos : 0 < π_sparse) (h_sparse_lt : π_sparse < 1/2)
-    (h_poly_gt : 1/2 < π_poly) (h_poly_lt : π_poly < 1)
+ (h_sparse_lt : π_sparse < 1/2)
+ (h_poly_gt : 1/2 < π_poly)
     (h_far_enough : 1 - π_sparse < π_poly) :
     misspecExcessRisk π_poly σ_β_sq < misspecExcessRisk π_sparse σ_β_sq := by
   unfold misspecExcessRisk
@@ -503,7 +499,7 @@ theorem posterior_predictive_wider_than_residual
 theorem estimation_variance_decreases_with_n
     (σ_sq h_sq n₁ n₂ : ℝ)
     (h_σ : 0 < σ_sq) (h_hsq : 0 < h_sq)
-    (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
+ (h_n₁ : 0 < n₁)
     (h_more : n₁ < n₂) :
     σ_sq / (n₂ * h_sq) < σ_sq / (n₁ * h_sq) := by
   apply div_lt_div_of_pos_left h_σ (mul_pos h_n₁ h_hsq)
@@ -542,7 +538,7 @@ section PRSCS
     is monotonically increasing in φ, larger φ yields more nonzero effects. -/
 theorem global_shrinkage_controls_sparsity
     (M φ₁ φ₂ : ℝ)
-    (hM : 0 < M) (hφ₁ : 0 < φ₁) (hφ₂ : 0 < φ₂)
+ (hM : 0 < M) (hφ₁ : 0 < φ₁)
     (h_more_phi : φ₁ < φ₂) :
     M * (φ₁ / (1 + φ₁)) < M * (φ₂ / (1 + φ₂)) := by
   apply mul_lt_mul_of_pos_left _ hM
@@ -558,10 +554,9 @@ theorem global_shrinkage_controls_sparsity
     Since p ≤ M and noise_CS ≤ noise_CT, PRS-CS dominates. -/
 theorem prs_cs_dominates_ct
     (h_sq p M noise_ct noise_cs : ℝ)
-    (h_hsq : 0 < h_sq) (h_p : 0 < p) (h_M : 0 < M)
+ (h_hsq : 0 < h_sq) (h_M : 0 < M)
     (h_pM : p ≤ M)
-    (h_noise_ct : 0 ≤ noise_ct) (h_noise_ct1 : noise_ct < 1)
-    (h_noise_cs : 0 ≤ noise_cs) (h_noise_cs1 : noise_cs < 1)
+ (h_noise_ct1 : noise_ct < 1)
     (h_cs_better : noise_cs ≤ noise_ct) :
     h_sq * (p / M) * (1 - noise_ct) ≤ h_sq * (1 - noise_cs) := by
   have h_pM_ratio : p / M ≤ 1 := by rwa [div_le_one (by linarith : (0:ℝ) < M)]
@@ -580,10 +575,9 @@ theorem prs_cs_dominates_ct
     When mismatch_penalty > base_r2 · (1 - p/M), PRS-CS is worse. -/
 theorem ld_mismatch_can_reverse_advantage
     (base_r2 p M mismatch_penalty : ℝ)
-    (h_r2 : 0 < base_r2) (h_p : 0 < p) (h_M : 0 < M)
+ (h_M : 0 < M)
     (h_pM : p ≤ M)
-    (h_penalty_large : base_r2 * (1 - p / M) < mismatch_penalty)
-    (h_pen_lt : mismatch_penalty < base_r2) :
+    (h_penalty_large : base_r2 * (1 - p / M) < mismatch_penalty) :
     base_r2 - mismatch_penalty < base_r2 * (p / M) := by
   have : p / M ≤ 1 := by rwa [div_le_one (by linarith : (0:ℝ) < M)]
   nlinarith
@@ -625,7 +619,7 @@ noncomputable def multiAncestryEffectiveN
     and R² = n_eff · h²/(n_eff · h² + 1) is monotone in n_eff. -/
 theorem multi_ancestry_at_least_as_good
     (n_target rg n_other h_sq : ℝ)
-    (h_nt : 0 < n_target) (h_rg : 0 ≤ rg) (h_no : 0 ≤ n_other)
+ (h_nt : 0 < n_target) (h_no : 0 ≤ n_other)
     (h_hsq : 0 < h_sq) :
     gaussianPosteriorShrinkage n_target h_sq ≤
       gaussianPosteriorShrinkage (multiAncestryEffectiveN n_target rg n_other) h_sq := by
@@ -636,7 +630,7 @@ theorem multi_ancestry_at_least_as_good
 /-- Multi-ancestry effective N ≥ single-ancestry N. -/
 theorem multi_ancestry_effective_n_ge
     (n_target rg n_other : ℝ)
-    (h_rg : 0 ≤ rg) (h_n : 0 ≤ n_other) :
+ (h_n : 0 ≤ n_other) :
     n_target ≤ multiAncestryEffectiveN n_target rg n_other := by
   unfold multiAncestryEffectiveN
   linarith [mul_nonneg (sq_nonneg rg) h_n]
@@ -661,12 +655,9 @@ theorem diminishing_returns_from_majority
     oversampling underrepresented populations. -/
 theorem optimal_allocation_oversamples_minority
     (n_majority n_minority n_total : ℝ)
-    (h_total : n_majority + n_minority = n_total)
     (h_optimal_minority_share proportion : ℝ)
     (h_oversampled : proportion < h_optimal_minority_share)
-    (h_prop_def : proportion = n_minority / n_total)
-    (h_pos : 0 < n_total)
-    (h_minority_share : n_minority / n_total < 1/2) :
+    (h_prop_def : proportion = n_minority / n_total) :
     -- The optimal minority share exceeds the population proportion
     n_minority / n_total < h_optimal_minority_share := by linarith
 

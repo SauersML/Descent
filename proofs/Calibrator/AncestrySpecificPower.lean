@@ -92,7 +92,7 @@ theorem genotypeVariance_pos (p : ℝ) (h_p : 0 < p) (h_p_lt : p < 1) :
   nlinarith
 
 /-- Genotype variance is maximized at p = 1/2 where it equals 1/2. -/
-theorem genotypeVariance_max (p : ℝ) (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
+theorem genotypeVariance_max (p : ℝ) :
     genotypeVarianceHWE p ≤ genotypeVarianceHWE (1/2 : ℝ) := by
   unfold genotypeVarianceHWE
   nlinarith [sq_nonneg (p - 1/2)]
@@ -117,7 +117,7 @@ theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :
 
 /-- Information loss from imperfect tagging: effective info ≤ full info. -/
 theorem information_loss_from_tagging (n : ℕ) (p r2_ld : ℝ)
-    (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2 : 0 ≤ r2_ld) (h_r2_le : r2_ld ≤ 1) :
+ (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2_le : r2_ld ≤ 1) :
     effectiveFisherInformation n p r2_ld ≤ fisherInformation n (genotypeVarianceHWE p) := by
   unfold effectiveFisherInformation
   have h_info_nonneg : 0 ≤ fisherInformation n (genotypeVarianceHWE p) := by
@@ -236,7 +236,6 @@ theorem effective_n_mono_n (n_a n_b : ℕ) (p r2_ld : ℝ)
 theorem source_higher_effective_n
     (n_source n_target : ℕ) (p_source p_target r2_source r2_target : ℝ)
     (h_n : n_target < n_source) (h_r2 : r2_target < r2_source)
-    (h_p_source : 0 < p_source) (h_p_source_lt : p_source < 1)
     (h_p_target : 0 < p_target) (h_p_target_lt : p_target < 1)
     (h_r2_target : 0 < r2_target)
     -- Same variant, same allele frequency for simplicity
@@ -364,10 +363,7 @@ theorem discovered_variants_eur_biased
     This is a definitional identity: the proof content is the model
     decomposition, not the algebra. -/
 theorem discovery_bias_inflates_source_r2
-    (r2_causal r2_tag_bonus ρ_sq : ℝ)
-    (h_causal_pos : 0 < r2_causal)
-    (h_bonus_pos : 0 < r2_tag_bonus)
-    (h_ρ_pos : 0 ≤ ρ_sq) (h_ρ_le : ρ_sq ≤ 1) :
+    (r2_causal r2_tag_bonus ρ_sq : ℝ) :
     let r2_source := r2_causal + r2_tag_bonus
     let r2_target := r2_causal * ρ_sq
     let apparent_gap := r2_source - r2_target
@@ -416,7 +412,7 @@ section PowerPortabilityTradeoff
 theorem multi_ancestry_tradeoff
     (N c₁ c₂ α : ℝ)
     (h_N : 0 < N) (h_c₁ : 0 < c₁) (h_c₂ : 0 < c₂)
-    (h_α_pos : 0 < α) (h_α_lt : α < 1) :
+ (h_α_lt : α < 1) :
     -- Multi-ancestry reduces best-pop R² (pop1 gets αN < N)
     α * N * c₁ < N * c₁ ∧
     -- Multi-ancestry creates nonzero worst-pop R² (pop2 gets (1-α)N > 0)
@@ -441,7 +437,7 @@ theorem multi_ancestry_tradeoff
     Proof: multiply out to get 2ρ² < 1 + ρ², i.e., ρ² < 1. -/
 theorem minimax_favors_multi_ancestry
     (R2 ρ_sq : ℝ)
-    (h_R2 : 0 < R2) (h_ρ : 0 < ρ_sq) (h_ρ_lt : ρ_sq < 1) :
+ (h_R2 : 0 < R2) (h_ρ_lt : ρ_sq < 1) :
     -- single-ancestry worst-case < multi-ancestry worst-case
     ρ_sq * R2 < R2 * (1 + ρ_sq) / 2 := by
   -- Equivalent to: 2 * ρ_sq * R2 < R2 * (1 + ρ_sq)
@@ -460,8 +456,7 @@ theorem minimax_favors_multi_ancestry
     dimension contradicts the weak inequality required for dominance. -/
 theorem pareto_no_dominance
     (power₁ port₁ power₂ port₂ : ℝ)
-    (h_more_power : power₁ < power₂)
-    (h_less_port : port₂ < port₁) :
+    (h_more_power : power₁ < power₂) :
     -- Neither design dominates the other
     ¬(power₂ ≤ power₁ ∧ port₁ ≤ port₂) := by
   intro ⟨h1, h2⟩; linarith
@@ -504,7 +499,7 @@ theorem proportional_sums_to_total
     This proves that EUR-maximizing and equity-maximizing allocations
     diverge whenever marginal returns differ. -/
 theorem optimal_depends_on_objective
-    (n₁ n₂ Δ c₁ c₂ : ℝ)
+ (Δ c₁ c₂ : ℝ)
     (h_Δ : 0 < Δ) (_h_c₁ : 0 < c₁) (_h_c₂ : 0 < c₂)
     (h_c₂_gt : c₁ < c₂) :
     -- Rebalancing toward pop2 increases pop2 R² more than it decreases pop1 R²

@@ -34,7 +34,7 @@ theorem island_fst_in_unit_interval (Ne m : ℝ)
 
 /-- More migration → lower equilibrium F_ST. -/
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
-    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
+ (hNe : 0 < Ne) (hm₁ : 0 < m₁)
     (h_more : m₁ < m₂) :
     demoIslandModelFst Ne m₂ < demoIslandModelFst Ne m₁ := by
   unfold demoIslandModelFst
@@ -192,8 +192,6 @@ theorem admixed_fst_smaller (α fst_AB : ℝ)
     the weighted average is strictly between the two parent values. -/
 theorem admixed_intermediate_portability
     (r2_AA r2_AB α : ℝ)
-    (h_AA_pos : 0 < r2_AA)
-    (h_AB_nn : 0 ≤ r2_AB)
     (h_gap : r2_AB < r2_AA)
     (hα : 0 < α) (hα1 : α < 1) :
     r2_AB < α * r2_AA + (1 - α) * r2_AB ∧
@@ -267,8 +265,7 @@ theorem admixed_freq_diff (α p_A p_B : ℝ) :
     We express this as: for any set of loci, the mean squared frequency
     difference between admixed and source is (1-α)² times the mean squared
     frequency difference between parents. -/
-theorem admixedFst_from_freq_variance (α : ℝ) (var_parent pbar_term : ℝ)
-    (h_pbar : 0 < pbar_term) :
+theorem admixedFst_from_freq_variance (α : ℝ) (var_parent pbar_term : ℝ) :
     (1 - α) ^ 2 * var_parent / pbar_term =
       admixedFst α (var_parent / pbar_term) := by
   unfold admixedFst
@@ -428,7 +425,7 @@ noncomputable def founderFst (k : ℕ) (t : ℕ) : ℝ :=
 /-- Smaller founding population → larger F_ST (more drift). -/
 theorem smaller_founder_larger_fst
     (k₁ k₂ : ℕ) (t : ℕ)
-    (hk₁ : 2 < k₁) (hk₂ : 2 < k₂)
+ (hk₂ : 2 < k₂)
     (h_smaller : k₂ < k₁) (ht : 0 < t) :
     founderFst k₁ t < founderFst k₂ t := by
   unfold founderFst
@@ -483,7 +480,7 @@ noncomputable def fstVariableNe {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
   1 - Real.exp (-(cumulativeDrift Ne))
 
 /-- Fst under variable Ne is nonneg when all Ne are positive. -/
-theorem fst_variable_ne_nonneg {T : ℕ} (hT : 0 < T)
+theorem fst_variable_ne_nonneg {T : ℕ}
     (Ne : Fin T → ℝ) (hNe : ∀ i, 0 < Ne i) :
     0 ≤ fstVariableNe Ne := by
   unfold fstVariableNe
@@ -505,7 +502,6 @@ theorem fst_variable_ne_lt_one {T : ℕ} (Ne : Fin T → ℝ) :
 /-- Larger cumulative drift yields higher Fst. -/
 theorem more_drift_higher_fst {T : ℕ}
     (Ne₁ Ne₂ : Fin T → ℝ)
-    (hNe₁ : ∀ i, 0 < Ne₁ i) (hNe₂ : ∀ i, 0 < Ne₂ i)
     (h_more_drift : cumulativeDrift Ne₁ < cumulativeDrift Ne₂) :
     fstVariableNe Ne₁ < fstVariableNe Ne₂ := by
   unfold fstVariableNe
@@ -518,7 +514,7 @@ theorem more_drift_higher_fst {T : ℕ}
 /-- Population with uniformly smaller Ne accumulates more drift. -/
 theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
     (Ne₁ Ne₂ : Fin T → ℝ)
-    (hNe₁ : ∀ i, 0 < Ne₁ i) (hNe₂ : ∀ i, 0 < Ne₂ i)
+ (hNe₂ : ∀ i, 0 < Ne₂ i)
     (h_smaller : ∀ i, Ne₂ i < Ne₁ i) :
     cumulativeDrift Ne₁ < cumulativeDrift Ne₂ := by
   unfold cumulativeDrift
@@ -532,7 +528,7 @@ theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
 /-- A bottleneck generation contributes more to cumulative drift than a
     normal-sized generation. -/
 theorem bottleneck_gen_contributes_more_drift (Ne_b Ne_n : ℝ)
-    (hb : 0 < Ne_b) (hn : 0 < Ne_n)
+ (hb : 0 < Ne_b)
     (h_bottle : Ne_b < Ne_n) :
     1 / (2 * Ne_n) < 1 / (2 * Ne_b) := by
   exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
@@ -597,7 +593,7 @@ noncomputable def excessDriftRate (Ne_b Ne_stable : ℝ) : ℝ :=
 
 /-- The excess drift rate is positive when Ne_b < Ne_stable. -/
 theorem excessDriftRate_pos (Ne_b Ne_stable : ℝ)
-    (hNb : 0 < Ne_b) (hNs : 0 < Ne_stable) (h_bottle : Ne_b < Ne_stable) :
+ (hNb : 0 < Ne_b) (h_bottle : Ne_b < Ne_stable) :
     0 < excessDriftRate Ne_b Ne_stable := by
   unfold excessDriftRate driftLDCreationRate
   rw [sub_pos]
@@ -618,8 +614,7 @@ noncomputable def cumulativeExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ) : ℝ :=
 
     We show this equals (1-(1-1/(2·Ne_b))^t_b) - (1-(1-1/(2·Ne_stable))^t_b),
     which is the definition of bottleneckExcessLD below. -/
-theorem cumulativeExcessLD_eq_closedForm (Ne_b Ne_stable : ℝ) (t_b : ℕ)
-    (hNb : 0 < Ne_b) (hNs : 0 < Ne_stable) :
+theorem cumulativeExcessLD_eq_closedForm (Ne_b Ne_stable : ℝ) (t_b : ℕ) :
     cumulativeExcessLD Ne_b Ne_stable t_b =
       excessDriftRate Ne_b Ne_stable *
         ((Finset.range t_b).sum fun k => (1 - 1 / (2 * Ne_b)) ^ k) := by
@@ -662,8 +657,7 @@ theorem geom_sum_drift (Ne_b : ℝ) (t_b : ℕ) (hNb : 0 < Ne_b) :
     derivation produces the bottleneckExcessLD formula. We state this as
     an algebraic identity that the derived cumulative form and the direct
     per-population drift difference coincide. -/
-theorem derivation_matches_bottleneckExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ)
-    (hNb : 0 < Ne_b) (hNs : 0 < Ne_stable) :
+theorem derivation_matches_bottleneckExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ) :
     (1 - (1 - 1/(2 * Ne_b)) ^ t_b) - (1 - (1 - 1/(2 * Ne_stable)) ^ t_b) =
       (1 - 1/(2 * Ne_stable)) ^ t_b - (1 - 1/(2 * Ne_b)) ^ t_b := by
   ring
@@ -717,7 +711,7 @@ theorem bottleneck_excess_ld_pos (Ne_b Ne_stable : ℝ) (t_b : ℕ)
 theorem bottleneck_worsens_portability
     (Ne_b Ne_stable : ℝ) (t_b : ℕ)
     (hNb : 2 < Ne_b) (hNs : 2 < Ne_stable) (h_bottle : Ne_b < Ne_stable)
-    (ht : 0 < t_b) (fst_mismatch : ℝ) (h_fst_nn : 0 ≤ fst_mismatch) :
+ (ht : 0 < t_b) (fst_mismatch : ℝ) :
     fst_mismatch < fst_mismatch + bottleneckExcessLD Ne_b Ne_stable t_b := by
   linarith [bottleneck_excess_ld_pos Ne_b Ne_stable t_b hNb hNs h_bottle ht]
 
@@ -731,9 +725,7 @@ theorem bottleneck_reduces_portability_ratio
     (R2_source Ne_b Ne_stable : ℝ) (t_b : ℕ) (fst : ℝ)
     (hR2 : 0 < R2_source)
     (hNb : 2 < Ne_b) (hNs : 2 < Ne_stable) (h_bottle : Ne_b < Ne_stable)
-    (ht : 0 < t_b)
-    (hfst : 0 ≤ fst) (hfst1 : fst < 1)
-    (h_pen_bound : bottleneckExcessLD Ne_b Ne_stable t_b < 1 - fst) :
+    (ht : 0 < t_b) :
     R2_source * ((1 - fst) - bottleneckExcessLD Ne_b Ne_stable t_b) <
     R2_source * (1 - fst) := by
   apply mul_lt_mul_of_pos_left _ hR2
@@ -751,7 +743,6 @@ theorem expansion_smaller_portability_loss
     (ld_mismatch_exp ld_mismatch_small accuracy_coeff : ℝ)
     (h_coeff_pos : 0 < accuracy_coeff)
     (h_mismatch_exp_nn : 0 ≤ ld_mismatch_exp)
-    (h_mismatch_small_nn : 0 ≤ ld_mismatch_small)
     (h_exp_less : ld_mismatch_exp < ld_mismatch_small) :
     accuracy_coeff * ld_mismatch_exp ^ 2 < accuracy_coeff * ld_mismatch_small ^ 2 := by
   apply mul_lt_mul_of_pos_left _ h_coeff_pos

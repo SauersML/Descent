@@ -55,8 +55,6 @@ noncomputable def incrementalR2 (r2_full r2_covariates : ℝ) : ℝ :=
 theorem incremental_r2_nonneg
     (rss_full rss_cov tss : ℝ)
     (h_tss : 0 < tss)
-    (h_rss_full : 0 ≤ rss_full)
-    (h_rss_cov : 0 ≤ rss_cov)
     -- Nested model property: full model has no more residual than submodel
     (h_nested : rss_full ≤ rss_cov) :
     let r2_full := 1 - rss_full / tss
@@ -277,7 +275,7 @@ theorem genetic_correlation_predicts_portability {m : ℕ} (hm : 0 < m)
     For well-powered GWAS: SE ∝ 1/√n, so larger n yields smaller SE. -/
 theorem ldsc_se_decreases_with_n
     (c : ℝ) (n₁ n₂ : ℝ)
-    (h_c : 0 < c) (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
+ (h_c : 0 < c) (h_n₁ : 0 < n₁)
     (h_more : n₁ < n₂) :
     c / Real.sqrt n₂ < c / Real.sqrt n₁ := by
   apply div_lt_div_of_pos_left h_c
@@ -290,7 +288,7 @@ theorem ldsc_se_decreases_with_n
     yielding a smaller SE (fewer parameters → tighter estimate). -/
 theorem constrained_intercept_more_powerful
     (se_per_param : ℝ) (k : ℕ)
-    (h_se : 0 < se_per_param) (h_k : 0 < k) :
+ (h_se : 0 < se_per_param) :
     se_per_param * k < se_per_param * (k + 1) := by
   have : (k : ℝ) < (k : ℝ) + 1 := lt_add_one _
   exact mul_lt_mul_of_pos_left this h_se

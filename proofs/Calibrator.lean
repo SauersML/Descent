@@ -53,32 +53,6 @@ noise without adding usable mathematical content and should be deleted rather
 than retained as named results.
 -/
 
-/-- Top-level HWE expectation identity for the diploid alternative-allele count. -/
-theorem hardyWeinberg_expectedAltAlleleCount_proved
-    (h : HardyWeinbergModel) :
-    h.expectedAltAlleleCount = 2 * h.altFreq :=
-  h.expectedAltAlleleCount_eq
-
-/-- Top-level HWE variance identity for the diploid alternative-allele count. -/
-theorem hardyWeinberg_genotypeVariance_proved
-    (h : HardyWeinbergModel) :
-    h.genotypeVariance = 2 * h.altFreq * h.refFreq :=
-  h.genotypeVariance_eq
-
-/-- Top-level HWE score variance is nonnegative. -/
-theorem hweScoreVariance_nonneg_proved
-    {m : ℕ} [Fintype (Fin m)]
-    (model : HWEScoreModel m) :
-    0 ≤ model.scoreVariance :=
-  model.scoreVariance_nonneg
-
-/-- Top-level Berry-Esseen error radius is nonnegative for the HWE score model. -/
-theorem hweBerryEsseenError_nonneg_proved
-    {m : ℕ} [Fintype (Fin m)]
-    (model : HWEScoreModel m) (berryEsseenConstant : ℝ)
-    (hC : 0 ≤ berryEsseenConstant) :
-    0 ≤ model.berryEsseenErrorBound berryEsseenConstant :=
-  model.berryEsseenErrorBound_nonneg berryEsseenConstant hC
 
 /-- Concrete `2 × 2` specialization of the two-locus coalescent covariance-gap theorem. -/
 theorem twoLocusCoalescent_covariance_gap_lower_bound_proved
@@ -110,14 +84,6 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent_proved
     (t := 2) ibdWeight recombRate tSource tTarget
     h_ibd_pos h_recomb_pos h_recomb_lt_one h_time
 
-/-- Top-level AUC interval membership from a Berry-Esseen error bound on the discrete HWE score. -/
-theorem hwe_aucApproximationInterval_membership_proved
-    {m : ℕ} [Fintype (Fin m)]
-    (dgp : HWEPolygenicScoreDGP m)
-    (aucExact aucGaussian : ℝ)
-    (h : |aucExact - aucGaussian| ≤ dgp.scoreApproximationError) :
-    aucExact ∈ dgp.aucApproximationInterval aucGaussian :=
-  dgp.mem_aucApproximationInterval_of_abs_sub_le aucExact aucGaussian h
 
 /-- Top-level `R²` interval membership from a Berry-Esseen error bound on the discrete HWE score. -/
 theorem hwe_r2ApproximationInterval_membership_proved
@@ -186,15 +152,6 @@ theorem source_target_erm_differ_proved :
     have h : wS 0 = wT 0 := congrFun heq 0
     simp [wS, wT] at h
 
-/-- Top-level mean-shift formula: delegates to `PortabilityDrift.expected_abs_mean_shift_bound_proved`. -/
-theorem expected_abs_mean_shift_formula_proved
-    (V_A fstS fstT : ℝ)
-    (hVA_pos : 0 < V_A)
-    (hfst_sum_nonneg : 0 ≤ fstS + fstT)
-    (hfstS_lt_one : fstS < 1) :
-    Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
-      2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) :=
-  expected_abs_mean_shift_bound_proved V_A fstS fstT hVA_pos hfst_sum_nonneg hfstS_lt_one
 
 /-- Specialization of the exact mean-shift formula to discrete Wright-Fisher drift. -/
 theorem expected_abs_mean_shift_of_wrightFisher_proved
@@ -348,10 +305,5 @@ theorem targetBrier_strict_gt_source_proved
   targetBrier_strict_gt_source_of_neutralAF_benchmark π V_A V_E fstSource fstTarget
     hπ0 hπ1 hVA hVE h_fst h_fst_bounds
 
-/-- Top-level: increasing migration strictly reduces IM equilibrium differentiation
-    on the biologically relevant domain of positive migration rates. -/
-theorem im_delta_strictAntiOn_proved :
-    StrictAntiOn (fun M : ℝ => twoDemeIMEquilibriumDelta M) (Set.Ioi 0) :=
-  twoDemeIMEquilibriumDelta_strictAntiOn
 
 end Calibrator

@@ -145,7 +145,6 @@ theorem expected_pgs_diff_var_nonneg (V_A fst : ℝ)
 theorem stratification_confounds_overdispersion
     (delta_true strat_bias drift_var critical : ℝ)
     (h_drift_pos : 0 < drift_var)
-    (h_bias_pos : 0 < strat_bias)
     (h_not_sig : delta_true ^ 2 / drift_var ≤ critical)
     (h_confounded_sig : critical * drift_var < (delta_true + strat_bias) ^ 2) :
     delta_true ^ 2 / drift_var ≤ critical ∧
@@ -164,7 +163,6 @@ theorem stratification_confounds_overdispersion
     the biases are less than the naive statistic). -/
 theorem corrections_reduce_signal
     (stat_naive ld_bias ascertainment_bias : ℝ)
-    (h_naive_pos : 0 < stat_naive)
     (h_ld : 0 < ld_bias) (h_asc : 0 < ascertainment_bias)
     (h_partial : ld_bias + ascertainment_bias < stat_naive) :
     let stat_corrected := stat_naive - ld_bias - ascertainment_bias
@@ -219,7 +217,7 @@ theorem directional_selection_shifts_pgs
     ρ_stab = 1 - d/(1 + s·N) > 1 - d = ρ_neutral. -/
 theorem stabilizing_maintains_architecture
     (d s N : ℝ)
-    (h_d_pos : 0 < d) (h_d_le : d ≤ 1)
+ (h_d_pos : 0 < d)
     (h_s : 0 < s) (h_N : 0 < N) :
     let rho_neutral := 1 - d
     let rho_stab := 1 - d / (1 + s * N)
@@ -244,7 +242,7 @@ theorem stabilizing_maintains_architecture
     We derive the full ordering: ρ_fluctuating < ρ_neutral < ρ_stabilizing. -/
 theorem fluctuating_selection_worst_portability
     (d s f N : ℝ)
-    (h_d_pos : 0 < d) (h_d_small : d * (1 + f * N) < 1)
+ (h_d_pos : 0 < d)
     (h_s : 0 < s) (h_f : 0 < f) (h_N : 0 < N) :
     let rho_stab := 1 - d / (1 + s * N)
     let rho_neutral := 1 - d
@@ -294,7 +292,7 @@ section DetectingAdaptation
     After correction, the signal was greatly reduced. -/
 theorem stratification_reduces_adaptation_signal
     (signal_raw strat_bias : ℝ)
-    (h_raw_pos : 0 < signal_raw) (h_bias_pos : 0 < strat_bias)
+ (h_bias_pos : 0 < strat_bias)
     (h_partial : strat_bias < signal_raw) :
     -- After removing stratification bias, signal is reduced but not eliminated
     0 < signal_raw - strat_bias ∧ signal_raw - strat_bias < signal_raw := by

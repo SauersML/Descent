@@ -45,9 +45,7 @@ theorem recalibration_slope_under_drift
     These two components sum to r2_source by algebraic decomposition:
       r2_source × ρ² + r2_source × (1 - ρ²) = r2_source × (ρ² + 1 - ρ²) = r2_source. -/
 theorem recalibration_recovers_up_to_turnover
-    (r2_source ρ_sq : ℝ)
-    (h_ρ : 0 ≤ ρ_sq) (h_ρ_le : ρ_sq ≤ 1)
-    (h_r2 : 0 < r2_source) :
+    (r2_source ρ_sq : ℝ) :
     let r2_recalibrated := r2_source * ρ_sq
     let r2_loss_turnover := r2_source * (1 - ρ_sq)
     r2_recalibrated + r2_loss_turnover = r2_source := by
@@ -95,8 +93,6 @@ theorem spline_error_improves_with_knots
     decomposition MSE = bias² + variance. -/
 theorem bias_variance_tradeoff
     (bias₁ bias₂ var₁ var₂ : ℝ)
-    (h_bias_improves : bias₂ ^ 2 < bias₁ ^ 2)
-    (h_var_worsens : var₁ < var₂)
     (h_var_dominates : var₂ - var₁ > bias₁ ^ 2 - bias₂ ^ 2) :
     bias₁ ^ 2 + var₁ < bias₂ ^ 2 + var₂ := by linarith
 
@@ -109,7 +105,7 @@ theorem spline_r2_upper_bound
     (var_signal var_noise var_total : ℝ)
     (h_total : var_total = var_signal + var_noise)
     (h_total_pos : 0 < var_total)
-    (h_signal_nn : 0 ≤ var_signal) (h_noise_nn : 0 ≤ var_noise) :
+ (h_noise_nn : 0 ≤ var_noise) :
     var_signal / var_total ≤ 1 := by
   rw [div_le_one h_total_pos, h_total]; linarith
 
@@ -130,7 +126,7 @@ section TransferLearning
 theorem more_target_data_reduces_mse
     (σ_sq gap : ℝ) (n₁ n₂ : ℕ)
     (h_σ : 0 < σ_sq) (h_gap : 0 < gap)
-    (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
+ (h_n₁ : 0 < n₁)
     (h_more : n₁ < n₂) :
     gap * σ_sq / (n₂ : ℝ) < gap * σ_sq / (n₁ : ℝ) := by
   apply div_lt_div_of_pos_left (mul_pos h_gap h_σ)
@@ -151,8 +147,8 @@ theorem more_target_data_reduces_mse
     As n_T → ∞, σ²_extra/n_T → 0, so target-only wins (bias² > 0). -/
 theorem transfer_beats_target_only
     (σ_sq bias_sq σ_extra_sq : ℝ) (n_T : ℝ)
-    (h_σ : 0 < σ_sq) (h_bias : 0 < bias_sq)
-    (h_extra : 0 < σ_extra_sq) (h_n : 0 < n_T)
+ (h_bias : 0 < bias_sq)
+ (h_n : 0 < n_T)
     (h_small_n : n_T < σ_extra_sq / bias_sq) :
     let mse_transfer := σ_sq / n_T + bias_sq
     let mse_target := (σ_sq + σ_extra_sq) / n_T
@@ -179,11 +175,7 @@ theorem transfer_beats_target_only
     in between. -/
 theorem critical_sample_size_exists
     (mse_transfer mse_target : ℝ → ℝ) (n_lo n_hi : ℝ)
-    (h_transfer_decreasing : ∀ n₁ n₂ : ℝ, 0 < n₁ → n₁ < n₂ → mse_transfer n₂ < mse_transfer n₁)
-    (h_target_decreasing : ∀ n₁ n₂ : ℝ, 0 < n₁ → n₁ < n₂ → mse_target n₂ < mse_target n₁)
-    (h_lo_pos : 0 < n_lo) (h_range : n_lo < n_hi)
-    (h_small_n : mse_transfer n_lo < mse_target n_lo)
-    (h_large_n : mse_target n_hi < mse_transfer n_hi) :
+ (h_range : n_lo < n_hi) :
     -- There exists a crossover point
     ∃ n_crit : ℝ, n_lo < n_crit ∧ n_crit < n_hi := by
   exact ⟨(n_lo + n_hi) / 2, by linarith, by linarith⟩
@@ -218,7 +210,7 @@ section PhenotypeHeterogeneity
     If the phenotype Y is measured with different scales or thresholds
     across populations, R² comparisons are invalid. -/
 theorem measurement_invariance_violation
-    (r2₁ r2₂ : ℝ) (scale : ℝ)
+ (r2₁ : ℝ) (scale : ℝ)
     (h_scale : scale ≠ 1) (h_scale_pos : 0 < scale)
     (h_r2₁ : 0 < r2₁) (h_r2₁_le : r2₁ ≤ 1) :
     -- Scaling the phenotype changes R² when there's additive noise
@@ -264,8 +256,6 @@ theorem threshold_shift_changes_prevalence
 theorem r2_depends_on_prevalence_but_auc_doesnt
     (h2 π₁ π₂ : ℝ)
     (h_h2 : 0 < h2)
-    (h_π₁ : 0 < π₁) (h_π₁_lt : π₁ < 1)
-    (h_π₂ : 0 < π₂) (h_π₂_lt : π₂ < 1)
     (h_diff_prev : π₁ ≠ π₂)
     (h_not_complement : π₁ + π₂ ≠ 1) :
     h2 * (π₁ * (1 - π₁)) ≠ h2 * (π₂ * (1 - π₂)) := by

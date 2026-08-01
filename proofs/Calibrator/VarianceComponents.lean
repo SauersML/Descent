@@ -59,8 +59,6 @@ noncomputable def snpH2 (V_A_tagged V_P : ℝ) : ℝ :=
 theorem snp_h2_le_narrow_h2
     (V_A_tagged V_A_total V_D V_I V_E : ℝ)
     (h_tagged : V_A_tagged ≤ V_A_total)
-    (h_tagged_nn : 0 ≤ V_A_tagged)
-    (hD : 0 ≤ V_D) (hI : 0 ≤ V_I) (hE : 0 ≤ V_E)
     (h_total : 0 < V_A_total + V_D + V_I + V_E) :
     snpH2 V_A_tagged (V_A_total + V_D + V_I + V_E) ≤
       narrowSenseH2 V_A_total V_D V_I V_E := by
@@ -79,8 +77,7 @@ theorem snp_h2_le_narrow_h2
 theorem missing_heritability_gap
     (V_A_tagged V_A_untagged V_D V_I V_E : ℝ)
     (h_tagged_nn : 0 ≤ V_A_tagged) (h_untagged_pos : 0 < V_A_untagged)
-    (h_D : 0 ≤ V_D) (h_I : 0 ≤ V_I) (h_E : 0 ≤ V_E)
-    (h_total : 0 < V_A_tagged + V_A_untagged + V_D + V_I + V_E) :
+    (h_D : 0 ≤ V_D) (h_I : 0 ≤ V_I) (h_E : 0 ≤ V_E) :
     let V_P := V_A_tagged + V_A_untagged + V_D + V_I + V_E
     let h2_twin := (V_A_tagged + V_A_untagged) / V_P
     let h2_snp := V_A_tagged / V_P
@@ -133,8 +130,6 @@ theorem additive_variance_nonneg
     the contribution to V_A changes. -/
 theorem frequency_change_affects_va
     (p₁ p₂ α : ℝ)
-    (h₁ : 0 < p₁) (h₁' : p₁ < 1)
-    (h₂ : 0 < p₂) (h₂' : p₂ < 1)
     (h_freq : p₁ ≠ p₂) (h_α : α ≠ 0)
     (h_sum : p₁ + p₂ ≠ 1) :
     2 * p₁ * (1 - p₁) * α ^ 2 ≠ 2 * p₂ * (1 - p₂) * α ^ 2 := by
@@ -152,7 +147,7 @@ theorem frequency_change_affects_va
     If Ve differs, h² differs even with identical genetic architecture. -/
 theorem env_variance_changes_h2
     (V_A Ve₁ Ve₂ : ℝ)
-    (hVA : 0 < V_A) (hVe₁ : 0 < Ve₁) (hVe₂ : 0 < Ve₂)
+ (hVA : 0 < V_A) (hVe₁ : 0 < Ve₁)
     (h_diff : Ve₁ < Ve₂) :
     V_A / (V_A + Ve₂) < V_A / (V_A + Ve₁) := by
   exact div_lt_div_of_pos_left hVA (by linarith) (by linarith)
@@ -193,7 +188,7 @@ section PGSCeiling
 theorem pgs_r2_ceiling_from_h2
     (h2_snp f : ℝ)
     (h_h2 : 0 < h2_snp)
-    (h_f_nn : 0 ≤ f) (h_f_le : f ≤ 1) :
+ (h_f_le : f ≤ 1) :
     h2_snp * f ≤ h2_snp := by
   exact mul_le_of_le_one_right (le_of_lt h_h2) h_f_le
 
@@ -203,8 +198,8 @@ theorem pgs_r2_ceiling_from_h2
     With finite sample size, not all SNPs are discovered. -/
 theorem pgs_r2_ceiling_from_gwas_power
     (h2_snp power_fraction : ℝ)
-    (h_h2 : 0 < h2_snp) (h_h2_le : h2_snp ≤ 1)
-    (h_power : 0 < power_fraction) (h_power_le : power_fraction ≤ 1) :
+ (h_h2 : 0 < h2_snp)
+ (h_power_le : power_fraction ≤ 1) :
     h2_snp * power_fraction ≤ h2_snp := by
   exact mul_le_of_le_one_right (le_of_lt h_h2) h_power_le
 
@@ -212,7 +207,7 @@ theorem pgs_r2_ceiling_from_gwas_power
     R²_PGS_target ≤ h²_SNP × power_fraction × portability_ratio. -/
 theorem portability_reduces_ceiling
     (h2_snp power_frac port_ratio : ℝ)
-    (h_h2 : 0 < h2_snp) (h_power : 0 < power_frac) (h_port : 0 < port_ratio)
+ (h_h2 : 0 < h2_snp) (h_port : 0 < port_ratio)
     (h_power_le : power_frac ≤ 1) (h_port_le : port_ratio ≤ 1) :
     h2_snp * power_frac * port_ratio ≤ h2_snp := by
   calc h2_snp * power_frac * port_ratio
@@ -231,7 +226,7 @@ theorem three_way_ceiling
     (h2 gwas_power port_ratio target_r2 : ℝ)
     (h_h2_le : h2 ≤ 1) (h_power_le : gwas_power ≤ 1)
     (h_port_le : port_ratio ≤ 1)
-    (h_h2_nn : 0 ≤ h2) (h_power_nn : 0 ≤ gwas_power) (h_port_nn : 0 ≤ port_ratio)
+ (h_h2_nn : 0 ≤ h2) (h_power_nn : 0 ≤ gwas_power)
     (h_bound : target_r2 ≤ h2 * gwas_power * port_ratio) :
     target_r2 ≤ 1 := by
   have : h2 * gwas_power * port_ratio ≤ 1 := by
@@ -303,7 +298,7 @@ theorem greml_underestimates_with_poor_tagging
     (V_A + V_strat)/V_P > V_A/V_P when V_P > 0. -/
 theorem stratification_inflates_greml
     (V_A V_strat V_E : ℝ)
-    (h_VA : 0 ≤ V_A) (h_strat_pos : 0 < V_strat) (h_VE : 0 ≤ V_E)
+ (h_strat_pos : 0 < V_strat)
     (h_total : 0 < V_A + V_strat + V_E) :
     let V_P := V_A + V_strat + V_E
     let h2_true := V_A / V_P
@@ -370,9 +365,7 @@ noncomputable def liabilityScaleH2
 theorem liability_h2_larger_for_rare
     (h2_observed prevalence z_height : ℝ)
     (h_obs_pos : 0 < h2_observed)
-    (h_prev : 0 < prevalence) (h_prev1 : prevalence < 1)
-    (h_conversion_gt_one : prevalence * (1 - prevalence) / z_height ^ 2 > 1)
-    (h_z : 0 < z_height) :
+    (h_conversion_gt_one : prevalence * (1 - prevalence) / z_height ^ 2 > 1) :
     h2_observed < liabilityScaleH2 h2_observed prevalence z_height := by
   unfold liabilityScaleH2
   rw [show h2_observed * prevalence * (1 - prevalence) / z_height ^ 2 =
@@ -385,11 +378,6 @@ theorem liability_h2_larger_for_rare
     for a portability effect. -/
 theorem prevalence_confounds_h2_portability
     (h2_liability : ℝ) (K₁ K₂ z₁ z₂ : ℝ)
-    (h_same_liability : 0 < h2_liability)
-    (h_K1 : 0 < K₁) (h_K2 : 0 < K₂)
-    (h_z1 : 0 < z₁) (h_z2 : 0 < z₂)
-    (h_diff_prev : K₁ ≠ K₂)
-    (h_diff_z : z₁ ≠ z₂)
     (h_diff_ratio : K₁ * (1 - K₁) / z₁ ^ 2 ≠ K₂ * (1 - K₂) / z₂ ^ 2) :
     -- Different observed h² even with same genetic architecture
     liabilityScaleH2 1 K₁ z₁ ≠ liabilityScaleH2 1 K₂ z₂ := by
