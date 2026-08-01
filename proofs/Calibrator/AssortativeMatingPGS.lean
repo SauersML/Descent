@@ -207,7 +207,9 @@ theorem am_inflates_observed_h2
 /-- **PGS R² inflation under AM.**
     A PGS with accuracy R2_rm under random mating has inflated accuracy
     under AM: R2_am = R2_rm / (1 - r*h2).
-    This is because the PGS captures the AM-induced LD variance. -/
+    This is because the PGS captures the AM-induced LD variance.
+
+    Empirical status: UNTESTED. -/
 noncomputable def AssortativeMatingModel.pgsR2AM (m : AssortativeMatingModel)
     (R2_rm : ℝ) : ℝ :=
   R2_rm / (1 - m.r * m.h2)
@@ -453,7 +455,9 @@ section PopulationStructure
 /-- **Isolation by distance model.**
     In a stepping-stone model, Fst between populations i and j
     increases with geographic distance d_ij:
-    Fst(d) ≈ d / (4Nσ² + d) where σ² is dispersal variance. -/
+    Fst(d) ≈ d / (4Nσ² + d) where σ² is dispersal variance.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ibdFst (d N sigma_sq : ℝ) : ℝ :=
   d / (4 * N * sigma_sq + d)
 

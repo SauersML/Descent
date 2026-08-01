@@ -33,7 +33,9 @@ and effect sizes.
 section ScoreMeanVariance
 
 /-- **PGS mean under HWE.**
-    E[PGS] = Σᵢ βᵢ × 2pᵢ. -/
+    E[PGS] = Σᵢ βᵢ × 2pᵢ.
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsMean {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : ℝ :=
   ∑ i, β i * (2 * p i)
 
@@ -53,7 +55,9 @@ theorem pgs_variance_nonneg {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ)
   nlinarith [hp i, hp1 i]
 
 /-- **Mean shift between populations.**
-    Δμ = Σᵢ βᵢ × 2(p'ᵢ - pᵢ). -/
+    Δμ = Σᵢ βᵢ × 2(p'ᵢ - pᵢ).
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsMeanShift
     {m : ℕ} (β : Fin m → ℝ) (p_source p_target : Fin m → ℝ) : ℝ :=
   ∑ i, β i * (2 * (p_target i - p_source i))
@@ -94,7 +98,9 @@ section TailProbabilities
 
 /-- Standardized benchmark threshold coordinate for a Gaussian score law with
 mean `μ` and standard deviation `σ`. This is a score-summary object, not by
-itself a clinical decision or misclassification theorem. -/
+itself a clinical decision or misclassification theorem.
+
+    Empirical status: UNTESTED. -/
 noncomputable def thresholdStandardizedCoordinate (threshold μ σ : ℝ) : ℝ :=
   (threshold - μ) / σ
 

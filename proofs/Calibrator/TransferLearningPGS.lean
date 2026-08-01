@@ -53,7 +53,9 @@ section PGSPortabilityDerivation
 /-- Covariance between PGS (using source weights) and the genetic component
     of the phenotype in a given population:
     Cov(PGS, Y_genetic) = Σᵢ Σⱼ β_source_i × Σᵢⱼ × β_causal_j
-    where β_causal are the true causal effects in that population. -/
+    where β_causal are the true causal effects in that population.
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsPhenoCov {m : ℕ} (β_weights β_causal : Fin m → ℝ)
     (ld : Fin m → Fin m → ℝ) : ℝ :=
   ∑ i : Fin m, ∑ j : Fin m, β_weights i * ld i j * β_causal j
@@ -69,7 +71,9 @@ noncomputable def sharedLDHeritability {m : ℕ}
   sharedLDGeneticVariance β ld / var_y
 
 /-- R² of a PGS: the squared correlation between PGS and phenotype.
-    R² = Cov(PGS, Y)² / (Var(PGS) × Var(Y)). -/
+    R² = Cov(PGS, Y)² / (Var(PGS) × Var(Y)).
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsR2 (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
   cov_pgs_y ^ 2 / (var_pgs * var_y)
 
@@ -87,7 +91,9 @@ noncomputable def transportedTargetR2SharedLD {m : ℕ}
   pgsR2 (pgsPhenoCov β_source β_target ld)
     (sharedLDGeneticVariance β_source ld) var_y
 
-/-- Effect correlation induced by a shared LD kernel. -/
+/-- Effect correlation induced by a shared LD kernel.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldEffectGeneticCorrelation {m : ℕ}
     (β_source β_target : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) : ℝ :=
   pgsPhenoCov β_source β_target ld /
@@ -108,7 +114,9 @@ def standardizedDiagonalLD {m : ℕ} : Fin m → Fin m → ℝ :=
 noncomputable def additiveGeneticVariance {m : ℕ} (β : Fin m → ℝ) : ℝ :=
   ∑ i : Fin m, β i ^ 2
 
-/-- Additive heritability `h² = V_A / V_Y` in the standardized diagonal-LD model. -/
+/-- Additive heritability `h² = V_A / V_Y` in the standardized diagonal-LD model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def additiveHeritability {m : ℕ} (β : Fin m → ℝ) (var_y : ℝ) : ℝ :=
   additiveGeneticVariance β / var_y
 
@@ -947,7 +955,9 @@ def infoBottleneckObjective (I_phi_Y I_phi_A lam : ℝ) : ℝ :=
 
 /-- Exact normalized Gaussian source residual risk from mutual information.
     For a jointly Gaussian source trait `Y` and representation `φ(X)` with
-    `Var(Y)=1`, the residual variance fraction is exactly `exp(-2 I(φ(X);Y))`. -/
+    `Var(Y)=1`, the residual variance fraction is exactly `exp(-2 I(φ(X);Y))`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def gaussianSourceResidualRisk (I_phi_Y : ℝ) : ℝ :=
   Real.exp (-2 * I_phi_Y)
 
@@ -1559,7 +1569,9 @@ noncomputable def metaLearnedSourceWeights {p : ℕ}
 
 /-- Population-specific effect deviation around a shared ancestral-effect
     center. This is the exact effect-architecture object whose average is used
-    by the meta-learning block below. -/
+    by the meta-learning block below.
+
+    Empirical status: UNTESTED. -/
 noncomputable def centeredPopulationEffectDeviation {p : ℕ}
     (wShared : Fin p → ℝ)
     (wSource : ℕ → Fin p → ℝ) : ℕ → Fin p → ℝ :=
@@ -2017,7 +2029,9 @@ noncomputable def weightedMetaTransferGapSq {p k : ℕ}
 noncomputable def uniformMetaWeight (k : ℕ) : Fin k → ℝ :=
   fun _ => (k : ℝ)⁻¹
 
-/-- Weighted average of source-population effect vectors. -/
+/-- Weighted average of source-population effect vectors.
+
+    Empirical status: UNTESTED. -/
 noncomputable def weightedPopulationEffectAverage {p k : ℕ}
     (wSource : Fin k → Fin p → ℝ)
     (weight : Fin k → ℝ) : Fin p → ℝ :=

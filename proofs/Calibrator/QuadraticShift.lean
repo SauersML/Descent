@@ -16,7 +16,9 @@ identity follows from any solution of the normal equations `B v = b`.
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Quadratic risk up to an arbitrary outcome-only constant. -/
+/-- Quadratic risk up to an arbitrary outcome-only constant.
+
+    Empirical status: UNTESTED. -/
 def quadraticRisk (outcomeSecondMoment : ℝ) (B : Matrix ι ι ℝ)
     (b w : ι → ℝ) : ℝ :=
   outcomeSecondMoment - 2 * dot w b + dot w (B.mulVec w)

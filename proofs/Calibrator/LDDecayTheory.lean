@@ -158,7 +158,9 @@ section AdmixtureLD
 
 /-- **Admixture LD between unlinked loci.**
     D_admix = α(1-α)(p₁_A - p₁_B)(p₂_A - p₂_B)
-    where α is admixture proportion and A,B are ancestral populations. -/
+    where α is admixture proportion and A,B are ancestral populations.
+
+    Empirical status: UNTESTED. -/
 noncomputable def admixtureLD (α Δp₁ Δp₂ : ℝ) : ℝ :=
   α * (1 - α) * Δp₁ * Δp₂
 
@@ -197,7 +199,9 @@ section BottleneckLD
 
 /-- **Bottleneck amplification of LD.**
     After a bottleneck of size N_b for t generations, LD increases by
-    approximately 1/(2·N_b) per generation (drift-generated LD). -/
+    approximately 1/(2·N_b) per generation (drift-generated LD).
+
+    Empirical status: UNTESTED. -/
 noncomputable def bottleneckLDAmplification (N_b : ℝ) (t : ℕ) : ℝ :=
   1 - (1 - 1/(2 * N_b)) ^ t
 
@@ -247,7 +251,9 @@ section LDMismatchQuantification
 
 /-- **LD matrix distance.**
     The Frobenius norm of the difference between source and target
-    LD matrices captures the total LD mismatch. -/
+    LD matrices captures the total LD mismatch.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldMismatchFrobenius
     {p : ℕ} (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ) : ℝ :=
   frobeniusNormSq (Sig_S - Sig_T)
@@ -341,7 +347,9 @@ section BottleneckLDExcess
 /-- **Excess LD from a bottleneck.**
     During a bottleneck of size N_b for t_b generations, drift generates
     LD of magnitude ≈ 1/(2N_b) per generation. After recovery to size N_r,
-    this excess decays at rate 1/(2N_r) per generation. -/
+    this excess decays at rate 1/(2N_r) per generation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def excessLDAfterBottleneck (N_b N_r : ℝ) (t_b t_r : ℕ) : ℝ :=
   (1 - (1 - 1/(2 * N_b)) ^ t_b) * (1 - 1/(2 * N_r)) ^ t_r
 
@@ -415,7 +423,9 @@ section ExpansionLD
 
 /-- **LD decay rate depends on current Ne.**
     The fraction of LD that decays per generation is 1/(2Ne).
-    Larger Ne → slower decay → LD persists longer. -/
+    Larger Ne → slower decay → LD persists longer.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldDecayRatePerGen (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 
@@ -428,7 +438,9 @@ theorem larger_pop_slower_ld_decay (Ne₁ Ne₂ : ℝ)
 
 /-- **LD half-life is proportional to Ne.**
     After a perturbation, the number of generations for LD to halve
-    is approximately 2·Ne·ln(2). We define it and show monotonicity. -/
+    is approximately 2·Ne·ln(2). We define it and show monotonicity.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldHalfLife (Ne : ℝ) : ℝ :=
   2 * Ne * Real.log 2
 
@@ -471,7 +483,9 @@ Ne have slower LD decay toward equilibrium.
 
 section LDHalfLifeTrajectory
 
-/-- **LD retained fraction** after t generations at constant size Ne. -/
+/-- **LD retained fraction** after t generations at constant size Ne.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldRetainedFraction (Ne : ℝ) (t : ℕ) : ℝ :=
   (1 - 1/(2 * Ne)) ^ t
 
@@ -533,7 +547,9 @@ section LDDecayDerivation
 /-- **LD recurrence relation.**
     D(t+1) = (1-r) · D(t) where r is the recombination rate between two loci
     and D₀ is the initial LD. This is the fundamental discrete-time model
-    of LD decay under random mating with recombination. -/
+    of LD decay under random mating with recombination.
+
+    Empirical status: UNTESTED. -/
 def ldRecurrence (r D₀ : ℝ) : ℕ → ℝ
   | 0 => D₀
   | t + 1 => (1 - r) * ldRecurrence r D₀ t

@@ -187,7 +187,9 @@ section InformationTheoreticLimits
 /-- **Mutual information between source and target effect vectors.**
     Under a multivariate Gaussian model for effects:
     β_target | β_source ~ N(ρ·β_source, (1-ρ²)·σ²_β · I).
-    The mutual information is -(m/2)·log(1-ρ²). -/
+    The mutual information is -(m/2)·log(1-ρ²).
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectMutualInformation (m : ℕ) (ρ : ℝ) : ℝ :=
   -(m : ℝ) / 2 * Real.log (1 - ρ ^ 2)
 

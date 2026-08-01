@@ -30,7 +30,9 @@ noncomputable def mechanisticPortabilityRatio {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   targetR2FromSourceWeights m / sourceR2FromSourceWeights m
 
-/-- Total additive source squared-effect mass in a direct-causal witness. -/
+/-- Total additive source squared-effect mass in a direct-causal witness.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sourceSquaredEffectMass {q : ℕ}
     (β : Fin q → ℝ) : ℝ :=
   ∑ i, β i ^ 2
@@ -194,7 +196,9 @@ noncomputable def baselineMetricModel : CrossPopulationMetricModel 1 1 := {
   targetPrevalence_lt_one := by norm_num
 }
 
-/-- Target-LD-shift witness: only the target LD among scored SNPs changes. -/
+/-- Target-LD-shift witness: only the target LD among scored SNPs changes.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetLDShiftMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineMetricModel with
       sigmaTagTarget := !![2] }
@@ -214,7 +218,9 @@ noncomputable def targetTaggingShiftMetricModel : CrossPopulationMetricModel 1 1
   { baselineProxyTagMetricModel with
       proxyTaggingTarget := !![1 / 2] }
 
-/-- Target effect-shift witness: only the target causal effect size changes. -/
+/-- Target effect-shift witness: only the target causal effect size changes.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetEffectShiftMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineMetricModel with
       betaTarget := ![1 / 2] }
@@ -968,7 +974,9 @@ noncomputable def timeVaryingAFGenerationalModel :
 
 /-- Single-locus generational witness where LD, tagging, and allele frequencies
 stay fixed, but the target effect vector changes over time. This isolates
-population/time-varying effect heterogeneity as the sole portability driver. -/
+population/time-varying effect heterogeneity as the sole portability driver.
+
+    Empirical status: UNTESTED. -/
 noncomputable def timeVaryingEffectGenerationalModel :
     CrossPopulationGenerationalModel 1 1 := {
   popGen := baselineGenerationalPopGen

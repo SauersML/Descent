@@ -68,7 +68,9 @@ drift variances.
 /-- **Drift variance for a single population.**
     Var(p_t - p₀) = p₀(1-p₀) × Fst, which is the definition
     of Fst as the proportion of ancestral heterozygosity that
-    has become between-population variance. -/
+    has become between-population variance.
+
+    Empirical status: UNTESTED. -/
 noncomputable def driftVariance (p0 fst : ℝ) : ℝ :=
   p0 * (1 - p0) * fst
 
@@ -84,7 +86,9 @@ theorem drift_variance_nonneg (p0 fst : ℝ)
 /-- **Two-population drift variance from independent lineages.**
     For two populations diverging independently from the same
     ancestor, Var(p₁ - p₂) = Var(p₁) + Var(p₂) = 2·driftVariance.
-    The factor of 2 comes from independence of drift. -/
+    The factor of 2 comes from independence of drift.
+
+    Empirical status: UNTESTED. -/
 noncomputable def twoPopDriftVariance (p0 fst : ℝ) : ℝ :=
   2 * driftVariance p0 fst
 
@@ -203,7 +207,9 @@ theorem different_tags_different_weights
 /-- **LD tagging efficiency.**
     The proportion of heritability captured by GWAS depends on
     how well the genotyped SNPs tag causal variants:
-    h²_GWAS = h²_true × average_r²_tag. -/
+    h²_GWAS = h²_true × average_r²_tag.
+
+    Empirical status: UNTESTED. -/
 noncomputable def gwasHeritability (h2_true avg_r2_tag : ℝ) : ℝ :=
   h2_true * avg_r2_tag
 
@@ -330,7 +336,9 @@ The definition below is identical to both. We prove this equality explicitly.
 /-- **Gene flow homogenizes architecture.**
     Migration between populations at rate m per generation
     reduces FST toward m/(m + 1/(4Ne)) at equilibrium.
-    This improves portability for common variants. -/
+    This improves portability for common variants.
+
+    Empirical status: UNTESTED. -/
 noncomputable def equilibriumFst (m Ne : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 

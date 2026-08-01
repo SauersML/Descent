@@ -76,7 +76,9 @@ noncomputable def fisherInformation (n : ℕ) (v : ℝ) : ℝ := n * v
 /-- **Genotype variance under HWE.**
     For a biallelic locus with MAF p, the dosage G ∈ {0, 1, 2}
     follows Binomial(2, p). Its variance is 2p(1-p).
-    This is the heterozygosity and equals the per-locus information content. -/
+    This is the heterozygosity and equals the per-locus information content.
+
+    Empirical status: UNTESTED. -/
 noncomputable def genotypeVarianceHWE (p : ℝ) : ℝ := 2 * p * (1 - p)
 
 /-- Genotype variance is nonnegative when 0 ≤ p ≤ 1. -/
@@ -105,7 +107,9 @@ theorem genotypeVariance_max (p : ℝ) (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
     Derivation: Under imperfect tagging, the observed genotype G_tag
     satisfies Cov(G_tag, G_causal)² / (Var(G_tag) × Var(G_causal)) = r².
     The regression of Y on G_tag recovers β_tag = β × r², and the
-    information about β through G_tag is I × r². -/
+    information about β through G_tag is I × r².
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
   fisherInformation n (genotypeVarianceHWE p) * r2_ld
 
@@ -171,7 +175,9 @@ theorem ncp_eq_neff_times_beta_sq (n : ℕ) (p r2_ld β : ℝ) :
 
 /-- **Effective sample size for a variant.**
     n_eff = n × 2p(1-p) × r²_LD(tag, causal)
-    where p is MAF in that ancestry and r²_LD is tagging efficiency. -/
+    where p is MAF in that ancestry and r²_LD is tagging efficiency.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectiveSampleSize (n : ℕ) (p r2_ld : ℝ) : ℝ :=
   n * (2 * p * (1 - p)) * r2_ld
 
@@ -260,7 +266,9 @@ theorem source_higher_effective_n
 
 /-- **Non-centrality parameter (NCP) for association test.**
     NCP = n_eff × β² where β is the true effect size.
-    Power is Φ(√NCP - z_α) for threshold z_α. -/
+    Power is Φ(√NCP - z_α) for threshold z_α.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ncp (n_eff β : ℝ) : ℝ := n_eff * β ^ 2
 
 /-- NCP is monotone in effective sample size. -/
@@ -301,7 +309,9 @@ well-tagged in the discovery population, creating systematic bias in PGS.
 section DiscoveryBias
 
 /-- **Heterozygosity function.** het(p) = 2p(1-p) is the per-variant
-    information content for association testing. -/
+    information content for association testing.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ancestryHeterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
 
 /-- Heterozygosity is strictly increasing on (0, 1/2).

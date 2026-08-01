@@ -8,6 +8,7 @@ open MeasureTheory
 section PortabilityDrift
 
 
+/-- Empirical status: UNTESTED. -/
 noncomputable def integratedCoalescentHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   ∫ s in (0)..t, hazard s
 
@@ -20,6 +21,7 @@ noncomputable def coalescenceCdfFromHazard (hazard : ℝ → ℝ) (t : ℝ) : �
 noncomputable def coalescentTau (t Ne : ℝ) : ℝ :=
   t / (2 * Ne)
 
+/-- Empirical status: UNTESTED. -/
 noncomputable def fstFromTau (tau : ℝ) : ℝ :=
   1 - Real.exp (-tau)
 
@@ -66,6 +68,7 @@ structure PureSplitModel where
 noncomputable def PureSplitModel.tau (m : PureSplitModel) : ℝ :=
   coalescentTau m.t m.Ne
 
+/-- Empirical status: UNTESTED. -/
 noncomputable def PureSplitModel.fst (m : PureSplitModel) : ℝ :=
   fstFromTau m.tau
 
@@ -80,6 +83,7 @@ structure SplitMigrationModel where
   nDemes_ge_two : 2 ≤ nDemes
   mu_nonneg : 0 ≤ mu
 
+/-- Empirical status: UNTESTED. -/
 noncomputable def SplitMigrationModel.scaledMigration (m : SplitMigrationModel) : ℝ :=
   4 * m.Ne * m.mig
 
@@ -102,6 +106,7 @@ noncomputable def DemographicCoalescenceScalars.delta
     d.delta = 1 - d.ETss / d.ETst := by
   rfl
 
+/-- Empirical status: UNTESTED. -/
 noncomputable def twoDemeIMEquilibriumETss (_M : ℝ) : ℝ := 2
 
 noncomputable def twoDemeIMEquilibriumETst (M : ℝ) : ℝ :=
@@ -161,7 +166,9 @@ Derivation:
                          = V_A × (1 - Fst)
 
 Here V_A encodes both Σᵢ βᵢ² and the source heterozygosity, so the target
-variance is `pgsVarianceFromHet(V_A, 1 - fst)`. -/
+variance is `pgsVarianceFromHet(V_A, 1 - fst)`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetPGSVariance (V_A fst : ℝ) : ℝ :=
   pgsVarianceFromHet V_A (1 - fst)
 
@@ -183,7 +190,9 @@ theorem targetPGSVariance_eq_presentDay (V_A fst : ℝ) :
   unfold targetPGSVariance pgsVarianceFromHet presentDayPGSVariance
   ring
 
-/-- The exact discrete Wright-Fisher retention factor after `t` generations. -/
+/-- The exact discrete Wright-Fisher retention factor after `t` generations.
+
+    Empirical status: UNTESTED. -/
 noncomputable def wrightFisherDriftRetention (N t : ℕ) : ℝ :=
   (1 - 1 / (2 * (N : ℝ))) ^ t
 
@@ -228,7 +237,9 @@ theorem wrightFisherFst_lt_one
   linarith
 
 /-- Drift-driven variance of the between-population PGS-mean difference.
-For one branch with drift index `fst`, this is `2 * fst * V_A`. -/
+For one branch with drift index `fst`, this is `2 * fst * V_A`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def Var_Delta_Mu (V_A fst : ℝ) : ℝ :=
   2 * fst * V_A
 
@@ -404,7 +415,9 @@ noncomputable def presentDayAUC (V_A V_E fst : ℝ) : ℝ :=
 /-- Exact present-day AUC under the equal-variance Gaussian liability model.
 If case/control scores differ only by a mean shift with common residual variance
 `V_E`, then the population AUC is exactly `Φ(√(SNR/2))`, where
-`SNR = presentDayPGSVariance / V_E`. -/
+`SNR = presentDayPGSVariance / V_E`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def presentDayLiabilityAUC (V_A V_E fst : ℝ) : ℝ :=
   presentDayAUC V_A V_E fst
 
@@ -633,7 +646,9 @@ noncomputable def sigmaTagCausalTarget {p q : ℕ}
   simp [sigmaTagCausalTarget, add_assoc]
 
 /-- Total target causal-effect vector, split into standing target effects and
-target-only novel causal effects. -/
+target-only novel causal effects.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetTotalEffect {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin q → ℝ :=
   m.betaTarget + m.novelCausalEffectTarget
@@ -772,7 +787,9 @@ noncomputable def targetEffectHeterogeneityProjection {p q : ℕ}
   (sigmaTagCausalTarget m).mulVec (targetEffectHeterogeneity m)
 
 /-- Projection induced purely by target-only novel causal effects through the
-target tagging surface. -/
+target tagging surface.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetNovelMutationEffectProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
   (sigmaTagCausalTarget m).mulVec m.novelCausalEffectTarget
@@ -1085,7 +1102,9 @@ theorem brokenTaggingResidual_nonneg {p q : ℕ}
 
 /-- Additive irreducible loss from ancestry-specific LD distortion.
 This is the squared source-score covariance distortion induced by the gap
-between the source and target scored-SNP LD matrices. -/
+between the source and target scored-SNP LD matrices.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ancestrySpecificLDResidual {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   let wS := sourceWeightsFromExplicitDrivers m
@@ -1237,7 +1256,9 @@ noncomputable def sourceResidualVarianceFromSourceWeights {p q : ℕ}
 source-state score equation, evaluated at an arbitrary observed prevalence
 coordinate `π`. This lets downstream theory compare source and target Brier on
 the same target-population outcome scale without falling back to a benchmark
-`R²` surrogate. -/
+`R²` surrogate.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sourceCalibratedBrierFromSourceWeightsAtPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) : ℝ :=
   TransportedMetrics.calibratedBrierFromVariances
@@ -1538,7 +1559,9 @@ theorem targetR2FromSourceWeights_exact_effect_heterogeneity_law {p q : ℕ}
     targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores]
 
 /-- Ohta-Kimura-style exact LD-correlation decay law across populations:
-correlation decays exponentially with recombination distance and divergence. -/
+correlation decays exponentially with recombination distance and divergence.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldCorrelationDecay (distance fstGap lambda : ℝ) : ℝ :=
   Real.exp (-(lambda * fstGap * distance))
 
@@ -1584,7 +1607,9 @@ structure GenerationalPopGenParameters where
 
 namespace GenerationalPopGenParameters
 
-/-- Scaled mutation rate `θ = 4Neμ`. -/
+/-- Scaled mutation rate `θ = 4Neμ`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def theta (g : GenerationalPopGenParameters) : ℝ :=
   4 * g.Ne * g.μ
 
@@ -1602,7 +1627,9 @@ noncomputable def hetDecayFactor (g : GenerationalPopGenParameters) : ℝ :=
 
 /-- Transient differentiation after `t` generations. This is the same
 discrete-time drift/mutation/migration coordinate used in the evolutionary
-layer, but now exposed directly to the mechanistic SNP/LD state. -/
+layer, but now exposed directly to the mechanistic SNP/LD state.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstTransientAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
   (1 / (1 + g.theta + g.bigM)) * (1 - g.hetDecayFactor ^ t)
 
@@ -1744,7 +1771,9 @@ theorem PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_fl
 
 /-- Allele-frequency mismatch penalty. This penalizes transport when target
 allele frequencies drift away from the source frequencies, even if the source
-score itself is unchanged. -/
+score itself is unchanged.
+
+    Empirical status: UNTESTED. -/
 noncomputable def alleleFreqMismatchPenalty (pSource pTarget : ℝ) : ℝ :=
   Real.exp (-|pTarget - pSource|)
 
@@ -1814,7 +1843,9 @@ noncomputable def betaTargetAt {p q : ℕ}
   rfl
 
 /-- Explicit target tag-SNP allele frequency after standing drift and
-mutation-specific shift are combined. -/
+mutation-specific shift are combined.
+
+    Empirical status: UNTESTED. -/
 noncomputable def tagAlleleFreqTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ :=
   m.tagAlleleFreqStandingTargetAt t i + m.tagAlleleFreqMutationShiftAt t i
@@ -1826,7 +1857,9 @@ noncomputable def tagAlleleFreqTargetAt {p q : ℕ}
   rfl
 
 /-- Explicit target causal-site allele frequency after standing drift and
-mutation-specific shift are combined. -/
+mutation-specific shift are combined.
+
+    Empirical status: UNTESTED. -/
 noncomputable def causalAlleleFreqTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ :=
   m.causalAlleleFreqStandingTargetAt t j + m.causalAlleleFreqMutationShiftAt t j
@@ -1859,7 +1892,9 @@ noncomputable def novelVariantInnovationAt (g : GenerationalPopGenParameters) (t
 /-- Joint locus-level transport kernel for LD among scored SNPs at generation
 `t`. This is where drift, recombination, mutation history, migration history,
 and tag-SNP allele-frequency drift meet; the mechanistic model does not treat
-them as independent global scalars. -/
+them as independent global scalars.
+
+    Empirical status: UNTESTED. -/
 noncomputable def jointTagLDKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) : ℝ :=
   ldCorrelationDecay (m.tagDistance i j)
@@ -1924,7 +1959,9 @@ noncomputable def jointProxyTaggingKernelAt {p q : ℕ}
 
 /-- Joint locus-level kernel for target-only novel direct causal links. Novel
 target-specific causal variants accumulate with mutation history, are diluted by
-migration, and still depend on target allele-frequency matching. -/
+migration, and still depend on target allele-frequency matching.
+
+    Empirical status: UNTESTED. -/
 noncomputable def jointNovelDirectCausalKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ :=
   novelVariantInnovationAt m.popGen t *
@@ -1982,7 +2019,9 @@ noncomputable def directCausalTargetAt {p q : ℕ}
   fun i j =>
     m.directCausalSource i j * jointDirectCausalKernelAt m t i j
 
-/-- Time-varying target-only novel direct-causal alignment. -/
+/-- Time-varying target-only novel direct-causal alignment.
+
+    Empirical status: UNTESTED. -/
 noncomputable def novelDirectCausalTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin q) ℝ :=
@@ -2025,7 +2064,9 @@ noncomputable def targetSourceEffectProjectionAt {p q : ℕ}
   (sigmaTagCausalTargetAt m t).mulVec m.betaSource
 
 /-- Incremental generation-indexed projection induced purely by per-locus
-target-effect heterogeneity, including target-only novel causal effects. -/
+target-effect heterogeneity, including target-only novel causal effects.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetEffectHeterogeneityProjectionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin p → ℝ :=
   (sigmaTagCausalTargetAt m t).mulVec
@@ -2478,7 +2519,9 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
 /-- Exact liability-threshold AUC as a function of SNR:
-`AUC = Φ(√(snr/2))`. -/
+`AUC = Φ(√(snr/2))`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def liabilityAUCFromSNR (snr : ℝ) : ℝ :=
   Phi (Real.sqrt (snr / 2))
 
@@ -2510,7 +2553,9 @@ deployed `R²`.
 
 This is not a transport law and does not recover a latent biological signal
 from source `R²`; it is just the closed-form coordinate map induced by the
-equal-variance Gaussian liability model. -/
+equal-variance Gaussian liability model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def liabilityAUCFromExplainedR2 (r2 : ℝ) : ℝ :=
   Phi (Real.sqrt (r2 / (2 * (1 - r2))))
 
@@ -2538,7 +2583,9 @@ theorem liabilityAUCFromExplainedR2_strictMonoOn_unitInterval
 /-- Liability-threshold AUC induced by the full explicit source-side driver
 state. Like the target-side exported AUC, this is built directly from source
 explained signal and source residual variance under the source-learned score
-equation. -/
+equation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sourceLiabilityAUCFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   liabilityAUCFromVariances
@@ -2579,7 +2626,9 @@ driver state.
 The exported mechanistic AUC is computed directly from target explained signal
 variance and target residual variance under transported source weights. It is
 not defined by reading target `R²` through a chart, and it does not recover a
-latent biological signal from source `R²`. -/
+latent biological signal from source `R²`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetLiabilityAUCFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   liabilityAUCFromVariances
@@ -2652,7 +2701,9 @@ theorem targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
 arbitrary observed prevalence coordinate `π`. This is the source-side analogue
 of `targetMetricProfileFromSourceWeights`, and it lets downstream calibration
 theory compare source and target Brier on the same target-population
-prevalence scale. -/
+prevalence scale.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sourceMetricProfileFromSourceWeightsAtPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) : TransportedMetrics.Profile where
   r2 := sourceR2FromSourceWeights m
@@ -2678,7 +2729,9 @@ noncomputable def sourceMetricProfileFromSourceWeightsAtPrevalence {p q : ℕ}
   rfl
 
 /-- The source metric profile evaluated on the target-population observed
-prevalence scale carried by the mechanistic target state. -/
+prevalence scale carried by the mechanistic target state.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sourceMetricProfileFromSourceWeightsAtTargetPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile :=
   sourceMetricProfileFromSourceWeightsAtPrevalence m m.targetPrevalence
@@ -2769,7 +2822,9 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
       targetCalibratedBrierFromSourceWeights_exact_metric_portability_law]
 
 /-- Exact liability-threshold AUC after `t` generations under the full
-time-varying mechanistic state. -/
+time-varying mechanistic state.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetLiabilityAUCAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
   targetLiabilityAUCFromSourceWeights (m.toMetricModelAt t)
@@ -3244,7 +3299,9 @@ theorem targetBrier_strict_gt_source_of_neutralAF_benchmark
   unfold sourceBrierFromR2 targetBrierFromNeutralAFBenchmark
   exact brierFromR2_strictAnti π hπ0 hπ1 hr2_drop
 
-/-- Squared mean PGS difference under the pure split model. -/
+/-- Squared mean PGS difference under the pure split model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def expectedSqMeanPGSDiff_pureSplit (V_A fstS fstT : ℝ) : ℝ :=
   Var_Delta_Mu V_A (fstS + fstT)
 
@@ -3315,7 +3372,9 @@ structure MutationDriftModelAssumptions where
   mu_pos : 0 < μ
   t_nonneg : 0 ≤ t
 
-/-- The scaled mutation parameter θ = 4Neμ for a mutation-drift model. -/
+/-- The scaled mutation parameter θ = 4Neμ for a mutation-drift model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def MutationDriftModelAssumptions.theta (m : MutationDriftModelAssumptions) : ℝ :=
   4 * m.Ne * m.μ
 
@@ -3349,7 +3408,9 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_lt_one
   linarith [m.theta_pos]
 
 /-- **Transient Fst under mutation-drift: approach to equilibrium.**
-    Fst(t) = Fst_eq × (1 - exp(-(1+θ)t/(2Ne))) -/
+    Fst(t) = Fst_eq × (1 - exp(-(1+θ)t/(2Ne)))
+
+    Empirical status: UNTESTED. -/
 noncomputable def MutationDriftModelAssumptions.fstTransient
     (m : MutationDriftModelAssumptions) : ℝ :=
   m.fstEquilibrium * (1 - Real.exp (-(1 + m.theta) * m.t / (2 * m.Ne)))
@@ -3442,7 +3503,9 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
   freq_corr * ld_overlap
 
 /-- Allele frequency correlation equals `1 - Fst`, where Fst measures the
-    fraction of genetic variance due to population divergence. -/
+    fraction of genetic variance due to population divergence.
+
+    Empirical status: UNTESTED. -/
 noncomputable def freqCorrFromFst (fst : ℝ) : ℝ := 1 - fst
 
 /-- LD overlap is directly the shared LD fraction (identity mapping, made
@@ -3475,7 +3538,9 @@ theorem covarianceDivergenceFromRetention_eq (fst shared_ld : ℝ) :
     (b) mutation-driven LD changes: proportional to tagging decay from new variants
 
     Total divergence factor = Fst_drift + (1 - Fst_drift) × (1 - shared_LD)
-    where shared_LD is the fraction of LD preserved despite new mutations. -/
+    where shared_LD is the fraction of LD preserved despite new mutations.
+
+    Empirical status: UNTESTED. -/
 noncomputable def covarianceDivergenceMutationDrift
     (fst_drift shared_ld : ℝ) : ℝ :=
   fst_drift + (1 - fst_drift) * (1 - shared_ld)
@@ -3529,7 +3594,9 @@ theorem covarianceDivergence_le_one (fst_drift shared_ld : ℝ)
   linarith
 
 /-- **Generalized signal retention under mutation-drift.**
-    The retained signal is (1 - total_divergence) × V_A. -/
+    The retained signal is (1 - total_divergence) × V_A.
+
+    Empirical status: UNTESTED. -/
 noncomputable def presentDayPGSVarianceMutationDrift
     (V_A fst_drift shared_ld : ℝ) : ℝ :=
   (1 - covarianceDivergenceMutationDrift fst_drift shared_ld) * V_A
@@ -3732,7 +3799,9 @@ section MigrationDriftPortability
 
 /-- **Island model equilibrium Fst under migration-drift balance.**
     Fst_eq = 1 / (1 + 4Nm) where N is effective size and m is migration rate.
-    This is the classical Wright (1931) result. -/
+    This is the classical Wright (1931) result.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstMigrationDriftEquilibrium (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
@@ -3820,7 +3889,9 @@ theorem migration_bounds_fst_below_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m)
   have h_eq_lt := fstMigrationDriftEquilibrium_lt_one Ne m hNe hm
   linarith
 
-/-- **SplitMigrationModel equilibrium Fst using the structure.** -/
+/-- **SplitMigrationModel equilibrium Fst using the structure.**
+
+    Empirical status: UNTESTED. -/
 noncomputable def SplitMigrationModel.fstMigDriftEq (s : SplitMigrationModel) : ℝ :=
   fstMigrationDriftEquilibrium s.Ne s.mig
 
@@ -3851,7 +3922,9 @@ theorem splitMigration_more_migration_less_fst
     Fst between demes separated by d steps is approximately:
     Fst(d) ≈ Fst_neighbor × (1 + α × (d - 1))
     where α controls the rate of increase with distance (isolation by distance).
-    This is a linear approximation to the exact result. -/
+    This is a linear approximation to the exact result.
+
+    Empirical status: UNTESTED. -/
 noncomputable def steppingStoneFst (fst_neighbor α : ℝ) (d : ℕ) : ℝ :=
   fst_neighbor * (1 + α * ((d : ℝ) - 1))
 
@@ -3984,7 +4057,9 @@ theorem fst_plus_sharedLD_eq_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
 
 /-- **Signal retention under migration-drift balance.**
     The retained signal variance accounts for both allele frequency drift
-    and LD sharing determined by migration rate. -/
+    and LD sharing determined by migration rate.
+
+    Empirical status: UNTESTED. -/
 noncomputable def signalRetentionMigrationDrift (V_A Ne m : ℝ) : ℝ :=
   let fst := fstMigrationDriftEquilibrium Ne m
   let M := scaledMigrationRate Ne m
@@ -4063,7 +4138,9 @@ theorem migration_improves_R2_over_pure_drift (V_A V_E Ne m : ℝ)
     When migration is asymmetric (m₁₂ ≠ m₂₁), the effective Fst depends on
     direction. The effective migration for population i is the rate at which
     it receives migrants. The "effective Fst" from population 1's perspective
-    uses m₁₂ (rate of migrants into pop 1 from pop 2). -/
+    uses m₁₂ (rate of migrants into pop 1 from pop 2).
+
+    Empirical status: UNTESTED. -/
 noncomputable def asymmetricFst (Ne m_into : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m_into)
 
@@ -4102,7 +4179,9 @@ theorem asymmetric_migration_portability_direction
 
 /-- **Mean effective Fst under asymmetric migration.**
     The harmonic mean of directional migration rates gives the effective
-    symmetric migration rate for overall Fst. -/
+    symmetric migration rate for overall Fst.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
   (m₁₂ + m₂₁) / 2
 
@@ -4121,7 +4200,9 @@ theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ) (_hm₁₂ :
     LD between loci at recombination distance r. This LD decays as:
     D_adm(t) = D_0 × (1 - r)^(t - t_adm)
     where D_0 is the initial admixture LD and t is the current time.
-    We model the decay factor. -/
+    We model the decay factor.
+
+    Empirical status: UNTESTED. -/
 noncomputable def admixtureLDDecay (r : ℝ) (generations_since : ℕ) : ℝ :=
   (1 - r) ^ generations_since
 
@@ -4166,7 +4247,9 @@ theorem admixtureLDDecay_at_zero (r : ℝ) :
     Recent admixture (small t since pulse) means LD patterns are shared,
     which temporarily improves tagging efficiency. The portability boost
     from admixture LD relative to equilibrium LD is captured by the ratio
-    of admixture LD retention to equilibrium LD fraction. -/
+    of admixture LD retention to equilibrium LD fraction.
+
+    Empirical status: UNTESTED. -/
 noncomputable def admixtureLDBoost (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ) : ℝ :=
   admixtureLDDecay r t_since / equilibrium_ld
 
@@ -4226,7 +4309,9 @@ section MigrationDriftRecurrence
     the linearized one-generation update of Fst is:
       Fst_{t+1} = (1 - 2m - 1/(2Ne)) * Fst_t + 1/(2Ne)
     Migration reduces Fst by a factor (1-2m), and drift adds (1-Fst)/(2Ne).
-    The linearization replaces (1-m)² with 1-2m (valid for small m). -/
+    The linearization replaces (1-m)² with 1-2m (valid for small m).
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstMigDriftNext (Ne m Fst : ℝ) : ℝ :=
   (1 - 2 * m - 1 / (2 * Ne)) * Fst + 1 / (2 * Ne)
 
@@ -4259,7 +4344,9 @@ theorem fstMigDriftNext_no_migration_fixedpoint_one (Ne : ℝ) (hNe : Ne ≠ 0) 
       Fst* * (2m + 1/(2Ne)) = 1/(2Ne)
       Fst* = (1/(2Ne)) / (2m + 1/(2Ne))
             = 1 / (4*Ne*m + 1)
-    This is the exact solution of the linearized recurrence. -/
+    This is the exact solution of the linearized recurrence.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstMigDriftEquil (Ne m : ℝ) : ℝ :=
   1 / (4 * Ne * m + 1)
 

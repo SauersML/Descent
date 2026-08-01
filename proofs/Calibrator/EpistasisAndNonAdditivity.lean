@@ -62,7 +62,9 @@ theorem additive_pgs_ceiling
 /-- **The additive approximation is frequency-dependent.**
     Fisher's average effect changes when allele frequencies change.
     α(p) = a + d(1-2p) where a is the additive effect and
-    d is the dominance deviation. -/
+    d is the dominance deviation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fisherAverageEffect (a d p : ℝ) : ℝ :=
   a + d * (1 - 2 * p)
 
@@ -118,7 +120,9 @@ theorem additive_misses_epistasis
 /-- **Epistasis affects portability when allele frequencies change.**
     The contribution of epistasis to genetic variance:
     V_I ∝ Σ β₁₂² × 2p₁(1-p₁) × 2p₂(1-p₂).
-    When frequencies change, V_I changes → additive PGS is miscalibrated. -/
+    When frequencies change, V_I changes → additive PGS is miscalibrated.
+
+    Empirical status: UNTESTED. -/
 noncomputable def epistaticVariance
     (beta12 p1 p2 : ℝ) : ℝ :=
   beta12 ^ 2 * (2 * p1 * (1 - p1)) * (2 * p2 * (1 - p2))
@@ -179,7 +183,9 @@ section DominanceEffects
 
 /-- **Dominance variance.**
     V_D = Σ (2pq d)² where d is the dominance deviation.
-    V_D depends on heterozygosity, which differs across populations. -/
+    V_D depends on heterozygosity, which differs across populations.
+
+    Empirical status: UNTESTED. -/
 noncomputable def dominanceVariance
     {m : ℕ} (p : Fin m → ℝ) (d : Fin m → ℝ) : ℝ :=
   ∑ i, (2 * p i * (1 - p i) * d i) ^ 2

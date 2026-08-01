@@ -317,7 +317,9 @@ theorem negative_selection_constraint
     α = -1: LDAK (β² ∝ 1/[p(1-p)])
     When `α < -1`, the exponent `1 + α` is negative, so lower heterozygosity
     implies a larger expected effect-size multiplier. This makes rarer variants
-    more population-specific and therefore less portable. -/
+    more population-specific and therefore less portable.
+
+    Empirical status: UNTESTED. -/
 noncomputable def expectedEffectMultiplier (p α : ℝ) : ℝ :=
   (p * (1 - p)) ^ (1 + α)
 

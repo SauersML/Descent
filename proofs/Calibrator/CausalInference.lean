@@ -349,7 +349,9 @@ theorem diminishing_marginal_returns
 /-- **Cost-effectiveness analysis.**
     New GWAS is most effective but most expensive.
     Computational corrections are cheap but limited.
-    Optimal strategy depends on budget. -/
+    Optimal strategy depends on budget.
+
+    Empirical status: UNTESTED. -/
 noncomputable def costEffectiveness (improvement cost : ℝ) : ℝ :=
   improvement / cost
 

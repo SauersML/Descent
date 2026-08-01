@@ -814,6 +814,7 @@ structure ConfusionMatrix where
 
 namespace ConfusionMatrix
 
+/-- Empirical status: UNTESTED. -/
 def prevalence (c : ConfusionMatrix) : ℝ := c.tp + c.fn
 
 def recallRate (c : ConfusionMatrix) : ℝ := c.tp / (c.tp + c.fn)

@@ -246,7 +246,9 @@ theorem hl_contrib_nonneg (obs exp n : ℝ)
 
 end CalibrationDefinitions
 
-/-- Logistic-scale prevalence log-odds. -/
+/-- Logistic-scale prevalence log-odds.
+
+    Empirical status: UNTESTED. -/
 noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
   Real.log (pi / (1 - pi))
 
@@ -1273,7 +1275,9 @@ calibration drifts systematically.
 
 section PopulationCalibrationDrift
 
-/-- Shared logistic-scale calibration profile induced by a prevalence shift. -/
+/-- Shared logistic-scale calibration profile induced by a prevalence shift.
+
+    Empirical status: UNTESTED. -/
 noncomputable def prevalenceLogisticCalibrationProfile
     (pi_source pi_target slope : ℝ) : CalibrationProfile :=
   logisticCalibrationProfile (prevalenceLogit pi_target) (prevalenceLogit pi_source) slope
@@ -1726,7 +1730,9 @@ theorem down_reclassified_after_downward_shift_iff_mem_band
 /-- **Threshold-band reclassification rate.**
     Under a downward intercept correction by `δ > 0`, this is the fraction of
     a class-specific score law lying in the band `(threshold, threshold + δ]`.
-    It is exactly the reclassification rate for that class. -/
+    It is exactly the reclassification rate for that class.
+
+    Empirical status: UNTESTED. -/
 noncomputable def thresholdBandRate
     (μ : Measure ℝ) [IsProbabilityMeasure μ] (threshold δ : ℝ) : ℝ :=
   (μ (Set.Ioc threshold (threshold + δ))).toReal
@@ -1797,7 +1803,9 @@ theorem positive_nri_means_improvement
 /-- **Outcome prevalence among reclassified patients.**
     Let `π` be the cohort event prevalence. Among the patients moved across the
     decision threshold by a downward intercept recalibration, this is the event
-    rate in the moved threshold band `(threshold, threshold + δ]`. -/
+    rate in the moved threshold band `(threshold, threshold + δ]`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def reclassifiedBandEventPrevalence
     (π : ℝ)
     (μevent μnonevent : Measure ℝ)
@@ -2823,7 +2831,9 @@ structure ThresholdTreatmentModel where
   harm_eq_threshold : harm = benefit * threshold
 
 /-- One-step longitudinal model corresponding to a single threshold-based
-    treatment decision. -/
+    treatment decision.
+
+    Empirical status: UNTESTED. -/
 noncomputable def thresholdLongitudinalModel
     (_model : ThresholdTreatmentModel) : LongitudinalTreatmentModel 1 where
   discount := fun _ => 1
@@ -2868,7 +2878,9 @@ theorem receivesTreatment_thresholdClinicalPathway_iff
 
 /-- **Threshold-based QALY gain under a scalar risk decision.**
     The deployed system treats when the risk used for decision-making exceeds
-    the clinical treatment threshold. -/
+    the clinical treatment threshold.
+
+    Empirical status: UNTESTED. -/
 noncomputable def thresholdQalyGainUnderDecision
     (model : ThresholdTreatmentModel) (trueRisk decisionRisk : ℝ) : ℝ :=
   if _ : model.threshold < decisionRisk then
@@ -2888,7 +2900,9 @@ noncomputable def thresholdQalyLoss
     disagrees with the oracle threshold rule:
     - false positives pay `threshold - trueRisk`,
     - false negatives pay `trueRisk - threshold`,
-    - correct decisions pay `0`. -/
+    - correct decisions pay `0`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def thresholdDecisionRegretMargin
     (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ :=
   by
@@ -3058,7 +3072,9 @@ theorem miscalibration_induced_false_positive_qaly_loss
   exact thresholdQalyLoss_false_positive_exact
     model trueRisk (trueRisk + c) (le_of_lt h_truly_low) h_decision.2
 
-/-- **Expected threshold-specialized QALY loss from miscalibration.** -/
+/-- **Expected threshold-specialized QALY loss from miscalibration.**
+
+    Empirical status: UNTESTED. -/
 noncomputable def expectedThresholdQalyLoss {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (model : ThresholdTreatmentModel)
     (trueRisk predictedRisk : Z → ℝ) : ℝ :=

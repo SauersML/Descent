@@ -183,7 +183,9 @@ noncomputable def explainedR2FromTransportMoments
     (scoreOutcomeCov scoreVariance outcomeVariance : ℝ) : ℝ :=
   scoreOutcomeCov ^ 2 / (scoreVariance * outcomeVariance)
 
-/-- Source tagged moments for the explicit LD witness. -/
+/-- Source tagged moments for the explicit LD witness.
+
+    Empirical status: UNTESTED. -/
 def ldWitnessSourceMoments : SourceTaggedMoments 2 2 where
   sigmaTagSource := 1
   directCausalSource := 1
@@ -196,7 +198,9 @@ def ldWitnessBeta : CausalVec 2 := ![1, 1]
 noncomputable def ldWitnessSourceWeights : TagVec 2 :=
   sourceBestLinearWeightsFromLD ldWitnessSourceMoments ldWitnessBeta
 
-/-- Target cross-covariance witness shared across the two target LD states. -/
+/-- Target cross-covariance witness shared across the two target LD states.
+
+    Empirical status: UNTESTED. -/
 def ldWitnessTargetCross : TagVec 2 := ![1, 1]
 
 /-- Target LD witness with independent scored SNPs. -/
@@ -296,7 +300,9 @@ private def twoLocusIdx0 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
 private def twoLocusIdx1 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
   ⟨1, lt_of_lt_of_le (by decide : 1 < 2) Fact.out⟩
 
-/-- Survival of two linked loci to the MRCA under discrete recombination. -/
+/-- Survival of two linked loci to the MRCA under discrete recombination.
+
+    Empirical status: UNTESTED. -/
 noncomputable def discreteRecombinationSurvival (recombRate : ℝ) (tmrca : ℕ) : ℝ :=
   (1 - recombRate) ^ tmrca
 
@@ -880,7 +886,9 @@ structure PrevalenceDGP (k : ℕ) where
   is_prob : IsProbabilityMeasure jointMeasure := by infer_instance
 
 /-- True conditional risk under a prevalence DGP (identity link, additive form).
-    E[Y | P, C] = π(C) + β · P, where π varies by ancestry and β is shared. -/
+    E[Y | P, C] = π(C) + β · P, where π varies by ancestry and β is shared.
+
+    Empirical status: UNTESTED. -/
 noncomputable def prevalenceDGP_trueExpectation {k : ℕ} (pdgp : PrevalenceDGP k)
     (p : ℝ) (c : Fin k → ℝ) : ℝ :=
   pdgp.prevalence c + pdgp.pgs_effect * p
@@ -1470,7 +1478,9 @@ structure EvolutionaryParameters where
   recomb_le_half : recomb ≤ 1 / 2
   V_A_pos : 0 < V_A
 
-/-- Scaled drift parameter: τ = t/(2Ne). -/
+/-- Scaled drift parameter: τ = t/(2Ne).
+
+    Empirical status: UNTESTED. -/
 noncomputable def EvolutionaryParameters.tau (p : EvolutionaryParameters) : ℝ :=
   p.t_div / (2 * p.Ne)
 
@@ -1504,7 +1514,9 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
 
 
 /-- **Drift-mutation equilibrium Fst**: Fst = 1/(1 + θ).
-    Mutation prevents Fst from reaching 1 by introducing shared variation. -/
+    Mutation prevents Fst from reaching 1 by introducing shared variation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstDriftMutation (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.theta)
 
@@ -1560,7 +1572,9 @@ theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
 
 /-- **Shared LD retention** under recombination and divergence.
     The fraction of LD shared between populations decays as exp(-2rt)
-    (factor of 2 because both lineages must avoid recombination). -/
+    (factor of 2 because both lineages must avoid recombination).
+
+    Empirical status: UNTESTED. -/
 noncomputable def sharedLDRetention (p : EvolutionaryParameters) : ℝ :=
   Real.exp (-2 * p.recomb * p.t_div)
 
@@ -1591,7 +1605,9 @@ theorem sharedLDRetention_decreasing_in_time
 
 /-- **Mutation-induced LD erosion**: new mutations create population-specific LD
     that is not shared. The fraction of LD that remains "ancestral" (shared)
-    decays exponentially with the scaled mutation rate. -/
+    decays exponentially with the scaled mutation rate.
+
+    Empirical status: UNTESTED. -/
 noncomputable def mutationLDErosion (p : EvolutionaryParameters) : ℝ :=
   Real.exp (-p.theta * p.tau)
 
@@ -1609,7 +1625,9 @@ theorem mutationLDErosion_le_one (p : EvolutionaryParameters) :
   nlinarith [p.theta_nonneg, p.tau_nonneg]
 
 /-- **Migration LD boost**: migration increases shared LD by introducing
-    alleles from the other population. Models as a correction factor ≥ 1. -/
+    alleles from the other population. Models as a correction factor ≥ 1.
+
+    Empirical status: UNTESTED. -/
 noncomputable def migrationLDBoost (p : EvolutionaryParameters) : ℝ :=
   1 + p.bigM * p.tau / (1 + p.bigM)
 
@@ -1883,7 +1901,9 @@ At equilibrium (t → ∞), Fst → Fst_eq = 1/(1+θ+M).
     λ = (1 - 1/(2Ne)) × (1 - θ/(2Ne))
     Derived from the Wright-Fisher recurrence with mutation:
     H(t+1) = (1-1/(2N)) × (1-μ)² × H(t) + mutation_input
-    where (1-μ)² ≈ 1 - 2μ = 1 - θ/(2N). -/
+    where (1-μ)² ≈ 1 - 2μ = 1 - θ/(2N).
+
+    Empirical status: UNTESTED. -/
 noncomputable def PGSEvolutionaryModel.hetDecayFactor (m : PGSEvolutionaryModel) : ℝ :=
   (1 - 1 / (2 * m.Ne)) * (1 - m.theta / (2 * m.Ne))
 
@@ -1895,7 +1915,9 @@ noncomputable def PGSEvolutionaryModel.hetDecayFactor (m : PGSEvolutionaryModel)
     As t → ∞: Fst → Fst_eq (equilibrium).
 
     DERIVED from the heterozygosity recurrence H(t) = H* + (H₀ - H*) × λ^t
-    and Fst(t) = 1 - H(t)/H₀. See PopulationGeneticsFoundations.lean. -/
+    and Fst(t) = 1 - H(t)/H₀. See PopulationGeneticsFoundations.lean.
+
+    Empirical status: UNTESTED. -/
 noncomputable def PGSEvolutionaryModel.fstTransient (m : PGSEvolutionaryModel) : ℝ :=
   fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))
 
@@ -1907,7 +1929,9 @@ noncomputable def PGSEvolutionaryModel.fstTransient (m : PGSEvolutionaryModel) :
     (1-r)^(2t) ≈ exp(-2rt) for small r.
 
     DERIVED from the LD recurrence D(t+1) = (1-r) × D(t) by induction
-    in LDDecayTheory.lean. -/
+    in LDDecayTheory.lean.
+
+    Empirical status: UNTESTED. -/
 noncomputable def PGSEvolutionaryModel.ldRetention (m : PGSEvolutionaryModel) : ℝ :=
   sharedLDRetention m.toEvo
 
@@ -2010,7 +2034,9 @@ lemmas back to this namespace.
 
 namespace TransportedMetrics
 
-/-- Exact conversion from signal variance to deployed `R²` at fixed residual scale. -/
+/-- Exact conversion from signal variance to deployed `R²` at fixed residual scale.
+
+    Empirical status: UNTESTED. -/
 noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   vSignal / (vSignal + vNoise)
 
@@ -2253,7 +2279,9 @@ useful for comparing the timescales of distinct population-genetic drivers, but
 they are not added or multiplied into a single portability law. -/
 
 /-- Allele-frequency divergence rate summary from the transient `F_ST`
-coordinate. -/
+coordinate.
+
+    Empirical status: UNTESTED. -/
 noncomputable def alleleFreqDivergenceRate (Ne mu m_rate : ℝ) : ℝ :=
   let theta := 4 * Ne * mu
   let bigM := 4 * Ne * m_rate

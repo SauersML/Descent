@@ -36,7 +36,9 @@ LD structure and allele frequency spectrum.
 
 section GWASDiscovery
 
-/-- Genotype variance of an additive tag SNP under Hardy-Weinberg equilibrium. -/
+/-- Genotype variance of an additive tag SNP under Hardy-Weinberg equilibrium.
+
+    Empirical status: UNTESTED. -/
 def tagGenotypeVariance (maf : ℝ) : ℝ :=
   2 * maf * (1 - maf)
 
@@ -50,7 +52,9 @@ def discoveryNCP (n β maf ld : ℝ) : ℝ :=
 
 /-- A locus is discovered when its test statistic crosses the genome-wide
     `z`-threshold. In the one-degree-of-freedom Gaussian approximation this is
-    equivalent to `z^2 ≤ discoveryNCP`. -/
+    equivalent to `z^2 ≤ discoveryNCP`.
+
+    Empirical status: UNTESTED. -/
 def gwasDiscovered (n β maf ld z : ℝ) : Prop :=
   z ^ 2 ≤ discoveryNCP n β maf ld
 
@@ -289,7 +293,9 @@ Different estimation methods have different bias-variance tradeoffs.
 section EffectEstimation
 
 /-- Expected one-locus linear-effect estimate under an additive estimation-error
-decomposition `β̂ = β_true + ε̄`, where `ε̄` is the mean estimation error. -/
+decomposition `β̂ = β_true + ε̄`, where `ε̄` is the mean estimation error.
+
+    Empirical status: UNTESTED. -/
 noncomputable def expectedLinearEffectEstimate
     (β_true meanEstimationError : ℝ) : ℝ :=
   β_true + meanEstimationError
@@ -418,7 +424,9 @@ noncomputable def geneticCorrelation
   cov_g / Real.sqrt (vg₁ * vg₂)
 
 /-- Effective discovery-sample size for trait A after borrowing information
-from a genetically correlated trait B. -/
+from a genetically correlated trait B.
+
+    Empirical status: UNTESTED. -/
 noncomputable def multiTraitEffectiveSampleSize
     (n₁ n₂ rg : ℝ) : ℝ :=
   n₁ + rg ^ 2 * n₂

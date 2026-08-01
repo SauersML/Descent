@@ -155,7 +155,9 @@ section LOOCorrections
 
 /-- **Approximate LOO using linear algebra.**
     PGS_LOO_i ≈ PGS_full_i - leverage_i × residual_i
-    where leverage_i = X_i'(X'X)⁻¹X_i. -/
+    where leverage_i = X_i'(X'X)⁻¹X_i.
+
+    Empirical status: UNTESTED. -/
 noncomputable def approxLOOPGS (pgs_full leverage residual : ℝ) : ℝ :=
   pgs_full - leverage * residual
 

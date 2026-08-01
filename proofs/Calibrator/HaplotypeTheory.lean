@@ -35,6 +35,7 @@ diversity. This affects PGS portability.
 
 section HaplotypeDiversity
 
+/-- Empirical status: UNTESTED. -/
 noncomputable def expectedDistinctHaplotypes (k n : ℕ) : ℝ :=
   (2 : ℝ) ^ k * (1 - (1 - 1 / ((2 : ℝ) ^ k)) ^ n)
 
@@ -79,7 +80,9 @@ theorem expectedDistinctHaplotypes_strictMono
 /-- **Haplotype homozygosity.**
     H = Σ f_i² where f_i are haplotype frequencies.
     Lower in more diverse populations → more unique haplotypes.
-    With n haplotypes at equal frequency 1/n, H = n × (1/n)² = 1/n. -/
+    With n haplotypes at equal frequency 1/n, H = n × (1/n)² = 1/n.
+
+    Empirical status: UNTESTED. -/
 noncomputable def haplotypeHomozygosity {α : Type*} [Fintype α] (freq : α → ℝ) : ℝ :=
   ∑ i, freq i ^ 2
 
@@ -143,7 +146,9 @@ theorem uniform_homozygosity_decreases_with_diversity (n₁ n₂ : ℕ)
 
 /-- Inverse homozygosity (Hill number of order 2), a standard effective-number
 summary of haplotype diversity. Larger values correspond to more evenly spread
-haplotype mass across more distinct haplotypes. -/
+haplotype mass across more distinct haplotypes.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectiveHaplotypeNumber {α : Type*} [Fintype α]
     (freq : α → ℝ) : ℝ :=
   1 / haplotypeHomozygosity freq
@@ -194,7 +199,9 @@ section PhaseDependentEffects
 /-- **Cis interaction effect.**
     When two alleles on the same haplotype interact, the effect
     differs from the sum of individual effects.
-    g_cis = β₁ + β₂ + δ_cis (where δ_cis ≠ 0 for interactions). -/
+    g_cis = β₁ + β₂ + δ_cis (where δ_cis ≠ 0 for interactions).
+
+    Empirical status: UNTESTED. -/
 noncomputable def cisEffect (beta1 beta2 delta_cis : ℝ) : ℝ :=
   beta1 + beta2 + delta_cis
 
@@ -240,7 +247,9 @@ noncomputable def dosagePhaseMisspecificationError
       (interaction_trans - averagePhaseInteraction freq_cis interaction_cis interaction_trans) ^ 2
 
 /-- A phase-aware haplotype predictor that tracks cis/trans configuration has no
-structural phase-misspecification error. -/
+structural phase-misspecification error.
+
+    Empirical status: UNTESTED. -/
 noncomputable def haplotypePhasePredictionError : ℝ :=
   0
 
@@ -253,7 +262,9 @@ noncomputable def dosageTransportBias
 
 /-- A phase-aware haplotype model transports without this structural bias when
 the cis/trans effects themselves are portable and only configuration
-frequencies differ. -/
+frequencies differ.
+
+    Empirical status: UNTESTED. -/
 noncomputable def haplotypeTransportBias : ℝ :=
   0
 
@@ -354,7 +365,9 @@ theorem haplotype_pgs_more_portable_for_cis
     noisier. This theorem states the actual carrier-count mechanism: estimation
     variance scales like `σ² / (n × f)` where `f` is haplotype frequency in a
     sample of size `n`. Adding a rarer haplotype strictly increases the total
-    estimation-noise burden. -/
+    estimation-noise burden.
+
+    Empirical status: UNTESTED. -/
 noncomputable def haplotypeEffectEstimationVariance
     (σ2 n freq : ℝ) : ℝ :=
   σ2 / (n * freq)
@@ -396,7 +409,9 @@ section PhasingErrors
 
 /-- **Phasing error introduces noise.**
     With switch error rate s, the phase-dependent signal
-    is attenuated by (1 - 2s)². For s = 0.01, this is ~0.96. -/
+    is attenuated by (1 - 2s)². For s = 0.01, this is ~0.96.
+
+    Empirical status: UNTESTED. -/
 noncomputable def phaseAttenuation (s : ℝ) : ℝ := (1 - 2 * s)^2
 
 /-- Phase attenuation is in [0,1] for small error rate. -/
@@ -445,7 +460,9 @@ section LocalAncestryHaplotypes
 
 /-- **Ancestry-specific haplotype effect.**
     At a given locus, the haplotype effect depends on
-    which ancestral population the haplotype derives from. -/
+    which ancestral population the haplotype derives from.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ancestrySpecificEffect (beta_pop1 beta_pop2 alpha : ℝ) : ℝ :=
   alpha * beta_pop1 + (1 - alpha) * beta_pop2
 
@@ -459,7 +476,9 @@ theorem ancestry_effect_between_pops (beta₁ beta₂ alpha : ℝ)
   constructor <;> nlinarith
 
 /-- Single-effect predictor obtained by averaging ancestry-specific effects
-according to the admixture proportion `alpha`. -/
+according to the admixture proportion `alpha`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def globalAncestryAveragedEffect
     (beta₁ beta₂ alpha : ℝ) : ℝ :=
   ancestrySpecificEffect beta₁ beta₂ alpha

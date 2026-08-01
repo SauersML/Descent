@@ -145,6 +145,7 @@ theorem integrable_prod_mul {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y
 variable {Ω : Type*} [MeasureSpace Ω] {ℙ : Measure Ω} [IsProbabilityMeasure ℙ]
 
 def Phenotype := Ω → ℝ
+/-- Empirical status: UNTESTED. -/
 def PGS := Ω → ℝ
 def PC (k : ℕ) := Ω → (Fin k → ℝ)
 
@@ -194,7 +195,9 @@ def DiploidGenotype.equivFin3 : DiploidGenotype ≃ Fin 3 where
     DiploidGenotype.equivFin3.symm (DiploidGenotype.equivFin3 g) = g := by
   exact DiploidGenotype.equivFin3.left_inv g
 
-/-- Number of alternative alleles carried by a diploid genotype. -/
+/-- Number of alternative alleles carried by a diploid genotype.
+
+    Empirical status: UNTESTED. -/
 def altAlleleCount : DiploidGenotype → ℝ
   | .homRef => 0
   | .het => 1
@@ -221,7 +224,9 @@ theorem HardyWeinbergModel.refFreq_le_one (h : HardyWeinbergModel) :
   linarith [h.altFreq_nonneg]
 
 /-- Hardy-Weinberg genotype probabilities:
-`P(AA) = p^2`, `P(Aa) = 2pq`, `P(aa) = q^2`, where `q` is the alternative-allele frequency. -/
+`P(AA) = p^2`, `P(Aa) = 2pq`, `P(aa) = q^2`, where `q` is the alternative-allele frequency.
+
+    Empirical status: UNTESTED. -/
 def HardyWeinbergModel.genotypeProb (h : HardyWeinbergModel) : DiploidGenotype → ℝ
   | .homRef => h.refFreq ^ 2
   | .het => 2 * h.refFreq * h.altFreq
@@ -259,7 +264,9 @@ theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
         = (h.refFreq + h.altFreq) ^ 2 := by ring
     _ = 1 := by rw [hsum]; norm_num
 
-/-- Expected alternative-allele count under Hardy-Weinberg equilibrium. -/
+/-- Expected alternative-allele count under Hardy-Weinberg equilibrium.
+
+    Empirical status: UNTESTED. -/
 noncomputable def HardyWeinbergModel.expectedAltAlleleCount (h : HardyWeinbergModel) : ℝ :=
   ∑ g : DiploidGenotype, altAlleleCount g * h.genotypeProb g
 
@@ -291,7 +298,9 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
         = 2 * h.altFreq * (h.refFreq + h.altFreq) := by ring
     _ = 2 * h.altFreq := by rw [hsum]; ring
 
-/-- Centered alternative-allele count at one locus. -/
+/-- Centered alternative-allele count at one locus.
+
+    Empirical status: UNTESTED. -/
 noncomputable def HardyWeinbergModel.centeredAltAlleleCount
     (h : HardyWeinbergModel) (g : DiploidGenotype) : ℝ :=
   altAlleleCount g - h.expectedAltAlleleCount
@@ -324,7 +333,9 @@ theorem HardyWeinbergModel.genotypeVariance_eq
   ring_nf
 
 /-- Absolute third centered moment at one Hardy-Weinberg locus. This is the term that
-enters the Berry-Esseen numerator for weighted sums of bounded genotype variables. -/
+enters the Berry-Esseen numerator for weighted sums of bounded genotype variables.
+
+    Empirical status: UNTESTED. -/
 noncomputable def HardyWeinbergModel.genotypeThirdAbsMoment
     (h : HardyWeinbergModel) : ℝ :=
   ∑ g : DiploidGenotype,
@@ -521,7 +532,9 @@ theorem noise_integrated_cdf_zero {k : ℕ} (hN : GaussianNoiseAssumption k)
 
 /-! ### Biological Truth: Liability Threshold Model -/
 
-/-- Latent liability `L = S + E`. -/
+/-- Latent liability `L = S + E`.
+
+    Empirical status: UNTESTED. -/
 def latentLiability (s e : ℝ) : ℝ := s + e
 
 /-- Disease event under an ancestry-dependent threshold: `L > T(x)`. -/
@@ -599,7 +612,9 @@ theorem liability_threshold_probit_real {k : ℕ} (hN : GaussianNoiseAssumption 
   rw [ENNReal.toReal_sub_of_le h_le (by simp)]
   simp [ProbabilityTheory.cdf_nonneg]
 
-/-- Conditional disease probability under the liability-threshold model. -/
+/-- Conditional disease probability under the liability-threshold model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def etaLiabilityThreshold {k : ℕ} (hN : GaussianNoiseAssumption k)
     (T : (Fin k → ℝ) → ℝ) (s : ℝ) (x : Fin k → ℝ) : ℝ :=
   (noiseMeasureGivenX hN x (diseaseEvent T x s)).toReal

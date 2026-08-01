@@ -38,7 +38,9 @@ section StabilizingSelection
 /-- **Stabilizing selection constraint on effect sizes.**
     Under stabilizing selection with strength s and optimum μ,
     large-effect alleles are rare because they're selected against.
-    The equilibrium effect size distribution has variance ∝ 1/s. -/
+    The equilibrium effect size distribution has variance ∝ 1/s.
+
+    Empirical status: UNTESTED. -/
 noncomputable def equilibriumEffectVariance (v_mutation s : ℝ) : ℝ :=
   v_mutation / s
 
@@ -82,7 +84,9 @@ theorem stronger_stabilizing_smaller_effects
 /-- **Effect correlation under stabilizing selection.**
     When both populations are under the same stabilizing selection,
     effect sizes are pulled toward the same optimum.
-    ρ(effects) ≈ 1 - O(1/2Ns) where Ns is selection × drift balance. -/
+    ρ(effects) ≈ 1 - O(1/2Ns) where Ns is selection × drift balance.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectCorrelationStabilizing (Ns : ℝ) : ℝ :=
   1 - 1 / (2 * Ns)
 
@@ -138,7 +142,9 @@ section DiversifyingSelection
     normalization gives the correlation exp(-Δ/τ). The parameter τ controls
     how quickly the selective landscape decorrelates: small τ means rapid
     turnover, while τ → ∞ recovers stabilizing selection with a fixed
-    optimum. -/
+    optimum.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fluctuatingEffectCorrelation (t τ : ℝ) : ℝ :=
   Real.exp (-t / τ)
 
@@ -250,7 +256,9 @@ theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
   simpa [Real.exp_log h_rho_pos] using h_exp_lt
 
 /-- Recover the stabilizing `Ns` parameter from an observed cross-population
-    effect correlation. -/
+    effect correlation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def stabilizingNsFromObservedCorrelation (rho : ℝ) : ℝ :=
   1 / (2 * (1 - rho))
 
@@ -265,7 +273,9 @@ theorem effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs
   ring
 
 /-- Recover the fluctuating-selection autocorrelation time `τ` from an observed
-    cross-population effect correlation measured at divergence time `t`. -/
+    cross-population effect correlation measured at divergence time `t`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def tauFromObservedEffectCorrelation (t rho : ℝ) : ℝ :=
   -t / Real.log rho
 
@@ -301,7 +311,9 @@ theorem fluctuatingEffectCorrelation_eq_observedCorrelation_of_recoveredTau
 
 /-- Recover the fluctuating-selection optimum-diffusion scale `σ_θ` from an
     observed selected-architecture variance once the fluctuation time scale has
-    been recovered from the effect correlation. -/
+    been recovered from the effect correlation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sigmaThetaFromObservedSelectedVariance
     (v_selected v_mutation s t rho : ℝ) : ℝ :=
   Real.sqrt
@@ -427,7 +439,9 @@ section PolygenicAdaptation
 
 /-- **Polygenic adaptation score shift.**
     Under polygenic adaptation, the mean PGS shifts by
-    Δμ = Σᵢ βᵢ · Δpᵢ where Δpᵢ are coordinated frequency changes. -/
+    Δμ = Σᵢ βᵢ · Δpᵢ where Δpᵢ are coordinated frequency changes.
+
+    Empirical status: UNTESTED. -/
 noncomputable def polygenicAdaptationShift
     {m : ℕ} (β : Fin m → ℝ) (Δp : Fin m → ℝ) : ℝ :=
   ∑ i, β i * Δp i
@@ -524,7 +538,9 @@ section GWASPowerMAF
 
 /-- **GWAS non-centrality parameter.**
     NCP = n × β² × 2p(1-p) where n is sample size, β is effect, p is MAF.
-    Larger NCP → more power to detect the variant. -/
+    Larger NCP → more power to detect the variant.
+
+    Empirical status: UNTESTED. -/
 noncomputable def gwasNCP (n : ℕ) (β p : ℝ) : ℝ :=
   n * β ^ 2 * (2 * p * (1 - p))
 

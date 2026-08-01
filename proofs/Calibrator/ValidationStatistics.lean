@@ -13,7 +13,9 @@ behavior from source `R²`; they are generic goodness-of-fit tools.
 section GoodnessOfFit
 
 /-- Gaussian profile log-likelihood for an observed scalar summary under a
-candidate mean and noise variance. -/
+candidate mean and noise variance.
+
+    Empirical status: UNTESTED. -/
 noncomputable def gaussianProfileLogLik
     (observed mean variance : ℝ) : ℝ :=
   -((observed - mean) ^ 2) / (2 * variance) -
@@ -53,7 +55,9 @@ theorem gaussianProfileLogLik_strictAnti_sqResidual
   unfold gaussianProfileLogLik
   simpa only [neg_div] using hConst
 
-/-- Likelihood-ratio statistic comparing a null and alternative fit. -/
+/-- Likelihood-ratio statistic comparing a null and alternative fit.
+
+    Empirical status: UNTESTED. -/
 noncomputable def likelihoodRatioStat
     (logLNull logLAlt : ℝ) : ℝ :=
   -2 * (logLNull - logLAlt)

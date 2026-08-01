@@ -36,7 +36,9 @@ section EffectSizeDistribution
 
 /-- **Exponential distribution of squared effects.**
     Under the infinitesimal model: β² ~ Exponential(1/σ²)
-    where σ² = h²/M (heritability divided by number of variants). -/
+    where σ² = h²/M (heritability divided by number of variants).
+
+    Empirical status: UNTESTED. -/
 noncomputable def expectedSquaredEffect (h2 M : ℝ) : ℝ := h2 / M
 
 /-- Per-variant heritability decreases with polygenicity. -/
@@ -50,7 +52,9 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
 /-- **Spike-and-slab model.**
     π proportion of variants have effect ~ N(0, σ²_large),
     (1-π) proportion have effect = 0 (or ~ N(0, σ²_small)).
-    π is the polygenicity parameter. -/
+    π is the polygenicity parameter.
+
+    Empirical status: UNTESTED. -/
 noncomputable def spikeAndSlabVariance (pi sigma_sq_large sigma_sq_small : ℝ) : ℝ :=
   pi * sigma_sq_large + (1 - pi) * sigma_sq_small
 
@@ -92,7 +96,9 @@ section PolygenicityAndPortability
 
 /-- **Polygenicity definition.**
     M_eff = effective number of causal variants
-    = (Σ β²_j)² / Σ β⁴_j (inverse kurtosis measure). -/
+    = (Σ β²_j)² / Σ β⁴_j (inverse kurtosis measure).
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectivePolygenicity (sum_beta_sq sum_beta_fourth : ℝ) : ℝ :=
   sum_beta_sq^2 / sum_beta_fourth
 
@@ -122,7 +128,9 @@ structure SNPArchitecturePortabilityModel (q : ℕ) where
 
 namespace SNPArchitecturePortabilityModel
 
-/-- Total causal signal mass in the source architecture. -/
+/-- Total causal signal mass in the source architecture.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sourceEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   ∑ j, model.sourceSquaredEffect j
@@ -294,7 +302,9 @@ section HeritabilityPartitioning
 /-- **Heritability enrichment.**
     Enrichment of category c = (h²_c / M_c) / (h²_total / M_total).
     High enrichment means the category harbors more causal signal
-    per variant. -/
+    per variant.
+
+    Empirical status: UNTESTED. -/
 noncomputable def heritabilityEnrichment (h2_cat M_cat h2_total M_total : ℝ) : ℝ :=
   (h2_cat / M_cat) / (h2_total / M_total)
 
@@ -443,7 +453,9 @@ theorem architecture_classification
 This is not a single trait-wide multiplicative law. Instead, each causal SNP
 gets its own upper envelope from a locus-specific effect-correlation bound
 `rgUpper j` and a locus-specific divergence lower bound `fstLower j`, and the
-global portability bound is their source-effect-weighted average. -/
+global portability bound is their source-effect-weighted average.
+
+    Empirical status: UNTESTED. -/
 noncomputable def rgFstWeightedUpperBound {q : ℕ}
     (model : SNPArchitecturePortabilityModel q)
     (rgUpper fstLower : Fin q → ℝ) : ℝ :=

@@ -37,7 +37,9 @@ section GxEInteraction
 /-- **Linear GxE model.**
     Y = β_G × G + β_E × E + β_GxE × G × E + ε.
     The interaction term β_GxE × G × E makes the genetic effect
-    environment-dependent: effective β_G = β_G + β_GxE × E. -/
+    environment-dependent: effective β_G = β_G + β_GxE × E.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectiveGeneticEffect (β_G β_GxE E_mean : ℝ) : ℝ :=
   β_G + β_GxE * E_mean
 

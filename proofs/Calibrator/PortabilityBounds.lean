@@ -210,7 +210,9 @@ We formalize the key models and their predictions.
 section EvolutionaryModels
 
 /-- **Neutral drift model: linear portability decay.**
-    Under pure neutral drift: R²(d) ≈ R²(0) · (1 - 2·Fst(d)). -/
+    Under pure neutral drift: R²(d) ≈ R²(0) · (1 - 2·Fst(d)).
+
+    Empirical status: UNTESTED. -/
 noncomputable def neutralPortability (r2_0 fst : ℝ) : ℝ :=
   r2_0 * (1 - 2 * fst)
 
@@ -237,7 +239,9 @@ theorem stabilizing_le_neutral (r2_0 fst strength : ℝ)
     _ = r2_0 * (1 - 2 * fst) := mul_one _
 
 /-- **Diversifying/fluctuating selection model: much-faster-than-neutral decay.**
-    Under fluctuating selection (immune traits), effects change rapidly. -/
+    Under fluctuating selection (immune traits), effects change rapidly.
+
+    Empirical status: UNTESTED. -/
 noncomputable def diversifyingPortability (r2_0 fst lam_turn : ℝ) : ℝ :=
   r2_0 * (1 - 2 * fst) * (Real.exp (-lam_turn * fst)) ^ 2
 

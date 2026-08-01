@@ -35,7 +35,9 @@ semidefinite. Population-specific LD matrices differ in structure.
 section LDMatrixProperties
 
 /-- **Diagonal of LD matrix is allelic variance.**
-    Σ_jj = 2p_j(1-p_j) (heterozygosity). -/
+    Σ_jj = 2p_j(1-p_j) (heterozygosity).
+
+    Empirical status: UNTESTED. -/
 noncomputable def allelicVariance (p : ℝ) : ℝ := 2 * p * (1 - p)
 
 /-- Allelic variance is nonneg. -/
@@ -82,7 +84,9 @@ theorem ld_bounded_by_freq (D p_i p_j : ℝ)
   nlinarith [h_abs_sq, Real.sq_sqrt h_rhs_nonneg, abs_nonneg D, h_sqrt_nonneg]
 
 /-- **LD correlation r² is in [0,1].**
-    r²_ij = D²_ij / (p_i(1-p_i) × p_j(1-p_j)). -/
+    r²_ij = D²_ij / (p_i(1-p_i) × p_j(1-p_j)).
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldCorrelationSq (D p_i p_j : ℝ) : ℝ :=
   D^2 / (allelicVariance p_i * allelicVariance p_j)
 
@@ -290,7 +294,9 @@ tags a number of causal effects proportional to its LD score.
 
 /-- **LDSR regression model: per-SNP expected squared marginal effect.**
     E[β̂_j²] = (h²/M) × ℓ_j + 1/N, where the first term is the
-    signal from LD-tagged causal effects and the second is sampling noise. -/
+    signal from LD-tagged causal effects and the second is sampling noise.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldsrExpectedBetaSq (h2 M ell_j N : ℝ) : ℝ :=
   h2 / M * ell_j + 1 / N
 
@@ -418,7 +424,9 @@ from first principles, starting with haplotype frequency dynamics.
 
 /-- **Haplotype AB frequency in an admixed population.**
     Under linkage equilibrium within each source population,
-    freq(AB)_admix = α × p_A × q_A + (1−α) × p_B × q_B. -/
+    freq(AB)_admix = α × p_A × q_A + (1−α) × p_B × q_B.
+
+    Empirical status: UNTESTED. -/
 noncomputable def haplotypeFreqAdmixed (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
   alpha * p_A * q_A + (1 - alpha) * p_B * q_B
 
@@ -433,7 +441,9 @@ noncomputable def admixedAlleleFreq2 (alpha q_A q_B : ℝ) : ℝ :=
 /-- **Admixture LD at generation 0 (two-locus form).**
     D_admix = freq(AB) − freq(A) × freq(B).
     This is the general two-locus definition before any
-    recombination has acted. -/
+    recombination has acted.
+
+    Empirical status: UNTESTED. -/
 noncomputable def admixtureLDTwoLocus (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
   haplotypeFreqAdmixed alpha p_A q_A p_B q_B
     - admixedAlleleFreq1 alpha p_A p_B * admixedAlleleFreq2 alpha q_A q_B
@@ -450,7 +460,9 @@ theorem admixture_ld_two_locus_eq (alpha p_A q_A p_B q_B : ℝ) :
 
 /-- **Recombination decay of admixture LD (Step 5).**
     After g generations of random mating, recombination reduces LD
-    by (1−r) each generation: D(g) = (1−r)^g × D(0). -/
+    by (1−r) each generation: D(g) = (1−r)^g × D(0).
+
+    Empirical status: UNTESTED. -/
 noncomputable def admixtureLDAtGen (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) : ℝ :=
   (1 - r) ^ g * admixtureLDTwoLocus alpha p_A q_A p_B q_B
 
@@ -467,7 +479,9 @@ theorem admixture_ld_at_gen_eq (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) :
 /-- **Admixture LD magnitude.**
     D_admix ≈ α(1-α) × (p_A - p_B)² × (1-r)^g
     where α is admixture proportion, g is generations since
-    admixture, r is recombination rate. -/
+    admixture, r is recombination rate.
+
+    Empirical status: UNTESTED. -/
 noncomputable def admixtureLDMagnitude (alpha p_A p_B r : ℝ) (g : ℕ) : ℝ :=
   alpha * (1 - alpha) * (p_A - p_B)^2 * (1 - r)^g
 

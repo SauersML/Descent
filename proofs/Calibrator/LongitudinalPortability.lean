@@ -68,7 +68,9 @@ theorem portability_decreases_with_time (r2_initial lambda_total t₁ t₂ : ℝ
 
 /-- **Drift component of decay.**
     Under Wright-Fisher drift with Ne:
-    λ_drift = 1/(2Ne) per generation. -/
+    λ_drift = 1/(2Ne) per generation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def longitudinalDriftDecayRate (Ne : ℝ) : ℝ := 1 / (2 * Ne)
 
 /-- Drift decay rate is positive for positive Ne. -/
@@ -90,7 +92,9 @@ theorem larger_Ne_slower_drift (Ne₁ Ne₂ : ℝ)
 
 /-- **LD decay component.**
     LD between linked loci decays as (1-r)^t per generation,
-    where r is recombination rate. For small r: λ_LD ≈ r. -/
+    where r is recombination rate. For small r: λ_LD ≈ r.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldDecayPerGeneration (r : ℝ) (t : ℕ) : ℝ :=
   (1 - r) ^ t
 
@@ -206,7 +210,9 @@ theorem temporalR2_eq_signal_coordinate
   unfold temporalR2
   simp
 
-/-- Gaussian age-kernel shape for age-specific signal variation. -/
+/-- Gaussian age-kernel shape for age-specific signal variation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ageDependentSignalShape
     (age age_peak width : ℝ) : ℝ :=
   Real.exp (-(age - age_peak)^2 / (2 * width^2))

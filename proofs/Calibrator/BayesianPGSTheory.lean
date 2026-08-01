@@ -362,7 +362,9 @@ section PriorSpecification
 
 /-- **Spike-and-slab prior allows variable sparsity.**
     A proportion π of SNPs are causal with effects from a slab distribution,
-    and (1-π) are null. -/
+    and (1-π) are null.
+
+    Empirical status: UNTESTED. -/
 noncomputable def spikeAndSlabPriorVariance (π σ_slab : ℝ) : ℝ :=
   π * σ_slab ^ 2
 
@@ -613,7 +615,9 @@ theorem info_borrowing_proportional_to_rg
 
 /-- **Effective sample size in multi-ancestry setting.**
     n_eff = n_target + Σ_k (rg_k² × n_k × h_k / h_target)
-    where h_k is heritability in population k. -/
+    where h_k is heritability in population k.
+
+    Empirical status: UNTESTED. -/
 noncomputable def multiAncestryEffectiveN
     (n_target rg n_other : ℝ) : ℝ :=
   n_target + rg ^ 2 * n_other

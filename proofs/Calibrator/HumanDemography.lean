@@ -60,7 +60,9 @@ section NeutralDriftFloor
 
 /-- Ratio of target to source `R²` when the two populations differ only by
 neutral drift in allele frequencies. The source is the same model evaluated at
-zero divergence. -/
+zero divergence.
+
+    Empirical status: UNTESTED. -/
 noncomputable def neutralDriftR2Ratio (V_A V_E fst : ℝ) : ℝ :=
   presentDayR2 V_A V_E fst / presentDayR2 V_A V_E 0
 
@@ -171,7 +173,9 @@ quantitative form of "the loss is in the linkage disequilibrium".
 -/
 
 /-- Ratio of target to source `R²` when both allele-frequency divergence and
-loss of shared tagging act. -/
+loss of shared tagging act.
+
+    Empirical status: UNTESTED. -/
 noncomputable def taggedDriftR2Ratio (V_A V_E fst shared_ld : ℝ) : ℝ :=
   presentDayR2MutationDrift V_A V_E fst shared_ld / presentDayR2 V_A V_E 0
 

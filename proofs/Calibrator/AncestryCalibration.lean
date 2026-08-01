@@ -290,7 +290,9 @@ section Epistasis
 /-- **Epistatic variance under HWE.**
     For two loci with frequencies p₁, p₂ and interaction effect γ,
     the epistatic variance component is:
-    V_epistasis = γ² × H₁ × H₂ where Hᵢ = 2pᵢ(1-pᵢ). -/
+    V_epistasis = γ² × H₁ × H₂ where Hᵢ = 2pᵢ(1-pᵢ).
+
+    Empirical status: UNTESTED. -/
 noncomputable def epistaticVariancePairwise (γ p₁ p₂ : ℝ) : ℝ :=
   γ ^ 2 * (2 * p₁ * (1 - p₁)) * (2 * p₂ * (1 - p₂))
 

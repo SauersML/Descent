@@ -86,7 +86,9 @@ used in the portability theorem below.
 /-- **Neutral drift factor per generation.**
     Under Wright-Fisher, the probability of NOT coalescing in one generation
     is (1 - 1/(2*Ne)). The fraction of heterozygosity remaining after t
-    generations is this quantity raised to the t-th power. -/
+    generations is this quantity raised to the t-th power.
+
+    Empirical status: UNTESTED. -/
 noncomputable def neutralDriftFactor (Ne : ℝ) (t : ℕ) : ℝ :=
   (1 - 1 / (2 * Ne)) ^ t
 
@@ -101,7 +103,9 @@ noncomputable def selectedDriftFactor (Ne : ℝ) (t : ℕ) (s_correction : ℝ) 
 
 /-- **Fst from a drift factor.**
     In the island/drift model, Fst = 1 - driftFactor, where driftFactor
-    is the fraction of ancestral heterozygosity retained. -/
+    is the fraction of ancestral heterozygosity retained.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
   1 - driftFactor
 
@@ -154,7 +158,9 @@ theorem fst_causal_lt_fst_neutral_of_stabilizing_selection
     h_s_pos h_t_pos h_base_pos
 
 /-- Effect-size-weighted retained causal portability from a locus-specific
-causal-`F_ST` profile, resolved per locus rather than as a trait-wide scalar. -/
+causal-`F_ST` profile, resolved per locus rather than as a trait-wide scalar.
+
+    Empirical status: UNTESTED. -/
 noncomputable def causalPortabilityFromLocalFst {m : ℕ}
     (sourceSquaredEffect fstCausal : Fin m → ℝ) : ℝ :=
   (∑ i, sourceSquaredEffect i * (1 - fstCausal i)) /

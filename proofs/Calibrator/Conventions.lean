@@ -3,6 +3,7 @@ import Calibrator.DemographicHistory
 import Calibrator.AncestrySpecificArchitecture
 import Calibrator.PCCorrectability.Threshold
 import Calibrator.Identification
+import Calibrator.AssortativeMatingPGS
 
 namespace Calibrator
 
@@ -52,7 +53,9 @@ drift between them is a compile error rather than a silent disagreement. -/
 noncomputable def ploidy : ℝ := 2
 
 /-- Genotype variance at a locus in Hardy-Weinberg proportions, for dosage
-coded `0, 1, …, ploidy`. -/
+coded `0, 1, …, ploidy`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def hweGenotypeVariance (p : ℝ) : ℝ := ploidy * p * (1 - p)
 
 /-- Coalescent time scale: time measured in units of `ploidy · Nₑ`
@@ -80,14 +83,16 @@ theorem scaledMigrationRate_eq_ploidy_form (Ne m : ℝ) :
 /-- **Cross-check: the drift `F_ST` uses the coalescent time scale**, so the
 `2 Nₑ` inside it is the same `ploidy · Nₑ` and not a separate choice. -/
 theorem fstFromDrift_uses_coalescentTimeScale (t : ℕ) (Ne : ℝ) :
-    fstFromDrift t Ne = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
-  unfold fstFromDrift; rw [coalescentTimeScale_eq]
+    heterozygosityLossFromDrift t Ne = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
+  unfold heterozygosityLossFromDrift; rw [coalescentTimeScale_eq]
 
 end Ploidy
 
 section Differentiation
 
-/-- Mean allele frequency across two subgroups of equal weight. -/
+/-- Mean allele frequency across two subgroups of equal weight.
+
+    Empirical status: UNTESTED. -/
 noncomputable def meanAlleleFreq (p₁ p₂ : ℝ) : ℝ := (p₁ + p₂) / 2
 
 /-- **Hudson's `F_ST` for two subgroups**, as one minus the ratio of mean
@@ -161,7 +166,9 @@ that motivated it. `formula` is what the calculator computes, `observable` is
 the standardized contrast variance times the effective subgroup size, defined
 without reference to the formula, and `derivation` is discharged. The old
 constant cannot be substituted here, because the resulting field would not
-typecheck. -/
+typecheck.
+
+    Empirical status: UNTESTED. -/
 noncomputable def spikeIdentification (n m p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
     Identification ℝ where
@@ -183,6 +190,38 @@ factor of four. -/
 theorem equilibriumFst_eq_demoIslandModelFst (Ne m : ℝ) :
     equilibriumFst m Ne = demoIslandModelFst Ne m := by
   unfold equilibriumFst demoIslandModelFst; ring_nf
+
+/-- **Cross-check: the two assortative-mating inflation claims agree only at
+full heritability.**
+
+`StratificationConfounding` carried `amInflationFactor r = 1/(1 - r)` and
+`AssortativeMatingPGS` carries `amEquilibriumVariance V_A r h² = V_A/(1 - r h²)`
+for the same quantity, and no theorem related them. Forward simulation with
+the spousal correlation measured rather than assumed puts the second within
+-5% to +1% and the first between +3% and +82% high, so the first is deleted.
+This theorem records why the disagreement was invisible: the two coincide
+exactly when `h² = 1`, which is the only case anyone would have checked by
+inspection, and diverge with `h²` everywhere else. Assortative mating is a
+forward-time phenomenon, so no coalescent simulation could have separated
+them. -/
+theorem amEquilibriumVariance_at_full_heritability (V_A r : ℝ) :
+    amEquilibriumVariance V_A r 1 = V_A / (1 - r) := by
+  unfold amEquilibriumVariance
+  ring_nf
+
+/-- **Cross-check spanning the mating and drift modules: assortative mating and
+drift act multiplicatively on the additive variance.**
+
+`amEquilibriumVariance` inflates by `1/(1 - r h²)` and `presentDayPGSVariance`
+deflates by `(1 - F_ST)`, and composing them gives the product. Stated because
+the two modules described the same variance and were never related, which is
+the condition under which a falsified companion of `amEquilibriumVariance`
+survived. -/
+theorem amEquilibrium_then_drift (V_A r h2 fst : ℝ) :
+    presentDayPGSVariance (amEquilibriumVariance V_A r h2) fst =
+      (1 - fst) * (V_A / (1 - r * h2)) := by
+  unfold presentDayPGSVariance amEquilibriumVariance
+  ring
 
 end EquilibriumAgreements
 

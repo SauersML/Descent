@@ -30,7 +30,9 @@ structure SelectionModelSummary where
   predictedEffectCorrelation : ℝ
   predictedSelectedVariance : ℝ
 
-/-- Stabilizing-selection summary induced by the explicit architecture model. -/
+/-- Stabilizing-selection summary induced by the explicit architecture model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def stabilizingSelectionSummary
     (Ns vMutation s : ℝ) : SelectionModelSummary where
   predictedEffectCorrelation := effectCorrelationStabilizing Ns
@@ -44,7 +46,9 @@ noncomputable def fluctuatingSelectionSummary
     fluctuatingSelectedArchitectureVariance vMutation s sigmaTheta tau
 
 /-- Validation log-likelihood of a candidate summary under Gaussian measurement
-noise on the observed effect-correlation and selected-variance summaries. -/
+noise on the observed effect-correlation and selected-variance summaries.
+
+    Empirical status: UNTESTED. -/
 noncomputable def selectionSummaryLogLik
     (validation : SelectionValidationModel)
     (summary : SelectionModelSummary) : ℝ :=
@@ -71,7 +75,9 @@ theorem missedSelectedVariance_nonneg
   positivity
 
 /-- Likelihood-ratio statistic comparing two selection summaries on the same
-observed validation target. -/
+observed validation target.
+
+    Empirical status: UNTESTED. -/
 noncomputable def selectionModelLRT
     (validation : SelectionValidationModel)
     (nullSummary altSummary : SelectionModelSummary) : ℝ :=

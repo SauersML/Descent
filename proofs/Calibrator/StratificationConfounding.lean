@@ -132,30 +132,22 @@ in subsequent generations. This affects PGS portability because:
 
 section AssortativeMating
 
-/-- **AM inflation factor.**
-    After t generations of AM with spousal correlation r,
-    genetic variance inflates by factor ≈ 1/(1-r) at equilibrium. -/
-noncomputable def amInflationFactor (r : ℝ) : ℝ :=
-  1 / (1 - r)
+/-! ### Assortative-mating variance inflation
 
-/-- AM inflation factor > 1 for positive assortment. -/
-theorem am_inflation_gt_one (r : ℝ) (hr : 0 < r) (hr1 : r < 1) :
-    1 < amInflationFactor r := by
-  unfold amInflationFactor
-  rw [lt_div_iff₀ (by linarith)]
-  linarith
+Removed.  This defined `amInflationFactor r = 1/(1 - r)` as the equilibrium
+inflation of genetic variance under assortative mating.  Forward Wright-Fisher
+simulation with the spousal correlation measured rather than assumed falsifies
+it: the error runs from +3% to +82%, always overstating.  It also takes no
+heritability, while the observable depends on it strongly, the true inflation
+at `r = 0.5` being `1.10` for `h² = 0.2` and `1.74` for `h² = 0.8`, so no
+constant repairs it.
 
-/-- **Differential AM creates portability artifact.**
-    If source population has stronger AM (r_s > r_t), then
-    PGS variance is higher in source → R² appears higher in source
-    even with identical genetic architecture. -/
-theorem differential_am_creates_portability_artifact
-    (r_s r_t : ℝ)
-    (hrs1 : r_s < 1)
-    (h_stronger : r_t < r_s) :
-    amInflationFactor r_t < amInflationFactor r_s := by
-  unfold amInflationFactor
-  apply div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+`amEquilibriumVariance` in `AssortativeMatingPGS` gives `V_A / (1 - r h²)` for
+the same quantity and is accurate to between -5% and +1% across that grid.
+The two were never related by any theorem, which is why both could stand.
+This is the coalescent-untestable case: assortative mating is a forward-time
+phenomenon and no coalescent simulation could have caught it.
+-/
 
 /-- **AM affects both numerator and denominator of R².**
     R² = V_PGS / V_Y. AM inflates V_PGS by α and V_Y by less than α
@@ -432,7 +424,9 @@ section CausalInference
 /-- **Measurement error model for PGS.**
     PGS = true genetic liability × attenuation + noise.
     Attenuation = √R² in the training GWAS.
-    In a new population, attenuation changes. -/
+    In a new population, attenuation changes.
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsAttenuationFactor (r2_gwas : ℝ) : ℝ :=
   Real.sqrt r2_gwas
 
@@ -468,7 +462,9 @@ structure AttenuationModel where
   /-- Target has lower signal -/
   r2_drop : r2_target < r2_source
 
-/-- Reliability ratio in a population -/
+/-- Reliability ratio in a population
+
+    Empirical status: UNTESTED. -/
 noncomputable def reliabilityRatio (r2 σ2_noise : ℝ) : ℝ :=
   r2 / (r2 + σ2_noise)
 
@@ -562,7 +558,9 @@ structure MRInstrumentModel where
   p_target_pos : 0 < p_target
   p_target_lt : p_target < 1
 
-/-- Heterozygosity 2p(1-p) as a function of allele frequency -/
+/-- Heterozygosity 2p(1-p) as a function of allele frequency
+
+    Empirical status: UNTESTED. -/
 noncomputable def heterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
 
 /-- F-statistic of an instrument at a given allele frequency -/
@@ -625,7 +623,9 @@ We formalize the power analysis for portability comparisons.
 section PowerAnalysis
 
 /-- **Variance of R² estimator.**
-    Var(R²) ≈ 4R²(1-R²)²/n for the standard R² estimator. -/
+    Var(R²) ≈ 4R²(1-R²)²/n for the standard R² estimator.
+
+    Empirical status: VALIDATED (40000-replicate Monte Carlo, ratio 0.99-1.01 for n >= 1000). -/
 noncomputable def r2EstimatorVariance (r2 : ℝ) (n : ℕ) : ℝ :=
   4 * r2 * (1 - r2) ^ 2 / n
 

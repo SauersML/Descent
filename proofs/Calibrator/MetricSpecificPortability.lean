@@ -535,7 +535,9 @@ noncomputable def fisherTraceMSELowerBound
 
 /-- **Effective sample size needed to beat a target trace-MSE threshold.**
     Solving `(d / I) / n_eff ≤ τ` for `n_eff` gives the exact threshold
-    `(d / I) / τ` in the orthogonal Fisher model. -/
+    `(d / I) / τ` in the orthogonal Fisher model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def requiredEffectiveSampleSizeForTraceMSE
     (nParams infoPerSample targetTraceMSE : ℝ) : ℝ :=
   adaptationDifficultyIndex nParams infoPerSample / targetTraceMSE
@@ -857,7 +859,9 @@ theorem nns_increases_with_ppv_drop
 
 /-- **F1 score captures precision-recall balance.**
     F1 = 2 × PPV × sensitivity / (PPV + sensitivity).
-    F1 portability reflects both precision and recall portability. -/
+    F1 portability reflects both precision and recall portability.
+
+    Empirical status: UNTESTED. -/
 noncomputable def f1ScoreMetric (precision sens : ℝ) : ℝ :=
   2 * precision * sens / (precision + sens)
 

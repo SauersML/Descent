@@ -107,7 +107,9 @@ section PopulationSpecificH2
 
 /-- **Additive variance depends on allele frequencies.**
     V_A = Σᵢ 2pᵢ(1-pᵢ)αᵢ² where αᵢ is the average effect.
-    When frequencies differ, V_A differs. -/
+    When frequencies differ, V_A differs.
+
+    Empirical status: UNTESTED. -/
 noncomputable def additiveVariance
     {m : ℕ} (p : Fin m → ℝ) (α : Fin m → ℝ) : ℝ :=
   ∑ i, 2 * p i * (1 - p i) * (α i) ^ 2
@@ -357,7 +359,9 @@ section LiabilityScale
     which accounts for the nonlinear mapping between the continuous liability
     and binary disease status. For rare diseases (small K), the threshold T
     is far in the tail, z = φ(T) is small, and z² << K(1-K), so
-    h²_liab >> h²_obs. -/
+    h²_liab >> h²_obs.
+
+    Empirical status: UNTESTED. -/
 noncomputable def liabilityScaleH2
     (h2_observed prevalence z_height : ℝ) : ℝ :=
   h2_observed * prevalence * (1 - prevalence) / z_height ^ 2

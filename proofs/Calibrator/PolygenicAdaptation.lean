@@ -38,7 +38,9 @@ section QSTFSTTest
 /-- **QST definition.**
     QST = V_between / (V_between + 2 × V_within)
     where V_between and V_within are between- and within-population
-    additive genetic variance components. -/
+    additive genetic variance components.
+
+    Empirical status: UNTESTED. -/
 noncomputable def qst (V_between V_within : ℝ) : ℝ :=
   V_between / (V_between + 2 * V_within)
 
@@ -74,7 +76,9 @@ section PGSOverdispersion
                 = Fst × Σᵢ 2pᵢ(1-pᵢ)βᵢ²
                 = Fst × V_A              (definition of additive genetic variance)
 
-    This gives the variance of PGS change in one population due to drift. -/
+    This gives the variance of PGS change in one population due to drift.
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsDriftVariance_one_pop (V_A fst : ℝ) : ℝ :=
   fst * V_A
 
@@ -95,7 +99,9 @@ theorem pgsDriftVariance_one_pop_nonneg (V_A fst : ℝ)
 
     The factor of 2 arises because both populations drift independently
     from their common ancestor, analogous to the factor of 2 in
-    expectedFreqDiffSq for allele frequency differences. -/
+    expectedFreqDiffSq for allele frequency differences.
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsDiffVariance_two_pop (V_A fst : ℝ) : ℝ :=
   2 * pgsDriftVariance_one_pop V_A fst
 
@@ -109,7 +115,9 @@ theorem pgsDiffVariance_two_pop_eq_sum (V_A fst : ℝ) :
 /-- **Expected PGS mean difference under drift.**
     Under pure drift, the PGS mean difference has variance:
     Var(ΔPGS) = V_A × 2FST.
-    The expected |ΔPGS| ∝ √(V_A × FST). -/
+    The expected |ΔPGS| ∝ √(V_A × FST).
+
+    Empirical status: UNTESTED. -/
 noncomputable def expectedPGSDiffVariance (V_A fst : ℝ) : ℝ :=
   V_A * 2 * fst
 

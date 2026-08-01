@@ -521,7 +521,9 @@ theorem faster_decay_lower_correlation
   nlinarith
 
 /-- **LD tagging efficiency decays exponentially with genetic distance.**
-    ρ²_LD(d) = exp(-λ_LD · d). This is the Ohta-Kimura result. -/
+    ρ²_LD(d) = exp(-λ_LD · d). This is the Ohta-Kimura result.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldTaggingDecay (lam_LD d : ℝ) : ℝ :=
   Real.exp (-lam_LD * d)
 
@@ -721,7 +723,9 @@ For binary traits (asthma, T2D), portability depends on additional factors:
 
 section DiseasePortability
 
-/-- **F1 score definition.** -/
+/-- **F1 score definition.**
+
+    Empirical status: UNTESTED. -/
 noncomputable def f1Score (precision sensitivity : ℝ) : ℝ :=
   2 * precision * sensitivity / (precision + sensitivity)
 

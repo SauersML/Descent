@@ -88,7 +88,9 @@ structure LiabilityThresholdModel where
     The argument to Φ is monotone increasing in R² because:
     - The numerator `R · h · μ_case − T'` increases in R (for μ_case > 0)
     - The denominator `σ_resid` decreases in R² (less residual variance)
-    - Both effects push the z-score upward as R² increases -/
+    - Both effects push the z-score upward as R² increases
+
+    Empirical status: UNTESTED. -/
 noncomputable def liabilitySensitivity
     (Φ : ℝ → ℝ) (m : LiabilityThresholdModel) (R2 : ℝ) (T' : ℝ) : ℝ :=
   let R := Real.sqrt R2
@@ -104,7 +106,9 @@ noncomputable def liabilitySensitivity
 
     where `μ_control = E[Y | Y ≤ T]` is the mean liability among controls
     (typically negative). This is also monotone increasing in R² by the
-    same argument: higher R² increases separation between cases and controls. -/
+    same argument: higher R² increases separation between cases and controls.
+
+    Empirical status: UNTESTED. -/
 noncomputable def liabilitySpecificity
     (Φ : ℝ → ℝ) (m : LiabilityThresholdModel)
     (R2 : ℝ) (T' : ℝ) (μ_control : ℝ) : ℝ :=

@@ -19,7 +19,9 @@ nonzero residual axis can provide such a uniform guarantee.
 -/
 
 /-- Bias in a PGS association statistic along a residual cross-panel ancestry
-axis.  `scale` collects the positive locus- and panel-count factors. -/
+axis.  `scale` collects the positive locus- and panel-count factors.
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsTestAxisBias {d : ℕ} (scale : ℝ)
     (expectedPhenotype residualTargetAxis : Fin d → ℝ) : ℝ :=
   scale * ∑ i, expectedPhenotype i * residualTargetAxis i
@@ -66,7 +68,9 @@ ascertainment to determine the critical confounding magnitude.
 
 /-- Genetic variance in the GWAS panel explained by a specified external
 ancestry gradient.  This is `H` before correction and `H'` when
-`ancestryVariance` is the residual variance after correction. -/
+`ancestryVariance` is the residual variance after correction.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ancestryGradientSusceptibility
     (markerAxisVariance ancestryVariance : ℝ) : ℝ :=
   markerAxisVariance * ancestryVariance
@@ -120,7 +124,9 @@ noncomputable def ascertainmentAmplification (Φ Λ : ℝ) : ℝ :=
 
 /-- Coefficient multiplying the magnitude of environmental confounding in the
 standardized PGS bias formula.  `expectedSNPCount` corresponds to `L Sbar`,
-`Hres` to residual susceptibility `H'`, and `effectSD` to `σβ`. -/
+`Hres` to residual susceptibility `H'`, and `effectSD` to `σβ`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsStratificationRiskCoefficient
     (expectedSNPCount Hres effectSD Φ Λ : ℝ) : ℝ :=
   Real.sqrt expectedSNPCount * Real.sqrt Hres / effectSD *

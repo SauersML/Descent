@@ -67,7 +67,9 @@ end IslandModel
 
 section SteppingStone
 
-/-- Stepping-stone model pairwise F_ST: d / (d + 4·Ne·m·σ²). -/
+/-- Stepping-stone model pairwise F_ST: d / (d + 4·Ne·m·σ²).
+
+    Empirical status: UNTESTED. -/
 noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
@@ -123,7 +125,9 @@ which is `steppingStoneFst` as defined above.
 
 /-- **Coalescence time at distance d in the stepping-stone model.**
     T(d) = d / (σ² · m), the expected time for lineages separated by d demes
-    to first coalesce, from the diffusion approximation. -/
+    to first coalesce, from the diffusion approximation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def steppingStoneCoalescenceTime (d σ_sq m : ℝ) : ℝ :=
   d / (σ_sq * m)
 
@@ -176,7 +180,9 @@ end SteppingStone
 
 section AdmixtureModels
 
-/-- Two-way admixed F_ST: (1-α)² × F_ST(A,B). -/
+/-- Two-way admixed F_ST: (1-α)² × F_ST(A,B).
+
+    Empirical status: UNTESTED. -/
 noncomputable def admixedFst (α fst_AB : ℝ) : ℝ :=
   (1 - α) ^ 2 * fst_AB
 
@@ -254,7 +260,9 @@ This is `admixedFst α fst_AB`.
 -/
 
 /-- **Allele frequency in the admixed population.**
-    p_adm = α · p_A + (1-α) · p_B. -/
+    p_adm = α · p_A + (1-α) · p_B.
+
+    Empirical status: UNTESTED. -/
 noncomputable def admixedAlleleFreq (α p_A p_B : ℝ) : ℝ :=
   α * p_A + (1 - α) * p_B
 
@@ -352,7 +360,9 @@ end ArchaicIntrogression
 
 section FounderEffects
 
-/-- Founder F_ST after t generations: 1 - (1 - 1/(2k))^t. -/
+/-- Founder F_ST after t generations: 1 - (1 - 1/(2k))^t.
+
+    Empirical status: UNTESTED. -/
 noncomputable def founderFst (k : ℕ) (t : ℕ) : ℝ :=
   1 - (1 - 1 / (2 * (k : ℝ))) ^ t
 
@@ -405,7 +415,9 @@ replacing the constant-size formula Fst = 1 - exp(-T/(2·Ne)).
 
 section VariableNeFst
 
-/-- **Cumulative drift** under variable Ne: Σ 1/(2·Ne(t)). -/
+/-- **Cumulative drift** under variable Ne: Σ 1/(2·Ne(t)).
+
+    Empirical status: UNTESTED. -/
 noncomputable def cumulativeDrift {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
   ∑ i, 1 / (2 * Ne i)
 
@@ -516,7 +528,9 @@ in subsequent generations.
 
 /-- **Drift LD creation rate**: In a population of effective size Ne,
     genetic drift creates new LD at rate 1/(2·Ne) per generation.
-    This arises from Cov(Δpᵢ, Δpⱼ) for linked loci under drift. -/
+    This arises from Cov(Δpᵢ, Δpⱼ) for linked loci under drift.
+
+    Empirical status: UNTESTED. -/
 noncomputable def driftLDCreationRate (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 
@@ -537,7 +551,9 @@ theorem excessDriftRate_pos (Ne_b Ne_stable : ℝ)
 /-- **Cumulative excess LD from drift** over t_b bottleneck generations.
     Each generation's excess LD contribution decays by (1 - 1/(2·Ne_b))
     per subsequent generation. The cumulative excess is:
-    Σ_{k=0}^{t_b-1} (1-1/(2·Ne_b))^k × excessDriftRate(Ne_b, Ne_stable) -/
+    Σ_{k=0}^{t_b-1} (1-1/(2·Ne_b))^k × excessDriftRate(Ne_b, Ne_stable)
+
+    Empirical status: UNTESTED. -/
 noncomputable def cumulativeExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ) : ℝ :=
   (Finset.range t_b).sum fun k =>
     (1 - 1 / (2 * Ne_b)) ^ k * excessDriftRate Ne_b Ne_stable
@@ -616,7 +632,9 @@ section DemographicPortability
     This equals the cumulative excess drift-generated LD over the bottleneck,
     computed as the difference between total drift-LD in the bottlenecked vs
     stable population over t_b generations. See `driftLDCreationRate`,
-    `excessDriftRate`, and `cumulativeExcessLD` for the step-by-step derivation. -/
+    `excessDriftRate`, and `cumulativeExcessLD` for the step-by-step derivation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def bottleneckExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ) : ℝ :=
   (1 - (1 - 1/(2 * Ne_b)) ^ t_b) - (1 - (1 - 1/(2 * Ne_stable)) ^ t_b)
 

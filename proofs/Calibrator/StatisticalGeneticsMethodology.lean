@@ -136,7 +136,9 @@ section SummaryStatPGS
 /-- **Effective sample size from summary stats.**
     n_eff_j = (Z_j / β_true_j)² if β_true_j were known.
     In practice: n_eff = median over SNPs of 1/SE_j².
-    This can differ from the reported GWAS n. -/
+    This can differ from the reported GWAS n.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectiveSampleSizeSE (se : ℝ) : ℝ := 1 / se ^ 2
 
 /-- Effective sample size is positive. -/
@@ -218,7 +220,9 @@ structure LDSCModel (m : ℕ) where
   h_ld_adj_pos : ∀ i, 0 ≤ ld_adj i
   h_ld_adj_le_one : ∀ i, ld_adj i ≤ 1
 
-/-- Genetic correlation is defined by the inner product of effects. -/
+/-- Genetic correlation is defined by the inner product of effects.
+
+    Empirical status: UNTESTED. -/
 noncomputable def geneticCorrelationLDSC {m : ℕ} (model : LDSCModel m) : ℝ :=
   (∑ i, model.beta_s i * model.beta_t i) /
     Real.sqrt ((∑ i, model.beta_s i ^ 2) * (∑ i, model.beta_t i ^ 2))

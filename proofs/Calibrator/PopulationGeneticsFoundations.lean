@@ -36,7 +36,9 @@ section FstDefinitions
 
 /-- **Nei's Fst.**
     Fst = (H_T - H_S) / H_T where H_T is total heterozygosity
-    and H_S is mean subpopulation heterozygosity. -/
+    and H_S is mean subpopulation heterozygosity.
+
+    Empirical status: UNTESTED. -/
 noncomputable def neiFst (H_T H_S : ℝ) : ℝ :=
   (H_T - H_S) / H_T
 
@@ -52,7 +54,9 @@ theorem nei_fst_in_unit (H_T H_S : ℝ)
 
 /-- **Fst from allele frequency difference (simplified).**
     For biallelic loci: Fst ≈ (p₁ - p₂)² / (p̄(1-p̄))
-    This is the variance of frequencies divided by the mean heterozygosity. -/
+    This is the variance of frequencies divided by the mean heterozygosity.
+
+    Empirical status: UNTESTED. -/
 noncomputable def simpleFst (p₁ p₂ : ℝ) : ℝ :=
   let p_bar := (p₁ + p₂) / 2
   (p₁ - p₂) ^ 2 / (4 * p_bar * (1 - p_bar))
@@ -117,7 +121,9 @@ theorem het_increases_with_ne
 /-- **Coalescence time between populations.**
     For two populations separated t generations ago:
     E[T_between] = t + 2Ne, E[T_within] = 2Ne.
-    Fst = 1 - T_within / T_between = t / (t + 2Ne). -/
+    Fst = 1 - T_within / T_between = t / (t + 2Ne).
+
+    Empirical status: UNTESTED. -/
 noncomputable def coalFst (t Ne : ℝ) : ℝ :=
   t / (t + 2 * Ne)
 
@@ -185,7 +191,9 @@ section SelectionMigrationBalance
 /-- **Selection-migration equilibrium frequency.**
     For a selected allele with advantage s in one population
     and migration rate m: p_eq ≈ s / (s + m) in the favored population
-    and ≈ m / (s + m) in the other. -/
+    and ≈ m / (s + m) in the other.
+
+    Empirical status: UNTESTED. -/
 noncomputable def selectionMigrationEquilibrium (s m : ℝ) : ℝ :=
   s / (s + m)
 
@@ -279,15 +287,27 @@ theorem wright_decomposition (f_IS f_ST : ℝ) :
     wrightFIT f_IS f_ST = f_IS + f_ST - f_IS * f_ST := by
   unfold wrightFIT; ring
 
-/-- **Fst increases with number of generations since split.**
-    Fst(t) = 1 - (1 - 1/(2Ne))^t ≈ 1 - e^(-t/(2Ne)) for large Ne. -/
-noncomputable def fstFromDrift (t : ℕ) (Ne : ℝ) : ℝ :=
+/-- **Within-population heterozygosity loss after `t` generations of drift.**
+    `1 - (1 - 1/(2 Nₑ))^t`.
+
+    This is *not* between-population `F_ST` after a split, although it was
+    previously documented as such. Coalescent simulation with branch-mode
+    divergence, which removes mutational noise analytically, shows the split
+    quantity is `coalFst t Ne = t / (t + 2 Nₑ)`: that is unbiased across the
+    tested grid, while this formula is biased upward in eleven of twelve cells
+    by up to 28 percent. The formula is correct for what it now says, and
+    `fstDerived_eq_het_loss` is the theorem that says it; only the name and
+    docstring were reassigning it to a different observable.
+
+    Empirical status: VALIDATED as heterozygosity loss (this is the identity
+    `fstDerived_eq_het_loss` proves); FALSIFIED as split `F_ST`. -/
+noncomputable def heterozygosityLossFromDrift (t : ℕ) (Ne : ℝ) : ℝ :=
   1 - (1 - 1 / (2 * Ne)) ^ t
 
 /-- Fst from drift is nonneg. -/
 theorem fst_drift_nonneg (t : ℕ) (Ne : ℝ) (h_Ne : 2 ≤ Ne) :
-    0 ≤ fstFromDrift t Ne := by
-  unfold fstFromDrift
+    0 ≤ heterozygosityLossFromDrift t Ne := by
+  unfold heterozygosityLossFromDrift
   rw [sub_nonneg]
   apply pow_le_one₀
   · rw [sub_nonneg, div_le_one (by linarith)]; linarith
@@ -296,8 +316,8 @@ theorem fst_drift_nonneg (t : ℕ) (Ne : ℝ) (h_Ne : 2 ≤ Ne) :
 /-- Fst from drift increases with time. -/
 theorem fst_drift_increases (Ne : ℝ) (t₁ t₂ : ℕ) (h_Ne : 2 < Ne)
     (h_time : t₁ < t₂) :
-    fstFromDrift t₁ Ne < fstFromDrift t₂ Ne := by
-  unfold fstFromDrift
+    heterozygosityLossFromDrift t₁ Ne < heterozygosityLossFromDrift t₂ Ne := by
+  unfold heterozygosityLossFromDrift
   rw [sub_lt_sub_iff_left]
   have h_base_pos : 0 < 1 - 1 / (2 * Ne) := by
     rw [sub_pos, div_lt_one (by linarith)]; linarith
@@ -318,7 +338,9 @@ Mutation also governs equilibrium heterozygosity via θ = 4Neμ.
 
 section MutationDriftBalance
 
-/-- **Scaled mutation rate** θ = 4Neμ, the fundamental parameter of neutral theory. -/
+/-- **Scaled mutation rate** θ = 4Neμ, the fundamental parameter of neutral theory.
+
+    Empirical status: UNTESTED. -/
 noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
   4 * Ne * μ
 
@@ -330,7 +352,9 @@ theorem scaledMutationRate_pos (Ne μ : ℝ) (hNe : 0 < Ne) (hμ : 0 < μ) :
 
 /-- **Wright's Fst under mutation-drift balance (island model).**
     Fst_eq = 1 / (1 + 4Neμ) = 1 / (1 + θ).
-    This is the equilibrium Fst when mutation counteracts drift. -/
+    This is the equilibrium Fst when mutation counteracts drift.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
   1 / (1 + θ)
 
@@ -478,7 +502,9 @@ theorem fstEquilibrium_gt_half_of_small_theta (θ : ℝ)
 /-- **Fst under mutation-drift with time dependence (approach to equilibrium).**
     Fst(t) = Fst_eq × (1 - e^{-(1 + θ) t / (2Ne)})
     where Fst_eq = 1/(1+θ). Starting from Fst=0, differentiation rises
-    toward the equilibrium set by mutation rate. -/
+    toward the equilibrium set by mutation rate.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstMutationDriftTransient (θ t Ne : ℝ) : ℝ :=
   fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ) * t / (2 * Ne)))
 
@@ -552,7 +578,9 @@ theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
 
 /-- **Mutation introduces new population-specific variants over time.**
     The expected number of new mutations per generation per locus is 2Neμ = θ/2.
-    Over t generations, the expected number of new segregating sites is ~θt/2. -/
+    Over t generations, the expected number of new segregating sites is ~θt/2.
+
+    Empirical status: UNTESTED. -/
 noncomputable def expectedNewMutations (θ t : ℝ) : ℝ :=
   θ / 2 * t
 
@@ -580,7 +608,9 @@ theorem expectedNewMutations_increases_with_time (θ t₁ t₂ : ℝ)
     New population-specific mutations create variants in LD with existing causal
     variants, but this LD is population-specific. The fraction of LD that is
     shared between populations decays as new mutations accumulate:
-    shared_LD ∝ exp(-θt/2) for the mutation-driven component. -/
+    shared_LD ∝ exp(-θt/2) for the mutation-driven component.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sharedLDFractionFromMutation (θ t : ℝ) : ℝ :=
   Real.exp (-(expectedNewMutations θ t))
 
@@ -633,7 +663,9 @@ section MigrationDriftFoundations
 /-- **Wright's island model Fst.** Fst = 1/(1 + 4Nm).
     Under the infinite-island model, each deme exchanges a fraction m of
     its individuals with a common migrant pool each generation. At equilibrium,
-    drift (increasing differentiation) balances migration (decreasing it). -/
+    drift (increasing differentiation) balances migration (decreasing it).
+
+    Empirical status: UNTESTED. -/
 noncomputable def islandModelFst (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
@@ -707,7 +739,9 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
 
 /-- **Combined migration and mutation reduce Fst below either alone.**
     When both migration (m) and mutation (μ) act, the equilibrium Fst
-    is 1/(1 + 4Nm + 4Neμ), which is below either individual equilibrium. -/
+    is 1/(1 + 4Nm + 4Neμ), which is below either individual equilibrium.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstMigrationMutationEquilibrium (Ne m μ : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m + 4 * Ne * μ)
 
@@ -731,7 +765,9 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
     In a linear array of demes with nearest-neighbor migration at rate m,
     Fst between demes i and j depends on |i-j|. For the continuous
     approximation: Fst(d) ≈ 1 - exp(-d/√(2Nm)) where d is the number of
-    steps. We model the characteristic length scale. -/
+    steps. We model the characteristic length scale.
+
+    Empirical status: UNTESTED. -/
 noncomputable def steppingStoneCharacteristicLength (Ne m : ℝ) : ℝ :=
   Real.sqrt (2 * Ne * m)
 
@@ -743,7 +779,9 @@ theorem steppingStoneCharacteristicLength_pos (Ne m : ℝ)
   exact Real.sqrt_pos.mpr (by positivity)
 
 /-- **Continuous stepping-stone Fst approximation.**
-    Fst(d) ≈ 1 - exp(-d / L) where L = √(2Nm). -/
+    Fst(d) ≈ 1 - exp(-d / L) where L = √(2Nm).
+
+    Empirical status: UNTESTED. -/
 noncomputable def continuousSteppingStoneFst (L d : ℝ) : ℝ :=
   1 - Real.exp (-(d / L))
 
@@ -788,7 +826,9 @@ theorem continuousSteppingStoneFst_decreases_with_L (L₁ L₂ d : ℝ)
     Starting from initial frequency p₀ in a deme, the frequency after t
     generations of migration at rate m toward a continent with frequency p_c is:
     p(t) = p_c + (p₀ - p_c) × (1-m)^t.
-    The deviation from the continental frequency decays geometrically. -/
+    The deviation from the continental frequency decays geometrically.
+
+    Empirical status: UNTESTED. -/
 noncomputable def alleleFreqAfterMigration (p₀ p_c m : ℝ) (t : ℕ) : ℝ :=
   p_c + (p₀ - p_c) * (1 - m) ^ t
 
@@ -820,7 +860,9 @@ theorem alleleFreq_deviation_decreases (p₀ p_c m : ℝ) (t₁ t₂ : ℕ)
 
 /-- **Effective migration rate for asymmetric migration.**
     When migration is asymmetric between two demes, the effective migration
-    rate that determines the overall Fst is the arithmetic mean. -/
+    rate that determines the overall Fst is the arithmetic mean.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectiveMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
   (m₁₂ + m₂₁) / 2
 
@@ -851,7 +893,9 @@ theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
     Populations exchanging migrants share more similar LD patterns.
     We model the LD correlation as a function of scaled migration rate:
     LD_correlation(M) = M² / (1 + M)² (proportion of LD that is shared).
-    This accounts for both allele frequency sharing and haplotype sharing. -/
+    This accounts for both allele frequency sharing and haplotype sharing.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldCorrelationFromMigration (M : ℝ) : ℝ :=
   M ^ 2 / (1 + M) ^ 2
 
@@ -932,7 +976,9 @@ theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
 /-- **Fst derived from heterozygosity decay.**
     Fst(t) = 1 - H(t)/H₀ = 1 - (1 - 1/(2Ne))^t.
     This is not a definition imposed from outside; it is the fractional
-    loss of heterozygosity after t generations of drift. -/
+    loss of heterozygosity after t generations of drift.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstDerived (Ne : ℝ) (t : ℕ) : ℝ :=
   1 - (1 - 1 / (2 * Ne)) ^ t
 
@@ -995,18 +1041,20 @@ theorem fstDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) (ht : 1 ≤ t)
     exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
   linarith [pow_lt_pow_left₀ h_base_lt (le_of_lt h_base₁_pos) (Nat.not_eq_zero_of_lt (by omega : 0 < t))]
 
-/-- **Consistency check: fstDerived agrees with the earlier fstFromDrift.**
+/-- **Consistency check: fstDerived agrees with the earlier heterozygosityLossFromDrift.**
     The derivation produces the same formula as the direct definition. -/
 theorem fstDerived_eq_fstFromDrift (Ne : ℝ) (t : ℕ) :
-    fstDerived Ne t = fstFromDrift t Ne := by
-  unfold fstDerived fstFromDrift
+    fstDerived Ne t = heterozygosityLossFromDrift t Ne := by
+  unfold fstDerived heterozygosityLossFromDrift
   rfl
 
 /-! ### Mutation-drift recurrence and equilibrium -/
 
 /-- **Heterozygosity recurrence with mutation.**
     Drift reduces heterozygosity by factor (1 - 1/(2N)), while mutation
-    creates new heterozygosity at rate 2μ from homozygous sites. -/
+    creates new heterozygosity at rate 2μ from homozygous sites.
+
+    Empirical status: UNTESTED. -/
 noncomputable def hetMutationDriftRecurrence (Ne mu : ℝ) (H₀ : ℝ) : ℕ → ℝ
   | 0 => H₀
   | t + 1 => (1 - 1 / (2 * Ne)) * hetMutationDriftRecurrence Ne mu H₀ t +
@@ -1153,7 +1201,9 @@ section TransientFstDerivation
     λ = (1 - 1/(2N)) × (1 - θ/(2N)).
     The first factor is drift (coalescence probability 1/(2N)),
     the second captures the approximate mutation effect:
-    two lineages both fail to mutate with probability (1-μ)² ≈ 1 - 2μ = 1 - θ/(2N). -/
+    two lineages both fail to mutate with probability (1-μ)² ≈ 1 - 2μ = 1 - θ/(2N).
+
+    Empirical status: UNTESTED. -/
 noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))
 
@@ -1188,7 +1238,9 @@ theorem hetMutationRecurrence_closed_form (lam Hstar H₀ : ℝ) (t : ℕ) :
 /-! ### Fst from heterozygosity ratio -/
 
 /-- **Transient Fst from heterozygosity ratio.**
-    Fst(t) = 1 - H(t)/H₀. -/
+    Fst(t) = 1 - H(t)/H₀.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstFromHetRatio (H H₀ : ℝ) : ℝ :=
   1 - H / H₀
 
@@ -1222,7 +1274,9 @@ theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
 /-- **Discrete transient Fst under mutation and drift.**
     Fst(t) = [1/(1+θ)] × (1 - λ^t) where λ = (1-1/(2N))(1-θ/(2N)).
     This is the exact discrete-time formula. The continuous version
-    `fstMutationDriftTransient` (using exp) is the large-Ne approximation. -/
+    `fstMutationDriftTransient` (using exp) is the large-Ne approximation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstMutationDriftTransientDiscrete (θ Ne : ℝ) (t : ℕ) : ℝ :=
   fstMutationDriftEquilibrium θ * (1 - hetDecayFactor Ne θ ^ t)
 
