@@ -1,0 +1,163 @@
+import Calibrator.TransportIdentities
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Ring
+
+namespace Calibrator
+
+noncomputable section
+
+/-!
+# Singular quadratic risk and post-hoc correction floors
+
+All statements are finite-dimensional and allow a singular second-moment
+matrix.  A pseudoinverse is not logically required: the exact excess-risk
+identity follows from any solution of the normal equations `B v = b`.
+-/
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- Quadratic risk up to an arbitrary outcome-only constant. -/
+def quadraticRisk (outcomeSecondMoment : ℝ) (B : Matrix ι ι ℝ)
+    (b w : ι → ℝ) : ℝ :=
+  outcomeSecondMoment - 2 * dot w b + dot w (B.mulVec w)
+
+/-- Symmetry of the bilinear form represented by a second-moment matrix. -/
+def IsSymmetricBilinearMatrix (B : Matrix ι ι ℝ) : Prop :=
+  ∀ x y : ι → ℝ, dot x (B.mulVec y) = dot y (B.mulVec x)
+
+theorem matrix_mulVec_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ) :
+    B.mulVec (fun i => x i - y i) =
+      fun i => B.mulVec x i - B.mulVec y i := by
+  ext i
+  simp [Matrix.mulVec, dotProduct, Finset.sum_sub_distrib]
+
+theorem matrix_mulVec_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
+    B.mulVec (c • x) = c • B.mulVec x := by
+  ext i
+  simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_comm, mul_left_comm]
+
+theorem dot_sub_right (x y z : ι → ℝ) :
+    dot x (fun i => y i - z i) = dot x y - dot x z := by
+  simp [dot, mul_sub, Finset.sum_sub_distrib]
+
+theorem dot_smul_left (c : ℝ) (x y : ι → ℝ) :
+    dot (c • x) y = c * dot x y := by
+  simp [dot, Finset.mul_sum, mul_assoc]
+
+theorem dot_smul_right (c : ℝ) (x y : ι → ℝ) :
+    dot x (c • y) = c * dot x y := by
+  simp [dot, Finset.mul_sum, mul_assoc, mul_comm, mul_left_comm]
+
+/-- The usual excess-risk identity remains exact for singular `B`.  The only
+needed fact is range compatibility, expressed directly as `B v = b`. -/
+theorem singular_quadratic_excess_risk_identity
+    (outcomeSecondMoment : ℝ) (B : Matrix ι ι ℝ)
+    (b w v : ι → ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B)
+    (hnormal : B.mulVec v = b) :
+    quadraticRisk outcomeSecondMoment B b w -
+        quadraticRisk outcomeSecondMoment B b v =
+      dot (fun i => w i - v i)
+        (B.mulVec (fun i => w i - v i)) := by
+  have hnormalDotW : dot w b = dot w (B.mulVec v) := by rw [← hnormal]
+  have hnormalDotV : dot v b = dot v (B.mulVec v) := by rw [← hnormal]
+  have hcross : dot v (B.mulVec w) = dot w (B.mulVec v) := hsymmetric v w
+  rw [quadraticRisk, quadraticRisk, hnormalDotW, hnormalDotV,
+    matrix_mulVec_sub, dot_sub_left, dot_sub_right, dot_sub_right, hcross]
+  ring
+
+/-- Positive semidefiniteness turns the singular identity into global
+optimality; uniqueness is deliberately not asserted. -/
+theorem normal_solution_minimizes_singular_quadratic_risk
+    (outcomeSecondMoment : ℝ) (B : Matrix ι ι ℝ)
+    (b v : ι → ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B)
+    (hpsd : ∀ z : ι → ℝ, 0 ≤ dot z (B.mulVec z))
+    (hnormal : B.mulVec v = b) :
+    ∀ w, quadraticRisk outcomeSecondMoment B b v ≤
+      quadraticRisk outcomeSecondMoment B b w := by
+  intro w
+  have hid := singular_quadratic_excess_risk_identity
+    outcomeSecondMoment B b w v hsymmetric hnormal
+  linarith [hpsd (fun i => w i - v i)]
+
+/-- Moving a normal-equation solution by a kernel vector produces another
+solution with exactly the same risk. -/
+theorem singular_minimizer_kernel_invariance
+    (outcomeSecondMoment : ℝ) (B : Matrix ι ι ℝ)
+    (b v k : ι → ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B)
+    (hnormal : B.mulVec v = b)
+    (hkernel : B.mulVec k = 0) :
+    B.mulVec (fun i => v i + k i) = b ∧
+      quadraticRisk outcomeSecondMoment B b (fun i => v i + k i) =
+        quadraticRisk outcomeSecondMoment B b v := by
+  have hnormalShift : B.mulVec (fun i => v i + k i) = b := by
+    ext i
+    simp [Matrix.mulVec, dotProduct, Finset.sum_add_distrib, hnormal, hkernel]
+  refine ⟨hnormalShift, ?_⟩
+  have hid := singular_quadratic_excess_risk_identity
+    outcomeSecondMoment B b (fun i => v i + k i) v hsymmetric hnormal
+  have hzero :
+      dot (fun i => (v i + k i) - v i)
+        (B.mulVec (fun i => (v i + k i) - v i)) = 0 := by
+    have hdiff : (fun i => (v i + k i) - v i) = k := by
+      funext i
+      ring
+    rw [hdiff, hkernel]
+    simp [dot]
+  linarith
+
+/-- Quadratic-form distance between two coefficient vectors. -/
+def quadraticCoefficientDistance (B : Matrix ι ι ℝ)
+    (w v : ι → ℝ) : ℝ :=
+  dot (fun i => w i - v i) (B.mulVec (fun i => w i - v i))
+
+/-- Best scalar rescaling of a deployed direction toward a target direction. -/
+def bestScalarCorrection (B : Matrix ι ι ℝ)
+    (u v : ι → ℝ) : ℝ :=
+  dot u (B.mulVec v) / dot u (B.mulVec u)
+
+/-- Irreducible quadratic risk after optimizing over scalar rescalings. -/
+def scalarCorrectionFloor (B : Matrix ι ι ℝ)
+    (u v : ι → ℝ) : ℝ :=
+  dot v (B.mulVec v) -
+    dot u (B.mulVec v) ^ 2 / dot u (B.mulVec u)
+
+/-- Completed-square identity for post-hoc scalar correction.  It gives both
+the exact optimum and the exact geometric floor. -/
+theorem scalar_correction_completed_square
+    (B : Matrix ι ι ℝ) (u v : ι → ℝ) (c : ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B)
+    (hu : dot u (B.mulVec u) ≠ 0) :
+    quadraticCoefficientDistance B (c • u) v =
+      scalarCorrectionFloor B u v +
+        dot u (B.mulVec u) * (c - bestScalarCorrection B u v) ^ 2 := by
+  have hcross : dot v (B.mulVec u) = dot u (B.mulVec v) := hsymmetric v u
+  unfold quadraticCoefficientDistance scalarCorrectionFloor bestScalarCorrection
+  rw [matrix_mulVec_sub, matrix_mulVec_smul, dot_sub_left,
+    dot_sub_right, dot_sub_right, dot_smul_left, dot_smul_right, hcross]
+  field_simp [hu]
+  ring
+
+/-- With positive variance along the deployed direction, the floor is attained
+by the reported scalar and no scalar correction can do better. -/
+theorem best_scalar_correction_attains_floor
+    (B : Matrix ι ι ℝ) (u v : ι → ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B)
+    (hu : 0 < dot u (B.mulVec u)) :
+    quadraticCoefficientDistance B (bestScalarCorrection B u v • u) v =
+        scalarCorrectionFloor B u v ∧
+      ∀ c, scalarCorrectionFloor B u v ≤
+        quadraticCoefficientDistance B (c • u) v := by
+  have hidentity := scalar_correction_completed_square B u v
+    (bestScalarCorrection B u v) hsymmetric hu.ne'
+  constructor
+  · simpa using hidentity
+  · intro c
+    rw [scalar_correction_completed_square B u v c hsymmetric hu.ne']
+    exact le_add_of_nonneg_right (mul_nonneg (le_of_lt hu) (sq_nonneg _))
+
+end
+
+end Calibrator

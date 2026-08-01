@@ -7,6 +7,7 @@ import Calibrator.AdditiveInvariance
 import Calibrator.OpenQuestions
 import Calibrator.TransportIdentities
 import Calibrator.SecondMomentShift
+import Calibrator.QuadraticShift
 import Calibrator.PortabilityBounds
 import Calibrator.MultiAncestryTheory
 import Calibrator.StratificationConfounding
