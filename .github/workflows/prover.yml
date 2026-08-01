@@ -70,141 +70,33 @@ jobs:
           curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
           
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-          
       - name: Cache Lean toolchain
         uses: actions/cache@v4
         with:
           path: ~/.elan
           key: ${{ runner.os }}-elan-${{ hashFiles('lean-toolchain') }}
           
-      - name: Cache everything Lake-related
-        id: cache-lake-all
+      - name: Cache Lake dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            .lake
-          key: ${{ runner.os }}-lake-v5-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}
+          path: .lake/packages
+          key: ${{ runner.os }}-lake-deps-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}
           restore-keys: |
-            ${{ runner.os }}-lake-v5-${{ hashFiles('lean-toolchain') }}-
-            
-      - name: Enforce manifest integrity
-        run: |
-          # Failsafe: Ensure the cache never overwrites our locked dependencies.
-          # Even if someone accidentally adds lake-manifest.json back to the cache paths,
-          # this un-does the damage immediately.
-          git restore lake-manifest.json
-            
-      - name: Verify cache completeness
-        id: check-cache
-        run: |
-          echo "🔍 Checking cache completeness..."
-          
-          # Check if .lake directory exists
-          if [ ! -d ".lake" ]; then
-            echo "valid=false" >> $GITHUB_OUTPUT
-            echo "❌ No .lake directory found"
-            exit 0
-          fi
-          
-          # Check for all expected packages and their builds
-          EXPECTED_PACKAGES=(
-            "mathlib"
-            "aesop"
-            "batteries"
-            "proofwidgets"
-            "Qq"
-            "plausible"
-            "LeanSearchClient"
-            "importGraph"
-            "Cli"
-          )
-          
-          ALL_FOUND=true
-          for pkg in "${EXPECTED_PACKAGES[@]}"; do
-            if [ ! -d ".lake/packages/$pkg" ]; then
-              echo "⚠️  Missing package: $pkg"
-              ALL_FOUND=false
-            else
-              # Check if package has build artifacts
-              if [ ! -d ".lake/packages/$pkg/.lake" ] && [ ! -d ".lake/build" ]; then
-                echo "⚠️  Missing build artifacts for: $pkg"
-                ALL_FOUND=false
-              fi
-            fi
-          done
-          
-          if [ "$ALL_FOUND" = true ]; then
-            echo "valid=true" >> $GITHUB_OUTPUT
-            echo "✅ Complete cache found with all packages and builds!"
-          else
-            echo "valid=false" >> $GITHUB_OUTPUT
-            echo "❌ Cache incomplete, will rebuild"
-          fi
-          
-      - name: Update and fetch dependencies (only if cache miss)
-        if: steps.check-cache.outputs.valid != 'true'
-        run: |
-          echo "📦 Cache miss - updating dependencies..."
-          # lake update  <-- REMOVED: Do not update dependencies, use the lockfile!
-          
+            ${{ runner.os }}-lake-deps-v1-
 
-          
-          echo "📥 Downloading mathlib cache..."
-          # The '|| true' is REMOVED. We MUST succeed in getting the cache
-          # because building Mathlib from source is not viable in CI.
-          lake exe cache get
-          
-      - name: Build all dependencies (only if cache miss)
-        if: steps.check-cache.outputs.valid != 'true'
-        run: |
-          echo "🔨 Building ALL dependencies (this will take a few minutes)..."
-          # First, ensure all dependencies are fetched (already done above, but safe to repeat)
-          # lake build --no-build || true  <-- Moved up
-          # Then build everything to populate the cache
-          lake build
-          echo "✅ All dependencies built and ready for caching!"
+      - name: Cache compiled project
+        uses: actions/cache@v4
+        with:
+          path: .lake/build
+          key: ${{ runner.os }}-gnomon-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'proofs/**/*.lean') }}
+          restore-keys: |
+            ${{ runner.os }}-gnomon-v1-
 
+      - name: Fetch precompiled dependencies
+        run: lake exe cache get
 
-      - name: 🔍 Deep Debug Information
-        if: always() # Always run this step for maximum visibility
-        run: |
-          echo "================================================="
-          echo "📄 CONFIGURATION FILES"
-          echo "================================================="
-          echo "--- lakefile.lean ---"
-          cat lakefile.lean
-          echo ""
-          echo "--- lean-toolchain ---"
-          cat lean-toolchain
-          echo "================================================="
-          echo ""
-
-          echo "================================================="
-          echo "🌳 DIRECTORY STRUCTURE"
-          echo "================================================="
-          ls -R
-          echo "================================================="
-          echo ""
-          
-          echo "================================================="
-          echo "🔬 VERBOSE BUILD LOG"
-          echo "================================================="
-          # The '-v' (verbose) flag is the most important debugging tool.
-          # It shows every command Lake runs, revealing exactly what
-          # files are (or are not) being compiled.
-          lake build -v Calibrator
-          echo "================================================="
-          echo ""
-          
-      - name: Quick build of project
-        run: |
-          echo "🚀 Building Calibrator (should be instant with cache)..."
-          lake build Calibrator
+      - name: Build project
+        run: lake build Calibrator
           
       - name: Display build statistics
         if: always()
@@ -212,14 +104,6 @@ jobs:
           echo "📊 Build Statistics:"
           echo "===================="
           echo "Build completed at: $(date -u)"
-          
-          if [ "${{ steps.check-cache.outputs.valid }}" == "true" ]; then
-            echo "✨ FAST BUILD - Used complete cache!"
-            echo "⚡ Only compiled project-specific files"
-          else
-            echo "🐌 SLOW BUILD - Had to build all dependencies"
-            echo "💾 But next build will be fast!"
-          fi
           
           # Show cache size info
           if [ -d ".lake" ]; then

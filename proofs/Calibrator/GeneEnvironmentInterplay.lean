@@ -168,8 +168,7 @@ theorem rge_difference_amplifies_portability_loss
 
 /-- **Separating genetic from environmental portability.**
     The PGS captures both genetic signal (V_direct) and rGE-mediated
-    environmental signal. Within-family estimation removes rGE,
-    isolating V_direct. We show the observed (population-level)
+    environmental signal. We show the observed (population-level)
     R² = (V_direct + V_rge) / V_P strictly exceeds the direct
     genetic R² = V_direct / V_P, so the environmental component
     V_rge / V_P is the non-portable inflation. -/
@@ -181,23 +180,6 @@ theorem total_portability_le_genetic
   constructor
   · exact div_lt_div_of_pos_right (by linarith) h_P
   · rw [← sub_div]; ring_nf
-
-/-- **Within-family PGS removes rGE.**
-    Sibling-difference or GWAS-by-subtraction removes rGE,
-    giving "direct genetic effects" that are more portable.
-    Population PGS captures V_direct + V_rge (inflated by rGE),
-    while within-family captures only V_direct. The within-family
-    PGS has lower R² but the rGE component doesn't port, so
-    within-family is more portable. -/
-theorem within_family_more_portable_less_predictive
-    (V_direct V_rge V_E : ℝ)
-    (h_dir : 0 < V_direct) (h_rge : 0 < V_rge) (h_E : 0 < V_E) :
-    -- Within-family R² < population R² (less predictive)
-    V_direct / (V_direct + V_rge + V_E) < (V_direct + V_rge) / (V_direct + V_rge + V_E) ∧
-    -- But within-family captures only portable signal (no rGE inflation)
-      0 < V_rge / (V_direct + V_rge + V_E) := by
-  have h_denom : 0 < V_direct + V_rge + V_E := by linarith
-  exact ⟨div_lt_div_of_pos_right (by linarith) h_denom, div_pos h_rge h_denom⟩
 
 end GeneEnvironmentCorrelation
 

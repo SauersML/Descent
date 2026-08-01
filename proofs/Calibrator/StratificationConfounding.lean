@@ -1,6 +1,5 @@
 import Calibrator.Probability
-import Calibrator.PortabilityDrift
-import Calibrator.OpenQuestions
+import Calibrator.PCCorrectability
 
 namespace Calibrator
 
@@ -18,7 +17,11 @@ and how this confounding interacts with portability. Key results:
 4. Collider bias in ascertained samples
 5. Gene-environment correlation and portability
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+References:
+- Zaidi and Mathieson (2020), eLife 9:e61548.
+- Blanc and Berg (2025), Genetics 230(2):iyaf071.
+- Blanc, Mawass, and Berg (2025), bioRxiv 2025.12.04.692430.
+- Wang et al. (2026), Nature Communications 17:942.
 -/
 
 
@@ -87,8 +90,7 @@ theorem stratification_bias_variance_pos {p : ℕ} (m : StratificationModel p) :
     The observed PGS variance (true + bias components, ignoring cross-term for
     independent biases) exceeds the true PGS variance, derived from the model
     structure rather than assumed. -/
-theorem stratification_inflates_pgs_variance {p : ℕ} (m : StratificationModel p)
-    (h_true : 0 < m.varTrue) :
+theorem stratification_inflates_pgs_variance {p : ℕ} (m : StratificationModel p) :
     m.varTrue < m.varTrue + m.varBias := by
   linarith [stratification_bias_variance_pos m]
 
@@ -109,7 +111,7 @@ noncomputable def TwoPopBiasModel.varBiasTarget {p : ℕ} (m : TwoPopBiasModel p
   m.attenuation * m.toStratificationModel.varBias
 
 theorem spurious_portability_from_stratification {p : ℕ} (m : TwoPopBiasModel p)
-    (r2_true : ℝ) (h_true_nn : 0 ≤ r2_true) :
+    (r2_true : ℝ) :
     -- Apparent portability drop (source_obs - target_obs) exceeds true drop (0)
     (r2_true + m.toStratificationModel.varBias) -
       (r2_true + m.varBiasTarget) > 0 := by
@@ -119,90 +121,6 @@ theorem spurious_portability_from_stratification {p : ℕ} (m : TwoPopBiasModel 
     rw [← mul_one m.toStratificationModel.varBias]
     simpa [mul_assoc] using mul_lt_mul_of_pos_right m.atten_lt_one hv
   linarith
-
-/-- **PC correction model.**
-    Ancestry covariance has eigenvalues λ₁ ≥ λ₂ ≥ ... ≥ λ_p > 0.
-    Correcting for k PCs removes variance proportional to Σ_{i≤k} λ_i.
-    Residual bias is proportional to Σ_{i>k} λ_i. -/
-structure PCCorrectionModel where
-  /-- Number of eigenvalues -/
-  p : ℕ
-  /-- Eigenvalues of ancestry covariance, in decreasing order -/
-  eigenvals : Fin p → ℝ
-  /-- All eigenvalues positive -/
-  eig_pos : ∀ i, 0 < eigenvals i
-  /-- Eigenvalues are decreasing -/
-  eig_decreasing : ∀ i j : Fin p, i < j → eigenvals j < eigenvals i
-  /-- Proportionality constant relating eigenvalues to bias -/
-  c : ℝ
-  c_pos : 0 < c
-  /-- Number of PCs used for correction -/
-  k : Fin p
-  /-- At least one eigenvalue remains after correction -/
-  k_lt : k.val + 1 < p
-
-/-- Residual bias after correcting for k PCs -/
-noncomputable def PCCorrectionModel.residualBias (m : PCCorrectionModel) : ℝ :=
-  m.c * ∑ i : Fin m.p, if m.k.val < i.val then m.eigenvals i else 0
-
-/-- Uncorrected bias (k = 0) -/
-noncomputable def PCCorrectionModel.uncorrectedBias (m : PCCorrectionModel) : ℝ :=
-  m.c * ∑ i : Fin m.p, m.eigenvals i
-
-/-- **PC correction reduces but doesn't eliminate bias.**
-    Residual bias is strictly less than uncorrected bias (because we remove
-    at least one positive eigenvalue), but strictly positive (because at
-    least one eigenvalue remains). -/
-theorem pc_correction_residual_bias (m : PCCorrectionModel) :
-    0 < m.residualBias ∧ m.residualBias < m.uncorrectedBias := by
-  unfold PCCorrectionModel.residualBias PCCorrectionModel.uncorrectedBias
-  constructor
-  · apply mul_pos m.c_pos
-    apply Finset.sum_pos'
-    · intro i _
-      split_ifs with h
-      · exact le_of_lt (m.eig_pos i)
-      · exact le_refl _
-    · refine ⟨⟨m.k.val + 1, m.k_lt⟩, Finset.mem_univ _, ?_⟩
-      simp only [show m.k.val < m.k.val + 1 from Nat.lt_succ_iff.mpr (le_refl _), ite_true]
-      exact m.eig_pos _
-  · apply mul_lt_mul_of_pos_left _ m.c_pos
-    apply Finset.sum_lt_sum
-    · intro i _
-      split_ifs with h
-      · exact le_refl _
-      · exact le_of_lt (m.eig_pos i)
-    · have hp : 0 < m.p := by
-        exact lt_trans (Nat.succ_pos m.k.val) m.k_lt
-      refine ⟨⟨0, hp⟩, Finset.mem_univ _, ?_⟩
-      simp only [show ¬(m.k.val < 0) from Nat.not_lt_zero _, ite_false]
-      exact m.eig_pos _
-
-/-- **More PCs reduce residual bias monotonically.**
-    Residual bias with k+1 PCs < residual bias with k PCs, because
-    adding a PC removes the (k+1)-th eigenvalue from the residual sum. -/
-theorem more_pcs_less_bias
-    (p : ℕ) (eigenvals : Fin p → ℝ) (c : ℝ) (k : ℕ)
-    (h_c : 0 < c)
-    (h_eig_pos : ∀ i, 0 < eigenvals i)
-    (h_k_bound : k + 2 < p) :
-    c * (∑ i : Fin p, if k + 1 < i.val then eigenvals i else 0) <
-      c * (∑ i : Fin p, if k < i.val then eigenvals i else 0) := by
-  apply mul_lt_mul_of_pos_left _ h_c
-  apply Finset.sum_lt_sum
-  · intro i _
-    split_ifs with h1 h2
-    · exact le_refl _
-    · exfalso
-      exact h2 (lt_trans (Nat.lt_succ_self k) h1)
-    · exact le_of_lt (h_eig_pos i)
-    · exact le_refl _
-  · have hk1_bound : k + 1 < p := by
-      exact lt_trans (Nat.lt_succ_self (k + 1)) h_k_bound
-    refine ⟨⟨k + 1, hk1_bound⟩, Finset.mem_univ _, ?_⟩
-    simp only [show ¬(k + 1 < k + 1) from lt_irrefl _, ite_false,
-               show k < k + 1 from Nat.lt_succ_iff.mpr (le_refl _), ite_true]
-    exact h_eig_pos _
 
 end StratificationBias
 
@@ -237,7 +155,7 @@ theorem am_inflation_gt_one (r : ℝ) (hr : 0 < r) (hr1 : r < 1) :
     even with identical genetic architecture. -/
 theorem differential_am_creates_portability_artifact
     (r_s r_t : ℝ)
-    (hrs : 0 < r_s) (hrt : 0 < r_t) (hrs1 : r_s < 1) (hrt1 : r_t < 1)
+    (hrs1 : r_s < 1)
     (h_stronger : r_t < r_s) :
     amInflationFactor r_t < amInflationFactor r_s := by
   unfold amInflationFactor
@@ -327,8 +245,6 @@ theorem collider_attenuates_association (m : ColliderModel) :
     the apparent portability drop includes an ascertainment component. -/
 theorem differential_ascertainment_artifact
     (r2_source_pop r2_target_pop r2_source_asc r2_target_asc : ℝ)
-    (h_source_asc : r2_source_asc < r2_source_pop)
-    (h_target_asc : r2_target_asc < r2_target_pop)
     -- Different ascertainment severity
     (h_diff_severity : r2_target_pop - r2_target_asc < r2_source_pop - r2_source_asc) :
     -- Apparent portability drop is larger than true portability drop
@@ -514,17 +430,6 @@ theorem survivorship_attenuates_in_older (m : SurvivorshipAttenuationModel) :
       < m.r2_full * 1 := by exact mul_lt_mul_of_pos_left h_ratio_lt_one m.r2_full_pos
     _ = m.r2_full := by ring
 
-/-- **Differential survivorship across populations creates portability artifact.**
-    If the target population has different age structure or mortality patterns,
-    survivorship bias contributes to apparent portability loss. -/
-theorem differential_survivorship_artifact
-    (r2_source_full r2_target_full Δ_surv_source Δ_surv_target : ℝ)
-    (h_surv_s : 0 ≤ Δ_surv_source) (h_surv_t : 0 ≤ Δ_surv_target)
-    (h_diff : Δ_surv_target > Δ_surv_source)
-    (h_obs_s : r2_source_full - Δ_surv_source > 0) :
-    (r2_source_full - Δ_surv_source) - (r2_target_full - Δ_surv_target) >
-      r2_source_full - r2_target_full := by
-  linarith
 
 end SurvivorshipBias
 
@@ -552,7 +457,7 @@ noncomputable def pgsAttenuationFactor (r2_gwas : ℝ) : ℝ :=
     the PGS is a noisier proxy for genetic liability. -/
 theorem attenuation_decreases_with_r2
     (r2_source r2_target : ℝ)
-    (h_s : 0 ≤ r2_source) (h_t : 0 ≤ r2_target)
+    (h_t : 0 ≤ r2_target)
     (h_drop : r2_target < r2_source) :
     pgsAttenuationFactor r2_target < pgsAttenuationFactor r2_source := by
   unfold pgsAttenuationFactor
@@ -588,7 +493,7 @@ noncomputable def AttenuationModel.β_obs (m : AttenuationModel) (r2 : ℝ) : �
   m.β_true * reliabilityRatio r2 m.σ2_noise
 
 /-- Helper: x ↦ x / (x + c) is strictly monotone for c > 0. -/
-theorem ratio_strict_mono {a b c : ℝ} (ha : 0 < a) (hb : 0 < b) (hc : 0 < c)
+theorem ratio_strict_mono {a b c : ℝ} (ha : 0 < a) (hc : 0 < c)
     (hab : a < b) : a / (a + c) < b / (b + c) := by
   have h1 : 0 < a + c := by linarith
   have h2 : 0 < b + c := by linarith
@@ -602,7 +507,7 @@ theorem noisier_proxy_more_bias (m : AttenuationModel) :
     m.β_obs m.r2_target < m.β_obs m.r2_source := by
   unfold AttenuationModel.β_obs
   apply mul_lt_mul_of_pos_left _ m.β_true_pos
-  exact ratio_strict_mono m.r2_target_pos m.r2_source_pos m.σ2_noise_pos m.r2_drop
+  exact ratio_strict_mono m.r2_target_pos m.σ2_noise_pos m.r2_drop
 
 /-- **Transportability model.**
     PGS accuracy in the target is the source accuracy minus the sum of
@@ -705,7 +610,7 @@ theorem instrument_strength_decreases (m : MRInstrumentModel)
 theorem weak_instrument_bias_increases
     (conf_bias : ℝ) (F₁ F₂ : ℝ)
     (h_conf : 0 < conf_bias)
-    (h_F₁ : 1 < F₁) (h_F₂ : 1 < F₂)
+    (h_F₂ : 1 < F₂)
     (h_weaker : F₂ < F₁) :
     (1 - 1/F₂) * conf_bias < (1 - 1/F₁) * conf_bias := by
   apply mul_lt_mul_of_pos_right _ h_conf
@@ -757,8 +662,8 @@ theorem r2_estimator_variance_pos (r2 : ℝ) (n : ℕ)
     To detect ΔR² = R²_source - R²_target at power 1-β with significance α,
     need n ≈ (z_α + z_β)² × (Var₁ + Var₂) / ΔR²². -/
 theorem larger_sample_more_power
-    (var₁ var₂ Δr2 z_sum n₁ n₂ : ℝ)
-    (h_var : 0 < var₁ + var₂) (h_Δ : 0 < Δr2)
+    (var₁ var₂ z_sum n₁ n₂ : ℝ)
+    (h_var : 0 < var₁ + var₂)
     (h_z : 0 < z_sum)
     (h_n : n₁ < n₂) (h_n₁ : 0 < n₁) :
     -- Larger sample → smaller required effect size (more power)
@@ -777,7 +682,7 @@ theorem larger_sample_more_power
     distance-on-error illustrates this. -/
 theorem small_effect_needs_large_n
     (r2_effect n_required ub : ℝ)
-    (h_small : r2_effect ≤ ub) (h_ub_pos : 0 < ub)
+    (h_small : r2_effect ≤ ub)
     (h_formula : n_required ≥ 1 / r2_effect)
     (h_effect_pos : 0 < r2_effect) :
     n_required ≥ 1 / ub := by

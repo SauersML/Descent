@@ -366,22 +366,9 @@ theorem AssortativeMatingModel.pgs_r2_inflation_eq_h2_inflation
   have hden : 1 - m.r * m.h2 ≠ 0 := by linarith [m.stability]
   field_simp [hden, ne_of_gt hR2, ne_of_gt m.h2_pos]
 
-/-- **Within-family PGS model.**
-    Within-family (e.g., sibling) PGS differences remove the
-    between-family AM component. The within-family R² reflects
-    only Mendelian segregation, not AM-induced covariance.
-
-    Population R²: R2_pop = R2_rm / (1 - r*h2)
-    Within-family R²: R2_wf = R2_rm (no AM inflation)
-    Therefore R2_wf < R2_pop. -/
-theorem AssortativeMatingModel.within_family_removes_am
-    (m : AssortativeMatingModel) (R2_rm : ℝ) (hR2 : 0 < R2_rm) :
-    R2_rm < m.pgsR2AM R2_rm :=
-  m.inflates_pgs_r2 R2_rm hR2
-
-/-- **The gap between population and within-family R² grows with AM.**
-    Stronger AM (higher r) creates a larger gap between population-level
-    and within-family PGS accuracy.
+/-- **The PGS R² inflation gap under assortative mating.**
+    Stronger AM (higher r) creates a larger gap from the random-mating
+    baseline.
     gap(r) = R2_rm * r*h2 / (1 - r*h2). -/
 noncomputable def AssortativeMatingModel.amGap
     (m : AssortativeMatingModel) (R2_rm : ℝ) : ℝ :=
@@ -579,15 +566,6 @@ theorem am_ld_zero_under_random_mating (beta_i beta_j h2 : ℝ) :
   unfold amInducedLD
   simp [mul_zero, zero_mul, zero_div]
 
-/-- **AM-LD decays rapidly when mating becomes random.**
-    After one generation of random mating, AM-LD is halved
-    (recombination breaks cross-locus correlations each generation).
-    After t generations: LD(t) = LD(0) * (1/2)^t.
-    We prove: for any LD that has decayed below half, it is less than original. -/
-theorem am_ld_one_generation_decay
-    (ld_am : ℝ) (h_pos : 0 < ld_am) :
-    (1 / 2 : ℝ) * ld_am < ld_am := by
-  nlinarith
 
 /-- **Cross-trait AM effect.**
     AM on a primary trait (e.g., education) with genetic correlation rg

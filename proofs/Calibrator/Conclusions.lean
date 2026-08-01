@@ -2,6 +2,8 @@ import Calibrator.Probability
 
 namespace Calibrator
 
+universe u
+
 open scoped InnerProductSpace
 open InnerProductSpace
 open MeasureTheory
@@ -31,9 +33,8 @@ These are NOT equal due to Jensen's inequality (sigmoid is nonlinear).
 We prove that under **Brier Score** loss (squared error on probabilities),
 the Posterior Mean strictly dominates the Mode when there's parameter uncertainty.
 
-This justifies the existence of:
-- `quadrature.rs`: Computes E[sigmoid(η)] via Gauss-Hermite integration
-- `hmc.rs`: Samples from posterior to compute the true posterior mean
+So a predictor that integrates over posterior uncertainty — by quadrature or by
+posterior sampling — is strictly preferable to plugging in the MAP estimate.
 -/
 
 section BrierScore
@@ -391,27 +392,27 @@ section OracleAndRegret
 /-! ### Oracle Comparison at Population Level -/
 
 /-- True conditional probability on feature space `Z`. -/
-abbrev TrueCondProb (Z : Type*) := Z → UnitProb
+abbrev TrueCondProb (Z : Type u) := Z → UnitProb
 
 /-- Predictor on feature space `Z`. -/
-abbrev ProbPredictor (Z : Type*) := Z → UnitProb
+abbrev ProbPredictor (Z : Type u) := Z → UnitProb
 
 /-- Population risk under Bernoulli mixing with true probability `p(z)`. -/
-noncomputable def populationRisk {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def populationRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (q : ProbPredictor Z) : ℝ :=
   ∫ z, (p z).1 * ℓ (q z).1 true + (1 - (p z).1) * ℓ (q z).1 false ∂μ
 
 /-- Population-level oracle risk over a model class `F`. -/
-noncomputable def oracleRisk {α : Type*} (R : α → ℝ) (F : Set α) : ℝ :=
+noncomputable def oracleRisk {α : Type u} (R : α → ℝ) (F : Set α) : ℝ :=
   sInf (R '' F)
 
 /-- Oracle infimum risk for a predictor class `F`. -/
-noncomputable def infRisk {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def infRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (F : Set (ProbPredictor Z)) : ℝ :=
   oracleRisk (populationRisk μ ℓ p) F
 
 /-- If your class contains the baseline class, its oracle risk is no worse. -/
-theorem oracleRisk_mono {α : Type*} (R : α → ℝ) (Fyours Fbaseline : Set α)
+theorem oracleRisk_mono {α : Type u} (R : α → ℝ) (Fyours Fbaseline : Set α)
     (hsub : Fbaseline ⊆ Fyours)
     (h_bdd : BddBelow (R '' Fyours))
     (h_nonempty_base : (R '' Fbaseline).Nonempty) :
@@ -423,7 +424,7 @@ theorem oracleRisk_mono {α : Type*} (R : α → ℝ) (Fyours Fbaseline : Set α
   exact ⟨b, hsub hb, rfl⟩
 
 /-- Reusable monotonicity lemma: if `F ⊆ G`, then `infRisk G ≤ infRisk F`. -/
-theorem infRisk_mono {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem infRisk_mono {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (F G : Set (ProbPredictor Z))
     (hFG : F ⊆ G)
     (h_bdd : BddBelow ((populationRisk μ ℓ p) '' G))
@@ -432,7 +433,7 @@ theorem infRisk_mono {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
   oracleRisk_mono (R := populationRisk μ ℓ p) (Fyours := G) (Fbaseline := F) hFG h_bdd h_nonempty
 
 /-- Strict oracle improvement from a witness in `Fyours` that beats every baseline member. -/
-theorem oracleRisk_strict_of_witness {α : Type*} (R : α → ℝ) (Fyours Fbaseline : Set α)
+theorem oracleRisk_strict_of_witness {α : Type u} (R : α → ℝ) (Fyours Fbaseline : Set α)
     (h_bdd : BddBelow (R '' Fyours))
     (h_nonempty_base : (R '' Fbaseline).Nonempty)
     (h_witness : ∃ y ∈ Fyours, ∃ ε > 0, ∀ b ∈ Fbaseline, R y + ε ≤ R b) :
@@ -452,11 +453,11 @@ theorem oracleRisk_strict_of_witness {α : Type*} (R : α → ℝ) (Fyours Fbase
   exact lt_of_le_of_lt h_left h_right
 
 /-- Bayes risk over a class: `R⋆(F) = inf_{p∈F} R(p)`. -/
-noncomputable def BayesRisk {α : Type*} (R : α → ℝ) (F : Set α) : ℝ :=
+noncomputable def BayesRisk {α : Type u} (R : α → ℝ) (F : Set α) : ℝ :=
   oracleRisk R F
 
 /-- Monotonicity under inclusion for Bayes risk. -/
-theorem BayesRisk_mono {α : Type*} (R : α → ℝ) (F G : Set α)
+theorem BayesRisk_mono {α : Type u} (R : α → ℝ) (F G : Set α)
     (hFG : F ⊆ G)
     (h_bdd : BddBelow (R '' G))
     (h_nonempty : (R '' F).Nonempty) :
@@ -541,17 +542,17 @@ theorem logLoss_regret_eq_kl_pointwise (p q : ℝ)
   ring
 
 /-- Population log-loss regret. -/
-noncomputable def logLossRegret {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def logLossRegret {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) : ℝ :=
   ∫ z, bernoulliLogLoss (p z) (q z) - bernoulliLogLoss (p z) (p z) ∂μ
 
 /-- Population Bernoulli KL certificate. -/
-noncomputable def logLossKLCertificate {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def logLossKLCertificate {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) : ℝ :=
   ∫ z, bernoulliKLReal (p z) (q z) ∂μ
 
 /-- Regret identity for log-loss at population level. -/
-theorem logLoss_regret_eq_integral_kl {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem logLoss_regret_eq_integral_kl {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ)
     (hp : ∀ z, 0 < p z ∧ p z < 1)
     (hq : ∀ z, 0 < q z ∧ q z < 1) :
@@ -563,7 +564,7 @@ theorem logLoss_regret_eq_integral_kl {Z : Type*} [MeasurableSpace Z] (μ : Meas
 
 /-- Method-agnostic main theorem:
 `R_log(q) - R_log(p) = ∫ klBernReal(p(z), q(z)) dμ`. -/
-theorem logRisk_regret_eq_expected_klBernReal {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem logRisk_regret_eq_expected_klBernReal {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : ProbPredictor Z)
     (hp : ∀ z, 0 < (p z).1 ∧ (p z).1 < 1)
     (hq : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1) :
@@ -574,7 +575,7 @@ theorem logRisk_regret_eq_expected_klBernReal {Z : Type*} [MeasurableSpace Z] (�
 
 /-- Method-comparison magnitude identity:
 the log-risk gap equals the KL-gap integral. -/
-theorem logRisk_gap_eq_integral_klGap {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem logRisk_gap_eq_integral_klGap {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p qBaseline qYours : ProbPredictor Z)
     (hp : ∀ z, 0 < (p z).1 ∧ (p z).1 < 1)
     (hqBaseline : ∀ z, 0 < (qBaseline z).1 ∧ (qBaseline z).1 < 1)
@@ -591,7 +592,7 @@ theorem logRisk_gap_eq_integral_klGap {Z : Type*} [MeasurableSpace Z] (μ : Meas
     linarith [hB, hY])
 
 /-- Corollary: nonnegativity of log-loss regret from pointwise nonnegativity of `klBernReal`. -/
-theorem logRisk_regret_nonneg {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem logRisk_regret_nonneg {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : ProbPredictor Z)
     (hp : ∀ z, 0 < (p z).1 ∧ (p z).1 < 1)
     (hq : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1) :
@@ -605,7 +606,7 @@ theorem logRisk_regret_nonneg {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
 
 /-- Corollary: strictness criterion.
 Regret is zero iff `q = p` almost everywhere, assuming pointwise KL characterization. -/
-theorem logRisk_regret_zero_iff_ae_eq {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem logRisk_regret_zero_iff_ae_eq {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : ProbPredictor Z)
     (hp : ∀ z, 0 < (p z).1 ∧ (p z).1 < 1)
     (hq : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
@@ -638,16 +639,16 @@ theorem brier_regret_pointwise (p q : ℝ) :
   ring
 
 /-- Population Brier regret. -/
-noncomputable def brierRegret {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def brierRegret {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) : ℝ :=
   ∫ z, expectedBrierScore (q z) (p z) - expectedBrierScore (p z) (p z) ∂μ
 
 /-- Population L² certificate for Brier regret. -/
-noncomputable def brierL2Certificate {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def brierL2Certificate {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) : ℝ :=
   ∫ z, (q z - p z) ^ 2 ∂μ
 
-theorem brier_regret_eq_l2_certificate {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem brier_regret_eq_l2_certificate {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) :
     brierRegret μ p q = brierL2Certificate μ p q := by
   unfold brierRegret brierL2Certificate
@@ -656,7 +657,7 @@ theorem brier_regret_eq_l2_certificate {Z : Type*} [MeasurableSpace Z] (μ : Mea
 
 /-- Method-agnostic Brier identity on `p,q : Z → [0,1]`:
 regret equals the `L²` distance. -/
-theorem brier_regret_eq_l2_probPredictor {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem brier_regret_eq_l2_probPredictor {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : ProbPredictor Z) :
     (∫ z, expectedBrierScore (q z).1 (p z).1 - expectedBrierScore (p z).1 (p z).1 ∂μ)
       = ∫ z, ((p z).1 - (q z).1) ^ 2 ∂μ := by
@@ -672,19 +673,19 @@ theorem brier_regret_eq_l2_probPredictor {Z : Type*} [MeasurableSpace Z] (μ : M
 /-! ### Clean Bayes-Optimal Target Statements -/
 
 /-- Population log-loss risk for Bernoulli truth `η`. -/
-noncomputable def logRisk {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def logRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η q : ProbPredictor Z) : ℝ :=
   ∫ z, bernoulliLogLoss (η z).1 (q z).1 ∂μ
 
 /-- Population Brier risk for Bernoulli truth `η`. -/
-noncomputable def brierRisk {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def brierRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η q : ProbPredictor Z) : ℝ :=
   ∫ z, expectedBrierScore (q z).1 (η z).1 ∂μ
 
 /-- Covariate-shift transport bound for Brier risk under a bounded density ratio.
 If `μT = w · μS` and `w(z) ≤ M`, then `R_T ≤ M · R_S`. -/
 theorem brierRisk_target_le_mul_source_of_withDensity
-    {Z : Type*} [MeasurableSpace Z]
+    {Z : Type u} [MeasurableSpace Z]
     (μS μT : Measure Z)
     (η q : ProbPredictor Z)
     (w : Z → ℝ) (M : ℝ)
@@ -738,7 +739,7 @@ theorem brierRisk_target_le_mul_source_of_withDensity
     _ = M * brierRisk μS η q := by simp [brierRisk, ℓ]
 
 /-- Log-loss Bayes-optimality: `η` minimizes risk among all measurable predictors in `[0,1]`. -/
-theorem logRisk_minimized_at_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem logRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z)
     (hη_open : ∀ z, 0 < (η z).1 ∧ (η z).1 < 1)
     (h_int_eta : Integrable (fun z => bernoulliLogLoss (η z).1 (η z).1) μ)
@@ -760,7 +761,7 @@ theorem logRisk_minimized_at_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure Z
   linarith [hreg, hsub]
 
 /-- Log-loss uniqueness: equality of risks iff equality of predictors a.e. -/
-theorem logRisk_eq_iff_ae_eq_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem logRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η q : ProbPredictor Z)
     (hη_open : ∀ z, 0 < (η z).1 ∧ (η z).1 < 1)
     (hq_open : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
@@ -790,7 +791,7 @@ theorem logRisk_eq_iff_ae_eq_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure Z
     linarith [hsub, h0]
 
 /-- Brier Bayes-optimality. -/
-theorem brierRisk_minimized_at_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem brierRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z)
     (h_int_eta : Integrable (fun z => expectedBrierScore (η z).1 (η z).1) μ)
     (h_int_q : ∀ q : ProbPredictor Z, Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μ) :
@@ -800,7 +801,7 @@ theorem brierRisk_minimized_at_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure
       = ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ := by
     exact brier_regret_eq_l2_probPredictor μ η q
   have hnonneg : 0 ≤ ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ := by
-    exact integral_nonneg (fun z => sq_nonneg ((η z).1 - (q z).1))
+    exact integral_nonneg (μ := μ) (fun z => sq_nonneg ((η z).1 - (q z).1))
   have hsub :
       (∫ z, expectedBrierScore (q z).1 (η z).1 - expectedBrierScore (η z).1 (η z).1 ∂μ)
         = brierRisk μ η q - brierRisk μ η η := by
@@ -811,7 +812,7 @@ theorem brierRisk_minimized_at_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure
   exact sub_nonneg.mp hdiff_nonneg
 
 /-- Brier uniqueness: equal risks iff predictors are equal a.e. -/
-theorem brierRisk_eq_iff_ae_eq_eta {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem brierRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η q : ProbPredictor Z)
     (h_int_eta : Integrable (fun z => expectedBrierScore (η z).1 (η z).1) μ)
     (h_int_q : Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μ)
@@ -907,12 +908,12 @@ theorem logBernoulliRisk_eq_iff (η q : ℝ)
     ring
 
 /-- Population log-risk alias: `R_log(q) = E[ℓ_log(Y,q(Z))]` with Bernoulli truth `η(Z)`. -/
-noncomputable def Rlog {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def Rlog {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η q : ProbPredictor Z) : ℝ :=
   logRisk μ η q
 
 /-- Population Brier-risk alias: `R_brier(q) = E[ℓ_brier(Y,q(Z))]`. -/
-noncomputable def Rbrier {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def Rbrier {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η q : ProbPredictor Z) : ℝ :=
   brierRisk μ η q
 
@@ -920,19 +921,19 @@ noncomputable def Rbrier {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
 
 /-- Binary-outcome population described by the conditional feature laws:
 `Z⁺ ~ law(Z|Y=1)`, `Z⁻ ~ law(Z|Y=0)`, independent. -/
-structure BinaryPopulation (Z : Type*) [MeasurableSpace Z] where
+structure BinaryPopulation (Z : Type u) [MeasurableSpace Z] where
   μpos : Measure Z
   μneg : Measure Z
 
 /-- Population AUC of a score:
 `P(s(Z⁺) > s(Z⁻)) + 1/2 P(s(Z⁺)=s(Z⁻))`. -/
-noncomputable def populationAUC {Z : Type*} [MeasurableSpace Z]
+noncomputable def populationAUC {Z : Type u} [MeasurableSpace Z]
     (pop : BinaryPopulation Z) (s : Z → ℝ) : ENNReal :=
   (pop.μpos.prod pop.μneg) {zz : Z × Z | s zz.1 > s zz.2} +
     (ENNReal.ofReal (1 / 2 : ℝ)) *
       (pop.μpos.prod pop.μneg) {zz : Z × Z | s zz.1 = s zz.2}
 
-theorem populationAUC_strictMono_invariant {Z : Type*} [MeasurableSpace Z]
+theorem populationAUC_strictMono_invariant {Z : Type u} [MeasurableSpace Z]
     (pop : BinaryPopulation Z) (s : Z → ℝ) (g : ℝ → ℝ) (hg : StrictMono g) :
     populationAUC pop (g ∘ s) = populationAUC pop s := by
   unfold populationAUC
@@ -949,7 +950,7 @@ theorem populationAUC_strictMono_invariant {Z : Type*} [MeasurableSpace Z]
   simp [h_gt, h_eq]
 
 /-- A strictly increasing transform of an AUC-optimal posterior score is also AUC-optimal. -/
-theorem populationAUC_optimal_of_eta_transform {Z : Type*} [MeasurableSpace Z]
+theorem populationAUC_optimal_of_eta_transform {Z : Type u} [MeasurableSpace Z]
     (pop : BinaryPopulation Z) (η score : Z → ℝ)
     (h_opt_eta : ∀ s : Z → ℝ, populationAUC pop s ≤ populationAUC pop η)
     (h_rep : ∃ g : ℝ → ℝ, StrictMono g ∧ score = g ∘ η) :
@@ -966,16 +967,16 @@ theorem populationAUC_optimal_of_eta_transform {Z : Type*} [MeasurableSpace Z]
 /-! ### Classwise Bayes Comparisons -/
 
 /-- Log-loss Bayes risk over a predictor class. -/
-noncomputable def logBayesRisk {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def logBayesRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z)) : ℝ :=
   BayesRisk (logRisk μ η) F
 
 /-- Brier Bayes risk over a predictor class. -/
-noncomputable def brierBayesRisk {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+noncomputable def brierBayesRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z)) : ℝ :=
   BayesRisk (brierRisk μ η) F
 
-theorem logBayesRisk_eq_eta_of_mem {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem logBayesRisk_eq_eta_of_mem {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z))
     (h_eta_mem : η ∈ F)
     (h_bdd : BddBelow ((logRisk μ η) '' F))
@@ -993,7 +994,7 @@ theorem logBayesRisk_eq_eta_of_mem {Z : Type*} [MeasurableSpace Z] (μ : Measure
       rcases hr with ⟨q, hqF, rfl⟩
       exact logRisk_minimized_at_eta μ η hη_open h_int_eta h_int_q h_q_open q
 
-theorem brierBayesRisk_eq_eta_of_mem {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem brierBayesRisk_eq_eta_of_mem {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z))
     (h_eta_mem : η ∈ F)
     (h_bdd : BddBelow ((brierRisk μ η) '' F))
@@ -1010,7 +1011,7 @@ theorem brierBayesRisk_eq_eta_of_mem {Z : Type*} [MeasurableSpace Z] (μ : Measu
       exact brierRisk_minimized_at_eta μ η h_int_eta h_int_q q
 
 /-- Non-strict full-vs-baseline comparison from class inclusion. -/
-theorem logBayesRisk_full_le_baseline {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem logBayesRisk_full_le_baseline {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (Ffull Fbase : Set (ProbPredictor Z))
     (h_sub : Fbase ⊆ Ffull)
     (h_bdd_full : BddBelow ((logRisk μ η) '' Ffull))
@@ -1019,7 +1020,7 @@ theorem logBayesRisk_full_le_baseline {Z : Type*} [MeasurableSpace Z] (μ : Meas
   exact BayesRisk_mono (R := logRisk μ η) Fbase Ffull h_sub h_bdd_full h_nonempty_base
 
 /-- Strict full-vs-baseline theorem under a margin nondegeneracy condition. -/
-theorem logBayesRisk_full_lt_baseline_of_margin {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem logBayesRisk_full_lt_baseline_of_margin {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (Ffull Fbase : Set (ProbPredictor Z))
     (h_eta_mem_full : η ∈ Ffull)
     (h_bdd_full : BddBelow ((logRisk μ η) '' Ffull))
@@ -1035,7 +1036,7 @@ theorem logBayesRisk_full_lt_baseline_of_margin {Z : Type*} [MeasurableSpace Z] 
   exact hgap q hq
 
 /-- Strict full-vs-baseline theorem for Brier loss under a margin condition. -/
-theorem brierBayesRisk_full_lt_baseline_of_margin {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem brierBayesRisk_full_lt_baseline_of_margin {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (Ffull Fbase : Set (ProbPredictor Z))
     (h_eta_mem_full : η ∈ Ffull)
     (h_bdd_full : BddBelow ((brierRisk μ η) '' Ffull))
@@ -1052,7 +1053,7 @@ theorem brierBayesRisk_full_lt_baseline_of_margin {Z : Type*} [MeasurableSpace Z
 
 /-- Proper-loss strictness wrapper (log loss):
 strict Bayes-risk improvement follows from a baseline margin witness. -/
-theorem strict_logBayesRisk_of_proper_margin {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem strict_logBayesRisk_of_proper_margin {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (Ffull Fbase : Set (ProbPredictor Z))
     (h_eta_mem_full : η ∈ Ffull)
     (h_bdd_full : BddBelow ((logRisk μ η) '' Ffull))
@@ -1064,7 +1065,7 @@ theorem strict_logBayesRisk_of_proper_margin {Z : Type*} [MeasurableSpace Z] (μ
 
 /-- Proper-loss strictness wrapper (Brier loss):
 strict Bayes-risk improvement follows from a baseline margin witness. -/
-theorem strict_brierBayesRisk_of_proper_margin {Z : Type*} [MeasurableSpace Z] (μ : Measure Z)
+theorem strict_brierBayesRisk_of_proper_margin {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (Ffull Fbase : Set (ProbPredictor Z))
     (h_eta_mem_full : η ∈ Ffull)
     (h_bdd_full : BddBelow ((brierRisk μ η) '' Ffull))
@@ -1074,10 +1075,9 @@ theorem strict_brierBayesRisk_of_proper_margin {Z : Type*} [MeasurableSpace Z] (
   brierBayesRisk_full_lt_baseline_of_margin μ η Ffull Fbase
     h_eta_mem_full h_bdd_full h_nonempty_base h_margin
 
-/-- Strict Bayes-risk improvement from an explicit truth witness and a uniform baseline margin.
-This is the proved replacement for prior closure-based placeholder assumptions. -/
+/-- Strict Bayes-risk improvement from an explicit truth witness and a uniform baseline margin. -/
 theorem BayesRisk_strict_of_truth_witness_and_margin
-    {α : Type*} (R : α → ℝ) (truth : α) (Fsmall Fbig : Set α) :
+    {α : Type u} (R : α → ℝ) (truth : α) (Fsmall Fbig : Set α) :
     truth ∈ Fbig →
     BddBelow (R '' Fbig) →
     (R '' Fsmall).Nonempty →
@@ -1091,7 +1091,7 @@ theorem BayesRisk_strict_of_truth_witness_and_margin
 
 /-- Log-loss strictness via witness+margin (proved, no axioms). -/
 theorem logBayesRisk_strict_of_eta_in_closure_not_in_baseline_closure
-    {Z : Type*} [MeasurableSpace Z]
+    {Z : Type u} [MeasurableSpace Z]
     (μ : Measure Z) (η : ProbPredictor Z) (Fbase Ffull : Set (ProbPredictor Z)) :
     η ∈ Ffull →
     BddBelow ((logRisk μ η) '' Ffull) →
@@ -1104,7 +1104,7 @@ theorem logBayesRisk_strict_of_eta_in_closure_not_in_baseline_closure
 
 /-- Brier-loss strictness via witness+margin (proved, no axioms). -/
 theorem brierBayesRisk_strict_of_eta_in_closure_not_in_baseline_closure
-    {Z : Type*} [MeasurableSpace Z]
+    {Z : Type u} [MeasurableSpace Z]
     (μ : Measure Z) (η : ProbPredictor Z) (Fbase Ffull : Set (ProbPredictor Z)) :
     η ∈ Ffull →
     BddBelow ((brierRisk μ η) '' Ffull) →
