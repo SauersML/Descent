@@ -103,6 +103,46 @@ structure Identification (α : Type u) where
   /-- Whether the obligation is discharged from a primitive. -/
   evidence : Evidence
 
+/-- **An approximation, with its target and its error made explicit.**
+
+Three of the four falsified definitions found so far were approximations
+asserted as identities. `approxPower ncp = 1 - exp (-ncp / 2)` carried a
+docstring naming the true quantity, `Φ(√ncp - z_α)`, and then defined
+something else; at genome-wide significance with `ncp = 10` it reports power
+`0.993` where the truth is `0.011`. The docstring was right and unenforced.
+
+An `Approximation` cannot be introduced without naming the target and bounding
+the distance to it. Two consequences matter. The target must be expressible,
+which forces the arguments it depends on into scope: `Φ(√ncp - z_α)` cannot be
+written without `z_α`, so an approximation of it cannot have `approxPower`'s
+signature. And the bound must be discharged or left as a visible `sorry`,
+so "we model it as" stops being free. -/
+structure Approximation where
+  /-- The expression used for computation. -/
+  formula : ℝ
+  /-- The quantity being approximated, written out in full. -/
+  target : ℝ
+  /-- A claimed bound on the discrepancy. -/
+  error : ℝ
+  /-- The obligation. -/
+  bound : |formula - target| ≤ error
+  /-- Whether the bound is discharged from a primitive. -/
+  evidence : Evidence
+
+namespace Approximation
+
+/-- An approximation may be replaced by its target at the cost of its error. -/
+theorem formula_le (a : Approximation) : a.formula ≤ a.target + a.error := by
+  have h := abs_le.mp a.bound
+  linarith [h.2]
+
+/-- And bounded below likewise. -/
+theorem le_formula (a : Approximation) : a.target - a.error ≤ a.formula := by
+  have h := abs_le.mp a.bound
+  linarith [h.1]
+
+end Approximation
+
 namespace Identification
 
 variable {α : Type u}

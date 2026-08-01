@@ -108,8 +108,10 @@ theorem hudsonFst_eq_varianceRatio (p₁ p₂ : ℝ)
     hudsonFst p₁ p₂ =
       betweenSubgroupVariance p₁ p₂ /
         (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
-  unfold hudsonFst betweenSubgroupVariance meanAlleleFreq ploidy at *
-  field_simp at h ⊢
+  have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
+  have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
+  unfold hudsonFst betweenSubgroupVariance ploidy
+  field_simp
   ring
 
 /-- **Cross-check: `simpleFst`, written separately in
@@ -117,8 +119,10 @@ theorem hudsonFst_eq_varianceRatio (p₁ p₂ : ℝ)
 theorem simpleFst_eq_hudsonFst (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
     simpleFst p₁ p₂ = hudsonFst p₁ p₂ := by
+  have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
+  have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
   unfold simpleFst hudsonFst meanAlleleFreq ploidy at *
-  field_simp at h ⊢
+  field_simp
   ring
 
 /-- **The spike constant is forced, not chosen.**
@@ -136,7 +140,6 @@ theorem four_hudsonFst_eq_standardizedContrastVariance (p₁ p₂ : ℝ)
   rw [hudsonFst_eq_varianceRatio p₁ p₂ h]
   unfold betweenSubgroupVariance
   field_simp
-  ring
 
 /-- **The spike written without any free constant.** With `F` pinned to Hudson
 `F_ST`, the rank-one signal is the contrast variance times the effective
@@ -149,7 +152,6 @@ theorem demographicSpike_eq_contrastVariance_mul_effectiveSize
         effectiveSubgroupSize n m := by
   unfold demographicSpike
   rw [← four_hudsonFst_eq_standardizedContrastVariance p₁ p₂ h]
-  ring
 
 end Differentiation
 

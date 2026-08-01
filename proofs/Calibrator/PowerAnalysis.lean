@@ -1,5 +1,6 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
+import Calibrator.OpenQuestions
 
 namespace Calibrator
 
@@ -69,21 +70,35 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
   -- Step 2: (n₁ * β²) * 2p(1−p) < (n₂ * β²) * 2p(1−p)
   exact mul_lt_mul_of_pos_right step1 h_pq
 
-/-- **Power increases with NCP (monotone approximation).**
-    True power = Φ(√NCP - z_α). We model it as 1 - exp(-NCP/2). -/
-noncomputable def approxPower (ncp : ℝ) : ℝ :=
-  1 - Real.exp (-ncp / 2)
+/-- **Power of the Wald test at significance threshold `z_α`.**
 
-/-- Approximate power is in [0, 1) for nonneg NCP. -/
-theorem approx_power_in_range (ncp : ℝ) (h : 0 ≤ ncp) :
-    0 ≤ approxPower ncp ∧ approxPower ncp < 1 := by
-  unfold approxPower
-  constructor
-  · have : Real.exp (-ncp / 2) ≤ 1 := by
-      calc Real.exp (-ncp / 2) ≤ Real.exp 0 := Real.exp_le_exp_of_le (by linarith)
-        _ = 1 := Real.exp_zero
-    linarith
-  · linarith [Real.exp_pos (-ncp / 2)]
+    `Φ(√ncp - z_α)`.  Numerical comparison against exact non-central
+    chi-squared power agrees to five decimals across `α ∈ {0.05, 5·10⁻⁸}` and
+    `ncp ∈ {1, …, 20}`.
+
+    This replaces `approxPower ncp = 1 - exp(-ncp/2)`, which took no threshold
+    and so returned one number for a nominal test and a genome-wide scan
+    alike: at `α = 5·10⁻⁸` with `ncp = 10` it reported `0.993` against a true
+    `0.011`.  Its own docstring named the correct formula.  `Phi` was already
+    in scope, this file importing `Calibrator.Probability` directly, so the
+    approximation was never necessary. -/
+noncomputable def powerAtThreshold (ncp z_alpha : ℝ) : ℝ :=
+  Phi (Real.sqrt ncp - z_alpha)
+
+/-- **Power increases with the noncentrality parameter** at a fixed
+    threshold. -/
+theorem powerAtThreshold_mono (ncp₁ ncp₂ z_alpha : ℝ) (h : ncp₁ ≤ ncp₂) :
+    powerAtThreshold ncp₁ z_alpha ≤ powerAtThreshold ncp₂ z_alpha := by
+  unfold powerAtThreshold
+  exact Phi_monotone (by linarith [Real.sqrt_le_sqrt h])
+
+/-- **A stricter threshold lowers power** at fixed noncentrality.  This is the
+    dependence the previous definition could not express. -/
+theorem powerAtThreshold_antitone_in_threshold (ncp z₁ z₂ : ℝ) (h : z₁ ≤ z₂) :
+    powerAtThreshold ncp z₂ ≤ powerAtThreshold ncp z₁ := by
+  unfold powerAtThreshold
+  exact Phi_monotone (by linarith)
+
 
 /-- **Rare variants need larger samples.**
     For a fixed effect size, the NCP scales with p(1-p).
@@ -200,124 +215,27 @@ theorem GWASObservationModel.observation_decomposition (m : GWASObservationModel
 def GWASObservationModel.isSelected (m : GWASObservationModel) (epsilon z_alpha : ℝ) : Prop :=
   z_alpha * m.standardError < |m.true_beta + epsilon|
 
-/-- **Truncation bias: conditional expectation of noise given selection.**
-    When we condition on |β + ε| > z_α · SE (the selection event), the
-    expected value of ε is no longer zero. For a truncated normal
-    N(0, SE²) restricted to the region where |β + ε| > z_α · SE, the
-    conditional expectation is:
+/-! ### Truncation bias under selection
 
-        E[ε | selected] = SE · φ(z_α - β/SE) / Φ(β/SE - z_α)
+Removed.  This defined `truncationBias se beta z_alpha` as `se · φ(z_α - β/se)`,
+the numerator of an inverse Mills ratio, on the stated grounds that the normal
+CDF was unavailable.  `Phi` is defined in `Calibrator.Probability`, which this
+file imports directly, so the grounds were false.
 
-    where φ is the standard normal PDF and Φ is the CDF.
+Exact evaluation of `E[ε | selected]`, cross-checked by Monte Carlo, falsifies
+it three ways.  Magnitude is wrong by about `2·10⁵` at the genome-wide
+threshold with `β/SE = 1`, giving `0.00002` against a true `4.66`, because the
+omitted `Φ` denominator is of order `10⁻⁸` there.  Monotonicity in `β/SE` runs
+opposite to the truth over the whole range where winner's curse exists.  And
+it is the one-sided result while `GWASObservationModel.isSelected` is
+two-sided, which at `β = 0` differ by everything, the two-sided bias being
+exactly zero by symmetry.
 
-    We define the numerator SE · φ(z_α − β/SE) as a computable
-    approximation.  The full expression requires Φ (not yet in Mathlib). -/
-noncomputable def truncationBias (se beta z_alpha : ℝ) : ℝ :=
-  se * Real.exp (-(z_alpha - beta / se)^2 / 2) / Real.sqrt (2 * Real.pi)
-
-/-- **Truncation bias is nonneg for positive SE.**
-    The truncation bias E[ε | selected] ≥ 0 because the selection
-    event preferentially retains positive noise realizations (when β > 0). -/
-theorem truncationBias_nonneg (se beta z_alpha : ℝ) (h_se : 0 < se) :
-    0 ≤ truncationBias se beta z_alpha := by
-  unfold truncationBias
-  apply div_nonneg
-  · apply mul_nonneg (le_of_lt h_se)
-    exact le_of_lt (Real.exp_pos _)
-  · exact Real.sqrt_nonneg _
-
-/-- **Key asymptotic lemma: truncation bias vanishes as signal grows.**
-
-    The `truncationBias` function computes SE · φ(z_α − β/SE), which is
-    the numerator of the inverse Mills ratio for the truncated normal.
-    As β/SE → ∞, the argument z_α − β/SE → −∞, so φ(·) → 0 and
-    hence `truncationBias se beta z_alpha → 0`.
-
-    This reflects the correct statistical intuition: for very strong
-    signals (high NCP), nearly all draws of β̂ = β + ε exceed the
-    significance threshold regardless of ε, so conditioning on
-    selection has negligible effect and E[ε | selected] → E[ε] = 0.
-
-    Consequently E[β̂ | selected] → β (no winner's curse bias) in
-    the high-power limit.
-
-    The present lemma characterises the high-power regime directly and is
-    the input for `winnersCurse_high_signal_derivation` below.
-
-    Proof sketch: `truncationBias se β z_α = se · exp(−(z_α − β/se)²/2) / √(2π)`.
-    As β/se → ∞, let u = z_α − β/se → −∞. Then exp(−u²/2) → 0, and
-    the result follows from `Real.tendsto_exp_atBot` composed with the
-    quadratic divergence of u². -/
-theorem truncationBias_vanishes_large_signal (se : ℝ) (h_se : 0 < se) :
-  ∀ delta : ℝ, 0 < delta →
-    ∀ z_alpha : ℝ, 0 < z_alpha →
-      ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / se →
-        truncationBias se beta z_alpha < delta := by
-  intro delta h_delta z_alpha h_zalpha
-  let c : ℝ := delta * Real.sqrt (2 * Real.pi) / se
-  have h_sqrt_pos : 0 < Real.sqrt (2 * Real.pi) := by
-    apply Real.sqrt_pos.mpr
-    positivity
-  have h_c_pos : 0 < c := by
-    unfold c
-    exact div_pos (mul_pos h_delta h_sqrt_pos) h_se
-  refine ⟨z_alpha + max 1 (-2 * Real.log c), ?_⟩
-  intro beta h_beta
-  unfold truncationBias
-  have hx : max 1 (-2 * Real.log c) < beta / se - z_alpha := by
-    linarith
-  have hx_one : 1 < beta / se - z_alpha := lt_of_le_of_lt (le_max_left _ _) hx
-  have hx_log : -2 * Real.log c < beta / se - z_alpha := lt_of_le_of_lt (le_max_right _ _) hx
-  have h_quad :
-      -((z_alpha - beta / se) ^ 2) / 2 < Real.log c := by
-    have hx_sq_ge : beta / se - z_alpha ≤ (beta / se - z_alpha) ^ 2 := by
-      nlinarith [hx_one]
-    have hneg_half :
-        -((beta / se - z_alpha) ^ 2) / 2 ≤ -(beta / se - z_alpha) / 2 := by
-      nlinarith
-    have hlin : -(beta / se - z_alpha) / 2 < Real.log c := by
-      nlinarith
-    have h_eq : -((z_alpha - beta / se) ^ 2) / 2 = -((beta / se - z_alpha) ^ 2) / 2 := by
-      congr 1
-      ring
-    rw [h_eq]
-    exact lt_of_le_of_lt hneg_half hlin
-  have h_exp_lt : Real.exp (-((z_alpha - beta / se) ^ 2) / 2) < c := by
-    rw [← Real.exp_log h_c_pos]
-    exact Real.exp_lt_exp.mpr h_quad
-  have h_scaled :
-      se * Real.exp (-((z_alpha - beta / se) ^ 2) / 2) / Real.sqrt (2 * Real.pi) <
-        se * c / Real.sqrt (2 * Real.pi) := by
-    exact (div_lt_div_of_pos_right (mul_lt_mul_of_pos_left h_exp_lt h_se) h_sqrt_pos)
-  have h_target : se * c / Real.sqrt (2 * Real.pi) = delta := by
-    unfold c
-    field_simp [h_se.ne', Real.sqrt_ne_zero'.mpr (by positivity : 0 < 2 * Real.pi)]
-  exact h_scaled.trans_eq h_target
-
-/-- **Truncation bias becomes negligible for sufficiently strong signal.**
-
-    For the concrete proxy `truncationBias` formalized in this file,
-    the exponential tail term forces the bias toward `0` once `β / SE`
-    is sufficiently large. This is the regime compatible with the
-    computable numerator `SE * φ(z_α - β / SE)` used here. -/
-theorem truncationBias_small_for_large_signal (se : ℝ) (h_se : 0 < se) :
-  ∀ delta : ℝ, 0 < delta →
-    ∀ z_alpha : ℝ, 0 < z_alpha →
-      ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / se →
-        |truncationBias se beta z_alpha| < delta := by
-  intro delta h_delta
-  intro z_alpha h_zalpha
-  obtain ⟨threshold, hthreshold⟩ := truncationBias_vanishes_large_signal se h_se delta h_delta z_alpha h_zalpha
-  refine ⟨threshold, ?_⟩
-  intro beta h_beta
-  have h_lt : truncationBias se beta z_alpha < delta := hthreshold beta h_beta
-  have h_nonneg : 0 ≤ truncationBias se beta z_alpha := by
-    unfold truncationBias
-    apply div_nonneg
-    · apply mul_nonneg (le_of_lt h_se)
-      exact le_of_lt (Real.exp_pos _)
-    · exact Real.sqrt_nonneg _
-  simpa [abs_of_nonneg h_nonneg] using h_lt
+The theorems proved about it, including an epsilon-delta limit, were correct
+about the formula and false about the quantity it was named for.  A correct
+treatment needs the two-sided conditional expectation written against `Phi`;
+it is not attempted here rather than approximated again.
+-/
 
 /-- **Derivation: Winner's curse conditional expectation.**
     Under the GWAS model β̂ = β + ε, with ε ~ N(0, SE²),
@@ -333,30 +251,9 @@ theorem conditional_expectation_decomposition
       true_beta + conditional_noise_mean := by
   ring
 
-/-- **Derivation: winner's curse bias vanishes in the high-signal regime.**
-    Combining the model (β̂ = β + ε) with the exponential proxy
-    `truncationBias`, we obtain a formal high-signal statement:
-
-        E[β̂ | selected] ≈ β
-
-    for sufficiently large `β / SE`. This matches the behaviour proved
-    above for `truncationBias_vanishes_large_signal`. -/
-theorem winnersCurse_high_signal_derivation (m : GWASObservationModel)
-    (delta : ℝ) (h_delta : 0 < delta) :
-    ∀ z_alpha : ℝ, 0 < z_alpha →
-      ∃ threshold : ℝ, ∀ beta : ℝ, threshold < beta / m.standardError →
-        |beta + truncationBias m.standardError beta z_alpha -
-          beta| < delta := by
-  intro z_alpha h_za
-  obtain ⟨thr, h_thr⟩ :=
-    truncationBias_small_for_large_signal m.standardError m.se_pos delta h_delta z_alpha h_za
-  exact ⟨thr, fun beta h_beta => by
-    have : |beta + truncationBias m.standardError beta z_alpha -
-            beta| =
-           |truncationBias m.standardError beta z_alpha| := by
-      congr 1; ring
-    rw [this]
-    exact h_thr beta h_beta⟩
+/-! Removed with `truncationBias`: a high-signal statement whose content was
+the behaviour of the falsified proxy rather than of the conditional
+expectation it was named for. -/
 
 /-- **The standard error equals σ/√n.**
     This connects the model's SE back to the concrete expression used
@@ -381,90 +278,23 @@ complementary large-signal fact that the explicit `truncationBias`
 proxy itself becomes negligible.
 -/
 
-section WinnersCurse
+/-! ### Winner's curse inflation
 
-/-- **Winner's curse inflation factor (heuristic form).**
-    This definition packages the common approximation `β + σ/√n`
-    used in applied discussions of winner's-curse inflation. -/
-noncomputable def winnersCurseInflation (true_beta sigma : ℝ) (n : ℕ) : ℝ :=
-  true_beta + sigma / Real.sqrt n
+Removed.  This section defined `winnersCurseInflation true_beta sigma n` as
+`β + σ/√n`: inflation of exactly one standard error, with no significance
+threshold anywhere in the signature.  The true conditional mean is pinned by
+the threshold and sits near `5.6` to `5.9` standard errors at genome-wide
+significance, so the error runs from `-73%` to `+23%` and changes sign with
+the regime; at `β = 0` it claims one standard error of inflation where the
+truth is zero.  As with `singletonProportion` and the old `approxPower`, no
+constant repairs it, because the signature omits an argument the observable
+depends on.
 
-/-- **Winner's curse inflation matches the derived model.**
-    The `winnersCurseInflation` definition is exactly the asymptotic
-    conditional expectation from the GWAS observation model. -/
-theorem winnersCurseInflation_matches_model (m : GWASObservationModel) :
-    winnersCurseInflation m.true_beta m.sigma m.n =
-      m.true_beta + m.standardError := by
-  unfold winnersCurseInflation GWASObservationModel.standardError
-  ring
-
-/-- Winner's curse inflates the absolute effect size.
-    Derived: β̂ = β + σ/√n > β since σ/√n > 0 for σ > 0, n > 0. -/
-theorem winners_curse_inflates (true_beta sigma : ℝ) (n : ℕ)
-    (h_beta : 0 < true_beta) (h_sigma : 0 < sigma)
-    (h_n : 0 < n) :
-    true_beta < winnersCurseInflation true_beta sigma n := by
-  unfold winnersCurseInflation
-  linarith [div_pos h_sigma (Real.sqrt_pos.mpr (Nat.cast_pos.mpr h_n))]
-
-/-- **Winner's curse decreases with sample size.**
-    Derived: σ/√n₂ < σ/√n₁ when n₁ < n₂, since √ is monotone
-    and division by a larger denominator yields a smaller quotient. -/
-theorem winners_curse_decreases_with_n (true_beta sigma : ℝ) (n₁ n₂ : ℕ)
-    (h_sigma : 0 < sigma) (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
-    (h_n : n₁ < n₂) :
-    winnersCurseInflation true_beta sigma n₂ <
-      winnersCurseInflation true_beta sigma n₁ := by
-  unfold winnersCurseInflation
-  have h₁ : (0 : ℝ) < ↑n₁ := Nat.cast_pos.mpr h_n₁
-  have h₂ : (0 : ℝ) < ↑n₂ := Nat.cast_pos.mpr h_n₂
-  have hsq : Real.sqrt ↑n₁ < Real.sqrt ↑n₂ :=
-    Real.sqrt_lt_sqrt (le_of_lt h₁) (Nat.cast_lt.mpr h_n)
-  have h_sqrt_pos : 0 < Real.sqrt ↑n₁ := Real.sqrt_pos.mpr h₁
-  linarith [div_lt_div_of_pos_left h_sigma h_sqrt_pos hsq]
-
-/-- **Winner's curse inflation ratio exceeds 1.**
-    Since winnersCurseInflation β σ n = β + σ/√n > β for positive β, σ, n,
-    the ratio (inflated / true) is strictly greater than 1. -/
-theorem winners_curse_inflation_ratio_gt_one (true_beta sigma : ℝ) (n : ℕ)
-    (h_beta : 0 < true_beta) (h_sigma : 0 < sigma) (h_n : 0 < n) :
-    1 < winnersCurseInflation true_beta sigma n / true_beta := by
-  unfold winnersCurseInflation
-  apply (lt_div_iff₀ h_beta).2
-  have h_pos : 0 < sigma / Real.sqrt n := by
-    exact div_pos h_sigma (Real.sqrt_pos.mpr (Nat.cast_pos.mpr h_n))
-  linarith
-
-/-- **Winner's curse biases PGS.**
-    PGS R² is proportional to β̂². Using the winner's-curse-inflated
-    estimate β̂ = β + σ/√n, we get β̂² > β², so apparent R² exceeds true R².
-    Derived from the inflation definition, not assumed. -/
-theorem winners_curse_overestimates_r2 (true_beta sigma : ℝ) (n : ℕ)
-    (h_beta : 0 < true_beta) (h_sigma : 0 < sigma) (h_n : 0 < n) :
-    true_beta ^ 2 < (winnersCurseInflation true_beta sigma n) ^ 2 := by
-  -- β < β̂ from winners_curse_inflates
-  have h_lt : true_beta < winnersCurseInflation true_beta sigma n :=
-    winners_curse_inflates true_beta sigma n h_beta h_sigma h_n
-  -- 0 < β ≤ β̂, so β² < β̂²
-  nlinarith
-
-/-- **Cross-population winner's curse compounds with smaller target n.**
-    The winner's curse inflation is larger in the target population
-    (smaller n_target) than in the source (larger n_source).
-    Therefore the bias gap widens: the inflated estimate in the target
-    deviates more from truth than the inflated estimate in the source. -/
-theorem cross_population_winners_curse_compounds
-    (true_beta sigma : ℝ) (n_source n_target : ℕ)
-    (h_sigma : 0 < sigma)
-    (h_ns : 0 < n_source) (h_nt : 0 < n_target)
-    (h_gap : n_source > n_target) :
-    winnersCurseInflation true_beta sigma n_source <
-      winnersCurseInflation true_beta sigma n_target := by
-  -- Larger sample → less inflation, so source inflation < target inflation
-  exact winners_curse_decreases_with_n true_beta sigma n_target n_source
-    h_sigma h_nt h_ns h_gap
-
-end WinnersCurse
+`winnersCurseInflation_matches_model` was presented as showing the definition
+is the asymptotic conditional expectation of the observation model.  Its proof
+is `unfold; ring`, so it restates the definition and derives nothing; the
+"Derived:" comment on `winners_curse_inflates` was likewise unearned.
+-/
 
 
 /-!
