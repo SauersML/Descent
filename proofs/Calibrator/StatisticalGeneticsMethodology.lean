@@ -55,6 +55,8 @@ noncomputable def incrementalR2 (r2_full r2_covariates : ℝ) : ℝ :=
 theorem incremental_r2_nonneg
     (rss_full rss_cov tss : ℝ)
     (h_tss : 0 < tss)
+    (h_rss_full : 0 ≤ rss_full)
+    (h_rss_cov : 0 ≤ rss_cov)
     -- Nested model property: full model has no more residual than submodel
     (h_nested : rss_full ≤ rss_cov) :
     let r2_full := 1 - rss_full / tss

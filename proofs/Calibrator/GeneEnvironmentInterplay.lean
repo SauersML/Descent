@@ -93,8 +93,8 @@ theorem portability_bounded_by_genetic_correlation
     that in the low-carb environment. -/
 theorem diet_genetics_bmi_example
     (β_G β_GxE E_low E_high : ℝ)
-    (h_β_GxE : 0 < β_GxE)
-    (h_E_high : E_low < E_high) :
+    (h_β_G : 0 < β_G) (h_β_GxE : 0 < β_GxE)
+    (h_E_low : 0 < E_low) (h_E_high : E_low < E_high) :
     effectiveGeneticEffect β_G β_GxE E_low <
       effectiveGeneticEffect β_G β_GxE E_high := by
   unfold effectiveGeneticEffect
@@ -152,6 +152,7 @@ theorem rge_inflates_pgs_r2
 theorem rge_difference_amplifies_portability_loss
     (r2_g r2_e rge_source rge_target : ℝ)
     (h_g : 0 < r2_g) (h_e : 0 < r2_e)
+    (h_rge_s : 0 < rge_source) (h_rge_t : 0 ≤ rge_target)
     (h_rge_diff : rge_target < rge_source) :
     let inflation_s := 2 * rge_source * Real.sqrt (r2_g * r2_e)
     let inflation_t := 2 * rge_target * Real.sqrt (r2_g * r2_e)
@@ -168,7 +169,7 @@ theorem rge_difference_amplifies_portability_loss
     V_rge / V_P is the non-portable inflation. -/
 theorem total_portability_le_genetic
     (V_direct V_rge V_P : ℝ)
-    (h_rge : 0 < V_rge) (h_P : 0 < V_P) :
+    (h_dir : 0 < V_direct) (h_rge : 0 < V_rge) (h_P : 0 < V_P) :
     V_direct / V_P < (V_direct + V_rge) / V_P ∧
     (V_direct + V_rge) / V_P - V_direct / V_P = V_rge / V_P := by
   constructor
@@ -191,7 +192,7 @@ section EnvironmentalVariance
     h² = V_A / (V_A + V_E). More environmental variance → lower h². -/
 theorem env_variance_reduces_h2
     (V_A V_E₁ V_E₂ : ℝ)
-    (h_VA : 0 < V_A) (h_VE₁ : 0 < V_E₁)
+    (h_VA : 0 < V_A) (h_VE₁ : 0 < V_E₁) (h_VE₂ : 0 < V_E₂)
     (h_more_env : V_E₁ < V_E₂) :
     V_A / (V_A + V_E₂) < V_A / (V_A + V_E₁) := by
   exact div_lt_div_of_pos_left h_VA (by linarith) (by linarith)
@@ -202,7 +203,7 @@ theorem env_variance_reduces_h2
     the denominator is larger, so h² is lower. -/
 theorem pgs_ceiling_lower_in_high_env_variance
     (V_A V_E_low V_E_high : ℝ)
-    (h_VA : 0 < V_A) (h_low : 0 < V_E_low)
+    (h_VA : 0 < V_A) (h_low : 0 < V_E_low) (h_high : 0 < V_E_high)
     (h_more_env : V_E_low < V_E_high) :
     V_A / (V_A + V_E_high) < V_A / (V_A + V_E_low) := by
   exact div_lt_div_of_pos_left h_VA (by linarith) (by linarith)
@@ -214,7 +215,8 @@ theorem pgs_ceiling_lower_in_high_env_variance
     = (1 - R²)(V_A + V_E). When V_E differs, residuals differ. -/
 theorem heteroscedastic_residuals
     (V_A V_E₁ V_E₂ R2 : ℝ)
-    (h_R2_lt : R2 < 1)
+    (h_VA : 0 < V_A) (h_VE₁ : 0 < V_E₁) (h_VE₂ : 0 < V_E₂)
+    (h_R2 : 0 < R2) (h_R2_lt : R2 < 1)
     (h_env_diff : V_E₁ ≠ V_E₂) :
     (1 - R2) * (V_A + V_E₁) ≠ (1 - R2) * (V_A + V_E₂) := by
   intro h
@@ -349,7 +351,7 @@ theorem portability_gap_ate_nonneg
 theorem portability_gap_decomposition
     (V_genetic V_env V_E : ℝ)
     (loss_genetic loss_env : ℝ)
-    (h_VE : 0 < V_E)
+    (h_Vg : 0 < V_genetic) (h_Ve : 0 < V_env) (h_VE : 0 < V_E)
     (h_lg : 0 < loss_genetic) (h_lg_le : loss_genetic < V_genetic)
     (h_le : 0 < loss_env) (h_le_le : loss_env < V_env) :
     let V_P := V_genetic + V_env + V_E

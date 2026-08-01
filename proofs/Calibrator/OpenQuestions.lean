@@ -482,7 +482,8 @@ theorem neutral_beats_immune
 theorem drift_only_overestimates_immune_portability
     (V_A V_E fstS fstT ρ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfstT : fstT < 1)
+    (hfstS : 0 ≤ fstS) (hfstT : fstT < 1)
+    (hfst : fstS < fstT)
     (hρ_pos : 0 < ρ) (hρ_lt : ρ < 1) :
     expectedR2 (ρ ^ 2 * presentDayPGSVariance V_A fstT) V_E <
       expectedR2 (presentDayPGSVariance V_A fstT) V_E := by

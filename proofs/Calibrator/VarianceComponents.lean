@@ -77,7 +77,8 @@ theorem snp_h2_le_narrow_h2
 theorem missing_heritability_gap
     (V_A_tagged V_A_untagged V_D V_I V_E : ℝ)
     (h_tagged_nn : 0 ≤ V_A_tagged) (h_untagged_pos : 0 < V_A_untagged)
-    (h_D : 0 ≤ V_D) (h_I : 0 ≤ V_I) (h_E : 0 ≤ V_E) :
+    (h_D : 0 ≤ V_D) (h_I : 0 ≤ V_I) (h_E : 0 ≤ V_E)
+    (h_total : 0 < V_A_tagged + V_A_untagged + V_D + V_I + V_E) :
     let V_P := V_A_tagged + V_A_untagged + V_D + V_I + V_E
     let h2_twin := (V_A_tagged + V_A_untagged) / V_P
     let h2_snp := V_A_tagged / V_P
@@ -130,6 +131,8 @@ theorem additive_variance_nonneg
     the contribution to V_A changes. -/
 theorem frequency_change_affects_va
     (p₁ p₂ α : ℝ)
+    (h₁ : 0 < p₁) (h₁' : p₁ < 1)
+    (h₂ : 0 < p₂) (h₂' : p₂ < 1)
     (h_freq : p₁ ≠ p₂) (h_α : α ≠ 0)
     (h_sum : p₁ + p₂ ≠ 1) :
     2 * p₁ * (1 - p₁) * α ^ 2 ≠ 2 * p₂ * (1 - p₂) * α ^ 2 := by
@@ -147,7 +150,7 @@ theorem frequency_change_affects_va
     If Ve differs, h² differs even with identical genetic architecture. -/
 theorem env_variance_changes_h2
     (V_A Ve₁ Ve₂ : ℝ)
-    (hVA : 0 < V_A) (hVe₁ : 0 < Ve₁)
+    (hVA : 0 < V_A) (hVe₁ : 0 < Ve₁) (hVe₂ : 0 < Ve₂)
     (h_diff : Ve₁ < Ve₂) :
     V_A / (V_A + Ve₂) < V_A / (V_A + Ve₁) := by
   exact div_lt_div_of_pos_left hVA (by linarith) (by linarith)
@@ -207,7 +210,7 @@ theorem pgs_r2_ceiling_from_gwas_power
     R²_PGS_target ≤ h²_SNP × power_fraction × portability_ratio. -/
 theorem portability_reduces_ceiling
     (h2_snp power_frac port_ratio : ℝ)
-    (h_h2 : 0 < h2_snp) (h_port : 0 < port_ratio)
+    (h_h2 : 0 < h2_snp) (h_power : 0 < power_frac) (h_port : 0 < port_ratio)
     (h_power_le : power_frac ≤ 1) (h_port_le : port_ratio ≤ 1) :
     h2_snp * power_frac * port_ratio ≤ h2_snp := by
   calc h2_snp * power_frac * port_ratio
@@ -226,7 +229,7 @@ theorem three_way_ceiling
     (h2 gwas_power port_ratio target_r2 : ℝ)
     (h_h2_le : h2 ≤ 1) (h_power_le : gwas_power ≤ 1)
     (h_port_le : port_ratio ≤ 1)
-    (h_h2_nn : 0 ≤ h2) (h_power_nn : 0 ≤ gwas_power)
+    (h_h2_nn : 0 ≤ h2) (h_power_nn : 0 ≤ gwas_power) (h_port_nn : 0 ≤ port_ratio)
     (h_bound : target_r2 ≤ h2 * gwas_power * port_ratio) :
     target_r2 ≤ 1 := by
   have : h2 * gwas_power * port_ratio ≤ 1 := by
@@ -298,7 +301,7 @@ theorem greml_underestimates_with_poor_tagging
     (V_A + V_strat)/V_P > V_A/V_P when V_P > 0. -/
 theorem stratification_inflates_greml
     (V_A V_strat V_E : ℝ)
-    (h_strat_pos : 0 < V_strat)
+    (h_VA : 0 ≤ V_A) (h_strat_pos : 0 < V_strat) (h_VE : 0 ≤ V_E)
     (h_total : 0 < V_A + V_strat + V_E) :
     let V_P := V_A + V_strat + V_E
     let h2_true := V_A / V_P

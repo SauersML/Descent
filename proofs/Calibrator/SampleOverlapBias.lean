@@ -134,7 +134,8 @@ theorem corrected_portability_better
     (r2_cross r2_same_true overlap_bias : ℝ)
     (h_cross_pos : 0 < r2_cross)
     (h_same_pos : 0 < r2_same_true)
-    (h_bias_pos : 0 < overlap_bias) :
+    (h_bias_pos : 0 < overlap_bias)
+    (h_cross_le : r2_cross < r2_same_true) :
     -- apparent portability < true portability
     r2_cross / (r2_same_true + overlap_bias) < r2_cross / r2_same_true := by
   apply div_lt_div_of_pos_left h_cross_pos h_same_pos
@@ -229,6 +230,8 @@ theorem kinship_inflates (r2_true K h2_family : ℝ)
 theorem grm_threshold_tradeoff
     (r2_true h2_family K_strict K_lenient : ℝ)
     (h_strict_lt : K_strict < K_lenient)
+    (h_strict_pos : 0 < K_strict)
+    (h_lenient_pos : 0 < K_lenient)
     (h_h2_pos : 0 < h2_family) :
     -- Stricter threshold gives smaller kinship inflation
     kinshipInflation r2_true K_strict h2_family <

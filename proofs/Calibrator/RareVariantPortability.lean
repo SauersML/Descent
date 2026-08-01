@@ -49,6 +49,7 @@ section RareVariantSpecificity
 theorem ultra_rare_not_shared
     (Ne p : ℝ)
     (h_Ne : 0 < Ne)
+    (h_p : 0 < p)
     (h_ultra_rare : p < 1 / (2 * Ne)) :
     -- sharing_prob = 2 * Ne * p (coalescent approximation) is < 1
     2 * Ne * p < 1 := by
@@ -200,7 +201,7 @@ theorem common_component_more_portable
     (h_β : β ≠ 0)
     (h_pc : 0 < p_common) (h_pc1 : p_common < 1)
     (h_pr : 0 < p_rare) (h_pr1 : p_rare < 1)
-    (h_sr : 0 < s_rare)
+    (h_sc : 0 < s_common) (h_sr : 0 < s_rare)
     (h_freq : p_rare < p_common) (h_half : p_common ≤ 1/2)
     (h_sharing : s_rare ≤ s_common) :
     β ^ 2 * (2 * p_rare * (1 - p_rare)) * s_rare ≤
@@ -304,7 +305,8 @@ section EffectSizeDistribution
     the expected effect size is larger. -/
 theorem negative_selection_constraint
     (maf_rare maf_common : ℝ)
-    (h_common_lt : maf_common ≤ 1/2)
+    (h_rare_pos : 0 < maf_rare) (h_rare_lt : maf_rare < 1)
+    (h_common_pos : 0 < maf_common) (h_common_lt : maf_common ≤ 1/2)
     (h_rare_maf : maf_rare < maf_common) :
     -- Heterozygosity is smaller for rarer variants (when both ≤ 1/2)
     2 * maf_rare * (1 - maf_rare) < 2 * maf_common * (1 - maf_common) := by

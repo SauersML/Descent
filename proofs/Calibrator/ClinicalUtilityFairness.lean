@@ -130,6 +130,7 @@ theorem liabilitySensitivity_zScore_monotone_in_R
     (m : LiabilityThresholdModel) (T' : ℝ)
     (R₁ R₂ : ℝ) (hR₁ : 0 ≤ R₁) (hR₂ : R₂ ≤ 1)
     (hR : R₁ < R₂)
+    (hR2₁ : 0 ≤ R₁ ^ 2) (hR2₂ : R₂ ^ 2 ≤ 1)
     -- σ_resid is positive at R₂ (the tighter bound)
     (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq)))
     -- The z-score numerator is nonneg at the lower R value.
@@ -566,8 +567,9 @@ theorem treat_all_net_benefit (π t : ℝ) :
 theorem pgs_useful_when_exceeds_treat_all
     (sens spec π n t : ℝ)
     (hn : 0 < n) (ht : 0 < t) (ht1 : t < 1)
-    (h_π : 0 < π)
+    (h_π : 0 < π) (h_π1 : π < 1)
     (h_sens : 0 < sens) (h_sens1 : sens ≤ 1)
+    (h_spec : 0 < spec) (h_spec1 : spec ≤ 1)
     -- Positive Youden's index: classifier is better than random
     (h_youden : 1 < sens + spec)
     -- Treatment threshold exceeds prevalence (selective-treatment regime)
@@ -641,7 +643,10 @@ theorem portability_narrows_useful_range
     (h_sens_num_nonneg :
       0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
     (h_spec_num_nonneg :
-      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control) :
+      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control)
+    (h_sens_t : 0 ≤ sensFromR2 m r2_target T')
+    (h_spec_t : 0 ≤ specFromR2 m r2_target T' μ_control)
+    (h_spec_s1 : specFromR2 m r2_source T' μ_control ≤ 1) :
     decisionCurveNetBenefit (sensFromR2 m r2_target T' * π)
         ((1 - specFromR2 m r2_target T' μ_control) * (1 - π)) 1 t <
       decisionCurveNetBenefit (sensFromR2 m r2_source T' * π)
@@ -767,7 +772,8 @@ theorem portability_violates_equalized_odds
 theorem fairness_accuracy_tradeoff
     (sens_B_unconstrained sens_B_fair fp_B n t : ℝ)
     (h_sens_drop : sens_B_fair < sens_B_unconstrained)
-    (hn : 0 < n) :
+    (hn : 0 < n) (ht : 0 < t) (ht1 : t < 1)
+    (h_fp : 0 ≤ fp_B) :
     decisionCurveNetBenefit sens_B_fair fp_B n t <
       decisionCurveNetBenefit sens_B_unconstrained fp_B n t := by
   repeat rw [decisionCurveNetBenefit_eq_formula]
@@ -797,8 +803,8 @@ noncomputable def proportionCorrectlyClassified
 
 /-- PCC is bounded by max(prevalence, 1-prevalence) from below. -/
 theorem pcc_lower_bound (sens spec π : ℝ)
-    (h_sens : 0 ≤ sens)
-    (h_spec : 0 ≤ spec)
+    (h_sens : 0 ≤ sens) (h_sens1 : sens ≤ 1)
+    (h_spec : 0 ≤ spec) (h_spec1 : spec ≤ 1)
     (h_π : 0 < π) (h_π1 : π < 1) :
     0 ≤ proportionCorrectlyClassified sens spec π := by
   unfold proportionCorrectlyClassified
@@ -862,8 +868,9 @@ section CostEffectiveness
 theorem qaly_gain_positive_condition
     (sens spec π benefit harm : ℝ)
     (h_π : 0 < π) (h_π1 : π < 1)
-    (h_sens : 0 < sens)
-    (h_harm : 0 < harm)
+    (h_sens : 0 < sens) (h_sens1 : sens ≤ 1)
+    (h_spec : 0 < spec) (h_spec1 : spec < 1)
+    (h_benefit : 0 < benefit) (h_harm : 0 < harm)
     -- True positive probability exceeds false positive probability
     -- (equivalent to positive predictive value > 50%, or LR+ × prevalence odds > 1)
     (h_tp_dominates : (1 - spec) * (1 - π) < sens * π)
@@ -894,7 +901,9 @@ theorem lower_portability_lower_cost_effectiveness
     (sens_s spec_s sens_t spec_t π benefit harm : ℝ)
     (h_sens : sens_t < sens_s) (h_spec : spec_t < spec_s)
     (h_π : 0 < π) (h_π1 : π < 1)
-    (h_benefit : 0 < benefit) (h_harm : 0 < harm) :
+    (h_benefit : 0 < benefit) (h_harm : 0 < harm)
+    (h_sens_t : 0 ≤ sens_t) (h_spec_t : 0 ≤ spec_t)
+    (h_spec_s1 : spec_s ≤ 1) :
     screeningQalyGain sens_t spec_t π benefit harm <
       screeningQalyGain sens_s spec_s π benefit harm := by
   repeat rw [screeningQalyGain_eq_formula]
@@ -911,8 +920,8 @@ theorem lower_portability_lower_cost_effectiveness
     If the R² is too low, the QALY gain is negative (more harm than benefit). -/
 theorem cost_effectiveness_threshold_exists
     (π benefit harm : ℝ)
-    (h_π1 : π < 1)
-    (h_harm : 0 < harm) :
+    (h_π : 0 < π) (h_π1 : π < 1)
+    (h_benefit : 0 < benefit) (h_harm : 0 < harm) :
     -- At zero sensitivity, QALY gain is negative
     screeningQalyGain 0 0 π benefit harm < 0 := by
   rw [screeningQalyGain_eq_formula]
@@ -1069,6 +1078,10 @@ theorem marginal_value_highest_for_underserved
     to a concrete clinical consequence via the qalyGain definition. -/
 theorem minimum_sample_for_clinical_pgs
     (sens spec π benefit harm : ℝ)
+    (h_π : 0 < π) (h_π1 : π < 1)
+    (h_benefit : 0 < benefit) (h_harm : 0 < harm)
+    (h_sens : 0 ≤ sens) (h_sens1 : sens ≤ 1)
+    (h_spec : 0 ≤ spec) (h_spec1 : spec ≤ 1)
     -- The key clinical condition: discrimination is too poor, so
     -- false positive harm exceeds true positive benefit
     (h_poor_disc : sens * π * benefit < (1 - spec) * (1 - π) * harm) :

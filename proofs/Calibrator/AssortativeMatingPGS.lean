@@ -110,8 +110,8 @@ theorem AssortativeMatingModel.variance_exceeds_random (m : AssortativeMatingMod
 /-- Standalone version: AM equilibrium variance exceeds random mating variance. -/
 theorem am_variance_exceeds_random
     (V_A r h2 : ℝ)
-    (h_VA : 0 < V_A) (h_r : 0 < r)
-    (h_h2 : 0 < h2)
+    (h_VA : 0 < V_A) (h_r : 0 < r) (h_r_le : r < 1)
+    (h_h2 : 0 < h2) (h_h2_le : h2 < 1)
     (h_product : r * h2 < 1) :
     V_A < amEquilibriumVariance V_A r h2 := by
   unfold amEquilibriumVariance
@@ -127,7 +127,7 @@ theorem AssortativeMatingModel.variance_finite (m : AssortativeMatingModel) :
 /-- Standalone version. -/
 theorem am_variance_finite
     (V_A r h2 : ℝ)
-    (h_VA : 0 < V_A) (h_product : r * h2 < 1) :
+    (h_VA : 0 < V_A) (h_product : r * h2 < 1) (h_product_nn : 0 ≤ r * h2) :
     0 < amEquilibriumVariance V_A r h2 := by
   unfold amEquilibriumVariance
   exact div_pos h_VA (by linarith)
@@ -330,10 +330,10 @@ noncomputable def amCorrectedPortability
     (1-r_s*h2)/(1-r_t*h2) < 1 when r_s > r_t. -/
 theorem am_correction_increases_portability
     (port_m r_s r_t h2 : ℝ)
-    (h_port : 0 < port_m) (h_rt : 0 ≤ r_t)
-    (h_h2 : 0 < h2)
+    (h_port : 0 < port_m) (h_rs : 0 < r_s) (h_rt : 0 ≤ r_t)
+    (h_h2 : 0 < h2) (h_h2_le : h2 < 1) (h_rs_le : r_s < 1)
     (h_more_am : r_t < r_s)
-    (h_product_t : r_t * h2 < 1) :
+    (h_product_s : r_s * h2 < 1) (h_product_t : r_t * h2 < 1) :
     amCorrectedPortability port_m r_s r_t h2 < port_m := by
   unfold amCorrectedPortability
   have h_denom : 0 < 1 - r_t * h2 := by nlinarith [mul_nonneg h_rt (le_of_lt h_h2)]
@@ -417,6 +417,8 @@ theorem CrossPopAMLD.source_ld_exceeds_target (c : CrossPopAMLD)
     when r_t < r_s. -/
 theorem am_ld_breaks_cross_population
     (r_s r_t h2 : ℝ)
+    (h_rs : 0 < r_s) (h_rt : 0 < r_t) (h_h2 : 0 < h2)
+    (h_stab_s : r_s * h2 < 1) (h_stab_t : r_t * h2 < 1)
     (h_more : r_t < r_s) :
     r_t * (1 - r_s * h2) < r_s * (1 - r_t * h2) := by
   nlinarith
