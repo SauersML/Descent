@@ -529,6 +529,50 @@ theorem neutralPortability_uses_ploidy (r2_0 fst : ℝ) :
     neutralPortability r2_0 fst = r2_0 * (1 - ploidy * fst) := by
   unfold neutralPortability ploidy; ring
 
+/-! ### The last entangled uses
+
+These carry the convention inside a larger expression. A relation still ties
+them down; no definition needs rewriting. -/
+
+theorem selectedDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) (s_correction : ℝ) :
+    selectedDriftFactor Ne t s_correction
+      = (1 - 1 / coalescentTimeScale Ne + s_correction) ^ t := by
+  unfold selectedDriftFactor; rw [coalescentTimeScale_eq]
+
+theorem SplitMigrationModel_scaledMigration_eq_ploidy_form
+    (m : SplitMigrationModel) :
+    SplitMigrationModel.scaledMigration m = 2 * ploidy * m.Ne * m.mig := by
+  unfold SplitMigrationModel.scaledMigration ploidy; ring
+
+theorem fstMigDriftNext_uses_timeScale (Ne m Fst : ℝ) :
+    fstMigDriftNext Ne m Fst
+      = (1 - 2 * m - 1 / coalescentTimeScale Ne) * Fst
+        + 1 / coalescentTimeScale Ne := by
+  unfold fstMigDriftNext; rw [coalescentTimeScale_eq]
+
+theorem stabilizingPortability_uses_ploidy (r2_0 fst strength : ℝ) :
+    stabilizingPortability r2_0 fst strength
+      = r2_0 * (1 - ploidy * fst) * Real.exp (-strength * fst) := by
+  unfold stabilizingPortability ploidy; ring_nf
+
+theorem ibdFst_eq_ploidy_form (d N sigma_sq : ℝ) :
+    ibdFst d N sigma_sq = d / (2 * ploidy * N * sigma_sq + d) := by
+  unfold ibdFst ploidy; ring_nf
+
+theorem EvolutionaryParameters_tau_uses_timeScale (p : EvolutionaryParameters) :
+    EvolutionaryParameters.tau p = p.t_div / coalescentTimeScale p.Ne := by
+  unfold EvolutionaryParameters.tau; rw [coalescentTimeScale_eq]
+
+theorem sharedLDRetention_uses_ploidy (p : EvolutionaryParameters) :
+    sharedLDRetention p = Real.exp (-ploidy * p.recomb * p.t_div) := by
+  unfold sharedLDRetention ploidy; ring_nf
+
+theorem demoSteppingStoneFst_eq_scaled (d Ne m σ_sq : ℝ) :
+    demoSteppingStoneFst d Ne m σ_sq
+      = d / (d + scaledMigrationRate Ne m * σ_sq) := by
+  unfold demoSteppingStoneFst
+  rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
+
 end EquilibriumAgreements
 
 end Calibrator
