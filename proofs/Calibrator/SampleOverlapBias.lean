@@ -99,15 +99,6 @@ because discovery and target samples are from different populations.
 
 section CrossAncestryNoOverlap
 
-/-- **Cross-ancestry has zero overlap by design.**
-    When discovery is EUR and validation is AFR, there is no
-    sample overlap → no overfitting inflation. With zero overlap
-    fraction f = 0, the partial overlap formula gives R²_observed = R²_true. -/
-theorem cross_ancestry_no_overlap_bias
-    (r2_true h2 : ℝ) (n_gwas : ℕ) :
-    partialOverlapR2 r2_true h2 0 n_gwas = r2_true :=
-  no_overlap_unbiased r2_true h2 n_gwas
-
 /-- **Same-ancestry R² is inflated relative to cross-ancestry.**
     Derived from the overfitting bias formula `partialOverlapR2`:
     same-ancestry R² with overlap fraction f > 0 exceeds true R²,

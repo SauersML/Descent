@@ -27,51 +27,6 @@ We also formalize sub-questions:
 -/
 
 /-!
-# Master Transport Theorem
-
-The core portability identity is the exact MSE transport decomposition together
-with the exact decomposition of target cross-covariances and target-optimal
-weights into causal and context terms.
--/
-
-section MasterTransport
-
-variable {Ω : Type*}
-variable {J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
-
-theorem master_transport_decomposition_exact
-    (sigmaInv : Matrix J J ℝ)
-    (E : ExpFunctional Ω)
-    (X : Ω → J → ℝ) (Y : Ω → ℝ)
-    (w : J → ℝ)
-    (hcentered : ∀ i, E (fun ω => X ω i) = 0)
-    (hsigmaInv : covarianceMatrix E X * sigmaInv = 1) :
-    expMse E Y (linScore w X)
-      = expMse E Y (linScore (optimalWeightsFromMoments sigmaInv E X Y) X)
-        + dot (fun i => w i - optimalWeightsFromMoments sigmaInv E X Y i)
-            ((covarianceMatrix E X).mulVec
-              (fun i => w i - optimalWeightsFromMoments sigmaInv E X Y i)) := by
-  exact master_transport_theorem_closed_form sigmaInv E X Y w hcentered hsigmaInv
-
-theorem target_cross_covariance_decomposition_exact
-    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (C : Ω → L → ℝ)
-    (β : L → ℝ) (h : Ω → ℝ) :
-    crossCovVector E X (fun ω => causalSignal β C ω + h ω)
-      = (predictorCausalCovariance E X C).mulVec β + contextCrossCovVector E X h := by
-  exact crossCovVector_decomposition E X C β h
-
-theorem target_optimal_weights_decomposition_exact
-    (sigmaInv : Matrix J J ℝ)
-    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (C : Ω → L → ℝ)
-    (β : L → ℝ) (h : Ω → ℝ) :
-    optimalWeightsFromMoments sigmaInv E X (fun ω => causalSignal β C ω + h ω)
-      = sigmaInv.mulVec ((predictorCausalCovariance E X C).mulVec β)
-        + sigmaInv.mulVec (contextCrossCovVector E X h) := by
-  exact optimalWeightsFromMoments_decomposition sigmaInv E X C β h
-
-end MasterTransport
-
-/-!
 ## Open Question 1: Law of Total Variance and Weak Predictability
 
 Individual-level squared prediction error ε²ᵢ has high within-group variance.
@@ -185,25 +140,6 @@ section Question2
 variable {J L : Type*}
 variable [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
 
-theorem trait_transport_is_locus_weighted_sum
-    (w : J → ℝ) (K : J → L → ℝ) (β : L → ℝ) :
-    transportedCovariance w K β = ∑ l, locusTerm w K β l := by
-  exact transported_covariance_decomposes w K β
-
-theorem normalized_trait_transport_from_locus_factors
-    (aQ aT : L → ℝ)
-    (hbase : ∀ l, aT l ≠ 0) :
-    (∑ l, aQ l) / (∑ l, aT l)
-      = ∑ l, baselineWeight aT l * transportFactor aQ aT l := by
-  exact normalized_transport_from_factors aQ aT hbase
-
-theorem universal_trait_transport_when_factor_constant
-    (aT τ : L → ℝ) (φ : ℝ)
-    (hden : ∑ m, aT m ≠ 0)
-    (hτ : ∀ l, τ l = φ) :
-    (∑ l, aT l * τ l) / (∑ l, aT l) = φ := by
-  exact normalized_transport_constant_factor aT τ φ hden hτ
-
 /-- **Heterozygosity increases toward 0.5.**
     Under divergent selection, allele freq p moves from extreme to
     intermediate → H = 2p(1-p) increases.
@@ -271,17 +207,6 @@ the exact prevalence-recall-FPR formula for precision.
 section Question3
 
 variable {Ω : Type*}
-
-theorem continuous_metric_identity_exact
-    (E : ExpFunctional Ω) (Y S : Ω → ℝ)
-    (ρ lam : ℝ)
-    (hvarY : 0 < variance E Y)
-    (hlam : variance E S = variance E Y * lam)
-    (hρ : covariance E Y S = ρ * variance E Y * Real.sqrt lam) :
-    expMse E Y S
-      = variance E Y * (1 + lam - 2 * ρ * Real.sqrt lam)
-        + (bias E Y S) ^ 2 := by
-  exact mse_from_variance_ratio_corr_bias E Y S ρ lam hvarY hlam hρ
 
 theorem binary_precision_formula_exact (c : ConfusionMatrix) :
     ConfusionMatrix.precision c =

@@ -421,16 +421,6 @@ theorem am_ld_breaks_cross_population
     r_t * (1 - r_s * h2) < r_s * (1 - r_t * h2) := by
   nlinarith
 
-/-- **AM-LD disappears under random mating.**
-    When r = 0, the AM-induced LD component vanishes entirely.
-    This shows the LD is a mating-pattern artifact, not intrinsic
-    genetic architecture. Formalized: amInducedLD with r=0 is zero. -/
-theorem am_ld_zero_under_random_mating (beta_i beta_j h2 : ℝ) :
-    amInducedLD beta_i beta_j 0 h2 = 0 := by
-  unfold amInducedLD
-  simp [mul_zero, zero_mul, zero_div]
-
-
 /-- **Cross-trait AM effect.**
     AM on a primary trait (e.g., education) with genetic correlation rg
     to a secondary trait creates AM-LD for the secondary trait proportional

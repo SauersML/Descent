@@ -85,15 +85,6 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent_proved
     h_ibd_pos h_recomb_pos h_recomb_lt_one h_time
 
 
-/-- Top-level `R²` interval membership from a Berry-Esseen error bound on the discrete HWE score. -/
-theorem hwe_r2ApproximationInterval_membership_proved
-    {m : ℕ} [Fintype (Fin m)]
-    (dgp : HWEPolygenicScoreDGP m)
-    (r2Exact r2Gaussian : ℝ)
-    (h : |r2Exact - r2Gaussian| ≤ dgp.scoreApproximationError) :
-    r2Exact ∈ dgp.r2ApproximationInterval r2Gaussian :=
-  dgp.mem_r2ApproximationInterval_of_abs_sub_le r2Exact r2Gaussian h
-
 /-- The true derivative of expected Brier score with respect to `p`,
     proved via the quadratic-form derivative in `Conclusions`. -/
 theorem expectedBrierScore_deriv_proved (p π : ℝ) :
@@ -152,20 +143,6 @@ theorem source_target_erm_differ_proved :
     have h : wS 0 = wT 0 := congrFun heq 0
     simp [wS, wT] at h
 
-
-/-- Specialization of the exact mean-shift formula to discrete Wright-Fisher drift. -/
-theorem expected_abs_mean_shift_of_wrightFisher_proved
-    (V_A : ℝ)
-    (NS tS NT tT : ℕ)
-    (hVA_pos : 0 < V_A)
-    (hNS : 0 < NS)
-    (hNT : 0 < NT) :
-    Expected_Abs_Shift V_A (wrightFisherFst NS tS) (wrightFisherFst NT tT) /
-        Real.sqrt (presentDayPGSVariance V_A (wrightFisherFst NS tS)) =
-      2 * Real.sqrt
-        ((wrightFisherFst NS tS + wrightFisherFst NT tT) /
-          (Real.pi * (1 - wrightFisherFst NS tS))) := by
-  exact expected_abs_mean_shift_of_wrightFisher V_A NS tS NT tT hVA_pos hNS hNT
 
 /-- Rigorous `2 × 2` target-`R²` drop proof using the two-locus coalescent witness. -/
 theorem target_r2_drop_of_twoLocusCoalescent_proved
@@ -284,26 +261,5 @@ theorem ld_decay_implies_nonlinear_calibration_proved {k : ℕ} [Fintype (Fin k)
   linarith
 
 end NoAxioms
-
-/-- Top-level: at zero divergence, the neutral allele-frequency benchmark
-target `R²` is the same present-day `R²` evaluated at that state. -/
-theorem targetR2_eq_source_at_zero_drift_proved
-    (V_A V_E fst : ℝ) :
-    targetR2FromNeutralAFBenchmark V_A V_E fst = presentDayR2 V_A V_E fst :=
-  targetR2FromNeutralAFBenchmark_self V_A V_E fst
-
-/-- Top-level: strict neutral allele-frequency benchmark Brier degradation
-under positive drift and non-degenerate prevalence. -/
-theorem targetBrier_strict_gt_source_proved
-    (π V_A V_E fstSource fstTarget : ℝ)
-    (hπ0 : 0 < π) (hπ1 : π < 1)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
-      targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget :=
-  targetBrier_strict_gt_source_of_neutralAF_benchmark π V_A V_E fstSource fstTarget
-    hπ0 hπ1 hVA hVE h_fst h_fst_bounds
-
 
 end Calibrator

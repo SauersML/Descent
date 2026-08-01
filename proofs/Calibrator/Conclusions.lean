@@ -1017,30 +1017,6 @@ theorem brierBayesRisk_full_lt_baseline_of_margin {Z : Type u} [MeasurableSpace 
   intro q hq
   exact hgap q hq
 
-/-- Proper-loss strictness wrapper (log loss):
-strict Bayes-risk improvement follows from a baseline margin witness. -/
-theorem strict_logBayesRisk_of_proper_margin {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
-    (η : ProbPredictor Z) (Ffull Fbase : Set (ProbPredictor Z))
-    (h_eta_mem_full : η ∈ Ffull)
-    (h_bdd_full : BddBelow ((logRisk μ η) '' Ffull))
-    (h_nonempty_base : ((logRisk μ η) '' Fbase).Nonempty)
-    (h_margin : ∃ ε > 0, ∀ q ∈ Fbase, logRisk μ η η + ε ≤ logRisk μ η q) :
-    logBayesRisk μ η Ffull < logBayesRisk μ η Fbase :=
-  logBayesRisk_full_lt_baseline_of_margin μ η Ffull Fbase
-    h_eta_mem_full h_bdd_full h_nonempty_base h_margin
-
-/-- Proper-loss strictness wrapper (Brier loss):
-strict Bayes-risk improvement follows from a baseline margin witness. -/
-theorem strict_brierBayesRisk_of_proper_margin {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
-    (η : ProbPredictor Z) (Ffull Fbase : Set (ProbPredictor Z))
-    (h_eta_mem_full : η ∈ Ffull)
-    (h_bdd_full : BddBelow ((brierRisk μ η) '' Ffull))
-    (h_nonempty_base : ((brierRisk μ η) '' Fbase).Nonempty)
-    (h_margin : ∃ ε > 0, ∀ q ∈ Fbase, brierRisk μ η η + ε ≤ brierRisk μ η q) :
-    brierBayesRisk μ η Ffull < brierBayesRisk μ η Fbase :=
-  brierBayesRisk_full_lt_baseline_of_margin μ η Ffull Fbase
-    h_eta_mem_full h_bdd_full h_nonempty_base h_margin
-
 /-- Strict Bayes-risk improvement from an explicit truth witness and a uniform baseline margin. -/
 theorem BayesRisk_strict_of_truth_witness_and_margin
     {α : Type u} (R : α → ℝ) (truth : α) (Fsmall Fbig : Set α) :

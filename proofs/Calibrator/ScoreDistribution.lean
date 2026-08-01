@@ -163,20 +163,6 @@ theorem threshold_standardized_coordinate_diff_of_variance_change
       (div_eq_div_iff h_σS.ne' h_σT.ne').mp h
   exact (mul_left_cancel₀ h_ne h1).symm
 
-/-- **Source threshold changes the target standardized coordinate.**
-    This is the combined equal-variance coordinate statement: if the target mean
-    shifts, the source raw threshold lands at a different standardized location
-    in the target score law. Actual clinical threshold consequences should be
-    routed through an explicit decision rule elsewhere. -/
-theorem source_threshold_changes_standardized_coordinate
-    (threshold μ_S μ_T σ : ℝ)
-    (h_σ : 0 < σ)
-    (h_shift : μ_S ≠ μ_T) :
-    thresholdStandardizedCoordinate threshold μ_S σ ≠
-      thresholdStandardizedCoordinate threshold μ_T σ :=
-  threshold_standardized_coordinate_diff_of_mean_shift
-    threshold μ_S μ_T σ h_σ h_shift
-
 /-- **Mean shift changes the benchmark high-score rate.**
     Under the Gaussian benchmark score law, a rightward mean shift strictly
     increases the fraction of scores above a fixed raw threshold. This is the

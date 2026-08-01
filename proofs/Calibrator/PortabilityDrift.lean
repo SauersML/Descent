@@ -2463,14 +2463,6 @@ theorem neutralAFBenchmarkMetricProfile_eq
       presentDayR2
     rfl
 
-/-- Exact neutral allele-frequency benchmark target AUC is definitionally the
-literal present-day AUC. -/
-@[simp] theorem targetAUCFromNeutralAFBenchmark_eq
-    (V_A V_E fstTarget : ℝ) :
-    targetAUCFromNeutralAFBenchmark V_A V_E fstTarget =
-      presentDayAUC V_A V_E fstTarget := by
-  rfl
-
 /-- Full neutral allele-frequency benchmark AUC degradation theorem:
 strictly higher drift implies strictly lower exact target AUC. -/
 theorem targetAUC_lt_source_of_neutralAF_benchmark

@@ -129,11 +129,9 @@ noncomputable def transportedTargetR2DiagonalLD {m : ℕ}
     of effect sizes, and is the core mathematical ingredient for the
     portability bound.
 
-    We prove this using Mathlib's `inner_mul_le_norm_mul_sq` on `EuclideanSpace`.
-    The key insight: interpreting β_source and β_target as elements of ℝ^m
-    (a Hilbert space), the Cauchy-Schwarz inequality gives
-    ⟨β_source, β_target⟩² ≤ ‖β_source‖² × ‖β_target‖².
-    The inner product ⟨u, v⟩ = Σᵢ uᵢ vᵢ and ‖u‖² = Σᵢ uᵢ² in EuclideanSpace. -/
+    Proved from Mathlib's `sum_mul_sq_le_sq_mul_sq` over `Finset.univ`, which
+    is the finite-sum form of Cauchy-Schwarz and needs no Hilbert-space
+    structure on `Fin m → ℝ`. -/
 theorem effect_size_cauchy_schwarz {m : ℕ}
     (β_s β_t : Fin m → ℝ)
     (sum_s_sq sum_t_sq cross : ℝ)
@@ -3004,20 +3002,6 @@ theorem private_causal_fraction_lowers_transfer_ceiling
   have h_r2_lt_h2 : r2_target < h2_target :=
     lt_trans h_r2_lt_no_private h_no_private_lt_h2
   exact ⟨h_ceiling_lt_no_private, h_r2_lt_no_private, h_r2_lt_h2⟩
-
-/-- **In the neutral allele-frequency benchmark, a more diverged target lowers
-`R²`.** Once the target population is strictly farther in `F_ST` than the
-source, the benchmark target `R²` is strictly below the source `R²`. This is a
-statement inside the benchmark chart only; it is not a general mechanistic
-no-free-lunch theorem over all predictors. -/
-theorem neutral_af_benchmark_lowers_r2_with_positive_drift
-    (V_A V_E fstSource fstTarget : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    targetR2FromNeutralAFBenchmark V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
-  exact targetR2_lt_source_from_neutralAF_benchmark V_A V_E fstSource fstTarget
-    hVA hVE h_fst h_fst_bounds
 
 end TransferLimits
 

@@ -127,15 +127,6 @@ theorem information_loss_from_tagging (n : ℕ) (p r2_ld : ℝ)
     · exact genotypeVariance_nonneg p h_p h_p_le
   nlinarith
 
-/-- **Effective sample size is derived from Fisher information.**
-    n_eff is defined so that n_eff × 1 = I_eff, i.e., it is the sample
-    size of a perfectly-tagged study with unit genotype variance that
-    gives the same information as the actual study.
-    This justifies: n_eff = n × 2p(1-p) × r²_LD. -/
-theorem effectiveSampleSize_from_fisher (n : ℕ) (p r2_ld : ℝ) :
-    effectiveFisherInformation n p r2_ld = n * (2 * p * (1 - p)) * r2_ld := by
-  exact effectiveFisherInfo_eq n p r2_ld
-
 /-!
 ### Derivation of the Non-Centrality Parameter (NCP)
 

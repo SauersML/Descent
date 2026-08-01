@@ -305,15 +305,6 @@ theorem neutralAF_benchmark_r2_sensitive_to_drift
   have h := drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT_le_one
   linarith
 
-/-- **Exact present-day liability AUC formula.**
-    Under the equal-variance Gaussian liability model, the present-day AUC is
-    exactly `Φ(√(SNR/2))`, where `SNR = presentDaySignalToNoise`. -/
-theorem presentDayLiabilityAUC_formula
-    (V_A V_E fst : ℝ) :
-    presentDayLiabilityAUC V_A V_E fst =
-      Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
-  simp [presentDayLiabilityAUC, presentDayAUC]
-
 /-- **Brier score depends on prevalence (derived from Brier definition).**
     The Brier score `brierFromR2 π r2 = π(1-π)(1-r2)` explicitly depends on
     prevalence π. Higher prevalence (up to 0.5) gives higher Brier score

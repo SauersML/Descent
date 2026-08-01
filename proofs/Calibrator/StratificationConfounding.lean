@@ -329,12 +329,6 @@ theorem rge_inflates_apparent_heritability (m : RGEInflationModel) :
     mul_pos (sq_pos_of_ne_zero m.β_indirect_ne) m.σ2_pos
   linarith
 
-/-- **Loss of rGE is not recoverable from genetic data alone.**
-    The rGE-mediated component requires knowing the environmental
-    structure of the target population. -/
-theorem rge_loss_requires_environmental_data (m : RGEModel) :
-    m.predSource ≠ m.predTarget := rge_changes_total_prediction m
-
 end GeneEnvironmentCorrelation
 
 

@@ -521,17 +521,6 @@ theorem target_metric_profile_auc_uses_explicit_target_moments {p q : ℕ}
         (targetResidualVarianceFromSourceWeights m) := by
   simp [targetMetricProfileFromSourceWeights, targetLiabilityAUCFromSourceWeights]
 
-/-- The standalone liability-threshold AUC accessor agrees with the canonical
-target metric profile built from the explicit source-weights-on-target-state
-equation. -/
-theorem target_liability_auc_uses_explicit_target_moments {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) :
-    targetLiabilityAUCFromSourceWeights m =
-      liabilityAUCFromVariances
-        (targetExplainedSignalVarianceFromSourceWeights m)
-        (targetResidualVarianceFromSourceWeights m) := by
-  simpa using target_metric_profile_auc_uses_explicit_target_moments m
-
 /-- The mechanistic target AUC agrees with the `R²` chart induced by the same
 explicit target explained-signal and total-variance decomposition. This is a
 derived chart identity, not the definition of transported AUC. -/

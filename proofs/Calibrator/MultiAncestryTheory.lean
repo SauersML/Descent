@@ -171,32 +171,6 @@ theorem portability_concave_in_fst_reduction
   rw [h_high_reduce, h_high, h_low_reduce, h_low]
   exact expectedR2_gain_strictAnti_base xHigh xLow δ V_E hVE hxHigh hx_lt hδ
 
-/-- **Optimal GWAS allocation.**
-    In the exact shared-feature multi-ancestry effect model, the training
-    weights induce a weighted average of ancestry-specific SNP effect vectors.
-    Under equal per-ancestry deviation scale and orthogonal ancestry-specific
-    effect components, the equal-weight diverse mixture minimizes the exact
-    target coefficient gap among all affine allocations. -/
-theorem maxmin_allocation_favors_diversity
-    {p k : ℕ}
-    (wShared wTarget : Fin p → ℝ)
-    (deviation : Fin k → Fin p → ℝ)
-    (weight : Fin k → ℝ)
-    (irreducibleGap populationSpecificGap : ℝ)
-    (h_k : 0 < k)
-    (h_sum : ∑ j : Fin k, weight j = 1)
-    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
-    (h_shared_orth :
-      ∀ j, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
-    (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
-    (h_pair : ∀ j l, j ≠ l → dotProduct (deviation j) (deviation l) = 0)
-    (h_pop : 0 ≤ populationSpecificGap) :
-    weightedMetaTransferGapSq wShared wTarget deviation (uniformMetaWeight k) ≤
-      weightedMetaTransferGapSq wShared wTarget deviation weight := by
-  exact weightedMetaTransferGapSq_ge_uniform_of_affine_weights
-    wShared wTarget deviation weight irreducibleGap populationSpecificGap
-    h_k h_sum h_shared h_shared_orth h_norm h_pair h_pop
-
 end GWASDiversity
 
 
