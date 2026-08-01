@@ -1014,8 +1014,7 @@ theorem fstDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) (ht : 1 ≤ t)
   linarith [pow_lt_pow_left₀ h_base_lt (le_of_lt h_base₁_pos) (Nat.not_eq_zero_of_lt (by omega : 0 < t))]
 
 /-- **Consistency check: fstDerived agrees with the earlier fstFromDrift.**
-    This confirms our derivation produces the same formula that was previously
-    defined axiomatically. -/
+    The derivation produces the same formula as the direct definition. -/
 theorem fstDerived_eq_fstFromDrift (Ne : ℝ) (t : ℕ) :
     fstDerived Ne t = fstFromDrift t Ne := by
   unfold fstDerived fstFromDrift

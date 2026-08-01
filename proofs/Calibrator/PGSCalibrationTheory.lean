@@ -310,8 +310,8 @@ change after transport:
 - score-mean transport shift from changed target genetic architecture, and
 - any deployment intercept offset applied to the transported score.
 
-Unlike the deleted prevalence-only headline theorem, this does not treat target
-calibration drift as a function of prevalence alone. -/
+This does not treat target calibration drift as a function of prevalence
+alone. -/
 structure CrossPopulationCalibrationShiftModel where
   sourceObservedMean : ℝ
   sourcePredictedMean : ℝ

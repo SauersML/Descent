@@ -403,20 +403,6 @@ one population and maximizing cross-population portability.
 
 section PowerPortabilityTradeoff
 
-/-- **Single-ancestry GWAS maximizes within-ancestry power.**
-    With n total samples all in one ancestry:
-    - Source R² ∝ n (full power in discovery population)
-    - Cross-population R² = n × ρ² where ρ² < 1 is portability ratio
-
-    We model cross-pop prediction as attenuated by ρ² and derive
-    that cross-pop R² is strictly less than within-pop R².
-    The inequality n × ρ² < n follows from ρ² < 1 and n > 0. -/
-theorem single_ancestry_max_power
-    (n : ℝ) (ρ_sq : ℝ)
-    (h_n : 0 < n)
-    (h_ρ : 0 < ρ_sq) (h_ρ_lt : ρ_sq < 1) :
-    n * ρ_sq < n := by
-  nlinarith
 
 /-- **Multi-ancestry tradeoff: splitting budget.**
     With total budget N and two populations, allocate fraction α to pop1

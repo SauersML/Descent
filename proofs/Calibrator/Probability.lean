@@ -799,7 +799,7 @@ For continuous functions on a measure with full support (`IsOpenPosMeasure`),
 a.e. equality implies pointwise equality. -/
 
 /-- If two continuous functions agree a.e. on a measure with `IsOpenPosMeasure`,
-    they agree everywhere. This replaces ad-hoc upgrades throughout the file. -/
+    they agree everywhere. -/
 theorem eq_of_ae_eq_of_continuous {α : Type*} [TopologicalSpace α]
     [MeasurableSpace α] {μ : Measure α} [μ.IsOpenPosMeasure] {f g : α → ℝ}
     (hf : Continuous f) (hg : Continuous g)

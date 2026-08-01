@@ -15,7 +15,6 @@ import Calibrator.ClinicalUtilityFairness
 import Calibrator.VarianceComponents
 import Calibrator.ScoreDistribution
 import Calibrator.ValidationStatistics
-import Calibrator.CrossValidationTheory
 import Calibrator.SimulationValidation
 import Calibrator.SelectionValidation
 import Calibrator.GeneticArchitectureDiscovery
@@ -37,13 +36,11 @@ import Calibrator.ImputationPortability
 import Calibrator.LongitudinalPortability
 import Calibrator.PowerAnalysis
 import Calibrator.CovarianceStructure
-import Calibrator.MendelianRandomization
 import Calibrator.CausalInference
 import Calibrator.FineMapping
 import Calibrator.PolygenicArchitecture
 import Calibrator.SampleOverlapBias
 import Calibrator.HaplotypeTheory
-import Calibrator.MultiTraitPGS
 import Calibrator.AncestrySpecificArchitecture
 import Calibrator.AncestrySpecificPower
 import Calibrator.PGSCalibrationTheory
@@ -156,8 +153,8 @@ def crossT : Fin 2 → ℝ := ![1, 1]
 def sigmaT2 : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 0.5], ![0.5, 1]]
 
 /-- A concrete proof that the source ERM is LD-specific and does not solve
-    the target normal equations under a new correlation structure, without relying on the vacuous `hMismatch`
-    hypothesis from `source_erm_is_ld_specific_of_normal_eq_mismatch`. -/
+    the target normal equations under a new correlation structure. The mismatch is
+    exhibited by explicit `2 × 2` witnesses rather than assumed as a hypothesis. -/
 theorem source_erm_is_ld_specific_proved :
     let wS : Fin 2 → ℝ := ![1, 0]
     sigmaS.mulVec wS = crossS ∧
@@ -174,8 +171,8 @@ theorem source_erm_is_ld_specific_proved :
     simp [wS, sigmaT2, crossT, Matrix.mulVec, dotProduct]
     norm_num
 
-/-- A concrete proof that ERM mismatch occurs under LD shift, without relying on
-    the abstract, vacuous `hConflict` hypothesis from `source_target_erm_differ_of_ld_system_conflict`.
+/-- A concrete proof that ERM mismatch occurs under LD shift, without assuming an
+    abstract system-conflict hypothesis.
     Here we construct explicit 2x2 covariance and cross-covariance matrices
     and show that the weights solving the normal equations must strictly differ. -/
 theorem source_target_erm_differ_proved :
@@ -287,8 +284,8 @@ theorem target_r2_drop_of_fst_and_sparse_array_proved
     mseSource mseTarget varY lam sigmaSource sigmaTarget
     h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
 
-/-- Rigorous proof that exponential LD decay cannot be fit by a linear slope calibration,
-    replacing the specification gaming in `ld_decay_implies_nonlinear_calibration_sketch`. -/
+/-- Rigorous proof that exponential LD decay cannot be fit by a linear slope calibration.
+    Non-affineness is derived from three explicit distances rather than assumed. -/
 theorem ld_decay_implies_nonlinear_calibration_proved {k : ℕ} [Fintype (Fin k)]
     (mech : LDDecayMechanism k)
     (lambda : ℝ) (h_lambda_pos : 0 < lambda)

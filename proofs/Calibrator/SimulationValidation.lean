@@ -11,8 +11,8 @@ open scoped Matrix
 This file records only simulation-validation objects that remain honest under
 the explicit SNP/LD-aware portability surface in `PortabilityDrift`.
 
-The deleted source-`R²` attenuation law is intentionally absent. Target metrics
-are evaluated directly from explicit source/target biological state:
+No source-`R²` attenuation law is assumed. Target metrics are evaluated
+directly from explicit source/target biological state:
 
 - source and target LD among scored SNPs
 - source and target tag-to-causal alignment
@@ -36,8 +36,8 @@ noncomputable def sourceSquaredEffectMass {q : ℕ}
   ∑ i, β i ^ 2
 
 /-- Generic `q`-locus direct-causal witness with identical source and target
-states and no proxy, context, or novel-variant channels. This is the
-multi-locus replacement for the old `1×1` baseline sanity check. -/
+states and no proxy, context, or novel-variant channels. Serves as the
+multi-locus baseline sanity check. -/
 noncomputable def identityDirectMetricModel {q : ℕ}
     (β : Fin q → ℝ)
     (outcomeVariance targetPrevalence : ℝ)

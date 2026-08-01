@@ -594,19 +594,6 @@ theorem ncp_ratio_from_maf
   -- 2p₁(1-p₁) < 2p₂(1-p₂) when p₁ < p₂ ≤ 1/2
   nlinarith [sq_nonneg (p₂ - p₁), sq_nonneg (1/2 - p₂)]
 
-/-- **Population-specific GWAS recovers population-specific signals.**
-    Variants that are common in the target population but rare in the
-    source population are missed by source GWAS. Target GWAS recovers them.
-
-    Note: This is a direct algebraic consequence of the model assumption
-    that combined R² exceeds source-only R². The substantive claim is in
-    the model: multi-ancestry GWAS discovers variants with population-specific
-    MAF spectra that single-ancestry GWAS misses. -/
-theorem target_gwas_recovers_missed_variants
-    (r2_source_only r2_combined : ℝ)
-    (h_improvement : r2_source_only < r2_combined)
-    (h_source_nn : 0 ≤ r2_source_only) :
-    0 < r2_combined - r2_source_only := by linarith
 
 end GWASPowerMAF
 
@@ -622,13 +609,6 @@ section ArchitecturePredictions
 
 /- **Trait classes can be ranked by regime-specific portability parameters.** -/
 
-/-- Portability ordering follows from any transitive ranking of regime-level
-    portability values. -/
-theorem portability_ordering
-    (r2_high r2_mid r2_low : ℝ)
-    (h_high : r2_mid < r2_high)
-    (h_mid : r2_low < r2_mid) :
-    r2_low < r2_high := by linarith
 
 /-- **Selection coefficient determines portability timescale.**
     The characteristic timescale for portability decay is 1/(2s) generations,

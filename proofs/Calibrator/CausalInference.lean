@@ -91,16 +91,6 @@ theorem selection_dominant_for_immune
           nlinarith [sq_abs ρ, sq_nonneg ρ]
       _ = presentDayPGSVariance V_A fst := one_mul _
 
-/-- **Interaction effects between pathways.**
-    Pathways are not fully independent: LD changes interact
-    with MAF changes (LD × MAF interaction). -/
-theorem pathway_interactions_exist
-    (sum_individual total_with_interactions interaction : ℝ)
-    (h_interaction : total_with_interactions = sum_individual + interaction)
-    (h_nonzero : interaction ≠ 0) :
-    total_with_interactions ≠ sum_individual := by
-  rw [h_interaction]; intro h; apply h_nonzero; linarith
-
 end PathDecomposition
 
 
@@ -434,27 +424,6 @@ theorem e_value_ge_one (rr : ℝ) (h_rr : 1 ≤ rr) :
   unfold eValue
   have : 0 ≤ Real.sqrt (rr * (rr - 1)) := Real.sqrt_nonneg _
   linarith
-
-/-- **Sensitivity to LD reference mismatch.**
-    Portability estimates are sensitive to the choice of LD reference.
-    Using in-sample LD vs. external reference can change R² by δ. -/
-theorem ld_reference_sensitivity
-    (r2_in_sample r2_external delta : ℝ)
-    (h_diff : r2_in_sample = r2_external + delta)
-    (h_delta : 0 < |delta|) :
-    r2_in_sample ≠ r2_external := by
-  rw [h_diff]; intro h; have : delta = 0 := by linarith
-  exact absurd (this ▸ h_delta) (by simp)
-
-/-- **Sensitivity to phenotype definition.**
-    Different phenotype definitions (self-report vs clinical,
-    ICD-9 vs ICD-10) can change portability estimates.
-    When the difference exceeds any threshold ε > 0, the estimates differ. -/
-theorem phenotype_definition_matters
-    (port_def1 port_def2 ε : ℝ) (h_ε : 0 < ε)
-    (h_large_diff : ε < |port_def1 - port_def2|) :
-    port_def1 ≠ port_def2 := by
-  intro h; rw [h, sub_self, abs_zero] at h_large_diff; linarith
 
 end SensitivityAnalysis
 

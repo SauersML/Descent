@@ -145,18 +145,6 @@ theorem expected_pgs_diff_var_nonneg (V_A fst : ℝ)
 noncomputable def overdispersionStatistic (delta_pgs V_A fst : ℝ) : ℝ :=
   delta_pgs ^ 2 / expectedPGSDiffVariance V_A fst
 
-/-- **Overdispersion → portability loss.**
-    If the observed PGS difference exceeds the drift expectation,
-    the χ² statistic (ΔPGS² / drift_variance) exceeds the critical value.
-    We derive significance from the raw quantities. -/
-theorem overdispersion_implies_miscalibration
-    (delta_pgs drift_var : ℝ)
-    (h_drift_pos : 0 < drift_var)
-    (h_large_shift : 3.84 * drift_var < delta_pgs ^ 2) :
-    -- At 5% significance level (χ²₁ critical value = 3.84)
-    3.84 < delta_pgs ^ 2 / drift_var := by
-  rwa [lt_div_iff₀ h_drift_pos]
-
 /-- **Population stratification confounds overdispersion tests.**
     Cryptic stratification in the GWAS discovery sample can
     create spurious PGS differences that look like adaptation.
@@ -334,25 +322,6 @@ theorem stratification_reduces_adaptation_signal
     0 < signal_raw - strat_bias ∧ signal_raw - strat_bias < signal_raw := by
   exact ⟨by linarith, by linarith⟩
 
-/-- **Implications for portability.**
-    If apparent adaptation is actually stratification:
-    - The true portability may be better than expected
-    - But the PGS itself may be biased by stratification
-    Both effects need correction for accurate portability assessment. -/
-theorem confounding_overestimates_portability_loss
-    (port_apparent port_true : ℝ)
-    (h_overestimated : port_apparent < port_true) :
-    0 < port_true - port_apparent := by linarith
-
-/-- **Multi-trait adaptation.**
-    Selection on one trait affects correlated traits via pleiotropy.
-    Adaptation for immune defense can change lipid levels, BMI, etc.
-    This creates correlated portability patterns across traits. -/
-theorem pleiotropic_adaptation_correlates_portability
-    (port_trait1 port_trait2 rg lb : ℝ)
-    (h_correlated : |port_trait1 - port_trait2| ≤ 2 * (1 - |rg|))
-    (h_rg_high : lb < |rg|) :
-    |port_trait1 - port_trait2| < 2 * (1 - lb) := by linarith
 
 end DetectingAdaptation
 

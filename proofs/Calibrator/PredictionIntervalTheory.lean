@@ -197,14 +197,6 @@ theorem stratified_intervals_narrower
     (h_within_nn : 0 ≤ var_within) :
     var_within < var_total := by linarith
 
-/-- **Law of total variance for prediction intervals.**
-    Var(ε) = E[Var(ε|A)] + Var(E[ε|A]).
-    The marginal interval width accounts for both components. -/
-theorem total_variance_decomposition
-    (within_var between_var total_var : ℝ)
-    (h_decomp : total_var = within_var + between_var)
-    (h_w : 0 ≤ within_var) (h_b : 0 ≤ between_var) :
-    within_var ≤ total_var := by linarith
 
 /-- **Conditional intervals improve with ancestry precision (transitivity of
     the law of total variance).**

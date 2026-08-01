@@ -457,7 +457,7 @@ theorem neutralAF_benchmark_discrimination_preserved_calibration_lost
 
 /-- **Mechanistic transport can jointly worsen calibration slope and Brier.**
     This theorem is stated on the explicit SNP-level transport model rather
-    than on the deleted neutral-AF slope benchmark.
+    than on a neutral-AF slope benchmark.
 
     If the transported source score has calibration slope below `1` in the
     target population and its transported `R²` drops, then:

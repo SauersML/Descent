@@ -68,69 +68,6 @@ theorem incremental_r2_nonneg
   have : rss_cov / tss - rss_full / tss = (rss_cov - rss_full) / tss := by ring
   linarith [div_nonneg (by linarith : 0 ≤ rss_cov - rss_full) (le_of_lt h_tss)]
 
-/- **Derivation: Standard error of R² via the delta method.**
-
-    We derive SE(R²) = √(4R²(1-R²)²/(n-k-1)) from the relationship between
-    R² and the F-statistic using the delta method.
-
-    **Step 1: R² as a function of the F-statistic.**
-    The overall F-test for a linear model with k predictors and n observations:
-        F = (R²/k) / ((1-R²)/(n-k-1))
-    Solving for R²:
-        R² = Fk / (Fk + n - k - 1)
-
-    **Step 2: Variance of F.**
-    Under the alternative hypothesis (non-central F), for large n the
-    variance of F_{k, n-k-1} is approximately:
-        Var(F) ≈ 2(n-k-1)²(k + 2F̄(n-k-1)) / (k²(n-k-1-2)(n-k-1)²)
-    For moderate to large n-k-1 this simplifies. More directly, we use
-    that for R̂² near R²:
-        Var(SS_reg/SS_tot) ≈ 4R²(1-R²)²/(n-k-1)
-    which follows from the beta distribution approximation for R².
-
-    **Step 3: Delta method.**
-    Since R² = g(SS_reg/SS_tot) where g is approximately the identity
-    near typical values, and more precisely since R² follows approximately
-    a scaled Beta distribution:
-        R² ~ Beta(k/2, (n-k-1)/2) scaled appropriately
-    The variance of this distribution gives:
-        Var(R²) = 4R²(1-R²)² × (k + (n-k-1)) / ((n-k-1)(k + 2(n-k-1)))
-    For n >> k this simplifies to:
-        Var(R²) ≈ 4R²(1-R²)² / (n-k-1)
-
-    **Step 4: Alternatively via direct delta method on F.**
-    Write R² = h(F) = Fk/(Fk + n-k-1). Then:
-        dR²/dF = k(n-k-1)/(Fk + n-k-1)² = (1-R²)²(n-k-1)/k
-    And Var(F) ≈ 2F²(k + n-k-1) / (k(n-k-1)) for large df.
-    Combining: Var(R²) = (dR²/dF)² × Var(F) ≈ 4R²(1-R²)²/(n-k-1).
-
-    Therefore: **SE(R²) = √(4R²(1-R²)²/(n-k-1))**. -/
-
-/-- **Approximate standard error of R².**
-    SE(R²) ≈ √(4R²(1-R²)²/(n-k-1)) for n observations, k predictors.
-    This comes from the delta method on the F-statistic. -/
-noncomputable def r2StandardError (r2 n k : ℝ) : ℝ :=
-  Real.sqrt (4 * r2 * (1 - r2) ^ 2 / (n - k - 1))
-
-/-- SE decreases with sample size. -/
-theorem r2_se_decreases_with_n
-    (r2 k : ℝ) (n₁ n₂ : ℝ)
-    (h_r2 : 0 < r2) (h_r2_lt : r2 < 1)
-    (h_k : 0 < k)
-    (h_n₁ : k + 1 < n₁) (h_n₂ : k + 1 < n₂)
-    (h_more : n₁ < n₂) :
-    r2StandardError r2 n₂ k < r2StandardError r2 n₁ k := by
-  unfold r2StandardError
-  apply Real.sqrt_lt_sqrt
-  · apply div_nonneg
-    · apply mul_nonneg (mul_nonneg (by norm_num) (le_of_lt h_r2)) (sq_nonneg _)
-    · linarith
-  · apply div_lt_div_of_pos_left
-    · exact mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) h_r2)
-        (sq_pos_of_ne_zero (by linarith : (1 : ℝ) - r2 ≠ 0))
-    · linarith
-    · linarith
-
 /-- **Portability ratio with confidence interval.**
     Port = ΔR²_target / ΔR²_source.
     SE(Port) ≈ Port × √(SE²_target/ΔR²²_target + SE²_source/ΔR²²_source). -/
@@ -423,16 +360,6 @@ section GeneticCorrelationMethods
     Uses the LDAK model for LD-dependent architecture
     and may give different ρ_g estimates than LDSC. -/
 
-/-- **Method comparison: different methods can give different ρ̂_g.**
-    This matters because ρ̂_g predicts portability.
-    When methods disagree, the range of estimates is positive,
-    introducing irreducible uncertainty in portability prediction. -/
-theorem method_disagreement_increases_uncertainty
-    (rho_ldsc rho_popcorn rho_sumher : ℝ)
-    (h_order : rho_popcorn < rho_ldsc)
-    (h_order₂ : rho_ldsc < rho_sumher) :
-    -- The range of estimates is strictly positive
-    0 < rho_sumher - rho_popcorn := by linarith
 
 /-- **Genetic correlation varies across the genome.**
     ρ_g estimated from different genomic regions can vary,
@@ -448,18 +375,6 @@ theorem local_genetic_correlation_varies
   rw [lt_div_iff₀ (by linarith : (0:ℝ) < w₁ + w₆)]
   nlinarith
 
-/-- **Genetic correlation is frequency-dependent.**
-    Common variants may have higher ρ_g than rare variants
-    because common variants are older and more shared across populations.
-    Modeled: shared drift time t_shared produces correlation ~ 1 - Fst,
-    and Fst is lower for older (common) variants. -/
-theorem common_variants_higher_correlation
-    (fst_common fst_rare : ℝ)
-    (h_fst_common : 0 ≤ fst_common) (h_fst_common_lt : fst_common < 1)
-    (h_fst_rare : 0 ≤ fst_rare) (h_fst_rare_lt : fst_rare < 1)
-    (h_older_less_diverged : fst_common < fst_rare) :
-    -- ρ_g ~ 1 - Fst, so lower Fst → higher correlation
-    1 - fst_rare < 1 - fst_common := by linarith
 
 end GeneticCorrelationMethods
 

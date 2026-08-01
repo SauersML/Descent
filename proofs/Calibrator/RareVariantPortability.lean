@@ -95,18 +95,6 @@ theorem rare_variant_zero_portability
     β ^ 2 * (2 * maf_B * (1 - maf_B)) = 0 := by
   rw [h_absent]; ring
 
-/-- **Number of rare variants scales with population size.**
-    n_rare ∝ θ × Σ_{i=1}^{2N} 1/i ≈ θ × ln(2N).
-    Larger populations have more rare variants because θ = 4·Ne·μ
-    scales linearly with Ne. For the same mutation rate μ, a larger
-    population has proportionally more expected segregating sites. -/
-theorem more_variants_in_larger_population
-    (μ Ne₁ Ne₂ : ℝ)
-    (h_μ : 0 < μ)
-    (h_Ne₁ : 0 < Ne₁)
-    (h_larger : Ne₁ < Ne₂) :
-    4 * Ne₁ * μ < 4 * Ne₂ * μ := by
-  nlinarith
 
 /-- **African populations have the most rare variants.**
     Due to larger long-term Ne and no out-of-Africa bottleneck,
@@ -179,16 +167,6 @@ theorem functional_equivalence_aids_portability
     exact_mod_cast (by omega : 1 < k)
   linarith [mul_lt_mul_of_pos_right h_k_real h_β2]
 
-/-- **Optimal weighting of rare variants in burden test.**
-    Common weights: constant (1), MAF-based (1/√(p(1-p))),
-    functional (CADD, PolyPhen).
-    Functional weights improve portability because they capture
-    the biological effect regardless of frequency. -/
-theorem functional_weights_improve_portability
-    (port_constant port_maf port_functional : ℝ)
-    (h_func_best : port_maf < port_functional)
-    (h_const_worst : port_constant < port_maf) :
-    port_constant < port_functional := by linarith
 
 /-- **SKAT (sequence kernel association test) handles bidirectional effects.**
     Unlike burden tests, SKAT allows variants to have different
@@ -255,39 +233,6 @@ theorem common_component_more_portable
         apply mul_nonneg (le_of_lt h_β2)
         nlinarith [sq_nonneg (p_common - 1/2)]
 
-/-- **WGS PGS within-population outperforms array PGS.**
-    Within the discovery population, WGS PGS captures more variance
-    (including rare variant contributions). The WGS R² = R²_common + R²_rare
-    while array R² ≈ R²_common (arrays miss rare variants). -/
-theorem wgs_within_pop_better
-    (r2_common r2_rare : ℝ)
-    (h_common_nn : 0 ≤ r2_common)
-    (h_rare_pos : 0 < r2_rare) :
-    r2_common < r2_common + r2_rare := by linarith
-
-/-- **WGS PGS cross-population can be worse than array PGS.**
-    Because population-specific rare variants add noise in the
-    target population (zero signal + estimation error).
-    If rare variant R² in target is 0 but rare variant estimation noise
-    is ε > 0, the WGS PGS cross-population R² is reduced. -/
-theorem wgs_cross_pop_can_be_worse
-    (r2_common_cross noise_rare : ℝ)
-    (h_common_pos : 0 < r2_common_cross)
-    (h_noise : 0 < noise_rare)
-    (h_noise_small : noise_rare < r2_common_cross) :
-    -- WGS cross-pop R² = R²_common - noise < R²_common = array cross-pop R²
-    r2_common_cross - noise_rare < r2_common_cross := by linarith
-
-/-- **Optimal strategy: population-specific rare + shared common.**
-    Use common variants for the shared component (portable)
-    and population-specific rare variants for local prediction.
-    Combined R² = R²_common + R²_rare_local when the components are
-    orthogonal (independent genetic signals). -/
-theorem optimal_combined_strategy
-    (r2_common r2_rare_local : ℝ)
-    (h_common_nn : 0 ≤ r2_common)
-    (h_rare_nn : 0 ≤ r2_rare_local) :
-    r2_common ≤ r2_common + r2_rare_local := by linarith
 
 end WGSBasedPGS
 
@@ -430,19 +375,6 @@ theorem rare_variant_needs_large_n
     _ < 1 / 100 := h_maf_small
   nlinarith
 
-/-- **Population-specific rare variant PGS is optimal for within-population.**
-    Each population should have its own rare variant PGS component,
-    estimated from population-specific large samples. A generic PGS
-    trained on a different population misses the population-specific
-    rare variants (contributing R²_missed) and includes irrelevant
-    variants (adding noise ε). -/
-theorem population_specific_rare_pgs_optimal
-    (r2_shared r2_missed noise : ℝ)
-    (h_shared_nn : 0 ≤ r2_shared)
-    (h_missed_pos : 0 < r2_missed)
-    (h_noise_nn : 0 ≤ noise) :
-    -- Generic R² = r2_shared - noise < r2_shared + r2_missed = specific R²
-    r2_shared - noise ≤ r2_shared + r2_missed := by linarith
 
 end EffectSizeDistribution
 

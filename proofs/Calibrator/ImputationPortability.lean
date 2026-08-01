@@ -53,23 +53,6 @@ theorem attenuated_le_true (beta_sq het r2_imp : ℝ)
         mul_le_mul_of_nonneg_left h_r2_le (mul_nonneg h_bsq h_het)
     _ = beta_sq * het := by ring
 
-/-- **Population-specific imputation quality.**
-    Imputation r² depends on:
-    1. Reference panel size and diversity
-    2. LD structure in the target population
-    3. Allele frequency in the target
-    Lower quality for underrepresented populations.
-    Model: imputation r² ≈ r²_LD(best_tag), which depends on LD extent.
-    Populations with shorter LD blocks (due to older demographic history)
-    have lower r²_LD for the same array. If r²_tag_afr < r²_tag_eur and
-    imputation quality is monotone in tag LD, then r²_imp_afr < r²_imp_eur. -/
-theorem imputation_worse_for_underrepresented
-    (r2_tag_eur r2_tag_afr scale : ℝ)
-    (h_scale : 0 < scale) (h_scale_le : scale ≤ 1)
-    (h_shorter_ld : r2_tag_afr < r2_tag_eur) :
-    scale * r2_tag_afr < scale * r2_tag_eur := by
-  exact mul_lt_mul_of_pos_left h_shorter_ld h_scale
-
 /-- **Imputation error adds noise to PGS.**
     Imputed dosage = true genotype + imputation error.
     PGS_imputed = PGS_true + PGS_error.
@@ -106,21 +89,6 @@ PGS quality across populations.
 -/
 
 section ReferencePanel
-
-/-- **Reference panel diversity affects imputation for all populations.**
-    More diverse panels (e.g., TOPMed vs 1000G) improve imputation
-    for underrepresented populations.
-    Model: imputation r² improves with reference panel size n_ref as
-    r²(n) = r²_max × (1 - 1/n). Larger panels yield higher r². -/
-theorem diverse_panel_improves_imputation
-    (r2_max : ℝ) (n_small n_diverse : ℝ)
-    (h_r2 : 0 < r2_max) (h_ns : 1 < n_small) (h_nd : 1 < n_diverse)
-    (h_larger : n_small < n_diverse) :
-    r2_max * (1 - 1 / n_small) < r2_max * (1 - 1 / n_diverse) := by
-  apply mul_lt_mul_of_pos_left _ h_r2
-  have h1 : 1 / n_diverse < 1 / n_small :=
-    div_lt_div_of_pos_left one_pos (by linarith) h_larger
-  linarith
 
 /-- **Population-specific reference panels are optimal.**
     A reference panel from the same population gives the best
@@ -177,14 +145,6 @@ difficulty varies dramatically across populations.
 
 section RareVariantImputation
 
-/-- **Imputation r² drops sharply for rare variants.**
-    For MAF < 1%, r²_imp is often < 0.5 even with large reference panels.
-    This means rare variant PGS components are very noisy. -/
-theorem rare_variant_poor_imputation
-    (r2_common r2_rare : ℝ)
-    (h_much_worse : r2_rare < (1 / 2) * r2_common)
-    (h_common_good : 9 / 10 < r2_common) (h_common_le : r2_common ≤ 1) :
-    r2_rare < 1 / 2 := by nlinarith
 
 /-- **Population specificity of rare variant imputation.**
     Rare variants are population-specific → they're only in the
@@ -314,14 +274,6 @@ theorem portability_loss_decomposition
   · dsimp [total_portability_loss]
     linarith
 
-/-- **Technical loss is fixable; genetic loss is fundamental.**
-    WGS + diverse reference panels can eliminate technical loss.
-    Genetic loss requires new GWAS in target populations. -/
-theorem technical_loss_eliminable
-    (loss_with_tech loss_without_tech : ℝ)
-    (h_eliminated : loss_without_tech < loss_with_tech)
-    (h_nn : 0 ≤ loss_without_tech) :
-    0 ≤ loss_with_tech - loss_without_tech := by linarith
 
 end ArrayAscertainment
 

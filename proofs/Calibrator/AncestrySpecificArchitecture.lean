@@ -215,14 +215,6 @@ theorem gwas_h2_le_true (h2_true avg_r2_tag : ℝ)
   unfold gwasHeritability
   nlinarith
 
-/-- **Tagging efficiency varies by population.**
-    Source LD is tagged better in source-derived GWAS than target LD.
-    This creates a technical portability artifact. -/
-theorem tagging_creates_portability_artifact
-    (h2_source_gwas h2_target_gwas h2_true : ℝ)
-    (h_source_better : h2_target_gwas < h2_source_gwas)
-    (h_true : h2_source_gwas ≤ h2_true) :
-    h2_target_gwas < h2_true := by linarith
 
 end LDTagging
 
@@ -368,15 +360,6 @@ theorem fst_decreases_with_migration (m₁ m₂ Ne : ℝ)
   rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
   nlinarith
 
-/-- **Shared selection homogenizes architecture.**
-    If both populations experience the same selective pressure
-    (e.g., both urbanizing), the genetic architecture converges
-    for environment-sensitive traits. -/
-theorem shared_selection_improves_portability
-    (rg_before rg_after : ℝ)
-    (h_improves : rg_before < rg_after)
-    (h_le : rg_after ≤ 1) :
-    rg_before < 1 := by linarith
 
 /-!
 ### Derivation: portabilityFromArchitecture = rg² × (1 - Fst) × tagging_ratio

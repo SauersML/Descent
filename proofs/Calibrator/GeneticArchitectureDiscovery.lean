@@ -235,12 +235,6 @@ theorem ct_more_variable_than_bayesian
       exact bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
     exact mul_lt_mul_of_pos_left h_mse (h_tag i)
 
-/-- **Bayesian methods (PRS-CS) shrink small effects toward zero.**
-    This reduces the impact of noise → more stable portability. -/
-theorem shrinkage_stabilizes_portability
-    (noise_ct noise_bayes : ℝ)
-    (h_less_noise : noise_bayes < noise_ct) :
-    0 < noise_ct - noise_bayes := by linarith
 
 /-- **Both methods converge with infinite sample size.**
     The large-sample convergence statement is now tied to explicit discovered

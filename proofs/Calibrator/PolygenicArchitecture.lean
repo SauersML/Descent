@@ -168,8 +168,7 @@ theorem targetRetainedEffectMass_le_sourceEffectMass {q : ℕ}
   exact Finset.sum_le_sum fun j _ => model.targetRetained_le_source j
 
 /-- The relative portability loss is exactly the locuswise lost-effect mass
-fraction. This is the explicit SNP-level replacement for the deleted CLT
-`1 / √M` law. -/
+fraction. -/
 theorem relativePortabilityLoss_eq_locuswise_loss_fraction {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) :
     model.relativePortabilityLoss =
@@ -263,9 +262,7 @@ theorem height_polygenic_good_portability
 /-- **Selection can outweigh a polygenicity advantage.**
 
 Even if the selected trait has more causal SNPs, it can still have worse
-portability when the fraction of causal SNPs that lose target signal is larger.
-This is the explicit-SNP replacement for the deleted `rg² × portabilityScore`
-product theorem. -/
+portability when the fraction of causal SNPs that lose target signal is larger. -/
 theorem selection_overrides_polygenicity
     {M_neutral M_selected : ℕ}
     (neutralMismatch : Finset (Fin M_neutral))

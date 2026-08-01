@@ -117,12 +117,6 @@ theorem lai_pgs_at_least_as_good
   · simp [min_eq_left hab]; nlinarith
   · simp [min_eq_right (le_of_lt hab)]; nlinarith
 
-/-- **LAI accuracy required for improvement.**
-    LAI-PGS only helps if local ancestry can be called accurately.
-    With error rate ε in LAI, the improvement is proportional to (1-2ε). -/
-theorem lai_improvement_requires_accuracy
-    (ε : ℝ) (h_ε : 0 ≤ ε) (h_ε_lt : ε < 1/2) :
-    0 < 1 - 2 * ε := by linarith
 
 /-- **LAI accuracy decreases with admixture time.**
     Older admixture → shorter ancestry tracts → harder to call.
@@ -142,17 +136,6 @@ theorem tract_length_decreases_with_time
   · exact mul_pos (Nat.cast_pos.mpr h_t₁) h_r
   · exact mul_lt_mul_of_pos_right (Nat.cast_lt.mpr h_time) h_r
 
-/-- **LAI-PGS improvement is largest for recently admixed individuals.**
-    With long ancestry tracts, LAI is more accurate and the
-    ancestry-specific effects can be applied more precisely.
-    The LAI gain scales with (1 - 2ε) where ε is the LAI error rate.
-    Recent admixture has lower ε (longer tracts → easier to call). -/
-theorem recent_admixture_benefits_more
-    (ε_recent ε_ancient : ℝ)
-    (h_recent_accurate : 0 ≤ ε_recent) (h_recent_lt : ε_recent < 1/2)
-    (h_ancient_accurate : 0 ≤ ε_ancient) (h_ancient_lt : ε_ancient < 1/2)
-    (h_recent_better_lai : ε_recent < ε_ancient) :
-    1 - 2 * ε_ancient < 1 - 2 * ε_recent := by linarith
 
 end LocalAncestryPGS
 
@@ -343,16 +326,6 @@ theorem portability_gap_scales_with_fst
     c * fst₁ < c * fst₂ := by
   exact mul_lt_mul_of_pos_left h_fst h_c
 
-/-- **Equitable PGS requires proportional investment.**
-    To achieve equal R² across populations, the sample size
-    for underrepresented groups must be larger than proportional
-    to their population size (due to the LD mismatch penalty).
-    If the LD penalty factor is k > 1, then n_needed = k × n_proportional. -/
-theorem equitable_pgs_overinvestment
-    (n_proportional k : ℝ)
-    (h_nn : 0 < n_proportional) (h_k : 1 < k) :
-    n_proportional < k * n_proportional := by
-  nlinarith
 
 /-- **Universal portability is impossible.**
     No single PGS can achieve equal R² in all populations,

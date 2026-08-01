@@ -2702,9 +2702,8 @@ theorem fineTunedTargetR2_eq_oracle_minus_postGap_isotropic
     _ = oracle_target_r2 - coefficientGapSq wAfter wStar := by ring
 
 /-- **A better information-bottleneck representation lowers target sample needs.**
-    This theorem no longer inserts an affine bridge from a domain-adaptation
-    bound into the fine-tuning gap. Instead it uses an exact estimator-level
-    model:
+    The statement rests on an exact estimator-level model rather than an affine
+    bridge from a domain-adaptation bound:
 
     - target prediction risk is the literal quadratic risk
       `targetLinearRisk Σ_T c_T σ²`;

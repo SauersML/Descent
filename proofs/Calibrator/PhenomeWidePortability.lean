@@ -154,8 +154,7 @@ theorem fst_causal_lt_fst_neutral_of_stabilizing_selection
     h_s_pos h_t_pos h_base_pos
 
 /-- Effect-size-weighted retained causal portability from a locus-specific
-causal-`F_ST` profile. This is the direct SNP-level replacement for the old
-trait-wide `fst_causal` scalar. -/
+causal-`F_ST` profile, resolved per locus rather than as a trait-wide scalar. -/
 noncomputable def causalPortabilityFromLocalFst {m : ℕ}
     (sourceSquaredEffect fstCausal : Fin m → ℝ) : ℝ :=
   (∑ i, sourceSquaredEffect i * (1 - fstCausal i)) /
@@ -368,15 +367,6 @@ theorem region_disproportionate_variance
     n_region_snps / n_total_snps < r2_region / r2_genome_wide := by
   linarith
 
-/-- **Subtracting a positive selection shift lowers a scalar effect-correlation
-coordinate.**
-    This is the exact scalar inequality `ρ₀ - δ < ρ₀` when `δ > 0`. It is a
-    bookkeeping lemma for downstream biological interpretations, not by itself
-    a mechanistic selection theorem. -/
-theorem positive_selection_shift_lowers_scalar_effect_correlation
-    (rho_baseline δ_selection : ℝ)
-    (h_selection : 0 < δ_selection) :
-    rho_baseline - δ_selection < rho_baseline := by linarith
 
 /-- **A threshold sandwich implies observed portability is below neutral.**
     This is the literal transitivity fact `port_observed < threshold < port_neutral

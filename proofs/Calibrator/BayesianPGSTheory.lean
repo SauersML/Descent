@@ -139,8 +139,8 @@ noncomputable def gaussianPosteriorShrinkage (n h : ℝ) : ℝ :=
   n * h / (n * h + 1)
 
 /-- **Connection theorem:** The shrinkage factor derived from the Bayesian
-    linear model is exactly `gaussianPosteriorShrinkage n h`.
-    This justifies the previously-assumed formula by deriving it from first principles. -/
+    linear model is exactly `gaussianPosteriorShrinkage n h`, deriving that
+    formula from first principles rather than positing it. -/
 theorem BayesianLinearModel.shrinkageFactor_eq_gaussianPosteriorShrinkage
     (m : BayesianLinearModel) :
     m.shrinkageFactor =
@@ -548,17 +548,6 @@ theorem cross_population_posterior_wider
   unfold posteriorPredictiveVariance
   linarith
 
-/-- **Model uncertainty adds a third variance component.**
-    When comparing multiple Bayesian models (e.g., PRS-CS vs LDpred),
-    model uncertainty further widens the posterior predictive.
-    Total variance = within-model variance + between-model variance (law of
-    total variance). Since between-model variance ≥ 0, total ≥ within-model. -/
-theorem model_uncertainty_widens_intervals
-    (within_model_var between_model_var : ℝ)
-    (h_within_nn : 0 ≤ within_model_var)
-    (h_between_nn : 0 ≤ between_model_var) :
-    within_model_var ≤ within_model_var + between_model_var := by
-  linarith
 
 end PosteriorPredictive
 
@@ -612,21 +601,6 @@ theorem prs_cs_dominates_ct
     apply mul_le_mul h_pM_ratio h1 (by linarith) (by linarith)
   nlinarith
 
-/-- **PRS-CS portability advantage over C+T.**
-    By using the full LD structure, PRS-CS captures more of the
-    shared genetic signal, improving cross-population prediction.
-    Model: portability = R²_target/R²_source. PRS-CS recovers a
-    fraction (1-ε_cs) of the shared signal while C+T recovers
-    (1-ε_ct) where ε_ct ≥ ε_cs (C+T loses more to LD mismatch
-    because it uses hard thresholding). -/
-theorem prs_cs_portability_advantage
-    (shared_signal ε_ct ε_cs : ℝ)
-    (h_sig : 0 < shared_signal)
-    (h_ect : 0 ≤ ε_ct) (h_ect1 : ε_ct < 1)
-    (h_ecs : 0 ≤ ε_cs) (h_ecs1 : ε_cs < 1)
-    (h_cs_better : ε_cs ≤ ε_ct) :
-    shared_signal * (1 - ε_ct) ≤ shared_signal * (1 - ε_cs) := by
-  nlinarith
 
 /-- **PRS-CS with mismatched LD can be worse than C+T.**
     If the LD reference panel is from a very different population,

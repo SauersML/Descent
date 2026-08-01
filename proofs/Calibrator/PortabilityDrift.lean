@@ -670,38 +670,6 @@ noncomputable def targetLinearRisk {p : ℕ}
     (w : Fin p → ℝ) : ℝ :=
   noiseVar + dotProduct w (sigmaObsTarget.mulVec w) - 2 * dotProduct w crossTarget
 
-/-- If source ERM satisfies source normal equations but not target normal equations,
-the learned projection is source-LD specific (Euro-centric mismatch statement).
-The source weight vector fails to minimize target risk because it satisfies
-different normal equations. -/
-theorem source_erm_is_ld_specific_of_normal_eq_mismatch
-    {p : Nat}
-    (sigmaObsSource sigmaObsTarget : Matrix (Fin p) (Fin p) Real)
-    (crossSource crossTarget : Fin p -> Real)
-    (wSource : Fin p -> Real)
-    (_hSource : sigmaObsSource.mulVec wSource = crossSource)
-    (hMismatch : sigmaObsTarget.mulVec wSource ≠ crossTarget) :
-    ¬ sigmaObsTarget.mulVec wSource = crossTarget := by
-  intro hContra
-  exact absurd hContra hMismatch
-
-/-- If one coefficient vector solves source normal equations and another solves target normal equations,
-and no single vector can satisfy both systems, then source ERM and target ERM must differ. -/
-theorem source_target_erm_differ_of_ld_system_conflict
-    {p : Nat}
-    (sigmaObsSource sigmaObsTarget : Matrix (Fin p) (Fin p) Real)
-    (crossSource crossTarget : Fin p -> Real)
-    (wSource wTarget : Fin p -> Real)
-    (hSource : sigmaObsSource.mulVec wSource = crossSource)
-    (hTarget : sigmaObsTarget.mulVec wTarget = crossTarget)
-    (hConflict :
-      ∀ w : Fin p -> Real, sigmaObsSource.mulVec w = crossSource -> sigmaObsTarget.mulVec w ≠ crossTarget) :
-    wSource ≠ wTarget := by
-  intro hEq
-  have hNotTargetAtSource : sigmaObsTarget.mulVec wSource ≠ crossTarget := hConflict wSource hSource
-  have hTargetAtSource : sigmaObsTarget.mulVec wSource = crossTarget := by simpa [hEq] using hTarget
-  exact hNotTargetAtSource hTargetAtSource
-
 /-- Dense source covariance witness for non-degenerate ERM-transport tests. -/
 def sigmaObsSource : Matrix (Fin 2) (Fin 2) ℝ :=
   !![1, 0.5; 0.5, 1]
@@ -1185,8 +1153,8 @@ noncomputable def novelUntaggablePhenotypeResidual {p q : ℕ}
     m.novelUntaggablePhenotypeVarianceTarget_nonneg
 
 /-- Total additive irreducible target-side residual burden from the explicit
-biological state. Unlike the deleted scalar model, these losses are not folded
-into a single multiplicative retention factor. -/
+biological state. These losses are kept separate rather than folded into a
+single multiplicative retention factor. -/
 noncomputable def irreducibleTargetResidualBurden {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   brokenTaggingResidual m +
@@ -1334,7 +1302,7 @@ construction of source Brier. -/
 /-- Exact target `R²` under transported source weights and the full target-side
 driver state.
 
-Unlike the deleted scalar model, this depends explicitly on:
+Rather than collapsing to a scalar retention factor, this depends explicitly on:
 - source and target tag LD,
 - source and target tag-causal alignment,
 - source and target effect vectors,

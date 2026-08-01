@@ -1020,11 +1020,12 @@ theorem normalization_no_bias_iff_constant_prevalence {k : ℕ} [Fintype (Fin k)
   intro p c
   simp [prevalenceDGP_trueExpectation, h_const c]
 
-/-! ### Biological → Statistical Bridges (Sketches)
+/-! ### Biological → Statistical Bridges
 
-These statements connect biological mechanisms to statistical DGPs and to the
-need for nonlinear calibration. Proofs are sketched; fill in with measure-theory
-and L² projection lemmas. -/
+These structures connect biological mechanisms to statistical DGPs and to the
+need for nonlinear calibration. The consequence for calibration is proved in
+`Calibrator.ld_decay_implies_nonlinear_calibration_proved`, which exhibits three
+explicit distances rather than assuming non-affineness as a hypothesis. -/
 
 structure LDDecayMechanism (k : ℕ) where
   /-- Genetic distance proxy (e.g., PC-distance from training centroid). -/
@@ -1034,23 +1035,6 @@ structure LDDecayMechanism (k : ℕ) where
 
 def decaySlope {k : ℕ} (mech : LDDecayMechanism k) (c : Fin k → ℝ) : ℝ :=
   mech.tagging_efficiency (mech.distance c)
-
-theorem ld_decay_implies_nonlinear_calibration_sketch {k : ℕ} [Fintype (Fin k)]
-    (mech : LDDecayMechanism k)
-    (h_nonlin : ¬ ∃ a b, ∀ d ∈ Set.range mech.distance, mech.tagging_efficiency d = a + b * d) :
-    ∀ (beta0 beta1 : ℝ),
-      (fun c => beta0 + beta1 * mech.distance c) ≠
-        (fun c => decaySlope mech c) := by
-  intro beta0 beta1 h_eq
-  have h_forall : ∀ c, beta0 + beta1 * mech.distance c = mech.tagging_efficiency (mech.distance c) :=
-    fun c => congr_fun h_eq c
-
-  -- This contradicts h_nonlin
-  apply h_nonlin
-  use beta0, beta1
-  intro d hd
-  obtain ⟨c, hc⟩ := hd
-  rw [← hc, h_forall c]
 
 theorem optimal_slope_trace_variance {k : ℕ} [Fintype (Fin k)]
     (arch : GeneticArchitecture k) (c : Fin k → ℝ)
@@ -2393,12 +2377,6 @@ coordinates on transported signal plus any explicitly supplied calibration
 factor. The theorems below are therefore coordinate facts, not a general
 ranking theorem for real-world portability across distinct metrics. -/
 
-/-- A Nagelkerke-style score is strictly below the deployed `R²` coordinate when
-    the supplied calibration factor lies in `(0, 1)`. -/
-theorem nagelkerke_lt_r2_when_calibration_factor_lt_one (r2_target cal : ℝ)
-    (h_r2 : 0 < r2_target) (_h_cal : 0 < cal) (h_cal_lt : cal < 1) :
-    r2_target * cal < r2_target := by
-  nlinarith
 
 end EndToEndMetrics
 
