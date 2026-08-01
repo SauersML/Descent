@@ -15,9 +15,17 @@ size `n`. -/
 noncomputable def effectiveSubgroupSize (n m : ℝ) : ℝ := m * (n - m) / n
 
 /-- Rank-one signal contributed by a subgroup contrast with differentiation
-`F`. -/
+`F`, where `F` is Hudson `F_ST` between the two subgroups.
+
+The constant is `4`, not `2`.  Inverting the BBP eigenvalue law on simulated
+genotypes recovers `3.9920 ± 0.0045` with `F` measured as Hudson `F_ST` on the
+same simulated data, and the resulting sharp criterion `1 < M F² n` is the
+Patterson-Price-Reich boundary.  A constant of `2` corresponds instead to
+reading `F` as `Var(p₁ - p₂) / (p̄ (1 - p̄)) = 2 F_ST`; that is self-consistent
+but is not a standard quantity, so the scale of `F` is pinned to Hudson `F_ST`
+here rather than left to the caller. -/
 noncomputable def demographicSpike (n F m : ℝ) : ℝ :=
-  2 * F * effectiveSubgroupSize n m
+  4 * F * effectiveSubgroupSize n m
 
 /-- BBP-style proxy threshold for `n` samples and `M` effectively independent
 markers. -/

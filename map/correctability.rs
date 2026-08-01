@@ -205,7 +205,7 @@ pub fn calculate(input: &CorrectabilityInput) -> Result<CorrectabilityReport, Co
         .map(|class| {
             let aspect_ratio = input.sample_size / class.effective_markers;
             let bbp_threshold = aspect_ratio.sqrt();
-            let bbp_spike = 2.0 * class.differentiation * effective_subgroup_size;
+            let bbp_spike = 4.0 * class.differentiation * effective_subgroup_size;
             let detectable_by_sample_pca = bbp_spike > bbp_threshold;
             let included_by_fitted_pcs =
                 detectable_by_sample_pca && class.theoretical_pc_rank <= input.fitted_pcs;
@@ -267,7 +267,7 @@ pub fn calculate(input: &CorrectabilityInput) -> Result<CorrectabilityReport, Co
         fitted_pcs: input.fitted_pcs,
         effective_subgroup_size,
         total_frequency_information,
-        combined_signal_to_threshold_ratio: 2.0
+        combined_signal_to_threshold_ratio: 4.0
             * effective_subgroup_size
             * (total_frequency_information / input.sample_size).sqrt(),
         any_single_class_detectable: marker_classes
@@ -363,7 +363,7 @@ mod tests {
 
         let report = calculate(&input).expect("valid design");
         let class = &report.marker_classes[0];
-        let expected_spike: f64 = 2.0 * 0.01 * 250.0;
+        let expected_spike: f64 = 4.0 * 0.01 * 250.0;
         let expected_aspect_ratio: f64 = 1_000.0 / 4_000.0;
 
         assert_eq!(report.effective_subgroup_size, 250.0);
