@@ -4,6 +4,7 @@ import Calibrator.PCCorrectability.Frequency
 import Calibrator.PCCorrectability.Geometry
 import Calibrator.PCCorrectability.Nonidentifiability
 import Calibrator.PCCorrectability.Overlap
+import Calibrator.PCCorrectability.Unified
 
 /-!
 # Population-structure correctability for PC and mixed-model adjustment
