@@ -7,6 +7,9 @@ import Calibrator.AssortativeMatingPGS
 import Calibrator.CovarianceStructure
 import Calibrator.AncestrySpecificPower
 import Calibrator.GeneticArchitectureDiscovery
+import Calibrator.LongitudinalPortability
+import Calibrator.LDDecayTheory
+import Calibrator.MetricSpecificPortability
 
 namespace Calibrator
 
@@ -119,7 +122,7 @@ theorem hudsonFst_eq_varianceRatio (p₁ p₂ : ℝ)
         (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
   have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
   have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
-  unfold hudsonFst betweenSubgroupVariance ploidy
+  unfold hudsonFst betweenSubgroupVariance meanAlleleFreq ploidy
   field_simp
   ring
 
@@ -128,10 +131,8 @@ theorem hudsonFst_eq_varianceRatio (p₁ p₂ : ℝ)
 theorem simpleFst_eq_hudsonFst (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
     simpleFst p₁ p₂ = hudsonFst p₁ p₂ := by
-  have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
-  have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
-  unfold simpleFst hudsonFst meanAlleleFreq ploidy at *
-  field_simp
+  rw [hudsonFst_eq_varianceRatio p₁ p₂ h]
+  unfold simpleFst betweenSubgroupVariance meanAlleleFreq
   ring
 
 /-- **The spike constant is forced, not chosen.**
@@ -275,6 +276,46 @@ theorem equilibriumFst_eq_scaled (Ne m : ℝ) :
       fstMutationDriftEquilibrium (scaledMigrationRate Ne m) := by
   unfold equilibriumFst fstMutationDriftEquilibrium
   rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
+
+/-! ### Per-generation drift rate, written out in three modules
+
+`1 / (2 Nₑ)` appears independently in `LongitudinalPortability`,
+`DemographicHistory` and `LDDecayTheory` under three names. It is the
+reciprocal of the coalescent time scale in each. -/
+
+theorem longitudinalDriftDecayRate_eq_inv_timeScale (Ne : ℝ) :
+    longitudinalDriftDecayRate Ne = 1 / coalescentTimeScale Ne := by
+  unfold longitudinalDriftDecayRate; rw [coalescentTimeScale_eq]
+
+theorem driftLDCreationRate_eq_inv_timeScale (Ne : ℝ) :
+    driftLDCreationRate Ne = 1 / coalescentTimeScale Ne := by
+  unfold driftLDCreationRate; rw [coalescentTimeScale_eq]
+
+theorem ldDecayRatePerGen_eq_inv_timeScale (Ne : ℝ) :
+    ldDecayRatePerGen Ne = 1 / coalescentTimeScale Ne := by
+  unfold ldDecayRatePerGen; rw [coalescentTimeScale_eq]
+
+/-! ### The coalescent `F_ST` map, written out twice
+
+`DemographicHistory.fstFromCoalescenceTime` and
+`PopulationGeneticsFoundations.coalFst` are the same function. `coalFst` is
+the one simulation validated as split `F_ST`, being unbiased against
+branch-mode divergence where the drift formula was biased upward by up to 28
+percent, so relating them transfers that evidence. -/
+
+theorem fstFromCoalescenceTime_eq_coalFst (T Ne : ℝ) :
+    fstFromCoalescenceTime T Ne = coalFst T Ne := by
+  unfold fstFromCoalescenceTime coalFst; ring_nf
+
+/-! ### The harmonic mean, written out twice
+
+`MetricSpecificPortability.f1ScoreMetric` and `OpenQuestions.f1Score` are the
+same expression under two names in two modules, with no theorem relating
+them. -/
+
+theorem f1ScoreMetric_eq_f1Score (precision sens : ℝ) :
+    f1ScoreMetric precision sens = f1Score precision sens := by
+  unfold f1ScoreMetric f1Score; ring_nf
 
 end EquilibriumAgreements
 

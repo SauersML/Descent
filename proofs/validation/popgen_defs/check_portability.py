@@ -111,10 +111,14 @@ def one_rep(args):
     yB = np.sqrt(h2) * gB_scaled + np.sqrt(1 - h2) * eB
     yB -= yB.mean()
 
-    # marginal GWAS in the source
-    n = n_dip
-    bhat = (ZA.T @ y) / n
-    se = np.sqrt((1 - bhat**2).clip(1e-12) / n)
+    # Hold out half the SOURCE population.  R^2 must be measured out of sample
+    # in both populations, otherwise the source number is inflated by
+    # overfitting and the ratio confounds overfitting with portability.
+    n_train = n_dip // 2
+    tr = slice(0, n_train)
+    te = slice(n_train, n_dip)
+    bhat = (ZA[tr].T @ (y[tr] - y[tr].mean())) / n_train
+    se = np.sqrt((1 - bhat**2).clip(1e-12) / n_train)
     z = bhat / se
 
     out = dict(split_t=split_t, fst=fst, n_causal=n_causal, h2=h2,
@@ -127,10 +131,12 @@ def one_rep(args):
             out[f"r2A_{tag}"] = out[f"r2B_{tag}"] = float("nan")
             continue
         w = bhat[sel]
-        sA = ZA[:, sel] @ w
-        sB = ZB[:, sel] @ w
-        out[f"r2A_{tag}"] = float(np.corrcoef(sA, y)[0, 1] ** 2)
+        sA_te = ZA[te][:, sel] @ w          # held-out source individuals
+        sB = ZB[:, sel] @ w                 # target population
+        sA_tr = ZA[tr][:, sel] @ w          # in-sample, for reference only
+        out[f"r2A_{tag}"] = float(np.corrcoef(sA_te, y[te])[0, 1] ** 2)
         out[f"r2B_{tag}"] = float(np.corrcoef(sB, yB)[0, 1] ** 2)
+        out[f"r2Ain_{tag}"] = float(np.corrcoef(sA_tr, y[tr])[0, 1] ** 2)
         out[f"nsnp_{tag}"] = int(len(sel))
 
     # pgsVariance: sum beta^2 2p(1-p) vs the actual variance of the score,
