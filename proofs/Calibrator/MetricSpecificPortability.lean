@@ -351,8 +351,8 @@ theorem neutralAF_benchmark_liability_auc_sensitive_to_drift
     (h_fst : fstS < fstT)
     (h_fst_bounds : 0 ≤ fstS ∧ fstT < 1)
     (hPhiStrict : StrictMono Phi) :
-    0 < presentDayLiabilityAUC V_A V_E fstS -
-      targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fstT := by
+    0 < presentDayEqualVarianceGaussianAUC V_A V_E fstS -
+      targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fstT := by
   have h_drop :=
     targetLiabilityAUC_lt_source_of_neutralAF_benchmark
       V_A V_E fstS fstT hVA hVE h_fst h_fst_bounds hPhiStrict
@@ -406,8 +406,8 @@ while CITL shifts exactly with the mean-score offset.**
     while calibration is lost." -/
 theorem neutralAF_benchmark_auc_preserved_citl_shift_at_fixed_fst
     (V_A V_E fst mean_obs mean_pred δ : ℝ) :
-    targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fst =
-      presentDayLiabilityAUC V_A V_E fst ∧
+    targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fst =
+      presentDayEqualVarianceGaussianAUC V_A V_E fst ∧
     calibrationInTheLarge mean_obs (mean_pred + δ) =
       calibrationInTheLarge mean_obs mean_pred - δ := by
   constructor
@@ -429,8 +429,8 @@ theorem neutralAF_benchmark_discrimination_preserved_calibration_lost
     (V_A V_E fst mean_obs mean_pred δ : ℝ)
     (h_src_cal : calibrationInTheLarge mean_obs mean_pred = 0)
     (h_shift : δ ≠ 0) :
-    targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fst =
-      presentDayLiabilityAUC V_A V_E fst ∧
+    targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fst =
+      presentDayEqualVarianceGaussianAUC V_A V_E fst ∧
     |calibrationInTheLarge mean_obs mean_pred| <
       |calibrationInTheLarge mean_obs (mean_pred + δ)| := by
   rcases neutralAF_benchmark_auc_preserved_citl_shift_at_fixed_fst
@@ -986,8 +986,8 @@ theorem metrics_both_degrade_under_drift
         (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
       sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
-      targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart,
-      sourceLiabilityAUCFromSourceWeights_eq_explainedR2_chart]
+      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart,
+      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_brier :

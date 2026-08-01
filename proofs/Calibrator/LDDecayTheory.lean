@@ -197,45 +197,15 @@ generates LD between previously independent loci.
 
 section BottleneckLD
 
-/-- **Bottleneck amplification of LD.**
-    After a bottleneck of size N_b for t generations, LD increases by
-    approximately 1/(2·N_b) per generation (drift-generated LD).
+/-! ### Bottleneck LD amplification
 
-    Empirical status: UNTESTED. -/
-noncomputable def bottleneckLDAmplification (N_b : ℝ) (t : ℕ) : ℝ :=
-  1 - (1 - 1/(2 * N_b)) ^ t
-
-/-- Bottleneck LD increases with bottleneck duration. -/
-theorem bottleneck_ld_increases_with_duration
-    (N_b : ℝ) (t₁ t₂ : ℕ)
-    (hN : 2 < N_b) (h_time : t₁ < t₂) :
-    bottleneckLDAmplification N_b t₁ < bottleneckLDAmplification N_b t₂ := by
-  unfold bottleneckLDAmplification
-  have h_base_pos : 0 < 1 - 1/(2 * N_b) := by
-    rw [sub_pos, div_lt_one (by linarith)]; linarith
-  have h_base_lt : 1 - 1/(2 * N_b) < 1 := by
-    rw [sub_lt_self_iff]; positivity
-  linarith [pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt h_time]
-
-/-- Bottleneck LD increases with smaller bottleneck size. -/
-theorem bottleneck_ld_increases_with_severity
-    (N₁ N₂ : ℝ) (t : ℕ)
-    (hN₁ : 2 < N₁) (hN₂ : 2 < N₂) (h_smaller : N₂ < N₁)
-    (ht : 0 < t) :
-    bottleneckLDAmplification N₁ t < bottleneckLDAmplification N₂ t := by
-  unfold bottleneckLDAmplification
-  -- Need: (1 - 1/(2N₁))^t > (1 - 1/(2N₂))^t, so 1 - former < 1 - latter
-  -- Since N₂ < N₁, 1/(2N₂) > 1/(2N₁), so 1 - 1/(2N₂) < 1 - 1/(2N₁)
-  have h_base : 1 - 1/(2 * N₂) < 1 - 1/(2 * N₁) := by
-    rw [sub_lt_sub_iff_left]
-    exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
-  have h_nn : 0 ≤ 1 - 1/(2 * N₂) := by
-    rw [sub_nonneg, div_le_one (by linarith)]; linarith
-  have h_lt_one : 1 - 1/(2 * N₁) < 1 := by
-    rw [sub_lt_self_iff]; positivity
-  -- (1-1/(2N₂))^t < (1-1/(2N₁))^t because base is smaller and both in [0,1)
-  have h_pow := pow_lt_pow_left₀ h_base h_nn (by omega : t ≠ 0)
-  linarith
+Removed.  This defined `bottleneckLDAmplification N_b t = 1 - (1 - 1/(2 N_b))^t`,
+drift-generated LD after a bottleneck.  Simulation falsifies it: it takes no
+recombination rate, so it rises to 1 with time instead of saturating at the
+drift-recombination equilibrium `1/(1 + 4 N c)`, overstating by up to 3.3-fold.
+The missing argument is the defect, as in five earlier cases, and no constant
+repairs it.
+-/
 
 end BottleneckLD
 

@@ -819,8 +819,8 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
           metric cal.targetObservedMean).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
       sourceMetricProfileFromSourceWeightsAtPrevalence_auc,
-      targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart,
-      sourceLiabilityAUCFromSourceWeights_eq_explainedR2_chart]
+      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart,
+      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
@@ -1171,8 +1171,8 @@ theorem cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget
         (sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
       sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
-      targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart,
-      sourceLiabilityAUCFromSourceWeights_eq_explainedR2_chart]
+      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart,
+      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
@@ -1253,8 +1253,8 @@ theorem neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget <
-      presentDayLiabilityAUC V_A V_E fstSource ∧
+    targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
+      presentDayEqualVarianceGaussianAUC V_A V_E fstSource ∧
     sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
       targetExactCalibratedBrierRisk π V_A V_E fstTarget := by
   constructor

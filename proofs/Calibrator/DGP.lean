@@ -2041,7 +2041,7 @@ noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   vSignal / (vSignal + vNoise)
 
 /-- Exact equal-variance Gaussian liability AUC from signal and residual variances. -/
-noncomputable def aucFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
+noncomputable def gaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   Phi (Real.sqrt (vSignal / (2 * vNoise)))
 
 /-- Exact calibrated Bernoulli Brier risk from prevalence and explained-risk fraction. -/
@@ -2118,7 +2118,7 @@ structure Profile where
 noncomputable def profileFromSignalVariance
     (π vNoise vSignal : ℝ) : Profile where
   r2 := r2FromSignalVariance vSignal vNoise
-  auc := aucFromSignalVariance vSignal vNoise
+  auc := gaussianAUCFromSignalVariance vSignal vNoise
   brier := calibratedBrierFromVariances π vSignal vNoise
 
 @[simp] theorem profileFromSignalVariance_r2
@@ -2130,7 +2130,7 @@ noncomputable def profileFromSignalVariance
 @[simp] theorem profileFromSignalVariance_auc
     (π vNoise vSignal : ℝ) :
     (profileFromSignalVariance π vNoise vSignal).auc =
-      aucFromSignalVariance vSignal vNoise := by
+      gaussianAUCFromSignalVariance vSignal vNoise := by
   rfl
 
 @[simp] theorem profileFromSignalVariance_brier
@@ -2160,7 +2160,7 @@ noncomputable def profileFromSignalVarianceWithPenalty
 @[simp] theorem profileFromSignalVarianceWithPenalty_auc
     (π vNoise vSignal : ℝ) (penalty : IrreducibleTargetPenalty) :
     (profileFromSignalVarianceWithPenalty π vNoise vSignal penalty).auc =
-      aucFromSignalVariance vSignal (vNoise + penalty.total) := by
+      gaussianAUCFromSignalVariance vSignal (vNoise + penalty.total) := by
   rfl
 
 @[simp] theorem profileFromSignalVarianceWithPenalty_brier
@@ -2259,7 +2259,7 @@ noncomputable def PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty
     (m : PGSEvolutionaryModel) (vSignalTarget : ℝ)
     (penalty : TransportedMetrics.IrreducibleTargetPenalty) :
     (m.metricProfileFromTargetSignalWithPenalty vSignalTarget penalty).auc =
-      TransportedMetrics.aucFromSignalVariance vSignalTarget (m.V_E + penalty.total) := by
+      TransportedMetrics.gaussianAUCFromSignalVariance vSignalTarget (m.V_E + penalty.total) := by
   rfl
 
 @[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty_brier

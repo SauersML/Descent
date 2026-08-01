@@ -10,6 +10,7 @@ import Calibrator.GeneticArchitectureDiscovery
 import Calibrator.LongitudinalPortability
 import Calibrator.LDDecayTheory
 import Calibrator.MetricSpecificPortability
+import Calibrator.PortabilityDrift
 import Calibrator.StratificationConfounding
 
 namespace Calibrator
@@ -139,7 +140,6 @@ theorem simpleFst_eq_hudsonFst (p₁ p₂ : ℝ)
     ((p₁ - p₂) ^ 2 / 4) /
       (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
   field_simp [h]
-  ring
 
 /-- **The spike constant is forced, not chosen.**
 
@@ -340,8 +340,8 @@ they must agree. -/
 theorem equalVarianceGaussianAUCFromVariances_eq_aucFromSignalVariance
     (vSignal vNoise : ℝ) :
     equalVarianceGaussianAUCFromVariances vSignal vNoise =
-      aucFromSignalVariance vSignal vNoise := by
-  unfold equalVarianceGaussianAUCFromVariances aucFromSignalVariance; ring_nf
+      gaussianAUCFromSignalVariance vSignal vNoise := by
+  unfold equalVarianceGaussianAUCFromVariances gaussianAUCFromSignalVariance; ring_nf
 
 /-- Wright's compounding identity: one minus the product of retentions. It is
 written once for the two branches of a split and once for the two levels of

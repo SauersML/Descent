@@ -525,24 +525,24 @@ theorem target_metric_profile_auc_uses_explicit_target_moments {p q : ℕ}
       equalVarianceGaussianAUCFromVariances
         (targetExplainedSignalVarianceFromSourceWeights m)
         (targetResidualVarianceFromSourceWeights m) := by
-  simp [targetMetricProfileFromSourceWeights, targetLiabilityAUCFromSourceWeights]
+  simp [targetMetricProfileFromSourceWeights, targetEqualVarianceGaussianAUCFromSourceWeights]
 
 /-- The mechanistic target AUC agrees with the `R²` chart induced by the same
 explicit target explained-signal and total-variance decomposition. This is a
 derived chart identity, not the definition of transported AUC. -/
 theorem target_liability_auc_eq_explainedR2_chart {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetLiabilityAUCFromSourceWeights m =
+    targetEqualVarianceGaussianAUCFromSourceWeights m =
       equalVarianceGaussianAUCFromExplainedR2 (targetR2FromSourceWeights m) := by
-  simpa using targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart m
+  simpa using targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart m
 
 /-- When target LD among scored SNPs changes, the deployed liability-threshold
 AUC changes because the explicit target score moments, and therefore the
 derived deployed `R²`, change under the mechanistic state. -/
 theorem target_ld_shift_changes_liability_auc
     (hPhiStrict : StrictMono Phi) :
-    targetLiabilityAUCFromSourceWeights targetLDShiftMetricModel <
-      targetLiabilityAUCFromSourceWeights baselineMetricModel := by
+    targetEqualVarianceGaussianAUCFromSourceWeights targetLDShiftMetricModel <
+      targetEqualVarianceGaussianAUCFromSourceWeights baselineMetricModel := by
   rcases target_ld_shift_changes_portability_without_changing_source_r2 with
     ⟨_, _, h_target_shift, h_target_base, _⟩
   rw [target_liability_auc_eq_explainedR2_chart,

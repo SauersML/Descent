@@ -413,7 +413,7 @@ noncomputable def expectedR2 (vSignal V_E : ℝ) : ℝ :=
 If case/control scores differ only by a mean shift with common residual variance
 `V_E`, then the population AUC is exactly `Φ(√(SNR/2))`, where
 `SNR = presentDayPGSVariance / V_E`. -/
-noncomputable def presentDayAUC (V_A V_E fst : ℝ) : ℝ :=
+noncomputable def presentDayGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
   Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2))
 
 /-- Exact present-day AUC under the equal-variance Gaussian liability model.
@@ -422,8 +422,8 @@ If case/control scores differ only by a mean shift with common residual variance
 `SNR = presentDayPGSVariance / V_E`.
 
     Empirical status: UNTESTED. -/
-noncomputable def presentDayLiabilityAUC (V_A V_E fst : ℝ) : ℝ :=
-  presentDayAUC V_A V_E fst
+noncomputable def presentDayEqualVarianceGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
+  presentDayGaussianAUC V_A V_E fst
 
 /-- Drift monotonically degrades signal-to-noise when `V_A, V_E > 0`. -/
 theorem drift_degrades_signalToNoise
@@ -512,8 +512,8 @@ theorem drift_degrades_AUC_of_strictMono
     (hfst : fstS < fstT)
     (hfstT_le_one : fstT ≤ 1)
     (hPhiStrict : StrictMono Phi) :
-    presentDayAUC V_A V_E fstT < presentDayAUC V_A V_E fstS := by
-  unfold presentDayAUC
+    presentDayGaussianAUC V_A V_E fstT < presentDayGaussianAUC V_A V_E fstS := by
+  unfold presentDayGaussianAUC
   apply hPhiStrict
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
@@ -530,9 +530,9 @@ theorem drift_degrades_AUC_of_strictMono
   exact Real.sqrt_lt_sqrt hhalf_nonneg hhalf_lt
 
 /-- Exact present-day liability AUC formula in variance units. -/
-theorem presentDayLiabilityAUC_eq
+theorem presentDayEqualVarianceGaussianAUC_eq
     (V_A V_E fst : ℝ) :
-    presentDayLiabilityAUC V_A V_E fst =
+    presentDayEqualVarianceGaussianAUC V_A V_E fst =
       Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
   rfl
 
@@ -544,8 +544,8 @@ theorem drift_degrades_equalVarianceGaussianAUC
     (hfst : fstS < fstT)
     (hfstT_le_one : fstT ≤ 1)
     (hPhiStrict : StrictMono Phi) :
-    presentDayLiabilityAUC V_A V_E fstT < presentDayLiabilityAUC V_A V_E fstS := by
-  unfold presentDayLiabilityAUC
+    presentDayEqualVarianceGaussianAUC V_A V_E fstT < presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
+  unfold presentDayEqualVarianceGaussianAUC
   apply hPhiStrict
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
@@ -2447,16 +2447,16 @@ abbrev brierFromR2 (π r2 : ℝ) : ℝ :=
   exactCalibratedBrierRiskFromR2 π r2
 
 /-- Exact target AUC from the neutral allele-frequency benchmark state. -/
-noncomputable def targetAUCFromNeutralAFBenchmark
+noncomputable def targetGaussianAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget : ℝ) : ℝ :=
-  presentDayAUC V_A V_E fstTarget
+  presentDayGaussianAUC V_A V_E fstTarget
 
 /-- The neutral allele-frequency benchmark target AUC is definitionally the
 literal present-day AUC in this coarse chart. -/
 theorem targetAUCFromNeutralAFBenchmark_eq_presentDayAUC
     (V_A V_E fstTarget : ℝ) :
-    targetAUCFromNeutralAFBenchmark V_A V_E fstTarget =
-      presentDayAUC V_A V_E fstTarget := by
+    targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget =
+      presentDayGaussianAUC V_A V_E fstTarget := by
   rfl
 
 /-- Source Brier chart as a function of prevalence and source `R²`. -/
@@ -2496,7 +2496,7 @@ theorem neutralAFBenchmarkMetricProfile_eq
     (π V_A V_E fstTarget : ℝ) :
     neutralAFBenchmarkMetricProfile π V_A V_E fstTarget =
       { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
-      , auc := targetAUCFromNeutralAFBenchmark V_A V_E fstTarget
+      , auc := targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
       , brier := targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget } := by
   ext
   · change
@@ -2505,10 +2505,10 @@ theorem neutralAFBenchmarkMetricProfile_eq
     unfold targetR2FromNeutralAFBenchmark TransportedMetrics.r2FromSignalVariance presentDayR2
     rfl
   · change
-      TransportedMetrics.aucFromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
-        targetAUCFromNeutralAFBenchmark V_A V_E fstTarget
-    unfold targetAUCFromNeutralAFBenchmark TransportedMetrics.aucFromSignalVariance
-      presentDayAUC presentDaySignalToNoise
+      TransportedMetrics.gaussianAUCFromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
+        targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
+    unfold targetGaussianAUCFromNeutralAFBenchmark TransportedMetrics.gaussianAUCFromSignalVariance
+      presentDayGaussianAUC presentDaySignalToNoise
     congr 1
     congr 1
     ring_nf
@@ -2530,9 +2530,9 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetAUCFromNeutralAFBenchmark V_A V_E fstTarget <
-      presentDayAUC V_A V_E fstSource := by
-  simpa [targetAUCFromNeutralAFBenchmark] using
+    targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
+      presentDayGaussianAUC V_A V_E fstSource := by
+  simpa [targetGaussianAUCFromNeutralAFBenchmark] using
     drift_degrades_AUC_of_strictMono
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
@@ -2569,18 +2569,6 @@ noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
 noncomputable def equalVarianceGaussianAUCFromVariances (vSignal vEnv : ℝ) : ℝ :=
   Phi (Real.sqrt (vSignal / (2 * vEnv)))
 
-/-- **Cross-check: the `R²` form and the SNR form are the same map.**
-
-Under `snr = R²/(1 - R²)` the two agree exactly. Stated because they were
-written separately and never related, which is the condition under which the
-whole family could be misnamed without any of them contradicting the others. -/
-theorem equalVarianceGaussianAUCFromExplainedR2_eq_fromSNR (r2 : ℝ) :
-    equalVarianceGaussianAUCFromExplainedR2 r2 =
-      equalVarianceGaussianAUCFromSNR (r2 / (1 - r2)) := by
-  unfold equalVarianceGaussianAUCFromExplainedR2 equalVarianceGaussianAUCFromSNR
-  congr 2
-  rw [div_div, mul_comm]
-
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
     equalVarianceGaussianAUCFromVariances vSignal 1 = equalVarianceGaussianAUCFromSNR vSignal := by
@@ -2614,6 +2602,18 @@ docstring named the right model out loud.
 noncomputable def equalVarianceGaussianAUCFromExplainedR2 (r2 : ℝ) : ℝ :=
   Phi (Real.sqrt (r2 / (2 * (1 - r2))))
 
+/-- **Cross-check: the `R²` form and the SNR form are the same map.**
+
+Under `snr = R²/(1 - R²)` the two agree exactly. Stated because they were
+written separately and never related, which is the condition under which the
+whole family could be misnamed without any of them contradicting the others. -/
+theorem equalVarianceGaussianAUCFromExplainedR2_eq_fromSNR (r2 : ℝ) :
+    equalVarianceGaussianAUCFromExplainedR2 r2 =
+      equalVarianceGaussianAUCFromSNR (r2 / (1 - r2)) := by
+  unfold equalVarianceGaussianAUCFromExplainedR2 equalVarianceGaussianAUCFromSNR
+  congr 2
+  rw [div_div, mul_comm]
+
 /-- On valid deployed `R²` values, the liability-threshold AUC chart is strictly
 increasing whenever `Phi` is strictly increasing. -/
 theorem equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
@@ -2641,7 +2641,7 @@ explained signal and source residual variance under the source-learned score
 equation.
 
     Empirical status: UNTESTED. -/
-noncomputable def sourceLiabilityAUCFromSourceWeights {p q : ℕ}
+noncomputable def sourceEqualVarianceGaussianAUCFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   equalVarianceGaussianAUCFromVariances
     (sourceExplainedSignalVarianceFromSourceWeights m)
@@ -2649,9 +2649,9 @@ noncomputable def sourceLiabilityAUCFromSourceWeights {p q : ℕ}
 
 /-- The mechanistic source AUC is exactly the explicit liability-threshold map
 applied to source explained signal and source residual variance. -/
-theorem sourceLiabilityAUCFromSourceWeights_eq_explicit_source_variances
+theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    sourceLiabilityAUCFromSourceWeights m =
+    sourceEqualVarianceGaussianAUCFromSourceWeights m =
       equalVarianceGaussianAUCFromVariances
         (sourceExplainedSignalVarianceFromSourceWeights m)
         (sourceResidualVarianceFromSourceWeights m) := by
@@ -2662,13 +2662,13 @@ same source explained-signal and total-variance decomposition.
 
 This is only a derived coordinate identity; it is not the defining
 construction of source AUC. -/
-theorem sourceLiabilityAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
+theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    sourceLiabilityAUCFromSourceWeights m =
+    sourceEqualVarianceGaussianAUCFromSourceWeights m =
       equalVarianceGaussianAUCFromExplainedR2 (sourceR2FromSourceWeights m) := by
   have h_source_ne : m.sourceOutcomeVariance ≠ 0 := by
     exact ne_of_gt m.sourceOutcomeVariance_pos
-  unfold sourceLiabilityAUCFromSourceWeights equalVarianceGaussianAUCFromVariances
+  unfold sourceEqualVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromVariances
     sourceResidualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
     sourceR2FromSourceWeights
   congr 1
@@ -2684,7 +2684,7 @@ not defined by reading target `R²` through a chart, and it does not recover a
 latent biological signal from source `R²`.
 
     Empirical status: UNTESTED. -/
-noncomputable def targetLiabilityAUCFromSourceWeights {p q : ℕ}
+noncomputable def targetEqualVarianceGaussianAUCFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   equalVarianceGaussianAUCFromVariances
     (targetExplainedSignalVarianceFromSourceWeights m)
@@ -2692,9 +2692,9 @@ noncomputable def targetLiabilityAUCFromSourceWeights {p q : ℕ}
 
 /-- The mechanistic target AUC is exactly the explicit liability-threshold map
 applied to target explained signal and target residual variance. -/
-theorem targetLiabilityAUCFromSourceWeights_eq_explicit_target_variances {p q : ℕ}
+theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetLiabilityAUCFromSourceWeights m =
+    targetEqualVarianceGaussianAUCFromSourceWeights m =
       equalVarianceGaussianAUCFromVariances
         (targetExplainedSignalVarianceFromSourceWeights m)
         (targetResidualVarianceFromSourceWeights m) := by
@@ -2703,24 +2703,24 @@ theorem targetLiabilityAUCFromSourceWeights_eq_explicit_target_variances {p q : 
 /-- Exact mechanistic target liability-AUC portability law from transported
 score moments. This is the direct liability-threshold variance law on the
 explicit SNP-level transport model. -/
-theorem targetLiabilityAUCFromSourceWeights_exact_metric_portability_law
+theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetLiabilityAUCFromSourceWeights m =
+    targetEqualVarianceGaussianAUCFromSourceWeights m =
       equalVarianceGaussianAUCFromVariances
         ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
           targetScoreVarianceFromSourceWeights m)
         (effectiveTargetOutcomeVariance m -
           (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
             targetScoreVarianceFromSourceWeights m) := by
-  rw [targetLiabilityAUCFromSourceWeights_eq_explicit_target_variances]
+  rw [targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances]
   simp [targetExplainedSignalVarianceFromSourceWeights,
     targetResidualVarianceFromSourceWeights]
 
 /-- Exact mechanistic target liability-AUC portability law with the additive
 biological loss budget made explicit in the residual term. -/
-theorem targetLiabilityAUCFromSourceWeights_exact_loss_budget_law
+theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetLiabilityAUCFromSourceWeights m =
+    targetEqualVarianceGaussianAUCFromSourceWeights m =
       equalVarianceGaussianAUCFromVariances
         ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
           targetScoreVarianceFromSourceWeights m)
@@ -2731,7 +2731,7 @@ theorem targetLiabilityAUCFromSourceWeights_exact_loss_budget_law
           novelUntaggablePhenotypeResidual m -
           (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
             targetScoreVarianceFromSourceWeights m) := by
-  rw [targetLiabilityAUCFromSourceWeights_exact_metric_portability_law,
+  rw [targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law,
     effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses]
 
 /-- The direct mechanistic target AUC agrees with the `R²` chart induced by the
@@ -2739,13 +2739,13 @@ same target explained-signal and total-variance decomposition.
 
 This is only a derived coordinate identity; it is not the defining
 construction of target AUC. -/
-theorem targetLiabilityAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
+theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetLiabilityAUCFromSourceWeights m =
+    targetEqualVarianceGaussianAUCFromSourceWeights m =
       equalVarianceGaussianAUCFromExplainedR2 (targetR2FromSourceWeights m) := by
   have h_eff_ne : effectiveTargetOutcomeVariance m ≠ 0 := by
     exact ne_of_gt (effectiveTargetOutcomeVariance_pos m)
-  unfold targetLiabilityAUCFromSourceWeights equalVarianceGaussianAUCFromVariances
+  unfold targetEqualVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromVariances
     targetResidualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
     targetR2FromSourceWeights
   congr 1
@@ -2762,7 +2762,7 @@ prevalence scale.
 noncomputable def sourceMetricProfileFromSourceWeightsAtPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) : TransportedMetrics.Profile where
   r2 := sourceR2FromSourceWeights m
-  auc := sourceLiabilityAUCFromSourceWeights m
+  auc := sourceEqualVarianceGaussianAUCFromSourceWeights m
   brier := sourceCalibratedBrierFromSourceWeightsAtPrevalence m π
 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtPrevalence_r2 {p q : ℕ}
@@ -2774,7 +2774,7 @@ noncomputable def sourceMetricProfileFromSourceWeightsAtPrevalence {p q : ℕ}
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtPrevalence_auc {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) :
     (sourceMetricProfileFromSourceWeightsAtPrevalence m π).auc =
-      sourceLiabilityAUCFromSourceWeights m := by
+      sourceEqualVarianceGaussianAUCFromSourceWeights m := by
   rfl
 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtPrevalence_brier {p q : ℕ}
@@ -2800,7 +2800,7 @@ noncomputable def sourceMetricProfileFromSourceWeightsAtTargetPrevalence {p q : 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).auc =
-      sourceLiabilityAUCFromSourceWeights m := by
+      sourceEqualVarianceGaussianAUCFromSourceWeights m := by
   rfl
 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtTargetPrevalence_brier {p q : ℕ}
@@ -2817,7 +2817,7 @@ transport surrogate. -/
 noncomputable def targetMetricProfileFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile where
   r2 := targetR2FromSourceWeights m
-  auc := targetLiabilityAUCFromSourceWeights m
+  auc := targetEqualVarianceGaussianAUCFromSourceWeights m
   brier := targetCalibratedBrierFromSourceWeights m
 
 @[simp] theorem targetMetricProfileFromSourceWeights_r2 {p q : ℕ}
@@ -2827,7 +2827,7 @@ noncomputable def targetMetricProfileFromSourceWeights {p q : ℕ}
 
 @[simp] theorem targetMetricProfileFromSourceWeights_auc {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    (targetMetricProfileFromSourceWeights m).auc = targetLiabilityAUCFromSourceWeights m := by
+    (targetMetricProfileFromSourceWeights m).auc = targetEqualVarianceGaussianAUCFromSourceWeights m := by
   rfl
 
 @[simp] theorem targetMetricProfileFromSourceWeights_brier {p q : ℕ}
@@ -2872,7 +2872,7 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
   · rw [targetMetricProfileFromSourceWeights_r2,
       targetR2FromSourceWeights_exact_metric_portability_law]
   · rw [targetMetricProfileFromSourceWeights_auc,
-      targetLiabilityAUCFromSourceWeights_exact_metric_portability_law]
+      targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law]
   · rw [targetMetricProfileFromSourceWeights_brier,
       targetCalibratedBrierFromSourceWeights_exact_metric_portability_law]
 
@@ -2880,9 +2880,9 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
 time-varying mechanistic state.
 
     Empirical status: UNTESTED. -/
-noncomputable def targetLiabilityAUCAtGeneration {p q : ℕ}
+noncomputable def targetGaussianAUCAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  targetLiabilityAUCFromSourceWeights (m.toMetricModelAt t)
+  targetEqualVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t)
 
 /-- Canonical mechanistic deployed metric profile after `t` generations. -/
 noncomputable def targetMetricProfileAtGeneration {p q : ℕ}
@@ -2896,10 +2896,10 @@ noncomputable def targetMetricProfileAtGeneration {p q : ℕ}
       targetMetricProfileFromSourceWeights (m.toMetricModelAt t) := by
   rfl
 
-@[simp] theorem targetLiabilityAUCAtGeneration_eq_slice {p q : ℕ}
+@[simp] theorem targetGaussianAUCAtGeneration_eq_slice {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetLiabilityAUCAtGeneration m t =
-      targetLiabilityAUCFromSourceWeights (m.toMetricModelAt t) := by
+    targetGaussianAUCAtGeneration m t =
+      targetEqualVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t) := by
   rfl
 
 /-- Exact transported predictive covariance after `t` generations under the
@@ -3070,17 +3070,17 @@ theorem targetCalibratedBrierAtGeneration_exact_mechanistic_popgen_portability_l
 
 /-- Exact generation-indexed target liability-AUC portability law on the
 mechanistic population-genetic state slice at generation `t`. -/
-theorem targetLiabilityAUCAtGeneration_exact_mechanistic_popgen_portability_law
+theorem targetGaussianAUCAtGeneration_exact_mechanistic_popgen_portability_law
     {p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetLiabilityAUCAtGeneration m t =
+    targetGaussianAUCAtGeneration m t =
       equalVarianceGaussianAUCFromVariances
         ((targetPredictiveCovarianceAtGeneration m t) ^ 2 /
           targetScoreVarianceAtGeneration m t)
         (effectiveTargetOutcomeVarianceAtGeneration m t -
           (targetPredictiveCovarianceAtGeneration m t) ^ 2 /
             targetScoreVarianceAtGeneration m t) := by
-  rw [targetLiabilityAUCAtGeneration_eq_slice,
-    targetLiabilityAUCFromSourceWeights_exact_metric_portability_law]
+  rw [targetGaussianAUCAtGeneration_eq_slice,
+    targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law]
   simp [targetPredictiveCovarianceAtGeneration, targetScoreVarianceAtGeneration,
     effectiveTargetOutcomeVarianceAtGeneration]
 
@@ -3128,9 +3128,9 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
 benchmark in the equal-variance Gaussian liability model.
 
     Empirical status: UNTESTED. -/
-noncomputable def targetExactLiabilityAUCFromNeutralAFBenchmark
+noncomputable def targetExactGaussianAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget : ℝ) : ℝ :=
-  targetAUCFromNeutralAFBenchmark V_A V_E fstTarget
+  targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
 
 /-- The direct `R²`-chart liability AUC agrees with the literal present-day
 liability AUC when the deployed `R²` comes from the same neutral benchmark
@@ -3140,7 +3140,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst_lt_one : fst < 1) :
     equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 V_A V_E fst) =
-      presentDayAUC V_A V_E fst := by
+      presentDayGaussianAUC V_A V_E fst := by
   have hv_pos : 0 < presentDayPGSVariance V_A fst := by
     unfold presentDayPGSVariance
     have h_one_minus : 0 < 1 - fst := by linarith
@@ -3154,7 +3154,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
     unfold presentDayR2 presentDaySignalToNoise
     field_simp [hsum_ne, hve_ne]
     ring
-  unfold equalVarianceGaussianAUCFromExplainedR2 presentDayAUC
+  unfold equalVarianceGaussianAUCFromExplainedR2 presentDayGaussianAUC
   rw [hchart]
 
 /-- Full neutral allele-frequency benchmark liability-AUC degradation theorem
@@ -3166,9 +3166,9 @@ theorem targetLiabilityAUC_lt_source_of_neutralAF_benchmark
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetExactLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget <
-      presentDayLiabilityAUC V_A V_E fstSource := by
-  simpa [targetExactLiabilityAUCFromNeutralAFBenchmark] using
+    targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
+      presentDayEqualVarianceGaussianAUC V_A V_E fstSource := by
+  simpa [targetExactGaussianAUCFromNeutralAFBenchmark] using
     drift_degrades_equalVarianceGaussianAUC
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
