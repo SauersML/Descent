@@ -92,4 +92,46 @@ theorem samplePCResidualAxisFraction_pos_and_lt_one
   unfold samplePCResidualAxisFraction
   constructor <;> linarith
 
+/-- Above the phase transition, the residual fraction has a closed rational
+form.  This is algebraically equivalent to one minus the Johnstone--Paul
+overlap but is better suited to design calculations and monotonicity proofs. -/
+theorem samplePCResidualAxisFraction_eq_rational
+    (n M spike : ℝ) (hn : 0 < n) (hM : 0 < M)
+    (h : bbpProxyThreshold n M < spike) :
+    samplePCResidualAxisFraction n M spike =
+      (n / M) * (spike + 1) / (spike * (spike + n / M)) := by
+  rw [superthreshold_sample_pc_residual_fraction n M spike h]
+  have hratio : 0 < n / M := div_pos hn hM
+  have hedge : 0 < bbpProxyThreshold n M := Real.sqrt_pos.2 hratio
+  have hspike : 0 < spike := hedge.trans h
+  field_simp [ne_of_gt hspike]
+  ring
+
+/-- Once the spike is detectable, increasing its strength strictly decreases
+the fraction of the target axis left after projecting out the sample PC. -/
+theorem samplePCResidualAxisFraction_strictAntiOn_superthreshold
+    (n M spike₁ spike₂ : ℝ) (hn : 0 < n) (hM : 0 < M)
+    (h₁ : bbpProxyThreshold n M < spike₁) (h₂ : spike₁ < spike₂) :
+    samplePCResidualAxisFraction n M spike₂ <
+      samplePCResidualAxisFraction n M spike₁ := by
+  have hratio : 0 < n / M := div_pos hn hM
+  have hedge : 0 < bbpProxyThreshold n M := Real.sqrt_pos.2 hratio
+  have hspike₁ : 0 < spike₁ := hedge.trans h₁
+  have hspike₂ : 0 < spike₂ := hspike₁.trans h₂
+  have h₂super : bbpProxyThreshold n M < spike₂ := h₁.trans h₂
+  rw [samplePCResidualAxisFraction_eq_rational n M spike₁ hn hM h₁,
+    samplePCResidualAxisFraction_eq_rational n M spike₂ hn hM h₂super]
+  have hdenominator₁ : 0 < spike₁ * (spike₁ + n / M) :=
+    mul_pos hspike₁ (add_pos hspike₁ hratio)
+  have hdenominator₂ : 0 < spike₂ * (spike₂ + n / M) :=
+    mul_pos hspike₂ (add_pos hspike₂ hratio)
+  rw [div_lt_div_iff₀ hdenominator₂ hdenominator₁]
+  apply mul_lt_mul_of_pos_left _ hratio
+  have hfactor :
+      0 < (spike₂ - spike₁) *
+        (spike₁ * spike₂ + spike₁ + spike₂ + n / M) := by
+    apply mul_pos (sub_pos.mpr h₂)
+    positivity
+  nlinarith
+
 end Calibrator
