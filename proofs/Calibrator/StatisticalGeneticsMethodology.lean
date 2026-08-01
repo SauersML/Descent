@@ -1,13 +1,7 @@
 import Calibrator.Probability
-import Mathlib.Data.Real.Basic
 import Mathlib.Algebra.Order.Chebyshev
-import Mathlib.Analysis.SpecialFunctions.Sqrt
-import Mathlib.Data.Real.Sqrt
-
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
-open scoped BigOperators
-
 
 namespace Calibrator
 
