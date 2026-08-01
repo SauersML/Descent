@@ -90,7 +90,6 @@ theorem weighted_residual_moment_directional_bound
 def coefficientEnergy (B : Matrix ι ι ℝ) (x : ι → ℝ) : ℝ :=
   dot x (B.mulVec x)
 
-omit [DecidableEq ι] in
 theorem dot_add_right_shift (x y z : ι → ℝ) :
     dot x (y + z) = dot x y + dot x z := by
   simp [dot, mul_add, Finset.sum_add_distrib]

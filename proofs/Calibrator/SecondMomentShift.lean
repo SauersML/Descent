@@ -105,7 +105,6 @@ theorem projection_movement_under_measure_shift
 
 /-- Residual scores are additive in the outcome function.  This is the
 algebraic step separating conditional-mean change from projection movement. -/
-omit [DecidableEq ι] in
 theorem residualScoreMoment_outcome_change
     (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
     (hOld hNew : Ω → ℝ) (w : ι → ℝ) :
