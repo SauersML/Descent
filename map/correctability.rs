@@ -3,8 +3,7 @@ use std::fmt;
 use std::fs;
 use std::path::Path;
 
-pub const CORRECTABILITY_FORMULA_CONTRACT: &str =
-    "rank_one_hudson_fst_independent_markers_v2";
+pub const CORRECTABILITY_FORMULA_CONTRACT: &str = "rank_one_hudson_fst_independent_markers_v2";
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct MarkerClassInput {
@@ -164,7 +163,10 @@ fn validate(input: &CorrectabilityInput) -> Result<(), CorrectabilityError> {
                 "marker class names must not be empty".to_owned(),
             ));
         }
-        require_finite_positive(marker_class.effective_independent_markers, "effective_independent_markers")?;
+        require_finite_positive(
+            marker_class.effective_independent_markers,
+            "effective_independent_markers",
+        )?;
         require_finite_nonnegative(marker_class.differentiation, "differentiation")?;
         if marker_class.differentiation > 1.0 {
             return Err(CorrectabilityError::InvalidInput(
@@ -435,6 +437,9 @@ mod tests {
             application: None,
         };
 
-        assert!(matches!(calculate(&input), Err(CorrectabilityError::InvalidInput(_))));
+        assert!(matches!(
+            calculate(&input),
+            Err(CorrectabilityError::InvalidInput(_))
+        ));
     }
 }
