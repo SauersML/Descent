@@ -93,7 +93,22 @@ def main():
     print(f"  explicit figure : {len(strong)}/{total} = "
           f"{100*len(strong)/total:.1f}%   (name actually used as code)")
 
-    print("\nsample of what the regex counts that is NOT a definition:")
+    # The 130 non-definition tokens are mostly harmless: coverage.py intersects
+    # its matches against real definition names, so a literal like 'drift_only'
+    # cannot inflate anything.  The actual defect is subtler and worse -- the
+    # criterion is MENTION.  A definition counts as covered when its name
+    # appears inside any string literal in any script, whether or not a single
+    # line evaluates it.  That is the same flaw the falsifiability rule exists
+    # to prevent, one level up: presence of a name, not existence of a check.
+    mention_only = sorted(loose_real - set(strong))
+    print(f"\nmatched as a definition name but NEVER used as code : "
+          f"{len(mention_only)}")
+    for n in mention_only:
+        print(f"    {n}   <- counted as covered on a mention alone")
+
+    print("\nsample of what the regex counts that is NOT a definition")
+    print("(harmless to the count, since it is intersected against real names,")
+    print(" but it shows the pattern is not selecting for definition names):")
     for tok in sorted(loose_bogus)[:25]:
         print(f"    {tok!r}")
 

@@ -988,7 +988,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 75,
+   "line": 78,
    "signature": "(m : AssortativeMatingModel) : ℝ",
    "args": [
     {
@@ -1048,6 +1048,7 @@
      "Calibrator.AssortativeMatingModel.inflates_observed_h2": [],
      "Calibrator.AssortativeMatingModel.pgs_r2_inflation_eq_h2_inflation": [],
      "Calibrator.AssortativeMatingModel.am_gap_formula": [],
+     "Calibrator.DifferentialAMModel.stability_t": [],
      "Calibrator.DifferentialAMModel.denom_s_pos": [],
      "Calibrator.DifferentialAMModel.denom_t_pos": [],
      "Calibrator.DifferentialAMModel.differential_am_misleading": [],
@@ -1187,6 +1188,7 @@
     "Calibrator.DifferentialAMModel.denom_s_pos",
     "Calibrator.DifferentialAMModel.denom_t_pos",
     "Calibrator.DifferentialAMModel.differential_am_misleading",
+    "Calibrator.DifferentialAMModel.stability_t",
     "Calibrator.MellinProfile.spike_cost_ge",
     "Calibrator.additive_misses_epistasis",
     "Calibrator.admixture_ld_confounds_pgs",
@@ -1281,7 +1283,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 136,
+   "line": 139,
    "signature": "(V₀ r h2 V : ℝ) : ℝ",
    "args": [
     {
@@ -1329,7 +1331,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 145,
+   "line": 148,
    "signature": "(m : AssortativeMatingModel) : ℝ",
    "args": [
     {
@@ -1373,7 +1375,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 151,
+   "line": 154,
    "signature": "(V_A r h2 : ℝ) : ℝ",
    "args": [
     {
@@ -1452,7 +1454,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 239,
+   "line": 242,
    "signature": "(beta_i beta_j r h2 : ℝ) : ℝ",
    "args": [
     {
@@ -1519,7 +1521,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 276,
+   "line": 279,
    "signature": "(m : AssortativeMatingModel) : ℝ",
    "args": [
     {
@@ -1559,7 +1561,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 305,
+   "line": 308,
    "signature": "(m : AssortativeMatingModel) (R2_rm : ℝ) : ℝ",
    "args": [
     {
@@ -1615,7 +1617,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 333,
+   "line": 336,
    "signature": "(m : AssortativeMatingModel) (R2_rm : ℝ) : ℝ",
    "args": [
     {
@@ -1667,7 +1669,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 401,
+   "line": 412,
    "signature": "(d : DifferentialAMModel) : ℝ",
    "args": [
     {
@@ -1710,7 +1712,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 418,
+   "line": 429,
    "signature": "(port_measured r_source r_target h2 : ℝ) : ℝ",
    "args": [
     {
@@ -1768,7 +1770,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 553,
+   "line": 564,
    "signature": "(d N sigma_sq : ℝ) : ℝ",
    "args": [
     {
@@ -3476,12 +3478,59 @@
    ]
   },
   {
+   "name": "Calibrator.PosteriorPrediction.prob_mode",
+   "short": "prob_mode",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/Conclusions.lean",
+   "line": 180,
+   "signature": "(pred : PosteriorPrediction) : ℝ",
+   "args": [
+    {
+     "names": [
+      "pred"
+     ],
+     "type": "PosteriorPrediction",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  1 / (1 + Real.exp (-pred.η_mean))",
+   "docstring": "**The mode prediction, `sigmoid(E[η])`.**\n\nThis was a field of `PosteriorPrediction` pinned by the hypothesis\n`mode_is_sigmoid_of_mean : prob_mode = 1 / (1 + exp (-η_mean))`. Carrying it as a free\nfield meant the structure had a degree of freedom the equation immediately removed, and\nevery consumer had to be handed the equation to make use of it. Computing it makes\n`mode_is_sigmoid_of_mean` an `rfl` theorem, and the distinction this structure exists to\ndraw — that `prob_mean` is `E[sigmoid(η)]` while the mode is `sigmoid(E[η])` — is now\ncarried by the shape of the definitions rather than by an assumption.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "π = pred.prob_mean",
+     "pred.prob_mean ≠ pred.prob_mode"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.PosteriorPrediction.mode_is_sigmoid_of_mean": [],
+     "Calibrator.posterior_mean_optimal": [
+      "π = pred.prob_mean"
+     ],
+     "Calibrator.posterior_mean_strictly_better": [
+      "π = pred.prob_mean",
+      "pred.prob_mean ≠ pred.prob_mode"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.PosteriorPrediction.mode_is_sigmoid_of_mean",
+    "Calibrator.posterior_mean_optimal",
+    "Calibrator.posterior_mean_strictly_better"
+   ]
+  },
+  {
    "name": "Calibrator.sigmoid",
    "short": "sigmoid",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 214,
+   "line": 225,
    "signature": "(x : ℝ) : ℝ",
    "args": [
     {
@@ -3551,7 +3600,7 @@
    "kind": "abbrev",
    "noncomputable": false,
    "file": "Calibrator/Conclusions.lean",
-   "line": 381,
+   "line": 392,
    "signature": "(Z : Type u)",
    "args": [
     {
@@ -3589,7 +3638,7 @@
    "kind": "abbrev",
    "noncomputable": false,
    "file": "Calibrator/Conclusions.lean",
-   "line": 384,
+   "line": 395,
    "signature": "(Z : Type u)",
    "args": [
     {
@@ -3672,7 +3721,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 387,
+   "line": 398,
    "signature": "{Z : Type u} [MeasurableSpace Z] (μ : Measure Z) (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (q : ProbPredictor Z) : ℝ",
    "args": [
     {
@@ -3757,7 +3806,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 392,
+   "line": 403,
    "signature": "{α : Type u} (R : α → ℝ) (F : Set α) : ℝ",
    "args": [
     {
@@ -3830,7 +3879,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 396,
+   "line": 407,
    "signature": "{Z : Type u} [MeasurableSpace Z] (μ : Measure Z) (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (F : Set (ProbPredictor Z)) : ℝ",
    "args": [
     {
@@ -3914,7 +3963,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 442,
+   "line": 453,
    "signature": "{α : Type u} (R : α → ℝ) (F : Set α) : ℝ",
    "args": [
     {
@@ -3999,7 +4048,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 457,
+   "line": 468,
    "signature": "(p q : ℝ) : ℝ",
    "args": [
     {
@@ -4086,7 +4135,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 461,
+   "line": 472,
    "signature": "(p q : ℝ) : ℝ",
    "args": [
     {
@@ -4163,7 +4212,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 465,
+   "line": 476,
    "signature": "(p q : UnitProb) : ℝ",
    "args": [
     {
@@ -4230,7 +4279,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 520,
+   "line": 531,
    "signature": "{Z : Type u} [MeasurableSpace Z] (μ : Measure Z) (p q : Z → ℝ) : ℝ",
    "args": [
     {
@@ -4297,7 +4346,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 525,
+   "line": 536,
    "signature": "{Z : Type u} [MeasurableSpace Z] (μ : Measure Z) (p q : Z → ℝ) : ℝ",
    "args": [
     {
@@ -4364,7 +4413,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 617,
+   "line": 628,
    "signature": "{Z : Type u} [MeasurableSpace Z] (μ : Measure Z) (p q : Z → ℝ) : ℝ",
    "args": [
     {
@@ -4427,7 +4476,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 622,
+   "line": 633,
    "signature": "{Z : Type u} [MeasurableSpace Z] (μ : Measure Z) (p q : Z → ℝ) : ℝ",
    "args": [
     {
@@ -4490,7 +4539,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 651,
+   "line": 662,
    "signature": "{Z : Type u} [MeasurableSpace Z] (μ : Measure Z) (η q : ProbPredictor Z) : ℝ",
    "args": [
     {
@@ -4600,7 +4649,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 656,
+   "line": 667,
    "signature": "{Z : Type u} [MeasurableSpace Z] (μ : Measure Z) (η q : ProbPredictor Z) : ℝ",
    "args": [
     {
@@ -4702,7 +4751,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 834,
+   "line": 845,
    "signature": "(η q : ℝ) : ℝ",
    "args": [
     {
@@ -4742,7 +4791,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 859,
+   "line": 870,
    "signature": "(η q : ℝ) : ℝ",
    "args": [
     {
@@ -4797,7 +4846,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 896,
+   "line": 907,
    "signature": "{Z : Type u} [MeasurableSpace Z] (pop : BinaryPopulation Z) (s : Z → ℝ) : ENNReal",
    "args": [
     {
@@ -4874,7 +4923,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 936,
+   "line": 947,
    "signature": "{Z : Type u} [MeasurableSpace Z] (μ : Measure Z) (η : ProbPredictor Z) (F : Set (ProbPredictor Z)) : ℝ",
    "args": [
     {
@@ -4973,7 +5022,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Conclusions.lean",
-   "line": 941,
+   "line": 952,
    "signature": "{Z : Type u} [MeasurableSpace Z] (μ : Measure Z) (η : ProbPredictor Z) (F : Set (ProbPredictor Z)) : ℝ",
    "args": [
     {
@@ -35916,7 +35965,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 230,
+   "line": 235,
    "signature": "(m : SplitMigrationModel) : ℝ",
    "args": [
     {
@@ -35953,7 +36002,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 233,
+   "line": 238,
    "signature": "(m : SplitMigrationModel) : ℝ",
    "args": [
     {
@@ -35988,7 +36037,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 236,
+   "line": 241,
    "signature": "(ETss ETst : ℝ) : ℝ",
    "args": [
     {
@@ -36028,7 +36077,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 243,
+   "line": 248,
    "signature": "(d : DemographicCoalescenceScalars) : ℝ",
    "args": [
     {
@@ -36077,7 +36126,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 269,
+   "line": 274,
    "signature": "(M _ETss ETst : ℝ) : ℝ",
    "args": [
     {
@@ -36126,7 +36175,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 277,
+   "line": 282,
    "signature": "(M ETss _ETst : ℝ) : ℝ",
    "args": [
     {
@@ -36171,7 +36220,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 289,
+   "line": 294,
    "signature": "(_M : ℝ) : ℝ",
    "args": [
     {
@@ -36217,7 +36266,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 296,
+   "line": 301,
    "signature": "(M : ℝ) : ℝ",
    "args": [
     {
@@ -36269,7 +36318,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 299,
+   "line": 304,
    "signature": "(M : ℝ) : DemographicCoalescenceScalars where ETss",
    "args": [
     {
@@ -36308,7 +36357,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 314,
+   "line": 319,
    "signature": "(M : ℝ) : ℝ",
    "args": [
     {
@@ -36375,7 +36424,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 435,
+   "line": 440,
    "signature": "(Ne mu H : ℝ) : ℝ",
    "args": [
     {
@@ -36433,7 +36482,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 443,
+   "line": 448,
    "signature": "(Ne mu H₀ : ℝ) : ℕ → ℝ",
    "args": [
     {
@@ -36510,7 +36559,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 460,
+   "line": 465,
    "signature": "(Ne mu : ℝ) : ℝ",
    "args": [
     {
@@ -36581,7 +36630,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 582,
+   "line": 587,
    "signature": "(r : ClosedPopulationNoMutation) : ℝ",
    "args": [
     {
@@ -36621,7 +36670,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 594,
+   "line": 599,
    "signature": "(r : ClosedPopulationNoMutation) : ℝ",
    "args": [
     {
@@ -36659,7 +36708,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 604,
+   "line": 609,
    "signature": "(r : ClosedPopulationNoMutation) : ℝ",
    "args": [
     {
@@ -36699,7 +36748,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 628,
+   "line": 633,
    "signature": "(β_sq_sum het : ℝ) : ℝ",
    "args": [
     {
@@ -36782,7 +36831,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 653,
+   "line": 658,
    "signature": "(het_source fst : ℝ) : ℝ",
    "args": [
     {
@@ -36822,7 +36871,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 687,
+   "line": 692,
    "signature": "(V_A fst : ℝ) : ℝ",
    "args": [
     {
@@ -36973,7 +37022,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 707,
+   "line": 712,
    "signature": "(N t : ℕ) : ℝ",
    "args": [
     {
@@ -37015,7 +37064,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 727,
+   "line": 732,
    "signature": "(N t : ℕ) : ℝ",
    "args": [
     {
@@ -37077,7 +37126,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 770,
+   "line": 775,
    "signature": "(V_A fst : ℝ) : ℝ",
    "args": [
     {
@@ -37124,7 +37173,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 774,
+   "line": 779,
    "signature": "(V_A fstS fstT : ℝ) : ℝ",
    "args": [
     {
@@ -37173,7 +37222,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 873,
+   "line": 878,
    "signature": "(V_A V_E fst : ℝ) : ℝ",
    "args": [
     {
@@ -37237,7 +37286,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 882,
+   "line": 887,
    "signature": "(vSignal V_E : ℝ) : ℝ",
    "args": [
     {
@@ -37376,7 +37425,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 890,
+   "line": 895,
    "signature": "(V_A V_E fst : ℝ) : ℝ",
    "args": [
     {
@@ -37535,7 +37584,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 942,
+   "line": 947,
    "signature": "(V_A V_E fst : ℝ) : ℝ",
    "args": [
     {
@@ -37597,7 +37646,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 951,
+   "line": 956,
    "signature": "(V_A V_E fst : ℝ) : ℝ",
    "args": [
     {
@@ -37664,7 +37713,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1093,
+   "line": 1098,
    "signature": "(V_A fst rhoSq : ℝ) : ℝ",
    "args": [
     {
@@ -37720,7 +37769,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1139,
+   "line": 1144,
    "signature": "{α : Sort*} (s t : α) : Pop → α",
    "args": [
     {
@@ -37766,7 +37815,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1149,
+   "line": 1154,
    "signature": "{α : Sort*} (f : Pop → α) (t : α) : Pop → α",
    "args": [
     {
@@ -37810,7 +37859,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1152,
+   "line": 1157,
    "signature": "{α : Sort*} (f : Pop → α) (s : α) : Pop → α",
    "args": [
     {
@@ -37854,7 +37903,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1195,
+   "line": 1200,
    "signature": "{p : ℕ} (sigmaObsSource : Matrix (Fin p) (Fin p) ℝ) (crossSource : Fin p → ℝ) : Fin p → ℝ",
    "args": [
     {
@@ -37942,7 +37991,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1207,
+   "line": 1212,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -38003,7 +38052,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1214,
+   "line": 1219,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Fin q → ℝ",
    "args": [
     {
@@ -38078,7 +38127,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1244,
+   "line": 1249,
    "signature": "{p : ℕ} (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ) (crossTarget : Fin p → ℝ) (noiseVar : ℝ) (w : Fin p → ℝ) : ℝ",
    "args": [
     {
@@ -38154,7 +38203,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1252,
+   "line": 1257,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -38183,7 +38232,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1256,
+   "line": 1261,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -38218,7 +38267,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1260,
+   "line": 1265,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -38247,7 +38296,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1264,
+   "line": 1269,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -38294,7 +38343,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1268,
+   "line": 1273,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -38320,7 +38369,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1272,
+   "line": 1277,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -38346,7 +38395,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1302,
+   "line": 1307,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Fin p → ℝ",
    "args": [
     {
@@ -38455,7 +38504,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1308,
+   "line": 1313,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin p → ℝ",
    "args": [
     {
@@ -38550,7 +38599,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1316,
+   "line": 1321,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (tagState : Fin p → ℝ) : ℝ",
    "args": [
     {
@@ -38646,7 +38695,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1328,
+   "line": 1333,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Fin p → ℝ",
    "args": [
     {
@@ -38726,7 +38775,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1337,
+   "line": 1342,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin q → ℝ",
    "args": [
     {
@@ -38775,7 +38824,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1355,
+   "line": 1360,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin p → ℝ",
    "args": [
     {
@@ -38829,7 +38878,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1363,
+   "line": 1368,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin p → ℝ",
    "args": [
     {
@@ -38883,7 +38932,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1371,
+   "line": 1376,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin p → ℝ",
    "args": [
     {
@@ -38931,7 +38980,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1376,
+   "line": 1381,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Fin p → ℝ",
    "args": [
     {
@@ -39024,7 +39073,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1382,
+   "line": 1387,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Fin p → ℝ",
    "args": [
     {
@@ -39117,7 +39166,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1461,
+   "line": 1466,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
@@ -39256,7 +39305,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1470,
+   "line": 1475,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
@@ -39389,7 +39438,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1476,
+   "line": 1481,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
@@ -39457,7 +39506,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1603,
+   "line": 1608,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -39561,7 +39610,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1621,
+   "line": 1626,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -39651,7 +39700,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1638,
+   "line": 1643,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -39741,7 +39790,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1653,
+   "line": 1658,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -39810,7 +39859,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1671,
+   "line": 1676,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -39894,7 +39943,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1688,
+   "line": 1693,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : TransportedMetrics.IrreducibleTargetPenalty where brokenTagging",
    "args": [
     {
@@ -39931,7 +39980,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1712,
+   "line": 1717,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
@@ -39980,7 +40029,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1722,
+   "line": 1727,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
@@ -40096,7 +40145,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1769,
+   "line": 1774,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
@@ -40211,7 +40260,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1775,
+   "line": 1780,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
@@ -40369,7 +40418,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1783,
+   "line": 1788,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
@@ -40442,7 +40491,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1800,
+   "line": 1805,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) : ℝ",
    "args": [
     {
@@ -40517,7 +40566,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1870,
+   "line": 1875,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -40592,7 +40641,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2091,
+   "line": 2096,
    "signature": "(distance fstGap lambda : ℝ) : ℝ",
    "args": [
     {
@@ -40651,7 +40700,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2139,
+   "line": 2144,
    "signature": "(g : GenerationalPopGenParameters) : ℝ",
    "args": [
     {
@@ -40735,7 +40784,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2143,
+   "line": 2148,
    "signature": "(g : GenerationalPopGenParameters) : ℝ",
    "args": [
     {
@@ -40809,7 +40858,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2147,
+   "line": 2152,
    "signature": "(g : GenerationalPopGenParameters) (t : ℕ) : ℝ",
    "args": [
     {
@@ -40870,7 +40919,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2151,
+   "line": 2156,
    "signature": "(g : GenerationalPopGenParameters) : ℝ",
    "args": [
     {
@@ -40933,7 +40982,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2159,
+   "line": 2164,
    "signature": "(g : GenerationalPopGenParameters) (t : ℕ) : ℝ",
    "args": [
     {
@@ -40990,7 +41039,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2164,
+   "line": 2169,
    "signature": "(g : GenerationalPopGenParameters) (t : ℕ) : ℝ",
    "args": [
     {
@@ -41049,7 +41098,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2169,
+   "line": 2174,
    "signature": "(g : GenerationalPopGenParameters) (t : ℕ) : ℝ",
    "args": [
     {
@@ -41108,7 +41157,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2195,
+   "line": 2200,
    "signature": "(m : PGSEvolutionaryModel) : GenerationalPopGenParameters where Ne",
    "args": [
     {
@@ -41159,7 +41208,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2303,
+   "line": 2308,
    "signature": "(pSource pTarget : ℝ) : ℝ",
    "args": [
     {
@@ -41204,7 +41253,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2361,
+   "line": 2366,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin q → ℝ",
    "args": [
     {
@@ -41264,7 +41313,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2375,
+   "line": 2380,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ",
    "args": [
     {
@@ -41327,7 +41376,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2389,
+   "line": 2394,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41390,7 +41439,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2400,
+   "line": 2405,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ",
    "args": [
     {
@@ -41460,7 +41509,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2407,
+   "line": 2412,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41530,7 +41579,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2413,
+   "line": 2418,
    "signature": "(g : GenerationalPopGenParameters) (t : ℕ) : ℝ",
    "args": [
     {
@@ -41571,7 +41620,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2426,
+   "line": 2431,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) : ℝ",
    "args": [
     {
@@ -41636,7 +41685,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2449,
+   "line": 2454,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41701,7 +41750,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2468,
+   "line": 2473,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41772,7 +41821,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2493,
+   "line": 2498,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41837,7 +41886,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2512,
+   "line": 2517,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41898,7 +41947,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2535,
+   "line": 2540,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin p) ℝ",
    "args": [
     {
@@ -41961,7 +42010,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2544,
+   "line": 2549,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -42026,7 +42075,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2553,
+   "line": 2558,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -42082,7 +42131,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2562,
+   "line": 2567,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -42149,7 +42198,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2570,
+   "line": 2575,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -42205,7 +42254,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2580,
+   "line": 2585,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -42263,7 +42312,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2592,
+   "line": 2597,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin p → ℝ",
    "args": [
     {
@@ -42321,7 +42370,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2600,
+   "line": 2605,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin p → ℝ",
    "args": [
     {
@@ -42379,7 +42428,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2609,
+   "line": 2614,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : CrossPopulationMetricModel p q where beta",
    "args": [
     {
@@ -42459,7 +42508,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2633,
+   "line": 2638,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -42530,7 +42579,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2638,
+   "line": 2643,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -42586,7 +42635,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2889,
+   "line": 2894,
    "signature": "(V_A V_E fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -42656,7 +42705,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2963,
+   "line": 2968,
    "signature": "(fstSource fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -42745,7 +42794,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3011,
+   "line": 3016,
    "signature": "(NeA NeB mu H₀ : ℝ) (t : ℕ) : ℝ",
    "args": [
     {
@@ -42806,7 +42855,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3046,
+   "line": 3051,
    "signature": "(π r2 : ℝ) : ℝ",
    "args": [
     {
@@ -42892,7 +42941,7 @@
    "kind": "abbrev",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3051,
+   "line": 3056,
    "signature": "(π r2 : ℝ) : ℝ",
    "args": [
     {
@@ -42978,7 +43027,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3055,
+   "line": 3060,
    "signature": "(V_A V_E fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -43032,7 +43081,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3068,
+   "line": 3073,
    "signature": "(π r2Source : ℝ) : ℝ",
    "args": [
     {
@@ -43095,7 +43144,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3081,
+   "line": 3086,
    "signature": "(π V_A V_E fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -43158,7 +43207,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3088,
+   "line": 3093,
    "signature": "(π V_A V_E fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -43224,7 +43273,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3094,
+   "line": 3099,
    "signature": "(π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile",
    "args": [
     {
@@ -43265,7 +43314,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3162,
+   "line": 3167,
    "signature": "(snr : ℝ) : ℝ",
    "args": [
     {
@@ -43307,7 +43356,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3174,
+   "line": 3179,
    "signature": "(vSignal vEnv : ℝ) : ℝ",
    "args": [
     {
@@ -43372,7 +43421,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3221,
+   "line": 3226,
    "signature": "(r2 : ℝ) : ℝ",
    "args": [
     {
@@ -43439,7 +43488,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3267,
+   "line": 3272,
    "signature": "(r2 : ℝ) : ℝ",
    "args": [
     {
@@ -43483,7 +43532,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3330,
+   "line": 3335,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
@@ -43556,7 +43605,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3449,
+   "line": 3454,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) : TransportedMetrics.Profile where r2",
    "args": [
     {
@@ -43613,7 +43662,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3477,
+   "line": 3482,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile",
    "args": [
     {
@@ -43672,7 +43721,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3504,
+   "line": 3509,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile where r2",
    "args": [
     {
@@ -43739,7 +43788,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3570,
+   "line": 3575,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -43795,7 +43844,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3575,
+   "line": 3580,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : TransportedMetrics.Profile",
    "args": [
     {
@@ -43855,7 +43904,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3594,
+   "line": 3599,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -43923,7 +43972,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3600,
+   "line": 3605,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -43991,7 +44040,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3608,
+   "line": 3613,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -44057,7 +44106,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3614,
+   "line": 3619,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -44107,7 +44156,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3620,
+   "line": 3625,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -44167,7 +44216,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3714,
+   "line": 3719,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (sourceBaseline : ℝ) (t : ℕ) : ℝ",
    "args": [
     {
@@ -44231,7 +44280,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3818,
+   "line": 3823,
    "signature": "(V_A V_E fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -44297,7 +44346,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3942,
+   "line": 3947,
    "signature": "(η q : ℝ) : ℝ",
    "args": [
     {
@@ -44336,7 +44385,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3946,
+   "line": 3951,
    "signature": "(η qSource qTarget : ℝ) : ℝ",
    "args": [
     {
@@ -44373,7 +44422,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3963,
+   "line": 3968,
    "signature": "(η q : ℝ) : ℝ",
    "args": [
     {
@@ -44419,7 +44468,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3967,
+   "line": 3972,
    "signature": "(η qSource qTarget : ℝ) : ℝ",
    "args": [
     {
@@ -44470,7 +44519,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4051,
+   "line": 4056,
    "signature": "(V_A fstS fstT : ℝ) : ℝ",
    "args": [
     {
@@ -44504,7 +44553,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4061,
+   "line": 4066,
    "signature": "(V_A M : ℝ) : ℝ",
    "args": [
     {
@@ -44547,7 +44596,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4124,
+   "line": 4129,
    "signature": "(m : MutationDriftModelAssumptions) : ℝ",
    "args": [
     {
@@ -44632,7 +44681,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4157,
+   "line": 4162,
    "signature": "(Ne rate F : ℝ) : ℝ",
    "args": [
     {
@@ -44687,7 +44736,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4189,
+   "line": 4194,
    "signature": "(m : MutationDriftModelAssumptions) : ℝ",
    "args": [
     {
@@ -44767,7 +44816,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4223,
+   "line": 4228,
    "signature": "(m : MutationDriftModelAssumptions) : ℝ",
    "args": [
     {
@@ -44811,7 +44860,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4311,
+   "line": 4316,
    "signature": "(freq_corr ld_overlap : ℝ) : ℝ",
    "args": [
     {
@@ -44854,7 +44903,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4321,
+   "line": 4326,
    "signature": "(fst : ℝ) : ℝ",
    "args": [
     {
@@ -44898,7 +44947,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4325,
+   "line": 4330,
    "signature": "(shared_ld : ℝ) : ℝ",
    "args": [
     {
@@ -44937,7 +44986,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4337,
+   "line": 4342,
    "signature": "(fst shared_ld : ℝ) : ℝ",
    "args": [
     {
@@ -44980,7 +45029,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4356,
+   "line": 4361,
    "signature": "(fst_drift shared_ld : ℝ) : ℝ",
    "args": [
     {
@@ -45044,7 +45093,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4412,
+   "line": 4417,
    "signature": "(V_A fst_drift shared_ld : ℝ) : ℝ",
    "args": [
     {
@@ -45131,7 +45180,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4457,
+   "line": 4462,
    "signature": "(V_A V_E fst_drift shared_ld : ℝ) : ℝ",
    "args": [
     {
@@ -45192,7 +45241,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4487,
+   "line": 4492,
    "signature": "(fstSource fstTarget shared_ld_source shared_ld_target : ℝ) : ℝ",
    "args": [
     {
@@ -45245,7 +45294,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4632,
+   "line": 4637,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45381,7 +45430,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4670,
+   "line": 4675,
    "signature": "(Ne rate x : ℝ) : ℝ",
    "args": [
     {
@@ -45432,7 +45481,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4683,
+   "line": 4688,
    "signature": "(Ne rate : ℝ) : ℝ",
    "args": [
     {
@@ -45499,7 +45548,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4773,
+   "line": 4778,
    "signature": "(Ne m F : ℝ) : ℝ",
    "args": [
     {
@@ -45551,7 +45600,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4790,
+   "line": 4795,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45602,7 +45651,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4822,
+   "line": 4827,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45706,7 +45755,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4908,
+   "line": 4913,
    "signature": "(s : SplitMigrationModel) : ℝ",
    "args": [
     {
@@ -45746,7 +45795,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4958,
+   "line": 4963,
    "signature": "(fst_neighbor α : ℝ) (d : ℕ) : ℝ",
    "args": [
     {
@@ -45830,7 +45879,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5043,
+   "line": 5048,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45880,7 +45929,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5069,
+   "line": 5074,
    "signature": "(M : ℝ) : ℝ",
    "args": [
     {
@@ -45951,7 +46000,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5133,
+   "line": 5138,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -46019,7 +46068,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5144,
+   "line": 5149,
    "signature": "(V_A Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -46085,7 +46134,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5255,
+   "line": 5260,
    "signature": "(Ne m_into : ℝ) : ℝ",
    "args": [
     {
@@ -46136,7 +46185,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5296,
+   "line": 5301,
    "signature": "(m₁₂ m₂₁ : ℝ) : ℝ",
    "args": [
     {
@@ -46183,7 +46232,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5317,
+   "line": 5322,
    "signature": "(r : ℝ) (generations_since : ℕ) : ℝ",
    "args": [
     {
@@ -46274,7 +46323,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5364,
+   "line": 5369,
    "signature": "(r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ) : ℝ",
    "args": [
     {
@@ -46339,7 +46388,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5426,
+   "line": 5431,
    "signature": "(Ne m Fst : ℝ) : ℝ",
    "args": [
     {
@@ -46390,7 +46439,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5461,
+   "line": 5466,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -46482,7 +46531,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5543,
+   "line": 5548,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -59983,7 +60032,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 52,
+   "line": 55,
    "signature": "where r : ℝ V_A : ℝ V_P : ℝ r_pos : 0 < r r_lt_one : r < 1 V_A_pos : 0 < V_A V_A_lt_V_P : V_A < V_P stability : r * (V_A / V_P) < 1",
    "args": [],
    "ret_type": "ℝ V_A : ℝ V_P : ℝ r_pos : 0 < r r_lt_one : r < 1 V_A_pos : 0 < V_A V_A_lt_V_P : V_A < V_P stability : r * (V_A / V_P) < 1",
@@ -60037,10 +60086,10 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 368,
-   "signature": "where r_s : ℝ r_t : ℝ h2 : ℝ r_s_pos : 0 < r_s r_s_lt_one : r_s < 1 r_t_nonneg : 0 ≤ r_t h2_pos : 0 < h2 h2_lt_one : h2 < 1 stability_s : r_s * h2 < 1 stability_t : r_t * h2 < 1 more_am_in_source : r_t < r_s",
+   "line": 371,
+   "signature": "where r_s : ℝ r_t : ℝ h2 : ℝ r_s_pos : 0 < r_s r_s_lt_one : r_s < 1 r_t_nonneg : 0 ≤ r_t h2_pos : 0 < h2 h2_lt_one : h2 < 1 stability_s : r_s * h2 < 1 more_am_in_source : r_t < r_s",
    "args": [],
-   "ret_type": "ℝ r_t : ℝ h2 : ℝ r_s_pos : 0 < r_s r_s_lt_one : r_s < 1 r_t_nonneg : 0 ≤ r_t h2_pos : 0 < h2 h2_lt_one : h2 < 1 stability_s : r_s * h2 < 1 stability_t : r_t * h2 < 1 more_am_in_source : r_t < r_s",
+   "ret_type": "ℝ r_t : ℝ h2 : ℝ r_s_pos : 0 < r_s r_s_lt_one : r_s < 1 r_t_nonneg : 0 ≤ r_t h2_pos : 0 < h2 h2_lt_one : h2 < 1 stability_s : r_s * h2 < 1 more_am_in_source : r_t < r_s",
    "body": "",
    "docstring": "**Two-population differential AM model.**\n    Captures a scenario where PGS is trained in a source population\n    with AM rate r_s and evaluated in a target with rate r_t.",
    "empirical_status": "",
@@ -60083,17 +60132,13 @@
      "type": "r_s * h2 < 1"
     },
     {
-     "name": "stability_t",
-     "type": "r_t * h2 < 1"
-    },
-    {
      "name": "more_am_in_source",
      "type": "r_t < r_s"
     }
    ],
    "equations": [],
    "constraints": {
-    "raw_chunk_lines": 18
+    "raw_chunk_lines": 20
    },
    "mentioned_by": []
   },
@@ -60103,7 +60148,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 467,
+   "line": 478,
    "signature": "where beta_i : ℝ beta_j : ℝ r_s : ℝ r_t : ℝ h2 : ℝ r_s_pos : 0 < r_s r_t_nonneg : 0 ≤ r_t r_t_lt_rs : r_t < r_s h2_pos : 0 < h2 stability_s : r_s * h2 < 1 stability_t : r_t * h2 < 1",
    "args": [],
    "ret_type": "ℝ beta_j : ℝ r_s : ℝ r_t : ℝ h2 : ℝ r_s_pos : 0 < r_s r_t_nonneg : 0 ≤ r_t r_t_lt_rs : r_t < r_s h2_pos : 0 < h2 stability_s : r_s * h2 < 1 stability_t : r_t * h2 < 1",
@@ -60287,9 +60332,9 @@
    "noncomputable": false,
    "file": "Calibrator/Conclusions.lean",
    "line": 165,
-   "signature": "where η_mean : ℝ prob_mean : ℝ prob_mode : ℝ mode_is_sigmoid_of_mean : prob_mode = 1 / (1 + Real.exp (-η_mean))",
+   "signature": "where η_mean : ℝ prob_mean : ℝ",
    "args": [],
-   "ret_type": "ℝ prob_mean : ℝ prob_mode : ℝ mode_is_sigmoid_of_mean : prob_mode = 1 / (1 + Real.exp (-η_mean))",
+   "ret_type": "ℝ prob_mean : ℝ",
    "body": "",
    "docstring": "The posterior mean prediction for a binary outcome.\n\n    Given a distribution over the linear predictor η (represented by its mean μ\n    and the expected value of sigmoid(η)), the posterior mean prediction is\n    E[sigmoid(η)], NOT sigmoid(E[η]).\n\n    This structure captures the key distinction between Mode and Mean prediction.",
    "empirical_status": "",
@@ -60298,19 +60343,11 @@
     {
      "name": "prob_mean",
      "type": "ℝ"
-    },
-    {
-     "name": "prob_mode",
-     "type": "ℝ"
-    },
-    {
-     "name": "mode_is_sigmoid_of_mean",
-     "type": "prob_mode = 1 / (1 + Real.exp (-η_mean))"
     }
    ],
    "equations": [],
    "constraints": {
-    "raw_chunk_lines": 27
+    "raw_chunk_lines": 15
    },
    "mentioned_by": []
   },
@@ -60320,7 +60357,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/Conclusions.lean",
-   "line": 890,
+   "line": 901,
    "signature": "(Z : Type u) [MeasurableSpace Z] where μpos : Measure Z μneg : Measure Z",
    "args": [
     {
@@ -63371,12 +63408,12 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 218,
-   "signature": "where t : ℝ Ne : ℝ mig : ℝ nDemes : ℕ mu : ℝ Ne_pos : 0 < Ne mig_nonneg : 0 ≤ mig nDemes_ge_two : 2 ≤ nDemes mu_nonneg : 0 ≤ mu",
+   "line": 225,
+   "signature": "where t : ℝ Ne : ℝ mig : ℝ mu : ℝ Ne_pos : 0 < Ne mig_nonneg : 0 ≤ mig mu_nonneg : 0 ≤ mu",
    "args": [],
-   "ret_type": "ℝ Ne : ℝ mig : ℝ nDemes : ℕ mu : ℝ Ne_pos : 0 < Ne mig_nonneg : 0 ≤ mig nDemes_ge_two : 2 ≤ nDemes mu_nonneg : 0 ≤ mu",
+   "ret_type": "ℝ Ne : ℝ mig : ℝ mu : ℝ Ne_pos : 0 < Ne mig_nonneg : 0 ≤ mig mu_nonneg : 0 ≤ mu",
    "body": "",
-   "docstring": "",
+   "docstring": "A split with ongoing migration.\n\n`nDemes`, together with its `2 ≤ nDemes` hypothesis, used to sit here. Nothing read it:\nthe deme count entered no formula and no theorem, so it was a free parameter that could\ntake any value without changing a single statement in the file. The many-deme regime that\n`fstEqLimitLowMutationManyDemes` names is a limit, not a stored count, and naming it in a\nfield gave the appearance of tracking something the development does not track.",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [
@@ -63393,10 +63430,6 @@
      "type": "ℝ"
     },
     {
-     "name": "nDemes",
-     "type": "ℕ"
-    },
-    {
      "name": "mu",
      "type": "ℝ"
     },
@@ -63409,17 +63442,13 @@
      "type": "0 ≤ mig"
     },
     {
-     "name": "nDemes_ge_two",
-     "type": "2 ≤ nDemes"
-    },
-    {
      "name": "mu_nonneg",
      "type": "0 ≤ mu"
     }
    ],
    "equations": [],
    "constraints": {
-    "raw_chunk_lines": 12
+    "raw_chunk_lines": 10
    },
    "mentioned_by": []
   },
@@ -63429,7 +63458,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 239,
+   "line": 244,
    "signature": "where ETss : ℝ ETst : ℝ",
    "args": [],
    "ret_type": "ℝ ETst : ℝ",
@@ -63459,7 +63488,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 551,
+   "line": 556,
    "signature": "where Ne : ℝ mu : ℝ H₀ : ℝ horizon : ℕ tolerance : ℝ Ne_pos : 0 < Ne mu_nonneg : 0 ≤ mu H₀_pos : 0 < H₀ tolerance_pos : 0 < tolerance forces_contract : 1 / (2 * Ne) + 2 * mu ≤ 1 mutation_negligible : hetMutationFloor Ne mu ≤ tolerance * H₀",
    "args": [],
    "ret_type": "ℝ mu : ℝ H₀ : ℝ horizon : ℕ tolerance : ℝ Ne_pos : 0 < Ne mu_nonneg : 0 ≤ mu H₀_pos : 0 < H₀ tolerance_pos : 0 < tolerance forces_contract : 1 / (2 * Ne) + 2 * mu ≤ 1 mutation_negligible : hetMutationFloor Ne mu ≤ tolerance * H₀",
@@ -63525,7 +63554,7 @@
    "kind": "inductive",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1131,
+   "line": 1136,
    "signature": "where",
    "args": [],
    "ret_type": "",
@@ -63546,7 +63575,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1166,
+   "line": 1171,
    "signature": "(p q : ℕ) where beta : Pop → Fin q → ℝ sigmaTag : Pop → Matrix (Fin p) (Fin p) ℝ directCausal : Pop → Matrix (Fin p) (Fin q) ℝ proxyTagging : Pop → Matrix (Fin p) (Fin q) ℝ novelDirectCausal : Pop → Matrix (Fin p) (Fin q) ℝ novelProxyTagging : Pop → Matrix (Fin p) (Fin q) ℝ novelCausalEffect : Pop → Fin q → ℝ contextCross : Pop → Fin p → ℝ outcomeVariance : Pop → ℝ novelUntaggablePhenotypeVarianceTarget : ℝ targetPrevalence : ℝ novelDirectCausal_source : novelDirectCausal Pop.source = 0 novelProxyTagging_source : novelProxyTagging Pop.source = 0 novelCausalEffect_source : novelCausalEffect Pop.source = 0 outcomeVariance_pos : ∀ P : Pop, 0 < outcomeVariance P novelUntaggablePhenotypeVarianceTarget_nonneg : 0 ≤ novelUntaggablePhenotypeVarianceTarget targetPrevalence_pos : 0 < targetPrevalence targetPrevalence_lt_one : targetPrevalence < 1",
    "args": [
     {
@@ -63650,7 +63679,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2121,
+   "line": 2126,
    "signature": "where Ne : ℝ μ : ℝ mig : ℝ recomb : ℝ V_A : ℝ Ne_pos : 0 < Ne μ_nonneg : 0 ≤ μ mig_nonneg : 0 ≤ mig recomb_nonneg : 0 ≤ recomb recomb_le_half : recomb ≤ 1 / 2 V_A_pos : 0 < V_A",
    "args": [],
    "ret_type": "ℝ μ : ℝ mig : ℝ recomb : ℝ V_A : ℝ Ne_pos : 0 < Ne μ_nonneg : 0 ≤ μ mig_nonneg : 0 ≤ mig recomb_nonneg : 0 ≤ recomb recomb_le_half : recomb ≤ 1 / 2 V_A_pos : 0 < V_A",
@@ -63708,7 +63737,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2327,
+   "line": 2332,
    "signature": "(p q : ℕ) where popGen : GenerationalPopGenParameters betaSource : Fin q → ℝ targetEffectHeterogeneityAt : ℕ → Fin q → ℝ novelCausalEffectTargetAt : ℕ → Fin q → ℝ sigmaTagSource : Matrix (Fin p) (Fin p) ℝ directCausalSource : Matrix (Fin p) (Fin q) ℝ novelDirectCausalTemplate : Matrix (Fin p) (Fin q) ℝ proxyTaggingSource : Matrix (Fin p) (Fin q) ℝ novelProxyTaggingTemplate : Matrix (Fin p) (Fin q) ℝ tagDistance : Matrix (Fin p) (Fin p) ℝ tagCausalDistance : Matrix (Fin p) (Fin q) ℝ tagAlleleFreqSource : Fin p → ℝ tagAlleleFreqStandingTargetAt : ℕ → Fin p → ℝ tagAlleleFreqMutationShiftAt : ℕ → Fin p → ℝ causalAlleleFreqSource : Fin q → ℝ causalAlleleFreqStandingTargetAt : ℕ → Fin q → ℝ causalAlleleFreqMutationShiftAt : ℕ → Fin q → ℝ contextCrossSource : Fin p → ℝ contextCrossTargetAt : ℕ → Fin p → ℝ sourceOutcomeVariance : ℝ targetOutcomeVarianceAt : ℕ → ℝ novelUntaggablePhenotypeVarianceAt : ℕ → ℝ targetPrevalenceAt : ℕ → ℝ sourceOutcomeVariance_pos : 0 < sourceOutcomeVariance targetOutcomeVariance_pos : ∀ t, 0 < targetOutcomeVarianceAt t novelUntaggablePhenotypeVariance_nonneg : ∀ t, 0 ≤ novelUntaggablePhenotypeVarianceAt t targetPrevalence_pos : ∀ t, 0 < targetPrevalenceAt t targetPrevalence_lt_one : ∀ t, targetPrevalenceAt t < 1",
    "args": [
     {
@@ -63852,7 +63881,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4113,
+   "line": 4118,
    "signature": "where Ne : ℝ μ : ℝ t : ℝ Ne_pos : 0 < Ne mu_pos : 0 < μ t_nonneg : 0 ≤ t",
    "args": [],
    "ret_type": "ℝ μ : ℝ t : ℝ Ne_pos : 0 < Ne mu_pos : 0 < μ t_nonneg : 0 ≤ t",

@@ -1,5 +1,5 @@
 {
- "total": 1001,
+ "total": 1002,
  "extractable": 668,
  "roots": [
   "Calibrator.FrequencyResolvedCohort.correctableClasses",
@@ -155,6 +155,7 @@
   "Calibrator.PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty",
   "Calibrator.PGSEvolutionaryModel.migBoost",
   "Calibrator.PGSEvolutionaryModel.mutErosion",
+  "Calibrator.PosteriorPrediction.prob_mode",
   "Calibrator.Predictor",
   "Calibrator.RGEInflationModel.r2_obs",
   "Calibrator.RGEModel.predSource",
