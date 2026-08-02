@@ -103,8 +103,23 @@ export ELAN_HOME=$ROOT/.elan
 # getting about one percent of a core, while recompiling Mathlib. Nobody chose
 # that; the invocation everyone copied did it silently. So the script resubmits
 # itself rather than trusting the caller to remember.
+#
+# CAPACITY IS NOT THE CONSTRAINT. agsmall, aglarge, msismall and sioux are all
+# available; pick whichever has queue with PARTITION=<p>. Serialising every
+# build against one shared checkout was the right answer only while everyone
+# shared one `.lake` and contended for its package lock. With real capacity the
+# better answer is SEPARATE BUILD TREES ON SEPARATE NODES, and the lock stops
+# being a bottleneck at all -- but a separate tree only helps if its `.lake` is
+# genuinely COPIED. `cp -al` hardlinks and a symlink both share the lock inode
+# and deadlock exactly as the shared tree does.
+#
+# --output must be on shared storage under /projects. /tmp is node-local, so a
+# log written there is invisible to the next call -- and the relay does not land
+# on the same node twice, which makes that a silent cause of an empty log. On
+# acn112/116 /tmp is also RAM-backed tmpfs shared with other users.
 if [ -z "${SLURM_JOB_ID:-}" ]; then
-  exec sbatch --job-name=leanbld --partition=agsmall --nodes=1 --ntasks=1 \
+  exec sbatch --job-name=leanbld --partition="${PARTITION:-agsmall}" \
+    --nodes=1 --ntasks=1 \
     --cpus-per-task=8 --mem=32g --time=2:00:00 \
     --output="$ROOT/leanbuild-%j.out" "$0" "$@"
 fi
