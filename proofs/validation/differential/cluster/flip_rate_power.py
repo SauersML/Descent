@@ -103,39 +103,57 @@ def norm_ppf(p):
     return 0.5 * (lo + hi)
 
 
-def run_architecture(n_causal, h2, rng, reps=REPS):
+MIN_SELECTED = 200      # below this a flip rate is noise, not a measurement
+
+
+def run_architecture(n_causal, h2, rng, reps=REPS, p_thresh=P_THRESH,
+                     spread=True):
     """Discovery -> threshold -> replication; return the sign-flip rate.
 
-    All causal SNPs share one MAF so that h2 is divided evenly and the only
-    thing distinguishing architectures is HOW MANY loci carry it.
+    True effects are DRAWN, not fixed. A single shared beta was the first
+    version and it is unfaithful in a way that matters: with no variation in
+    the true effect, passing the discovery threshold cannot enrich for larger
+    true effects, so the selected set has the same signal-to-noise as the
+    causal set. In reality selection is exactly what makes the selected set
+    unrepresentative -- that IS the winner's curse -- and the flip rate is a
+    property of the selected set. Effects are Gaussian with variance set so
+    that h2 = n_causal * var_g * E[beta^2] holds exactly.
     """
     var_g = 2.0 * MAF * (1.0 - MAF)
-    beta = math.sqrt(h2 / (n_causal * var_g))          # per-SNP true effect
+    beta_sd = math.sqrt(h2 / (n_causal * var_g))
     se_d = 1.0 / math.sqrt(N_DISC * var_g)
     se_r = 1.0 / math.sqrt(N_REPL * var_g)
-    zt = z_threshold(P_THRESH)
+    zt = z_threshold(p_thresh)
 
-    flips, n_sel_tot = [], []
+    flips, n_sel_tot, sel_true_z = [], [], []
     for _ in range(reps):
-        bd = beta + rng.normal(0.0, se_d, n_causal)     # discovery estimates
+        beta = (rng.normal(0.0, beta_sd, n_causal) if spread
+                else np.full(n_causal, beta_sd))
+        bd = beta + rng.normal(0.0, se_d, n_causal)
         sel = np.abs(bd / se_d) > zt                    # winner's curse enters HERE
         k = int(sel.sum())
         n_sel_tot.append(k)
         if k == 0:
             continue
-        br = beta + rng.normal(0.0, se_r, k)            # replication estimates
+        br = beta[sel] + rng.normal(0.0, se_r, k)
         flips.append(float(np.mean(np.sign(br) != np.sign(bd[sel]))))
+        sel_true_z.append(float(np.mean(np.abs(beta[sel]) / se_r)))
+
+    total_sel = float(np.sum(n_sel_tot))
+    enough = total_sel >= MIN_SELECTED
     return {
         "n_causal": n_causal,
         "h2": h2,
-        "per_snp_beta": beta,
-        "true_z_discovery": beta / se_d,
-        "true_z_replication": beta / se_r,
-        "analytic_flip_rate": 1.0 - norm_cdf(beta / se_r),
-        "simulated_flip_rate": float(np.mean(flips)) if flips else None,
-        "flip_sem": float(np.std(flips) / math.sqrt(len(flips))) if flips else None,
-        "mean_n_selected": float(np.mean(n_sel_tot)),
-        "mean_discovery_beta_hat_if_selected": None,
+        "per_snp_beta_sd": beta_sd,
+        "population_z_replication": beta_sd / se_r,
+        "selected_mean_true_z_replication":
+            float(np.mean(sel_true_z)) if sel_true_z else None,
+        "simulated_flip_rate": (float(np.mean(flips))
+                                if (flips and enough) else None),
+        "flip_sem": (float(np.std(flips) / math.sqrt(len(flips)))
+                     if (flips and enough) else None),
+        "total_selected": total_sel,
+        "enough_selected": bool(enough),
     }
 
 
@@ -160,8 +178,8 @@ def main():
     # ---- matched h2, different architecture -------------------------------
     print("")
     print("MATCHED SNP HERITABILITY, DIFFERENT FLIP RATE")
-    print("    %-10s %-12s %-14s %-14s %-10s"
-          % ("n_causal", "h2", "true z_repl", "flip rate", "n selected"))
+    print("    %-10s %-12s %-14s %-16s %-10s"
+          % ("n_causal", "h2", "sel z_repl", "flip rate", "tot selected"))
     rows = []
     for m in (200, 2_000, 20_000, 100_000, 300_000):
         r = run_architecture(m, H2, rng)
@@ -184,18 +202,28 @@ def main():
     # ---- controls ----------------------------------------------------------
     print("")
     print("CONTROLS")
-    null = run_architecture(20_000, 0.0, rng)
+    # Under h2 = 0 nothing reaches p < 5e-8 except by a fluctuation of
+    # probability 5e-8 per SNP, so the null control CANNOT select at the
+    # genome-wide threshold -- the first version of this control failed for
+    # that reason and the failure was an artefact of the control, not a
+    # finding. The threshold is relaxed here so that selection happens at all;
+    # the claim being checked, that a selected null SNP flips with probability
+    # exactly one half, is threshold-independent.
+    null = run_architecture(200_000, 0.0, rng, p_thresh=1e-3)
     c1 = (null["simulated_flip_rate"] is not None
           and abs(null["simulated_flip_rate"] - 0.5) < 0.02)
-    print("    C1 null (h2 = 0): flip rate %s, must be 0.5 -> %s"
+    print("    C1 null (h2 = 0, threshold relaxed to 1e-3 so anything is "
+          "selected): flip rate %s, must be 0.5 -> %s"
           % (("%.4f" % null["simulated_flip_rate"])
-             if null["simulated_flip_rate"] is not None else "no SNP selected",
+             if null["simulated_flip_rate"] is not None else "too few selected",
              "PASS" if c1 else "FAIL"))
     sat = run_architecture(50, H2, rng)
+
     c2 = sat["simulated_flip_rate"] is not None and sat["simulated_flip_rate"] < 1e-3
-    print("    C2 saturation (50 causal, z_repl = %.1f): flip rate %.6f, must be"
-          " ~0 -> %s" % (sat["true_z_replication"], sat["simulated_flip_rate"],
-                         "PASS" if c2 else "FAIL"))
+    print("    C2 saturation (50 causal, selected z_repl = %.1f): flip rate "
+          "%.6f, must be ~0 -> %s"
+          % (sat["selected_mean_true_z_replication"] or float("nan"),
+             sat["simulated_flip_rate"], "PASS" if c2 else "FAIL"))
     out["controls"] = {"null": null, "saturation": sat,
                        "C1_pass": bool(c1), "C2_pass": bool(c2)}
     out["READ_THE_TEST"] = bool(c1 and c2)
