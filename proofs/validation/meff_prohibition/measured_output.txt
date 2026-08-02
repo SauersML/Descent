@@ -1,0 +1,12 @@
+  n      m meff_ratio cert_ratio   measured  max_moment_gap    bound
+--------------------------------------------------------------------
+  4     20     0.9951     1.8000     1.8415         0.19968  0.20000
+  8     72     0.9989     1.8889     1.9679         0.11109  0.11111
+ 16    272     0.9998     1.9412     1.9942         0.05882  0.05882
+
+m_eff       predicts measured = meff_ratio (-> 1.0)
+certificate predicts measured = cert_ratio (-> 2.0)
+
+n=4   |measured-meff|=0.8464   |measured-cert|=0.0415   -> CERTIFICATE wins
+n=8   |measured-meff|=0.9690   |measured-cert|=0.0790   -> CERTIFICATE wins
+n=16  |measured-meff|=0.9944   |measured-cert|=0.0530   -> CERTIFICATE wins

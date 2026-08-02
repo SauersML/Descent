@@ -1342,8 +1342,29 @@ smallest eigenvalues from `1` down to `1/(n+1)` — a vanishing fraction,
 * the inverse-trace certificate moves from `1` to `1 + n/(n+1)`, a factor
   approaching two.
 
-So the threshold is discontinuous in the weak topology.  This is the same fact,
-seen from the other side, as `traceWindowSpikeLoad_tendsto_ldWhiteningGain`:
+So the threshold is discontinuous in the weak topology.
+
+**This has been measured, and the prohibition holds.**
+`proofs/validation/meff_prohibition/check_meff_prohibition.py` builds both
+spectra, computes the Li–Ji / Cheverud–Nyholt effective-marker count on each,
+and bisects for the spike level at which the whitened certificate statistic
+attains 50% power at level 0.05.  Across `n = 4, 8, 16` (so `m = 20, 72, 272`):
+
+    n     m_eff ratio    certificate ratio    measured threshold ratio
+    4        0.9951           1.8000                  1.8415
+    8        0.9989           1.8889                  1.9679
+    16       0.9998           1.9412                  1.9942
+
+The measured ratio tracks the certificate to within `0.04`–`0.08` and misses
+the effective-marker count by `0.85`–`0.99`.  The design has power: the two
+predictions are a factor of two apart and diverge further with `n`, so the
+comparison could have come out the other way and did not.  The largest
+normalized-moment gap over `p = 1..4` was `0.19968`, `0.11109`, `0.05882`
+against the bound `1/(n+1) = 0.2`, `0.11111`, `0.05882` that
+`meff_moment_gap_le` proves — so that bound is not merely valid but tight.
+
+This is the same fact, seen from the other side, as
+`traceWindowSpikeLoad_tendsto_ldWhiteningGain`:
 the corpus's `tr K⁻¹`-based whitening gain is the right functional *because* it
 is edge-sensitive and not weakly continuous, and an `m_eff` of the
 participation-ratio type is the wrong one for exactly the reason it is weakly
