@@ -1,10 +1,27 @@
-import Mathlib
+import Mathlib.Tactic
+import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Data.Fin.VecNotation
+import Mathlib.Data.Real.Sqrt
+import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Topology.ContinuousMap.Algebra
+import Mathlib.GroupTheory.Perm.Basic
 
 /-!
 # The bundle modulus operator, its mass identity, and symmetric families
 
 This module is **self-contained: it imports only Mathlib**. It deliberately does not
 import any other `Calibrator` module, so it can be read, checked and built on its own.
+
+*On the import style, since it changed and the reason is not obvious from the diff.* This
+module and its siblings originally began `import Mathlib`, pulling the whole library at
+once. That requires the root `Mathlib.olean`, which is **absent** from the cluster build —
+so these modules alone could not be built, while every other module in `proofs/Calibrator`
+could, because the rest of the corpus imports targeted modules. The imports are now
+targeted to match. This was a build-availability fix, not a tidy-up, and reverting it
+would make this directory unbuildable again.
 
 ## What is here
 

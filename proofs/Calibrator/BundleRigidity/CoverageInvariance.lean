@@ -1,4 +1,13 @@
-import Mathlib
+import Mathlib.Tactic
+import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Data.Fin.VecNotation
+import Mathlib.Data.Real.Sqrt
+import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Topology.ContinuousMap.Algebra
+import Mathlib.GroupTheory.Perm.Basic
 
 /-!
 # Support-level coverage invariance and slotwise bookkeeping

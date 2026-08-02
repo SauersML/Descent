@@ -1,10 +1,29 @@
-import Mathlib
+import Mathlib.Tactic
+import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Data.Fin.VecNotation
+import Mathlib.Data.Real.Sqrt
+import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Topology.ContinuousMap.Algebra
+import Mathlib.GroupTheory.Perm.Basic
 import Calibrator.BundleRigidity.Realizability
 
 /-!
 # Effective independence dimension and the master decay bound
 
-This module is **self-contained: it imports only Mathlib**.
+This module imports targeted Mathlib modules **and** `Calibrator.BundleRigidity.Realizability`.
+It is therefore **no longer self-contained**, and the previous claim that it imports only
+Mathlib is stale — the `Realizability` dependency was added after that sentence was
+written, and the sentence is corrected here rather than left to contradict the header.
+
+*On the import style, since it changed and the reason is not obvious from the diff.* Every
+module in this directory originally began `import Mathlib` — the whole library at once.
+That requires the root `Mathlib.olean`, which is **absent** from the cluster build, so
+these modules could not be built at all while every other module in the corpus could. The
+imports are now targeted, matching the rest of `proofs/Calibrator`, which needs no root
+olean. This was a build-availability fix, not a cleanup.
 
 ## What this replaces
 
