@@ -1275,6 +1275,23 @@ FAMILIES = [
                     "optimalSlopeLinearNoise", "optimalSlopeFromVariance",
                     "totalVariance", "toDGP", "trueExp"],
     },
+    {
+        "name": "ensemble_portability_channel",
+        "model": "stationary Gaussian latent target panels with genomic order erased; "
+                 "finite Fejer and symmetric fourth-order dependence channels",
+        "simulator": "cluster/fam_ensemble_channel.py",
+        "status": "IMPLEMENTED, NOT YET RUN. The formal core predicts an exact finite "
+                  "sample-mean channel and proves that it is incomplete; deconvolution "
+                  "rates and compound empirical-Bayes performance are exploratory arms.",
+        "found_by": "manual",
+        "spec": "Simulate stationary scaled-rotation Gaussian chains with exact stationary "
+                "starts. Compare n Var(mean) to the finite Fejer sum, then hold the Fejer "
+                "channel fixed while testing the symmetric fourth-order channel. The curve "
+                "arm must verify injectivity rather than infer it from low dimension. Do not "
+                "interpret `(mass,L)` as sufficient for the full unordered panel law.",
+        "members": ["fejerChannel3", "gaussianPairSquareChannel3",
+                    "ensembleSquaredLoss", "scalarPermeability"],
+    },
 ]
 
 # ---------------------------------------------------------------------------

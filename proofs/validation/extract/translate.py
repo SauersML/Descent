@@ -69,6 +69,25 @@ FUNCS = {
     "Real.nnabs": ("_rt.rabs", 1),
     "abs": ("_rt.rabs", 1), "max": ("_rt.rmax", 2), "min": ("_rt.rmin", 2),
     "Nat.cast": ("float", 1), "Int.cast": ("float", 1), "id": ("(lambda _x: _x)", 1),
+    # Mathlib's finite linear algebra.  These were NOT missing because they are
+    # hard -- `dotProduct` alone was the reported cause on 12 definitions, and
+    # each of those blocked everything that called it in turn.  The runtime
+    # versions refuse on a shape mismatch rather than zipping to the shorter
+    # argument, because in Lean both sides live in one `Fin n` by construction.
+    "dotProduct": ("_rt.dotProduct", 2),
+    "Matrix.dotProduct": ("_rt.dotProduct", 2),
+    "Matrix.mulVec": ("_rt.mulVec", 2), "Matrix.vecMul": ("_rt.vecMul", 2),
+    "Matrix.trace": ("_rt.trace", 1),
+}
+
+# The same operations written in Lean's dot notation on a matrix-valued binder:
+# `B.mulVec v`, `A.trace`.  The base is an ordinary argument, not a structure,
+# so the projection path does not apply and the old parser refused it as a
+# "qualified name".
+MATRIX_METHODS = {
+    "mulVec": ("_rt.mulVec", 2), "vecMul": ("_rt.vecMul", 2),
+    "trace": ("_rt.trace", 1), "dotProduct": ("_rt.dotProduct", 2),
+    "transpose": ("_rt.transpose", 1),
 }
 CONSTS = {"Real.pi": "_rt.pi", "π": "_rt.pi"}
 
@@ -131,10 +150,19 @@ def tokenize(src: str):
 
 # ------------------------------------------------------------------ parser
 
+def _dedup(pairs):
+    out = []
+    for x in pairs:
+        if x not in out:
+            out.append(x)
+    return out
+
+
 class Parser:
     def __init__(self, toks, struct_args, locals_=(), resolver=None,
                  struct_types=None, fields_of=None, dot_resolver=None,
-                 vector_args=None, dims=None, lift_arith=False):
+                 vector_args=None, dims=None, lift_arith=False,
+                 enums=None, qualified_resolver=None):
         self.t = toks
         self.i = 0
         self.stop_cols = []            # layout barriers introduced by `let`
@@ -147,6 +175,19 @@ class Parser:
         self.vector_args = vector_args or {}     # arg name -> (dim var, rank)
         self.dims = dims or {}                   # dim var -> python length expr
         self.sum_vars = []                       # indices bound by an enclosing ∑
+        # {type: {constructor: ordinal}} for the corpus's enumerations (`Pop`,
+        # `DiploidGenotype`).  The corpus uses them as INDEX SETS -- `Pop → Fin
+        # q → ℝ`, `∑ g : DiploidGenotype, …` -- so a constructor is an index
+        # and an enum-annotated sum has a known, fixed length.
+        self.enums = enums or {}
+        self.qualified_resolver = qualified_resolver
+        # Every application of an enclosing ∑'s index: {idx: [(head, argpos)]}.
+        # `∑ i, freq i` has no type annotation and no `Fin n` argument to read a
+        # dimension from, but Lean infers `i`'s type from `freq`'s domain, and
+        # so can we: the sum ranges over the length of what it indexes.  All
+        # uses are kept, not just the first, so that the generated code can
+        # CHECK they agree at runtime instead of trusting one of them.
+        self.index_apply = {}
         # Only definitions that actually take a vector need elementwise
         # arithmetic.  Scalar-only definitions keep plain Python operators, so
         # their generated source is unchanged by this feature.
@@ -155,10 +196,18 @@ class Parser:
     def _dot(self, x, nargs):
         """Resolve `base.method` now that its application arity is known.
 
+        `_DOT2:` markers are already resolved (a Mathlib matrix method on an
+        ordinary binder) and pass straight through as (function, base).
+
         Lean's dot notation means `m.foo a` = `T.foo m a` when `m : T`.  Treating
         it as a field access silently turns a method call into a KeyError, or
         worse, into a projection that happens to exist.
         """
+        if isinstance(x, str) and x.startswith("_DOT2:"):
+            fn, base = x[6:].split("|")
+            return (fn, base)
+        if isinstance(x, str) and x.startswith("_QUAL:"):
+            return x[6:]
         if not isinstance(x, str) or not x.startswith("_DOT:"):
             return x
         base, ty, meth = x[5:].split("|")
@@ -168,6 +217,11 @@ class Parser:
 
     def _dep(self, x, nargs):
         """Resolve a `_DEP:` marker now that its application arity is known."""
+        if isinstance(x, str) and x.startswith("_DOT2:"):
+            fn, base = x[6:].split("|")
+            return (fn, base)                  # app() emits fn(base, *args)
+        if isinstance(x, str) and x.startswith("_QUAL:"):
+            return x[6:]
         x = self._dot(x, nargs)
         if isinstance(x, tuple):                 # dot-call with no extra args
             return f"{x[0]}({x[1]})"
@@ -293,7 +347,17 @@ class Parser:
             if len(args) != arity:
                 raise Untranslatable(f"arity mismatch for {fn}: got {len(args)}")
             return f"{fn}({', '.join(args)})"
-        return f"{self._dep(head, len(args))}({', '.join(args)})"
+        fn = self._dep(head, len(args))
+        # A ∑ index applied to something records where its dimension can be
+        # read from.  Only a LOCAL head counts: `∑ i, someOtherDef i` applies a
+        # function, and `len` of a function is not a dimension -- taking one
+        # there would invent a range and hand back a plausible wrong sum.
+        if self.sum_vars and not head.startswith("_DEP:"):
+            for pos, a in enumerate(args):
+                for idx in self.sum_vars:
+                    if a == pyname(idx):
+                        self.index_apply.setdefault(idx, []).append((fn, pos))
+        return f"{fn}({', '.join(args)})"
 
     def atom(self):
         p = self.peek()
@@ -306,7 +370,7 @@ class Parser:
             if self.peek() is None or self.peek().kind != "ident":
                 raise Untranslatable("∑ without a simple index binder")
             idx = self.next().text
-            dimexpr = None
+            dimexpr, annot = None, ""
             if self.at(":"):                       # ∑ i : Fin t, …
                 self.next()
                 toks = []
@@ -315,9 +379,12 @@ class Parser:
                 if len(toks) >= 2 and toks[0] == "Fin":
                     dimexpr = self.dims.get(toks[1]) or (
                         toks[1] if toks[1].isdigit() else None)
-                if dimexpr is None:
-                    raise Untranslatable(
-                        f"∑ over {' '.join(toks)}: not a `Fin n` index set")
+                elif len(toks) == 1 and toks[0].split(".")[-1] in self.enums:
+                    # `∑ g : DiploidGenotype, …`.  The index set is the
+                    # enumeration's constructors, so its size is fixed by the
+                    # Lean declaration -- read, not assumed.
+                    dimexpr = str(len(self.enums[toks[0].split(".")[-1]]))
+                annot = " ".join(toks)          # kept for the refusal message
             elif self.at("∈"):                     # ∑ i ∈ Finset.univ, …
                 self.next()
                 toks = []
@@ -328,19 +395,34 @@ class Parser:
                         f"∑ over the Finset `{' '.join(toks)}`, not `Finset.univ`")
             if dimexpr is None:
                 cand = {d for d, _ in self.vector_args.values()}
-                if len(cand) != 1:
-                    raise Untranslatable(
-                        "∑ with an unannotated index and "
-                        f"{len(cand)} candidate dimensions: cannot tell which")
-                dimexpr = self.dims.get(next(iter(cand)))
-            if dimexpr is None:
-                raise Untranslatable("∑ over a dimension with no runtime length")
+                if len(cand) == 1:
+                    dimexpr = self.dims.get(next(iter(cand)))
             self.expect(",")
             self.locals.add(idx)
             self.sum_vars.append(idx)
+            outer_uses = self.index_apply.pop(idx, None)
             body = self.expr()
+            uses = self.index_apply.pop(idx, [])
+            if outer_uses is not None:
+                self.index_apply[idx] = outer_uses
             self.sum_vars.pop()
             self.locals.discard(idx)
+            if dimexpr is None:
+                # INFERRED FROM USE.  Lean elaborates `∑ i, freq i` by reading
+                # `i`'s type off `freq`'s domain; the same information is in the
+                # body here.  Every place the index is applied contributes a
+                # length, and `_rt.sumdim` RAISES if they disagree, so a wrong
+                # inference becomes a loud failure rather than a sum over the
+                # wrong range -- which would be a plausible number, and the one
+                # outcome worse than refusing.
+                if not uses:
+                    raise Untranslatable(
+                        f"∑ over {annot or 'an unannotated index'} whose index "
+                        "is never applied to a local value: there is nothing in "
+                        "the body to read a dimension from")
+                lens = ", ".join(
+                    f"len({h}{'[0]' * pos})" for h, pos in _dedup(uses))
+                dimexpr = f"_rt.sumdim({pyname(idx)!r}, {lens})"
             return f"sum(({body}) for {pyname(idx)} in range(int({dimexpr})))"
         if p.text == "|":                       # |e|  absolute value
             self.next()
@@ -399,6 +481,20 @@ class Parser:
                 return f"_FN:{fn}|{ar}"
             if "." in name:                     # projection or qualified name
                 base, *flds = name.split(".")
+                # An enumeration CONSTRUCTOR is a value of a finite index type,
+                # and the corpus uses it as an index (`m.beta Pop.target`).  Its
+                # ordinal is the honest translation: it is exactly the position
+                # the shape-directed inhabitant in admissible.type_value keys on.
+                if len(flds) == 1 and base in self.enums \
+                        and flds[0] in self.enums[base]:
+                    return str(self.enums[base][flds[0]])
+                # `B.mulVec v`, `A.trace` -- Lean dot notation on a matrix-valued
+                # BINDER.  Not a structure projection and not a qualified name;
+                # it is Mathlib's method on a value we already hold.
+                if len(flds) == 1 and flds[0] in MATRIX_METHODS \
+                        and base not in self.struct_args \
+                        and (base in self.locals or base in self.vector_args):
+                    return f"_DOT2:{MATRIX_METHODS[flds[0]][0]}|{pyname(base)}"
                 if base in self.struct_args or (flds and flds[0].isdigit()):
                     ty = self.struct_types.get(base)
                     known = self.fields_of.get(ty, set())
@@ -411,6 +507,15 @@ class Parser:
                     for f in flds:
                         out = f"_rt._proj({out}, {f!r})"
                     return out
+                # Last resort before refusing: the dotted name may simply BE a
+                # definition of this corpus (`Pop.pair`, `TransportedMetrics.
+                # calibratedBrier`).  Resolving it is not a guess -- the
+                # resolver only answers when exactly one declaration bears that
+                # fully-qualified name.
+                if self.qualified_resolver is not None:
+                    got = self.qualified_resolver(name)
+                    if got is not None:
+                        return f"_QUAL:{got}"
                 raise Untranslatable(f"qualified name {name}")
             if name in self.vector_args:
                 dim, rank = self.vector_args[name]
@@ -431,7 +536,8 @@ LET_RE = re.compile(r"^(\s*)let\s+([A-Za-z_][\w'₀-₉ₐ-ₜ]*)\s*(?::[^:=]*)?
 
 def translate_body(body: str, struct_args=(), locals_=(), resolver=None,
                    struct_types=None, fields_of=None, dot_resolver=None,
-                 vector_args=None, dims=None, lift_arith=False):
+                   vector_args=None, dims=None, lift_arith=False,
+                   enums=None, qualified_resolver=None):
     """Translate a Lean body into (statements, return_expression)."""
     toks = tokenize(body)
     if not toks:
@@ -439,7 +545,7 @@ def translate_body(body: str, struct_args=(), locals_=(), resolver=None,
     stmts = []
     p = Parser(toks, set(struct_args), locals_, resolver,
                struct_types, fields_of, dot_resolver, vector_args, dims,
-               lift_arith)
+               lift_arith, enums, qualified_resolver)
     while p.at("let"):
         letcol = p.peek().col
         p.next()
@@ -461,6 +567,61 @@ def translate_body(body: str, struct_args=(), locals_=(), resolver=None,
     if p.peek() is not None:
         raise Untranslatable(f"trailing tokens after expression: {p.peek()!r}")
     return stmts, ret
+
+
+def _enum_of(patterns, enums):
+    """The enumeration whose constructors are exactly these patterns, or None."""
+    if not patterns:
+        return None
+    for ty, ctors in enums.items():
+        got = []
+        for pat in patterns:
+            base, _, ctor = pat.rpartition(".")
+            if base and base.split(".")[-1] != ty:
+                return None
+            if ctor not in ctors:
+                got = None
+                break
+            got.append(ctors[ctor])
+        if got is not None and sorted(got) == list(range(len(ctors))):
+            return ty
+    return None
+
+
+def translate_enum_match(d, enums, struct_arg_names=(), fname=None,
+                         resolver=None, **kw):
+    """A def defined by cases on an enumeration becomes a dispatch table.
+
+        def Pop.pair (s t : α) : Pop → α
+          | Pop.source => s
+          | Pop.target => t
+
+    The enumeration is an index type here (see `Parser.enums`), so the branches
+    are just the entries of a table read at the constructor's ordinal.  Every
+    constructor must be covered -- `_enum_of` checks the patterns are exactly
+    the constructors, once each -- so there is no default branch to get wrong.
+    """
+    ty = _enum_of([e["pattern"].strip() for e in d["equations"]], enums)
+    ctors = enums[ty]
+    explicit = [n for a in d["args"] if not a["implicit"] for n in a["names"]]
+    binders = [n for a in d["args"] for n in a["names"]]
+    scrut = "_e"
+    while pyname(scrut) in {pyname(n) for n in binders}:
+        scrut += "_"
+    branches = {}
+    for e in d["equations"]:
+        _base, _, ctor = e["pattern"].strip().rpartition(".")
+        stmts, ret = translate_body(e["rhs"], struct_arg_names, binders,
+                                    resolver, **kw)
+        if stmts:
+            raise Untranslatable("enum branch needs `let`, not supported here")
+        branches[ctors[ctor]] = ret
+    args = [pyname(n) for n in explicit] + [pyname(scrut)]
+    lines = [f"def {fname or pyname(d['short'])}({', '.join(args)}):",
+             f"    _t = [{', '.join(branches[i] for i in range(len(ctors)))}]",
+             f"    return _t[_rt._ix({pyname(scrut)}, {len(ctors)}, "
+             f"{d['short']!r})]"]
+    return "\n".join(lines), args
 
 
 def translate_recursion(d, struct_arg_names=(), fname=None, resolver=None):
@@ -547,7 +708,8 @@ def translate_recursion(d, struct_arg_names=(), fname=None, resolver=None):
 
 def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
                   struct_types=None, fields_of=None, dot_resolver=None,
-                 vector_args=None, dims=None, lift_arith=False):
+                  vector_args=None, dims=None, lift_arith=False,
+                  enums=None, qualified_resolver=None):
     """Return (python_source, argnames) or raise Untranslatable.
 
     `resolver(short, n_args) -> python_name` decides which definition an
@@ -557,6 +719,11 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
     a callable that computes a different function than the Lean says.
     """
     if d.get("equations"):
+        pats = [e["pattern"].strip() for e in d.get("equations") or []]
+        if enums and _enum_of(pats, enums):
+            return translate_enum_match(d, enums, struct_arg_names, fname,
+                                        resolver, enums=enums,
+                                        qualified_resolver=qualified_resolver)
         return translate_recursion(d, struct_arg_names, fname, resolver)
     argnames = [pyname(n) for a in d["args"] if not a["implicit"] for n in a["names"]]
     if not argnames and not d["body"].strip():
@@ -564,7 +731,8 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
     binders = [n for a in d["args"] for n in a["names"]]      # incl. implicit
     stmts, ret = translate_body(d["body"], struct_arg_names, binders, resolver,
                                 struct_types, fields_of, dot_resolver,
-                                vector_args, dims, bool(vector_args))
+                                vector_args, dims, bool(vector_args),
+                                enums, qualified_resolver)
     lines = [f"def {fname or pyname(d['short'])}({', '.join(argnames)}):"]
     # BUG A fix: a dimension variable is an IMPLICIT binder, so it is correctly
     # absent from the signature -- but the body may still use it (`(T : ℝ) / ∑ i,
