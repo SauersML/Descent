@@ -1079,51 +1079,91 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
 
     Empirical status: FORMULA CORRECTED AND MEASURED on all three axes above;
     the corrected form is the published Kimura-Weiss result. The `σ² = 1`
-    assumption is DECLARED HERE AND UNTESTED -- the runs that fixed the
-    exponents did not vary the dispersal variance, so nothing yet distinguishes
-    this body from `σ·√(m/(2μ))` with `σ` absorbed into the fitted prefactor. -/
-noncomputable def steppingStoneCharacteristicLength (m μ : ℝ) : ℝ :=
-  Real.sqrt (m / (2 * μ))
+    assumption has now been MEASURED and it is load-bearing:
+    `d log L / d log σ² = +0.475` against `0` for a body without `σ²`, and the
+    errors at `σ² ≠ 1` are `-26.9%` at `σ² = 2` and `-49.3%` at `σ² = 4`. So
+    `σ²` is now an argument and the body is `√(m·σ²/(2μ))`; the previous body
+    is exactly its `σ² = 1` slice.
 
-/-- The characteristic length scale is positive for positive migration and
-    mutation rates. -/
-theorem steppingStoneCharacteristicLength_pos (m μ : ℝ)
-    (hm : 0 < m) (hμ : 0 < μ) :
-    0 < steppingStoneCharacteristicLength m μ := by
+    Why that measurement is decisive where an earlier one was not. A convention
+    difference -- infinite-alleles versus infinite-sites, say -- multiplies `μ`
+    by a constant, which rescales every `L` UNIFORMLY AND CANNOT MOVE AN
+    EXPONENT. An earlier +44% discrepancy on this definition dissolved into
+    exactly such a convention artefact because it was a constant factor. An
+    exponent is immune to that entire class of explanation, which is why the
+    `σ²` axis settles it and why it was worth waiting for rather than
+    estimating. The measured `+0.475` is the diffusion balance's `+1/2`.
+
+    Signature consistency: both siblings already carry a dispersal variance --
+    `DemographicHistory.demoSteppingStoneFst (d Ne m σ_sq)` and
+    `DemographicHistory.steppingStoneCoalescenceTime (d σ_sq m)` -- so this
+    restores the family rather than adding a novelty. A mentions query found no
+    call site supplying one, so no caller was silently wrong and all become
+    able to express it. -/
+noncomputable def steppingStoneCharacteristicLength (m σ_sq μ : ℝ) : ℝ :=
+  Real.sqrt (m * σ_sq / (2 * μ))
+
+/-- The characteristic length scale is positive for positive migration,
+    dispersal and mutation rates. -/
+theorem steppingStoneCharacteristicLength_pos (m σ_sq μ : ℝ)
+    (hm : 0 < m) (hσ : 0 < σ_sq) (hμ : 0 < μ) :
+    0 < steppingStoneCharacteristicLength m σ_sq μ := by
   unfold steppingStoneCharacteristicLength
   exact Real.sqrt_pos.mpr (by positivity)
 
 /-- **What the definition claims: the migration/mutation balance.**
-    `L² · (2·μ) = m`, i.e. the time `L²/m` a lineage takes to diffuse `L`
-    demes is exactly the time `1/(2·μ)` in which mutation destroys identity
-    between two lineages. This is the content of the Kimura-Weiss scale, and
-    stating it as an equation is what stops the body from drifting back to
-    something containing `Nₑ`: no expression in `Nₑ` and `m` alone can satisfy
-    it. -/
-theorem steppingStoneCharacteristicLength_balances_mutation (m μ : ℝ)
-    (hm : 0 ≤ m) (hμ : 0 < μ) :
-    steppingStoneCharacteristicLength m μ ^ 2 * (2 * μ) = m := by
+    `L² · (2·μ) = m·σ²`, i.e. the time `L²/(m·σ²)` a lineage takes to diffuse
+    `L` demes is exactly the time `1/(2·μ)` in which mutation destroys identity
+    between two lineages. Stating it as an equation is what stops the body from
+    drifting back to something containing `Nₑ`, and now also what pins the
+    `σ²` scaling: no expression lacking `σ²` can satisfy it. -/
+theorem steppingStoneCharacteristicLength_balances_mutation (m σ_sq μ : ℝ)
+    (hm : 0 ≤ m) (hσ : 0 ≤ σ_sq) (hμ : 0 < μ) :
+    steppingStoneCharacteristicLength m σ_sq μ ^ 2 * (2 * μ) = m * σ_sq := by
   unfold steppingStoneCharacteristicLength
   rw [Real.sq_sqrt (by positivity)]
   field_simp
 
-/-- **The decay scale shrinks as mutation gets faster.**
-    This is the axis on which the previous body was falsified: `√(2·Nₑ·m)` is
-    constant in `μ`, so it could not move here at all. -/
-theorem steppingStoneCharacteristicLength_strictAnti_mutation (m μ₁ μ₂ : ℝ)
-    (hm : 0 < m) (hμ₁ : 0 < μ₁) (h : μ₁ < μ₂) :
-    steppingStoneCharacteristicLength m μ₂ < steppingStoneCharacteristicLength m μ₁ := by
+/-- **The `σ² = 1` slice is the old body**, stated so the correction is not
+    silently a different quantity: everything previously proved about
+    `√(m/(2μ))` is the unit-dispersal case of this. -/
+theorem steppingStoneCharacteristicLength_at_unit_dispersal (m μ : ℝ) :
+    steppingStoneCharacteristicLength m 1 μ = Real.sqrt (m / (2 * μ)) := by
+  unfold steppingStoneCharacteristicLength
+  norm_num
+
+/-- **The decay scale grows with dispersal variance.** This is the axis that
+    was just measured at `+0.475`, and on which a body without `σ²` is pinned
+    at `0` and cannot move. -/
+theorem steppingStoneCharacteristicLength_strictMono_dispersal
+    (m σ₁ σ₂ μ : ℝ) (hm : 0 < m) (hσ₁ : 0 ≤ σ₁) (hμ : 0 < μ) (h : σ₁ < σ₂) :
+    steppingStoneCharacteristicLength m σ₁ μ
+      < steppingStoneCharacteristicLength m σ₂ μ := by
   unfold steppingStoneCharacteristicLength
   apply Real.sqrt_lt_sqrt (by positivity)
-  exact div_lt_div_of_pos_left hm (by linarith) (by linarith)
+  apply div_lt_div_of_pos_right _ (by positivity)
+  exact (mul_lt_mul_left hm).mpr h
+
+/-- **The decay scale shrinks as mutation gets faster.**
+    This is the axis on which the `√(2·Nₑ·m)` body was falsified: it is
+    constant in `μ`, so it could not move here at all. -/
+theorem steppingStoneCharacteristicLength_strictAnti_mutation (m σ_sq μ₁ μ₂ : ℝ)
+    (hm : 0 < m) (hσ : 0 < σ_sq) (hμ₁ : 0 < μ₁) (h : μ₁ < μ₂) :
+    steppingStoneCharacteristicLength m σ_sq μ₂
+      < steppingStoneCharacteristicLength m σ_sq μ₁ := by
+  unfold steppingStoneCharacteristicLength
+  apply Real.sqrt_lt_sqrt (by positivity)
+  exact div_lt_div_of_pos_left (by positivity) (by linarith) (by linarith)
 
 /-- The decay scale grows with the migration rate. -/
-theorem steppingStoneCharacteristicLength_strictMono_migration (m₁ m₂ μ : ℝ)
-    (hm₁ : 0 ≤ m₁) (hμ : 0 < μ) (h : m₁ < m₂) :
-    steppingStoneCharacteristicLength m₁ μ < steppingStoneCharacteristicLength m₂ μ := by
+theorem steppingStoneCharacteristicLength_strictMono_migration
+    (m₁ m₂ σ_sq μ : ℝ) (hm₁ : 0 ≤ m₁) (hσ : 0 < σ_sq) (hμ : 0 < μ) (h : m₁ < m₂) :
+    steppingStoneCharacteristicLength m₁ σ_sq μ
+      < steppingStoneCharacteristicLength m₂ σ_sq μ := by
   unfold steppingStoneCharacteristicLength
   apply Real.sqrt_lt_sqrt (by positivity)
-  exact div_lt_div_of_pos_right h (by positivity)
+  apply div_lt_div_of_pos_right _ (by positivity)
+  exact (mul_lt_mul_right hσ).mpr h
 
 /-! ### `continuousSteppingStoneFst` has been deleted
 

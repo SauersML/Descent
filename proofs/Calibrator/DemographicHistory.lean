@@ -100,9 +100,28 @@ section SteppingStone
     product and nothing else. In particular it does NOT distinguish this form
     from the `d / (d + 4·Nₑ·σ⁴·m²)` the old derivation produced, since a
     refitted σ² absorbs the extra power exactly. The evidence for the functional
-    form here is the coalescent derivation below, not the fit. Distinguishing
-    the two empirically requires holding σ² fixed at an independently measured
-    dispersal variance and varying `m`, which has not been done. -/
+    form here is the coalescent derivation below, not the fit.
+
+    That distinguishing run HAS NOW BEEN DONE, with σ² SET rather than fitted,
+    and this form wins decisively: RMS relative error `0.044`, against `0.622`
+    for the quadratic, `0.335` for the linear, and `0.163` for a FREELY FITTED
+    exponential. The exponential is 3.7× worse even with its length scale
+    fitted, which is independent corroboration of the derivation-based deletion
+    of `continuousSteppingStoneFst`.
+
+    **REGIME, BOUNDED AT BOTH ENDS.** The `m·σ²` degeneracy above -- the claim
+    that only the product matters -- is a LARGE-`d` property and fails badly at
+    short range. Holding `m·σ²` fixed at `0.1` with σ² set, two cells this
+    formula says must be IDENTICAL measure `0.0968` against `0.2638` AT `d = 1`,
+    converging to `0.8673` against `0.8711` only by `d = 128`. So the valid
+    regime is
+      dispersal scale ≪ d ≪ D (lattice size),
+    and the previous docstring anticipated only the upper half of that. The
+    lower bound is the one nobody had written down: at `d` of order the
+    dispersal distance, `m` and `σ²` are separately identifiable and this
+    expression is wrong by a factor of nearly three. The upper bound is the
+    `d ≪ D` limit in which the meeting time is linear in `d`; at `d = D/2` the
+    fit degrades to `-6.6%`. -/
 noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
