@@ -107,7 +107,7 @@ REPS = 6
 GENS = 4 * NE            # = 2 * (2Ne): the can-fail requirement
 GRID = [0, 25, 50, 100, 200, 350, 500, 750, 1000]
 SEED = 20260802
-NIND_MEASURE = NE        # individuals formed per deme for metric measurement
+NIND = 4000              # individuals per deme, >> the 36 tag loci
 H2 = 0.5                 # heritability of the simulated liability
 
 
@@ -197,11 +197,22 @@ def init_state(rng, reps, nhap, nloci):
 # ---------------------------------------------------------------------------
 # Measurement
 # ---------------------------------------------------------------------------
-def genotypes(hap, rng):
-    """Pair haplotypes into individuals: (reps, nind, L) in {0,1,2}."""
+def genotypes(hap, rng, nind):
+    """Random-mating individuals: (reps, nind, L) in {0,1,2}.
+
+    Haplotypes are paired at random WITH REPLACEMENT, which is a draw from the
+    population the haplotype pool represents. nind is set well above the
+    number of tag loci: with nind ~ p the source second-moment matrix is so
+    noisy that the source-fitted weights overfit the source SAMPLE, and the
+    score then collapses on any second draw from the SAME population -- which
+    reads as a transport failure at t = 25 when F_ST is still 0.02. Raising
+    nind removes an artefact; it does not loosen any tolerance.
+    """
     reps, nhap, nloci = hap.shape
-    nind = nhap // 2
-    return (hap[:, :nind, :] + hap[:, nind:2 * nind, :]).astype(np.float64)
+    ia = rng.integers(0, nhap, size=(reps, nind))
+    ib = rng.integers(0, nhap, size=(reps, nind))
+    ri = np.arange(reps)[:, None]
+    return (hap[ri, ia] + hap[ri, ib]).astype(np.float64)
 
 
 def freqs(hap):
@@ -406,7 +417,8 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
 
     # source state, frozen at the split (t = 0), exactly as the Lean's
     # source-side fields are constant in t.
-    G0 = genotypes(st["a0"], rng)
+    G0 = genotypes(st["a0"], rng, NIND)          # moment sample
+    G0e = genotypes(st["a0"], rng, NIND)         # independent evaluation sample
     S0_all = second_moments(G0)                       # (reps, L, L)
     p_S_all = freqs(st["a0"])                         # (reps, L)
     # Everything below is PER REPLICATE. Averaging the source second-moment
@@ -427,7 +439,8 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
             st = wf_generation(st, rng, ne, mu, mig, r_adj)
             g += 1
         # ---- measured target state at generation t
-        GT = genotypes(st["a1"], rng)
+        GT = genotypes(st["a1"], rng, NIND)      # moment sample
+        GTe = genotypes(st["a1"], rng, NIND)     # independent evaluation sample
         ST_all = second_moments(GT)
         p_T_all = freqs(st["a1"])
         acc = []
@@ -462,8 +475,8 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
             sig_tc_T_pred = sig_tc_S * K_pt
 
             # ---- measured metrics on simulated individuals, this replicate
-            meas = measure_metrics_rep(G0[k], GT[k], tag_idx, causal_idx, beta,
-                                       ve, env_rng, sig_tag_S, sig_tc_S)
+            meas = measure_metrics_rep(G0e[k], GTe[k], tag_idx, causal_idx,
+                                       beta, ve, env_rng, sig_tag_S, sig_tc_S)
 
             # ---- the three layers, this replicate
             src_m, tgt_meas = metric_layer(
@@ -474,8 +487,8 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
                 outcome_var_S, outcome_var_T)
 
             acc.append({
-                "kernel_diag_measured": float(np.mean(
-                    np.diag(sig_tag_T_meas) / np.diag(sig_tag_S))),
+                "kernel_diag_measured": safe_ratio_mean(
+                    np.diag(sig_tag_T_meas), np.diag(sig_tag_S)),
                 "kernel_diag_predicted": float(np.mean(np.diag(K_tag))),
                 "kernel_offdiag_measured": ratio_offdiag(sig_tag_T_meas,
                                                          sig_tag_S),
@@ -548,6 +561,19 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
                   f" metricAlone={row['metricLayerAlone_r2']:.4f}"
                   f" composite={row['composite_r2']:.4f}", flush=True)
     return rows
+
+
+def safe_ratio_mean(a, b):
+    """Mean of a/b over the entries where b is not numerically zero.
+
+    b is a SOURCE second moment, so b = 0 means the locus is monomorphic in the
+    source and the corpus's kernel is 0/0 there: no claim is being dropped.
+    The count of skipped entries is printed by the caller's *_sd companion.
+    """
+    ok = np.abs(b) > 1e-12
+    if not np.any(ok):
+        return float("nan")
+    return float(np.mean(np.asarray(a)[ok] / np.asarray(b)[ok]))
 
 
 def ratio_offdiag(A, B):
