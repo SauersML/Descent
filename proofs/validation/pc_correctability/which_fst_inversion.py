@@ -116,7 +116,7 @@ def main() -> int:
     print(f"n={n} m={m} M={M} reps={reps}")
     print()
     for F in (0.01, 0.02, 0.05):
-        rows = [one_rep(n, m, M, F, seed=1000 + F * 1e5 + i) for i in range(reps)]
+        rows = [one_rep(n, m, M, F, seed=int(1000 + F * 1e5 + i)) for i in range(reps)]
         edge = np.sqrt(rows[0]["c"])
         usable = [r for r in rows if np.isfinite(r["s"]) and r["s"] > edge]
         dropped = len(rows) - len(usable)
