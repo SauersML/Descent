@@ -86,8 +86,20 @@ def run():
         for n in set(re.findall(r"[A-Za-z_][A-Za-z0-9_.']*", t["body"])):
             mentions.setdefault(n.split(".")[-1], []).append(t)
 
+    # Target the WHOLE slice, not the ledger's UNREACHABLE entries.
+    #
+    # check7 feeds slice_ledger and slice_ledger feeds check7, so filtering on
+    # the ledger's verdict made this non-idempotent: once check7's own results
+    # were folded in, the definitions it had covered were no longer UNREACHABLE,
+    # so the next run skipped them, and the ledger rebuilt from the smaller
+    # output. Two runs took the tier from 194 verified to 83 -- a check eroding
+    # its own result while every individual step looked correct.
+    #
+    # Testing the whole slice is idempotent by construction. It costs little,
+    # because the per-definition search stops at the first theorem that rejects
+    # a mutation and already-covered definitions stop almost immediately.
     ledger = json.loads((ART / "slice_ledger.json").read_text())
-    targets = [r for r in ledger.values() if r["status"] == "UNREACHABLE"]
+    targets = list(ledger.values())
 
     results = []
     for r in targets:
