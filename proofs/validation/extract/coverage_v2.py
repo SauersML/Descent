@@ -11,6 +11,29 @@ passes on the real body and fails on at least one mutant that is numerically
 distinguishable from the real one.  A check that survives every mutant covers
 nothing and is reported as VACUOUS, not as coverage.
 
+WHAT THIS NUMBER CANNOT SEE.  Two independent blind spots, both of which make
+internal coverage overstate itself.  They belong next to the number, so it never
+travels without them.
+
+  1. MODEL ERRORS.  Mutation testing perturbs a body and asks whether a check
+     notices.  A body that is exactly what its author intended, and answers a
+     different question from the one its name poses, survives every mutant by
+     construction: the mutants are all wrong in the coordinate the definition is
+     right in.  `hetRecurrence` is the specimen -- algebraically correct
+     everywhere, quotes 0.9048/0.6065/0.1353 as VALIDATED, those numbers ARE
+     correct for a closed population with no mutation, and it is cited about a
+     population at mutation-drift equilibrium where the true retention is 1.0.
+     100% here would not have caught it.  See regime.py, the second metric.
+
+  2. UNGUARDED REGIONS.  A range check grades against the bounds the corpus
+     proves.  Where no theorem reaches, there is no bound to violate.
+     `neutralAFBenchmarkRatio` returns 2.4 against a true ratio of 1.0 at a
+     point where four of its five theorems hold and the fifth's hypotheses do
+     not reach -- every proof true, the region unguarded, and this accounting
+     scores it COVERED on the strength of the bounds it does satisfy.  Coverage
+     is therefore an upper bound on how much of the input space is actually
+     checked, not a measure of it.
+
 Check kinds, by class:
 
   NUMERIC     range invariant over the admissible box, where the range is mined

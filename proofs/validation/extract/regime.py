@@ -113,17 +113,47 @@ def mine_external_claim(d):
     return [name for name, pat in EXTERNAL_MARKERS if re.search(pat, doc, re.I)]
 
 
+# Which checking layers produce EXTERNAL evidence and which produce INTERNAL.
+# This distinction is the whole point of the metric, so it is recorded in code
+# rather than inferred: a layer that checks a definition against the corpus's
+# own theorems is doing internal consistency, however rigorously, and counting
+# it here would fold metric one back into metric two.
+EXTERNAL_TIERS = {
+    "differential": "analytic-reference",   # closed forms derived independently
+    "popgen_defs": "simulation",            # SLiM / coalescent simulation
+    "pc_correctability": "simulation",
+    "condensation": "simulation",
+    "imitation_rigidity": "simulation",
+}
+INTERNAL_TIERS = {"extract", "invariants", "symbolic"}
+
+# Verdicts that record an absence of checking rather than a check.
+NON_VERDICTS = {"not-transpiled", "no-range", "inconclusive", "skipped",
+                "unavailable", "not-extractable", "uncovered", "n/a", "none",
+                "NOT-EXTRACTABLE", "UNCOVERED", "not_extractable"}
+
+
 def external_checks():
-    """Definitions actually compared against an outside reference by some script.
+    """Definitions actually compared against an OUTSIDE reference.
 
     Evidence is a machine-readable verdict naming the definition, not a mention:
     a name appearing in a source file proves nothing, which is the flaw in the
-    old coverage script.  Results files written by the checking layers are the
-    only thing counted.
+    old coverage script.  And only results from tiers that compare against
+    something outside the development count -- a range check against the
+    corpus's own theorems is internal consistency wearing a different hat.
     """
     hits = collections.defaultdict(set)
     for path in (PROOFS / "validation").rglob("*.json"):
         if path.is_relative_to(HERE):
+            continue
+        tier = None
+        for part in path.parts:
+            if part in EXTERNAL_TIERS:
+                tier = EXTERNAL_TIERS[part]
+            elif part in INTERNAL_TIERS:
+                tier = None
+                break
+        if tier is None:
             continue
         try:
             blob = json.loads(path.read_text())
@@ -138,8 +168,9 @@ def external_checks():
                 name = node.get("definition") or node.get("name") or node.get("def")
                 verdict = (node.get("verdict") or node.get("status")
                            or node.get("result") or node.get("class"))
-                if isinstance(name, str) and isinstance(verdict, str):
-                    hits[name.split(".")[-1]].add(f"{tag}:{verdict}")
+                if isinstance(name, str) and isinstance(verdict, str) \
+                        and verdict not in NON_VERDICTS:
+                    hits[name.split(".")[-1]].add(f"{tag}[{tier}]:{verdict}")
                 for v in node.values():
                     walk(v, depth + 1)
             elif isinstance(node, list):

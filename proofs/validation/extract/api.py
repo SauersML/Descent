@@ -186,6 +186,12 @@ def callable_for(name: str):
     entry = _classes()[fq]
     if entry["python"] is None:
         raise NotExtractable(fq, entry["note"] or "no executable form emitted")
+    if entry["class"] == "NOT-EXTRACTABLE":
+        # A body can translate and still be unusable -- an untranslated
+        # dependency, an argument type we do not model.  The accounting already
+        # knows; handing the callable out anyway lets a consumer build on
+        # something this table has already judged broken.
+        raise NotExtractable(fq, entry["note"] or "classified NOT-EXTRACTABLE")
     import lean_defs
     fn = getattr(lean_defs, entry["python"], None)
     if fn is None:

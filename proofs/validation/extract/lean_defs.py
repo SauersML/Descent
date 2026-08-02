@@ -288,12 +288,6 @@ def Calibrator_HWEPolygenicScoreDGP_scoreVariance(dgp):
 def scoreApproximationError(dgp):
     return _rt._proj(_rt._proj(dgp, 'scoreModel'), 'berryEsseenErrorBound')(_rt._proj(dgp, 'berryEsseenConstant'))
 
-def sigmaTagCausalSource(mom):
-    return (_rt._proj(mom, 'directCausalSource') + _rt._proj(mom, 'proxyTaggingSource'))
-
-def sourceBestLinearWeightsFromLD(mom, betaCausal):
-    return _rt._proj(_rt.rinv(_rt._proj(mom, 'sigmaTagSource')), 'mulVec')((_rt._proj(_rt._proj(mom, 'sigmaTagCausalSource'), 'mulVec')(betaCausal)))
-
 def frobeniusNormSq(A):
     t = float(len(A))
     return sum((sum((_rt.lpow((A[int(i)][int(j)]), 2.0)) for j in range(int(len(A))))) for i in range(int(len(A))))
@@ -1451,40 +1445,17 @@ def sourceWeightedTagScore(m, tagState):
 def taggingProjection(m, P):
     return _rt._proj((Calibrator_sigmaTagCausal(m, P)), 'mulVec')((totalEffect(m, P)))
 
-def targetEffectHeterogeneityProjection(m):
-    return _rt._proj((sigmaTagCausalTarget(m)), 'mulVec')((targetEffectHeterogeneity(m)))
-
 def directCausalProjection(m, P):
     return _rt._proj(((_rt._proj(m, 'directCausal')(P) + _rt._proj(m, 'novelDirectCausal')(P))), 'mulVec')((totalEffect(m, P)))
 
 def proxyTaggingProjection(m, P):
     return _rt._proj(((_rt._proj(m, 'proxyTagging')(P) + _rt._proj(m, 'novelProxyTagging')(P))), 'mulVec')((totalEffect(m, P)))
 
-def sourceScoreVarianceFromExplicitDrivers(m):
-    wS = sourceWeightsFromExplicitDrivers(m)
-    return dotProduct(wS, (_rt._proj(_rt._proj(m, 'sigmaTagSource'), 'mulVec')(wS)))
-
-def targetScoreVarianceFromSourceWeights(m):
-    wS = sourceWeightsFromExplicitDrivers(m)
-    return dotProduct(wS, (_rt._proj(_rt._proj(m, 'sigmaTagTarget'), 'mulVec')(wS)))
-
-def sourcePredictiveCovarianceFromSourceWeights(m):
-    wS = sourceWeightsFromExplicitDrivers(m)
-    return dotProduct(wS, (sourceCrossCovariance(m)))
-
-def targetPredictiveCovarianceFromSourceWeights(m):
-    wS = sourceWeightsFromExplicitDrivers(m)
-    return dotProduct(wS, (targetCrossCovariance(m)))
-
 def sourceCalibrationSlopeFromSourceWeights(m):
     return _rt.rdiv(sourcePredictiveCovarianceFromSourceWeights(m), sourceScoreVarianceFromExplicitDrivers(m))
 
 def targetCalibrationSlopeFromSourceWeights(m):
     return _rt.rdiv(targetPredictiveCovarianceFromSourceWeights(m), targetScoreVarianceFromSourceWeights(m))
-
-def brokenTaggingResidual(m):
-    delta = _rt._proj((((sigmaTagCausalSource(m)) - (sigmaTagCausalTarget(m)))), 'mulVec')((targetTotalEffect(m)))
-    return dotProduct(delta, delta)
 
 def novelUntaggablePhenotypeResidual(m):
     return _rt._proj(m, 'novelUntaggablePhenotypeVarianceTarget')
@@ -1528,9 +1499,6 @@ def migrationSharedBoostAt(g, t):
 def alleleFreqMismatchPenalty(pSource, pTarget):
     return _rt.rexp(((-_rt.rabs((pTarget - pSource)))))
 
-def betaTargetAt(m, t):
-    return ((_rt._proj(m, 'betaSource') + _rt._proj(m, 'targetEffectHeterogeneityAt')(t)) + _rt._proj(m, 'novelCausalEffectTargetAt')(t))
-
 def tagAlleleFreqTargetAt(m, t, i):
     return (_rt._proj(m, 'tagAlleleFreqStandingTargetAt')(t, i) + _rt._proj(m, 'tagAlleleFreqMutationShiftAt')(t, i))
 
@@ -1561,26 +1529,14 @@ def jointNovelDirectCausalKernelAt(m, t, i, j):
 def jointNovelProxyTaggingKernelAt(m, t, i, j):
     return ((((ldCorrelationDecay((_rt._proj(m, 'tagCausalDistance')(i, j)), (_rt._proj(_rt._proj(m, 'popGen'), 'fstTransientAt')(t)), _rt._proj(_rt._proj(m, 'popGen'), 'recomb')) * novelVariantInnovationAt(_rt._proj(m, 'popGen'), t)) * _rt.rinv((_rt._proj(_rt._proj(m, 'popGen'), 'migrationSharedBoostAt')(t)))) * tagAlleleFreqRetentionAt(m, t, i)) * causalAlleleFreqRetentionAt(m, t, j))
 
-def sigmaTagTargetAt(m, t):
-    return (lambda i, j: (_rt._proj(m, 'sigmaTagSource')(i, j) * jointTagLDKernelAt(m, t, i, j)))
-
-def directCausalTargetAt(m, t):
-    return (lambda i, j: (_rt._proj(m, 'directCausalSource')(i, j) * jointDirectCausalKernelAt(m, t, i, j)))
-
 def novelDirectCausalTargetAt(m, t):
     return (lambda i, j: (_rt._proj(m, 'novelDirectCausalTemplate')(i, j) * jointNovelDirectCausalKernelAt(m, t, i, j)))
-
-def proxyTaggingTargetAt(m, t):
-    return (lambda i, j: (_rt._proj(m, 'proxyTaggingSource')(i, j) * jointProxyTaggingKernelAt(m, t, i, j)))
 
 def novelProxyTaggingTargetAt(m, t):
     return (lambda i, j: (_rt._proj(m, 'novelProxyTaggingTemplate')(i, j) * jointNovelProxyTaggingKernelAt(m, t, i, j)))
 
 def sigmaTagCausalTargetAt(m, t):
     return (directCausalTargetAt(m, t) + ((novelDirectCausalTargetAt(m, t) + ((proxyTaggingTargetAt(m, t) + novelProxyTaggingTargetAt(m, t))))))
-
-def targetSourceEffectProjectionAt(m, t):
-    return _rt._proj((sigmaTagCausalTargetAt(m, t)), 'mulVec')(_rt._proj(m, 'betaSource'))
 
 def targetEffectHeterogeneityProjectionAt(m, t):
     return _rt._proj((sigmaTagCausalTargetAt(m, t)), 'mulVec')(((_rt._proj(m, 'targetEffectHeterogeneityAt')(t) + _rt._proj(m, 'novelCausalEffectTargetAt')(t))))
@@ -2002,7 +1958,7 @@ def r2EstimatorVariance(r2, n):
 
 def pgsPhenoCov(β_weights, β_causal, ld):
     m = float(len(β_weights))
-    return sum((sum((_rt.mul(_rt.mul(β_weights[int(i)], ld(i, j)), β_causal[int(j)])) for j in range(int(len(β_weights))))) for i in range(int(len(β_weights))))
+    return sum((sum((_rt.mul(_rt.mul(β_weights[int(i)], ld[int(i)][int(j)]), β_causal[int(j)])) for j in range(int(len(β_weights))))) for i in range(int(len(β_weights))))
 
 def sharedLDGeneticVariance(β, ld):
     return pgsPhenoCov(β, β, ld)
@@ -2121,8 +2077,8 @@ def metaLearnedTransferGapSq(wShared, wTarget, deviation, k):
     return coefficientGapSq((metaLearnedSourceWeights(wShared, deviation, k)), wTarget)
 
 def weightedPopulationDeviation(deviation, weight):
-    k = float(len(weight))
-    return (lambda i: sum((_rt.mul(weight[int(j)], deviation(j, i))) for j in range(int(len(weight)))))
+    k = float(len(deviation))
+    return (lambda i: sum((_rt.mul(weight[int(j)], deviation[int(j)][int(i)])) for j in range(int(len(deviation)))))
 
 def weightedMetaSourceWeights(wShared, deviation, weight):
     return (lambda i: _rt.add(wShared[int(i)], weightedPopulationDeviation(deviation, weight, i)))
@@ -2134,11 +2090,11 @@ def uniformMetaWeight(k):
     return (lambda _: _rt.rinv((k)))
 
 def weightedPopulationEffectAverage(wSource, weight):
-    k = float(len(weight))
-    return (lambda i: sum((_rt.mul(weight[int(j)], wSource(j, i))) for j in range(int(len(weight)))))
+    k = float(len(wSource))
+    return (lambda i: sum((_rt.mul(weight[int(j)], wSource[int(j)][int(i)])) for j in range(int(len(wSource)))))
 
 def centeredPopulationEffectDeviationFin(wShared, wSource):
-    return (lambda j, i: _rt.sub(wSource(j, i), wShared[int(i)]))
+    return (lambda j, i: _rt.sub(wSource[int(j)][int(i)], wShared[int(i)]))
 
 def optimalFineTuningMSE(gapSq, noiseVar, nTarget):
     return sourceShrinkageMSE(gapSq, noiseVar, nTarget, (optimalSourceShrinkageWeight(gapSq, noiseVar, nTarget)))

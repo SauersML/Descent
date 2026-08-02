@@ -210,6 +210,11 @@ def main():
             ty = " ".join(a["type"].split())
             mv = re.fullmatch(r"Fin\s+(\w+)\s*→\s*ℝ", ty)
             mm = re.fullmatch(r"Matrix\s*\(Fin\s+(\w+)\)\s*\(Fin\s+(\w+)\)\s*ℝ", ty)
+            if mm is None:
+                # Curried index functions: `Fin m → Fin m → ℝ` is how the corpus
+                # writes an LD matrix in several places, and it indexes exactly
+                # like a Matrix.
+                mm = re.fullmatch(r"Fin\s+(\w+)\s*→\s*Fin\s+(\w+)\s*→\s*ℝ", ty)
             for n in a["names"]:
                 if mv:
                     vector_args[n] = (mv.group(1), 1)

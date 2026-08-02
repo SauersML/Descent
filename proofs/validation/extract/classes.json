@@ -4676,6 +4676,7 @@
   "mentioned_by": [
    "Calibrator.MafSpectrum.centeredSquareThirdMoment_differs_of_sixth",
    "Calibrator.MafSpectrum.fourthMoment_eq",
+   "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
    "Calibrator.floorOne_match_does_not_transport_calibration"
   ],
   "constraints": {
@@ -4687,6 +4688,9 @@
    ],
    "hypotheses_by_theorem": {
     "Calibrator.MafSpectrum.fourthMoment_eq": [
+     "∀ j, 0 < (spectrum.model j"
+    ],
+    "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [
      "∀ j, 0 < (spectrum.model j"
     ],
     "Calibrator.MafSpectrum.centeredSquareThirdMoment_differs_of_sixth": [
@@ -4736,6 +4740,37 @@
     ],
     "Calibrator.floorOne_match_does_not_transport_calibration": [
      "spectrum.centeredSquareThirdMoment ≠ spectrum'.centeredSquareThirdMoment"
+    ]
+   }
+  }
+ },
+ "Calibrator.MafSpectrum.fourthMomentDispersion": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "file": "Calibrator/CondensationUnification.lean",
+  "line": 882,
+  "short": "fourthMomentDispersion",
+  "ret_type": "ℝ",
+  "empirical_status": "UNTESTED",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion"
+  ],
+  "constraints": {
+   "declared_kind": "frequency",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "∀ j, 0 < (spectrum.model j"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [
+     "∀ j, 0 < (spectrum.model j"
     ]
    }
   }
@@ -6313,8 +6348,32 @@
   "mentioned_by": [
    "Calibrator.CrossTraitBorrowingModel.borrowedTraitBCrossCov_nonneg",
    "Calibrator.CrossTraitBorrowingModel.traitBSpecificCrossCov_nonneg",
+   "Calibrator.baseline_mechanistic_metrics",
+   "Calibrator.commonAndRarePortableModel_sourceR2",
+   "Calibrator.commonAndRarePortableModel_targetR2",
+   "Calibrator.commonOnlyPortableModel_sourceR2",
+   "Calibrator.commonOnlyPortableModel_targetR2",
+   "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context",
    "Calibrator.cross_trait_portability_gain",
-   "Calibrator.taggingProjection_eq_direct_plus_proxy"
+   "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
+   "Calibrator.identityDirectMetricModel_metrics",
+   "Calibrator.identityDirectMetricModel_source_weights",
+   "Calibrator.novel_target_only_tagging_changes_target_r2",
+   "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
+   "Calibrator.popgenDrivenProxyGenerationalModel_source_weights",
+   "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
+   "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
+   "Calibrator.taggingProjection_eq_direct_plus_proxy",
+   "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect",
+   "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores",
+   "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
+   "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
+   "Calibrator.target_effect_shift_changes_target_r2",
+   "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
+   "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2",
+   "Calibrator.target_r2_changes_along_generation_indexed_af_path",
+   "Calibrator.target_tagging_shift_changes_target_r2",
+   "Calibrator.wgs_eliminates_ld_mismatch"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -6325,7 +6384,12 @@
     "∀ j, 0 ≤ m.traitBSpecificEffect j",
     "∀ j, 0 ≤ m.sharedTraitEffect j",
     "0 ≤ m.rg",
-    "∀ i, 0 ≤ m.sourceWeights i"
+    "∀ i, 0 ≤ m.sourceWeights i",
+    "(m.directCausal Pop.target",
+    "(m.novelDirectCausal Pop.target",
+    "(m.proxyTagging Pop.source",
+    "(m.proxyTagging Pop.target",
+    "(m.novelProxyTagging Pop.target"
    ],
    "hypotheses_by_theorem": {
     "Calibrator.CrossTraitBorrowingModel.traitBSpecificCrossCov_nonneg": [
@@ -6344,36 +6408,64 @@
      "∀ j, 0 ≤ m.traitBSpecificEffect j",
      "0 ≤ m.rg"
     ],
-    "Calibrator.taggingProjection_eq_direct_plus_proxy": []
+    "Calibrator.commonOnlyPortableModel_sourceR2": [],
+    "Calibrator.commonOnlyPortableModel_targetR2": [],
+    "Calibrator.commonAndRarePortableModel_sourceR2": [],
+    "Calibrator.commonAndRarePortableModel_targetR2": [],
+    "Calibrator.wgs_eliminates_ld_mismatch": [
+     "(m.directCausal Pop.target",
+     "(m.novelDirectCausal Pop.target",
+     "(m.proxyTagging Pop.source",
+     "(m.proxyTagging Pop.target",
+     "(m.novelProxyTagging Pop.target"
+    ],
+    "Calibrator.taggingProjection_eq_direct_plus_proxy": [],
+    "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect": [],
+    "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context": [],
+    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores": [],
+    "Calibrator.identityDirectMetricModel_source_weights": [],
+    "Calibrator.identityDirectMetricModel_metrics": [],
+    "Calibrator.baseline_mechanistic_metrics": [],
+    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
+    "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2": [],
+    "Calibrator.target_tagging_shift_changes_target_r2": [],
+    "Calibrator.target_effect_shift_changes_target_r2": [],
+    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
+    "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2": [],
+    "Calibrator.novel_target_only_tagging_changes_target_r2": [],
+    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
+    "Calibrator.popgenDrivenProxyGenerationalModel_source_weights": [],
+    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
+    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one": [],
+    "Calibrator.target_r2_changes_along_generation_indexed_af_path": [],
+    "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change": []
    }
   }
  },
- "Calibrator.SourceTaggedMoments.sigmaTagCausalSource": {
+ "Calibrator.SourceTaggedMoments.sigmaTagCausal": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: structure projection unavailable (KeyError('directCausalSource'))",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/DGP.lean",
   "line": 134,
-  "short": "sigmaTagCausalSource",
+  "short": "sigmaTagCausal",
   "ret_type": "Matrix (Fin t) (Fin c) ℝ",
   "empirical_status": "",
-  "python": "sigmaTagCausalSource",
-  "args": [
-   "mom"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "KeyError('directCausalSource')"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.CrossTraitBorrowingModel.borrowedTraitBCrossCov_nonneg",
+   "Calibrator.CrossTraitBorrowingModel.traitBSpecificCrossCov_nonneg",
    "Calibrator.baseline_mechanistic_metrics",
    "Calibrator.commonAndRarePortableModel_sourceR2",
    "Calibrator.commonAndRarePortableModel_targetR2",
    "Calibrator.commonOnlyPortableModel_sourceR2",
    "Calibrator.commonOnlyPortableModel_targetR2",
+   "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context",
+   "Calibrator.cross_trait_portability_gain",
    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
    "Calibrator.identityDirectMetricModel_metrics",
    "Calibrator.identityDirectMetricModel_source_weights",
@@ -6381,6 +6473,10 @@
    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
    "Calibrator.popgenDrivenProxyGenerationalModel_source_weights",
    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
+   "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
+   "Calibrator.taggingProjection_eq_direct_plus_proxy",
+   "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect",
+   "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores",
    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
    "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
    "Calibrator.target_effect_shift_changes_target_r2",
@@ -6396,11 +6492,18 @@
    "declared_hi": null,
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Calibrator.CrossTraitBorrowingModel.traitBSpecificCrossCov_nonneg": [],
+    "Calibrator.CrossTraitBorrowingModel.borrowedTraitBCrossCov_nonneg": [],
+    "Calibrator.cross_trait_portability_gain": [],
     "Calibrator.commonOnlyPortableModel_sourceR2": [],
     "Calibrator.commonOnlyPortableModel_targetR2": [],
     "Calibrator.commonAndRarePortableModel_sourceR2": [],
     "Calibrator.commonAndRarePortableModel_targetR2": [],
     "Calibrator.wgs_eliminates_ld_mismatch": [],
+    "Calibrator.taggingProjection_eq_direct_plus_proxy": [],
+    "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect": [],
+    "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context": [],
+    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores": [],
     "Calibrator.identityDirectMetricModel_source_weights": [],
     "Calibrator.identityDirectMetricModel_metrics": [],
     "Calibrator.baseline_mechanistic_metrics": [],
@@ -6414,6 +6517,7 @@
     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
     "Calibrator.popgenDrivenProxyGenerationalModel_source_weights": [],
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
+    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one": [],
     "Calibrator.target_r2_changes_along_generation_indexed_af_path": [],
     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change": []
    }
@@ -6421,23 +6525,16 @@
  },
  "Calibrator.sourceBestLinearWeightsFromLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/DGP.lean",
   "line": 140,
   "short": "sourceBestLinearWeightsFromLD",
   "ret_type": "TagVec t",
   "empirical_status": "",
-  "python": "sourceBestLinearWeightsFromLD",
-  "args": [
-   "mom",
-   "betaCausal"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "KeyError('sigmaTagSource')"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [],
@@ -6670,7 +6767,7 @@
  },
  "Calibrator.ldWitnessSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition ldWitnessSourceMoments",
+  "note": "self-check: calls untranslated definition sourceBestLinearWeightsFromLD",
   "file": "Calibrator/DGP.lean",
   "line": 198,
   "short": "ldWitnessSourceWeights",
@@ -6682,7 +6779,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'ldWitnessSourceMoments' is not defined\")"
+   "error": "NameError(\"name 'sourceBestLinearWeightsFromLD' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -11127,6 +11224,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Calibrator.MafSpectrum.fourthMoment_eq",
+   "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
    "Calibrator.centeredSquare_expectation_zero",
    "Calibrator.centeredSquare_negative_at_half",
    "Calibrator.centeredSquare_third_moment_eq",
@@ -11175,6 +11273,7 @@
      "h.altFreq < 1"
     ],
     "Calibrator.MafSpectrum.fourthMoment_eq": [],
+    "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [],
     "Calibrator.standardizedGenotype_symmetric_iff": [
      "0 < h.altFreq",
      "h.altFreq < 1"
@@ -11272,7 +11371,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1004,
+  "line": 1021,
   "short": "reflect",
   "ret_type": "HardyWeinbergModel where altFreq",
   "empirical_status": "",
@@ -11307,7 +11406,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name design.locusSet",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1177,
+  "line": 1194,
   "short": "interactionOrder",
   "ret_type": "ℕ",
   "empirical_status": "UNTESTED",
@@ -11344,7 +11443,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over ι: not a `Fin n` index set",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1185,
+  "line": 1202,
   "short": "statistic",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11365,7 +11464,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1206,
+  "line": 1223,
   "short": "InLinkageEquilibrium",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11401,7 +11500,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1214,
+  "line": 1231,
   "short": "Polymorphic",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11438,7 +11537,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1229,
+  "line": 1246,
   "short": "VariantDisjoint",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11487,7 +11586,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Finset.univ.filter",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1238,
+  "line": 1255,
   "short": "variantRecurrence",
   "ret_type": "ℕ",
   "empirical_status": "UNTESTED",
@@ -11531,7 +11630,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over the Finset `Finset.univ.filter ( fun s => i ∈ design.locusSet s )`, not `Finset.univ`",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1247,
+  "line": 1264,
   "short": "locusInfluence",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11564,7 +11663,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1262,
+  "line": 1279,
   "short": "IsTwoPoolInteraction",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11610,7 +11709,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1328,
+  "line": 1345,
   "short": "geneBurdenDesign",
   "ret_type": "GenotypeDesign n γ where model",
   "empirical_status": "UNTESTED",
@@ -11645,7 +11744,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1355,
+  "line": 1372,
   "short": "slidingWindowDesign",
   "ret_type": "GenotypeDesign n (Fin n) where model",
   "empirical_status": "UNTESTED",
@@ -11678,7 +11777,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1614,
+  "line": 1631,
   "short": "fourthCumulantFromMoments",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11720,7 +11819,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1744,
+  "line": 1761,
   "short": "circulantSpectrumA",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11767,7 +11866,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1751,
+  "line": 1768,
   "short": "circulantSpectrumB",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11816,7 +11915,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "expected ')', found op:∩",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1847,
+  "line": 1864,
   "short": "overlapMatrix",
   "ret_type": "Matrix ιx ιx ℝ",
   "empirical_status": "UNTESTED",
@@ -11843,7 +11942,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Matrix.trace",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1866,
+  "line": 1883,
   "short": "cycleDensity",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11890,7 +11989,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1904,
+  "line": 1921,
   "short": "Tempered",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11919,7 +12018,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1913,
+  "line": 1930,
   "short": "BoundedHubRecurrence",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11971,7 +12070,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 2083,
+  "line": 2100,
   "short": "palindromicCycleDensityA",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -12038,7 +12137,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 2092,
+  "line": 2109,
   "short": "palindromicCycleDensityB",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -24365,7 +24464,7 @@
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "self-check: calls untranslated definition sourcePredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 589,
   "short": "sourceCalibrationSlope",
@@ -24379,7 +24478,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
+   "error": "NameError(\"name 'sourcePredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -24388,7 +24487,7 @@
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 594,
   "short": "targetCalibrationSlope",
@@ -24402,7 +24501,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
+   "error": "NameError(\"name 'targetPredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -30938,10 +31037,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1212,
+  "line": 1227,
   "short": "fstDerived",
   "ret_type": "ℝ",
-  "empirical_status": "UNTESTED",
+  "empirical_status": "FALSIFIED",
   "python": "fstDerived",
   "args": [
    "Ne",
@@ -31018,7 +31117,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1288,
+  "line": 1303,
   "short": "hetMutationDriftRecurrence",
   "ret_type": "ℕ → ℝ",
   "empirical_status": "UNTESTED",
@@ -31080,7 +31179,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1295,
+  "line": 1310,
   "short": "hetEquilibrium",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -31187,7 +31286,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1445,
+  "line": 1460,
   "short": "hetDecayFactor",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -31276,7 +31375,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1454,
+  "line": 1469,
   "short": "hetMutationRecurrence",
   "ret_type": "ℕ → ℝ",
   "empirical_status": "",
@@ -31335,7 +31434,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1482,
+  "line": 1497,
   "short": "fstFromHetRatio",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -31386,7 +31485,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1518,
+  "line": 1533,
   "short": "fstMutationDriftTransientDiscrete",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -34258,11 +34357,37 @@
   },
   "numeric_standins": null,
   "vector_args": null,
-  "mentioned_by": [],
+  "mentioned_by": [
+   "Calibrator.commonAndRarePortableModel_sourceR2",
+   "Calibrator.commonAndRarePortableModel_targetR2",
+   "Calibrator.commonOnlyPortableModel_sourceR2",
+   "Calibrator.commonOnlyPortableModel_targetR2",
+   "Calibrator.identityDirectMetricModel_metrics",
+   "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
+   "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect",
+   "Calibrator.targetCalibrationSlopeAtGeneration_exact_mechanistic_popgen_portability_law",
+   "Calibrator.targetPredictiveCovarianceAtGeneration_exact_direct_proxy_context_law",
+   "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity",
+   "Calibrator.totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity"
+  ],
   "constraints": {
    "declared_kind": "nonnegative",
    "declared_lo": 0.0,
-   "declared_hi": null
+   "declared_hi": null,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Calibrator.commonOnlyPortableModel_sourceR2": [],
+    "Calibrator.commonOnlyPortableModel_targetR2": [],
+    "Calibrator.commonAndRarePortableModel_sourceR2": [],
+    "Calibrator.commonAndRarePortableModel_targetR2": [],
+    "Calibrator.totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity": [],
+    "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect": [],
+    "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity": [],
+    "Calibrator.targetPredictiveCovarianceAtGeneration_exact_direct_proxy_context_law": [],
+    "Calibrator.targetCalibrationSlopeAtGeneration_exact_mechanistic_popgen_portability_law": [],
+    "Calibrator.identityDirectMetricModel_metrics": [],
+    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one": []
+   }
   }
  },
  "Calibrator.targetLinearRisk": {
@@ -34505,8 +34630,34 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.baseline_mechanistic_metrics",
+   "Calibrator.commonAndRarePortableModel_sourceR2",
+   "Calibrator.commonAndRarePortableModel_targetR2",
+   "Calibrator.commonOnlyPortableModel_sourceR2",
+   "Calibrator.commonOnlyPortableModel_targetR2",
    "Calibrator.crossCovariance_eq_direct_plus_proxy_plus_context",
-   "Calibrator.crossCovariance_eq_taggingProjection_plus_context"
+   "Calibrator.crossCovariance_eq_taggingProjection_plus_context",
+   "Calibrator.crossCovariance_target_eq_source_effect_plus_effectHeterogeneity_plus_context",
+   "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context",
+   "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
+   "Calibrator.identityDirectMetricModel_metrics",
+   "Calibrator.identityDirectMetricModel_source_weights",
+   "Calibrator.novel_target_only_tagging_changes_target_r2",
+   "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
+   "Calibrator.popgenDrivenProxyGenerationalModel_source_weights",
+   "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
+   "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
+   "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov",
+   "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law",
+   "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov",
+   "Calibrator.targetR2FromSourceWeights_exact_snp_transport_law",
+   "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
+   "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
+   "Calibrator.target_effect_shift_changes_target_r2",
+   "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
+   "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2",
+   "Calibrator.target_r2_changes_along_generation_indexed_af_path",
+   "Calibrator.target_tagging_shift_changes_target_r2"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -34514,14 +34665,40 @@
    "declared_hi": null,
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Calibrator.commonOnlyPortableModel_sourceR2": [],
+    "Calibrator.commonOnlyPortableModel_targetR2": [],
+    "Calibrator.commonAndRarePortableModel_sourceR2": [],
+    "Calibrator.commonAndRarePortableModel_targetR2": [],
     "Calibrator.crossCovariance_eq_taggingProjection_plus_context": [],
-    "Calibrator.crossCovariance_eq_direct_plus_proxy_plus_context": []
+    "Calibrator.crossCovariance_eq_direct_plus_proxy_plus_context": [],
+    "Calibrator.crossCovariance_target_eq_source_effect_plus_effectHeterogeneity_plus_context": [],
+    "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context": [],
+    "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov": [],
+    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov": [],
+    "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law": [],
+    "Calibrator.targetR2FromSourceWeights_exact_snp_transport_law": [],
+    "Calibrator.identityDirectMetricModel_source_weights": [],
+    "Calibrator.identityDirectMetricModel_metrics": [],
+    "Calibrator.baseline_mechanistic_metrics": [],
+    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
+    "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2": [],
+    "Calibrator.target_tagging_shift_changes_target_r2": [],
+    "Calibrator.target_effect_shift_changes_target_r2": [],
+    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
+    "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2": [],
+    "Calibrator.novel_target_only_tagging_changes_target_r2": [],
+    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
+    "Calibrator.popgenDrivenProxyGenerationalModel_source_weights": [],
+    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
+    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one": [],
+    "Calibrator.target_r2_changes_along_generation_indexed_af_path": [],
+    "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change": []
    }
   }
  },
  "Calibrator.sourceWeightsFromExplicitDrivers": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationMetricModel.sigmaTagSource: no such definition",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1290,
   "short": "sourceWeightsFromExplicitDrivers",
@@ -34696,20 +34873,46 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.baseline_mechanistic_metrics",
    "Calibrator.crossCovariance_eq_taggingProjection_plus_context",
-   "Calibrator.taggingProjection_eq_direct_plus_proxy"
+   "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
+   "Calibrator.novel_target_only_tagging_changes_target_r2",
+   "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
+   "Calibrator.taggingProjection_eq_direct_plus_proxy",
+   "Calibrator.taggingProjection_target_eq_source_effect_plus_effectHeterogeneity",
+   "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect",
+   "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity",
+   "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
+   "Calibrator.target_effect_shift_changes_target_r2",
+   "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
+   "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2",
+   "Calibrator.target_r2_changes_along_generation_indexed_af_path",
+   "Calibrator.target_tagging_shift_changes_target_r2"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Calibrator.taggingProjection_eq_direct_plus_proxy": [],
-    "Calibrator.crossCovariance_eq_taggingProjection_plus_context": []
+    "Calibrator.taggingProjection_target_eq_source_effect_plus_effectHeterogeneity": [],
+    "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect": [],
+    "Calibrator.crossCovariance_eq_taggingProjection_plus_context": [],
+    "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity": [],
+    "Calibrator.baseline_mechanistic_metrics": [],
+    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
+    "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2": [],
+    "Calibrator.target_tagging_shift_changes_target_r2": [],
+    "Calibrator.target_effect_shift_changes_target_r2": [],
+    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
+    "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2": [],
+    "Calibrator.novel_target_only_tagging_changes_target_r2": [],
+    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
+    "Calibrator.target_r2_changes_along_generation_indexed_af_path": []
    }
   }
  },
  "Calibrator.targetEffectHeterogeneity": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationMetricModel.betaSource: no such definition",
+  "note": "qualified name Pop.target",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1319,
   "short": "targetEffectHeterogeneity",
@@ -34723,7 +34926,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity",
-   "Calibrator.targetTotalEffect_eq_betaSource_plus_targetEffectHeterogeneity"
+   "Calibrator.totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity"
   ],
   "constraints": {
    "declared_kind": "ratio",
@@ -34731,14 +34934,14 @@
    "declared_hi": 1.0,
    "hypotheses": [],
    "hypotheses_by_theorem": {
-    "Calibrator.targetTotalEffect_eq_betaSource_plus_targetEffectHeterogeneity": [],
+    "Calibrator.totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity": [],
     "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity": []
    }
   }
  },
  "Calibrator.targetSourceEffectProjection": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationMetricModel.betaSource: no such definition",
+  "note": "qualified name Pop.target",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1337,
   "short": "targetSourceEffectProjection",
@@ -34751,18 +34954,18 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.crossCovariance_target_eq_source_effect_plus_effectHeterogeneity_plus_context",
+   "Calibrator.taggingProjection_target_eq_source_effect_plus_effectHeterogeneity",
    "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law",
-   "Calibrator.targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context",
    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores",
    "Calibrator.targetR2FromSourceWeights_exact_effect_heterogeneity_law",
-   "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity",
-   "Calibrator.targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity"
+   "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
-    "Calibrator.targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity": [],
-    "Calibrator.targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context": [],
+    "Calibrator.taggingProjection_target_eq_source_effect_plus_effectHeterogeneity": [],
+    "Calibrator.crossCovariance_target_eq_source_effect_plus_effectHeterogeneity_plus_context": [],
     "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores": [],
     "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law": [],
     "Calibrator.targetR2FromSourceWeights_exact_effect_heterogeneity_law": [],
@@ -34772,37 +34975,31 @@
  },
  "Calibrator.targetEffectHeterogeneityProjection": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sigmaTagCausalTarget",
+  "note": "qualified name Pop.target",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1345,
   "short": "targetEffectHeterogeneityProjection",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "UNTESTED",
-  "python": "targetEffectHeterogeneityProjection",
-  "args": [
-   "m"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "NameError(\"name 'sigmaTagCausalTarget' is not defined\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.crossCovariance_target_eq_source_effect_plus_effectHeterogeneity_plus_context",
+   "Calibrator.taggingProjection_target_eq_source_effect_plus_effectHeterogeneity",
    "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law",
-   "Calibrator.targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context",
    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores",
    "Calibrator.targetR2FromSourceWeights_exact_effect_heterogeneity_law",
-   "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity",
-   "Calibrator.targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity"
+   "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
-    "Calibrator.targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity": [],
-    "Calibrator.targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context": [],
+    "Calibrator.taggingProjection_target_eq_source_effect_plus_effectHeterogeneity": [],
+    "Calibrator.crossCovariance_target_eq_source_effect_plus_effectHeterogeneity_plus_context": [],
     "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores": [],
     "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law": [],
     "Calibrator.targetR2FromSourceWeights_exact_effect_heterogeneity_law": [],
@@ -34812,7 +35009,7 @@
  },
  "Calibrator.targetNovelMutationEffectProjection": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationMetricModel.novelCausalEffectTarget: no such definition",
+  "note": "qualified name Pop.target",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1353,
   "short": "targetNovelMutationEffectProjection",
@@ -34825,15 +35022,15 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Calibrator.targetCrossCovariance_eq_standing_plus_novelMutationEffect_plus_context",
-   "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores",
-   "Calibrator.targetTaggingProjection_eq_standing_plus_novelMutationEffect"
+   "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context",
+   "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect",
+   "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
-    "Calibrator.targetTaggingProjection_eq_standing_plus_novelMutationEffect": [],
-    "Calibrator.targetCrossCovariance_eq_standing_plus_novelMutationEffect_plus_context": [],
+    "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect": [],
+    "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context": [],
     "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores": []
    }
   }
@@ -34860,8 +35057,26 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
+   "Calibrator.baseline_mechanistic_metrics",
    "Calibrator.crossCovariance_eq_direct_plus_proxy_plus_context",
-   "Calibrator.taggingProjection_eq_direct_plus_proxy"
+   "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
+   "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier",
+   "Calibrator.novel_target_only_tagging_changes_target_r2",
+   "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
+   "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
+   "Calibrator.taggingProjection_eq_direct_plus_proxy",
+   "Calibrator.targetCalibrationSlopeAtGeneration_exact_mechanistic_popgen_portability_law",
+   "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law",
+   "Calibrator.targetPredictiveCovarianceAtGeneration_exact_direct_proxy_context_law",
+   "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
+   "Calibrator.targetR2FromSourceWeights_exact_direct_proxy_context_law",
+   "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
+   "Calibrator.target_effect_shift_changes_target_r2",
+   "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
+   "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2",
+   "Calibrator.target_r2_changes_along_generation_indexed_af_path",
+   "Calibrator.target_tagging_shift_changes_target_r2"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -34869,8 +35084,26 @@
    "declared_hi": null,
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law": [],
     "Calibrator.taggingProjection_eq_direct_plus_proxy": [],
-    "Calibrator.crossCovariance_eq_direct_plus_proxy_plus_context": []
+    "Calibrator.crossCovariance_eq_direct_plus_proxy_plus_context": [],
+    "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores": [],
+    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores": [],
+    "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law": [],
+    "Calibrator.targetR2FromSourceWeights_exact_direct_proxy_context_law": [],
+    "Calibrator.targetPredictiveCovarianceAtGeneration_exact_direct_proxy_context_law": [],
+    "Calibrator.targetCalibrationSlopeAtGeneration_exact_mechanistic_popgen_portability_law": [],
+    "Calibrator.baseline_mechanistic_metrics": [],
+    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
+    "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2": [],
+    "Calibrator.target_tagging_shift_changes_target_r2": [],
+    "Calibrator.target_effect_shift_changes_target_r2": [],
+    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
+    "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2": [],
+    "Calibrator.novel_target_only_tagging_changes_target_r2": [],
+    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
+    "Calibrator.target_r2_changes_along_generation_indexed_af_path": []
    }
   }
  },
@@ -34896,8 +35129,26 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
+   "Calibrator.baseline_mechanistic_metrics",
    "Calibrator.crossCovariance_eq_direct_plus_proxy_plus_context",
-   "Calibrator.taggingProjection_eq_direct_plus_proxy"
+   "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
+   "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier",
+   "Calibrator.novel_target_only_tagging_changes_target_r2",
+   "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
+   "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
+   "Calibrator.taggingProjection_eq_direct_plus_proxy",
+   "Calibrator.targetCalibrationSlopeAtGeneration_exact_mechanistic_popgen_portability_law",
+   "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law",
+   "Calibrator.targetPredictiveCovarianceAtGeneration_exact_direct_proxy_context_law",
+   "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
+   "Calibrator.targetR2FromSourceWeights_exact_direct_proxy_context_law",
+   "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
+   "Calibrator.target_effect_shift_changes_target_r2",
+   "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
+   "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2",
+   "Calibrator.target_r2_changes_along_generation_indexed_af_path",
+   "Calibrator.target_tagging_shift_changes_target_r2"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -34905,29 +35156,41 @@
    "declared_hi": null,
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law": [],
     "Calibrator.taggingProjection_eq_direct_plus_proxy": [],
-    "Calibrator.crossCovariance_eq_direct_plus_proxy_plus_context": []
+    "Calibrator.crossCovariance_eq_direct_plus_proxy_plus_context": [],
+    "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores": [],
+    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores": [],
+    "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law": [],
+    "Calibrator.targetR2FromSourceWeights_exact_direct_proxy_context_law": [],
+    "Calibrator.targetPredictiveCovarianceAtGeneration_exact_direct_proxy_context_law": [],
+    "Calibrator.targetCalibrationSlopeAtGeneration_exact_mechanistic_popgen_portability_law": [],
+    "Calibrator.baseline_mechanistic_metrics": [],
+    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
+    "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2": [],
+    "Calibrator.target_tagging_shift_changes_target_r2": [],
+    "Calibrator.target_effect_shift_changes_target_r2": [],
+    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
+    "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2": [],
+    "Calibrator.novel_target_only_tagging_changes_target_r2": [],
+    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
+    "Calibrator.target_r2_changes_along_generation_indexed_af_path": []
    }
   }
  },
  "Calibrator.sourceScoreVarianceFromExplicitDrivers": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1443,
+  "line": 1442,
   "short": "sourceScoreVarianceFromExplicitDrivers",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "sourceScoreVarianceFromExplicitDrivers",
-  "args": [
-   "m"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -34977,22 +35240,16 @@
  },
  "Calibrator.targetScoreVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "qualified name Pop.target",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1451,
+  "line": 1450,
   "short": "targetScoreVarianceFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "targetScoreVarianceFromSourceWeights",
-  "args": [
-   "m"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -35078,22 +35335,16 @@
  },
  "Calibrator.sourcePredictiveCovarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1457,
+  "line": 1456,
   "short": "sourcePredictiveCovarianceFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "sourcePredictiveCovarianceFromSourceWeights",
-  "args": [
-   "m"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -35145,22 +35396,16 @@
  },
  "Calibrator.targetPredictiveCovarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "qualified name Pop.target",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1465,
+  "line": 1464,
   "short": "targetPredictiveCovarianceFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "targetPredictiveCovarianceFromSourceWeights",
-  "args": [
-   "m"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -35238,9 +35483,9 @@
  },
  "Calibrator.sourceCalibrationSlopeFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "self-check: calls untranslated definition sourcePredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1473,
+  "line": 1472,
   "short": "sourceCalibrationSlopeFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -35252,7 +35497,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
+   "error": "NameError(\"name 'sourcePredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -35268,9 +35513,9 @@
  },
  "Calibrator.targetCalibrationSlopeFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1481,
+  "line": 1480,
   "short": "targetCalibrationSlopeFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -35282,7 +35527,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
+   "error": "NameError(\"name 'targetPredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -35312,22 +35557,16 @@
  },
  "Calibrator.brokenTaggingResidual": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: structure projection unavailable (KeyError('directCausalSource'))",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1609,
+  "line": 1608,
   "short": "brokenTaggingResidual",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "brokenTaggingResidual",
-  "args": [
-   "m"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "KeyError('directCausalSource')"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -35358,21 +35597,21 @@
    "declared_lo": 0.0,
    "declared_hi": null,
    "hypotheses": [
-    "m.directCausalTarget = m.directCausalSource",
-    "m.novelDirectCausalTarget = 0",
-    "m.proxyTaggingSource = 0",
-    "m.proxyTaggingTarget = 0",
-    "m.novelProxyTaggingTarget = 0"
+    "(m.directCausal Pop.target",
+    "(m.novelDirectCausal Pop.target",
+    "(m.proxyTagging Pop.source",
+    "(m.proxyTagging Pop.target",
+    "(m.novelProxyTagging Pop.target"
    ],
    "hypotheses_by_theorem": {
     "Calibrator.commonOnlyPortableModel_targetR2": [],
     "Calibrator.commonAndRarePortableModel_targetR2": [],
     "Calibrator.wgs_eliminates_ld_mismatch": [
-     "m.directCausalTarget = m.directCausalSource",
-     "m.novelDirectCausalTarget = 0",
-     "m.proxyTaggingSource = 0",
-     "m.proxyTaggingTarget = 0",
-     "m.novelProxyTaggingTarget = 0"
+     "(m.directCausal Pop.target",
+     "(m.novelDirectCausal Pop.target",
+     "(m.proxyTagging Pop.source",
+     "(m.proxyTagging Pop.target",
+     "(m.novelProxyTagging Pop.target"
     ],
     "Calibrator.brokenTaggingResidual_nonneg": [],
     "Calibrator.effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses": [],
@@ -35402,9 +35641,9 @@
  },
  "Calibrator.ancestrySpecificLDResidual": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationMetricModel.sigmaTagSource: no such definition",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1627,
+  "line": 1626,
   "short": "ancestrySpecificLDResidual",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -35472,9 +35711,9 @@
  },
  "Calibrator.sourceSpecificOverfitResidual": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationMetricModel.contextCrossSource: no such definition",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1644,
+  "line": 1643,
   "short": "sourceSpecificOverfitResidual",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -35544,7 +35783,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1659,
+  "line": 1658,
   "short": "novelUntaggablePhenotypeResidual",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -35597,9 +35836,9 @@
  },
  "Calibrator.irreducibleTargetResidualBurden": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: structure projection unavailable (KeyError('directCausalSource'))",
+  "note": "self-check: calls untranslated definition brokenTaggingResidual",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1677,
+  "line": 1676,
   "short": "irreducibleTargetResidualBurden",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -35611,7 +35850,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "KeyError('directCausalSource')"
+   "error": "NameError(\"name 'brokenTaggingResidual' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -35669,7 +35908,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1694,
+  "line": 1693,
   "short": "targetIrreduciblePenaltyProfile",
   "ret_type": "TransportedMetrics.IrreducibleTargetPenalty where brokenTagging",
   "empirical_status": "",
@@ -35684,9 +35923,9 @@
  },
  "Calibrator.effectiveTargetOutcomeVariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationMetricModel.targetOutcomeVariance: no such definition",
+  "note": "qualified name Pop.target",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1718,
+  "line": 1717,
   "short": "effectiveTargetOutcomeVariance",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -35772,9 +36011,9 @@
  },
  "Calibrator.sourceExplainedSignalVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "self-check: calls untranslated definition sourcePredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1752,
+  "line": 1751,
   "short": "sourceExplainedSignalVarianceFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -35786,7 +36025,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
+   "error": "NameError(\"name 'sourcePredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -35833,9 +36072,9 @@
  },
  "Calibrator.sourceR2FromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationMetricModel.sourceOutcomeVariance: no such definition",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1758,
+  "line": 1757,
   "short": "sourceR2FromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -35935,9 +36174,9 @@
  },
  "Calibrator.sourceResidualVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationMetricModel.sourceOutcomeVariance: no such definition",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1766,
+  "line": 1765,
   "short": "sourceResidualVarianceFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -35968,7 +36207,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name TransportedMetrics.calibratedBrierFromVariances",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1783,
+  "line": 1782,
   "short": "sourceCalibratedBrierFromSourceWeightsAtPrevalence",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -36018,9 +36257,9 @@
  },
  "Calibrator.targetExplainedSignalVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1835,
+  "line": 1834,
   "short": "targetExplainedSignalVarianceFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -36032,7 +36271,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
+   "error": "NameError(\"name 'targetPredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -36095,9 +36334,9 @@
  },
  "Calibrator.targetR2FromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1842,
+  "line": 1841,
   "short": "targetR2FromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -36109,7 +36348,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
+   "error": "NameError(\"name 'targetPredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -36217,7 +36456,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition effectiveTargetOutcomeVariance",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1851,
+  "line": 1850,
   "short": "targetResidualVarianceFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -36260,7 +36499,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name TransportedMetrics.calibratedBrierFromVariances",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1865,
+  "line": 1864,
   "short": "targetCalibratedBrierFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -36315,7 +36554,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2086,
+  "line": 2085,
   "short": "ldCorrelationDecay",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -36382,7 +36621,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "unrecognised character '.'",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2134,
+  "line": 2133,
   "short": "theta",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -36455,7 +36694,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2138,
+  "line": 2137,
   "short": "bigM",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -36524,7 +36763,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2142,
+  "line": 2141,
   "short": "tauAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -36578,7 +36817,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition Calibrator_GenerationalPopGenParameters_theta",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2146,
+  "line": 2145,
   "short": "hetDecayFactor",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -36636,7 +36875,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition Calibrator_GenerationalPopGenParameters_theta",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2154,
+  "line": 2153,
   "short": "fstTransientAt",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -36686,7 +36925,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition Calibrator_GenerationalPopGenParameters_theta",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2159,
+  "line": 2158,
   "short": "mutationSharedRetentionAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -36738,7 +36977,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2164,
+  "line": 2163,
   "short": "migrationSharedBoostAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -36790,7 +37029,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2190,
+  "line": 2189,
   "short": "toGenerationalPopGenParameters",
   "ret_type": "GenerationalPopGenParameters where Ne",
   "empirical_status": "",
@@ -36830,7 +37069,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2298,
+  "line": 2297,
   "short": "alleleFreqMismatchPenalty",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -36877,28 +37116,21 @@
  },
  "Calibrator.betaTargetAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2356,
+  "line": 2355,
   "short": "betaTargetAt",
   "ret_type": "Fin q → ℝ",
   "empirical_status": "",
-  "python": "betaTargetAt",
-  "args": [
-   "m",
-   "t"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "t": [
     1.0,
     20.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'function' and 'float'\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -36923,7 +37155,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2370,
+  "line": 2369,
   "short": "tagAlleleFreqTargetAt",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -36963,7 +37195,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2384,
+  "line": 2383,
   "short": "causalAlleleFreqTargetAt",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -37003,7 +37235,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2395,
+  "line": 2394,
   "short": "tagAlleleFreqRetentionAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -37050,7 +37282,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2402,
+  "line": 2401,
   "short": "causalAlleleFreqRetentionAt",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -37097,7 +37329,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition Calibrator_GenerationalPopGenParameters_theta",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2408,
+  "line": 2407,
   "short": "novelVariantInnovationAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -37131,7 +37363,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: structure projection unavailable (KeyError('tagDistance'))",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2421,
+  "line": 2420,
   "short": "jointTagLDKernelAt",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -37173,7 +37405,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: structure projection unavailable (KeyError('mutationSharedRetentionAt'))",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2444,
+  "line": 2443,
   "short": "jointDirectCausalKernelAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -37208,7 +37440,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: structure projection unavailable (KeyError('tagCausalDistance'))",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2463,
+  "line": 2462,
   "short": "jointProxyTaggingKernelAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -37249,7 +37481,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition Calibrator_GenerationalPopGenParameters_theta",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2488,
+  "line": 2487,
   "short": "jointNovelDirectCausalKernelAt",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -37284,7 +37516,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: structure projection unavailable (KeyError('tagCausalDistance'))",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2507,
+  "line": 2506,
   "short": "jointNovelProxyTaggingKernelAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -37313,28 +37545,21 @@
  },
  "Calibrator.sigmaTagTargetAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2530,
+  "line": 2529,
   "short": "sigmaTagTargetAt",
   "ret_type": "Matrix (Fin p) (Fin p) ℝ",
   "empirical_status": "",
-  "python": "sigmaTagTargetAt",
-  "args": [
-   "m",
-   "t"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "t": [
     1.0,
     20.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "value is not a real number: function"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -37360,28 +37585,21 @@
  },
  "Calibrator.directCausalTargetAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2539,
+  "line": 2538,
   "short": "directCausalTargetAt",
   "ret_type": "Matrix (Fin p) (Fin q) ℝ",
   "empirical_status": "",
-  "python": "directCausalTargetAt",
-  "args": [
-   "m",
-   "t"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "t": [
     1.0,
     20.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "value is not a real number: function"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -37411,7 +37629,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2548,
+  "line": 2547,
   "short": "novelDirectCausalTargetAt",
   "ret_type": "Matrix (Fin p) (Fin q) ℝ",
   "empirical_status": "UNTESTED",
@@ -37449,28 +37667,21 @@
  },
  "Calibrator.proxyTaggingTargetAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2557,
+  "line": 2556,
   "short": "proxyTaggingTargetAt",
   "ret_type": "Matrix (Fin p) (Fin q) ℝ",
   "empirical_status": "",
-  "python": "proxyTaggingTargetAt",
-  "args": [
-   "m",
-   "t"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "t": [
     1.0,
     20.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "value is not a real number: function"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -37502,7 +37713,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2565,
+  "line": 2564,
   "short": "novelProxyTaggingTargetAt",
   "ret_type": "Matrix (Fin p) (Fin q) ℝ",
   "empirical_status": "",
@@ -37540,9 +37751,9 @@
  },
  "Calibrator.sigmaTagCausalTargetAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)",
+  "note": "self-check: calls untranslated definition directCausalTargetAt",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2575,
+  "line": 2574,
   "short": "sigmaTagCausalTargetAt",
   "ret_type": "Matrix (Fin p) (Fin q) ℝ",
   "empirical_status": "",
@@ -37560,7 +37771,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'function' and 'function'\")"
+   "error": "NameError(\"name 'directCausalTargetAt' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -37582,28 +37793,21 @@
  },
  "Calibrator.targetSourceEffectProjectionAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)",
+  "note": "qualified name Pop.source",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2587,
+  "line": 2586,
   "short": "targetSourceEffectProjectionAt",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "UNTESTED",
-  "python": "targetSourceEffectProjectionAt",
-  "args": [
-   "m",
-   "t"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "t": [
     1.0,
     20.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'function' and 'function'\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -37624,9 +37828,9 @@
  },
  "Calibrator.targetEffectHeterogeneityProjectionAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)",
+  "note": "self-check: calls untranslated definition directCausalTargetAt",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2595,
+  "line": 2594,
   "short": "targetEffectHeterogeneityProjectionAt",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "UNTESTED",
@@ -37644,7 +37848,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'function' and 'function'\")"
+   "error": "NameError(\"name 'directCausalTargetAt' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -37668,7 +37872,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2604,
+  "line": 2603,
   "short": "toMetricModelAt",
   "ret_type": "CrossPopulationMetricModel p q where betaSource",
   "empirical_status": "",
@@ -37725,7 +37929,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition toMetricModelAt",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2632,
+  "line": 2631,
   "short": "targetR2AtGeneration",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -37780,7 +37984,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition targetCalibratedBrierFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2637,
+  "line": 2636,
   "short": "targetCalibratedBrierAtGeneration",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -37820,7 +38024,7 @@
   "class": "WRAPPER",
   "note": "delegates to presentDayR2",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2888,
+  "line": 2887,
   "short": "targetR2FromNeutralAFBenchmark",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -37898,7 +38102,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2962,
+  "line": 2961,
   "short": "neutralAFBenchmarkRatio",
   "ret_type": "ℝ",
   "empirical_status": "FALSIFIED",
@@ -37991,7 +38195,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3010,
+  "line": 3009,
   "short": "hetRatioBetweenBranches",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -38061,7 +38265,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3045,
+  "line": 3044,
   "short": "exactCalibratedBrierRiskFromR2",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -38151,7 +38355,7 @@
   "class": "WRAPPER",
   "note": "delegates to exactCalibratedBrierRiskFromR2",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3050,
+  "line": 3049,
   "short": "brierFromR2",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -38241,7 +38445,7 @@
   "class": "WRAPPER",
   "note": "delegates to presentDayGaussianAUC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3054,
+  "line": 3053,
   "short": "targetGaussianAUCFromNeutralAFBenchmark",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -38303,7 +38507,7 @@
   "class": "WRAPPER",
   "note": "delegates to exactCalibratedBrierRiskFromR2",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3067,
+  "line": 3066,
   "short": "sourceBrierFromR2",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -38370,7 +38574,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3080,
+  "line": 3079,
   "short": "targetExactCalibratedBrierRisk",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -38445,7 +38649,7 @@
   "class": "WRAPPER",
   "note": "delegates to targetExactCalibratedBrierRisk",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3087,
+  "line": 3086,
   "short": "targetBrierFromNeutralAFBenchmark",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -38523,7 +38727,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name TransportedMetrics.profileFromSignalVariance",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3093,
+  "line": 3092,
   "short": "neutralAFBenchmarkMetricProfile",
   "ret_type": "TransportedMetrics.Profile",
   "empirical_status": "",
@@ -38567,7 +38771,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3161,
+  "line": 3160,
   "short": "equalVarianceGaussianAUCFromSNR",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",
@@ -38609,7 +38813,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3173,
+  "line": 3172,
   "short": "equalVarianceGaussianAUCFromVariances",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",
@@ -38676,7 +38880,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3220,
+  "line": 3219,
   "short": "equalVarianceGaussianAUCFromExplainedR2",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",
@@ -38743,7 +38947,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3266,
+  "line": 3265,
   "short": "equalVarianceGaussianAUCChart",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -38785,9 +38989,9 @@
  },
  "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "self-check: calls untranslated definition sourcePredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3329,
+  "line": 3328,
   "short": "sourceEqualVarianceGaussianAUCFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -38799,7 +39003,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
+   "error": "NameError(\"name 'sourcePredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": "depends on Calibrator.equalVarianceGaussianAUCFromVariances: depends on Calibrator.Phi: Mathlib `ProbabilityTheory.cdf (gaussianReal 0 1)` replaced by its erf form; mathematically equal, but not derived from the Lean body",
   "vector_args": null,
@@ -38820,9 +39024,9 @@
  },
  "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3372,
+  "line": 3371,
   "short": "targetEqualVarianceGaussianAUCFromSourceWeights",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -38834,7 +39038,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
+   "error": "NameError(\"name 'targetPredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": "depends on Calibrator.equalVarianceGaussianAUCFromVariances: depends on Calibrator.Phi: Mathlib `ProbabilityTheory.cdf (gaussianReal 0 1)` replaced by its erf form; mathematically equal, but not derived from the Lean body",
   "vector_args": null,
@@ -38867,7 +39071,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3447,
+  "line": 3446,
   "short": "sourceMetricProfileFromSourceWeightsAtPrevalence",
   "ret_type": "TransportedMetrics.Profile where r2",
   "empirical_status": "UNTESTED",
@@ -38901,7 +39105,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition sourceMetricProfileFromSourceWeightsAtPrevalence",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3475,
+  "line": 3474,
   "short": "sourceMetricProfileFromSourceWeightsAtTargetPrevalence",
   "ret_type": "TransportedMetrics.Profile",
   "empirical_status": "UNTESTED",
@@ -38946,7 +39150,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3502,
+  "line": 3501,
   "short": "targetMetricProfileFromSourceWeights",
   "ret_type": "TransportedMetrics.Profile where r2",
   "empirical_status": "",
@@ -38993,7 +39197,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition toMetricModelAt",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3568,
+  "line": 3567,
   "short": "targetGaussianAUCAtGeneration",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -39033,7 +39237,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition targetMetricProfileFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3573,
+  "line": 3572,
   "short": "targetMetricProfileAtGeneration",
   "ret_type": "TransportedMetrics.Profile",
   "empirical_status": "",
@@ -39075,9 +39279,9 @@
  },
  "Calibrator.targetPredictiveCovarianceAtGeneration": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition toMetricModelAt",
+  "note": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3592,
+  "line": 3591,
   "short": "targetPredictiveCovarianceAtGeneration",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -39095,7 +39299,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'toMetricModelAt' is not defined\")"
+   "error": "NameError(\"name 'targetPredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -39127,9 +39331,9 @@
  },
  "Calibrator.targetScoreVarianceAtGeneration": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition toMetricModelAt",
+  "note": "self-check: calls untranslated definition targetScoreVarianceFromSourceWeights",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3598,
+  "line": 3597,
   "short": "targetScoreVarianceAtGeneration",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -39147,7 +39351,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'toMetricModelAt' is not defined\")"
+   "error": "NameError(\"name 'targetScoreVarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -39181,7 +39385,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition effectiveTargetOutcomeVariance",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3606,
+  "line": 3605,
   "short": "effectiveTargetOutcomeVarianceAtGeneration",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -39231,7 +39435,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition toMetricModelAt",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3612,
+  "line": 3611,
   "short": "targetResidualVarianceAtGeneration",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -39265,7 +39469,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition toMetricModelAt",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3618,
+  "line": 3617,
   "short": "targetCalibrationSlopeAtGeneration",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -39309,7 +39513,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition toMetricModelAt",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3712,
+  "line": 3711,
   "short": "sourceNormalizedTargetR2AtGeneration",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -39354,7 +39558,7 @@
   "class": "WRAPPER",
   "note": "delegates to targetGaussianAUCFromNeutralAFBenchmark",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3816,
+  "line": 3815,
   "short": "targetExactGaussianAUCFromNeutralAFBenchmark",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -39428,7 +39632,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3940,
+  "line": 3939,
   "short": "brierRegretPoint",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -39471,7 +39675,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3944,
+  "line": 3943,
   "short": "brierRegretRatio",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -39516,7 +39720,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3961,
+  "line": 3960,
   "short": "logLossRegretPoint",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -39566,7 +39770,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3965,
+  "line": 3964,
   "short": "logLossRegretRatio",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -39625,7 +39829,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4049,
+  "line": 4048,
   "short": "expectedSqMeanPGSDiff_pureSplit",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -39667,7 +39871,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4059,
+  "line": 4058,
   "short": "expectedSqMeanPGSDiff_IMEquilibrium",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -39714,7 +39918,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "unrecognised character '.'",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4122,
+  "line": 4121,
   "short": "theta",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -39788,7 +39992,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4155,
+  "line": 4154,
   "short": "ibdFlowStep",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -39851,7 +40055,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition Calibrator_MutationDriftModelAssumptions_theta",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4187,
+  "line": 4186,
   "short": "fstEquilibrium",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -39926,7 +40130,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition Calibrator_MutationDriftModelAssumptions_theta",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4221,
+  "line": 4220,
   "short": "fstTransient",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -39965,7 +40169,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4309,
+  "line": 4308,
   "short": "covarianceRetention",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -40012,7 +40216,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4319,
+  "line": 4318,
   "short": "freqCorrFromFst",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40056,7 +40260,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4323,
+  "line": 4322,
   "short": "ldOverlapFromSharedLD",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -40095,7 +40299,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4335,
+  "line": 4334,
   "short": "covarianceDivergenceFromRetention",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -40142,7 +40346,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4354,
+  "line": 4353,
   "short": "covarianceDivergenceMutationDrift",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40210,7 +40414,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4410,
+  "line": 4409,
   "short": "presentDayPGSVarianceMutationDrift",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40305,7 +40509,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4455,
+  "line": 4454,
   "short": "presentDayR2MutationDrift",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40378,7 +40582,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4485,
+  "line": 4484,
   "short": "neutralAFSharedLDBenchmarkRatio",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40443,7 +40647,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4630,
+  "line": 4629,
   "short": "fstMigrationDriftEquilibrium",
   "ret_type": "ℝ",
   "empirical_status": "CONDITIONALLY VALID",
@@ -40583,7 +40787,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4668,
+  "line": 4667,
   "short": "ibdRecurrenceStep",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40642,7 +40846,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4681,
+  "line": 4680,
   "short": "ibdRecurrenceFixedPoint",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40713,7 +40917,7 @@
   "class": "WRAPPER",
   "note": "delegates to ibdRecurrenceStep",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4771,
+  "line": 4770,
   "short": "islandFstMultiplicativeStep",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40773,7 +40977,7 @@
   "class": "WRAPPER",
   "note": "delegates to ibdRecurrenceFixedPoint",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4788,
+  "line": 4787,
   "short": "fstIslandMultiplicativeEquilibrium",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40828,7 +41032,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4820,
+  "line": 4819,
   "short": "scaledMigrationRate",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40936,7 +41140,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4906,
+  "line": 4905,
   "short": "fstMigDriftEq",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -40971,7 +41175,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4956,
+  "line": 4955,
   "short": "steppingStoneFst",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41056,7 +41260,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5041,
+  "line": 5040,
   "short": "sharedLD_from_equilibrium",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41110,7 +41314,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5067,
+  "line": 5066,
   "short": "sharedLDFromMigration",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41181,7 +41385,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5131,
+  "line": 5130,
   "short": "signalRetentionMigrationDrift",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41253,7 +41457,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5142,
+  "line": 5141,
   "short": "retainedSignalVarianceMigrationDrift",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41327,7 +41531,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5253,
+  "line": 5252,
   "short": "asymmetricFst",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41382,7 +41586,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5294,
+  "line": 5293,
   "short": "effectiveSymmetricMigration",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41433,7 +41637,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5315,
+  "line": 5314,
   "short": "admixtureLDDecay",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41521,7 +41725,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5362,
+  "line": 5361,
   "short": "admixtureLDBoost",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41580,7 +41784,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5424,
+  "line": 5423,
   "short": "fstMigDriftNext",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41639,7 +41843,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5459,
+  "line": 5458,
   "short": "fstMigDriftEquil",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41735,7 +41939,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5541,
+  "line": 5540,
   "short": "neutralAFBenchmarkFromRecurrence",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -42772,6 +42976,7 @@
    "Calibrator.HardyWeinbergModel.genotypeProb_sum",
    "Calibrator.HardyWeinbergModel.genotypeVariance_eq",
    "Calibrator.MafSpectrum.fourthMoment_eq",
+   "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
    "Calibrator.centeredSquare_expectation_zero",
    "Calibrator.centeredSquare_third_moment_eq",
    "Calibrator.genotypeProb_values",
@@ -42830,6 +43035,7 @@
      "h.altFreq < 1"
     ],
     "Calibrator.MafSpectrum.fourthMoment_eq": [],
+    "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [],
     "Calibrator.hweThirdCentralMoment_eq": [],
     "Calibrator.hwe_symmetricCoding_forces_half": [
      "0 < h.altFreq",
@@ -43041,6 +43247,7 @@
    "Calibrator.HWEScoreModel.scoreVariance_nonneg",
    "Calibrator.HardyWeinbergModel.genotypeVariance_eq",
    "Calibrator.MafSpectrum.fourthMoment_eq",
+   "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
    "Calibrator.centeredSquare_negative_at_half",
    "Calibrator.genotypeVariance_determines_frequency_pair",
    "Calibrator.hweCenteredSixthMoment_eq",
@@ -43079,6 +43286,7 @@
      "h.altFreq < 1"
     ],
     "Calibrator.MafSpectrum.fourthMoment_eq": [],
+    "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [],
     "Calibrator.standardizedGenotype_symmetric_iff": [
      "0 < h.altFreq",
      "h.altFreq < 1"
@@ -46706,7 +46914,7 @@
  },
  "Calibrator.mechanisticPortabilityRatio": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers",
+  "note": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights",
   "file": "Calibrator/SimulationValidation.lean",
   "line": 29,
   "short": "mechanisticPortabilityRatio",
@@ -46720,7 +46928,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceWeightsFromExplicitDrivers' is not defined\")"
+   "error": "NameError(\"name 'targetPredictiveCovarianceFromSourceWeights' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -48228,8 +48436,8 @@
   }
  },
  "Calibrator.pgsPhenoCov": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 59,
   "short": "pgsPhenoCov",
@@ -48243,9 +48451,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"'float' object is not callable\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -48256,6 +48464,10 @@
    "β_causal": {
     "dim": "m",
     "rank": 1
+   },
+   "ld": {
+    "dim": "m",
+    "rank": 2
    }
   },
   "mentioned_by": [
@@ -48282,8 +48494,8 @@
   }
  },
  "Calibrator.sharedLDGeneticVariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
+  "class": "WRAPPER",
+  "note": "delegates to pgsPhenoCov",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 64,
   "short": "sharedLDGeneticVariance",
@@ -48296,15 +48508,19 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"'float' object is not callable\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
    "β": {
     "dim": "m",
     "rank": 1
+   },
+   "ld": {
+    "dim": "m",
+    "rank": 2
    }
   },
   "mentioned_by": [
@@ -48351,8 +48567,8 @@
   }
  },
  "Calibrator.sharedLDHeritability": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 69,
   "short": "sharedLDHeritability",
@@ -48371,15 +48587,19 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"'float' object is not callable\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
    "β": {
     "dim": "m",
     "rank": 1
+   },
+   "ld": {
+    "dim": "m",
+    "rank": 2
    }
   },
   "mentioned_by": [
@@ -48490,8 +48710,8 @@
   }
  },
  "Calibrator.sourceTruthR2SharedLD": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 82,
   "short": "sourceTruthR2SharedLD",
@@ -48510,15 +48730,19 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"'float' object is not callable\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
    "β_source": {
     "dim": "m",
     "rank": 1
+   },
+   "ld": {
+    "dim": "m",
+    "rank": 2
    }
   },
   "mentioned_by": [
@@ -48551,8 +48775,8 @@
   }
  },
  "Calibrator.transportedTargetR2SharedLD": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 89,
   "short": "transportedTargetR2SharedLD",
@@ -48572,9 +48796,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"'float' object is not callable\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -48585,6 +48809,10 @@
    "β_target": {
     "dim": "m",
     "rank": 1
+   },
+   "ld": {
+    "dim": "m",
+    "rank": 2
    }
   },
   "mentioned_by": [
@@ -48626,8 +48854,8 @@
   }
  },
  "Calibrator.ldEffectGeneticCorrelation": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 97,
   "short": "ldEffectGeneticCorrelation",
@@ -48641,9 +48869,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"'float' object is not callable\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -48654,6 +48882,10 @@
    "β_target": {
     "dim": "m",
     "rank": 1
+   },
+   "ld": {
+    "dim": "m",
+    "rank": 2
    }
   },
   "mentioned_by": [
@@ -48957,7 +49189,7 @@
  },
  "Calibrator.sourceSelfR2DiagonalLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('standardizedDiagonalLD() takes 0 positional argum)",
+  "note": "self-check: arity/type mismatch (TypeError(\"'function' object is not subscriptable\"))",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 125,
   "short": "sourceSelfR2DiagonalLD",
@@ -48977,7 +49209,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError('standardizedDiagonalLD() takes 0 positional arguments but 2 were given')"
+   "error": "TypeError(\"'function' object is not subscriptable\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -49023,7 +49255,7 @@
  },
  "Calibrator.transportedTargetR2DiagonalLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('standardizedDiagonalLD() takes 0 positional argum)",
+  "note": "self-check: arity/type mismatch (TypeError(\"'function' object is not subscriptable\"))",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 130,
   "short": "transportedTargetR2DiagonalLD",
@@ -49044,7 +49276,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError('standardizedDiagonalLD() takes 0 positional arguments but 2 were given')"
+   "error": "TypeError(\"'function' object is not subscriptable\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -50004,7 +50236,7 @@
  },
  "Calibrator.targetOracleR2DiagonalLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('standardizedDiagonalLD() takes 0 positional argum)",
+  "note": "self-check: arity/type mismatch (TypeError(\"'function' object is not subscriptable\"))",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 1158,
   "short": "targetOracleR2DiagonalLD",
@@ -50024,7 +50256,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError('standardizedDiagonalLD() takes 0 positional arguments but 2 were given')"
+   "error": "TypeError(\"'function' object is not subscriptable\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -50975,6 +51207,10 @@
   },
   "numeric_standins": null,
   "vector_args": {
+   "deviation": {
+    "dim": "k",
+    "rank": 2
+   },
    "weight": {
     "dim": "k",
     "rank": 1
@@ -51031,6 +51267,10 @@
    "wShared": {
     "dim": "p",
     "rank": 1
+   },
+   "deviation": {
+    "dim": "k",
+    "rank": 2
    },
    "weight": {
     "dim": "k",
@@ -51092,6 +51332,10 @@
    "wTarget": {
     "dim": "p",
     "rank": 1
+   },
+   "deviation": {
+    "dim": "k",
+    "rank": 2
    },
    "weight": {
     "dim": "k",
@@ -51207,6 +51451,10 @@
   },
   "numeric_standins": null,
   "vector_args": {
+   "wSource": {
+    "dim": "k",
+    "rank": 2
+   },
    "weight": {
     "dim": "k",
     "rank": 1
@@ -51254,6 +51502,10 @@
    "wShared": {
     "dim": "p",
     "rank": 1
+   },
+   "wSource": {
+    "dim": "k",
+    "rank": 2
    }
   },
   "mentioned_by": [

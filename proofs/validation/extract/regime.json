@@ -1,10 +1,10 @@
 {
  "summary": {
-  "total": 998,
-  "have_regime": 276,
-  "have_external": 423,
-  "internally_validated": 201,
-  "internally_validated_no_regime": 118,
+  "total": 999,
+  "have_regime": 277,
+  "have_external": 40,
+  "internally_validated": 203,
+  "internally_validated_no_regime": 117,
   "worst_cell": 4
  },
  "definitions": {
@@ -19,10 +19,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.driftVariance": {
@@ -36,10 +34,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.twoPopDriftVariance": {
@@ -51,10 +47,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.expectedFreqDiffSq": {
@@ -66,10 +60,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.gwasHeritability": {
@@ -83,10 +75,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.equilibriumFst": {
@@ -102,11 +92,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:proved",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.geneFlowFstStep": {
@@ -120,10 +107,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.portabilityFromArchitecture": {
@@ -135,10 +120,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.fisherInformation": {
@@ -152,10 +135,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.genotypeVarianceHWE": {
@@ -170,10 +151,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.effectiveFisherInformation": {
@@ -187,10 +166,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.standardErrorSq": {
@@ -202,10 +179,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.effectiveSampleSize": {
@@ -217,10 +192,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ncp": {
@@ -232,10 +205,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.hweHeterozygosity": {
@@ -250,10 +221,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.portableFraction": {
@@ -265,10 +234,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.proportionalAllocation": {
@@ -280,10 +247,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.amVarianceStep": {
@@ -300,10 +265,8 @@
    "external_claimed_in_docstring": [
     "published-estimate"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.AssortativeMatingModel.equilibriumVariance": {
@@ -319,10 +282,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "symbolic:opaque_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.amEquilibriumVariance": {
@@ -334,11 +295,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.amInducedLD": {
@@ -352,10 +310,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.AssortativeMatingModel.observedH2": {
@@ -424,10 +380,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ibdFst": {
@@ -441,10 +395,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.BayesianLinearModel.posteriorPrecision": {
@@ -511,10 +463,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.jamesSteinMSE": {
@@ -526,10 +476,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.optimalShrinkage": {
@@ -541,10 +489,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.snpShrinkage": {
@@ -559,10 +505,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.spikeAndSlabPriorVariance": {
@@ -574,10 +518,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.misspecExcessRisk": {
@@ -592,10 +534,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.posteriorPredictiveVariance": {
@@ -607,10 +547,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.multiAncestryEffectiveN": {
@@ -622,10 +560,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.StructuralGuard.verdict": {
@@ -676,10 +612,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.costEffectiveness": {
@@ -691,10 +625,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.eValue": {
@@ -706,10 +638,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.liabilitySensitivity": {
@@ -749,10 +679,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.sensFromR2": {
@@ -790,10 +718,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.proportionCorrectlyClassified": {
@@ -805,10 +731,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.numberNeededToScreen": {
@@ -820,10 +744,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.populationAttributableFraction": {
@@ -835,10 +757,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.brierScore": {
@@ -850,10 +770,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.expectedBrierScore": {
@@ -865,10 +783,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.exactBrierRiskOfCalibrated": {
@@ -893,10 +809,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.TrueCondProb": {
@@ -986,10 +900,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.bernoulliKLReal": {
@@ -1001,10 +913,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.klBernReal": {
@@ -1107,10 +1017,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.logBernoulliRisk": {
@@ -1122,10 +1030,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.populationAUC": {
@@ -1195,10 +1101,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.criticalDegree": {
@@ -1210,10 +1114,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.gaussianCriticalMultiplier": {
@@ -1240,10 +1142,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.gaussianKurtosisMaf": {
@@ -1259,11 +1159,9 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
-   "internally_validated": false
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": true
   },
   "Calibrator.hweLevelOne": {
    "file": "Calibrator/CondensationUnification.lean",
@@ -1321,6 +1219,21 @@
    "has_external": false,
    "internally_validated": false
   },
+  "Calibrator.MafSpectrum.fourthMomentDispersion": {
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 882,
+   "class": "NOT-EXTRACTABLE",
+   "empirical_status": "UNTESTED",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
+   "external_claimed_in_docstring": [
+    "simulation"
+   ],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
+  },
   "Calibrator.ploidy": {
    "file": "Calibrator/Conventions.lean",
    "line": 80,
@@ -1330,10 +1243,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.hweGenotypeVariance": {
@@ -1373,10 +1284,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.hudsonFst": {
@@ -1403,10 +1312,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.spikeIdentification": {
@@ -1431,10 +1338,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.geometricDecay": {
@@ -1448,10 +1353,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.oneMinusRatio": {
@@ -1463,10 +1366,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.retainedFraction": {
@@ -1480,10 +1381,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ldCorrelationSq": {
@@ -1497,10 +1396,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ldCorrelationSqOfHaplotypeD": {
@@ -1514,10 +1411,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:escape"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.numBlocks": {
@@ -1531,10 +1426,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ldsrExpectedBetaSq": {
@@ -1551,10 +1444,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ldsrExpectedChi2": {
@@ -1570,10 +1461,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.haplotypeFreqAdmixed": {
@@ -1587,10 +1476,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.admixtureLDTwoLocus": {
@@ -1604,10 +1491,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.admixtureLDAtGen": {
@@ -1622,10 +1507,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.admixtureLDMagnitude": {
@@ -1639,10 +1522,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.CausalVec": {
@@ -1798,7 +1679,7 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.SourceTaggedMoments.sigmaTagCausalSource": {
+  "Calibrator.SourceTaggedMoments.sigmaTagCausal": {
    "file": "Calibrator/DGP.lean",
    "line": 134,
    "class": "NOT-EXTRACTABLE",
@@ -1848,10 +1729,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.explainedR2FromTransportMoments": {
@@ -1863,10 +1742,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ldWitnessSourceMoments": {
@@ -1968,10 +1845,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.demographicCovarianceGapLowerBound": {
@@ -1985,10 +1860,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.twoLocusIdx0": {
@@ -2026,10 +1899,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.twoLocusIBDCovariance": {
@@ -2041,10 +1912,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.twoLocusCoalescentCovarianceMatrix": {
@@ -2108,10 +1977,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.totalVariance": {
@@ -2426,10 +2293,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "symbolic:opaque_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.sharedLDRetention": {
@@ -2513,8 +2378,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
@@ -2591,10 +2455,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.TransportedMetrics.gaussianAUCFromSignalVariance": {
@@ -2609,10 +2471,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.TransportedMetrics.calibratedBrier": {
@@ -2624,10 +2484,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.TransportedMetrics.calibratedBrierFromVariances": {
@@ -2639,10 +2497,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.TransportedMetrics.IrreducibleTargetPenalty.total": {
@@ -2727,10 +2583,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ldBreakageRate": {
@@ -2744,10 +2598,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.contrastSpikeLevel": {
@@ -2761,10 +2613,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.demoSteppingStoneFst": {
@@ -2779,8 +2629,7 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": true
@@ -2796,10 +2645,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.admixedFst": {
@@ -2812,8 +2659,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:FORMULA",
-    "invariants:proved"
+    "differential[analytic-reference]:FORMULA"
    ],
    "has_external": true,
    "internally_validated": true
@@ -2827,10 +2673,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.introgressionVariants": {
@@ -2842,10 +2686,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.founderFst": {
@@ -2857,10 +2699,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.cumulativeDrift": {
@@ -2873,7 +2713,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:MODEL"
+    "differential[analytic-reference]:MODEL"
    ],
    "has_external": true,
    "internally_validated": false
@@ -2888,8 +2728,8 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "differential:MODEL"
+    "differential[analytic-reference]:AGREE",
+    "differential[analytic-reference]:MODEL"
    ],
    "has_external": true,
    "internally_validated": false
@@ -2905,10 +2745,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.bottleneckExcessLD": {
@@ -2979,10 +2817,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "symbolic:opaque_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.lossOfRetention": {
@@ -2994,10 +2830,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.targetHetOfRetention": {
@@ -3009,10 +2843,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.targetPgsVarOfRetention": {
@@ -3024,10 +2856,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.clusterCrossCheck": {
@@ -3067,10 +2897,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.benchmarkRatioSquared": {
@@ -3082,10 +2910,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.diagonalDesign": {
@@ -3125,10 +2951,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.pairwiseModel": {
@@ -3140,10 +2964,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.epistaticVariance": {
@@ -3157,10 +2979,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.dominanceVariance": {
@@ -3299,7 +3119,7 @@
   },
   "Calibrator.HardyWeinbergModel.reflect": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1004,
+   "line": 1021,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -3312,7 +3132,7 @@
   },
   "Calibrator.GenotypeDesign.interactionOrder": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1177,
+   "line": 1194,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3325,7 +3145,7 @@
   },
   "Calibrator.GenotypeDesign.statistic": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1185,
+   "line": 1202,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3338,7 +3158,7 @@
   },
   "Calibrator.GenotypeDesign.InLinkageEquilibrium": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1206,
+   "line": 1223,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3349,15 +3169,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "symbolic:no_fixed_point_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.GenotypeDesign.Polymorphic": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1214,
+   "line": 1231,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3370,7 +3188,7 @@
   },
   "Calibrator.GenotypeDesign.VariantDisjoint": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1229,
+   "line": 1246,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3383,7 +3201,7 @@
   },
   "Calibrator.GenotypeDesign.variantRecurrence": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1238,
+   "line": 1255,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3396,7 +3214,7 @@
   },
   "Calibrator.GenotypeDesign.locusInfluence": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1247,
+   "line": 1264,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3409,7 +3227,7 @@
   },
   "Calibrator.GenotypeDesign.IsTwoPoolInteraction": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1262,
+   "line": 1279,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3424,7 +3242,7 @@
   },
   "Calibrator.geneBurdenDesign": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1328,
+   "line": 1345,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3437,7 +3255,7 @@
   },
   "Calibrator.slidingWindowDesign": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1355,
+   "line": 1372,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3450,52 +3268,46 @@
   },
   "Calibrator.fourthCumulantFromMoments": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1614,
+   "line": 1631,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.circulantSpectrumA": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1744,
+   "line": 1761,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.circulantSpectrumB": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1751,
+   "line": 1768,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.GenotypeDesign.overlapMatrix": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1847,
+   "line": 1864,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3508,7 +3320,7 @@
   },
   "Calibrator.GenotypeDesign.cycleDensity": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1866,
+   "line": 1883,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3521,7 +3333,7 @@
   },
   "Calibrator.GenotypeDesign.Tempered": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1904,
+   "line": 1921,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3534,7 +3346,7 @@
   },
   "Calibrator.GenotypeDesign.BoundedHubRecurrence": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1913,
+   "line": 1930,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -3547,32 +3359,28 @@
   },
   "Calibrator.palindromicCycleDensityA": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 2083,
+   "line": 2100,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.palindromicCycleDensityB": {
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 2092,
+   "line": 2109,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.expectedR2FromN": {
@@ -3586,10 +3394,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.effectiveGeneticEffect": {
@@ -3601,10 +3407,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.linearNormOfReaction": {
@@ -3616,10 +3420,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.discoveryNCP": {
@@ -3636,10 +3438,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.gwasDiscovered": {
@@ -3694,10 +3494,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.olsEffectEstimationVariance": {
@@ -3709,10 +3507,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.lassoActiveLoci": {
@@ -3737,10 +3533,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.geneticCorrelation": {
@@ -3752,10 +3546,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.multiTraitEffectiveSampleSize": {
@@ -3767,10 +3559,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.multiTraitDiscoveryNCP": {
@@ -3782,10 +3572,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.CrossTraitBorrowingModel.borrowedTraitBCrossCov": {
@@ -3888,10 +3676,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.haplotypeHomozygosity": {
@@ -3929,10 +3715,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.dosagePhaseMisspecificationError": {
@@ -3944,10 +3728,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.haplotypePhasePredictionError": {
@@ -3961,10 +3743,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.dosageTransportBias": {
@@ -3976,10 +3756,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.haplotypeTransportBias": {
@@ -3991,10 +3769,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.haplotypeEffectEstimationVariance": {
@@ -4006,10 +3782,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.phaseAttenuation": {
@@ -4021,10 +3795,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ancestrySpecificEffect": {
@@ -4036,10 +3808,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.globalAncestryAveragedEffect": {
@@ -4051,10 +3821,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.localAncestryMisspecification": {
@@ -4066,10 +3834,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.expectedSegmentLength": {
@@ -4081,10 +3847,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.BoundedLogDistortion": {
@@ -4137,10 +3901,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.taggedDriftR2Ratio": {
@@ -4152,10 +3914,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.addRankOneSignal": {
@@ -4219,10 +3979,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fairTwoPointVariance": {
@@ -4234,10 +3992,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.gramForm": {
@@ -4304,11 +4060,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range",
-    "symbolic:opaque_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.markovLDStep": {
@@ -4337,10 +4090,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ldHardEdge": {
@@ -4354,10 +4105,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ldWhiteningGain": {
@@ -4371,10 +4120,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ldPrecisionTrace": {
@@ -4391,10 +4138,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.adjacentBoundarySeparation": {
@@ -4436,10 +4181,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "symbolic:no_fixed_point_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ridgeSelfConsistentStep": {
@@ -4467,10 +4210,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.absorptionInformation": {
@@ -4482,10 +4223,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.absorptionChannelWeight": {
@@ -4497,10 +4236,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.informationCrossoverTime": {
@@ -4512,10 +4249,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.attenuatedVariance": {
@@ -4527,10 +4262,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.imputationErrorVariance": {
@@ -4542,10 +4275,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.meanImputationR2": {
@@ -4559,10 +4290,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.apparent_portability_loss": {
@@ -4574,10 +4303,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.true_portability_loss": {
@@ -4589,10 +4316,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ascertainment_loss": {
@@ -4604,10 +4329,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.total_portability_loss": {
@@ -4619,10 +4342,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.latticeInflation": {
@@ -4636,10 +4357,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.latticeBracket": {
@@ -4651,10 +4370,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ChaosSpectroscopy.disjointRecord": {
@@ -4714,8 +4431,7 @@
     "simulation"
    ],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": true
@@ -4731,10 +4447,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.tagR2": {
@@ -4748,10 +4462,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.admixtureLD": {
@@ -4766,10 +4478,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.driftLDStep": {
@@ -4789,10 +4499,8 @@
     "simulation",
     "published-estimate"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.driftLDRetention": {
@@ -4804,10 +4512,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.driftLDEquilibrium": {
@@ -4822,10 +4528,8 @@
     "analytic-reference"
    ],
    "external_checked_by": [
-    "differential:AGREE",
-    "differential:MODEL",
-    "invariants:no-range",
-    "symbolic:fixed_point_verified"
+    "differential[analytic-reference]:AGREE",
+    "differential[analytic-reference]:MODEL"
    ],
    "has_external": true,
    "internally_validated": true
@@ -4842,8 +4546,7 @@
     "analytic-reference"
    ],
    "external_checked_by": [
-    "differential:AGREE",
-    "symbolic:has_nonzero_rest_point"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
@@ -4860,7 +4563,7 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
@@ -4875,7 +4578,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
@@ -4909,10 +4612,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ldHalfLife": {
@@ -4927,8 +4628,7 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:FORMULA",
-    "invariants:no-range"
+    "differential[analytic-reference]:FORMULA"
    ],
    "has_external": true,
    "internally_validated": true
@@ -4950,8 +4650,7 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:INTERNAL-INCONSISTENT",
-    "invariants:proved"
+    "differential[analytic-reference]:INTERNAL-INCONSISTENT"
    ],
    "has_external": true,
    "internally_validated": true
@@ -4969,8 +4668,7 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:INTERNAL-INCONSISTENT",
-    "symbolic:ONLY_REST_POINT_IS_ZERO"
+    "differential[analytic-reference]:INTERNAL-INCONSISTENT"
    ],
    "has_external": true,
    "internally_validated": false
@@ -4984,11 +4682,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range",
-    "symbolic:no_fixed_point_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.portabilityAtTime": {
@@ -5000,10 +4695,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ldDecayPerGeneration": {
@@ -5017,10 +4710,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.secularTrendBias": {
@@ -5032,10 +4723,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.temporalMetricProfile": {
@@ -5075,10 +4764,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ageDependentSignalVariance": {
@@ -5092,10 +4779,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ageDependentMetricProfile": {
@@ -5133,10 +4818,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.temporalExactBrierRisk": {
@@ -5161,10 +4844,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.R2DecompositionData.r2": {
@@ -5215,10 +4896,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.fisherTraceMSELowerBound": {
@@ -5230,10 +4909,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.requiredEffectiveSampleSizeForTraceMSE": {
@@ -5247,10 +4924,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.brierDiscriminationLoss": {
@@ -5288,10 +4963,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.sensitivityPortabilityGap": {
@@ -5303,10 +4976,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ppvPortabilityGap": {
@@ -5318,10 +4989,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.brierScoreMetric": {
@@ -5367,10 +5036,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ldPruningDetectionDeficit": {
@@ -5382,10 +5049,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ldPanelRetentionFraction": {
@@ -5397,10 +5062,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ldBlockDetectionShare": {
@@ -5414,10 +5077,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ldBlockPruningDeficit": {
@@ -5429,10 +5090,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ldTightLinkageDetectionShare": {
@@ -5444,10 +5103,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.effectMutualInformation": {
@@ -5461,10 +5118,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.portabilityGap": {
@@ -5476,10 +5131,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ProbeBlindness.and": {
@@ -5573,10 +5226,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.combinedPortability": {
@@ -5590,10 +5241,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.snrPortabilityRatio": {
@@ -5605,10 +5254,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.f1Score": {
@@ -5620,10 +5267,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.PCCorrectionModel.residualBias": {
@@ -5739,10 +5384,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.pcTargetAxisEfficacy": {
@@ -5754,10 +5397,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ascertainmentAmplification": {
@@ -5771,10 +5412,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.pgsStratificationRiskCoefficient": {
@@ -5786,10 +5425,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.standardizedResidualPGSBias": {
@@ -5801,10 +5438,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.criticalConfoundingMagnitude": {
@@ -5816,10 +5451,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.FrequencyResolvedCohort.classMargin": {
@@ -6160,10 +5793,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.whitenedCapacity": {
@@ -6177,10 +5808,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.subgroupContrast": {
@@ -6220,10 +5849,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.blockSpectrum": {
@@ -6317,10 +5944,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.samplePCResidualAxisFraction": {
@@ -6332,10 +5957,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.EmpiricalPCOverlapModel.residualBiasEnergy": {
@@ -6360,10 +5983,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.effectiveSubgroupSize": {
@@ -6375,10 +5996,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.demographicSpike": {
@@ -6392,10 +6011,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.bbpProxyThreshold": {
@@ -6409,10 +6026,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.pcCorrectabilityMargin": {
@@ -6424,10 +6039,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.modeledPCResidualSusceptibility": {
@@ -6439,10 +6052,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.calibrationInTheLarge": {
@@ -6454,10 +6065,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.calibrationSlopeDeviation": {
@@ -6469,10 +6078,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.calibrationProfile": {
@@ -6562,10 +6169,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.prevalenceLogit": {
@@ -6577,10 +6182,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.prevalenceCITLShift": {
@@ -6592,10 +6195,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.CrossPopulationCalibrationShiftModel.observedMeanShift": {
@@ -7066,10 +6667,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.logisticRecalibrated": {
@@ -7081,10 +6680,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.recalibratedCalibrationSlope": {
@@ -7096,10 +6693,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.recalibrationTraceMSELowerBound": {
@@ -7111,10 +6706,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.requiredEventsForRecalibration": {
@@ -7126,10 +6719,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.requiredTargetCohortSizeForRecalibration": {
@@ -7141,10 +6732,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.classifiedHighRisk": {
@@ -7169,10 +6758,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.thresholdBandRate": {
@@ -7513,10 +7100,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.neutralDriftFactor": {
@@ -7537,10 +7122,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.selectedDriftFactor": {
@@ -7552,10 +7135,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fstFromDriftFactor": {
@@ -7567,10 +7148,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.causalPortabilityFromLocalFst": {
@@ -7597,10 +7176,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.pgsDriftVariance_one_pop": {
@@ -7616,10 +7193,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.pgsDriftVarianceFromLoci": {
@@ -7646,10 +7221,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.expectedPGSDiffVariance": {
@@ -7661,10 +7234,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.effectCorrelationStabilizing": {
@@ -7676,11 +7247,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape",
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.effectCorrelationFluctuating": {
@@ -7692,10 +7260,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.expectedSquaredEffect": {
@@ -7709,10 +7275,8 @@
    "regime_mined": [],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.spikeAndSlabVariance": {
@@ -7724,10 +7288,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.effectivePolygenicity": {
@@ -7739,10 +7301,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.effectivePolygenicityOfEffects": {
@@ -7864,10 +7424,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.gradeCertifiedRisk": {
@@ -7879,10 +7437,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.certificateDeficit": {
@@ -7894,10 +7450,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.heritabilityEnrichment": {
@@ -7909,10 +7463,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.predictedPortability": {
@@ -8002,10 +7554,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.maxSafeEpistaticOrder": {
@@ -8021,10 +7571,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.hweLatticeCondition": {
@@ -8049,10 +7597,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.HardyWeinbergModel.mellinJetVariance": {
@@ -8081,10 +7627,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.hardCallLatticeSpan": {
@@ -8142,8 +7686,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:escape-outside-theorem"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8160,9 +7703,8 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "differential:CONVENTION-DIFFERS",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE",
+    "differential[analytic-reference]:CONVENTION-DIFFERS"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8179,8 +7721,7 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8195,9 +7736,8 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "differential:SCOPE",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE",
+    "differential[analytic-reference]:SCOPE"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8211,10 +7751,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.continentIslandStepMigrationFirst": {
@@ -8226,10 +7764,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.selectionMigrationEquilibrium": {
@@ -8244,9 +7780,7 @@
     "analytic-reference"
    ],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved",
-    "symbolic:fixed_point_verified"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
@@ -8262,11 +7796,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:proved",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.wrightFIT": {
@@ -8279,8 +7810,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:escape-unguarded"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
@@ -8303,8 +7833,7 @@
     "simulation"
    ],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:no-range"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8320,10 +7849,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.scaledIdentityStep": {
@@ -8335,10 +7862,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fstMutationDriftEquilibrium": {
@@ -8353,11 +7878,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved",
-    "symbolic:opaque_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.fstMutationDriftTransient": {
@@ -8369,10 +7891,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.expectedNewMutations": {
@@ -8384,10 +7904,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.sharedLDFractionFromMutation": {
@@ -8401,10 +7919,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.islandModelFst": {
@@ -8423,9 +7939,8 @@
     "simulation"
    ],
    "external_checked_by": [
-    "differential:AGREE",
-    "differential:MODEL",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE",
+    "differential[analytic-reference]:MODEL"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8439,11 +7954,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved",
-    "symbolic:opaque_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.steppingStoneCharacteristicLength": {
@@ -8458,8 +7970,7 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:FORMULA",
-    "invariants:no-range"
+    "differential[analytic-reference]:FORMULA"
    ],
    "has_external": true,
    "internally_validated": false
@@ -8476,8 +7987,7 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:INTERNAL-INCONSISTENT",
-    "invariants:proved"
+    "differential[analytic-reference]:INTERNAL-INCONSISTENT"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8492,8 +8002,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:inconclusive"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
@@ -8508,8 +8017,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:no-range"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
@@ -8526,8 +8034,7 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8548,32 +8055,36 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:MODEL",
-    "symbolic:ONLY_REST_POINT_IS_ZERO"
+    "differential[analytic-reference]:MODEL"
    ],
    "has_external": true,
    "internally_validated": false
   },
   "Calibrator.fstDerived": {
    "file": "Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1212,
+   "line": 1227,
    "class": "NUMERIC",
-   "empirical_status": "UNTESTED",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
+   "empirical_status": "FALSIFIED",
+   "regime_explicit": [
+    "closed population, no mutation. The previous sentence here read"
+   ],
+   "regime_mined": [
+    "closed-population",
+    "no-mutation",
+    "mutation-drift-equilibrium"
+   ],
+   "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "differential:MODEL",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE",
+    "differential[analytic-reference]:MODEL"
    ],
    "has_external": true,
    "internally_validated": true
   },
   "Calibrator.hetMutationDriftRecurrence": {
    "file": "Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1288,
+   "line": 1303,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -8581,15 +8092,14 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "symbolic:has_nonzero_rest_point"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
   },
   "Calibrator.hetEquilibrium": {
    "file": "Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1295,
+   "line": 1310,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8599,16 +8109,14 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved",
-    "symbolic:opaque_theorem"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": true
   },
   "Calibrator.hetDecayFactor": {
    "file": "Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1445,
+   "line": 1460,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -8616,45 +8124,40 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": true
   },
   "Calibrator.hetMutationRecurrence": {
    "file": "Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1454,
+   "line": 1469,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "symbolic:has_nonzero_rest_point"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fstFromHetRatio": {
    "file": "Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1482,
+   "line": 1497,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fstMutationDriftTransientDiscrete": {
    "file": "Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1518,
+   "line": 1533,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -8664,8 +8167,7 @@
     "analytic-reference"
    ],
    "external_checked_by": [
-    "differential:INTERNAL-INCONSISTENT",
-    "invariants:proved"
+    "differential[analytic-reference]:INTERNAL-INCONSISTENT"
    ],
    "has_external": true,
    "internally_validated": false
@@ -8686,10 +8188,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.stabilizingPortability": {
@@ -8707,10 +8207,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.diversifyingPortability": {
@@ -8726,10 +8224,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.integratedCoalescentHazard": {
@@ -8780,10 +8276,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fstFromTau": {
@@ -8797,10 +8291,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.fstFromGenerations": {
@@ -8813,8 +8305,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8835,8 +8326,7 @@
     "simulation"
    ],
    "external_checked_by": [
-    "differential:FORMULA",
-    "invariants:proved"
+    "differential[analytic-reference]:FORMULA"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8851,8 +8341,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": true
@@ -8918,10 +8407,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.DemographicCoalescenceScalars.delta": {
@@ -8948,10 +8435,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.twoDemeIMFirstStepDiff": {
@@ -8963,10 +8448,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.twoDemeIMEquilibriumETss": {
@@ -8978,11 +8461,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.twoDemeIMEquilibriumETst": {
@@ -8994,11 +8474,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.twoDemeIMEquilibriumScalars": {
@@ -9010,10 +8487,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "symbolic:derived_from_equilibrium"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.twoDemeIMEquilibriumDelta": {
@@ -9025,11 +8500,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.hetStepWithMutation": {
@@ -9047,10 +8519,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.hetTrajectory": {
@@ -9065,8 +8535,7 @@
    "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "symbolic:has_nonzero_rest_point"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
@@ -9082,11 +8551,8 @@
    "regime_mined": [],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ClosedPopulationNoMutation.retention": {
@@ -9155,10 +8621,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.targetHetFromFst": {
@@ -9171,8 +8635,7 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:no-range"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
@@ -9188,10 +8651,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.presentDayPGSVariance": {
@@ -9203,10 +8664,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.wrightFisherDriftRetention": {
@@ -9226,10 +8685,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.wrightFisherHeterozygosityLoss": {
@@ -9246,10 +8703,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.Var_Delta_Mu": {
@@ -9261,10 +8716,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.Expected_Abs_Shift": {
@@ -9276,10 +8729,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.presentDaySignalToNoise": {
@@ -9291,10 +8742,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.presentDayR2": {
@@ -9306,10 +8755,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.expectedR2": {
@@ -9321,10 +8768,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.presentDayGaussianAUC": {
@@ -9339,10 +8784,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.presentDayEqualVarianceGaussianAUC": {
@@ -9359,10 +8802,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.realWorldPGSVariance": {
@@ -9376,10 +8817,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.Pop.pair": {
@@ -9650,7 +9089,7 @@
   },
   "Calibrator.sourceScoreVarianceFromExplicitDrivers": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1443,
+   "line": 1442,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9663,7 +9102,7 @@
   },
   "Calibrator.targetScoreVarianceFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1451,
+   "line": 1450,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9678,7 +9117,7 @@
   },
   "Calibrator.sourcePredictiveCovarianceFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1457,
+   "line": 1456,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9691,7 +9130,7 @@
   },
   "Calibrator.targetPredictiveCovarianceFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1465,
+   "line": 1464,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9704,7 +9143,7 @@
   },
   "Calibrator.sourceCalibrationSlopeFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1473,
+   "line": 1472,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9719,7 +9158,7 @@
   },
   "Calibrator.targetCalibrationSlopeFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1481,
+   "line": 1480,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9734,7 +9173,7 @@
   },
   "Calibrator.brokenTaggingResidual": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1609,
+   "line": 1608,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9749,7 +9188,7 @@
   },
   "Calibrator.ancestrySpecificLDResidual": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1627,
+   "line": 1626,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9766,7 +9205,7 @@
   },
   "Calibrator.sourceSpecificOverfitResidual": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1644,
+   "line": 1643,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9781,7 +9220,7 @@
   },
   "Calibrator.novelUntaggablePhenotypeResidual": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1659,
+   "line": 1658,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9796,7 +9235,7 @@
   },
   "Calibrator.irreducibleTargetResidualBurden": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1677,
+   "line": 1676,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9811,7 +9250,7 @@
   },
   "Calibrator.targetIrreduciblePenaltyProfile": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1694,
+   "line": 1693,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9826,7 +9265,7 @@
   },
   "Calibrator.effectiveTargetOutcomeVariance": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1718,
+   "line": 1717,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9841,7 +9280,7 @@
   },
   "Calibrator.sourceExplainedSignalVarianceFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1752,
+   "line": 1751,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9854,7 +9293,7 @@
   },
   "Calibrator.sourceR2FromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1758,
+   "line": 1757,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9867,7 +9306,7 @@
   },
   "Calibrator.sourceResidualVarianceFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1766,
+   "line": 1765,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9882,7 +9321,7 @@
   },
   "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1783,
+   "line": 1782,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9897,7 +9336,7 @@
   },
   "Calibrator.targetExplainedSignalVarianceFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1835,
+   "line": 1834,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9913,7 +9352,7 @@
   },
   "Calibrator.targetR2FromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1842,
+   "line": 1841,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9926,7 +9365,7 @@
   },
   "Calibrator.targetResidualVarianceFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1851,
+   "line": 1850,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9939,7 +9378,7 @@
   },
   "Calibrator.targetCalibratedBrierFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1865,
+   "line": 1864,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9952,7 +9391,7 @@
   },
   "Calibrator.ldCorrelationDecay": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2086,
+   "line": 2085,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9963,15 +9402,13 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.GenerationalPopGenParameters.theta": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2134,
+   "line": 2133,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9984,7 +9421,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.bigM": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2138,
+   "line": 2137,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9997,7 +9434,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.tauAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2142,
+   "line": 2141,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10010,7 +9447,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.hetDecayFactor": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2146,
+   "line": 2145,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10018,15 +9455,14 @@
    "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
   },
   "Calibrator.GenerationalPopGenParameters.fstTransientAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2154,
+   "line": 2153,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10042,7 +9478,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.mutationSharedRetentionAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2159,
+   "line": 2158,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10055,7 +9491,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.migrationSharedBoostAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2164,
+   "line": 2163,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10068,7 +9504,7 @@
   },
   "Calibrator.PGSEvolutionaryModel.toGenerationalPopGenParameters": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2190,
+   "line": 2189,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10084,22 +9520,20 @@
   },
   "Calibrator.alleleFreqMismatchPenalty": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2298,
+   "line": 2297,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.betaTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2356,
+   "line": 2355,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10112,7 +9546,7 @@
   },
   "Calibrator.tagAlleleFreqTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2370,
+   "line": 2369,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10127,7 +9561,7 @@
   },
   "Calibrator.causalAlleleFreqTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2384,
+   "line": 2383,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10140,7 +9574,7 @@
   },
   "Calibrator.tagAlleleFreqRetentionAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2395,
+   "line": 2394,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10153,7 +9587,7 @@
   },
   "Calibrator.causalAlleleFreqRetentionAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2402,
+   "line": 2401,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10166,7 +9600,7 @@
   },
   "Calibrator.novelVariantInnovationAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2408,
+   "line": 2407,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10179,7 +9613,7 @@
   },
   "Calibrator.jointTagLDKernelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2421,
+   "line": 2420,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10195,7 +9629,7 @@
   },
   "Calibrator.jointDirectCausalKernelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2444,
+   "line": 2443,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10210,7 +9644,7 @@
   },
   "Calibrator.jointProxyTaggingKernelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2463,
+   "line": 2462,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10225,7 +9659,7 @@
   },
   "Calibrator.jointNovelDirectCausalKernelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2488,
+   "line": 2487,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10238,7 +9672,7 @@
   },
   "Calibrator.jointNovelProxyTaggingKernelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2507,
+   "line": 2506,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10253,7 +9687,7 @@
   },
   "Calibrator.sigmaTagTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2530,
+   "line": 2529,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10269,7 +9703,7 @@
   },
   "Calibrator.directCausalTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2539,
+   "line": 2538,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10284,7 +9718,7 @@
   },
   "Calibrator.novelDirectCausalTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2548,
+   "line": 2547,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10297,7 +9731,7 @@
   },
   "Calibrator.proxyTaggingTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2557,
+   "line": 2556,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10312,7 +9746,7 @@
   },
   "Calibrator.novelProxyTaggingTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2565,
+   "line": 2564,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10325,7 +9759,7 @@
   },
   "Calibrator.sigmaTagCausalTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2575,
+   "line": 2574,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10340,7 +9774,7 @@
   },
   "Calibrator.targetSourceEffectProjectionAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2587,
+   "line": 2586,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10353,7 +9787,7 @@
   },
   "Calibrator.targetEffectHeterogeneityProjectionAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2595,
+   "line": 2594,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10366,7 +9800,7 @@
   },
   "Calibrator.CrossPopulationGenerationalModel.toMetricModelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2604,
+   "line": 2603,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10379,7 +9813,7 @@
   },
   "Calibrator.targetR2AtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2632,
+   "line": 2631,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10392,7 +9826,7 @@
   },
   "Calibrator.targetCalibratedBrierAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2637,
+   "line": 2636,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10405,7 +9839,7 @@
   },
   "Calibrator.targetR2FromNeutralAFBenchmark": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2888,
+   "line": 2887,
    "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10416,15 +9850,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.neutralAFBenchmarkRatio": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2962,
+   "line": 2961,
    "class": "NUMERIC",
    "empirical_status": "FALSIFIED",
    "regime_explicit": [],
@@ -10436,15 +9868,14 @@
     "simulation"
    ],
    "external_checked_by": [
-    "differential:MODEL",
-    "invariants:no-range"
+    "differential[analytic-reference]:MODEL"
    ],
    "has_external": true,
    "internally_validated": false
   },
   "Calibrator.hetRatioBetweenBranches": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3010,
+   "line": 3009,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [
@@ -10463,7 +9894,7 @@
   },
   "Calibrator.exactCalibratedBrierRiskFromR2": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3045,
+   "line": 3044,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10472,15 +9903,13 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.brierFromR2": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3050,
+   "line": 3049,
    "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10493,7 +9922,7 @@
   },
   "Calibrator.targetGaussianAUCFromNeutralAFBenchmark": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3054,
+   "line": 3053,
    "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10502,45 +9931,39 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.sourceBrierFromR2": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3067,
+   "line": 3066,
    "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.targetExactCalibratedBrierRisk": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3080,
+   "line": 3079,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.targetBrierFromNeutralAFBenchmark": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3087,
+   "line": 3086,
    "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10549,15 +9972,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.neutralAFBenchmarkMetricProfile": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3093,
+   "line": 3092,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10572,7 +9993,7 @@
   },
   "Calibrator.equalVarianceGaussianAUCFromSNR": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3161,
+   "line": 3160,
    "class": "NUMERIC",
    "empirical_status": "VALIDATED",
    "regime_explicit": [],
@@ -10584,15 +10005,13 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.equalVarianceGaussianAUCFromVariances": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3173,
+   "line": 3172,
    "class": "NUMERIC",
    "empirical_status": "VALIDATED",
    "regime_explicit": [],
@@ -10602,15 +10021,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.equalVarianceGaussianAUCFromExplainedR2": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3220,
+   "line": 3219,
    "class": "NUMERIC",
    "empirical_status": "VALIDATED",
    "regime_explicit": [
@@ -10624,15 +10041,13 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
-   "internally_validated": true
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
   },
   "Calibrator.equalVarianceGaussianAUCChart": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3266,
+   "line": 3265,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [
@@ -10644,15 +10059,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
-   "internally_validated": false
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": true
   },
   "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3329,
+   "line": 3328,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10665,7 +10078,7 @@
   },
   "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3372,
+   "line": 3371,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10678,7 +10091,7 @@
   },
   "Calibrator.sourceMetricProfileFromSourceWeightsAtPrevalence": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3447,
+   "line": 3446,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10691,7 +10104,7 @@
   },
   "Calibrator.sourceMetricProfileFromSourceWeightsAtTargetPrevalence": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3475,
+   "line": 3474,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10704,7 +10117,7 @@
   },
   "Calibrator.targetMetricProfileFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3502,
+   "line": 3501,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10720,7 +10133,7 @@
   },
   "Calibrator.targetGaussianAUCAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3568,
+   "line": 3567,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10735,7 +10148,7 @@
   },
   "Calibrator.targetMetricProfileAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3573,
+   "line": 3572,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10748,7 +10161,7 @@
   },
   "Calibrator.targetPredictiveCovarianceAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3592,
+   "line": 3591,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10761,7 +10174,7 @@
   },
   "Calibrator.targetScoreVarianceAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3598,
+   "line": 3597,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10776,7 +10189,7 @@
   },
   "Calibrator.effectiveTargetOutcomeVarianceAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3606,
+   "line": 3605,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10791,7 +10204,7 @@
   },
   "Calibrator.targetResidualVarianceAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3612,
+   "line": 3611,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10804,7 +10217,7 @@
   },
   "Calibrator.targetCalibrationSlopeAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3618,
+   "line": 3617,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10817,7 +10230,7 @@
   },
   "Calibrator.sourceNormalizedTargetR2AtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3712,
+   "line": 3711,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10830,7 +10243,7 @@
   },
   "Calibrator.targetExactGaussianAUCFromNeutralAFBenchmark": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3816,
+   "line": 3815,
    "class": "WRAPPER",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10843,90 +10256,78 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.brierRegretPoint": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3940,
+   "line": 3939,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.brierRegretRatio": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3944,
+   "line": 3943,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.logLossRegretPoint": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3961,
+   "line": 3960,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.logLossRegretRatio": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3965,
+   "line": 3964,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.expectedSqMeanPGSDiff_pureSplit": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4049,
+   "line": 4048,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.expectedSqMeanPGSDiff_IMEquilibrium": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4059,
+   "line": 4058,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [
@@ -10935,16 +10336,13 @@
    "regime_mined": [],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range",
-    "symbolic:derived_from_equilibrium"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.MutationDriftModelAssumptions.theta": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4122,
+   "line": 4121,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10957,7 +10355,7 @@
   },
   "Calibrator.ibdFlowStep": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4155,
+   "line": 4154,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10967,15 +10365,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.MutationDriftModelAssumptions.fstEquilibrium": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4187,
+   "line": 4186,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10987,15 +10383,13 @@
    "external_claimed_in_docstring": [
     "published-estimate"
    ],
-   "external_checked_by": [
-    "symbolic:opaque_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.MutationDriftModelAssumptions.fstTransient": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4221,
+   "line": 4220,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11008,7 +10402,7 @@
   },
   "Calibrator.covarianceRetention": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4309,
+   "line": 4308,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -11017,30 +10411,26 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.freqCorrFromFst": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4319,
+   "line": 4318,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ldOverlapFromSharedLD": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4323,
+   "line": 4322,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -11049,30 +10439,26 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.covarianceDivergenceFromRetention": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4335,
+   "line": 4334,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.covarianceDivergenceMutationDrift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4354,
+   "line": 4353,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11081,30 +10467,26 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.presentDayPGSVarianceMutationDrift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4410,
+   "line": 4409,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.presentDayR2MutationDrift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4455,
+   "line": 4454,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11113,15 +10495,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.neutralAFSharedLDBenchmarkRatio": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4485,
+   "line": 4484,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11132,15 +10512,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fstMigrationDriftEquilibrium": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4630,
+   "line": 4629,
    "class": "NUMERIC",
    "empirical_status": "CONDITIONALLY VALID",
    "regime_explicit": [
@@ -11154,16 +10532,13 @@
     "simulation",
     "published-estimate"
    ],
-   "external_checked_by": [
-    "invariants:proved",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.ibdRecurrenceStep": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4668,
+   "line": 4667,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11172,46 +10547,39 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.ibdRecurrenceFixedPoint": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4681,
+   "line": 4680,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.islandFstMultiplicativeStep": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4771,
+   "line": 4770,
    "class": "WRAPPER",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fstIslandMultiplicativeEquilibrium": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4788,
+   "line": 4787,
    "class": "WRAPPER",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11223,31 +10591,27 @@
     "analytic-reference"
    ],
    "external_checked_by": [
-    "differential:AGREE",
-    "invariants:proved",
-    "symbolic:fixed_point_verified"
+    "differential[analytic-reference]:AGREE"
    ],
    "has_external": true,
    "internally_validated": false
   },
   "Calibrator.scaledMigrationRate": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4820,
+   "line": 4819,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.SplitMigrationModel.fstMigDriftEq": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4906,
+   "line": 4905,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11260,7 +10624,7 @@
   },
   "Calibrator.steppingStoneFst": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4956,
+   "line": 4955,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [
@@ -11274,15 +10638,13 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.sharedLD_from_equilibrium": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5041,
+   "line": 5040,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11291,16 +10653,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved",
-    "symbolic:derived_from_equilibrium"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.sharedLDFromMigration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5067,
+   "line": 5066,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11311,15 +10670,13 @@
    "external_claimed_in_docstring": [
     "published-estimate"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.signalRetentionMigrationDrift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5131,
+   "line": 5130,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11329,15 +10686,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.retainedSignalVarianceMigrationDrift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5142,
+   "line": 5141,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11346,45 +10701,39 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.asymmetricFst": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5253,
+   "line": 5252,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.effectiveSymmetricMigration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5294,
+   "line": 5293,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.admixtureLDDecay": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5315,
+   "line": 5314,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11393,15 +10742,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.admixtureLDBoost": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5362,
+   "line": 5361,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11410,15 +10757,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fstMigDriftNext": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5424,
+   "line": 5423,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11427,15 +10772,13 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fstMigDriftEquil": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5459,
+   "line": 5458,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11444,15 +10787,13 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.neutralAFBenchmarkFromRecurrence": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5541,
+   "line": 5540,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -11461,10 +10802,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.noncentralityParam": {
@@ -11478,10 +10817,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.powerAtThreshold": {
@@ -11493,10 +10830,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.GWASObservationModel.standardError": {
@@ -11549,10 +10884,8 @@
    "regime_mined": [],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.logRateSampleSize": {
@@ -11564,10 +10897,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.gradeCertifiedSampleSize": {
@@ -11579,10 +10910,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.UnitProb": {
@@ -11896,10 +11225,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.HWEScoreModel.berryEsseenErrorBound": {
@@ -11913,10 +11240,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.approximationInterval": {
@@ -12010,10 +11335,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.diseaseEvent": {
@@ -12155,10 +11478,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.reconstructionWeight": {
@@ -12170,10 +11491,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.wienerWeight": {
@@ -12187,10 +11506,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.spectralCapture": {
@@ -12338,10 +11655,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "symbolic:no_fixed_point_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.mutationSelectionStepRare": {
@@ -12353,10 +11668,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.mutationSelectionBalance": {
@@ -12370,11 +11683,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.mutationSelectionStepRecessive": {
@@ -12386,10 +11696,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.mutationSelectionBalanceRecessive": {
@@ -12403,11 +11711,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved",
-    "symbolic:fixed_point_verified"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.expectedEffectMultiplier": {
@@ -12423,10 +11728,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.overlapInflation": {
@@ -12438,10 +11741,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.partialOverlapR2": {
@@ -12455,10 +11756,8 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.approxLOOPGS": {
@@ -12470,10 +11769,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.kinshipInflation": {
@@ -12485,10 +11782,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.pgsMean": {
@@ -12546,10 +11841,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.benchmarkHighScoreRate": {
@@ -12563,10 +11856,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.externallyStandardized": {
@@ -12578,10 +11869,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.internallyStandardized": {
@@ -12593,10 +11882,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.rawCrossMoment": {
@@ -12634,11 +11921,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range",
-    "symbolic:no_fixed_point_theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.effectVarianceRecurrence": {
@@ -12650,10 +11934,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fluctuatingEffectCorrelation": {
@@ -12665,10 +11947,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.stabilizingSelectedArchitectureVariance": {
@@ -12680,10 +11960,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.optimumOUVariance": {
@@ -12695,10 +11973,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.fluctuatingSelectedArchitectureVariance": {
@@ -12710,10 +11986,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.stabilizingNsFromObservedCorrelation": {
@@ -12725,10 +11999,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.tauFromObservedEffectCorrelation": {
@@ -12740,10 +12012,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.sigmaThetaFromObservedSelectedVariance": {
@@ -12755,10 +12025,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.polygenicAdaptationShift": {
@@ -12783,10 +12051,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.selectionSummaryLogLik": {
@@ -13100,10 +12366,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.portabilityRatio": {
@@ -13115,10 +12379,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.effectiveSampleSizeSE": {
@@ -13130,10 +12392,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-outside-theorem"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.fixed_weights": {
@@ -13355,10 +12615,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.reliabilityRatio": {
@@ -13370,10 +12628,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.AttenuationModel.β_obs": {
@@ -13426,16 +12682,14 @@
    "external_claimed_in_docstring": [
     "simulation"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.pgsPhenoCov": {
    "file": "Calibrator/TransferLearningPGS.lean",
    "line": 59,
-   "class": "NOT-EXTRACTABLE",
+   "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
@@ -13448,7 +12702,7 @@
   "Calibrator.sharedLDGeneticVariance": {
    "file": "Calibrator/TransferLearningPGS.lean",
    "line": 64,
-   "class": "NOT-EXTRACTABLE",
+   "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [
@@ -13458,12 +12712,12 @@
    "external_claimed_in_docstring": [],
    "external_checked_by": [],
    "has_external": false,
-   "internally_validated": false
+   "internally_validated": true
   },
   "Calibrator.sharedLDHeritability": {
    "file": "Calibrator/TransferLearningPGS.lean",
    "line": 69,
-   "class": "NOT-EXTRACTABLE",
+   "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [
@@ -13484,16 +12738,14 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.sourceTruthR2SharedLD": {
    "file": "Calibrator/TransferLearningPGS.lean",
    "line": 82,
-   "class": "NOT-EXTRACTABLE",
+   "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [
@@ -13508,7 +12760,7 @@
   "Calibrator.transportedTargetR2SharedLD": {
    "file": "Calibrator/TransferLearningPGS.lean",
    "line": 89,
-   "class": "NOT-EXTRACTABLE",
+   "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [
@@ -13523,7 +12775,7 @@
   "Calibrator.ldEffectGeneticCorrelation": {
    "file": "Calibrator/TransferLearningPGS.lean",
    "line": 97,
-   "class": "NOT-EXTRACTABLE",
+   "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [
@@ -13636,10 +12888,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.importanceWeightESS": {
@@ -13651,10 +12901,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.AsymptoticallyZero": {
@@ -13692,10 +12940,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.pcaBiasReduction": {
@@ -13707,10 +12953,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.pcaNetTargetError": {
@@ -13722,10 +12966,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.infoBottleneckObjective": {
@@ -13737,10 +12979,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.gaussianSourceResidualRisk": {
@@ -13756,10 +12996,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.pinskerAncestryDivergenceCap": {
@@ -13771,10 +13009,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.infoCertifiedBenDavidUpperBound": {
@@ -13788,10 +13024,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.fineTunedTargetR2": {
@@ -13805,10 +13039,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.scratchTargetR2": {
@@ -13822,10 +13054,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.deployedTransferTargetR2": {
@@ -13837,10 +13067,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.oracleTransportAdaptationGain": {
@@ -13852,10 +13080,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.transportPenalty": {
@@ -13867,10 +13093,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.targetOracleR2DiagonalLD": {
@@ -13902,10 +13126,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.usableScratchTargetR2": {
@@ -13917,10 +13139,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.scratchVsFineTuningCriticalSampleSize": {
@@ -13934,10 +13154,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.sourceShrinkageMSE": {
@@ -13949,10 +13167,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.optimalSourceShrinkageWeight": {
@@ -13964,10 +13180,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:proved"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.coefficientGapSq": {
@@ -14150,10 +13364,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.requiredTargetSamplesForOptimalFineTuningMSE": {
@@ -14167,10 +13379,8 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.targetLinearExcessRisk": {
@@ -14210,10 +13420,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.mean": {
@@ -14461,10 +13669,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:escape-unguarded"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.conditionalMean": {
@@ -14556,10 +13762,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.likelihoodRatioStat": {
@@ -14571,10 +13775,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.narrowSenseH2": {
@@ -14588,10 +13790,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": true
   },
   "Calibrator.snpH2": {
@@ -14605,10 +13805,8 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.additiveVariance": {
@@ -14635,10 +13833,8 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [
-    "invariants:no-range"
-   ],
-   "has_external": true,
+   "external_checked_by": [],
+   "has_external": false,
    "internally_validated": false
   },
   "Calibrator.rightTransform": {
