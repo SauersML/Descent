@@ -2673,17 +2673,18 @@ theorem portability_ratio_with_ld_decay
       r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
   rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
   have hfstS_lt_one : fstS < 1 := lt_trans hfst hfstT_lt_one
-  have hTargetPos : 0 < (1 - fstT) * V_A := by
+  have hTargetPos : 0 < V_A * (1 - fstT) := by
     have : 0 < 1 - fstT := by linarith
-    exact mul_pos this hVA
-  have hTarget_nonneg : 0 ≤ (1 - fstT) * V_A := le_of_lt hTargetPos
+    exact mul_pos hVA this
+  have hTarget_nonneg : 0 ≤ V_A * (1 - fstT) := le_of_lt hTargetPos
   have hRhoT_lt_one : rhoT < 1 := by simpa [hRhoS] using hRhoT_lt_rhoS
   have hRealTarget_lt :
       realWorldPGSVariance V_A fstT rhoT < presentDayPGSVariance V_A fstT := by
     have hscaled :
-        rhoT * ((1 - fstT) * V_A) < 1 * ((1 - fstT) * V_A) :=
+        rhoT * (V_A * (1 - fstT)) < 1 * (V_A * (1 - fstT)) :=
       mul_lt_mul_of_pos_right hRhoT_lt_one hTargetPos
-    simpa [realWorldPGSVariance, presentDayPGSVariance, mul_assoc] using hscaled
+    simpa [realWorldPGSVariance, presentDayPGSVariance, pgsVarianceFromHet,
+      mul_assoc, mul_left_comm, mul_comm] using hscaled
   have hR2Target_lt :
       r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E <
         r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E := by
@@ -2697,8 +2698,8 @@ theorem portability_ratio_with_ld_decay
     · exact hRealTarget_lt
   have hSourcePos : 0 < presentDayPGSVariance V_A fstS := by
     unfold presentDayPGSVariance pgsVarianceFromHet
-    have : 0 < 1 - fstS := by linarith
-    exact mul_pos this hVA
+    have h1s : 0 < 1 - fstS := by linarith
+    exact mul_pos hVA h1s
   have hR2Source_pos : 0 < r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
     unfold r2FromSignalVariance
     have hden : 0 < presentDayPGSVariance V_A fstS + V_E := by linarith [hSourcePos, hVE]
@@ -2990,9 +2991,13 @@ theorem neutralAFBenchmarkMetricProfile_eq
       TransportedMetrics.calibratedBrier π
         (TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E) =
         targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget
+    -- `TransportedMetrics.calibratedBrier` was named TWICE in this list. The
+    -- first occurrence unfolds it; the second then fails, because by that
+    -- point the constant is gone from the goal. `unfold` is not idempotent --
+    -- it errors when a name is already absent rather than succeeding vacuously.
     unfold targetBrierFromNeutralAFBenchmark targetExactCalibratedBrierRisk
       TransportedMetrics.calibratedBrier targetR2FromNeutralAFBenchmark
-      TransportedMetrics.calibratedBrier TransportedMetrics.r2FromSignalVariance
+      TransportedMetrics.r2FromSignalVariance
       presentDayR2
     rfl
 
