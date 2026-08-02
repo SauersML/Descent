@@ -480,8 +480,13 @@ def definition_expected_freq_diff_sq():
             [call("expectedFreqDiffSq", float(fst_theory), float(x))
              for x in p0[:20000]]))
         out.append({"t_over_2Ne": tfrac, "t_generations": t, "Ne": Ne,
+                    "n_haplotypes_per_daughter": n,
+                    "n_haplotypes_ancestral": n_anc,
                     "n_sites_polymorphic_in_ancestor": int(p1.size),
                     "mean_p0_times_1_minus_p0": het0,
+                    "sampling_corrections_applied": True,
+                    "uncorrected_E_freq_diff_sq": d2_raw,
+                    "uncorrected_drift_fst": fst_drift_uncorrected,
                     "measured_E_freq_diff_sq": d2,
                     "measured_single_pop_drift_var_A": var1,
                     "measured_single_pop_drift_var_B": var2,
@@ -498,9 +503,10 @@ def definition_expected_freq_diff_sq():
         print("  t=%.2f x 2Ne  sites=%6d  E[p0(1-p0)]=%.5f" %
               (tfrac, p1.size, het0))
         print("     D2a drift F_ST: measured %.5f  theory 1-exp(-t/2Ne) %.5f  "
-              "(%+.2f%%)"
+              "(%+.2f%%)   [uncorrected estimator would say %.5f]"
               % (fst_drift_measured, fst_theory,
-                 100 * (fst_theory - fst_drift_measured) / fst_drift_measured))
+                 100 * (fst_theory - fst_drift_measured) / fst_drift_measured,
+                 fst_drift_uncorrected))
         print("     D2b E[(p1-p2)^2] = %.5f   corpus 2*F*p0(1-p0) = %.5f "
               "(%+.2f%%)   two-pop/one-pop ratio %.4f (definition says 2)"
               % (d2, pred, 100 * (pred - d2) / d2,
