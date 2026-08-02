@@ -113,6 +113,8 @@ N_EVAL = 12000          # evaluation sample: independent individuals
 H2 = 0.5
 
 
+
+
 # ---------------------------------------------------------------------------
 # inverse normal CDF (no scipy on the cluster). Acklam, |rel err| < 1.15e-9.
 # Its accuracy is checked in main() -- a bad ppf would corrupt every marginal
@@ -312,6 +314,16 @@ def residualVarianceFromSourceWeights(m, P):
 
 def explainedR2FromTransportMoments(scoreOutcomeCov, scoreVariance, outcomeVariance):
     return scoreOutcomeCov ** 2 / (scoreVariance * outcomeVariance)
+
+
+def taggingMismatchScale(recombRate, arraySparsity):
+    # DGP.lean:327 -- recombRate * arraySparsity.
+    return recombRate * arraySparsity
+
+
+def demographicCovarianceGapLowerBound(fstSource, fstTarget, recombRate,
+                                       arraySparsity, kappa):
+    return kappa * taggingMismatchScale(recombRate, arraySparsity) * (fstTarget - fstSource)
 
 
 def ldMismatchFrobenius(Sig_S, Sig_T):
@@ -733,6 +745,42 @@ def main():
 
     # =====================================================================
     print("")
+    print("E. ldMismatchFrobenius vs demographicCovarianceGapLowerBound")
+    print("   The bound is assumed, never proved: it appears only as a")
+    print("   HYPOTHESIS of covariance_mismatch_pos_of_fst_and_sparse_array.")
+    print("   It reads the F_ST DIFFERENCE fstTarget - fstSource, so it is")
+    print("   identically 0 for two populations equally diverged from one")
+    print("   ancestor -- the generic split, and exactly the case the family")
+    print("   calls ancestry-specific LD.")
+    print("   %-6s %-7s %-16s %-16s %-8s"
+          % ("fst", "ar_T", "measuredFrobenius", "bound@equalFst", "vacuous"))
+    rowsE = []
+    for (fst, arT) in ((0.05, 0.90), (0.05, 0.75), (0.15, 0.75), (0.15, 0.55)):
+        me_, _ = build_world(rng, fst, 0.90, arT, 60, world_seed=4242)
+        frob = ldMismatchFrobenius(me_["sigmaTag"]["source"], me_["sigmaTag"]["target"])
+        bound = demographicCovarianceGapLowerBound(fst, fst, 0.01, 0.1, 1.0)
+        rowsE.append({"fst_source": fst, "fst_target": fst, "ar_target": arT,
+                      "ldMismatchFrobenius": frob,
+                      "demographicCovarianceGapLowerBound_equal_fst": bound,
+                      "vacuous": bound == 0.0 and frob > 0.0})
+        print("   %-6.2f %-7.2f %-16.6g %-16.6g %-8s"
+              % (fst, arT, frob, bound, rowsE[-1]["vacuous"]))
+    e_ok = all(r["vacuous"] for r in rowsE)
+    # CONTROL: the bound is NOT identically zero -- it fires when the F_ST
+    # difference is nonzero, so the vacuity above is about the regime, not the
+    # formula.
+    nz = demographicCovarianceGapLowerBound(0.05, 0.15, 0.01, 0.1, 1.0)
+    print("   CONTROL bound at fstS=0.05, fstT=0.15: %.6g (must be > 0): %s"
+          % (nz, "PASS" if nz > 0 else "FAIL"))
+    print("   -> at equal divergence the bound is 0 while the measured LD")
+    print("      mismatch spans %.4g to %.4g: MISSING REGIME DECLARATION"
+          % (min(r["ldMismatchFrobenius"] for r in rowsE),
+             max(r["ldMismatchFrobenius"] for r in rowsE)))
+    out["E_ld_mismatch"] = {"rows": rowsE, "bound_nonzero_when_fst_differs": nz,
+                            "vacuous_at_equal_fst": bool(e_ok and nz > 0)}
+
+    # =====================================================================
+    print("")
     print("C. NOVEL TARGET-ONLY CAUSAL VARIANTS: the three target projections")
     mc, ec = build_world(rng, 0.15, 0.90, 0.55, 60, effect_shift=0.5, novel_frac=0.25)
     tp = taggingProjection(mc, "target")
@@ -754,7 +802,8 @@ def main():
 
     # =====================================================================
     ok = bool(ppf_err < 1e-8 and s1 and s1_fires and s2 and s2_fires and s3
-              and s3_fires and p1 and d_ok and c_ok and c_ok2 and p2_fires)
+              and s3_fires and p1 and d_ok and c_ok and c_ok2 and p2_fires
+              and e_ok and nz > 0)
     out["READ_THE_TEST"] = ok
     print("")
     print("READ_THE_TEST: %s" % ok)
