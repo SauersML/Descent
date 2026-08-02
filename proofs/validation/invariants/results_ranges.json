@@ -811,7 +811,7 @@
   "side": "below",
   "name": "amCorrectedPortability",
   "module": "AssortativeMatingPGS",
-  "line": 400,
+  "line": 429,
   "family": "range",
   "py": "_b.div((port_measured * ((1.0 - (r_source * h2)))), ((1.0 - (r_target * h2))))",
   "severity": 38.01247084295437
@@ -821,7 +821,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "amEquilibriumVariance",
   "module": "AssortativeMatingPGS",
-  "line": 133,
+  "line": 154,
   "family": "range",
   "py": "_b.div(V_A, ((1.0 - (r * h2))))",
   "severity": -1.0
@@ -831,7 +831,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "amInducedLD",
   "module": "AssortativeMatingPGS",
-  "line": 221,
+  "line": 242,
   "family": "range",
   "py": "_b.div((((beta_i * beta_j) * r) * h2), ((1.0 - (r * h2))))",
   "severity": -1.0
@@ -898,7 +898,7 @@
   "searched": 8000,
   "name": "amVarianceStep",
   "module": "AssortativeMatingPGS",
-  "line": 118,
+  "line": 139,
   "family": "range",
   "py": "_b.div((((V * ((1.0 + (r * h2)))) + V0)), 2.0)",
   "severity": -1.0
@@ -979,7 +979,7 @@
   "searched": 8000,
   "name": "ibdFst",
   "module": "AssortativeMatingPGS",
-  "line": 535,
+  "line": 564,
   "family": "range",
   "py": "_b.div(d, ((((4.0 * N) * sigma_sq) + d)))",
   "severity": -1.0
@@ -1530,7 +1530,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "bernoulliKLReal",
   "module": "Conclusions",
-  "line": 461,
+  "line": 472,
   "family": "range",
   "py": "((p * _b.log((_b.div(p, q)))) + (((1.0 - p)) * _b.log((_b.div(((1.0 - p)), ((1.0 - q)))))))",
   "severity": -1.0
@@ -1540,7 +1540,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "bernoulliLogLoss",
   "module": "Conclusions",
-  "line": 457,
+  "line": 468,
   "family": "range",
   "py": "(- (((p * _b.log(q)) + (((1.0 - p)) * _b.log(((1.0 - q)))))))",
   "severity": -1.0
@@ -1550,7 +1550,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "brierBernoulliRisk",
   "module": "Conclusions",
-  "line": 834,
+  "line": 845,
   "family": "range",
   "py": "Conclusions_expectedBrierScore(q, \u03b7)",
   "severity": -1.0
@@ -1667,7 +1667,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "logBernoulliRisk",
   "module": "Conclusions",
-  "line": 859,
+  "line": 870,
   "family": "range",
   "py": "Conclusions_bernoulliLogLoss(\u03b7, q)",
   "severity": -1.0
@@ -1677,7 +1677,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "sigmoid",
   "module": "Conclusions",
-  "line": 214,
+  "line": 225,
   "family": "range",
   "py": "_b.div(1.0, ((1.0 + _b.exp(((- x))))))",
   "severity": -1.0
@@ -1723,9 +1723,49 @@
   "witness": {},
   "name": "gaussianKurtosisMaf",
   "module": "CondensationUnification",
-  "line": 555,
+  "line": 570,
   "family": "range",
   "py": "_b.div(((3.0 - _b.sqrt(3.0))), 6.0)",
+  "severity": -1.0
+ },
+ "CondensationUnification.nextFloorFourthMoment": {
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
+  "name": "nextFloorFourthMoment",
+  "module": "CondensationUnification",
+  "line": 1076,
+  "family": "range",
+  "py": "_b.div((((((m8 - (4.0 * m6)) + (6.0 * m4)) - (4.0 * m2)) + 1.0)), _b.pow(((m4 - 1.0)), 2.0))",
+  "severity": -1.0
+ },
+ "CondensationUnification.squaringFixedPoint": {
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
+  "name": "squaringFixedPoint",
+  "module": "CondensationUnification",
+  "line": 1198,
+  "family": "range",
+  "py": "_b.div(((scale + _b.sqrt(((_b.pow(scale, 2.0) + 4.0))))), 2.0)",
+  "severity": -1.0
+ },
+ "CondensationUnification.squaringScaleSq": {
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
+  "name": "squaringScaleSq",
+  "module": "CondensationUnification",
+  "line": 1069,
+  "family": "range",
+  "py": "(fourthMoment - 1.0)",
+  "severity": -1.0
+ },
+ "CondensationUnification.squaringStep": {
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
+  "name": "squaringStep",
+  "module": "CondensationUnification",
+  "line": 1192,
+  "family": "range",
+  "py": "_b.div(((_b.pow(x, 2.0) - 1.0)), scale)",
   "severity": -1.0
  },
  "Conventions.betweenSubgroupVariance": {
@@ -2189,7 +2229,7 @@
   "searched": 8000,
   "name": "alleleFreqDivergenceRate",
   "module": "DGP",
-  "line": 2348,
+  "line": 2379,
   "family": "range",
   "py": "(lambda theta: (lambda bigM: _b.div(1.0, (((2.0 * Ne) * (((1.0 + theta) + bigM))))))(((4.0 * Ne) * m_rate)))(((4.0 * Ne) * mu))",
   "severity": -1.0
@@ -2238,7 +2278,7 @@
   "searched": 8000,
   "name": "calibratedBrier",
   "module": "DGP",
-  "line": 2108,
+  "line": 2139,
   "family": "range",
   "py": "((\u03c0 * ((1.0 - \u03c0))) * ((1.0 - r2)))",
   "severity": -1.0
@@ -2297,7 +2337,7 @@
   "searched": 8000,
   "name": "calibratedBrierFromVariances",
   "module": "DGP",
-  "line": 2120,
+  "line": 2151,
   "family": "range",
   "py": "((\u03c0 * ((1.0 - \u03c0))) * ((1.0 - _b.div(vSignal, ((vSignal + vResidual))))))",
   "severity": -1.0
@@ -2456,7 +2496,7 @@
   "searched": 8000,
   "name": "gaussianAUCFromSignalVariance",
   "module": "DGP",
-  "line": 2104,
+  "line": 2135,
   "family": "range",
   "py": "_b.Phi((_b.sqrt((_b.div(vSignal, ((2.0 * vNoise)))))))",
   "severity": -1.0
@@ -2466,7 +2506,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ldBreakageRate",
   "module": "DGP",
-  "line": 2354,
+  "line": 2385,
   "family": "range",
   "py": "(2.0 * r)",
   "severity": -1.0
@@ -3788,7 +3828,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "latticeBracket",
   "module": "JetBarrier",
-  "line": 146,
+  "line": 155,
   "family": "range",
   "py": "_b.div((h * _b.exp(((- \u03b4)))), ((1.0 - _b.exp(((- h))))))",
   "severity": -1.0
@@ -3798,7 +3838,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "latticeInflation",
   "module": "JetBarrier",
-  "line": 141,
+  "line": 150,
   "family": "range",
   "py": "_b.div(h, ((1.0 - _b.exp(((- h))))))",
   "severity": -1.0
@@ -5140,7 +5180,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "interceptRecalibrated",
   "module": "PGSCalibrationTheory",
-  "line": 1397,
+  "line": 1386,
   "family": "range",
   "py": "(new_intercept + pgs)",
   "severity": -1.0
@@ -5150,7 +5190,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "logisticRecalibrated",
   "module": "PGSCalibrationTheory",
-  "line": 1423,
+  "line": 1412,
   "family": "range",
   "py": "(a + (b * pgs))",
   "severity": -1.0
@@ -5160,7 +5200,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "nri",
   "module": "PGSCalibrationTheory",
-  "line": 1702,
+  "line": 1691,
   "family": "range",
   "py": "(_b.div(((up_events - down_events)), n_events) + _b.div(((down_nonevents - up_nonevents)), n_nonevents))",
   "severity": -1.0
@@ -5249,9 +5289,9 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "recalibratedCalibrationSlope",
   "module": "PGSCalibrationTheory",
-  "line": 1450,
+  "line": 1439,
   "family": "range",
-  "py": "_b.div(targetSlope, fittedSlope)",
+  "py": "_b.div(slope, fittedSlope)",
   "severity": -1.0
  },
  "PGSCalibrationTheory.recalibrationTraceMSELowerBound": {
@@ -5259,7 +5299,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "recalibrationTraceMSELowerBound",
   "module": "PGSCalibrationTheory",
-  "line": 1530,
+  "line": 1519,
   "family": "range",
   "py": "_b.div(nParams, ((nEvents * infoPerEvent)))",
   "severity": -1.0
@@ -5269,7 +5309,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "requiredEventsForRecalibration",
   "module": "PGSCalibrationTheory",
-  "line": 1539,
+  "line": 1528,
   "family": "range",
   "py": "_b.div(nParams, ((infoPerEvent * targetTraceMSE)))",
   "severity": -1.0
@@ -5279,7 +5319,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "requiredTargetCohortSizeForRecalibration",
   "module": "PGSCalibrationTheory",
-  "line": 1605,
+  "line": 1594,
   "family": "range",
   "py": "_b.div(PGSCalibrationTheory_requiredEventsForRecalibration(nParams, infoPerEvent, targetTraceMSE), prevalence)",
   "severity": -1.0
@@ -5581,48 +5621,31 @@
   "py": "_b.mx(((- 1.0)), ((1.0 - (d * ((1.0 + (f * N)))))))",
   "severity": 65.00000434294265
  },
- "PolygenicAdaptation.effectCorrelationStabilizing": {
+ "PolygenicAdaptation.effectCorrelationStabilizingDriftSelection": {
   "range": [
    -1.0,
    1.0
   ],
-  "range_why": "`effectCorrelationStabilizing` names a correlation coefficient",
+  "range_why": "`effectCorrelationStabilizingDriftSelection` names a correlation coefficient",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "proved_bound": null,
+  "proved_bound": [
+   -1,
+   1
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [
    {
     "thm": "effectCorrelation_mem_range",
-    "hyp": "0 \u2264 Ns",
-    "reason": "unknown identifier Ns"
-   },
-   {
-    "thm": "effectCorrelation_mem_range",
-    "hyp": "Ns \u2264 1",
-    "reason": "unknown identifier Ns"
-   },
-   {
-    "thm": "effectCorrelation_mem_range",
     "hyp": "0 \u2264 f * N",
     "reason": "unknown identifier f"
-   },
-   {
-    "thm": "effectCorrelationStabilizing_pos",
-    "hyp": "1 < Ns",
-    "reason": "unknown identifier Ns"
-   },
-   {
-    "thm": "effectCorrelationStabilizing_lt_one",
-    "hyp": "1 < Ns",
-    "reason": "unknown identifier Ns"
    }
   ],
   "box": {
    "d": [
     1.0,
     1000.0,
-    "meaning"
+    "theorem+meaning"
    ],
    "s": [
     1e-06,
@@ -5635,12 +5658,16 @@
     "theorem+meaning"
    ]
   },
-  "unguarded": [
-   "d"
-  ],
+  "unguarded": [],
   "box_provenance": {
    "d": [
-    "a distance or deme count is positive"
+    "a distance or deme count is positive",
+    "effectCorrelation_mem_range: 0 \u2264 d",
+    "effectCorrelation_mem_range: d \u2264 1",
+    "stabilizing_maintains_architecture: 0 < d",
+    "stabilizing_maintains_architecture: d \u2264 1",
+    "fluctuating_selection_worst_portability: 0 < d",
+    "fluctuating_selection_worst_portability: d \u2264 1"
    ],
    "s": [
     "a selection coefficient in (0,1]",
@@ -5653,7 +5680,8 @@
     "fluctuating_selection_worst_portability: 0 < N"
    ]
   },
-  "verdict": "escape",
+  "guard_not_modelled": "a theorem proves this bound but its hypotheses are outside the arithmetic fragment, so the exclusion could not be checked directly; graded conservatively",
+  "verdict": "escape-outside-theorem",
   "decided_by": "sampling + pattern search",
   "witness": {
    "d": 1000.0,
@@ -5665,12 +5693,12 @@
   "blind_coordinates": [],
   "escapes_only_where_violated": [],
   "side": "below",
-  "name": "effectCorrelationStabilizing",
+  "name": "effectCorrelationStabilizingDriftSelection",
   "module": "PolygenicAdaptation",
   "line": 288,
   "family": "range",
   "py": "(1.0 - _b.div(d, ((1.0 + (s * N)))))",
-  "severity": 26.989695700417542
+  "severity": 11.989695700417542
  },
  "PolygenicAdaptation.expectedPGSDiffVariance": {
   "verdict": "no-range",
@@ -7483,7 +7511,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "Expected_Abs_Shift",
   "module": "PortabilityDrift",
-  "line": 777,
+  "line": 779,
   "family": "range",
   "py": "(_b.sqrt((PortabilityDrift_Var_Delta_Mu(V_A, ((fstS + fstT))))) * _b.sqrt((_b.div(2.0, _b.pi))))",
   "severity": -1.0
@@ -7532,7 +7560,7 @@
   "searched": 8000,
   "name": "Var_Delta_Mu",
   "module": "PortabilityDrift",
-  "line": 773,
+  "line": 775,
   "family": "range",
   "py": "((2.0 * fst) * V_A)",
   "severity": -1.0
@@ -7542,7 +7570,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "admixtureLDBoost",
   "module": "PortabilityDrift",
-  "line": 5377,
+  "line": 5369,
   "family": "range",
   "py": "_b.div(PortabilityDrift_admixtureLDDecay(r, t_since), equilibrium_ld)",
   "severity": -1.0
@@ -7552,9 +7580,9 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "admixtureLDDecay",
   "module": "PortabilityDrift",
-  "line": 5330,
+  "line": 5322,
   "family": "range",
-  "py": "_b.pow(((1.0 - r)), generations_since)",
+  "py": "DGP_discreteRecombinationSurvival(r, generations_since)",
   "severity": -1.0
  },
  "PortabilityDrift.alleleFreqMismatchPenalty": {
@@ -7601,7 +7629,7 @@
   "searched": 8000,
   "name": "alleleFreqMismatchPenalty",
   "module": "PortabilityDrift",
-  "line": 2317,
+  "line": 2308,
   "family": "range",
   "py": "_b.exp(((- _b.absv((pTarget - pSource)))))",
   "severity": -1.0
@@ -7660,7 +7688,7 @@
   "side": "below",
   "name": "asymmetricFst",
   "module": "PortabilityDrift",
-  "line": 5268,
+  "line": 5260,
   "family": "range",
   "py": "_b.div(1.0, ((1.0 + ((4.0 * Ne) * m_into))))",
   "severity": 39.49360472935638
@@ -7670,7 +7698,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "brierRegretPoint",
   "module": "PortabilityDrift",
-  "line": 3955,
+  "line": 3947,
   "family": "range",
   "py": "(Conclusions_brierBernoulliRisk(\u03b7, q) - Conclusions_brierBernoulliRisk(\u03b7, \u03b7))",
   "severity": -1.0
@@ -7680,7 +7708,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "brierRegretRatio",
   "module": "PortabilityDrift",
-  "line": 3959,
+  "line": 3951,
   "family": "range",
   "py": "_b.div(PortabilityDrift_brierRegretPoint(\u03b7, qTarget), PortabilityDrift_brierRegretPoint(\u03b7, qSource))",
   "severity": -1.0
@@ -7739,7 +7767,7 @@
   "searched": 8000,
   "name": "covarianceDivergenceFromRetention",
   "module": "PortabilityDrift",
-  "line": 4350,
+  "line": 4342,
   "family": "range",
   "py": "(1.0 - PortabilityDrift_covarianceRetention((PortabilityDrift_freqCorrFromFst(fst)), (PortabilityDrift_ldOverlapFromSharedLD(shared_ld))))",
   "severity": -1.0
@@ -7801,7 +7829,7 @@
   "searched": 8000,
   "name": "covarianceDivergenceMutationDrift",
   "module": "PortabilityDrift",
-  "line": 4369,
+  "line": 4361,
   "family": "range",
   "py": "(fst_drift + (((1.0 - fst_drift)) * ((1.0 - shared_ld))))",
   "severity": -1.0
@@ -7857,7 +7885,7 @@
   "side": "below",
   "name": "covarianceRetention",
   "module": "PortabilityDrift",
-  "line": 4324,
+  "line": 4316,
   "family": "range",
   "py": "(freq_corr * ld_overlap)",
   "severity": 33.01029995663981
@@ -7867,7 +7895,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "effectiveSymmetricMigration",
   "module": "PortabilityDrift",
-  "line": 5309,
+  "line": 5301,
   "family": "range",
   "py": "_b.div(((m12 + m21)), 2.0)",
   "severity": -1.0
@@ -7913,7 +7941,7 @@
   "searched": 8000,
   "name": "equalVarianceGaussianAUCChart",
   "module": "PortabilityDrift",
-  "line": 3281,
+  "line": 3272,
   "family": "range",
   "py": "_b.ite(_b.cmp(1.0, '<=', r2), 1.0, PortabilityDrift_equalVarianceGaussianAUCFromExplainedR2(r2))",
   "severity": -1.0
@@ -7969,7 +7997,7 @@
   "searched": 8000,
   "name": "equalVarianceGaussianAUCFromExplainedR2",
   "module": "PortabilityDrift",
-  "line": 3235,
+  "line": 3226,
   "family": "range",
   "py": "_b.Phi((_b.sqrt((_b.div(r2, ((2.0 * ((1.0 - r2)))))))))",
   "severity": -1.0
@@ -8009,7 +8037,7 @@
   "searched": 8000,
   "name": "equalVarianceGaussianAUCFromSNR",
   "module": "PortabilityDrift",
-  "line": 3176,
+  "line": 3167,
   "family": "range",
   "py": "_b.Phi((_b.sqrt((_b.div(snr, 2.0)))))",
   "severity": -1.0
@@ -8058,9 +8086,9 @@
   "searched": 8000,
   "name": "equalVarianceGaussianAUCFromVariances",
   "module": "PortabilityDrift",
-  "line": 3188,
+  "line": 3179,
   "family": "range",
-  "py": "_b.Phi((_b.sqrt((_b.div(vSignal, ((2.0 * vEnv)))))))",
+  "py": "DGP_gaussianAUCFromSignalVariance(vSignal, vEnv)",
   "severity": -1.0
  },
  "PortabilityDrift.exactCalibratedBrierRiskFromR2": {
@@ -8068,9 +8096,9 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "exactCalibratedBrierRiskFromR2",
   "module": "PortabilityDrift",
-  "line": 3060,
+  "line": 3051,
   "family": "range",
-  "py": "((\u03c0 * ((1.0 - \u03c0))) * ((1.0 - r2)))",
+  "py": "DGP_calibratedBrier(\u03c0, r2)",
   "severity": -1.0
  },
  "PortabilityDrift.expectedR2": {
@@ -8078,7 +8106,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "expectedR2",
   "module": "PortabilityDrift",
-  "line": 935,
+  "line": 887,
   "family": "range",
   "py": "_b.div(vSignal, ((vSignal + V_E)))",
   "severity": -1.0
@@ -8088,7 +8116,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "expectedSqMeanPGSDiff_IMEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4074,
+  "line": 4066,
   "family": "range",
   "py": "PortabilityDrift_Var_Delta_Mu(V_A, ((2.0 * PortabilityDrift_twoDemeIMEquilibriumDelta(M))))",
   "severity": -1.0
@@ -8098,7 +8126,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "expectedSqMeanPGSDiff_pureSplit",
   "module": "PortabilityDrift",
-  "line": 4064,
+  "line": 4056,
   "family": "range",
   "py": "PortabilityDrift_Var_Delta_Mu(V_A, ((fstS + fstT)))",
   "severity": -1.0
@@ -8108,7 +8136,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "freqCorrFromFst",
   "module": "PortabilityDrift",
-  "line": 4334,
+  "line": 4326,
   "family": "range",
   "py": "(1.0 - fst)",
   "severity": -1.0
@@ -8266,7 +8294,7 @@
   "searched": 8000,
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4803,
+  "line": 4795,
   "family": "range",
   "py": "PortabilityDrift_ibdRecurrenceFixedPoint(Ne, m)",
   "severity": -1.0
@@ -8343,7 +8371,7 @@
   "searched": 8000,
   "name": "fstMigDriftEquil",
   "module": "PortabilityDrift",
-  "line": 5474,
+  "line": 5466,
   "family": "range",
   "py": "_b.div(1.0, ((((4.0 * Ne) * m) + 1.0)))",
   "severity": -1.0
@@ -8402,7 +8430,7 @@
   "searched": 8000,
   "name": "fstMigDriftNext",
   "module": "PortabilityDrift",
-  "line": 5439,
+  "line": 5431,
   "family": "range",
   "py": "(((((1.0 - (2.0 * m)) - _b.div(1.0, ((2.0 * Ne))))) * Fst) + _b.div(1.0, ((2.0 * Ne))))",
   "severity": -1.0
@@ -8498,7 +8526,7 @@
   "searched": 8000,
   "name": "fstMigrationDriftEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4645,
+  "line": 4637,
   "family": "range",
   "py": "_b.div(1.0, ((1.0 + ((4.0 * Ne) * m))))",
   "severity": -1.0
@@ -8553,7 +8581,7 @@
   "searched": 8000,
   "name": "hetMutationFloor",
   "module": "PortabilityDrift",
-  "line": 460,
+  "line": 465,
   "family": "range",
   "py": "_b.div(((4.0 * Ne) * mu), ((1.0 + ((4.0 * Ne) * mu))))",
   "severity": -1.0
@@ -8623,7 +8651,7 @@
   "side": "below",
   "name": "hetStepWithMutation",
   "module": "PortabilityDrift",
-  "line": 435,
+  "line": 440,
   "family": "range",
   "py": "((((1.0 - _b.div(1.0, ((2.0 * Ne))))) * H) + ((2.0 * mu) * ((1.0 - H))))",
   "severity": 35.00434055699428
@@ -8682,7 +8710,7 @@
   "side": "above",
   "name": "hudsonFstFromCoalescenceTimes",
   "module": "PortabilityDrift",
-  "line": 236,
+  "line": 241,
   "family": "range",
   "py": "(1.0 - _b.div(ETss, ETst))",
   "severity": 55.000004342942646
@@ -8692,7 +8720,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ibdFlowStep",
   "module": "PortabilityDrift",
-  "line": 4170,
+  "line": 4162,
   "family": "range",
   "py": "((F + _b.div(((1.0 - F)), ((2.0 * Ne)))) - ((2.0 * rate) * F))",
   "severity": -1.0
@@ -8702,7 +8730,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ibdRecurrenceFixedPoint",
   "module": "PortabilityDrift",
-  "line": 4696,
+  "line": 4688,
   "family": "range",
   "py": "_b.div(_b.pow(((1.0 - rate)), 2.0), ((_b.pow(((1.0 - rate)), 2.0) + (((2.0 * Ne) * rate) * ((2.0 - rate))))))",
   "severity": -1.0
@@ -8712,7 +8740,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ibdRecurrenceStep",
   "module": "PortabilityDrift",
-  "line": 4683,
+  "line": 4675,
   "family": "range",
   "py": "(_b.pow(((1.0 - rate)), 2.0) * ((_b.div(1.0, ((2.0 * Ne))) + (((1.0 - _b.div(1.0, ((2.0 * Ne))))) * x))))",
   "severity": -1.0
@@ -8781,7 +8809,7 @@
   "side": "below",
   "name": "islandFstMultiplicativeStep",
   "module": "PortabilityDrift",
-  "line": 4786,
+  "line": 4778,
   "family": "range",
   "py": "PortabilityDrift_ibdRecurrenceStep(Ne, m, F)",
   "severity": 35.00434054896873
@@ -8839,7 +8867,7 @@
   "searched": 8000,
   "name": "ldCorrelationDecay",
   "module": "PortabilityDrift",
-  "line": 2105,
+  "line": 2096,
   "family": "range",
   "py": "_b.exp(((- (((v_lambda * fstGap) * distance)))))",
   "severity": -1.0
@@ -8849,7 +8877,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ldOverlapFromSharedLD",
   "module": "PortabilityDrift",
-  "line": 4338,
+  "line": 4330,
   "family": "range",
   "py": "shared_ld",
   "severity": -1.0
@@ -8859,7 +8887,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "logLossRegretPoint",
   "module": "PortabilityDrift",
-  "line": 3976,
+  "line": 3968,
   "family": "range",
   "py": "(Conclusions_bernoulliLogLoss(\u03b7, q) - Conclusions_bernoulliLogLoss(\u03b7, \u03b7))",
   "severity": -1.0
@@ -8869,7 +8897,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "logLossRegretRatio",
   "module": "PortabilityDrift",
-  "line": 3980,
+  "line": 3972,
   "family": "range",
   "py": "_b.div(PortabilityDrift_logLossRegretPoint(\u03b7, qTarget), PortabilityDrift_logLossRegretPoint(\u03b7, qSource))",
   "severity": -1.0
@@ -8879,7 +8907,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "neutralAFBenchmarkFromRecurrence",
   "module": "PortabilityDrift",
-  "line": 5556,
+  "line": 5548,
   "family": "range",
   "py": "(1.0 - PortabilityDrift_fstMigDriftEquil(Ne, m))",
   "severity": -1.0
@@ -8889,7 +8917,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "neutralAFBenchmarkRatio",
   "module": "PortabilityDrift",
-  "line": 2977,
+  "line": 2968,
   "family": "range",
   "py": "_b.div(((1.0 - fstTarget)), ((1.0 - fstSource)))",
   "severity": -1.0
@@ -8899,7 +8927,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "neutralAFSharedLDBenchmarkRatio",
   "module": "PortabilityDrift",
-  "line": 4500,
+  "line": 4492,
   "family": "range",
   "py": "_b.div(((((1.0 - fstTarget)) * shared_ld_target)), ((((1.0 - fstSource)) * shared_ld_source)))",
   "severity": -1.0
@@ -9015,7 +9043,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "pgsVarianceFromHet",
   "module": "PortabilityDrift",
-  "line": 628,
+  "line": 633,
   "family": "range",
   "py": "(\u03b2_sq_sum * het)",
   "severity": -1.0
@@ -9078,7 +9106,7 @@
   "searched": 8000,
   "name": "presentDayEqualVarianceGaussianAUC",
   "module": "PortabilityDrift",
-  "line": 952,
+  "line": 956,
   "family": "range",
   "py": "PortabilityDrift_presentDayGaussianAUC(V_A, V_E, fst)",
   "severity": -1.0
@@ -9140,7 +9168,7 @@
   "searched": 8000,
   "name": "presentDayGaussianAUC",
   "module": "PortabilityDrift",
-  "line": 943,
+  "line": 947,
   "family": "range",
   "py": "_b.Phi((_b.sqrt((_b.div(PortabilityDrift_presentDaySignalToNoise(V_A, V_E, fst), 2.0)))))",
   "severity": -1.0
@@ -9150,9 +9178,9 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "presentDayPGSVariance",
   "module": "PortabilityDrift",
-  "line": 689,
+  "line": 692,
   "family": "range",
-  "py": "(((1.0 - fst)) * V_A)",
+  "py": "PortabilityDrift_pgsVarianceFromHet(V_A, ((1.0 - fst)))",
   "severity": -1.0
  },
  "PortabilityDrift.presentDayPGSVarianceMutationDrift": {
@@ -9236,7 +9264,7 @@
   "searched": 8000,
   "name": "presentDayPGSVarianceMutationDrift",
   "module": "PortabilityDrift",
-  "line": 4425,
+  "line": 4417,
   "family": "range",
   "py": "(((1.0 - PortabilityDrift_covarianceDivergenceMutationDrift(fst_drift, shared_ld))) * V_A)",
   "severity": -1.0
@@ -9246,9 +9274,9 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "presentDayR2",
   "module": "PortabilityDrift",
-  "line": 887,
+  "line": 895,
   "family": "range",
-  "py": "(lambda v: _b.div(v, ((v + V_E))))(PortabilityDrift_presentDayPGSVariance(V_A, fst))",
+  "py": "PortabilityDrift_expectedR2((PortabilityDrift_presentDayPGSVariance(V_A, fst)), V_E)",
   "severity": -1.0
  },
  "PortabilityDrift.presentDayR2MutationDrift": {
@@ -9256,7 +9284,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "presentDayR2MutationDrift",
   "module": "PortabilityDrift",
-  "line": 4470,
+  "line": 4462,
   "family": "range",
   "py": "(lambda v: _b.div(v, ((v + V_E))))(PortabilityDrift_presentDayPGSVarianceMutationDrift(V_A, fst_drift, shared_ld))",
   "severity": -1.0
@@ -9266,7 +9294,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "presentDaySignalToNoise",
   "module": "PortabilityDrift",
-  "line": 876,
+  "line": 878,
   "family": "range",
   "py": "_b.div(PortabilityDrift_presentDayPGSVariance(V_A, fst), V_E)",
   "severity": -1.0
@@ -9276,7 +9304,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "realWorldPGSVariance",
   "module": "PortabilityDrift",
-  "line": 1094,
+  "line": 1098,
   "family": "range",
   "py": "((rhoSq * ((1.0 - fst))) * V_A)",
   "severity": -1.0
@@ -9346,7 +9374,7 @@
   "searched": 8000,
   "name": "retainedSignalVarianceMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 5157,
+  "line": 5149,
   "family": "range",
   "py": "(PortabilityDrift_signalRetentionMigrationDrift(Ne, m) * V_A)",
   "severity": -1.0
@@ -9356,7 +9384,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "scaledMigrationRate",
   "module": "PortabilityDrift",
-  "line": 4835,
+  "line": 4827,
   "family": "range",
   "py": "((4.0 * Ne) * m)",
   "severity": -1.0
@@ -9409,7 +9437,7 @@
   "searched": 8000,
   "name": "sharedLDFromMigration",
   "module": "PortabilityDrift",
-  "line": 5082,
+  "line": 5074,
   "family": "range",
   "py": "_b.div(M, ((1.0 + M)))",
   "severity": -1.0
@@ -9459,7 +9487,7 @@
   "searched": 8000,
   "name": "sharedLD_from_equilibrium",
   "module": "PortabilityDrift",
-  "line": 5056,
+  "line": 5048,
   "family": "range",
   "py": "(1.0 - PortabilityDrift_fstMigrationDriftEquilibrium(Ne, m))",
   "severity": -1.0
@@ -9524,7 +9552,7 @@
   "searched": 8000,
   "name": "signalRetentionMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 5146,
+  "line": 5138,
   "family": "range",
   "py": "(((1.0 - PortabilityDrift_fstMigrationDriftEquilibrium(Ne, m))) * PortabilityDrift_sharedLDFromMigration((PortabilityDrift_scaledMigrationRate(Ne, m))))",
   "severity": -1.0
@@ -9576,7 +9604,7 @@
   "searched": 8000,
   "name": "sourceBrierFromR2",
   "module": "PortabilityDrift",
-  "line": 3082,
+  "line": 3073,
   "family": "range",
   "py": "PortabilityDrift_exactCalibratedBrierRiskFromR2(\u03c0, r2Source)",
   "severity": -1.0
@@ -9648,7 +9676,7 @@
   "searched": 8000,
   "name": "steppingStoneFst",
   "module": "PortabilityDrift",
-  "line": 4971,
+  "line": 4963,
   "family": "range",
   "py": "_b.mn(1.0, ((fst_neighbor * ((1.0 + (\u03b1 * ((d - 1.0))))))))",
   "severity": -1.0
@@ -9719,7 +9747,7 @@
   "searched": 8000,
   "name": "targetBrierFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3102,
+  "line": 3093,
   "family": "range",
   "py": "PortabilityDrift_targetExactCalibratedBrierRisk(\u03c0, V_A, V_E, fstTarget)",
   "severity": -1.0
@@ -9729,7 +9757,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "targetExactCalibratedBrierRisk",
   "module": "PortabilityDrift",
-  "line": 3095,
+  "line": 3086,
   "family": "range",
   "py": "PortabilityDrift_exactCalibratedBrierRiskFromR2(\u03c0, (PortabilityDrift_targetR2FromNeutralAFBenchmark(V_A, V_E, fstTarget)))",
   "severity": -1.0
@@ -9791,7 +9819,7 @@
   "searched": 8000,
   "name": "targetExactGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3831,
+  "line": 3823,
   "family": "range",
   "py": "PortabilityDrift_targetGaussianAUCFromNeutralAFBenchmark(V_A, V_E, fstTarget)",
   "severity": -1.0
@@ -9849,7 +9877,7 @@
   "searched": 8000,
   "name": "targetGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3069,
+  "line": 3060,
   "family": "range",
   "py": "PortabilityDrift_presentDayGaussianAUC(V_A, V_E, fstTarget)",
   "severity": -1.0
@@ -9859,19 +9887,9 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "targetHetFromFst",
   "module": "PortabilityDrift",
-  "line": 653,
+  "line": 658,
   "family": "range",
   "py": "(het_source * ((1.0 - fst)))",
-  "severity": -1.0
- },
- "PortabilityDrift.targetPGSVariance": {
-  "verdict": "no-range",
-  "reason": "name and docstring commit the definition to no particular range",
-  "name": "targetPGSVariance",
-  "module": "PortabilityDrift",
-  "line": 679,
-  "family": "range",
-  "py": "PortabilityDrift_pgsVarianceFromHet(V_A, ((1.0 - fst)))",
   "severity": -1.0
  },
  "PortabilityDrift.targetR2FromNeutralAFBenchmark": {
@@ -9879,7 +9897,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "targetR2FromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 2903,
+  "line": 2894,
   "family": "range",
   "py": "PortabilityDrift_presentDayR2(V_A, V_E, fstTarget)",
   "severity": -1.0
@@ -9889,7 +9907,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "twoDemeIMEquilibriumDelta",
   "module": "PortabilityDrift",
-  "line": 314,
+  "line": 319,
   "family": "range",
   "py": "_b.div(1.0, (((2.0 * M) + 1.0)))",
   "severity": -1.0
@@ -9899,7 +9917,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "twoDemeIMEquilibriumETss",
   "module": "PortabilityDrift",
-  "line": 289,
+  "line": 294,
   "family": "range",
   "py": "2.0",
   "severity": -1.0
@@ -9909,7 +9927,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "twoDemeIMEquilibriumETst",
   "module": "PortabilityDrift",
-  "line": 296,
+  "line": 301,
   "family": "range",
   "py": "_b.div((((2.0 * M) + 1.0)), M)",
   "severity": -1.0
@@ -9919,7 +9937,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "twoDemeIMFirstStepDiff",
   "module": "PortabilityDrift",
-  "line": 277,
+  "line": 282,
   "family": "range",
   "py": "(_b.div(1.0, M) + ETss)",
   "severity": -1.0
@@ -9929,7 +9947,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "twoDemeIMFirstStepSame",
   "module": "PortabilityDrift",
-  "line": 269,
+  "line": 274,
   "family": "range",
   "py": "(_b.div(1.0, ((1.0 + M))) + ((_b.div(M, ((1.0 + M)))) * ETst))",
   "severity": -1.0
@@ -9978,7 +9996,7 @@
   "searched": 8000,
   "name": "wrightFisherDriftRetention",
   "module": "PortabilityDrift",
-  "line": 710,
+  "line": 712,
   "family": "range",
   "py": "_b.pow(((1.0 - _b.div(1.0, ((2.0 * N))))), t)",
   "severity": -1.0
@@ -9988,7 +10006,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "wrightFisherHeterozygosityLoss",
   "module": "PortabilityDrift",
-  "line": 730,
+  "line": 732,
   "family": "range",
   "py": "(1.0 - PortabilityDrift_wrightFisherDriftRetention(N, t))",
   "severity": -1.0
@@ -10431,7 +10449,7 @@
   "range_why": "`effectCorrelationStabilizing` names a correlation coefficient",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
   "proved_bound": [
-   -1,
+   0,
    1
   ],
   "bounding_theorems": [
@@ -10448,18 +10466,7 @@
     "1 < Ns"
    ]
   },
-  "unmodelled_hypotheses": [
-   {
-    "thm": "effectCorrelation_mem_range",
-    "hyp": "0 \u2264 s * N",
-    "reason": "unknown identifier s"
-   },
-   {
-    "thm": "effectCorrelation_mem_range",
-    "hyp": "0 \u2264 f * N",
-    "reason": "unknown identifier f"
-   }
-  ],
+  "unmodelled_hypotheses": [],
   "box": {
    "Ns": [
     1.0,
@@ -10471,12 +10478,6 @@
   "box_provenance": {
    "Ns": [
     "a sample / variant count is a positive integer",
-    "effectCorrelation_mem_range: 0 \u2264 d",
-    "effectCorrelation_mem_range: d \u2264 1",
-    "stabilizing_maintains_architecture: 0 < d",
-    "stabilizing_maintains_architecture: d \u2264 1",
-    "fluctuating_selection_worst_portability: 0 < d",
-    "fluctuating_selection_worst_portability: d \u2264 1",
     "effect_correlation_increases_with_Ns: 1 < Ns\u2081",
     "effectCorrelationStabilizing_pos: 1 < Ns",
     "effectCorrelationStabilizing_lt_one: 1 < Ns",
@@ -11056,7 +11057,7 @@
   "module": "TransferLearningPGS",
   "line": 77,
   "family": "range",
-  "py": "_b.div(_b.pow(cov_pgs_y, 2.0), ((var_pgs * var_y)))",
+  "py": "DGP_explainedR2FromTransportMoments(cov_pgs_y, var_pgs, var_y)",
   "severity": -1.0
  },
  "TransferLearningPGS.pinskerAncestryDivergenceCap": {
@@ -11364,7 +11365,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "liabilityScaleH2",
   "module": "VarianceComponents",
-  "line": 437,
+  "line": 435,
   "family": "range",
   "py": "_b.div(((h2_observed * prevalence) * ((1.0 - prevalence))), _b.pow(z_height, 2.0))",
   "severity": -1.0
@@ -11387,6 +11388,12 @@
   "line": 55,
   "family": "range",
   "py": "_b.div(V_A_tagged, V_P)",
+  "severity": -1.0
+ },
+ "AssortativeMatingPGS.AssortativeMatingModel.h2": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "range",
   "severity": -1.0
  },
  "AssortativeMatingPGS.AssortativeMatingModel.equilibriumVariance": {
@@ -11486,6 +11493,12 @@
   "severity": -1.0
  },
  "Conclusions.exactBrierRiskOfCalibrated": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "Conclusions.PosteriorPrediction.prob_mode": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
@@ -11685,7 +11698,7 @@
  },
  "DGP.frobeniusNormSq": {
   "verdict": "not-transpiled",
-  "reason": "non-arithmetic construct",
+  "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
@@ -12411,7 +12424,7 @@
  },
  "LDDecayTheory.ldMismatchFrobenius": {
   "verdict": "not-transpiled",
-  "reason": "trailing tokens at [('op', '('), ('ident', 'Sig_S'), ('op', '-'), ('ident', 'Sig_T')]",
+  "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
@@ -12490,6 +12503,36 @@
  "MetricSpecificPortability.ldBandReconstructionShare": {
   "verdict": "not-transpiled",
   "reason": "unknown identifier Real.tan",
+  "family": "range",
+  "severity": -1.0
+ },
+ "MetricSpecificPortability.targetCorrectionCurvature": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u03b9 \u2192 \u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "MetricSpecificPortability.targetCorrectionOptimum": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u03b9 \u2192 \u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "MetricSpecificPortability.sharedCorrectionConsensus": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "MetricSpecificPortability.sharedCorrectionSpread": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "MetricSpecificPortability.sharedCorrectionCost": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
@@ -12829,51 +12872,39 @@
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetObservedMean": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.observedMean": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetPredictedMean": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.predictedMean": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.sourceCalibrationMoments": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.calibrationMoments": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (CalibrationMoments where meanObserved)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetCalibrationMoments": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CalibrationMoments)",
-  "family": "range",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.sourceCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.calibrationProfile": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (CalibrationProfile)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.identityCalibrationProfile": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (CalibrationProfile)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.deploymentIntercept": {
   "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CalibrationProfile)",
-  "family": "range",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CalibrationProfile)",
+  "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
@@ -12883,13 +12914,7 @@
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceScoreMean": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetScoreMean": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.scoreMean": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
@@ -12901,31 +12926,19 @@
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourcePredictedMean": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.predictedMean": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetPredictedMean": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.observedMean": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetObservedMean": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.calibrationSlope": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
@@ -12933,31 +12946,31 @@
  },
  "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.toShiftModel": {
   "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CrossPopulationCalibrationShiftModel where sourceObservedMean)",
+  "reason": "non-scalar signature (CrossPopulationCalibrationShiftModel where baseObservedMean)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.calibrationProfile": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (CalibrationProfile)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (CalibrationProfile)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.tagMeanAt": {
   "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CalibrationProfile)",
+  "reason": "non-scalar signature (Fin p \u2192 \u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt": {
   "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CalibrationProfile)",
+  "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
@@ -12967,13 +12980,7 @@
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.sourceScoreMeanAt": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.targetScoreMeanAt": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.scoreMeanAt": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
@@ -12985,19 +12992,13 @@
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.sourcePredictedMeanAt": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.predictedMeanAt": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.targetObservedMeanAt": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.observedMeanAt": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
@@ -13221,7 +13222,7 @@
  },
  "PolygenicArchitecture.uniformCatastrophicPortabilityScore": {
   "verdict": "not-transpiled",
-  "reason": "bad char ':'",
+  "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
@@ -13282,6 +13283,12 @@
  "PolygenicSpectroscopy.hweCodingInvariants": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (CodingInvariants where drift)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "PolygenicSpectroscopy.HardyWeinbergModel.standardizedFourthMoment": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
@@ -13405,7 +13412,7 @@
   "family": "range",
   "severity": -1.0
  },
- "PortabilityDrift.sigmaTagCausal": {
+ "PortabilityDrift.sigmaTagCausalSourceAt": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (Matrix (Fin p) (Fin q) \u211d)",
   "family": "range",
@@ -13519,37 +13526,19 @@
   "family": "range",
   "severity": -1.0
  },
- "PortabilityDrift.sourceScoreVarianceFromExplicitDrivers": {
+ "PortabilityDrift.scoreVarianceFromSourceWeights": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PortabilityDrift.targetScoreVarianceFromSourceWeights": {
+ "PortabilityDrift.predictiveCovarianceFromSourceWeights": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PortabilityDrift.sourcePredictiveCovarianceFromSourceWeights": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PortabilityDrift.targetPredictiveCovarianceFromSourceWeights": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PortabilityDrift.sourceCalibrationSlopeFromSourceWeights": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PortabilityDrift.targetCalibrationSlopeFromSourceWeights": {
+ "PortabilityDrift.calibrationSlopeFromSourceWeights": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
@@ -13591,49 +13580,37 @@
   "family": "range",
   "severity": -1.0
  },
- "PortabilityDrift.effectiveTargetOutcomeVariance": {
+ "PortabilityDrift.residualBurden": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PortabilityDrift.sourceExplainedSignalVarianceFromSourceWeights": {
+ "PortabilityDrift.effectiveOutcomeVariance": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PortabilityDrift.sourceR2FromSourceWeights": {
+ "PortabilityDrift.explainedSignalVarianceFromSourceWeights": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
- "PortabilityDrift.sourceResidualVarianceFromSourceWeights": {
+ "PortabilityDrift.r2FromSourceWeights": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "PortabilityDrift.residualVarianceFromSourceWeights": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },
  "PortabilityDrift.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PortabilityDrift.targetExplainedSignalVarianceFromSourceWeights": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PortabilityDrift.targetR2FromSourceWeights": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PortabilityDrift.targetResidualVarianceFromSourceWeights": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
@@ -13837,13 +13814,7 @@
   "family": "range",
   "severity": -1.0
  },
- "PortabilityDrift.sourceEqualVarianceGaussianAUCFromSourceWeights": {
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "range",
-  "severity": -1.0
- },
- "PortabilityDrift.targetEqualVarianceGaussianAUCFromSourceWeights": {
+ "PortabilityDrift.equalVarianceGaussianAUCFromSourceWeights": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
   "family": "range",
@@ -14212,6 +14183,18 @@
  "ProjectionShiftBounds.HasThresholdSetAtEveryRank": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (Prop)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "ProjectionShiftBounds.sharedCorrectionOptimum": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "ProjectionShiftBounds.irreducibleDegradation": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
   "family": "range",
   "severity": -1.0
  },

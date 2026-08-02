@@ -32,14 +32,58 @@ STOP_RE = re.compile(
     r"open\s|import\s|variable\s|class\s|axiom\s|#|\.\.\.)"
 )
 
-BINDER_RE = re.compile(r"\(([^():]*):\s*([^()]*)\)")
+def _binder_groups(sig: str):
+    """Split a signature into top-level bracket groups, paren-depth aware.
+
+    A regex cannot do this.  `(T : (Fin k → ℝ) → ℝ)` has parentheses INSIDE
+    the type, and a pattern like `\(([^():]*):\s*([^()]*)\)` simply fails to
+    match it -- so the binder was dropped, silently, and every argument after
+    it shifted by one in the generated callable.  The definition then either
+    took the wrong number of arguments or, where the arities happened to line
+    up, computed a different function under the right name.
+    """
+    groups, depth, start = [], 0, None
+    for i, ch in enumerate(sig):
+        if ch in "({[":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch in ")}]":
+            depth -= 1
+            if depth == 0 and start is not None:
+                groups.append(sig[start:i + 1])
+                start = None
+    return groups
 
 
 def _params(sig: str):
-    """Parse `(a b : ℝ) (n : ℕ) : ℝ` into ([(a,ℝ),(b,ℝ),(n,ℕ)], 'ℝ')."""
-    params = []
-    for names, ty in BINDER_RE.findall(sig):
-        ty = ty.strip()
+    """Parse `(a b : ℝ) (n : ℕ) : ℝ` into ([(a,ℝ),(b,ℝ),(n,ℕ)], [], 'ℝ')."""
+    params, implicit = [], []
+    for g in _binder_groups(sig):
+        inner = g[1:-1]
+        # split on the FIRST top-level colon only; the type may contain more
+        depth, cut = 0, -1
+        for i, ch in enumerate(inner):
+            if ch in "({[":
+                depth += 1
+            elif ch in ")}]":
+                depth -= 1
+            elif ch == ":" and depth == 0:
+                cut = i
+                break
+        if cut < 0:
+            continue
+        names, ty = inner[:cut], inner[cut + 1:].strip()
+        if g[0] in "{[":
+            # Implicit and instance binders are INFERRED by Lean and do not
+            # appear at call sites, so they must not count toward arity --
+            # including them makes every call to the definition look like it
+            # is missing an argument.  They are recorded separately because
+            # the BODY may still reference them, and a body that does is one
+            # this tier cannot evaluate.
+            for nm in names.split():
+                implicit.append((nm, ty or "instance"))
+            continue
         for nm in names.split():
             params.append((nm, ty))
     # return type = after the LAST top-level colon
@@ -54,7 +98,7 @@ def _params(sig: str):
             ret = sig[i + 1 :]
     if ret is not None:
         ret = ret.split(":=")[0].strip()
-    return params, ret
+    return params, implicit, ret
 
 
 def _docstring(lines, i):
@@ -118,7 +162,7 @@ def extract_file(path: pathlib.Path):
                 break
             body_lines.append(ln.strip())
             i += 1
-        params, ret = _params(sig)
+        params, implicit, ret = _params(sig)
         out.append(
             dict(
                 name=name,
@@ -126,6 +170,7 @@ def extract_file(path: pathlib.Path):
                 path=str(path.relative_to(CAL.parent.parent)),
                 line=start + 1,
                 params=params,
+                implicit_params=implicit,
                 ret=ret,
                 doc=_docstring(lines, start),
                 body="\n".join(body_lines).strip(),

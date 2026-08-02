@@ -452,7 +452,7 @@
  "AssortativeMatingPGS.amCorrectedPortability": {
   "name": "amCorrectedPortability",
   "module": "AssortativeMatingPGS",
-  "line": 400,
+  "line": 429,
   "registered": [
    "range"
   ],
@@ -466,7 +466,7 @@
  "AssortativeMatingPGS.amEquilibriumVariance": {
   "name": "amEquilibriumVariance",
   "module": "AssortativeMatingPGS",
-  "line": 133,
+  "line": 154,
   "registered": [
    "continuity"
   ],
@@ -490,7 +490,7 @@
  "AssortativeMatingPGS.amInducedLD": {
   "name": "amInducedLD",
   "module": "AssortativeMatingPGS",
-  "line": 221,
+  "line": 242,
   "registered": [
    "continuity"
   ],
@@ -517,7 +517,7 @@
  "AssortativeMatingPGS.amVarianceStep": {
   "name": "amVarianceStep",
   "module": "AssortativeMatingPGS",
-  "line": 118,
+  "line": 139,
   "registered": [
    "continuity",
    "range"
@@ -553,7 +553,7 @@
  "AssortativeMatingPGS.ibdFst": {
   "name": "ibdFst",
   "module": "AssortativeMatingPGS",
-  "line": 535,
+  "line": 564,
   "registered": [
    "continuity",
    "range"
@@ -964,7 +964,7 @@
  "Conclusions.bernoulliKLReal": {
   "name": "bernoulliKLReal",
   "module": "Conclusions",
-  "line": 461,
+  "line": 472,
   "registered": [
    "continuity"
   ],
@@ -987,7 +987,7 @@
  "Conclusions.bernoulliLogLoss": {
   "name": "bernoulliLogLoss",
   "module": "Conclusions",
-  "line": 457,
+  "line": 468,
   "registered": [
    "continuity"
   ],
@@ -1010,7 +1010,7 @@
  "Conclusions.brierBernoulliRisk": {
   "name": "brierBernoulliRisk",
   "module": "Conclusions",
-  "line": 834,
+  "line": 845,
   "registered": [
    "continuity"
   ],
@@ -1092,7 +1092,7 @@
  "Conclusions.logBernoulliRisk": {
   "name": "logBernoulliRisk",
   "module": "Conclusions",
-  "line": 859,
+  "line": 870,
   "registered": [
    "continuity"
   ],
@@ -1112,7 +1112,7 @@
  "Conclusions.sigmoid": {
   "name": "sigmoid",
   "module": "Conclusions",
-  "line": 214,
+  "line": 225,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -1156,7 +1156,7 @@
  "CondensationUnification.gaussianKurtosisMaf": {
   "name": "gaussianKurtosisMaf",
   "module": "CondensationUnification",
-  "line": 555,
+  "line": 570,
   "registered": [
    "range"
   ],
@@ -1179,6 +1179,51 @@
    "scale-by-three"
   ],
   "reason": null
+ },
+ "CondensationUnification.nextFloorFourthMoment": {
+  "name": "nextFloorFourthMoment",
+  "module": "CondensationUnification",
+  "line": 1076,
+  "registered": [],
+  "covered": false,
+  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+ },
+ "CondensationUnification.squaringFixedPoint": {
+  "name": "squaringFixedPoint",
+  "module": "CondensationUnification",
+  "line": 1198,
+  "registered": [
+   "continuity"
+  ],
+  "n_mutants": 5,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
+  "survived": [
+   "const-off-by-one",
+   "negate",
+   "swap-plus-minus",
+   "shift-by-half",
+   "scale-by-three"
+  ],
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+ },
+ "CondensationUnification.squaringScaleSq": {
+  "name": "squaringScaleSq",
+  "module": "CondensationUnification",
+  "line": 1069,
+  "registered": [],
+  "covered": false,
+  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+ },
+ "CondensationUnification.squaringStep": {
+  "name": "squaringStep",
+  "module": "CondensationUnification",
+  "line": 1192,
+  "registered": [],
+  "covered": false,
+  "reason": "no check on this definition currently holds, so there is nothing to falsify"
  },
  "Conventions.betweenSubgroupVariance": {
   "name": "betweenSubgroupVariance",
@@ -1507,7 +1552,7 @@
  "DGP.alleleFreqDivergenceRate": {
   "name": "alleleFreqDivergenceRate",
   "module": "DGP",
-  "line": 2348,
+  "line": 2379,
   "registered": [
    "continuity",
    "range"
@@ -1549,7 +1594,7 @@
  "DGP.calibratedBrier": {
   "name": "calibratedBrier",
   "module": "DGP",
-  "line": 2108,
+  "line": 2139,
   "registered": [
    "continuity",
    "range"
@@ -1591,7 +1636,7 @@
  "DGP.calibratedBrierFromVariances": {
   "name": "calibratedBrierFromVariances",
   "module": "DGP",
-  "line": 2120,
+  "line": 2151,
   "registered": [
    "continuity",
    "range"
@@ -1711,7 +1756,7 @@
  "DGP.gaussianAUCFromSignalVariance": {
   "name": "gaussianAUCFromSignalVariance",
   "module": "DGP",
-  "line": 2104,
+  "line": 2135,
   "registered": [
    "continuity",
    "range",
@@ -1760,7 +1805,7 @@
  "DGP.ldBreakageRate": {
   "name": "ldBreakageRate",
   "module": "DGP",
-  "line": 2354,
+  "line": 2385,
   "registered": [
    "continuity"
   ],
@@ -3272,7 +3317,7 @@
  "JetBarrier.latticeBracket": {
   "name": "latticeBracket",
   "module": "JetBarrier",
-  "line": 146,
+  "line": 155,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -3280,7 +3325,7 @@
  "JetBarrier.latticeInflation": {
   "name": "latticeInflation",
   "module": "JetBarrier",
-  "line": 141,
+  "line": 150,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -4112,7 +4157,7 @@
  "PGSCalibrationTheory.interceptRecalibrated": {
   "name": "interceptRecalibrated",
   "module": "PGSCalibrationTheory",
-  "line": 1397,
+  "line": 1386,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -4120,7 +4165,7 @@
  "PGSCalibrationTheory.logisticRecalibrated": {
   "name": "logisticRecalibrated",
   "module": "PGSCalibrationTheory",
-  "line": 1423,
+  "line": 1412,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -4128,7 +4173,7 @@
  "PGSCalibrationTheory.nri": {
   "name": "nri",
   "module": "PGSCalibrationTheory",
-  "line": 1702,
+  "line": 1691,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -4158,7 +4203,7 @@
  "PGSCalibrationTheory.recalibratedCalibrationSlope": {
   "name": "recalibratedCalibrationSlope",
   "module": "PGSCalibrationTheory",
-  "line": 1450,
+  "line": 1439,
   "registered": [
    "continuity"
   ],
@@ -4171,14 +4216,14 @@
    "negate",
    "shift-by-half",
    "scale-by-three",
-   "swap-args(targetSlope,fittedSlope)"
+   "swap-args(slope,fittedSlope)"
   ],
   "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PGSCalibrationTheory.recalibrationTraceMSELowerBound": {
   "name": "recalibrationTraceMSELowerBound",
   "module": "PGSCalibrationTheory",
-  "line": 1530,
+  "line": 1519,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -4186,7 +4231,7 @@
  "PGSCalibrationTheory.requiredEventsForRecalibration": {
   "name": "requiredEventsForRecalibration",
   "module": "PGSCalibrationTheory",
-  "line": 1539,
+  "line": 1528,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -4194,7 +4239,7 @@
  "PGSCalibrationTheory.requiredTargetCohortSizeForRecalibration": {
   "name": "requiredTargetCohortSizeForRecalibration",
   "module": "PGSCalibrationTheory",
-  "line": 1605,
+  "line": 1594,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -4317,8 +4362,8 @@
   ],
   "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
- "PolygenicAdaptation.effectCorrelationStabilizing": {
-  "name": "effectCorrelationStabilizing",
+ "PolygenicAdaptation.effectCorrelationStabilizingDriftSelection": {
+  "name": "effectCorrelationStabilizingDriftSelection",
   "module": "PolygenicAdaptation",
   "line": 288,
   "registered": [
@@ -5575,7 +5620,7 @@
  "PortabilityDrift.Expected_Abs_Shift": {
   "name": "Expected_Abs_Shift",
   "module": "PortabilityDrift",
-  "line": 777,
+  "line": 779,
   "registered": [
    "continuity"
   ],
@@ -5600,7 +5645,7 @@
  "PortabilityDrift.Var_Delta_Mu": {
   "name": "Var_Delta_Mu",
   "module": "PortabilityDrift",
-  "line": 773,
+  "line": 775,
   "registered": [
    "continuity",
    "range"
@@ -5630,7 +5675,7 @@
  "PortabilityDrift.admixtureLDBoost": {
   "name": "admixtureLDBoost",
   "module": "PortabilityDrift",
-  "line": 5377,
+  "line": 5369,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -5638,17 +5683,16 @@
  "PortabilityDrift.admixtureLDDecay": {
   "name": "admixtureLDDecay",
   "module": "PortabilityDrift",
-  "line": 5330,
+  "line": 5322,
   "registered": [
    "continuity"
   ],
-  "n_mutants": 4,
+  "n_mutants": 3,
   "covered": false,
   "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
-   "drop-a-one-minus",
    "negate",
    "shift-by-half",
    "scale-by-three"
@@ -5658,7 +5702,7 @@
  "PortabilityDrift.alleleFreqMismatchPenalty": {
   "name": "alleleFreqMismatchPenalty",
   "module": "PortabilityDrift",
-  "line": 2317,
+  "line": 2308,
   "registered": [
    "continuity",
    "range"
@@ -5698,7 +5742,7 @@
  "PortabilityDrift.asymmetricFst": {
   "name": "asymmetricFst",
   "module": "PortabilityDrift",
-  "line": 5268,
+  "line": 5260,
   "registered": [
    "range"
   ],
@@ -5712,7 +5756,7 @@
  "PortabilityDrift.brierRegretPoint": {
   "name": "brierRegretPoint",
   "module": "PortabilityDrift",
-  "line": 3955,
+  "line": 3947,
   "registered": [
    "continuity"
   ],
@@ -5732,7 +5776,7 @@
  "PortabilityDrift.brierRegretRatio": {
   "name": "brierRegretRatio",
   "module": "PortabilityDrift",
-  "line": 3959,
+  "line": 3951,
   "registered": [
    "continuity"
   ],
@@ -5776,7 +5820,7 @@
  "PortabilityDrift.covarianceDivergenceFromRetention": {
   "name": "covarianceDivergenceFromRetention",
   "module": "PortabilityDrift",
-  "line": 4350,
+  "line": 4342,
   "registered": [
    "continuity",
    "range"
@@ -5805,7 +5849,7 @@
  "PortabilityDrift.covarianceDivergenceMutationDrift": {
   "name": "covarianceDivergenceMutationDrift",
   "module": "PortabilityDrift",
-  "line": 4369,
+  "line": 4361,
   "registered": [
    "continuity",
    "range"
@@ -5842,7 +5886,7 @@
  "PortabilityDrift.covarianceRetention": {
   "name": "covarianceRetention",
   "module": "PortabilityDrift",
-  "line": 4324,
+  "line": 4316,
   "registered": [
    "continuity",
    "range"
@@ -5857,7 +5901,7 @@
  "PortabilityDrift.effectiveSymmetricMigration": {
   "name": "effectiveSymmetricMigration",
   "module": "PortabilityDrift",
-  "line": 5309,
+  "line": 5301,
   "registered": [
    "continuity"
   ],
@@ -5879,7 +5923,7 @@
  "PortabilityDrift.equalVarianceGaussianAUCChart": {
   "name": "equalVarianceGaussianAUCChart",
   "module": "PortabilityDrift",
-  "line": 3281,
+  "line": 3272,
   "registered": [
    "continuity",
    "range"
@@ -5917,7 +5961,7 @@
  "PortabilityDrift.equalVarianceGaussianAUCFromExplainedR2": {
   "name": "equalVarianceGaussianAUCFromExplainedR2",
   "module": "PortabilityDrift",
-  "line": 3235,
+  "line": 3226,
   "registered": [
    "continuity",
    "range"
@@ -5932,7 +5976,7 @@
  "PortabilityDrift.equalVarianceGaussianAUCFromSNR": {
   "name": "equalVarianceGaussianAUCFromSNR",
   "module": "PortabilityDrift",
-  "line": 3176,
+  "line": 3167,
   "registered": [
    "range"
   ],
@@ -5971,48 +6015,40 @@
  "PortabilityDrift.equalVarianceGaussianAUCFromVariances": {
   "name": "equalVarianceGaussianAUCFromVariances",
   "module": "PortabilityDrift",
-  "line": 3188,
+  "line": 3179,
   "registered": [
    "continuity",
    "range",
    "scale"
   ],
-  "n_mutants": 6,
+  "n_mutants": 4,
   "covered": true,
   "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
-    "body": "-(Phi (Real.sqrt (vSignal / (2 * vEnv))))",
+    "body": "-(gaussianAUCFromSignalVariance vSignal vEnv)",
     "rejected_by": [
      "range"
     ]
    },
    {
-    "mutation": "swap-times-div",
-    "body": "Phi (Real.sqrt (vSignal / (2 / vEnv)))",
-    "rejected_by": [
-     "scale"
-    ]
-   },
-   {
     "mutation": "shift-by-half",
-    "body": "(Phi (Real.sqrt (vSignal / (2 * vEnv)))) + 0.5",
+    "body": "(gaussianAUCFromSignalVariance vSignal vEnv) + 0.5",
     "rejected_by": [
      "range"
     ]
    },
    {
     "mutation": "scale-by-three",
-    "body": "3 * (Phi (Real.sqrt (vSignal / (2 * vEnv))))",
+    "body": "3 * (gaussianAUCFromSignalVariance vSignal vEnv)",
     "rejected_by": [
      "range"
     ]
    }
   ],
-  "n_killed": 4,
+  "n_killed": 3,
   "survived": [
-   "const-off-by-one",
    "swap-args(vSignal,vEnv)"
   ],
   "reason": null
@@ -6020,19 +6056,17 @@
  "PortabilityDrift.exactCalibratedBrierRiskFromR2": {
   "name": "exactCalibratedBrierRiskFromR2",
   "module": "PortabilityDrift",
-  "line": 3060,
+  "line": 3051,
   "registered": [
    "continuity"
   ],
-  "n_mutants": 6,
+  "n_mutants": 4,
   "covered": false,
   "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
-   "drop-a-one-minus",
    "negate",
-   "swap-times-div",
    "shift-by-half",
    "scale-by-three",
    "swap-args(\u03c0,r2)"
@@ -6042,7 +6076,7 @@
  "PortabilityDrift.expectedR2": {
   "name": "expectedR2",
   "module": "PortabilityDrift",
-  "line": 935,
+  "line": 887,
   "registered": [
    "continuity",
    "scale"
@@ -6064,7 +6098,7 @@
  "PortabilityDrift.expectedSqMeanPGSDiff_IMEquilibrium": {
   "name": "expectedSqMeanPGSDiff_IMEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4074,
+  "line": 4066,
   "registered": [
    "continuity"
   ],
@@ -6086,7 +6120,7 @@
  "PortabilityDrift.expectedSqMeanPGSDiff_pureSplit": {
   "name": "expectedSqMeanPGSDiff_pureSplit",
   "module": "PortabilityDrift",
-  "line": 4064,
+  "line": 4056,
   "registered": [
    "continuity"
   ],
@@ -6109,7 +6143,7 @@
  "PortabilityDrift.freqCorrFromFst": {
   "name": "freqCorrFromFst",
   "module": "PortabilityDrift",
-  "line": 4334,
+  "line": 4326,
   "registered": [
    "continuity"
   ],
@@ -6199,7 +6233,7 @@
  "PortabilityDrift.fstIslandMultiplicativeEquilibrium": {
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4803,
+  "line": 4795,
   "registered": [
    "continuity",
    "limit",
@@ -6248,7 +6282,7 @@
  "PortabilityDrift.fstMigDriftEquil": {
   "name": "fstMigDriftEquil",
   "module": "PortabilityDrift",
-  "line": 5474,
+  "line": 5466,
   "registered": [
    "continuity",
    "limit",
@@ -6302,7 +6336,7 @@
  "PortabilityDrift.fstMigDriftNext": {
   "name": "fstMigDriftNext",
   "module": "PortabilityDrift",
-  "line": 5439,
+  "line": 5431,
   "registered": [
    "continuity",
    "range"
@@ -6347,7 +6381,7 @@
  "PortabilityDrift.fstMigrationDriftEquilibrium": {
   "name": "fstMigrationDriftEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4645,
+  "line": 4637,
   "registered": [
    "continuity",
    "limit",
@@ -6401,7 +6435,7 @@
  "PortabilityDrift.hetMutationFloor": {
   "name": "hetMutationFloor",
   "module": "PortabilityDrift",
-  "line": 460,
+  "line": 465,
   "registered": [
    "continuity",
    "range"
@@ -6449,7 +6483,7 @@
  "PortabilityDrift.hetStepWithMutation": {
   "name": "hetStepWithMutation",
   "module": "PortabilityDrift",
-  "line": 435,
+  "line": 440,
   "registered": [
    "range"
   ],
@@ -6463,7 +6497,7 @@
  "PortabilityDrift.hudsonFstFromCoalescenceTimes": {
   "name": "hudsonFstFromCoalescenceTimes",
   "module": "PortabilityDrift",
-  "line": 236,
+  "line": 241,
   "registered": [
    "range"
   ],
@@ -6477,7 +6511,7 @@
  "PortabilityDrift.ibdFlowStep": {
   "name": "ibdFlowStep",
   "module": "PortabilityDrift",
-  "line": 4170,
+  "line": 4162,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -6485,7 +6519,7 @@
  "PortabilityDrift.ibdRecurrenceFixedPoint": {
   "name": "ibdRecurrenceFixedPoint",
   "module": "PortabilityDrift",
-  "line": 4696,
+  "line": 4688,
   "registered": [
    "continuity"
   ],
@@ -6509,7 +6543,7 @@
  "PortabilityDrift.ibdRecurrenceStep": {
   "name": "ibdRecurrenceStep",
   "module": "PortabilityDrift",
-  "line": 4683,
+  "line": 4675,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -6517,7 +6551,7 @@
  "PortabilityDrift.islandFstMultiplicativeStep": {
   "name": "islandFstMultiplicativeStep",
   "module": "PortabilityDrift",
-  "line": 4786,
+  "line": 4778,
   "registered": [
    "range"
   ],
@@ -6531,7 +6565,7 @@
  "PortabilityDrift.ldCorrelationDecay": {
   "name": "ldCorrelationDecay",
   "module": "PortabilityDrift",
-  "line": 2105,
+  "line": 2096,
   "registered": [
    "continuity",
    "range"
@@ -6574,7 +6608,7 @@
  "PortabilityDrift.ldOverlapFromSharedLD": {
   "name": "ldOverlapFromSharedLD",
   "module": "PortabilityDrift",
-  "line": 4338,
+  "line": 4330,
   "registered": [
    "continuity"
   ],
@@ -6593,7 +6627,7 @@
  "PortabilityDrift.logLossRegretPoint": {
   "name": "logLossRegretPoint",
   "module": "PortabilityDrift",
-  "line": 3976,
+  "line": 3968,
   "registered": [
    "continuity"
   ],
@@ -6613,7 +6647,7 @@
  "PortabilityDrift.logLossRegretRatio": {
   "name": "logLossRegretRatio",
   "module": "PortabilityDrift",
-  "line": 3980,
+  "line": 3972,
   "registered": [
    "continuity"
   ],
@@ -6635,7 +6669,7 @@
  "PortabilityDrift.neutralAFBenchmarkFromRecurrence": {
   "name": "neutralAFBenchmarkFromRecurrence",
   "module": "PortabilityDrift",
-  "line": 5556,
+  "line": 5548,
   "registered": [
    "continuity",
    "monotone"
@@ -6670,7 +6704,7 @@
  "PortabilityDrift.neutralAFBenchmarkRatio": {
   "name": "neutralAFBenchmarkRatio",
   "module": "PortabilityDrift",
-  "line": 2977,
+  "line": 2968,
   "registered": [
    "continuity"
   ],
@@ -6691,7 +6725,7 @@
  "PortabilityDrift.neutralAFSharedLDBenchmarkRatio": {
   "name": "neutralAFSharedLDBenchmarkRatio",
   "module": "PortabilityDrift",
-  "line": 4500,
+  "line": 4492,
   "registered": [
    "continuity"
   ],
@@ -6812,7 +6846,7 @@
  "PortabilityDrift.pgsVarianceFromHet": {
   "name": "pgsVarianceFromHet",
   "module": "PortabilityDrift",
-  "line": 628,
+  "line": 633,
   "registered": [
    "continuity"
   ],
@@ -6833,7 +6867,7 @@
  "PortabilityDrift.presentDayEqualVarianceGaussianAUC": {
   "name": "presentDayEqualVarianceGaussianAUC",
   "module": "PortabilityDrift",
-  "line": 952,
+  "line": 956,
   "registered": [
    "continuity",
    "range"
@@ -6881,7 +6915,7 @@
  "PortabilityDrift.presentDayGaussianAUC": {
   "name": "presentDayGaussianAUC",
   "module": "PortabilityDrift",
-  "line": 943,
+  "line": 947,
   "registered": [
    "continuity",
    "range"
@@ -6930,11 +6964,11 @@
  "PortabilityDrift.presentDayPGSVariance": {
   "name": "presentDayPGSVariance",
   "module": "PortabilityDrift",
-  "line": 689,
+  "line": 692,
   "registered": [
    "continuity"
   ],
-  "n_mutants": 6,
+  "n_mutants": 5,
   "covered": false,
   "demonstration": null,
   "killed": [],
@@ -6942,7 +6976,6 @@
   "survived": [
    "drop-a-one-minus",
    "negate",
-   "swap-times-div",
    "shift-by-half",
    "scale-by-three",
    "swap-args(V_A,fst)"
@@ -6952,7 +6985,7 @@
  "PortabilityDrift.presentDayPGSVarianceMutationDrift": {
   "name": "presentDayPGSVarianceMutationDrift",
   "module": "PortabilityDrift",
-  "line": 4425,
+  "line": 4417,
   "registered": [
    "continuity",
    "range"
@@ -6977,17 +7010,19 @@
  "PortabilityDrift.presentDayR2": {
   "name": "presentDayR2",
   "module": "PortabilityDrift",
-  "line": 887,
+  "line": 895,
   "registered": [
    "continuity"
   ],
-  "n_mutants": 4,
+  "n_mutants": 6,
   "covered": false,
   "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
-   "swap-plus-minus",
+   "negate",
+   "shift-by-half",
+   "scale-by-three",
    "swap-args(V_A,V_E)",
    "swap-args(V_A,fst)",
    "swap-args(V_E,fst)"
@@ -6997,7 +7032,7 @@
  "PortabilityDrift.presentDayR2MutationDrift": {
   "name": "presentDayR2MutationDrift",
   "module": "PortabilityDrift",
-  "line": 4470,
+  "line": 4462,
   "registered": [
    "continuity"
   ],
@@ -7020,7 +7055,7 @@
  "PortabilityDrift.presentDaySignalToNoise": {
   "name": "presentDaySignalToNoise",
   "module": "PortabilityDrift",
-  "line": 876,
+  "line": 878,
   "registered": [
    "continuity"
   ],
@@ -7042,7 +7077,7 @@
  "PortabilityDrift.realWorldPGSVariance": {
   "name": "realWorldPGSVariance",
   "module": "PortabilityDrift",
-  "line": 1094,
+  "line": 1098,
   "registered": [
    "continuity"
   ],
@@ -7066,7 +7101,7 @@
  "PortabilityDrift.retainedSignalVarianceMigrationDrift": {
   "name": "retainedSignalVarianceMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 5157,
+  "line": 5149,
   "registered": [
    "continuity",
    "range"
@@ -7090,7 +7125,7 @@
  "PortabilityDrift.scaledMigrationRate": {
   "name": "scaledMigrationRate",
   "module": "PortabilityDrift",
-  "line": 4835,
+  "line": 4827,
   "registered": [
    "continuity"
   ],
@@ -7112,7 +7147,7 @@
  "PortabilityDrift.sharedLDFromMigration": {
   "name": "sharedLDFromMigration",
   "module": "PortabilityDrift",
-  "line": 5082,
+  "line": 5074,
   "registered": [
    "continuity",
    "range"
@@ -7133,7 +7168,7 @@
  "PortabilityDrift.sharedLD_from_equilibrium": {
   "name": "sharedLD_from_equilibrium",
   "module": "PortabilityDrift",
-  "line": 5056,
+  "line": 5048,
   "registered": [
    "continuity",
    "range"
@@ -7180,7 +7215,7 @@
  "PortabilityDrift.signalRetentionMigrationDrift": {
   "name": "signalRetentionMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 5146,
+  "line": 5138,
   "registered": [
    "continuity",
    "range"
@@ -7199,7 +7234,7 @@
  "PortabilityDrift.sourceBrierFromR2": {
   "name": "sourceBrierFromR2",
   "module": "PortabilityDrift",
-  "line": 3082,
+  "line": 3073,
   "registered": [
    "continuity",
    "range"
@@ -7227,7 +7262,7 @@
  "PortabilityDrift.steppingStoneFst": {
   "name": "steppingStoneFst",
   "module": "PortabilityDrift",
-  "line": 4971,
+  "line": 4963,
   "registered": [
    "continuity",
    "range"
@@ -7270,7 +7305,7 @@
  "PortabilityDrift.targetBrierFromNeutralAFBenchmark": {
   "name": "targetBrierFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3102,
+  "line": 3093,
   "registered": [
    "continuity",
    "range"
@@ -7320,7 +7355,7 @@
  "PortabilityDrift.targetExactCalibratedBrierRisk": {
   "name": "targetExactCalibratedBrierRisk",
   "module": "PortabilityDrift",
-  "line": 3095,
+  "line": 3086,
   "registered": [
    "continuity"
   ],
@@ -7342,7 +7377,7 @@
  "PortabilityDrift.targetExactGaussianAUCFromNeutralAFBenchmark": {
   "name": "targetExactGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3831,
+  "line": 3823,
   "registered": [
    "continuity",
    "range"
@@ -7390,7 +7425,7 @@
  "PortabilityDrift.targetGaussianAUCFromNeutralAFBenchmark": {
   "name": "targetGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3069,
+  "line": 3060,
   "registered": [
    "continuity",
    "range"
@@ -7438,7 +7473,7 @@
  "PortabilityDrift.targetHetFromFst": {
   "name": "targetHetFromFst",
   "module": "PortabilityDrift",
-  "line": 653,
+  "line": 658,
   "registered": [
    "continuity"
   ],
@@ -7457,31 +7492,10 @@
   ],
   "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
- "PortabilityDrift.targetPGSVariance": {
-  "name": "targetPGSVariance",
-  "module": "PortabilityDrift",
-  "line": 679,
-  "registered": [
-   "continuity"
-  ],
-  "n_mutants": 5,
-  "covered": false,
-  "demonstration": null,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "drop-a-one-minus",
-   "negate",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(V_A,fst)"
-  ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
- },
  "PortabilityDrift.targetR2FromNeutralAFBenchmark": {
   "name": "targetR2FromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 2903,
+  "line": 2894,
   "registered": [
    "continuity"
   ],
@@ -7503,7 +7517,7 @@
  "PortabilityDrift.twoDemeIMEquilibriumDelta": {
   "name": "twoDemeIMEquilibriumDelta",
   "module": "PortabilityDrift",
-  "line": 314,
+  "line": 319,
   "registered": [
    "continuity"
   ],
@@ -7525,7 +7539,7 @@
  "PortabilityDrift.twoDemeIMEquilibriumETss": {
   "name": "twoDemeIMEquilibriumETss",
   "module": "PortabilityDrift",
-  "line": 289,
+  "line": 294,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -7533,7 +7547,7 @@
  "PortabilityDrift.twoDemeIMEquilibriumETst": {
   "name": "twoDemeIMEquilibriumETst",
   "module": "PortabilityDrift",
-  "line": 296,
+  "line": 301,
   "registered": [
    "continuity"
   ],
@@ -7555,7 +7569,7 @@
  "PortabilityDrift.twoDemeIMFirstStepDiff": {
   "name": "twoDemeIMFirstStepDiff",
   "module": "PortabilityDrift",
-  "line": 277,
+  "line": 282,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -7563,7 +7577,7 @@
  "PortabilityDrift.twoDemeIMFirstStepSame": {
   "name": "twoDemeIMFirstStepSame",
   "module": "PortabilityDrift",
-  "line": 269,
+  "line": 274,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -7571,7 +7585,7 @@
  "PortabilityDrift.wrightFisherDriftRetention": {
   "name": "wrightFisherDriftRetention",
   "module": "PortabilityDrift",
-  "line": 710,
+  "line": 712,
   "registered": [
    "continuity",
    "range"
@@ -7619,7 +7633,7 @@
  "PortabilityDrift.wrightFisherHeterozygosityLoss": {
   "name": "wrightFisherHeterozygosityLoss",
   "module": "PortabilityDrift",
-  "line": 730,
+  "line": 732,
   "registered": [
    "continuity"
   ],
@@ -8733,26 +8747,11 @@
   "registered": [
    "scale"
   ],
-  "n_mutants": 8,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "const-off-by-one",
-    "body": "cov_pgs_y ^ 4 / (var_pgs * var_y)",
-    "rejected_by": [
-     "scale"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "body": "cov_pgs_y ^ 2 / (var_pgs / var_y)",
-    "rejected_by": [
-     "scale"
-    ]
-   }
-  ],
-  "n_killed": 2,
+  "n_mutants": 6,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
    "negate",
    "shift-by-half",
@@ -8761,7 +8760,7 @@
    "swap-args(cov_pgs_y,var_y)",
    "swap-args(var_pgs,var_y)"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "TransferLearningPGS.pinskerAncestryDivergenceCap": {
   "name": "pinskerAncestryDivergenceCap",
@@ -8973,7 +8972,7 @@
  "VarianceComponents.liabilityScaleH2": {
   "name": "liabilityScaleH2",
   "module": "VarianceComponents",
-  "line": 437,
+  "line": 435,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"

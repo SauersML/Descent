@@ -63,6 +63,16 @@ def transpile_all(defs, overrides=None):
         if d["ret"] != "ℝ" or not all(t in ("ℝ", "ℕ") for _, t in d["params"]):
             why_not[key(d)] = f"non-scalar signature ({d['ret']})"
             continue
+        # A body that mentions an implicit binder needs a value this tier
+        # cannot supply -- Lean infers it from the call site.  Refuse rather
+        # than treat the name as an unknown identifier.
+        impl = {n for n, _ in d.get("implicit_params", [])}
+        if impl and re.search(r"\b(" + "|".join(re.escape(n) for n in impl)
+                              + r")\b", d["body"] or ""):
+            why_not[key(d)] = ("body references an implicit binder "
+                               f"({sorted(impl)}), whose value Lean infers "
+                               "from the call site")
+            continue
         body = (overrides or {}).get(d["name"], d["body"])
         ar, rn, amb = build_arity(defs, d["module"])
         try:

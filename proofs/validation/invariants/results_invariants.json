@@ -1111,7 +1111,7 @@
   ],
   "name": "amCorrectedPortability",
   "module": "AssortativeMatingPGS",
-  "line": 400,
+  "line": 429,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -1186,7 +1186,7 @@
   ],
   "name": "amEquilibriumVariance",
   "module": "AssortativeMatingPGS",
-  "line": 133,
+  "line": 154,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -1270,7 +1270,7 @@
   ],
   "name": "amInducedLD",
   "module": "AssortativeMatingPGS",
-  "line": 221,
+  "line": 242,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -1354,7 +1354,7 @@
   ],
   "name": "amVarianceStep",
   "module": "AssortativeMatingPGS",
-  "line": 118,
+  "line": 139,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -1429,7 +1429,7 @@
   ],
   "name": "ibdFst",
   "module": "AssortativeMatingPGS",
-  "line": 535,
+  "line": 564,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -2511,7 +2511,7 @@
   ],
   "name": "bernoulliKLReal",
   "module": "Conclusions",
-  "line": 461,
+  "line": 472,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -2577,7 +2577,7 @@
   ],
   "name": "bernoulliLogLoss",
   "module": "Conclusions",
-  "line": 457,
+  "line": 468,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -2643,7 +2643,7 @@
   ],
   "name": "brierBernoulliRisk",
   "module": "Conclusions",
-  "line": 834,
+  "line": 845,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -2814,7 +2814,7 @@
   ],
   "name": "logBernoulliRisk",
   "module": "Conclusions",
-  "line": 859,
+  "line": 870,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -2853,7 +2853,7 @@
   ],
   "name": "sigmoid",
   "module": "Conclusions",
-  "line": 214,
+  "line": 225,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -3036,7 +3036,181 @@
   ],
   "name": "gaussianKurtosisMaf",
   "module": "CondensationUnification",
-  "line": 555,
+  "line": 570,
+  "family": "invariant",
+  "n_checks": 0,
+  "severity": -1.0
+ },
+ "CondensationUnification.nextFloorFourthMoment": {
+  "checks": [],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['m2', 'm4', 'm6', 'm8']"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "cannot place a physically meaningful box on ['m4', 'm6', 'm8']"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "continuity",
+    "reason": "cannot place a physically meaningful box on ['m4', 'm6', 'm8']"
+   },
+   {
+    "kind": "totality",
+    "reason": "cannot place a physically meaningful box on ['m4', 'm6', 'm8']"
+   }
+  ],
+  "name": "nextFloorFourthMoment",
+  "module": "CondensationUnification",
+  "line": 1076,
+  "family": "invariant",
+  "n_checks": 0,
+  "severity": -1.0
+ },
+ "CondensationUnification.squaringFixedPoint": {
+  "checks": [
+   {
+    "kind": "continuity",
+    "why": "`scale` reaches 0.001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "totality",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
+    "holds": true,
+    "detail": {
+     "findings": [],
+     "n_findings": 0,
+     "n_defects": 0,
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
+    }
+   }
+  ],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['scale']"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "no effective-population-size argument"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "monotone",
+    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+   }
+  ],
+  "name": "squaringFixedPoint",
+  "module": "CondensationUnification",
+  "line": 1198,
+  "family": "invariant",
+  "n_checks": 2,
+  "severity": -1.0
+ },
+ "CondensationUnification.squaringScaleSq": {
+  "checks": [],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "`squaringScaleSq` is not evidently dimensionless"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "cannot place a physically meaningful box on ['fourthMoment']"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "continuity",
+    "reason": "cannot place a physically meaningful box on ['fourthMoment']"
+   },
+   {
+    "kind": "totality",
+    "reason": "cannot place a physically meaningful box on ['fourthMoment']"
+   }
+  ],
+  "name": "squaringScaleSq",
+  "module": "CondensationUnification",
+  "line": 1069,
+  "family": "invariant",
+  "n_checks": 0,
+  "severity": -1.0
+ },
+ "CondensationUnification.squaringStep": {
+  "checks": [],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['scale', 'x']"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "cannot place a physically meaningful box on ['x']"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "continuity",
+    "reason": "cannot place a physically meaningful box on ['x']"
+   },
+   {
+    "kind": "totality",
+    "reason": "cannot place a physically meaningful box on ['x']"
+   }
+  ],
+  "name": "squaringStep",
+  "module": "CondensationUnification",
+  "line": 1192,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -4153,7 +4327,7 @@
   ],
   "name": "alleleFreqDivergenceRate",
   "module": "DGP",
-  "line": 2348,
+  "line": 2379,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -4219,7 +4393,7 @@
   ],
   "name": "calibratedBrier",
   "module": "DGP",
-  "line": 2108,
+  "line": 2139,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -4294,7 +4468,7 @@
   ],
   "name": "calibratedBrierFromVariances",
   "module": "DGP",
-  "line": 2120,
+  "line": 2151,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -4541,7 +4715,7 @@
   ],
   "name": "gaussianAUCFromSignalVariance",
   "module": "DGP",
-  "line": 2104,
+  "line": 2135,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -4598,7 +4772,7 @@
   ],
   "name": "ldBreakageRate",
   "module": "DGP",
-  "line": 2354,
+  "line": 2385,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -9101,7 +9275,7 @@
   ],
   "name": "latticeBracket",
   "module": "JetBarrier",
-  "line": 146,
+  "line": 155,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -9140,7 +9314,7 @@
   ],
   "name": "latticeInflation",
   "module": "JetBarrier",
-  "line": 141,
+  "line": 150,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -11650,7 +11824,7 @@
   ],
   "name": "interceptRecalibrated",
   "module": "PGSCalibrationTheory",
-  "line": 1397,
+  "line": 1386,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -11689,7 +11863,7 @@
   ],
   "name": "logisticRecalibrated",
   "module": "PGSCalibrationTheory",
-  "line": 1423,
+  "line": 1412,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -11728,7 +11902,7 @@
   ],
   "name": "nri",
   "module": "PGSCalibrationTheory",
-  "line": 1702,
+  "line": 1691,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -11815,7 +11989,7 @@
   "checks": [
    {
     "kind": "continuity",
-    "why": "`targetSlope` reaches -3 and 3 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "why": "`slope` reaches -3 and 3 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
     "holds": true,
     "detail": {
      "violations": [],
@@ -11851,7 +12025,7 @@
    },
    {
     "kind": "scale",
-    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['targetSlope', 'fittedSlope']"
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['slope', 'fittedSlope']"
    },
    {
     "kind": "absorbing",
@@ -11872,7 +12046,7 @@
   ],
   "name": "recalibratedCalibrationSlope",
   "module": "PGSCalibrationTheory",
-  "line": 1450,
+  "line": 1439,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -11911,7 +12085,7 @@
   ],
   "name": "recalibrationTraceMSELowerBound",
   "module": "PGSCalibrationTheory",
-  "line": 1530,
+  "line": 1519,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -11950,7 +12124,7 @@
   ],
   "name": "requiredEventsForRecalibration",
   "module": "PGSCalibrationTheory",
-  "line": 1539,
+  "line": 1528,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -11989,7 +12163,7 @@
   ],
   "name": "requiredTargetCohortSizeForRecalibration",
   "module": "PGSCalibrationTheory",
-  "line": 1605,
+  "line": 1594,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -12336,7 +12510,7 @@
   "n_checks": 0,
   "severity": -1.0
  },
- "PolygenicAdaptation.effectCorrelationStabilizing": {
+ "PolygenicAdaptation.effectCorrelationStabilizingDriftSelection": {
   "checks": [
    {
     "kind": "continuity",
@@ -12404,7 +12578,7 @@
     "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
    }
   ],
-  "name": "effectCorrelationStabilizing",
+  "name": "effectCorrelationStabilizingDriftSelection",
   "module": "PolygenicAdaptation",
   "line": 288,
   "family": "invariant",
@@ -15394,7 +15568,7 @@
   ],
   "name": "Expected_Abs_Shift",
   "module": "PortabilityDrift",
-  "line": 777,
+  "line": 779,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -15460,7 +15634,7 @@
   ],
   "name": "Var_Delta_Mu",
   "module": "PortabilityDrift",
-  "line": 773,
+  "line": 775,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -15499,7 +15673,7 @@
   ],
   "name": "admixtureLDBoost",
   "module": "PortabilityDrift",
-  "line": 5377,
+  "line": 5369,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -15565,7 +15739,7 @@
   ],
   "name": "admixtureLDDecay",
   "module": "PortabilityDrift",
-  "line": 5330,
+  "line": 5322,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -15631,7 +15805,7 @@
   ],
   "name": "alleleFreqMismatchPenalty",
   "module": "PortabilityDrift",
-  "line": 2317,
+  "line": 2308,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -15670,7 +15844,7 @@
   ],
   "name": "asymmetricFst",
   "module": "PortabilityDrift",
-  "line": 5268,
+  "line": 5260,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -15736,7 +15910,7 @@
   ],
   "name": "brierRegretPoint",
   "module": "PortabilityDrift",
-  "line": 3955,
+  "line": 3947,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -15811,7 +15985,7 @@
   ],
   "name": "brierRegretRatio",
   "module": "PortabilityDrift",
-  "line": 3959,
+  "line": 3951,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -15943,7 +16117,7 @@
   ],
   "name": "covarianceDivergenceFromRetention",
   "module": "PortabilityDrift",
-  "line": 4350,
+  "line": 4342,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -16009,7 +16183,7 @@
   ],
   "name": "covarianceDivergenceMutationDrift",
   "module": "PortabilityDrift",
-  "line": 4369,
+  "line": 4361,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -16075,7 +16249,7 @@
   ],
   "name": "covarianceRetention",
   "module": "PortabilityDrift",
-  "line": 4324,
+  "line": 4316,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -16141,7 +16315,7 @@
   ],
   "name": "effectiveSymmetricMigration",
   "module": "PortabilityDrift",
-  "line": 5309,
+  "line": 5301,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -16198,7 +16372,7 @@
   ],
   "name": "equalVarianceGaussianAUCChart",
   "module": "PortabilityDrift",
-  "line": 3281,
+  "line": 3272,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -16341,7 +16515,7 @@
   ],
   "name": "equalVarianceGaussianAUCFromExplainedR2",
   "module": "PortabilityDrift",
-  "line": 3235,
+  "line": 3226,
   "family": "invariant",
   "n_checks": 2,
   "severity": 140.0
@@ -16380,7 +16554,7 @@
   ],
   "name": "equalVarianceGaussianAUCFromSNR",
   "module": "PortabilityDrift",
-  "line": 3176,
+  "line": 3167,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -16463,7 +16637,7 @@
   ],
   "name": "equalVarianceGaussianAUCFromVariances",
   "module": "PortabilityDrift",
-  "line": 3188,
+  "line": 3179,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -16529,7 +16703,7 @@
   ],
   "name": "exactCalibratedBrierRiskFromR2",
   "module": "PortabilityDrift",
-  "line": 3060,
+  "line": 3051,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -16612,7 +16786,7 @@
   ],
   "name": "expectedR2",
   "module": "PortabilityDrift",
-  "line": 935,
+  "line": 887,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -16678,7 +16852,7 @@
   ],
   "name": "expectedSqMeanPGSDiff_IMEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4074,
+  "line": 4066,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -16753,7 +16927,7 @@
   ],
   "name": "expectedSqMeanPGSDiff_pureSplit",
   "module": "PortabilityDrift",
-  "line": 4064,
+  "line": 4056,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -16810,7 +16984,7 @@
   ],
   "name": "freqCorrFromFst",
   "module": "PortabilityDrift",
-  "line": 4334,
+  "line": 4326,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -17009,7 +17183,7 @@
   ],
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4803,
+  "line": 4795,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -17094,7 +17268,7 @@
   ],
   "name": "fstMigDriftEquil",
   "module": "PortabilityDrift",
-  "line": 5474,
+  "line": 5466,
   "family": "invariant",
   "n_checks": 6,
   "severity": -1.0
@@ -17169,7 +17343,7 @@
   ],
   "name": "fstMigDriftNext",
   "module": "PortabilityDrift",
-  "line": 5439,
+  "line": 5431,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -17254,7 +17428,7 @@
   ],
   "name": "fstMigrationDriftEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4645,
+  "line": 4637,
   "family": "invariant",
   "n_checks": 6,
   "severity": -1.0
@@ -17320,7 +17494,7 @@
   ],
   "name": "hetMutationFloor",
   "module": "PortabilityDrift",
-  "line": 460,
+  "line": 465,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -17359,7 +17533,7 @@
   ],
   "name": "hetStepWithMutation",
   "module": "PortabilityDrift",
-  "line": 435,
+  "line": 440,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -17398,7 +17572,7 @@
   ],
   "name": "hudsonFstFromCoalescenceTimes",
   "module": "PortabilityDrift",
-  "line": 236,
+  "line": 241,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -17437,7 +17611,7 @@
   ],
   "name": "ibdFlowStep",
   "module": "PortabilityDrift",
-  "line": 4170,
+  "line": 4162,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -17503,7 +17677,7 @@
   ],
   "name": "ibdRecurrenceFixedPoint",
   "module": "PortabilityDrift",
-  "line": 4696,
+  "line": 4688,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -17542,7 +17716,7 @@
   ],
   "name": "ibdRecurrenceStep",
   "module": "PortabilityDrift",
-  "line": 4683,
+  "line": 4675,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -17581,7 +17755,7 @@
   ],
   "name": "islandFstMultiplicativeStep",
   "module": "PortabilityDrift",
-  "line": 4786,
+  "line": 4778,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -17656,7 +17830,7 @@
   ],
   "name": "ldCorrelationDecay",
   "module": "PortabilityDrift",
-  "line": 2105,
+  "line": 2096,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -17713,7 +17887,7 @@
   ],
   "name": "ldOverlapFromSharedLD",
   "module": "PortabilityDrift",
-  "line": 4338,
+  "line": 4330,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -17779,7 +17953,7 @@
   ],
   "name": "logLossRegretPoint",
   "module": "PortabilityDrift",
-  "line": 3976,
+  "line": 3968,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -17854,7 +18028,7 @@
   ],
   "name": "logLossRegretRatio",
   "module": "PortabilityDrift",
-  "line": 3980,
+  "line": 3972,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -17925,7 +18099,7 @@
   ],
   "name": "neutralAFBenchmarkFromRecurrence",
   "module": "PortabilityDrift",
-  "line": 5556,
+  "line": 5548,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -18007,7 +18181,7 @@
   ],
   "name": "neutralAFBenchmarkRatio",
   "module": "PortabilityDrift",
-  "line": 2977,
+  "line": 2968,
   "family": "invariant",
   "n_checks": 3,
   "severity": 140.0
@@ -18126,7 +18300,7 @@
   ],
   "name": "neutralAFSharedLDBenchmarkRatio",
   "module": "PortabilityDrift",
-  "line": 4500,
+  "line": 4492,
   "family": "invariant",
   "n_checks": 5,
   "severity": 140.0
@@ -18324,7 +18498,7 @@
   ],
   "name": "pgsVarianceFromHet",
   "module": "PortabilityDrift",
-  "line": 628,
+  "line": 633,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -18399,7 +18573,7 @@
   ],
   "name": "presentDayEqualVarianceGaussianAUC",
   "module": "PortabilityDrift",
-  "line": 952,
+  "line": 956,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -18474,7 +18648,7 @@
   ],
   "name": "presentDayGaussianAUC",
   "module": "PortabilityDrift",
-  "line": 943,
+  "line": 947,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -18540,7 +18714,7 @@
   ],
   "name": "presentDayPGSVariance",
   "module": "PortabilityDrift",
-  "line": 689,
+  "line": 692,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -18615,7 +18789,7 @@
   ],
   "name": "presentDayPGSVarianceMutationDrift",
   "module": "PortabilityDrift",
-  "line": 4425,
+  "line": 4417,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -18690,7 +18864,7 @@
   ],
   "name": "presentDayR2",
   "module": "PortabilityDrift",
-  "line": 887,
+  "line": 895,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -18774,7 +18948,7 @@
   ],
   "name": "presentDayR2MutationDrift",
   "module": "PortabilityDrift",
-  "line": 4470,
+  "line": 4462,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -18849,7 +19023,7 @@
   ],
   "name": "presentDaySignalToNoise",
   "module": "PortabilityDrift",
-  "line": 876,
+  "line": 878,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -18924,7 +19098,7 @@
   ],
   "name": "realWorldPGSVariance",
   "module": "PortabilityDrift",
-  "line": 1094,
+  "line": 1098,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -18999,7 +19173,7 @@
   ],
   "name": "retainedSignalVarianceMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 5157,
+  "line": 5149,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -19065,7 +19239,7 @@
   ],
   "name": "scaledMigrationRate",
   "module": "PortabilityDrift",
-  "line": 4835,
+  "line": 4827,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -19122,7 +19296,7 @@
   ],
   "name": "sharedLDFromMigration",
   "module": "PortabilityDrift",
-  "line": 5082,
+  "line": 5074,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -19188,7 +19362,7 @@
   ],
   "name": "sharedLD_from_equilibrium",
   "module": "PortabilityDrift",
-  "line": 5056,
+  "line": 5048,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -19254,7 +19428,7 @@
   ],
   "name": "signalRetentionMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 5146,
+  "line": 5138,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -19320,7 +19494,7 @@
   ],
   "name": "sourceBrierFromR2",
   "module": "PortabilityDrift",
-  "line": 3082,
+  "line": 3073,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -19395,7 +19569,7 @@
   ],
   "name": "steppingStoneFst",
   "module": "PortabilityDrift",
-  "line": 4971,
+  "line": 4963,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -19479,7 +19653,7 @@
   ],
   "name": "targetBrierFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3102,
+  "line": 3093,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -19563,7 +19737,7 @@
   ],
   "name": "targetExactCalibratedBrierRisk",
   "module": "PortabilityDrift",
-  "line": 3095,
+  "line": 3086,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -19638,7 +19812,7 @@
   ],
   "name": "targetExactGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3831,
+  "line": 3823,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -19713,7 +19887,7 @@
   ],
   "name": "targetGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3069,
+  "line": 3060,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -19779,73 +19953,7 @@
   ],
   "name": "targetHetFromFst",
   "module": "PortabilityDrift",
-  "line": 653,
-  "family": "invariant",
-  "n_checks": 3,
-  "severity": -1.0
- },
- "PortabilityDrift.targetPGSVariance": {
-  "checks": [
-   {
-    "kind": "continuity",
-    "why": "`V_A` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "continuity",
-    "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "totality",
-    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
-    "holds": true,
-    "detail": {
-     "findings": [],
-     "n_findings": 0,
-     "n_defects": 0,
-     "n_wrong_finite_value": 0,
-     "n_direction_inverted": 0
-    }
-   }
-  ],
-  "skipped": [
-   {
-    "kind": "symmetry",
-    "reason": "no two parameters name the same quantity for two populations"
-   },
-   {
-    "kind": "scale",
-    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are ['V_A'] of ['V_A', 'fst']"
-   },
-   {
-    "kind": "absorbing",
-    "reason": "no allele-frequency state argument"
-   },
-   {
-    "kind": "limit-Ne",
-    "reason": "no effective-population-size argument"
-   },
-   {
-    "kind": "limit-freq",
-    "reason": "not a heterozygosity of a frequency"
-   },
-   {
-    "kind": "monotone",
-    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
-   }
-  ],
-  "name": "targetPGSVariance",
-  "module": "PortabilityDrift",
-  "line": 679,
+  "line": 658,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -19920,7 +20028,7 @@
   ],
   "name": "targetR2FromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 2903,
+  "line": 2894,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -19977,7 +20085,7 @@
   ],
   "name": "twoDemeIMEquilibriumDelta",
   "module": "PortabilityDrift",
-  "line": 314,
+  "line": 319,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -20016,7 +20124,7 @@
   ],
   "name": "twoDemeIMEquilibriumETss",
   "module": "PortabilityDrift",
-  "line": 289,
+  "line": 294,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -20073,7 +20181,7 @@
   ],
   "name": "twoDemeIMEquilibriumETst",
   "module": "PortabilityDrift",
-  "line": 296,
+  "line": 301,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -20112,7 +20220,7 @@
   ],
   "name": "twoDemeIMFirstStepDiff",
   "module": "PortabilityDrift",
-  "line": 277,
+  "line": 282,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -20151,7 +20259,7 @@
   ],
   "name": "twoDemeIMFirstStepSame",
   "module": "PortabilityDrift",
-  "line": 269,
+  "line": 274,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -20217,7 +20325,7 @@
   ],
   "name": "wrightFisherDriftRetention",
   "module": "PortabilityDrift",
-  "line": 710,
+  "line": 712,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -20283,7 +20391,7 @@
   ],
   "name": "wrightFisherHeterozygosityLoss",
   "module": "PortabilityDrift",
-  "line": 730,
+  "line": 732,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -24444,7 +24552,7 @@
   ],
   "name": "liabilityScaleH2",
   "module": "VarianceComponents",
-  "line": 437,
+  "line": 435,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -24599,6 +24707,15 @@
   "n_checks": 3,
   "severity": -1.0
  },
+ "AssortativeMatingPGS.AssortativeMatingModel.h2": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "invariant",
+  "severity": -1.0
+ },
  "AssortativeMatingPGS.AssortativeMatingModel.equilibriumVariance": {
   "checks": [],
   "skipped": [],
@@ -24744,6 +24861,15 @@
   "severity": -1.0
  },
  "Conclusions.exactBrierRiskOfCalibrated": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "Conclusions.PosteriorPrediction.prob_mode": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -25045,7 +25171,7 @@
   "skipped": [],
   "n_checks": 0,
   "verdict": "not-transpiled",
-  "reason": "non-arithmetic construct",
+  "reason": "non-scalar signature (\u211d)",
   "family": "invariant",
   "severity": -1.0
  },
@@ -26134,7 +26260,7 @@
   "skipped": [],
   "n_checks": 0,
   "verdict": "not-transpiled",
-  "reason": "trailing tokens at [('op', '('), ('ident', 'Sig_S'), ('op', '-'), ('ident', 'Sig_T')]",
+  "reason": "non-scalar signature (\u211d)",
   "family": "invariant",
   "severity": -1.0
  },
@@ -26252,6 +26378,51 @@
   "n_checks": 0,
   "verdict": "not-transpiled",
   "reason": "unknown identifier Real.tan",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "MetricSpecificPortability.targetCorrectionCurvature": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u03b9 \u2192 \u211d)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "MetricSpecificPortability.targetCorrectionOptimum": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u03b9 \u2192 \u211d)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "MetricSpecificPortability.sharedCorrectionConsensus": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "MetricSpecificPortability.sharedCorrectionSpread": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "MetricSpecificPortability.sharedCorrectionCost": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
   "family": "invariant",
   "severity": -1.0
  },
@@ -26759,7 +26930,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetObservedMean": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.observedMean": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26768,7 +26939,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetPredictedMean": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.predictedMean": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26777,7 +26948,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.sourceCalibrationMoments": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.calibrationMoments": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26786,16 +26957,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetCalibrationMoments": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CalibrationMoments)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.sourceCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.calibrationProfile": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26804,7 +26966,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.identityCalibrationProfile": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26813,21 +26975,12 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.deploymentIntercept": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
   "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CalibrationProfile)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CalibrationProfile)",
+  "reason": "non-scalar signature (\u211d)",
   "family": "invariant",
   "severity": -1.0
  },
@@ -26840,16 +26993,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceScoreMean": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetScoreMean": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.scoreMean": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26867,7 +27011,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourcePredictedMean": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.predictedMean": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26876,7 +27020,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetPredictedMean": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.observedMean": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26885,25 +27029,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetObservedMean": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.calibrationSlope": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26917,11 +27043,11 @@
   "skipped": [],
   "n_checks": 0,
   "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CrossPopulationCalibrationShiftModel where sourceObservedMean)",
+  "reason": "non-scalar signature (CrossPopulationCalibrationShiftModel where baseObservedMean)",
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.calibrationProfile": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26930,7 +27056,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26939,21 +27065,21 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.tagMeanAt": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
   "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CalibrationProfile)",
+  "reason": "non-scalar signature (Fin p \u2192 \u211d)",
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
   "verdict": "not-transpiled",
-  "reason": "non-scalar signature (CalibrationProfile)",
+  "reason": "non-scalar signature (\u211d)",
   "family": "invariant",
   "severity": -1.0
  },
@@ -26966,16 +27092,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.sourceScoreMeanAt": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.targetScoreMeanAt": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.scoreMeanAt": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26993,7 +27110,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.sourcePredictedMeanAt": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.predictedMeanAt": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -27002,16 +27119,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.targetObservedMeanAt": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.observedMeanAt": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -27349,7 +27457,7 @@
   "skipped": [],
   "n_checks": 0,
   "verdict": "not-transpiled",
-  "reason": "bad char ':'",
+  "reason": "non-scalar signature (\u211d)",
   "family": "invariant",
   "severity": -1.0
  },
@@ -27440,6 +27548,15 @@
   "n_checks": 0,
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (CodingInvariants where drift)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "PolygenicSpectroscopy.HardyWeinbergModel.standardizedFourthMoment": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
   "family": "invariant",
   "severity": -1.0
  },
@@ -27623,7 +27740,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sigmaTagCausal": {
+ "PortabilityDrift.sigmaTagCausalSourceAt": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -27794,7 +27911,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sourceScoreVarianceFromExplicitDrivers": {
+ "PortabilityDrift.scoreVarianceFromSourceWeights": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -27803,7 +27920,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.targetScoreVarianceFromSourceWeights": {
+ "PortabilityDrift.predictiveCovarianceFromSourceWeights": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -27812,34 +27929,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sourcePredictiveCovarianceFromSourceWeights": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetPredictiveCovarianceFromSourceWeights": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.sourceCalibrationSlopeFromSourceWeights": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetCalibrationSlopeFromSourceWeights": {
+ "PortabilityDrift.calibrationSlopeFromSourceWeights": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -27902,7 +27992,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.effectiveTargetOutcomeVariance": {
+ "PortabilityDrift.residualBurden": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -27911,7 +28001,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sourceExplainedSignalVarianceFromSourceWeights": {
+ "PortabilityDrift.effectiveOutcomeVariance": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -27920,7 +28010,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sourceR2FromSourceWeights": {
+ "PortabilityDrift.explainedSignalVarianceFromSourceWeights": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -27929,7 +28019,16 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sourceResidualVarianceFromSourceWeights": {
+ "PortabilityDrift.r2FromSourceWeights": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "PortabilityDrift.residualVarianceFromSourceWeights": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -27939,33 +28038,6 @@
   "severity": -1.0
  },
  "PortabilityDrift.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetExplainedSignalVarianceFromSourceWeights": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetR2FromSourceWeights": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetResidualVarianceFromSourceWeights": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -28271,16 +28343,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sourceEqualVarianceGaussianAUCFromSourceWeights": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (\u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetEqualVarianceGaussianAUCFromSourceWeights": {
+ "PortabilityDrift.equalVarianceGaussianAUCFromSourceWeights": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -28835,6 +28898,24 @@
   "n_checks": 0,
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (Prop)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "ProjectionShiftBounds.sharedCorrectionOptimum": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "ProjectionShiftBounds.irreducibleDegradation": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
   "family": "invariant",
   "severity": -1.0
  },

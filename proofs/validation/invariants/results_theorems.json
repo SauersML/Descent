@@ -956,6 +956,45 @@
    "status": "untranspilable",
    "reason": "bad char '.'"
   },
+  "gaussianFloorOneScaleSq": {
+   "status": "untranspilable",
+   "reason": "no scalar variables to sample"
+  },
+  "gaussianFloorTwoFourthMoment": {
+   "status": "untranspilable",
+   "reason": "no scalar variables to sample"
+  },
+  "gaussianFloorTwoScaleSq": {
+   "status": "untranspilable",
+   "reason": "no scalar variables to sample"
+  },
+  "hweFloorOneScaleSq_eq": {
+   "status": "untranspilable",
+   "reason": "no scalar variables to sample"
+  },
+  "hweFloorOneScaleSq_eq_gaussian_at_blind_maf": {
+   "status": "untranspilable",
+   "reason": "no scalar variables to sample"
+  },
+  "squaringFixedPoint_root": {
+   "status": "untranspilable",
+   "reason": "bad char '='"
+  },
+  "squaringFixedPoint_isFixedPoint": {
+   "status": "untranspilable",
+   "reason": "bad char '='"
+  },
+  "scale_le_squaringFixedPoint": {
+   "status": "holds",
+   "module": "CondensationUnification",
+   "accepted": 40,
+   "mentions": [
+    "squaringFixedPoint"
+   ],
+   "discriminates": [
+    "CondensationUnification.squaringFixedPoint"
+   ]
+  },
   "scaledMutationRate_eq_ploidy_form": {
    "status": "untranspilable",
    "reason": "bad char '='"
@@ -1403,7 +1442,7 @@
   },
   "twoLocusCoalescent_covariance_gap_lower_bound": {
    "status": "untranspilable",
-   "reason": "trailing tokens at [('op', '('), ('ident', 'twoLocusCoalescentCovarianceMatrix'), ('op', '('), ('ident', 't')]"
+   "reason": "expected ')' got ':='"
   },
   "target_r2_drop_of_twoLocusCoalescent": {
    "status": "hypothesis-not-modelled"
@@ -3745,12 +3784,16 @@
    ]
   },
   "effectCorrelation_mem_range": {
-   "status": "untranspilable",
-   "reason": "unknown identifier effectCorrelationStabilizingDriftSelection"
+   "status": "no-admissible-points",
+   "reason": "hypotheses rejected almost every sampled point"
+  },
+  "stabilizing_maintains_architecture": {
+   "status": "no-admissible-points",
+   "reason": "hypotheses rejected almost every sampled point"
   },
   "fluctuating_selection_worst_portability": {
-   "status": "untranspilable",
-   "reason": "unknown identifier effectCorrelationStabilizingDriftSelection"
+   "status": "no-admissible-points",
+   "reason": "hypotheses rejected almost every sampled point"
   },
   "per_variant_h2_decreases_with_M": {
    "status": "holds",
@@ -5156,9 +5199,7 @@
    "mentions": [
     "presentDayR2"
    ],
-   "discriminates": [
-    "PortabilityDrift.presentDayR2"
-   ]
+   "discriminates": []
   },
   "neutralAFBenchmarkRatio_from_state": {
    "status": "holds",
@@ -5169,7 +5210,6 @@
     "targetR2FromNeutralAFBenchmark"
    ],
    "discriminates": [
-    "PortabilityDrift.presentDayR2",
     "PortabilityDrift.targetR2FromNeutralAFBenchmark"
    ]
   },
@@ -7466,6 +7506,13 @@
     "conclusion": "1 < maxSafeEpistaticOrder N q"
    }
   ],
+  "CondensationUnification.squaringFixedPoint": [
+   {
+    "theorem": "scale_le_squaringFixedPoint",
+    "mutation": "negate",
+    "conclusion": "scale \u2264 squaringFixedPoint scale"
+   }
+  ],
   "CovarianceStructure.ldCorrelationSq": [
    {
     "theorem": "ld_correlation_sq_nonneg",
@@ -8074,77 +8121,67 @@
   "PortabilityDrift.presentDayR2": [
    {
     "theorem": "neutralAF_benchmark_r2_sensitive_to_drift",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "0 < presentDayR2 V_A V_E fstS - presentDayR2 V_A V_E fstT"
    },
    {
     "theorem": "portability_concave_in_fst_reduction",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "presentDayR2 V_A V_E (fst\u2082 - \u0394) - presentDayR2 V_A V_E fst\u2082 > presentDayR2 V_A V_E (fst\u2081 - \u0394) - presentDayR2 V_A V_E fst\u2081"
    },
    {
     "theorem": "portability_gap_nonneg",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "0 \u2264 portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fstT)"
    },
    {
     "theorem": "portability_gap_increases_with_distance",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fstT\u2081) < portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fstT\u2082)"
    },
    {
     "theorem": "diversity_reduces_max_gap",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_multi) < portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_single)"
    },
    {
     "theorem": "drift_degrades_R2",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS"
    },
    {
-    "theorem": "portability_ratio_lt_one_of_positive_drift",
-    "mutation": "swap-plus-minus",
-    "conclusion": "presentDayR2 V_A V_E fstT / presentDayR2 V_A V_E fstS < 1"
-   },
-   {
-    "theorem": "neutralAFBenchmarkRatio_from_state",
-    "mutation": "swap-plus-minus",
-    "conclusion": "targetR2FromNeutralAFBenchmark V_A V_E fstTarget / presentDayR2 V_A V_E fstSource < 1"
-   },
-   {
     "theorem": "targetR2_lt_source_from_neutralAF_benchmark",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "targetR2FromNeutralAFBenchmark V_A V_E fstTarget < presentDayR2 V_A V_E fstSource"
    },
    {
     "theorem": "targetBrier_ge_source_of_neutralAF_benchmark",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "sourceBrierFromR2 \u03c0 (presentDayR2 V_A V_E fstSource) \u2264 targetBrierFromNeutralAFBenchmark \u03c0 V_A V_E fstTarget"
    },
    {
     "theorem": "targetBrier_strict_gt_source_of_neutralAF_benchmark",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "sourceBrierFromR2 \u03c0 (presentDayR2 V_A V_E fstSource) < targetBrierFromNeutralAFBenchmark \u03c0 V_A V_E fstTarget"
    },
    {
     "theorem": "mutationDrift_R2_lt_puredrift_R2",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "presentDayR2MutationDrift V_A V_E fst_drift shared_ld < presentDayR2 V_A V_E fst_drift"
    },
    {
     "theorem": "migration_improves_R2_over_pure_drift",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "presentDayR2 V_A V_E fst_nomial < presentDayR2 V_A V_E (fstMigrationDriftEquilibrium Ne m)"
    },
    {
     "theorem": "asymmetric_migration_portability_direction",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "presentDayR2 V_A V_E (asymmetricFst Ne m\u2082\u2081) < presentDayR2 V_A V_E (asymmetricFst Ne m\u2081\u2082)"
    },
    {
     "theorem": "recurrence_derived_R2_increases_with_m",
-    "mutation": "swap-plus-minus",
+    "mutation": "negate",
     "conclusion": "presentDayR2 V_A V_E (fstMigDriftEquil Ne m\u2081) < presentDayR2 V_A V_E (fstMigDriftEquil Ne m\u2082)"
    }
   ],
@@ -9293,17 +9330,17 @@
    },
    {
     "theorem": "admixtureLDDecay_le_one",
-    "mutation": "drop-a-one-minus",
+    "mutation": "shift-by-half",
     "conclusion": "admixtureLDDecay r t \u2264 1"
    },
    {
     "theorem": "admixtureLDDecay_decreases_with_time",
-    "mutation": "drop-a-one-minus",
+    "mutation": "negate",
     "conclusion": "admixtureLDDecay r t\u2082 < admixtureLDDecay r t\u2081"
    },
    {
     "theorem": "admixtureLDDecay_decreases_with_recombination",
-    "mutation": "drop-a-one-minus",
+    "mutation": "negate",
     "conclusion": "admixtureLDDecay r\u2082 t < admixtureLDDecay r\u2081 t"
    }
   ],

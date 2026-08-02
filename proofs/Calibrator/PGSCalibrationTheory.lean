@@ -1058,7 +1058,7 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
     (t : ℕ) (link : CalibrationLink) :
     targetCalibrationProfileAtGeneration m t link =
       { citl :=
-          ((m.observedMean Pop.source) +
+          (m.baseObservedMean +
               (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t)) -
             (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
@@ -1115,7 +1115,7 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
                 targetScoreVarianceAtGeneration m.metric t) } ∧
     targetCalibrationProfileAtGeneration m t link =
       { citl :=
-          ((m.observedMean Pop.source) +
+          (m.baseObservedMean +
               (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t)) -
             (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))

@@ -59,7 +59,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "variance of the pairwise product of centred Hardy-Weinberg dosages",
-    "worst_excess": 0.11032206559118997
+    "worst_excess": 0.06633665562648247
    },
    {
     "family": "theorem",
@@ -116,7 +116,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "Var(p_t) from an explicit binomial Wright-Fisher run drifted to the requested F_ST",
-    "worst_excess": 0.08973179491093157
+    "worst_excess": 0.1673764480151698
    },
    {
     "family": "theorem",
@@ -171,7 +171,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "Var(p1-p2) between two independently drifting populations",
-    "worst_excess": 0.08317660310710194
+    "worst_excess": 0.2631816336163155
    }
   ],
   "findings": []
@@ -220,7 +220,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "E[(p1-p2)^2] for two Wright-Fisher populations drifting independently from the same start",
-    "worst_excess": 0.27413770475176363
+    "worst_excess": 0.34237031391601297
    },
    {
     "family": "theorem",
@@ -600,7 +600,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "variance of a diploid dosage drawn Binomial(2, p)",
-    "worst_excess": 0.06453590431970482
+    "worst_excess": 0.06820149533034972
    },
    {
     "family": "theorem",
@@ -1078,9 +1078,31 @@
    }
   ]
  },
+ "AssortativeMatingPGS.AssortativeMatingModel.h2": {
+  "module": "AssortativeMatingPGS",
+  "line": 78,
+  "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
+  "dependent_theorems": null,
+  "params": [
+   "m"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
+  }
+ },
  "AssortativeMatingPGS.amVarianceStep": {
   "module": "AssortativeMatingPGS",
-  "line": 118,
+  "line": 139,
   "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
   "dependent_theorems": 2,
   "params": [
@@ -1150,7 +1172,7 @@
  },
  "AssortativeMatingPGS.AssortativeMatingModel.equilibriumVariance": {
   "module": "AssortativeMatingPGS",
-  "line": 127,
+  "line": 148,
   "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
   "dependent_theorems": null,
   "params": [
@@ -1172,7 +1194,7 @@
  },
  "AssortativeMatingPGS.amEquilibriumVariance": {
   "module": "AssortativeMatingPGS",
-  "line": 133,
+  "line": 154,
   "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
   "dependent_theorems": 6,
   "params": [
@@ -1231,7 +1253,7 @@
  },
  "AssortativeMatingPGS.amInducedLD": {
   "module": "AssortativeMatingPGS",
-  "line": 221,
+  "line": 242,
   "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
   "dependent_theorems": 3,
   "params": [
@@ -1295,7 +1317,7 @@
  },
  "AssortativeMatingPGS.AssortativeMatingModel.observedH2": {
   "module": "AssortativeMatingPGS",
-  "line": 258,
+  "line": 279,
   "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
   "dependent_theorems": null,
   "params": [
@@ -1317,7 +1339,7 @@
  },
  "AssortativeMatingPGS.AssortativeMatingModel.pgsR2AM": {
   "module": "AssortativeMatingPGS",
-  "line": 287,
+  "line": 308,
   "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
   "dependent_theorems": null,
   "params": [
@@ -1340,7 +1362,7 @@
  },
  "AssortativeMatingPGS.AssortativeMatingModel.amGap": {
   "module": "AssortativeMatingPGS",
-  "line": 315,
+  "line": 336,
   "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
   "dependent_theorems": null,
   "params": [
@@ -1363,7 +1385,7 @@
  },
  "AssortativeMatingPGS.DifferentialAMModel.apparentPortability": {
   "module": "AssortativeMatingPGS",
-  "line": 383,
+  "line": 412,
   "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
   "dependent_theorems": null,
   "params": [
@@ -1385,7 +1407,7 @@
  },
  "AssortativeMatingPGS.amCorrectedPortability": {
   "module": "AssortativeMatingPGS",
-  "line": 400,
+  "line": 429,
   "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
   "dependent_theorems": 2,
   "params": [
@@ -1441,7 +1463,7 @@
  },
  "AssortativeMatingPGS.ibdFst": {
   "module": "AssortativeMatingPGS",
-  "line": 535,
+  "line": 564,
   "path": "proofs/Calibrator/AssortativeMatingPGS.lean",
   "dependent_theorems": 5,
   "params": [
@@ -1711,7 +1733,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "MSE of the shrunk estimator lam*(beta+noise) for beta, sampled",
-    "worst_excess": 0.02914862067039388
+    "worst_excess": 0.028989243950352753
    },
    {
     "family": "theorem",
@@ -1779,7 +1801,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "the shrinkage minimising MSE, found by grid search over a simulated sample rather than by formula",
-    "worst_excess": 0.02856409210646344
+    "worst_excess": 0.030804899740875687
    },
    {
     "family": "theorem",
@@ -2143,9 +2165,7 @@
   "params": [
    "hne",
    "newGuard",
-   "hnew",
-   "fun",
-   "g"
+   "hnew"
   ],
   "ret": "ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r)) (fun r => r = trueRetention) where positive",
   "covered": false,
@@ -2690,7 +2710,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "expected number screened to detect one case, sampled as a waiting time rather than computed",
-    "worst_excess": 0.09246751713424531
+    "worst_excess": 0.09306560280157902
    },
    {
     "family": "theorem",
@@ -2896,7 +2916,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "E[(p - y)^2] for y ~ Bernoulli(pi), sampled",
-    "worst_excess": 0.016064024140395247
+    "worst_excess": 0.11487046165260763
    },
    {
     "family": "theorem",
@@ -2933,9 +2953,31 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
+ "Conclusions.PosteriorPrediction.prob_mode": {
+  "module": "Conclusions",
+  "line": 180,
+  "path": "proofs/Calibrator/Conclusions.lean",
+  "dependent_theorems": null,
+  "params": [
+   "pred"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
+  }
+ },
  "Conclusions.sigmoid": {
   "module": "Conclusions",
-  "line": 214,
+  "line": 225,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 10,
   "params": [
@@ -2969,7 +3011,7 @@
  },
  "Conclusions.populationRisk": {
   "module": "Conclusions",
-  "line": 387,
+  "line": 398,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 1,
   "params": [
@@ -2994,7 +3036,7 @@
  },
  "Conclusions.oracleRisk": {
   "module": "Conclusions",
-  "line": 392,
+  "line": 403,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 4,
   "params": [
@@ -3017,13 +3059,14 @@
  },
  "Conclusions.infRisk": {
   "module": "Conclusions",
-  "line": 396,
+  "line": 407,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 1,
   "params": [
    "\u03bc",
    "\u2113",
-   "p"
+   "p",
+   "F"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -3041,7 +3084,7 @@
  },
  "Conclusions.BayesRisk": {
   "module": "Conclusions",
-  "line": 442,
+  "line": 453,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 7,
   "params": [
@@ -3064,7 +3107,7 @@
  },
  "Conclusions.bernoulliLogLoss": {
   "module": "Conclusions",
-  "line": 457,
+  "line": 468,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 8,
   "params": [
@@ -3103,14 +3146,14 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "E[-log P_q(y)] for y ~ Bernoulli(p), sampled",
-    "worst_excess": 0.03228561187614079
+    "worst_excess": 0.025735523770566843
    }
   ],
   "findings": []
  },
  "Conclusions.bernoulliKLReal": {
   "module": "Conclusions",
-  "line": 461,
+  "line": 472,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 6,
   "params": [
@@ -3151,7 +3194,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "E[log(P_p(y)/P_q(y))] for y ~ Bernoulli(p), sampled",
-    "worst_excess": 0.00754691761034585
+    "worst_excess": 0.13596500162791805
    },
    {
     "family": "theorem",
@@ -3167,7 +3210,7 @@
  },
  "Conclusions.klBernReal": {
   "module": "Conclusions",
-  "line": 465,
+  "line": 476,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 5,
   "params": [
@@ -3190,7 +3233,7 @@
  },
  "Conclusions.logLossRegret": {
   "module": "Conclusions",
-  "line": 520,
+  "line": 531,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 1,
   "params": [
@@ -3214,7 +3257,7 @@
  },
  "Conclusions.logLossKLCertificate": {
   "module": "Conclusions",
-  "line": 525,
+  "line": 536,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 1,
   "params": [
@@ -3238,7 +3281,7 @@
  },
  "Conclusions.brierRegret": {
   "module": "Conclusions",
-  "line": 617,
+  "line": 628,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 2,
   "params": [
@@ -3262,7 +3305,7 @@
  },
  "Conclusions.brierL2Certificate": {
   "module": "Conclusions",
-  "line": 622,
+  "line": 633,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 2,
   "params": [
@@ -3286,7 +3329,7 @@
  },
  "Conclusions.logRisk": {
   "module": "Conclusions",
-  "line": 651,
+  "line": 662,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 6,
   "params": [
@@ -3310,7 +3353,7 @@
  },
  "Conclusions.brierRisk": {
   "module": "Conclusions",
-  "line": 656,
+  "line": 667,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 6,
   "params": [
@@ -3334,7 +3377,7 @@
  },
  "Conclusions.brierBernoulliRisk": {
   "module": "Conclusions",
-  "line": 834,
+  "line": 845,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 3,
   "params": [
@@ -3375,7 +3418,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "E[(q - y)^2] for y ~ Bernoulli(eta), sampled",
-    "worst_excess": 0.02377179012473413
+    "worst_excess": 0.017250835311270755
    },
    {
     "family": "theorem",
@@ -3391,7 +3434,7 @@
  },
  "Conclusions.logBernoulliRisk": {
   "module": "Conclusions",
-  "line": 859,
+  "line": 870,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 2,
   "params": [
@@ -3441,7 +3484,7 @@
  },
  "Conclusions.populationAUC": {
   "module": "Conclusions",
-  "line": 896,
+  "line": 907,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 6,
   "params": [
@@ -3464,12 +3507,13 @@
  },
  "Conclusions.logBayesRisk": {
   "module": "Conclusions",
-  "line": 936,
+  "line": 947,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 4,
   "params": [
    "\u03bc",
-   "\u03b7"
+   "\u03b7",
+   "F"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -3487,12 +3531,13 @@
  },
  "Conclusions.brierBayesRisk": {
   "module": "Conclusions",
-  "line": 941,
+  "line": 952,
   "path": "proofs/Calibrator/Conclusions.lean",
   "dependent_theorems": 3,
   "params": [
    "\u03bc",
-   "\u03b7"
+   "\u03b7",
+   "F"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -3651,7 +3696,7 @@
  },
  "CondensationUnification.gaussianKurtosisMaf": {
   "module": "CondensationUnification",
-  "line": 555,
+  "line": 570,
   "path": "proofs/Calibrator/CondensationUnification.lean",
   "dependent_theorems": 5,
   "params": [],
@@ -3685,7 +3730,7 @@
  },
  "CondensationUnification.hweLevelOne": {
   "module": "CondensationUnification",
-  "line": 631,
+  "line": 646,
   "path": "proofs/Calibrator/CondensationUnification.lean",
   "dependent_theorems": 4,
   "params": [
@@ -3707,7 +3752,7 @@
  },
  "CondensationUnification.GenotypeDesign.reModel": {
   "module": "CondensationUnification",
-  "line": 677,
+  "line": 692,
   "path": "proofs/Calibrator/CondensationUnification.lean",
   "dependent_theorems": null,
   "params": [
@@ -3730,7 +3775,7 @@
  },
  "CondensationUnification.moment": {
   "module": "CondensationUnification",
-  "line": 830,
+  "line": 845,
   "path": "proofs/Calibrator/CondensationUnification.lean",
   "dependent_theorems": 4,
   "params": [
@@ -3753,7 +3798,7 @@
  },
  "CondensationUnification.centeredSquareThirdMoment": {
   "module": "CondensationUnification",
-  "line": 869,
+  "line": 884,
   "path": "proofs/Calibrator/CondensationUnification.lean",
   "dependent_theorems": 2,
   "params": [
@@ -3775,7 +3820,7 @@
  },
  "CondensationUnification.fourthMomentDispersion": {
   "module": "CondensationUnification",
-  "line": 882,
+  "line": 897,
   "path": "proofs/Calibrator/CondensationUnification.lean",
   "dependent_theorems": 1,
   "params": [
@@ -3794,6 +3839,122 @@
    "stage": "transpile",
    "detail": "non-scalar signature (\u211d)"
   }
+ },
+ "CondensationUnification.squaringScaleSq": {
+  "module": "CondensationUnification",
+  "line": 1069,
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "dependent_theorems": 4,
+  "params": [
+   "fourthMoment"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
+  }
+ },
+ "CondensationUnification.nextFloorFourthMoment": {
+  "module": "CondensationUnification",
+  "line": 1076,
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "dependent_theorems": 2,
+  "params": [
+   "m2",
+   "m4",
+   "m6",
+   "m8"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
+  }
+ },
+ "CondensationUnification.squaringStep": {
+  "module": "CondensationUnification",
+  "line": 1192,
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "dependent_theorems": 1,
+  "params": [
+   "scale",
+   "x"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
+  }
+ },
+ "CondensationUnification.squaringFixedPoint": {
+  "module": "CondensationUnification",
+  "line": 1198,
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "dependent_theorems": 3,
+  "params": [
+   "scale"
+  ],
+  "ret": "\u211d",
+  "covered": true,
+  "demonstration": "theorem-mutant-rejected",
+  "evidence_class": "internal-consistency",
+  "simulation_oracle": null,
+  "discriminating_theorems": [
+   "scale_le_squaringFixedPoint"
+  ],
+  "falsifiability_evidence": null,
+  "checks": [
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`scale` reaches 0.001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
+    "totality_findings": []
+   },
+   {
+    "family": "theorem",
+    "kind": "theorem",
+    "verdict": "discriminates",
+    "why": "1 proved theorem(s) about this definition break when its body is mutated",
+    "theorems": [
+     "scale_le_squaringFixedPoint"
+    ]
+   }
+  ],
+  "findings": []
  },
  "Conventions.ploidy": {
   "module": "Conventions",
@@ -3992,7 +4153,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "between-group component of allele-frequency variance over two equally sized subgroups",
-    "worst_excess": 0.110643873607579
+    "worst_excess": 0.1381800964752232
    }
   ],
   "findings": []
@@ -4006,7 +4167,8 @@
    "n",
    "m",
    "p\u2081",
-   "p\u2082"
+   "p\u2082",
+   "h"
   ],
   "ret": "Identification \u211d where formula",
   "covered": false,
@@ -4088,7 +4250,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "fraction of LD surviving t generations of recombination, from an explicit two-locus haplotype pool",
-    "worst_excess": 0.1607013298548672
+    "worst_excess": 0.20097183030713034
    }
   ],
   "findings": []
@@ -4498,7 +4660,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "frequency of the AB haplotype among individuals drawn from source A with probability alpha, each source in linkage equilibrium",
-    "worst_excess": 0.08249302206181515
+    "worst_excess": 0.2971973049662239
    }
   ],
   "findings": []
@@ -4565,7 +4727,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "D = P(AB) - P(A)P(B) measured in a simulated admixed population",
-    "worst_excess": 0.8155790403101882
+    "worst_excess": 0.8054055596356852
    }
   ],
   "findings": []
@@ -4585,9 +4747,9 @@
    "g"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "simulation-mutant-rejected",
-  "evidence_class": "external-reference",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
   "simulation_oracle": "admixture LD after g generations of random mating with recombination, simulated end to end rather than multiplied by a decay factor",
   "discriminating_theorems": null,
   "falsifiability_evidence": null,
@@ -4644,12 +4806,46 @@
    {
     "family": "simulation",
     "kind": "simulation",
-    "verdict": "agrees",
+    "verdict": "disagrees",
     "why": "admixture LD after g generations of random mating with recombination, simulated end to end rather than multiplied by a decay factor",
-    "worst_excess": 0.4350918324537666
+    "worst_excess": 1.0861377648643211
    }
   ],
-  "findings": []
+  "findings": [
+   {
+    "family": "simulation",
+    "kind": "simulation",
+    "verdict": "disagrees",
+    "why": "admixture LD after g generations of random mating with recombination, simulated end to end rather than multiplied by a decay factor",
+    "worst_excess": 1.0861377648643211
+   }
+  ],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(alpha,p_A)",
+    "swap-args(alpha,q_A)",
+    "swap-args(alpha,p_B)",
+    "swap-args(alpha,q_B)",
+    "swap-args(alpha,r)",
+    "swap-args(p_A,q_A)",
+    "swap-args(p_A,p_B)",
+    "swap-args(p_A,q_B)",
+    "swap-args(p_A,r)",
+    "swap-args(q_A,p_B)",
+    "swap-args(q_A,q_B)",
+    "swap-args(q_A,r)",
+    "swap-args(p_B,q_B)",
+    "swap-args(p_B,r)",
+    "swap-args(q_B,r)"
+   ]
+  }
  },
  "CovarianceStructure.admixtureLDMagnitude": {
   "module": "CovarianceStructure",
@@ -4865,7 +5061,7 @@
   "module": "DGP",
   "line": 105,
   "path": "proofs/Calibrator/DGP.lean",
-  "dependent_theorems": 0,
+  "dependent_theorems": 2,
   "params": [
    "dgp",
    "j"
@@ -4980,7 +5176,9 @@
   "line": 146,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 15,
-  "params": [],
+  "params": [
+   "A"
+  ],
   "ret": "\u211d",
   "covered": false,
   "demonstration": null,
@@ -4992,7 +5190,7 @@
   "findings": [],
   "uncovered_reason": {
    "stage": "transpile",
-   "detail": "non-arithmetic construct"
+   "detail": "non-scalar signature (\u211d)"
   }
  },
  "DGP.r2FromMSE": {
@@ -5369,7 +5567,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "P(no recombination in t meioses), sampled",
-    "worst_excess": 0.22627562354284808
+    "worst_excess": 0.09968278045399034
    }
   ],
   "findings": []
@@ -5506,7 +5704,9 @@
   "line": 598,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 2,
-  "params": [],
+  "params": [
+   "f"
+  ],
   "ret": "Prop",
   "covered": false,
   "demonstration": null,
@@ -5668,7 +5868,8 @@
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 1,
   "params": [
-   "dgp"
+   "dgp",
+   "f"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -5690,7 +5891,9 @@
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 1,
   "params": [
-   "dgp"
+   "dgp",
+   "f",
+   "g"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -5875,7 +6078,8 @@
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 5,
   "params": [
-   "dgp"
+   "dgp",
+   "pred"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -6357,14 +6561,14 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "squared correlation between signal and signal+noise, sampled",
-    "worst_excess": 0.27036337868185856
+    "worst_excess": 0.2564816881189635
    }
   ],
   "findings": []
  },
  "DGP.gaussianAUCFromSignalVariance": {
   "module": "DGP",
-  "line": 2104,
+  "line": 2135,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 2,
   "params": [
@@ -6438,7 +6642,7 @@
  },
  "DGP.calibratedBrier": {
   "module": "DGP",
-  "line": 2108,
+  "line": 2139,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 11,
   "params": [
@@ -6506,7 +6710,7 @@
  },
  "DGP.calibratedBrierFromVariances": {
   "module": "DGP",
-  "line": 2120,
+  "line": 2151,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 8,
   "params": [
@@ -6581,7 +6785,7 @@
  },
  "DGP.IrreducibleTargetPenalty.total": {
   "module": "DGP",
-  "line": 2146,
+  "line": 2177,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": null,
   "params": [
@@ -6603,7 +6807,7 @@
  },
  "DGP.profileFromSignalVariance": {
   "module": "DGP",
-  "line": 2181,
+  "line": 2212,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 1,
   "params": [
@@ -6627,7 +6831,7 @@
  },
  "DGP.profileFromSignalVarianceWithPenalty": {
   "module": "DGP",
-  "line": 2213,
+  "line": 2244,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 1,
   "params": [
@@ -6652,7 +6856,7 @@
  },
  "DGP.PGSEvolutionaryModel.coordinateSummary": {
   "module": "DGP",
-  "line": 2246,
+  "line": 2277,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": null,
   "params": [
@@ -6674,7 +6878,7 @@
  },
  "DGP.PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty": {
   "module": "DGP",
-  "line": 2307,
+  "line": 2338,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": null,
   "params": [
@@ -6698,7 +6902,7 @@
  },
  "DGP.alleleFreqDivergenceRate": {
   "module": "DGP",
-  "line": 2348,
+  "line": 2379,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 2,
   "params": [
@@ -6773,7 +6977,7 @@
  },
  "DGP.ldBreakageRate": {
   "module": "DGP",
-  "line": 2354,
+  "line": 2385,
   "path": "proofs/Calibrator/DGP.lean",
   "dependent_theorems": 1,
   "params": [
@@ -8031,7 +8235,7 @@
     "kind": "simulation",
     "verdict": "agrees",
     "why": "variance of the pairwise product of centred Hardy-Weinberg dosages",
-    "worst_excess": 0.08889011687376969
+    "worst_excess": 0.07097755517045312
    },
    {
     "family": "theorem",
@@ -8099,6 +8303,7 @@
   "dependent_theorems": 3,
   "params": [
    "coding",
+   "locusSet",
    "x"
   ],
   "ret": "\u211d",
@@ -8447,7 +8652,10 @@
   "line": 1279,
   "path": "proofs/Calibrator/EpistaticChaos.lean",
   "dependent_theorems": 3,
-  "params": [],
+  "params": [
+   "poolOne",
+   "poolTwo"
+  ],
   "ret": "Prop",
   "covered": false,
   "demonstration": null,
@@ -8470,7 +8678,8 @@
   "params": [
    "model",
    "geneOf",
-   "coeff"
+   "coeff",
+   "jointGenotypeProb"
   ],
   "ret": "GenotypeDesign n \u03b3 where model",
   "covered": false,
@@ -8494,7 +8703,8 @@
   "params": [
    "model",
    "width",
-   "coeff"
+   "coeff",
+   "jointGenotypeProb"
   ],
   "ret": "GenotypeDesign n (Fin n) where model",
   "covered": false,
@@ -9034,6 +9244,7 @@
   "path": "proofs/Calibrator/GeneticArchitectureDiscovery.lean",
   "dependent_theorems": 1,
   "params": [
+   "discovered",
    "targetCausalSignal"
   ],
   "ret": "\u211d",
@@ -11455,7 +11666,7 @@
  },
  "JetBarrier.latticeInflation": {
   "module": "JetBarrier",
-  "line": 141,
+  "line": 150,
   "path": "proofs/Calibrator/JetBarrier.lean",
   "dependent_theorems": 6,
   "params": [
@@ -11485,7 +11696,7 @@
  },
  "JetBarrier.latticeBracket": {
   "module": "JetBarrier",
-  "line": 146,
+  "line": 155,
   "path": "proofs/Calibrator/JetBarrier.lean",
   "dependent_theorems": 1,
   "params": [
@@ -11509,7 +11720,7 @@
  },
  "JetBarrier.disjointRecord": {
   "module": "JetBarrier",
-  "line": 297,
+  "line": 306,
   "path": "proofs/Calibrator/JetBarrier.lean",
   "dependent_theorems": 3,
   "params": [
@@ -11531,7 +11742,7 @@
  },
  "JetBarrier.gaussianObservables": {
   "module": "JetBarrier",
-  "line": 403,
+  "line": 412,
   "path": "proofs/Calibrator/JetBarrier.lean",
   "dependent_theorems": 3,
   "params": [],
@@ -11551,7 +11762,7 @@
  },
  "JetBarrier.IsChameleonObservable": {
   "module": "JetBarrier",
-  "line": 420,
+  "line": 429,
   "path": "proofs/Calibrator/JetBarrier.lean",
   "dependent_theorems": 2,
   "params": [
@@ -12019,7 +12230,10 @@
   "line": 545,
   "path": "proofs/Calibrator/LDDecayTheory.lean",
   "dependent_theorems": 2,
-  "params": [],
+  "params": [
+   "Sig_S",
+   "Sig_T"
+  ],
   "ret": "\u211d",
   "covered": false,
   "demonstration": null,
@@ -12031,7 +12245,7 @@
   "findings": [],
   "uncovered_reason": {
    "stage": "transpile",
-   "detail": "trailing tokens at [('op', '('), ('ident', 'Sig_S'), ('op', '-'), ('ident', 'Sig_T')]"
+   "detail": "non-scalar signature (\u211d)"
   }
  },
  "LDDecayTheory.harmonicMeanNe": {
@@ -13667,6 +13881,124 @@
    }
   ]
  },
+ "MetricSpecificPortability.targetCorrectionCurvature": {
+  "module": "MetricSpecificPortability",
+  "line": 1780,
+  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
+  "dependent_theorems": 0,
+  "params": [
+   "weight",
+   "B",
+   "beta"
+  ],
+  "ret": "\u03b9 \u2192 \u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u03b9 \u2192 \u211d)"
+  }
+ },
+ "MetricSpecificPortability.targetCorrectionOptimum": {
+  "module": "MetricSpecificPortability",
+  "line": 1788,
+  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
+  "dependent_theorems": 0,
+  "params": [
+   "B",
+   "beta",
+   "theta"
+  ],
+  "ret": "\u03b9 \u2192 \u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u03b9 \u2192 \u211d)"
+  }
+ },
+ "MetricSpecificPortability.sharedCorrectionConsensus": {
+  "module": "MetricSpecificPortability",
+  "line": 1796,
+  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
+  "dependent_theorems": 6,
+  "params": [
+   "curvature",
+   "optimum"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
+  }
+ },
+ "MetricSpecificPortability.sharedCorrectionSpread": {
+  "module": "MetricSpecificPortability",
+  "line": 1803,
+  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
+  "dependent_theorems": 7,
+  "params": [
+   "curvature",
+   "optimum"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
+  }
+ },
+ "MetricSpecificPortability.sharedCorrectionCost": {
+  "module": "MetricSpecificPortability",
+  "line": 1811,
+  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
+  "dependent_theorems": 3,
+  "params": [
+   "curvature",
+   "optimum",
+   "correction"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
+  }
+ },
  "MultiAncestryTheory.effectMutualInformation": {
   "module": "MultiAncestryTheory",
   "line": 209,
@@ -14893,7 +15225,8 @@
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "dependent_theorems": 6,
   "params": [
-   "S\u2080"
+   "S\u2080",
+   "support"
   ],
   "ret": "Set \u211d",
   "covered": false,
@@ -14915,7 +15248,8 @@
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "dependent_theorems": 12,
   "params": [
-   "S\u2080"
+   "S\u2080",
+   "support"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -15870,7 +16204,7 @@
   "module": "PGSCalibrationTheory",
   "line": 73,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
-  "dependent_theorems": 4,
+  "dependent_theorems": 11,
   "params": [
    "link",
    "mean_observed",
@@ -15923,7 +16257,7 @@
    "mom",
    "observedShift",
    "predictedShift",
-   "targetSlope"
+   "slope"
   ],
   "ret": "CalibrationMoments where meanObserved",
   "covered": false,
@@ -15943,7 +16277,7 @@
   "module": "PGSCalibrationTheory",
   "line": 96,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
-  "dependent_theorems": 0,
+  "dependent_theorems": 14,
   "params": [
    "mean_observed",
    "mean_predicted",
@@ -16120,7 +16454,7 @@
  },
  "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.observedMeanShift": {
   "module": "PGSCalibrationTheory",
-  "line": 329,
+  "line": 331,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
@@ -16142,7 +16476,7 @@
  },
  "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.predictedMeanShift": {
   "module": "PGSCalibrationTheory",
-  "line": 334,
+  "line": 336,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
@@ -16162,13 +16496,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetObservedMean": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.observedMean": {
   "module": "PGSCalibrationTheory",
-  "line": 339,
+  "line": 342,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -16184,13 +16519,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetPredictedMean": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.predictedMean": {
   "module": "PGSCalibrationTheory",
-  "line": 344,
+  "line": 347,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -16206,13 +16542,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.sourceCalibrationMoments": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.calibrationMoments": {
   "module": "PGSCalibrationTheory",
-  "line": 353,
+  "line": 361,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "CalibrationMoments where meanObserved",
   "covered": false,
@@ -16228,35 +16565,14 @@
    "detail": "non-scalar signature (CalibrationMoments where meanObserved)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetCalibrationMoments": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.calibrationProfile": {
   "module": "PGSCalibrationTheory",
-  "line": 363,
-  "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
-  ],
-  "ret": "CalibrationMoments",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (CalibrationMoments)"
-  }
- },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.sourceCalibrationProfile": {
-  "module": "PGSCalibrationTheory",
-  "line": 369,
+  "line": 368,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
    "m",
+   "P",
    "link"
   ],
   "ret": "CalibrationProfile",
@@ -16273,14 +16589,14 @@
    "detail": "non-scalar signature (CalibrationProfile)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.identityCalibrationProfile": {
   "module": "PGSCalibrationTheory",
-  "line": 375,
+  "line": 374,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
    "m",
-   "link"
+   "P"
   ],
   "ret": "CalibrationProfile",
   "covered": false,
@@ -16296,15 +16612,16 @@
    "detail": "non-scalar signature (CalibrationProfile)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.deploymentIntercept": {
   "module": "PGSCalibrationTheory",
-  "line": 381,
+  "line": 563,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
-  "ret": "CalibrationProfile",
+  "ret": "\u211d",
   "covered": false,
   "demonstration": null,
   "evidence_class": null,
@@ -16315,34 +16632,12 @@
   "findings": [],
   "uncovered_reason": {
    "stage": "transpile",
-   "detail": "non-scalar signature (CalibrationProfile)"
-  }
- },
- "PGSCalibrationTheory.CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile": {
-  "module": "PGSCalibrationTheory",
-  "line": 386,
-  "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
-  ],
-  "ret": "CalibrationProfile",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (CalibrationProfile)"
+   "detail": "non-scalar signature (\u211d)"
   }
  },
  "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.observedMeanShift": {
   "module": "PGSCalibrationTheory",
-  "line": 552,
+  "line": 568,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
@@ -16362,35 +16657,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceScoreMean": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.scoreMean": {
   "module": "PGSCalibrationTheory",
-  "line": 557,
+  "line": 573,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
-   "m"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetScoreMean": {
-  "module": "PGSCalibrationTheory",
-  "line": 562,
-  "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -16408,7 +16682,7 @@
  },
  "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.scoreMeanShift": {
   "module": "PGSCalibrationTheory",
-  "line": 569,
+  "line": 580,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
@@ -16428,13 +16702,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourcePredictedMean": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.predictedMean": {
   "module": "PGSCalibrationTheory",
-  "line": 574,
+  "line": 585,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -16450,13 +16725,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetPredictedMean": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.observedMean": {
   "module": "PGSCalibrationTheory",
-  "line": 579,
+  "line": 590,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -16472,57 +16748,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetObservedMean": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.calibrationSlope": {
   "module": "PGSCalibrationTheory",
-  "line": 584,
+  "line": 596,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
-   "m"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope": {
-  "module": "PGSCalibrationTheory",
-  "line": 589,
-  "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope": {
-  "module": "PGSCalibrationTheory",
-  "line": 594,
-  "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -16540,13 +16773,13 @@
  },
  "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.toShiftModel": {
   "module": "PGSCalibrationTheory",
-  "line": 600,
+  "line": 602,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
    "m"
   ],
-  "ret": "CrossPopulationCalibrationShiftModel where sourceObservedMean",
+  "ret": "CrossPopulationCalibrationShiftModel where baseObservedMean",
   "covered": false,
   "demonstration": null,
   "evidence_class": null,
@@ -16557,16 +16790,17 @@
   "findings": [],
   "uncovered_reason": {
    "stage": "transpile",
-   "detail": "non-scalar signature (CrossPopulationCalibrationShiftModel where sourceObservedMean)"
+   "detail": "non-scalar signature (CrossPopulationCalibrationShiftModel where baseObservedMean)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.calibrationProfile": {
   "module": "PGSCalibrationTheory",
-  "line": 614,
+  "line": 616,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
    "m",
+   "P",
    "link"
   ],
   "ret": "CalibrationProfile",
@@ -16583,14 +16817,14 @@
    "detail": "non-scalar signature (CalibrationProfile)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile": {
   "module": "PGSCalibrationTheory",
-  "line": 620,
+  "line": 622,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
    "m",
-   "link"
+   "P"
   ],
   "ret": "CalibrationProfile",
   "covered": false,
@@ -16606,15 +16840,17 @@
    "detail": "non-scalar signature (CalibrationProfile)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.tagMeanAt": {
   "module": "PGSCalibrationTheory",
-  "line": 626,
+  "line": 958,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
-   "m"
+   "m",
+   "P",
+   "t"
   ],
-  "ret": "CalibrationProfile",
+  "ret": "Fin p \u2192 \u211d",
   "covered": false,
   "demonstration": null,
   "evidence_class": null,
@@ -16625,18 +16861,20 @@
   "findings": [],
   "uncovered_reason": {
    "stage": "transpile",
-   "detail": "non-scalar signature (CalibrationProfile)"
+   "detail": "non-scalar signature (Fin p \u2192 \u211d)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt": {
   "module": "PGSCalibrationTheory",
-  "line": 632,
+  "line": 964,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
-   "m"
+   "m",
+   "P",
+   "t"
   ],
-  "ret": "CalibrationProfile",
+  "ret": "\u211d",
   "covered": false,
   "demonstration": null,
   "evidence_class": null,
@@ -16647,12 +16885,12 @@
   "findings": [],
   "uncovered_reason": {
    "stage": "transpile",
-   "detail": "non-scalar signature (CalibrationProfile)"
+   "detail": "non-scalar signature (\u211d)"
   }
  },
  "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.observedMeanShiftAt": {
   "module": "PGSCalibrationTheory",
-  "line": 966,
+  "line": 969,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
@@ -16673,36 +16911,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.sourceScoreMeanAt": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.scoreMeanAt": {
   "module": "PGSCalibrationTheory",
-  "line": 973,
+  "line": 974,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
    "m",
-   "t"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.targetScoreMeanAt": {
-  "module": "PGSCalibrationTheory",
-  "line": 978,
-  "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m",
+   "P",
    "t"
   ],
   "ret": "\u211d",
@@ -16721,7 +16937,7 @@
  },
  "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt": {
   "module": "PGSCalibrationTheory",
-  "line": 984,
+  "line": 980,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
@@ -16742,59 +16958,38 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.sourcePredictedMeanAt": {
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.predictedMeanAt": {
+  "module": "PGSCalibrationTheory",
+  "line": 985,
+  "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
+  "dependent_theorems": null,
+  "params": [
+   "m",
+   "P",
+   "t"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
+  }
+ },
+ "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.observedMeanAt": {
   "module": "PGSCalibrationTheory",
   "line": 990,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
    "m",
-   "t"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt": {
-  "module": "PGSCalibrationTheory",
-  "line": 995,
-  "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m",
-   "t"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.targetObservedMeanAt": {
-  "module": "PGSCalibrationTheory",
-  "line": 1000,
-  "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m",
+   "P",
    "t"
   ],
   "ret": "\u211d",
@@ -16813,7 +17008,7 @@
  },
  "PGSCalibrationTheory.CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt": {
   "module": "PGSCalibrationTheory",
-  "line": 1006,
+  "line": 996,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": null,
   "params": [
@@ -16836,7 +17031,7 @@
  },
  "PGSCalibrationTheory.targetCalibrationProfileAtGeneration": {
   "module": "PGSCalibrationTheory",
-  "line": 1056,
+  "line": 1045,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 3,
   "params": [
@@ -16860,7 +17055,7 @@
  },
  "PGSCalibrationTheory.targetIdentityCalibrationProfileAtGeneration": {
   "module": "PGSCalibrationTheory",
-  "line": 1062,
+  "line": 1051,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 1,
   "params": [
@@ -16883,7 +17078,7 @@
  },
  "PGSCalibrationTheory.prevalenceLogisticCalibrationProfile": {
   "module": "PGSCalibrationTheory",
-  "line": 1281,
+  "line": 1270,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 1,
   "params": [
@@ -16907,7 +17102,7 @@
  },
  "PGSCalibrationTheory.interceptRecalibrated": {
   "module": "PGSCalibrationTheory",
-  "line": 1397,
+  "line": 1386,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 2,
   "params": [
@@ -16931,7 +17126,7 @@
  },
  "PGSCalibrationTheory.logisticRecalibrated": {
   "module": "PGSCalibrationTheory",
-  "line": 1423,
+  "line": 1412,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 6,
   "params": [
@@ -16956,11 +17151,11 @@
  },
  "PGSCalibrationTheory.recalibratedCalibrationSlope": {
   "module": "PGSCalibrationTheory",
-  "line": 1450,
+  "line": 1439,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 4,
   "params": [
-   "targetSlope",
+   "slope",
    "fittedSlope"
   ],
   "ret": "\u211d",
@@ -16975,7 +17170,7 @@
     "family": "invariant",
     "kind": "continuity",
     "verdict": "holds",
-    "why": "`targetSlope` reaches -3 and 3 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+    "why": "`slope` reaches -3 and 3 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    },
    {
     "family": "invariant",
@@ -16999,13 +17194,13 @@
     "negate",
     "shift-by-half",
     "scale-by-three",
-    "swap-args(targetSlope,fittedSlope)"
+    "swap-args(slope,fittedSlope)"
    ]
   }
  },
  "PGSCalibrationTheory.recalibrationTraceMSELowerBound": {
   "module": "PGSCalibrationTheory",
-  "line": 1530,
+  "line": 1519,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 2,
   "params": [
@@ -17030,7 +17225,7 @@
  },
  "PGSCalibrationTheory.requiredEventsForRecalibration": {
   "module": "PGSCalibrationTheory",
-  "line": 1539,
+  "line": 1528,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 4,
   "params": [
@@ -17064,7 +17259,7 @@
  },
  "PGSCalibrationTheory.requiredTargetCohortSizeForRecalibration": {
   "module": "PGSCalibrationTheory",
-  "line": 1605,
+  "line": 1594,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 2,
   "params": [
@@ -17097,7 +17292,7 @@
  },
  "PGSCalibrationTheory.classifiedHighRisk": {
   "module": "PGSCalibrationTheory",
-  "line": 1680,
+  "line": 1669,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 12,
   "params": [
@@ -17120,7 +17315,7 @@
  },
  "PGSCalibrationTheory.nri": {
   "module": "PGSCalibrationTheory",
-  "line": 1702,
+  "line": 1691,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 1,
   "params": [
@@ -17148,7 +17343,7 @@
  },
  "PGSCalibrationTheory.thresholdBandRate": {
   "module": "PGSCalibrationTheory",
-  "line": 1736,
+  "line": 1725,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 4,
   "params": [
@@ -17172,7 +17367,7 @@
  },
  "PGSCalibrationTheory.downReclassificationRate": {
   "module": "PGSCalibrationTheory",
-  "line": 1743,
+  "line": 1732,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 1,
   "params": [
@@ -17196,7 +17391,7 @@
  },
  "PGSCalibrationTheory.nriFromDownwardInterceptRecalibration": {
   "module": "PGSCalibrationTheory",
-  "line": 1765,
+  "line": 1754,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 3,
   "params": [
@@ -17221,7 +17416,7 @@
  },
  "PGSCalibrationTheory.reclassifiedBandEventPrevalence": {
   "module": "PGSCalibrationTheory",
-  "line": 1809,
+  "line": 1798,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 1,
   "params": [
@@ -17247,7 +17442,7 @@
  },
  "PGSCalibrationTheory.qalyContributionAtTime": {
   "module": "PGSCalibrationTheory",
-  "line": 1887,
+  "line": 1876,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 3,
   "params": [
@@ -17271,7 +17466,7 @@
  },
  "PGSCalibrationTheory.treatmentMargin": {
   "module": "PGSCalibrationTheory",
-  "line": 1896,
+  "line": 1885,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 12,
   "params": [
@@ -17294,7 +17489,7 @@
  },
  "PGSCalibrationTheory.receivesTreatment": {
   "module": "PGSCalibrationTheory",
-  "line": 1902,
+  "line": 1891,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 13,
   "params": [
@@ -17317,7 +17512,7 @@
  },
  "PGSCalibrationTheory.qalyGainUnderDecision": {
   "module": "PGSCalibrationTheory",
-  "line": 1909,
+  "line": 1898,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 8,
   "params": [
@@ -17341,7 +17536,7 @@
  },
  "PGSCalibrationTheory.qalyLoss": {
   "module": "PGSCalibrationTheory",
-  "line": 1922,
+  "line": 1911,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 10,
   "params": [
@@ -17365,7 +17560,7 @@
  },
  "PGSCalibrationTheory.qalyDecisionRegretMargin": {
   "module": "PGSCalibrationTheory",
-  "line": 1931,
+  "line": 1920,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 4,
   "params": [
@@ -17389,7 +17584,7 @@
  },
  "PGSCalibrationTheory.expectedQalyLoss": {
   "module": "PGSCalibrationTheory",
-  "line": 2538,
+  "line": 2527,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 3,
   "params": [
@@ -17414,7 +17609,7 @@
  },
  "PGSCalibrationTheory.screeningLongitudinalModel": {
   "module": "PGSCalibrationTheory",
-  "line": 2585,
+  "line": 2574,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 5,
   "params": [
@@ -17436,7 +17631,7 @@
  },
  "PGSCalibrationTheory.screeningClinicalPathway": {
   "module": "PGSCalibrationTheory",
-  "line": 2595,
+  "line": 2584,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 5,
   "params": [
@@ -17459,7 +17654,7 @@
  },
  "PGSCalibrationTheory.screeningUtilityFromCounts": {
   "module": "PGSCalibrationTheory",
-  "line": 2637,
+  "line": 2626,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 2,
   "params": [
@@ -17484,7 +17679,7 @@
  },
  "PGSCalibrationTheory.screeningUtilityFromRates": {
   "module": "PGSCalibrationTheory",
-  "line": 2642,
+  "line": 2631,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 2,
   "params": [
@@ -17509,7 +17704,7 @@
  },
  "PGSCalibrationTheory.qalyScreeningDecisionModel": {
   "module": "PGSCalibrationTheory",
-  "line": 2727,
+  "line": 2716,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 3,
   "params": [
@@ -17532,7 +17727,7 @@
  },
  "PGSCalibrationTheory.screeningQalyGain": {
   "module": "PGSCalibrationTheory",
-  "line": 2757,
+  "line": 2746,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 5,
   "params": [
@@ -17558,7 +17753,7 @@
  },
  "PGSCalibrationTheory.decisionCurveScreeningModel": {
   "module": "PGSCalibrationTheory",
-  "line": 2774,
+  "line": 2763,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 3,
   "params": [
@@ -17580,7 +17775,7 @@
  },
  "PGSCalibrationTheory.decisionCurveNetBenefit": {
   "module": "PGSCalibrationTheory",
-  "line": 2806,
+  "line": 2795,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 6,
   "params": [
@@ -17605,7 +17800,7 @@
  },
  "PGSCalibrationTheory.thresholdLongitudinalModel": {
   "module": "PGSCalibrationTheory",
-  "line": 2837,
+  "line": 2826,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 5,
   "params": [
@@ -17627,7 +17822,7 @@
  },
  "PGSCalibrationTheory.thresholdClinicalPathway": {
   "module": "PGSCalibrationTheory",
-  "line": 2846,
+  "line": 2835,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 5,
   "params": [
@@ -17650,7 +17845,7 @@
  },
  "PGSCalibrationTheory.thresholdQalyGainUnderDecision": {
   "module": "PGSCalibrationTheory",
-  "line": 2884,
+  "line": 2873,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 4,
   "params": [
@@ -17674,7 +17869,7 @@
  },
  "PGSCalibrationTheory.thresholdQalyLoss": {
   "module": "PGSCalibrationTheory",
-  "line": 2893,
+  "line": 2882,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 8,
   "params": [
@@ -17698,7 +17893,7 @@
  },
  "PGSCalibrationTheory.thresholdDecisionRegretMargin": {
   "module": "PGSCalibrationTheory",
-  "line": 2906,
+  "line": 2895,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 3,
   "params": [
@@ -17722,7 +17917,7 @@
  },
  "PGSCalibrationTheory.expectedThresholdQalyLoss": {
   "module": "PGSCalibrationTheory",
-  "line": 3078,
+  "line": 3067,
   "path": "proofs/Calibrator/PGSCalibrationTheory.lean",
   "dependent_theorems": 3,
   "params": [
@@ -18302,11 +18497,11 @@
   ],
   "findings": []
  },
- "PolygenicAdaptation.effectCorrelationStabilizing": {
+ "PolygenicAdaptation.effectCorrelationStabilizingDriftSelection": {
   "module": "PolygenicAdaptation",
   "line": 288,
   "path": "proofs/Calibrator/PolygenicAdaptation.lean",
-  "dependent_theorems": null,
+  "dependent_theorems": 3,
   "params": [
    "d",
    "s",
@@ -18325,12 +18520,12 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      -1.0,
      1.0
     ],
-    "why": "`effectCorrelationStabilizing` names a correlation coefficient"
+    "why": "`effectCorrelationStabilizingDriftSelection` names a correlation coefficient"
    },
    {
     "family": "invariant",
@@ -18362,12 +18557,12 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      -1.0,
      1.0
     ],
-    "why": "`effectCorrelationStabilizing` names a correlation coefficient"
+    "why": "`effectCorrelationStabilizingDriftSelection` names a correlation coefficient"
    }
   ]
  },
@@ -18723,7 +18918,8 @@
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
   "dependent_theorems": 3,
   "params": [
-   "M"
+   "M",
+   "mismatched"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -18736,7 +18932,7 @@
   "findings": [],
   "uncovered_reason": {
    "stage": "transpile",
-   "detail": "bad char ':'"
+   "detail": "non-scalar signature (\u211d)"
   }
  },
  "PolygenicArchitecture.meanAbsoluteEffect": {
@@ -19323,7 +19519,7 @@
  },
  "PolygenicSpectroscopy.hweCodingInvariants": {
   "module": "PolygenicSpectroscopy",
-  "line": 1075,
+  "line": 1118,
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
   "dependent_theorems": 2,
   "params": [
@@ -19343,6 +19539,28 @@
   "uncovered_reason": {
    "stage": "transpile",
    "detail": "non-scalar signature (CodingInvariants where drift)"
+  }
+ },
+ "PolygenicSpectroscopy.HardyWeinbergModel.standardizedFourthMoment": {
+  "module": "PolygenicSpectroscopy",
+  "line": 1207,
+  "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
+  "dependent_theorems": null,
+  "params": [
+   "h"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
   }
  },
  "PopulationGeneticsFoundations.neiFst": {
@@ -21975,7 +22193,7 @@
  },
  "PortabilityDrift.SplitMigrationModel.scaledMigration": {
   "module": "PortabilityDrift",
-  "line": 230,
+  "line": 235,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -21997,7 +22215,7 @@
  },
  "PortabilityDrift.SplitMigrationModel.fstEqLimitLowMutationManyDemes": {
   "module": "PortabilityDrift",
-  "line": 233,
+  "line": 238,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -22019,7 +22237,7 @@
  },
  "PortabilityDrift.hudsonFstFromCoalescenceTimes": {
   "module": "PortabilityDrift",
-  "line": 236,
+  "line": 241,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -22062,7 +22280,7 @@
  },
  "PortabilityDrift.DemographicCoalescenceScalars.delta": {
   "module": "PortabilityDrift",
-  "line": 243,
+  "line": 248,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -22084,7 +22302,7 @@
  },
  "PortabilityDrift.twoDemeIMFirstStepSame": {
   "module": "PortabilityDrift",
-  "line": 269,
+  "line": 274,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -22109,7 +22327,7 @@
  },
  "PortabilityDrift.twoDemeIMFirstStepDiff": {
   "module": "PortabilityDrift",
-  "line": 277,
+  "line": 282,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -22134,7 +22352,7 @@
  },
  "PortabilityDrift.twoDemeIMEquilibriumETss": {
   "module": "PortabilityDrift",
-  "line": 289,
+  "line": 294,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 5,
   "params": [
@@ -22157,7 +22375,7 @@
  },
  "PortabilityDrift.twoDemeIMEquilibriumETst": {
   "module": "PortabilityDrift",
-  "line": 296,
+  "line": 301,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -22201,7 +22419,7 @@
  },
  "PortabilityDrift.twoDemeIMEquilibriumScalars": {
   "module": "PortabilityDrift",
-  "line": 299,
+  "line": 304,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -22223,7 +22441,7 @@
  },
  "PortabilityDrift.twoDemeIMEquilibriumDelta": {
   "module": "PortabilityDrift",
-  "line": 314,
+  "line": 319,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 5,
   "params": [
@@ -22268,7 +22486,7 @@
  },
  "PortabilityDrift.hetStepWithMutation": {
   "module": "PortabilityDrift",
-  "line": 435,
+  "line": 440,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -22323,7 +22541,7 @@
  },
  "PortabilityDrift.hetTrajectory": {
   "module": "PortabilityDrift",
-  "line": 443,
+  "line": 448,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 5,
   "params": [
@@ -22347,7 +22565,7 @@
  },
  "PortabilityDrift.hetMutationFloor": {
   "module": "PortabilityDrift",
-  "line": 460,
+  "line": 465,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -22426,7 +22644,7 @@
  },
  "PortabilityDrift.ClosedPopulationNoMutation.retention": {
   "module": "PortabilityDrift",
-  "line": 582,
+  "line": 587,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -22448,7 +22666,7 @@
  },
  "PortabilityDrift.ClosedPopulationNoMutation.heterozygosityLoss": {
   "module": "PortabilityDrift",
-  "line": 594,
+  "line": 599,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -22470,7 +22688,7 @@
  },
  "PortabilityDrift.ClosedPopulationNoMutation.targetHet": {
   "module": "PortabilityDrift",
-  "line": 604,
+  "line": 609,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -22492,7 +22710,7 @@
  },
  "PortabilityDrift.pgsVarianceFromHet": {
   "module": "PortabilityDrift",
-  "line": 628,
+  "line": 633,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 23,
   "params": [
@@ -22542,7 +22760,7 @@
  },
  "PortabilityDrift.targetHetFromFst": {
   "module": "PortabilityDrift",
-  "line": 653,
+  "line": 658,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -22591,59 +22809,9 @@
    ]
   }
  },
- "PortabilityDrift.targetPGSVariance": {
-  "module": "PortabilityDrift",
-  "line": 679,
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
-  "params": [
-   "V_A",
-   "fst"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`V_A` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "totality",
-    "verdict": "holds",
-    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
-    "totality_findings": []
-   }
-  ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "drop-a-one-minus",
-    "negate",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(V_A,fst)"
-   ]
-  }
- },
  "PortabilityDrift.presentDayPGSVariance": {
   "module": "PortabilityDrift",
-  "line": 689,
+  "line": 692,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 30,
   "params": [
@@ -22697,7 +22865,7 @@
  },
  "PortabilityDrift.wrightFisherDriftRetention": {
   "module": "PortabilityDrift",
-  "line": 710,
+  "line": 712,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -22765,7 +22933,7 @@
  },
  "PortabilityDrift.wrightFisherHeterozygosityLoss": {
   "module": "PortabilityDrift",
-  "line": 730,
+  "line": 732,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -22817,7 +22985,7 @@
  },
  "PortabilityDrift.Var_Delta_Mu": {
   "module": "PortabilityDrift",
-  "line": 773,
+  "line": 775,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -22873,7 +23041,7 @@
  },
  "PortabilityDrift.Expected_Abs_Shift": {
   "module": "PortabilityDrift",
-  "line": 777,
+  "line": 779,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -22934,7 +23102,7 @@
  },
  "PortabilityDrift.presentDaySignalToNoise": {
   "module": "PortabilityDrift",
-  "line": 876,
+  "line": 878,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -22989,74 +23157,9 @@
   ],
   "findings": []
  },
- "PortabilityDrift.presentDayR2": {
-  "module": "PortabilityDrift",
-  "line": 887,
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": 25,
-  "params": [
-   "V_A",
-   "V_E",
-   "fst"
-  ],
-  "ret": "\u211d",
-  "covered": true,
-  "demonstration": "theorem-mutant-rejected",
-  "evidence_class": "internal-consistency",
-  "simulation_oracle": null,
-  "discriminating_theorems": [
-   "neutralAF_benchmark_r2_sensitive_to_drift",
-   "portability_concave_in_fst_reduction",
-   "portability_gap_nonneg",
-   "portability_gap_increases_with_distance",
-   "diversity_reduces_max_gap"
-  ],
-  "falsifiability_evidence": null,
-  "checks": [
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`V_A` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`V_E` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "totality",
-    "verdict": "holds",
-    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
-    "totality_findings": []
-   },
-   {
-    "family": "theorem",
-    "kind": "theorem",
-    "verdict": "discriminates",
-    "why": "15 proved theorem(s) about this definition break when its body is mutated",
-    "theorems": [
-     "neutralAF_benchmark_r2_sensitive_to_drift",
-     "portability_concave_in_fst_reduction",
-     "portability_gap_nonneg",
-     "portability_gap_increases_with_distance",
-     "diversity_reduces_max_gap"
-    ]
-   }
-  ],
-  "findings": []
- },
  "PortabilityDrift.expectedR2": {
   "module": "PortabilityDrift",
-  "line": 935,
+  "line": 887,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 24,
   "params": [
@@ -23114,9 +23217,74 @@
   ],
   "findings": []
  },
+ "PortabilityDrift.presentDayR2": {
+  "module": "PortabilityDrift",
+  "line": 895,
+  "path": "proofs/Calibrator/PortabilityDrift.lean",
+  "dependent_theorems": 25,
+  "params": [
+   "V_A",
+   "V_E",
+   "fst"
+  ],
+  "ret": "\u211d",
+  "covered": true,
+  "demonstration": "theorem-mutant-rejected",
+  "evidence_class": "internal-consistency",
+  "simulation_oracle": null,
+  "discriminating_theorems": [
+   "neutralAF_benchmark_r2_sensitive_to_drift",
+   "portability_concave_in_fst_reduction",
+   "portability_gap_nonneg",
+   "portability_gap_increases_with_distance",
+   "diversity_reduces_max_gap"
+  ],
+  "falsifiability_evidence": null,
+  "checks": [
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`V_A` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`V_E` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
+    "totality_findings": []
+   },
+   {
+    "family": "theorem",
+    "kind": "theorem",
+    "verdict": "discriminates",
+    "why": "13 proved theorem(s) about this definition break when its body is mutated",
+    "theorems": [
+     "neutralAF_benchmark_r2_sensitive_to_drift",
+     "portability_concave_in_fst_reduction",
+     "portability_gap_nonneg",
+     "portability_gap_increases_with_distance",
+     "diversity_reduces_max_gap"
+    ]
+   }
+  ],
+  "findings": []
+ },
  "PortabilityDrift.presentDayGaussianAUC": {
   "module": "PortabilityDrift",
-  "line": 943,
+  "line": 947,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 5,
   "params": [
@@ -23191,7 +23359,7 @@
  },
  "PortabilityDrift.presentDayEqualVarianceGaussianAUC": {
   "module": "PortabilityDrift",
-  "line": 952,
+  "line": 956,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 7,
   "params": [
@@ -23266,7 +23434,7 @@
  },
  "PortabilityDrift.realWorldPGSVariance": {
   "module": "PortabilityDrift",
-  "line": 1094,
+  "line": 1098,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -23323,7 +23491,7 @@
  },
  "PortabilityDrift.Pop.pair": {
   "module": "PortabilityDrift",
-  "line": 1140,
+  "line": 1144,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -23348,7 +23516,7 @@
  },
  "PortabilityDrift.Pop.withTarget": {
   "module": "PortabilityDrift",
-  "line": 1150,
+  "line": 1154,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -23371,7 +23539,7 @@
  },
  "PortabilityDrift.Pop.withSource": {
   "module": "PortabilityDrift",
-  "line": 1153,
+  "line": 1157,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -23394,10 +23562,11 @@
  },
  "PortabilityDrift.sourceERMWeights": {
   "module": "PortabilityDrift",
-  "line": 1196,
+  "line": 1200,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 18,
   "params": [
+   "sigmaObsSource",
    "crossSource"
   ],
   "ret": "Fin p \u2192 \u211d",
@@ -23414,11 +23583,11 @@
    "detail": "non-scalar signature (Fin p \u2192 \u211d)"
   }
  },
- "PortabilityDrift.sigmaTagCausal": {
+ "PortabilityDrift.sigmaTagCausalSourceAt": {
   "module": "PortabilityDrift",
-  "line": 1208,
+  "line": 1212,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
+  "dependent_theorems": 4,
   "params": [
    "m",
    "P"
@@ -23439,7 +23608,7 @@
  },
  "PortabilityDrift.totalEffect": {
   "module": "PortabilityDrift",
-  "line": 1215,
+  "line": 1219,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 11,
   "params": [
@@ -23462,10 +23631,11 @@
  },
  "PortabilityDrift.targetLinearRisk": {
   "module": "PortabilityDrift",
-  "line": 1245,
+  "line": 1249,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
+   "sigmaObsTarget",
    "crossTarget",
    "noiseVar",
    "w"
@@ -23486,7 +23656,7 @@
  },
  "PortabilityDrift.sigmaObsSource": {
   "module": "PortabilityDrift",
-  "line": 1253,
+  "line": 1257,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [],
@@ -23506,7 +23676,7 @@
  },
  "PortabilityDrift.sigmaObsTarget": {
   "module": "PortabilityDrift",
-  "line": 1257,
+  "line": 1261,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [],
@@ -23526,7 +23696,7 @@
  },
  "PortabilityDrift.crossSource": {
   "module": "PortabilityDrift",
-  "line": 1261,
+  "line": 1265,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [],
@@ -23546,7 +23716,7 @@
  },
  "PortabilityDrift.crossTarget": {
   "module": "PortabilityDrift",
-  "line": 1265,
+  "line": 1269,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 10,
   "params": [],
@@ -23566,7 +23736,7 @@
  },
  "PortabilityDrift.wSource_opt": {
   "module": "PortabilityDrift",
-  "line": 1269,
+  "line": 1273,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [],
@@ -23586,7 +23756,7 @@
  },
  "PortabilityDrift.wTarget_opt": {
   "module": "PortabilityDrift",
-  "line": 1273,
+  "line": 1277,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [],
@@ -23606,7 +23776,7 @@
  },
  "PortabilityDrift.crossCovariance": {
   "module": "PortabilityDrift",
-  "line": 1303,
+  "line": 1307,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 28,
   "params": [
@@ -23629,7 +23799,7 @@
  },
  "PortabilityDrift.sourceWeightsFromExplicitDrivers": {
   "module": "PortabilityDrift",
-  "line": 1309,
+  "line": 1313,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 25,
   "params": [
@@ -23651,7 +23821,7 @@
  },
  "PortabilityDrift.sourceWeightedTagScore": {
   "module": "PortabilityDrift",
-  "line": 1317,
+  "line": 1321,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 23,
   "params": [
@@ -23674,7 +23844,7 @@
  },
  "PortabilityDrift.taggingProjection": {
   "module": "PortabilityDrift",
-  "line": 1329,
+  "line": 1333,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 15,
   "params": [
@@ -23697,7 +23867,7 @@
  },
  "PortabilityDrift.targetEffectHeterogeneity": {
   "module": "PortabilityDrift",
-  "line": 1338,
+  "line": 1342,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -23719,7 +23889,7 @@
  },
  "PortabilityDrift.targetSourceEffectProjection": {
   "module": "PortabilityDrift",
-  "line": 1356,
+  "line": 1360,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -23741,7 +23911,7 @@
  },
  "PortabilityDrift.targetEffectHeterogeneityProjection": {
   "module": "PortabilityDrift",
-  "line": 1364,
+  "line": 1368,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -23763,7 +23933,7 @@
  },
  "PortabilityDrift.targetNovelMutationEffectProjection": {
   "module": "PortabilityDrift",
-  "line": 1372,
+  "line": 1376,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -23785,7 +23955,7 @@
  },
  "PortabilityDrift.directCausalProjection": {
   "module": "PortabilityDrift",
-  "line": 1377,
+  "line": 1381,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 20,
   "params": [
@@ -23808,7 +23978,7 @@
  },
  "PortabilityDrift.proxyTaggingProjection": {
   "module": "PortabilityDrift",
-  "line": 1383,
+  "line": 1387,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 20,
   "params": [
@@ -23829,13 +23999,14 @@
    "detail": "non-scalar signature (Fin p \u2192 \u211d)"
   }
  },
- "PortabilityDrift.sourceScoreVarianceFromExplicitDrivers": {
+ "PortabilityDrift.scoreVarianceFromSourceWeights": {
   "module": "PortabilityDrift",
-  "line": 1462,
+  "line": 1466,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
+  "dependent_theorems": 43,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -23851,13 +24022,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PortabilityDrift.targetScoreVarianceFromSourceWeights": {
+ "PortabilityDrift.predictiveCovarianceFromSourceWeights": {
   "module": "PortabilityDrift",
-  "line": 1470,
+  "line": 1475,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
+  "dependent_theorems": 40,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -23873,79 +24045,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PortabilityDrift.sourcePredictiveCovarianceFromSourceWeights": {
+ "PortabilityDrift.calibrationSlopeFromSourceWeights": {
   "module": "PortabilityDrift",
-  "line": 1476,
+  "line": 1481,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
+  "dependent_theorems": 9,
   "params": [
-   "m"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PortabilityDrift.targetPredictiveCovarianceFromSourceWeights": {
-  "module": "PortabilityDrift",
-  "line": 1484,
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PortabilityDrift.sourceCalibrationSlopeFromSourceWeights": {
-  "module": "PortabilityDrift",
-  "line": 1492,
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PortabilityDrift.targetCalibrationSlopeFromSourceWeights": {
-  "module": "PortabilityDrift",
-  "line": 1500,
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -23963,7 +24070,7 @@
  },
  "PortabilityDrift.brokenTaggingResidual": {
   "module": "PortabilityDrift",
-  "line": 1628,
+  "line": 1608,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 21,
   "params": [
@@ -23985,7 +24092,7 @@
  },
  "PortabilityDrift.ancestrySpecificLDResidual": {
   "module": "PortabilityDrift",
-  "line": 1646,
+  "line": 1626,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 20,
   "params": [
@@ -24007,7 +24114,7 @@
  },
  "PortabilityDrift.sourceSpecificOverfitResidual": {
   "module": "PortabilityDrift",
-  "line": 1663,
+  "line": 1643,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 20,
   "params": [
@@ -24029,7 +24136,7 @@
  },
  "PortabilityDrift.novelUntaggablePhenotypeResidual": {
   "module": "PortabilityDrift",
-  "line": 1678,
+  "line": 1658,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 12,
   "params": [
@@ -24051,7 +24158,7 @@
  },
  "PortabilityDrift.irreducibleTargetResidualBurden": {
   "module": "PortabilityDrift",
-  "line": 1696,
+  "line": 1676,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 17,
   "params": [
@@ -24073,7 +24180,7 @@
  },
  "PortabilityDrift.targetIrreduciblePenaltyProfile": {
   "module": "PortabilityDrift",
-  "line": 1713,
+  "line": 1693,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 0,
   "params": [
@@ -24093,13 +24200,14 @@
    "detail": "non-scalar signature (TransportedMetrics.IrreducibleTargetPenalty where brokenTagging)"
   }
  },
- "PortabilityDrift.effectiveTargetOutcomeVariance": {
+ "PortabilityDrift.residualBurden": {
   "module": "PortabilityDrift",
-  "line": 1737,
+  "line": 1717,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
+  "dependent_theorems": 0,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -24115,13 +24223,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PortabilityDrift.sourceExplainedSignalVarianceFromSourceWeights": {
+ "PortabilityDrift.effectiveOutcomeVariance": {
   "module": "PortabilityDrift",
-  "line": 1771,
+  "line": 1727,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
+  "dependent_theorems": 29,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -24137,13 +24246,14 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PortabilityDrift.sourceR2FromSourceWeights": {
+ "PortabilityDrift.explainedSignalVarianceFromSourceWeights": {
   "module": "PortabilityDrift",
-  "line": 1777,
+  "line": 1774,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
+  "dependent_theorems": 31,
   "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -24159,13 +24269,37 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PortabilityDrift.sourceResidualVarianceFromSourceWeights": {
+ "PortabilityDrift.r2FromSourceWeights": {
   "module": "PortabilityDrift",
-  "line": 1785,
+  "line": 1780,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
+  "dependent_theorems": 42,
   "params": [
-   "m"
+   "m",
+   "P"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
+  }
+ },
+ "PortabilityDrift.residualVarianceFromSourceWeights": {
+  "module": "PortabilityDrift",
+  "line": 1788,
+  "path": "proofs/Calibrator/PortabilityDrift.lean",
+  "dependent_theorems": 10,
+  "params": [
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -24183,7 +24317,7 @@
  },
  "PortabilityDrift.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
   "module": "PortabilityDrift",
-  "line": 1802,
+  "line": 1805,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 5,
   "params": [
@@ -24204,75 +24338,9 @@
    "detail": "non-scalar signature (\u211d)"
   }
  },
- "PortabilityDrift.targetExplainedSignalVarianceFromSourceWeights": {
-  "module": "PortabilityDrift",
-  "line": 1854,
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PortabilityDrift.targetR2FromSourceWeights": {
-  "module": "PortabilityDrift",
-  "line": 1861,
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PortabilityDrift.targetResidualVarianceFromSourceWeights": {
-  "module": "PortabilityDrift",
-  "line": 1870,
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
  "PortabilityDrift.targetCalibratedBrierFromSourceWeights": {
   "module": "PortabilityDrift",
-  "line": 1884,
+  "line": 1875,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 9,
   "params": [
@@ -24294,7 +24362,7 @@
  },
  "PortabilityDrift.ldCorrelationDecay": {
   "module": "PortabilityDrift",
-  "line": 2105,
+  "line": 2096,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -24382,7 +24450,7 @@
  },
  "PortabilityDrift.theta": {
   "module": "PortabilityDrift",
-  "line": 2153,
+  "line": 2144,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 30,
   "params": [
@@ -24404,7 +24472,7 @@
  },
  "PortabilityDrift.bigM": {
   "module": "PortabilityDrift",
-  "line": 2157,
+  "line": 2148,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 19,
   "params": [
@@ -24426,7 +24494,7 @@
  },
  "PortabilityDrift.tauAt": {
   "module": "PortabilityDrift",
-  "line": 2161,
+  "line": 2152,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 8,
   "params": [
@@ -24449,7 +24517,7 @@
  },
  "PortabilityDrift.hetDecayFactor": {
   "module": "PortabilityDrift",
-  "line": 2165,
+  "line": 2156,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 13,
   "params": [
@@ -24471,7 +24539,7 @@
  },
  "PortabilityDrift.fstTransientAt": {
   "module": "PortabilityDrift",
-  "line": 2173,
+  "line": 2164,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -24494,7 +24562,7 @@
  },
  "PortabilityDrift.mutationSharedRetentionAt": {
   "module": "PortabilityDrift",
-  "line": 2178,
+  "line": 2169,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 7,
   "params": [
@@ -24517,7 +24585,7 @@
  },
  "PortabilityDrift.migrationSharedBoostAt": {
   "module": "PortabilityDrift",
-  "line": 2183,
+  "line": 2174,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 7,
   "params": [
@@ -24540,7 +24608,7 @@
  },
  "PortabilityDrift.PGSEvolutionaryModel.toGenerationalPopGenParameters": {
   "module": "PortabilityDrift",
-  "line": 2209,
+  "line": 2200,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -24562,7 +24630,7 @@
  },
  "PortabilityDrift.alleleFreqMismatchPenalty": {
   "module": "PortabilityDrift",
-  "line": 2317,
+  "line": 2308,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -24630,7 +24698,7 @@
  },
  "PortabilityDrift.betaTargetAt": {
   "module": "PortabilityDrift",
-  "line": 2375,
+  "line": 2366,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -24653,7 +24721,7 @@
  },
  "PortabilityDrift.tagAlleleFreqTargetAt": {
   "module": "PortabilityDrift",
-  "line": 2389,
+  "line": 2380,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -24677,7 +24745,7 @@
  },
  "PortabilityDrift.causalAlleleFreqTargetAt": {
   "module": "PortabilityDrift",
-  "line": 2403,
+  "line": 2394,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -24701,7 +24769,7 @@
  },
  "PortabilityDrift.tagAlleleFreqRetentionAt": {
   "module": "PortabilityDrift",
-  "line": 2414,
+  "line": 2405,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -24725,7 +24793,7 @@
  },
  "PortabilityDrift.causalAlleleFreqRetentionAt": {
   "module": "PortabilityDrift",
-  "line": 2421,
+  "line": 2412,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -24749,7 +24817,7 @@
  },
  "PortabilityDrift.novelVariantInnovationAt": {
   "module": "PortabilityDrift",
-  "line": 2427,
+  "line": 2418,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 0,
   "params": [
@@ -24772,7 +24840,7 @@
  },
  "PortabilityDrift.jointTagLDKernelAt": {
   "module": "PortabilityDrift",
-  "line": 2440,
+  "line": 2431,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -24797,7 +24865,7 @@
  },
  "PortabilityDrift.jointDirectCausalKernelAt": {
   "module": "PortabilityDrift",
-  "line": 2463,
+  "line": 2454,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 0,
   "params": [
@@ -24822,7 +24890,7 @@
  },
  "PortabilityDrift.jointProxyTaggingKernelAt": {
   "module": "PortabilityDrift",
-  "line": 2482,
+  "line": 2473,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -24847,7 +24915,7 @@
  },
  "PortabilityDrift.jointNovelDirectCausalKernelAt": {
   "module": "PortabilityDrift",
-  "line": 2507,
+  "line": 2498,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 0,
   "params": [
@@ -24872,7 +24940,7 @@
  },
  "PortabilityDrift.jointNovelProxyTaggingKernelAt": {
   "module": "PortabilityDrift",
-  "line": 2526,
+  "line": 2517,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 0,
   "params": [
@@ -24897,7 +24965,7 @@
  },
  "PortabilityDrift.sigmaTagTargetAt": {
   "module": "PortabilityDrift",
-  "line": 2549,
+  "line": 2540,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 5,
   "params": [
@@ -24920,7 +24988,7 @@
  },
  "PortabilityDrift.directCausalTargetAt": {
   "module": "PortabilityDrift",
-  "line": 2558,
+  "line": 2549,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -24943,7 +25011,7 @@
  },
  "PortabilityDrift.novelDirectCausalTargetAt": {
   "module": "PortabilityDrift",
-  "line": 2567,
+  "line": 2558,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -24966,7 +25034,7 @@
  },
  "PortabilityDrift.proxyTaggingTargetAt": {
   "module": "PortabilityDrift",
-  "line": 2576,
+  "line": 2567,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 7,
   "params": [
@@ -24989,7 +25057,7 @@
  },
  "PortabilityDrift.novelProxyTaggingTargetAt": {
   "module": "PortabilityDrift",
-  "line": 2584,
+  "line": 2575,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -25012,7 +25080,7 @@
  },
  "PortabilityDrift.sigmaTagCausalTargetAt": {
   "module": "PortabilityDrift",
-  "line": 2594,
+  "line": 2585,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -25035,7 +25103,7 @@
  },
  "PortabilityDrift.targetSourceEffectProjectionAt": {
   "module": "PortabilityDrift",
-  "line": 2606,
+  "line": 2597,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -25058,7 +25126,7 @@
  },
  "PortabilityDrift.targetEffectHeterogeneityProjectionAt": {
   "module": "PortabilityDrift",
-  "line": 2614,
+  "line": 2605,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -25081,7 +25149,7 @@
  },
  "PortabilityDrift.CrossPopulationGenerationalModel.toMetricModelAt": {
   "module": "PortabilityDrift",
-  "line": 2623,
+  "line": 2614,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -25104,7 +25172,7 @@
  },
  "PortabilityDrift.targetR2AtGeneration": {
   "module": "PortabilityDrift",
-  "line": 2647,
+  "line": 2638,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -25127,7 +25195,7 @@
  },
  "PortabilityDrift.targetCalibratedBrierAtGeneration": {
   "module": "PortabilityDrift",
-  "line": 2652,
+  "line": 2643,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -25150,7 +25218,7 @@
  },
  "PortabilityDrift.targetR2FromNeutralAFBenchmark": {
   "module": "PortabilityDrift",
-  "line": 2903,
+  "line": 2894,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -25209,7 +25277,7 @@
  },
  "PortabilityDrift.neutralAFBenchmarkRatio": {
   "module": "PortabilityDrift",
-  "line": 2977,
+  "line": 2968,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 11,
   "params": [
@@ -25299,7 +25367,7 @@
  },
  "PortabilityDrift.hetRatioBetweenBranches": {
   "module": "PortabilityDrift",
-  "line": 3025,
+  "line": 3016,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -25325,7 +25393,7 @@
  },
  "PortabilityDrift.exactCalibratedBrierRiskFromR2": {
   "module": "PortabilityDrift",
-  "line": 3060,
+  "line": 3051,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 8,
   "params": [
@@ -25365,9 +25433,7 @@
    "stage": "falsifiability",
    "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
    "survived": [
-    "drop-a-one-minus",
     "negate",
-    "swap-times-div",
     "shift-by-half",
     "scale-by-three",
     "swap-args(\u03c0,r2)"
@@ -25376,7 +25442,7 @@
  },
  "PortabilityDrift.targetGaussianAUCFromNeutralAFBenchmark": {
   "module": "PortabilityDrift",
-  "line": 3069,
+  "line": 3060,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -25451,7 +25517,7 @@
  },
  "PortabilityDrift.sourceBrierFromR2": {
   "module": "PortabilityDrift",
-  "line": 3082,
+  "line": 3073,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 7,
   "params": [
@@ -25520,7 +25586,7 @@
  },
  "PortabilityDrift.targetExactCalibratedBrierRisk": {
   "module": "PortabilityDrift",
-  "line": 3095,
+  "line": 3086,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -25585,7 +25651,7 @@
  },
  "PortabilityDrift.targetBrierFromNeutralAFBenchmark": {
   "module": "PortabilityDrift",
-  "line": 3102,
+  "line": 3093,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -25680,7 +25746,7 @@
  },
  "PortabilityDrift.neutralAFBenchmarkMetricProfile": {
   "module": "PortabilityDrift",
-  "line": 3108,
+  "line": 3099,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -25705,7 +25771,7 @@
  },
  "PortabilityDrift.equalVarianceGaussianAUCFromSNR": {
   "module": "PortabilityDrift",
-  "line": 3176,
+  "line": 3167,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -25753,7 +25819,7 @@
  },
  "PortabilityDrift.equalVarianceGaussianAUCFromVariances": {
   "module": "PortabilityDrift",
-  "line": 3188,
+  "line": 3179,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 14,
   "params": [
@@ -25774,13 +25840,13 @@
     ]
    },
    {
-    "mutation": "swap-times-div",
+    "mutation": "shift-by-half",
     "rejected_by": [
-     "scale"
+     "range"
     ]
    },
    {
-    "mutation": "shift-by-half",
+    "mutation": "scale-by-three",
     "rejected_by": [
      "range"
     ]
@@ -25827,7 +25893,7 @@
  },
  "PortabilityDrift.equalVarianceGaussianAUCFromExplainedR2": {
   "module": "PortabilityDrift",
-  "line": 3235,
+  "line": 3226,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 11,
   "params": [
@@ -25907,7 +25973,7 @@
  },
  "PortabilityDrift.equalVarianceGaussianAUCChart": {
   "module": "PortabilityDrift",
-  "line": 3281,
+  "line": 3272,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -25966,35 +26032,14 @@
   ],
   "findings": []
  },
- "PortabilityDrift.sourceEqualVarianceGaussianAUCFromSourceWeights": {
+ "PortabilityDrift.equalVarianceGaussianAUCFromSourceWeights": {
   "module": "PortabilityDrift",
-  "line": 3344,
+  "line": 3335,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
+  "dependent_theorems": 10,
   "params": [
-   "m"
-  ],
-  "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "evidence_class": null,
-  "simulation_oracle": null,
-  "discriminating_theorems": null,
-  "falsifiability_evidence": null,
-  "checks": [],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "transpile",
-   "detail": "non-scalar signature (\u211d)"
-  }
- },
- "PortabilityDrift.targetEqualVarianceGaussianAUCFromSourceWeights": {
-  "module": "PortabilityDrift",
-  "line": 3387,
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "dependent_theorems": null,
-  "params": [
-   "m"
+   "m",
+   "P"
   ],
   "ret": "\u211d",
   "covered": false,
@@ -26012,7 +26057,7 @@
  },
  "PortabilityDrift.sourceMetricProfileFromSourceWeightsAtPrevalence": {
   "module": "PortabilityDrift",
-  "line": 3462,
+  "line": 3454,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -26035,7 +26080,7 @@
  },
  "PortabilityDrift.sourceMetricProfileFromSourceWeightsAtTargetPrevalence": {
   "module": "PortabilityDrift",
-  "line": 3490,
+  "line": 3482,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -26057,7 +26102,7 @@
  },
  "PortabilityDrift.targetMetricProfileFromSourceWeights": {
   "module": "PortabilityDrift",
-  "line": 3517,
+  "line": 3509,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 7,
   "params": [
@@ -26079,7 +26124,7 @@
  },
  "PortabilityDrift.targetGaussianAUCAtGeneration": {
   "module": "PortabilityDrift",
-  "line": 3583,
+  "line": 3575,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -26102,7 +26147,7 @@
  },
  "PortabilityDrift.targetMetricProfileAtGeneration": {
   "module": "PortabilityDrift",
-  "line": 3588,
+  "line": 3580,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -26125,7 +26170,7 @@
  },
  "PortabilityDrift.targetPredictiveCovarianceAtGeneration": {
   "module": "PortabilityDrift",
-  "line": 3607,
+  "line": 3599,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 7,
   "params": [
@@ -26148,7 +26193,7 @@
  },
  "PortabilityDrift.targetScoreVarianceAtGeneration": {
   "module": "PortabilityDrift",
-  "line": 3613,
+  "line": 3605,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 7,
   "params": [
@@ -26171,7 +26216,7 @@
  },
  "PortabilityDrift.effectiveTargetOutcomeVarianceAtGeneration": {
   "module": "PortabilityDrift",
-  "line": 3621,
+  "line": 3613,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -26194,7 +26239,7 @@
  },
  "PortabilityDrift.targetResidualVarianceAtGeneration": {
   "module": "PortabilityDrift",
-  "line": 3627,
+  "line": 3619,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 0,
   "params": [
@@ -26217,7 +26262,7 @@
  },
  "PortabilityDrift.targetCalibrationSlopeAtGeneration": {
   "module": "PortabilityDrift",
-  "line": 3633,
+  "line": 3625,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -26240,7 +26285,7 @@
  },
  "PortabilityDrift.sourceNormalizedTargetR2AtGeneration": {
   "module": "PortabilityDrift",
-  "line": 3727,
+  "line": 3719,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -26264,7 +26309,7 @@
  },
  "PortabilityDrift.targetExactGaussianAUCFromNeutralAFBenchmark": {
   "module": "PortabilityDrift",
-  "line": 3831,
+  "line": 3823,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 5,
   "params": [
@@ -26339,7 +26384,7 @@
  },
  "PortabilityDrift.brierRegretPoint": {
   "module": "PortabilityDrift",
-  "line": 3955,
+  "line": 3947,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -26388,7 +26433,7 @@
  },
  "PortabilityDrift.brierRegretRatio": {
   "module": "PortabilityDrift",
-  "line": 3959,
+  "line": 3951,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -26446,7 +26491,7 @@
  },
  "PortabilityDrift.logLossRegretPoint": {
   "module": "PortabilityDrift",
-  "line": 3976,
+  "line": 3968,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -26495,7 +26540,7 @@
  },
  "PortabilityDrift.logLossRegretRatio": {
   "module": "PortabilityDrift",
-  "line": 3980,
+  "line": 3972,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -26553,7 +26598,7 @@
  },
  "PortabilityDrift.expectedSqMeanPGSDiff_pureSplit": {
   "module": "PortabilityDrift",
-  "line": 4064,
+  "line": 4056,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 0,
   "params": [
@@ -26612,7 +26657,7 @@
  },
  "PortabilityDrift.expectedSqMeanPGSDiff_IMEquilibrium": {
   "module": "PortabilityDrift",
-  "line": 4074,
+  "line": 4066,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -26663,7 +26708,7 @@
  },
  "PortabilityDrift.MutationDriftModelAssumptions.theta": {
   "module": "PortabilityDrift",
-  "line": 4137,
+  "line": 4129,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -26685,7 +26730,7 @@
  },
  "PortabilityDrift.ibdFlowStep": {
   "module": "PortabilityDrift",
-  "line": 4170,
+  "line": 4162,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -26710,7 +26755,7 @@
  },
  "PortabilityDrift.MutationDriftModelAssumptions.fstEquilibrium": {
   "module": "PortabilityDrift",
-  "line": 4202,
+  "line": 4194,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -26732,7 +26777,7 @@
  },
  "PortabilityDrift.MutationDriftModelAssumptions.fstTransient": {
   "module": "PortabilityDrift",
-  "line": 4236,
+  "line": 4228,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -26754,7 +26799,7 @@
  },
  "PortabilityDrift.covarianceRetention": {
   "module": "PortabilityDrift",
-  "line": 4324,
+  "line": 4316,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -26816,7 +26861,7 @@
  },
  "PortabilityDrift.freqCorrFromFst": {
   "module": "PortabilityDrift",
-  "line": 4334,
+  "line": 4326,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -26858,7 +26903,7 @@
  },
  "PortabilityDrift.ldOverlapFromSharedLD": {
   "module": "PortabilityDrift",
-  "line": 4338,
+  "line": 4330,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -26899,7 +26944,7 @@
  },
  "PortabilityDrift.covarianceDivergenceFromRetention": {
   "module": "PortabilityDrift",
-  "line": 4350,
+  "line": 4342,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -26955,7 +27000,7 @@
  },
  "PortabilityDrift.covarianceDivergenceMutationDrift": {
   "module": "PortabilityDrift",
-  "line": 4369,
+  "line": 4361,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -27030,7 +27075,7 @@
  },
  "PortabilityDrift.presentDayPGSVarianceMutationDrift": {
   "module": "PortabilityDrift",
-  "line": 4425,
+  "line": 4417,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 8,
   "params": [
@@ -27101,7 +27146,7 @@
  },
  "PortabilityDrift.presentDayR2MutationDrift": {
   "module": "PortabilityDrift",
-  "line": 4470,
+  "line": 4462,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -27165,7 +27210,7 @@
  },
  "PortabilityDrift.neutralAFSharedLDBenchmarkRatio": {
   "module": "PortabilityDrift",
-  "line": 4500,
+  "line": 4492,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -27291,7 +27336,7 @@
  },
  "PortabilityDrift.fstMigrationDriftEquilibrium": {
   "module": "PortabilityDrift",
-  "line": 4645,
+  "line": 4637,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 22,
   "params": [
@@ -27399,7 +27444,7 @@
  },
  "PortabilityDrift.ibdRecurrenceStep": {
   "module": "PortabilityDrift",
-  "line": 4683,
+  "line": 4675,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -27424,7 +27469,7 @@
  },
  "PortabilityDrift.ibdRecurrenceFixedPoint": {
   "module": "PortabilityDrift",
-  "line": 4696,
+  "line": 4688,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -27474,7 +27519,7 @@
  },
  "PortabilityDrift.islandFstMultiplicativeStep": {
   "module": "PortabilityDrift",
-  "line": 4786,
+  "line": 4778,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -27518,7 +27563,7 @@
  },
  "PortabilityDrift.fstIslandMultiplicativeEquilibrium": {
   "module": "PortabilityDrift",
-  "line": 4803,
+  "line": 4795,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -27594,7 +27639,7 @@
  },
  "PortabilityDrift.scaledMigrationRate": {
   "module": "PortabilityDrift",
-  "line": 4835,
+  "line": 4827,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 19,
   "params": [
@@ -27644,7 +27689,7 @@
  },
  "PortabilityDrift.SplitMigrationModel.fstMigDriftEq": {
   "module": "PortabilityDrift",
-  "line": 4921,
+  "line": 4913,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": null,
   "params": [
@@ -27666,7 +27711,7 @@
  },
  "PortabilityDrift.steppingStoneFst": {
   "module": "PortabilityDrift",
-  "line": 4971,
+  "line": 4963,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 6,
   "params": [
@@ -27758,7 +27803,7 @@
  },
  "PortabilityDrift.sharedLD_from_equilibrium": {
   "module": "PortabilityDrift",
-  "line": 5056,
+  "line": 5048,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 2,
   "params": [
@@ -27826,7 +27871,7 @@
  },
  "PortabilityDrift.sharedLDFromMigration": {
   "module": "PortabilityDrift",
-  "line": 5082,
+  "line": 5074,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 7,
   "params": [
@@ -27881,7 +27926,7 @@
  },
  "PortabilityDrift.signalRetentionMigrationDrift": {
   "module": "PortabilityDrift",
-  "line": 5146,
+  "line": 5138,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -27938,7 +27983,7 @@
  },
  "PortabilityDrift.retainedSignalVarianceMigrationDrift": {
   "module": "PortabilityDrift",
-  "line": 5157,
+  "line": 5149,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -28007,7 +28052,7 @@
  },
  "PortabilityDrift.asymmetricFst": {
   "module": "PortabilityDrift",
-  "line": 5268,
+  "line": 5260,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -28063,7 +28108,7 @@
  },
  "PortabilityDrift.effectiveSymmetricMigration": {
   "module": "PortabilityDrift",
-  "line": 5309,
+  "line": 5301,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 3,
   "params": [
@@ -28113,7 +28158,7 @@
  },
  "PortabilityDrift.admixtureLDDecay": {
   "module": "PortabilityDrift",
-  "line": 5330,
+  "line": 5322,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 9,
   "params": [
@@ -28169,7 +28214,7 @@
  },
  "PortabilityDrift.admixtureLDBoost": {
   "module": "PortabilityDrift",
-  "line": 5377,
+  "line": 5369,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 1,
   "params": [
@@ -28201,7 +28246,7 @@
  },
  "PortabilityDrift.fstMigDriftNext": {
   "module": "PortabilityDrift",
-  "line": 5439,
+  "line": 5431,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 4,
   "params": [
@@ -28276,7 +28321,7 @@
  },
  "PortabilityDrift.fstMigDriftEquil": {
   "module": "PortabilityDrift",
-  "line": 5474,
+  "line": 5466,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 10,
   "params": [
@@ -28384,7 +28429,7 @@
  },
  "PortabilityDrift.neutralAFBenchmarkFromRecurrence": {
   "module": "PortabilityDrift",
-  "line": 5556,
+  "line": 5548,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "dependent_theorems": 5,
   "params": [
@@ -29491,6 +29536,7 @@
   "path": "proofs/Calibrator/Probability.lean",
   "dependent_theorems": 2,
   "params": [
+   "T",
    "x",
    "s"
   ],
@@ -29515,6 +29561,7 @@
   "dependent_theorems": 1,
   "params": [
    "hN",
+   "T",
    "s",
    "x"
   ],
@@ -29967,6 +30014,54 @@
   "uncovered_reason": {
    "stage": "transpile",
    "detail": "non-scalar signature (Prop)"
+  }
+ },
+ "ProjectionShiftBounds.sharedCorrectionOptimum": {
+  "module": "ProjectionShiftBounds",
+  "line": 864,
+  "path": "proofs/Calibrator/ProjectionShiftBounds.lean",
+  "dependent_theorems": 3,
+  "params": [
+   "B",
+   "beta",
+   "theta"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
+  }
+ },
+ "ProjectionShiftBounds.irreducibleDegradation": {
+  "module": "ProjectionShiftBounds",
+  "line": 875,
+  "path": "proofs/Calibrator/ProjectionShiftBounds.lean",
+  "dependent_theorems": 5,
+  "params": [
+   "B",
+   "beta",
+   "theta"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
+  "simulation_oracle": null,
+  "discriminating_theorems": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
   }
  },
  "QuadraticShift.quadraticRisk": {
@@ -32841,25 +32936,12 @@
    "var_y"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "evidence_class": "self-property",
+  "covered": false,
+  "demonstration": null,
+  "evidence_class": null,
   "simulation_oracle": null,
   "discriminating_theorems": null,
-  "falsifiability_evidence": [
-   {
-    "mutation": "const-off-by-one",
-    "rejected_by": [
-     "scale"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "rejected_by": [
-     "scale"
-    ]
-   }
-  ],
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "invariant",
@@ -32868,7 +32950,19 @@
     "why": "`pgsR2` is dimensionless and ['cov_pgs_y', 'var_pgs', 'var_y'] are second moments, so scaling them together must leave the value unchanged"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "negate",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(cov_pgs_y,var_pgs)",
+    "swap-args(cov_pgs_y,var_y)",
+    "swap-args(var_pgs,var_y)"
+   ]
+  }
  },
  "TransferLearningPGS.sourceTruthR2SharedLD": {
   "module": "TransferLearningPGS",
@@ -34415,6 +34509,7 @@
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
   "dependent_theorems": 3,
   "params": [
+   "sigmaObsTarget",
    "crossTarget",
    "noiseVar",
    "w",
@@ -34440,6 +34535,7 @@
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
   "dependent_theorems": 6,
   "params": [
+   "sigmaObsTarget",
    "crossTarget",
    "noiseVar",
    "wBefore",
@@ -35022,7 +35118,7 @@
  },
  "TransportIdentities.prevalence": {
   "module": "TransportIdentities",
-  "line": 818,
+  "line": 817,
   "path": "proofs/Calibrator/TransportIdentities.lean",
   "dependent_theorems": 12,
   "params": [
@@ -35044,7 +35140,7 @@
  },
  "TransportIdentities.recallRate": {
   "module": "TransportIdentities",
-  "line": 820,
+  "line": 819,
   "path": "proofs/Calibrator/TransportIdentities.lean",
   "dependent_theorems": 3,
   "params": [
@@ -35066,7 +35162,7 @@
  },
  "TransportIdentities.fpr": {
   "module": "TransportIdentities",
-  "line": 822,
+  "line": 821,
   "path": "proofs/Calibrator/TransportIdentities.lean",
   "dependent_theorems": 5,
   "params": [
@@ -35088,7 +35184,7 @@
  },
  "TransportIdentities.precision": {
   "module": "TransportIdentities",
-  "line": 824,
+  "line": 823,
   "path": "proofs/Calibrator/TransportIdentities.lean",
   "dependent_theorems": 3,
   "params": [
@@ -35284,7 +35380,7 @@
  },
  "VarianceComponents.additiveVariance": {
   "module": "VarianceComponents",
-  "line": 139,
+  "line": 137,
   "path": "proofs/Calibrator/VarianceComponents.lean",
   "dependent_theorems": 2,
   "params": [
@@ -35307,7 +35403,7 @@
  },
  "VarianceComponents.liabilityScaleH2": {
   "module": "VarianceComponents",
-  "line": 437,
+  "line": 435,
   "path": "proofs/Calibrator/VarianceComponents.lean",
   "dependent_theorems": 2,
   "params": [
