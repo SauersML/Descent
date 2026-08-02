@@ -107,6 +107,98 @@ theorem genotypeFlip3_involutive : Function.Involutive genotypeFlip3 := by
 theorem genotypeFlip3_cast (j : Fin 3) : ((genotypeFlip3 j : Fin 3) : ℝ) = 2 - (j : ℝ) := by
   fin_cases j <;> norm_num [genotypeFlip3]
 
+/-- The squared standardized dosage, with the square root discharged:
+`a_j(q)² = (j - 2q)²/(2q(1-q))`. -/
+theorem diploidAtomValue_sq (j : Fin 3) (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
+    diploidAtomValue j q ^ 2 = ((j : ℝ) - 2 * q) ^ 2 / (2 * q * (1 - q)) := by
+  have hs : (0 : ℝ) < 2 * q * (1 - q) := by nlinarith
+  unfold diploidAtomValue diploidStdev
+  rw [div_pow, Real.sq_sqrt hs.le]
+
+/-- The modulus curve in closed form. -/
+theorem diploid_modulus_eq (j : Fin 3) (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
+    diploidFamily.modulus j q = |((j : ℝ) - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1| := by
+  unfold BundleFamily.modulus diploidFamily
+  simp only
+  rw [diploidAtomValue_sq j q hq0 hq1]
+
+/-! ## 1b. Degeneracy of the modulus law: a correction to a relayed classification
+
+A relayed classification asserted that a family has **single-atom modulus law** — every
+atom producing the same value of `|X² - 1|` — exactly when it has four atoms
+`±√(1+v), ±√(1-v)` with masses `1/4 ± c√(1∓v)`, and that **no three-atom family** can do
+this for `v > 0`. The stated two-line reason was that killing one mass forces another to
+`1/4 - (1/4)√((1+v)/(1-v))`, which is negative.
+
+**That impossibility claim is false at `v = 1`, and the counterexample is the balanced
+locus `q = 1/2`,** which is the most ordinary marker on an ascertained array. At `q = 1/2`
+the standardized genotype takes values `-√2, 0, √2` with masses `1/4, 1/2, 1/4`; then
+`X² - 1` takes values `1, -1, 1`, so `|X² - 1| ≡ 1` — a three-atom family with
+single-atom modulus law (`diploid_modulus_at_half`). The classification is not
+contradicted, it is *attained at its boundary*: `√(1-v) = 0` at `v = 1`, so the two atoms
+`±√(1-v)` collapse into the single atom `0` carrying the combined mass `1/2`. The
+impossibility argument divides by `√(1-v)` and therefore says nothing at exactly the
+point where the counterexample lives.
+
+The consequence for this module is that the invited statement — *genotype modulus data is
+never degenerate* — must **not** be made. What is true is stated below: degenerate at
+`q = 1/2`, non-degenerate away from it. -/
+
+/-- **The balanced locus is modulus-degenerate**: at `q = 1/2` all three genotypes give
+`|X² - 1| = 1`.
+
+A panel of balanced markers therefore carries a single modulus value, and its
+allele-frequency spectrum is invisible in the strongest possible sense — every locus looks
+identical. This sharpens the ascertainment warning of §4: enrichment for common,
+near-balanced SNPs pushes a panel toward the degenerate point, where modulus data carries
+no spectral information at all. -/
+theorem diploid_modulus_at_half (j : Fin 3) : diploidFamily.modulus j (1 / 2) = 1 := by
+  rw [diploid_modulus_eq j (1 / 2) (by norm_num) (by norm_num)]
+  fin_cases j <;> norm_num
+
+/-- **Away from balance the modulus law is non-degenerate**, and `q = 1/2` is the only
+degenerate frequency.
+
+The mechanism, in one line: writing `A = a_0(q)² = 2q/(1-q)` and `C = a_2(q)² = 2(1-q)/q`,
+we have `A·C = 4` identically, so `A + C ≥ 4 > 2`; equality of the two moduli forces
+either `A = C`, which gives `q = 1/2`, or `A + C = 2`, which the bound excludes. -/
+theorem diploid_modulus_degenerate_only_at_half (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1)
+    (hdeg : diploidFamily.modulus 0 q = diploidFamily.modulus 2 q) : q = 1 / 2 := by
+  have hden : (0 : ℝ) < 2 * q * (1 - q) := by nlinarith
+  rw [diploid_modulus_eq 0 q hq0 hq1, diploid_modulus_eq 2 q hq0 hq1] at hdeg
+  have hcast0 : ((0 : Fin 3) : ℝ) = 0 := by norm_num
+  have hcast2 : ((2 : Fin 3) : ℝ) = 2 := by norm_num
+  rw [hcast0, hcast2] at hdeg
+  have hsq : ((0 - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1) ^ 2
+      = ((2 - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1) ^ 2 := by
+    rw [← sq_abs ((0 - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1),
+      ← sq_abs ((2 - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1), hdeg]
+  have hne : (2 * q * (1 - q)) ≠ 0 := ne_of_gt hden
+  have hpoly : ((0 - 2 * q) ^ 2 - 2 * q * (1 - q)) ^ 2
+      = ((2 - 2 * q) ^ 2 - 2 * q * (1 - q)) ^ 2 := by
+    have hexp : ∀ x : ℝ, x / (2 * q * (1 - q)) - 1
+        = (x - 2 * q * (1 - q)) / (2 * q * (1 - q)) := by
+      intro x
+      field_simp
+    rw [hexp, hexp, div_pow, div_pow, div_eq_div_iff (by positivity) (by positivity)] at hsq
+    have hD2 : ((2 * q * (1 - q)) ^ 2) ≠ 0 := pow_ne_zero 2 hne
+    exact mul_right_cancel₀ hD2 hsq
+  have hfac : (2 * q - 1) * (3 * q ^ 2 - 3 * q + 1) = 0 := by
+    linear_combination hpoly / 16
+  have hpos : 0 < 3 * q ^ 2 - 3 * q + 1 := by nlinarith [sq_nonneg (2 * q - 1)]
+  rcases mul_eq_zero.mp hfac with h | h
+  · linarith
+  · linarith
+
+/-- The degeneracy is a knife edge, not a neighbourhood: at `q = 1/3` the three moduli are
+`0`, `3/4` and `3`. -/
+theorem diploid_modulus_at_third :
+    diploidFamily.modulus 0 (1 / 3) = 0 ∧ diploidFamily.modulus 1 (1 / 3) = 3 / 4 ∧
+      diploidFamily.modulus 2 (1 / 3) = 3 := by
+  refine ⟨?_, ?_, ?_⟩ <;>
+    · rw [diploid_modulus_eq _ (1 / 3) (by norm_num) (by norm_num)]
+      norm_num
+
 /-! ## 2. The allele-label gauge: this is the folded spectrum
 
 The reflection `τ(q) = 1 - q` is the choice of which allele is called the alternate one.
@@ -248,6 +340,12 @@ measure*. Biologically that is a panel carrying many markers at the **same** all
 frequency: a fixed-MAF simulation grid, or an ascertained genotyping array whose markers
 were selected to sit in a narrow frequency band. The theorems here say exactly what goes
 wrong, and they are checkable on a real panel by looking at its frequency column.
+
+There are two distinct ways an array can lose spectral information and they compound.
+*Ties between loci* are this section: markers sharing a frequency cannot be told apart.
+*Degeneracy within a locus* is `diploid_modulus_at_half`: a marker at `q = 1/2` produces
+only the value `1`, whatever its weight. An array ascertained for common variants is
+pushed toward both at once — many markers, similar frequencies, all near balance.
 -/
 
 /-- A panel has an **ascertainment tie** when two distinct loci sit at the same
@@ -311,14 +409,12 @@ recoverable functional of the spectrum. -/
 theorem diploid_fourth_moment (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
     ∑ j : Fin 3, diploidAtomMass j q * diploidAtomValue j q ^ 4 = invHeterozygosity q := by
   have hs : (0 : ℝ) < 2 * q * (1 - q) := by nlinarith
-  have hsq : Real.sqrt (2 * q * (1 - q)) ^ 2 = 2 * q * (1 - q) := Real.sq_sqrt hs.le
   have h4 : ∀ j : Fin 3,
       diploidAtomValue j q ^ 4 = ((j : ℝ) - 2 * q) ^ 4 / (2 * q * (1 - q)) ^ 2 := by
     intro j
-    unfold diploidAtomValue diploidStdev
-    rw [div_pow]
+    rw [show (4 : ℕ) = 2 * 2 from rfl, pow_mul, diploidAtomValue_sq j q hq0 hq1, div_pow]
     congr 1
-    rw [show (4 : ℕ) = 2 * 2 from rfl, pow_mul, hsq]
+    ring
   simp only [Fin.sum_univ_three, h4, diploidAtomMass, invHeterozygosity]
   norm_num
   field_simp
@@ -463,9 +559,19 @@ theorem spectrum_recoverable_architecture_not {n : ℕ} (panel : Panel n)
 * **Linkage disequilibrium.** Every statement above assumes independent loci, and the
   factorization the method rests on does not survive dependence. This is the named
   limitation, not a to-do.
-* **The continuum spectrum.** The diploid family's core is full, so the peeling criterion
-  says nothing about a continuously distributed spectrum. Whether the folded continuum
-  spectrum is identifiable from modulus data is open.
+* **The continuum spectrum.** The diploid family's core is full — coverage multiplicity is
+  four on `(0,1)` and two above, never one — so the peeling criterion says nothing about a
+  continuously distributed spectrum. Whether the folded continuum spectrum is identifiable
+  from modulus data is **open**, and it is open as a sharp dichotomy: if the family's trip
+  semigroup is *free* (with subexponential overlap growth) the folded spectrum is
+  identifiable; if it satisfies any *relation* there is an explicit infinite-dimensional
+  family of distinct spectra with identical modulus data. Which of the two holds is under
+  computation elsewhere and **nothing in this file assumes either answer**.
+
+  A superseded form of that criterion should not be quoted: it was conjectured that
+  non-identifiability additionally requires a relation whose weight product equals one.
+  **That is refuted** — a counterexample has a kernel with weight product `98/27`.
+  Relations alone suffice, with no condition on weights.
 * **The tail regime.** The exponentially tilted versions of these statements are the ones
   that govern large deviations — polygenic score tails and quadratic-form statistics such
   as heritability estimators and GRM spectra, which is the regime clinical risk
