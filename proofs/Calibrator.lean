@@ -64,6 +64,7 @@ import Calibrator.PolygenicSpectroscopy
 import Calibrator.EpistaticChaos
 import Calibrator.CondensationUnification
 import Calibrator.CramerStratum
+import Calibrator.FoldedSpectrum
 
 namespace Calibrator
 

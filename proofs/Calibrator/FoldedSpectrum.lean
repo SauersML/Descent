@@ -950,331 +950,78 @@ structure TwoPointIdentification where
   /-- Markov consistency cuts the tensor kernel. -/
   freedomShrinks : jointFreedom ≤ marginalFreedom
 
-/-! ## 9. The effective-independence dimension `D`, and why it is the effective marker count
+/-! ## 9. The coupled core: gain and support are different biological axes
 
-Everything above threshold-like is controlled by the same scalar, and it is defined for an
-**arbitrary** coupling — no conditional independence, no regeneration.
+The earlier version of this section tried to make one scalar `D` control decay,
+transfer, and rigidity. That is too strong. The corrected core is split in exactly the
+way the biology is split.
 
-*Sequential freshness.* Order the coordinates. The freshness `εᵢ` of coordinate `i` is the
-largest `ε` with `Law(Xᵢ | earlier coordinates) ≥ ε ·` (fiber reference), almost surely.
-Then `D = max over orderings of Σᵢ εᵢ`.
+**Oscillatory gain.** `FiniteCoupledPhaseLaw.conditionalGainFunctional` is computed from
+the actual joint characteristic function of a multilocus score. Sequential freshness is
+a sufficient certificate for this gain through `BundleRigidity.master_decay_bound`; it is
+not a necessary representation of dependence. In particular, a deterministic driving
+system can create linear gain when it exposes new haplotype digits, while a rotation-like
+zero-entropy system can have bounded centered fluctuations along a subsequence. The
+proved finite consequence is `FiniteBoundedDeviation.secondMoment_le_radius_sq`: a
+uniform Denjoy--Koksma bound precludes diffusive score variance.
 
-Evaluations, all computable from the coupling data:
+**Support.** Rigidity asks a different question: which multilocus genotype cells remain
+possible? `FiberCoupling.coverage_invariant` proves that every full-support coupling has
+the product coverage correspondence, regardless of how severely LD reweights the cells.
+Support-killing dependence — perfect LD, structural haplotypes, or a modulus copy — lies
+on the other side of this boundary.
 
-| coupling | `D` |
-|---|---|
-| independent | `n` |
-| Harris chain, correlation length `ℓ` | `≈ n/ℓ`, the regeneration count |
-| block-copy, blocks of size `ℓ` | `n/ℓ` **exactly** — one fresh unit per block |
-| Gaussian copula, precision `J` | `≥ c Σᵢ 1/(Jᵢᵢ σᵢ²)` |
-| Gibbs density `e^{-H}` | `≥ Σᵢ e^{-2 osc_i(H)}` |
+This distinction is useful in study design. A recombining panel may have enough gain for
+a local approximation while still having support holes caused by haplotype constraints;
+conversely, a full-support panel can remain coverage-equivalent while its score
+fluctuations are too correlated for Gaussian calibration. Neither marker count nor
+one-locus MAFs can substitute for checking both conditions.
 
-**`D` IS NOT THE INVARIANT, AND AN EARLIER VERSION OF THIS SECTION SAID IT WAS.** A single
-number was the wrong ambition. The object that actually controls decay is a *functional* —
-the **conditional gain**
+### Two proposed upgrades that do not survive audit
 
-`Γ_s(Π) = -log |E ∏ᵢ cᵢ|`, with `cᵢ = E[e^{i s h(Xᵢ)} | earlier coordinates]`,
+The product of one-coordinate conditional phase factors is not the joint characteristic
+function; `copied_binary_refutes_conditional_product_identity` gives the exact two-locus
+counterexample. Consequently the conditional factors may enter only through a proved
+partial-expectation contraction.
 
-which controls it tautologically. `D` is the **freshness lower bound** on `Γ`: sufficient,
-not necessary. Every statement below that quantifies over `D` is a sufficient condition
-only, and this section no longer calls `D` an effective dimension.
-
-**How badly a linear count can fail, and it is the case we care about most.** Under an
-**equicorrelated** coupling — every pair correlated at `ρ`, one shared source touching every
-marker — the exact answer is `Γ = Θ(log n)`, so `|E e^{i s Sₙ}| = n^{-Θ(1)}`: **polynomial
-decay, not exponential.** The naive count `n` is off by an exponential; the freshness bound
-`D` errs in the other direction; the variational rate is the truth and both sides are
-attained.
-
-**THE HEADLINE, AND IT IS ABOUT POPULATION STRUCTURE, NOT LINKAGE.** A common latent factor
-correlating every marker with every other is exactly the structure of **population
-stratification**, as opposed to linkage disequilibrium's local, decaying correlation. So `n`
-correlated markers supply only `log n` worth of effective independence: **the loss is
-exponential, not a constant-factor shrinkage.** The transfer threshold changes shape with
-it — under a shared factor the requirement becomes `n ≳ N^{c·ρ}`, **a power law replacing
-the logarithm**, so the sample cost grows as a *power* of the marker count.
-
-That is the mathematical form of **why population structure does not wash out with larger
-cohorts, and why ancestry confounding is categorically different from linkage
-disequilibrium.** Not different in degree: different functional form. LD in the freshness
-regime gives linear effective independence; a shared factor gives logarithmic. Two
-structures routinely discussed with the same vocabulary are not the same kind of object.
-
-The empirical corroboration is now the weaker of the two statements, and is recorded as
-corroboration only: two panels the standard estimators rated at ratio `0.995`–`1.000` had
-true separation `1.84`, `1.97` and `1.99` against a certificate demanding a factor of two.
+The proposed two-sided Gaussian-copula variational theorem also needs a non-cancellation
+hypothesis. Under a symmetric common factor an antisymmetric one-coordinate conditional
+factor integrates to zero for every odd panel size; the algebraic obstruction is
+`symmetric_latent_odd_cancellation`. Thus an unconditional claim
+`Gamma = Θ(log n)` is false even though a one-sided Laplace-rate heuristic may be useful
+for even sizes or absolute conditional moments. No power-law sample threshold is claimed
+here until that missing phase/parity condition is supplied.
 -/
 
-/-- **The freshness bound `D`, and the conditional gain it bounds.**
+/-- **Diploid coverage survives arbitrary full-support LD with a quantitative joint
+floor.**
 
-`D` is defined for an arbitrary coupling via sequential freshness, so this structure carries
-no independence or regeneration hypothesis — which is the point of it. But `D` is a **lower
-bound on the conditional gain, not the gain**: `freshness_bound` is an inequality, in that
-direction, and it is not an equality. `regime` records when the bound is the truth.
-
-`variationalRate` is carried as a **named hypothesis with a known defect**: its source
-definition has a dangling `-scale` term, so `g_s` is not fully pinned and the rate is not
-fully specified as written. The matched-constants result therefore rests on a quantity whose
-definition has a hole in it. It is a field here rather than a definition so that nothing
-below can silently choose the reading of `-scale` that makes it work. -/
-structure EffectiveIndependence (n : ℕ) where
-  /-- The freshness bound `D = max over orderings of Σ εᵢ`. -/
-  D : ℝ
-  D_nonneg : 0 ≤ D
-  /-- `D` never exceeds the coordinate count, with equality exactly for independence. -/
-  D_le_count : D ≤ (n : ℝ)
-  /-- The conditional gain `Γ_s(Π)`, the functional that actually controls decay. -/
-  conditionalGain : ℝ
-  /-- **`D` bounds the gain from below. It does not compute it.** -/
-  freshness_bound : D ≤ conditionalGain
-  /-- **Defective input, carried deliberately.** The variational rate `V_s`, whose source
-  definition contains a dangling `-scale` and is therefore not fully pinned. -/
-  variationalRate : ℝ
-  /-- Whether the coupling is in the freshness regime, where the bound is tight. Under a
-  shared latent factor it is not: there `conditionalGain = Θ(log n)` while `D` is linear. -/
-  freshnessRegime : Prop
-  freshnessRegime_tight : freshnessRegime → D = conditionalGain
-  /-- Whether the coordinates are independent. -/
-  independent : Prop
-  independent_iff : independent ↔ D = (n : ℝ)
-  /-- The number of usable slots in `k`-point data. -/
-  usableSlots : ℕ → ℝ
-  /-- **Slot count.** Coupled `k`-point data carries `min(k, D)` usable slots, not `k`. -/
-  usableSlots_eq : ∀ k : ℕ, usableSlots k = min (k : ℝ) D
-
-namespace EffectiveIndependence
-
-variable {n : ℕ} (E : EffectiveIndependence n)
-
-/-- **Adding perfectly correlated markers adds no usable slots.** Once `k` exceeds `D`, the
-slot count stops growing: it is pinned at `D` however many more coordinates are added. -/
-theorem usableSlots_saturates (k : ℕ) (hk : E.D ≤ (k : ℝ)) : E.usableSlots k = E.D := by
-  rw [E.usableSlots_eq k]
-  exact min_eq_right hk
-
-end EffectiveIndependence
-
-/-- **THE MERGED THRESHOLD — IN THE FRESHNESS REGIME ONLY.**
-
-The panel-design condition of §7b and the dependence condition of §8 are one condition:
-
-> local theory applies `↔ min(panel dimension, D) ≳ log N`.
-
-The panel needs enough distinct frequencies **and** enough effective independence, and it
-is the *minimum* that binds. Both faces are attained, so neither half is slack: a panel can
-fail by having too few distinct frequencies at full independence, or by having ample
-frequency diversity inside one correlated block.
-
-**The scope restriction is not decoration and an earlier version of this file omitted it.**
-The `log N` form holds in the freshness regime. Under a shared latent factor — population
-stratification — the threshold is a **power law**, `n ≳ N^{c·ρ}`, and the criterion below
-does not describe it. `freshnessRegime` is therefore a hypothesis of the criterion, in the
-signature. -/
-structure MergedThreshold (n : ℕ) where
-  /-- The panel's dimension — its count of distinct marker frequencies. -/
-  panelDimension : ℝ
-  /-- The effective-independence dimension of the coupling. -/
-  effective : EffectiveIndependence n
-  /-- Score length. -/
-  scoreLength : ℝ
-  scoreLength_pos : 1 < scoreLength
-  constant : ℝ
-  constant_pos : 0 < constant
-  /-- Whether local-limit and expansion theory transfers. -/
-  transfers : Prop
-  /-- Equicorrelation strength of the shared latent factor, zero when there is none. -/
-  correlationStrength : ℝ
-  /-- **The merged criterion, valid in the freshness regime only.** -/
-  criterion : effective.freshnessRegime → (transfers ↔
-    constant * Real.log scoreLength < min panelDimension effective.D)
-  /-- **The shared-factor regime, where the logarithm becomes a power law.** Under
-  equicorrelation at strength `ρ` the requirement is `N ^ (c·ρ) < panelDimension`: the
-  sample cost is a *power* of the marker count, not a logarithm of it. -/
-  sharedFactorCriterion : ¬ effective.freshnessRegime → correlationStrength ≠ 0 →
-    (transfers ↔ scoreLength ^ (constant * correlationStrength) < panelDimension)
-
-namespace MergedThreshold
-
-variable {n : ℕ} (M : MergedThreshold n)
-
-/-- **Either face alone can fail the criterion.** Frequency diversity does not rescue a
-correlated panel, and independence does not rescue a monotonous one. -/
-theorem transfers_needs_both (hfresh : M.effective.freshnessRegime) (h : M.transfers) :
-    M.constant * Real.log M.scoreLength < M.panelDimension ∧
-      M.constant * Real.log M.scoreLength < M.effective.D := by
-  have hmin := (M.criterion hfresh).mp h
-  exact ⟨lt_of_lt_of_le hmin (min_le_left _ _), lt_of_lt_of_le hmin (min_le_right _ _)⟩
-
-end MergedThreshold
-
-/-- **THE FALSIFIER, AND THE DESIGN CONSEQUENCE: modulus-copy coupling.**
-
-Take two slots at equal fibers with the second an **exact modulus copy** of the first. The
-two-point modulus law collapses onto a diagonal, and its kernel then contains *every*
-perturbation that fixes the first marginal — an infinite-dimensional kernel, present even
-when the one-point map is injective.
-
-So **coupled `k`-point data can be strictly blinder than `k` independent one-point
-observations**, and the deficit is exactly the freshness deficit `k - D`.
-
-In panel terms, and this is the useful sentence: **perfectly correlated markers contribute
-nothing, and adding them does not merely fail to help — it can destroy identifiability that
-the same markers would have had independently.** That is why adding correlated markers adds
-no information, stated with a mechanism rather than as folklore, and it is what makes `D` a
-design criterion rather than a diagnostic. -/
-structure ModulusCopyCoupling (K : ℕ) where
-  /-- The bundle family the two slots draw from. -/
-  family : BundleFamily K
-  /-- The shared fiber parameter of the two slots. -/
-  fiber : ℝ
-  /-- The one-point modulus map is injective — the copy blindness is not inherited from a
-  defect at one point. -/
-  oneSiteInjective : Prop
-  /-- The two-point kernel contains every perturbation fixing the first marginal. -/
-  kernelContainsMarginalFixing : Prop
-  /-- **The collapse.** -/
-  collapse : oneSiteInjective → kernelContainsMarginalFixing
-
-/-! ## 10. THE COVERAGE-INVARIANCE THEOREM: identifiability survives arbitrary LD
-
-This is the strongest biological statement in the module, and it needs none of the
-apparatus above: no band, no conditional independence, no latent structure, no perturbation
-theory, and it holds for every `k`.
-
-> **If the base family is peelable, and every conditional one-coordinate law charges every
-> atom of its fiber with probability at least `η > 0` — that is,
-> `P(Xᵢ = a_j(tᵢ) | all other coordinates and fibers) ≥ η` almost surely — then the coupled
-> `k`-point modulus map is injective for every `k`, with `σ_min ≥ (η/C⋆)^k`.**
-
-**Why it is so robust, which is the whole content.** Coverage — which value cells are
-charged from which fiber tuples — is determined by **supports alone**. The hypothesis says
-the supports are those of the product. So **coverage is coupling-invariant**, and the
-peeling argument of §7b runs slot by slot verbatim, degraded only by the weight floor `η`.
-Dependence changes the *weights* and cannot change *which cells are touched*, and peeling
-only ever needed the latter.
-
-**THE BIOLOGY: THE ALLELE-FREQUENCY SPECTRUM REMAINS IDENTIFIABLE UNDER ARBITRARY LINKAGE
-DISEQUILIBRIUM, PROVIDED NO GENOTYPE IS RENDERED CONDITIONALLY IMPOSSIBLE.** The condition
-fails only at **perfect** LD, where knowing the other markers determines a genotype exactly,
-and holds for every imperfect correlation structure however strong or long-range. This
-retires the standing limitation that §§1–7 carried and that §8 only partly relaxed: §8
-bought dependence in the *frequencies*; this buys dependence in the *genotypes*, which is
-what LD actually is.
-
-**THE LD-PRUNING CONSEQUENCE, WHICH CONTRADICTS THE FOLK JUSTIFICATION.** `η = 0` is
-`r² = 1`: a marker that is a deterministic function of another. Rigidity survives any amount
-of LD short of perfect, and perfect LD is the exact and only failure. **That licenses
-pruning exact duplicates — not pruning at `r² < 0.2` or `< 0.5`.** The universal practice of
-tuning a threshold has no basis in this result; the cost of *retained* correlation shows up
-as the explicit constant `(η/C⋆)^k`, which is a quantified degradation, not a reason to
-prune harder.
-
-**The boundary is exact, not conjectural.** The modulus-copy falsifier of §9 is precisely
-the `η = 0` case, and there the `k`-point kernel is infinite-dimensional even over rigid
-families. Full-support conditionals give rigidity under all coupling; support-killing
-couplings give collapse; nothing in between is undetermined.
-
-**`η` is checkable on real data.** It is a minimum conditional genotype probability and is
-estimable directly from a genotype matrix. That makes this a usable criterion rather than a
-genericity claim.
-
-**On the `(η/C⋆)^k` decay in `k`:** it is real and not an artifact. Even under complete
-independence, `σ_min` of a tensor square is the square of `σ_min`. The per-slot normalized
-reading — `σ_min^{1/k} ≥ η/C⋆`, a constant floor per slot — is the right one.
--/
-
-/-- **The coverage-invariance theorem**, with its two hypotheses in the signature.
-
-`fullSupportFloor` is `η`, and `η > 0` is the entire dependence hypothesis: no genotype may
-be conditionally impossible. `basePeelable` is the base family's rigidity, supplied for the
-diploid family by §7b.
-
-`coverageDeterminedBySupports` is the mechanism, recorded as a field because it is the
-reason the theorem holds under arbitrary coupling rather than an incidental step. -/
-structure CoverageInvariance (K : ℕ) where
-  /-- The base bundle family. -/
-  family : BundleFamily K
-  /-- The base family is peelable — its finite panels are rigid. -/
-  basePeelable : Prop
-  /-- The conditional charge floor `η`. -/
-  fullSupportFloor : ℝ
-  /-- **The dependence hypothesis, in full: `η > 0`.** Equivalently, no genotype is
-  conditionally impossible given the others. Fails only at perfect LD. -/
-  floor_pos : 0 < fullSupportFloor
-  /-- The peeling constant `C⋆` of the base family. -/
-  peelingConstant : ℝ
-  peelingConstant_pos : 0 < peelingConstant
-  /-- **The mechanism.** Coverage depends on supports only, hence is coupling-invariant. -/
-  coverageDeterminedBySupports : Prop
-  /-- Injectivity of the coupled `k`-point modulus map. -/
-  kPointInjective : ℕ → Prop
-  /-- The least singular value of the coupled `k`-point map. -/
-  sigmaMin : ℕ → ℝ
-  /-- **Injectivity for every `k`, under arbitrary coupling.** -/
-  injective_of_floor : basePeelable → coverageDeterminedBySupports →
-    ∀ k : ℕ, kPointInjective k
-  /-- **The quantitative floor.** -/
-  sigmaMin_bound : basePeelable → coverageDeterminedBySupports →
-    ∀ k : ℕ, (fullSupportFloor / peelingConstant) ^ k ≤ sigmaMin k
-
-namespace CoverageInvariance
-
-variable {K : ℕ} (C : CoverageInvariance K)
-
-/-- **The per-slot reading, which is the one to quote.** The bound degrades geometrically in
-`k` only because a tensor power does; per slot the floor is the constant `η/C⋆`, and it does
-not depend on the coupling at all. -/
-theorem sigmaMin_pos (hbase : C.basePeelable) (hcov : C.coverageDeterminedBySupports)
-    (k : ℕ) : 0 < C.sigmaMin k :=
-  lt_of_lt_of_le
-    (pow_pos (div_pos C.floor_pos C.peelingConstant_pos) k)
-    (C.sigmaMin_bound hbase hcov k)
-
-/-- **Pruning exact duplicates is what the theorem licenses; a tuned `r²` threshold is not.**
-Any `η > 0` — any imperfect LD, however strong — gives an injective map at every `k`. -/
-theorem identifiable_under_any_imperfect_ld
-    (hbase : C.basePeelable) (hcov : C.coverageDeterminedBySupports) (k : ℕ) :
-    C.kPointInjective k :=
-  C.injective_of_floor hbase hcov k
-
-end CoverageInvariance
-
-/-! ### A third failure mode: fluctuation collapse under zero-entropy driving
-
-Deterministic driving splits by **entropy**, and the zero-entropy case fails in a way that
-is neither of the two failure modes catalogued above. Under rotation driving the phases
-**equidistribute** — the empirical law converges and everything looks healthy — **yet the
-sum collapses**: fluctuations stay bounded along continued-fraction denominators, so no
-diffusive normalization exists and the decay dies. That is **fluctuation collapse, not
-lattice recurrence**, and it is invisible to any diagnostic that checks whether the
-empirical frequency distribution looks right.
-
-Scope, stated honestly: positive-entropy driving is recombination and mutation as genuinely
-entropy-producing processes along a chromosome, and it sits inside the theory with full
-linear gain. The rotation case is a strictly periodic layout with no entropy production —
-an artifact of **designed** panels rather than a biological configuration. So the failure
-mode is real but does not occur in nature; what it rules out is a class of simulation and
-array designs, not a class of genomes.
--/
+The two couplings may assign completely different probabilities to multilocus hard calls.
+If each atom tuple retains positive mass in both, they cover exactly the same tuples of
+`|X²-1|` values. This is the finite, proved content of coverage invariance. It does not
+assert the unproved transfinite peeling step or a singular-value constant. -/
+theorem diploid_coverage_invariant_of_joint_floor {k : ℕ} (fiber value : Fin k → ℝ)
+    (J J' : FiberCoupling k 3) (η η' : ℝ) (hη : 0 < η) (hη' : 0 < η')
+    (hfloor : ∀ x, η ≤ J.mass x) (hfloor' : ∀ x, η' ≤ J'.mass x) :
+    FiberCoupling.CoversTuple diploidFamily fiber J value ↔
+      FiberCoupling.CoversTuple diploidFamily fiber J' value := by
+  exact FiberCoupling.coverage_invariant diploidFamily fiber J J'
+    (FiberCoupling.fullSupport_of_uniform_floor J η hη hfloor)
+    (FiberCoupling.fullSupport_of_uniform_floor J' η' hη' hfloor') value
 
 /-!
 ## What is left open, plainly
 
-* **Linkage disequilibrium proper — now largely closed, by §10.** §8 bought dependence *in
-  the allele frequencies*; §10 buys dependence *in the genotypes*, which is what LD is, and
-  it does so for arbitrary coupling with the single condition `η > 0`. What remains open is
-  the exact boundary case `η = 0` in structures that are not literal duplicates. Sections
-  1–7 still assume outright independence and should be read as the independent special case.
+* **Linkage disequilibrium proper — coverage is closed, rigidity is not.** Section 9 proves
+  that a positive **joint atom floor** makes coverage coupling-invariant. It does not prove
+  the transfinite peeling step, the singular-value bound, or that a conditional floor can
+  be inferred from a pairwise `r²` threshold. Sections 1–7 still assume independence and
+  should be read as the independent special case.
 
-* **THE INTERMEDIATE STRATUM, AND IT IS THE CASE THAT MATTERS. (Named open question.)** The
-  theory now has both edges: positive-entropy driving — recombination and mutation as
-  entropy-producing processes — sits inside it with full linear gain, and zero-entropy
-  rotation driving fails by fluctuation collapse. **Admixture LD and recent selective sweeps
-  are neither.** They produce long-range, slowly-decaying correlation that is not
-  entropy-producing and not rigid, and they are exactly the structures where portability
-  empirically fails. If they land in an intermediate regime rather than at either edge, that
-  intermediate regime is the right framework for the failures this whole programme is about,
-  and **nobody has computed it.** This is a named target, not a gap in the write-up.
+* **The biologically important intermediate stratum is open.** Admixture LD, recent
+  selective sweeps, inversions, and long IBD tracts can have slow dependence without being
+  either an independent regenerative chain or an irrational rotation. Their actual joint
+  gain and support holes must be computed rather than assigned by analogy to either edge.
 * **The regeneration hypothesis itself.** Admixture, recent sweeps and population structure
   are exactly the cases with no excursion decomposition, so §8 covers the well-mixed case
   and declines the interesting ones.
