@@ -200,6 +200,37 @@ def permeability(rho, n=None, C=C_MIX, W=W_FLOOR, theta=THETA0, amp=AMP0):
     return 0.5 * float((M * M).sum())
 
 
+def precompute_grid(n, grid):
+    """Sigma^{-1} and log det Sigma at every grid point, once.
+
+    Speed only: the profile likelihood evaluates the SAME Sigma(rho) for every
+    ensemble, so building it inside the ensemble loop recomputed one 2x2
+    inverse 1.5 million times. Nothing about the grid, the depth or the number
+    of ensembles changes.
+    """
+    inv = np.empty((len(grid), 2, 2))
+    ld = np.empty(len(grid))
+    for i, r in enumerate(grid):
+        Sg = sigma_of(r, n)
+        inv[i] = np.linalg.inv(Sg)
+        ld[i] = float(np.linalg.slogdet(Sg)[1])
+    return inv, ld
+
+
+def mle_rho_fast(U, grid, inv, ld):
+    """Same profiled MLE as mle_rho, evaluated against the precomputed grid."""
+    S = U.T.dot(U) / U.shape[0]
+    ll = -0.5 * (ld + np.einsum("kij,ji->k", inv, S))
+    i = int(np.argmax(ll))
+    if 0 < i < len(grid) - 1:
+        y0, y1, y2 = ll[i - 1], ll[i], ll[i + 1]
+        d = y0 - 2 * y1 + y2
+        if d != 0:
+            off = 0.5 * (y0 - y2) / d
+            return float(grid[i] + off * (grid[1] - grid[0]))
+    return float(grid[i])
+
+
 def mle_rho(U, n, grid, C=C_MIX, W=W_FLOOR):
     """Gaussian covariance MLE of rho from draws U (m x 2), U ~ N(0, Sigma(rho)).
 
@@ -283,6 +314,13 @@ def c1(rng, out):
     clt_ok = abs(kurt[0]) < 0.05 and abs(kurt[1]) < 0.05 and relS < 0.03
 
     grid = np.linspace(0.05, 0.95, 181)
+    ginv, gld = precompute_grid(NP, grid)
+    # agreement between the reference implementation and the precomputed one,
+    # on a real block, so the speed fix cannot silently change the estimator
+    chk = abs(mle_rho(U[:2000], NP, grid) - mle_rho_fast(U[:2000], grid,
+                                                         ginv, gld))
+    print("  speed-fix audit: reference MLE and precomputed MLE differ by "
+          "%.2e on a 2000-draw block" % chk)
     rows = []
     print("")
     print("  %-8s %-8s %-13s %-13s %-11s %-9s"
@@ -291,7 +329,7 @@ def c1(rng, out):
         nens = POOL // m
         est = np.empty(nens)
         for e in range(nens):
-            est[e] = mle_rho(U[e * m:(e + 1) * m], NP, grid)
+            est[e] = mle_rho_fast(U[e * m:(e + 1) * m], grid, ginv, gld)
         rmse = float(np.sqrt(np.mean((est - RHO0) ** 2)))
         pred = 1.0 / math.sqrt(m * p_fin)
         rows.append({"m": m, "ensembles": nens, "rmse": rmse,
@@ -569,15 +607,21 @@ def c4(rng, out):
     print("")
     print("  %-7s %-7s %-7s %-14s %-14s %-9s"
           % ("n", "m", "r_perp", "AggRisk meas", "AggRisk pred", "ratio"))
+    # The deployment error depends on m and eta, NOT on the source depth n, so
+    # it is measured once per m rather than once per (n, m) cell. Speed only:
+    # the same m values, the same REP replicates, the same depth.
+    deploy_err = {}
+    for m in m_grid:
+        derr2 = 0.0
+        for eta in ETAS:
+            mm = sim_seal_means(eta, DELTA0, NP, m * REP, rng)
+            U2 = (NP * mm ** 2).reshape(REP, m).mean(axis=1)
+            dhat = (np.sqrt(np.maximum(U2 / Lz, 1e-12)) - 1.0) / eta
+            derr2 += float(np.mean((dhat - DELTA0) ** 2))
+        deploy_err[m] = derr2
     for n in n_grid:
         for m in m_grid:
-            # deployment coordinates, estimated through the real channel
-            derr2 = 0.0
-            for eta in ETAS:
-                mm = sim_seal_means(eta, DELTA0, NP, m * REP, rng)
-                U2 = (NP * mm ** 2).reshape(REP, m).mean(axis=1)
-                dhat = (np.sqrt(np.maximum(U2 / Lz, 1e-12)) - 1.0) / eta
-                derr2 += float(np.mean((dhat - DELTA0) ** 2))
+            derr2 = deploy_err[m]
             # source block: n draws of unit information per coordinate
             src = rng.standard_normal((REP, D0)) / math.sqrt(float(n))
             serr2 = float(np.mean((src ** 2).sum(axis=1)))
