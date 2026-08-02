@@ -67,6 +67,7 @@ import Calibrator.CramerStratum
 import Calibrator.FoldedSpectrum
 import Calibrator.SpectralDegradation
 import Calibrator.EnsembleChannel
+import Calibrator.Permeability
 
 namespace Calibrator
 

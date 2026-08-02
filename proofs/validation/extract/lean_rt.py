@@ -72,6 +72,14 @@ def _proj(obj, fld):
     if fld.isdigit():
         return obj[int(fld) - 1]
     if isinstance(obj, dict):
+        if fld not in obj:
+            why = (obj.get("__uninhabited__") or {}).get(fld)
+            if why:
+                raise KeyError(
+                    f"field {fld!r} was deliberately left uninhabited: {why}. "
+                    "This definition reads a field whose Lean type this "
+                    "harness does not model, so there is no honest value to "
+                    "give it.")
         return obj[fld]
     return getattr(obj, fld)
 
@@ -207,13 +215,18 @@ class VecFn(list):
     __slots__ = ()
 
     def __call__(self, *idx):
-        v = self
-        for k in idx:
-            if not isinstance(v, (list, tuple)):
-                raise TypeError(
-                    f"VecFn applied to {len(idx)} indices but ran out of "
-                    "dimensions; this value is not that many levels deep")
-            v = v[_ix(k, len(v), "VecFn")]
+        v, rest = self, list(idx)
+        while rest:
+            if isinstance(v, (list, tuple)):
+                v = v[_ix(rest.pop(0), len(v), "VecFn")]
+                continue
+            if callable(v):
+                # `Fin atomCount → ℝ → ℝ`: a table OF functions.  The remaining
+                # arguments belong to the function, not to the table.
+                return v(*rest)
+            raise TypeError(
+                f"VecFn applied to {len(idx)} indices but ran out of "
+                "dimensions; this value is not that many levels deep")
         return v
 
     def __repr__(self):

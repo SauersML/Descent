@@ -12,6 +12,7 @@ invariant is asserted, so a wrong body can be caught by exhibiting a point in it
 """
 from __future__ import annotations
 
+import math
 import random
 import re
 
@@ -206,6 +207,18 @@ FIELD_HYP = re.compile(r"^\s*(-?[\d./]+|\w[\w'\u2080-\u2089]*)\s*(<|\u2264|>|\u2
 # worse than NOT-EXTRACTABLE.
 
 
+_ABSTRACT_TYPE = re.compile(r"[A-Za-z\u0391-\u03c9\u03d1-\u03f5][\w'\u2080-\u2089]*")
+
+
+def _leaves(x):
+    """Every numeric leaf of a nested sequence, in order."""
+    if isinstance(x, (list, tuple)):
+        for y in x:
+            yield from _leaves(y)
+    elif isinstance(x, (int, float)) and not isinstance(x, bool):
+        yield float(x)
+
+
 class Uninhabitable(Exception):
     """No inhabitant of this Lean type is modelled.  Refusing, not guessing."""
 
@@ -310,15 +323,56 @@ def type_value(ty, rng, structs=None, dim=None, lo=0.05, hi=1.0, _depth=0):
     arrow = _split_arrow(ty)
     if arrow is not None:
         dom, cod = arrow
-        n = _index_card(dom, structs, dim)
-        if n is None:                   # infinite domain: a genuine function
+        if _split_arrow(dom) is not None or _norm(dom).startswith("Matrix"):
+            # A FUNCTIONAL: `(Fin k → ℝ) → ℝ`, the corpus's way of writing "a
+            # variance as a function of the whole effect vector".  Its domain is
+            # a function space whose index set we do not enumerate, so it cannot
+            # be a table -- but it is still an honest function of its argument,
+            # and it must actually DEPEND on it.  A constant here would make
+            # `totalVariance arch c` independent of `c` and hide any error.
             if _norm(cod) not in SCALAR_TYPES:
                 raise Uninhabitable(
-                    f"function out of the infinite domain {dom!r} into the "
-                    f"non-scalar {cod!r}: no finite table represents it")
-            a, b = rng.uniform(lo, hi), rng.uniform(lo, hi)
-            return lambda *xs: a + b / (1.0 + sum(
-                x for x in xs if isinstance(x, (int, float))))
+                    f"functional on {dom!r} valued in the non-scalar {cod!r}")
+            a, seed = rng.uniform(lo, hi), rng.uniform(1.0, 9.0)
+            return lambda *xs: a + sum(
+                (0.3 + 0.7 * abs(math.sin(seed + i))) * v
+                for i, v in enumerate(_leaves(xs)))
+        n = _index_card(dom, structs, dim)
+        if n is None:                   # infinite domain: a genuine function
+            if _norm(cod) in SCALAR_TYPES:
+                a, b = rng.uniform(lo, hi), rng.uniform(lo, hi)
+                return lambda *xs: a + b / (1.0 + sum(
+                    x for x in xs if isinstance(x, (int, float))))
+            # `ℕ → Fin p → ℝ`: a generation-indexed vector.  The generation is
+            # unbounded, so the outer level cannot be a table -- but each
+            # generation must map to the SAME inhabitant every time it is asked
+            # for, or the definition stops being a function of its input and two
+            # reads of `m.f t j` inside one body disagree.
+            key0 = rng.random()
+            cache = {}
+
+            def _memo(*xs, _c=cache, _k=key0, _cod=cod, _d=dim, _lo=lo, _hi=hi):
+                # ONE argument is consumed here -- the one this arrow binds.
+                # Any further arguments belong to the codomain and are applied
+                # to it.  Consuming them all would return an inhabitant of the
+                # codomain where the body expects a real, which is the "value
+                # is not a real number: list" failure.
+                if not xs:
+                    raise TypeError("function of an infinite domain applied to "
+                                    "no argument")
+                k = xs[0]
+                try:
+                    hash(k)
+                except TypeError as e:
+                    raise TypeError(
+                        f"function of an infinite domain indexed by the "
+                        f"unhashable {k!r}: refusing to invent a value") from e
+                if k not in _c:
+                    _c[k] = type_value(_cod, random.Random(hash((_k, k))),
+                                       structs, _d, _lo, _hi, _depth + 1)
+                v = _c[k]
+                return v(*xs[1:]) if xs[1:] else v
+            return _memo
         return _rt.VecFn(type_value(cod, rng, structs, dim, lo, hi, _depth + 1)
                          for _ in range(n))
 
@@ -339,6 +393,14 @@ def type_value(ty, rng, structs=None, dim=None, lo=0.05, hi=1.0, _depth=0):
     sd = (structs or {}).get(head)
     if sd is not None and sd.get("fields"):
         return struct_value(sd, rng, structs, _depth + 1, dim=dim)
+    if _ABSTRACT_TYPE.fullmatch(ty):
+        # An abstract `[Fintype]` index type -- `Band`, `α`, `ι`, `V`.  The
+        # corpus uses these exactly as index sets (`Band → ℝ` spectra, `∑ i,
+        # freq i`), so an inhabitant is an index into the same `dim` that
+        # `_index_card` gives such a type.  The two MUST agree: if a value of
+        # `Band` could exceed the length of a `Band → ℝ` table, every read
+        # through it would raise.
+        return rng.randrange(dim)
     raise Uninhabitable(f"no inhabitant modelled for the type {ty!r}")
 
 
@@ -348,21 +410,22 @@ def _index_card(dom, structs, dim):
     if dom in CONTINUOUS_DOMAINS:
         return None
     head = dom.split()[0].split(".")[-1] if dom.split() else ""
+    if _split_arrow(dom) is not None:
+        # Checked BEFORE the `Fin` case: the domain of `(Fin k → ℝ) → ℝ` starts
+        # with the word `Fin` but is a function SPACE, of cardinality |ℝ|^k.
+        # Reading it as `Fin k` would build a table indexed by an integer and
+        # then be handed a whole vector, which is the "index [0.1, 0.35, …] is
+        # not a finite-type index" failure.
+        raise Uninhabitable(
+            f"function whose domain is itself a function space ({dom!r}); its "
+            "index set is not enumerated here")
     if head == "Fin":
         rest = dom.split(None, 1)[1].strip() if " " in dom else ""
         return int(rest) if rest.isdigit() else dim
     cards = enum_cards(structs)
     if head in cards:
         return cards[head]
-    if _split_arrow(dom) is not None:
-        # `(Fin n → Fin d) → ℝ`: the domain is itself a finite function space.
-        # Its cardinality is d^n, which we do not enumerate; a table of `dim`
-        # entries is a legitimate finite function on SOME index set, but it is
-        # not this one, so refuse rather than pretend.
-        raise Uninhabitable(
-            f"function whose domain is itself a function space ({dom!r}); its "
-            "index set is not enumerated here")
-    if re.fullmatch(r"[A-Za-zα-ωΑ-Ωι][\w'₀-₉]*", dom) and dom not in SCALAR_TYPES:
+    if _ABSTRACT_TYPE.fullmatch(dom) and dom not in SCALAR_TYPES:
         return dim                      # abstract `Fintype` index (`α`, `ι`, `V`)
     raise Uninhabitable(f"cannot tell whether the domain {dom!r} is finite")
 
