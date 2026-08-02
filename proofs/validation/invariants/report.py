@@ -55,6 +55,7 @@ def build():
     rng = load("results_ranges.json")
     inv = load("results_invariants.json")
     fal = load("results_falsifiability.json")
+    sim = load("results_simulation.json")
     radius = blast_radius()
 
     out = {}
@@ -84,13 +85,25 @@ def build():
                     for f in (c.get("detail") or {}).get("findings", [])
                     if f.get("is_defect")]
             checks.append(e)
-        covered = bool(f.get("covered"))
+        sm = sim.get(k, {})
+        if sm.get("verdict") in ("agrees", "disagrees"):
+            checks.append(dict(family="simulation", kind="simulation",
+                               verdict=sm["verdict"], why=sm.get("oracle"),
+                               worst_excess=sm.get("worst_excess_over_allowed")))
+        # Simulation is the strongest evidence available: it compares against
+        # an independent reference rather than against the definition's own
+        # stated properties.  It counts as coverage on the same terms as
+        # everything else -- only when a mutant of the body is rejected.
+        covered = bool(f.get("covered")) or bool(sm.get("covered"))
         entry = dict(
             module=d["module"], line=d["line"], path=d["path"],
             dependent_theorems=radius.get((d["module"], d["name"])),
             params=[p for p, _ in d["params"]], ret=d["ret"],
             covered=covered,
-            demonstration=f.get("demonstration"),
+            demonstration=(f.get("demonstration") or
+                           ("simulation-mutant-rejected" if sm.get("covered")
+                            else None)),
+            simulation_oracle=sm.get("oracle"),
             falsifiability_evidence=(
                 [dict(mutation=m["mutation"], rejected_by=m["rejected_by"])
                  for m in f.get("killed", [])[:3]]
@@ -100,7 +113,7 @@ def build():
             findings=[c for c in checks
                       if c["verdict"] in ("escape", "escape-unguarded",
                                           "escape-outside-theorem",
-                                          "violated")],
+                                          "violated", "disagrees")],
         )
         if not covered:
             entry["uncovered_reason"] = _why_not(d, r, i, f)
@@ -140,6 +153,16 @@ def main(argv):
     print("residue by stage:")
     for s, k in stage.most_common():
         print(f"  {k:5d}  {s}")
+    print()
+    tiers = collections.Counter()
+    for v in cov.values():
+        if not v["covered"]:
+            continue
+        tiers["simulation" if v.get("demonstration", "").startswith("simulation")
+              else "range/invariant"] += 1
+    print("covered by tier:")
+    for t, k in tiers.most_common():
+        print(f"  {k:5d}  {t}")
     print()
     kinds = collections.Counter(ch["kind"] for v in cov.values()
                                 for ch in v["checks"])

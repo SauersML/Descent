@@ -1,6 +1,9 @@
 # Range and invariant checks over `proofs/Calibrator`
 
-Bulk validation that runs in seconds and needs no simulation. Two families:
+Bulk validation over `proofs/Calibrator`, in three tiers. The first two run in
+seconds and need no reference values, which is why they cover the corpus in
+bulk; the third supplies external ground truth for the residue they cannot
+settle.
 
 **Range escapes.** A definition whose name forces a range — a probability in
 `[0,1]`, a correlation in `[-1,1]`, an F_ST in `[0,1]`, a variance nonnegative —
@@ -12,6 +15,24 @@ value at another, so no reference value is needed: symmetry under swapping two
 populations, invariance under rescaling every second moment together, limits,
 absorbing boundaries, asserted monotonicity, continuity at the endpoints of the
 box, and **totality artifacts**.
+
+**Simulation.** What the first two tiers cannot decide is whether a formula
+computes the quantity its NAME claims: `2 * p * (1 - p)` is in range, is
+continuous, and is either the Hardy-Weinberg genotype variance or it is not.
+Each spec in `check_simulation.py` pairs a definition with an oracle that
+simulates the named quantity from first principles — draw individuals, draw
+genotypes, run generations, measure. No oracle is derived by rearranging the
+Lean formula, because an oracle obtained that way tests nothing.
+
+Two disciplines keep that tier honest. Agreement is judged against the
+sampler's OWN Monte Carlo noise: each oracle runs under two seeds, and a gap
+counts as disagreement only when it exceeds both the relative tolerance and
+three times the observed standard error. Without that, a quantity passing
+through zero — admixture LD does — shows unbounded *relative* error at points
+where both numbers are noise, and gets reported as a defect. And the oracles
+are themselves tested: `check_simulation.py` has negative controls in which a
+deliberately wrong oracle (half the true genotype variance, drift at twice the
+F_ST, decay at the wrong rate) must be rejected. They are, by 8-25x.
 
 ## The totality contract, in two clauses
 
@@ -69,12 +90,18 @@ guesses** on anything else; what it rejects is reported, not skipped.
 ## Running
 
 ```
-python extract_defs.py       # -> defs.json          (991 definitions)
-python check_ranges.py       # -> results_ranges.json
-python check_invariants.py   # -> results_invariants.json
-python demo_falsifiable.py   # -> results_falsifiability.json
-python report.py --findings  # -> coverage.json + the ranked defect list
+python test_lean_semantics.py  # differential test of the Lean conventions
+python extract_defs.py         # -> defs.json          (992 definitions)
+python check_ranges.py         # -> results_ranges.json
+python check_invariants.py     # -> results_invariants.json
+python check_simulation.py     # -> results_simulation.json   (~30s)
+python demo_falsifiable.py     # -> results_falsifiability.json
+python report.py --findings    # -> coverage.json + the ranked defect list
 ```
+
+Run `test_lean_semantics.py` first. If it fails, every verdict in the
+`results_*.json` files is suspect, because the transcribed bodies are not
+computing what Lean computes.
 
 Requires Python 3.11+ and nothing else. `z3` is optional: install it
 (`pip install z3-solver`) and range containment is DECIDED for the
