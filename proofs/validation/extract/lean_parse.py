@@ -358,6 +358,31 @@ def mine_from_theorems(defs, theorems):
                     (rf"(-?[\d./]+)\s*[{LE}<]\s*{re.escape(base)}\b{simple}(?=[,∧)\n]|$)", "lo"),
                     (rf"(?<![\w'])(?<![-+*/^]\s){re.escape(base)}\b{simple}[{LE}<]\s*(-?[\d./]+)", "hi"),
                 ):
+                # KNOWN FALSE POSITIVE, NOT YET FIXED.  A numeral that is an
+                # ARGUMENT is read here as a BOUND.  In
+                # `target_ld_shift_changes_explainedR2_under_fixed_source_weights`
+                # the definition is compared against itself and both sides pass
+                # `4` as the outcome variance:
+                #
+                #   explainedR2FromTransportMoments (…) (…) 4 <
+                #     explainedR2FromTransportMoments (…) (…) 4
+                #
+                # The `lo` pattern matches the `4 <` sitting immediately left of
+                # the right-hand occurrence and records
+                # `4 ≤ explainedR2FromTransportMoments`, which no theorem proves.
+                # The definition then evaluates to 1.0 at cov = varS = varY = 0.05
+                # -- its correct value, a perfect R^2 -- and is reported as the
+                # corpus's only DEFECT, the tool's strongest verdict, reserved for
+                # a body that leaves a range a Lean THEOREM proves.
+                #
+                # An attempted fix (reject the match when this definition's own
+                # name appears between the last relational operator and the
+                # literal, so the literal is inside an application of it) did NOT
+                # clear this case and could not be A/B'd honestly, because the
+                # corpus moved underneath two consecutive runs of the tool. It is
+                # recorded here rather than shipped unverified. Whoever fixes it:
+                # the check is that DEFECT falls to 2 with NO other status moving,
+                # measured against a baseline run at the SAME revision.
                     for mm in re.finditer(pat, concl):
                         try:
                             v = eval(mm.group(1), {"__builtins__": {}})  # numeric literal only
