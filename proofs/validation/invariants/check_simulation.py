@@ -25,6 +25,7 @@ import math
 import pathlib
 import random
 import sys
+import zlib
 
 import backends
 import compile_defs as C
@@ -275,7 +276,14 @@ def main(argv):
                                      f"definition now has {len(c.names)} "
                                      f"({c.names}) -- the definition changed")
             continue
-        pts = _grid(sp["domain"], sp["reps"], seed=hash(k) % 10000)
+        # `hash()` on a str is SALTED PER PROCESS in Python, so this seed --
+        # and therefore this tier's verdicts -- changed from run to run.  The
+        # binder-fix re-run flipped `admixtureLDAtGen` from agrees to
+        # disagrees with an identical body and identical parameters, which is
+        # how it was found.  A simulation tier whose answers are not
+        # reproducible cannot be used to adjudicate anything.
+        pts = _grid(sp["domain"], sp["reps"],
+                    seed=zlib.crc32(k.encode()) % 10000)
         orc = oracle_values(sp, pts)
         rows, worst = compare(c.fn, sp, pts, orc)
         agrees = worst <= 1.0
