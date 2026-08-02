@@ -54,7 +54,77 @@ Of 402 `Empirical status:` markers, 323 are `UNTESTED`, ~28 `DERIVED`, ~20 `VALI
 | 20 | **Exposure correction.** Exposing a square cumulant of order ≥3 forces the second hub energy to diverge, so no hub bound survives. | standing | `CondensationUnification.ObservableTower.higher_cumulants_need_divergent_hub` (field, :738); corollary `boundedHub_exposes_no_higher_cumulant` (:764, PROVED) | If every variant is tested a bounded number of times, no cumulant of `x²` beyond the second is exposed, whatever the design does. This is what makes row 5's naive four-element list wrong and the recursion right. | HYPOTHESIS + PROVED corollary | Analytic input. **Naming hazard:** this "exposure correction" is a *different* object from the retracted "exposure claim" of row 10 and is easily confused with it in a grep. |
 | 21 | **AR(1) whitening gain as the certificate value.** `traceWindowSpikeLoad → (1+ρ²)/(1−ρ²)`; capacity = headroom × (1−ρ²)/(1+ρ²). | standing | **PROVED.** `ImitationCapacity.traceWindowSpikeLoad` (:1000), `traceWindowSpikeLoad_tendsto_ldWhiteningGain` (:1007), `whitenedCapacity_closedForm` (:1023), `imitationCapacity_eq_whitenedCapacity` (:1034), `whitenedCapacity_strictAnti` (:1049), `inverseTraceCertificate_tendsto_ldWhiteningGain` (:1430) | LD decay sets the detection threshold in closed form: stronger LD (larger ρ) strictly lowers imitation capacity, so a more correlated panel is easier, not harder, to defend against stratification imitating a polygenic spike. | **PROVED + SIMULATED.** `validation/imitation_rigidity/README.md`: `ldWhiteningGain` = harmonic mean of the symbol exact to 2e-16; `ldPrecisionTrace = tr K⁻¹` exact to 1e-16 at k = 8, 64, 512 including the finite-size boundary correction; `ldHardEdge` = symbol minimum exact to 1.7e-16, and = smallest eigenvalue to 6e-4 at 64 variants approaching from above | None material. |
 | 22 | **`ridgeBalance` — FALSIFIED and repaired.** | falsified upstream, repaired | `ImitationRigidity` (see `validation/imitation_rigidity/README.md`) | — | **SIMULATED falsification.** Took no variants-per-individual ratio although the ridge fixed point depends on it; the resolvent functional came out **34% too large at aspect 0.3** (1.452 predicted vs 0.957 simulated). Repaired by adding an `aspect` argument; agreement now 2e-4. | Kept as the precedent for the missing-argument failure class that `scripts/check-identifications.py` screens for statically — no constant repairs it, because the signature could not express the dependence. |
-| 23 | **Spike constant and effective-marker count for PC correctability.** `demographicSpike = 4 F · m(n−m)/n`, `F` = Hudson `F_ST`. | standing, previously wrong and now corrected | `PCCorrectability/Threshold.lean:31` | The sharp criterion `1 < M F² n` is the Patterson–Price–Reich boundary. | **VALIDATED**: BBP inversion recovers **3.9920 ± 0.0045** against the derived 4. Separately measured: supplying a **raw** variant count for `M` overstates correctability ~20-fold in `M`, predicting eigenvector overlap **0.87** at `F_ST = 0.001` where the observed value is **0.014**. | The two errors partially masked each other (spike-constant error conservative, marker-count error optimistic). `validation/pc_correctability/analyze.py` still documents `KAPPA = 2` in its module docstring — **stale**, contradicting `Threshold.lean` and `analyze_b.py`, both of which use 4. |
+| 23 | **Spike constant and effective-marker count for PC correctability.** `demographicSpike = 4 F · m(n−m)/n`. **`F` is Nei's `G_ST`, NOT Hudson's `F_ST`** — see the correction block below. | standing; the arithmetic is sound, the estimator label was wrong, and the direction of the resulting user error is **the opposite of what was first reported** | `PCCorrectability/Threshold.lean:31`; the estimator is `Conventions.hudsonFst` (misnamed) | The sharp criterion `1 < M F² n` is the Patterson–Price–Reich boundary. | **VALIDATED**: BBP inversion recovers **3.9920 ± 0.0045** against the derived 4 — but see the provenance finding below for *which* estimator that inversion used. Separately measured: supplying a **raw** variant count for `M` overstates correctability ~20-fold in `M`, predicting eigenvector overlap **0.87** at `F_ST = 0.001` where the observed value is **0.014**. | See the correction block. `validation/pc_correctability/analyze.py` still documents `KAPPA = 2` in its module docstring — **stale**, contradicting `Threshold.lean` and `analyze_b.py`, both of which use 4. |
+
+#### Correction to row 23 — which `F_ST`, and which way the error runs
+
+**Nothing below deletes the superseded wording; it is preserved at the end of this block.**
+
+**1. The estimator is Nei's `G_ST`.** `Conventions.hudsonFst` divides by the total-pool
+heterozygosity `2 p̄(1−p̄)`; Hudson divides by the between-subgroup heterozygosity
+`p₁(1−p₂) + p₂(1−p₁)`. The denominators differ by exactly `(p₁−p₂)²/2`. At
+`p₁ = 0.2, p₂ = 0.6`: Nei `0.1667`, Hudson `0.2857` — Hudson 71.4% larger, matching the
+72% gap the differential tier measured against scikit-allel independently.
+`validation/pc_correctability/which_fst.py` reproduces that point value exactly
+(`ratio = 1.7143`), which is what establishes its implementation is right.
+
+**2. The Lean is sound; `simpleFst_eq_hudsonFst` is a true theorem with a false name.**
+`4F =` contrast variance is a true identity for the Nei quantity. What was wrong is every
+claim about *which* `F_ST` a user must supply.
+
+**3. The provenance question, answered — and the proposed explanation is refuted.**
+`bn_independent.py`, the experiment behind `3.9920`, estimates `F_ST` with **genuine
+Hudson** (`den = p1*(1-p2) + p2*(1-p1)`, Bhatia et al. ratio of averages). So a
+Nei-derived formula was inverted against a Hudson-estimated input. The proposed
+explanation was that the run sat near `p̄ = 0.5` where the two coincide. **It did not, and
+they do not.** Measured on the cluster (`which_fst.py`, 400k markers × 8 reps per arm):
+
+| ancestral spectrum | mean `p̄` | Hudson | Nei | Hudson/Nei |
+|---|---|---|---|---|
+| `U(0.05,0.95)` **as run** | 0.5001 | 0.01001 | 0.00503 | **1.990** |
+| `U(0.05,0.50)` control | 0.2751 | 0.01000 | 0.00503 | 1.990 |
+| `U(0.50,0.95)` control | 0.7250 | 0.01000 | 0.00503 | 1.990 |
+| `U(0.01,0.20)` control | 0.1050 | 0.00999 | 0.00502 | 1.990 |
+
+(at `F = 0.01`; the ratio is 1.999 at `F = 0.001` and 1.950 at `F = 0.05`.)
+
+The ratio is **≈ 2 regardless of symmetry**. The asymmetric controls were included so a
+null would be informative, and they earned their place: they rule out the `p̄ = 0.5`
+mechanism outright. Under aggregation the two functionals never coincide.
+
+**4. Why the ratio is 2, structurally.** The corpus's own `expectedFreqDiffSq` gives the
+Balding–Nichols identity `E[(p₁−p₂)²] = 2 F p(1−p)`. Hudson's denominator tends to
+`2p(1−p)`, so **Hudson estimates the BN parameter `F`**; Nei's numerator carries the extra
+`½`, so **Nei estimates `F/2`**. Confirmed to four digits above: at target `F = 0.01`,
+Hudson reads `0.01001` and Nei `0.00503`. So `Conventions.hudsonFst` is not merely a
+different estimator — **it is asymptotically half the Balding–Nichols `F_ST`.**
+
+**5. Consequence, and it reverses the reported direction of user risk.** The `3.9920`
+calibration was performed against Hudson. So `κ = 4` is the constant that goes with
+**genuine Hudson**, and a user supplying scikit-allel's `hudson_fst` gets the **validated,
+correct** spike. It is supplying the corpus's own `Conventions.hudsonFst` — the Nei
+quantity — that understates the spike by ≈ 2×. The first report had this backwards.
+*Pending confirmation by direct inversion under both conventions
+(`which_fst_inversion.py`); this row will be updated with `κ_hudson` and `κ_nei` measured
+from identical genotypes.*
+
+**6. Sweep for the same conflation.** `four_hudsonFst_eq_standardizedContrastVariance` and
+`contrastSpikeLevel_eq_four_hudsonFst` (`DemographicCapacity`:50, and the `hudsonFst`
+applications at :67–:136) all inherit the misnomer — they are true statements about the
+Nei quantity under a Hudson name. **Checked and clean:** `driftVariance = p₀(1−p₀)F`,
+`twoPopDriftVariance`, `expectedFreqDiffSq = 2F p₀(1−p₀)`
+(`AncestrySpecificArchitecture`), `fstFromDriftFactor`, `freqCorrFromFst`,
+`neutralPortability` — these take `F` as a *model parameter* and assert no estimator
+provenance, so they carry no conflation. The defect is confined to the `hudsonFst` name
+and its dependents.
+
+> **SUPERSEDED WORDING, PRESERVED.** The original row 23 read: *"`demographicSpike =
+> 4 F · m(n−m)/n`, `F` = Hudson `F_ST`. … **VALIDATED**: BBP inversion recovers 3.9920 ±
+> 0.0045 against the derived 4. … The two errors partially masked each other
+> (spike-constant error conservative, marker-count error optimistic)."* The claim that
+> `F` is Hudson's `F_ST` is **false of the corpus's definition** and is what this block
+> corrects. The `3.9920` measurement itself stands.
+
 | 24 | **Heterozygosity / drift-regime laws** — several defs marked FALSIFIED at demographic equilibrium. | falsified | `DriftRegime.lean:100` (`HeterozygosityTrajectory.measuredLoss`), `PhenomeWidePortability.lean:122`, `PopulationGeneticsFoundations.lean:1199`, `LDDecayTheory.lean:881` | Drift-only heterozygosity-loss laws overestimate loss once mutation balances drift. | **SIMULATED.** `validation/differential/heavy/h0_results.json`: both controls pass (mutation-off reproduces the closed form; equilibrium level matches Kimura–Crow θ/(1+θ)). Test rows at t=2000 show retention **measured 1.22 / 1.01** where the drift-only cluster prediction is **0.135**. Equilibrium levels agree with theory within 0.4–1.7 SEM. | Flagged correctly in-file. **Note for the lead:** I could not find a "240 standard errors" heterozygosity cluster anywhere in `proofs/validation/` — the h0 equilibrium deviations are all under 2 SEM and the *separation* is against the drift-only prediction, not a 240-σ cluster. If that number is real it lives outside this repo. |
 
 ### Session 10 (closes the upstream arc)
