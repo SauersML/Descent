@@ -1737,6 +1737,180 @@ theorem hweLadderMoments (h : HardyWeinbergModel)
     standardizedGenotype_sixth_moment h hq0 hq1⟩
 
 /-!
+## 5l. The ladder fiber is empty over genotype panels
+
+A **ladder chameleon** has been constructed upstream: an explicit symmetric,
+unit-variance, all-moments, nonlattice law that is not Gaussian and matches the Gaussian
+in every proven-exposed invariant at every floor. It is built by **fiber splitting** —
+for each `s`, the two preimages of `|u| = s` are the `x²` values `1 + s` and `1 - s`, and
+mass is moved between them. That preserves the law of `|u|` exactly, hence every
+functional of it, hence floors three and up as laws, and changes only the odd part of the
+floor-two law.
+
+**The dichotomy is therefore now believed FALSE in its final form.** Universality-iff-
+Gaussian survives only if the floor-two coupling channel is exposable, and the last
+candidate mechanism for that has been examined and fails: nonlattice local-limit
+prefactors are universal, corrections are Edgeworth-mortal at `1/√m`, and the lattice
+precedent carried information precisely *because* lattice prefactors are not universal.
+Reflection asymmetry is not arithmetic. So the expected answer is that the observable
+algebra is exactly the ladder and the universality class is the **ladder fiber** of the
+Gaussian, infinite-dimensional and explicitly parameterized. This is not asserted as
+settled — the assembly is open, and the remaining gap is a limit-classification theorem
+rather than a construction — but nothing in this corpus should now be read as though
+Gaussian-only were the expected answer.
+
+### The genetic question, and its answer
+
+A single locus has no freedom: three atoms, all determined by `q`. A panel is a MAF
+mixture, and a mixture over `q` gives a rich law of `x²`. So: **can two MAF spectra
+realize a fiber splitting** — two MAF distributions whose induced laws of `|u|` agree
+exactly, with different odd parts of `u`?
+
+**No.** The genotype fibers are too rigid, and the reason is the rare homozygote. Writing
+`u = x² - 1`, a locus at frequency `q` contributes exactly three atoms,
+
+| atom | value | mass |
+|---|---|---|
+| `u_ref` | `(3q-1)/(1-q)` | `(1-q)²` |
+| `u_het` | `(1-6q+6q²)/(2q(1-q))` | `2q(1-q)` |
+| `u_alt` | `2/q - 3` | `q²` |
+
+and on the minor-allele range `(0, 1/2]` the third **strictly dominates** the other two
+(`abs_centeredSquare_le_homAlt`) while being **strictly decreasing** in `q`
+(`centeredSquare_homAlt_strictAnti`). So the rarest locus in a panel owns the strictly
+largest `|u|` atom, and owns it alone (`rarest_locus_owns_largest_atom`).
+
+That gives a peeling argument. Matching the `|u|` law is linear in the weights; at the
+level of the largest atom the constraint involves exactly one locus, so that locus's
+weight is forced; delete it and repeat. The matrix sending weights to the `|u|` law has
+full column rank, its nullspace is trivial, and there is no direction along which the odd
+part can move while `|u|` stays fixed.
+
+Verified in exact rational arithmetic by
+`proofs/validation/coupling/fiber_splitting.py` over uniform, rare-weighted, clustered
+and fifty-locus frequency sets: nullity zero throughout. Its control is the reflection
+`q ↔ 1-q`, which *must* produce a dependency — the two frequencies give identical laws of
+`u` by `reflect_even_moment` — and does, with the odd part moving by exactly zero. A
+search that found nothing anywhere would not have been shown to work; this one finds the
+one dependency theory demands and no others.
+
+**So matching the ladder pins the MAF spectrum.** The chameleon phenomenon has no genetic
+realization: whatever the upstream limit classification concludes about laws in general,
+two genotype panels that agree in the ladder are the same panel. That is the opposite of
+the floor-one result, where matching four scalars left the spectrum badly
+underdetermined, and it is worth stating as the sharp contrast — floor-one matching is
+cheap and says little, ladder matching is rigid and says everything.
+
+### A false positive, recorded
+
+The first version of the search clustered `|u|` values with a `1e-9` tolerance and
+reported a splitting. It was an artifact: the frequency list held `(3-√3)/6` and the
+decimal `0.2113248654`, which differ at the eleventh place and straddle the root of
+`u_het`. Both `|u_het|` values are about `1e-10`, so the tolerance merged them into one
+level, while their *signs* are opposite because `u_het` changes sign at that root — and
+every other atom of the two near-equal frequencies was silently merged too. The reported
+direction was two nearly identical loci on opposite sides of a zero crossing. The search
+is now exact and rejects duplicate frequencies rather than merging them.
+-/
+
+/-- The centered square as an offset of the corpus's `standardizedSquare`. -/
+theorem centeredSquare_eq_standardizedSquare_sub_one (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (g : DiploidGenotype) :
+    h.centeredSquare g = h.standardizedSquare g - 1 := by
+  unfold HardyWeinbergModel.centeredSquare
+  rw [standardizedGenotype_sq_eq_standardizedSquare h hq0 hq1]
+
+/-- The rare-homozygote atom in closed form: `u_alt = (2 - 3q)/q`. -/
+theorem centeredSquare_homAlt_eq (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    h.centeredSquare DiploidGenotype.homAlt = (2 - 3 * h.altFreq) / h.altFreq := by
+  obtain ⟨_, _, halt⟩ := standardizedSquare_values h hq0 hq1
+  rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, halt,
+    div_sub_one (ne_of_gt hq0)]
+  congr 1
+  ring
+
+/-- **The rare-homozygote atom is strictly decreasing in the allele frequency.** This is
+half the peeling argument: rarer loci carry strictly larger atoms, so the rarest locus in
+a panel is identifiable from the `|u|` law alone. -/
+theorem centeredSquare_homAlt_strictAnti (h h' : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
+    (hq0' : 0 < h'.altFreq) (hq1' : h'.altFreq < 1)
+    (hrarer : h.altFreq < h'.altFreq) :
+    h'.centeredSquare DiploidGenotype.homAlt <
+      h.centeredSquare DiploidGenotype.homAlt := by
+  rw [centeredSquare_homAlt_eq h hq0 hq1, centeredSquare_homAlt_eq h' hq0' hq1']
+  rw [div_lt_div_iff hq0' hq0]
+  nlinarith [hq0, hq0', hrarer]
+
+/-- **The rare-homozygote atom dominates the other two on the minor-allele range.**
+
+At `q ≤ 1/2` every atom of a locus is at most `u_alt` in absolute value, with equality
+only at the balanced locus, where all three coincide at `1` — the Rademacher case. This is
+the other half of the peeling argument: the largest atom of a panel comes from the rarest
+locus and from its rare homozygote. -/
+theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hhalf : h.altFreq ≤ 1 / 2) (g : DiploidGenotype) :
+    |h.centeredSquare g| ≤ h.centeredSquare DiploidGenotype.homAlt := by
+  have hq1 : h.altFreq < 1 := by linarith
+  have hp : (0 : ℝ) < 1 - h.altFreq := by linarith
+  obtain ⟨href, hhet, halt⟩ := standardizedSquare_values h hq0 hq1
+  have haltval : h.centeredSquare DiploidGenotype.homAlt =
+      (2 - 3 * h.altFreq) / h.altFreq := centeredSquare_homAlt_eq h hq0 hq1
+  cases g with
+  | homRef =>
+      have hval : h.centeredSquare DiploidGenotype.homRef =
+          (3 * h.altFreq - 1) / (1 - h.altFreq) := by
+        rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, href,
+          div_sub_one (ne_of_gt hp)]
+        congr 1
+        ring
+      rw [hval, haltval, abs_div, abs_of_pos hp, div_le_div_iff hp hq0]
+      rcases abs_cases (3 * h.altFreq - 1) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
+        nlinarith [hq0, hhalf, hp]
+  | het =>
+      have hval : h.centeredSquare DiploidGenotype.het =
+          (1 - 6 * h.altFreq + 6 * h.altFreq ^ 2) /
+            (2 * h.altFreq * (1 - h.altFreq)) := by
+        have hden : 2 * h.altFreq * (1 - h.altFreq) ≠ 0 := by positivity
+        rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, hhet,
+          div_sub_one hden]
+        congr 1
+        ring
+      have hden : (0 : ℝ) < 2 * h.altFreq * (1 - h.altFreq) := by positivity
+      rw [hval, haltval, abs_div, abs_of_pos hden, div_le_div_iff hden hq0]
+      rcases abs_cases (1 - 6 * h.altFreq + 6 * h.altFreq ^ 2) with
+        ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
+        nlinarith [hq0, hhalf, hp, sq_nonneg (2 * h.altFreq - 1)]
+  | homAlt =>
+      have hnonneg : 0 ≤ h.centeredSquare DiploidGenotype.homAlt := by
+        rw [haltval]
+        apply div_nonneg _ hq0.le
+        linarith
+      rw [abs_of_nonneg hnonneg]
+
+/-- **The rarest locus owns the strictly largest atom, alone.**
+
+Every atom of a commoner locus is strictly smaller in absolute value than the rare
+homozygote atom of a rarer one. So in a panel the largest `|u|` value identifies the
+rarest frequency present, and the mass there involves that locus and no other — which
+forces its weight, and by induction the whole spectrum.
+
+This is the peeling step, and with it the matrix sending MAF weights to the `|u|` law has
+trivial nullspace: **no fiber splitting exists over genotype panels**. -/
+theorem rarest_locus_owns_largest_atom (h h' : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hhalf : h.altFreq ≤ 1 / 2)
+    (hq0' : 0 < h'.altFreq) (hhalf' : h'.altFreq ≤ 1 / 2)
+    (hrarer : h.altFreq < h'.altFreq) (g : DiploidGenotype) :
+    |h'.centeredSquare g| < h.centeredSquare DiploidGenotype.homAlt := by
+  have hq1 : h.altFreq < 1 := by linarith
+  have hq1' : h'.altFreq < 1 := by linarith
+  calc |h'.centeredSquare g| ≤ h'.centeredSquare DiploidGenotype.homAlt :=
+        abs_centeredSquare_le_homAlt h' hq0' hhalf' g
+    _ < h.centeredSquare DiploidGenotype.homAlt :=
+        centeredSquare_homAlt_strictAnti h h' hq0 hq1 hq0' hq1' hrarer
+
+/-!
 ## 6. Where the whole development now stands
 
 Four negative results, each with its positive complement, and each attached to a
