@@ -2,6 +2,7 @@ import Calibrator.BundleRigidity
 import Calibrator.EffectSizeSurgery
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.Fin.VecNotation
+import Mathlib.Algebra.BigOperators.Fin
 
 namespace Calibrator
 
@@ -277,18 +278,15 @@ LD-score-based statistic can tell the panels apart. On an ascertained array, the
 of weight among markers sharing a frequency is not estimable at all, and any procedure
 reporting it is reporting its prior. -/
 theorem frequencyTie_gives_kernel {n : ℕ} (panel : Panel n) (i l : Fin n) (hne : i ≠ l)
-    (htie : panel.support i = panel.support l) (c v : ℝ) :
-    spectrumModulusLaw diploidFamily
-      { support := panel.support,
-        weight := fun m => if m = i then c else if m = l then -c else 0 } v = 0 := by
+    (htie : panel.support i = panel.support l) (c : ℝ) (w : Fin n → ℝ)
+    (hi : w i = c) (hl : w l = -c) (hrest : ∀ m : Fin n, m ≠ i → m ≠ l → w m = 0) (v : ℝ) :
+    spectrumModulusLaw diploidFamily { support := panel.support, weight := w } v = 0 := by
   unfold spectrumModulusLaw
   simp only
-  rw [Finset.sum_eq_add_of_mem i l (Finset.mem_univ i) (Finset.mem_univ l) hne]
-  · simp only [if_pos rfl, if_neg hne.symm, if_pos rfl]
-    rw [htie]
-    ring
-  · intro m _ hm
-    rw [if_neg hm.1, if_neg hm.2, zero_mul]
+  rw [Finset.sum_eq_add_of_mem i l (Finset.mem_univ i) (Finset.mem_univ l) hne
+    (fun m _ hm => by rw [hrest m hm.1 hm.2, zero_mul])]
+  rw [hi, hl, htie]
+  ring
 
 /-- The same statement in its smallest concrete instance: two markers at frequency `q`,
 weights `c` and `-c`, produce no modulus signal at any value. A fixed-MAF grid is this
