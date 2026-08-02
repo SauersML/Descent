@@ -68,6 +68,23 @@
 >   you do when you cannot solve, not a more honest version of solving.
 > - A diff can only report a number. A **prediction** can be wrong in a way that
 >   indicts the tool. Prefer instruments that can embarrass themselves.
+> - **Neither line numbers nor files are a key.** Definitions move between lines
+>   under concurrent editing and between files under reorganisation. A tier that
+>   scanned a hardcoded list of six filenames silently lost two definitions when
+>   a commit relocated them into a seventh, with identical bodies. Only the
+>   fully-qualified `name` survives.
+
+## Single-sourced definitions
+
+Four definitions in the cross-validation battery — `cumulativeDrift`,
+`fstVariableNe`, `harmonicMeanNe`, `ldMismatchFrobenius` — take `Fin n → ℝ` or
+matrix arguments, which the independent translator refuses by design rather
+than guessing. **They are extractable by this tier alone.** If the finite-vector
+evaluator is wrong about them, nothing in this project would catch it, which is
+why `verify.py`'s adversarial cases target exactly that feature. The right fix
+is not to add vector support to the second translator: a second translator is
+only worth having while it is independently written, and writing it against this
+one would make it a copy rather than a check.
 
 Every validation script in this repo used to re-transcribe a Lean formula into
 Python by hand. That transcription is an unvalidated step *inside* the
