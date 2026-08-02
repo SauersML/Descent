@@ -452,7 +452,7 @@ noncomputable def threeAtom (v A B r : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
   atom_inj := by
     have hBA : B < A := by rw [hr]; nlinarith
     intro i j hij
-    fin_cases i <;> fin_cases j <;> simp_all <;> linarith
+    fin_cases i <;> fin_cases j <;> norm_num at hij ⊢ <;> linarith
   mass_pos := by
     intro j
     fin_cases j
@@ -519,7 +519,7 @@ noncomputable def threeAtomAtOne (A : ℝ) (hA : A ^ 2 = 2) (hApos : 0 < A) :
   mass := ![1 / 4, 1 / 4, 1 / 2]
   atom_inj := by
     intro i j hij
-    fin_cases i <;> fin_cases j <;> simp_all <;> linarith
+    fin_cases i <;> fin_cases j <;> norm_num at hij ⊢ <;> linarith
   mass_pos := by
     intro j
     fin_cases j
@@ -571,7 +571,7 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
   mass := ![1 / 4 + c * B, 1 / 4 - c * B, 1 / 4 - c * A, 1 / 4 + c * A]
   atom_inj := by
     intro i j hij
-    fin_cases i <;> fin_cases j <;> simp_all <;> linarith
+    fin_cases i <;> fin_cases j <;> norm_num at hij ⊢ <;> linarith
   mass_pos := by
     intro j
     have hcA : |c * A| < 1 / 4 := by
