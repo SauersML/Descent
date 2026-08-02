@@ -86,6 +86,13 @@ is not to add vector support to the second translator: a second translator is
 only worth having while it is independently written, and writing it against this
 one would make it a copy rather than a check.
 
+**They are also invisible to staleness.** When three definitions were repaired
+upstream and this table was twelve minutes behind, the drift was caught because
+the second translator reads the Lean directly and disagreed on exactly those
+three. For these four there is no second reader: if one of them is repaired and
+the table is stale, every consumer gets a confident wrong number and nothing in
+this project notices. `api.require_fresh()` is the only guard they have.
+
 Every validation script in this repo used to re-transcribe a Lean formula into
 Python by hand. That transcription is an unvalidated step *inside* the
 validator: a slip produces a false verdict in either direction. This directory
