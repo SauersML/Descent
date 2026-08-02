@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import pathlib
 import re
@@ -411,7 +412,12 @@ def mine_from_docstring(d: Decl):
 
 # --------------------------------------------------------------------------
 
+_SOURCE_DIGEST = (None, 0)
+
+
 def build(root: pathlib.Path):
+    global _SOURCE_DIGEST
+    _SOURCE_DIGEST = source_digest(root)
     all_decls, failures = [], []
     files = sorted(root.rglob("*.lean"))
     extra = root.parent / (root.name + ".lean")
@@ -435,6 +441,27 @@ def build(root: pathlib.Path):
         d.constraints.pop("raw_chunk_lines", None)
         d.mentioned_by = sorted(set(d.mentioned_by))
     return defs, thms, structs, failures
+
+
+def source_digest(root):
+    """A content hash of every Lean source the table is derived from.
+
+    The point of comparison for staleness.  Comparing generated artifacts
+    against EACH OTHER only detects an internally incoherent snapshot; it
+    cannot detect a perfectly coherent snapshot of a corpus that no longer
+    exists, which is the more likely and more dangerous failure once
+    definitions are being repaired continuously.  Content rather than mtime,
+    so a checkout or a touch does not read as a change.
+    """
+    h = hashlib.sha256()
+    files = sorted(pathlib.Path(root).rglob("*.lean"))
+    extra = pathlib.Path(root).parent / (pathlib.Path(root).name + ".lean")
+    if extra.exists():
+        files.append(extra)
+    for f in files:
+        h.update(str(f.name).encode())
+        h.update(f.read_bytes())
+    return f"sha256:{h.hexdigest()[:32]}", len(files)
 
 
 def find_collisions(defs):
@@ -480,6 +507,8 @@ def to_json(defs, structs, failures, thms=()):
         r = {k: v for k, v in asdict(d).items()}
         return r
     return {
+        "source_digest": _SOURCE_DIGEST[0],
+        "source_files": _SOURCE_DIGEST[1],
         "collisions": find_collisions(defs),
         "theorems": theorem_rows(thms, defs),
         "definitions": [clean(d) for d in defs],
