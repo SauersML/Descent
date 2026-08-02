@@ -1869,3 +1869,97 @@ check(
         "reports vacuity rather than a formula that is always zero."
     ),
 )
+
+
+# --- generational transport kernel: the allele-frequency retention factor ---
+#
+# alleleFreqMismatchPenalty is the only locus-resolved factor in every kernel
+# of the `...At` layer: jointTagLDKernelAt, jointDirectCausalKernelAt,
+# jointProxyTaggingKernelAt and both novel kernels all carry it, once per
+# index. On the DIAGONAL of sigmaTagTargetAt, and with mutation and migration
+# switched off, the whole kernel is exactly penalty(p_s, p_t)^2 -- every other
+# factor is identically 1 -- so the diagonal is the one place where this
+# factor can be isolated from the rest of the product. That is the split
+# control; a joint check on the full kernel would let a wrong AF factor be
+# absorbed by the mutation or migration factor.
+check(
+    id="alleleFreqMismatchPenalty-is-not-the-variance-retention",
+    fqn="Calibrator.alleleFreqMismatchPenalty",
+    claim="MODEL: the AF retention factor exp(-|p_target - p_source|) is a "
+          "strictly DECREASING function of |delta p|, but the quantity it "
+          "multiplies -- the tag locus's contribution to the target second "
+          "moment -- retains p_t(1-p_t)/(p_s(1-p_s)), which INCREASES above 1 "
+          "whenever drift carries the frequency toward 1/2 and falls to "
+          "exactly 0 at fixation. The penalty is bounded below by exp(-2) = "
+          "0.135 on the diagonal and can never reach 0",
+    model_lean="exp(-|p_t - p_s|), squared because the diagonal of "
+               "sigmaTagTargetAt carries tagAlleleFreqRetentionAt at both i "
+               "and j; with mu = mig = 0 every other kernel factor is 1",
+    model_ref="the MEASURED ratio of the target to the source diagonal of the "
+              "tag second-moment matrix, on individuals from a forward "
+              "two-deme Wright-Fisher simulation at Ne = 250, mu = 0, "
+              "mig = 0, r = 0.004 between adjacent loci, 4000 individuals "
+              "per deme, 6 replicates, generations 100 to 1000 = 2*(2Ne)",
+    reference="cluster/fam_generational_transport_results.json, "
+              "per_locus.drift_only",
+    grid=[
+        {"t": 100, "ps": 0.588, "pt": 0.590, "measured": 0.98207},
+        {"t": 200, "ps": 0.610, "pt": 0.660, "measured": 0.91238},
+        {"t": 100, "ps": 0.184, "pt": 0.338, "measured": 1.53984},
+        {"t": 200, "ps": 0.574, "pt": 0.732, "measured": 0.77120},
+        {"t": 200, "ps": 0.748, "pt": 0.458, "measured": 1.31963},
+        {"t": 500, "ps": 0.212, "pt": 0.668, "measured": 1.36577},
+        {"t": 500, "ps": 0.266, "pt": 1.000, "measured": 0.00000},
+        {"t": 1000, "ps": 0.478, "pt": 0.000, "measured": 0.00000},
+    ],
+    lean=lambda D, t, ps, pt, measured: (
+        D["alleleFreqMismatchPenalty"](ps, pt) ** 2),
+    ref=lambda t, ps, pt, measured: measured,
+    kind="model",
+    expected_verdict="MODEL",
+    note=(
+        "EXPECTED TO DISAGREE. The two sides are not the same quantity and "
+        "the corpus does not say so: alleleFreqMismatchPenalty carries no "
+        "regime declaration at all (regime.json: has_regime false, "
+        "regime_explicit empty) and its docstring says only that it "
+        "'penalizes transport when target allele frequencies drift away from "
+        "the source frequencies'. A mentions query finds it in four theorems, "
+        "all of which use it as an opaque positive scalar; none pins it to a "
+        "measurable retention.\n\n"
+        "MEASURED, commit see below, drift-only arm:\n"
+        "  delta p = 0.002: penalty^2 = 0.99601 vs measured 0.98207 (1.4%) -- "
+        "the two agree in the limit, which is why a small-delta grid decides "
+        "nothing.\n"
+        "  p_s = 0.184 -> p_t = 0.338: penalty^2 = 0.73492 vs measured "
+        "1.53984, rel err 0.52. The penalty predicts a 27% LOSS where the "
+        "simulation shows a 54% GAIN; the exact HWE ratio "
+        "p_t(1-p_t)/(p_s(1-p_s)) = 1.4903 is within 3% of the measurement, so "
+        "the reference is the right closed form and the sign of the effect is "
+        "what is wrong.\n"
+        "  p_s = 0.212 -> p_t = 0.668: penalty^2 = 0.40172 vs measured "
+        "1.36577, rel err 0.71.\n"
+        "  p_s = 0.266 -> p_t = 1.000 (fixed): penalty^2 = 0.23039 vs "
+        "measured 0.0. At fixation the tag carries no variance and transports "
+        "nothing, but exp(-|delta p|)^2 >= exp(-2) = 0.135 for any pair of "
+        "frequencies, so the corpus's kernel can never express a lost locus.\n"
+        "  p_s = 0.478 -> p_t = 0.000 (fixed): penalty^2 = 0.38443 vs 0.0.\n\n"
+        "The repair is a regime declaration plus a reference, not a rescaling: "
+        "the factor is monotone in |delta p| by construction and the target "
+        "quantity is not monotone in |delta p| at all, so no scaling of "
+        "exp(-|delta p|) can fit it."
+    ),
+    canfail_clause=(
+        "The grid MUST contain at least one locus whose target frequency is "
+        "CLOSER to 1/2 than its source frequency -- (0.184, 0.338), "
+        "(0.748, 0.458) and (0.212, 0.668) are those points, with measured "
+        "ratios 1.54, 1.32 and 1.37. Only there does the measured retention "
+        "exceed 1, and no strictly decreasing function of |delta p| can "
+        "produce a value above 1, so those points alone separate the "
+        "functional FORM rather than a constant. The grid must also contain "
+        "at least one FIXED target locus (p_t = 0 or 1, measured ratio "
+        "exactly 0), which is what exposes the exp(-2) floor. And it must "
+        "retain the (0.588, 0.590) point where both sides are 1 to within "
+        "1.4%: without it the check would not show that the disagreement is "
+        "about the shape and not an overall offset."
+    ),
+)
