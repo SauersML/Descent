@@ -105,7 +105,7 @@ theorem quadraticChannel_deriv_zero : deriv quadraticChannel 0 = 0 := by
   have hderiv : deriv (fun x : ℝ => x ^ 2) 0 =
       2 * (0 : ℝ) ^ (2 - 1) * deriv (fun x : ℝ => x) 0 := by
     exact deriv_pow (n := 2) differentiableAt_id
-  rw [hderiv, deriv_id]
+  rw [hderiv]
   norm_num
 
 /-- But that local flatness is not absolute non-identifiability. -/

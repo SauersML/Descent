@@ -138,9 +138,9 @@ noncomputable def rescale (P : FiniteSpectralModel Band) (c : ℝ) (hc : c ≠ 0
   targetPower := P.targetPower
   featureSpectrum_pos := fun b => mul_pos (sq_pos_of_ne_zero hc) (P.featureSpectrum_pos b)
 
+omit [Fintype Band] in
 /-- Under `g -> c * g` the optimal readout is `beta / c`: it is scale-covariant, which is
 exactly what makes the score itself invariant. -/
-omit [Fintype Band] in
 theorem optimalReadout_rescale (P : FiniteSpectralModel Band) (c : ℝ) (hc : c ≠ 0)
     (b : Band) :
     optimalReadout (P.rescale c hc) b = optimalReadout P b / c := by

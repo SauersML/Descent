@@ -440,30 +440,19 @@ division at all**. Positivity of the middle mass is exactly `r < 1`, which is ex
 `B < A`, which is exactly `v > 0`. This shape was adopted after a build showed the
 divided form failing on renamed division lemmas; it is the same family.
 
-*On the proof style.* The entries of `![A, -A, -B]` are extracted by **type ascription**
-(`(hij : A = -A)`, `show |A ^ 2 - 1| = v`) rather than by `simp` with `Matrix.cons_*`
-lemmas. Ascription relies only on definitional reduction, which always succeeds here;
-two builds were lost to guessed `simp only` lemma lists that silently failed to reduce
-`![…] ⟨2, _⟩`, leaving later `rw`s with nothing to match. -/
+*On the proof style.* The atom vector is written as an explicit finite piecewise function.
+This makes `fin_cases` reduce it definitionally and avoids depending on the internal
+`Matrix.cons` representation of vector notation. -/
 noncomputable def threeAtom (v A B r : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
     (hB : B ^ 2 = 1 - v) (hApos : 0 < A) (hBpos : 0 < B)
     (hr0 : 0 < r) (hr1 : r < 1) (hr : B = A * r) :
     SingleModulus 3 v where
-  atom := ![A, -A, -B]
+  atom := fun j => if j = 0 then A else if j = 1 then -A else -B
   mass := ![1 / 4 + r / 4, 1 / 4 - r / 4, 1 / 2]
   atom_inj := by
     have hBA : B < A := by rw [hr]; nlinarith
     intro i j hij
-    fin_cases i <;> fin_cases j
-    · rfl
-    · exact absurd (hij : A = -A) (by intro h; linarith)
-    · exact absurd (hij : A = -B) (by intro h; linarith)
-    · exact absurd (hij : -A = A) (by intro h; linarith)
-    · rfl
-    · exact absurd (hij : -A = -B) (by intro h; linarith)
-    · exact absurd (hij : -B = A) (by intro h; linarith)
-    · exact absurd (hij : -B = -A) (by intro h; linarith)
-    · rfl
+    fin_cases i <;> fin_cases j <;> simp_all <;> linarith
   mass_pos := by
     intro j
     fin_cases j
@@ -526,20 +515,11 @@ argument could not have reached at all, since the ratio `√((1+v)/(1-v))` on wh
 argument turns is undefined at `v = 1`. -/
 noncomputable def threeAtomAtOne (A : ℝ) (hA : A ^ 2 = 2) (hApos : 0 < A) :
     SingleModulus 3 1 where
-  atom := ![A, -A, 0]
+  atom := fun j => if j = 0 then A else if j = 1 then -A else 0
   mass := ![1 / 4, 1 / 4, 1 / 2]
   atom_inj := by
     intro i j hij
-    fin_cases i <;> fin_cases j
-    · rfl
-    · exact absurd (hij : A = -A) (by intro h; linarith)
-    · exact absurd (hij : A = 0) (by intro h; linarith)
-    · exact absurd (hij : -A = A) (by intro h; linarith)
-    · rfl
-    · exact absurd (hij : -A = 0) (by intro h; linarith)
-    · exact absurd (hij : (0:ℝ) = A) (by intro h; linarith)
-    · exact absurd (hij : (0:ℝ) = -A) (by intro h; linarith)
-    · rfl
+    fin_cases i <;> fin_cases j <;> simp_all <;> linarith
   mass_pos := by
     intro j
     fin_cases j
@@ -587,27 +567,11 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
     (hB : B ^ 2 = 1 - v) (hApos : 0 < A) (hBpos : 0 < B) (hBA : B < A)
     (hc : |c| * A < 1 / 4) :
     SingleModulus 4 v where
-  atom := ![A, -A, B, -B]
+  atom := fun j => if j = 0 then A else if j = 1 then -A else if j = 2 then B else -B
   mass := ![1 / 4 + c * B, 1 / 4 - c * B, 1 / 4 - c * A, 1 / 4 + c * A]
   atom_inj := by
     intro i j hij
-    fin_cases i <;> fin_cases j
-    · rfl
-    · exact absurd (hij : A = -A) (by intro h; linarith)
-    · exact absurd (hij : A = B) (by intro h; linarith)
-    · exact absurd (hij : A = -B) (by intro h; linarith)
-    · exact absurd (hij : -A = A) (by intro h; linarith)
-    · rfl
-    · exact absurd (hij : -A = B) (by intro h; linarith)
-    · exact absurd (hij : -A = -B) (by intro h; linarith)
-    · exact absurd (hij : B = A) (by intro h; linarith)
-    · exact absurd (hij : B = -A) (by intro h; linarith)
-    · rfl
-    · exact absurd (hij : B = -B) (by intro h; linarith)
-    · exact absurd (hij : -B = A) (by intro h; linarith)
-    · exact absurd (hij : -B = -A) (by intro h; linarith)
-    · exact absurd (hij : -B = B) (by intro h; linarith)
-    · rfl
+    fin_cases i <;> fin_cases j <;> simp_all <;> linarith
   mass_pos := by
     intro j
     have hcA : |c * A| < 1 / 4 := by
