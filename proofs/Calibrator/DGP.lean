@@ -1554,9 +1554,6 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
     Mutation prevents Fst from reaching 1 by introducing shared variation.
 
     Empirical status: UNTESTED. -/
-noncomputable def fstDriftMutation (p : EvolutionaryParameters) : ℝ :=
-  fstMutationDriftEquilibrium p.theta
-
 /-- **Drift-migration equilibrium Fst**: Fst = 1/(1 + M).
     Migration homogenizes populations, reducing Fst. -/
 noncomputable def fstDriftMigration (p : EvolutionaryParameters) : ℝ :=
@@ -1605,7 +1602,7 @@ theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :
   have hscaled : 1 + p.theta + p.bigM = 1 + 4 * p.Ne * (p.mig + p.mu) := by
     unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
     ring
-  unfold fstDriftFlowStep fstEquilibrium fstMutationDriftEquilibrium
+  unfold fstDriftFlowStep fstEquilibrium
   rw [hscaled] at hd' ⊢
   field_simp
   ring
@@ -1623,14 +1620,14 @@ theorem fstEquilibrium_of_no_flow (p : EvolutionaryParameters)
   have hM : p.bigM = 0 := by
     unfold EvolutionaryParameters.bigM scaledMigrationRate
     rw [hmig]; ring
-  unfold fstEquilibrium fstMutationDriftEquilibrium
+  unfold fstEquilibrium
   rw [hθ, hM]
   norm_num
 
 /-- Full equilibrium Fst is positive. -/
 theorem fstEquilibrium_pos (p : EvolutionaryParameters) :
     0 < fstEquilibrium p := by
-  unfold fstEquilibrium fstMutationDriftEquilibrium
+  unfold fstEquilibrium
   apply div_pos one_pos
   linarith [p.theta_nonneg, p.bigM_nonneg]
 
@@ -1638,20 +1635,20 @@ theorem fstEquilibrium_pos (p : EvolutionaryParameters) :
 theorem fstEquilibrium_lt_one (p : EvolutionaryParameters)
     (h : 0 < p.theta + p.bigM) :
     fstEquilibrium p < 1 := by
-  unfold fstEquilibrium fstMutationDriftEquilibrium
+  unfold fstEquilibrium
   rw [div_lt_one (by linarith : 0 < 1 + p.theta + p.bigM)]
   linarith
 
 /-- Full equilibrium Fst ≤ drift-mutation Fst (migration only helps). -/
 theorem fstEquilibrium_le_driftMutation (p : EvolutionaryParameters) :
-    fstEquilibrium p ≤ fstDriftMutation p := by
-  unfold fstEquilibrium fstDriftMutation fstMutationDriftEquilibrium
+    fstEquilibrium p ≤ fstMutationDriftEquilibrium p.theta := by
+  unfold fstEquilibrium fstMutationDriftEquilibrium fstMutationDriftEquilibrium.theta
   exact one_div_le_one_div_of_le (by linarith [p.theta_nonneg]) (by linarith [p.bigM_nonneg])
 
 /-- Full equilibrium Fst ≤ drift-migration Fst (mutation only helps). -/
 theorem fstEquilibrium_le_driftMigration (p : EvolutionaryParameters) :
     fstEquilibrium p ≤ fstDriftMigration p := by
-  unfold fstEquilibrium fstDriftMigration fstMutationDriftEquilibrium
+  unfold fstEquilibrium fstDriftMigration
   apply one_div_le_one_div_of_le
   · linarith [p.bigM_nonneg]
   · linarith [p.theta_nonneg]
@@ -1659,11 +1656,11 @@ theorem fstEquilibrium_le_driftMigration (p : EvolutionaryParameters) :
 /-- **Key ordering**: Fst_full ≤ Fst_mutation_only ≤ Fst_drift_only (at equilibrium).
     Each additional force beyond drift reduces Fst. -/
 theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
-    fstEquilibrium p ≤ fstDriftMutation p ∧
-    fstDriftMutation p < 1 := by
+    fstEquilibrium p ≤ fstMutationDriftEquilibrium p.theta ∧
+    fstMutationDriftEquilibrium p.theta < 1 := by
   constructor
   · exact fstEquilibrium_le_driftMutation p
-  · unfold fstDriftMutation
+  · unfold fstMutationDriftEquilibrium fstMutationDriftEquilibrium.theta
     rw [div_lt_one (by linarith : 0 < 1 + p.theta)]
     linarith
 
@@ -1830,7 +1827,7 @@ theorem fstEquilibrium_decreasing_in_theta
     let p₂ : EvolutionaryParameters := ⟨Ne, mu₂, mig, t_div, recomb, V_A, hNe, hmu₂, hmig, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate fstMutationDriftEquilibrium
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
   simp only
   rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu₂ + 4 * Ne * mig)
@@ -1846,7 +1843,7 @@ theorem fstEquilibrium_decreasing_in_migration
     let p₂ : EvolutionaryParameters := ⟨Ne, mu, mig₂, t_div, recomb, V_A, hNe, hmu, hmig₂, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate fstMutationDriftEquilibrium
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
   simp only
   rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₂)
