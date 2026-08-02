@@ -298,8 +298,20 @@ def _phase2_one(recon, structs, results, NE_FIELDS, T_FIELDS, LEVELS, NES,
             sc = max(1.0, max([abs(x) for x in per_level]))
             moved = (max(per_level) - min(per_level)) > RTOL * sc
 
+        relation = "UNDETERMINED"
+        if len(per_level) >= 3:
+            x0, x1 = LEVELS[0], LEVELS[1]
+            y0, y1 = per_level[0], per_level[1]
+            if abs(x1 - x0) > 1e-15:
+                bb = (y1 - y0) / (x1 - x0)
+                aa = y0 - bb * x0
+                worst = 0.0
+                for xi, yi in zip(LEVELS[2:], per_level[2:]):
+                    worst = max(worst, abs(aa + bb * xi - yi) / max(1.0, abs(yi)))
+                relation = "AFFINE" if worst <= 1e-9 else "CO-FUNCTION"
         entry = {"definition": rec["definition"], "line": rec["line"],
                  "reference": ref_name, "ne_field": ne_f, "t_field": t_f,
+                 "relation": relation,
                  "levels": per_level, "empirical_status": rec["empirical_status"]}
         if all_inv and moved:
             results["members"].append(entry)
@@ -364,19 +376,29 @@ def main():
             print("    %-18s %-22s attempted %d, members %d"
                   % (name, b["form"], b["attempted"], b["members"]))
         for m in res["members"]:
-            print("    MEMBER   %-42s [%s] (%s,%s) status=%s"
+            print("    MEMBER   %-38s [%s] %-12s (%s,%s) status=%s"
                   % (m["definition"].split(".")[-1], m["reference"],
-                     m["ne_field"], m["t_field"], m["empirical_status"]))
+                     m.get("relation"), m["ne_field"], m["t_field"],
+                     m["empirical_status"]))
         # control: tau / theta / bigM must NOT be members
-        # A control that passes when nothing ran is not a control. If phase 2
-        # attempted no definitions, tau/theta/bigM were never evaluated and
-        # their absence from the member list says nothing at all.
+        # The control is SCOPED TO drift_retention, which is what it was
+        # designed for. tau = t_div/(2 Ne), theta = 4 Ne mu and bigM = 4 Ne mig
+        # are not functions of (1 - 1/(2Ne))^t, so their appearing there would
+        # mean every field is being fed the same value.
+        #
+        # Against the ISLAND form the same reasoning does not apply: bigM is
+        # 4 Ne mig, which shares that form's level sets exactly and legitimately.
+        # Flagging it there would be a false alarm, and the first version of
+        # this control did exactly that once the island reference was added.
         bad = [m["definition"] for m in res["members"]
-               if m["definition"].split(".")[-1] in ("tau", "theta", "bigM")]
-        if res["attempted"] == 0:
-            print("  CONTROL UNDETERMINED: phase 2 attempted 0 definitions, so "
-                  "tau/theta/bigM being absent from the member list is vacuous. "
-                  "Neither pass nor fail.")
+               if m["reference"] == "drift_retention"
+               and m["definition"].split(".")[-1] in ("tau", "theta", "bigM")]
+        n_dr = res.get("by_reference", {}).get("drift_retention", {}).get(
+            "attempted", 0)
+        if n_dr == 0:
+            print("  CONTROL UNDETERMINED: nothing was attempted against "
+                  "drift_retention, so tau/theta/bigM being absent from that "
+                  "reference's members is vacuous. Neither pass nor fail.")
             out["control_failed"] = None
         elif bad:
             print("  CONTROL FAILED: %s reported as members of the "
@@ -385,8 +407,9 @@ def main():
                   "field. Do not read the member list." % bad)
             out["control_failed"] = bad
         else:
-            print("  CONTROL PASSED: tau/theta/bigM evaluated and correctly "
-                  "excluded (%d definitions attempted)" % res["attempted"])
+            print("  CONTROL PASSED: tau/theta/bigM evaluated against "
+                  "drift_retention and correctly excluded (%d attempted there)"
+                  % n_dr)
             out["control_failed"] = []
         if res["errors"]:
             print("  first 5 errors:")
