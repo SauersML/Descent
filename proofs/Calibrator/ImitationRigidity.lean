@@ -670,7 +670,9 @@ theorem ldKernelSymbol_harmonicMean {decay : ℝ} (hd : |decay| < 1) :
     intervalIntegral.integral_const]
   rw [Real.sin_two_pi, Real.sin_zero]
   unfold ldWhiteningGain
+  simp only [smul_eq_mul]
   field_simp
+  ring
 
 theorem ldWhiteningGain_ge_one {decay : ℝ} (hd : |decay| < 1) :
     1 ≤ ldWhiteningGain decay := by
@@ -1182,6 +1184,130 @@ theorem absorptionChannelWeight_strictAntiOn {initial : ℝ} (hinitial : 0 < ini
     exact div_neg_of_neg_of_pos hnum hden
 
 end AbsorbingBoundary
+
+section Unification
+
+/-!
+## Unification with the rest of the development
+
+The results above are stated in their own vocabulary; this section connects
+each of them to a quantity the rest of the corpus already reasons about, so
+that a disagreement between them is a failed proof rather than two coexisting
+answers.
+
+* the imitation bump acts on the normal equations of `Calibrator.SecondMomentShift`
+  through a single scalar, so a residual-score analysis cannot separate it from
+  a background;
+* whitening — the operation `Calibrator.WhiteningEquivalence` formalizes — maps
+  the bump to another bump, which is why no whitening scheme escapes the
+  identifiability wall;
+* the dropout floor of the dead-sensor construction caps the fraction of
+  individual-level variation that any group-level covariate can explain, which
+  is the mechanism behind open question 1 of `Calibrator.OpenQuestions`.
+-/
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- The imitation bump acts on any weight vector through one scalar: the
+projection of the weights on the signal direction. -/
+theorem mulVec_add_rankOneCovarianceBump
+    (K : Matrix ι ι ℝ) (scale : ℝ) (loading weights : ι → ℝ) :
+    (K + rankOneCovarianceBump scale loading).mulVec weights =
+      K.mulVec weights + (scale ^ 2 * dot loading weights) • loading := by
+  funext i
+  simp only [Matrix.mulVec, dotProduct, Matrix.add_apply, Pi.add_apply,
+    rankOneCovarianceBump, Pi.smul_apply, smul_eq_mul, dot, add_mul]
+  rw [Finset.sum_add_distrib]
+  congr 1
+  have hterm : ∀ j : ι,
+      scale ^ 2 * loading i * loading j * weights j =
+        (scale ^ 2 * loading i) * (loading j * weights j) := by
+    intro j; ring
+  simp_rw [hterm]
+  rw [← Finset.mul_sum]
+  ring
+
+/-- **The imitation is invisible to the normal equations of a score orthogonal
+to the signal.** The second-moment matrix of `Calibrator.SecondMomentShift`
+moves by a rank-one term, so a deployed polygenic score uncorrelated with the
+signal direction sees no change at all: the two experiments agree exactly on
+everything that score can measure. -/
+theorem secondMoment_imitation_shift
+    {Ω : Type*} (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
+    (scale : ℝ) (loading weights : ι → ℝ) :
+    (secondMomentMatrix E X + rankOneCovarianceBump scale loading).mulVec weights =
+      (secondMomentMatrix E X).mulVec weights +
+        (scale ^ 2 * dot loading weights) • loading :=
+  mulVec_add_rankOneCovarianceBump (secondMomentMatrix E X) scale loading weights
+
+theorem secondMoment_imitation_invisible_to_orthogonal_score
+    {Ω : Type*} (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
+    (scale : ℝ) (loading weights : ι → ℝ)
+    (horth : dot loading weights = 0) :
+    (secondMomentMatrix E X + rankOneCovarianceBump scale loading).mulVec weights =
+      (secondMomentMatrix E X).mulVec weights := by
+  rw [secondMoment_imitation_shift, horth]
+  simp
+
+/-- **Whitening cannot destroy the imitation, only rotate it.** Conjugating the
+bump by any right-side transform — the operation `rightWhiten` performs on data
+rows — returns a bump of the same size in the transformed direction. Every
+whitening or LD-pruning scheme therefore faces the same secular threshold, in
+new coordinates. -/
+theorem rankOneCovarianceBump_conjugate
+    (transform : Matrix ι ι ℝ) (scale : ℝ) (loading : ι → ℝ) :
+    transform.transpose * rankOneCovarianceBump scale loading * transform =
+      rankOneCovarianceBump scale (transform.transpose.mulVec loading) := by
+  ext i j
+  have hinner : ∀ a : ι,
+      (∑ b, transform b i * (scale ^ 2 * loading b * loading a) * transform a j) =
+        (∑ b, transform b i * loading b) *
+          (scale ^ 2 * (loading a * transform a j)) := by
+    intro a
+    have hterm : ∀ b : ι,
+        transform b i * (scale ^ 2 * loading b * loading a) * transform a j =
+          (transform b i * loading b) * (scale ^ 2 * (loading a * transform a j)) := by
+      intro b; ring
+    simp_rw [hterm]
+    exact (Finset.sum_mul _ _ _).symm
+  have hexpand :
+      (transform.transpose * rankOneCovarianceBump scale loading * transform) i j =
+        ∑ a, (∑ b, transform b i * loading b) *
+          (scale ^ 2 * (loading a * transform a j)) := by
+    simp only [Matrix.mul_apply, rankOneCovarianceBump, Matrix.transpose_apply]
+    exact Finset.sum_congr rfl (fun a _ => by rw [← hinner a, Finset.sum_mul])
+  have hright :
+      rankOneCovarianceBump scale (transform.transpose.mulVec loading) i j =
+        scale ^ 2 * ((∑ b, transform b i * loading b) *
+          (∑ a, transform a j * loading a)) := by
+    simp only [rankOneCovarianceBump, Matrix.mulVec, dotProduct, Matrix.transpose_apply]
+    ring
+  have hswap : (∑ a, loading a * transform a j) = ∑ a, transform a j * loading a :=
+    Finset.sum_congr rfl (fun a _ => mul_comm _ _)
+  rw [hexpand, hright, ← Finset.mul_sum, ← Finset.mul_sum, hswap]
+  ring
+
+/-- **The dropout floor caps individual-level explanation.** With a positive
+leave-one-out quadratic form, a fair alive/dead genotyping mixture leaves a
+strictly positive variance floor in the per-individual quantity, so the
+`explainableFraction` of any group-level covariate — genetic distance included —
+is strictly below one no matter how much between-group signal there is. This is
+the technical mechanism underneath open question 1: individual accuracy is not
+a function of population-level distance, and part of the residue is not
+genetics at all. -/
+theorem dropout_floor_caps_explainable_fraction
+    (between quadraticForm : ℝ)
+    (hbetween : 0 ≤ between) (hquadratic : 0 < quadraticForm) :
+    explainableFraction between
+        (between +
+          fairTwoPointVariance (scalarRowResolvent 0 quadraticForm)
+            (scalarRowResolvent (Real.sqrt 2) quadraticForm)) < 1 := by
+  have hfloor := deadSensor_resolvent_variance_pos quadraticForm hquadratic
+  unfold explainableFraction
+  rw [div_lt_one (by linarith)]
+  linarith
+
+end Unification
 
 end
 
