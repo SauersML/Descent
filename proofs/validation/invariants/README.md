@@ -1,5 +1,33 @@
 # Range and invariant checks over `proofs/Calibrator`
 
+> **A measurement that cannot report its own absence will eventually report
+> someone else's answer as its own.**
+
+That is the general form of every defect this tier has found in itself, and of
+most of what it found elsewhere. A guard that never fires, a control that
+passes on an empty population, a filter reporting on what it could parse, a
+staleness check comparing two derived files to each other, a definition table
+older than the corpus, an overflow that collapses back into range before the
+comparison sees it — each is a measurement with no way to say "I did not
+measure anything." So is a log file a failed job never wrote. So is a monitor
+that greps it.
+
+The corollary, which cost the most to learn: **a correct general principle
+does not apply itself.** The overflow fix and the underflow it missed were
+three lines apart in the same function, minutes apart, written while
+explicitly reasoning about representability. Having the right idea in one
+place is no defence in another, and "another" can be adjacent.
+
+## Method, and why the mechanism matters more than the fit
+
+A story that explains the evidence AND rhymes with a story you already trust is
+more dangerous than one that only does the first: the resemblance supplies the
+confidence that checking would have. The defence is to check the MECHANISM
+rather than the fit — find the pattern that produces the failure, not the
+examples consistent with it. Every real diagnosis in this directory came from
+going one level down; every wrong one came from stopping when the story
+cohered.
+
 Bulk validation over `proofs/Calibrator`, in three tiers. The first two run in
 seconds and need no reference values, which is why they cover the corpus in
 bulk; the third supplies external ground truth for the residue they cannot
