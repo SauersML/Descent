@@ -65,11 +65,30 @@ import sys
 
 import numpy as np
 
+# CORRECTED FROM THE PAPER'S METHODS. The first run used p < 5e-8 and the full
+# 69,500 prediction set. Both were wrong and both mattered.
+#
+# They clump at --clump-p1 0.01 --clump-r2 0.2 --clump-kb 250 and then threshold
+# index SNPs at MARGINAL p < 1e-5. That is |z| > 4.42, not 5.45. The weaker cut
+# admits a far larger and far more marginal index set with much weaker
+# enrichment for large true effects -- which is precisely the mechanism that
+# stopped the first run reaching high flip rates. So the earlier conclusion
+# "selection enriches so hard that selected z_repl bottoms out near 2" was a
+# true statement about a threshold they did not use.
+#
+# And the re-estimation splits the prediction sample into close (distance <= 10,
+# 38,992) and far (> 10, 30,508). The far arm is ~30,500, not 69,500.
+#
+# NOTE AN INTERNAL INCONSISTENCY IN THE PAPER: the additional lymphocyte
+# analyses report the same close/far split as 96,457 and 32,822, which sum to
+# more than the stated 69,500 prediction sample. The two cannot both be right.
+# This script uses the Results figures and says so; nothing here depends on
+# which is correct beyond the sqrt of a ratio.
 N_DISC = 336_923         # Harpak et al. GWAS sample
-N_REPL = 69_500          # their prediction/replication sample
+N_REPL = 30_508          # FAR arm of the prediction sample (Results)
 H2 = 0.20
 MAF = 0.20
-P_THRESH = 5e-8
+P_THRESH = 1e-5          # their index-SNP threshold, not genome-wide
 REPS = 40
 SEED = 20260802
 
@@ -181,7 +200,7 @@ def main():
     print("    %-10s %-12s %-14s %-16s %-10s"
           % ("n_causal", "h2", "sel z_repl", "flip rate", "tot selected"))
     rows = []
-    for m in (200, 2_000, 20_000, 100_000, 300_000):
+    for m in (200, 2_000, 20_000, 100_000, 300_000, 1_000_000):
         r = run_architecture(m, H2, rng)
         rows.append(r)
         print("    %-10d %-12.6f %-14s %-16s %-10.0f"
