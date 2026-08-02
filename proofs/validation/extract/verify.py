@@ -286,6 +286,108 @@ def collision_handling_actually_works():
           + (f" -- {list(live)}" if live else " (corpus compiles)"))
 
 
+def shape_directed_inhabitants_are_right():
+    """POSITIVE CONTROLS for `admissible.type_value` and `lean_rt.VecFn`.
+
+    Every value below is known independently of the code under test: the
+    cardinalities come from the Lean declarations (`Pop` has two constructors,
+    `DiploidGenotype` three), and the linear-algebra answers are computed by
+    hand.  The point of the controls is that a *wrong* inhabitant is silent --
+    a scalar where a vector belongs does not crash, it makes the definition
+    return a plausible number -- so the shapes have to be asserted, not
+    observed.
+    """
+    import random
+    import admissible
+    import lean_rt as _rt
+    import api
+    api.refresh()
+    structs = api.structures()
+    rng = random.Random(11)
+
+    # -- the runtime's linear algebra, against arithmetic done by hand
+    close("dotProduct([1,2,3],[4,5,6])",
+          float(_rt.dotProduct([1.0, 2.0, 3.0], [4.0, 5.0, 6.0])), 32.0)
+    assert list(_rt.mulVec([[1.0, 2.0], [3.0, 4.0]], [1.0, 1.0])) == [3.0, 7.0]
+    print("  ok  mulVec [[1,2],[3,4]] [1,1] = [3,7]")
+    assert list(_rt.vecMul([1.0, 1.0], [[1.0, 2.0], [3.0, 4.0]])) == [4.0, 6.0]
+    print("  ok  vecMul [1,1] [[1,2],[3,4]] = [4,6]")
+    close("trace [[1,2],[3,4]]", float(_rt.trace([[1.0, 2.0], [3.0, 4.0]])), 5.0)
+    for bad, why in (((lambda: _rt.dotProduct([1.0], [1.0, 2.0])), "length mismatch"),
+                     ((lambda: _rt.trace([[1.0, 2.0]])), "non-square trace")):
+        try:
+            bad()
+        except ValueError:
+            print(f"  ok  refuses: {why}")
+        else:
+            raise AssertionError(f"{why} was accepted instead of refused")
+
+    # -- VecFn: one value, two readings, and a loud edge
+    v = _rt.VecFn([10.0, 20.0, 30.0])
+    assert v(1) == v[1] == 20.0 and len(v) == 3
+    print("  ok  VecFn: v(1) == v[1] == 20.0, len 3")
+    m = _rt.VecFn([_rt.VecFn([1.0, 2.0]), _rt.VecFn([3.0, 4.0])])
+    assert m(1, 0) == m[1][0] == 3.0
+    print("  ok  VecFn: m(1,0) == m[1][0] == 3.0")
+    try:
+        v(3)
+    except IndexError:
+        print("  ok  VecFn refuses an index outside its dimension")
+    else:
+        raise AssertionError("VecFn returned a value for an out-of-range index")
+
+    # -- cardinalities read from the corpus's own inductives
+    cards = admissible.enum_cards(structs)
+    assert cards.get("Pop") == 2, cards.get("Pop")
+    assert cards.get("DiploidGenotype") == 3, cards.get("DiploidGenotype")
+    print("  ok  enum cardinalities: Pop=2, DiploidGenotype=3 (from the Lean)")
+
+    # -- shapes, asserted against the Lean types they were built from
+    D = admissible.VECTOR_DIM
+    beta = admissible.type_value("Pop \u2192 Fin q \u2192 \u211d", rng, structs)
+    assert len(beta) == 2, "a Pop-indexed table must have exactly 2 entries"
+    assert len(beta[0]) == D and all(isinstance(x, float) for x in beta[0])
+    print(f"  ok  `Pop \u2192 Fin q \u2192 \u211d` is 2 x {D} reals")
+    try:
+        beta(2)
+    except IndexError:
+        print("  ok  there is no third population to read")
+    else:
+        raise AssertionError("a Pop-indexed table invented a third population")
+
+    M = admissible.type_value(
+        "Matrix (Fin p) (Fin q) \u211d", rng, structs)
+    assert len(M) == D and len(M[0]) == D and M(1, 2) == M[1][2]
+    print(f"  ok  `Matrix (Fin p) (Fin q) \u211d` is {D} x {D}, M(1,2)==M[1][2]")
+
+    # A functional must actually depend on its argument: a constant here would
+    # make `totalVariance arch c` independent of `c` and hide every error in it.
+    F = admissible.type_value("(Fin k \u2192 \u211d) \u2192 \u211d", rng, structs)
+    a, b = F([1.0, 0.0, 0.0]), F([0.0, 0.0, 1.0])
+    assert isinstance(a, float) and a != b, (a, b)
+    print("  ok  `(Fin k \u2192 \u211d) \u2192 \u211d` is a NON-constant functional")
+
+    # `\u2115 \u2192 Fin p \u2192 \u211d`: unbounded outer index, and the same
+    # generation must give the same vector every time it is asked for.
+    G = admissible.type_value("\u2115 \u2192 Fin p \u2192 \u211d", rng, structs)
+    assert G(3, 1) == G(3, 1) and len(G(7)) == D
+    assert G(3, 1) != G(4, 1), "a generation-indexed field must vary with t"
+    print("  ok  `\u2115 \u2192 Fin p \u2192 \u211d` is stable in t and varies with t")
+
+    # -- and the refusals, which are the safety property
+    for ty in ("Measure \u211d", "Set \u03b1", "List \u03b9"):
+        try:
+            admissible.type_value(ty, rng, structs)
+        except admissible.Uninhabitable:
+            print(f"  ok  refuses to inhabit {ty!r}")
+        else:
+            raise AssertionError(f"invented an inhabitant of {ty!r}")
+
+
+step("shape-directed inhabitants (positive controls)",
+     shape_directed_inhabitants_are_right)
+
+
 step("collision handling is exercised, not assumed", collision_handling_actually_works)
 step("mechanical extraction ceiling", lambda: run("ceiling.py"))
 step("parser reconciliation against the other tables", lambda: run("reconcile.py"))
