@@ -63,6 +63,10 @@ noncomputable def characteristicAmplitude (s : ℝ) : ℝ :=
 theorem characteristicAmplitude_nonneg (s : ℝ) : 0 ≤ C.characteristicAmplitude s :=
   Real.sqrt_nonneg _
 
+/-- The joint characteristic amplitude is normalized at frequency zero. -/
+@[simp] theorem characteristicAmplitude_zero : C.characteristicAmplitude 0 = 1 := by
+  simp [characteristicAmplitude, cosPart, sinPart, C.mass_sum]
+
 /-- The conditional-gain functional.  At positive amplitude it is `-log |φ(s)|`; exact
 cancellation has infinite gain.  `WithTop` is essential here because `Real.log 0 = 0` in
 Lean, which would otherwise assign the wrong value to a vanishing characteristic
@@ -81,6 +85,10 @@ theorem conditionalGainFunctional_eq_coe {s : ℝ}
     C.conditionalGainFunctional s =
       ((-Real.log (C.characteristicAmplitude s) : ℝ) : WithTop ℝ) := by
   simp [conditionalGainFunctional, h]
+
+/-- Zero frequency has zero gain. -/
+@[simp] theorem conditionalGainFunctional_zero : C.conditionalGainFunctional 0 = 0 := by
+  simp [conditionalGainFunctional]
 
 end FiniteCoupledPhaseLaw
 
