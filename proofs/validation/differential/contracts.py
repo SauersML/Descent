@@ -29,9 +29,16 @@ CONTRACT 2 -- THEOREM-PROVED AND DOCSTRING-IMPLIED BOUNDS MUST NOT MERGE.
 
 from __future__ import annotations
 
+import os
 import sys
 
-EXTRACT = "/Users/user/gnomon/proofs/validation/extract"
+# Derived from this file's own location, never hardcoded. An absolute path to
+# one machine's checkout is the same mistake as keying on a filename: it works
+# until the code runs anywhere else, and it failed the moment this ran on the
+# cluster rather than the workstation.
+EXTRACT = os.path.normpath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "extract")
+)
 if EXTRACT not in sys.path:
     sys.path.insert(0, EXTRACT)
 

@@ -13,11 +13,14 @@ Disagreements are reported, never averaged or silently resolved.
 
 from __future__ import annotations
 
+import os
 import sys
 
 import corpus
 
-EXTRACT = "/Users/user/gnomon/proofs/validation/extract"
+EXTRACT = os.path.normpath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "extract")
+)
 if EXTRACT not in sys.path:
     sys.path.insert(0, EXTRACT)
 
