@@ -227,7 +227,7 @@ theorem diploid_modulus_degenerate_only_at_half (q : ℝ) (hq0 : 0 < q) (hq1 : q
     have hexp : ∀ x : ℝ, x / (2 * q * (1 - q)) - 1
         = (x - 2 * q * (1 - q)) / (2 * q * (1 - q)) := by
       intro x
-      field_simp
+      rw [sub_div, div_self hne]
     rw [hexp, hexp, div_pow, div_pow, div_eq_div_iff hD2 hD2] at hsq
     exact mul_right_cancel₀ hD2 hsq
   have hfac : (2 * q - 1) * (3 * q ^ 2 - 3 * q + 1) = 0 := by
@@ -413,6 +413,7 @@ theorem not_separating_of_frequencyTie {k n : ℕ} (family : BundleFamily k)
   have hzero : family.massAt (panel.support i) v = 0 := by
     rw [htie]
     exact hothers l hne
+  unfold Covers at hcover
   exact hcover hzero
 
 /-- **A tie is not merely an obstruction to the proof: it is a genuine non-identifiability.**
