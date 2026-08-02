@@ -942,64 +942,104 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
 
 /-! ### Stepping-Stone Model Foundations -/
 
-/-- **One-dimensional stepping-stone Fst.**
-    In a linear array of demes with nearest-neighbor migration at rate m,
-    Fst between demes i and j depends on |i-j|. For the continuous
-    approximation: Fst(d) ≈ 1 - exp(-d/√(2Nm)) where d is the number of
-    steps. We model the characteristic length scale.
+/-- **Characteristic length of one-dimensional isolation by distance.**
+    `L = √(m / (2·μ))`, in demes. This is the Malécot / Kimura-Weiss decay
+    scale: in an infinite linear array of demes with nearest-neighbour
+    migration rate `m` and mutation rate `μ`, the probability that two genes
+    sampled `d` demes apart are identical by descent falls off as `exp(-d/L)`.
 
-    Empirical status: UNTESTED. -/
-noncomputable def steppingStoneCharacteristicLength (Ne m : ℝ) : ℝ :=
-  Real.sqrt (2 * Ne * m)
+    It is the balance point of two rates. Over a stretch of `L` demes a lineage
+    diffuses in time `L²/m`; identity is destroyed by mutation in the two
+    lineages at rate `2·μ`. Setting `L²/m = 1/(2·μ)` gives this body, and
+    `steppingStoneCharacteristicLength_balances_mutation` states exactly that.
 
-/-- The characteristic length scale is positive for positive Ne and m. -/
-theorem steppingStoneCharacteristicLength_pos (Ne m : ℝ)
-    (hNe : 0 < Ne) (hm : 0 < m) :
-    0 < steppingStoneCharacteristicLength Ne m := by
+    **This is a correction.** The previous body was `√(2·Nₑ·m)`: it contained
+    the deme size and no mutation rate. That is not a mis-set constant, it is
+    the wrong function. `√(2·Nₑ·m)` is not even a length -- `Nₑ` is a count of
+    individuals, so the expression has units of √individuals, while `m/(2μ)` is
+    a ratio of two per-generation rates and is dimensionless as a squared deme
+    count must be. Diagnostically the two disagree on both axes that matter:
+    the old body is constant in `μ` where the true scale goes as `μ^(-1/2)`,
+    and grows as `√Nₑ` where the true scale does not depend on `Nₑ` at all.
+    `validation/differential/heavy/h1_stepping_stone_length.py` measures those
+    two exponents and is retained as the standing check on this definition.
+
+    Regime: mutation-limited, i.e. distances comparable to `L`. Below `L`,
+    isolation by distance is governed instead by the mutation-free coalescent
+    result `DemographicHistory.demoSteppingStoneFst`, which is a different
+    function and is derived separately.
+
+    Empirical status: FORMULA CORRECTED; the corrected form is the published
+    Kimura-Weiss result, and h1 is the run that decides it. -/
+noncomputable def steppingStoneCharacteristicLength (m μ : ℝ) : ℝ :=
+  Real.sqrt (m / (2 * μ))
+
+/-- The characteristic length scale is positive for positive migration and
+    mutation rates. -/
+theorem steppingStoneCharacteristicLength_pos (m μ : ℝ)
+    (hm : 0 < m) (hμ : 0 < μ) :
+    0 < steppingStoneCharacteristicLength m μ := by
   unfold steppingStoneCharacteristicLength
   exact Real.sqrt_pos.mpr (by positivity)
 
-/-- **Continuous stepping-stone Fst approximation.**
-    Fst(d) ≈ 1 - exp(-d / L) where L = √(2Nm).
+/-- **What the definition claims: the migration/mutation balance.**
+    `L² · (2·μ) = m`, i.e. the time `L²/m` a lineage takes to diffuse `L`
+    demes is exactly the time `1/(2·μ)` in which mutation destroys identity
+    between two lineages. This is the content of the Kimura-Weiss scale, and
+    stating it as an equation is what stops the body from drifting back to
+    something containing `Nₑ`: no expression in `Nₑ` and `m` alone can satisfy
+    it. -/
+theorem steppingStoneCharacteristicLength_balances_mutation (m μ : ℝ)
+    (hm : 0 ≤ m) (hμ : 0 < μ) :
+    steppingStoneCharacteristicLength m μ ^ 2 * (2 * μ) = m := by
+  unfold steppingStoneCharacteristicLength
+  rw [Real.sq_sqrt (by positivity)]
+  field_simp
 
-    Empirical status: UNTESTED. -/
-noncomputable def continuousSteppingStoneFst (L d : ℝ) : ℝ :=
-  1 - Real.exp (-(d / L))
+/-- **The decay scale shrinks as mutation gets faster.**
+    This is the axis on which the previous body was falsified: `√(2·Nₑ·m)` is
+    constant in `μ`, so it could not move here at all. -/
+theorem steppingStoneCharacteristicLength_strictAnti_mutation (m μ₁ μ₂ : ℝ)
+    (hm : 0 < m) (hμ₁ : 0 < μ₁) (h : μ₁ < μ₂) :
+    steppingStoneCharacteristicLength m μ₂ < steppingStoneCharacteristicLength m μ₁ := by
+  unfold steppingStoneCharacteristicLength
+  apply Real.sqrt_lt_sqrt (by positivity)
+  exact div_lt_div_of_pos_left hm (by linarith) (by linarith)
 
-/-- Stepping-stone Fst is nonneg for nonneg distance and positive L. -/
-theorem continuousSteppingStoneFst_nonneg (L d : ℝ)
-    (hL : 0 < L) (hd : 0 ≤ d) :
-    0 ≤ continuousSteppingStoneFst L d := by
-  unfold continuousSteppingStoneFst
-  have harg : 0 ≤ d / L := div_nonneg hd (le_of_lt hL)
-  have hexp : Real.exp (-(d / L)) ≤ 1 := by
-    rw [← Real.exp_zero]
-    exact Real.exp_le_exp.mpr (by linarith)
-  linarith
+/-- The decay scale grows with the migration rate. -/
+theorem steppingStoneCharacteristicLength_strictMono_migration (m₁ m₂ μ : ℝ)
+    (hm₁ : 0 ≤ m₁) (hμ : 0 < μ) (h : m₁ < m₂) :
+    steppingStoneCharacteristicLength m₁ μ < steppingStoneCharacteristicLength m₂ μ := by
+  unfold steppingStoneCharacteristicLength
+  apply Real.sqrt_lt_sqrt (by positivity)
+  exact div_lt_div_of_pos_right h (by positivity)
 
-/-- **Stepping-stone Fst is strictly increasing in distance.** -/
-theorem continuousSteppingStoneFst_increases (L d₁ d₂ : ℝ)
-    (hL : 0 < L) (hd₁ : 0 ≤ d₁) (h_more : d₁ < d₂) :
-    continuousSteppingStoneFst L d₁ < continuousSteppingStoneFst L d₂ := by
-  unfold continuousSteppingStoneFst
-  have h_exp_lt : Real.exp (-(d₂ / L)) < Real.exp (-(d₁ / L)) := by
-    apply Real.exp_lt_exp.mpr
-    have : d₁ / L < d₂ / L := div_lt_div_of_pos_right h_more hL
-    linarith
-  linarith
+/-! ### `continuousSteppingStoneFst` has been deleted
 
-/-- **Stepping-stone Fst increases with larger L (more migration).**
-    More migration increases the characteristic length, which means at any
-    fixed distance d, Fst is lower (i.e., increasing L decreases Fst). -/
-theorem continuousSteppingStoneFst_decreases_with_L (L₁ L₂ d : ℝ)
-    (hL₁ : 0 < L₁) (hL₂ : 0 < L₂) (hd : 0 < d) (h_more : L₁ < L₂) :
-    continuousSteppingStoneFst L₂ d < continuousSteppingStoneFst L₁ d := by
-  unfold continuousSteppingStoneFst
-  have h_ratio_lt : d / L₂ < d / L₁ := by
-    exact div_lt_div_of_pos_left hd hL₁ h_more
-  have h_exp_lt : Real.exp (-(d / L₁)) < Real.exp (-(d / L₂)) := by
-    apply Real.exp_lt_exp.mpr; linarith
-  linarith
+The corpus carried a second stepping-stone F_ST,
+`continuousSteppingStoneFst L d = 1 - exp(-d/L)`, evaluated at
+`L = steppingStoneCharacteristicLength`. It contradicted
+`DemographicHistory.demoSteppingStoneFst d Nₑ m σ² = d/(d + 4·Nₑ·m·σ²)` by up
+to 878% on the differential grid, so at most one of the two could be right.
+
+The contradiction is decidable without simulation, and it is decided against
+the exponential. `demoSteppingStoneFst` is derived from the coalescent in
+`DemographicHistory`: the meeting time of two lineages `d` demes apart is
+linear in `d`, `T(d) = d/(2σ²m)`, and `F_ST = T/(T + 2Nₑ)` then gives the
+hyperbolic `d/(d + 4Nₑσ²m)` exactly, with
+`steppingStoneFst_from_coalescence_time` proving that equality. A linear
+meeting time under the `T/(T+2Nₑ)` map cannot produce `1 - exp(-d/L)` for any
+`L`: the two agree only to first order in `d`, and there they agree only if
+`L = 4·Nₑ·m·σ²`, which is not the scale the corpus passed and is not a
+mutation scale at all. The exponential had no derivation anywhere in the
+corpus and no theorem tying it to anything.
+
+Its three theorems -- `continuousSteppingStoneFst_nonneg`,
+`_increases`, `_decreases_with_L` -- were deleted with it. They were true of
+the body as written, and that is the point: all three are monotonicity and
+sign facts, which `d/(d + 4Nₑmσ²)` satisfies equally, so none of them could
+have detected that the functional form was wrong. Callers wanting a
+stepping-stone F_ST should use `demoSteppingStoneFst`. -/
 
 /-! ### Allele Frequency Homogenization by Migration -/
 

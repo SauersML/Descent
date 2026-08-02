@@ -411,9 +411,16 @@ theorem neutralDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) :
     neutralDriftFactor Ne t = (1 - 1 / coalescentTimeScale Ne) ^ t := by
   unfold neutralDriftFactor; rw [coalescentTimeScale_eq]
 
-theorem ldRetainedFraction_uses_timeScale (Ne : ℝ) (t : ℕ) :
-    ldRetainedFraction Ne t = (1 - 1 / coalescentTimeScale Ne) ^ t := by
-  unfold ldRetainedFraction; rw [coalescentTimeScale_eq]
+/-- RESTATED. This used to read
+`ldRetainedFraction Ne t = (1 - 1/coalescentTimeScale Ne)^t`, which was true of
+a body that had dropped the recombination factor and false of the corrected
+one. It is restated rather than deleted because the convention it was pinning
+-- that the drift channel enters through `2·Nₑ` -- is still present and still
+worth pinning; what changed is that drift is no longer the whole retention. -/
+theorem ldRetainedFraction_uses_timeScale (r Ne : ℝ) (t : ℕ) :
+    ldRetainedFraction r Ne t
+      = ((1 - r) * (1 - 1 / coalescentTimeScale Ne)) ^ t := by
+  unfold ldRetainedFraction ldRetentionPerGen; rw [coalescentTimeScale_eq]
 
 theorem fstDerived_uses_timeScale (Ne : ℝ) (t : ℕ) :
     fstDerived Ne t = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
@@ -513,14 +520,24 @@ theorem expectedPGSDiffVariance_eq_ploidy_form (V_A fst : ℝ) :
 Each of these uses the ploidy convention once, with no sibling to disagree
 with, so only a derivation from `ploidy` ties them down. -/
 
-theorem ldHalfLife_uses_timeScale (Ne : ℝ) :
-    ldHalfLife Ne = coalescentTimeScale Ne * Real.log 2 := by
-  unfold ldHalfLife; rw [coalescentTimeScale_eq]
+/-- RESTATED. This used to read `ldHalfLife Ne = coalescentTimeScale Ne * log 2`,
+which is the `r → 0` limit and is false of the corrected body at every `r > 0`.
+The `2·Nₑ` convention still appears, now inside the retention whose logarithm
+sets the half-life, and that is what this states. -/
+theorem ldHalfLife_uses_timeScale (r Ne : ℝ) :
+    ldHalfLife r Ne
+      = Real.log 2 / (-Real.log ((1 - r) * (1 - 1 / coalescentTimeScale Ne))) := by
+  unfold ldHalfLife ldRetentionPerGen; rw [coalescentTimeScale_eq]
 
-theorem steppingStoneCharacteristicLength_uses_timeScale (Ne m : ℝ) :
-    steppingStoneCharacteristicLength Ne m
-      = Real.sqrt (coalescentTimeScale Ne * m) := by
-  unfold steppingStoneCharacteristicLength; rw [coalescentTimeScale_eq]
+/-! `steppingStoneCharacteristicLength_uses_timeScale` has been DELETED, not
+restated. It asserted
+`steppingStoneCharacteristicLength Ne m = Real.sqrt (coalescentTimeScale Ne * m)`,
+i.e. that the 1D decay length carries the `2·Nₑ` ploidy convention. The
+corrected definition is `√(m/(2·μ))` and contains no effective size at all, so
+there is no convention here to pin and no honest restatement to make: the
+theorem existed only because the wrong body happened to contain `2·Nₑ`. Its
+replacement, stating what that definition does claim, is
+`PopulationGeneticsFoundations.steppingStoneCharacteristicLength_balances_mutation`. -/
 
 theorem cumulativeDrift_uses_timeScale {T : ℕ} (Ne : Fin T → ℝ) :
     cumulativeDrift Ne = ∑ i, 1 / coalescentTimeScale (Ne i) := by

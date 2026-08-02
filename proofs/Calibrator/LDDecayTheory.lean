@@ -820,21 +820,89 @@ theorem larger_pop_slower_ld_decay (Ne₁ Ne₂ : ℝ)
   unfold ldDecayRatePerGen
   exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
 
-/-- **LD half-life is proportional to Ne.**
-    After a perturbation, the number of generations for LD to halve
-    is approximately 2·Ne·ln(2). We define it and show monotonicity.
+/-- **LD half-life at recombination rate `r` and effective size `Nₑ`.**
+    The number of generations for `E[D]` to halve, read off the
+    per-generation retention `ldRetentionPerGen r Ne = (1-r)(1 - 1/(2Nₑ))`
+    already established at the top of this file:
 
-    Empirical status: UNTESTED. -/
-noncomputable def ldHalfLife (Ne : ℝ) : ℝ :=
-  2 * Ne * Real.log 2
+      `t₁ᵥ₂ = ln 2 / -ln[(1-r)(1 - 1/(2Nₑ))]`
 
-/-- LD half-life increases with population size. -/
-theorem ld_half_life_increasing (Ne₁ Ne₂ : ℝ)
-    (hNe₁ : 0 < Ne₁) (h_larger : Ne₁ < Ne₂) :
-    ldHalfLife Ne₁ < ldHalfLife Ne₂ := by
+    **This is a correction.** The previous body was `2·Nₑ·ln 2`, with no
+    recombination argument at all. That is the `r → 0` limit of this
+    expression and nothing else: it makes the half-life of linkage
+    disequilibrium independent of the recombination rate, which is the one
+    parameter that dominates it away from zero. The discrepancy is not a
+    constant factor -- at `Ne = 10000, r = 0.1` the old body gives 13863
+    generations against 6.6, a factor of 2110, and the factor grows without
+    bound in `Nₑ` at fixed `r`, since the true half-life tends to
+    `ln 2 / -ln(1-r)` while the old one diverges.
+
+    `ldHalfLife_halves_retention` states what this body claims, and the
+    differential check `ldHalfLife-drops-recombination` is retained as the
+    standing check. Note that the check's grid must keep `r > 0`: at `r = 0`
+    the corrected and the old body coincide exactly, which is the degenerate
+    point that let the defect survive.
+
+    Empirical status: DERIVED from `ldRetentionPerGen`, which is VALIDATED. -/
+noncomputable def ldHalfLife (r Ne : ℝ) : ℝ :=
+  Real.log 2 / (-Real.log (ldRetentionPerGen r Ne))
+
+/-- **What the definition claims.** Retaining LD for `ldHalfLife r Ne`
+    generations leaves exactly half of it. Stated with the real power, since
+    the half-life is not an integer. This is the property the name asserts,
+    and the old body satisfied it only at `r = 0`. -/
+theorem ldHalfLife_halves_retention (r Ne : ℝ)
+    (h0 : 0 < ldRetentionPerGen r Ne) (h1 : ldRetentionPerGen r Ne < 1) :
+    (ldRetentionPerGen r Ne) ^ (ldHalfLife r Ne) = 1 / 2 := by
+  have hlog : Real.log (ldRetentionPerGen r Ne) < 0 := Real.log_neg h0 h1
+  have hne : Real.log (ldRetentionPerGen r Ne) ≠ 0 := ne_of_lt hlog
+  rw [Real.rpow_def_of_pos h0]
   unfold ldHalfLife
-  have hln2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
-  nlinarith
+  rw [show Real.log (ldRetentionPerGen r Ne) *
+        (Real.log 2 / -Real.log (ldRetentionPerGen r Ne)) = -Real.log 2 by
+      field_simp]
+  rw [Real.exp_neg, Real.exp_log (by norm_num)]
+  norm_num
+
+/-- LD half-life increases with population size, at a fixed recombination
+    rate. Drift is the only channel `Nₑ` acts through, so the statement is
+    the same as before; its content is now conditional on `r`, which is
+    honest -- the old version's independence of `r` was the defect. -/
+theorem ld_half_life_increasing (r Ne₁ Ne₂ : ℝ)
+    (hr0 : 0 ≤ r) (hr1 : r < 1) (hNe₁ : 1 < Ne₁) (h_larger : Ne₁ < Ne₂) :
+    ldHalfLife r Ne₁ < ldHalfLife r Ne₂ := by
+  have hNe₂ : (1 : ℝ) < Ne₂ := lt_trans hNe₁ h_larger
+  have hd₁ : (0 : ℝ) < 1 - 1 / (2 * Ne₁) := by
+    rw [sub_pos, div_lt_one (by linarith)]; linarith
+  have hd₂ : (0 : ℝ) < 1 - 1 / (2 * Ne₂) := by
+    rw [sub_pos, div_lt_one (by linarith)]; linarith
+  have hd₂lt : (1 : ℝ) - 1 / (2 * Ne₂) < 1 := by
+    rw [sub_lt_self_iff]; positivity
+  have hp₁ : 0 < ldRetentionPerGen r Ne₁ := by
+    unfold ldRetentionPerGen; exact mul_pos (by linarith) hd₁
+  have hp₁₂ : ldRetentionPerGen r Ne₁ < ldRetentionPerGen r Ne₂ := by
+    unfold ldRetentionPerGen
+    have hfac : (1 : ℝ) - 1 / (2 * Ne₁) < 1 - 1 / (2 * Ne₂) := by
+      rw [sub_lt_sub_iff_left]
+      exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+    exact mul_lt_mul_of_pos_left hfac (by linarith)
+  have hp₂lt : ldRetentionPerGen r Ne₂ < 1 := by
+    unfold ldRetentionPerGen
+    calc (1 - r) * (1 - 1 / (2 * Ne₂))
+        ≤ 1 * (1 - 1 / (2 * Ne₂)) := by
+          exact mul_le_mul_of_nonneg_right (by linarith) (le_of_lt hd₂)
+      _ = 1 - 1 / (2 * Ne₂) := one_mul _
+      _ < 1 := hd₂lt
+  have hp₁lt : ldRetentionPerGen r Ne₁ < 1 := lt_trans hp₁₂ hp₂lt
+  have hl₁ : Real.log (ldRetentionPerGen r Ne₁) < 0 := Real.log_neg hp₁ hp₁lt
+  have hl₂ : Real.log (ldRetentionPerGen r Ne₂) < 0 :=
+    Real.log_neg (lt_trans hp₁ hp₁₂) hp₂lt
+  have hlog_lt : Real.log (ldRetentionPerGen r Ne₁)
+      < Real.log (ldRetentionPerGen r Ne₂) :=
+    Real.log_lt_log hp₁ hp₁₂
+  unfold ldHalfLife
+  exact div_lt_div_of_pos_left (Real.log_pos (by norm_num))
+    (by linarith) (by linarith)
 
 /-- Pre-expansion LD retained after t generations in expanded population.
     If pre-expansion LD level is D₀ and expansion is to Ne_new,
@@ -867,56 +935,88 @@ Ne have slower LD decay toward equilibrium.
 
 section LDHalfLifeTrajectory
 
-/-- **LD retained fraction** after t generations at constant size Ne.
+/-- **Fraction of `E[D]` retained after `t` generations** at recombination
+    rate `r` and constant effective size `Nₑ`: the per-generation retention
+    `ldRetentionPerGen r Ne`, compounded.
 
-    Regime: closed population, no mutation. This body is the retention of
-    `closedPopulation`, and it is written here as though constant `Ne` were the
-    only assumption it needs. It is not:
-    the formula also assumes nothing replenishes variation. Under
-    mutation-drift balance the retention is measured at `1.025 ± 0.020` at
-    `Ne = 1000`, `t = 4000`, where this expression gives `0.135`;
-    `Calibrator.DriftRegime` exhibits the two regimes and proves they disagree
-    at every positive time.
+    **This is a correction.** The previous body was `(1 - 1/(2Nₑ))^t`, with no
+    recombination argument -- the drift factor alone, raised to `t`. That
+    contradicted `ldRetentionPerGen`, stated 800 lines above in this same file,
+    which already says the per-generation retention is `(1-r)(1 - 1/(2Nₑ))`.
+    The gap is the missing `(1-r)^t` and is therefore unbounded in `t`: at
+    `r = 0.1, t = 100` the old body overstates retention by a factor of
+    `0.9^(-100) ≈ 3.7 × 10⁴`. `ldAfterGenerations` in this file already used
+    the correct compounding, so the corpus held both answers at once;
+    `ldAfterGenerations_eq_retainedFraction` below now makes them the same
+    expression, so they cannot separate again.
 
-    Empirical status: FALSIFIED at demographic equilibrium; see
-    `closedPopulation`. Inside the declared regime it stands, so the half-life
-    results below are conditional on that regime rather than wrong. -/
-noncomputable def ldRetainedFraction (Ne : ℝ) (t : ℕ) : ℝ :=
-  (1 - 1/(2 * Ne)) ^ t
+    Regime: two neutral loci, constant `Nₑ`, no mutation and no new input of
+    disequilibrium. The `Nₑ` channel here is the same closed-population
+    retention as `DriftRegime.closedPopulation`, and carries the same caveat:
+    under mutation-drift balance nothing in this expression replenishes
+    variation, so it must not be read as a heterozygosity trajectory at
+    demographic equilibrium.
 
-/-- Larger current Ne means more LD retained after any fixed time. -/
-theorem larger_ne_more_ld_retained (Ne₁ Ne₂ : ℝ) (t : ℕ)
-    (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂) (h : Ne₁ < Ne₂) (ht : 0 < t) :
-    ldRetainedFraction Ne₁ t < ldRetainedFraction Ne₂ t := by
-  unfold ldRetainedFraction
-  have h_base : 1 - 1/(2 * Ne₁) < 1 - 1/(2 * Ne₂) := by
+    Empirical status: DERIVED from `ldRetentionPerGen`, which is VALIDATED.
+    The differential check `ldRetainedFraction-inconsistent-with-retention` is
+    retained as the standing check; its grid must keep `r > 0`, since the
+    `r = 0` row is where the old and corrected bodies coincide. -/
+noncomputable def ldRetainedFraction (r Ne : ℝ) (t : ℕ) : ℝ :=
+  (ldRetentionPerGen r Ne) ^ t
+
+/-- **The internal agreement that the old body broke.** `ldAfterGenerations`
+    and `ldRetainedFraction` are now one expression, not two that happened to
+    be written differently. -/
+theorem ldAfterGenerations_eq_retainedFraction (D₀ r Ne : ℝ) (t : ℕ) :
+    ldAfterGenerations D₀ r Ne t = D₀ * ldRetainedFraction r Ne t := rfl
+
+/-- Larger current Ne means more LD retained after any fixed time, at a fixed
+    recombination rate. -/
+theorem larger_ne_more_ld_retained (r Ne₁ Ne₂ : ℝ) (t : ℕ)
+    (hr0 : 0 ≤ r) (hr1 : r < 1) (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂)
+    (h : Ne₁ < Ne₂) (ht : 0 < t) :
+    ldRetainedFraction r Ne₁ t < ldRetainedFraction r Ne₂ t := by
+  unfold ldRetainedFraction ldRetentionPerGen
+  have h_fac : 1 - 1/(2 * Ne₁) < 1 - 1/(2 * Ne₂) := by
     rw [sub_lt_sub_iff_left]
     exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
-  have h_nn : 0 ≤ 1 - 1/(2 * Ne₁) := by
+  have h_base : (1 - r) * (1 - 1/(2 * Ne₁)) < (1 - r) * (1 - 1/(2 * Ne₂)) :=
+    mul_lt_mul_of_pos_left h_fac (by linarith)
+  have h_nn : 0 ≤ (1 - r) * (1 - 1/(2 * Ne₁)) := by
+    apply mul_nonneg (by linarith)
     rw [sub_nonneg, div_le_one (by linarith)]; linarith
   exact pow_lt_pow_left₀ h_base h_nn (by omega)
 
 /-- Retained fraction is strictly decreasing with time for finite Ne. -/
-theorem ld_retained_decreasing (Ne : ℝ) (t₁ t₂ : ℕ)
-    (hNe : 2 < Ne) (h_time : t₁ < t₂) :
-    ldRetainedFraction Ne t₂ < ldRetainedFraction Ne t₁ := by
-  unfold ldRetainedFraction
-  have h_pos : 0 < 1 - 1/(2 * Ne) := by
+theorem ld_retained_decreasing (r Ne : ℝ) (t₁ t₂ : ℕ)
+    (hr0 : 0 ≤ r) (hr1 : r < 1) (hNe : 2 < Ne) (h_time : t₁ < t₂) :
+    ldRetainedFraction r Ne t₂ < ldRetainedFraction r Ne t₁ := by
+  unfold ldRetainedFraction ldRetentionPerGen
+  have h_fac_pos : 0 < 1 - 1/(2 * Ne) := by
     rw [sub_pos, div_lt_one (by linarith)]; linarith
-  have h_lt_one : 1 - 1/(2 * Ne) < 1 := by
+  have h_fac_lt : 1 - 1/(2 * Ne) < 1 := by
     rw [sub_lt_self_iff]; positivity
+  have h_pos : 0 < (1 - r) * (1 - 1/(2 * Ne)) :=
+    mul_pos (by linarith) h_fac_pos
+  have h_lt_one : (1 - r) * (1 - 1/(2 * Ne)) < 1 := by
+    calc (1 - r) * (1 - 1/(2 * Ne))
+        ≤ 1 * (1 - 1/(2 * Ne)) :=
+          mul_le_mul_of_nonneg_right (by linarith) (le_of_lt h_fac_pos)
+      _ = 1 - 1/(2 * Ne) := one_mul _
+      _ < 1 := h_fac_lt
   exact pow_lt_pow_right_of_lt_one₀ h_pos h_lt_one h_time
 
 /-- Two populations with the same initial LD perturbation but different
     modern Ne will have different LD levels after the same time.
     The one with larger Ne retains more excess LD. -/
 theorem different_ne_different_ld_persistence
-    (D₀ Ne₁ Ne₂ : ℝ) (t : ℕ)
-    (hD₀ : 0 < D₀) (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂)
+    (D₀ r Ne₁ Ne₂ : ℝ) (t : ℕ)
+    (hD₀ : 0 < D₀) (hr0 : 0 ≤ r) (hr1 : r < 1)
+    (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂)
     (h_larger : Ne₁ < Ne₂) (ht : 0 < t) :
-    D₀ * ldRetainedFraction Ne₁ t < D₀ * ldRetainedFraction Ne₂ t := by
+    D₀ * ldRetainedFraction r Ne₁ t < D₀ * ldRetainedFraction r Ne₂ t := by
   apply mul_lt_mul_of_pos_left _ hD₀
-  exact larger_ne_more_ld_retained Ne₁ Ne₂ t hNe₁ hNe₂ h_larger ht
+  exact larger_ne_more_ld_retained r Ne₁ Ne₂ t hr0 hr1 hNe₁ hNe₂ h_larger ht
 
 end LDHalfLifeTrajectory
 

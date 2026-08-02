@@ -4600,9 +4600,11 @@ theorem splitMigration_more_migration_less_fst
     below carry that condition as a hypothesis rather than assuming it. The
     saturating closed forms are `demoSteppingStoneFst` in
     `Calibrator.DemographicHistory`, which is derived from a coalescence time,
-    and `continuousSteppingStoneFst` in
-    `Calibrator.PopulationGeneticsFoundations`, which is `1 - exp (-d/L)`.
-    Neither is this function and neither is being replaced here.
+    which is not this function and is not being replaced here. A second
+    saturating form, `continuousSteppingStoneFst = 1 - exp (-d/L)`, has been
+    deleted from `Calibrator.PopulationGeneticsFoundations`: it contradicted
+    `demoSteppingStoneFst`, and the coalescent derivation decides against the
+    exponential.
 
     Empirical status: UNTESTED. -/
 noncomputable def steppingStoneFst (fst_neighbor α : ℝ) (d : ℕ) : ℝ :=
