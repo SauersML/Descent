@@ -232,8 +232,11 @@ def dimSum (fresh : Equiv.Perm (Fin n) → ℕ → ℝ) (σ : Equiv.Perm (Fin n)
 /-- **The freshness floor** `D`: the maximum of total freshness over all orderings of the
 coordinates.
 
-It is a lower-bound parameter for the conditional gain, **not** a characterization of it
-and **not** an "effective dimension". See `freshness_bound_not_tight`.
+It is a lower-bound parameter for the bound proved below, **not** a characterization of any
+coupling invariant and **not** an "effective dimension". In particular it must not be cited
+as an evaluation of the joint gain: the zero-safe conditional gain functional lives in
+`Calibrator.ConditionalGain`, and the conditional-product identity that would have related
+the two is false under dependence, refuted there by the copied-binary counterexample.
 
 For independent coordinates every freshness is `1` and `D = n`. Under dependence `D`
 collapses gracefully — it is the number of coordinates' worth of genuinely new randomness
