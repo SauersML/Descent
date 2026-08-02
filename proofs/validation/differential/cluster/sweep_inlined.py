@@ -60,7 +60,20 @@ if EXTRACT not in sys.path:
 import lean_defs  # noqa: E402
 
 RTOL = 1e-9
-FILLERS = [0.3, 0.7, 1.5]
+
+# Values for arguments that are NOT part of the reference. Each set assigns
+# DISTINCT values to distinct arguments, which matters more than it looks:
+# giving every spare argument the same number manufactures cancellations.
+# `demoSteppingStoneFst d Ne m sigma_sq = d/(d + 4 Ne m sigma_sq)` collapses to
+# exactly 1/(1 + 4 Ne m) whenever d == sigma_sq, so a single shared filler
+# reported it as computing the island form when it only does so on that
+# diagonal. Distinct values per argument, and three independent assignments,
+# make an accidental identity have to hold three times over.
+FILLER_SETS = [
+    [0.3, 0.7, 1.5, 0.45, 1.1, 0.62],
+    [1.2, 0.25, 0.9, 1.7, 0.55, 1.35],
+    [0.8, 1.45, 0.35, 1.05, 0.5, 0.95],
+]
 
 
 # ---------------------------------------------------------------------------
@@ -265,7 +278,7 @@ def sweep(ref, table):
         evaluated = 0
         sample = []
 
-        for filler in FILLERS:
+        for fset in FILLER_SETS:
             level_values = []
             for level in ref["levels"]:
                 vals = []
@@ -275,8 +288,8 @@ def sweep(ref, table):
                     except Exception:
                         continue
                     asg = {}
-                    for n in others:
-                        asg[n] = filler
+                    for j, n in enumerate(others):
+                        asg[n] = fset[j % len(fset)]
                     asg[a1] = p1
                     asg[a2] = p2
                     try:
