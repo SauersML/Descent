@@ -7,3 +7,4 @@ __pycache__/
 # run, because the cluster checkout cannot push -- and a stale artifact that
 # still parses is indistinguishable from a current one.
 *.json
+fetched/
