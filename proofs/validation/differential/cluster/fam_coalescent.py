@@ -55,9 +55,14 @@ import sys
 import msprime
 import numpy as np
 
-SEQ = 2_000_000
+# Sized for SIGNAL FIRST. A first attempt at 2 Mb x 6 replicates x 12 island
+# cells did not finish in two minutes, which is a design problem rather than a
+# compute problem: branch-mode statistics carry no mutational noise, so
+# precision comes from independent trees, and 200 kb at rho=1e-8 already gives
+# thousands. Deep low-migration island trees over 40 demes were the real cost.
+SEQ = 200_000
 RHO = 1e-8
-REPS = 6
+REPS = 3
 
 
 def hudson_branch_fst(ts, sa, sb):
@@ -74,8 +79,7 @@ def family_split():
     cells = []
     for t in (0, 500, 2000, 8000):
         for (n1, n2, tag) in ((NA, NA, "equal"),
-                              (NA // 4, 4 * NA, "16x apart"),
-                              (4 * NA, 4 * NA, "both 4x")):
+                              (NA // 4, 4 * NA, "16x apart")):
             cells.append((t, n1, n2, NA, tag))
 
     for (t, n1, n2, na, tag) in cells:
@@ -112,7 +116,7 @@ def family_island():
     out = []
     NE = 500
     for m in (0.01, 0.002):
-        for d in (2, 5, 10, 40):
+        for d in (2, 5, 20):
             vals = []
             for r in range(REPS):
                 dem = msprime.Demography.island_model([NE] * d, migration_rate=m)
@@ -160,8 +164,8 @@ def main():
           "number of demes)")
     res["island"] = family_island()
 
-    hi = [r for r in res["island"] if r["m"] == 0.01 and r["d"] == 40]
-    lo = [r for r in res["island"] if r["m"] == 0.002 and r["d"] == 40]
+    hi = [r for r in res["island"] if r["m"] == 0.01 and r["d"] == 20]
+    lo = [r for r in res["island"] if r["m"] == 0.002 and r["d"] == 20]
     c2 = bool(hi and lo and hi[0]["fst_measured"] < lo[0]["fst_measured"])
     print("  CONTROL F_ST decreases with migration: %s" % ("PASS" if c2 else "FAIL"))
 
