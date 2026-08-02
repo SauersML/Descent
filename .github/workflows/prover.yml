@@ -109,7 +109,7 @@ jobs:
         run: cargo test --manifest-path proofs/validation/correctability_calculator/Cargo.toml
 
       - name: Build project
-        run: lake build Calibrator --jobs $(nproc)
+        run: lake build Calibrator
 
   auto-close-failed-proof-pr:
     runs-on: ubuntu-latest
