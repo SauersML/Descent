@@ -815,19 +815,6 @@ optimum.  No abstract covariance is introduced.
 
 section RescalingAndRotation
 
-theorem dot_smul_left (c : ℝ) (x y : ι → ℝ) :
-    dot (fun i => c * x i) y = c * dot x y := by
-  simp [dot, Finset.mul_sum, mul_assoc]
-
-theorem dot_smul_right (c : ℝ) (x y : ι → ℝ) :
-    dot x (fun i => c * y i) = c * dot x y := by
-  simp [dot, Finset.mul_sum, mul_left_comm]
-
-theorem matrix_mulVec_smul (A : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
-    A.mulVec (fun i => c * x i) = fun j => c * A.mulVec x j := by
-  ext j
-  simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_comm]
-
 /-- Rescaling a coefficient vector scales its energy by the square. -/
 theorem coefficientEnergy_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
     coefficientEnergy B (fun i => c * x i) = c ^ 2 * coefficientEnergy B x := by
