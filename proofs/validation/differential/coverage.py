@@ -66,6 +66,22 @@ UNREACHABLE_NAMED = {
 # theory-pinned controls green. Each entry names the script, the result file,
 # and the separation that makes the check able to fail.
 # ---------------------------------------------------------------------------
+def _inlined_members():
+    """Cluster members found MECHANICALLY by inlined.py, not by name or docstring.
+
+    Driven from the sweep rather than a hand list: a hand list stops covering
+    definitions added later, and the whole point of the sweep is that the
+    cluster cannot be found by reading names. `neutralDriftFactor`
+    (PhenomeWidePortability.lean:125) was found this way and by no other route.
+    """
+    import os
+    if not os.path.exists("inlined.json"):
+        return []
+    d = json.load(open("inlined.json"))
+    return [m["definition"].split(".")[-1]
+            for r in d.values() for m in r["members"]]
+
+
 SIMULATION_COVERED = {
     name: {
         "script": "heavy/h0_heterozygosity_cluster.py",
@@ -81,15 +97,12 @@ SIMULATION_COVERED = {
                    "no-mutation population it assumes; that population is not "
                    "the one it is cited about.",
     }
-    for name in [
+    for name in sorted(set(_inlined_members()) | {
+        # recursion / vector forms of the same quantity, outside the scalar sweep
         "hetRecurrence",
-        "fstDerived",
-        "heterozygosityLossFromDrift",
-        "wrightFisherDriftRetention",
-        "wrightFisherHeterozygosityLoss",
         "cumulativeDrift",
         "fstVariableNe",
-    ]
+    })
 }
 
 
