@@ -1463,17 +1463,15 @@
    ]
   },
   "more_migration_lower_fst": {
-   "status": "checker-disagrees-with-proved-theorem",
+   "status": "holds",
    "module": "DemographicHistory",
-   "accepted": 39,
-   "failed": 1,
-   "first_failure": {
-    "Ne": 7304938.341114906,
-    "m\u2081": 2.072875619693563e-09,
-    "m\u2082": 1.5424651135313468e-09
-   },
-   "conclusion": "islandModelFst Ne m\u2082 < islandModelFst Ne m\u2081",
-   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
+   "accepted": 40,
+   "mentions": [
+    "islandModelFst"
+   ],
+   "discriminates": [
+    "PopulationGeneticsFoundations.islandModelFst"
+   ]
   },
   "islandModelFst_eq_derived": {
    "status": "untranspilable",
@@ -3755,17 +3753,15 @@
    "reason": "unknown identifier effectCorrelationStabilizingDriftSelection"
   },
   "per_variant_h2_decreases_with_M": {
-   "status": "checker-disagrees-with-proved-theorem",
+   "status": "holds",
    "module": "PolygenicArchitecture",
-   "accepted": 39,
-   "failed": 1,
-   "first_failure": {
-    "h2": 0.980518598982204,
-    "M\u2081": 2.072875619693563e-09,
-    "M\u2082": 1.5424651135313468e-09
-   },
-   "conclusion": "expectedSquaredEffect h2 M\u2082 < expectedSquaredEffect h2 M\u2081",
-   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
+   "accepted": 40,
+   "mentions": [
+    "expectedSquaredEffect"
+   ],
+   "discriminates": [
+    "PolygenicArchitecture.expectedSquaredEffect"
+   ]
   },
   "spikeAndSlabVariance_eq_averagePhaseInteraction": {
    "status": "untranspilable",
@@ -4205,17 +4201,17 @@
    ]
   },
   "fstEquilibrium_decreases_with_mu": {
-   "status": "checker-disagrees-with-proved-theorem",
+   "status": "holds",
    "module": "PopulationGeneticsFoundations",
-   "accepted": 38,
-   "failed": 2,
-   "first_failure": {
-    "Ne": 107.7225230559393,
-    "\u03bc\u2081": 3.2743916823229725e-09,
-    "\u03bc\u2082": 3.1177136617494437e-09
-   },
-   "conclusion": "fstMutationDriftEquilibrium (scaledMutationRate Ne \u03bc\u2082) < fstMutationDriftEquilibrium (scaledMutationRate Ne \u03bc\u2081)",
-   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
+   "accepted": 40,
+   "mentions": [
+    "fstMutationDriftEquilibrium",
+    "scaledMutationRate"
+   ],
+   "discriminates": [
+    "PopulationGeneticsFoundations.fstMutationDriftEquilibrium",
+    "PopulationGeneticsFoundations.scaledMutationRate"
+   ]
   },
   "het_plus_fst_eq_one": {
    "status": "untranspilable",
@@ -5620,17 +5616,15 @@
    ]
   },
   "fstMigrationDriftEquilibrium_decreases_with_m": {
-   "status": "checker-disagrees-with-proved-theorem",
+   "status": "holds",
    "module": "PortabilityDrift",
-   "accepted": 39,
-   "failed": 1,
-   "first_failure": {
-    "Ne": 7304938.341114906,
-    "m\u2081": 2.072875619693563e-09,
-    "m\u2082": 1.5424651135313468e-09
-   },
-   "conclusion": "fstMigrationDriftEquilibrium Ne m\u2082 < fstMigrationDriftEquilibrium Ne m\u2081",
-   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
+   "accepted": 40,
+   "mentions": [
+    "fstMigrationDriftEquilibrium"
+   ],
+   "discriminates": [
+    "PortabilityDrift.fstMigrationDriftEquilibrium"
+   ]
   },
   "fstMigrationDriftEquilibrium_decreases_with_Ne": {
    "status": "holds",
@@ -5977,17 +5971,15 @@
    ]
   },
   "fstMigDriftEquil_decreasing_in_m": {
-   "status": "checker-disagrees-with-proved-theorem",
+   "status": "holds",
    "module": "PortabilityDrift",
-   "accepted": 39,
-   "failed": 1,
-   "first_failure": {
-    "Ne": 7304938.341114906,
-    "m\u2081": 2.072875619693563e-09,
-    "m\u2082": 1.5424651135313468e-09
-   },
-   "conclusion": "fstMigDriftEquil Ne m\u2082 < fstMigDriftEquil Ne m\u2081",
-   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
+   "accepted": 40,
+   "mentions": [
+    "fstMigDriftEquil"
+   ],
+   "discriminates": [
+    "PortabilityDrift.fstMigDriftEquil"
+   ]
   },
   "fstMigDriftEquil_decreasing_in_Ne": {
    "status": "holds",
@@ -6005,17 +5997,15 @@
    "reason": "bad char '='"
   },
   "neutralAFBenchmarkFromRecurrence_increasing_in_m": {
-   "status": "checker-disagrees-with-proved-theorem",
+   "status": "holds",
    "module": "PortabilityDrift",
-   "accepted": 39,
-   "failed": 1,
-   "first_failure": {
-    "Ne": 7304938.341114906,
-    "m\u2081": 2.072875619693563e-09,
-    "m\u2082": 1.5424651135313468e-09
-   },
-   "conclusion": "neutralAFBenchmarkFromRecurrence Ne m\u2081 < neutralAFBenchmarkFromRecurrence Ne m\u2082",
-   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
+   "accepted": 40,
+   "mentions": [
+    "neutralAFBenchmarkFromRecurrence"
+   ],
+   "discriminates": [
+    "PortabilityDrift.neutralAFBenchmarkFromRecurrence"
+   ]
   },
   "neutralAFBenchmarkFromRecurrence_nonneg": {
    "status": "holds",
@@ -6051,19 +6041,17 @@
    ]
   },
   "recurrence_derived_R2_increases_with_m": {
-   "status": "checker-disagrees-with-proved-theorem",
+   "status": "holds",
    "module": "PortabilityDrift",
-   "accepted": 39,
-   "failed": 1,
-   "first_failure": {
-    "V_A": 66.07814247850368,
-    "V_E": 2.263301776987847e-06,
-    "Ne": 37.638696601209816,
-    "m\u2081": 2.2566114167203466e-09,
-    "m\u2082": 1.3582039028959177e-09
-   },
-   "conclusion": "presentDayR2 V_A V_E (fstMigDriftEquil Ne m\u2081) < presentDayR2 V_A V_E (fstMigDriftEquil Ne m\u2082)",
-   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
+   "accepted": 40,
+   "mentions": [
+    "fstMigDriftEquil",
+    "presentDayR2"
+   ],
+   "discriminates": [
+    "PortabilityDrift.fstMigDriftEquil",
+    "PortabilityDrift.presentDayR2"
+   ]
   },
   "ncp_nonneg": {
    "status": "holds",
@@ -6400,18 +6388,13 @@
    "reason": "unexpected end in atom"
   },
   "threshold_standardized_coordinate_diff_of_mean_shift": {
-   "status": "checker-disagrees-with-proved-theorem",
+   "status": "holds",
    "module": "ScoreDistribution",
-   "accepted": 39,
-   "failed": 1,
-   "first_failure": {
-    "threshold": 0.7595294803154076,
-    "\u03bc_S": 1.3479546293666938e-07,
-    "\u03bc_T": 9.143648502429992e-08,
-    "\u03c3": 667.8052912954179
-   },
-   "conclusion": "thresholdStandardizedCoordinate threshold \u03bc_S \u03c3 \u2260 thresholdStandardizedCoordinate threshold \u03bc_T \u03c3",
-   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
+   "accepted": 40,
+   "mentions": [
+    "thresholdStandardizedCoordinate"
+   ],
+   "discriminates": []
   },
   "threshold_standardized_coordinate_diff_of_variance_change": {
    "status": "holds",
@@ -6435,18 +6418,14 @@
    "status": "hypothesis-not-modelled"
   },
   "external_vs_internal_differ_mean": {
-   "status": "checker-disagrees-with-proved-theorem",
+   "status": "holds",
    "module": "ScoreDistribution",
-   "accepted": 39,
-   "failed": 1,
-   "first_failure": {
-    "pgs": 0.5343906416594213,
-    "\u03bc_S": 1.3479546293666938e-07,
-    "\u03bc_T": 9.143648502429992e-08,
-    "\u03c3": 667.8052912954179
-   },
-   "conclusion": "externallyStandardized pgs \u03bc_S \u03c3 \u2260 internallyStandardized pgs \u03bc_T \u03c3",
-   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
+   "accepted": 40,
+   "mentions": [
+    "externallyStandardized",
+    "internallyStandardized"
+   ],
+   "discriminates": []
   },
   "external_vs_internal_differ_variance": {
    "status": "holds",
@@ -7539,6 +7518,11 @@
     "conclusion": "0 < islandModelFst Ne m \u2227 islandModelFst Ne m < 1"
    },
    {
+    "theorem": "more_migration_lower_fst",
+    "mutation": "negate",
+    "conclusion": "islandModelFst Ne m\u2082 < islandModelFst Ne m\u2081"
+   },
+   {
     "theorem": "islandModelFst_pos",
     "mutation": "negate",
     "conclusion": "0 < islandModelFst Ne m"
@@ -8157,6 +8141,11 @@
     "theorem": "asymmetric_migration_portability_direction",
     "mutation": "swap-plus-minus",
     "conclusion": "presentDayR2 V_A V_E (asymmetricFst Ne m\u2082\u2081) < presentDayR2 V_A V_E (asymmetricFst Ne m\u2081\u2082)"
+   },
+   {
+    "theorem": "recurrence_derived_R2_increases_with_m",
+    "mutation": "swap-plus-minus",
+    "conclusion": "presentDayR2 V_A V_E (fstMigDriftEquil Ne m\u2081) < presentDayR2 V_A V_E (fstMigDriftEquil Ne m\u2082)"
    }
   ],
   "MetricSpecificPortability.metricPPV": [
@@ -8525,6 +8514,13 @@
     "conclusion": "0 \u2264 expectedPGSDiffVariance V_A fst"
    }
   ],
+  "PolygenicArchitecture.expectedSquaredEffect": [
+   {
+    "theorem": "per_variant_h2_decreases_with_M",
+    "mutation": "negate",
+    "conclusion": "expectedSquaredEffect h2 M\u2082 < expectedSquaredEffect h2 M\u2081"
+   }
+  ],
   "PolygenicArchitecture.spikeAndSlabVariance": [
    {
     "theorem": "spikeAndSlabVariance_mem_interval",
@@ -8638,6 +8634,11 @@
     "theorem": "fstEquilibrium_decreases_with_Ne",
     "mutation": "negate",
     "conclusion": "fstMutationDriftEquilibrium (scaledMutationRate Ne\u2082 \u03bc) < fstMutationDriftEquilibrium (scaledMutationRate Ne\u2081 \u03bc)"
+   },
+   {
+    "theorem": "fstEquilibrium_decreases_with_mu",
+    "mutation": "negate",
+    "conclusion": "fstMutationDriftEquilibrium (scaledMutationRate Ne \u03bc\u2082) < fstMutationDriftEquilibrium (scaledMutationRate Ne \u03bc\u2081)"
    }
   ],
   "PopulationGeneticsFoundations.fstMutationDriftEquilibrium": [
@@ -8665,6 +8666,11 @@
     "theorem": "fstEquilibrium_decreases_with_Ne",
     "mutation": "negate",
     "conclusion": "fstMutationDriftEquilibrium (scaledMutationRate Ne\u2082 \u03bc) < fstMutationDriftEquilibrium (scaledMutationRate Ne\u2081 \u03bc)"
+   },
+   {
+    "theorem": "fstEquilibrium_decreases_with_mu",
+    "mutation": "negate",
+    "conclusion": "fstMutationDriftEquilibrium (scaledMutationRate Ne \u03bc\u2082) < fstMutationDriftEquilibrium (scaledMutationRate Ne \u03bc\u2081)"
    },
    {
     "theorem": "fstEquilibrium_gt_half_of_small_theta",
@@ -9199,6 +9205,11 @@
     "conclusion": "0 < fstMigrationDriftEquilibrium Ne m \u2227 fstMigrationDriftEquilibrium Ne m < 1"
    },
    {
+    "theorem": "fstMigrationDriftEquilibrium_decreases_with_m",
+    "mutation": "negate",
+    "conclusion": "fstMigrationDriftEquilibrium Ne m\u2082 < fstMigrationDriftEquilibrium Ne m\u2081"
+   },
+   {
     "theorem": "fstMigrationDriftEquilibrium_decreases_with_Ne",
     "mutation": "negate",
     "conclusion": "fstMigrationDriftEquilibrium Ne\u2082 m < fstMigrationDriftEquilibrium Ne\u2081 m"
@@ -9320,12 +9331,27 @@
     "conclusion": "fstMigDriftEquil Ne m < 1"
    },
    {
+    "theorem": "fstMigDriftEquil_decreasing_in_m",
+    "mutation": "negate",
+    "conclusion": "fstMigDriftEquil Ne m\u2082 < fstMigDriftEquil Ne m\u2081"
+   },
+   {
     "theorem": "fstMigDriftEquil_decreasing_in_Ne",
     "mutation": "negate",
     "conclusion": "fstMigDriftEquil Ne\u2082 m < fstMigDriftEquil Ne\u2081 m"
+   },
+   {
+    "theorem": "recurrence_derived_R2_increases_with_m",
+    "mutation": "negate",
+    "conclusion": "presentDayR2 V_A V_E (fstMigDriftEquil Ne m\u2081) < presentDayR2 V_A V_E (fstMigDriftEquil Ne m\u2082)"
    }
   ],
   "PortabilityDrift.neutralAFBenchmarkFromRecurrence": [
+   {
+    "theorem": "neutralAFBenchmarkFromRecurrence_increasing_in_m",
+    "mutation": "drop-a-one-minus",
+    "conclusion": "neutralAFBenchmarkFromRecurrence Ne m\u2081 < neutralAFBenchmarkFromRecurrence Ne m\u2082"
+   },
    {
     "theorem": "neutralAFBenchmarkFromRecurrence_nonneg",
     "mutation": "negate",

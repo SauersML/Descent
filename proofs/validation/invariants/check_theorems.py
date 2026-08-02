@@ -32,6 +32,7 @@ from transpile import Untranspilable, build_arity, pyname, transpile
 
 HERE = pathlib.Path(__file__).resolve().parent
 TOL = backends.TOLERANT
+STRICT = backends.STRICT
 
 
 def _box(varname, ty):
@@ -72,7 +73,7 @@ def build(st, defs, arity, rename, ambiguous, ns, emitted):
     params = [(v, t) for v, t, _ in st["variables"]]
     args = ", ".join(pyname(v) for v in varnames)
 
-    def mk(src_lean):
+    def mk(src_lean, backend=TOL):
         src = transpile(src_lean, params, arity, st["name"], rename, ambiguous)
         # thread the backend through calls to compiled definitions, exactly as
         # `compile_defs.build_namespace` does for definition bodies
@@ -84,12 +85,12 @@ def build(st, defs, arity, rename, ambiguous, ns, emitted):
         exec(compile(f"def {fname}(_b, {args}):\n return {src}",
                      "<thm>", "exec"), ns)
         fn = ns[fname]
-        return lambda *x: fn(TOL, *x)
+        return lambda *x: fn(backend, *x)
 
     hyps = []
     for h in st["hypotheses"]:
         try:
-            hyps.append(mk(h))
+            hyps.append(mk(h, STRICT))
         except Exception:
             # A hypothesis we cannot model is not a licence to ignore it: it
             # means sampled points may violate it, so the theorem is recorded

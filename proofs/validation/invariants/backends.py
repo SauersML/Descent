@@ -388,6 +388,45 @@ class TolerantBackend(FloatBackend):
         raise ValueError(op)
 
 
+class StrictBackend(FloatBackend):
+    """FloatBackend for evaluating HYPOTHESES, with margins that SHRINK.
+
+    Tolerance has a direction and getting it backwards is not conservative.
+    `TolerantBackend` reads `a < b` as `a < b + tol` so that a proved
+    conclusion is not failed on rounding.  Applying that same rule to a
+    HYPOTHESIS admits points the theorem excludes: `m1 < m2` was accepted with
+    m1 fractionally GREATER than m2, and the conclusion -- which genuinely
+    depends on the ordering -- then failed, and the failure was reported
+    against the checker rather than against the sampler.
+
+    So hypotheses are evaluated here, where every margin makes the admissible
+    set smaller, and conclusions are evaluated in `TolerantBackend`, where
+    every margin makes the accepted set larger.  Points near a hypothesis
+    boundary are simply not sampled.
+    """
+
+    name = "strict"
+    REL = 1e-6
+
+    @staticmethod
+    def cmp(a, op, b):
+        tol = StrictBackend.REL * max(1.0, abs(a), abs(b))
+        if op == "==":
+            return abs(a - b) <= 1e-12 * max(1.0, abs(a), abs(b))
+        if op == "!=":
+            return abs(a - b) > tol
+        if op == "<":
+            return a < b - tol
+        if op == "<=":
+            return a <= b - 0.0
+        if op == ">":
+            return a > b + tol
+        if op == ">=":
+            return a >= b + 0.0
+        raise ValueError(op)
+
+
 FLOAT = FloatBackend
 TOLERANT = TolerantBackend
+STRICT = StrictBackend
 INTERVAL = IntervalBackend

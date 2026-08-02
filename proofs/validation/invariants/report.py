@@ -56,6 +56,7 @@ def build():
     inv = load("results_invariants.json")
     fal = load("results_falsifiability.json")
     sim = load("results_simulation.json")
+    thm = (load("results_theorems.json") or {}).get("by_definition", {})
     radius = blast_radius()
 
     out = {}
@@ -94,16 +95,32 @@ def build():
         # an independent reference rather than against the definition's own
         # stated properties.  It counts as coverage on the same terms as
         # everything else -- only when a mutant of the body is rejected.
-        covered = bool(f.get("covered")) or bool(sm.get("covered"))
+        th = thm.get(k) or []
+        if th:
+            checks.append(dict(family="theorem", kind="theorem",
+                               verdict="discriminates",
+                               why=f"{len(th)} proved theorem(s) about this "
+                                   "definition break when its body is mutated",
+                               theorems=[t["theorem"] for t in th[:5]]))
+        covered = bool(f.get("covered")) or bool(sm.get("covered")) or bool(th)
         entry = dict(
             module=d["module"], line=d["line"], path=d["path"],
             dependent_theorems=radius.get((d["module"], d["name"])),
             params=[p for p, _ in d["params"]], ret=d["ret"],
             covered=covered,
-            demonstration=(f.get("demonstration") or
-                           ("simulation-mutant-rejected" if sm.get("covered")
-                            else None)),
+            demonstration=(("simulation-mutant-rejected" if sm.get("covered")
+                            else None) or f.get("demonstration") or
+                           ("theorem-mutant-rejected" if th else None)),
+            # WHAT KIND of evidence, kept separate on purpose.  A coverage
+            # number that pools these is how internal consistency gets
+            # reported as contact with reality; it has already happened twice
+            # in this project, in both cases making the number look better.
+            evidence_class=(
+                "external-reference" if sm.get("covered") else
+                "self-property" if f.get("covered") else
+                "internal-consistency" if th else None),
             simulation_oracle=sm.get("oracle"),
+            discriminating_theorems=[t["theorem"] for t in th[:5]] or None,
             falsifiability_evidence=(
                 [dict(mutation=m["mutation"], rejected_by=m["rejected_by"])
                  for m in f.get("killed", [])[:3]]
@@ -154,15 +171,16 @@ def main(argv):
     for s, k in stage.most_common():
         print(f"  {k:5d}  {s}")
     print()
-    tiers = collections.Counter()
-    for v in cov.values():
-        if not v["covered"]:
-            continue
-        tiers["simulation" if v.get("demonstration", "").startswith("simulation")
-              else "range/invariant"] += 1
-    print("covered by tier:")
+    tiers = collections.Counter(v["evidence_class"] for v in cov.values()
+                                if v["covered"])
+    print("covered by EVIDENCE CLASS (these must not be pooled):")
+    labels = {
+        "external-reference": "external reference (simulation) -- validation",
+        "self-property": "the definition's own named range/invariant",
+        "internal-consistency": "a proved theorem breaks under mutation",
+    }
     for t, k in tiers.most_common():
-        print(f"  {k:5d}  {t}")
+        print(f"  {k:5d}  {labels.get(t, t)}")
     print()
     kinds = collections.Counter(ch["kind"] for v in cov.values()
                                 for ch in v["checks"])
