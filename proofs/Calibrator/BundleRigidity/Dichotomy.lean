@@ -30,10 +30,38 @@ defect
 (Q₁/P₁)² · (P₂/Q₂)  =  (7/3)² · (2/3)  =  49/9 · 2/3  =  98/27  ≠  1,
 ```
 
-which is `defect_witness`. That number is proved here from the weights, not quoted. The
-accompanying Bézout constant `c = 125/147` is *not* verified here: its definition involves
-a character `χ` that this module does not carry, so it is recorded as sourced rather than
-checked. **Reported numbers say where they came from.**
+which is `defect_witness`. That number is proved here from the weights, not quoted.
+
+The accompanying **Bézout constant `c = 125/147` is also derived here**, not quoted. The
+character is `χ w = P^w / Q^w`, the ratio of weight products along the word, and the
+constant is
+
+```
+c  =  (-1)^{|u|-1} χ u  -  (-1)^{|v|-1} χ v.
+```
+
+For `u = "2"` and `v = "11"`: `χ 2 = 2/3`, `χ 1 = 3/7` so `χ 11 = 9/49`, and the lengths
+`1` and `2` have opposite parity, so the signs are `+1` and `-1` and the two terms **add**:
+
+```
+c  =  2/3 + 9/49  =  (98 + 27)/147  =  125/147.
+```
+
+That is `bezout_witness`. Both constants now come from the single definition of `χ`, and
+the `98/27` above is the same numbers read the other way: `defect = χ u / χ w`
+(`defect_eq_chi_ratio`).
+
+### Why the conjecture had to die: parity forbids the cancellation
+
+`bezout_ne_zero_of_parity_mismatch` is the structural statement. When `|u|` and `|v|` have
+**opposite parity** the two signs are opposite, so the two terms **add** rather than
+subtract; and `χ > 0` always, being a ratio of products of positive weights. Hence
+`c ≠ 0` for **every** choice of weights — no tuning can make it vanish.
+
+The refuted conjecture required a cancellation that parity forbids. That is the mechanism,
+and it is why the falsifier is not a lucky choice of numbers: `φ₁ = f`, `φ₂ = f ∘ f` gives
+the relation `"2" = "11"` with lengths `1` and `2`, and the parity mismatch alone settles
+it before any weight is chosen.
 
 ## The corrected picture
 
@@ -141,6 +169,97 @@ theorem defect_witness_ne_one :
     defect falsifierP falsifierQ [0, 0] [1] ≠ 1 := by
   rw [defect_witness]; norm_num
 
+/-! ## The character `χ` and the Bézout constant -/
+
+/-- **The character** `χ w = P^w / Q^w`, the ratio of weight products along the word.
+
+Both constants of the falsifier come from this one definition: the Bézout constant is an
+alternating combination of `χ` and the weight defect is a ratio of `χ`. -/
+noncomputable def chi (P Q : ι → ℝ) (w : List ι) : ℝ := wProd P w / wProd Q w
+
+/-- A product of positive weights along a word is positive. -/
+theorem wProd_pos (P : ι → ℝ) (hP : ∀ i, 0 < P i) (w : List ι) : 0 < wProd P w := by
+  induction w with
+  | nil => rw [wProd_nil]; norm_num
+  | cons i u ih => rw [wProd_cons]; exact mul_pos (hP i) ih
+
+/-- **The character is strictly positive**, being a ratio of products of positive
+weights. This is half of why the Bézout constant cannot vanish. -/
+theorem chi_pos (P Q : ι → ℝ) (hP : ∀ i, 0 < P i) (hQ : ∀ i, 0 < Q i) (w : List ι) :
+    0 < chi P Q w :=
+  div_pos (wProd_pos P hP w) (wProd_pos Q hQ w)
+
+/-- **The weight defect is a ratio of characters**: `defect w u = χ u / χ w`.
+
+So the `98/27` and the `125/147` are the same four numbers read two different ways. -/
+theorem defect_eq_chi_ratio (P Q : ι → ℝ) (hP : ∀ i, 0 < P i) (hQ : ∀ i, 0 < Q i)
+    (w u : List ι) :
+    defect P Q w u = chi P Q u / chi P Q w := by
+  have hPw := wProd_pos P hP w
+  have hQw := wProd_pos Q hQ w
+  have hPu := wProd_pos P hP u
+  have hQu := wProd_pos Q hQ u
+  unfold defect weightRatio chi
+  field_simp
+  ring
+
+/-- **The Bézout constant** of a relation `u ≈ v`:
+
+`c = (-1)^{|u|-1} χ u - (-1)^{|v|-1} χ v`.
+
+The exponent is written `|u| + 1`, which agrees with `|u| - 1` for every length and avoids
+truncated natural subtraction at the empty word. -/
+noncomputable def bezout (P Q : ι → ℝ) (u v : List ι) : ℝ :=
+  (-1 : ℝ) ^ (u.length + 1) * chi P Q u - (-1 : ℝ) ^ (v.length + 1) * chi P Q v
+
+/-- **The Bézout constant of the falsifier is `125/147`.**
+
+`χ 2 = 2/3` and `χ 11 = (3/7)² = 9/49`; the lengths `1` and `2` have opposite parity so
+the terms add, giving `2/3 + 9/49 = 125/147`. Derived from the weights here. -/
+theorem bezout_witness :
+    bezout falsifierP falsifierQ [1] [0, 0] = 125 / 147 := by
+  unfold bezout chi falsifierP falsifierQ
+  simp only [wProd_cons, wProd_nil, mul_one, List.length_cons, List.length_nil,
+    Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  norm_num
+
+/-- **Parity forbids the cancellation: the Bézout constant cannot vanish.**
+
+If `|u|` and `|v|` have opposite parity then the two signs are opposite, so the two terms
+**add** rather than subtract. Since `χ > 0` always, the sum is non-zero — for *every*
+choice of weights, with no tuning available.
+
+**This is why the weight-product-one conjecture died.** That conjecture required a
+cancellation between the two terms, and a parity mismatch makes the cancellation
+impossible before any weight is chosen. The falsifier `φ₁ = f`, `φ₂ = f ∘ f` produces the
+relation `"2" = "11"` with lengths `1` and `2`, and the mismatch alone settles it. -/
+theorem bezout_ne_zero_of_parity_mismatch (P Q : ι → ℝ)
+    (hP : ∀ i, 0 < P i) (hQ : ∀ i, 0 < Q i) (u v : List ι)
+    (hpar : (Even u.length ∧ Odd v.length) ∨ (Odd u.length ∧ Even v.length)) :
+    bezout P Q u v ≠ 0 := by
+  have hcu := chi_pos P Q hP hQ u
+  have hcv := chi_pos P Q hP hQ v
+  unfold bezout
+  rcases hpar with ⟨hu, hv⟩ | ⟨hu, hv⟩
+  · -- `|u|` even, `|v|` odd: signs are `-1` and `+1`, so `c = -(χ u + χ v) < 0`.
+    rw [(hu.add_one).neg_one_pow, (hv.add_one).neg_one_pow]
+    intro hzero
+    nlinarith [hcu, hcv]
+  · -- `|u|` odd, `|v|` even: signs are `+1` and `-1`, so `c = χ u + χ v > 0`.
+    rw [(hu.add_one).neg_one_pow, (hv.add_one).neg_one_pow]
+    intro hzero
+    nlinarith [hcu, hcv]
+
+/-- The falsifier's lengths do have opposite parity, so the general theorem applies to
+it. -/
+theorem falsifier_parity_mismatch :
+    (Even ([1] : List (Fin 2)).length ∧ Odd ([0, 0] : List (Fin 2)).length) ∨
+      (Odd ([1] : List (Fin 2)).length ∧ Even ([0, 0] : List (Fin 2)).length) := by
+  right
+  constructor
+  · decide
+  · decide
+
 /-! ## The dichotomy, with the deep theorems as named inputs -/
 
 /-- **A trip system**: the weights, the relation structure, and the three theorems of the
@@ -247,5 +366,48 @@ theorem not_weightProductOne_conjecture (hrel : ∃ w u, S.Relation w u)
   exact hno (hconj.mp hne)
 
 end TripSystem
+
+/-! ## Theorem 1's architecture, and where its weight actually rests
+
+Theorem 1 is **not a case analysis**, and this matters for how it should be audited. It is
+a growth-and-contradiction argument in four steps:
+
+1. **shell partition** — with the images `Bᵢ = φᵢ V` disjoint and `Λ` the attractor, the
+   shells `S_w = φ_w G` over all words (`G` the complement of the images) are pairwise
+   disjoint, and `V` is their disjoint union together with `Λ`;
+2. **shell recursion** — restricting the kernel equation to `S_{iw}` gives
+   `P₁ α_{iw} + P₂ β_{iw} = -Qᵢ Φᵢ(γ_w)`, with `P₁ α_G + P₂ β_G = 0` on the free start;
+3. **growth** — summing over `i` and over all words of length `n` gives
+   `U_{n+1} ≥ (Q_min / P_max) · U_n` with ratio strictly above one, so any non-zero `U_n₀`
+   forces `U_n → ∞`, contradicting finite total variation;
+4. **attractor** — depth-`n` cylinders partition `Λ`, both sides collapse by the partition
+   identity, and `(Q_min - P_max) T ≤ 0` forces `T = 0`.
+
+**There is no "the remaining cases are analogous" to audit, and there cannot be**: steps 3
+and 4 sum over `i` and over *all* words at once, so no case is left outside the argument.
+
+The contrast with the refuted single-modulus classification is exact. That argument
+enumerated deletions and asserted the unenumerated ones were symmetric, about an object
+where `A > B` breaks the symmetry. Theorem 1 never enumerates.
+
+**Where its weight actually rests is step 1's disjointness**, which is a single sentence
+doing real work, together with the escape-depth claim separating shells from the attractor.
+If disjointness fails anywhere, the partition collapses and step 3 sums the same mass
+twice. That is where a hidden assumption would live, so those two are carried as separate
+named fields below rather than folded into one. -/
+structure ShellPartitionHypotheses where
+  /-- **The load-bearing step.** The shells `S_w = φ_w G` are pairwise disjoint. Argued
+  uniformly: two distinct words agree up to their first differing letter, and at that
+  letter the sets sit inside disjoint images pulled forward injectively. If this fails,
+  the growth step counts the same mass twice. -/
+  shellsPairwiseDisjoint : Prop
+  /-- A shell is disjoint from the attractor, because a point of `S_w` has escape depth
+  `|w|` while attractor points have none. Separated from disjointness because it is a
+  different claim about a different pair of sets. -/
+  shellDisjointFromAttractor : Prop
+  /-- `V` is the disjoint union of the shells together with the attractor. -/
+  partitionsAmbient : Prop
+  /-- Depth-`n` cylinders partition the attractor, which is what lets step 4 collapse. -/
+  cylindersPartitionAttractor : Prop
 
 end Calibrator.BundleRigidity
