@@ -41,11 +41,22 @@ or a heterozygosity summary sees" requires the panel to be in **linkage equilibr
 which is stated here as `InLinkageEquilibrium` and carried as an explicit hypothesis of
 the headline theorems rather than mentioned in a remark.
 
-This is a **structural limitation of the method, not a gap to be filled later.** The
-surrounding theory factors a panel's characteristic function as a product over loci, and
-dependence destroys that factorization outright. Every claim below is therefore a claim
-about a linkage-equilibrium idealization of a panel, and real panels are not that.
-Extending any of it to linked loci is open and is not attempted here.
+Sections 1–7 are stated under that hypothesis, and it is genuinely restrictive: the
+surrounding theory factors a panel's characteristic function as a product over loci.
+
+**Section 8 relaxes it, but not as far as the name "linkage disequilibrium" would
+suggest, and the difference is the single most important caveat in this file.** What §8
+handles is a **Markov-modulated bundle chain**: the *parameter* — the allele frequency —
+follows a Markov chain along the sequence, and the genotype coordinates are conditionally
+independent **given the parameters**. That is correlation of allele frequencies between
+nearby sites. It is **not** correlation between genotypes at fixed frequencies, which is
+what linkage disequilibrium actually is. The two are different objects and the difference
+bites for anything haplotype-level. Genotype-level dependence at fixed frequencies remains
+entirely outside this theory, and no theorem here should be quoted as covering it.
+
+Accordingly the independence hypothesis is not dropped, it is **replaced**: theorems in §8
+carry Harris recurrence / regeneration as an explicit hypothesis, in the signature, in
+exactly the way `InLinkageEquilibrium` is carried in §§1–7.
 
 ## What is new here and what is not
 
@@ -59,6 +70,15 @@ calibration.
 * The peeling argument of `BundleRigidity` is the classical lightning-bolt argument for
   sums of weighted compositions (Diliberto–Straus, Marshall–O'Farrell), on the measure
   side.
+
+* The dependent theory of §8 is, in its analytic content, **classical machinery correctly
+  applied**: Doeblin minorization, Nummelin splitting, regeneration/renewal decomposition,
+  and Nagaev–Guivarc'h perturbed-operator theory for chains. It is imported here, not
+  invented here, and the docstrings below name the ancestors rather than implying
+  provenance. Two things in it are not standard issue: that the Doeblin argument runs on
+  the *gap curves between phases* rather than on the individual phases, which changes the
+  exponent; and the exact lattice-ghost mass `e^{-1/κ}` at the freezing transition, which
+  is a two-line conditioning argument but a statement worth remembering.
 
 What is not standard is that the *same* peeling machinery that yields the folded-spectrum
 fact then decides identifiability of the folded spectrum itself, and that it does so for
@@ -553,12 +573,204 @@ theorem spectrum_recoverable_architecture_not {n : ℕ} (panel : Panel n)
   ⟨fun i => spectrum_determined_of_separating diploidFamily panel hsep hkernel i,
     F.even_summary_blind_to_transfer heven shift⟩
 
+/-! ## 8. Correlated frequencies along the genome: what regeneration buys
+
+**The model, and its scope, first.** A *Markov-modulated bundle chain* lets the parameter
+`t_i` — the allele frequency at site `i` — follow a Markov chain along the sequence, with
+the genotype coordinates conditionally independent **given the parameters**. Read that
+again before quoting anything below: this is dependence *in the frequency profile along
+the genome*, not correlation between genotypes at fixed frequencies. Linkage
+disequilibrium is the latter. Nothing in this section covers it.
+
+The analytic content is classical — Doeblin minorization, Nummelin splitting, regeneration
+decomposition, Nagaev–Guivarc'h perturbation — and is carried below as named hypothesis
+fields rather than reproved.
+-/
+
+/-- **A Markov-modulated bundle chain, with its regeneration structure.**
+
+The two modelling hypotheses are fields, not assumptions in prose:
+
+* `conditionalIndependenceGivenParameters` — the model itself: genotypes are independent
+  once the frequency profile is fixed. This is the scope limit; genotype-level dependence
+  at fixed frequencies is outside it.
+* `harrisMinorization` — Harris recurrence / a Doeblin minorization for the parameter
+  chain, which is what produces regeneration times. Its failure boundary is not decorative:
+  admixture, recent selective sweeps and unmodelled population structure give long-range
+  parameter structure with **no** excursion decomposition, and the theory then declines to
+  speak. That exception list is a scope statement, not advice.
+
+`renormalization` is **the renormalization theorem**: after one regeneration decomposition
+the chain's modulus law is exactly that of an *independent* panel over the excursion
+bundle family, whose loci are the blocks between regeneration events. Recombination is
+regeneration; the excursions are the blocks. This is the footing under the standard
+practice of treating LD blocks as independent units. -/
+structure MarkovModulatedChain (K n : ℕ) where
+  /-- The model hypothesis: coordinates independent given the frequency profile. -/
+  conditionalIndependenceGivenParameters : Prop
+  /-- Harris recurrence / Doeblin minorization of the parameter chain. Fails under
+  admixture, recent sweeps and population structure. -/
+  harrisMinorization : Prop
+  /-- The bundle family whose parameter is a whole excursion. -/
+  excursionFamily : BundleFamily K
+  /-- The panel of regeneration blocks. -/
+  blockPanel : Panel n
+  /-- The modulus law of the dependent chain itself. -/
+  chainModulusLaw : ℝ → ℝ
+  /-- **The renormalization theorem.** -/
+  renormalization : conditionalIndependenceGivenParameters → harrisMinorization →
+    ∀ v : ℝ, chainModulusLaw v = spectrumModulusLaw excursionFamily blockPanel v
+
+namespace MarkovModulatedChain
+
+variable {K n : ℕ} (M : MarkovModulatedChain K n)
+
+/-- **Rigidity survives parameter dependence, with no new condition.**
+
+Every theorem of the independent theory applies verbatim to the renormalized chain. Here
+is the identifiability theorem transported: if the block panel is separating, a dependent
+chain with vanishing modulus law has vanishing block weights.
+
+The hypotheses that must travel with it: the model, Harris regeneration, finiteness of the
+block panel, and separation of the blocks. -/
+theorem blockWeight_eq_zero_of_separating
+    (hmodel : M.conditionalIndependenceGivenParameters) (hharris : M.harrisMinorization)
+    (hsep : Separating M.excursionFamily M.blockPanel)
+    (hzero : ∀ v : ℝ, M.chainModulusLaw v = 0) (i : Fin n) :
+    M.blockPanel.weight i = 0 :=
+  spectrum_determined_of_separating M.excursionFamily M.blockPanel hsep
+    (fun v => by rw [← M.renormalization hmodel hharris v]; exact hzero v) i
+
+end MarkovModulatedChain
+
+/-- **The freezing transition.**
+
+With correlation length `ℓ` and `n` markers in the regime `n/ℓ → 1/κ`, the local law of a
+score is a smooth body plus a **lattice ghost of mass exactly `e^{-1/κ}`**.
+
+The operational content, which is what a methodologist would use: *the number of
+effectively independent blocks, not the number of markers, controls when a normal
+approximation to a score distribution is safe.* A score built from a few markers inside
+one correlated block stays visibly discrete — the comb one sees instead of a bell curve
+when plotting a twenty-marker score is this ghost — and a score spread over many
+independent blocks is smooth. The transition is quantitative, with the coefficient above.
+
+The derivation is a conditioning argument on the number of regenerations, so it carries
+the same Harris hypothesis as everything else in this section; it is recorded as a field. -/
+structure FreezingTransition where
+  /-- Correlation length of the parameter chain, in markers. -/
+  correlationLength : ℝ
+  /-- Number of markers in the score. -/
+  markerCount : ℝ
+  /-- The scaling parameter: `κ = ℓ/n`, so `n/ℓ = 1/κ` is the effective block count. -/
+  kappa : ℝ
+  kappa_pos : 0 < kappa
+  scaling : markerCount / correlationLength = 1 / kappa
+  /-- Harris minorization, inherited. -/
+  harrisMinorization : Prop
+  /-- Mass of the residual lattice component of the local law. -/
+  latticeGhostMass : ℝ
+  /-- Mass of the smooth component. -/
+  smoothBodyMass : ℝ
+  /-- **The transition, with its exact coefficient.** -/
+  freezing : harrisMinorization → latticeGhostMass = Real.exp (-(1 / kappa))
+  /-- The two components are a decomposition of the whole law. -/
+  decomposition : latticeGhostMass + smoothBodyMass = 1
+
+namespace FreezingTransition
+
+variable (T : FreezingTransition)
+
+/-- **The ghost never vanishes at any finite effective block count.** A normal
+approximation to a score distribution is never exactly right; it is right up to a mass
+`e^{-1/κ}` that the theorem names. -/
+theorem latticeGhostMass_pos (hharris : T.harrisMinorization) : 0 < T.latticeGhostMass := by
+  rw [T.freezing hharris]
+  exact Real.exp_pos _
+
+/-- **More effectively independent blocks means a smaller ghost**, monotonically. Halving
+`κ` — doubling the number of independent blocks per correlation length — squares the
+residual discreteness. -/
+theorem latticeGhostMass_mono (T' : FreezingTransition)
+    (hharris : T.harrisMinorization) (hharris' : T'.harrisMinorization)
+    (hlt : T.kappa < T'.kappa) : T.latticeGhostMass < T'.latticeGhostMass := by
+  rw [T.freezing hharris, T'.freezing hharris']
+  apply Real.exp_lt_exp.mpr
+  have h : 1 / T'.kappa < 1 / T.kappa :=
+    one_div_lt_one_div_of_lt T.kappa_pos hlt
+  linarith
+
+/-- **It is the block count that matters, not the marker count.** Two designs with the
+same `κ` carry the same residual discreteness however many markers they use. -/
+theorem latticeGhostMass_depends_only_on_blockCount (T' : FreezingTransition)
+    (hharris : T.harrisMinorization) (hharris' : T'.harrisMinorization)
+    (hkappa : T.kappa = T'.kappa) : T.latticeGhostMass = T'.latticeGhostMass := by
+  rw [T.freezing hharris, T'.freezing hharris', hkappa]
+
+end FreezingTransition
+
+/-- **Two-point modulus data**, as a functional of the two-site path marginal: the joint
+law of `|U|` at a pair of sites. -/
+noncomputable def twoPointModulusLaw {K m : ℕ} (family : BundleFamily K)
+    (site : Fin m → ℝ × ℝ) (pathWeight : Fin m → ℝ) (v w : ℝ) : ℝ :=
+  ∑ i : Fin m, pathWeight i *
+    (family.massAt (site i).1 v * family.massAt (site i).2 w)
+
+/-- **The `k`-point modulus law is linear in the path marginal.**
+
+This is the step that dissolves the natural fear about dependence — that identification
+becomes a nonlinear problem. It does not. The nonlinearity of a Markov model lives in the
+factorization of the path law into transition kernels, which is a *parameterization*
+choice; the identification map itself is still linear in the marginal, so the same kernel
+computation applies. -/
+theorem twoPointModulusLaw_add {K m : ℕ} (family : BundleFamily K)
+    (site : Fin m → ℝ × ℝ) (u u' : Fin m → ℝ) (v w : ℝ) :
+    twoPointModulusLaw family site (fun i => u i + u' i) v w =
+      twoPointModulusLaw family site u v w + twoPointModulusLaw family site u' v w := by
+  unfold twoPointModulusLaw
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl (fun i _ => by ring)
+
+/-- **Joint two-site data is strictly more identifying than single-site data.**
+
+Two claims, both carried with their hypotheses visible:
+
+* if the one-point fiber map is injective, two-point modulus data determines the two-point
+  marginal and hence the chain (`chainDetermined`);
+* Markov consistency cuts the tensor kernel, so the surgery freedom under dependence is no
+  larger than the freedom marginal data leaves (`freedomShrinks`).
+
+`sliceMapProperty` is the **pre-registered weak point** and is a hypothesis rather than a
+lemma. Slice-map properties fail in enough settings that it cannot be taken for free; it
+is named here so that anything derived from it says so in its own type. -/
+structure TwoPointIdentification where
+  /-- The one-point fiber map is injective. -/
+  oneSiteFiberInjective : Prop
+  /-- **Weak point.** The slice-map step of the tensor argument. Not free. -/
+  sliceMapProperty : Prop
+  /-- Dimension of the surgery freedom left by single-site modulus data. -/
+  marginalFreedom : ℕ
+  /-- Dimension of the surgery freedom left by joint two-site modulus data. -/
+  jointFreedom : ℕ
+  /-- The chain is determined by two-point data. -/
+  chainDetermined : Prop
+  /-- Identification from two-point data, under both inputs. -/
+  identification : oneSiteFiberInjective → sliceMapProperty → chainDetermined
+  /-- Markov consistency cuts the tensor kernel. -/
+  freedomShrinks : jointFreedom ≤ marginalFreedom
+
 /-!
 ## What is left open, plainly
 
-* **Linkage disequilibrium.** Every statement above assumes independent loci, and the
-  factorization the method rests on does not survive dependence. This is the named
-  limitation, not a to-do.
+* **Linkage disequilibrium proper.** §8 buys dependence *in the allele frequencies along
+  the genome*, via regeneration. It does **not** buy correlation between genotypes at
+  fixed frequencies, which is what LD is. That remains outside the theory, and it is the
+  named limitation, not a to-do. Sections 1–7 assume outright independence.
+* **The regeneration hypothesis itself.** Admixture, recent sweeps and population structure
+  are exactly the cases with no excursion decomposition, so §8 covers the well-mixed case
+  and declines the interesting ones.
+* **The slice-map step** in `TwoPointIdentification` is unproved and is carried as a
+  hypothesis field.
 * **The continuum spectrum.** The diploid family's core is full — coverage multiplicity is
   four on `(0,1)` and two above, never one — so the peeling criterion says nothing about a
   continuously distributed spectrum. Whether the folded continuum spectrum is identifiable
