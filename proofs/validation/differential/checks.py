@@ -851,6 +851,30 @@ check(
 
 # --- 8b. Admixture: what cluster/fam_admixture.py established ---------------
 #
+# A NOTE ON THE THREE CHECKS ADDED HERE AND IN SECTION 5 THAT ARE MEANT TO
+# DISAGREE (admixedFst-over-a-spectrum, admixtureLDDecay-is-the-infinite-Ne-limit,
+# steppingStoneCoalescenceTime-lattice-scale).
+#
+# run.py's vacuity test asks whether a check separates the real definition from
+# deliberately wrong ones. For a check whose verdict is AGREE that is the right
+# question. For a check that is SUPPOSED to disagree it is nearly free: a check
+# that disagrees with everything detects every mutant and looks maximally
+# non-vacuous while constraining nothing. The mutant test cannot tell "this
+# found something" from "this is broken".
+#
+# So each of the three is also checked in the OTHER direction -- that its
+# reference is REACHABLE, i.e. that some body would make it AGREE. Verified
+# exactly (max relative error 0 at every grid point):
+#
+#   steppingStoneCoalescenceTime  d(D-d)/(2 sigma^2 m)
+#   admixtureLDDecay              ((1-r)(1-1/(2Ne)))^g
+#   admixedFst                    (1-alpha)^2 * F_ST(A,B) * den_AB/den_CA
+#
+# That is what makes each of them a measurement of a specific missing factor
+# rather than a complaint. It also names the repair: the first two need an
+# argument the signature does not have, which is why they are SCOPE and MODEL
+# rather than FORMULA, and the third needs a regime declaration.
+#
 # A DETERMINISTIC spectrum, so nothing here samples and the file's opening
 # promise still holds. The pairs below are a fixed, weighted set standing in
 # for a differentiated pair of populations; the reference evaluates F_ST as a
