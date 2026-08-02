@@ -318,17 +318,36 @@ def corpus_ibd_iterate(ne, rate, f0, steps):
     return f
 
 
-def wf_mutation_arm(rng, ne, mu, gens, loci=N_LOCI, reps=N_REPS):
-    """One deme, two-way mutation. Measures stationary heterozygosity.
+# BURN-IN IS MEASURED, NOT ASSERTED.
+#
+# The first draft ran 30*Ne generations at Ne = 200 on a 400 x 400 array, which
+# is fifteen relaxation times and would not have finished in hours. The fix is
+# NOT fewer replicates, fewer loci, a coarser grid or a looser tolerance -- all
+# of those are unchanged. It is that the burn-in was over-provisioned and is now
+# CHECKED instead of guessed: the statistic is recorded at 2/3 of the run and
+# again at the end, and a cell whose two readings disagree by more than 2% is
+# reported as NOT CONVERGED rather than silently averaged. A stated burn-in that
+# nobody verifies is the same failure mode as a control that cannot fail.
+CONVERGENCE_TOL = 0.02
 
-    One binomial call per generation over the whole (reps, loci) array.
+
+def wf_mutation_arm(rng, ne, mu, gens, loci=N_LOCI, reps=N_REPS):
+    """One deme, two-way mutation. Measures stationary identity in state.
+
+    One binomial call per generation over the whole (reps, loci) array -- a
+    generation for every replicate at every locus is ONE call, not a loop.
+    Returns (final, two_thirds) so convergence is observable.
     """
     p = np.full((reps, loci), 0.5)
-    for _ in range(gens):
+    mark = (2 * gens) // 3
+    mid = None
+    for g in range(gens):
         p = p * (1 - mu) + (1 - p) * mu
         p = rng.binomial(2 * ne, p) / float(2 * ne)
+        if g == mark:
+            mid = 1.0 - float(np.mean(2 * p * (1 - p))) / 0.5
     h = float(np.mean(2 * p * (1 - p)))
-    return 1.0 - h / 0.5          # identity relative to a maximally diverse start
+    return 1.0 - h / 0.5, mid
 
 
 def wf_migration_arm(rng, ne, m, gens, loci=N_LOCI, reps=N_REPS):
@@ -337,26 +356,34 @@ def wf_migration_arm(rng, ne, m, gens, loci=N_LOCI, reps=N_REPS):
     Mutation is reintroduced at a rate far below the migration rate purely to
     keep the demes segregating; without it drift fixes every locus and F_ST is
     undefined. The rate is 1/50 of the migration rate, so the migration-drift
-    balance is what is measured, and the same rate is used in every cell so it
+    balance is what is measured, and the same ratio is used in every cell so it
     cannot generate a trend in m.
     """
     mu = m / 50.0
     p1 = np.full((reps, loci), 0.5)
     p2 = np.full((reps, loci), 0.5)
-    for _ in range(gens):
+    mark = (2 * gens) // 3
+    mid = None
+
+    def stat(a, b):
+        return ratio_of_averages(((a - b) ** 2).ravel(),
+                                 (a * (1 - b) + b * (1 - a)).ravel())
+
+    for g in range(gens):
         a = (1 - m) * p1 + m * p2
         b = (1 - m) * p2 + m * p1
         a = a * (1 - mu) + (1 - a) * mu
         b = b * (1 - mu) + (1 - b) * mu
         p1 = rng.binomial(2 * ne, a) / float(2 * ne)
         p2 = rng.binomial(2 * ne, b) / float(2 * ne)
-    return ratio_of_averages(((p1 - p2) ** 2).ravel(),
-                             (p1 * (1 - p2) + p2 * (1 - p1)).ravel())
+        if g == mark:
+            mid = stat(p1, p2)
+    return stat(p1, p2), mid
 
 
 def arm_ibd(rng):
     rows = []
-    NE = 200
+    NE = 100
 
     # ---- I1 : rate = 0. Must converge to F = 1. Isolates the drift arm. ----
     f = corpus_ibd_iterate(NE, 0.0, 0.0, 20000)
@@ -382,15 +409,22 @@ def arm_ibd(rng):
     for scaled in (0.5, 2.0, 8.0):
         rate = scaled / (4.0 * NE)
         corpus_fp = corpus_ibd_fixed_point(NE, rate)
-        gens = 30 * NE
-        mut_measured = wf_mutation_arm(rng, NE, rate, gens)
-        mig_measured = wf_migration_arm(rng, NE, rate, gens)
+        gens = 12 * NE
+        mut_measured, mut_mid = wf_mutation_arm(rng, NE, rate, gens)
+        mig_measured, mig_mid = wf_migration_arm(rng, NE, rate, gens)
+        conv = (abs(mut_measured - mut_mid)
+                <= CONVERGENCE_TOL * max(abs(mut_measured), 1e-3)
+                and abs(mig_measured - mig_mid)
+                <= CONVERGENCE_TOL * max(abs(mig_measured), 1e-3))
         rows.append({
             "cell": "I3 discriminating run, matched scaled rate",
             "scaled_rate_4Ne": scaled, "rate": rate,
             "corpus_single_fixed_point": corpus_fp,
             "mutation_arm_measured_F": mut_measured,
+            "mutation_arm_at_two_thirds": mut_mid,
             "migration_arm_measured_Fst": mig_measured,
+            "migration_arm_at_two_thirds": mig_mid,
+            "converged": conv,
             "infinite_island_reference": 1.0 / (1.0 + scaled),
             "mutation_drift_reference": 1.0 / (1.0 + scaled),
             "isolates": ("nothing -- this is the test. I1 and I2 have already "

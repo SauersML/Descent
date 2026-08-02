@@ -145,6 +145,7 @@ FAMILIES = [
                     # newly classified
                     "alleleFreqAfterMigration", "bigM", "scaledMigration",
                     "scaledMigrationRate", "effectiveSymmetricMigration",
+                    "effectiveMigration",
                     "fstMigDriftEq", "fstMigrationMutationEquilibrium",
                     "fstEqLimitLowMutationManyDemes",
                     "ldCorrelationFromMigration", "sharedLDFromMigration",
@@ -233,7 +234,7 @@ FAMILIES = [
                     "bottleneckExcessLD", "driftLDCreationRate", "tagR2",
                     # newly classified
                     "ldRetention", "ldBreakageRate", "sharedLDRetention",
-                    "taggingMismatchScale", "ohtaKimuraSigmaDSq"],
+                    "taggingMismatchScale", "ohtaKimuraSigmaDSq", "decaySlope"],
     },
     {
         "name": "stepping_stone",
@@ -518,7 +519,11 @@ FAMILIES = [
         "members": ["integratedCoalescentHazard", "coalescenceSurvivalFromHazard",
                     "coalescenceCdfFromHazard", "discreteRecombinationSurvival",
                     "twoLocusIBDCovariance",
-                    "twoLocusCoalescentCovarianceMatrix"],
+                    "twoLocusCoalescentCovarianceMatrix",
+                    # moved here after losing the un-simulatable falsifier:
+                    # twoLocusCoalescentCovarianceMatrix returns a real matrix
+                    # and names both indices in its body.
+                    "twoLocusIdx0", "twoLocusIdx1"],
     },
     {
         "name": "hwe_genotype_score",
@@ -555,7 +560,11 @@ FAMILIES = [
                 "which no candidate error bound could ever bind.",
         "members": ["scoreMean", "scoreVariance", "scoreApproximationError",
                     "causalMean", "tagMean", "crossCovEntry",
-                    "sigmaTagCausal", "pgsVarianceFromHet"],
+                    "sigmaTagCausal", "pgsVarianceFromHet",
+                    # moved here after losing the un-simulatable falsifier:
+                    # causalMean, tagMean and crossCovEntry name them in their
+                    # bodies, so the composition is what gets tested.
+                    "CausalVec", "TagVec"],
     },
     {
         "name": "estimator_moments",
@@ -657,6 +666,7 @@ FAMILIES = [
                     "sourceCalibratedBrierFromSourceWeightsAtPrevalence",
                     "sourceMetricProfileFromSourceWeightsAtPrevalence",
                     "sourceMetricProfileFromSourceWeightsAtTargetPrevalence",
+                    "exactCalibratedBrierRiskFromR2",
                     "total"],
     },
     {
@@ -723,7 +733,16 @@ FAMILIES = [
                     "targetIrreduciblePenaltyProfile",
                     "effectiveOutcomeVariance", "ldMismatchFrobenius",
                     "demographicCovarianceGapLowerBound",
+                    # The dense 2x2 witness. BOTH the pre-rename and the
+                    # post-rename names are listed: defs.json still carries the
+                    # six separate constants while the Lean now carries the
+                    # three Pop-indexed ones, so a list with only one spelling
+                    # would report a phantom gap on whichever side is stale.
                     "witnessSigmaObs", "witnessCross", "witnessW_opt",
+                    "sigmaObsSource", "sigmaObsTarget",
+                    "crossSource", "crossTarget",
+                    "wSource_opt", "wTarget_opt",
+                    "Pop.pair", "pair", "withSource", "withTarget",
                     "ldWitnessSourceMoments", "ldWitnessBeta",
                     "ldWitnessSourceWeights", "ldWitnessTargetCross",
                     "ldWitnessSigmaTargetIndependent",
@@ -938,32 +957,56 @@ FAMILIES = [
 # -- `CausalVec c` IS `Fin c -> R`, and `twoLocusIdx0` IS `(0 : Fin t)` -- so
 # unfolding them changes no proof obligation and no numeric value.
 # ---------------------------------------------------------------------------
+# EVERY ENTRY BELOW LOST ITS FALSIFIER. THE PARKED COUNT IS ZERO.
+#
+# These four were parked as carrying no real-valued content, with the falsifier
+# in `falsify_unsimulatable` named before it was run. It was run, on defs.json
+# as of 2026-08-02, and it FIRED ON ALL FOUR through F3, the composition test:
+#
+#   CausalVec     3 real-valued definitions name it in their BODY --
+#                 causalMean, tagMean, crossCovEntry.
+#   TagVec        the same three.
+#   twoLocusIdx0  twoLocusCoalescentCovarianceMatrix, which returns a real
+#                 matrix, names it in its body.
+#   twoLocusIdx1  the same.
+#
+# F1 (returns a real) and F2 (a numeric theorem) held for all four. F3 is what
+# took them, and F3 is what took the previous tier's twenty-seven. The rule was
+# stated before the run and is honoured after it: a fired falsifier means the
+# CLAIM is lost, not that the falsifier was too strict. All four are therefore
+# also listed as members of the families of the definitions that consume them
+# -- CausalVec and TagVec in hwe_genotype_score, the two indices in
+# coalescent_hazard -- and they are NOT counted as parked below.
+#
+# STANDING RESULT: across two tiers and thirty-one attempts, nothing in this
+# corpus slice has survived the un-simulatable claim. The entries are kept
+# rather than deleted so the machinery stays live and the loss stays visible;
+# the next candidate has to survive the same test rather than inherit an
+# exemption from an empty list.
 UNSIMULATABLE = [
     {
         "name": "CausalVec",
-        "reason": "Type abbreviation, `CausalVec c := Fin c -> R`. Returns a "
-                  "Type, not a number. No sample of any process can come out "
-                  "differently depending on it, because it is definitionally "
-                  "equal to its unfolding and every consumer typechecks "
-                  "identically without it.",
+        "lost": True,
+        "reason": "CLAIMED: type abbreviation, `CausalVec c := Fin c -> R`, "
+                  "returns a Type and not a number. LOST to F3.",
     },
     {
         "name": "TagVec",
-        "reason": "Type abbreviation, `TagVec t := Fin t -> R`. Same as "
-                  "CausalVec.",
+        "lost": True,
+        "reason": "CLAIMED: type abbreviation, `TagVec t := Fin t -> R`. "
+                  "LOST to F3.",
     },
     {
         "name": "twoLocusIdx0",
-        "reason": "Index construction, the element `0` of `Fin t` under "
-                  "`Fact (2 <= t)`. Returns a Fin, not a real. It selects "
-                  "WHICH locus a two-locus formula reads; the formula's value "
-                  "is simulatable and is checked in the coalescent_hazard "
-                  "family, but the index itself carries no process.",
+        "lost": True,
+        "reason": "CLAIMED: index construction, the element `0` of `Fin t`, "
+                  "returns a Fin and not a real. LOST to F3.",
     },
     {
         "name": "twoLocusIdx1",
-        "reason": "Index construction, the element `1` of `Fin t`. Same as "
-                  "twoLocusIdx0.",
+        "lost": True,
+        "reason": "CLAIMED: index construction, the element `1` of `Fin t`. "
+                  "LOST to F3.",
     },
 ]
 
@@ -1169,11 +1212,18 @@ def main():
 
     # Un-simulatable declarations count as ACCOUNTED FOR but NOT covered.
     unsim = falsify_unsimulatable(by_short, theorems)
+    # Only entries whose falsifier did NOT fire count as parked. An entry that
+    # lost its falsifier is not accounted for by being on this list; it has to
+    # earn a family like everything else, and it is credited only through the
+    # family it was moved into.
     unsim_fq = set()
     for u in unsim:
+        if u["falsifier_fired"]:
+            continue
         for n in u["declarations_found"]:
             if n in in_slice_fq:
                 unsim_fq.add(n)
+    unsim_lost = [u["name"] for u in unsim if u["falsifier_fired"]]
 
     n_fam = len(rows)
     n_sim = len([r for r in rows if r["simulator"]])
@@ -1194,6 +1244,8 @@ def main():
     print("  in-slice statements in a simulated family      %d" % len(covered_fq))
     print("  in-slice statements in an unsimulated family   %d" % stmts_without)
     print("  in-slice statements parked as UN-SIMULATABLE   %d" % len(unsim_fq))
+    print("      (%d claims of un-simulatability were made and %d LOST their "
+          "falsifier: %s)" % (len(unsim), len(unsim_lost), unsim_lost))
     print("  in-slice statements in NO family at all        %d"
           % len(unassigned_fq))
     print("")
@@ -1205,9 +1257,18 @@ def main():
                  "yes" if r["simulator"] else "NO",
                  r["status"].split(".")[0][:60]))
         if r["members_not_found_in_corpus"]:
-            print("      declared but ABSENT FROM CORPUS (removed or renamed "
-                  "since the list was written): %s"
+            print("      declared here but ABSENT FROM defs.json: %s"
                   % r["members_not_found_in_corpus"])
+            print("      NOTE: absent from defs.json is NOT absent from the "
+                  "corpus. hetDecayFromScaled, ohtaKimuraSigmaDSq, "
+                  "neiGstFromFrequencies, steppingStoneFstQuadratic, "
+                  "witnessSigmaObs, witnessCross and witnessW_opt are all "
+                  "present in the .lean sources and missing from the extract, "
+                  "and conversely defs.json still carries sigmaObsSource, "
+                  "crossSource and wSource_opt which the Lean has renamed "
+                  "away. The extract layer is STALE, so every coverage number "
+                  "computed from it -- including the ones printed above -- is "
+                  "a number about defs.json, not about the corpus.")
         if r.get("sweep_only"):
             print("      found by sweep, not in the hand list: %s"
                   % r["sweep_only"])
