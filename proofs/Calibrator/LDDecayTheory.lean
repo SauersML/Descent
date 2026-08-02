@@ -108,7 +108,12 @@ When LD changes, tags become less informative → PGS accuracy drops.
 section LDTagging
 
 /-- **Tag SNP r² with causal variant.**
-    The proportion of causal variant information captured by a tag. -/
+    The proportion of causal variant information captured by a tag.
+
+    Convention: `var_tag` and `var_causal` are genotypic variances `2p(1-p)`,
+    matching `hweGenotypeVariance`, and `D_sq` is a squared dosage covariance.
+    Reading the variances as allelic `p(1-p)` scales the result by four, the
+    same hazard `ldCorrelationSq` carries. -/
 noncomputable def tagR2 (D_sq var_tag var_causal : ℝ) : ℝ :=
   D_sq / (var_tag * var_causal)
 

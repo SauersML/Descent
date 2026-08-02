@@ -854,13 +854,25 @@ theorem deterministicEquivalent_commutes_design
 /-- The self-consistency equation of the ridge deterministic equivalent, in the
 variable `u = 1 + δ`. The left side is the increasing part, the right side the
 LD-dependent decreasing part, and a solution is exactly a fixed point of the
-usual equation. The evaluation geometry does not appear. -/
-def ridgeBalance (eig : ι → ℝ) (ridge u : ℝ) : ℝ :=
-  (1 - 1 / u) - (∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ)
+usual equation. The evaluation geometry does not appear.
 
-theorem ridgeBalance_strictMonoOn (eig : ι → ℝ) (ridge : ℝ)
-    (heig : ∀ i, 0 ≤ eig i) (hridge : 0 < ridge) :
-    StrictMonoOn (ridgeBalance eig ridge) (Set.Ici (1 : ℝ)) := by
+`aspect` is the variants-per-individual ratio of the training sample. It is not
+optional: the fixed point is a functional of the design *and its aspect ratio*,
+and dropping it — the first version of this definition did — misprices the
+resolvent functional by 34 percent at `aspect = 0.3`, as
+`proofs/validation/imitation_rigidity/check_imitation.py` records.
+
+Empirical status: VALIDATED. Simulated ridge regression on genotype-like
+designs matches `tr(B (S + ridge)⁻¹)/k` computed from this fixed point, for
+evaluation geometries that commute with the design and for ones in general
+position alike. -/
+def ridgeBalance (aspect : ℝ) (eig : ι → ℝ) (ridge u : ℝ) : ℝ :=
+  (1 - 1 / u) -
+    aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ))
+
+theorem ridgeBalance_strictMonoOn (aspect : ℝ) (eig : ι → ℝ) (ridge : ℝ)
+    (haspect : 0 ≤ aspect) (heig : ∀ i, 0 ≤ eig i) (hridge : 0 < ridge) :
+    StrictMonoOn (ridgeBalance aspect eig ridge) (Set.Ici (1 : ℝ)) := by
   intro u hu w hw hlt
   have hu1 : (1 : ℝ) ≤ u := hu
   have hw1 : (1 : ℝ) ≤ w := hw
@@ -888,22 +900,27 @@ theorem ridgeBalance_strictMonoOn (eig : ι → ℝ) (ridge : ℝ)
         (∑ i, eig i / (eig i + ridge * w)) / (Fintype.card ι : ℝ) ≤
           (∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ) :=
       div_le_div_of_nonneg_right hsum hcardpos.le
+    have hscaled :
+        aspect * ((∑ i, eig i / (eig i + ridge * w)) / (Fintype.card ι : ℝ)) ≤
+          aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ)) :=
+      mul_le_mul_of_nonneg_left hdiv haspect
     linarith
 
 /-- **Uniqueness of the ridge fixed point.** The scalar that every ridge-PGS
 risk formula depends on is well defined: there is at most one, and it is a
-functional of the training genotype spectrum alone. -/
-theorem ridgeBalance_root_unique (eig : ι → ℝ) (ridge : ℝ)
-    (heig : ∀ i, 0 ≤ eig i) (hridge : 0 < ridge)
+functional of the training genotype spectrum and aspect ratio alone. -/
+theorem ridgeBalance_root_unique (aspect : ℝ) (eig : ι → ℝ) (ridge : ℝ)
+    (haspect : 0 ≤ aspect) (heig : ∀ i, 0 ≤ eig i) (hridge : 0 < ridge)
     {u w : ℝ} (hu : 1 ≤ u) (hw : 1 ≤ w)
-    (hru : ridgeBalance eig ridge u = 0) (hrw : ridgeBalance eig ridge w = 0) :
+    (hru : ridgeBalance aspect eig ridge u = 0)
+    (hrw : ridgeBalance aspect eig ridge w = 0) :
     u = w := by
   by_contra hne
   rcases lt_or_gt_of_ne hne with hlt | hgt
-  · have := ridgeBalance_strictMonoOn eig ridge heig hridge hu hw hlt
+  · have := ridgeBalance_strictMonoOn aspect eig ridge haspect heig hridge hu hw hlt
     rw [hru, hrw] at this
     exact lt_irrefl 0 this
-  · have := ridgeBalance_strictMonoOn eig ridge heig hridge hw hu hgt
+  · have := ridgeBalance_strictMonoOn aspect eig ridge haspect heig hridge hw hu hgt
     rw [hru, hrw] at this
     exact lt_irrefl 0 this
 

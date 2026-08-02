@@ -86,9 +86,50 @@ theorem ld_bounded_by_freq (D p_i p_j : ℝ)
 /-- **LD correlation r² is in [0,1].**
     r²_ij = D²_ij / (p_i(1-p_i) × p_j(1-p_j)).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Convention: `D` is a dosage covariance, twice the haplotype `D`. The
+    denominator `allelicVariance p_i * allelicVariance p_j` cancels only under
+    that reading; feeding a haplotype `D` yields `r²/4`. Use
+    `ldCorrelationSqOfHaplotypeD` for the other convention. -/
 noncomputable def ldCorrelationSq (D p_i p_j : ℝ) : ℝ :=
   D^2 / (allelicVariance p_i * allelicVariance p_j)
+
+/-! **Convention of `D` in `ldCorrelationSq`.**
+
+The denominator is `allelicVariance p_i * allelicVariance p_j = 4 p_i q_i p_j q_j`,
+which cancels only when `D` is a *dosage* covariance, that is twice the
+haplotype `D`. `admixtureLDTwoLocus` in this same file produces the haplotype
+`D`, so composing the two — the obvious move, since one produces `D` and the
+other consumes it — yields `r²/4` rather than `r²`.
+
+Both definitions are defensible in isolation and Lean cannot object, because
+both arguments are `ℝ` and nothing records which convention each carries. This
+is the first defect found here that is not local to a single definition: it
+lives in the composition. `tagR2` carries the same hazard if its variance
+arguments are read as `allelicVariance`.
+
+The convention is therefore stated: `ldCorrelationSq` expects a dosage
+covariance. `ldCorrelationSq_of_haplotypeD` below converts. -/
+
+/-- Haplotype `D` to squared correlation, with the factor the dosage
+convention requires. Use this when the input came from
+`admixtureLDTwoLocus`.
+
+    Convention: consumes haplotype `D`, produces `r²`.
+
+    Empirical status: VALIDATED (direct simulation of r² agrees with the
+    dosage-covariance reading to four decimals; the haplotype reading is
+    exactly one quarter of it). -/
+noncomputable def ldCorrelationSqOfHaplotypeD (D p_i p_j : ℝ) : ℝ :=
+  ldCorrelationSq (2 * D) p_i p_j
+
+/-- The two differ by exactly the square of the ploidy factor, which is the
+whole content of the hazard. -/
+theorem ldCorrelationSqOfHaplotypeD_eq (D p_i p_j : ℝ) :
+    ldCorrelationSqOfHaplotypeD D p_i p_j = 4 * ldCorrelationSq D p_i p_j := by
+  unfold ldCorrelationSqOfHaplotypeD ldCorrelationSq
+  ring_nf
 
 /-- LD correlation squared is nonneg. -/
 theorem ld_correlation_sq_nonneg (D p_i p_j : ℝ)
@@ -300,12 +341,23 @@ tags a number of causal effects proportional to its LD score.
 noncomputable def ldsrExpectedBetaSq (h2 M ell_j N : ℝ) : ℝ :=
   h2 / M * ell_j + 1 / N
 
-/-- **LD score regression intercept.**
-    χ²_j = N × h²/M × ℓ_j + N × a/M + 1
-    Intercept > 1 indicates confounding.
-    Slope ∝ h²/M. -/
+/-- **LD score regression expectation.**
+    `χ²_j = (N h²/M) ℓ_j + N a + 1`, with intercept above one indicating
+    confounding and slope proportional to `h²/M`.
+
+    The confounding term was previously divided by `M` as well. Simulation with
+    pure stratification and no genetic effect holds the confounding fixed and
+    varies `M` sixteenfold: the excess over one is flat, so the reference law's
+    `a` is constant to within noise while the divided form's implied `a` grows
+    with `M`, contradicting its definition as a property of the confounding
+    rather than of the marker panel. At `N = 8·10⁵` and `M = 9·10⁵` the divided
+    form reports `χ² = 1.32` where the truth is `420.8`, so it declares
+    stratification invisible at any severity.
+
+    Empirical status: VALIDATED in the corrected form (implied `a` constant to
+    within 15 percent across a sixteenfold range of `M`). -/
 noncomputable def ldsrExpectedChi2 (N h2 M ell_j a : ℝ) : ℝ :=
-  N * h2 / M * ell_j + N * a / M + 1
+  N * h2 / M * ell_j + N * a + 1
 
 /-- **From per-SNP β² to chi-squared: multiply by N.**
     χ²_j = N × β̂_j², so E[χ²_j] = N × E[β̂_j²]. -/
