@@ -100,7 +100,24 @@ def translated_reason(d):
 
 # ------------------------------------------------------------- main
 
-HEADER = '''"""GENERATED FILE -- do not edit.
+HEADER = '''"""GENERATED FILE -- do not edit.  NOT AUTHORITATIVE IF COMMITTED.
+
+    THE COPY OF THIS FILE IN GIT IS STALE BY CONSTRUCTION.
+
+`proofs/Calibrator/` changes every few minutes.  A generated table committed
+alongside it is a cache of a moving target, and committing it moves the
+staleness from DETECTABLE to COMMITTED -- which is worse, because a file in the
+repository reads as authoritative.
+
+DO NOT CONSUME A COMMITTED COPY.  Run `python3 validation/extract/emit.py` in
+your own worktree immediately before use.  It takes about a minute, writes only
+inside that worktree, pins your numbers to the revision you are standing on, and
+makes `api.require_fresh()` pass for a reason rather than by luck.  It also means
+no two agents write to each other's artifacts.
+
+`api.require_fresh()` will raise if you skip this.  That is the intended
+behaviour, not an obstacle.
+
 
 Produced by validation/extract/emit.py from the Lean sources under
 proofs/Calibrator/.  Each function below was translated from the parsed body of

@@ -507,6 +507,12 @@ def to_json(defs, structs, failures, thms=()):
         r = {k: v for k, v in asdict(d).items()}
         return r
     return {
+        "_NOT_AUTHORITATIVE": (
+            "The committed copy of this file is STALE BY CONSTRUCTION: the Lean "
+            "corpus moves every few minutes and this is a cache of it. Do not "
+            "consume a committed copy -- run validation/extract/emit.py in your "
+            "own worktree immediately before use, and call api.require_fresh(), "
+            "which raises if the table does not describe the Lean on disk."),
         "source_digest": _SOURCE_DIGEST[0],
         "source_files": _SOURCE_DIGEST[1],
         "collisions": find_collisions(defs),
