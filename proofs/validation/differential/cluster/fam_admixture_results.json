@@ -1936,6 +1936,7 @@
    "retention_with_drift": 0.9975,
    "rel_err_corpus": 0.0024309198007547664,
    "rel_err_with_drift": -7.515749874706723e-05,
+   "generations_above_noise_floor": 41,
    "D_trajectory_head": [
     0.0825,
     0.08224266375,
@@ -1953,6 +1954,7 @@
    "retention_with_drift": 0.9962531250000001,
    "rel_err_corpus": 0.0025361375218645025,
    "rel_err_with_drift": 2.9797178059887635e-05,
+   "generations_above_noise_floor": 41,
    "D_trajectory_head": [
     0.0825,
     0.08224051791666667,
@@ -1970,6 +1972,7 @@
    "retention_with_drift": 0.9950062500000001,
    "rel_err_corpus": 0.0026858292413342775,
    "rel_err_with_drift": 0.000179114668230981,
+   "generations_above_noise_floor": 41,
    "D_trajectory_head": [
     0.0825,
     0.0821076675,
@@ -1987,6 +1990,7 @@
    "retention_with_drift": 0.9925125,
    "rel_err_corpus": 0.0023647672610316002,
    "rel_err_with_drift": -0.00014114465712095452,
+   "generations_above_noise_floor": 41,
    "D_trajectory_head": [
     0.0825,
     0.08183467166666666,
@@ -2004,6 +2008,7 @@
    "retention_with_drift": 0.97755,
    "rel_err_corpus": 0.0024592417049042474,
    "rel_err_with_drift": -4.690639935796417e-05,
+   "generations_above_noise_floor": 41,
    "D_trajectory_head": [
     0.0825,
     0.08069272104166667,
@@ -2021,6 +2026,7 @@
    "retention_with_drift": 0.89775,
    "rel_err_corpus": 0.003726826773294482,
    "rel_err_with_drift": 0.0012175097063612747,
+   "generations_above_noise_floor": 41,
    "D_trajectory_head": [
     0.0825,
     0.07413820125,
@@ -2033,11 +2039,12 @@
   {
    "r": 0.5,
    "Ne": 200,
-   "retention_measured": 0.8414339429917188,
+   "retention_measured": 0.5061538087964369,
    "retention_corpus_admixtureLDDecay": 0.5,
    "retention_with_drift": 0.49875,
-   "rel_err_corpus": -0.4057762891971653,
-   "rel_err_with_drift": -0.40726184847417235,
+   "rel_err_corpus": -0.012157981802151796,
+   "rel_err_with_drift": -0.014627586847646364,
+   "generations_above_noise_floor": 9,
    "D_trajectory_head": [
     0.0825,
     0.041218392916666666,
