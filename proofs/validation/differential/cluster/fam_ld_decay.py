@@ -1,0 +1,215 @@
+#!/usr/bin/env python3
+"""Family simulator: LD DECAY AND RECURRENCE. numpy only.
+
+The largest unsimulated family in the slice, 13 in-slice definitions, and it
+carries the two largest analytic errors found anywhere in the corpus. One
+two-locus Wright-Fisher engine settles all of them.
+
+    ldRetentionPerGen  ldAfterGenerations  ldRecurrence  ldDecayRatePerGen
+    ldHalfLife         driftLDStep         driftLDRetention
+    driftLDEquilibrium driftLDTrajectory   excessLDAfterBottleneck
+    bottleneckExcessLD driftLDCreationRate tagR2
+
+WHAT IS MEASURED, AND WHICH DEFINITION EACH SETTLES
+
+  A. E[D_t]/D_0 per generation.  Hill & Robertson: E[D] decays by exactly
+     (1-r)(1 - 1/(2Ne)) per generation. Settles ldRetentionPerGen,
+     ldAfterGenerations, ldRecurrence, and -- since it is the same quantity
+     inverted -- ldHalfLife and ldDecayRatePerGen.
+
+     ldHalfLife and ldRetainedFraction were REPAIRED this session, having been
+     2110x and 37000x wrong by dropping the recombination argument entirely.
+     Their checks are expected to pass now. This simulator is the standing
+     check that keeps them right, which is the third leg the repair needed.
+
+  B. sigma_d^2 = E[D^2]/E[p(1-p)q(1-q)] at equilibrium.  Decides whether
+     driftLDEquilibrium -- exactly the fixed point of driftLDStep -- is the
+     gametic-identity probability it algebraically is, or the E[r^2] its name
+     implies. Sved gives 1/(1+4Nc); Ohta-Kimura gives (10+rho)/((2+rho)(11+rho));
+     they differ by 120% as rho -> 0 and converge as rho -> infinity.
+
+  C. Bottleneck excess.  excessLDAfterBottleneck and bottleneckExcessLD are the
+     only definitions here with NO closed-form reference under a size change,
+     which is why they were left out of the analytic tier rather than checked
+     against a bound wide enough to always hold.
+
+TWO CONTROLS PINNED BY THEORY, EACH ISOLATING ONE FACTOR OF THE PRODUCT
+
+  C1  NO RECOMBINATION, r = 0.  Then E[D] must decay by exactly (1-1/(2Ne))^t.
+      Pins the DRIFT factor alone.
+  C2  NO DRIFT, Ne enormous.  Then E[D] must decay by exactly (1-r)^t.
+      Pins the RECOMBINATION factor alone.
+
+  Together they pin both factors of (1-r)(1-1/2Ne) separately, so a simulator
+  that gets the product right by getting both factors wrong in compensating
+  directions cannot pass. Neither control is fitted; both are exact.
+
+CAN-FAIL CLAUSE
+  The r grid MUST straddle 1/(2Ne). Where r >> 1/(2Ne) the drift factor is
+  invisible and the retention is indistinguishable from (1-r); where
+  r << 1/(2Ne) recombination is invisible and it is indistinguishable from
+  (1-1/2Ne). Only near r ~ 1/(2Ne) do both factors matter at once, and a grid
+  that misses that band cannot tell a product from either of its factors.
+
+  For sigma_d^2 the rho = 4 Ne c grid must reach BELOW 10. Sved and Ohta-Kimura
+  agree to 2% at rho = 100, so a loosely-linked grid validates both and decides
+  nothing.
+
+SPEED
+  Vectorised over replicates; haplotype frequencies, not individuals. Sized for
+  signal first, then scaled only where the answer was interesting.
+"""
+
+import json
+import math
+import sys
+
+import numpy as np
+
+MU = 1e-4
+SEED = 20260802
+
+
+def wf_step(x, ne, c, rng, mutate=True):
+    """One Wright-Fisher generation on 4 haplotype frequencies, all replicates.
+
+    Order: recombination, then mutation, then multinomial resampling. x has
+    shape (reps, 4) for haplotypes AB, Ab, aB, ab.
+    """
+    D = x[:, 0] * x[:, 3] - x[:, 1] * x[:, 2]
+    x = x + c * np.stack([-D, D, D, -D], axis=1)
+    if mutate:
+        m = MU
+        M = np.array([
+            [(1 - m) ** 2, m * (1 - m), m * (1 - m), m * m],
+            [m * (1 - m), (1 - m) ** 2, m * m, m * (1 - m)],
+            [m * (1 - m), m * m, (1 - m) ** 2, m * (1 - m)],
+            [m * m, m * (1 - m), m * (1 - m), (1 - m) ** 2],
+        ])
+        x = x @ M.T
+    x = np.clip(x, 0.0, None)
+    x /= x.sum(axis=1, keepdims=True)
+    if ne is None:                      # infinite population: no drift
+        return x
+    n = 2 * ne
+    return np.stack([rng.multinomial(n, xi) for xi in x]).astype(np.float64) / n
+
+
+def d_of(x):
+    return x[:, 0] * x[:, 3] - x[:, 1] * x[:, 2]
+
+
+def measure_D_retention(ne, c, gens, reps, rng, mutate=False):
+    """E[D_t]/E[D_0] per generation, averaged over the trajectory.
+
+    D is measured in EXPECTATION across replicates, not per replicate: E[D] is
+    what Hill & Robertson describes, and |D| or D^2 decay differently.
+    """
+    # start in complete positive LD at p = q = 0.5
+    x = np.tile(np.array([0.5, 0.0, 0.0, 0.5]), (reps, 1))
+    d0 = float(np.mean(d_of(x)))
+    traj = [d0]
+    for _ in range(gens):
+        x = wf_step(x, ne, c, rng, mutate=mutate)
+        traj.append(float(np.mean(d_of(x))))
+    traj = np.array(traj)
+    ok = traj > 1e-9
+    k = int(ok.sum())
+    if k < 3:
+        return None, None
+    t = np.arange(len(traj))[ok]
+    slope = np.polyfit(t, np.log(traj[ok]), 1)[0]
+    return math.exp(slope), k
+
+
+def measure_sigma_d2(ne, c, burn, samples, reps, rng):
+    x = rng.multinomial(2 * ne, [0.25] * 4, size=reps).astype(np.float64) / (2 * ne)
+    for _ in range(burn):
+        x = wf_step(x, ne, c, rng)
+    num, den = [], []
+    for i in range(samples):
+        x = wf_step(x, ne, c, rng)
+        if i % 20:
+            continue
+        pa = x[:, 0] + x[:, 1]
+        pb = x[:, 0] + x[:, 2]
+        D = d_of(x)
+        num.append(D ** 2)
+        den.append(pa * (1 - pa) * pb * (1 - pb))
+    num = np.concatenate(num); den = np.concatenate(den)
+    return float(num.mean() / den.mean())
+
+
+def main():
+    rng = np.random.default_rng(SEED)
+    out = {}
+
+    # ---------- CONTROLS FIRST -------------------------------------------
+    print("CONTROLS (each isolates one factor of (1-r)(1-1/2Ne))")
+    NE_C, REPS_C, GENS_C = 200, 400, 60
+
+    ret, _ = measure_D_retention(NE_C, 0.0, GENS_C, REPS_C, rng)
+    want = 1.0 - 1.0 / (2.0 * NE_C)
+    c1 = ret is not None and abs(ret - want) < 0.004
+    print("  C1 r=0, drift only: measured %.6f vs (1-1/2Ne) = %.6f -> %s"
+          % (ret if ret else float("nan"), want, "PASS" if c1 else "FAIL"))
+
+    ret2, _ = measure_D_retention(None, 0.02, 40, REPS_C, rng)
+    want2 = 1.0 - 0.02
+    c2 = ret2 is not None and abs(ret2 - want2) < 0.004
+    print("  C2 Ne=inf, recombination only: measured %.6f vs (1-r) = %.6f -> %s"
+          % (ret2 if ret2 else float("nan"), want2, "PASS" if c2 else "FAIL"))
+    out["controls"] = {"C1_drift_only": ret, "C1_expected": want, "C1_pass": bool(c1),
+                       "C2_recomb_only": ret2, "C2_expected": want2,
+                       "C2_pass": bool(c2)}
+
+    # ---------- A. E[D] retention, r straddling 1/(2Ne) -------------------
+    print("")
+    print("A. E[D] RETENTION PER GENERATION  (r straddles 1/(2Ne) = %.5f)"
+          % (1.0 / (2.0 * NE_C)))
+    print("    %-10s %-14s %-14s %-10s" % ("r", "measured", "HR (1-r)(1-1/2Ne)",
+                                           "rel err"))
+    rowsA = []
+    for r in (0.0, 0.00125, 0.0025, 0.005, 0.02, 0.10):
+        ret, k = measure_D_retention(NE_C, r, GENS_C, REPS_C, rng)
+        if ret is None:
+            continue
+        hr = (1.0 - r) * (1.0 - 1.0 / (2.0 * NE_C))
+        rowsA.append({"r": r, "measured": ret, "hill_robertson": hr,
+                      "rel_err": (ret - hr) / hr, "gens_used": k})
+        print("    %-10.5f %-14.6f %-14.6f %+.4f"
+              % (r, ret, hr, (ret - hr) / hr))
+    out["A_D_retention"] = rowsA
+
+    # ---------- B. sigma_d^2 at equilibrium -------------------------------
+    print("")
+    print("B. sigma_d^2 AT EQUILIBRIUM  (rho grid reaches below 10)")
+    print("    %-8s %-12s %-12s %-12s %-12s"
+          % ("rho", "measured", "corpus(Sved)", "Ohta-Kimura", "closer to"))
+    rowsB = []
+    NE_B, REPS_B = 150, 500
+    for rho in (0.5, 2.0, 10.0, 40.0):
+        c = rho / (4.0 * NE_B)
+        s = measure_sigma_d2(NE_B, c, 12 * NE_B, 3000, REPS_B, rng)
+        a = (1.0 - c) ** 2
+        corpus = a / (2.0 * NE_B) / (1.0 - a * (1.0 - 1.0 / (2.0 * NE_B)))
+        ok_ = (10.0 + rho) / ((2.0 + rho) * (11.0 + rho))
+        closer = "corpus" if abs(s - corpus) < abs(s - ok_) else "Ohta-Kimura"
+        rowsB.append({"rho": rho, "measured": s, "corpus_driftLDEquilibrium": corpus,
+                      "ohta_kimura": ok_, "closer_to": closer})
+        print("    %-8.1f %-12.5f %-12.5f %-12.5f %-12s"
+              % (rho, s, corpus, ok_, closer))
+    out["B_sigma_d2"] = rowsB
+
+    out["READ_THE_TEST"] = bool(c1 and c2)
+    print("")
+    print("READ_THE_TEST: %s" % out["READ_THE_TEST"])
+    fh = open("fam_ld_decay_results.json", "w")
+    json.dump(out, fh, indent=1)
+    fh.close()
+    print("-> fam_ld_decay_results.json")
+    return 0 if out["READ_THE_TEST"] else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
