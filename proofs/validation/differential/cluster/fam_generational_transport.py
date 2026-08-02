@@ -433,6 +433,7 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
     outcome_var_S_all = va_S_all + ve
 
     rows = []
+    perlocus = []
     g = 0
     for t in grid:
         while g < t:
@@ -533,6 +534,17 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
                 "source_gaussianAUC": src_m["gaussianAUC"],
                 "targetOutcomeVarianceAt": outcome_var_T,
             })
+            if k == 0:
+                perlocus.append({
+                    "t": t,
+                    "p_tag_source": [float(x) for x in p_tag_S],
+                    "p_tag_target": [float(x) for x in p_tag_T],
+                    "sigmaTag_diag_source": [float(x) for x in
+                                             np.diag(sig_tag_S)],
+                    "sigmaTag_diag_target": [float(x) for x in
+                                             np.diag(sig_tag_T_meas)],
+                    "tagAlleleFreqRetentionAt": [float(x) for x in ret_tag],
+                })
 
         fst_ra, fst_ar = fst_nei(st["a0"], st["a1"])
         row = {
@@ -560,7 +572,7 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
                   f"  R2meas={row['meas_r2']:.4f}"
                   f" metricAlone={row['metricLayerAlone_r2']:.4f}"
                   f" composite={row['composite_r2']:.4f}", flush=True)
-    return rows
+    return rows, perlocus
 
 
 def safe_ratio_mean(a, b):
@@ -729,18 +741,20 @@ def main():
                           "gens": GENS, "grid": GRID, "seed": SEED,
                           "h2": H2}}
     print("=== baseline: drift + mutation, no migration ===", flush=True)
-    base = run_scenario("base", NE, MU, 0.0, R_ADJ, GENS, GRID, REPS, SEED)
+    base, base_pl = run_scenario("base", NE, MU, 0.0, R_ADJ, GENS, GRID, REPS, SEED)
     out["baseline"] = base
 
     print("=== drift only (mu = 0, mig = 0): C2 scenario ===", flush=True)
-    drift = run_scenario("drift", NE, 0.0, 0.0, R_ADJ, GENS, GRID, REPS,
+    drift, drift_pl = run_scenario("drift", NE, 0.0, 0.0, R_ADJ, GENS, GRID, REPS,
                          SEED + 101)
     out["drift_only"] = drift
 
     print("=== drift + migration (mig = 1/(4Ne) -> M = 1) ===", flush=True)
     mig = 1.0 / (4.0 * NE)
-    migr = run_scenario("mig", NE, MU, mig, R_ADJ, GENS, GRID, REPS, SEED + 202)
+    migr, migr_pl = run_scenario("mig", NE, MU, mig, R_ADJ, GENS, GRID, REPS, SEED + 202)
     out["with_migration"] = migr
+    out["per_locus"] = {"baseline": base_pl, "drift_only": drift_pl,
+                        "with_migration": migr_pl}
     out["migration_rate"] = mig
 
     out["controls"] = [control_c1(base), control_c2(NE, SEED),
