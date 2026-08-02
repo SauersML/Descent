@@ -2975,7 +2975,7 @@
  },
  "Calibrator.exactBrierRiskOfCalibrated": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/Conclusions.lean",
   "line": 143,
   "short": "exactBrierRiskOfCalibrated",
@@ -3172,7 +3172,7 @@
  },
  "Calibrator.populationRisk": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/Conclusions.lean",
   "line": 387,
   "short": "populationRisk",
@@ -3577,7 +3577,7 @@
  },
  "Calibrator.logLossRegret": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/Conclusions.lean",
   "line": 520,
   "short": "logLossRegret",
@@ -3605,7 +3605,7 @@
  },
  "Calibrator.logLossKLCertificate": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/Conclusions.lean",
   "line": 525,
   "short": "logLossKLCertificate",
@@ -3633,7 +3633,7 @@
  },
  "Calibrator.brierRegret": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/Conclusions.lean",
   "line": 617,
   "short": "brierRegret",
@@ -3657,7 +3657,7 @@
  },
  "Calibrator.brierL2Certificate": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/Conclusions.lean",
   "line": 622,
   "short": "brierL2Certificate",
@@ -3681,7 +3681,7 @@
  },
  "Calibrator.logRisk": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/Conclusions.lean",
   "line": 651,
   "short": "logRisk",
@@ -3752,7 +3752,7 @@
  },
  "Calibrator.brierRisk": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/Conclusions.lean",
   "line": 656,
   "short": "brierRisk",
@@ -5741,7 +5741,7 @@
  },
  "Calibrator.causalMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 100,
   "short": "causalMean",
@@ -5756,7 +5756,7 @@
  },
  "Calibrator.tagMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 105,
   "short": "tagMean",
@@ -5771,7 +5771,7 @@
  },
  "Calibrator.crossCovEntry": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 110,
   "short": "crossCovEntry",
@@ -5890,16 +5890,23 @@
  },
  "Calibrator.sourceBestLinearWeightsFromLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/DGP.lean",
   "line": 140,
   "short": "sourceBestLinearWeightsFromLD",
   "ret_type": "TagVec t",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "sourceBestLinearWeightsFromLD",
+  "args": [
+   "mom",
+   "betaCausal"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('sigmaTagSource')"
+  },
   "mentioned_by": [],
   "constraints": {}
  },
@@ -6094,7 +6101,7 @@
  },
  "Calibrator.ldWitnessBeta": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator/DGP.lean",
   "line": 195,
   "short": "ldWitnessBeta",
@@ -6109,7 +6116,7 @@
  },
  "Calibrator.ldWitnessSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceBestLinearWeightsFromLD",
+  "note": "self-check: calls untranslated definition ldWitnessSourceMoments",
   "file": "Calibrator/DGP.lean",
   "line": 198,
   "short": "ldWitnessSourceWeights",
@@ -6121,7 +6128,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceBestLinearWeightsFromLD' is not defined\")"
+   "error": "NameError(\"name 'ldWitnessSourceMoments' is not defined\")"
   },
   "mentioned_by": [
    "Calibrator.target_ld_shift_changes_explainedR2_under_fixed_source_weights"
@@ -6135,7 +6142,7 @@
  },
  "Calibrator.ldWitnessTargetCross": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator/DGP.lean",
   "line": 204,
   "short": "ldWitnessTargetCross",
@@ -6164,7 +6171,7 @@
  },
  "Calibrator.ldWitnessSigmaTargetIndependent": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator/DGP.lean",
   "line": 207,
   "short": "ldWitnessSigmaTargetIndependent",
@@ -6186,7 +6193,7 @@
  },
  "Calibrator.ldWitnessSigmaTargetCorrelated": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator/DGP.lean",
   "line": 211,
   "short": "ldWitnessSigmaTargetCorrelated",
@@ -7002,7 +7009,7 @@
  },
  "Calibrator.var": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 977,
   "short": "var",
@@ -7028,7 +7035,7 @@
  },
  "Calibrator.rsquared": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 983,
   "short": "rsquared",
@@ -7050,7 +7057,7 @@
  },
  "Calibrator.measureMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 1006,
   "short": "measureMean",
@@ -7094,7 +7101,7 @@
  },
  "Calibrator.measureVariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 1010,
   "short": "measureVariance",
@@ -7132,7 +7139,7 @@
  },
  "Calibrator.measureCovariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 1014,
   "short": "measureCovariance",
@@ -7175,7 +7182,7 @@
  },
  "Calibrator.measureExpMSE": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 1018,
   "short": "measureExpMSE",
@@ -7257,7 +7264,7 @@
  },
  "Calibrator.irreduciblePredictionRisk": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 1190,
   "short": "irreduciblePredictionRisk",
@@ -7289,7 +7296,7 @@
  },
  "Calibrator.conditionalMeanApproximationRisk": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 1195,
   "short": "conditionalMeanApproximationRisk",
@@ -7320,7 +7327,7 @@
  },
  "Calibrator.mse": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/DGP.lean",
   "line": 1335,
   "short": "mse",
@@ -10198,14 +10205,17 @@
    "Calibrator.constantDiagonal_class_is_rankOne_rigid",
    "Calibrator.covarianceMatrix_addRankOneSignal",
    "Calibrator.covariance_imitation_of_rankOne_closed",
+   "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump",
    "Calibrator.measurement_invariance_violation",
    "Calibrator.mulVec_add_rankOneCovarianceBump",
    "Calibrator.quadForm_rankOneCovarianceBump",
    "Calibrator.rankOneCovarianceBump_conjugate",
+   "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter",
    "Calibrator.rightTransform_addRankOneSignal",
    "Calibrator.secondMoment_imitation_invisible_to_orthogonal_score",
    "Calibrator.secondMoment_imitation_shift",
    "Calibrator.shiftInvariant_class_is_rankOne_rigid",
+   "Calibrator.spiked_eq_add_rankOneCovarianceBump",
    "Calibrator.spiked_genotype_covariance_belowCeiling",
    "Calibrator.standardizedGenotype_symmetric_iff",
    "Calibrator.target_axis_control_iff_uniformly_unbiased",
@@ -10237,7 +10247,10 @@
     "Calibrator.secondMoment_imitation_invisible_to_orthogonal_score": [],
     "Calibrator.rankOneCovarianceBump_conjugate": [],
     "Calibrator.rightTransform_addRankOneSignal": [],
-    "Calibrator.target_axis_control_iff_uniformly_unbiased": []
+    "Calibrator.target_axis_control_iff_uniformly_unbiased": [],
+    "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter": [],
+    "Calibrator.spiked_eq_add_rankOneCovarianceBump": [],
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": []
    }
   }
  },
@@ -10378,7 +10391,7 @@
  },
  "Calibrator.GenotypeDesign.interactionOrder": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "qualified name design.locusSet",
   "file": "Calibrator/EpistaticChaos.lean",
   "line": 792,
   "short": "interactionOrder",
@@ -10413,7 +10426,7 @@
  },
  "Calibrator.GenotypeDesign.statistic": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "Finset/indexed sum",
   "file": "Calibrator/EpistaticChaos.lean",
   "line": 800,
   "short": "statistic",
@@ -10548,7 +10561,7 @@
  },
  "Calibrator.GenotypeDesign.variantRecurrence": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "qualified name Finset.univ.filter",
   "file": "Calibrator/EpistaticChaos.lean",
   "line": 853,
   "short": "variantRecurrence",
@@ -10559,17 +10572,27 @@
   "box": {},
   "selfcheck": null,
   "mentioned_by": [
+   "Calibrator.GenotypeDesign.overlap_row_sum_eq_recurrence",
+   "Calibrator.GenotypeDesign.variantRecurrence_eq_card_of_ubiquitous",
    "Calibrator.GenotypeDesign.variantRecurrence_le_one_of_disjoint",
+   "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free",
    "Calibrator.recurrence_preserving_resampling_is_not_a_calibration"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
    "declared_lo": 0.0,
    "declared_hi": null,
-   "hypotheses": [],
+   "hypotheses": [
+    "∀ s : ιx, i ∈ design.locusSet s"
+   ],
    "hypotheses_by_theorem": {
     "Calibrator.recurrence_preserving_resampling_is_not_a_calibration": [],
-    "Calibrator.GenotypeDesign.variantRecurrence_le_one_of_disjoint": []
+    "Calibrator.GenotypeDesign.variantRecurrence_le_one_of_disjoint": [],
+    "Calibrator.GenotypeDesign.overlap_row_sum_eq_recurrence": [],
+    "Calibrator.GenotypeDesign.variantRecurrence_eq_card_of_ubiquitous": [
+     "∀ s : ιx, i ∈ design.locusSet s"
+    ],
+    "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free": []
    },
    "range_hi_thm": [
     "Calibrator.GenotypeDesign.variantRecurrence_le_one_of_disjoint",
@@ -10781,7 +10804,11 @@
    "error": null
   },
   "mentioned_by": [
+   "Calibrator.circulantSpectrumA_at_neg_one",
+   "Calibrator.circulantSpectrumA_at_neg_root",
+   "Calibrator.circulantSpectrumA_at_one",
    "Calibrator.circulantSpectrumA_at_quarter_turn",
+   "Calibrator.circulantSpectrumA_at_root",
    "Calibrator.circulantSpectrumA_eq_cos",
    "Calibrator.palindromic_circulant_spectra_differ"
   ],
@@ -10790,7 +10817,11 @@
    "hypotheses_by_theorem": {
     "Calibrator.circulantSpectrumA_eq_cos": [],
     "Calibrator.circulantSpectrumA_at_quarter_turn": [],
-    "Calibrator.palindromic_circulant_spectra_differ": []
+    "Calibrator.palindromic_circulant_spectra_differ": [],
+    "Calibrator.circulantSpectrumA_at_one": [],
+    "Calibrator.circulantSpectrumA_at_neg_one": [],
+    "Calibrator.circulantSpectrumA_at_root": [],
+    "Calibrator.circulantSpectrumA_at_neg_root": []
    }
   }
  },
@@ -10818,6 +10849,11 @@
    "error": null
   },
   "mentioned_by": [
+   "Calibrator.circulantSpectrumB_at_neg_one",
+   "Calibrator.circulantSpectrumB_at_neg_root",
+   "Calibrator.circulantSpectrumB_at_one",
+   "Calibrator.circulantSpectrumB_at_root",
+   "Calibrator.circulantSpectrumB_at_zero",
    "Calibrator.circulantSpectrumB_eq_cos",
    "Calibrator.circulantSpectrumB_ne_neg_four",
    "Calibrator.palindromic_circulant_spectra_differ"
@@ -10827,7 +10863,285 @@
    "hypotheses_by_theorem": {
     "Calibrator.circulantSpectrumB_eq_cos": [],
     "Calibrator.circulantSpectrumB_ne_neg_four": [],
-    "Calibrator.palindromic_circulant_spectra_differ": []
+    "Calibrator.palindromic_circulant_spectra_differ": [],
+    "Calibrator.circulantSpectrumB_at_one": [],
+    "Calibrator.circulantSpectrumB_at_neg_one": [],
+    "Calibrator.circulantSpectrumB_at_zero": [],
+    "Calibrator.circulantSpectrumB_at_root": [],
+    "Calibrator.circulantSpectrumB_at_neg_root": []
+   }
+  }
+ },
+ "Calibrator.GenotypeDesign.overlapMatrix": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "expected ')', found op:∩",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1462,
+  "short": "overlapMatrix",
+  "ret_type": "Matrix ιx ιx ℝ",
+  "empirical_status": "UNTESTED",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "mentioned_by": [
+   "Calibrator.GenotypeDesign.overlapMatrix_symm"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Calibrator.GenotypeDesign.overlapMatrix_symm": []
+   }
+  }
+ },
+ "Calibrator.GenotypeDesign.cycleDensity": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Matrix.trace",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1481,
+  "short": "cycleDensity",
+  "ret_type": "ℝ",
+  "empirical_status": "UNTESTED",
+  "python": null,
+  "args": [],
+  "box": {
+   "p": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "mentioned_by": [
+   "Calibrator.CycleDeterminacy.cycle_preserving_resampling_is_a_calibration",
+   "Calibrator.CycleDeterminacy.no_moment_matching_calibration_off_temperedness",
+   "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "CD.isAdmissible design",
+    "design.BoundedHubRecurrence bound",
+    "∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p",
+    "design.cycleDensity 4 = palindromicCycleDensityA s 4"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.CycleDeterminacy.cycle_preserving_resampling_is_a_calibration": [
+     "CD.isAdmissible design",
+     "design.BoundedHubRecurrence bound",
+     "∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p"
+    ],
+    "Calibrator.CycleDeterminacy.no_moment_matching_calibration_off_temperedness": [],
+    "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free": [
+     "design.cycleDensity 4 = palindromicCycleDensityA s 4"
+    ]
+   }
+  }
+ },
+ "Calibrator.GenotypeDesign.Tempered": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1515,
+  "short": "Tempered",
+  "ret_type": "Prop",
+  "empirical_status": "UNTESTED",
+  "python": null,
+  "args": [],
+  "box": {
+   "rate": [
+    0.02,
+    0.98
+   ]
+  },
+  "selfcheck": null,
+  "mentioned_by": [
+   "Calibrator.CycleDeterminacy.no_moment_matching_calibration_off_temperedness"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Calibrator.CycleDeterminacy.no_moment_matching_calibration_off_temperedness": []
+   }
+  }
+ },
+ "Calibrator.GenotypeDesign.BoundedHubRecurrence": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1524,
+  "short": "BoundedHubRecurrence",
+  "ret_type": "Prop",
+  "empirical_status": "UNTESTED",
+  "python": null,
+  "args": [],
+  "box": {
+   "bound": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "mentioned_by": [
+   "Calibrator.CycleDeterminacy.cycle_preserving_resampling_is_a_calibration",
+   "Calibrator.GenotypeDesign.ubiquitous_variant_forces_hub_bound"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "∀ s : ιx, i ∈ design.locusSet s",
+    "design.BoundedHubRecurrence bound",
+    "CD.isAdmissible design",
+    "resampled.BoundedHubRecurrence bound",
+    "∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.GenotypeDesign.ubiquitous_variant_forces_hub_bound": [
+     "∀ s : ιx, i ∈ design.locusSet s",
+     "design.BoundedHubRecurrence bound"
+    ],
+    "Calibrator.CycleDeterminacy.cycle_preserving_resampling_is_a_calibration": [
+     "CD.isAdmissible design",
+     "design.BoundedHubRecurrence bound",
+     "resampled.BoundedHubRecurrence bound",
+     "∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p"
+    ]
+   }
+  }
+ },
+ "Calibrator.palindromicCycleDensityA": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1694,
+  "short": "palindromicCycleDensityA",
+  "ret_type": "ℝ",
+  "empirical_status": "UNTESTED",
+  "python": "palindromicCycleDensityA",
+  "args": [
+   "s",
+   "p"
+  ],
+  "box": {
+   "s": [
+    0.05,
+    3.0
+   ],
+   "p": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "mentioned_by": [
+   "Calibrator.palindromicCycleDensityA_four",
+   "Calibrator.palindromicCycleDensityA_two",
+   "Calibrator.palindromic_fourth_cycle_densities_differ",
+   "Calibrator.palindromic_second_cycle_densities_equal",
+   "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "s ^ 2 = 2",
+    "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+    "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.palindromicCycleDensityA_two": [
+     "s ^ 2 = 2"
+    ],
+    "Calibrator.palindromic_second_cycle_densities_equal": [
+     "s ^ 2 = 2"
+    ],
+    "Calibrator.palindromicCycleDensityA_four": [
+     "s ^ 2 = 2"
+    ],
+    "Calibrator.palindromic_fourth_cycle_densities_differ": [
+     "s ^ 2 = 2"
+    ],
+    "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free": [
+     "s ^ 2 = 2",
+     "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+     "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+    ]
+   }
+  }
+ },
+ "Calibrator.palindromicCycleDensityB": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1703,
+  "short": "palindromicCycleDensityB",
+  "ret_type": "ℝ",
+  "empirical_status": "UNTESTED",
+  "python": "palindromicCycleDensityB",
+  "args": [
+   "s",
+   "p"
+  ],
+  "box": {
+   "s": [
+    0.05,
+    3.0
+   ],
+   "p": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "mentioned_by": [
+   "Calibrator.palindromicCycleDensityB_four",
+   "Calibrator.palindromicCycleDensityB_two",
+   "Calibrator.palindromic_fourth_cycle_densities_differ",
+   "Calibrator.palindromic_second_cycle_densities_equal",
+   "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "s ^ 2 = 2",
+    "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+    "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.palindromicCycleDensityB_two": [
+     "s ^ 2 = 2"
+    ],
+    "Calibrator.palindromic_second_cycle_densities_equal": [
+     "s ^ 2 = 2"
+    ],
+    "Calibrator.palindromicCycleDensityB_four": [
+     "s ^ 2 = 2"
+    ],
+    "Calibrator.palindromic_fourth_cycle_densities_differ": [
+     "s ^ 2 = 2"
+    ],
+    "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free": [
+     "s ^ 2 = 2",
+     "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+     "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+    ]
    }
   }
  },
@@ -13042,14 +13356,17 @@
    "Calibrator.constantDiagonal_class_is_rankOne_rigid",
    "Calibrator.covarianceMatrix_addRankOneSignal",
    "Calibrator.covariance_imitation_of_rankOne_closed",
+   "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump",
    "Calibrator.mulVec_add_rankOneCovarianceBump",
    "Calibrator.quadForm_rankOneCovarianceBump",
    "Calibrator.rankOneCovarianceBump_conjugate",
+   "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter",
    "Calibrator.rankOneCovarianceBump_sampleNormalized",
    "Calibrator.secondMoment_imitation_invisible_to_orthogonal_score",
    "Calibrator.secondMoment_imitation_shift",
    "Calibrator.shiftInvariant_class_is_rankOne_rigid",
    "Calibrator.spikeOuter_eq_rankOneCovarianceBump",
+   "Calibrator.spiked_eq_add_rankOneCovarianceBump",
    "Calibrator.varianceNonneg_sub_rankOne_iff"
   ],
   "constraints": {
@@ -13108,7 +13425,12 @@
      "dot loading weights = 0"
     ],
     "Calibrator.rankOneCovarianceBump_conjugate": [],
-    "Calibrator.spikeOuter_eq_rankOneCovarianceBump": []
+    "Calibrator.spikeOuter_eq_rankOneCovarianceBump": [],
+    "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter": [],
+    "Calibrator.spiked_eq_add_rankOneCovarianceBump": [],
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [
+     "scale ≠ 0"
+    ]
    }
   }
  },
@@ -13434,6 +13756,7 @@
   "selfcheck": null,
   "mentioned_by": [
    "Calibrator.belowCeiling_add_rankOne_iff",
+   "Calibrator.diagonalGap_imitationCapacity_eq_zero",
    "Calibrator.gramForm_sq_le",
    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
    "Calibrator.positive_pc_margin_does_not_imply_detectable",
@@ -13480,6 +13803,7 @@
     "Calibrator.traceWindow_rigid": [
      "∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v"
     ],
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero": [],
     "Calibrator.imitable_despite_positive_pcCorrectabilityMargin": [],
     "Calibrator.positive_pc_margin_does_not_imply_detectable": []
    }
@@ -16453,14 +16777,17 @@
  },
  "Calibrator.temporalExactBrierRisk": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: calls untranslated definition temporalMetricProfile",
   "file": "Calibrator/LongitudinalPortability.lean",
   "line": 383,
   "short": "temporalExactBrierRisk",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "temporalExactBrierRisk",
+  "args": [
+   "π",
+   "signalAtTime"
+  ],
   "box": {
    "π": [
     0.05,
@@ -16471,7 +16798,11 @@
     3.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'temporalMetricProfile' is not defined\")"
+  },
   "mentioned_by": [
    "Calibrator.brier_calibration_worsens_discrimination_stable",
    "Calibrator.temporalExactBrierRisk_eq_prevalence_scale"
@@ -17249,7 +17580,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1182,
+  "line": 1183,
   "short": "ldBandDetectionShare",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -17319,7 +17650,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1189,
+  "line": 1190,
   "short": "ldPruningDetectionDeficit",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -17395,7 +17726,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1393,
+  "line": 1394,
   "short": "ldPanelRetentionFraction",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -17469,7 +17800,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1444,
+  "line": 1445,
   "short": "ldBlockReconstructionShare",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -17510,7 +17841,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1455,
+  "line": 1456,
   "short": "ldBlockDetectionShare",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -17583,7 +17914,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1465,
+  "line": 1466,
   "short": "ldBlockPruningDeficit",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -17656,7 +17987,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1476,
+  "line": 1477,
   "short": "ldTightLinkageDetectionShare",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -19099,9 +19430,11 @@
   },
   "mentioned_by": [
    "Calibrator.BackgroundClass.isNull_spiked_of_le_imitationCapacity",
+   "Calibrator.diagonalGapForm_spikeOuter",
    "Calibrator.frobeniusForm_spikeOuter",
    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
    "Calibrator.quadForm_spikeOuter",
+   "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter",
    "Calibrator.spikeOuter_eq_rankOneCovarianceBump",
    "Calibrator.traceForm_spikeOuter",
    "Calibrator.varianceNonneg_spikeOuter"
@@ -19122,6 +19455,8 @@
     ],
     "Calibrator.frobeniusForm_spikeOuter": [],
     "Calibrator.traceForm_spikeOuter": [],
+    "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter": [],
+    "Calibrator.diagonalGapForm_spikeOuter": [],
     "Calibrator.imitable_despite_positive_pcCorrectabilityMargin": []
    }
   }
@@ -19200,6 +19535,8 @@
    "Calibrator.EquiExit.imitationCapacity_eq",
    "Calibrator.EquiExit.margin_pos_of_gt_capacity",
    "Calibrator.active_budget_makes_stratification_detectable",
+   "Calibrator.diagonalGap_imitationCapacity_eq_zero",
+   "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump",
    "Calibrator.grm_absorbs_tested_association",
    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
    "Calibrator.imitationCapacity_eq_whitenedCapacity",
@@ -19235,6 +19572,8 @@
     ],
     "Calibrator.traceWindowClass_isNull_baseline": [],
     "Calibrator.traceWindow_every_level_detectable": [],
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero": [],
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [],
     "Calibrator.imitationCapacity_eq_whitenedCapacity": [],
     "Calibrator.imitable_despite_positive_pcCorrectabilityMargin": [],
     "Calibrator.not_isNull_of_demographicSpike_gt_budget": [],
@@ -19270,6 +19609,9 @@
    "Calibrator.demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
    "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
    "Calibrator.demographicSpike_eq_level_mul_spikeLoad",
+   "Calibrator.diagonalGapClass_spikeLoad",
+   "Calibrator.diagonalGap_imitationCapacity_eq_zero",
+   "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump",
    "Calibrator.traceWindowBudgetClass_spikeLoad",
    "Calibrator.traceWindowClass_spikeLoad",
    "Calibrator.traceWindow_spikeLoad_demographic"
@@ -19281,7 +19623,8 @@
     "∀ (a : cidx",
     "K.Active a S₀",
     "∀ a : cidx, K'.form (f a",
-    "∀ a : cidx, K'.bound (f a"
+    "∀ a : cidx, K'.bound (f a",
+    "v j ^ 2 < v i ^ 2"
    ],
    "hypotheses_by_theorem": {
     "Calibrator.demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad": [],
@@ -19314,6 +19657,14 @@
     "Calibrator.EquiExit.exitLevels_nonempty": [],
     "Calibrator.EquiExit.imitationCapacity_eq": [],
     "Calibrator.traceWindowClass_spikeLoad": [],
+    "Calibrator.diagonalGapClass_spikeLoad": [],
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero": [
+     "v ∈ support",
+     "v j ^ 2 < v i ^ 2"
+    ],
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [
+     "v j ^ 2 < v i ^ 2"
+    ],
     "Calibrator.traceWindow_spikeLoad_demographic": [],
     "Calibrator.demographicSpike_eq_level_mul_spikeLoad": []
    }
@@ -19418,13 +19769,17 @@
    "Calibrator.BackgroundClass.headroom_eq_zero_of_active",
    "Calibrator.BackgroundClass.imitationCapacity_eq_zero_of_active",
    "Calibrator.BackgroundClass.not_isNull_spiked_of_active",
+   "Calibrator.diagonalGap_imitationCapacity_eq_zero",
+   "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump",
    "Calibrator.traceWindowClass_active"
   ],
   "constraints": {
    "hypotheses": [
     "K.Active a S₀",
     "0 < K.spikeLoad a v",
-    "K.IsNull S₀"
+    "K.IsNull S₀",
+    "VarianceNonneg (S₀ - base",
+    "S₀ i i = S₀ j j"
    ],
    "hypotheses_by_theorem": {
     "Calibrator.BackgroundClass.headroom_eq_zero_of_active": [
@@ -19439,7 +19794,14 @@
      "K.Active a S₀",
      "0 < K.spikeLoad a v"
     ],
-    "Calibrator.traceWindowClass_active": []
+    "Calibrator.traceWindowClass_active": [],
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero": [
+     "VarianceNonneg (S₀ - base",
+     "S₀ i i = S₀ j j"
+    ],
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [
+     "S₀ i i = S₀ j j"
+    ]
    }
   }
  },
@@ -19473,6 +19835,7 @@
    "Calibrator.positive_pc_margin_does_not_imply_detectable",
    "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
    "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+   "Calibrator.spiked_eq_add_rankOneCovarianceBump",
    "Calibrator.stratification_imitable_iff_within_budget",
    "Calibrator.traceWindow_every_level_detectable"
   ],
@@ -19527,6 +19890,7 @@
      "v ≠ 0",
      "0 < t"
     ],
+    "Calibrator.spiked_eq_add_rankOneCovarianceBump": [],
     "Calibrator.imitable_despite_positive_pcCorrectabilityMargin": [
      "VarianceNonneg (S₀ - base",
      "traceForm S₀ + demographicSpike (N : ℝ"
@@ -19625,6 +19989,7 @@
    "Calibrator.BackgroundClass.le_imitationCapacity",
    "Calibrator.EquiExit.imitationCapacity_eq",
    "Calibrator.EquiExit.margin_pos_of_gt_capacity",
+   "Calibrator.diagonalGap_imitationCapacity_eq_zero",
    "Calibrator.grm_absorbs_tested_association",
    "Calibrator.imitationCapacity_eq_whitenedCapacity",
    "Calibrator.loco_lowers_imitation_wall",
@@ -19639,7 +20004,8 @@
     "K.Active a S₀",
     "K'.IsNull S₀",
     "K.imitationCapacity S₀ support < t",
-    "VarianceNonneg (S₀ - base"
+    "VarianceNonneg (S₀ - base",
+    "S₀ i i = S₀ j j"
    ],
    "hypotheses_by_theorem": {
     "Calibrator.BackgroundClass.imitationCapacity_le": [
@@ -19672,6 +20038,11 @@
     ],
     "Calibrator.traceWindow_rigid": [
      "VarianceNonneg (S₀ - base",
+     "v ∈ support"
+    ],
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero": [
+     "VarianceNonneg (S₀ - base",
+     "S₀ i i = S₀ j j",
      "v ∈ support"
     ],
     "Calibrator.imitationCapacity_eq_whitenedCapacity": [
@@ -19960,11 +20331,106 @@
    }
   }
  },
+ "Calibrator.diagonalGapForm": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
+  "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 878,
+  "short": "diagonalGapForm",
+  "ret_type": "ℝ",
+  "empirical_status": "DERIVED",
+  "python": "diagonalGapForm",
+  "args": [
+   "i",
+   "j",
+   "M"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "TypeError(\"'float' object is not callable\")"
+  },
+  "mentioned_by": [
+   "Calibrator.diagonalGapForm_add",
+   "Calibrator.diagonalGapForm_smul",
+   "Calibrator.diagonalGapForm_spikeOuter",
+   "Calibrator.diagonalGap_imitationCapacity_eq_zero",
+   "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "S₀ i i = S₀ j j",
+    "v j ^ 2 < v i ^ 2"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.diagonalGapForm_add": [],
+    "Calibrator.diagonalGapForm_smul": [],
+    "Calibrator.diagonalGapForm_spikeOuter": [],
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero": [
+     "S₀ i i = S₀ j j",
+     "v j ^ 2 < v i ^ 2"
+    ],
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [
+     "S₀ i i = S₀ j j",
+     "v j ^ 2 < v i ^ 2"
+    ]
+   }
+  }
+ },
+ "Calibrator.diagonalGapClass": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 910,
+  "short": "diagonalGapClass",
+  "ret_type": "BackgroundClass ι Unit where base",
+  "empirical_status": "UNTESTED",
+  "python": null,
+  "args": [],
+  "box": {
+   "budget": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "mentioned_by": [
+   "Calibrator.diagonalGapClass_spikeLoad",
+   "Calibrator.diagonalGap_imitationCapacity_eq_zero",
+   "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "VarianceNonneg (S₀ - base",
+    "S₀ i i = S₀ j j",
+    "v j ^ 2 < v i ^ 2"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.diagonalGapClass_spikeLoad": [],
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero": [
+     "VarianceNonneg (S₀ - base",
+     "S₀ i i = S₀ j j",
+     "v j ^ 2 < v i ^ 2"
+    ],
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [
+     "S₀ i i = S₀ j j",
+     "v j ^ 2 < v i ^ 2"
+    ]
+   }
+  }
+ },
  "Calibrator.traceWindowSpikeLoad": {
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 855,
+  "line": 1000,
   "short": "traceWindowSpikeLoad",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -20015,7 +20481,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 875,
+  "line": 1020,
   "short": "whitenedCapacity",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -20069,7 +20535,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 992,
+  "line": 1137,
   "short": "subgroupContrast",
   "ret_type": "ℕ → ℝ",
   "empirical_status": "DERIVED",
@@ -20116,7 +20582,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name i.val",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 998,
+  "line": 1143,
   "short": "demographicSpikeDirection",
   "ret_type": "Fin n → ℝ",
   "empirical_status": "DERIVED",
@@ -20194,7 +20660,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1075,
+  "line": 1220,
   "short": "stratificationCertificateMargin",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -20247,7 +20713,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1215,
+  "line": 1360,
   "short": "blockSpectrum",
   "ret_type": "ℕ → ℝ",
   "empirical_status": "DERIVED",
@@ -20297,7 +20763,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Finset/indexed sum",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1223,
+  "line": 1368,
   "short": "normalizedMoment",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -20334,7 +20800,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Finset/indexed sum",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1233,
+  "line": 1378,
   "short": "inverseTraceCertificate",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -20387,7 +20853,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1329,
+  "line": 1474,
   "short": "meffPerturbed",
   "ret_type": "ℕ → ℝ",
   "empirical_status": "DERIVED",
@@ -20441,7 +20907,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1334,
+  "line": 1479,
   "short": "meffFlat",
   "ret_type": "ℕ → ℝ",
   "empirical_status": "DERIVED",
@@ -20495,7 +20961,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1339,
+  "line": 1484,
   "short": "meffSize",
   "ret_type": "ℕ",
   "empirical_status": "DERIVED",
@@ -23094,15 +23560,23 @@
   "short": "targetCalibrationProfileAtGeneration",
   "ret_type": "CalibrationProfile",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "targetCalibrationProfileAtGeneration",
+  "args": [
+   "m",
+   "t",
+   "link"
+  ],
   "box": {
    "t": [
     1.0,
     20.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('toMechanisticCalibrationModelAt')"
+  },
   "mentioned_by": [
    "Calibrator.targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law",
    "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget",
@@ -23700,7 +24174,7 @@
  },
  "Calibrator.thresholdBandRate": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "qualified name Set.Ioc",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 1736,
   "short": "thresholdBandRate",
@@ -23741,7 +24215,7 @@
  },
  "Calibrator.downReclassificationRate": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "expected ')', found op:{",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 1743,
   "short": "downReclassificationRate",
@@ -24261,7 +24735,7 @@
  },
  "Calibrator.expectedQalyLoss": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 2538,
   "short": "expectedQalyLoss",
@@ -24969,7 +25443,7 @@
  },
  "Calibrator.expectedThresholdQalyLoss": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 3078,
   "short": "expectedThresholdQalyLoss",
@@ -31732,16 +32206,23 @@
  },
  "Calibrator.sourceERMWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (AttributeError(\"'float' object has no attribute 'mulVec'\"))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1149,
   "short": "sourceERMWeights",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "sourceERMWeights",
+  "args": [
+   "sigmaObsSource",
+   "crossSource"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "AttributeError(\"'float' object has no attribute 'mulVec'\")"
+  },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
    "Calibrator.commonAndRarePortableModel_sourceR2",
@@ -32041,7 +32522,7 @@
  },
  "Calibrator.sigmaObsSource": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1203,
   "short": "sigmaObsSource",
@@ -32066,7 +32547,7 @@
  },
  "Calibrator.sigmaObsTarget": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1207,
   "short": "sigmaObsTarget",
@@ -32097,7 +32578,7 @@
  },
  "Calibrator.crossSource": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1211,
   "short": "crossSource",
@@ -32122,7 +32603,7 @@
  },
  "Calibrator.crossTarget": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1215,
   "short": "crossTarget",
@@ -32165,7 +32646,7 @@
  },
  "Calibrator.wSource_opt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1219,
   "short": "wSource_opt",
@@ -32187,7 +32668,7 @@
  },
  "Calibrator.wTarget_opt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1223,
   "short": "wTarget_opt",
@@ -32209,16 +32690,22 @@
  },
  "Calibrator.sourceCrossCovariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1253,
   "short": "sourceCrossCovariance",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "sourceCrossCovariance",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('directCausalSource')"
+  },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
    "Calibrator.commonAndRarePortableModel_sourceR2",
@@ -32276,16 +32763,22 @@
  },
  "Calibrator.targetCrossCovariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalTarget'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1259,
   "short": "targetCrossCovariance",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "targetCrossCovariance",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('directCausalTarget')"
+  },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
    "Calibrator.commonAndRarePortableModel_targetR2",
@@ -32345,7 +32838,7 @@
  },
  "Calibrator.sourceWeightsFromExplicitDrivers": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1265,
   "short": "sourceWeightsFromExplicitDrivers",
@@ -32359,7 +32852,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
@@ -32497,16 +32990,22 @@
  },
  "Calibrator.sourceTaggingProjection": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1284,
   "short": "sourceTaggingProjection",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "sourceTaggingProjection",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('directCausalSource')"
+  },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
@@ -32539,16 +33038,22 @@
  },
  "Calibrator.targetTaggingProjection": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalTarget'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1289,
   "short": "targetTaggingProjection",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "targetTaggingProjection",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('directCausalTarget')"
+  },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
@@ -32622,16 +33127,22 @@
  },
  "Calibrator.targetSourceEffectProjection": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalTarget'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1316,
   "short": "targetSourceEffectProjection",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "targetSourceEffectProjection",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('directCausalTarget')"
+  },
   "mentioned_by": [
    "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law",
    "Calibrator.targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context",
@@ -32654,16 +33165,22 @@
  },
  "Calibrator.targetEffectHeterogeneityProjection": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalTarget'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1324,
   "short": "targetEffectHeterogeneityProjection",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "targetEffectHeterogeneityProjection",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('directCausalTarget')"
+  },
   "mentioned_by": [
    "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law",
    "Calibrator.targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context",
@@ -32686,16 +33203,22 @@
  },
  "Calibrator.targetNovelMutationEffectProjection": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalTarget'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1332,
   "short": "targetNovelMutationEffectProjection",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "targetNovelMutationEffectProjection",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('directCausalTarget')"
+  },
   "mentioned_by": [
    "Calibrator.targetCrossCovariance_eq_standing_plus_novelMutationEffect_plus_context",
    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores",
@@ -32818,16 +33341,22 @@
  },
  "Calibrator.targetDirectCausalProjection": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalTarget'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1347,
   "short": "targetDirectCausalProjection",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "targetDirectCausalProjection",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('directCausalTarget')"
+  },
   "mentioned_by": [
    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
    "Calibrator.baseline_mechanistic_metrics",
@@ -32879,16 +33408,22 @@
  },
  "Calibrator.targetProxyTaggingProjection": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('proxyTaggingTarget'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1352,
   "short": "targetProxyTaggingProjection",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "targetProxyTaggingProjection",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('proxyTaggingTarget')"
+  },
   "mentioned_by": [
    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
    "Calibrator.baseline_mechanistic_metrics",
@@ -32940,7 +33475,7 @@
  },
  "Calibrator.sourceScoreVarianceFromExplicitDrivers": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1463,
   "short": "sourceScoreVarianceFromExplicitDrivers",
@@ -32954,7 +33489,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
@@ -33003,7 +33538,7 @@
  },
  "Calibrator.targetScoreVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1471,
   "short": "targetScoreVarianceFromSourceWeights",
@@ -33017,7 +33552,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
@@ -33102,7 +33637,7 @@
  },
  "Calibrator.sourcePredictiveCovarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1477,
   "short": "sourcePredictiveCovarianceFromSourceWeights",
@@ -33116,7 +33651,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
@@ -33167,7 +33702,7 @@
  },
  "Calibrator.targetPredictiveCovarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1485,
   "short": "targetPredictiveCovarianceFromSourceWeights",
@@ -33181,7 +33716,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
@@ -33258,7 +33793,7 @@
  },
  "Calibrator.sourceCalibrationSlopeFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1493,
   "short": "sourceCalibrationSlopeFromSourceWeights",
@@ -33272,7 +33807,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law"
@@ -33286,7 +33821,7 @@
  },
  "Calibrator.targetCalibrationSlopeFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1501,
   "short": "targetCalibrationSlopeFromSourceWeights",
@@ -33300,7 +33835,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.mechanistic_target_identity_calibration_slopeDeviation_eq_one_sub",
@@ -33328,16 +33863,22 @@
  },
  "Calibrator.brokenTaggingResidual": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1629,
   "short": "brokenTaggingResidual",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "brokenTaggingResidual",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('directCausalSource')"
+  },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
    "Calibrator.brokenTaggingResidual_nonneg",
@@ -33410,16 +33951,22 @@
  },
  "Calibrator.ancestrySpecificLDResidual": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1647,
   "short": "ancestrySpecificLDResidual",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "ancestrySpecificLDResidual",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('sigmaTagSource')"
+  },
   "mentioned_by": [
    "Calibrator.ancestrySpecificLDResidual_nonneg",
    "Calibrator.baseline_mechanistic_metrics",
@@ -33605,7 +34152,7 @@
  },
  "Calibrator.irreducibleTargetResidualBurden": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition brokenTaggingResidual",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1697,
   "short": "irreducibleTargetResidualBurden",
@@ -33619,7 +34166,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'brokenTaggingResidual' is not defined\")"
+   "error": "KeyError('directCausalSource')"
   },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
@@ -33688,7 +34235,7 @@
  },
  "Calibrator.effectiveTargetOutcomeVariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition brokenTaggingResidual",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1738,
   "short": "effectiveTargetOutcomeVariance",
@@ -33702,7 +34249,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'brokenTaggingResidual' is not defined\")"
+   "error": "KeyError('directCausalSource')"
   },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
@@ -33780,7 +34327,7 @@
  },
  "Calibrator.sourceExplainedSignalVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1772,
   "short": "sourceExplainedSignalVarianceFromSourceWeights",
@@ -33794,7 +34341,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
@@ -33839,7 +34386,7 @@
  },
  "Calibrator.sourceR2FromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1778,
   "short": "sourceR2FromSourceWeights",
@@ -33853,7 +34400,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
@@ -33945,7 +34492,7 @@
  },
  "Calibrator.sourceResidualVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1786,
   "short": "sourceResidualVarianceFromSourceWeights",
@@ -33959,7 +34506,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances",
@@ -34030,7 +34577,7 @@
  },
  "Calibrator.targetExplainedSignalVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1855,
   "short": "targetExplainedSignalVarianceFromSourceWeights",
@@ -34044,7 +34591,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
@@ -34105,7 +34652,7 @@
  },
  "Calibrator.targetR2FromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1862,
   "short": "targetR2FromSourceWeights",
@@ -34119,7 +34666,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
@@ -34223,7 +34770,7 @@
  },
  "Calibrator.targetResidualVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition brokenTaggingResidual",
+  "note": "self-check: structure projection unavailable (KeyError('directCausalSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 1871,
   "short": "targetResidualVarianceFromSourceWeights",
@@ -34237,7 +34784,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'brokenTaggingResidual' is not defined\")"
+   "error": "KeyError('directCausalSource')"
   },
   "mentioned_by": [
    "Calibrator.targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances",
@@ -35532,21 +36079,28 @@
  },
  "Calibrator.targetSourceEffectProjectionAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 2607,
   "short": "targetSourceEffectProjectionAt",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "targetSourceEffectProjectionAt",
+  "args": [
+   "m",
+   "t"
+  ],
   "box": {
    "t": [
     1.0,
     20.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "TypeError(\"unsupported operand type(s) for +: 'function' and 'function'\")"
+  },
   "mentioned_by": [
    "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity",
    "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change"
@@ -35565,21 +36119,28 @@
  },
  "Calibrator.targetEffectHeterogeneityProjectionAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 2615,
   "short": "targetEffectHeterogeneityProjectionAt",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "targetEffectHeterogeneityProjectionAt",
+  "args": [
+   "m",
+   "t"
+  ],
   "box": {
    "t": [
     1.0,
     20.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "TypeError(\"unsupported operand type(s) for +: 'function' and 'function'\")"
+  },
   "mentioned_by": [
    "Calibrator.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity",
    "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change"
@@ -36624,7 +37185,7 @@
  },
  "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 3268,
   "short": "sourceEqualVarianceGaussianAUCFromSourceWeights",
@@ -36638,7 +37199,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
@@ -36657,7 +37218,7 @@
  },
  "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 3311,
   "short": "targetEqualVarianceGaussianAUCFromSourceWeights",
@@ -36671,7 +37232,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
@@ -39913,16 +40474,23 @@
  },
  "Calibrator.InformationTheoryBridge.bernoulliMeasure": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: calls untranslated definition bernoulliPMF",
   "file": "Calibrator/Probability.lean",
   "line": 29,
   "short": "bernoulliMeasure",
   "ret_type": "Measure Bool",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "bernoulliMeasure",
+  "args": [
+   "p",
+   "hp"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'bernoulliPMF' is not defined\")"
+  },
   "mentioned_by": [
    "Calibrator.InformationTheoryBridge.bernoulliKL_eq_zero_iff",
    "Calibrator.InformationTheoryBridge.klBern_eq_klDiv",
@@ -40528,7 +41096,7 @@
  },
  "Calibrator.HWEScoreModel.scoreMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "Finset/indexed sum",
   "file": "Calibrator/Probability.lean",
   "line": 359,
   "short": "scoreMean",
@@ -40543,7 +41111,7 @@
  },
  "Calibrator.HWEScoreModel.scoreVariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "Finset/indexed sum",
   "file": "Calibrator/Probability.lean",
   "line": 364,
   "short": "scoreVariance",
@@ -40570,7 +41138,7 @@
  },
  "Calibrator.HWEScoreModel.scoreThirdAbsMomentBound": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "Finset/indexed sum",
   "file": "Calibrator/Probability.lean",
   "line": 369,
   "short": "scoreThirdAbsMomentBound",
@@ -40822,7 +41390,7 @@
  },
  "Calibrator.stdNormalProdMeasure": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "qualified name ProbabilityTheory.gaussianReal",
   "file": "Calibrator/Probability.lean",
   "line": 466,
   "short": "stdNormalProdMeasure",
@@ -41054,21 +41622,30 @@
  },
  "Calibrator.etaLiabilityThreshold": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: calls untranslated definition noiseMeasureGivenX",
   "file": "Calibrator/Probability.lean",
   "line": 618,
   "short": "etaLiabilityThreshold",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "etaLiabilityThreshold",
+  "args": [
+   "hN",
+   "T",
+   "s",
+   "x"
+  ],
   "box": {
    "s": [
     0.05,
     3.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'noiseMeasureGivenX' is not defined\")"
+  },
   "mentioned_by": [
    "Calibrator.etaLiabilityThreshold_eq_gaussian_threshold"
   ],
@@ -41126,7 +41703,7 @@
  },
  "Calibrator.mseRisk": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/Probability.lean",
   "line": 653,
   "short": "mseRisk",
@@ -41157,7 +41734,7 @@
  },
  "Calibrator.predictionRiskY": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '∂'",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/Probability.lean",
   "line": 680,
   "short": "predictionRiskY",
@@ -43922,7 +44499,7 @@
  },
  "Calibrator.mechanisticPortabilityRatio": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sourceERMWeights",
+  "note": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
   "file": "Calibrator/SimulationValidation.lean",
   "line": 29,
   "short": "mechanisticPortabilityRatio",
@@ -43936,7 +44513,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sourceERMWeights' is not defined\")"
+   "error": "KeyError('sigmaTagSource')"
   },
   "mentioned_by": [
    "Calibrator.baseline_mechanistic_metrics",
@@ -49995,7 +50572,7 @@
  },
  "Calibrator.sigmaS": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator.lean",
   "line": 117,
   "short": "sigmaS",
@@ -50019,7 +50596,7 @@
  },
  "Calibrator.sigmaT": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator.lean",
   "line": 120,
   "short": "sigmaT",
@@ -50041,7 +50618,7 @@
  },
  "Calibrator.crossS": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator.lean",
   "line": 123,
   "short": "crossS",
@@ -50068,7 +50645,7 @@
  },
  "Calibrator.sigmaT2": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "Matrix/vector literal (![…])",
   "file": "Calibrator.lean",
   "line": 130,
   "short": "sigmaT2",

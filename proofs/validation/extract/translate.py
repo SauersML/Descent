@@ -39,6 +39,7 @@ TOKEN_RE = re.compile(r"""
     (?P<ws>\s+)
   | (?P<num>\d+\.\d+(?:[eE][-+]?\d+)?|\d+(?:[eE][-+]?\d+)?)
   | (?P<ident>[A-Za-z_Α-ωϑ-ϵᴀ-ᵿ℀-⅏Ḁ-ỿ][A-Za-z0-9_'Α-ωϑ-ϵ₀-₉ₐ-ₜḀ-ỿ]*(?:\.[A-Za-z0-9_'₀-₉]+)*)
+  | (?P<proj>\.[A-Za-z_][A-Za-z0-9_'₀-₉]*|\.[0-9]+)
   | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙∈∉⊆∩∪ℝℕℤ∞πΦ⁻¹])
   | (?P<other>.)
 """, re.X)
@@ -73,12 +74,27 @@ CONSTS = {"Real.pi": "_rt.pi", "π": "_rt.pi"}
 
 # tokens whose presence means the body is outside the arithmetic fragment
 HARD_STOP = {
+    ".card": "Finset cardinality", "∂": "integral / derivative",
     "∑": "Finset/indexed sum", "∏": "indexed product", "∫": "integral",
     "√": "notation √ (use Real.sqrt)", "⌊": "floor", "⌋": "floor",
     "‖": "norm of a vector/matrix", "∘": "function composition",
     "∈": "set membership", "∉": "set membership", "⊆": "set inclusion",
     "∩": "set operation", "∪": "set operation", "×": "product type",
     "⟨": "anonymous constructor", "⟩": "anonymous constructor",
+}
+
+
+# Characters that mean the body lives outside real arithmetic entirely.  Naming
+# the mathematics rather than the byte keeps the NOT-EXTRACTABLE reasons
+# actionable: "measure-theoretic integral" tells you no translator will help,
+# "unrecognised character '∂'" does not.
+NONARITH = {
+    "∂": "measure-theoretic integral (∫ … ∂μ)",
+    "∀": "universal quantifier", "∃": "existential quantifier",
+    "!": "Matrix/vector literal (![…])",
+    "μ": "measure argument", "σ": "sigma-algebra / measure argument",
+    "ω": "sample-space argument", "η": "measure-theoretic predictor",
+    "β": "vector-valued effect argument",
 }
 
 
@@ -107,7 +123,7 @@ def tokenize(src: str):
                 col += len(text)
             continue
         if kind == "other":
-            raise Untranslatable(f"unrecognised character {text!r}")
+            raise Untranslatable(NONARITH.get(text, f"unrecognised character {text!r}"))
         toks.append(Tok(kind, text, line, col, m.start()))
         col += len(text)
     return toks
@@ -210,7 +226,11 @@ class Parser:
                 break
             if p.text == "⁻¹":
                 self.next()
-                head = f"_rt.rinv({head})"
+                head = f"_rt.rinv({self._dep(head, 0)})"
+                continue
+            if p.kind == "proj":                      # (e).1 / (e).field
+                self.next()
+                head = f"_rt._proj({self._dep(head, 0)}, {p.text[1:]!r})"
                 continue
             if p.kind in ("ident", "num") or p.text in ("(", "-", "↑", "|"):
                 args.append(self._dep(self.atom(), 0))

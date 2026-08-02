@@ -11971,7 +11971,10 @@
      "Calibrator.secondMoment_imitation_invisible_to_orthogonal_score": [],
      "Calibrator.rankOneCovarianceBump_conjugate": [],
      "Calibrator.rightTransform_addRankOneSignal": [],
-     "Calibrator.target_axis_control_iff_uniformly_unbiased": []
+     "Calibrator.target_axis_control_iff_uniformly_unbiased": [],
+     "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter": [],
+     "Calibrator.spiked_eq_add_rankOneCovarianceBump": [],
+     "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": []
     }
    },
    "mentioned_by": [
@@ -11984,14 +11987,17 @@
     "Calibrator.constantDiagonal_class_is_rankOne_rigid",
     "Calibrator.covarianceMatrix_addRankOneSignal",
     "Calibrator.covariance_imitation_of_rankOne_closed",
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump",
     "Calibrator.measurement_invariance_violation",
     "Calibrator.mulVec_add_rankOneCovarianceBump",
     "Calibrator.quadForm_rankOneCovarianceBump",
     "Calibrator.rankOneCovarianceBump_conjugate",
+    "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter",
     "Calibrator.rightTransform_addRankOneSignal",
     "Calibrator.secondMoment_imitation_invisible_to_orthogonal_score",
     "Calibrator.secondMoment_imitation_shift",
     "Calibrator.shiftInvariant_class_is_rankOne_rigid",
+    "Calibrator.spiked_eq_add_rankOneCovarianceBump",
     "Calibrator.spiked_genotype_covariance_belowCeiling",
     "Calibrator.standardizedGenotype_symmetric_iff",
     "Calibrator.target_axis_control_iff_uniformly_unbiased",
@@ -12422,10 +12428,17 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "hypotheses": [],
+    "hypotheses": [
+     "∀ s : ιx, i ∈ design.locusSet s"
+    ],
     "hypotheses_by_theorem": {
      "Calibrator.recurrence_preserving_resampling_is_not_a_calibration": [],
-     "Calibrator.GenotypeDesign.variantRecurrence_le_one_of_disjoint": []
+     "Calibrator.GenotypeDesign.variantRecurrence_le_one_of_disjoint": [],
+     "Calibrator.GenotypeDesign.overlap_row_sum_eq_recurrence": [],
+     "Calibrator.GenotypeDesign.variantRecurrence_eq_card_of_ubiquitous": [
+      "∀ s : ιx, i ∈ design.locusSet s"
+     ],
+     "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free": []
     },
     "range_hi_thm": [
      "Calibrator.GenotypeDesign.variantRecurrence_le_one_of_disjoint",
@@ -12434,7 +12447,10 @@
     "range_hi": 1
    },
    "mentioned_by": [
+    "Calibrator.GenotypeDesign.overlap_row_sum_eq_recurrence",
+    "Calibrator.GenotypeDesign.variantRecurrence_eq_card_of_ubiquitous",
     "Calibrator.GenotypeDesign.variantRecurrence_le_one_of_disjoint",
+    "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free",
     "Calibrator.recurrence_preserving_resampling_is_not_a_calibration"
    ]
   },
@@ -12758,11 +12774,19 @@
     "hypotheses_by_theorem": {
      "Calibrator.circulantSpectrumA_eq_cos": [],
      "Calibrator.circulantSpectrumA_at_quarter_turn": [],
-     "Calibrator.palindromic_circulant_spectra_differ": []
+     "Calibrator.palindromic_circulant_spectra_differ": [],
+     "Calibrator.circulantSpectrumA_at_one": [],
+     "Calibrator.circulantSpectrumA_at_neg_one": [],
+     "Calibrator.circulantSpectrumA_at_root": [],
+     "Calibrator.circulantSpectrumA_at_neg_root": []
     }
    },
    "mentioned_by": [
+    "Calibrator.circulantSpectrumA_at_neg_one",
+    "Calibrator.circulantSpectrumA_at_neg_root",
+    "Calibrator.circulantSpectrumA_at_one",
     "Calibrator.circulantSpectrumA_at_quarter_turn",
+    "Calibrator.circulantSpectrumA_at_root",
     "Calibrator.circulantSpectrumA_eq_cos",
     "Calibrator.palindromic_circulant_spectra_differ"
    ]
@@ -12797,13 +12821,367 @@
     "hypotheses_by_theorem": {
      "Calibrator.circulantSpectrumB_eq_cos": [],
      "Calibrator.circulantSpectrumB_ne_neg_four": [],
-     "Calibrator.palindromic_circulant_spectra_differ": []
+     "Calibrator.palindromic_circulant_spectra_differ": [],
+     "Calibrator.circulantSpectrumB_at_one": [],
+     "Calibrator.circulantSpectrumB_at_neg_one": [],
+     "Calibrator.circulantSpectrumB_at_zero": [],
+     "Calibrator.circulantSpectrumB_at_root": [],
+     "Calibrator.circulantSpectrumB_at_neg_root": []
     }
    },
    "mentioned_by": [
+    "Calibrator.circulantSpectrumB_at_neg_one",
+    "Calibrator.circulantSpectrumB_at_neg_root",
+    "Calibrator.circulantSpectrumB_at_one",
+    "Calibrator.circulantSpectrumB_at_root",
+    "Calibrator.circulantSpectrumB_at_zero",
     "Calibrator.circulantSpectrumB_eq_cos",
     "Calibrator.circulantSpectrumB_ne_neg_four",
     "Calibrator.palindromic_circulant_spectra_differ"
+   ]
+  },
+  {
+   "name": "Calibrator.GenotypeDesign.overlapMatrix",
+   "short": "overlapMatrix",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/EpistaticChaos.lean",
+   "line": 1462,
+   "signature": "(design : GenotypeDesign nx ιx) : Matrix ιx ιx ℝ",
+   "args": [
+    {
+     "names": [
+      "design"
+     ],
+     "type": "GenotypeDesign nx ιx",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Matrix ιx ιx ℝ",
+   "body": "  fun s t => ((design.locusSet s ∩ design.locusSet t).card : ℝ)",
+   "docstring": "**The overlap structure of a design.** Entry `(s, t)` counts the variants\ntested by both set `s` and set `t`; the diagonal is the interaction order. This\nis the object whose spectrum the limit law is a function of, and whose row sums\nare the recurrence profile.\n\nEmpirical status: UNTESTED. A count matrix read off the design; no free parameter\nand nothing fitted.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator.GenotypeDesign",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Calibrator.GenotypeDesign.overlapMatrix_symm": []
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.GenotypeDesign.overlapMatrix_symm"
+   ]
+  },
+  {
+   "name": "Calibrator.GenotypeDesign.cycleDensity",
+   "short": "cycleDensity",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/EpistaticChaos.lean",
+   "line": 1481,
+   "signature": "(design : GenotypeDesign nx ιx) (p : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "design"
+     ],
+     "type": "GenotypeDesign nx ιx",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "p"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  Matrix.trace (design.overlapMatrix ^ p)",
+   "docstring": "**The `p`-th cycle density**: `trace (A ^ p)`, the total weight of closed\nwalks of length `p` in the overlap structure. For `p = 2` it is the squared\nFrobenius norm and for `p = 4` the fourth spectral moment.\n\nThese are the invariants the limit law is a function of, in contrast to the star\ndensities of `variantRecurrence`.\n\nEmpirical status: UNTESTED. A trace of a power of the overlap count matrix; no\nfree parameter and nothing fitted.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator.GenotypeDesign",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "CD.isAdmissible design",
+     "design.BoundedHubRecurrence bound",
+     "∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p",
+     "design.cycleDensity 4 = palindromicCycleDensityA s 4"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.CycleDeterminacy.cycle_preserving_resampling_is_a_calibration": [
+      "CD.isAdmissible design",
+      "design.BoundedHubRecurrence bound",
+      "∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p"
+     ],
+     "Calibrator.CycleDeterminacy.no_moment_matching_calibration_off_temperedness": [],
+     "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free": [
+      "design.cycleDensity 4 = palindromicCycleDensityA s 4"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.CycleDeterminacy.cycle_preserving_resampling_is_a_calibration",
+    "Calibrator.CycleDeterminacy.no_moment_matching_calibration_off_temperedness",
+    "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free"
+   ]
+  },
+  {
+   "name": "Calibrator.GenotypeDesign.Tempered",
+   "short": "Tempered",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/EpistaticChaos.lean",
+   "line": 1515,
+   "signature": "(design : GenotypeDesign nx ιx) (rate : ℝ) : Prop",
+   "args": [
+    {
+     "names": [
+      "design"
+     ],
+     "type": "GenotypeDesign nx ιx",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "rate"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Prop",
+   "body": "  ∀ p : ℕ, |design.cycleDensity p| ≤ rate ^ p",
+   "docstring": "**The tempered regime.** The cycle densities grow at most exponentially in\nthe diagram size, so a single truncation level determines the limit law and\nmoment matching is a valid calibration strategy.\n\nEmpirical status: UNTESTED. A growth condition on the design's own cycle\ndensities; checkable on a panel by computing the overlap structure, with no free\nparameter beyond the declared rate.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator.GenotypeDesign",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Calibrator.CycleDeterminacy.no_moment_matching_calibration_off_temperedness": []
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.CycleDeterminacy.no_moment_matching_calibration_off_temperedness"
+   ]
+  },
+  {
+   "name": "Calibrator.GenotypeDesign.BoundedHubRecurrence",
+   "short": "BoundedHubRecurrence",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/EpistaticChaos.lean",
+   "line": 1524,
+   "signature": "(design : GenotypeDesign nx ιx) (bound : ℕ) : Prop",
+   "args": [
+    {
+     "names": [
+      "design"
+     ],
+     "type": "GenotypeDesign nx ιx",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "bound"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Prop",
+   "body": "  ∀ i : Fin nx, design.variantRecurrence i ≤ bound",
+   "docstring": "**Bounded hub energy**, in its operational form: no variant is tested more\nthan `bound` times. This is what fails for a lead variant in a dense sliding\nscan, or for a pleiotropic variant across a phenotype panel.\n\nEmpirical status: UNTESTED. A bound on the design's own recurrence profile;\ncheckable by inspection.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator.GenotypeDesign",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "∀ s : ιx, i ∈ design.locusSet s",
+     "design.BoundedHubRecurrence bound",
+     "CD.isAdmissible design",
+     "resampled.BoundedHubRecurrence bound",
+     "∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.GenotypeDesign.ubiquitous_variant_forces_hub_bound": [
+      "∀ s : ιx, i ∈ design.locusSet s",
+      "design.BoundedHubRecurrence bound"
+     ],
+     "Calibrator.CycleDeterminacy.cycle_preserving_resampling_is_a_calibration": [
+      "CD.isAdmissible design",
+      "design.BoundedHubRecurrence bound",
+      "resampled.BoundedHubRecurrence bound",
+      "∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.CycleDeterminacy.cycle_preserving_resampling_is_a_calibration",
+    "Calibrator.GenotypeDesign.ubiquitous_variant_forces_hub_bound"
+   ]
+  },
+  {
+   "name": "Calibrator.palindromicCycleDensityA",
+   "short": "palindromicCycleDensityA",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/EpistaticChaos.lean",
+   "line": 1694,
+   "signature": "(s : ℝ) (p : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "s"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "p"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  circulantSpectrumA 1 ^ p + 2 * circulantSpectrumA (s / 2) ^ p +\n    2 * circulantSpectrumA 0 ^ p + 2 * circulantSpectrumA (-(s / 2)) ^ p +\n    circulantSpectrumA (-1) ^ p",
+   "docstring": "Power sum of the first circulant's eigenvalues, with their multiplicities:\nthe `p`-th cycle density of that overlap structure.\n\nEmpirical status: UNTESTED. A power sum of the eigenvalues of one fixed integer\nmatrix; no modelling content and no free parameter.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "s ^ 2 = 2",
+     "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+     "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.palindromicCycleDensityA_two": [
+      "s ^ 2 = 2"
+     ],
+     "Calibrator.palindromic_second_cycle_densities_equal": [
+      "s ^ 2 = 2"
+     ],
+     "Calibrator.palindromicCycleDensityA_four": [
+      "s ^ 2 = 2"
+     ],
+     "Calibrator.palindromic_fourth_cycle_densities_differ": [
+      "s ^ 2 = 2"
+     ],
+     "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free": [
+      "s ^ 2 = 2",
+      "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+      "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.palindromicCycleDensityA_four",
+    "Calibrator.palindromicCycleDensityA_two",
+    "Calibrator.palindromic_fourth_cycle_densities_differ",
+    "Calibrator.palindromic_second_cycle_densities_equal",
+    "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free"
+   ]
+  },
+  {
+   "name": "Calibrator.palindromicCycleDensityB",
+   "short": "palindromicCycleDensityB",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/EpistaticChaos.lean",
+   "line": 1703,
+   "signature": "(s : ℝ) (p : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "s"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "p"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  circulantSpectrumB 1 ^ p + 2 * circulantSpectrumB (s / 2) ^ p +\n    2 * circulantSpectrumB 0 ^ p + 2 * circulantSpectrumB (-(s / 2)) ^ p +\n    circulantSpectrumB (-1) ^ p",
+   "docstring": "Power sum of the second circulant's eigenvalues, with their multiplicities.\n\nEmpirical status: UNTESTED. As for `palindromicCycleDensityA`: a power sum for\none fixed integer matrix, no free parameter.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "s ^ 2 = 2",
+     "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+     "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.palindromicCycleDensityB_two": [
+      "s ^ 2 = 2"
+     ],
+     "Calibrator.palindromic_second_cycle_densities_equal": [
+      "s ^ 2 = 2"
+     ],
+     "Calibrator.palindromicCycleDensityB_four": [
+      "s ^ 2 = 2"
+     ],
+     "Calibrator.palindromic_fourth_cycle_densities_differ": [
+      "s ^ 2 = 2"
+     ],
+     "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free": [
+      "s ^ 2 = 2",
+      "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+      "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.palindromicCycleDensityB_four",
+    "Calibrator.palindromicCycleDensityB_two",
+    "Calibrator.palindromic_fourth_cycle_densities_differ",
+    "Calibrator.palindromic_second_cycle_densities_equal",
+    "Calibrator.recurrence_matching_leaves_fourth_cycle_density_free"
    ]
   },
   {
@@ -15168,7 +15546,12 @@
       "dot loading weights = 0"
      ],
      "Calibrator.rankOneCovarianceBump_conjugate": [],
-     "Calibrator.spikeOuter_eq_rankOneCovarianceBump": []
+     "Calibrator.spikeOuter_eq_rankOneCovarianceBump": [],
+     "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter": [],
+     "Calibrator.spiked_eq_add_rankOneCovarianceBump": [],
+     "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [
+      "scale ≠ 0"
+     ]
     }
    },
    "mentioned_by": [
@@ -15181,14 +15564,17 @@
     "Calibrator.constantDiagonal_class_is_rankOne_rigid",
     "Calibrator.covarianceMatrix_addRankOneSignal",
     "Calibrator.covariance_imitation_of_rankOne_closed",
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump",
     "Calibrator.mulVec_add_rankOneCovarianceBump",
     "Calibrator.quadForm_rankOneCovarianceBump",
     "Calibrator.rankOneCovarianceBump_conjugate",
+    "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter",
     "Calibrator.rankOneCovarianceBump_sampleNormalized",
     "Calibrator.secondMoment_imitation_invisible_to_orthogonal_score",
     "Calibrator.secondMoment_imitation_shift",
     "Calibrator.shiftInvariant_class_is_rankOne_rigid",
     "Calibrator.spikeOuter_eq_rankOneCovarianceBump",
+    "Calibrator.spiked_eq_add_rankOneCovarianceBump",
     "Calibrator.varianceNonneg_sub_rankOne_iff"
    ]
   },
@@ -15625,12 +16011,14 @@
      "Calibrator.traceWindow_rigid": [
       "∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v"
      ],
+     "Calibrator.diagonalGap_imitationCapacity_eq_zero": [],
      "Calibrator.imitable_despite_positive_pcCorrectabilityMargin": [],
      "Calibrator.positive_pc_margin_does_not_imply_detectable": []
     }
    },
    "mentioned_by": [
     "Calibrator.belowCeiling_add_rankOne_iff",
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero",
     "Calibrator.gramForm_sq_le",
     "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
     "Calibrator.positive_pc_margin_does_not_imply_detectable",
@@ -19518,7 +19906,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1182,
+   "line": 1183,
    "signature": "(decay kappa : ℝ) : ℝ",
    "args": [
     {
@@ -19533,7 +19921,7 @@
    ],
    "ret_type": "ℝ",
    "body": "  kappa - 2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))",
-   "docstring": "**Detection share of a pruned (low-frequency) band** on a stationary AR(1)\nchromosome: the fraction of the total inverse-LD (whitened) weight that survives\npruning down to a fraction `kappa` of the directions.\n\nClosed form `κ - 2ρ sin(πκ) / (π(1 + ρ²))`, obtained by integrating the\nreciprocal symbol; the `1 + ρ²` is the numerator of\n`Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel\ntrace.  The claim that it equals the integral ratio is\n`ldBandDetectionShare_eq_integral`.\n\nEmpirical status: UNTESTED.",
+   "docstring": "**Detection share of a pruned (low-frequency) band** on a stationary AR(1)\nchromosome: the fraction of the total inverse-LD (whitened) weight that survives\npruning down to a fraction `kappa` of the directions.\n\nClosed form `κ - 2ρ sin(πκ) / (π(1 + ρ²))`, obtained by integrating the\nreciprocal symbol; the `1 + ρ²` is the numerator of\n`Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel\ntrace.  That it equals the integral ratio is not proved here: it is the\n`detection` field of `LDBandIntegralIdentification`, carried as a hypothesis by\nevery result that relies on the identification.\n\nEmpirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
    "fields": [],
@@ -19586,7 +19974,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1189,
+   "line": 1190,
    "signature": "(decay kappa : ℝ) : ℝ",
    "args": [
     {
@@ -19660,7 +20048,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1393,
+   "line": 1394,
    "signature": "(retainedMarkers totalMarkers : ℕ) : ℝ",
    "args": [
     {
@@ -19732,7 +20120,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1444,
+   "line": 1445,
    "signature": "(recomb Ne : ℝ) (retainedMarkers totalMarkers : ℕ) : ℝ",
    "args": [
     {
@@ -19770,7 +20158,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1455,
+   "line": 1456,
    "signature": "(recomb Ne : ℝ) (retainedMarkers totalMarkers : ℕ) : ℝ",
    "args": [
     {
@@ -19840,7 +20228,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1465,
+   "line": 1466,
    "signature": "(recomb Ne : ℝ) (retainedMarkers totalMarkers : ℕ) : ℝ",
    "args": [
     {
@@ -19910,7 +20298,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1476,
+   "line": 1477,
    "signature": "(retainedMarkers totalMarkers : ℕ) : ℝ",
    "args": [
     {
@@ -21969,14 +22357,18 @@
      ],
      "Calibrator.frobeniusForm_spikeOuter": [],
      "Calibrator.traceForm_spikeOuter": [],
+     "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter": [],
+     "Calibrator.diagonalGapForm_spikeOuter": [],
      "Calibrator.imitable_despite_positive_pcCorrectabilityMargin": []
     }
    },
    "mentioned_by": [
     "Calibrator.BackgroundClass.isNull_spiked_of_le_imitationCapacity",
+    "Calibrator.diagonalGapForm_spikeOuter",
     "Calibrator.frobeniusForm_spikeOuter",
     "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
     "Calibrator.quadForm_spikeOuter",
+    "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter",
     "Calibrator.spikeOuter_eq_rankOneCovarianceBump",
     "Calibrator.traceForm_spikeOuter",
     "Calibrator.varianceNonneg_spikeOuter"
@@ -22082,6 +22474,8 @@
      ],
      "Calibrator.traceWindowClass_isNull_baseline": [],
      "Calibrator.traceWindow_every_level_detectable": [],
+     "Calibrator.diagonalGap_imitationCapacity_eq_zero": [],
+     "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [],
      "Calibrator.imitationCapacity_eq_whitenedCapacity": [],
      "Calibrator.imitable_despite_positive_pcCorrectabilityMargin": [],
      "Calibrator.not_isNull_of_demographicSpike_gt_budget": [],
@@ -22104,6 +22498,8 @@
     "Calibrator.EquiExit.imitationCapacity_eq",
     "Calibrator.EquiExit.margin_pos_of_gt_capacity",
     "Calibrator.active_budget_makes_stratification_detectable",
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero",
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump",
     "Calibrator.grm_absorbs_tested_association",
     "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
     "Calibrator.imitationCapacity_eq_whitenedCapacity",
@@ -22155,7 +22551,8 @@
      "∀ (a : cidx",
      "K.Active a S₀",
      "∀ a : cidx, K'.form (f a",
-     "∀ a : cidx, K'.bound (f a"
+     "∀ a : cidx, K'.bound (f a",
+     "v j ^ 2 < v i ^ 2"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad": [],
@@ -22188,6 +22585,14 @@
      "Calibrator.EquiExit.exitLevels_nonempty": [],
      "Calibrator.EquiExit.imitationCapacity_eq": [],
      "Calibrator.traceWindowClass_spikeLoad": [],
+     "Calibrator.diagonalGapClass_spikeLoad": [],
+     "Calibrator.diagonalGap_imitationCapacity_eq_zero": [
+      "v ∈ support",
+      "v j ^ 2 < v i ^ 2"
+     ],
+     "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [
+      "v j ^ 2 < v i ^ 2"
+     ],
      "Calibrator.traceWindow_spikeLoad_demographic": [],
      "Calibrator.demographicSpike_eq_level_mul_spikeLoad": []
     }
@@ -22205,6 +22610,9 @@
     "Calibrator.demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
     "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
     "Calibrator.demographicSpike_eq_level_mul_spikeLoad",
+    "Calibrator.diagonalGapClass_spikeLoad",
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero",
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump",
     "Calibrator.traceWindowBudgetClass_spikeLoad",
     "Calibrator.traceWindowClass_spikeLoad",
     "Calibrator.traceWindow_spikeLoad_demographic"
@@ -22351,7 +22759,9 @@
     "hypotheses": [
      "K.Active a S₀",
      "0 < K.spikeLoad a v",
-     "K.IsNull S₀"
+     "K.IsNull S₀",
+     "VarianceNonneg (S₀ - base",
+     "S₀ i i = S₀ j j"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.BackgroundClass.headroom_eq_zero_of_active": [
@@ -22366,13 +22776,22 @@
       "K.Active a S₀",
       "0 < K.spikeLoad a v"
      ],
-     "Calibrator.traceWindowClass_active": []
+     "Calibrator.traceWindowClass_active": [],
+     "Calibrator.diagonalGap_imitationCapacity_eq_zero": [
+      "VarianceNonneg (S₀ - base",
+      "S₀ i i = S₀ j j"
+     ],
+     "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [
+      "S₀ i i = S₀ j j"
+     ]
     }
    },
    "mentioned_by": [
     "Calibrator.BackgroundClass.headroom_eq_zero_of_active",
     "Calibrator.BackgroundClass.imitationCapacity_eq_zero_of_active",
     "Calibrator.BackgroundClass.not_isNull_spiked_of_active",
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero",
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump",
     "Calibrator.traceWindowClass_active"
    ]
   },
@@ -22476,6 +22895,7 @@
       "v ≠ 0",
       "0 < t"
      ],
+     "Calibrator.spiked_eq_add_rankOneCovarianceBump": [],
      "Calibrator.imitable_despite_positive_pcCorrectabilityMargin": [
       "VarianceNonneg (S₀ - base",
       "traceForm S₀ + demographicSpike (N : ℝ"
@@ -22514,6 +22934,7 @@
     "Calibrator.positive_pc_margin_does_not_imply_detectable",
     "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
     "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+    "Calibrator.spiked_eq_add_rankOneCovarianceBump",
     "Calibrator.stratification_imitable_iff_within_budget",
     "Calibrator.traceWindow_every_level_detectable"
    ]
@@ -22633,7 +23054,8 @@
      "K.Active a S₀",
      "K'.IsNull S₀",
      "K.imitationCapacity S₀ support < t",
-     "VarianceNonneg (S₀ - base"
+     "VarianceNonneg (S₀ - base",
+     "S₀ i i = S₀ j j"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.BackgroundClass.imitationCapacity_le": [
@@ -22668,6 +23090,11 @@
       "VarianceNonneg (S₀ - base",
       "v ∈ support"
      ],
+     "Calibrator.diagonalGap_imitationCapacity_eq_zero": [
+      "VarianceNonneg (S₀ - base",
+      "S₀ i i = S₀ j j",
+      "v ∈ support"
+     ],
      "Calibrator.imitationCapacity_eq_whitenedCapacity": [
       "K.IsNull S₀"
      ],
@@ -22690,6 +23117,7 @@
     "Calibrator.BackgroundClass.le_imitationCapacity",
     "Calibrator.EquiExit.imitationCapacity_eq",
     "Calibrator.EquiExit.margin_pos_of_gt_capacity",
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero",
     "Calibrator.grm_absorbs_tested_association",
     "Calibrator.imitationCapacity_eq_whitenedCapacity",
     "Calibrator.loco_lowers_imitation_wall",
@@ -23058,12 +23486,146 @@
    ]
   },
   {
+   "name": "Calibrator.diagonalGapForm",
+   "short": "diagonalGapForm",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+   "line": 878,
+   "signature": "(i j : ι) (M : Matrix ι ι ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "i",
+      "j"
+     ],
+     "type": "ι",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "M"
+     ],
+     "type": "Matrix ι ι ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " M i i - M j j",
+   "docstring": "**The diagonal-gap functional.**  The difference of two diagonal entries —\nfor a genotype covariance, the difference in standardized variance carried by\ntwo markers.  It is linear, so it is a legal constraint of a background class,\nand `ConstantDiagonal` is the statement that all of these vanish.\n\n    Empirical status: DERIVED (a difference of matrix entries;\n    `diagonalGapForm_spikeOuter` identifies its spike load).",
+   "empirical_status": "DERIVED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "S₀ i i = S₀ j j",
+     "v j ^ 2 < v i ^ 2"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.diagonalGapForm_add": [],
+     "Calibrator.diagonalGapForm_smul": [],
+     "Calibrator.diagonalGapForm_spikeOuter": [],
+     "Calibrator.diagonalGap_imitationCapacity_eq_zero": [
+      "S₀ i i = S₀ j j",
+      "v j ^ 2 < v i ^ 2"
+     ],
+     "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [
+      "S₀ i i = S₀ j j",
+      "v j ^ 2 < v i ^ 2"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.diagonalGapForm_add",
+    "Calibrator.diagonalGapForm_smul",
+    "Calibrator.diagonalGapForm_spikeOuter",
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero",
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump"
+   ]
+  },
+  {
+   "name": "Calibrator.diagonalGapClass",
+   "short": "diagonalGapClass",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+   "line": 910,
+   "signature": "(base : Matrix ι ι ℝ) (i j : ι) (budget : ℝ) : BackgroundClass ι Unit where base",
+   "args": [
+    {
+     "names": [
+      "base"
+     ],
+     "type": "Matrix ι ι ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "i",
+      "j"
+     ],
+     "type": "ι",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "budget"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "BackgroundClass ι Unit where base",
+   "body": " base\n  form := fun _ => diagonalGapForm i j\n  bound := fun _ => budget\n  form_add := fun _ M N => diagonalGapForm_add i j M N\n  form_smul := fun _ c M => diagonalGapForm_smul i j c M",
+   "docstring": "**The diagonal-gap background class**: backgrounds in which two markers\ndiffer in standardized variance by at most `budget`.  At `budget = 0` with the\nconstraint\nactive this is the constant-diagonal condition restricted to one pair, which is\nall `ImitationRigidity` ever used.\n\n    Empirical status: UNTESTED. `budget` is measurable — it is the spread in\n    standardized variance a panel admits between two markers.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "VarianceNonneg (S₀ - base",
+     "S₀ i i = S₀ j j",
+     "v j ^ 2 < v i ^ 2"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.diagonalGapClass_spikeLoad": [],
+     "Calibrator.diagonalGap_imitationCapacity_eq_zero": [
+      "VarianceNonneg (S₀ - base",
+      "S₀ i i = S₀ j j",
+      "v j ^ 2 < v i ^ 2"
+     ],
+     "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump": [
+      "S₀ i i = S₀ j j",
+      "v j ^ 2 < v i ^ 2"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.diagonalGapClass_spikeLoad",
+    "Calibrator.diagonalGap_imitationCapacity_eq_zero",
+    "Calibrator.diagonalGap_not_isNull_add_rankOneCovarianceBump"
+   ]
+  },
+  {
    "name": "Calibrator.traceWindowSpikeLoad",
    "short": "traceWindowSpikeLoad",
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 855,
+   "line": 1000,
    "signature": "(decay : ℝ) (nSites : ℕ) : ℝ",
    "args": [
     {
@@ -23119,7 +23681,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 875,
+   "line": 1020,
    "signature": "(headroom decay : ℝ) : ℝ",
    "args": [
     {
@@ -23171,7 +23733,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 992,
+   "line": 1137,
    "signature": "(n m : ℕ) : ℕ → ℝ",
    "args": [
     {
@@ -23216,7 +23778,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 998,
+   "line": 1143,
    "signature": "(n m : ℕ) : Fin n → ℝ",
    "args": [
     {
@@ -23299,7 +23861,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1075,
+   "line": 1220,
    "signature": "(headroom n M F m : ℝ) : ℝ",
    "args": [
     {
@@ -23338,7 +23900,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1215,
+   "line": 1360,
    "signature": "(k : ℕ) (ε : ℝ) : ℕ → ℝ",
    "args": [
     {
@@ -23393,7 +23955,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1223,
+   "line": 1368,
    "signature": "(m : ℕ) (lam : ℕ → ℝ) (p : ℕ) : ℝ",
    "args": [
     {
@@ -23450,7 +24012,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1233,
+   "line": 1378,
    "signature": "(m : ℕ) (lam : ℕ → ℝ) : ℝ",
    "args": [
     {
@@ -23519,7 +24081,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1329,
+   "line": 1474,
    "signature": "(n : ℕ) : ℕ → ℝ",
    "args": [
     {
@@ -23575,7 +24137,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1334,
+   "line": 1479,
    "signature": "(n : ℕ) : ℕ → ℝ",
    "args": [
     {
@@ -23631,7 +24193,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1339,
+   "line": 1484,
    "signature": "(n : ℕ) : ℕ",
    "args": [
     {
@@ -59864,6 +60426,95 @@
    "mentioned_by": []
   },
   {
+   "name": "Calibrator.CycleDeterminacy",
+   "short": "CycleDeterminacy",
+   "kind": "structure",
+   "noncomputable": false,
+   "file": "Calibrator/EpistaticChaos.lean",
+   "line": 1558,
+   "signature": "(nx : ℕ) (ιx : Type*) [Fintype ιx] [DecidableEq ιx] (Limit : Type*) where isAdmissible : GenotypeDesign nx ιx → Prop limitLaw : GenotypeDesign nx ιx → Limit temperingRate : ℕ → ℝ cycles_determine : ∀ (rate : ℝ) (designOne designTwo : GenotypeDesign nx ιx), isAdmissible designOne → isAdmissible designTwo → designOne.Tempered rate → designTwo.Tempered rate → (∀ p : ℕ, designOne.cycleDensity p = designTwo.cycleDensity p) → limitLaw designOne = limitLaw designTwo tempered_of_boundedHub : ∀ (design : GenotypeDesign nx ιx) (bound : ℕ), isAdmissible design → design.BoundedHubRecurrence bound → design.Tempered (temperingRate bound) divergence_phase : ∀ (rate : ℝ) (truncation : ℕ), ∃ designOne designTwo : GenotypeDesign nx ιx, isAdmissible designOne ∧ isAdmissible designTwo ∧ ¬ designOne.Tempered rate ∧ (∀ p : ℕ, p ≤ truncation → designOne.cycleDensity p = designTwo.cycleDensity p) ∧ limitLaw designOne ≠ limitLaw designTwo",
+   "args": [
+    {
+     "names": [
+      "nx"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "ιx"
+     ],
+     "type": "Type*",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "Fintype",
+      "ιx"
+     ],
+     "type": "",
+     "binder": "[]",
+     "implicit": true
+    },
+    {
+     "names": [
+      "DecidableEq",
+      "ιx"
+     ],
+     "type": "",
+     "binder": "[]",
+     "implicit": true
+    },
+    {
+     "names": [
+      "Limit"
+     ],
+     "type": "Type*",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "GenotypeDesign nx ιx → Prop limitLaw : GenotypeDesign nx ιx → Limit temperingRate : ℕ → ℝ cycles_determine : ∀ (rate : ℝ) (designOne designTwo : GenotypeDesign nx ιx), isAdmissible designOne → isAdmissible designTwo → designOne.Tempered rate → designTwo.Tempered rate → (∀ p : ℕ, designOne.cycleDensity p = designTwo.cycleDensity p) → limitLaw designOne = limitLaw designTwo tempered_of_boundedHub : ∀ (design : GenotypeDesign nx ιx) (bound : ℕ), isAdmissible design → design.BoundedHubRecurrence bound → design.Tempered (temperingRate bound) divergence_phase : ∀ (rate : ℝ) (truncation : ℕ), ∃ designOne designTwo : GenotypeDesign nx ιx, isAdmissible designOne ∧ isAdmissible designTwo ∧ ¬ designOne.Tempered rate ∧ (∀ p : ℕ, p ≤ truncation → designOne.cycleDensity p = designTwo.cycleDensity p) ∧ limitLaw designOne ≠ limitLaw designTwo",
+   "body": "",
+   "docstring": "Cycle determinacy over a genotype panel: which designs have a null that its\ncycle densities pin down, and what happens off that class.\n\n`temperingRate bound` is the rate a design with hub recurrence at most `bound`\nenjoys, which is how the hub condition enters the type.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [
+    {
+     "name": "isAdmissible",
+     "type": "GenotypeDesign nx ιx → Prop"
+    },
+    {
+     "name": "limitLaw",
+     "type": "GenotypeDesign nx ιx → Limit"
+    },
+    {
+     "name": "temperingRate",
+     "type": "ℕ → ℝ"
+    },
+    {
+     "name": "cycles_determine",
+     "type": "∀ (rate : ℝ) (designOne designTwo : GenotypeDesign nx ιx),"
+    },
+    {
+     "name": "tempered_of_boundedHub",
+     "type": "∀ (design : GenotypeDesign nx ιx) (bound : ℕ),"
+    },
+    {
+     "name": "divergence_phase",
+     "type": "∀ (rate : ℝ) (truncation : ℕ),"
+    }
+   ],
+   "equations": [],
+   "constraints": {
+    "raw_chunk_lines": 31
+   },
+   "mentioned_by": []
+  },
+  {
    "name": "Calibrator.CrossTraitBorrowingModel",
    "short": "CrossTraitBorrowingModel",
    "kind": "structure",
@@ -60193,7 +60844,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1329,
+   "line": 1330,
    "signature": "(decay : ℝ) : Prop where detection : ∀ kappa : ℝ, 0 ≤ kappa → kappa ≤ 1 → (∫ angle in (0:ℝ)..(Real.pi * kappa), (ldKernelSymbol decay angle)⁻¹) / (∫ angle in (0:ℝ)..Real.pi, (ldKernelSymbol decay angle)⁻¹) = ldBandDetectionShare decay kappa reconstruction : ∀ kappa : ℝ, 0 ≤ kappa → kappa < 1 → (∫ angle in (0:ℝ)..(Real.pi * kappa), ldKernelSymbol decay angle) / (∫ angle in (0:ℝ)..Real.pi, ldKernelSymbol decay angle) = ldBandReconstructionShare decay kappa",
    "args": [
     {
@@ -60837,7 +61488,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1394,
+   "line": 1539,
    "signature": "where value : ℕ → (ℕ → ℝ) → ℝ order : ℕ modulus : ℝ modulus_nonneg : 0 ≤ modulus moment_lipschitz : ∀ (m : ℕ) (lam mu : ℕ → ℝ) (δ : ℝ), 0 ≤ δ → (∀ p, p ≤ order → |normalizedMoment m lam p - normalizedMoment m mu p| ≤ δ) →",
    "args": [],
    "ret_type": "ℕ → (ℕ → ℝ) → ℝ order : ℕ modulus : ℝ modulus_nonneg : 0 ≤ modulus moment_lipschitz : ∀ (m : ℕ) (lam mu : ℕ → ℝ) (δ : ℝ), 0 ≤ δ → (∀ p, p ≤ order → |normalizedMoment m lam p - normalizedMoment m mu p| ≤ δ) →",

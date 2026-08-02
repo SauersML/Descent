@@ -285,6 +285,9 @@ def scoreApproximationError(dgp):
 def Calibrator_SourceTaggedMoments_sigmaTagCausalSource(mom):
     return (_rt._proj(mom, 'directCausalSource') + _rt._proj(mom, 'proxyTaggingSource'))
 
+def sourceBestLinearWeightsFromLD(mom, betaCausal):
+    return _rt._proj(_rt.rinv(_rt._proj(mom, 'sigmaTagSource')), 'mulVec')((_rt._proj(_rt._proj(mom, 'sigmaTagCausalSource'), 'mulVec')(betaCausal)))
+
 def r2FromMSE(mse, varY):
     return (1.0 - _rt.rdiv(mse, varY))
 
@@ -478,6 +481,12 @@ def circulantSpectrumA(c):
 
 def circulantSpectrumB(c):
     return (((4.0 * _rt.lpow(c, 2.0)) + (4.0 * c)) - 2.0)
+
+def palindromicCycleDensityA(s, p):
+    return ((((_rt.lpow(circulantSpectrumA(1.0), p) + (2.0 * _rt.lpow(circulantSpectrumA((_rt.rdiv(s, 2.0))), p))) + (2.0 * _rt.lpow(circulantSpectrumA(0.0), p))) + (2.0 * _rt.lpow(circulantSpectrumA(((-(_rt.rdiv(s, 2.0))))), p))) + _rt.lpow(circulantSpectrumA(((-1.0))), p))
+
+def palindromicCycleDensityB(s, p):
+    return ((((_rt.lpow(circulantSpectrumB(1.0), p) + (2.0 * _rt.lpow(circulantSpectrumB((_rt.rdiv(s, 2.0))), p))) + (2.0 * _rt.lpow(circulantSpectrumB(0.0), p))) + (2.0 * _rt.lpow(circulantSpectrumB(((-(_rt.rdiv(s, 2.0))))), p))) + _rt.lpow(circulantSpectrumB(((-1.0))), p))
 
 def expectedR2FromN(n, h2, M):
     return (h2 * (_rt.rdiv((n * h2), (((n * h2) + M)))))
@@ -728,6 +737,9 @@ def ageDependentR2(sourceSignalPeak, age, age_peak, width):
 def temporalCalibrationInTheLarge(π_obs, π_pred):
     return calibrationInTheLarge(π_obs, π_pred)
 
+def temporalExactBrierRisk(π, signalAtTime):
+    return _rt._proj((temporalMetricProfile(_rt.pi, signalAtTime)), 'brier')
+
 def modelStaleness(lambda_, t):
     return (1.0 - _rt.rexp((((-lambda_) * t))))
 
@@ -844,6 +856,9 @@ def spikeOuter(v):
 
 def twoBlock(k, a, b):
     return (lambda i: (a if (i < k) else b))
+
+def diagonalGapForm(i, j, M):
+    return (M(i, i) - M(j, j))
 
 def traceWindowSpikeLoad(decay, nSites):
     return _rt.rdiv(ldPrecisionTrace(decay, nSites), (nSites))
@@ -988,6 +1003,9 @@ def targetPredictedMeanAt(m, t):
 
 def targetObservedMeanAt(m, t):
     return (_rt._proj(m, 'sourceObservedMean') + _rt._proj(m, 'observedMeanShiftAt')(t))
+
+def targetCalibrationProfileAtGeneration(m, t, link):
+    return _rt._proj((_rt._proj(m, 'toMechanisticCalibrationModelAt')(t)), 'targetCalibrationProfile')(link)
 
 def prevalenceLogisticCalibrationProfile(pi_source, pi_target, slope):
     return logisticCalibrationProfile((prevalenceLogit(pi_target)), (prevalenceLogit(pi_source)), slope)
@@ -1369,6 +1387,9 @@ def presentDayEqualVarianceGaussianAUC(V_A, V_E, fst):
 def realWorldPGSVariance(V_A, fst, rhoSq):
     return ((rhoSq * ((1.0 - fst))) * V_A)
 
+def sourceERMWeights(sigmaObsSource, crossSource):
+    return _rt._proj(_rt.rinv(sigmaObsSource), 'mulVec')(crossSource)
+
 def Calibrator_sigmaTagCausalSource(m):
     return (_rt._proj(m, 'directCausalSource') + _rt._proj(m, 'proxyTaggingSource'))
 
@@ -1378,20 +1399,47 @@ def sigmaTagCausalTarget(m):
 def targetTotalEffect(m):
     return (_rt._proj(m, 'betaTarget') + _rt._proj(m, 'novelCausalEffectTarget'))
 
+def sourceCrossCovariance(m):
+    return (_rt._proj((Calibrator_sigmaTagCausalSource(m)), 'mulVec')(_rt._proj(m, 'betaSource')) + _rt._proj(m, 'contextCrossSource'))
+
+def targetCrossCovariance(m):
+    return (_rt._proj((sigmaTagCausalTarget(m)), 'mulVec')((targetTotalEffect(m))) + _rt._proj(m, 'contextCrossTarget'))
+
 def sourceWeightsFromExplicitDrivers(m):
     return sourceERMWeights(_rt._proj(m, 'sigmaTagSource'), (sourceCrossCovariance(m)))
 
 def sourceWeightedTagScore(m, tagState):
     return dotProduct((sourceWeightsFromExplicitDrivers(m)), tagState)
 
+def sourceTaggingProjection(m):
+    return _rt._proj((Calibrator_sigmaTagCausalSource(m)), 'mulVec')(_rt._proj(m, 'betaSource'))
+
+def targetTaggingProjection(m):
+    return _rt._proj((sigmaTagCausalTarget(m)), 'mulVec')((targetTotalEffect(m)))
+
 def targetEffectHeterogeneity(m):
     return (targetTotalEffect(m) - _rt._proj(m, 'betaSource'))
+
+def targetSourceEffectProjection(m):
+    return _rt._proj((sigmaTagCausalTarget(m)), 'mulVec')(_rt._proj(m, 'betaSource'))
+
+def targetEffectHeterogeneityProjection(m):
+    return _rt._proj((sigmaTagCausalTarget(m)), 'mulVec')((targetEffectHeterogeneity(m)))
+
+def targetNovelMutationEffectProjection(m):
+    return _rt._proj((sigmaTagCausalTarget(m)), 'mulVec')(_rt._proj(m, 'novelCausalEffectTarget'))
 
 def sourceDirectCausalProjection(m):
     return _rt._proj(_rt._proj(m, 'directCausalSource'), 'mulVec')(_rt._proj(m, 'betaSource'))
 
 def sourceProxyTaggingProjection(m):
     return _rt._proj(_rt._proj(m, 'proxyTaggingSource'), 'mulVec')(_rt._proj(m, 'betaSource'))
+
+def targetDirectCausalProjection(m):
+    return _rt._proj(((_rt._proj(m, 'directCausalTarget') + _rt._proj(m, 'novelDirectCausalTarget'))), 'mulVec')((targetTotalEffect(m)))
+
+def targetProxyTaggingProjection(m):
+    return _rt._proj(((_rt._proj(m, 'proxyTaggingTarget') + _rt._proj(m, 'novelProxyTaggingTarget'))), 'mulVec')((targetTotalEffect(m)))
 
 def sourceScoreVarianceFromExplicitDrivers(m):
     wS = sourceWeightsFromExplicitDrivers(m)
@@ -1414,6 +1462,15 @@ def sourceCalibrationSlopeFromSourceWeights(m):
 
 def targetCalibrationSlopeFromSourceWeights(m):
     return _rt.rdiv(targetPredictiveCovarianceFromSourceWeights(m), targetScoreVarianceFromSourceWeights(m))
+
+def brokenTaggingResidual(m):
+    delta = _rt._proj((((Calibrator_sigmaTagCausalSource(m)) - (sigmaTagCausalTarget(m)))), 'mulVec')((targetTotalEffect(m)))
+    return dotProduct(delta, delta)
+
+def ancestrySpecificLDResidual(m):
+    wS = sourceWeightsFromExplicitDrivers(m)
+    delta = _rt._proj(((_rt._proj(m, 'sigmaTagSource') - _rt._proj(m, 'sigmaTagTarget'))), 'mulVec')(wS)
+    return dotProduct(delta, delta)
 
 def sourceSpecificOverfitResidual(m):
     delta = (_rt._proj(m, 'contextCrossSource') - _rt._proj(m, 'contextCrossTarget'))
@@ -1520,6 +1577,12 @@ def novelProxyTaggingTargetAt(m, t):
 
 def sigmaTagCausalTargetAt(m, t):
     return (directCausalTargetAt(m, t) + ((novelDirectCausalTargetAt(m, t) + ((proxyTaggingTargetAt(m, t) + novelProxyTaggingTargetAt(m, t))))))
+
+def targetSourceEffectProjectionAt(m, t):
+    return _rt._proj((sigmaTagCausalTargetAt(m, t)), 'mulVec')(_rt._proj(m, 'betaSource'))
+
+def targetEffectHeterogeneityProjectionAt(m, t):
+    return _rt._proj((sigmaTagCausalTargetAt(m, t)), 'mulVec')(((_rt._proj(m, 'targetEffectHeterogeneityAt')(t) + _rt._proj(m, 'novelCausalEffectTargetAt')(t))))
 
 def targetR2AtGeneration(m, t):
     return targetR2FromSourceWeights((_rt._proj(m, 'toMetricModelAt')(t)))
@@ -1732,6 +1795,9 @@ def logRateSampleSize(epsilon):
 def gradeCertifiedSampleSize(epsilon, K, c):
     return _rt.lpow(epsilon, ((-(_rt.rdiv(K, c)))))
 
+def bernoulliMeasure(p, hp):
+    return _rt._proj((bernoulliPMF(p, hp)), 'toMeasure')
+
 def klBern(p, q):
     return bernoulliKL((unitProbToNNReal(p)), (unitProbToNNReal(q)), (unitProbToNNReal_le_one(p)), (unitProbToNNReal_le_one(q)))
 
@@ -1755,6 +1821,9 @@ def Calibrator_r2ApproximationInterval(r2Gaussian, epsilon):
 
 def latentLiability(s, e):
     return (s + e)
+
+def etaLiabilityThreshold(hN, T, s, x):
+    return _rt._proj((noiseMeasureGivenX(hN, x, (diseaseEvent(T, x, s)))), 'toReal')
 
 def chiSquareBudget(P, densityRatio):
     return P(((lambda ω: _rt.lpow(((densityRatio(ω) - 1.0)), 2.0))))

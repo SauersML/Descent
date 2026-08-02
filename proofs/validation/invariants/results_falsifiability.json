@@ -9,6 +9,7 @@
   ],
   "n_mutants": 9,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -52,6 +53,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -75,6 +77,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -124,6 +127,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -141,9 +145,15 @@
   "name": "geneFlowFstStep",
   "module": "AncestrySpecificArchitecture",
   "line": 371,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "AncestrySpecificArchitecture.gwasHeritability": {
   "name": "gwasHeritability",
@@ -155,6 +165,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -195,9 +206,15 @@
   "name": "portabilityFromArchitecture",
   "module": "AncestrySpecificArchitecture",
   "line": 478,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "AncestrySpecificArchitecture.twoPopDriftVariance": {
   "name": "twoPopDriftVariance",
@@ -208,6 +225,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -229,6 +247,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -249,6 +268,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -271,6 +291,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -291,6 +312,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -321,6 +343,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -368,6 +391,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -397,6 +421,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -435,9 +460,15 @@
   "name": "proportionalAllocation",
   "module": "AncestrySpecificPower",
   "line": 516,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "AncestrySpecificPower.standardErrorSq": {
   "name": "standardErrorSq",
@@ -449,6 +480,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -463,9 +495,15 @@
   "name": "amCorrectedPortability",
   "module": "AssortativeMatingPGS",
   "line": 400,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "AssortativeMatingPGS.amEquilibriumVariance": {
   "name": "amEquilibriumVariance",
@@ -476,6 +514,7 @@
   ],
   "n_mutants": 8,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -499,6 +538,7 @@
   ],
   "n_mutants": 11,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -526,6 +566,7 @@
   ],
   "n_mutants": 12,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -560,6 +601,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -579,9 +621,15 @@
   "name": "gaussianPosteriorShrinkage",
   "module": "BayesianPGSTheory",
   "line": 138,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "BayesianPGSTheory.jamesSteinMSE": {
   "name": "jamesSteinMSE",
@@ -592,6 +640,7 @@
   ],
   "n_mutants": 10,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -617,6 +666,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -638,6 +688,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -662,6 +713,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -682,6 +734,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -702,6 +755,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -722,6 +776,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -760,6 +815,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -803,6 +859,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -823,6 +880,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -838,9 +896,15 @@
   "name": "populationAttributableFraction",
   "module": "ClinicalUtilityFairness",
   "line": 973,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "ClinicalUtilityFairness.ppv": {
   "name": "ppv",
@@ -851,6 +915,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -875,6 +940,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -899,6 +965,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -921,6 +988,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -943,6 +1011,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -957,9 +1026,15 @@
   "name": "brierScore",
   "module": "Conclusions",
   "line": 49,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "Conclusions.expectedBrierScore": {
   "name": "expectedBrierScore",
@@ -971,6 +1046,7 @@
   ],
   "n_mutants": 8,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -1017,6 +1093,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1044,6 +1121,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1079,6 +1157,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1107,6 +1186,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1127,6 +1207,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -1184,9 +1265,15 @@
   "name": "retainedFraction",
   "module": "Conventions",
   "line": 762,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "CovarianceStructure.admixtureLDAtGen": {
   "name": "admixtureLDAtGen",
@@ -1197,6 +1284,7 @@
   ],
   "n_mutants": 20,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1232,6 +1320,7 @@
   ],
   "n_mutants": 12,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1259,6 +1348,7 @@
   ],
   "n_mutants": 11,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1285,6 +1375,7 @@
   ],
   "n_mutants": 16,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1312,46 +1403,30 @@
   "module": "CovarianceStructure",
   "line": 110,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 8,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "const-off-by-one",
-   "negate",
-   "swap-times-div",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(D,p_i)",
-   "swap-args(D,p_j)",
-   "swap-args(p_i,p_j)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "CovarianceStructure.ldCorrelationSqOfHaplotypeD": {
   "name": "ldCorrelationSqOfHaplotypeD",
   "module": "CovarianceStructure",
   "line": 139,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 8,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "const-off-by-one",
-   "negate",
-   "swap-times-div",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(D,p_i)",
-   "swap-args(D,p_j)",
-   "swap-args(p_i,p_j)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "CovarianceStructure.ldsrExpectedBetaSq": {
   "name": "ldsrExpectedBetaSq",
@@ -1379,6 +1454,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -1406,6 +1482,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-plus-minus",
@@ -1447,6 +1524,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -1487,6 +1565,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1512,6 +1591,7 @@
   ],
   "n_mutants": 14,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -1562,6 +1642,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1577,36 +1658,15 @@
   "module": "DGP",
   "line": 182,
   "registered": [
+   "range",
    "scale"
   ],
-  "n_mutants": 8,
   "covered": true,
-  "killed": [
-   {
-    "mutation": "const-off-by-one",
-    "body": "scoreOutcomeCov ^ 4 / (scoreVariance * outcomeVariance)",
-    "rejected_by": [
-     "scale"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "body": "scoreOutcomeCov ^ 2 / (scoreVariance / outcomeVariance)",
-    "rejected_by": [
-     "scale"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 2,
-  "survived": [
-   "negate",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(scoreOutcomeCov,scoreVariance)",
-   "swap-args(scoreOutcomeCov,outcomeVariance)",
-   "swap-args(scoreVariance,outcomeVariance)"
-  ],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "DGP.gaussianAUCFromSignalVariance": {
   "name": "gaussianAUCFromSignalVariance",
@@ -1619,6 +1679,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -1665,6 +1726,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1693,6 +1755,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1714,6 +1777,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1734,6 +1798,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1754,6 +1819,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1774,6 +1840,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1799,6 +1866,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -1845,6 +1913,7 @@
   ],
   "n_mutants": 12,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1872,6 +1941,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1893,6 +1963,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -1940,6 +2011,7 @@
   ],
   "n_mutants": 8,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-args(N\u2080,introgressionRate)",
@@ -1970,6 +2042,7 @@
   ],
   "n_mutants": 8,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -1993,6 +2066,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2053,6 +2127,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2073,6 +2148,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2095,6 +2171,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -2142,6 +2219,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -2186,6 +2264,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -2221,20 +2300,15 @@
   "module": "DriftRegime",
   "line": 168,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 5,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "negate",
-   "swap-times-div",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(V_A,r)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "EpistasisAndNonAdditivity.epistaticVariance": {
   "name": "epistaticVariance",
@@ -2245,6 +2319,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2285,6 +2360,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2306,6 +2382,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2335,6 +2412,7 @@
   ],
   "n_mutants": 8,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2361,9 +2439,15 @@
   "name": "linearNormOfReaction",
   "module": "GeneEnvironmentInterplay",
   "line": 258,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "GeneticArchitectureDiscovery.discoveryNCP": {
   "name": "discoveryNCP",
@@ -2382,6 +2466,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2403,6 +2488,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-times-div",
@@ -2458,6 +2544,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2482,6 +2569,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2504,6 +2592,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2523,6 +2612,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2571,6 +2661,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2601,6 +2692,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2622,6 +2714,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2660,6 +2753,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2682,6 +2776,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -2727,6 +2822,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-args(V_A,fst)",
@@ -2755,6 +2851,7 @@
   ],
   "n_mutants": 9,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-args(V_A,fst)",
@@ -2800,6 +2897,7 @@
   ],
   "n_mutants": 3,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2837,9 +2935,15 @@
   "name": "alleleLossProbability",
   "module": "ImitationRigidity",
   "line": 1146,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "ImitationRigidity.fairTwoPointVariance": {
   "name": "fairTwoPointVariance",
@@ -2866,6 +2970,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-plus-minus",
@@ -2901,6 +3006,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2923,6 +3029,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-plus-minus",
@@ -2959,6 +3066,7 @@
   ],
   "n_mutants": 3,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2977,6 +3085,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -2996,6 +3105,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3017,6 +3127,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3039,6 +3150,7 @@
   ],
   "n_mutants": 8,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3062,6 +3174,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -3116,6 +3229,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3159,6 +3273,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3182,6 +3297,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -3227,6 +3343,7 @@
   ],
   "n_mutants": 10,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3252,6 +3369,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-args(D\u2080,r)",
@@ -3281,6 +3399,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3301,6 +3420,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3322,6 +3442,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -3369,6 +3490,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -3415,6 +3537,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -3484,6 +3607,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3503,6 +3627,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-times-div",
@@ -3532,6 +3657,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -3579,6 +3705,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -3626,22 +3753,15 @@
   "module": "MetricSpecificPortability",
   "line": 1182,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 7,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "const-off-by-one",
-   "negate",
-   "swap-plus-minus",
-   "swap-times-div",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(decay,kappa)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "MetricSpecificPortability.ldBlockDetectionShare": {
   "name": "ldBlockDetectionShare",
@@ -3653,6 +3773,7 @@
   ],
   "n_mutants": 2,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-args(retainedMarkers,totalMarkers)",
@@ -3677,6 +3798,7 @@
   ],
   "n_mutants": 2,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3695,6 +3817,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -3738,6 +3861,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3761,6 +3885,7 @@
   ],
   "n_mutants": 1,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-args(retainedMarkers,totalMarkers)",
@@ -3783,6 +3908,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3805,6 +3931,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3835,6 +3962,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -3874,6 +4002,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -3904,27 +4033,29 @@
   "module": "MultiAncestryTheory",
   "line": 428,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 4,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "negate",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(r2_source,r2_target)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "OpenQuestions.combinedPortability": {
   "name": "combinedPortability",
   "module": "OpenQuestions",
   "line": 532,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "OpenQuestions.f1Score": {
   "name": "f1Score",
@@ -3935,6 +4066,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3966,6 +4098,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -3998,6 +4131,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4020,6 +4154,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4039,6 +4174,7 @@
   ],
   "n_mutants": 3,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4084,9 +4220,15 @@
   "name": "prevalenceCITLShift",
   "module": "PGSCalibrationTheory",
   "line": 259,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PGSCalibrationTheory.prevalenceLogit": {
   "name": "prevalenceLogit",
@@ -4105,6 +4247,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4152,19 +4295,15 @@
   "module": "PhenomeWidePortability",
   "line": 154,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 4,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "drop-a-one-minus",
-   "negate",
-   "shift-by-half",
-   "scale-by-three"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PhenomeWidePortability.neutralDriftFactor": {
   "name": "neutralDriftFactor",
@@ -4175,6 +4314,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-times-div",
@@ -4199,21 +4339,15 @@
   "module": "PhenomeWidePortability",
   "line": 37,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 6,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "drop-a-one-minus",
-   "negate",
-   "swap-times-div",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(fst_additional,ld_factor)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PhenomeWidePortability.selectedDriftFactor": {
   "name": "selectedDriftFactor",
@@ -4225,6 +4359,7 @@
   ],
   "n_mutants": 8,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -4269,6 +4404,7 @@
   ],
   "n_mutants": 9,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -4308,24 +4444,15 @@
   "module": "PolygenicAdaptation",
   "line": 288,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 9,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "drop-a-one-minus",
-   "negate",
-   "swap-plus-minus",
-   "swap-times-div",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(d,s)",
-   "swap-args(d,N)",
-   "swap-args(s,N)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PolygenicAdaptation.expectedPGSDiffVariance": {
   "name": "expectedPGSDiffVariance",
@@ -4336,6 +4463,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4358,6 +4486,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -4387,6 +4516,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -4414,6 +4544,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4436,6 +4567,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4457,6 +4589,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4477,6 +4610,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4496,6 +4630,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4525,6 +4660,7 @@
   ],
   "n_mutants": 3,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4551,6 +4687,7 @@
   ],
   "n_mutants": 3,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4569,6 +4706,7 @@
   ],
   "n_mutants": 3,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4587,6 +4725,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -4613,6 +4752,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4632,6 +4772,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4658,6 +4799,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -4707,6 +4849,7 @@
   ],
   "n_mutants": 9,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "shift-by-half",
@@ -4751,6 +4894,7 @@
   ],
   "n_mutants": 9,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "shift-by-half",
@@ -4796,6 +4940,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -4841,6 +4986,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4863,6 +5009,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -4901,6 +5048,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -4924,6 +5072,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -4969,9 +5118,15 @@
   "name": "fstFromHetRatio",
   "module": "PopulationGeneticsFoundations",
   "line": 1378,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PopulationGeneticsFoundations.fstMigrationMutationEquilibrium": {
   "name": "fstMigrationMutationEquilibrium",
@@ -4984,6 +5139,7 @@
   ],
   "n_mutants": 9,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -5035,6 +5191,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -5080,6 +5237,7 @@
   ],
   "n_mutants": 10,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -5133,6 +5291,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -5181,6 +5340,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -5226,6 +5386,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5248,6 +5409,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-times-div",
@@ -5278,6 +5440,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -5327,6 +5490,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5348,6 +5512,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -5391,6 +5556,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5413,6 +5579,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5435,6 +5602,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -5471,6 +5639,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -5511,6 +5680,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "const-off-by-one",
@@ -5545,6 +5715,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5561,17 +5732,29 @@
   "name": "wrightFIT",
   "module": "PopulationGeneticsFoundations",
   "line": 383,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityBounds.diversifyingPortability": {
   "name": "diversifyingPortability",
   "module": "PortabilityBounds",
   "line": 354,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityBounds.neutralPortability": {
   "name": "neutralPortability",
@@ -5583,6 +5766,7 @@
   ],
   "n_mutants": 8,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -5624,9 +5808,15 @@
   "name": "stabilizingPortability",
   "module": "PortabilityBounds",
   "line": 316,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityDrift.Expected_Abs_Shift": {
   "name": "Expected_Abs_Shift",
@@ -5637,6 +5827,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5662,6 +5853,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -5698,6 +5890,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5718,6 +5911,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -5751,9 +5945,15 @@
   "name": "asymmetricFst",
   "module": "PortabilityDrift",
   "line": 5002,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityDrift.brierRegretPoint": {
   "name": "brierRegretPoint",
@@ -5764,6 +5964,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5783,6 +5984,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5804,6 +6006,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5826,6 +6029,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -5854,6 +6058,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -5885,20 +6090,15 @@
   "module": "PortabilityDrift",
   "line": 4248,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 5,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "negate",
-   "swap-times-div",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(freq_corr,ld_overlap)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityDrift.effectiveSymmetricMigration": {
   "name": "effectiveSymmetricMigration",
@@ -5909,6 +6109,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -5926,40 +6127,15 @@
   "module": "PortabilityDrift",
   "line": 3226,
   "registered": [
+   "continuity",
    "range"
   ],
-  "n_mutants": 6,
   "covered": true,
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(Phi (Real.sqrt (r2 / (2 * (1 - r2)))))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "(Phi (Real.sqrt (r2 / (2 * (1 - r2))))) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (Phi (Real.sqrt (r2 / (2 * (1 - r2)))))",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "continuity"
   ],
-  "n_killed": 3,
-  "survived": [
-   "const-off-by-one",
-   "drop-a-one-minus",
-   "swap-times-div"
-  ],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityDrift.equalVarianceGaussianAUCFromSNR": {
   "name": "equalVarianceGaussianAUCFromSNR",
@@ -5970,6 +6146,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -6010,6 +6187,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -6056,6 +6234,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6078,6 +6257,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6098,6 +6278,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6119,6 +6300,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6141,6 +6323,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6161,6 +6344,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -6200,6 +6384,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6220,6 +6405,7 @@
   ],
   "n_mutants": 8,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -6270,6 +6456,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -6322,6 +6509,7 @@
   ],
   "n_mutants": 10,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6350,6 +6538,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -6403,6 +6592,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "const-off-by-one",
@@ -6449,6 +6639,7 @@
   ],
   "n_mutants": 10,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6469,9 +6660,15 @@
   "name": "hudsonFstFromCoalescenceTimes",
   "module": "PortabilityDrift",
   "line": 236,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityDrift.ibdFlowStep": {
   "name": "ibdFlowStep",
@@ -6485,9 +6682,15 @@
   "name": "islandFstMultiplicativeStep",
   "module": "PortabilityDrift",
   "line": 4602,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityDrift.ldCorrelationDecay": {
   "name": "ldCorrelationDecay",
@@ -6499,6 +6702,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "swap-times-div",
@@ -6540,6 +6744,7 @@
   ],
   "n_mutants": 3,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6558,6 +6763,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6577,6 +6783,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6599,6 +6806,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -6632,6 +6840,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6652,6 +6861,7 @@
   ],
   "n_mutants": 11,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6678,6 +6888,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6699,6 +6910,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -6744,6 +6956,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6765,6 +6978,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -6812,6 +7026,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -6859,6 +7074,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6880,6 +7096,7 @@
   ],
   "n_mutants": 8,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6904,6 +7121,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6923,6 +7141,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6945,6 +7164,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6966,6 +7186,7 @@
   ],
   "n_mutants": 8,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -6989,6 +7210,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7011,6 +7233,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -7038,6 +7261,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -7079,20 +7303,15 @@
   "module": "PortabilityDrift",
   "line": 4921,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 5,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "drop-a-one-minus",
-   "swap-times-div",
-   "swap-args(V_A,Ne)",
-   "swap-args(V_A,m)",
-   "swap-args(Ne,m)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityDrift.sourceBrierFromR2": {
   "name": "sourceBrierFromR2",
@@ -7104,6 +7323,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -7126,21 +7346,15 @@
   "module": "PortabilityDrift",
   "line": 4782,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 6,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "negate",
-   "swap-plus-minus",
-   "swap-times-div",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(fst_neighbor,\u03b1)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityDrift.targetBrierFromNeutralAFBenchmark": {
   "name": "targetBrierFromNeutralAFBenchmark",
@@ -7151,6 +7365,7 @@
   ],
   "n_mutants": 9,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7175,6 +7390,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7197,6 +7413,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -7244,6 +7461,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -7290,6 +7508,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7311,6 +7530,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7331,6 +7551,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7352,6 +7573,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7381,6 +7603,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7419,6 +7642,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -7466,6 +7690,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7503,6 +7728,7 @@
   ],
   "n_mutants": 7,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -7539,6 +7765,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -7577,6 +7804,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7613,6 +7841,7 @@
   ],
   "n_mutants": 3,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7631,6 +7860,7 @@
   ],
   "n_mutants": 3,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7649,6 +7879,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7669,6 +7900,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7699,6 +7931,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7729,6 +7962,7 @@
   ],
   "n_mutants": 10,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7762,6 +7996,7 @@
   ],
   "n_mutants": 8,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7785,6 +8020,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7799,9 +8035,15 @@
   "name": "partialOverlapR2",
   "module": "SampleOverlapBias",
   "line": 73,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "ScoreDistribution.benchmarkHighScoreRate": {
   "name": "benchmarkHighScoreRate",
@@ -7812,6 +8054,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7850,6 +8093,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7872,6 +8116,7 @@
   ],
   "n_mutants": 6,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "drop-a-one-minus",
@@ -7919,6 +8164,7 @@
   ],
   "n_mutants": 9,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -7968,6 +8214,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -7988,6 +8235,7 @@
   ],
   "n_mutants": 4,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "shift-by-half",
@@ -8026,6 +8274,7 @@
   ],
   "n_mutants": 10,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8051,6 +8300,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8073,6 +8323,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8094,6 +8345,7 @@
   ],
   "n_mutants": 12,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8121,6 +8373,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8142,6 +8395,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8161,6 +8415,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8184,19 +8439,15 @@
   "module": "StatisticalGeneticsMethodology",
   "line": 42,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 4,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "negate",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(r2_full,r2_covariates)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "StatisticalGeneticsMethodology.portabilityRatio": {
   "name": "portabilityRatio",
@@ -8207,6 +8458,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8227,6 +8479,7 @@
   ],
   "n_mutants": 3,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -8263,6 +8516,7 @@
   ],
   "n_mutants": 6,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8284,6 +8538,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8304,6 +8559,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8331,6 +8587,7 @@
   ],
   "n_mutants": 5,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8362,17 +8619,29 @@
   "name": "deployedTransferTargetR2",
   "module": "TransferLearningPGS",
   "line": 1114,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "TransferLearningPGS.fineTunedTargetR2": {
   "name": "fineTunedTargetR2",
   "module": "TransferLearningPGS",
   "line": 1103,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "TransferLearningPGS.gaussianSourceResidualRisk": {
   "name": "gaussianSourceResidualRisk",
@@ -8415,6 +8684,7 @@
   ],
   "n_mutants": 3,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8433,6 +8703,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8455,6 +8726,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8474,6 +8746,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8493,6 +8766,7 @@
   ],
   "n_mutants": 10,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8518,6 +8792,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8536,36 +8811,15 @@
   "module": "TransferLearningPGS",
   "line": 77,
   "registered": [
+   "range",
    "scale"
   ],
-  "n_mutants": 8,
   "covered": true,
-  "killed": [
-   {
-    "mutation": "const-off-by-one",
-    "body": "cov_pgs_y ^ 4 / (var_pgs * var_y)",
-    "rejected_by": [
-     "scale"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "body": "cov_pgs_y ^ 2 / (var_pgs / var_y)",
-    "rejected_by": [
-     "scale"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 2,
-  "survived": [
-   "negate",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(cov_pgs_y,var_pgs)",
-   "swap-args(cov_pgs_y,var_y)",
-   "swap-args(var_pgs,var_y)"
-  ],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "TransferLearningPGS.pinskerAncestryDivergenceCap": {
   "name": "pinskerAncestryDivergenceCap",
@@ -8576,6 +8830,7 @@
   ],
   "n_mutants": 5,
   "covered": true,
+  "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
@@ -8611,6 +8866,7 @@
   ],
   "n_mutants": 7,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8629,29 +8885,29 @@
   "module": "TransferLearningPGS",
   "line": 1225,
   "registered": [
-   "continuity"
+   "continuity",
+   "range"
   ],
-  "n_mutants": 6,
-  "covered": false,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "negate",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(oracle_target_r2,noiseVar)",
-   "swap-args(oracle_target_r2,nTarget)",
-   "swap-args(noiseVar,nTarget)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "TransferLearningPGS.scratchTargetR2": {
   "name": "scratchTargetR2",
   "module": "TransferLearningPGS",
   "line": 1107,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "TransferLearningPGS.scratchVsFineTuningCriticalSampleSize": {
   "name": "scratchVsFineTuningCriticalSampleSize",
@@ -8670,6 +8926,7 @@
   ],
   "n_mutants": 13,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8698,6 +8955,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8712,9 +8970,15 @@
   "name": "explainableFraction",
   "module": "TransportIdentities",
   "line": 667,
-  "registered": [],
-  "covered": false,
-  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+  "registered": [
+   "range"
+  ],
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
+  ],
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "Unified.modeledPCResidualSusceptibility": {
   "name": "modeledPCResidualSusceptibility",
@@ -8757,6 +9021,7 @@
   ],
   "n_mutants": 10,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
@@ -8782,6 +9047,7 @@
   ],
   "n_mutants": 4,
   "covered": false,
+  "demonstration": null,
   "killed": [],
   "n_killed": 0,
   "survived": [
