@@ -10,11 +10,14 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Topology.ContinuousMap.Algebra
 import Mathlib.GroupTheory.Perm.Basic
+import Calibrator.BundleRigidity.Telescope
 
 /-!
 # The corrected kernel dichotomy for trip semigroups
 
-This module is **self-contained: it imports only Mathlib**.
+This module imports Mathlib and one sibling, `Calibrator.BundleRigidity.Telescope`, for
+the word-weight product `prodWeight`. It used to import only Mathlib and to define its own
+copy of that product under the name `wProd`; the copy is gone.
 
 ## What this replaces
 
@@ -119,16 +122,15 @@ variable {ι : Type*}
 
 /-! ## Words and weight defects -/
 
-/-- The product of a weight function along a word. -/
-def wProd (P : ι → ℝ) (w : List ι) : ℝ := (w.map P).prod
-
-@[simp] theorem wProd_nil (P : ι → ℝ) : wProd P ([] : List ι) = 1 := rfl
-
-@[simp] theorem wProd_cons (P : ι → ℝ) (i : ι) (u : List ι) :
-    wProd P (i :: u) = P i * wProd P u := rfl
+/-! `prodWeight`, `wProd_nil` and `wProd_cons` used to be defined here. They were
+character-for-character `Telescope.prodWeight`, `prodWeight_nil` and `prodWeight_cons` --
+same body `(w.map P).prod`, same namespace `Calibrator.BundleRigidity`, same two `rfl`
+companion lemmas -- written twice because neither file imported the other. This file now
+imports `Telescope` and uses `prodWeight`, so the word-weight product is one definition
+and a change to it reaches both the telescoping identity and the falsifier below. -/
 
 /-- The **weight ratio** of a word: `Q`-product over `P`-product. -/
-noncomputable def weightRatio (P Q : ι → ℝ) (w : List ι) : ℝ := wProd Q w / wProd P w
+noncomputable def weightRatio (P Q : ι → ℝ) (w : List ι) : ℝ := prodWeight Q w / prodWeight P w
 
 /-- The **weight defect of a relation** `w ≈ u`: the ratio of the two words' weight
 ratios. The refuted conjecture asserted that a relation contributes to the kernel exactly
@@ -186,10 +188,10 @@ theorem defect_witness_ne_one :
 
 Both constants of the falsifier come from this one definition: the Bézout constant is an
 alternating combination of `χ` and the weight defect is a ratio of `χ`. -/
-noncomputable def chi (P Q : ι → ℝ) (w : List ι) : ℝ := wProd P w / wProd Q w
+noncomputable def chi (P Q : ι → ℝ) (w : List ι) : ℝ := prodWeight P w / prodWeight Q w
 
 /-- A product of positive weights along a word is positive. -/
-theorem wProd_pos (P : ι → ℝ) (hP : ∀ i, 0 < P i) (w : List ι) : 0 < wProd P w := by
+theorem wProd_pos (P : ι → ℝ) (hP : ∀ i, 0 < P i) (w : List ι) : 0 < prodWeight P w := by
   induction w with
   | nil => rw [wProd_nil]; norm_num
   | cons i u ih => rw [wProd_cons]; exact mul_pos (hP i) ih
