@@ -111,6 +111,57 @@ theorem degradation_nonneg (source target : FiniteSpectralModel Band) :
   rw [degradation_eq_weighted_readout_distance]
   simp
 
+/-! ### Genotype rescaling, and why this degradation is the scale-free residual
+
+A residual burden attributed to a transported score must not depend on the *units* the
+genotypes are carried in. The substitution `g -> c * g`, `beta -> beta / c` — the free
+choice between raw dosages and standardised genotypes — leaves the phenotype, the fitted
+score and every measured moment unchanged bit for bit.
+
+A quantity built as a **dot product of covariances** fails that test: covariances carry
+one factor of the genotype scale, so such a quantity moves by `c ^ 2` while the outcome
+variance it is added to does not. That is a dimensional error, not a modelling choice,
+and it has been measured elsewhere in this corpus: a residual burden of that shape grows
+by exactly `c ^ 2` while the measured `R ^ 2` moves by `0.000e+00`.
+
+`degradation` has the right shape by construction. It is
+`sum_b (readout gap) ^ 2 * featureSpectrum`, i.e. `(covariance mismatch) ^ 2 / (feature
+variance)` — two factors of the genotype scale upstairs and two downstairs. The two
+theorems below prove that, and they are the statement of what the correct invariant form
+of a transport residual is: **normalise the covariance mismatch by the feature variance
+before adding it to an outcome variance.** -/
+noncomputable def rescale (P : FiniteSpectralModel Band) (c : ℝ) (hc : c ≠ 0) :
+    FiniteSpectralModel Band where
+  featureSpectrum := fun b => c ^ 2 * P.featureSpectrum b
+  crossSpectrum := fun b => c * P.crossSpectrum b
+  targetPower := P.targetPower
+  featureSpectrum_pos := fun b => mul_pos (sq_pos_of_ne_zero hc) (P.featureSpectrum_pos b)
+
+/-- Under `g -> c * g` the optimal readout is `beta / c`: it is scale-covariant, which is
+exactly what makes the score itself invariant. -/
+theorem optimalReadout_rescale (P : FiniteSpectralModel Band) (c : ℝ) (hc : c ≠ 0)
+    (b : Band) :
+    optimalReadout (P.rescale c hc) b = optimalReadout P b / c := by
+  unfold optimalReadout rescale
+  have hfp := ne_of_gt (P.featureSpectrum_pos b)
+  field_simp
+  ring
+
+/-- **Degradation is invariant under a change of genotype coding.** The two factors of `c`
+in the squared readout gap cancel the two in the feature spectrum. Any transport residual
+that is *not* invariant here is measuring the units, and any repair of such a residual has
+to reproduce this normalisation. -/
+theorem degradation_rescale (source target : FiniteSpectralModel Band) (c : ℝ) (hc : c ≠ 0) :
+    degradation (source.rescale c hc) (target.rescale c hc) = degradation source target := by
+  rw [degradation_eq_weighted_readout_distance, degradation_eq_weighted_readout_distance]
+  refine Finset.sum_congr rfl fun b _ => ?_
+  rw [optimalReadout_rescale source c hc b, optimalReadout_rescale target c hc b]
+  show (optimalReadout source b / c - optimalReadout target b / c) ^ 2 *
+      (c ^ 2 * target.featureSpectrum b) =
+    (optimalReadout source b - optimalReadout target b) ^ 2 * target.featureSpectrum b
+  field_simp
+  ring
+
 /-- The same degradation restricted to a selected set of frequency bands. -/
 noncomputable def bandDegradation (source target : FiniteSpectralModel Band)
     (bands : Finset Band) : ℝ :=
