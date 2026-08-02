@@ -30,265 +30,11 @@
    "bound": 0.0,
    "kind": "UNGUARDED-PROVEN",
    "proving_theorem": "Calibrator.excess_ld_nonneg",
-   "theorem_preconditions_hold": false
+   "theorem_preconditions_hold": false,
+   "n_preconditions_modelled": 4,
+   "n_preconditions_dropped": 0
   },
   "empirical_status": "UNTESTED"
- },
- {
-  "definition": "Calibrator.selectedDriftFactor",
-  "source": "Calibrator/PhenomeWidePortability.lean:137",
-  "declared_kind": "F_ST",
-  "declared_range": [
-   0.0,
-   1.0
-  ],
-  "declared_provenance": "mined from prose; NOT machine-checked",
-  "range_proving_theorems": {
-   "lo": "Calibrator.selectedDriftFactor_mem_unit",
-   "hi": "Calibrator.selectedDriftFactor_mem_unit"
-  },
-  "n_points_scanned": 343,
-  "n_out_of_range": 336,
-  "kinds": [
-   "IN-SCOPE-VIOLATION"
-  ],
-  "worst": {
-   "point": {
-    "Ne": 1000.0,
-    "t": 20.0,
-    "s_correction": 3.0000000000000004
-   },
-   "value": 1096766110434.8751,
-   "side": "hi",
-   "bound": 1.0,
-   "kind": "IN-SCOPE-VIOLATION",
-   "proving_theorem": "Calibrator.selectedDriftFactor_mem_unit",
-   "theorem_preconditions_hold": true
-  },
-  "empirical_status": "UNTESTED"
- },
- {
-  "definition": "Calibrator.admixtureLDBoost",
-  "source": "Calibrator/PortabilityDrift.lean:5301",
-  "declared_kind": "ratio",
-  "declared_range": [
-   0.0,
-   1.0
-  ],
-  "declared_provenance": "mined from prose; NOT machine-checked",
-  "range_proving_theorems": {
-   "lo": "Calibrator.admixtureLDBoost_gt_one"
-  },
-  "n_points_scanned": 343,
-  "n_out_of_range": 202,
-  "kinds": [
-   "IN-SCOPE-VIOLATION",
-   "UNGUARDED-DOCSTRING"
-  ],
-  "worst": {
-   "point": {
-    "r": 3.0000000000000004,
-    "t_since": 20.0,
-    "equilibrium_ld": 0.05
-   },
-   "value": 20971520.000000093,
-   "side": "hi",
-   "bound": 1.0,
-   "kind": "UNGUARDED-DOCSTRING",
-   "proving_theorem": null,
-   "theorem_preconditions_hold": null
-  },
-  "empirical_status": "UNTESTED"
- },
- {
-  "definition": "Calibrator.portabilityRatio",
-  "source": "Calibrator/StatisticalGeneticsMethodology.lean:74",
-  "declared_kind": "R-squared",
-  "declared_range": [
-   0.0,
-   1.0
-  ],
-  "declared_provenance": "mined from prose; NOT machine-checked",
-  "range_proving_theorems": {
-   "hi": "Calibrator.portability_ratio_le_one"
-  },
-  "n_points_scanned": 49,
-  "n_out_of_range": 21,
-  "kinds": [
-   "IN-SCOPE-VIOLATION"
-  ],
-  "worst": {
-   "point": {
-    "dr2_target": 3.0000000000000004,
-    "dr2_source": 0.05
-   },
-   "value": 60.00000000000001,
-   "side": "hi",
-   "bound": 1.0,
-   "kind": "IN-SCOPE-VIOLATION",
-   "proving_theorem": "Calibrator.portability_ratio_le_one",
-   "theorem_preconditions_hold": true
-  },
-  "empirical_status": ""
- },
- {
-  "definition": "Calibrator.neutralAFBenchmarkRatio",
-  "source": "Calibrator/PortabilityDrift.lean:2982",
-  "declared_kind": "F_ST",
-  "declared_range": [
-   0.0,
-   1.0
-  ],
-  "declared_provenance": "mined from prose; NOT machine-checked",
-  "range_proving_theorems": {
-   "lo": "Calibrator.neutral_af_benchmark_bounded_by_fst",
-   "hi": "Calibrator.neutral_af_benchmark_bounded_by_fst"
-  },
-  "n_points_scanned": 49,
-  "n_out_of_range": 21,
-  "kinds": [
-   "IN-SCOPE-VIOLATION"
-  ],
-  "worst": {
-   "point": {
-    "fstSource": 0.98,
-    "fstTarget": 0.02
-   },
-   "value": 48.99999999999996,
-   "side": "hi",
-   "bound": 1.0,
-   "kind": "IN-SCOPE-VIOLATION",
-   "proving_theorem": "Calibrator.neutral_af_benchmark_bounded_by_fst",
-   "theorem_preconditions_hold": true
-  },
-  "empirical_status": "FALSIFIED"
- },
- {
-  "definition": "Calibrator.ldKernelSymbol",
-  "source": "Calibrator/ImitationRigidity.lean:689",
-  "declared_kind": "correlation",
-  "declared_range": [
-   -1.0,
-   1.0
-  ],
-  "declared_provenance": "mined from prose; NOT machine-checked",
-  "range_proving_theorems": {
-   "lo": "Calibrator.ldKernelSymbol_pos"
-  },
-  "n_points_scanned": 49,
-  "n_out_of_range": 17,
-  "kinds": [
-   "IN-SCOPE-VIOLATION",
-   "UNGUARDED-DOCSTRING"
-  ],
-  "worst": {
-   "point": {
-    "decay": 1.0333333333333334,
-    "angle": 0.05
-   },
-   "value": -18.348537393143317,
-   "side": "lo",
-   "bound": -1.0,
-   "kind": "IN-SCOPE-VIOLATION",
-   "proving_theorem": "Calibrator.ldKernelSymbol_pos",
-   "theorem_preconditions_hold": true
-  },
-  "empirical_status": "DERIVED"
- },
- {
-  "definition": "Calibrator.prevalenceCITLShift",
-  "source": "Calibrator/PGSCalibrationTheory.lean:259",
-  "declared_kind": "probability",
-  "declared_range": [
-   0.0,
-   1.0
-  ],
-  "declared_provenance": "mined from prose; NOT machine-checked",
-  "range_proving_theorems": {
-   "lo": "Calibrator.citl_shift_positive_higher_prevalence"
-  },
-  "n_points_scanned": 49,
-  "n_out_of_range": 32,
-  "kinds": [
-   "IN-SCOPE-VIOLATION",
-   "UNGUARDED-DOCSTRING"
-  ],
-  "worst": {
-   "point": {
-    "pi_source": 1.0333333333333334,
-    "pi_target": 0.05
-   },
-   "value": -6.378426183651584,
-   "side": "lo",
-   "bound": 0.0,
-   "kind": "IN-SCOPE-VIOLATION",
-   "proving_theorem": "Calibrator.citl_shift_positive_higher_prevalence",
-   "theorem_preconditions_hold": true
-  },
-  "empirical_status": ""
- },
- {
-  "definition": "Calibrator.neutralPortabilityRatioLD",
-  "source": "Calibrator/PhenomeWidePortability.lean:37",
-  "declared_kind": "R-squared",
-  "declared_range": [
-   0.0,
-   1.0
-  ],
-  "declared_provenance": "mined from prose; NOT machine-checked",
-  "range_proving_theorems": {
-   "lo": "Calibrator.neutral_ratio_in_unit",
-   "hi": "Calibrator.neutral_ratio_in_unit"
-  },
-  "n_points_scanned": 49,
-  "n_out_of_range": 17,
-  "kinds": [
-   "IN-SCOPE-VIOLATION"
-  ],
-  "worst": {
-   "point": {
-    "fst_additional": 0.02,
-    "ld_factor": 3.0000000000000004
-   },
-   "value": 2.9400000000000004,
-   "side": "hi",
-   "bound": 1.0,
-   "kind": "IN-SCOPE-VIOLATION",
-   "proving_theorem": "Calibrator.neutral_ratio_in_unit",
-   "theorem_preconditions_hold": true
-  },
-  "empirical_status": ""
- },
- {
-  "definition": "Calibrator.portabilityGap",
-  "source": "Calibrator/MultiAncestryTheory.lean:428",
-  "declared_kind": "R-squared",
-  "declared_range": [
-   0.0,
-   1.0
-  ],
-  "declared_provenance": "mined from prose; NOT machine-checked",
-  "range_proving_theorems": {
-   "lo": "Calibrator.portability_gap_nonneg"
-  },
-  "n_points_scanned": 49,
-  "n_out_of_range": 21,
-  "kinds": [
-   "IN-SCOPE-VIOLATION"
-  ],
-  "worst": {
-   "point": {
-    "r2_source": 0.02,
-    "r2_target": 0.98
-   },
-   "value": -0.96,
-   "side": "lo",
-   "bound": 0.0,
-   "kind": "IN-SCOPE-VIOLATION",
-   "proving_theorem": "Calibrator.portability_gap_nonneg",
-   "theorem_preconditions_hold": true
-  },
-  "empirical_status": ""
  },
  {
   "definition": "Calibrator.tagR2",
@@ -318,7 +64,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-PROVEN",
    "proving_theorem": "Calibrator.tag_r2_le_one",
-   "theorem_preconditions_hold": false
+   "theorem_preconditions_hold": false,
+   "n_preconditions_modelled": 3,
+   "n_preconditions_dropped": 0
   },
   "empirical_status": ""
  },
@@ -350,7 +98,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-PROVEN",
    "proving_theorem": "Calibrator.requiredTargetSamplesForOptimalFineTuningMSE_pos",
-   "theorem_preconditions_hold": false
+   "theorem_preconditions_hold": false,
+   "n_preconditions_modelled": 3,
+   "n_preconditions_dropped": 0
   },
   "empirical_status": ""
  },
@@ -382,7 +132,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-PROVEN",
    "proving_theorem": "Calibrator.nei_fst_in_unit",
-   "theorem_preconditions_hold": false
+   "theorem_preconditions_hold": false,
+   "n_preconditions_modelled": 3,
+   "n_preconditions_dropped": 0
   },
   "empirical_status": "UNTESTED"
  },
@@ -413,7 +165,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-PROVEN",
    "proving_theorem": "Calibrator.portable_fraction_le_one",
-   "theorem_preconditions_hold": false
+   "theorem_preconditions_hold": false,
+   "n_preconditions_modelled": 2,
+   "n_preconditions_dropped": 0
   },
   "empirical_status": ""
  },
@@ -445,7 +199,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-PROVEN",
    "proving_theorem": "Calibrator.ldPanelRetentionFraction_mem",
-   "theorem_preconditions_hold": false
+   "theorem_preconditions_hold": false,
+   "n_preconditions_modelled": 2,
+   "n_preconditions_dropped": 0
   },
   "empirical_status": "UNTESTED"
  },
@@ -478,7 +234,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-PROVEN",
    "proving_theorem": "Calibrator.bottleneck_excess_ld_pos",
-   "theorem_preconditions_hold": false
+   "theorem_preconditions_hold": false,
+   "n_preconditions_modelled": 5,
+   "n_preconditions_dropped": 0
   },
   "empirical_status": "UNTESTED"
  },
@@ -509,7 +267,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -539,7 +299,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -568,7 +330,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -597,7 +361,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -626,9 +392,46 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "DERIVED"
+ },
+ {
+  "definition": "Calibrator.admixtureLDBoost",
+  "source": "Calibrator/PortabilityDrift.lean:5301",
+  "declared_kind": "ratio",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.admixtureLDBoost_gt_one"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 202,
+  "kinds": [
+   "UNGUARDED-DOCSTRING",
+   "UNKNOWN-SCOPE"
+  ],
+  "worst": {
+   "point": {
+    "r": 3.0000000000000004,
+    "t_since": 20.0,
+    "equilibrium_ld": 0.05
+   },
+   "value": 20971520.000000093,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
+  },
+  "empirical_status": "UNTESTED"
  },
  {
   "definition": "Calibrator.demographicSpike",
@@ -656,7 +459,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VALIDATED"
  },
@@ -688,7 +493,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -719,7 +526,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -750,7 +559,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VALIDATED"
  },
@@ -780,7 +591,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -809,7 +622,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -841,7 +656,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VALIDATED"
  },
@@ -872,7 +689,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -902,7 +721,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VALIDATED"
  },
@@ -932,7 +753,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VALIDATED"
  },
@@ -962,7 +785,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -993,7 +818,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1023,7 +850,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1056,7 +885,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1087,7 +918,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1116,7 +949,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1146,7 +981,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1177,7 +1014,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1211,7 +1050,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-PROVEN",
    "proving_theorem": "Calibrator.am_ld_sign",
-   "theorem_preconditions_hold": false
+   "theorem_preconditions_hold": false,
+   "n_preconditions_modelled": 5,
+   "n_preconditions_dropped": 0
   },
   "empirical_status": ""
  },
@@ -1241,7 +1082,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1270,7 +1113,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "DERIVED"
  },
@@ -1298,7 +1143,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1329,7 +1176,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1359,7 +1208,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1388,7 +1239,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1420,7 +1273,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1450,7 +1305,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1480,7 +1337,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1512,7 +1371,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VALIDATED"
  },
@@ -1542,7 +1403,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1572,7 +1435,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1602,7 +1467,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1631,7 +1498,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1660,7 +1529,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1689,7 +1560,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1720,7 +1593,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1752,7 +1627,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1780,7 +1657,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1810,7 +1689,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1839,7 +1720,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1871,7 +1754,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -1901,7 +1786,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1930,7 +1817,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "DERIVED"
  },
@@ -1959,7 +1848,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -1991,7 +1882,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2023,7 +1916,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2052,7 +1947,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2081,7 +1978,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2110,7 +2009,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2139,7 +2040,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2168,9 +2071,45 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.ldKernelSymbol",
+  "source": "Calibrator/ImitationRigidity.lean:689",
+  "declared_kind": "correlation",
+  "declared_range": [
+   -1.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.ldKernelSymbol_pos"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 17,
+  "kinds": [
+   "UNGUARDED-DOCSTRING",
+   "UNKNOWN-SCOPE"
+  ],
+  "worst": {
+   "point": {
+    "decay": 1.0333333333333334,
+    "angle": 0.05
+   },
+   "value": -18.348537393143317,
+   "side": "lo",
+   "bound": -1.0,
+   "kind": "UNKNOWN-SCOPE",
+   "proving_theorem": "Calibrator.ldKernelSymbol_pos",
+   "theorem_preconditions_hold": true,
+   "n_preconditions_modelled": 0,
+   "n_preconditions_dropped": 1
+  },
+  "empirical_status": "DERIVED"
  },
  {
   "definition": "Calibrator.numberNeededToScreen",
@@ -2197,7 +2136,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2228,7 +2169,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2260,7 +2203,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2290,7 +2235,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2320,7 +2267,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2352,7 +2301,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2381,7 +2332,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2410,7 +2363,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2439,7 +2394,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VACUOUS"
  },
@@ -2469,7 +2426,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2498,7 +2457,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2529,7 +2490,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2559,7 +2522,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2591,7 +2556,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2622,7 +2589,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2652,7 +2621,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2681,7 +2652,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2710,7 +2683,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2739,7 +2714,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2768,7 +2745,43 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.prevalenceCITLShift",
+  "source": "Calibrator/PGSCalibrationTheory.lean:259",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.citl_shift_positive_higher_prevalence"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 32,
+  "kinds": [
+   "UNGUARDED-DOCSTRING",
+   "UNKNOWN-SCOPE"
+  ],
+  "worst": {
+   "point": {
+    "pi_source": 1.0333333333333334,
+    "pi_target": 0.05
+   },
+   "value": -6.378426183651584,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNKNOWN-SCOPE",
+   "proving_theorem": "Calibrator.citl_shift_positive_higher_prevalence",
+   "theorem_preconditions_hold": true,
+   "n_preconditions_modelled": 0,
+   "n_preconditions_dropped": 0
   },
   "empirical_status": ""
  },
@@ -2797,7 +2810,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2827,7 +2842,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2857,7 +2874,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -2887,7 +2906,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2916,7 +2937,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2947,7 +2970,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -2977,7 +3002,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3006,7 +3033,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3036,7 +3065,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3070,7 +3101,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3099,7 +3132,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3129,7 +3164,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3158,7 +3195,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3188,7 +3227,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3217,7 +3258,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3246,7 +3289,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3274,7 +3319,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3304,7 +3351,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3334,7 +3383,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3364,7 +3415,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3392,7 +3445,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VACUOUS"
  },
@@ -3424,7 +3479,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3454,7 +3511,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3484,7 +3543,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "DERIVED"
  },
@@ -3518,7 +3579,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3547,7 +3610,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3578,7 +3643,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3607,7 +3674,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3636,7 +3705,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VACUOUS"
  },
@@ -3665,7 +3736,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3695,7 +3768,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3726,7 +3801,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VALIDATED"
  },
@@ -3758,7 +3835,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3788,7 +3867,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3819,7 +3900,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3849,7 +3932,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3879,7 +3964,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -3911,7 +3998,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3940,7 +4029,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "UNTESTED"
  },
@@ -3970,7 +4061,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "VALIDATED"
  },
@@ -3999,7 +4092,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -4028,7 +4123,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -4057,7 +4154,9 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": ""
  },
@@ -4085,7 +4184,9 @@
    "bound": 1.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "DERIVED"
  },
@@ -4113,8 +4214,179 @@
    "bound": 0.0,
    "kind": "UNGUARDED-DOCSTRING",
    "proving_theorem": null,
-   "theorem_preconditions_hold": null
+   "theorem_preconditions_hold": null,
+   "n_preconditions_modelled": null,
+   "n_preconditions_dropped": null
   },
   "empirical_status": "DERIVED"
+ },
+ {
+  "definition": "Calibrator.selectedDriftFactor",
+  "source": "Calibrator/PhenomeWidePortability.lean:137",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.selectedDriftFactor_mem_unit",
+   "hi": "Calibrator.selectedDriftFactor_mem_unit"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 336,
+  "kinds": [
+   "UNKNOWN-SCOPE"
+  ],
+  "worst": {
+   "point": {
+    "Ne": 1000.0,
+    "t": 20.0,
+    "s_correction": 3.0000000000000004
+   },
+   "value": 1096766110434.8751,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNKNOWN-SCOPE",
+   "proving_theorem": "Calibrator.selectedDriftFactor_mem_unit",
+   "theorem_preconditions_hold": true,
+   "n_preconditions_modelled": 1,
+   "n_preconditions_dropped": 2
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.portabilityRatio",
+  "source": "Calibrator/StatisticalGeneticsMethodology.lean:74",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "hi": "Calibrator.portability_ratio_le_one"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNKNOWN-SCOPE"
+  ],
+  "worst": {
+   "point": {
+    "dr2_target": 3.0000000000000004,
+    "dr2_source": 0.05
+   },
+   "value": 60.00000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNKNOWN-SCOPE",
+   "proving_theorem": "Calibrator.portability_ratio_le_one",
+   "theorem_preconditions_hold": true,
+   "n_preconditions_modelled": 0,
+   "n_preconditions_dropped": 0
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.neutralAFBenchmarkRatio",
+  "source": "Calibrator/PortabilityDrift.lean:2982",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.neutral_af_benchmark_bounded_by_fst",
+   "hi": "Calibrator.neutral_af_benchmark_bounded_by_fst"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNKNOWN-SCOPE"
+  ],
+  "worst": {
+   "point": {
+    "fstSource": 0.98,
+    "fstTarget": 0.02
+   },
+   "value": 48.99999999999996,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNKNOWN-SCOPE",
+   "proving_theorem": "Calibrator.neutral_af_benchmark_bounded_by_fst",
+   "theorem_preconditions_hold": true,
+   "n_preconditions_modelled": 0,
+   "n_preconditions_dropped": 0
+  },
+  "empirical_status": "FALSIFIED"
+ },
+ {
+  "definition": "Calibrator.neutralPortabilityRatioLD",
+  "source": "Calibrator/PhenomeWidePortability.lean:37",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.neutral_ratio_in_unit",
+   "hi": "Calibrator.neutral_ratio_in_unit"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 17,
+  "kinds": [
+   "UNKNOWN-SCOPE"
+  ],
+  "worst": {
+   "point": {
+    "fst_additional": 0.02,
+    "ld_factor": 3.0000000000000004
+   },
+   "value": 2.9400000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNKNOWN-SCOPE",
+   "proving_theorem": "Calibrator.neutral_ratio_in_unit",
+   "theorem_preconditions_hold": true,
+   "n_preconditions_modelled": 0,
+   "n_preconditions_dropped": 0
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.portabilityGap",
+  "source": "Calibrator/MultiAncestryTheory.lean:428",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.portability_gap_nonneg"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNKNOWN-SCOPE"
+  ],
+  "worst": {
+   "point": {
+    "r2_source": 0.02,
+    "r2_target": 0.98
+   },
+   "value": -0.96,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNKNOWN-SCOPE",
+   "proving_theorem": "Calibrator.portability_gap_nonneg",
+   "theorem_preconditions_hold": true,
+   "n_preconditions_modelled": 0,
+   "n_preconditions_dropped": 0
+  },
+  "empirical_status": ""
  }
 ]

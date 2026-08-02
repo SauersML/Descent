@@ -34,10 +34,28 @@ kinds are never merged:
                        than the name implies.
 
   IN-SCOPE-VIOLATION   the value leaves a proven bound at a point where the
-                       proving theorem's preconditions DO hold. That cannot
-                       happen if Lean is consistent and the extraction is
-                       faithful, so it indicts the extraction or this scanner,
-                       never the corpus. Reported loudly and separately.
+                       proving theorem's preconditions DO hold, AND at least
+                       one precondition was actually modelled and evaluated.
+                       That cannot happen if Lean is consistent and the
+                       extraction is faithful, so it indicts the extraction or
+                       this scanner, never the corpus.
+
+  UNKNOWN-SCOPE        the value leaves a proven bound but the proving theorem
+                       has NO modellable hypotheses recorded, so whether the
+                       point is in scope cannot be decided. This is NOT a
+                       finding. It must never be collapsed into
+                       IN-SCOPE-VIOLATION: an empty precondition list makes
+                       `satisfies` return True VACUOUSLY, which would report
+                       every such definition as contradicting a Lean theorem.
+                       That mis-classification produced 8 spurious hits on the
+                       first run of this scanner, including
+                       `portability_ratio_le_one`, whose real hypotheses
+                       (`0 < dr2_s`, `dr2_t <= dr2_s`) exist in the Lean but
+                       are attributed to the definition as `[]` because the
+                       theorem renames the binders (`dr2_t` vs `dr2_target`).
+                       Corpus-wide, 2997 of 4743 theorem attributions carry an
+                       empty hypothesis list, so this is the common case, not
+                       an edge case.
 
 Points are scanned inside `api.admissible_box`, and Mathlib totality applies
 throughout because the callables come from extract (`lean_rt`).
@@ -125,16 +143,40 @@ def scan_definition(fq: str) -> dict | None:
             if thm is None:
                 kind = "UNGUARDED-DOCSTRING"
                 thm_holds = None
+                n_modelled = n_dropped = None
             else:
+                # How many of this theorem's hypotheses were actually modelled?
+                # Zero means `satisfies` returns True vacuously and decides
+                # nothing -- see UNKNOWN-SCOPE above.
+                try:
+                    preds, _texts, dropped = api.hypotheses(fq, thm)
+                    n_modelled, n_dropped = len(preds), len(dropped)
+                except Exception:
+                    n_modelled, n_dropped = 0, 1
                 try:
                     thm_holds = api.satisfies(fq, point, thm)
                 except Exception:
                     thm_holds = None
-                kind = "IN-SCOPE-VIOLATION" if thm_holds else "UNGUARDED-PROVEN"
+                # `satisfies` means "every MODELLED hypothesis holds". If any
+                # hypothesis was dropped as unparseable it is unsound in the
+                # True direction, so a True verdict decides nothing. Example:
+                # selectedDriftFactor_mem_unit has three hypotheses; only
+                # `0 < s_correction` is modelled, and the one that actually
+                # binds -- `s_correction < 1/(2*Ne)` -- is dropped. At
+                # s_correction=3.0, Ne=1000 the modelled one holds, the dropped
+                # one fails 3.0 < 0.0005, and the theorem does not apply.
+                if n_modelled == 0 or n_dropped > 0:
+                    kind = "UNKNOWN-SCOPE"
+                elif thm_holds:
+                    kind = "IN-SCOPE-VIOLATION"
+                else:
+                    kind = "UNGUARDED-PROVEN"
             hits.append({
                 "point": point, "value": v, "side": side, "bound": bound,
                 "kind": kind, "proving_theorem": thm,
                 "theorem_preconditions_hold": thm_holds,
+                "n_preconditions_modelled": n_modelled,
+                "n_preconditions_dropped": n_dropped if thm else None,
             })
     if not hits:
         return None
@@ -171,7 +213,8 @@ if __name__ == "__main__":
     import json
 
     res = scan_all()
-    order = {"IN-SCOPE-VIOLATION": 0, "UNGUARDED-PROVEN": 1, "UNGUARDED-DOCSTRING": 2}
+    order = {"IN-SCOPE-VIOLATION": 0, "UNGUARDED-PROVEN": 1,
+             "UNGUARDED-DOCSTRING": 2, "UNKNOWN-SCOPE": 3}
     res.sort(key=lambda r: (order.get(r["kinds"][0], 9),
                             -abs(r["worst"]["value"] - r["worst"]["bound"])))
     print(f"{len(res)} definitions leave their declared range somewhere in their box\n")
