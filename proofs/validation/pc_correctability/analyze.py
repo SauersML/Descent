@@ -3,12 +3,38 @@
 For each replicate we know n, M, the realized Hudson Fst, and the subgroup size.
 The Lean model predicts
 
-    s = demographicSpike = KAPPA * F * m (n - m) / n     with KAPPA = 2
+    s = demographicSpike = KAPPA * F * m (n - m) / n     with KAPPA = 4
     edge = bbpProxyThreshold = sqrt(n / M)               (BBP: detect iff s > edge)
     overlap^2 = (1 - c/s^2) / (1 + c/s)                  c = n / M
 
 We invert the BBP eigenvalue law lam1 = (1+s)(1+c/s) to recover an observed
 spike per replicate, and report the implied KAPPA.
+
+WHICH KAPPA, AND WHICH F_ST -- BOTH WERE WRONG HERE
+
+This docstring said KAPPA = 2, contradicting `Calibrator/PCCorrectability/
+Threshold.lean` and `analyze_b.py`, which both use 4. The constant is 4:
+inverting BBP on simulated genotypes recovers 3.9920 +/- 0.0045 with F measured
+as Hudson's F_ST on the same data. A constant of 2 corresponds to reading F as
+Var(p1 - p2) / (pbar (1 - pbar)) = 2 F_ST, which is self-consistent but is not
+a standard quantity.
+
+The scale of F is therefore pinned to GENUINE Hudson F_ST -- the ratio-of-
+averages estimator `hudson_fst` in `bn_independent.py`, whose denominator is
+the between-subgroup heterozygosity p1(1-p2) + p2(1-p1).
+
+Do NOT substitute `Calibrator.Conventions.hudsonFst`. Despite its name that
+definition computes NEI'S G_ST (it divides by the total-pool heterozygosity
+2 pbar (1 - pbar)), and the two are related exactly by
+
+    Hudson = 2G / (1 + G)
+
+so G understates Hudson by a factor tending to 2. Feeding G here in place of
+Hudson would halve the recovered spike. `which_fst.py` measures the ratio at
+1.990 for F = 0.01 and shows it is invariant to the ancestral allele-frequency
+spectrum -- 1.990 alike at mean pbar 0.5001, 0.2751, 0.7250 and 0.1050 -- so
+the two estimators do not coincide anywhere in this design, and the closed form
+above reproduces those measurements to 5-7 decimals.
 """
 from __future__ import annotations
 
