@@ -1010,177 +1010,29 @@ theorem diploid_coverage_invariant_of_joint_floor {k : ℕ} (fiber value : Fin k
     (FiberCoupling.fullSupport_of_uniform_floor J η hη hfloor)
     (FiberCoupling.fullSupport_of_uniform_floor J' η' hη' hfloor') value
 
-/-! ## 11. THE REVERSAL THEOREM: portability degradation is not a number
+/-! ## 10. Task-relative spectral portability
 
-This is the module's headline for the biology, and it settles two of the three published
-open questions in the portability literature — as a **theorem**, not as a proposed
-mechanism.
+`FiniteSpectralModel.degradation_eq_weighted_readout_distance` is the exact finite-band
+identity behind relative degradation:
 
-**The exact identity first**, because it is an equality with no closeness hypothesis:
+`DEG(P → P') = ∑ₛ |c_P/σ_P - c_{P'}/σ_{P'}|² σ_{P'}(s)`.
 
-`DEG(P → P') = ∫ |c_P/σ_P - c_{P'}/σ_{P'}|² · σ_{P'}(s) ds`
+It has no closeness hypothesis and is directed because evaluation occurs under the target
+spectrum. `twoBand_reversal_values` computes an explicit low-band/high-band reversal, and
+`twoBand_no_common_monotone_scalar` proves that no single scalar population distance,
+even with task-specific monotone rescalings, can reproduce both task orderings. The result
+is consumed by `MetricSpecificPortability.not_hasTaskIndependentSpectralPortabilityScalar`.
 
-So a readout's weighting is explicit: **which spectral band a readout lives in determines
-which discrepancy it is exposed to.** Degradation is a *family* of quadratic functionals
-indexed by what the readout weights, not a property of the population pair.
+This is the biologically useful conclusion: long-horizon ancestry-sensitive readouts and
+short-window haplotype or imputation readouts can rank the same population shifts in
+opposite orders. Cross-trait and cross-metric disagreement need not be sampling noise.
 
-**The reversal.** There is no scalar divergence `D(P,P')` — no functional of the pair
-alone — and no monotone `Φ` with `DEG_k = Φ_k(D)`, **not even up to ordinal equivalence**:
-the ordering of pairs by degradation *reverses* across bands. The witness is explicit and
-computed rather than argued: four couplings built through their spectral symbols, two
-perturbed in a low band and two in a high band; against a long-horizon readout the first
-pair degrades and the second does not, and against a short-horizon readout exactly the
-reverse.
-
-**What it explains.** The published open questions include that *portability trends vary
-across traits*, and that *qualitative trends depend on the metric of predictive
-performance* — precision roughly constant while recall rises with genetic distance. The
-reversal theorem says **both are structural and unavoidable**. A trait whose signal sits in
-one band and a trait whose signal sits in another **will** disagree about which target
-population is harder; a metric sensitive to one band **will** disagree with a metric
-sensitive to another. This is not a caution about noisy measurement: it is a proof that the
-quantity everyone is trying to summarize with one number **does not admit one number**.
-
-What survives is a **two-band representation**: restrict the degradation to a low and a high
-band and the canonical orderings are determined. The right object is the family; the theorem
-is that the family has no one-dimensional monotone section.
-
-**Audit points, carried as named hypotheses** rather than absorbed: the boundary terms in the
-renormalization reduction, and the symbol-to-correlation positivity used to realize the band
-symbols.
+The stationary integral formula is the continuum analogue, not a theorem of this finite
+module. A Szegő/Avram--Parter rate requires a uniformly positive symbol, regular
+cross-spectrum and controlled finite-window boundaries. Likewise, no
+`n^β log n` conditional-gain law, heavy-tail renewal rate, or Pisot classification is
+claimed without the missing analytic and non-cancellation hypotheses.
 -/
-
-/-- A **family of degradation functionals**, indexed by the evaluation band a readout
-weights. `deg k p` is the degradation of population pair `p` as seen in band `k`. -/
-structure DegradationFamily (Pair : Type*) where
-  /-- Degradation of a pair, as seen from a given evaluation band. -/
-  deg : ℕ → Pair → ℝ
-
-/-- **A scalar summary of degradation**: one number per population pair, which every band
-reads through its own monotone rescaling. This is what "genetic distance predicts
-portability loss" asserts, and what the reversal refutes. -/
-def HasScalarSummary {Pair : Type*} (F : DegradationFamily Pair) : Prop :=
-  ∃ D : Pair → ℝ, ∃ Φ : ℕ → ℝ → ℝ,
-    (∀ k : ℕ, Monotone (Φ k)) ∧ ∀ (k : ℕ) (p : Pair), F.deg k p = Φ k (D p)
-
-/-- **THE REVERSAL THEOREM.** One reversed pair of pairs kills every scalar summary at once.
-
-If band `k` ranks `p` below `q` and band `l` ranks `q` below `p`, then no single number per
-population pair — however rescaled, and however the rescaling varies with the band — can
-reproduce both orderings. Monotone maps preserve order, so a scalar summary forces all bands
-to agree on the ranking; the witness says two of them do not.
-
-**Biologically: portability degradation is not a scalar property of a population pair that
-different traits and metrics estimate with different noise.** Cross-trait disagreement and
-metric-dependent trend reversal are consequences of the structure, not defects of the
-studies that report them. -/
-theorem no_scalar_summary_of_reversal {Pair : Type*} (F : DegradationFamily Pair)
-    (p q : Pair) (k l : ℕ)
-    (hk : F.deg k p < F.deg k q) (hl : F.deg l q < F.deg l p) :
-    ¬ HasScalarSummary F := by
-  rintro ⟨D, Φ, hmono, heq⟩
-  rcases le_total (D p) (D q) with h | h
-  · have hle : Φ l (D p) ≤ Φ l (D q) := hmono l h
-    rw [← heq l p, ← heq l q] at hle
-    linarith
-  · have hle : Φ k (D q) ≤ Φ k (D p) := hmono k h
-    rw [← heq k p, ← heq k q] at hle
-    linarith
-
-/-- The two-band representation that does survive: the canonical orderings are determined by
-restricting to a low and a high band. Recorded with the two audit points as fields. -/
-structure TwoBandRepresentation (Pair : Type*) where
-  /-- The degradation family. -/
-  family : DegradationFamily Pair
-  /-- The low evaluation band. -/
-  lowBand : ℕ
-  /-- The high evaluation band. -/
-  highBand : ℕ
-  /-- **Audit point.** Boundary terms in the renormalization reduction. -/
-  boundaryTermsControlled : Prop
-  /-- **Audit point.** Symbol-to-correlation positivity, used to realize the band symbols. -/
-  symbolPositivity : Prop
-  /-- Whether the canonical orderings are determined. -/
-  orderingsDetermined : Prop
-  /-- The two bands suffice, given both audit points. -/
-  twoBandsSuffice : boundaryTermsControlled → symbolPositivity → orderingsDetermined
-
-/-! ### The exponent `β`: effective independence is `n^β`, and `β` is already measured
-
-For a long-range coupling whose correlation decays like `(1+k)^{-β}`, the conditional gain
-is `Γ = Θ(n^β log n)` for every `β ∈ (0,1)`, with matched bounds both ways — a genuine
-continuum between the shared-factor case `Θ(log n)` and full independence `Θ(n)`.
-
-**And `β` is the low-frequency exponent of the coupling's spectral density**, equivalently
-the deviation exponent of the field the correlation is read from. For markers along a
-chromosome **that is the LD decay exponent, which is estimated routinely.**
-
-> **The effective independence of `n` markers is `n^β`, with `β` read off an LD decay
-> curve.**
-
-Not `n/ℓ`, not `log n`: a power, whose exponent is already measured in every LD analysis.
-This is the sharpest answer this development gives to "what is the effective number of
-independent markers", and it subsumes the two earlier answers as the endpoints `β → 1`
-(independence) and `β → 0` (shared factor). The transfer threshold becomes a continuum with
-it: `n ≳ (log N / log log N)^{1/β}`. -/
-structure DecayExponent where
-  /-- The LD decay exponent `β ∈ (0,1)`, read off the correlation decay curve. -/
-  beta : ℝ
-  beta_pos : 0 < beta
-  beta_lt_one : beta < 1
-  /-- Number of markers. -/
-  markerCount : ℝ
-  markerCount_gt_one : 1 < markerCount
-  /-- Effective independence, `n^β`. -/
-  effectiveIndependence : ℝ
-  effectiveIndependence_eq : effectiveIndependence = markerCount ^ beta
-
-namespace DecayExponent
-
-variable (E : DecayExponent)
-
-/-- **Faster LD decay buys more effective independence**, monotonically in the exponent.
-Two panels of the same size with different decay exponents are not equally informative, and
-the comparison is by a measured quantity. -/
-theorem effectiveIndependence_mono (E' : DecayExponent)
-    (hsize : E.markerCount = E'.markerCount) (hbeta : E.beta < E'.beta) :
-    E.effectiveIndependence < E'.effectiveIndependence := by
-  rw [E.effectiveIndependence_eq, E'.effectiveIndependence_eq, hsize]
-  exact Real.rpow_lt_rpow_left_iff (by linarith [E'.markerCount_gt_one] :
-    1 < E'.markerCount) |>.mpr hbeta
-
-end DecayExponent
-
-/-! ### The heavy-tail warning: counting blocks is blind, not merely inaccurate
-
-Blocks of **heavy-tailed** length with copies inside — which is what recombination hotspots
-produce, since hotspot spacing makes block lengths highly variable — give a block count of
-order `n^α`. The counting invariant reports `n^α`. **The truth is `Θ(α log n)`.**
-
-The moral is sharper than the instance. Two couplings with **identical effective-unit
-counts** have gains of order `log n` and `n^α` respectively, so **no counting functional can
-distinguish them.** Counting LD blocks does not merely approximate effective independence
-badly: it is blind to the distinction that matters, and it fails in the direction of
-**catastrophic overestimation** exactly when block lengths are heavy-tailed, which is the
-realistic case.
-
-What sees the difference is **the cost of the freezing event, not the number of units**. -/
-theorem no_counting_functional {Coupling : Type*} (count gain : Coupling → ℝ)
-    (c₁ c₂ : Coupling) (hcount : count c₁ = count c₂) (hgain : gain c₁ ≠ gain c₂) :
-    ¬ ∃ f : ℝ → ℝ, ∀ c : Coupling, gain c = f (count c) := by
-  rintro ⟨f, hf⟩
-  exact hgain (by rw [hf c₁, hf c₂, hcount])
-
-/-! ### Scope: the arithmetic obstruction, which is not the entropic one
-
-Deterministic driving lives at `O(1)` or `Θ(log n)` and **cannot reach the continuum**, and
-the obstruction is **arithmetic, not entropic**. Under a Pisot renormalization spectrum the
-characteristic function telescopes to a nonzero limit and the decay collapses entirely —
-**despite a positive deviation exponent**. So a strictly periodic or self-similar marker
-layout sits outside the theory for a reason that has nothing to do with information content.
-That is a designed-panel artifact rather than a biological configuration, but it belongs in
-the scope statement because it is the one case where a positive deviation exponent does not
-buy decay. -/
 
 /-!
 ## What is left open, plainly
