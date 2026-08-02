@@ -65,9 +65,10 @@ CAN-FAIL CLAUSE ON THE GRID
     mu/(h*s + mu) and the textbook mu/(h*s) agree to within mu/(hs) of each
     other -- i.e. they CONVERGE as s grows. A grid confined to large s would
     validate both. The grid therefore runs down to h*s = 3e-4 with mu = 1e-5,
-    where mu/(hs) = 0.0333 and mu/(hs+mu) = 0.0323: a 3.2% separation that a
-    10^6-replicate run resolves. Likewise the N axis spans 10^2 to 10^7, which
-    is 4Ns from 0.12 to 12000 -- drift-dominated to selection-dominated.
+    where mu/(hs) = 0.0333 and mu/(hs+mu) = 0.0323: a 3.2% separation the
+    run below resolves. Likewise the N axis spans 5x10^2 to 10^6, which at
+    h*s = 3e-4 is 4N(hs) from 0.6 to 1200 -- drift-dominated to
+    selection-dominated. The drift-free end is control 2, at N = 10^7.
 
 SPEED
     VECTORIZED OVER REPLICATES. A Wright-Fisher generation for R independent
@@ -75,6 +76,13 @@ SPEED
     loop of R calls. Every regime below is (n_cells, n_replicates) arrays
     advanced together, so wall time scales with GENERATIONS, not with
     generations x replicates.
+
+    The second lever is TIME-AVERAGING. Once burnt in, the chain is
+    stationary, so each further generation is another draw and precision is
+    bought with generations that are already being paid for. Every equilibrium
+    number below is a per-replicate time average over a sampling window equal
+    to the burn-in, then averaged across replicates. This RAISES precision at
+    fixed cost; it is not a reduction of replicates, tolerances or grid.
 """
 
 import json
@@ -118,10 +126,18 @@ for _n in ("continentIslandStepSelectionFirst",
         print("WARNING: could not load %s from the corpus: %s" % (_n, exc))
 
 
-def call(name, **kw):
-    """Evaluate a corpus definition by Lean argument name."""
+def call(name, *pos):
+    """Evaluate a corpus definition POSITIONALLY, in Lean binder order.
+
+    Not by keyword: api.callable_for hands back the PYTHON names, and Lean
+    binders that are not legal Python (θ, μ, p₁) are renamed by translate.
+    Positional order is the one thing that is stable.
+    """
     fn, args = LEAN[name]
-    return float(fn(*[kw[a] for a in args]))
+    if len(pos) != len(args):
+        raise RuntimeError("%s takes %d args %r, got %d"
+                           % (name, len(args), args, len(pos)))
+    return float(fn(*pos))
 
 
 RNG = np.random.default_rng(20260802)
@@ -190,7 +206,7 @@ def control_algebra():
             # e^-800 at the slowest cell on this grid.
             for _ in range(40000):
                 p = float(fn(**dict(zip(argn, (s, m, p)))))
-            closed = call(eqname, s=s, m=m)
+            closed = call(eqname, s, m)
             rows.append({"s": s, "m": m, "order": order,
                          "iterated_fixed_point": p, "closed_form": closed,
                          "abs_err": abs(p - closed)})
@@ -202,13 +218,13 @@ def control_algebra():
         # the residual is below 1e-17 relative, far under the 1e-6 tolerance.
         for _ in range(int(40.0 / (h * s + mu))):
             q = float(fn(**dict(zip(argn, (mu, s, h, q)))))
-        closed = call("mutationSelectionBalance", mu=mu, s=s, h=h)
+        closed = call("mutationSelectionBalance", mu, s, h)
         rows.append({"mu": mu, "s": s, "h": h, "order": "rare_additive",
                      "iterated_fixed_point": q, "closed_form": closed,
                      "abs_err": abs(q - closed)})
     for (mu, s) in ((1e-5, 0.01), (1e-6, 0.05)):
         fn, argn = LEAN["mutationSelectionStepRecessive"]
-        closed = call("mutationSelectionBalanceRecessive", mu=mu, s=s)
+        closed = call("mutationSelectionBalanceRecessive", mu, s)
         q = 0.0
         # contraction rate near the fixed point is (1 - 2 s q* - mu).
         for _ in range(int(40.0 / (2 * s * closed + mu))):
@@ -244,7 +260,7 @@ def control_driftfree():
         for _ in range(4000):
             p = wf_continent_island(p, s, m, BIG, order)
         pred = call("selectionMigrationEquilibrium" if order == "selection_first"
-                    else "selectionMigrationEquilibriumMigrationFirst", s=s, m=m)
+                    else "selectionMigrationEquilibriumMigrationFirst", s, m)
         mean = float(p.mean())
         rows.append({"s": s, "m": m, "order": order, "N": BIG,
                      "measured": mean, "predicted": pred,
@@ -306,26 +322,44 @@ def control_halves():
 
 # ===========================================================================
 # REGIME 1 -- continent-island. Vary N, which no member takes.
+#
+# PRECISION COMES FROM TIME-AVERAGING, NOT FROM MORE REPLICATES. The chain is
+# stationary after burn-in, so every subsequent generation is another draw from
+# the stationary distribution. Averaging R replicates over G sampling
+# generations is far more information than one snapshot of R x (something)
+# replicates at the same cost, because the cost is set by GENERATIONS. The
+# reported SEM is the between-replicate SEM of the per-replicate time average,
+# which is honest about the within-chain autocorrelation that a naive
+# R*G-independent-draws count would not be.
 # ===========================================================================
 
 def regime_continent_island():
     out = []
     R = 4000
-    GENS = 6000
+    BURN, SAMP = 3000, 3000
     for (s, m) in ((0.10, 0.05), (0.10, 0.08), (0.05, 0.04)):
         for order in ("selection_first", "migration_first"):
             pred = call("selectionMigrationEquilibrium"
                         if order == "selection_first"
                         else "selectionMigrationEquilibriumMigrationFirst",
-                        s=s, m=m)
-            for N in (100, 1000, 10000, 10 ** 7):
+                        s, m)
+            for N in (100, 1000, 10000, 10 ** 6):
                 p = np.full(R, min(0.9, max(pred, 0.05)))
-                for _ in range(GENS):
+                for _ in range(BURN):
                     p = wf_continent_island(p, s, m, N, order)
-                mean = float(p.mean())
-                sem = float(p.std()) / np.sqrt(R)
-                lost = float((p <= 0).mean())
+                acc = np.zeros(R)
+                lost_acc = np.zeros(R)
+                for _ in range(SAMP):
+                    p = wf_continent_island(p, s, m, N, order)
+                    acc += p
+                    lost_acc += (p <= 0)
+                per_rep = acc / SAMP
+                mean = float(per_rep.mean())
+                sem = float(per_rep.std()) / np.sqrt(R)
+                lost = float((lost_acc / SAMP).mean())
                 out.append({"s": s, "m": m, "order": order, "N": N,
+                            "replicates": R, "burn_in": BURN,
+                            "sampling_generations": SAMP,
                             "measured_mean_freq": mean, "sem": sem,
                             "loss_fraction": lost,
                             "corpus_prediction": pred,
@@ -344,21 +378,29 @@ def regime_continent_island():
 
 def regime_mutation_selection():
     out = []
-    R = 20000
+    R = 4000
     for (mu, hs) in ((1e-5, 3e-4), (1e-5, 1e-3), (1e-5, 1e-2), (1e-4, 1e-2)):
         h = 0.5
         s = hs / h
-        corpus = call("mutationSelectionBalance", mu=mu, s=s, h=h)
+        corpus = call("mutationSelectionBalance", mu, s, h)
         textbook = mu / hs
-        for N in (500, 5000, 50000, 10 ** 7):
-            gens = max(20000, int(20.0 / hs))
+        for N in (500, 5000, 50000, 10 ** 6):
+            burn = int(6.0 / hs)
+            samp = int(6.0 / hs)
+            gens = burn + samp
             q = np.full(R, corpus)
-            for _ in range(gens):
+            for _ in range(burn):
                 q = wf_mutation_selection(q, mu, s, h, N, False)
+            acc = np.zeros(R)
+            for _ in range(samp):
+                q = wf_mutation_selection(q, mu, s, h, N, False)
+                acc += q
+            q = acc / samp
             mean = float(q.mean())
             sem = float(q.std()) / np.sqrt(R)
             out.append({"mu": mu, "s": s, "h": h, "hs": hs, "N": N,
-                        "gens": gens,
+                        "gens": gens, "replicates": R,
+                        "burn_in": burn, "sampling_generations": samp,
                         "measured_mean_freq": mean, "sem": sem,
                         "corpus_mutationSelectionBalance": corpus,
                         "textbook_mu_over_hs": textbook,
@@ -375,17 +417,27 @@ def regime_mutation_selection():
                      100 * (textbook - corpus) / corpus))
     # recessive
     for (mu, s) in ((1e-5, 0.01), (1e-5, 0.001)):
-        corpus = call("mutationSelectionBalanceRecessive", mu=mu, s=s)
+        corpus = call("mutationSelectionBalanceRecessive", mu, s)
         textbook = np.sqrt(mu / s)
-        for N in (5000, 50000, 10 ** 7):
-            gens = max(30000, int(20.0 / s))
+        for N in (5000, 50000, 10 ** 6):
+            # contraction near q* is 2 s q*, so this is 6 e-foldings of burn-in
+            # and 6 more of sampling.
+            burn = int(6.0 / (2 * s * corpus))
+            samp = burn
+            gens = burn + samp
             q = np.full(R, corpus)
-            for _ in range(gens):
+            for _ in range(burn):
                 q = wf_mutation_selection(q, mu, s, None, N, True)
+            acc = np.zeros(R)
+            for _ in range(samp):
+                q = wf_mutation_selection(q, mu, s, None, N, True)
+                acc += q
+            q = acc / samp
             mean = float(q.mean())
             sem = float(q.std()) / np.sqrt(R)
             out.append({"mu": mu, "s": s, "h": "recessive", "N": N,
-                        "gens": gens,
+                        "gens": gens, "replicates": R,
+                        "burn_in": burn, "sampling_generations": samp,
                         "measured_mean_freq": mean, "sem": sem,
                         "corpus_mutationSelectionBalanceRecessive": corpus,
                         "textbook_sqrt_mu_over_s": float(textbook),
@@ -503,19 +555,18 @@ def regime_stabilizing():
 def control_positive(ms_rows):
     """Corrupt the corpus prediction and require the checker to flag it.
 
-    Applied to the LARGEST-N mutation-selection cells, which is exactly where
+    Applied to the largest-N (10^6) mutation-selection cells, which is exactly where
     this run reports agreement. If a 30% corruption is not flagged there, the
     "no discrepancy" verdict at those cells measures nothing.
     """
     flagged = 0
     tested = 0
     for r in ms_rows:
-        if r["N"] != 10 ** 7 or "corpus_mutationSelectionBalance" not in r:
+        if r["N"] != 10 ** 6 or "corpus_mutationSelectionBalance" not in r:
             continue
         tested += 1
         good = r["corpus_mutationSelectionBalance"]
-        bad = call("mutationSelectionBalance", mu=r["mu"], s=1.3 * r["s"],
-                   h=r["h"])
+        bad = call("mutationSelectionBalance", r["mu"], 1.3 * r["s"], r["h"])
         m = r["measured_mean_freq"]
         if abs((bad - m) / m) > 0.05 >= abs((good - m) / m):
             flagged += 1

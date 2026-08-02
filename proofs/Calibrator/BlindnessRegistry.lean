@@ -22,6 +22,7 @@ and then proves the thing the collection is for.
 | 5 | any complete invariant of the fiber relation | `ℓ∞`-divergent coded decay profiles | mathematical | `HiddenConeAmbiguity` |
 | 6 | the cluster's internal cross-checks | two retention values | **methodological** | `DriftRegime` |
 | 7 | a symmetric validation design | the ratio vs. its square | **methodological** | `DriftRegime` |
+| 8 | Fisher's average effect | additive vs. dominant locus at `p = 1/2` | **genotypic** | this file |
 
 Instances 1-5 are theorems about the mathematics. Instances 6 and 7 are theorems about
 the **development's own quality process**, and that is the point of assembling them in
@@ -29,6 +30,12 @@ one place: a cross-check is a probe, a validation design is a probe, and neither
 exempt from the law they are used to establish. A guard that cannot separate two
 candidate definitions certifies neither of them, exactly as a cumulant that cannot
 separate two laws certifies neither.
+
+Instance 8 is of a third kind. Its witness pair is two *loci*, and the property the probe
+fails to certify — whether the heterozygote sits at the midpoint of the homozygotes — is a
+genotypic fact a reader would expect a score to be sensitive to. It is the first entry
+whose blindness has a direct experimental reading rather than a mathematical or procedural
+one, and it is proved at the bottom of this file.
 
 ## What this file proves
 
@@ -170,5 +177,69 @@ guards: an impossibility result and a quality process are the same kind of objec
 are probes. Asking "what pair does this fail to separate?" is the only question that
 distinguishes a check which can fail from one which cannot.
 -/
+
+/-!
+## An instance with a genotypic referent: dominance at equal allele frequency
+
+Every witness pair above separates two mathematical objects. This one separates two
+*loci*, and the property it fails to certify is one a reader would assume a polygenic
+score could see.
+
+A one-locus architecture is a genotypic value `a` for the homozygote contrast and a
+dominance deviation `d`, at allele frequency `p`. Fisher's average effect is
+`α = a + d(1 - 2p)`: the coefficient a regression of phenotype on standardized dosage
+recovers, and therefore the only thing a score built from dosages fits. `AdditiveInvariance`
+already notes in prose that `α = a` when `d` vanishes; the point here is the converse
+direction, which is sharper and is not recorded anywhere.
+
+At `p = 1/2` the factor `1 - 2p` is zero, so `α = a` **whatever `d` is**. Two loci with the
+same `a` and different dominance are then identical to the probe: same average effect, same
+additive variance, same fitted weight, and they differ in a genotypic property — whether
+the heterozygote sits at the midpoint of the homozygotes. Dominance is not attenuated at
+equal frequency, it is *absent from the observable*.
+
+This is why the corpus keeps meeting `p = 1/2` as a special point:
+`EpistaticChaos.standardizedGenotype_symmetric_iff` locates it as the frequency at which
+the standardized genotype is symmetric, and symmetry is exactly the collapse of the
+odd coordinate that carries `d` into `α`. -/
+
+/-- A one-locus genotypic architecture: additive contrast, dominance deviation, frequency. -/
+structure OneLocusArchitecture where
+  /-- Homozygote contrast. -/
+  a : ℝ
+  /-- Dominance deviation: displacement of the heterozygote from the midpoint. -/
+  d : ℝ
+  /-- Allele frequency. -/
+  p : ℝ
+
+/-- **Fisher's average effect**, the coefficient a dosage regression recovers. -/
+noncomputable def OneLocusArchitecture.averageEffect (m : OneLocusArchitecture) : ℝ :=
+  m.a + m.d * (1 - 2 * m.p)
+
+/-- **The average effect is blind to dominance at equal allele frequency.**
+
+Instance 8 of the registry. Probe: the average effect. Witness pair: two loci with the same
+homozygote contrast at `p = 1/2`, one additive and one not. Kind: genotypic.
+
+The consequence, via `ProbeBlindness.no_criterion_of_factors`, is that *no* rule reading the
+average effect — no significance threshold, no effect-size filter, no combination of them —
+decides whether a locus is additive. A score fit on dosages is not approximately blind to
+dominance at equal frequency; it is exactly blind. -/
+noncomputable def averageEffect_blind_to_dominance {δ : ℝ} (hδ : δ ≠ 0) (a : ℝ) :
+    ProbeBlindness OneLocusArchitecture.averageEffect (fun m => m.d = 0) where
+  positive := ⟨a, 0, 1 / 2⟩
+  negative := ⟨a, δ, 1 / 2⟩
+  same_data := by
+    unfold OneLocusArchitecture.averageEffect
+    norm_num
+  holds := rfl
+  fails := hδ
+
+/-- **No criterion reading the average effect decides additivity.** -/
+theorem no_averageEffect_criterion_for_additivity {δ : ℝ} (hδ : δ ≠ 0) (a : ℝ)
+    {Verdict : Type*} (combine : ℝ → Verdict) :
+    ¬ ∃ accept : Verdict → Prop,
+        ∀ m : OneLocusArchitecture, m.d = 0 ↔ accept (combine m.averageEffect) :=
+  (averageEffect_blind_to_dominance hδ a).no_criterion_of_factors combine
 
 end Calibrator
