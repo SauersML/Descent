@@ -290,3 +290,161 @@ def sim_admixture_ld_at_gen(alpha, pA, qA, pB, qB, r, g, n=2000000, seed=0):
         rec = rng.random(n) < r
         a, b = a[i], np.where(rec, b[j], b[i])
     return float(np.mean(a * b) - np.mean(a) * np.mean(b))
+
+
+# --------------------------------------------------------------------------
+# second batch: regression, variance components, mutation-drift, structure
+
+
+def sim_ols_slope_variance(sigma2, varX, n, reps=3000, seed=0):
+    """Sampling variance of the OLS slope, measured across replicate fits.
+
+    y = b*x + e with Var(e) = sigma2 and Var(x) = varX.  The slope is refit on
+    each replicate and the variance is taken over replicates, so the textbook
+    sigma2/(n*varX) is never used -- it is what the check is testing.
+    """
+    rng = np.random.default_rng(seed)
+    n = int(round(n))
+    est = np.empty(reps)
+    sx = np.sqrt(varX)
+    for k in range(reps):
+        x = rng.normal(0.0, sx, n)
+        y = 1.0 * x + rng.normal(0.0, np.sqrt(sigma2), n)
+        xc = x - x.mean()
+        est[k] = float(xc @ (y - y.mean()) / (xc @ xc))
+    return float(np.var(est, ddof=1))
+
+
+def sim_r2_from_mse(mse, varY, n=400000, seed=0):
+    """1 - SSE/SST for a predictor whose error variance is `mse`."""
+    rng = np.random.default_rng(seed)
+    y = rng.normal(0.0, np.sqrt(varY), n)
+    pred = y + rng.normal(0.0, np.sqrt(mse), n)
+    # centre the predictor so the comparison is of explained variance
+    sse = np.mean((y - pred) ** 2)
+    sst = np.var(y)
+    return float(1.0 - sse / sst)
+
+
+def sim_fisher_average_effect(a, d, p, n=800000, seed=0):
+    """Fisher's average effect: the REGRESSION slope of genotypic value on dosage.
+
+    Genotypic values -a, d, a at dosages 0, 1, 2 under Hardy-Weinberg.  The
+    average effect of a gene substitution is defined as the least-squares
+    slope, so it is obtained here by regressing, not by the formula.
+    """
+    rng = np.random.default_rng(seed)
+    g = rng.binomial(2, p, size=n)
+    val = np.where(g == 0, -a, np.where(g == 1, d, a)).astype(float)
+    gc = g - g.mean()
+    return float(gc @ (val - val.mean()) / (gc @ gc))
+
+
+def sim_hwe_heterozygote_freq(p, n=400000, seed=0):
+    """P(heterozygote) under Hardy-Weinberg, sampled."""
+    rng = np.random.default_rng(seed)
+    return float(np.mean(rng.binomial(2, p, size=n) == 1))
+
+
+def sim_heterozygosity_loss(t, Ne, reps=20000, seed=0):
+    """1 - H_t/H_0 after t generations of drift, from an explicit WF run."""
+    rng = np.random.default_rng(seed)
+    p0 = 0.5
+    p = wf_trajectory(p0, Ne, t, reps, rng)
+    h0 = 2 * p0 * (1 - p0)
+    return float(1.0 - np.mean(2 * p * (1 - p)) / h0)
+
+
+def sim_infinite_alleles_heterozygosity(theta, Ne=None, reps=4000, seed=0):
+    """Equilibrium heterozygosity under the infinite-alleles model.
+
+    theta = 4*Ne*mu.  Simulated as a coalescent: two gene copies differ if any
+    mutation falls on either lineage before they coalesce.  Coalescence of two
+    lineages in a diploid population of size Ne is geometric with rate
+    1/(2*Ne), and mutations arrive at rate mu on each lineage; the identity is
+    measured by sampling those waiting times, not by evaluating theta/(1+theta).
+    """
+    rng = np.random.default_rng(seed)
+    Ne = 1000.0 if Ne is None else Ne
+    mu = theta / (4.0 * Ne)
+    if mu <= 0 or mu >= 1:
+        return None
+    tcoal = rng.geometric(1.0 / (2.0 * Ne), size=reps)
+    # P(at least one mutation on either of the two lineages before coalescing)
+    p_no_mut = (1.0 - mu) ** (2.0 * tcoal)
+    return float(np.mean(1.0 - p_no_mut))
+
+
+def sim_island_model_fst(Ne, m, demes=200, gens=None, reps=300, seed=0):
+    """F_ST at migration-drift equilibrium in a finite island model.
+
+    Explicit Wright-Fisher in each deme with a migrant pool.  REGIME: the
+    closed form being checked is the infinite-island limit, so this is run
+    with many demes; at few demes the two genuinely differ and that is a
+    property of the model, not a defect in the formula.
+    """
+    rng = np.random.default_rng(seed)
+    Ne = float(Ne)
+    n = int(round(2 * Ne))
+    if n < 2 or not (0 < m < 1):
+        return None
+    gens = int(gens or max(200, 8 * Ne))
+    p = np.full((reps, demes), 0.5)
+    for _ in range(gens):
+        pbar = p.mean(axis=1, keepdims=True)
+        p = (1.0 - m) * p + m * pbar
+        p = rng.binomial(n, np.clip(p, 0.0, 1.0)) / n
+    pbar = p.mean(axis=1, keepdims=True)
+    hs = np.mean(2 * p * (1 - p))
+    ht = np.mean(2 * pbar * (1 - pbar))
+    if ht <= 0:
+        return None
+    return float((ht - hs) / ht)
+
+
+def sim_distinct_haplotypes(k, n, reps=4000, seed=0):
+    """Expected number of DISTINCT haplotypes when n are drawn from 2^k types."""
+    rng = np.random.default_rng(seed)
+    k, n = int(k), int(n)
+    types = 2 ** k
+    if types > 10 ** 7:
+        return None
+    out = np.empty(reps)
+    for i in range(reps):
+        out[i] = len(np.unique(rng.integers(0, types, size=n)))
+    return float(out.mean())
+
+
+def sim_spike_slab_variance(pi, sigma_slab, n=800000, seed=0):
+    """Variance of a spike-and-slab draw: zero w.p. 1-pi, N(0, s^2) w.p. pi."""
+    rng = np.random.default_rng(seed)
+    on = rng.random(n) < pi
+    x = np.where(on, rng.normal(0.0, sigma_slab, n), 0.0)
+    return float(np.mean(x ** 2))
+
+
+def sim_am_equilibrium_variance(V_A, r, h2, gens=60, n=200000, seed=0):
+    """Additive variance at assortative-mating equilibrium, by iteration.
+
+    Runs the mating process forward: each generation, mates are paired on
+    phenotype with correlation r, and the additive variance is remeasured.
+    The closed form V_A/(1 - r*h2) is never used.
+    """
+    rng = np.random.default_rng(seed)
+    if not (0 <= r * h2 < 0.95):
+        return None
+    va = float(V_A)
+    ve = V_A * (1.0 - h2) / max(h2, 1e-9)
+    for _ in range(gens):
+        a = rng.normal(0.0, np.sqrt(va), n)
+        phen = a + rng.normal(0.0, np.sqrt(ve), n)
+        order = np.argsort(phen)
+        a_s = a[order]
+        # pair rank-adjacent individuals with probability r, at random otherwise
+        partner = a_s.copy()
+        shuffled = a_s[rng.permutation(n)]
+        take = rng.random(n) < r
+        mate = np.where(take, np.roll(a_s, 1), shuffled)
+        off = 0.5 * (partner + mate) + rng.normal(0.0, np.sqrt(va / 2.0), n)
+        va = float(np.var(off))
+    return va

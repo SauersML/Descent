@@ -120,6 +120,11 @@ def build():
                 "self-property" if f.get("covered") else
                 "internal-consistency" if th else None),
             simulation_oracle=sm.get("oracle"),
+            simulation_seed_stability=sm.get("seed_stability"),
+            mutants_rejected=sm.get("mutants_rejected") or (
+                f.get("n_killed") if f.get("covered") else None),
+            mutants_tried=sm.get("mutants_tried") or (
+                f.get("n_mutants") if f.get("covered") else None),
             discriminating_theorems=[t["theorem"] for t in th[:5]] or None,
             falsifiability_evidence=(
                 [dict(mutation=m["mutation"], rejected_by=m["rejected_by"])

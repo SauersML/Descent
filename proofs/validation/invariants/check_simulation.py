@@ -188,6 +188,71 @@ SPECS = [
          "expected number screened to detect one case, sampled as a waiting "
          "time rather than computed",
          tol=0.03),
+
+    # ---- second batch -------------------------------------------------
+    spec("GeneticArchitectureDiscovery.olsEffectEstimationVariance",
+         lambda s2, vX, n, seed=0: S.sim_ols_slope_variance(s2, vX, n, seed=seed),
+         [(0.2, 3.0), (0.2, 3.0), (200, 2000)],
+         "sampling variance of the OLS slope, taken over replicate refits",
+         tol=0.06),
+
+    spec("DGP.r2FromMSE",
+         lambda mse, vY, seed=0: S.sim_r2_from_mse(mse, vY, seed=seed),
+         [(0.1, 2.0), (2.0, 6.0)],
+         "1 - SSE/SST for a simulated predictor with the given error variance",
+         tol=0.03),
+
+    spec("EpistasisAndNonAdditivity.fisherAverageEffect",
+         lambda a, d, p, seed=0: S.sim_fisher_average_effect(a, d, p, seed=seed),
+         [(0.3, 2.0), (-1.0, 1.0), (0.15, 0.85)],
+         "Fisher's average effect obtained as the least-squares slope of "
+         "genotypic value on dosage, which is its definition",
+         tol=0.03),
+
+    spec("AncestrySpecificPower.hweHeterozygosity",
+         lambda p, seed=0: S.sim_hwe_heterozygote_freq(p, seed=seed),
+         [(0.05, 0.95)],
+         "P(heterozygote) under Hardy-Weinberg, sampled"),
+
+    spec("PopulationGeneticsFoundations.heterozygosityLossFromDrift",
+         lambda t, Ne, seed=0: S.sim_heterozygosity_loss(t, Ne, seed=seed),
+         [(5, 60), (50.0, 400.0)],
+         "1 - H_t/H_0 from an explicit binomial Wright-Fisher run",
+         tol=0.08),
+
+    spec("PopulationGeneticsFoundations.expectedHeterozygosity",
+         lambda th, seed=0: S.sim_infinite_alleles_heterozygosity(th, seed=seed),
+         [(0.05, 2.0)],
+         "infinite-alleles equilibrium heterozygosity, from sampled "
+         "coalescence and mutation waiting times",
+         tol=0.06),
+
+    spec("PopulationGeneticsFoundations.islandModelFst",
+         lambda Ne, m, seed=0: S.sim_island_model_fst(Ne, m, seed=seed),
+         [(20.0, 60.0), (0.01, 0.15)],
+         "F_ST at migration-drift equilibrium in an explicit 200-deme island "
+         "model. REGIME: the closed form is the infinite-island limit, so "
+         "many demes are used; at few demes the two genuinely differ",
+         tol=0.12),
+
+    spec("HaplotypeTheory.expectedDistinctHaplotypes",
+         lambda k, n, seed=0: S.sim_distinct_haplotypes(k, n, seed=seed),
+         [(1, 8), (2, 60)],
+         "expected distinct types among n draws from 2^k, counted",
+         tol=0.03),
+
+    spec("BayesianPGSTheory.spikeAndSlabPriorVariance",
+         lambda pi, ss, seed=0: S.sim_spike_slab_variance(pi, ss, seed=seed),
+         [(0.02, 0.9), (0.3, 3.0)],
+         "second moment of a spike-and-slab draw, sampled",
+         tol=0.04),
+
+    spec("AssortativeMatingPGS.amEquilibriumVariance",
+         lambda VA, r, h2, seed=0: S.sim_am_equilibrium_variance(VA, r, h2, seed=seed),
+         [(0.5, 2.0), (0.05, 0.6), (0.2, 0.8)],
+         "additive variance reached by iterating assortative mating forward, "
+         "never using the closed form",
+         tol=0.12),
 ]
 
 
