@@ -1,0 +1,86 @@
+{
+ "identity_E_x6_eq_a2_plus_10a_minus_20": {
+  "verified": true,
+  "max_abs_err": 9.094947017729282e-13
+ },
+ "construction": {
+  "n_atoms": 40,
+  "maf_range": [
+   0.005,
+   0.5
+  ],
+  "matched_functionals": [
+   "mass",
+   "mean a = M4",
+   "mean 2q(1-q)",
+   "mean q"
+  ],
+  "armA": {
+   "M4": 22.82635753336406,
+   "M6": 1552.098731980641,
+   "dispersion": 822.7925584060343
+  },
+  "armB": {
+   "M4": 22.826357533364057,
+   "M6": 1287.6079674665423,
+   "dispersion": 558.3017938919356
+  },
+  "M4_gap_predicted": 3.552713678800501e-15,
+  "M6_gap_predicted": 264.4907645140988,
+  "M6_relative_gap": 0.20541249448347443,
+  "min_weight": 0.0012500000000000011
+ },
+ "control_2_degenerate_arm": [
+  {
+   "q": 0.01,
+   "dispersion": 0.0,
+   "M6_panel": 3035.8106315682066,
+   "M6_single_locus_identity": 3035.8106315682076,
+   "ok": true
+  },
+  {
+   "q": 0.1,
+   "dispersion": 0.0,
+   "M6_panel": 66.41975308641973,
+   "M6_single_locus_identity": 66.41975308641975,
+   "ok": true
+  },
+  {
+   "q": 0.4,
+   "dispersion": 0.0,
+   "M6_panel": 5.173611111111114,
+   "M6_single_locus_identity": 5.173611111111112,
+   "ok": true
+  }
+ ],
+ "simulation": {
+  "n_per_atom": 4000000,
+  "armA": {
+   "M4": 22.8537983227133,
+   "M4_sem": 0.03893231584634727,
+   "M6": 1547.0525084970945,
+   "M6_sem": 9.205930157294329
+  },
+  "armB": {
+   "M4": 22.79949962148222,
+   "M4_sem": 0.029381017891107565,
+   "M6": 1284.8488858702726,
+   "M6_sem": 5.357935985894839
+  },
+  "M4_gap_measured": 0.054298701231079605,
+  "M4_gap_sem": 0.04877468020886786,
+  "M4_gap_in_sem": 1.113255914719609,
+  "M6_gap_measured": 262.2036226268219,
+  "M6_gap_sem": 10.651602137234008,
+  "M6_gap_in_sem": 24.6163552908399,
+  "M6_gap_predicted": 264.4907645140988
+ },
+ "control_1_matched_M4_does_not_separate": {
+  "ok": true,
+  "gap": 0.054298701231079605,
+  "sem": 0.04877468020886786,
+  "gap_in_sem": 1.113255914719609,
+  "pinned_by": "M4 is a matched linear constraint of the construction"
+ },
+ "READ_THE_TEST": true
+}
