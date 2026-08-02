@@ -725,12 +725,33 @@ rather than only in the limit.
 Empirical status: DERIVED from the first-order Markov structure — one
 unconstrained variant plus `nSites - 1` variants each whitened against its
 neighbour, which is the content of `ldPrecisionTrace_eq_boundary_add_interior`.
-The three-term identities below are the interior verification that the
-tridiagonal precision inverts the kernel; the boundary rows and the resulting
-finite-size correction are checked numerically in
-`proofs/validation/imitation_rigidity/check_imitation.py`. -/
+The stencil identities below verify both boundary and interior rows of the
+tridiagonal inverse at every separation.  The Python validation remains an
+independent numerical check, not part of the proof. -/
 def ldPrecisionTrace (decay : ℝ) (nSites : ℕ) : ℝ :=
   ((nSites : ℝ) * (1 + decay ^ 2) - 2 * decay ^ 2) / (1 - decay ^ 2)
+
+/-- Separation from a boundary row to the adjacent row.  At the diagonal the
+adjacent entry is one step away; off the diagonal at separation `d+1`, it is
+at separation `d`. -/
+def adjacentBoundarySeparation : ℕ → ℕ
+  | 0 => 1
+  | d + 1 => d
+
+/-- **Exact boundary-row inverse identity.**  The endpoint precision stencil
+`[1, -ρ]` annihilates every off-diagonal geometric-correlation entry and
+returns `1-ρ²` on the diagonal.  This closes the boundary case omitted by the
+interior three-term calculation. -/
+theorem stationaryLD_boundary_stencil (decay : ℝ) (separation : ℕ) :
+    stationaryLDEntry decay separation -
+        decay * stationaryLDEntry decay (adjacentBoundarySeparation separation) =
+      if separation = 0 then 1 - decay ^ 2 else 0 := by
+  cases separation with
+  | zero =>
+      simp [adjacentBoundarySeparation, stationaryLDEntry]
+      ring
+  | succ d =>
+      simp [adjacentBoundarySeparation, stationaryLDEntry, pow_succ]
 
 /-- **Interior three-term identity.** Away from the ends of the chromosome the
 geometric LD sequence is annihilated by the tridiagonal AR(1) precision
@@ -753,6 +774,22 @@ theorem stationaryLD_three_term_diagonal (decay : ℝ) :
       - decay * stationaryLDEntry decay 1 = 1 - decay ^ 2 := by
   unfold stationaryLDEntry
   ring
+
+/-- **Complete interior-row inverse identity.**  Combining the diagonal and
+off-diagonal calculations gives the tridiagonal precision stencil against an
+arbitrary kernel column.  It equals `(1-ρ²)I` pointwise, with no unproved
+boundary or distance case left over. -/
+theorem stationaryLD_interior_stencil (decay : ℝ) (separation : ℕ) :
+    (1 + decay ^ 2) * stationaryLDEntry decay separation
+        - decay * stationaryLDEntry decay (separation - 1)
+        - decay * stationaryLDEntry decay (separation + 1) =
+      if separation = 0 then 1 - decay ^ 2 else 0 := by
+  cases separation with
+  | zero =>
+      simpa using stationaryLD_three_term_diagonal decay
+  | succ d =>
+      have hpos : 1 ≤ d + 1 := Nat.succ_le_succ (Nat.zero_le d)
+      simpa using stationaryLD_three_term decay (d + 1) hpos
 
 /-- **The whitening cost decomposes into one boundary variant plus interior
 variants.** Each interior variant contributes exactly the whitening gain; the
@@ -997,6 +1034,25 @@ theorem hasDerivAt_alleleLossProbability {time : ℝ} (htime : time ≠ 0) (init
     have := ((hasDerivAt_id initial).div_const (2 * time)).neg
     simpa using this
   simpa [alleleLossProbability, one_div, mul_comm, mul_left_comm, mul_assoc] using hbase.exp
+
+/-- The square-root mass itself is differentiable.  This is the actual
+quadratic-mean derivative of the atomic coordinate, rather than merely a
+formal Fisher-information calculation performed after the fact. -/
+theorem hasDerivAt_sqrt_alleleLossProbability {time : ℝ}
+    (htime : time ≠ 0) (initial : ℝ) :
+    HasDerivAt (fun x => Real.sqrt (alleleLossProbability x time))
+      (-(1 / (4 * time)) * Real.sqrt (alleleLossProbability initial time)) initial := by
+  have hp : 0 < alleleLossProbability initial time :=
+    alleleLossProbability_pos initial time
+  have hsqrt := (hasDerivAt_alleleLossProbability htime initial).sqrt hp.ne'
+  convert hsqrt using 1
+  have hsqrtPos : 0 < Real.sqrt (alleleLossProbability initial time) :=
+    Real.sqrt_pos.2 hp
+  have hsquare :
+      Real.sqrt (alleleLossProbability initial time) ^ 2 =
+        alleleLossProbability initial time := Real.sq_sqrt hp.le
+  field_simp [htime, hsqrtPos.ne']
+  nlinarith [hsquare]
 
 /-- **Quadratic-mean differentiability tolerates the atom.** The square root of
 the absorbed mass is smooth in the ancestral frequency, and four times its

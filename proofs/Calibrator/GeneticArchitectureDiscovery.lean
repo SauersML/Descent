@@ -45,7 +45,7 @@ section GWASDiscovery
     `hweGenotypeVariance` in `Conventions`. The name says tag for historical
     reasons, but `discoveryNCP` correctly passes the *causal* frequency. -/
 def tagGenotypeVariance (maf_causal : ℝ) : ℝ :=
-  2 * maf * (1 - maf)
+  2 * maf_causal * (1 - maf_causal)
 
 /-- Noncentrality parameter for a GWAS tag SNP.
 
@@ -77,7 +77,7 @@ def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
     Convention: `maf_causal` is the causal variant's frequency, matching
     `discoveryNCP`, which this predicate thresholds. -/
 def gwasDiscovered (n β maf_causal ld z : ℝ) : Prop :=
-  z ^ 2 ≤ discoveryNCP n β maf ld
+  z ^ 2 ≤ discoveryNCP n β maf_causal ld
 
 /-- **The GWAS noncentrality parameter increases with sample size.** -/
 theorem discoveryNCP_increases_with_n
