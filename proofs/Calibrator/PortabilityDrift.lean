@@ -213,6 +213,27 @@ theorem fstFromTau_lt_coalescenceCdf (tau : ℝ) (htau : 0 < tau) :
   exact div_pos (by linarith) (by positivity)
 
 
+/-! ### The two ploidy-scaled rates
+
+`θ = 4 Nₑ μ` and `M = 4 Nₑ m` are the same scaling applied to a mutation rate and to a
+migration rate. They sit here, at the top of the base module, because five structures
+below — `SplitMigrationModel`, `GenerationalPopGenParameters`,
+`MutationDriftModelAssumptions`, `EvolutionaryParameters` and `PGSEvolutionaryModel` —
+each used to spell out its own `4 * Ne * _` rather than apply one of these. That is five
+independent chances to write a different four.
+
+`scaledMutationRate` previously lived in `PopulationGeneticsFoundations`, which *imports*
+this module, so the definitions here could not reach it even though they were computing
+it. That is why the copies existed. -/
+
+/-- **Scaled mutation rate** `θ = 4 Nₑ μ`, the fundamental parameter of neutral theory. -/
+noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
+  4 * Ne * μ
+
+/-- **Scaled migration rate** `M = 4 Nₑ m`, the same scaling applied to gene flow. -/
+noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
+  4 * Ne * m
+
 structure PureSplitModel where
   t : ℝ
   Ne : ℝ
@@ -243,7 +264,7 @@ structure SplitMigrationModel where
 
 /-- Empirical status: UNTESTED. -/
 noncomputable def SplitMigrationModel.scaledMigration (m : SplitMigrationModel) : ℝ :=
-  4 * m.Ne * m.mig
+  scaledMigrationRate m.Ne m.mig
 
 noncomputable def SplitMigrationModel.fstEqLimitLowMutationManyDemes (m : SplitMigrationModel) : ℝ :=
   1 / (1 + m.scaledMigration)
@@ -2106,11 +2127,11 @@ namespace GenerationalPopGenParameters
 
     Empirical status: UNTESTED. -/
 noncomputable def theta (g : GenerationalPopGenParameters) : ℝ :=
-  4 * g.Ne * g.μ
+  scaledMutationRate g.Ne g.μ
 
 /-- Scaled migration rate `M = 4Nem`. -/
 noncomputable def bigM (g : GenerationalPopGenParameters) : ℝ :=
-  4 * g.Ne * g.mig
+  scaledMigrationRate g.Ne g.mig
 
 /-- Coalescent time coordinate at generation `t`. -/
 noncomputable def tauAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
@@ -4098,12 +4119,12 @@ structure MutationDriftModelAssumptions where
 
     Empirical status: UNTESTED. -/
 noncomputable def MutationDriftModelAssumptions.theta (m : MutationDriftModelAssumptions) : ℝ :=
-  4 * m.Ne * m.μ
+  scaledMutationRate m.Ne m.μ
 
 /-- θ is positive for any valid mutation-drift model. -/
 theorem MutationDriftModelAssumptions.theta_pos (m : MutationDriftModelAssumptions) :
     0 < m.theta := by
-  unfold MutationDriftModelAssumptions.theta
+  unfold MutationDriftModelAssumptions.theta scaledMutationRate
   nlinarith [m.Ne_pos, m.mu_pos]
 
 /-- **One generation of the identity-by-descent balance.**
@@ -4796,12 +4817,6 @@ theorem fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium :
     fstMigrationDriftEquilibrium
   norm_num
 
-
-/-- The scaled migration parameter M = 4Nm, analogous to θ = 4Neμ.
-
-    Empirical status: UNTESTED. -/
-noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
-  4 * Ne * m
 
 /-- Scaled migration rate is positive when Ne and m are positive. -/
 theorem scaledMigrationRate_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :

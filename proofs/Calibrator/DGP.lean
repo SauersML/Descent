@@ -1486,23 +1486,23 @@ noncomputable def EvolutionaryParameters.tau (p : EvolutionaryParameters) : ℝ 
 
 /-- Scaled mutation parameter: θ = 4Neμ. -/
 noncomputable def EvolutionaryParameters.theta (p : EvolutionaryParameters) : ℝ :=
-  4 * p.Ne * p.mu
+  scaledMutationRate p.Ne p.mu
 
 /-- Scaled migration parameter: M = 4Nem. -/
 noncomputable def EvolutionaryParameters.bigM (p : EvolutionaryParameters) : ℝ :=
-  4 * p.Ne * p.mig
+  scaledMigrationRate p.Ne p.mig
 
 /-- θ ≥ 0. -/
 theorem EvolutionaryParameters.theta_nonneg (p : EvolutionaryParameters) :
     0 ≤ p.theta := by
-  unfold theta
+  unfold theta scaledMutationRate
   have h1 : 0 < 4 * p.Ne := by linarith [p.Ne_pos]
   exact mul_nonneg (le_of_lt h1) p.mu_nonneg
 
 /-- M ≥ 0. -/
 theorem EvolutionaryParameters.bigM_nonneg (p : EvolutionaryParameters) :
     0 ≤ p.bigM := by
-  unfold bigM
+  unfold bigM scaledMigrationRate
   have h1 : 0 < 4 * p.Ne := by linarith [p.Ne_pos]
   exact mul_nonneg (le_of_lt h1) p.mig_nonneg
 
@@ -1566,7 +1566,7 @@ theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :
     linarith [p.theta_nonneg, p.bigM_nonneg]
   have hd' : (1 : ℝ) + p.theta + p.bigM ≠ 0 := ne_of_gt hd
   have hscaled : 1 + p.theta + p.bigM = 1 + 4 * p.Ne * (p.mig + p.mu) := by
-    unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM
+    unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
     ring
   unfold fstDriftFlowStep fstEquilibrium
   rw [hscaled] at hd' ⊢
@@ -1581,10 +1581,10 @@ theorem fstEquilibrium_of_no_flow (p : EvolutionaryParameters)
     (hmig : p.mig = 0) (hmu : p.mu = 0) :
     fstEquilibrium p = 1 := by
   have hθ : p.theta = 0 := by
-    unfold EvolutionaryParameters.theta
+    unfold EvolutionaryParameters.theta scaledMutationRate
     rw [hmu]; ring
   have hM : p.bigM = 0 := by
-    unfold EvolutionaryParameters.bigM
+    unfold EvolutionaryParameters.bigM scaledMigrationRate
     rw [hmig]; ring
   unfold fstEquilibrium
   rw [hθ, hM]
@@ -1793,7 +1793,7 @@ theorem fstEquilibrium_decreasing_in_theta
     let p₂ : EvolutionaryParameters := ⟨Ne, mu₂, mig, t_div, recomb, V_A, hNe, hmu₂, hmig, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
   simp only
   rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu₂ + 4 * Ne * mig)
@@ -1809,7 +1809,7 @@ theorem fstEquilibrium_decreasing_in_migration
     let p₂ : EvolutionaryParameters := ⟨Ne, mu, mig₂, t_div, recomb, V_A, hNe, hmu, hmig₂, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
   simp only
   rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₂)

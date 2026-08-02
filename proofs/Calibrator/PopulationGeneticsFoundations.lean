@@ -488,12 +488,6 @@ Mutation also governs equilibrium heterozygosity via θ = 4Neμ.
 
 section MutationDriftBalance
 
-/-- **Scaled mutation rate** θ = 4Neμ, the fundamental parameter of neutral theory.
-
-    Empirical status: UNTESTED. -/
-noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
-  4 * Ne * μ
-
 /-- Scaled mutation rate is positive when Ne and μ are positive. -/
 theorem scaledMutationRate_pos (Ne μ : ℝ) (hNe : 0 < Ne) (hμ : 0 < μ) :
     0 < scaledMutationRate Ne μ := by

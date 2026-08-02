@@ -441,20 +441,20 @@ theorem coalescentTau_uses_timeScale (t Ne : ℝ) :
 theorem GenerationalPopGenParameters_theta_eq_ploidy_form
     (g : GenerationalPopGenParameters) :
     GenerationalPopGenParameters.theta g = 2 * ploidy * g.Ne * g.μ := by
-  unfold GenerationalPopGenParameters.theta ploidy; ring
+  unfold GenerationalPopGenParameters.theta ploidy scaledMutationRate; ring
 
 theorem GenerationalPopGenParameters_bigM_eq_ploidy_form
     (g : GenerationalPopGenParameters) :
     GenerationalPopGenParameters.bigM g = 2 * ploidy * g.Ne * g.mig := by
-  unfold GenerationalPopGenParameters.bigM ploidy; ring
+  unfold GenerationalPopGenParameters.bigM ploidy scaledMigrationRate; ring
 
 theorem EvolutionaryParameters_theta_eq_ploidy_form (p : EvolutionaryParameters) :
     EvolutionaryParameters.theta p = 2 * ploidy * p.Ne * p.mu := by
-  unfold EvolutionaryParameters.theta ploidy; ring
+  unfold EvolutionaryParameters.theta ploidy scaledMutationRate; ring
 
 theorem EvolutionaryParameters_bigM_eq_ploidy_form (p : EvolutionaryParameters) :
     EvolutionaryParameters.bigM p = 2 * ploidy * p.Ne * p.mig := by
-  unfold EvolutionaryParameters.bigM ploidy; ring
+  unfold EvolutionaryParameters.bigM ploidy scaledMigrationRate; ring
 
 /-- **The between-population variance of the mean breeding value is
 `ploidy · F_ST · V_A`.**
@@ -584,7 +584,7 @@ theorem selectedDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) (s_correction : 
 theorem SplitMigrationModel_scaledMigration_eq_ploidy_form
     (m : SplitMigrationModel) :
     SplitMigrationModel.scaledMigration m = 2 * ploidy * m.Ne * m.mig := by
-  unfold SplitMigrationModel.scaledMigration ploidy; ring
+  unfold SplitMigrationModel.scaledMigration ploidy scaledMigrationRate; ring
 
 theorem fstMigDriftNext_uses_timeScale (Ne m Fst : ℝ) :
     fstMigDriftNext Ne m Fst
