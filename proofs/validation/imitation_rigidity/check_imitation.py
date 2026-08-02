@@ -38,16 +38,18 @@ import numpy as np  # noqa: E402
 FAILURES = []
 
 
-def report(name, claim, predicted, observed, tol, note="", floor=0.0):
+def report(name, claim, predicted, observed, tol, note="", abs_tol=0.0):
     """Record one comparison.
 
-    `tol` is a relative tolerance; `floor` is an absolute tolerance added to
-    the denominator, for quantities whose truth is near zero and whose Monte
-    Carlo error is therefore absolute rather than relative.
+    A claim fails when the discrepancy exceeds both the relative tolerance
+    `tol` and the absolute tolerance `abs_tol`. The absolute term carries the
+    Monte Carlo standard error, so a simulation that is merely noisy is not
+    reported as a falsification, and a small bias in a small quantity still is.
     """
-    scale = max(abs(predicted), abs(observed), floor, 1e-12)
-    err = abs(predicted - observed) / scale
-    ok = err <= tol
+    scale = max(abs(predicted), abs(observed), 1e-12)
+    diff = abs(predicted - observed)
+    err = diff / scale
+    ok = diff <= tol * scale + abs_tol
     status = "ok   " if ok else "FAIL "
     print(f"  {status} {name:<44s} lean={predicted: .6g}  sim={observed: .6g}  "
           f"rel={err: .2e}  tol={tol:g} {note}")
@@ -131,7 +133,7 @@ def check_stationary_ld():
             ok &= report(f"stationaryLDEntry(rho={decay}, d={sep})",
                          "correlation at separation d is decay**d",
                          lean_stationaryLDEntry(decay, sep), est,
-                         0.02, f"(4 se = {4 * se:.1e})", floor=4 * se)
+                         0.02, f"(4 se = {4 * se:.1e})", abs_tol=4 * se)
         # exact Toeplitz kernel, for the spectral claims
         idx = np.arange(n_sites)
         K = decay ** np.abs(idx[:, None] - idx[None, :])
@@ -304,7 +306,7 @@ def check_spectator():
                      "tr(B (S+ridge)^-1)/k from the scalar fixed point",
                      predicted, float(np.mean(emp)), 0.05)
     ok &= report("ridgeBalance root", "root of the balance equation",
-                 0.0, lean_ridgeBalance(aspect, eig, ridge, u), 1e-6, floor=1e-6)
+                 0.0, lean_ridgeBalance(aspect, eig, ridge, u), 1e-6, abs_tol=1e-6)
     return ok
 
 
