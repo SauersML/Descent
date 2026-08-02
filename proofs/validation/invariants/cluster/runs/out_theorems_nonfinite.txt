@@ -1,0 +1,5 @@
+2261 theorem statements parsed
+  680 usable (hypotheses modelled, admissible points found)
+  679 hold numerically
+  1 disagree with this checker -- checker bugs, not corpus defects
+  319 definitions are DISCRIMINATED by some theorem (a mutant breaks it)
