@@ -1,6 +1,8 @@
 import Calibrator.BundleRigidity
 import Calibrator.ConditionalGain
 import Calibrator.SpectralDegradation
+import Calibrator.EnsembleChannel
+import Calibrator.Permeability
 import Calibrator.EffectSizeSurgery
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.Fin.VecNotation
@@ -1404,12 +1406,11 @@ term from squared loss instead of storing the desired identity in a hypothesis f
 Turning that identity into an empirical-Bayes theorem requires an observation kernel, a
 prior class, and an estimator; none is silently postulated here. -/
 
-/-! ## 15. THE TRICHOTOMY OF BLINDNESS
+/-! ## 15. A TAXONOMY OF BLINDNESS
 
-Three blindness theorems arrived separately in this development. They are not a coincidence
-and they are not three instances of one theorem; they are a **classification**, recorded
-here because a structure that arrives piecemeal is the kind that gets lost if only its
-instances are written down.
+Three different proved examples motivate the following taxonomy. It is an organization of
+mechanisms, not a classification theorem: proving exhaustiveness would require specifying
+the category of observation maps and showing that every kernel has one of these forms.
 
 * **SYMMETRY blindness.** The observation factors through a gauge action, and the invisible
   set is the **orbit tangent**. Both the marginal-versus-dependence blindness of §14a and the
@@ -1424,10 +1425,9 @@ instances are written down.
 
 ### Why the invisible direction is always the one we care about
 
-This kept recurring and it is **structural rather than bad luck**: **robustness *is*
-invariance.** A statistic built to ignore a nuisance has fibers that *are* the deformation
-space, so drift moves along exactly what the robust statistic was designed not to see. Every
-blindness result in this file is that sentence applied to a different gauge.
+For symmetry examples, the alignment is structural: robustness is invariance, so a
+statistic built to ignore a nuisance has fibres containing the corresponding gauge orbit.
+Resonance and support examples need separate proofs and are not consequences of this slogan.
 
 ### The noise-coupling research principle
 
@@ -1438,43 +1438,6 @@ estimator can couple to time structure. That is why the sample-mean channel of �
 But `EnsembleChannel` also proves that this channel is incomplete, and some gauges may
 remain invisible to every statistic in a specified observation experiment. Characterizing
 when estimator noise separates quotient fibres is the continuation, not a theorem here. -/
-
-/-- The three mechanisms by which a statistic can be blind to a deformation. Recorded as a
-type so the classification survives independently of its instances. -/
-inductive BlindnessMechanism where
-  /-- The observation factors through a gauge action; the invisible set is the orbit
-  tangent. -/
-  | symmetry : BlindnessMechanism
-  /-- No gauge; kernels live on arithmetic or dynamical resonance sets, with direction not
-  predictable in advance. -/
-  | resonance : BlindnessMechanism
-  /-- Resonance made total by a vanishing-support condition. -/
-  | support : BlindnessMechanism
-  deriving DecidableEq, Repr
-
-/-- The folded spectrum is symmetry blindness: `q ↔ 1-q` is a gauge action and the invisible
-directions are its orbit tangents (§2). -/
-def foldedSpectrumBlindness : BlindnessMechanism := BlindnessMechanism.symmetry
-
-/-- Marginal-versus-dependence blindness is also symmetry blindness. Estimator fluctuation
-can expose some directions (§14a), without identifying the full dependence law. -/
-def marginalDependenceBlindness : BlindnessMechanism := BlindnessMechanism.symmetry
-
-/-- The balanced-locus degeneracy is resonance blindness: it occurs at an isolated
-arithmetic condition, `q = 1/2`, not along an orbit (§1b). -/
-def balancedLocusBlindness : BlindnessMechanism := BlindnessMechanism.resonance
-
-/-- Perfect linkage disequilibrium is support blindness: `η = 0` makes the resonance total
-(§10). -/
-def perfectLinkageBlindness : BlindnessMechanism := BlindnessMechanism.support
-
-/-- The three mechanisms are genuinely distinct, so the trichotomy is a classification
-rather than a restatement. -/
-theorem blindness_mechanisms_distinct :
-    foldedSpectrumBlindness ≠ balancedLocusBlindness ∧
-      balancedLocusBlindness ≠ perfectLinkageBlindness ∧
-      foldedSpectrumBlindness ≠ perfectLinkageBlindness := by
-  refine ⟨?_, ?_, ?_⟩ <;> decide
 
 /-!
 ## What is left open, plainly

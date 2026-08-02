@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Family simulator: THE BLINDNESS TRICHOTOMY. numpy only.
+"""Family simulator: THREE BLINDNESS INSTANCES. numpy only.
 
 FIRST CONTACT BETWEEN Sec. 15 OF FoldedSpectrum.lean AND ANY NUMBER.
-`BlindnessMechanism` and `blindness_mechanisms_distinct` are proved in Lean by
-`decide`, which establishes that three CONSTRUCTORS differ -- a statement about
-an inductive type, carrying no information whatever about the genotype family.
-Whether the three named blindnesses actually behave as three different kinds of
-object is an empirical question and this file is the first to ask it.
+The Lean module now labels symmetry, isolated coincidence, and support loss as a
+TAXONOMY, not an exhaustive classification. This script compares one concrete
+instance of each. Distinct responses in these examples do not prove that every
+blind observation map belongs to one of three classes.
 
 SCOPE, SO THIS DOES NOT DUPLICATE WORK ALREADY RUNNING
     `fam_ensemble_channel.py` covers Sec. 14: the channel T1, the depth sweep
@@ -35,12 +34,11 @@ WHAT THE CORPUS CLAIMS (FoldedSpectrum.lean Sec. 15)
       LD.  `frequencyTie_gives_kernel` proves the weight split between them is
       invisible at every modulus value.
 
-  B4  THE COLLAPSE CLAIM, which arrived after the Lean was written and is the
-      reason this file exists in its present form: at completion level the
-      trichotomy is said to COLLAPSE -- resonance is either broken by ONE
-      GENERIC BAND SHIFT, or was symmetry blindness in disguise.  That is a
-      prediction about behaviour under perturbation, so it is measurable, and
-      B1-B3 give three instances to measure it on.
+  B4  AN EXPLORATORY COMPLETION PROBE. A proposed collapse principle says that
+      an isolated analytic resonance is broken by a generic band shift unless
+      it comes from a persistent identity. One random shift of one genotype
+      instance is a falsifier and development check, never evidence for the
+      universal principle.
 
 THE DISCRIMINATING EXPERIMENT
     A band shift sends the three modulus values m_j -> m_j + delta_j.  Take
@@ -53,10 +51,9 @@ THE DISCRIMINATING EXPERIMENT
         resonance  DIES                             n/a          n/a
         support    survives                         DIES         n/a
 
-    A trichotomy that is really one thing in three costumes would not produce
-    three different rows.  If resonance survives the shift, B4's first horn is
-    refuted and its second horn ("symmetry in disguise") becomes testable by
-    whether a gauge can be exhibited.
+    These rows describe these three witnesses only. If the resonance survives
+    the shift, this instance refutes the proposed generic-breaking story; if it
+    dies, the universal claim remains open.
 
 WITNESS PLACEMENT: THE CLAIM SAYS "EXCEPT ON S", SO THE WITNESS GOES IN S
     B2's content is an EXCEPT: non-degenerate everywhere in (0,1) EXCEPT at
@@ -378,7 +375,7 @@ def mutation_gate(grid):
 
 
 def main():
-    print("FAMILY: THE BLINDNESS TRICHOTOMY  (FoldedSpectrum.lean Sec. 15)")
+    print("FAMILY: THREE BLINDNESS INSTANCES  (FoldedSpectrum.lean Sec. 15)")
     print("=" * 70)
 
     inst, rng, grid = run_instances()
@@ -409,7 +406,7 @@ def main():
           % (shift["B2_degeneracy_at_half_after_shift"], shift["B2_dies_under_shift"]))
     print("   support   after shift: %.3e -> survives: %s"
           % (shift["B3_tied_residual_after_shift"], shift["B3_survives_shift"]))
-    print("   THREE DISTINCT ROWS (trichotomy not one thing in three costumes): %s"
+    print("   THREE DISTINCT RESPONSE ROWS IN THESE WITNESSES: %s"
           % shift["three_distinct_rows"])
 
     mutants, gate_pass = mutation_gate(grid)
@@ -425,8 +422,8 @@ def main():
         "band_shift": shift,
         "mutation_gate": {"mutants": mutants, "pass": gate_pass},
         "headline": {
-            "trichotomy_three_distinct_rows": shift["three_distinct_rows"],
-            "collapse_claim_first_horn_resonance_broken_by_generic_shift":
+            "three_witnesses_have_distinct_rows": shift["three_distinct_rows"],
+            "one_shift_breaks_this_resonance_witness":
                 shift["B2_dies_under_shift"],
             "gate_pass": gate_pass,
         },

@@ -105,8 +105,10 @@ Written for Python 3.6.8 with numpy only: no f-strings, no dataclasses, no
 walrus, no scipy.
 """
 
+import argparse
 import json
 import math
+import os
 import sys
 import time
 
@@ -129,6 +131,35 @@ ENS_T4 = 40
 N_T5 = 500
 M_T5 = 1000
 ENS_T5 = 200
+REPS_T1B = 20000
+DEPTHS_T1B = (32, 64, 128, 256, 512, 1024, 2048, 4096)
+NTRUE_T3 = 4000000
+ORACLE_T4 = 400000
+ORACLE_T5 = 2000000
+ISSERLIS_SUBSAMPLE = 20000
+
+
+def configure_profile(profile):
+    """Select a bounded development run or the registered full experiment."""
+    global N_PRIME, REPS_T1, N_T2, REPS_T2, N_T3, POOL_T3
+    global N_T4, M_T4, ENS_T4, N_T5, M_T5, ENS_T5
+    global REPS_T1B, DEPTHS_T1B, NTRUE_T3, ORACLE_T4, ORACLE_T5
+    global ISSERLIS_SUBSAMPLE
+    if profile == "full":
+        return
+    if profile != "quick":
+        raise ValueError("profile must be 'quick' or 'full'")
+    N_PRIME, REPS_T1 = 512, 4000
+    N_T2, REPS_T2 = 256, 8000
+    N_T3, POOL_T3 = 128, 128000
+    N_T4, M_T4, ENS_T4 = 128, 200, 20
+    N_T5, M_T5, ENS_T5 = 128, 300, 30
+    REPS_T1B = 3000
+    DEPTHS_T1B = (32, 128, 512)
+    NTRUE_T3 = 200000
+    ORACLE_T4 = 50000
+    ORACLE_T5 = 100000
+    ISSERLIS_SUBSAMPLE = 5000
 
 
 # ===========================================================================
@@ -348,10 +379,9 @@ def test1(rng, out):
 def test1b(rng, out):
     """Where the fluctuation limit starts to bite as rho -> 1.
 
-    `SampleBudget.depthSufficient` is a HYPOTHESIS (mixingTime < depthPerTarget)
-    and the corpus says depth past it "buys nothing".  Both halves are checked:
-    the approach of the measurement to L as n'/tau grows, and the exact size of
-    the deficit, which the Fejer sum predicts with no free constant.
+    This checks the approach to the asymptotic long-run variance and the exact
+    finite-depth deficit predicted by the Fejer sum. It does not assert that
+    depth beyond a mixing threshold has zero design value.
     """
     print("")
     print("-" * 74)
@@ -359,14 +389,14 @@ def test1b(rng, out):
     print("-" * 74)
     amp, s2 = 1.0, 1.0
     rows = []
-    reps = 20000
+    reps = REPS_T1B
     for r in (0.9, 0.99):
         tau = mixing_time(r)
         L = float(long_run_L(amp, s2, r, 0.0))
         print("  rho = %.3f, tau = 1/(1-rho) = %.1f, L = %.4f" % (r, tau, L))
         print("    %-7s %-8s %-11s %-11s %-11s %-10s"
               % ("n'", "n'/tau", "measured", "Fejer(n')", "err vs L", "err vs FN"))
-        for n in (32, 64, 128, 256, 512, 1024, 2048, 4096):
+        for n in DEPTHS_T1B:
             a_arr = np.full(reps, amp)
             s_arr = np.full(reps, s2)
             r_arr = np.full(reps, r)
@@ -651,7 +681,7 @@ def test3(rng, out):
 
     # ---- truth by parameter-only MC ---------------------------------------
     trng = np.random.default_rng(SEED + 777)
-    NTRUE = 4000000
+    NTRUE = NTRUE_T3
     r = trng.uniform(RHO_LO, RHO_HI, NTRUE)
     th = trng.uniform(TH_LO, TH_HI, NTRUE)
     FN_true = fejer_channel(np.full(NTRUE, AMP), np.full(NTRUE, S2), r, th, N_T3)
@@ -659,8 +689,8 @@ def test3(rng, out):
     E1 = float(FN_true.mean())
     E2 = float((FN_true ** 2).mean())
     V = E2 - E1 ** 2
-    print("  TRUTH (4e6 parameter draws, closed form):  E[FN] = %.6f, "
-          "Var[FN] = %.6f" % (E1, V))
+    print("  TRUTH (%d parameter draws, closed form):  E[FN] = %.6f, "
+          "Var[FN] = %.6f" % (NTRUE, E1, V))
     print("         limit quantities:                   E[L]  = %.6f, "
           "Var[L]  = %.6f  (n'-deficit %.3f%%)"
           % (float(L_true.mean()),
@@ -728,9 +758,9 @@ def test3(rng, out):
 # Rules:
 #   source-centred (the envelope): a single constant, the source's b.
 #   pooled/compound             : E[b | v], fitted across the m cohorts.
-# `EnsembleTransfer.improvement` says
-#   envelopePenalty - compoundPenalty = visiblePredictableVariance = Var(E[b|v])
-# and `full_recovery` says that on the curve this equals the whole blind term.
+# `ensembleSquaredLoss_decomposition` supplies the finite Pythagorean identity.
+# The curve arm separately checks that the visible coordinate is injective; low
+# dimension alone would not imply full recovery.
 
 def curve_params(xi):
     """One-parameter family.  rho up, theta down: L and b both monotone in xi,
@@ -767,7 +797,7 @@ def test4(rng, out):
     AMP, S2 = 1.0, 1.0
 
     # ---- C4: the identity and the two arms, on ORACLE visibles ------------
-    NT = 400000
+    NT = ORACLE_T4
     trng = np.random.default_rng(SEED + 991)
     xi = trng.uniform(0.0, 1.0, NT)
     cr, cth = curve_params(xi)
@@ -926,7 +956,7 @@ def test5(rng, out):
 
     # exact risks under the prior
     trng = np.random.default_rng(SEED + 313)
-    NT = 2000000
+    NT = ORACLE_T5
     G = trng.uniform(G_LO, G_HI, NT)
     rP = rho_from_G(G, THETA, -1)
     rQ = rho_from_G(G, THETA, +1)
@@ -934,9 +964,9 @@ def test5(rng, out):
     bQ = AMP * rQ * math.cos(THETA)
     LP = long_run_L(AMP, S2, rP, THETA)
     LQ = long_run_L(AMP, S2, rQ, THETA)
-    print("  visible check: max |L_P - L_Q| over 2e6 draws = %.3e "
+    print("  visible check: max |L_P - L_Q| over %d draws = %.3e "
           "(identical), L range [%.4f, %.4f]"
-          % (float(np.max(np.abs(LP - LQ))), float(LP.min()), float(LP.max())))
+          % (NT, float(np.max(np.abs(LP - LQ))), float(LP.min()), float(LP.max())))
     print("  rho_P in [%.4f, %.4f];  rho_Q in [%.4f, %.4f]"
           % (rP.min(), rP.max(), rQ.min(), rQ.max()))
     riskP = float(np.mean(bP ** 2))
@@ -949,8 +979,8 @@ def test5(rng, out):
         k = np.arange(1, kmax + 1)
         g = amp * (rho[:, None] ** k) * np.cos(k * theta)
         return (amp + s2) ** 2 + 2.0 * (g ** 2).sum(axis=1)
-    sg2P = float(np.mean(sum_g2(AMP, S2, rP[:20000], THETA)))
-    sg2Q = float(np.mean(sum_g2(AMP, S2, rQ[:20000], THETA)))
+    sg2P = float(np.mean(sum_g2(AMP, S2, rP[:ISSERLIS_SUBSAMPLE], THETA)))
+    sg2Q = float(np.mean(sum_g2(AMP, S2, rQ[:ISSERLIS_SUBSAMPLE], THETA)))
     print("  fourth-order (Isserlis) channel 2*sum gamma(k)^2:  P %.4f  "
           "Q %.4f  (ratio %.2fx)" % (2 * sg2P, 2 * sg2Q, sg2Q / sg2P))
 
@@ -1032,10 +1062,18 @@ def test5(rng, out):
 
 # ===========================================================================
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile", choices=("quick", "full"), default="quick",
+                        help="bounded development signal or registered full experiment")
+    parser.add_argument("--output", default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "fam_ensemble_channel_results.json"))
+    args = parser.parse_args(argv)
+    configure_profile(args.profile)
     t0 = time.time()
     rng = np.random.default_rng(SEED)
-    out = {"seed": SEED, "n_prime_T1": N_PRIME, "reps_T1": REPS_T1,
+    out = {"profile": args.profile, "seed": SEED,
+           "n_prime_T1": N_PRIME, "reps_T1": REPS_T1,
            "n_T2": N_T2, "reps_T2": REPS_T2, "n_T3": N_T3, "pool_T3": POOL_T3,
            "n_T4": N_T4, "m_T4": M_T4, "ens_T4": ENS_T4,
            "n_T5": N_T5, "m_T5": M_T5, "ens_T5": ENS_T5}
@@ -1070,10 +1108,10 @@ def main():
     print("")
     print("  READ_THE_TEST (every control fired): %s" % ok)
     print("  runtime %.1f s" % (time.time() - t0))
-    fh = open("fam_ensemble_channel_results.json", "w")
+    fh = open(args.output, "w")
     json.dump(out, fh, indent=1)
     fh.close()
-    print("-> fam_ensemble_channel_results.json")
+    print("-> %s" % args.output)
     return 0 if ok else 1
 
 
