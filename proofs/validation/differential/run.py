@@ -279,6 +279,10 @@ def main() -> int:
             "reference": chk.reference,
             "tol": chk.tol,
             "verdict": verdict,
+            "expected_verdict": chk.expected_verdict,
+            "verdict_regression": bool(
+                chk.expected_verdict and verdict != chk.expected_verdict
+            ),
             "kind": chk.kind,
             "vacuous": not vac["can_fail"],
             "mutants_detected": vac["mutants_detected"],
@@ -351,13 +355,24 @@ def main() -> int:
     )
     for cid, fq in standins:
         print(f"    {cid}  ({fq})")
+    regressions = [
+        (cid, c["expected_verdict"], c["verdict"])
+        for cid, c in out["checks"].items() if c["verdict_regression"]
+    ]
+    if regressions:
+        print("VERDICT REGRESSIONS -- a check stopped producing its declared "
+              "result:")
+        for cid, want, got in regressions:
+            print("    %-46s expected %s, got %s" % (cid, want, got))
+        print("    A convention pin that becomes agreement is a regression, "
+              "not an improvement.")
     n_unresolved = len(out["cross_validation"]["unresolved_disagreements"])
     if n_unresolved:
         print(
             f"FAIL: {n_unresolved} translation disagreements are unresolved. "
             "No verdict below is trustworthy until they are."
         )
-    return 1 if (n_vac or n_unresolved) else 0
+    return 1 if (n_vac or n_unresolved or regressions) else 0
 
 
 if __name__ == "__main__":
