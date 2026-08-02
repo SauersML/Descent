@@ -59,13 +59,9 @@ def Pop.withTarget {α : Sort*} (f : Pop → α) (t : α) : Pop → α := Pop.pa
 
 namespace InformationTheoryBridge
 
-/-- Bernoulli PMF on `Bool`, using mathlib's canonical construction. -/
-noncomputable def bernoulliPMF (p : NNReal) (hp : p ≤ 1) : PMF Bool :=
-  PMF.bernoulli p hp
-
-/-- Bernoulli probability measure induced by `bernoulliPMF`. -/
+/-- Bernoulli probability measure, from mathlib's canonical PMF construction. -/
 noncomputable def bernoulliMeasure (p : NNReal) (hp : p ≤ 1) : Measure Bool :=
-  (bernoulliPMF p hp).toMeasure
+  (PMF.bernoulli p hp).toMeasure
 
 /-- KL divergence between Bernoulli laws, via `InformationTheory.klDiv`. -/
 noncomputable def bernoulliKL (p q : NNReal) (hp : p ≤ 1) (hq : q ≤ 1) : ENNReal :=
@@ -73,7 +69,7 @@ noncomputable def bernoulliKL (p q : NNReal) (hp : p ≤ 1) (hq : q ≤ 1) : ENN
 
 @[simp] theorem bernoulliKL_self (p : NNReal) (hp : p ≤ 1) :
     bernoulliKL p p hp hp = 0 := by
-  simp [bernoulliKL, bernoulliMeasure, bernoulliPMF]
+  simp [bernoulliKL, bernoulliMeasure, PMF.bernoulli]
 
 theorem bernoulliKL_eq_zero_iff (p q : NNReal) (hp : p ≤ 1) (hq : q ≤ 1)
     [IsFiniteMeasure (bernoulliMeasure p hp)] [IsFiniteMeasure (bernoulliMeasure q hq)] :
@@ -110,7 +106,7 @@ theorem klBern_eq_klDiv_pmf (p q : UnitProb) :
       InformationTheory.klDiv
         ((PMF.bernoulli (unitProbToNNReal p) (unitProbToNNReal_le_one p)).toMeasure)
         ((PMF.bernoulli (unitProbToNNReal q) (unitProbToNNReal_le_one q)).toMeasure) := by
-  simp [klBern, bernoulliKL, bernoulliMeasure, bernoulliPMF]
+  simp [klBern, bernoulliKL, bernoulliMeasure, PMF.bernoulli]
 
 end InformationTheoryBridge
 

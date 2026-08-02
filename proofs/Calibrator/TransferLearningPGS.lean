@@ -1654,12 +1654,11 @@ noncomputable def metaLearnedSourceWeights {p : ℕ}
     center. This is the closed-form effect-architecture object whose average is used
     by the meta-learning block below.
 
-    Empirical status: UNTESTED. -/
-/-- Per-population deviation of the source effects from the shared ones.
+    The population index is left general. This was two definitions with identical
+    bodies, one indexed by `ℕ` and one by `Fin k`; nothing in the deviation depends on
+    which, so the index is a parameter rather than a reason for a second definition.
 
-The population index is left general. This was two definitions with identical bodies, one
-indexed by `ℕ` and one by `Fin k`; nothing in the deviation depends on which, so the index
-is a parameter rather than a reason for a second definition. -/
+    Empirical status: UNTESTED. -/
 noncomputable def centeredPopulationEffectDeviation {p : ℕ} {ι : Type*}
     (wShared : Fin p → ℝ)
     (wSource : ι → Fin p → ℝ) : ι → Fin p → ℝ :=

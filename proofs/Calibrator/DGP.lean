@@ -82,24 +82,15 @@ noncomputable def HWEPolygenicScoreDGP.scoreApproximationError {m : ℕ} [Fintyp
     (dgp : HWEPolygenicScoreDGP m) : ℝ :=
   dgp.scoreModel.berryEsseenErrorBound dgp.berryEsseenConstant
 
-/-- AUC interval induced by a Gaussian approximation center and Berry-Esseen error radius. -/
-noncomputable def HWEPolygenicScoreDGP.aucApproximationInterval {m : ℕ} [Fintype (Fin m)]
-    (dgp : HWEPolygenicScoreDGP m) (aucGaussian : ℝ) : Set ℝ :=
-  Calibrator.aucApproximationInterval aucGaussian dgp.scoreApproximationError
-
-/-- `R²` interval induced by a Gaussian approximation center and Berry-Esseen error radius. -/
-noncomputable def HWEPolygenicScoreDGP.r2ApproximationInterval {m : ℕ} [Fintype (Fin m)]
-    (dgp : HWEPolygenicScoreDGP m) (r2Gaussian : ℝ) : Set ℝ :=
-  Calibrator.r2ApproximationInterval r2Gaussian dgp.scoreApproximationError
-
 /-- Any exact AUC lying within the Berry-Esseen error radius belongs to the certified interval. -/
 theorem HWEPolygenicScoreDGP.mem_aucApproximationInterval_of_abs_sub_le
     {m : ℕ} [Fintype (Fin m)]
     (dgp : HWEPolygenicScoreDGP m)
     (aucExact aucGaussian : ℝ)
     (h : |aucExact - aucGaussian| ≤ dgp.scoreApproximationError) :
-    aucExact ∈ dgp.aucApproximationInterval aucGaussian := by
-  simpa [HWEPolygenicScoreDGP.aucApproximationInterval] using
+    aucExact ∈
+      Calibrator.aucApproximationInterval aucGaussian dgp.scoreApproximationError := by
+  simpa [Calibrator.aucApproximationInterval] using
     (mem_approximationInterval_of_abs_sub_le
     aucExact aucGaussian dgp.scoreApproximationError
     (by
@@ -113,8 +104,9 @@ theorem HWEPolygenicScoreDGP.mem_r2ApproximationInterval_of_abs_sub_le
     (dgp : HWEPolygenicScoreDGP m)
     (r2Exact r2Gaussian : ℝ)
     (h : |r2Exact - r2Gaussian| ≤ dgp.scoreApproximationError) :
-    r2Exact ∈ dgp.r2ApproximationInterval r2Gaussian := by
-  simpa [HWEPolygenicScoreDGP.r2ApproximationInterval] using
+    r2Exact ∈
+      Calibrator.r2ApproximationInterval r2Gaussian dgp.scoreApproximationError := by
+  simpa [Calibrator.r2ApproximationInterval] using
     (mem_approximationInterval_of_abs_sub_le
     r2Exact r2Gaussian dgp.scoreApproximationError
     (by
