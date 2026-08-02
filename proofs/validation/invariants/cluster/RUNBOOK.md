@@ -4,6 +4,34 @@ All jobs are pure Python + numpy, single process, no builds, no tree copies.
 Peak memory is a few hundred MB (one simulated haplotype pool of 1.5e6 int8).
 Nothing here writes outside `proofs/validation/invariants/`.
 
+## Getting the clone current — GIT MUST NEVER EDIT
+
+Runs happen in a private clone at `/projects/standard/hsiehph/sauer354/ranges_wt`
+so they do not race other agents' merges in the shared checkout. A private
+clone that never updates diverges silently and starts testing a revision
+nobody else has, so it must be brought current before every run — but **not
+with a command that mutates tracked content.**
+
+```
+cd /projects/standard/hsiehph/sauer354/ranges_wt
+git fetch origin
+git merge origin/main          # NEVER `git reset --hard`
+```
+
+**`git reset --hard` is forbidden, with any argument, on any tree.** So are
+`git checkout -- <path>`, `git restore`, `git clean`, `git stash` and
+`git revert`. Git is for commit, push, and reading history. To change a file,
+edit the file. `git show <rev>:<path>` to READ old content is fine.
+
+I used `git reset --hard origin/main` here earlier and it was wrong. It is the
+leading suspect for a new module file that vanished from the shared cluster
+tree today: a hard reset against a stale ref deletes exactly the files added
+after that ref while sparing established ones, so it looks harmless right up
+until it isn't.
+
+Recording the revision with every result (below) is the other half of the
+defence, and it is now the only one that does not involve git touching files.
+
 ```
 module load python3/3.10.9_anaconda2023.03_libmamba
 cd <repo>/proofs/validation/invariants
@@ -62,6 +90,25 @@ scipy being available may let some hand-rolled numerics go, but **do not swap
 oracle implementations in the same run as a stability sweep.** The sweep exists
 to isolate seed dependence, and a simultaneous numerics change would confound
 it. Numerics changes go in a later, separate run.
+
+## Results do not come back on their own
+
+**The cluster is write-only compute.** Its checkout has no push credentials, so
+anything produced there exists in exactly one place until it is pulled back
+deliberately. Another agent had seven result files living only on MSI for an
+entire session, surviving repeated hard resets purely because untracked files
+are spared.
+
+```
+bash cluster/fetch_results.sh      # -> cluster/runs/, plus REVISION.txt
+```
+
+Run it after every job, and commit what it brings back. "It is on the cluster"
+is one copy, not a backup.
+
+Note what it reports ABSENT: a job that writes its results only at the end has
+nothing to retrieve until it finishes, so a crash loses everything it did. The
+stability sweep has this shape and the next version writes per spec.
 
 ## What each job reads and writes
 
