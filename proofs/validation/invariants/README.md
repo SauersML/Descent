@@ -24,15 +24,30 @@ simulates the named quantity from first principles — draw individuals, draw
 genotypes, run generations, measure. No oracle is derived by rearranging the
 Lean formula, because an oracle obtained that way tests nothing.
 
-Two disciplines keep that tier honest. Agreement is judged against the
+Three disciplines keep that tier honest. Agreement is judged against the
 sampler's OWN Monte Carlo noise: each oracle runs under two seeds, and a gap
 counts as disagreement only when it exceeds both the relative tolerance and
 three times the observed standard error. Without that, a quantity passing
 through zero — admixture LD does — shows unbounded *relative* error at points
-where both numbers are noise, and gets reported as a defect. And the oracles
-are themselves tested: `check_simulation.py` has negative controls in which a
-deliberately wrong oracle (half the true genotype variance, drift at twice the
-F_ST, decay at the wrong rate) must be rejected. They are, by 8-25x.
+where both numbers are noise, and gets reported as a defect. The oracles are themselves tested: `check_simulation.py` has negative controls
+in which a deliberately wrong oracle (half the true genotype variance, drift at
+twice the F_ST, decay at the wrong rate) must be rejected. They are, by 8-25x.
+
+And every spec must survive FIVE INDEPENDENT POINT-SETS before it counts. A
+verdict that flips with the seed is not a verdict, and this is not
+hypothetical: a sweep across eight point-sets found two specs agreeing on only
+4/8 and 5/8 while the tier was reporting them as agreeing on a lucky draw. The
+cause was the noise estimate itself — the oracle's standard error was taken
+from two seeds, and an SE from two samples is chi-square with one degree of
+freedom, so the allowance was sometimes far too tight. Five seeds and a proper
+standard error of the mean fixed it. `seed_stability` is now recorded on every
+result, and a spec that is not stable gets verdict `unstable` and is not
+counted.
+
+A related bug worth naming because it is invisible: the point-set seed was
+`hash(name) % 10000`, and Python salts `hash()` on strings per process, so the
+whole tier gave different answers on every run. It was found by diffing a
+re-run done for an unrelated reason, not by inspection.
 
 ## The totality contract, in two clauses
 
@@ -73,6 +88,25 @@ kind.
 | `direction-inverted` | 17 | yes — and the worse kind |
 | `wrong-finite-value` | 1 | yes |
 | `singularity` | 0 | no |
+
+## Evidence classes — never pool these
+
+`coverage.json` carries `evidence_class` on every covered definition:
+
+| class | meaning |
+| --- | --- |
+| `external-reference` | compared against an independent simulation. **The only one that is validation against the world.** |
+| `self-property` | the definition's own name-implied range or a derived invariant |
+| `internal-consistency` | a proved theorem about it breaks when its body is mutated |
+
+The third is genuine falsifiability — a wrong body would have been caught — but
+Lean admits no false theorem, so it discovers nothing and two definitions can
+satisfy every identity between them and both be wrong about biology. If a
+single coverage figure is quoted anywhere, it should be the external one.
+
+`mutants_rejected` and `mutants_tried` are reported separately. "At least one
+mutant was rejected" and "most nearby wrong bodies are rejected" are different
+claims, and reporting only the first implies the second.
 
 `equalVarianceGaussianAUCFromExplainedR2` returns 0.5 — chance discrimination —
 at `r2 = 1`, where the AUC tends to 1.

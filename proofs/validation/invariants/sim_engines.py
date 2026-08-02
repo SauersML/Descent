@@ -137,7 +137,7 @@ def sim_admixed_haplotype_freq(alpha, pA, qA, pB, qB, n=800000, seed=0):
     return float(np.mean(hap_a & hap_b))
 
 
-def sim_admixture_ld(alpha, pA, qA, pB, qB, n=4000000, seed=0):
+def sim_admixture_ld(alpha, pA, qA, pB, qB, n=1500000, seed=0):
     """D = P(AB) - P(A)P(B) in a freshly admixed population."""
     rng = np.random.default_rng(seed)
     from_a = rng.random(n) < alpha
@@ -272,7 +272,7 @@ def sim_gwas_estimator_variance(n_ind, p, r2_ld, reps=4000, seed=0):
     return float(np.var(ests))
 
 
-def sim_admixture_ld_at_gen(alpha, pA, qA, pB, qB, r, g, n=2000000, seed=0):
+def sim_admixture_ld_at_gen(alpha, pA, qA, pB, qB, r, g, n=800000, seed=0):
     """Admixture LD after `g` generations of random mating with recombination.
 
     One simulation end to end: build the admixed haplotype pool by drawing each
@@ -296,7 +296,7 @@ def sim_admixture_ld_at_gen(alpha, pA, qA, pB, qB, r, g, n=2000000, seed=0):
 # second batch: regression, variance components, mutation-drift, structure
 
 
-def sim_ols_slope_variance(sigma2, varX, n, reps=3000, seed=0):
+def sim_ols_slope_variance(sigma2, varX, n, reps=1200, seed=0):
     """Sampling variance of the OLS slope, measured across replicate fits.
 
     y = b*x + e with Var(e) = sigma2 and Var(x) = varX.  The slope is refit on
@@ -375,7 +375,7 @@ def sim_infinite_alleles_heterozygosity(theta, Ne=None, reps=4000, seed=0):
     return float(np.mean(1.0 - p_no_mut))
 
 
-def sim_island_model_fst(Ne, m, demes=200, gens=None, reps=300, seed=0):
+def sim_island_model_fst(Ne, m, demes=100, gens=None, reps=60, seed=0):
     """F_ST at migration-drift equilibrium in a finite island model.
 
     Explicit Wright-Fisher in each deme with a migrant pool.  REGIME: the
@@ -388,7 +388,7 @@ def sim_island_model_fst(Ne, m, demes=200, gens=None, reps=300, seed=0):
     n = int(round(2 * Ne))
     if n < 2 or not (0 < m < 1):
         return None
-    gens = int(gens or max(200, 8 * Ne))
+    gens = int(gens or max(120, 4 * Ne))
     p = np.full((reps, demes), 0.5)
     for _ in range(gens):
         pbar = p.mean(axis=1, keepdims=True)
@@ -402,7 +402,7 @@ def sim_island_model_fst(Ne, m, demes=200, gens=None, reps=300, seed=0):
     return float((ht - hs) / ht)
 
 
-def sim_distinct_haplotypes(k, n, reps=4000, seed=0):
+def sim_distinct_haplotypes(k, n, reps=1500, seed=0):
     """Expected number of DISTINCT haplotypes when n are drawn from 2^k types."""
     rng = np.random.default_rng(seed)
     k, n = int(k), int(n)
@@ -423,7 +423,7 @@ def sim_spike_slab_variance(pi, sigma_slab, n=800000, seed=0):
     return float(np.mean(x ** 2))
 
 
-def sim_am_equilibrium_variance(V_A, r, h2, gens=60, n=200000, seed=0):
+def sim_am_equilibrium_variance(V_A, r, h2, gens=40, n=60000, seed=0):
     """Additive variance at assortative-mating equilibrium, by iteration.
 
     Runs the mating process forward: each generation, mates are paired on

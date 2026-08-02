@@ -1,7 +1,8 @@
 # Shared simulation oracle — interface, announced before it is built
 
-**Status: PROPOSED. Comment before it is finished.** This is published ahead of
-the implementation on purpose. Four agents independently wrote four Lean
+**Status: ACTIVE.** The one section that was unsettled — the join key — is now
+settled and binding (below), so this comes off PROPOSED. Published ahead of the
+implementation on purpose. Four agents independently wrote four Lean
 parsers this session and reconciling them cost real time and turned up 76
 disagreements, one of which silently replaced a declaration with a namesake.
 The simulator is the next thing with that shape, so the interface is being
@@ -93,21 +94,58 @@ value in this project that should count toward model validation.
 
 `mutants_rejected` / `mutants_tried` are BOTH reported. "At least one mutant
 was rejected" and "most nearby wrong bodies are rejected" are different claims
-and pooling them overstates the evidence.
+and pooling them overstates the evidence. Where `mutants_tried` is below a
+small minimum the ratio is reported as UNDEFINED rather than as 1.0 — a body
+the mutation operators barely applied to displays as the strongest evidence in
+the set while being the weakest.
 
-## Join key — OPEN QUESTION, needs `extract`
+`seed_stability` is required on every external record:
 
-Consumers must map a definition to an oracle. Three candidate keys all fail
-today: short names collide (22 of them); `(file, short)` still collides because
-a namespaced definition and a bare one in the same file share a `short`; and
-`(file, line)` breaks because tables are extracted from different revisions of
-a corpus several agents are editing — 93 of 403 of my callables had no row at
-their file:line against a table generated minutes earlier.
+```json
+"seed_stability": {"seeds_tried": 8, "seeds_agreeing": 8}
+```
 
-Proposal: the fully-qualified name as `extract` emits it, with `body_checksum`
-as a corroborating field — if names join but checksums differ, the consumer is
-told the two sides are looking at different revisions rather than proceeding.
-**Not settled. Do not build a join against this document until it is.**
+A record where those differ is one nobody should count, mine included. Three
+states must stay distinct downstream — stable, flickers, and never checked —
+because "asked and answered" and "never asked" are different, and merging them
+is the same move as merging a mention with a check.
+
+## Join key — SETTLED AND BINDING
+
+| role | field | note |
+| --- | --- | --- |
+| PRIMARY | `name` | fully qualified, e.g. `Calibrator.HWEScoreModel.berryEsseenErrorBound` |
+| SECONDARY | `decl_name` | the declaration name exactly as written; `(file, decl_name)` is unique |
+| **not a key** | `short` | display only |
+| **not a key** | line numbers | never |
+| corroborate | `body_checksum` | join on the key, then compare |
+
+Construction, from `extract`:
+
+```
+name = ".".join(enclosing `namespace` blocks) + "." + <declaration name as written>
+```
+
+Both halves matter. The declaration name is taken verbatim and **may itself
+contain dots**: `def HWEScoreModel.berryEsseenErrorBound` inside `namespace
+Calibrator` gives `Calibrator.HWEScoreModel.berryEsseenErrorBound`. So it is
+not "namespace path + short name" — the declaration's own qualification is part
+of the name, and `short` throws it away. That is exactly why `(file, short)`
+collides.
+
+Why the rejected keys are rejected, on live evidence: short names collide 22
+ways, and short-name keying is what silently mis-bound a definition in another
+tier and produced a wrong number rather than an error. Line numbers fail
+because several agents edit this corpus continuously — 93 of 403 of my
+callables had no row at their file:line against a table generated minutes
+earlier, and `presentDayR2` mapped to a row with entirely different arguments.
+That is revision skew, not parse disagreement, and it mismatches *differently*
+on every regeneration.
+
+**Revision skew is detected, not tolerated.** Join on `name`, then compare
+`body_checksum`. Equal means same revision. Unequal means the two sides are
+looking at different source, and the consumer must be TOLD rather than proceed.
+`api.stamp()["corpus_digest"]` is the whole-corpus version.
 
 ## What this will and will not cover
 
