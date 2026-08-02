@@ -17,11 +17,26 @@ import any other `Calibrator` module, so it can be read, checked and built on it
 
 *On the import style, since it changed and the reason is not obvious from the diff.* This
 module and its siblings originally began `import Mathlib`, pulling the whole library at
-once. That requires the root `Mathlib.olean`, which is **absent** from the cluster build —
-so these modules alone could not be built, while every other module in `proofs/Calibrator`
-could, because the rest of the corpus imports targeted modules. The imports are now
-targeted to match. This was a build-availability fix, not a tidy-up, and reverting it
-would make this directory unbuildable again.
+once. That requires the root `Mathlib.olean`. **Do not revert to the wholesale form**, for
+three reasons, in increasing order of importance:
+
+1. *cost.* The aggregate import makes every builder pay for the whole library, and
+   targeted imports are why the rest of `proofs/Calibrator` builds in minutes instead of
+   descending into thousands of Mathlib targets.
+2. *single point of failure — the real argument.* The wholesale form made these modules'
+   buildability depend on a **global artifact that nothing else in the corpus depended
+   on**. When the root olean went missing, every other module still built and these
+   eleven alone could not — and because they were the only ones affected, the fact went
+   unnoticed for a long time while being reported as two separate problems ("these
+   modules are never checked" and "the root is missing"), which were one problem. The
+   targeted form puts this directory on the same footing as everything around it, so the
+   next time the root is absent **nobody has to notice that these modules are special.**
+3. *these modules are now foundational.* Files outside this directory are being wired to
+   depend on them, so their import structure is load-bearing rather than local.
+
+The root olean has since been rebuilt and the wholesale form would work again. That does
+not restore the argument for it; reason 2 is about what happens the next time, not this
+time.
 
 ## What is here
 
