@@ -27,6 +27,29 @@ ORDER, and why:
                            arguments, which is the part I am least able to
                            verify blind -- see its header.
 
+MODEL-FAMILY LAYER (added later; these are the coverage-expansion scripts)
+
+  families.py              the inventory itself. Reads defs.json only, no
+                           sampling, seconds. Prints the family table, the
+                           un-simulatable list WITH its falsifier executed on
+                           every entry, and the statements still in no family.
+                           Run it before and after any corpus change: the
+                           membership lists go stale inside a session.
+  fam_metrics.py           liability-threshold metrics, HWE genotype score,
+                           estimator moments. ~50 in-slice statements, pure
+                           numpy, ~1 min. Contains an INVERTED positive control
+                           (L4, vNoise=0) that is SUPPOSED to come back red;
+                           if it comes back green the harness is not comparing
+                           anything and the rest of that arm is void.
+  fam_fst_estimators.py    F_ST estimator conventions under finite sampling,
+                           and the identity-by-descent recurrence read as
+                           mutation versus as migration. ~15 statements.
+                           Positive control E3 must show Nei and Hudson
+                           DISAGREEING; if it does not, the arm's agreements
+                           mean nothing.
+  fam_ld_decay.py          two-locus Wright-Fisher, the LD family.
+  fam_coalescent.py        split and island F_ST. Needs msprime.
+
 PYTHON 3.6.8 CONSTRAINTS OBSERVED THROUGHOUT
   no `from __future__ import annotations`
   no f-strings at all (not just the `=` form)
