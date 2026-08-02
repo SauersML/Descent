@@ -4134,36 +4134,66 @@
   "n_theorems": 3
  },
  {
-  "name": "hweObservableContent",
+  "name": "gaussianKurtosisMaf",
   "module": "CondensationUnification",
   "path": "proofs/Calibrator/CondensationUnification.lean",
-  "line": 462,
+  "line": 555,
+  "params": [],
+  "ret": "ℝ",
+  "doc": "**The allele frequency at which the hub channel is blind**, `(3 - √3)/6 = 0.211324…`.\n\nThe fourth-cumulant channel separates a coordinate law from the Gaussian exactly when\n`E[x⁴] ≠ 3`. Since `E[x⁴] = 1 / (2q(1-q))`, the channel closes when `2q(1-q) = 1/3`, that\nis `6q² - 6q + 1 = 0`, whose polymorphic roots are `(3 ± √3)/6`. The minor-allele root is\nthis constant.\n\nEmpirical status: DERIVED. The constant is the polymorphic root of `6q² - 6q + 1`, forced\nby `hweGenotypeVariance` through `standardizedGenotype_fourth_moment`;\n`gaussianKurtosisMaf_genotypeVariance` proves the variance identity and\n`standardizedGenotype_kurtosis_gaussian_at_blind_maf` proves the fourth moment is `3`\nthere. Nothing is fitted and there is no free parameter.\n\nWhat is *not* tested is the consequence rather than the constant: the prediction that an\ninteraction statistic relying on fourth-cumulant separation loses power near this\nfrequency has not been checked in simulation. It is the most directly falsifiable number\nthis development produces.",
+  "body": "(3 - Real.sqrt 3) / 6",
+  "theorem_hyps": [
+   {
+    "thm": "gaussianKurtosisMaf_pos",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "gaussianKurtosisMaf_lt_one",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "gaussianKurtosisMaf_genotypeVariance",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "standardizedGenotype_kurtosis_gaussian_at_blind_maf",
+    "hyps": [
+     "HardyWeinbergModel",
+     "h.altFreq = gaussianKurtosisMaf"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 4
+ },
+ {
+  "name": "hweLevelOne",
+  "module": "CondensationUnification",
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "line": 631,
   "params": [
-   [
-    "squareCumulant",
-    "ℝ → ℕ → ℝ"
-   ],
    [
     "q",
     "ℝ"
    ]
   ],
-  "ret": "GenotypeObservableContent where drift",
-  "doc": "The observable content of a Hardy-Weinberg locus at allele frequency `q`, assembled\nfrom the quantities this corpus already computes. The square-cumulant sequence is\nsupplied as a parameter because it is a sequence rather than a closed form; every other\ncomponent is a function of `q` already proved here.\n\nEmpirical status: DERIVED from `hweMellinDrift`, `hweMellinJetVariance` and\n`hweLatticeCondition`, each of which is derived elsewhere in the corpus; no free\nparameter beyond the supplied cumulant sequence, and nothing fitted.",
-  "body": "hweMellinDrift q\njetVariance := hweMellinJetVariance q\nIsLattice := hweLatticeCondition q\nIsSignSymmetric := q = 1 / 2\nsquareCumulant := squareCumulant q",
+  "ret": "LevelChannels where drift",
+  "doc": "Floor one of the tower for a Hardy-Weinberg locus, assembled from quantities this\ncorpus computes in closed form.\n\nEmpirical status: DERIVED from `hweMellinDrift`, `hweMellinJetVariance` and\n`hweLatticeCondition`, each derived elsewhere in the corpus, together with the symmetry\ncharacterization `standardizedGenotype_symmetric_iff`; no free parameter and nothing\nfitted.",
+  "body": "hweMellinDrift q\njetVariance := hweMellinJetVariance q\nIsLattice := hweLatticeCondition q\nIsSignSymmetric := q = 1 / 2",
   "theorem_hyps": [
    {
-    "thm": "hweObservableContent_components",
+    "thm": "hweLevelOne_components",
     "hyps": [
-     "ℝ → ℕ → ℝ",
      "ℝ"
     ],
     "argmap": {}
    },
    {
-    "thm": "hweObservableContent_symmetry",
+    "thm": "hweLevelOne_symmetry",
     "hyps": [
-     "ℝ → ℕ → ℝ",
      "HardyWeinbergModel",
      "0 < h.altFreq",
      "h.altFreq < 1"
@@ -4173,33 +4203,21 @@
     }
    },
    {
-    "thm": "hweObservableContent_symmetric_jetVariance_zero",
+    "thm": "hweLevelOne_symmetric_jetVariance_zero",
     "hyps": [
-     "ℝ → ℕ → ℝ",
      "ℝ",
-     "(hweObservableContent squareCumulant q).IsSignSymmetric"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "experiment_factors_through_observable_content",
-    "hyps": [
-     "Limit → Report",
-     "GenotypeDesign n ι",
-     "VW.isAdmissible (design.reModel model)",
-     "VW.isAdmissible (design.reModel model')",
-     "∀ i : Fin n,\n      hweObservableContent VW.squareCumulant (model i).altFreq =\n        hweObservableContent VW.squareCumulant (model' i).altFreq"
+     "(hweLevelOne q).IsSignSymmetric"
     ],
     "argmap": {}
    }
   ],
-  "n_theorems": 4
+  "n_theorems": 3
  },
  {
   "name": "GenotypeDesign.reModel",
   "module": "CondensationUnification",
   "path": "proofs/Calibrator/CondensationUnification.lean",
-  "line": 519,
+  "line": 677,
   "params": [
    [
     "design",
@@ -4211,10 +4229,98 @@
    ]
   ],
   "ret": "GenotypeDesign n ι",
-  "doc": "Re-model a design: the same tested locus-sets, coefficients and joint law, at a\ndifferent allele-frequency family. This is what varying the coordinate law while holding\nthe design fixed means, and it is the comparison the Vertex-Weight Law is about.\n\nEmpirical status: UNTESTED. A field update on a design; no modelling content and no free\nparameter.",
+  "doc": "Re-model a design: the same tested locus-sets, coefficients and joint law, at a\ndifferent allele-frequency family. This is what varying the coordinate law while holding\nthe design fixed means.\n\nEmpirical status: UNTESTED. A field update on a design; no modelling content and no free\nparameter.",
   "body": "{ design with model := model }",
   "theorem_hyps": [],
   "n_theorems": 0
+ },
+ {
+  "name": "moment",
+  "module": "CondensationUnification",
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "line": 830,
+  "params": [
+   [
+    "spectrum",
+    "MafSpectrum m"
+   ],
+   [
+    "k",
+    "ℕ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "The `k`-th moment of the panel's effective coordinate law: the mixture average of the\nper-locus moments of the standardized genotype.\n\nEmpirical status: UNTESTED. A mixture average over the panel's own spectrum; no free\nparameter beyond the spectrum itself, and nothing fitted.",
+  "body": "∑ j, spectrum.weight j *\n∑ g : DiploidGenotype,\n(spectrum.model j).genotypeProb g * (spectrum.model j).standardizedGenotype g ^ k",
+  "theorem_hyps": [
+   {
+    "thm": "fourthMoment_eq",
+    "hyps": [
+     "MafSpectrum m",
+     "∀ j, 0 < (spectrum.model j).altFreq ∧ (spectrum.model j).altFreq < 1"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "centeredSquareThirdMoment_differs_of_sixth",
+    "hyps": [
+     "spectrum.moment 4 = spectrum'.moment 4",
+     "spectrum.moment 6 ≠ spectrum'.moment 6"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "floorOne_match_does_not_transport_calibration",
+    "hyps": [
+     "MafSpectrum m → Limit",
+     "∀ j, hweMellinDrift (spectrum.model j).altFreq =\n      hweMellinDrift (spectrum'.model j).altFreq",
+     "∀ j, hweMellinJetVariance (spectrum.model j).altFreq =\n      hweMellinJetVariance (spectrum'.model j).altFreq",
+     "spectrum.moment 4 = spectrum'.moment 4",
+     "∀ s s' : MafSpectrum m,\n      s.centeredSquareThirdMoment ≠ s'.centeredSquareThirdMoment → nullLaw s ≠ nullLaw s'",
+     "spectrum.centeredSquareThirdMoment ≠ spectrum'.centeredSquareThirdMoment"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 3
+ },
+ {
+  "name": "centeredSquareThirdMoment",
+  "module": "CondensationUnification",
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "line": 869,
+  "params": [
+   [
+    "spectrum",
+    "MafSpectrum m"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**The first floor-two datum of a panel**: the third moment of the centered square,\n`E[u³] = E[x⁶] - 3 E[x⁴] + 2`, where the `+2` uses `E[x²] = 1`, which holds atom by atom\nby `standardizedGenotype_second_moment_one` and hence for the mixture.\n\nEmpirical status: DERIVED from `MafSpectrum.moment` by the expansion\n`(x² - 1)³ = x⁶ - 3x⁴ + 3x² - 1`, which is `centeredSquare_third_moment_eq` at each atom;\nno free parameter.",
+  "body": "spectrum.moment 6 - 3 * spectrum.moment 4 + 2",
+  "theorem_hyps": [
+   {
+    "thm": "centeredSquareThirdMoment_differs_of_sixth",
+    "hyps": [
+     "spectrum.moment 4 = spectrum'.moment 4",
+     "spectrum.moment 6 ≠ spectrum'.moment 6"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "floorOne_match_does_not_transport_calibration",
+    "hyps": [
+     "MafSpectrum m → Limit",
+     "∀ j, hweMellinDrift (spectrum.model j).altFreq =\n      hweMellinDrift (spectrum'.model j).altFreq",
+     "∀ j, hweMellinJetVariance (spectrum.model j).altFreq =\n      hweMellinJetVariance (spectrum'.model j).altFreq",
+     "spectrum.moment 4 = spectrum'.moment 4",
+     "∀ s s' : MafSpectrum m,\n      s.centeredSquareThirdMoment ≠ s'.centeredSquareThirdMoment → nullLaw s ≠ nullLaw s'",
+     "spectrum.centeredSquareThirdMoment ≠ spectrum'.centeredSquareThirdMoment"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 2
  },
  {
   "name": "ploidy",
@@ -4370,6 +4476,24 @@
     }
    },
    {
+    "thm": "hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance",
+    "hyps": [
+     "HardyWeinbergModel",
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "argmap": {
+     "h": "p"
+    }
+   },
+   {
+    "thm": "gaussianKurtosisMaf_genotypeVariance",
+    "hyps": [],
+    "argmap": {
+     "gaussianKurtosisMaf": "p"
+    }
+   },
+   {
     "thm": "genotypeVarianceHWE_eq_hwe",
     "hyps": [
      "ℝ"
@@ -4434,7 +4558,7 @@
     }
    }
   ],
-  "n_theorems": 12
+  "n_theorems": 14
  },
  {
   "name": "coalescentTimeScale",
@@ -5722,7 +5846,8 @@
      "∀ j, 0 ≤ m.traitBSpecificEffect j"
     ],
     "argmap": {
-     "i": "dgp"
+     "i": "m",
+     "j": "P"
     }
    },
    {
@@ -5734,7 +5859,8 @@
      "0 ≤ m.rg"
     ],
     "argmap": {
-     "i": "dgp"
+     "i": "m",
+     "j": "P"
     }
    },
    {
@@ -5748,7 +5874,8 @@
      "0 ≤ m.rg"
     ],
     "argmap": {
-     "i": "dgp"
+     "i": "m",
+     "j": "P"
     }
    }
   ],
@@ -8659,31 +8786,10 @@
   "n_theorems": 2
  },
  {
-  "name": "driftRetention",
-  "module": "DriftRegime",
-  "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 182,
-  "params": [
-   [
-    "Ne",
-    "ℝ"
-   ],
-   [
-    "t",
-    "ℕ"
-   ]
-  ],
-  "ret": "ℝ",
-  "doc": "The shared premise, isolated as a single number.\n\n    Regime: closed population, no mutation. Isolating it is the point: every\n    member of the cluster is a function of this one value, so every identity among\n    them is an identity in it.\n\n    Empirical status: FALSIFIED at demographic equilibrium; see\n    `closedPopulation`.",
-  "body": "(1 - 1 / (2 * Ne)) ^ t",
-  "theorem_hyps": [],
-  "n_theorems": 0
- },
- {
   "name": "lossOfRetention",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 194,
+  "line": 190,
   "params": [
    [
     "r",
@@ -8706,7 +8812,7 @@
   "name": "targetHetOfRetention",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 197,
+  "line": 193,
   "params": [
    [
     "H₀",
@@ -8733,7 +8839,7 @@
   "name": "targetPgsVarOfRetention",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 204,
+  "line": 200,
   "params": [
    [
     "V_A",
@@ -8760,7 +8866,7 @@
   "name": "clusterCrossCheck",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 222,
+  "line": 218,
   "params": [
    [
     "r",
@@ -8785,7 +8891,7 @@
   "name": "crossChecks_blind_to_retention",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 244,
+  "line": 240,
   "params": [
    [
     "hne",
@@ -8802,7 +8908,7 @@
   "name": "benchmarkRatio",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 274,
+  "line": 270,
   "params": [
    [
     "fstS",
@@ -8839,7 +8945,7 @@
   "name": "benchmarkRatioSquared",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 278,
+  "line": 274,
   "params": [
    [
     "fstS",
@@ -8871,7 +8977,7 @@
   "name": "diagonalDesign",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 285,
+  "line": 281,
   "params": [
    [
     "g",
@@ -8901,7 +9007,7 @@
   "name": "symmetricDesignBlindness",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 322,
+  "line": 318,
   "params": [],
   "ret": "ProbeBlindness diagonalDesign (fun g => g = benchmarkRatio) where positive",
   "doc": "**Symmetric designs have provably zero power to check this functional form.**\n\nNo criterion computed from a symmetric grid can decide whether the benchmark ratio is\nthe right functional form, because the correct form and its square produce identical\ndata on every such grid. The `3.2%` agreement originally recorded was therefore not weak\nevidence — it was *no* evidence about the exponent, and the asymmetric design that\nfollowed found errors of `-37%` to `-74%`.\n\nThe general obligation: a validation must report the spread of its prediction across the\ndesign. A prediction that is constant on the design tests nothing about shape.\n\nAs above this is a `def`, since `ProbeBlindness` carries its witnesses as data; the\nproposition is `symmetric_design_has_no_power` immediately below.\n\n    Empirical status: not an empirical claim. This is a witness construction.",
@@ -9306,8 +9412,33 @@
   "ret": "DiploidGenotype ≃ DiploidGenotype where toFun | .homRef => .homAlt | .het => .het | .homAlt => .homRef invFun | .homRef => .homAlt | .het => .het | .homAlt => .homRef left_inv g",
   "doc": "The only candidate value-negating relabelling of diploid genotypes: swap the\ntwo homozygotes and fix the heterozygote.\n\nIt is forced. A relabelling that negates centered dosages must send the unique\ngenotype whose centered dosage is its own negative — the heterozygote, at\n`q = 1/2` — to itself, and must exchange the other two.\n\nEmpirical status: DERIVED. A permutation of a three-element type; no modelling\ncontent and no free parameter.",
   "body": "by cases g <;> rfl\nright_inv g := by cases g <;> rfl",
-  "theorem_hyps": [],
-  "n_theorems": 0
+  "theorem_hyps": [
+   {
+    "thm": "reflect_genotypeProb",
+    "hyps": [
+     "HardyWeinbergModel",
+     "DiploidGenotype"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "reflect_centeredAltAlleleCount",
+    "hyps": [
+     "HardyWeinbergModel",
+     "DiploidGenotype"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "reflect_standardizedGenotype",
+    "hyps": [
+     "HardyWeinbergModel",
+     "DiploidGenotype"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 3
  },
  {
   "name": "equalFrequencyGenotypeCoding",
@@ -9352,10 +9483,48 @@
   "n_theorems": 0
  },
  {
+  "name": "HardyWeinbergModel.centeredSquare",
+  "module": "EpistaticChaos",
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "line": 855,
+  "params": [
+   [
+    "h",
+    "HardyWeinbergModel"
+   ],
+   [
+    "g",
+    "DiploidGenotype"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**The centered square** `u = x² - 1`: the coordinate of floor two.\n\nEmpirical status: DERIVED from `HardyWeinbergModel.standardizedGenotype`; the\ncentering constant is forced by `standardizedGenotype_second_moment_one`, which\nproves `E[x²] = 1`, so there is no free parameter.",
+  "body": "h.standardizedGenotype g ^ 2 - 1",
+  "theorem_hyps": [],
+  "n_theorems": 0
+ },
+ {
+  "name": "HardyWeinbergModel.reflect",
+  "module": "EpistaticChaos",
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "line": 951,
+  "params": [
+   [
+    "h",
+    "HardyWeinbergModel"
+   ]
+  ],
+  "ret": "HardyWeinbergModel where altFreq",
+  "doc": "The reflected locus, at allele frequency `1 - q`.",
+  "body": "1 - h.altFreq\naltFreq_nonneg := by linarith [h.altFreq_le_one]\naltFreq_le_one := by linarith [h.altFreq_nonneg]",
+  "theorem_hyps": [],
+  "n_theorems": 0
+ },
+ {
   "name": "interactionOrder",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 792,
+  "line": 1124,
   "params": [
    [
     "s",
@@ -9402,7 +9571,7 @@
   "name": "statistic",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 800,
+  "line": 1132,
   "params": [
    [
     "x",
@@ -9419,7 +9588,7 @@
   "name": "InLinkageEquilibrium",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 821,
+  "line": 1153,
   "params": [],
   "ret": "Prop",
   "doc": "**Linkage equilibrium across the tested panel**: the joint genotype law\nfactorizes into the per-locus Hardy-Weinberg laws. It is stated as the\nfactorization it is; the dynamics that drive a population towards it live in\n`Calibrator.LDDecayTheory`.\n\nThis is an assumption about the population, not about the coding, and it is what\nthe disjoint licence needs in place of symmetry. A design whose tested sets sit\ninside one LD block does not have it, which makes the licence's applicability\ncheckable on a study's own panel rather than on an idealized coordinate law.\n\nNote for automated checking: this is a *predicate* on a design, not a stipulated\nequilibrium quantity. There is no one-step map here and nothing for a\n`_isFixedPoint` theorem to be about; the recombination dynamics that have a fixed\npoint live in `Calibrator.LDDecayTheory`.\n\nEmpirical status: UNTESTED. A factorization condition on the joint law; testable\ndirectly as pairwise LD between panel loci.",
@@ -9431,7 +9600,7 @@
   "name": "Polymorphic",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 829,
+  "line": 1161,
   "params": [],
   "ret": "Prop",
   "doc": "Every panel locus is polymorphic, so the standardized coordinate exists and\nhas unit variance.\n\nEmpirical status: UNTESTED. A range condition on the panel's allele frequencies.",
@@ -9443,7 +9612,7 @@
   "name": "VariantDisjoint",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 844,
+  "line": 1176,
   "params": [],
   "ret": "Prop",
   "doc": "**The disjointness hypothesis, as a property of the design.** No variant\nenters two tested sets.\n\nThis is what Theorem D needs and what Theorem S is the failure of. It is a named\npredicate so that every result depending on it carries it as an argument rather\nthan in prose. Gene-based burden tests over non-overlapping genes have it\n(`geneBurdenDesign_variantDisjoint`); sliding windows never do\n(`slidingWindowDesign_not_variantDisjoint`); a pathway panel has it only if no\ngene belongs to two pathways.\n\nEmpirical status: UNTESTED. A structural property of a study design, checkable by\ninspection and requiring no measurement.",
@@ -9455,7 +9624,7 @@
   "name": "variantRecurrence",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 853,
+  "line": 1185,
   "params": [
    [
     "i",
@@ -9520,7 +9689,7 @@
   "name": "locusInfluence",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 862,
+  "line": 1194,
   "params": [
    [
     "i",
@@ -9553,7 +9722,7 @@
   "name": "IsTwoPoolInteraction",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 877,
+  "line": 1209,
   "params": [],
   "ret": "Prop",
   "doc": "**The two-pool interaction design**: two disjoint pools of loci, with the\ntested sets being the cross-pool pairs and at least one tested set per pair.\n\nThis is the formal shape of a two-gene-set interaction test, and the design whose\nlimit is a product of two independent Gaussians.\n\nEmpirical status: UNTESTED. A study design, not a claim about data; it constrains\nthe locus-sets only, never the allele frequencies, which is what makes the\nfourth-cumulant separation uniform over the frequency spectrum.",
@@ -9565,7 +9734,7 @@
   "name": "geneBurdenDesign",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 943,
+  "line": 1275,
   "params": [
    [
     "model",
@@ -9615,7 +9784,7 @@
   "name": "slidingWindowDesign",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 970,
+  "line": 1302,
   "params": [
    [
     "model",
@@ -9654,7 +9823,7 @@
   "name": "fourthCumulantFromMoments",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1229,
+  "line": 1561,
   "params": [
    [
     "secondMoment",
@@ -9691,7 +9860,7 @@
   "name": "circulantSpectrumA",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1359,
+  "line": 1691,
   "params": [
    [
     "c",
@@ -9752,7 +9921,7 @@
   "name": "circulantSpectrumB",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1366,
+  "line": 1698,
   "params": [
    [
     "c",
@@ -9822,7 +9991,7 @@
   "name": "overlapMatrix",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1462,
+  "line": 1794,
   "params": [
    [
     "design",
@@ -9849,7 +10018,7 @@
   "name": "cycleDensity",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1481,
+  "line": 1813,
   "params": [
    [
     "design",
@@ -9902,7 +10071,7 @@
   "name": "Tempered",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1519,
+  "line": 1851,
   "params": [
    [
     "design",
@@ -9923,7 +10092,7 @@
   "name": "BoundedHubRecurrence",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1528,
+  "line": 1860,
   "params": [
    [
     "design",
@@ -9944,7 +10113,7 @@
   "name": "palindromicCycleDensityA",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1698,
+  "line": 2030,
   "params": [
    [
     "s",
@@ -10009,7 +10178,7 @@
   "name": "palindromicCycleDensityB",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1707,
+  "line": 2039,
   "params": [
    [
     "s",
@@ -16125,39 +16294,10 @@
   "n_theorems": 4
  },
  {
-  "name": "ldBlockReconstructionShare",
-  "module": "MetricSpecificPortability",
-  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1445,
-  "params": [
-   [
-    "recomb",
-    "ℝ"
-   ],
-   [
-    "Ne",
-    "ℝ"
-   ],
-   [
-    "retainedMarkers",
-    "ℕ"
-   ],
-   [
-    "totalMarkers",
-    "ℕ"
-   ]
-  ],
-  "ret": "ℝ",
-  "doc": "**Reconstruction share of a clumped panel**, as a function of the\nrecombination rate between adjacent markers, the effective population size, and\nhow many markers survive clumping.\n\nEmpirical status: UNTESTED.",
-  "body": "ldBandReconstructionShare (ldRetentionPerGen recomb Ne)\n(ldPanelRetentionFraction retainedMarkers totalMarkers)",
-  "theorem_hyps": [],
-  "n_theorems": 0
- },
- {
   "name": "ldBlockDetectionShare",
   "module": "MetricSpecificPortability",
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1456,
+  "line": 1446,
   "params": [
    [
     "recomb",
@@ -16214,7 +16354,7 @@
   "name": "ldBlockPruningDeficit",
   "module": "MetricSpecificPortability",
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1466,
+  "line": 1456,
   "params": [
    [
     "recomb",
@@ -16274,7 +16414,7 @@
   "name": "ldTightLinkageDetectionShare",
   "module": "MetricSpecificPortability",
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1477,
+  "line": 1467,
   "params": [
    [
     "retainedMarkers",
@@ -16430,56 +16570,10 @@
   "n_theorems": 3
  },
  {
-  "name": "congrProp",
-  "module": "ObservationalCeiling",
-  "path": "proofs/Calibrator/ObservationalCeiling.lean",
-  "line": 120,
-  "params": [
-   [
-    "B",
-    "ProbeBlindness probe P"
-   ],
-   [
-    "hpos",
-    "Q B.positive"
-   ],
-   [
-    "hneg",
-    "¬ Q B.negative"
-   ]
-  ],
-  "ret": "ProbeBlindness probe Q where positive",
-  "doc": "Blindness transports along any refinement of the property that agrees on the\nwitness pair — useful when a module states its property in several equivalent forms.",
-  "body": "B.positive\nnegative := B.negative\nsame_data := B.same_data\nholds := hpos\nfails := hneg",
-  "theorem_hyps": [],
-  "n_theorems": 0
- },
- {
-  "name": "comap",
-  "module": "ObservationalCeiling",
-  "path": "proofs/Calibrator/ObservationalCeiling.lean",
-  "line": 130,
-  "params": [
-   [
-    "B",
-    "ProbeBlindness probe P"
-   ],
-   [
-    "coarse",
-    "Data → Data'"
-   ]
-  ],
-  "ret": "ProbeBlindness (fun o => coarse (probe o)) P where positive",
-  "doc": "Blindness for a coarser probe follows from blindness for a finer one: if `refine`\nfactors the coarse probe through the fine one, the same witness pair works.",
-  "body": "B.positive\nnegative := B.negative\nsame_data := by rw [B.same_data]\nholds := B.holds\nfails := B.fails",
-  "theorem_hyps": [],
-  "n_theorems": 0
- },
- {
   "name": "and",
   "module": "ObservationalCeiling",
   "path": "proofs/Calibrator/ObservationalCeiling.lean",
-  "line": 155,
+  "line": 135,
   "params": [
    [
     "B₁",
@@ -16628,6 +16722,22 @@
     }
    },
    {
+    "thm": "neutralDriftFactor_eq_driftRetention",
+    "hyps": [
+     "ℝ",
+     "ℕ",
+     "ℝ",
+     "ℕ",
+     "ℝ"
+    ],
+    "argmap": {
+     "every": "B₁",
+     "theorem": "B₂",
+     "about": "hpos",
+     "it": "hneg"
+    }
+   },
+   {
     "thm": "selected_drift_factor_gt_neutral",
     "hyps": [
      "ℝ",
@@ -16677,13 +16787,13 @@
     }
    }
   ],
-  "n_theorems": 18
+  "n_theorems": 19
  },
  {
   "name": "ofWitnessFamily",
   "module": "ObservationalCeiling",
   "path": "proofs/Calibrator/ObservationalCeiling.lean",
-  "line": 173,
+  "line": 153,
   "params": [
    [
     "p",
@@ -16721,31 +16831,10 @@
   "n_theorems": 0
  },
  {
-  "name": "ProbeBlindness.toApprox",
-  "module": "ObservationalCeiling",
-  "path": "proofs/Calibrator/ObservationalCeiling.lean",
-  "line": 250,
-  "params": [
-   [
-    "B",
-    "ProbeBlindness probe P"
-   ],
-   [
-    "hrefl",
-    "∀ d : Data, close d d"
-   ]
-  ],
-  "ret": "ApproxProbeBlindness close probe P where positive",
-  "doc": "An exact witness is an approximate witness at any scale that is reflexive on the\nshared probe value. So the approximate law subsumes the exact one, and every instance in\n`Calibrator.BlindnessRegistry` inherits it.",
-  "body": "B.positive\nnegative := B.negative\nclose_data := by\nrw [B.same_data]\nexact hrefl _\nholds := B.holds\nfails := B.fails",
-  "theorem_hyps": [],
-  "n_theorems": 0
- },
- {
   "name": "toProbeBlindness",
   "module": "ObservationalCeiling",
   "path": "proofs/Calibrator/ObservationalCeiling.lean",
-  "line": 283,
+  "line": 249,
   "params": [
    [
     "B",
@@ -16762,7 +16851,7 @@
   "name": "atLevel",
   "module": "ObservationalCeiling",
   "path": "proofs/Calibrator/ObservationalCeiling.lean",
-  "line": 292,
+  "line": 258,
   "params": [
    [
     "B",
@@ -16783,7 +16872,7 @@
   "name": "IsCompleteCatalogue",
   "module": "ObservationalCeiling",
   "path": "proofs/Calibrator/ObservationalCeiling.lean",
-  "line": 325,
+  "line": 291,
   "params": [
    [
     "E",
@@ -16804,7 +16893,7 @@
   "name": "IsUnionOfCertificates",
   "module": "ObservationalCeiling",
   "path": "proofs/Calibrator/ObservationalCeiling.lean",
-  "line": 381,
+  "line": 347,
   "params": [
    [
     "E",
@@ -23820,7 +23909,7 @@
   "name": "neutralPortabilityRatioLD",
   "module": "PhenomeWidePortability",
   "path": "proofs/Calibrator/PhenomeWidePortability.lean",
-  "line": 37,
+  "line": 38,
   "params": [
    [
     "fst_additional",
@@ -23876,7 +23965,7 @@
   "name": "neutralDriftFactor",
   "module": "PhenomeWidePortability",
   "path": "proofs/Calibrator/PhenomeWidePortability.lean",
-  "line": 106,
+  "line": 125,
   "params": [
    [
     "Ne",
@@ -23888,7 +23977,7 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "**Neutral drift factor per generation.**\n    Under Wright-Fisher, the probability of NOT coalescing in one generation\n    is (1 - 1/(2*Ne)). The fraction of heterozygosity remaining after t\n    generations is this quantity raised to the t-th power.\n\n    Empirical status: UNTESTED.",
+  "doc": "**Neutral drift factor per generation.**\n    Under Wright-Fisher, the probability of NOT coalescing in one generation\n    is (1 - 1/(2*Ne)), and that quantity raised to the t-th power is the\n    fraction of ancestral heterozygosity remaining after t generations *in a\n    closed population with no mutation*.\n\n    Regime: closed population, no mutation. The qualifier is not decoration and\n    the unqualified sentence this docstring used to carry — that the retained\n    fraction *is* this power — is the claim that measurement rejects. Under\n    mutation-drift balance heterozygosity is stationary: simulation at\n    `Ne = 1000`, `t = 4000` measures the retention as `1.025 ± 0.020` where this\n    formula gives `0.135`. `Calibrator.DriftRegime` exhibits the two regimes and\n    proves they disagree at every positive time.\n\n    This body is identical to `driftRetention`, which has carried that\n    falsification since it was found, while this copy stood marked UNTESTED in a\n    different file. That is how a corrected formula survives its own\n    correction, and it is why `neutralDriftFactor_eq_driftRetention` below ties\n    the two: the finding can no longer be recorded on one side alone.\n\n    Empirical status: FALSIFIED at demographic equilibrium; see\n    `closedPopulation` and `driftRetention`. It remains correct inside the\n    declared regime, so the theorems below are conditional on that regime\n    holding rather than false.",
   "body": "(1 - 1 / (2 * Ne)) ^ t",
   "theorem_hyps": [
    {
@@ -23896,6 +23985,17 @@
     "hyps": [
      "ℝ",
      "ℕ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "neutralDriftFactor_eq_driftRetention",
+    "hyps": [
+     "ℝ",
+     "ℕ",
+     "ℝ",
+     "ℕ",
+     "ℝ"
     ],
     "argmap": {}
    },
@@ -23949,13 +24049,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 5
+  "n_theorems": 6
  },
  {
   "name": "selectedDriftFactor",
   "module": "PhenomeWidePortability",
   "path": "proofs/Calibrator/PhenomeWidePortability.lean",
-  "line": 137,
+  "line": 165,
   "params": [
    [
     "Ne",
@@ -23977,6 +24077,17 @@
    {
     "thm": "selectedDriftFactor_uses_timeScale",
     "hyps": [
+     "ℝ",
+     "ℕ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "neutralDriftFactor_eq_driftRetention",
+    "hyps": [
+     "ℝ",
+     "ℕ",
      "ℝ",
      "ℕ",
      "ℝ"
@@ -24047,13 +24158,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 6
+  "n_theorems": 7
  },
  {
   "name": "fstFromDriftFactor",
   "module": "PhenomeWidePortability",
   "path": "proofs/Calibrator/PhenomeWidePortability.lean",
-  "line": 154,
+  "line": 192,
   "params": [
    [
     "driftFactor",
@@ -24061,9 +24172,20 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "**Fst from a drift factor.**\n    In the island/drift model, Fst = 1 - driftFactor, where driftFactor\n    is the fraction of ancestral heterozygosity retained.\n\n    This map returns a valid `F_ST` only for `driftFactor ∈ (0, 1]`. It has no\n    clamp of its own, deliberately: the constraint belongs on the factor it is\n    fed, and `fstFromDriftFactor_mem_unit` below states which inputs are\n    admissible. Feeding it a factor above `1` -- which `selectedDriftFactor`\n    used to permit -- returns a negative `F_ST`.\n\n    Empirical status: UNTESTED.\n\n    Denotes: the reading its name carries. The same formula appears under\n    names from 'factor', 'frequency', 'fst', and the formula alone does not fix which is meant.",
+  "doc": "**Fst from a drift factor.**\n    In the island/drift model, Fst = 1 - driftFactor, where driftFactor\n    is the fraction of ancestral heterozygosity retained.\n\n    This map returns a valid `F_ST` only for `driftFactor ∈ (0, 1]`. It has no\n    clamp of its own, deliberately: the constraint belongs on the factor it is\n    fed, and `fstFromDriftFactor_mem_unit` below states which inputs are\n    admissible. Feeding it a factor above `1` -- which `selectedDriftFactor`\n    used to permit -- returns a negative `F_ST`.\n\n    **Inherited falsification.** This body, `1 - driftFactor`, is innocent: it\n    is an involution on the unit interval and carries no regime of its own. But\n    an innocent body fed a falsified input yields a falsified result, and the\n    input this file supplies is `neutralDriftFactor`, which is falsified at\n    demographic equilibrium. So every value computed here through that route\n    inherits the closed-population, no-mutation regime, and nothing in this\n    definition's signature or body records that. It is written down here because\n    an inheritance of that kind is invisible otherwise: a reader checking this\n    definition alone finds nothing wrong with it, which is the whole difficulty.\n\n    Empirical status: UNTESTED.\n\n    Denotes: the reading its name carries. The same formula appears under\n    names from 'factor', 'frequency', 'fst', and the formula alone does not fix which is meant.",
   "body": "1 - driftFactor",
   "theorem_hyps": [
+   {
+    "thm": "neutralDriftFactor_eq_driftRetention",
+    "hyps": [
+     "ℝ",
+     "ℕ",
+     "ℝ",
+     "ℕ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
    {
     "thm": "fstFromDriftFactor_eq_freqCorrFromFst",
     "hyps": [
@@ -24119,13 +24241,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 5
+  "n_theorems": 6
  },
  {
   "name": "causalPortabilityFromLocalFst",
   "module": "PhenomeWidePortability",
   "path": "proofs/Calibrator/PhenomeWidePortability.lean",
-  "line": 269,
+  "line": 307,
   "params": [
    [
     "sourceSquaredEffect",
@@ -24141,6 +24263,17 @@
   "body": "(∑ i, sourceSquaredEffect i * (1 - fstCausal i)) /\n(∑ i, sourceSquaredEffect i)",
   "theorem_hyps": [
    {
+    "thm": "neutralDriftFactor_eq_driftRetention",
+    "hyps": [
+     "ℝ",
+     "ℕ",
+     "ℝ",
+     "ℕ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "better_than_neutral_implies_stabilizing_selection",
     "hyps": [
      "ℝ",
@@ -24151,7 +24284,7 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 1
+  "n_theorems": 2
  },
  {
   "name": "qst",
@@ -25419,6 +25552,25 @@
     "argmap": {}
    },
    {
+    "thm": "standardizedGenotype_sq_eq_standardizedSquare",
+    "hyps": [
+     "HardyWeinbergModel",
+     "0 < h.altFreq",
+     "h.altFreq < 1",
+     "DiploidGenotype"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "standardizedSquare_never_symmetric",
+    "hyps": [
+     "HardyWeinbergModel",
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "standardizedSquare_values",
     "hyps": [
      "HardyWeinbergModel",
@@ -25428,7 +25580,7 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 2
+  "n_theorems": 4
  },
  {
   "name": "mellinDrift",
@@ -25545,23 +25697,34 @@
     "argmap": {}
    },
    {
-    "thm": "hweObservableContent_components",
+    "thm": "hweLevelOne_components",
     "hyps": [
-     "ℝ → ℕ → ℝ",
      "ℝ"
     ],
     "argmap": {}
    },
    {
-    "thm": "indistinguishable_of_matching_computed_quantities",
+    "thm": "complete_content_of_truncation",
     "hyps": [
+     "T.depth = 0",
      "GenotypeDesign n ι",
-     "VW.isAdmissible (design.reModel model)",
-     "VW.isAdmissible (design.reModel model')",
+     "T.isAdmissible (design.reModel model)",
+     "T.isAdmissible (design.reModel model')",
      "∀ i : Fin n, hweMellinDrift (model i).altFreq =\n      hweMellinDrift (model' i).altFreq",
      "∀ i : Fin n, hweMellinJetVariance (model i).altFreq =\n      hweMellinJetVariance (model' i).altFreq",
-     "∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq",
-     "∀ i : Fin n, VW.squareCumulant (model i).altFreq =\n      VW.squareCumulant (model' i).altFreq"
+     "∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "floorOne_match_does_not_transport_calibration",
+    "hyps": [
+     "MafSpectrum m → Limit",
+     "∀ j, hweMellinDrift (spectrum.model j).altFreq =\n      hweMellinDrift (spectrum'.model j).altFreq",
+     "∀ j, hweMellinJetVariance (spectrum.model j).altFreq =\n      hweMellinJetVariance (spectrum'.model j).altFreq",
+     "spectrum.moment 4 = spectrum'.moment 4",
+     "∀ s s' : MafSpectrum m,\n      s.centeredSquareThirdMoment ≠ s'.centeredSquareThirdMoment → nullLaw s ≠ nullLaw s'",
+     "spectrum.centeredSquareThirdMoment ≠ spectrum'.centeredSquareThirdMoment"
     ],
     "argmap": {}
    },
@@ -25668,7 +25831,7 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 22
+  "n_theorems": 23
  },
  {
   "name": "maxSafeEpistaticOrder",
@@ -25781,23 +25944,22 @@
   "body": "(1 - 2 * q) ^ 2 = 4 * q * (1 - q)",
   "theorem_hyps": [
    {
-    "thm": "hweObservableContent_components",
+    "thm": "hweLevelOne_components",
     "hyps": [
-     "ℝ → ℕ → ℝ",
      "ℝ"
     ],
     "argmap": {}
    },
    {
-    "thm": "indistinguishable_of_matching_computed_quantities",
+    "thm": "complete_content_of_truncation",
     "hyps": [
+     "T.depth = 0",
      "GenotypeDesign n ι",
-     "VW.isAdmissible (design.reModel model)",
-     "VW.isAdmissible (design.reModel model')",
+     "T.isAdmissible (design.reModel model)",
+     "T.isAdmissible (design.reModel model')",
      "∀ i : Fin n, hweMellinDrift (model i).altFreq =\n      hweMellinDrift (model' i).altFreq",
      "∀ i : Fin n, hweMellinJetVariance (model i).altFreq =\n      hweMellinJetVariance (model' i).altFreq",
-     "∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq",
-     "∀ i : Fin n, VW.squareCumulant (model i).altFreq =\n      VW.squareCumulant (model' i).altFreq"
+     "∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq"
     ],
     "argmap": {}
    },
@@ -25893,23 +26055,34 @@
     }
    },
    {
-    "thm": "hweObservableContent_components",
+    "thm": "hweLevelOne_components",
     "hyps": [
-     "ℝ → ℕ → ℝ",
      "ℝ"
     ],
     "argmap": {}
    },
    {
-    "thm": "indistinguishable_of_matching_computed_quantities",
+    "thm": "complete_content_of_truncation",
     "hyps": [
+     "T.depth = 0",
      "GenotypeDesign n ι",
-     "VW.isAdmissible (design.reModel model)",
-     "VW.isAdmissible (design.reModel model')",
+     "T.isAdmissible (design.reModel model)",
+     "T.isAdmissible (design.reModel model')",
      "∀ i : Fin n, hweMellinDrift (model i).altFreq =\n      hweMellinDrift (model' i).altFreq",
      "∀ i : Fin n, hweMellinJetVariance (model i).altFreq =\n      hweMellinJetVariance (model' i).altFreq",
-     "∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq",
-     "∀ i : Fin n, VW.squareCumulant (model i).altFreq =\n      VW.squareCumulant (model' i).altFreq"
+     "∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "floorOne_match_does_not_transport_calibration",
+    "hyps": [
+     "MafSpectrum m → Limit",
+     "∀ j, hweMellinDrift (spectrum.model j).altFreq =\n      hweMellinDrift (spectrum'.model j).altFreq",
+     "∀ j, hweMellinJetVariance (spectrum.model j).altFreq =\n      hweMellinJetVariance (spectrum'.model j).altFreq",
+     "spectrum.moment 4 = spectrum'.moment 4",
+     "∀ s s' : MafSpectrum m,\n      s.centeredSquareThirdMoment ≠ s'.centeredSquareThirdMoment → nullLaw s ≠ nullLaw s'",
+     "spectrum.centeredSquareThirdMoment ≠ spectrum'.centeredSquareThirdMoment"
     ],
     "argmap": {}
    },
@@ -25925,7 +26098,7 @@
     }
    }
   ],
-  "n_theorems": 4
+  "n_theorems": 5
  },
  {
   "name": "hardCallLatticeSpan",
@@ -26361,8 +26534,18 @@
   "ret": "ℝ",
   "doc": "The same generation with the migration step first.\n\n    Empirical status: VALIDATED (iteration gives 0.47368 at s = 0.1, m = 0.05,\n    matching this map's fixed point exactly).",
   "body": "((1 - m) * p) * (1 + s) / (1 + s * ((1 - m) * p))",
-  "theorem_hyps": [],
-  "n_theorems": 0
+  "theorem_hyps": [
+   {
+    "thm": "selectionMigrationEquilibriumMigrationFirst_isFixedPoint",
+    "hyps": [
+     "0 < s",
+     "m < 1",
+     "m * (1 + s) < s"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 1
  },
  {
   "name": "selectionMigrationEquilibrium",
@@ -26430,7 +26613,7 @@
   "name": "selectionMigrationEquilibriumMigrationFirst",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 247,
+  "line": 258,
   "params": [
    [
     "s",
@@ -26442,9 +26625,18 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "The equilibrium under the migration-first convention.",
+  "doc": "The equilibrium under the migration-first convention.\n\nDerived, not stipulated, in the same way as its companion:\n`selectionMigrationEquilibriumMigrationFirst_isFixedPoint` proves it is the\nnonzero solution of `continentIslandStepMigrationFirst s m p = p`, and the\n`max 0` carries the same absorbing boundary, since migration swamps selection\nunder either ordering.\n\n    Empirical status: VALIDATED (iteration gives 0.47368 at s = 0.1, m = 0.05,\n    matching this closed form; the selection-first convention rests at 0.45000\n    on the same parameters, which is the composition convention showing up in\n    the fourth decimal).",
   "body": "max 0 ((s - m - m * s) / (s * (1 - m)))",
   "theorem_hyps": [
+   {
+    "thm": "selectionMigrationEquilibriumMigrationFirst_isFixedPoint",
+    "hyps": [
+     "0 < s",
+     "m < 1",
+     "m * (1 + s) < s"
+    ],
+    "argmap": {}
+   },
    {
     "thm": "selectionMigrationEquilibrium_orderings",
     "hyps": [
@@ -26454,13 +26646,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 1
+  "n_theorems": 2
  },
  {
   "name": "wrightFIT",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 383,
+  "line": 422,
   "params": [
    [
     "f_IS",
@@ -26495,7 +26687,7 @@
   "name": "heterozygosityLossFromDrift",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 415,
+  "line": 454,
   "params": [
    [
     "t",
@@ -26553,7 +26745,7 @@
   "name": "scaledMutationRate",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 455,
+  "line": 494,
   "params": [
    [
     "Ne",
@@ -26635,10 +26827,57 @@
   "n_theorems": 8
  },
  {
+  "name": "scaledIdentityStep",
+  "module": "PopulationGeneticsFoundations",
+  "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 519,
+  "params": [
+   [
+    "scaledRate",
+    "ℝ"
+   ],
+   [
+    "F",
+    "ℝ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**One coalescent time unit of the identity balance, in scaled units.**\n\nTime in units of `2 Nₑ` generations. On that timescale a lineage pair coalesces\nat rate one, so identity is regenerated in full over a unit of scaled time,\nwhile the homogenising force removes identity at the scaled rate `scaledRate`:\n`θ = 4 Nₑ μ` for mutation, `M = 4 Nₑ m` for migration, and the *sum* when both\nact, which is the reason the two scaled rates add rather than compose.\n\nComposition convention: the balance is written in scaled time, so no\nwithin-generation ordering enters and the map is the same under either. The\nper-generation maps, where the ordering does matter, are `ibdFlowStep` and\n`ibdRecurrenceStep` in `Calibrator.PortabilityDrift`; this one is their\nscaled-time limit and is stated here because the definitions it pins are\nparameterised by `θ` and `M` rather than by `Nₑ` and a rate.\n\n    Empirical status: UNTESTED.",
+  "body": "1 - scaledRate * F",
+  "theorem_hyps": [
+   {
+    "thm": "scaledIdentityStep_fixedPoint",
+    "hyps": [
+     "ℝ",
+     "0 ≤ scaledRate"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "fstMutationDriftEquilibrium_isFixedPoint",
+    "hyps": [
+     "ℝ",
+     "0 ≤ θ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "fstMigrationMutationEquilibrium_isFixedPoint",
+    "hyps": [
+     "0 < Ne",
+     "0 ≤ m",
+     "0 ≤ μ"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 3
+ },
+ {
   "name": "fstMutationDriftEquilibrium",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 469,
+  "line": 540,
   "params": [
    [
     "θ",
@@ -26646,7 +26885,7 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "**Wright's Fst under mutation-drift balance (island model).**\n    Fst_eq = 1 / (1 + 4Neμ) = 1 / (1 + θ).\n    This is the equilibrium Fst when mutation counteracts drift.\n\n    Empirical status: UNTESTED.",
+  "doc": "**Wright's Fst under mutation-drift balance (island model).**\n    Fst_eq = 1 / (1 + 4Neμ) = 1 / (1 + θ).\n    This is the equilibrium Fst when mutation counteracts drift.\n\n    Not stipulated: `fstMutationDriftEquilibrium_isFixedPoint` derives it as the\n    rest point of `scaledIdentityStep` at scaled rate `θ`.\n\n    Empirical status: UNTESTED.",
   "body": "1 / (1 + θ)",
   "theorem_hyps": [
    {
@@ -26677,6 +26916,14 @@
    {
     "thm": "fstMutationDriftTransient_uses_timeScale",
     "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "fstMutationDriftEquilibrium_isFixedPoint",
+    "hyps": [
+     "ℝ",
+     "0 ≤ θ"
+    ],
     "argmap": {}
    },
    {
@@ -26816,13 +27063,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 22
+  "n_theorems": 23
  },
  {
   "name": "fstMutationDriftTransient",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 619,
+  "line": 697,
   "params": [
    [
     "θ",
@@ -26887,7 +27134,7 @@
   "name": "expectedNewMutations",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 695,
+  "line": 773,
   "params": [
    [
     "θ",
@@ -26935,7 +27182,7 @@
   "name": "sharedLDFractionFromMutation",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 725,
+  "line": 803,
   "params": [
    [
     "θ",
@@ -26979,7 +27226,7 @@
   "name": "islandModelFst",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 791,
+  "line": 869,
   "params": [
    [
     "Ne",
@@ -27128,7 +27375,7 @@
   "name": "fstMigrationMutationEquilibrium",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 867,
+  "line": 945,
   "params": [
    [
     "Ne",
@@ -27153,6 +27400,15 @@
     "argmap": {}
    },
    {
+    "thm": "fstMigrationMutationEquilibrium_isFixedPoint",
+    "hyps": [
+     "0 < Ne",
+     "0 ≤ m",
+     "0 ≤ μ"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "fstMigrationMutation_lt_migrationOnly",
     "hyps": [
      "0 < Ne",
@@ -27171,13 +27427,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 3
+  "n_theorems": 4
  },
  {
   "name": "steppingStoneCharacteristicLength",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 893,
+  "line": 989,
   "params": [
    [
     "Ne",
@@ -27212,7 +27468,7 @@
   "name": "continuousSteppingStoneFst",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 907,
+  "line": 1003,
   "params": [
    [
     "L",
@@ -27265,7 +27521,7 @@
   "name": "alleleFreqAfterMigration",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 954,
+  "line": 1050,
   "params": [
    [
     "p₀",
@@ -27312,7 +27568,7 @@
   "name": "effectiveMigration",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 988,
+  "line": 1084,
   "params": [
    [
     "m₁₂",
@@ -27360,7 +27616,7 @@
   "name": "ldCorrelationFromMigration",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1021,
+  "line": 1117,
   "params": [
    [
     "M",
@@ -27404,7 +27660,7 @@
   "name": "hetRecurrence",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1090,
+  "line": 1186,
   "params": [
    [
     "Ne",
@@ -27441,7 +27697,7 @@
   "name": "fstDerived",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1116,
+  "line": 1212,
   "params": [
    [
     "Ne",
@@ -27536,7 +27792,7 @@
   "name": "hetMutationDriftRecurrence",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1192,
+  "line": 1288,
   "params": [
    [
     "Ne",
@@ -27569,15 +27825,23 @@
      "0 < mu"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "hetEquilibrium_isFixedPoint",
+    "hyps": [
+     "0 < Ne",
+     "0 < mu"
+    ],
+    "argmap": {}
    }
   ],
-  "n_theorems": 2
+  "n_theorems": 3
  },
  {
   "name": "hetEquilibrium",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1199,
+  "line": 1295,
   "params": [
    [
     "Ne",
@@ -27599,6 +27863,14 @@
    },
    {
     "thm": "hetMutationDrift_fixed_point",
+    "hyps": [
+     "0 < Ne",
+     "0 < mu"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "hetEquilibrium_isFixedPoint",
     "hyps": [
      "0 < Ne",
      "0 < mu"
@@ -27674,13 +27946,13 @@
     }
    }
   ],
-  "n_theorems": 10
+  "n_theorems": 11
  },
  {
   "name": "hetDecayFactor",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1341,
+  "line": 1445,
   "params": [
    [
     "Ne",
@@ -27738,7 +28010,7 @@
   "name": "hetMutationRecurrence",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1350,
+  "line": 1454,
   "params": [
    [
     "lam",
@@ -27792,7 +28064,7 @@
   "name": "fstFromHetRatio",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1378,
+  "line": 1482,
   "params": [
    [
     "H",
@@ -27835,7 +28107,7 @@
   "name": "fstMutationDriftTransientDiscrete",
   "module": "PopulationGeneticsFoundations",
   "path": "proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1414,
+  "line": 1518,
   "params": [
    [
     "θ",
@@ -30188,7 +30460,7 @@
   "name": "sourceERMWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1149,
+  "line": 1166,
   "params": [
    [
     "crossSource",
@@ -30202,63 +30474,69 @@
   "n_theorems": 0
  },
  {
-  "name": "sigmaTagCausalSource",
+  "name": "sigmaTagCausal",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1156,
+  "line": 1178,
   "params": [
    [
     "m",
     "CrossPopulationMetricModel p q"
-   ]
-  ],
-  "ret": "Matrix (Fin p) (Fin q) ℝ",
-  "doc": "Aggregate source tag-to-causal alignment: directly observed causal variants\nplus ancestry-specific proxy tagging.",
-  "body": "m.directCausalSource + m.proxyTaggingSource",
-  "theorem_hyps": [],
-  "n_theorems": 0
- },
- {
-  "name": "sigmaTagCausalTarget",
-  "module": "PortabilityDrift",
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1163,
-  "params": [
+   ],
    [
-    "m",
-    "CrossPopulationMetricModel p q"
+    "P",
+    "Pop"
    ]
   ],
   "ret": "Matrix (Fin p) (Fin q) ℝ",
-  "doc": "Aggregate target tag-to-causal alignment: directly observed causal variants\nplus ancestry-specific proxy tagging, plus target-only links generated by novel\ncausal mutations after divergence.",
-  "body": "m.directCausalTarget +\n(m.novelDirectCausalTarget +\n(m.proxyTaggingTarget + m.novelProxyTaggingTarget))",
+  "doc": "**Aggregate tag-to-causal alignment in a population**: directly observed causal\nvariants plus ancestry-specific proxy tagging, each including whatever arose after\ndivergence.\n\nOne definition now covers both populations. The source form is not a second definition\nbut a consequence of `novelDirectCausal_source` and `novelProxyTagging_source`, recorded\nas `sigmaTagCausal_source` below.",
+  "body": "(m.directCausal P + m.novelDirectCausal P) +\n(m.proxyTagging P + m.novelProxyTagging P)",
   "theorem_hyps": [
    {
-    "thm": "targetTaggingProjection_eq_standing_plus_novelMutationEffect",
+    "thm": "traitBSpecificCrossCov_nonneg",
     "hyps": [
-     "CrossPopulationMetricModel p q"
+     "CrossTraitBorrowingModel p q",
+     "∀ i j, 0 ≤ m.sigmaTagCausal i j",
+     "∀ j, 0 ≤ m.traitBSpecificEffect j"
     ],
-    "argmap": {}
+    "argmap": {
+     "i": "m",
+     "j": "P"
+    }
    },
    {
-    "thm": "targetCrossCovariance_eq_standing_plus_novelMutationEffect_plus_context",
+    "thm": "borrowedTraitBCrossCov_nonneg",
     "hyps": [
-     "CrossPopulationMetricModel p q"
+     "CrossTraitBorrowingModel p q",
+     "∀ i j, 0 ≤ m.sigmaTagCausal i j",
+     "∀ j, 0 ≤ m.sharedTraitEffect j",
+     "0 ≤ m.rg"
     ],
-    "argmap": {}
+    "argmap": {
+     "i": "m",
+     "j": "P"
+    }
    },
    {
-    "thm": "targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores",
+    "thm": "cross_trait_portability_gain",
     "hyps": [
-     "CrossPopulationMetricModel p q"
+     "CrossTraitBorrowingModel p q",
+     "∀ i, 0 ≤ m.sourceWeights i",
+     "∀ i j, 0 ≤ m.sigmaTagCausal i j",
+     "∀ j, 0 ≤ m.sharedTraitEffect j",
+     "∀ j, 0 ≤ m.traitBSpecificEffect j",
+     "0 ≤ m.rg"
     ],
-    "argmap": {}
+    "argmap": {
+     "i": "m",
+     "j": "P"
+    }
    }
   ],
   "n_theorems": 3
  },
  {
-  "name": "targetTotalEffect",
+  "name": "totalEffect",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "line": 1185,
@@ -30266,27 +30544,23 @@
    [
     "m",
     "CrossPopulationMetricModel p q"
+   ],
+   [
+    "P",
+    "Pop"
    ]
   ],
   "ret": "Fin q → ℝ",
-  "doc": "Total target causal-effect vector, split into standing target effects and\ntarget-only novel causal effects.\n\n    Empirical status: UNTESTED.",
-  "body": "m.betaTarget + m.novelCausalEffectTarget",
-  "theorem_hyps": [
-   {
-    "thm": "targetTotalEffect_eq_betaSource_plus_targetEffectHeterogeneity",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   }
-  ],
-  "n_theorems": 1
+  "doc": "**Total causal-effect vector in a population**: standing effects plus those carried\nby variants that arose after divergence.",
+  "body": "m.beta P + m.novelCausalEffect P",
+  "theorem_hyps": [],
+  "n_theorems": 0
  },
  {
   "name": "targetLinearRisk",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1195,
+  "line": 1215,
   "params": [
    [
     "crossTarget",
@@ -30311,7 +30585,7 @@
   "name": "sigmaObsSource",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1203,
+  "line": 1223,
   "params": [],
   "ret": "Matrix (Fin 2) (Fin 2) ℝ",
   "doc": "Dense source covariance witness for non-degenerate ERM-transport tests.",
@@ -30329,7 +30603,7 @@
   "name": "sigmaObsTarget",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1207,
+  "line": 1227,
   "params": [],
   "ret": "Matrix (Fin 2) (Fin 2) ℝ",
   "doc": "Dense target covariance witness for non-degenerate ERM-transport tests.",
@@ -30376,7 +30650,7 @@
   "name": "crossSource",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1211,
+  "line": 1231,
   "params": [],
   "ret": "Fin 2 → ℝ",
   "doc": "Source cross-covariance vector paired with `sigmaObsSource`.",
@@ -30394,7 +30668,7 @@
   "name": "crossTarget",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1215,
+  "line": 1235,
   "params": [],
   "ret": "Fin 2 → ℝ",
   "doc": "Target cross-covariance vector paired with `sigmaObsTarget`.",
@@ -30507,7 +30781,7 @@
   "name": "wSource_opt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1219,
+  "line": 1239,
   "params": [],
   "ret": "Fin 2 → ℝ",
   "doc": "Exact source OLS solution for the dense witness system.",
@@ -30525,7 +30799,7 @@
   "name": "wTarget_opt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1223,
+  "line": 1243,
   "params": [],
   "ret": "Fin 2 → ℝ",
   "doc": "Exact target OLS solution for the dense witness system.",
@@ -30540,116 +30814,48 @@
   "n_theorems": 1
  },
  {
-  "name": "sourceCrossCovariance",
+  "name": "crossCovariance",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1253,
+  "line": 1273,
   "params": [
    [
     "m",
     "CrossPopulationMetricModel p q"
-   ]
-  ],
-  "ret": "Fin p → ℝ",
-  "doc": "Source predictor/outcome cross-covariance from explicit biological and\nobservational drivers.",
-  "body": "(sigmaTagCausalSource m).mulVec m.betaSource + m.contextCrossSource",
-  "theorem_hyps": [
-   {
-    "thm": "sourceCrossCovariance_eq_taggingProjection_plus_context",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "sourceCrossCovariance_eq_direct_plus_proxy_plus_context",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   }
-  ],
-  "n_theorems": 3
- },
- {
-  "name": "targetCrossCovariance",
-  "module": "PortabilityDrift",
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1259,
-  "params": [
+   ],
    [
-    "m",
-    "CrossPopulationMetricModel p q"
+    "P",
+    "Pop"
    ]
   ],
   "ret": "Fin p → ℝ",
-  "doc": "Target predictor/outcome cross-covariance from explicit biological and\nobservational drivers.",
-  "body": "(sigmaTagCausalTarget m).mulVec (targetTotalEffect m) + m.contextCrossTarget",
+  "doc": "**Predictor/outcome cross-covariance in a population**, from explicit biological and\nobservational drivers.",
+  "body": "(sigmaTagCausal m P).mulVec (totalEffect m P) + m.contextCross P",
   "theorem_hyps": [
    {
-    "thm": "targetCrossCovariance_eq_taggingProjection_plus_context",
+    "thm": "crossCovariance_eq_taggingProjection_plus_context",
     "hyps": [
-     "CrossPopulationMetricModel p q"
+     "CrossPopulationMetricModel p q",
+     "Pop"
     ],
     "argmap": {}
    },
    {
-    "thm": "targetCrossCovariance_eq_direct_plus_proxy_plus_context",
+    "thm": "crossCovariance_eq_direct_plus_proxy_plus_context",
     "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetCrossCovariance_eq_standing_plus_novelMutationEffect_plus_context",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetR2FromSourceWeights_exact_snp_transport_law",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
+     "CrossPopulationMetricModel p q",
+     "Pop"
     ],
     "argmap": {}
    }
   ],
-  "n_theorems": 7
+  "n_theorems": 2
  },
  {
   "name": "sourceWeightsFromExplicitDrivers",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1265,
+  "line": 1279,
   "params": [
    [
     "m",
@@ -30719,7 +30925,7 @@
   "name": "sourceWeightedTagScore",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1273,
+  "line": 1287,
   "params": [
    [
     "m",
@@ -30885,31 +31091,37 @@
   "n_theorems": 18
  },
  {
-  "name": "sourceTaggingProjection",
+  "name": "taggingProjection",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1284,
+  "line": 1299,
   "params": [
    [
     "m",
     "CrossPopulationMetricModel p q"
+   ],
+   [
+    "P",
+    "Pop"
    ]
   ],
   "ret": "Fin p → ℝ",
-  "doc": "Source tag-to-causal projection induced by the source causal effect vector.",
-  "body": "(sigmaTagCausalSource m).mulVec m.betaSource",
+  "doc": "**Tag-to-causal projection in a population**, induced by that population's causal\neffect vector.",
+  "body": "(sigmaTagCausal m P).mulVec (totalEffect m P)",
   "theorem_hyps": [
    {
-    "thm": "sourceTaggingProjection_eq_direct_plus_proxy",
+    "thm": "taggingProjection_eq_direct_plus_proxy",
     "hyps": [
-     "CrossPopulationMetricModel p q"
+     "CrossPopulationMetricModel p q",
+     "Pop"
     ],
     "argmap": {}
    },
    {
-    "thm": "sourceCrossCovariance_eq_taggingProjection_plus_context",
+    "thm": "crossCovariance_eq_taggingProjection_plus_context",
     "hyps": [
-     "CrossPopulationMetricModel p q"
+     "CrossPopulationMetricModel p q",
+     "Pop"
     ],
     "argmap": {}
    }
@@ -30917,64 +31129,10 @@
   "n_theorems": 2
  },
  {
-  "name": "targetTaggingProjection",
-  "module": "PortabilityDrift",
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1289,
-  "params": [
-   [
-    "m",
-    "CrossPopulationMetricModel p q"
-   ]
-  ],
-  "ret": "Fin p → ℝ",
-  "doc": "Target tag-to-causal projection induced by the target causal effect vector.",
-  "body": "(sigmaTagCausalTarget m).mulVec (targetTotalEffect m)",
-  "theorem_hyps": [
-   {
-    "thm": "targetTaggingProjection_eq_direct_plus_proxy",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetTaggingProjection_eq_standing_plus_novelMutationEffect",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetCrossCovariance_eq_taggingProjection_plus_context",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity",
-    "hyps": [
-     "CrossPopulationGenerationalModel p q",
-     "ℕ"
-    ],
-    "argmap": {}
-   }
-  ],
-  "n_theorems": 5
- },
- {
   "name": "targetEffectHeterogeneity",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1298,
+  "line": 1308,
   "params": [
    [
     "m",
@@ -30999,7 +31157,7 @@
   "name": "targetSourceEffectProjection",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1316,
+  "line": 1326,
   "params": [
    [
     "m",
@@ -31052,7 +31210,7 @@
   "name": "targetEffectHeterogeneityProjection",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1324,
+  "line": 1334,
   "params": [
    [
     "m",
@@ -31105,7 +31263,7 @@
   "name": "targetNovelMutationEffectProjection",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1332,
+  "line": 1342,
   "params": [
    [
     "m",
@@ -31141,99 +31299,7 @@
   "n_theorems": 3
  },
  {
-  "name": "sourceDirectCausalProjection",
-  "module": "PortabilityDrift",
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1337,
-  "params": [
-   [
-    "m",
-    "CrossPopulationMetricModel p q"
-   ]
-  ],
-  "ret": "Fin p → ℝ",
-  "doc": "Source projection carried by directly observed causal variants in the score.",
-  "body": "m.directCausalSource.mulVec m.betaSource",
-  "theorem_hyps": [
-   {
-    "thm": "sourceTaggingProjection_eq_direct_plus_proxy",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "sourceCrossCovariance_eq_direct_plus_proxy_plus_context",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "direct_causal_vs_proxy_tag_same_source_r2_different_portability",
-    "hyps": [],
-    "argmap": {
-     "baselineMetricModel": "m"
-    }
-   }
-  ],
-  "n_theorems": 4
- },
- {
-  "name": "sourceProxyTaggingProjection",
-  "module": "PortabilityDrift",
-  "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1342,
-  "params": [
-   [
-    "m",
-    "CrossPopulationMetricModel p q"
-   ]
-  ],
-  "ret": "Fin p → ℝ",
-  "doc": "Source projection carried only by proxy tagging of unscored causal variants.",
-  "body": "m.proxyTaggingSource.mulVec m.betaSource",
-  "theorem_hyps": [
-   {
-    "thm": "sourceTaggingProjection_eq_direct_plus_proxy",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "sourceCrossCovariance_eq_direct_plus_proxy_plus_context",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "direct_causal_vs_proxy_tag_same_source_r2_different_portability",
-    "hyps": [],
-    "argmap": {
-     "baselineMetricModel": "m"
-    }
-   }
-  ],
-  "n_theorems": 4
- },
- {
-  "name": "targetDirectCausalProjection",
+  "name": "directCausalProjection",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "line": 1347,
@@ -31241,146 +31307,78 @@
    [
     "m",
     "CrossPopulationMetricModel p q"
+   ],
+   [
+    "P",
+    "Pop"
    ]
   ],
   "ret": "Fin p → ℝ",
-  "doc": "Target projection carried by directly observed causal variants in the score.",
-  "body": "(m.directCausalTarget + m.novelDirectCausalTarget).mulVec (targetTotalEffect m)",
+  "doc": "**Projection carried by directly observed causal variants**, in a population.",
+  "body": "(m.directCausal P + m.novelDirectCausal P).mulVec (totalEffect m P)",
   "theorem_hyps": [
    {
-    "thm": "mechanistic_transport_disrupts_calibration_slope_and_brier",
+    "thm": "taggingProjection_eq_direct_plus_proxy",
     "hyps": [
-     "CrossPopulationMechanisticCalibrationModel p q",
-     "targetCalibrationSlopeFromSourceWeights cal.metric < 1",
-     "targetR2FromSourceWeights cal.metric < sourceR2FromSourceWeights cal.metric"
-    ],
-    "argmap": {
-     "cal": "m"
-    }
-   },
-   {
-    "thm": "CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
-    "hyps": [
-     "CrossPopulationMechanisticCalibrationModel p q",
-     "CalibrationLink"
+     "CrossPopulationMetricModel p q",
+     "Pop"
     ],
     "argmap": {}
    },
    {
-    "thm": "targetTaggingProjection_eq_direct_plus_proxy",
+    "thm": "crossCovariance_eq_direct_plus_proxy_plus_context",
     "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetCrossCovariance_eq_direct_plus_proxy_plus_context",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetR2FromSourceWeights_exact_direct_proxy_context_law",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
+     "CrossPopulationMetricModel p q",
+     "Pop"
     ],
     "argmap": {}
    }
   ],
-  "n_theorems": 7
+  "n_theorems": 2
  },
  {
-  "name": "targetProxyTaggingProjection",
+  "name": "proxyTaggingProjection",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1352,
+  "line": 1353,
   "params": [
    [
     "m",
     "CrossPopulationMetricModel p q"
+   ],
+   [
+    "P",
+    "Pop"
    ]
   ],
   "ret": "Fin p → ℝ",
-  "doc": "Target projection carried only by proxy tagging of unscored causal variants.",
-  "body": "(m.proxyTaggingTarget + m.novelProxyTaggingTarget).mulVec (targetTotalEffect m)",
+  "doc": "**Projection carried only by proxy tagging** of unscored causal variants, in a\npopulation.",
+  "body": "(m.proxyTagging P + m.novelProxyTagging P).mulVec (totalEffect m P)",
   "theorem_hyps": [
    {
-    "thm": "mechanistic_transport_disrupts_calibration_slope_and_brier",
+    "thm": "taggingProjection_eq_direct_plus_proxy",
     "hyps": [
-     "CrossPopulationMechanisticCalibrationModel p q",
-     "targetCalibrationSlopeFromSourceWeights cal.metric < 1",
-     "targetR2FromSourceWeights cal.metric < sourceR2FromSourceWeights cal.metric"
-    ],
-    "argmap": {
-     "cal": "m"
-    }
-   },
-   {
-    "thm": "CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
-    "hyps": [
-     "CrossPopulationMechanisticCalibrationModel p q",
-     "CalibrationLink"
+     "CrossPopulationMetricModel p q",
+     "Pop"
     ],
     "argmap": {}
    },
    {
-    "thm": "targetTaggingProjection_eq_direct_plus_proxy",
+    "thm": "crossCovariance_eq_direct_plus_proxy_plus_context",
     "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetCrossCovariance_eq_direct_plus_proxy_plus_context",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
-    ],
-    "argmap": {}
-   },
-   {
-    "thm": "targetR2FromSourceWeights_exact_direct_proxy_context_law",
-    "hyps": [
-     "CrossPopulationMetricModel p q"
+     "CrossPopulationMetricModel p q",
+     "Pop"
     ],
     "argmap": {}
    }
   ],
-  "n_theorems": 7
+  "n_theorems": 2
  },
  {
   "name": "sourceScoreVarianceFromExplicitDrivers",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1463,
+  "line": 1432,
   "params": [
    [
     "m",
@@ -31435,7 +31433,7 @@
   "name": "targetScoreVarianceFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1471,
+  "line": 1440,
   "params": [
    [
     "m",
@@ -31570,7 +31568,7 @@
   "name": "sourcePredictiveCovarianceFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1477,
+  "line": 1446,
   "params": [
    [
     "m",
@@ -31632,7 +31630,7 @@
   "name": "targetPredictiveCovarianceFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1485,
+  "line": 1454,
   "params": [
    [
     "m",
@@ -31741,7 +31739,7 @@
   "name": "sourceCalibrationSlopeFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1493,
+  "line": 1462,
   "params": [
    [
     "m",
@@ -31766,7 +31764,7 @@
   "name": "targetCalibrationSlopeFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1501,
+  "line": 1470,
   "params": [
    [
     "m",
@@ -31843,7 +31841,7 @@
   "name": "brokenTaggingResidual",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1629,
+  "line": 1598,
   "params": [
    [
     "m",
@@ -31922,7 +31920,7 @@
   "name": "ancestrySpecificLDResidual",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1647,
+  "line": 1616,
   "params": [
    [
     "m",
@@ -31989,7 +31987,7 @@
   "name": "sourceSpecificOverfitResidual",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1664,
+  "line": 1633,
   "params": [
    [
     "m",
@@ -32056,7 +32054,7 @@
   "name": "novelUntaggablePhenotypeResidual",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1679,
+  "line": 1648,
   "params": [
    [
     "m",
@@ -32116,7 +32114,7 @@
   "name": "irreducibleTargetResidualBurden",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1697,
+  "line": 1666,
   "params": [
    [
     "m",
@@ -32148,7 +32146,7 @@
   "name": "targetIrreduciblePenaltyProfile",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1714,
+  "line": 1683,
   "params": [
    [
     "m",
@@ -32165,7 +32163,7 @@
   "name": "effectiveTargetOutcomeVariance",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1738,
+  "line": 1707,
   "params": [
    [
     "m",
@@ -32260,7 +32258,7 @@
   "name": "sourceExplainedSignalVarianceFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1772,
+  "line": 1741,
   "params": [
    [
     "m",
@@ -32300,7 +32298,7 @@
   "name": "sourceR2FromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1778,
+  "line": 1747,
   "params": [
    [
     "m",
@@ -32573,7 +32571,7 @@
   "name": "sourceResidualVarianceFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1786,
+  "line": 1755,
   "params": [
    [
     "m",
@@ -32606,7 +32604,7 @@
   "name": "sourceCalibratedBrierFromSourceWeightsAtPrevalence",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1803,
+  "line": 1772,
   "params": [
    [
     "m",
@@ -32675,7 +32673,7 @@
   "name": "targetExplainedSignalVarianceFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1855,
+  "line": 1824,
   "params": [
    [
     "m",
@@ -32721,7 +32719,7 @@
   "name": "targetR2FromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1862,
+  "line": 1831,
   "params": [
    [
     "m",
@@ -33025,7 +33023,7 @@
   "name": "targetResidualVarianceFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1871,
+  "line": 1840,
   "params": [
    [
     "m",
@@ -33064,7 +33062,7 @@
   "name": "targetCalibratedBrierFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1885,
+  "line": 1854,
   "params": [
    [
     "m",
@@ -33158,7 +33156,7 @@
   "name": "ldCorrelationDecay",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2106,
+  "line": 2075,
   "params": [
    [
     "distance",
@@ -33205,7 +33203,7 @@
   "name": "theta",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2154,
+  "line": 2123,
   "params": [
    [
     "g",
@@ -33311,7 +33309,7 @@
   "name": "bigM",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2158,
+  "line": 2127,
   "params": [
    [
     "g",
@@ -33395,7 +33393,7 @@
   "name": "tauAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2162,
+  "line": 2131,
   "params": [
    [
     "g",
@@ -33433,7 +33431,7 @@
   "name": "hetDecayFactor",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2166,
+  "line": 2135,
   "params": [
    [
     "g",
@@ -33487,7 +33485,7 @@
   "name": "fstTransientAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2174,
+  "line": 2143,
   "params": [
    [
     "g",
@@ -33524,7 +33522,7 @@
   "name": "mutationSharedRetentionAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2179,
+  "line": 2148,
   "params": [
    [
     "g",
@@ -33569,7 +33567,7 @@
   "name": "migrationSharedBoostAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2184,
+  "line": 2153,
   "params": [
    [
     "g",
@@ -33614,7 +33612,7 @@
   "name": "PGSEvolutionaryModel.toGenerationalPopGenParameters",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2210,
+  "line": 2179,
   "params": [
    [
     "m",
@@ -33631,7 +33629,7 @@
   "name": "alleleFreqMismatchPenalty",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2318,
+  "line": 2287,
   "params": [
    [
     "pSource",
@@ -33652,7 +33650,7 @@
   "name": "betaTargetAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2376,
+  "line": 2345,
   "params": [
    [
     "m",
@@ -33695,7 +33693,7 @@
   "name": "tagAlleleFreqTargetAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2390,
+  "line": 2359,
   "params": [
    [
     "m",
@@ -33720,7 +33718,7 @@
   "name": "causalAlleleFreqTargetAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2404,
+  "line": 2373,
   "params": [
    [
     "m",
@@ -33745,7 +33743,7 @@
   "name": "tagAlleleFreqRetentionAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2415,
+  "line": 2384,
   "params": [
    [
     "m",
@@ -33770,7 +33768,7 @@
   "name": "causalAlleleFreqRetentionAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2422,
+  "line": 2391,
   "params": [
    [
     "m",
@@ -33795,7 +33793,7 @@
   "name": "novelVariantInnovationAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2428,
+  "line": 2397,
   "params": [
    [
     "g",
@@ -33816,7 +33814,7 @@
   "name": "jointTagLDKernelAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2441,
+  "line": 2410,
   "params": [
    [
     "m",
@@ -33845,7 +33843,7 @@
   "name": "jointDirectCausalKernelAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2464,
+  "line": 2433,
   "params": [
    [
     "m",
@@ -33874,7 +33872,7 @@
   "name": "jointProxyTaggingKernelAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2483,
+  "line": 2452,
   "params": [
    [
     "m",
@@ -33903,7 +33901,7 @@
   "name": "jointNovelDirectCausalKernelAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2508,
+  "line": 2477,
   "params": [
    [
     "m",
@@ -33932,7 +33930,7 @@
   "name": "jointNovelProxyTaggingKernelAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2527,
+  "line": 2496,
   "params": [
    [
     "m",
@@ -33961,7 +33959,7 @@
   "name": "sigmaTagTargetAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2550,
+  "line": 2519,
   "params": [
    [
     "m",
@@ -33993,7 +33991,7 @@
   "name": "directCausalTargetAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2559,
+  "line": 2528,
   "params": [
    [
     "m",
@@ -34031,7 +34029,7 @@
   "name": "novelDirectCausalTargetAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2568,
+  "line": 2537,
   "params": [
    [
     "m",
@@ -34069,7 +34067,7 @@
   "name": "proxyTaggingTargetAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2577,
+  "line": 2546,
   "params": [
    [
     "m",
@@ -34112,7 +34110,7 @@
   "name": "novelProxyTaggingTargetAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2585,
+  "line": 2554,
   "params": [
    [
     "m",
@@ -34150,7 +34148,7 @@
   "name": "sigmaTagCausalTargetAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2595,
+  "line": 2564,
   "params": [
    [
     "m",
@@ -34177,7 +34175,7 @@
   "name": "targetSourceEffectProjectionAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2607,
+  "line": 2576,
   "params": [
    [
     "m",
@@ -34212,7 +34210,7 @@
   "name": "targetEffectHeterogeneityProjectionAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2615,
+  "line": 2584,
   "params": [
    [
     "m",
@@ -34247,7 +34245,7 @@
   "name": "CrossPopulationGenerationalModel.toMetricModelAt",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2624,
+  "line": 2593,
   "params": [
    [
     "m",
@@ -34268,7 +34266,7 @@
   "name": "targetR2AtGeneration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2652,
+  "line": 2621,
   "params": [
    [
     "m",
@@ -34326,7 +34324,7 @@
   "name": "targetCalibratedBrierAtGeneration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2657,
+  "line": 2626,
   "params": [
    [
     "m",
@@ -34356,7 +34354,7 @@
   "name": "targetR2FromNeutralAFBenchmark",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2908,
+  "line": 2877,
   "params": [
    [
     "V_A",
@@ -34419,7 +34417,7 @@
   "name": "neutralAFBenchmarkRatio",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2982,
+  "line": 2951,
   "params": [
    [
     "fstSource",
@@ -34550,7 +34548,7 @@
   "name": "hetRatioBetweenBranches",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3030,
+  "line": 2999,
   "params": [
    [
     "NeA",
@@ -34599,7 +34597,7 @@
   "name": "exactCalibratedBrierRiskFromR2",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3065,
+  "line": 3034,
   "params": [
    [
     "π",
@@ -34632,7 +34630,7 @@
   "name": "targetGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3074,
+  "line": 3043,
   "params": [
    [
     "V_A",
@@ -34679,7 +34677,7 @@
   "name": "sourceBrierFromR2",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3087,
+  "line": 3056,
   "params": [
    [
     "π",
@@ -34742,7 +34740,7 @@
   "name": "targetExactCalibratedBrierRisk",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3100,
+  "line": 3069,
   "params": [
    [
     "π",
@@ -34785,7 +34783,7 @@
   "name": "targetBrierFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3107,
+  "line": 3076,
   "params": [
    [
     "π",
@@ -34843,7 +34841,7 @@
   "name": "neutralAFBenchmarkMetricProfile",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3113,
+  "line": 3082,
   "params": [
    [
     "π",
@@ -34878,7 +34876,7 @@
   "name": "equalVarianceGaussianAUCFromSNR",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3181,
+  "line": 3150,
   "params": [
    [
     "snr",
@@ -34919,7 +34917,7 @@
   "name": "equalVarianceGaussianAUCFromVariances",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3193,
+  "line": 3162,
   "params": [
    [
     "vSignal",
@@ -34998,7 +34996,7 @@
   "name": "equalVarianceGaussianAUCFromExplainedR2",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3226,
+  "line": 3209,
   "params": [
    [
     "r2",
@@ -35006,7 +35004,7 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "Exact liability-threshold AUC as a direct chart map on an already-specified\ndeployed `R²`.\n\nThis is not a transport law and does not recover a latent biological signal\nfrom source `R²`; it is just the closed-form coordinate map induced by the\nequal-variance Gaussian model, which the previous name obscured while the\ndocstring named the right model out loud.\n\n    Empirical status: VALIDATED for the equal-variance Gaussian model;\n    FALSIFIED as the liability-threshold AUC. Takes no prevalence, so it\n    cannot express the observable it was named for.",
+  "doc": "Exact liability-threshold AUC as a direct chart map on an already-specified\ndeployed `R²`.\n\nThis is not a transport law and does not recover a latent biological signal\nfrom source `R²`; it is just the closed-form coordinate map induced by the\nequal-variance Gaussian model, which the previous name obscured while the\ndocstring named the right model out loud.\n\n    Regime: `r2 ∈ [0, 1)`. The boundary `r2 = 1` is attainable, has a defined\n    limit -- a score explaining all the variance discriminates perfectly, so\n    AUC tends to `1` -- and is NOT in this function's domain. There the body\n    divides by zero, Lean's division returns `0`, `Real.sqrt 0 = 0`, and the\n    value collapses to `Phi 0 = 1/2`: chance discrimination assigned to a\n    perfect predictor, the opposite extreme from the limit, silently and with\n    no type error. `equalVarianceGaussianAUCFromExplainedR2_at_one` exhibits\n    it, and `equalVarianceGaussianAUCFromExplainedR2_endpoint_lt_interior`\n    proves the endpoint value is strictly below *every* interior value, so the\n    map is not monotone on `[0, 1]` although it is on `[0, 1)`.\n    `equalVarianceGaussianAUCChart` is the continuous extension and is what a\n    caller who can reach the boundary should use.\n\n    Empirical status: VALIDATED for the equal-variance Gaussian model on\n    `[0, 1)`; FALSIFIED at `r2 = 1`, where it returns `1/2` and the AUC is `1`.\n    FALSIFIED as the liability-threshold AUC: takes no prevalence, so it cannot\n    express the observable it was named for.",
   "body": "Phi (Real.sqrt (r2 / (2 * (1 - r2))))",
   "theorem_hyps": [
    {
@@ -35020,6 +35018,38 @@
     "argmap": {
      "r2₁": "r2"
     }
+   },
+   {
+    "thm": "equalVarianceGaussianAUCFromExplainedR2_at_one",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "equalVarianceGaussianAUCFromExplainedR2_endpoint_lt_interior",
+    "hyps": [
+     "StrictMono Phi",
+     "ℝ",
+     "0 < x",
+     "x < 1"
+    ],
+    "argmap": {
+     "x": "r2"
+    }
+   },
+   {
+    "thm": "equalVarianceGaussianAUCChart_eq_of_lt_one",
+    "hyps": [
+     "ℝ",
+     "r2 < 1"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "equalVarianceGaussianAUCChart_ne_chart_at_one",
+    "hyps": [
+     "Phi 0 ≠ 1"
+    ],
+    "argmap": {}
    },
    {
     "thm": "equalVarianceGaussianAUCFromExplainedR2_eq_fromSNR",
@@ -35066,13 +35096,46 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 7
+  "n_theorems": 11
+ },
+ {
+  "name": "equalVarianceGaussianAUCChart",
+  "module": "PortabilityDrift",
+  "path": "proofs/Calibrator/PortabilityDrift.lean",
+  "line": 3255,
+  "params": [
+   [
+    "r2",
+    "ℝ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**The equal-variance Gaussian AUC chart, extended to the closed interval.**\n\nIdentical to `equalVarianceGaussianAUCFromExplainedR2` on `[0, 1)` and equal to\nthe limit `1` at and beyond `r2 = 1`, so the boundary that the underlying chart\ncannot represent is given the value the quantity actually takes there. The\nextension is the honest one for the standard normal: `Phi` tends to `1` at\n`+∞`, and `r2/(2(1-r2))` tends to `+∞` as `r2 → 1⁻`.\n\n    Regime: `r2 ∈ [0, 1]`; values above `1` are outside the model and are\n    clamped rather than extrapolated.\n\n    Empirical status: UNTESTED as an extension. On `[0, 1)` it inherits\n    whatever `equalVarianceGaussianAUCFromExplainedR2` has, by\n    `equalVarianceGaussianAUCChart_eq_of_lt_one`.",
+  "body": "if 1 ≤ r2 then 1 else equalVarianceGaussianAUCFromExplainedR2 r2",
+  "theorem_hyps": [
+   {
+    "thm": "equalVarianceGaussianAUCChart_eq_of_lt_one",
+    "hyps": [
+     "ℝ",
+     "r2 < 1"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "equalVarianceGaussianAUCChart_ne_chart_at_one",
+    "hyps": [
+     "Phi 0 ≠ 1"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 2
  },
  {
   "name": "sourceEqualVarianceGaussianAUCFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3268,
+  "line": 3318,
   "params": [
    [
     "m",
@@ -35104,7 +35167,7 @@
   "name": "targetEqualVarianceGaussianAUCFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3311,
+  "line": 3361,
   "params": [
    [
     "m",
@@ -35166,7 +35229,7 @@
   "name": "sourceMetricProfileFromSourceWeightsAtPrevalence",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3386,
+  "line": 3436,
   "params": [
    [
     "m",
@@ -35187,7 +35250,7 @@
   "name": "sourceMetricProfileFromSourceWeightsAtTargetPrevalence",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3414,
+  "line": 3464,
   "params": [
    [
     "m",
@@ -35252,7 +35315,7 @@
   "name": "targetMetricProfileFromSourceWeights",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3441,
+  "line": 3491,
   "params": [
    [
     "m",
@@ -35331,7 +35394,7 @@
   "name": "targetGaussianAUCAtGeneration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3507,
+  "line": 3557,
   "params": [
    [
     "m",
@@ -35361,7 +35424,7 @@
   "name": "targetMetricProfileAtGeneration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3512,
+  "line": 3562,
   "params": [
    [
     "m",
@@ -35408,7 +35471,7 @@
   "name": "targetPredictiveCovarianceAtGeneration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3531,
+  "line": 3581,
   "params": [
    [
     "m",
@@ -35471,7 +35534,7 @@
   "name": "targetScoreVarianceAtGeneration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3537,
+  "line": 3587,
   "params": [
    [
     "m",
@@ -35534,7 +35597,7 @@
   "name": "effectiveTargetOutcomeVarianceAtGeneration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3545,
+  "line": 3595,
   "params": [
    [
     "m",
@@ -35589,7 +35652,7 @@
   "name": "targetResidualVarianceAtGeneration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3551,
+  "line": 3601,
   "params": [
    [
     "m",
@@ -35610,7 +35673,7 @@
   "name": "targetCalibrationSlopeAtGeneration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3557,
+  "line": 3607,
   "params": [
    [
     "m",
@@ -35640,7 +35703,7 @@
   "name": "sourceNormalizedTargetR2AtGeneration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3651,
+  "line": 3701,
   "params": [
    [
     "m",
@@ -35675,7 +35738,7 @@
   "name": "targetExactGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3755,
+  "line": 3805,
   "params": [
    [
     "V_A",
@@ -35755,7 +35818,7 @@
   "name": "brierRegretPoint",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3879,
+  "line": 3929,
   "params": [
    [
     "η",
@@ -35782,7 +35845,7 @@
   "name": "brierRegretRatio",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3883,
+  "line": 3933,
   "params": [
    [
     "η",
@@ -35813,7 +35876,7 @@
   "name": "logLossRegretPoint",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3900,
+  "line": 3950,
   "params": [
    [
     "η",
@@ -35845,7 +35908,7 @@
   "name": "logLossRegretRatio",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3904,
+  "line": 3954,
   "params": [
    [
     "η",
@@ -35883,7 +35946,7 @@
   "name": "expectedSqMeanPGSDiff_pureSplit",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3988,
+  "line": 4038,
   "params": [
    [
     "V_A",
@@ -35908,7 +35971,7 @@
   "name": "expectedSqMeanPGSDiff_IMEquilibrium",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3998,
+  "line": 4048,
   "params": [
    [
     "V_A",
@@ -35938,7 +36001,7 @@
   "name": "MutationDriftModelAssumptions.theta",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4061,
+  "line": 4111,
   "params": [
    [
     "m",
@@ -35955,7 +36018,7 @@
   "name": "ibdFlowStep",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4094,
+  "line": 4144,
   "params": [
    [
     "Ne",
@@ -36011,7 +36074,7 @@
   "name": "MutationDriftModelAssumptions.fstEquilibrium",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4126,
+  "line": 4176,
   "params": [
    [
     "m",
@@ -36028,7 +36091,7 @@
   "name": "MutationDriftModelAssumptions.fstTransient",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4160,
+  "line": 4210,
   "params": [
    [
     "m",
@@ -36045,7 +36108,7 @@
   "name": "covarianceRetention",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4248,
+  "line": 4298,
   "params": [
    [
     "freq_corr",
@@ -36077,7 +36140,7 @@
   "name": "freqCorrFromFst",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4258,
+  "line": 4308,
   "params": [
    [
     "fst",
@@ -36114,7 +36177,7 @@
   "name": "ldOverlapFromSharedLD",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4262,
+  "line": 4312,
   "params": [
    [
     "shared_ld",
@@ -36144,7 +36207,7 @@
   "name": "covarianceDivergenceFromRetention",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4274,
+  "line": 4324,
   "params": [
    [
     "fst",
@@ -36183,7 +36246,7 @@
   "name": "covarianceDivergenceMutationDrift",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4293,
+  "line": 4343,
   "params": [
    [
     "fst_drift",
@@ -36250,7 +36313,7 @@
   "name": "presentDayPGSVarianceMutationDrift",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4349,
+  "line": 4399,
   "params": [
    [
     "V_A",
@@ -36352,7 +36415,7 @@
   "name": "presentDayR2MutationDrift",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4394,
+  "line": 4444,
   "params": [
    [
     "V_A",
@@ -36394,7 +36457,7 @@
   "name": "neutralAFSharedLDBenchmarkRatio",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4424,
+  "line": 4474,
   "params": [
    [
     "fstSource",
@@ -36441,7 +36504,7 @@
   "name": "fstMigrationDriftEquilibrium",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4569,
+  "line": 4619,
   "params": [
    [
     "Ne",
@@ -36605,7 +36668,7 @@
   "name": "ibdRecurrenceStep",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4607,
+  "line": 4657,
   "params": [
    [
     "Ne",
@@ -36648,7 +36711,7 @@
   "name": "ibdRecurrenceFixedPoint",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4620,
+  "line": 4670,
   "params": [
    [
     "Ne",
@@ -36697,7 +36760,7 @@
   "name": "islandFstMultiplicativeStep",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4710,
+  "line": 4760,
   "params": [
    [
     "Ne",
@@ -36745,7 +36808,7 @@
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4727,
+  "line": 4777,
   "params": [
    [
     "Ne",
@@ -36795,7 +36858,7 @@
   "name": "scaledMigrationRate",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4759,
+  "line": 4809,
   "params": [
    [
     "Ne",
@@ -36902,7 +36965,15 @@
     "argmap": {}
    },
    {
-    "thm": "signalRetentionMigrationDrift_eq",
+    "thm": "signalRetentionMigrationDrift_eq_ratio",
+    "hyps": [
+     "0 < Ne",
+     "0 ≤ m"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "retainedSignalVarianceMigrationDrift_eq",
     "hyps": [
      "0 < Ne",
      "0 ≤ m"
@@ -36910,13 +36981,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 16
+  "n_theorems": 17
  },
  {
   "name": "SplitMigrationModel.fstMigDriftEq",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4845,
+  "line": 4895,
   "params": [
    [
     "s",
@@ -36933,7 +37004,7 @@
   "name": "steppingStoneFst",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4878,
+  "line": 4945,
   "params": [
    [
     "fst_neighbor",
@@ -36949,12 +37020,29 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "**Stepping-stone Fst model.**\n    In the stepping-stone model, migration occurs only between adjacent demes.\n    Fst between demes separated by d steps is approximately:\n    Fst(d) ≈ Fst_neighbor × (1 + α × (d - 1))\n    where α controls the rate of increase with distance (isolation by distance).\n    This is a linear approximation to the closed-form result.\n\n    Empirical status: UNTESTED.",
-  "body": "fst_neighbor * (1 + α * ((d : ℝ) - 1))",
+  "doc": "**Stepping-stone Fst model.**\n    In the stepping-stone model, migration occurs only between adjacent demes.\n    Fst between demes separated by d steps is approximately:\n    Fst(d) ≈ min 1 (Fst_neighbor × (1 + α × (d - 1)))\n    where α controls the rate of increase with distance (isolation by distance).\n\n    The `min 1` is not cosmetic. An `F_ST` is a variance ratio and lies in\n    `[0, 1]`; the bare linear form returns `10000` at\n    `fst_neighbor = 1, α = 1, d = 10000`, which is not a value the quantity can\n    take. Clamping also makes the fixation boundary attainable rather than\n    merely approached: `steppingStoneFst_eq_one_of_saturated` exhibits the\n    regime where distant demes are completely differentiated, which is the\n    physically correct behaviour of isolation by distance at long range.\n\n    Regime: linear, valid below saturation. This is a first-order approximation\n    to the closed form, so it is trustworthy only while\n    `fst_neighbor * (1 + α (d - 1))` is well below `1`; the monotonicity results\n    below carry that condition as a hypothesis rather than assuming it. The\n    saturating closed forms are `demoSteppingStoneFst` in\n    `Calibrator.DemographicHistory`, which is derived from a coalescence time,\n    and `continuousSteppingStoneFst` in\n    `Calibrator.PopulationGeneticsFoundations`, which is `1 - exp (-d/L)`.\n    Neither is this function and neither is being replaced here.\n\n    Empirical status: UNTESTED.",
+  "body": "min 1 (fst_neighbor * (1 + α * ((d : ℝ) - 1)))",
   "theorem_hyps": [
    {
+    "thm": "steppingStoneFst_le_one",
+    "hyps": [
+     "ℕ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "steppingStoneFst_eq_one_of_saturated",
+    "hyps": [
+     "ℕ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "steppingStoneFst_at_one",
-    "hyps": [],
+    "hyps": [
+     "fst_neighbor ≤ 1"
+    ],
     "argmap": {}
    },
    {
@@ -36962,7 +37050,8 @@
     "hyps": [
      "0 < fst_neighbor",
      "0 < α",
-     "d₁ < d₂"
+     "d₁ < d₂",
+     "ℝ"
     ],
     "argmap": {}
    },
@@ -36972,7 +37061,8 @@
      "ℕ",
      "0 < fst_neighbor",
      "0 < α",
-     "1 < d"
+     "1 < d",
+     "ℝ"
     ],
     "argmap": {}
    },
@@ -36987,13 +37077,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 4
+  "n_theorems": 6
  },
  {
   "name": "sharedLD_from_equilibrium",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4940,
+  "line": 5030,
   "params": [
    [
     "Ne",
@@ -37031,7 +37121,7 @@
   "name": "sharedLDFromMigration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4966,
+  "line": 5056,
   "params": [
    [
     "M",
@@ -37092,7 +37182,58 @@
   "name": "signalRetentionMigrationDrift",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5017,
+  "line": 5120,
+  "params": [
+   [
+    "Ne",
+    "ℝ"
+   ],
+   [
+    "m",
+    "ℝ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**Signal retention under migration-drift balance.**\n\nThe fraction of additive signal that survives, accounting for both allele\nfrequency drift and LD sharing at the migration-drift equilibrium. It is\n`(1 - F_ST) * shared_LD = M²/(1 + M)²` with `M = 4 Nₑ m`, and it lies in\n`[0, 1)`.\n\nThe previous body of this name multiplied by `V_A` and so returned a variance,\nnot a fraction: it was unbounded and grew without limit as the additive variance\ngrew. A retention that scales with an additive variance is not a retention. The\nname now denotes the fraction and `retainedSignalVarianceMigrationDrift` denotes\nthe variance; `retainedSignalVarianceMigrationDrift_eq_retention_mul_VA` relates\nthem. This corpus has already lost a factor of four to just this kind of\nname/quantity mismatch, so the two are separated rather than bounded.\n\n    Denotes: a dimensionless fraction in `[0, 1)`, never a variance.\n\n    Empirical status: UNTESTED.",
+  "body": "(1 - fstMigrationDriftEquilibrium Ne m) *\nsharedLDFromMigration (scaledMigrationRate Ne m)",
+  "theorem_hyps": [
+   {
+    "thm": "retainedSignalVarianceMigrationDrift_eq_retention_mul_VA",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "signalRetentionMigrationDrift_eq_ratio",
+    "hyps": [
+     "0 < Ne",
+     "0 ≤ m"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "signalRetentionMigrationDrift_lt_one",
+    "hyps": [
+     "0 < Ne",
+     "0 < m"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "signalRetentionMigrationDrift_nonneg",
+    "hyps": [
+     "0 < Ne",
+     "0 ≤ m"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 4
+ },
+ {
+  "name": "retainedSignalVarianceMigrationDrift",
+  "module": "PortabilityDrift",
+  "path": "proofs/Calibrator/PortabilityDrift.lean",
+  "line": 5131,
   "params": [
    [
     "V_A",
@@ -37108,11 +37249,16 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "**Signal retention under migration-drift balance.**\n    The retained signal variance accounts for both allele frequency drift\n    and LD sharing determined by migration rate.\n\n    Empirical status: UNTESTED.",
-  "body": "let fst := fstMigrationDriftEquilibrium Ne m\nlet M := scaledMigrationRate Ne m\nlet shared_ld := sharedLDFromMigration M\n(1 - fst) * shared_ld * V_A",
+  "doc": "**Retained signal variance under migration-drift balance.**\n    The additive variance that survives: the retention fraction times `V_A`.\n    This is the quantity the previous `signalRetentionMigrationDrift` computed.\n\n    Denotes: a variance, in the units of `V_A`.\n\n    Empirical status: UNTESTED.",
+  "body": "signalRetentionMigrationDrift Ne m * V_A",
   "theorem_hyps": [
    {
-    "thm": "signalRetentionMigrationDrift_eq",
+    "thm": "retainedSignalVarianceMigrationDrift_eq_retention_mul_VA",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "retainedSignalVarianceMigrationDrift_eq",
     "hyps": [
      "0 < Ne",
      "0 ≤ m"
@@ -37120,7 +37266,7 @@
     "argmap": {}
    },
    {
-    "thm": "signalRetentionMigrationDrift_pos",
+    "thm": "retainedSignalVarianceMigrationDrift_pos",
     "hyps": [
      "0 < V_A",
      "0 < Ne",
@@ -37142,13 +37288,13 @@
     }
    }
   ],
-  "n_theorems": 3
+  "n_theorems": 4
  },
  {
   "name": "asymmetricFst",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5098,
+  "line": 5242,
   "params": [
    [
     "Ne",
@@ -37206,7 +37352,7 @@
   "name": "effectiveSymmetricMigration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5139,
+  "line": 5283,
   "params": [
    [
     "m₁₂",
@@ -37247,7 +37393,7 @@
   "name": "admixtureLDDecay",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5160,
+  "line": 5304,
   "params": [
    [
     "r",
@@ -37383,7 +37529,7 @@
   "name": "admixtureLDBoost",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5207,
+  "line": 5351,
   "params": [
    [
     "r",
@@ -37423,7 +37569,7 @@
   "name": "fstMigDriftNext",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5269,
+  "line": 5413,
   "params": [
    [
     "Ne",
@@ -37472,7 +37618,7 @@
   "name": "fstMigDriftEquil",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5304,
+  "line": 5448,
   "params": [
    [
     "Ne",
@@ -37574,7 +37720,7 @@
   "name": "neutralAFBenchmarkFromRecurrence",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5386,
+  "line": 5530,
   "params": [
    [
     "Ne",
@@ -41695,68 +41841,10 @@
   "n_theorems": 3
  },
  {
-  "name": "stabilizingSelectionSummary",
-  "module": "SelectionValidation",
-  "path": "proofs/Calibrator/SelectionValidation.lean",
-  "line": 36,
-  "params": [
-   [
-    "Ns",
-    "ℝ"
-   ],
-   [
-    "vMutation",
-    "ℝ"
-   ],
-   [
-    "s",
-    "ℝ"
-   ]
-  ],
-  "ret": "SelectionModelSummary where predictedEffectCorrelation",
-  "doc": "Stabilizing-selection summary induced by the explicit architecture model.\n\n    Empirical status: UNTESTED.",
-  "body": "effectCorrelationStabilizing Ns\npredictedSelectedVariance := stabilizingSelectedArchitectureVariance vMutation s",
-  "theorem_hyps": [],
-  "n_theorems": 0
- },
- {
-  "name": "fluctuatingSelectionSummary",
-  "module": "SelectionValidation",
-  "path": "proofs/Calibrator/SelectionValidation.lean",
-  "line": 42,
-  "params": [
-   [
-    "t",
-    "ℝ"
-   ],
-   [
-    "tau",
-    "ℝ"
-   ],
-   [
-    "vMutation",
-    "ℝ"
-   ],
-   [
-    "s",
-    "ℝ"
-   ],
-   [
-    "sigmaTheta",
-    "ℝ"
-   ]
-  ],
-  "ret": "SelectionModelSummary where predictedEffectCorrelation",
-  "doc": "Fluctuating-selection summary induced by the explicit architecture model.",
-  "body": "fluctuatingEffectCorrelation t tau\npredictedSelectedVariance :=\nfluctuatingSelectedArchitectureVariance vMutation s sigmaTheta tau",
-  "theorem_hyps": [],
-  "n_theorems": 0
- },
- {
   "name": "selectionSummaryLogLik",
   "module": "SelectionValidation",
   "path": "proofs/Calibrator/SelectionValidation.lean",
-  "line": 52,
+  "line": 37,
   "params": [
    [
     "validation",
@@ -41799,7 +41887,7 @@
   "name": "missedSelectedVariance",
   "module": "SelectionValidation",
   "path": "proofs/Calibrator/SelectionValidation.lean",
-  "line": 65,
+  "line": 50,
   "params": [
    [
     "validation",
@@ -41861,7 +41949,7 @@
   "name": "selectionModelLRT",
   "module": "SelectionValidation",
   "path": "proofs/Calibrator/SelectionValidation.lean",
-  "line": 81,
+  "line": 66,
   "params": [
    [
     "validation",
@@ -44884,7 +44972,7 @@
   "name": "sampleLimitedScratchTargetR2",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1225,
+  "line": 1241,
   "params": [
    [
     "oracle_target_r2",
@@ -44900,9 +44988,30 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "Scratch-trained target `R²` with finite-sample estimation noise\n    `noiseVar / nTarget`.",
+  "doc": "Scratch-trained target `R²` with finite-sample estimation noise\n    `noiseVar / nTarget`.\n\n    Regime: `noiseVar / nTarget ≤ oracle_target_r2`. The subtraction is a\n    first-order estimation penalty and is only a model of `R²` while it stays\n    below the ceiling it is subtracted from. Outside that regime it returns\n    values no `R²` can take: at `oracle_target_r2 = 1e-4`, `noiseVar = 1000`,\n    `nTarget = 1` it is `-1000`.\n    `sampleLimitedScratchTargetR2_negative_of_small_sample` exhibits the escape\n    and `sampleLimitedScratchTargetR2_nonneg` states the condition that\n    excludes it. `usableScratchTargetR2` is the clamped variant for callers who\n    cannot discharge the regime; it is offered rather than substituted here\n    because clamping would assert that the estimator still attains `0` at\n    sample sizes where this model has simply left its domain, and that is a\n    modelling claim the development has no evidence for.\n\n    Empirical status: UNTESTED inside the regime; FALSIFIED outside it, where\n    the value is not an `R²`.",
   "body": "scratchTargetR2 oracle_target_r2 (noiseVar / nTarget)",
   "theorem_hyps": [
+   {
+    "thm": "sampleLimitedScratchTargetR2_negative_of_small_sample",
+    "hyps": [
+     "oracle_target_r2 < noiseVar / nTarget"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "sampleLimitedScratchTargetR2_nonneg",
+    "hyps": [
+     "noiseVar / nTarget ≤ oracle_target_r2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "usableScratchTargetR2_eq_of_nonneg",
+    "hyps": [
+     "noiseVar / nTarget ≤ oracle_target_r2"
+    ],
+    "argmap": {}
+   },
    {
     "thm": "sampleLimitedScratchTargetR2_eq_targetHeritability_minus_noise_over_n_diagonalLD",
     "hyps": [
@@ -44945,13 +45054,58 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 5
+  "n_theorems": 8
+ },
+ {
+  "name": "usableScratchTargetR2",
+  "module": "TransferLearningPGS",
+  "path": "proofs/Calibrator/TransferLearningPGS.lean",
+  "line": 1274,
+  "params": [
+   [
+    "oracle_target_r2",
+    "ℝ"
+   ],
+   [
+    "noiseVar",
+    "ℝ"
+   ],
+   [
+    "nTarget",
+    "ℝ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**Clamped scratch-trained target `R²`.**\n\nThe same model, floored at `0`: a predictor is never worse than the population\nmean in the `R²` a deployment would report, because the mean is always\navailable. Use this where the sample size is not known to satisfy the regime on\n`sampleLimitedScratchTargetR2`; the two agree inside it\n(`usableScratchTargetR2_eq_of_nonneg`), and `0` is attained rather than\napproached, which is the correct behaviour at sample sizes carrying no usable\nsignal.\n\n    Empirical status: UNTESTED.",
+  "body": "max 0 (sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar nTarget)",
+  "theorem_hyps": [
+   {
+    "thm": "usableScratchTargetR2_eq_of_nonneg",
+    "hyps": [
+     "noiseVar / nTarget ≤ oracle_target_r2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "usableScratchTargetR2_nonneg",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "usableScratchTargetR2_eq_zero_of_exhausted",
+    "hyps": [
+     "oracle_target_r2 ≤ noiseVar / nTarget"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 3
  },
  {
   "name": "scratchVsFineTuningCriticalSampleSize",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1284,
+  "line": 1361,
   "params": [
    [
     "r2_source",
@@ -45001,7 +45155,7 @@
   "name": "sourceShrinkageMSE",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1379,
+  "line": 1456,
   "params": [
    [
     "gapSq",
@@ -45047,7 +45201,7 @@
   "name": "optimalSourceShrinkageWeight",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1386,
+  "line": 1463,
   "params": [
    [
     "gapSq",
@@ -45118,7 +45272,7 @@
   "name": "coefficientGapSq",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1547,
+  "line": 1624,
   "params": [
    [
     "wSource",
@@ -45386,7 +45540,7 @@
   "name": "populationDeviationSum",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1553,
+  "line": 1630,
   "params": [
    [
     "deviation",
@@ -45433,7 +45587,7 @@
   "name": "meanPopulationDeviation",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1559,
+  "line": 1636,
   "params": [
    [
     "deviation",
@@ -45477,7 +45631,7 @@
   "name": "metaLearnedSourceWeights",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1565,
+  "line": 1642,
   "params": [
    [
     "wShared",
@@ -45513,7 +45667,7 @@
   "name": "centeredPopulationEffectDeviation",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1575,
+  "line": 1652,
   "params": [
    [
     "wShared",
@@ -45567,7 +45721,7 @@
   "name": "sourcePopulationMeanWeights",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1581,
+  "line": 1658,
   "params": [
    [
     "wSource",
@@ -45621,7 +45775,7 @@
   "name": "metaLearnedTransferGapSq",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 1618,
+  "line": 1695,
   "params": [
    [
     "wShared",
@@ -45741,7 +45895,7 @@
   "name": "weightedPopulationDeviation",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2008,
+  "line": 2085,
   "params": [
    [
     "deviation",
@@ -45774,7 +45928,7 @@
   "name": "weightedMetaSourceWeights",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2015,
+  "line": 2092,
   "params": [
    [
     "wShared",
@@ -45810,7 +45964,7 @@
   "name": "weightedMetaTransferGapSq",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2022,
+  "line": 2099,
   "params": [
    [
     "wShared",
@@ -45888,7 +46042,7 @@
   "name": "uniformMetaWeight",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2029,
+  "line": 2106,
   "params": [
    [
     "k",
@@ -45933,7 +46087,7 @@
   "name": "weightedPopulationEffectAverage",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2035,
+  "line": 2112,
   "params": [
    [
     "wSource",
@@ -45974,7 +46128,7 @@
   "name": "centeredPopulationEffectDeviationFin",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2041,
+  "line": 2118,
   "params": [
    [
     "wShared",
@@ -46015,7 +46169,7 @@
   "name": "optimalFineTuningMSE",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2333,
+  "line": 2410,
   "params": [
    [
     "gapSq",
@@ -46079,7 +46233,7 @@
   "name": "requiredTargetSamplesForOptimalFineTuningMSE",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2383,
+  "line": 2460,
   "params": [
    [
     "gapSq",
@@ -46161,7 +46315,7 @@
   "name": "targetLinearExcessRisk",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2432,
+  "line": 2509,
   "params": [
    [
     "crossTarget",
@@ -46232,7 +46386,7 @@
   "name": "exactAdaptationGain",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2540,
+  "line": 2617,
   "params": [
    [
     "crossTarget",
@@ -46337,7 +46491,7 @@
   "name": "privateArchitectureTransferCeiling",
   "module": "TransferLearningPGS",
   "path": "proofs/Calibrator/TransferLearningPGS.lean",
-  "line": 2961,
+  "line": 3038,
   "params": [
    [
     "h2_target",

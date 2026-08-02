@@ -38,12 +38,21 @@ record every divisor and every `log`/`sqrt` argument, finding where a guard
 changes sign along a coordinate, and bisecting onto the exact junk point —
 sampling essentially never lands on one, since they are a measure-zero set.
 
-Of 275 definitions scanned, 16 have an attainable junk point. In 15 the limit
-is infinite, so the quantity is genuinely undefined there and the junk value is
-a modelling choice; those are reported separately and are **not** called
-defects. One has a finite limit and is a defect:
-`equalVarianceGaussianAUCFromExplainedR2` returns 0.5 — chance discrimination —
-at `r2 = 1`, where the AUC tends to 1.
+Findings are graded in three classes, and only the first is called a defect:
+
+| `klass` | meaning | count |
+| --- | --- | --- |
+| `wrong-finite-value` | the limit is finite and the definition returns something else. A wrong answer inside the domain | 1 |
+| `direction-inverted` | the limit diverges to `+inf` and the definition returns 0 — the opposite extreme. There is no right finite answer to return, so this is not a defect, but it inverts the direction any downstream comparison sees | 17 |
+| `singularity` | the limit is infinite and the junk value is an arbitrary but not misleading choice | 0 |
+
+The one defect is `equalVarianceGaussianAUCFromExplainedR2`, which returns 0.5 —
+chance discrimination — at `r2 = 1`, where the AUC tends to 1.
+
+The sharpest of the inverted cases is
+`stabilizingNsFromObservedCorrelation = 1 / (2 * (1 - rho))`, which reports
+**no** selection at `rho = 1`, the correlation at which selection is infinitely
+strong.
 
 Nothing here runs Lean. Bodies are transcribed by a narrow transpiler
 (`transpile.py`) that accepts the arithmetic fragment and **raises rather than

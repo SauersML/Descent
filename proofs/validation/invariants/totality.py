@@ -240,17 +240,35 @@ def scan(c, box, names, pts, max_report=6):
                     lim, why = right, "limit from inside the box (lower edge)"
                 if lim is None or _close(lim, val):
                     continue
+                finite = math.isfinite(lim)
+                # A junk value of 0 where the limit DIVERGES to +infinity is
+                # not a neutral choice: it returns the smallest possible value
+                # where the truth is the largest.  `stabilizingNsFromObserved
+                # Correlation` reports NO selection at the correlation where
+                # selection is infinitely strong.  Weaker than a wrong finite
+                # answer -- there is no right finite answer to return -- but
+                # much worse than an arbitrary one, because it inverts the
+                # direction any downstream comparison will see.
+                inverted = (not finite) and lim > 0 and val <= 0
                 findings.append(dict(
                     point={n: v for n, v in zip(names, y)},
                     coordinate=nm, at=t, junk_branch=kind,
                     value=val, limit=lim, limit_kind=why,
+                    klass=("wrong-finite-value" if finite else
+                           "direction-inverted" if inverted else
+                           "singularity"),
                     severity_note=(
+                        "the quantity has a finite limit here and the "
+                        "definition returns something else -- a wrong value "
+                        "inside the domain"
+                        if finite else
+                        "the limit diverges to +infinity and the definition "
+                        "returns 0, the opposite extreme; there is no right "
+                        "finite answer, but this one inverts the direction"
+                        if inverted else
                         "the limit is infinite, so the quantity is genuinely "
                         "undefined here and the junk value is a modelling "
-                        "choice rather than a wrong finite answer"
-                        if not math.isfinite(lim) else
-                        "the quantity has a finite limit here and the "
-                        "definition returns something else"),
+                        "choice"),
                 ))
                 if len(findings) >= max_report:
                     return findings

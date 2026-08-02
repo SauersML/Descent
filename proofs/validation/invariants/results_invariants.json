@@ -35,7 +35,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -99,7 +100,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -172,7 +174,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -232,7 +235,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -335,7 +339,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -438,7 +443,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -511,7 +517,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -584,7 +591,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -648,7 +656,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -703,7 +712,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -776,7 +786,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -836,7 +847,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -900,7 +912,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1012,7 +1025,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1124,7 +1138,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1206,7 +1221,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1288,7 +1304,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1361,7 +1378,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1473,7 +1491,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1537,7 +1556,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1610,7 +1630,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1674,7 +1695,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1738,7 +1760,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1802,7 +1825,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -1866,7 +1890,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -2018,11 +2043,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (lower edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -2086,7 +2113,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -2160,11 +2188,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (lower edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -2276,7 +2306,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -2349,7 +2380,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -2413,7 +2445,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -2477,7 +2510,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -2541,7 +2575,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -2644,7 +2679,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -2708,7 +2744,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -2811,7 +2848,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -2926,6 +2964,45 @@
   "n_checks": 0,
   "severity": -1.0
  },
+ "CondensationUnification.gaussianKurtosisMaf": {
+  "checks": [],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "no second-moment argument to scale"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "no effective-population-size argument"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "monotone",
+    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+   },
+   {
+    "kind": "totality",
+    "reason": "no arguments to scan"
+   }
+  ],
+  "name": "gaussianKurtosisMaf",
+  "module": "CondensationUnification",
+  "line": 555,
+  "family": "invariant",
+  "n_checks": 0,
+  "severity": -1.0
+ },
  "Conventions.betweenSubgroupVariance": {
   "checks": [
    {
@@ -2953,7 +3030,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -3056,7 +3134,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -3120,7 +3199,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -3346,7 +3426,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -3437,7 +3518,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -3528,7 +3610,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -3619,7 +3702,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -3692,7 +3776,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -3765,7 +3850,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -3911,7 +3997,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -3984,7 +4071,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4048,7 +4136,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4121,7 +4210,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4224,7 +4314,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4368,7 +4459,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4419,7 +4511,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4600,7 +4693,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4660,7 +4754,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4733,7 +4828,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4797,7 +4893,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4870,7 +4967,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -4934,7 +5032,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -5016,7 +5115,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -5071,7 +5171,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -5135,7 +5236,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -5208,7 +5310,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -5281,7 +5384,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -5345,7 +5449,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -5614,11 +5719,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (upper edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -5650,7 +5757,7 @@
   ],
   "name": "benchmarkRatio",
   "module": "DriftRegime",
-  "line": 274,
+  "line": 270,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -5692,11 +5799,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (upper edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -5728,71 +5837,7 @@
   ],
   "name": "benchmarkRatioSquared",
   "module": "DriftRegime",
-  "line": 278,
-  "family": "invariant",
-  "n_checks": 3,
-  "severity": -1.0
- },
- "DriftRegime.driftRetention": {
-  "checks": [
-   {
-    "kind": "continuity",
-    "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "continuity",
-    "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "totality",
-    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
-    "holds": true,
-    "detail": {
-     "findings": [],
-     "n_findings": 0,
-     "n_with_finite_limit": 0
-    }
-   }
-  ],
-  "skipped": [
-   {
-    "kind": "symmetry",
-    "reason": "no two parameters name the same quantity for two populations"
-   },
-   {
-    "kind": "scale",
-    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['Ne', 't']"
-   },
-   {
-    "kind": "absorbing",
-    "reason": "no allele-frequency state argument"
-   },
-   {
-    "kind": "limit-Ne",
-    "reason": "`driftRetention` is not an F_ST-like quantity; a retention or drift FACTOR tends to one, not zero, so the direction is not derivable from the name alone"
-   },
-   {
-    "kind": "limit-freq",
-    "reason": "not a heterozygosity of a frequency"
-   },
-   {
-    "kind": "monotone",
-    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
-   }
-  ],
-  "name": "driftRetention",
-  "module": "DriftRegime",
-  "line": 182,
+  "line": 274,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -5815,7 +5860,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -5847,7 +5893,7 @@
   ],
   "name": "lossOfRetention",
   "module": "DriftRegime",
-  "line": 194,
+  "line": 190,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -5879,7 +5925,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -5911,7 +5958,7 @@
   ],
   "name": "targetHetOfRetention",
   "module": "DriftRegime",
-  "line": 197,
+  "line": 193,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -5943,7 +5990,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -5975,7 +6023,7 @@
   ],
   "name": "targetPgsVarOfRetention",
   "module": "DriftRegime",
-  "line": 204,
+  "line": 200,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -6016,7 +6064,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -6149,7 +6198,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -6181,7 +6231,7 @@
   ],
   "name": "circulantSpectrumA",
   "module": "EpistaticChaos",
-  "line": 1359,
+  "line": 1691,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -6204,7 +6254,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -6236,7 +6287,7 @@
   ],
   "name": "circulantSpectrumB",
   "module": "EpistaticChaos",
-  "line": 1366,
+  "line": 1698,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -6275,7 +6326,7 @@
   ],
   "name": "fourthCumulantFromMoments",
   "module": "EpistaticChaos",
-  "line": 1229,
+  "line": 1561,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -6307,7 +6358,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -6339,7 +6391,7 @@
   ],
   "name": "palindromicCycleDensityA",
   "module": "EpistaticChaos",
-  "line": 1698,
+  "line": 2030,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -6371,7 +6423,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -6403,7 +6456,7 @@
   ],
   "name": "palindromicCycleDensityB",
   "module": "EpistaticChaos",
-  "line": 1707,
+  "line": 2039,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -6444,7 +6497,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -6629,7 +6683,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -6800,7 +6855,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -6873,7 +6929,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -6937,7 +6994,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -7010,7 +7068,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -7191,7 +7250,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -7303,7 +7363,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -7376,7 +7437,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -7527,7 +7589,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -7582,7 +7645,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -7655,7 +7719,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -7737,7 +7802,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -7850,11 +7916,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (upper edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -8143,7 +8211,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -8256,11 +8325,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (upper edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -8324,11 +8395,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (upper edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -8431,7 +8504,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -8495,7 +8569,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -8559,7 +8634,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -8632,7 +8708,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -8705,7 +8782,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -8847,7 +8925,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9028,7 +9107,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9092,7 +9172,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9165,7 +9246,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9247,7 +9329,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9302,7 +9385,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9357,7 +9441,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9421,7 +9506,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9485,7 +9571,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9558,7 +9645,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9739,7 +9827,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9803,7 +9892,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9876,7 +9966,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -9940,7 +10031,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -10190,11 +10282,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (lower edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -10226,7 +10320,7 @@
   ],
   "name": "ldBlockDetectionShare",
   "module": "MetricSpecificPortability",
-  "line": 1456,
+  "line": 1446,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -10276,7 +10370,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -10308,7 +10403,7 @@
   ],
   "name": "ldBlockPruningDeficit",
   "module": "MetricSpecificPortability",
-  "line": 1466,
+  "line": 1456,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -10350,11 +10445,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (lower edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -10467,11 +10564,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (lower edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -10503,7 +10602,7 @@
   ],
   "name": "ldTightLinkageDetectionShare",
   "module": "MetricSpecificPortability",
-  "line": 1477,
+  "line": 1467,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -10544,7 +10643,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -10626,7 +10726,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -10729,7 +10830,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -10793,7 +10895,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -10857,7 +10960,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -10960,7 +11064,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -11106,7 +11211,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -11244,7 +11350,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -11299,7 +11406,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -11597,7 +11705,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -11808,7 +11917,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -11840,7 +11950,7 @@
   ],
   "name": "fstFromDriftFactor",
   "module": "PhenomeWidePortability",
-  "line": 154,
+  "line": 192,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -11872,7 +11982,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -11904,7 +12015,7 @@
   ],
   "name": "neutralDriftFactor",
   "module": "PhenomeWidePortability",
-  "line": 106,
+  "line": 125,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -11936,7 +12047,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -11968,7 +12080,7 @@
   ],
   "name": "neutralPortabilityRatioLD",
   "module": "PhenomeWidePortability",
-  "line": 37,
+  "line": 38,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -12009,7 +12121,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12041,7 +12154,7 @@
   ],
   "name": "selectedDriftFactor",
   "module": "PhenomeWidePortability",
-  "line": 137,
+  "line": 165,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -12121,7 +12234,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12185,7 +12299,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12249,7 +12364,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12313,7 +12429,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12377,7 +12494,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12450,7 +12568,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12524,11 +12643,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (lower edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -12592,7 +12713,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12665,7 +12787,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12759,7 +12882,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12853,7 +12977,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -12908,7 +13033,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13011,7 +13137,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13093,7 +13220,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13125,7 +13253,7 @@
   ],
   "name": "alleleFreqAfterMigration",
   "module": "PopulationGeneticsFoundations",
-  "line": 954,
+  "line": 1050,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -13166,7 +13294,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13244,7 +13373,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13322,7 +13452,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13391,7 +13522,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13419,7 +13551,7 @@
   ],
   "name": "continuousSteppingStoneFst",
   "module": "PopulationGeneticsFoundations",
-  "line": 907,
+  "line": 1003,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -13451,7 +13583,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13483,7 +13616,7 @@
   ],
   "name": "effectiveMigration",
   "module": "PopulationGeneticsFoundations",
-  "line": 988,
+  "line": 1084,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -13506,7 +13639,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13570,7 +13704,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13602,7 +13737,7 @@
   ],
   "name": "expectedNewMutations",
   "module": "PopulationGeneticsFoundations",
-  "line": 695,
+  "line": 773,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -13643,7 +13778,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13671,7 +13807,7 @@
   ],
   "name": "fstDerived",
   "module": "PopulationGeneticsFoundations",
-  "line": 1116,
+  "line": 1212,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -13710,7 +13846,7 @@
   ],
   "name": "fstFromHetRatio",
   "module": "PopulationGeneticsFoundations",
-  "line": 1378,
+  "line": 1482,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -13760,7 +13896,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13788,7 +13925,7 @@
   ],
   "name": "fstMigrationMutationEquilibrium",
   "module": "PopulationGeneticsFoundations",
-  "line": 867,
+  "line": 945,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -13811,7 +13948,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13843,7 +13981,7 @@
   ],
   "name": "fstMutationDriftEquilibrium",
   "module": "PopulationGeneticsFoundations",
-  "line": 469,
+  "line": 540,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -13893,7 +14031,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13921,7 +14060,7 @@
   ],
   "name": "fstMutationDriftTransient",
   "module": "PopulationGeneticsFoundations",
-  "line": 619,
+  "line": 697,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -13971,7 +14110,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -13999,7 +14139,7 @@
   ],
   "name": "fstMutationDriftTransientDiscrete",
   "module": "PopulationGeneticsFoundations",
-  "line": 1414,
+  "line": 1518,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -14031,7 +14171,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14063,7 +14204,7 @@
   ],
   "name": "hetDecayFactor",
   "module": "PopulationGeneticsFoundations",
-  "line": 1341,
+  "line": 1445,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -14095,7 +14236,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14127,7 +14269,7 @@
   ],
   "name": "hetEquilibrium",
   "module": "PopulationGeneticsFoundations",
-  "line": 1199,
+  "line": 1295,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -14159,7 +14301,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14191,7 +14334,7 @@
   ],
   "name": "heterozygosityLossFromDrift",
   "module": "PopulationGeneticsFoundations",
-  "line": 415,
+  "line": 454,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -14232,7 +14375,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14260,7 +14404,7 @@
   ],
   "name": "islandModelFst",
   "module": "PopulationGeneticsFoundations",
-  "line": 791,
+  "line": 869,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -14283,7 +14427,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14315,7 +14460,7 @@
   ],
   "name": "ldCorrelationFromMigration",
   "module": "PopulationGeneticsFoundations",
-  "line": 1021,
+  "line": 1117,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -14347,7 +14492,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14384,6 +14530,45 @@
   "n_checks": 3,
   "severity": -1.0
  },
+ "PopulationGeneticsFoundations.scaledIdentityStep": {
+  "checks": [],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['scaledRate', 'F']"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "cannot place a physically meaningful box on ['F']"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "continuity",
+    "reason": "cannot place a physically meaningful box on ['F']"
+   },
+   {
+    "kind": "totality",
+    "reason": "cannot place a physically meaningful box on ['F']"
+   }
+  ],
+  "name": "scaledIdentityStep",
+  "module": "PopulationGeneticsFoundations",
+  "line": 519,
+  "family": "invariant",
+  "n_checks": 0,
+  "severity": -1.0
+ },
  "PopulationGeneticsFoundations.scaledMutationRate": {
   "checks": [
    {
@@ -14411,7 +14596,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14443,7 +14629,7 @@
   ],
   "name": "scaledMutationRate",
   "module": "PopulationGeneticsFoundations",
-  "line": 455,
+  "line": 494,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -14475,7 +14661,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14539,7 +14726,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14571,7 +14759,7 @@
   ],
   "name": "selectionMigrationEquilibriumMigrationFirst",
   "module": "PopulationGeneticsFoundations",
-  "line": 247,
+  "line": 258,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -14603,7 +14791,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14635,7 +14824,7 @@
   ],
   "name": "sharedLDFractionFromMutation",
   "module": "PopulationGeneticsFoundations",
-  "line": 725,
+  "line": 803,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -14676,7 +14865,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14736,7 +14926,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14768,7 +14959,7 @@
   ],
   "name": "steppingStoneCharacteristicLength",
   "module": "PopulationGeneticsFoundations",
-  "line": 893,
+  "line": 989,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -14807,7 +14998,7 @@
   ],
   "name": "wrightFIT",
   "module": "PopulationGeneticsFoundations",
-  "line": 383,
+  "line": 422,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -14878,7 +15069,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -14990,7 +15182,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15054,7 +15247,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15125,7 +15319,7 @@
   ],
   "name": "admixtureLDBoost",
   "module": "PortabilityDrift",
-  "line": 5207,
+  "line": 5351,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -15157,7 +15351,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15189,7 +15384,7 @@
   ],
   "name": "admixtureLDDecay",
   "module": "PortabilityDrift",
-  "line": 5160,
+  "line": 5304,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -15221,7 +15416,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15253,7 +15449,7 @@
   ],
   "name": "alleleFreqMismatchPenalty",
   "module": "PortabilityDrift",
-  "line": 2318,
+  "line": 2287,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -15292,7 +15488,7 @@
   ],
   "name": "asymmetricFst",
   "module": "PortabilityDrift",
-  "line": 5098,
+  "line": 5242,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -15324,7 +15520,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15356,7 +15553,7 @@
   ],
   "name": "brierRegretPoint",
   "module": "PortabilityDrift",
-  "line": 3879,
+  "line": 3929,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -15397,7 +15594,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15429,7 +15627,7 @@
   ],
   "name": "brierRegretRatio",
   "module": "PortabilityDrift",
-  "line": 3883,
+  "line": 3933,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -15461,7 +15659,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15525,7 +15724,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15557,7 +15757,7 @@
   ],
   "name": "covarianceDivergenceFromRetention",
   "module": "PortabilityDrift",
-  "line": 4274,
+  "line": 4324,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -15589,7 +15789,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15621,7 +15822,7 @@
   ],
   "name": "covarianceDivergenceMutationDrift",
   "module": "PortabilityDrift",
-  "line": 4293,
+  "line": 4343,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -15653,7 +15854,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15685,7 +15887,7 @@
   ],
   "name": "covarianceRetention",
   "module": "PortabilityDrift",
-  "line": 4248,
+  "line": 4298,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -15717,7 +15919,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15749,9 +15952,65 @@
   ],
   "name": "effectiveSymmetricMigration",
   "module": "PortabilityDrift",
-  "line": 5139,
+  "line": 5283,
   "family": "invariant",
   "n_checks": 3,
+  "severity": -1.0
+ },
+ "PortabilityDrift.equalVarianceGaussianAUCChart": {
+  "checks": [
+   {
+    "kind": "continuity",
+    "why": "`r2` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "totality",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
+    "holds": true,
+    "detail": {
+     "findings": [],
+     "n_findings": 0,
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
+    }
+   }
+  ],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['r2']"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "no effective-population-size argument"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "monotone",
+    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+   }
+  ],
+  "name": "equalVarianceGaussianAUCChart",
+  "module": "PortabilityDrift",
+  "line": 3255,
+  "family": "invariant",
+  "n_checks": 2,
   "severity": -1.0
  },
  "PortabilityDrift.equalVarianceGaussianAUCFromExplainedR2": {
@@ -15852,11 +16111,13 @@
        "value": 0.5,
        "limit": 1.0,
        "limit_kind": "limit from inside the box (upper edge)",
-       "severity_note": "the quantity has a finite limit here and the definition returns something else"
+       "klass": "wrong-finite-value",
+       "severity_note": "the quantity has a finite limit here and the definition returns something else -- a wrong value inside the domain"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 1
+     "n_wrong_finite_value": 1,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -15888,7 +16149,7 @@
   ],
   "name": "equalVarianceGaussianAUCFromExplainedR2",
   "module": "PortabilityDrift",
-  "line": 3226,
+  "line": 3209,
   "family": "invariant",
   "n_checks": 2,
   "severity": 120.0
@@ -15927,7 +16188,7 @@
   ],
   "name": "equalVarianceGaussianAUCFromSNR",
   "module": "PortabilityDrift",
-  "line": 3181,
+  "line": 3150,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -15980,7 +16241,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16008,7 +16270,7 @@
   ],
   "name": "equalVarianceGaussianAUCFromVariances",
   "module": "PortabilityDrift",
-  "line": 3193,
+  "line": 3162,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -16040,7 +16302,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16072,7 +16335,7 @@
   ],
   "name": "exactCalibratedBrierRiskFromR2",
   "module": "PortabilityDrift",
-  "line": 3065,
+  "line": 3034,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -16125,7 +16388,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16185,7 +16449,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16217,7 +16482,7 @@
   ],
   "name": "expectedSqMeanPGSDiff_IMEquilibrium",
   "module": "PortabilityDrift",
-  "line": 3998,
+  "line": 4048,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -16258,7 +16523,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16290,7 +16556,7 @@
   ],
   "name": "expectedSqMeanPGSDiff_pureSplit",
   "module": "PortabilityDrift",
-  "line": 3988,
+  "line": 4038,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -16313,7 +16579,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16345,7 +16612,7 @@
   ],
   "name": "freqCorrFromFst",
   "module": "PortabilityDrift",
-  "line": 4258,
+  "line": 4308,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -16386,7 +16653,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16437,7 +16705,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16510,7 +16779,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16538,7 +16808,7 @@
   ],
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4727,
+  "line": 4777,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -16597,7 +16867,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16621,7 +16892,7 @@
   ],
   "name": "fstMigDriftEquil",
   "module": "PortabilityDrift",
-  "line": 5304,
+  "line": 5448,
   "family": "invariant",
   "n_checks": 6,
   "severity": -1.0
@@ -16662,7 +16933,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16694,7 +16966,7 @@
   ],
   "name": "fstMigDriftNext",
   "module": "PortabilityDrift",
-  "line": 5269,
+  "line": 5413,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -16753,7 +17025,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16777,7 +17050,7 @@
   ],
   "name": "fstMigrationDriftEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4569,
+  "line": 4619,
   "family": "invariant",
   "n_checks": 6,
   "severity": -1.0
@@ -16809,7 +17082,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -16958,7 +17232,7 @@
   ],
   "name": "ibdFlowStep",
   "module": "PortabilityDrift",
-  "line": 4094,
+  "line": 4144,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -16990,7 +17264,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17022,7 +17297,7 @@
   ],
   "name": "ibdRecurrenceFixedPoint",
   "module": "PortabilityDrift",
-  "line": 4620,
+  "line": 4670,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -17061,7 +17336,7 @@
   ],
   "name": "ibdRecurrenceStep",
   "module": "PortabilityDrift",
-  "line": 4607,
+  "line": 4657,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -17100,7 +17375,7 @@
   ],
   "name": "islandFstMultiplicativeStep",
   "module": "PortabilityDrift",
-  "line": 4710,
+  "line": 4760,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -17141,7 +17416,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17173,7 +17449,7 @@
   ],
   "name": "ldCorrelationDecay",
   "module": "PortabilityDrift",
-  "line": 2106,
+  "line": 2075,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -17196,7 +17472,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17228,7 +17505,7 @@
   ],
   "name": "ldOverlapFromSharedLD",
   "module": "PortabilityDrift",
-  "line": 4262,
+  "line": 4312,
   "family": "invariant",
   "n_checks": 2,
   "severity": -1.0
@@ -17260,7 +17537,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17292,7 +17570,7 @@
   ],
   "name": "logLossRegretPoint",
   "module": "PortabilityDrift",
-  "line": 3900,
+  "line": 3950,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -17333,7 +17611,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17365,7 +17644,7 @@
   ],
   "name": "logLossRegretRatio",
   "module": "PortabilityDrift",
-  "line": 3904,
+  "line": 3954,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -17406,7 +17685,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17434,7 +17714,7 @@
   ],
   "name": "neutralAFBenchmarkFromRecurrence",
   "module": "PortabilityDrift",
-  "line": 5386,
+  "line": 5530,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -17476,11 +17756,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (upper edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -17512,7 +17794,7 @@
   ],
   "name": "neutralAFBenchmarkRatio",
   "module": "PortabilityDrift",
-  "line": 2982,
+  "line": 2951,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -17574,7 +17856,8 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (upper edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       },
       {
        "point": {
@@ -17589,11 +17872,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (lower edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 2,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 2
     }
    }
   ],
@@ -17625,7 +17910,7 @@
   ],
   "name": "neutralAFSharedLDBenchmarkRatio",
   "module": "PortabilityDrift",
-  "line": 4424,
+  "line": 4474,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -17657,7 +17942,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17721,7 +18007,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17785,7 +18072,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17858,7 +18146,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17931,7 +18220,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -17995,7 +18285,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18068,7 +18359,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18100,7 +18392,7 @@
   ],
   "name": "presentDayPGSVarianceMutationDrift",
   "module": "PortabilityDrift",
-  "line": 4349,
+  "line": 4399,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -18141,7 +18433,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18223,7 +18516,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18255,7 +18549,7 @@
   ],
   "name": "presentDayR2MutationDrift",
   "module": "PortabilityDrift",
-  "line": 4394,
+  "line": 4444,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -18296,7 +18590,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18369,7 +18664,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18406,190 +18702,7 @@
   "n_checks": 4,
   "severity": -1.0
  },
- "PortabilityDrift.scaledMigrationRate": {
-  "checks": [
-   {
-    "kind": "continuity",
-    "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "continuity",
-    "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "totality",
-    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
-    "holds": true,
-    "detail": {
-     "findings": [],
-     "n_findings": 0,
-     "n_with_finite_limit": 0
-    }
-   }
-  ],
-  "skipped": [
-   {
-    "kind": "symmetry",
-    "reason": "no two parameters name the same quantity for two populations"
-   },
-   {
-    "kind": "scale",
-    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['Ne', 'm']"
-   },
-   {
-    "kind": "absorbing",
-    "reason": "no allele-frequency state argument"
-   },
-   {
-    "kind": "limit-Ne",
-    "reason": "`scaledMigrationRate` is not an F_ST-like quantity; a retention or drift FACTOR tends to one, not zero, so the direction is not derivable from the name alone"
-   },
-   {
-    "kind": "limit-freq",
-    "reason": "not a heterozygosity of a frequency"
-   },
-   {
-    "kind": "monotone",
-    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
-   }
-  ],
-  "name": "scaledMigrationRate",
-  "module": "PortabilityDrift",
-  "line": 4759,
-  "family": "invariant",
-  "n_checks": 3,
-  "severity": -1.0
- },
- "PortabilityDrift.sharedLDFromMigration": {
-  "checks": [
-   {
-    "kind": "continuity",
-    "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "totality",
-    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
-    "holds": true,
-    "detail": {
-     "findings": [],
-     "n_findings": 0,
-     "n_with_finite_limit": 0
-    }
-   }
-  ],
-  "skipped": [
-   {
-    "kind": "symmetry",
-    "reason": "no two parameters name the same quantity for two populations"
-   },
-   {
-    "kind": "scale",
-    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['M']"
-   },
-   {
-    "kind": "absorbing",
-    "reason": "no allele-frequency state argument"
-   },
-   {
-    "kind": "limit-Ne",
-    "reason": "no effective-population-size argument"
-   },
-   {
-    "kind": "limit-freq",
-    "reason": "not a heterozygosity of a frequency"
-   },
-   {
-    "kind": "monotone",
-    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
-   }
-  ],
-  "name": "sharedLDFromMigration",
-  "module": "PortabilityDrift",
-  "line": 4966,
-  "family": "invariant",
-  "n_checks": 2,
-  "severity": -1.0
- },
- "PortabilityDrift.sharedLD_from_equilibrium": {
-  "checks": [
-   {
-    "kind": "continuity",
-    "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "continuity",
-    "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "totality",
-    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
-    "holds": true,
-    "detail": {
-     "findings": [],
-     "n_findings": 0,
-     "n_with_finite_limit": 0
-    }
-   }
-  ],
-  "skipped": [
-   {
-    "kind": "symmetry",
-    "reason": "no two parameters name the same quantity for two populations"
-   },
-   {
-    "kind": "scale",
-    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['Ne', 'm']"
-   },
-   {
-    "kind": "absorbing",
-    "reason": "no allele-frequency state argument"
-   },
-   {
-    "kind": "limit-Ne",
-    "reason": "`sharedLD_from_equilibrium` is not an F_ST-like quantity; a retention or drift FACTOR tends to one, not zero, so the direction is not derivable from the name alone"
-   },
-   {
-    "kind": "limit-freq",
-    "reason": "not a heterozygosity of a frequency"
-   },
-   {
-    "kind": "monotone",
-    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
-   }
-  ],
-  "name": "sharedLD_from_equilibrium",
-  "module": "PortabilityDrift",
-  "line": 4940,
-  "family": "invariant",
-  "n_checks": 3,
-  "severity": -1.0
- },
- "PortabilityDrift.signalRetentionMigrationDrift": {
+ "PortabilityDrift.retainedSignalVarianceMigrationDrift": {
   "checks": [
    {
     "kind": "continuity",
@@ -18625,7 +18738,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18637,6 +18751,257 @@
    {
     "kind": "scale",
     "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are ['V_A'] of ['V_A', 'Ne', 'm']"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "`retainedSignalVarianceMigrationDrift` is not an F_ST-like quantity; a retention or drift FACTOR tends to one, not zero, so the direction is not derivable from the name alone"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "monotone",
+    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+   }
+  ],
+  "name": "retainedSignalVarianceMigrationDrift",
+  "module": "PortabilityDrift",
+  "line": 5131,
+  "family": "invariant",
+  "n_checks": 4,
+  "severity": -1.0
+ },
+ "PortabilityDrift.scaledMigrationRate": {
+  "checks": [
+   {
+    "kind": "continuity",
+    "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "continuity",
+    "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "totality",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
+    "holds": true,
+    "detail": {
+     "findings": [],
+     "n_findings": 0,
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
+    }
+   }
+  ],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['Ne', 'm']"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "`scaledMigrationRate` is not an F_ST-like quantity; a retention or drift FACTOR tends to one, not zero, so the direction is not derivable from the name alone"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "monotone",
+    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+   }
+  ],
+  "name": "scaledMigrationRate",
+  "module": "PortabilityDrift",
+  "line": 4809,
+  "family": "invariant",
+  "n_checks": 3,
+  "severity": -1.0
+ },
+ "PortabilityDrift.sharedLDFromMigration": {
+  "checks": [
+   {
+    "kind": "continuity",
+    "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "totality",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
+    "holds": true,
+    "detail": {
+     "findings": [],
+     "n_findings": 0,
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
+    }
+   }
+  ],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['M']"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "no effective-population-size argument"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "monotone",
+    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+   }
+  ],
+  "name": "sharedLDFromMigration",
+  "module": "PortabilityDrift",
+  "line": 5056,
+  "family": "invariant",
+  "n_checks": 2,
+  "severity": -1.0
+ },
+ "PortabilityDrift.sharedLD_from_equilibrium": {
+  "checks": [
+   {
+    "kind": "continuity",
+    "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "continuity",
+    "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "totality",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
+    "holds": true,
+    "detail": {
+     "findings": [],
+     "n_findings": 0,
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
+    }
+   }
+  ],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['Ne', 'm']"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "`sharedLD_from_equilibrium` is not an F_ST-like quantity; a retention or drift FACTOR tends to one, not zero, so the direction is not derivable from the name alone"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "monotone",
+    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+   }
+  ],
+  "name": "sharedLD_from_equilibrium",
+  "module": "PortabilityDrift",
+  "line": 5030,
+  "family": "invariant",
+  "n_checks": 3,
+  "severity": -1.0
+ },
+ "PortabilityDrift.signalRetentionMigrationDrift": {
+  "checks": [
+   {
+    "kind": "continuity",
+    "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "continuity",
+    "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "totality",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
+    "holds": true,
+    "detail": {
+     "findings": [],
+     "n_findings": 0,
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
+    }
+   }
+  ],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are [] of ['Ne', 'm']"
    },
    {
     "kind": "absorbing",
@@ -18657,9 +19022,9 @@
   ],
   "name": "signalRetentionMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 5017,
+  "line": 5120,
   "family": "invariant",
-  "n_checks": 4,
+  "n_checks": 3,
   "severity": -1.0
  },
  "PortabilityDrift.sourceBrierFromR2": {
@@ -18689,7 +19054,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18721,7 +19087,7 @@
   ],
   "name": "sourceBrierFromR2",
   "module": "PortabilityDrift",
-  "line": 3087,
+  "line": 3056,
   "family": "invariant",
   "n_checks": 3,
   "severity": -1.0
@@ -18762,7 +19128,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18794,7 +19161,7 @@
   ],
   "name": "steppingStoneFst",
   "module": "PortabilityDrift",
-  "line": 4878,
+  "line": 4945,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -18844,7 +19211,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18876,7 +19244,7 @@
   ],
   "name": "targetBrierFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3107,
+  "line": 3076,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -18926,7 +19294,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -18958,7 +19327,7 @@
   ],
   "name": "targetExactCalibratedBrierRisk",
   "module": "PortabilityDrift",
-  "line": 3100,
+  "line": 3069,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -18999,7 +19368,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19031,7 +19401,7 @@
   ],
   "name": "targetExactGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3755,
+  "line": 3805,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -19072,7 +19442,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19104,7 +19475,7 @@
   ],
   "name": "targetGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3074,
+  "line": 3043,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -19136,7 +19507,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19200,7 +19572,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19273,7 +19646,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19305,7 +19679,7 @@
   ],
   "name": "targetR2FromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 2908,
+  "line": 2877,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -19328,7 +19702,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19422,7 +19797,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19564,7 +19940,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19628,7 +20005,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19779,7 +20157,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19843,7 +20222,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -19907,7 +20287,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20040,7 +20421,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20095,7 +20477,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20159,7 +20542,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20223,7 +20607,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20326,7 +20711,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20438,7 +20824,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20550,7 +20937,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20614,7 +21002,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20726,7 +21115,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20877,7 +21267,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -20932,7 +21323,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21005,7 +21397,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21069,7 +21462,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21133,7 +21527,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21215,7 +21610,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21288,7 +21684,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21352,7 +21749,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21443,7 +21841,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21507,11 +21906,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (upper edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 1,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 1
     }
    }
   ],
@@ -21575,7 +21976,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21649,7 +22051,8 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (lower edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       },
       {
        "point": {
@@ -21662,11 +22065,13 @@
        "value": 0.0,
        "limit": Infinity,
        "limit_kind": "limit from inside the box (upper edge)",
-       "severity_note": "the limit is infinite, so the quantity is genuinely undefined here and the junk value is a modelling choice rather than a wrong finite answer"
+       "klass": "direction-inverted",
+       "severity_note": "the limit diverges to +infinity and the definition returns 0, the opposite extreme; there is no right finite answer, but this one inverts the direction"
       }
      ],
      "n_findings": 2,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 2
     }
    }
   ],
@@ -21769,7 +22174,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21833,7 +22239,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21888,7 +22295,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -21952,7 +22360,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -22016,7 +22425,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -22080,7 +22490,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -22183,7 +22594,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -22568,7 +22980,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -22600,7 +23013,7 @@
   ],
   "name": "optimalFineTuningMSE",
   "module": "TransferLearningPGS",
-  "line": 2333,
+  "line": 2410,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -22641,7 +23054,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -22673,7 +23087,7 @@
   ],
   "name": "optimalSourceShrinkageWeight",
   "module": "TransferLearningPGS",
-  "line": 1386,
+  "line": 1463,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -22705,7 +23119,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -22769,7 +23184,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -22851,7 +23267,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -22924,7 +23341,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -23093,7 +23511,7 @@
   ],
   "name": "privateArchitectureTransferCeiling",
   "module": "TransferLearningPGS",
-  "line": 2961,
+  "line": 3038,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -23134,7 +23552,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -23166,7 +23585,7 @@
   ],
   "name": "requiredTargetSamplesForOptimalFineTuningMSE",
   "module": "TransferLearningPGS",
-  "line": 2383,
+  "line": 2460,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -23207,7 +23626,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -23239,7 +23659,7 @@
   ],
   "name": "sampleLimitedScratchTargetR2",
   "module": "TransferLearningPGS",
-  "line": 1225,
+  "line": 1241,
   "family": "invariant",
   "n_checks": 4,
   "severity": -1.0
@@ -23317,7 +23737,7 @@
   ],
   "name": "scratchVsFineTuningCriticalSampleSize",
   "module": "TransferLearningPGS",
-  "line": 1284,
+  "line": 1361,
   "family": "invariant",
   "n_checks": 0,
   "severity": -1.0
@@ -23367,7 +23787,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -23399,7 +23820,7 @@
   ],
   "name": "sourceShrinkageMSE",
   "module": "TransferLearningPGS",
-  "line": 1379,
+  "line": 1456,
   "family": "invariant",
   "n_checks": 5,
   "severity": -1.0
@@ -23431,7 +23852,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -23466,6 +23888,80 @@
   "line": 1127,
   "family": "invariant",
   "n_checks": 3,
+  "severity": -1.0
+ },
+ "TransferLearningPGS.usableScratchTargetR2": {
+  "checks": [
+   {
+    "kind": "continuity",
+    "why": "`oracle_target_r2` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "continuity",
+    "why": "`noiseVar` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "continuity",
+    "why": "`nTarget` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
+    "holds": true,
+    "detail": {
+     "violations": [],
+     "n_violations": 0
+    }
+   },
+   {
+    "kind": "totality",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
+    "holds": true,
+    "detail": {
+     "findings": [],
+     "n_findings": 0,
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
+    }
+   }
+  ],
+  "skipped": [
+   {
+    "kind": "symmetry",
+    "reason": "no two parameters name the same quantity for two populations"
+   },
+   {
+    "kind": "scale",
+    "reason": "the scaling transformation is only well defined when every argument is a second moment of the same degree; here moments are ['noiseVar'] of ['oracle_target_r2', 'noiseVar', 'nTarget']"
+   },
+   {
+    "kind": "absorbing",
+    "reason": "no allele-frequency state argument"
+   },
+   {
+    "kind": "limit-Ne",
+    "reason": "no effective-population-size argument"
+   },
+   {
+    "kind": "limit-freq",
+    "reason": "not a heterozygosity of a frequency"
+   },
+   {
+    "kind": "monotone",
+    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+   }
+  ],
+  "name": "usableScratchTargetR2",
+  "module": "TransferLearningPGS",
+  "line": 1274,
+  "family": "invariant",
+  "n_checks": 4,
   "severity": -1.0
  },
  "TransportIdentities.explainableFraction": {
@@ -23708,7 +24204,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -23772,7 +24269,8 @@
     "detail": {
      "findings": [],
      "n_findings": 0,
-     "n_with_finite_limit": 0
+     "n_wrong_finite_value": 0,
+     "n_direction_inverted": 0
     }
    }
   ],
@@ -24097,12 +24595,12 @@
   "family": "invariant",
   "severity": -1.0
  },
- "CondensationUnification.hweObservableContent": {
+ "CondensationUnification.hweLevelOne": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
   "verdict": "not-transpiled",
-  "reason": "non-scalar signature (GenotypeObservableContent where drift)",
+  "reason": "non-scalar signature (LevelChannels where drift)",
   "family": "invariant",
   "severity": -1.0
  },
@@ -24112,6 +24610,24 @@
   "n_checks": 0,
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (GenotypeDesign n \u03b9)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "CondensationUnification.moment": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "CondensationUnification.centeredSquareThirdMoment": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
   "family": "invariant",
   "severity": -1.0
  },
@@ -24862,6 +25378,24 @@
   "family": "invariant",
   "severity": -1.0
  },
+ "EpistaticChaos.HardyWeinbergModel.centeredSquare": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "invariant",
+  "severity": -1.0
+ },
+ "EpistaticChaos.HardyWeinbergModel.reflect": {
+  "checks": [],
+  "skipped": [],
+  "n_checks": 0,
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (HardyWeinbergModel where altFreq)",
+  "family": "invariant",
+  "severity": -1.0
+ },
  "EpistaticChaos.interactionOrder": {
   "checks": [],
   "skipped": [],
@@ -25420,24 +25954,6 @@
   "family": "invariant",
   "severity": -1.0
  },
- "ObservationalCeiling.congrProp": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (ProbeBlindness probe Q where positive)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "ObservationalCeiling.comap": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (ProbeBlindness (fun o => coarse (probe o)) P where positive)",
-  "family": "invariant",
-  "severity": -1.0
- },
  "ObservationalCeiling.and": {
   "checks": [],
   "skipped": [],
@@ -25453,15 +25969,6 @@
   "n_checks": 0,
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (ProbeBlindness (fun o => fun i => p i o) P where positive)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "ObservationalCeiling.ProbeBlindness.toApprox": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (ApproxProbeBlindness close probe P where positive)",
   "family": "invariant",
   "severity": -1.0
  },
@@ -26788,7 +27295,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sigmaTagCausalSource": {
+ "PortabilityDrift.sigmaTagCausal": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26797,16 +27304,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sigmaTagCausalTarget": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (Matrix (Fin p) (Fin q) \u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetTotalEffect": {
+ "PortabilityDrift.totalEffect": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26878,16 +27376,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sourceCrossCovariance": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (Fin p \u2192 \u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetCrossCovariance": {
+ "PortabilityDrift.crossCovariance": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26914,16 +27403,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sourceTaggingProjection": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (Fin p \u2192 \u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetTaggingProjection": {
+ "PortabilityDrift.taggingProjection": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26968,7 +27448,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sourceDirectCausalProjection": {
+ "PortabilityDrift.directCausalProjection": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -26977,25 +27457,7 @@
   "family": "invariant",
   "severity": -1.0
  },
- "PortabilityDrift.sourceProxyTaggingProjection": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (Fin p \u2192 \u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetDirectCausalProjection": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (Fin p \u2192 \u211d)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "PortabilityDrift.targetProxyTaggingProjection": {
+ "PortabilityDrift.proxyTaggingProjection": {
   "checks": [],
   "skipped": [],
   "n_checks": 0,
@@ -28147,24 +28609,6 @@
   "family": "invariant",
   "severity": -1.0
  },
- "SelectionValidation.stabilizingSelectionSummary": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (SelectionModelSummary where predictedEffectCorrelation)",
-  "family": "invariant",
-  "severity": -1.0
- },
- "SelectionValidation.fluctuatingSelectionSummary": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "non-scalar signature (SelectionModelSummary where predictedEffectCorrelation)",
-  "family": "invariant",
-  "severity": -1.0
- },
  "SelectionValidation.selectionSummaryLogLik": {
   "checks": [],
   "skipped": [],
@@ -29098,15 +29542,6 @@
   "n_checks": 0,
   "verdict": "not-transpiled",
   "reason": "depends on an uncompiled definition: name 'LongitudinalPortability_temporalR2' is not defined",
-  "family": "invariant",
-  "severity": -1.0
- },
- "MetricSpecificPortability.ldBlockReconstructionShare": {
-  "checks": [],
-  "skipped": [],
-  "n_checks": 0,
-  "verdict": "not-transpiled",
-  "reason": "depends on an uncompiled definition: name 'MetricSpecificPortability_ldBandReconstructionShare' is not defined",
   "family": "invariant",
   "severity": -1.0
  },

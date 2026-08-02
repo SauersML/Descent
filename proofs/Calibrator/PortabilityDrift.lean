@@ -1134,6 +1134,17 @@ inductive Pop where
   | target
   deriving DecidableEq, Repr
 
+/-- A population-indexed value given by its two components. Model literals supply their
+fields with this, so a field that genuinely differs between populations still reads as one
+line rather than two. -/
+def Pop.pair {α : Sort*} (s t : α) : Pop → α
+  | Pop.source => s
+  | Pop.target => t
+
+@[simp] theorem Pop.pair_source {α : Sort*} (s t : α) : Pop.pair s t Pop.source = s := rfl
+
+@[simp] theorem Pop.pair_target {α : Sort*} (s t : α) : Pop.pair s t Pop.target = t := rfl
+
 structure CrossPopulationMetricModel (p q : ℕ) where
   beta : Pop → Fin q → ℝ
   sigmaTag : Pop → Matrix (Fin p) (Fin p) ℝ

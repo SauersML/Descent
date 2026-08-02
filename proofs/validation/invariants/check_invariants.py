@@ -57,8 +57,8 @@ def check_one(c, defs):
             out.append(dict(kind="totality", why="junk-branch scan",
                             holds=None, detail=dict(error=str(e))))
         else:
-            finite = [f for f in tf if f["limit"] not in (float("inf"),
-                                                          float("-inf"))]
+            finite = [f for f in tf if f.get("klass") == "wrong-finite-value"]
+            inverted = [f for f in tf if f.get("klass") == "direction-inverted"]
             out.append(dict(
                 kind="totality",
                 why="Lean totalises x/0, log 0 and sqrt of a negative to 0; "
@@ -67,7 +67,8 @@ def check_one(c, defs):
                     "wrong answer inside the domain, not a harmless artifact",
                 holds=not finite,
                 detail=dict(findings=tf[:4], n_findings=len(tf),
-                            n_with_finite_limit=len(finite))))
+                            n_wrong_finite_value=len(finite),
+                            n_direction_inverted=len(inverted))))
     else:
         skipped.append(("totality", f"cannot place a physically meaningful "
                                     f"box on {blind}" if blind
