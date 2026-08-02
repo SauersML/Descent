@@ -467,7 +467,7 @@ theorem mechanistic_transport_disrupts_calibration_slope_and_brier
     (h_target_slope_lt : calibrationSlopeFromSourceWeights cal.metric Pop.target < 1)
     (h_r2_drop :
       r2FromSourceWeights cal.metric Pop.target < r2FromSourceWeights cal.metric Pop.source) :
-    let profile := cal.targetIdentityCalibrationProfile
+    let profile := (cal.identityCalibrationProfile Pop.target)
     profile.slope < 1 ∧
     calibrationSlopeDeviation 1 < profile.slopeDeviation ∧
     profile.slopeDeviation = 1 - profile.slope ∧
@@ -480,32 +480,32 @@ theorem mechanistic_transport_disrupts_calibration_slope_and_brier
         cal.metric cal.metric.targetPrevalence <
       targetCalibratedBrierFromSourceWeights cal.metric := by
   dsimp
-  have hslope_lt : (cal.targetIdentityCalibrationProfile).slope < 1 := by
-    simpa [CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile] using
+  have hslope_lt : ((cal.identityCalibrationProfile Pop.target)).slope < 1 := by
+    simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.target),
+      CrossPopulationMechanisticCalibrationModel.calibrationProfile] using
       h_target_slope_lt
   have hslope_dev_pos :
       calibrationSlopeDeviation 1 <
-        (cal.targetIdentityCalibrationProfile).slopeDeviation := by
+        ((cal.identityCalibrationProfile Pop.target)).slopeDeviation := by
     unfold CalibrationProfile.slopeDeviation calibrationSlopeDeviation
     rw [show (1 : ℝ) - 1 = 0 by ring, abs_zero]
-    have hneg : (cal.targetIdentityCalibrationProfile).slope - 1 < 0 := by
+    have hneg : ((cal.identityCalibrationProfile Pop.target)).slope - 1 < 0 := by
       linarith
     rw [abs_of_neg hneg]
     linarith
   have hslope_dev :
-      (cal.targetIdentityCalibrationProfile).slopeDeviation =
-        1 - (cal.targetIdentityCalibrationProfile).slope := by
+      ((cal.identityCalibrationProfile Pop.target)).slopeDeviation =
+        1 - ((cal.identityCalibrationProfile Pop.target)).slope := by
     exact calibrationSlopeDeviation_eq_one_sub_of_lt_one
-      (cal.targetIdentityCalibrationProfile).slope hslope_lt
+      ((cal.identityCalibrationProfile Pop.target)).slope hslope_lt
   have hslope_eq :
-      (cal.targetIdentityCalibrationProfile).slope =
+      ((cal.identityCalibrationProfile Pop.target)).slope =
         (sourceWeightedTagScore cal.metric (directCausalProjection cal.metric Pop.target) +
           sourceWeightedTagScore cal.metric (proxyTaggingProjection cal.metric Pop.target) +
           sourceWeightedTagScore cal.metric (cal.metric.contextCross Pop.target)) /
             scoreVarianceFromSourceWeights cal.metric Pop.target := by
-    simpa [CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile] using
+    simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.target),
+      CrossPopulationMechanisticCalibrationModel.calibrationProfile] using
       CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law
         cal CalibrationLink.identity
   have hbrier :

@@ -266,9 +266,9 @@ transported SNP-level score law says so.**
 theorem mechanistic_target_identity_calibration_slope_lt_one
     {p q : ℕ} (cal : CrossPopulationMechanisticCalibrationModel p q)
     (h_target_slope_lt : calibrationSlopeFromSourceWeights cal.metric Pop.target < 1) :
-    (cal.targetIdentityCalibrationProfile).slope < 1 := by
-  simpa [CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
-    CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile] using
+    ((cal.identityCalibrationProfile Pop.target)).slope < 1 := by
+  simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.target),
+    CrossPopulationMechanisticCalibrationModel.calibrationProfile] using
     h_target_slope_lt
 
 /-- **Under mechanistic transport, slope deviation is exactly `1 - slope`
@@ -276,10 +276,10 @@ when the deployed target slope lies below `1`.** -/
 theorem mechanistic_target_identity_calibration_slopeDeviation_eq_one_sub
     {p q : ℕ} (cal : CrossPopulationMechanisticCalibrationModel p q)
     (h_target_slope_lt : calibrationSlopeFromSourceWeights cal.metric Pop.target < 1) :
-    (cal.targetIdentityCalibrationProfile).slopeDeviation =
-      1 - (cal.targetIdentityCalibrationProfile).slope := by
+    ((cal.identityCalibrationProfile Pop.target)).slopeDeviation =
+      1 - ((cal.identityCalibrationProfile Pop.target)).slope := by
   exact calibrationSlopeDeviation_eq_one_sub_of_lt_one
-    (cal.targetIdentityCalibrationProfile).slope
+    ((cal.identityCalibrationProfile Pop.target)).slope
     (mechanistic_target_identity_calibration_slope_lt_one cal h_target_slope_lt)
 
 /-- **Recalibration restores calibration-in-the-large.**

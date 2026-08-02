@@ -815,9 +815,12 @@ optimum.  No abstract covariance is introduced.
 
 section RescalingAndRotation
 
-/-- Rescaling a coefficient vector scales its energy by the square. -/
+/-- Rescaling a coefficient vector scales its energy by the square.
+
+Stated with `•` rather than `fun i => c * x i` so that the scalar-multiplication
+lemmas of `Calibrator.QuadraticShift` apply on the nose. -/
 theorem coefficientEnergy_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
-    coefficientEnergy B (fun i => c * x i) = c ^ 2 * coefficientEnergy B x := by
+    coefficientEnergy B (c • x) = c ^ 2 * coefficientEnergy B x := by
   unfold coefficientEnergy
   rw [matrix_mulVec_smul, dot_smul_left, dot_smul_right]
   ring
@@ -827,10 +830,10 @@ theorem coefficientEnergy_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ)
     coefficientEnergy B (fun i => x i - y i) =
       coefficientEnergy B x + coefficientEnergy B y -
         2 * dot x (B.mulVec y) := by
-  have hrw : (fun i => x i - y i) = (fun i => x i + (-1) * y i) := by
+  have hrw : (fun i => x i - y i) = (fun i => x i + ((-1 : ℝ) • y) i) := by
     funext i
-    ring
-  rw [hrw, coefficientEnergy_add B x (fun i => (-1) * y i) hsymmetric,
+    simp
+  rw [hrw, coefficientEnergy_add B x ((-1 : ℝ) • y) hsymmetric,
     coefficientEnergy_smul, matrix_mulVec_smul, dot_smul_right]
   ring
 
@@ -843,7 +846,11 @@ theorem coefficientEnergy_rescaled_expand
     coefficientEnergy B (fun i => a * beta i - theta i) =
       a ^ 2 * coefficientEnergy B beta -
         2 * a * dot beta (B.mulVec theta) + coefficientEnergy B theta := by
-  rw [coefficientEnergy_sub B (fun i => a * beta i) theta hsymmetric,
+  have hrw : (fun i => a * beta i - theta i) =
+      (fun i => (a • beta) i - theta i) := by
+    funext i
+    rfl
+  rw [hrw, coefficientEnergy_sub B (a • beta) theta hsymmetric,
     coefficientEnergy_smul, dot_smul_left]
   ring
 

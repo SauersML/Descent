@@ -86,11 +86,11 @@ noncomputable def CalibrationMoments.toProfile
 explicit observed and predicted mean shifts and replacing the slope with the
 target slope. -/
 noncomputable def CalibrationMoments.shifted
-    (mom : CalibrationMoments) (observedShift predictedShift targetSlope : ℝ) :
+    (mom : CalibrationMoments) (observedShift predictedShift slope : ℝ) :
     CalibrationMoments where
   meanObserved := mom.meanObserved + observedShift
   meanPredicted := mom.meanPredicted + predictedShift
-  slope := targetSlope
+  slope := slope
 
 /-- Identity-scale calibration profile. -/
 noncomputable def identityCalibrationProfile
@@ -190,20 +190,20 @@ starts later in `CrossPopulationCalibrationShiftModel`. -/
   rfl
 
 @[simp] theorem CalibrationMoments.shifted_meanObserved
-    (mom : CalibrationMoments) (observedShift predictedShift targetSlope : ℝ) :
-    (mom.shifted observedShift predictedShift targetSlope).meanObserved =
+    (mom : CalibrationMoments) (observedShift predictedShift slope : ℝ) :
+    (mom.shifted observedShift predictedShift slope).meanObserved =
       mom.meanObserved + observedShift := by
   rfl
 
 @[simp] theorem CalibrationMoments.shifted_meanPredicted
-    (mom : CalibrationMoments) (observedShift predictedShift targetSlope : ℝ) :
-    (mom.shifted observedShift predictedShift targetSlope).meanPredicted =
+    (mom : CalibrationMoments) (observedShift predictedShift slope : ℝ) :
+    (mom.shifted observedShift predictedShift slope).meanPredicted =
       mom.meanPredicted + predictedShift := by
   rfl
 
 @[simp] theorem CalibrationMoments.shifted_slope
-    (mom : CalibrationMoments) (observedShift predictedShift targetSlope : ℝ) :
-    (mom.shifted observedShift predictedShift targetSlope).slope = targetSlope := by
+    (mom : CalibrationMoments) (observedShift predictedShift slope : ℝ) :
+    (mom.shifted observedShift predictedShift slope).slope = slope := by
   rfl
 
 /-- Generic profile algebra for target-vs-source calibration moments: once the
@@ -212,9 +212,9 @@ change is source CITL plus observed shift minus predicted shift, regardless of
 which link label the profile carries. -/
 theorem CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget
     (mom : CalibrationMoments)
-    (observedShift predictedShift targetSlope : ℝ)
+    (observedShift predictedShift slope : ℝ)
     (link : CalibrationLink) :
-    ((mom.shifted observedShift predictedShift targetSlope).toProfile link).citl =
+    ((mom.shifted observedShift predictedShift slope).toProfile link).citl =
       (mom.toProfile link).citl + observedShift - predictedShift := by
   unfold CalibrationMoments.shifted CalibrationMoments.toProfile
     calibrationProfile calibrationInTheLarge
@@ -315,15 +315,17 @@ change after transport:
 This does not treat target calibration drift as a function of prevalence
 alone. -/
 structure CrossPopulationCalibrationShiftModel where
-  sourceObservedMean : ℝ
-  sourcePredictedMean : ℝ
+  /-- Observed mean in the reference population, from which the target is shifted. -/
+  baseObservedMean : ℝ
+  /-- Predicted mean in the reference population. -/
+  basePredictedMean : ℝ
   prevalenceShift : ℝ
   environmentalObservedShift : ℝ
   geneticObservedShift : ℝ
   scoreMeanShift : ℝ
   deploymentInterceptShift : ℝ
-  sourceSlope : ℝ
-  targetSlope : ℝ
+  /-- Deployed slope in each population. -/
+  slope : Pop → ℝ
 
 /-- Total target observed-mean shift relative to source. -/
 noncomputable def CrossPopulationCalibrationShiftModel.observedMeanShift
@@ -335,131 +337,138 @@ noncomputable def CrossPopulationCalibrationShiftModel.predictedMeanShift
     (m : CrossPopulationCalibrationShiftModel) : ℝ :=
   m.scoreMeanShift + m.deploymentInterceptShift
 
-/-- Source observed mean under the explicit calibration-shift state. -/
-noncomputable def CrossPopulationCalibrationShiftModel.targetObservedMean
-    (m : CrossPopulationCalibrationShiftModel) : ℝ :=
-  m.sourceObservedMean + m.observedMeanShift
+/-- **Observed mean in a population.** The source is the reference; the shift budget
+applies at the target, recorded by `Pop.pair` rather than by a second definition. -/
+noncomputable def CrossPopulationCalibrationShiftModel.observedMean
+    (m : CrossPopulationCalibrationShiftModel) (P : Pop) : ℝ :=
+  m.baseObservedMean + Pop.pair 0 m.observedMeanShift P
 
-/-- Target deployed mean prediction under the explicit calibration-shift state. -/
-noncomputable def CrossPopulationCalibrationShiftModel.targetPredictedMean
-    (m : CrossPopulationCalibrationShiftModel) : ℝ :=
-  m.sourcePredictedMean + m.predictedMeanShift
+/-- **Deployed mean prediction in a population.** -/
+noncomputable def CrossPopulationCalibrationShiftModel.predictedMean
+    (m : CrossPopulationCalibrationShiftModel) (P : Pop) : ℝ :=
+  m.basePredictedMean + Pop.pair 0 m.predictedMeanShift P
 
-/-- Source calibration moments under the explicit shift state.
+/-- **Calibration moments in a population.**
 
-The mechanistic cross-population calibration model talks in terms of observed
-and predicted means plus a deployed slope. These moments are the common bridge
-into the generic `CalibrationProfile` algebra. -/
-noncomputable def CrossPopulationCalibrationShiftModel.sourceCalibrationMoments
-    (m : CrossPopulationCalibrationShiftModel) : CalibrationMoments where
-  meanObserved := m.sourceObservedMean
-  meanPredicted := m.sourcePredictedMean
-  slope := m.sourceSlope
+The mechanistic cross-population calibration model talks in terms of observed and
+predicted means plus a deployed slope. These moments are the common bridge into the
+generic `CalibrationProfile` algebra.
 
-/-- Target calibration moments under the explicit shift state.
+The target moments used to be built by applying a `shifted` budget to the source moments —
+a second route to the same triple, kept in step by hand. Both populations now read their
+own means and slope off one indexed definition, and
+`targetCalibrationMoments_eq_shifted` is the theorem that the shift route agrees. -/
+noncomputable def CrossPopulationCalibrationShiftModel.calibrationMoments
+    (m : CrossPopulationCalibrationShiftModel) (P : Pop) : CalibrationMoments where
+  meanObserved := m.observedMean P
+  meanPredicted := m.predictedMean P
+  slope := m.slope P
 
-These are obtained from source moments by the mechanistic target shift budget:
-observed-mean drift, predicted-mean drift, and target deployed slope. -/
-noncomputable def CrossPopulationCalibrationShiftModel.targetCalibrationMoments
-    (m : CrossPopulationCalibrationShiftModel) : CalibrationMoments :=
-  m.sourceCalibrationMoments.shifted
-    m.observedMeanShift m.predictedMeanShift m.targetSlope
-
-/-- Shared source calibration profile under the explicit shift state. -/
-noncomputable def CrossPopulationCalibrationShiftModel.sourceCalibrationProfile
-    (m : CrossPopulationCalibrationShiftModel) (link : CalibrationLink) :
+/-- **Calibration profile in a population**, at any link. -/
+noncomputable def CrossPopulationCalibrationShiftModel.calibrationProfile
+    (m : CrossPopulationCalibrationShiftModel) (P : Pop) (link : CalibrationLink) :
     CalibrationProfile :=
-  m.sourceCalibrationMoments.toProfile link
+  (m.calibrationMoments P).toProfile link
 
-/-- Shared target calibration profile under the explicit shift state. -/
-noncomputable def CrossPopulationCalibrationShiftModel.targetCalibrationProfile
-    (m : CrossPopulationCalibrationShiftModel) (link : CalibrationLink) :
-    CalibrationProfile :=
-  m.targetCalibrationMoments.toProfile link
+/-- **Identity-scale calibration profile in a population.** -/
+noncomputable def CrossPopulationCalibrationShiftModel.identityCalibrationProfile
+    (m : CrossPopulationCalibrationShiftModel) (P : Pop) : CalibrationProfile :=
+  m.calibrationProfile P CalibrationLink.identity
 
-/-- Source identity-scale calibration profile under the explicit shift state. -/
-noncomputable def CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile
-    (m : CrossPopulationCalibrationShiftModel) : CalibrationProfile :=
-  m.sourceCalibrationProfile CalibrationLink.identity
+@[simp] theorem CrossPopulationCalibrationShiftModel.observedMean_source
+    (m : CrossPopulationCalibrationShiftModel) :
+    m.observedMean Pop.source = m.baseObservedMean := by
+  simp [CrossPopulationCalibrationShiftModel.observedMean]
 
-/-- Target identity-scale calibration profile under the explicit shift state. -/
-noncomputable def CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile
-    (m : CrossPopulationCalibrationShiftModel) : CalibrationProfile :=
-  m.targetCalibrationProfile CalibrationLink.identity
+@[simp] theorem CrossPopulationCalibrationShiftModel.predictedMean_source
+    (m : CrossPopulationCalibrationShiftModel) :
+    m.predictedMean Pop.source = m.basePredictedMean := by
+  simp [CrossPopulationCalibrationShiftModel.predictedMean]
+
+/-- **The target moments are the source moments carried by the shift budget.** This used
+to be the definition of the target moments; it is now a theorem relating two routes. -/
+theorem CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted
+    (m : CrossPopulationCalibrationShiftModel) :
+    m.calibrationMoments Pop.target =
+      (m.calibrationMoments Pop.source).shifted
+        m.observedMeanShift m.predictedMeanShift (m.slope Pop.target) := by
+  simp [CrossPopulationCalibrationShiftModel.calibrationMoments,
+    CrossPopulationCalibrationShiftModel.observedMean,
+    CrossPopulationCalibrationShiftModel.predictedMean, CalibrationMoments.shifted]
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.sourceCalibrationMoments_meanObserved
     (m : CrossPopulationCalibrationShiftModel) :
-    m.sourceCalibrationMoments.meanObserved = m.sourceObservedMean := by
+    (m.calibrationMoments Pop.source).meanObserved = (m.observedMean Pop.source) := by
   rfl
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.sourceCalibrationMoments_meanPredicted
     (m : CrossPopulationCalibrationShiftModel) :
-    m.sourceCalibrationMoments.meanPredicted = m.sourcePredictedMean := by
+    (m.calibrationMoments Pop.source).meanPredicted = (m.predictedMean Pop.source) := by
   rfl
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.sourceCalibrationMoments_slope
     (m : CrossPopulationCalibrationShiftModel) :
-    m.sourceCalibrationMoments.slope = m.sourceSlope := by
+    (m.calibrationMoments Pop.source).slope = (m.slope Pop.source) := by
   rfl
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_source_shifted
     (m : CrossPopulationCalibrationShiftModel) :
-    m.targetCalibrationMoments =
-      m.sourceCalibrationMoments.shifted
-        m.observedMeanShift m.predictedMeanShift m.targetSlope := by
+    (m.calibrationMoments Pop.target) =
+      (m.calibrationMoments Pop.source).shifted
+        m.observedMeanShift m.predictedMeanShift (m.slope Pop.target) := by
   rfl
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.sourceCalibrationProfile_eq_toProfile
     (m : CrossPopulationCalibrationShiftModel) (link : CalibrationLink) :
-    m.sourceCalibrationProfile link =
-      m.sourceCalibrationMoments.toProfile link := by
+    m.calibrationProfile Pop.source link =
+      (m.calibrationMoments Pop.source).toProfile link := by
   rfl
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.targetCalibrationProfile_eq_toProfile
     (m : CrossPopulationCalibrationShiftModel) (link : CalibrationLink) :
-    m.targetCalibrationProfile link =
-      m.targetCalibrationMoments.toProfile link := by
+    m.calibrationProfile Pop.target link =
+      (m.calibrationMoments Pop.target).toProfile link := by
   rfl
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.targetObservedMean_eq
     (m : CrossPopulationCalibrationShiftModel) :
-    m.targetObservedMean =
-      m.sourceObservedMean +
+    (m.observedMean Pop.target) =
+      (m.observedMean Pop.source) +
         m.prevalenceShift + m.environmentalObservedShift + m.geneticObservedShift := by
-  simp [CrossPopulationCalibrationShiftModel.targetObservedMean,
+  simp [(CrossPopulationCalibrationShiftModel.observedMean Pop.target),
     CrossPopulationCalibrationShiftModel.observedMeanShift, add_left_comm,
     add_comm]
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.targetPredictedMean_eq
     (m : CrossPopulationCalibrationShiftModel) :
-    m.targetPredictedMean =
-      m.sourcePredictedMean + m.scoreMeanShift + m.deploymentInterceptShift := by
-  simp [CrossPopulationCalibrationShiftModel.targetPredictedMean,
+    (m.predictedMean Pop.target) =
+      (m.predictedMean Pop.source) + m.scoreMeanShift + m.deploymentInterceptShift := by
+  simp [(CrossPopulationCalibrationShiftModel.predictedMean Pop.target),
     CrossPopulationCalibrationShiftModel.predictedMeanShift, add_assoc]
 
 /-- Generic CITL bridge: the mechanistic target shift budget feeds directly into
 the shared calibration-profile algebra for any chosen link label. -/
 theorem CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget
     (m : CrossPopulationCalibrationShiftModel) (link : CalibrationLink) :
-    (m.targetCalibrationProfile link).citl =
-      (m.sourceCalibrationProfile link).citl +
+    (m.calibrationProfile Pop.target link).citl =
+      (m.calibrationProfile Pop.source link).citl +
         m.observedMeanShift - m.predictedMeanShift := by
-  simpa [CrossPopulationCalibrationShiftModel.targetCalibrationProfile,
-    CrossPopulationCalibrationShiftModel.sourceCalibrationProfile,
-    CrossPopulationCalibrationShiftModel.targetCalibrationMoments,
-    CrossPopulationCalibrationShiftModel.sourceCalibrationMoments] using
+  simpa [CrossPopulationCalibrationShiftModel.calibrationProfile,
+    CrossPopulationCalibrationShiftModel.calibrationProfile,
+    (CrossPopulationCalibrationShiftModel.calibrationMoments Pop.target),
+    (CrossPopulationCalibrationShiftModel.calibrationMoments Pop.source)] using
     CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget
-      m.sourceCalibrationMoments
-      m.observedMeanShift m.predictedMeanShift m.targetSlope link
+      (m.calibrationMoments Pop.source)
+      m.observedMeanShift m.predictedMeanShift (m.slope Pop.target) link
 
 /-- Exact CITL decomposition under the explicit calibration-shift budget. -/
 theorem CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget
     (m : CrossPopulationCalibrationShiftModel) :
-    (m.targetIdentityCalibrationProfile).citl =
-      (m.sourceIdentityCalibrationProfile).citl +
+    ((m.identityCalibrationProfile Pop.target)).citl =
+      ((m.identityCalibrationProfile Pop.source)).citl +
         m.observedMeanShift - m.predictedMeanShift := by
-  simpa [CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile,
-    CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile] using
+  simpa [(CrossPopulationCalibrationShiftModel.identityCalibrationProfile Pop.target),
+    (CrossPopulationCalibrationShiftModel.identityCalibrationProfile Pop.source)] using
     CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget
       m CalibrationLink.identity
 
@@ -467,8 +476,8 @@ theorem CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shif
 full explicit shift budget: observed-mean drift minus predicted-mean drift. -/
 theorem source_calibrated_target_citl_eq_shift_budget
     (m : CrossPopulationCalibrationShiftModel)
-    (h_src_cal : (m.sourceIdentityCalibrationProfile).citl = 0) :
-    (m.targetIdentityCalibrationProfile).citl =
+    (h_src_cal : ((m.identityCalibrationProfile Pop.source)).citl = 0) :
+    ((m.identityCalibrationProfile Pop.target)).citl =
       m.observedMeanShift - m.predictedMeanShift := by
   rw [m.target_citl_eq_source_citl_add_shift_budget, h_src_cal]
   ring
@@ -477,8 +486,8 @@ theorem source_calibrated_target_citl_eq_shift_budget
 absolute explicit shift budget. -/
 theorem source_calibrated_target_abs_citl_eq_abs_shift_budget
     (m : CrossPopulationCalibrationShiftModel)
-    (h_src_cal : (m.sourceIdentityCalibrationProfile).citl = 0) :
-    |(m.targetIdentityCalibrationProfile).citl| =
+    (h_src_cal : ((m.identityCalibrationProfile Pop.source)).citl = 0) :
+    |((m.identityCalibrationProfile Pop.target)).citl| =
       |m.observedMeanShift - m.predictedMeanShift| := by
   rw [source_calibrated_target_citl_eq_shift_budget m h_src_cal]
 
@@ -487,12 +496,12 @@ the explicit calibration budget reduces to pure prevalence shift. This is a
 special case, not the general cross-population calibration law. -/
 theorem source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts
     (m : CrossPopulationCalibrationShiftModel)
-    (h_src_cal : (m.sourceIdentityCalibrationProfile).citl = 0)
+    (h_src_cal : ((m.identityCalibrationProfile Pop.source)).citl = 0)
     (h_env : m.environmentalObservedShift = 0)
     (h_genetic : m.geneticObservedShift = 0)
     (h_score : m.scoreMeanShift = 0)
     (h_intercept : m.deploymentInterceptShift = 0) :
-    (m.targetIdentityCalibrationProfile).citl = m.prevalenceShift := by
+    ((m.identityCalibrationProfile Pop.target)).citl = m.prevalenceShift := by
   rw [source_calibrated_target_citl_eq_shift_budget m h_src_cal]
   simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
     CrossPopulationCalibrationShiftModel.predictedMeanShift,
@@ -502,12 +511,12 @@ theorem source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts
 special case of the full calibration budget. -/
 theorem source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts
     (m : CrossPopulationCalibrationShiftModel)
-    (h_src_cal : (m.sourceIdentityCalibrationProfile).citl = 0)
+    (h_src_cal : ((m.identityCalibrationProfile Pop.source)).citl = 0)
     (h_env : m.environmentalObservedShift = 0)
     (h_genetic : m.geneticObservedShift = 0)
     (h_score : m.scoreMeanShift = 0)
     (h_intercept : m.deploymentInterceptShift = 0) :
-    |(m.targetIdentityCalibrationProfile).citl| = |m.prevalenceShift| := by
+    |((m.identityCalibrationProfile Pop.target)).citl| = |m.prevalenceShift| := by
   rw [source_calibrated_target_abs_citl_eq_abs_shift_budget m h_src_cal]
   simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
     CrossPopulationCalibrationShiftModel.predictedMeanShift,
@@ -518,9 +527,9 @@ calibrated and non-prevalence calibration shifts remain, then target CITL
 still changes even when prevalence itself is unchanged. -/
 theorem source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved
     (m : CrossPopulationCalibrationShiftModel)
-    (h_src_cal : (m.sourceIdentityCalibrationProfile).citl = 0)
+    (h_src_cal : ((m.identityCalibrationProfile Pop.source)).citl = 0)
     (h_prev : m.prevalenceShift = 0) :
-    (m.targetIdentityCalibrationProfile).citl =
+    ((m.identityCalibrationProfile Pop.target)).citl =
       m.environmentalObservedShift + m.geneticObservedShift -
         m.scoreMeanShift - m.deploymentInterceptShift := by
   rw [source_calibrated_target_citl_eq_shift_budget m h_src_cal]
@@ -539,146 +548,126 @@ This is the calibration-law companion to `CrossPopulationMetricModel`:
   outcome-mean shifts. -/
 structure CrossPopulationMechanisticCalibrationModel (p q : ℕ) where
   metric : CrossPopulationMetricModel p q
-  sourceObservedMean : ℝ
+  /-- Observed mean in the reference population. -/
+  baseObservedMean : ℝ
   prevalenceShift : ℝ
   environmentalObservedShift : ℝ
   geneticObservedShift : ℝ
-  sourceDeploymentIntercept : ℝ
+  /-- Deployment intercept in the reference population. -/
+  baseDeploymentIntercept : ℝ
   deploymentInterceptShift : ℝ
-  sourceTagMean : Fin p → ℝ
-  targetTagMean : Fin p → ℝ
+  /-- Mean tag genotype in each population. -/
+  tagMean : Pop → Fin p → ℝ
+
+/-- **Deployment intercept in a population.** The shift applies at the target only. -/
+noncomputable def CrossPopulationMechanisticCalibrationModel.deploymentIntercept
+    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) (P : Pop) : ℝ :=
+  m.baseDeploymentIntercept + Pop.pair 0 m.deploymentInterceptShift P
 
 /-- Total target observed-mean shift under the mechanistic calibration state. -/
 noncomputable def CrossPopulationMechanisticCalibrationModel.observedMeanShift
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
   m.prevalenceShift + m.environmentalObservedShift + m.geneticObservedShift
 
-/-- Mean transported source score in the source population. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.sourceScoreMean
-    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
-  sourceWeightedTagScore m.metric m.sourceTagMean
-
-/-- Mean transported source score in the target population. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.targetScoreMean
-    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
-  sourceWeightedTagScore m.metric m.targetTagMean
+/-- **Mean transported score in a population.** -/
+noncomputable def CrossPopulationMechanisticCalibrationModel.scoreMean
+    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) (P : Pop) : ℝ :=
+  sourceWeightedTagScore m.metric (m.tagMean P)
 
 /-- Predicted-mean shift induced by the source-weighted score acting on the
 target-vs-source tag-mean difference. This is the AF/tag-mean channel through
 which score means change across populations. -/
 noncomputable def CrossPopulationMechanisticCalibrationModel.scoreMeanShift
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
-  sourceWeightedTagScore m.metric (m.targetTagMean - m.sourceTagMean)
+  m.scoreMean Pop.target - m.scoreMean Pop.source
 
-/-- Source deployed mean prediction under the mechanistic calibration state. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.sourcePredictedMean
-    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
-  m.sourceDeploymentIntercept + m.sourceScoreMean
+/-- **Deployed mean prediction in a population.** -/
+noncomputable def CrossPopulationMechanisticCalibrationModel.predictedMean
+    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) (P : Pop) : ℝ :=
+  m.deploymentIntercept P + m.scoreMean P
 
-/-- Target deployed mean prediction under the mechanistic calibration state. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.targetPredictedMean
-    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
-  m.sourceDeploymentIntercept + m.deploymentInterceptShift + m.targetScoreMean
+/-- **Observed mean in a population.** -/
+noncomputable def CrossPopulationMechanisticCalibrationModel.observedMean
+    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) (P : Pop) : ℝ :=
+  m.baseObservedMean + Pop.pair 0 m.observedMeanShift P
 
-/-- Source observed mean under the mechanistic calibration state. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.targetObservedMean
-    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
-  m.sourceObservedMean + m.observedMeanShift
-
-/-- Literal source calibration slope on the explicit SNP-level transport state. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope
-    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
-  calibrationSlopeFromSourceWeights m.metric Pop.source
-
-/-- Literal target calibration slope on the explicit SNP-level transport state. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope
-    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
-  calibrationSlopeFromSourceWeights m.metric Pop.target
+/-- **Literal calibration slope in a population** on the explicit SNP-level transport
+state. This was two definitions differing only in which `Pop` they passed through. -/
+noncomputable def CrossPopulationMechanisticCalibrationModel.calibrationSlope
+    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) (P : Pop) : ℝ :=
+  calibrationSlopeFromSourceWeights m.metric P
 
 /-- Algebraic bridge from the mechanistic calibration state into the generic
 shift-profile container. -/
 noncomputable def CrossPopulationMechanisticCalibrationModel.toShiftModel
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
     CrossPopulationCalibrationShiftModel where
-  sourceObservedMean := m.sourceObservedMean
-  sourcePredictedMean := m.sourcePredictedMean
+  baseObservedMean := (m.observedMean Pop.source)
+  basePredictedMean := (m.predictedMean Pop.source)
   prevalenceShift := m.prevalenceShift
   environmentalObservedShift := m.environmentalObservedShift
   geneticObservedShift := m.geneticObservedShift
   scoreMeanShift := m.scoreMeanShift
   deploymentInterceptShift := m.deploymentInterceptShift
-  sourceSlope := m.sourceCalibrationSlope
-  targetSlope := m.targetCalibrationSlope
+  slope := Pop.pair (m.calibrationSlope Pop.source) (m.calibrationSlope Pop.target)
 
 /-- Shared source calibration profile on the mechanistic calibration state. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile
+noncomputable def CrossPopulationMechanisticCalibrationModel.calibrationProfile
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q)
-    (link : CalibrationLink) : CalibrationProfile :=
-  m.toShiftModel.sourceCalibrationProfile link
+    (P : Pop) (link : CalibrationLink) : CalibrationProfile :=
+  m.toShiftModel.calibrationProfile P link
 
-/-- Shared target calibration profile on the mechanistic calibration state. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile
-    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q)
-    (link : CalibrationLink) : CalibrationProfile :=
-  m.toShiftModel.targetCalibrationProfile link
-
-/-- Identity-scale source calibration profile on the mechanistic state. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile
-    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
+/-- **Identity-scale calibration profile in a population**, on the mechanistic state. -/
+noncomputable def CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile
+    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) (P : Pop) :
     CalibrationProfile :=
-  m.sourceCalibrationProfile CalibrationLink.identity
-
-/-- Identity-scale target calibration profile on the mechanistic state. -/
-noncomputable def CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile
-    {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
-    CalibrationProfile :=
-  m.targetCalibrationProfile CalibrationLink.identity
+  m.calibrationProfile P CalibrationLink.identity
 
 @[simp] theorem CrossPopulationMechanisticCalibrationModel.scoreMeanShift_eq_target_minus_source
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
-    m.scoreMeanShift = m.targetScoreMean - m.sourceScoreMean := by
+    m.scoreMeanShift = (m.scoreMean Pop.target) - (m.scoreMean Pop.source) := by
   unfold CrossPopulationMechanisticCalibrationModel.scoreMeanShift
-    CrossPopulationMechanisticCalibrationModel.targetScoreMean
-    CrossPopulationMechanisticCalibrationModel.sourceScoreMean
+    (CrossPopulationMechanisticCalibrationModel.scoreMean Pop.target)
+    (CrossPopulationMechanisticCalibrationModel.scoreMean Pop.source)
     sourceWeightedTagScore
   simp [dotProduct, Finset.sum_sub_distrib, mul_sub]
 
 @[simp] theorem CrossPopulationMechanisticCalibrationModel.targetPredictedMean_eq
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
-    m.targetPredictedMean =
-      m.sourcePredictedMean + m.scoreMeanShift + m.deploymentInterceptShift := by
+    (m.predictedMean Pop.target) =
+      (m.predictedMean Pop.source) + m.scoreMeanShift + m.deploymentInterceptShift := by
   rw [CrossPopulationMechanisticCalibrationModel.scoreMeanShift_eq_target_minus_source]
-  unfold CrossPopulationMechanisticCalibrationModel.targetPredictedMean
-    CrossPopulationMechanisticCalibrationModel.sourcePredictedMean
+  unfold (CrossPopulationMechanisticCalibrationModel.predictedMean Pop.target)
+    (CrossPopulationMechanisticCalibrationModel.predictedMean Pop.source)
   ring
 
 @[simp] theorem CrossPopulationMechanisticCalibrationModel.toShiftModel_sourceSlope
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
-    m.toShiftModel.sourceSlope = calibrationSlopeFromSourceWeights m.metric Pop.source := by
+    (m.toShiftModel.slope Pop.source) = calibrationSlopeFromSourceWeights m.metric Pop.source := by
   rfl
 
 @[simp] theorem CrossPopulationMechanisticCalibrationModel.toShiftModel_targetSlope
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
-    m.toShiftModel.targetSlope = calibrationSlopeFromSourceWeights m.metric Pop.target := by
+    (m.toShiftModel.slope Pop.target) = calibrationSlopeFromSourceWeights m.metric Pop.target := by
   rfl
 
 @[simp] theorem CrossPopulationMechanisticCalibrationModel.toShiftModel_targetObservedMean
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
-    m.toShiftModel.targetObservedMean = m.targetObservedMean := by
+    (m.toShiftModel.observedMean Pop.target) = (m.observedMean Pop.target) := by
   simp [CrossPopulationMechanisticCalibrationModel.toShiftModel,
-    CrossPopulationMechanisticCalibrationModel.targetObservedMean,
+    (CrossPopulationMechanisticCalibrationModel.observedMean Pop.target),
     CrossPopulationMechanisticCalibrationModel.observedMeanShift,
-    CrossPopulationCalibrationShiftModel.targetObservedMean,
+    (CrossPopulationCalibrationShiftModel.observedMean Pop.target),
     CrossPopulationCalibrationShiftModel.observedMeanShift, add_assoc]
 
 @[simp] theorem CrossPopulationMechanisticCalibrationModel.toShiftModel_targetPredictedMean
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
-    m.toShiftModel.targetPredictedMean = m.targetPredictedMean := by
+    (m.toShiftModel.predictedMean Pop.target) = (m.predictedMean Pop.target) := by
   simp [CrossPopulationMechanisticCalibrationModel.toShiftModel,
-    CrossPopulationMechanisticCalibrationModel.targetPredictedMean,
-    CrossPopulationMechanisticCalibrationModel.sourcePredictedMean,
+    (CrossPopulationMechanisticCalibrationModel.predictedMean Pop.target),
+    (CrossPopulationMechanisticCalibrationModel.predictedMean Pop.source),
     CrossPopulationMechanisticCalibrationModel.scoreMeanShift_eq_target_minus_source,
-    CrossPopulationCalibrationShiftModel.targetPredictedMean,
+    (CrossPopulationCalibrationShiftModel.predictedMean Pop.target),
     CrossPopulationCalibrationShiftModel.predictedMeanShift]
   ring
 
@@ -689,11 +678,11 @@ equation. -/
 theorem CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q)
     (link : CalibrationLink) :
-    m.sourceCalibrationProfile link =
+    m.calibrationProfile Pop.source link =
       { citl :=
-          m.sourceObservedMean -
-            (m.sourceDeploymentIntercept +
-              sourceWeightedTagScore m.metric m.sourceTagMean)
+          (m.observedMean Pop.source) -
+            ((m.deploymentIntercept Pop.source) +
+              sourceWeightedTagScore m.metric (m.tagMean Pop.source))
       , slope :=
           predictiveCovarianceFromSourceWeights m.metric Pop.source /
             scoreVarianceFromSourceWeights m.metric Pop.source
@@ -707,32 +696,32 @@ transported `Cov/Var` ratio from the SNP-level score equation. -/
 theorem CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q)
     (link : CalibrationLink) :
-    m.targetCalibrationProfile link =
+    m.calibrationProfile Pop.target link =
       { citl :=
-          (m.sourceObservedMean +
+          ((m.observedMean Pop.source) +
               (m.prevalenceShift + m.environmentalObservedShift + m.geneticObservedShift)) -
-            (m.sourceDeploymentIntercept + m.deploymentInterceptShift +
-              sourceWeightedTagScore m.metric m.targetTagMean)
+            ((m.deploymentIntercept Pop.source) + m.deploymentInterceptShift +
+              sourceWeightedTagScore m.metric (m.tagMean Pop.target))
       , slope :=
           predictiveCovarianceFromSourceWeights m.metric Pop.target /
             scoreVarianceFromSourceWeights m.metric Pop.target
       , link := link } := by
   cases link <;>
-    simp [CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile,
+    simp [CrossPopulationMechanisticCalibrationModel.calibrationProfile,
       CrossPopulationMechanisticCalibrationModel.toShiftModel,
-      CrossPopulationCalibrationShiftModel.targetCalibrationProfile,
-      CrossPopulationCalibrationShiftModel.targetCalibrationMoments,
-      CrossPopulationCalibrationShiftModel.sourceCalibrationMoments,
-      CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope,
-      CrossPopulationMechanisticCalibrationModel.sourcePredictedMean,
-      CrossPopulationMechanisticCalibrationModel.sourceScoreMean,
+      CrossPopulationCalibrationShiftModel.calibrationProfile,
+      (CrossPopulationCalibrationShiftModel.calibrationMoments Pop.target),
+      (CrossPopulationCalibrationShiftModel.calibrationMoments Pop.source),
+      (CrossPopulationMechanisticCalibrationModel.calibrationSlope Pop.target),
+      (CrossPopulationMechanisticCalibrationModel.predictedMean Pop.source),
+      (CrossPopulationMechanisticCalibrationModel.scoreMean Pop.source),
       CalibrationMoments.toProfile, CalibrationMoments.shifted, calibrationProfile,
       calibrationInTheLarge, sub_eq_add_neg, add_assoc]
   all_goals
     constructor
     · simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
         CrossPopulationCalibrationShiftModel.predictedMeanShift,
-        CrossPopulationMechanisticCalibrationModel.targetScoreMean]
+        (CrossPopulationMechanisticCalibrationModel.scoreMean Pop.target)]
       ring
     · rfl
 
@@ -742,11 +731,11 @@ intercept drift. -/
 theorem CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q)
     (link : CalibrationLink) :
-    (m.targetCalibrationProfile link).citl =
-      (m.sourceCalibrationProfile link).citl +
+    (m.calibrationProfile Pop.target link).citl =
+      (m.calibrationProfile Pop.source link).citl +
         m.observedMeanShift - (m.scoreMeanShift + m.deploymentInterceptShift) := by
-  simpa [CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile,
-    CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile,
+  simpa [CrossPopulationMechanisticCalibrationModel.calibrationProfile,
+    CrossPopulationMechanisticCalibrationModel.calibrationProfile,
     CrossPopulationMechanisticCalibrationModel.toShiftModel,
     CrossPopulationMechanisticCalibrationModel.observedMeanShift,
     CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
@@ -760,16 +749,16 @@ context channels made explicit. -/
 theorem CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q)
     (link : CalibrationLink) :
-    (m.targetCalibrationProfile link).slope =
+    (m.calibrationProfile Pop.target link).slope =
       (sourceWeightedTagScore m.metric (directCausalProjection m.metric Pop.target) +
         sourceWeightedTagScore m.metric (proxyTaggingProjection m.metric Pop.target) +
         sourceWeightedTagScore m.metric (m.metric.contextCross Pop.target)) /
           scoreVarianceFromSourceWeights m.metric Pop.target := by
-  simp [CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile,
+  simp [CrossPopulationMechanisticCalibrationModel.calibrationProfile,
     CrossPopulationMechanisticCalibrationModel.toShiftModel,
-    CrossPopulationCalibrationShiftModel.targetCalibrationProfile,
-    CrossPopulationCalibrationShiftModel.targetCalibrationMoments,
-    CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope,
+    CrossPopulationCalibrationShiftModel.calibrationProfile,
+    (CrossPopulationCalibrationShiftModel.calibrationMoments Pop.target),
+    (CrossPopulationMechanisticCalibrationModel.calibrationSlope Pop.target),
     CalibrationMoments.toProfile, CalibrationMoments.shifted, calibrationProfile,
     targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law]
 
@@ -793,19 +782,19 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
     (metric : CrossPopulationMetricModel p q)
     (cal : CrossPopulationCalibrationShiftModel)
     (h_target_mean_eq_prevalence :
-      cal.targetObservedMean = metric.targetPrevalence)
+      (cal.observedMean Pop.target) = metric.targetPrevalence)
     (h_source_r2_unit : r2FromSourceWeights metric Pop.source ∈ Set.Ico 0 1)
     (h_target_r2_unit : r2FromSourceWeights metric Pop.target ∈ Set.Ico 0 1)
     (h_r2_drop :
       r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
-    (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
+    (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_shift_nonzero :
       cal.observedMeanShift - cal.predictedMeanShift ≠ 0)
     (hPhiStrict : StrictMono Phi) :
-    let sourceProfile := cal.sourceIdentityCalibrationProfile
-    let targetProfile := cal.targetIdentityCalibrationProfile
+    let sourceProfile := (cal.identityCalibrationProfile Pop.source)
+    let targetProfile := (cal.identityCalibrationProfile Pop.target)
     let sourceMetrics :=
-      sourceMetricProfileFromSourceWeightsAtPrevalence metric cal.targetObservedMean
+      sourceMetricProfileFromSourceWeightsAtPrevalence metric (cal.observedMean Pop.target)
     let targetMetrics := targetMetricProfileFromSourceWeights metric
     targetMetrics.auc < sourceMetrics.auc ∧
     targetProfile.citl = cal.observedMeanShift - cal.predictedMeanShift ∧
@@ -816,7 +805,7 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
   have h_auc :
       (targetMetricProfileFromSourceWeights metric).auc <
         (sourceMetricProfileFromSourceWeightsAtPrevalence
-          metric cal.targetObservedMean).auc := by
+          metric (cal.observedMean Pop.target)).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
       sourceMetricProfileFromSourceWeightsAtPrevalence_auc,
       targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart,
@@ -824,26 +813,26 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
-      (cal.targetIdentityCalibrationProfile).citl =
+      ((cal.identityCalibrationProfile Pop.target)).citl =
         cal.observedMeanShift - cal.predictedMeanShift := by
     exact source_calibrated_target_citl_eq_shift_budget cal h_src_cal
   have h_abs_eq :
-      |(cal.targetIdentityCalibrationProfile).citl| =
+      |((cal.identityCalibrationProfile Pop.target)).citl| =
         |cal.observedMeanShift - cal.predictedMeanShift| := by
     exact source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal
-  have h_tgt_ne_zero : (cal.targetIdentityCalibrationProfile).citl ≠ 0 := by
+  have h_tgt_ne_zero : ((cal.identityCalibrationProfile Pop.target)).citl ≠ 0 := by
     rw [h_citl_eq]
     exact h_shift_nonzero
   have h_abs_worse :
-      |(cal.sourceIdentityCalibrationProfile).citl| <
-        |(cal.targetIdentityCalibrationProfile).citl| := by
+      |((cal.identityCalibrationProfile Pop.source)).citl| <
+        |((cal.identityCalibrationProfile Pop.target)).citl| := by
     have h_tgt_abs_pos :
-        0 < |(cal.targetIdentityCalibrationProfile).citl| :=
+        0 < |((cal.identityCalibrationProfile Pop.target)).citl| :=
       abs_pos.mpr h_tgt_ne_zero
     simpa [h_src_cal] using h_tgt_abs_pos
   have h_brier :
       (sourceMetricProfileFromSourceWeightsAtPrevalence
-        metric cal.targetObservedMean).brier <
+        metric (cal.observedMean Pop.target)).brier <
         (targetMetricProfileFromSourceWeights metric).brier := by
     rw [sourceMetricProfileFromSourceWeightsAtPrevalence_brier,
       targetMetricProfileFromSourceWeights_brier,
@@ -872,19 +861,19 @@ theorem cross_ancestry_exact_metric_profile
     {p q : ℕ}
     (cal : CrossPopulationMechanisticCalibrationModel p q)
     (h_target_mean_eq_prevalence :
-      cal.targetObservedMean = cal.metric.targetPrevalence)
+      (cal.observedMean Pop.target) = cal.metric.targetPrevalence)
     (h_source_r2_unit : r2FromSourceWeights cal.metric Pop.source ∈ Set.Ico 0 1)
     (h_target_r2_unit : r2FromSourceWeights cal.metric Pop.target ∈ Set.Ico 0 1)
     (h_r2_drop :
       r2FromSourceWeights cal.metric Pop.target < r2FromSourceWeights cal.metric Pop.source)
-    (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
+    (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_shift_nonzero :
       cal.observedMeanShift - (cal.scoreMeanShift + cal.deploymentInterceptShift) ≠ 0)
     (hPhiStrict : StrictMono Phi) :
-    let sourceProfile := cal.sourceIdentityCalibrationProfile
-    let targetProfile := cal.targetIdentityCalibrationProfile
+    let sourceProfile := (cal.identityCalibrationProfile Pop.source)
+    let targetProfile := (cal.identityCalibrationProfile Pop.target)
     let sourceMetrics :=
-      sourceMetricProfileFromSourceWeightsAtPrevalence cal.metric cal.targetObservedMean
+      sourceMetricProfileFromSourceWeightsAtPrevalence cal.metric (cal.observedMean Pop.target)
     let targetMetrics := targetMetricProfileFromSourceWeights cal.metric
     targetMetrics.auc < sourceMetrics.auc ∧
     targetProfile.citl =
@@ -894,17 +883,17 @@ theorem cross_ancestry_exact_metric_profile
     |sourceProfile.citl| < |targetProfile.citl| ∧
     sourceMetrics.brier < targetMetrics.brier := by
   have h_target_mean_eq_prevalence_shift :
-      cal.toShiftModel.targetObservedMean = cal.metric.targetPrevalence := by
+      (cal.toShiftModel.observedMean Pop.target) = cal.metric.targetPrevalence := by
     simpa [CrossPopulationMechanisticCalibrationModel.toShiftModel,
-      CrossPopulationMechanisticCalibrationModel.targetObservedMean,
+      (CrossPopulationMechanisticCalibrationModel.observedMean Pop.target),
       CrossPopulationMechanisticCalibrationModel.observedMeanShift,
-      CrossPopulationCalibrationShiftModel.targetObservedMean,
+      (CrossPopulationCalibrationShiftModel.observedMean Pop.target),
       CrossPopulationCalibrationShiftModel.observedMeanShift] using
       h_target_mean_eq_prevalence
   have h_src_cal_shift :
-      (cal.toShiftModel.sourceIdentityCalibrationProfile).citl = 0 := by
-    simpa [CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile] using h_src_cal
+      ((cal.toShiftModel.identityCalibrationProfile Pop.source)).citl = 0 := by
+    simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.source),
+      CrossPopulationMechanisticCalibrationModel.calibrationProfile] using h_src_cal
   have h_shift_nonzero_shift :
       cal.toShiftModel.observedMeanShift - cal.toShiftModel.predictedMeanShift ≠ 0 := by
     simpa [CrossPopulationMechanisticCalibrationModel.toShiftModel,
@@ -920,33 +909,33 @@ theorem cross_ancestry_exact_metric_profile
   dsimp at h_main ⊢
   rcases h_main with ⟨h_auc, h_citl, h_abs, h_worse, h_brier⟩
   refine ⟨h_auc, ?_, ?_, ?_, ?_⟩
-  · simpa [CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile,
+  · simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.target),
+      CrossPopulationMechanisticCalibrationModel.calibrationProfile,
       CrossPopulationMechanisticCalibrationModel.toShiftModel,
       CrossPopulationMechanisticCalibrationModel.observedMeanShift,
       CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
       CrossPopulationCalibrationShiftModel.observedMeanShift,
       CrossPopulationCalibrationShiftModel.predictedMeanShift] using h_citl
-  · simpa [CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile,
+  · simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.target),
+      CrossPopulationMechanisticCalibrationModel.calibrationProfile,
       CrossPopulationMechanisticCalibrationModel.toShiftModel,
       CrossPopulationMechanisticCalibrationModel.observedMeanShift,
       CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
       CrossPopulationCalibrationShiftModel.observedMeanShift,
       CrossPopulationCalibrationShiftModel.predictedMeanShift] using h_abs
-  · simpa [CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile,
+  · simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.source),
+      (CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.target),
+      CrossPopulationMechanisticCalibrationModel.calibrationProfile,
+      CrossPopulationMechanisticCalibrationModel.calibrationProfile,
       CrossPopulationMechanisticCalibrationModel.toShiftModel,
       CrossPopulationMechanisticCalibrationModel.observedMeanShift,
       CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
       CrossPopulationCalibrationShiftModel.observedMeanShift,
       CrossPopulationCalibrationShiftModel.predictedMeanShift] using h_worse
   · simpa [CrossPopulationMechanisticCalibrationModel.toShiftModel,
-      CrossPopulationMechanisticCalibrationModel.targetObservedMean,
+      (CrossPopulationMechanisticCalibrationModel.observedMean Pop.target),
       CrossPopulationMechanisticCalibrationModel.observedMeanShift,
-      CrossPopulationCalibrationShiftModel.targetObservedMean,
+      (CrossPopulationCalibrationShiftModel.observedMean Pop.target),
       CrossPopulationCalibrationShiftModel.observedMeanShift, add_assoc] using h_brier
 
 /-- Generation-indexed mechanistic calibration state tied directly to the
@@ -1007,14 +996,13 @@ noncomputable def CrossPopulationGenerationalCalibrationModel.toMechanisticCalib
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) :
     CrossPopulationMechanisticCalibrationModel p q where
   metric := m.metric.toMetricModelAt t
-  sourceObservedMean := m.sourceObservedMean
+  baseObservedMean := m.baseObservedMean
   prevalenceShift := m.prevalenceShiftAt t
   environmentalObservedShift := m.environmentalObservedShiftAt t
   geneticObservedShift := m.geneticObservedShiftAt t
-  sourceDeploymentIntercept := m.baseDeploymentIntercept
+  baseDeploymentIntercept := m.baseDeploymentIntercept
   deploymentInterceptShift := m.deploymentInterceptShiftAt t
-  sourceTagMean := m.baseTagMean
-  targetTagMean := m.targetTagMeanAt t
+  tagMean := Pop.pair m.baseTagMean (m.targetTagMeanAt t)
 
 /-- The score-mean shift is the difference of the two score means. This needed a
 `sourceWeightedTagScore`/`dotProduct` linearity argument while the shift was defined as the
@@ -1035,27 +1023,27 @@ score of a tag-mean difference; defining it as the difference makes it `rfl`. -/
 
 @[simp] theorem CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt_targetObservedMean
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) :
-    (m.toMechanisticCalibrationModelAt t).targetObservedMean = m.observedMeanAt Pop.target t := by
+    (m.toMechanisticCalibrationModelAt t).observedMean = m.observedMeanAt Pop.target t := by
   simp [CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt,
     CrossPopulationGenerationalCalibrationModel.observedMeanAt,
     CrossPopulationGenerationalCalibrationModel.observedMeanShiftAt,
-    CrossPopulationMechanisticCalibrationModel.targetObservedMean,
+    (CrossPopulationMechanisticCalibrationModel.observedMean Pop.target),
     CrossPopulationMechanisticCalibrationModel.observedMeanShift, add_assoc]
 
 @[simp] theorem CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt_targetPredictedMean
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) :
-    (m.toMechanisticCalibrationModelAt t).targetPredictedMean = m.predictedMeanAt Pop.target t := by
+    (m.toMechanisticCalibrationModelAt t).predictedMean = m.predictedMeanAt Pop.target t := by
   simp [CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt,
     CrossPopulationGenerationalCalibrationModel.predictedMeanAt,
     CrossPopulationGenerationalCalibrationModel.scoreMeanAt,
-    CrossPopulationMechanisticCalibrationModel.targetPredictedMean,
-    CrossPopulationMechanisticCalibrationModel.targetScoreMean]
+    (CrossPopulationMechanisticCalibrationModel.predictedMean Pop.target),
+    (CrossPopulationMechanisticCalibrationModel.scoreMean Pop.target)]
 
 /-- Shared target calibration profile at generation `t`. -/
 noncomputable def targetCalibrationProfileAtGeneration
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q)
     (t : ℕ) (link : CalibrationLink) : CalibrationProfile :=
-  (m.toMechanisticCalibrationModelAt t).targetCalibrationProfile link
+  (m.toMechanisticCalibrationModelAt t).calibrationProfile Pop.target link
 
 /-- Identity-scale target calibration profile at generation `t`. -/
 noncomputable def targetIdentityCalibrationProfileAtGeneration
@@ -1070,7 +1058,7 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
     (t : ℕ) (link : CalibrationLink) :
     targetCalibrationProfileAtGeneration m t link =
       { citl :=
-          (m.sourceObservedMean +
+          ((m.observedMean Pop.source) +
               (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t)) -
             (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
@@ -1085,19 +1073,19 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
 state slice. -/
 theorem targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ)
-    (h_src_cal : ((m.toMechanisticCalibrationModelAt t).sourceIdentityCalibrationProfile).citl = 0) :
+    (h_src_cal : ((m.toMechanisticCalibrationModelAt t).identityCalibrationProfile).citl = 0) :
     (targetIdentityCalibrationProfileAtGeneration m t).citl =
       m.observedMeanShiftAt t - (m.scoreMeanShiftAt t + m.deploymentInterceptShiftAt t) := by
   simpa [targetIdentityCalibrationProfileAtGeneration, targetCalibrationProfileAtGeneration,
     CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt,
     CrossPopulationGenerationalCalibrationModel.observedMeanShiftAt,
     CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt,
-    CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile,
-    CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile] using
+    (CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.source),
+    (CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.target)] using
     source_calibrated_target_citl_eq_shift_budget
       (m.toMechanisticCalibrationModelAt t).toShiftModel
-      (by simpa [CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile,
-            CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile] using h_src_cal)
+      (by simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.source),
+            CrossPopulationMechanisticCalibrationModel.calibrationProfile] using h_src_cal)
 
 /-- Bundled exact generation-indexed deployment law: the target metric profile
 and target calibration profile are both determined by the same time-sliced
@@ -1127,7 +1115,7 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
                 targetScoreVarianceAtGeneration m.metric t) } ∧
     targetCalibrationProfileAtGeneration m t link =
       { citl :=
-          (m.sourceObservedMean +
+          ((m.observedMean Pop.source) +
               (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t)) -
             (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
@@ -1152,12 +1140,12 @@ theorem cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget
     (h_target_r2_unit : r2FromSourceWeights metric Pop.target ∈ Set.Ico 0 1)
     (h_r2_drop :
       r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
-    (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
+    (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_shift_nonzero :
       cal.observedMeanShift - cal.predictedMeanShift ≠ 0)
     (hPhiStrict : StrictMono Phi) :
-    let sourceProfile := cal.sourceIdentityCalibrationProfile
-    let targetProfile := cal.targetIdentityCalibrationProfile
+    let sourceProfile := (cal.identityCalibrationProfile Pop.source)
+    let targetProfile := (cal.identityCalibrationProfile Pop.target)
     let sourceMetrics := sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric
     let targetMetrics := targetMetricProfileFromSourceWeights metric
     targetMetrics.auc < sourceMetrics.auc ∧
@@ -1175,21 +1163,21 @@ theorem cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
-      (cal.targetIdentityCalibrationProfile).citl =
+      ((cal.identityCalibrationProfile Pop.target)).citl =
         cal.observedMeanShift - cal.predictedMeanShift := by
     exact source_calibrated_target_citl_eq_shift_budget cal h_src_cal
   have h_abs_eq :
-      |(cal.targetIdentityCalibrationProfile).citl| =
+      |((cal.identityCalibrationProfile Pop.target)).citl| =
         |cal.observedMeanShift - cal.predictedMeanShift| := by
     exact source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal
-  have h_tgt_ne_zero : (cal.targetIdentityCalibrationProfile).citl ≠ 0 := by
+  have h_tgt_ne_zero : ((cal.identityCalibrationProfile Pop.target)).citl ≠ 0 := by
     rw [h_citl_eq]
     exact h_shift_nonzero
   have h_abs_worse :
-      |(cal.sourceIdentityCalibrationProfile).citl| <
-        |(cal.targetIdentityCalibrationProfile).citl| := by
+      |((cal.identityCalibrationProfile Pop.source)).citl| <
+        |((cal.identityCalibrationProfile Pop.target)).citl| := by
     have h_tgt_abs_pos :
-        0 < |(cal.targetIdentityCalibrationProfile).citl| :=
+        0 < |((cal.identityCalibrationProfile Pop.target)).citl| :=
       abs_pos.mpr h_tgt_ne_zero
     simpa [h_src_cal] using h_tgt_abs_pos
   exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩
@@ -1206,15 +1194,15 @@ theorem cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case
     (h_target_r2_unit : r2FromSourceWeights metric Pop.target ∈ Set.Ico 0 1)
     (h_r2_drop :
       r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
-    (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
+    (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_env : cal.environmentalObservedShift = 0)
     (h_genetic : cal.geneticObservedShift = 0)
     (h_score : cal.scoreMeanShift = 0)
     (h_intercept : cal.deploymentInterceptShift = 0)
     (h_prev_shift : cal.prevalenceShift ≠ 0)
     (hPhiStrict : StrictMono Phi) :
-    let sourceProfile := cal.sourceIdentityCalibrationProfile
-    let targetProfile := cal.targetIdentityCalibrationProfile
+    let sourceProfile := (cal.identityCalibrationProfile Pop.source)
+    let targetProfile := (cal.identityCalibrationProfile Pop.target)
     let sourceMetrics := sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric
     let targetMetrics := targetMetricProfileFromSourceWeights metric
     targetMetrics.auc < sourceMetrics.auc ∧
@@ -1442,23 +1430,23 @@ theorem logistic_recalibration_corrects_citl
   ring
 
 /-- Effective calibration slope after logistic recalibration.
-    If the target linear predictor uses slope `targetSlope` on the original PGS
+    If the target linear predictor uses slope `slope` on the original PGS
     scale, and deployed predictions use fitted slope `fittedSlope`, then the
     target linear predictor as a function of the deployed predictor has slope
-    `targetSlope / fittedSlope`. -/
+    `slope / fittedSlope`. -/
 noncomputable def recalibratedCalibrationSlope
-    (targetSlope fittedSlope : ℝ) : ℝ :=
-  targetSlope / fittedSlope
+    (slope fittedSlope : ℝ) : ℝ :=
+  slope / fittedSlope
 
 /-- Exact affine representation of the target linear predictor in terms of the
     logistic-recalibrated predictor. -/
 theorem target_linear_predictor_eq_affine_in_logistic_recalibrated
-    (pgs targetIntercept targetSlope fittedIntercept fittedSlope : ℝ)
+    (pgs targetIntercept slope fittedIntercept fittedSlope : ℝ)
     (h_fit_nonzero : fittedSlope ≠ 0) :
-    targetIntercept + targetSlope * pgs =
+    targetIntercept + slope * pgs =
       (targetIntercept -
-          recalibratedCalibrationSlope targetSlope fittedSlope * fittedIntercept) +
-        recalibratedCalibrationSlope targetSlope fittedSlope *
+          recalibratedCalibrationSlope slope fittedSlope * fittedIntercept) +
+        recalibratedCalibrationSlope slope fittedSlope *
           logisticRecalibrated pgs fittedIntercept fittedSlope := by
   unfold recalibratedCalibrationSlope logisticRecalibrated
   field_simp [h_fit_nonzero]
@@ -1467,11 +1455,11 @@ theorem target_linear_predictor_eq_affine_in_logistic_recalibrated
 /-- If the fitted slope equals the target calibration slope, the recalibrated
     predictor has exact calibration slope `1`. -/
 theorem logistic_recalibration_corrects_slope
-    (targetSlope : ℝ)
-    (h_slope_nonzero : targetSlope ≠ 0) :
-    recalibratedCalibrationSlope targetSlope targetSlope = 1 ∧
+    (slope : ℝ)
+    (h_slope_nonzero : slope ≠ 0) :
+    recalibratedCalibrationSlope slope slope = 1 ∧
       calibrationSlopeDeviation
-        (recalibratedCalibrationSlope targetSlope targetSlope) = 0 := by
+        (recalibratedCalibrationSlope slope slope) = 0 := by
   constructor
   · unfold recalibratedCalibrationSlope
     exact div_self h_slope_nonzero
@@ -1480,31 +1468,31 @@ theorem logistic_recalibration_corrects_slope
 
 /-- Shared logistic calibration profile of the fully recalibrated predictor. -/
 theorem logistic_recalibrated_profile_corrects_citl_and_slope
-    (mean_obs mean_pgs targetSlope : ℝ)
-    (h_slope_nonzero : targetSlope ≠ 0) :
+    (mean_obs mean_pgs slope : ℝ)
+    (h_slope_nonzero : slope ≠ 0) :
     let profile :=
       logisticCalibrationProfile
         mean_obs
-        (logisticRecalibrated mean_pgs (mean_obs - targetSlope * mean_pgs) targetSlope)
-        (recalibratedCalibrationSlope targetSlope targetSlope)
+        (logisticRecalibrated mean_pgs (mean_obs - slope * mean_pgs) slope)
+        (recalibratedCalibrationSlope slope slope)
     profile.citl = 0 ∧ profile.slopeDeviation = 0 := by
   dsimp
   constructor
-  · exact logistic_recalibration_corrects_citl mean_obs mean_pgs targetSlope
-  · exact (logistic_recalibration_corrects_slope targetSlope h_slope_nonzero).2
+  · exact logistic_recalibration_corrects_citl mean_obs mean_pgs slope
+  · exact (logistic_recalibration_corrects_slope slope h_slope_nonzero).2
 
 /-- Logistic recalibration with the fitted intercept and fitted slope corrects
     both calibration-in-the-large and slope deviation exactly. -/
 theorem logistic_recalibration_corrects_citl_and_slope
-    (mean_obs mean_pgs targetSlope : ℝ)
-    (h_slope_nonzero : targetSlope ≠ 0) :
+    (mean_obs mean_pgs slope : ℝ)
+    (h_slope_nonzero : slope ≠ 0) :
     calibrationInTheLarge mean_obs
-        (logisticRecalibrated mean_pgs (mean_obs - targetSlope * mean_pgs) targetSlope) = 0 ∧
+        (logisticRecalibrated mean_pgs (mean_obs - slope * mean_pgs) slope) = 0 ∧
       calibrationSlopeDeviation
-        (recalibratedCalibrationSlope targetSlope targetSlope) = 0 := by
+        (recalibratedCalibrationSlope slope slope) = 0 := by
   simpa [CalibrationProfile.slopeDeviation] using
     logistic_recalibrated_profile_corrects_citl_and_slope
-      mean_obs mean_pgs targetSlope h_slope_nonzero
+      mean_obs mean_pgs slope h_slope_nonzero
 
 /-- Logistic recalibration preserves AUC because it is a strictly increasing
     affine transform when the fitted slope is positive. -/
