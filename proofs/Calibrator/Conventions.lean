@@ -1,4 +1,5 @@
 import Calibrator.PopulationGeneticsFoundations
+import Calibrator.DriftRegime
 import Calibrator.ImitationRigidity
 import Calibrator.DemographicHistory
 import Calibrator.AncestrySpecificArchitecture
@@ -875,6 +876,48 @@ theorem explainedR2FromTransportMoments_eq_pgsR2 (cov vs vy : ℝ) :
 written once in `SimulationValidation` and once in
 `GeneticArchitectureDiscovery`. `sourceTargetPortabilityRatio` has been deleted
 and `GeneticArchitectureDiscovery` now calls `mechanisticPortabilityRatio`. -/
+
+/-! ### Attaching the drift closed forms to the regime they came from
+
+`DriftRegime` records the incident these two definitions are the residue of: a cluster of
+five quantities, all functions of one closed-population retention, every cross-check
+between them passing because every identity among them is an identity *in* that retention.
+It fixed the diagnosis by making the regime an object — `closedPopulation` against
+`mutationDriftBalance`, with `regimes_disagree` separating them — but the closed forms in
+`PopulationGeneticsFoundations` were never attached to it, so they still carry their regime
+only in prose.
+
+These two theorems attach them. Neither is deep; that is the point. Each says the bare
+formula is the measured loss of a *named* trajectory, so a reader who wants to know which
+regime `heterozygosityLossFromDrift` assumes can follow a proof instead of trusting a
+docstring — and anyone who moves it to a population at mutation-drift balance now
+contradicts `regimes_disagree` rather than silently getting a wrong number. -/
+
+theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
+    (t : ℕ) (Ne H₀ : ℝ) (hH : 0 < H₀) :
+    heterozygosityLossFromDrift t Ne = (closedPopulation Ne H₀ hH).measuredLoss t := by
+  rw [measuredLoss_closedPopulation]
+  unfold heterozygosityLossFromDrift
+
+/-- **The same body, read as a between-population `F_ST`.**
+
+`fstDerived` and `heterozygosityLossFromDrift` share a body, and `DriftRegime` names that
+coincidence as the defect rather than a convenience: a within-population heterozygosity
+loss and a between-population variance ratio are different quantities, and the shared body
+is what let one be substituted for the other. They are deliberately *not* merged. This
+theorem records that `fstDerived` inherits the closed-population regime through that
+shared body — which is the fact a reader needs in order to see that its `F_ST` reading is
+only available in the regime where the loss reading is.
+
+Note the argument orders differ: `heterozygosityLossFromDrift` takes `(t, Ne)` and
+`fstDerived` takes `(Ne, t)`, so the same call spelled the same way means different things
+depending on which is in scope. That is the hazard `equilibriumFst` carried before it was
+collapsed, still live here because these two must *not* be collapsed. -/
+theorem fstDerived_eq_closedPopulation_measuredLoss
+    (t : ℕ) (Ne H₀ : ℝ) (hH : 0 < H₀) :
+    fstDerived Ne t = (closedPopulation Ne H₀ hH).measuredLoss t := by
+  rw [measuredLoss_closedPopulation]
+  unfold fstDerived
 
 end EquilibriumAgreements
 
