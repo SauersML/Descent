@@ -52,34 +52,50 @@ theorem nei_fst_in_unit (H_T H_S : ℝ)
   · rw [div_le_one h_HT]; linarith
 
 
-/-- **Fst from allele frequency difference (simplified).**
-    For biallelic loci: Fst ≈ (p₁ - p₂)² / (p̄(1-p̄))
-    This is the variance of frequencies divided by the mean heterozygosity.
+/-- **Nei's `G_ST` for two equally weighted subgroups, from allele
+    frequencies:** `G_ST = (p₁ - p₂)² / (4·p̄·(1-p̄))`.
 
-    Empirical status: UNTESTED. -/
-noncomputable def simpleFst (p₁ p₂ : ℝ) : ℝ :=
+    RENAMED from `simpleFst`, which named no estimator and so left the reader
+    to supply one. It is Nei's `G_ST` -- `1 - H_S/H_T` with `H_T = 2p̄(1-p̄)`
+    the total-pool heterozygosity and `H_S` the mean within-subgroup
+    heterozygosity -- and it is NOT Hudson's `F_ST`, which divides instead by
+    the between-subgroup heterozygosity `p₁(1-p₂) + p₂(1-p₁)`. Derivation:
+    `H_T - H_S = 2p̄(1-p̄) - (p₁(1-p₁) + p₂(1-p₂)) = (p₁-p₂)²/2`, and dividing
+    by `H_T` gives this body. Hudson's estimator lives in `Conventions` as
+    `trueHudsonFst`, with the exact conversion `Hudson = 2·G/(1 + G)` proved as
+    `Conventions.trueHudsonFst_eq_of_neiGst`. The two differ by up to a factor
+    of two -- +71.4% at `p₁ = 0.2, p₂ = 0.6` -- and agree only at `p₁ = p₂` or
+    `p̄ = 1/2`.
+
+    The arithmetic is unchanged by the rename; only the claim about what the
+    number is has been made explicit.
+
+    Empirical status: CONVENTION PINNED as Nei's `G_ST`, confirmed against an
+    independent implementation by the differential checks `simpleFst-is-nei`
+    and `simpleFst-vs-hudson`, which are retained as the standing checks. -/
+noncomputable def neiGstFromFrequencies (p₁ p₂ : ℝ) : ℝ :=
   let p_bar := (p₁ + p₂) / 2
   (p₁ - p₂) ^ 2 / (4 * p_bar * (1 - p_bar))
 
-/-- Simple Fst is nonneg. -/
-theorem simple_fst_nonneg (p₁ p₂ : ℝ)
+/-- Nei's `G_ST` is nonneg. -/
+theorem neiGstFromFrequencies_nonneg (p₁ p₂ : ℝ)
     (h₁ : 0 < p₁) (h₁' : p₁ < 1)
     (h₂ : 0 < p₂) (h₂' : p₂ < 1) :
-    0 ≤ simpleFst p₁ p₂ := by
-  unfold simpleFst
+    0 ≤ neiGstFromFrequencies p₁ p₂ := by
+  unfold neiGstFromFrequencies
   apply div_nonneg (sq_nonneg _)
   nlinarith
 
-/-- **Fst is zero when populations are identical.** -/
-theorem simple_fst_zero_same (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
-    simpleFst p p = 0 := by
-  unfold simpleFst
+/-- **`G_ST` is zero when the subgroups are identical.** -/
+theorem neiGstFromFrequencies_zero_same (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
+    neiGstFromFrequencies p p = 0 := by
+  unfold neiGstFromFrequencies
   simp [sub_self, zero_pow (by norm_num : 2 ≠ 0)]
 
-/-- **Fst is symmetric.** -/
-theorem simple_fst_symmetric (p₁ p₂ : ℝ) :
-    simpleFst p₁ p₂ = simpleFst p₂ p₁ := by
-  unfold simpleFst
+/-- **`G_ST` is symmetric.** -/
+theorem neiGstFromFrequencies_symmetric (p₁ p₂ : ℝ) :
+    neiGstFromFrequencies p₁ p₂ = neiGstFromFrequencies p₂ p₁ := by
+  unfold neiGstFromFrequencies
   ring_nf
 
 

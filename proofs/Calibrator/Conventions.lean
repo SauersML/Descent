@@ -163,8 +163,9 @@ they agree only when `p₁ = p₂` or `p̄ = 1/2`.
     `d = p₁ - p₂` and `p̄ = (p₁+p₂)/2`,
     `H_T - H_S = 2p̄(1-p̄) - (p₁(1-p₁) + p₂(1-p₂)) = d²/2`, so this body is
     `d² / (4·p̄·(1-p̄))`, which is Nei's `G_ST` and is also exactly the body of
-    `PopulationGeneticsFoundations.simpleFst` -- `simpleFst_eq_hudsonFst` below
-    proves the two agree, and what it actually proves is that both are Nei.
+    `PopulationGeneticsFoundations.neiGstFromFrequencies` --
+    `neiGstFromFrequencies_eq_hudsonFst` below proves the two agree, and what
+    it actually proves is that both are Nei.
     Hudson's is `d² / (p₁ + p₂ - 2p₁p₂)`; `trueHudsonFst` states it and
     `trueHudsonFst_eq_of_neiGst` gives the exact conversion. At `p₁ = 0.2`,
     `p₂ = 0.6` this body gives `0.1667` where Hudson gives `0.2857`, the
@@ -260,11 +261,18 @@ theorem hudsonFst_eq_varianceRatio (p₁ p₂ : ℝ)
   unfold meanAlleleFreq
   ring
 
-/-- **Cross-check: `simpleFst`, written separately in
-`PopulationGeneticsFoundations`, is the same quantity.** -/
-theorem simpleFst_eq_hudsonFst (p₁ p₂ : ℝ)
+/-- **Cross-check: the two spellings of Nei's `G_ST` in this corpus agree.**
+
+RENAMED from `simpleFst_eq_hudsonFst`. That name asserted that
+`PopulationGeneticsFoundations.simpleFst` is Hudson's `F_ST`. The theorem is
+true and the name was the defect: what it proves is that two independently
+written spellings of NEI's `G_ST` coincide, because `hudsonFst` is misnamed
+(see its docstring above). Neither side is Hudson's estimator; that one is
+`trueHudsonFst`, and `hudsonFst_ne_trueHudsonFst` exhibits a point where it
+differs from both of these. -/
+theorem neiGstFromFrequencies_eq_hudsonFst (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
-    simpleFst p₁ p₂ = hudsonFst p₁ p₂ := by
+    neiGstFromFrequencies p₁ p₂ = hudsonFst p₁ p₂ := by
   rw [hudsonFst_eq_varianceRatio p₁ p₂ h]
   change (p₁ - p₂) ^ 2 /
       (4 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) =
@@ -274,7 +282,9 @@ theorem simpleFst_eq_hudsonFst (p₁ p₂ : ℝ)
 
 /-- **The spike constant is forced, not chosen.**
 
-Four times Hudson `F_ST` is exactly the variance of the standardized subgroup
+Four times `hudsonFst` -- which is Nei's `G_ST`, see its docstring; the `4` is
+derived for THAT quantity and is not the constant for Hudson's estimator -- is
+exactly the variance of the standardized subgroup
 contrast. Writing `2` in `demographicSpike` asserts that twice `F_ST` equals
 that variance, which this theorem refutes, so the old constant is now
 unprovable rather than merely differently calibrated. Simulation recovers
