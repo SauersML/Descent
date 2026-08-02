@@ -45,6 +45,13 @@ class Check:
     atol: float = 1e-9            # both sides ~0 is agreement, not 100% error
     kind: str = "formula"         # expected class if it disagrees
     mutable_arg: int | None = None
+    # Verdict this check is SUPPOSED to produce. A disagreement that is a
+    # documented, intended result -- a convention pin, say -- is not an open
+    # defect, but it must not be allowed to quietly become agreement either.
+    # Declaring it here means a check that starts passing when it is meant to
+    # differ is reported as a REGRESSION rather than silently improving the
+    # numbers. Leave None for checks that are simply meant to pass.
+    expected_verdict: str | None = None
     note: str = ""
     canfail_clause: str = ""
 
@@ -82,13 +89,13 @@ _PQ = grid(p1=[0.02, 0.1, 0.3, 0.5], p2=[0.05, 0.2, 0.5, 0.8])
 
 check(
     id="simpleFst-is-nei",
-    fqn="Calibrator.PopulationGeneticsFoundations.simpleFst",
+    fqn="Calibrator.PopulationGeneticsFoundations.neiGstFromFrequencies",
     claim="simpleFst p1 p2 equals Nei's G_ST for two equally weighted demes",
     model_lean="biallelic, two demes, parametric allele frequencies",
     model_ref="same",
     reference="refs.fst_nei_gst",
     grid=_PQ,
-    lean=lambda D, p1, p2: D["simpleFst"](p1, p2),
+    lean=lambda D, p1, p2: D["neiGstFromFrequencies"](p1, p2),
     ref=lambda p1, p2: refs.fst_nei_gst(p1, p2),
     canfail_clause=(
         "grid must include |p1-p2| large AND pbar far from 0.5: at p1=p2 both "
@@ -99,17 +106,48 @@ check(
 
 check(
     id="simpleFst-vs-hudson",
-    fqn="Calibrator.PopulationGeneticsFoundations.simpleFst",
+    fqn="Calibrator.PopulationGeneticsFoundations.neiGstFromFrequencies",
     claim="CONVENTION PIN: is simpleFst Hudson's F_ST rather than Nei's?",
     model_lean="biallelic, two demes, parametric",
     model_ref="Hudson ratio-of-averages, parametric limit (Bhatia 2013 eq 10)",
     reference="refs.fst_hudson",
     grid=_PQ,
-    lean=lambda D, p1, p2: D["simpleFst"](p1, p2),
+    lean=lambda D, p1, p2: D["neiGstFromFrequencies"](p1, p2),
     ref=lambda p1, p2: refs.fst_hudson(p1, p2),
     kind="convention",
-    note="expected to DISAGREE; that disagreement is the pin",
+    expected_verdict="CONVENTION-DIFFERS",
+    note="EXPECTED TO DISAGREE, and the disagreement IS the result. The "
+         "definition is Nei's G_ST and is not Hudson; Conventions proves the "
+         "exact conversion Hudson = 2G/(1+G), so the gap is 2x as G -> 0 and "
+         "vanishes as G -> 1. It is not a constant, which is why no tolerance "
+         "or calibration factor may ever absorb it. If this check ever PASSES, "
+         "either the definition changed or refs.fst_hudson broke.",
     canfail_clause="needs pbar != 0.5; Nei and Hudson coincide exactly at pbar=0.5",
+)
+
+check(
+    id="trueHudsonFst-is-hudson",
+    fqn="Calibrator.Conventions.trueHudsonFst",
+    claim="POSITIVE CONTROL for the convention pin: trueHudsonFst really is "
+          "Hudson's parametric F_ST",
+    model_lean="(p1-p2)^2 / (p1(1-p2) + p2(1-p1)), Bhatia 2013 eq 10",
+    model_ref="same, computed independently in refs",
+    reference="refs.fst_hudson",
+    grid=_PQ,
+    lean=lambda D, p1, p2: D["trueHudsonFst"](p1, p2),
+    ref=lambda p1, p2: refs.fst_hudson(p1, p2),
+    note=(
+        "This exists so that `simpleFst-vs-hudson` failing is INTERPRETABLE. "
+        "Without it a reader cannot tell whether that check disagrees because "
+        "the corpus definition is Nei or because refs.fst_hudson is wrong. "
+        "With it, one of the pair passing to machine precision while the other "
+        "differs by up to 50% localises the disagreement to the definition."
+    ),
+    canfail_clause=(
+        "the grid must stay off pbar = 0.5, where Nei and Hudson coincide "
+        "exactly and every check in this group goes degenerate. _PQ is chosen "
+        "for that."
+    ),
 )
 
 check(
