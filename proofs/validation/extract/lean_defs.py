@@ -832,6 +832,12 @@ def ldBlockPruningDeficit(recomb, Ne, retainedMarkers, totalMarkers):
 def ldTightLinkageDetectionShare(retainedMarkers, totalMarkers):
     return (ldPanelRetentionFraction(retainedMarkers, totalMarkers) - _rt.rdiv(_rt.sin(((_rt.pi * ldPanelRetentionFraction(retainedMarkers, totalMarkers)))), _rt.pi))
 
+def targetCorrectionCurvature(weight, B, beta):
+    return (lambda i: (weight(i) * coefficientEnergy((B(i)), beta)))
+
+def targetCorrectionOptimum(B, beta, theta):
+    return (lambda i: sharedCorrectionOptimum((B(i)), beta, theta))
+
 def effectMutualInformation(m, ρ):
     return (_rt.rdiv((-(m)), 2.0) * _rt.rlog(((1.0 - _rt.lpow(ρ, 2.0)))))
 

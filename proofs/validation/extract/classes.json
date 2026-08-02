@@ -19837,6 +19837,214 @@
    }
   }
  },
+ "Calibrator.targetCorrectionCurvature": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "file": "Calibrator/MetricSpecificPortability.lean",
+  "line": 1780,
+  "short": "targetCorrectionCurvature",
+  "ret_type": "ι → ℝ",
+  "empirical_status": "UNTESTED",
+  "python": "targetCorrectionCurvature",
+  "args": [
+   "weight",
+   "B",
+   "beta"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "value is not a real number: function"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Calibrator.targetCorrectionOptimum": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "file": "Calibrator/MetricSpecificPortability.lean",
+  "line": 1788,
+  "short": "targetCorrectionOptimum",
+  "ret_type": "ι → ℝ",
+  "empirical_status": "UNTESTED",
+  "python": "targetCorrectionOptimum",
+  "args": [
+   "B",
+   "beta",
+   "theta"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "value is not a real number: function"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Calibrator.sharedCorrectionConsensus": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "file": "Calibrator/MetricSpecificPortability.lean",
+  "line": 1796,
+  "short": "sharedCorrectionConsensus",
+  "ret_type": "ℝ",
+  "empirical_status": "UNTESTED",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Calibrator.sharedCorrectionCost_at_consensus",
+   "Calibrator.sharedCorrectionCost_eq_consensus_add_spread",
+   "Calibrator.sharedCorrectionSpread_eq_zero_iff",
+   "Calibrator.sharedCorrectionSpread_eq_zero_iff_agree",
+   "Calibrator.sharedCorrectionSpread_le_cost",
+   "Calibrator.sharedCorrection_centered"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∑ i, curvature i ≠ 0",
+    "0 < ∑ i, curvature i",
+    "∀ i, 0 < curvature i"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.sharedCorrection_centered": [
+     "∑ i, curvature i ≠ 0"
+    ],
+    "Calibrator.sharedCorrectionCost_eq_consensus_add_spread": [
+     "∑ i, curvature i ≠ 0"
+    ],
+    "Calibrator.sharedCorrectionSpread_le_cost": [
+     "0 < ∑ i, curvature i"
+    ],
+    "Calibrator.sharedCorrectionCost_at_consensus": [
+     "∑ i, curvature i ≠ 0"
+    ],
+    "Calibrator.sharedCorrectionSpread_eq_zero_iff": [
+     "∀ i, 0 < curvature i"
+    ],
+    "Calibrator.sharedCorrectionSpread_eq_zero_iff_agree": [
+     "∀ i, 0 < curvature i",
+     "∑ i, curvature i ≠ 0"
+    ]
+   }
+  }
+ },
+ "Calibrator.sharedCorrectionSpread": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "file": "Calibrator/MetricSpecificPortability.lean",
+  "line": 1803,
+  "short": "sharedCorrectionSpread",
+  "ret_type": "ℝ",
+  "empirical_status": "UNTESTED",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Calibrator.sharedCorrectionCost_at_consensus",
+   "Calibrator.sharedCorrectionCost_eq_consensus_add_spread",
+   "Calibrator.sharedCorrectionSpread_eq_zero_iff",
+   "Calibrator.sharedCorrectionSpread_eq_zero_iff_agree",
+   "Calibrator.sharedCorrectionSpread_le_cost",
+   "Calibrator.sharedCorrectionSpread_nonneg",
+   "Calibrator.sharedCorrectionSpread_of_identical_optima"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "∑ i, curvature i ≠ 0",
+    "0 < ∑ i, curvature i",
+    "∀ i, 0 ≤ curvature i",
+    "∀ i, 0 < curvature i"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.sharedCorrectionCost_eq_consensus_add_spread": [
+     "∑ i, curvature i ≠ 0"
+    ],
+    "Calibrator.sharedCorrectionSpread_le_cost": [
+     "0 < ∑ i, curvature i"
+    ],
+    "Calibrator.sharedCorrectionCost_at_consensus": [
+     "∑ i, curvature i ≠ 0"
+    ],
+    "Calibrator.sharedCorrectionSpread_nonneg": [
+     "∀ i, 0 ≤ curvature i"
+    ],
+    "Calibrator.sharedCorrectionSpread_eq_zero_iff": [
+     "∀ i, 0 < curvature i"
+    ],
+    "Calibrator.sharedCorrectionSpread_eq_zero_iff_agree": [
+     "∀ i, 0 < curvature i",
+     "∑ i, curvature i ≠ 0"
+    ],
+    "Calibrator.sharedCorrectionSpread_of_identical_optima": [
+     "∀ i, 0 < curvature i",
+     "∑ i, curvature i ≠ 0"
+    ]
+   },
+   "range_lo_thm": [
+    "Calibrator.sharedCorrectionSpread_nonneg",
+    1
+   ],
+   "range_lo": 0
+  }
+ },
+ "Calibrator.sharedCorrectionCost": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "file": "Calibrator/MetricSpecificPortability.lean",
+  "line": 1811,
+  "short": "sharedCorrectionCost",
+  "ret_type": "ℝ",
+  "empirical_status": "UNTESTED",
+  "python": null,
+  "args": [],
+  "box": {
+   "correction": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Calibrator.sharedCorrectionCost_at_consensus",
+   "Calibrator.sharedCorrectionCost_eq_consensus_add_spread",
+   "Calibrator.sharedCorrectionSpread_le_cost"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∑ i, curvature i ≠ 0",
+    "0 < ∑ i, curvature i"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.sharedCorrectionCost_eq_consensus_add_spread": [
+     "∑ i, curvature i ≠ 0"
+    ],
+    "Calibrator.sharedCorrectionSpread_le_cost": [
+     "0 < ∑ i, curvature i"
+    ],
+    "Calibrator.sharedCorrectionCost_at_consensus": [
+     "∑ i, curvature i ≠ 0"
+    ]
+   }
+  }
+ },
  "Calibrator.effectMutualInformation": {
   "class": "NUMERIC",
   "note": "",

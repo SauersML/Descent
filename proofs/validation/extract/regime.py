@@ -133,16 +133,55 @@ NON_VERDICTS = {"not-transpiled", "no-range", "inconclusive", "skipped",
                 "NOT-EXTRACTABLE", "UNCOVERED", "not_extractable"}
 
 
+# Evidence classes a producing tier may declare per record, in `evidence_class`
+# (or `demonstration`).  An explicit declaration always beats the directory
+# heuristic below, because a directory is a guess about a tier and this is a
+# statement about one record -- and a tier can produce several kinds at once.
+EXTERNAL_EVIDENCE = {
+    "simulation", "simulation-mutant-rejected", "analytic-reference",
+    "published-estimate", "external-reference",
+}
+INTERNAL_EVIDENCE = {
+    "internal-consistency", "theorem-derived", "self-property",
+    "range", "invariant", "mutation",
+}
+
+
+def _declared_class(node):
+    """The evidence class a record declares for itself, if any.
+
+    Returns (class_name, is_external) or None when the record says nothing.
+    An UNRECOGNISED declaration is treated as NOT external: a name I do not
+    know is not a licence to count it as contact with reality.
+    """
+    for key in ("evidence_class", "demonstration", "evidence"):
+        v = node.get(key)
+        if isinstance(v, str):
+            return v, v in EXTERNAL_EVIDENCE
+    return None
+
+
 def external_checks():
     """Definitions actually compared against an OUTSIDE reference.
 
     Evidence is a machine-readable verdict naming the definition, not a mention:
     a name appearing in a source file proves nothing, which is the flaw in the
-    old coverage script.  And only results from tiers that compare against
-    something outside the development count -- a range check against the
-    corpus's own theorems is internal consistency wearing a different hat.
+    old coverage script.  And only evidence that compares against something
+    outside the development counts -- a range check against the corpus's own
+    theorems, or a theorem-derived property test, is internal consistency
+    however rigorous, and counting it here folds metric one back into metric
+    two.  That mistake put this figure at 42.3% instead of 4.0% once already.
+
+    Two sources of truth, in priority order:
+      1. a per-record `evidence_class` / `demonstration` declared by the tier
+         that produced it -- authoritative, because a tier can produce several
+         kinds of evidence and only it knows which is which;
+      2. failing that, the directory heuristic below, which is a guess about a
+         whole tier and is wrong the moment a tier adds a second kind.
+    Anything unrecognised is NOT counted as external.
     """
     hits = collections.defaultdict(set)
+    declared_internal = collections.defaultdict(set)
     for path in (PROOFS / "validation").rglob("*.json"):
         if path.is_relative_to(HERE):
             continue
@@ -153,8 +192,6 @@ def external_checks():
             elif part in INTERNAL_TIERS:
                 tier = None
                 break
-        if tier is None:
-            continue
         try:
             blob = json.loads(path.read_text())
         except Exception:                                       # noqa: BLE001
@@ -168,9 +205,19 @@ def external_checks():
                 name = node.get("definition") or node.get("name") or node.get("def")
                 verdict = (node.get("verdict") or node.get("status")
                            or node.get("result") or node.get("class"))
+                declared = _declared_class(node)
                 if isinstance(name, str) and isinstance(verdict, str) \
                         and verdict not in NON_VERDICTS:
-                    hits[name.split(".")[-1]].add(f"{tag}[{tier}]:{verdict}")
+                    if declared is not None:
+                        cls, is_ext = declared
+                        if is_ext:
+                            hits[name.split(".")[-1]].add(f"{tag}[{cls}]:{verdict}")
+                        else:
+                            declared_internal[name.split(".")[-1]].add(
+                                f"{tag}[{cls}]:{verdict}")
+                    elif tier is not None:
+                        hits[name.split(".")[-1]].add(
+                            f"{tag}[{tier}?]:{verdict}")   # ? = inferred, not declared
                 for v in node.values():
                     walk(v, depth + 1)
             elif isinstance(node, list):
@@ -178,7 +225,7 @@ def external_checks():
                     walk(v, depth + 1)
 
         walk(blob)
-    return hits
+    return hits, declared_internal
 
 
 def main(argv=None):
@@ -191,7 +238,7 @@ def main(argv=None):
     classes = json.loads((HERE / "classes.json").read_text())
     cov_path = HERE / "coverage.json"
     coverage = json.loads(cov_path.read_text()) if cov_path.exists() else {}
-    ext = external_checks()
+    ext, ext_internal = external_checks()
 
     rows = {}
     for name, d in table.items():
@@ -230,6 +277,14 @@ def main(argv=None):
           f"{sum(1 for r in rows.values() if r['regime_explicit'])}")
     print(f"compared against an EXTERNAL reference        : {have_ext}"
           f"  ({100*have_ext/total:.1f}%)")
+    inferred = sum(1 for r in rows.values()
+                   if any("?]" in e for e in r["external_checked_by"]))
+    print(f"  of which the tier DECLARED as external     : {have_ext - inferred}")
+    print(f"  of which inferred from the directory       : {inferred}"
+          + ("   <- ask that tier to declare evidence_class" if inferred else ""))
+    print(f"definitions whose only evidence is DECLARED internal: "
+          f"{len({n for n in ext_internal})}"
+          f"  (correctly excluded from the figure above)")
     print(f"internally validated (falsifiable check)      : {internal}"
           f"  ({100*internal/total:.1f}%)")
 

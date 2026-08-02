@@ -21493,6 +21493,284 @@
    ]
   },
   {
+   "name": "Calibrator.targetCorrectionCurvature",
+   "short": "targetCorrectionCurvature",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1780,
+   "signature": "(weight : ι → ℝ) (B : ι → Matrix J J ℝ) (beta : J → ℝ) : ι → ℝ",
+   "args": [
+    {
+     "names": [
+      "weight"
+     ],
+     "type": "ι → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "B"
+     ],
+     "type": "ι → Matrix J J ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "beta"
+     ],
+     "type": "J → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ι → ℝ",
+   "body": "  fun i => weight i * coefficientEnergy (B i) beta",
+   "docstring": "**Curvature of a target's recalibration objective**: how hard target `i`\npulls on the shared correction.  Deployment weight times the energy of the\ntransported direction in that target's own second-moment matrix.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {},
+   "mentioned_by": []
+  },
+  {
+   "name": "Calibrator.targetCorrectionOptimum",
+   "short": "targetCorrectionOptimum",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1788,
+   "signature": "(B : ι → Matrix J J ℝ) (beta theta : J → ℝ) : ι → ℝ",
+   "args": [
+    {
+     "names": [
+      "B"
+     ],
+     "type": "ι → Matrix J J ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "beta",
+      "theta"
+     ],
+     "type": "J → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ι → ℝ",
+   "body": "  fun i => sharedCorrectionOptimum (B i) beta theta",
+   "docstring": "**The correction each target would choose alone**, as a family indexed by\ndeployment target.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {},
+   "mentioned_by": []
+  },
+  {
+   "name": "Calibrator.sharedCorrectionConsensus",
+   "short": "sharedCorrectionConsensus",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1796,
+   "signature": "(curvature optimum : ι → ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "curvature",
+      "optimum"
+     ],
+     "type": "ι → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (∑ i, curvature i * optimum i) / ∑ i, curvature i",
+   "docstring": "The curvature-weighted mean of the per-target optimal corrections: the\nshared correction that a weighted-least-squares compromise selects.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∑ i, curvature i ≠ 0",
+     "0 < ∑ i, curvature i",
+     "∀ i, 0 < curvature i"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.sharedCorrection_centered": [
+      "∑ i, curvature i ≠ 0"
+     ],
+     "Calibrator.sharedCorrectionCost_eq_consensus_add_spread": [
+      "∑ i, curvature i ≠ 0"
+     ],
+     "Calibrator.sharedCorrectionSpread_le_cost": [
+      "0 < ∑ i, curvature i"
+     ],
+     "Calibrator.sharedCorrectionCost_at_consensus": [
+      "∑ i, curvature i ≠ 0"
+     ],
+     "Calibrator.sharedCorrectionSpread_eq_zero_iff": [
+      "∀ i, 0 < curvature i"
+     ],
+     "Calibrator.sharedCorrectionSpread_eq_zero_iff_agree": [
+      "∀ i, 0 < curvature i",
+      "∑ i, curvature i ≠ 0"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.sharedCorrectionCost_at_consensus",
+    "Calibrator.sharedCorrectionCost_eq_consensus_add_spread",
+    "Calibrator.sharedCorrectionSpread_eq_zero_iff",
+    "Calibrator.sharedCorrectionSpread_eq_zero_iff_agree",
+    "Calibrator.sharedCorrectionSpread_le_cost",
+    "Calibrator.sharedCorrection_centered"
+   ]
+  },
+  {
+   "name": "Calibrator.sharedCorrectionSpread",
+   "short": "sharedCorrectionSpread",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1803,
+   "signature": "(curvature optimum : ι → ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "curvature",
+      "optimum"
+     ],
+     "type": "ι → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  ∑ i, curvature i *\n    (optimum i - sharedCorrectionConsensus curvature optimum) ^ 2",
+   "docstring": "**The spread law's right-hand side**: the curvature-weighted variance of the\nper-target optimal corrections.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "∑ i, curvature i ≠ 0",
+     "0 < ∑ i, curvature i",
+     "∀ i, 0 ≤ curvature i",
+     "∀ i, 0 < curvature i"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.sharedCorrectionCost_eq_consensus_add_spread": [
+      "∑ i, curvature i ≠ 0"
+     ],
+     "Calibrator.sharedCorrectionSpread_le_cost": [
+      "0 < ∑ i, curvature i"
+     ],
+     "Calibrator.sharedCorrectionCost_at_consensus": [
+      "∑ i, curvature i ≠ 0"
+     ],
+     "Calibrator.sharedCorrectionSpread_nonneg": [
+      "∀ i, 0 ≤ curvature i"
+     ],
+     "Calibrator.sharedCorrectionSpread_eq_zero_iff": [
+      "∀ i, 0 < curvature i"
+     ],
+     "Calibrator.sharedCorrectionSpread_eq_zero_iff_agree": [
+      "∀ i, 0 < curvature i",
+      "∑ i, curvature i ≠ 0"
+     ],
+     "Calibrator.sharedCorrectionSpread_of_identical_optima": [
+      "∀ i, 0 < curvature i",
+      "∑ i, curvature i ≠ 0"
+     ]
+    },
+    "range_lo_thm": [
+     "Calibrator.sharedCorrectionSpread_nonneg",
+     1
+    ],
+    "range_lo": 0
+   },
+   "mentioned_by": [
+    "Calibrator.sharedCorrectionCost_at_consensus",
+    "Calibrator.sharedCorrectionCost_eq_consensus_add_spread",
+    "Calibrator.sharedCorrectionSpread_eq_zero_iff",
+    "Calibrator.sharedCorrectionSpread_eq_zero_iff_agree",
+    "Calibrator.sharedCorrectionSpread_le_cost",
+    "Calibrator.sharedCorrectionSpread_nonneg",
+    "Calibrator.sharedCorrectionSpread_of_identical_optima"
+   ]
+  },
+  {
+   "name": "Calibrator.sharedCorrectionCost",
+   "short": "sharedCorrectionCost",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1811,
+   "signature": "(curvature optimum : ι → ℝ) (correction : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "curvature",
+      "optimum"
+     ],
+     "type": "ι → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "correction"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  ∑ i, curvature i * (correction - optimum i) ^ 2",
+   "docstring": "Total excess risk incurred across the family by applying the single\ncorrection `correction` instead of each target's own optimum.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∑ i, curvature i ≠ 0",
+     "0 < ∑ i, curvature i"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.sharedCorrectionCost_eq_consensus_add_spread": [
+      "∑ i, curvature i ≠ 0"
+     ],
+     "Calibrator.sharedCorrectionSpread_le_cost": [
+      "0 < ∑ i, curvature i"
+     ],
+     "Calibrator.sharedCorrectionCost_at_consensus": [
+      "∑ i, curvature i ≠ 0"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.sharedCorrectionCost_at_consensus",
+    "Calibrator.sharedCorrectionCost_eq_consensus_add_spread",
+    "Calibrator.sharedCorrectionSpread_le_cost"
+   ]
+  },
+  {
    "name": "Calibrator.effectMutualInformation",
    "short": "effectMutualInformation",
    "kind": "def",

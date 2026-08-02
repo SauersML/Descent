@@ -1,5 +1,5 @@
 {
- "total": 1004,
+ "total": 1009,
  "extractable": 668,
  "roots": [
   "Calibrator.FrequencyResolvedCohort.correctableClasses",
@@ -281,7 +281,10 @@
   "Calibrator.scalarCorrectionFloor",
   "Calibrator.scoreVarianceFromSourceWeights",
   "Calibrator.screeningQalyGain",
+  "Calibrator.sharedCorrectionConsensus",
+  "Calibrator.sharedCorrectionCost",
   "Calibrator.sharedCorrectionOptimum",
+  "Calibrator.sharedCorrectionSpread",
   "Calibrator.sigmaTagCausalSourceAt",
   "Calibrator.sigmaTagCausalTargetAt",
   "Calibrator.sigmaTagTargetAt",
@@ -305,6 +308,8 @@
   "Calibrator.targetCalibratedBrierAtGeneration",
   "Calibrator.targetCalibratedBrierFromSourceWeights",
   "Calibrator.targetCalibrationSlopeAtGeneration",
+  "Calibrator.targetCorrectionCurvature",
+  "Calibrator.targetCorrectionOptimum",
   "Calibrator.targetEffectHeterogeneity",
   "Calibrator.targetEffectHeterogeneityProjection",
   "Calibrator.targetEffectHeterogeneityProjectionAt",

@@ -237,6 +237,13 @@ def main(argv=None):
         cls = entry["class"]
         rec = {"class": cls, "file": entry["file"], "line": entry["line"],
                "status": "UNCOVERED", "check": None, "killed": [],
+               # Declared, not inferred.  Everything this script produces is
+               # INTERNAL CONSISTENCY: a range mined from the corpus's own
+               # theorems or its own docstrings, demonstrated falsifiable by
+               # mutation.  No record here is contact with anything outside the
+               # development, and a consumer must not count it as such.
+               "evidence_class": "internal-consistency",
+               "evidence_detail": "range-invariant + mutation-rejection",
                "reason": entry["note"]}
         results[name] = rec
 

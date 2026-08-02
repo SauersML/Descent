@@ -1,16 +1,16 @@
 {
- "ours": 979,
+ "ours": 984,
  "stamp": {
   "arg_convention": 2,
   "n_collisions": 0,
-  "n_definitions": 1004,
+  "n_definitions": 1009,
   "n_structures": 104,
   "n_parse_failures": 2,
-  "corpus_digest": "sha256:07d0f9ad4ad69c4647034acf9690c94a"
+  "corpus_digest": "sha256:6fced06a92b612cf53e1a30428cc4504"
  },
  "invariants/defs.json": {
   "shared": 948,
-  "only_ours": 31,
+  "only_ours": 36,
   "only_theirs": 17,
   "body": 32,
   "params": 25,
@@ -2176,7 +2176,7 @@
  },
  "symbolic/decls.json": {
   "shared": 968,
-  "only_ours": 11,
+  "only_ours": 16,
   "only_theirs": 2,
   "body": 12,
   "params": 3,
