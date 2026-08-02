@@ -1676,6 +1676,18 @@ noncomputable def effectiveOutcomeVariance {p q : ℕ}
 @[simp] theorem residualBurden_source {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     residualBurden m Pop.source = 0 := rfl
 
+/-- The companion to `residualBurden_source`, and the one that was missing.
+
+`residualBurden` is written as a `Pop.pair`, so at the target it reduces to
+`irreducibleTargetResidualBurden` by `rfl` -- but only if something performs
+that reduction. `residualBurden_source` existed and this did not, which left
+every target-side fact stated about `irreducibleTargetResidualBurden`
+syntactically disconnected from goals mentioning `residualBurden m Pop.target`.
+`linarith` in particular cannot bridge that gap: it was being handed a
+nonnegativity fact about a term that does not occur in its goal. -/
+@[simp] theorem residualBurden_target {p q : ℕ} (m : CrossPopulationMetricModel p q) :
+    residualBurden m Pop.target = irreducibleTargetResidualBurden m := rfl
+
 @[simp] theorem effectiveOutcomeVariance_source {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     effectiveOutcomeVariance m Pop.source = m.outcomeVariance Pop.source := by
@@ -1691,7 +1703,7 @@ variance because the additive residual burden is nonnegative. -/
 theorem effectiveTargetOutcomeVariance_ge_targetOutcomeVariance {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     (m.outcomeVariance Pop.target) ≤ effectiveOutcomeVariance m Pop.target := by
-  unfold effectiveOutcomeVariance
+  simp only [effectiveOutcomeVariance, residualBurden_target]
   linarith [irreducibleTargetResidualBurden_nonneg m]
 
 /-- The effective target outcome variance stays strictly positive because the
@@ -1700,8 +1712,8 @@ nonnegative. -/
 theorem effectiveTargetOutcomeVariance_pos {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     0 < effectiveOutcomeVariance m Pop.target := by
-  unfold effectiveOutcomeVariance
-  linarith [m.outcomeVariance_pos, irreducibleTargetResidualBurden_nonneg m]
+  simp only [effectiveOutcomeVariance, residualBurden_target]
+  linarith [m.outcomeVariance_pos Pop.target, irreducibleTargetResidualBurden_nonneg m]
 
 /-- Exact decomposition of the effective target outcome variance into the base
 target scale plus the three named additive residual-loss terms. -/
@@ -1713,7 +1725,8 @@ theorem effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses {p q 
         ancestrySpecificLDResidual m +
         sourceSpecificOverfitResidual m +
         novelUntaggablePhenotypeResidual m := by
-  simp [effectiveOutcomeVariance, irreducibleTargetResidualBurden, add_assoc]
+  simp [effectiveOutcomeVariance, residualBurden_target,
+    irreducibleTargetResidualBurden, add_assoc]
 
 /-- Exact source `R²` under the full source-side driver state. -/
 noncomputable def explainedSignalVarianceFromSourceWeights {p q : ℕ}
