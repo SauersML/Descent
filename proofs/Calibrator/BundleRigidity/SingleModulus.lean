@@ -432,12 +432,19 @@ which is exactly `v > 0`.
 **This refutes the upstream claim that no `d ≤ 3` family exists for `v > 0`.** It is the
 `c = 1/(4A)` endpoint of the upstream one-parameter line, at which the mass on `√(1-v)`
 reaches zero and the atom disappears — not a new solution, but an endpoint of the known
-one that the upstream positivity analysis excluded by assumption. -/
+one that the upstream positivity analysis excluded by assumption.
+
 Parameterized by the **ratio** `r = B / A` rather than by a quotient written inline: the
 masses are then `1/4 + r/4`, `1/4 - r/4`, `1/2`, and the construction contains **no
 division at all**. Positivity of the middle mass is exactly `r < 1`, which is exactly
 `B < A`, which is exactly `v > 0`. This shape was adopted after a build showed the
-divided form failing on renamed division lemmas; it is the same family. -/
+divided form failing on renamed division lemmas; it is the same family.
+
+*On the proof style.* The entries of `![A, -A, -B]` are extracted by **type ascription**
+(`(hij : A = -A)`, `show |A ^ 2 - 1| = v`) rather than by `simp` with `Matrix.cons_*`
+lemmas. Ascription relies only on definitional reduction, which always succeeds here;
+two builds were lost to guessed `simp only` lemma lists that silently failed to reduce
+`![…] ⟨2, _⟩`, leaving later `rw`s with nothing to match. -/
 noncomputable def threeAtom (v A B r : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
     (hB : B ^ 2 = 1 - v) (hApos : 0 < A) (hBpos : 0 < B)
     (hr0 : 0 < r) (hr1 : r < 1) (hr : B = A * r) :
@@ -447,17 +454,25 @@ noncomputable def threeAtom (v A B r : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
   atom_inj := by
     have hBA : B < A := by rw [hr]; nlinarith
     intro i j hij
-    fin_cases i <;> fin_cases j <;>
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-        Matrix.head_fin_const, Matrix.cons_val] at hij ⊢ <;>
-      first
-        | rfl
-        | (exfalso; linarith)
+    fin_cases i <;> fin_cases j
+    · rfl
+    · exact absurd (hij : A = -A) (by intro h; linarith)
+    · exact absurd (hij : A = -B) (by intro h; linarith)
+    · exact absurd (hij : -A = A) (by intro h; linarith)
+    · rfl
+    · exact absurd (hij : -A = -B) (by intro h; linarith)
+    · exact absurd (hij : -B = A) (by intro h; linarith)
+    · exact absurd (hij : -B = -A) (by intro h; linarith)
+    · rfl
   mass_pos := by
     intro j
-    fin_cases j <;>
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-        Matrix.head_fin_const, Matrix.cons_val] <;> linarith
+    fin_cases j
+    · show (0:ℝ) < 1 / 4 + r / 4
+      linarith
+    · show (0:ℝ) < 1 / 4 - r / 4
+      linarith
+    · show (0:ℝ) < 1 / 2
+      norm_num
   mass_sum := by
     rw [Fin.sum_univ_three]
     show (1 / 4 + r / 4) + (1 / 4 - r / 4) + (1 / 2 : ℝ) = 1
@@ -475,14 +490,16 @@ noncomputable def threeAtom (v A B r : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
     rw [hkey, hA, hB]; ring
   modulus_eq := by
     intro j
-    fin_cases j <;>
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-        Matrix.head_fin_const, Matrix.cons_val]
-    · rw [hA, abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 + v - 1)]; ring
-    · rw [show (-A) ^ 2 = A ^ 2 by ring, hA,
-        abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 + v - 1)]; ring
-    · rw [show (-B) ^ 2 = B ^ 2 by ring, hB, show (1 : ℝ) - v - 1 = -v by ring,
-        abs_neg, abs_of_nonneg hv]
+    fin_cases j
+    · show |A ^ 2 - 1| = v
+      rw [hA, show (1 : ℝ) + v - 1 = v by ring]
+      exact abs_of_nonneg hv
+    · show |(-A) ^ 2 - 1| = v
+      rw [show (-A) ^ 2 = A ^ 2 by ring, hA, show (1 : ℝ) + v - 1 = v by ring]
+      exact abs_of_nonneg hv
+    · show |(-B) ^ 2 - 1| = v
+      rw [show (-B) ^ 2 = B ^ 2 by ring, hB, show (1 : ℝ) - v - 1 = -v by ring, abs_neg]
+      exact abs_of_nonneg hv
 
 /-- **The rational witness at `v = 3/5`**, which needs no square-root manipulation: with
 `B² = 2/5` and `A = 2B`, the masses are exactly `(3/8, 1/8, 1/2)`.
@@ -513,17 +530,25 @@ noncomputable def threeAtomAtOne (A : ℝ) (hA : A ^ 2 = 2) (hApos : 0 < A) :
   mass := ![1 / 4, 1 / 4, 1 / 2]
   atom_inj := by
     intro i j hij
-    fin_cases i <;> fin_cases j <;>
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-        Matrix.head_fin_const, Matrix.cons_val] at hij ⊢ <;>
-      first
-        | rfl
-        | (exfalso; linarith)
+    fin_cases i <;> fin_cases j
+    · rfl
+    · exact absurd (hij : A = -A) (by intro h; linarith)
+    · exact absurd (hij : A = 0) (by intro h; linarith)
+    · exact absurd (hij : -A = A) (by intro h; linarith)
+    · rfl
+    · exact absurd (hij : -A = 0) (by intro h; linarith)
+    · exact absurd (hij : (0:ℝ) = A) (by intro h; linarith)
+    · exact absurd (hij : (0:ℝ) = -A) (by intro h; linarith)
+    · rfl
   mass_pos := by
     intro j
-    fin_cases j <;>
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-        Matrix.head_fin_const, Matrix.cons_val] <;> norm_num
+    fin_cases j
+    · show (0:ℝ) < 1 / 4
+      norm_num
+    · show (0:ℝ) < 1 / 4
+      norm_num
+    · show (0:ℝ) < 1 / 2
+      norm_num
   mass_sum := by
     rw [Fin.sum_univ_three]
     show (1 / 4 : ℝ) + 1 / 4 + 1 / 2 = 1
@@ -540,12 +565,13 @@ noncomputable def threeAtomAtOne (A : ℝ) (hA : A ^ 2 = 2) (hApos : 0 < A) :
     rw [hkey, hA]; norm_num
   modulus_eq := by
     intro j
-    fin_cases j <;>
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-        Matrix.head_fin_const, Matrix.cons_val]
-    · rw [hA]; norm_num
-    · rw [show (-A) ^ 2 = A ^ 2 by ring, hA]; norm_num
-    · norm_num
+    fin_cases j
+    · show |A ^ 2 - 1| = 1
+      rw [hA]; norm_num
+    · show |(-A) ^ 2 - 1| = 1
+      rw [show (-A) ^ 2 = A ^ 2 by ring, hA]; norm_num
+    · show |(0:ℝ) ^ 2 - 1| = 1
+      norm_num
 
 /-- **The upstream `d = 4` line, which is correct.**
 
@@ -565,12 +591,23 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
   mass := ![1 / 4 + c * B, 1 / 4 - c * B, 1 / 4 - c * A, 1 / 4 + c * A]
   atom_inj := by
     intro i j hij
-    fin_cases i <;> fin_cases j <;>
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-        Matrix.head_fin_const, Matrix.cons_val] at hij ⊢ <;>
-      first
-        | rfl
-        | (exfalso; linarith)
+    fin_cases i <;> fin_cases j
+    · rfl
+    · exact absurd (hij : A = -A) (by intro h; linarith)
+    · exact absurd (hij : A = B) (by intro h; linarith)
+    · exact absurd (hij : A = -B) (by intro h; linarith)
+    · exact absurd (hij : -A = A) (by intro h; linarith)
+    · rfl
+    · exact absurd (hij : -A = B) (by intro h; linarith)
+    · exact absurd (hij : -A = -B) (by intro h; linarith)
+    · exact absurd (hij : B = A) (by intro h; linarith)
+    · exact absurd (hij : B = -A) (by intro h; linarith)
+    · rfl
+    · exact absurd (hij : B = -B) (by intro h; linarith)
+    · exact absurd (hij : -B = A) (by intro h; linarith)
+    · exact absurd (hij : -B = -A) (by intro h; linarith)
+    · exact absurd (hij : -B = B) (by intro h; linarith)
+    · rfl
   mass_pos := by
     intro j
     have hcA : |c * A| < 1 / 4 := by
@@ -582,10 +619,15 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
       linarith
     have h1 := abs_lt.mp hcA
     have h2 := abs_lt.mp hcB
-    fin_cases j <;>
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-        Matrix.head_fin_const, Matrix.cons_val] <;>
-      linarith [h1.1, h1.2, h2.1, h2.2]
+    fin_cases j
+    · show (0:ℝ) < 1 / 4 + c * B
+      linarith [h2.1, h2.2]
+    · show (0:ℝ) < 1 / 4 - c * B
+      linarith [h2.1, h2.2]
+    · show (0:ℝ) < 1 / 4 - c * A
+      linarith [h1.1, h1.2]
+    · show (0:ℝ) < 1 / 4 + c * A
+      linarith [h1.1, h1.2]
   mass_sum := by
     rw [Fin.sum_univ_four]
     show (1 / 4 + c * B) + (1 / 4 - c * B) + (1 / 4 - c * A) + (1 / 4 + c * A) = 1
@@ -605,14 +647,18 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
     rw [hkey, hA, hB]; ring
   modulus_eq := by
     intro j
-    fin_cases j <;>
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-        Matrix.head_fin_const, Matrix.cons_val]
-    · rw [hA, abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 + v - 1)]; ring
-    · rw [show (-A) ^ 2 = A ^ 2 by ring, hA,
-        abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 + v - 1)]; ring
-    · rw [hB, show (1 : ℝ) - v - 1 = -v by ring, abs_neg, abs_of_nonneg hv]
-    · rw [show (-B) ^ 2 = B ^ 2 by ring, hB, show (1 : ℝ) - v - 1 = -v by ring,
-        abs_neg, abs_of_nonneg hv]
+    fin_cases j
+    · show |A ^ 2 - 1| = v
+      rw [hA, show (1 : ℝ) + v - 1 = v by ring]
+      exact abs_of_nonneg hv
+    · show |(-A) ^ 2 - 1| = v
+      rw [show (-A) ^ 2 = A ^ 2 by ring, hA, show (1 : ℝ) + v - 1 = v by ring]
+      exact abs_of_nonneg hv
+    · show |B ^ 2 - 1| = v
+      rw [hB, show (1 : ℝ) - v - 1 = -v by ring, abs_neg]
+      exact abs_of_nonneg hv
+    · show |(-B) ^ 2 - 1| = v
+      rw [show (-B) ^ 2 = B ^ 2 by ring, hB, show (1 : ℝ) - v - 1 = -v by ring, abs_neg]
+      exact abs_of_nonneg hv
 
 end Calibrator.BundleRigidity
