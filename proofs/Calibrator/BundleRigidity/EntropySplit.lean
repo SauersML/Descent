@@ -43,12 +43,24 @@ failure of fluctuation growth with equidistribution intact.
 diffusive rate. It is short, and it is the part worth having in a machine-checked form,
 because it is what rules out a normalization rather than merely failing to supply one.
 
-## What is proved and what is assumed
+## What is proved and what is assumed — read this before quoting anything above
 
-Proved outright: the two quantitative consequences above. Assumed, as named fields of
-`DrivingHypotheses`: the exact doubling-map factor identity, the Denjoy–Koksma bound, and
-equidistribution under rotation driving. Those are the analysis, and this module does not
-carry it.
+**The two evaluations narrated above are inputs, not results of this module**, and the
+prose states them in the indicative only because that is how the source states them. This
+module does **not** establish that the doubling-map conditional factor equals
+`|cos(s Δ_w / 2)|`, does **not** establish that it is bounded away from one off the
+lattice, and does **not** establish the Denjoy–Koksma bound or equidistribution under
+rotation driving. All four are named fields of `DrivingHypotheses`.
+
+Proved outright, and *only* these: `linear_gain_of_uniform_factor`, which converts a
+uniform per-step factor `ρ < 1` into linear gain, and `no_diffusive_normalization`, which
+converts a bounded gain sequence into a vanishing diffusive rate. Both are conditional on
+their hypotheses; neither says anything about doubling maps or rotations by itself.
+
+So the entropy split as a *claim about dynamics* is carried, not shown. What is shown is
+that **if** the two dynamical inputs hold, **then** the two failure modes are as described
+— which is the part worth having machine-checked, since it is where the reasoning could
+have been wrong in a way inspection would miss.
 -/
 
 namespace Calibrator.BundleRigidity
@@ -77,13 +89,9 @@ theorem linear_gain_of_uniform_factor (ρ E : ℝ) (hρ0 : 0 < ρ) (hρ1 : ρ < 
   linarith
 
 /-- The per-step factor for a doubling-map block factor is a cosine modulus, hence at most
-one; the content of the positive-entropy case is that it is bounded strictly below one away
-from the lattice, which is the hypothesis `hlt` here. -/
+one. That it is bounded *strictly* below one off the lattice is analysis and is carried as
+`factorBoundedOffLattice`, not proved here. -/
 theorem cos_factor_le_one (x : ℝ) : |Real.cos x| ≤ 1 := abs_cos_le_one x
-
-/-- A strict cosine bound is exactly what makes the linear-gain hypothesis available. -/
-theorem factor_lt_one_of_cos_lt (x : ℝ) (hlt : |Real.cos x| < 1) :
-    |Real.cos x| < 1 := hlt
 
 /-! ## Zero entropy: fluctuation collapse -/
 

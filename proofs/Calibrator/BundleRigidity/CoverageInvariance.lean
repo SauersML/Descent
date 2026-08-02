@@ -58,15 +58,21 @@ enumerate-and-assert-completeness failure that sank the single-modulus classific
 it deserved a direct attack rather than a downstream formalization. Two findings, and both
 go the same way.
 
-**Finding 1 — there are no limit ordinals, so the crack has no site.** The core is
-definable coinductively, as the union of all peel-stable subsets, i.e. the greatest
-post-fixed point. Because peeling is monotone (`Coverage.peel_mono`), Knaster–Tarski makes
-that object **equal** to the limit of the transfinite decreasing iteration. So the
-transfinite presentation and the coinductive one compute the same core, and the
-coinductive one has no successor step, no limit step, and no stabilization lemma. A
-pathology located specifically at limit ordinals cannot be a pathology of an object that
-is definable without them. This is the same dissolution that made Lemma 1 unnecessary, and
-it is structural rather than a repair.
+**Finding 1 — the coinductive core has no limit ordinals, so the crack has no site *there*.**
+The core is definable coinductively, as the union of all peel-stable subsets, i.e. the
+greatest post-fixed point, and peeling is monotone (`Coverage.peel_mono`, proved). That
+object has no successor step, no limit step, and no stabilization lemma, so a pathology
+located specifically at limit ordinals cannot be a pathology of *it*.
+
+**This finding is weaker than it first looks, and the gap is stated rather than
+papered over.** The claim that the coinductive core **equals** the limit of the transfinite
+decreasing iteration is Knaster–Tarski, and **it is not proved here** — it is carried as
+`coincidesWithTransfiniteIteration` below. Without that equality what is established is
+only that *an* object with the right fixed-point property is definable without ordinals,
+**not** that the source's transfinitely-defined core is that object. So this dissolves the
+concern for the formulation used in `Coverage`, and it does **not** by itself discharge the
+concern for the source's formulation. Anyone citing it for the latter is citing more than
+was shown.
 
 **Finding 2 — uniformity is a consequence, not an assumption.** In the coinductive
 formulation uniformity is needed wherever the peeling lemma is applied, not specially at
@@ -218,5 +224,14 @@ structure CoupledPeelingHypotheses where
   infinite-dimensional kernel even over a rigid base family, so `η > 0` is the exact
   boundary rather than a convenience. -/
   modulusCopyWitness : Prop
+  /-- **Knaster–Tarski, demoted from an assertion to an input.** That the coinductive core
+  coincides with the limit of the transfinite decreasing iteration. The module docstring
+  previously asserted this as established; it is not proved anywhere in this development,
+  and Finding 1 applies only to the coinductive formulation without it. -/
+  coincidesWithTransfiniteIteration : Prop
+  /-- **The headline bound is the source's, not this module's.** That the coupled
+  `k`-point modulus map is injective with `σ_min ≥ (η/C_*)^k`. What is proved here is the
+  bookkeeping (`sigmaMin_pow_le`) and the coverage invariance it rests on, not this. -/
+  coupledInjectivity : Prop
 
 end Calibrator.BundleRigidity

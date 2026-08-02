@@ -66,6 +66,37 @@ single-cover. It is killed instead by the **mass identity (0.4)**: a measure sup
 vanishing image forces the multiple to be zero (`rademacher_point_killed`). That is the
 one place in the argument where the mass identity, rather than coverage, does the work.
 
+## Audit point (AP-b): our family sits on a block-collision stratum, and the argument
+## here does not depend on the framework that excludes them
+
+The realizability framework's second pre-registered audit point is **block collisions** —
+atom merging — where the sufficiency argument assumes a constant block pattern and is
+currently proved *off* those isolated strata.
+
+**This family sits on exactly such a stratum, and not incidentally.** At `p = 1/2` both
+modulus curves vanish together (`mOne_half`, `mTwo_half`), so the distinct modulus values
+collapse. That is a block collision, and it is the **accumulation point of the peeling
+chain** (`chain_tendsto_half`), not an interior point one could exclude by hand.
+
+So the inherited scope condition had to be checked rather than assumed. It clears, and here
+is the specific reason:
+
+* **the Rademacher point is killed by the mass identity, not by continuation.**
+  `rademacher_point_killed` is pure arithmetic — `c · (p + (1 - p)) = c`, so a vanishing
+  image forces `c = 0`. It invokes no analyticity, no germ, no block pattern and no
+  continuation argument, so nothing about constant block patterns can affect it;
+* **the chain never reaches the collision.** `chain_lt_half` proves every `P k` is strictly
+  below `1/2`, so every peeling step happens strictly off the collision stratum, and the
+  collision is approached only in the limit;
+* **the peeling machinery used here is topological, not analytic.** The coverage and core
+  results in `Coverage` use continuity of the modulus curves and monotonicity of peeling;
+  they never use analyticity, so they carry no off-strata scope condition to inherit.
+
+**Conclusion: nothing in this file's argument is inherited from the off-collision-strata
+sufficiency claim.** This is recorded because an inherited scope condition is exactly the
+kind of thing that goes unnoticed — the argument would still *read* correctly if it had
+silently depended on one.
+
 ## Attribution
 
 The two-atom solution is new here. The peeling argument it runs on is the classical
