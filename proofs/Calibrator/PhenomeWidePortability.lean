@@ -424,11 +424,11 @@ theorem worse_than_neutral_implies_diversifying_selection
     let sigma_hat :=
       sigmaThetaFromObservedSelectedVariance v_selected_obs v_mutation s t rho_obs
     let observed_ratio :=
-      expectedR2 (realWorldPGSVariance V_A fstT rho_obs) V_E /
-        expectedR2 (presentDayPGSVariance V_A fstS) V_E
+      r2FromSignalVariance (realWorldPGSVariance V_A fstT rho_obs) V_E /
+        r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E
     let neutral_ratio :=
-      expectedR2 (presentDayPGSVariance V_A fstT) V_E /
-        expectedR2 (presentDayPGSVariance V_A fstS) V_E
+      r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
+        r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E
     (0 < tau_hat ∧
       0 < sigma_hat ∧
       fluctuatingEffectCorrelation t tau_hat = rho_obs ∧
@@ -457,10 +457,10 @@ theorem worse_than_neutral_implies_diversifying_selection
       v_mutation s t rho_obs v_selected_obs h_t h_rho h_rho_lt h_var_gap
   rcases h_selection with ⟨h_match, h_not_stab⟩
   have h_port :
-      expectedR2 (realWorldPGSVariance V_A fstT rho_obs) V_E /
-          expectedR2 (presentDayPGSVariance V_A fstS) V_E <
-        expectedR2 (presentDayPGSVariance V_A fstT) V_E /
-          expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
+      r2FromSignalVariance (realWorldPGSVariance V_A fstT rho_obs) V_E /
+          r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E <
+        r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
+          r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
     simpa [realWorldPGSVariance, presentDayPGSVariance] using
       portability_ratio_with_ld_decay V_A V_E fstS fstT 1 rho_obs
         hVA hVE hfst hfstT_lt_one rfl ⟨h_rho, h_rho_lt⟩

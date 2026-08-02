@@ -485,8 +485,8 @@ theorem drift_only_overestimates_immune_portability
     (hfstS : 0 ≤ fstS) (hfstT : fstT < 1)
     (hfst : fstS < fstT)
     (hρ_pos : 0 < ρ) (hρ_lt : ρ < 1) :
-    expectedR2 (ρ ^ 2 * presentDayPGSVariance V_A fstT) V_E <
-      expectedR2 (presentDayPGSVariance V_A fstT) V_E := by
+    r2FromSignalVariance (ρ ^ 2 * presentDayPGSVariance V_A fstT) V_E <
+      r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E := by
   apply expectedR2_strictMono_nonneg V_E _ _ hVE
   · exact le_of_lt (mul_pos (sq_pos_of_pos hρ_pos)
       (by unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos (by linarith) hVA))

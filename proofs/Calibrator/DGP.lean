@@ -2190,6 +2190,40 @@ namespace TransportedMetrics
 noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   vSignal / (vSignal + vNoise)
 
+/-- **The explained-variance ratio really is the `R²` of a data-generating process** —
+under a regime that is now written down rather than assumed.
+
+Two hypotheses carry the whole modelling content, and both are discharged by the caller:
+
+* `h_additive` says the outcome's conditional mean tracks the signal one for one, i.e. the
+  outcome is the signal plus a residual uncorrelated with it. This is the additive-noise
+  regime. Outside it the covariance is not the signal variance and the ratio below is not
+  an `R²` — it is a number.
+* `h_split` says the outcome variance decomposes as signal plus `V_E`, which is what makes
+  `V_E` deserve the name "environmental variance" rather than being an arbitrary second
+  argument.
+
+This is the bridge the development was missing. `presentDayR2`, and with it every drift,
+mutation-drift and generational `R²`, is `r2FromSignalVariance` applied to a different signal
+variance, so each of them inherits this theorem instead of needing its own. Before it,
+the statement "this quotient is the `R²` of the process" was not something the corpus
+could express, let alone check: the quotient was a definition, and a definition cannot be
+wrong. -/
+theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
+    {dgp : DataGeneratingProcess k} {signal : Predictor k}
+    (R : MomentReading dgp signal) (V_E : ℝ)
+    (h_additive : R.cov = R.vSignal)
+    (h_split : R.vOutcome = R.vSignal + V_E) :
+    r2FromSignalVariance R.vSignal V_E = rsquared dgp signal dgp.trueExpectation := by
+  rw [rsquared_eq_of_momentReading R, h_additive, h_split]
+  unfold r2FromSignalVariance
+  have hs : R.vSignal ≠ 0 := ne_of_gt R.vSignal_pos
+  have ho : R.vSignal + V_E ≠ 0 := by
+    rw [← h_split]; exact ne_of_gt R.vOutcome_pos
+  field_simp
+  ring
+
+
 /-- **AUC of the equal-variance Gaussian model**, from signal and residual
     variances: `Φ(√(vSignal / (2 · vNoise)))`.
 
@@ -2246,6 +2280,26 @@ noncomputable def calibratedBrierFromVariances (π vSignal vResidual : ℝ) : �
     calibratedBrierFromVariances π vSignal vResidual =
       calibratedBrier π (r2FromSignalVariance vSignal vResidual) := by
   rfl
+
+/-- **The calibrated Brier closed form is the Brier risk at the process's own `R²`.**
+
+Nothing new is assumed here beyond `r2FromSignalVariance_eq_rsquared`: the same
+additive-noise regime and variance split, discharged once, carry the Brier family across
+too. That is the whole reason for anchoring the quotient rather than each metric
+separately - `calibratedBrierFromVariances` was already the calibrated Brier evaluated at
+`r2FromSignalVariance`, so the moment the quotient became the process `R²`, so did this.
+
+The prevalence `π` is untouched by any of it, which is the honest reading: Brier moves
+with prevalence for reasons that have nothing to do with how well the score predicts. -/
+theorem calibratedBrierFromVariances_eq_rsquared_form {k : ℕ} [Fintype (Fin k)]
+    {dgp : DataGeneratingProcess k} {signal : Predictor k}
+    (R : MomentReading dgp signal) (π V_E : ℝ)
+    (h_additive : R.cov = R.vSignal)
+    (h_split : R.vOutcome = R.vSignal + V_E) :
+    calibratedBrierFromVariances π R.vSignal V_E =
+      calibratedBrier π (rsquared dgp signal dgp.trueExpectation) := by
+  rw [calibratedBrierFromVariances_eq_chart,
+    r2FromSignalVariance_eq_rsquared R V_E h_additive h_split]
 
 /-- Explicit additive irreducible target-side residual-loss budget.
 These penalties are not compressed into a single multiplicative transport

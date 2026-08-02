@@ -65,7 +65,7 @@ theorem ld_dominant_pathway
     loss (source R² minus immune R²) exceeds twice the drift-only
     loss (source R² minus drift-only R²) when ρ is small enough.
 
-    We model this using expectedR2 from PortabilityDrift: drift-only
+    We model this using r2FromSignalVariance from PortabilityDrift: drift-only
     uses signal (1-fst)·V_A, immune uses ρ²·(1-fst)·V_A.
     We show the immune R² is strictly below the drift-only R²,
     establishing that effect turnover is a genuine additional
@@ -78,8 +78,8 @@ theorem selection_dominant_for_immune
     -- Immune R² (with effect turnover ρ) is strictly less than
     -- drift-only R² (no effect turnover), showing the selection
     -- pathway causes genuine additional loss beyond LD/drift.
-    expectedR2 (ρ ^ 2 * presentDayPGSVariance V_A fst) V_E <
-      expectedR2 (presentDayPGSVariance V_A fst) V_E := by
+    r2FromSignalVariance (ρ ^ 2 * presentDayPGSVariance V_A fst) V_E <
+      r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E := by
   apply expectedR2_strictMono_nonneg V_E _ _ hVE
   · exact le_of_lt (mul_pos (sq_pos_of_pos hρ_pos)
       (by unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos (by linarith) hVA))
@@ -129,31 +129,31 @@ theorem proportion_mediated_in_unit
 /-- **LD mediates ancestry → PGS accuracy.**
     Ancestry → LD structure → PGS weights → Accuracy.
 
-    Model: PGS accuracy = expectedR2(vSignal, V_E + V_ld_mismatch).
+    Model: PGS accuracy = r2FromSignalVariance(vSignal, V_E + V_ld_mismatch).
     Without LD correction, the full mismatch V_ld adds noise.
     With LD correction (using target-population LD matrix), a fraction
     `α` of the mismatch is removed, leaving V_E + (1-α)·V_ld.
     Since 0 < α ≤ 1, the corrected noise is strictly less,
-    so R²_corrected > R²_uncorrected by expectedR2 monotonicity.
+    so R²_corrected > R²_uncorrected by r2FromSignalVariance monotonicity.
     A residual gap to source R² (V_E only) remains when α < 1. -/
 theorem ld_mediates_portability
     (vSignal V_E V_ld α : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E)
     (h_ld : 0 < V_ld) (h_α_pos : 0 < α) (h_α_le : α ≤ 1) :
     -- LD correction improves R²: corrected > uncorrected
-    expectedR2 vSignal (V_E + V_ld) <
-      expectedR2 vSignal (V_E + (1 - α) * V_ld) ∧
+    r2FromSignalVariance vSignal (V_E + V_ld) <
+      r2FromSignalVariance vSignal (V_E + (1 - α) * V_ld) ∧
     -- Residual gap remains (corrected < source) when α < 1
-    (α < 1 → expectedR2 vSignal (V_E + (1 - α) * V_ld) <
-      expectedR2 vSignal V_E) := by
+    (α < 1 → r2FromSignalVariance vSignal (V_E + (1 - α) * V_ld) <
+      r2FromSignalVariance vSignal V_E) := by
   constructor
   · -- Corrected noise = V_E + (1-α)·V_ld < V_E + V_ld = uncorrected noise
     -- since α > 0 implies (1-α) < 1, so (1-α)·V_ld < V_ld.
-    unfold expectedR2
+    unfold r2FromSignalVariance
     exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
   · -- If α < 1, then (1-α)·V_ld > 0, so corrected noise > V_E = source noise.
     intro h_α_lt
-    unfold expectedR2
+    unfold r2FromSignalVariance
     exact div_lt_div_of_pos_left h_sig (by linarith) (by nlinarith)
 
 /-- **Environment mediates ancestry → PGS accuracy.**
@@ -164,15 +164,15 @@ theorem ld_mediates_portability
     Genetic R² (no environmental noise) = V_genetic / V_genetic = 1,
     but more usefully, the phenotypic R² is strictly less than what
     we'd get without environmental variance.  Specifically:
-      R²_pheno = expectedR2(V_genetic, V_env) < expectedR2(V_genetic, 0) = 1.
+      R²_pheno = r2FromSignalVariance(V_genetic, V_env) < r2FromSignalVariance(V_genetic, 0) = 1.
     This shows environment genuinely reduces predictive accuracy;
     the reduction is derived from the variance decomposition, not assumed. -/
 theorem environment_mediates_portability
     (V_genetic V_env : ℝ)
     (h_gen : 0 < V_genetic) (h_env : 0 < V_env) :
     -- Phenotypic R² is strictly less than 1 (perfect genetic prediction)
-    expectedR2 V_genetic V_env < 1 := by
-  unfold expectedR2
+    r2FromSignalVariance V_genetic V_env < 1 := by
+  unfold r2FromSignalVariance
   rw [div_lt_one (by linarith : 0 < V_genetic + V_env)]
   linarith
 
@@ -199,8 +199,8 @@ theorem counterfactual_same_ancestry_perfect
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst_pos : 0 < fst) (hfst_lt : fst < 1) :
     -- Cross-ancestry R² is strictly below same-ancestry R²
-    expectedR2 (presentDayPGSVariance V_A fst) V_E <
-      expectedR2 (presentDayPGSVariance V_A 0) V_E := by
+    r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E <
+      r2FromSignalVariance (presentDayPGSVariance V_A 0) V_E := by
   apply expectedR2_strictMono_nonneg V_E _ _ hVE
   · unfold presentDayPGSVariance pgsVarianceFromHet
     exact le_of_lt (mul_pos (by linarith) hVA)
@@ -219,8 +219,8 @@ theorem counterfactual_wgs_residual
     (vSignal V_E V_tech : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_tech : 0 < V_tech) :
     -- Array R² (with technical noise) < WGS R² (without)
-    expectedR2 vSignal (V_E + V_tech) < expectedR2 vSignal V_E := by
-  unfold expectedR2
+    r2FromSignalVariance vSignal (V_E + V_tech) < r2FromSignalVariance vSignal V_E := by
+  unfold r2FromSignalVariance
   have h_denom_wgs : 0 < vSignal + V_E := by linarith
   have h_denom_arr : 0 < vSignal + (V_E + V_tech) := by linarith
   rw [div_lt_div_iff₀ h_denom_arr h_denom_wgs]
@@ -229,7 +229,7 @@ theorem counterfactual_wgs_residual
 /-- **Counterfactual: infinite sample size.**
     With finite sample, winner's curse inflates effect estimates,
     adding noise V_wc to the prediction.  With n → ∞, V_wc → 0.
-    We model finite-sample R² as expectedR2 with signal vSignal
+    We model finite-sample R² as r2FromSignalVariance with signal vSignal
     and noise V_E + V_wc (winner's curse adds prediction error).
     Infinite-sample R² uses noise V_E only.
     The remaining loss (infinite-sample R² vs source R²) is from
@@ -238,8 +238,8 @@ theorem counterfactual_infinite_sample
     (vSignal V_E V_wc : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_wc : 0 < V_wc) :
     -- Finite-sample R² < infinite-sample R²
-    expectedR2 vSignal (V_E + V_wc) < expectedR2 vSignal V_E := by
-  unfold expectedR2
+    r2FromSignalVariance vSignal (V_E + V_wc) < r2FromSignalVariance vSignal V_E := by
+  unfold r2FromSignalVariance
   have h_denom_inf : 0 < vSignal + V_E := by linarith
   have h_denom_fin : 0 < vSignal + (V_E + V_wc) := by linarith
   rw [div_lt_div_iff₀ h_denom_fin h_denom_inf]
@@ -255,8 +255,8 @@ theorem counterfactual_equal_environments
     (vSignal V_E V_gxe : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_gxe : 0 < V_gxe) :
     -- R² with GxE < R² without GxE
-    expectedR2 vSignal (V_E + V_gxe) < expectedR2 vSignal V_E := by
-  unfold expectedR2
+    r2FromSignalVariance vSignal (V_E + V_gxe) < r2FromSignalVariance vSignal V_E := by
+  unfold r2FromSignalVariance
   have h_denom_eq : 0 < vSignal + V_E := by linarith
   have h_denom_gxe : 0 < vSignal + (V_E + V_gxe) := by linarith
   rw [div_lt_div_iff₀ h_denom_gxe h_denom_eq]
@@ -294,15 +294,15 @@ theorem intervention_hierarchy
     (h_ld : 0 < V_ld) (h_power : 0 < V_power) (h_cal : 0 < V_cal)
     (h_α_pos : 0 < α) (h_αβ : α < β) (h_β_lt : β < 1) :
     -- Original < recalibrated < LD-corrected < meta-analysis < new GWAS
-    expectedR2 vSig (V_E + V_ld + V_power + V_cal) <
-      expectedR2 vSig (V_E + V_ld + V_power) ∧
-    expectedR2 vSig (V_E + V_ld + V_power) <
-      expectedR2 vSig (V_E + (1 - α) * V_ld + V_power) ∧
-    expectedR2 vSig (V_E + (1 - α) * V_ld + V_power) <
-      expectedR2 vSig (V_E + (1 - β) * V_ld) ∧
-    expectedR2 vSig (V_E + (1 - β) * V_ld) <
-      expectedR2 vSig V_E := by
-  unfold expectedR2
+    r2FromSignalVariance vSig (V_E + V_ld + V_power + V_cal) <
+      r2FromSignalVariance vSig (V_E + V_ld + V_power) ∧
+    r2FromSignalVariance vSig (V_E + V_ld + V_power) <
+      r2FromSignalVariance vSig (V_E + (1 - α) * V_ld + V_power) ∧
+    r2FromSignalVariance vSig (V_E + (1 - α) * V_ld + V_power) <
+      r2FromSignalVariance vSig (V_E + (1 - β) * V_ld) ∧
+    r2FromSignalVariance vSig (V_E + (1 - β) * V_ld) <
+      r2FromSignalVariance vSig V_E := by
+  unfold r2FromSignalVariance
   refine ⟨?_, ?_, ?_, ?_⟩
   · exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
   · exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
@@ -319,9 +319,9 @@ theorem diminishing_marginal_returns
     (v Δ V_E : ℝ)
     (hv : 0 ≤ v) (hΔ : 0 < Δ) (hVE : 0 < V_E) :
     -- Second increment gives less R² gain than the first
-    expectedR2 (v + 2 * Δ) V_E - expectedR2 (v + Δ) V_E <
-      expectedR2 (v + Δ) V_E - expectedR2 v V_E := by
-  unfold expectedR2
+    r2FromSignalVariance (v + 2 * Δ) V_E - r2FromSignalVariance (v + Δ) V_E <
+      r2FromSignalVariance (v + Δ) V_E - r2FromSignalVariance v V_E := by
+  unfold r2FromSignalVariance
   have ha : 0 < v + V_E := by linarith
   have hb : 0 < v + Δ + V_E := by linarith
   have hc : 0 < v + 2 * Δ + V_E := by linarith

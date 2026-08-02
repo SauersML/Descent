@@ -839,59 +839,17 @@ theorem expected_abs_mean_shift_of_wrightFisher
 noncomputable def presentDaySignalToNoise (V_A V_E fst : ℝ) : ℝ :=
   presentDayPGSVariance V_A fst / V_E
 
-/-- **Explained-variance ratio from a signal variance and a residual variance.**
-
-This is the single place the ratio `vSignal / (vSignal + V_E)` is written down. Every
-present-day, mutation-drift and temporal `R²` in the corpus is this function applied to a
-different signal variance, and each of those is now that application rather than a second
-copy of the same quotient. -/
-noncomputable def expectedR2 (vSignal V_E : ℝ) : ℝ :=
-  vSignal / (vSignal + V_E)
-
-/-- **The explained-variance ratio really is the `R²` of a data-generating process** —
-under a regime that is now written down rather than assumed.
-
-Two hypotheses carry the whole modelling content, and both are discharged by the caller:
-
-* `h_additive` says the outcome's conditional mean tracks the signal one for one, i.e. the
-  outcome is the signal plus a residual uncorrelated with it. This is the additive-noise
-  regime. Outside it the covariance is not the signal variance and the ratio below is not
-  an `R²` — it is a number.
-* `h_split` says the outcome variance decomposes as signal plus `V_E`, which is what makes
-  `V_E` deserve the name "environmental variance" rather than being an arbitrary second
-  argument.
-
-This is the bridge the development was missing. `presentDayR2`, and with it every drift,
-mutation-drift and generational `R²`, is `expectedR2` applied to a different signal
-variance, so each of them inherits this theorem instead of needing its own. Before it,
-the statement "this quotient is the `R²` of the process" was not something the corpus
-could express, let alone check: the quotient was a definition, and a definition cannot be
-wrong. -/
-theorem expectedR2_eq_rsquared {k : ℕ} [Fintype (Fin k)]
-    {dgp : DataGeneratingProcess k} {signal : Predictor k}
-    (R : MomentReading dgp signal) (V_E : ℝ)
-    (h_additive : R.cov = R.vSignal)
-    (h_split : R.vOutcome = R.vSignal + V_E) :
-    expectedR2 R.vSignal V_E = rsquared dgp signal dgp.trueExpectation := by
-  rw [rsquared_eq_of_momentReading R, h_additive, h_split]
-  unfold expectedR2
-  have hs : R.vSignal ≠ 0 := ne_of_gt R.vSignal_pos
-  have ho : R.vSignal + V_E ≠ 0 := by
-    rw [← h_split]; exact ne_of_gt R.vOutcome_pos
-  field_simp
-  ring
-
 /-- **Present-day coefficient of determination under drift.**
 
 `R² = V_PGS / (V_PGS + V_E)` where `V_PGS = presentDayPGSVariance V_A fst`. The quotient
-itself is not restated here: this is `expectedR2` applied to the drift-attenuated signal
+itself is not restated here: this is `r2FromSignalVariance` applied to the drift-attenuated signal
 variance, so the two cannot drift apart. -/
 noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
-  expectedR2 (presentDayPGSVariance V_A fst) V_E
+  r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E
 
 /-- **The drift `R²` is the process `R²`**, inherited rather than re-derived.
 
-The only thing this adds to `expectedR2_eq_rsquared` is the identification of the signal
+The only thing this adds to `r2FromSignalVariance_eq_rsquared` is the identification of the signal
 variance with the drift-attenuated one, which is the single modelling step this quantity
 makes. Everything else - the additive-noise regime, the variance split, the reduction of
 an integral to a quotient - is already discharged upstream. That is the point of routing
@@ -905,7 +863,7 @@ theorem presentDayR2_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     presentDayR2 V_A V_E fst = rsquared dgp signal dgp.trueExpectation := by
   unfold presentDayR2
   rw [← h_signal]
-  exact expectedR2_eq_rsquared R V_E h_additive h_split
+  exact r2FromSignalVariance_eq_rsquared R V_E h_additive h_split
 
 /-- Exact bridge theorem: the dashboard algebraic `presentDayR2` equals statistical
 `rsquared` when the relevant second-moment identities hold. -/
@@ -946,7 +904,7 @@ theorem presentDayR2_eq_statistical_rsquared
     unfold rsquared
     simp [h_vf, h_vg, h_cov, h_if_not]
   rw [h_rs]
-  unfold presentDayR2 expectedR2
+  unfold presentDayR2 r2FromSignalVariance
   field_simp [h_vsig_ne, h_vtrue_ne]
 
 
@@ -990,7 +948,7 @@ theorem drift_degrades_R2
     (hfst : fstS < fstT)
     (hfstT_le_one : fstT ≤ 1) :
     presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS := by
-  unfold presentDayR2 expectedR2 presentDayPGSVariance pgsVarianceFromHet
+  unfold presentDayR2 r2FromSignalVariance presentDayPGSVariance pgsVarianceFromHet
   have h_mono : ∀ (x y : ℝ), 0 ≤ x → x < y → x / (x + V_E) < y / (y + V_E) := by
     intro x y hx hxy
     have hxE : 0 < x + V_E := by linarith
@@ -1024,8 +982,8 @@ theorem drift_degrades_R2
 theorem expectedR2_strictMono_nonneg
     (V_E x y : ℝ)
     (hVE : 0 < V_E) (hx : 0 ≤ x) (hxy : x < y) :
-    expectedR2 x V_E < expectedR2 y V_E := by
-  unfold expectedR2
+    r2FromSignalVariance x V_E < r2FromSignalVariance y V_E := by
+  unfold r2FromSignalVariance
   have hxE : 0 < x + V_E := by linarith
   have hyE : 0 < y + V_E := by linarith [hx, hxy]
   have hxyE : x + V_E < y + V_E := by linarith
@@ -2631,17 +2589,17 @@ theorem portability_ratio_with_target_ld_decay_any_source
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfstS_lt_one : fstS < 1) (hfstT_lt_one : fstT < 1)
     (h_rho : 0 < rhoT ∧ rhoT < rhoS) :
-    expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E /
-      expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E <
-    expectedR2 (realWorldPGSVariance V_A fstT rhoS) V_E /
-      expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E := by
+    r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
+      r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E <
+    r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoS) V_E /
+      r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E := by
   rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
   have hRhoS_pos : 0 < rhoS := lt_trans hRhoT_pos hRhoT_lt_rhoS
   have hu_pos : 0 < (1 - fstT) * V_A := mul_pos (by linarith) hVA
   -- Numerator: rhoT < rhoS implies R²(rhoT·u) < R²(rhoS·u)
   have h_num_lt :
-      expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E <
-        expectedR2 (realWorldPGSVariance V_A fstT rhoS) V_E := by
+      r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E <
+        r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoS) V_E := by
     apply expectedR2_strictMono_nonneg V_E _ _ hVE
     · unfold realWorldPGSVariance
       exact le_of_lt (by simpa [mul_assoc] using mul_pos hRhoT_pos hu_pos)
@@ -2651,8 +2609,8 @@ theorem portability_ratio_with_target_ld_decay_any_source
   have hsource_sig_pos : 0 < realWorldPGSVariance V_A fstS rhoS := by
     unfold realWorldPGSVariance
     simpa [mul_assoc] using mul_pos (mul_pos hRhoS_pos (by linarith : 0 < 1 - fstS)) hVA
-  have h_den_pos : 0 < expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E := by
-    unfold expectedR2
+  have h_den_pos : 0 < r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E := by
+    unfold r2FromSignalVariance
     exact div_pos hsource_sig_pos (by linarith)
   -- Divide both sides by positive denominator
   simpa [div_eq_mul_inv] using
@@ -2665,10 +2623,10 @@ theorem portability_ratio_with_ld_decay
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT) (hfstT_lt_one : fstT < 1) (hRhoS : rhoS = 1)
     (h_rho : 0 < rhoT ∧ rhoT < rhoS) :
-    expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E /
-      expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E <
-    expectedR2 (presentDayPGSVariance V_A fstT) V_E /
-      expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
+    r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
+      r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E <
+    r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
+      r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
   rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
   have hfstS_lt_one : fstS < 1 := lt_trans hfst hfstT_lt_one
   have hTargetPos : 0 < (1 - fstT) * V_A := by
@@ -2683,8 +2641,8 @@ theorem portability_ratio_with_ld_decay
       mul_lt_mul_of_pos_right hRhoT_lt_one hTargetPos
     simpa [realWorldPGSVariance, presentDayPGSVariance, mul_assoc] using hscaled
   have hR2Target_lt :
-      expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E <
-        expectedR2 (presentDayPGSVariance V_A fstT) V_E := by
+      r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E <
+        r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E := by
     apply expectedR2_strictMono_nonneg V_E
     · exact hVE
     · unfold realWorldPGSVariance
@@ -2697,18 +2655,18 @@ theorem portability_ratio_with_ld_decay
     unfold presentDayPGSVariance pgsVarianceFromHet
     have : 0 < 1 - fstS := by linarith
     exact mul_pos this hVA
-  have hR2Source_pos : 0 < expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
-    unfold expectedR2
+  have hR2Source_pos : 0 < r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
+    unfold r2FromSignalVariance
     have hden : 0 < presentDayPGSVariance V_A fstS + V_E := by linarith [hSourcePos, hVE]
     exact div_pos hSourcePos hden
   have hL :
-      expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E /
-          expectedR2 (presentDayPGSVariance V_A fstS) V_E <
-        expectedR2 (presentDayPGSVariance V_A fstT) V_E /
-          expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
+      r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
+          r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E <
+        r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
+          r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
     have hmul :
-        expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E * (expectedR2 (presentDayPGSVariance V_A fstS) V_E)⁻¹ <
-          expectedR2 (presentDayPGSVariance V_A fstT) V_E * (expectedR2 (presentDayPGSVariance V_A fstS) V_E)⁻¹ :=
+        r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E * (r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E)⁻¹ <
+          r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E * (r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E)⁻¹ :=
       mul_lt_mul_of_pos_right hR2Target_lt (inv_pos.mpr hR2Source_pos)
     simpa [div_eq_mul_inv] using hmul
   simpa [hRhoS, realWorldPGSVariance] using hL
@@ -2722,10 +2680,10 @@ theorem portability_ratio_with_ld_decay_general
     (hfst : fstS < fstT) (hfstT_lt_one : fstT < 1)
     (hRhoS : rhoS = 1)
     (h_rho : 0 < rhoT ∧ rhoT < rhoS ∧ rhoS ≤ 1) :
-    expectedR2 (realWorldPGSVariance V_A fstT rhoT) V_E /
-      expectedR2 (realWorldPGSVariance V_A fstS rhoS) V_E <
-    expectedR2 (presentDayPGSVariance V_A fstT) V_E /
-      expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
+    r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
+      r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E <
+    r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
+      r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
   rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS, _⟩
   exact portability_ratio_with_ld_decay V_A V_E fstS fstT rhoS rhoT
     hVA hVE hfst hfstT_lt_one hRhoS ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
@@ -2770,7 +2728,7 @@ theorem neutralAFBenchmarkRatio_from_state
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
     targetR2FromNeutralAFBenchmark V_A V_E fstTarget / presentDayR2 V_A V_E fstSource < 1 := by
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstSource := by
-    unfold presentDayR2 expectedR2
+    unfold presentDayR2 r2FromSignalVariance
     have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
       unfold presentDayPGSVariance pgsVarianceFromHet
       have h_one_minus : 0 < 1 - fstSource := by linarith [h_fst_bounds.2, h_fst]
@@ -3534,7 +3492,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
   have hchart :
       presentDayR2 V_A V_E fst / (2 * (1 - presentDayR2 V_A V_E fst)) =
         presentDaySignalToNoise V_A V_E fst / 2 := by
-    unfold presentDayR2 expectedR2 presentDaySignalToNoise
+    unfold presentDayR2 r2FromSignalVariance presentDaySignalToNoise
     field_simp [hsum_ne, hve_ne]
     ring
   unfold equalVarianceGaussianAUCFromExplainedR2 presentDayGaussianAUC
@@ -4164,7 +4122,7 @@ theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
     (hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
     presentDayR2MutationDrift V_A V_E fst_drift shared_ld <
       presentDayR2 V_A V_E fst_drift := by
-  unfold presentDayR2MutationDrift presentDayR2 expectedR2
+  unfold presentDayR2MutationDrift presentDayR2 r2FromSignalVariance
   have h_sig_lt := mutationDrift_signal_lt_puredrift V_A fst_drift shared_ld
     hVA hfst hfst_lt hld hld_lt
   have h_md_nonneg : 0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld := by

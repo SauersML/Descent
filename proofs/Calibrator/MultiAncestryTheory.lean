@@ -49,12 +49,12 @@ theorem multi_ancestry_reduces_fst
       V_A V_E ((1 - α) * d₁ + α * d₂) d₁
       hVA hVE h_multi_lt_single h_d₁_le_one)
 
-/-- Present-day `R²` is the `expectedR2` chart applied to the drift-attenuated
+/-- Present-day `R²` is the `r2FromSignalVariance` chart applied to the drift-attenuated
 signal variance `V_A × (1 - fst)`. -/
 private theorem presentDayR2_eq_expectedR2
     (V_A V_E fst : ℝ) :
-    presentDayR2 V_A V_E fst = expectedR2 ((1 - fst) * V_A) V_E := by
-  simp [presentDayR2, presentDayPGSVariance, pgsVarianceFromHet, expectedR2]
+    presentDayR2 V_A V_E fst = r2FromSignalVariance ((1 - fst) * V_A) V_E := by
+  simp [presentDayR2, presentDayPGSVariance, pgsVarianceFromHet, r2FromSignalVariance]
 
 /-- Exact gain from adding `δ` units of taggable signal variance to a deployed
 target state with baseline signal variance `x`. -/
@@ -63,9 +63,9 @@ private theorem expectedR2_gain_eq
     (hVE : 0 < V_E)
     (hx : 0 ≤ x)
     (hδ : 0 < δ) :
-    expectedR2 (x + δ) V_E - expectedR2 x V_E =
+    r2FromSignalVariance (x + δ) V_E - r2FromSignalVariance x V_E =
       δ * V_E / ((x + δ + V_E) * (x + V_E)) := by
-  unfold expectedR2
+  unfold r2FromSignalVariance
   have hxE : x + V_E ≠ 0 := by
     linarith
   have hxdE : x + δ + V_E ≠ 0 := by
@@ -82,8 +82,8 @@ private theorem expectedR2_gain_strictAnti_base
     (hx₁ : 0 ≤ x₁)
     (hx_lt : x₁ < x₂)
     (hδ : 0 < δ) :
-    expectedR2 (x₁ + δ) V_E - expectedR2 x₁ V_E >
-      expectedR2 (x₂ + δ) V_E - expectedR2 x₂ V_E := by
+    r2FromSignalVariance (x₁ + δ) V_E - r2FromSignalVariance x₁ V_E >
+      r2FromSignalVariance (x₂ + δ) V_E - r2FromSignalVariance x₂ V_E := by
   have hx₂ : 0 ≤ x₂ := by
     linarith
   rw [expectedR2_gain_eq x₁ δ V_E hVE hx₁ hδ,
@@ -151,22 +151,22 @@ theorem portability_concave_in_fst_reduction
     unfold xHigh xLow
     nlinarith [mul_lt_mul_of_pos_right hfst hVA]
   have h_high_reduce :
-      presentDayR2 V_A V_E (fst₂ - Δ) = expectedR2 (xHigh + δ) V_E := by
+      presentDayR2 V_A V_E (fst₂ - Δ) = r2FromSignalVariance (xHigh + δ) V_E := by
     rw [presentDayR2_eq_expectedR2]
     unfold xHigh δ
     congr 1
     ring
   have h_high :
-      presentDayR2 V_A V_E fst₂ = expectedR2 xHigh V_E := by
+      presentDayR2 V_A V_E fst₂ = r2FromSignalVariance xHigh V_E := by
     rw [presentDayR2_eq_expectedR2]
   have h_low_reduce :
-      presentDayR2 V_A V_E (fst₁ - Δ) = expectedR2 (xLow + δ) V_E := by
+      presentDayR2 V_A V_E (fst₁ - Δ) = r2FromSignalVariance (xLow + δ) V_E := by
     rw [presentDayR2_eq_expectedR2]
     unfold xLow δ
     congr 1
     ring
   have h_low :
-      presentDayR2 V_A V_E fst₁ = expectedR2 xLow V_E := by
+      presentDayR2 V_A V_E fst₁ = r2FromSignalVariance xLow V_E := by
     rw [presentDayR2_eq_expectedR2]
   rw [h_high_reduce, h_high, h_low_reduce, h_low]
   exact expectedR2_gain_strictAnti_base xHigh xLow δ V_E hVE hxHigh hx_lt hδ
