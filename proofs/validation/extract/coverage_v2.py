@@ -69,6 +69,11 @@ PROOFS = HERE.parent.parent
 N_POINTS = 40
 _ALL_STRUCTS = {}
 
+# Below this many DISTINGUISHABLE mutants, the killed/tried ratio is not a
+# measurement.  One of one is not a perfect score; it is a body the operators
+# could barely perturb.
+MIN_DISTINGUISHABLE_MUTANTS = 3
+
 
 # ------------------------------------------------------------------ mutants
 
@@ -419,7 +424,22 @@ def main(argv=None):
         # A check that rejects one of many nearby wrong bodies is weaker than
         # one that rejects most.  Publish the ratio rather than a bare boolean,
         # so a consumer can set its own bar.
-        rec["falsifiability"] = round(len(killed) / tried, 3) if tried else 0.0
+        #
+        # But the ratio is UNDEFINED when too few distinguishable mutants were
+        # produced to divide by.  A body the mutation operators barely apply to
+        # yields killed 1 of 1 and a ratio of 1.0, which displays as the
+        # strongest evidence in the set while being the weakest -- the operators
+        # never got a chance to be wrong.  Reporting None forces a consumer to
+        # handle the case rather than read it as a perfect score.
+        if tried >= MIN_DISTINGUISHABLE_MUTANTS:
+            rec["falsifiability"] = round(len(killed) / tried, 3)
+        else:
+            rec["falsifiability"] = None
+            rec["falsifiability_undefined_reason"] = (
+                f"only {tried} distinguishable mutant(s) produced; "
+                f"a ratio needs at least {MIN_DISTINGUISHABLE_MUTANTS}. The "
+                f"body may be too simple for the mutation operators to perturb "
+                f"meaningfully -- this needs a hand-written check, not a ratio.")
         if killed:
             rec["status"] = "COVERED"
         else:
@@ -548,7 +568,9 @@ def report(results, classes, args):
 
     # ---- falsifiability evidence, published per definition
     cov = {n: r for n, r in results.items() if r["status"] == "COVERED"}
-    strong = [n for n, r in cov.items() if r.get("falsifiability", 0) >= 0.5]
+    strong = [n for n, r in cov.items()
+              if (r.get("falsifiability") or 0) >= 0.5]
+    undef = [n for n, r in cov.items() if r.get("falsifiability") is None]
     single = [n for n, r in cov.items() if r.get("mutants_killed", 0) == 1]
     onethm = [n for n, r in cov.items()
               if (r.get("check") or {}).get("source_lo") == "theorem"
@@ -559,6 +581,9 @@ def report(results, classes, args):
     print(f"  rejecting >=50% of distinguishable mutants: {len(strong)}")
     print(f"  rejecting exactly ONE mutant             : {len(single)}"
           f"   <- weakest evidence, audit these first")
+    print(f"  ratio UNDEFINED (<{MIN_DISTINGUISHABLE_MUTANTS} distinguishable "
+          f"mutants): {len(undef)}"
+          f"   <- not a score; the body resists perturbation")
     print(f"  checked against a THEOREM-proved bound   : {len(onethm)}")
     print(f"  checked only against a name/docstring bound: {len(cov) - len(onethm)}"
           f"   <- the bound itself is a conjecture")

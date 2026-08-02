@@ -1584,90 +1584,59 @@ theorem redundant_invariant_of_matched_four {Report : Type*} (report : Law → R
 end TowerRigidity
 
 /-!
-## 5j. Sliding windows are not safe: the hub channel and the coupling channel
+## 5j. The sign bias, and a retracted exposure mechanism
 
-This corpus records that a bounded hub energy keeps a design inside the tempered class,
-where cycle densities determine the null. That is a statement about the **hub** channel and
-it is true. It is not a clean bill of health, because there is a second channel and it is
-governed by something else entirely.
+### What was claimed here, and is withdrawn
 
-The **coupling** channel is dead only when the coordinate law is symmetric — that is the
-Sign-Erasure Lemma, now visible as the zero fibre of a continuum rather than as a separate
-phenomenon. Its strength is the conditional sign bias `b = E[x|x|]/E[x²]`, and its
-contribution to a shared-core design's tuned-sector variance is
+An earlier version of this section asserted a **coupling channel** separate from the hub
+channel: that a sliding-window design carries a tuned-sector variance inflation
+`2b²/(1 - b²)` in the conditional sign bias `b`, tunable through a window tilt `θ*`, and
+therefore that a bounded hub energy is no reassurance for a rare-variant window scan. It
+gave the inflation in closed form, `2(1-2q)⁴/(1-(1-2q)⁴)`, and as exact rationals at MAF
+0.05 and 0.01.
 
-> `2b² / (1 - b²)`   (`Calibrator.EpistaticChaos.couplingVarianceInflation`).
+**That mechanism is retracted.** Its author's own audit found a tilt-bookkeeping error: the
+vanishing-first-order argument used a `θ = 1/2` weight, mixing a level-two normalization
+into a level-one computation. At the correct weights the solo-factor mean is
 
-For a standardized Hardy-Weinberg coordinate the bias has a closed form, `b = (1 - 2q)²`
-(`hweSignBias_eq`), so the inflation is `2(1-2q)⁴/(1-(1-2q)⁴)` and is computable from
-allele frequencies alone, with no simulation:
+> `E[u e^λ] / E[e^λ] = E[(x² - 1) x²] = σ₁² = 2`,
 
-| MAF | `b` | inflation |
-|---|---|---|
-| 0.5 | 0 | 0 |
-| 0.35 | 0.09 | 0.0163 |
-| 0.2113 | 0.3334 | 0.2501 |
-| 0.10 | 0.64 | 1.3875 |
-| 0.05 | 0.81 | 3.8156 |
-| 0.01 | 0.9604 | 23.7626 |
+not zero. So the first-order cross term does not vanish, and what it exposes is `Λ(2)` data
+— that is `E[x⁴]` — which the hub channel already exposes. The term is **hub-redundant
+rather than a new channel**, the separation between the two channels was the premise the
+audit removed, and every quantitative consequence drawn from it goes with it.
 
-**So a sliding-window statistic on a genotype panel carries a variance correction relative
-to the disjoint case that is zero only at MAF one half, above 380% at MAF 0.05, and above
-2300% at MAF 0.01.** For rare-variant window scans that is an order-one miscalibration, and
-it is the opposite of the reassurance a bounded hub energy suggests. The two exact values
-are theorems below, as rationals rather than decimals.
+A second retraction landed at the same time and is recorded here because this file leaned
+on it: the jet-to-strip upgrade is false, since the window channel's exposed functional is
+the truncated second moment at tilt `θ = 1` whatever the tuning slope. Changing the slope
+moves the threshold *within* the `θ = 1` tilted walk rather than changing the tilt at which
+the law is probed. That is what `Calibrator.JetBarrier` had already said, so the arc
+contradicted its own theorem and the theorem was right.
 
-The tilt matters as much as the frequency: at MAF 0.05 the same channel contributes 0.10 at
-tilt `θ = 0.6`, 3.82 at `θ = 1`, and 525 at `θ = 2`. The formalization here fixes `θ = 1`,
-which is the window tilt of an untuned scan; a tuned scan is worse.
+Removed with the mechanism: `couplingVarianceInflation` and its closed form, the exact
+rationals `13122/3439` and `11529602/485199` presented as a sliding-window inflation, and
+`boundedHub_does_not_bound_coupling`, whose conclusion asserted an order-one correction a
+bounded hub misses.
+
+### What stands
+
+* `Calibrator.EpistaticChaos.hweSignBias_eq` — `E[x|x|] = (1-2q)²` for `q ≤ 1/2`. This is
+  arithmetic about the genotype law, derived here independently of the retracted mechanism,
+  and nothing upstream touches it.
+* `hweSignBias_zero_iff_balanced` — `b` vanishes exactly at the balanced locus, so the
+  Sign-Erasure Lemma is the zero fibre of `b`.
+* `b` as a well-defined object and as the correct *name* for the data a symmetric law
+  destroys. That naming is retained upstream explicitly.
+
+### What is open
+
+**Whether any admissible design exposes `b` at all.** The one mechanism proposed for that
+has been withdrawn and no replacement has been supplied. Until one is, `b` is a property of
+the coordinate law with no established design-level consequence, and this file asserts none.
+In particular nothing here now says a sliding-window scan is miscalibrated through `b`, and
+nothing here says it is safe either — the hub statement remains a statement about the hub
+channel, and the coupling question is open rather than answered in either direction.
 -/
-
-/-- **The coupling inflation at MAF 0.05**, exactly `13122/3439 ≈ 3.8156`: a 380% variance
-correction for a shared-core design on a panel of variants at five percent frequency. -/
-theorem couplingVarianceInflation_at_maf_five_percent :
-    couplingVarianceInflation ((1 - 2 * (1 / 20 : ℝ)) ^ 2) = 13122 / 3439 := by
-  unfold couplingVarianceInflation
-  norm_num
-
-/-- **The coupling inflation at MAF 0.01**, exactly `11529602/485199 ≈ 23.7626`: a 2300%
-variance correction on a rare-variant panel. -/
-theorem couplingVarianceInflation_at_maf_one_percent :
-    couplingVarianceInflation ((1 - 2 * (1 / 100 : ℝ)) ^ 2) = 11529602 / 485199 := by
-  unfold couplingVarianceInflation
-  norm_num
-
-/-- **The coupling channel is silent only at the balanced locus.** At `q = 1/2` the bias is
-zero and the inflation vanishes, so a shared-core design is calibrated as if disjoint. At
-every other polymorphic frequency it is not. -/
-theorem couplingVarianceInflation_zero_at_balanced (h : HardyWeinbergModel)
-    (hq0 : 0 < h.altFreq) (hhalf : h.altFreq = 1 / 2) :
-    couplingVarianceInflation h.signBias = 0 := by
-  rw [hweSignBias_eq h hq0 (le_of_eq hhalf), hhalf]
-  unfold couplingVarianceInflation
-  norm_num
-
-/-- **The two channels are governed by different things, and a bounded hub says nothing
-about the coupling.**
-
-`hbounded` is the hub condition this corpus uses to place a design in the tempered class;
-`hratio` is the coupling channel's contribution to the variance of a shared-core design.
-The conclusion computes that contribution in closed form from the allele frequency alone —
-and the hub hypothesis is *never used*, which is the point. A design can have bounded hub
-recurrence at every locus and still be miscalibrated by an order-one factor through the
-other channel.
-
-Wherever this development says a sliding-window scan is safe because its hub energy is
-bounded, read it as a statement about one channel of two. -/
-theorem boundedHub_does_not_bound_coupling
-    {ι : Type*} [Fintype ι] {n : ℕ} (design : GenotypeDesign n ι) (bound : ℕ)
-    (_hbounded : design.BoundedHubRecurrence bound)
-    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hhalf : h.altFreq ≤ 1 / 2)
-    (varianceRatio : ℝ) (hratio : varianceRatio = 1 + couplingVarianceInflation h.signBias) :
-    varianceRatio =
-      1 + 2 * (1 - 2 * h.altFreq) ^ 4 / (1 - (1 - 2 * h.altFreq) ^ 4) := by
-  rw [hratio, hweCouplingVarianceInflation_eq h hq0 hhalf]
-
-/-!
 ## 6. Where the whole development now stands
 
 Four negative results, each with its positive complement, and each attached to a

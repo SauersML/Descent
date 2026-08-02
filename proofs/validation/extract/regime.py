@@ -182,6 +182,7 @@ def external_checks():
     """
     hits = collections.defaultdict(set)
     declared_internal = collections.defaultdict(set)
+    seed_state = collections.defaultdict(set)
     for path in (PROOFS / "validation").rglob("*.json"):
         if path.is_relative_to(HERE):
             continue
@@ -212,19 +213,39 @@ def external_checks():
                            or node.get("demonstration"))
                 if verdict is None and node.get("covered") is True:
                     verdict = "covered"
+                # A Monte Carlo verdict that depends on the seed is not a
+                # verdict.  A tier may attest that it re-ran the check across
+                # independent point-sets:
+                #     "seed_stability": {"seeds_tried": 8, "seeds_agreeing": 8}
+                # Unequal counts mean the result flickers and nobody should
+                # count it, the producing tier included.  Absent means the
+                # question was not asked -- reported separately from "asked and
+                # answered", never merged with it.
+                stab = node.get("seed_stability")
+                if isinstance(stab, dict):
+                    tried = stab.get("seeds_tried")
+                    agree = stab.get("seeds_agreeing")
+                    if isinstance(tried, int) and isinstance(agree, int):
+                        stability = "stable" if (tried > 1 and agree == tried) \
+                            else "flickers"
+                    else:
+                        stability = "malformed"
+                else:
+                    stability = "unchecked"
                 declared = _declared_class(node)
                 if isinstance(name, str) and isinstance(verdict, str) \
                         and verdict not in NON_VERDICTS:
+                    short = name.split(".")[-1]
                     if declared is not None:
                         cls, is_ext = declared
                         if is_ext:
-                            hits[name.split(".")[-1]].add(f"{tag}[{cls}]:{verdict}")
+                            hits[short].add(f"{tag}[{cls}]:{verdict}")
+                            seed_state[short].add(stability)
                         else:
-                            declared_internal[name.split(".")[-1]].add(
-                                f"{tag}[{cls}]:{verdict}")
+                            declared_internal[short].add(f"{tag}[{cls}]:{verdict}")
                     elif tier is not None:
-                        hits[name.split(".")[-1]].add(
-                            f"{tag}[{tier}?]:{verdict}")   # ? = inferred, not declared
+                        hits[short].add(f"{tag}[{tier}?]:{verdict}")  # ? = inferred
+                        seed_state[short].add(stability)
                 for k, v in node.items():
                     walk(v, depth + 1, k)
             elif isinstance(node, list):
@@ -232,7 +253,7 @@ def external_checks():
                     walk(v, depth + 1, key)
 
         walk(blob)
-    return hits, declared_internal
+    return hits, declared_internal, seed_state
 
 
 def main(argv=None):
@@ -245,7 +266,7 @@ def main(argv=None):
     classes = json.loads((HERE / "classes.json").read_text())
     cov_path = HERE / "coverage.json"
     coverage = json.loads(cov_path.read_text()) if cov_path.exists() else {}
-    ext, ext_internal = external_checks()
+    ext, ext_internal, ext_seed = external_checks()
 
     rows = {}
     for name, d in table.items():
@@ -262,6 +283,8 @@ def main(argv=None):
             "has_regime": bool(explicit or mined),
             "external_claimed_in_docstring": claimed,
             "external_checked_by": checked,
+            "external_seed_stability": sorted(
+                ext_seed.get(name.split(".")[-1], ())),
             "has_external": bool(checked),
             "internally_validated": internally,
         }
@@ -289,6 +312,20 @@ def main(argv=None):
     print(f"  of which the tier DECLARED as external     : {have_ext - inferred}")
     print(f"  of which inferred from the directory       : {inferred}"
           + ("   <- ask that tier to declare evidence_class" if inferred else ""))
+    # A Monte Carlo verdict that moves with the seed is not evidence.  Report
+    # stability-checked, flickering and unchecked as three separate things --
+    # merging "asked and answered" with "never asked" is the same move as
+    # merging a mention with a check.
+    stable = sum(1 for r in rows.values()
+                 if r["has_external"] and "stable" in r["external_seed_stability"]
+                 and "flickers" not in r["external_seed_stability"])
+    flick = sum(1 for r in rows.values()
+                if "flickers" in r["external_seed_stability"])
+    unchecked = have_ext - stable - flick
+    print(f"  of which SEED-STABLE (re-run across point-sets): {stable}")
+    print(f"  of which FLICKER with the seed                 : {flick}"
+          + ("   <- nobody should count these" if flick else ""))
+    print(f"  of which not stability-checked                 : {unchecked}")
     print(f"definitions whose only evidence is DECLARED internal: "
           f"{len({n for n in ext_internal})}"
           f"  (correctly excluded from the figure above)")

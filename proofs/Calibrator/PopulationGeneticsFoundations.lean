@@ -1061,19 +1061,16 @@ theorem alleleFreq_deviation_decreases (p₀ p_c m : ℝ) (t₁ t₂ : ℕ)
     rate that determines the overall Fst is the arithmetic mean.
 
     Empirical status: UNTESTED. -/
-noncomputable def effectiveMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
-  (m₁₂ + m₂₁) / 2
-
 /-- Effective migration is between the two directional rates. -/
 theorem effectiveMigration_bounds (m₁₂ m₂₁ : ℝ) (h : m₂₁ < m₁₂) :
-    m₂₁ < effectiveMigration m₁₂ m₂₁ ∧ effectiveMigration m₁₂ m₂₁ < m₁₂ := by
-  unfold effectiveMigration
+    m₂₁ < effectiveSymmetricMigration m₁₂ m₂₁ ∧ effectiveSymmetricMigration m₁₂ m₂₁ < m₁₂ := by
+  unfold effectiveSymmetricMigration
   constructor <;> linarith
 
 /-- Effective migration equals both rates when migration is symmetric. -/
 theorem effectiveMigration_symmetric (m : ℝ) :
-    effectiveMigration m m = m := by
-  unfold effectiveMigration
+    effectiveSymmetricMigration m m = m := by
+  unfold effectiveSymmetricMigration
   ring
 
 /-- **Asymmetric migration yields asymmetric Fst.**
@@ -1287,17 +1284,14 @@ noncomputable def hetMutationDriftRecurrence (Ne mu : ℝ) (H₀ : ℝ) : ℕ �
 
 /-- **Equilibrium heterozygosity.**
     At mutation-drift balance, H* = θ/(1+θ) where θ = 4Neμ. -/
-noncomputable def hetEquilibrium (Ne mu : ℝ) : ℝ :=
-  4 * Ne * mu / (1 + 4 * Ne * mu)
-
 /-- **Algebraic verification of the fixed point.**
     If we start at H* = θ/(1+θ), one step of the recurrence returns H*.
     This proves H* is indeed a fixed point — the equilibrium heterozygosity. -/
 theorem hetMutationDrift_fixed_point (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
-    hetMutationDriftRecurrence Ne mu (hetEquilibrium Ne mu) 1 =
-      hetEquilibrium Ne mu := by
-  simp [hetMutationDriftRecurrence, hetEquilibrium]
+    hetMutationDriftRecurrence Ne mu (hetMutationFloor Ne mu) 1 =
+      hetMutationFloor Ne mu := by
+  simp [hetMutationDriftRecurrence, hetMutationFloor]
   -- We need: (1 - 1/(2Ne)) * (4Neμ/(1+4Neμ)) + 2μ * (1 - 4Neμ/(1+4Neμ))
   --        = 4Neμ/(1+4Neμ)
   have hθ : 0 < 4 * Ne * mu := by positivity
@@ -1310,8 +1304,8 @@ theorem hetMutationDrift_fixed_point (Ne mu : ℝ)
     The same statement as `hetMutationDrift_fixed_point`, under the name that
     ties it to the definition it pins. -/
 theorem hetEquilibrium_isFixedPoint (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    hetMutationDriftRecurrence Ne mu (hetEquilibrium Ne mu) 1 =
-      hetEquilibrium Ne mu :=
+    hetMutationDriftRecurrence Ne mu (hetMutationFloor Ne mu) 1 =
+      hetMutationFloor Ne mu :=
   hetMutationDrift_fixed_point Ne mu hNe hmu
 
 /-- **The fixed point is unique in [0,1].**
@@ -1320,8 +1314,8 @@ theorem hetEquilibrium_isFixedPoint (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) 
 theorem hetMutationDrift_fixed_point_unique (Ne mu H : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu)
     (h_fixed : (1 - 1 / (2 * Ne)) * H + 2 * mu * (1 - H) = H) :
-    H = hetEquilibrium Ne mu := by
-  unfold hetEquilibrium
+    H = hetMutationFloor Ne mu := by
+  unfold hetMutationFloor
   -- From the fixed-point equation:
   -- H - (1 - 1/(2Ne))H - 2μ(1-H) = 0
   -- H × [1 - (1 - 1/(2Ne)) + 2μ] = 2μ
@@ -1351,8 +1345,8 @@ theorem hetMutationDrift_fixed_point_unique (Ne mu H : ℝ)
     This is Wright's classical result, but *derived* from the recurrence
     rather than postulated. -/
 theorem fstEquilibrium_derived (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    1 - hetEquilibrium Ne mu = 1 / (1 + 4 * Ne * mu) := by
-  unfold hetEquilibrium
+    1 - hetMutationFloor Ne mu = 1 / (1 + 4 * Ne * mu) := by
+  unfold hetMutationFloor
   have hθ : 0 < 4 * Ne * mu := by positivity
   have hden : (1 + 4 * Ne * mu) ≠ 0 := by linarith
   field_simp
@@ -1363,30 +1357,30 @@ theorem fstEquilibrium_derived (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
     same as the one previously defined. -/
 theorem fstEquilibrium_derived_consistent (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
-    1 - hetEquilibrium Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu) := by
+    1 - hetMutationFloor Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu) := by
   rw [fstEquilibrium_derived Ne mu hNe hmu]
   unfold fstMutationDriftEquilibrium
   rfl
 
 /-- **Equilibrium heterozygosity is in (0, 1) for positive parameters.** -/
 theorem hetEquilibrium_pos (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    0 < hetEquilibrium Ne mu := by
-  unfold hetEquilibrium
+    0 < hetMutationFloor Ne mu := by
+  unfold hetMutationFloor
   positivity
 
 theorem hetEquilibrium_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    hetEquilibrium Ne mu < 1 := by
-  unfold hetEquilibrium
+    hetMutationFloor Ne mu < 1 := by
+  unfold hetMutationFloor
   rw [div_lt_one (by positivity)]
   linarith
 
 /-- **Equilibrium Fst is in (0, 1) for positive parameters.** -/
 theorem fstEquilibrium_derived_pos (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    0 < 1 - hetEquilibrium Ne mu := by
+    0 < 1 - hetMutationFloor Ne mu := by
   linarith [hetEquilibrium_lt_one Ne mu hNe hmu]
 
 theorem fstEquilibrium_derived_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    1 - hetEquilibrium Ne mu < 1 := by
+    1 - hetMutationFloor Ne mu < 1 := by
   linarith [hetEquilibrium_pos Ne mu hNe hmu]
 
 /-- **Larger θ → lower equilibrium Fst** (derived version).
@@ -1394,10 +1388,10 @@ theorem fstEquilibrium_derived_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu
 theorem fstEquilibrium_derived_decreases (Ne₁ Ne₂ mu : ℝ)
     (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (hmu : 0 < mu)
     (h_lt : Ne₁ < Ne₂) :
-    1 - hetEquilibrium Ne₂ mu < 1 - hetEquilibrium Ne₁ mu := by
-  -- Equivalent to hetEquilibrium Ne₁ mu < hetEquilibrium Ne₂ mu
+    1 - hetMutationFloor Ne₂ mu < 1 - hetMutationFloor Ne₁ mu := by
+  -- Equivalent to hetMutationFloor Ne₁ mu < hetMutationFloor Ne₂ mu
   -- i.e., 4Ne₁μ/(1+4Ne₁μ) < 4Ne₂μ/(1+4Ne₂μ)
-  unfold hetEquilibrium
+  unfold hetMutationFloor
   have h₁ : 0 < 1 + 4 * Ne₁ * mu := by positivity
   have h₂ : 0 < 1 + 4 * Ne₂ * mu := by positivity
   rw [sub_lt_sub_iff_left]

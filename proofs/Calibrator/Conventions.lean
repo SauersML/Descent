@@ -142,8 +142,8 @@ convention that has to be the same equal-weight convention in all three or the
 `F_ST` these feed disagrees with itself. -/
 
 theorem effectiveMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
-    effectiveMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
-  unfold effectiveMigration meanAlleleFreq; ring
+    effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
+  unfold effectiveSymmetricMigration meanAlleleFreq; ring
 
 theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
     effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
@@ -377,8 +377,8 @@ theorem relating them. These are the configurations in which a divergence goes
 unnoticed, which is how `amInflationFactor` and `fstFromDrift` survived. -/
 
 theorem effectiveSymmetricMigration_eq_effectiveMigration (m₁₂ m₂₁ : ℝ) :
-    effectiveSymmetricMigration m₁₂ m₂₁ = effectiveMigration m₁₂ m₂₁ := by
-  unfold effectiveSymmetricMigration effectiveMigration; ring_nf
+    effectiveSymmetricMigration m₁₂ m₂₁ = effectiveSymmetricMigration m₁₂ m₂₁ := by
+  unfold effectiveSymmetricMigration effectiveSymmetricMigration; ring_nf
 
 /-- The AUC map of the equal-variance Gaussian model appears in `DGP` under a
 name that does not mention a model at all. Both were falsified as
@@ -673,9 +673,9 @@ theorem hetMutationDriftRecurrence_step_uses_timeScale
 written out with its own four. This is the last inline restatement of the
 ploidy convention in the development. -/
 theorem hetEquilibrium_eq_scaled (Ne mu : ℝ) :
-    hetEquilibrium Ne mu
+    hetMutationFloor Ne mu
       = scaledMutationRate Ne mu / (1 + scaledMutationRate Ne mu) := by
-  unfold hetEquilibrium
+  unfold hetMutationFloor
   rw [scaledMutationRate_eq_ploidy_form]; unfold ploidy; ring_nf
 
 /-! ### Shared primitives
