@@ -279,48 +279,144 @@
   {
    "maf_causal": 0.05,
    "maf_tag": 0.05,
-   "r2": 0.5,
-   "beta": 0.05,
+   "r2": 0.8999999999999998,
+   "max_attainable_r2_at_these_frequencies": 0.9999999999999998,
+   "beta": 0.10814761408717503,
    "n": 4000,
-   "realized_allelic_corr": 0.7054848740893996,
-   "measured_ncp_at_tag": 0.4879589861189131,
-   "corpus_read_as_causal_maf": 0.4750000000000002,
-   "corpus_read_as_tag_maf": 0.4750000000000002,
-   "rel_err_causal_reading": -0.02655753144743777,
-   "rel_err_tag_reading": -0.02655753144743777
+   "frequency_ratio": 1.0,
+   "realized_allelic_corr": 0.9486305062291907,
+   "measured_ncp_at_tag": 4.004655566324123,
+   "corpus_read_as_causal_maf": 3.999999999999999,
+   "corpus_read_as_tag_maf": 3.999999999999999,
+   "rel_err_causal_reading": -0.0011625385122440042,
+   "rel_err_tag_reading": -0.0011625385122440042
+  },
+  {
+   "maf_causal": 0.05,
+   "maf_tag": 0.15,
+   "r2": 0.2684210526315791,
+   "max_attainable_r2_at_these_frequencies": 0.29824561403508787,
+   "beta": 0.1980295085953348,
+   "n": 4000,
+   "frequency_ratio": 2.9999999999999996,
+   "realized_allelic_corr": 0.5181561212836265,
+   "measured_ncp_at_tag": 4.017988565624487,
+   "corpus_read_as_causal_maf": 4.0,
+   "corpus_read_as_tag_maf": 10.73684210526316,
+   "rel_err_causal_reading": -0.004477007669555392,
+   "rel_err_tag_reading": 1.6721932952027727
+  },
+  {
+   "maf_causal": 0.05,
+   "maf_tag": 0.45,
+   "r2": 0.057894736842105284,
+   "max_attainable_r2_at_these_frequencies": 0.06432748538011698,
+   "beta": 0.42640143271122083,
+   "n": 4000,
+   "frequency_ratio": 9.0,
+   "realized_allelic_corr": 0.24088335160307459,
+   "measured_ncp_at_tag": 3.9403039040647956,
+   "corpus_read_as_causal_maf": 4.000000000000001,
+   "corpus_read_as_tag_maf": 20.8421052631579,
+   "rel_err_causal_reading": 0.01515012480982067,
+   "rel_err_tag_reading": 4.28946643979854
+  },
+  {
+   "maf_causal": 0.15,
+   "maf_tag": 0.05,
+   "r2": 0.26842105263157895,
+   "max_attainable_r2_at_these_frequencies": 0.2982456140350877,
+   "beta": 0.12087086280331326,
+   "n": 4000,
+   "frequency_ratio": 2.9999999999999996,
+   "realized_allelic_corr": 0.5172590353574015,
+   "measured_ncp_at_tag": 4.005176933635943,
+   "corpus_read_as_causal_maf": 4.0,
+   "corpus_read_as_tag_maf": 1.4901960784313726,
+   "rel_err_causal_reading": -0.0012925605339596362,
+   "rel_err_tag_reading": -0.6279325225518673
   },
   {
    "maf_causal": 0.15,
    "maf_tag": 0.15,
-   "r2": 0.5,
-   "beta": 0.05,
+   "r2": 0.9,
+   "max_attainable_r2_at_these_frequencies": 1.0,
+   "beta": 0.06600983619844496,
    "n": 4000,
-   "realized_allelic_corr": 0.706861200429272,
-   "measured_ncp_at_tag": 1.3072927848247144,
-   "corpus_read_as_causal_maf": 1.2750000000000006,
-   "corpus_read_as_tag_maf": 1.2750000000000006,
-   "rel_err_causal_reading": -0.02470202941496673,
-   "rel_err_tag_reading": -0.02470202941496673
+   "frequency_ratio": 1.0,
+   "realized_allelic_corr": 0.9482518456565668,
+   "measured_ncp_at_tag": 4.031157581116842,
+   "corpus_read_as_causal_maf": 4.0,
+   "corpus_read_as_tag_maf": 4.0,
+   "rel_err_causal_reading": -0.007729189566489186,
+   "rel_err_tag_reading": -0.007729189566489186
+  },
+  {
+   "maf_causal": 0.15,
+   "maf_tag": 0.45,
+   "r2": 0.19411764705882353,
+   "max_attainable_r2_at_these_frequencies": 0.21568627450980393,
+   "beta": 0.1421338109037403,
+   "n": 4000,
+   "frequency_ratio": 3.0,
+   "realized_allelic_corr": 0.43961204220281935,
+   "measured_ncp_at_tag": 3.9830725223047034,
+   "corpus_read_as_causal_maf": 4.000000000000001,
+   "corpus_read_as_tag_maf": 7.764705882352944,
+   "rel_err_causal_reading": 0.00424985425208949,
+   "rel_err_tag_reading": 0.949426187665821
+  },
+  {
+   "maf_causal": 0.45,
+   "maf_tag": 0.05,
+   "r2": 0.057894736842105284,
+   "max_attainable_r2_at_these_frequencies": 0.06432748538011698,
+   "beta": 0.1868004243323932,
+   "n": 4000,
+   "frequency_ratio": 9.0,
+   "realized_allelic_corr": 0.24022365251487543,
+   "measured_ncp_at_tag": 3.9334219580174805,
+   "corpus_read_as_causal_maf": 4.0,
+   "corpus_read_as_tag_maf": 0.7676767676767675,
+   "rel_err_causal_reading": 0.016926239466074494,
+   "rel_err_tag_reading": -0.8048323378802484
+  },
+  {
+   "maf_causal": 0.45,
+   "maf_tag": 0.15,
+   "r2": 0.19411764705882353,
+   "max_attainable_r2_at_these_frequencies": 0.21568627450980393,
+   "beta": 0.10201520139759673,
+   "n": 4000,
+   "frequency_ratio": 3.0,
+   "realized_allelic_corr": 0.43979121331119814,
+   "measured_ncp_at_tag": 3.997549594018877,
+   "corpus_read_as_causal_maf": 3.999999999999999,
+   "corpus_read_as_tag_maf": 2.0606060606060597,
+   "rel_err_causal_reading": 0.0006129770059109229,
+   "rel_err_tag_reading": -0.48453270881513694
   },
   {
    "maf_causal": 0.45,
    "maf_tag": 0.45,
-   "r2": 0.5,
-   "beta": 0.05,
+   "r2": 0.9,
+   "max_attainable_r2_at_these_frequencies": 1.0,
+   "beta": 0.047377936967913425,
    "n": 4000,
-   "realized_allelic_corr": 0.7072902803723334,
-   "measured_ncp_at_tag": 2.435962906819782,
-   "corpus_read_as_causal_maf": 2.475000000000001,
-   "corpus_read_as_tag_maf": 2.475000000000001,
-   "rel_err_causal_reading": 0.016025323321192567,
-   "rel_err_tag_reading": 0.016025323321192567
+   "frequency_ratio": 1.0,
+   "realized_allelic_corr": 0.9486663334598221,
+   "measured_ncp_at_tag": 3.99324129487807,
+   "corpus_read_as_causal_maf": 3.999999999999999,
+   "corpus_read_as_tag_maf": 3.999999999999999,
+   "rel_err_causal_reading": 0.001692536118615818,
+   "rel_err_tag_reading": 0.001692536118615818
   }
  ],
  "control_positive": {
   "matched_cells": 3,
   "matched_agree": true,
-  "mismatched_cells": 0,
-  "mismatched_caught": 0,
+  "mismatched_cells": 6,
+  "mismatched_caught": 6,
   "tolerance": 0.1
  },
  "winners_curse": {
@@ -511,49 +607,85 @@
     "beta_over_se": 4.0,
     "z_alpha": 5.4513104,
     "replicates": 300000,
-    "selected": 22345,
-    "selection_rate": 0.07448333333333333,
     "exact_selection_probability": 0.07334672331933839,
-    "simulated_E_in_SE": 5.883789579713566,
-    "sem": 0.002657628865686523,
     "exact_E_in_SE": 5.897368593531057,
-    "deviation_in_sems": 5.109446993451212
+    "z_known_SE": {
+     "selected": 22191,
+     "selection_rate": 0.07397,
+     "simulated_E_in_SE": 5.898635121526809,
+     "sem": 0.0025970579144212343,
+     "deviation_in_sems": -0.48767799467174505
+    },
+    "t_estimated_SE": {
+     "selected": 22345,
+     "selection_rate": 0.07448333333333333,
+     "simulated_E_in_SE": 5.890955816943078,
+     "sem": 0.0026262381491920944,
+     "deviation_in_sems": 2.4418107664579227
+    }
    },
    {
     "beta_over_se": 6.0,
     "z_alpha": 5.4513104,
     "replicates": 60000,
-    "selected": 42545,
-    "selection_rate": 0.7090833333333333,
     "exact_selection_probability": 0.7083907577303185,
-    "simulated_E_in_SE": 6.482665726039863,
-    "sem": 0.0034552789578281566,
     "exact_E_in_SE": 6.484465405858216,
-    "deviation_in_sems": 0.5208493555275872
+    "z_known_SE": {
+     "selected": 42542,
+     "selection_rate": 0.7090333333333333,
+     "simulated_E_in_SE": 6.487845338213949,
+     "sem": 0.0034496140527543995,
+     "deviation_in_sems": -0.9798001469280279
+    },
+    "t_estimated_SE": {
+     "selected": 42545,
+     "selection_rate": 0.7090833333333333,
+     "simulated_E_in_SE": 6.486583609456231,
+     "sem": 0.0034580041698456278,
+     "deviation_in_sems": -0.6125509091302626
+    }
    },
    {
     "beta_over_se": 0.0,
     "z_alpha": 1.96,
     "replicates": 200000,
-    "selected": 9948,
-    "selection_rate": 0.04974,
     "exact_selection_probability": 0.049995790296440856,
-    "simulated_E_in_SE": 0.06110947599960507,
-    "sem": 0.02361812198512944,
     "exact_E_in_SE": 0.0,
-    "deviation_in_sems": -2.5873977633819116
+    "z_known_SE": {
+     "selected": 9929,
+     "selection_rate": 0.049645,
+     "simulated_E_in_SE": 0.05394577850968818,
+     "sem": 0.023655830461954328,
+     "deviation_in_sems": -2.280443233495826
+    },
+    "t_estimated_SE": {
+     "selected": 9948,
+     "selection_rate": 0.04974,
+     "simulated_E_in_SE": 0.060729602529313025,
+     "sem": 0.023618672102674407,
+     "deviation_in_sems": -2.5712538903673776
+    }
    },
    {
     "beta_over_se": 1.0,
     "z_alpha": 1.96,
     "replicates": 200000,
-    "selected": 34172,
-    "selection_rate": 0.17086,
     "exact_selection_probability": 0.17006580267857585,
-    "simulated_E_in_SE": 2.4507284866210393,
-    "sem": 0.003453618952659037,
     "exact_E_in_SE": 2.450329448952625,
-    "deviation_in_sems": -0.11554189210920207
+    "z_known_SE": {
+     "selected": 34107,
+     "selection_rate": 0.170535,
+     "simulated_E_in_SE": 2.4531925738814033,
+     "sem": 0.0034512499993684183,
+     "deviation_in_sems": -0.8295907075124803
+    },
+    "t_estimated_SE": {
+     "selected": 34172,
+     "selection_rate": 0.17086,
+     "simulated_E_in_SE": 2.4516904088329414,
+     "sem": 0.0034504432863168163,
+     "deviation_in_sems": -0.3944304448398432
+    }
    }
   ]
  },
@@ -612,8 +744,8 @@
   "ld_attenuation": true,
   "threshold_null_two_sided": true,
   "power": true,
-  "positive_control_mismatch_axis": false,
-  "winners_curse_exact_matches_simulated_gwas": false
+  "positive_control_mismatch_axis": true,
+  "winners_curse_exact_matches_simulated_gwas": true
  },
- "READ_THE_TEST": false
+ "READ_THE_TEST": true
 }

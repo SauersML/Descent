@@ -33,20 +33,20 @@ CONTROL 4 -- POWER
   REPORTED, not scored: powerAtThreshold's worst relative error is 1.20% INSIDE its declared ncp range [1,20] and 5.54% OUTSIDE it. The docstring's scope is doing real work.
 
 REGIME 1 -- TAG/CAUSAL FREQUENCY MISMATCH AT FIXED r2
-  maf_c=0.05 maf_t=0.05  measured NCP 0.4880 | as CAUSAL 0.4750 (   -2.7%) | as TAG 0.4750 (   -2.7%)
-  maf_causal=0.05 maf_tag=0.15 r2=0.50 INFEASIBLE haplotype frequencies -- skipped
-  maf_causal=0.05 maf_tag=0.45 r2=0.50 INFEASIBLE haplotype frequencies -- skipped
-  maf_causal=0.15 maf_tag=0.05 r2=0.50 INFEASIBLE haplotype frequencies -- skipped
-  maf_c=0.15 maf_t=0.15  measured NCP 1.3073 | as CAUSAL 1.2750 (   -2.5%) | as TAG 1.2750 (   -2.5%)
-  maf_causal=0.15 maf_tag=0.45 r2=0.50 INFEASIBLE haplotype frequencies -- skipped
-  maf_causal=0.45 maf_tag=0.05 r2=0.50 INFEASIBLE haplotype frequencies -- skipped
-  maf_causal=0.45 maf_tag=0.15 r2=0.50 INFEASIBLE haplotype frequencies -- skipped
-  maf_c=0.45 maf_t=0.45  measured NCP 2.4360 | as CAUSAL 2.4750 (   +1.6%) | as TAG 2.4750 (   +1.6%)
+  maf_c=0.05 maf_t=0.05 (r2=0.900, max 1.000)  measured NCP 4.0047 | as CAUSAL 4.0000 (   -0.1%) | as TAG 4.0000 (   -0.1%)
+  maf_c=0.05 maf_t=0.15 (r2=0.268, max 0.298)  measured NCP 4.0180 | as CAUSAL 4.0000 (   -0.4%) | as TAG 10.7368 ( +167.2%)
+  maf_c=0.05 maf_t=0.45 (r2=0.058, max 0.064)  measured NCP 3.9403 | as CAUSAL 4.0000 (   +1.5%) | as TAG 20.8421 ( +428.9%)
+  maf_c=0.15 maf_t=0.05 (r2=0.268, max 0.298)  measured NCP 4.0052 | as CAUSAL 4.0000 (   -0.1%) | as TAG 1.4902 (  -62.8%)
+  maf_c=0.15 maf_t=0.15 (r2=0.900, max 1.000)  measured NCP 4.0312 | as CAUSAL 4.0000 (   -0.8%) | as TAG 4.0000 (   -0.8%)
+  maf_c=0.15 maf_t=0.45 (r2=0.194, max 0.216)  measured NCP 3.9831 | as CAUSAL 4.0000 (   +0.4%) | as TAG 7.7647 (  +94.9%)
+  maf_c=0.45 maf_t=0.05 (r2=0.058, max 0.064)  measured NCP 3.9334 | as CAUSAL 4.0000 (   +1.7%) | as TAG 0.7677 (  -80.5%)
+  maf_c=0.45 maf_t=0.15 (r2=0.194, max 0.216)  measured NCP 3.9975 | as CAUSAL 4.0000 (   +0.1%) | as TAG 2.0606 (  -48.5%)
+  maf_c=0.45 maf_t=0.45 (r2=0.900, max 1.000)  measured NCP 3.9932 | as CAUSAL 4.0000 (   +0.2%) | as TAG 4.0000 (   +0.2%)
 
 CONTROL 5 -- POSITIVE CONTROL ON THE MISMATCH AXIS
   C5 at MATCHED frequencies the two readings coincide and the checker is silent: yes (3 cells)
-  C5 at MISMATCHED frequencies the wrong reading is caught: 0/0 cells
-  CONTROL 5 (the mismatch axis is what is being measured): FAIL
+  C5 at MISMATCHED frequencies the wrong reading is caught: 6/6 cells
+  CONTROL 5 (the mismatch axis is what is being measured): PASS
 
 REGIME 2 -- WINNER'S CURSE AT GENOME-WIDE SIGNIFICANCE
   genome-wide 5e-8 lam= 0.0  P(sel)=5.000e-08  E[b|sel]=  0.0000 SE  bias= 0.0000 SE  |  removed 'beta+SE' =   1.0 SE (rel     +nan%)
@@ -68,11 +68,12 @@ REGIME 2 -- WINNER'S CURSE AT GENOME-WIDE SIGNIFICANCE
   nominal 0.05     lam= 6.0  P(sel)=1.000e+00  E[b|sel]=  6.0001 SE  bias= 0.0001 SE  |  removed 'beta+SE' =   7.0 SE (rel    +16.7%)
   nominal 0.05     lam= 8.0  P(sel)=1.000e+00  E[b|sel]=  8.0000 SE  bias= 0.0000 SE  |  removed 'beta+SE' =   9.0 SE (rel    +12.5%)
   The corpus removal note states the true conditional mean sits 'near 5.6 to 5.9 standard errors at genome-wide significance' and that beta+SE is wrong by '-73%% to +23%%'; both are read off above.
-  SIM lam= 4.0 z= 5.45  selected  22345 (7.448e-02 vs exact 7.335e-02)  E[b|sel]=  5.8838 +- 0.0027 SE   exact   5.8974  (5.11 sems)
-  SIM lam= 6.0 z= 5.45  selected  42545 (7.091e-01 vs exact 7.084e-01)  E[b|sel]=  6.4827 +- 0.0035 SE   exact   6.4845  (0.52 sems)
-  SIM lam= 0.0 z= 1.96  selected   9948 (4.974e-02 vs exact 5.000e-02)  E[b|sel]=  0.0611 +- 0.0236 SE   exact   0.0000  (-2.59 sems)
-  SIM lam= 1.0 z= 1.96  selected  34172 (1.709e-01 vs exact 1.701e-01)  E[b|sel]=  2.4507 +- 0.0035 SE   exact   2.4503  (-0.12 sems)
-  CONTROL 6 (exact conditional mean reproduces a simulated GWAS): FAIL
+  SIM lam= 4.0 z= 5.45 exact   5.8974 | z-rule   5.8986 +-0.0026 (-0.49 sems) | t-rule   5.8910 +-0.0026 (+2.44 sems)
+  SIM lam= 6.0 z= 5.45 exact   6.4845 | z-rule   6.4878 +-0.0034 (-0.98 sems) | t-rule   6.4866 +-0.0035 (-0.61 sems)
+  SIM lam= 0.0 z= 1.96 exact   0.0000 | z-rule   0.0539 +-0.0237 (-2.28 sems) | t-rule   0.0607 +-0.0236 (-2.57 sems)
+  SIM lam= 1.0 z= 1.96 exact   2.4503 | z-rule   2.4532 +-0.0035 (-0.83 sems) | t-rule   2.4517 +-0.0035 (-0.39 sems)
+  CONTROL 6 (exact conditional mean reproduces a simulated GWAS under its OWN selection rule, 4 cells at 4 sems): PASS
+  REPORTED, not scored: switching to the t statistic a real GWAS actually uses moves the conditional mean by up to 2.57 sems (0.118% of the value). That is the finite-sample cost of an estimated denominator, not an error in the formula.
 
 REGIME 3 -- ASCERTAINMENT LOSS
   coverage=1.00  uncovered causal variance 0.0000  corpus (1-cov)*v_causal 0.0000 (+nan%)  |  R2 0.5016 -> 0.5016
@@ -80,4 +81,4 @@ REGIME 3 -- ASCERTAINMENT LOSS
   coverage=0.50  uncovered causal variance 70.5693  corpus (1-cov)*v_causal 73.1145 (+3.61%)  |  R2 0.5016 -> 0.2593
   coverage=0.20  uncovered causal variance 114.9204  corpus (1-cov)*v_causal 116.9831 (+1.79%)  |  R2 0.5016 -> 0.1087
 
-READ_THE_TEST: False   -> fam_ascertainment_results.json
+READ_THE_TEST: True   -> fam_ascertainment_results.json
