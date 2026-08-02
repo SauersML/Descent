@@ -2215,7 +2215,7 @@ theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetent
     (m.toGenerationalPopGenParameters).mutationSharedRetentionAt (Nat.floor m.t_div) =
       mutationLDErosion m.toEvo := by
   unfold GenerationalPopGenParameters.mutationSharedRetentionAt
-    mutationLDErosion PGSEvolutionaryModel.toEvo mutationLDErosion
+    PGSEvolutionaryModel.toEvo mutationLDErosion
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
   simp only [GenerationalPopGenParameters.tauAt,
     PGSEvolutionaryModel.toGenerationalPopGenParameters,
@@ -2231,7 +2231,7 @@ theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoost
     (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) =
       migrationLDBoost m.toEvo := by
   unfold GenerationalPopGenParameters.migrationSharedBoostAt
-    migrationLDBoost PGSEvolutionaryModel.toEvo migrationLDBoost
+    PGSEvolutionaryModel.toEvo migrationLDBoost
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
   simp only [GenerationalPopGenParameters.tauAt,
     PGSEvolutionaryModel.toGenerationalPopGenParameters,
@@ -4610,7 +4610,7 @@ theorem SplitMigrationModel.fstMigDriftEq_eq_limit (s : SplitMigrationModel) :
     s.fstMigDriftEq = s.fstEqLimitLowMutationManyDemes := by
   unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium
     SplitMigrationModel.fstEqLimitLowMutationManyDemes
-    scaledMigrationRate SplitMigrationModel.Ne SplitMigrationModel.mig
+    scaledMigrationRate
   ring
 
 /-- **Increased migration strictly improves equilibrium Fst in the SplitMigration framework.**

@@ -2341,8 +2341,7 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
         migrationCoordinate := 1 + m.bigM * m.tau / (1 + m.bigM) } := by
   ext <;>
     simp [PGSEvolutionaryModel.coordinateSummary, PGSEvolutionaryModel.fstTransient,
-      sharedLDRetention PGSEvolutionaryModel.toEvo, mutationLDErosion PGSEvolutionaryModel.toEvo,
-      migrationLDBoost PGSEvolutionaryModel.toEvo, PGSEvolutionaryModel.toEvo,
+      PGSEvolutionaryModel.toEvo,
       sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium]
 
 /-- Phi is monotone increasing because it is the standard normal CDF. -/
