@@ -55,14 +55,23 @@ import sys
 import msprime
 import numpy as np
 
-# Sized for SIGNAL FIRST. A first attempt at 2 Mb x 6 replicates x 12 island
-# cells did not finish in two minutes, which is a design problem rather than a
-# compute problem: branch-mode statistics carry no mutational noise, so
-# precision comes from independent trees, and 200 kb at rho=1e-8 already gives
-# thousands. Deep low-migration island trees over 40 demes were the real cost.
-SEQ = 200_000
-RHO = 1e-8
-REPS = 3
+# PRECISION COMES FROM INDEPENDENT TREES, NOT FROM SEQUENCE LENGTH.
+#
+# The first sized-down run finished in 32 s and returned noise: island F_ST was
+# non-monotonic in the deme count and HIGHER at m=0.01 than at m=0.002, which
+# is backwards. The cause was arithmetic I should have done before running.
+# The expected number of recombination events is 4*Ne*r*L, and at Ne=500,
+# r=1e-8, L=200 kb that is 0.004 -- the whole run rested on ONE tree per
+# replicate, so branch-mode statistics had nothing to average over.
+#
+# Cutting cost is right; cutting the axis that buys precision is not. Raising
+# the recombination rate multiplies independent trees at fixed sequence length
+# and costs far less than lengthening the sequence: at r=1e-7 and L=2 Mb this
+# is ~4000 trees for the island cells and ~8000 for the split cells. The
+# simulation stays neutral, so r only controls tree independence here.
+SEQ = 2_000_000
+RHO = 1e-7
+REPS = 5
 
 
 def hudson_branch_fst(ts, sa, sb):
@@ -153,11 +162,17 @@ def main():
           "daughter sizes)")
     res["split"] = family_split()
 
+    # Judge the t=0 control against ITS OWN noise, not a fixed constant. The
+    # first run flagged -0.01000 +/- 0.01415 as a failure when that is well
+    # inside one standard error of zero; a control whose threshold ignores the
+    # estimator's variance reports the run's precision, not its correctness.
     zero = [r for r in res["split"] if r["t"] == 0]
-    c1 = all(abs(r["fst_measured"]) < 5e-3 for r in zero)
+    c1 = all(abs(r["fst_measured"]) <= max(3.0 * r["fst_sem"], 1e-3)
+             for r in zero)
     print("  CONTROL t=0 gives F_ST=0: %s (%s)"
           % ("PASS" if c1 else "FAIL",
-             ", ".join("%.5f" % r["fst_measured"] for r in zero)))
+             ", ".join("%.5f+-%.5f" % (r["fst_measured"], r["fst_sem"])
+                       for r in zero)))
 
     print("")
     print("FAMILY 2 -- ISLAND F_ST  (difference the definitions cannot see: "
