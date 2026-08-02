@@ -312,10 +312,51 @@ def sweep(ref, table):
                 "mapped": {ref["p1"]: a1, ref["p2"]: a2},
                 "empirical_status": entry.get("empirical_status"),
                 "level_to_value": [[l, v] for l, v in sample],
+                "relation": classify_relation(sample),
             })
         elif moved_across:
             excluded += 1
     return members, excluded
+
+
+def classify_relation(sample):
+    """How a member relates to the reference: is it the form, or a co-function?
+
+    Level-set invariance says a definition depends on its two parameters ONLY
+    through the same one-dimensional statistic as the reference. That is
+    necessary for computing the reference, not sufficient. The distinction
+    matters and the first version of this sweep blurred it:
+
+    for 1/(1 + 4 Ne m), the level sets are just the level sets of the PRODUCT
+    Ne*m, so `scaledMigrationRate = 4*Ne*m` is invariant along them while
+    computing something else entirely. For (1 - 1/(2 Ne))^t the statistic is
+    t*log(1 - 1/(2Ne)), which is far more specific and has no such degeneracy.
+
+    So members are split by whether the value is an AFFINE function of the
+    reference -- fitted on two levels and checked on the rest:
+
+      AFFINE       value = a + b * reference. Computes the reference up to
+                   scale and offset; b = 1, a = 0 means it IS the reference.
+      CO-FUNCTION  same level sets, not affine in the reference. Shares the
+                   underlying statistic and may mean something unrelated.
+    """
+    pts = [(l, v) for l, v in sample if l is not None and v is not None]
+    if len(pts) < 3:
+        return {"kind": "UNDETERMINED", "reason": "fewer than 3 levels"}
+    (x0, y0), (x1, y1) = pts[0], pts[1]
+    if abs(x1 - x0) < 1e-15:
+        return {"kind": "UNDETERMINED", "reason": "degenerate levels"}
+    b = (y1 - y0) / (x1 - x0)
+    a = y0 - b * x0
+    worst = 0.0
+    for x, y in pts[2:]:
+        pred = a + b * x
+        worst = max(worst, abs(pred - y) / max(1.0, abs(y)))
+    if worst <= 1e-9:
+        identity = abs(b - 1.0) <= 1e-9 and abs(a) <= 1e-9
+        return {"kind": "AFFINE", "slope": b, "intercept": a,
+                "is_the_reference": bool(identity), "max_rel_resid": worst}
+    return {"kind": "CO-FUNCTION", "max_rel_resid_if_affine": worst}
 
 
 def schema_selfcheck(table):
@@ -399,10 +440,19 @@ def main():
         }
         print("")
         print("REFERENCE %s   %s" % (ref["name"], ref["form"]))
-        print("  %d definitions are functions of this form ALONE "
-              "(%d compatible but excluded)" % (len(members), excluded))
+        n_aff = len([m for m in members if m["relation"]["kind"] == "AFFINE"])
+        print("  %d share this form's level sets (%d affine in it, %d "
+              "co-functions); %d compatible but excluded"
+              % (len(members), n_aff, len(members) - n_aff, excluded))
         for m in members:
-            print("    %-50s %s" % (m["definition"], m["source"]))
+            rel = m["relation"]
+            tag = rel["kind"]
+            if tag == "AFFINE":
+                tag += " (slope %.6g, intercept %.6g%s)" % (
+                    rel["slope"], rel["intercept"],
+                    ", IS THE REFERENCE" if rel["is_the_reference"] else "")
+            print("    %-46s %-14s %s" % (m["definition"].split(".")[-1], tag,
+                                          m["source"]))
             print("        args=%s  status=%s" % (m["args"], m["empirical_status"]))
         if ref.get("positive_control"):
             control_ok = len(members) > 0
