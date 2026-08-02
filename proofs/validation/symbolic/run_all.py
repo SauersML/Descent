@@ -1,11 +1,16 @@
 """Run every symbolic check and emit one findings table keyed by fully-qualified
 name, for coverage accounting to consume.
 
-    .venv/bin/python run_all.py
+    python3 run_all.py
+
+Runs under whatever interpreter invokes it -- the child steps inherit
+`sys.executable`, so there is no hard-coded virtualenv path and the same entry
+point works locally and on the cluster.  Requires sympy; see cluster_run.sh for
+the module that provides it.
 
 Outputs, all in this directory:
     decls.json        parsed declaration table
-    results_check1..4 per-check detail
+    results_check1..6 per-check detail
     coverage.json     mutation-tested coverage, keyed by definition FQN
     findings.json     every disagreement and gap, keyed by FQN
 """
@@ -19,7 +24,7 @@ from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).parent
-PY = str(HERE / ".venv" / "bin" / "python")
+PY = sys.executable
 
 STEPS = ["leanparse.py", "check1_fixedpoints.py", "check1b_joint.py", "check3_duplicates.py",
          "check2_derivations.py", "check4_limits.py", "check5_recurrences.py", "mutation.py",

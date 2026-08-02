@@ -1,5 +1,31 @@
 """CHECK 6 -- the constraining power of certificates.
 
+THIS CHECK IS NOT AN AUDIT OF THE CERTIFICATE SYSTEM.  IT IS THE CERTIFICATE
+SYSTEM, IN THE ONLY FORM THAT HAS REACH.  Read that before assuming the record
+types in `Identification.lean` are load-bearing, because they are not:
+
+    In 1001 definitions the corpus contains exactly ONE `Identification` record
+    instance -- `spikeIdentification`, Conventions.lean:242 -- and ZERO
+    `Approximation` instances.  One `derivation :=` field, one
+    `evidence := Evidence.derived`.  Against that, 493 theorems claim a
+    derivation by name or docstring.
+
+`Identification` and `Approximation` are structures whose docstrings argue at
+length that the derivation obligation cannot be omitted -- "its whole purpose
+is that the third field cannot be omitted"; "an `Approximation` cannot be
+introduced without naming the target and bounding the distance to it".  The
+discipline was designed, argued for, and then not adopted.  And because
+adoption is voluntary, the machinery cannot report its own non-use: nothing in
+the corpus would tell a reader that the structure is a singleton.  A convention
+that cannot detect that it is unused will always report success.  That is a
+defect in the design rather than in anyone's diligence, and it is the same
+shape as a guard that never fires, a check that cannot fail, and a count of
+mentions standing in for a count of evaluations.
+
+Hence this check tests any theorem that CLAIMS to pin a definition, whether or
+not it wears the record type -- which is the only way to get coverage over a
+discipline that was adopted once.
+
 A theorem that certifies a definition should fail if the definition changes.
 Nothing in this project measured that, so the over-determination programme
 rested on certificates whose grip had never been tested.  This check applies
@@ -13,6 +39,13 @@ one factor of a definition and not another:
     CONSTRAINS    at least one perturbation of that definition breaks it
     VACUOUS_FOR   every perturbation survives -- the theorem holds for any body
                   whatsoever and certifies nothing about this definition
+
+AND THE ONE INSTANCE THAT EXISTS IS THE ONE THAT OVERCLAIMS.
+`spikeIdentification`'s `derivation` field is discharged by the theorem below,
+in which `effectiveSubgroupSize` occurs on both sides and cancels.  So the
+single use of the machinery built to make obligations unskippable certifies one
+factor of its definition and not the other, in the file written to prevent
+exactly that.
 
 `Conventions.demographicSpike_eq_contrastVariance_mul_effectiveSize` is the
 motivating case, and the nuance is worth preserving: it CONSTRAINS
