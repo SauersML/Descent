@@ -584,18 +584,6 @@ noncomputable def ClosedPopulationNoMutation.retention
     (r : ClosedPopulationNoMutation) : ℝ :=
   (1 - 1 / (2 * r.Ne)) ^ r.horizon
 
-/-- Within-population heterozygosity loss over the horizon. Note the name: this
-is a heterozygosity ratio inside one population, not a between-population
-variance ratio, and it must not be read as `F_ST`.
-
-    Regime: closed population, no mutation.
-
-    Empirical status: FALSIFIED outside the regime; see
-    `ClosedPopulationNoMutation.retention`. -/
-noncomputable def ClosedPopulationNoMutation.heterozygosityLoss
-    (r : ClosedPopulationNoMutation) : ℝ :=
-  1 - r.retention
-
 /-- Target heterozygosity after the horizon.
 
     Regime: closed population, no mutation.

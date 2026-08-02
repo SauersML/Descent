@@ -997,12 +997,6 @@ need for nonlinear calibration. The consequence for calibration is proved in
 `Calibrator.ld_decay_implies_nonlinear_calibration_proved`, which exhibits three
 explicit distances rather than assuming non-affineness as a hypothesis. -/
 
-structure LDDecayMechanism (k : ℕ) where
-  /-- Genetic distance proxy (e.g., PC-distance from training centroid). -/
-  distance : (Fin k → ℝ) → ℝ
-  /-- Tagging efficiency ρ² decreases with distance. -/
-  tagging_efficiency : ℝ → ℝ
-
 theorem optimal_slope_trace_variance {k : ℕ} [Fintype (Fin k)]
     (arch : GeneticArchitecture k) (c : Fin k → ℝ)
     (h_genic_pos : arch.V_genic c ≠ 0) :
