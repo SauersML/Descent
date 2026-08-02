@@ -879,10 +879,9 @@ theorem latticeGhostMass_mono (T' : FreezingTransition)
     (hharris : T.harrisMinorization) (hharris' : T'.harrisMinorization)
     (hlt : T.kappa < T'.kappa) : T.latticeGhostMass < T'.latticeGhostMass := by
   rw [T.freezing hharris, T'.freezing hharris']
-  apply Real.exp_lt_exp.mpr
   have h : 1 / T'.kappa < 1 / T.kappa :=
-    one_div_lt_one_div_of_lt T.kappa_pos hlt
-  linarith
+    div_lt_div_of_pos_left one_pos T.kappa_pos hlt
+  exact Real.exp_lt_exp.mpr (by linarith)
 
 /-- **It is the block count that matters, not the marker count.** Two designs with the
 same `κ` carry the same residual discreteness however many markers they use. -/
