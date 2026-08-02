@@ -195,12 +195,72 @@ being 2m (or 2·m·σ²), not from any separate diploid doubling.
     two independently moving lineages; omitting it was the error in the
     previous derivation (see the block comment above).
 
-    Empirical status: UNTESTED as a standalone quantity. Its consequence
-    `demoSteppingStoneFst` is CONDITIONALLY VALID, with the caveat recorded
-    there that a freely fitted σ² cannot distinguish this scaling from others.
-    -/
+    **REGIME: this is a PER-DEME meeting time, not the meeting time.** On a
+    finite lattice of `D` demes the expected time for two lineages `d` demes
+    apart to first share a deme is `d·(D-d)/(2·σ²·m)`. This body omits the
+    factor `(D-d)` entirely, and the omission is not small: at `d = 1`,
+    `D = 256` this expression gives `5.0` where the measured meeting time is
+    `1344.2`. Read as a standalone number of generations it is wrong by that
+    factor. `steppingStoneMeetingTimeOnLattice` states the lattice quantity and
+    `steppingStoneMeetingTime_eq_scaled` proves the exact relation between
+    them, so the missing factor is now visible rather than implicit.
+
+    **Why no consumer-level check could have caught this, which is the reason
+    it survived.** The only thing this feeds is `coalFst _ Ne`, and `coalFst`
+    is handed the PER-DEME size `Ne` rather than the metapopulation size
+    `D·Ne`. The lattice size therefore cancels between the two arguments, and
+    `demoSteppingStoneFst` comes out right to 4.4% despite the meeting time
+    being off by `(D-d)`. Two compensating omissions in a ratio look exactly
+    like a correct ratio from outside. Anything that consumes this value on its
+    own, or pairs it with a metapopulation-scale `Ne`, will be wrong by
+    `(D-d)`; that pairing is a load-bearing convention and not an incidental
+    choice of argument.
+
+    Empirical status: MEASURED and off by exactly `(D-d)` as a standalone
+    meeting time. Its consequence `demoSteppingStoneFst` is CONDITIONALLY
+    VALID -- RMS relative error 0.044 with σ² SET rather than fitted, against
+    0.622 for a quadratic, 0.335 for a linear and 0.163 for a freely fitted
+    exponential form. Note that this is the σ²-held-fixed comparison the
+    docstring on `demoSteppingStoneFst` records as not yet done; it has now
+    been done and the derived form wins. -/
 noncomputable def steppingStoneCoalescenceTime (d σ_sq m : ℝ) : ℝ :=
   d / (2 * σ_sq * m)
+
+/-- **Expected meeting time on a lattice of `D` demes**, `d·(D-d)/(2·σ²·m)`:
+    the quantity `steppingStoneCoalescenceTime` is a per-deme rescaling of.
+    Stated so that the corpus contains the lattice-level time under a name,
+    rather than only the rescaled one under a name that does not say it is
+    rescaled. -/
+noncomputable def steppingStoneMeetingTimeOnLattice (d D σ_sq m : ℝ) : ℝ :=
+  d * (D - d) / (2 * σ_sq * m)
+
+/-- **The exact factor between the two**, which is `(D - d)` and nothing else.
+    Proving it as an equation is what stops the per-deme convention from being
+    reintroduced silently: any future body for either one that does not differ
+    by exactly this factor stops compiling. -/
+theorem steppingStoneMeetingTime_eq_scaled (d D σ_sq m : ℝ) :
+    steppingStoneMeetingTimeOnLattice d D σ_sq m
+      = (D - d) * steppingStoneCoalescenceTime d σ_sq m := by
+  unfold steppingStoneMeetingTimeOnLattice steppingStoneCoalescenceTime
+  ring
+
+/-- **The two agree only when `D - d = 1`**, i.e. essentially never for a
+    lattice worth modelling. Stated as the contrapositive of the regime: if a
+    reader takes `steppingStoneCoalescenceTime` for the meeting time, this is
+    the assumption they have made without writing it down. -/
+theorem steppingStoneMeetingTime_eq_perDeme_iff (d D σ_sq m : ℝ)
+    (hd : 0 < d) (hσ : 0 < σ_sq) (hm : 0 < m) :
+    steppingStoneMeetingTimeOnLattice d D σ_sq m
+      = steppingStoneCoalescenceTime d σ_sq m ↔ D - d = 1 := by
+  rw [steppingStoneMeetingTime_eq_scaled]
+  constructor
+  · intro h
+    have hpos : 0 < steppingStoneCoalescenceTime d σ_sq m := by
+      unfold steppingStoneCoalescenceTime
+      apply div_pos hd; have := mul_pos hσ hm; linarith
+    have := mul_right_cancel₀ (ne_of_gt hpos) (by linarith : (D - d) * steppingStoneCoalescenceTime d σ_sq m = 1 * steppingStoneCoalescenceTime d σ_sq m)
+    linarith
+  · intro h; rw [h, one_mul]
 
 /-! **Fst from coalescence time ratio**: `Fst = T/(T + 2Ne)`. This file used to
 restate it as `fstFromCoalescenceTime`; it is `coalFst` from
@@ -283,9 +343,63 @@ section AdmixtureModels
 
 /-- Two-way admixed F_ST: (1-α)² × F_ST(A,B).
 
-    Empirical status: UNTESTED. -/
+    **REGIME: the numerator only.** `F_ST` is a ratio, and the derivation
+    below computes the NUMERATOR ratio correctly -- simulation confirms it is
+    exactly `(1-α)²`, so the algebra in this file survives intact -- and then
+    divides by `p̄(1-p̄)` as though the DENOMINATOR were the same for the
+    (admixed, A) pair as for the (A, B) pair. It is not. The admixed population
+    has its own mean allele frequency, so its heterozygosity term differs, and
+    the measured denominator ratio runs from `0.978` at `α = 0.1` down to
+    `0.428` at `α = 0.9`. This body assumes that ratio is `1`.
+
+    The consequence is a one-sided bias, never a wash: measured error
+    `-2.2%` to `-19.9%` across `α = 0.1 … 0.9` at `F_ST = 0.222`, and `-6.4%`
+    to `-57.2%` at `F_ST = 0.633`. It is always NEGATIVE -- this body
+    understates admixed `F_ST` -- and `admixedFst_le_exact` below proves that
+    sign rather than leaving it as an observation, since a bias whose direction
+    is known is a different object from one that merely happened to be negative
+    in the runs performed.
+
+    Second, separate assumption: NO POST-ADMIXTURE DRIFT. With 20 generations
+    of drift after the admixture event the error reaches `-82.8%`. Nothing in
+    the expression carries a time since admixture, so this is an assumption the
+    body cannot even express.
+
+    Empirical status: NUMERATOR VALIDATED (exactly `(1-α)²`), DENOMINATOR
+    OMITTED. Use `admixedFstExact` when the heterozygosity ratio is available. -/
 noncomputable def admixedFst (α fst_AB : ℝ) : ℝ :=
   (1 - α) ^ 2 * fst_AB
+
+/-- **Two-way admixed F_ST with the heterozygosity ratio carried**, rather than
+    assumed to be one:
+
+      `F_ST(adm, A) = (1-α)² · F_ST(A,B) / hetRatio`
+
+    where `hetRatio = p̄_adm(1-p̄_adm) / p̄_AB(1-p̄_AB)` is the ratio of the
+    denominator heterozygosity of the (admixed, A) pair to that of the (A, B)
+    pair. This is the quantity `admixedFst` computes when that ratio is `1`. -/
+noncomputable def admixedFstExact (α fst_AB hetRatio : ℝ) : ℝ :=
+  (1 - α) ^ 2 * fst_AB / hetRatio
+
+/-- **The regime, made checkable.** `admixedFst` is exactly the `hetRatio = 1`
+    case. A future edit that changes either body without preserving this stops
+    compiling. -/
+theorem admixedFstExact_at_one (α fst_AB : ℝ) :
+    admixedFstExact α fst_AB 1 = admixedFst α fst_AB := by
+  unfold admixedFstExact admixedFst
+  ring
+
+/-- **The sign of the bias is forced, not observed.** The measured
+    heterozygosity ratio is below one at every admixture proportion tested, and
+    whenever it is, `admixedFst` understates the true admixed `F_ST`. This is
+    why every measured error is negative; it is a property of the omission, not
+    a fact about which parameter values happened to be simulated. -/
+theorem admixedFst_le_exact (α fst_AB hetRatio : ℝ)
+    (hfst : 0 ≤ fst_AB) (hpos : 0 < hetRatio) (hle : hetRatio ≤ 1) :
+    admixedFst α fst_AB ≤ admixedFstExact α fst_AB hetRatio := by
+  unfold admixedFst admixedFstExact
+  rw [le_div_iff₀ hpos]
+  nlinarith [sq_nonneg (1 - α), mul_nonneg (sq_nonneg (1 - α)) hfst]
 
 /-- Admixed F_ST < parent F_ST for any admixture proportion α ∈ (0,1). -/
 theorem admixed_fst_smaller (α fst_AB : ℝ)

@@ -5,6 +5,27 @@ namespace Calibrator
 
 open MeasureTheory
 
+/-! `r2FromSignalVariance` and the Gaussian-AUC declarations live in
+`Calibrator.TransportedMetrics` (DGP.lean). `Calibrator.DGP` is imported, so
+the module is available, but the namespace was never opened here and this file
+refers to five of its declarations WITHOUT qualification. Lean does not report
+that as a missing constant: it auto-binds the bare name as an implicit
+variable, which is why the failure surfaced as three unrelated-looking symptoms
+-- "unknown identifier", "function expected at", and the discriminating
+"LOCAL VARIABLE `r2FromSignalVariance` has no definition". A definition that
+had failed to build would say something else, and `Calibrator.DGP` itself
+builds clean.
+
+These five names are opened rather than qualified at ~40 call sites: the
+mechanical repoint is the larger and riskier diff, and an explicit import list
+cannot collide, since this file defines none of these names and the only
+`Profile` and `calibratedBrier` in the corpus are the ones inside this same
+namespace. The remaining `TransportedMetrics.` prefixes in this file are left
+alone; both spellings resolve to the same constant. -/
+open TransportedMetrics (r2FromSignalVariance r2FromSignalVariance_eq_rsquared
+  gaussianAUCFromSignalVariance gaussianAUCFromSignalVariance_eq_processAUC
+  GaussianLiabilityRegime)
+
 section PortabilityDrift
 
 
@@ -5031,9 +5052,56 @@ theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ) (_hm₁₂ :
     where D_0 is the initial admixture LD and t is the current time.
     We model the decay factor.
 
-    Empirical status: UNTESTED. -/
+    **REGIME: infinite population.** `(1-r)` is the recombination-only
+    retention, i.e. the `Nₑ → ∞` limit, and nothing in the expression says so
+    -- there is no `Nₑ` argument for it to say it with. The finite-population
+    retention is `(1-r)(1 - 1/(2Nₑ))`, which is
+    `LDDecayTheory.ldRetentionPerGen` and is measured accurate to within
+    `0.12%`. This body is high by exactly the omitted drift factor: measured
+    `+0.24%` to `+0.37%` over the tested range. The bias is therefore small but
+    STRICTLY ONE-SIDED, and `admixtureLDDecay_ge_finitePopulation` below proves
+    that direction rather than leaving it to the runs that happened to be done;
+    it also grows with `generations_since`, since the omitted factor is
+    compounded.
+
+    Small and one-sided is the combination worth naming: it will not show up as
+    noise in a comparison, and it accumulates in the same direction over time.
+
+    Empirical status: VALIDATED as the `Nₑ → ∞` limit; MEASURED high by
+    `+0.24%` to `+0.37%` against the finite-population retention. The sibling
+    quantities `LDDecayTheory.admixtureLD` and
+    `CovarianceStructure.admixtureLDTwoLocus` are EXACT to `2.8e-17` and need
+    nothing. -/
 noncomputable def admixtureLDDecay (r : ℝ) (generations_since : ℕ) : ℝ :=
   (1 - r) ^ generations_since
+
+/-- **The omission is one-sided: this body is never below the finite-population
+    retention.** The finite-`Nₑ` retention per generation is
+    `(1-r)(1 - 1/(2Nₑ))`, compounded over `generations_since`; dropping the
+    drift factor can only raise the result, at every `r`, every `Nₑ` and every
+    number of generations. That is why every measured error is positive
+    (`+0.24%` to `+0.37%`) rather than scattered about zero, and it is a
+    property of the omission rather than of the parameters that were simulated.
+
+    The finite-population factor is written out here instead of being called by
+    name because `LDDecayTheory.ldRetentionPerGen`, which is that expression,
+    lives in a module that imports this one; the two are the same quantity. -/
+theorem admixtureLDDecay_ge_finitePopulation (r Ne : ℝ) (t : ℕ)
+    (hr0 : 0 ≤ r) (hr1 : r ≤ 1) (hNe : 1 ≤ Ne) :
+    ((1 - r) * (1 - 1 / (2 * Ne))) ^ t ≤ admixtureLDDecay r t := by
+  unfold admixtureLDDecay
+  have hdrift_nn : (0 : ℝ) ≤ 1 - 1 / (2 * Ne) := by
+    rw [sub_nonneg, div_le_one (by linarith)]; linarith
+  have hdrift_le : (1 : ℝ) - 1 / (2 * Ne) ≤ 1 := by
+    have : (0 : ℝ) < 1 / (2 * Ne) := by positivity
+    linarith
+  have h_nn : (0 : ℝ) ≤ (1 - r) * (1 - 1 / (2 * Ne)) :=
+    mul_nonneg (by linarith) hdrift_nn
+  have h_le : (1 - r) * (1 - 1 / (2 * Ne)) ≤ 1 - r := by
+    calc (1 - r) * (1 - 1 / (2 * Ne)) ≤ (1 - r) * 1 :=
+          mul_le_mul_of_nonneg_left hdrift_le (by linarith)
+      _ = 1 - r := mul_one _
+  exact pow_le_pow_left₀ h_nn h_le t
 
 /-- **One body, two names, tied.** `DGP.discreteRecombinationSurvival` is the
 same quantity read as survival of two loci to the MRCA rather than as decay of
