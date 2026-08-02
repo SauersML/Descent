@@ -59,6 +59,21 @@
 >   internal verdicts, or absences.
 > - A clean run on the wrong revision is worse than no run, because it reads as
 >   confirmation.
+> - **A check that cannot finish is the same as a check that does not exist.**
+>   The first version of the permutation detector re-parsed the whole corpus at
+>   every removal commit and produced no output in ten minutes. Narrowing it to
+>   removals with no body-equivalent survivor among the changed files was the
+>   right optimisation *because it did not change what the check can find, only
+>   what it re-derives*.
+> - **An empty log is not evidence of anything.** Five distinct causes seen in
+>   one session: (1) the job never ran because an earlier `&&` link failed;
+>   (2) the log survived from a previous run and impersonated this one;
+>   (3) the job wrote to node-local `/tmp`, invisible to the next relay call —
+>   put run output on shared storage; (4) the job is genuinely still running;
+>   (5) a build deadlocked on a package lock, high wall clock and near-zero CPU.
+>   Check CPU time and the output path before concluding a run failed. At least
+>   one run this session was reported as a timeout when cause (3) is equally
+>   consistent with the evidence, and that cannot now be distinguished.
 > - **Elaboration reads as rigour.** A 2001-point grid search was found where a
 >   closed form existed — the search was not buying accuracy over solving it, it
 >   was *costing* accuracy by quantising the answer to the grid, and it had been
