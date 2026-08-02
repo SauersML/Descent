@@ -1767,23 +1767,23 @@ theorem effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses {p q 
   simp [effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden, add_assoc]
 
 /-- Exact source `R²` under the full source-side driver state. -/
-noncomputable def sourceExplainedSignalVarianceFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  (sourcePredictiveCovarianceFromSourceWeights m) ^ 2 /
-    sourceScoreVarianceFromExplicitDrivers m
+noncomputable def explainedSignalVarianceFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
+  (predictiveCovarianceFromSourceWeights m P) ^ 2 / scoreVarianceFromSourceWeights m P
 
-/-- Exact source `R²` under the full source-side driver state. -/
-noncomputable def sourceR2FromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  sourceExplainedSignalVarianceFromSourceWeights m / (m.outcomeVariance Pop.source)
+/-- **Exact `R²` in a population** under the full driver state, against the outcome
+variance that population is actually scored against. -/
+noncomputable def r2FromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
+  explainedSignalVarianceFromSourceWeights m P / effectiveOutcomeVariance m P
 
 /-- Exact unexplained source-side liability variance under the full explicit
 source-state score equation. This is the residual variance paired with the
 source explained signal when constructing exact source AUC and source Brier
 coordinates from the same mechanistic SNP-level state. -/
-noncomputable def sourceResidualVarianceFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  (m.outcomeVariance Pop.source) - sourceExplainedSignalVarianceFromSourceWeights m
+noncomputable def residualVarianceFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
+  effectiveOutcomeVariance m P - explainedSignalVarianceFromSourceWeights m P
 
 @[simp] theorem sourceResidualVarianceFromSourceWeights_eq_outcome_minus_signal {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
@@ -1850,32 +1850,20 @@ Rather than collapsing to a scalar retention factor, this depends explicitly on:
 - source and target context/environment cross-covariances, and
 - additive irreducible target-side losses from broken tagging,
   ancestry-specific LD distortion, and source-specific overfit. -/
-noncomputable def targetExplainedSignalVarianceFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-    targetScoreVarianceFromSourceWeights m
-
-/-- Exact target `R²` under transported source weights and the full target-side
-driver state. -/
-noncomputable def targetR2FromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  targetExplainedSignalVarianceFromSourceWeights m /
-    effectiveTargetOutcomeVariance m
+theorem explainedSignalVarianceFromSourceWeights_target {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    explainedSignalVarianceFromSourceWeights m Pop.target =
+      (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+        scoreVarianceFromSourceWeights m Pop.target := rfl
 
 /-- Exact unexplained target-side liability variance under transported source
 weights and the full explicit target-state loss budget. This is the residual
 variance entering the liability-threshold AUC formula after the mechanistic
 explained signal has been computed from the transported score moments. -/
-noncomputable def targetResidualVarianceFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  effectiveTargetOutcomeVariance m - targetExplainedSignalVarianceFromSourceWeights m
-
-@[simp] theorem targetResidualVarianceFromSourceWeights_eq_effective_minus_signal {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) :
-    targetResidualVarianceFromSourceWeights m =
-      effectiveTargetOutcomeVariance m -
-        targetExplainedSignalVarianceFromSourceWeights m := by
-  rfl
+@[simp] theorem residualVarianceFromSourceWeights_eq_effective_minus_signal {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop) :
+    residualVarianceFromSourceWeights m P =
+      effectiveOutcomeVariance m P - explainedSignalVarianceFromSourceWeights m P := rfl
 
 /-- Exact target calibrated Brier coordinate from the full explicit driver
 state. Prevalence enters here, so Brier can change even when the score moments
@@ -3340,11 +3328,11 @@ explained signal and source residual variance under the source-learned score
 equation.
 
     Empirical status: UNTESTED. -/
-noncomputable def sourceEqualVarianceGaussianAUCFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
+noncomputable def equalVarianceGaussianAUCFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
   equalVarianceGaussianAUCFromVariances
-    (sourceExplainedSignalVarianceFromSourceWeights m)
-    (sourceResidualVarianceFromSourceWeights m)
+    (explainedSignalVarianceFromSourceWeights m P)
+    (residualVarianceFromSourceWeights m P)
 
 /-- The mechanistic source AUC is exactly the explicit liability-threshold map
 applied to source explained signal and source residual variance. -/
@@ -3383,11 +3371,12 @@ not defined by reading target `R²` through a chart, and it does not recover a
 latent biological signal from source `R²`.
 
     Empirical status: UNTESTED. -/
-noncomputable def targetEqualVarianceGaussianAUCFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  equalVarianceGaussianAUCFromVariances
-    (targetExplainedSignalVarianceFromSourceWeights m)
-    (targetResidualVarianceFromSourceWeights m)
+theorem equalVarianceGaussianAUCFromSourceWeights_target {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    equalVarianceGaussianAUCFromSourceWeights m Pop.target =
+      equalVarianceGaussianAUCFromVariances
+        (explainedSignalVarianceFromSourceWeights m Pop.target)
+        (residualVarianceFromSourceWeights m Pop.target) := rfl
 
 /-- The mechanistic target AUC is exactly the explicit liability-threshold map
 applied to target explained signal and target residual variance. -/

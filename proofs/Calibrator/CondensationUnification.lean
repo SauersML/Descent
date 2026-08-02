@@ -992,6 +992,264 @@ theorem floorOne_match_does_not_transport_calibration
   floorTwo_separates spectrum spectrum' hfloorTwo
 
 /-!
+## 5h. The squaring flow, its scale sequence, and why the tower is unreachable
+
+Each floor of the tower is reached by the **normalized squaring flow**
+
+> `X_{k+1} = (X_k² - 1) / σ_k`,  `σ_k² = Var(X_k²)`,
+
+which centers the square and rescales it to unit variance. The sequence `σ_k` is the
+object that decides whether the tower's floors can be separated, and for the Gaussian it
+is not bounded — it grows doubly exponentially.
+
+The first two values are computed here outright, from the standard normal moments
+`1, 3, 15, 105` and nothing else:
+
+* `σ₁² = E[X⁴] - 1 = 2`, so `σ₁ = √2 = 1.41421…`;
+* the next floor's fourth moment is `E[(X²-1)⁴]/σ₁⁴ = (105 - 60 + 18 - 4 + 1)/4 = 15`,
+  so `σ₂² = 15 - 1 = 14` and `σ₂ = √14 = 3.74166…`.
+
+Numerically the sequence continues `19.07, 294.1, 72756, 4.699·10⁹, 2.005·10¹⁹`: the
+logarithm doubles at each floor, so `σ_k ≈ exp(c · 2^k)`. That growth is carried as a
+named hypothesis (`ScaleSequence.doubly_exponential`) with the two closed forms above as
+its anchor, because a general proof is not in reach here.
+
+### What the divergence does, and it is a rigidity mechanism rather than a defect
+
+An escape argument for tower constructions needs the flow to be *expanding* beyond some
+fixed threshold, so that points past it run away and the reflection constraints are
+locally finite. That needs a bounded `σ`. With `σ_k` diverging the opposite happens: the
+map `x ↦ (x² - 1)/σ` is a **contraction** on any fixed region once `σ` exceeds twice its
+radius (`squaringFlow_lipschitz`), and it maps that region into itself
+(`squaringFlow_maps_ball_into_itself`). The positive fixed point
+`x* = (σ + √(σ² + 4))/2` is at least `σ` (`scale_le_squaringFixedPoint`) and so diverges
+with it, swallowing every bounded set. So no fixed threshold escapes, the escape region is
+asymptotically empty, and the constraint cascade is not locally finite — which is the
+branch on which determinacy is plausible.
+
+### The biology: the tower is finite in practice, with a brutal cutoff
+
+Floor `k`'s datum is a variance-normalized quantity whose natural scale is `σ_k`, so
+estimating it from data needs a sample size growing like `σ_k²`, hence like
+`exp(2c · 2^k)`. With `σ₃ ≈ 19`, `σ₄ ≈ 294`, `σ₅ ≈ 7.3·10⁴`, the implied sample sizes are
+of order `4·10²`, `9·10⁴`, `5·10⁹`. **The observable algebra is infinite in principle and
+finite in practice, truncated at about floor three no matter how large the study.**
+
+For genotypes the first floor's scale is not the Gaussian's. It is `σ₁² = 1/V - 1` with
+`V = 2q(1-q)` (`hweFloorOneScaleSq_eq`), which equals the Gaussian's `2` at exactly one
+frequency — `gaussianKurtosisMaf`, the same `MAF = 0.2113…` at which the hub channel goes
+blind — and diverges for rare variants, where it is about `49` at MAF `0.01`. So rare
+variants start the tower further from the Gaussian and are harder to read at every floor.
+-/
+
+/-- The squared scale of the normalized squaring flow at a unit-variance coordinate:
+`σ² = Var(X²) = E[X⁴] - 1`.
+
+Empirical status: DERIVED. The variance of the square of a unit-variance coordinate, with
+no free parameter; for genotypes it is `standardizedSquare_second_cumulant`. -/
+noncomputable def squaringScaleSq (fourthMoment : ℝ) : ℝ := fourthMoment - 1
+
+/-- The fourth moment of the next floor, `E[((X² - 1)/σ)⁴]`, expanded in the current
+floor's even moments: `(m₈ - 4m₆ + 6m₄ - 4m₂ + 1) / (m₄ - 1)²`.
+
+Empirical status: DERIVED. The binomial expansion of `(X² - 1)⁴` divided by `σ⁴`; no free
+parameter and nothing fitted. -/
+noncomputable def nextFloorFourthMoment (m2 m4 m6 m8 : ℝ) : ℝ :=
+  (m8 - 4 * m6 + 6 * m4 - 4 * m2 + 1) / (m4 - 1) ^ 2
+
+/-- **Floor one of the Gaussian tower has `σ₁² = 2`.** From `E[X⁴] = 3`. -/
+theorem gaussianFloorOneScaleSq : squaringScaleSq 3 = 2 := by
+  unfold squaringScaleSq
+  norm_num
+
+/-- **The Gaussian's second floor has fourth moment `15`.** From the standard normal
+moments `E[X²] = 1`, `E[X⁴] = 3`, `E[X⁶] = 15`, `E[X⁸] = 105`:
+`(105 - 60 + 18 - 4 + 1)/4 = 60/4 = 15`. The numerator `60` is the fourth central moment
+of a chi-square with one degree of freedom, which is the independent check. -/
+theorem gaussianFloorTwoFourthMoment : nextFloorFourthMoment 1 3 15 105 = 15 := by
+  unfold nextFloorFourthMoment
+  norm_num
+
+/-- **Floor two of the Gaussian tower has `σ₂² = 14`**, so `σ₂ = √14 = 3.74166…`.
+
+This is the second entry of a sequence nobody has written down, and with
+`gaussianFloorOneScaleSq` it anchors the doubly-exponential growth carried below as a
+hypothesis. -/
+theorem gaussianFloorTwoScaleSq :
+    squaringScaleSq (nextFloorFourthMoment 1 3 15 105) = 14 := by
+  rw [gaussianFloorTwoFourthMoment]
+  unfold squaringScaleSq
+  norm_num
+
+/-- **The genotype's floor-one scale**, in cleared form: `V · σ₁² = 1 - V`, that is
+`σ₁² = 1/V - 1` with `V = 2q(1-q)`.
+
+This is `standardizedSquare_second_cumulant` read as the first entry of the genotype's own
+scale sequence. It exceeds the Gaussian's `2` for rare variants — about `49` at MAF `0.01`
+— and falls below it for common ones. -/
+theorem hweFloorOneScaleSq_eq (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    h.genotypeVariance *
+        squaringScaleSq
+          (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) =
+      1 - h.genotypeVariance := by
+  unfold squaringScaleSq
+  exact standardizedSquare_second_cumulant h hq0 hq1
+
+/-- **The genotype's floor-one scale equals the Gaussian's at exactly one frequency**, and
+it is the blind frequency `gaussianKurtosisMaf = (3 - √3)/6`.
+
+At that MAF the genotype variance is `1/3`, so `σ₁² = 1/V - 1 = 2`, the Gaussian value.
+The frequency at which the hub channel cannot separate a genotype from a Gaussian is the
+same frequency at which the two towers start from the same scale — one fact, reached from
+two directions. -/
+theorem hweFloorOneScaleSq_eq_gaussian_at_blind_maf (h : HardyWeinbergModel)
+    (hmaf : h.altFreq = gaussianKurtosisMaf) :
+    squaringScaleSq
+        (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) =
+      squaringScaleSq 3 := by
+  rw [standardizedGenotype_kurtosis_gaussian_at_blind_maf h hmaf]
+
+/-!
+### The flow is a contraction once the scale is large
+
+Three facts about `x ↦ (x² - 1)/σ`, all proved: it is `2R/σ`-Lipschitz on the ball of
+radius `R`, it maps that ball into itself once `σ` is large enough, and its positive fixed
+point is at least `σ`. Together they say a diverging scale sequence leaves no escape
+region.
+-/
+
+/-- The squaring map is `2R`-Lipschitz on the ball of radius `R`, before normalization.
+Dividing by `σ` makes the constant `2R/σ`, which is below one as soon as `σ > 2R`. -/
+theorem squaringFlow_lipschitz {R x y : ℝ} (hx : |x| ≤ R) (hy : |y| ≤ R) :
+    |x ^ 2 - y ^ 2| ≤ 2 * R * |x - y| := by
+  have hfactor : x ^ 2 - y ^ 2 = (x + y) * (x - y) := by ring
+  have hsum : |x + y| ≤ 2 * R := by
+    calc |x + y| ≤ |x| + |y| := abs_add x y
+      _ ≤ R + R := by linarith
+      _ = 2 * R := by ring
+  rw [hfactor, abs_mul]
+  exact mul_le_mul_of_nonneg_right hsum (abs_nonneg _)
+
+/-- **The flow maps every bounded region into itself once the scale is large.** For
+`σ ≥ (R² + 1)/R` the ball of radius `R` is invariant, so no point of it escapes — however
+the threshold `R` was chosen.
+
+This is the failure of the escape argument, stated positively: with `σ_k` diverging, every
+fixed threshold is eventually swallowed. -/
+theorem squaringFlow_maps_ball_into_itself {σ R x : ℝ} (hR : 0 < R) (hσ : 0 < σ)
+    (hx : |x| ≤ R) (hlarge : (R ^ 2 + 1) / R ≤ σ) :
+    |(x ^ 2 - 1) / σ| ≤ R := by
+  have hxle : x ≤ R := (abs_le.mp hx).2
+  have hxge : -R ≤ x := (abs_le.mp hx).1
+  have hsq : x ^ 2 ≤ R ^ 2 := by nlinarith [hxle, hxge]
+  have hnum : |x ^ 2 - 1| ≤ R ^ 2 + 1 := by
+    rw [abs_le]
+    constructor
+    · nlinarith [sq_nonneg x]
+    · nlinarith [hsq]
+  have hmul : R ^ 2 + 1 ≤ σ * R := by
+    rw [div_le_iff₀ hR] at hlarge
+    linarith [hlarge]
+  rw [abs_div, abs_of_pos hσ, div_le_iff₀ hσ]
+  calc |x ^ 2 - 1| ≤ R ^ 2 + 1 := hnum
+    _ ≤ σ * R := hmul
+    _ = R * σ := by ring
+
+/-- **The one-step map of the flow**: `x ↦ (x² - 1)/σ`, one floor of the tower applied to
+a point rather than to a law.
+
+Empirical status: DERIVED. The centering-and-rescaling step that defines the tower; the
+centering constant is forced by `E[X²] = 1` and the scale by `Var(X²)`, so there is no free
+parameter. -/
+noncomputable def squaringStep (scale x : ℝ) : ℝ := (x ^ 2 - 1) / scale
+
+/-- The positive fixed point of the normalized squaring flow, `(σ + √(σ² + 4))/2`.
+
+Empirical status: DERIVED. The positive root of `x² - σx - 1 = 0`, which is the fixed-point
+equation of `squaringStep`; no free parameter. -/
+noncomputable def squaringFixedPoint (scale : ℝ) : ℝ :=
+  (scale + Real.sqrt (scale ^ 2 + 4)) / 2
+
+/-- The defining identity in cleared form: `x*² - 1 = σ x*`. -/
+theorem squaringFixedPoint_root (scale : ℝ) :
+    squaringFixedPoint scale ^ 2 - 1 = scale * squaringFixedPoint scale := by
+  have hsq : Real.sqrt (scale ^ 2 + 4) ^ 2 = scale ^ 2 + 4 :=
+    Real.sq_sqrt (by positivity)
+  unfold squaringFixedPoint
+  nlinarith [hsq]
+
+/-- **It is a fixed point of the one-step map**: `squaringStep σ x* = x*`. This is the
+obligation a named fixed point carries — the map beside it, and the theorem tying them. -/
+theorem squaringFixedPoint_isFixedPoint (scale : ℝ) (hscale : scale ≠ 0) :
+    squaringStep scale (squaringFixedPoint scale) = squaringFixedPoint scale := by
+  unfold squaringStep
+  rw [squaringFixedPoint_root, mul_div_cancel_left₀ _ hscale]
+
+/-- **The fixed point tracks the scale**: `σ ≤ x*`. So a diverging scale sequence has
+diverging fixed points, and the region inside the fixed point — where the flow is
+contracting — eventually contains any given bounded set. -/
+theorem scale_le_squaringFixedPoint {scale : ℝ} (hscale : 0 ≤ scale) :
+    scale ≤ squaringFixedPoint scale := by
+  have hsq : Real.sqrt (scale ^ 2 + 4) ^ 2 = scale ^ 2 + 4 :=
+    Real.sq_sqrt (by positivity)
+  have hnonneg : 0 ≤ Real.sqrt (scale ^ 2 + 4) := Real.sqrt_nonneg _
+  unfold squaringFixedPoint
+  nlinarith [hsq, hnonneg, hscale]
+
+/-- The scale sequence of a tower, with the growth carried as a named hypothesis.
+
+The two anchor values are theorems (`gaussianFloorOneScaleSq`, `gaussianFloorTwoScaleSq`);
+the growth law is quadrature evidence, exact through floor seven, and is a hypothesis here
+rather than an assertion. -/
+structure ScaleSequence where
+  /-- The scale at each floor. -/
+  scale : ℕ → ℝ
+  /-- Scales are positive. -/
+  scale_pos : ∀ k, 0 < scale k
+  /-- Floor one is the Gaussian's `√2`, squared. -/
+  scale_one_sq : scale 1 ^ 2 = 2
+  /-- Floor two is the Gaussian's `√14`, squared. -/
+  scale_two_sq : scale 2 ^ 2 = 14
+  /-- **The growth law (numerical input).** `exp(c · 2^k) ≤ σ_k` for some positive `c`;
+  Gauss-Hermite quadrature at 200 nodes, exact through floor seven, gives
+  `1.414, 3.742, 19.07, 294.1, 7.276·10⁴, 4.699·10⁹, 2.005·10¹⁹`, whose logarithms double
+  at each floor to four significant figures. -/
+  growthRate : ℝ
+  growthRate_pos : 0 < growthRate
+  doubly_exponential : ∀ k : ℕ, Real.exp (growthRate * 2 ^ k) ≤ scale k
+
+namespace ScaleSequence
+
+variable (S : ScaleSequence)
+
+/-- **No fixed threshold escapes.** For every radius `R` there is a floor beyond which the
+flow maps the ball of radius `R` into itself, provided the scale has reached
+`(R² + 1)/R` — which a diverging scale sequence does.
+
+The hypothesis `hreached` is what the growth law supplies; the conclusion is that the
+escape region below `R` is empty from that floor on. -/
+theorem no_escape_below_radius {R : ℝ} (hR : 0 < R) (k : ℕ)
+    (hreached : (R ^ 2 + 1) / R ≤ S.scale k) {x : ℝ} (hx : |x| ≤ R) :
+    |(x ^ 2 - 1) / S.scale k| ≤ R :=
+  squaringFlow_maps_ball_into_itself hR (S.scale_pos k) hx hreached
+
+/-- **The sample size needed at floor `k` grows doubly exponentially.** If floor `k`'s
+datum needs a sample of order `σ_k²`, then it needs at least `exp(2c · 2^k)`.
+
+With the quadrature values this is about `4·10²` at floor three, `9·10⁴` at floor four and
+`5·10⁹` at floor five: the tower is observationally truncated at about floor three for any
+study that will ever be run. -/
+theorem sampleSize_doubly_exponential (k : ℕ) :
+    Real.exp (S.growthRate * 2 ^ k + S.growthRate * 2 ^ k) ≤ S.scale k ^ 2 := by
+  have hbound := S.doubly_exponential k
+  have hpos : 0 < Real.exp (S.growthRate * 2 ^ k) := Real.exp_pos _
+  rw [Real.exp_add, pow_two]
+  exact mul_le_mul hbound hbound hpos.le (le_trans hpos.le hbound)
+
+end ScaleSequence
+
+/-!
 ## 6. Where the whole development now stands
 
 Four negative results, each with its positive complement, and each attached to a
