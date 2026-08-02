@@ -115,6 +115,19 @@ def asymmetry_witness(fn, n_args, rng):
     return None
 
 
+def is_permutation(a1, a2):
+    """True only when a2 REORDERS a1 -- same names, different order.
+
+    A rename is not a permutation.  `f (m) -> g (p)` maps positionally with no
+    hazard at all, and reporting it wastes the reader's attention on the one
+    thing this detector must not do.  The first version of this check compared
+    the lists for inequality, so every rename fired; two of the two "findings"
+    over 60 commits were renames of unrelated quantities that happened to share
+    a body shape.
+    """
+    return len(a1) > 1 and a1 != a2 and sorted(a1) == sorted(a2)
+
+
 def bodies_equivalent(d1, d2):
     """Same body up to renaming the explicit arguments positionally."""
     a1, a2 = explicit_args(d1), explicit_args(d2)
@@ -133,6 +146,22 @@ def bodies_equivalent(d1, d2):
     return " ".join(ren.split()) == b1
 
 
+_TREE_CACHE = {}
+
+
+def full_tree(rev):
+    """Every definition in the corpus at `rev`, cached per revision."""
+    if rev in _TREE_CACHE:
+        return _TREE_CACHE[rev]
+    out = {}
+    listing = git("ls-tree", "-r", "--name-only", rev, "proofs/Calibrator").split()
+    for f in listing:
+        if f.endswith(".lean"):
+            out.update(parse_revision_file(rev, f))
+    _TREE_CACHE[rev] = out
+    return out
+
+
 def scan(n_commits):
     findings, examined, permuted = [], 0, 0
     log = git("log", "--format=%H", f"-{n_commits}", "--", "proofs/Calibrator").split()
@@ -147,6 +176,14 @@ def scan(n_commits):
         for f in files:
             before.update(parse_revision_file(f"{rev}^", f))
             after.update(parse_revision_file(rev, f))
+        # The survivor of an absorption is very often in a DIFFERENT file, which
+        # the collapsing commit need not have touched -- `equilibriumFst` lived
+        # in AncestrySpecificArchitecture and its survivor in PortabilityDrift.
+        # Searching only the changed files misses exactly the cross-file case
+        # this detector exists for, so fall back to the whole tree.
+        removed_here = set(before) - set(after)
+        if removed_here:
+            after.update(full_tree(rev))
         # a definition present before and absent after was removed by this commit
         for name in set(before) - set(after):
             gone = before[name]
@@ -157,8 +194,8 @@ def scan(n_commits):
                 if sname == name or not bodies_equivalent(gone, surv):
                     continue
                 ga, sa = explicit_args(gone), explicit_args(surv)
-                if ga == sa:
-                    continue                    # same order: no permutation
+                if not is_permutation(ga, sa):
+                    continue        # identical order, or a rename: no hazard
                 permuted += 1
                 fn, argnames = compile_body(surv)
                 if fn is None or len(argnames) < 2:
