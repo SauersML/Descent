@@ -585,15 +585,20 @@ theorem gradeCertified_understates_sample_size (epsilon K c : ℝ)
   unfold gradeCertifiedSampleSize logRateSampleSize
   exact h_gap
 
-/-- **The two-point certificate understates the requirement unconditionally.**
+/-- **At a normalised grade one, the shortfall needs no crossing hypothesis.**
 
-    At grade one — `K/c ≤ 1`, which covers the two-point argument and any
-    Assouad cube of bounded order — the certified sample size is below `1/ε`
-    while the requirement is `exp (1/ε)`, at every target accuracy in `(0, 1]`.
-    No hypothesis about where the curves cross is needed, because `1/ε + 1 ≤
-    exp (1/ε)` everywhere. A designer using a two-point calculation to size a
-    study for a nonsmooth architecture summary is therefore not merely optimistic
-    by a constant; the shortfall grows without bound as the target sharpens. -/
+    What is unconditional here is the *crossing*: no hypothesis about where the
+    two curves meet is needed, because `1/ε + 1 ≤ exp (1/ε)` holds everywhere.
+    What is **not** unconditional is `h_grade : K/c ≤ 1`. That is a
+    normalisation on the certificate constant `c`, and at `K = 1` it says
+    exactly `c ≥ 1`; it is not automatic for a two-point argument, and it is
+    stated as a hypothesis for that reason rather than folded into the prose.
+    Under it, the certified sample size is at most `1/ε` while the requirement
+    is `exp (1/ε)`, at every target accuracy in `(0, 1]`.
+
+    For every grade, with no normalisation at all, see
+    `gradeCertified_understates_sample_size_eventually` below, which gives the
+    same conclusion once the target is sharp enough. -/
 theorem twoPoint_understates_sample_size (epsilon K c : ℝ)
     (h_eps : 0 < epsilon) (h_eps_le : epsilon ≤ 1) (h_grade : K / c ≤ 1) :
     gradeCertifiedSampleSize epsilon K c < logRateSampleSize epsilon := by

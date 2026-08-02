@@ -1,0 +1,447 @@
+"""Parser for the Calibrator Lean corpus.
+
+Produces a machine-readable table of every declaration under proofs/Calibrator/,
+so that downstream validation never has to re-transcribe a Lean formula by hand.
+
+The parser is deliberately syntactic (no Lean elaboration): it tokenises far
+enough to find declaration boundaries, split header from body at the top-level
+`:=`, attach docstrings, track the namespace stack, and mine constraints out of
+docstrings and out of the theorems that mention each definition.
+
+Usage:
+    python3 lean_parse.py [--root Calibrator] [--out defs.json]
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import pathlib
+import re
+import sys
+from dataclasses import dataclass, field, asdict
+
+# --------------------------------------------------------------------------
+# comment / docstring stripping
+# --------------------------------------------------------------------------
+
+DOC_OPEN = "/--"
+MOD_OPEN = "/-!"
+BLK_OPEN = "/-"
+BLK_CLOSE = "-/"
+
+
+def strip_comments(src: str):
+    """Blank out every comment, preserving offsets and newlines.
+
+    Returns (clean, docs) where docs maps the *end offset* of a `/-- ... -/`
+    docstring to its text.  Nested block comments are handled.
+    """
+    out = list(src)
+    docs = {}
+    i, n = 0, len(src)
+    while i < n:
+        c = src[i]
+        if c == '"':                                  # string literal
+            j = i + 1
+            while j < n and src[j] != '"':
+                j += 2 if src[j] == "\\" else 1
+            i = j + 1
+            continue
+        if src.startswith("--", i) and not src.startswith("-/", i):
+            j = src.find("\n", i)
+            j = n if j < 0 else j
+            for k in range(i, j):
+                out[k] = " "
+            i = j
+            continue
+        if src.startswith(BLK_OPEN, i):
+            is_doc = src.startswith(DOC_OPEN, i)
+            depth, j = 1, i + 3 if (is_doc or src.startswith(MOD_OPEN, i)) else i + 2
+            while j < n and depth:
+                if src.startswith(BLK_OPEN, j):
+                    depth += 1
+                    j += 2
+                elif src.startswith(BLK_CLOSE, j):
+                    depth -= 1
+                    j += 2
+                else:
+                    j += 1
+            if is_doc:
+                docs[j] = src[i + 3:j - 2].strip()
+            for k in range(i, min(j, n)):
+                if out[k] != "\n":
+                    out[k] = " "
+            i = j
+            continue
+        i += 1
+    return "".join(out), docs
+
+
+# --------------------------------------------------------------------------
+# declaration scanning
+# --------------------------------------------------------------------------
+
+DECL_KINDS = ("def", "theorem", "lemma", "structure", "inductive", "abbrev",
+              "instance", "example", "class", "opaque", "axiom")
+MODIFIERS = ("noncomputable", "private", "protected", "partial", "unsafe",
+             "scoped", "local", "nonrec", "@[simp]")
+
+DECL_RE = re.compile(
+    r"^(?P<mods>(?:(?:noncomputable|private|protected|partial|unsafe|scoped|local|nonrec)\s+)*)"
+    r"(?P<kind>def|theorem|lemma|structure|inductive|abbrev|instance|example|class|opaque|axiom)"
+    r"(?:\s+(?P<name>[^\s:({\[⦃]+))?",
+)
+BOUNDARY_RE = re.compile(
+    r"^(?:namespace|end|section|open|import|variable|universe|attribute|set_option|@\[|"
+    r"noncomputable|private|protected|partial|unsafe|scoped|local|nonrec|"
+    r"def|theorem|lemma|structure|inductive|abbrev|instance|example|class|opaque|axiom)\b")
+
+IDENT_CH = re.compile(r"[A-Za-z0-9_'!?.À-￿]")
+IDENT_RE = re.compile(r"[A-Za-z_Ͱ-Ͽᴀ-ᶿ℀-⅏]"
+                      r"[A-Za-z0-9_'Ͱ-Ͽᴀ-ᶿ₀-ₜÀ-￿]*"
+                      r"(?:\.[A-Za-z_Ͱ-Ͽ℀-⅏][A-Za-z0-9_'₀-ₜÀ-￿]*)*")
+
+
+@dataclass
+class Decl:
+    name: str            # fully qualified
+    short: str
+    kind: str            # def | theorem | structure | ...
+    noncomputable: bool
+    file: str
+    line: int
+    signature: str       # everything between name and the top-level `:=`
+    args: list           # [{"names": [...], "type": str, "binder": "()"|"{}"|"[]"}]
+    ret_type: str
+    body: str
+    docstring: str
+    empirical_status: str
+    namespace: str
+    fields: list = field(default_factory=list)      # structures
+    equations: list = field(default_factory=list)   # equation-compiler alternatives
+    constraints: dict = field(default_factory=dict)
+    mentioned_by: list = field(default_factory=list)
+
+
+def _split_top(s: str, marker: str):
+    """Index of first `marker` at bracket depth 0, else -1."""
+    depth = 0
+    opens, closes = "([{⟨⦃⁅", ")]}⟩⦄⁆"
+    i, n = 0, len(s)
+    while i < n:
+        c = s[i]
+        if c in opens:
+            depth += 1
+        elif c in closes:
+            depth -= 1
+        elif depth == 0 and s.startswith(marker, i):
+            return i
+        i += 1
+    return -1
+
+
+def parse_binders(sig: str):
+    """Split a Lean binder list into structured arguments plus the return type."""
+    args, i, n = [], 0, len(sig)
+    while i < n:
+        while i < n and sig[i] in " \n\t":
+            i += 1
+        if i >= n:
+            break
+        c = sig[i]
+        if c in "({[⦃⁅":                     # (, {, [, ⦃, ⁅
+            close = {"(": ")", "{": "}", "[": "]", "⦃": "⦄", "⁅": "⁆"}[c]
+            depth, j = 1, i + 1
+            while j < n and depth:
+                if sig[j] == c:
+                    depth += 1
+                elif sig[j] == close:
+                    depth -= 1
+                j += 1
+            inner = sig[i + 1:j - 1]
+            k = _split_top(inner, ":")
+            if k >= 0:
+                names = inner[:k].split()
+                ty = inner[k + 1:].strip()
+            else:
+                names, ty = inner.split(), ""
+            args.append({"names": names, "type": " ".join(ty.split()),
+                         "binder": c + close, "implicit": c != "("})
+            i = j
+            continue
+        if c == ":":                                   # start of return type
+            return args, " ".join(sig[i + 1:].split())
+        # bare binder or something we do not model; consume one token
+        m = IDENT_RE.match(sig, i)
+        i = m.end() if m else i + 1
+    return args, ""
+
+
+def parse_file(path: pathlib.Path, root: pathlib.Path):
+    src = path.read_text(errors="ignore")
+    clean, docs = strip_comments(src)
+    lines = clean.splitlines(keepends=True)
+    offsets, off = [], 0
+    for ln in lines:
+        offsets.append(off)
+        off += len(ln)
+
+    # namespace stack, computed per line
+    ns_at, stack = [], []
+    for ln in lines:
+        s = ln.strip()
+        ns_at.append(".".join(x for x in stack if x is not None))
+        if s.startswith("namespace "):
+            stack.append(s.split()[1])
+        elif s.startswith("section"):
+            stack.append(None)
+        elif s == "end" or s.startswith("end "):
+            tail = s[3:].strip()
+            if stack:
+                if not tail:
+                    stack.pop()
+                elif stack and stack[-1] == tail:
+                    stack.pop()
+                elif tail in stack:
+                    while stack and stack.pop() != tail:
+                        pass
+
+    # declaration start lines
+    starts = []
+    for i, ln in enumerate(lines):
+        if ln[:1] in (" ", "\t", "\n") or not ln.strip():
+            continue
+        m = DECL_RE.match(ln)
+        if m:
+            starts.append((i, m))
+
+    decls, failures = [], []
+    for idx, (i, m) in enumerate(starts):
+        # body extends until the next top-level boundary line
+        j = i + 1
+        while j < len(lines):
+            ln = lines[j]
+            if ln[:1] not in (" ", "\t") and ln.strip() and BOUNDARY_RE.match(ln):
+                break
+            j += 1
+        chunk_clean = "".join(lines[i:j]).rstrip()
+        chunk_raw = src[offsets[i]:offsets[j] if j < len(lines) else len(src)].rstrip()
+
+        kind, name = m.group("kind"), m.group("name")
+        if name is None:
+            failures.append({"file": str(path.relative_to(root.parent)), "line": i + 1,
+                             "reason": "no name in declaration header",
+                             "head": lines[i].rstrip()[:120]})
+            continue
+
+        # docstring: the `/-- -/` whose end offset lands just before this decl
+        doc = ""
+        for end, text in docs.items():
+            if end <= offsets[i] and not src[end:offsets[i]].strip():
+                doc = text
+        # header / body split
+        after_name = chunk_clean[m.end():]
+        cut = _split_top(after_name, ":=")
+        equations = []
+        if cut < 0:
+            # equation-compiler form:  def f (args) : T\n  | pat => rhs ...
+            mbar = re.search(r"^\s*\|", after_name, re.M)
+            if mbar:
+                sig, eqtext = after_name[:mbar.start()], after_name[mbar.start():]
+                for alt in re.split(r"^\s*\|", eqtext, flags=re.M):
+                    if not alt.strip():
+                        continue
+                    if "=>" in alt:
+                        pat, rhs = alt.split("=>", 1)
+                        equations.append({"pattern": " ".join(pat.split()),
+                                          "rhs": " ".join(rhs.split())})
+                body = eqtext.strip()
+            elif kind in ("structure", "class", "inductive"):
+                sig, body = after_name, ""
+            else:
+                sig, body = after_name, ""
+                failures.append({"file": str(path.relative_to(root.parent)),
+                                 "line": i + 1, "name": name,
+                                 "reason": "no top-level ':=' found",
+                                 "head": lines[i].rstrip()[:120]})
+        else:
+            sig, body = after_name[:cut], after_name[cut + 2:]
+
+        args, ret = parse_binders(sig)
+        ns = ns_at[i]
+        fq = f"{ns}.{name}" if ns else name
+
+        est = ""
+        mest = re.search(r"Empirical status:\s*([A-Z][A-Z_\- ]*)", doc)
+        if mest:
+            est = mest.group(1).strip().rstrip(".")
+
+        d = Decl(name=fq, short=name.split(".")[-1], kind=kind,
+                 noncomputable="noncomputable" in m.group("mods"),
+                 file=str(path.relative_to(root.parent)), line=i + 1,
+                 signature=" ".join(sig.split()), args=args, ret_type=ret,
+                 body=body.strip("\n").rstrip(), docstring=doc,
+                 empirical_status=est, namespace=ns, equations=equations)
+        if kind in ("structure", "class"):
+            d.fields = parse_struct_fields(chunk_clean, m.end())
+        d.constraints = {"raw_chunk_lines": j - i}
+        d._chunk = chunk_clean       # type: ignore[attr-defined]
+        decls.append(d)
+    return decls, failures
+
+
+FIELD_RE = re.compile(r"^\s{1,}([A-Za-z_][\w'₀-ₜ]*)\s*:\s*(.+?)\s*$")
+
+
+def parse_struct_fields(chunk: str, hdr_end: int):
+    fields = []
+    tail = chunk[hdr_end:]
+    if "where" in tail:
+        tail = tail.split("where", 1)[1]
+    elif ":=" in tail:
+        tail = tail.split(":=", 1)[1]
+    for ln in tail.splitlines():
+        m = FIELD_RE.match(ln)
+        if m:
+            fields.append({"name": m.group(1), "type": " ".join(m.group(2).split())})
+    return fields
+
+
+# --------------------------------------------------------------------------
+# constraint mining
+# --------------------------------------------------------------------------
+
+RANGE_BY_KEYWORD = [
+    (r"\bfst\b|f_?st\b|fixation index", (0.0, 1.0), "F_ST"),
+    (r"\bprobabilit|\bprevalence|\bpower\b|\bauc\b|\bsensitivit|\bspecificit",
+     (0.0, 1.0), "probability"),
+    (r"frequenc", (0.0, 1.0), "frequency"),
+    (r"heritabilit|\bh2\b|h²", (0.0, 1.0), "heritability"),
+    (r"\br2\b|r²|r-squared|variance explained", (0.0, 1.0), "R-squared"),
+    (r"correlation|\brg\b|genetic correlation", (-1.0, 1.0), "correlation"),
+    (r"heterozygosit", (0.0, 1.0), "heterozygosity"),
+    (r"portabilit.*ratio|retention", (0.0, 1.0), "ratio"),
+    (r"varian|\bmse\b|\bsquared\b|\bne\b|sample size|generation", (0.0, None), "nonnegative"),
+]
+
+# `0 ≤ f x y`, `f x y ≤ 1`, `0 < f x`, `f x < 1`
+LE, LT = "≤", "<"
+
+
+def mine_from_theorems(defs, theorems):
+    """For each def: which theorems mention it, and what bounds/hypotheses they assert."""
+    by_short = {}
+    for d in defs:
+        by_short.setdefault(d.short, []).append(d)
+    for t in theorems:
+        text = t._chunk                        # type: ignore[attr-defined]
+        stmt = text.split(":=", 1)[0]
+        names = set(IDENT_RE.findall(text))
+        for nm in names:
+            base = nm.split(".")[-1]
+            for d in by_short.get(base, []):
+                if d.name == t.name:
+                    continue
+                d.mentioned_by.append(t.name)
+                # bounds
+                lo, hi = d.constraints.get("range_lo"), d.constraints.get("range_hi")
+                for pat, which in (
+                    (rf"(-?[\d./]+)\s*[{LE}<]\s*{re.escape(base)}\b", "lo"),
+                    (rf"{re.escape(base)}\b[^,;\n]*?[{LE}<]\s*(-?[\d./]+)", "hi"),
+                ):
+                    for mm in re.finditer(pat, stmt):
+                        try:
+                            v = eval(mm.group(1), {"__builtins__": {}})  # numeric literal only
+                        except Exception:
+                            continue
+                        if which == "lo":
+                            lo = v if lo is None else min(lo, v)
+                        else:
+                            hi = v if hi is None else max(hi, v)
+                if lo is not None:
+                    d.constraints["range_lo"] = lo
+                if hi is not None:
+                    d.constraints["range_hi"] = hi
+                # hypothesis constraints on the def's own argument names
+                argnames = {n for a in d.args for n in a["names"]}
+                hyps = d.constraints.setdefault("hypotheses", [])
+                for mm in re.finditer(r"\(\s*h[\w'₀-ₜ]*\s*:\s*([^)]*)\)", stmt):
+                    h = " ".join(mm.group(1).split())
+                    if any(re.search(rf"(?<![\w']){re.escape(a)}(?![\w'])", h) for a in argnames):
+                        if h not in hyps:
+                            hyps.append(h)
+
+
+def mine_from_docstring(d: Decl):
+    hay = (d.docstring + " " + d.short + " " + d.name).lower()
+    for pat, (lo, hi), label in RANGE_BY_KEYWORD:
+        if re.search(pat, hay):
+            d.constraints.setdefault("declared_kind", label)
+            d.constraints.setdefault("declared_lo", lo)
+            d.constraints.setdefault("declared_hi", hi)
+            break
+    m = re.search(r"\b(per generation|per year|generations?|years?|per sample|per snp)\b", hay)
+    if m:
+        d.constraints["units"] = m.group(1)
+
+
+# --------------------------------------------------------------------------
+
+def build(root: pathlib.Path):
+    all_decls, failures = [], []
+    files = sorted(root.rglob("*.lean"))
+    extra = root.parent / (root.name + ".lean")
+    if extra.exists():
+        files.append(extra)
+    for p in files:
+        try:
+            ds, fs = parse_file(p, root)
+        except Exception as e:                                   # noqa: BLE001
+            failures.append({"file": str(p), "reason": f"parser exception: {e!r}"})
+            continue
+        all_decls.extend(ds)
+        failures.extend(fs)
+    defs = [d for d in all_decls if d.kind in ("def", "abbrev")]
+    thms = [d for d in all_decls if d.kind in ("theorem", "lemma", "example")]
+    structs = [d for d in all_decls if d.kind in ("structure", "class", "inductive")]
+    for d in defs:
+        mine_from_docstring(d)
+    mine_from_theorems(defs, thms)
+    for d in defs:
+        d.constraints.pop("raw_chunk_lines", None)
+        d.mentioned_by = sorted(set(d.mentioned_by))
+    return defs, thms, structs, failures
+
+
+def to_json(defs, structs, failures):
+    def clean(d):
+        r = {k: v for k, v in asdict(d).items()}
+        return r
+    return {
+        "definitions": [clean(d) for d in defs],
+        "structures": [clean(d) for d in structs],
+        "parse_failures": failures,
+    }
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--root", default="Calibrator")
+    ap.add_argument("--out", default=None)
+    a = ap.parse_args(argv)
+    root = pathlib.Path(a.root).resolve()
+    defs, thms, structs, failures = build(root)
+    blob = to_json(defs, structs, failures)
+    text = json.dumps(blob, indent=1, ensure_ascii=False)
+    if a.out:
+        pathlib.Path(a.out).write_text(text)
+    print(f"definitions: {len(defs)}   theorems: {len(thms)}   "
+          f"structures/inductives: {len(structs)}   parse failures: {len(failures)}",
+          file=sys.stderr)
+    if not a.out:
+        print(text)
+    return blob
+
+
+if __name__ == "__main__":
+    main()

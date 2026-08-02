@@ -101,7 +101,7 @@ namespace, because it is not a technical convenience:
 * on designs whose tested locus-sets share variants the achievable limits are
   weakly dense in the entire moment body — every centered law with second moment
   at most one — uniformly over the coordinate law. See
-  `Calibrator.EpistaticChaos.ChaosLimitSpectrum`.
+  `Calibrator.EpistaticChaos.GenotypeChaosLimits`.
 
 Genetically this is the difference between burden or kernel statistics over
 non-overlapping genes and partitioned windows (gated in), and sliding windows,
@@ -228,13 +228,13 @@ limit laws.
 said in prose that `Design` ranged over *disjoint-support* designs while the
 `barrier` field quantified over every `D : Design`. Read literally that asserted
 the barrier for overlapping designs too, which is false:
-`Calibrator.EpistaticChaos.ChaosLimitSpectrum.admissibility_alone_certifies_only_the_moment_body`
+`Calibrator.EpistaticChaos.GenotypeChaosLimits.admissibility_alone_certifies_only_the_moment_body`
 shows that once tested locus-sets share variants the achievable limits fill the
 whole moment body, so a pair of laws with equal observable triples has no reason
 to produce equal limits there. The support condition is now the `isDisjoint`
 field and `barrier` carries it as a hypothesis; every consequence below is
 restricted to the disjoint sub-family accordingly. In genetics the restriction is
-exactly the one of `Calibrator.EpistaticChaos.InteractionDesign.VariantDisjoint`:
+exactly the one of `Calibrator.EpistaticChaos.GenotypeDesign.VariantDisjoint`:
 non-overlapping genes, disjoint LD blocks, partitioned windows — and not sliding
 windows or overlapping pathway panels.
 

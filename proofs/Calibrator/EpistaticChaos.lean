@@ -279,7 +279,7 @@ inference is blocked by an explicit counterexample in §`OverlapSpectrum`:
 compatible with a non-Gaussian limit, because the limit law of an overlapping
 design is a spectral invariant of the overlap structure and no second-order
 functional determines it. The disjoint limit theory needs
-`InteractionDesign.VariantDisjoint`, which sign symmetry does not supply.
+`GenotypeDesign.VariantDisjoint`, which sign symmetry does not supply.
 
 **Genotype applicability.** The `SymmetricCoding` argument is a hypothesis, and
 for a Hardy-Weinberg locus it is satisfied at exactly one allele frequency:
@@ -685,7 +685,7 @@ it, and the reason is visible in the inputs its proof route uses:
    `standardizedGenotype_expectation_zero` and
    `standardizedGenotype_second_moment_one`;
 2. the coordinates are independent across loci — the linkage-equilibrium
-   hypothesis `GenotypeDesign.InLinkageEquilibrium`, an argument of the licence,
+   hypothesis `GenotypeDesign.LociIndependent`, an argument of the licence,
    not an assumption about the coding;
 3. no monomial is macroscopic — `no_macroscopic_interaction_term` of §`NoJump`,
    which carries no symmetry hypothesis and holds for any design and any coding.
@@ -766,7 +766,7 @@ population's joint genotype law over the panel.
 
 The joint law is carried alongside the per-locus models so that linkage
 equilibrium is a checkable relation between them
-(`GenotypeDesign.InLinkageEquilibrium`) rather than a silent assumption; the
+(`GenotypeDesign.LociIndependent`) rather than a silent assumption; the
 disjoint licence needs it, and a design whose tested sets sit inside one LD block
 does not have it. -/
 structure GenotypeDesign (n : ℕ) (ι : Type*) where
@@ -801,15 +801,18 @@ noncomputable def statistic (x : Fin n → DiploidGenotype) : ℝ :=
   ∑ s : ι, design.coefficient s *
     ∏ i ∈ design.locusSet s, (design.model i).standardizedGenotype (x i)
 
-/-- **Linkage equilibrium across the panel**: the joint genotype law factorizes
-into the per-locus Hardy-Weinberg laws.
+/-- **The panel loci are independent**: the joint genotype law factorizes into
+the per-locus Hardy-Weinberg laws. This is linkage equilibrium across the tested
+panel, stated as the factorization it is; the dynamics that drive a population
+towards it live in `Calibrator.LDDecayTheory`.
 
-This is an assumption about the population, not about the coding, and it is what
-the disjoint licence actually needs in place of symmetry.
+It is an assumption about the population, not about the coding, and it is what
+the disjoint licence needs in place of symmetry. A design whose tested sets sit
+inside one LD block does not have it.
 
 Empirical status: UNTESTED. A factorization condition on the joint law; testable
 directly as pairwise LD between panel loci. -/
-def InLinkageEquilibrium : Prop :=
+def LociIndependent : Prop :=
   ∀ x : Fin n → DiploidGenotype,
     design.jointGenotypeProb x = ∏ i, (design.model i).genotypeProb (x i)
 
@@ -856,8 +859,8 @@ def locusInfluence (i : Fin n) : ℝ :=
 theorem locusInfluence_nonneg (i : Fin n) : 0 ≤ design.locusInfluence i :=
   Finset.sum_nonneg (fun _ _ => sq_nonneg _)
 
-/-- **The two-pool interaction design**: two disjoint pools of loci, the tested
-sets exactly the cross-pool pairs, at least one tested set per pair.
+/-- **The two-pool interaction design**: two disjoint pools of loci, with the
+tested sets being the cross-pool pairs and at least one tested set per pair.
 
 This is the formal shape of a two-gene-set interaction test, and the design whose
 limit is a product of two independent Gaussians.
@@ -1030,7 +1033,7 @@ structure GenotypeChaosLimits (n : ℕ) (ι : Type*) (Limit : Type*) where
   carries no symmetry hypothesis and is licensed at every polymorphic
   frequency. -/
   disjoint_segment : ∀ design : GenotypeDesign n ι, isAdmissible design →
-    design.Polymorphic → design.InLinkageEquilibrium → design.VariantDisjoint →
+    design.Polymorphic → design.LociIndependent → design.VariantDisjoint →
     ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ IsCenteredGaussian (limitLaw design) s2
   /-- The Gaussian moment identity `E[g⁴] = 3 (E[g²])²`, in cumulant form. -/
   gaussian_fourthCumulant : ∀ (L : Limit) (s2 : ℝ), IsCenteredGaussian L s2 →
@@ -1046,7 +1049,7 @@ structure GenotypeChaosLimits (n : ℕ) (ι : Type*) (Limit : Type*) where
     (∀ i : Fin n, 0 < (model i).altFreq ∧ (model i).altFreq < 1) →
     ∀ target : Limit, InMomentBody target → ∀ ε : ℝ, 0 < ε →
       ∃ design : GenotypeDesign n ι, design.model = model ∧
-        design.InLinkageEquilibrium ∧ isAdmissible design ∧
+        design.LociIndependent ∧ isAdmissible design ∧
         weakDistance (limitLaw design) target < ε
   /-- **The non-soficity witness (analytic input).** The two-pool interaction
   statistic has limiting fourth cumulant `6`, at every polymorphic
@@ -1057,7 +1060,7 @@ structure GenotypeChaosLimits (n : ℕ) (ι : Type*) (Limit : Type*) where
   `twoPool_interaction_fourthCumulant`. -/
   twoPool_witness : ∀ (design : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n)),
     design.IsTwoPoolInteraction poolOne poolTwo → design.Polymorphic →
-    design.InLinkageEquilibrium → fourthCumulant (limitLaw design) = 6
+    design.LociIndependent → fourthCumulant (limitLaw design) = 6
 
 namespace GenotypeChaosLimits
 
@@ -1073,7 +1076,7 @@ sharpness but a total loss of the conclusion
 (`admissibility_alone_certifies_only_the_moment_body`). -/
 theorem gaussian_null_licensed_of_disjoint (design : GenotypeDesign n ι)
     (hadmissible : Sp.isAdmissible design) (hpolymorphic : design.Polymorphic)
-    (hequilibrium : design.InLinkageEquilibrium)
+    (hequilibrium : design.LociIndependent)
     (hdisjoint : design.VariantDisjoint) :
     ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ Sp.IsCenteredGaussian (Sp.limitLaw design) s2 :=
   Sp.disjoint_segment design hadmissible hpolymorphic hequilibrium hdisjoint
@@ -1092,7 +1095,7 @@ theorem geneBurden_gaussian_null {γ : Type*} [DecidableEq γ]
     (hadmissible : Sp'.isAdmissible (geneBurdenDesign model geneOf coeff jointGenotypeProb))
     (hpolymorphic : (geneBurdenDesign model geneOf coeff jointGenotypeProb).Polymorphic)
     (hequilibrium :
-      (geneBurdenDesign model geneOf coeff jointGenotypeProb).InLinkageEquilibrium) :
+      (geneBurdenDesign model geneOf coeff jointGenotypeProb).LociIndependent) :
     ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧
       Sp'.IsCenteredGaussian
         (Sp'.limitLaw (geneBurdenDesign model geneOf coeff jointGenotypeProb)) s2 :=
@@ -1103,7 +1106,7 @@ theorem geneBurden_gaussian_null {γ : Type*} [DecidableEq γ]
 shadow of the licence, and the quantity the two-pool witness violates. -/
 theorem disjoint_limit_fourthCumulant_zero (design : GenotypeDesign n ι)
     (hadmissible : Sp.isAdmissible design) (hpolymorphic : design.Polymorphic)
-    (hequilibrium : design.InLinkageEquilibrium)
+    (hequilibrium : design.LociIndependent)
     (hdisjoint : design.VariantDisjoint) :
     Sp.fourthCumulant (Sp.limitLaw design) = 0 := by
   obtain ⟨s2, _, _, hgauss⟩ :=
@@ -1256,9 +1259,9 @@ theorem twoPool_witness_not_a_disjoint_limit {Limit : Type*}
     (Sp : GenotypeChaosLimits n ι Limit)
     (witness : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n))
     (hwitness : witness.IsTwoPoolInteraction poolOne poolTwo)
-    (hwitnessPoly : witness.Polymorphic) (hwitnessLE : witness.InLinkageEquilibrium)
+    (hwitnessPoly : witness.Polymorphic) (hwitnessLE : witness.LociIndependent)
     (design : GenotypeDesign n ι) (hadmissible : Sp.isAdmissible design)
-    (hpolymorphic : design.Polymorphic) (hequilibrium : design.InLinkageEquilibrium)
+    (hpolymorphic : design.Polymorphic) (hequilibrium : design.LociIndependent)
     (hdisjoint : design.VariantDisjoint) :
     Sp.limitLaw design ≠ Sp.limitLaw witness := by
   intro heq
@@ -1287,10 +1290,10 @@ theorem sign_symmetry_does_not_license_disjoint_reduction {Limit : Type*}
     (Sp : GenotypeChaosLimits n ι Limit)
     (witness : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n))
     (hwitness : witness.IsTwoPoolInteraction poolOne poolTwo)
-    (hwitnessPoly : witness.Polymorphic) (hwitnessLE : witness.InLinkageEquilibrium)
+    (hwitnessPoly : witness.Polymorphic) (hwitnessLE : witness.LociIndependent)
     (_hbalanced : ∀ i : Fin n, (witness.model i).altFreq = 1 / 2)
     (design : GenotypeDesign n ι) (hadmissible : Sp.isAdmissible design)
-    (hpolymorphic : design.Polymorphic) (hequilibrium : design.InLinkageEquilibrium)
+    (hpolymorphic : design.Polymorphic) (hequilibrium : design.LociIndependent)
     (hdisjoint : design.VariantDisjoint) :
     Sp.limitLaw design ≠ Sp.limitLaw witness :=
   twoPool_witness_not_a_disjoint_limit Sp witness poolOne poolTwo hwitness hwitnessPoly

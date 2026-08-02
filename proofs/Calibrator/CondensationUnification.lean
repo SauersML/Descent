@@ -213,7 +213,7 @@ Two separate things then have to be true before the independent-design theory of
 
 So the honest statement is not "overlap is unresolved for genotypes" but "overlap is
 resolved, negatively, for everyone": the licence for a Gaussian or chi-square null is
-`Calibrator.EpistaticChaos.InteractionDesign.VariantDisjoint`, and no property of the
+`Calibrator.EpistaticChaos.GenotypeDesign.VariantDisjoint`, and no property of the
 coding substitutes for it.
 -/
 
@@ -262,28 +262,31 @@ family the non-disjoint designs realize the entire moment body. The theorems bel
 those to the drift and safe-order machinery of `Calibrator.PolygenicSpectroscopy`.
 -/
 
-/-- **Both gates, for a disjoint design.** A pairwise-disjoint admissible design over
-polymorphic loci in linkage equilibrium, tested at an interaction order below the
-condensation boundary, passes both: its null is a centered Gaussian with variance in
-`[0, 1]` (Theorem D), and its order is subcritical, `c(q) * m < log N`
-(`epistatic_order_safe_iff`, i.e. `criticalDegree` via
+/-- **Both gates, for a disjoint design.** Take a pairwise-disjoint admissible design
+over polymorphic loci in linkage equilibrium, and a tested set `s` whose interaction
+order `GenotypeDesign.interactionOrder` sits below the condensation boundary at the
+allele frequency of one of its loci. Then both gates pass: the null is a centered
+Gaussian with variance in `[0, 1]` (Theorem D), and the order is subcritical,
+`c(q) * m < log N` (`epistatic_order_safe_iff`, hence `criticalDegree` through
 `maxSafeEpistaticOrder_eq_criticalDegree`).
 
-The two conjuncts answer different questions and neither implies the other.
+The conjuncts answer different questions and neither implies the other.
 `maxSafeEpistaticOrder` says the aggregate has not condensed onto a few terms; Theorem D
-says the surviving limit is Gaussian at all. Before the overlap results the corpus had
-only the first, and a reader could take "subcritical order" to mean "Gaussian null".
-The next theorem shows that reading is wrong. -/
+says the surviving limit is Gaussian at all. Before the overlap results the corpus
+carried only the first, and a reader could take "subcritical order" to mean "Gaussian
+null". The next theorem shows that reading is wrong. -/
 theorem disjoint_design_gaussian_null_below_condensation
     {ι : Type*} [Fintype ι] {n : ℕ} {Limit : Type*}
     (Sp : GenotypeChaosLimits n ι Limit) (design : GenotypeDesign n ι)
     (hadmissible : Sp.isAdmissible design) (hpolymorphic : design.Polymorphic)
-    (hequilibrium : design.InLinkageEquilibrium) (hdisjoint : design.VariantDisjoint)
-    {N q m : ℝ} (hdrift : 0 < hweMellinDrift q)
-    (hsafe : m < maxSafeEpistaticOrder N q) :
+    (hindependent : design.LociIndependent) (hdisjoint : design.VariantDisjoint)
+    (s : ι) (i : Fin n) {N : ℝ}
+    (hdrift : 0 < hweMellinDrift (design.model i).altFreq)
+    (hsafe : (design.interactionOrder s : ℝ) <
+      maxSafeEpistaticOrder N (design.model i).altFreq) :
     (∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ Sp.IsCenteredGaussian (Sp.limitLaw design) s2) ∧
-      hweMellinDrift q * m < Real.log N :=
-  ⟨Sp.gaussian_null_licensed_of_disjoint design hadmissible hpolymorphic hequilibrium
+      hweMellinDrift (design.model i).altFreq * design.interactionOrder s < Real.log N :=
+  ⟨Sp.gaussian_null_licensed_of_disjoint design hadmissible hpolymorphic hindependent
       hdisjoint,
     (epistatic_order_safe_iff hdrift).mp hsafe⟩
 
@@ -306,7 +309,7 @@ theorem subcritical_order_does_not_license_overlapping_design
     (target : Limit) (htarget : Sp.InMomentBody target) (ε : ℝ) (hε : 0 < ε) :
     hweMellinDrift q * m < Real.log N ∧
       ∃ design : GenotypeDesign n ι, design.model = model ∧
-        design.InLinkageEquilibrium ∧ Sp.isAdmissible design ∧
+        design.LociIndependent ∧ Sp.isAdmissible design ∧
         Sp.weakDistance (Sp.limitLaw design) target < ε :=
   ⟨(epistatic_order_safe_iff hdrift).mp hsafe,
     Sp.maximal_spectrum model hpolymorphic target htarget ε hε⟩

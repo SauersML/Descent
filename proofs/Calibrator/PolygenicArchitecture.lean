@@ -2,6 +2,7 @@ import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
 import Calibrator.HaplotypeTheory
+import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 
 namespace Calibrator
 
@@ -561,6 +562,67 @@ theorem nonsmoothSummaryRisk_exceeds_polynomial (q a : ℝ)
   unfold nonsmoothSummaryRisk
   rw [le_div_iff₀ h_log]
   exact h_cross
+
+/-! ### The crossing hypotheses discharged
+
+The two statements above carry the crossing point as an explicit hypothesis,
+which is honest but leaves the reader to supply it. Both hypotheses hold
+eventually, for every exponent and every target factor, and the two theorems
+below say so. Their content is that a logarithm is negligible against every
+positive power, which is `Real.isLittleO_log_rpow_atTop`; nothing about
+genetics enters. -/
+
+/-- **No polynomial rate is attainable, unconditionally.**
+
+    For every exponent `a > 0`, past some variant count the polynomial rate
+    `q^(-a)` sits below the risk the nonsmooth summary carries. This discharges
+    the crossing hypothesis of `nonsmoothSummaryRisk_exceeds_polynomial`: there
+    is no `a` for which the polynomial rate eventually wins, so the logarithmic
+    rate is not a weak bound that a sharper analysis could improve to a power
+    law. -/
+theorem nonsmoothSummaryRisk_exceeds_polynomial_eventually (a : ℝ) (ha : 0 < a) :
+    ∀ᶠ q : ℝ in Filter.atTop, q ^ (-a) ≤ nonsmoothSummaryRisk q := by
+  have hbound := (Real.isLittleO_log_rpow_atTop ha).bound one_pos
+  filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with q hq hq2
+  have hq0 : (0 : ℝ) < q := by linarith
+  have hlog : 0 < Real.log q := Real.log_pos (by linarith)
+  have hrpow : 0 < q ^ a := Real.rpow_pos_of_pos hq0 a
+  have hle : Real.log q ≤ q ^ a := by
+    rw [Real.norm_of_nonneg (le_of_lt hlog), Real.norm_of_nonneg (le_of_lt hrpow),
+      one_mul] at hq
+    exact hq
+  have hneg : q ^ (-a) = 1 / q ^ a := by
+    rw [Real.rpow_neg (le_of_lt hq0), one_div]
+  unfold nonsmoothSummaryRisk
+  rw [hneg]
+  exact one_div_le_one_div_of_le hlog hle
+
+/-- **The certificate's shortfall grows without bound.**
+
+    For every grade `K` with positive exponent `c/K` and every target factor
+    `D`, past some variant count the deficit exceeds `D`. This discharges the
+    crossing hypothesis of `gradeCertifiedRisk_understates`. Together with the
+    previous theorem it says the shortfall is not a constant that a careful
+    accounting could absorb: no fixed-grade certificate certifies the right
+    rate, and the factor by which it fails is unbounded in the number of
+    variants. -/
+theorem gradeCertifiedRisk_deficit_eventually_ge (K c D : ℝ)
+    (hr : 0 < c / K) (hD : 0 < D) :
+    ∀ᶠ q : ℝ in Filter.atTop, D ≤ certificateDeficit q K c := by
+  have hbound := (Real.isLittleO_log_rpow_atTop hr).bound (inv_pos.mpr hD)
+  filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with q hq hq2
+  have hq0 : (0 : ℝ) < q := by linarith
+  have hlog : 0 < Real.log q := Real.log_pos (by linarith)
+  have hrpow : 0 < q ^ (c / K) := Real.rpow_pos_of_pos hq0 (c / K)
+  have hle : Real.log q ≤ D⁻¹ * q ^ (c / K) := by
+    rw [Real.norm_of_nonneg (le_of_lt hlog),
+      Real.norm_of_nonneg (le_of_lt hrpow)] at hq
+    exact hq
+  have hcross : D * Real.log q ≤ q ^ (c / K) := by
+    have hmul := mul_le_mul_of_nonneg_left hle (le_of_lt hD)
+    rw [← mul_assoc, mul_inv_cancel₀ (ne_of_gt hD), one_mul] at hmul
+    exact hmul
+  exact gradeCertifiedRisk_understates q K c D (le_of_lt hq0) hlog hcross
 
 end NonsmoothSummaries
 
