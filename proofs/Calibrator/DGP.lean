@@ -3,6 +3,46 @@ import Calibrator.TransportIdentities
 
 namespace Calibrator
 
+/-! ### The ploidy-scaled rates, and the identity fraction they feed
+
+`θ = 4 Nₑ μ` and `M = 4 Nₑ m` are the same scaling applied to a mutation rate and to a
+migration rate, and `1 / (1 + θ)` is the identity fraction at either. Six accessors across
+five structures — `SplitMigrationModel`, `GenerationalPopGenParameters`,
+`MutationDriftModelAssumptions`, `EvolutionaryParameters` and `PGSEvolutionaryModel` —
+used to spell out their own `4 * Ne * _`, and two more wrote out the quotient. That is
+eight independent chances to write a different four.
+
+They sit at the top of this module because that is the lowest point every user can see.
+The copies existed for a structural reason rather than by oversight: `scaledMutationRate`
+and `fstMutationDriftEquilibrium` lived in `PopulationGeneticsFoundations` and
+`scaledMigrationRate` in `PortabilityDrift`, each of which *imports* the modules whose
+definitions were computing them. A definition that cannot reach the function it is
+computing will be written out again, so placing these correctly is what removes the
+duplication rather than merely forbidding it. -/
+
+/-- **Scaled mutation rate** `θ = 4 Nₑ μ`, the fundamental parameter of neutral theory. -/
+noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
+  4 * Ne * μ
+
+/-- **Scaled migration rate** `M = 4 Nₑ m`, the same scaling applied to gene flow. -/
+noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
+  4 * Ne * m
+
+/-- **Identity fraction at a scaled rate**, `1 / (1 + θ)`.
+
+Not stipulated: `fstMutationDriftEquilibrium_isFixedPoint` derives it as the rest point of
+`scaledIdentityStep` at scaled rate `θ`. Two structure accessors used to write the quotient
+out again for their own `theta`, for the same import reason as the scaled rates. -/
+noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
+  1 / (1 + θ)
+
+/-- **Per-generation heterozygosity decay** at effective size `Nₑ` and scaled mutation
+rate `θ`: drift removes a fraction `1 / (2 Nₑ)` and mutation is replenishing against it.
+Two accessors on two structures used to write this product out separately. -/
+noncomputable def hetDecayFromScaled (Ne θ : ℝ) : ℝ :=
+  (1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))
+
+
 open scoped InnerProductSpace
 open InnerProductSpace
 open MeasureTheory
@@ -1518,7 +1558,7 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
 
     Empirical status: UNTESTED. -/
 noncomputable def fstDriftMutation (p : EvolutionaryParameters) : ℝ :=
-  1 / (1 + p.theta)
+  fstMutationDriftEquilibrium p.theta
 
 /-- **Drift-migration equilibrium Fst**: Fst = 1/(1 + M).
     Migration homogenizes populations, reducing Fst. -/
@@ -1568,7 +1608,7 @@ theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :
   have hscaled : 1 + p.theta + p.bigM = 1 + 4 * p.Ne * (p.mig + p.mu) := by
     unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
     ring
-  unfold fstDriftFlowStep fstEquilibrium
+  unfold fstDriftFlowStep fstEquilibrium fstMutationDriftEquilibrium
   rw [hscaled] at hd' ⊢
   field_simp
   ring
@@ -1586,14 +1626,14 @@ theorem fstEquilibrium_of_no_flow (p : EvolutionaryParameters)
   have hM : p.bigM = 0 := by
     unfold EvolutionaryParameters.bigM scaledMigrationRate
     rw [hmig]; ring
-  unfold fstEquilibrium
+  unfold fstEquilibrium fstMutationDriftEquilibrium
   rw [hθ, hM]
   norm_num
 
 /-- Full equilibrium Fst is positive. -/
 theorem fstEquilibrium_pos (p : EvolutionaryParameters) :
     0 < fstEquilibrium p := by
-  unfold fstEquilibrium
+  unfold fstEquilibrium fstMutationDriftEquilibrium
   apply div_pos one_pos
   linarith [p.theta_nonneg, p.bigM_nonneg]
 
@@ -1601,20 +1641,20 @@ theorem fstEquilibrium_pos (p : EvolutionaryParameters) :
 theorem fstEquilibrium_lt_one (p : EvolutionaryParameters)
     (h : 0 < p.theta + p.bigM) :
     fstEquilibrium p < 1 := by
-  unfold fstEquilibrium
+  unfold fstEquilibrium fstMutationDriftEquilibrium
   rw [div_lt_one (by linarith : 0 < 1 + p.theta + p.bigM)]
   linarith
 
 /-- Full equilibrium Fst ≤ drift-mutation Fst (migration only helps). -/
 theorem fstEquilibrium_le_driftMutation (p : EvolutionaryParameters) :
     fstEquilibrium p ≤ fstDriftMutation p := by
-  unfold fstEquilibrium fstDriftMutation
+  unfold fstEquilibrium fstDriftMutation fstMutationDriftEquilibrium
   exact one_div_le_one_div_of_le (by linarith [p.theta_nonneg]) (by linarith [p.bigM_nonneg])
 
 /-- Full equilibrium Fst ≤ drift-migration Fst (mutation only helps). -/
 theorem fstEquilibrium_le_driftMigration (p : EvolutionaryParameters) :
     fstEquilibrium p ≤ fstDriftMigration p := by
-  unfold fstEquilibrium fstDriftMigration
+  unfold fstEquilibrium fstDriftMigration fstMutationDriftEquilibrium
   apply one_div_le_one_div_of_le
   · linarith [p.bigM_nonneg]
   · linarith [p.theta_nonneg]
@@ -1793,7 +1833,7 @@ theorem fstEquilibrium_decreasing_in_theta
     let p₂ : EvolutionaryParameters := ⟨Ne, mu₂, mig, t_div, recomb, V_A, hNe, hmu₂, hmig, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate fstMutationDriftEquilibrium
   simp only
   rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu₂ + 4 * Ne * mig)
@@ -1809,7 +1849,7 @@ theorem fstEquilibrium_decreasing_in_migration
     let p₂ : EvolutionaryParameters := ⟨Ne, mu, mig₂, t_div, recomb, V_A, hNe, hmu, hmig₂, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate fstMutationDriftEquilibrium
   simp only
   rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₂)
@@ -1965,7 +2005,7 @@ At equilibrium (t → ∞), Fst → Fst_eq = 1/(1+θ+M).
 
     Empirical status: UNTESTED. -/
 noncomputable def PGSEvolutionaryModel.hetDecayFactor (m : PGSEvolutionaryModel) : ℝ :=
-  (1 - 1 / (2 * m.Ne)) * (1 - m.theta / (2 * m.Ne))
+  hetDecayFromScaled m.Ne m.theta
 
 /-- **Transient Fst(t)**: Fst as a function of divergence time.
     Fst(t) = Fst_eq × (1 - λ^t)

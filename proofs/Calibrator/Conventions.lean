@@ -534,7 +534,7 @@ theorem ldRetentionPerGen_uses_timeScale (r Ne : ℝ) :
 theorem hetDecayFactor_uses_timeScale (Ne θ : ℝ) :
     hetDecayFactor Ne θ
       = (1 - 1 / coalescentTimeScale Ne) * (1 - θ / coalescentTimeScale Ne) := by
-  unfold hetDecayFactor; rw [coalescentTimeScale_eq]
+  unfold hetDecayFactor hetDecayFromScaled; rw [coalescentTimeScale_eq]
 
 theorem asymmetricFst_eq_scaled (Ne m_into : ℝ) :
     asymmetricFst Ne m_into

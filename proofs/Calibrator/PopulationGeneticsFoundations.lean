@@ -531,9 +531,6 @@ theorem scaledIdentityStep_fixedPoint (scaledRate : ℝ) (h : 0 ≤ scaledRate) 
     rest point of `scaledIdentityStep` at scaled rate `θ`.
 
     Empirical status: UNTESTED. -/
-noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
-  1 / (1 + θ)
-
 /-- **The mutation-drift equilibrium is the rest point of the scaled identity
 balance** driven by mutation alone. -/
 theorem fstMutationDriftEquilibrium_isFixedPoint (θ : ℝ) (hθ : 0 ≤ θ) :
@@ -1559,7 +1556,7 @@ theorem fstTransientDiscrete_le_equilibrium (θ Ne : ℝ) (t : ℕ)
         apply mul_le_mul_of_nonneg_left _ (le_of_lt hfeq)
         have hpow_nonneg : 0 ≤ hetDecayFactor Ne θ ^ t := by
           apply pow_nonneg
-          unfold hetDecayFactor
+          unfold hetDecayFactor hetDecayFromScaled
           apply mul_nonneg
           · rw [sub_nonneg, div_le_one (by linarith)]
             linarith
@@ -1575,7 +1572,7 @@ theorem fstTransientDiscrete_le_equilibrium (θ Ne : ℝ) (t : ℕ)
     (1-1/(2N))(1-θ/(2N)) = 1 - (1+θ)/(2N) + θ/(4N²). -/
 theorem hetDecayFactor_expansion (Ne θ : ℝ) (hNe : Ne ≠ 0) :
     hetDecayFactor Ne θ = 1 - (1 + θ) / (2 * Ne) + θ / (4 * Ne ^ 2) := by
-  unfold hetDecayFactor
+  unfold hetDecayFactor hetDecayFromScaled
   field_simp
   ring
 
@@ -1599,7 +1596,7 @@ theorem hetDecayFactor_approx_error (Ne θ : ℝ) (hNe : 0 < Ne) (hθ : 0 ≤ θ
 theorem fstTransientDiscrete_eq_explicit (θ Ne : ℝ) (t : ℕ) :
     fstMutationDriftTransientDiscrete θ Ne t =
       1 / (1 + θ) * (1 - ((1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))) ^ t) := by
-  unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor
+  unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor hetDecayFromScaled
   rfl
 
 end TransientFstDerivation

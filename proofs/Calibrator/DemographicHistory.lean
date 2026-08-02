@@ -484,7 +484,7 @@ theorem smaller_founder_larger_fst
     derived in `PopulationGeneticsFoundations`. -/
 theorem founderFst_eq_derived (k : ℕ) (t : ℕ) :
     founderFst k t = fstMutationDriftTransientDiscrete 0 (k : ℝ) t := by
-  unfold founderFst fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor
+  unfold founderFst fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor hetDecayFromScaled
   simp
 
 end FounderEffects

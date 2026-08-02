@@ -213,26 +213,6 @@ theorem fstFromTau_lt_coalescenceCdf (tau : ℝ) (htau : 0 < tau) :
   exact div_pos (by linarith) (by positivity)
 
 
-/-! ### The two ploidy-scaled rates
-
-`θ = 4 Nₑ μ` and `M = 4 Nₑ m` are the same scaling applied to a mutation rate and to a
-migration rate. They sit here, at the top of the base module, because five structures
-below — `SplitMigrationModel`, `GenerationalPopGenParameters`,
-`MutationDriftModelAssumptions`, `EvolutionaryParameters` and `PGSEvolutionaryModel` —
-each used to spell out its own `4 * Ne * _` rather than apply one of these. That is five
-independent chances to write a different four.
-
-`scaledMutationRate` previously lived in `PopulationGeneticsFoundations`, which *imports*
-this module, so the definitions here could not reach it even though they were computing
-it. That is why the copies existed. -/
-
-/-- **Scaled mutation rate** `θ = 4 Nₑ μ`, the fundamental parameter of neutral theory. -/
-noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
-  4 * Ne * μ
-
-/-- **Scaled migration rate** `M = 4 Nₑ m`, the same scaling applied to gene flow. -/
-noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
-  4 * Ne * m
 
 structure PureSplitModel where
   t : ℝ
@@ -2139,7 +2119,7 @@ noncomputable def tauAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
 
 /-- Per-generation heterozygosity retention factor under drift + mutation. -/
 noncomputable def hetDecayFactor (g : GenerationalPopGenParameters) : ℝ :=
-  (1 - 1 / (2 * g.Ne)) * (1 - g.theta / (2 * g.Ne))
+  hetDecayFromScaled g.Ne g.theta
 
 /-- Transient differentiation after `t` generations. This is the same
 discrete-time drift/mutation/migration coordinate used in the evolutionary
@@ -2211,7 +2191,7 @@ noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
 @[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
     (m : PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).hetDecayFactor = m.hetDecayFactor := by
-  unfold GenerationalPopGenParameters.hetDecayFactor PGSEvolutionaryModel.hetDecayFactor
+  unfold GenerationalPopGenParameters.hetDecayFactor PGSEvolutionaryModel.hetDecayFactor hetDecayFromScaled
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
   rfl
 
@@ -4185,7 +4165,7 @@ The closed form takes that value exactly, rather than approaching it. -/
     Empirical status: UNTESTED. -/
 noncomputable def MutationDriftModelAssumptions.fstEquilibrium
     (m : MutationDriftModelAssumptions) : ℝ :=
-  1 / (1 + m.theta)
+  fstMutationDriftEquilibrium m.theta
 
 /-- **The mutation-drift equilibrium is the fixed point of the identity
 balance** driven by mutation alone. -/
@@ -4200,7 +4180,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
 theorem MutationDriftModelAssumptions.fstEquilibrium_pos
     (m : MutationDriftModelAssumptions) :
     0 < m.fstEquilibrium := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium
+  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium
   have hden : 0 < 1 + m.theta := by
     nlinarith [m.theta_pos]
   exact div_pos one_pos hden
@@ -4209,7 +4189,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_pos
 theorem MutationDriftModelAssumptions.fstEquilibrium_lt_one
     (m : MutationDriftModelAssumptions) :
     m.fstEquilibrium < 1 := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium
+  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium
   rw [div_lt_one (by linarith [m.theta_pos])]
   linarith [m.theta_pos]
 
