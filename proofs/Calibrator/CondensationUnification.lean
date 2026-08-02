@@ -623,8 +623,7 @@ theorem standardizedGenotype_kurtosis_gaussian_at_blind_maf (h : HardyWeinbergMo
   have hq1 : h.altFreq < 1 := by
     rw [hmaf]
     exact gaussianKurtosisMaf_lt_one
-  rw [hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance h hq0 hq1, hmaf,
-    gaussianKurtosisMaf_genotypeVariance]
+  rw [hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance h hq0 hq1, hmaf, gaussianKurtosisMaf_genotypeVariance]
   norm_num
 
 /-!
@@ -794,7 +793,7 @@ theorem complete_content_of_truncation
   intro floor i hfloor
   rw [htruncates] at hfloor
   have hzero : floor = 0 := Nat.le_zero.mp hfloor
-  rw [hzero, T.levelChannels_zero, T.levelChannels_zero]
+  rw [hzero, T.levelChannels_zero]
   unfold hweLevelOne
   rw [hdrift i, hjet i, hlattice i, hsymmetry i]
 
@@ -874,8 +873,7 @@ theorem fourthMoment_eq (spectrum : MafSpectrum m)
               (spectrum.model j).standardizedGenotype g ^ 4 =
         spectrum.weight j / (spectrum.model j).genotypeVariance := by
     intro j
-    rw [standardizedGenotype_fourth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2,
-      mul_one_div]
+    rw [standardizedGenotype_fourth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2, mul_one_div]
   have hdef : spectrum.moment 4 =
       ∑ j, spectrum.weight j *
         ∑ g : DiploidGenotype,
@@ -960,8 +958,7 @@ theorem sixthMoment_eq_floorOne_plus_dispersion (spectrum : MafSpectrum m)
         (10 * spectrum.moment 4 - 20) := by
     rw [hdef6]
     simp_rw [hterm]
-    rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum,
-      spectrum.weight_sum, mul_one]
+    rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.mul_sum, spectrum.weight_sum, mul_one]
     congr 2
     rw [hdef4]
     exact Finset.sum_congr rfl (fun j _ => hfour j)
@@ -1747,17 +1744,40 @@ mass is moved between them. That preserves the law of `|u|` exactly, hence every
 functional of it, hence floors three and up as laws, and changes only the odd part of the
 floor-two law.
 
-**The dichotomy is therefore now believed FALSE in its final form.** Universality-iff-
-Gaussian survives only if the floor-two coupling channel is exposable, and the last
-candidate mechanism for that has been examined and fails: nonlattice local-limit
-prefactors are universal, corrections are Edgeworth-mortal at `1/√m`, and the lattice
-precedent carried information precisely *because* lattice prefactors are not universal.
-Reflection asymmetry is not arithmetic. So the expected answer is that the observable
-algebra is exactly the ladder and the universality class is the **ladder fiber** of the
-Gaussian, infinite-dimensional and explicitly parameterized. This is not asserted as
-settled — the assembly is open, and the remaining gap is a limit-classification theorem
-rather than a construction — but nothing in this corpus should now be read as though
-Gaussian-only were the expected answer.
+**The dichotomy is therefore now believed FALSE in its final form** — *on the stratum
+where it is proved*, which is the qualifier that matters here and is stated below. The
+expected answer is that the observable algebra is exactly the ladder and the universality
+class is the **ladder fiber** of the Gaussian, infinite-dimensional and explicitly
+parameterized. This is not asserted as settled: the assembly is open and the remaining gap
+is a limit-classification theorem rather than a construction.
+
+**Scope, and genotypes are outside it.** The blindness argument runs through a
+second-order Edgeworth expansion of walk-convolution profiles with an `O(b^(-3/2))`
+remainder, and that needs **Cramér's condition on the log-square law**. Nonlattice
+*atomic-modulus* laws violate it; there the per-coordinate remainder is only `o(b^(-1/2))`
+and the coordinate count defeats it. The theorem was rescued for its own pair because both
+members have smooth modulus densities, so the general statement re-scopes to
+Cramér-modulus laws with the non-Cramér frontier an open annex.
+
+A standardized genotype at a diallelic locus takes three values, so `x²` takes at most
+three and `log x²` is **finitely supported** — purely atomic, and generically nonlattice,
+since three points lie in an arithmetic progression only when their gaps are
+commensurable, which is `hweLatticeCondition`. Genotype coordinates are therefore not
+merely outside the proved stratum; they are the canonical member of the class the audit
+carved out. **Nothing in the blindness theorem transfers to genotype data**, and this file
+asserts no such transfer.
+
+The corpus's own results point the same way from the other side. `Calibrator.JetBarrier`
+proves `one_lt_latticeInflation` and `lattice_detection`: at a lattice-aligned threshold a
+lattice law's exceedance intensity exceeds the nonlattice one by `h/(1 - e^(-h)) > 1`, so
+its prefactor is *not* universal and it carries information a design can read. That is a
+worked example, already proved here, of exactly the mechanism blindness requires to be
+absent. Whether reflection data leaks through resonance-type window structure at atomic
+modulus is open — and if it does, the odd parts are readable from genotype data, which is
+the interesting direction rather than the disappointing one.
+
+What follows in this section does not depend on any of that. The peeling result below is
+exact linear algebra on the `|u|` law and holds whatever the modulus regularity.
 
 ### The genetic question, and its answer
 
@@ -1825,8 +1845,7 @@ theorem centeredSquare_homAlt_eq (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.centeredSquare DiploidGenotype.homAlt = (2 - 3 * h.altFreq) / h.altFreq := by
   obtain ⟨_, _, halt⟩ := standardizedSquare_values h hq0 hq1
-  rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, halt,
-    div_sub_one (ne_of_gt hq0)]
+  rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, halt, div_sub_one (ne_of_gt hq0)]
   congr 1
   ring
 
@@ -1861,8 +1880,7 @@ theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
   | homRef =>
       have hval : h.centeredSquare DiploidGenotype.homRef =
           (3 * h.altFreq - 1) / (1 - h.altFreq) := by
-        rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, href,
-          div_sub_one (ne_of_gt hp)]
+        rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, href, div_sub_one (ne_of_gt hp)]
         congr 1
         ring
       rw [hval, haltval, abs_div, abs_of_pos hp, div_le_div_iff hp hq0]
@@ -1873,8 +1891,7 @@ theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
           (1 - 6 * h.altFreq + 6 * h.altFreq ^ 2) /
             (2 * h.altFreq * (1 - h.altFreq)) := by
         have hden : 2 * h.altFreq * (1 - h.altFreq) ≠ 0 := by positivity
-        rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, hhet,
-          div_sub_one hden]
+        rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, hhet, div_sub_one hden]
         congr 1
         ring
       have hden : (0 : ℝ) < 2 * h.altFreq * (1 - h.altFreq) := by positivity
