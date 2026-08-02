@@ -17,7 +17,9 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-EXTRACT = "/Users/user/gnomon/proofs/validation/extract"
+from paths import EXTRACT as _EXTRACT, PROOFS, require
+
+EXTRACT = str(require(_EXTRACT, "proofs/validation/extract"))
 if EXTRACT not in sys.path:
     sys.path.insert(0, EXTRACT)
 
@@ -150,7 +152,7 @@ def def_records():
                    for a in d["args"]]
         out.append({
             "kind": "def", "name": d["short"], "fq": fq, "module": module,
-            "file": "/Users/user/gnomon/proofs/" + d["file"], "line": d["line"],
+            "file": str(PROOFS / d["file"]), "line": d["line"],
             "docstring": d.get("docstring") or "",
             "signature": d.get("signature") or "",
             "body": (d.get("body") or "").strip(),

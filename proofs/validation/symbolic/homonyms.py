@@ -21,7 +21,9 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
-CAL = Path("/Users/user/gnomon/proofs/Calibrator")
+from paths import CALIBRATOR as CAL, require
+
+require(CAL, "proofs/Calibrator")
 
 DEF = re.compile(
     r"^(?:noncomputable\s+|private\s+|protected\s+|partial\s+)*"

@@ -48,7 +48,9 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-VALIDATION = Path("/Users/user/gnomon/proofs/validation")
+from paths import VALIDATION, require  # noqa: E402
+
+require(VALIDATION, "proofs/validation")
 HERE = VALIDATION / "symbolic"
 sys.path.insert(0, str(VALIDATION / "extract"))
 import api  # noqa: E402

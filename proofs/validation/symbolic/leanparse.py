@@ -13,7 +13,9 @@ import re
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
-CALIBRATOR = Path("/Users/user/gnomon/proofs/Calibrator")
+from paths import CALIBRATOR, require  # noqa: E402
+
+require(CALIBRATOR, "proofs/Calibrator")
 
 # A new top-level declaration starts at column 0 with one of these.
 DECL_START = re.compile(
