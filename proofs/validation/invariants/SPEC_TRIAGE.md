@@ -61,7 +61,39 @@ sampling them would be the grid-search mistake again.
 claimed properties are algebraic identities, better settled by the solver than
 by a sampler.
 
-## D. Parked — CORPUS-LEVEL claim (28)
+## D. Parked — CORPUS-LEVEL claim (was 28, now 0) — **CLAIM REFUTED**
+
+**I ran the consumer search within the hour of writing this section, and it
+refutes the claim for every definition in it.** Recorded rather than quietly
+edited, because the claim was stated as being about the corpus and a claim
+about the corpus has to be allowed to lose.
+
+    11 of 27  have a downstream CONSUMER, so the composition is testable
+              exactly as the falsifier said it would be
+    16 of 27  have no consumer but DO have theorems mentioning them — which
+              my theorem tier failed to evaluate
+     0 of 27  are genuinely isolated
+
+Consumers found: `coalescentTau` feeds `fstFromGenerations` and
+`PureSplitModel.tau`; `prevalenceLogit` feeds `prevalenceCITLShift`;
+`thresholdStandardizedCoordinate` feeds `benchmarkHighScoreRate`;
+`hweMellinJetVariance` feeds three; `pgsStratificationRiskCoefficient` feeds
+two; and six more. Every one of those composites is a measurable quantity, so
+the convention underneath is under test even though the conversion alone is
+not — which is precisely what I said would have to exist for the claim to be
+wrong.
+
+The other 16 are a different and more embarrassing finding: they all have
+theorems about them, and my theorem tier did not use those theorems. That is a
+gap in my evaluator — untranspilable conclusions, or hypotheses that admitted
+no sampled point — not a property of the corpus. It is the same shape as the
+`Finset` sums that looked unmeasurable until somebody wrote forty lines of
+evaluator.
+
+So the honest count for this class is ZERO corpus-level parks. What I had was
+27 claims about my afternoon wearing a claim about the corpus.
+
+### The original section, kept for the record (28)
 
 Claim: *no non-circular oracle exists*, because the name introduces an
 abbreviation and has no referent independent of the formula. Measuring
@@ -109,9 +141,24 @@ before.
 
 ## What this changes about the residue
 
-The 64 do not collapse to one number. 13 are done, 11+8 are work I have
-declined to pretend is impossible, 4 want a solver rather than a sampler, and
-28 rest on a corpus-level claim with a named and mechanical falsifier that I
-have not yet run.
+The 64 do not collapse to one number, and after the consumer search they do
+not collapse to my first answer either:
 
-The number I would not want quoted is "64 need simulation". Roughly half do.
+    13  simulation spec written
+    11  simulatable, spec not yet written
+     4  decidable, want a solver rather than a sampler
+    11  testable IN COMPOSITION via a downstream consumer
+    16  have theorems my own theorem tier could not evaluate
+     8  compositions of the above
+     0  genuinely beyond reach
+
+Nothing here is unreachable. Every one of the 64 is work, and the only honest
+label for the whole set is "not done yet".
+
+**The methodological point costs me the section above and is worth more than
+it.** A claim about the corpus must be refutable, and mine was refuted within
+the hour by a search I had already described. The version of this mistake that
+would have survived is the one where the falsifier is named but never run —
+naming it is what makes the claim look rigorous, and running it is the only
+thing that makes it a claim at all. Stating a falsifier and not executing it is
+the same failure as a check that cannot fail, one level up.
