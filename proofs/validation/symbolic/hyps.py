@@ -245,3 +245,109 @@ def verdict_for(lhs, rhs, binders, conv, extra_hyps=()):
         # we could not model every constraint; the witness may violate one
         return None, dict(info, method="inconclusive_unparsed_hypotheses")
     return v, info
+
+
+def holds_under(rel, hyps, nats=(), trials=4000, need=12, seed=20260801):
+    """Does a RELATION (<=, <, >=, >) hold everywhere the hypotheses allow?
+
+    check7 evaluated equations and returned None for everything else, so a
+    theorem like `1 <= ldWhiteningGain ...` could never reject a mutated body
+    -- and the definition was then filed as one no theorem constrains.  Most of
+    that bucket was inequalities, i.e. this gap, not corpus vacuity.
+
+    Returns (verdict, info); False carries a witness violating the relation.
+    """
+    import random
+    if not rel.is_Relational:
+        return None, {"method": "not_relational"}
+    lhs, rhs = rel.lhs, rel.rhs
+    op = rel.rel_op
+
+    subs, remaining = {}, []
+    for h in hyps:
+        if isinstance(h, sp.Eq):
+            tgt = None
+            for v in sorted(h.free_symbols, key=str):
+                if v in subs:
+                    continue
+                try:
+                    sols = sp.solve(h, v, dict=False)
+                except Exception:
+                    continue
+                if len(sols) == 1 and v not in sols[0].free_symbols:
+                    tgt, expr = v, sols[0]
+                    break
+            if tgt is not None:
+                subs[tgt] = expr
+                continue
+        remaining.append(h)
+    if subs:
+        lhs, rhs = lhs.subs(subs, simultaneous=True), rhs.subs(subs, simultaneous=True)
+        remaining = [h.subs(subs, simultaneous=True) for h in remaining]
+
+    syms = sorted((lhs.free_symbols | rhs.free_symbols
+                   | set().union(*[h.free_symbols for h in remaining])
+                   if remaining else lhs.free_symbols | rhs.free_symbols), key=str)
+    syms = [x for x in syms if x.is_Symbol]
+    if not syms:
+        try:
+            d = float(sp.N(lhs - rhs))
+        except Exception:
+            return None, {"method": "constant_failed"}
+        ok = {"<=": d <= 1e-12, "<": d < -1e-12,
+              ">=": d >= -1e-12, ">": d > 1e-12}.get(op)
+        return ok, {"method": "constant"}
+
+    _extra = {"Abs": abs, "Min": min, "Max": max}
+
+    def compile_(e):
+        e = totalize(e)
+        for mods in ([{**_extra, **TOTAL_FUNCS}, "cmath", "math"],
+                     [{**_extra, **TOTAL_FUNCS}, "math"]):
+            try:
+                return sp.lambdify(syms, e, modules=mods)
+            except Exception:
+                continue
+        return None
+
+    f_l, f_r = compile_(lhs), compile_(rhs)
+    f_h = [compile_(h) for h in remaining]
+    if f_l is None or f_r is None or any(f is None for f in f_h):
+        return None, {"method": "lambdify_failed"}
+
+    rng = random.Random(seed)
+    accepted = 0
+    for _ in range(trials):
+        vals = []
+        for x in syms:
+            if str(x) in nats:
+                vals.append(float(rng.randint(0, 6)))
+            elif rng.random() < 0.08:
+                vals.append(rng.choice([0.0, 1.0, -1.0]))
+            else:
+                vals.append(rng.randint(-300, 300) / rng.randint(1, 200))
+        try:
+            if not all(bool(f(*vals)) for f in f_h):
+                continue
+            a, b = complex(f_l(*vals)), complex(f_r(*vals))
+        except Exception:
+            continue
+        if any(z != z or abs(z) == float("inf") for z in (a, b)):
+            continue
+        if abs(a.imag) > 1e-9 or abs(b.imag) > 1e-9:
+            continue
+        accepted += 1
+        d = a.real - b.real
+        ok = {"<=": d <= 1e-9, "<": d < 1e-9,
+              ">=": d >= -1e-9, ">": d > -1e-9}.get(op)
+        if ok is None:
+            return None, {"method": "unknown_operator", "op": op}
+        if not ok:
+            return False, {"method": "witness",
+                           "witness": {str(k): repr(v) for k, v in zip(syms, vals)},
+                           "lhs_value": a.real, "rhs_value": b.real}
+        if accepted >= need * 8:
+            break
+    if accepted < need:
+        return None, {"method": "too_few_admissible_points", "accepted": accepted}
+    return True, {"method": "numeric", "accepted_points": accepted}

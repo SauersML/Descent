@@ -134,8 +134,16 @@ def run():
                     if isinstance(eq, sp.Eq):
                         v, _ = H.verdict_for(eq.lhs, eq.rhs, t["binders"], conv)
                     elif eq.is_Relational:
-                        # an inequality: check it can be violated by the mutation
-                        v = None
+                        # An inequality DOES constrain the body: `1 <= f x`
+                        # is violated by negating f. Returning None here was
+                        # why most of the "no theorem constrains it" bucket
+                        # was inequalities rather than vacuity.
+                        rel = eq
+                        hlist, unparsed = H.parse_hypotheses(t["binders"], conv)
+                        v, _info = H.holds_under(rel, hlist,
+                                                 H.type_domains(t["binders"]))
+                        if v is False and unparsed:
+                            v = None   # a constraint we could not model
                     else:
                         v = None
                 except Exception:
