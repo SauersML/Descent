@@ -838,18 +838,6 @@ theorem islandModelFst_eq_inv (Ne m : ℝ) :
   unfold fstMigrationDriftEquilibrium
   rw [one_div]
 
-/-- Island model Fst is in (0, 1) for positive Ne and m. -/
-theorem islandModelFst_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    0 < fstMigrationDriftEquilibrium Ne m := by
-  unfold fstMigrationDriftEquilibrium
-  positivity
-
-theorem islandModelFst_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
-    fstMigrationDriftEquilibrium Ne m < 1 := by
-  unfold fstMigrationDriftEquilibrium
-  rw [div_lt_one (by nlinarith)]
-  nlinarith
-
 /-- **Island model Fst is strictly decreasing in migration rate.**
     The function m ↦ 1/(1 + 4Nm) is strictly anti-monotone for positive Ne. -/
 theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
@@ -1315,14 +1303,6 @@ theorem hetMutationDrift_fixed_point (Ne mu : ℝ)
   have hNe2 : (2 * Ne) ≠ 0 := by linarith
   field_simp
   ring_nf
-
-/-- **The equilibrium heterozygosity is a fixed point of the recurrence.**
-    The same statement as `hetMutationDrift_fixed_point`, under the name that
-    ties it to the definition it pins. -/
-theorem hetEquilibrium_isFixedPoint (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    hetMutationDriftRecurrence Ne mu (hetMutationFloor Ne mu) 1 =
-      hetMutationFloor Ne mu :=
-  hetMutationDrift_fixed_point Ne mu hNe hmu
 
 /-- **The fixed point is unique in [0,1].**
     For any H in [0,1] satisfying f(H) = H, we must have H = θ/(1+θ).

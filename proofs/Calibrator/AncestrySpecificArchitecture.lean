@@ -363,14 +363,6 @@ theorem equilibriumFst_isFixedPoint (m Ne : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
     geneFlowFstStep m Ne (fstMigrationDriftEquilibrium Ne m) = fstMigrationDriftEquilibrium Ne m :=
   ibdFlowStep_fixedPoint Ne m hNe hm
 
-/-- **Total isolation is a boundary the formula attains.**  With no gene flow
-the populations differentiate completely and `fstMigrationDriftEquilibrium` is exactly `1`;
-the smooth form does not merely approach the boundary, it reaches it. -/
-@[simp] theorem equilibriumFst_of_no_migration (Ne : ℝ) :
-    fstMigrationDriftEquilibrium Ne 0 = 1 := by
-  unfold fstMigrationDriftEquilibrium
-  norm_num
-
 /-- Equilibrium FST decreases with migration rate. -/
 theorem fst_decreases_with_migration (m₁ m₂ Ne : ℝ)
     (h_Ne : 0 < Ne) (h_m₁ : 0 < m₁) (h_m₂ : 0 < m₂)

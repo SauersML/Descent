@@ -45,15 +45,6 @@ file already imports, so the restatement has been deleted and the theorems
 below are stated about that one definition. The regime caveats above travel
 with it. -/
 
-/-- Island model F_ST is in (0, 1) for positive Ne and m. -/
-theorem island_fst_in_unit_interval (Ne m : ℝ)
-    (hNe : 0 < Ne) (hm : 0 < m) :
-    0 < fstMigrationDriftEquilibrium Ne m ∧ fstMigrationDriftEquilibrium Ne m < 1 := by
-  unfold fstMigrationDriftEquilibrium
-  constructor
-  · positivity
-  · rw [div_lt_one (by positivity)]; linarith [mul_pos hNe hm]
-
 /-- More migration → lower equilibrium F_ST. -/
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
@@ -76,10 +67,6 @@ so the status was "unverified but probably true" rather than "derived". That the
 exists: `fstMigrationDriftEquilibrium_isFixedPoint`. -/
 
 /-- Equivalent formulation: `fstMigrationDriftEquilibrium` = 1/(1 + M) where M = `scaledMigrationRate`. -/
-theorem islandModelFst_eq_from_scaledMigration (Ne m : ℝ) :
-    fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m) :=
-  fstMigrationDriftEquilibrium_eq_from_M Ne m
-
 end IslandModel
 
 
