@@ -1098,6 +1098,125 @@ theorem centeredSquare_third_moment_zero_iff_balanced (h : HardyWeinbergModel)
     norm_num
 
 /-!
+### The coupling channel: the sign bias of a genotype coordinate
+
+The Sign-Erasure Lemma kills cross-terms when the coordinate law is symmetric. What
+survives when it is not is the **coupling channel**, whose strength is governed by the
+conditional sign bias `b = E[x |x|] / E[x²]` — at unit variance simply `E[x |x|]`, the
+mean of the signed square.
+
+For a Hardy-Weinberg coordinate this has a closed form, `b = (1 - 2q)²` below frequency one
+half, proved below. It vanishes exactly at `q = 1/2`, which is where the coding is
+symmetric, so the Sign-Erasure Lemma is recovered as the zero fibre of this channel rather
+than as a separate phenomenon.
+-/
+
+/-- **The sign bias of the standardized genotype at tilt one**: `E[x |x|]`, the mean signed
+square. It is the numerator of `b = E[x|x|]/E[x²]`, and the denominator is `1` because the
+coordinate is standardized (`standardizedGenotype_second_moment_one`).
+
+Empirical status: DERIVED from `HardyWeinbergModel.standardizedGenotype`; closed form
+`(1 - 2q)²` at or below frequency one half (`hweSignBias_eq`), with no free parameter. -/
+noncomputable def HardyWeinbergModel.signBias (h : HardyWeinbergModel) : ℝ :=
+  ∑ g : DiploidGenotype,
+    h.genotypeProb g * (h.standardizedGenotype g * |h.standardizedGenotype g|)
+
+/-- **The sign bias in closed form: `b = (1 - 2q)²`.**
+
+The three signed squares are `-2q(1-q)`, `(1-2q)²` and `+2q(1-q)`, weighted by the
+Hardy-Weinberg probabilities; the two homozygote contributions cancel exactly and the
+heterozygote term is what remains.
+
+Stated for `q ≤ 1/2` so the signs of the three centered dosages are determined, which is
+the minor-allele convention. It vanishes iff `q = 1/2` and rises to `1` as the variant
+becomes rare, so the coupling channel is strongest exactly where rare-variant methods
+operate. -/
+theorem hweSignBias_eq (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
+    (hhalf : h.altFreq ≤ 1 / 2) : h.signBias = (1 - 2 * h.altFreq) ^ 2 := by
+  have hq1 : h.altFreq < 1 := by linarith
+  have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+  have hvar : 0 < h.genotypeVariance := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    nlinarith [hq0, hcomp]
+  have hs : 0 < Real.sqrt h.genotypeVariance := Real.sqrt_pos.mpr hvar
+  have hss : Real.sqrt h.genotypeVariance * Real.sqrt h.genotypeVariance =
+      h.genotypeVariance := Real.mul_self_sqrt hvar.le
+  have hsigned : ∀ g : DiploidGenotype,
+      h.genotypeProb g * (h.standardizedGenotype g * |h.standardizedGenotype g|) =
+        h.genotypeProb g *
+          (h.centeredAltAlleleCount g * |h.centeredAltAlleleCount g|) / h.genotypeVariance := by
+    intro g
+    unfold HardyWeinbergModel.standardizedGenotype
+    rw [abs_div, abs_of_pos hs, div_mul_div_comm, hss]
+    ring
+  have hcref : h.centeredAltAlleleCount DiploidGenotype.homRef = -(2 * h.altFreq) := by
+    unfold HardyWeinbergModel.centeredAltAlleleCount
+    rw [h.expectedAltAlleleCount_eq]
+    simp only [altAlleleCount]
+    ring
+  have hchet : h.centeredAltAlleleCount DiploidGenotype.het = 1 - 2 * h.altFreq := by
+    unfold HardyWeinbergModel.centeredAltAlleleCount
+    rw [h.expectedAltAlleleCount_eq]
+    simp only [altAlleleCount]
+    ring
+  have hcalt : h.centeredAltAlleleCount DiploidGenotype.homAlt = 2 - 2 * h.altFreq := by
+    unfold HardyWeinbergModel.centeredAltAlleleCount
+    rw [h.expectedAltAlleleCount_eq]
+    simp only [altAlleleCount]
+    ring
+  unfold HardyWeinbergModel.signBias
+  simp_rw [hsigned]
+  rw [← Finset.sum_div, sum_over_genotypes, hcref, hchet, hcalt,
+    abs_of_nonpos (by linarith : -(2 * h.altFreq) ≤ 0),
+    abs_of_nonneg (by linarith : (0 : ℝ) ≤ 1 - 2 * h.altFreq),
+    abs_of_nonneg (by linarith : (0 : ℝ) ≤ 2 - 2 * h.altFreq),
+    div_eq_iff (ne_of_gt hvar), h.genotypeVariance_eq]
+  simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq]
+  ring
+
+/-- **The sign bias vanishes exactly at the balanced locus**, where the coding is
+symmetric. So the Sign-Erasure Lemma is the zero fibre of the coupling channel rather than
+an independent phenomenon. -/
+theorem hweSignBias_zero_iff_balanced (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
+    (hhalf : h.altFreq ≤ 1 / 2) : h.signBias = 0 ↔ h.altFreq = 1 / 2 := by
+  rw [hweSignBias_eq h hq0 hhalf]
+  constructor
+  · intro hzero
+    have := pow_eq_zero_iff (n := 2) (by norm_num) |>.mp hzero
+    linarith [this]
+  · intro hbal
+    rw [hbal]
+    norm_num
+
+/-- **The coupling channel's variance inflation**, `2b²/(1 - b²)`: the correction a design
+with shared cores carries relative to the disjoint case, as a function of the sign bias.
+
+Empirical status: UNTESTED. The functional form is an input from the diagram expansion of
+the tuned sector; what is derived here is its value on genotype coordinates, through
+`hweSignBias_eq`. The predicted inflation has not been checked against a simulated window
+scan. -/
+noncomputable def couplingVarianceInflation (bias : ℝ) : ℝ := 2 * bias ^ 2 / (1 - bias ^ 2)
+
+/-- Zero bias, zero inflation: the disjoint answer is recovered exactly on the symmetric
+fibre. -/
+theorem couplingVarianceInflation_zero : couplingVarianceInflation 0 = 0 := by
+  unfold couplingVarianceInflation
+  norm_num
+
+/-- **The genotype coupling inflation in closed form**: `2(1-2q)⁴ / (1 - (1-2q)⁴)`.
+
+Zero at `q = 1/2` and diverging as `q → 0`, so a design with shared cores carries an
+order-one variance correction on a rare-variant panel and none at all on a balanced one. -/
+theorem hweCouplingVarianceInflation_eq (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
+    (hhalf : h.altFreq ≤ 1 / 2) :
+    couplingVarianceInflation h.signBias =
+      2 * (1 - 2 * h.altFreq) ^ 4 / (1 - (1 - 2 * h.altFreq) ^ 4) := by
+  rw [hweSignBias_eq h hq0 hhalf]
+  unfold couplingVarianceInflation
+  ring
+
+/-!
 ### The single-locus collapse
 
 For one locus the tower adds nothing, and the reason is that a standardized

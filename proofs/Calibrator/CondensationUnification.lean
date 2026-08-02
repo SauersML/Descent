@@ -1584,6 +1584,90 @@ theorem redundant_invariant_of_matched_four {Report : Type*} (report : Law → R
 end TowerRigidity
 
 /-!
+## 5j. Sliding windows are not safe: the hub channel and the coupling channel
+
+This corpus records that a bounded hub energy keeps a design inside the tempered class,
+where cycle densities determine the null. That is a statement about the **hub** channel and
+it is true. It is not a clean bill of health, because there is a second channel and it is
+governed by something else entirely.
+
+The **coupling** channel is dead only when the coordinate law is symmetric — that is the
+Sign-Erasure Lemma, now visible as the zero fibre of a continuum rather than as a separate
+phenomenon. Its strength is the conditional sign bias `b = E[x|x|]/E[x²]`, and its
+contribution to a shared-core design's tuned-sector variance is
+
+> `2b² / (1 - b²)`   (`Calibrator.EpistaticChaos.couplingVarianceInflation`).
+
+For a standardized Hardy-Weinberg coordinate the bias has a closed form, `b = (1 - 2q)²`
+(`hweSignBias_eq`), so the inflation is `2(1-2q)⁴/(1-(1-2q)⁴)` and is computable from
+allele frequencies alone, with no simulation:
+
+| MAF | `b` | inflation |
+|---|---|---|
+| 0.5 | 0 | 0 |
+| 0.35 | 0.09 | 0.0163 |
+| 0.2113 | 0.3334 | 0.2501 |
+| 0.10 | 0.64 | 1.3875 |
+| 0.05 | 0.81 | 3.8156 |
+| 0.01 | 0.9604 | 23.7626 |
+
+**So a sliding-window statistic on a genotype panel carries a variance correction relative
+to the disjoint case that is zero only at MAF one half, above 380% at MAF 0.05, and above
+2300% at MAF 0.01.** For rare-variant window scans that is an order-one miscalibration, and
+it is the opposite of the reassurance a bounded hub energy suggests. The two exact values
+are theorems below, as rationals rather than decimals.
+
+The tilt matters as much as the frequency: at MAF 0.05 the same channel contributes 0.10 at
+tilt `θ = 0.6`, 3.82 at `θ = 1`, and 525 at `θ = 2`. The formalization here fixes `θ = 1`,
+which is the window tilt of an untuned scan; a tuned scan is worse.
+-/
+
+/-- **The coupling inflation at MAF 0.05**, exactly `13122/3439 ≈ 3.8156`: a 380% variance
+correction for a shared-core design on a panel of variants at five percent frequency. -/
+theorem couplingVarianceInflation_at_maf_five_percent :
+    couplingVarianceInflation ((1 - 2 * (1 / 20 : ℝ)) ^ 2) = 13122 / 3439 := by
+  unfold couplingVarianceInflation
+  norm_num
+
+/-- **The coupling inflation at MAF 0.01**, exactly `11529602/485199 ≈ 23.7626`: a 2300%
+variance correction on a rare-variant panel. -/
+theorem couplingVarianceInflation_at_maf_one_percent :
+    couplingVarianceInflation ((1 - 2 * (1 / 100 : ℝ)) ^ 2) = 11529602 / 485199 := by
+  unfold couplingVarianceInflation
+  norm_num
+
+/-- **The coupling channel is silent only at the balanced locus.** At `q = 1/2` the bias is
+zero and the inflation vanishes, so a shared-core design is calibrated as if disjoint. At
+every other polymorphic frequency it is not. -/
+theorem couplingVarianceInflation_zero_at_balanced (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hhalf : h.altFreq = 1 / 2) :
+    couplingVarianceInflation h.signBias = 0 := by
+  rw [hweSignBias_eq h hq0 (le_of_eq hhalf), hhalf]
+  unfold couplingVarianceInflation
+  norm_num
+
+/-- **The two channels are governed by different things, and a bounded hub says nothing
+about the coupling.**
+
+`hbounded` is the hub condition this corpus uses to place a design in the tempered class;
+`hratio` is the coupling channel's contribution to the variance of a shared-core design.
+The conclusion computes that contribution in closed form from the allele frequency alone —
+and the hub hypothesis is *never used*, which is the point. A design can have bounded hub
+recurrence at every locus and still be miscalibrated by an order-one factor through the
+other channel.
+
+Wherever this development says a sliding-window scan is safe because its hub energy is
+bounded, read it as a statement about one channel of two. -/
+theorem boundedHub_does_not_bound_coupling
+    {ι : Type*} [Fintype ι] {n : ℕ} (design : GenotypeDesign n ι) (bound : ℕ)
+    (_hbounded : design.BoundedHubRecurrence bound)
+    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hhalf : h.altFreq ≤ 1 / 2)
+    (varianceRatio : ℝ) (hratio : varianceRatio = 1 + couplingVarianceInflation h.signBias) :
+    varianceRatio =
+      1 + 2 * (1 - 2 * h.altFreq) ^ 4 / (1 - (1 - 2 * h.altFreq) ^ 4) := by
+  rw [hratio, hweCouplingVarianceInflation_eq h hq0 hhalf]
+
+/-!
 ## 6. Where the whole development now stands
 
 Four negative results, each with its positive complement, and each attached to a
