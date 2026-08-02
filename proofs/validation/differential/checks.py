@@ -441,7 +441,7 @@ check(
     model_ref="Malecot/Kimura-Weiss 1D lattice: L = sqrt(m/(2 mu))",
     reference="refs.stepping_stone_decay_scale_malecot",
     grid=grid(Ne=[100.0, 1000.0, 10000.0], m=[1e-3, 1e-2], mu=[1e-8, 1e-6]),
-    lean=lambda D, Ne, m, mu: D["steppingStoneCharacteristicLength"](m, mu),
+    lean=lambda D, Ne, m, mu: D["steppingStoneCharacteristicLength"](m, 1.0, mu),
     ref=lambda Ne, m, mu: refs.stepping_stone_decay_scale_malecot(m, mu),
     kind="formula",
     note=(
@@ -463,14 +463,19 @@ check(
         "    d log L / d log Ne  = -0.000   (corrected 0;    OLD BODY +1/2)\n"
         "    d log L / d log m   = +0.510   (corrected +1/2)\n"
         "A magnitude agreement can be a coincidence; three exponents cannot.\n\n"
-        "OPEN, and now MEASURED rather than argued -- see "
-        "`steppingStoneLength-missing-sigma-squared` below. The body carries "
-        "NO dispersal variance, and the fourth exponent is\n"
-        "    d log L / d log sigma^2 = +0.475   (corpus 0; truth +1/2)\n"
-        "giving -26.9% at sigma^2 = 2 and -49.3% at sigma^2 = 4. That exponent "
-        "is convention-free: a constant factor on the mutation rate shifts "
-        "every L equally and cannot move an exponent, so this finding survives "
-        "the question that dissolved the apparent +44% above."
+        "CLOSED. The fourth exponent, d log L / d log sigma^2 = +0.475 against "
+        "a corpus value of 0, was the remaining defect; the definition now "
+        "carries sigma_sq and `steppingStoneLength-missing-sigma-squared` "
+        "below guards it. That exponent is what settled it, and the reason is "
+        "worth keeping: a constant factor on the mutation rate shifts every L "
+        "equally and CANNOT MOVE AN EXPONENT, so the sigma^2 finding survives "
+        "the very question that dissolved the apparent +44% above into a "
+        "convention artefact.\n\n"
+        "This check passes 1.0 for sigma_sq because "
+        "refs.stepping_stone_decay_scale_malecot is the unit-dispersal "
+        "reference. Lean's steppingStoneCharacteristicLength_at_unit_dispersal "
+        "proves that slice equals the old two-argument body, so this check "
+        "still measures exactly what it measured before the signature changed."
     ),
     canfail_clause=(
         "the grid MUST vary mu at fixed Ne and m: the Lean value is constant "
@@ -502,17 +507,19 @@ def _ss_length_with_sigma(m: float, mu: float, sigma_sq: float) -> float:
 check(
     id="steppingStoneLength-missing-sigma-squared",
     fqn="Calibrator.PopulationGeneticsFoundations.steppingStoneCharacteristicLength",
-    claim="the decay length carries a dispersal variance the signature cannot "
-          "express; the body is the sigma^2 = 1 case",
-    model_lean="L = sqrt(m/(2 mu)) -- two arguments, no dispersal variance",
+    claim="the decay length scales as sqrt(sigma^2); REPAIRED, this is now the "
+          "standing check that it still does",
+    model_lean="L = sqrt(m sigma^2/(2 mu)) -- three arguments, dispersal "
+               "variance carried explicitly",
     model_ref="Malecot/Kimura-Weiss on a lattice of dispersal variance "
               "sigma^2: L = sqrt(m sigma^2/(2 mu))",
     reference="_ss_length_with_sigma",
     grid=grid(m=[1e-2, 0.1], mu=[1e-6, 1e-4], sigma_sq=[1.0, 2.0, 4.0]),
-    lean=lambda D, m, mu, sigma_sq: D["steppingStoneCharacteristicLength"](m, mu),
+    lean=lambda D, m, mu, sigma_sq: D["steppingStoneCharacteristicLength"](
+        m, sigma_sq, mu
+    ),
     ref=lambda m, mu, sigma_sq: _ss_length_with_sigma(m, mu, sigma_sq),
-    kind="scope",
-    expected_verdict="SCOPE",
+    kind="formula",
     note=(
         "MEASURED by cluster/fam_stepping_stone.py, on a migration kernel "
         "whose dispersal variance is SET and then measured back by control "
@@ -524,13 +531,26 @@ check(
         "The first three VALIDATE the sqrt(2 Ne m) -> sqrt(m/(2 mu)) repair on "
         "every axis it was repaired along, and each separates the old body "
         "from the new, so the agreement is not a magnitude coincidence. The "
-        "fourth is what remains: -26.9% at sigma^2 = 2, -49.3% at sigma^2 = 4.\n\n"
+        "fourth was the defect: -26.9% at sigma^2 = 2, -49.3% at sigma^2 = 4.\n\n"
+        "REPAIRED. The definition now takes (m, sigma_sq, mu) and its body is "
+        "sqrt(m*sigma_sq/(2*mu)). This check has been converted from kind="
+        "'scope' -- where it recorded a defect and was EXPECTED to disagree -- "
+        "to kind='formula', where it is expected to AGREE and a disagreement "
+        "is a regression. The id and grid are unchanged on purpose: the check "
+        "that measured the defect is the check that now guards the repair, so "
+        "the history stays attached to it and the sigma^2 axis cannot quietly "
+        "stop being swept.\n\n"
         "The two siblings in the same family, demoSteppingStoneFst "
         "(d Ne m sigma_sq) and steppingStoneCoalescenceTime (d sigma_sq m), "
-        "both take sigma_sq explicitly. A mentions query finds no call site "
-        "that supplies a dispersal variance to THIS one and no docstring that "
-        "says sigma^2 = 1, so the family is silently split on whether its "
-        "lattice has one. The repair is a declaration, not arithmetic."
+        "both took sigma_sq explicitly all along; the family is no longer "
+        "split on whether its lattice has one.\n\n"
+        "Lean-side companion: steppingStoneCharacteristicLength_at_unit_"
+        "dispersal proves the OLD two-argument body is exactly the sigma^2 = 1 "
+        "slice of the new one, so the correction is a generalisation rather "
+        "than a substitution. That is why the sibling check "
+        "steppingStoneLength-missing-mutation can still compare against "
+        "refs.stepping_stone_decay_scale_malecot -- which is the sigma^2 = 1 "
+        "reference -- simply by passing 1.0."
     ),
     canfail_clause=(
         "sigma^2 must exceed 1 somewhere in the grid -- at sigma^2 = 1 the two "
