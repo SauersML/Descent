@@ -288,6 +288,12 @@ def Calibrator_HWEPolygenicScoreDGP_scoreVariance(dgp):
 def scoreApproximationError(dgp):
     return _rt._proj(_rt._proj(dgp, 'scoreModel'), 'berryEsseenErrorBound')(_rt._proj(dgp, 'berryEsseenConstant'))
 
+def Calibrator_SourceTaggedMoments_sigmaTagCausal(mom):
+    return (_rt._proj(mom, 'directCausalSource') + _rt._proj(mom, 'proxyTaggingSource'))
+
+def sourceBestLinearWeightsFromLD(mom, betaCausal):
+    return _rt._proj(_rt.rinv(_rt._proj(mom, 'sigmaTagSource')), 'mulVec')((_rt._proj(_rt._proj(mom, 'sigmaTagCausal'), 'mulVec')(betaCausal)))
+
 def frobeniusNormSq(A):
     t = float(len(A))
     return sum((sum((_rt.lpow((A[int(i)][int(j)]), 2.0)) for j in range(int(len(A))))) for i in range(int(len(A))))

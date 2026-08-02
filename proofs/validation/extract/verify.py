@@ -25,6 +25,12 @@ sys.path.insert(0, str(HERE))
 QUICK = "--quick" in sys.argv
 failures = []
 
+# Python can serve bytecode from before a regeneration, and the symptom is
+# indistinguishable from "the fix was never applied".  Clear it before anything
+# imports the generated module, so a green run cannot be a stale one.
+import shutil
+shutil.rmtree(HERE / "__pycache__", ignore_errors=True)
+
 
 def step(label, fn):
     print(f"\n=== {label} ===")
@@ -50,6 +56,18 @@ def close(label, got, want, tol=1e-9):
 
 
 step("regenerate the table and the executable module", lambda: run("emit.py"))
+
+
+def staleness():
+    import api
+    api.refresh()
+    complaints = api.staleness()
+    if complaints:
+        raise AssertionError("; ".join(complaints))
+    print("  ok  generated module is current with the table, no stale bytecode")
+
+
+step("generated artifacts are current", staleness)
 step("hand-verified ground truth + cross-validation", lambda: run("test_parser.py"))
 
 

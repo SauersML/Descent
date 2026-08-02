@@ -87,7 +87,7 @@ CLASSES_JSON = HERE / "classes.json"
 __all__ = ["definition_table", "definition", "structures", "resolve",
            "callable_for", "classification", "body_checksum", "stamp",
            "admissible_box", "hypotheses", "satisfies", "vector_args",
-           "numeric_standins", "refresh", "ARG_CONVENTION"]
+           "numeric_standins", "refresh", "staleness", "ARG_CONVENTION"]
 
 # Bumped whenever the calling convention changes.  Consumers should assert on
 # this rather than discovering a convention change from a TypeError.
@@ -320,9 +320,43 @@ def stamp() -> dict:
 
 
 def refresh():
-    """Drop caches after re-running emit.py in the same process."""
+    """Drop this process's in-memory caches.
+
+    READ-ONLY.  It clears `lru_cache`s so a later call re-reads defs.json and
+    classes.json from disk.  It does NOT run emit.py, does not regenerate
+    anything, and does not touch a single file -- calling it while someone else
+    is editing this directory is safe.  (If you have seen artifacts change
+    across a refresh, the cause was someone running emit.py, not this.)
+    """
     for f in (_blob, definition_table, structures, _by_short, _classes):
         f.cache_clear()
+
+
+def staleness():
+    """Is the generated module older than the table it was generated from?
+
+    Two ways to read a lie: `lean_defs.py` older than `defs.json` means emit.py
+    has not been re-run since the table changed; a `__pycache__` entry newer
+    than neither means Python may serve stale bytecode across a regeneration,
+    whose symptom is indistinguishable from "the fix was never applied".
+    Returns a list of complaints, empty when clean.
+    """
+    import os
+    out = []
+    defs_m = DEFS_JSON.stat().st_mtime if DEFS_JSON.exists() else 0
+    mod = HERE / "lean_defs.py"
+    mod_m = mod.stat().st_mtime if mod.exists() else 0
+    if not mod.exists():
+        out.append("lean_defs.py missing; run emit.py")
+    elif mod_m < defs_m - 1:
+        out.append("lean_defs.py is older than defs.json; run emit.py")
+    for pyc in (HERE / "__pycache__").glob("lean_defs.*.pyc"):
+        if pyc.stat().st_mtime < mod_m - 1:
+            out.append(f"stale bytecode {pyc.name}; delete __pycache__ "
+                       "(Python may serve the pre-regeneration module)")
+    if os.environ.get("EXTRACT_STRICT") and out:
+        raise RuntimeError("; ".join(out))
+    return out
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 {
- "total": 999,
- "extractable": 661,
+ "total": 1001,
+ "extractable": 663,
  "roots": [
   "Calibrator.FrequencyResolvedCohort.correctableClasses",
   "Calibrator.GenotypeDesign.cycleDensity",
@@ -345,5 +345,5 @@
   "Calibrator.weightedResidualMoment",
   "Calibrator.weightedRetentionUpperBound"
  ],
- "ceiling": 726
+ "ceiling": 728
 }
