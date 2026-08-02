@@ -110,14 +110,35 @@ def admissibility(fq: str, params: dict) -> dict:
         codes, texts, unmodelled = [], [], []
     out["unmodelled_hypotheses"] = list(unmodelled)
 
-    sat, vio = [], []
+    # extract compiles hypotheses in EXEC mode: the verdict lands in `__r` and
+    # the namespace must carry `_rt` (lean_rt) for total arithmetic. Evaluating
+    # them with `eval` returns None, which reads as False and manufactures a
+    # violation at every point -- the precise failure the totality contract is
+    # about. Mirror `admissible.satisfies` instead of improvising.
+    import lean_rt as _rt
+
+    sat, vio, unevaluable = [], [], []
     for code, text in zip(codes, texts):
+        ns = dict(params)
+        ns["_rt"] = _rt
         try:
-            ok = bool(eval(code, {"__builtins__": {}}, dict(params)))
+            exec(code, {"__builtins__": {}}, ns)
+        except NameError:
+            # hypothesis constrains a binder this check's grid does not name
+            unevaluable.append(text)
+            continue
         except Exception:
+            unevaluable.append(text)
+            continue
+        r = ns.get("__r")
+        if r is None:
+            unevaluable.append(text)
             continue
         sources = [t for t, hs in by_thm.items() if text in hs]
-        (sat if ok else vio).append({"hypothesis": text, "stated_by": sources})
+        (sat if r is True else vio).append(
+            {"hypothesis": text, "stated_by": sources}
+        )
+    out["unevaluable_hypotheses"] = unevaluable
     if sat or vio:
         out["theorem_proved"] = {
             "verdict": "all-satisfied" if not vio else "some-violated",

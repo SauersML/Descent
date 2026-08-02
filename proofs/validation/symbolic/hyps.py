@@ -115,11 +115,17 @@ def equal_under(lhs, rhs, hyps, nats=(), trials=4000, need=12, seed=20260801):
     # to run over the whole corpus.
     import cmath
 
+    # `cmath` cannot print Abs/Min/Max, and silently failing to compile them
+    # turned every `max 0 (...)` equilibrium into an inconclusive verdict.
+    _extra = {"Abs": abs, "Min": min, "Max": max}
+
     def compile_(e):
-        try:
-            return sp.lambdify(syms, e, modules=["cmath", "math"])
-        except Exception:
-            return None
+        for mods in ([_extra, "cmath", "math"], [_extra, "math"]):
+            try:
+                return sp.lambdify(syms, e, modules=mods)
+            except Exception:
+                continue
+        return None
 
     f_lhs, f_rhs = compile_(lhs), compile_(rhs)
     f_hyps = [compile_(h) for h in remaining]

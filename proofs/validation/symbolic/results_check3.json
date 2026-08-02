@@ -2608,7 +2608,7 @@
    },
    "b": {
     "fqn": "Calibrator.MetricSpecificPortability.ldBandDetectionShare",
-    "line": 1182,
+    "line": 1183,
     "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
     "expr": "-2*x0*sin(pi*x1)/(pi*(x0**2 + 1)) + x1",
     "binders": [
@@ -3084,15 +3084,11 @@
   }
  ],
  "parsed": 370,
- "opaque": 607,
+ "opaque": 609,
  "opaque_reasons": [
   [
    "non-real binder",
-   480
-  ],
-  [
-   "non-closed-form construct: fun",
-   13
+   482
   ],
   [
    "Phi expects 0 args [], got 1",
@@ -3104,7 +3100,15 @@
   ],
   [
    "non-closed-form construct: with",
-   8
+   9
+  ],
+  [
+   "non-closed-form construct: then",
+   9
+  ],
+  [
+   "non-closed-form construct: fun",
+   7
   ],
   [
    "lex error at 'ℝ) / (totalMarkers :'",
@@ -3120,10 +3124,6 @@
   ],
   [
    "propositional",
-   4
-  ],
-  [
-   "non-closed-form construct: then",
    4
   ],
   [

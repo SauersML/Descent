@@ -1336,6 +1336,12 @@
     },
     "unmodelled_hypotheses": [
      "meanAlleleFreq p\u2081 p\u2082 * (1 - meanAlleleFreq p\u2081 p\u2082"
+    ],
+    "unevaluable_hypotheses": [
+     "0 < p\u2081",
+     "p\u2081 < 1",
+     "0 < p\u2082",
+     "p\u2082 < 1"
     ]
    },
    "n_grid": 16,
@@ -2237,8 +2243,7 @@
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "some-violated",
-     "satisfied": [],
-     "violated": [
+     "satisfied": [
       {
        "hypothesis": "0 < Ne",
        "stated_by": [
@@ -2262,7 +2267,9 @@
        "stated_by": [
         "Calibrator.coal_fst_approaches_one"
        ]
-      },
+      }
+     ],
+     "violated": [
       {
        "hypothesis": "100 * Ne < t",
        "stated_by": [
@@ -2280,7 +2287,8 @@
      "units": "generations",
      "provenance": "mined from prose; NOT machine-checked"
     },
-    "unmodelled_hypotheses": []
+    "unmodelled_hypotheses": [],
+    "unevaluable_hypotheses": []
    },
    "n_grid": 3,
    "rows": [
@@ -2346,9 +2354,8 @@
    },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "some-violated",
-     "satisfied": [],
-     "violated": [
+     "verdict": "all-satisfied",
+     "satisfied": [
       {
        "hypothesis": "2 < Ne",
        "stated_by": [
@@ -2369,6 +2376,7 @@
        ]
       }
      ],
+     "violated": [],
      "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
     },
     "docstring_implied": {
@@ -2379,7 +2387,8 @@
      "units": "generations",
      "provenance": "mined from prose; NOT machine-checked"
     },
-    "unmodelled_hypotheses": []
+    "unmodelled_hypotheses": [],
+    "unevaluable_hypotheses": []
    },
    "n_grid": 15,
    "rows": [
@@ -3079,7 +3088,8 @@
      "units": null,
      "provenance": "mined from prose; NOT machine-checked"
     },
-    "unmodelled_hypotheses": []
+    "unmodelled_hypotheses": [],
+    "unevaluable_hypotheses": []
    },
    "n_grid": 9,
    "rows": [
@@ -3712,9 +3722,8 @@
    },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "some-violated",
-     "satisfied": [],
-     "violated": [
+     "verdict": "all-satisfied",
+     "satisfied": [
       {
        "hypothesis": "2 \u2264 Ne",
        "stated_by": [
@@ -3723,6 +3732,7 @@
        ]
       }
      ],
+     "violated": [],
      "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
     },
     "docstring_implied": {
@@ -3735,6 +3745,9 @@
     },
     "unmodelled_hypotheses": [
      "0 \u2264 \u03b8"
+    ],
+    "unevaluable_hypotheses": [
+     "\u03b8 \u2264 2 * Ne"
     ]
    },
    "n_grid": 12,
@@ -3895,9 +3908,8 @@
    },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "some-violated",
-     "satisfied": [],
-     "violated": [
+     "verdict": "all-satisfied",
+     "satisfied": [
       {
        "hypothesis": "0 < Ne",
        "stated_by": [
@@ -3936,6 +3948,7 @@
        ]
       }
      ],
+     "violated": [],
      "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
     },
     "docstring_implied": {
@@ -3948,7 +3961,8 @@
     },
     "unmodelled_hypotheses": [
      "k < 4 * Ne * m"
-    ]
+    ],
+    "unevaluable_hypotheses": []
    },
    "n_grid": 12,
    "rows": [
@@ -4215,9 +4229,8 @@
    },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "some-violated",
-     "satisfied": [],
-     "violated": [
+     "verdict": "all-satisfied",
+     "satisfied": [
       {
        "hypothesis": "0 < Ne",
        "stated_by": [
@@ -4256,6 +4269,7 @@
        ]
       }
      ],
+     "violated": [],
      "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
     },
     "docstring_implied": {
@@ -4268,7 +4282,8 @@
     },
     "unmodelled_hypotheses": [
      "k < 4 * Ne * m"
-    ]
+    ],
+    "unevaluable_hypotheses": []
    },
    "n_grid": 8,
    "rows": [
@@ -4380,9 +4395,8 @@
    },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "some-violated",
-     "satisfied": [],
-     "violated": [
+     "verdict": "all-satisfied",
+     "satisfied": [
       {
        "hypothesis": "0 < Ne",
        "stated_by": [
@@ -4396,6 +4410,7 @@
        ]
       }
      ],
+     "violated": [],
      "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
     },
     "docstring_implied": {
@@ -4406,7 +4421,8 @@
      "units": null,
      "provenance": "mined from prose; NOT machine-checked"
     },
-    "unmodelled_hypotheses": []
+    "unmodelled_hypotheses": [],
+    "unevaluable_hypotheses": []
    },
    "n_grid": 12,
    "rows": [
@@ -4566,9 +4582,8 @@
    },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "some-violated",
-     "satisfied": [],
-     "violated": [
+     "verdict": "all-satisfied",
+     "satisfied": [
       {
        "hypothesis": "0 \u2264 d",
        "stated_by": [
@@ -4582,6 +4597,7 @@
        ]
       }
      ],
+     "violated": [],
      "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
     },
     "docstring_implied": {
@@ -4592,7 +4608,10 @@
      "units": null,
      "provenance": "mined from prose; NOT machine-checked"
     },
-    "unmodelled_hypotheses": []
+    "unmodelled_hypotheses": [],
+    "unevaluable_hypotheses": [
+     "0 < L"
+    ]
    },
    "n_grid": 6,
    "rows": [
@@ -5149,7 +5168,8 @@
      "units": "generations",
      "provenance": "mined from prose; NOT machine-checked"
     },
-    "unmodelled_hypotheses": []
+    "unmodelled_hypotheses": [],
+    "unevaluable_hypotheses": []
    },
    "n_grid": 12,
    "rows": [
@@ -5297,9 +5317,8 @@
    },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "some-violated",
-     "satisfied": [],
-     "violated": [
+     "verdict": "all-satisfied",
+     "satisfied": [
       {
        "hypothesis": "0 < t",
        "stated_by": [
@@ -5314,6 +5333,7 @@
        ]
       }
      ],
+     "violated": [],
      "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
     },
     "docstring_implied": {
@@ -5324,7 +5344,8 @@
      "units": "generations",
      "provenance": "mined from prose; NOT machine-checked"
     },
-    "unmodelled_hypotheses": []
+    "unmodelled_hypotheses": [],
+    "unevaluable_hypotheses": []
    },
    "n_grid": 8,
    "rows": [
@@ -5551,9 +5572,8 @@
    },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "some-violated",
-     "satisfied": [],
-     "violated": [
+     "verdict": "all-satisfied",
+     "satisfied": [
       {
        "hypothesis": "0 < c",
        "stated_by": [
@@ -5610,6 +5630,7 @@
        ]
       }
      ],
+     "violated": [],
      "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
     },
     "docstring_implied": {
@@ -5625,7 +5646,8 @@
      "1 - driftLDRetention Ne c \u2260 0",
      "1 - driftLDRetention N_b c \u2260 0",
      "1 - driftLDRetention N_r c \u2260 0"
-    ]
+    ],
+    "unevaluable_hypotheses": []
    },
    "n_grid": 5,
    "rows": [
@@ -6242,6 +6264,9 @@
     "unmodelled_hypotheses": [
      "0 < \u03b1",
      "\u03b1 < 1"
+    ],
+    "unevaluable_hypotheses": [
+     "0 < fst_AB"
     ]
    },
    "n_grid": 16,
@@ -7153,7 +7178,14 @@
      "units": null,
      "provenance": "mined from prose; NOT machine-checked"
     },
-    "unmodelled_hypotheses": []
+    "unmodelled_hypotheses": [],
+    "unevaluable_hypotheses": [
+     "0 \u2264 fstTarget",
+     "fstSource < 1",
+     "fstTarget \u2264 1",
+     "fstSource < fstTarget",
+     "fstTarget < 1"
+    ]
    },
    "n_grid": 4,
    "rows": [

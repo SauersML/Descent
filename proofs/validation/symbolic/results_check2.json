@@ -2571,7 +2571,7 @@
   "name": "ldBandDetectionShare_eq_sub_deficit",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1192,
+  "line": 1193,
   "claim_source": "name",
   "statement": "ldBandDetectionShare decay kappa = kappa - ldPruningDetectionDeficit decay kappa",
   "status": "not_an_equation",
@@ -2821,11 +2821,53 @@
  },
  {
   "check": "check2_derivation",
+  "fqn": "Calibrator.PCCorrectability.ImitationCapacity.rankOneCovarianceBump_eq_smul_spikeOuter",
+  "name": "rankOneCovarianceBump_eq_smul_spikeOuter",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 857,
+  "claim_source": "name",
+  "statement": "rankOneCovarianceBump scale v = (scale ^ 2) • spikeOuter v",
+  "status": "opaque",
+  "detail": {
+   "reason": "lex error at '• spikeOuter v'"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.PCCorrectability.ImitationCapacity.spiked_eq_add_rankOneCovarianceBump",
+  "name": "spiked_eq_add_rankOneCovarianceBump",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 865,
+  "claim_source": "name",
+  "statement": "K.spiked S₀ (scale ^ 2) v = S₀ + rankOneCovarianceBump scale v",
+  "status": "opaque",
+  "detail": {
+   "reason": "spiked expects 1 args ['t'], got 3"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.PCCorrectability.ImitationCapacity.diagonalGap_imitationCapacity_eq_zero",
+  "name": "diagonalGap_imitationCapacity_eq_zero",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 928,
+  "claim_source": "name",
+  "statement": "(diagonalGapClass base i j 0).imitationCapacity S₀ support = 0",
+  "status": "opaque",
+  "detail": {
+   "reason": "lex error at '.imitationCapacity S'"
+  }
+ },
+ {
+  "check": "check2_derivation",
   "fqn": "Calibrator.PCCorrectability.ImitationCapacity.whitenedCapacity_closedForm",
   "name": "whitenedCapacity_closedForm",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 878,
+  "line": 1023,
   "claim_source": "name",
   "statement": "whitenedCapacity headroom decay = headroom * (1 - decay ^ 2) / (1 + decay ^ 2)",
   "status": "opaque",
@@ -2841,7 +2883,7 @@
   "name": "imitationCapacity_eq_whitenedCapacity",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 889,
+  "line": 1034,
   "claim_source": "name",
   "statement": "K.imitationCapacity S₀ support = whitenedCapacity (K.headroom E.binding S₀) decay",
   "status": "opaque",
@@ -2855,7 +2897,7 @@
   "name": "demographicSpike_eq_level_mul_spikeLoad",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1055,
+  "line": 1200,
   "claim_source": "name",
   "statement": "demographicSpike (N : ℝ) F (m : ℝ) = (4 * F) * (traceWindowBudgetClass base budget).spikeLoad a (demographicSpikeDirection N m)",
   "status": "opaque",
@@ -2869,7 +2911,7 @@
   "name": "inverseTraceCertificate_eq_traceWindowSpikeLoad",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1252,
+  "line": 1397,
   "claim_source": "name",
   "statement": "inverseTraceCertificate m lam = traceWindowSpikeLoad decay m",
   "status": "opaque",
@@ -2888,7 +2930,7 @@
   "statement": "samplePCOverlapSq n M spike = 0",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: else"
+   "reason": "non-closed-form construct: if"
   }
  },
  {
@@ -2902,7 +2944,7 @@
   "statement": "samplePCOverlapSq n M spike = (1 - (n / M) / spike ^ 2) / (1 + (n / M) / spike)",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: else"
+   "reason": "non-closed-form construct: if"
   }
  },
  {
@@ -2916,7 +2958,7 @@
   "statement": "samplePCResidualAxisFraction n M spike = (n / M) * (spike + 1) / (spike * (spike + n / M))",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: else"
+   "reason": "non-closed-form construct: if"
   }
  },
  {
@@ -2930,7 +2972,7 @@
   "statement": "modeledPCResidualSusceptibility markerAxisVariance ancestryVariance n markers spike = ancestryGradientSusceptibility markerAxisVariance ancestryVariance",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: else"
+   "reason": "non-closed-form construct: if"
   }
  },
  {
@@ -2956,7 +2998,7 @@
   "line": 224,
   "claim_source": "name",
   "statement": "calibrationSlopeDeviation slope = 1 - slope",
-  "status": "inconclusive",
+  "status": "derivation_verified",
   "detail": {
    "lhs": "Abs(slope - 1)",
    "rhs": "1 - slope",
@@ -2964,7 +3006,10 @@
     "slope < 1"
    ],
    "unparsed_hypotheses": [],
-   "method": "lambdify_failed"
+   "method": "numeric",
+   "opaque_lhs": "calibrationSlopeDeviation(slope)",
+   "opaque_rhs": "1 - slope",
+   "mentions_any_definition": true
   }
  },
  {
@@ -3393,7 +3438,7 @@
   "statement": "treatmentMargin model predictedPath - treatmentMargin model truePath = Finset.univ.sum (fun t => model.discount t * ((predictedPath.followupWeight t - truePath.followupWeight t) * (truePath.eventProb t * truePath.treatmentBenefit t - truePath.treatmentHarm t) + predictedPath.followupWeight t * ((predictedPath.eventProb t - truePath.eventProb t) * truePath.treatmentBenefit t + predictedPath.eventPr",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: Finset"
+   "reason": "non-closed-form construct: fun"
   }
  },
  {
@@ -3928,7 +3973,7 @@
   "line": 283,
   "claim_source": "name",
   "statement": "selectionMigrationEquilibrium s m = 0",
-  "status": "inconclusive",
+  "status": "derivation_verified",
   "detail": {
    "lhs": "Max(0, (-m*s - m + s)/s)",
    "rhs": "0",
@@ -3937,7 +3982,10 @@
     "s <= m*(s + 1)"
    ],
    "unparsed_hypotheses": [],
-   "method": "lambdify_failed"
+   "method": "numeric",
+   "opaque_lhs": "selectionMigrationEquilibrium(s, m)",
+   "opaque_rhs": "0",
+   "mentions_any_definition": true
   }
  },
  {
@@ -5762,7 +5810,7 @@
   "statement": "∑ i, (A.mulVec u) i * v i = ∑ i, u i * ((Matrix.transpose A).mulVec v) i",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: ∑"
+   "reason": "non-closed-form construct: Matrix"
   }
  },
  {
@@ -6070,7 +6118,7 @@
   "statement": "{v : ℝ | ∃ (w : ℕ) (share : Fin w → ℝ), (∀ j, 0 ≤ share j) ∧ (∑ j, share j) ≤ 1 ∧ disjointWindowLimitVariance share = v} = Set.Icc (0 : ℝ) 1",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: Set"
+   "reason": "non-closed-form construct: ∑"
   }
  },
  {

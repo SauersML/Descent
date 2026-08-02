@@ -3100,7 +3100,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-   "line": 1182,
+   "line": 1183,
    "this_expr": "-2*x0*sin(pi*x1)/(pi*(x0**2 + 1)) + x1",
    "other": "Calibrator.MetricSpecificPortability.ldBandReconstructionShare",
    "other_expr": "2*atan((x0 + 1)*tan(pi*x1/2)/(1 - x0))/pi"
@@ -3259,6 +3259,22 @@
    "this_expr": "Max(0, (-x0*x1 + x0 - x1)/x0)",
    "other": "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst",
    "other_expr": "Max(0, (-x0*x1 + x0 - x1)/(x0*(1 - x1)))"
+  },
+  {
+   "check": "check2_derivation",
+   "severity": "vacuous_coverage",
+   "status": "CHECK_CANNOT_FAIL_FOR_THIS_DEFINITION",
+   "detail": {
+    "covered": false,
+    "via_theorem": "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium_eq_zero",
+    "mutations_rejected": [
+     "literal 0->1",
+     "shift by 1"
+    ],
+    "mutations_survived": [
+     "scale by 2"
+    ]
+   }
   }
  ],
  "Calibrator.PopulationGeneticsFoundations.sharedLDFractionFromMutation": [

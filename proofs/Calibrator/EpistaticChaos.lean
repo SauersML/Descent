@@ -1405,6 +1405,400 @@ theorem palindromic_circulant_spectra_differ :
 
 end OverlapSpectrum
 
+section StarVersusCycle
+
+/-!
+## Star statistics versus cycle statistics, and the tempered regime
+
+The overlap results above leave a practical gap: they say a checklist of design
+summaries cannot certify a null, but not what would. The gap closes with a
+diagnosis of *why* each failed summary failed.
+
+Every invariant that turned out not to determine the limit — coefficient
+profiles, column masses, signed hub energies, and the variant-recurrence profile
+`GenotypeDesign.variantRecurrence` — is a **star** density: a sum over walks
+leaving a single tested set and returning nowhere. The limit law lives in
+**cycle** densities: sums over closed walks in the overlap structure. A star
+density cannot see a cycle, which is why no amount of recurrence matching pins
+the null, and why the diagram family does pin it — it contains the cycles.
+
+`GenotypeDesign.overlapMatrix` is the overlap structure of a design: entry
+`(s, t)` is the number of variants tested by both sets. Its `p`-th cycle density
+is `trace (A ^ p)`, and `overlap_row_sum_eq_recurrence` below proves the
+diagnosis in the one case that matters operationally: the recurrence profile is
+exactly the row-sum functional of `A`, a star density, and row sums do not
+determine the spectrum.
+
+The prescription follows: a resampling or permutation scheme must preserve the
+**cycle densities**, and in the quadratic sector the first one that bites is the
+fourth, `trace (A ^ 4)`. The palindromic-circulant witness separates precisely
+there — equal second cycle densities, forced by the equal entry multiset, and
+fourth densities `1840` against `1600`.
+
+The last ingredient is a regime condition, and it is checkable on a panel.
+A design is **tempered** when its cycle densities grow at most exponentially in
+the diagram size; on that class one truncation level determines the limit, and
+moment matching is a valid calibration strategy. Off it there is a divergence
+phase in which no finite family of numerical densities determines the limit at
+any truncation, and the invariant becomes law-valued. Temperedness fails through
+hub energy: a lead variant entering every window of a dense scan, or a
+pleiotropic variant recurring across a whole phenotype panel, drives the
+recurrence of one variant up with the number of tested sets
+(`ubiquitous_variant_forces_hub_bound`). For such designs no moment-matching
+calibration can be correct, however many moments are matched.
+-/
+
+variable {ιx : Type*} [Fintype ιx] [DecidableEq ιx] {nx : ℕ}
+
+namespace GenotypeDesign
+
+/-- **The overlap structure of a design.** Entry `(s, t)` counts the variants
+tested by both set `s` and set `t`; the diagonal is the interaction order. This
+is the object whose spectrum the limit law is a function of, and whose row sums
+are the recurrence profile.
+
+Empirical status: UNTESTED. A count matrix read off the design; no free parameter
+and nothing fitted. -/
+def overlapMatrix (design : GenotypeDesign nx ιx) : Matrix ιx ιx ℝ :=
+  fun s t => ((design.locusSet s ∩ design.locusSet t).card : ℝ)
+
+/-- The overlap structure is symmetric: sharing is a symmetric relation. -/
+theorem overlapMatrix_symm (design : GenotypeDesign nx ιx) (s t : ιx) :
+    design.overlapMatrix s t = design.overlapMatrix t s := by
+  have hdef : ∀ u v : ιx, design.overlapMatrix u v =
+      ((design.locusSet u ∩ design.locusSet v).card : ℝ) := fun _ _ => rfl
+  rw [hdef, hdef, Finset.inter_comm]
+
+/-- **The `p`-th cycle density**: `trace (A ^ p)`, the total weight of closed
+walks of length `p` in the overlap structure. For `p = 2` it is the squared
+Frobenius norm and for `p = 4` the fourth spectral moment.
+
+These are the invariants the limit law is a function of, in contrast to the star
+densities of `variantRecurrence`.
+
+Empirical status: UNTESTED. A trace of a power of the overlap count matrix; no
+free parameter and nothing fitted. -/
+def cycleDensity (design : GenotypeDesign nx ιx) (p : ℕ) : ℝ :=
+  Matrix.trace (design.overlapMatrix ^ p)
+
+/-- **Recurrence is a star density.** The row sum of the overlap structure at a
+tested set is the total recurrence of the variants in it. So the
+variant-recurrence profile is a functional of the row sums of `A` — a sum over
+walks out of one vertex — and row sums do not determine the spectrum of a
+symmetric matrix.
+
+This is the diagnosis, in the one case a practitioner acts on: matching
+recurrence matches a star density and leaves every cycle density free. -/
+theorem overlap_row_sum_eq_recurrence (design : GenotypeDesign nx ιx) (s : ιx) :
+    ∑ t : ιx, ((design.locusSet s ∩ design.locusSet t).card : ℕ) =
+      ∑ i ∈ design.locusSet s, design.variantRecurrence i := by
+  have hcard : ∀ t : ιx, (design.locusSet s ∩ design.locusSet t).card =
+      ∑ i ∈ design.locusSet s, if i ∈ design.locusSet t then 1 else 0 := by
+    intro t
+    rw [← Finset.filter_mem_eq_inter, Finset.card_filter]
+  have hrec : ∀ i : Fin nx, design.variantRecurrence i =
+      ∑ t : ιx, if i ∈ design.locusSet t then 1 else 0 := by
+    intro i
+    have hdef : design.variantRecurrence i =
+        (Finset.univ.filter (fun t => i ∈ design.locusSet t)).card := rfl
+    rw [hdef, Finset.card_filter]
+  simp_rw [hcard, hrec]
+  exact Finset.sum_comm
+
+/-- **The tempered regime.** The cycle densities grow at most exponentially in
+the diagram size, so a single truncation level determines the limit law and
+moment matching is a valid calibration strategy.
+
+Empirical status: UNTESTED. A growth condition on the design's own cycle
+densities; checkable on a panel by computing the overlap structure, with no free
+parameter beyond the declared rate. -/
+def Tempered (design : GenotypeDesign nx ιx) (rate : ℝ) : Prop :=
+  ∀ p : ℕ, |design.cycleDensity p| ≤ rate ^ p
+
+/-- **Bounded hub energy**, in its operational form: no variant is tested more
+than `bound` times. This is what fails for a lead variant in a dense sliding
+scan, or for a pleiotropic variant across a phenotype panel.
+
+Empirical status: UNTESTED. A bound on the design's own recurrence profile;
+checkable by inspection. -/
+def BoundedHubRecurrence (design : GenotypeDesign nx ιx) (bound : ℕ) : Prop :=
+  ∀ i : Fin nx, design.variantRecurrence i ≤ bound
+
+/-- A variant entering *every* tested set has recurrence equal to the number of
+tested sets. -/
+theorem variantRecurrence_eq_card_of_ubiquitous (design : GenotypeDesign nx ιx)
+    (i : Fin nx) (hall : ∀ s : ιx, i ∈ design.locusSet s) :
+    design.variantRecurrence i = Fintype.card ιx := by
+  have hdef : design.variantRecurrence i =
+      (Finset.univ.filter (fun s => i ∈ design.locusSet s)).card := rfl
+  have hfilter : Finset.univ.filter (fun s => i ∈ design.locusSet s) = Finset.univ :=
+    Finset.filter_true_of_mem (fun s _ => hall s)
+  rw [hdef, hfilter, Finset.card_univ]
+
+/-- **A ubiquitous variant forces the hub bound up with the number of tested
+sets.** A lead variant present in every window of a dense scan, or a pleiotropic
+variant in every panel of a phenome-wide scan, makes any hub bound at least as
+large as the design itself — so along a family of scans with more and more tested
+sets there is no bound uniform in panel size, and temperedness is lost. -/
+theorem ubiquitous_variant_forces_hub_bound (design : GenotypeDesign nx ιx)
+    (i : Fin nx) (hall : ∀ s : ιx, i ∈ design.locusSet s) (bound : ℕ)
+    (hhub : design.BoundedHubRecurrence bound) : Fintype.card ιx ≤ bound := by
+  have hrec := design.variantRecurrence_eq_card_of_ubiquitous i hall
+  have hle := hhub i
+  rw [hrec] at hle
+  exact hle
+
+end GenotypeDesign
+
+/-- Cycle determinacy over a genotype panel: which designs have a null that its
+cycle densities pin down, and what happens off that class.
+
+`temperingRate bound` is the rate a design with hub recurrence at most `bound`
+enjoys, which is how the hub condition enters the type. -/
+structure CycleDeterminacy (nx : ℕ) (ιx : Type*) [Fintype ιx] [DecidableEq ιx]
+    (Limit : Type*) where
+  /-- Minimum interaction order diverging, influence vanishing, unit variance. -/
+  isAdmissible : GenotypeDesign nx ιx → Prop
+  /-- The limit law of the design's statistic. -/
+  limitLaw : GenotypeDesign nx ιx → Limit
+  /-- The tempering rate available at a given hub bound. -/
+  temperingRate : ℕ → ℝ
+  /-- **Diagram input.** On tempered designs the cycle densities determine the
+  limit law: this is the positive half of the star/cycle diagnosis, and the
+  reason a cycle-preserving resampling scheme is a calibration. -/
+  cycles_determine : ∀ (rate : ℝ) (designOne designTwo : GenotypeDesign nx ιx),
+    isAdmissible designOne → isAdmissible designTwo →
+    designOne.Tempered rate → designTwo.Tempered rate →
+    (∀ p : ℕ, designOne.cycleDensity p = designTwo.cycleDensity p) →
+    limitLaw designOne = limitLaw designTwo
+  /-- **Hub input.** Bounded hub recurrence buys temperedness at a rate depending
+  only on the bound. -/
+  tempered_of_boundedHub : ∀ (design : GenotypeDesign nx ιx) (bound : ℕ),
+    isAdmissible design → design.BoundedHubRecurrence bound →
+    design.Tempered (temperingRate bound)
+  /-- **Divergence phase.** Off temperedness no truncation of the density family
+  determines the limit: for every truncation level there are two admissible
+  designs agreeing in all densities up to that level with different limits. -/
+  divergence_phase : ∀ (rate : ℝ) (truncation : ℕ),
+    ∃ designOne designTwo : GenotypeDesign nx ιx,
+      isAdmissible designOne ∧ isAdmissible designTwo ∧
+      ¬ designOne.Tempered rate ∧
+      (∀ p : ℕ, p ≤ truncation → designOne.cycleDensity p = designTwo.cycleDensity p) ∧
+      limitLaw designOne ≠ limitLaw designTwo
+
+namespace CycleDeterminacy
+
+variable {Limit : Type*} (CD : CycleDeterminacy nx ιx Limit)
+
+/-- **The prescription.** A resampling scheme that preserves every cycle density
+preserves the null, provided both designs have bounded hub recurrence. This is
+the positive replacement for the recurrence-matching argument that fails. -/
+theorem cycle_preserving_resampling_is_a_calibration
+    (design resampled : GenotypeDesign nx ιx) (bound : ℕ)
+    (hadmissible : CD.isAdmissible design) (hadmissibleResampled : CD.isAdmissible resampled)
+    (hhub : design.BoundedHubRecurrence bound)
+    (hhubResampled : resampled.BoundedHubRecurrence bound)
+    (hcycles : ∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p) :
+    CD.limitLaw design = CD.limitLaw resampled :=
+  CD.cycles_determine (CD.temperingRate bound) design resampled hadmissible
+    hadmissibleResampled
+    (CD.tempered_of_boundedHub design bound hadmissible hhub)
+    (CD.tempered_of_boundedHub resampled bound hadmissibleResampled hhubResampled)
+    hcycles
+
+/-- **No moment-matching calibration is correct off the tempered class.** For
+every truncation level, two admissible designs agree in all cycle densities up to
+that level and still have different nulls. Matching more densities does not help,
+because the statement is quantified over the truncation. -/
+theorem no_moment_matching_calibration_off_temperedness (rate : ℝ) (truncation : ℕ) :
+    ∃ designOne designTwo : GenotypeDesign nx ιx,
+      CD.isAdmissible designOne ∧ CD.isAdmissible designTwo ∧
+      ¬ designOne.Tempered rate ∧
+      (∀ p : ℕ, p ≤ truncation → designOne.cycleDensity p = designTwo.cycleDensity p) ∧
+      CD.limitLaw designOne ≠ CD.limitLaw designTwo :=
+  CD.divergence_phase rate truncation
+
+end CycleDeterminacy
+
+/-!
+### The witness, in cycle densities
+
+The two palindromic circulants of the previous section, read as overlap
+structures. Their eigenvalues are the values of `circulantSpectrumA` and
+`circulantSpectrumB` at the eight cosines `cos (2πk/8)`, which take the five
+values `1`, `s/2`, `0`, `-s/2`, `-1` with multiplicities `1, 2, 2, 2, 1`, where
+`s` is a square root of two. Cycle densities are then power sums of eigenvalues,
+which is how `trace (A ^ p)` is computed for a circulant.
+
+The second densities agree, at `80` — forced, since both matrices have the same
+entry multiset and the second density is the squared Frobenius norm. The fourth
+densities are `1840` and `1600`. So the pair is separated by the first cycle
+density that the shared profile does not already fix, and a scheme matching only
+the recurrence profile is matching star densities while this quantity moves.
+-/
+
+/-- The eigenvalue at `cos 0 = 1`. -/
+theorem circulantSpectrumA_at_one : circulantSpectrumA 1 = 6 := by
+  unfold circulantSpectrumA
+  norm_num
+
+/-- The eigenvalue at `cos π = -1`. -/
+theorem circulantSpectrumA_at_neg_one : circulantSpectrumA (-1) = 2 := by
+  unfold circulantSpectrumA
+  norm_num
+
+/-- The eigenvalue at `cos (π/4) = s/2` with `s² = 2`. -/
+theorem circulantSpectrumA_at_root (s : ℝ) (hs : s ^ 2 = 2) :
+    circulantSpectrumA (s / 2) = s := by
+  unfold circulantSpectrumA
+  linarith [hs]
+
+/-- The eigenvalue at `cos (3π/4) = -s/2`. -/
+theorem circulantSpectrumA_at_neg_root (s : ℝ) (hs : s ^ 2 = 2) :
+    circulantSpectrumA (-(s / 2)) = -s := by
+  unfold circulantSpectrumA
+  linarith [hs]
+
+/-- The eigenvalue at `cos 0 = 1`, second circulant. -/
+theorem circulantSpectrumB_at_one : circulantSpectrumB 1 = 6 := by
+  unfold circulantSpectrumB
+  norm_num
+
+/-- The eigenvalue at `cos π = -1`, second circulant. -/
+theorem circulantSpectrumB_at_neg_one : circulantSpectrumB (-1) = -2 := by
+  unfold circulantSpectrumB
+  norm_num
+
+/-- The eigenvalue at `cos (π/2) = 0`, second circulant. -/
+theorem circulantSpectrumB_at_zero : circulantSpectrumB 0 = -2 := by
+  unfold circulantSpectrumB
+  norm_num
+
+/-- The eigenvalue at `cos (π/4) = s/2`, second circulant. -/
+theorem circulantSpectrumB_at_root (s : ℝ) (hs : s ^ 2 = 2) :
+    circulantSpectrumB (s / 2) = 2 * s := by
+  unfold circulantSpectrumB
+  linarith [hs]
+
+/-- The eigenvalue at `cos (3π/4) = -s/2`, second circulant. -/
+theorem circulantSpectrumB_at_neg_root (s : ℝ) (hs : s ^ 2 = 2) :
+    circulantSpectrumB (-(s / 2)) = -(2 * s) := by
+  unfold circulantSpectrumB
+  linarith [hs]
+
+/-- Power sum of the first circulant's eigenvalues, with their multiplicities:
+the `p`-th cycle density of that overlap structure.
+
+Empirical status: UNTESTED. A power sum of the eigenvalues of one fixed integer
+matrix; no modelling content and no free parameter. -/
+def palindromicCycleDensityA (s : ℝ) (p : ℕ) : ℝ :=
+  circulantSpectrumA 1 ^ p + 2 * circulantSpectrumA (s / 2) ^ p +
+    2 * circulantSpectrumA 0 ^ p + 2 * circulantSpectrumA (-(s / 2)) ^ p +
+    circulantSpectrumA (-1) ^ p
+
+/-- Power sum of the second circulant's eigenvalues, with their multiplicities.
+
+Empirical status: UNTESTED. As for `palindromicCycleDensityA`: a power sum for
+one fixed integer matrix, no free parameter. -/
+def palindromicCycleDensityB (s : ℝ) (p : ℕ) : ℝ :=
+  circulantSpectrumB 1 ^ p + 2 * circulantSpectrumB (s / 2) ^ p +
+    2 * circulantSpectrumB 0 ^ p + 2 * circulantSpectrumB (-(s / 2)) ^ p +
+    circulantSpectrumB (-1) ^ p
+
+/-- Second cycle density of the first structure: `80`. -/
+theorem palindromicCycleDensityA_two (s : ℝ) (hs : s ^ 2 = 2) :
+    palindromicCycleDensityA s 2 = 80 := by
+  unfold palindromicCycleDensityA
+  rw [circulantSpectrumA_at_one, circulantSpectrumA_at_neg_one,
+    circulantSpectrumA_at_quarter_turn, circulantSpectrumA_at_root s hs,
+    circulantSpectrumA_at_neg_root s hs]
+  have hsq : (-s) ^ 2 = s ^ 2 := by ring
+  rw [hsq, hs]
+  norm_num
+
+/-- Second cycle density of the second structure: also `80`. The agreement is
+forced by the shared entry multiset, since the second density is the squared
+Frobenius norm. -/
+theorem palindromicCycleDensityB_two (s : ℝ) (hs : s ^ 2 = 2) :
+    palindromicCycleDensityB s 2 = 80 := by
+  unfold palindromicCycleDensityB
+  rw [circulantSpectrumB_at_one, circulantSpectrumB_at_neg_one,
+    circulantSpectrumB_at_zero, circulantSpectrumB_at_root s hs,
+    circulantSpectrumB_at_neg_root s hs]
+  have hsq : (2 * s) ^ 2 = 4 * s ^ 2 := by ring
+  have hsqneg : (-(2 * s)) ^ 2 = 4 * s ^ 2 := by ring
+  rw [hsq, hsqneg, hs]
+  norm_num
+
+/-- **The second cycle densities agree.** -/
+theorem palindromic_second_cycle_densities_equal (s : ℝ) (hs : s ^ 2 = 2) :
+    palindromicCycleDensityA s 2 = palindromicCycleDensityB s 2 := by
+  rw [palindromicCycleDensityA_two s hs, palindromicCycleDensityB_two s hs]
+
+/-- Fourth cycle density of the first structure: `1840`. -/
+theorem palindromicCycleDensityA_four (s : ℝ) (hs : s ^ 2 = 2) :
+    palindromicCycleDensityA s 4 = 1840 := by
+  have hfour : s ^ 4 = 4 := by
+    have hrewrite : s ^ 4 = (s ^ 2) ^ 2 := by ring
+    rw [hrewrite, hs]
+    norm_num
+  unfold palindromicCycleDensityA
+  rw [circulantSpectrumA_at_one, circulantSpectrumA_at_neg_one,
+    circulantSpectrumA_at_quarter_turn, circulantSpectrumA_at_root s hs,
+    circulantSpectrumA_at_neg_root s hs]
+  have hneg : (-s) ^ 4 = s ^ 4 := by ring
+  rw [hneg, hfour]
+  norm_num
+
+/-- Fourth cycle density of the second structure: `1600`. -/
+theorem palindromicCycleDensityB_four (s : ℝ) (hs : s ^ 2 = 2) :
+    palindromicCycleDensityB s 4 = 1600 := by
+  have hfour : s ^ 4 = 4 := by
+    have hrewrite : s ^ 4 = (s ^ 2) ^ 2 := by ring
+    rw [hrewrite, hs]
+    norm_num
+  unfold palindromicCycleDensityB
+  rw [circulantSpectrumB_at_one, circulantSpectrumB_at_neg_one,
+    circulantSpectrumB_at_zero, circulantSpectrumB_at_root s hs,
+    circulantSpectrumB_at_neg_root s hs]
+  have hpos : (2 * s) ^ 4 = 16 * s ^ 4 := by ring
+  have hneg : (-(2 * s)) ^ 4 = 16 * s ^ 4 := by ring
+  rw [hpos, hneg, hfour]
+  norm_num
+
+/-- **The fourth cycle densities differ.** `1840` against `1600`: the witness
+pair is separated by the fourth spectral moment of the overlap structure, the
+first cycle density their shared profile does not fix. -/
+theorem palindromic_fourth_cycle_densities_differ (s : ℝ) (hs : s ^ 2 = 2) :
+    palindromicCycleDensityA s 4 ≠ palindromicCycleDensityB s 4 := by
+  rw [palindromicCycleDensityA_four s hs, palindromicCycleDensityB_four s hs]
+  norm_num
+
+/-- **Matching the recurrence profile leaves the fourth cycle density free.**
+
+Two designs whose overlap structures are the two palindromic circulants have
+equal second cycle densities and unequal fourth ones. The hypothesis
+`hrecurrence` — that the two agree in the whole variant-recurrence profile — is
+an argument of the theorem and is *never used in the proof*. That is the content:
+recurrence is a star density, it is compatible with either value of the fourth
+cycle density, and a scheme that preserves it has preserved nothing the limit law
+depends on.
+
+The prescription is `CycleDeterminacy.cycle_preserving_resampling_is_a_calibration`:
+preserve the cycle densities, of which the fourth is the first that bites in the
+quadratic sector. -/
+theorem recurrence_matching_leaves_fourth_cycle_density_free
+    (design resampled : GenotypeDesign nx ιx) (s : ℝ) (hs : s ^ 2 = 2)
+    (_hrecurrence : ∀ i : Fin nx,
+      resampled.variantRecurrence i = design.variantRecurrence i)
+    (hdesign : design.cycleDensity 4 = palindromicCycleDensityA s 4)
+    (hresampled : resampled.cycleDensity 4 = palindromicCycleDensityB s 4) :
+    design.cycleDensity 4 ≠ resampled.cycleDensity 4 := by
+  rw [hdesign, hresampled]
+  exact palindromic_fourth_cycle_densities_differ s hs
+
+end StarVersusCycle
+
 end
 
 end Calibrator

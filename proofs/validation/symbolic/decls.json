@@ -47100,8 +47100,8 @@
   "name": "ldBandDetectionShare",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1182,
-  "docstring": "**Detection share of a pruned (low-frequency) band** on a stationary AR(1)\nchromosome: the fraction of the total inverse-LD (whitened) weight that survives\npruning down to a fraction `kappa` of the directions.\n\nClosed form `κ - 2ρ sin(πκ) / (π(1 + ρ²))`, obtained by integrating the\nreciprocal symbol; the `1 + ρ²` is the numerator of\n`Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel\ntrace.  The claim that it equals the integral ratio is\n`ldBandDetectionShare_eq_integral`.\n\nEmpirical status: UNTESTED.",
+  "line": 1183,
+  "docstring": "**Detection share of a pruned (low-frequency) band** on a stationary AR(1)\nchromosome: the fraction of the total inverse-LD (whitened) weight that survives\npruning down to a fraction `kappa` of the directions.\n\nClosed form `κ - 2ρ sin(πκ) / (π(1 + ρ²))`, obtained by integrating the\nreciprocal symbol; the `1 + ρ²` is the numerator of\n`Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel\ntrace.  That it equals the integral ratio is not proved here: it is the\n`detection` field of `LDBandIntegralIdentification`, carried as a hypothesis by\nevery result that relies on the identification.\n\nEmpirical status: UNTESTED.",
   "signature": "(decay kappa : ℝ) : ℝ",
   "body": "kappa - 2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))",
   "proof": "",
@@ -47122,7 +47122,7 @@
   "name": "ldPruningDetectionDeficit",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1189,
+  "line": 1190,
   "docstring": "**The detection weight pruning throws away**, over and above the fraction of\ndirections it discards.  This is the quantity the frontier prices.\n\nEmpirical status: UNTESTED.",
   "signature": "(decay kappa : ℝ) : ℝ",
   "body": "2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))",
@@ -47144,7 +47144,7 @@
   "name": "ldBandDetectionShare_eq_sub_deficit",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1192,
+  "line": 1193,
   "docstring": "",
   "signature": "(decay kappa : ℝ)",
   "body": "ldBandDetectionShare decay kappa =\n      kappa - ldPruningDetectionDeficit decay kappa",
@@ -47166,7 +47166,7 @@
   "name": "ldBandDetectionShare_le_retention",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1199,
+  "line": 1200,
   "docstring": "**Pruning loses detection weight faster than it loses markers.**  Keeping a\nfraction `κ` of directions retains at most a fraction `κ` of the detection\nweight, for every LD level and every retention fraction.",
   "signature": "{decay kappa : ℝ}\n    (hd0 : 0 ≤ decay) (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1)",
   "body": "ldBandDetectionShare decay kappa ≤ kappa",
@@ -47209,7 +47209,7 @@
   "name": "ldBandDetectionShare_lt_retention",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1219,
+  "line": 1220,
   "docstring": "The loss is strict whenever there is LD to exploit and the reduction is\nneither trivial nor vacuous.  This is the AR(1) form of the pruning\nprohibition: for `0 < ρ < 1` and `0 < κ < 1` there is no retention fraction at\nwhich pruning is detection-neutral.",
   "signature": "{decay kappa : ℝ}\n    (hd0 : 0 < decay) (hk0 : 0 < kappa) (hk1 : kappa < 1)",
   "body": "ldBandDetectionShare decay kappa < kappa",
@@ -47252,7 +47252,7 @@
   "name": "ldPruningDetectionDeficit_le_half_retention",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1240,
+  "line": 1241,
   "docstring": "**The deficit is largest at half retention**, where it equals\n`2ρ / (π(1 + ρ²))`.  Since `2ρ/(1 + ρ²) ≤ 1`, the worst-case detection loss\nattributable to pruning is at most `1/π ≈ 0.318` of the total whitened weight,\nand it is attained in the strong-LD limit at 50 % retention.  This is the number\na simulation should be asked to reproduce.",
   "signature": "{decay kappa : ℝ}\n    (hd0 : 0 ≤ decay)",
   "body": "ldPruningDetectionDeficit decay kappa ≤\n      2 * decay / (Real.pi * (1 + decay ^ 2))",
@@ -47281,7 +47281,7 @@
   "name": "ldPruningDetectionDeficit_half",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1255,
+  "line": 1256,
   "docstring": "At half retention the deficit is exactly `2ρ / (π(1 + ρ²))`, so the bound of\n`ldPruningDetectionDeficit_le_half_retention` is attained and the frontier is\ntight there.",
   "signature": "(decay : ℝ)",
   "body": "ldPruningDetectionDeficit decay (1 / 2) =\n      2 * decay / (Real.pi * (1 + decay ^ 2))",
@@ -47302,7 +47302,7 @@
   "name": "ldBandDetectionShare_one",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1265,
+  "line": 1266,
   "docstring": "**Retaining everything retains everything.**  A consistency check on the\nnormalisation: at `κ = 1` the detection share is exactly `1`, which is the\nstatement that the denominator used in `ldBandDetectionShare` really is the full\ninverse-kernel trace `ldWhiteningGain`.",
   "signature": "(decay : ℝ)",
   "body": "ldBandDetectionShare decay 1 = 1",
@@ -47323,7 +47323,7 @@
   "name": "ldBandDetectionShare_zero",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1271,
+  "line": 1272,
   "docstring": "",
   "signature": "(decay : ℝ)",
   "body": "ldBandDetectionShare decay 0 = 0",
@@ -47344,7 +47344,7 @@
   "name": "ldBandDetectionShare_of_no_ld",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1281,
+  "line": 1282,
   "docstring": "**No LD, no trade-off.**  When the chromosome has no linkage the spectrum is\nflat, the two weight profiles coincide, and pruning is exactly neutral: the\ndetection share equals the retention fraction.  The whole phenomenon is a\nconsequence of spectral spread, and vanishes with it.",
   "signature": "(kappa : ℝ)",
   "body": "ldBandDetectionShare 0 kappa = kappa",
@@ -47365,7 +47365,7 @@
   "name": "ldBandReconstructionShare_of_no_ld",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1287,
+  "line": 1288,
   "docstring": "The reconstruction share is likewise neutral in the absence of LD.",
   "signature": "{kappa : ℝ}\n    (hk0 : 0 ≤ kappa) (hk1 : kappa < 1)",
   "body": "ldBandReconstructionShare 0 kappa = kappa",
@@ -47400,7 +47400,7 @@
   "name": "ldBand_detection_integral_ratio_le_retention",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1345,
+  "line": 1346,
   "docstring": "**The band integral itself loses detection weight faster than markers.**\n\nThe conclusion of `ldBandDetectionShare_le_retention` transported from the\nclosed form to the quantity it names: under the identification, the fraction of\nthe inverse-symbol integral retained by a low-frequency band of relative width\n`κ` is at most `κ`.",
   "signature": "{decay kappa : ℝ}\n    (hid : LDBandIntegralIdentification decay)\n    (hd0 : 0 ≤ decay) (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1)",
   "body": "(∫ angle in (0:ℝ)..(Real.pi * kappa), (ldKernelSymbol decay angle)⁻¹) /\n        (∫ angle in (0:ℝ)..Real.pi, (ldKernelSymbol decay angle)⁻¹) ≤ kappa",
@@ -47450,7 +47450,7 @@
   "name": "ldPanelRetentionFraction",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1393,
+  "line": 1394,
   "docstring": "**Fraction of the marker panel retained** by a pruning or clumping pass:\n`retainedMarkers` of `totalMarkers` survive.  This is the rank budget of the\nreduction, expressed in the units a clumping tool reports.\n\nEmpirical status: UNTESTED.",
   "signature": "(retainedMarkers totalMarkers : ℕ) : ℝ",
   "body": "(retainedMarkers : ℝ) / (totalMarkers : ℝ)",
@@ -47472,7 +47472,7 @@
   "name": "ldPanelRetentionFraction_mem",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1396,
+  "line": 1397,
   "docstring": "",
   "signature": "{retainedMarkers totalMarkers : ℕ}\n    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers)",
   "body": "0 < ldPanelRetentionFraction retainedMarkers totalMarkers ∧\n      ldPanelRetentionFraction retainedMarkers totalMarkers < 1",
@@ -47508,7 +47508,7 @@
   "name": "ldRetentionPerGen_abs_lt_one",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1410,
+  "line": 1411,
   "docstring": "The Ohta–Kimura retention lies in `[0, 1)` for admissible parameters, so it\nis an admissible AR(1) decay.  This is the compatibility check that lets the two\ncorpus modules be chained at all.",
   "signature": "{recomb Ne : ℝ}\n    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)",
   "body": "|ldRetentionPerGen recomb Ne| < 1",
@@ -47551,7 +47551,7 @@
   "name": "ldRetentionPerGen_strictAnti_recomb",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1430,
+  "line": 1431,
   "docstring": "Less recombination, more retention.  Extracted here in the form the frontier\nneeds; it is the step the corpus already performs inside\n`ImitationRigidity.ldWhiteningGain_of_ldRetention_antitone`.",
   "signature": "{r₁ r₂ Ne : ℝ}\n    (hNe : 1 < Ne) (hlt : r₁ < r₂)",
   "body": "ldRetentionPerGen r₂ Ne < ldRetentionPerGen r₁ Ne",
@@ -47588,7 +47588,7 @@
   "name": "ldBlockReconstructionShare",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1444,
+  "line": 1445,
   "docstring": "**Reconstruction share of a clumped panel**, as a function of the\nrecombination rate between adjacent markers, the effective population size, and\nhow many markers survive clumping.\n\nEmpirical status: UNTESTED.",
   "signature": "(recomb Ne : ℝ)\n    (retainedMarkers totalMarkers : ℕ) : ℝ",
   "body": "ldBandReconstructionShare (ldRetentionPerGen recomb Ne)\n    (ldPanelRetentionFraction retainedMarkers totalMarkers)",
@@ -47618,7 +47618,7 @@
   "name": "ldBlockDetectionShare",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1455,
+  "line": 1456,
   "docstring": "**Detection share of a clumped panel**: the fraction of the whitened\ndetection weight — the inverse-LD-kernel trace whose per-variant limit is\n`ImitationRigidity.ldWhiteningGain` — that survives clumping, as a function of\nrecombination rate, effective size and marker counts.\n\nEmpirical status: UNTESTED.",
   "signature": "(recomb Ne : ℝ)\n    (retainedMarkers totalMarkers : ℕ) : ℝ",
   "body": "ldBandDetectionShare (ldRetentionPerGen recomb Ne)\n    (ldPanelRetentionFraction retainedMarkers totalMarkers)",
@@ -47648,7 +47648,7 @@
   "name": "ldBlockPruningDeficit",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1465,
+  "line": 1466,
   "docstring": "**Detection weight surrendered to clumping**, over and above the fraction of\nmarkers discarded, as a function of recombination rate and effective size.  This\nis the price the frontier puts on the pruning convention.\n\nEmpirical status: UNTESTED.",
   "signature": "(recomb Ne : ℝ)\n    (retainedMarkers totalMarkers : ℕ) : ℝ",
   "body": "ldPruningDetectionDeficit (ldRetentionPerGen recomb Ne)\n    (ldPanelRetentionFraction retainedMarkers totalMarkers)",
@@ -47678,7 +47678,7 @@
   "name": "ldTightLinkageDetectionShare",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1476,
+  "line": 1477,
   "docstring": "**Tight-linkage floor on the detection share**, `κ - sin(πκ)/π`.  It carries\nno recombination rate because it is the value the frontier saturates to as the\nretention approaches one, and `ldTightLinkage_le_ldBlockDetectionShare` shows it\nbounds the detection share at every recombination rate and effective size.\n\nEmpirical status: UNTESTED.",
   "signature": "(retainedMarkers totalMarkers : ℕ) : ℝ",
   "body": "ldPanelRetentionFraction retainedMarkers totalMarkers -\n    Real.sin (Real.pi *\n      ldPanelRetentionFraction retainedMarkers totalMarkers) / Real.pi",
@@ -47700,7 +47700,7 @@
   "name": "ldBlockDetectionShare_add_deficit",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1483,
+  "line": 1484,
   "docstring": "Accounting identity: what clumping keeps plus what it surrenders is the\nfraction of markers it retained.",
   "signature": "(recomb Ne : ℝ)\n    (retainedMarkers totalMarkers : ℕ)",
   "body": "ldBlockDetectionShare recomb Ne retainedMarkers totalMarkers +\n        ldBlockPruningDeficit recomb Ne retainedMarkers totalMarkers =\n      ldPanelRetentionFraction retainedMarkers totalMarkers",
@@ -47730,7 +47730,7 @@
   "name": "ldBlockDetectionShare_le_retention",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1494,
+  "line": 1495,
   "docstring": "**Clumping loses detection weight faster than it loses markers**, at every\nrecombination rate and effective size.",
   "signature": "{recomb Ne : ℝ}\n    {retainedMarkers totalMarkers : ℕ}\n    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)\n    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers)",
   "body": "ldBlockDetectionShare recomb Ne retainedMarkers totalMarkers ≤\n      ldPanelRetentionFraction retainedMarkers totalMarkers",
@@ -47795,7 +47795,7 @@
   "name": "ldWhiteningGain_one_lt_iff",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1508,
+  "line": 1509,
   "docstring": "The whitening gain exceeds its no-linkage value exactly when there is\nlinkage to exploit.",
   "signature": "{decay : ℝ}\n    (hd0 : 0 ≤ decay) (hd1 : decay < 1)",
   "body": "1 < ldWhiteningGain decay ↔ 0 < decay",
@@ -47830,7 +47830,7 @@
   "name": "ldPruningDetectionDeficit_pos_iff",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1527,
+  "line": 1528,
   "docstring": "The pruning deficit is strictly positive exactly when there is linkage.",
   "signature": "{decay kappa : ℝ}\n    (hd0 : 0 ≤ decay) (hk0 : 0 < kappa) (hk1 : kappa < 1)",
   "body": "0 < ldPruningDetectionDeficit decay kappa ↔ 0 < decay",
@@ -47873,7 +47873,7 @@
   "name": "pruning_loses_detection_iff_whiteningGain_exceeds_one",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1560,
+  "line": 1561,
   "docstring": "**The corpus's detection quantity is what clumping destroys.**\n\n`ImitationRigidity.ldWhiteningGain` is the per-variant limit of `tr K⁻¹`, the\nquantity every whitened detection threshold in this corpus is stated in.  It\nexceeds its no-linkage value `1` precisely when the LD kernel has spectral\nspread — and that is precisely the condition under which a clumped panel loses\ndetection weight strictly faster than it loses markers.\n\nThis is the implication the inverse-ordering result explains: the inverse-kernel\ntrace is built out of the small-eigenvalue directions, clumping keeps the large\nones, so the gain being larger than one and the pruning deficit being positive\nare the same fact seen from two sides.  Everything on both sides is an explicit\nfunction of the recombination rate and the effective population size.",
   "signature": "{recomb Ne : ℝ} {retainedMarkers totalMarkers : ℕ}\n    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)\n    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers)",
   "body": "1 < ldWhiteningGain (ldRetentionPerGen recomb Ne) ↔\n      0 < ldBlockPruningDeficit recomb Ne retainedMarkers totalMarkers",
@@ -47938,7 +47938,7 @@
   "name": "ldPruningDetectionDeficit_strictMono",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1576,
+  "line": 1577,
   "docstring": "The deficit is strictly increasing in the AR(1) decay.",
   "signature": "{p₁ p₂ kappa : ℝ}\n    (h₁ : 0 ≤ p₁) (h₂ : p₂ < 1) (hlt : p₁ < p₂)\n    (hk0 : 0 < kappa) (hk1 : kappa < 1)",
   "body": "ldPruningDetectionDeficit p₁ kappa < ldPruningDetectionDeficit p₂ kappa",
@@ -47996,7 +47996,7 @@
   "name": "ldBlockPruningDeficit_antitone_in_recombination",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1599,
+  "line": 1600,
   "docstring": "**Tighter linkage, larger surrendered detection power.**  Lowering the\nrecombination rate between adjacent markers at fixed effective size strictly\nincreases the detection weight a clumped panel gives up.  This is the frontier's\ndependence on `r`, and it runs in the same direction as\n`ImitationRigidity.ldWhiteningGain_of_ldRetention_antitone`: the tighter the\nblock, the more there was to lose.",
   "signature": "{r₁ r₂ Ne : ℝ} {retainedMarkers totalMarkers : ℕ}\n    (hr₁ : 0 ≤ r₁) (hr₂ : r₂ ≤ 1) (hNe : 1 < Ne) (hlt : r₁ < r₂)\n    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers)",
   "body": "ldBlockPruningDeficit r₂ Ne retainedMarkers totalMarkers <\n      ldBlockPruningDeficit r₁ Ne retainedMarkers totalMarkers",
@@ -48069,7 +48069,7 @@
   "name": "ldPruningDetectionDeficit_le_sin_div_pi",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1616,
+  "line": 1617,
   "docstring": "The deficit never exceeds `sin(πκ)/π`, at any decay.",
   "signature": "{decay kappa : ℝ}\n    (hd0 : 0 ≤ decay) (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1)",
   "body": "ldPruningDetectionDeficit decay kappa ≤\n      Real.sin (Real.pi * kappa) / Real.pi",
@@ -48112,7 +48112,7 @@
   "name": "ldTightLinkage_le_ldBlockDetectionShare",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1636,
+  "line": 1637,
   "docstring": "",
   "signature": "{recomb Ne : ℝ}\n    {retainedMarkers totalMarkers : ℕ}\n    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)\n    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers)",
   "body": "ldTightLinkageDetectionShare retainedMarkers totalMarkers ≤\n      ldBlockDetectionShare recomb Ne retainedMarkers totalMarkers",
@@ -48177,7 +48177,7 @@
   "name": "clumping_minimizes_detection_on_ld_kernel",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1670,
+  "line": 1671,
   "docstring": "**The pruning prohibition on the LD kernel itself.**\n\n`S` is the set of retained directions of a clumping pass: the low-frequency band\nof the LD kernel, which by `ldKernelSymbol_mono_in_cos` is exactly a top-`|S|`\nset by eigenvalue.  The conclusion is that among *all* relaxed rank-`|S|`\nreductions of the same kernel — every linear dimension reduction with the same\nbudget, fractional ones included — the clumped panel has the minimum detection\nefficiency.\n\nThe kernel is the Ohta–Kimura one: its decay is `ldRetentionPerGen recomb Ne`,\nso the statement is about a chromosome with a named recombination rate and a\nnamed effective population size, not an abstract spectrum.\n\nScope: relaxed projection-type reductions.  This is not a statement about\narbitrary measurable summaries of the genotypes, and no joint data-processing\ninequality is available that would make it one.",
   "signature": "{ι : Type*} [Fintype ι] [DecidableEq ι]\n    (angle : ι → ℝ) (recomb Ne cutAngle : ℝ) (S : Finset ι) (M : ι → ℝ)\n    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)\n    (hM : IsRankAllocation (S.card : ℝ) M)\n    (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))\n    (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle)\n    (htotal : 0 < spectralTotal (fun i =>\n      detectionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))))",
   "body": "detectionEfficiency\n        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))\n        (pruneAllocation S) ≤\n      detectionEfficiency\n        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M",
@@ -48277,7 +48277,7 @@
   "name": "clumping_maximizes_reconstruction_on_ld_kernel",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1703,
+  "line": 1704,
   "docstring": "The same statement for the other task: a clumped panel maximises\nreconstruction efficiency on the LD kernel.  Stated alongside the prohibition\nbecause the pair is the trade-off — the clumping rule is not merely bad for\ndetection, it is bad for detection *because* it is optimal for reconstruction,\nand the two conclusions come from the one threshold hypothesis.",
   "signature": "{ι : Type*} [Fintype ι] [DecidableEq ι]\n    (angle : ι → ℝ) (recomb Ne cutAngle : ℝ) (S : Finset ι) (M : ι → ℝ)\n    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)\n    (hM : IsRankAllocation (S.card : ℝ) M)\n    (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))\n    (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle)\n    (htotal : 0 < spectralTotal (fun i =>\n      reconstructionWeight\n        (ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))))",
   "body": "reconstructionEfficiency\n        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M ≤\n      reconstructionEfficiency\n        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))\n        (pruneAllocation S)",
@@ -48377,7 +48377,7 @@
   "name": "ldBlock_detection_integral_ratio_le_retention",
   "module": "Calibrator.MetricSpecificPortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1739,
+  "line": 1740,
   "docstring": "**The whitened-weight integral of a clumped panel, at a named recombination\nrate and effective size.**\n\nThe endpoint of the whole chain: under the named integral identification, the\nfraction of the inverse-LD-kernel integral that a clumped panel retains is at\nmost the fraction of markers it retained, where the kernel is the Ohta–Kimura\none with decay `ldRetentionPerGen recomb Ne`.  Every object in the statement is\neither an integral of the LD symbol or a marker count.",
   "signature": "{recomb Ne : ℝ}\n    {retainedMarkers totalMarkers : ℕ}\n    (hid : LDBandIntegralIdentification (ldRetentionPerGen recomb Ne))\n    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)\n    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers)",
   "body": "(∫ angle in (0:ℝ)..(Real.pi *\n        ldPanelRetentionFraction retainedMarkers totalMarkers),\n      (ldKernelSymbol (ldRetentionPerGen recomb Ne) angle)⁻¹) /\n        (∫ angle in (0:ℝ)..Real.pi,\n          (ldKernelSymbol (ldRetentionPerGen recomb Ne) angle)⁻¹) ≤\n      ldPanelRetentionFraction retainedMarkers totalMarkers",
@@ -56617,11 +56617,435 @@
   "raw": "theorem traceWindow_every_level_detectable {base A S₀ : Matrix ι ι ℝ}\n    (hpd : ∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v)\n    {v : ι → ℝ} (hvne : v ≠ 0) {t : ℝ} (ht : 0 < t) :\n    ¬ (traceWindowClass base A S₀).IsNull\n      ((traceWindowClass base A S₀).spiked S₀ t v) := by\n  refine (traceWindowClass base A S₀).not_isNull_spiked_of_active\n    (traceWindowClass_active base A S₀) ?_ ht\n  rw [traceWindowClass_spikeLoad]\n  exact hpd v hvne"
  },
  {
+  "kind": "theorem",
+  "name": "rankOneCovarianceBump_eq_smul_spikeOuter",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 857,
+  "docstring": "**The two spike parametrizations agree.**  `ImitationRigidity`'s bump at\nscale `s` is this file's spike at level `s²`; the level is squared because the\nbump's scale multiplies the effect vector while the level multiplies the\ncovariance.",
+  "signature": "(scale : ℝ) (v : ι → ℝ)",
+  "body": "rankOneCovarianceBump scale v = (scale ^ 2) • spikeOuter v",
+  "proof": "by\n  ext i j\n  simp only [rankOneCovarianceBump, Matrix.smul_apply, spikeOuter, smul_eq_mul]\n  ring",
+  "binders": [
+   [
+    [
+     "scale"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "v"
+    ],
+    "ι → ℝ",
+    "("
+   ]
+  ],
+  "raw": "theorem rankOneCovarianceBump_eq_smul_spikeOuter (scale : ℝ) (v : ι → ℝ) :\n    rankOneCovarianceBump scale v = (scale ^ 2) • spikeOuter v := by\n  ext i j\n  simp only [rankOneCovarianceBump, Matrix.smul_apply, spikeOuter, smul_eq_mul]\n  ring"
+ },
+ {
+  "kind": "theorem",
+  "name": "spiked_eq_add_rankOneCovarianceBump",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 865,
+  "docstring": "The linear program's alternative and `ImitationRigidity`'s bumped\nbackground are the same matrix.",
+  "signature": "{cidx : Type*}\n    (K : BackgroundClass ι cidx) (S₀ : Matrix ι ι ℝ) (scale : ℝ) (v : ι → ℝ)",
+  "body": "K.spiked S₀ (scale ^ 2) v = S₀ + rankOneCovarianceBump scale v",
+  "proof": "by\n  unfold BackgroundClass.spiked\n  rw [rankOneCovarianceBump_eq_smul_spikeOuter]",
+  "binders": [
+   [
+    [
+     "cidx"
+    ],
+    "Type*",
+    "{"
+   ],
+   [
+    [
+     "K"
+    ],
+    "BackgroundClass ι cidx",
+    "("
+   ],
+   [
+    [
+     "S₀"
+    ],
+    "Matrix ι ι ℝ",
+    "("
+   ],
+   [
+    [
+     "scale"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "v"
+    ],
+    "ι → ℝ",
+    "("
+   ]
+  ],
+  "raw": "theorem spiked_eq_add_rankOneCovarianceBump {cidx : Type*}\n    (K : BackgroundClass ι cidx) (S₀ : Matrix ι ι ℝ) (scale : ℝ) (v : ι → ℝ) :\n    K.spiked S₀ (scale ^ 2) v = S₀ + rankOneCovarianceBump scale v := by\n  unfold BackgroundClass.spiked\n  rw [rankOneCovarianceBump_eq_smul_spikeOuter]"
+ },
+ {
+  "kind": "def",
+  "name": "diagonalGapForm",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 878,
+  "docstring": "**The diagonal-gap functional.**  The difference of two diagonal entries —\nfor a genotype covariance, the difference in standardized variance carried by\ntwo markers.  It is linear, so it is a legal constraint of a background class,\nand `ConstantDiagonal` is the statement that all of these vanish.\n\n    Empirical status: DERIVED (a difference of matrix entries;\n    `diagonalGapForm_spikeOuter` identifies its spike load).",
+  "signature": "(i j : ι) (M : Matrix ι ι ℝ) : ℝ",
+  "body": "M i i - M j j",
+  "proof": "",
+  "binders": [
+   [
+    [
+     "i",
+     "j"
+    ],
+    "ι",
+    "("
+   ],
+   [
+    [
+     "M"
+    ],
+    "Matrix ι ι ℝ",
+    "("
+   ]
+  ],
+  "raw": "def diagonalGapForm (i j : ι) (M : Matrix ι ι ℝ) : ℝ := M i i - M j j"
+ },
+ {
+  "kind": "theorem",
+  "name": "diagonalGapForm_add",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 880,
+  "docstring": "",
+  "signature": "(i j : ι) (M N : Matrix ι ι ℝ)",
+  "body": "diagonalGapForm i j (M + N) =\n      diagonalGapForm i j M + diagonalGapForm i j N",
+  "proof": "by\n  unfold diagonalGapForm\n  simp only [Matrix.add_apply]\n  ring",
+  "binders": [
+   [
+    [
+     "i",
+     "j"
+    ],
+    "ι",
+    "("
+   ],
+   [
+    [
+     "M",
+     "N"
+    ],
+    "Matrix ι ι ℝ",
+    "("
+   ]
+  ],
+  "raw": "theorem diagonalGapForm_add (i j : ι) (M N : Matrix ι ι ℝ) :\n    diagonalGapForm i j (M + N) =\n      diagonalGapForm i j M + diagonalGapForm i j N := by\n  unfold diagonalGapForm\n  simp only [Matrix.add_apply]\n  ring"
+ },
+ {
+  "kind": "theorem",
+  "name": "diagonalGapForm_smul",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 887,
+  "docstring": "",
+  "signature": "(i j : ι) (c : ℝ) (M : Matrix ι ι ℝ)",
+  "body": "diagonalGapForm i j (c • M) = c * diagonalGapForm i j M",
+  "proof": "by\n  unfold diagonalGapForm\n  simp only [Matrix.smul_apply, smul_eq_mul]\n  ring",
+  "binders": [
+   [
+    [
+     "i",
+     "j"
+    ],
+    "ι",
+    "("
+   ],
+   [
+    [
+     "c"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "M"
+    ],
+    "Matrix ι ι ℝ",
+    "("
+   ]
+  ],
+  "raw": "theorem diagonalGapForm_smul (i j : ι) (c : ℝ) (M : Matrix ι ι ℝ) :\n    diagonalGapForm i j (c • M) = c * diagonalGapForm i j M := by\n  unfold diagonalGapForm\n  simp only [Matrix.smul_apply, smul_eq_mul]\n  ring"
+ },
+ {
+  "kind": "theorem",
+  "name": "diagonalGapForm_spikeOuter",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 896,
+  "docstring": "**The spike load of the diagonal gap is the squared-loading gap.**  This is\nthe quantity `ImitationRigidity`'s `hloading` hypothesis asserts is nonzero, now\nidentified as a spike load rather than an algebraic coincidence.",
+  "signature": "(i j : ι) (v : ι → ℝ)",
+  "body": "diagonalGapForm i j (spikeOuter v) = v i ^ 2 - v j ^ 2",
+  "proof": "by\n  unfold diagonalGapForm\n  simp only [spikeOuter]\n  ring",
+  "binders": [
+   [
+    [
+     "i",
+     "j"
+    ],
+    "ι",
+    "("
+   ],
+   [
+    [
+     "v"
+    ],
+    "ι → ℝ",
+    "("
+   ]
+  ],
+  "raw": "theorem diagonalGapForm_spikeOuter (i j : ι) (v : ι → ℝ) :\n    diagonalGapForm i j (spikeOuter v) = v i ^ 2 - v j ^ 2 := by\n  unfold diagonalGapForm\n  simp only [spikeOuter]\n  ring"
+ },
+ {
+  "kind": "def",
+  "name": "diagonalGapClass",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 910,
+  "docstring": "**The diagonal-gap background class**: backgrounds in which two markers\ndiffer in standardized variance by at most `budget`.  At `budget = 0` with the\nconstraint\nactive this is the constant-diagonal condition restricted to one pair, which is\nall `ImitationRigidity` ever used.\n\n    Empirical status: UNTESTED. `budget` is measurable — it is the spread in\n    standardized variance a panel admits between two markers.",
+  "signature": "(base : Matrix ι ι ℝ) (i j : ι) (budget : ℝ) :\n    BackgroundClass ι Unit where\n  base",
+  "body": "base\n  form := fun _ => diagonalGapForm i j\n  bound := fun _ => budget\n  form_add := fun _ M N => diagonalGapForm_add i j M N\n  form_smul := fun _ c M => diagonalGapForm_smul i j c M",
+  "proof": "",
+  "binders": [
+   [
+    [
+     "base"
+    ],
+    "Matrix ι ι ℝ",
+    "("
+   ],
+   [
+    [
+     "i",
+     "j"
+    ],
+    "ι",
+    "("
+   ],
+   [
+    [
+     "budget"
+    ],
+    "ℝ",
+    "("
+   ]
+  ],
+  "raw": "def diagonalGapClass (base : Matrix ι ι ℝ) (i j : ι) (budget : ℝ) :\n    BackgroundClass ι Unit where\n  base := base\n  form := fun _ => diagonalGapForm i j\n  bound := fun _ => budget\n  form_add := fun _ M N => diagonalGapForm_add i j M N\n  form_smul := fun _ c M => diagonalGapForm_smul i j c M"
+ },
+ {
+  "kind": "theorem",
+  "name": "diagonalGapClass_spikeLoad",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 918,
+  "docstring": "",
+  "signature": "(base : Matrix ι ι ℝ) (i j : ι) (budget : ℝ)\n    (a : Unit) (v : ι → ℝ)",
+  "body": "(diagonalGapClass base i j budget).spikeLoad a v = v i ^ 2 - v j ^ 2",
+  "proof": "diagonalGapForm_spikeOuter i j v",
+  "binders": [
+   [
+    [
+     "base"
+    ],
+    "Matrix ι ι ℝ",
+    "("
+   ],
+   [
+    [
+     "i",
+     "j"
+    ],
+    "ι",
+    "("
+   ],
+   [
+    [
+     "budget"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "a"
+    ],
+    "Unit",
+    "("
+   ],
+   [
+    [
+     "v"
+    ],
+    "ι → ℝ",
+    "("
+   ]
+  ],
+  "raw": "theorem diagonalGapClass_spikeLoad (base : Matrix ι ι ℝ) (i j : ι) (budget : ℝ)\n    (a : Unit) (v : ι → ℝ) :\n    (diagonalGapClass base i j budget).spikeLoad a v = v i ^ 2 - v j ^ 2 :=\n  diagonalGapForm_spikeOuter i j v"
+ },
+ {
+  "kind": "theorem",
+  "name": "diagonalGap_imitationCapacity_eq_zero",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 928,
+  "docstring": "**The `ConstantDiagonal` mechanism, as a certificate.**  Two diagonal\nentries that agree at the baseline are an active constraint; unequal squared\nloadings are positive spike load; the imitation capacity is therefore zero.\nOnly the one pair is constrained — nothing is assumed about the rest of the\nmatrix, so the class is not Toeplitz, not stationary, and has no symmetry.",
+  "signature": "{base S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)} {i j : ι}\n    (hbase : VarianceNonneg (S₀ - base))\n    (hactive : S₀ i i = S₀ j j)\n    {v : ι → ℝ} (hv : v ∈ support) (hload : v j ^ 2 < v i ^ 2)",
+  "body": "(diagonalGapClass base i j 0).imitationCapacity S₀ support = 0",
+  "proof": "by\n  have hgap : diagonalGapForm i j S₀ = 0 := by\n    unfold diagonalGapForm\n    rw [hactive]\n    ring\n  have hnull : (diagonalGapClass base i j 0).IsNull S₀ := by\n    refine ⟨hbase, ?_⟩\n    intro _a\n    exact le_of_eq hgap\n  have hactive' : (diagonalGapClass base i j 0).Active () S₀ := hgap\n  have hload' : 0 < (diagonalGapClass base i j 0).spikeLoad () v := by\n    rw [diagonalGapClass_spikeLoad]\n    linarith\n  exact (diagonalGapClass base i j 0).imitationCapacity_eq_zero_of_active\n    hnull hv hactive' hload'",
+  "binders": [
+   [
+    [
+     "base",
+     "S₀"
+    ],
+    "Matrix ι ι ℝ",
+    "{"
+   ],
+   [
+    [
+     "support"
+    ],
+    "Set (ι → ℝ)",
+    "{"
+   ],
+   [
+    [
+     "i",
+     "j"
+    ],
+    "ι",
+    "{"
+   ],
+   [
+    [
+     "hbase"
+    ],
+    "VarianceNonneg (S₀ - base)",
+    "("
+   ],
+   [
+    [
+     "hactive"
+    ],
+    "S₀ i i = S₀ j j",
+    "("
+   ],
+   [
+    [
+     "v"
+    ],
+    "ι → ℝ",
+    "{"
+   ],
+   [
+    [
+     "hv"
+    ],
+    "v ∈ support",
+    "("
+   ],
+   [
+    [
+     "hload"
+    ],
+    "v j ^ 2 < v i ^ 2",
+    "("
+   ]
+  ],
+  "raw": "theorem diagonalGap_imitationCapacity_eq_zero\n    {base S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)} {i j : ι}\n    (hbase : VarianceNonneg (S₀ - base))\n    (hactive : S₀ i i = S₀ j j)\n    {v : ι → ℝ} (hv : v ∈ support) (hload : v j ^ 2 < v i ^ 2) :\n    (diagonalGapClass base i j 0).imitationCapacity S₀ support = 0 := by\n  have hgap : diagonalGapForm i j S₀ = 0 := by\n    unfold diagonalGapForm\n    rw [hactive]\n    ring\n  have hnull : (diagonalGapClass base i j 0).IsNull S₀ := by\n    refine ⟨hbase, ?_⟩\n    intro _a\n    exact le_of_eq hgap\n  have hactive' : (diagonalGapClass base i j 0).Active () S₀ := hgap\n  have hload' : 0 < (diagonalGapClass base i j 0).spikeLoad () v := by\n    rw [diagonalGapClass_spikeLoad]\n    linarith\n  exact (diagonalGapClass base i j 0).imitationCapacity_eq_zero_of_active\n    hnull hv hactive' hload'"
+ },
+ {
+  "kind": "theorem",
+  "name": "diagonalGap_not_isNull_add_rankOneCovarianceBump",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 954,
+  "docstring": "**The two files draw the same conclusion.**  `ImitationRigidity`'s\n`add_rankOneBump_diagonal_gap_ne_of_active` says the bumped background leaves\nthe constant-diagonal condition at the witnessing pair; this says the same\nmatrix is not a member of the diagonal-gap class.  Both are the normal-cone\ncondition, and neither needs stationarity.",
+  "signature": "{base S₀ : Matrix ι ι ℝ} {i j : ι}\n    (hactive : S₀ i i = S₀ j j) {scale : ℝ} (hscale : scale ≠ 0)\n    {v : ι → ℝ} (hload : v j ^ 2 < v i ^ 2)",
+  "body": "¬ (diagonalGapClass base i j 0).IsNull\n      (S₀ + rankOneCovarianceBump scale v)",
+  "proof": "by\n  have hgap : diagonalGapForm i j S₀ = 0 := by\n    unfold diagonalGapForm\n    rw [hactive]\n    ring\n  have hactive' : (diagonalGapClass base i j 0).Active () S₀ := hgap\n  have hload' : 0 < (diagonalGapClass base i j 0).spikeLoad () v := by\n    rw [diagonalGapClass_spikeLoad]\n    linarith\n  have hscaleSq : (0 : ℝ) < scale ^ 2 := sq_pos_of_ne_zero hscale\n  rw [← spiked_eq_add_rankOneCovarianceBump (diagonalGapClass base i j 0) S₀ scale v]\n  exact (diagonalGapClass base i j 0).not_isNull_spiked_of_active\n    hactive' hload' hscaleSq",
+  "binders": [
+   [
+    [
+     "base",
+     "S₀"
+    ],
+    "Matrix ι ι ℝ",
+    "{"
+   ],
+   [
+    [
+     "i",
+     "j"
+    ],
+    "ι",
+    "{"
+   ],
+   [
+    [
+     "hactive"
+    ],
+    "S₀ i i = S₀ j j",
+    "("
+   ],
+   [
+    [
+     "scale"
+    ],
+    "ℝ",
+    "{"
+   ],
+   [
+    [
+     "hscale"
+    ],
+    "scale ≠ 0",
+    "("
+   ],
+   [
+    [
+     "v"
+    ],
+    "ι → ℝ",
+    "{"
+   ],
+   [
+    [
+     "hload"
+    ],
+    "v j ^ 2 < v i ^ 2",
+    "("
+   ]
+  ],
+  "raw": "theorem diagonalGap_not_isNull_add_rankOneCovarianceBump\n    {base S₀ : Matrix ι ι ℝ} {i j : ι}\n    (hactive : S₀ i i = S₀ j j) {scale : ℝ} (hscale : scale ≠ 0)\n    {v : ι → ℝ} (hload : v j ^ 2 < v i ^ 2) :\n    ¬ (diagonalGapClass base i j 0).IsNull\n      (S₀ + rankOneCovarianceBump scale v) := by\n  have hgap : diagonalGapForm i j S₀ = 0 := by\n    unfold diagonalGapForm\n    rw [hactive]\n    ring\n  have hactive' : (diagonalGapClass base i j 0).Active () S₀ := hgap\n  have hload' : 0 < (diagonalGapClass base i j 0).spikeLoad () v := by\n    rw [diagonalGapClass_spikeLoad]\n    linarith\n  have hscaleSq : (0 : ℝ) < scale ^ 2 := sq_pos_of_ne_zero hscale\n  rw [← spiked_eq_add_rankOneCovarianceBump (diagonalGapClass base i j 0) S₀ scale v]\n  exact (diagonalGapClass base i j 0).not_isNull_spiked_of_active\n    hactive' hload' hscaleSq"
+ },
+ {
   "kind": "def",
   "name": "traceWindowSpikeLoad",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 855,
+  "line": 1000,
   "docstring": "**The finite-chromosome trace-window spike load**: the normalized trace of\nthe LD precision matrix, which is the value the trace-window certificate\nassigns to a unit isotropic spike on `nSites` variants.\n\n    Empirical status: DERIVED from `ldPrecisionTrace`, itself derived from the\n    AR(1) precision stencil (`stationaryLD_interior_stencil`).",
   "signature": "(decay : ℝ) (nSites : ℕ) : ℝ",
   "body": "ldPrecisionTrace decay nSites / (nSites : ℝ)",
@@ -56649,7 +57073,7 @@
   "name": "traceWindowSpikeLoad_tendsto_ldWhiteningGain",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 862,
+  "line": 1007,
   "docstring": "**The identification.**  The whitening gain already in the corpus *is* the\nlarge-chromosome certificate value of the trace-window constraint.  This is\nwhat turns `(1+ρ²)/(1-ρ²)` from a quantity correlated with detectability into\nthe denominator of the detection threshold.",
   "signature": "{decay : ℝ}\n    (hd : |decay| < 1)",
   "body": "Filter.Tendsto (traceWindowSpikeLoad decay) Filter.atTop\n      (nhds (ldWhiteningGain decay))",
@@ -56677,7 +57101,7 @@
   "name": "whitenedCapacity",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 875,
+  "line": 1020,
   "docstring": "**The whitened capacity**: the linear program's value when the binding\nconstraint is the trace window and the effect prior is isotropic.\n\n    Empirical status: UNTESTED. Directly testable: simulate AR(1) genotypes at\n    known `ρ`, sweep the spike level, and compare the measured detection\n    boundary against `headroom · (1 - ρ²) / (1 + ρ²)`.",
   "signature": "(headroom decay : ℝ) : ℝ",
   "body": "headroom / ldWhiteningGain decay",
@@ -56699,7 +57123,7 @@
   "name": "whitenedCapacity_closedForm",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 878,
+  "line": 1023,
   "docstring": "",
   "signature": "(headroom decay : ℝ)",
   "body": "whitenedCapacity headroom decay =\n      headroom * (1 - decay ^ 2) / (1 + decay ^ 2)",
@@ -56721,7 +57145,7 @@
   "name": "imitationCapacity_eq_whitenedCapacity",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 889,
+  "line": 1034,
   "docstring": "**Threshold equals capacity, for the LD certificate.**  When the binding\nconstraint is the trace window and the equi-exit load is the whitening gain,\nthe imitation capacity — and hence, by `EquiExit.imitationCapacity_eq` together\nwith the two halves of the certificate test, the detection threshold — is\nheadroom over `(1+ρ²)/(1-ρ²)`.",
   "signature": "{ι : Type*} [Fintype ι] [DecidableEq ι] {cidx : Type*}\n    {K : BackgroundClass ι cidx} {S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}\n    (E : EquiExit K S₀ support) (hnull : K.IsNull S₀) {decay : ℝ}\n    (hload : E.load = ldWhiteningGain decay)",
   "body": "K.imitationCapacity S₀ support =\n      whitenedCapacity (K.headroom E.binding S₀) decay",
@@ -56798,7 +57222,7 @@
   "name": "whitenedCapacity_strictAnti",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 904,
+  "line": 1049,
   "docstring": "**Stronger LD lowers the threshold.**  More LD means a larger whitening\ngain, hence a smaller capacity: the imitation wall is lower on a strongly\nlinked chromosome, so a spike of a given size is easier to detect after\nwhitening.  This is the opposite of the intuition that LD only costs\ninformation, and it is a consequence of the certificate being edge-sensitive.",
   "signature": "{headroom decay₁ decay₂ : ℝ}\n    (hheadroom : 0 < headroom) (h₁ : 0 ≤ decay₁) (h₂ : |decay₂| < 1)\n    (hlt : decay₁ < decay₂)",
   "body": "whitenedCapacity headroom decay₂ < whitenedCapacity headroom decay₁",
@@ -56849,7 +57273,7 @@
   "name": "subgroupContrast",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 992,
+  "line": 1137,
   "docstring": "**The subgroup-contrast direction**: the centered indicator of a subgroup of\nsize `m` in a panel of `n` individuals.  Centering is forced rather than\nconventional — an uncentered indicator has a component along the all-ones\nvector, which is the grand mean and not a contrast, and its trace-window spike\nload is not `effectiveSubgroupSize`.\n\n    Empirical status: DERIVED. `dot_demographicSpikeDirection` proves its\n    squared length is `effectiveSubgroupSize`, which is what makes the latter a\n    certificate value rather than a stipulated formula.",
   "signature": "(n m : ℕ) : ℕ → ℝ",
   "body": "twoBlock m (((n : ℝ) - (m : ℝ)) / (n : ℝ)) (-((m : ℝ) / (n : ℝ)))",
@@ -56871,7 +57295,7 @@
   "name": "demographicSpikeDirection",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 998,
+  "line": 1143,
   "docstring": "The subgroup contrast as a vector on the panel's individuals.\n\n    Empirical status: DERIVED.",
   "signature": "(n m : ℕ) : Fin n → ℝ",
   "body": "fun i => subgroupContrast n m i.val",
@@ -56893,7 +57317,7 @@
   "name": "dot_demographicSpikeDirection",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1005,
+  "line": 1150,
   "docstring": "**`effectiveSubgroupSize` is the squared length of the subgroup contrast.**\nThis is the theorem that stops `m(n-m)/n` from being a formula nothing can\ncontradict: it is the trace-window spike load of an explicitly constructed\ndirection, and any other centering would give a different number.",
   "signature": "(n m : ℕ) (hmn : m ≤ n) (hn : 0 < n)",
   "body": "dot (demographicSpikeDirection n m) (demographicSpikeDirection n m) =\n      effectiveSubgroupSize (n : ℝ) (m : ℝ)",
@@ -56929,7 +57353,7 @@
   "name": "traceWindowBudgetClass_form",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1033,
+  "line": 1178,
   "docstring": "",
   "signature": "{ι : Type*} [Fintype ι] [DecidableEq ι]\n    (base : Matrix ι ι ℝ) (budget : ℝ) (a : Unit) (M : Matrix ι ι ℝ)",
   "body": "(traceWindowBudgetClass base budget).form a M = traceForm M",
@@ -56978,7 +57402,7 @@
   "name": "traceWindowBudgetClass_bound",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1037,
+  "line": 1182,
   "docstring": "",
   "signature": "{ι : Type*} [Fintype ι] [DecidableEq ι]\n    (base : Matrix ι ι ℝ) (budget : ℝ) (a : Unit)",
   "body": "(traceWindowBudgetClass base budget).bound a = budget",
@@ -57020,7 +57444,7 @@
   "name": "traceWindow_spikeLoad_demographic",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1042,
+  "line": 1187,
   "docstring": "**The spike load of the demographic direction is `effectiveSubgroupSize`.**",
   "signature": "{N : ℕ} (m : ℕ) (hmn : m ≤ N) (hN : 0 < N)\n    (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit)",
   "body": "(traceWindowBudgetClass base budget).spikeLoad a (demographicSpikeDirection N m) =\n      effectiveSubgroupSize (N : ℝ) (m : ℝ)",
@@ -57083,7 +57507,7 @@
   "name": "demographicSpike_eq_level_mul_spikeLoad",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1055,
+  "line": 1200,
   "docstring": "**`demographicSpike` is the trace-window certificate increment.**  The\nexisting quantity is the amount by which a demographic spike at level `4F`\nraises the certificate: level times load, which is exactly the linear program's\nleft-hand side.  The level is the standardized contrast variance, pinned to\nHudson `F_ST` by `Conventions.four_hudsonFst_eq_standardizedContrastVariance`.",
   "signature": "{N : ℕ} (m : ℕ) (F : ℝ)\n    (hmn : m ≤ N) (hN : 0 < N)\n    (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit)",
   "body": "demographicSpike (N : ℝ) F (m : ℝ) =\n      (4 * F) *\n        (traceWindowBudgetClass base budget).spikeLoad a\n          (demographicSpikeDirection N m)",
@@ -57153,7 +57577,7 @@
   "name": "stratificationCertificateMargin",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1075,
+  "line": 1220,
   "docstring": "**The certificate margin for a demographic spike**, with the class headroom\nand the estimation-error scale as separate arguments, because they are separate\nthings and the existing `pcCorrectabilityMargin` conflates them by omitting the\nfirst.\n\n    Empirical status: UNTESTED. Falsifiable against a simulation that varies\n    the trace-window budget at fixed `n`, `M`, `F`: the detection boundary must\n    move with `headroom`, which `pcCorrectabilityMargin` predicts it does\n    not.",
   "signature": "(headroom n M F m : ℝ) : ℝ",
   "body": "demographicSpike n F m - (headroom + bbpProxyThreshold n M)",
@@ -57178,7 +57602,7 @@
   "name": "stratificationCertificateMargin_zero_headroom",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1081,
+  "line": 1226,
   "docstring": "**The existing margin is this one at zero headroom.**  This is the precise\nsense in which `pcCorrectabilityMargin` is a special case: it assumes the\nbackground class has no room left.",
   "signature": "(n M F m : ℝ)",
   "body": "stratificationCertificateMargin 0 n M F m = pcCorrectabilityMargin n M F m",
@@ -57202,7 +57626,7 @@
   "name": "imitable_despite_positive_pcCorrectabilityMargin",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1093,
+  "line": 1238,
   "docstring": "**A positive `pcCorrectabilityMargin` does not imply detectability.**\n\nThe hypothesis `_hmargin` is deliberately unused, and its being unused is the\ncontent: whenever the spike fits inside the trace-window budget, the spiked\ncovariance is a legal background and no test at any sample size can separate\nit, however far the spike clears the spectral edge.  What the existing margin\nomits is the headroom, and the omission is not conservative.",
   "signature": "{N : ℕ} (m : ℕ) (F markerCount : ℝ) (hF : 0 ≤ F) (hmn : m ≤ N) (hN : 0 < N)\n    (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)\n    (hbase : VarianceNonneg (S₀ - base))\n    (hbudget : traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget)\n    (_hmargin : 0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ))",
   "body": "(traceWindowBudgetClass base budget).IsNull\n      ((traceWindowBudgetClass base budget).spiked S₀ (4 * F)\n        (demographicSpikeDirection N m))",
@@ -57295,7 +57719,7 @@
   "name": "not_isNull_of_demographicSpike_gt_budget",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1124,
+  "line": 1269,
   "docstring": "**The converse: exceeding the budget leaves the class.**  Together with the\nprevious theorem this is the linear program in genotype terms — the demographic\nspike is imitable exactly when it fits inside the trace-window headroom, and\n`bbpProxyThreshold` plays no part in that question.",
   "signature": "{N : ℕ} (m : ℕ) (F : ℝ) (hmn : m ≤ N) (hN : 0 < N)\n    (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)\n    (hbudget : budget < traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ))",
   "body": "¬ (traceWindowBudgetClass base budget).IsNull\n      ((traceWindowBudgetClass base budget).spiked S₀ (4 * F)\n        (demographicSpikeDirection N m))",
@@ -57366,7 +57790,7 @@
   "name": "rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1146,
+  "line": 1291,
   "docstring": "**Under rigidity the existing margin is the criterion, exactly.**\n\nWhen the trace window is active at the baseline — budget equal to the\nbaseline's own certificate value, so the headroom is zero — the sign of\n`pcCorrectabilityMargin` is precisely the statement that the alternative's\ncertificate value clears the null ceiling by more than the sampling\nfluctuation.  This is the hypothesis under which the existing docstring's claim\nis true, and it was not previously stated.",
   "signature": "{N : ℕ} (m : ℕ) (F markerCount : ℝ) (hmn : m ≤ N) (hN : 0 < N)\n    (base S₀ : Matrix (Fin N) (Fin N) ℝ) (a : Unit)",
   "body": "0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ) ↔\n      (traceWindowBudgetClass base (traceForm S₀)).bound a +\n          bbpProxyThreshold (N : ℝ) markerCount <\n        (traceWindowBudgetClass base (traceForm S₀)).form a\n          ((traceWindowBudgetClass base (traceForm S₀)).spiked S₀ (4 * F)\n            (demographicSpikeDirection N m))",
@@ -57431,7 +57855,7 @@
   "name": "bbpProxyThreshold_tendsto_zero",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1170,
+  "line": 1315,
   "docstring": "**The estimation barrier vanishes with markers; the capacity does not.**\nAt fixed panel size, `√(n/M) → 0` as the effectively independent marker count\ngrows, so the spectral-edge term is asymptotically free and the imitation\ncapacity is the whole of what remains.  This is why the two halves cannot be\ncollapsed into one: they dominate in opposite regimes.",
   "signature": "(n : ℝ)",
   "body": "Filter.Tendsto (fun M : ℕ => bbpProxyThreshold n (M : ℝ)) Filter.atTop\n      (nhds 0)",
@@ -57452,7 +57876,7 @@
   "name": "blockSpectrum",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1215,
+  "line": 1360,
   "docstring": "**A two-block spectrum**: the first `k` eigenvalues equal `ε`, the rest\nequal `1`.\n\n    Empirical status: DERIVED. A witness construction, not a claim about any\n    real LD matrix; its only role is to be a legal spectrum.",
   "signature": "(k : ℕ) (ε : ℝ) : ℕ → ℝ",
   "body": "twoBlock k ε 1",
@@ -57480,7 +57904,7 @@
   "name": "normalizedMoment",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1223,
+  "line": 1368,
   "docstring": "**The `p`-th normalized moment of the leading `m` eigenvalues.**  Weak\nconvergence of empirical spectral distributions with bounded support is\nconvergence of all of these, so a functional determined by them is precisely a\nweakly continuous one.\n\n    Empirical status: DERIVED.",
   "signature": "(m : ℕ) (lam : ℕ → ℝ) (p : ℕ) : ℝ",
   "body": "(∑ i ∈ Finset.range m, lam i ^ p) / (m : ℝ)",
@@ -57515,7 +57939,7 @@
   "name": "inverseTraceCertificate",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1233,
+  "line": 1378,
   "docstring": "**The inverse-trace certificate**: `tr K⁻¹ / m` in eigenvalue coordinates.\nThis is the quantity `ldWhiteningGain` computes in closed form for an AR(1)\nkernel, and the one the linear program identifies as the detection threshold's\ndenominator.\n\n    Empirical status: DERIVED. In the AR(1) case it is `traceWindowSpikeLoad`,\n    by the definition of `ldPrecisionTrace` as the trace of the inverse.",
   "signature": "(m : ℕ) (lam : ℕ → ℝ) : ℝ",
   "body": "(∑ i ∈ Finset.range m, (lam i)⁻¹) / (m : ℝ)",
@@ -57543,7 +57967,7 @@
   "name": "inverseTraceCertificate_eq_traceWindowSpikeLoad",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1252,
+  "line": 1397,
   "docstring": "**The inverse-trace certificate of an AR(1) LD spectrum is the trace-window\nspike load.**  The hypothesis says `lam` is the spectrum of the stationary LD\nmatrix on `m` sites, in the only form the statement needs: its inverse-trace\nagrees with `ldPrecisionTrace`.",
   "signature": "{decay : ℝ} {m : ℕ}\n    (lam : ℕ → ℝ)\n    (hspectrum : ∑ i ∈ Finset.range m, (lam i)⁻¹ = ldPrecisionTrace decay m)",
   "body": "inverseTraceCertificate m lam = traceWindowSpikeLoad decay m",
@@ -57585,7 +58009,7 @@
   "name": "inverseTraceCertificate_tendsto_ldWhiteningGain",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1264,
+  "line": 1409,
   "docstring": "**The certificate's large-chromosome limit is the whitening gain.**  This\nis the theorem the corpus was missing: `(1+ρ²)/(1-ρ²)` is not merely correlated\nwith detectability, it is the limiting value of the certificate that\n`certificate_not_momentContinuous` proves no weakly continuous functional can\nreproduce.",
   "signature": "{decay : ℝ}\n    (hd : |decay| < 1) (lam : ℕ → ℕ → ℝ)\n    (hspectrum : ∀ m : ℕ,\n      ∑ i ∈ Finset.range m, (lam m i)⁻¹ = ldPrecisionTrace decay m)",
   "body": "Filter.Tendsto (fun m : ℕ => inverseTraceCertificate m (lam m)) Filter.atTop\n      (nhds (ldWhiteningGain decay))",
@@ -57627,7 +58051,7 @@
   "name": "normalizedMoment_blockSpectrum",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1277,
+  "line": 1422,
   "docstring": "",
   "signature": "(k j : ℕ) (ε : ℝ) (p : ℕ)",
   "body": "normalizedMoment (k + j) (blockSpectrum k ε) p =\n      ((k : ℝ) * ε ^ p + (j : ℝ)) / ((k : ℝ) + (j : ℝ))",
@@ -57663,7 +58087,7 @@
   "name": "inverseTraceCertificate_blockSpectrum",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1285,
+  "line": 1430,
   "docstring": "",
   "signature": "(k j : ℕ) (ε : ℝ)",
   "body": "inverseTraceCertificate (k + j) (blockSpectrum k ε) =\n      ((k : ℝ) * ε⁻¹ + (j : ℝ)) / ((k : ℝ) + (j : ℝ))",
@@ -57692,7 +58116,7 @@
   "name": "blockSpectrum_moment_gap_le",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1297,
+  "line": 1442,
   "docstring": "**Every normalized moment is insensitive to the perturbation.**  Moving a\n`1/(n+1)` fraction of the spectrum anywhere inside `[0,1]` moves every\nnormalized moment by at most `1/(n+1)`, uniformly in the order `p`.  This is\nthe precise sense in which the two spectra have the same weak limit.",
   "signature": "(n p : ℕ) (ε : ℝ) (hn : 0 < n)\n    (hε0 : 0 ≤ ε) (hε1 : ε ≤ 1)",
   "body": "|normalizedMoment (n + n * n) (blockSpectrum n ε) p -\n      normalizedMoment (n + n * n) (blockSpectrum n 1) p| ≤ 1 / ((n : ℝ) + 1)",
@@ -57742,7 +58166,7 @@
   "name": "meffPerturbed",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1329,
+  "line": 1474,
   "docstring": "The perturbed spectrum of the witness: on `n + n²` markers, the `n`\nsmallest eigenvalues pushed down to `1/(n+1)`.\n\n    Empirical status: DERIVED (witness construction).",
   "signature": "(n : ℕ) : ℕ → ℝ",
   "body": "blockSpectrum n (((n : ℝ) + 1)⁻¹)",
@@ -57763,7 +58187,7 @@
   "name": "meffFlat",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1334,
+  "line": 1479,
   "docstring": "The unperturbed comparison spectrum: flat at `1`.\n\n    Empirical status: DERIVED (witness construction).",
   "signature": "(n : ℕ) : ℕ → ℝ",
   "body": "blockSpectrum n 1",
@@ -57784,7 +58208,7 @@
   "name": "meffSize",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1339,
+  "line": 1484,
   "docstring": "The number of markers in the witness at stage `n`.\n\n    Empirical status: DERIVED (witness construction).",
   "signature": "(n : ℕ) : ℕ",
   "body": "n + n * n",
@@ -57805,7 +58229,7 @@
   "name": "meff_moment_gap_le",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1345,
+  "line": 1490,
   "docstring": "**The two witness spectra agree on every normalized moment to within\n`1/(n+1)`.**  They therefore have the same weak limit and agree asymptotically\non every weakly continuous functional, every fixed normalized moment\nincluded.",
   "signature": "(n p : ℕ) (hn : 0 < n)",
   "body": "|normalizedMoment (meffSize n) (meffPerturbed n) p -\n      normalizedMoment (meffSize n) (meffFlat n) p| ≤ 1 / ((n : ℝ) + 1)",
@@ -57834,7 +58258,7 @@
   "name": "meff_certificate_gap",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1359,
+  "line": 1504,
   "docstring": "**The inverse-trace certificate moves by `n/(n+1)` — a constant — between\nthe same two spectra.**  This is the discontinuity: the certificate is not\ndetermined by the weak limit.",
   "signature": "(n : ℕ) (hn : 0 < n)",
   "body": "inverseTraceCertificate (meffSize n) (meffPerturbed n) -\n      inverseTraceCertificate (meffSize n) (meffFlat n) =\n      (n : ℝ) / ((n : ℝ) + 1)",
@@ -57862,7 +58286,7 @@
   "name": "certificate_not_momentContinuous",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1419,
+  "line": 1564,
   "docstring": "**The `m_eff` prohibition.**  No weakly continuous functional of the\nspectral law can equal the inverse-trace certificate — hence no\nparticipation-ratio-type effective-marker count can determine a detection\nthreshold.\n\nThe proof is the witness: at stage `n` the two spectra differ by at most\n`1/(n+1)` in every moment, so any moment-continuous functional differs by at\nmost `C/(n+1)`, while the certificates differ by `n/(n+1)`.  Equality would\nforce `n ≤ C` for every `n`.\n\nRead the other way, this is why `ldWhiteningGain` is the right quantity: it is\na certificate value, edge-sensitive, and outside this class.",
   "signature": "(Φ : MomentContinuousFunctional)\n    (hΦ : ∀ (m : ℕ) (lam : ℕ → ℝ), Φ.value m lam = inverseTraceCertificate m lam)",
   "body": "False",
@@ -57890,7 +58314,7 @@
   "name": "meffWitness_spectrum_pos",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1448,
+  "line": 1593,
   "docstring": "**The witness spectra are legal LD spectra.**  Every eigenvalue is strictly\npositive, so both are spectra a correlation matrix can have; the prohibition is\nnot evaded by restricting attention to spectra a real LD matrix could\nproduce.",
   "signature": "(n i : ℕ)",
   "body": "0 < meffPerturbed n i ∧ 0 < meffFlat n i",
@@ -57912,7 +58336,7 @@
   "name": "meff_normalizedTrace_gap_le",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1464,
+  "line": 1609,
   "docstring": "The two witness panels agree on the normalized trace — the `p = 1` moment,\nwhich is what fixes a correlation matrix's normalization — to within\n`1/(n+1)`.",
   "signature": "(n : ℕ) (hn : 0 < n)",
   "body": "|normalizedMoment (meffSize n) (meffPerturbed n) 1 -\n      normalizedMoment (meffSize n) (meffFlat n) 1| ≤ 1 / ((n : ℝ) + 1)",
@@ -57940,7 +58364,7 @@
   "name": "meff_prohibition_with_certificate",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1482,
+  "line": 1627,
   "docstring": "**Both halves, in one statement.**\n\nNegative half: no effective-marker count of the participation-ratio family — no\nfunctional continuous in the moments of the LD spectrum — equals the whitening\ncertificate, so none can determine a detection threshold.\n\nPositive half: the certificate does determine one.  Its large-panel limit is\nthe AR(1) whitening gain, and the threshold is headroom divided by that gain,\nin closed form.\n\nThe two are consistent because the certificate is edge-sensitive and therefore\noutside the weakly continuous class, which is precisely the property that\ndisqualifies `m_eff` and qualifies `tr K⁻¹`.",
   "signature": "{decay : ℝ} (hd : |decay| < 1)\n    (lam : ℕ → ℕ → ℝ)\n    (hspectrum : ∀ m : ℕ,\n      ∑ i ∈ Finset.range m, (lam m i)⁻¹ = ldPrecisionTrace decay m)\n    (Φ : MomentContinuousFunctional)",
   "body": "Filter.Tendsto (fun m : ℕ => inverseTraceCertificate m (lam m)) Filter.atTop\n        (nhds (ldWhiteningGain decay)) ∧\n      (∀ headroom : ℝ, whitenedCapacity headroom decay =\n        headroom * (1 - decay ^ 2) / (1 + decay ^ 2)) ∧\n      ¬ (∀ (m : ℕ) (s : ℕ → ℝ), Φ.value m s = inverseTraceCertificate m s)",

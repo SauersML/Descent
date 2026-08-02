@@ -99,12 +99,31 @@ def main(argv):
                 ok = None
             base_inv.append(ok)
 
-        registered = []
+        # A check that already REJECTS the definition as written has proved
+        # its own falsifiability on the spot -- no mutant is needed, the real
+        # body is the counterexample.
+        fires = []
+        if base_range["verdict"] in ("escape", "escape-unguarded"):
+            fires.append("range")
+        for ch, ok in zip(base_checks, base_inv):
+            if ok is False:
+                fires.append(ch["kind"])
+
+        registered = list(fires)
         if base_range["verdict"] in ("proved", "guarded-by-side-condition"):
             registered.append("range")
         for ch, ok in zip(base_checks, base_inv):
             if ok is True:
                 registered.append(ch["kind"])
+        if fires:
+            results[k] = dict(
+                name=d["name"], module=d["module"], line=d["line"],
+                registered=sorted(set(registered)), covered=True,
+                demonstration="rejects-as-written",
+                rejected_by=sorted(set(fires)),
+                reason="the check rejects the definition as it stands, which "
+                       "is itself the demonstration that it can fail")
+            continue
         if not registered:
             results[k] = dict(name=d["name"], module=d["module"], line=d["line"],
                               registered=[], covered=False,
@@ -147,6 +166,7 @@ def main(argv):
             registered=sorted(set(registered)),
             n_mutants=len(muts),
             covered=bool(killed),
+            demonstration="mutant-rejected" if killed else None,
             killed=killed[:4],
             n_killed=len(killed),
             survived=survived,
@@ -159,9 +179,13 @@ def main(argv):
     out.write_text(json.dumps(results, indent=1, default=str))
     reg = [r for r in results.values() if r["registered"]]
     cov = [r for r in reg if r["covered"]]
+    fired = [r for r in cov if r.get("demonstration") == "rejects-as-written"]
     print(f"{len(results)} transpiled definitions -> {out}")
     print(f"  {len(reg)} have at least one currently-holding check")
-    print(f"  {len(cov)} are DEMONSTRABLY covered (some mutant is rejected)")
+    print(f"  {len(cov)} are DEMONSTRABLY covered")
+    print(f"     of which {len(fired)} because a check rejects the body as "
+          "written")
+    print(f"     and {len(cov) - len(fired)} because a mutant is rejected")
     print(f"  {len(reg) - len(cov)} have checks that no mutant could break "
           "-- reported as uncovered")
     return 0

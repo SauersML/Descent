@@ -1,4 +1,4 @@
-parsed 987 defs, 2252 theorems
+parsed 989 defs, 2260 theorems
 wrote /Users/user/gnomon/proofs/validation/symbolic/decls.json
 CHECK 1: 30 equilibrium/rest-point definitions
   fixed_point_verified       13
@@ -26,7 +26,7 @@ CHECK 1b: 1 coupled equilibrium systems detected
       solve: twoDemeIMEquilibriumETst = 2 + 1/M   (claimed (2*M + 1)/M)
       unique solution: True
 
-CHECK 3: converted 370 definitions to sympy (607 opaque)
+CHECK 3: converted 370 definitions to sympy (609 opaque)
   symbolically identical groups: 50 (43 spanning more than one file)
   name-mate disagreements      : 31
   homonyms with distinct bodies: 1
@@ -273,27 +273,27 @@ CHECK 3: converted 370 definitions to sympy (607 opaque)
       1 - 1/(2*x0)   @ ['Calibrator.SelectionArchitecture:90']
 
 === opaque reasons ===
-    480  non-real binder
-     13  non-closed-form construct: fun
+    482  non-real binder
      11  Phi expects 0 args [], got 1
      10  non-closed-form construct: let
-      8  non-closed-form construct: with
+      9  non-closed-form construct: with
+      9  non-closed-form construct: then
+      7  non-closed-form construct: fun
       5  lex error at 'ℝ) / (totalMarkers :'
       4  lex error at 'ℝ'
       4  r2FromSignalVariance expects 2 args ['vSignal', 'vNoise'], got 3
       4  propositional
-      4  non-closed-form construct: then
       4  non-closed-form construct: Set
       3  lex error at 'ℝ))) ^ t'
       2  unresolved name Real.eulerMascheroniConstant
       2  lex error at '![1, 1]'
       2  applied non-function driftLDTrajectory
-CHECK 2: 477 derivation-claiming theorems
-  opaque                     272
+CHECK 2: 480 derivation-claiming theorems
+  opaque                     275
   not_an_equation            154
-  derivation_verified        47
-  inconclusive               3
+  derivation_verified        49
   VACUOUS_DERIVATION_NO_DEFS 1
+  inconclusive               1
 
 === VACUOUS_DERIVATION_NO_DEFS (1) ===
   Calibrator.OpenQuestions.brier_uncertainty_formula  (OpenQuestions.lean:379)
@@ -326,12 +326,13 @@ CHECK 4: 21 approximation/limit claims tested
       m -> 0
       s -> 0, m -> 0
       s -> infinity, m -> 0
-MUTATION TESTING: 205 definitions reached by a check
-  definitions with at least one check that provably can fail: 201
+MUTATION TESTING: 206 definitions reached by a check
+  definitions with at least one check that provably can fail: 202
     check3_duplicate_body      165
-    check2_derivation          52
+    check2_derivation          53
     check1_fixed_point         13
-  check/definition pairs where every mutation SURVIVED (vacuous): 7
+  check/definition pairs where every mutation SURVIVED (vacuous): 8
+    Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium  [check2_derivation]  survived: ['scale by 2']
     Calibrator.Conclusions.bernoulliLogLoss  [check2_derivation]  survived: ['shift by 1']
     Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize  [check2_derivation]  survived: ['scale by 2', 'shift by 1']
     Calibrator.DGP.twoLocusIBDCovariance  [check2_derivation]  survived: ['shift by 1']
@@ -351,7 +352,7 @@ findings.json: 210 names with at least one finding
   duplicate              149
   disagreement           62
   gap                    11
-  vacuous_coverage       7
+  vacuous_coverage       8
   naming_gap             6
   vacuous                1
   unstated_regime        1
