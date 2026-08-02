@@ -10020,6 +10020,12 @@
      "Calibrator.MutationDriftModelAssumptions.fstEquilibrium_pos": [],
      "Calibrator.MutationDriftModelAssumptions.fstTransient_nonneg": [],
      "Calibrator.MutationDriftModelAssumptions.fstTransient_le_equilibrium": [],
+     "Calibrator.coefficientEnergy_rescaled_expand": [],
+     "Calibrator.irreducibleDegradation_le_rescaled": [],
+     "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation": [],
+     "Calibrator.rescaled_energy_sub_irreducible_eq_sq": [],
+     "Calibrator.removable_part_nonneg": [],
+     "Calibrator.rescaled_eq_irreducible_iff_optimal": [],
      "Calibrator.nondegenerateGenerationalPopGen_coordinates_at_one": [],
      "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
      "Calibrator.popgenDrivenProxyGenerationalModel_generation_one_scales": [],
@@ -10039,15 +10045,21 @@
     "Calibrator.MutationDriftModelAssumptions_fstTransient_uses_timeScale",
     "Calibrator.PGSEvolutionaryModel.coordinateSummary_explicit",
     "Calibrator.PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor",
+    "Calibrator.coefficientEnergy_rescaled_expand",
     "Calibrator.fstEquilibrium_decreasing_in_migration",
     "Calibrator.fstEquilibrium_decreasing_in_theta",
     "Calibrator.fstEquilibrium_isFixedPoint",
     "Calibrator.fstEquilibrium_lt_one",
     "Calibrator.fstEquilibrium_of_no_flow",
     "Calibrator.fst_ordering",
+    "Calibrator.irreducibleDegradation_le_rescaled",
     "Calibrator.nondegenerateGenerationalPopGen_coordinates_at_one",
     "Calibrator.popgenDrivenProxyGenerationalModel_generation_one_scales",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
+    "Calibrator.removable_part_nonneg",
+    "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation",
+    "Calibrator.rescaled_energy_sub_irreducible_eq_sq",
+    "Calibrator.rescaled_eq_irreducible_iff_optimal",
     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
     "Calibrator.target_r2_changes_along_generation_indexed_af_path",
     "Calibrator.unified_fst_to_covariance_gap",
@@ -40744,6 +40756,12 @@
      "Calibrator.MutationDriftModelAssumptions.fstEquilibrium_pos": [],
      "Calibrator.MutationDriftModelAssumptions.fstTransient_nonneg": [],
      "Calibrator.MutationDriftModelAssumptions.fstTransient_le_equilibrium": [],
+     "Calibrator.coefficientEnergy_rescaled_expand": [],
+     "Calibrator.irreducibleDegradation_le_rescaled": [],
+     "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation": [],
+     "Calibrator.rescaled_energy_sub_irreducible_eq_sq": [],
+     "Calibrator.removable_part_nonneg": [],
+     "Calibrator.rescaled_eq_irreducible_iff_optimal": [],
      "Calibrator.nondegenerateGenerationalPopGen_coordinates_at_one": [],
      "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
      "Calibrator.popgenDrivenProxyGenerationalModel_generation_one_scales": [],
@@ -40763,15 +40781,21 @@
     "Calibrator.MutationDriftModelAssumptions_fstTransient_uses_timeScale",
     "Calibrator.PGSEvolutionaryModel.coordinateSummary_explicit",
     "Calibrator.PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor",
+    "Calibrator.coefficientEnergy_rescaled_expand",
     "Calibrator.fstEquilibrium_decreasing_in_migration",
     "Calibrator.fstEquilibrium_decreasing_in_theta",
     "Calibrator.fstEquilibrium_isFixedPoint",
     "Calibrator.fstEquilibrium_lt_one",
     "Calibrator.fstEquilibrium_of_no_flow",
     "Calibrator.fst_ordering",
+    "Calibrator.irreducibleDegradation_le_rescaled",
     "Calibrator.nondegenerateGenerationalPopGen_coordinates_at_one",
     "Calibrator.popgenDrivenProxyGenerationalModel_generation_one_scales",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
+    "Calibrator.removable_part_nonneg",
+    "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation",
+    "Calibrator.rescaled_energy_sub_irreducible_eq_sq",
+    "Calibrator.rescaled_eq_irreducible_iff_optimal",
     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
     "Calibrator.target_r2_changes_along_generation_indexed_af_path",
     "Calibrator.unified_fst_to_covariance_gap",
@@ -44641,6 +44665,12 @@
      "Calibrator.MutationDriftModelAssumptions.fstEquilibrium_pos": [],
      "Calibrator.MutationDriftModelAssumptions.fstTransient_nonneg": [],
      "Calibrator.MutationDriftModelAssumptions.fstTransient_le_equilibrium": [],
+     "Calibrator.coefficientEnergy_rescaled_expand": [],
+     "Calibrator.irreducibleDegradation_le_rescaled": [],
+     "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation": [],
+     "Calibrator.rescaled_energy_sub_irreducible_eq_sq": [],
+     "Calibrator.removable_part_nonneg": [],
+     "Calibrator.rescaled_eq_irreducible_iff_optimal": [],
      "Calibrator.nondegenerateGenerationalPopGen_coordinates_at_one": [],
      "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
      "Calibrator.popgenDrivenProxyGenerationalModel_generation_one_scales": [],
@@ -44660,15 +44690,21 @@
     "Calibrator.MutationDriftModelAssumptions_fstTransient_uses_timeScale",
     "Calibrator.PGSEvolutionaryModel.coordinateSummary_explicit",
     "Calibrator.PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor",
+    "Calibrator.coefficientEnergy_rescaled_expand",
     "Calibrator.fstEquilibrium_decreasing_in_migration",
     "Calibrator.fstEquilibrium_decreasing_in_theta",
     "Calibrator.fstEquilibrium_isFixedPoint",
     "Calibrator.fstEquilibrium_lt_one",
     "Calibrator.fstEquilibrium_of_no_flow",
     "Calibrator.fst_ordering",
+    "Calibrator.irreducibleDegradation_le_rescaled",
     "Calibrator.nondegenerateGenerationalPopGen_coordinates_at_one",
     "Calibrator.popgenDrivenProxyGenerationalModel_generation_one_scales",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
+    "Calibrator.removable_part_nonneg",
+    "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation",
+    "Calibrator.rescaled_energy_sub_irreducible_eq_sq",
+    "Calibrator.rescaled_eq_irreducible_iff_optimal",
     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
     "Calibrator.target_r2_changes_along_generation_indexed_af_path",
     "Calibrator.unified_fst_to_covariance_gap",
@@ -49475,7 +49511,8 @@
      "IsSymmetricBilinearMatrix B",
      "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
      "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
-     "dot genuine (B.mulVec artifact"
+     "dot genuine (B.mulVec artifact",
+     "0 < coefficientEnergy B beta"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.projection_artifact_implies_standardized_bias_bound": [
@@ -49496,13 +49533,48 @@
       "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
       "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
       "dot genuine (B.mulVec artifact"
+     ],
+     "Calibrator.coefficientEnergy_smul": [],
+     "Calibrator.coefficientEnergy_sub": [
+      "IsSymmetricBilinearMatrix B"
+     ],
+     "Calibrator.coefficientEnergy_rescaled_expand": [
+      "IsSymmetricBilinearMatrix B"
+     ],
+     "Calibrator.irreducibleDegradation_le_rescaled": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_energy_sub_irreducible_eq_sq": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.removable_part_nonneg": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_eq_irreducible_iff_optimal": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
      ]
     }
    },
    "mentioned_by": [
     "Calibrator.coefficientEnergy_add",
+    "Calibrator.coefficientEnergy_rescaled_expand",
+    "Calibrator.coefficientEnergy_smul",
+    "Calibrator.coefficientEnergy_sub",
+    "Calibrator.irreducibleDegradation_le_rescaled",
     "Calibrator.projection_artifact_energy_le_chiSquare_mul_curvature",
     "Calibrator.projection_artifact_implies_standardized_bias_bound",
+    "Calibrator.removable_part_nonneg",
+    "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation",
+    "Calibrator.rescaled_energy_sub_irreducible_eq_sq",
+    "Calibrator.rescaled_eq_irreducible_iff_optimal",
     "Calibrator.total_shift_energy_le_sum_budget_sq"
    ]
   },
@@ -49971,6 +50043,139 @@
    ]
   },
   {
+   "name": "Calibrator.sharedCorrectionOptimum",
+   "short": "sharedCorrectionOptimum",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/ProjectionShiftBounds.lean",
+   "line": 870,
+   "signature": "(B : Matrix ι ι ℝ) (beta theta : ι → ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "B"
+     ],
+     "type": "Matrix ι ι ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "beta",
+      "theta"
+     ],
+     "type": "ι → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  dot beta (B.mulVec theta) / coefficientEnergy B beta",
+   "docstring": "**The optimal recalibration of a transported predictor for one target.**\n\n`a* = (beta' B theta) / (beta' B beta)`, the scalar that best rescales the\ntransported direction `beta` towards the target optimum `theta` in the target\nmetric `B`.  This is the correction a recalibration step finds.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "IsSymmetricBilinearMatrix B",
+     "0 < coefficientEnergy B beta"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_energy_sub_irreducible_eq_sq": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_eq_irreducible_iff_optimal": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation",
+    "Calibrator.rescaled_energy_sub_irreducible_eq_sq",
+    "Calibrator.rescaled_eq_irreducible_iff_optimal"
+   ]
+  },
+  {
+   "name": "Calibrator.irreducibleDegradation",
+   "short": "irreducibleDegradation",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/ProjectionShiftBounds.lean",
+   "line": 881,
+   "signature": "(B : Matrix ι ι ℝ) (beta theta : ι → ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "B"
+     ],
+     "type": "Matrix ι ι ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "beta",
+      "theta"
+     ],
+     "type": "ι → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  coefficientEnergy B theta -\n    dot beta (B.mulVec theta) ^ 2 / coefficientEnergy B beta",
+   "docstring": "**The part of the degradation no rescaling can remove.**\n\n`theta' B theta - (beta' B theta)^2 / (beta' B beta)`, which is the target\nsignal energy times the squared sine of the `B`-angle between `beta` and\n`theta`.  It vanishes when the transported direction is `B`-parallel to the\ntarget truth and is strictly positive otherwise.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "IsSymmetricBilinearMatrix B",
+     "0 < coefficientEnergy B beta"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.irreducibleDegradation_le_rescaled": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_energy_sub_irreducible_eq_sq": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.removable_part_nonneg": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_eq_irreducible_iff_optimal": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.irreducibleDegradation_le_rescaled",
+    "Calibrator.removable_part_nonneg",
+    "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation",
+    "Calibrator.rescaled_energy_sub_irreducible_eq_sq",
+    "Calibrator.rescaled_eq_irreducible_iff_optimal"
+   ]
+  },
+  {
    "name": "Calibrator.quadraticRisk",
    "short": "quadraticRisk",
    "kind": "def",
@@ -50073,6 +50278,7 @@
      "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
      "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
      "dot genuine (B.mulVec artifact",
+     "0 < coefficientEnergy B beta",
      "B.mulVec v = b",
      "∀ z : ι → ℝ, 0 ≤ dot z (B.mulVec z",
      "B.mulVec k = 0",
@@ -50088,6 +50294,32 @@
       "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
       "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
       "dot genuine (B.mulVec artifact"
+     ],
+     "Calibrator.coefficientEnergy_sub": [
+      "IsSymmetricBilinearMatrix B"
+     ],
+     "Calibrator.coefficientEnergy_rescaled_expand": [
+      "IsSymmetricBilinearMatrix B"
+     ],
+     "Calibrator.irreducibleDegradation_le_rescaled": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_energy_sub_irreducible_eq_sq": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.removable_part_nonneg": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
+     ],
+     "Calibrator.rescaled_eq_irreducible_iff_optimal": [
+      "IsSymmetricBilinearMatrix B",
+      "0 < coefficientEnergy B beta"
      ],
      "Calibrator.singular_quadratic_excess_risk_identity": [
       "IsSymmetricBilinearMatrix B",
@@ -50116,7 +50348,14 @@
    "mentioned_by": [
     "Calibrator.best_scalar_correction_attains_floor",
     "Calibrator.coefficientEnergy_add",
+    "Calibrator.coefficientEnergy_rescaled_expand",
+    "Calibrator.coefficientEnergy_sub",
+    "Calibrator.irreducibleDegradation_le_rescaled",
     "Calibrator.normal_solution_minimizes_singular_quadratic_risk",
+    "Calibrator.removable_part_nonneg",
+    "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation",
+    "Calibrator.rescaled_energy_sub_irreducible_eq_sq",
+    "Calibrator.rescaled_eq_irreducible_iff_optimal",
     "Calibrator.scalar_correction_completed_square",
     "Calibrator.singular_minimizer_kernel_invariance",
     "Calibrator.singular_quadratic_excess_risk_identity",
@@ -57803,7 +58042,6 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [
-     "0 < variance E Y",
      "variance E S = variance E Y * lam",
      "covariance E Y S = ρ * variance E Y * Real.sqrt lam"
     ],
@@ -57813,7 +58051,6 @@
      "Calibrator.variance_eq_expect_sq_sub_sq_mean": [],
      "Calibrator.mse_eq_variance_add_variance_sub_two_cov_add_bias_sq": [],
      "Calibrator.mse_from_variance_ratio_corr_bias": [
-      "0 < variance E Y",
       "variance E S = variance E Y * lam",
       "covariance E Y S = ρ * variance E Y * Real.sqrt lam"
      ],
@@ -57872,7 +58109,6 @@
      "∀ i, covariance E (fun ω => noise ω i",
      "∀ i, covariance E factor (fun ω => noise ω i",
      "covarianceMatrix E noise ∈ nuisanceClass",
-     "0 < variance E Y",
      "variance E S = variance E Y * lam",
      "covariance E Y S = ρ * variance E Y * Real.sqrt lam"
     ],
@@ -57903,7 +58139,6 @@
      "Calibrator.covariance_finset_sum_right": [],
      "Calibrator.covariance_with_causal_signal": [],
      "Calibrator.mse_from_variance_ratio_corr_bias": [
-      "0 < variance E Y",
       "variance E S = variance E Y * lam",
       "covariance E Y S = ρ * variance E Y * Real.sqrt lam"
      ]
@@ -57964,7 +58199,6 @@
      "∀ i, E (fun ω => X ω i * (Y ω - dot wStar (X ω",
      "∀ i, E (fun ω => X ω i",
      "covarianceMatrix E X * sigmaInv = 1",
-     "0 < variance E Y",
      "variance E S = variance E Y * lam",
      "covariance E Y S = ρ * variance E Y * Real.sqrt lam"
     ],
@@ -57979,7 +58213,6 @@
       "covarianceMatrix E X * sigmaInv = 1"
      ],
      "Calibrator.mse_from_variance_ratio_corr_bias": [
-      "0 < variance E Y",
       "variance E S = variance E Y * lam",
       "covariance E Y S = ρ * variance E Y * Real.sqrt lam"
      ]
@@ -58028,7 +58261,6 @@
    "equations": [],
    "constraints": {
     "hypotheses": [
-     "0 < variance E Y",
      "variance E S = variance E Y * lam",
      "covariance E Y S = ρ * variance E Y * Real.sqrt lam"
     ],
@@ -58039,7 +58271,6 @@
      "Calibrator.expected_squared_error_given_x": [],
      "Calibrator.mse_eq_variance_add_variance_sub_two_cov_add_bias_sq": [],
      "Calibrator.mse_from_variance_ratio_corr_bias": [
-      "0 < variance E Y",
       "variance E S = variance E Y * lam",
       "covariance E Y S = ρ * variance E Y * Real.sqrt lam"
      ]
@@ -58106,9 +58337,14 @@
      "Calibrator.projection_artifact_energy_le_chiSquare_mul_curvature": [],
      "Calibrator.coefficientEnergy_add": [],
      "Calibrator.total_shift_energy_le_sum_budget_sq": [],
-     "Calibrator.dot_sub_right": [],
      "Calibrator.dot_smul_left": [],
      "Calibrator.dot_smul_right": [],
+     "Calibrator.coefficientEnergy_sub": [],
+     "Calibrator.coefficientEnergy_rescaled_expand": [],
+     "Calibrator.irreducibleDegradation_le_rescaled": [],
+     "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation": [],
+     "Calibrator.rescaled_energy_sub_irreducible_eq_sq": [],
+     "Calibrator.dot_sub_right": [],
      "Calibrator.singular_quadratic_excess_risk_identity": [],
      "Calibrator.normal_solution_minimizes_singular_quadratic_risk": [],
      "Calibrator.singular_minimizer_kernel_invariance": [],
@@ -58145,6 +58381,8 @@
     "Calibrator.ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition",
     "Calibrator.best_scalar_correction_attains_floor",
     "Calibrator.coefficientEnergy_add",
+    "Calibrator.coefficientEnergy_rescaled_expand",
+    "Calibrator.coefficientEnergy_sub",
     "Calibrator.covariance_with_causal_signal",
     "Calibrator.crossCovVector_causalSignal_self",
     "Calibrator.crossCovVector_decomposition",
@@ -58159,6 +58397,7 @@
     "Calibrator.dot_weightedResidualMoment",
     "Calibrator.expected_coordinate_dot_eq_covariance_mulVec",
     "Calibrator.gramForm_witness",
+    "Calibrator.irreducibleDegradation_le_rescaled",
     "Calibrator.master_transport_theorem",
     "Calibrator.master_transport_theorem_closed_form",
     "Calibrator.mean_nonlinear_conditional_excess_eq_quadratic",
@@ -58176,6 +58415,8 @@
     "Calibrator.rawCrossMoment_annihilates_secondMoment_kernel",
     "Calibrator.rawCrossMoment_annihilates_secondMoment_kernel_of_cauchySchwarz",
     "Calibrator.rawCrossMoment_linScore",
+    "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation",
+    "Calibrator.rescaled_energy_sub_irreducible_eq_sq",
     "Calibrator.residualScoreMoment_eq_cross_sub_secondMoment",
     "Calibrator.residualScoreMoment_outcome_change",
     "Calibrator.scalar_correction_completed_square",
@@ -59238,7 +59479,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/TransportIdentities.lean",
-   "line": 818,
+   "line": 817,
    "signature": "(c : ConfusionMatrix) : ℝ",
    "args": [
     {
@@ -59307,7 +59548,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/TransportIdentities.lean",
-   "line": 820,
+   "line": 819,
    "signature": "(c : ConfusionMatrix) : ℝ",
    "args": [
     {
@@ -59346,7 +59587,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/TransportIdentities.lean",
-   "line": 822,
+   "line": 821,
    "signature": "(c : ConfusionMatrix) : ℝ",
    "args": [
     {
@@ -59389,7 +59630,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/TransportIdentities.lean",
-   "line": 824,
+   "line": 823,
    "signature": "(c : ConfusionMatrix) : ℝ",
    "args": [
     {
@@ -59592,9 +59833,7 @@
      "Calibrator.snp_h2_le_narrow_h2": [
       "0 < V_A_total + V_D + V_I + V_E"
      ],
-     "Calibrator.narrow_h2_sub_snp_h2_eq": [
-      "0 < V_A_total + V_D + V_I + V_E"
-     ]
+     "Calibrator.narrow_h2_sub_snp_h2_eq": []
     }
    },
    "mentioned_by": [
@@ -59654,7 +59893,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/VarianceComponents.lean",
-   "line": 139,
+   "line": 137,
    "signature": "{m : ℕ} (p : Fin m → ℝ) (α : Fin m → ℝ) : ℝ",
    "args": [
     {
@@ -59716,7 +59955,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/VarianceComponents.lean",
-   "line": 437,
+   "line": 435,
    "signature": "(h2_observed prevalence z_height : ℝ) : ℝ",
    "args": [
     {
@@ -64975,7 +65214,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/TransportIdentities.lean",
-   "line": 804,
+   "line": 803,
    "signature": "where tp : ℝ fp : ℝ tn : ℝ fn : ℝ tp_nonneg : 0 ≤ tp fp_nonneg : 0 ≤ fp tn_nonneg : 0 ≤ tn fn_nonneg : 0 ≤ fn mass_one : tp + fp + tn + fn = 1",
    "args": [],
    "ret_type": "ℝ fp : ℝ tn : ℝ fn : ℝ tp_nonneg : 0 ≤ tp fp_nonneg : 0 ≤ fp tn_nonneg : 0 ≤ tn fn_nonneg : 0 ≤ fn mass_one : tp + fp + tn + fn = 1",

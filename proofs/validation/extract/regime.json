@@ -1,6 +1,6 @@
 {
  "summary": {
-  "total": 1002,
+  "total": 1004,
   "have_regime": 274,
   "have_external": 40,
   "internally_validated": 205,
@@ -11615,6 +11615,32 @@
    "has_external": false,
    "internally_validated": false
   },
+  "Calibrator.sharedCorrectionOptimum": {
+   "file": "Calibrator/ProjectionShiftBounds.lean",
+   "line": 870,
+   "class": "NOT-EXTRACTABLE",
+   "empirical_status": "UNTESTED",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
+   "external_claimed_in_docstring": [],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
+  },
+  "Calibrator.irreducibleDegradation": {
+   "file": "Calibrator/ProjectionShiftBounds.lean",
+   "line": 881,
+   "class": "NOT-EXTRACTABLE",
+   "empirical_status": "UNTESTED",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
+   "external_claimed_in_docstring": [],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
+  },
   "Calibrator.quadraticRisk": {
    "file": "Calibrator/QuadraticShift.lean",
    "line": 22,
@@ -13735,7 +13761,7 @@
   },
   "Calibrator.ConfusionMatrix.prevalence": {
    "file": "Calibrator/TransportIdentities.lean",
-   "line": 818,
+   "line": 817,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -13748,7 +13774,7 @@
   },
   "Calibrator.ConfusionMatrix.recallRate": {
    "file": "Calibrator/TransportIdentities.lean",
-   "line": 820,
+   "line": 819,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -13761,7 +13787,7 @@
   },
   "Calibrator.ConfusionMatrix.fpr": {
    "file": "Calibrator/TransportIdentities.lean",
-   "line": 822,
+   "line": 821,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -13774,7 +13800,7 @@
   },
   "Calibrator.ConfusionMatrix.precision": {
    "file": "Calibrator/TransportIdentities.lean",
-   "line": 824,
+   "line": 823,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -13845,7 +13871,7 @@
   },
   "Calibrator.additiveVariance": {
    "file": "Calibrator/VarianceComponents.lean",
-   "line": 139,
+   "line": 137,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -13860,7 +13886,7 @@
   },
   "Calibrator.liabilityScaleH2": {
    "file": "Calibrator/VarianceComponents.lean",
-   "line": 437,
+   "line": 435,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],

@@ -220,16 +220,32 @@ def main():
         if not isinstance(v, dict) or "detail" not in v:
             continue
         for k, row in v["detail"].items():
-            ours = [p[0] for p in row["ours"]["params"]]
-            theirs_p = [p[0] for p in row["theirs"]["params"]]
-            if len(theirs_p) < len(ours) and set(theirs_p) <= set(ours):
-                multiline.append((label, k, sorted(set(ours) - set(theirs_p))))
+            our_p = [p[0] for p in row["ours"]["params"]]
+            their_p = [p[0] for p in row["theirs"]["params"]]
+            if len(their_p) < len(our_p) and set(their_p) <= set(our_p):
+                missing = sorted(set(our_p) - set(their_p))
+                # Strongest possible evidence, and it does not require trusting
+                # MY parse at all: does THEIR OWN body reference the name THEIR
+                # OWN parameter list omits?  If so the record is internally
+                # inconsistent and the callable cannot be right.
+                own = [m for m in missing
+                       if re.search(rf"(?<![\w']){re.escape(m)}(?![\w'])",
+                                    row["theirs"]["body"] or "")]
+                row["missing_params"] = missing
+                row["missing_but_used_in_their_own_body"] = own
+                multiline.append((label, k, missing, own))
     if multiline:
         print(f"\n{len(multiline)} of these are the SAME failure: a parameter "
               "dropped from a\nmulti-line signature.  A callable built from the "
               "short list mis-binds every\nargument after the missing one.")
-        for label, k, missing in multiline[:20]:
-            print(f"  {label}  {k}: missing {missing}")
+        selfev = [m for m in multiline if m[3]]
+        print(f"{len(selfev)} of those are self-evidencing: the name is absent "
+              "from their\nparameter list and PRESENT in their own recorded "
+              "body, so the record is\ninternally inconsistent without "
+              "reference to my parse.")
+        for label, k, missing, own in multiline[:24]:
+            mark = f"  <- used in their own body: {own}" if own else ""
+            print(f"  {label}  {k}: missing {missing}{mark}")
 
 
 if __name__ == "__main__":

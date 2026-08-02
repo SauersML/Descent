@@ -1,5 +1,5 @@
 {
- "total": 1002,
+ "total": 1004,
  "extractable": 668,
  "roots": [
   "Calibrator.FrequencyResolvedCohort.correctableClasses",
@@ -229,6 +229,7 @@
   "Calibrator.hudsonFst",
   "Calibrator.hweGenotypeVariance",
   "Calibrator.hweThirdCentralMoment",
+  "Calibrator.irreducibleDegradation",
   "Calibrator.irreducibleTargetResidualBurden",
   "Calibrator.jointDirectCausalKernelAt",
   "Calibrator.jointNovelDirectCausalKernelAt",
@@ -280,6 +281,7 @@
   "Calibrator.scalarCorrectionFloor",
   "Calibrator.scoreVarianceFromSourceWeights",
   "Calibrator.screeningQalyGain",
+  "Calibrator.sharedCorrectionOptimum",
   "Calibrator.sigmaTagCausalSourceAt",
   "Calibrator.sigmaTagCausalTargetAt",
   "Calibrator.sigmaTagTargetAt",
