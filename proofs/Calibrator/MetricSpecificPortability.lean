@@ -1437,16 +1437,6 @@ theorem ldRetentionPerGen_strictAnti_recomb {r₁ r₂ Ne : ℝ}
   unfold ldRetentionPerGen
   nlinarith [hlt, hfac]
 
-/-- **Reconstruction share of a clumped panel**, as a function of the
-recombination rate between adjacent markers, the effective population size, and
-how many markers survive clumping.
-
-Empirical status: UNTESTED. -/
-def ldBlockReconstructionShare (recomb Ne : ℝ)
-    (retainedMarkers totalMarkers : ℕ) : ℝ :=
-  ldBandReconstructionShare (ldRetentionPerGen recomb Ne)
-    (ldPanelRetentionFraction retainedMarkers totalMarkers)
-
 /-- **Detection share of a clumped panel**: the fraction of the whitened
 detection weight — the inverse-LD-kernel trace whose per-variant limit is
 `ImitationRigidity.ldWhiteningGain` — that survives clumping, as a function of

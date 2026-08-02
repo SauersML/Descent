@@ -1,15 +1,18 @@
-parsed 999 defs, 2287 theorems
+parsed 1004 defs, 2321 theorems
 wrote /Users/user/gnomon/proofs/validation/symbolic/decls.json
 CHECK 1: 30 equilibrium/rest-point definitions
-  fixed_point_verified       13
-  no_fixed_point_theorem     9
-  opaque_theorem             5
+  fixed_point_verified       14
+  opaque_theorem             8
+  no_fixed_point_theorem     5
   derived_from_equilibrium   3
 
 --- multiple rest points (relevance question Lean does not ask) ---
    Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium: roots ['0', '-m - m/s + 1']
       0                                        unknown
       -m - m/s + 1                             unknown
+   Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst: roots ['0', '(m*s + m - s)/(s*(m - 1))']
+      0                                        unknown
+      (m*s + m - s)/(s*(m - 1))                unknown
    Calibrator.RareVariantPortability.mutationSelectionBalanceRecessive: roots ['(-mu - sqrt(mu*(mu + 4*s)))/(2*s)', '(-mu + sqrt(mu*(mu + 4*s)))/(2*s)']
       (-mu - sqrt(mu*(mu + 4*s)))/(2*s)        unknown
       (-mu + sqrt(mu*(mu + 4*s)))/(2*s)        unknown
@@ -25,7 +28,7 @@ CHECK 1b: 1 coupled equilibrium systems detected
       solve: twoDemeIMEquilibriumETst = 2 + 1/M   (claimed (2*M + 1)/M)
       unique solution: True
 
-CHECK 3: converted 372 definitions to sympy (627 opaque)
+CHECK 3: converted 374 definitions to sympy (628 opaque)
   symbolically identical groups: 50 (43 spanning more than one file)
   name-mate disagreements      : 32
   homonyms with distinct bodies: 0
@@ -55,8 +58,8 @@ CHECK 3: converted 372 definitions to sympy (627 opaque)
       Calibrator.AncestrySpecificArchitecture.equilibriumFst  (AncestrySpecificArchitecture.lean:353)  ['m', 'Ne']
       Calibrator.PopulationGeneticsFoundations.islandModelFst  (PopulationGeneticsFoundations.lean:791)  ['Ne', 'm']
       Calibrator.PortabilityDrift.fstMigrationDriftEquilibrium  (PortabilityDrift.lean:4569)  ['Ne', 'm']
-      Calibrator.PortabilityDrift.asymmetricFst  (PortabilityDrift.lean:5098)  ['Ne', 'm_into']
-      Calibrator.PortabilityDrift.fstMigDriftEquil  (PortabilityDrift.lean:5304)  ['Ne', 'm']
+      Calibrator.PortabilityDrift.asymmetricFst  (PortabilityDrift.lean:5192)  ['Ne', 'm_into']
+      Calibrator.PortabilityDrift.fstMigDriftEquil  (PortabilityDrift.lean:5398)  ['Ne', 'm']
 
   2*x0*(1 - x0)
       Calibrator.AncestrySpecificPower.genotypeVarianceHWE  (AncestrySpecificPower.lean:95)  ['p']
@@ -122,7 +125,7 @@ CHECK 3: converted 372 definitions to sympy (627 opaque)
   x0/2 + x1/2
       Calibrator.Conventions.meanAlleleFreq  (Conventions.lean:133)  ['p₁', 'p₂']
       Calibrator.PopulationGeneticsFoundations.effectiveMigration  (PopulationGeneticsFoundations.lean:988)  ['m₁₂', 'm₂₁']
-      Calibrator.PortabilityDrift.effectiveSymmetricMigration  (PortabilityDrift.lean:5139)  ['m₁₂', 'm₂₁']
+      Calibrator.PortabilityDrift.effectiveSymmetricMigration  (PortabilityDrift.lean:5233)  ['m₁₂', 'm₂₁']
 
   (x0 - x1)**2/4
       Calibrator.Conventions.betweenSubgroupVariance  (Conventions.lean:167)  ['p₁', 'p₂']
@@ -138,7 +141,7 @@ CHECK 3: converted 372 definitions to sympy (627 opaque)
       Calibrator.Conventions.geometricDecay  (Conventions.lean:716)  ['r', 't']
       Calibrator.DGP.discreteRecombinationSurvival  (DGP.lean:306)  ['recombRate', 'tmrca']
       Calibrator.LongitudinalPortability.ldDecayPerGeneration  (LongitudinalPortability.lean:108)  ['r', 't']
-      Calibrator.PortabilityDrift.admixtureLDDecay  (PortabilityDrift.lean:5160)  ['r', 'generations_since']
+      Calibrator.PortabilityDrift.admixtureLDDecay  (PortabilityDrift.lean:5254)  ['r', 'generations_since']
 
   -x0/x1 + 1
       Calibrator.Conventions.oneMinusRatio  (Conventions.lean:733)  ['a', 'b']
@@ -216,7 +219,7 @@ CHECK 3: converted 372 definitions to sympy (627 opaque)
       Calibrator.LongitudinalPortability.temporalR2  (LongitudinalPortability.lean:216)  ['signalAtTime']
       Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity  (PopulationGeneticsFoundations.lean:100)  ['θ']
       Calibrator.PortabilityDrift.fstFromTau  (PortabilityDrift.lean:38)  ['tau']
-      Calibrator.PortabilityDrift.sharedLDFromMigration  (PortabilityDrift.lean:4966)  ['M']
+      Calibrator.PortabilityDrift.sharedLDFromMigration  (PortabilityDrift.lean:5006)  ['M']
 
   x1/(x0*x2)
       Calibrator.MetricSpecificPortability.fisherTraceMSELowerBound  (MetricSpecificPortability.lean:535)  ['nEff', 'nParams', 'infoPerSample']
@@ -251,8 +254,8 @@ CHECK 3: converted 372 definitions to sympy (627 opaque)
   4*x0*x1/(4*x0*x1 + 1)
       Calibrator.PopulationGeneticsFoundations.hetEquilibrium  (PopulationGeneticsFoundations.lean:1199)  ['Ne', 'mu']
       Calibrator.PortabilityDrift.hetMutationFloor  (PortabilityDrift.lean:460)  ['Ne', 'mu']
-      Calibrator.PortabilityDrift.sharedLD_from_equilibrium  (PortabilityDrift.lean:4940)  ['Ne', 'm']
-      Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence  (PortabilityDrift.lean:5386)  ['Ne', 'm']
+      Calibrator.PortabilityDrift.sharedLD_from_equilibrium  (PortabilityDrift.lean:4980)  ['Ne', 'm']
+      Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence  (PortabilityDrift.lean:5480)  ['Ne', 'm']
 
   x0
       Calibrator.PortabilityDrift.ldOverlapFromSharedLD  (PortabilityDrift.lean:4262)  ['shared_ld']
@@ -269,25 +272,25 @@ CHECK 3: converted 372 definitions to sympy (627 opaque)
 === homonyms ===
 
 === opaque reasons ===
-    489  non-real binder
+    491  non-real binder
      11  Phi expects 0 args [], got 1
      10  non-closed-form construct: else
-     10  non-closed-form construct: let
+      9  non-closed-form construct: let
       8  non-closed-form construct: with
-      7  non-closed-form construct: fun
       7  unexpected token '>'
       5  lex error at 'ℝ) / (totalMarkers :'
       4  lex error at 'ℝ'
       4  r2FromSignalVariance expects 2 args ['vSignal', 'vNoise'], got 3
       4  propositional
+      4  non-closed-form construct: fun
       4  non-closed-form construct: Set
       3  lex error at 'ℝ))) ^ t'
       2  unresolved name Real.eulerMascheroniConstant
       2  lex error at '![1, 1]'
-CHECK 2: 481 derivation-claiming theorems
-  opaque                     273
-  not_an_equation            157
-  derivation_verified        49
+CHECK 2: 489 derivation-claiming theorems
+  opaque                     278
+  not_an_equation            158
+  derivation_verified        51
   VACUOUS_DERIVATION_NO_DEFS 1
   inconclusive               1
 
@@ -299,9 +302,9 @@ CHECK 2: 481 derivation-claiming theorems
 === theorems named for a definition they never mention (6) ===
   Calibrator.AncestrySpecificPower.ncp_from_wald_test:173  -> theorem is named for `ncp` but its statement never mentions it
   Calibrator.DemographicHistory.steppingStoneFst_from_coalescence_time:229  -> theorem is named for `steppingStoneFst` but its statement never mentions it
-  Calibrator.PopulationGeneticsFoundations.fstEquilibrium_derived:1254  -> theorem is named for `fstEquilibrium` but its statement never mentions it
+  Calibrator.PopulationGeneticsFoundations.fstEquilibrium_derived:1358  -> theorem is named for `fstEquilibrium` but its statement never mentions it
   Calibrator.PortabilityDrift.neutralAFBenchmarkRatio_from_state:2914  -> theorem is named for `neutralAFBenchmarkRatio` but its statement never mentions it
-  Calibrator.PortabilityDrift.targetBrierFromNeutralAFBenchmark_eq:3801  -> theorem is named for `targetBrierFromNeutralAFBenchmark` but its statement never mentions it
+  Calibrator.PortabilityDrift.targetBrierFromNeutralAFBenchmark_eq:3882  -> theorem is named for `targetBrierFromNeutralAFBenchmark` but its statement never mentions it
   Calibrator.TransportIdentities.mse_from_variance_ratio_corr_bias:788  -> theorem is named for `mse` but its statement never mentions it
 CHECK 4: 22 approximation/limit claims tested
   skipped_binders_do_not_correspond      18
@@ -329,11 +332,41 @@ CHECK 4: 22 approximation/limit claims tested
       m -> 0
       s -> 0, m -> 0
       s -> infinity, m -> 0
-MUTATION TESTING: 206 definitions reached by a check
-  definitions with at least one check that provably can fail: 202
+CHECK 5: 6 recurrences analysed
+  has_nonzero_rest_point       4
+  ONLY_REST_POINT_IS_ZERO      2
+
+   Calibrator.driftLDTrajectory  (Calibrator/LDDecayTheory.lean:495)
+     step        : _H -> (1 - c)**2*(_H*(1 - 1/(2*Ne)) + 1/(2*Ne))
+     rest points : ['(c - 1)**2/(-2*Ne*(c - 1)**2 + 2*Ne + (c - 1)**2)']
+     limit       : (c - 1)**2/(2*Ne - (2*Ne - 1)*(c - 1)**2)   when (c - 1)**2*Abs(Ne - 1/2)/Ne < 1
+!! Calibrator.ldRecurrence  (Calibrator/LDDecayTheory.lean:937)
+     step        : _H -> _H*(1 - r)
+     rest points : ['0']
+     limit       : 0   when Abs(r - 1) < 1
+!! Calibrator.hetRecurrence  (Calibrator/PopulationGeneticsFoundations.lean:1090)
+     step        : _H -> _H*(1 - 1/(2*Ne))
+     rest points : ['0']
+     limit       : 0   when Abs(Ne - 1/2)/Ne < 1
+   Calibrator.hetMutationDriftRecurrence  (Calibrator/PopulationGeneticsFoundations.lean:1192)
+     step        : _H -> _H*(1 - 1/(2*Ne)) + 2*mu*(1 - _H)
+     rest points : ['4*Ne*mu/(4*Ne*mu + 1)']
+     limit       : 4*Ne*mu/(4*Ne*mu + 1)   when Abs(2*mu - 1 + 1/(2*Ne)) < 1
+   Calibrator.hetMutationRecurrence  (Calibrator/PopulationGeneticsFoundations.lean:1350)
+     step        : _H -> Hstar*(1 - lam) + _H*lam
+     rest points : ['Hstar']
+     limit       : Hstar   when lam < 1
+   Calibrator.hetTrajectory  (Calibrator/PortabilityDrift.lean:443)
+     step        : _H -> _H*(1 - 1/(2*Ne)) + 2*mu*(1 - _H)
+     rest points : ['4*Ne*mu/(4*Ne*mu + 1)']
+     limit       : 4*Ne*mu/(4*Ne*mu + 1)   when Abs(2*mu - 1 + 1/(2*Ne)) < 1
+
+=== definitions consuming a recurrence whose only limit is 0 (0) ===
+MUTATION TESTING: 209 definitions reached by a check
+  definitions with at least one check that provably can fail: 205
     check3_duplicate_body      165
-    check2_derivation          53
-    check1_fixed_point         13
+    check2_derivation          55
+    check1_fixed_point         14
   check/definition pairs where every mutation SURVIVED (vacuous): 8
     Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium  [check2_derivation]  survived: ['scale by 2']
     Calibrator.Conclusions.bernoulliLogLoss  [check2_derivation]  survived: ['shift by 1']
@@ -349,14 +382,16 @@ MUTATION TESTING: 206 definitions reached by a check
 --- check3_duplicates.py
 --- check2_derivations.py
 --- check4_limits.py
+--- check5_recurrences.py
 --- mutation.py
 
 findings.json: 209 names with at least one finding
   duplicate              149
   disagreement           64
-  gap                    9
   vacuous_coverage       8
   naming_gap             6
+  gap                    5
+  degenerate_limit       2
   vacuous                1
   unstated_regime        1
   error                  1

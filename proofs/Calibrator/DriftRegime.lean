@@ -169,17 +169,13 @@ theorem regimes_disagree {Ne H₀ : ℝ} (hNe : 1 / 2 < Ne) (hH : 0 < H₀) {t :
 Each member of the cluster is a function of the single quantity `retention`. That is the
 whole disease: the identities relating them are identities *in* `retention`, so they hold
 at every value of it, correct or not.
+
+The retention is not restated here as a formula of its own. It is the retention of the
+`closedPopulation` regime, and `measuredLoss_closedPopulation` is what says so. A second
+copy of `(1 - 1/(2 Ne))^t` sitting beside the regime it came from is precisely the defect
+this file is about: the copy cannot record which regime it belongs to, so it can be
+carried into a regime where it is false without anything failing.
 -/
-
-/-- The shared premise, isolated as a single number.
-
-    Regime: closed population, no mutation. Isolating it is the point: every
-    member of the cluster is a function of this one value, so every identity among
-    them is an identity in it.
-
-    Empirical status: FALSIFIED at demographic equilibrium; see
-    `closedPopulation`. -/
-noncomputable def driftRetention (Ne : ℝ) (t : ℕ) : ℝ := (1 - 1 / (2 * Ne)) ^ t
 
 /-- Cluster member: heterozygosity loss.
 

@@ -1,5 +1,6 @@
 import Calibrator.PortabilityDrift
 import Calibrator.SelectionArchitecture
+import Calibrator.DriftRegime
 
 namespace Calibrator
 
@@ -99,12 +100,39 @@ used in the portability theorem below.
 
 /-- **Neutral drift factor per generation.**
     Under Wright-Fisher, the probability of NOT coalescing in one generation
-    is (1 - 1/(2*Ne)). The fraction of heterozygosity remaining after t
-    generations is this quantity raised to the t-th power.
+    is (1 - 1/(2*Ne)), and that quantity raised to the t-th power is the
+    fraction of ancestral heterozygosity remaining after t generations *in a
+    closed population with no mutation*.
 
-    Empirical status: UNTESTED. -/
+    Regime: closed population, no mutation. The qualifier is not decoration and
+    the unqualified sentence this docstring used to carry — that the retained
+    fraction *is* this power — is the claim that measurement rejects. Under
+    mutation-drift balance heterozygosity is stationary: simulation at
+    `Ne = 1000`, `t = 4000` measures the retention as `1.025 ± 0.020` where this
+    formula gives `0.135`. `Calibrator.DriftRegime` exhibits the two regimes and
+    proves they disagree at every positive time.
+
+    This body is identical to `driftRetention`, which has carried that
+    falsification since it was found, while this copy stood marked UNTESTED in a
+    different file. That is how a corrected formula survives its own
+    correction, and it is why `neutralDriftFactor_eq_driftRetention` below ties
+    the two: the finding can no longer be recorded on one side alone.
+
+    Empirical status: FALSIFIED at demographic equilibrium; see
+    `closedPopulation` and `driftRetention`. It remains correct inside the
+    declared regime, so the theorems below are conditional on that regime
+    holding rather than false. -/
 noncomputable def neutralDriftFactor (Ne : ℝ) (t : ℕ) : ℝ :=
   (1 - 1 / (2 * Ne)) ^ t
+
+/-- **The falsified retention, under its two names.**
+
+Byte-identical bodies in two files, one of which recorded the falsification and
+one of which did not. Stating the identity means a repair applied to either
+side must be applied to both or this stops compiling — which is exactly the
+protection that was missing while the two drifted apart. -/
+theorem neutralDriftFactor_eq_driftRetention (Ne : ℝ) (t : ℕ) :
+    neutralDriftFactor Ne t = driftRetention Ne t := rfl
 
 /-- **Selected drift factor per generation.**
     Under stabilizing selection with correction s_correction, the
@@ -146,6 +174,16 @@ noncomputable def selectedDriftFactor (Ne : ℝ) (t : ℕ) (s_correction : ℝ) 
     fed, and `fstFromDriftFactor_mem_unit` below states which inputs are
     admissible. Feeding it a factor above `1` -- which `selectedDriftFactor`
     used to permit -- returns a negative `F_ST`.
+
+    **Inherited falsification.** This body, `1 - driftFactor`, is innocent: it
+    is an involution on the unit interval and carries no regime of its own. But
+    an innocent body fed a falsified input yields a falsified result, and the
+    input this file supplies is `neutralDriftFactor`, which is falsified at
+    demographic equilibrium. So every value computed here through that route
+    inherits the closed-population, no-mutation regime, and nothing in this
+    definition's signature or body records that. It is written down here because
+    an inheritance of that kind is invisible otherwise: a reader checking this
+    definition alone finds nothing wrong with it, which is the whole difficulty.
 
     Empirical status: UNTESTED.
 

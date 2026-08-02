@@ -50,6 +50,20 @@ EXPECTED RUNTIME
     20*N_r generations at N_r = 5000.  This is the most expensive item in the
     queue; run it after h1 and h2.
 
+THEORY-PINNED CONTROL (mandatory)
+    CONTROL -- NULL BOTTLENECK.  Run the identical code path with N_b = N_r,
+    i.e. no bottleneck at all. The measured ratio sigma_d^2(post)/sigma_d^2(pre)
+    must then be 1.0, pinned by stationarity: a constant-size population at
+    drift-recombination equilibrium does not move. It is NOT fitted and does
+    not depend on which of Sved / Ohta-Kimura / the corpus recursion is right.
+    A null-bottleneck ratio that departs from 1 means the burn-in was short or
+    the engine drifts, and any amplification measured in the real cells is then
+    that artefact rather than a bottleneck effect. Run it FIRST.
+
+    Note this control is exactly the degenerate cell that can-fail condition 1
+    forbids for the TEST. That is the point: useless as a test, decisive as a
+    control.
+
 REQUIREMENTS
     numpy only.
 """
@@ -111,6 +125,23 @@ def lean_prediction(n_b, n_r, c, t_b, t_r):
 def main():
     rng = np.random.default_rng(20260802)
     out = []
+
+    # ---- CONTROL: no bottleneck, ratio pinned at 1.0 by stationarity -------
+    ctrl = []
+    for rho in RHOS_AT_NB[:2]:
+        c = rho / (4.0 * N_B)
+        x = rng.multinomial(2 * N_R, [0.25] * 4, size=REPS).astype(np.float64) / (2 * N_R)
+        x = step_block(x, N_R, c, 20 * N_R, rng)
+        pre = sigma_d2(x)
+        x2 = step_block(x.copy(), N_R, c, max(T_BS), rng)   # same duration, no size change
+        ctrl.append({
+            "rho_at_Nb": rho, "c": c,
+            "ratio_measured": sigma_d2(x2) / pre,
+            "ratio_theory": 1.0,
+            "pinned_by": "stationarity of a constant-size population at equilibrium",
+        })
+        print(json.dumps({"control_null_bottleneck": ctrl[-1]}), flush=True)
+
     for rho in RHOS_AT_NB:
         c = rho / (4.0 * N_B)
         x = rng.multinomial(2 * N_R, [0.25] * 4, size=REPS).astype(np.float64) / (2 * N_R)
@@ -130,7 +161,8 @@ def main():
                 )
                 out.append(rec)
                 print(json.dumps(rec), flush=True)
-    json.dump(out, open("h3_results.json", "w"), indent=1)
+    json.dump({"control_null_bottleneck": ctrl, "cells": out},
+              open("h3_results.json", "w"), indent=1)
 
 
 if __name__ == "__main__":

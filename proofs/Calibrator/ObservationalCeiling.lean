@@ -115,26 +115,6 @@ theorem no_criterion (B : ProbeBlindness probe P) :
     ¬ ∃ decide : Data → Prop, ∀ o : Object, P o ↔ decide (probe o) :=
   B.no_criterion_of_factors id
 
-/-- Blindness transports along any refinement of the property that agrees on the
-witness pair — useful when a module states its property in several equivalent forms. -/
-def congrProp (B : ProbeBlindness probe P) {Q : Object → Prop}
-    (hpos : Q B.positive) (hneg : ¬ Q B.negative) : ProbeBlindness probe Q where
-  positive := B.positive
-  negative := B.negative
-  same_data := B.same_data
-  holds := hpos
-  fails := hneg
-
-/-- Blindness for a coarser probe follows from blindness for a finer one: if `refine`
-factors the coarse probe through the fine one, the same witness pair works. -/
-def comap (B : ProbeBlindness probe P) {Data' : Type*} (coarse : Data → Data') :
-    ProbeBlindness (fun o => coarse (probe o)) P where
-  positive := B.positive
-  negative := B.negative
-  same_data := by rw [B.same_data]
-  holds := B.holds
-  fails := B.fails
-
 end ProbeBlindness
 
 /-!
@@ -243,20 +223,6 @@ theorem no_stable_criterion_of_tolerance {Object : Type*} {probe : Object → �
   B.no_stable_criterion report hstable
 
 end ApproxProbeBlindness
-
-/-- An exact witness is an approximate witness at any scale that is reflexive on the
-shared probe value. So the approximate law subsumes the exact one, and every instance in
-`Calibrator.BlindnessRegistry` inherits it. -/
-def ProbeBlindness.toApprox {Object Data : Type*} {probe : Object → Data}
-    {P : Object → Prop} (B : ProbeBlindness probe P) {close : Data → Data → Prop}
-    (hrefl : ∀ d : Data, close d d) : ApproxProbeBlindness close probe P where
-  positive := B.positive
-  negative := B.negative
-  close_data := by
-    rw [B.same_data]
-    exact hrefl _
-  holds := B.holds
-  fails := B.fails
 
 /-!
 ## 2. Blindness at every level at once

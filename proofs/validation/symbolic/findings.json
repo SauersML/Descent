@@ -5,7 +5,7 @@
    "severity": "gap",
    "status": "no_fixed_point_theorem",
    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-   "line": 821,
+   "line": 888,
    "detail": {
     "claimed": null,
     "claimed_opaque": "non-closed-form construct: ∏"
@@ -35,77 +35,6 @@
    "detail": {
     "claimed": "1/2 - sqrt(5)/6"
    }
-  }
- ],
- "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst": [
-  {
-   "check": "check1_fixed_point",
-   "severity": "gap",
-   "status": "no_fixed_point_theorem",
-   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 247,
-   "detail": {
-    "claimed": "Max(0, (-m*s - m + s)/(s*(1 - m)))"
-   }
-  },
-  {
-   "check": "check3_name_mate_disagreement",
-   "severity": "disagreement",
-   "status": "NAME_MATE_BODIES_DIFFER",
-   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 247,
-   "this_expr": "Max(0, (-x0*x1 + x0 - x1)/(x0*(1 - x1)))",
-   "other": "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium",
-   "other_expr": "Max(0, (-x0*x1 + x0 - x1)/x0)"
-  }
- ],
- "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium": [
-  {
-   "check": "check1_fixed_point",
-   "severity": "gap",
-   "status": "no_fixed_point_theorem",
-   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 469,
-   "detail": {
-    "claimed": "1/(θ + 1)"
-   }
-  }
- ],
- "Calibrator.PopulationGeneticsFoundations.fstMigrationMutationEquilibrium": [
-  {
-   "check": "check1_fixed_point",
-   "severity": "gap",
-   "status": "no_fixed_point_theorem",
-   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 867,
-   "detail": {
-    "claimed": "1/(4*Ne*m + 4*Ne*μ + 1)"
-   }
-  }
- ],
- "Calibrator.PopulationGeneticsFoundations.hetEquilibrium": [
-  {
-   "check": "check1_fixed_point",
-   "severity": "gap",
-   "status": "no_fixed_point_theorem",
-   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1199,
-   "detail": {
-    "claimed": "4*Ne*mu/(4*Ne*mu + 1)"
-   }
-  },
-  {
-   "check": "check3_duplicate_body",
-   "severity": "duplicate",
-   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
-   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1199,
-   "expression": "4*x0*x1/(4*x0*x1 + 1)",
-   "other_members": [
-    "Calibrator.PortabilityDrift.hetMutationFloor",
-    "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
-    "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence"
-   ]
   }
  ],
  "Calibrator.QuadraticShift.scalarCorrectionFloor": [
@@ -224,7 +153,7 @@
    "severity": "naming_gap",
    "status": "derivation_verified",
    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1254,
+   "line": 1358,
    "statement": "1 - hetEquilibrium Ne mu = 1 / (1 + 4 * Ne * mu)",
    "detail": {
     "names_definition": "fstEquilibrium",
@@ -265,7 +194,7 @@
    "severity": "naming_gap",
    "status": "opaque",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 3801,
+   "line": 3882,
    "statement": "targetExactCalibratedBrierRisk π V_A V_E fstTarget = exactCalibratedBrierRiskFromR2 π (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)",
    "detail": {
     "names_definition": "targetBrierFromNeutralAFBenchmark",
@@ -627,7 +556,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5098,
+   "line": 5192,
    "expression": "1/(4*x0*x1 + 1)",
    "other_members": [
     "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
@@ -643,7 +572,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5304,
+   "line": 5398,
    "expression": "1/(4*x0*x1 + 1)",
    "other_members": [
     "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
@@ -1412,7 +1341,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5139,
+   "line": 5233,
    "expression": "x0/2 + x1/2",
    "other_members": [
     "Calibrator.Conventions.meanAlleleFreq",
@@ -1573,7 +1502,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5160,
+   "line": 5254,
    "expression": "(1 - x0)**x1",
    "other_members": [
     "Calibrator.Conventions.geometricDecay",
@@ -2433,7 +2362,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 4966,
+   "line": 5006,
    "expression": "x0/(x0 + 1)",
    "other_members": [
     "Calibrator.LongitudinalPortability.temporalR2",
@@ -2676,6 +2605,21 @@
    ]
   }
  ],
+ "Calibrator.PopulationGeneticsFoundations.hetEquilibrium": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1199,
+   "expression": "4*x0*x1/(4*x0*x1 + 1)",
+   "other_members": [
+    "Calibrator.PortabilityDrift.hetMutationFloor",
+    "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
+    "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence"
+   ]
+  }
+ ],
  "Calibrator.PortabilityDrift.hetMutationFloor": [
   {
    "check": "check3_duplicate_body",
@@ -2697,7 +2641,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 4940,
+   "line": 4980,
    "expression": "4*x0*x1/(4*x0*x1 + 1)",
    "other_members": [
     "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
@@ -2710,7 +2654,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 4940,
+   "line": 4980,
    "this_expr": "1 - 1/(4*x0*x1 + 1)",
    "other": "Calibrator.PopulationGeneticsFoundations.sharedLDFractionFromMutation",
    "other_expr": "exp(-x0*x1/2)"
@@ -2722,7 +2666,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5386,
+   "line": 5480,
    "expression": "4*x0*x1/(4*x0*x1 + 1)",
    "other_members": [
     "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
@@ -2735,7 +2679,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5386,
+   "line": 5480,
    "this_expr": "1 - 1/(4*x0*x1 + 1)",
    "other": "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio",
    "other_expr": "(1 - x1)/(1 - x0)"
@@ -2939,7 +2883,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5207,
+   "line": 5301,
    "this_expr": "(1 - x0)**x1/x2",
    "other": "Calibrator.LDDecayTheory.admixtureLD",
    "other_expr": "x0*x1*x2*(1 - x0)"
@@ -2999,7 +2943,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-   "line": 1359,
+   "line": 1426,
    "this_expr": "8*x0**2 + 2*x0 - 4",
    "other": "Calibrator.EpistaticChaos.circulantSpectrumB",
    "other_expr": "4*x0**2 + 4*x0 - 2"
@@ -3011,7 +2955,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-   "line": 1366,
+   "line": 1433,
    "this_expr": "4*x0**2 + 4*x0 - 2",
    "other": "Calibrator.EpistaticChaos.circulantSpectrumA",
    "other_expr": "8*x0**2 + 2*x0 - 4"
@@ -3023,7 +2967,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-   "line": 1694,
+   "line": 1765,
    "this_expr": "2*(-4)**x1 + 2**x1 + 6**x1 + 2*(2*x0**2 - x0 - 4)**x1 + 2*(2*x0**2 + x0 - 4)**x1",
    "other": "Calibrator.EpistaticChaos.palindromicCycleDensityB",
    "other_expr": "3*(-2)**x1 + 6**x1 + 2*(x0**2 - 2*x0 - 2)**x1 + 2*(x0**2 + 2*x0 - 2)**x1"
@@ -3035,7 +2979,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-   "line": 1703,
+   "line": 1774,
    "this_expr": "3*(-2)**x1 + 6**x1 + 2*(x0**2 - 2*x0 - 2)**x1 + 2*(x0**2 + 2*x0 - 2)**x1",
    "other": "Calibrator.EpistaticChaos.palindromicCycleDensityA",
    "other_expr": "2*(-4)**x1 + 2**x1 + 6**x1 + 2*(2*x0**2 - x0 - 4)**x1 + 2*(2*x0**2 + x0 - 4)**x1"
@@ -3234,6 +3178,18 @@
      "scale by 2"
     ]
    }
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 247,
+   "this_expr": "Max(0, (-x0*x1 + x0 - x1)/(x0*(1 - x1)))",
+   "other": "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium",
+   "other_expr": "Max(0, (-x0*x1 + x0 - x1)/x0)"
   }
  ],
  "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransient": [
@@ -3437,6 +3393,48 @@
    "this_expr": "x0*(1 - x2) - x1*x2**2 + x2",
    "other": "Calibrator.RareVariantPortability.mutationSelectionBalance",
    "other_expr": "x0/(x0 + x1*x2)"
+  }
+ ],
+ "Calibrator.ldRecurrence": [
+  {
+   "check": "check5_recurrence_limit",
+   "severity": "degenerate_limit",
+   "status": "ONLY_REST_POINT_IS_ZERO",
+   "file": "Calibrator/LDDecayTheory.lean",
+   "line": 937,
+   "detail": {
+    "step": "_H*(1 - r)",
+    "base": "D₀",
+    "rest_points": [
+     "0"
+    ],
+    "slope": "1 - r",
+    "contracting_when": "Abs(r - 1) < 1",
+    "affine": true,
+    "intercept": "0",
+    "limit_if_contracting": "0"
+   }
+  }
+ ],
+ "Calibrator.hetRecurrence": [
+  {
+   "check": "check5_recurrence_limit",
+   "severity": "degenerate_limit",
+   "status": "ONLY_REST_POINT_IS_ZERO",
+   "file": "Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1090,
+   "detail": {
+    "step": "_H*(1 - 1/(2*Ne))",
+    "base": "H₀",
+    "rest_points": [
+     "0"
+    ],
+    "slope": "(Ne - 1/2)/Ne",
+    "contracting_when": "Abs(Ne - 1/2)/Ne < 1",
+    "affine": true,
+    "intercept": "0",
+    "limit_if_contracting": "0"
+   }
   }
  ],
  "Calibrator.Conclusions.bernoulliLogLoss": [

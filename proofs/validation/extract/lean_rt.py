@@ -21,7 +21,17 @@ import math
 pi = math.pi
 
 
+def _is_vec(x):
+    return isinstance(x, (list, tuple))
+
+
 def rdiv(a, b):
+    if _is_vec(a) or _is_vec(b):
+        if _is_vec(a) and _is_vec(b):
+            return [rdiv(x, y) for x, y in zip(a, b)]
+        if _is_vec(a):
+            return [rdiv(x, b) for x in a]
+        return [rdiv(a, y) for y in b]
     return 0.0 if b == 0 else a / b
 
 
@@ -102,3 +112,48 @@ def Phi(x):
 
 def logb(b, x):
     return rdiv(rlog(x), rlog(b))
+
+
+# ------------------------------------------------- elementwise arithmetic
+#
+# `Fin n → ℝ` and `Matrix (Fin p) (Fin q) ℝ` arguments arrive as Python
+# sequences, and Lean writes ordinary `+`, `-`, `*` on them (`Sig_S - Sig_T` is
+# matrix subtraction).  Python lists do not subtract, so generated code for a
+# definition with vector arguments routes arithmetic through these instead.
+# Scalar-only definitions are NOT routed through them and are byte-identical to
+# before, so this cannot perturb anything that already worked.
+
+
+
+def add(a, b):
+    if _is_vec(a) and _is_vec(b):
+        return [add(x, y) for x, y in zip(a, b)]
+    if _is_vec(a):
+        return [add(x, b) for x in a]
+    if _is_vec(b):
+        return [add(a, y) for y in b]
+    return a + b
+
+
+def sub(a, b):
+    if _is_vec(a) and _is_vec(b):
+        return [sub(x, y) for x, y in zip(a, b)]
+    if _is_vec(a):
+        return [sub(x, b) for x in a]
+    if _is_vec(b):
+        return [sub(a, y) for y in b]
+    return a - b
+
+
+def mul(a, b):
+    if _is_vec(a) and _is_vec(b):
+        return [mul(x, y) for x, y in zip(a, b)]
+    if _is_vec(a):
+        return [mul(x, b) for x in a]
+    if _is_vec(b):
+        return [mul(a, y) for y in b]
+    return a * b
+
+
+def neg(a):
+    return [neg(x) for x in a] if _is_vec(a) else -a

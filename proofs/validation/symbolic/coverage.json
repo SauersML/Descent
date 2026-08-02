@@ -110,6 +110,21 @@
    }
   }
  },
+ "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst": {
+  "fqn": "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst",
+  "checks": {
+   "check1_fixed_point": {
+    "covered": true,
+    "mutations_rejected": [
+     "literal 0->1",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": [],
+    "guard": "selectionMigrationEquilibriumMigrationFirst_isFixedPoint"
+   }
+  }
+ },
  "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETss": {
   "fqn": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETss",
   "checks": {
@@ -324,6 +339,21 @@
    }
   }
  },
+ "Calibrator.Conclusions.bernoulliKLReal": {
+  "fqn": "Calibrator.Conclusions.bernoulliKLReal",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.Conclusions.logLoss_regret_eq_kl_pointwise",
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
  "Calibrator.Conclusions.bernoulliLogLoss": {
   "fqn": "Calibrator.Conclusions.bernoulliLogLoss",
   "checks": {
@@ -341,21 +371,6 @@
    "check3_duplicate_body": {
     "covered": true,
     "group_expression": "-x0*log(x1) - (1 - x0)*log(1 - x1)",
-    "mutations_rejected": [
-     "literal 1->2",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
- "Calibrator.Conclusions.bernoulliKLReal": {
-  "fqn": "Calibrator.Conclusions.bernoulliKLReal",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.Conclusions.logLoss_regret_eq_kl_pointwise",
     "mutations_rejected": [
      "literal 1->2",
      "scale by 2",
@@ -390,6 +405,21 @@
    }
   }
  },
+ "Calibrator.Conventions.hudsonFst": {
+  "fqn": "Calibrator.Conventions.hudsonFst",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.Conventions.hudsonFst_eq_varianceRatio",
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
  "Calibrator.Conventions.betweenSubgroupVariance": {
   "fqn": "Calibrator.Conventions.betweenSubgroupVariance",
   "checks": {
@@ -408,21 +438,6 @@
     "group_expression": "(x0 - x1)**2/4",
     "mutations_rejected": [
      "literal 2->3",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
- "Calibrator.Conventions.hudsonFst": {
-  "fqn": "Calibrator.Conventions.hudsonFst",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.Conventions.hudsonFst_eq_varianceRatio",
-    "mutations_rejected": [
-     "literal 1->2",
      "scale by 2",
      "shift by 1"
     ],
@@ -614,21 +629,6 @@
    }
   }
  },
- "Calibrator.DemographicHistory.demoSteppingStoneFst": {
-  "fqn": "Calibrator.DemographicHistory.demoSteppingStoneFst",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.DemographicHistory.steppingStoneFst_from_coalescence_time",
-    "mutations_rejected": [
-     "literal 4->5",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
  "Calibrator.DemographicHistory.steppingStoneCoalescenceTime": {
   "fqn": "Calibrator.DemographicHistory.steppingStoneCoalescenceTime",
   "checks": {
@@ -637,6 +637,21 @@
     "via_theorem": "Calibrator.DemographicHistory.steppingStoneFst_from_coalescence_time",
     "mutations_rejected": [
      "literal 2->3",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.DemographicHistory.demoSteppingStoneFst": {
+  "fqn": "Calibrator.DemographicHistory.demoSteppingStoneFst",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.DemographicHistory.steppingStoneFst_from_coalescence_time",
+    "mutations_rejected": [
+     "literal 4->5",
      "scale by 2",
      "shift by 1"
     ],
@@ -812,20 +827,6 @@
    }
   }
  },
- "Calibrator.PGSCalibrationTheory.logisticRecalibrated": {
-  "fqn": "Calibrator.PGSCalibrationTheory.logisticRecalibrated",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.PGSCalibrationTheory.target_linear_predictor_eq_affine_in_logistic_recalibrated",
-    "mutations_rejected": [
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
  "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope": {
   "fqn": "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
   "checks": {
@@ -841,6 +842,20 @@
    "check3_duplicate_body": {
     "covered": true,
     "group_expression": "x0/x1",
+    "mutations_rejected": [
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.PGSCalibrationTheory.logisticRecalibrated": {
+  "fqn": "Calibrator.PGSCalibrationTheory.logisticRecalibrated",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.PGSCalibrationTheory.target_linear_predictor_eq_affine_in_logistic_recalibrated",
     "mutations_rejected": [
      "scale by 2",
      "shift by 1"
@@ -889,21 +904,6 @@
    }
   }
  },
- "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium": {
-  "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.PopulationGeneticsFoundations.het_plus_fst_eq_one",
-    "mutations_rejected": [
-     "literal 1->2",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
  "Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity": {
   "fqn": "Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity",
   "checks": {
@@ -920,6 +920,21 @@
    "check3_duplicate_body": {
     "covered": true,
     "group_expression": "x0/(x0 + 1)",
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium": {
+  "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.PopulationGeneticsFoundations.het_plus_fst_eq_one",
     "mutations_rejected": [
      "literal 1->2",
      "scale by 2",
@@ -1119,31 +1134,6 @@
    }
   }
  },
- "Calibrator.PortabilityDrift.scaledMigrationRate": {
-  "fqn": "Calibrator.PortabilityDrift.scaledMigrationRate",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium_eq",
-    "mutations_rejected": [
-     "literal 4->5",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   },
-   "check3_duplicate_body": {
-    "covered": true,
-    "group_expression": "4*x0*x1",
-    "mutations_rejected": [
-     "literal 4->5",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
  "Calibrator.PortabilityDrift.sharedLD_from_equilibrium": {
   "fqn": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
   "checks": {
@@ -1169,6 +1159,31 @@
    }
   }
  },
+ "Calibrator.PortabilityDrift.scaledMigrationRate": {
+  "fqn": "Calibrator.PortabilityDrift.scaledMigrationRate",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium_eq",
+    "mutations_rejected": [
+     "literal 4->5",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   },
+   "check3_duplicate_body": {
+    "covered": true,
+    "group_expression": "4*x0*x1",
+    "mutations_rejected": [
+     "literal 4->5",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
  "Calibrator.PortabilityDrift.sharedLDFromMigration": {
   "fqn": "Calibrator.PortabilityDrift.sharedLDFromMigration",
   "checks": {
@@ -1187,6 +1202,35 @@
     "group_expression": "x0/(x0 + 1)",
     "mutations_rejected": [
      "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.PortabilityDrift.signalRetentionMigrationDrift": {
+  "fqn": "Calibrator.PortabilityDrift.signalRetentionMigrationDrift",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.PortabilityDrift.signalRetentionMigrationDrift_eq_ratio",
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.PortabilityDrift.retainedSignalVarianceMigrationDrift": {
+  "fqn": "Calibrator.PortabilityDrift.retainedSignalVarianceMigrationDrift",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.PortabilityDrift.retainedSignalVarianceMigrationDrift_eq",
+    "mutations_rejected": [
      "scale by 2",
      "shift by 1"
     ],
@@ -1293,20 +1337,6 @@
    }
   }
  },
- "Calibrator.VarianceComponents.narrowSenseH2": {
-  "fqn": "Calibrator.VarianceComponents.narrowSenseH2",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.VarianceComponents.narrow_h2_sub_snp_h2_eq",
-    "mutations_rejected": [
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
  "Calibrator.VarianceComponents.snpH2": {
   "fqn": "Calibrator.VarianceComponents.snpH2",
   "checks": {
@@ -1322,6 +1352,20 @@
    "check3_duplicate_body": {
     "covered": true,
     "group_expression": "x0/x1",
+    "mutations_rejected": [
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.VarianceComponents.narrowSenseH2": {
+  "fqn": "Calibrator.VarianceComponents.narrowSenseH2",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.VarianceComponents.narrow_h2_sub_snp_h2_eq",
     "mutations_rejected": [
      "scale by 2",
      "shift by 1"

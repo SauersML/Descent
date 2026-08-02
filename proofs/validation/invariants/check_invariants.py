@@ -19,6 +19,8 @@ import sys
 
 import compile_defs as C
 import invariants as INV
+import totality
+from semantics import admissible_box
 
 HERE = pathlib.Path(__file__).resolve().parent
 
@@ -36,6 +38,41 @@ def check_one(c, defs):
         except Exception as e:
             ok, detail = None, dict(error=f"{type(e).__name__}: {e}")
         out.append(dict(kind=ch["kind"], why=ch["why"], holds=ok, detail=detail))
+    # -- totality artifacts -------------------------------------------
+    # Separate from the other invariants because it needs the instrumented
+    # backend and an exact-point search rather than a sample.
+    d = c.d
+    box, _ = admissible_box(d)
+    blind = [n for n in c.names if box[n]["source"] == "none"]
+    if c.names and not blind:
+        import random
+
+        from invariants import _sample
+
+        pts = _sample(box, c.names, random.Random(0), 40)
+        try:
+            tf = totality.scan(c, box, c.names, pts)
+        except Exception as e:
+            tf = []
+            out.append(dict(kind="totality", why="junk-branch scan",
+                            holds=None, detail=dict(error=str(e))))
+        else:
+            finite = [f for f in tf if f["limit"] not in (float("inf"),
+                                                          float("-inf"))]
+            out.append(dict(
+                kind="totality",
+                why="Lean totalises x/0, log 0 and sqrt of a negative to 0; "
+                    "where such a point is attainable inside the box AND the "
+                    "quantity has a defined limit there, the junk value is a "
+                    "wrong answer inside the domain, not a harmless artifact",
+                holds=not finite,
+                detail=dict(findings=tf[:4], n_findings=len(tf),
+                            n_with_finite_limit=len(finite))))
+    else:
+        skipped.append(("totality", f"cannot place a physically meaningful "
+                                    f"box on {blind}" if blind
+                        else "no arguments to scan"))
+
     return dict(checks=out,
                 skipped=[dict(kind=k, reason=r) for k, r in skipped])
 
@@ -48,8 +85,12 @@ def severity(r):
     asserted MONOTONICITY is next -- the author wrote down the direction and
     the formula disagrees.  Broken SYMMETRY and SCALE invariance follow.
     """
-    weight = dict(absorbing=100, monotone=80, limit=70, continuity=65,
-                  symmetry=60, scale=55)
+    # A totality artifact outranks everything: it is a wrong value at an
+    # attainable point inside the domain, it is silent, and it sits exactly at
+    # the endpoint people care about.  An unbounded range, by contrast, is
+    # usually a missing hypothesis.
+    weight = dict(totality=120, absorbing=100, monotone=80, limit=70,
+                  continuity=65, symmetry=60, scale=55)
     s = -1.0
     for ch in r.get("checks", []):
         if ch["holds"] is False:

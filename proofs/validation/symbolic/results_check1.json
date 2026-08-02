@@ -122,7 +122,7 @@
   "name": "InLinkageEquilibrium",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 821,
+  "line": 888,
   "check": "check1_fixed_point",
   "guard_theorem": null,
   "status": "no_fixed_point_theorem",
@@ -248,10 +248,36 @@
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
   "line": 247,
   "check": "check1_fixed_point",
-  "guard_theorem": null,
-  "status": "no_fixed_point_theorem",
+  "guard_theorem": "selectionMigrationEquilibriumMigrationFirst_isFixedPoint",
+  "status": "fixed_point_verified",
   "detail": {
-   "claimed": "Max(0, (-m*s - m + s)/(s*(1 - m)))"
+   "claimed": "Max(0, (-m*s - m + s)/(s*(1 - m)))",
+   "guard_statement": "continentIslandStepMigrationFirst s m (selectionMigrationEquilibriumMigrationFirst s m) = selectionMigrationEquilibriumMigrationFirst s m",
+   "lhs_map_applied": "(1 - m)*(s + 1)*Max(0, (-m*s - m + s)/(s*(1 - m)))/(s*(1 - m)*Max(0, (-m*s - m + s)/(s*(1 - m))) + 1)",
+   "rhs_claimed": "Max(0, (-m*s - m + s)/(s*(1 - m)))",
+   "residual": "(-s*(m - 1)*Max(0, (m*s + m - s)/(s*(m - 1))) + (m - 1)*(s + 1) + 1)*Max(0, (m*s + m - s)/(s*(m - 1)))/(s*(m - 1)*Max(0, (m*s + m - s)/(s*(m - 1))) - 1)",
+   "map": "continentIslandStepMigrationFirst",
+   "map_roots": [
+    "0",
+    "(m*s + m - s)/(s*(m - 1))"
+   ],
+   "map_derivative": "-p*s*(1 - m)**2*(s + 1)/(p*s*(1 - m) + 1)**2 + (1 - m)*(s + 1)/(p*s*(1 - m) + 1)",
+   "root_stability": [
+    {
+     "root": "0",
+     "stability": "unknown",
+     "derivative": "-(m - 1)*(s + 1)"
+    },
+    {
+     "root": "(m*s + m - s)/(s*(m - 1))",
+     "stability": "unknown",
+     "derivative": "-1/(m*s + m - s - 1)"
+    }
+   ],
+   "multiple_roots": [
+    "0",
+    "(m*s + m - s)/(s*(m - 1))"
+   ]
   }
  },
  {
@@ -261,10 +287,12 @@
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
   "line": 469,
   "check": "check1_fixed_point",
-  "guard_theorem": null,
-  "status": "no_fixed_point_theorem",
+  "guard_theorem": "fstMutationDriftEquilibrium_isFixedPoint",
+  "status": "opaque_theorem",
   "detail": {
-   "claimed": "1/(θ + 1)"
+   "claimed": "1/(θ + 1)",
+   "guard_statement": "scaledIdentityStep θ (fstMutationDriftEquilibrium θ) = fstMutationDriftEquilibrium θ",
+   "reason": "applied non-function scaledIdentityStep"
   }
  },
  {
@@ -274,10 +302,12 @@
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
   "line": 867,
   "check": "check1_fixed_point",
-  "guard_theorem": null,
-  "status": "no_fixed_point_theorem",
+  "guard_theorem": "fstMigrationMutationEquilibrium_isFixedPoint",
+  "status": "opaque_theorem",
   "detail": {
-   "claimed": "1/(4*Ne*m + 4*Ne*μ + 1)"
+   "claimed": "1/(4*Ne*m + 4*Ne*μ + 1)",
+   "guard_statement": "scaledIdentityStep (4 * Ne * m + 4 * Ne * μ) (fstMigrationMutationEquilibrium Ne m μ) = fstMigrationMutationEquilibrium Ne m μ",
+   "reason": "applied non-function scaledIdentityStep"
   }
  },
  {
@@ -287,10 +317,14 @@
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1199,
   "check": "check1_fixed_point",
-  "guard_theorem": null,
-  "status": "no_fixed_point_theorem",
+  "guard_theorem": "hetEquilibrium_isFixedPoint",
+  "status": "opaque_theorem",
   "detail": {
-   "claimed": "4*Ne*mu/(4*Ne*mu + 1)"
+   "claimed": "4*Ne*mu/(4*Ne*mu + 1)",
+   "guard_statement": "hetMutationDriftRecurrence Ne mu (hetEquilibrium Ne mu) 1 = hetEquilibrium Ne mu",
+   "reason": "hetMutationDriftRecurrence expects 3 args ['Ne', 'mu', 'H₀'], got 4",
+   "map": "hetMutationDriftRecurrence",
+   "root_analysis_skipped": "guard theorem is not a self-map in its final argument"
   }
  },
  {
@@ -523,7 +557,7 @@
   "name": "sharedLD_from_equilibrium",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4940,
+  "line": 4980,
   "check": "check1_fixed_point",
   "guard_theorem": null,
   "status": "derived_from_equilibrium",

@@ -47,6 +47,21 @@ EXPECTED RUNTIME
     ~40 min on 16 cores.  6 rho x 2 Ne x 200 replicates x 20*Ne generations.
     Pure numpy, vectorised over replicates; memory < 1 GB.
 
+THEORY-PINNED CONTROLS (mandatory; neither is fitted)
+    CONTROL A -- FREE RECOMBINATION.  At c = 0.5 with the two loci unlinked,
+        rho = 4*Ne*0.5 = 2*Ne is enormous and sigma_d^2 must collapse to the
+        Ohta-Kimura large-rho limit 1/rho = 1/(2*Ne), which for Ne = 250 is
+        0.002. All three candidates agree there, so this control tests the
+        SIMULATOR, not the candidates. If it fails, the two-locus engine is
+        wrong and no other row may be reported.
+    CONTROL B -- MARGINAL ALLELE FREQUENCY.  Under symmetric two-allele
+        mutation at rate MU with no selection, E[p] = 0.5 exactly, by symmetry
+        of the mutation matrix. This is pinned by a symmetry argument and is
+        independent of Ne, c and rho. It catches a biased resampler or a
+        mutation matrix that does not preserve the marginal, either of which
+        would corrupt sigma_d^2 while leaving it superficially plausible.
+    Report both before any sigma_d^2 verdict.
+
 REQUIREMENTS
     numpy only.  No msprime, no SLiM.  Runs anywhere.
 """
@@ -56,6 +71,7 @@ import json
 import numpy as np
 
 RHOS = [0.1, 0.5, 2.0, 10.0, 40.0, 100.0]
+CONTROL_C = 0.5          # free recombination; CONTROL A
 NES = [250, 2000]
 REPS = 200
 MU = 1e-4          # per locus per generation, symmetric two-allele
@@ -63,7 +79,7 @@ BURNIN_MULT = 20   # generations = BURNIN_MULT * Ne
 SAMPLE_EVERY = 50
 
 
-def evolve(ne, c, reps, gens, rng):
+def evolve(ne, c, reps, gens, rng, want_pbar=False):
     """Vectorised two-locus Wright-Fisher on haplotype frequencies.
 
     State: (reps, 4) counts of haplotypes AB, Ab, aB, ab among 2*Ne gametes.
@@ -101,12 +117,37 @@ def evolve(ne, c, reps, gens, rng):
             D = x[:, 0] * x[:, 3] - x[:, 1] * x[:, 2]
             d_sq.append(D ** 2)
             denom.append(pA * (1 - pA) * pB * (1 - pB))
+    if want_pbar:
+        pa = x[:, 0] + x[:, 1]
+        return np.concatenate(d_sq), np.concatenate(denom), float(pa.mean())
     return np.concatenate(d_sq), np.concatenate(denom)
 
 
 def main():
     rng = np.random.default_rng(20260802)
     out = []
+
+    # ---- CONTROL A + B, run first; a failure here invalidates everything ----
+    controls = []
+    for ne in NES:
+        ds, dn, pbar = evolve(ne, CONTROL_C, REPS, BURNIN_MULT * ne, rng,
+                              want_pbar=True)
+        measured = float(ds.mean() / dn.mean())
+        controls.append({
+            "Ne": ne,
+            "control_A_free_recombination": {
+                "sigma_d2_measured": measured,
+                "theory_1_over_rho": 1.0 / (4.0 * ne * CONTROL_C),
+                "pinned_by": "Ohta-Kimura large-rho limit; candidate-independent",
+            },
+            "control_B_marginal_freq": {
+                "mean_p_measured": float(pbar),
+                "theory": 0.5,
+                "pinned_by": "symmetry of the two-allele mutation matrix",
+            },
+        })
+        print(json.dumps({"control": controls[-1]}), flush=True)
+
     for ne in NES:
         for rho in RHOS:
             c = rho / (4.0 * ne)
@@ -123,7 +164,8 @@ def main():
             )
             out.append(rec)
             print(json.dumps(rec), flush=True)
-    json.dump(out, open("h2_results.json", "w"), indent=1)
+    json.dump({"controls": controls, "cells": out},
+              open("h2_results.json", "w"), indent=1)
 
 
 if __name__ == "__main__":
