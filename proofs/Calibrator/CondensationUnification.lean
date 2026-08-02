@@ -1653,8 +1653,18 @@ read fourth moments, which is `σ₁`; floor two sits near `θ = 2` and floor th
 `2, 4, 8, 16, …`.
 
 That is the mechanism. Reading a moment of order `2m` costs a sample budget growing with
-the size of that moment, and for a standardized genotype the moments grow along the ladder
-in a way this corpus has already computed at its first three orders:
+the size of that moment, and for a standardized genotype those moments diverge — **at every
+order, by proof rather than by pattern**:
+
+> `Calibrator.EpistaticChaos.standardizedGenotype_even_moment_lower_bound` :
+> `E[x^(2m)] ≥ (1-2q)^(2m) / V^(m-1)`,
+
+obtained by keeping the heterozygote term and discarding the other two, which are
+non-negative at every order. The general-order identity behind it is
+`standardizedGenotype_even_moment_mul`, `E[x^(2m)] · V^m = E[(g-2q)^(2m)]`, where the
+standardization contributes exactly `V^m` whatever the order.
+
+The three orders this corpus computes in closed form are the instances:
 
 | moment | value | growth as `V → 0` |
 |---|---|---|
@@ -1664,9 +1674,13 @@ in a way this corpus has already computed at its first three orders:
 
 with `V = 2q(1-q)` (`standardizedGenotype_second_moment_one`,
 `standardizedGenotype_fourth_moment`, `standardizedGenotype_sixth_moment`, collected as
-`hweLadderMoments`). The exponent of `V⁻¹` advances by one per moment-order step of two, so
-along the ladder — whose steps *double* the moment order — it advances by `2^(k-1)`. A
-doubling of moment order squares the divergence.
+`hweLadderMoments`). A symbolic check over `m = 1..5`
+(`proofs/validation/coupling/ladder_moments.py`) confirms the sharp form the bound only
+brackets: `V^(m-1) E[x^(2m)] → 1` at every order tested, and `V` divides the numerator
+exactly, so that quantity is a polynomial in `q` equal to `1` at `q = 0`. The exponent of
+`V⁻¹` advances by one per moment-order step of two, so along the ladder — whose steps
+*double* the moment order — it advances by `2^(k-1)`. A doubling of moment order squares
+the divergence.
 
 So the doubly-exponential sample cost is not an accident of how the floors were normalized.
 It is dyadic rung spacing measured against a polynomial sample budget: reachable floors go

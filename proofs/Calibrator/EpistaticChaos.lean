@@ -1097,6 +1097,83 @@ theorem centeredSquare_third_moment_zero_iff_balanced (h : HardyWeinbergModel)
     rw [htwo]
     norm_num
 
+/-- **Every even moment, at every order, in cleared form.**
+
+`E[x^(2m)] · V^m = E[(g - 2q)^(2m)]`: the standardization contributes exactly `V^m`
+whatever the order, because `(√V)^(2m) = V^m`. This is the general-`m` statement that
+the three computed orders are instances of, and it needs no case analysis.
+
+Verified symbolically for `m = 1..5` against the three-point law by
+`proofs/validation/coupling/ladder_moments.py`, which reproduces the corpus's closed
+forms at `m = 1, 2, 3` as its positive control. -/
+theorem standardizedGenotype_even_moment_mul (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (m : ℕ) :
+    (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * m)) *
+        h.genotypeVariance ^ m =
+      ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m) := by
+  have hvar : 0 < h.genotypeVariance := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+    nlinarith [hq0, hcomp]
+  have hpow : Real.sqrt h.genotypeVariance ^ (2 * m) = h.genotypeVariance ^ m := by
+    rw [pow_mul, Real.sq_sqrt hvar.le]
+  have hterm : ∀ g : DiploidGenotype,
+      h.genotypeProb g * h.standardizedGenotype g ^ (2 * m) =
+        h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m) /
+          h.genotypeVariance ^ m := by
+    intro g
+    unfold HardyWeinbergModel.standardizedGenotype
+    rw [div_pow, hpow]
+    ring
+  simp_rw [hterm]
+  rw [← Finset.sum_div, div_mul_cancel₀ _ (ne_of_gt (pow_pos hvar m))]
+
+/-- **The even moments diverge at least like `V^(1-m)`.**
+
+Keeping only the heterozygote term of the three gives
+`E[x^(2m)] · V^m ≥ V · (1-2q)^(2m)`, that is `E[x^(2m)] ≥ (1-2q)^(2m) / V^(m-1)`. The
+other two terms are non-negative, being even powers weighted by probabilities, so
+dropping them is legitimate at every order.
+
+This is what turns the ladder's growth claim from a pattern into a theorem. It is a
+lower bound rather than the full asymptotic law — the symbolic check finds
+`V^(m-1) E[x^(2m)] → 1` at every order through `m = 5`, and `V` divides the numerator
+exactly, so that quantity is a polynomial in `q` taking the value `1` at `q = 0` — but
+the bound is what the divergence needs, and it holds at every `m` by proof rather than
+by inspection of finitely many orders. -/
+theorem standardizedGenotype_even_moment_lower_bound (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (m : ℕ) :
+    h.genotypeVariance * (1 - 2 * h.altFreq) ^ (2 * m) ≤
+      (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * m)) *
+        h.genotypeVariance ^ m := by
+  rw [standardizedGenotype_even_moment_mul h hq0 hq1 m]
+  have hpow_nonneg : ∀ g : DiploidGenotype,
+      0 ≤ h.centeredAltAlleleCount g ^ (2 * m) := by
+    intro g
+    rw [pow_mul]
+    exact pow_nonneg (sq_nonneg _) m
+  have hhet : h.genotypeProb DiploidGenotype.het *
+      h.centeredAltAlleleCount DiploidGenotype.het ^ (2 * m) =
+        h.genotypeVariance * (1 - 2 * h.altFreq) ^ (2 * m) := by
+    have hcentered : h.centeredAltAlleleCount DiploidGenotype.het =
+        1 - 2 * h.altFreq := by
+      unfold HardyWeinbergModel.centeredAltAlleleCount
+      rw [h.expectedAltAlleleCount_eq]
+      simp only [altAlleleCount]
+      ring
+    rw [hcentered, h.genotypeVariance_eq]
+    simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq]
+    ring
+  calc h.genotypeVariance * (1 - 2 * h.altFreq) ^ (2 * m)
+      = h.genotypeProb DiploidGenotype.het *
+          h.centeredAltAlleleCount DiploidGenotype.het ^ (2 * m) := hhet.symm
+    _ ≤ ∑ g : DiploidGenotype,
+          h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m) :=
+        Finset.single_le_sum
+          (fun g _ => mul_nonneg (h.genotypeProb_nonneg g) (hpow_nonneg g))
+          (Finset.mem_univ _)
+
 /-!
 ### The sign bias of a genotype coordinate, and what is open about it
 
