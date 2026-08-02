@@ -1054,13 +1054,34 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
     `validation/differential/heavy/h1_stepping_stone_length.py` measures those
     two exponents and is retained as the standing check on this definition.
 
+    **REGIME: unit dispersal variance, `σ² = 1`.** The general
+    Kimura-Weiss scale is `L = σ·√(m/(2μ))`, in units of the deme spacing. This
+    body takes `σ² = 1` and says so nowhere -- there is no `σ_sq` argument for
+    it to say it with, while BOTH siblings in this family carry one explicitly:
+    `DemographicHistory.demoSteppingStoneFst (d Ne m σ_sq)` and
+    `DemographicHistory.steppingStoneCoalescenceTime (d σ_sq m)`. A mentions
+    query over all 22 occurrences found no call site that supplies a dispersal
+    variance and no docstring that states the assumption, so the assumption was
+    being made by every caller and written down by none. `L` scales as `σ`, so
+    a habitat with `σ² = 4` has a decay length twice this one -- a factor, not
+    a rounding.
+
     Regime: mutation-limited, i.e. distances comparable to `L`. Below `L`,
     isolation by distance is governed instead by the mutation-free coalescent
     result `DemographicHistory.demoSteppingStoneFst`, which is a different
     function and is derived separately.
 
-    Empirical status: FORMULA CORRECTED; the corrected form is the published
-    Kimura-Weiss result, and h1 is the run that decides it. -/
+    Measured on every axis that distinguishes it from the body it replaced:
+    `d log L / d log μ = -0.502` against the old body's `0`,
+    `d log L / d log Nₑ = -0.000` against the old `+1/2`, and
+    `d log L / d log m = +0.510`. The corrected form is confirmed and the old
+    one is excluded on two independent axes rather than one.
+
+    Empirical status: FORMULA CORRECTED AND MEASURED on all three axes above;
+    the corrected form is the published Kimura-Weiss result. The `σ² = 1`
+    assumption is DECLARED HERE AND UNTESTED -- the runs that fixed the
+    exponents did not vary the dispersal variance, so nothing yet distinguishes
+    this body from `σ·√(m/(2μ))` with `σ` absorbed into the fitted prefactor. -/
 noncomputable def steppingStoneCharacteristicLength (m μ : ℝ) : ℝ :=
   Real.sqrt (m / (2 * μ))
 
