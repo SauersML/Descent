@@ -1946,7 +1946,7 @@ theorem sourceR2FromSourceWeights_exact_metric_law {p q : ℕ}
     r2FromSourceWeights m Pop.source =
       (predictiveCovarianceFromSourceWeights m Pop.source) ^ 2 /
         (scoreVarianceFromSourceWeights m Pop.source * (m.outcomeVariance Pop.source)) := by
-  unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights Pop.source
+  unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights
   ring_nf
 
 /-- The target `R²` is exactly the explained signal variance from the explicit
@@ -1971,7 +1971,7 @@ theorem targetR2FromSourceWeights_exact_metric_portability_law {p q : ℕ}
     r2FromSourceWeights m Pop.target =
       (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
         (scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target) := by
-  unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights Pop.target
+  unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights
   ring_nf
 
 /-- Exact mechanistic source/target `R²` portability ratio law. The ratio is
@@ -3238,7 +3238,7 @@ theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.source) := by
   have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 := by
     exact ne_of_gt (m.outcomeVariance_pos Pop.source)
-  unfold equalVarianceGaussianAUCFromSourceWeights gaussianAUCFromSignalVariance Pop.source
+  unfold equalVarianceGaussianAUCFromSourceWeights gaussianAUCFromSignalVariance
     residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2 Pop.source
     r2FromSourceWeights
   congr 1
@@ -3300,7 +3300,7 @@ theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) := by
   have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 := by
     exact ne_of_gt (effectiveTargetOutcomeVariance_pos m)
-  unfold equalVarianceGaussianAUCFromSourceWeights gaussianAUCFromSignalVariance Pop.target
+  unfold equalVarianceGaussianAUCFromSourceWeights gaussianAUCFromSignalVariance
     residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2 Pop.target
     r2FromSourceWeights
   congr 1
