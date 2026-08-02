@@ -86,6 +86,27 @@ The instantiation in `Calibrator.PolygenicSpectroscopy` was built on the
 symmetry-free side, so nothing there is retracted by this record. The record
 exists so that the symmetry-gated statements are not quoted about genotypes at
 frequencies where their hypothesis is false.
+
+## A second gate: disjointness of the tested locus-sets
+
+The title of this file says "independent chaos designs", and independence there
+means *disjoint variable supports*. That condition used to live only in prose.
+It is now the `isDisjoint` field of `ChaosSpectroscopy`, a hypothesis of the
+`barrier` field, and a restriction on the type of every experiment in the
+namespace, because it is not a technical convenience:
+
+* on disjoint designs the achievable limits are the Gaussian segment
+  `{N(0, s²) : 0 ≤ s² ≤ 1}`, so the trichotomy has something to be complete
+  *about*;
+* on designs whose tested locus-sets share variants the achievable limits are
+  weakly dense in the entire moment body — every centered law with second moment
+  at most one — uniformly over the coordinate law. See
+  `Calibrator.EpistaticChaos.ChaosLimitSpectrum`.
+
+Genetically this is the difference between burden or kernel statistics over
+non-overlapping genes and partitioned windows (gated in), and sliding windows,
+overlapping gene-set panels, and any recurrently tested pleiotropic variant
+(gated out). Nothing in this file may be quoted about the second class.
 -/
 
 open scoped BigOperators
@@ -199,9 +220,23 @@ at the type level rather than buried, matching the convention in
 /-- An independent-design chaos spectroscopy over a class of coordinate laws.
 
 `Law` ranges over symmetric unit-variance coordinate laws with all moments finite;
-`Design` over admissible disjoint-support multilinear designs (arbitrary degrees,
-arbitrary coefficients with unit `L2` norm and vanishing max coefficient);
-`Limit` over limit laws.
+`Design` over admissible multilinear designs (arbitrary degrees, arbitrary
+coefficients with unit `L2` norm and vanishing max coefficient); `Limit` over
+limit laws.
+
+**Disjointness is a field, not a comment.** An earlier version of this structure
+said in prose that `Design` ranged over *disjoint-support* designs while the
+`barrier` field quantified over every `D : Design`. Read literally that asserted
+the barrier for overlapping designs too, which is false:
+`Calibrator.EpistaticChaos.ChaosLimitSpectrum.admissibility_alone_certifies_only_the_moment_body`
+shows that once tested locus-sets share variants the achievable limits fill the
+whole moment body, so a pair of laws with equal observable triples has no reason
+to produce equal limits there. The support condition is now the `isDisjoint`
+field and `barrier` carries it as a hypothesis; every consequence below is
+restricted to the disjoint sub-family accordingly. In genetics the restriction is
+exactly the one of `Calibrator.EpistaticChaos.InteractionDesign.VariantDisjoint`:
+non-overlapping genes, disjoint LD blocks, partitioned windows — and not sliding
+windows or overlapping pathway panels.
 
 **Genotype applicability — read this before instantiating `Law` at a genotype.**
 The symmetry restriction on `Law` is not decoration; the barrier field is
@@ -230,33 +265,58 @@ the ones that never invoke symmetry: the lattice arithmetic of Section 1 and
 structure ChaosSpectroscopy (Law Design Limit : Type*) where
   /-- The observable triple of a coordinate law. -/
   observables : Law → MellinObservables
+  /-- The tested monomials have pairwise disjoint variable sets. This is the
+  hypothesis the barrier depends on, and it is a field so that it appears in the
+  type of every result below. -/
+  isDisjoint : Design → Prop
   /-- The limit law of a design under a coordinate law, when it exists. -/
   limitLaw : Law → Design → Limit
   /-- **Theorem 1a, nonlattice barrier (analytic input).** Two laws agreeing in the
-  full observable triple are indistinguishable by every independent design.
+  full observable triple are indistinguishable by every **disjoint** design.
   Discharged for nonlattice laws by Stone's local CLT via the unit-slab decomposition
-  of the exact tilt identity `P(L > y) = Etilde[exp(-(Ltilde - y)); Ltilde > y]`. -/
+  of the exact tilt identity `P(L > y) = Etilde[exp(-(Ltilde - y)); Ltilde > y]`.
+
+  The disjointness hypothesis is not removable: for overlapping designs the
+  achievable limits are dense in the whole moment body over any fixed coordinate
+  law, so equal observables cannot force equal limits. -/
   barrier : ∀ ν ν' : Law, observables ν = observables ν' →
-    ∀ D : Design, limitLaw ν D = limitLaw ν' D
+    ∀ D : Design, isDisjoint D → limitLaw ν D = limitLaw ν' D
 
 namespace ChaosSpectroscopy
 
 variable {Law Design Limit : Type*} (S : ChaosSpectroscopy Law Design Limit)
 
+/-- The record an experimenter obtains from a coordinate law when restricted to
+disjoint designs: the limit law of each disjoint design.
+
+Every completeness statement below is about this record and not about the full
+design-indexed family, which is the type-level form of the disjointness licence.
+
+Empirical status: DERIVED. A restriction of the `limitLaw` field to a
+sub-family; no modelling content and no free parameter. -/
+def disjointRecord (ν : Law) : {D : Design // S.isDisjoint D} → Limit :=
+  fun D => S.limitLaw ν D.1
+
 /-- **The observable algebra is exactly three-dimensional: nothing beyond the triple
-is measurable.** Any experiment that reports a function of the design limits is a
-function of the observable triple alone.
+is measurable by disjoint designs.** Any experiment that reports a function of the
+*disjoint*-design limits is a function of the observable triple alone.
+
+The experiment is typed as a function of `S.disjointRecord`, so it can only read
+limits of designs whose tested locus-sets are pairwise disjoint. That restriction
+is the content of the correction recorded in the `ChaosSpectroscopy` docstring: an
+experiment allowed to use overlapping designs is not covered, and by
+`Calibrator.EpistaticChaos` its reports are not constrained by the triple.
 
 Genotype applicability: inherits the symmetry restriction on `Law`, so the
 genotype instantiation is licensed only at `q = 1/2`. See the `ChaosSpectroscopy`
 docstring. -/
 theorem experiment_factors_through_observables
-    {Report : Type*} (experiment : (Design → Limit) → Report)
+    {Report : Type*} (experiment : ({D : Design // S.isDisjoint D} → Limit) → Report)
     (ν ν' : Law) (h : S.observables ν = S.observables ν') :
-    experiment (S.limitLaw ν) = experiment (S.limitLaw ν') := by
+    experiment (S.disjointRecord ν) = experiment (S.disjointRecord ν') := by
   congr 1
   funext D
-  exact S.barrier ν ν' h D
+  exact S.barrier ν ν' h D.1 D.2
 
 /-- **Chameleon calibration.** A *chameleon* is a coordinate law that is not the
 Gaussian but has the Gaussian's observable triple. Every independent-design criterion
@@ -272,12 +332,12 @@ docstring. This is not a limitation on the instrument's use against *dosage*
 surrogates, which is its intended use — it is a limitation on reading the
 conclusion back onto hard-called genotypes at an arbitrary allele frequency. -/
 theorem chameleon_passes_every_independent_criterion
-    {Report : Type*} (experiment : (Design → Limit) → Report)
+    {Report : Type*} (experiment : ({D : Design // S.isDisjoint D} → Limit) → Report)
     (accept : Report → Prop)
     (gaussianLaw chameleon : Law)
     (hjet : S.observables chameleon = S.observables gaussianLaw)
-    (hgauss : accept (experiment (S.limitLaw gaussianLaw))) :
-    accept (experiment (S.limitLaw chameleon)) := by
+    (hgauss : accept (experiment (S.disjointRecord gaussianLaw))) :
+    accept (experiment (S.disjointRecord chameleon)) := by
   rwa [S.experiment_factors_through_observables experiment chameleon gaussianLaw hjet]
 
 /-- **No independent-design criterion decides Gaussianity.** If a chameleon exists
@@ -288,19 +348,20 @@ Genotype applicability: inherits the symmetry restriction on `Law`, so the
 genotype instantiation is licensed only at `q = 1/2`. See the `ChaosSpectroscopy`
 docstring. -/
 theorem no_independent_design_criterion_decides_gaussianity
-    {Report : Type*} (experiment : (Design → Limit) → Report)
+    {Report : Type*} (experiment : ({D : Design // S.isDisjoint D} → Limit) → Report)
     (gaussianLaw chameleon : Law)
     (hne : chameleon ≠ gaussianLaw)
     (hjet : S.observables chameleon = S.observables gaussianLaw) :
     ¬ ∃ accept : Report → Prop,
-        ∀ ν : Law, ν = gaussianLaw ↔ accept (experiment (S.limitLaw ν)) :=
+        ∀ ν : Law, ν = gaussianLaw ↔ accept (experiment (S.disjointRecord ν)) :=
   ({ positive := gaussianLaw
      negative := chameleon
      same_data :=
        (S.experiment_factors_through_observables experiment chameleon gaussianLaw hjet).symm
      holds := rfl
      fails := hne } :
-      ProbeBlindness (fun ν => experiment (S.limitLaw ν)) (fun ν => ν = gaussianLaw)).no_criterion
+      ProbeBlindness (fun ν => experiment (S.disjointRecord ν))
+        (fun ν => ν = gaussianLaw)).no_criterion
 
 end ChaosSpectroscopy
 

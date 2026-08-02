@@ -196,6 +196,571 @@ theorem total_shift_energy_le_sum_budget_sq
   rw [coefficientEnergy_add B genuine artifact hsymmetric]
   nlinarith
 
+/-!
+## The detection/reconstruction frontier for rank-limited reductions
+
+Everything above bounds the movement of a projection.  This section asks a
+different question about the same object: **what is a dimension reduction
+for?**
+
+Fix a background covariance already diagonalised, with eigenvalues
+`spectrum i > 0`.  Two tasks are run on the same reduced data.
+
+* **Detection** of a weak spike.  The optimal linear certificate weights each
+  eigendirection by the inverse background variance, `1 / σᵢ`: a direction with
+  little background noise is a direction in which a small signal is visible.
+  Detection power is therefore carried by the *smallest*-variance directions.
+* **Reconstruction / denoising.**  The optimal weights are the signal-variance
+  shares, increasing in `σᵢ`; the fraction of variance retained is exactly what
+  a principal-component truncation maximises.  Reconstruction accuracy is
+  carried by the *largest*-variance directions.
+
+The two weight profiles are inversely ordered (`weight_orders_reversed`), and
+that single fact drives everything else here.
+
+### Why this is about LD pruning
+
+LD pruning and clumping keep one representative marker per correlated block and
+discard the rest.  In the eigenbasis of the LD kernel that is precisely the
+operation "keep the high-variance directions, discard the low-variance ones":
+the discarded directions are the tightly-linked contrasts, which are exactly
+where the *inverse* LD kernel is large.  `Calibrator.ImitationRigidity` computes
+that inverse trace in closed form for a stationary chromosome
+(`ldWhiteningGain`), so pruning is not being accused of a vague inefficiency —
+it discards a computable amount of the quantity every whitened detection
+threshold is stated in.  `topVariance_minimizes_detection` below turns that into
+a prohibition: among reductions of a given rank, the variance-greedy one is the
+*worst possible* choice for detection.
+
+### Scope, stated honestly
+
+Everything below is proved for **linear, projection-type reductions**, relaxed
+to the spectrahedron `{0 ≤ M ≤ I, tr M ≤ k}` and then diagonalised.  The
+diagonalisation is legitimate here because both objective matrices are functions
+of the background and hence commute with it, so the Pareto problem is a linear
+program in the eigenvalue coordinates; that is why the allocations below are
+vectors `M : ι → ℝ` rather than matrices.  This is *not* proved for arbitrary
+measurable reductions, and it should not be quoted as if it were: extending it
+would need a joint data-processing inequality for the pair of tasks, and no such
+inequality exists — applying data processing to each task separately yields only
+the trivial unit box.
+-/
+
+section DetectionReconstructionFrontier
+
+/-- **Detection weight of an eigendirection** with background variance `s`.
+
+The whitened certificate that maximises noncentrality against a weak spike
+weights each direction by the inverse background variance.  This is the same
+`1/σ` that produces the inverse-kernel trace in
+`Calibrator.ImitationRigidity.ldWhiteningGain`.
+
+Empirical status: UNTESTED. -/
+def detectionWeight (s : ℝ) : ℝ := s⁻¹
+
+/-- **Reconstruction weight of an eigendirection** with background variance `s`:
+the direction's own variance, i.e. its share of the total signal energy.  A
+rank-`k` truncation maximising `∑ σᵢ` over retained directions is what
+principal-component truncation does.
+
+Empirical status: UNTESTED. -/
+def reconstructionWeight (s : ℝ) : ℝ := s
+
+/-- **Wiener (denoising) weight** `σ / (σ + noise)`: the shrinkage factor of the
+optimal linear denoiser in a direction with signal variance `s` and additive
+noise level `noise`.  Recorded so that the inverse-ordering conclusion is not an
+artefact of the particular reconstruction profile chosen — `wienerWeight` is a
+different, strictly increasing function of `s` and gives the same ordering.
+
+Empirical status: UNTESTED. -/
+def wienerWeight (noise s : ℝ) : ℝ := s / (s + noise)
+
+/-- **Detection weights are strictly decreasing in the background variance.** -/
+theorem detectionWeight_strictAnti {s₁ s₂ : ℝ} (h₁ : 0 < s₁) (h : s₁ < s₂) :
+    detectionWeight s₂ < detectionWeight s₁ := by
+  have h₂ : 0 < s₂ := lt_trans h₁ h
+  have hprod : 0 < s₁ * s₂ := mul_pos h₁ h₂
+  have e1 : s₂⁻¹ * (s₁ * s₂) = s₁ := by
+    rw [show s₁ * s₂ = s₂ * s₁ by ring, ← mul_assoc,
+      inv_mul_cancel₀ (ne_of_gt h₂), one_mul]
+  have e2 : s₁⁻¹ * (s₁ * s₂) = s₂ := by
+    rw [← mul_assoc, inv_mul_cancel₀ (ne_of_gt h₁), one_mul]
+  have key : s₂⁻¹ * (s₁ * s₂) < s₁⁻¹ * (s₁ * s₂) := by
+    rw [e1, e2]; exact h
+  unfold detectionWeight
+  exact lt_of_mul_lt_mul_right key (le_of_lt hprod)
+
+/-- **Reconstruction weights are strictly increasing in the background
+variance.** -/
+theorem reconstructionWeight_strictMono {s₁ s₂ : ℝ} (h : s₁ < s₂) :
+    reconstructionWeight s₁ < reconstructionWeight s₂ := h
+
+/-- The Wiener profile is strictly increasing too: the inverse ordering is a
+property of the two *tasks*, not of the particular reconstruction weight. -/
+theorem wienerWeight_strictMono {noise s₁ s₂ : ℝ}
+    (hn : 0 < noise) (h₁ : 0 < s₁) (h : s₁ < s₂) :
+    wienerWeight noise s₁ < wienerWeight noise s₂ := by
+  have h₂ : 0 < s₂ := lt_trans h₁ h
+  have d₁ : 0 < s₁ + noise := by linarith
+  have d₂ : 0 < s₂ + noise := by linarith
+  unfold wienerWeight
+  rw [div_lt_div_iff d₁ d₂]
+  nlinarith
+
+/-- **The two weight profiles are inversely ordered.**  On a background with
+distinct eigenvalues, moving to a higher-variance direction strictly increases
+the reconstruction weight and strictly decreases the detection weight.  No
+reduction can therefore be greedy for both tasks at once, and the rest of this
+section quantifies the resulting loss. -/
+theorem weight_orders_reversed {s₁ s₂ : ℝ} (h₁ : 0 < s₁) (h : s₁ < s₂) :
+    reconstructionWeight s₁ < reconstructionWeight s₂ ∧
+      detectionWeight s₂ < detectionWeight s₁ :=
+  ⟨reconstructionWeight_strictMono h, detectionWeight_strictAnti h₁ h⟩
+
+/-- **A relaxed rank-`k` reduction**, written in the eigenbasis of the
+background.  `M i` is the fraction of eigendirection `i` that survives the
+reduction; `0 ≤ M ≤ 1` is the operator constraint `0 ≤ M ≤ I` and the trace
+condition is the rank budget.  Genuine rank-`k` projections are the `0/1`
+points of this set; the relaxation is what makes both task efficiencies linear.
+
+The trace is pinned to `k` rather than bounded by it because the minimisation
+results below are statements about reductions that actually *use* their budget:
+with `tr M ≤ k` the detection minimum is attained trivially by `M = 0`.
+
+Empirical status: UNTESTED. -/
+structure IsRankAllocation (k : ℝ) (M : ι → ℝ) : Prop where
+  lower : ∀ i, 0 ≤ M i
+  upper : ∀ i, M i ≤ 1
+  trace : ∑ i, M i = k
+
+/-- Weight captured by an allocation: the linear functional both task
+efficiencies are built from.
+
+Empirical status: UNTESTED. -/
+def spectralCapture (w M : ι → ℝ) : ℝ := ∑ i, M i * w i
+
+/-- Total available weight of a profile: the denominator of both efficiencies.
+
+Empirical status: UNTESTED. -/
+def spectralTotal (w : ι → ℝ) : ℝ := ∑ i, w i
+
+/-- **Reconstruction efficiency**: the fraction of total background variance
+retained by the reduction.  This is the quantity a scree plot reports.
+
+Empirical status: UNTESTED. -/
+def reconstructionEfficiency (spectrum M : ι → ℝ) : ℝ :=
+  spectralCapture (fun i => reconstructionWeight (spectrum i)) M /
+    spectralTotal (fun i => reconstructionWeight (spectrum i))
+
+/-- **Detection efficiency**: the fraction of the total inverse-variance
+(whitened) weight retained by the reduction.  For an LD kernel the denominator
+is the inverse-kernel trace whose closed form is
+`Calibrator.ImitationRigidity.ldWhiteningGain`.
+
+Empirical status: UNTESTED. -/
+def detectionEfficiency (spectrum M : ι → ℝ) : ℝ :=
+  spectralCapture (fun i => detectionWeight (spectrum i)) M /
+    spectralTotal (fun i => detectionWeight (spectrum i))
+
+/-- The variance-greedy ("pruning") allocation: keep the directions in `S`
+entirely and discard everything else.  LD pruning and clumping are of this form
+with `S` the high-variance block representatives.
+
+Empirical status: UNTESTED. -/
+def pruneAllocation (S : Finset ι) : ι → ℝ := fun i => if i ∈ S then 1 else 0
+
+/-- Dividing a proved capture inequality by a fixed positive total.  Stated
+separately so that no efficiency-level result depends on the exact name of a
+division-monotonicity lemma. -/
+theorem captureRatio_le_of_le {a b c : ℝ} (h : a ≤ b) (hc : 0 < c) :
+    a / c ≤ b / c := by
+  rw [div_eq_mul_inv, div_eq_mul_inv]
+  exact mul_le_mul_of_nonneg_right h (le_of_lt (inv_pos.mpr hc))
+
+theorem spectralCapture_pruneAllocation (w : ι → ℝ) (S : Finset ι) :
+    spectralCapture w (pruneAllocation S) = ∑ i ∈ S, w i := by
+  have hzero : ∀ i, i ∉ S → pruneAllocation S i * w i = 0 := by
+    intro i hi
+    simp [pruneAllocation, hi]
+  have hS : ∀ i ∈ S, pruneAllocation S i * w i = w i := by
+    intro i hi
+    simp [pruneAllocation, hi]
+  have h1 : ∑ i ∈ S, pruneAllocation S i * w i ≤
+      ∑ i, pruneAllocation S i * w i :=
+    Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ S)
+      (fun i _ hi => le_of_eq (hzero i hi).symm)
+  have h2 : ∑ i ∈ S, (-(pruneAllocation S i * w i)) ≤
+      ∑ i, (-(pruneAllocation S i * w i)) :=
+    Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ S)
+      (fun i _ hi => by rw [hzero i hi]; norm_num)
+  rw [Finset.sum_neg_distrib, Finset.sum_neg_distrib] at h2
+  have heq : ∑ i, pruneAllocation S i * w i =
+      ∑ i ∈ S, pruneAllocation S i * w i := by linarith
+  unfold spectralCapture
+  rw [heq]
+  exact Finset.sum_congr rfl hS
+
+theorem pruneAllocation_isRankAllocation (S : Finset ι) :
+    IsRankAllocation (S.card : ℝ) (pruneAllocation S) := by
+  refine ⟨?_, ?_, ?_⟩
+  · intro i
+    by_cases hi : i ∈ S
+    · simp [pruneAllocation, hi]
+    · simp [pruneAllocation, hi]
+  · intro i
+    by_cases hi : i ∈ S
+    · simp [pruneAllocation, hi]
+    · simp [pruneAllocation, hi]
+  · have h := spectralCapture_pruneAllocation (fun _ => (1 : ℝ)) S
+    unfold spectralCapture at h
+    simp only [mul_one] at h
+    rw [Finset.sum_const, nsmul_eq_mul, mul_one] at h
+    exact h
+
+/-!
+### The exchange (threshold) lemma
+
+The whole frontier rests on one dual certificate.  If a set `S` of cardinality
+`k` is separated from its complement by a threshold `t` in some weight profile
+`w`, then no relaxed rank-`k` allocation can capture more `w`-weight than `S`
+does, and none can capture less than `S` does when the ordering is reversed.
+Nothing here needs a sort, an eigenvector, or a compactness argument.
+-/
+
+/-- **Threshold optimality.**  `S` is `w`-dominant above the threshold `t`; then
+`S` maximises captured `w`-weight over all relaxed rank-`|S|` allocations. -/
+theorem spectralCapture_le_of_threshold
+    (w M : ι → ℝ) (S : Finset ι) (t : ℝ)
+    (hM : IsRankAllocation (S.card : ℝ) M)
+    (hin : ∀ i ∈ S, t ≤ w i)
+    (hout : ∀ i ∉ S, w i ≤ t) :
+    spectralCapture w M ≤ ∑ i ∈ S, w i := by
+  have hstep1 : ∑ i, M i * (w i - t) ≤ ∑ i ∈ S, M i * (w i - t) := by
+    have hneg : ∑ i ∈ S, (-(M i * (w i - t))) ≤
+        ∑ i, (-(M i * (w i - t))) := by
+      refine Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ S) ?_
+      intro i _ hi
+      have hw : w i - t ≤ 0 := sub_nonpos.mpr (hout i hi)
+      nlinarith [mul_nonneg (hM.lower i) (neg_nonneg.mpr hw)]
+    rw [Finset.sum_neg_distrib, Finset.sum_neg_distrib] at hneg
+    linarith
+  have hstep2 : ∑ i ∈ S, M i * (w i - t) ≤ ∑ i ∈ S, (w i - t) := by
+    refine Finset.sum_le_sum ?_
+    intro i hi
+    have hw : 0 ≤ w i - t := sub_nonneg.mpr (hin i hi)
+    nlinarith [mul_le_mul_of_nonneg_right (hM.upper i) hw]
+  have hL : ∑ i, M i * (w i - t) = (∑ i, M i * w i) - t * ∑ i, M i := by
+    calc ∑ i, M i * (w i - t)
+        = ∑ i, (M i * w i - t * M i) :=
+          Finset.sum_congr rfl (fun i _ => by ring)
+      _ = (∑ i, M i * w i) - ∑ i, t * M i := Finset.sum_sub_distrib
+      _ = (∑ i, M i * w i) - t * ∑ i, M i := by rw [← Finset.mul_sum]
+  have hR : ∑ i ∈ S, (w i - t) = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
+    calc ∑ i ∈ S, (w i - t)
+        = (∑ i ∈ S, w i) - ∑ i ∈ S, t := Finset.sum_sub_distrib
+      _ = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
+          rw [Finset.sum_const, nsmul_eq_mul]; ring
+  rw [hL, hM.trace] at hstep1
+  rw [hR] at hstep2
+  unfold spectralCapture
+  linarith
+
+/-- **Threshold pessimality**, the mirror statement.  If `S` sits *below* the
+threshold in the profile `w`, then `S` captures less `w`-weight than any relaxed
+rank-`|S|` allocation.  This is the half that turns "pruning is greedy for
+variance" into "pruning is anti-greedy for detection". -/
+theorem spectralCapture_ge_of_threshold
+    (w M : ι → ℝ) (S : Finset ι) (t : ℝ)
+    (hM : IsRankAllocation (S.card : ℝ) M)
+    (hin : ∀ i ∈ S, w i ≤ t)
+    (hout : ∀ i ∉ S, t ≤ w i) :
+    ∑ i ∈ S, w i ≤ spectralCapture w M := by
+  have hstep1 : ∑ i ∈ S, M i * (w i - t) ≤ ∑ i, M i * (w i - t) := by
+    refine Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ S) ?_
+    intro i _ hi
+    have hw : 0 ≤ w i - t := sub_nonneg.mpr (hout i hi)
+    exact mul_nonneg (hM.lower i) hw
+  have hstep2 : ∑ i ∈ S, (w i - t) ≤ ∑ i ∈ S, M i * (w i - t) := by
+    refine Finset.sum_le_sum ?_
+    intro i hi
+    have hw : w i - t ≤ 0 := sub_nonpos.mpr (hin i hi)
+    nlinarith [mul_le_mul_of_nonneg_right (hM.upper i) (neg_nonneg.mpr hw)]
+  have hL : ∑ i, M i * (w i - t) = (∑ i, M i * w i) - t * ∑ i, M i := by
+    calc ∑ i, M i * (w i - t)
+        = ∑ i, (M i * w i - t * M i) :=
+          Finset.sum_congr rfl (fun i _ => by ring)
+      _ = (∑ i, M i * w i) - ∑ i, t * M i := Finset.sum_sub_distrib
+      _ = (∑ i, M i * w i) - t * ∑ i, M i := by rw [← Finset.mul_sum]
+  have hR : ∑ i ∈ S, (w i - t) = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
+    calc ∑ i ∈ S, (w i - t)
+        = (∑ i ∈ S, w i) - ∑ i ∈ S, t := Finset.sum_sub_distrib
+      _ = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
+          rw [Finset.sum_const, nsmul_eq_mul]; ring
+  rw [hL, hM.trace] at hstep1
+  rw [hR] at hstep2
+  unfold spectralCapture
+  linarith
+
+/-!
+### The pruning prohibition
+
+`S` is a top-`k` set by background variance: separated above a threshold `t`.
+Because the detection profile is the *reciprocal* of the reconstruction profile,
+the very same set is separated *below* the threshold `1/t` in the detection
+profile.  So one hypothesis yields both conclusions, in opposite directions.
+-/
+
+/-- A variance-dominant set is inverse-variance-dominated: the reversal of the
+weight order transports the separating threshold `t` to the threshold `t⁻¹`. -/
+theorem detection_threshold_of_variance_threshold
+    (spectrum : ι → ℝ) (S : Finset ι) (t : ℝ)
+    (hpos : ∀ i, 0 < spectrum i) (ht : 0 < t)
+    (hin : ∀ i ∈ S, t ≤ spectrum i)
+    (hout : ∀ i ∉ S, spectrum i ≤ t) :
+    (∀ i ∈ S, detectionWeight (spectrum i) ≤ detectionWeight t) ∧
+      (∀ i ∉ S, detectionWeight t ≤ detectionWeight (spectrum i)) := by
+  constructor
+  · intro i hi
+    rcases eq_or_lt_of_le (hin i hi) with heq | hlt
+    · simp [heq]
+    · exact le_of_lt (detectionWeight_strictAnti ht hlt)
+  · intro i hi
+    rcases eq_or_lt_of_le (hout i hi) with heq | hlt
+    · simp [heq]
+    · exact le_of_lt (detectionWeight_strictAnti (hpos i) hlt)
+
+/-- **Variance-greedy reduction maximises reconstruction efficiency.**  This is
+the half of the story the field already relies on: a top-`k` truncation is the
+best rank-`k` linear reconstruction there is. -/
+theorem topVariance_maximizes_reconstruction
+    (spectrum M : ι → ℝ) (S : Finset ι) (t : ℝ)
+    (hpos : ∀ i, 0 < spectrum i)
+    (hM : IsRankAllocation (S.card : ℝ) M)
+    (hin : ∀ i ∈ S, t ≤ spectrum i)
+    (hout : ∀ i ∉ S, spectrum i ≤ t)
+    (htotal : 0 < spectralTotal (fun i => reconstructionWeight (spectrum i))) :
+    reconstructionEfficiency spectrum M ≤
+      reconstructionEfficiency spectrum (pruneAllocation S) := by
+  have hin' : ∀ i ∈ S, t ≤ reconstructionWeight (spectrum i) := by
+    intro i hi
+    unfold reconstructionWeight
+    exact hin i hi
+  have hout' : ∀ i ∉ S, reconstructionWeight (spectrum i) ≤ t := by
+    intro i hi
+    unfold reconstructionWeight
+    exact hout i hi
+  have hcap : spectralCapture (fun i => reconstructionWeight (spectrum i)) M ≤
+      spectralCapture (fun i => reconstructionWeight (spectrum i))
+        (pruneAllocation S) := by
+    rw [spectralCapture_pruneAllocation]
+    exact spectralCapture_le_of_threshold
+      (fun i => reconstructionWeight (spectrum i)) M S t hM hin' hout'
+  exact captureRatio_le_of_le hcap htotal
+
+/-- **Variance-greedy reduction minimises detection efficiency.**
+
+*The pruning prohibition.*  Among all relaxed rank-`k` reductions of the same
+background, the one that keeps the top `k` directions by variance — the
+eigenbasis form of LD pruning and clumping — captures the least detection weight
+of any of them.  It is not merely suboptimal for detection; it is the extreme
+point in the wrong direction.
+
+Together with `topVariance_maximizes_reconstruction` this is the trade-off in
+its sharpest form: the single reduction that is best for reconstruction is
+simultaneously worst for detection, at every rank. -/
+theorem topVariance_minimizes_detection
+    (spectrum M : ι → ℝ) (S : Finset ι) (t : ℝ)
+    (hpos : ∀ i, 0 < spectrum i) (ht : 0 < t)
+    (hM : IsRankAllocation (S.card : ℝ) M)
+    (hin : ∀ i ∈ S, t ≤ spectrum i)
+    (hout : ∀ i ∉ S, spectrum i ≤ t)
+    (htotal : 0 < spectralTotal (fun i => detectionWeight (spectrum i))) :
+    detectionEfficiency spectrum (pruneAllocation S) ≤
+      detectionEfficiency spectrum M := by
+  obtain ⟨hlow, hhigh⟩ :=
+    detection_threshold_of_variance_threshold spectrum S t hpos ht hin hout
+  have hcap : spectralCapture (fun i => detectionWeight (spectrum i))
+      (pruneAllocation S) ≤
+      spectralCapture (fun i => detectionWeight (spectrum i)) M := by
+    rw [spectralCapture_pruneAllocation]
+    exact spectralCapture_ge_of_threshold
+      (fun i => detectionWeight (spectrum i)) M S (detectionWeight t) hM hlow hhigh
+  exact captureRatio_le_of_le hcap htotal
+
+/-!
+### The frontier itself
+
+Both efficiencies are affine in `M` and the feasible set is convex, so the
+achievable region in the `(reconstruction, detection)` plane is convex; its
+upper-right boundary is therefore a concave curve.  The scalarisation theorem
+below says that every supporting line of that curve is attained at a coordinate
+split — a threshold set of the combined score `λσ + μ/σ`.  That is the content
+of "the extreme solutions are coordinate splits with at most one fractional
+index"; the fractional index appears only when the score has a tie at the
+threshold, which is exactly when the threshold set of a given cardinality is not
+unique.
+-/
+
+theorem spectralCapture_linear
+    (w₁ w₂ M : ι → ℝ) (lam mu : ℝ) :
+    spectralCapture (fun i => lam * w₁ i + mu * w₂ i) M =
+      lam * spectralCapture w₁ M + mu * spectralCapture w₂ M := by
+  unfold spectralCapture
+  calc ∑ i, M i * (lam * w₁ i + mu * w₂ i)
+      = ∑ i, (lam * (M i * w₁ i) + mu * (M i * w₂ i)) :=
+        Finset.sum_congr rfl (fun i _ => by ring)
+    _ = (∑ i, lam * (M i * w₁ i)) + ∑ i, mu * (M i * w₂ i) :=
+        Finset.sum_add_distrib
+    _ = lam * (∑ i, M i * w₁ i) + mu * ∑ i, M i * w₂ i := by
+        rw [← Finset.mul_sum, ← Finset.mul_sum]
+
+/-- The relaxed feasible set is convex. -/
+theorem isRankAllocation_convex {k lam : ℝ} {M N : ι → ℝ}
+    (hM : IsRankAllocation k M) (hN : IsRankAllocation k N)
+    (h0 : 0 ≤ lam) (h1 : lam ≤ 1) :
+    IsRankAllocation k (fun i => lam * M i + (1 - lam) * N i) := by
+  refine ⟨?_, ?_, ?_⟩
+  · intro i
+    show 0 ≤ lam * M i + (1 - lam) * N i
+    have hA : 0 ≤ lam * M i := mul_nonneg h0 (hM.lower i)
+    have hB : 0 ≤ (1 - lam) * N i :=
+      mul_nonneg (by linarith : (0:ℝ) ≤ 1 - lam) (hN.lower i)
+    linarith
+  · intro i
+    show lam * M i + (1 - lam) * N i ≤ 1
+    have hA : lam * M i ≤ lam * 1 := mul_le_mul_of_nonneg_left (hM.upper i) h0
+    have hB : (1 - lam) * N i ≤ (1 - lam) * 1 :=
+      mul_le_mul_of_nonneg_left (hN.upper i) (by linarith)
+    linarith
+  · calc ∑ i, (lam * M i + (1 - lam) * N i)
+        = (∑ i, lam * M i) + ∑ i, (1 - lam) * N i := Finset.sum_add_distrib
+      _ = lam * (∑ i, M i) + (1 - lam) * ∑ i, N i := by
+          rw [← Finset.mul_sum, ← Finset.mul_sum]
+      _ = k := by rw [hM.trace, hN.trace]; ring
+
+/-- Captured weight is affine along segments of the feasible set; hence so are
+both efficiencies, and hence the achievable region is convex. -/
+theorem spectralCapture_affine (w M N : ι → ℝ) (lam : ℝ) :
+    spectralCapture w (fun i => lam * M i + (1 - lam) * N i) =
+      lam * spectralCapture w M + (1 - lam) * spectralCapture w N := by
+  unfold spectralCapture
+  calc ∑ i, (lam * M i + (1 - lam) * N i) * w i
+      = ∑ i, (lam * (M i * w i) + (1 - lam) * (N i * w i)) :=
+        Finset.sum_congr rfl (fun i _ => by ring)
+    _ = (∑ i, lam * (M i * w i)) + ∑ i, (1 - lam) * (N i * w i) :=
+        Finset.sum_add_distrib
+    _ = lam * (∑ i, M i * w i) + (1 - lam) * ∑ i, N i * w i := by
+        rw [← Finset.mul_sum, ← Finset.mul_sum]
+
+/-- **Every scalarisation of the two tasks is maximised by a coordinate
+split.**
+
+Given nonnegative task priorities `lam` (reconstruction) and `mu` (detection),
+the combined objective is maximised over relaxed rank-`k` allocations by the
+threshold set of the combined score `lam * σ + mu / σ`.  Since every supporting
+line of the achievable region's upper boundary is such a scalarisation, the
+Pareto frontier is carried entirely by these threshold allocations — the
+"coordinate splits" of the statement.
+
+Note the shape of the combined score: it is a *sum* of an increasing and a
+decreasing function of `σ`, so its threshold sets are in general neither a
+prefix nor a suffix of the variance ordering.  That is the precise sense in
+which a reduction that serves both tasks is neither pruning nor its opposite. -/
+theorem scalarized_optimum_is_coordinate_split
+    (spectrum M : ι → ℝ) (S : Finset ι) (lam mu t : ℝ)
+    (hM : IsRankAllocation (S.card : ℝ) M)
+    (hin : ∀ i ∈ S,
+      t ≤ lam * reconstructionWeight (spectrum i) +
+        mu * detectionWeight (spectrum i))
+    (hout : ∀ i ∉ S,
+      lam * reconstructionWeight (spectrum i) +
+        mu * detectionWeight (spectrum i) ≤ t) :
+    lam * spectralCapture (fun i => reconstructionWeight (spectrum i)) M +
+        mu * spectralCapture (fun i => detectionWeight (spectrum i)) M ≤
+      lam * spectralCapture (fun i => reconstructionWeight (spectrum i))
+          (pruneAllocation S) +
+        mu * spectralCapture (fun i => detectionWeight (spectrum i))
+          (pruneAllocation S) := by
+  have hcombM := spectralCapture_linear
+    (fun i => reconstructionWeight (spectrum i))
+    (fun i => detectionWeight (spectrum i)) M lam mu
+  have hcombS := spectralCapture_linear
+    (fun i => reconstructionWeight (spectrum i))
+    (fun i => detectionWeight (spectrum i)) (pruneAllocation S) lam mu
+  have hthr := spectralCapture_le_of_threshold
+    (fun i => lam * reconstructionWeight (spectrum i) +
+      mu * detectionWeight (spectrum i)) M S t hM hin hout
+  rw [spectralCapture_pruneAllocation] at hcombS
+  rw [hcombM] at hthr
+  rw [← hcombS]
+  exact hthr
+
+/-!
+### The two-coordinate frontier, in closed form
+
+Two directions, rank one.  Here the frontier is not merely concave — it is an
+exact straight line, and the trade-off is a conservation law: reconstruction
+efficiency and detection efficiency sum to one, for *every* allocation.  Spend a
+fraction `m` of the single retained dimension on the high-variance direction and
+you have spent `1 - m` of it on detection.  There is no allocation, fractional
+or not, that escapes.
+-/
+
+/-- **Exact two-coordinate frontier.**  For a two-direction background with
+variances `σ₁, σ₂` and a rank-one budget split as `(m, 1 - m)`, the
+reconstruction and detection efficiencies sum to exactly `1`.
+
+The trade-off is therefore not asymptotic, not a large-`n` phenomenon, and not
+an artefact of relaxation: it holds at every `m`, including the two integral
+endpoints `m = 1` (pure pruning) and `m = 0` (pure whitening). -/
+theorem twoCoordinate_frontier_line
+    (σ₁ σ₂ m : ℝ) (h₁ : 0 < σ₁) (h₂ : 0 < σ₂) :
+    (m * σ₁ + (1 - m) * σ₂) / (σ₁ + σ₂) +
+        (m * σ₁⁻¹ + (1 - m) * σ₂⁻¹) / (σ₁⁻¹ + σ₂⁻¹) = 1 := by
+  have hu : σ₁ * σ₁⁻¹ = 1 := mul_inv_cancel₀ (ne_of_gt h₁)
+  have hv : σ₂ * σ₂⁻¹ = 1 := mul_inv_cancel₀ (ne_of_gt h₂)
+  have hS : σ₁ + σ₂ ≠ 0 := ne_of_gt (add_pos h₁ h₂)
+  have hT : σ₁⁻¹ + σ₂⁻¹ ≠ 0 :=
+    ne_of_gt (add_pos (inv_pos.mpr h₁) (inv_pos.mpr h₂))
+  rw [div_add_div _ _ hS hT, div_eq_iff (mul_ne_zero hS hT)]
+  linear_combination (2 * m - 1) * hu + (1 - 2 * m) * hv
+
+/-- The two-coordinate frontier lies strictly inside the unit box whenever both
+directions carry variance: perfect reconstruction efficiency is unattainable at
+rank one, and so is perfect detection efficiency.  The pruning corner `m = 1`
+attains reconstruction efficiency `σ₁ / (σ₁ + σ₂)` and, by
+`twoCoordinate_frontier_line`, detection efficiency `σ₂ / (σ₁ + σ₂)` — which for
+a strongly correlated pair (`σ₁ ≫ σ₂`) is close to zero. -/
+theorem twoCoordinate_pruning_corner_lt_one
+    (σ₁ σ₂ : ℝ) (h₁ : 0 < σ₁) (h₂ : 0 < σ₂) :
+    σ₁ / (σ₁ + σ₂) < 1 := by
+  rw [div_lt_one (add_pos h₁ h₂)]
+  linarith
+
+/-- **Existence of a threshold set of prescribed cardinality** for the combined
+score.
+
+`sorry` stands for exactly one thing: sorting a finite family of reals and
+cutting it at rank `k`.  It is a statement about `Finset` combinatorics with no
+probabilistic or genetic content, and it is the only missing ingredient between
+`scalarized_optimum_is_coordinate_split` (proved, for a *given* threshold set)
+and the packaged claim "the achievable region is the hypograph of the concave
+envelope of the inversely-sorted allocation curve".
+
+What is proved without it: every threshold set is a scalarised optimum, so every
+supporting line of the achievable region is attained by a coordinate split, and
+the region is convex (`isRankAllocation_convex`, `spectralCapture_affine`).
+What is *not* proved without it: that a supporting line exists for every
+direction, i.e. that the frontier is exactly — rather than at most — the concave
+envelope of the split values. -/
+theorem exists_threshold_set
+    (score : ι → ℝ) (k : ℕ) (hk : k ≤ Fintype.card ι) :
+    ∃ (S : Finset ι) (t : ℝ), S.card = k ∧
+      (∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t) := by
+  sorry
+
+end DetectionReconstructionFrontier
+
 end
 
 end Calibrator

@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Calibrator.PolygenicArchitecture
 
 namespace Calibrator
 
@@ -135,19 +136,34 @@ theorem powerAtThreshold_antitone_in_threshold (ncp z₁ z₂ : ℝ) (h : z₁ �
 
 /-- **Rare variants need larger samples.**
     For a fixed effect size, the NCP scales with p(1-p).
-    At MAF 1% vs 30%, need ~25× more samples. -/
+    At MAF 1% vs 30%, need ~25× more samples.
+
+    **Strengthened: the symmetry hypothesis is removed.** The previous form
+    assumed `p_common ≤ 1/2`, folding both frequencies into the minor half of
+    the axis, and additionally `0 < p_common` and `p_common < 1`. None of that
+    is what the conclusion needs. The difference factors as
+
+        `2 p_c (1 - p_c) - 2 p_r (1 - p_r) = 2 (p_c - p_r) (1 - p_c - p_r)`,
+
+    so the sign is decided by a single linear condition on the pair,
+    `p_r + p_c < 1`: the constraint that has to be active is that the two
+    frequencies straddle the fold point, not that either of them is minor. The
+    old hypotheses all follow from the new one together with `0 < p_rare` and
+    `p_rare < p_common`, so this is a strict weakening, and it now covers pairs
+    such as `p_rare = 0.6, p_common = 0.3` read on the major allele, which the
+    folded statement could not reach. -/
 theorem rare_variant_lower_power (n : ℕ) (beta p_rare p_common : ℝ)
     (h_beta : beta ≠ 0) (h_rare : 0 < p_rare)
-    (h_common : 0 < p_common) (h_common_lt : p_common < 1)
     (h_rare_lt : p_rare < p_common)
-    (h_sym : p_common ≤ 1/2) (hn : 0 < n) :
+    (h_active : p_rare + p_common < 1) (hn : 0 < n) :
     noncentralityParam n beta p_rare < noncentralityParam n beta p_common := by
   unfold noncentralityParam
   have h_n : (0 : ℝ) < n := Nat.cast_pos.mpr hn
   have h_b : 0 < beta ^ 2 := sq_pos_of_ne_zero h_beta
   apply mul_lt_mul_of_pos_left _ (mul_pos h_n h_b)
   -- Need: 2 * p_rare * (1 - p_rare) < 2 * p_common * (1 - p_common)
-  -- f(x) = x(1-x) is increasing on [0, 0.5]
+  have h_straddle : (0 : ℝ) < (p_common - p_rare) * (1 - (p_rare + p_common)) :=
+    mul_pos (sub_pos.mpr h_rare_lt) (sub_pos.mpr h_active)
   have : p_rare * (1 - p_rare) < p_common * (1 - p_common) := by nlinarith
   linarith
 
@@ -482,5 +498,114 @@ theorem low_rg_limits_portability
   nlinarith
 
 end EffectSizeHeterogeneity
+
+
+/-!
+## Sample Size for Nonsmooth Architecture Summaries
+
+Every sample-size law in this file is polynomial: `r2ScalingModel` saturates as
+`n / (n + C)`, the noncentrality grows linearly in `n`, and the allocation
+results are concavity statements about that shape. All of it is correct for the
+targets those laws are about — `R²`, a per-variant association test, a variance
+component — because those are smooth functionals of the underlying parameters,
+and smooth functionals are estimable at polynomial rates.
+
+None of it transfers to the nonsmooth summaries of an effect-size distribution.
+For the mean absolute effect and its kin (see
+`Calibrator.PolygenicArchitecture`, section `NonsmoothSummaries`) the attainable
+risk is of order `1 / log n`. Two things follow, and neither was recorded
+anywhere in this corpus before.
+
+First, the sample size needed to reach accuracy `ε` is `exp (1/ε)`, exponential
+in the reciprocal accuracy, not a power of it.
+
+Second — and this is the trap — a designer who derives a sample size for such a
+summary from a two-point argument, an Assouad cube, a `K`-point Fano bound or an
+order-`K` moment-matched construction gets a *polynomial* answer, because that
+is all a fixed-grade certificate can express. The answer is not conservative in
+the safe direction. It is short, by a polynomial factor for grade `K` and by an
+exponential factor at grade one, and the shortfall is an invariant of the
+functional rather than looseness that a sharper version of the same argument
+could remove.
+
+The claims in this corpus that the incompleteness result marks as optimistic
+are listed in the module docstring of `Calibrator.PolygenicArchitecture`; within
+this file the affected surface is any use of `r2ScalingModel`,
+`diminishing_returns`, `invest_in_undersampled` or
+`balanced_allocation_maximizes_total_utility` where the quantity being bought
+with the samples is a polygenicity or sparsity summary rather than an `R²`.
+Those four theorems remain true as stated — they are statements about the
+saturating shape, and nothing here contradicts them — but the shape is the wrong
+model for a nonsmooth target.
+-/
+
+section NonsmoothSampleSize
+
+/-- **Sample size at which the attainable risk for a nonsmooth summary reaches
+    `ε`.**
+
+    `exp (1/ε)`. This is the inverse of `nonsmoothSummaryRisk`, and it is
+    exponential in the reciprocal accuracy.
+
+    Empirical status: UNTESTED. -/
+noncomputable def logRateSampleSize (epsilon : ℝ) : ℝ := Real.exp (1 / epsilon)
+
+/-- **Sample size a grade-`K` certificate reports as sufficient.**
+
+    `ε ^ (-(K/c))`, the inverse of `gradeCertifiedRisk`: a power law in the
+    reciprocal accuracy, with the grade of the certificate setting the exponent.
+
+    Empirical status: UNTESTED. -/
+noncomputable def gradeCertifiedSampleSize (epsilon K c : ℝ) : ℝ :=
+  epsilon ^ (-(K / c))
+
+/-- `logRateSampleSize` inverts the logarithmic rate. -/
+theorem logRateSampleSize_attains (epsilon : ℝ) :
+    nonsmoothSummaryRisk (logRateSampleSize epsilon) = epsilon := by
+  unfold nonsmoothSummaryRisk logRateSampleSize
+  rw [Real.log_exp, one_div_one_div]
+
+/-- `gradeCertifiedSampleSize` inverts the certified polynomial rate. -/
+theorem gradeCertifiedSampleSize_attains (epsilon K c : ℝ)
+    (h_eps : 0 < epsilon) (hK : K ≠ 0) (hc : c ≠ 0) :
+    gradeCertifiedRisk (gradeCertifiedSampleSize epsilon K c) K c = epsilon := by
+  unfold gradeCertifiedRisk gradeCertifiedSampleSize
+  have hexp : (-(K / c)) * (-(c / K)) = 1 := by
+    rw [neg_mul_neg, div_mul_div_comm, mul_comm c K, div_self (mul_ne_zero hK hc)]
+  rw [← Real.rpow_mul (le_of_lt h_eps), hexp, Real.rpow_one]
+
+/-- **A grade-`K` sample-size calculation understates the requirement.**
+
+    Stated with the crossing point as a hypothesis: wherever the power law sits
+    below the exponential, the certificate's answer is short. The unconditional
+    grade-one case is `twoPoint_understates_sample_size` below. -/
+theorem gradeCertified_understates_sample_size (epsilon K c : ℝ)
+    (h_gap : epsilon ^ (-(K / c)) < Real.exp (1 / epsilon)) :
+    gradeCertifiedSampleSize epsilon K c < logRateSampleSize epsilon := by
+  unfold gradeCertifiedSampleSize logRateSampleSize
+  exact h_gap
+
+/-- **The two-point certificate understates the requirement unconditionally.**
+
+    At grade one — `K/c ≤ 1`, which covers the two-point argument and any
+    Assouad cube of bounded order — the certified sample size is below `1/ε`
+    while the requirement is `exp (1/ε)`, at every target accuracy in `(0, 1]`.
+    No hypothesis about where the curves cross is needed, because `1/ε + 1 ≤
+    exp (1/ε)` everywhere. A designer using a two-point calculation to size a
+    study for a nonsmooth architecture summary is therefore not merely optimistic
+    by a constant; the shortfall grows without bound as the target sharpens. -/
+theorem twoPoint_understates_sample_size (epsilon K c : ℝ)
+    (h_eps : 0 < epsilon) (h_eps_le : epsilon ≤ 1) (h_grade : K / c ≤ 1) :
+    gradeCertifiedSampleSize epsilon K c < logRateSampleSize epsilon := by
+  unfold gradeCertifiedSampleSize logRateSampleSize
+  have h1 : epsilon ^ (-(K / c)) ≤ epsilon ^ (-(1 : ℝ)) :=
+    Real.rpow_le_rpow_of_exponent_ge h_eps h_eps_le (by linarith)
+  have h2 : epsilon ^ (-(1 : ℝ)) = 1 / epsilon := by
+    rw [Real.rpow_neg (le_of_lt h_eps), Real.rpow_one, one_div]
+  have h3 : 1 / epsilon + 1 ≤ Real.exp (1 / epsilon) := Real.add_one_le_exp _
+  rw [h2] at h1
+  linarith
+
+end NonsmoothSampleSize
 
 end Calibrator

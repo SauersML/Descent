@@ -65,6 +65,23 @@ theorem snp_h2_le_narrow_h2
   unfold snpH2 narrowSenseH2
   exact div_le_div_of_nonneg_right h_tagged (le_of_lt h_total)
 
+/-- **The tagging gap, as an identity rather than an inequality.**
+
+    `snp_h2_le_narrow_h2` says only that the SNP heritability is the smaller of
+    the two. How much smaller is not an estimate: the difference is the untagged
+    additive variance over the phenotypic variance, on the nose. The one-sided
+    statement is the corollary obtained by discarding the sign information in
+    the numerator, and with it goes the ability to say when the two coincide,
+    which is now visible — never, unless the tagging is complete. -/
+theorem narrow_h2_sub_snp_h2_eq
+    (V_A_tagged V_A_total V_D V_I V_E : ℝ)
+    (h_total : 0 < V_A_total + V_D + V_I + V_E) :
+    narrowSenseH2 V_A_total V_D V_I V_E -
+        snpH2 V_A_tagged (V_A_total + V_D + V_I + V_E) =
+      (V_A_total - V_A_tagged) / (V_A_total + V_D + V_I + V_E) := by
+  unfold snpH2 narrowSenseH2
+  rw [div_sub_div_same]
+
 /-- **The missing heritability gap.**
     h²_twin - h²_SNP > 0 for most traits. This is the "missing heritability".
     It sets an upper bound on what PGS can achieve with current genotyping.
@@ -73,7 +90,13 @@ theorem snp_h2_le_narrow_h2
     V_A_total / V_P while h²_SNP captures only V_A_tagged / V_P. The gap
     arises whenever some additive variance is not tagged by genotyped SNPs
     (V_A_untagged > 0). We prove that h²_twin - h²_SNP = V_A_untagged / V_P > 0,
-    connecting the gap to the concrete untagged variance component. -/
+    connecting the gap to the concrete untagged variance component.
+
+    **Strengthened to the equality the docstring already claimed.** The
+    conclusion was `0 < h2_twin - h2_snp`, one-sided, while the text above it
+    asserted the identity. The identity is now in the statement and the
+    positivity is its corollary, so a reader of the signature no longer has to
+    take the numerator on trust. -/
 theorem missing_heritability_gap
     (V_A_tagged V_A_untagged V_D V_I V_E : ℝ)
     (h_tagged_nn : 0 ≤ V_A_tagged) (h_untagged_pos : 0 < V_A_untagged)
@@ -82,15 +105,18 @@ theorem missing_heritability_gap
     let V_P := V_A_tagged + V_A_untagged + V_D + V_I + V_E
     let h2_twin := (V_A_tagged + V_A_untagged) / V_P
     let h2_snp := V_A_tagged / V_P
-    0 < h2_twin - h2_snp := by
+    h2_twin - h2_snp = V_A_untagged / V_P ∧ 0 < h2_twin - h2_snp := by
   simp only
-  rw [show (V_A_tagged + V_A_untagged) / (V_A_tagged + V_A_untagged + V_D + V_I + V_E) -
-    V_A_tagged / (V_A_tagged + V_A_untagged + V_D + V_I + V_E) =
-    ((V_A_tagged + V_A_untagged) - V_A_tagged) / (V_A_tagged + V_A_untagged + V_D + V_I + V_E)
-    from (sub_div _ _ _).symm]
-  apply div_pos
-  · linarith
-  · linarith
+  have h_gap :
+      (V_A_tagged + V_A_untagged) / (V_A_tagged + V_A_untagged + V_D + V_I + V_E) -
+        V_A_tagged / (V_A_tagged + V_A_untagged + V_D + V_I + V_E) =
+      V_A_untagged / (V_A_tagged + V_A_untagged + V_D + V_I + V_E) := by
+    rw [div_sub_div_same]
+    congr 1
+    ring
+  refine ⟨h_gap, ?_⟩
+  rw [h_gap]
+  exact div_pos h_untagged_pos h_total
 
 end HeritabilityDefinitions
 
@@ -127,6 +153,23 @@ theorem additive_variance_nonneg
     · apply mul_nonneg (by norm_num : (0:ℝ) ≤ 2) (hp i)
     · linarith [hp1 i]
   · exact sq_nonneg _
+
+/-! ### Why the variance components are the easy summaries
+
+`additiveVariance` is a quadratic — hence smooth — functional of the effect
+vector, and so are `narrowSenseH2`, `snpH2` and every component appearing in
+the ceiling results below. Smooth functionals of this kind are estimable at
+polynomial rates, and the sample-size laws in `Calibrator.PowerAnalysis` are
+the right shape for them.
+
+That is a property of these particular summaries and does not extend to the
+whole file's subject matter. A summary of the same effect vector that is not
+smooth — the mean absolute effect, or an inverse-kurtosis polygenicity measure
+— carries an attainable risk of order `1 / log q` rather than a power of `q`;
+see `Calibrator.PolygenicArchitecture`, section `NonsmoothSummaries`. The
+distinction is invisible in the formulas, which look equally elementary, and it
+is worth stating here because the two kinds of quantity are routinely reported
+side by side in the same table with the same standard errors. -/
 
 /-- **Frequency change affects additive variance.**
     When MAF changes from p to p' at a single locus,
@@ -196,6 +239,23 @@ theorem pgs_r2_ceiling_from_h2
     (h_f_le : f ≤ 1) :
     h2_snp * f ≤ h2_snp := by
   exact mul_le_of_le_one_right (le_of_lt h_h2) h_f_le
+
+/-- **The ceiling is attained only by a complete PGS.**
+
+    The two-sided companion to `pgs_r2_ceiling_from_h2`: the ceiling `h²_SNP`
+    is reached exactly when the fraction of tagged additive variance the score
+    captures is one. A bound with no attainment condition cannot distinguish a
+    ceiling that is approached from one that is unreachable; this says which
+    this is. -/
+theorem pgs_r2_ceiling_attained_iff
+    (h2_snp f : ℝ) (h_h2 : 0 < h2_snp) :
+    h2_snp * f = h2_snp ↔ f = 1 := by
+  constructor
+  · intro h
+    have h' : h2_snp * f = h2_snp * 1 := by rw [mul_one]; exact h
+    exact mul_left_cancel₀ (ne_of_gt h_h2) h'
+  · intro h
+    rw [h, mul_one]
 
 /-- **PGS R² ceiling from GWAS power.**
     R²_PGS ≤ h²_SNP × (1 - (1-power)^m)
@@ -300,7 +360,13 @@ theorem greml_underestimates_with_poor_tagging
       h²_true = V_A / (V_A + V_strat + V_E)
 
     We derive: h²_GREML > h²_true whenever V_strat > 0, because
-    (V_A + V_strat)/V_P > V_A/V_P when V_P > 0. -/
+    (V_A + V_strat)/V_P > V_A/V_P when V_P > 0.
+
+    **Strengthened from a direction to a magnitude.** The inflation is not
+    merely positive; it equals the stratification variance as a fraction of the
+    phenotypic variance, `V_strat / V_P`, with no residual term. That is what
+    makes the bias correctable in principle from an estimate of `V_strat`
+    alone, which the one-sided form could not support. -/
 theorem stratification_inflates_greml
     (V_A V_strat V_E : ℝ)
     (h_VA : 0 ≤ V_A) (h_strat_pos : 0 < V_strat) (h_VE : 0 ≤ V_E)
@@ -308,8 +374,14 @@ theorem stratification_inflates_greml
     let V_P := V_A + V_strat + V_E
     let h2_true := V_A / V_P
     let h2_greml := (V_A + V_strat) / V_P
-    h2_true < h2_greml := by
+    h2_greml - h2_true = V_strat / V_P ∧ h2_true < h2_greml := by
   simp only
+  have h_gap : (V_A + V_strat) / (V_A + V_strat + V_E) -
+      V_A / (V_A + V_strat + V_E) = V_strat / (V_A + V_strat + V_E) := by
+    rw [div_sub_div_same]
+    congr 1
+    ring
+  refine ⟨h_gap, ?_⟩
   exact div_lt_div_of_pos_right (by linarith) h_total
 
 end GREML

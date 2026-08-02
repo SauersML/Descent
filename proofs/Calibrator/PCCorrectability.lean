@@ -2,6 +2,7 @@ import Calibrator.PCCorrectability.Diagnostic
 import Calibrator.PCCorrectability.Design
 import Calibrator.PCCorrectability.Frequency
 import Calibrator.PCCorrectability.Geometry
+import Calibrator.PCCorrectability.ImitationCapacity
 import Calibrator.PCCorrectability.Nonidentifiability
 import Calibrator.PCCorrectability.Overlap
 import Calibrator.PCCorrectability.Unified
@@ -10,8 +11,16 @@ import Calibrator.PCCorrectability.Unified
 # Population-structure correctability for PC and mixed-model adjustment
 
 The implementation is split into a linear-algebra core, spectral phase bounds,
-and the frequency-resolved application diagnostic so incremental proof edits
-compile independently.
+the frequency-resolved application diagnostic, and the imitation-capacity
+linear program so incremental proof edits compile independently.
+
+`Calibrator.PCCorrectability.ImitationCapacity` is where the spectral proxy
+threshold of `Threshold.lean` acquires a justification rather than a stipulation:
+the detection threshold is the value of a linear program over the background
+class, its certificate is a constraint index, and the AR(1) whitening gain
+`(1+ρ²)/(1-ρ²)` is identified as that certificate's value.  The same file
+records why a participation-ratio effective-marker count cannot be substituted
+for `M` in `bbpProxyThreshold`.
 
 References:
 - Zaidi and Mathieson (2020), eLife 9:e61548.

@@ -1,0 +1,1084 @@
+import Calibrator.ImitationRigidity
+import Calibrator.PCCorrectability.Threshold
+import Mathlib.Tactic.Positivity
+
+namespace Calibrator
+
+noncomputable section
+
+/-!
+# Imitation capacity as a linear program, and the certificate that detects
+
+`Calibrator.ImitationRigidity` proves the algebraic half of the imitation
+problem: a polygenic signal mixed over its own effect prior inflates the
+genotype covariance by exactly `t · vvᵀ`, and whether that is a *signal* or an
+*imitation* depends on one thing — whether the inflated covariance is still a
+legal member of the background class.  That file settles the question for a
+single quadratic ceiling.  This file settles it for the class the applications
+actually use: a background class cut out by *linear* constraints,
+
+    K = { Σ : Σ - B is variance-nonnegative, and ℓ_a(Σ) ≤ κ_a for every a }.
+
+Three things follow, and they are what this file is for.
+
+**The capacity is the value of a linear program.**  The largest spike level at
+which the mixed alternative is literally a mixture of nulls — hence
+undetectable at any sample size, by any procedure — is
+
+    t* = inf over constraints a and spike directions v of
+           (κ_a - ℓ_a(Σ₀)) / ℓ_a(vvᵀ),
+
+the infimum ranging over pairs whose *spike load* `ℓ_a(vvᵀ)` is positive.
+`BackgroundClass.isNull_spiked_of_le_imitationCapacity` is the licence: below
+`t*` every component of the mixture is a null covariance.
+
+**Rigidity is a normal-cone condition, not a symmetry condition.**  If some
+constraint is *active* at `Σ₀` and has positive spike load, the capacity is
+zero and no positive spike level is imitable.  The constraint index is a
+Hahn–Banach certificate the machine returns rather than merely proves to
+exist.  It had been conjectured that rigidity requires a transitive symmetry
+group on the class; `traceWindow_rigid` refutes that by construction, with a
+generic positive-definite `A` and no symmetry whatsoever.
+
+**On the equi-exit class the detection threshold equals the capacity.**
+Equi-exit — the binding constraint's spike load is constant over the prior's
+support — is the precise content of "the likelihood ratio depends on the
+nuisance only through a quadratic form", and it appears as an explicit field of
+`EquiExit`, never as an implicit convention.  Under it the optimal test is
+*synthesized*, not merely shown to exist: reject when the empirical certificate
+statistic `ℓ_a(Σ̂)` exceeds the null ceiling `κ_a` plus half the margin.
+`EquiExit.certificateTest_null_control` and `EquiExit.certificateTest_power`
+are the two halves, and both are proved.
+
+## The biology
+
+*The imitation wall is the proximal-contamination problem.*  A genetic
+relatedness matrix that absorbs the very association being tested, and the
+episode in which polygenic-adaptation signals turned out to be residual
+stratification imitating a polygenic spike, are the same phenomenon: the
+alternative was a legal background.  The linear program makes this computable
+instead of anecdotal — given the background class as linear constraints, the
+capacity is an LP value and the certificate is an index.  Leave-one-chromosome-
+out is then not a variance fix but a *restriction of the background class*, and
+`BackgroundClass.imitationCapacity_antitone_constraints` says which way and by
+how much: more constraints, smaller capacity, lower threshold.
+
+*Rigidity without symmetry is the useful direction.*  Any active linear
+constraint with positive spike load rigidifies.  That is a design instruction
+for study construction, not a structural accident of symmetric designs.
+
+*The `m_eff` prohibition.*  Effective-marker counts of the Cheverud–Nyholt and
+Li–Ji type are participation-ratio functionals of the LD spectrum, hence
+continuous in the weak topology.  `certificate_not_momentContinuous` proves
+that no such functional can determine a detection threshold: two spectra agree
+on every normalized moment to within `1/(n+1)` while their inverse-trace
+certificates differ by `n/(n+1)`.  The corpus's own `ldWhiteningGain` is the
+right functional for exactly the reason those are wrong — it is edge-sensitive
+and *not* weakly continuous.  Those two facts are the same fact.
+
+References:
+- Berisa and Pickrell (2016), Bioinformatics 32:283--285 (LD blocks).
+- Cheverud (2001), Heredity 87:52--58; Li and Ji (2005), Heredity 95:221--227.
+- Onatski, Moreira, and Hallin (2013), Annals of Statistics 41:1204--1231.
+- Yang et al. (2014), Nature Genetics 46:100--106 (leave-one-chromosome-out).
+-/
+
+section SpikeAlgebra
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- **The rank-one spike matrix `vvᵀ`.**  This is the covariance inflation a
+polygenic signal with effect direction `v` contributes once the per-individual
+factor is mixed over its own prior — the infinitesimal model, read at the level
+of second moments.
+
+    Empirical status: DERIVED. `spikeOuter_eq_rankOneCovarianceBump` identifies
+    it with the bump of `covarianceMatrix_addRankOneSignal`, which is an exact
+    covariance identity rather than a modelling choice. -/
+def spikeOuter (v : ι → ℝ) : Matrix ι ι ℝ := fun i j => v i * v j
+
+theorem spikeOuter_eq_rankOneCovarianceBump (v : ι → ℝ) :
+    spikeOuter v = rankOneCovarianceBump 1 v := by
+  ext i j
+  simp [spikeOuter, rankOneCovarianceBump]
+
+/-- The score variance a unit spike contributes to a weighting `x` is the
+squared projection of `x` on the spike direction. -/
+theorem quadForm_spikeOuter (v x : ι → ℝ) :
+    quadForm (spikeOuter v) x = dot v x ^ 2 := by
+  rw [spikeOuter_eq_rankOneCovarianceBump, quadForm_rankOneCovarianceBump]
+  ring
+
+theorem quadForm_add_matrix (A B : Matrix ι ι ℝ) (x : ι → ℝ) :
+    quadForm (A + B) x = quadForm A x + quadForm B x := by
+  unfold quadForm gramForm
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl (fun j _ => ?_)
+  simp only [Matrix.add_apply]
+  ring
+
+theorem quadForm_smul_matrix (c : ℝ) (A : Matrix ι ι ℝ) (x : ι → ℝ) :
+    quadForm (c • A) x = c * quadForm A x := by
+  unfold quadForm gramForm
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl (fun j _ => ?_)
+  simp only [Matrix.smul_apply, smul_eq_mul]
+  ring
+
+theorem varianceNonneg_add {A B : Matrix ι ι ℝ}
+    (hA : VarianceNonneg A) (hB : VarianceNonneg B) : VarianceNonneg (A + B) := by
+  intro x
+  rw [quadForm_add_matrix]
+  exact add_nonneg (hA x) (hB x)
+
+theorem varianceNonneg_smul {c : ℝ} {A : Matrix ι ι ℝ}
+    (hc : 0 ≤ c) (hA : VarianceNonneg A) : VarianceNonneg (c • A) := by
+  intro x
+  rw [quadForm_smul_matrix]
+  exact mul_nonneg hc (hA x)
+
+theorem varianceNonneg_spikeOuter (v : ι → ℝ) : VarianceNonneg (spikeOuter v) := by
+  intro x
+  rw [quadForm_spikeOuter]
+  exact sq_nonneg _
+
+end SpikeAlgebra
+
+/-- **A background class cut out by linear constraints.**
+
+`base` is the floor of the class: membership requires `Σ - base` to be
+variance-nonnegative, and `base = c • 1` recovers the usual `Σ ≥ cI`.  Each
+`a : cidx` indexes one linear functional `form a` with ceiling `bound a`.
+Additivity and homogeneity are fields rather than side conditions, because the
+whole linear-programming argument is the statement that these two properties,
+and nothing else about the class, determine the capacity.
+
+    Empirical status: UNTESTED. This is a modelling frame, not a measured
+    quantity; what is testable is the capacity it computes for a specific
+    background class, via `BackgroundClass.imitationCapacity`. -/
+structure BackgroundClass (ι : Type*) [Fintype ι] [DecidableEq ι]
+    (cidx : Type*) where
+  /-- Floor of the class: `Σ - base` must be variance-nonnegative. -/
+  base : Matrix ι ι ℝ
+  /-- One linear functional per constraint index. -/
+  form : cidx → Matrix ι ι ℝ → ℝ
+  /-- The ceiling each functional must respect. -/
+  bound : cidx → ℝ
+  form_add : ∀ (a : cidx) (M N : Matrix ι ι ℝ),
+    form a (M + N) = form a M + form a N
+  form_smul : ∀ (a : cidx) (c : ℝ) (M : Matrix ι ι ℝ),
+    form a (c • M) = c * form a M
+
+namespace BackgroundClass
+
+section Capacity
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι] {cidx : Type*}
+variable (K : BackgroundClass ι cidx)
+
+/-- Membership in the background class: above the floor, and under every
+ceiling.
+
+    Empirical status: UNTESTED (a definition of legality, not a measurement). -/
+def IsNull (S : Matrix ι ι ℝ) : Prop :=
+  VarianceNonneg (S - K.base) ∧ ∀ a : cidx, K.form a S ≤ K.bound a
+
+/-- **Spike load of a constraint in a direction**: how fast the constraint's
+value rises per unit of spike.  This is the quantity that decides rigidity.
+
+    Empirical status: UNTESTED. -/
+def spikeLoad (a : cidx) (v : ι → ℝ) : ℝ := K.form a (spikeOuter v)
+
+/-- **Headroom of a constraint at the baseline**: how much of its budget the
+null covariance has not yet spent.
+
+    Empirical status: UNTESTED. -/
+def headroom (a : cidx) (S₀ : Matrix ι ι ℝ) : ℝ := K.bound a - K.form a S₀
+
+/-- A constraint is *active* at `S₀` when it is met with equality: the baseline
+has spent its entire budget.
+
+    Empirical status: UNTESTED. -/
+def Active (a : cidx) (S₀ : Matrix ι ι ℝ) : Prop := K.form a S₀ = K.bound a
+
+/-- The spiked covariance at level `t` in direction `v`.
+
+    Empirical status: DERIVED (this is the bump of
+    `covarianceMatrix_addRankOneSignal`, re-parametrized so the level enters
+    linearly). -/
+def spiked (S₀ : Matrix ι ι ℝ) (t : ℝ) (v : ι → ℝ) : Matrix ι ι ℝ :=
+  S₀ + t • spikeOuter v
+
+theorem headroom_nonneg {S₀ : Matrix ι ι ℝ} (hnull : K.IsNull S₀) (a : cidx) :
+    0 ≤ K.headroom a S₀ :=
+  sub_nonneg.mpr (hnull.2 a)
+
+theorem headroom_eq_zero_of_active {a : cidx} {S₀ : Matrix ι ι ℝ}
+    (hactive : K.Active a S₀) : K.headroom a S₀ = 0 := by
+  have h : K.form a S₀ = K.bound a := hactive
+  unfold headroom
+  rw [h]
+  ring
+
+/-- **Every constraint moves linearly in the spike level, at rate equal to its
+spike load.**  This single identity is the whole reason the capacity is a
+linear-programming value: the feasible set of levels is an intersection of
+half-lines. -/
+theorem form_spiked (a : cidx) (S₀ : Matrix ι ι ℝ) (t : ℝ) (v : ι → ℝ) :
+    K.form a (K.spiked S₀ t v) = K.form a S₀ + t * K.spikeLoad a v := by
+  unfold spiked spikeLoad
+  rw [K.form_add, K.form_smul]
+
+/-- The set of *exit levels*: for each constraint and each spike direction with
+positive load, the level at which that constraint is first violated.  The
+capacity is the infimum of this set — the linear program.
+
+    Empirical status: UNTESTED. -/
+def exitLevels (S₀ : Matrix ι ι ℝ) (support : Set (ι → ℝ)) : Set ℝ :=
+  {s | ∃ a : cidx, ∃ v ∈ support, 0 < K.spikeLoad a v ∧
+    s = K.headroom a S₀ / K.spikeLoad a v}
+
+/-- **The imitation capacity: the value of the linear program.**  The largest
+spike level at which the mixed alternative is still a mixture of nulls.
+
+    Empirical status: UNTESTED. Testable by construction: for a background
+    class given by explicit linear constraints this is a finite infimum a
+    simulation can evaluate and compare against a measured detection boundary. -/
+def imitationCapacity (S₀ : Matrix ι ι ℝ) (support : Set (ι → ℝ)) : ℝ :=
+  sInf (K.exitLevels S₀ support)
+
+theorem bddBelow_exitLevels {S₀ : Matrix ι ι ℝ} (hnull : K.IsNull S₀)
+    (support : Set (ι → ℝ)) : BddBelow (K.exitLevels S₀ support) := by
+  refine ⟨0, ?_⟩
+  rintro s ⟨a, v, _hv, hload, rfl⟩
+  exact div_nonneg (K.headroom_nonneg hnull a) (le_of_lt hload)
+
+theorem imitationCapacity_le {S₀ : Matrix ι ι ℝ} (hnull : K.IsNull S₀)
+    {support : Set (ι → ℝ)} {a : cidx} {v : ι → ℝ} (hv : v ∈ support)
+    (hload : 0 < K.spikeLoad a v) :
+    K.imitationCapacity S₀ support ≤ K.headroom a S₀ / K.spikeLoad a v :=
+  csInf_le (K.bddBelow_exitLevels hnull support) ⟨a, v, hv, hload, rfl⟩
+
+theorem le_imitationCapacity {S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)} {t : ℝ}
+    (hne : (K.exitLevels S₀ support).Nonempty)
+    (hlb : ∀ (a : cidx) (v : ι → ℝ), v ∈ support → 0 < K.spikeLoad a v →
+      t ≤ K.headroom a S₀ / K.spikeLoad a v) :
+    t ≤ K.imitationCapacity S₀ support := by
+  refine le_csInf hne ?_
+  rintro s ⟨a, v, hv, hload, rfl⟩
+  exact hlb a v hv hload
+
+/-!
+### The licence: below the capacity the alternative is a mixture of nulls
+
+`isNull_spiked_of_le_imitationCapacity` is the statement that matters for
+practice.  It says the *components* of the mixed alternative are themselves
+null covariances, so the alternative law is literally a mixture of null laws
+within any covariance-determined family — Gaussian, in the applications.  No
+test at any sample size separates a mixture of nulls from the convex hull of
+the null family; that is the imitation wall.
+-/
+
+/-- **Licence.**  At any nonnegative level at or below the capacity, the spiked
+covariance in any supported direction is itself a member of the background
+class. -/
+theorem isNull_spiked_of_le_imitationCapacity {S₀ : Matrix ι ι ℝ}
+    {support : Set (ι → ℝ)} (hnull : K.IsNull S₀)
+    {t : ℝ} (ht : 0 ≤ t) (hle : t ≤ K.imitationCapacity S₀ support)
+    {v : ι → ℝ} (hv : v ∈ support) :
+    K.IsNull (K.spiked S₀ t v) := by
+  constructor
+  · have hrewrite : K.spiked S₀ t v - K.base = (S₀ - K.base) + t • spikeOuter v := by
+      unfold spiked
+      exact add_sub_right_comm S₀ (t • spikeOuter v) K.base
+    rw [hrewrite]
+    exact varianceNonneg_add hnull.1
+      (varianceNonneg_smul ht (varianceNonneg_spikeOuter v))
+  · intro a
+    rw [K.form_spiked]
+    have hbase := hnull.2 a
+    rcases le_or_lt (K.spikeLoad a v) 0 with hload | hload
+    · have hstep : t * K.spikeLoad a v ≤ 0 := by nlinarith [ht, hload]
+      linarith
+    · have hcap : t ≤ K.headroom a S₀ / K.spikeLoad a v :=
+        le_trans hle (K.imitationCapacity_le hnull hv hload)
+      have hmul : t * K.spikeLoad a v ≤ K.headroom a S₀ :=
+        (le_div_iff₀ hload).mp hcap
+      unfold headroom at hmul
+      linarith
+
+/-- **The class is convex**, so a mixture of nulls is a null at the level of
+covariances too.  Together with the licence this is the sense in which the
+mixed alternative "is" a background: not merely componentwise legal, but legal
+after mixing. -/
+theorem isNull_convex {S T : Matrix ι ι ℝ} (hS : K.IsNull S) (hT : K.IsNull T)
+    {w : ℝ} (hw0 : 0 ≤ w) (hw1 : w ≤ 1) :
+    K.IsNull (w • S + (1 - w) • T) := by
+  have hw1' : (0 : ℝ) ≤ 1 - w := by linarith
+  constructor
+  · have hrewrite : w • S + (1 - w) • T - K.base
+        = w • (S - K.base) + (1 - w) • (T - K.base) := by
+      ext i j
+      simp only [Matrix.add_apply, Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul]
+      ring
+    rw [hrewrite]
+    exact varianceNonneg_add (varianceNonneg_smul hw0 hS.1)
+      (varianceNonneg_smul hw1' hT.1)
+  · intro a
+    rw [K.form_add, K.form_smul, K.form_smul]
+    have h1 : w * K.form a S ≤ w * K.bound a :=
+      mul_le_mul_of_nonneg_left (hS.2 a) hw0
+    have h2 : (1 - w) * K.form a T ≤ (1 - w) * K.bound a :=
+      mul_le_mul_of_nonneg_left (hT.2 a) hw1'
+    nlinarith [h1, h2]
+
+/-!
+### The certificate: an active constraint with positive load forces capacity zero
+
+This is the Hahn–Banach direction, and the reason the theorem is useful rather
+than merely true: the separating functional is not asserted to exist, it is
+returned.  The constraint index `a` *is* the certificate.
+-/
+
+/-- **Rigidity, pointwise.**  If a constraint is active at the baseline and has
+positive load in direction `v`, then no positive spike level in that direction
+is legal.  The proof is one line of arithmetic on the constraint value, which
+is exactly the point: rigidity is a normal-cone condition, not a symmetry
+condition. -/
+theorem not_isNull_spiked_of_active {S₀ : Matrix ι ι ℝ} {a : cidx} {v : ι → ℝ}
+    (hactive : K.Active a S₀) (hload : 0 < K.spikeLoad a v)
+    {t : ℝ} (ht : 0 < t) :
+    ¬ K.IsNull (K.spiked S₀ t v) := by
+  intro hcontra
+  have hbound := hcontra.2 a
+  have hactive' : K.form a S₀ = K.bound a := hactive
+  rw [K.form_spiked, hactive'] at hbound
+  have hpos : 0 < t * K.spikeLoad a v := mul_pos ht hload
+  linarith
+
+/-- **Rigidity, as a linear-programming value.**  An active constraint with
+positive spike load in some supported direction drives the capacity to zero:
+the background class can imitate nothing at all. -/
+theorem imitationCapacity_eq_zero_of_active {S₀ : Matrix ι ι ℝ}
+    {support : Set (ι → ℝ)} (hnull : K.IsNull S₀)
+    {a : cidx} {v : ι → ℝ} (hv : v ∈ support)
+    (hactive : K.Active a S₀) (hload : 0 < K.spikeLoad a v) :
+    K.imitationCapacity S₀ support = 0 := by
+  have hmem : (0 : ℝ) ∈ K.exitLevels S₀ support := by
+    refine ⟨a, v, hv, hload, ?_⟩
+    rw [K.headroom_eq_zero_of_active hactive, zero_div]
+  refine le_antisymm ?_ ?_
+  · exact csInf_le (K.bddBelow_exitLevels hnull support) hmem
+  · refine le_csInf ⟨0, hmem⟩ ?_
+    rintro s ⟨b, w, _hw, hloadb, rfl⟩
+    exact div_nonneg (K.headroom_nonneg hnull b) (le_of_lt hloadb)
+
+/-!
+### Leave-one-chromosome-out is a restriction of the background class
+
+LOCO is usually described as removing the proximal contribution from the
+relatedness matrix so a test statistic is not adjusted by its own signal.  In
+this frame it is something sharper and more computable: it *adds* linear
+constraints to the background class.  The capacity is antitone in the
+constraint family, so LOCO can only lower the imitation wall — and the amount
+by which it lowers it is the difference of two linear-programming values, not
+an unquantified benefit.
+-/
+
+/-- **Adding constraints cannot raise the capacity.**  `f` embeds the smaller
+constraint family into the larger one with the same functionals and ceilings;
+every exit level of the small class is an exit level of the large one, so the
+large class's infimum is no larger. -/
+theorem imitationCapacity_antitone_constraints {cidx' : Type*}
+    (K' : BackgroundClass ι cidx') {S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}
+    (hnull' : K'.IsNull S₀) (f : cidx → cidx')
+    (hform : ∀ a : cidx, K'.form (f a) = K.form a)
+    (hbound : ∀ a : cidx, K'.bound (f a) = K.bound a)
+    (hne : (K.exitLevels S₀ support).Nonempty) :
+    K'.imitationCapacity S₀ support ≤ K.imitationCapacity S₀ support := by
+  refine csInf_le_csInf (K'.bddBelow_exitLevels hnull' support) hne ?_
+  rintro s ⟨a, v, hv, hload, rfl⟩
+  have hloadeq : K'.spikeLoad (f a) v = K.spikeLoad a v := by
+    unfold spikeLoad
+    rw [hform a]
+  have hheadeq : K'.headroom (f a) S₀ = K.headroom a S₀ := by
+    unfold headroom
+    rw [hform a, hbound a]
+  refine ⟨f a, v, hv, ?_, ?_⟩
+  · rw [hloadeq]
+    exact hload
+  · rw [hloadeq, hheadeq]
+
+end Capacity
+
+end BackgroundClass
+
+/-!
+## The concrete certificate: a Frobenius pairing
+
+Every constraint used in the applications — trace windows, block-LD budgets,
+per-chromosome budgets — is a Frobenius pairing `⟪A, Σ⟫` against a fixed
+matrix.  For that shape the spike load is a quadratic form, so "positive spike
+load" is checkable, and the certificate statistic is continuous, so the
+population-level separation of the next section transfers to samples.
+-/
+
+section Frobenius
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι] {cidx : Type*}
+
+/-- **The Frobenius pairing** `⟪A, M⟫ = tr(AᵀM)`, written as a double sum so no
+trace lemmas are needed.
+
+    Empirical status: DERIVED (a definition of the pairing; its identification
+    with the spike load is `frobeniusForm_spikeOuter`). -/
+def frobeniusForm (A M : Matrix ι ι ℝ) : ℝ := ∑ i, ∑ j, A i j * M i j
+
+theorem frobeniusForm_add (A M N : Matrix ι ι ℝ) :
+    frobeniusForm A (M + N) = frobeniusForm A M + frobeniusForm A N := by
+  unfold frobeniusForm
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl (fun j _ => ?_)
+  simp only [Matrix.add_apply]
+  ring
+
+theorem frobeniusForm_smul (A : Matrix ι ι ℝ) (c : ℝ) (M : Matrix ι ι ℝ) :
+    frobeniusForm A (c • M) = c * frobeniusForm A M := by
+  unfold frobeniusForm
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl (fun j _ => ?_)
+  simp only [Matrix.smul_apply, smul_eq_mul]
+  ring
+
+/-- **The spike load of a Frobenius constraint is the quadratic form of its
+matrix in the spike direction.**  This is what makes "positive spike load" a
+checkable condition rather than an abstraction: for a positive-definite `A` it
+holds in every nonzero direction. -/
+theorem frobeniusForm_spikeOuter (A : Matrix ι ι ℝ) (v : ι → ℝ) :
+    frobeniusForm A (spikeOuter v) = quadForm A v := by
+  unfold frobeniusForm quadForm gramForm
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  refine Finset.sum_congr rfl (fun j _ => ?_)
+  simp only [spikeOuter]
+  ring
+
+/-- **Consistency of the certificate statistic.**  Entrywise convergence of the
+empirical covariance carries the Frobenius certificate to its population value.
+Combined with `EquiExit.certificateTest_power` and
+`EquiExit.certificateTest_null_control` this closes the achievability half for
+the trace-window certificate, given a consistent covariance estimator.  What it
+does *not* supply is the probabilistic statement that a sample covariance from
+`n` draws is entrywise consistent: that is a hypothesis here, not a
+conclusion. -/
+theorem frobeniusForm_tendsto (A : Matrix ι ι ℝ)
+    (empirical : ℕ → Matrix ι ι ℝ) (S : Matrix ι ι ℝ)
+    (hentry : ∀ i j, Filter.Tendsto (fun n => empirical n i j) Filter.atTop
+      (nhds (S i j))) :
+    Filter.Tendsto (fun n => frobeniusForm A (empirical n)) Filter.atTop
+      (nhds (frobeniusForm A S)) := by
+  unfold frobeniusForm
+  exact tendsto_finset_sum _ (fun i _ =>
+    tendsto_finset_sum _ (fun j _ => (hentry i j).const_mul (A i j)))
+
+/-- **Achievability for an abstract certificate: the remaining obligation.**
+
+For a general `BackgroundClass.form` — additive and `ℝ`-homogeneous, but with
+no further structure recorded in the type — the step from entrywise consistency
+to consistency of the certificate statistic is the routine finite-dimensional
+fact that such a functional is a linear combination of matrix entries and hence
+continuous.  It is *not* proved here.
+
+What this `sorry` stands for, exactly: the representation
+`form a M = ∑ i ∑ j (form a Eᵢⱼ) · Mᵢⱼ` over the matrix units `Eᵢⱼ`, followed
+by `frobeniusForm_tendsto`.  Nothing probabilistic is hidden in it — the
+probabilistic content, that a sample covariance is entrywise consistent, is a
+hypothesis of this statement rather than part of its conclusion.  For the
+certificate actually used in the applications the obligation does not arise,
+because `frobeniusForm_tendsto` is proved outright. -/
+theorem BackgroundClass.form_tendsto_of_entrywise
+    (K : BackgroundClass ι cidx) (a : cidx)
+    (empirical : ℕ → Matrix ι ι ℝ) (S : Matrix ι ι ℝ)
+    (_hentry : ∀ i j, Filter.Tendsto (fun n => empirical n i j) Filter.atTop
+      (nhds (S i j))) :
+    Filter.Tendsto (fun n => K.form a (empirical n)) Filter.atTop
+      (nhds (K.form a S)) := by
+  sorry
+
+end Frobenius
+
+/-!
+## Threshold equals capacity on the equi-exit class
+
+Equi-exit is the hypothesis that the binding constraint's spike load is
+constant over the prior's support.  It is the precise content of the informal
+"the likelihood ratio depends on the nuisance only through a quadratic form":
+if the load varied over the support, different components of the mixture would
+exit the class at different levels and there would be no single threshold to
+speak of.  It is carried here as an explicit field of `EquiExit`, so no theorem
+below can be read as holding more generally than it does.
+-/
+
+section EquiExitClass
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι] {cidx : Type*}
+
+/-- **The equi-exit hypothesis, made explicit.**  One constraint `binding`
+whose spike load is the same constant `load` in every supported direction, and
+which attains the linear program's infimum.
+
+    Empirical status: UNTESTED. Directly falsifiable: draw effect vectors from
+    the prior, evaluate `ℓ_a(vvᵀ)` on each, and check the value is constant. -/
+structure EquiExit (K : BackgroundClass ι cidx) (S₀ : Matrix ι ι ℝ)
+    (support : Set (ι → ℝ)) where
+  /-- The certificate: which constraint binds. -/
+  binding : cidx
+  /-- The common spike load of the binding constraint. -/
+  load : ℝ
+  load_pos : 0 < load
+  /-- Some direction is actually supported. -/
+  supported : ∃ v, v ∈ support
+  /-- **Equi-exit.**  The binding constraint's load does not depend on the
+  direction drawn from the effect prior. -/
+  equi : ∀ v ∈ support, K.spikeLoad binding v = load
+  /-- The binding constraint attains the infimum. -/
+  binds : ∀ (a : cidx) (v : ι → ℝ), v ∈ support → 0 < K.spikeLoad a v →
+    K.headroom binding S₀ / load ≤ K.headroom a S₀ / K.spikeLoad a v
+
+namespace EquiExit
+
+variable {K : BackgroundClass ι cidx} {S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}
+
+theorem exitLevels_nonempty (E : EquiExit K S₀ support) :
+    (K.exitLevels S₀ support).Nonempty := by
+  obtain ⟨v, hv⟩ := E.supported
+  have hload : 0 < K.spikeLoad E.binding v := by
+    rw [E.equi v hv]
+    exact E.load_pos
+  exact ⟨K.headroom E.binding S₀ / K.spikeLoad E.binding v,
+    E.binding, v, hv, hload, rfl⟩
+
+/-- **The linear program's value in closed form.**  On the equi-exit class the
+infimum is attained at the binding constraint, so the capacity is a single
+quotient: headroom over load. -/
+theorem imitationCapacity_eq (E : EquiExit K S₀ support) (hnull : K.IsNull S₀) :
+    K.imitationCapacity S₀ support = K.headroom E.binding S₀ / E.load := by
+  obtain ⟨v, hv⟩ := E.supported
+  have hloadv : K.spikeLoad E.binding v = E.load := E.equi v hv
+  have hloadpos : 0 < K.spikeLoad E.binding v := by
+    rw [hloadv]
+    exact E.load_pos
+  refine le_antisymm ?_ ?_
+  · have hle := K.imitationCapacity_le hnull hv hloadpos
+    rwa [hloadv] at hle
+  · refine K.le_imitationCapacity E.exitLevels_nonempty ?_
+    intro a w hw hload
+    exact E.binds a w hw hload
+
+/-- **The margin by which a level-`t` alternative overshoots the binding
+constraint.**  Positive exactly above the capacity; this is the quantity the
+synthesized test is calibrated against.
+
+    Empirical status: UNTESTED. -/
+def margin (E : EquiExit K S₀ support) (t : ℝ) : ℝ :=
+  t * E.load - K.headroom E.binding S₀
+
+theorem margin_pos_of_gt_capacity (E : EquiExit K S₀ support)
+    (hnull : K.IsNull S₀) {t : ℝ}
+    (ht : K.imitationCapacity S₀ support < t) : 0 < E.margin t := by
+  rw [E.imitationCapacity_eq hnull, div_lt_iff₀ E.load_pos] at ht
+  unfold margin
+  linarith
+
+/-- **The certificate statistic's population value at the alternative.**  It
+sits exactly `margin t` above the null ceiling: the certificate does not merely
+correlate with detectability, it measures it. -/
+theorem form_spiked_eq_bound_add_margin (E : EquiExit K S₀ support) (t : ℝ)
+    {v : ι → ℝ} (hv : v ∈ support) :
+    K.form E.binding (K.spiked S₀ t v) = K.bound E.binding + E.margin t := by
+  rw [K.form_spiked, E.equi v hv]
+  unfold margin BackgroundClass.headroom
+  ring
+
+/-- **The synthesized test.**  Reject when the empirical certificate statistic
+exceeds the null ceiling plus half the margin.  There is no tuning parameter
+and no oracle: both the ceiling and the margin are functionals of the declared
+background class.
+
+    Empirical status: UNTESTED. -/
+def rejectionThreshold (E : EquiExit K S₀ support) (t : ℝ) : ℝ :=
+  K.bound E.binding + E.margin t / 2
+
+/-- **Null control.**  Whatever null covariance generated the data, if the
+empirical certificate is within half the margin of its population value the
+test does not reject.  This holds uniformly over the whole class, because the
+ceiling is a property of the class rather than of any particular null. -/
+theorem certificateTest_null_control (E : EquiExit K S₀ support)
+    {S : Matrix ι ι ℝ} (hS : K.IsNull S) {empirical t ε : ℝ}
+    (hε : ε ≤ E.margin t / 2)
+    (hclose : |empirical - K.form E.binding S| ≤ ε) :
+    empirical ≤ E.rejectionThreshold t := by
+  have habs := abs_le.mp hclose
+  have hbound := hS.2 E.binding
+  unfold rejectionThreshold
+  linarith [habs.2]
+
+/-- **Power.**  Above the capacity the margin is positive; if the empirical
+certificate is within strictly less than half the margin of its population
+value at the alternative, the test rejects.  Together with null control this is
+the achievability side of threshold-equals-capacity, at the level of the
+certificate statistic. -/
+theorem certificateTest_power (E : EquiExit K S₀ support)
+    {t ε : ℝ} {v : ι → ℝ} (hv : v ∈ support) (hε : ε < E.margin t / 2)
+    {empirical : ℝ}
+    (hclose : |empirical - K.form E.binding (K.spiked S₀ t v)| ≤ ε) :
+    E.rejectionThreshold t < empirical := by
+  have hpop := E.form_spiked_eq_bound_add_margin t hv
+  have habs := abs_le.mp hclose
+  rw [hpop] at habs
+  unfold rejectionThreshold
+  linarith [habs.1]
+
+end EquiExit
+
+end EquiExitClass
+
+/-!
+## Rigidity is not a symmetry condition
+
+It had been conjectured that a background class can be rigid only if it has a
+transitive symmetry group — that rigidity is a consequence of the class being
+"the same in every direction".  It is not.  Rigidity is the normal-cone
+condition of the previous section, and the following class witnesses it with a
+completely generic positive-definite `A` and no symmetry at all: one linear
+constraint, active at the baseline by construction, with spike load `vᵀAv > 0`
+in every nonzero direction.
+-/
+
+section NoSymmetry
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- **The one-constraint trace-window class.**  A single linear budget
+`⟪A, Σ⟫ ≤ ⟪A, Σ₀⟫`, active at `Σ₀` by construction.
+
+    Empirical status: UNTESTED. -/
+def traceWindowClass (base A S₀ : Matrix ι ι ℝ) : BackgroundClass ι Unit where
+  base := base
+  form := fun _ => frobeniusForm A
+  bound := fun _ => frobeniusForm A S₀
+  form_add := fun _ M N => frobeniusForm_add A M N
+  form_smul := fun _ c M => frobeniusForm_smul A c M
+
+theorem traceWindowClass_active (base A S₀ : Matrix ι ι ℝ) :
+    (traceWindowClass base A S₀).Active () S₀ := rfl
+
+theorem traceWindowClass_spikeLoad (base A S₀ : Matrix ι ι ℝ) (v : ι → ℝ) :
+    (traceWindowClass base A S₀).spikeLoad () v = quadForm A v :=
+  frobeniusForm_spikeOuter A v
+
+theorem traceWindowClass_isNull_baseline {base A S₀ : Matrix ι ι ℝ}
+    (hbase : VarianceNonneg (S₀ - base)) :
+    (traceWindowClass base A S₀).IsNull S₀ := by
+  refine ⟨hbase, ?_⟩
+  intro a
+  exact le_refl _
+
+/-- **Rigidity without symmetry.**  For any positive-definite `A` — generic,
+with trivial automorphism group — the trace-window class has imitation capacity
+zero: every spike direction points out of the class at `Σ₀`.  No symmetry
+hypothesis appears in the statement or the proof, which refutes the conjecture
+that rigidity requires a transitive group. -/
+theorem traceWindow_rigid {base A S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}
+    (hpd : ∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v)
+    (hbase : VarianceNonneg (S₀ - base))
+    {v : ι → ℝ} (hv : v ∈ support) (hvne : v ≠ 0) :
+    (traceWindowClass base A S₀).imitationCapacity S₀ support = 0 := by
+  refine (traceWindowClass base A S₀).imitationCapacity_eq_zero_of_active
+    (traceWindowClass_isNull_baseline hbase) hv
+    (traceWindowClass_active base A S₀) ?_
+  rw [traceWindowClass_spikeLoad]
+  exact hpd v hvne
+
+/-- **The design instruction.**  Constrain the background class by an active
+linear constraint with positive spike load and detection becomes possible where
+it was information-theoretically impossible: at every positive level the spiked
+covariance leaves the class, so the certificate statistic separates. -/
+theorem traceWindow_every_level_detectable {base A S₀ : Matrix ι ι ℝ}
+    (hpd : ∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v)
+    {v : ι → ℝ} (hvne : v ≠ 0) {t : ℝ} (ht : 0 < t) :
+    ¬ (traceWindowClass base A S₀).IsNull
+      ((traceWindowClass base A S₀).spiked S₀ t v) := by
+  refine (traceWindowClass base A S₀).not_isNull_spiked_of_active
+    (traceWindowClass_active base A S₀) ?_ ht
+  rw [traceWindowClass_spikeLoad]
+  exact hpd v hvne
+
+end NoSymmetry
+
+/-!
+## The AR(1) whitening gain is the certificate value of the trace window
+
+`Calibrator.ImitationRigidity` computes, for a stationary first-order LD kernel
+with per-site retention `ρ`, the per-variant limit of `tr K⁻¹`:
+
+    ldWhiteningGain ρ = (1 + ρ²) / (1 - ρ²),
+
+the harmonic mean of the LD symbol.  That quantity was previously *related to*
+detection thresholds.  It is now *identified* as one: it is the spike load of
+the whitened trace-window constraint under an isotropic effect prior, hence the
+denominator of the linear program's value.  The isotropic prior is what
+supplies equi-exit — the load is the same in every direction — so the threshold
+equals the capacity by `EquiExit.imitationCapacity_eq`, and the capacity is
+headroom divided by the whitening gain.
+-/
+
+section WhiteningGain
+
+/-- **The finite-chromosome trace-window spike load**: the normalized trace of
+the LD precision matrix, which is the value the trace-window certificate
+assigns to a unit isotropic spike on `nSites` variants.
+
+    Empirical status: DERIVED from `ldPrecisionTrace`, itself derived from the
+    AR(1) precision stencil (`stationaryLD_interior_stencil`). -/
+def traceWindowSpikeLoad (decay : ℝ) (nSites : ℕ) : ℝ :=
+  ldPrecisionTrace decay nSites / (nSites : ℝ)
+
+/-- **The identification.**  The whitening gain already in the corpus *is* the
+large-chromosome certificate value of the trace-window constraint.  This is
+what turns `(1+ρ²)/(1-ρ²)` from a quantity correlated with detectability into
+the denominator of the detection threshold. -/
+theorem traceWindowSpikeLoad_tendsto_ldWhiteningGain {decay : ℝ}
+    (hd : |decay| < 1) :
+    Filter.Tendsto (traceWindowSpikeLoad decay) Filter.atTop
+      (nhds (ldWhiteningGain decay)) := by
+  unfold traceWindowSpikeLoad
+  exact ldPrecisionTrace_div_sites_tendsto hd
+
+/-- **The whitened capacity**: the linear program's value when the binding
+constraint is the trace window and the effect prior is isotropic.
+
+    Empirical status: UNTESTED. Directly testable: simulate AR(1) genotypes at
+    known `ρ`, sweep the spike level, and compare the measured detection
+    boundary against `headroom · (1 - ρ²) / (1 + ρ²)`. -/
+def whitenedCapacity (headroom decay : ℝ) : ℝ :=
+  headroom / ldWhiteningGain decay
+
+theorem whitenedCapacity_closedForm (headroom decay : ℝ) :
+    whitenedCapacity headroom decay =
+      headroom * (1 - decay ^ 2) / (1 + decay ^ 2) := by
+  unfold whitenedCapacity ldWhiteningGain
+  rw [div_div_eq_mul_div]
+
+/-- **Threshold equals capacity, for the LD certificate.**  When the binding
+constraint is the trace window and the equi-exit load is the whitening gain,
+the imitation capacity — and hence, by `EquiExit.imitationCapacity_eq` together
+with the two halves of the certificate test, the detection threshold — is
+headroom over `(1+ρ²)/(1-ρ²)`. -/
+theorem imitationCapacity_eq_whitenedCapacity
+    {ι : Type*} [Fintype ι] [DecidableEq ι] {cidx : Type*}
+    {K : BackgroundClass ι cidx} {S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}
+    (E : EquiExit K S₀ support) (hnull : K.IsNull S₀) {decay : ℝ}
+    (hload : E.load = ldWhiteningGain decay) :
+    K.imitationCapacity S₀ support =
+      whitenedCapacity (K.headroom E.binding S₀) decay := by
+  unfold whitenedCapacity
+  rw [E.imitationCapacity_eq hnull, hload]
+
+/-- **Stronger LD lowers the threshold.**  More LD means a larger whitening
+gain, hence a smaller capacity: the imitation wall is lower on a strongly
+linked chromosome, so a spike of a given size is easier to detect after
+whitening.  This is the opposite of the intuition that LD only costs
+information, and it is a consequence of the certificate being edge-sensitive. -/
+theorem whitenedCapacity_strictAnti {headroom decay₁ decay₂ : ℝ}
+    (hheadroom : 0 < headroom) (h₁ : 0 ≤ decay₁) (h₂ : |decay₂| < 1)
+    (hlt : decay₁ < decay₂) :
+    whitenedCapacity headroom decay₂ < whitenedCapacity headroom decay₁ := by
+  have hup : decay₂ < 1 := (abs_lt.mp h₂).2
+  have hd₁ : |decay₁| < 1 := by
+    rw [abs_lt]
+    exact ⟨by linarith, by linarith⟩
+  have hg₁ : (0 : ℝ) < ldWhiteningGain decay₁ :=
+    lt_of_lt_of_le zero_lt_one (ldWhiteningGain_ge_one hd₁)
+  have hg₂ : (0 : ℝ) < ldWhiteningGain decay₂ :=
+    lt_of_lt_of_le zero_lt_one (ldWhiteningGain_ge_one h₂)
+  have hmono : ldWhiteningGain decay₁ < ldWhiteningGain decay₂ :=
+    ldWhiteningGain_strictMono h₁ h₂ hlt
+  unfold whitenedCapacity
+  rw [div_lt_div_iff₀ hg₂ hg₁]
+  exact mul_lt_mul_of_pos_left hmono hheadroom
+
+end WhiteningGain
+
+/-!
+## The `m_eff` prohibition
+
+Multiple-testing corrections in statistical genetics replace the raw variant
+count by an *effective number of independent markers* computed from the
+eigenvalues of the LD matrix: the Cheverud–Nyholt and Li–Ji family.  Every
+member of that family is a participation-ratio-flavoured functional of the
+empirical spectral distribution — it depends on the eigenvalues only through
+their normalized moments, and it is therefore continuous in the weak topology.
+
+The theorem below says no such functional can determine a detection threshold.
+The witness is explicit and finite.  On `m = n + n²` markers, perturb the `n`
+smallest eigenvalues from `1` down to `1/(n+1)` — a vanishing fraction,
+`1/(n+1)`, of the spectrum.  Then:
+
+* every normalized moment moves by at most `1/(n+1)`, so the weak limit is
+  unchanged and every weakly continuous functional agrees asymptotically;
+* the inverse-trace certificate moves from `1` to `1 + n/(n+1)`, a factor
+  approaching two.
+
+So the threshold is discontinuous in the weak topology.  This is the same fact,
+seen from the other side, as `traceWindowSpikeLoad_tendsto_ldWhiteningGain`:
+the corpus's `tr K⁻¹`-based whitening gain is the right functional *because* it
+is edge-sensitive and not weakly continuous, and an `m_eff` of the
+participation-ratio type is the wrong one for exactly the reason it is weakly
+continuous.  The two facts are consistent, and their consistency is the point.
+-/
+
+section MeffProhibition
+
+/-- **A two-block spectrum**: the first `k` eigenvalues equal `ε`, the rest
+equal `1`.
+
+    Empirical status: DERIVED. A witness construction, not a claim about any
+    real LD matrix; its only role is to be a legal spectrum. -/
+def blockSpectrum (k : ℕ) (ε : ℝ) : ℕ → ℝ := fun i => if i < k then ε else 1
+
+/-- **The `p`-th normalized moment of the leading `m` eigenvalues.**  Weak
+convergence of empirical spectral distributions with bounded support is
+convergence of all of these, so a functional determined by them is precisely a
+weakly continuous one.
+
+    Empirical status: DERIVED. -/
+def normalizedMoment (m : ℕ) (lam : ℕ → ℝ) (p : ℕ) : ℝ :=
+  (∑ i ∈ Finset.range m, lam i ^ p) / (m : ℝ)
+
+/-- **The inverse-trace certificate**: `tr K⁻¹ / m` in eigenvalue coordinates.
+This is the quantity `ldWhiteningGain` computes in closed form for an AR(1)
+kernel, and the one the linear program identifies as the detection threshold's
+denominator.
+
+    Empirical status: DERIVED. In the AR(1) case it is `traceWindowSpikeLoad`,
+    by the definition of `ldPrecisionTrace` as the trace of the inverse. -/
+def inverseTraceCertificate (m : ℕ) (lam : ℕ → ℝ) : ℝ :=
+  (∑ i ∈ Finset.range m, (lam i)⁻¹) / (m : ℝ)
+
+theorem sum_twoBlock (a b : ℝ) (k j : ℕ) :
+    ∑ i ∈ Finset.range (k + j), (if i < k then a else b) =
+      (k : ℝ) * a + (j : ℝ) * b := by
+  induction j with
+  | zero =>
+      have hcongr : ∀ i ∈ Finset.range (k + 0), (if i < k then a else b) = a := by
+        intro i hi
+        have hi' : i < k := by
+          have := Finset.mem_range.mp hi
+          omega
+        exact if_pos hi'
+      rw [Finset.sum_congr rfl hcongr, Finset.sum_const, Finset.card_range,
+        nsmul_eq_mul]
+      simp
+  | succ n ih =>
+      have hstep : k + (n + 1) = (k + n) + 1 := by omega
+      have hnot : ¬ (k + n < k) := by omega
+      rw [hstep, Finset.sum_range_succ, ih, if_neg hnot]
+      push_cast
+      ring
+
+theorem sum_blockSpectrum (k j : ℕ) (ε : ℝ) (f : ℝ → ℝ) :
+    ∑ i ∈ Finset.range (k + j), f (blockSpectrum k ε i) =
+      (k : ℝ) * f ε + (j : ℝ) * f 1 := by
+  have hpoint : ∀ i : ℕ, f (blockSpectrum k ε i) = if i < k then f ε else f 1 := by
+    intro i
+    unfold blockSpectrum
+    exact apply_ite f (i < k) ε 1
+  simp only [hpoint]
+  exact sum_twoBlock (f ε) (f 1) k j
+
+theorem normalizedMoment_blockSpectrum (k j : ℕ) (ε : ℝ) (p : ℕ) :
+    normalizedMoment (k + j) (blockSpectrum k ε) p =
+      ((k : ℝ) * ε ^ p + (j : ℝ)) / ((k : ℝ) + (j : ℝ)) := by
+  unfold normalizedMoment
+  have hsum : ∑ i ∈ Finset.range (k + j), blockSpectrum k ε i ^ p =
+      (k : ℝ) * ε ^ p + (j : ℝ) * (1 : ℝ) ^ p :=
+    sum_blockSpectrum k j ε (fun x => x ^ p)
+  rw [hsum, one_pow, mul_one]
+  push_cast
+  ring
+
+theorem inverseTraceCertificate_blockSpectrum (k j : ℕ) (ε : ℝ) :
+    inverseTraceCertificate (k + j) (blockSpectrum k ε) =
+      ((k : ℝ) * ε⁻¹ + (j : ℝ)) / ((k : ℝ) + (j : ℝ)) := by
+  unfold inverseTraceCertificate
+  have hsum : ∑ i ∈ Finset.range (k + j), (blockSpectrum k ε i)⁻¹ =
+      (k : ℝ) * ε⁻¹ + (j : ℝ) * (1 : ℝ)⁻¹ :=
+    sum_blockSpectrum k j ε (fun x => x⁻¹)
+  rw [hsum, inv_one, mul_one]
+  push_cast
+  ring
+
+/-- **Every normalized moment is insensitive to the perturbation.**  Moving a
+`1/(n+1)` fraction of the spectrum anywhere inside `[0,1]` moves every
+normalized moment by at most `1/(n+1)`, uniformly in the order `p`.  This is
+the precise sense in which the two spectra have the same weak limit. -/
+theorem blockSpectrum_moment_gap_le (n p : ℕ) (ε : ℝ) (hn : 0 < n)
+    (hε0 : 0 ≤ ε) (hε1 : ε ≤ 1) :
+    |normalizedMoment (n + n * n) (blockSpectrum n ε) p -
+      normalizedMoment (n + n * n) (blockSpectrum n 1) p| ≤ 1 / ((n : ℝ) + 1) := by
+  have hn' : (0 : ℝ) < (n : ℝ) := by exact_mod_cast hn
+  have hn1 : (0 : ℝ) < (n : ℝ) + 1 := by linarith
+  have hD : (0 : ℝ) < (n : ℝ) + (n : ℝ) * (n : ℝ) := by nlinarith
+  have hpow0 : (0 : ℝ) ≤ ε ^ p := pow_nonneg hε0 p
+  have hpow1 : ε ^ p ≤ 1 := pow_le_one₀ hε0 hε1
+  have hP : normalizedMoment (n + n * n) (blockSpectrum n ε) p =
+      ((n : ℝ) * ε ^ p + (n : ℝ) * (n : ℝ)) /
+        ((n : ℝ) + (n : ℝ) * (n : ℝ)) := by
+    rw [normalizedMoment_blockSpectrum n (n * n) ε p]
+    push_cast
+    ring
+  have hF : normalizedMoment (n + n * n) (blockSpectrum n 1) p =
+      ((n : ℝ) * 1 + (n : ℝ) * (n : ℝ)) / ((n : ℝ) + (n : ℝ) * (n : ℝ)) := by
+    rw [normalizedMoment_blockSpectrum n (n * n) 1 p, one_pow]
+    push_cast
+    ring
+  have hnum : (n : ℝ) * ε ^ p + (n : ℝ) * (n : ℝ) -
+      ((n : ℝ) * 1 + (n : ℝ) * (n : ℝ)) = (n : ℝ) * (ε ^ p - 1) := by ring
+  have habs : |ε ^ p - 1| ≤ 1 := abs_le.mpr ⟨by linarith, by linarith⟩
+  rw [hP, hF, div_sub_div_same, hnum, abs_div, abs_of_pos hD, abs_mul,
+    abs_of_pos hn', div_le_div_iff₀ hD hn1]
+  nlinarith [mul_nonneg (mul_nonneg (le_of_lt hn') (le_of_lt hn1))
+    (sub_nonneg.mpr habs), abs_nonneg (ε ^ p - 1)]
+
+/-- The perturbed spectrum of the witness: on `n + n²` markers, the `n`
+smallest eigenvalues pushed down to `1/(n+1)`.
+
+    Empirical status: DERIVED (witness construction). -/
+def meffPerturbed (n : ℕ) : ℕ → ℝ := blockSpectrum n (((n : ℝ) + 1)⁻¹)
+
+/-- The unperturbed comparison spectrum: flat at `1`.
+
+    Empirical status: DERIVED (witness construction). -/
+def meffFlat (n : ℕ) : ℕ → ℝ := blockSpectrum n 1
+
+/-- The number of markers in the witness at stage `n`.
+
+    Empirical status: DERIVED (witness construction). -/
+def meffSize (n : ℕ) : ℕ := n + n * n
+
+/-- **The two witness spectra agree on every normalized moment to within
+`1/(n+1)`.**  They therefore have the same weak limit and agree asymptotically
+on every weakly continuous functional, every fixed normalized moment
+included. -/
+theorem meff_moment_gap_le (n p : ℕ) (hn : 0 < n) :
+    |normalizedMoment (meffSize n) (meffPerturbed n) p -
+      normalizedMoment (meffSize n) (meffFlat n) p| ≤ 1 / ((n : ℝ) + 1) := by
+  have hn' : (0 : ℝ) < (n : ℝ) := by exact_mod_cast hn
+  have hn1 : (0 : ℝ) < (n : ℝ) + 1 := by linarith
+  have hεpos : (0 : ℝ) < ((n : ℝ) + 1)⁻¹ := inv_pos.mpr hn1
+  have hεmul : ((n : ℝ) + 1)⁻¹ * ((n : ℝ) + 1) = 1 :=
+    inv_mul_cancel₀ (ne_of_gt hn1)
+  have hε1 : ((n : ℝ) + 1)⁻¹ ≤ 1 := by nlinarith [mul_pos hεpos hn']
+  exact blockSpectrum_moment_gap_le n p (((n : ℝ) + 1)⁻¹) hn (le_of_lt hεpos) hε1
+
+/-- **The inverse-trace certificate moves by `n/(n+1)` — a constant — between
+the same two spectra.**  This is the discontinuity: the certificate is not
+determined by the weak limit. -/
+theorem meff_certificate_gap (n : ℕ) (hn : 0 < n) :
+    inverseTraceCertificate (meffSize n) (meffPerturbed n) -
+      inverseTraceCertificate (meffSize n) (meffFlat n) =
+      (n : ℝ) / ((n : ℝ) + 1) := by
+  have hn' : (0 : ℝ) < (n : ℝ) := by exact_mod_cast hn
+  have hn1 : (0 : ℝ) < (n : ℝ) + 1 := by linarith
+  have hD : (0 : ℝ) < (n : ℝ) + (n : ℝ) * (n : ℝ) := by nlinarith
+  have hP : inverseTraceCertificate (meffSize n) (meffPerturbed n) =
+      ((n : ℝ) * ((n : ℝ) + 1) + (n : ℝ) * (n : ℝ)) /
+        ((n : ℝ) + (n : ℝ) * (n : ℝ)) := by
+    unfold meffSize meffPerturbed
+    rw [inverseTraceCertificate_blockSpectrum n (n * n) (((n : ℝ) + 1)⁻¹), inv_inv]
+    push_cast
+    ring
+  have hF : inverseTraceCertificate (meffSize n) (meffFlat n) =
+      ((n : ℝ) * 1 + (n : ℝ) * (n : ℝ)) / ((n : ℝ) + (n : ℝ) * (n : ℝ)) := by
+    unfold meffSize meffFlat
+    rw [inverseTraceCertificate_blockSpectrum n (n * n) 1, inv_one]
+    push_cast
+    ring
+  have hnum : (n : ℝ) * ((n : ℝ) + 1) + (n : ℝ) * (n : ℝ) -
+      ((n : ℝ) * 1 + (n : ℝ) * (n : ℝ)) = (n : ℝ) * (n : ℝ) := by ring
+  rw [hP, hF, div_sub_div_same, hnum,
+    div_eq_div_iff (ne_of_gt hD) (ne_of_gt hn1)]
+  ring
+
+/-- **A functional of the spectrum determined by its low-order normalized
+moments**, with an explicit modulus of continuity.  Every member of the
+Cheverud–Nyholt and Li–Ji effective-marker family has this shape: each is a
+fixed algebraic combination of `∑λ`, `∑λ²` and the marker count, divided by
+`m`, so a uniform bound on moment differences bounds the difference of values.
+
+    Empirical status: UNTESTED. This is the abstraction of the `m_eff` family,
+    and the prohibition below is exactly as strong as the claim that the family
+    lands inside it. -/
+structure MomentContinuousFunctional where
+  /-- The value assigned to the leading `m` eigenvalues of a spectrum. -/
+  value : ℕ → (ℕ → ℝ) → ℝ
+  /-- The highest moment order the functional consults. -/
+  order : ℕ
+  /-- The modulus of continuity in the moment metric. -/
+  modulus : ℝ
+  modulus_nonneg : 0 ≤ modulus
+  /-- Continuity in the weak (moment) topology, quantitatively. -/
+  moment_lipschitz : ∀ (m : ℕ) (lam mu : ℕ → ℝ) (δ : ℝ), 0 ≤ δ →
+    (∀ p, p ≤ order → |normalizedMoment m lam p - normalizedMoment m mu p| ≤ δ) →
+    |value m lam - value m mu| ≤ modulus * δ
+
+/-- **The `m_eff` prohibition.**  No weakly continuous functional of the
+spectral law can equal the inverse-trace certificate — hence no
+participation-ratio-type effective-marker count can determine a detection
+threshold.
+
+The proof is the witness: at stage `n` the two spectra differ by at most
+`1/(n+1)` in every moment, so any moment-continuous functional differs by at
+most `C/(n+1)`, while the certificates differ by `n/(n+1)`.  Equality would
+force `n ≤ C` for every `n`.
+
+Read the other way, this is why `ldWhiteningGain` is the right quantity: it is
+a certificate value, edge-sensitive, and outside this class. -/
+theorem certificate_not_momentContinuous (Φ : MomentContinuousFunctional)
+    (hΦ : ∀ (m : ℕ) (lam : ℕ → ℝ), Φ.value m lam = inverseTraceCertificate m lam) :
+    False := by
+  obtain ⟨n, hn⟩ := exists_nat_gt Φ.modulus
+  have hnpos : 0 < n := by
+    rcases Nat.eq_zero_or_pos n with hzero | hpos
+    · exfalso
+      rw [hzero] at hn
+      have hneg : Φ.modulus < 0 := by exact_mod_cast hn
+      linarith [Φ.modulus_nonneg]
+    · exact hpos
+  have hn' : (0 : ℝ) < (n : ℝ) := by exact_mod_cast hnpos
+  have hn1 : (0 : ℝ) < (n : ℝ) + 1 := by linarith
+  have hne : ((n : ℝ) + 1) ≠ 0 := ne_of_gt hn1
+  have hδ : (0 : ℝ) ≤ 1 / ((n : ℝ) + 1) := le_of_lt (by positivity)
+  have hlip := Φ.moment_lipschitz (meffSize n) (meffPerturbed n) (meffFlat n)
+    (1 / ((n : ℝ) + 1)) hδ (fun p _ => meff_moment_gap_le n p hnpos)
+  simp only [hΦ] at hlip
+  rw [meff_certificate_gap n hnpos] at hlip
+  rw [abs_of_nonneg (le_of_lt (div_pos hn' hn1))] at hlip
+  have hsimp : Φ.modulus * (1 / ((n : ℝ) + 1)) * ((n : ℝ) + 1) = Φ.modulus := by
+    rw [mul_assoc, one_div, inv_mul_cancel₀ hne, mul_one]
+  rw [div_le_iff₀ hn1, hsimp] at hlip
+  linarith
+
+end MeffProhibition
+
+end
+
+end Calibrator

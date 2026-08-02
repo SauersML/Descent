@@ -169,7 +169,12 @@ section PolygenicityAndPortability
 noncomputable def effectivePolygenicity (sum_beta_sq sum_beta_fourth : ℝ) : ℝ :=
   sum_beta_sq^2 / sum_beta_fourth
 
-/-- Effective polygenicity ≥ 1. -/
+/-- Effective polygenicity ≥ 1.
+
+    The hypothesis `h_cs` is not free: on a genuine effect vector it is a
+    theorem, not an assumption. See `effectivePolygenicityOfEffects_mem_Icc`
+    below, which removes it and adds the matching upper bound. This form is
+    kept for callers holding only the two moment sums. -/
 theorem effective_polygenicity_ge_one
     (sum_sq sum_fourth : ℝ)
     (h_fourth : 0 < sum_fourth)
@@ -178,6 +183,65 @@ theorem effective_polygenicity_ge_one
   unfold effectivePolygenicity
   rw [le_div_iff₀ h_fourth]
   linarith
+
+/-- **Effective polygenicity of an explicit effect vector.**
+
+    The same inverse-kurtosis measure, but fed the two moment sums of a named
+    effect vector rather than two unrelated reals. Stating it this way is what
+    lets the Cauchy–Schwarz hypothesis of `effective_polygenicity_ge_one` be
+    discharged instead of assumed, and lets the matching upper bound be stated
+    at all: `M_eff` cannot exceed the number of variants, which no formulation
+    over two free reals can express.
+
+    Empirical status: UNTESTED. -/
+noncomputable def effectivePolygenicityOfEffects {q : ℕ} (beta : Fin q → ℝ) : ℝ :=
+  effectivePolygenicity (∑ j, beta j ^ 2) (∑ j, beta j ^ 4)
+
+/-- `∑ β⁴ ≤ (∑ β²)²`: the lower half of the polygenicity range, as a theorem
+about an effect vector rather than a hypothesis about two reals. It is the
+statement that a sum of nonnegative numbers dominates the sum of their
+squares. -/
+theorem sum_fourth_le_sq_sum_sq {q : ℕ} (beta : Fin q → ℝ) :
+    ∑ j, beta j ^ 4 ≤ (∑ j, beta j ^ 2) ^ 2 := by
+  have h : ∑ j : Fin q, (beta j ^ 2) ^ 2 ≤ (∑ j : Fin q, beta j ^ 2) ^ 2 :=
+    Finset.sum_sq_le_sq_sum_of_nonneg (fun j _ => sq_nonneg (beta j))
+  have hrw : ∑ j : Fin q, (beta j ^ 2) ^ 2 = ∑ j, beta j ^ 4 :=
+    Finset.sum_congr rfl (fun j _ => by ring)
+  rw [hrw] at h
+  exact h
+
+/-- `(∑ β²)² ≤ q · ∑ β⁴`: the upper half, by Cauchy–Schwarz against the
+constant vector. This is the direction the two-free-reals formulation could not
+state, because the variant count does not appear in its signature. -/
+theorem sq_sum_sq_le_card_mul_sum_fourth {q : ℕ} (beta : Fin q → ℝ) :
+    (∑ j, beta j ^ 2) ^ 2 ≤ (q : ℝ) * ∑ j, beta j ^ 4 := by
+  have h := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (Fin q))
+    (fun _ => (1 : ℝ)) (fun j => beta j ^ 2)
+  have h3 : ∑ j : Fin q, (beta j ^ 2) ^ 2 = ∑ j, beta j ^ 4 :=
+    Finset.sum_congr rfl (fun j _ => by ring)
+  simp only [one_mul, one_pow, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul, mul_one] at h
+  rw [h3] at h
+  exact h
+
+/-- **Effective polygenicity lies between one and the number of variants.**
+
+    Two strengthenings of `effective_polygenicity_ge_one` at once. The
+    Cauchy–Schwarz hypothesis is discharged rather than assumed, and the
+    one-sided bound becomes two-sided: `1 ≤ M_eff ≤ q`, with the lower end
+    approached by a single large effect and the upper end by `q` equal ones.
+    Only the positivity of the fourth moment remains, and that is not a
+    modelling assumption but the condition for the quotient to exist. -/
+theorem effectivePolygenicityOfEffects_mem_Icc {q : ℕ} (beta : Fin q → ℝ)
+    (h_pos : 0 < ∑ j, beta j ^ 4) :
+    1 ≤ effectivePolygenicityOfEffects beta ∧
+      effectivePolygenicityOfEffects beta ≤ (q : ℝ) := by
+  unfold effectivePolygenicityOfEffects effectivePolygenicity
+  constructor
+  · rw [le_div_iff₀ h_pos, one_mul]
+    exact sum_fourth_le_sq_sum_sq beta
+  · rw [div_le_iff₀ h_pos]
+    exact sq_sum_sq_le_card_mul_sum_fourth beta
 
 /-- Explicit SNP-level portability model.
 
@@ -358,6 +422,150 @@ end PolygenicityAndPortability
 
 
 /-!
+## Nonsmooth Architecture Summaries and What They Cost to Estimate
+
+The quantities this file uses to summarise an effect-size distribution are not
+all of the same difficulty, and nothing in the corpus recorded the difference.
+
+`expectedSquaredEffect`, `spikeAndSlabVariance` and `additiveVariance` are
+smooth — quadratic — functionals of the effect vector, and are estimable at the
+usual root-`n` rate. `effectivePolygenicity` and the mean absolute effect
+`q⁻¹ ∑ |β_j|` are not. The mean absolute effect is the canonical nonsmooth
+functional: in the Gaussian sequence model over a box, estimating
+`n⁻¹ ∑ |θ_i|` has minimax risk of order `1 / log n`, logarithmic, not
+polynomial. It is the natural measure of total additive signal and the closest
+kin in this file to a polygenicity or sparsity summary, and it is far harder to
+estimate than the variance-type summaries standing beside it.
+
+The second half of the picture is about certificates rather than estimators.
+For a nonsmooth functional every fixed-grade lower-bound argument —
+two-point, Assouad, Fano over `K` points, order-`K` moment-matched fuzzy
+hypotheses — under-certifies the minimax rate by a polynomial factor: grade `K`
+certifies only `n^(-Θ(1/K))` against a truth of order `1 / log n`. The
+shortfall is not slack in a particular argument but an approximation-theoretic
+invariant of the functional, a modulus ratio, so it cannot be closed by
+sharpening the constants. `certificateDeficit` below names the shortfall, and
+`gradeCertifiedRisk_understates` gives it a lower bound that grows without
+limit in the number of variants.
+
+The consequence for study design is stated in `Calibrator.PowerAnalysis`: a
+sample size read off a two-point or Fano calculation for one of these summaries
+is not merely conservative in the wrong direction, it is short by a polynomial
+factor, and for the two-point case the requirement is exponential in the
+reciprocal accuracy where the certificate reports a power law.
+-/
+
+section NonsmoothSummaries
+
+/-- **Mean absolute effect size across variants.**
+
+    `q⁻¹ ∑_j |β_j|`, the natural summary of total additive signal on the effect
+    scale rather than the squared-effect scale. Unlike `expectedSquaredEffect`
+    it is not a smooth functional of the effect vector: it is Lipschitz but has
+    no derivative at any coordinate through zero, and that is what governs how
+    hard it is to estimate.
+
+    Empirical status: UNTESTED. -/
+noncomputable def meanAbsoluteEffect {q : ℕ} (beta : Fin q → ℝ) : ℝ :=
+  (∑ j, |beta j|) / q
+
+theorem meanAbsoluteEffect_nonneg {q : ℕ} (beta : Fin q → ℝ) :
+    0 ≤ meanAbsoluteEffect beta := by
+  unfold meanAbsoluteEffect
+  exact div_nonneg (Finset.sum_nonneg fun j _ => abs_nonneg _) (Nat.cast_nonneg q)
+
+/-- **The nonsmooth summary is dominated by the smooth one.**
+
+    `(q⁻¹ ∑ |β_j|)² ≤ q⁻¹ ∑ β_j²` by Cauchy–Schwarz. The point of recording it
+    is the contrast it sets up: the smaller quantity is the harder one to
+    estimate, so the ordering of the two summaries by magnitude runs opposite to
+    their ordering by statistical difficulty. -/
+theorem meanAbsoluteEffect_sq_le_meanSquaredEffect {q : ℕ} (beta : Fin q → ℝ)
+    (hq : 0 < q) :
+    (meanAbsoluteEffect beta) ^ 2 ≤ (∑ j, beta j ^ 2) / q := by
+  have hq' : (0 : ℝ) < q := Nat.cast_pos.mpr hq
+  have h := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (Fin q))
+    (fun _ => (1 : ℝ)) (fun j => |beta j|)
+  have h3 : ∑ j : Fin q, |beta j| ^ 2 = ∑ j, beta j ^ 2 :=
+    Finset.sum_congr rfl (fun j _ => sq_abs _)
+  simp only [one_mul, one_pow, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul, mul_one] at h
+  rw [h3] at h
+  unfold meanAbsoluteEffect
+  rw [div_pow, div_le_div_iff₀ (by positivity) hq']
+  have hmul := mul_le_mul_of_nonneg_right h (le_of_lt hq')
+  nlinarith [hmul]
+
+/-- **Attainable estimation risk for a nonsmooth architecture summary.**
+
+    Order `1 / log q` at `q` variants. This is the rate for the mean absolute
+    effect in the Gaussian sequence model over a box, and it is logarithmic
+    rather than polynomial, so it does not improve at any polynomial rate as
+    the variant count grows.
+
+    Empirical status: UNTESTED. -/
+noncomputable def nonsmoothSummaryRisk (q : ℝ) : ℝ := 1 / Real.log q
+
+/-- **Risk certified by a grade-`K` lower-bound argument.**
+
+    `q ^ (-(c/K))`: what a two-point (`K = 1`), Assouad, `K`-point Fano or
+    order-`K` moment-matched construction can establish. Polynomial in `q`,
+    hence for large `q` far below the risk of `nonsmoothSummaryRisk` that the
+    functional actually carries.
+
+    Empirical status: UNTESTED. -/
+noncomputable def gradeCertifiedRisk (q K c : ℝ) : ℝ := q ^ (-(c / K))
+
+/-- **The shortfall of a fixed-grade certificate**, as a ratio of the risk the
+    functional carries to the risk grade `K` can certify. The mathematics says
+    this ratio is a modulus ratio: an approximation-theoretic invariant of the
+    functional, not slack in any particular argument, so no sharpening of
+    constants inside a grade-`K` method reduces it.
+
+    Empirical status: UNTESTED. -/
+noncomputable def certificateDeficit (q K c : ℝ) : ℝ :=
+  nonsmoothSummaryRisk q / gradeCertifiedRisk q K c
+
+/-- Closed form for the deficit: `q^(c/K) / log q`. -/
+theorem certificateDeficit_eq (q K c : ℝ) (hq : 0 ≤ q) :
+    certificateDeficit q K c = q ^ (c / K) / Real.log q := by
+  unfold certificateDeficit nonsmoothSummaryRisk gradeCertifiedRisk
+  rw [Real.rpow_neg hq (c / K), div_inv_eq_mul]
+  ring
+
+/-- **A fixed-grade certificate understates the risk by an unbounded factor.**
+
+    For every target factor `D`, once the variant count is large enough that
+    `D · log q ≤ q^(c/K)` — which happens for every `D` and every grade `K`,
+    since a positive power beats a logarithm — the certificate is short by at
+    least `D`. The crossing point is supplied as a hypothesis rather than
+    derived, so the statement is an inequality about a stated regime and not an
+    asymptotic assertion dressed as one. -/
+theorem gradeCertifiedRisk_understates (q K c D : ℝ)
+    (hq : 0 ≤ q) (h_log : 0 < Real.log q)
+    (h_cross : D * Real.log q ≤ q ^ (c / K)) :
+    D ≤ certificateDeficit q K c := by
+  rw [certificateDeficit_eq q K c hq, le_div_iff₀ h_log]
+  exact h_cross
+
+/-- **The logarithmic rate dominates every polynomial rate.**
+
+    Wherever `q^(-a) · log q ≤ 1`, the polynomial rate `q^(-a)` sits below the
+    risk the functional carries. Since the left side tends to zero for every
+    `a > 0`, no polynomial rate is attainable for such a summary, whatever the
+    exponent. -/
+theorem nonsmoothSummaryRisk_exceeds_polynomial (q a : ℝ)
+    (h_log : 0 < Real.log q)
+    (h_cross : q ^ (-a) * Real.log q ≤ 1) :
+    q ^ (-a) ≤ nonsmoothSummaryRisk q := by
+  unfold nonsmoothSummaryRisk
+  rw [le_div_iff₀ h_log]
+  exact h_cross
+
+end NonsmoothSummaries
+
+
+/-!
 ## Heritability Partitioning
 
 Partitioning heritability by functional category reveals
@@ -483,6 +691,86 @@ theorem predicted_le_weightedRetentionUpperBound {q : ℕ}
     unfold targetRetainedEffectMass
     exact Finset.sum_le_sum fun j _ => h_bound j
   exact (div_le_div_iff_of_pos_right h_source).2 h_sum
+
+/-- **The slack in the retention envelope, as an identity rather than a
+bound.**
+
+The one-sided statement `predicted_le_weightedRetentionUpperBound` says only
+that the envelope is above the truth. What is above it by is the
+source-effect-weighted average of the locuswise slacks, and that is an equality
+with no hypotheses on the envelope at all — not even that it is an upper bound.
+The inequality and the attainment condition are both corollaries. -/
+theorem weightedRetentionUpperBound_sub_predicted {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (retentionUpper : Fin q → ℝ) :
+    weightedRetentionUpperBound model retentionUpper - predictedPortability model =
+      (∑ j, (retentionUpper j * model.sourceSquaredEffect j -
+        model.targetRetainedSquaredEffect j)) / model.sourceEffectMass := by
+  unfold weightedRetentionUpperBound predictedPortability portabilityScore
+    targetRetainedEffectMass
+  rw [div_sub_div_same]
+  congr 1
+  rw [← Finset.sum_sub_distrib]
+
+/-- **Threshold equals capacity when the locuswise constraint is active.**
+
+If the envelope is attained at every causal SNP, the global portability equals
+the global bound. No symmetry of the architecture is needed and no condition on
+the effect distribution: activity of the constraint at each locus is the whole
+hypothesis. -/
+theorem predicted_eq_weightedRetentionUpperBound_of_active {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (retentionUpper : Fin q → ℝ)
+    (h_active : ∀ j, model.targetRetainedSquaredEffect j =
+      retentionUpper j * model.sourceSquaredEffect j) :
+    predictedPortability model = weightedRetentionUpperBound model retentionUpper := by
+  have h_sum : model.targetRetainedEffectMass =
+      ∑ j, retentionUpper j * model.sourceSquaredEffect j := by
+    unfold targetRetainedEffectMass
+    exact Finset.sum_congr rfl (fun j _ => h_active j)
+  unfold predictedPortability weightedRetentionUpperBound portabilityScore
+  rw [h_sum]
+
+/-- **The bound is attained if and only if every locuswise constraint is
+active.**
+
+The two-sided form: under the locuswise envelope, global portability meets the
+global bound exactly when no causal SNP has slack. One slack locus with positive
+source mass is enough to make the bound strict, and no amount of activity
+elsewhere compensates. -/
+theorem weightedRetentionUpperBound_eq_predicted_iff_active {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
+    (retentionUpper : Fin q → ℝ)
+    (h_source : 0 < model.sourceEffectMass)
+    (h_bound : ∀ j, model.targetRetainedSquaredEffect j ≤
+      retentionUpper j * model.sourceSquaredEffect j) :
+    weightedRetentionUpperBound model retentionUpper = predictedPortability model ↔
+      ∀ j, model.targetRetainedSquaredEffect j =
+        retentionUpper j * model.sourceSquaredEffect j := by
+  have hid := weightedRetentionUpperBound_sub_predicted model retentionUpper
+  constructor
+  · intro h
+    have hz : (∑ j, (retentionUpper j * model.sourceSquaredEffect j -
+        model.targetRetainedSquaredEffect j)) / model.sourceEffectMass = 0 := by
+      rw [← hid, h, sub_self]
+    have hz' : ∑ j, (retentionUpper j * model.sourceSquaredEffect j -
+        model.targetRetainedSquaredEffect j) = 0 := by
+      rcases div_eq_zero_iff.mp hz with h1 | h1
+      · exact h1
+      · exact absurd h1 (ne_of_gt h_source)
+    have hall := (Finset.sum_eq_zero_iff_of_nonneg
+      (fun j _ => sub_nonneg.mpr (h_bound j))).mp hz'
+    intro j
+    have hj := hall j (Finset.mem_univ j)
+    linarith [hj]
+  · intro h
+    have hz : ∑ j, (retentionUpper j * model.sourceSquaredEffect j -
+        model.targetRetainedSquaredEffect j) = 0 := by
+      apply Finset.sum_eq_zero
+      intro j _
+      rw [h j]
+      ring
+    rw [← sub_eq_zero, hid, hz, zero_div]
 
 /-- **Architecture-based trait classification.**
 

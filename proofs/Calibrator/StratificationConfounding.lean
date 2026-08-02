@@ -685,4 +685,101 @@ theorem small_effect_needs_large_n
 
 end PowerAnalysis
 
+/-!
+## Proximal contamination, LOCO, and the imitation wall
+
+The results above quantify stratification bias *given* that the confounding and
+the signal are distinguishable.  This section records the prior question, which
+is not always answerable: whether the association being tested is a legal member
+of the background the test adjusts against.  When it is, no amount of data
+helps, and the failure mode has two familiar names.
+
+*Proximal contamination.*  A genetic relatedness matrix built from markers that
+include the tested locus, or in LD with it, absorbs the very association being
+tested.  Formally the alternative's covariance is a legal background, so the
+alternative law is a mixture of null laws.
+
+*Polygenic adaptation from residual stratification.*  Signals of coordinated
+allele-frequency shift, read as adaptation, turned out in several cases to be
+residual stratification imitating a polygenic spike.  Same formal object: the
+spike level sat below the background class's imitation capacity.
+
+`Calibrator.PCCorrectability.ImitationCapacity` makes this computable.  The
+capacity is the value of a linear program over the background class, its
+certificate is a constraint index, and the results below name the three
+consequences that matter for study design.
+-/
+
+section ImitationWall
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι] {cidx : Type*}
+
+/-- **Proximal contamination, exactly.**  Below the imitation capacity the
+spiked genotype covariance is itself a legal background: the relatedness matrix
+has absorbed the tested association, and no test at any sample size separates
+the two.  The capacity is not a heuristic margin — it is the linear program's
+value, and the constraint achieving the infimum is the reason. -/
+theorem grm_absorbs_tested_association
+    (K : BackgroundClass ι cidx) {S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}
+    (hnull : K.IsNull S₀) {t : ℝ} (ht : 0 ≤ t)
+    (hle : t ≤ K.imitationCapacity S₀ support) {v : ι → ℝ} (hv : v ∈ support) :
+    K.IsNull (K.spiked S₀ t v) :=
+  K.isNull_spiked_of_le_imitationCapacity hnull ht hle hv
+
+/-- **Leave-one-chromosome-out is a restriction of the background class, not a
+variance fix.**  LOCO adds constraints — one budget per excluded chromosome —
+and the capacity is antitone in the constraint family.  So LOCO can only lower
+the imitation wall, and the amount is computable: the difference of two linear
+programming values, `K'`'s minus `K`'s, rather than an unquantified benefit.
+
+`f` embeds the pre-LOCO constraint family into the post-LOCO one with the same
+functionals and ceilings; the extra constraints are the ones outside its
+image. -/
+theorem loco_lowers_imitation_wall
+    (K : BackgroundClass ι cidx) {cidx' : Type*}
+    (K' : BackgroundClass ι cidx') {S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}
+    (hnull' : K'.IsNull S₀) (f : cidx → cidx')
+    (hform : ∀ a : cidx, K'.form (f a) = K.form a)
+    (hbound : ∀ a : cidx, K'.bound (f a) = K.bound a)
+    (hne : (K.exitLevels S₀ support).Nonempty) :
+    K'.imitationCapacity S₀ support ≤ K.imitationCapacity S₀ support :=
+  K.imitationCapacity_antitone_constraints K' hnull' f hform hbound hne
+
+/-- **A saturated background budget makes stratification detectable at every
+level.**  If the study design imposes one linear budget the baseline already
+meets with equality — a trace window on the adjusted relatedness matrix is the
+concrete case — then every nonzero effect direction points out of the class,
+and no positive spike level is imitable.  This is a design instruction: an
+active constraint with positive spike load buys detectability that is
+information-theoretically unavailable without it, and it requires no symmetry
+of the background class. -/
+theorem active_budget_makes_stratification_detectable
+    {base A S₀ : Matrix ι ι ℝ}
+    (hpd : ∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v)
+    {v : ι → ℝ} (hvne : v ≠ 0) {t : ℝ} (ht : 0 < t) :
+    ¬ (traceWindowClass base A S₀).IsNull
+      ((traceWindowClass base A S₀).spiked S₀ t v) :=
+  traceWindow_every_level_detectable hpd hvne ht
+
+/-- **The genome-wide threshold is not an effective-marker count.**
+
+Multiple-testing corrections that replace the variant count by an effective
+number of independent markers derived from the LD eigenvalues — the
+Cheverud–Nyholt and Li–Ji family — compute a participation-ratio-type
+functional of the spectral law, and every such functional is continuous in the
+weak topology.  No weakly continuous functional determines a detection
+threshold, so no effective-marker count of that form can be the right quantity.
+
+The corpus's own `ldWhiteningGain`, `(1+ρ²)/(1-ρ²)`, is the right one for
+exactly the complementary reason: it is the value of the trace-window
+certificate, edge-sensitive, and *not* weakly continuous.  Those two facts are
+consistent, and their consistency is the content of this pairing. -/
+theorem effective_marker_count_cannot_set_threshold
+    (Φ : MomentContinuousFunctional)
+    (hΦ : ∀ (m : ℕ) (lam : ℕ → ℝ), Φ.value m lam = inverseTraceCertificate m lam) :
+    False :=
+  certificate_not_momentContinuous Φ hΦ
+
+end ImitationWall
+
 end Calibrator

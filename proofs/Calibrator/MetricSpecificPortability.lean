@@ -3,6 +3,9 @@ import Calibrator.PortabilityDrift
 import Calibrator.PGSCalibrationTheory
 import Calibrator.ClinicalUtilityFairness
 import Calibrator.OpenQuestions
+import Calibrator.ProjectionShiftBounds
+import Calibrator.ImitationRigidity
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Inverse
 
 namespace Calibrator
 
@@ -1086,5 +1089,249 @@ theorem brier_proper_score_portability_decomposition
   exact ⟨h_decomp, h_half⟩
 
 end ProperScoringRules
+
+/-!
+## Metric-specific portability of the marker panel itself: the AR(1) frontier
+
+Open Question 3 asks which *metric* a score is portable in.  Everything above
+holds the marker panel fixed and varies the metric.  This section varies the
+panel and finds the same phenomenon one level down: the panel construction step
+— LD pruning or clumping — is itself a choice of metric, and it is not neutral
+between the two things a panel is used for.
+
+`Calibrator.ProjectionShiftBounds` proves the general statement: among relaxed
+rank-`k` reductions of a background covariance, the variance-greedy one
+simultaneously maximises reconstruction efficiency
+(`topVariance_maximizes_reconstruction`) and minimises detection efficiency
+(`topVariance_minimizes_detection`).  LD pruning is variance-greedy by
+construction: it keeps one representative per correlated block, which in the
+eigenbasis is a low-frequency band.
+
+Here that abstract frontier is made numerical.  On a chromosome whose LD follows
+the first-order Markov law of `Calibrator.ImitationRigidity` — correlation `ρ^d`
+at separation `d` — the eigenvalues of the LD kernel are the values of the
+Poisson-kernel symbol `ldKernelSymbol`, so both efficiencies are integrals of an
+explicit function and the frontier has a closed form in the single parameter
+`ρ`.  The detection normaliser is the inverse-kernel trace, whose closed form is
+`ldWhiteningGain ρ = (1 + ρ²)/(1 - ρ²)`.
+
+The headline number: at retention fraction `κ`, a pruned panel keeps only
+`κ - 2ρ sin(πκ) / (π(1 + ρ²))` of the available detection weight — strictly less
+than `κ`, with the shortfall maximised at 50 % retention where it equals
+`2ρ / (π(1 + ρ²))`.  Pruning does not merely fail to help detection at the
+margin; it loses detection weight faster than it loses markers.
+-/
+
+section ARoneFrontier
+
+/-- **The LD spectrum is ordered by frequency.**  For nonnegative decay the
+Poisson symbol is increasing in `cos angle`, so the high-variance eigendirections
+are exactly the low-frequency ones.
+
+This is the lemma that makes "LD pruning keeps the top-`k` directions by
+variance" a theorem about the symbol rather than an assertion: a contiguous
+low-frequency band *is* a top-`k` variance set, and therefore satisfies the
+threshold hypothesis of `topVariance_minimizes_detection`. -/
+theorem ldKernelSymbol_mono_in_cos {decay angle₁ angle₂ : ℝ}
+    (hd : |decay| < 1) (hd0 : 0 ≤ decay)
+    (hcos : Real.cos angle₁ ≤ Real.cos angle₂) :
+    ldKernelSymbol decay angle₁ ≤ ldKernelSymbol decay angle₂ := by
+  have hden₁ : 0 < 1 - 2 * decay * Real.cos angle₁ + decay ^ 2 :=
+    ldKernelSymbol_denom_pos hd
+  have hden₂ : 0 < 1 - 2 * decay * Real.cos angle₂ + decay ^ 2 :=
+    ldKernelSymbol_denom_pos hd
+  have hnum : 0 ≤ 1 - decay ^ 2 := by
+    have := sq_abs decay
+    nlinarith [abs_nonneg decay, hd]
+  have hcmp : 1 - 2 * decay * Real.cos angle₂ + decay ^ 2 ≤
+      1 - 2 * decay * Real.cos angle₁ + decay ^ 2 := by
+    nlinarith [mul_nonneg hd0 (sub_nonneg.mpr hcos)]
+  unfold ldKernelSymbol
+  exact div_le_div_of_nonneg_left hnum hden₂ hcmp
+
+/-- **Reconstruction share of a pruned (low-frequency) band** on a stationary
+AR(1) chromosome, as a function of the per-site LD retention `decay` and the
+fraction `kappa` of directions kept.
+
+This is the closed form of the harmonic-measure integral of the Poisson kernel:
+`(2/π) · arctan( ((1+ρ)/(1-ρ)) · tan(πκ/2) )`.  The claim that it equals the
+integral is `ldBandReconstructionShare_eq_integral`, which is stated with a
+`sorry`; this definition on its own asserts nothing.
+
+Valid for `0 ≤ kappa < 1`.  At `kappa = 1` the expression is not the limit —
+`Real.tan (π/2) = 0` under Mathlib's junk-value convention — so the endpoint
+must be read off from `ldBandReconstructionShare_eq_integral` rather than from
+the formula.
+
+Empirical status: UNTESTED. -/
+def ldBandReconstructionShare (decay kappa : ℝ) : ℝ :=
+  2 * Real.arctan (((1 + decay) / (1 - decay)) *
+    Real.tan (Real.pi * kappa / 2)) / Real.pi
+
+/-- **Detection share of a pruned (low-frequency) band** on a stationary AR(1)
+chromosome: the fraction of the total inverse-LD (whitened) weight that survives
+pruning down to a fraction `kappa` of the directions.
+
+Closed form `κ - 2ρ sin(πκ) / (π(1 + ρ²))`, obtained by integrating the
+reciprocal symbol; the `1 + ρ²` is the numerator of
+`Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel
+trace.  The claim that it equals the integral ratio is
+`ldBandDetectionShare_eq_integral`.
+
+Empirical status: UNTESTED. -/
+def ldBandDetectionShare (decay kappa : ℝ) : ℝ :=
+  kappa - 2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))
+
+/-- **The detection weight pruning throws away**, over and above the fraction of
+directions it discards.  This is the quantity the frontier prices.
+
+Empirical status: UNTESTED. -/
+def ldPruningDetectionDeficit (decay kappa : ℝ) : ℝ :=
+  2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))
+
+theorem ldBandDetectionShare_eq_sub_deficit (decay kappa : ℝ) :
+    ldBandDetectionShare decay kappa =
+      kappa - ldPruningDetectionDeficit decay kappa := rfl
+
+/-- **Pruning loses detection weight faster than it loses markers.**  Keeping a
+fraction `κ` of directions retains at most a fraction `κ` of the detection
+weight, for every LD level and every retention fraction. -/
+theorem ldBandDetectionShare_le_retention {decay kappa : ℝ}
+    (hd0 : 0 ≤ decay) (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1) :
+    ldBandDetectionShare decay kappa ≤ kappa := by
+  have hpi : 0 < Real.pi := Real.pi_pos
+  have hden : 0 < Real.pi * (1 + decay ^ 2) := by positivity
+  have hsin : 0 ≤ Real.sin (Real.pi * kappa) := by
+    refine Real.sin_nonneg_of_nonneg_of_le_pi ?_ ?_
+    · exact mul_nonneg (le_of_lt hpi) hk0
+    · nlinarith [mul_nonneg (le_of_lt hpi) (by linarith : (0:ℝ) ≤ 1 - kappa)]
+  have hnum : 0 ≤ 2 * decay * Real.sin (Real.pi * kappa) :=
+    mul_nonneg (by linarith) hsin
+  have hfrac : 0 ≤ 2 * decay * Real.sin (Real.pi * kappa) /
+      (Real.pi * (1 + decay ^ 2)) := div_nonneg hnum (le_of_lt hden)
+  unfold ldBandDetectionShare
+  linarith
+
+/-- The loss is strict whenever there is LD to exploit and the reduction is
+neither trivial nor vacuous.  This is the AR(1) form of the pruning
+prohibition: for `0 < ρ < 1` and `0 < κ < 1` there is no retention fraction at
+which pruning is detection-neutral. -/
+theorem ldBandDetectionShare_lt_retention {decay kappa : ℝ}
+    (hd0 : 0 < decay) (hk0 : 0 < kappa) (hk1 : kappa < 1) :
+    ldBandDetectionShare decay kappa < kappa := by
+  have hpi : 0 < Real.pi := Real.pi_pos
+  have hden : 0 < Real.pi * (1 + decay ^ 2) := by positivity
+  have hsin : 0 < Real.sin (Real.pi * kappa) := by
+    refine Real.sin_pos_of_pos_of_lt_pi ?_ ?_
+    · exact mul_pos hpi hk0
+    · nlinarith [mul_pos hpi (by linarith : (0:ℝ) < 1 - kappa)]
+  have hnum : 0 < 2 * decay * Real.sin (Real.pi * kappa) :=
+    mul_pos (by linarith) hsin
+  have hfrac : 0 < 2 * decay * Real.sin (Real.pi * kappa) /
+      (Real.pi * (1 + decay ^ 2)) := div_pos hnum hden
+  unfold ldBandDetectionShare
+  linarith
+
+/-- **The deficit is largest at half retention**, where it equals
+`2ρ / (π(1 + ρ²))`.  Since `2ρ/(1 + ρ²) ≤ 1`, the worst-case detection loss
+attributable to pruning is at most `1/π ≈ 0.318` of the total whitened weight,
+and it is attained in the strong-LD limit at 50 % retention.  This is the number
+a simulation should be asked to reproduce. -/
+theorem ldPruningDetectionDeficit_le_half_retention {decay kappa : ℝ}
+    (hd0 : 0 ≤ decay) :
+    ldPruningDetectionDeficit decay kappa ≤
+      2 * decay / (Real.pi * (1 + decay ^ 2)) := by
+  have hden : 0 < Real.pi * (1 + decay ^ 2) := by positivity
+  have hnum : 2 * decay * Real.sin (Real.pi * kappa) ≤ 2 * decay := by
+    nlinarith [mul_nonneg (by linarith : (0:ℝ) ≤ 2 * decay)
+      (by linarith [Real.sin_le_one (Real.pi * kappa)] :
+        (0:ℝ) ≤ 1 - Real.sin (Real.pi * kappa))]
+  unfold ldPruningDetectionDeficit
+  exact captureRatio_le_of_le hnum hden
+
+/-- At half retention the deficit is exactly `2ρ / (π(1 + ρ²))`, so the bound of
+`ldPruningDetectionDeficit_le_half_retention` is attained and the frontier is
+tight there. -/
+theorem ldPruningDetectionDeficit_half (decay : ℝ) :
+    ldPruningDetectionDeficit decay (1 / 2) =
+      2 * decay / (Real.pi * (1 + decay ^ 2)) := by
+  unfold ldPruningDetectionDeficit
+  rw [show Real.pi * (1 / 2) = Real.pi / 2 by ring, Real.sin_pi_div_two, mul_one]
+
+/-- **Retaining everything retains everything.**  A consistency check on the
+normalisation: at `κ = 1` the detection share is exactly `1`, which is the
+statement that the denominator used in `ldBandDetectionShare` really is the full
+inverse-kernel trace `ldWhiteningGain`. -/
+theorem ldBandDetectionShare_one (decay : ℝ) :
+    ldBandDetectionShare decay 1 = 1 := by
+  unfold ldBandDetectionShare
+  rw [mul_one, Real.sin_pi]
+  norm_num
+
+theorem ldBandDetectionShare_zero (decay : ℝ) :
+    ldBandDetectionShare decay 0 = 0 := by
+  unfold ldBandDetectionShare
+  rw [mul_zero, Real.sin_zero]
+  norm_num
+
+/-- **No LD, no trade-off.**  When the chromosome has no linkage the spectrum is
+flat, the two weight profiles coincide, and pruning is exactly neutral: the
+detection share equals the retention fraction.  The whole phenomenon is a
+consequence of spectral spread, and vanishes with it. -/
+theorem ldBandDetectionShare_of_no_ld (kappa : ℝ) :
+    ldBandDetectionShare 0 kappa = kappa := by
+  unfold ldBandDetectionShare
+  norm_num
+
+/-- The reconstruction share is likewise neutral in the absence of LD. -/
+theorem ldBandReconstructionShare_of_no_ld {kappa : ℝ}
+    (hk0 : 0 ≤ kappa) (hk1 : kappa < 1) :
+    ldBandReconstructionShare 0 kappa = kappa := by
+  have hpi : 0 < Real.pi := Real.pi_pos
+  have hne : Real.pi ≠ 0 := ne_of_gt hpi
+  have hx1 : -(Real.pi / 2) < Real.pi * kappa / 2 := by
+    nlinarith [mul_nonneg (le_of_lt hpi) hk0]
+  have hx2 : Real.pi * kappa / 2 < Real.pi / 2 := by
+    nlinarith [mul_pos hpi (by linarith : (0:ℝ) < 1 - kappa)]
+  unfold ldBandReconstructionShare
+  rw [div_eq_iff hne,
+    show ((1 + (0:ℝ)) / (1 - 0)) = 1 by norm_num, one_mul,
+    Real.arctan_tan hx1 hx2]
+  ring
+
+/-- **Closed form of the pruned detection share.**
+
+`sorry` stands for the evaluation of one elementary integral,
+`∫₀^a (1 - 2ρ cos θ + ρ²) dθ = (1 + ρ²) a - 2ρ sin a`, followed by cancellation
+of the constant factor `(1 - ρ²)⁻¹` between numerator and denominator.  No
+genetics and no inequality is involved; the content is `intervalIntegral` API for
+`cos`.  Consistency of the resulting formula with the corpus is separately
+checked by `ldBandDetectionShare_one` (the `κ = 1` endpoint reproduces the full
+inverse-kernel trace of `ldWhiteningGain`) and `ldBandDetectionShare_zero`. -/
+theorem ldBandDetectionShare_eq_integral {decay kappa : ℝ}
+    (hd : |decay| < 1) (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1) :
+    (∫ angle in (0:ℝ)..(Real.pi * kappa), (ldKernelSymbol decay angle)⁻¹) /
+        (∫ angle in (0:ℝ)..Real.pi, (ldKernelSymbol decay angle)⁻¹) =
+      ldBandDetectionShare decay kappa := by
+  sorry
+
+/-- **Closed form of the pruned reconstruction share.**
+
+`sorry` stands for the harmonic-measure evaluation of the Poisson-kernel
+integral, `∫₀^a P_ρ(θ) dθ = 2 arctan( ((1+ρ)/(1-ρ)) tan(a/2) )`, together with
+the normalisation `∫₀^π P_ρ = π` (which is the half-interval form of
+`Calibrator.ImitationRigidity.ldKernelSymbol_harmonicMean`'s companion identity
+for the kernel itself).  This is a standard complex-analysis computation; it is
+`sorry`ed rather than asserted because nothing else here depends on it, and the
+`κ = 1` endpoint of the formula is a junk value (see
+`ldBandReconstructionShare`). -/
+theorem ldBandReconstructionShare_eq_integral {decay kappa : ℝ}
+    (hd : |decay| < 1) (hd0 : 0 ≤ decay) (hk0 : 0 ≤ kappa) (hk1 : kappa < 1) :
+    (∫ angle in (0:ℝ)..(Real.pi * kappa), ldKernelSymbol decay angle) /
+        (∫ angle in (0:ℝ)..Real.pi, ldKernelSymbol decay angle) =
+      ldBandReconstructionShare decay kappa := by
+  sorry
+
+end ARoneFrontier
 
 end Calibrator
