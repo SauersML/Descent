@@ -561,6 +561,39 @@ check(
 )
 
 check(
+    id="ohtaKimuraSigmaDSq-matches-simulation",
+    fqn="Calibrator.ohtaKimuraSigmaDSq",
+    claim="the Ohta-Kimura form reproduces simulated sigma_d^2 where the "
+          "identity measure does not",
+    model_lean="(10 + rho)/((2 + rho)(11 + rho)), rho = 4 Ne c -- the "
+               "Ohta-Kimura APPROXIMATION to sigma_d^2, not E[r^2] itself",
+    model_ref="refs.ohta_kimura_sigma_d_sq, written independently",
+    reference="refs.ohta_kimura_sigma_d_sq",
+    grid=grid(Ne=[150.0], c=[0.5 / 600, 2.0 / 600, 10.0 / 600, 40.0 / 600]),
+    lean=lambda D, Ne, c: D["ohtaKimuraSigmaDSq"](Ne, c),
+    ref=lambda Ne, c: refs.ohta_kimura_sigma_d_sq(Ne, c),
+    note=(
+        "PENDING: this check names a definition that does not exist yet. It is "
+        "written first deliberately, so the definition arrives with its "
+        "validation attached rather than acquiring one later.\n\n"
+        "The definition is DELIBERATELY UNCALLED. It exists because the corpus "
+        "has no sigma_d^2 at all -- a whole-table search for E[r^2], sigma_d^2 "
+        "or expected r-squared returns only identity-by-descent definitions. "
+        "A later de-duplication pass should read this reason rather than the "
+        "absence of callers.\n\n"
+        "Measured against cluster/fam_ld_decay.py: within 3.5% of simulation "
+        "at rho = 0.5 and 1% at rho = 2, where the identity measure "
+        "driftLDEquilibrium is +76% and +45%. The two converge by rho = 10, "
+        "which is why the grid reaches below it."
+    ),
+    canfail_clause=(
+        "rho must reach below 10. Ohta-Kimura and the identity measure agree "
+        "to 2% by rho = 100, so a loosely-linked grid validates both forms and "
+        "distinguishes nothing."
+    ),
+)
+
+check(
     id="driftLDTrajectory-converges",
     fqn="Calibrator.LDDecayTheory.driftLDTrajectory",
     claim="iterating driftLDStep from Q0=0 reaches driftLDEquilibrium",
