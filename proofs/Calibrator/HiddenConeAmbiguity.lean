@@ -1,4 +1,5 @@
 import Calibrator.Probability
+import Calibrator.ObservationalCeiling
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Tactic.Linarith
 
@@ -160,7 +161,7 @@ theorem BoundedLogDistortion.trans {t t' t'' : ℕ → ℝ}
       = |(Real.log (t n) - Real.log (t' n)) + (Real.log (t' n) - Real.log (t'' n))| := by
         ring_nf
     _ ≤ |Real.log (t n) - Real.log (t' n)| + |Real.log (t' n) - Real.log (t'' n)| :=
-        abs_add _ _
+        abs_add_le _ _
     _ ≤ C₁ + C₂ := add_le_add (hC₁ n) (hC₂ n)
 
 /-- The equivalence, as a genuine `Equivalence`. This is the fiber relation over a
@@ -201,18 +202,30 @@ theorem boundedLogDistortion_eq_iUnion :
   simp only [Set.mem_setOf_eq, Set.mem_iUnion]
   exact boundedLogDistortion_iff_nat p.1 p.2
 
+/-- The fiber relation is **countably certified** in the sense of
+`Calibrator.ObservationalCeiling`: membership is witnessed by a single natural number,
+the distortion constant. This is the exact statement that all of the ambiguity is
+carried by the sigma-compact escape hatch. -/
+theorem boundedLogDistortion_isCountablyCertified :
+    IsCountablyCertified BoundedLogDistortion
+      (fun C : ℕ => fun t t' : ℕ → ℝ =>
+        ∀ n : ℕ, |Real.log (t n) - Real.log (t' n)| ≤ (C : ℝ)) :=
+  fun t t' => boundedLogDistortion_iff_nat t t'
+
 /-- **Ceilings transport along reductions.** If a relation `E` reduces to `F` via `f`,
 and `F` is a countable union of conditions `F_C`, then `E` is the countable union of
 their pullbacks. This is the abstract form of the argument that refutes the wildness
-alternative: a reduction cannot raise a relation above the ceiling of its target. -/
+alternative: a reduction cannot raise a relation above the ceiling of its target.
+
+Kept as a named result because it is the load-bearing step of Corollary N; the general
+statement lives in `Calibrator.ObservationalCeiling.countablyCertified_of_reduction`. -/
 theorem reduction_preserves_countable_union
     {α β ι : Type*} (E : α → α → Prop) (F : β → β → Prop) (F' : ι → β → β → Prop)
     (f : α → β)
     (hred : ∀ x y, E x y ↔ F (f x) (f y))
     (hunion : ∀ u v, F u v ↔ ∃ C : ι, F' C u v) :
-    ∀ x y, E x y ↔ ∃ C : ι, F' C (f x) (f y) := by
-  intro x y
-  rw [hred x y, hunion]
+    ∀ x y, E x y ↔ ∃ C : ι, F' C (f x) (f y) :=
+  countablyCertified_of_reduction (E := E) (F := F) (cert := F') f hred hunion
 
 /-!
 ## 4. The explicit reduction: unbounded ambiguity inside one observable
@@ -327,16 +340,16 @@ the coded profiles of `ℓ∞`-divergent sequences; the content of the anti-clas
 theorem (Kechris-Louveau, via the universality of the sigma-compact relation) is that
 no invariant arising from a Polish group action can do this.
 
-What is proved here is the elementary transport: a catalogue induces a reduction, so
-an obstruction to reductions is an obstruction to catalogues. -/
+What is proved here is the elementary transport: a catalogue must separate every
+inequivalent pair, which is
+`Calibrator.ObservationalCeiling.IsCompleteCatalogue.separates`. -/
 theorem catalogue_induces_reduction
     {Invariant : Type*} (inv : (ℕ → ℝ) → Invariant)
     (hcomplete : ∀ t t', BoundedLogDistortion t t' ↔ inv t = inv t')
     (B x y : ℕ → ℝ)
     (hdiv : ∀ C : ℝ, ∃ n : ℕ, C < |x n - y n|) :
-    inv (codedDecayProfile B x) ≠ inv (codedDecayProfile B y) := by
-  intro heq
-  exact inequivalent_of_unbounded_coding B x y hdiv
-    ((hcomplete _ _).mpr heq)
+    inv (codedDecayProfile B x) ≠ inv (codedDecayProfile B y) :=
+  (hcomplete : IsCompleteCatalogue BoundedLogDistortion inv).separates
+    (inequivalent_of_unbounded_coding B x y hdiv)
 
 end Calibrator

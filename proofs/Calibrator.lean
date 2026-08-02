@@ -50,6 +50,7 @@ import Calibrator.HaplotypeTheory
 import Calibrator.AncestrySpecificArchitecture
 import Calibrator.AncestrySpecificPower
 import Calibrator.PGSCalibrationTheory
+import Calibrator.ObservationalCeiling
 import Calibrator.Condensation
 import Calibrator.CumulantBlindness
 import Calibrator.JetBarrier
@@ -57,6 +58,7 @@ import Calibrator.LocalToGlobalCoherence
 import Calibrator.HiddenConeAmbiguity
 import Calibrator.LatentMechanismCollapse
 import Calibrator.PolygenicSpectroscopy
+import Calibrator.CondensationUnification
 
 namespace Calibrator
 
@@ -277,5 +279,48 @@ theorem ld_decay_implies_nonlinear_calibration_proved {k : ℕ} [Fintype (Fin k)
   linarith
 
 end NoAxioms
+
+section Condensation
+
+/-!
+### Concrete specializations of the condensation results
+
+Same policy as the rest of this file: only specializations that instantiate a general
+theorem at genuine numbers, not restatements.
+-/
+
+/-- A genome-scale **additive** score at a balanced locus is strictly subcritical:
+`1 < log (10 ^ 6) / c(1/2)`. The Gaussian score apparatus of
+`Calibrator.ScoreDistribution` applies with enormous margin, and this is the concrete
+witness that the condensation theory does not disturb it. -/
+theorem additive_score_subcritical_at_balanced_locus_proved :
+    1 < maxSafeEpistaticOrder 1000000 (1 / 2) := by
+  have hc : 0 < hweMellinDrift (1 / 2) := by
+    rw [hweMellinDrift_half]
+    exact Real.log_pos (by norm_num)
+  refine additive_score_is_subcritical hc ?_
+  rw [hweMellinDrift_half]
+  exact Real.log_lt_log (by norm_num) (by norm_num)
+
+/-- Pairwise epistasis at a sufficiently rare variant is supercritical for a
+million-term aggregate: the Gaussian surrogate converges to a different limit. -/
+theorem pairwise_epistasis_supercritical_proved :
+    ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧
+      Real.log 1000000 < 2 * hweMellinDrift q :=
+  exists_maf_supercritical (by norm_num) (by norm_num)
+
+/-- The hard-call lattice point produces a strictly inflated exceedance intensity, so
+hard calls and dosage surrogates are not exchangeable at high epistatic order. -/
+theorem hardCall_lattice_inflation_proved :
+    1 < latticeInflation hardCallLatticeSpan :=
+  hardCall_intensity_inflated
+
+/-- The expander frustration floor is a genuine constant above `0.127`, so the
+non-bipartite twin sits a constant total-variation distance from every globally
+realizable system. -/
+theorem frustration_floor_proved : (0.127 : ℝ) < expanderAgreementFloor :=
+  expanderAgreementFloor_gt
+
+end Condensation
 
 end Calibrator

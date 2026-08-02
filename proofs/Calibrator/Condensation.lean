@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Mathlib.NumberTheory.Harmonic.EulerMascheroni
 import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.Real.Pi.Bounds
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
@@ -221,7 +222,9 @@ noncomputable def gaussianJetVariance : ℝ := Real.pi ^ 2 / 2 - 4
 
 /-- `v_G > 0`, from `pi > 3`. -/
 theorem gaussianJetVariance_pos : 0 < gaussianJetVariance := by
-  have hpi : (3 : ℝ) < Real.pi := Real.pi_gt_three
+  have hpi : (3 : ℝ) < Real.pi := by
+    have := Real.pi_gt_d2
+    linarith
   have : (9 : ℝ) < Real.pi ^ 2 := by nlinarith
   unfold gaussianJetVariance
   linarith

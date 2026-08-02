@@ -1,5 +1,6 @@
 import Calibrator.Condensation
 import Calibrator.CumulantBlindness
+import Calibrator.ObservationalCeiling
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Tactic.Linarith
 
@@ -229,13 +230,14 @@ theorem no_independent_design_criterion_decides_gaussianity
     (hne : chameleon ≠ gaussianLaw)
     (hjet : S.observables chameleon = S.observables gaussianLaw) :
     ¬ ∃ accept : Report → Prop,
-        ∀ ν : Law, ν = gaussianLaw ↔ accept (experiment (S.limitLaw ν)) := by
-  rintro ⟨accept, hacc⟩
-  have hg : accept (experiment (S.limitLaw gaussianLaw)) := (hacc gaussianLaw).mp rfl
-  have hc : accept (experiment (S.limitLaw chameleon)) :=
-    S.chameleon_passes_every_independent_criterion experiment accept gaussianLaw chameleon
-      hjet hg
-  exact hne ((hacc chameleon).mpr hc)
+        ∀ ν : Law, ν = gaussianLaw ↔ accept (experiment (S.limitLaw ν)) :=
+  ({ positive := gaussianLaw
+     negative := chameleon
+     same_data :=
+       (S.experiment_factors_through_observables experiment chameleon gaussianLaw hjet).symm
+     holds := rfl
+     fails := hne } :
+      ProbeBlindness (fun ν => experiment (S.limitLaw ν)) (fun ν => ν = gaussianLaw)).no_criterion
 
 end ChaosSpectroscopy
 

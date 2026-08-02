@@ -131,6 +131,7 @@ theorem head_mixture_exact
   have hne : (1 : ℝ) - η ≠ 0 := sub_ne_zero.mpr (Ne.symm hη)
   rw [hbary k, hadjusted k]
   field_simp
+  ring
 
 /-- The floor keeps the mixing density strictly positive: with weights bounded below
 by `wmin > 0` and floor `η ∈ (0, 1)`, the density is bounded below by `η / (2 π)`
@@ -167,6 +168,7 @@ for every direction, i.e. the tail is reproduced exactly. -/
 theorem tail_coefficient_exact
     (ε : ℝ) (hε : ε ≠ 0) (a c : ι → ℝ) (ha : ∀ j, a j ≠ 0) (j : ι) :
     a j * (c j / (ε * a j)) = c j / ε := by
+  have haj : a j ≠ 0 := ha j
   field_simp
 
 /-- **Tail positivity budget for the mechanism.** If the amplitudes weighted by the

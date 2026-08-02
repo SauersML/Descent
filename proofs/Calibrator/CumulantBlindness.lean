@@ -1,4 +1,5 @@
 import Calibrator.Condensation
+import Calibrator.ObservationalCeiling
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Tactic.Linarith
@@ -104,7 +105,10 @@ the models differ in universality status.
 
 The conclusion is stated in the form that refutes the problem's request: *no function
 of the order-`≤ K` cumulant tensors, with no continuity or computability assumption
-whatsoever, decides covariance universality.* -/
+whatsoever, decides covariance universality.*
+
+The logic is `Calibrator.ObservationalCeiling.ProbeBlindness.no_criterion_of_factors`;
+all this theorem contributes is the witness pair. -/
 theorem no_fixed_order_cumulant_criterion
     {Model Cumulants Decision : Type*}
     (cumulantsUpTo : Model → Cumulants)
@@ -115,10 +119,10 @@ theorem no_fixed_order_cumulant_criterion
     ¬ ∃ decide : Cumulants → Decision, ∃ accept : Decision → Prop,
         ∀ m : Model, universal m ↔ accept (decide (cumulantsUpTo m)) := by
   rintro ⟨decide, accept, hdec⟩
-  have e₀ : accept (decide (cumulantsUpTo m₀)) := (hdec m₀).mp h₀
-  have e₁ : ¬ accept (decide (cumulantsUpTo m₁)) := fun h => h₁ ((hdec m₁).mpr h)
-  rw [hmatch] at e₀
-  exact e₁ e₀
+  exact
+    ({ positive := m₀, negative := m₁, same_data := hmatch, holds := h₀, fails := h₁ } :
+        ProbeBlindness cumulantsUpTo universal).no_criterion_of_factors decide
+      ⟨accept, hdec⟩
 
 end HiddenTilt
 

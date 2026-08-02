@@ -1,4 +1,5 @@
 import Calibrator.Probability
+import Calibrator.ObservationalCeiling
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
@@ -199,7 +200,10 @@ certificate-hierarchical or not.
 /-- **Theorem 4 (iv): realizability is not a function of bounded-locality data.**
 
 `localData r L` is whatever an audit of radius `r` can see about the system `L`. The
-twin pair agrees on it for every `r`, and differs in realizability. -/
+twin pair agrees on it for every `r`, and differs in realizability.
+
+The logic is `Calibrator.ObservationalCeiling.LeveledBlindness`; the content of the
+theorem is the twin construction that supplies the witness pair. -/
 theorem no_bounded_locality_criterion
     {System LocalData : Type*}
     (localData : ℕ → System → LocalData)
@@ -209,12 +213,10 @@ theorem no_bounded_locality_criterion
     (hbip : asymptoticallyRealizable bipartiteTwin)
     (hnon : ¬ asymptoticallyRealizable nonBipartiteTwin) :
     ∀ r : ℕ, ¬ ∃ decide : LocalData → Prop,
-        ∀ L : System, asymptoticallyRealizable L ↔ decide (localData r L) := by
-  intro r
-  rintro ⟨decide, hdec⟩
-  have h₁ : decide (localData r bipartiteTwin) := (hdec bipartiteTwin).mp hbip
-  rw [hlocal r] at h₁
-  exact hnon ((hdec nonBipartiteTwin).mpr h₁)
+        ∀ L : System, asymptoticallyRealizable L ↔ decide (localData r L) :=
+  ({ positive := bipartiteTwin, negative := nonBipartiteTwin, same_data := hlocal,
+     holds := hbip, fails := hnon } :
+      LeveledBlindness localData asymptoticallyRealizable).no_level_criterion
 
 /-- The same impossibility for audits that may consult **every** radius at once and
 combine the results arbitrarily: the twin pair is identical on the whole family. -/
@@ -231,12 +233,11 @@ theorem no_bounded_locality_hierarchy
     ¬ ∀ L : System,
         asymptoticallyRealizable L ↔ accept (combine (fun r => localData r L)) := by
   intro hdec
-  have hfun : (fun r => localData r bipartiteTwin) = fun r => localData r nonBipartiteTwin := by
-    funext r; exact hlocal r
-  have h₁ : accept (combine (fun r => localData r bipartiteTwin)) :=
-    (hdec bipartiteTwin).mp hbip
-  rw [hfun] at h₁
-  exact hnon ((hdec nonBipartiteTwin).mpr h₁)
+  exact
+    ({ positive := bipartiteTwin, negative := nonBipartiteTwin, same_data := hlocal,
+       holds := hbip, fails := hnon } :
+        LeveledBlindness localData asymptoticallyRealizable).no_hierarchy_criterion combine
+      ⟨accept, hdec⟩
 
 /-!
 ## 4. Genetics corollary, stated in the vocabulary of summary statistics

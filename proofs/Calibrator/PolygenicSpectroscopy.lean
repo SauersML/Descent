@@ -217,8 +217,9 @@ theorem standardizedSquare_values (h : HardyWeinbergModel)
     · unfold HardyWeinbergModel.standardizedSquare
       rw [hwe_centered, hwe_variance_eq]
       simp only [altAlleleCount]
-      field_simp
-      ring
+      first
+        | (field_simp; ring)
+        | field_simp
 
 /-- The three Hardy-Weinberg genotype probabilities in terms of `q`. -/
 theorem genotypeProb_values (h : HardyWeinbergModel) :
@@ -254,19 +255,26 @@ theorem HardyWeinbergModel.mellinDrift_eq (h : HardyWeinbergModel)
     · intro hc; exact hpne (by linarith [hc])
     · exact hqne
   have hprod : (2 * q / (1 - q)) * (2 * (1 - q) / q) = 4 := by
-    field_simp
-    ring
+    first
+      | (field_simp; ring)
+      | field_simp
   have hL : Real.log (2 * q / (1 - q)) + Real.log (2 * (1 - q) / q) = 2 * Real.log 2 := by
     rw [← Real.log_mul hne0 hne2, hprod]
     rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.log_pow]
     norm_num
   -- coefficient collapses
   have hA : (1 - q) ^ 2 * (2 * q / (1 - q)) = 2 * q * (1 - q) := by
-    field_simp; ring
+    first
+      | (field_simp; ring)
+      | field_simp
   have hB : 2 * (1 - q) * q * ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) = (1 - 2 * q) ^ 2 := by
-    field_simp; ring
+    first
+      | (field_simp; ring)
+      | field_simp
   have hC : q ^ 2 * (2 * (1 - q) / q) = 2 * q * (1 - q) := by
-    field_simp; ring
+    first
+      | (field_simp; ring)
+      | field_simp
   unfold HardyWeinbergModel.mellinDrift hweMellinDrift
   rw [sum_diploidGenotype, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC]
   linear_combination (2 * q * (1 - q)) * hL
@@ -446,12 +454,15 @@ theorem exists_maf_supercritical {N m : ℝ} (hm : 0 < m) (hN : 1 ≤ N) :
         linarith
       linarith
     refine supercritical_of_small_maf hq0 hq hm ?_
+    have hmne : m ≠ 0 := ne_of_gt hm
     have harg : 1 / (8 * (Real.exp (-t) / 8)) = Real.exp t := by
-      rw [← Real.exp_neg]
-      field_simp
+      rw [show 8 * (Real.exp (-t) / 8) = Real.exp (-t) by ring, Real.exp_neg]
+      simp
     rw [harg, Real.log_exp, ht]
     have : m / 4 * (4 * Real.log N / m + 1) = Real.log N + m / 4 := by
-      field_simp; ring
+      first
+        | (field_simp; ring)
+        | field_simp
     rw [this]
     linarith
 
@@ -501,6 +512,59 @@ theorem hardCall_arithmeticProgression_at_critical_maf :
   unfold hweLatticeCondition latticeCriticalMaf
   nlinarith [hsq]
 
+/-!
+### The second Mellin observable of a genotype, and the full triple
+
+`Calibrator.JetBarrier` says independent designs observe exactly `(c, v, lattice)`. The
+first component is `hweMellinDrift`; this section supplies the second in the same closed
+form, so the **entire observable triple of a hard-called locus is computable from the
+allele frequency alone**. That is what makes the abstract trichotomy an instrument here
+rather than a classification scheme with no instances.
+-/
+
+namespace HardyWeinbergModel
+
+/-- The second Mellin observable: `v(q) = Var(log x^2)` under the size-biased law. -/
+noncomputable def mellinJetVariance (h : HardyWeinbergModel) : ℝ :=
+  (∑ g : DiploidGenotype,
+      h.genotypeProb g * h.standardizedSquare g * (Real.log (h.standardizedSquare g)) ^ 2)
+    - h.mellinDrift ^ 2
+
+end HardyWeinbergModel
+
+/-- Closed form of the Hardy-Weinberg jet variance. The coefficient collapse is the
+same one that produces `hweMellinDrift`; only the logarithm is squared. -/
+noncomputable def hweMellinJetVariance (q : ℝ) : ℝ :=
+  2 * q * (1 - q) * (Real.log (2 * q / (1 - q))) ^ 2 +
+      (1 - 2 * q) ^ 2 * (Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))) ^ 2 +
+      2 * q * (1 - q) * (Real.log (2 * (1 - q) / q)) ^ 2 -
+    hweMellinDrift q ^ 2
+
+/-- **The jet variance of a Hardy-Weinberg locus in closed form.** -/
+theorem HardyWeinbergModel.mellinJetVariance_eq (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    h.mellinJetVariance = hweMellinJetVariance h.altFreq := by
+  set q := h.altFreq with hq
+  have hqne : q ≠ 0 := ne_of_gt hq0
+  have hpne : (1 : ℝ) - q ≠ 0 := by intro hc; apply absurd hq1; linarith [hc]
+  obtain ⟨hX0, hX1, hX2⟩ := standardizedSquare_values h hq0 hq1
+  obtain ⟨hP0, hP1, hP2⟩ := genotypeProb_values h
+  have hA : (1 - q) ^ 2 * (2 * q / (1 - q)) = 2 * q * (1 - q) := by
+    first
+      | (field_simp; ring)
+      | field_simp
+  have hB : 2 * (1 - q) * q * ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) = (1 - 2 * q) ^ 2 := by
+    first
+      | (field_simp; ring)
+      | field_simp
+  have hC : q ^ 2 * (2 * (1 - q) / q) = 2 * q * (1 - q) := by
+    first
+      | (field_simp; ring)
+      | field_simp
+  have hdrift : h.mellinDrift = hweMellinDrift q := h.mellinDrift_eq hq0 hq1
+  unfold HardyWeinbergModel.mellinJetVariance hweMellinJetVariance
+  rw [sum_diploidGenotype, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC, hdrift]
+
 /-- The lattice span at `q*` is `h = log ((1 - q*) / q*) = log (3 + 2 sqrt 2)`, which
 is strictly positive; hence the inflation factor `h / (1 - exp (-h))` is strictly
 greater than one and the separation of `hardCall_arithmeticProgression_at_critical_maf`
@@ -522,6 +586,36 @@ theorem hardCallLatticeSpan_pos : 0 < hardCallLatticeSpan := by
     linarith
   unfold hardCallLatticeSpan
   exact Real.log_pos hgt
+
+/-- **The complete observable triple of a hard-called locus at the lattice frequency.**
+
+Every component is a closed-form function of the allele frequency, and the third
+component is `lattice` because the three values of `log x ^ 2` form an exact arithmetic
+progression there (`hardCall_arithmeticProgression_at_critical_maf`). -/
+noncomputable def hardCallObservables : MellinObservables where
+  drift := hweMellinDrift latticeCriticalMaf
+  jetVariance := hweMellinJetVariance latticeCriticalMaf
+  latticeDatum :=
+    LatticeDatum.lattice hardCallLatticeSpan
+      (Real.log (2 * latticeCriticalMaf / (1 - latticeCriticalMaf)))
+
+/-- **A hard-called locus is observationally distinct from the Gaussian, whatever its
+2-jet.** The third observable separates them outright — no moment computation, no
+window tuning, and nothing a cumulant can see.
+
+This is the instantiation that makes `Calibrator.JetBarrier` bite: the abstract
+trichotomy is not merely a classification, it has a concrete genotype in the lattice
+stratum. -/
+theorem hardCallObservables_ne_gaussian : hardCallObservables ≠ gaussianObservables :=
+  lattice_observables_ne_gaussian _ _ _ _
+
+/-- Equivalently: a hard-called locus at the lattice frequency is **not** a chameleon.
+The chameleon stratum is nonlattice, so no hard call can hide there — the blind spot of
+the additive apparatus is populated by imputed dosages, not by genotypes. -/
+theorem hardCall_not_chameleon : ¬ IsChameleonObservable hardCallObservables := by
+  rw [isChameleonObservable_iff]
+  exact hardCallObservables_ne_gaussian
+
 
 /-- **Hard calls are separated from dosage surrogates at high epistatic order.**
 The inflation factor at `q*` is strictly above one, so the Poisson exceedance
