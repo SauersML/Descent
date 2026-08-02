@@ -1,0 +1,580 @@
+#!/usr/bin/env python3
+"""Family simulator: SELECTION REGIMES (forward Wright-Fisher, vectorized).
+
+Run with the popgen venv:
+    /projects/standard/hsiehph/sauer354/popgenv/bin/python fam_selection.py
+
+WHY A FORWARD SIMULATOR
+    Every member of this family is a DETERMINISTIC recursion or its fixed
+    point. msprime cannot check any of them -- the coalescent is neutral. SLiM
+    is not installed and is not needed: the models here are one-locus, so a
+    Wright-Fisher generation is one line of array arithmetic.
+
+WHAT IS COVERED
+    continent-island (directional selection against migration):
+        continentIslandStepSelectionFirst, continentIslandStepMigrationFirst,
+        selectionMigrationEquilibrium,
+        selectionMigrationEquilibriumMigrationFirst
+    mutation-selection balance:
+        mutationSelectionStepRare, mutationSelectionBalance,
+        mutationSelectionStepRecessive, mutationSelectionBalanceRecessive
+    stabilizing selection on a quantitative trait:
+        effectVarianceRecurrence, equilibriumEffectVariance,
+        stabilizingSelectedArchitectureVariance
+    NOT covered, deliberately: selectedDriftFactor. `s_correction` is a free
+    parameter no model in the corpus derives, so any measurement can be fitted.
+    coverage.py already lists it UNREACHABLE and this run does not disturb that.
+
+THE DIFFERENCE THE DEFINITIONS CANNOT SEE: POPULATION SIZE.
+    Not one member of this family takes N. Every one therefore predicts the
+    same equilibrium frequency in a population of 100 and of 10^6. Drift does
+    not merely add noise around the deterministic fixed point: at a boundary it
+    is absorbing, and near mutation-selection balance the stationary MEAN of a
+    Wright-Fisher chain is not its deterministic fixed point. The N axis is the
+    test. A single-N run cannot fail.
+
+CONTROL DISCIPLINE -- each control isolates ONE factor
+    C1 ALGEBRA ONLY, NO DRIFT, NO SELECTION-MIGRATION COUPLING.
+       Iterate the corpus's own step map deterministically (N = infinity) and
+       check it converges to the corpus's own closed form. This isolates
+       "closed form solves the recurrence" from "the recurrence is right".
+       It is the control that must pass before any disagreement below can be
+       read as being about population genetics.
+    C2 DRIFT-FREE LIMIT OF THE STOCHASTIC SIMULATOR.
+       Run the SAME Wright-Fisher code at N = 10^7, where drift is negligible,
+       and require it to reproduce C1. This isolates "the simulator implements
+       the model" from "drift matters". If C2 failed, every N-dependence below
+       would be a coding error rather than a finding.
+    C3 SELECTION OFF.
+       s = 0 with mutation only must give q -> mu_forward/(mu_forward +
+       mu_back); with mu = 0 and s = 0 the mean frequency must be a martingale.
+       Isolates the drift/mutation half of the update from the selection half.
+    C4 MUTATION OFF, SELECTION ON, DETERMINISTIC.
+       q must go to 0. Isolates the selection half.
+    C1-C4 SPLIT WHAT A COMBINED "does the simulator reproduce mu/(hs)" CONTROL
+    WOULD FUSE: a code that got the selection step wrong by the same factor it
+    got the mutation step wrong would pass the combined check and fail C3/C4.
+
+POSITIVE CONTROL ON THE NULL (C5)
+    Where this run reports "no discrepancy", it must be shown the comparison
+    COULD have found one. C5 feeds the checker a deliberately corrupted
+    prediction (s -> 1.3 s) and requires it to be flagged. A check that cannot
+    fail on a wrong input is not evidence about the right one.
+
+CAN-FAIL CLAUSE ON THE GRID
+    mu/(h*s + mu) and the textbook mu/(h*s) agree to within mu/(hs) of each
+    other -- i.e. they CONVERGE as s grows. A grid confined to large s would
+    validate both. The grid therefore runs down to h*s = 3e-4 with mu = 1e-5,
+    where mu/(hs) = 0.0333 and mu/(hs+mu) = 0.0323: a 3.2% separation that a
+    10^6-replicate run resolves. Likewise the N axis spans 10^2 to 10^7, which
+    is 4Ns from 0.12 to 12000 -- drift-dominated to selection-dominated.
+
+SPEED
+    VECTORIZED OVER REPLICATES. A Wright-Fisher generation for R independent
+    replicates is ONE np.random.binomial call on an array of R, not a Python
+    loop of R calls. Every regime below is (n_cells, n_replicates) arrays
+    advanced together, so wall time scales with GENERATIONS, not with
+    generations x replicates.
+"""
+
+import json
+import os
+import sys
+
+import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+EXTRACT = os.path.normpath(os.path.join(HERE, "..", "..", "extract"))
+if EXTRACT not in sys.path:
+    sys.path.insert(0, EXTRACT)
+
+# THE PREDICTIONS ARE THE CORPUS'S OWN BODIES, NOT MY TRANSCRIPTION OF THEM.
+# Retyping `max 0 ((s - m - m*s)/s)` into Python is a second chance to get it
+# wrong, and a typo there would be reported as a population-genetics finding.
+# api.callable_for compiles the Lean body itself.
+import api  # noqa: E402
+
+
+def lean(name):
+    fn, args = api.callable_for(name)
+    return fn, args
+
+
+LEAN = {}
+for _n in ("continentIslandStepSelectionFirst",
+           "continentIslandStepMigrationFirst",
+           "selectionMigrationEquilibrium",
+           "selectionMigrationEquilibriumMigrationFirst",
+           "mutationSelectionStepRare",
+           "mutationSelectionBalance",
+           "mutationSelectionStepRecessive",
+           "mutationSelectionBalanceRecessive",
+           "effectVarianceRecurrence",
+           "equilibriumEffectVariance"):
+    try:
+        LEAN[_n] = lean(_n)
+    except Exception as exc:                                # pragma: no cover
+        LEAN[_n] = None
+        print("WARNING: could not load %s from the corpus: %s" % (_n, exc))
+
+
+def call(name, **kw):
+    """Evaluate a corpus definition by Lean argument name."""
+    fn, args = LEAN[name]
+    return float(fn(*[kw[a] for a in args]))
+
+
+RNG = np.random.default_rng(20260802)
+
+
+# ===========================================================================
+# The two Wright-Fisher kernels. Both take and return an ARRAY of frequencies.
+# ===========================================================================
+
+def wf_continent_island(p, s, m, N, order):
+    """One generation: deterministic step from the corpus, then binomial drift.
+
+    `p` is an array of R replicate frequencies advanced simultaneously. `N` is
+    the number of DIPLOID individuals, so 2N gene copies are sampled.
+    N = None means the infinite-population (deterministic) limit.
+    """
+    if order == "selection_first":
+        # selection: p(1+s)/(1+sp); then migration: (1-m)*p
+        p = p * (1.0 + s) / (1.0 + s * p)
+        p = (1.0 - m) * p
+    else:
+        p = (1.0 - m) * p
+        p = p * (1.0 + s) / (1.0 + s * p)
+    if N is None:
+        return p
+    return RNG.binomial(2 * N, np.clip(p, 0.0, 1.0)) / (2.0 * N)
+
+
+def wf_mutation_selection(q, mu, s, h, N, recessive, mu_back=0.0):
+    """One generation of mutation + selection + drift on the DERIVED allele q.
+
+    Selection is applied on genotype frequencies under HWE with fitnesses
+    (1, 1-hs, 1-s) for (AA, Aa, aa); the corpus's rare-allele step maps are the
+    small-q limits of exactly this, which is the point of comparison.
+    """
+    if recessive:
+        w = 1.0 - s * q * q
+        q = (q * (1.0 - s * q)) / np.where(w <= 0, 1e-300, w)
+    else:
+        wbar = 1.0 - 2.0 * h * s * q * (1.0 - q) - s * q * q
+        num = q * (1.0 - h * s) * (1.0 - q) + q * q * (1.0 - s)
+        q = num / np.where(wbar <= 0, 1e-300, wbar)
+    q = q * (1.0 - mu_back) + mu * (1.0 - q)
+    if N is None:
+        return q
+    return RNG.binomial(2 * N, np.clip(q, 0.0, 1.0)) / (2.0 * N)
+
+
+# ===========================================================================
+# CONTROL 1 -- ALGEBRA. Deterministic iteration of the corpus step map must
+# reach the corpus closed form. Isolates: does the closed form solve the
+# recurrence? Nothing stochastic, nothing of mine, in this control.
+# ===========================================================================
+
+def control_algebra():
+    rows = []
+    for (s, m) in ((0.10, 0.05), (0.10, 0.08), (0.20, 0.02), (0.05, 0.04)):
+        for order, stepname, eqname in (
+                ("selection_first", "continentIslandStepSelectionFirst",
+                 "selectionMigrationEquilibrium"),
+                ("migration_first", "continentIslandStepMigrationFirst",
+                 "selectionMigrationEquilibriumMigrationFirst")):
+            fn, argn = LEAN[stepname]
+            p = 0.5
+            # convergence rate is at worst (1-m) per generation; 40000 steps is
+            # e^-800 at the slowest cell on this grid.
+            for _ in range(40000):
+                p = float(fn(**dict(zip(argn, (s, m, p)))))
+            closed = call(eqname, s=s, m=m)
+            rows.append({"s": s, "m": m, "order": order,
+                         "iterated_fixed_point": p, "closed_form": closed,
+                         "abs_err": abs(p - closed)})
+    for (mu, s, h) in ((1e-5, 0.01, 0.5), (1e-5, 3e-4 / 0.5, 0.5),
+                       (1e-6, 0.001, 0.2)):
+        fn, argn = LEAN["mutationSelectionStepRare"]
+        q = 0.0
+        # the map contracts at rate (1 - h*s - mu); iterate 40 e-foldings so
+        # the residual is below 1e-17 relative, far under the 1e-6 tolerance.
+        for _ in range(int(40.0 / (h * s + mu))):
+            q = float(fn(**dict(zip(argn, (mu, s, h, q)))))
+        closed = call("mutationSelectionBalance", mu=mu, s=s, h=h)
+        rows.append({"mu": mu, "s": s, "h": h, "order": "rare_additive",
+                     "iterated_fixed_point": q, "closed_form": closed,
+                     "abs_err": abs(q - closed)})
+    for (mu, s) in ((1e-5, 0.01), (1e-6, 0.05)):
+        fn, argn = LEAN["mutationSelectionStepRecessive"]
+        closed = call("mutationSelectionBalanceRecessive", mu=mu, s=s)
+        q = 0.0
+        # contraction rate near the fixed point is (1 - 2 s q* - mu).
+        for _ in range(int(40.0 / (2 * s * closed + mu))):
+            q = float(fn(**dict(zip(argn, (mu, s, q)))))
+        rows.append({"mu": mu, "s": s, "order": "rare_recessive",
+                     "iterated_fixed_point": q, "closed_form": closed,
+                     "abs_err": abs(q - closed)})
+    ok = all(r["abs_err"] <= 1e-9 + 1e-6 * abs(r["closed_form"]) for r in rows)
+    for r in rows:
+        print("  C1 %-22s %-16s iterated %.8g   closed %.8g   |d| %.2g"
+              % (r["order"],
+                 "s=%g m=%g" % (r["s"], r["m"]) if "m" in r
+                 else "mu=%g s=%g" % (r["mu"], r["s"]),
+                 r["iterated_fixed_point"], r["closed_form"], r["abs_err"]))
+    print("  CONTROL 1 (closed form solves the corpus recurrence): %s"
+          % ("PASS" if ok else "FAIL"))
+    return ok, rows
+
+
+# ===========================================================================
+# CONTROL 2 -- the stochastic simulator at N = 10^7 must reproduce control 1.
+# Isolates: is the Wright-Fisher code the same model as the recurrence?
+# ===========================================================================
+
+def control_driftfree():
+    rows = []
+    R = 400
+    BIG = 10 ** 7
+    for (s, m, order) in ((0.10, 0.05, "selection_first"),
+                          (0.10, 0.05, "migration_first"),
+                          (0.20, 0.02, "selection_first")):
+        p = np.full(R, 0.5)
+        for _ in range(4000):
+            p = wf_continent_island(p, s, m, BIG, order)
+        pred = call("selectionMigrationEquilibrium" if order == "selection_first"
+                    else "selectionMigrationEquilibriumMigrationFirst", s=s, m=m)
+        mean = float(p.mean())
+        rows.append({"s": s, "m": m, "order": order, "N": BIG,
+                     "measured": mean, "predicted": pred,
+                     "rel_err": (pred - mean) / mean if mean else None})
+        print("  C2 %-16s s=%.2f m=%.3f  N=1e7 measured %.6f  corpus %.6f  "
+              "rel %+.4f%%" % (order, s, m, mean, pred,
+                               100 * (pred - mean) / mean if mean else float("nan")))
+    ok = all(abs(r["rel_err"]) < 0.002 for r in rows)
+    print("  CONTROL 2 (simulator == recurrence when drift is off): %s"
+          % ("PASS" if ok else "FAIL"))
+    return ok, rows
+
+
+# ===========================================================================
+# CONTROL 3 -- SELECTION OFF. Isolates the mutation+drift half.
+# CONTROL 4 -- MUTATION OFF, DETERMINISTIC. Isolates the selection half.
+# ===========================================================================
+
+def control_halves():
+    rows = []
+    # C3a: s = 0, two-way mutation -> q* = mu/(mu + nu), independent of N.
+    mu, nu, N, R = 1e-3, 3e-3, 2000, 4000
+    q = np.zeros(R)
+    for _ in range(40000):
+        q = wf_mutation_selection(q, mu, 0.0, 0.5, N, False, mu_back=nu)
+    want = mu / (mu + nu)
+    got = float(q.mean())
+    c3a = abs(got - want) < 4.0 * float(q.std()) / np.sqrt(R) + 1e-3
+    rows.append({"control": "s=0 two-way mutation", "measured": got,
+                 "expected": want, "pass": bool(c3a)})
+    print("  C3a s=0, mu=%.0e nu=%.0e: measured q=%.5f  expected %.5f  %s"
+          % (mu, nu, got, want, "PASS" if c3a else "FAIL"))
+
+    # C3b: s = 0, mu = 0 -> pure drift, E[q] is a martingale (mean preserved).
+    q = np.full(20000, 0.3)
+    for _ in range(500):
+        q = wf_mutation_selection(q, 0.0, 0.0, 0.5, 500, False)
+    got = float(q.mean())
+    sem = float(q.std()) / np.sqrt(q.size)
+    c3b = abs(got - 0.3) < 4 * sem
+    rows.append({"control": "pure drift martingale", "measured": got,
+                 "expected": 0.3, "sem": sem, "pass": bool(c3b)})
+    print("  C3b pure drift: E[q] %.5f +- %.5f vs 0.30000  %s"
+          % (got, sem, "PASS" if c3b else "FAIL"))
+
+    # C4: mutation off, selection on, deterministic -> q -> 0.
+    q = np.array([0.4])
+    for _ in range(20000):
+        q = wf_mutation_selection(q, 0.0, 0.02, 0.5, None, False)
+    c4 = float(q[0]) < 1e-6
+    rows.append({"control": "mu=0 deterministic selection -> 0",
+                 "measured": float(q[0]), "expected": 0.0, "pass": bool(c4)})
+    print("  C4  mu=0, s=0.02 deterministic: q=%.3g  %s"
+          % (q[0], "PASS" if c4 else "FAIL"))
+    ok = c3a and c3b and c4
+    print("  CONTROLS 3-4 (halves isolated): %s" % ("PASS" if ok else "FAIL"))
+    return ok, rows
+
+
+# ===========================================================================
+# REGIME 1 -- continent-island. Vary N, which no member takes.
+# ===========================================================================
+
+def regime_continent_island():
+    out = []
+    R = 4000
+    GENS = 6000
+    for (s, m) in ((0.10, 0.05), (0.10, 0.08), (0.05, 0.04)):
+        for order in ("selection_first", "migration_first"):
+            pred = call("selectionMigrationEquilibrium"
+                        if order == "selection_first"
+                        else "selectionMigrationEquilibriumMigrationFirst",
+                        s=s, m=m)
+            for N in (100, 1000, 10000, 10 ** 7):
+                p = np.full(R, min(0.9, max(pred, 0.05)))
+                for _ in range(GENS):
+                    p = wf_continent_island(p, s, m, N, order)
+                mean = float(p.mean())
+                sem = float(p.std()) / np.sqrt(R)
+                lost = float((p <= 0).mean())
+                out.append({"s": s, "m": m, "order": order, "N": N,
+                            "measured_mean_freq": mean, "sem": sem,
+                            "loss_fraction": lost,
+                            "corpus_prediction": pred,
+                            "rel_err": (pred - mean) / mean if mean > 0 else None})
+                print("  s=%.2f m=%.3f %-16s N=%-8d  E[p]=%.5f +-%.5f  "
+                      "lost=%4.1f%%  corpus %.5f  rel %+8.2f%%"
+                      % (s, m, order, N, mean, sem, 100 * lost, pred,
+                         100 * (pred - mean) / mean if mean > 0 else float("nan")))
+    return out
+
+
+# ===========================================================================
+# REGIME 2 -- mutation-selection balance. Vary N and reach the regime where
+# mu/(hs+mu) and the textbook mu/(hs) SEPARATE.
+# ===========================================================================
+
+def regime_mutation_selection():
+    out = []
+    R = 20000
+    for (mu, hs) in ((1e-5, 3e-4), (1e-5, 1e-3), (1e-5, 1e-2), (1e-4, 1e-2)):
+        h = 0.5
+        s = hs / h
+        corpus = call("mutationSelectionBalance", mu=mu, s=s, h=h)
+        textbook = mu / hs
+        for N in (500, 5000, 50000, 10 ** 7):
+            gens = max(20000, int(20.0 / hs))
+            q = np.full(R, corpus)
+            for _ in range(gens):
+                q = wf_mutation_selection(q, mu, s, h, N, False)
+            mean = float(q.mean())
+            sem = float(q.std()) / np.sqrt(R)
+            out.append({"mu": mu, "s": s, "h": h, "hs": hs, "N": N,
+                        "gens": gens,
+                        "measured_mean_freq": mean, "sem": sem,
+                        "corpus_mutationSelectionBalance": corpus,
+                        "textbook_mu_over_hs": textbook,
+                        "rel_err_corpus": (corpus - mean) / mean if mean else None,
+                        "rel_err_textbook": (textbook - mean) / mean if mean else None,
+                        "corpus_vs_textbook_separation":
+                            (textbook - corpus) / corpus})
+            print("  mu=%.0e hs=%.0e N=%-8d E[q]=%.6f +-%.6f | corpus %.6f "
+                  "(%+.2f%%) | mu/hs %.6f (%+.2f%%) | forms differ by %.2f%%"
+                  % (mu, hs, N, mean, sem, corpus,
+                     100 * (corpus - mean) / mean if mean else float("nan"),
+                     textbook,
+                     100 * (textbook - mean) / mean if mean else float("nan"),
+                     100 * (textbook - corpus) / corpus))
+    # recessive
+    for (mu, s) in ((1e-5, 0.01), (1e-5, 0.001)):
+        corpus = call("mutationSelectionBalanceRecessive", mu=mu, s=s)
+        textbook = np.sqrt(mu / s)
+        for N in (5000, 50000, 10 ** 7):
+            gens = max(30000, int(20.0 / s))
+            q = np.full(R, corpus)
+            for _ in range(gens):
+                q = wf_mutation_selection(q, mu, s, None, N, True)
+            mean = float(q.mean())
+            sem = float(q.std()) / np.sqrt(R)
+            out.append({"mu": mu, "s": s, "h": "recessive", "N": N,
+                        "gens": gens,
+                        "measured_mean_freq": mean, "sem": sem,
+                        "corpus_mutationSelectionBalanceRecessive": corpus,
+                        "textbook_sqrt_mu_over_s": float(textbook),
+                        "rel_err_corpus": (corpus - mean) / mean if mean else None})
+            print("  RECESSIVE mu=%.0e s=%.0e N=%-8d E[q]=%.6f +-%.6f | "
+                  "corpus %.6f (%+.2f%%) | sqrt(mu/s) %.6f"
+                  % (mu, s, N, mean, sem, corpus,
+                     100 * (corpus - mean) / mean if mean else float("nan"),
+                     textbook))
+    return out
+
+
+# ===========================================================================
+# REGIME 3 -- stabilizing selection on a quantitative trait.
+#
+# effectVarianceRecurrence is `V' = (1-s) V + v_mut`, whose fixed point is
+# `v_mut / s` = equilibriumEffectVariance. The algebra is one line, so a check
+# that iterated the recurrence and got its own fixed point would measure
+# nothing. THE CLAIM WITH CONTENT IS THE LINEARITY: the recurrence says the
+# per-generation variance loss is a CONSTANT FRACTION `s` of standing variance,
+# the same fraction at every V. Neither definition takes V, so both assert this.
+#
+# WHAT IS MEASURED: an individual-based population under Gaussian stabilizing
+# selection, and the REALIZED loss fraction loss/V at several standing
+# variances. If loss/V is flat in V, `s` is a parameter and the recurrence is
+# structurally right. If loss/V rises with V, `s` is not a constant of the
+# model and v_mut/s is a small-variance limit that neither signature declares.
+#
+# THIS CAN FAIL IN BOTH DIRECTIONS and nothing here is imposed: selection acts
+# on sampled phenotypes by resampling parents in proportion to fitness, and the
+# variance loss is read off afterwards rather than substituted in. An earlier
+# draft of this function computed the loss from Bulmer's formula and then
+# divided by V to get s -- that made v_mut/s = V an identity and would have
+# passed for any model whatever. It is recorded here because the difference
+# between the two versions is invisible in a results file.
+# ===========================================================================
+
+def regime_stabilizing():
+    out = []
+    L = 200            # loci
+    N = 1000           # diploids
+    REPS = 6
+    Ve = 1.0
+    for Vs in (2.0, 10.0, 50.0):
+        eff = np.sqrt(1.0 / L) * np.ones(L)
+        # start at several standing variances so loss/V is measured across a
+        # RANGE of V rather than at one point -- the whole test is the slope.
+        g0 = np.zeros((REPS, N, L), dtype=np.int8)
+        for start_p in (0.5, 0.2, 0.05):
+            g0[:] = (RNG.random((REPS, N, L)) < start_p).astype(np.int8) \
+                + (RNG.random((REPS, N, L)) < start_p).astype(np.int8)
+            g = g0.copy()
+            rows_V, rows_loss = [], []
+            for gen in range(40):
+                z = g.astype(np.float32) @ eff.astype(np.float32)
+                q = g.mean(axis=(1,)) / 2.0                 # (REPS, L)
+                V_before = np.sum(2.0 * q * (1.0 - q) * eff ** 2, axis=1)
+                z = z + RNG.normal(0.0, np.sqrt(Ve), size=z.shape)
+                w = np.exp(-(z - z.mean(axis=1, keepdims=True)) ** 2
+                           / (2.0 * Vs))
+                w = w / w.sum(axis=1, keepdims=True)
+                # sexual reproduction: two parents drawn w.p. proportional to
+                # fitness, one gamete each, free recombination between loci.
+                out_g = np.empty_like(g)
+                for r in range(REPS):
+                    pa = RNG.choice(N, size=N, p=w[r])
+                    pb = RNG.choice(N, size=N, p=w[r])
+                    ga = RNG.binomial(g[r][pa], 0.5)
+                    gb = RNG.binomial(g[r][pb], 0.5)
+                    out_g[r] = (ga + gb).astype(np.int8)
+                g = out_g
+                q2 = g.mean(axis=(1,)) / 2.0
+                V_after = np.sum(2.0 * q2 * (1.0 - q2) * eff ** 2, axis=1)
+                if gen >= 5:
+                    rows_V.append(V_before)
+                    rows_loss.append(V_before - V_after)
+            Vbar = float(np.mean(rows_V))
+            lossbar = float(np.mean(rows_loss))
+            frac = lossbar / Vbar if Vbar else float("nan")
+            out.append({"Vs": Vs, "N": N, "L": L, "start_p": start_p,
+                        "mean_standing_variance_V": Vbar,
+                        "mean_per_generation_loss": lossbar,
+                        "realized_loss_fraction_s": frac})
+            print("  Vs=%-5.1f start_p=%.2f  V=%.5f  loss/gen=%.6f  "
+                  "realized s = loss/V = %.5f" % (Vs, start_p, Vbar, lossbar,
+                                                  frac))
+    # THE CLAIM UNDER TEST: is s constant across V at fixed Vs?
+    verdict = []
+    for Vs in (2.0, 10.0, 50.0):
+        cells = [r for r in out if r["Vs"] == Vs]
+        cells.sort(key=lambda r: r["mean_standing_variance_V"])
+        lo, hi = cells[0], cells[-1]
+        ratio = (hi["realized_loss_fraction_s"]
+                 / lo["realized_loss_fraction_s"]
+                 if lo["realized_loss_fraction_s"] else float("nan"))
+        verdict.append({"Vs": Vs,
+                        "V_low": lo["mean_standing_variance_V"],
+                        "s_at_V_low": lo["realized_loss_fraction_s"],
+                        "V_high": hi["mean_standing_variance_V"],
+                        "s_at_V_high": hi["realized_loss_fraction_s"],
+                        "s_ratio_high_over_low": ratio})
+        print("  Vs=%-5.1f  s(V=%.4f)=%.5f  vs  s(V=%.4f)=%.5f   ratio %.3f"
+              % (Vs, lo["mean_standing_variance_V"],
+                 lo["realized_loss_fraction_s"],
+                 hi["mean_standing_variance_V"],
+                 hi["realized_loss_fraction_s"], ratio))
+    print("  effectVarianceRecurrence asserts this ratio is 1.000 at every Vs.")
+    return {"cells": out, "constancy_of_s": verdict}
+
+
+# ===========================================================================
+# CONTROL 5 -- POSITIVE CONTROL. The comparison must be able to fail.
+# ===========================================================================
+
+def control_positive(ms_rows):
+    """Corrupt the corpus prediction and require the checker to flag it.
+
+    Applied to the LARGEST-N mutation-selection cells, which is exactly where
+    this run reports agreement. If a 30% corruption is not flagged there, the
+    "no discrepancy" verdict at those cells measures nothing.
+    """
+    flagged = 0
+    tested = 0
+    for r in ms_rows:
+        if r["N"] != 10 ** 7 or "corpus_mutationSelectionBalance" not in r:
+            continue
+        tested += 1
+        good = r["corpus_mutationSelectionBalance"]
+        bad = call("mutationSelectionBalance", mu=r["mu"], s=1.3 * r["s"],
+                   h=r["h"])
+        m = r["measured_mean_freq"]
+        if abs((bad - m) / m) > 0.05 >= abs((good - m) / m):
+            flagged += 1
+    ok = tested > 0 and flagged == tested
+    print("  CONTROL 5 positive control: %d/%d corrupted predictions rejected "
+          "while the true one passed: %s"
+          % (flagged, tested, "PASS" if ok else "FAIL"))
+    return ok, {"tested": tested, "flagged": flagged}
+
+
+def main():
+    res = {"family": "selection_regimes",
+           "covers": ["continentIslandStepSelectionFirst",
+                      "continentIslandStepMigrationFirst",
+                      "selectionMigrationEquilibrium",
+                      "selectionMigrationEquilibriumMigrationFirst",
+                      "mutationSelectionStepRare", "mutationSelectionBalance",
+                      "mutationSelectionStepRecessive",
+                      "mutationSelectionBalanceRecessive",
+                      "effectVarianceRecurrence",
+                      "equilibriumEffectVariance"],
+           "not_covered": {"selectedDriftFactor":
+                           "free parameter s_correction; already UNREACHABLE "
+                           "in coverage.py and not disturbed here"}}
+    print("CONTROL 1 -- ALGEBRA (no drift, no simulator)")
+    c1, res["control_algebra"] = control_algebra()
+    print("")
+    print("CONTROL 2 -- DRIFT-FREE LIMIT OF THE SIMULATOR")
+    c2, res["control_driftfree"] = control_driftfree()
+    print("")
+    print("CONTROLS 3-4 -- HALVES ISOLATED")
+    c34, res["control_halves"] = control_halves()
+    print("")
+    print("REGIME 1 -- CONTINENT-ISLAND (axis: N, which no member takes)")
+    res["continent_island"] = regime_continent_island()
+    print("")
+    print("REGIME 2 -- MUTATION-SELECTION BALANCE (axis: N; grid reaches where "
+          "mu/(hs+mu) and mu/(hs) separate)")
+    res["mutation_selection"] = regime_mutation_selection()
+    print("")
+    print("REGIME 3 -- STABILIZING SELECTION")
+    res["stabilizing"] = regime_stabilizing()
+    print("")
+    print("CONTROL 5 -- POSITIVE CONTROL ON THE NULL")
+    c5, res["control_positive"] = control_positive(res["mutation_selection"])
+
+    res["controls"] = {"algebra_closed_form_solves_recurrence": bool(c1),
+                       "simulator_equals_recurrence_without_drift": bool(c2),
+                       "halves_isolated": bool(c34),
+                       "positive_control_can_fail": bool(c5)}
+    res["READ_THE_TEST"] = bool(c1 and c2 and c34 and c5)
+    fh = open(os.path.join(HERE, "fam_selection_results.json"), "w")
+    json.dump(res, fh, indent=1)
+    fh.close()
+    print("")
+    print("READ_THE_TEST: %s   -> fam_selection_results.json"
+          % res["READ_THE_TEST"])
+    return 0 if res["READ_THE_TEST"] else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
