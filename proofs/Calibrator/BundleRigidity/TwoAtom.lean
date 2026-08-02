@@ -237,7 +237,7 @@ theorem chain_identity_right (k : ℕ) :
     rw [chain]; field_simp
   have hden : 1 - chain k = ((k : ℝ) + 1) / (2 * (k : ℝ) + 1) := by
     rw [chain]; field_simp
-  rw [hnum, hden, div_div_div_comm]
+  rw [hnum, hden]
   field_simp
 
 /-- **The chain identity, as the source states it:**
