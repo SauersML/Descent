@@ -7,7 +7,6 @@ import Mathlib.Data.Fin.VecNotation
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Exp
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 namespace Calibrator
 
@@ -1034,8 +1033,81 @@ cross-spectrum and controlled finite-window boundaries. Likewise, no
 claimed without the missing analytic and non-cancellation hypotheses.
 -/
 
+/-! ## 11. Two proved no-go theorems about summarizing degradation
+
+These two were removed once as "unproved coupling landscape claims" and are restored here
+because **they are proved, from explicit hypotheses, with no analytic input at all.** What
+was correctly removed alongside them — the structures asserting an `n^β log n` gain law, a
+heavy-tail renewal rate and a Pisot classification — is not restored: those carried their
+conclusions as fields, and the objection to them was right. These two do not.
+
+The hypothesis of each is a *witness*, supplied by the caller. Neither theorem claims the
+witness exists; each says what follows if it does. That is the whole difference.
+-/
+
+/-- A **family of degradation functionals**, indexed by the evaluation band a readout
+weights. `deg k p` is the degradation of population pair `p` as seen in band `k`. -/
+structure DegradationFamily (Pair : Type*) where
+  /-- Degradation of a pair, as seen from a given evaluation band. -/
+  deg : ℕ → Pair → ℝ
+
+/-- **A scalar summary of degradation**: one number per population pair, which every band
+reads through its own monotone rescaling. This is what "genetic distance predicts
+portability loss" asserts. -/
+def HasScalarSummary {Pair : Type*} (F : DegradationFamily Pair) : Prop :=
+  ∃ D : Pair → ℝ, ∃ Φ : ℕ → ℝ → ℝ,
+    (∀ k : ℕ, Monotone (Φ k)) ∧ ∀ (k : ℕ) (p : Pair), F.deg k p = Φ k (D p)
+
+/-- **THE REVERSAL NO-GO.** A single reversed comparison kills every scalar summary at once.
+
+If band `k` ranks pair `p` below pair `q` while band `l` ranks `q` below `p`, then no single
+number per population pair — however rescaled, and however the rescaling varies with the
+band — reproduces both orderings. Monotone maps preserve order, so a scalar summary forces
+every band to agree on the ranking.
+
+**What it would mean, given a reversal witness:** portability degradation would not be a
+scalar property of a population pair that different traits and metrics estimate with
+different noise, and the reported cross-trait disagreement and metric-dependent trend
+reversal in the portability literature would be structural rather than defects of those
+studies. **This file does not supply the witness.** Whether the canonical degradation family
+actually reverses is exactly the claim that must be established elsewhere, and until it is,
+this theorem is an implication with an open antecedent. -/
+theorem no_scalar_summary_of_reversal {Pair : Type*} (F : DegradationFamily Pair)
+    (p q : Pair) (k l : ℕ)
+    (hk : F.deg k p < F.deg k q) (hl : F.deg l q < F.deg l p) :
+    ¬ HasScalarSummary F := by
+  rintro ⟨D, Φ, hmono, heq⟩
+  rcases le_total (D p) (D q) with h | h
+  · have hle : Φ l (D p) ≤ Φ l (D q) := hmono l h
+    rw [← heq l p, ← heq l q] at hle
+    linarith
+  · have hle : Φ k (D q) ≤ Φ k (D p) := hmono k h
+    rw [← heq k p, ← heq k q] at hle
+    linarith
+
+/-- **THE COUNTING NO-GO.** Two couplings that agree in their unit count but differ in gain
+rule out *every* functional of the count, not merely the one being used.
+
+**What it would mean, given such a pair:** counting LD blocks would not merely approximate
+effective independence badly — it would be blind to the distinction, since no rule taking
+the block count as input could separate the two cases. **This file does not supply the
+pair.** The candidate witness is a heavy-tailed block-length coupling against a
+shared-factor one, and establishing that they share a count while differing in gain is the
+open half. -/
+theorem no_counting_functional {Coupling : Type*} (count gain : Coupling → ℝ)
+    (c₁ c₂ : Coupling) (hcount : count c₁ = count c₂) (hgain : gain c₁ ≠ gain c₂) :
+    ¬ ∃ f : ℝ → ℝ, ∀ c : Coupling, gain c = f (count c) := by
+  rintro ⟨f, hf⟩
+  exact hgain (by rw [hf c₁, hf c₂, hcount])
+
 /-!
 ## What is left open, plainly
+
+* **The witnesses for §11.** Both no-go theorems above are implications whose antecedents
+  are unproved here: that the canonical degradation family admits a band reversal, and that
+  two couplings share a unit count while differing in gain. The mathematics that would
+  supply them — the exact degradation identity and the `n^β log n` gain law — is not in this
+  module and is not claimed by it.
 
 * **Linkage disequilibrium proper — coverage is closed, rigidity is not.** Section 9 proves
   that a positive **joint atom floor** makes coverage coupling-invariant. It does not prove
