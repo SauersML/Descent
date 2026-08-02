@@ -81,4 +81,52 @@ theorem historySelfEnergy_closed (h : SpectralHistory) (hmemory : h.memory ^ 2 �
   rw [sub_self, Real.cos_zero]
   simpa [pow_two] using markovPoissonKernel_at_one (h.memory ^ 2) hmemory
 
+/-! ## Marginal blindness to dependence -/
+
+/-- The one-time signal amplitude visible from a marginal feature law in the one-mode
+model. Memory and phase are absent by construction. -/
+def historyMarginalAmplitude (h : SpectralHistory) : ℝ := h.amplitude
+
+/-- Independent driving with a prescribed marginal signal amplitude. -/
+def independentHistory (amplitude : ℝ) : SpectralHistory where
+  amplitude := amplitude
+  memory := 0
+  phase := 0
+
+/-- A persistent two-state driving mode with the same marginal signal amplitude. -/
+def persistentHalfHistory (amplitude : ℝ) : SpectralHistory where
+  amplitude := amplitude
+  memory := 1 / 2
+  phase := 0
+
+/-- **Marginal-data blindness, executed.** The independent and persistent histories have
+the same one-locus marginal amplitude, but at unit amplitude their exact history
+degradation is `2/3`. This is a realizable reversible two-state witness; no complex
+eigenvalue or compact spectral bump is needed.
+
+Biologically, two populations can have the same allele-/feature-frequency marginal while
+differing in ancestry-tract or haplotype persistence. A deployment radius containing that
+memory direction cannot be inferred from target marginals alone. -/
+theorem same_marginal_different_memory_degradation :
+    historyMarginalAmplitude (independentHistory 1) =
+        historyMarginalAmplitude (persistentHalfHistory 1) ∧
+      historyDegradation (independentHistory 1) (persistentHalfHistory 1) = 2 / 3 := by
+  norm_num [historyMarginalAmplitude, independentHistory, persistentHalfHistory,
+    historyDegradation, historySelfEnergy, historyKernel, markovPoissonKernel]
+
+/-- The assertion that marginal amplitude alone determines all history degradation. -/
+def MarginalAmplitudeDeterminesHistoryDegradation : Prop :=
+  ∀ h h' : SpectralHistory,
+    historyMarginalAmplitude h = historyMarginalAmplitude h' →
+      historyDegradation h h' = 0
+
+/-- **Deployment separation is not identifiable from marginal amplitude.** -/
+theorem not_marginalAmplitudeDeterminesHistoryDegradation :
+    ¬ MarginalAmplitudeDeterminesHistoryDegradation := by
+  intro hdetermines
+  have hzero := hdetermines (independentHistory 1) (persistentHalfHistory 1)
+    same_marginal_different_memory_degradation.1
+  rw [same_marginal_different_memory_degradation.2] at hzero
+  norm_num at hzero
+
 end Calibrator

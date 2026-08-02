@@ -1335,6 +1335,13 @@ bound. The proposed cancellation of deployment bias likewise needs an actual exp
 not a proposition stored in a structure. No claim that long memory is sample-cost-free is
 made here. The exact Poisson-history quadratic and its amplitude/spectrum slices are in
 `GenerativePortabilityLaw`; its boundary asymptotics remain to be proved analytically.
+
+The radius-identifiability verdict is already exact in the one-mode biological model:
+`same_marginal_different_memory_degradation` constructs independent and persistent
+two-state histories with the same marginal amplitude but degradation `2/3`, and
+`not_marginalAmplitudeDeterminesHistoryDegradation` proves that no marginal-amplitude rule
+can recover deployment separation. Target genotype marginals therefore need an LD/tract
+measurement companion; more precise one-locus frequencies cannot identify memory.
 -/
 
 /-!
