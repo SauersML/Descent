@@ -62,6 +62,30 @@ dosages are nonlattice**: they have a density. Theorem 1b therefore says that ha
 calls and imputed dosages are distinguishable by high-degree epistatic aggregates
 *even after matching every moment*, with an explicit inflation factor. See
 `Calibrator.PolygenicSpectroscopy`.
+
+## Which half of this file applies to genotypes, and where
+
+The file splits cleanly along the symmetry hypothesis, and the split is worth
+stating once because it decides what may be quoted about real data.
+
+* **Symmetry-gated.** Everything in the `ChaosSpectroscopy` namespace — the
+  barrier, the factorization, the chameleon calibration, the undecidability of
+  Gaussianity — quantifies over *symmetric* unit-variance laws. A standardized
+  Hardy-Weinberg genotype is symmetric at `q = 1/2` and nowhere else in the
+  polymorphic range (`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff`),
+  so these results are licensed for genotypes at that one frequency, which is
+  also the frequency where the jet variance vanishes.
+* **Symmetry-free.** The lattice arithmetic (`one_lt_latticeInflation`,
+  `latticeBracket_antitone`, `latticeInflation_normalization`) and
+  `lattice_detection` never mention symmetry, and neither does the drift theory
+  of `Calibrator.Condensation`. These are the parts that apply to genotypes at
+  every allele frequency — and they are the parts
+  `Calibrator.PolygenicSpectroscopy` actually instantiates.
+
+The instantiation in `Calibrator.PolygenicSpectroscopy` was built on the
+symmetry-free side, so nothing there is retracted by this record. The record
+exists so that the symmetry-gated statements are not quoted about genotypes at
+frequencies where their hypothesis is false.
 -/
 
 open scoped BigOperators
@@ -177,7 +201,32 @@ at the type level rather than buried, matching the convention in
 `Law` ranges over symmetric unit-variance coordinate laws with all moments finite;
 `Design` over admissible disjoint-support multilinear designs (arbitrary degrees,
 arbitrary coefficients with unit `L2` norm and vanishing max coefficient);
-`Limit` over limit laws. -/
+`Limit` over limit laws.
+
+**Genotype applicability — read this before instantiating `Law` at a genotype.**
+The symmetry restriction on `Law` is not decoration; the barrier field is
+discharged through the sign-erasure reduction of `Calibrator.EpistaticChaos`,
+which needs `E[x | |x|] = 0`. A standardized Hardy-Weinberg genotype satisfies
+that at **exactly one allele frequency, `q = 1/2`**, and at no other polymorphic
+frequency (`EpistaticChaos.standardizedGenotype_symmetric_iff`; the obstruction
+is the third central moment `2q(1-q)(1-2q)`). So every theorem in this namespace
+— `experiment_factors_through_observables`,
+`chameleon_passes_every_independent_criterion`,
+`no_independent_design_criterion_decides_gaussianity` — is licensed for genotype
+coordinate laws only at `q = 1/2`.
+
+That single licensed frequency is also where the second observable dies:
+`Calibrator.PolygenicSpectroscopy.hweMellinJetVariance_half` gives `v(1/2) = 0`,
+because `log x ^ 2` collapses to one point. The symmetric branch of this theory
+therefore meets the genotypes only at a maximally lattice, jet-variance-free
+point. Note that the *drift* does not degenerate there: `c(1/2) = log 2`, not
+zero. The theorems below are correct as stated; what this note records is that
+their genotype instantiation is a single frequency wide.
+
+The results that do apply to genotypes across the whole frequency spectrum are
+the ones that never invoke symmetry: the lattice arithmetic of Section 1 and
+`lattice_detection` in Section 3, and the drift/condensation machinery of
+`Calibrator.Condensation`, whose `MellinProfile` carries no symmetry field. -/
 structure ChaosSpectroscopy (Law Design Limit : Type*) where
   /-- The observable triple of a coordinate law. -/
   observables : Law → MellinObservables
@@ -196,7 +245,11 @@ variable {Law Design Limit : Type*} (S : ChaosSpectroscopy Law Design Limit)
 
 /-- **The observable algebra is exactly three-dimensional: nothing beyond the triple
 is measurable.** Any experiment that reports a function of the design limits is a
-function of the observable triple alone. -/
+function of the observable triple alone.
+
+Genotype applicability: inherits the symmetry restriction on `Law`, so the
+genotype instantiation is licensed only at `q = 1/2`. See the `ChaosSpectroscopy`
+docstring. -/
 theorem experiment_factors_through_observables
     {Report : Type*} (experiment : (Design → Limit) → Report)
     (ν ν' : Law) (h : S.observables ν = S.observables ν') :
@@ -211,7 +264,13 @@ that certifies the Gaussian also certifies the chameleon — so any criterion in
 family carries at most `(c, v, lattice)` information, and the barrier bounds its power
 exactly.
 
-This is the calibration instrument: feed a candidate criterion a chameleon. -/
+This is the calibration instrument: feed a candidate criterion a chameleon.
+
+Genotype applicability: inherits the symmetry restriction on `Law`, so the
+genotype instantiation is licensed only at `q = 1/2`. See the `ChaosSpectroscopy`
+docstring. This is not a limitation on the instrument's use against *dosage*
+surrogates, which is its intended use — it is a limitation on reading the
+conclusion back onto hard-called genotypes at an arbitrary allele frequency. -/
 theorem chameleon_passes_every_independent_criterion
     {Report : Type*} (experiment : (Design → Limit) → Report)
     (accept : Report → Prop)
@@ -223,7 +282,11 @@ theorem chameleon_passes_every_independent_criterion
 
 /-- **No independent-design criterion decides Gaussianity.** If a chameleon exists
 (non-Gaussian, matched triple) then no decision rule built from independent-design
-limits can have "is the Gaussian" as its acceptance set. -/
+limits can have "is the Gaussian" as its acceptance set.
+
+Genotype applicability: inherits the symmetry restriction on `Law`, so the
+genotype instantiation is licensed only at `q = 1/2`. See the `ChaosSpectroscopy`
+docstring. -/
 theorem no_independent_design_criterion_decides_gaussianity
     {Report : Type*} (experiment : (Design → Limit) → Report)
     (gaussianLaw chameleon : Law)

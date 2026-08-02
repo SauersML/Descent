@@ -325,6 +325,13 @@ theorem targetPGSVariance_eq_presentDay (V_A fst : ℝ) :
 
 /-- The closed-form discrete Wright-Fisher retention factor after `t` generations.
 
+    Regime: closed population, no mutation. Heterozygosity decays geometrically
+    only while nothing replenishes it. At mutation-drift balance the measured
+    retention is `1.02 ± 0.02` where this formula gives `e^(-2) = 0.135` at
+    `Ne = 1000`, `t = 4000`; `Calibrator.DriftRegime.regimes_disagree` proves the
+    two regimes disagree at every positive time. Do not read this factor as a
+    between-population `F_ST`.
+
     Empirical status: UNTESTED. -/
 noncomputable def wrightFisherDriftRetention (N t : ℕ) : ℝ :=
   (1 - 1 / (2 * (N : ℝ))) ^ t
@@ -4124,7 +4131,8 @@ theorem fstIslandMultiplicativeEquilibrium_isFixedPoint (Ne m : ℝ)
     islandFstMultiplicativeStep Ne m (fstIslandMultiplicativeEquilibrium Ne m) =
       fstIslandMultiplicativeEquilibrium Ne m := by
   have hNe' : Ne ≠ 0 := ne_of_gt hNe
-  have hsq : (0 : ℝ) < (1 - m) ^ 2 := by positivity
+  have hpos : (0 : ℝ) < 1 - m := by linarith
+  have hsq : (0 : ℝ) < (1 - m) ^ 2 := pow_pos hpos 2
   have hflow : (0 : ℝ) ≤ 2 * Ne * m * (2 - m) := by
     have h2 : (0 : ℝ) ≤ 2 - m := by linarith
     positivity

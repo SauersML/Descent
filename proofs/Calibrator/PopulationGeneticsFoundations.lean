@@ -401,8 +401,15 @@ theorem wright_decomposition (f_IS f_ST : ℝ) :
     `fstDerived_eq_het_loss` is the theorem that says it; only the name and
     docstring were reassigning it to a different observable.
 
-    Empirical status: VALIDATED as heterozygosity loss (this is the identity
-    `fstDerived_eq_het_loss` proves); FALSIFIED as split `F_ST`.
+    Regime: closed population, no mutation. See `Calibrator.DriftRegime`.
+
+    Empirical status: VALIDATED as heterozygosity loss against the drift-only
+    recurrence it restates (0.9048/0.6065/0.1353 retention at t = 200/1000/4000
+    with Ne = 1000); FALSIFIED as split `F_ST`, and FALSIFIED as *measured*
+    heterozygosity loss at mutation-drift balance, where the simulated retention
+    is 1.025 ± 0.02 at every one of those times. The first clause is an identity
+    and carries no empirical weight on its own — a cross-check cannot measure the
+    premise it shares, `DriftRegime.crossChecks_blind_to_retention`.
 
     Denotes: the reading its name carries. The same formula appears under
     names from 'fst', 'heterozygosity', and the formula alone does not fix which is meant. -/
@@ -1071,7 +1078,16 @@ section FstDerivationFromDrift
 
 /-- **Heterozygosity recurrence under pure drift.**
     Each generation, the probability that two sampled alleles are distinct
-    is reduced by a factor of (1 - 1/(2Ne)). -/
+    is reduced by a factor of (1 - 1/(2Ne)).
+
+    Regime: closed population, no mutation. This is the root of the cluster that
+    `Calibrator.DriftRegime` dissects: every quantity downstream of this
+    recurrence is a function of the single number `(1 - 1/(2Ne))^t`, so every
+    cross-check among them holds at every value of it, correct or not
+    (`crossChecks_blind_to_retention`). At mutation-drift balance the measured
+    retention is `1.02 ± 0.02` against `e^(-2) = 0.135` predicted here, and the
+    resulting `F_ST` is `≈ 0` where the measurable between-population `F_ST` is
+    `0.50`. The recurrence is correct for what it says; it is not a split `F_ST`. -/
 noncomputable def hetRecurrence (Ne : ℝ) (H₀ : ℝ) : ℕ → ℝ
   | 0 => H₀
   | t + 1 => (1 - 1 / (2 * Ne)) * hetRecurrence Ne H₀ t

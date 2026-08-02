@@ -278,9 +278,9 @@ noncomputable def mutationSelectionStepRare (mu s h p : ℝ) : ℝ :=
 
 The fixed point of `mutationSelectionStepRare`. It is `mu / (h * s + mu)`, not
 `mu / (h * s)`: the two agree to leading order when `h * s` is large against
-`mu`, and the difference is precisely what keeps this quantity inside `[0, 1]`
-for every admissible parameter, including the weak-constraint regime `s < mu`
-where `mu / s` is not a frequency at all.
+`mu`, and the difference is what keeps this quantity inside `[0, 1]` for every
+admissible parameter, including the weak-constraint regime `s < mu` where
+`mu / s` is not a frequency at all.
 
     Empirical status: UNTESTED. -/
 noncomputable def mutationSelectionBalance (mu s h : ℝ) : ℝ :=
@@ -331,7 +331,9 @@ theorem mutationSelectionBalance_at_zero_dominance (mu s : ℝ) (h_mu : mu ≠ 0
 
 /-- **One generation for a fully recessive deleterious allele.** Selection acts
 only on homozygotes, so the load is `s * p` per copy rather than `h * s`, and
-mutation replenishes as before. -/
+mutation replenishes as before.
+
+    Empirical status: UNTESTED. -/
 noncomputable def mutationSelectionStepRecessive (mu s p : ℝ) : ℝ :=
   p - s * p ^ 2 + mu * (1 - p)
 

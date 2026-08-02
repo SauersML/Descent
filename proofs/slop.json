@@ -1,0 +1,4799 @@
+{
+ "dead": [
+  [
+   "spikeIdentification",
+   "Conventions.lean",
+   200
+  ],
+  [
+   "decaySlope",
+   "DGP.lean",
+   966
+  ],
+  [
+   "driftRetention",
+   "DriftRegime.lean",
+   153
+  ],
+  [
+   "congrProp",
+   "ObservationalCeiling.lean",
+   95
+  ],
+  [
+   "comap",
+   "ObservationalCeiling.lean",
+   105
+  ],
+  [
+   "stabilizingSelectionSummary",
+   "SelectionValidation.lean",
+   36
+  ],
+  [
+   "fluctuatingSelectionSummary",
+   "SelectionValidation.lean",
+   42
+  ]
+ ],
+ "trivial": [
+  [
+   "additive_architecture_weights_are_transport_invariant",
+   "AdditiveInvariance.lean",
+   86,
+   "unfold optimalWeightsFromMoments"
+  ],
+  [
+   "recalibration_recovers_up_to_turnover",
+   "AncestryCalibration.lean",
+   47,
+   "simp only ring"
+  ],
+  [
+   "spline_error_improves_with_knots",
+   "AncestryCalibration.lean",
+   74,
+   "norm_num"
+  ],
+  [
+   "epistatic_changes_faster",
+   "AncestryCalibration.lean",
+   313,
+   "nlinarith [mul_pos h\u2081_s_pos h\u2081_pos]"
+  ],
+  [
+   "additive_pgs_misses_epistasis",
+   "AncestryCalibration.lean",
+   326,
+   "linarith"
+  ],
+  [
+   "drift_variance_nonneg",
+   "AncestrySpecificArchitecture.lean",
+   78,
+   "unfold driftVariance"
+  ],
+  [
+   "twoPopDriftVariance_eq_sum",
+   "AncestrySpecificArchitecture.lean",
+   96,
+   "unfold twoPopDriftVariance; ring"
+  ],
+  [
+   "twoPopDriftVariance_eq_expectedFreqDiffSq",
+   "AncestrySpecificArchitecture.lean",
+   109,
+   "unfold twoPopDriftVariance driftVariance expectedFreqDiffSq;"
+  ],
+  [
+   "expected_freq_diff_nonneg",
+   "AncestrySpecificArchitecture.lean",
+   114,
+   "unfold expectedFreqDiffSq; nlinarith [mul_nonneg h_fst h_p0,"
+  ],
+  [
+   "freq_diff_increases_with_fst",
+   "AncestrySpecificArchitecture.lean",
+   124,
+   "unfold expectedFreqDiffSq nlinarith"
+  ],
+  [
+   "gwas_h2_le_true",
+   "AncestrySpecificArchitecture.lean",
+   217,
+   "unfold gwasHeritability nlinarith"
+  ],
+  [
+   "equilibriumFst_eq_fstMigrationDriftEquilibrium",
+   "AncestrySpecificArchitecture.lean",
+   399,
+   "unfold equilibriumFst fstMigrationDriftEquilibrium; ring"
+  ],
+  [
+   "equilibriumFst_eq_islandModelFst",
+   "AncestrySpecificArchitecture.lean",
+   406,
+   "unfold equilibriumFst islandModelFst; ring"
+  ],
+  [
+   "portabilityFromArchitecture_eq_rg_sq_mul_retention",
+   "AncestrySpecificArchitecture.lean",
+   487,
+   "unfold portabilityFromArchitecture covarianceRetention freqC"
+  ],
+  [
+   "portabilityFromArchitecture_from_divergence",
+   "AncestrySpecificArchitecture.lean",
+   498,
+   "unfold portabilityFromArchitecture covarianceDivergenceFromR"
+  ],
+  [
+   "portability_bounded_by_rg_sq",
+   "AncestrySpecificArchitecture.lean",
+   507,
+   "unfold portabilityFromArchitecture nlinarith [sq_nonneg rg, "
+  ],
+  [
+   "genotypeVariance_nonneg",
+   "AncestrySpecificPower.lean",
+   98,
+   "unfold genotypeVarianceHWE nlinarith"
+  ],
+  [
+   "genotypeVariance_pos",
+   "AncestrySpecificPower.lean",
+   104,
+   "unfold genotypeVarianceHWE nlinarith"
+  ],
+  [
+   "genotypeVariance_max",
+   "AncestrySpecificPower.lean",
+   110,
+   "unfold genotypeVarianceHWE nlinarith [sq_nonneg (p - 1/2)]"
+  ],
+  [
+   "effectiveFisherInfo_eq",
+   "AncestrySpecificPower.lean",
+   130,
+   "unfold effectiveFisherInformation fisherInformation genotype"
+  ],
+  [
+   "ncp_from_wald_test",
+   "AncestrySpecificPower.lean",
+   173,
+   "unfold standardErrorSq"
+  ],
+  [
+   "ncp_eq_neff_times_beta_sq",
+   "AncestrySpecificPower.lean",
+   183,
+   "ring"
+  ],
+  [
+   "effective_n_mono_n",
+   "AncestrySpecificPower.lean",
+   227,
+   "unfold effectiveSampleSize nlinarith"
+  ],
+  [
+   "ncp_mono_neff",
+   "AncestrySpecificPower.lean",
+   288,
+   "unfold ncp"
+  ],
+  [
+   "hweHeterozygosity_eq_genotypeVarianceHWE",
+   "AncestrySpecificPower.lean",
+   347,
+   "unfold hweHeterozygosity genotypeVarianceHWE; ring"
+  ],
+  [
+   "het_strict_mono_on_lower_half",
+   "AncestrySpecificPower.lean",
+   354,
+   "unfold hweHeterozygosity nlinarith [sq_nonneg p, sq_nonneg q"
+  ],
+  [
+   "portable_fraction_le_one",
+   "AncestrySpecificPower.lean",
+   419,
+   "unfold portableFraction"
+  ],
+  [
+   "minimax_favors_multi_ancestry",
+   "AncestrySpecificPower.lean",
+   474,
+   "nlinarith [sq_nonneg \u03c1_sq]"
+  ],
+  [
+   "proportional_sums_to_total",
+   "AncestrySpecificPower.lean",
+   520,
+   "unfold proportionalAllocation"
+  ],
+  [
+   "AssortativeMatingModel.denom_pos",
+   "AssortativeMatingPGS.lean",
+   81,
+   "linarith [m.stability]"
+  ],
+  [
+   "amEquilibriumVariance_of_no_assortment",
+   "AssortativeMatingPGS.lean",
+   171,
+   "unfold amEquilibriumVariance norm_num"
+  ],
+  [
+   "AssortativeMatingModel.variance_exceeds_random",
+   "AssortativeMatingPGS.lean",
+   178,
+   "unfold equilibriumVariance nlinarith [m.rh2_pos, mul_pos m.V"
+  ],
+  [
+   "am_variance_exceeds_random",
+   "AssortativeMatingPGS.lean",
+   185,
+   "unfold amEquilibriumVariance nlinarith [mul_pos h_r h_h2, mu"
+  ],
+  [
+   "AssortativeMatingModel.variance_finite",
+   "AssortativeMatingPGS.lean",
+   196,
+   "unfold equilibriumVariance"
+  ],
+  [
+   "am_variance_finite",
+   "AssortativeMatingPGS.lean",
+   202,
+   "unfold amEquilibriumVariance"
+  ],
+  [
+   "AssortativeMatingModel.variance_inflation_factor",
+   "AssortativeMatingPGS.lean",
+   211,
+   "unfold equilibriumVariance"
+  ],
+  [
+   "am_ld_sign",
+   "AssortativeMatingPGS.lean",
+   225,
+   "unfold amInducedLD"
+  ],
+  [
+   "am_ld_zero_when_random",
+   "AssortativeMatingPGS.lean",
+   236,
+   "unfold amInducedLD simp [mul_zero, zero_mul, zero_div]"
+  ],
+  [
+   "AssortativeMatingModel.inflates_observed_h2",
+   "AssortativeMatingPGS.lean",
+   264,
+   "unfold observedH2 nlinarith [m.rh2_pos, mul_pos m.h2_pos m.r"
+  ],
+  [
+   "am_inflates_observed_h2",
+   "AssortativeMatingPGS.lean",
+   271,
+   "nlinarith [mul_pos h_r h_h2, mul_pos h_h2 (mul_pos h_r h_h2)"
+  ],
+  [
+   "AssortativeMatingModel.inflates_pgs_r2",
+   "AssortativeMatingPGS.lean",
+   295,
+   "unfold pgsR2AM nlinarith [m.rh2_pos, mul_pos hR2 m.rh2_pos]"
+  ],
+  [
+   "AssortativeMatingModel.pgs_r2_inflation_eq_h2_inflation",
+   "AssortativeMatingPGS.lean",
+   304,
+   "unfold pgsR2AM observedH2"
+  ],
+  [
+   "AssortativeMatingModel.am_gap_positive",
+   "AssortativeMatingPGS.lean",
+   319,
+   "unfold amGap linarith [m.inflates_pgs_r2 R2_rm hR2]"
+  ],
+  [
+   "AssortativeMatingModel.am_gap_formula",
+   "AssortativeMatingPGS.lean",
+   327,
+   "unfold amGap pgsR2AM ring_nf"
+  ],
+  [
+   "DifferentialAMModel.denom_s_pos",
+   "AssortativeMatingPGS.lean",
+   368,
+   "linarith [d.stability_s]"
+  ],
+  [
+   "DifferentialAMModel.denom_t_pos",
+   "AssortativeMatingPGS.lean",
+   372,
+   "linarith [d.stability_t]"
+  ],
+  [
+   "DifferentialAMModel.differential_am_misleading",
+   "AssortativeMatingPGS.lean",
+   390,
+   "unfold apparentPortability linarith"
+  ],
+  [
+   "am_correction_increases_portability",
+   "AssortativeMatingPGS.lean",
+   407,
+   "unfold amCorrectedPortability nlinarith [mul_pos h_port h_de"
+  ],
+  [
+   "am_correction_recovers_true",
+   "AssortativeMatingPGS.lean",
+   425,
+   "unfold amCorrectedPortability"
+  ],
+  [
+   "am_ld_breaks_cross_population",
+   "AssortativeMatingPGS.lean",
+   494,
+   "nlinarith"
+  ],
+  [
+   "ibd_fst_increases_with_distance",
+   "AssortativeMatingPGS.lean",
+   539,
+   "unfold ibdFst nlinarith [mul_pos h_N h_s]"
+  ],
+  [
+   "ibd_fst_nonneg",
+   "AssortativeMatingPGS.lean",
+   550,
+   "unfold ibdFst positivity"
+  ],
+  [
+   "ibd_fst_lt_one",
+   "AssortativeMatingPGS.lean",
+   556,
+   "unfold ibdFst linarith [mul_pos h_N h_s]"
+  ],
+  [
+   "posteriorPrecision_pos",
+   "BayesianPGSTheory.lean",
+   71,
+   "unfold posteriorPrecision positivity"
+  ],
+  [
+   "posteriorVariance_pos",
+   "BayesianPGSTheory.lean",
+   83,
+   "unfold posteriorVariance"
+  ],
+  [
+   "posteriorMean_eq_shrinkage_mul",
+   "BayesianPGSTheory.lean",
+   100,
+   "unfold posteriorMean shrinkageFactor ring"
+  ],
+  [
+   "BayesianLinearModel.shrinkageFactor_eq_gaussianPosteriorShrinkage",
+   "BayesianPGSTheory.lean",
+   144,
+   "unfold gaussianPosteriorShrinkage ring"
+  ],
+  [
+   "shrinkage_increases_with_n",
+   "BayesianPGSTheory.lean",
+   164,
+   "unfold gaussianPosteriorShrinkage nlinarith"
+  ],
+  [
+   "shrinkage_increases_with_h",
+   "BayesianPGSTheory.lean",
+   174,
+   "unfold gaussianPosteriorShrinkage nlinarith"
+  ],
+  [
+   "mse_ols_is_no_shrinkage",
+   "BayesianPGSTheory.lean",
+   192,
+   "unfold jamesSteinMSE; ring"
+  ],
+  [
+   "optimal_shrinkage_in_unit",
+   "BayesianPGSTheory.lean",
+   204,
+   "unfold optimalShrinkage"
+  ],
+  [
+   "in_sample_ld_optimal",
+   "BayesianPGSTheory.lean",
+   316,
+   "linarith [mul_pos h_c_pos h_fst_pos]"
+  ],
+  [
+   "multi_ancestry_reference_reduces_bias",
+   "BayesianPGSTheory.lean",
+   329,
+   "nlinarith"
+  ],
+  [
+   "long_range_ld_worse_mismatch",
+   "BayesianPGSTheory.lean",
+   342,
+   "nlinarith"
+  ],
+  [
+   "spike_slab_variance_nonneg",
+   "BayesianPGSTheory.lean",
+   372,
+   "unfold spikeAndSlabPriorVariance"
+  ],
+  [
+   "misspec_excess_risk_nonneg",
+   "BayesianPGSTheory.lean",
+   390,
+   "unfold misspecExcessRisk"
+  ],
+  [
+   "prior_misspec_worse_for_sparse",
+   "BayesianPGSTheory.lean",
+   408,
+   "unfold misspecExcessRisk nlinarith"
+  ],
+  [
+   "portability_prior_interaction",
+   "BayesianPGSTheory.lean",
+   443,
+   "unfold misspecExcessRisk nlinarith"
+  ],
+  [
+   "empirical_bayes_population_specific",
+   "BayesianPGSTheory.lean",
+   464,
+   "unfold spikeAndSlabPriorVariance simp"
+  ],
+  [
+   "posterior_predictive_wider_than_residual",
+   "BayesianPGSTheory.lean",
+   493,
+   "unfold posteriorPredictiveVariance linarith"
+  ],
+  [
+   "cross_population_posterior_wider",
+   "BayesianPGSTheory.lean",
+   517,
+   "unfold posteriorPredictiveVariance linarith"
+  ],
+  [
+   "global_shrinkage_controls_sparsity",
+   "BayesianPGSTheory.lean",
+   545,
+   "nlinarith"
+  ],
+  [
+   "ld_mismatch_can_reverse_advantage",
+   "BayesianPGSTheory.lean",
+   583,
+   "nlinarith"
+  ],
+  [
+   "multi_ancestry_at_least_as_good",
+   "BayesianPGSTheory.lean",
+   630,
+   "unfold gaussianPosteriorShrinkage multiAncestryEffectiveN nl"
+  ],
+  [
+   "multi_ancestry_effective_n_ge",
+   "BayesianPGSTheory.lean",
+   641,
+   "unfold multiAncestryEffectiveN linarith [mul_nonneg (sq_nonn"
+  ],
+  [
+   "diminishing_returns_from_majority",
+   "BayesianPGSTheory.lean",
+   655,
+   "nlinarith"
+  ],
+  [
+   "ld_dominant_pathway",
+   "CausalInference.lean",
+   52,
+   "linarith"
+  ],
+  [
+   "proportion_mediated_in_unit",
+   "CausalInference.lean",
+   120,
+   "unfold proportionMediated"
+  ],
+  [
+   "environment_mediates_portability",
+   "CausalInference.lean",
+   170,
+   "unfold expectedR2 linarith"
+  ],
+  [
+   "counterfactual_wgs_residual",
+   "CausalInference.lean",
+   218,
+   "unfold expectedR2 nlinarith"
+  ],
+  [
+   "counterfactual_infinite_sample",
+   "CausalInference.lean",
+   237,
+   "unfold expectedR2 nlinarith"
+  ],
+  [
+   "counterfactual_equal_environments",
+   "CausalInference.lean",
+   254,
+   "unfold expectedR2 nlinarith"
+  ],
+  [
+   "choose_more_cost_effective",
+   "CausalInference.lean",
+   359,
+   "unfold costEffectiveness at h_ce\u2081"
+  ],
+  [
+   "e_value_ge_one",
+   "CausalInference.lean",
+   386,
+   "unfold eValue linarith"
+  ],
+  [
+   "residualVariance_pos",
+   "ClinicalUtilityFairness.lean",
+   361,
+   "linarith"
+  ],
+  [
+   "sensFromR2_strictMono",
+   "ClinicalUtilityFairness.lean",
+   419,
+   "unfold sensFromR2"
+  ],
+  [
+   "specFromR2_strictMono",
+   "ClinicalUtilityFairness.lean",
+   433,
+   "unfold specFromR2"
+  ],
+  [
+   "treat_all_net_benefit",
+   "ClinicalUtilityFairness.lean",
+   557,
+   "simp"
+  ],
+  [
+   "pcc_lower_bound",
+   "ClinicalUtilityFairness.lean",
+   814,
+   "unfold proportionCorrectlyClassified"
+  ],
+  [
+   "cost_effectiveness_threshold_exists",
+   "ClinicalUtilityFairness.lean",
+   930,
+   "nlinarith"
+  ],
+  [
+   "nns_higher_in_target",
+   "ClinicalUtilityFairness.lean",
+   959,
+   "unfold numberNeededToScreen"
+  ],
+  [
+   "paf_lower_in_target",
+   "ClinicalUtilityFairness.lean",
+   980,
+   "unfold populationAttributableFraction"
+  ],
+  [
+   "equity_gap_in_public_health",
+   "ClinicalUtilityFairness.lean",
+   996,
+   "linarith"
+  ],
+  [
+   "diversification_is_optimal_equity_intervention",
+   "ClinicalUtilityFairness.lean",
+   1023,
+   "unfold numberNeededToScreen"
+  ],
+  [
+   "minimum_sample_for_clinical_pgs",
+   "ClinicalUtilityFairness.lean",
+   1088,
+   "linarith"
+  ],
+  [
+   "expectedBrierScore_quadratic",
+   "Conclusions.lean",
+   61,
+   "unfold expectedBrierScore ring"
+  ],
+  [
+   "brierScore_minimized_at_true_prob",
+   "Conclusions.lean",
+   115,
+   "linarith [sq_nonneg (p - \u03c0)]"
+  ],
+  [
+   "brierScore_at_true_prob",
+   "Conclusions.lean",
+   128,
+   "unfold expectedBrierScore ring"
+  ],
+  [
+   "exactBrierRiskOfCalibrated_eq_integral",
+   "Conclusions.lean",
+   148,
+   "unfold exactBrierRiskOfCalibrated simp [brierScore_at_true_p"
+  ],
+  [
+   "sigmoid_pos",
+   "Conclusions.lean",
+   217,
+   "unfold sigmoid linarith"
+  ],
+  [
+   "logLoss_regret_eq_integral_kl",
+   "Conclusions.lean",
+   530,
+   "unfold logLossRegret logLossKLCertificate"
+  ],
+  [
+   "logRisk_regret_eq_expected_klBernReal",
+   "Conclusions.lean",
+   542,
+   "unfold klBernReal"
+  ],
+  [
+   "brier_regret_pointwise",
+   "Conclusions.lean",
+   611,
+   "unfold expectedBrierScore ring"
+  ],
+  [
+   "brier_regret_eq_l2_certificate",
+   "Conclusions.lean",
+   626,
+   "unfold brierRegret brierL2Certificate"
+  ],
+  [
+   "brierBernoulliRisk_decomp",
+   "Conclusions.lean",
+   837,
+   "unfold brierBernoulliRisk expectedBrierScore ring"
+  ],
+  [
+   "brierBernoulliRisk_min",
+   "Conclusions.lean",
+   842,
+   "nlinarith [sq_nonneg (q - \u03b7)]"
+  ],
+  [
+   "logBernoulliRisk_min",
+   "Conclusions.lean",
+   862,
+   "unfold logBernoulliRisk at * linarith"
+  ],
+  [
+   "tangency",
+   "Condensation.lean",
+   124,
+   "linarith"
+  ],
+  [
+   "tangency_eq_drift",
+   "Condensation.lean",
+   136,
+   "linarith"
+  ],
+  [
+   "condensationConstant_pos",
+   "Condensation.lean",
+   214,
+   "linarith"
+  ],
+  [
+   "subcritical_iff",
+   "Condensation.lean",
+   249,
+   "unfold criticalDegree"
+  ],
+  [
+   "supercritical_iff",
+   "Condensation.lean",
+   255,
+   "unfold criticalDegree"
+  ],
+  [
+   "gaussianCriticalMultiplier_pos",
+   "Condensation.lean",
+   264,
+   "unfold gaussianCriticalMultiplier"
+  ],
+  [
+   "criticalDegree_gaussian",
+   "Condensation.lean",
+   269,
+   "unfold criticalDegree gaussianCriticalMultiplier"
+  ],
+  [
+   "monotone_Phi",
+   "Condensation.lean",
+   311,
+   "unfold Phi"
+  ],
+  [
+   "Phi_nonneg",
+   "Condensation.lean",
+   315,
+   "unfold Phi"
+  ],
+  [
+   "Phi_le_one",
+   "Condensation.lean",
+   319,
+   "unfold Phi"
+  ],
+  [
+   "mellinDrift_uses_ploidy",
+   "CondensationUnification.lean",
+   54,
+   "unfold hweGenotypeVariance ploidy HardyWeinbergModel.refFreq"
+  ],
+  [
+   "standardizedSquare_eq_over_hweGenotypeVariance",
+   "CondensationUnification.lean",
+   63,
+   "unfold HardyWeinbergModel.standardizedSquare"
+  ],
+  [
+   "additive_score_is_subcritical",
+   "CondensationUnification.lean",
+   99,
+   "linarith"
+  ],
+  [
+   "scaledMutationRate_eq_ploidy_form",
+   "Conventions.lean",
+   98,
+   "unfold scaledMutationRate ploidy; ring"
+  ],
+  [
+   "scaledMigrationRate_eq_ploidy_form",
+   "Conventions.lean",
+   105,
+   "unfold scaledMigrationRate ploidy; ring"
+  ],
+  [
+   "fstFromDrift_uses_coalescentTimeScale",
+   "Conventions.lean",
+   111,
+   "unfold heterozygosityLossFromDrift; rw [coalescentTimeScale_"
+  ],
+  [
+   "four_hudsonFst_eq_standardizedContrastVariance",
+   "Conventions.lean",
+   170,
+   "unfold betweenSubgroupVariance"
+  ],
+  [
+   "demographicSpike_eq_contrastVariance_mul_effectiveSize",
+   "Conventions.lean",
+   181,
+   "unfold demographicSpike"
+  ],
+  [
+   "equilibriumFst_eq_demoIslandModelFst",
+   "Conventions.lean",
+   218,
+   "unfold equilibriumFst demoIslandModelFst; ring_nf"
+  ],
+  [
+   "amEquilibriumVariance_at_full_heritability",
+   "Conventions.lean",
+   235,
+   "unfold amEquilibriumVariance ring_nf"
+  ],
+  [
+   "genotypeVarianceHWE_eq_hwe",
+   "Conventions.lean",
+   268,
+   "unfold genotypeVarianceHWE hweGenotypeVariance ploidy; ring"
+  ],
+  [
+   "hweHeterozygosity_eq_hwe",
+   "Conventions.lean",
+   272,
+   "unfold hweHeterozygosity hweGenotypeVariance ploidy; ring"
+  ],
+  [
+   "fstMigrationDriftEquilibrium_eq_scaled",
+   "Conventions.lean",
+   281,
+   "unfold fstMigrationDriftEquilibrium fstMutationDriftEquilibr"
+  ],
+  [
+   "islandModelFst_eq_scaled",
+   "Conventions.lean",
+   287,
+   "unfold islandModelFst fstMutationDriftEquilibrium"
+  ],
+  [
+   "longitudinalDriftDecayRate_eq_inv_timeScale",
+   "Conventions.lean",
+   305,
+   "unfold longitudinalDriftDecayRate; rw [coalescentTimeScale_e"
+  ],
+  [
+   "driftLDCreationRate_eq_inv_timeScale",
+   "Conventions.lean",
+   309,
+   "unfold driftLDCreationRate; rw [coalescentTimeScale_eq]"
+  ],
+  [
+   "f1ScoreMetric_eq_f1Score",
+   "Conventions.lean",
+   335,
+   "unfold f1ScoreMetric f1Score; ring_nf"
+  ],
+  [
+   "effectiveSymmetricMigration_eq_effectiveMigration",
+   "Conventions.lean",
+   345,
+   "unfold effectiveSymmetricMigration effectiveMigration; ring_"
+  ],
+  [
+   "equalVarianceGaussianAUCFromVariances_eq_aucFromSignalVariance",
+   "Conventions.lean",
+   353,
+   "unfold equalVarianceGaussianAUCFromVariances ring_nf"
+  ],
+  [
+   "neutralDriftFactor_uses_timeScale",
+   "Conventions.lean",
+   374,
+   "unfold neutralDriftFactor; rw [coalescentTimeScale_eq]"
+  ],
+  [
+   "ldRetainedFraction_uses_timeScale",
+   "Conventions.lean",
+   378,
+   "unfold ldRetainedFraction; rw [coalescentTimeScale_eq]"
+  ],
+  [
+   "fstDerived_uses_timeScale",
+   "Conventions.lean",
+   382,
+   "unfold fstDerived; rw [coalescentTimeScale_eq]"
+  ],
+  [
+   "wrightFisherDriftRetention_uses_timeScale",
+   "Conventions.lean",
+   386,
+   "unfold wrightFisherDriftRetention; rw [coalescentTimeScale_e"
+  ],
+  [
+   "GenerationalPopGenParameters_theta_eq_ploidy_form",
+   "Conventions.lean",
+   405,
+   "unfold GenerationalPopGenParameters.theta ploidy; ring"
+  ],
+  [
+   "GenerationalPopGenParameters_bigM_eq_ploidy_form",
+   "Conventions.lean",
+   410,
+   "unfold GenerationalPopGenParameters.bigM ploidy; ring"
+  ],
+  [
+   "EvolutionaryParameters_theta_eq_ploidy_form",
+   "Conventions.lean",
+   415,
+   "unfold EvolutionaryParameters.theta ploidy; ring"
+  ],
+  [
+   "EvolutionaryParameters_bigM_eq_ploidy_form",
+   "Conventions.lean",
+   419,
+   "unfold EvolutionaryParameters.bigM ploidy; ring"
+  ],
+  [
+   "pgsVariance_uses_hwe",
+   "Conventions.lean",
+   440,
+   "unfold pgsVariance hweGenotypeVariance ploidy; ring_nf"
+  ],
+  [
+   "dominanceVariance_uses_hwe",
+   "Conventions.lean",
+   444,
+   "unfold dominanceVariance hweGenotypeVariance ploidy; ring_nf"
+  ],
+  [
+   "additiveVariance_uses_hwe",
+   "Conventions.lean",
+   448,
+   "unfold additiveVariance hweGenotypeVariance ploidy; ring_nf"
+  ],
+  [
+   "noncentralityParam_uses_hwe",
+   "Conventions.lean",
+   452,
+   "unfold noncentralityParam hweGenotypeVariance ploidy; ring_n"
+  ],
+  [
+   "gwasNCP_uses_hwe",
+   "Conventions.lean",
+   456,
+   "unfold gwasNCP hweGenotypeVariance ploidy; ring_nf"
+  ],
+  [
+   "effectiveSampleSize_uses_hwe",
+   "Conventions.lean",
+   460,
+   "unfold effectiveSampleSize hweGenotypeVariance ploidy; ring_"
+  ],
+  [
+   "epistaticVariancePairwise_uses_hwe",
+   "Conventions.lean",
+   464,
+   "unfold epistaticVariancePairwise hweGenotypeVariance ploidy;"
+  ],
+  [
+   "expectedPGSDiffVariance_eq_ploidy_form",
+   "Conventions.lean",
+   471,
+   "unfold expectedPGSDiffVariance ploidy; ring"
+  ],
+  [
+   "ldHalfLife_uses_timeScale",
+   "Conventions.lean",
+   480,
+   "unfold ldHalfLife; rw [coalescentTimeScale_eq]"
+  ],
+  [
+   "steppingStoneCharacteristicLength_uses_timeScale",
+   "Conventions.lean",
+   484,
+   "unfold steppingStoneCharacteristicLength; rw [coalescentTime"
+  ],
+  [
+   "cumulativeDrift_uses_timeScale",
+   "Conventions.lean",
+   489,
+   "unfold cumulativeDrift simp only [coalescentTimeScale_eq]"
+  ],
+  [
+   "ldRetentionPerGen_uses_timeScale",
+   "Conventions.lean",
+   494,
+   "unfold ldRetentionPerGen; rw [coalescentTimeScale_eq]"
+  ],
+  [
+   "hetDecayFactor_uses_timeScale",
+   "Conventions.lean",
+   498,
+   "unfold hetDecayFactor; rw [coalescentTimeScale_eq]"
+  ],
+  [
+   "asymmetricFst_eq_scaled",
+   "Conventions.lean",
+   503,
+   "unfold asymmetricFst fstMutationDriftEquilibrium"
+  ],
+  [
+   "fstMigDriftEquil_eq_scaled",
+   "Conventions.lean",
+   509,
+   "unfold fstMigDriftEquil fstMutationDriftEquilibrium"
+  ],
+  [
+   "fstMigrationMutationEquilibrium_eq_scaled",
+   "Conventions.lean",
+   515,
+   "unfold fstMigrationMutationEquilibrium unfold ploidy; ring_n"
+  ],
+  [
+   "expectedFreqDiffSq_uses_hwe",
+   "Conventions.lean",
+   522,
+   "unfold expectedFreqDiffSq hweGenotypeVariance ploidy; ring"
+  ],
+  [
+   "pgsMean_uses_ploidy",
+   "Conventions.lean",
+   526,
+   "unfold pgsMean ploidy; ring_nf"
+  ],
+  [
+   "fisherAverageEffect_uses_ploidy",
+   "Conventions.lean",
+   530,
+   "unfold fisherAverageEffect ploidy; ring"
+  ],
+  [
+   "neutralPortability_uses_ploidy",
+   "Conventions.lean",
+   534,
+   "unfold neutralPortability ploidy; ring"
+  ],
+  [
+   "selectedDriftFactor_uses_timeScale",
+   "Conventions.lean",
+   543,
+   "unfold selectedDriftFactor; rw [coalescentTimeScale_eq]"
+  ],
+  [
+   "SplitMigrationModel_scaledMigration_eq_ploidy_form",
+   "Conventions.lean",
+   548,
+   "unfold SplitMigrationModel.scaledMigration ploidy; ring"
+  ],
+  [
+   "fstMigDriftNext_uses_timeScale",
+   "Conventions.lean",
+   553,
+   "unfold fstMigDriftNext; rw [coalescentTimeScale_eq]"
+  ],
+  [
+   "stabilizingPortability_uses_ploidy",
+   "Conventions.lean",
+   559,
+   "unfold stabilizingPortability ploidy; ring_nf"
+  ],
+  [
+   "ibdFst_eq_ploidy_form",
+   "Conventions.lean",
+   564,
+   "unfold ibdFst ploidy; ring_nf"
+  ],
+  [
+   "EvolutionaryParameters_tau_uses_timeScale",
+   "Conventions.lean",
+   568,
+   "unfold EvolutionaryParameters.tau; rw [coalescentTimeScale_e"
+  ],
+  [
+   "sharedLDRetention_uses_ploidy",
+   "Conventions.lean",
+   572,
+   "unfold sharedLDRetention ploidy; ring_nf"
+  ],
+  [
+   "tauAt_uses_timeScale",
+   "Conventions.lean",
+   587,
+   "unfold GenerationalPopGenParameters.tauAt; rw [coalescentTim"
+  ],
+  [
+   "diversifyingPortability_uses_ploidy",
+   "Conventions.lean",
+   592,
+   "unfold diversifyingPortability ploidy; ring_nf"
+  ],
+  [
+   "alleleFreqDivergenceRate_eq_scaled",
+   "Conventions.lean",
+   597,
+   "unfold alleleFreqDivergenceRate unfold ploidy; ring_nf"
+  ],
+  [
+   "excessLDAfterBottleneck_uses_timeScale",
+   "Conventions.lean",
+   606,
+   "unfold excessLDAfterBottleneck; rw [coalescentTimeScale_eq, "
+  ],
+  [
+   "fstMutationDriftTransient_uses_timeScale",
+   "Conventions.lean",
+   612,
+   "unfold fstMutationDriftTransient; rw [coalescentTimeScale_eq"
+  ],
+  [
+   "MutationDriftModelAssumptions_fstTransient_uses_timeScale",
+   "Conventions.lean",
+   618,
+   "unfold MutationDriftModelAssumptions.fstTransient"
+  ],
+  [
+   "spikeAndSlabVariance_eq_convexMix",
+   "Conventions.lean",
+   658,
+   "unfold spikeAndSlabVariance convexMix; ring"
+  ],
+  [
+   "admixedAlleleFreq1_eq_convexMix",
+   "Conventions.lean",
+   662,
+   "unfold admixedAlleleFreq1 convexMix; ring"
+  ],
+  [
+   "ancestrySpecificEffect_eq_convexMix",
+   "Conventions.lean",
+   666,
+   "unfold ancestrySpecificEffect convexMix; ring"
+  ],
+  [
+   "ldDecayPerGeneration_eq_geometricDecay",
+   "Conventions.lean",
+   674,
+   "unfold ldDecayPerGeneration geometricDecay; ring_nf"
+  ],
+  [
+   "admixtureLDDecay_eq_geometricDecay",
+   "Conventions.lean",
+   678,
+   "unfold admixtureLDDecay geometricDecay; ring_nf"
+  ],
+  [
+   "discreteRecombinationSurvival_eq_geometricDecay",
+   "Conventions.lean",
+   682,
+   "unfold discreteRecombinationSurvival geometricDecay; ring_nf"
+  ],
+  [
+   "fstFromHetRatio_eq_oneMinusRatio",
+   "Conventions.lean",
+   691,
+   "unfold fstFromHetRatio oneMinusRatio; ring_nf"
+  ],
+  [
+   "hudsonFstFromCoalescenceTimes_eq_oneMinusRatio",
+   "Conventions.lean",
+   695,
+   "unfold hudsonFstFromCoalescenceTimes oneMinusRatio; ring_nf"
+  ],
+  [
+   "r2FromMSE_eq_oneMinusRatio",
+   "Conventions.lean",
+   699,
+   "unfold r2FromMSE oneMinusRatio; ring_nf"
+  ],
+  [
+   "ascertainment_loss_eq_retainedFraction",
+   "Conventions.lean",
+   711,
+   "unfold ascertainment_loss retainedFraction; ring"
+  ],
+  [
+   "neutralPortabilityRatioLD_eq_retainedFraction",
+   "Conventions.lean",
+   715,
+   "unfold neutralPortabilityRatioLD retainedFraction; ring"
+  ],
+  [
+   "presentDayPGSVariance_eq_retainedFraction",
+   "Conventions.lean",
+   719,
+   "unfold presentDayPGSVariance retainedFraction; ring"
+  ],
+  [
+   "explainedR2FromTransportMoments_eq_pgsR2",
+   "Conventions.lean",
+   725,
+   "unfold explainedR2FromTransportMoments pgsR2; ring_nf"
+  ],
+  [
+   "mechanisticPortabilityRatio_eq_sourceTargetPortabilityRatio",
+   "Conventions.lean",
+   731,
+   "unfold mechanisticPortabilityRatio sourceTargetPortabilityRa"
+  ],
+  [
+   "allelic_variance_nonneg",
+   "CovarianceStructure.lean",
+   58,
+   "unfold genotypeVarianceHWE; nlinarith"
+  ],
+  [
+   "allelic_variance_max_at_half",
+   "CovarianceStructure.lean",
+   64,
+   "unfold genotypeVarianceHWE nlinarith [sq_nonneg (p - 1/2)]"
+  ],
+  [
+   "allelic_variance_zero_at_fixation_zero",
+   "CovarianceStructure.lean",
+   72,
+   "unfold genotypeVarianceHWE; ring"
+  ],
+  [
+   "allelic_variance_zero_at_fixation_one",
+   "CovarianceStructure.lean",
+   76,
+   "unfold genotypeVarianceHWE; ring"
+  ],
+  [
+   "ldCorrelationSqOfHaplotypeD_eq",
+   "CovarianceStructure.lean",
+   143,
+   "unfold ldCorrelationSqOfHaplotypeD ldCorrelationSq ring_nf"
+  ],
+  [
+   "smaller_blocks_more_segments",
+   "CovarianceStructure.lean",
+   254,
+   "unfold numBlocks"
+  ],
+  [
+   "ldsr_chi2_from_beta_sq",
+   "CovarianceStructure.lean",
+   378,
+   "unfold ldsrExpectedBetaSq"
+  ],
+  [
+   "ldsr_with_confounding_eq",
+   "CovarianceStructure.lean",
+   388,
+   "unfold ldsrExpectedBetaSq ldsrExpectedChi2 ring_nf"
+  ],
+  [
+   "ldsr_increases_with_ell",
+   "CovarianceStructure.lean",
+   408,
+   "unfold ldsrExpectedChi2 nlinarith"
+  ],
+  [
+   "admixture_ld_two_locus_eq",
+   "CovarianceStructure.lean",
+   529,
+   "unfold admixtureLDTwoLocus haplotypeFreqAdmixed admixedAllel"
+  ],
+  [
+   "admixture_ld_at_gen_eq",
+   "CovarianceStructure.lean",
+   546,
+   "unfold admixtureLDAtGen ring"
+  ],
+  [
+   "admixture_ld_specializes_to_magnitude",
+   "CovarianceStructure.lean",
+   568,
+   "unfold admixtureLDMagnitude ring"
+  ],
+  [
+   "admixture_ld_nonneg",
+   "CovarianceStructure.lean",
+   578,
+   "unfold admixtureLDMagnitude"
+  ],
+  [
+   "contraction_bound_tendsto_zero",
+   "CumulantBlindness.lean",
+   224,
+   "simp only [Real.sqrt_zero, zero_pow hk0, mul_zero] at hcont"
+  ],
+  [
+   "HWEPolygenicScoreDGP.mem_aucApproximationInterval_of_abs_sub_le",
+   "DGP.lean",
+   56,
+   "simpa [HWEPolygenicScoreDGP.aucApproximationInterval] using "
+  ],
+  [
+   "frobeniusNormSq_nonneg",
+   "DGP.lean",
+   150,
+   "unfold frobeniusNormSq"
+  ],
+  [
+   "target_mse_strictly_increases_of_covariance_mismatch",
+   "DGP.lean",
+   243,
+   "linarith"
+  ],
+  [
+   "normalization_prevalence_bias",
+   "DGP.lean",
+   915,
+   "simp [prevalenceDGP_trueExpectation, h_norm]"
+  ],
+  [
+   "normalization_prevalence_mse",
+   "DGP.lean",
+   931,
+   "unfold mseRisk PrevalenceDGP.toDGP simp only"
+  ],
+  [
+   "optimal_slope_trace_variance",
+   "DGP.lean",
+   969,
+   "unfold optimalSlopeFromVariance totalVariance"
+  ],
+  [
+   "ConditionalMeanDGP.conditionalMeanApproximationRisk_eq_mseRisk_toDGP",
+   "DGP.lean",
+   1244,
+   "unfold conditionalMeanApproximationRisk mseRisk ConditionalM"
+  ],
+  [
+   "mse_calibrated_zero",
+   "DGP.lean",
+   1358,
+   "simp only [mse, HeterogeneousEffectDGP.toDGP, HeterogeneousE"
+  ],
+  [
+   "mse_raw_formula",
+   "DGP.lean",
+   1364,
+   "simp only [mse, HeterogeneousEffectDGP.toDGP, HeterogeneousE"
+  ],
+  [
+   "EvolutionaryParameters.theta_nonneg",
+   "DGP.lean",
+   1496,
+   "unfold theta"
+  ],
+  [
+   "EvolutionaryParameters.bigM_nonneg",
+   "DGP.lean",
+   1503,
+   "unfold bigM"
+  ],
+  [
+   "EvolutionaryParameters.tau_nonneg",
+   "DGP.lean",
+   1510,
+   "unfold tau"
+  ],
+  [
+   "fstEquilibrium_pos",
+   "DGP.lean",
+   1594,
+   "unfold fstEquilibrium linarith [p.theta_nonneg, p.bigM_nonne"
+  ],
+  [
+   "fstEquilibrium_lt_one",
+   "DGP.lean",
+   1601,
+   "unfold fstEquilibrium linarith"
+  ],
+  [
+   "fstEquilibrium_le_driftMutation",
+   "DGP.lean",
+   1609,
+   "unfold fstEquilibrium fstDriftMutation"
+  ],
+  [
+   "fstEquilibrium_le_driftMigration",
+   "DGP.lean",
+   1615,
+   "unfold fstEquilibrium fstDriftMigration"
+  ],
+  [
+   "sharedLDRetention_pos",
+   "DGP.lean",
+   1642,
+   "unfold sharedLDRetention; exact Real.exp_pos _"
+  ],
+  [
+   "sharedLDRetention_le_one",
+   "DGP.lean",
+   1647,
+   "unfold sharedLDRetention nlinarith [p.recomb_nonneg, p.t_div"
+  ],
+  [
+   "sharedLDRetention_decreasing_in_time",
+   "DGP.lean",
+   1655,
+   "unfold sharedLDRetention nlinarith [h_r_pos, h_time]"
+  ],
+  [
+   "mutationLDErosion_pos",
+   "DGP.lean",
+   1675,
+   "unfold mutationLDErosion"
+  ],
+  [
+   "mutationLDErosion_le_one",
+   "DGP.lean",
+   1680,
+   "unfold mutationLDErosion nlinarith [p.theta_nonneg, p.tau_no"
+  ],
+  [
+   "EvolutionaryParameters.coordinateSummary_alleleFreqCoordinate_nonneg",
+   "DGP.lean",
+   1755,
+   "linarith"
+  ],
+  [
+   "EvolutionaryParameters.coordinateSummary_sharedLDCoordinate_pos",
+   "DGP.lean",
+   1764,
+   "unfold sharedLDRetention"
+  ],
+  [
+   "IrreducibleTargetPenalty.total_nonneg",
+   "DGP.lean",
+   2153,
+   "unfold IrreducibleTargetPenalty.total linarith [penalty.brok"
+  ],
+  [
+   "island_fst_in_unit_interval",
+   "DemographicHistory.lean",
+   44,
+   "unfold demoIslandModelFst"
+  ],
+  [
+   "more_migration_lower_fst",
+   "DemographicHistory.lean",
+   53,
+   "unfold demoIslandModelFst"
+  ],
+  [
+   "islandModelFst_eq_derived",
+   "DemographicHistory.lean",
+   65,
+   "unfold demoIslandModelFst fstMigrationDriftEquilibrium ring"
+  ],
+  [
+   "stepping_stone_fst_increasing",
+   "DemographicHistory.lean",
+   93,
+   "unfold demoSteppingStoneFst nlinarith"
+  ],
+  [
+   "steppingStoneFst_from_coalescence_time",
+   "DemographicHistory.lean",
+   170,
+   "unfold fstFromCoalescenceTime steppingStoneCoalescenceTime r"
+  ],
+  [
+   "steppingStoneCoalescenceTime_pos",
+   "DemographicHistory.lean",
+   179,
+   "unfold steppingStoneCoalescenceTime positivity"
+  ],
+  [
+   "fstFromCoalescenceTime_in_unit",
+   "DemographicHistory.lean",
+   186,
+   "unfold fstFromCoalescenceTime"
+  ],
+  [
+   "admixed_freq_diff",
+   "DemographicHistory.lean",
+   288,
+   "unfold admixedAlleleFreq ring"
+  ],
+  [
+   "admixedFst_from_freq_variance",
+   "DemographicHistory.lean",
+   300,
+   "unfold admixedFst ring"
+  ],
+  [
+   "admixed_squared_diff",
+   "DemographicHistory.lean",
+   309,
+   "ring"
+  ],
+  [
+   "founderFst_eq_derived",
+   "DemographicHistory.lean",
+   416,
+   "unfold founderFst fstMutationDriftTransientDiscrete fstMutat"
+  ],
+  [
+   "fst_variable_ne_lt_one",
+   "DemographicHistory.lean",
+   459,
+   "unfold fstVariableNe linarith [Real.exp_pos (-(cumulativeDri"
+  ],
+  [
+   "excessDriftRate_pos",
+   "DemographicHistory.lean",
+   563,
+   "unfold excessDriftRate driftLDCreationRate"
+  ],
+  [
+   "derivation_matches_bottleneckExcessLD",
+   "DemographicHistory.lean",
+   637,
+   "ring"
+  ],
+  [
+   "bottleneck_worsens_portability",
+   "DemographicHistory.lean",
+   690,
+   "linarith [bottleneck_excess_ld_pos Ne_b Ne_stable t_b hNb hN"
+  ],
+  [
+   "bottleneck_reduces_portability_ratio",
+   "DemographicHistory.lean",
+   703,
+   "linarith [bottleneck_excess_ld_pos Ne_b Ne_stable t_b hNb hN"
+  ],
+  [
+   "measuredLoss_closedPopulation",
+   "DriftRegime.lean",
+   115,
+   "unfold HeterozygosityTrajectory.measuredLoss closedPopulatio"
+  ],
+  [
+   "benchmark_forms_differ",
+   "DriftRegime.lean",
+   245,
+   "unfold benchmarkRatio benchmarkRatioSquared at this norm_num"
+  ],
+  [
+   "additive_dominates_genetic_variance",
+   "EpistasisAndNonAdditivity.lean",
+   40,
+   "linarith"
+  ],
+  [
+   "epistatic_variance_nonneg",
+   "EpistasisAndNonAdditivity.lean",
+   131,
+   "unfold epistaticVariance nlinarith"
+  ],
+  [
+   "dominance_variance_nonneg",
+   "EpistasisAndNonAdditivity.lean",
+   194,
+   "unfold dominanceVariance"
+  ],
+  [
+   "heterozygote_advantage_large_dominance",
+   "EpistasisAndNonAdditivity.lean",
+   222,
+   "nlinarith simpa [mul_comm, mul_left_comm, mul_assoc] using m"
+  ],
+  [
+   "ml_pgs_worse_portability",
+   "EpistasisAndNonAdditivity.lean",
+   263,
+   "linarith"
+  ],
+  [
+   "configurationWeight_flipLocus",
+   "EpistaticChaos.lean",
+   222,
+   "unfold configurationWeight flipLocus simp only [Equiv.coe_fn"
+  ],
+  [
+   "portability_creates_benefit_gap",
+   "EquityAndImplementation.lean",
+   53,
+   "nlinarith"
+  ],
+  [
+   "disparity_increases_with_distance",
+   "EquityAndImplementation.lean",
+   67,
+   "linarith"
+  ],
+  [
+   "deployment_amplifies_disparity",
+   "EquityAndImplementation.lean",
+   84,
+   "linarith [mul_pos h_\u03b1 h_r2]"
+  ],
+  [
+   "qaly_gap_proportional_to_r2_gap",
+   "EquityAndImplementation.lean",
+   95,
+   "nlinarith"
+  ],
+  [
+   "expectedR2FromN_le_h2",
+   "EquityAndImplementation.lean",
+   221,
+   "unfold expectedR2FromN nlinarith"
+  ],
+  [
+   "r2_increases_with_n",
+   "EquityAndImplementation.lean",
+   231,
+   "unfold expectedR2FromN nlinarith [mul_pos h_h2 h_M]"
+  ],
+  [
+   "r2_threshold_for_utility",
+   "EquityAndImplementation.lean",
+   326,
+   "linarith [mul_comm \u03b1 r2]"
+  ],
+  [
+   "gxe_reduces_genetic_correlation",
+   "GeneEnvironmentInterplay.lean",
+   65,
+   "linarith"
+  ],
+  [
+   "diet_genetics_bmi_example",
+   "GeneEnvironmentInterplay.lean",
+   96,
+   "unfold effectiveGeneticEffect linarith"
+  ],
+  [
+   "rge_inflates_pgs_r2",
+   "GeneEnvironmentInterplay.lean",
+   140,
+   "linarith [mul_pos h_rge_pos h_sqrt_pos]"
+  ],
+  [
+   "heteroscedastic_residuals",
+   "GeneEnvironmentInterplay.lean",
+   218,
+   "linarith [mul_left_cancel\u2080 (ne_of_gt h_factor) h]"
+  ],
+  [
+   "gxe_variance_determines_portability",
+   "GeneEnvironmentInterplay.lean",
+   310,
+   "linarith nlinarith [mul_pos h_b (show 0 < E\u2082 ^ 2 - E\u2081 ^ 2 by"
+  ],
+  [
+   "equalize_environment_reveals_genetic_portability",
+   "GeneEnvironmentInterplay.lean",
+   367,
+   "unfold effectiveGeneticEffect; ring"
+  ],
+  [
+   "genotypeVarianceHWE_strictMono_left_half",
+   "GeneticArchitectureDiscovery.lean",
+   100,
+   "unfold genotypeVarianceHWE nlinarith [mul_pos (sub_pos.mpr h"
+  ],
+  [
+   "winners_curse_overestimates",
+   "GeneticArchitectureDiscovery.lean",
+   172,
+   "linarith"
+  ],
+  [
+   "traitBSpecificCrossCov_nonneg",
+   "GeneticArchitectureDiscovery.lean",
+   522,
+   "unfold traitBSpecificCrossCov Matrix.mulVec"
+  ],
+  [
+   "borrowedTraitBCrossCov_nonneg",
+   "GeneticArchitectureDiscovery.lean",
+   531,
+   "unfold borrowedTraitBCrossCov Matrix.mulVec"
+  ],
+  [
+   "rare_variant_pgs_poor_portability",
+   "GeneticArchitectureDiscovery.lean",
+   795,
+   "unfold sourceTargetPortabilityRatio norm_num [sourceTargetPo"
+  ],
+  [
+   "more_haplotypes_in_afr",
+   "HaplotypeTheory.lean",
+   159,
+   "unfold effectiveHaplotypeNumber"
+  ],
+  [
+   "dosagePhaseMisspecificationError_eq",
+   "HaplotypeTheory.lean",
+   273,
+   "unfold dosagePhaseMisspecificationError averagePhaseInteract"
+  ],
+  [
+   "haplotypePhasePredictionError_correctSpec_eq",
+   "HaplotypeTheory.lean",
+   303,
+   "unfold haplotypePhasePredictionError ring"
+  ],
+  [
+   "haplotypePhasePredictionError_eq_zero_of_perfect",
+   "HaplotypeTheory.lean",
+   316,
+   "ring"
+  ],
+  [
+   "dosagePhaseMisspecificationError_eq_haplotype_constrained",
+   "HaplotypeTheory.lean",
+   326,
+   "unfold dosagePhaseMisspecificationError haplotypePhasePredic"
+  ],
+  [
+   "haplotypeTransportBias_eq",
+   "HaplotypeTheory.lean",
+   340,
+   "unfold haplotypeTransportBias averagePhaseInteraction ring"
+  ],
+  [
+   "more_errors_more_attenuation",
+   "HaplotypeTheory.lean",
+   575,
+   "unfold phaseAttenuation"
+  ],
+  [
+   "ancestry_effect_between_pops",
+   "HaplotypeTheory.lean",
+   619,
+   "unfold ancestrySpecificEffect"
+  ],
+  [
+   "localAncestryMisspecification_eq",
+   "HaplotypeTheory.lean",
+   645,
+   "unfold localAncestryMisspecification globalAncestryAveragedE"
+  ],
+  [
+   "segments_shorten_with_time",
+   "HaplotypeTheory.lean",
+   679,
+   "unfold expectedSegmentLength"
+  ],
+  [
+   "boundedLogDistortion_eq_iUnion",
+   "HiddenConeAmbiguity.lean",
+   197,
+   "simp only [Set.mem_setOf_eq, Set.mem_iUnion]"
+  ],
+  [
+   "neutral_drift_ratio_ge_one_sub_fst",
+   "HumanDemography.lean",
+   91,
+   "nlinarith [mul_nonneg h1f.le (mul_nonneg hfst0 hVA.le)]"
+  ],
+  [
+   "fstFromGenerations_le_coalescentTau",
+   "HumanDemography.lean",
+   102,
+   "unfold fstFromGenerations fstFromTau coalescentTau nlinarith"
+  ],
+  [
+   "neutral_floor_shortfall_pos",
+   "HumanDemography.lean",
+   152,
+   "linarith"
+  ],
+  [
+   "formula_le",
+   "Identification.lean",
+   136,
+   "linarith [h.2]"
+  ],
+  [
+   "le_formula",
+   "Identification.lean",
+   141,
+   "linarith [h.1]"
+  ],
+  [
+   "rankOneCovarianceBump_sampleNormalized",
+   "ImitationRigidity.lean",
+   70,
+   "unfold rankOneCovarianceBump"
+  ],
+  [
+   "stationaryLDEntry_of_no_decay",
+   "ImitationRigidity.lean",
+   595,
+   "unfold stationaryLDEntry"
+  ],
+  [
+   "stationaryLDEntry_of_complete_ld",
+   "ImitationRigidity.lean",
+   604,
+   "unfold stationaryLDEntry"
+  ],
+  [
+   "stationaryLDEntry_eq_ldAfterGenerations",
+   "ImitationRigidity.lean",
+   637,
+   "unfold stationaryLDEntry ldAfterGenerations"
+  ],
+  [
+   "ldKernelSymbol_pos",
+   "ImitationRigidity.lean",
+   655,
+   "unfold ldKernelSymbol nlinarith [abs_nonneg decay, hd]"
+  ],
+  [
+   "stationaryLD_three_term_diagonal",
+   "ImitationRigidity.lean",
+   835,
+   "unfold stationaryLDEntry ring"
+  ],
+  [
+   "lossGeometryRisk_add",
+   "ImitationRigidity.lean",
+   928,
+   "unfold lossGeometryRisk"
+  ],
+  [
+   "lossGeometryRisk_smul",
+   "ImitationRigidity.lean",
+   933,
+   "unfold lossGeometryRisk"
+  ],
+  [
+   "ridgeBalance_root_isFixedPoint",
+   "ImitationRigidity.lean",
+   1021,
+   "unfold ridgeBalance ridgeSelfConsistentStep"
+  ],
+  [
+   "ridgeBalance_of_zero_aspect",
+   "ImitationRigidity.lean",
+   1041,
+   "unfold ridgeBalance norm_num"
+  ],
+  [
+   "alleleLossProbability_le_one",
+   "ImitationRigidity.lean",
+   1156,
+   "unfold alleleLossProbability linarith"
+  ],
+  [
+   "hasDerivAt_alleleLossProbability",
+   "ImitationRigidity.lean",
+   1166,
+   "simpa using this simpa [alleleLossProbability, one_div, mul_"
+  ],
+  [
+   "secondMoment_imitation_invisible_to_orthogonal_score",
+   "ImitationRigidity.lean",
+   1366,
+   "simp"
+  ],
+  [
+   "dropout_floor_caps_explainable_fraction",
+   "ImitationRigidity.lean",
+   1421,
+   "unfold explainableFraction linarith"
+  ],
+  [
+   "attenuated_le_true",
+   "ImputationPortability.lean",
+   43,
+   "unfold attenuatedVariance"
+  ],
+  [
+   "imputation_error_nonneg",
+   "ImputationPortability.lean",
+   60,
+   "unfold imputationErrorVariance"
+  ],
+  [
+   "imputed_pgs_variance_decomposition",
+   "ImputationPortability.lean",
+   71,
+   "unfold attenuatedVariance imputationErrorVariance ring"
+  ],
+  [
+   "wgs_perfect_imputation",
+   "ImputationPortability.lean",
+   192,
+   "unfold attenuatedVariance; rw [h_perfect]; ring"
+  ],
+  [
+   "wgs_vs_array_tradeoff",
+   "ImputationPortability.lean",
+   204,
+   "nlinarith"
+  ],
+  [
+   "multi_ethnic_arrays_reduce_bias",
+   "ImputationPortability.lean",
+   266,
+   "dsimp [ascertainment_loss]"
+  ],
+  [
+   "one_sub_exp_neg_pos",
+   "JetBarrier.lean",
+   133,
+   "linarith"
+  ],
+  [
+   "one_sub_lt_exp_neg",
+   "JetBarrier.lean",
+   140,
+   "linarith"
+  ],
+  [
+   "latticeInflation_normalization",
+   "JetBarrier.lean",
+   170,
+   "unfold latticeInflation"
+  ],
+  [
+   "lattice_observables_ne_gaussian",
+   "JetBarrier.lean",
+   349,
+   "simpa [gaussianObservables] using congrArg MellinObservables"
+  ],
+  [
+   "ld_retention_nonneg",
+   "LDDecayTheory.lean",
+   64,
+   "unfold ldRetentionPerGen"
+  ],
+  [
+   "tag_r2_le_one",
+   "LDDecayTheory.lean",
+   121,
+   "unfold tagR2"
+  ],
+  [
+   "tag_r2_decreases_with_ld_change",
+   "LDDecayTheory.lean",
+   131,
+   "unfold tagR2"
+  ],
+  [
+   "admixture_ld_max_at_half_freq",
+   "LDDecayTheory.lean",
+   173,
+   "unfold admixtureLD nlinarith [mul_pos h_pos\u2081 h_pos\u2082]"
+  ],
+  [
+   "driftLDStep_affine",
+   "LDDecayTheory.lean",
+   272,
+   "unfold driftLDStep driftLDRetention ring"
+  ],
+  [
+   "driftLDEquilibrium_mul_one_sub_retention",
+   "LDDecayTheory.lean",
+   333,
+   "unfold driftLDEquilibrium"
+  ],
+  [
+   "driftLDEquilibrium_isFixedPoint",
+   "LDDecayTheory.lean",
+   345,
+   "ring"
+  ],
+  [
+   "driftLDEquilibrium_nonneg",
+   "LDDecayTheory.lean",
+   364,
+   "unfold driftLDEquilibrium"
+  ],
+  [
+   "ld_mismatch_nonneg",
+   "LDDecayTheory.lean",
+   482,
+   "unfold ldMismatchFrobenius"
+  ],
+  [
+   "ld_mismatch_pos_of_ne",
+   "LDDecayTheory.lean",
+   489,
+   "unfold ldMismatchFrobenius"
+  ],
+  [
+   "larger_pop_slower_ld_decay",
+   "LDDecayTheory.lean",
+   656,
+   "unfold ldDecayRatePerGen"
+  ],
+  [
+   "ld_half_life_increasing",
+   "LDDecayTheory.lean",
+   671,
+   "unfold ldHalfLife nlinarith"
+  ],
+  [
+   "ld_decay_closed_form",
+   "LDDecayTheory.lean",
+   796,
+   "simp simp [ih, pow_succ, mul_assoc, mul_left_comm, mul_comm]"
+  ],
+  [
+   "expanderAgreementFloor_gt",
+   "LocalToGlobalCoherence.lean",
+   110,
+   "unfold expanderAgreementFloor linarith"
+  ],
+  [
+   "expanderAgreementFloor_lt",
+   "LocalToGlobalCoherence.lean",
+   116,
+   "unfold expanderAgreementFloor linarith"
+  ],
+  [
+   "expanderAgreementFloor_pos",
+   "LocalToGlobalCoherence.lean",
+   121,
+   "linarith"
+  ],
+  [
+   "portability_at_zero",
+   "LongitudinalPortability.lean",
+   46,
+   "unfold portabilityAtTime simp [mul_zero, Real.exp_zero, mul_"
+  ],
+  [
+   "portability_nonneg",
+   "LongitudinalPortability.lean",
+   52,
+   "unfold portabilityAtTime"
+  ],
+  [
+   "portability_decreases_with_time",
+   "LongitudinalPortability.lean",
+   59,
+   "unfold portabilityAtTime nlinarith"
+  ],
+  [
+   "drift_decay_rate_pos",
+   "LongitudinalPortability.lean",
+   80,
+   "unfold longitudinalDriftDecayRate positivity"
+  ],
+  [
+   "larger_Ne_slower_drift",
+   "LongitudinalPortability.lean",
+   87,
+   "unfold longitudinalDriftDecayRate nlinarith"
+  ],
+  [
+   "ld_decay_in_unit",
+   "LongitudinalPortability.lean",
+   105,
+   "unfold ldDecayPerGeneration"
+  ],
+  [
+   "ld_decay_faster_with_higher_r",
+   "LongitudinalPortability.lean",
+   114,
+   "unfold ldDecayPerGeneration"
+  ],
+  [
+   "secular_trend_grows",
+   "LongitudinalPortability.lean",
+   143,
+   "unfold secularTrendBias; nlinarith"
+  ],
+  [
+   "heritability_increases_when_env_equalizes",
+   "LongitudinalPortability.lean",
+   167,
+   "nlinarith"
+  ],
+  [
+   "temporalR2_eq_signal_coordinate",
+   "LongitudinalPortability.lean",
+   209,
+   "unfold temporalR2 simp"
+  ],
+  [
+   "temporal_calibration_changes_with_prevalence",
+   "LongitudinalPortability.lean",
+   338,
+   "simpa [temporalCalibrationInTheLarge] using"
+  ],
+  [
+   "temporalExactBrierRisk_eq_prevalence_scale",
+   "LongitudinalPortability.lean",
+   376,
+   "rfl"
+  ],
+  [
+   "staleness_at_zero",
+   "LongitudinalPortability.lean",
+   415,
+   "unfold modelStaleness simp [mul_zero, Real.exp_zero]"
+  ],
+  [
+   "staleness_nonneg",
+   "LongitudinalPortability.lean",
+   421,
+   "unfold modelStaleness linarith"
+  ],
+  [
+   "staleness_increases",
+   "LongitudinalPortability.lean",
+   431,
+   "unfold modelStaleness linarith [Real.exp_lt_exp_of_lt (show "
+  ],
+  [
+   "R2DecompositionData.r2_eq_disc_mul_cal",
+   "MetricSpecificPortability.lean",
+   125,
+   "unfold r2 discrimination calibration ring"
+  ],
+  [
+   "R2DecompositionData.r2_le_discrimination",
+   "MetricSpecificPortability.lean",
+   137,
+   "unfold r2 discrimination"
+  ],
+  [
+   "R2DecompositionData.r2_nonneg",
+   "MetricSpecificPortability.lean",
+   143,
+   "unfold r2"
+  ],
+  [
+   "R2DecompositionData.r2_le_one",
+   "MetricSpecificPortability.lean",
+   149,
+   "unfold r2 simpa using d.hCondE_le_Y"
+  ],
+  [
+   "R2DecompositionData.disc_le_one",
+   "MetricSpecificPortability.lean",
+   156,
+   "unfold discrimination simpa using d.hYhat_le_Y"
+  ],
+  [
+   "R2DecompositionData.disc_pos",
+   "MetricSpecificPortability.lean",
+   162,
+   "unfold discrimination"
+  ],
+  [
+   "R2DecompositionData.cal_le_one",
+   "MetricSpecificPortability.lean",
+   168,
+   "unfold calibration simpa using d.hCondE_le_Yhat"
+  ],
+  [
+   "R2DecompositionData.cal_pos",
+   "MetricSpecificPortability.lean",
+   174,
+   "unfold calibration"
+  ],
+  [
+   "R2DecompositionData.perfect_calibration_r2_eq_disc",
+   "MetricSpecificPortability.lean",
+   182,
+   "unfold r2 discrimination"
+  ],
+  [
+   "R2DecompositionData.cal_loss_reduces_r2",
+   "MetricSpecificPortability.lean",
+   191,
+   "unfold r2 discrimination"
+  ],
+  [
+   "neutralAF_benchmark_r2_sensitive_to_drift",
+   "MetricSpecificPortability.lean",
+   299,
+   "linarith"
+  ],
+  [
+   "brier_depends_on_prevalence",
+   "MetricSpecificPortability.lean",
+   314,
+   "unfold brierFromR2 exactCalibratedBrierRiskFromR2 nlinarith"
+  ],
+  [
+   "brier_worsens_when_r2_drops_and_prevalence_factor_grows",
+   "MetricSpecificPortability.lean",
+   365,
+   "unfold brierFromR2 exactCalibratedBrierRiskFromR2 nlinarith "
+  ],
+  [
+   "brier_increases_with_portability_loss",
+   "MetricSpecificPortability.lean",
+   623,
+   "unfold brierFromR2 exactCalibratedBrierRiskFromR2 nlinarith"
+  ],
+  [
+   "brier_bounded_by_prevalence",
+   "MetricSpecificPortability.lean",
+   636,
+   "unfold brierFromR2 exactCalibratedBrierRiskFromR2 nlinarith"
+  ],
+  [
+   "observableBrier_change_decomposition",
+   "MetricSpecificPortability.lean",
+   690,
+   "unfold brierDiscriminationLoss brierCalibrationLoss ring"
+  ],
+  [
+   "brierDiscriminationLoss_pos_of_mechanistic_r2_drop",
+   "MetricSpecificPortability.lean",
+   701,
+   "unfold brierDiscriminationLoss"
+  ],
+  [
+   "f1_le_one",
+   "MetricSpecificPortability.lean",
+   869,
+   "unfold f1ScoreMetric nlinarith [mul_nonneg (le_of_lt h_p) (b"
+  ],
+  [
+   "brier_nonneg",
+   "MetricSpecificPortability.lean",
+   1028,
+   "simpa [brierScoreMetric, brierScore] using sq_nonneg (y - p)"
+  ],
+  [
+   "presentDayR2_eq_expectedR2",
+   "MultiAncestryTheory.lean",
+   54,
+   "simp [presentDayR2, presentDayPGSVariance, expectedR2]"
+  ],
+  [
+   "no_info_when_uncorrelated",
+   "MultiAncestryTheory.lean",
+   213,
+   "unfold effectMutualInformation simp [Real.log_one]"
+  ],
+  [
+   "effectMutualInformation_at_perfect_correlation",
+   "MultiAncestryTheory.lean",
+   221,
+   "unfold effectMutualInformation"
+  ],
+  [
+   "additiveGeneticVariance_eq_dotProduct",
+   "MultiAncestryTheory.lean",
+   305,
+   "unfold additiveGeneticVariance dotProduct ring"
+  ],
+  [
+   "portability_gap_increases_with_distance",
+   "MultiAncestryTheory.lean",
+   445,
+   "unfold portabilityGap linarith"
+  ],
+  [
+   "diversity_reduces_max_gap",
+   "MultiAncestryTheory.lean",
+   462,
+   "unfold portabilityGap linarith"
+  ],
+  [
+   "shrinkage_reduces_portability_variance",
+   "MultiAncestryTheory.lean",
+   522,
+   "nlinarith [sq_abs \u03b2_shrunk, sq_abs \u03b2_raw, abs_nonneg \u03b2_shrun"
+  ],
+  [
+   "law_of_total_variance_r2_bound",
+   "OpenQuestions.lean",
+   81,
+   "linarith"
+  ],
+  [
+   "r2_small_when_within_dominates",
+   "OpenQuestions.lean",
+   95,
+   "linarith [le_div_iff\u2080 h_varZ_pos |>.mpr (by linarith : (1 - "
+  ],
+  [
+   "comparable_covariates_both_small",
+   "OpenQuestions.lean",
+   119,
+   "linarith"
+  ],
+  [
+   "heterozygosity_increases_toward_half",
+   "OpenQuestions.lean",
+   147,
+   "nlinarith [sq_nonneg (p\u2082 - p\u2081), sq_nonneg (1/2 - p\u2082)]"
+  ],
+  [
+   "pgs_variance_can_increase",
+   "OpenQuestions.lean",
+   157,
+   "linarith"
+  ],
+  [
+   "prediction_error_positive",
+   "OpenQuestions.lean",
+   317,
+   "linarith"
+  ],
+  [
+   "relative_error_increases_with_turnover",
+   "OpenQuestions.lean",
+   325,
+   "nlinarith [sq_nonneg \u03b2, sq_nonneg \u03b4, mul_pos h\u03c1\u2081 h\u03b2, mul_pos"
+  ],
+  [
+   "variance_increase_sufficient",
+   "OpenQuestions.lean",
+   359,
+   "linarith"
+  ],
+  [
+   "closer_to_half_more_uncertainty",
+   "OpenQuestions.lean",
+   387,
+   "nlinarith [brier_uncertainty_formula \u03c0\u2081, brier_uncertainty_f"
+  ],
+  [
+   "genetic_distance_variance_bound",
+   "OpenQuestions.lean",
+   437,
+   "linarith"
+  ],
+  [
+   "neutral_beats_immune",
+   "OpenQuestions.lean",
+   470,
+   "nlinarith [sq_abs \u03c1, sq_nonneg \u03c1]"
+  ],
+  [
+   "faster_decay_lower_correlation",
+   "OpenQuestions.lean",
+   514,
+   "nlinarith"
+  ],
+  [
+   "combined_portability_at_zero",
+   "OpenQuestions.lean",
+   537,
+   "unfold combinedPortability ldTaggingDecay simp [mul_zero, Re"
+  ],
+  [
+   "snr_portability_signal_only",
+   "OpenQuestions.lean",
+   633,
+   "unfold snrPortabilityRatio"
+  ],
+  [
+   "f1_symmetric",
+   "OpenQuestions.lean",
+   733,
+   "unfold f1Score; ring"
+  ],
+  [
+   "f1_le_arithmetic_mean",
+   "OpenQuestions.lean",
+   738,
+   "unfold f1Score nlinarith [sq_nonneg (p - r)]"
+  ],
+  [
+   "prevalence_dominates_sensitivity_for_recall",
+   "OpenQuestions.lean",
+   756,
+   "simpa [mul_comm] using htp"
+  ],
+  [
+   "residual_susceptibility_lower_bound",
+   "Diagnostic.lean",
+   80,
+   "unfold ancestryGradientSusceptibility"
+  ],
+  [
+   "residual_susceptibility_eq_one_sub_efficacy_mul",
+   "Diagnostic.lean",
+   113,
+   "unfold pcTargetAxisEfficacy ring"
+  ],
+  [
+   "standardized_bias_at_critical_confounding",
+   "Diagnostic.lean",
+   151,
+   "unfold standardizedResidualPGSBias criticalConfoundingMagnit"
+  ],
+  [
+   "FrequencyResolvedCohort.mem_correctableClasses_iff",
+   "Frequency.lean",
+   35,
+   "simp [FrequencyResolvedCohort.correctableClasses]"
+  ],
+  [
+   "FrequencyResolvedCohort.weight_mul_differentiation_eq_information",
+   "Frequency.lean",
+   50,
+   "unfold FrequencyResolvedCohort.informationMatchedWeight ring"
+  ],
+  [
+   "FrequencyResolvedCohort.totalInformation_nonneg",
+   "Frequency.lean",
+   74,
+   "unfold FrequencyResolvedCohort.totalInformation"
+  ],
+  [
+   "effectiveSubgroupSize_le_balanced",
+   "Geometry.lean",
+   19,
+   "unfold effectiveSubgroupSize nlinarith [sq_nonneg (2 * m - n"
+  ],
+  [
+   "effectiveSubgroupSize_balanced",
+   "Geometry.lean",
+   26,
+   "unfold effectiveSubgroupSize ring"
+  ],
+  [
+   "samplePCOverlapSq_eq_zero_of_subthreshold",
+   "Overlap.lean",
+   21,
+   "simp [samplePCOverlapSq, not_lt.mpr h]"
+  ],
+  [
+   "samplePCOverlapSq_eq_of_superthreshold",
+   "Overlap.lean",
+   28,
+   "simp [samplePCOverlapSq, h]"
+  ],
+  [
+   "subthreshold_sample_pc_leaves_full_axis",
+   "Overlap.lean",
+   70,
+   "ring"
+  ],
+  [
+   "samplePCResidualAxisFraction_pos_and_lt_one",
+   "Overlap.lean",
+   86,
+   "unfold samplePCResidualAxisFraction"
+  ],
+  [
+   "pc_step_total_error_change",
+   "Phase.lean",
+   73,
+   "ring"
+  ],
+  [
+   "adding_subthreshold_pc_can_increase_total_error",
+   "Phase.lean",
+   82,
+   "linarith"
+  ],
+  [
+   "modeledPCResidualSusceptibility_eq_uncorrected_of_subthreshold",
+   "Unified.lean",
+   33,
+   "unfold modeledPCResidualSusceptibility ring_nf"
+  ],
+  [
+   "ascertainmentAmplification_nonneg",
+   "Unified.lean",
+   69,
+   "unfold ascertainmentAmplification"
+  ],
+  [
+   "CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget",
+   "PGSCalibrationTheory.lean",
+   213,
+   "unfold CalibrationMoments.shifted CalibrationMoments.toProfi"
+  ],
+  [
+   "calibrationSlopeDeviation_eq_one_sub_of_lt_one",
+   "PGSCalibrationTheory.lean",
+   224,
+   "unfold calibrationSlopeDeviation ring"
+  ],
+  [
+   "hl_contrib_nonneg",
+   "PGSCalibrationTheory.lean",
+   239,
+   "unfold hosmerLemeshowContrib"
+  ],
+  [
+   "prevalence_shift_changes_calibration",
+   "PGSCalibrationTheory.lean",
+   297,
+   "unfold calibrationInTheLarge ring"
+  ],
+  [
+   "CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget",
+   "PGSCalibrationTheory.lean",
+   456,
+   "simpa [CrossPopulationCalibrationShiftModel.targetIdentityCa"
+  ],
+  [
+   "source_calibrated_target_citl_eq_shift_budget",
+   "PGSCalibrationTheory.lean",
+   468,
+   "ring"
+  ],
+  [
+   "source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts",
+   "PGSCalibrationTheory.lean",
+   488,
+   "simp [CrossPopulationCalibrationShiftModel.observedMeanShift"
+  ],
+  [
+   "source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts",
+   "PGSCalibrationTheory.lean",
+   503,
+   "simp [CrossPopulationCalibrationShiftModel.observedMeanShift"
+  ],
+  [
+   "source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved",
+   "PGSCalibrationTheory.lean",
+   519,
+   "simp [CrossPopulationCalibrationShiftModel.observedMeanShift"
+  ],
+  [
+   "no_citl_shift_same_prevalence",
+   "PGSCalibrationTheory.lean",
+   1300,
+   "simp [prevalenceLogisticCalibrationProfile, logisticCalibrat"
+  ],
+  [
+   "env_differences_shift_calibration",
+   "PGSCalibrationTheory.lean",
+   1328,
+   "unfold calibrationInTheLarge ring"
+  ],
+  [
+   "env_differences_shift_calibration_nonzero_of_calibrated_source",
+   "PGSCalibrationTheory.lean",
+   1337,
+   "simpa using h_effect"
+  ],
+  [
+   "genetic_distribution_shift",
+   "PGSCalibrationTheory.lean",
+   1353,
+   "unfold calibrationInTheLarge ring"
+  ],
+  [
+   "genetic_distribution_shift_of_calibrated_source",
+   "PGSCalibrationTheory.lean",
+   1363,
+   "ring"
+  ],
+  [
+   "intercept_recalibration_shifts_citl",
+   "PGSCalibrationTheory.lean",
+   1401,
+   "unfold calibrationInTheLarge interceptRecalibrated ring"
+  ],
+  [
+   "intercept_recal_corrects_citl",
+   "PGSCalibrationTheory.lean",
+   1411,
+   "ring"
+  ],
+  [
+   "logistic_recalibration_shifts_citl",
+   "PGSCalibrationTheory.lean",
+   1427,
+   "unfold calibrationInTheLarge logisticRecalibrated ring"
+  ],
+  [
+   "logistic_recalibration_corrects_citl",
+   "PGSCalibrationTheory.lean",
+   1437,
+   "unfold calibrationInTheLarge ring"
+  ],
+  [
+   "logistic_recalibration_corrects_citl_and_slope",
+   "PGSCalibrationTheory.lean",
+   1499,
+   "simpa [CalibrationProfile.slopeDeviation] using"
+  ],
+  [
+   "logistic_recalibration_preserves_auc",
+   "PGSCalibrationTheory.lean",
+   1512,
+   "simpa [logisticRecalibrated, Function.comp] using linarith ["
+  ],
+  [
+   "required_events_increase_with_recalibration_dimension",
+   "PGSCalibrationTheory.lean",
+   1572,
+   "unfold requiredEventsForRecalibration"
+  ],
+  [
+   "required_events_decrease_with_event_information",
+   "PGSCalibrationTheory.lean",
+   1586,
+   "unfold requiredEventsForRecalibration"
+  ],
+  [
+   "recalibration_preserves_auc",
+   "PGSCalibrationTheory.lean",
+   1655,
+   "simpa [Function.comp] using linarith [mul_lt_mul_of_pos_left"
+  ],
+  [
+   "qalyGainUnderDecision_self_eq_max_treatmentMargin",
+   "PGSCalibrationTheory.lean",
+   1943,
+   "unfold qalyGainUnderDecision receivesTreatment"
+  ],
+  [
+   "qalyLoss_eq_zero_of_perfect_pathway_calibration",
+   "PGSCalibrationTheory.lean",
+   2004,
+   "unfold qalyLoss qalyGainUnderDecision receivesTreatment simp"
+  ],
+  [
+   "screeningUtilityFromCounts_eq_screeningUtilityFromRates",
+   "PGSCalibrationTheory.lean",
+   2650,
+   "unfold screeningUtilityFromCounts screeningUtilityFromRates"
+  ],
+  [
+   "qalyScreeningDecisionModel_harm_eq_threshold_scale",
+   "PGSCalibrationTheory.lean",
+   2735,
+   "unfold qalyScreeningDecisionModel"
+  ],
+  [
+   "qalyScreeningDecisionModel_total_pos",
+   "PGSCalibrationTheory.lean",
+   2747,
+   "unfold qalyScreeningDecisionModel linarith"
+  ],
+  [
+   "screeningQalyGain_eq_formula",
+   "PGSCalibrationTheory.lean",
+   2764,
+   "unfold screeningQalyGain screeningUtilityFromRates qalyScree"
+  ],
+  [
+   "decisionCurveScreeningModel_harm_eq_threshold_scale",
+   "PGSCalibrationTheory.lean",
+   2782,
+   "unfold decisionCurveScreeningModel ring"
+  ],
+  [
+   "decisionCurveScreeningModel_total_pos",
+   "PGSCalibrationTheory.lean",
+   2795,
+   "unfold decisionCurveScreeningModel linarith"
+  ],
+  [
+   "decisionCurveNetBenefit_eq_formula",
+   "PGSCalibrationTheory.lean",
+   2812,
+   "unfold decisionCurveNetBenefit screeningUtilityFromCounts ri"
+  ],
+  [
+   "receivesTreatment_thresholdClinicalPathway_iff",
+   "PGSCalibrationTheory.lean",
+   2870,
+   "unfold receivesTreatment classifiedHighRisk"
+  ],
+  [
+   "qalyLoss_threshold_eq_thresholdQalyLoss",
+   "PGSCalibrationTheory.lean",
+   2943,
+   "unfold qalyLoss thresholdQalyLoss"
+  ],
+  [
+   "thresholdQalyLoss_eq_zero_of_perfect_calibration",
+   "PGSCalibrationTheory.lean",
+   3052,
+   "unfold thresholdQalyLoss ring"
+  ],
+  [
+   "selected_drift_factor_gt_neutral",
+   "PhenomeWidePortability.lean",
+   119,
+   "unfold neutralDriftFactor selectedDriftFactor linarith"
+  ],
+  [
+   "stabilizing_selection_reduces_fst",
+   "PhenomeWidePortability.lean",
+   138,
+   "unfold fstFromDriftFactor linarith [selected_drift_factor_gt"
+  ],
+  [
+   "region_disproportionate_variance",
+   "PhenomeWidePortability.lean",
+   365,
+   "linarith"
+  ],
+  [
+   "zero_portability_component_lowers_weighted_average",
+   "PhenomeWidePortability.lean",
+   389,
+   "linarith [mul_comm f port_rest]"
+  ],
+  [
+   "larger_gxe_variance_lowers_scalar_portability_fraction",
+   "PhenomeWidePortability.lean",
+   439,
+   "simp only"
+  ],
+  [
+   "pearson_r2_below_one_under_additive_noise",
+   "PhenomeWidePortability.lean",
+   573,
+   "simp only linarith"
+  ],
+  [
+   "pgsDriftVariance_one_pop_nonneg",
+   "PolygenicAdaptation.lean",
+   87,
+   "unfold pgsDriftVariance_one_pop; positivity"
+  ],
+  [
+   "pgsDriftVarianceFromLoci_eq_closedForm",
+   "PolygenicAdaptation.lean",
+   112,
+   "unfold pgsDriftVarianceFromLoci pgsDriftVariance_one_pop"
+  ],
+  [
+   "pgsDiffVariance_two_pop_eq_lociSum",
+   "PolygenicAdaptation.lean",
+   122,
+   "unfold pgsDiffVariance_two_pop ring"
+  ],
+  [
+   "pgsDiffVariance_two_pop_eq_sum",
+   "PolygenicAdaptation.lean",
+   148,
+   "unfold pgsDiffVariance_two_pop; ring"
+  ],
+  [
+   "pgsDiffVariance_eq_expected",
+   "PolygenicAdaptation.lean",
+   169,
+   "unfold pgsDiffVariance_two_pop pgsDriftVariance_one_pop expe"
+  ],
+  [
+   "expected_pgs_diff_var_nonneg",
+   "PolygenicAdaptation.lean",
+   175,
+   "unfold expectedPGSDiffVariance; positivity"
+  ],
+  [
+   "corrections_reduce_signal",
+   "PolygenicAdaptation.lean",
+   210,
+   "simp only"
+  ],
+  [
+   "per_variant_h2_decreases_with_M",
+   "PolygenicArchitecture.lean",
+   45,
+   "unfold expectedSquaredEffect"
+  ],
+  [
+   "spikeAndSlabVariance_mem_interval",
+   "PolygenicArchitecture.lean",
+   76,
+   "unfold spikeAndSlabVariance"
+  ],
+  [
+   "spikeAndSlabVariance_nonneg",
+   "PolygenicArchitecture.lean",
+   87,
+   "unfold spikeAndSlabVariance nlinarith"
+  ],
+  [
+   "spikeAndSlabVariance_neg_off_interval",
+   "PolygenicArchitecture.lean",
+   100,
+   "unfold spikeAndSlabVariance linarith"
+  ],
+  [
+   "sas_variance_monotone_in_pi",
+   "PolygenicArchitecture.lean",
+   111,
+   "unfold spikeAndSlabVariance; nlinarith"
+  ],
+  [
+   "effective_polygenicity_ge_one",
+   "PolygenicArchitecture.lean",
+   154,
+   "unfold effectivePolygenicity linarith"
+  ],
+  [
+   "sourceEffectMass_nonneg",
+   "PolygenicArchitecture.lean",
+   208,
+   "unfold sourceEffectMass"
+  ],
+  [
+   "targetRetainedEffectMass_nonneg",
+   "PolygenicArchitecture.lean",
+   214,
+   "unfold targetRetainedEffectMass"
+  ],
+  [
+   "targetRetainedEffectMass_le_sourceEffectMass",
+   "PolygenicArchitecture.lean",
+   220,
+   "unfold targetRetainedEffectMass sourceEffectMass"
+  ],
+  [
+   "relativePortabilityLoss_eq_locuswise_loss_fraction",
+   "PolygenicArchitecture.lean",
+   228,
+   "unfold relativePortabilityLoss lostEffectMass sourceEffectMa"
+  ],
+  [
+   "portabilityScore_le_one",
+   "PolygenicArchitecture.lean",
+   254,
+   "linarith"
+  ],
+  [
+   "enrichment_interpretation",
+   "PolygenicArchitecture.lean",
+   360,
+   "unfold heritabilityEnrichment"
+  ],
+  [
+   "coding_more_portable_than_regulatory",
+   "PolygenicArchitecture.lean",
+   400,
+   "nlinarith"
+  ],
+  [
+   "predicted_le_source",
+   "PolygenicArchitecture.lean",
+   434,
+   "simpa [predictedPortability] using portabilityScore_le_one m"
+  ],
+  [
+   "portability_upper_bound_from_rg_fst",
+   "PolygenicArchitecture.lean",
+   519,
+   "unfold rgFstWeightedUpperBound"
+  ],
+  [
+   "supercritical_of_small_maf",
+   "PolygenicSpectroscopy.lean",
+   432,
+   "nlinarith [hsmall, this]"
+  ],
+  [
+   "latticeCriticalMaf_pos",
+   "PolygenicSpectroscopy.lean",
+   497,
+   "unfold latticeCriticalMaf linarith"
+  ],
+  [
+   "latticeCriticalMaf_lt_one",
+   "PolygenicSpectroscopy.lean",
+   504,
+   "unfold latticeCriticalMaf linarith"
+  ],
+  [
+   "nei_fst_in_unit",
+   "PopulationGeneticsFoundations.lean",
+   46,
+   "unfold neiFst"
+  ],
+  [
+   "simple_fst_nonneg",
+   "PopulationGeneticsFoundations.lean",
+   65,
+   "unfold simpleFst nlinarith"
+  ],
+  [
+   "expected_het_in_unit",
+   "PopulationGeneticsFoundations.lean",
+   104,
+   "unfold expectedHeterozygosity linarith"
+  ],
+  [
+   "het_increases_with_ne",
+   "PopulationGeneticsFoundations.lean",
+   114,
+   "unfold expectedHeterozygosity nlinarith"
+  ],
+  [
+   "coal_fst_nonneg",
+   "PopulationGeneticsFoundations.lean",
+   145,
+   "unfold coalFst"
+  ],
+  [
+   "coal_fst_increases_with_time",
+   "PopulationGeneticsFoundations.lean",
+   151,
+   "unfold coalFst nlinarith"
+  ],
+  [
+   "coal_fst_approaches_one",
+   "PopulationGeneticsFoundations.lean",
+   160,
+   "unfold coalFst nlinarith"
+  ],
+  [
+   "selectionMigrationEquilibrium_eq_zero",
+   "PopulationGeneticsFoundations.lean",
+   283,
+   "unfold selectionMigrationEquilibrium nlinarith"
+  ],
+  [
+   "selectionMigrationEquilibrium_ge_of_strong_selection",
+   "PopulationGeneticsFoundations.lean",
+   293,
+   "nlinarith"
+  ],
+  [
+   "selectionMigrationEquilibrium_lt_one",
+   "PopulationGeneticsFoundations.lean",
+   302,
+   "unfold selectionMigrationEquilibrium nlinarith"
+  ],
+  [
+   "wright_decomposition",
+   "PopulationGeneticsFoundations.lean",
+   388,
+   "unfold wrightFIT; ring"
+  ],
+  [
+   "scaledMutationRate_pos",
+   "PopulationGeneticsFoundations.lean",
+   453,
+   "unfold scaledMutationRate positivity"
+  ],
+  [
+   "fstMutationDriftEquilibrium_pos",
+   "PopulationGeneticsFoundations.lean",
+   467,
+   "unfold fstMutationDriftEquilibrium positivity"
+  ],
+  [
+   "fstMutationDriftEquilibrium_le_one",
+   "PopulationGeneticsFoundations.lean",
+   473,
+   "unfold fstMutationDriftEquilibrium linarith"
+  ],
+  [
+   "fstMutationDriftEquilibrium_lt_one",
+   "PopulationGeneticsFoundations.lean",
+   482,
+   "unfold fstMutationDriftEquilibrium linarith"
+  ],
+  [
+   "fstMutationDriftEquilibrium_strictAnti",
+   "PopulationGeneticsFoundations.lean",
+   489,
+   "unfold fstMutationDriftEquilibrium simpa using div_lt_div_of"
+  ],
+  [
+   "het_plus_fst_eq_one",
+   "PopulationGeneticsFoundations.lean",
+   545,
+   "unfold expectedHeterozygosity fstMutationDriftEquilibrium ri"
+  ],
+  [
+   "nei_fst_complement",
+   "PopulationGeneticsFoundations.lean",
+   557,
+   "unfold neiFst ring_nf"
+  ],
+  [
+   "nei_fst_equilibrium_consistent",
+   "PopulationGeneticsFoundations.lean",
+   567,
+   "unfold neiFst expectedHeterozygosity fstMutationDriftEquilib"
+  ],
+  [
+   "within_pop_share_eq_het",
+   "PopulationGeneticsFoundations.lean",
+   576,
+   "simp"
+  ],
+  [
+   "fstEquilibrium_eq_one_minus_het",
+   "PopulationGeneticsFoundations.lean",
+   582,
+   "linarith"
+  ],
+  [
+   "mutation_timescale_exceeds_drift",
+   "PopulationGeneticsFoundations.lean",
+   591,
+   "unfold scaledMutationRate at h\u03b8_large nlinarith"
+  ],
+  [
+   "fstEquilibrium_gt_half_of_small_theta",
+   "PopulationGeneticsFoundations.lean",
+   600,
+   "unfold fstMutationDriftEquilibrium linarith"
+  ],
+  [
+   "fstMutationDriftTransient_at_zero",
+   "PopulationGeneticsFoundations.lean",
+   679,
+   "unfold fstMutationDriftTransient simp [mul_zero, zero_div, n"
+  ],
+  [
+   "expectedNewMutations_nonneg",
+   "PopulationGeneticsFoundations.lean",
+   693,
+   "unfold expectedNewMutations positivity"
+  ],
+  [
+   "expectedNewMutations_increases_with_theta",
+   "PopulationGeneticsFoundations.lean",
+   699,
+   "unfold expectedNewMutations nlinarith"
+  ],
+  [
+   "expectedNewMutations_increases_with_time",
+   "PopulationGeneticsFoundations.lean",
+   706,
+   "unfold expectedNewMutations nlinarith"
+  ],
+  [
+   "sharedLDFraction_pos",
+   "PopulationGeneticsFoundations.lean",
+   723,
+   "unfold sharedLDFractionFromMutation"
+  ],
+  [
+   "sharedLDFraction_le_one",
+   "PopulationGeneticsFoundations.lean",
+   728,
+   "unfold sharedLDFractionFromMutation linarith"
+  ],
+  [
+   "sharedLDFraction_decreases_with_time",
+   "PopulationGeneticsFoundations.lean",
+   737,
+   "unfold sharedLDFractionFromMutation linarith"
+  ],
+  [
+   "islandModelFst_eq_inv",
+   "PopulationGeneticsFoundations.lean",
+   789,
+   "unfold islandModelFst"
+  ],
+  [
+   "islandModelFst_pos",
+   "PopulationGeneticsFoundations.lean",
+   795,
+   "unfold islandModelFst positivity"
+  ],
+  [
+   "islandModelFst_lt_one",
+   "PopulationGeneticsFoundations.lean",
+   800,
+   "unfold islandModelFst nlinarith"
+  ],
+  [
+   "islandModelFst_strictAnti_m",
+   "PopulationGeneticsFoundations.lean",
+   808,
+   "unfold islandModelFst"
+  ],
+  [
+   "islandModelFst_strictAnti_Ne",
+   "PopulationGeneticsFoundations.lean",
+   818,
+   "unfold islandModelFst"
+  ],
+  [
+   "islandModelFst_lt_half_of_one_migrant",
+   "PopulationGeneticsFoundations.lean",
+   829,
+   "unfold islandModelFst linarith"
+  ],
+  [
+   "islandModelFst_small_of_large_migration",
+   "PopulationGeneticsFoundations.lean",
+   837,
+   "unfold islandModelFst"
+  ],
+  [
+   "islandModelFst_eq_mutationForm",
+   "PopulationGeneticsFoundations.lean",
+   851,
+   "unfold islandModelFst fstMutationDriftEquilibrium ring"
+  ],
+  [
+   "fstMigrationMutation_lt_migrationOnly",
+   "PopulationGeneticsFoundations.lean",
+   865,
+   "unfold fstMigrationMutationEquilibrium islandModelFst"
+  ],
+  [
+   "fstMigrationMutation_lt_mutationOnly",
+   "PopulationGeneticsFoundations.lean",
+   872,
+   "unfold fstMigrationMutationEquilibrium fstMutationDriftEquil"
+  ],
+  [
+   "steppingStoneCharacteristicLength_pos",
+   "PopulationGeneticsFoundations.lean",
+   891,
+   "unfold steppingStoneCharacteristicLength"
+  ],
+  [
+   "alleleFreqAfterMigration_at_zero",
+   "PopulationGeneticsFoundations.lean",
+   952,
+   "unfold alleleFreqAfterMigration simp"
+  ],
+  [
+   "effectiveMigration_bounds",
+   "PopulationGeneticsFoundations.lean",
+   986,
+   "unfold effectiveMigration"
+  ],
+  [
+   "effectiveMigration_symmetric",
+   "PopulationGeneticsFoundations.lean",
+   992,
+   "unfold effectiveMigration ring"
+  ],
+  [
+   "ldCorrelationFromMigration_nonneg",
+   "PopulationGeneticsFoundations.lean",
+   1019,
+   "unfold ldCorrelationFromMigration"
+  ],
+  [
+   "ldCorrelationFromMigration_le_one",
+   "PopulationGeneticsFoundations.lean",
+   1025,
+   "unfold ldCorrelationFromMigration"
+  ],
+  [
+   "fstDerived_eq_het_loss",
+   "PopulationGeneticsFoundations.lean",
+   1115,
+   "unfold fstDerived"
+  ],
+  [
+   "fstDerived_zero",
+   "PopulationGeneticsFoundations.lean",
+   1122,
+   "unfold fstDerived simp"
+  ],
+  [
+   "fstDerived_lt_one",
+   "PopulationGeneticsFoundations.lean",
+   1148,
+   "unfold fstDerived linarith [pow_pos (show 0 < 1 - 1 / (2 * N"
+  ],
+  [
+   "fstDerived_eq_fstFromDrift",
+   "PopulationGeneticsFoundations.lean",
+   1174,
+   "unfold fstDerived heterozygosityLossFromDrift rfl"
+  ],
+  [
+   "fstEquilibrium_derived",
+   "PopulationGeneticsFoundations.lean",
+   1248,
+   "unfold hetEquilibrium ring"
+  ],
+  [
+   "fstEquilibrium_derived_consistent",
+   "PopulationGeneticsFoundations.lean",
+   1259,
+   "unfold fstMutationDriftEquilibrium rfl"
+  ],
+  [
+   "hetEquilibrium_pos",
+   "PopulationGeneticsFoundations.lean",
+   1267,
+   "unfold hetEquilibrium positivity"
+  ],
+  [
+   "hetEquilibrium_lt_one",
+   "PopulationGeneticsFoundations.lean",
+   1272,
+   "unfold hetEquilibrium linarith"
+  ],
+  [
+   "fstEquilibrium_derived_pos",
+   "PopulationGeneticsFoundations.lean",
+   1279,
+   "linarith [hetEquilibrium_lt_one Ne mu hNe hmu]"
+  ],
+  [
+   "fstEquilibrium_derived_lt_one",
+   "PopulationGeneticsFoundations.lean",
+   1283,
+   "linarith [hetEquilibrium_pos Ne mu hNe hmu]"
+  ],
+  [
+   "hetMutationRecurrence_zero",
+   "PopulationGeneticsFoundations.lean",
+   1349,
+   "rfl"
+  ],
+  [
+   "fst_from_closed_form_het",
+   "PopulationGeneticsFoundations.lean",
+   1380,
+   "unfold fstFromHetRatio ring"
+  ],
+  [
+   "fstTransient_derived_from_recurrence",
+   "PopulationGeneticsFoundations.lean",
+   1424,
+   "unfold fstMutationDriftTransientDiscrete"
+  ],
+  [
+   "fstTransientDiscrete_at_zero",
+   "PopulationGeneticsFoundations.lean",
+   1434,
+   "unfold fstMutationDriftTransientDiscrete simp"
+  ],
+  [
+   "hetDecayFactor_expansion",
+   "PopulationGeneticsFoundations.lean",
+   1483,
+   "unfold hetDecayFactor ring"
+  ],
+  [
+   "fstTransientDiscrete_eq_explicit",
+   "PopulationGeneticsFoundations.lean",
+   1506,
+   "unfold fstMutationDriftTransientDiscrete fstMutationDriftEqu"
+  ],
+  [
+   "neutral_af_benchmark_at_equal_fst",
+   "PortabilityBounds.lean",
+   29,
+   "simpa using neutralAFBenchmarkRatio_self fst h"
+  ],
+  [
+   "neutral_af_benchmark_decreasing_in_fstT",
+   "PortabilityBounds.lean",
+   35,
+   "simpa [neutralAFBenchmarkRatio] using"
+  ],
+  [
+   "squared_error_expansion",
+   "PortabilityBounds.lean",
+   154,
+   "ring"
+  ],
+  [
+   "expected_squared_error_given_x",
+   "PortabilityBounds.lean",
+   161,
+   "linarith [sq_nonneg bias]"
+  ],
+  [
+   "high_cv_inevitable",
+   "PortabilityBounds.lean",
+   181,
+   "nlinarith [mul_nonneg hb (le_of_lt h\u03c3)]"
+  ],
+  [
+   "higher_rho_better_portability",
+   "PortabilityBounds.lean",
+   282,
+   "nlinarith"
+  ],
+  [
+   "fst_from_tau_lt_one",
+   "PortabilityDrift.lean",
+   65,
+   "unfold fstFromTau linarith"
+  ],
+  [
+   "twoDemeIMEquilibriumETst_isFixedPoint",
+   "PortabilityDrift.lean",
+   218,
+   "unfold twoDemeIMFirstStepDiff twoDemeIMEquilibriumETss twoDe"
+  ],
+  [
+   "twoDemeIMEquilibriumDelta_eq",
+   "PortabilityDrift.lean",
+   251,
+   "simp [DemographicCoalescenceScalars.delta, hudsonFstFromCoal"
+  ],
+  [
+   "twoDemeIMEquilibriumDelta_pos",
+   "PortabilityDrift.lean",
+   259,
+   "unfold twoDemeIMEquilibriumDelta positivity"
+  ],
+  [
+   "twoDemeIMEquilibriumDelta_lt_one",
+   "PortabilityDrift.lean",
+   264,
+   "unfold twoDemeIMEquilibriumDelta linarith"
+  ],
+  [
+   "targetPGSVariance_eq_pgsVarianceFromHet",
+   "PortabilityDrift.lean",
+   308,
+   "rfl"
+  ],
+  [
+   "targetPGSVariance_eq_presentDay",
+   "PortabilityDrift.lean",
+   321,
+   "unfold targetPGSVariance pgsVarianceFromHet presentDayPGSVar"
+  ],
+  [
+   "wrightFisherFst_lt_one",
+   "PortabilityDrift.lean",
+   370,
+   "linarith"
+  ],
+  [
+   "variance_mean_pgs_diff",
+   "PortabilityDrift.lean",
+   391,
+   "rfl"
+  ],
+  [
+   "presentDayEqualVarianceGaussianAUC_eq",
+   "PortabilityDrift.lean",
+   669,
+   "rfl"
+  ],
+  [
+   "targetTotalEffect_eq_betaSource_plus_targetEffectHeterogeneity",
+   "PortabilityDrift.lean",
+   914,
+   "simp [targetEffectHeterogeneity]"
+  ],
+  [
+   "targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity",
+   "PortabilityDrift.lean",
+   990,
+   "unfold targetTaggingProjection simp [targetSourceEffectProje"
+  ],
+  [
+   "targetTaggingProjection_eq_standing_plus_novelMutationEffect",
+   "PortabilityDrift.lean",
+   1001,
+   "simp [targetTaggingProjection, targetNovelMutationEffectProj"
+  ],
+  [
+   "sourceCrossCovariance_eq_taggingProjection_plus_context",
+   "PortabilityDrift.lean",
+   1012,
+   "rfl"
+  ],
+  [
+   "targetCrossCovariance_eq_taggingProjection_plus_context",
+   "PortabilityDrift.lean",
+   1019,
+   "rfl"
+  ],
+  [
+   "sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov",
+   "PortabilityDrift.lean",
+   1117,
+   "simp [sourcePredictiveCovarianceFromSourceWeights, sourceWei"
+  ],
+  [
+   "targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov",
+   "PortabilityDrift.lean",
+   1126,
+   "simp [targetPredictiveCovarianceFromSourceWeights, sourceWei"
+  ],
+  [
+   "sourceCalibrationSlopeFromSourceWeights_exact_metric_law",
+   "PortabilityDrift.lean",
+   1133,
+   "rfl"
+  ],
+  [
+   "targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law",
+   "PortabilityDrift.lean",
+   1142,
+   "rfl"
+  ],
+  [
+   "targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law",
+   "PortabilityDrift.lean",
+   1151,
+   "simp [targetCalibrationSlopeFromSourceWeights, targetPredict"
+  ],
+  [
+   "brokenTaggingResidual_nonneg",
+   "PortabilityDrift.lean",
+   1243,
+   "unfold brokenTaggingResidual simp [dotProduct]"
+  ],
+  [
+   "ancestrySpecificLDResidual_nonneg",
+   "PortabilityDrift.lean",
+   1262,
+   "unfold ancestrySpecificLDResidual simp [dotProduct]"
+  ],
+  [
+   "sourceSpecificOverfitResidual_nonneg",
+   "PortabilityDrift.lean",
+   1278,
+   "unfold sourceSpecificOverfitResidual simp [dotProduct]"
+  ],
+  [
+   "irreducibleTargetResidualBurden_nonneg",
+   "PortabilityDrift.lean",
+   1313,
+   "unfold irreducibleTargetResidualBurden linarith [brokenTaggi"
+  ],
+  [
+   "effectiveTargetOutcomeVariance_ge_targetOutcomeVariance",
+   "PortabilityDrift.lean",
+   1353,
+   "unfold effectiveTargetOutcomeVariance linarith [irreducibleT"
+  ],
+  [
+   "effectiveTargetOutcomeVariance_pos",
+   "PortabilityDrift.lean",
+   1362,
+   "unfold effectiveTargetOutcomeVariance linarith [m.targetOutc"
+  ],
+  [
+   "sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances",
+   "PortabilityDrift.lean",
+   1421,
+   "rfl"
+  ],
+  [
+   "targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances",
+   "PortabilityDrift.lean",
+   1503,
+   "rfl"
+  ],
+  [
+   "target_score_variance_from_source_weights_identity",
+   "PortabilityDrift.lean",
+   1574,
+   "simp [targetScoreVarianceFromSourceWeights]"
+  ],
+  [
+   "targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_action",
+   "PortabilityDrift.lean",
+   1583,
+   "simp [targetScoreVarianceFromSourceWeights, sourceWeightedTa"
+  ],
+  [
+   "sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action",
+   "PortabilityDrift.lean",
+   1592,
+   "simp [sourceScoreVarianceFromExplicitDrivers, sourceWeighted"
+  ],
+  [
+   "sourceR2FromSourceWeights_eq_signalVariance_ratio",
+   "PortabilityDrift.lean",
+   1601,
+   "rfl"
+  ],
+  [
+   "sourceR2FromSourceWeights_exact_metric_law",
+   "PortabilityDrift.lean",
+   1608,
+   "unfold sourceR2FromSourceWeights sourceExplainedSignalVarian"
+  ],
+  [
+   "targetR2FromSourceWeights_eq_signalVariance_ratio",
+   "PortabilityDrift.lean",
+   1618,
+   "rfl"
+  ],
+  [
+   "targetR2FromSourceWeights_exact_metric_portability_law",
+   "PortabilityDrift.lean",
+   1633,
+   "unfold targetR2FromSourceWeights targetExplainedSignalVarian"
+  ],
+  [
+   "ldCorrelationDecay_strictAnti_distance",
+   "PortabilityDrift.lean",
+   1719,
+   "unfold ldCorrelationDecay nlinarith [mul_lt_mul_of_pos_left "
+  ],
+  [
+   "targetR2_lt_source_from_neutralAF_benchmark",
+   "PortabilityDrift.lean",
+   2547,
+   "simpa [targetR2FromNeutralAFBenchmark] using"
+  ],
+  [
+   "targetR2FromNeutralAFBenchmark_eq_presentDayR2",
+   "PortabilityDrift.lean",
+   2564,
+   "rfl"
+  ],
+  [
+   "targetAUCFromNeutralAFBenchmark_eq_presentDayAUC",
+   "PortabilityDrift.lean",
+   2592,
+   "rfl"
+  ],
+  [
+   "sourceBrierFromR2_eq_transportedMetrics",
+   "PortabilityDrift.lean",
+   2604,
+   "rfl"
+  ],
+  [
+   "targetAUC_lt_source_of_neutralAF_benchmark",
+   "PortabilityDrift.lean",
+   2663,
+   "simpa [targetGaussianAUCFromNeutralAFBenchmark] using"
+  ],
+  [
+   "equalVarianceGaussianAUCFromVariances_scaleOne",
+   "PortabilityDrift.lean",
+   2709,
+   "unfold equalVarianceGaussianAUCFromVariances equalVarianceGa"
+  ],
+  [
+   "equalVarianceGaussianAUCFromExplainedR2_eq_fromSNR",
+   "PortabilityDrift.lean",
+   2746,
+   "unfold equalVarianceGaussianAUCFromExplainedR2 equalVariance"
+  ],
+  [
+   "sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances",
+   "PortabilityDrift.lean",
+   2788,
+   "rfl"
+  ],
+  [
+   "targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances",
+   "PortabilityDrift.lean",
+   2831,
+   "rfl"
+  ],
+  [
+   "targetLiabilityAUC_lt_source_of_neutralAF_benchmark",
+   "PortabilityDrift.lean",
+   3299,
+   "simpa [targetExactGaussianAUCFromNeutralAFBenchmark] using"
+  ],
+  [
+   "brierRegretPoint_eq_sq_error",
+   "PortabilityDrift.lean",
+   3399,
+   "unfold brierRegretPoint simpa [sub_eq_add_neg, add_comm, add"
+  ],
+  [
+   "brierRegretRatio_eq_sq_error_ratio",
+   "PortabilityDrift.lean",
+   3405,
+   "unfold brierRegretRatio"
+  ],
+  [
+   "logLossRegretPoint_eq_kl",
+   "PortabilityDrift.lean",
+   3420,
+   "unfold logLossRegretPoint simpa using logLoss_regret_eq_kl_p"
+  ],
+  [
+   "logLossRegretRatio_eq_kl_ratio",
+   "PortabilityDrift.lean",
+   3428,
+   "unfold logLossRegretRatio"
+  ],
+  [
+   "neutralAFBenchmarkRatio_nonneg",
+   "PortabilityDrift.lean",
+   3440,
+   "simp [neutralAFBenchmarkRatio]"
+  ],
+  [
+   "neutralAFBenchmarkRatio_lt_one",
+   "PortabilityDrift.lean",
+   3449,
+   "simp [neutralAFBenchmarkRatio] linarith"
+  ],
+  [
+   "targetR2FromNeutralAFBenchmark_self",
+   "PortabilityDrift.lean",
+   3466,
+   "rfl"
+  ],
+  [
+   "expectedSqMeanPGSDiff_IMEquilibrium_strictAntiOn_M",
+   "PortabilityDrift.lean",
+   3532,
+   "simp only [expectedSqMeanPGSDiff_IMEquilibrium_eq] nlinarith"
+  ],
+  [
+   "MutationDriftModelAssumptions.theta_pos",
+   "PortabilityDrift.lean",
+   3577,
+   "unfold MutationDriftModelAssumptions.theta nlinarith [m.Ne_p"
+  ],
+  [
+   "MutationDriftModelAssumptions.fstEquilibrium_pos",
+   "PortabilityDrift.lean",
+   3652,
+   "unfold MutationDriftModelAssumptions.fstEquilibrium nlinarit"
+  ],
+  [
+   "MutationDriftModelAssumptions.fstEquilibrium_lt_one",
+   "PortabilityDrift.lean",
+   3661,
+   "unfold MutationDriftModelAssumptions.fstEquilibrium linarith"
+  ],
+  [
+   "covarianceRetention_from_fst_ld",
+   "PortabilityDrift.lean",
+   3777,
+   "unfold covarianceRetention freqCorrFromFst ldOverlapFromShar"
+  ],
+  [
+   "covarianceDivergenceFromRetention_eq",
+   "PortabilityDrift.lean",
+   3790,
+   "unfold covarianceDivergenceFromRetention"
+  ],
+  [
+   "covarianceDivergenceMutationDrift_eq",
+   "PortabilityDrift.lean",
+   3810,
+   "unfold covarianceDivergenceMutationDrift ring"
+  ],
+  [
+   "covarianceDivergence_pure_drift",
+   "PortabilityDrift.lean",
+   3826,
+   "unfold covarianceDivergenceMutationDrift ring"
+  ],
+  [
+   "covarianceDivergence_pure_mutation",
+   "PortabilityDrift.lean",
+   3832,
+   "unfold covarianceDivergenceMutationDrift ring"
+  ],
+  [
+   "covarianceDivergence_ge_drift",
+   "PortabilityDrift.lean",
+   3838,
+   "unfold covarianceDivergenceMutationDrift linarith [mul_nonne"
+  ],
+  [
+   "covarianceDivergence_le_one",
+   "PortabilityDrift.lean",
+   3848,
+   "linarith"
+  ],
+  [
+   "presentDayPGSVarianceMutationDrift_eq",
+   "PortabilityDrift.lean",
+   3866,
+   "unfold presentDayPGSVarianceMutationDrift ring"
+  ],
+  [
+   "presentDayPGSVarianceMutationDrift_pure_drift",
+   "PortabilityDrift.lean",
+   3874,
+   "unfold presentDayPGSVariance ring"
+  ],
+  [
+   "neutralAFSharedLDBenchmarkRatio_pure_drift",
+   "PortabilityDrift.lean",
+   3942,
+   "unfold neutralAFSharedLDBenchmarkRatio neutralAFBenchmarkRat"
+  ],
+  [
+   "neutral_af_benchmark_correction_factor",
+   "PortabilityDrift.lean",
+   4021,
+   "unfold presentDayPGSVariance ring"
+  ],
+  [
+   "fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium",
+   "PortabilityDrift.lean",
+   4157,
+   "unfold fstIslandMultiplicativeEquilibrium fstMigrationDriftE"
+  ],
+  [
+   "scaledMigrationRate_pos",
+   "PortabilityDrift.lean",
+   4169,
+   "unfold scaledMigrationRate positivity"
+  ],
+  [
+   "fstMigrationDriftEquilibrium_eq_from_M",
+   "PortabilityDrift.lean",
+   4175,
+   "unfold fstMigrationDriftEquilibrium scaledMigrationRate ring"
+  ],
+  [
+   "fstMigrationDriftEquilibrium_pos",
+   "PortabilityDrift.lean",
+   4181,
+   "unfold fstMigrationDriftEquilibrium positivity"
+  ],
+  [
+   "fstMigrationDriftEquilibrium_le_one",
+   "PortabilityDrift.lean",
+   4188,
+   "unfold fstMigrationDriftEquilibrium nlinarith"
+  ],
+  [
+   "fstMigrationDriftEquilibrium_lt_one",
+   "PortabilityDrift.lean",
+   4196,
+   "unfold fstMigrationDriftEquilibrium nlinarith"
+  ],
+  [
+   "fstMigrationDriftEquilibrium_decreases_with_m",
+   "PortabilityDrift.lean",
+   4210,
+   "unfold fstMigrationDriftEquilibrium"
+  ],
+  [
+   "fstMigrationDriftEquilibrium_decreases_with_Ne",
+   "PortabilityDrift.lean",
+   4218,
+   "unfold fstMigrationDriftEquilibrium"
+  ],
+  [
+   "migration_reduces_fst_vs_pure_drift",
+   "PortabilityDrift.lean",
+   4231,
+   "unfold fstMigrationDriftEquilibrium"
+  ],
+  [
+   "migration_bounds_fst_below_one",
+   "PortabilityDrift.lean",
+   4242,
+   "linarith"
+  ],
+  [
+   "SplitMigrationModel.fstMigDriftEq_eq_limit",
+   "PortabilityDrift.lean",
+   4255,
+   "unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEq"
+  ],
+  [
+   "steppingStoneFst_at_one",
+   "PortabilityDrift.lean",
+   4288,
+   "unfold steppingStoneFst simp"
+  ],
+  [
+   "steppingStoneFst_increases_with_distance",
+   "PortabilityDrift.lean",
+   4296,
+   "unfold steppingStoneFst nlinarith"
+  ],
+  [
+   "sharedLD_from_equilibrium_eq",
+   "PortabilityDrift.lean",
+   4352,
+   "unfold sharedLD_from_equilibrium fstMigrationDriftEquilibriu"
+  ],
+  [
+   "sharedLD_from_equilibrium_eq_sharedLDFromMigration",
+   "PortabilityDrift.lean",
+   4378,
+   "unfold sharedLDFromMigration rfl"
+  ],
+  [
+   "sharedLDFromMigration_nonneg",
+   "PortabilityDrift.lean",
+   4386,
+   "unfold sharedLDFromMigration"
+  ],
+  [
+   "sharedLDFromMigration_lt_one",
+   "PortabilityDrift.lean",
+   4392,
+   "unfold sharedLDFromMigration linarith"
+  ],
+  [
+   "sharedLDFromMigration_increases",
+   "PortabilityDrift.lean",
+   4400,
+   "unfold sharedLDFromMigration nlinarith"
+  ],
+  [
+   "fst_plus_sharedLD_eq_one",
+   "PortabilityDrift.lean",
+   4410,
+   "unfold fstMigrationDriftEquilibrium sharedLDFromMigration sc"
+  ],
+  [
+   "signalRetentionMigrationDrift_eq",
+   "PortabilityDrift.lean",
+   4430,
+   "unfold signalRetentionMigrationDrift fstMigrationDriftEquili"
+  ],
+  [
+   "asymmetricFst_eq_migrationDriftEq",
+   "PortabilityDrift.lean",
+   4508,
+   "unfold asymmetricFst fstMigrationDriftEquilibrium rfl"
+  ],
+  [
+   "asymmetric_migration_directional_fst",
+   "PortabilityDrift.lean",
+   4516,
+   "simp only [asymmetricFst_eq_migrationDriftEq]"
+  ],
+  [
+   "effectiveSymmetricMigration_between",
+   "PortabilityDrift.lean",
+   4549,
+   "unfold effectiveSymmetricMigration"
+  ],
+  [
+   "admixtureLDDecay_nonneg",
+   "PortabilityDrift.lean",
+   4570,
+   "unfold admixtureLDDecay"
+  ],
+  [
+   "admixtureLDDecay_le_one",
+   "PortabilityDrift.lean",
+   4577,
+   "unfold admixtureLDDecay"
+  ],
+  [
+   "admixtureLDDecay_decreases_with_time",
+   "PortabilityDrift.lean",
+   4584,
+   "unfold admixtureLDDecay"
+  ],
+  [
+   "admixtureLDDecay_decreases_with_recombination",
+   "PortabilityDrift.lean",
+   4593,
+   "unfold admixtureLDDecay"
+  ],
+  [
+   "admixtureLDDecay_at_zero",
+   "PortabilityDrift.lean",
+   4601,
+   "unfold admixtureLDDecay simp"
+  ],
+  [
+   "admixtureLDBoost_gt_one",
+   "PortabilityDrift.lean",
+   4617,
+   "unfold admixtureLDBoost linarith"
+  ],
+  [
+   "fstMigDriftNext_eq",
+   "PortabilityDrift.lean",
+   4680,
+   "rfl"
+  ],
+  [
+   "fstMigDriftNext_no_migration",
+   "PortabilityDrift.lean",
+   4686,
+   "unfold fstMigDriftNext ring"
+  ],
+  [
+   "fstMigDriftNext_no_migration_fixedpoint_one",
+   "PortabilityDrift.lean",
+   4693,
+   "ring_nf"
+  ],
+  [
+   "fstMigDriftEquil_eq_fstMigrationDriftEquilibrium",
+   "PortabilityDrift.lean",
+   4714,
+   "unfold fstMigDriftEquil fstMigrationDriftEquilibrium ring"
+  ],
+  [
+   "fstMigDriftEquil_pos",
+   "PortabilityDrift.lean",
+   4739,
+   "unfold fstMigDriftEquil positivity"
+  ],
+  [
+   "fstMigDriftEquil_le_one",
+   "PortabilityDrift.lean",
+   4745,
+   "unfold fstMigDriftEquil nlinarith"
+  ],
+  [
+   "fstMigDriftEquil_lt_one",
+   "PortabilityDrift.lean",
+   4752,
+   "unfold fstMigDriftEquil nlinarith"
+  ],
+  [
+   "fstMigDriftEquil_decreasing_in_m",
+   "PortabilityDrift.lean",
+   4763,
+   "unfold fstMigDriftEquil"
+  ],
+  [
+   "fstMigDriftEquil_decreasing_in_Ne",
+   "PortabilityDrift.lean",
+   4776,
+   "unfold fstMigDriftEquil"
+  ],
+  [
+   "neutralAFBenchmarkFromRecurrence_eq",
+   "PortabilityDrift.lean",
+   4797,
+   "unfold neutralAFBenchmarkFromRecurrence fstMigDriftEquil rin"
+  ],
+  [
+   "neutralAFBenchmarkFromRecurrence_increasing_in_m",
+   "PortabilityDrift.lean",
+   4808,
+   "nlinarith"
+  ],
+  [
+   "neutralAFBenchmarkFromRecurrence_lt_one",
+   "PortabilityDrift.lean",
+   4830,
+   "linarith"
+  ],
+  [
+   "PowerAgreement.close",
+   "PowerAnalysis.lean",
+   116,
+   "unfold powerAtThreshold"
+  ],
+  [
+   "powerAtThreshold_mono",
+   "PowerAnalysis.lean",
+   123,
+   "unfold powerAtThreshold"
+  ],
+  [
+   "powerAtThreshold_antitone_in_threshold",
+   "PowerAnalysis.lean",
+   130,
+   "unfold powerAtThreshold"
+  ],
+  [
+   "GWASObservationModel.se_pos",
+   "PowerAnalysis.lean",
+   226,
+   "unfold GWASObservationModel.standardError"
+  ],
+  [
+   "GWASObservationModel.observation_decomposition",
+   "PowerAnalysis.lean",
+   239,
+   "unfold GWASObservationModel.observedBeta ring"
+  ],
+  [
+   "se_equals_sigma_over_sqrt_n",
+   "PowerAnalysis.lean",
+   294,
+   "unfold GWASObservationModel.standardError ring"
+  ],
+  [
+   "r2_scaling_increasing",
+   "PowerAnalysis.lean",
+   355,
+   "unfold r2ScalingModel nlinarith"
+  ],
+  [
+   "r2_scaling_bounded",
+   "PowerAnalysis.lean",
+   363,
+   "unfold r2ScalingModel linarith"
+  ],
+  [
+   "genetic_correlation_bounds_portability",
+   "PowerAnalysis.lean",
+   454,
+   "nlinarith"
+  ],
+  [
+   "high_rg_implies_good_portability",
+   "PowerAnalysis.lean",
+   465,
+   "nlinarith"
+  ],
+  [
+   "low_rg_limits_portability",
+   "PowerAnalysis.lean",
+   476,
+   "nlinarith"
+  ],
+  [
+   "bernoulliKL_eq_zero_iff",
+   "Probability.lean",
+   40,
+   "simpa [bernoulliKL] using"
+  ],
+  [
+   "klBern_eq_klDiv",
+   "Probability.lean",
+   62,
+   "simp [klBern, bernoulliKL]"
+  ],
+  [
+   "klBern_eq_klDiv_pmf",
+   "Probability.lean",
+   70,
+   "simp [klBern, bernoulliKL, bernoulliMeasure, bernoulliPMF]"
+  ],
+  [
+   "integrable_id_gaussian",
+   "Probability.lean",
+   121,
+   "unfold poly_n at h simp only [pow_one] at h"
+  ],
+  [
+   "HardyWeinbergModel.refFreq_nonneg",
+   "Probability.lean",
+   216,
+   "unfold HardyWeinbergModel.refFreq linarith [h.altFreq_le_one"
+  ],
+  [
+   "HardyWeinbergModel.refFreq_le_one",
+   "Probability.lean",
+   221,
+   "unfold HardyWeinbergModel.refFreq linarith [h.altFreq_nonneg"
+  ],
+  [
+   "HardyWeinbergModel.genotypeThirdAbsMoment_nonneg",
+   "Probability.lean",
+   344,
+   "unfold HardyWeinbergModel.genotypeThirdAbsMoment"
+  ],
+  [
+   "HWEScoreModel.scoreThirdAbsMomentBound_nonneg",
+   "Probability.lean",
+   385,
+   "unfold HWEScoreModel.scoreThirdAbsMomentBound"
+  ],
+  [
+   "berryEsseenErrorBound_nonneg",
+   "Probability.lean",
+   399,
+   "unfold berryEsseenErrorBound"
+  ],
+  [
+   "mem_approximationInterval_of_abs_sub_le",
+   "Probability.lean",
+   450,
+   "unfold approximationInterval"
+  ],
+  [
+   "noise_integrated_cdf_zero",
+   "Probability.lean",
+   526,
+   "simpa using noise_integrated_cdf hN x \u03bc 0"
+  ],
+  [
+   "gaussian_moments_integrable",
+   "Probability.lean",
+   705,
+   "simpa [poly_n, stdGaussianMeasure] using (integrable_poly_n "
+  ],
+  [
+   "gaussian_mean_zero",
+   "Probability.lean",
+   715,
+   "simp [ProbabilityTheory.integral_id_gaussianReal]"
+  ],
+  [
+   "dot_add_right_shift",
+   "ProjectionShiftBounds.lean",
+   93,
+   "simp [dot, mul_add, Finset.sum_add_distrib]"
+  ],
+  [
+   "total_shift_energy_le_sum_budget_sq",
+   "ProjectionShiftBounds.lean",
+   186,
+   "nlinarith"
+  ],
+  [
+   "matrix_mulVec_smul",
+   "QuadraticShift.lean",
+   40,
+   "simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_co"
+  ],
+  [
+   "dot_sub_right",
+   "QuadraticShift.lean",
+   46,
+   "simp [dot, mul_sub, Finset.sum_sub_distrib]"
+  ],
+  [
+   "dot_smul_left",
+   "QuadraticShift.lean",
+   51,
+   "simp [dot, Finset.mul_sum, mul_assoc]"
+  ],
+  [
+   "dot_smul_right",
+   "QuadraticShift.lean",
+   56,
+   "simp [dot, Finset.mul_sum, mul_left_comm]"
+  ],
+  [
+   "ultra_rare_not_shared",
+   "RareVariantPortability.lean",
+   49,
+   "linarith [mul_comm p (2 * Ne)]"
+  ],
+  [
+   "gene_level_more_portable",
+   "RareVariantPortability.lean",
+   125,
+   "nlinarith [sq_nonneg s]"
+  ],
+  [
+   "functional_equivalence_aids_portability",
+   "RareVariantPortability.lean",
+   150,
+   "linarith [mul_lt_mul_of_pos_right h_k_real h_\u03b22]"
+  ],
+  [
+   "skat_handles_bidirectional",
+   "RareVariantPortability.lean",
+   168,
+   "simp positivity"
+  ],
+  [
+   "mutationSelectionBalance_mem_unit",
+   "RareVariantPortability.lean",
+   305,
+   "unfold mutationSelectionBalance linarith"
+  ],
+  [
+   "mutationSelectionBalance_lt_classical",
+   "RareVariantPortability.lean",
+   315,
+   "unfold mutationSelectionBalance"
+  ],
+  [
+   "mutationSelectionBalance_at_zero_dominance",
+   "RareVariantPortability.lean",
+   326,
+   "unfold mutationSelectionBalance"
+  ],
+  [
+   "negative_selection_constraint",
+   "RareVariantPortability.lean",
+   468,
+   "nlinarith [sq_nonneg (maf_common - 1/2), sq_nonneg (maf_rare"
+  ],
+  [
+   "overlap_inflation_positive",
+   "SampleOverlapBias.lean",
+   45,
+   "unfold overlapInflation"
+  ],
+  [
+   "no_overlap_unbiased",
+   "SampleOverlapBias.lean",
+   77,
+   "unfold partialOverlapR2; ring"
+  ],
+  [
+   "corrected_portability_better",
+   "SampleOverlapBias.lean",
+   145,
+   "linarith"
+  ],
+  [
+   "loo_reduces_overfitting",
+   "SampleOverlapBias.lean",
+   178,
+   "unfold approxLOOPGS; linarith [mul_pos h_lev h_res]"
+  ],
+  [
+   "gwas_subtraction_estimates_bias",
+   "SampleOverlapBias.lean",
+   189,
+   "unfold partialOverlapR2 ring"
+  ],
+  [
+   "kinship_inflates",
+   "SampleOverlapBias.lean",
+   216,
+   "unfold kinshipInflation; linarith [mul_pos h_K h_h2]"
+  ],
+  [
+   "grm_threshold_tradeoff",
+   "SampleOverlapBias.lean",
+   232,
+   "unfold kinshipInflation linarith [mul_lt_mul_of_pos_right h_"
+  ],
+  [
+   "pgs_variance_nonneg",
+   "ScoreDistribution.lean",
+   48,
+   "unfold pgsVariance nlinarith [hp i, hp1 i]"
+  ],
+  [
+   "mean_shift_eq_diff",
+   "ScoreDistribution.lean",
+   66,
+   "unfold pgsMeanShift pgsMean simp [Finset.sum_sub_distrib, mu"
+  ],
+  [
+   "identity_citl_shift_eq_neg_pgsMeanShift",
+   "ScoreDistribution.lean",
+   238,
+   "unfold calibrationInTheLarge ring"
+  ],
+  [
+   "mechanistic_target_identity_calibration_slope_lt_one",
+   "ScoreDistribution.lean",
+   266,
+   "simpa [CrossPopulationMechanisticCalibrationModel.targetIden"
+  ],
+  [
+   "percentile_invariant_to_standardization",
+   "ScoreDistribution.lean",
+   451,
+   "unfold externallyStandardized"
+  ],
+  [
+   "nonlinear_conditional_excess_risk_identity",
+   "SecondMomentShift.lean",
+   199,
+   "ring"
+  ],
+  [
+   "effectVarianceRecurrence_fixedPoint",
+   "SelectionArchitecture.lean",
+   58,
+   "unfold effectVarianceRecurrence ring"
+  ],
+  [
+   "equilibriumEffectVariance_is_fixedPoint",
+   "SelectionArchitecture.lean",
+   67,
+   "unfold equilibriumEffectVariance"
+  ],
+  [
+   "stronger_stabilizing_smaller_effects",
+   "SelectionArchitecture.lean",
+   75,
+   "unfold equilibriumEffectVariance"
+  ],
+  [
+   "effect_correlation_increases_with_Ns",
+   "SelectionArchitecture.lean",
+   94,
+   "unfold effectCorrelationStabilizing"
+  ],
+  [
+   "fluctuating_correlation_decays",
+   "SelectionArchitecture.lean",
+   152,
+   "unfold fluctuatingEffectCorrelation"
+  ],
+  [
+   "shorter_autocorrelation_faster_decay",
+   "SelectionArchitecture.lean",
+   162,
+   "unfold fluctuatingEffectCorrelation"
+  ],
+  [
+   "effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs",
+   "SelectionArchitecture.lean",
+   267,
+   "unfold effectCorrelationStabilizing stabilizingNsFromObserve"
+  ],
+  [
+   "balancing_selection_high_het",
+   "SelectionArchitecture.lean",
+   418,
+   "nlinarith [sq_nonneg (p_balanced - 1/2), sq_nonneg (p_neutra"
+  ],
+  [
+   "neutral_expected_shift_zero",
+   "SelectionArchitecture.lean",
+   451,
+   "unfold polygenicAdaptationShift simp"
+  ],
+  [
+   "selected_shift_positive",
+   "SelectionArchitecture.lean",
+   461,
+   "unfold polygenicAdaptationShift"
+  ],
+  [
+   "ncp_ratio_from_maf",
+   "SelectionArchitecture.lean",
+   561,
+   "unfold gwasNCP nlinarith [sq_nonneg (p\u2082 - p\u2081), sq_nonneg (1/"
+  ],
+  [
+   "missedSelectedVariance_nonneg",
+   "SelectionValidation.lean",
+   70,
+   "unfold missedSelectedVariance positivity"
+  ],
+  [
+   "identityDirectMetricModel_source_weights",
+   "SimulationValidation.lean",
+   76,
+   "simp [identityDirectMetricModel, sourceWeightsFromExplicitDr"
+  ],
+  [
+   "target_metric_profile_auc_uses_explicit_target_moments",
+   "SimulationValidation.lean",
+   522,
+   "simp [targetMetricProfileFromSourceWeights, targetEqualVaria"
+  ],
+  [
+   "target_liability_auc_eq_explainedR2_chart",
+   "SimulationValidation.lean",
+   533,
+   "simpa using targetEqualVarianceGaussianAUCFromSourceWeights_"
+  ],
+  [
+   "target_metric_profile_at_generation_reads_explicit_target_r2",
+   "SimulationValidation.lean",
+   1308,
+   "simp [targetR2AtGeneration]"
+  ],
+  [
+   "portability_ratio_le_one",
+   "StatisticalGeneticsMethodology.lean",
+   78,
+   "unfold portabilityRatio"
+  ],
+  [
+   "blocked_cv_less_biased",
+   "StatisticalGeneticsMethodology.lean",
+   114,
+   "linarith"
+  ],
+  [
+   "effective_n_pos",
+   "StatisticalGeneticsMethodology.lean",
+   145,
+   "unfold effectiveSampleSizeSE"
+  ],
+  [
+   "local_genetic_correlation_varies",
+   "StatisticalGeneticsMethodology.lean",
+   319,
+   "nlinarith"
+  ],
+  [
+   "stratification_inflates_pgs_variance",
+   "StratificationConfounding.lean",
+   90,
+   "linarith [stratification_bias_variance_pos m]"
+  ],
+  [
+   "am_increases_r2",
+   "StratificationConfounding.lean",
+   156,
+   "nlinarith [mul_pos h_vpgs h_ve]"
+  ],
+  [
+   "ColliderModel.inducedCov_neg",
+   "StratificationConfounding.lean",
+   200,
+   "unfold ColliderModel.inducedCov"
+  ],
+  [
+   "differential_ascertainment_artifact",
+   "StratificationConfounding.lean",
+   235,
+   "linarith"
+  ],
+  [
+   "rge_inflates_apparent_heritability",
+   "StratificationConfounding.lean",
+   318,
+   "unfold RGEInflationModel.r2_obs linarith"
+  ],
+  [
+   "attenuation_decreases_with_r2",
+   "StratificationConfounding.lean",
+   437,
+   "unfold pgsAttenuationFactor"
+  ],
+  [
+   "ratio_strict_mono",
+   "StratificationConfounding.lean",
+   477,
+   "nlinarith"
+  ],
+  [
+   "noisier_proxy_more_bias",
+   "StratificationConfounding.lean",
+   487,
+   "unfold AttenuationModel.\u03b2_obs"
+  ],
+  [
+   "hweHeterozygosity_pos",
+   "StratificationConfounding.lean",
+   577,
+   "unfold hweHeterozygosity positivity"
+  ],
+  [
+   "instrument_strength_decreases",
+   "StratificationConfounding.lean",
+   586,
+   "unfold MRInstrumentModel.fStat"
+  ],
+  [
+   "weak_instrument_bias_increases",
+   "StratificationConfounding.lean",
+   598,
+   "linarith linarith"
+  ],
+  [
+   "effect_size_cauchy_schwarz",
+   "TransferLearningPGS.lean",
+   143,
+   "simpa using sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (F"
+  ],
+  [
+   "effect_genetic_correlation_bounded",
+   "TransferLearningPGS.lean",
+   155,
+   "unfold effectGeneticCorrelation rfl rfl rfl"
+  ],
+  [
+   "sourceTruthR2_eq_sharedLDHeritability",
+   "TransferLearningPGS.lean",
+   168,
+   "unfold sourceTruthR2SharedLD pgsR2 sharedLDHeritability"
+  ],
+  [
+   "pgsPhenoCov_standardizedDiagonalLD",
+   "TransferLearningPGS.lean",
+   253,
+   "unfold pgsPhenoCov standardizedDiagonalLD simp"
+  ],
+  [
+   "pgsPhenoCov_self_standardizedDiagonalLD",
+   "TransferLearningPGS.lean",
+   261,
+   "unfold additiveGeneticVariance ring"
+  ],
+  [
+   "sharedLDGeneticVariance_standardizedDiagonalLD_eq_additiveGeneticVariance",
+   "TransferLearningPGS.lean",
+   270,
+   "unfold sharedLDGeneticVariance"
+  ],
+  [
+   "sharedLDHeritability_standardizedDiagonalLD_eq_additiveHeritability",
+   "TransferLearningPGS.lean",
+   277,
+   "unfold sharedLDHeritability additiveHeritability sharedLDGen"
+  ],
+  [
+   "additiveHeritability_proportional",
+   "TransferLearningPGS.lean",
+   398,
+   "unfold additiveHeritability ring"
+  ],
+  [
+   "sourceSelfR2DiagonalLD_pos",
+   "TransferLearningPGS.lean",
+   482,
+   "unfold additiveHeritability"
+  ],
+  [
+   "ben_david_pgs_bound",
+   "TransferLearningPGS.lean",
+   566,
+   "unfold benDavidUpperBound linarith [cert.target_le_source_pl"
+  ],
+  [
+   "larger_lambda_star_worsens_ben_david_bound",
+   "TransferLearningPGS.lean",
+   595,
+   "unfold benDavidUpperBound linarith"
+  ],
+  [
+   "iw_ess_le_n",
+   "TransferLearningPGS.lean",
+   636,
+   "unfold importanceWeightESS"
+  ],
+  [
+   "pca_target_error_difference",
+   "TransferLearningPGS.lean",
+   775,
+   "unfold pcaNetTargetError pcaSignalLossPenalty pcaBiasReducti"
+  ],
+  [
+   "gaussianSourceResidualRisk_strictAnti",
+   "TransferLearningPGS.lean",
+   980,
+   "unfold gaussianSourceResidualRisk"
+  ],
+  [
+   "pinskerAncestryDivergenceCap_mono",
+   "TransferLearningPGS.lean",
+   988,
+   "unfold pinskerAncestryDivergenceCap nlinarith"
+  ],
+  [
+   "benDavidUpperBound_le_infoCertifiedBenDavidUpperBound",
+   "TransferLearningPGS.lean",
+   1020,
+   "unfold benDavidUpperBound infoCertifiedBenDavidUpperBound li"
+  ],
+  [
+   "fineTunedTargetR2_eq_transportedR2_plus_adaptation",
+   "TransferLearningPGS.lean",
+   1134,
+   "unfold fineTunedTargetR2 transportPenalty ring"
+  ],
+  [
+   "fineTunedTargetR2_eq_deployedTransferTargetR2",
+   "TransferLearningPGS.lean",
+   1146,
+   "unfold deployedTransferTargetR2 ring"
+  ],
+  [
+   "scratchTargetR2_eq_targetHeritability_minus_estimationPenalty_diagonalLD",
+   "TransferLearningPGS.lean",
+   1165,
+   "unfold scratchTargetR2 targetOracleR2DiagonalLD"
+  ],
+  [
+   "scratchTargetR2_eq_deployedTransferTargetR2",
+   "TransferLearningPGS.lean",
+   1179,
+   "unfold scratchTargetR2 deployedTransferTargetR2 oracleTransp"
+  ],
+  [
+   "deployedTransferTargetR2_eq_oracle_minus_residualGap_minus_estimationPenalty",
+   "TransferLearningPGS.lean",
+   1192,
+   "unfold deployedTransferTargetR2 oracleTransportAdaptationGai"
+  ],
+  [
+   "fine_tuned_target_r2_exceeds_scratch_of_penalty_gap",
+   "TransferLearningPGS.lean",
+   1214,
+   "unfold scratchTargetR2 fineTunedTargetR2 linarith"
+  ],
+  [
+   "sampleLimitedScratchTargetR2_eq_targetHeritability_minus_noise_over_n_diagonalLD",
+   "TransferLearningPGS.lean",
+   1231,
+   "unfold sampleLimitedScratchTargetR2 scratchTargetR2 targetOr"
+  ],
+  [
+   "metaLearnedTransferGapSq_eq_sourcePopulationMeanEffectGapSq",
+   "TransferLearningPGS.lean",
+   1626,
+   "unfold metaLearnedTransferGapSq"
+  ],
+  [
+   "dotProduct_add_left",
+   "TransferLearningPGS.lean",
+   1639,
+   "simp [dotProduct, add_mul, Finset.sum_add_distrib]"
+  ],
+  [
+   "dotProduct_add_right",
+   "TransferLearningPGS.lean",
+   1645,
+   "simp [dotProduct, mul_add, Finset.sum_add_distrib]"
+  ],
+  [
+   "dotProduct_comm",
+   "TransferLearningPGS.lean",
+   1651,
+   "simp [dotProduct, mul_comm]"
+  ],
+  [
+   "populationDeviationSum_succ",
+   "TransferLearningPGS.lean",
+   1709,
+   "simp [populationDeviationSum, Finset.sum_range_succ]"
+  ],
+  [
+   "weightedMetaTransferGapSq_eq_weightedPopulationEffectAverageGapSq",
+   "TransferLearningPGS.lean",
+   2098,
+   "unfold weightedMetaTransferGapSq"
+  ],
+  [
+   "optimalFineTuningMSE_eq_closed_form",
+   "TransferLearningPGS.lean",
+   2338,
+   "unfold optimalFineTuningMSE ring"
+  ],
+  [
+   "dotProduct_mulVec_swap_of_isSymm",
+   "TransferLearningPGS.lean",
+   2442,
+   "simpa [dotProduct, hA.eq, mul_comm] using h"
+  ],
+  [
+   "fineTunedTargetR2_eq_deployedTransferTargetR2_exactAdaptationGain",
+   "TransferLearningPGS.lean",
+   2586,
+   "simpa using fineTunedTargetR2_eq_deployedTransferTargetR2"
+  ],
+  [
+   "subunit_effect_correlation_prevents_attaining_target_heritability",
+   "TransferLearningPGS.lean",
+   2940,
+   "nlinarith"
+  ],
+  [
+   "eval_centered_zero",
+   "TransportIdentities.lean",
+   91,
+   "simp] ring"
+  ],
+  [
+   "dot_add_left",
+   "TransportIdentities.lean",
+   197,
+   "simp [dot, add_mul, Finset.sum_add_distrib]"
+  ],
+  [
+   "dot_sub_left",
+   "TransportIdentities.lean",
+   201,
+   "simp [dot, sub_eq_add_neg, add_mul, Finset.sum_add_distrib]"
+  ],
+  [
+   "matrix_mulVec_add",
+   "TransportIdentities.lean",
+   328,
+   "simp [Matrix.mulVec, dotProduct, left_distrib, Finset.sum_ad"
+  ],
+  [
+   "secondMoment_eq_covariance_of_centered",
+   "TransportIdentities.lean",
+   413,
+   "unfold secondMomentMatrix covarianceMatrix simp [covariance_"
+  ],
+  [
+   "transported_covariance_decomposes",
+   "TransportIdentities.lean",
+   611,
+   "unfold transportedCovariance locusTerm simpa [mul_assoc, mul"
+  ],
+  [
+   "total_variance_decomposition_subsigma",
+   "TransportIdentities.lean",
+   727,
+   "simpa [add_comm] using"
+  ],
+  [
+   "mse_from_variance_ratio_corr_bias",
+   "TransportIdentities.lean",
+   788,
+   "ring"
+  ],
+  [
+   "one_sub_prevalence",
+   "TransportIdentities.lean",
+   826,
+   "unfold prevalence linarith [c.mass_one]"
+  ],
+  [
+   "precision_eq_prevalence_recall_fpr",
+   "TransportIdentities.lean",
+   850,
+   "unfold precision rfl"
+  ],
+  [
+   "likelihoodRatioStat_nonneg",
+   "ValidationStatistics.lean",
+   65,
+   "unfold likelihoodRatioStat nlinarith"
+  ],
+  [
+   "likelihoodRatioStat_pos",
+   "ValidationStatistics.lean",
+   72,
+   "unfold likelihoodRatioStat nlinarith"
+  ],
+  [
+   "snp_h2_le_narrow_h2",
+   "VarianceComponents.lean",
+   59,
+   "unfold snpH2 narrowSenseH2"
+  ],
+  [
+   "liability_h2_larger_for_rare",
+   "VarianceComponents.lean",
+   372,
+   "unfold liabilityScaleH2"
+  ],
+  [
+   "prevalence_confounds_h2_portability",
+   "VarianceComponents.lean",
+   386,
+   "unfold liabilityScaleH2 simp"
+  ],
+  [
+   "rightTransform_add",
+   "WhiteningEquivalence.lean",
+   32,
+   "simp [rightTransform, Matrix.mulVec, dotProduct, Finset.sum_"
+  ]
+ ],
+ "dups": {
+  "1/(1+4*Ne*m)": [
+   [
+    "equilibriumFst",
+    "AncestrySpecificArchitecture.lean",
+    353
+   ],
+   [
+    "demoIslandModelFst",
+    "DemographicHistory.lean",
+    40
+   ],
+   [
+    "islandModelFst",
+    "PopulationGeneticsFoundations.lean",
+    785
+   ],
+   [
+    "fstMigrationDriftEquilibrium",
+    "PortabilityDrift.lean",
+    4081
+   ]
+  ],
+  "\u03c0*(1-\u03c0)*(1-r2)": [
+   [
+    "calibratedBrier",
+    "DGP.lean",
+    2108
+   ],
+   [
+    "exactCalibratedBrierRiskFromR2",
+    "PortabilityDrift.lean",
+    2577
+   ]
+  ],
+  "1/(2*Ne)": [
+   [
+    "driftLDCreationRate",
+    "DemographicHistory.lean",
+    553
+   ],
+   [
+    "ldDecayRatePerGen",
+    "LDDecayTheory.lean",
+    652
+   ]
+  ],
+  "(m:CrossPopulationMetricModelpq):\u211d:=targetR2FromSourceWeightsm/sourceR2FromSourceWeightsm": [
+   [
+    "sourceTargetPortabilityRatio",
+    "GeneticArchitectureDiscovery.lean",
+    662
+   ],
+   [
+    "mechanisticPortabilityRatio",
+    "SimulationValidation.lean",
+    29
+   ]
+  ],
+  "(1-1/(2*Ne))^t": [
+   [
+    "ldRetainedFraction",
+    "LDDecayTheory.lean",
+    712
+   ],
+   [
+    "neutralDriftFactor",
+    "PhenomeWidePortability.lean",
+    92
+   ]
+  ],
+  "1-(1-1/(2*Ne))^t": [
+   [
+    "heterozygosityLossFromDrift",
+    "PopulationGeneticsFoundations.lean",
+    409
+   ],
+   [
+    "fstDerived",
+    "PopulationGeneticsFoundations.lean",
+    1110
+   ]
+  ],
+  "(m\u2081\u2082+m\u2082\u2081)/2": [
+   [
+    "effectiveMigration",
+    "PopulationGeneticsFoundations.lean",
+    982
+   ],
+   [
+    "effectiveSymmetricMigration",
+    "PortabilityDrift.lean",
+    4545
+   ]
+  ],
+  "![0.8,0.4]": [
+   [
+    "crossSource",
+    "PortabilityDrift.lean",
+    820
+   ],
+   [
+    "crossTarget",
+    "PortabilityDrift.lean",
+    824
+   ]
+  ]
+ }
+}

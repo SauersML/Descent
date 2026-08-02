@@ -99,20 +99,55 @@ theorem matched_panel_optimal
         exact mul_le_mul_of_nonneg_left h_pm_le h_r2
     _ = r2_LD := mul_one _
 
+/-- **Mean imputation quality as a function of LD extent.**
+
+    `1 - c / ld_extent` is an `r²` and must lie in `[0, 1]`, but the bare
+    expression goes negative for `ld_extent < c` — which is the short-LD limit
+    the portability claim is about, not a remote corner. The clamp at `0` is
+    what makes this a quality measure at every LD extent; the theorems below
+    that need the unclamped branch say so with a hypothesis `c < ld_extent`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def meanImputationR2 (c ld_extent : ℝ) : ℝ :=
+  max 0 (1 - c / ld_extent)
+
+/-- The clamped quality measure is an `r²`: it lies in `[0, 1]` for every
+positive tagging constant and LD extent, with no side condition. -/
+theorem meanImputationR2_mem_unit (c ld_extent : ℝ)
+    (h_c : 0 < c) (h_ld : 0 < ld_extent) :
+    0 ≤ meanImputationR2 c ld_extent ∧ meanImputationR2 c ld_extent ≤ 1 := by
+  have h_frac_pos : 0 < c / ld_extent := div_pos h_c h_ld
+  refine ⟨le_max_left _ _, ?_⟩
+  unfold meanImputationR2
+  apply max_le
+  · norm_num
+  · linarith
+
 /-- **LD-dependent imputation creates systematic bias.**
     In populations with shorter LD (e.g., AFR), tagging is worse,
     so imputation quality is systematically lower.
     This creates a baseline portability artifact.
-    Model: mean imputation r² = f(LD_extent) where f is monotone increasing.
-    Shorter LD → smaller LD_extent → lower mean imputation r².
-    Specifically, mean_r2 = 1 - c/LD_extent for constant c > 0. -/
+    Model: mean imputation r² = `meanImputationR2 c ld_extent`, monotone
+    increasing in LD extent. Shorter LD → smaller LD_extent → lower mean
+    imputation r². The hypothesis `c < ld_extent_short` is what puts both
+    populations on the unclamped branch; below it the measure is `0` in both and
+    the comparison is an equality rather than a strict inequality. -/
 theorem shorter_ld_worse_imputation
     (c ld_extent_long ld_extent_short : ℝ)
     (h_c : 0 < c) (h_long : c < ld_extent_long) (h_short : c < ld_extent_short)
     (h_shorter : ld_extent_short < ld_extent_long) :
-    1 - c / ld_extent_short < 1 - c / ld_extent_long := by
+    meanImputationR2 c ld_extent_short < meanImputationR2 c ld_extent_long := by
+  have h_short_pos : 0 < ld_extent_short := by linarith
+  have h_long_pos : 0 < ld_extent_long := by linarith
   have h1 : c / ld_extent_long < c / ld_extent_short :=
-    div_lt_div_of_pos_left h_c (by linarith) h_shorter
+    div_lt_div_of_pos_left h_c h_short_pos h_shorter
+  have h_short_lt_one : c / ld_extent_short < 1 := by
+    rw [div_lt_one h_short_pos]; linarith
+  have h_long_lt_one : c / ld_extent_long < 1 := by
+    rw [div_lt_one h_long_pos]; linarith
+  unfold meanImputationR2
+  rw [max_eq_right (by linarith : (0 : ℝ) ≤ 1 - c / ld_extent_short),
+    max_eq_right (by linarith : (0 : ℝ) ≤ 1 - c / ld_extent_long)]
   linarith
 
 /-- **Imputation quality filtering threshold.**

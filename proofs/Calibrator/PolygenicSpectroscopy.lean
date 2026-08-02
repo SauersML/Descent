@@ -366,6 +366,157 @@ theorem rare_variant_drift_lower_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8
   unfold hweMellinDrift
   linarith
 
+/-- **Rare-variant upper bound.** For `0 < q ≤ 1/8`,
+`c(q) ≤ log (1 / (2q)) + 4 q log 2`.
+
+The two ingredients are that the heterozygote's squared standardized value
+`(1 - 2q) ^ 2 / (2q(1-q))` never exceeds `1 / (2q)` on this range — because
+`(1 - 2q) ^ 2 ≤ 1 - q` — and that the two homozygote contributions together
+supply only `4q(1-q) log 2`, which is `O(q)`.
+
+This is the missing half of the rare-variant asymptotic. `rare_variant_drift_lower_bound`
+shows the drift diverges; this shows it diverges no faster than `log (1 / (2q))`,
+and `rare_variant_drift_sharp_lower_bound` matches the same leading term from
+below. -/
+theorem rare_variant_drift_upper_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8) :
+    hweMellinDrift q ≤ Real.log (1 / (2 * q)) + 4 * q * Real.log 2 := by
+  have hqlt : q < 1 := by linarith
+  have hp : (0 : ℝ) < 1 - q := by linarith
+  have h2q : (0 : ℝ) < 1 - 2 * q := by linarith
+  have hden : (0 : ℝ) < 2 * q * (1 - q) := by positivity
+  -- The heterozygote's log argument never exceeds `1 / (2q)`: the difference
+  -- factors as `q (3 - 4q)` over a positive denominator.
+  have hkey : (1 - 2 * q) ^ 2 / (2 * q * (1 - q)) ≤ 1 / (2 * q) := by
+    rw [← sub_nonneg]
+    have hfac : 1 / (2 * q) - (1 - 2 * q) ^ 2 / (2 * q * (1 - q))
+        = (q * (3 - 4 * q)) / (2 * q * (1 - q)) := by
+      first
+        | (field_simp; ring)
+        | field_simp
+    rw [hfac]
+    refine div_nonneg ?_ hden.le
+    nlinarith [hq0, hq]
+  have harg0 : (0 : ℝ) < (1 - 2 * q) ^ 2 / (2 * q * (1 - q)) :=
+    div_pos (pow_pos h2q 2) hden
+  -- The log is nonnegative because the argument is at least `1` on `q ≤ 1/8`.
+  have hlognn : 0 ≤ Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) := by
+    apply Real.log_nonneg
+    rw [le_div_iff₀ hden]
+    nlinarith [hq0, hq, sq_nonneg q]
+  have hlogle : Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))
+      ≤ Real.log (1 / (2 * q)) := Real.log_le_log harg0 hkey
+  have hcoef : (1 - 2 * q) ^ 2 ≤ 1 := by nlinarith [hq0, hq]
+  have hterm1 : (1 - 2 * q) ^ 2 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))
+      ≤ Real.log (1 / (2 * q)) := by
+    calc (1 - 2 * q) ^ 2 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))
+        ≤ 1 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) :=
+          mul_le_mul_of_nonneg_right hcoef hlognn
+      _ = Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) := one_mul _
+      _ ≤ Real.log (1 / (2 * q)) := hlogle
+  have hterm2 : 4 * q * (1 - q) * Real.log 2 ≤ 4 * q * Real.log 2 := by
+    have hl2 : (0 : ℝ) ≤ Real.log 2 := Real.log_nonneg (by norm_num)
+    have hgap : 4 * q * Real.log 2 - 4 * q * (1 - q) * Real.log 2
+        = (4 * q ^ 2) * Real.log 2 := by ring
+    have hnn : 0 ≤ (4 * q ^ 2) * Real.log 2 := mul_nonneg (by positivity) hl2
+    linarith
+  unfold hweMellinDrift
+  linarith
+
+/-- **Rare-variant sharp lower bound.** For `0 < q ≤ 1/8`,
+`(1 - 4q) log (1 / (2q)) - 6q ≤ c(q)`.
+
+Paired with `rare_variant_drift_upper_bound` this sandwiches the drift between
+`(1 - 4q) log (1/(2q)) - 6q` and `log (1/(2q)) + 4q log 2`, so
+
+  `c(q) = log (1 / (2q)) + O(q log (1/q))`,
+
+and in particular `c(q) / log (1 / (2q)) → 1` as `q → 0`. The sandwich is tight
+in practice: at `q = 10 ^ (-5)` the two sides agree to four decimal places.
+
+**Where the divergence comes from, since it is easy to get wrong.** It is the
+**heterozygote**, not the rare homozygote. The heterozygote has probability
+`2q(1-q)` and squared standardized value `(1-2q)^2 / (2q(1-q))`, and those
+multiply to `(1-2q)^2 → 1`: it carries essentially the entire second moment, at
+a log-value `≈ log (1/(2q))` that diverges. The rare homozygote is the tempting
+culprit because its standardized value is large, `≈ sqrt (2/q)`, but its
+contribution is `q^2 * (2/q) * log (2/q) ≈ 2q log (1/q) → 0` — it is *too rare
+to matter*. This is why the leading constant is `log (1/(2q))` and not
+`log (1/q)` or `log (2/q)`: the `2` is the heterozygote's `2q(1-q)`
+denominator.
+
+The proof splits the heterozygote logarithm as
+`log (1/(2q)) + log ((1-2q)^2 / (1-q))` and bounds the second piece below by
+`-6q`, via `(1-2q)^2 / (1-q) ≥ 1 - 3q ≥ exp (-6q)`. -/
+theorem rare_variant_drift_sharp_lower_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8) :
+    (1 - 4 * q) * Real.log (1 / (2 * q)) - 6 * q ≤ hweMellinDrift q := by
+  have hp : (0 : ℝ) < 1 - q := by linarith
+  have h2q : (0 : ℝ) < 1 - 2 * q := by linarith
+  have h3q : (0 : ℝ) < 1 - 3 * q := by linarith
+  have hden : (0 : ℝ) < 2 * q * (1 - q) := by positivity
+  have hBpos : (0 : ℝ) < 1 / (2 * q) := by positivity
+  have hRpos : (0 : ℝ) < (1 - 2 * q) ^ 2 / (1 - q) := div_pos (pow_pos h2q 2) hp
+  -- Split the heterozygote logarithm into the leading term and a remainder.
+  have hsplit : (1 - 2 * q) ^ 2 / (2 * q * (1 - q))
+      = (1 / (2 * q)) * ((1 - 2 * q) ^ 2 / (1 - q)) := by
+    first
+      | (field_simp; ring)
+      | field_simp
+  have hlogsplit : Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))
+      = Real.log (1 / (2 * q)) + Real.log ((1 - 2 * q) ^ 2 / (1 - q)) := by
+    rw [hsplit, Real.log_mul (ne_of_gt hBpos) (ne_of_gt hRpos)]
+  -- The remainder is at least `1 - 3q`, since `(1-2q)^2 - (1-3q)(1-q) = q^2 ≥ 0`.
+  have hR : (1 : ℝ) - 3 * q ≤ (1 - 2 * q) ^ 2 / (1 - q) := by
+    rw [le_div_iff₀ hp]
+    nlinarith [sq_nonneg q]
+  -- and `1 - 3q ≥ exp (-6q)` on this range, from `exp (6q) ≥ 1 + 6q`.
+  have hexp : Real.exp (-(6 * q)) ≤ 1 - 3 * q := by
+    have hlin : 6 * q + 1 ≤ Real.exp (6 * q) := Real.add_one_le_exp _
+    have hEpos : (0 : ℝ) < Real.exp (6 * q) := Real.exp_pos _
+    have hprod : (1 : ℝ) ≤ (1 - 3 * q) * Real.exp (6 * q) := by
+      nlinarith [mul_nonneg h3q.le (by linarith : (0 : ℝ) ≤ Real.exp (6 * q) - (6 * q + 1)),
+        mul_nonneg hq0.le (by linarith : (0 : ℝ) ≤ 1 - 6 * q)]
+    have hmul : Real.exp (-(6 * q)) * Real.exp (6 * q) = 1 := by
+      rw [← Real.exp_add]
+      simp
+    nlinarith [hEpos, hprod, hmul]
+  have hlogR : -(6 * q) ≤ Real.log ((1 - 2 * q) ^ 2 / (1 - q)) := by
+    have hchain : Real.exp (-(6 * q)) ≤ (1 - 2 * q) ^ 2 / (1 - q) := le_trans hexp hR
+    have hmono := Real.log_le_log (Real.exp_pos _) hchain
+    rwa [Real.log_exp] at hmono
+  -- The leading term is at least `log 4`, comfortably above `6q`.
+  have hlogB : Real.log 4 ≤ Real.log (1 / (2 * q)) := by
+    refine Real.log_le_log (by norm_num) ?_
+    rw [le_div_iff₀ (by positivity)]
+    linarith
+  have hlog4 : Real.log 4 = 2 * Real.log 2 := by
+    rw [show (4 : ℝ) = 2 ^ (2 : ℕ) by norm_num, Real.log_pow]
+    norm_num
+  have hl2 : (0.6931471803 : ℝ) < Real.log 2 := Real.log_two_gt_d9
+  have hBnn : 6 * q ≤ Real.log (1 / (2 * q)) := by
+    have hsmall : 6 * q ≤ 3 / 4 := by linarith
+    linarith [hlogB, hlog4, hl2]
+  have hLlow : Real.log (1 / (2 * q)) - 6 * q
+      ≤ Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) := by
+    rw [hlogsplit]
+    linarith [hlogR]
+  have hcoef : 1 - 4 * q ≤ (1 - 2 * q) ^ 2 := by nlinarith [sq_nonneg q]
+  have hmain : (1 - 4 * q) * (Real.log (1 / (2 * q)) - 6 * q)
+      ≤ (1 - 2 * q) ^ 2 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) := by
+    have hnn : (0 : ℝ) ≤ Real.log (1 / (2 * q)) - 6 * q := by linarith [hBnn]
+    calc (1 - 4 * q) * (Real.log (1 / (2 * q)) - 6 * q)
+        ≤ (1 - 2 * q) ^ 2 * (Real.log (1 / (2 * q)) - 6 * q) :=
+          mul_le_mul_of_nonneg_right hcoef hnn
+      _ ≤ (1 - 2 * q) ^ 2 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) :=
+          mul_le_mul_of_nonneg_left hLlow (by positivity)
+  have htail : 0 ≤ 4 * q * (1 - q) * Real.log 2 := by
+    have : (0 : ℝ) ≤ Real.log 2 := Real.log_nonneg (by norm_num)
+    positivity
+  have hfinal : (1 - 4 * q) * Real.log (1 / (2 * q)) - 6 * q
+      ≤ (1 - 4 * q) * (Real.log (1 / (2 * q)) - 6 * q) := by
+    nlinarith [sq_nonneg q, hq0]
+  unfold hweMellinDrift
+  linarith [hmain, htail, hfinal]
+
 /-- **The genotype drift exceeds the Gaussian condensation constant for rare
 variants.** Already at `q = 1 / 256` the drift is above `c_G`.
 
@@ -417,6 +568,72 @@ theorem maxSafeEpistaticOrder_eq_criticalDegree (N q : ℝ) :
 theorem epistatic_order_safe_iff {N q m : ℝ} (hc : 0 < hweMellinDrift q) :
     m < maxSafeEpistaticOrder N q ↔ hweMellinDrift q * m < Real.log N :=
   subcritical_iff hc
+
+/-- **A drift above the Gaussian constant is a safe order below the Gaussian value.**
+
+`maxSafeEpistaticOrder` is `log N / c(q)` and the Gaussian calculation is
+`log N / c_G`; both share the numerator, so the comparison is entirely a
+comparison of drifts. Stated separately because it is the step at which the
+frequency-dependence of `c(q)` becomes an actionable statement about a study
+design rather than a fact about a function. -/
+theorem maxSafeEpistaticOrder_lt_gaussian_of_drift_excess
+    {N q : ℝ} (hN : 0 < Real.log N)
+    (hlt : condensationConstant < hweMellinDrift q) :
+    maxSafeEpistaticOrder N q < criticalDegree N condensationConstant := by
+  unfold maxSafeEpistaticOrder criticalDegree
+  first
+    | exact div_lt_div_of_pos_left hN condensationConstant_pos hlt
+    | exact div_lt_div_of_lt_left hN condensationConstant_pos hlt
+
+/-- **The rare-variant drift is more than seven times the Gaussian constant.**
+
+At `q = 1 / 1024 = 0.00098`, essentially the `q = 0.001` row of the table in the
+module docstring, `rare_variant_drift_sharp_lower_bound` gives
+`c(q) ≥ (1 - 4/1024) * 9 log 2 - 6/1024 = 6.2081...`, while
+`condensationConstant_bounds` gives `c_G < 0.807`. So `c(q) > 7 c_G`.
+
+The crude `rare_variant_drift_lower_bound` cannot reach this: it would only give
+`c(q) ≥ (1/4) log (128) = 1.213`, a factor of `1.5`. Recovering the true factor
+— numerically `8.5` — is what the sharp bound buys. -/
+theorem sevenfold_drift_excess_at_rare_maf :
+    7 * condensationConstant < hweMellinDrift (1 / 1024) := by
+  have hlb := rare_variant_drift_sharp_lower_bound (q := 1 / 1024) (by norm_num) (by norm_num)
+  have harg : (1 : ℝ) / (2 * (1 / 1024)) = 512 := by norm_num
+  rw [harg] at hlb
+  have h512 : Real.log 512 = 9 * Real.log 2 := by
+    rw [show (512 : ℝ) = 2 ^ (9 : ℕ) by norm_num, Real.log_pow]
+    norm_num
+  rw [h512] at hlb
+  have hl2 : (0.6931471803 : ℝ) < Real.log 2 := Real.log_two_gt_d9
+  have hcc : condensationConstant < 0.807 := condensationConstant_bounds.2
+  linarith
+
+/-- **The safe epistatic order collapses by more than sevenfold at MAF `10 ^ (-3)`.**
+
+`7 * maxSafeEpistaticOrder N (1/1024) < criticalDegree N c_G`: a design calibrated
+by the Gaussian condensation constant overstates the safe interaction order at a
+rare-variant panel by more than a factor of seven.
+
+The number that matters downstream: at `N = 10 ^ 6` disjoint terms
+(`log N = 13.8`) the Gaussian calculation gives a safe order near `19`, and the
+genotype drift at this frequency gives a safe order near `2`. Pairwise
+interaction statistics on standardized rare variants therefore sit *at* the
+condensation boundary, not two decades below it, and the Gaussian-surrogate null
+used to calibrate them is converging to a different limit. -/
+theorem maxSafeEpistaticOrder_collapse_at_rare_maf {N : ℝ} (hN : 0 < Real.log N) :
+    7 * maxSafeEpistaticOrder N (1 / 1024) < criticalDegree N condensationConstant := by
+  have hd : 7 * condensationConstant < hweMellinDrift (1 / 1024) :=
+    sevenfold_drift_excess_at_rare_maf
+  have hgpos : 0 < condensationConstant := condensationConstant_pos
+  have hdpos : 0 < hweMellinDrift (1 / 1024) := by linarith
+  have hcross : 7 * Real.log N * condensationConstant
+      < Real.log N * hweMellinDrift (1 / 1024) := by nlinarith [hN, hd]
+  unfold maxSafeEpistaticOrder criticalDegree
+  have hrw : 7 * (Real.log N / hweMellinDrift (1 / 1024))
+      = 7 * Real.log N / hweMellinDrift (1 / 1024) := by ring
+  rw [hrw]
+  rw [div_lt_div_iff hdpos hgpos]
+  linarith
 
 /-- **Supercriticality from a small allele frequency, in usable form.**
 

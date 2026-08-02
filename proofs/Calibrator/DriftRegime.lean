@@ -93,7 +93,10 @@ noncomputable def HeterozygosityTrajectory.measuredLoss
   1 - M.het t / M.het 0
 
 /-- **Regime A: closed population, no mutation.** Heterozygosity decays geometrically
-at the drift rate. This is the premise the cluster encodes. -/
+at the drift rate. This is the premise the cluster encodes.
+
+    Regime: closed population, no mutation — stated here as the definition's whole
+    content rather than as a hidden assumption. -/
 noncomputable def closedPopulation (Ne H₀ : ℝ) (hH : 0 < H₀) : HeterozygosityTrajectory where
   het := fun t => (1 - 1 / (2 * Ne)) ^ t * H₀
   het_zero_pos := by simpa using hH
@@ -149,7 +152,11 @@ whole disease: the identities relating them are identities *in* `retention`, so 
 at every value of it, correct or not.
 -/
 
-/-- The shared premise, isolated as a single number. -/
+/-- The shared premise, isolated as a single number.
+
+    Regime: closed population, no mutation. Isolating it is the point: every
+    member of the cluster is a function of this one value, so every identity among
+    them is an identity in it. -/
 noncomputable def driftRetention (Ne : ℝ) (t : ℕ) : ℝ := (1 - 1 / (2 * Ne)) ^ t
 
 /-- Cluster member: heterozygosity loss. -/

@@ -19,7 +19,7 @@ Reference: Wang et al. (2026), Nature Communications 17:942.
 
 section IslandModel
 
-/-- Island model equilibrium F_ST: 1 / (1 + 4·Ne·m).
+/-! Island model equilibrium F_ST: `1 / (1 + 4·Ne·m)`.
 
     Empirical status: CONDITIONALLY VALID. A simulation check was attempted and was
     invalid, because the migration parameter was supplied per pair of demes, so
@@ -36,15 +36,19 @@ section IslandModel
     assumption, and there are four of them in four files.
 
     Empirical status: CONDITIONALLY VALID. Accurate in the limit it was derived
-    for; frequently violated in use. Neither validated nor falsified. -/
-noncomputable def demoIslandModelFst (Ne m : ℝ) : ℝ :=
-  1 / (1 + 4 * Ne * m)
+    for; frequently violated in use. Neither validated nor falsified.
+
+This file used to restate the formula as `demoIslandModelFst`. It is
+`islandModelFst` from `Calibrator.PopulationGeneticsFoundations`, which this
+file already imports, so the restatement has been deleted and the theorems
+below are stated about that one definition. The regime caveats above travel
+with it. -/
 
 /-- Island model F_ST is in (0, 1) for positive Ne and m. -/
 theorem island_fst_in_unit_interval (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) :
-    0 < demoIslandModelFst Ne m ∧ demoIslandModelFst Ne m < 1 := by
-  unfold demoIslandModelFst
+    0 < islandModelFst Ne m ∧ islandModelFst Ne m < 1 := by
+  unfold islandModelFst
   constructor
   · positivity
   · rw [div_lt_one (by positivity)]; linarith [mul_pos hNe hm]
@@ -53,8 +57,8 @@ theorem island_fst_in_unit_interval (Ne m : ℝ)
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
     (h_more : m₁ < m₂) :
-    demoIslandModelFst Ne m₂ < demoIslandModelFst Ne m₁ := by
-  unfold demoIslandModelFst
+    islandModelFst Ne m₂ < islandModelFst Ne m₁ := by
+  unfold islandModelFst
   apply div_lt_div_of_pos_left one_pos (by positivity) (by nlinarith)
 
 /-- **Connection to derived formula**: `islandModelFst` equals
@@ -63,13 +67,13 @@ theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     `fstMigrationDriftEquilibrium` was derived from first principles via
     the migration-drift balance in `PortabilityDrift`. -/
 theorem islandModelFst_eq_derived (Ne m : ℝ) :
-    demoIslandModelFst Ne m = fstMigrationDriftEquilibrium Ne m := by
-  unfold demoIslandModelFst fstMigrationDriftEquilibrium
+    islandModelFst Ne m = fstMigrationDriftEquilibrium Ne m := by
+  unfold islandModelFst fstMigrationDriftEquilibrium
   ring
 
 /-- Equivalent formulation: `islandModelFst` = 1/(1 + M) where M = `scaledMigrationRate`. -/
 theorem islandModelFst_eq_from_scaledMigration (Ne m : ℝ) :
-    demoIslandModelFst Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
+    islandModelFst Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
   rw [islandModelFst_eq_derived]
   exact fstMigrationDriftEquilibrium_eq_from_M Ne m
 
@@ -147,10 +151,10 @@ which is `steppingStoneFst` as defined above.
 noncomputable def steppingStoneCoalescenceTime (d σ_sq m : ℝ) : ℝ :=
   d / (σ_sq * m)
 
-/-- **Fst from coalescence time ratio**: Fst = T/(T + 2Ne).
-    This is the general relationship between coalescence time and Fst. -/
-noncomputable def fstFromCoalescenceTime (T Ne : ℝ) : ℝ :=
-  T / (T + 2 * Ne)
+/-! **Fst from coalescence time ratio**: `Fst = T/(T + 2Ne)`. This file used to
+restate it as `fstFromCoalescenceTime`; it is `coalFst` from
+`Calibrator.PopulationGeneticsFoundations`, and the restatement has been
+deleted in favour of that one. -/
 
 /-- **Derivation**: the stepping-stone Fst formula arises from the coalescence
     time. When T(d) = d/(σ²·m), we get:
@@ -169,9 +173,9 @@ noncomputable def fstFromCoalescenceTime (T Ne : ℝ) : ℝ :=
     which is exactly `steppingStoneFst d Ne m σ_sq`. -/
 theorem steppingStoneFst_from_coalescence_time (d Ne m σ_sq : ℝ)
     (hσ : σ_sq ≠ 0) (hm : m ≠ 0) :
-    fstFromCoalescenceTime (steppingStoneCoalescenceTime d σ_sq m) (2 * Ne * σ_sq * m) =
+    coalFst (steppingStoneCoalescenceTime d σ_sq m) (2 * Ne * σ_sq * m) =
       d / (d + 4 * Ne * σ_sq ^ 2 * m ^ 2) := by
-  unfold fstFromCoalescenceTime steppingStoneCoalescenceTime
+  unfold coalFst steppingStoneCoalescenceTime
   field_simp
   ring_nf
 
@@ -185,8 +189,8 @@ theorem steppingStoneCoalescenceTime_pos (d σ_sq m : ℝ)
 /-- Fst from coalescence time is in (0, 1) for positive parameters. -/
 theorem fstFromCoalescenceTime_in_unit (T Ne : ℝ)
     (hT : 0 < T) (hNe : 0 < Ne) :
-    0 < fstFromCoalescenceTime T Ne ∧ fstFromCoalescenceTime T Ne < 1 := by
-  unfold fstFromCoalescenceTime
+    0 < coalFst T Ne ∧ coalFst T Ne < 1 := by
+  unfold coalFst
   constructor
   · positivity
   · rw [div_lt_one (by linarith)]; linarith
@@ -571,6 +575,13 @@ theorem excessDriftRate_pos (Ne_b Ne_stable : ℝ)
     Each generation's excess LD contribution decays by (1 - 1/(2·Ne_b))
     per subsequent generation. The cumulative excess is:
     Σ_{k=0}^{t_b-1} (1-1/(2·Ne_b))^k × excessDriftRate(Ne_b, Ne_stable)
+
+    Regime: closed population, no mutation, for the duration of the bottleneck.
+    The geometric decay factor is the drift-only retention; see
+    `Calibrator.DriftRegime`, which proves that at mutation-drift balance the
+    measured retention is stationary and this factor does not describe it. Over a
+    short bottleneck the assumption is defensible, which is precisely why it must
+    be stated rather than inferred from the body.
 
     Empirical status: UNTESTED. -/
 noncomputable def cumulativeExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ) : ℝ :=

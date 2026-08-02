@@ -311,7 +311,7 @@ theorem driftLDRetention_pos (Ne c : ℝ)
     0 < driftLDRetention Ne c := by
   have hu_lt : 1 / (2 * Ne) < 1 := by
     rw [div_lt_one (by linarith)]; linarith
-  have hk_pos : 0 < (1 - c) ^ 2 := by positivity
+  have hk_pos : 0 < (1 - c) ^ 2 := pow_pos (by linarith : (0:ℝ) < 1 - c) 2
   unfold driftLDRetention
   exact mul_pos hk_pos (by linarith)
 
@@ -395,9 +395,9 @@ theorem driftLDEquilibrium_antitone (Ne₁ Ne₂ c : ℝ)
     nlinarith [mul_nonneg hc (by linarith : (0:ℝ) ≤ 2 - c)]
   have hu_le : 1 / (2 * Ne₂) ≤ 1 / (2 * Ne₁) :=
     one_div_le_one_div_of_le (by linarith) (by linarith)
-  unfold driftLDEquilibrium at *
-  unfold driftLDRetention at *
+  unfold driftLDEquilibrium
   rw [div_le_div_iff₀ hd₂ hd₁]
+  unfold driftLDRetention
   nlinarith [mul_nonneg (mul_nonneg hk_nonneg (sub_nonneg.2 hk_le))
     (sub_nonneg.2 hu_le)]
 
@@ -409,14 +409,14 @@ theorem driftLDEquilibrium_strictAnti (Ne₁ Ne₂ c : ℝ)
   have hNe₂ : (1 : ℝ) ≤ Ne₂ := by linarith
   have hd₁ := driftLD_one_sub_retention_pos Ne₁ c hNe₁ (le_of_lt hc) (le_of_lt hc1)
   have hd₂ := driftLD_one_sub_retention_pos Ne₂ c hNe₂ (le_of_lt hc) (le_of_lt hc1)
-  have hk_pos : 0 < (1 - c) ^ 2 := by positivity
+  have hk_pos : 0 < (1 - c) ^ 2 := pow_pos (by linarith : (0:ℝ) < 1 - c) 2
   have hk_lt : (1 - c) ^ 2 < 1 := by
     nlinarith [mul_pos hc (by linarith : (0:ℝ) < 2 - c)]
   have hu_lt : 1 / (2 * Ne₂) < 1 / (2 * Ne₁) :=
     one_div_lt_one_div_of_lt (by linarith) (by linarith)
-  unfold driftLDEquilibrium at *
-  unfold driftLDRetention at *
+  unfold driftLDEquilibrium
   rw [div_lt_div_iff₀ hd₂ hd₁]
+  unfold driftLDRetention
   nlinarith [mul_pos (mul_pos hk_pos (sub_pos.2 hk_lt)) (sub_pos.2 hu_lt)]
 
 /-- **The trajectory of the two-locus identity measure** from an initial level

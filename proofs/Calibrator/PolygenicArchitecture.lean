@@ -61,8 +61,53 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
 noncomputable def spikeAndSlabVariance (pi sigma_sq_large sigma_sq_small : ℝ) : ℝ :=
   pi * sigma_sq_large + (1 - pi) * sigma_sq_small
 
+/-- **The spike-and-slab formula is a variance only on `0 ≤ pi ≤ 1`.**
+
+    Outside that interval `pi * σ²_large + (1 - pi) * σ²_small` is a signed
+    extrapolation of a mixture, not a mixture, and it goes negative: at `pi = 2`
+    with a zero slab variance it returns `-σ²_small`. Nothing in the definition
+    prevents this, and `sas_variance_monotone_in_pi` below imposes no bounds at
+    all, so the bound is recorded here as a theorem with the interval hypothesis
+    visible.
+
+    This is the mixture-interval statement: on `[0, 1]` the value is a convex
+    combination and therefore lies between the two component variances, hence is
+    nonnegative whenever they are. -/
+theorem spikeAndSlabVariance_mem_interval
+    (pi sigma_sq_large sigma_sq_small : ℝ)
+    (h_pi_nonneg : 0 ≤ pi) (h_pi_le : pi ≤ 1)
+    (h_order : sigma_sq_small ≤ sigma_sq_large) :
+    sigma_sq_small ≤ spikeAndSlabVariance pi sigma_sq_large sigma_sq_small ∧
+      spikeAndSlabVariance pi sigma_sq_large sigma_sq_small ≤ sigma_sq_large := by
+  unfold spikeAndSlabVariance
+  constructor <;> nlinarith
+
+/-- On the mixture interval, and only there, the spike-and-slab variance is
+nonnegative when its components are. -/
+theorem spikeAndSlabVariance_nonneg
+    (pi sigma_sq_large sigma_sq_small : ℝ)
+    (h_pi_nonneg : 0 ≤ pi) (h_pi_le : pi ≤ 1)
+    (h_large : 0 ≤ sigma_sq_large) (h_small : 0 ≤ sigma_sq_small) :
+    0 ≤ spikeAndSlabVariance pi sigma_sq_large sigma_sq_small := by
+  unfold spikeAndSlabVariance
+  have h_one_minus : 0 ≤ 1 - pi := by linarith
+  nlinarith
+
+/-- **And it is negative off the interval**, which is what the missing bound
+costs. At `pi = 2` with a zero slab variance the formula returns `-σ²_small`, a
+negative variance. The witness is exhibited so that the failure is recorded
+rather than assumed away. -/
+theorem spikeAndSlabVariance_neg_off_interval
+    (sigma_sq_small : ℝ) (h_small : 0 < sigma_sq_small) :
+    spikeAndSlabVariance 2 0 sigma_sq_small < 0 := by
+  unfold spikeAndSlabVariance
+  linarith
+
 /-- Spike-and-slab variance increases with polygenicity
-    when the slab dominates. -/
+    when the slab dominates. Note that this holds for every real `pi`, including
+    values outside `[0, 1]` at which the quantity is not a variance; see
+    `spikeAndSlabVariance_mem_interval` for the interval on which the conclusion
+    is about a mixture. -/
 theorem sas_variance_monotone_in_pi
     (pi₁ pi₂ sigma_sq_large sigma_sq_small : ℝ)
     (h_large : sigma_sq_small < sigma_sq_large)

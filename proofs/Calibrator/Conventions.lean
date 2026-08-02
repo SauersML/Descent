@@ -211,13 +211,13 @@ end Differentiation
 
 section EquilibriumAgreements
 
-/-- **Cross-check: the island-model `F_ST` in `DemographicHistory` and the
+/-! **Cross-check: the island-model `F_ST` in `DemographicHistory` and the
 architecture-level `equilibriumFst` in `AncestrySpecificArchitecture` are the
 same function.** They were written in separate files, each spelling out its own
-factor of four. -/
-theorem equilibriumFst_eq_demoIslandModelFst (Ne m : ℝ) :
-    equilibriumFst m Ne = demoIslandModelFst Ne m := by
-  unfold equilibriumFst demoIslandModelFst; ring_nf
+factor of four. `DemographicHistory.demoIslandModelFst` has since been deleted
+in favour of `PopulationGeneticsFoundations.islandModelFst`, and
+`AncestrySpecificArchitecture.equilibriumFst_eq_islandModelFst` carries what
+this theorem used to say. -/
 
 /-- **Cross-check: the two assortative-mating inflation claims agree only at
 full heritability.**
@@ -314,17 +314,14 @@ theorem ldDecayRatePerGen_eq_inv_timeScale (Ne : ℝ) :
     ldDecayRatePerGen Ne = 1 / coalescentTimeScale Ne := by
   unfold ldDecayRatePerGen; rw [coalescentTimeScale_eq]
 
-/-! ### The coalescent `F_ST` map, written out twice
+/-! ### The coalescent `F_ST` map, no longer written out twice
 
 `DemographicHistory.fstFromCoalescenceTime` and
-`PopulationGeneticsFoundations.coalFst` are the same function. `coalFst` is
-the one simulation validated as split `F_ST`, being unbiased against
-branch-mode divergence where the drift formula was biased upward by up to 28
-percent, so relating them transfers that evidence. -/
-
-theorem fstFromCoalescenceTime_eq_coalFst (T Ne : ℝ) :
-    fstFromCoalescenceTime T Ne = coalFst T Ne := by
-  unfold fstFromCoalescenceTime coalFst; ring_nf
+`PopulationGeneticsFoundations.coalFst` were the same function under two names.
+`coalFst` is the one simulation validated as split `F_ST`, being unbiased
+against branch-mode divergence where the drift formula was biased upward by up
+to 28 percent, so it is the survivor; `fstFromCoalescenceTime` has been deleted
+and its uses in `DemographicHistory` now call `coalFst` directly. -/
 
 /-! ### The harmonic mean, written out twice
 

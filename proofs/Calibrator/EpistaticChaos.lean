@@ -351,8 +351,15 @@ section GenotypeCoding
 /-!
 ## Where diploid dosage sits
 
-Two obstructions, at complementary frequencies, and together they exclude
-hard-called dosage from the sign-symmetric class at every allele frequency.
+Two obstructions, at complementary frequencies. Away from `q = 1/2` the coding
+is skewed and admits no value-negating relabelling at all; at `q = 1/2` it does
+admit one — `hwe_symmetricCoding_iff_half` proves both directions — but there
+the squared coding takes only two values, so `log x ^ 2` sits on a single point.
+
+Together they say that no allele frequency puts a hard call in the stratum the
+symmetric-law theory needs: symmetric *and* nondegenerate in `log x ^ 2`. The
+frequency-by-frequency applicability verdict is recorded in the module docstring
+and repeated on each symmetry-carrying theorem.
 -/
 
 /-- Expand a sum over the three diploid genotypes. -/
