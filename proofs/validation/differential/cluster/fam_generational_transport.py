@@ -209,13 +209,22 @@ def freqs(hap):
 
 
 def fst_nei(h0, h1):
-    """Nei's F_ST = 1 - H_S/H_T from the two demes' allele frequencies."""
+    """Nei's F_ST = 1 - mean(H_S)/mean(H_T), a RATIO OF AVERAGES.
+
+    The average-of-ratios form has to drop loci that are fixed for the same
+    allele in both demes (H_T = 0), and those are exactly the most-diverged
+    loci, so it is biased DOWNWARD at large t -- by enough at t = 2*(2Ne) to
+    be mistaken for a defect in the closed form. Both forms are returned so
+    the estimator choice is visible rather than assumed.
+    """
     p0, p1 = freqs(h0), freqs(h1)
     hs = 0.5 * (2 * p0 * (1 - p0) + 2 * p1 * (1 - p1))
     pbar = 0.5 * (p0 + p1)
     ht = 2 * pbar * (1 - pbar)
+    ratio_of_avgs = 1.0 - float(np.mean(hs)) / float(np.mean(ht))
     ok = ht > 1e-12
-    return float(np.mean(1.0 - hs[ok] / ht[ok]))
+    avg_of_ratios = float(np.mean(1.0 - hs[ok] / ht[ok]))
+    return ratio_of_avgs, avg_of_ratios
 
 
 def shared_unmutated(st):
@@ -398,16 +407,18 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
     # source state, frozen at the split (t = 0), exactly as the Lean's
     # source-side fields are constant in t.
     G0 = genotypes(st["a0"], rng)
-    S0 = second_moments(G0).mean(axis=0)
-    sig_tag_S = S0[np.ix_(tag_idx, tag_idx)]
-    sig_tc_S = S0[np.ix_(tag_idx, causal_idx)]
-    p_tag_S = freqs(st["a0"]).mean(axis=0)[tag_idx]
-    p_causal_S = freqs(st["a0"]).mean(axis=0)[causal_idx]
-
-    # source phenotype variance: V_A + environment at heritability H2
-    va_S = float(beta @ (S0[np.ix_(causal_idx, causal_idx)] @ beta))
-    ve = va_S * (1 - H2) / H2
-    outcome_var_S = va_S + ve
+    S0_all = second_moments(G0)                       # (reps, L, L)
+    p_S_all = freqs(st["a0"])                         # (reps, L)
+    # Everything below is PER REPLICATE. Averaging the source second-moment
+    # matrix across replicates and then fitting one weight vector to it makes
+    # the closed form describe a population no replicate is drawn from, and
+    # showed up as a t = 0 disagreement of 48% between the closed-form source
+    # R2 and the simulated source R2 -- an artefact of the averaging, not of
+    # the corpus.
+    va_S_all = np.array([float(beta @ (S0_all[k][np.ix_(causal_idx, causal_idx)]
+                                       @ beta)) for k in range(reps)])
+    ve = float(np.mean(va_S_all)) * (1 - H2) / H2
+    outcome_var_S_all = va_S_all + ve
 
     rows = []
     g = 0
@@ -417,45 +428,104 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
             g += 1
         # ---- measured target state at generation t
         GT = genotypes(st["a1"], rng)
-        ST = second_moments(GT).mean(axis=0)
-        sig_tag_T_meas = ST[np.ix_(tag_idx, tag_idx)]
-        sig_tc_T_meas = ST[np.ix_(tag_idx, causal_idx)]
-        p_tag_T = freqs(st["a1"]).mean(axis=0)[tag_idx]
-        p_causal_T = freqs(st["a1"]).mean(axis=0)[causal_idx]
-        va_T = float(beta @ (ST[np.ix_(causal_idx, causal_idx)] @ beta))
-        outcome_var_T = va_T + ve
+        ST_all = second_moments(GT)
+        p_T_all = freqs(st["a1"])
+        acc = []
+        for k in range(reps):
+            S0, ST = S0_all[k], ST_all[k]
+            sig_tag_S = S0[np.ix_(tag_idx, tag_idx)]
+            sig_tc_S = S0[np.ix_(tag_idx, causal_idx)]
+            p_tag_S = p_S_all[k][tag_idx]
+            p_causal_S = p_S_all[k][causal_idx]
+            outcome_var_S = float(outcome_var_S_all[k])
+            sig_tag_T_meas = ST[np.ix_(tag_idx, tag_idx)]
+            sig_tc_T_meas = ST[np.ix_(tag_idx, causal_idx)]
+            p_tag_T = p_T_all[k][tag_idx]
+            p_causal_T = p_T_all[k][causal_idx]
+            va_T = float(beta @ (ST[np.ix_(causal_idx, causal_idx)] @ beta))
+            outcome_var_T = va_T + ve
 
-        # ---- corpus predictions
-        ret_tag = allele_freq_mismatch_penalty(p_tag_S, p_tag_T)
-        ret_causal = allele_freq_mismatch_penalty(p_causal_S, p_causal_T)
-        K_tag = joint_tag_ld_kernel_at(dist_tt, ne, mu, mig, r_adj, t, ret_tag)
-        K_dc = joint_direct_causal_kernel_at(ne, mu, mig, t, ret_tag, ret_causal)
-        K_pt = joint_proxy_tagging_kernel_at(dist_tc, ne, mu, mig, r_adj, t,
-                                             ret_tag, ret_causal)
-        sig_tag_T_pred = sig_tag_S * K_tag
-        # sigmaTagCausalTargetAt = directCausal*K_dc + proxyTagging*K_pt with
-        # the novel templates zero. The corpus splits the source cross-moment
-        # into a direct-causal part and a proxy-tagging part; with no
-        # separate genotyping of causal sites the whole source cross moment is
-        # proxy tagging, so directCausal_source = 0 here and the split is
-        # reported rather than assumed.
-        sig_tc_T_pred = sig_tc_S * K_pt
+            # ---- corpus predictions
+            ret_tag = allele_freq_mismatch_penalty(p_tag_S, p_tag_T)
+            ret_causal = allele_freq_mismatch_penalty(p_causal_S, p_causal_T)
+            K_tag = joint_tag_ld_kernel_at(dist_tt, ne, mu, mig, r_adj, t, ret_tag)
+            K_dc = joint_direct_causal_kernel_at(ne, mu, mig, t, ret_tag,
+                                                 ret_causal)
+            K_pt = joint_proxy_tagging_kernel_at(dist_tc, ne, mu, mig, r_adj, t,
+                                                 ret_tag, ret_causal)
+            sig_tag_T_pred = sig_tag_S * K_tag
+            # sigmaTagCausalTargetAt = directCausal*K_dc + proxyTagging*K_pt
+            # with the novel templates zero. With no separate genotyping of
+            # causal sites the whole source cross-moment is proxy tagging, so
+            # directCausal_source = 0 here; K_dc is still computed and
+            # reported so the direct-causal kernel is not left unmeasured.
+            sig_tc_T_pred = sig_tc_S * K_pt
 
-        # ---- measured metrics on simulated individuals
-        meas = measure_metrics(G0, GT, tag_idx, causal_idx, beta, ve, env_rng,
-                               sig_tag_S, sig_tc_S)
+            # ---- measured metrics on simulated individuals, this replicate
+            meas = measure_metrics_rep(G0[k], GT[k], tag_idx, causal_idx, beta,
+                                       ve, env_rng, sig_tag_S, sig_tc_S)
 
-        # ---- three layers
-        src_m, tgt_measured_moments = metric_layer(
-            sig_tag_S, sig_tc_S, beta, sig_tag_T_meas, sig_tc_T_meas, beta,
-            outcome_var_S, outcome_var_T)
-        _, tgt_predicted_moments = metric_layer(
-            sig_tag_S, sig_tc_S, beta, sig_tag_T_pred, sig_tc_T_pred, beta,
-            outcome_var_S, outcome_var_T)
+            # ---- the three layers, this replicate
+            src_m, tgt_meas = metric_layer(
+                sig_tag_S, sig_tc_S, beta, sig_tag_T_meas, sig_tc_T_meas, beta,
+                outcome_var_S, outcome_var_T)
+            _, tgt_pred = metric_layer(
+                sig_tag_S, sig_tc_S, beta, sig_tag_T_pred, sig_tc_T_pred, beta,
+                outcome_var_S, outcome_var_T)
 
+            acc.append({
+                "kernel_diag_measured": float(np.mean(
+                    np.diag(sig_tag_T_meas) / np.diag(sig_tag_S))),
+                "kernel_diag_predicted": float(np.mean(np.diag(K_tag))),
+                "kernel_offdiag_measured": ratio_offdiag(sig_tag_T_meas,
+                                                         sig_tag_S),
+                "kernel_offdiag_predicted": float(np.mean(
+                    K_tag[~np.eye(len(tag_idx), dtype=bool)])),
+                "kernel_tagcausal_measured": ratio_all(sig_tc_T_meas, sig_tc_S),
+                "kernel_tagcausal_predicted": float(np.mean(K_pt)),
+                "kernel_directcausal_predicted": float(np.mean(K_dc)),
+                "tagAlleleFreqRetentionAt_mean": float(np.mean(ret_tag)),
+                "causalAlleleFreqRetentionAt_mean": float(np.mean(ret_causal)),
+                "meas_predictiveCovariance": meas["pcov_T"],
+                "meas_scoreVariance": meas["svar_T"],
+                "meas_calibrationSlope": meas["slope_T"],
+                "meas_r2": meas["r2_T"],
+                "meas_r2_source": meas["r2_S"],
+                "meas_predictiveCovariance_source": meas["pcov_S"],
+                "meas_scoreVariance_source": meas["svar_S"],
+                "meas_outcomeVariance": meas["yvar_T"],
+                "metricLayerAlone_predictiveCovariance":
+                    tgt_meas["predictiveCovariance"],
+                "metricLayerAlone_scoreVariance": tgt_meas["scoreVariance"],
+                "metricLayerAlone_calibrationSlope":
+                    tgt_meas["calibrationSlope"],
+                "metricLayerAlone_r2": tgt_meas["r2"],
+                "metricLayerAlone_r2_without_burden":
+                    tgt_meas["r2_without_burden"],
+                "metricLayerAlone_residualBurden": tgt_meas["residualBurden"],
+                "metricLayerAlone_effectiveOutcomeVariance":
+                    tgt_meas["effectiveOutcomeVariance"],
+                "metricLayerAlone_gaussianAUC": tgt_meas["gaussianAUC"],
+                "composite_predictiveCovariance":
+                    tgt_pred["predictiveCovariance"],
+                "composite_scoreVariance": tgt_pred["scoreVariance"],
+                "composite_calibrationSlope": tgt_pred["calibrationSlope"],
+                "composite_r2": tgt_pred["r2"],
+                "composite_r2_without_burden": tgt_pred["r2_without_burden"],
+                "composite_residualBurden": tgt_pred["residualBurden"],
+                "composite_gaussianAUC": tgt_pred["gaussianAUC"],
+                "source_r2_closedform": src_m["r2"],
+                "source_predictiveCovariance": src_m["predictiveCovariance"],
+                "source_scoreVariance": src_m["scoreVariance"],
+                "source_gaussianAUC": src_m["gaussianAUC"],
+                "targetOutcomeVarianceAt": outcome_var_T,
+            })
+
+        fst_ra, fst_ar = fst_nei(st["a0"], st["a1"])
         row = {
             "t": t,
-            "fst_measured": fst_nei(st["a0"], st["a1"]),
+            "fst_measured": fst_ra,
+            "fst_measured_avg_of_ratios": fst_ar,
             "fst_predicted": fst_transient_at(ne, mu, mig, t),
             "sharedUnmutated_measured": shared_unmutated(st),
             "mutationSharedRetentionAt": mutation_shared_retention_at(ne, mu, t),
@@ -463,46 +533,11 @@ def run_scenario(name, ne, mu, mig, r_adj, gens, grid, reps, seed,
                 novel_variant_innovation_at(ne, mu, t),
             "novelVariantInnovation_measured": 1.0 - shared_unmutated(st),
             "migrationSharedBoostAt": migration_shared_boost_at(ne, mig, t),
-            # M3/M4: kernel layer
-            "kernel_diag_measured": float(np.mean(
-                np.diag(sig_tag_T_meas) / np.diag(sig_tag_S))),
-            "kernel_diag_predicted": float(np.mean(np.diag(K_tag))),
-            "kernel_offdiag_measured": ratio_offdiag(sig_tag_T_meas, sig_tag_S),
-            "kernel_offdiag_predicted": float(np.mean(
-                K_tag[~np.eye(len(tag_idx), dtype=bool)])),
-            "kernel_tagcausal_measured": ratio_all(sig_tc_T_meas, sig_tc_S),
-            "kernel_tagcausal_predicted": float(np.mean(K_pt)),
-            # M6: metric layer
-            "meas_predictiveCovariance": meas["pcov_T"],
-            "meas_scoreVariance": meas["svar_T"],
-            "meas_calibrationSlope": meas["slope_T"],
-            "meas_r2": meas["r2_T"],
-            "meas_r2_source": meas["r2_S"],
-            "meas_outcomeVariance": meas["yvar_T"],
-            "metricLayerAlone_predictiveCovariance":
-                tgt_measured_moments["predictiveCovariance"],
-            "metricLayerAlone_scoreVariance":
-                tgt_measured_moments["scoreVariance"],
-            "metricLayerAlone_calibrationSlope":
-                tgt_measured_moments["calibrationSlope"],
-            "metricLayerAlone_r2": tgt_measured_moments["r2"],
-            "metricLayerAlone_r2_without_burden":
-                tgt_measured_moments["r2_without_burden"],
-            "metricLayerAlone_residualBurden":
-                tgt_measured_moments["residualBurden"],
-            "composite_predictiveCovariance":
-                tgt_predicted_moments["predictiveCovariance"],
-            "composite_scoreVariance": tgt_predicted_moments["scoreVariance"],
-            "composite_calibrationSlope":
-                tgt_predicted_moments["calibrationSlope"],
-            "composite_r2": tgt_predicted_moments["r2"],
-            "composite_r2_without_burden":
-                tgt_predicted_moments["r2_without_burden"],
-            "composite_gaussianAUC": tgt_predicted_moments["gaussianAUC"],
-            "source_r2_closedform": src_m["r2"],
-            "source_predictiveCovariance": src_m["predictiveCovariance"],
-            "source_scoreVariance": src_m["scoreVariance"],
         }
+        for key in acc[0]:
+            vals = [a[key] for a in acc]
+            row[key] = float(np.mean(vals))
+            row[key + "_sd"] = float(np.std(vals, ddof=1)) if len(vals) > 1 else 0.0
         rows.append(row)
         if verbose:
             print(f"  [{name}] t={t:5d} Fst={row['fst_measured']:.4f}"
@@ -526,38 +561,32 @@ def ratio_all(A, B):
     return float(np.mean(A[ok] / B[ok]))
 
 
-def measure_metrics(G0, GT, tag_idx, causal_idx, beta, ve, rng,
-                    sig_tag_S, sig_tc_S):
-    """Fit the score in the SOURCE, evaluate it in the TARGET, on individuals.
+def measure_metrics_rep(G0k, GTk, tag_idx, causal_idx, beta, ve, rng,
+                        sig_tag_S, sig_tc_S):
+    """Fit the score in the SOURCE, evaluate it in the TARGET, on individuals,
+    for ONE replicate.
 
-    The weights are the source ERM weights of the corpus, computed from the
-    same source moments the closed form uses, so any disagreement is in the
-    transport and not in the fit.
+    The weights are the corpus's own source ERM weights computed from THIS
+    replicate's source moments, so any disagreement is in the transport and
+    not in the fit. y is drawn once per replicate from the simulated causal
+    genotypes plus independent environment.
     """
     w = erm_weights(sig_tag_S, sig_tc_S @ beta)
     out = {}
-    for tag, G in (("S", G0), ("T", GT)):
-        reps = G.shape[0]
-        pcovs, svars, r2s, yvars = [], [], [], []
-        for k in range(reps):
-            X = G[k]
-            Xc = X - X.mean(axis=0, keepdims=True)
-            gtag = Xc[:, tag_idx]
-            gcau = Xc[:, causal_idx]
-            gen = gcau @ beta
-            y = gen + rng.normal(0.0, math.sqrt(ve), size=gen.shape[0])
-            y = y - y.mean()
-            s = gtag @ w
-            s = s - s.mean()
-            pcovs.append(float(np.cov(s, y)[0, 1]))
-            svars.append(float(np.var(s, ddof=1)))
-            yvars.append(float(np.var(y, ddof=1)))
-            r2s.append(float(np.corrcoef(s, y)[0, 1] ** 2))
-        out[f"pcov_{tag}"] = float(np.mean(pcovs))
-        out[f"svar_{tag}"] = float(np.mean(svars))
-        out[f"yvar_{tag}"] = float(np.mean(yvars))
-        out[f"r2_{tag}"] = float(np.mean(r2s))
-        out[f"slope_{tag}"] = float(np.mean(pcovs)) / float(np.mean(svars))
+    for tag, X in (("S", G0k), ("T", GTk)):
+        Xc = X - X.mean(axis=0, keepdims=True)
+        gen = Xc[:, causal_idx] @ beta
+        y = gen + rng.normal(0.0, math.sqrt(ve), size=gen.shape[0])
+        y = y - y.mean()
+        sc = Xc[:, tag_idx] @ w
+        sc = sc - sc.mean()
+        pcov = float(np.cov(sc, y)[0, 1])
+        svar = float(np.var(sc, ddof=1))
+        out[f"pcov_{tag}"] = pcov
+        out[f"svar_{tag}"] = svar
+        out[f"yvar_{tag}"] = float(np.var(y, ddof=1))
+        out[f"r2_{tag}"] = float(np.corrcoef(sc, y)[0, 1] ** 2)
+        out[f"slope_{tag}"] = pcov / svar
     return out
 
 
