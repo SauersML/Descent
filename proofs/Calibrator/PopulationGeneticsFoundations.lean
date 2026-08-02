@@ -1202,10 +1202,25 @@ theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
 
 /-- **Fst derived from heterozygosity decay.**
     Fst(t) = 1 - H(t)/H₀ = 1 - (1 - 1/(2Ne))^t.
-    This is not a definition imposed from outside; it is the fractional
-    loss of heterozygosity after t generations of drift.
 
-    Empirical status: UNTESTED.
+    Regime: closed population, no mutation. The previous sentence here read
+    "This is not a definition imposed from outside; it is the fractional loss
+    of heterozygosity after t generations of drift", which is the strongest
+    form of the claim and is the one measurement rejects. Derived it is, but
+    derived *within a regime*: the recurrence it comes from lets heterozygosity
+    decay with nothing replenishing it. Under mutation-drift balance
+    heterozygosity is stationary, the retention is measured at `1.025 ± 0.020`
+    at `Ne = 1000`, `t = 4000` where this expression's factor gives `0.135`,
+    and the between-population `F_ST` at that design point is `0.50` while this
+    formula's cluster reports approximately zero. `Calibrator.DriftRegime`
+    exhibits both regimes and proves they disagree at every positive time.
+
+    Being derived rather than stipulated is what made this look safe. It is not
+    a defence: a derivation inherits every premise of the process it derives
+    from, and this one inherits the closed population.
+
+    Empirical status: FALSIFIED at demographic equilibrium; see
+    `closedPopulation`. Inside the declared regime it stands.
 
     Denotes: the reading its name carries. The same formula appears under
     names from 'fst', 'heterozygosity', and the formula alone does not fix which is meant. -/

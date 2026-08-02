@@ -237,7 +237,7 @@ because it had no other place to go.
     identity recursion is the same map with the migration rate `m` in the place
     of `c` and `F_ST` in the place of `Q`
     (`driftLDStep_eq_islandFstMultiplicativeStep` below states the identity).
-    The exact fixed point of `x = (1-t)²(a + (1-a)x)` with `a = 1/(2 Nₑ)` is
+    The fixed point of `x = (1-t)²(a + (1-a)x)` with `a = 1/(2 Nₑ)` is
     `x* = (1-t)² a / (1 - (1-t)²(1-a))`, which to first order in small `t` and
     `a` is `a/(a + 2t) = 1/(1 + 4 Nₑ t)`. Sved's `1/(1 + 4 Nₑ c)` and Wright's
     `1/(1 + 4 Nₑ m)` are therefore the same linearisation of the same
@@ -245,7 +245,7 @@ because it had no other place to go.
 
     **Pending refactor.** The owner of `PortabilityDrift.lean` is extracting the
     shared map under a rate-neutral name (`ibdRecurrenceStep Ne rate x`), with
-    the exact fixed point and the weak-rate linearisation stated there as
+    the fixed point and the weak-rate linearisation stated there as
     theorems. Once that lands this body should become
     `ibdRecurrenceStep Ne c Q`, keeping the recombination reading in this
     docstring and inheriting the fixed-point theorem instead of restating it.
@@ -869,9 +869,9 @@ section LDHalfLifeTrajectory
 
 /-- **LD retained fraction** after t generations at constant size Ne.
 
-    Regime: closed population, no mutation. This body is the closed-population
-    retention factor, the same one `driftRetention` carries, and it is written
-    here as though constant `Ne` were the only assumption it needs. It is not:
+    Regime: closed population, no mutation. This body is the retention of
+    `closedPopulation`, and it is written here as though constant `Ne` were the
+    only assumption it needs. It is not:
     the formula also assumes nothing replenishes variation. Under
     mutation-drift balance the retention is measured at `1.025 ± 0.020` at
     `Ne = 1000`, `t = 4000`, where this expression gives `0.135`;

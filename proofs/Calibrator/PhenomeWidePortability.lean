@@ -112,27 +112,31 @@ used in the portability theorem below.
     formula gives `0.135`. `Calibrator.DriftRegime` exhibits the two regimes and
     proves they disagree at every positive time.
 
-    This body is identical to `driftRetention`, which has carried that
-    falsification since it was found, while this copy stood marked UNTESTED in a
+    This body is the retention of `closedPopulation`, the regime object that
+    carries the falsification, while this copy stood marked UNTESTED in a
     different file. That is how a corrected formula survives its own
-    correction, and it is why `neutralDriftFactor_eq_driftRetention` below ties
-    the two: the finding can no longer be recorded on one side alone.
+    correction, and it is why
+    `closedPopulation_het_eq_neutralDriftFactor` below ties the two: the
+    finding can no longer be recorded on one side alone.
 
     Empirical status: FALSIFIED at demographic equilibrium; see
-    `closedPopulation` and `driftRetention`. It remains correct inside the
-    declared regime, so the theorems below are conditional on that regime
-    holding rather than false. -/
+    `closedPopulation`. It remains correct inside the declared regime, so the
+    theorems below are conditional on that regime holding rather than false. -/
 noncomputable def neutralDriftFactor (Ne : ℝ) (t : ℕ) : ℝ :=
   (1 - 1 / (2 * Ne)) ^ t
 
-/-- **The falsified retention, under its two names.**
+/-- **This factor is the closed-population regime's retention.**
 
-Byte-identical bodies in two files, one of which recorded the falsification and
-one of which did not. Stating the identity means a repair applied to either
-side must be applied to both or this stops compiling — which is exactly the
-protection that was missing while the two drifted apart. -/
-theorem neutralDriftFactor_eq_driftRetention (Ne : ℝ) (t : ℕ) :
-    neutralDriftFactor Ne t = driftRetention Ne t := rfl
+The tie is to the regime *object*, not to another copy of the formula. That
+distinction is the point. A free-standing `driftRetention` used to hold the
+same body in `DriftRegime`, and it was removed — correctly — as a copy of a
+regime's content that could not record which regime it came from. Had this
+identity been stated against that copy it would have died with it; stated
+against `closedPopulation` it survives, and it makes the regime and its
+falsification reachable from this file by a proof rather than by a comment. -/
+theorem closedPopulation_het_eq_neutralDriftFactor (Ne H₀ : ℝ) (hH : 0 < H₀) (t : ℕ) :
+    (closedPopulation Ne H₀ hH).het t = neutralDriftFactor Ne t * H₀ := by
+  simp [closedPopulation, neutralDriftFactor]
 
 /-- **Selected drift factor per generation.**
     Under stabilizing selection with correction s_correction, the
