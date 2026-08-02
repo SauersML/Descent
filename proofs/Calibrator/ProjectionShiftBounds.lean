@@ -825,6 +825,15 @@ theorem coefficientEnergy_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ)
   rw [matrix_mulVec_smul, dot_smul_left, dot_smul_right]
   ring
 
+/-- The `show`/`ring` in the conversion below is deliberate and should not be
+shortened back to `simp`.
+
+`simp` reduces the goal to `x i - y i = x i + -y i` and stops: closing it means
+reconciling `a - b` with `a + -b`, which is a question about simp's normal form
+rather than a fact, and it went the wrong way here. Stating the arithmetic goal
+with `show` — where the `•` unfolds definitionally, exactly as the sibling
+conversion in `coefficientEnergy_rescaled_expand` discharges with `rfl` — and
+closing with `ring` depends on nobody's normal form. -/
 theorem coefficientEnergy_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ)
     (hsymmetric : IsSymmetricBilinearMatrix B) :
     coefficientEnergy B (fun i => x i - y i) =
