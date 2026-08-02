@@ -28,6 +28,8 @@ import Calibrator.ImputationPortability
 import Calibrator.SimulationValidation
 import Calibrator.PortabilityDrift
 import Calibrator.StratificationConfounding
+import Calibrator.PolygenicArchitecture
+import Calibrator.TransferLearningPGS
 
 namespace Calibrator
 
