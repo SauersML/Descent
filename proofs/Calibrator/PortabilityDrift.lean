@@ -1264,7 +1264,7 @@ theorem source_target_erm_differ_dense_witness_proved :
   · intro heq
     have h : (witnessW_opt Pop.source) 0 = (witnessW_opt Pop.target) 0 := congrFun heq 0
     revert h
-    simp [witnessW_opt, witnessW_opt, Pop.pair]
+    simp [witnessW_opt, Pop.pair]
     norm_num
 
 /-- **Predictor/outcome cross-covariance in a population**, from explicit biological and
@@ -1721,7 +1721,7 @@ theorem effectiveTargetOutcomeVariance_pos {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     0 < effectiveOutcomeVariance m Pop.target := by
   unfold effectiveOutcomeVariance
-  linarith [(m.outcomeVariance_pos Pop.target), irreducibleTargetResidualBurden_nonneg m]
+  linarith [m.outcomeVariance_pos, irreducibleTargetResidualBurden_nonneg m]
 
 /-- Exact decomposition of the effective target outcome variance into the base
 target scale plus the three named additive residual-loss terms. -/

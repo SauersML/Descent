@@ -754,7 +754,7 @@ theorem fstMutationDriftTransient_increases_with_time (θ Ne t₁ t₂ : ℝ)
 theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
     fstMutationDriftTransient θ 0 Ne = 0 := by
   unfold fstMutationDriftTransient
-  simp [mul_zero, zero_div, neg_zero, Real.exp_zero, sub_self, mul_zero]
+  simp [mul_zero, zero_div, neg_zero, Real.exp_zero, sub_self]
 
 /-- **Mutation introduces new population-specific variants over time.**
     The expected number of new mutations per generation per locus is 2Neμ = θ/2.

@@ -481,7 +481,7 @@ theorem mechanistic_transport_disrupts_calibration_slope_and_brier
       targetCalibratedBrierFromSourceWeights cal.metric := by
   dsimp
   have hslope_lt : ((cal.identityCalibrationProfile Pop.target)).slope < 1 := by
-    simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.target),
+    simpa [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
       CrossPopulationMechanisticCalibrationModel.calibrationProfile] using
       h_target_slope_lt
   have hslope_dev_pos :
@@ -504,7 +504,7 @@ theorem mechanistic_transport_disrupts_calibration_slope_and_brier
           sourceWeightedTagScore cal.metric (proxyTaggingProjection cal.metric Pop.target) +
           sourceWeightedTagScore cal.metric (cal.metric.contextCross Pop.target)) /
             scoreVarianceFromSourceWeights cal.metric Pop.target := by
-    simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.target),
+    simpa [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
       CrossPopulationMechanisticCalibrationModel.calibrationProfile] using
       CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law
         cal CalibrationLink.identity
@@ -709,7 +709,7 @@ theorem brierDiscriminationLoss_pos_of_mechanistic_r2_drop
   exact sub_pos.mpr <|
     brierFromR2_strictAnti m.targetPrevalence
       m.targetPrevalence_pos m.targetPrevalence_lt_one
-      (by simpa [r2FromSourceWeights, r2FromSourceWeights] using h_r2_drop)
+      (by simpa [r2FromSourceWeights] using h_r2_drop)
 
 /-- If the Bernoulli variance factor increases from source to target on the
 same mechanistic source score, the outcome-scale contribution is positive. -/

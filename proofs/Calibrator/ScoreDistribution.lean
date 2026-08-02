@@ -68,7 +68,7 @@ theorem mean_shift_eq_diff {m : ℕ} (β : Fin m → ℝ)
     pgsMeanShift β p_source p_target =
       pgsMean β p_target - pgsMean β p_source := by
   unfold pgsMeanShift pgsMean
-  simp [Finset.sum_sub_distrib, mul_sub, Finset.sum_sub_distrib]
+  simp [Finset.sum_sub_distrib, mul_sub]
 
 /-- **Variance ratio between populations.**
     Var_T / Var_S can be > 1 or < 1 depending on frequency changes. -/
@@ -267,7 +267,7 @@ theorem mechanistic_target_identity_calibration_slope_lt_one
     {p q : ℕ} (cal : CrossPopulationMechanisticCalibrationModel p q)
     (h_target_slope_lt : calibrationSlopeFromSourceWeights cal.metric Pop.target < 1) :
     ((cal.identityCalibrationProfile Pop.target)).slope < 1 := by
-  simpa [(CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile Pop.target),
+  simpa [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
     CrossPopulationMechanisticCalibrationModel.calibrationProfile] using
     h_target_slope_lt
 
