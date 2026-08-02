@@ -243,11 +243,8 @@ structure SplitMigrationModel where
   mu_nonneg : 0 ≤ mu
 
 /-- Empirical status: UNTESTED. -/
-noncomputable def SplitMigrationModel.scaledMigration (m : SplitMigrationModel) : ℝ :=
-  scaledMigrationRate m.Ne m.mig
-
 noncomputable def SplitMigrationModel.fstEqLimitLowMutationManyDemes (m : SplitMigrationModel) : ℝ :=
-  1 / (1 + m.scaledMigration)
+  1 / (1 + scaledMigrationRate m.Ne m.mig)
 
 noncomputable def hudsonFstFromCoalescenceTimes (ETss ETst : ℝ) : ℝ :=
   1 - ETss / ETst
@@ -2216,9 +2213,9 @@ theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetent
     (m : PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     (m.toGenerationalPopGenParameters).mutationSharedRetentionAt (Nat.floor m.t_div) =
-      m.mutErosion := by
+      mutationLDErosion m.toEvo := by
   unfold GenerationalPopGenParameters.mutationSharedRetentionAt
-    PGSEvolutionaryModel.mutErosion mutationLDErosion
+    mutationLDErosion PGSEvolutionaryModel.toEvo mutationLDErosion
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
   simp only [GenerationalPopGenParameters.tauAt,
     PGSEvolutionaryModel.toGenerationalPopGenParameters,
@@ -2232,9 +2229,9 @@ theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoost
     (m : PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) =
-      m.migBoost := by
+      migrationLDBoost m.toEvo := by
   unfold GenerationalPopGenParameters.migrationSharedBoostAt
-    PGSEvolutionaryModel.migBoost migrationLDBoost
+    migrationLDBoost PGSEvolutionaryModel.toEvo migrationLDBoost
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
   simp only [GenerationalPopGenParameters.tauAt,
     PGSEvolutionaryModel.toGenerationalPopGenParameters,
@@ -4613,7 +4610,7 @@ theorem SplitMigrationModel.fstMigDriftEq_eq_limit (s : SplitMigrationModel) :
     s.fstMigDriftEq = s.fstEqLimitLowMutationManyDemes := by
   unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium
     SplitMigrationModel.fstEqLimitLowMutationManyDemes
-    SplitMigrationModel.scaledMigration
+    scaledMigrationRate SplitMigrationModel.Ne SplitMigrationModel.mig
   ring
 
 /-- **Increased migration strictly improves equilibrium Fst in the SplitMigration framework.**

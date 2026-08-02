@@ -2029,9 +2029,6 @@ noncomputable def PGSEvolutionaryModel.fstTransient (m : PGSEvolutionaryModel) :
     in LDDecayTheory.lean.
 
     Empirical status: UNTESTED. -/
-noncomputable def PGSEvolutionaryModel.ldRetention (m : PGSEvolutionaryModel) : ℝ :=
-  sharedLDRetention m.toEvo
-
 /-- **Mutation LD erosion**: new mutations after divergence create
     population-specific LD that is NOT shared.
 
@@ -2041,9 +2038,6 @@ noncomputable def PGSEvolutionaryModel.ldRetention (m : PGSEvolutionaryModel) : 
     DERIVED: new mutations arrive at rate 2μ per locus per generation.
     Over t generations, the fraction of polymorphisms that are ancestral
     (and thus shared) is approximately exp(-2μt) = exp(-θτ). -/
-noncomputable def PGSEvolutionaryModel.mutErosion (m : PGSEvolutionaryModel) : ℝ :=
-  mutationLDErosion m.toEvo
-
 /-- **Migration LD boost**: gene flow between populations introduces
     shared haplotypes, partially counteracting drift and mutation erosion.
 
@@ -2052,9 +2046,6 @@ noncomputable def PGSEvolutionaryModel.mutErosion (m : PGSEvolutionaryModel) : �
     DERIVED from the island model: migrants carry source-population LD,
     increasing shared LD fraction proportionally to migration rate M
     and divergence time τ. -/
-noncomputable def PGSEvolutionaryModel.migBoost (m : PGSEvolutionaryModel) : ℝ :=
-  migrationLDBoost m.toEvo
-
 /-! ### Step 2: Primitive evolutionary coordinate summaries
 
 The four coarse coordinates are kept side by side:
@@ -2314,9 +2305,9 @@ them into a single transport law. -/
 noncomputable def PGSEvolutionaryModel.coordinateSummary
     (m : PGSEvolutionaryModel) : EvolutionaryCoordinateSummary where
   alleleFreqCoordinate := 1 - m.fstTransient
-  sharedLDCoordinate := m.ldRetention
-  ancestralVariantCoordinate := m.mutErosion
-  migrationCoordinate := m.migBoost
+  sharedLDCoordinate := sharedLDRetention m.toEvo
+  ancestralVariantCoordinate := mutationLDErosion m.toEvo
+  migrationCoordinate := migrationLDBoost m.toEvo
 
 @[simp] theorem PGSEvolutionaryModel.coordinateSummary_alleleFreqCoordinate
     (m : PGSEvolutionaryModel) :
@@ -2325,17 +2316,17 @@ noncomputable def PGSEvolutionaryModel.coordinateSummary
 
 @[simp] theorem PGSEvolutionaryModel.coordinateSummary_sharedLDCoordinate
     (m : PGSEvolutionaryModel) :
-    m.coordinateSummary.sharedLDCoordinate = m.ldRetention := by
+    m.coordinateSummary.sharedLDCoordinate = sharedLDRetention m.toEvo := by
   rfl
 
 @[simp] theorem PGSEvolutionaryModel.coordinateSummary_ancestralVariantCoordinate
     (m : PGSEvolutionaryModel) :
-    m.coordinateSummary.ancestralVariantCoordinate = m.mutErosion := by
+    m.coordinateSummary.ancestralVariantCoordinate = mutationLDErosion m.toEvo := by
   rfl
 
 @[simp] theorem PGSEvolutionaryModel.coordinateSummary_migrationCoordinate
     (m : PGSEvolutionaryModel) :
-    m.coordinateSummary.migrationCoordinate = m.migBoost := by
+    m.coordinateSummary.migrationCoordinate = migrationLDBoost m.toEvo := by
   rfl
 
 /-- Fully expanded evolutionary coordinate summary. Each field is a separate
@@ -2350,8 +2341,8 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
         migrationCoordinate := 1 + m.bigM * m.tau / (1 + m.bigM) } := by
   ext <;>
     simp [PGSEvolutionaryModel.coordinateSummary, PGSEvolutionaryModel.fstTransient,
-      PGSEvolutionaryModel.ldRetention, PGSEvolutionaryModel.mutErosion,
-      PGSEvolutionaryModel.migBoost, PGSEvolutionaryModel.toEvo,
+      sharedLDRetention PGSEvolutionaryModel.toEvo, mutationLDErosion PGSEvolutionaryModel.toEvo,
+      migrationLDBoost PGSEvolutionaryModel.toEvo, PGSEvolutionaryModel.toEvo,
       sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium]
 
 /-- Phi is monotone increasing because it is the standard normal CDF. -/

@@ -583,8 +583,8 @@ theorem selectedDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) (s_correction : 
 
 theorem SplitMigrationModel_scaledMigration_eq_ploidy_form
     (m : SplitMigrationModel) :
-    SplitMigrationModel.scaledMigration m = 2 * ploidy * m.Ne * m.mig := by
-  unfold SplitMigrationModel.scaledMigration ploidy scaledMigrationRate; ring
+    scaledMigrationRate m.Ne m.mig = 2 * ploidy * m.Ne * m.mig := by
+  unfold scaledMigrationRate ploidy; ring
 
 theorem fstMigDriftNext_uses_timeScale (Ne m Fst : ℝ) :
     fstMigDriftNext Ne m Fst
