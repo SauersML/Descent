@@ -1211,7 +1211,7 @@ structure LevelSetCoordinates where
 
 /-- A one-dimensional threshold functional used to show why estimated-filter mixtures
 need the **law** of their random coordinates, not merely coordinate means. -/
-def positiveThreshold (x : ℝ) : ℝ := if 0 < x then 1 else 0
+noncomputable def positiveThreshold (x : ℝ) : ℝ := if 0 < x then 1 else 0
 
 /-- Two random coordinates can have the same mean while producing different threshold
 probabilities: the equiprobable law on `{-1,1}` and the point mass at zero both have mean
