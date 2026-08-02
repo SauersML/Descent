@@ -104,3 +104,6 @@ python/gnomon/_gnomon*.so
 !data/testdata/*.bed
 !data/testdata/*.bim
 !data/testdata/*.fam
+
+# Toolchain clones that concurrent build sessions drop in the tree
+/mathlib/
