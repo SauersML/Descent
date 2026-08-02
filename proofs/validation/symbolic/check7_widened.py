@@ -101,18 +101,40 @@ def run():
     ledger = json.loads((ART / "slice_ledger.json").read_text())
     targets = list(ledger.values())
 
+    # Memoise by BODY CHECKSUM, not by ledger status.
+    #
+    # Filtering on the ledger's UNREACHABLE set made this non-idempotent:
+    # check7 feeds slice_ledger and slice_ledger feeds check7, so once its own
+    # results were folded in the definitions it had covered were no longer
+    # UNREACHABLE, the next run skipped them, and the ledger rebuilt from the
+    # smaller output. Two runs took the tier from 194 verified to 83 while every
+    # step looked correct. Testing the whole slice instead is idempotent but
+    # does not finish. Keying the cached verdict to the body's checksum is both:
+    # a definition is re-tested exactly when its body changes.
+    prior = {}
+    prev_path = ART / "results_check7.json"
+    if prev_path.exists():
+        for r in json.loads(prev_path.read_text()):
+            if r.get("body_checksum"):
+                prior[(r["fqn"], r["body_checksum"])] = r
+
     results = []
     for r in targets:
         short = r["short"]
         d = sdefs.get(short)
+        csum = shared.checksum(r["fqn"])
+        cached = prior.get((r["fqn"], csum)) if csum else None
+        if cached is not None:
+            results.append(cached)
+            continue
         if d is None or not d["body"] or short not in base_table:
             results.append({"fqn": r["fqn"], "short": short, "status": "no_convertible_body",
-                            "prior_reason": r.get("reason")})
+                            "prior_reason": r.get("reason"), "body_checksum": csum})
             continue
         cands = sorted(mentions.get(short, []), key=lambda t: len(t["body"]))
         if not cands:
             results.append({"fqn": r["fqn"], "short": short, "status": "no_theorem_mentions_it",
-                            "prior_reason": r.get("reason")})
+                            "prior_reason": r.get("reason"), "body_checksum": csum})
             continue
 
         rejected_by, tried, errors = None, 0, Counter()
@@ -175,7 +197,7 @@ def run():
                 best = {"theorem": t["name"], "rejected": here_rej,
                         "survived": here_sur}
         results.append({
-            "fqn": r["fqn"], "short": short,
+            "fqn": r["fqn"], "short": short, "body_checksum": csum,
             "status": "NEWLY_COVERED" if rejected_by else "still_unreachable",
             "prior_reason": r.get("reason"),
             "rejecting_theorem": rejected_by[0] if rejected_by else None,
