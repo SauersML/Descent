@@ -291,14 +291,78 @@ noncomputable def driftLDRetention (Ne c : ℝ) : ℝ :=
     theorem that pins it, so no other constant can be substituted here and still
     compile.
 
-    In the small-`c`, large-`Nₑ` limit this reduces to Sved's `1/(1 + 4 Nₑ c)`;
-    that limit is stated in prose only.  What is proved here is the two
-    properties the deleted formula lacked: it is a genuine fixed point of a map
-    that mentions `c`, and it never exceeds `1`.
+    In the small-`c`, large-`Nₑ` limit this reduces to Sved's `1/(1 + 4 Nₑ c)`.
+    That limit is NOT a good approximation to `σ_d²` in the tightly-linked
+    regime: measured against a two-locus Wright-Fisher simulation
+    (`validation/differential/cluster/fam_ld_decay.py`) this form is +76% at
+    `ρ = 0.5` and +45% at `ρ = 2`, converging to within 2% only by `ρ = 10`.
+    Use `ohtaKimuraSigmaDSq` if `σ_d²` is what is wanted.
 
-    Empirical status: UNTESTED. -/
+    What is proved here is the two properties the deleted formula lacked: it is
+    a genuine fixed point of a map that mentions `c`, and it never exceeds `1`.
+
+    Empirical status: VALIDATED as the two-locus identity measure -- it is the
+    exact fixed point of `driftLDStep` and simulation confirms the family's
+    `E[D]` retention to within 0.07%. MEASURED to differ from `σ_d²` by +76%
+    at `ρ = 0.5`. -/
 noncomputable def driftLDEquilibrium (Ne c : ℝ) : ℝ :=
   (1 - c) ^ 2 * (1 / (2 * Ne)) / (1 - driftLDRetention Ne c)
+
+/-- **The Ohta-Kimura (1971) approximation to `σ_d²`**, in terms of the scaled
+recombination rate `ρ = 4·Nₑ·c`:
+
+  `σ_d² ≈ (10 + ρ) / ((2 + ρ)·(11 + ρ))`
+
+Read the name literally: this is Ohta and Kimura's APPROXIMATION to `σ_d²`, not
+`E[r²]` and not an identity probability. `σ_d²` is itself the ratio of
+expectations `E[D²]/E[p(1-p)q(1-q)]`, which is a different quantity from the
+expectation of the ratio that `r²` is, and the closed form above is a
+truncation of the two-locus moment recursion rather than an exact solution of
+anything. It is stated with its provenance because a name asserting a
+provenance the body does not have is the defect class this file has already
+been repaired for twice today: `driftLDEquilibrium` is the identity measure and
+says so, and calling this one `expectedRSquared` would undo that in one commit.
+
+Regime: neutral two-locus Wright-Fisher, no mutation, `Nₑ` constant, and the
+diffusion limit in which `ρ` is the only parameter. Outside it -- in particular
+at small `Nₑ` where `ρ` and `c` are not interchangeable -- the truncation is
+not justified.
+
+    Empirical status: VALIDATED against two-locus Wright-Fisher simulation --
+    within 3.5% at `ρ = 0.5` and 1% at `ρ = 2`, where the identity measure
+    `driftLDEquilibrium` is +76% and +45%. The differential check
+    `ohtaKimuraSigmaDSq-matches-simulation` is the standing check. -/
+noncomputable def ohtaKimuraSigmaDSq (Ne c : ℝ) : ℝ :=
+  let ρ := 4 * Ne * c
+  (10 + ρ) / ((2 + ρ) * (11 + ρ))
+
+/-- `σ_d²` under this approximation is strictly positive whenever `ρ ≥ 0`,
+which is what a ratio of nonnegative expectations requires and is the cheapest
+statement that would fail if the sign of a coefficient were ever flipped. -/
+theorem ohtaKimuraSigmaDSq_pos (Ne c : ℝ) (h : 0 ≤ 4 * Ne * c) :
+    0 < ohtaKimuraSigmaDSq Ne c := by
+  unfold ohtaKimuraSigmaDSq
+  apply div_pos (by linarith)
+  apply mul_pos <;> linarith
+
+/-- **It is below one**, as a ratio `E[D²]/E[p(1-p)q(1-q)]` must be, and
+strictly so at every `ρ ≥ 0`. -/
+theorem ohtaKimuraSigmaDSq_lt_one (Ne c : ℝ) (h : 0 ≤ 4 * Ne * c) :
+    ohtaKimuraSigmaDSq Ne c < 1 := by
+  unfold ohtaKimuraSigmaDSq
+  rw [div_lt_one (by apply mul_pos <;> linarith)]
+  nlinarith
+
+/-- **The tight-linkage value is `5/11`**, not `1`: at `ρ = 0` two loci are
+completely linked and `σ_d²` still falls well short of one, because the
+denominator averages over allele frequencies rather than conditioning on them.
+This is the point at which the identity measure `driftLDEquilibrium` and this
+approximation diverge most, and pinning it as an equation stops the constants
+`10`, `2` and `11` from drifting. -/
+theorem ohtaKimuraSigmaDSq_at_zero (Ne : ℝ) :
+    ohtaKimuraSigmaDSq Ne 0 = 5 / 11 := by
+  unfold ohtaKimuraSigmaDSq
+  norm_num
 
 /-- The one-generation map is affine in `Q`, with slope `driftLDRetention`. -/
 theorem driftLDStep_affine (Ne c Q : ℝ) :
