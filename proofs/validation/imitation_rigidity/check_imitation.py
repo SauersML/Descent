@@ -38,9 +38,14 @@ import numpy as np  # noqa: E402
 FAILURES = []
 
 
-def report(name, claim, predicted, observed, tol, note=""):
-    """Record one comparison. `tol` is relative unless the truth is ~0."""
-    scale = max(abs(predicted), abs(observed), 1e-12)
+def report(name, claim, predicted, observed, tol, note="", floor=0.0):
+    """Record one comparison.
+
+    `tol` is a relative tolerance; `floor` is an absolute tolerance added to
+    the denominator, for quantities whose truth is near zero and whose Monte
+    Carlo error is therefore absolute rather than relative.
+    """
+    scale = max(abs(predicted), abs(observed), floor, 1e-12)
     err = abs(predicted - observed) / scale
     ok = err <= tol
     status = "ok   " if ok else "FAIL "
@@ -77,8 +82,8 @@ def lean_ldPrecisionTrace(decay, n_sites):
     return (n_sites * (1 + decay ** 2) - 2 * decay ** 2) / (1 - decay ** 2)
 
 
-def lean_ridgeBalance(eig, ridge, u):
-    return (1 - 1 / u) - np.mean(eig / (eig + ridge * u))
+def lean_ridgeBalance(aspect, eig, ridge, u):
+    return (1 - 1 / u) - aspect * np.mean(eig / (eig + ridge * u))
 
 
 def lean_scalarRowResolvent(latent, quadratic_form):
@@ -117,13 +122,16 @@ def check_stationary_ld():
     for decay in (0.3, 0.6, 0.85):
         n_sites, n_hap = 64, 400_000
         H = markov_haplotypes(n_hap, n_sites, decay, rng)
-        emp = (H.T @ H) / n_hap                      # empirical LD kernel
         for sep in (1, 3, 8):
+            # haplotypes are independent, sites within one are not, so the
+            # Monte Carlo error is computed across haplotypes, not across pairs
+            per_hap = np.mean(H[:, :n_sites - sep] * H[:, sep:], axis=1)
+            est = float(per_hap.mean())
+            se = float(per_hap.std(ddof=1) / np.sqrt(n_hap))
             ok &= report(f"stationaryLDEntry(rho={decay}, d={sep})",
                          "correlation at separation d is decay**d",
-                         lean_stationaryLDEntry(decay, sep),
-                         float(np.mean(np.diagonal(emp, sep))),
-                         0.02)
+                         lean_stationaryLDEntry(decay, sep), est,
+                         0.02, f"(4 se = {4 * se:.1e})", floor=4 * se)
         # exact Toeplitz kernel, for the spectral claims
         idx = np.arange(n_sites)
         K = decay ** np.abs(idx[:, None] - idx[None, :])
@@ -252,11 +260,11 @@ def check_dead_sensors():
 # The spectator principle: the ridge fixed point is a functional of the design
 # alone, and the evaluation geometry enters only linearly, commuting or not.
 
-def ridge_fixed_point(eig, ridge):
+def ridge_fixed_point(aspect, eig, ridge):
     lo, hi = 1.0 + 1e-12, 1e12
     for _ in range(400):
         mid = np.sqrt(lo * hi)
-        if lean_ridgeBalance(eig, ridge, mid) < 0:
+        if lean_ridgeBalance(aspect, eig, ridge, mid) < 0:
             lo = mid
         else:
             hi = mid
@@ -272,7 +280,8 @@ def check_spectator():
     eig = rng.uniform(0.2, 3.0, size=k)
     A = QA @ np.diag(eig) @ QA.T
     Ah = QA @ np.diag(np.sqrt(eig)) @ QA.T
-    u = ridge_fixed_point(eig, ridge)
+    aspect = k / n
+    u = ridge_fixed_point(aspect, eig, ridge)
     M = np.linalg.inv(A / u + ridge * np.eye(k))     # deterministic equivalent
 
     # two evaluation geometries: one commuting with A, one in general position
@@ -295,7 +304,7 @@ def check_spectator():
                      "tr(B (S+ridge)^-1)/k from the scalar fixed point",
                      predicted, float(np.mean(emp)), 0.05)
     ok &= report("ridgeBalance root", "root of the balance equation",
-                 0.0, lean_ridgeBalance(eig, ridge, u), 1e-8)
+                 0.0, lean_ridgeBalance(aspect, eig, ridge, u), 1e-6, floor=1e-6)
     return ok
 
 

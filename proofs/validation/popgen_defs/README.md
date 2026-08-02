@@ -38,6 +38,26 @@ theory at a null or control point in the same run.
 | `admixedFst` | `DemographicHistory.lean:173` | `(1−α)²` scaling ignores that F_ST is a ratio; −2% to −91%, worst at high α |
 | `partialOverlapR2` | `SampleOverlapBias.lean:54` | spurious `/n_gwas` makes overlap inflation ~2000× too small; truth is `(1−f)R²_out + f·R²_in` |
 | `bottleneckLDAmplification` | `LDDecayTheory.lean:192` | no recombination rate; rises to 1 instead of saturating at `1/(1+4Nc)`; up to 3.3× too high |
+| `stabilizingPortability`, `diversifyingPortability` | `PortabilityBounds.lean:223,246` | no constant `strength` fits the portability curve — the fitted value spans 13× over a 29× F_ST range; also returns negative R² for F_ST > 0.5 |
+| `ldCorrelationSq` | `CovarianceStructure.lean:91` | equals r²/4 when fed haplotype `D`, which is exactly what `admixtureLDTwoLocus` in the same file produces |
+| `ldsrExpectedChi2` | `CovarianceStructure.lean:308` | confounding term divided by M; at N=8×10⁵, M=9×10⁵ it reports χ²=1.32 where the truth is 420.8 |
+
+### The composition hazard
+
+`ldCorrelationSq` is the first bug found that is not local to one definition.
+`admixtureLDTwoLocus` (line 447) is documented as `freq(AB) − freq(A)×freq(B)`,
+i.e. haplotype `D`. `ldCorrelationSq` (line 91) divides by
+`allelicVariance p_i * allelicVariance p_j = 4 p_i q_i p_j q_j`, which cancels
+only for a *dosage covariance* (= 2 × haplotype `D`). Each definition is
+defensible alone; composing them — the obvious thing to do, since one produces
+`D` and the other consumes `D`, 350 lines apart in one file — silently yields
+`r²/4`. Lean cannot see this because both are `ℝ`. `tagR2` carries the same
+hazard if `var_tag`/`var_causal` are read as `allelicVariance`.
+
+This suggests a second static screen alongside the missing-argument one: for
+each definition, record the *units/convention* of every real-valued argument,
+and check that any definition consuming a quantity another definition produces
+agrees on it.
 
 ## Validated
 
