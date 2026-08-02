@@ -1441,3 +1441,287 @@ check(
         "same number."
     ),
 )
+
+
+# --- 15. Identity-by-descent recurrence: the two readings of `rate` ---------
+#
+# One body carries nine names in the corpus, and `rate` is instantiated as a
+# MUTATION rate in some and a MIGRATION rate in others:
+#
+#     ibdRecurrenceStep Ne rate x = (1-rate)^2 (1/(2Ne) + (1-1/(2Ne)) x)
+#     ibdRecurrenceFixedPoint     = (1-rate)^2/((1-rate)^2 + 2 Ne rate (2-rate))
+#     islandFstMultiplicativeStep       := ibdRecurrenceStep
+#     fstIslandMultiplicativeEquilibrium := ibdRecurrenceFixedPoint
+#     ibdFlowStep / fstMigDriftNext / scaledIdentityStep / fstDriftFlowStep /
+#     fstEquilibrium -- the linearised companions, fixed point 1/(1+4 Ne rate)
+#
+# Every one of them is marked `Empirical status: UNTESTED` in the Lean. The
+# checks below are the analytic half; the sampled half is
+# cluster/fam_ibd_recurrence.py, which computes the same ancestral process by
+# an exact 2x2 identity solve AND by an independent Monte Carlo on deme labels.
+#
+# WHY THE TWO READINGS CANNOT BOTH BE RIGHT. A mutation destroys identity on
+# the lineage it hits and that lineage is gone for good, so `(1-mu)^2` is an
+# EXACT factor. A migration event MOVES one lineage; it is still there and can
+# migrate back, so `(1-m)^2` is an ABSORBING approximation to a recurrent
+# process. The pair `ibdRecurrenceFixedPoint-mutation-reading-exact` (expected
+# to AGREE to machine precision) and `ibdRecurrenceFixedPoint-migration-reading`
+# (expected to DISAGREE) is what makes the second interpretable: without the
+# first a reader cannot tell whether the disagreement is the corpus or the
+# reference.
+
+_IBD = grid(Ne=[50.0, 100.0, 1000.0], rate=[1e-4, 1e-3, 5e-3, 2e-2])
+
+
+def _ibd_exact_identity(ne, m, mu, d):
+    """EXACT probability of identity in state for two lineages in a d-deme
+    island model, discrete generations, migration then mutation then
+    coalescence. Returns (f_same_deme, f_different_demes).
+
+    Two states suffice because migration is uniform over the other d-1 demes,
+    so only co-residence matters:
+        S -> S : neither moves, (1-m)^2; or both move and land together,
+                 m^2/(d-1)
+        B -> S : exactly one moves onto the other, 2m(1-m)/(d-1); or both move
+                 and land together, m^2 (d-2)/(d-1)^2
+    This is an independent derivation, not a rearrangement of the corpus body:
+    the corpus body is what it is being compared against.
+    """
+    if mu <= 0.0:
+        return (1.0, 1.0 if (d > 1 and m > 0.0) else 0.0)
+    surv = (1.0 - mu) ** 2
+    c = 1.0 / (2.0 * ne)
+    if d <= 1 or m <= 0.0:
+        return (surv * c / (1.0 - surv * (1.0 - c)), 0.0)
+    q = 1.0 / (d - 1.0)
+    m_ss = (1 - m) ** 2 + m * m * q
+    m_sb = 1.0 - m_ss
+    m_bs = 2 * m * (1 - m) * q + m * m * (d - 2.0) * q * q
+    m_bb = 1.0 - m_bs
+    a = surv * m_ss * (1 - c)
+    b = surv * m_sb
+    u = surv * m_ss * c
+    cc = surv * m_bs * (1 - c)
+    dd = surv * m_bb
+    v = surv * m_bs * c
+    det = (1 - a) * (1 - dd) - b * cc
+    f_s = (u * (1 - dd) + b * v) / det
+    f_b = ((1 - a) * v + cc * u) / det
+    return (f_s, f_b)
+
+
+def _ibd_exact_island_fst(ne, m, d, theta=1e-3):
+    """F_ST = (f_S - f_B)/(1 - f_B) at a mutation floor theta = 4*Ne*mu.
+
+    F_ST is only defined relative to some mutation; theta is held three orders
+    below the migration scale and the simulator's companion cell halves it and
+    confirms F_ST does not move.
+    """
+    f_s, f_b = _ibd_exact_identity(ne, m, theta / (4.0 * ne), d)
+    return (f_s - f_b) / (1.0 - f_b)
+
+
+def _fixed_point(step, x0=0.0, n=200000):
+    x = x0
+    for _ in range(n):
+        x = step(x)
+    return x
+
+
+check(
+    id="ibdRecurrenceFixedPoint-is-fixed-point",
+    fqn="Calibrator.PortabilityDrift.ibdRecurrenceFixedPoint",
+    claim="the closed form is the rest point of ibdRecurrenceStep",
+    model_lean="(1-rate)^2 (1/(2Ne) + (1-1/(2Ne)) x)",
+    model_ref="the same map, iterated numerically to convergence",
+    reference="numerical iteration of the corpus step, 200000 iterations",
+    grid=_IBD,
+    lean=lambda D, Ne, rate: D["ibdRecurrenceFixedPoint"](Ne, rate),
+    ref=lambda D, Ne, rate: _fixed_point(
+        lambda x: D["ibdRecurrenceStep"](Ne, rate, x)),
+    tol=1e-7,
+    kind="identity",
+    note="SELF-CONSISTENCY, not validation. It exists so that a disagreement "
+         "in the checks below is known to be about the MODEL and not about "
+         "the closed form failing to solve its own recurrence.",
+    canfail_clause=(
+        "rate must be >0 and Ne finite: at rate=0 both sides are 1 and at "
+        "Ne=inf both are 0, and either boundary passes for any body with the "
+        "right limits."
+    ),
+)
+
+check(
+    id="ibdRecurrenceFixedPoint-mutation-reading-exact",
+    fqn="Calibrator.PortabilityDrift.ibdRecurrenceFixedPoint",
+    claim="POSITIVE CONTROL: under the MUTATION reading the corpus body is "
+          "exactly the identity probability of the ancestral process",
+    model_lean="rate = mu; one panmictic deme",
+    model_ref="two lineages in one Wright-Fisher deme of Ne diploids, "
+              "infinite alleles at rate mu per lineage per generation, "
+              "mutation acting before coalescence; P(coalesce before either "
+              "mutates), computed from the 2x2 identity system",
+    reference="_ibd_exact_identity(Ne, m=0, mu=rate, d=1)",
+    grid=_IBD,
+    lean=lambda D, Ne, rate: D["ibdRecurrenceFixedPoint"](Ne, rate),
+    ref=lambda Ne, rate: _ibd_exact_identity(Ne, 0.0, rate, 1)[0],
+    tol=1e-12,
+    note=(
+        "EXPECTED TO AGREE to machine precision, and it is what makes "
+        "ibdRecurrenceFixedPoint-migration-reading interpretable. The "
+        "mutation reading is not an approximation: a mutated lineage is gone "
+        "for good, so (1-mu)^2 is exact."
+    ),
+    canfail_clause=(
+        "the reference is derived from the ancestral process, not from the "
+        "corpus body; the companion check "
+        "ibdRecurrenceFixedPoint-migration-reading uses the SAME reference "
+        "machinery with d=2 and disagrees by tens of percent, which is the "
+        "demonstration that this reference can produce a different number."
+    ),
+)
+
+check(
+    id="ibdRecurrenceFixedPoint-migration-reading",
+    fqn="Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium",
+    claim="MODEL: under the MIGRATION reading the same body is NOT the island "
+          "F_ST, because migration is recurrent and the body treats it as "
+          "absorbing",
+    model_lean="rate = m; (1-m)^2 destroys identity outright",
+    model_ref="two-deme island model, exact identity system, migration "
+              "reversible, F_ST = (f_S - f_B)/(1 - f_B) at a mutation floor",
+    reference="_ibd_exact_island_fst(Ne, m, d=2)",
+    grid=grid(Ne=[100.0], m=[6.25e-4, 1.25e-3, 2.5e-3, 5e-3, 2e-2, 5e-2]),
+    lean=lambda D, Ne, m: D["fstIslandMultiplicativeEquilibrium"](Ne, m),
+    ref=lambda Ne, m: _ibd_exact_island_fst(Ne, m, 2),
+    kind="model",
+    expected_verdict="MODEL-DIFFERS",
+    note=(
+        "EXPECTED TO DISAGREE, and the disagreement is the result. Its "
+        "companion ibdRecurrenceFixedPoint-mutation-reading-exact passes to "
+        "1e-12 against the same reference machinery, which localises this gap "
+        "to the READING of `rate` and not to the reference."
+    ),
+    canfail_clause=(
+        "4*Ne*m must reach BELOW 1 (the grid starts at 0.25). Above 4*Ne*m ~ "
+        "10 every candidate gives F_ST ~ 0 and a grid confined there validates "
+        "all of them at once."
+    ),
+)
+
+check(
+    id="fstIslandMultiplicativeEquilibrium-missing-deme-count",
+    fqn="Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium",
+    claim="SCOPE: the island equilibrium has no argument for the NUMBER of "
+          "demes, and F_ST depends on it at fixed 4*Ne*m",
+    model_lean="Ne and m only",
+    model_ref="finite-island F_ST = 1/(1 + 4 Ne m (d/(d-1))^2), d = 2",
+    reference="refs.island_fst_finite_demes",
+    grid=grid(Ne=[100.0], m=[6.25e-4, 2.5e-3, 1e-2]),
+    lean=lambda D, Ne, m: D["fstIslandMultiplicativeEquilibrium"](Ne, m),
+    ref=lambda Ne, m: refs.island_fst_finite_demes(Ne, m, 2),
+    kind="scope",
+    expected_verdict="SCOPE-DIFFERS",
+    note=(
+        "The corpus body returns ONE number for d = 2, 10 and 100 demes; the "
+        "finite-island reference differs between them by the factor "
+        "(d/(d-1))^2, which is 4 at d=2 and 1.02 at d=100. This is a MISSING "
+        "REGIME DECLARATION, not wrong arithmetic: the body is the d -> "
+        "infinity reading and nothing says so."
+    ),
+    canfail_clause=(
+        "d must be SMALL. At d = 100 the reference and the d -> infinity form "
+        "agree to 2% and the check cannot see the missing argument; d = 2 is "
+        "the reach that makes it visible."
+    ),
+)
+
+check(
+    id="ibdFlowStep-linearisation-gap",
+    fqn="Calibrator.PortabilityDrift.ibdFlowStep",
+    claim="the linearised flow step and the multiplicative recurrence do NOT "
+          "share a fixed point",
+    model_lean="F + (1-F)/(2Ne) - 2 rate F, iterated to its rest point",
+    model_ref="the multiplicative recurrence's rest point, same Ne and rate",
+    reference="Calibrator.PortabilityDrift.ibdRecurrenceFixedPoint",
+    grid=_IBD,
+    lean=lambda D, Ne, rate: _fixed_point(
+        lambda x: D["ibdFlowStep"](Ne, rate, x)),
+    ref=lambda D, Ne, rate: D["ibdRecurrenceFixedPoint"](Ne, rate),
+    kind="model",
+    expected_verdict="MODEL-DIFFERS",
+    note=(
+        "Quantifies ibdRecurrenceFixedPoint_lt_linearisation. The two are "
+        "the SAME model composed in two different orders -- added versus "
+        "multiplied -- so the size of the gap is the cost of the composition "
+        "convention, which both docstrings declare as O(rate^2, rate/Ne)."
+    ),
+    canfail_clause=(
+        "rate must reach 2e-2 and Ne must reach 50. At rate=1e-4, Ne=50 the "
+        "two agree to better than 1e-3 and the check is vacuous -- which is "
+        "the point: the declared O(rate^2, rate/Ne) is exactly the regime "
+        "where it stops being vacuous, so the grid must span both."
+    ),
+)
+
+check(
+    id="fstMigDriftNext-duplicates-ibdFlowStep",
+    fqn="Calibrator.PortabilityDrift.fstMigDriftNext",
+    claim="DUPLICATE: fstMigDriftNext is ibdFlowStep with the terms collected",
+    model_lean="(1 - 2m - 1/(2Ne)) F + 1/(2Ne)",
+    model_ref="F + (1-F)/(2Ne) - 2 m F, the same map",
+    reference="Calibrator.PortabilityDrift.ibdFlowStep",
+    grid=grid(Ne=[50.0, 100.0, 1000.0], m=[1e-4, 1e-3, 2e-2],
+              F=[0.0, 0.3, 0.9]),
+    lean=lambda D, Ne, m, F: D["fstMigDriftNext"](Ne, m, F),
+    ref=lambda D, Ne, m, F: D["ibdFlowStep"](Ne, m, F),
+    kind="identity",
+    note="two names, one map, and neither file mentions the other; recorded "
+         "so the duplication is pinned rather than rediscovered",
+    canfail_clause=(
+        "F must be swept away from the fixed point (the grid runs 0, 0.3, "
+        "0.9). At F equal to the common fixed point both sides return it and "
+        "any map with the same rest point would pass."
+    ),
+)
+
+check(
+    id="scaledIdentityStep-fixed-point",
+    fqn="Calibrator.PopulationGeneticsFoundations.scaledIdentityStep",
+    claim="the scaled-time balance has fixed point 1/(1 + scaledRate), which "
+          "is the 4*Ne*rate limit of ibdFlowStep",
+    model_lean="1 - scaledRate * F at scaledRate = 4*Ne*rate",
+    model_ref="rest point of ibdFlowStep at the same Ne and rate",
+    reference="Calibrator.PortabilityDrift.ibdFlowStep, iterated",
+    grid=_IBD,
+    lean=lambda D, Ne, rate: 1.0 / (1.0 + 4.0 * Ne * rate),
+    ref=lambda D, Ne, rate: _fixed_point(
+        lambda x: D["ibdFlowStep"](Ne, rate, x)),
+    tol=1e-9,
+    kind="identity",
+    note="pins the scaled-time member onto the per-generation one; "
+         "scaledIdentityStep itself is exercised by "
+         "scaledIdentityStep-is-the-balance below",
+    canfail_clause=(
+        "needs rate > 0; at rate = 0 both are 1 for any body with that limit."
+    ),
+)
+
+check(
+    id="scaledIdentityStep-is-the-balance",
+    fqn="Calibrator.PopulationGeneticsFoundations.scaledIdentityStep",
+    claim="scaledIdentityStep really does fix 1/(1+scaledRate)",
+    model_lean="1 - scaledRate * F",
+    model_ref="the value 1/(1+scaledRate) fed back through the same map",
+    reference="algebraic fixed point",
+    grid=grid(scaledRate=[0.25, 0.5, 1.0, 2.0, 8.0, 20.0]),
+    lean=lambda D, scaledRate: D["scaledIdentityStep"](
+        scaledRate, 1.0 / (1.0 + scaledRate)),
+    ref=lambda scaledRate: 1.0 / (1.0 + scaledRate),
+    tol=1e-12,
+    kind="identity",
+    canfail_clause=(
+        "scaledRate must span below and above 1: at scaledRate=0 the map is "
+        "the constant 1 and fixes it trivially."
+    ),
+)

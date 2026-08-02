@@ -360,17 +360,30 @@ def main():
         vals = {}
         for d in (2, 10, 100):
             vals["exact_Fst_d%d" % d] = exact_fst(NE, rate, mu_floor, d)[0]
+        # REPLICATE COUNT AND ERROR PROPAGATION.
+        #   At the mutation floor both f_S and f_B sit within 0.003 of 1 and
+        #   F_ST = (f_S - f_B)/(1 - f_B) is a ratio of DIFFERENCES of near-one
+        #   probabilities, so the Monte Carlo error on F_ST is amplified by
+        #   1/(1 - f_B) ~ 500 relative to the error on f. The first run used
+        #   100000 replicates and a flat 5e-3 tolerance, which is a tolerance
+        #   on the wrong quantity: it read as a 32% RED at 4*Ne*m = 2 while the
+        #   exact and Monte Carlo f's agreed to 2e-4. The replicate count is
+        #   RAISED, not the tolerance loosened, and the tolerance is now the
+        #   delta-method standard error of F_ST itself.
         mc2, se2, un2 = mc_identity(rng, NE, rate, mu_floor, 2, True,
-                                    reps=100000, cap=200000)
+                                    reps=4000000, cap=200000)
         mcb, seb, unb = mc_identity(rng, NE, rate, mu_floor, 2, False,
-                                    reps=100000, cap=200000)
+                                    reps=4000000, cap=200000)
         mc_fst = (mc2 - mcb) / (1.0 - mcb)
+        se_fst = float(np.sqrt((se2 / (1.0 - mcb)) ** 2
+                               + (seb * (1.0 - mc2) / (1.0 - mcb) ** 2) ** 2))
         rows.append({
             "cell": "J4 MISSING ARGUMENT: F_ST depends on d, the body does not",
             "scaled_rate_4Ne": scaled,
             "CORPUS_ibdRecurrenceFixedPoint_no_d_argument":
                 ibd_recurrence_fixed_point(NE, rate),
-            "mc_Fst_d2": mc_fst, "mc_f_S": mc2, "mc_f_B": mcb,
+            "mc_Fst_d2": mc_fst, "mc_Fst_se_delta_method": se_fst,
+            "mc_f_S": mc2, "mc_f_S_se": se2, "mc_f_B": mcb, "mc_f_B_se": seb,
             "mc_unresolved": max(un2, unb),
             "mc_vs_exact_d2_relerr":
                 abs(mc_fst - vals["exact_Fst_d2"])
@@ -380,8 +393,7 @@ def main():
                 / max(abs(vals["exact_Fst_d2"]), 1e-12),
             "isolates": ("the number of demes alone -- every other parameter "
                          "is held fixed across the three columns"),
-            "ok": (abs(mc_fst - vals["exact_Fst_d2"])
-                   < 6 * max(se2 + seb, 1e-9) + 5e-3),
+            "ok": abs(mc_fst - vals["exact_Fst_d2"]) < 4.0 * se_fst,
             **vals,
         })
 
