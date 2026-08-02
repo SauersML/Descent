@@ -463,14 +463,14 @@ check(
         "    d log L / d log Ne  = -0.000   (corrected 0;    OLD BODY +1/2)\n"
         "    d log L / d log m   = +0.510   (corrected +1/2)\n"
         "A magnitude agreement can be a coincidence; three exponents cannot.\n\n"
-        "OPEN, and not fixed by this repair: the body carries NO dispersal "
-        "variance. The lattice truth is L = sqrt(m*sigma^2/(2*mu)), so this is "
-        "the sigma^2 = 1 case, while the two siblings in the same family -- "
-        "demoSteppingStoneFst (d Ne m sigma_sq) and steppingStoneCoalescenceTime "
-        "(d sigma_sq m) -- both take sigma_sq explicitly. A mentions query "
-        "finds no call site that supplies a dispersal variance and no "
-        "docstring that says sigma^2 = 1, so the family is silently split on "
-        "whether its lattice has one. The repair is a declaration."
+        "OPEN, and now MEASURED rather than argued -- see "
+        "`steppingStoneLength-missing-sigma-squared` below. The body carries "
+        "NO dispersal variance, and the fourth exponent is\n"
+        "    d log L / d log sigma^2 = +0.475   (corpus 0; truth +1/2)\n"
+        "giving -26.9% at sigma^2 = 2 and -49.3% at sigma^2 = 4. That exponent "
+        "is convention-free: a constant factor on the mutation rate shifts "
+        "every L equally and cannot move an exponent, so this finding survives "
+        "the question that dissolved the apparent +44% above."
     ),
     canfail_clause=(
         "the grid MUST vary mu at fixed Ne and m: the Lean value is constant "
@@ -495,6 +495,56 @@ check(
 # A check whose Lean side no longer exists cannot fail informatively, so
 # keeping it would have meant a permanent KeyError dressed up as coverage. The
 # surviving side is still checked by `demoSteppingStoneFst-exact` below.
+def _ss_length_with_sigma(m: float, mu: float, sigma_sq: float) -> float:
+    return math.sqrt(m * sigma_sq / (2.0 * mu))
+
+
+check(
+    id="steppingStoneLength-missing-sigma-squared",
+    fqn="Calibrator.PopulationGeneticsFoundations.steppingStoneCharacteristicLength",
+    claim="the decay length carries a dispersal variance the signature cannot "
+          "express; the body is the sigma^2 = 1 case",
+    model_lean="L = sqrt(m/(2 mu)) -- two arguments, no dispersal variance",
+    model_ref="Malecot/Kimura-Weiss on a lattice of dispersal variance "
+              "sigma^2: L = sqrt(m sigma^2/(2 mu))",
+    reference="_ss_length_with_sigma",
+    grid=grid(m=[1e-2, 0.1], mu=[1e-6, 1e-4], sigma_sq=[1.0, 2.0, 4.0]),
+    lean=lambda D, m, mu, sigma_sq: D["steppingStoneCharacteristicLength"](m, mu),
+    ref=lambda m, mu, sigma_sq: _ss_length_with_sigma(m, mu, sigma_sq),
+    kind="scope",
+    expected_verdict="SCOPE",
+    note=(
+        "MEASURED by cluster/fam_stepping_stone.py, on a migration kernel "
+        "whose dispersal variance is SET and then measured back by control "
+        "F2, never fitted. Four exponents, measured against corpus and truth:\n"
+        "    d log L / d log mu      -0.482   (-0.5 | -0.5)   old body: 0\n"
+        "    d log L / d log Ne      +0.003   ( 0.0 |  0.0)   old body: +0.5\n"
+        "    d log L / d log m       +0.511   (+0.5 | +0.5)\n"
+        "    d log L / d log sigma^2 +0.475   ( 0.0 | +0.5)   <-- this check\n"
+        "The first three VALIDATE the sqrt(2 Ne m) -> sqrt(m/(2 mu)) repair on "
+        "every axis it was repaired along, and each separates the old body "
+        "from the new, so the agreement is not a magnitude coincidence. The "
+        "fourth is what remains: -26.9% at sigma^2 = 2, -49.3% at sigma^2 = 4.\n\n"
+        "The two siblings in the same family, demoSteppingStoneFst "
+        "(d Ne m sigma_sq) and steppingStoneCoalescenceTime (d sigma_sq m), "
+        "both take sigma_sq explicitly. A mentions query finds no call site "
+        "that supplies a dispersal variance to THIS one and no docstring that "
+        "says sigma^2 = 1, so the family is silently split on whether its "
+        "lattice has one. The repair is a declaration, not arithmetic."
+    ),
+    canfail_clause=(
+        "sigma^2 must exceed 1 somewhere in the grid -- at sigma^2 = 1 the two "
+        "sides are identically equal and the check cannot fail, which is "
+        "exactly why the sigma_sq = 1.0 row is KEPT: it is the row that must "
+        "AGREE, and a reference that disagreed there would be wrong.\n\n"
+        "This axis is also the only convention-free one. A grid confined to "
+        "mu, m or Ne cannot separate this defect from a mutation-rate "
+        "convention mismatch, because a constant factor on mu rescales L "
+        "uniformly; sigma^2 changes the exponent, which no constant can."
+    ),
+)
+
+
 check(
     id="demoSteppingStoneFst-exact",
     fqn="Calibrator.DemographicHistory.demoSteppingStoneFst",
@@ -523,10 +573,26 @@ check(
         "exactly, which is the degeneracy demoSteppingStoneFst's own docstring "
         "records; the simulator holds sigma^2 at a value control F2 measures "
         "back, so the quadratic form can lose, and it does.\n\n"
-        "REGIME FOUND: the agreement degrades toward the far side of the "
-        "lattice, -6.6% at d = D/2, because the exact circle result is "
-        "d(D-d)/(...) and the corpus form is its d << D limit. Nothing in the "
-        "corpus states that limit."
+        "TWO REGIME BOUNDS FOUND, one at each end of the d range.\n\n"
+        "FAR END: agreement degrades to -6.6% at d = D/2, because the exact "
+        "circle result is d(D-d)/(...) and the corpus form is its d << D "
+        "limit. Nothing in the corpus states that limit.\n\n"
+        "NEAR END, and this is the experiment the docstring records as never "
+        "having been done. Two cells with IDENTICAL m*sigma^2 = 0.1, sigma^2 "
+        "set by the kernel and measured back by F2, so the degeneracy the "
+        "docstring describes is broken by construction. demoSteppingStoneFst "
+        "sees the pair only through m*sigma^2 and predicts the same F_ST in "
+        "both:\n"
+        "    d=1    measured 0.0968 vs 0.2638   demo 0.0909 both  (2.7x apart)\n"
+        "    d=4    measured 0.2893 vs 0.3854   demo 0.2857 both\n"
+        "    d=16   measured 0.6057 vs 0.6372   demo 0.6154 both\n"
+        "    d=128  measured 0.8673 vs 0.8711   demo 0.9275 both  (0.4% apart)\n"
+        "So the m*sigma^2 degeneracy is ITSELF ONLY A LARGE-d PROPERTY. At "
+        "separations comparable to the dispersal scale, F_ST depends on the "
+        "whole step distribution and not on m*sigma^2 at all. The docstring "
+        "says evidence gathered with sigma^2 free constrains m*sigma^2 and "
+        "nothing else -- true at long range; at short range even m*sigma^2 is "
+        "not sufficient, so the regime is d >> dispersal scale AND d << D."
     ),
     canfail_clause=(
         "d > 0 and finite Ne; at d=0 both sides are 0.\n\n"
