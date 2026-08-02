@@ -88,7 +88,11 @@ def main(argv):
     for k in sorted(cs):
         c = cs[k]
         d = c.d
-        base_range = range_check(c, defs)
+        # The BASE verdict uses the solver, so a containment z3 proved counts
+        # as a registered check.  Only the mutant sweep skips it: there we
+        # merely need to see the verdict flip, which sampling decides, and a
+        # solver call per mutant would cost hours.
+        base_range = range_check(c, defs, use_z3=True)
         base_checks, _ = INV.derive(c)
         base_inv = []
         for ch in base_checks:
@@ -142,7 +146,7 @@ def main(argv):
             kills = []
             if "range" in registered:
                 try:
-                    mr = range_check(mc, defs)
+                    mr = range_check(mc, defs, use_z3=False)
                     if range_verdict_rejects(base_range["verdict"], mr["verdict"]):
                         kills.append("range")
                 except Exception:

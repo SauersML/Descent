@@ -213,7 +213,9 @@ PARAM_BOXES = [
      (1e-3, 1e6, "log", "a length scale is positive")),
     (r"(?i)^(lam|lambda|λ|decay|decayFactor)$",
      (0.0, 1.0, "lin", "a decay factor per step is in [0,1]")),
-    (r"(?i)^(kappa|κ|scale|scaleFactor|c\w*Scale)$",
+    # `kappa`/`κ` deliberately omitted -- a band fraction in some definitions
+    # and a positive tuning factor in others; the name does not disambiguate.
+    (r"(?i)^(scale|scaleFactor|c\w*Scale)$",
      (1e-3, 1e3, "log", "a positive scale factor")),
 ]
 
@@ -279,7 +281,11 @@ SUBSTRING_BOXES = [
      (-5.0, 5.0, "lin", "a threshold on a standardized scale")),
     (("time", "generation", "epoch"),
      (0.0, 1e3, "log1p", "a time in generations is nonnegative")),
-    (("kappa", "gamma", "factor", "scale"),
+    # `kappa` is deliberately absent: it is a band FRACTION in
+    # `ldBandDetectionShare` and a positive tuning factor elsewhere, and the
+    # name does not say which.  Boxing it as a tuning factor produced a false
+    # escape.  Returning None marks the coordinate unguarded, which is true.
+    (("gamma", "factor"),
      (1e-3, 1e2, "log", "a positive tuning factor")),
 ]
 
@@ -294,7 +300,6 @@ GREEK_BOXES = {
     "α": (0.0, 1.0, "lin", "α is a proportion or error rate"),
     "β": (-3.0, 3.0, "lin", "β is an effect size"),
     "δ": (-3.0, 3.0, "lin", "δ is a shift"),
-    "κ": (1e-3, 1e2, "log", "κ is a positive tuning factor"),
     "η": (1e-3, 1e2, "log", "η is a positive tuning factor"),
     "π": (1e-4, 1 - 1e-4, "lin", "π is a probability or prevalence"),
     "γ": (1e-3, 1e2, "log", "γ is a positive tuning factor"),

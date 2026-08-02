@@ -776,6 +776,147 @@ theorem complete_content_of_truncation
 end ObservableTower
 
 /-!
+## 5g. Panels are mixtures, and that is where the tower bites
+
+Floor two of the observable tower is real: the centered square `u = x² - 1` carries
+Mellin data that no floor-one channel sees
+(`Calibrator.EpistaticChaos.centeredSquare_third_moment_eq`), and the trap beside it —
+tuning *uncentered* products, whose logarithm is the level-one walk again — is ruled out
+by `uncentered_square_log_additive`.
+
+For a single locus none of this matters, and that is proved rather than assumed:
+`singleLocus_tower_collapses` shows two polymorphic loci agreeing in the fourth moment
+agree in every even moment, because equal fourth moments force equal variance, equal
+variance forces `q' ∈ {q, 1-q}`, and reflection makes those two agree on all even data.
+A standardized Hardy-Weinberg coordinate has a one-parameter law and floor one already
+pins it.
+
+Panels are different, and the difference is the whole point. A real panel's effective
+coordinate law is a **mixture** over its allele-frequency spectrum, and a mixture's
+floor-one invariants are mixture averages: the drift, the jet variance, the lattice type,
+and the fourth moment, which is the mixture mean of `1/(2q(1-q))`. Mixtures are not
+determined by such low-order data. Two MAF spectra can agree on every floor-one invariant
+and differ at floor two, hence give different nulls for the *same* interaction statistic.
+
+That is a difference between things that genuinely differ between studies: MAF spectra
+differ between populations, between arrays and sequencing platforms, and after any
+frequency-based filtering. So the operational statement is the one below — matching
+floor-one invariants across two panels does not license transporting a calibration
+between them.
+-/
+
+/-- A panel's **allele-frequency spectrum**: the loci it contains and their weights. The
+effective coordinate law of the panel is the corresponding mixture of standardized
+genotype laws. -/
+structure MafSpectrum (m : ℕ) where
+  /-- The Hardy-Weinberg model of each spectrum atom. -/
+  model : Fin m → HardyWeinbergModel
+  /-- The weight of each atom. -/
+  weight : Fin m → ℝ
+  /-- Weights are non-negative. -/
+  weight_nonneg : ∀ j, 0 ≤ weight j
+  /-- Weights sum to one. -/
+  weight_sum : ∑ j, weight j = 1
+
+namespace MafSpectrum
+
+variable {m : ℕ}
+
+/-- The `k`-th moment of the panel's effective coordinate law: the mixture average of the
+per-locus moments of the standardized genotype.
+
+Empirical status: UNTESTED. A mixture average over the panel's own spectrum; no free
+parameter beyond the spectrum itself, and nothing fitted. -/
+noncomputable def moment (spectrum : MafSpectrum m) (k : ℕ) : ℝ :=
+  ∑ j, spectrum.weight j *
+    ∑ g : DiploidGenotype,
+      (spectrum.model j).genotypeProb g * (spectrum.model j).standardizedGenotype g ^ k
+
+/-- **The panel's fourth moment is the mixture mean of `1 / (2q(1-q))`.**
+
+Per locus the fourth moment is the reciprocal of the genotype variance
+(`standardizedGenotype_fourth_moment`), so the panel-level floor-one datum is an average
+of reciprocals — which is exactly the functional that two different spectra can match
+while differing elsewhere. -/
+theorem fourthMoment_eq (spectrum : MafSpectrum m)
+    (hpoly : ∀ j, 0 < (spectrum.model j).altFreq ∧ (spectrum.model j).altFreq < 1) :
+    spectrum.moment 4 =
+      ∑ j, spectrum.weight j / (spectrum.model j).genotypeVariance := by
+  have hterm : ∀ j : Fin m,
+      spectrum.weight j *
+          ∑ g : DiploidGenotype,
+            (spectrum.model j).genotypeProb g *
+              (spectrum.model j).standardizedGenotype g ^ 4 =
+        spectrum.weight j / (spectrum.model j).genotypeVariance := by
+    intro j
+    rw [standardizedGenotype_fourth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2,
+      mul_one_div]
+  have hdef : spectrum.moment 4 =
+      ∑ j, spectrum.weight j *
+        ∑ g : DiploidGenotype,
+          (spectrum.model j).genotypeProb g *
+            (spectrum.model j).standardizedGenotype g ^ 4 := rfl
+  rw [hdef]
+  exact Finset.sum_congr rfl (fun j _ => hterm j)
+
+/-- **The first floor-two datum of a panel**: the third moment of the centered square,
+`E[u³] = E[x⁶] - 3 E[x⁴] + 2`, where the `+2` uses `E[x²] = 1`, which holds atom by atom
+by `standardizedGenotype_second_moment_one` and hence for the mixture.
+
+Empirical status: DERIVED from `MafSpectrum.moment` by the expansion
+`(x² - 1)³ = x⁶ - 3x⁴ + 3x² - 1`, which is `centeredSquare_third_moment_eq` at each atom;
+no free parameter. -/
+noncomputable def centeredSquareThirdMoment (spectrum : MafSpectrum m) : ℝ :=
+  spectrum.moment 6 - 3 * spectrum.moment 4 + 2
+
+/-- **Floor one does not determine floor two, for panels.** Two spectra agreeing in the
+fourth moment — a floor-one invariant — but differing in the sixth have different
+floor-two data.
+
+This is the mechanism in its smallest form. The sixth moment is not a floor-one
+invariant: floor one sees `E[x⁴]` and the logarithmic two-jet, and neither pins the
+mixture's sixth moment, because a mixture has as many degrees of freedom as it has atoms
+while floor one imposes a fixed number of linear constraints on it. -/
+theorem centeredSquareThirdMoment_differs_of_sixth (spectrum spectrum' : MafSpectrum m)
+    (hfourth : spectrum.moment 4 = spectrum'.moment 4)
+    (hsixth : spectrum.moment 6 ≠ spectrum'.moment 6) :
+    spectrum.centeredSquareThirdMoment ≠ spectrum'.centeredSquareThirdMoment := by
+  intro hcontra
+  apply hsixth
+  unfold centeredSquareThirdMoment at hcontra
+  rw [hfourth] at hcontra
+  linarith [hcontra]
+
+end MafSpectrum
+
+/-- **Matching floor one across two panels does not license transporting a calibration.**
+
+`floorOneMatched` is the conjunction a study would check before reusing a calibration:
+the two panels agree in the drift, the jet variance, the lattice type and the fourth
+moment — every floor-one invariant, locus-weighted. `hfloorTwo` says they differ at floor
+two, which by `centeredSquareThirdMoment_differs_of_sixth` needs only a difference in the
+sixth moment. The conclusion is that the null laws differ, so a calibration valid for one
+panel is not valid for the other.
+
+The transport step itself — that different floor-two data give different nulls — is the
+`floorTwo_separates` hypothesis, which is the second floor of the tower doing its work.
+It is an argument rather than an assertion, because whether a *particular* pair of spectra
+realizes the difference is a numerical question about MAF spectra, not a theorem. -/
+theorem floorOne_match_does_not_transport_calibration
+    {m : ℕ} {Limit : Type*} (nullLaw : MafSpectrum m → Limit)
+    (spectrum spectrum' : MafSpectrum m)
+    (_hdrift : ∀ j, hweMellinDrift (spectrum.model j).altFreq =
+      hweMellinDrift (spectrum'.model j).altFreq)
+    (_hjet : ∀ j, hweMellinJetVariance (spectrum.model j).altFreq =
+      hweMellinJetVariance (spectrum'.model j).altFreq)
+    (_hfourth : spectrum.moment 4 = spectrum'.moment 4)
+    (floorTwo_separates : ∀ s s' : MafSpectrum m,
+      s.centeredSquareThirdMoment ≠ s'.centeredSquareThirdMoment → nullLaw s ≠ nullLaw s')
+    (hfloorTwo : spectrum.centeredSquareThirdMoment ≠ spectrum'.centeredSquareThirdMoment) :
+    nullLaw spectrum ≠ nullLaw spectrum' :=
+  floorTwo_separates spectrum spectrum' hfloorTwo
+
+/-!
 ## 6. Where the whole development now stands
 
 Four negative results, each with its positive complement, and each attached to a

@@ -58,6 +58,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "epistaticVariancePairwise",
@@ -117,6 +118,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "equilibriumFst",
@@ -184,6 +186,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "m": 1e-09,
    "Ne": 10000000.0,
@@ -242,6 +245,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "gwasHeritability",
@@ -309,6 +313,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "rg": -1.0,
    "fst": 0.0,
@@ -431,6 +436,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "genotypeVarianceHWE",
@@ -480,6 +486,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 3,
   "searched": 8000,
   "name": "hweHeterozygosity",
@@ -528,6 +535,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "ncp",
@@ -583,6 +591,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "r2_causal": 1.0,
    "r2_total": 0.0001
@@ -649,6 +658,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "pop_size": 10000000.0,
    "total_n": 10000000.0,
@@ -716,6 +726,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "standardErrorSq",
@@ -784,6 +795,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "port_measured": -1000.0,
    "r_source": 1e-08,
@@ -881,6 +893,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "amVarianceStep",
@@ -959,10 +972,11 @@
     "founder_effect_excess_fst: 0 < sigma_sq"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "ibdFst",
   "module": "AssortativeMatingPGS",
   "line": 535,
@@ -1019,6 +1033,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "n": 23.350490984154057,
    "h": -0.04288886564220264
@@ -1115,10 +1130,11 @@
     "bayesian_shrinkage_reduces_mse: 0 < \u03b2_sq"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "optimalShrinkage",
   "module": "BayesianPGSTheory",
   "line": 200,
@@ -1174,10 +1190,11 @@
     "ld_mismatch_bias_proportional: 0 < \u03c4"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "snpShrinkage",
   "module": "BayesianPGSTheory",
   "line": 257,
@@ -1261,6 +1278,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "indirect_effect": 3.0,
    "total_effect": 3.0000000000000004e-09
@@ -1338,6 +1356,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "p_high": 1000.0,
    "rr_reduction": -1.1188724040584299e-05
@@ -1404,10 +1423,11 @@
     "fairness_impossibility: 0 < fpr"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "ppv",
   "module": "ClinicalUtilityFairness",
   "line": 703,
@@ -1493,10 +1513,11 @@
     "a disease prevalence"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "proportionCorrectlyClassified",
   "module": "ClinicalUtilityFairness",
   "line": 809,
@@ -1573,6 +1594,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "p": 0.999999,
    "y": -1000.0
@@ -1630,6 +1652,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 35,
   "searched": 8000,
   "name": "expectedBrierScore",
@@ -1758,6 +1781,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "meanAlleleFreq",
@@ -1826,6 +1850,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "loss": -1000.0,
    "total": -1000.0
@@ -1944,6 +1969,7 @@
    ]
   },
   "verdict": "escape",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "D": 1000.0,
    "p_i": 1e-06,
@@ -2009,6 +2035,7 @@
    ]
   },
   "verdict": "escape",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "D": 1000.0,
    "p_i": 1e-06,
@@ -2084,6 +2111,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "numBlocks",
@@ -2140,6 +2168,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "alleleFreqDivergenceRate",
@@ -2188,6 +2217,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "calibratedBrier",
@@ -2244,10 +2274,11 @@
     "a variance / scale parameter is positive"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "calibratedBrierFromVariances",
   "module": "DGP",
   "line": 2120,
@@ -2291,14 +2322,15 @@
     "theorem+meaning"
    ],
    "kappa": [
-    0.001,
+    -1000.0,
     1000.0,
-    "theorem+meaning"
+    "none"
    ]
   },
   "unguarded": [
    "fstSource",
-   "fstTarget"
+   "fstTarget",
+   "kappa"
   ],
   "box_provenance": {
    "fstSource": [
@@ -2318,22 +2350,23 @@
     "target_r2_drop_of_fst_and_sparse_array: 0 < arraySparsity"
    ],
    "kappa": [
-    "a positive scale factor",
-    "covariance_mismatch_pos_of_fst_and_sparse_array: 0 < kappa",
-    "target_r2_drop_of_fst_and_sparse_array: 0 < kappa"
+    "no theorem hypothesis and no recognised meaning for parameter `kappa` : \u211d"
    ]
   },
-  "verdict": "escape",
+  "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
-   "fstSource": 1.0,
-   "fstTarget": 0.0,
+   "fstSource": 0.0,
+   "fstTarget": 1.0,
    "recombRate": 0.5,
    "arraySparsity": 1.0,
-   "kappa": 1000.0
+   "kappa": -1000.0
   },
   "value": -500.0,
   "overshoot": 500.0,
-  "blind_coordinates": [],
+  "blind_coordinates": [
+   "kappa"
+  ],
   "escapes_only_where_violated": [],
   "side": "below",
   "name": "demographicCovarianceGapLowerBound",
@@ -2341,7 +2374,7 @@
   "line": 293,
   "family": "range",
   "py": "((kappa * DGP_taggingMismatchScale(recombRate, arraySparsity)) * ((fstTarget - fstSource)))",
-  "severity": 56.99837725867246
+  "severity": 31.998377258672463
  },
  "DGP.discreteRecombinationSurvival": {
   "verdict": "no-range",
@@ -2402,6 +2435,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "gaussianAUCFromSignalVariance",
@@ -2528,10 +2562,11 @@
     "an allele frequency lies in (0,1)"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "admixedAlleleFreq",
   "module": "DemographicHistory",
   "line": 351,
@@ -2578,6 +2613,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "admixedFst",
@@ -2649,10 +2685,11 @@
     "steppingStoneFst_from_coalescence_time: 0 < \u03c3_sq"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "demoSteppingStoneFst",
   "module": "DemographicHistory",
   "line": 134,
@@ -2708,6 +2745,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "founderFst",
@@ -2856,6 +2894,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "driftRetention",
@@ -2895,6 +2934,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "lossOfRetention",
@@ -2943,6 +2983,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "targetHetOfRetention",
@@ -2991,6 +3032,7 @@
    ]
   },
   "verdict": "escape",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "V_A": 1000.0,
    "r": 0.5
@@ -3167,6 +3209,7 @@
   },
   "guard_not_modelled": "a theorem proves this bound but its hypotheses are outside the arithmetic fragment, so the exclusion could not be checked directly; graded conservatively",
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "a": -1000.0,
    "b": -5.0,
@@ -3265,6 +3308,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "cov_g": -1000.0,
    "vg\u2081": 1e-06,
@@ -3473,6 +3517,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "phaseAttenuation",
@@ -3600,6 +3645,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "initial": -1000.0,
    "time": 1e-05
@@ -3884,6 +3930,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "driftLDRetention",
@@ -3974,6 +4021,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "ldRetainedFraction",
@@ -4063,6 +4111,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "ldRetentionPerGen",
@@ -4187,6 +4236,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "portabilityAtTime",
@@ -4235,6 +4285,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "secularTrendBias",
@@ -4295,12 +4346,14 @@
     "theorem+meaning"
    ],
    "kappa": [
-    0.001,
+    -1000.0,
     1000.0,
-    "theorem+meaning"
+    "none"
    ]
   },
-  "unguarded": [],
+  "unguarded": [
+   "kappa"
+  ],
   "box_provenance": {
    "decay": [
     "a decay factor per step is in [0,1]",
@@ -4308,29 +4361,28 @@
     "ldBandDetectionShare_lt_retention: 0 < decay"
    ],
    "kappa": [
-    "a positive scale factor",
-    "ldBandDetectionShare_le_retention: 0 \u2264 kappa",
-    "ldBandDetectionShare_le_retention: kappa \u2264 1",
-    "ldBandDetectionShare_lt_retention: 0 < kappa",
-    "ldBandDetectionShare_lt_retention: kappa < 1"
+    "no theorem hypothesis and no recognised meaning for parameter `kappa` : \u211d"
    ]
   },
-  "verdict": "escape",
+  "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "decay": 1.0,
-   "kappa": 1000.0
+   "kappa": -1000.0
   },
-  "value": 1000.0000000000001,
-  "overshoot": 999.0000000000001,
-  "blind_coordinates": [],
+  "value": -1000.0000000000001,
+  "overshoot": 1000.0000000000001,
+  "blind_coordinates": [
+   "kappa"
+  ],
   "escapes_only_where_violated": [],
-  "side": "above",
+  "side": "below",
   "name": "ldBandDetectionShare",
   "module": "MetricSpecificPortability",
   "line": 1183,
   "family": "range",
   "py": "(kappa - _b.div(((2.0 * decay) * _b.sin(((_b.pi * kappa)))), ((_b.pi * ((1.0 + _b.pow(decay, 2.0)))))))",
-  "severity": 50.0
+  "severity": 35.00434077479319
  },
  "MetricSpecificPortability.ldBlockDetectionShare": {
   "range": [
@@ -4394,6 +4446,7 @@
    ]
   },
   "verdict": "escape",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "recomb": 0.0015482372184684094,
    "Ne": 163209.3122260625,
@@ -4470,6 +4523,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "retainedMarkers": 1000.0,
    "totalMarkers": 1.0
@@ -4537,6 +4591,7 @@
    ]
   },
   "verdict": "escape",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "retainedMarkers": 1000.0,
    "totalMarkers": 1.0
@@ -4604,10 +4659,11 @@
     "different_uses_different_metrics: K_source < 1"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "metricPPV",
   "module": "MetricSpecificPortability",
   "line": 795,
@@ -4676,10 +4732,11 @@
     "different_uses_different_metrics: K_target < 1"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "ppvPortabilityGap",
   "module": "MetricSpecificPortability",
   "line": 804,
@@ -4737,6 +4794,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "sensitivityPortabilityGap",
@@ -4800,6 +4858,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "effectMutualInformation",
@@ -4870,6 +4929,7 @@
   },
   "guard_not_modelled": "a theorem proves this bound but its hypotheses are outside the arithmetic fragment, so the exclusion could not be checked directly; graded conservatively",
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "r2_source": 0.0001,
    "r2_target": 1.0
@@ -4945,6 +5005,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "r2_src": 0.0001,
    "lam_LD": -1000.0,
@@ -5065,10 +5126,11 @@
     "no theorem hypothesis and no recognised meaning for parameter `spike` : \u211d"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "samplePCResidualAxisFraction",
   "module": "Overlap",
   "line": 64,
@@ -5183,6 +5245,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "pi_source": 1.000074706696589,
    "pi_target": -1.1188724040584299e-05
@@ -5302,6 +5365,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "driftFactor": 100.0
   },
@@ -5378,6 +5442,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "fst_additional": 0.0,
    "ld_factor": 100.0
@@ -5461,6 +5526,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "selectedDriftFactor",
@@ -5528,6 +5594,7 @@
   },
   "guard_not_modelled": "a theorem proves this bound but its hypotheses are outside the arithmetic fragment, so the exclusion could not be checked directly; graded conservatively",
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "d": 1000.0,
    "f": -1000.0,
@@ -5620,6 +5687,7 @@
    ]
   },
   "verdict": "escape",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "d": 1000.0,
    "s": 1e-06,
@@ -5686,6 +5754,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "pgsDiffVariance_two_pop",
@@ -5740,6 +5809,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "pgsDriftVariance_one_pop",
@@ -5933,9 +6003,12 @@
    ]
   },
   "verdict": "inconclusive",
+  "decided_by": "undecided: sampling, interval BnB, and z3 (unsupported)",
+  "z3_status": "unsupported",
+  "z3_detail": "non-integer exponent",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
+  "inconclusive_reason": "no escape found by sampling+pattern search, interval branch-and-bound did not close the box within 1500 subdivisions, and the solver returned unsupported: non-integer exponent",
   "name": "alleleFreqAfterMigration",
   "module": "PopulationGeneticsFoundations",
   "line": 954,
@@ -6001,10 +6074,11 @@
     "coal_fst_approaches_one: 0 < Ne"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "coalFst",
   "module": "PopulationGeneticsFoundations",
   "line": 127,
@@ -6081,6 +6155,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "continuousSteppingStoneFst",
@@ -6141,6 +6216,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "expectedHeterozygosity",
@@ -6215,6 +6291,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "fstDerived",
@@ -6263,6 +6340,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "H": -1000.0,
    "H\u2080": 1e-09
@@ -6331,6 +6409,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "fstMigrationMutationEquilibrium",
@@ -6396,6 +6475,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "fstMutationDriftEquilibrium",
@@ -6465,6 +6545,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "fstMutationDriftTransient",
@@ -6534,6 +6615,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "fstMutationDriftTransientDiscrete",
@@ -6583,6 +6665,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "hetDecayFactor",
@@ -6667,10 +6750,11 @@
     "fstEquilibrium_derived_decreases: 0 < mu"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "hetEquilibrium",
   "module": "PopulationGeneticsFoundations",
   "line": 1199,
@@ -6758,6 +6842,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "islandModelFst",
@@ -6804,6 +6889,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "ldCorrelationFromMigration",
@@ -6859,6 +6945,7 @@
    ]
   },
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "H_T": 1e-09,
    "H_S": 1.0
@@ -6942,6 +7029,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "selectionMigrationEquilibrium",
@@ -6989,6 +7077,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "selectionMigrationEquilibriumMigrationFirst",
@@ -7044,6 +7133,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "sharedLDFractionFromMutation",
@@ -7104,6 +7194,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 335,
   "searched": 8000,
   "name": "simpleFst",
@@ -7162,6 +7253,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "f_IS": -1000.0,
    "f_ST": 0.0
@@ -7235,6 +7327,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "r2_0": 1.0,
    "fst": 0.4493807717393076,
@@ -7313,6 +7406,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "neutralPortability",
@@ -7379,6 +7473,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "r2_0": 1.0,
    "fst": 0.4990000120308686,
@@ -7447,6 +7542,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "Var_Delta_Mu",
@@ -7515,6 +7611,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "alleleFreqMismatchPenalty",
@@ -7564,6 +7661,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "Ne": 1.0,
    "m_into": -0.25008886564220256
@@ -7651,6 +7749,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "covarianceDivergenceFromRetention",
@@ -7712,6 +7811,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "covarianceDivergenceMutationDrift",
@@ -7760,6 +7860,7 @@
    ]
   },
   "verdict": "escape",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "freq_corr": -1.0,
    "ld_overlap": 1.0
@@ -7815,6 +7916,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "equalVarianceGaussianAUCFromExplainedR2",
@@ -7854,6 +7956,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "equalVarianceGaussianAUCFromSNR",
@@ -7902,6 +8005,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "equalVarianceGaussianAUCFromVariances",
@@ -8000,10 +8104,11 @@
     "neutral_drift_ratio_ge_one_sub_coalescentTau: 0 < Ne"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "fstFromGenerations",
   "module": "PortabilityDrift",
   "line": 41,
@@ -8056,10 +8161,11 @@
     "fstFromTau_lt_coalescenceCdf: 0 < tau"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "fstFromTau",
   "module": "PortabilityDrift",
   "line": 38,
@@ -8105,10 +8211,11 @@
     "fstIslandMultiplicativeEquilibrium_isFixedPoint: m < 1"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "PortabilityDrift",
   "line": 4727,
@@ -8183,6 +8290,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "fstMigDriftEquil",
@@ -8239,10 +8347,11 @@
     "an F_ST in [0,1]"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "fstMigDriftNext",
   "module": "PortabilityDrift",
   "line": 5269,
@@ -8336,6 +8445,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "fstMigrationDriftEquilibrium",
@@ -8388,10 +8498,11 @@
     "driftOnly_lt_hetTrajectory_of_below_floor: 0 \u2264 mu"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "hetMutationFloor",
   "module": "PortabilityDrift",
   "line": 460,
@@ -8449,6 +8560,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "Ne": 10000000.0,
    "mu": 1e-10,
@@ -8507,6 +8619,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "ETss": 1000.0,
    "ETst": -1.1188724040584299e-05
@@ -8605,6 +8718,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "Ne": 10000000.0,
    "m": 1e-09,
@@ -8672,6 +8786,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "ldCorrelationDecay",
@@ -8780,10 +8895,11 @@
     "pairwiseFst_composition_gap_le: 0 \u2264 b"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "pairwiseFstFromBranchTaus",
   "module": "PortabilityDrift",
   "line": 92,
@@ -8836,6 +8952,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "pairwiseFstFromBranches",
@@ -8908,6 +9025,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "presentDayEqualVarianceGaussianAUC",
@@ -8969,6 +9087,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "presentDayGaussianAUC",
@@ -9062,10 +9181,11 @@
     "admixture_portability_above_equilibrium: equilibrium_ld < 1"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "presentDayPGSVarianceMutationDrift",
   "module": "PortabilityDrift",
   "line": 4349,
@@ -9166,6 +9286,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "sharedLDFromMigration",
@@ -9215,6 +9336,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "sharedLD_from_equilibrium",
@@ -9285,6 +9407,7 @@
   },
   "guard_not_modelled": "a theorem proves this bound but its hypotheses are outside the arithmetic fragment, so the exclusion could not be checked directly; graded conservatively",
   "verdict": "escape-outside-theorem",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "V_A": 1000.0,
    "Ne": 10000000.0,
@@ -9344,6 +9467,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "sourceBrierFromR2",
@@ -9414,6 +9538,7 @@
    ]
   },
   "verdict": "escape",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "fst_neighbor": 1.0,
    "\u03b1": 1.0,
@@ -9490,10 +9615,11 @@
     "an F_ST in [0,1]"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "targetBrierFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
   "line": 3107,
@@ -9563,6 +9689,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "targetExactGaussianAUCFromNeutralAFBenchmark",
@@ -9620,6 +9747,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "targetGaussianAUCFromNeutralAFBenchmark",
@@ -9748,6 +9876,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "wrightFisherDriftRetention",
@@ -9847,6 +9976,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "noncentralityParam",
@@ -9895,6 +10025,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "powerAtThreshold",
@@ -9955,10 +10086,11 @@
     "balanced_allocation_maximizes_total_utility: 0 < C"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "r2ScalingModel",
   "module": "PowerAnalysis",
   "line": 362,
@@ -10082,10 +10214,11 @@
     "mutationSelectionBalanceRecessive_sq_le: 0 < s"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "mutationSelectionBalanceRecessive",
   "module": "RareVariantPortability",
   "line": 347,
@@ -10254,6 +10387,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "effectCorrelationStabilizing",
@@ -10311,6 +10445,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "effectVarianceRecurrence",
@@ -10372,6 +10507,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "fluctuatingEffectCorrelation",
@@ -10487,16 +10623,23 @@
     "no theorem hypothesis and no recognised meaning for parameter `se` : \u211d"
    ]
   },
-  "verdict": "inconclusive",
-  "bnb_boxes": 163,
-  "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
+  "verdict": "escape-outside-theorem",
+  "decided_by": "z3 (SAT, model is the witness)",
+  "witness": {
+   "se": 0.0
+  },
+  "value": 0.0,
+  "side": "below",
+  "blind_coordinates": [
+   "se"
+  ],
+  "overshoot": 1e-300,
   "name": "effectiveSampleSizeSE",
   "module": "StatisticalGeneticsMethodology",
   "line": 154,
   "family": "range",
   "py": "_b.div(1.0, _b.pow(se, 2.0))",
-  "severity": -1.0
+  "severity": -15.0
  },
  "StatisticalGeneticsMethodology.incrementalR2": {
   "verdict": "no-range",
@@ -10547,6 +10690,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "pgsAttenuationFactor",
@@ -10756,10 +10900,11 @@
     "optimalSourceShrinkageWeight_le_half_iff_target_samples_dominate_gap: 0 < nTarget"
    ]
   },
-  "verdict": "inconclusive",
+  "verdict": "proved",
+  "decided_by": "z3 (UNSAT over the whole box)",
+  "z3_detail": "no point of the box leaves the range (UNSAT)",
   "bnb_boxes": 1500,
   "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "optimalSourceShrinkageWeight",
   "module": "TransferLearningPGS",
   "line": 1386,
@@ -10847,6 +10992,7 @@
    ]
   },
   "verdict": "proved",
+  "decided_by": "interval-branch-and-bound",
   "bnb_boxes": 1,
   "searched": 8000,
   "name": "pinskerAncestryDivergenceCap",
@@ -11056,6 +11202,7 @@
    ]
   },
   "verdict": "escape-unguarded",
+  "decided_by": "sampling + pattern search",
   "witness": {
    "between": 1000.0,
    "total": -1.1188724040584299e-05

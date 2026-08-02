@@ -4159,63 +4159,7 @@
   "severity": -1.0
  },
  "DGP.demographicCovarianceGapLowerBound": {
-  "checks": [
-   {
-    "kind": "continuity",
-    "why": "`fstSource` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "continuity",
-    "why": "`fstTarget` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "continuity",
-    "why": "`recombRate` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "continuity",
-    "why": "`arraySparsity` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "continuity",
-    "why": "`kappa` reaches 0.001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "totality",
-    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
-    "holds": true,
-    "detail": {
-     "findings": [],
-     "n_findings": 0,
-     "n_with_finite_limit": 0
-    }
-   }
-  ],
+  "checks": [],
   "skipped": [
    {
     "kind": "symmetry",
@@ -4231,22 +4175,26 @@
    },
    {
     "kind": "limit-Ne",
-    "reason": "no effective-population-size argument"
+    "reason": "cannot place a physically meaningful box on ['kappa']"
    },
    {
     "kind": "limit-freq",
     "reason": "not a heterozygosity of a frequency"
    },
    {
-    "kind": "monotone",
-    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+    "kind": "continuity",
+    "reason": "cannot place a physically meaningful box on ['kappa']"
+   },
+   {
+    "kind": "totality",
+    "reason": "cannot place a physically meaningful box on ['kappa']"
    }
   ],
   "name": "demographicCovarianceGapLowerBound",
   "module": "DGP",
   "line": 293,
   "family": "invariant",
-  "n_checks": 6,
+  "n_checks": 0,
   "severity": -1.0
  },
  "DGP.discreteRecombinationSurvival": {
@@ -10147,36 +10095,7 @@
   "severity": -1.0
  },
  "MetricSpecificPortability.ldBandDetectionShare": {
-  "checks": [
-   {
-    "kind": "continuity",
-    "why": "`decay` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "continuity",
-    "why": "`kappa` reaches 0.001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "totality",
-    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
-    "holds": true,
-    "detail": {
-     "findings": [],
-     "n_findings": 0,
-     "n_with_finite_limit": 0
-    }
-   }
-  ],
+  "checks": [],
   "skipped": [
    {
     "kind": "symmetry",
@@ -10192,22 +10111,26 @@
    },
    {
     "kind": "limit-Ne",
-    "reason": "no effective-population-size argument"
+    "reason": "cannot place a physically meaningful box on ['kappa']"
    },
    {
     "kind": "limit-freq",
     "reason": "not a heterozygosity of a frequency"
    },
    {
-    "kind": "monotone",
-    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+    "kind": "continuity",
+    "reason": "cannot place a physically meaningful box on ['kappa']"
+   },
+   {
+    "kind": "totality",
+    "reason": "cannot place a physically meaningful box on ['kappa']"
    }
   ],
   "name": "ldBandDetectionShare",
   "module": "MetricSpecificPortability",
   "line": 1183,
   "family": "invariant",
-  "n_checks": 3,
+  "n_checks": 0,
   "severity": -1.0
  },
  "MetricSpecificPortability.ldBlockDetectionShare": {
@@ -10469,36 +10392,7 @@
   "severity": -1.0
  },
  "MetricSpecificPortability.ldPruningDetectionDeficit": {
-  "checks": [
-   {
-    "kind": "continuity",
-    "why": "`decay` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "continuity",
-    "why": "`kappa` reaches 0.001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity",
-    "holds": true,
-    "detail": {
-     "violations": [],
-     "n_violations": 0
-    }
-   },
-   {
-    "kind": "totality",
-    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact",
-    "holds": true,
-    "detail": {
-     "findings": [],
-     "n_findings": 0,
-     "n_with_finite_limit": 0
-    }
-   }
-  ],
+  "checks": [],
   "skipped": [
    {
     "kind": "symmetry",
@@ -10514,22 +10408,26 @@
    },
    {
     "kind": "limit-Ne",
-    "reason": "no effective-population-size argument"
+    "reason": "cannot place a physically meaningful box on ['kappa']"
    },
    {
     "kind": "limit-freq",
     "reason": "not a heterozygosity of a frequency"
    },
    {
-    "kind": "monotone",
-    "reason": "neither the docstring nor an adjacent theorem name asserts a direction"
+    "kind": "continuity",
+    "reason": "cannot place a physically meaningful box on ['kappa']"
+   },
+   {
+    "kind": "totality",
+    "reason": "cannot place a physically meaningful box on ['kappa']"
    }
   ],
   "name": "ldPruningDetectionDeficit",
   "module": "MetricSpecificPortability",
   "line": 1190,
   "family": "invariant",
-  "n_checks": 3,
+  "n_checks": 0,
   "severity": -1.0
  },
  "MetricSpecificPortability.ldTightLinkageDetectionShare": {

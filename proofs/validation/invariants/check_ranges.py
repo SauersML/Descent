@@ -26,6 +26,7 @@ import sys
 import backends
 import compile_defs as C
 from backends import FLOAT, INTERVAL, Iv
+import z3backend
 from search import maximize, prove_contained
 import re
 
@@ -152,7 +153,7 @@ def _satisfies(guard, x):
     return True
 
 
-def check_one(c, defs, budget=8000, bnb=1500):
+def check_one(c, defs, budget=8000, bnb=1500, use_z3=True):
     d = c.d
     rng = required_range(d)
     if rng is None:
@@ -227,7 +228,7 @@ def check_one(c, defs, budget=8000, bnb=1500):
                 "a theorem proves this bound but its hypotheses are outside "
                 "the arithmetic fragment, so the exclusion could not be "
                 "checked directly; graded conservatively")
-        out.update(verdict=verdict,
+        out.update(verdict=verdict, decided_by="sampling + pattern search",
                    witness={n: v for n, v in zip(names, x)},
                    value=val, overshoot=best,
                    blind_coordinates=blind,
@@ -241,14 +242,52 @@ def check_one(c, defs, budget=8000, bnb=1500):
         return c(INTERVAL, *xs)
 
     status, worst, used = prove_contained(fiv, box, names, lo, hi, max_boxes=bnb)
-    out.update(verdict="proved" if status == "proved" else "inconclusive",
-               bnb_boxes=used,
-               searched=budget)
-    if status != "proved":
-        out["inconclusive_reason"] = (
-            "no escape found by sampling+pattern search, and interval "
-            f"branch-and-bound did not close the box within {bnb} subdivisions"
-        )
+    if status == "proved":
+        out.update(verdict="proved", decided_by="interval-branch-and-bound",
+                   bnb_boxes=used, searched=budget)
+        return out
+
+    # Sampling found nothing and the interval proof did not close.  Ask the
+    # solver, which DECIDES the polynomial/rational fragment rather than
+    # sampling it.  Anyone reading a verdict needs to know which of the two
+    # produced it, so `decided_by` is always recorded.
+    if not use_z3:
+        # The falsifiability sweep runs this thousands of times and only needs
+        # to see a verdict FLIP, which sampling already decides.  Paying for a
+        # solver call per mutant would cost hours and change no conclusion.
+        out.update(verdict="inconclusive", decided_by="sampling (z3 disabled)",
+                   bnb_boxes=used, searched=budget)
+        return out
+    zv, zw, zdetail = z3backend.decide_range(c, box, names, lo, hi)
+    if zv == "proved":
+        out.update(verdict="proved", decided_by="z3 (UNSAT over the whole box)",
+                   z3_detail=zdetail, bnb_boxes=used, searched=budget)
+        return out
+    if zv == "escape" and zw is not None and all(v is not None
+                                                 for v in zw.values()):
+        xs = [zw[n] for n in names]
+        val = c(FLOAT, *xs)
+        if _viol(val, lo, hi) > 0:
+            side = "above" if val > hi else "below"
+            blind = [n for n in names if box[n]["source"] == "none"]
+            relevant = [g for g in guards if side in g["bounds"]]
+            satisfied = [g["thm"] for g in relevant if _satisfies(g, xs)]
+            v = "escape-unguarded" if blind else "escape"
+            if relevant or satisfied:
+                v = "escape-outside-theorem"
+            out.update(verdict=v, decided_by="z3 (SAT, model is the witness)",
+                       witness=zw, value=val, side=side,
+                       blind_coordinates=blind,
+                       overshoot=_viol(val, lo, hi))
+            return out
+    out.update(verdict="inconclusive",
+               decided_by=f"undecided: sampling, interval BnB, and z3 ({zv})",
+               z3_status=zv, z3_detail=zdetail,
+               bnb_boxes=used, searched=budget,
+               inconclusive_reason=(
+                   "no escape found by sampling+pattern search, interval "
+                   f"branch-and-bound did not close the box within {bnb} "
+                   f"subdivisions, and the solver returned {zv}: {zdetail}"))
     return out
 
 

@@ -825,6 +825,271 @@ theorem standardizedSquare_second_cumulant (h : HardyWeinbergModel)
   rw [standardizedGenotype_fourth_moment h hq0 hq1, mul_sub, mul_one_div,
     div_self (ne_of_gt hvar), mul_one]
 
+/-!
+### Floor two of the observable tower, and the trap beside it
+
+The observable algebra does not stop at the two-jet, the arithmetic type, the
+symmetry verdict and `E[x⁴]`. There is a second floor, carrying the Mellin jet of
+the **centered** square `u = x² - 1` — fourth-through-eighth-moment logarithmic
+data that no floor-one channel sees — and the full object is a tower, one floor
+per iterated centered squaring, with universality holding exactly when the whole
+tower matches the Gaussian's.
+
+**The trap, encoded rather than described.** Tuning the *uncentered* products of
+shared cores does not produce a new floor, and it looks like it does. The reason
+is `uncentered_square_log_additive` below: the logarithm of a product of squares
+is the sum of the level-one increments, so its condensation re-exposes floor-one
+data wearing different clothes. The genuine second floor runs on the centered
+square, whose logarithm is *not* a sum of level-one increments — `u` takes both
+signs (`centeredSquare_negative_at_half`), while `x²` never does.
+
+Whatever is built on top of this must keep the two apart, which is why the
+additive identity is stated as a theorem here rather than left as a remark.
+-/
+
+/-- **The centered square** `u = x² - 1`: the coordinate of floor two.
+
+Empirical status: DERIVED from `HardyWeinbergModel.standardizedGenotype`; the
+centering constant is forced by `standardizedGenotype_second_moment_one`, which
+proves `E[x²] = 1`, so there is no free parameter. -/
+noncomputable def HardyWeinbergModel.centeredSquare
+    (h : HardyWeinbergModel) (g : DiploidGenotype) : ℝ :=
+  h.standardizedGenotype g ^ 2 - 1
+
+/-- Floor two's coordinate is centered: `E[u] = 0`, because `E[x²] = 1`. -/
+theorem centeredSquare_expectation_zero (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g = 0 := by
+  have hterm : ∀ g : DiploidGenotype,
+      h.genotypeProb g * h.centeredSquare g =
+        h.genotypeProb g * h.standardizedGenotype g ^ 2 - h.genotypeProb g := by
+    intro g
+    unfold HardyWeinbergModel.centeredSquare
+    ring
+  simp_rw [hterm]
+  rw [Finset.sum_sub_distrib, standardizedGenotype_second_moment_one h hq0 hq1,
+    h.genotypeProb_sum, sub_self]
+
+/-- **The centered square takes both signs**, unlike `x²` which is non-negative.
+At a balanced locus the standardized values are `-√2, 0, √2`, so `u` is `1, -1, 1`
+and the heterozygote sits strictly below zero.
+
+This is what makes floor two a genuinely new floor: `log u²` is not a sum of
+level-one increments, because `u` is not a product of squares. Contrast
+`uncentered_square_log_additive`. -/
+theorem centeredSquare_negative_at_half (h : HardyWeinbergModel)
+    (hhalf : h.altFreq = 1 / 2) :
+    h.centeredSquare DiploidGenotype.het = -1 := by
+  have hvar : h.genotypeVariance = 1 / 2 := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    rw [hhalf]
+    norm_num
+  have hcentered : h.centeredAltAlleleCount DiploidGenotype.het = 0 := by
+    unfold HardyWeinbergModel.centeredAltAlleleCount
+    rw [h.expectedAltAlleleCount_eq, hhalf]
+    simp only [altAlleleCount]
+    norm_num
+  unfold HardyWeinbergModel.centeredSquare HardyWeinbergModel.standardizedGenotype
+  rw [hcentered, hvar]
+  norm_num
+
+/-- **The trap.** The logarithm of a product of squared coordinates is the *sum*
+of the level-one increments `log x²`. So a design that tunes uncentered products
+of shared cores is running the same walk as floor one, and its condensation
+re-exposes floor-one data rather than opening a floor.
+
+Stated for two coordinates, which is enough: the general case is this identity
+iterated, and the point is the additivity, not the arity. -/
+theorem uncentered_square_log_additive (x y : ℝ) (hx : x ≠ 0) (hy : y ≠ 0) :
+    Real.log (x ^ 2 * y ^ 2) = Real.log (x ^ 2) + Real.log (y ^ 2) := by
+  have hx2 : x ^ 2 ≠ 0 := pow_ne_zero 2 hx
+  have hy2 : y ^ 2 ≠ 0 := pow_ne_zero 2 hy
+  exact Real.log_mul hx2 hy2
+
+/-- The third moment of the centered square, in terms of the plain moments:
+`E[u³] = E[x⁶] - 3 E[x⁴] + 2`, using `E[x²] = 1`.
+
+This is the first floor-two datum that floor one does not already fix, and the
+one a panel-level construction should target. -/
+theorem centeredSquare_third_moment_eq (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3 =
+      (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) -
+        3 * (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) +
+        (3 * (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2) -
+          ∑ g : DiploidGenotype, h.genotypeProb g) := by
+  have hterm : ∀ g : DiploidGenotype,
+      h.genotypeProb g * h.centeredSquare g ^ 3 =
+        h.genotypeProb g * h.standardizedGenotype g ^ 6 -
+          3 * (h.genotypeProb g * h.standardizedGenotype g ^ 4) +
+          (3 * (h.genotypeProb g * h.standardizedGenotype g ^ 2) - h.genotypeProb g) := by
+    intro g
+    unfold HardyWeinbergModel.centeredSquare
+    ring
+  simp_rw [hterm]
+  rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.sum_sub_distrib,
+    ← Finset.mul_sum, ← Finset.mul_sum]
+
+/-!
+### The single-locus collapse
+
+For one locus the tower adds nothing, and the reason is that a standardized
+Hardy-Weinberg coordinate has a one-parameter law. Floor one already pins it:
+`E[x⁴] = 1/(2q(1-q))` determines the variance, hence the unordered pair
+`{q, 1-q}`, and the two members of that pair give laws that differ only by a sign
+flip — the coordinate at `1-q` is the negative in distribution of the coordinate
+at `q`, since the genotype values reverse while the probabilities swap.
+
+So every even moment agrees across the pair, and floor two is built entirely from
+even data: it is the law of `x²`, which is invariant under the flip. The tower
+collapses to floor one for a single locus. Panels are where it bites, and that is
+`Calibrator.CondensationUnification`.
+-/
+
+/-- The reflected locus, at allele frequency `1 - q`. -/
+def HardyWeinbergModel.reflect (h : HardyWeinbergModel) : HardyWeinbergModel where
+  altFreq := 1 - h.altFreq
+  altFreq_nonneg := by linarith [h.altFreq_le_one]
+  altFreq_le_one := by linarith [h.altFreq_nonneg]
+
+@[simp] theorem HardyWeinbergModel.reflect_altFreq (h : HardyWeinbergModel) :
+    h.reflect.altFreq = 1 - h.altFreq := rfl
+
+/-- Reflection swaps the two homozygote probabilities and fixes the heterozygote:
+it is `genotypeFlip` on the probabilities. -/
+theorem reflect_genotypeProb (h : HardyWeinbergModel) (g : DiploidGenotype) :
+    h.reflect.genotypeProb g = h.genotypeProb (genotypeFlip g) := by
+  cases g <;>
+    · simp only [genotypeFlip_homRef, genotypeFlip_het, genotypeFlip_homAlt,
+        HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
+        HardyWeinbergModel.reflect_altFreq]
+      ring
+
+/-- Reflection preserves the genotype variance: `2(1-q)q = 2q(1-q)`. -/
+theorem reflect_genotypeVariance (h : HardyWeinbergModel) :
+    h.reflect.genotypeVariance = h.genotypeVariance := by
+  rw [h.reflect.genotypeVariance_eq, h.genotypeVariance_eq]
+  unfold HardyWeinbergModel.refFreq
+  rw [HardyWeinbergModel.reflect_altFreq]
+  ring
+
+/-- Reflection negates the centered dosage, after the homozygote swap. -/
+theorem reflect_centeredAltAlleleCount (h : HardyWeinbergModel) (g : DiploidGenotype) :
+    h.reflect.centeredAltAlleleCount g = -h.centeredAltAlleleCount (genotypeFlip g) := by
+  cases g <;>
+    · simp only [genotypeFlip_homRef, genotypeFlip_het, genotypeFlip_homAlt,
+        HardyWeinbergModel.centeredAltAlleleCount,
+        HardyWeinbergModel.expectedAltAlleleCount_eq, altAlleleCount,
+        HardyWeinbergModel.reflect_altFreq]
+      ring
+
+/-- **The reflected coordinate is the negative of the original.** This is the
+whole content of the single-locus collapse: `q` and `1-q` give the same law up to
+a sign. -/
+theorem reflect_standardizedGenotype (h : HardyWeinbergModel) (g : DiploidGenotype) :
+    h.reflect.standardizedGenotype g = -h.standardizedGenotype (genotypeFlip g) := by
+  unfold HardyWeinbergModel.standardizedGenotype
+  rw [reflect_centeredAltAlleleCount, reflect_genotypeVariance]
+  ring
+
+/-- Every moment of the reflected locus is the original's, up to the sign of the
+order. -/
+theorem reflect_moment (h : HardyWeinbergModel) (k : ℕ) :
+    ∑ g : DiploidGenotype, h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ k =
+      (-1) ^ k * ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ k := by
+  have hterm : ∀ g : DiploidGenotype,
+      h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ k =
+        (-1) ^ k * (h.genotypeProb (genotypeFlip g) *
+          h.standardizedGenotype (genotypeFlip g) ^ k) := by
+    intro g
+    rw [reflect_genotypeProb, reflect_standardizedGenotype, neg_pow]
+    ring
+  simp_rw [hterm]
+  rw [← Finset.mul_sum]
+  congr 1
+  exact Fintype.sum_equiv genotypeFlip
+    (fun g => h.genotypeProb (genotypeFlip g) * h.standardizedGenotype (genotypeFlip g) ^ k)
+    (fun g => h.genotypeProb g * h.standardizedGenotype g ^ k) (fun _ => rfl)
+
+/-- **Even moments are reflection-invariant.** Floor two is built from the law of
+`x²`, which is even data, so it cannot separate `q` from `1-q`. -/
+theorem reflect_even_moment (h : HardyWeinbergModel) (k : ℕ) :
+    ∑ g : DiploidGenotype,
+        h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ (2 * k) =
+      ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * k) := by
+  rw [reflect_moment, pow_mul]
+  norm_num
+
+/-- Two loci with the same allele frequency have the same moments: everything in
+sight is a function of `q`. -/
+theorem moment_eq_of_altFreq_eq (h h' : HardyWeinbergModel)
+    (hfreq : h.altFreq = h'.altFreq) (k : ℕ) :
+    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ k =
+      ∑ g : DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ k := by
+  have hprob : ∀ g : DiploidGenotype, h.genotypeProb g = h'.genotypeProb g := by
+    intro g
+    cases g <;>
+      simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq, hfreq]
+  have hstd : ∀ g : DiploidGenotype,
+      h.standardizedGenotype g = h'.standardizedGenotype g := by
+    intro g
+    unfold HardyWeinbergModel.standardizedGenotype HardyWeinbergModel.centeredAltAlleleCount
+    rw [h.expectedAltAlleleCount_eq, h'.expectedAltAlleleCount_eq,
+      h.genotypeVariance_eq, h'.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    rw [hfreq]
+  simp_rw [hprob, hstd]
+
+/-- **The genotype variance determines the frequency pair.** `2q(1-q) = 2q'(1-q')`
+forces `q' = q` or `q' = 1 - q`, which is the algebraic half of the collapse. -/
+theorem genotypeVariance_determines_frequency_pair (h h' : HardyWeinbergModel)
+    (hvar : h.genotypeVariance = h'.genotypeVariance) :
+    h'.altFreq = h.altFreq ∨ h'.altFreq = 1 - h.altFreq := by
+  rw [h.genotypeVariance_eq, h'.genotypeVariance_eq] at hvar
+  unfold HardyWeinbergModel.refFreq at hvar
+  have hfactor : (h'.altFreq - h.altFreq) * (h'.altFreq - (1 - h.altFreq)) = 0 := by
+    linarith [hvar]
+  rcases mul_eq_zero.mp hfactor with hleft | hright
+  · exact Or.inl (by linarith)
+  · exact Or.inr (by linarith)
+
+/-- **The single-locus collapse.** For one Hardy-Weinberg locus the tower adds
+nothing: two polymorphic loci with the same fourth moment — a floor-one datum —
+have the same law at floor two, and indeed the same even moments of every order.
+
+The proof is the collapse in three steps: equal fourth moments force equal
+variance, equal variance forces `q' ∈ {q, 1-q}`, and the reflection identity makes
+the second case agree with the first on all even data.
+
+So the tower is not a refinement of single-locus genotype theory. Where it bites
+is panels, whose effective coordinate law is a *mixture* over allele frequencies,
+and mixtures are not determined by their low-order data. See
+`Calibrator.CondensationUnification`. -/
+theorem singleLocus_tower_collapses (h h' : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
+    (hq0' : 0 < h'.altFreq) (hq1' : h'.altFreq < 1)
+    (hfourth : (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) =
+      ∑ g : DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ 4)
+    (k : ℕ) :
+    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * k) =
+      ∑ g : DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ (2 * k) := by
+  rw [standardizedGenotype_fourth_moment h hq0 hq1,
+    standardizedGenotype_fourth_moment h' hq0' hq1'] at hfourth
+  have hvar : h.genotypeVariance = h'.genotypeVariance := by
+    calc h.genotypeVariance = 1 / (1 / h.genotypeVariance) := (one_div_one_div _).symm
+      _ = 1 / (1 / h'.genotypeVariance) := by rw [hfourth]
+      _ = h'.genotypeVariance := one_div_one_div _
+  rcases genotypeVariance_determines_frequency_pair h h' hvar with hsame | hrefl
+  · exact moment_eq_of_altFreq_eq h h' hsame.symm (2 * k)
+  · have hreflected : h.reflect.altFreq = h'.altFreq := hrefl.symm
+    calc ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * k)
+        = ∑ g : DiploidGenotype,
+            h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ (2 * k) :=
+          (reflect_even_moment h k).symm
+      _ = ∑ g : DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ (2 * k) :=
+          moment_eq_of_altFreq_eq h.reflect h' hreflected (2 * k)
+
 /-! ### The design: locus-sets over a Hardy-Weinberg panel -/
 
 /-- A **design over a genotype panel**: the locus-sets a study tests, the

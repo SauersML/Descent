@@ -1,0 +1,4120 @@
+[
+ {
+  "definition": "Calibrator.excessLDAfterBottleneck",
+  "source": "Calibrator/LDDecayTheory.lean:660",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.excess_ld_nonneg"
+  },
+  "n_points_scanned": 16807,
+  "n_out_of_range": 7834,
+  "kinds": [
+   "IN-SCOPE-VIOLATION",
+   "UNGUARDED-PROVEN"
+  ],
+  "worst": {
+   "point": {
+    "N_b": 3.0,
+    "N_r": 0.05,
+    "c": 0.05,
+    "t_b": 20.0,
+    "t_r": 20.0
+   },
+   "value": -5.957569809454465e+17,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-PROVEN",
+   "proving_theorem": "Calibrator.excess_ld_nonneg",
+   "theorem_preconditions_hold": false
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.selectedDriftFactor",
+  "source": "Calibrator/PhenomeWidePortability.lean:137",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.selectedDriftFactor_mem_unit",
+   "hi": "Calibrator.selectedDriftFactor_mem_unit"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 336,
+  "kinds": [
+   "IN-SCOPE-VIOLATION"
+  ],
+  "worst": {
+   "point": {
+    "Ne": 1000.0,
+    "t": 20.0,
+    "s_correction": 3.0000000000000004
+   },
+   "value": 1096766110434.8751,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "IN-SCOPE-VIOLATION",
+   "proving_theorem": "Calibrator.selectedDriftFactor_mem_unit",
+   "theorem_preconditions_hold": true
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.admixtureLDBoost",
+  "source": "Calibrator/PortabilityDrift.lean:5301",
+  "declared_kind": "ratio",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.admixtureLDBoost_gt_one"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 202,
+  "kinds": [
+   "IN-SCOPE-VIOLATION",
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "r": 3.0000000000000004,
+    "t_since": 20.0,
+    "equilibrium_ld": 0.05
+   },
+   "value": 20971520.000000093,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.portabilityRatio",
+  "source": "Calibrator/StatisticalGeneticsMethodology.lean:74",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "hi": "Calibrator.portability_ratio_le_one"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "IN-SCOPE-VIOLATION"
+  ],
+  "worst": {
+   "point": {
+    "dr2_target": 3.0000000000000004,
+    "dr2_source": 0.05
+   },
+   "value": 60.00000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "IN-SCOPE-VIOLATION",
+   "proving_theorem": "Calibrator.portability_ratio_le_one",
+   "theorem_preconditions_hold": true
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.neutralAFBenchmarkRatio",
+  "source": "Calibrator/PortabilityDrift.lean:2982",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.neutral_af_benchmark_bounded_by_fst",
+   "hi": "Calibrator.neutral_af_benchmark_bounded_by_fst"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "IN-SCOPE-VIOLATION"
+  ],
+  "worst": {
+   "point": {
+    "fstSource": 0.98,
+    "fstTarget": 0.02
+   },
+   "value": 48.99999999999996,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "IN-SCOPE-VIOLATION",
+   "proving_theorem": "Calibrator.neutral_af_benchmark_bounded_by_fst",
+   "theorem_preconditions_hold": true
+  },
+  "empirical_status": "FALSIFIED"
+ },
+ {
+  "definition": "Calibrator.ldKernelSymbol",
+  "source": "Calibrator/ImitationRigidity.lean:689",
+  "declared_kind": "correlation",
+  "declared_range": [
+   -1.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.ldKernelSymbol_pos"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 17,
+  "kinds": [
+   "IN-SCOPE-VIOLATION",
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "decay": 1.0333333333333334,
+    "angle": 0.05
+   },
+   "value": -18.348537393143317,
+   "side": "lo",
+   "bound": -1.0,
+   "kind": "IN-SCOPE-VIOLATION",
+   "proving_theorem": "Calibrator.ldKernelSymbol_pos",
+   "theorem_preconditions_hold": true
+  },
+  "empirical_status": "DERIVED"
+ },
+ {
+  "definition": "Calibrator.prevalenceCITLShift",
+  "source": "Calibrator/PGSCalibrationTheory.lean:259",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.citl_shift_positive_higher_prevalence"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 32,
+  "kinds": [
+   "IN-SCOPE-VIOLATION",
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "pi_source": 1.0333333333333334,
+    "pi_target": 0.05
+   },
+   "value": -6.378426183651584,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "IN-SCOPE-VIOLATION",
+   "proving_theorem": "Calibrator.citl_shift_positive_higher_prevalence",
+   "theorem_preconditions_hold": true
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.neutralPortabilityRatioLD",
+  "source": "Calibrator/PhenomeWidePortability.lean:37",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.neutral_ratio_in_unit",
+   "hi": "Calibrator.neutral_ratio_in_unit"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 17,
+  "kinds": [
+   "IN-SCOPE-VIOLATION"
+  ],
+  "worst": {
+   "point": {
+    "fst_additional": 0.02,
+    "ld_factor": 3.0000000000000004
+   },
+   "value": 2.9400000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "IN-SCOPE-VIOLATION",
+   "proving_theorem": "Calibrator.neutral_ratio_in_unit",
+   "theorem_preconditions_hold": true
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.portabilityGap",
+  "source": "Calibrator/MultiAncestryTheory.lean:428",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.portability_gap_nonneg"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "IN-SCOPE-VIOLATION"
+  ],
+  "worst": {
+   "point": {
+    "r2_source": 0.02,
+    "r2_target": 0.98
+   },
+   "value": -0.96,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "IN-SCOPE-VIOLATION",
+   "proving_theorem": "Calibrator.portability_gap_nonneg",
+   "theorem_preconditions_hold": true
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.tagR2",
+  "source": "Calibrator/LDDecayTheory.lean:117",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "hi": "Calibrator.tag_r2_le_one"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 147,
+  "kinds": [
+   "UNGUARDED-PROVEN"
+  ],
+  "worst": {
+   "point": {
+    "D_sq": 3.0000000000000004,
+    "var_tag": 0.05,
+    "var_causal": 0.05
+   },
+   "value": 1200.0,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-PROVEN",
+   "proving_theorem": "Calibrator.tag_r2_le_one",
+   "theorem_preconditions_hold": false
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.requiredTargetSamplesForOptimalFineTuningMSE",
+  "source": "Calibrator/TransferLearningPGS.lean:2383",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.requiredTargetSamplesForOptimalFineTuningMSE_pos"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 147,
+  "kinds": [
+   "UNGUARDED-PROVEN"
+  ],
+  "worst": {
+   "point": {
+    "gapSq": 0.05,
+    "noiseVar": 3.0000000000000004,
+    "tau": 3.0000000000000004
+   },
+   "value": -59.000000000000014,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-PROVEN",
+   "proving_theorem": "Calibrator.requiredTargetSamplesForOptimalFineTuningMSE_pos",
+   "theorem_preconditions_hold": false
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.neiFst",
+  "source": "Calibrator/PopulationGeneticsFoundations.lean:42",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.nei_fst_in_unit",
+   "hi": "Calibrator.nei_fst_in_unit"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-PROVEN"
+  ],
+  "worst": {
+   "point": {
+    "H_T": 0.05,
+    "H_S": 3.0000000000000004
+   },
+   "value": -59.00000000000001,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-PROVEN",
+   "proving_theorem": "Calibrator.nei_fst_in_unit",
+   "theorem_preconditions_hold": false
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.portableFraction",
+  "source": "Calibrator/AncestrySpecificPower.lean:415",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "hi": "Calibrator.portable_fraction_le_one"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-PROVEN"
+  ],
+  "worst": {
+   "point": {
+    "r2_causal": 0.98,
+    "r2_total": 0.02
+   },
+   "value": 49.0,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-PROVEN",
+   "proving_theorem": "Calibrator.portable_fraction_le_one",
+   "theorem_preconditions_hold": false
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.ldPanelRetentionFraction",
+  "source": "Calibrator/MetricSpecificPortability.lean:1394",
+  "declared_kind": "ratio",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.ldPanelRetentionFraction_mem",
+   "hi": "Calibrator.ldPanelRetentionFraction_mem"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-PROVEN"
+  ],
+  "worst": {
+   "point": {
+    "retainedMarkers": 20.0,
+    "totalMarkers": 1.0
+   },
+   "value": 20.0,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-PROVEN",
+   "proving_theorem": "Calibrator.ldPanelRetentionFraction_mem",
+   "theorem_preconditions_hold": false
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.bottleneckExcessLD",
+  "source": "Calibrator/DemographicHistory.lean:685",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.bottleneck_excess_ld_pos"
+  },
+  "n_points_scanned": 2401,
+  "n_out_of_range": 1470,
+  "kinds": [
+   "UNGUARDED-PROVEN"
+  ],
+  "worst": {
+   "point": {
+    "Ne_b": 3.0,
+    "Ne_stable": 0.05,
+    "c": 0.3663333333333333,
+    "t_b": 20.0
+   },
+   "value": -0.7697115935930919,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-PROVEN",
+   "proving_theorem": "Calibrator.bottleneck_excess_ld_pos",
+   "theorem_preconditions_hold": false
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.ageDependentSignalVariance",
+  "source": "Calibrator/LongitudinalPortability.lean:245",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 1807,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "sourceSignalPeak": 3.0000000000000004,
+    "age": 0.05,
+    "age_peak": 1.5250000000000004,
+    "width": 0.05
+   },
+   "value": 2.8151898815372455e+189,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.gradeCertifiedSampleSize",
+  "source": "Calibrator/PowerAnalysis.lean:559",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 315,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "epsilon": 0.05,
+    "K": 3.0000000000000004,
+    "c": 0.05
+   },
+   "value": 1.1529215046068722e+78,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.palindromicCycleDensityA",
+  "source": "Calibrator/EpistaticChaos.lean:1765",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 49,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "s": 3.0000000000000004,
+    "p": 20.0
+   },
+   "value": 8.129808316943402e+24,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.palindromicCycleDensityB",
+  "source": "Calibrator/EpistaticChaos.lean:1774",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 49,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "s": 3.0000000000000004,
+    "p": 20.0
+   },
+   "value": 3.800993120592024e+22,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.stationaryLDEntry",
+  "source": "Calibrator/ImitationRigidity.lean:626",
+  "declared_kind": "correlation",
+  "declared_range": [
+   -1.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 35,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "decay": 3.0000000000000004,
+    "separation": 20.0
+   },
+   "value": 3486784401.0000105,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "DERIVED"
+ },
+ {
+  "definition": "Calibrator.demographicSpike",
+  "source": "Calibrator/PCCorrectability/Threshold.lean:31",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 288,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "n": 1.0,
+    "F": 3.0000000000000004,
+    "m": 1000.0
+   },
+   "value": -11988000.000000002,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VALIDATED"
+ },
+ {
+  "definition": "Calibrator.ldCorrelationSq",
+  "source": "Calibrator/CovarianceStructure.lean:110",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.ld_correlation_sq_nonneg"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 307,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "D": 3.0000000000000004,
+    "p_i": 0.999,
+    "p_j": 0.999
+   },
+   "value": 2254506.75901126,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.tauFromObservedEffectCorrelation",
+  "source": "Calibrator/SelectionArchitecture.lean:279",
+  "declared_kind": "correlation",
+  "declared_range": [
+   -1.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.tauFromObservedEffectCorrelation_pos"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 46,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "t": 1000.0,
+    "rho": 0.999
+   },
+   "value": 999499.9166249727,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.discoveryNCP",
+  "source": "Calibrator/GeneticArchitectureDiscovery.lean:71",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 2244,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "n": 1000.0,
+    "\u03b2": 3.0000000000000004,
+    "maf_causal": 3.0000000000000004,
+    "ld": 3.0000000000000004
+   },
+   "value": -972000.0000000008,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VALIDATED"
+ },
+ {
+  "definition": "Calibrator.twoLocusIBDCovariance",
+  "source": "Calibrator/DGP.lean:310",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 140,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "ibdWeight": 3.0000000000000004,
+    "recombRate": 3.0000000000000004,
+    "tmrca": 16.833333333333336
+   },
+   "value": -303382.23522782867,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.geometricDecay",
+  "source": "Calibrator/Conventions.lean:716",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 20,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "r": 3.0000000000000004,
+    "t": 16.833333333333336
+   },
+   "value": -101127.41174260955,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.ldsrExpectedChi2",
+  "source": "Calibrator/CovarianceStructure.lean:374",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 16807,
+  "n_out_of_range": 16807,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "N": 1000.0,
+    "h2": 0.98,
+    "M": 0.05,
+    "ell_j": 3.0000000000000004,
+    "a": 3.0000000000000004
+   },
+   "value": 61801.00000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VALIDATED"
+ },
+ {
+  "definition": "Calibrator.requiredTargetCohortSizeForRecalibration",
+  "source": "Calibrator/PGSCalibrationTheory.lean:1605",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 1552,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "nParams": 3.0000000000000004,
+    "prevalence": 0.02,
+    "infoPerEvent": 0.05,
+    "targetTraceMSE": 0.05
+   },
+   "value": 60000.0,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.continentIslandStepMigrationFirst",
+  "source": "Calibrator/PopulationGeneticsFoundations.lean:226",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 6,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "s": 0.05,
+    "m": 1000.0,
+    "p": 0.02
+   },
+   "value": -20979.000000002314,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VALIDATED"
+ },
+ {
+  "definition": "Calibrator.ldCorrelationSqOfHaplotypeD",
+  "source": "Calibrator/CovarianceStructure.lean:139",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 247,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "D": 3.0000000000000004,
+    "p_i": 1.0333333333333334,
+    "p_j": 1.0333333333333334
+   },
+   "value": 7585.848074921909,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VALIDATED"
+ },
+ {
+  "definition": "Calibrator.geneFlowFstStep",
+  "source": "Calibrator/AncestrySpecificArchitecture.lean:371",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 342,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "m": 1000.0,
+    "Ne": 1.0,
+    "F": 3.0000000000000004
+   },
+   "value": -5998.000000000001,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.snrPortabilityRatio",
+  "source": "Calibrator/OpenQuestions.lean:628",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 1155,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "v_sig_s": 0.05,
+    "v_noise_s": 3.0000000000000004,
+    "v_sig_t": 3.0000000000000004,
+    "v_noise_t": 0.05
+   },
+   "value": 3600.0000000000005,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.pgsR2",
+  "source": "Calibrator/TransferLearningPGS.lean:77",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 191,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "cov_pgs_y": 3.0000000000000004,
+    "var_pgs": 0.05,
+    "var_y": 0.05
+   },
+   "value": 3600.0,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.heritabilityEnrichment",
+  "source": "Calibrator/PolygenicArchitecture.lean:645",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.enrichment_interpretation"
+  },
+  "n_points_scanned": 2401,
+  "n_out_of_range": 1176,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "h2_cat": 0.98,
+    "M_cat": 0.05,
+    "h2_total": 0.02,
+    "M_total": 3.0000000000000004
+   },
+   "value": 2940.0,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.neutralAFSharedLDBenchmarkRatio",
+  "source": "Calibrator/PortabilityDrift.lean:4424",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 1174,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "fstSource": 0.98,
+    "fstTarget": 0.02,
+    "shared_ld_source": 0.02,
+    "shared_ld_target": 0.98
+   },
+   "value": 2400.9999999999977,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.benchmarkRatioSquared",
+  "source": "Calibrator/DriftRegime.lean:278",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "fstS": 0.98,
+    "fstT": 0.02
+   },
+   "value": 2400.999999999996,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.fstMigDriftNext",
+  "source": "Calibrator/PortabilityDrift.lean:5363",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 341,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "Ne": 1000.0,
+    "m": 1000.0,
+    "Fst": 0.98
+   },
+   "value": -1959.01999,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.steppingStoneCharacteristicLength",
+  "source": "Calibrator/PopulationGeneticsFoundations.lean:893",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.steppingStoneCharacteristicLength_pos"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 49,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "Ne": 1000.0,
+    "m": 1000.0
+   },
+   "value": 1414.213562373095,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.amInducedLD",
+  "source": "Calibrator/AssortativeMatingPGS.lean:221",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.am_ld_sign"
+  },
+  "n_points_scanned": 2401,
+  "n_out_of_range": 1310,
+  "kinds": [
+   "UNGUARDED-DOCSTRING",
+   "UNGUARDED-PROVEN"
+  ],
+  "worst": {
+   "point": {
+    "beta_i": 3.0000000000000004,
+    "beta_j": 3.0000000000000004,
+    "r": 1.5250000000000004,
+    "h2": 0.66
+   },
+   "value": -1393.6153846153486,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-PROVEN",
+   "proving_theorem": "Calibrator.am_ld_sign",
+   "theorem_preconditions_hold": false
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.standardErrorSq",
+  "source": "Calibrator/AncestrySpecificPower.lean:167",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 195,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "n": 1.0,
+    "p": 0.02,
+    "r2_ld": 0.02
+   },
+   "value": 1275.5102040816328,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.ldPrecisionTrace",
+  "source": "Calibrator/ImitationRigidity.lean:868",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 30,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "decay": 1.0333333333333334,
+    "nSites": 20.0
+   },
+   "value": -578.6557377049166,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "DERIVED"
+ },
+ {
+  "definition": "Calibrator.stabilizingNsFromObservedCorrelation",
+  "source": "Calibrator/SelectionArchitecture.lean:262",
+  "declared_kind": "correlation",
+  "declared_range": [
+   -1.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 7,
+  "n_out_of_range": 4,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "rho": 0.999
+   },
+   "value": 499.99999999999955,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.amCorrectedPortability",
+  "source": "Calibrator/AssortativeMatingPGS.lean:400",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 1760,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "port_measured": 3.0000000000000004,
+    "r_source": 3.0000000000000004,
+    "r_target": 1.0333333333333334,
+    "h2": 0.98
+   },
+   "value": 459.4736842105207,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.haplotypeEffectEstimationVariance",
+  "source": "Calibrator/HaplotypeTheory.lean:522",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 40,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03c32": 3.0000000000000004,
+    "n": 1.0,
+    "freq": 0.02
+   },
+   "value": 150.00000000000003,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.bbpProxyThreshold",
+  "source": "Calibrator/PCCorrectability/Threshold.lean:43",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 44,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "n": 1000.0,
+    "M": 0.05
+   },
+   "value": 141.4213562373095,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.scratchVsFineTuningCriticalSampleSize",
+  "source": "Calibrator/TransferLearningPGS.lean:1284",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 16807,
+  "n_out_of_range": 10108,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "r2_source": 0.02,
+    "divergence_penalty": 1.0333333333333334,
+    "adaptation_gain": 3.0000000000000004,
+    "oracle_target_r2": 2.0166666666666666,
+    "noiseVar": 3.0000000000000004
+   },
+   "value": 100.0000000000014,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.liabilityScaleH2",
+  "source": "Calibrator/VarianceComponents.lean:437",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 47,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "h2_observed": 0.98,
+    "prevalence": 0.5,
+    "z_height": 0.05
+   },
+   "value": 97.99999999999999,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.gwasNCP",
+  "source": "Calibrator/SelectionArchitecture.lean:544",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 227,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "n": 20.0,
+    "\u03b2": 3.0000000000000004,
+    "p": 0.5
+   },
+   "value": 90.00000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.noncentralityParam",
+  "source": "Calibrator/PowerAnalysis.lean:42",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.ncp_nonneg"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 227,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "n": 20.0,
+    "beta": 3.0000000000000004,
+    "p": 0.5
+   },
+   "value": 90.00000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VALIDATED"
+ },
+ {
+  "definition": "Calibrator.gaussianProfileLogLik",
+  "source": "Calibrator/ValidationStatistics.lean:19",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 336,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "observed": 0.05,
+    "mean": 3.0000000000000004,
+    "variance": 0.05
+   },
+   "value": -86.44607239642771,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.externallyStandardized",
+  "source": "Calibrator/ScoreDistribution.lean:385",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 147,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "pgs": 0.05,
+    "\u03bc_source": 3.0000000000000004,
+    "\u03c3_source": 0.05
+   },
+   "value": -59.00000000000001,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.internallyStandardized",
+  "source": "Calibrator/ScoreDistribution.lean:392",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 147,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "pgs": 0.05,
+    "\u03bc_target": 3.0000000000000004,
+    "\u03c3_target": 0.05
+   },
+   "value": -59.00000000000001,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.oneMinusRatio",
+  "source": "Calibrator/Conventions.lean:733",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "a": 3.0000000000000004,
+    "b": 0.05
+   },
+   "value": -59.00000000000001,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.r2FromMSE",
+  "source": "Calibrator/DGP.lean:176",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "mse": 3.0000000000000004,
+    "varY": 0.05
+   },
+   "value": -59.00000000000001,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.snpH2",
+  "source": "Calibrator/VarianceComponents.lean:55",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V_A_tagged": 3.0000000000000004,
+    "V_P": 0.05
+   },
+   "value": 60.00000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.ldsrExpectedBetaSq",
+  "source": "Calibrator/CovarianceStructure.lean:356",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 860,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "h2": 0.98,
+    "M": 0.05,
+    "ell_j": 3.0000000000000004,
+    "N": 1.0
+   },
+   "value": 59.800000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.admixtureLDTwoLocus",
+  "source": "Calibrator/CovarianceStructure.lean:520",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 16807,
+  "n_out_of_range": 7402,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "alpha": 3.0000000000000004,
+    "p_A": 3.0000000000000004,
+    "q_A": 3.0000000000000004,
+    "p_B": 0.05,
+    "q_B": 0.05
+   },
+   "value": -52.215000000000046,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.nonsmoothSummaryRisk",
+  "source": "Calibrator/PolygenicArchitecture.lean:508",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 7,
+  "n_out_of_range": 7,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "q": 0.98
+   },
+   "value": -49.49831645250911,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.certificateDeficit",
+  "source": "Calibrator/PolygenicArchitecture.lean:527",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 343,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "q": 0.98,
+    "K": 3.0000000000000004,
+    "c": 0.05
+   },
+   "value": -49.48165259145912,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.benchmarkRatio",
+  "source": "Calibrator/DriftRegime.lean:274",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "fstS": 0.98,
+    "fstT": 0.02
+   },
+   "value": 48.99999999999996,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.overlapInflation",
+  "source": "Calibrator/SampleOverlapBias.lean:41",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.overlap_inflation_positive"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 33,
+  "kinds": [
+   "UNGUARDED-DOCSTRING",
+   "UNGUARDED-PROVEN"
+  ],
+  "worst": {
+   "point": {
+    "r2_true": 0.02,
+    "r2_observed": 0.98
+   },
+   "value": 48.0,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.steppingStoneCoalescenceTime",
+  "source": "Calibrator/DemographicHistory.lean:202",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 12,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "d": 3.0000000000000004,
+    "\u03c3_sq": 0.05,
+    "m": 1.0
+   },
+   "value": 30.000000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.traceWindowSpikeLoad",
+  "source": "Calibrator/PCCorrectability/ImitationCapacity.lean:1000",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 30,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "decay": 1.0333333333333334,
+    "nSites": 20.0
+   },
+   "value": -28.932786885245832,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "DERIVED"
+ },
+ {
+  "definition": "Calibrator.ncp",
+  "source": "Calibrator/AncestrySpecificPower.lean:285",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 29,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "n_eff": 3.0000000000000004,
+    "\u03b2": 3.0000000000000004
+   },
+   "value": 27.00000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.haplotypeFreqAdmixed",
+  "source": "Calibrator/CovarianceStructure.lean:497",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 16807,
+  "n_out_of_range": 13513,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "alpha": 3.0000000000000004,
+    "p_A": 3.0000000000000004,
+    "q_A": 3.0000000000000004,
+    "p_B": 0.05,
+    "q_B": 0.05
+   },
+   "value": 26.995000000000015,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.demographicCovarianceGapLowerBound",
+  "source": "Calibrator/DGP.lean:293",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 16807,
+  "n_out_of_range": 7203,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "fstSource": 0.98,
+    "fstTarget": 0.02,
+    "recombRate": 3.0000000000000004,
+    "arraySparsity": 3.0000000000000004,
+    "kappa": 3.0000000000000004
+   },
+   "value": -25.920000000000012,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.effectMutualInformation",
+  "source": "Calibrator/MultiAncestryTheory.lean:209",
+  "declared_kind": "correlation",
+  "declared_range": [
+   -1.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 36,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "m": 20.0,
+    "\u03c1": 1.0333333333333334
+   },
+   "value": 26.915208991509974,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.misspecExcessRisk",
+  "source": "Calibrator/BayesianPGSTheory.lean:386",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 49,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03c0": 0.05,
+    "\u03c3_\u03b2_sq": 3.0000000000000004
+   },
+   "value": -20.184035242498698,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.ldTightLinkageDetectionShare",
+  "source": "Calibrator/MetricSpecificPortability.lean:1477",
+  "declared_kind": "ratio",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "retainedMarkers": 20.0,
+    "totalMarkers": 1.0
+   },
+   "value": 20.0,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.expectedSquaredEffect",
+  "source": "Calibrator/PolygenicArchitecture.lean:44",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 9,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "h2": 0.98,
+    "M": 0.05
+   },
+   "value": 19.599999999999998,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.perCausalLocusSignal",
+  "source": "Calibrator/GeneticArchitectureDiscovery.lean:358",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 9,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "h2": 0.98,
+    "k": 0.05
+   },
+   "value": 19.599999999999998,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.numberNeededToScreen",
+  "source": "Calibrator/ClinicalUtilityFairness.lean:955",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 14,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "sens": 0.02,
+    "\u03c0": 0.05
+   },
+   "value": 15.915494309189533,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.maxSafeEpistaticOrder",
+  "source": "Calibrator/PolygenicSpectroscopy.lean:627",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.additive_score_is_subcritical"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 42,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "N": 1000.0,
+    "q": 0.66
+   },
+   "value": 14.670713774887226,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.linearNormOfReaction",
+  "source": "Calibrator/GeneEnvironmentInterplay.lean:258",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.crossover_gxe_possible"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 311,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "a": 3.0000000000000004,
+    "b": 3.0000000000000004,
+    "E": 3.0000000000000004
+   },
+   "value": 12.000000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.hetStepWithMutation",
+  "source": "Calibrator/PortabilityDrift.lean:435",
+  "declared_kind": "heterozygosity",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 252,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "Ne": 1.0,
+    "mu": 3.0000000000000004,
+    "H": 3.0000000000000004
+   },
+   "value": -10.500000000000005,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.effectiveFisherInformation",
+  "source": "Calibrator/AncestrySpecificPower.lean:126",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 148,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "n": 20.0,
+    "p": 0.5,
+    "r2_ld": 0.98
+   },
+   "value": 9.8,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.effectiveSampleSize",
+  "source": "Calibrator/AncestrySpecificPower.lean:194",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.effective_n_nonneg"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 148,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "n": 20.0,
+    "p": 0.5,
+    "r2_ld": 0.98
+   },
+   "value": 9.8,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.brierRegretPoint",
+  "source": "Calibrator/PortabilityDrift.lean:3879",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 45,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03b7": 3.0000000000000004,
+    "q": 0.02
+   },
+   "value": 9.724292215395165,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.pgsVarianceFromHet",
+  "source": "Calibrator/PortabilityDrift.lean:628",
+  "declared_kind": "heterozygosity",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 31,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03b2_sq_sum": 3.0000000000000004,
+    "het": 3.0000000000000004
+   },
+   "value": 9.000000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.targetPgsVarOfRetention",
+  "source": "Calibrator/DriftRegime.lean:204",
+  "declared_kind": "ratio",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 31,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V_A": 3.0000000000000004,
+    "r": 3.0000000000000004
+   },
+   "value": 9.000000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VACUOUS"
+ },
+ {
+  "definition": "Calibrator.admixedAlleleFreq",
+  "source": "Calibrator/DemographicHistory.lean:351",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 275,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03b1": 3.0000000000000004,
+    "p_A": 3.0000000000000004,
+    "p_B": 0.05
+   },
+   "value": 8.900000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.brierScore",
+  "source": "Calibrator/Conclusions.lean:49",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 26,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "p": 0.02,
+    "y": 3.0000000000000004
+   },
+   "value": 8.880400000000003,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.mutationSelectionStepRare",
+  "source": "Calibrator/RareVariantPortability.lean:274",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 1597,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "mu": 0.05,
+    "s": 3.0000000000000004,
+    "h": 3.0000000000000004,
+    "p": 0.98
+   },
+   "value": -7.839000000000003,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.attenuatedVariance",
+  "source": "Calibrator/ImputationPortability.lean:40",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 130,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "beta_sq": 3.0000000000000004,
+    "het": 3.0000000000000004,
+    "r2_imp": 0.98
+   },
+   "value": 8.820000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.imputationErrorVariance",
+  "source": "Calibrator/ImputationPortability.lean:57",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.imputation_error_nonneg"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 130,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "beta_sq": 3.0000000000000004,
+    "het": 3.0000000000000004,
+    "r2_imp": 0.02
+   },
+   "value": 8.820000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.targetBrierFromNeutralAFBenchmark",
+  "source": "Calibrator/PortabilityDrift.lean:3107",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 2401,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03c0": 0.05,
+    "V_A": 0.05,
+    "V_E": 3.0000000000000004,
+    "fstTarget": 0.98
+   },
+   "value": -6.725769824224823,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.TransportedMetrics.calibratedBrierFromVariances",
+  "source": "Calibrator/DGP.lean:2120",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 343,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03c0": 0.05,
+    "vSignal": 0.05,
+    "vResidual": 3.0000000000000004
+   },
+   "value": -6.6177164729503914,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.TransportedMetrics.calibratedBrier",
+  "source": "Calibrator/DGP.lean:2108",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 49,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03c0": 0.05,
+    "r2": 0.02
+   },
+   "value": -6.593451512549573,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.brierFromR2",
+  "source": "Calibrator/PortabilityDrift.lean:3070",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 49,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03c0": 0.05,
+    "r2": 0.02
+   },
+   "value": -6.593451512549573,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.exactCalibratedBrierRiskFromR2",
+  "source": "Calibrator/PortabilityDrift.lean:3065",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 49,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03c0": 0.05,
+    "r2": 0.02
+   },
+   "value": -6.593451512549573,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.sourceBrierFromR2",
+  "source": "Calibrator/PortabilityDrift.lean:3087",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 49,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03c0": 0.05,
+    "r2Source": 0.02
+   },
+   "value": -6.593451512549573,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.retainedFraction",
+  "source": "Calibrator/Conventions.lean:762",
+  "declared_kind": "ratio",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 41,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "loss": 3.0000000000000004,
+    "total": 3.0000000000000004
+   },
+   "value": -6.000000000000003,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.effectVarianceRecurrence",
+  "source": "Calibrator/SelectionArchitecture.lean:51",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 117,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V": 3.0000000000000004,
+    "v_mut": 0.05,
+    "s": 3.0000000000000004
+   },
+   "value": -5.950000000000003,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.deployedTransferTargetR2",
+  "source": "Calibrator/TransferLearningPGS.lean:1114",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 282,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "transported_r2": 3.0000000000000004,
+    "adaptation_gain": 3.0000000000000004,
+    "estimation_penalty": 0.05
+   },
+   "value": 5.950000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.multiAncestryEffectiveN",
+  "source": "Calibrator/BayesianPGSTheory.lean:621",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 274,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "n_target": 3.0000000000000004,
+    "rg": 0.98,
+    "n_other": 3.0000000000000004
+   },
+   "value": 5.881200000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.Var_Delta_Mu",
+  "source": "Calibrator/PortabilityDrift.lean:773",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 26,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V_A": 3.0000000000000004,
+    "fst": 0.98
+   },
+   "value": 5.880000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.expectedPGSDiffVariance",
+  "source": "Calibrator/PolygenicAdaptation.lean:160",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.expected_pgs_diff_var_nonneg"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 26,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V_A": 3.0000000000000004,
+    "fst": 0.98
+   },
+   "value": 5.880000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.fisherAverageEffect",
+  "source": "Calibrator/EpistasisAndNonAdditivity.lean:68",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 270,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "a": 3.0000000000000004,
+    "d": 3.0000000000000004,
+    "p": 0.02
+   },
+   "value": 5.880000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.pgsDiffVariance_two_pop",
+  "source": "Calibrator/PolygenicAdaptation.lean:144",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 26,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V_A": 3.0000000000000004,
+    "fst": 0.98
+   },
+   "value": 5.880000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.ibdFlowStep",
+  "source": "Calibrator/PortabilityDrift.lean:4094",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 225,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "Ne": 1.0,
+    "rate": 0.98,
+    "F": 3.0000000000000004
+   },
+   "value": -3.880000000000001,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.sigmaThetaFromObservedSelectedVariance",
+  "source": "Calibrator/SelectionArchitecture.lean:317",
+  "declared_kind": "correlation",
+  "declared_range": [
+   -1.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.sigmaThetaFromObservedSelectedVariance_pos"
+  },
+  "n_points_scanned": 16807,
+  "n_out_of_range": 712,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "v_selected": 3.0000000000000004,
+    "v_mutation": 0.05,
+    "s": 3.0000000000000004,
+    "t": 1.0,
+    "rho": 0.05
+   },
+   "value": 4.227828745215699,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.wrightFIT",
+  "source": "Calibrator/PopulationGeneticsFoundations.lean:383",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 31,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "f_IS": 3.0000000000000004,
+    "f_ST": 3.0000000000000004
+   },
+   "value": -3.0000000000000018,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.driftLDStep",
+  "source": "Calibrator/LDDecayTheory.lean:263",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 75,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "Ne": 1.0,
+    "c": 3.0000000000000004,
+    "Q": 0.98
+   },
+   "value": 3.9600000000000017,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.oracleTransportAdaptationGain",
+  "source": "Calibrator/TransferLearningPGS.lean:1121",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 31,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "transported_r2": 3.0000000000000004,
+    "oracle_target_r2": 0.05
+   },
+   "value": -2.9500000000000006,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.sampleLimitedScratchTargetR2",
+  "source": "Calibrator/TransferLearningPGS.lean:1225",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 241,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "oracle_target_r2": 0.05,
+    "noiseVar": 3.0000000000000004,
+    "nTarget": 1.0
+   },
+   "value": -2.9500000000000006,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.scratchTargetR2",
+  "source": "Calibrator/TransferLearningPGS.lean:1107",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 31,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "oracle_target_r2": 0.05,
+    "estimation_penalty": 3.0000000000000004
+   },
+   "value": -2.9500000000000006,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.temporalCalibrationInTheLarge",
+  "source": "Calibrator/LongitudinalPortability.lean:352",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 31,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "\u03c0_obs": 0.05,
+    "\u03c0_pred": 3.0000000000000004
+   },
+   "value": -2.9500000000000006,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.prevalenceLogit",
+  "source": "Calibrator/PGSCalibrationTheory.lean:252",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 7,
+  "n_out_of_range": 3,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "pi": 0.05
+   },
+   "value": -2.9444389791664403,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.fineTunedTargetR2",
+  "source": "Calibrator/TransferLearningPGS.lean:1103",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 246,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "r2_source": 0.02,
+    "divergence_penalty": 3.0000000000000004,
+    "adaptation_gain": 0.05
+   },
+   "value": -2.9300000000000006,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.averagePhaseInteraction",
+  "source": "Calibrator/HaplotypeTheory.lean:201",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 249,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "freq_cis": 0.82,
+    "interaction_cis": 3.0000000000000004,
+    "interaction_trans": 3.0000000000000004
+   },
+   "value": 3.000000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.ancestrySpecificEffect",
+  "source": "Calibrator/HaplotypeTheory.lean:620",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 246,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "beta_pop1": 3.0000000000000004,
+    "beta_pop2": 2.0166666666666666,
+    "alpha": 0.9999999999999999
+   },
+   "value": 3.0000000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.lossOfRetention",
+  "source": "Calibrator/DriftRegime.lean:194",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 7,
+  "n_out_of_range": 5,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "r": 3.0000000000000004
+   },
+   "value": -2.0000000000000004,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VACUOUS"
+ },
+ {
+  "definition": "Calibrator.retainedSignalVarianceMigrationDrift",
+  "source": "Calibrator/PortabilityDrift.lean:5081",
+  "declared_kind": "ratio",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.retainedSignalVarianceMigrationDrift_pos"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 243,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V_A": 3.0000000000000004,
+    "Ne": 1000.0,
+    "m": 1000.0
+   },
+   "value": 2.999998500000563,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.islandFstMultiplicativeStep",
+  "source": "Calibrator/PortabilityDrift.lean:4710",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 74,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "Ne": 1000.0,
+    "m": 2.0,
+    "F": 3.0000000000000004
+   },
+   "value": 2.9990000000000006,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.hweMellinDrift",
+  "source": "Calibrator/PolygenicSpectroscopy.lean:210",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.disjoint_design_gaussian_null_below_condensation"
+  },
+  "n_points_scanned": 7,
+  "n_out_of_range": 2,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "q": 0.02
+   },
+   "value": 2.964234413918525,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "DERIVED"
+ },
+ {
+  "definition": "Calibrator.haplotypeTransportBias",
+  "source": "Calibrator/HaplotypeTheory.lean:266",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.haplotypeTransportBias_pos_of_effects_not_portable"
+  },
+  "n_points_scanned": 16807,
+  "n_out_of_range": 6312,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "freq_cis_target": 0.82,
+    "pred_cis": 0.05,
+    "pred_trans": 0.05,
+    "interaction_cis": 3.0000000000000004,
+    "interaction_trans": 3.0000000000000004
+   },
+   "value": 2.950000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.covarianceRetention",
+  "source": "Calibrator/PortabilityDrift.lean:4248",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 17,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "freq_corr": 0.98,
+    "ld_overlap": 3.0000000000000004
+   },
+   "value": 2.9400000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.pgsDriftVariance_one_pop",
+  "source": "Calibrator/PolygenicAdaptation.lean:95",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.pgsDriftVariance_one_pop_nonneg"
+  },
+  "n_points_scanned": 49,
+  "n_out_of_range": 17,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V_A": 3.0000000000000004,
+    "fst": 0.98
+   },
+   "value": 2.9400000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.presentDayPGSVariance",
+  "source": "Calibrator/PortabilityDrift.lean:689",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 17,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V_A": 3.0000000000000004,
+    "fst": 0.02
+   },
+   "value": 2.9400000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.targetHetFromFst",
+  "source": "Calibrator/PortabilityDrift.lean:653",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 17,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "het_source": 3.0000000000000004,
+    "fst": 0.02
+   },
+   "value": 2.9400000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VACUOUS"
+ },
+ {
+  "definition": "Calibrator.targetPGSVariance",
+  "source": "Calibrator/PortabilityDrift.lean:679",
+  "declared_kind": "F_ST",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 17,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V_A": 3.0000000000000004,
+    "fst": 0.02
+   },
+   "value": 2.9400000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.mutationSelectionStepRecessive",
+  "source": "Calibrator/RareVariantPortability.lean:337",
+  "declared_kind": "nonnegative",
+  "declared_range": [
+   0.0,
+   null
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 64,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "mu": 0.05,
+    "s": 3.0000000000000004,
+    "p": 0.98
+   },
+   "value": -1.9002000000000003,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.partialOverlapR2",
+  "source": "Calibrator/SampleOverlapBias.lean:73",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 770,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "r2_true": 0.02,
+    "h2": 0.98,
+    "f": 3.0000000000000004,
+    "_n_gwas": 1.0
+   },
+   "value": 2.9000000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VALIDATED"
+ },
+ {
+  "definition": "Calibrator.presentDayPGSVarianceMutationDrift",
+  "source": "Calibrator/PortabilityDrift.lean:4349",
+  "declared_kind": "ratio",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.presentDayPGSVarianceMutationDrift_nonneg"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 38,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "V_A": 3.0000000000000004,
+    "fst_drift": 0.02,
+    "shared_ld": 0.98
+   },
+   "value": 2.8812000000000006,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.ibdRecurrenceStep",
+  "source": "Calibrator/PortabilityDrift.lean:4607",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 67,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "Ne": 1000.0,
+    "rate": 0.02,
+    "x": 3.0000000000000004
+   },
+   "value": 2.8802396000000003,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.dosageTransportBias",
+  "source": "Calibrator/HaplotypeTheory.lean:245",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 2401,
+  "n_out_of_range": 240,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "freq_cis_source": 0.02,
+    "freq_cis_target": 0.98,
+    "interaction_cis": 0.05,
+    "interaction_trans": 3.0000000000000004
+   },
+   "value": 2.8320000000000003,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.twoDemeIMFirstStepSame",
+  "source": "Calibrator/PortabilityDrift.lean:269",
+  "declared_kind": "probability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 245,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "M": 3.0000000000000004,
+    "_ETss": 0.05,
+    "ETst": 3.0000000000000004
+   },
+   "value": 2.500000000000001,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.privateArchitectureTransferCeiling",
+  "source": "Calibrator/TransferLearningPGS.lean:2961",
+  "declared_kind": "heritability",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 245,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "h2_target": 0.98,
+    "f_private": 3.0000000000000004,
+    "M": 3.0000000000000004
+   },
+   "value": -1.4700000000000004,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.epistaticVariance",
+  "source": "Calibrator/EpistasisAndNonAdditivity.lean:126",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {
+   "lo": "Calibrator.epistatic_variance_nonneg"
+  },
+  "n_points_scanned": 343,
+  "n_out_of_range": 31,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "beta12": 3.0000000000000004,
+    "p1": 0.5,
+    "p2": 0.5
+   },
+   "value": 2.2500000000000004,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.ldBandReconstructionShare",
+  "source": "Calibrator/MetricSpecificPortability.lean:1167",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 35,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "decay": 1.0333333333333334,
+    "kappa": 0.999
+   },
+   "value": -0.9999836065438976,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "UNTESTED"
+ },
+ {
+  "definition": "Calibrator.continentIslandStepSelectionFirst",
+  "source": "Calibrator/PopulationGeneticsFoundations.lean:219",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 343,
+  "n_out_of_range": 294,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "s": 3.0000000000000004,
+    "m": 2.0,
+    "p": 0.98
+   },
+   "value": -0.9949238578680202,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "VALIDATED"
+ },
+ {
+  "definition": "Calibrator.apparent_portability_loss",
+  "source": "Calibrator/ImputationPortability.lean:228",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "r2_source": 0.02,
+    "r2_target_array": 0.98
+   },
+   "value": -0.96,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.incrementalR2",
+  "source": "Calibrator/StatisticalGeneticsMethodology.lean:42",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "r2_full": 0.02,
+    "r2_covariates": 0.98
+   },
+   "value": -0.96,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.true_portability_loss",
+  "source": "Calibrator/ImputationPortability.lean:234",
+  "declared_kind": "R-squared",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 49,
+  "n_out_of_range": 21,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "r2_source": 0.02,
+    "r2_target_ideal": 0.98
+   },
+   "value": -0.96,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": ""
+ },
+ {
+  "definition": "Calibrator.informationCrossoverTime",
+  "source": "Calibrator/ImitationRigidity.lean:1298",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 7,
+  "n_out_of_range": 3,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "initial": 3.0000000000000004
+   },
+   "value": 1.5000000000000002,
+   "side": "hi",
+   "bound": 1.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "DERIVED"
+ },
+ {
+  "definition": "Calibrator.ldHardEdge",
+  "source": "Calibrator/ImitationRigidity.lean:698",
+  "declared_kind": "frequency",
+  "declared_range": [
+   0.0,
+   1.0
+  ],
+  "declared_provenance": "mined from prose; NOT machine-checked",
+  "range_proving_theorems": {},
+  "n_points_scanned": 7,
+  "n_out_of_range": 5,
+  "kinds": [
+   "UNGUARDED-DOCSTRING"
+  ],
+  "worst": {
+   "point": {
+    "decay": 3.0000000000000004
+   },
+   "value": -0.5000000000000001,
+   "side": "lo",
+   "bound": 0.0,
+   "kind": "UNGUARDED-DOCSTRING",
+   "proving_theorem": null,
+   "theorem_preconditions_hold": null
+  },
+  "empirical_status": "DERIVED"
+ }
+]

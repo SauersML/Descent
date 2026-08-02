@@ -40,6 +40,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p\u2082` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -83,6 +89,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -123,6 +135,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -163,6 +181,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p0` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -233,6 +257,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`avg_r2_tag` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -298,6 +328,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -406,6 +442,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`v` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -447,6 +489,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -494,6 +542,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_ld` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -557,6 +611,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_ld` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -592,6 +652,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_ld` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -656,6 +722,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03b2` reaches -5 and 5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -719,6 +791,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -759,6 +837,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_total` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -869,6 +953,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`V` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -922,6 +1012,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`h2` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -978,6 +1074,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`h2` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -1131,7 +1233,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -1155,6 +1257,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`sigma_sq` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -1317,6 +1425,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03b2_sq` reaches 0.0001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -1353,7 +1467,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -1371,6 +1485,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03b2_sq` reaches 0.0001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -1395,14 +1515,33 @@
    "\u03c4"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-plus-minus",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "shift-by-half",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -1420,20 +1559,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c4` reaches 0.001 and 100 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "negate",
-    "swap-plus-minus",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(\u03c3,\u03c4)"
-   ]
-  }
+  "findings": []
  },
  "BayesianPGSTheory.spikeAndSlabPriorVariance": {
   "module": "BayesianPGSTheory",
@@ -1459,6 +1593,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c3_slab` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -1499,6 +1639,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c3_\u03b2_sq` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -1539,6 +1685,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`estimation_var` reaches 0.0001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -1585,6 +1737,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`n_other` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -1701,6 +1859,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`total_effect` reaches 0 and 3 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -1822,6 +1986,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`nonevent_nri` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -1888,14 +2058,33 @@
    "fpr"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-plus-minus",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-times-div",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -1919,24 +2108,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fpr` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "drop-a-one-minus",
-    "negate",
-    "swap-plus-minus",
-    "swap-times-div",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(prev,tpr)",
-    "swap-args(prev,fpr)",
-    "swap-args(tpr,fpr)"
-   ]
-  }
+  "findings": []
  },
  "ClinicalUtilityFairness.proportionCorrectlyClassified": {
   "module": "ClinicalUtilityFairness",
@@ -1948,14 +2128,33 @@
    "prevalence"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "drop-a-one-minus",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-plus-minus",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -1979,24 +2178,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`prevalence` reaches 1e-05 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "drop-a-one-minus",
-    "negate",
-    "swap-plus-minus",
-    "swap-times-div",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(sensitivity,specificity)",
-    "swap-args(sensitivity,prevalence)",
-    "swap-args(specificity,prevalence)"
-   ]
-  }
+  "findings": []
  },
  "ClinicalUtilityFairness.numberNeededToScreen": {
   "module": "ClinicalUtilityFairness",
@@ -2022,6 +2212,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c0` reaches 0.0001 and 0.9999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -2168,6 +2364,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c0` reaches 0.0001 and 0.9999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -2313,6 +2515,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -2354,6 +2562,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -2534,6 +2748,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -2572,6 +2792,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -2700,6 +2926,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`c` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -2894,6 +3126,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p\u2082` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -2941,6 +3179,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p\u2082` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -3022,6 +3266,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -3138,6 +3388,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p_j` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -3196,6 +3452,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p_j` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -3252,6 +3514,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`mean_block_size` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -3346,6 +3614,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q_B` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -3417,6 +3691,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q_B` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -3497,6 +3777,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`g` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -3572,6 +3858,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`g` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -4004,6 +4296,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`arraySparsity` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -4040,49 +4338,19 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-unguarded",
     "required_range": [
      0.0,
      Infinity
     ],
     "why": "`demographicCovarianceGapLowerBound` names a variance"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`fstSource` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`fstTarget` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`recombRate` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`arraySparsity` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`kappa` reaches 0.001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
   "findings": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-unguarded",
     "required_range": [
      0.0,
      Infinity
@@ -4147,6 +4415,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`tmrca` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -4192,6 +4466,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`tmrca` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -4960,6 +5240,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`vNoise` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -5034,6 +5320,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`vNoise` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -5091,6 +5383,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -5105,14 +5403,33 @@
    "vResidual"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "drop-a-one-minus",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-plus-minus",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -5136,24 +5453,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`vResidual` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "drop-a-one-minus",
-    "negate",
-    "swap-plus-minus",
-    "swap-times-div",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(\u03c0,vSignal)",
-    "swap-args(\u03c0,vResidual)",
-    "swap-args(vSignal,vResidual)"
-   ]
-  }
+  "findings": []
  },
  "DGP.IrreducibleTargetPenalty.total": {
   "module": "DGP",
@@ -5312,6 +5620,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m_rate` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -5333,6 +5647,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -5372,6 +5692,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p\u2082` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -5400,14 +5726,33 @@
    "\u03c3_sq"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-plus-minus",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "shift-by-half",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -5437,27 +5782,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c3_sq` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "const-off-by-one",
-    "negate",
-    "swap-plus-minus",
-    "swap-times-div",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(d,Ne)",
-    "swap-args(d,m)",
-    "swap-args(d,\u03c3_sq)",
-    "swap-args(Ne,m)",
-    "swap-args(Ne,\u03c3_sq)",
-    "swap-args(m,\u03c3_sq)"
-   ]
-  }
+  "findings": []
  },
  "DemographicHistory.steppingStoneCoalescenceTime": {
   "module": "DemographicHistory",
@@ -5490,6 +5823,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -5561,6 +5900,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst_AB` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -5575,14 +5920,33 @@
    "p_B"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "drop-a-one-minus",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-plus-minus",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -5606,24 +5970,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p_B` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "drop-a-one-minus",
-    "negate",
-    "swap-plus-minus",
-    "swap-times-div",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(\u03b1,p_A)",
-    "swap-args(\u03b1,p_B)",
-    "swap-args(p_A,p_B)"
-   ]
-  }
+  "findings": []
  },
  "DemographicHistory.introgressionVariants": {
   "module": "DemographicHistory",
@@ -5663,6 +6018,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 10000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -5720,6 +6081,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -5777,6 +6144,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -5924,6 +6297,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -5974,6 +6353,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -6031,6 +6416,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -6071,6 +6462,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -6146,6 +6543,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstT` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -6185,6 +6588,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstT` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -6310,6 +6719,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p2` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -6709,6 +7124,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`c` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -6742,6 +7163,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`c` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -6857,6 +7284,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -6894,6 +7327,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -6938,6 +7377,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -7122,6 +7567,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`meanEstimationError` reaches -3 and 3 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -7168,6 +7619,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`n` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -7228,6 +7685,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`k` reaches 1e-05 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -7319,6 +7782,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`rg` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -7508,6 +7977,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`n` reaches 1 and 10000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -7703,6 +8178,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`freq` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -7766,6 +8247,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`s` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -7801,6 +8288,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`alpha` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -7851,6 +8344,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`alpha` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -7898,6 +8397,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`alpha` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -8030,6 +8535,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -8085,6 +8596,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`shared_ld` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -8325,6 +8842,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`separation` reaches 1 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -8402,6 +8925,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`decay` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -8430,6 +8959,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`decay` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -8458,6 +8993,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`nSites` reaches 1 and 100000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -8681,6 +9222,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_imp` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -8729,6 +9276,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_imp` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -8791,6 +9344,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_target_array` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -8829,6 +9388,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_target_ideal` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -8867,6 +9432,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`v_causal` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -9035,6 +9606,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -9077,6 +9654,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -9125,6 +9708,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`var_causal` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -9194,6 +9783,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -9248,6 +9843,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`c` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -9289,6 +9890,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`c` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -9402,6 +10009,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -9434,6 +10047,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -9502,6 +10121,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -9602,6 +10227,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 10000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -9630,6 +10261,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -9685,6 +10322,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 10000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -9882,6 +10525,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 10000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -10049,14 +10698,27 @@
    "prevalence"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "swap-plus-minus",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-times-div",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -10080,21 +10742,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`prevalence` reaches 1e-05 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "drop-a-one-minus",
-    "swap-plus-minus",
-    "swap-times-div",
-    "swap-args(sensitivity,specificity)",
-    "swap-args(sensitivity,prevalence)",
-    "swap-args(specificity,prevalence)"
-   ]
-  }
+  "findings": []
  },
  "MetricSpecificPortability.sensitivityPortabilityGap": {
   "module": "MetricSpecificPortability",
@@ -10149,6 +10805,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`sensTarget` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -10171,7 +10833,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -10201,6 +10863,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`prevalenceTarget` reaches 0.0001 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -10254,31 +10922,19 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-unguarded",
     "required_range": [
      0.0,
      1.0
     ],
     "why": "`ldBandDetectionShare` names a proportion"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`decay` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`kappa` reaches 0.001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
   "findings": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-unguarded",
     "required_range": [
      0.0,
      1.0
@@ -10299,33 +10955,12 @@
   "covered": false,
   "demonstration": null,
   "falsifiability_evidence": null,
-  "checks": [
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`decay` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   },
-   {
-    "family": "invariant",
-    "kind": "continuity",
-    "verdict": "holds",
-    "why": "`kappa` reaches 0.001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
-   }
-  ],
+  "checks": [],
   "findings": [],
   "uncovered_reason": {
    "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "const-off-by-one",
-    "negate",
-    "swap-plus-minus",
-    "swap-times-div",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(decay,kappa)"
-   ]
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
   }
  },
  "MetricSpecificPortability.ldPanelRetentionFraction": {
@@ -10364,6 +10999,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`totalMarkers` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -10450,6 +11091,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`totalMarkers` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -10503,6 +11150,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`totalMarkers` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -10551,6 +11204,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`totalMarkers` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -10600,6 +11259,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c1` reaches -1 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -10652,6 +11317,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_target` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -10950,6 +11621,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`v_noise_t` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -10993,6 +11670,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`sensitivity` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -11183,6 +11866,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`ancestryVariance` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -11808,6 +12497,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`nSites` reaches 1 and 100000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -12045,14 +12740,33 @@
    "spike"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "drop-a-one-minus",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "shift-by-half",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -12060,12 +12774,7 @@
     "why": "`samplePCResidualAxisFraction` names a proportion"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "no check on this definition currently holds, so there is nothing to falsify",
-   "survived": null
-  }
+  "findings": []
  },
  "Phase.EmpiricalPCOverlapModel.residualBiasEnergy": {
   "module": "Phase",
@@ -12130,6 +12839,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -12190,6 +12905,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -12273,6 +12994,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`mean_predicted` reaches -3 and 3 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -12304,6 +13031,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`slope` reaches -3 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -13227,6 +13960,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fittedSlope` reaches -3 and 3 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -13883,6 +14622,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`ld_factor` reaches 0.001 and 100 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -13922,6 +14667,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 1 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -13998,6 +14749,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`s_correction` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -14031,6 +14788,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`driftFactor` reaches 0.001 and 100 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -14089,6 +14852,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`V_within` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -14140,6 +14909,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -14215,6 +14990,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -14243,6 +15024,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -14302,6 +15089,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`N` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -14381,6 +15174,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -14440,6 +15239,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`sum_beta_fourth` reaches 0 and 3 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -14616,6 +15421,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -14660,6 +15471,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`c` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -14707,6 +15524,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`c` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -14856,6 +15679,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -14893,6 +15722,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -14990,6 +15825,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -15091,6 +15932,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`H_S` reaches 1e-09 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -15159,6 +16006,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p\u2082` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -15190,6 +16043,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03b8` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -15239,7 +16098,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -15263,6 +16122,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -15323,6 +16188,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -15383,6 +16254,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -15421,6 +16298,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -15484,6 +16367,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -15551,6 +16440,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ne` reaches 2 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -15591,6 +16486,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03bc` reaches 1e-10 and 0.01 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -15634,6 +16535,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03b8` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -15716,6 +16623,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -15744,6 +16657,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 10000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -15801,6 +16720,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 10000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -15864,6 +16789,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -15936,6 +16867,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03bc` reaches 1e-10 and 0.01 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -15964,6 +16901,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -16040,6 +16983,12 @@
     "kind": "monotone",
     "verdict": "holds",
     "why": "theorem `continuousSteppingStoneFst_decreases_with_L` asserts the direction"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -16092,6 +17041,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -16135,6 +17090,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m\u2082\u2081` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -16178,6 +17139,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -16271,6 +17238,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 1 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -16311,7 +17284,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -16329,6 +17302,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`mu` reaches 1e-10 and 0.01 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -16399,6 +17378,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03b8` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -16530,6 +17515,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -16568,6 +17559,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -16747,6 +17744,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -16778,7 +17781,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -16790,6 +17793,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`tau` reaches 0.0001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -16819,20 +17828,21 @@
    {
     "mutation": "negate",
     "rejected_by": [
-     "limit"
+     "limit",
+     "range"
     ]
    },
    {
     "mutation": "shift-by-half",
     "rejected_by": [
-     "limit"
+     "limit",
+     "range"
     ]
    },
    {
-    "mutation": "swap-args(t,Ne)",
+    "mutation": "scale-by-three",
     "rejected_by": [
-     "continuity",
-     "limit"
+     "range"
     ]
    }
   ],
@@ -16840,7 +17850,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -16864,6 +17874,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -16921,6 +17937,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstT` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -16934,14 +17956,33 @@
    "tauT"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-plus-minus",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "shift-by-half",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -16959,20 +18000,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`tauT` reaches 0.0001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "negate",
-    "swap-plus-minus",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(tauS,tauT)"
-   ]
-  }
+  "findings": []
  },
  "PortabilityDrift.PureSplitModel.tau": {
   "module": "PortabilityDrift",
@@ -17181,6 +18217,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17232,6 +18274,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17317,14 +18365,33 @@
    "mu"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "const-off-by-one",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-plus-minus",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -17342,22 +18409,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`mu` reaches 1e-10 and 0.01 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "const-off-by-one",
-    "negate",
-    "swap-plus-minus",
-    "swap-times-div",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(Ne,mu)"
-   ]
-  }
+  "findings": []
  },
  "PortabilityDrift.ClosedPopulationNoMutation.retention": {
   "module": "PortabilityDrift",
@@ -17437,6 +18497,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`het` reaches 1e-09 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17476,6 +18542,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17516,6 +18588,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17555,6 +18633,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17624,6 +18708,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -17652,6 +18742,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17708,6 +18804,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -17743,6 +18845,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstT` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17793,6 +18901,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17840,6 +18954,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17884,6 +19004,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`V_E` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -17959,6 +19085,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -18023,6 +19155,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -18058,6 +19196,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`rhoSq` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -18956,6 +20100,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`lambda` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -19161,6 +20311,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`pTarget` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -19628,6 +20784,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstTarget` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -19668,6 +20830,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstTarget` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -19729,6 +20897,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -19805,6 +20979,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstTarget` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -19850,6 +21030,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2Source` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -19892,6 +21078,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstTarget` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -19919,14 +21111,33 @@
    "fstTarget"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-args(\u03c0,V_A)",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "swap-args(\u03c0,V_E)",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -19956,24 +21167,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstTarget` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "negate",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(\u03c0,V_A)",
-    "swap-args(\u03c0,V_E)",
-    "swap-args(\u03c0,fstTarget)",
-    "swap-args(V_A,V_E)",
-    "swap-args(V_A,fstTarget)",
-    "swap-args(V_E,fstTarget)"
-   ]
-  }
+  "findings": []
  },
  "PortabilityDrift.neutralAFBenchmarkMetricProfile": {
   "module": "PortabilityDrift",
@@ -20099,6 +21301,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`vEnv` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -20132,6 +21340,12 @@
     "kind": "continuity",
     "verdict": "violated",
     "why": "`r2` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "violated",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -20140,6 +21354,12 @@
     "kind": "continuity",
     "verdict": "violated",
     "why": "`r2` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "violated",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ]
  },
@@ -20447,6 +21667,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstTarget` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -20475,6 +21701,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -20520,6 +21752,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`qTarget` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -20560,6 +21798,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`q` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -20605,6 +21849,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`qTarget` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -20652,6 +21902,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fstT` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -20693,6 +21949,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -20820,6 +22082,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`ld_overlap` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -20852,6 +22120,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -20883,6 +22157,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`shared_ld` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -20937,6 +22217,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`shared_ld` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -20988,6 +22274,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`shared_ld` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -21009,7 +22301,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      Infinity
@@ -21033,6 +22325,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`shared_ld` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -21089,6 +22387,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`shared_ld` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -21144,6 +22448,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`shared_ld_target` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -21239,6 +22549,12 @@
     "kind": "monotone",
     "verdict": "holds",
     "why": "theorem `fstMigrationDriftEquilibrium_decreases_with_Ne` asserts the direction"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -21288,6 +22604,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`rate` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -21361,19 +22683,21 @@
    {
     "mutation": "negate",
     "rejected_by": [
-     "limit"
+     "limit",
+     "range"
     ]
    },
    {
     "mutation": "shift-by-half",
     "rejected_by": [
-     "limit"
+     "limit",
+     "range"
     ]
    },
    {
-    "mutation": "swap-args(Ne,m)",
+    "mutation": "scale-by-three",
     "rejected_by": [
-     "limit"
+     "range"
     ]
    }
   ],
@@ -21381,7 +22705,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -21405,6 +22729,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -21433,6 +22763,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -21510,6 +22846,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`d` reaches 1 and 10000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -21578,6 +22920,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -21609,6 +22957,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -21666,6 +23020,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [
@@ -21744,6 +23104,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`m\u2082\u2081` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -21784,6 +23150,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`generations_since` reaches 0 and 10000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -21829,14 +23201,33 @@
    "Fst"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "const-off-by-one",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "drop-a-one-minus",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -21860,25 +23251,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "const-off-by-one",
-    "drop-a-one-minus",
-    "negate",
-    "swap-plus-minus",
-    "swap-times-div",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(Ne,m)",
-    "swap-args(Ne,Fst)",
-    "swap-args(m,Fst)"
-   ]
-  }
+  "findings": []
  },
  "PortabilityDrift.fstMigDriftEquil": {
   "module": "PortabilityDrift",
@@ -21954,6 +23335,12 @@
     "kind": "monotone",
     "verdict": "holds",
     "why": "theorem `fstMigDriftEquil_decreasing_in_Ne` asserts the direction"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -22001,6 +23388,12 @@
     "kind": "monotone",
     "verdict": "holds",
     "why": "theorem `neutralAFBenchmarkFromRecurrence_increasing_in_m` asserts the direction"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -22046,6 +23439,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -22116,6 +23515,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`z_alpha` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -22193,7 +23598,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -22211,6 +23616,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`C` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23004,6 +24415,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`s` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23034,6 +24451,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`s` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23071,6 +24494,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`s` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23370,6 +24799,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23406,7 +24841,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      Infinity
@@ -23424,6 +24859,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`s` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23465,6 +24906,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03b1` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23506,6 +24953,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_observed` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23594,6 +25047,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`h2_family` reaches 0.001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23701,6 +25160,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c3` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23748,6 +25213,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c3` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23872,6 +25343,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`s` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -23946,6 +25423,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`s` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -23984,6 +25467,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`Ns` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -24041,6 +25530,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c4` reaches 0.001 and 100 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -24069,6 +25564,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`s` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -24107,6 +25608,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`tau` reaches 0.0001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -24161,6 +25668,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`tau` reaches 0.0001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -24198,6 +25711,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`rho` reaches -1 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -24238,6 +25757,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`rho` reaches -1 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -24310,6 +25835,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`rho` reaches -1 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -24364,6 +25895,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -24820,6 +26357,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_covariates` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -24858,6 +26401,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`dr2_source` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -24880,14 +26429,16 @@
    "se"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "falsifiability_evidence": [
+   "range"
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      1e-300,
      Infinity
@@ -24895,12 +26446,18 @@
     "why": "`effectiveSampleSizeSE` names an effective sample size"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "no check on this definition currently holds, so there is nothing to falsify",
-   "survived": null
-  }
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape-outside-theorem",
+    "required_range": [
+     1e-300,
+     Infinity
+    ],
+    "why": "`effectiveSampleSizeSE` names an effective sample size"
+   }
+  ]
  },
  "StatisticalGeneticsMethodology.fixed_weights": {
   "module": "StatisticalGeneticsMethodology",
@@ -25238,6 +26795,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`r2_gwas` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": []
@@ -25266,6 +26829,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`\u03c32_noise` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -25361,6 +26930,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`n` reaches 1 and 10000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -25753,6 +27328,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`lossWeight` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -25794,6 +27375,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`ancestryBiasWithout` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -25846,6 +27433,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`lossWeight` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -26045,6 +27638,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`oracle_target_r2` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -26083,6 +27682,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`transported_r2` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -26147,6 +27752,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`nTarget` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -26224,6 +27835,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`lam` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -26257,14 +27874,21 @@
    "nTarget"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "inconclusive",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -26288,22 +27912,15 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`nTarget` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "negate",
-    "swap-plus-minus",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(gapSq,noiseVar)",
-    "swap-args(gapSq,nTarget)",
-    "swap-args(noiseVar,nTarget)"
-   ]
-  }
+  "findings": []
  },
  "TransferLearningPGS.coefficientGapSq": {
   "module": "TransferLearningPGS",
@@ -26588,6 +28205,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`nTarget` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -26632,6 +28255,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`tau` reaches 0.0001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -27297,6 +28926,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`V_E` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
@@ -27341,6 +28976,12 @@
     "kind": "continuity",
     "verdict": "holds",
     "why": "`V_P` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "totality",
+    "verdict": "holds",
+    "why": "Lean totalises x/0, log 0 and sqrt of a negative to 0; where such a point is attainable inside the box AND the quantity has a defined limit there, the junk value is a wrong answer inside the domain, not a harmless artifact"
    }
   ],
   "findings": [],
