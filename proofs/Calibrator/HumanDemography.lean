@@ -99,11 +99,13 @@ theorem neutral_drift_ratio_ge_one_sub_fst (V_A V_E fst : ℝ)
 
 /-- Divergence accumulated in `t` generations at effective size `Ne` is at most
 `t / (2 Ne)`, the coalescent time scale. -/
-theorem fstFromGenerations_le_coalescentTau (t Ne : ℝ) :
+theorem fstFromGenerations_le_coalescentTau (t Ne : ℝ)
+    (ht : 0 ≤ t) (hNe : 0 < Ne) :
     fstFromGenerations t Ne ≤ t / (2 * Ne) := by
   unfold fstFromGenerations fstFromTau coalescentTau
-  have h := Real.add_one_le_exp (-(t / (2 * Ne)))
-  linarith
+  have hfrac : 0 ≤ t / (2 * Ne) := div_nonneg ht (by linarith)
+  rw [div_le_iff₀ (by linarith)]
+  nlinarith
 
 /-- **Demography bounds the portability loss directly.**
 
@@ -120,10 +122,11 @@ theorem neutral_drift_ratio_ge_one_sub_coalescentTau
     unfold fstFromGenerations
     exact fst_from_tau_nonneg_of_nonneg _ (by unfold coalescentTau; exact hτ)
   have hfst1 : fstFromGenerations t Ne < 1 := by
-    unfold fstFromGenerations; exact fst_from_tau_lt_one _
+    unfold fstFromGenerations
+    exact fst_from_tau_lt_one _ (by unfold coalescentTau; exact hτ)
   have hbound := neutral_drift_ratio_ge_one_sub_fst V_A V_E
     (fstFromGenerations t Ne) hVA hVE hfst0 hfst1
-  have hle := fstFromGenerations_le_coalescentTau t Ne
+  have hle := fstFromGenerations_le_coalescentTau t Ne ht hNe
   linarith
 
 /-- **An observed accuracy ratio below `1 - F_ST` is not attributable to

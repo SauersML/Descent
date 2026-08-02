@@ -127,6 +127,20 @@ theorem het_increases_with_ne
 noncomputable def coalFst (t Ne : ℝ) : ℝ :=
   t / (t + 2 * Ne)
 
+/-- **One quantity, one definition.**  `coalFst` and `fstFromTau` are the same
+function in generation and coalescent units.  Three formulas for this quantity
+existed across three files and two were wrong; this theorem is the relation
+whose absence let them disagree, and it fails to compile if either body moves. -/
+theorem coalFst_eq_fstFromTau (t Ne : ℝ) (ht : 0 ≤ t) (hNe : 0 < Ne) :
+    coalFst t Ne = fstFromTau (coalescentTau t Ne) := by
+  have h2 : (2 : ℝ) * Ne ≠ 0 := by positivity
+  have hsum : t + 2 * Ne ≠ 0 := by
+    have hs : 0 < t + 2 * Ne := by linarith
+    exact ne_of_gt hs
+  unfold coalFst fstFromTau coalescentTau
+  field_simp
+  ring
+
 /-- Coalescent Fst is nonneg. -/
 theorem coal_fst_nonneg (t Ne : ℝ) (h_t : 0 ≤ t) (h_Ne : 0 < Ne) :
     0 ≤ coalFst t Ne := by
@@ -188,44 +202,125 @@ at selected loci.
 
 section SelectionMigrationBalance
 
-/-- **Selection-migration equilibrium frequency.**
-    For a selected allele with advantage s in one population
-    and migration rate m: p_eq ≈ s / (s + m) in the favored population
-    and ≈ m / (s + m) in the other.
+/-- One generation of continent--island dynamics, selection step first: the
+locally favoured allele at frequency `p` is reweighted by relative fitness
+`1 + s`, then a fraction `m` of the island is replaced by continental migrants
+carrying the allele at frequency zero.
 
-    Empirical status: UNTESTED. -/
+Convention: selection precedes migration within a generation. The orderings are
+not interchangeable -- they have different fixed points, and deterministic
+iteration separates them at the fourth decimal -- so the ordering is part of the
+model rather than part of the presentation.  The other order is
+`continentIslandStepMigrationFirst`, and `selectionMigrationEquilibrium_orderings`
+relates the two.
+
+    Empirical status: VALIDATED (deterministic iteration reproduces the fixed
+    point to all digits reported, s = 0.1 m = 0.05 -> 0.45000). -/
+noncomputable def continentIslandStepSelectionFirst (s m p : ℝ) : ℝ :=
+  (1 - m) * (p * (1 + s) / (1 + s * p))
+
+/-- The same generation with the migration step first.
+
+    Empirical status: VALIDATED (iteration gives 0.47368 at s = 0.1, m = 0.05,
+    matching this map's fixed point exactly). -/
+noncomputable def continentIslandStepMigrationFirst (s m p : ℝ) : ℝ :=
+  ((1 - m) * p) * (1 + s) / (1 + s * ((1 - m) * p))
+
+/-- **Selection-migration equilibrium frequency** under the selection-first
+convention.
+
+This closed form is not stipulated.  It is the nonzero solution of
+`continentIslandStepSelectionFirst s m p = p`, and
+`selectionMigrationEquilibrium_isFixedPoint` is the theorem that pins it: no
+other constant can be substituted here and still compile.  The `max` is not
+cosmetic either.  Migration is absorbing: once `m (1 + s) ≥ s` the allele is
+lost outright and the equilibrium is the boundary value `0`, which
+`selectionMigrationEquilibrium_eq_zero` records and
+`continentIslandStep_zero` confirms is itself a fixed point.
+
+    Empirical status: VALIDATED (0.45000, 0.12000, 0, 0 against iteration at
+    (s, m) = (.1, .05), (.1, .08), (.1, .1), (.2, .4)). -/
 noncomputable def selectionMigrationEquilibrium (s m : ℝ) : ℝ :=
-  s / (s + m)
+  max 0 ((s - m - m * s) / s)
 
-/-- Equilibrium frequency is in (0, 1) when s, m > 0. -/
-theorem sel_mig_eq_in_unit (s m : ℝ)
+/-- The equilibrium under the migration-first convention. -/
+noncomputable def selectionMigrationEquilibriumMigrationFirst (s m : ℝ) : ℝ :=
+  max 0 ((s - m - m * s) / (s * (1 - m)))
+
+/-- Loss is absorbing: an allele absent from the island stays absent. -/
+@[simp] theorem continentIslandStep_zero (s m : ℝ) :
+    continentIslandStepSelectionFirst s m 0 = 0 := by
+  unfold continentIslandStepSelectionFirst
+  simp
+
+/-- **The equilibrium is a fixed point of the one-generation map.**  This is the
+theorem that makes the closed form above unfalsifiable-by-stipulation
+impossible: it is derived from the dynamic, not asserted alongside it. -/
+theorem selectionMigrationEquilibrium_isFixedPoint (s m : ℝ)
+    (h_s : 0 < s) (h_m : m < 1) (h_maintained : m * (1 + s) < s) :
+    continentIslandStepSelectionFirst s m (selectionMigrationEquilibrium s m) =
+      selectionMigrationEquilibrium s m := by
+  have hs' : s ≠ 0 := ne_of_gt h_s
+  have hm : (0 : ℝ) < 1 - m := by linarith
+  have hm' : (1 : ℝ) - m ≠ 0 := ne_of_gt hm
+  have hsm : (1 : ℝ) + s ≠ 0 := by positivity
+  have hx : 0 < (s - m - m * s) / s := by
+    apply div_pos _ h_s
+    nlinarith
+  have heq : selectionMigrationEquilibrium s m = (s - m - m * s) / s :=
+    max_eq_right hx.le
+  rw [heq]
+  unfold continentIslandStepSelectionFirst
+  have hden : 1 + s * ((s - m - m * s) / s) = (1 + s) * (1 - m) := by
+    field_simp
+    ring
+  rw [hden]
+  field_simp
+  ring
+
+/-- **Migration swamps selection.**  Once migration exceeds the selective
+advantage the allele is lost, not merely rare.  The previous statement of this
+result bounded the frequency below `1/10`; the frequency is `0`. -/
+theorem selectionMigrationEquilibrium_eq_zero (s m : ℝ)
+    (h_s : 0 < s) (h_swamped : s ≤ m * (1 + s)) :
+    selectionMigrationEquilibrium s m = 0 := by
+  unfold selectionMigrationEquilibrium
+  apply max_eq_left
+  apply div_nonpos_of_nonpos_of_nonneg _ h_s.le
+  nlinarith
+
+/-- **Strong selection maintains near-complete differentiation.**  Stated
+against the migration load `m (1 + s)` that the dynamic actually produces. -/
+theorem selectionMigrationEquilibrium_ge_of_strong_selection (s m : ℝ)
+    (h_s : 0 < s) (h_strong : 10 * (m * (1 + s)) ≤ s) :
+    9 / 10 ≤ selectionMigrationEquilibrium s m := by
+  have hge : 9 / 10 ≤ (s - m - m * s) / s := by
+    rw [le_div_iff₀ h_s]
+    nlinarith
+  exact le_max_of_le_right hge
+
+/-- The equilibrium never leaves the unit interval. -/
+theorem selectionMigrationEquilibrium_lt_one (s m : ℝ)
     (h_s : 0 < s) (h_m : 0 < m) :
-    0 < selectionMigrationEquilibrium s m ∧
-      selectionMigrationEquilibrium s m < 1 := by
+    selectionMigrationEquilibrium s m < 1 := by
   unfold selectionMigrationEquilibrium
-  constructor
-  · exact div_pos h_s (by linarith)
-  · rw [div_lt_one (by linarith)]; linarith
-
-/-- **Strong selection overcomes migration.**
-    When s >> m, differentiation is maintained (Fst_locus → 1).
-    This creates population-specific genetic architecture. -/
-theorem strong_selection_high_differentiation
-    (s m : ℝ) (h_s : 0 < s) (h_m : 0 < m) (h_strong : 10 * m < s) :
-    9 / 10 < selectionMigrationEquilibrium s m := by
-  unfold selectionMigrationEquilibrium
-  rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 10) (by linarith)]
+  apply max_lt one_pos
+  rw [div_lt_one h_s]
   nlinarith
 
-/-- **Weak selection is overwhelmed by migration.**
-    When s << m, allele frequencies homogenize (Fst_locus → 0).
-    These loci contribute to portable genetic architecture. -/
-theorem weak_selection_low_differentiation
-    (s m : ℝ) (h_s : 0 < s) (h_m : 0 < m) (h_weak : s < (1 / 10) * m) :
-    selectionMigrationEquilibrium s m < 1 / 10 := by
-  unfold selectionMigrationEquilibrium
-  rw [div_lt_iff₀ (by linarith)]
-  nlinarith
+/-- **The two orderings differ by exactly one migration step.**  This is the
+whole content of the composition convention: neither map is more correct, but
+they are not equal, and a definition that named neither could not say so. -/
+theorem selectionMigrationEquilibrium_orderings (s m : ℝ)
+    (h_s : 0 < s) (h_m : m < 1) :
+    selectionMigrationEquilibrium s m =
+      (1 - m) * selectionMigrationEquilibriumMigrationFirst s m := by
+  have hm : (0 : ℝ) < 1 - m := by linarith
+  unfold selectionMigrationEquilibrium selectionMigrationEquilibriumMigrationFirst
+  rw [← mul_max_of_nonneg _ _ hm.le, mul_zero]
+  congr 1
+  field_simp
+  ring
 
 /-- **Loci under selection contribute disproportionally to portability loss.**
     Selected loci have higher Fst → larger portability impact

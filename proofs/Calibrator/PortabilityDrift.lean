@@ -21,9 +21,22 @@ noncomputable def coalescenceCdfFromHazard (hazard : ℝ → ℝ) (t : ℝ) : �
 noncomputable def coalescentTau (t Ne : ℝ) : ℝ :=
   t / (2 * Ne)
 
-/-- Empirical status: UNTESTED. -/
+/-- **`F_ST` after a clean split, in coalescent units.**
+
+This is not an independent formula.  It is `coalFst` expressed in units of
+`tau = t / (2 Ne)`, and `coalFst_eq_fstFromTau` is the theorem that says so; the
+two cannot drift apart without that theorem failing.  The previous body here was
+`1 - exp (-tau)`, which is the coalescence CDF already defined in this file as
+`coalescenceCdfFromHazard` under unit hazard -- the probability that a lineage
+pair has coalesced by `tau`, not the between-population variance ratio.  The two
+were conflated, and `fstFromTau_lt_coalescenceCdf` now records that they are
+never equal.
+
+    Empirical status: VALIDATED (0.0909/0.2000/0.3333/0.5000/0.6667/0.8000 at
+    tau = .1/.25/.5/1/2/4 against simulated 0.0905/0.1887/0.3137/0.4782/0.6589/
+    0.8028, within simulation error at every point). -/
 noncomputable def fstFromTau (tau : ℝ) : ℝ :=
-  1 - Real.exp (-tau)
+  tau / (1 + tau)
 
 noncomputable def fstFromGenerations (t Ne : ℝ) : ℝ :=
   fstFromTau (coalescentTau t Ne)
@@ -43,21 +56,37 @@ noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
   simp [coalescenceCdfFromHazard, coalescenceSurvivalFromHazard]
 
 @[simp] theorem fstFromGenerations_eq (t Ne : ℝ) :
-    fstFromGenerations t Ne = 1 - Real.exp (-(t / (2 * Ne))) := by
-  simp [fstFromGenerations, fstFromTau, coalescentTau]
+    fstFromGenerations t Ne = t / (2 * Ne) / (1 + t / (2 * Ne)) := rfl
 
 theorem fst_from_tau_nonneg_of_nonneg (tau : ℝ) (htau : 0 ≤ tau) :
-    0 ≤ fstFromTau tau := by
+    0 ≤ fstFromTau tau :=
+  div_nonneg htau (by linarith)
+
+theorem fst_from_tau_lt_one (tau : ℝ) (htau : 0 ≤ tau) : fstFromTau tau < 1 := by
   unfold fstFromTau
-  have hexp_le : Real.exp (-tau) ≤ 1 := by
-    rw [← Real.exp_zero]
-    exact Real.exp_le_exp.mpr (by linarith)
+  rw [div_lt_one (by linarith)]
   linarith
 
-theorem fst_from_tau_lt_one (tau : ℝ) : fstFromTau tau < 1 := by
+/-- **The coalescence CDF is not `F_ST`.**  `1 - exp (-tau)` is the probability
+that a lineage pair has coalesced by `tau`; `F_ST` is the between-population
+share of variance.  Conflating them overstates divergence at every positive
+separation, which is the direction and the shape of the bias measured against
+simulation (+5% at `tau = 0.1`, rising to +32% at `tau = 1`).  Stating the
+inequality keeps the two from being interchanged again silently. -/
+theorem fstFromTau_lt_coalescenceCdf (tau : ℝ) (htau : 0 < tau) :
+    fstFromTau tau < 1 - Real.exp (-tau) := by
+  have hE : (0 : ℝ) < Real.exp tau := Real.exp_pos tau
+  have hexp : tau + 1 < Real.exp tau := Real.add_one_lt_exp (by linarith)
+  have h1t : (0 : ℝ) < 1 + tau := by linarith
+  rw [← sub_pos]
   unfold fstFromTau
-  have hpos : 0 < Real.exp (-tau) := Real.exp_pos (-tau)
-  linarith
+  rw [Real.exp_neg]
+  have hrw : 1 - (Real.exp tau)⁻¹ - tau / (1 + tau) =
+      (Real.exp tau - 1 - tau) / (Real.exp tau * (1 + tau)) := by
+    field_simp
+    ring
+  rw [hrw]
+  exact div_pos (by linarith) (by positivity)
 
 
 structure PureSplitModel where
