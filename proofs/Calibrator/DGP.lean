@@ -2005,14 +2005,6 @@ noncomputable def PGSEvolutionaryModel.hetDecayFactor (m : PGSEvolutionaryModel)
 noncomputable def PGSEvolutionaryModel.fstTransient (m : PGSEvolutionaryModel) : ℝ :=
   fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))
 
-/-- **Migration LD boost**: gene flow between populations introduces
-    shared haplotypes, partially counteracting drift and mutation erosion.
-
-    Boost factor = 1 + Mτ/(1+M) ≥ 1.
-
-    DERIVED from the island model: migrants carry source-population LD,
-    increasing shared LD fraction proportionally to migration rate M
-    and divergence time τ. -/
 /-! ### Step 2: Primitive evolutionary coordinate summaries
 
 The four coarse coordinates are kept side by side:
