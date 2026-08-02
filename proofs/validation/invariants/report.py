@@ -167,8 +167,10 @@ def main(argv):
     n = len(cov)
     c = sum(1 for v in cov.values() if v["covered"])
     print(f"definitions in proofs/Calibrator ......... {n}")
-    print(f"covered by a demonstrated check .......... {c}  ({100*c/n:.1f}%)")
-    print(f"residue for the simulation tiers ......... {n - c}")
+    print(f"covered BY THIS CHECKER .................. {c}  ({100*c/n:.1f}%)")
+    print(f"not reached by THIS CHECKER .............. {n - c}")
+    print("  (both are joint properties of the corpus and this tool;")
+    print("   a definition this tier cannot reach is not one nothing can)")
     print()
     stage = collections.Counter(v["uncovered_reason"]["stage"]
                                 for v in cov.values() if not v["covered"])

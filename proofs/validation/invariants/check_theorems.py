@@ -154,7 +154,12 @@ def main(argv):
 
     sts = T.all_theorems()
     results, per_def = {}, {}
-    usable = holds = broken_self = 0
+    # Named for BOTH halves on purpose. The count is a property of the corpus
+    # AND of this checker, and every name that mentions only the corpus makes
+    # the checker's half disappear when the number is spoken. "427 usable
+    # theorems" was 427 out of a much larger reachable set, and it was
+    # reported as though the corpus had supplied the limit.
+    evaluable_by_this_checker = holds = broken_self = 0
     for st in sts:
         ar, rn, amb = build_arity(defs, st["module"])
         mentioned = T.definitions_mentioned(st, set(by_short))
@@ -174,7 +179,7 @@ def main(argv):
                                        reason="hypotheses rejected almost every "
                                               "sampled point")
             continue
-        usable += 1
+        evaluable_by_this_checker += 1
         if fail:
             # Lean proved this; a numeric failure indicts the checker.
             broken_self += 1
@@ -224,10 +229,21 @@ def main(argv):
                                    discriminates=sorted(kills))
 
     out = HERE / "results_theorems.json"
-    out.write_text(json.dumps(dict(theorems=results, by_definition=per_def),
-                              indent=1, default=str))
+    out.write_text(json.dumps(
+        dict(theorems=results, by_definition=per_def,
+             evaluable_by_this_checker=evaluable_by_this_checker,
+             statements_parsed=len(sts),
+             note="`evaluable_by_this_checker` is a joint property of the "
+                  "corpus and this tool. A theorem outside it is not a "
+                  "theorem the corpus lacks."),
+        indent=1, default=str))
     print(f"{len(sts)} theorem statements parsed")
-    print(f"  {usable} usable (hypotheses modelled, admissible points found)")
+    print(f"  {evaluable_by_this_checker} EVALUABLE BY THIS CHECKER "
+          "(conclusion transpiles, hypotheses modelled, admissible points "
+          "found) -- a joint property of the corpus and this tool, not a "
+          "property of the corpus")
+    print(f"  {len(sts) - evaluable_by_this_checker} beyond this checker, "
+          "for reasons recorded per theorem")
     print(f"  {holds} hold numerically")
     print(f"  {broken_self} disagree with this checker -- checker bugs, "
           "not corpus defects")
