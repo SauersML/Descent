@@ -1,5 +1,43 @@
 # Extraction layer for the Calibrator corpus
 
+> ## Read this first: coherence is the trap
+>
+> Four bugs were found across two tiers in one session. Every one was a claim
+> that **fitted all the available evidence while answering a different question
+> than the one asked**:
+>
+> | the claim | what it actually answered |
+> |---|---|
+> | "the values disagree, so my transcription is wrong" | the values disagreed because a tolerance was applied in the wrong direction — widening a *hypothesis* admits points the theorem excludes |
+> | "these examples are multi-line, so it's a multi-line-signature bug" | the examples happened to be multi-line; the pattern failed on **nested parentheses in a binder type** |
+> | "the standard error says the verdict is safe" | an SE estimated from **two** samples is chi-square with one degree of freedom — too noisy to be a criterion |
+> | "this tier is deterministic, so it has no seed problem" | determinism makes a run *repeatable*; it says nothing about whether a verdict survives drawing 40 **different** points |
+>
+> None of these felt like carelessness, and none of them was. Each stopped one
+> step early at a point where the story was already coherent — and **a wrong
+> diagnosis that explains all the evidence provides no signal that it is
+> wrong.** At the level of the evidence, wrong-but-coherent is indistinguishable
+> from right.
+>
+> The only defence found: **check the mechanism, not the fit.** Go one level
+> below the evidence to the thing generating it. Confirm a binder bug by finding
+> the pattern that fails, not by counting examples that failed. Find a crash in
+> a consumer by reading the consumer, not the producer. Establish stability by
+> varying the seed, not by observing that the code looks deterministic.
+>
+> This cannot be automated — an automated check is itself a fit to evidence. It
+> is written here because it applies to every tier and to every number in this
+> directory, and because message history is not where anyone looks in a week.
+>
+> Corollaries that have already earned their place:
+> - A number that only ever rises is not being checked. Five corrections in one
+>   session lowered a number and all five were right.
+> - Every count is a count of *something*, and the thing is usually not what the
+>   name of the count says. Three separate metrics here were counting mentions,
+>   internal verdicts, or absences.
+> - A clean run on the wrong revision is worse than no run, because it reads as
+>   confirmation.
+
 Every validation script in this repo used to re-transcribe a Lean formula into
 Python by hand. That transcription is an unvalidated step *inside* the
 validator: a slip produces a false verdict in either direction. This directory

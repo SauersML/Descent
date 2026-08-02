@@ -34,6 +34,17 @@ travels without them.
      is therefore an upper bound on how much of the input space is actually
      checked, not a measure of it.
 
+  3. SEED DEPENDENCE, which is not a blind spot of the criterion but of the
+     RUN.  Every RNG here is constructed fresh at its point of use, never
+     shared across definitions and never derived from a name or from iteration
+     position, so processing order cannot leak into the draws.  That makes the
+     run REPRODUCIBLE.  It does NOT make a verdict STABLE: always drawing the
+     same 40 points is no evidence that a verdict survives drawing 40
+     different ones.  Use `--seed` and diff the covered sets; a definition
+     whose status moves was never covered.  (See the README's opening section
+     -- "deterministic, therefore stable" is one of the four specimens of a
+     claim that fits the evidence while answering a different question.)
+
 Check kinds, by class:
 
   NUMERIC     range invariant over the admissible box, where the range is mined
@@ -73,6 +84,18 @@ _ALL_STRUCTS = {}
 # measurement.  One of one is not a perfect score; it is a body the operators
 # could barely perturb.
 MIN_DISTINGUISHABLE_MUTANTS = 3
+
+# Every RNG in this file is constructed FRESH at its point of use from SEED,
+# never shared across definitions and never derived from a name or from
+# iteration position.  That makes the run reproducible and, more importantly,
+# makes a definition's verdict independent of the order definitions are
+# processed in -- a shared stream would leak processing order into the draws.
+#
+# Reproducibility is NOT stability.  Always drawing the same 40 points is not
+# evidence that the verdict survives drawing 40 different ones.  `--seed`
+# exists so that can be tested: re-run with a different seed and diff the
+# covered set.  Any definition whose status moves was never really covered.
+SEED = 11
 
 
 # ------------------------------------------------------------------ mutants
@@ -217,8 +240,14 @@ def main(argv=None):
     ap.add_argument("--json", default=None)
     ap.add_argument("--verbose", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--seed", type=int, default=SEED,
+                    help="master seed for admissible-point draws. Re-run with a "
+                         "different value and diff the covered set: a verdict "
+                         "that moves was never coverage.")
     a = ap.parse_args(argv)
 
+    global SEED
+    SEED = a.seed
     classes = json.loads((HERE / "classes.json").read_text())
     blob = json.loads((HERE / "defs.json").read_text())
     defs_by_name = {d["name"]: d for d in blob["definitions"]}
@@ -229,7 +258,6 @@ def main(argv=None):
         v["_name"] = k
 
     sys.path.insert(0, str(HERE))
-    rng = random.Random(4242)
 
     results = {}
     names = list(classes)
@@ -275,13 +303,13 @@ def main(argv=None):
                 bounding = d["constraints"][key][0]
                 break
         pts, hyps, dropped = make_points(entry, defs_by_name, structs,
-                                         random.Random(11), bounding)
+                                         random.Random(SEED), bounding)
         if not pts:
             rec["reason"] = ("mined hypotheses admit no sampled point; "
                              f"constraints: {hyps[:4]}")
             continue
         vecspec = entry.get("vector_args")
-        base_vals = values(fn, argnames, pts, random.Random(11), vecspec)
+        base_vals = values(fn, argnames, pts, random.Random(SEED), vecspec)
         if all(v is None for v in base_vals):
             rec["reason"] = "no admissible point evaluates"
             continue
@@ -324,14 +352,14 @@ def main(argv=None):
                     continue
                 thm = (d["constraints"].get(f"range_{side}_thm") or [None, 0])
                 side_pts, side_hyps, side_dropped = make_points(
-                    entry, defs_by_name, structs, random.Random(11), thm[0])
+                    entry, defs_by_name, structs, random.Random(SEED), thm[0])
                 if not side_pts:
                     continue
                 ok, viol = range_check(
                     fn, argnames, side_pts,
                     bound if side == "lo" else None,
                     bound if side == "hi" else None,
-                    random.Random(11), vecspec=vecspec)
+                    random.Random(SEED), vecspec=vecspec)
                 if ok:
                     continue
                 # A range proved by a Lean theorem cannot be violated by a
@@ -400,11 +428,11 @@ def main(argv=None):
                 mfn, man = compile_variant(d, mbody, fname + "_mut", struct_args)
             except (Untranslatable, Exception):                 # noqa: BLE001
                 continue
-            mvals = values(mfn, man, pts, random.Random(11), vecspec)
+            mvals = values(mfn, man, pts, random.Random(SEED), vecspec)
             if not distinguishable(base_vals, mvals):
                 continue                                        # equivalent mutant
             tried += 1
-            ok, viol = range_check(mfn, man, pts, lo, hi, random.Random(11),
+            ok, viol = range_check(mfn, man, pts, lo, hi, random.Random(SEED),
                                    vecspec=vecspec)
             if ok:
                 survivors.append(tag)
