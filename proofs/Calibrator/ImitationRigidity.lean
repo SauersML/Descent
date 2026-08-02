@@ -1,5 +1,6 @@
 import Calibrator.TransportIdentities
 import Calibrator.LDDecayTheory
+import Calibrator.WhiteningEquivalence
 import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
@@ -1409,6 +1410,24 @@ theorem rankOneCovarianceBump_conjugate
     Finset.sum_congr rfl (fun a _ => mul_comm _ _)
   rw [hexpand, hright, ← Finset.mul_sum, ← Finset.mul_sum, hswap]
   ring
+
+/-- **Whitening maps the imitation model to an imitation model.** Applying the
+right-side transform of `Calibrator.WhiteningEquivalence` to a signal-carrying
+genotype matrix returns the same construction at the same strength, with the
+loading direction rotated. Together with `rankOneCovarianceBump_conjugate` — the
+covariance-level statement — this is why no whitening or LD-pruning step
+improves the identifiability position: whitening is a change of coordinates on
+the problem, not a reduction of it. -/
+theorem rightTransform_addRankOneSignal {rows : Type*}
+    (transform : Matrix ι ι ℝ) (noise : Matrix rows ι ℝ) (factor : rows → ℝ)
+    (scale : ℝ) (loading : ι → ℝ) :
+    rightTransform transform (addRankOneSignal noise factor scale loading) =
+      addRankOneSignal (rightTransform transform noise) factor scale
+        (transform.transpose.mulVec loading) := by
+  funext r i
+  simp only [rightTransform, addRankOneSignal, Matrix.mulVec, dotProduct]
+  rw [Finset.mul_sum, ← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl (fun j _ => by ring)
 
 /-- **The dropout floor caps individual-level explanation.** With a positive
 leave-one-out quadratic form, a fair alive/dead genotyping mixture leaves a

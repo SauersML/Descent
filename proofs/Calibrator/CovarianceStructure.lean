@@ -2,6 +2,7 @@ import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
 import Calibrator.AncestrySpecificPower
+import Calibrator.DemographicHistory
 
 namespace Calibrator
 
@@ -496,21 +497,19 @@ from first principles, starting with haplotype frequency dynamics.
 noncomputable def haplotypeFreqAdmixed (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
   alpha * p_A * q_A + (1 - alpha) * p_B * q_B
 
-/-- **Marginal allele frequency at locus 1 in the admixed population.**
+/-! **Marginal allele frequency at either locus in the admixed population.**
 
-    Denotes: a frequency or proportion. Other definitions share this formula under names from a
-    different concept family; the formula does not fix which is meant. -/
-noncomputable def admixedAlleleFreq1 (alpha p_A p_B : ℝ) : ℝ :=
-  alpha * p_A + (1 - alpha) * p_B
+This file used to define that quantity twice, as `admixedAlleleFreq1` and
+`admixedAlleleFreq2`, differing only in the names of the bound variables. It is
+`admixedAlleleFreq` from `Calibrator.DemographicHistory`, one function of a
+mixing weight and two parental frequencies, applied once per locus; both
+restatements have been deleted in favour of that one.
 
-/-- **Marginal allele frequency at locus 2 in the admixed population.**
-
-    Denotes: a frequency or proportion. Other definitions share this formula under names from a
-    different concept family; the formula does not fix which is meant.
+    Denotes: a frequency or proportion. Other definitions share this formula
+    under names from a different concept family; the formula does not fix which
+    is meant.
 
     Empirical status: UNTESTED. -/
-noncomputable def admixedAlleleFreq2 (alpha q_A q_B : ℝ) : ℝ :=
-  alpha * q_A + (1 - alpha) * q_B
 
 /-- **Admixture LD at generation 0 (two-locus form).**
     D_admix = freq(AB) − freq(A) × freq(B).
@@ -520,7 +519,18 @@ noncomputable def admixedAlleleFreq2 (alpha q_A q_B : ℝ) : ℝ :=
     Empirical status: UNTESTED. -/
 noncomputable def admixtureLDTwoLocus (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
   haplotypeFreqAdmixed alpha p_A q_A p_B q_B
-    - admixedAlleleFreq1 alpha p_A p_B * admixedAlleleFreq2 alpha q_A q_B
+    - admixedAlleleFreq alpha p_A p_B * admixedAlleleFreq alpha q_A q_B
+
+/-- **Admixture LD is the haplotype frequency minus the product of the two
+marginal admixed allele frequencies**, where the marginal is
+`DemographicHistory.admixedAlleleFreq` at each locus rather than a restatement
+local to this file. -/
+theorem admixtureLDTwoLocus_eq_haplotype_sub_marginals
+    (alpha p_A q_A p_B q_B : ℝ) :
+    admixtureLDTwoLocus alpha p_A q_A p_B q_B =
+      haplotypeFreqAdmixed alpha p_A q_A p_B q_B
+        - admixedAlleleFreq alpha p_A p_B * admixedAlleleFreq alpha q_A q_B :=
+  rfl
 
 /-- **Core algebraic identity (Step 4): D_admix = α(1−α)(p_A − p_B)(q_A − q_B).**
     Expanding the haplotype frequency minus the product of marginals
@@ -529,7 +539,7 @@ noncomputable def admixtureLDTwoLocus (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
 theorem admixture_ld_two_locus_eq (alpha p_A q_A p_B q_B : ℝ) :
     admixtureLDTwoLocus alpha p_A q_A p_B q_B =
       alpha * (1 - alpha) * (p_A - p_B) * (q_A - q_B) := by
-  unfold admixtureLDTwoLocus haplotypeFreqAdmixed admixedAlleleFreq1 admixedAlleleFreq2
+  unfold admixtureLDTwoLocus haplotypeFreqAdmixed admixedAlleleFreq
   ring
 
 /-- **Recombination decay of admixture LD (Step 5).**

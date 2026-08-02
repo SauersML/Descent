@@ -469,7 +469,7 @@ holds at `q = 1/2` and nowhere else in the polymorphic range.
 Empirical status: DERIVED from `HardyWeinbergModel.genotypeProb` and
 `HardyWeinbergModel.centeredAltAlleleCount` evaluated at `q = 1/2`; no free
 parameter and nothing fitted. -/
-def balancedGenotypeCoding (h : HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
+def equalFrequencyGenotypeCoding (h : HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
     SymmetricCoding DiploidGenotype where
   weight := h.genotypeProb
   value := h.centeredAltAlleleCount
@@ -503,7 +503,7 @@ theorem hwe_symmetricCoding_iff_half
   · rintro ⟨coding, hweight, hvalue⟩
     exact hwe_symmetricCoding_forces_half h hq0 hq1 coding hweight hvalue
   · intro hhalf
-    exact ⟨balancedGenotypeCoding h hhalf, fun _ => rfl, fun _ => rfl⟩
+    exact ⟨equalFrequencyGenotypeCoding h hhalf, fun _ => rfl, fun _ => rfl⟩
 
 /-- The standardized genotype coordinate `x = (dosage - 2q) / sqrt (2 q (1 - q))`.
 
@@ -554,7 +554,7 @@ theorem standardizedGenotype_symmetric_iff
     unfold HardyWeinbergModel.standardizedGenotype
     field_simp
   · intro hhalf
-    refine ⟨(balancedGenotypeCoding h hhalf).scale (1 / Real.sqrt h.genotypeVariance),
+    refine ⟨(equalFrequencyGenotypeCoding h hhalf).scale (1 / Real.sqrt h.genotypeVariance),
       fun _ => rfl, ?_⟩
     intro g
     show (1 / Real.sqrt h.genotypeVariance) * h.centeredAltAlleleCount g =

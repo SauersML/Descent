@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Calibrator.HaplotypeTheory
 
 namespace Calibrator
 
@@ -60,6 +61,24 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
     different concept family; the formula does not fix which is meant. -/
 noncomputable def spikeAndSlabVariance (pi sigma_sq_large sigma_sq_small : ℝ) : ℝ :=
   pi * sigma_sq_large + (1 - pi) * sigma_sq_small
+
+/-! ### The mixture map, shared with `HaplotypeTheory`
+
+The spike-and-slab variance, the average phase interaction and the
+ancestry-specific effect are three different quantities — a variance, an
+interaction contribution and an effect size — that are all the same convex
+combination of two values at a mixing weight. `Conventions.convexMix` names
+that map; these two theorems record the coincidence in one of the two files
+each pair lives in, so that a change to the mixture convention in either file
+fails to compile rather than quietly disagreeing. -/
+
+theorem spikeAndSlabVariance_eq_averagePhaseInteraction (pi a b : ℝ) :
+    spikeAndSlabVariance pi a b = averagePhaseInteraction pi a b := by
+  unfold spikeAndSlabVariance averagePhaseInteraction; ring
+
+theorem spikeAndSlabVariance_eq_ancestrySpecificEffect (pi a b : ℝ) :
+    spikeAndSlabVariance pi a b = ancestrySpecificEffect a b pi := by
+  unfold spikeAndSlabVariance ancestrySpecificEffect; ring
 
 /-- **The spike-and-slab formula is a variance only on `0 ≤ pi ≤ 1`.**
 

@@ -42,6 +42,23 @@ not Gaussian at all; Section 2 says that pushing to *all* orders does not help, 
 the normalization forced by polygenicity (`max_i Influence_i → 0`) crushes every
 diagonal cumulant by `tau ^ ((r - 2) / 2)`. Diagnostics of this family cannot certify
 the score-distribution assumptions they are usually used to certify.
+
+## Applicability to genotypes: unrestricted
+
+Unlike the sign-erasure results of `Calibrator.EpistaticChaos` and the completeness
+results of `Calibrator.JetBarrier`, **nothing in this file assumes the coordinate law is
+sign-symmetric.** Section 1 is a pigeonhole about multi-index supports and the oddness
+of the *tilt* function `s`, not of the coordinate law; Section 2 quantifies over every
+i.i.d. law, explicitly including the ones that fail universality.
+
+This matters because a standardized Hardy-Weinberg genotype is sign-symmetric at
+exactly one allele frequency, `q = 1/2`
+(`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff`), so results carrying
+that hypothesis say nothing about a real allele frequency spectrum. The results here
+carry no such restriction: the cumulant-blindness conclusions apply to hard-called
+genotypes, to imputed dosages, and to every allele frequency, without an applicability
+caveat. Together with the drift theory of `Calibrator.Condensation`, this file is the
+part of the arc that transfers to genotype data unconditionally.
 -/
 
 open scoped BigOperators
@@ -225,9 +242,12 @@ theorem contraction_bound_tendsto_zero {k : ℕ} (hk : 1 ≤ k) (κ : ℝ) :
     Filter.Tendsto (fun τ : ℝ => |κ| * Real.sqrt τ ^ k)
       (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
   have hk0 : k ≠ 0 := by omega
+  -- `Continuous.const_mul` does not exist in mathlib; the constant factor goes in
+  -- through `continuous_const.mul` instead.
+  have hmul : Continuous fun τ : ℝ => |κ| * Real.sqrt τ ^ k :=
+    continuous_const.mul (Real.continuous_sqrt.pow k)
   have hcont : Filter.Tendsto (fun τ : ℝ => |κ| * Real.sqrt τ ^ k)
-      (nhds 0) (nhds (|κ| * Real.sqrt 0 ^ k)) :=
-    ((continuous_const.mul (Real.continuous_sqrt.pow k)) : Continuous fun τ : ℝ => |κ| * Real.sqrt τ ^ k).tendsto 0
+      (nhds 0) (nhds (|κ| * Real.sqrt 0 ^ k)) := hmul.tendsto 0
   simp only [Real.sqrt_zero, zero_pow hk0, mul_zero] at hcont
   exact hcont.mono_left nhdsWithin_le_nhds
 

@@ -387,12 +387,11 @@ theorem mutationSelectionBalanceRecessive_sq_le (mu s : ℝ)
     (h_mu : 0 ≤ mu) (h_s : 0 < s) :
     s * mutationSelectionBalanceRecessive mu s ^ 2 ≤ mu ∧
       0 ≤ mutationSelectionBalanceRecessive mu s := by
-  have hnn : 0 ≤ mu * (mu + 4 * s) := by
-    nlinarith [mul_nonneg h_mu h_mu, mul_nonneg h_mu h_s.le]
-  have hR : Real.sqrt (mu * (mu + 4 * s)) ^ 2 = mu * (mu + 4 * s) := Real.sq_sqrt hnn
-  have hRnn : 0 ≤ Real.sqrt (mu * (mu + 4 * s)) := Real.sqrt_nonneg _
-  have hRge : mu ≤ Real.sqrt (mu * (mu + 4 * s)) := by
-    nlinarith [hR, hRnn, h_mu, h_s, mul_nonneg hRnn h_s.le, mul_nonneg h_mu h_s.le]
+  have hle : mu * mu ≤ mu * (mu + 4 * s) := by
+    nlinarith [mul_nonneg h_mu h_s.le]
+  have hRge : mu ≤ Real.sqrt (mu * (mu + 4 * s)) :=
+    calc mu = Real.sqrt (mu * mu) := (Real.sqrt_mul_self h_mu).symm
+      _ ≤ Real.sqrt (mu * (mu + 4 * s)) := Real.sqrt_le_sqrt hle
   have hnonneg : 0 ≤ mutationSelectionBalanceRecessive mu s := by
     unfold mutationSelectionBalanceRecessive
     apply div_nonneg (by linarith)

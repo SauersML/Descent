@@ -49,8 +49,18 @@ score is as polygenic as any theory could ask, and the additive apparatus of
   converges to a *different limit*.
 
 Because `c(q)` is not constant across the frequency spectrum, the safe order is
-frequency-dependent, and `rare_variant_drift_lower_bound` shows `c(q)` grows like
-`log (1 / q)` as `q → 0`. Numerically (see
+frequency-dependent. The rare-variant asymptotic is now pinned from both sides:
+`rare_variant_drift_sharp_lower_bound` and `rare_variant_drift_upper_bound` sandwich
+`c(q)` between `(1 - 4q) log (1/(2q)) - 6q` and `log (1/(2q)) + 4q log 2`, so
+
+  `c(q) = log (1 / (2q)) + O(q log (1/q))`,
+
+and the drift diverges as `q → 0` at exactly that rate. The mechanism is the
+**heterozygote**, whose probability `2q(1-q)` and squared standardized value
+`(1-2q)^2 / (2q(1-q))` multiply to `(1-2q)^2 → 1` — it carries the entire second
+moment at a diverging log-value. It is *not* the rare homozygote: that has a large
+standardized value `≈ sqrt (2/q)` but contributes only
+`q^2 * (2/q) * log (2/q) ≈ 2q log (1/q) → 0`. Numerically (see
 `proofs/validation/condensation/check_condensation.py`, which recomputes all of this
 by direct summation over the three genotypes):
 
@@ -176,7 +186,14 @@ the reciprocal slope of the condensation boundary, i.e. the quantity that fixes 
 maximum epistatic order at which the Gaussian genotype surrogate is valid.
 
 It is *not* a moment or a cumulant of the genotype, and no bounded-order moment
-diagnostic determines it. -/
+diagnostic determines it.
+
+Empirical status: DERIVED from `HardyWeinbergModel.genotypeProb` and
+`HardyWeinbergModel.standardizedSquare` by direct summation over the three
+genotypes; no free parameter and nothing fitted. Recomputed independently by
+`proofs/validation/condensation/check_condensation.py`, which evaluates this sum
+numerically and checks it against `hweMellinDrift` across the frequency
+spectrum. -/
 noncomputable def mellinDrift (h : HardyWeinbergModel) : ℝ :=
   ∑ g : DiploidGenotype,
     h.genotypeProb g * h.standardizedSquare g * Real.log (h.standardizedSquare g)
@@ -184,7 +201,12 @@ noncomputable def mellinDrift (h : HardyWeinbergModel) : ℝ :=
 end HardyWeinbergModel
 
 /-- Closed form of the Hardy-Weinberg Mellin drift as a function of the
-alternative-allele frequency. -/
+alternative-allele frequency.
+
+Empirical status: DERIVED. Equal to `HardyWeinbergModel.mellinDrift` by
+`HardyWeinbergModel.mellinDrift_eq`, which is a proof, not a fit; the two are
+also checked against each other numerically across the frequency spectrum by
+`proofs/validation/condensation/check_condensation.py`. No free parameter. -/
 noncomputable def hweMellinDrift (q : ℝ) : ℝ :=
   (1 - 2 * q) ^ 2 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) +
     4 * q * (1 - q) * Real.log 2
@@ -383,6 +405,8 @@ theorem rare_variant_drift_upper_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8
   have hqlt : q < 1 := by linarith
   have hp : (0 : ℝ) < 1 - q := by linarith
   have h2q : (0 : ℝ) < 1 - 2 * q := by linarith
+  have hqne : q ≠ 0 := ne_of_gt hq0
+  have hpne : (1 : ℝ) - q ≠ 0 := ne_of_gt hp
   have hden : (0 : ℝ) < 2 * q * (1 - q) := by positivity
   -- The heterozygote's log argument never exceeds `1 / (2q)`: the difference
   -- factors as `q (3 - 4q)` over a positive denominator.
@@ -395,7 +419,7 @@ theorem rare_variant_drift_upper_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8
         | field_simp
     rw [hfac]
     refine div_nonneg ?_ hden.le
-    nlinarith [hq0, hq]
+    exact mul_nonneg hq0.le (by linarith : (0 : ℝ) ≤ 3 - 4 * q)
   have harg0 : (0 : ℝ) < (1 - 2 * q) ^ 2 / (2 * q * (1 - q)) :=
     div_pos (pow_pos h2q 2) hden
   -- The log is nonnegative because the argument is at least `1` on `q ≤ 1/8`.
@@ -405,7 +429,7 @@ theorem rare_variant_drift_upper_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8
     nlinarith [hq0, hq, sq_nonneg q]
   have hlogle : Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))
       ≤ Real.log (1 / (2 * q)) := Real.log_le_log harg0 hkey
-  have hcoef : (1 - 2 * q) ^ 2 ≤ 1 := by nlinarith [hq0, hq]
+  have hcoef : (1 - 2 * q) ^ 2 ≤ 1 := by nlinarith [mul_pos hq0 hp, hq0, hq]
   have hterm1 : (1 - 2 * q) ^ 2 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))
       ≤ Real.log (1 / (2 * q)) := by
     calc (1 - 2 * q) ^ 2 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))
@@ -452,6 +476,8 @@ theorem rare_variant_drift_sharp_lower_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤
   have hp : (0 : ℝ) < 1 - q := by linarith
   have h2q : (0 : ℝ) < 1 - 2 * q := by linarith
   have h3q : (0 : ℝ) < 1 - 3 * q := by linarith
+  have hqne : q ≠ 0 := ne_of_gt hq0
+  have hpne : (1 : ℝ) - q ≠ 0 := ne_of_gt hp
   have hden : (0 : ℝ) < 2 * q * (1 - q) := by positivity
   have hBpos : (0 : ℝ) < 1 / (2 * q) := by positivity
   have hRpos : (0 : ℝ) < (1 - 2 * q) ^ 2 / (1 - q) := div_pos (pow_pos h2q 2) hp
@@ -478,7 +504,11 @@ theorem rare_variant_drift_sharp_lower_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤
     have hmul : Real.exp (-(6 * q)) * Real.exp (6 * q) = 1 := by
       rw [← Real.exp_add]
       simp
-    nlinarith [hEpos, hprod, hmul]
+    have hcancel : Real.exp (-(6 * q)) * Real.exp (6 * q)
+        ≤ (1 - 3 * q) * Real.exp (6 * q) := by
+      rw [hmul]
+      exact hprod
+    exact le_of_mul_le_mul_right hcancel hEpos
   have hlogR : -(6 * q) ≤ Real.log ((1 - 2 * q) ^ 2 / (1 - q)) := by
     have hchain : Real.exp (-(6 * q)) ≤ (1 - 2 * q) ^ 2 / (1 - q) := le_trans hexp hR
     have hmono := Real.log_le_log (Real.exp_pos _) hchain
@@ -557,7 +587,21 @@ theorem drift_straddles_condensationConstant :
 
 /-- The largest epistatic order at which the Gaussian genotype surrogate is still
 valid for an aggregate of `N` disjoint monomials at loci of allele frequency `q`:
-`m*(N, q) = log N / c(q)`. -/
+`m*(N, q) = log N / c(q)`.
+
+Note that this is a function of the allele frequency, not of the Gaussian
+constant: it is `criticalDegree N (hweMellinDrift q)`, so the frequency argument
+is carried and the Gaussian value `criticalDegree N condensationConstant` is a
+different number, recovered only when `c(q) = c_G`. The gap between them at rare
+frequencies is `maxSafeEpistaticOrder_collapse_at_rare_maf`.
+
+Empirical status: UNTESTED as a claim about real interaction analyses. The
+quantity is `criticalDegree N (hweMellinDrift q)` by definition and its inputs
+are derived, but the assertion that it is the order at which a real
+epistatic-aggregate null distribution changes limit has not been checked against
+simulated or empirical interaction statistics. What has been checked is the
+arithmetic: `proofs/validation/condensation/check_condensation.py` recomputes the
+safe-order column of the module docstring table. -/
 noncomputable def maxSafeEpistaticOrder (N q : ℝ) : ℝ :=
   Real.log N / hweMellinDrift q
 
@@ -820,8 +864,18 @@ theorem hardCallLatticeSpan_pos : 0 < hardCallLatticeSpan := by
 At `q = 1/2` the standardized square takes only the two values `2` (both homozygotes)
 and `0` (the heterozygote), so `log x ^ 2` is confined to a single point and its
 size-biased variance vanishes. This is the same degeneracy that
-`Calibrator.EpistaticChaos.standardizedSquare_two_valued_at_half` records from the
+`Calibrator.EpistaticChaos.centeredDosageSquare_two_valued_at_half` records from the
 coding side, reached here from the Mellin side; the two computations agree.
+
+**And `q = 1/2` is the only frequency at which the symmetry hypothesis holds.**
+`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff` proves that a
+standardized Hardy-Weinberg genotype is sign-symmetric exactly at `q = 1/2`. So the
+one frequency where the symmetric-law results of `Calibrator.JetBarrier` may be
+instantiated at a genotype is the one frequency where the second observable they
+speak about is identically zero. The drift is *not* degenerate there — `c(1/2) = log 2`
+by `hweMellinDrift_half`, not zero, since the standardized coordinate takes the values
+`-sqrt 2, 0, sqrt 2` and is not Rademacher — so drift separation survives; it is the
+window theory and the barrier that have nothing to work with.
 
 The consequence is a genuine caveat on the spectroscopy, and it is worth stating
 plainly: `MellinProfile.jetVariance_pos` **fails** at exactly `q = 1/2`. The
@@ -864,7 +918,16 @@ theorem hardCallObservables_ne_gaussian : hardCallObservables ≠ gaussianObserv
 
 /-- Equivalently: a hard-called locus at the lattice frequency is **not** a chameleon.
 The chameleon stratum is nonlattice, so no hard call can hide there — the blind spot of
-the additive apparatus is populated by imputed dosages, not by genotypes. -/
+the additive apparatus is populated by imputed dosages, not by genotypes.
+
+**Applicability note.** This theorem is a comparison of observable triples and needs no
+symmetry: it holds at `q* = 0.1464...`, where the genotype law is *not* sign-symmetric.
+What does need symmetry is the surrounding *completeness* reading — "and nothing else is
+observable" — since that is the `ChaosSpectroscopy.barrier` field, whose `Law` parameter
+ranges over symmetric laws and which a genotype satisfies only at `q = 1/2`
+(`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff`). So the licensed claim
+here is the positive one, "this locus is separated from the Gaussian", and not the
+negative one, "these three numbers are all that a design can see about this locus". -/
 theorem hardCall_not_chameleon : ¬ IsChameleonObservable hardCallObservables := by
   rw [isChameleonObservable_iff]
   exact hardCallObservables_ne_gaussian
@@ -903,7 +966,9 @@ theorem hardCall_intensity_inflated :
 ## Honest status
 
 Proved here: the closed form of the Mellin drift, its value at `q = 1/2`, the
-rare-variant lower bound, the supercriticality criteria, the arithmetic-progression
+rare-variant bounds in both directions (hence the asymptotic
+`c(q) = log (1/(2q)) + O(q log (1/q))`), the supercriticality criteria, the sevenfold
+drift excess and safe-order collapse at `q = 1/1024`, the arithmetic-progression
 identity at `q*`, and the strict inflation factor. Carried as named hypotheses in
 `Calibrator.JetBarrier`: the local-CLT and Gnedenko-Kolmogorov inputs that convert an
 intensity gap into a limit-law gap. Not proved anywhere in this development: that the
@@ -911,6 +976,27 @@ same conclusions survive linkage disequilibrium between the loci entering one mo
 Every design here uses disjoint variant sets, which is the independent-design regime;
 overlapping designs are the open direction, and in the genetics reading overlap is
 exactly LD.
+
+## Symmetry, and which results here depend on it
+
+None of the quantitative results in this file depend on the coordinate law being
+sign-symmetric: the Mellin drift, the jet variance, the lattice datum and the
+condensation boundary are all computed by direct summation over the three genotypes,
+and `Calibrator.Condensation`'s `MellinProfile` carries no symmetry field. That is
+deliberate and it is what makes them quotable at any allele frequency.
+
+The symmetry hypothesis enters one door only: the *completeness* half of
+`Calibrator.JetBarrier`, whose `Law` parameter is symmetric unit-variance laws, and the
+sign-erasure reduction of `Calibrator.EpistaticChaos` that discharges it. A
+standardized Hardy-Weinberg genotype is sign-symmetric **iff `q = 1/2`**
+(`EpistaticChaos.standardizedGenotype_symmetric_iff`), and `hweMellinJetVariance_half`
+shows that is exactly where the second observable vanishes. So the statements of the
+form "and nothing else is observable" are licensed for genotypes at a single frequency
+where they are also vacuous, while the statements of the form "this locus is separated
+from its Gaussian surrogate" are licensed everywhere. The overlapping-design (LD)
+direction named above is, in the same reading, the direction in which the missing
+symmetry actually bites: sign erasure is what would have collapsed overlapping monomial
+designs onto disjoint ones, and for genotypes it does not.
 -/
 
 end Calibrator

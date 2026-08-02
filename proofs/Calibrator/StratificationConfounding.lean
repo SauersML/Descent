@@ -569,7 +569,10 @@ The `F`-statistic below is the one place in this file where the distinction
 matters: what enters the noncentrality is the genotype *variance*, which
 `hweHeterozygosity_eq_genotypeVarianceHWE` says is this same number. -/
 
-/-- F-statistic of an instrument at a given allele frequency -/
+/-- F-statistic of an instrument at a given allele frequency.
+
+    Empirical status: UNTESTED. It carried no marker of its own while it sat
+    next to the deleted `heterozygosity`, whose marker it was reading. -/
 noncomputable def MRInstrumentModel.fStat (m : MRInstrumentModel) (p : ℝ) : ℝ :=
   m.n * m.β_inst ^ 2 * hweHeterozygosity p / m.σ2_Y
 

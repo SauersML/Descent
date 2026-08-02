@@ -241,6 +241,16 @@ because it had no other place to go.
 noncomputable def driftLDStep (Ne c Q : ℝ) : ℝ :=
   (1 - c) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * Q)
 
+/-- **Cross-check: the Sved drift-recombination step and the island-model
+`F_ST` step are one recurrence.** `PortabilityDrift.islandFstMultiplicativeStep`
+applies it with the migration rate in the place of the recombination rate and
+`F_ST` in the place of the identity measure. The two are different processes
+and the same map, so the `1/(2 Nₑ)` inside them has to be the same
+`1/(2 Nₑ)`. -/
+theorem driftLDStep_eq_islandFstMultiplicativeStep (Ne c Q : ℝ) :
+    driftLDStep Ne c Q = islandFstMultiplicativeStep Ne c Q := by
+  unfold driftLDStep islandFstMultiplicativeStep; ring
+
 /-- **Per-generation retention factor of the two-locus identity measure**,
     `(1 - c)² · (1 - 1/(2 Nₑ))`: the slope of `driftLDStep` in `Q`.
 
@@ -314,6 +324,17 @@ theorem driftLDRetention_pos (Ne c : ℝ)
   have hk_pos : 0 < (1 - c) ^ 2 := pow_pos (by linarith : (0:ℝ) < 1 - c) 2
   unfold driftLDRetention
   exact mul_pos hk_pos (by linarith)
+
+/-- Larger populations retain a larger fraction of the identity measure per
+    generation, at fixed recombination rate. -/
+theorem driftLDRetention_strictMono (Ne₁ Ne₂ c : ℝ)
+    (hNe₁ : 1 ≤ Ne₁) (h_lt : Ne₁ < Ne₂) (hc1 : c < 1) :
+    driftLDRetention Ne₁ c < driftLDRetention Ne₂ c := by
+  have hk_pos : 0 < (1 - c) ^ 2 := pow_pos (by linarith : (0:ℝ) < 1 - c) 2
+  have hu_lt : 1 / (2 * Ne₂) < 1 / (2 * Ne₁) :=
+    one_div_lt_one_div_of_lt (by linarith) (by linarith)
+  unfold driftLDRetention
+  exact mul_lt_mul_of_pos_left (by linarith) hk_pos
 
 /-- The denominator of the equilibrium is positive, so the equilibrium is
     well-defined for every admissible `(Nₑ, c)`. -/
@@ -564,70 +585,163 @@ to recovery population size.
 
 section BottleneckLDExcess
 
-/-- **Excess LD from a bottleneck.**
-    During a bottleneck of size N_b for t_b generations, drift generates
-    LD of magnitude ≈ 1/(2N_b) per generation. After recovery to size N_r,
-    this excess decays at rate 1/(2N_r) per generation.
+/-- **Excess LD from a bottleneck**, over the level the same population would
+    have carried had it stayed at its recovered size.
 
-    Empirical status: UNTESTED. -/
-noncomputable def excessLDAfterBottleneck (N_b N_r : ℝ) (t_b t_r : ℕ) : ℝ :=
-  (1 - (1 - 1/(2 * N_b)) ^ t_b) * (1 - 1/(2 * N_r)) ^ t_r
+    The previous body of this definition was
+    `(1 - (1 - 1/(2 N_b))^t_b) * (1 - 1/(2 N_r))^t_r`.  Its first factor is
+    `bottleneckLDAmplification` verbatim -- the formula deleted about a hundred
+    lines above this one for taking no recombination rate, so that it rises to
+    `1` with time instead of saturating at the drift--recombination equilibrium,
+    overstating by up to 3.3-fold.  The deletion notice's reasoning applied to
+    this copy word for word, and to a third copy in `DemographicHistory`.
+
+    The replacement is not another closed form.  It is the composition of the
+    Sved drift--recombination process defined above: start the population at the
+    equilibrium for its recovered size `N_r`, run `t_b` generations at the
+    bottleneck size `N_b`, then run `t_r` generations back at `N_r`, and report
+    the level above the `N_r` equilibrium.  `excessLDAfterBottleneck_closedForm`
+    proves the closed form that results, and it saturates at the *gap between
+    two equilibria* rather than at `1`.
+
+    Empirical status: UNTESTED.  The falsification that removed its predecessor
+    (up to 3.3-fold overstatement, from the missing `c`) does not apply to this
+    body, because `c` is present and the process demonstrably saturates
+    (`driftLDEquilibrium_le_one`); but no simulation has been run against this
+    two-phase construction, and the amplitude it predicts is a prediction, not a
+    measurement. -/
+noncomputable def excessLDAfterBottleneck (N_b N_r c : ℝ) (t_b t_r : ℕ) : ℝ :=
+  driftLDTrajectory N_r c
+      (driftLDTrajectory N_b c (driftLDEquilibrium N_r c) t_b) t_r -
+    driftLDEquilibrium N_r c
+
+/-- **Closed form of the two-phase excess.**  The excess is the gap between the
+    two equilibria, approached over the bottleneck and decaying over the
+    recovery.  Unlike its predecessor, the amplitude is bounded by that gap. -/
+theorem excessLDAfterBottleneck_closedForm (N_b N_r c : ℝ) (t_b t_r : ℕ)
+    (h_b : 1 - driftLDRetention N_b c ≠ 0)
+    (h_r : 1 - driftLDRetention N_r c ≠ 0) :
+    excessLDAfterBottleneck N_b N_r c t_b t_r =
+      (driftLDEquilibrium N_b c - driftLDEquilibrium N_r c) *
+        (1 - driftLDRetention N_b c ^ t_b) *
+        driftLDRetention N_r c ^ t_r := by
+  unfold excessLDAfterBottleneck
+  rw [driftLDTrajectory_closedForm N_r c _ h_r t_r,
+    driftLDTrajectory_closedForm N_b c _ h_b t_b]
+  ring
 
 /-- Excess LD is nonneg for reasonable parameters. -/
-theorem excess_ld_nonneg (N_b N_r : ℝ) (t_b t_r : ℕ)
-    (hNb : 2 < N_b) (hNr : 2 < N_r) :
-    0 ≤ excessLDAfterBottleneck N_b N_r t_b t_r := by
-  unfold excessLDAfterBottleneck
-  apply mul_nonneg
-  · rw [sub_nonneg]
-    apply pow_le_one₀
-    · rw [sub_nonneg, div_le_one (by linarith)]; linarith
-    · rw [sub_le_self_iff]; positivity
-  · apply pow_nonneg
-    rw [sub_nonneg, div_le_one (by linarith)]; linarith
+theorem excess_ld_nonneg (N_b N_r c : ℝ) (t_b t_r : ℕ)
+    (hNb : 1 ≤ N_b) (h_bottle : N_b ≤ N_r)
+    (hc : 0 ≤ c) (hc1 : c ≤ 1) :
+    0 ≤ excessLDAfterBottleneck N_b N_r c t_b t_r := by
+  have hNr : (1 : ℝ) ≤ N_r := le_trans hNb h_bottle
+  have h_b := driftLD_one_sub_retention_pos N_b c hNb hc hc1
+  have h_r := driftLD_one_sub_retention_pos N_r c hNr hc hc1
+  rw [excessLDAfterBottleneck_closedForm N_b N_r c t_b t_r
+    (ne_of_gt h_b) (ne_of_gt h_r)]
+  have h_gap : 0 ≤ driftLDEquilibrium N_b c - driftLDEquilibrium N_r c := by
+    have := driftLDEquilibrium_antitone N_b N_r c hNb h_bottle hc hc1
+    linarith
+  have h_Lb := driftLDRetention_mem_unit N_b c hNb hc hc1
+  have h_Lr := driftLDRetention_mem_unit N_r c hNr hc hc1
+  have h_amp : 0 ≤ 1 - driftLDRetention N_b c ^ t_b := by
+    have := pow_le_one₀ h_Lb.1 h_Lb.2 (n := t_b)
+    linarith
+  have h_dec : 0 ≤ driftLDRetention N_r c ^ t_r := pow_nonneg h_Lr.1 t_r
+  exact mul_nonneg (mul_nonneg h_gap h_amp) h_dec
 
 /-- More severe bottleneck (smaller N_b) produces more excess LD. -/
-theorem more_severe_bottleneck_more_ld (N₁ N₂ N_r : ℝ) (t_b t_r : ℕ)
-    (hN₁ : 2 < N₁) (hN₂ : 2 < N₂) (hNr : 2 < N_r)
-    (h_smaller : N₂ < N₁) (ht_b : 0 < t_b) :
-    excessLDAfterBottleneck N₁ N_r t_b t_r <
-      excessLDAfterBottleneck N₂ N_r t_b t_r := by
-  unfold excessLDAfterBottleneck
-  have h_decay_nn : 0 ≤ (1 - 1/(2 * N_r)) ^ t_r := by
-    apply pow_nonneg; rw [sub_nonneg, div_le_one (by linarith)]; linarith
-  have h_decay_pos : 0 < (1 - 1/(2 * N_r)) ^ t_r := by
-    apply pow_pos; rw [sub_pos, div_lt_one (by linarith)]; linarith
-  apply mul_lt_mul_of_pos_right _ h_decay_pos
-  -- Need: 1 - (1 - 1/(2N₁))^t_b < 1 - (1 - 1/(2N₂))^t_b
-  -- i.e., (1 - 1/(2N₂))^t_b < (1 - 1/(2N₁))^t_b
-  rw [sub_lt_sub_iff_left]
-  -- Since N₂ < N₁, 1/(2N₂) > 1/(2N₁), so 1 - 1/(2N₂) < 1 - 1/(2N₁)
-  have h_base : 1 - 1/(2 * N₂) < 1 - 1/(2 * N₁) := by
-    rw [sub_lt_sub_iff_left]
-    exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
-  have h_nn : 0 ≤ 1 - 1/(2 * N₂) := by
-    rw [sub_nonneg, div_le_one (by linarith)]; linarith
-  exact pow_lt_pow_left₀ h_base h_nn (by omega)
+theorem more_severe_bottleneck_more_ld (N₁ N₂ N_r c : ℝ) (t_b t_r : ℕ)
+    (hN₂ : 1 ≤ N₂) (h_smaller : N₂ < N₁) (h_bound : N₁ ≤ N_r)
+    (hc : 0 < c) (hc1 : c < 1) (ht_b : 0 < t_b) :
+    excessLDAfterBottleneck N₁ N_r c t_b t_r <
+      excessLDAfterBottleneck N₂ N_r c t_b t_r := by
+  have hN₁ : (1 : ℝ) ≤ N₁ := by linarith
+  have hNr : (1 : ℝ) ≤ N_r := le_trans hN₁ h_bound
+  have hc0 : (0 : ℝ) ≤ c := le_of_lt hc
+  have hc1' : c ≤ 1 := le_of_lt hc1
+  have h₁ := driftLD_one_sub_retention_pos N₁ c hN₁ hc0 hc1'
+  have h₂ := driftLD_one_sub_retention_pos N₂ c hN₂ hc0 hc1'
+  have h_r := driftLD_one_sub_retention_pos N_r c hNr hc0 hc1'
+  rw [excessLDAfterBottleneck_closedForm N₁ N_r c t_b t_r
+      (ne_of_gt h₁) (ne_of_gt h_r),
+    excessLDAfterBottleneck_closedForm N₂ N_r c t_b t_r
+      (ne_of_gt h₂) (ne_of_gt h_r)]
+  -- the two equilibrium gaps
+  have h_gap₁ : 0 ≤ driftLDEquilibrium N₁ c - driftLDEquilibrium N_r c := by
+    have := driftLDEquilibrium_antitone N₁ N_r c hN₁ h_bound hc0 hc1'
+    linarith
+  have h_gap_lt :
+      driftLDEquilibrium N₁ c - driftLDEquilibrium N_r c <
+        driftLDEquilibrium N₂ c - driftLDEquilibrium N_r c := by
+    have := driftLDEquilibrium_strictAnti N₂ N₁ c hN₂ h_smaller hc hc1
+    linarith
+  -- the two approach amplitudes
+  have hL₂ := driftLDRetention_mem_unit N₂ c hN₂ hc0 hc1'
+  have hL₁ := driftLDRetention_mem_unit N₁ c hN₁ hc0 hc1'
+  have h_ret_lt : driftLDRetention N₂ c < driftLDRetention N₁ c :=
+    driftLDRetention_strictMono N₂ N₁ c hN₂ h_smaller hc1
+  have h_pow_lt :
+      driftLDRetention N₂ c ^ t_b < driftLDRetention N₁ c ^ t_b :=
+    pow_lt_pow_left₀ h_ret_lt hL₂.1 (by omega)
+  have h_amp₁ : 0 ≤ 1 - driftLDRetention N₁ c ^ t_b := by
+    have := pow_le_one₀ hL₁.1 hL₁.2 (n := t_b)
+    linarith
+  have h_amp₂_pos : 0 < 1 - driftLDRetention N₂ c ^ t_b := by linarith
+  -- the recovery decay factor is strictly positive
+  have h_Lr_pos : 0 < driftLDRetention N_r c :=
+    driftLDRetention_pos N_r c hNr hc1
+  have h_dec_pos : 0 < driftLDRetention N_r c ^ t_r := pow_pos h_Lr_pos t_r
+  -- combine: A₁·B₁ ≤ A₁·B₂ < A₂·B₂, then scale by the positive decay factor
+  have h_step₁ :
+      (driftLDEquilibrium N₁ c - driftLDEquilibrium N_r c) *
+          (1 - driftLDRetention N₁ c ^ t_b) ≤
+        (driftLDEquilibrium N₁ c - driftLDEquilibrium N_r c) *
+          (1 - driftLDRetention N₂ c ^ t_b) :=
+    mul_le_mul_of_nonneg_left (by linarith) h_gap₁
+  have h_step₂ :
+      (driftLDEquilibrium N₁ c - driftLDEquilibrium N_r c) *
+          (1 - driftLDRetention N₂ c ^ t_b) <
+        (driftLDEquilibrium N₂ c - driftLDEquilibrium N_r c) *
+          (1 - driftLDRetention N₂ c ^ t_b) :=
+    mul_lt_mul_of_pos_right h_gap_lt h_amp₂_pos
+  exact mul_lt_mul_of_pos_right (lt_of_le_of_lt h_step₁ h_step₂) h_dec_pos
 
 /-- After recovery, excess LD decays with time. -/
-theorem excess_ld_decays_after_recovery (N_b N_r : ℝ) (t_b : ℕ) (t₁ t₂ : ℕ)
-    (hNb : 2 < N_b) (hNr : 2 < N_r) (ht_b : 0 < t_b)
+theorem excess_ld_decays_after_recovery (N_b N_r c : ℝ) (t_b : ℕ) (t₁ t₂ : ℕ)
+    (hNb : 1 ≤ N_b) (h_bottle : N_b < N_r)
+    (hc : 0 < c) (hc1 : c < 1) (ht_b : 0 < t_b)
     (h_time : t₁ < t₂) :
-    excessLDAfterBottleneck N_b N_r t_b t₂ <
-      excessLDAfterBottleneck N_b N_r t_b t₁ := by
-  unfold excessLDAfterBottleneck
-  have h_amp_pos : 0 < 1 - (1 - 1/(2 * N_b)) ^ t_b := by
-    rw [sub_pos]
-    apply pow_lt_one₀
-    · rw [sub_nonneg, div_le_one (by linarith)]; linarith
-    · rw [sub_lt_self_iff]; positivity
-    · omega
-  apply mul_lt_mul_of_pos_left _ h_amp_pos
-  have h_base_pos : 0 < 1 - 1/(2 * N_r) := by
-    rw [sub_pos, div_lt_one (by linarith)]; linarith
-  have h_base_lt : 1 - 1/(2 * N_r) < 1 := by
-    rw [sub_lt_self_iff]; positivity
-  exact pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt h_time
+    excessLDAfterBottleneck N_b N_r c t_b t₂ <
+      excessLDAfterBottleneck N_b N_r c t_b t₁ := by
+  have hNr : (1 : ℝ) ≤ N_r := by linarith
+  have hc0 : (0 : ℝ) ≤ c := le_of_lt hc
+  have hc1' : c ≤ 1 := le_of_lt hc1
+  have h_b := driftLD_one_sub_retention_pos N_b c hNb hc0 hc1'
+  have h_r := driftLD_one_sub_retention_pos N_r c hNr hc0 hc1'
+  rw [excessLDAfterBottleneck_closedForm N_b N_r c t_b t₂
+      (ne_of_gt h_b) (ne_of_gt h_r),
+    excessLDAfterBottleneck_closedForm N_b N_r c t_b t₁
+      (ne_of_gt h_b) (ne_of_gt h_r)]
+  have h_gap_pos : 0 < driftLDEquilibrium N_b c - driftLDEquilibrium N_r c := by
+    have := driftLDEquilibrium_strictAnti N_b N_r c hNb h_bottle hc hc1
+    linarith
+  have hLb := driftLDRetention_mem_unit N_b c hNb hc0 hc1'
+  have hLb_lt : driftLDRetention N_b c < 1 :=
+    driftLDRetention_lt_one N_b c hNb hc hc1'
+  have h_amp_pos : 0 < 1 - driftLDRetention N_b c ^ t_b := by
+    have := pow_lt_one₀ hLb.1 hLb_lt (by omega : t_b ≠ 0)
+    linarith
+  have h_head_pos :
+      0 < (driftLDEquilibrium N_b c - driftLDEquilibrium N_r c) *
+        (1 - driftLDRetention N_b c ^ t_b) := mul_pos h_gap_pos h_amp_pos
+  apply mul_lt_mul_of_pos_left _ h_head_pos
+  have h_Lr_pos : 0 < driftLDRetention N_r c :=
+    driftLDRetention_pos N_r c hNr hc1
+  have h_Lr_lt : driftLDRetention N_r c < 1 :=
+    driftLDRetention_lt_one N_r c hNr hc hc1'
+  exact pow_lt_pow_right_of_lt_one₀ h_Lr_pos h_Lr_lt h_time
 
 end BottleneckLDExcess
 

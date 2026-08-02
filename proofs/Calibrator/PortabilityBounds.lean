@@ -210,40 +210,156 @@ We formalize the key models and their predictions.
 section EvolutionaryModels
 
 /-- **Neutral drift model: linear portability decay.**
-    Under pure neutral drift: R²(d) ≈ R²(0) · (1 - 2·Fst(d)).
+    Under pure neutral drift: R²(d) ≈ R²(0) · (1 - 2·Fst(d)), floored at zero.
 
-    Empirical status: UNTESTED. -/
+    **The floor is not cosmetic.** The previous body was `r2_0 * (1 - 2 * fst)`
+    with nothing constraining it, so it returned a negative `R²` for every
+    `fst > 0.5` -- an impossible value for a squared correlation, and one the
+    simulation harness flagged directly. `neutralPortability_nonneg` and
+    `neutralPortability_le_r2_0` now state the range, so a replacement body that
+    can go negative no longer typechecks as this definition. `max 0` is the same
+    absorbing-boundary device used by `selectionMigrationEquilibrium` in
+    `PopulationGeneticsFoundations.lean`.
+
+    **Two neutral laws coexist in this development and neither is settled.**
+    This one is linear in `F_ST` with slope `2·r2_0`. The other is
+    `neutralAFBenchmarkRatio fstS fstT = (1 - fstT)/(1 - fstS)`
+    (`PortabilityDrift.lean`), used at the top of this very file. They are
+    different functions: `neutralPortability_le_neutralAFBenchmark` below proves
+    this one is always the more pessimistic of the two, and that is the entire
+    relationship between them that is established. Which -- if either -- is the
+    right neutral benchmark is open:
+
+    * `neutralAFBenchmarkRatio` has just been falsified by simulation, −37% to
+      −74% under asymmetric effective population sizes.
+    * This law's `1 - 2·fst` slope has no derivation in the corpus at all; it is
+      the first-order expansion of a heterozygosity ratio and inherits no
+      evidence from the fit of anything else.
+
+    Both are under revision. Do not treat either as the neutral expectation
+    without saying which one and why.
+
+    Empirical status: UNTESTED as a portability law, and CONDITIONALLY VALID at
+    best as an approximation: the linear form can only be defensible for
+    `fst ≪ 0.5`, and outside that range the floor -- not the formula -- is doing
+    the work. -/
 noncomputable def neutralPortability (r2_0 fst : ℝ) : ℝ :=
-  r2_0 * (1 - 2 * fst)
+  r2_0 * max 0 (1 - 2 * fst)
+
+/-- **Neutral portability is a nonnegative `R²`.** The constraint the previous
+    body violated for every `fst > 0.5`. -/
+theorem neutralPortability_nonneg (r2_0 fst : ℝ) (hr2 : 0 ≤ r2_0) :
+    0 ≤ neutralPortability r2_0 fst := by
+  unfold neutralPortability
+  exact mul_nonneg hr2 (le_max_left _ _)
+
+/-- **Neutral portability never exceeds the source `R²`**, hence lies in
+    `[0, 1]` whenever the source `R²` does. -/
+theorem neutralPortability_le_r2_0 (r2_0 fst : ℝ)
+    (hr2 : 0 ≤ r2_0) (hfst : 0 ≤ fst) :
+    neutralPortability r2_0 fst ≤ r2_0 := by
+  unfold neutralPortability
+  have h_le : max 0 (1 - 2 * fst) ≤ 1 := max_le (by norm_num) (by linarith)
+  calc r2_0 * max 0 (1 - 2 * fst) ≤ r2_0 * 1 :=
+        mul_le_mul_of_nonneg_left h_le hr2
+    _ = r2_0 := mul_one _
+
+/-- **Neutral portability lies in `[0, 1]`** for a source `R²` in `[0, 1]`. -/
+theorem neutralPortability_mem_unit (r2_0 fst : ℝ)
+    (hr2 : 0 ≤ r2_0) (hr2_le : r2_0 ≤ 1) (hfst : 0 ≤ fst) :
+    0 ≤ neutralPortability r2_0 fst ∧ neutralPortability r2_0 fst ≤ 1 :=
+  ⟨neutralPortability_nonneg r2_0 fst hr2,
+    le_trans (neutralPortability_le_r2_0 r2_0 fst hr2 hfst) hr2_le⟩
+
+/-- **The two neutral laws, related.** The linear law in this file is never
+    above the allele-frequency benchmark ratio of `PortabilityDrift.lean`,
+    scaled by the source `R²`:
+
+      `r2_0 · max 0 (1 - 2·fstT) ≤ r2_0 · (1 - fstT)/(1 - fstS)`
+
+    for any source differentiation `fstS ∈ [0, 1)`. Two neutral laws used to sit
+    in the same development with nothing relating them; this is the inequality
+    that relates them. It is not an endorsement of either -- see the note on
+    `neutralPortability`, both are under revision -- but it does fix their
+    order, so a claim derived under one is at least known to be conservative or
+    liberal with respect to the other. -/
+theorem neutralPortability_le_neutralAFBenchmark
+    (r2_0 fstS fstT : ℝ)
+    (hr2 : 0 ≤ r2_0)
+    (hS : 0 ≤ fstS) (hS1 : fstS < 1)
+    (hT : 0 ≤ fstT) (hT1 : fstT ≤ 1) :
+    neutralPortability r2_0 fstT ≤ r2_0 * neutralAFBenchmarkRatio fstS fstT := by
+  unfold neutralPortability neutralAFBenchmarkRatio
+  have hden : (0 : ℝ) < 1 - fstS := by linarith
+  have h1 : 1 - fstT ≤ (1 - fstT) / (1 - fstS) := by
+    rw [le_div_iff₀ hden]
+    nlinarith
+  have h2 : max 0 (1 - 2 * fstT) ≤ 1 - fstT :=
+    max_le (by linarith) (by linarith)
+  exact mul_le_mul_of_nonneg_left (le_trans h2 h1) hr2
 
 /-- **Stabilizing selection model: faster-than-neutral decay.**
     Under stabilizing selection, allelic effects are constrained near the optimum
-    in both populations. The portability decay is close to neutral. -/
+    in both populations. The portability decay is close to neutral.
+
+    Defined through `neutralPortability` so that it inherits the nonnegativity
+    floor. The previous body spelled out `r2_0 * (1 - 2 * fst)` a second time
+    and inherited the negative-`R²` escape with it.
+
+    Empirical status: FALSIFIED as a one-parameter law. Simulation finds no
+    constant `strength` that fits the portability curve: the fitted value spans
+    13-fold over a 29-fold range of `F_ST`. The definition is retained because
+    the qualitative ordering it supports (`stabilizing_le_neutral`,
+    `diversifying_lt_stabilizing`) survives any positive `strength`, but the
+    magnitude it predicts should not be used, and `strength` should not be
+    reported as a fitted constant of a trait. -/
 noncomputable def stabilizingPortability (r2_0 fst strength : ℝ) : ℝ :=
-  r2_0 * (1 - 2 * fst) * Real.exp (-strength * fst)
+  neutralPortability r2_0 fst * Real.exp (-strength * fst)
+
+/-- Stabilizing portability is a nonnegative `R²`. -/
+theorem stabilizingPortability_nonneg (r2_0 fst strength : ℝ) (hr2 : 0 ≤ r2_0) :
+    0 ≤ stabilizingPortability r2_0 fst strength := by
+  unfold stabilizingPortability
+  exact mul_nonneg (neutralPortability_nonneg r2_0 fst hr2)
+    (le_of_lt (Real.exp_pos _))
 
 /-- Stabilizing selection is never better than neutral for portability. -/
 theorem stabilizing_le_neutral (r2_0 fst strength : ℝ)
     (hr2 : 0 ≤ r2_0)
-    (hfst : 0 ≤ fst) (hfst_small : 2 * fst ≤ 1)
+    (hfst : 0 ≤ fst)
     (hs : 0 ≤ strength) :
     stabilizingPortability r2_0 fst strength ≤ neutralPortability r2_0 fst := by
-  unfold stabilizingPortability neutralPortability
-  have h_base_nn : 0 ≤ r2_0 * (1 - 2 * fst) :=
-    mul_nonneg hr2 (by linarith)
+  unfold stabilizingPortability
+  have h_base_nn : 0 ≤ neutralPortability r2_0 fst :=
+    neutralPortability_nonneg r2_0 fst hr2
   have h_exp_le : Real.exp (-strength * fst) ≤ 1 := by
     rw [← Real.exp_zero]
     exact Real.exp_le_exp.mpr (by nlinarith)
-  calc r2_0 * (1 - 2 * fst) * Real.exp (-strength * fst)
-      ≤ r2_0 * (1 - 2 * fst) * 1 := mul_le_mul_of_nonneg_left h_exp_le h_base_nn
-    _ = r2_0 * (1 - 2 * fst) := mul_one _
+  calc neutralPortability r2_0 fst * Real.exp (-strength * fst)
+      ≤ neutralPortability r2_0 fst * 1 :=
+        mul_le_mul_of_nonneg_left h_exp_le h_base_nn
+    _ = neutralPortability r2_0 fst := mul_one _
 
 /-- **Diversifying/fluctuating selection model: much-faster-than-neutral decay.**
     Under fluctuating selection (immune traits), effects change rapidly.
 
-    Empirical status: UNTESTED. -/
+    Defined through `neutralPortability` for the same reason as
+    `stabilizingPortability`: the nonnegativity floor must be inherited, not
+    re-spelled.
+
+    Empirical status: FALSIFIED as a one-parameter law, jointly with
+    `stabilizingPortability` -- no constant turnover rate fits the curve, the
+    fitted value spanning 13-fold over a 29-fold `F_ST` range. The ordering
+    results below hold for any positive parameters; the magnitudes do not. -/
 noncomputable def diversifyingPortability (r2_0 fst lam_turn : ℝ) : ℝ :=
-  r2_0 * (1 - 2 * fst) * (Real.exp (-lam_turn * fst)) ^ 2
+  neutralPortability r2_0 fst * (Real.exp (-lam_turn * fst)) ^ 2
+
+/-- Diversifying portability is a nonnegative `R²`. -/
+theorem diversifyingPortability_nonneg (r2_0 fst lam_turn : ℝ) (hr2 : 0 ≤ r2_0) :
+    0 ≤ diversifyingPortability r2_0 fst lam_turn := by
+  unfold diversifyingPortability
+  exact mul_nonneg (neutralPortability_nonneg r2_0 fst hr2)
+    (pow_nonneg (le_of_lt (Real.exp_pos _)) 2)
 
 /-- Diversifying selection gives strictly worse portability than stabilizing. -/
 theorem diversifying_lt_stabilizing
@@ -255,9 +371,14 @@ theorem diversifying_lt_stabilizing
     diversifyingPortability r2_0 fst lam_turn <
       stabilizingPortability r2_0 fst lam_stab := by
   unfold diversifyingPortability stabilizingPortability
-  have h_base_pos : 0 < r2_0 * (1 - 2 * fst) := mul_pos hr2 (by linarith)
+  have h_max : max 0 (1 - 2 * fst) = 1 - 2 * fst :=
+    max_eq_right (by linarith)
+  have h_base_pos : 0 < neutralPortability r2_0 fst := by
+    unfold neutralPortability
+    rw [h_max]
+    exact mul_pos hr2 (by linarith)
   apply mul_lt_mul_of_pos_left _ h_base_pos
-  rw [← Real.exp_nat_mul] at *
+  rw [← Real.exp_nat_mul]
   simp only [Nat.cast_ofNat]
   apply Real.exp_lt_exp.mpr
   nlinarith

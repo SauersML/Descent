@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Calibrator.PhenomeWidePortability
 
 namespace Calibrator
 
@@ -117,8 +118,8 @@ theorem meanImputationR2_mem_unit (c ld_extent : ℝ)
     (h_c : 0 < c) (h_ld : 0 < ld_extent) :
     0 ≤ meanImputationR2 c ld_extent ∧ meanImputationR2 c ld_extent ≤ 1 := by
   have h_frac_pos : 0 < c / ld_extent := div_pos h_c h_ld
-  refine ⟨le_max_left _ _, ?_⟩
   unfold meanImputationR2
+  refine ⟨le_max_left _ _, ?_⟩
   apply max_le
   · norm_num
   · linarith
@@ -256,6 +257,22 @@ theorem ascertainment_artificial_loss
 /-- Ascertainment loss from incompletely tagged causal variation. -/
 noncomputable def ascertainment_loss (coverage v_causal : ℝ) : ℝ :=
   (1 - coverage) * v_causal
+
+/-- **Cross-check: incomplete tagging attenuates exactly as drift does.**
+`PortabilityDrift.presentDayPGSVariance` and
+`PhenomeWidePortability.neutralPortabilityRatioLD` are the same
+`(1 - x) · y` attenuation applied to a different pair of quantities. Three
+independent spellings of one map is the configuration in which a convention
+change in one goes unnoticed in the others. -/
+theorem ascertainment_loss_eq_presentDayPGSVariance (coverage v_causal : ℝ) :
+    ascertainment_loss coverage v_causal =
+      presentDayPGSVariance v_causal coverage := by
+  unfold ascertainment_loss presentDayPGSVariance; ring
+
+theorem ascertainment_loss_eq_neutralPortabilityRatioLD (coverage v_causal : ℝ) :
+    ascertainment_loss coverage v_causal =
+      neutralPortabilityRatioLD coverage v_causal := by
+  unfold ascertainment_loss neutralPortabilityRatioLD; ring
 
 /-- **Multi-ethnic arrays reduce ascertainment bias.**
     Arrays designed with variants from multiple populations

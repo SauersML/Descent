@@ -1,4 +1,5 @@
 import Calibrator.Probability
+import Calibrator.PopulationGeneticsFoundations
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
 
@@ -44,6 +45,17 @@ section QSTFSTTest
     Empirical status: UNTESTED. -/
 noncomputable def qst (V_between V_within : ℝ) : ℝ :=
   V_between / (V_between + 2 * V_within)
+
+/-- **Cross-check: `Q_ST` and the coalescent `F_ST` are one map applied to two
+different pairs of quantities.** `PopulationGeneticsFoundations.coalFst` sends
+`(t, Nₑ)` to `t / (t + 2 Nₑ)`; `qst` sends `(V_b, V_w)` to
+`V_b / (V_b + 2 V_w)`. The whole point of the `Q_ST` versus `F_ST` comparison
+is that these two numbers are compared on the same scale, which requires the
+factor of two to be the same factor of two in both. This theorem makes a
+divergence between them a failed proof rather than a silent recalibration. -/
+theorem qst_eq_coalFst_form (V_between V_within : ℝ) :
+    qst V_between V_within = coalFst V_between V_within := by
+  unfold qst coalFst; ring
 
 /-- QST is in [0, 1] for nonneg components with positive denominator. -/
 theorem qst_in_unit (V_b V_w : ℝ)
@@ -115,17 +127,6 @@ theorem pgsDriftVarianceFromLoci_eq_closedForm {n : ℕ} (fst : ℝ) (β : Fin n
   unfold pgsDriftVarianceFromLoci pgsDriftVariance_one_pop
   rw [Finset.mul_sum]
 
-/-- **And the two-population difference variance is the sum of two independent
-copies of it**, which is the content the factor of two was standing for. Chained
-with `pgsDiffVariance_eq_expected`, this ties `expectedPGSDiffVariance` back to a
-process over loci rather than to a restatement of itself. -/
-theorem pgsDiffVariance_two_pop_eq_lociSum {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) :
-    pgsDiffVariance_two_pop (∑ i : Fin n, β i ^ 2) fst =
-      pgsDriftVarianceFromLoci fst β + pgsDriftVarianceFromLoci fst β := by
-  rw [pgsDriftVarianceFromLoci_eq_closedForm]
-  unfold pgsDiffVariance_two_pop
-  ring
-
 /-- **PGS difference variance between two independently drifting populations.**
 
     For two populations that diverged from a common ancestor and drifted
@@ -169,6 +170,18 @@ noncomputable def expectedPGSDiffVariance (V_A fst : ℝ) : ℝ :=
 theorem pgsDiffVariance_eq_expected (V_A fst : ℝ) :
     pgsDiffVariance_two_pop V_A fst = expectedPGSDiffVariance V_A fst := by
   unfold pgsDiffVariance_two_pop pgsDriftVariance_one_pop expectedPGSDiffVariance
+  ring
+
+/-- **And the two-population difference variance is the sum of two independent
+copies of the locus sum**, which is the content the factor of two was standing
+for. Chained with `pgsDiffVariance_eq_expected`, this ties
+`expectedPGSDiffVariance` back to a process over loci rather than to a
+restatement of itself. -/
+theorem pgsDiffVariance_two_pop_eq_lociSum {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) :
+    pgsDiffVariance_two_pop (∑ i : Fin n, β i ^ 2) fst =
+      pgsDriftVarianceFromLoci fst β + pgsDriftVarianceFromLoci fst β := by
+  rw [pgsDriftVarianceFromLoci_eq_closedForm]
+  unfold pgsDiffVariance_two_pop
   ring
 
 /-- Expected variance is nonneg. -/
@@ -299,11 +312,11 @@ theorem effectCorrelation_mem_range
     rw [div_le_one h_denom_pos]
     linarith
   have h_prod_nonneg : 0 ≤ d * (1 + f * N) := by nlinarith
+  unfold effectCorrelationStabilizing effectCorrelationFluctuating
   refine ⟨⟨?_, ?_⟩, ⟨le_max_left _ _, ?_⟩⟩
-  · unfold effectCorrelationStabilizing; linarith
-  · unfold effectCorrelationStabilizing; linarith
-  · unfold effectCorrelationFluctuating
-    apply max_le
+  · linarith
+  · linarith
+  · apply max_le
     · norm_num
     · linarith
 

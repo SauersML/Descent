@@ -857,21 +857,22 @@ theorem nns_increases_with_ppv_drop
     1 / ppv₁ < 1 / ppv₂ := by
   exact div_lt_div_of_pos_left one_pos h_ppv₂ h_drop
 
-/-- **F1 score captures precision-recall balance.**
-    F1 = 2 × PPV × sensitivity / (PPV + sensitivity).
-    F1 portability reflects both precision and recall portability.
+/-! **F1 score captures precision-recall balance.**
+`F1 = 2 × PPV × sensitivity / (PPV + sensitivity)`, and F1 portability reflects
+both precision and recall portability.
 
-    Empirical status: UNTESTED. -/
-noncomputable def f1ScoreMetric (precision sens : ℝ) : ℝ :=
-  2 * precision * sens / (precision + sens)
+This file used to restate the formula as `f1ScoreMetric`. It is `f1Score` from
+`Calibrator.OpenQuestions`, which this file already imports, so the restatement
+has been deleted and the theorem below is stated about that one definition; the
+`Empirical status: UNTESTED` marker travelled with it. -/
 
 /-- F1 is bounded above by 1 when both precision and sensitivity lie in `(0,1]`. -/
 theorem f1_le_one
     (precision sens : ℝ)
     (h_p : 0 < precision) (h_r : 0 < sens)
     (h_p1 : precision ≤ 1) (h_r1 : sens ≤ 1) :
-    f1ScoreMetric precision sens ≤ 1 := by
-  unfold f1ScoreMetric
+    f1Score precision sens ≤ 1 := by
+  unfold f1Score
   rw [div_le_one (by linarith)]
   nlinarith [mul_nonneg (le_of_lt h_p) (by linarith : 0 ≤ 1 - sens),
              mul_nonneg (le_of_lt h_r) (by linarith : 0 ≤ 1 - precision)]

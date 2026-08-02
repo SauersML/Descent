@@ -2,6 +2,7 @@ import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.PopulationGeneticsFoundations
 import Calibrator.OpenQuestions
+import Calibrator.LDDecayTheory
 
 namespace Calibrator
 
@@ -61,11 +62,28 @@ theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
   unfold islandModelFst
   apply div_lt_div_of_pos_left one_pos (by positivity) (by nlinarith)
 
-/-- **Connection to derived formula**: `islandModelFst` equals
-    `fstMigrationDriftEquilibrium` from `PortabilityDrift.lean` when M = 4·Ne·m.
-    Both express Wright's (1931) island model Fst = 1/(1 + 4Nem).
-    `fstMigrationDriftEquilibrium` was derived from first principles via
-    the migration-drift balance in `PortabilityDrift`. -/
+/-- **Connection to the other copy of this formula**: `islandModelFst`
+    equals `fstMigrationDriftEquilibrium` from `PortabilityDrift.lean` when
+    M = 4·Ne·m. Both express Wright's (1931) island model Fst = 1/(1 + 4Nem).
+
+    This theorem relates two stipulated constants; it does not derive either.
+    An earlier version of this docstring said `fstMigrationDriftEquilibrium`
+    "was derived from first principles via the migration-drift balance in
+    `PortabilityDrift`". That claim was unearned and has been removed.
+    `PortabilityDrift` does define a one-generation migration-drift map
+    (`fstMigDriftNext`) and, separately, the constant `fstMigDriftEquil`, but no
+    theorem anywhere states that the constant is a fixed point of the map: the
+    algebra exists only in a docstring. The status is therefore "unverified but
+    probably true", not "derived" — the hand algebra checks out
+    (`b = F*(1-a)` with `a = 1 - 2m - 1/(2Nₑ)`, `b = 1/(2Nₑ)`,
+    `F* = 1/(1 + 4Nₑm)` reduces to `1/(2Nₑ) = 1/(2Nₑ)`), but Lean has not
+    checked it. The missing theorem is
+    `fstMigDriftNext Ne m (fstMigDriftEquil Ne m) = fstMigDriftEquil Ne m`,
+    which belongs in `PortabilityDrift.lean` next to the two definitions.
+
+    Compare `selectionMigrationEquilibrium_isFixedPoint` in
+    `PopulationGeneticsFoundations.lean`, which is what this claim would look
+    like if it were true. -/
 theorem islandModelFst_eq_derived (Ne m : ℝ) :
     islandModelFst Ne m = fstMigrationDriftEquilibrium Ne m := by
   unfold islandModelFst fstMigrationDriftEquilibrium
@@ -84,12 +102,35 @@ section SteppingStone
 
 /-- Stepping-stone model pairwise F_ST: d / (d + 4·Ne·m·σ²).
 
-    Empirical status: UNTESTED.
+    This is the Malécot/Rousset one-dimensional isolation-by-distance result
+    `F_ST/(1 - F_ST) = d / (4·Nₑ·m·σ²)` rearranged.
+    `steppingStoneFst_from_coalescence_time` now derives exactly this body from
+    the coalescent, and is the theorem that keeps the two from drifting apart.
 
-    Empirical status: VALIDATED. A single dispersal variance σ² ≈ 2.0 fits
-    every tested distance to within ±11%, inside the standard errors. An
-    earlier apparent 30-123% discrepancy came from fixing σ² = 1 arbitrarily;
-    σ² is a free parameter of the model, not a prediction of it. -/
+    A previous version of that derivation concluded
+    `d / (d + 4·Nₑ·σ⁴·m²)` instead -- a different function of the parameters,
+    with no theorem equating it to this definition. The defect was in the
+    derivation, in two places: `steppingStoneCoalescenceTime` omitted the factor
+    `1/2` from the relative diffusion of two lineages, and the derivation then
+    passed `2·Nₑ·σ²·m` where `coalFst` expects an effective size
+    `Nₑ`. The docstring's claim that "the factor of 4 arises from the diploid
+    convention... multiplying numerator and denominator by 2" is false as
+    stated: that operation gives `2d/(2d + 4Nₑσ²m)`, not this. Both have been
+    corrected.
+
+    Empirical status: CONDITIONALLY VALID. A single dispersal variance
+    σ² ≈ 2.0 fits every tested distance to within ±11%, inside the standard
+    errors. An earlier apparent 30-123% discrepancy came from fixing σ² = 1
+    arbitrarily; σ² is a free parameter of the model, not a prediction of it.
+
+    Regime and limits of that evidence: because σ² was fitted freely and enters
+    this expression only through the product `m·σ²`, the fit constrains that
+    product and nothing else. In particular it does NOT distinguish this form
+    from the `d / (d + 4·Nₑ·σ⁴·m²)` the old derivation produced, since a
+    refitted σ² absorbs the extra power exactly. The evidence for the functional
+    form here is the coalescent derivation below, not the fit. Distinguishing
+    the two empirically requires holding σ² fixed at an independently measured
+    dispersal variance and varying `m`, which has not been done. -/
 noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
@@ -112,72 +153,96 @@ theorem stepping_stone_fst_saturates (d Ne m σ_sq : ℝ)
   rw [div_lt_one (by nlinarith [mul_pos (mul_pos hNe hm) hσ])]
   linarith [mul_pos (mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) hNe) hm) hσ]
 
-/-! ### Derivation of stepping-stone Fst from diffusion approximation
+/-! ### Derivation of stepping-stone Fst from the coalescent
 
 In a one-dimensional stepping-stone model with demes of effective size Ne,
-migration rate m between adjacent demes, and dispersal variance σ², the
-expected coalescence time for two lineages separated by d demes scales as:
+migration rate m between adjacent demes, and dispersal variance σ², two
+lineages separated by d demes must first meet before they can coalesce. Both
+lineages move, so their separation diffuses at twice the single-lineage
+coefficient m·σ², and the expected extra time to meet is
 
-  T(d) ~ d / (σ² · m)
+  T(d) = d / (2 · σ² · m)
 
-This arises from the diffusion approximation to the random walk of lineages:
-the mean time for two lineages to first occupy the same deme is proportional
-to d (the initial separation) divided by the diffusion coefficient σ²·m.
+Once in the same deme, coalescence takes an expected 2·Ne generations, so
 
-Once in the same deme, coalescence occurs at rate 1/(2·Ne), so the total
-expected coalescence time is:
+  Fst(d) = T(d) / (T(d) + 2·Ne)                                     [`coalFst`]
+         = [d/(2σ²m)] / ([d/(2σ²m)] + 2·Ne)
+         = d / (d + 4·Ne·σ²·m)
 
-  T_coal(d) = T(d) + 2·Ne ≈ d/(σ²·m) + 2·Ne
+which is `demoSteppingStoneFst d Ne m σ_sq`, and is what
+`steppingStoneFst_from_coalescence_time` proves. Equivalently
+Fst/(1 - Fst) = d/(4·Ne·m·σ²), the standard Malécot/Rousset linear
+isolation-by-distance relation in one dimension.
 
-Then Fst = 1 - 1/(1 + T(d)/(2·Ne)) = T(d)/(T(d) + 2·Ne):
+This is a correction. The previous version of this block wrote
+T(d) = d/(σ²·m), dropping the factor 2 from the relative diffusion, and then
+recovered the factor 4 by passing `2·Ne·σ²·m` as the effective size to
+`coalFst` -- which is not an effective size. The result was
+d/(d + 4·Ne·σ⁴·m²), a different function of the parameters from the definition
+it claimed to derive, and no theorem related the two. The 1/2 belongs in the
+meeting time and the effective size argument is Ne.
 
-  Fst(d) = [d/(σ²·m)] / [d/(σ²·m) + 2·Ne]
-         = d / [d + 2·Ne·σ²·m]
-
-The factor of 4 (yielding 4·Ne·σ²·m in the denominator) arises from the
-diploid convention, exactly as in the island model where 4·Ne·m appears.
-Multiplying numerator and denominator by 2 for diploid organisms:
-
-  Fst(d) = d / (d + 4·Ne·σ²·m)
-
-which is `steppingStoneFst` as defined above.
+Cross-check against the island model, which uses the same `T/(T + 2Ne)` map:
+two lineages in different demes each migrate at rate m, so they meet at rate
+2m, giving T = 1/(2m) and Fst = [1/(2m)]/([1/(2m)] + 2Ne) = 1/(1 + 4·Ne·m),
+Wright's result. The factor 4 in both formulas comes from that meeting rate
+being 2m (or 2·m·σ²), not from any separate diploid doubling.
 -/
 
-/-- **Coalescence time at distance d in the stepping-stone model.**
-    T(d) = d / (σ² · m), the expected time for lineages separated by d demes
-    to first coalesce, from the diffusion approximation.
+/-- **Meeting time at distance d in the stepping-stone model.**
+    T(d) = d / (2 · σ² · m), the expected extra time for lineages separated by
+    d demes to first occupy the same deme. The 2 is the relative diffusion of
+    two independently moving lineages; omitting it was the error in the
+    previous derivation (see the block comment above).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED as a standalone quantity. Its consequence
+    `demoSteppingStoneFst` is CONDITIONALLY VALID, with the caveat recorded
+    there that a freely fitted σ² cannot distinguish this scaling from others.
+    -/
 noncomputable def steppingStoneCoalescenceTime (d σ_sq m : ℝ) : ℝ :=
-  d / (σ_sq * m)
+  d / (2 * σ_sq * m)
 
 /-! **Fst from coalescence time ratio**: `Fst = T/(T + 2Ne)`. This file used to
 restate it as `fstFromCoalescenceTime`; it is `coalFst` from
 `Calibrator.PopulationGeneticsFoundations`, and the restatement has been
 deleted in favour of that one. -/
 
-/-- **Derivation**: the stepping-stone Fst formula arises from the coalescence
-    time. When T(d) = d/(σ²·m), we get:
+/-- **Derivation, and the theorem that pins the definition.**
+    With T(d) = d/(2·σ²·m) and effective size Ne:
 
-      Fst = T/(T + 2·Ne) = [d/(σ²·m)] / [d/(σ²·m) + 2·Ne]
+      Fst = T/(T + 2·Ne) = [d/(2σ²m)] / ([d/(2σ²m)] + 2·Ne)
 
-    Multiplying numerator and denominator by σ²·m:
+    Multiplying numerator and denominator by 2·σ²·m:
 
-      = d / (d + 2·Ne·σ²·m)
+      = d / (d + 4·Ne·σ²·m)
 
-    With the diploid factor of 2 (convention: 4·Ne·σ²·m), we use Ne_diploid = 2·Ne
-    in the coalescence time formula, yielding:
+    which is exactly `demoSteppingStoneFst d Ne m σ_sq`. Stating the conclusion
+    as an equation between the derivation and the definition -- rather than as
+    a free-standing closed form, which is how the two came to disagree -- means
+    a replacement body for either one no longer typechecks.
 
-      = d / (d + 4·Ne·m·σ²)
-
-    which is exactly `steppingStoneFst d Ne m σ_sq`. -/
+    The previous statement of this theorem concluded
+    `d / (d + 4·Ne·σ⁴·m²)` from `coalFst _ (2·Ne·σ²·m)`, i.e. it fed a
+    non-effective-size into the effective-size slot and compensated for a
+    missing 1/2 in the meeting time. That is a different function from the
+    definition, and nothing equated them. -/
 theorem steppingStoneFst_from_coalescence_time (d Ne m σ_sq : ℝ)
-    (hσ : σ_sq ≠ 0) (hm : m ≠ 0) :
-    coalFst (steppingStoneCoalescenceTime d σ_sq m) (2 * Ne * σ_sq * m) =
-      d / (d + 4 * Ne * σ_sq ^ 2 * m ^ 2) := by
-  unfold coalFst steppingStoneCoalescenceTime
+    (hd : 0 < d) (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq) :
+    coalFst (steppingStoneCoalescenceTime d σ_sq m) Ne =
+      demoSteppingStoneFst d Ne m σ_sq := by
+  unfold coalFst steppingStoneCoalescenceTime demoSteppingStoneFst
+  have hσm : (0 : ℝ) < 2 * σ_sq * m := by
+    have h := mul_pos hσ hm; linarith
+  have hσm' : (2 : ℝ) * σ_sq * m ≠ 0 := ne_of_gt hσm
+  have hT : (0 : ℝ) < d / (2 * σ_sq * m) := div_pos hd hσm
+  have hTden : d / (2 * σ_sq * m) + 2 * Ne ≠ 0 :=
+    ne_of_gt (by linarith)
+  have hden : d + 4 * Ne * m * σ_sq ≠ 0 := by
+    have h4 : (0 : ℝ) < 4 * Ne * m * σ_sq :=
+      mul_pos (mul_pos (mul_pos (by norm_num : (0:ℝ) < 4) hNe) hm) hσ
+    exact ne_of_gt (by linarith)
   field_simp
-  ring_nf
+  ring
 
 /-- The coalescence time is positive for positive distance and dispersal. -/
 theorem steppingStoneCoalescenceTime_pos (d σ_sq m : ℝ)
@@ -515,40 +580,54 @@ bottleneck) compared to a stably-sized population at the same Fst.
 section BottleneckExcessLD_Derivation
 
 /-!
-## Derivation of Bottleneck Excess LD from Drift Dynamics
+## Excess LD from a bottleneck: what was here, and why it is gone
 
-In a population of effective size Ne, genetic drift creates new LD between
-loci at rate 1/(2·Ne) per generation. During a bottleneck (Ne_b < Ne_stable),
-the drift-based LD creation rate increases. The *excess* LD created by the
-bottleneck (relative to a stable population) accumulates over t_b generations,
-with each generation's contribution decaying by the factor (1 - 1/(2·Ne_b))
-in subsequent generations.
+This section used to derive `bottleneckExcessLD` from an additive drift
+accounting: LD is created at rate `1/(2 Ne)` per generation, the excess creation
+rate during a bottleneck is `1/(2 Ne_b) - 1/(2 Ne_stable)`, and the cumulative
+excess is the geometric sum of that rate under drift-only decay.
 
-### Step-by-step derivation:
-1. **Drift LD creation rate**: In a population of size Ne, new LD is created
-   at rate 1/(2·Ne) per generation from random drift in allele frequencies.
-2. **Excess creation rate**: During a bottleneck at size Ne_b vs stable Ne_stable,
-   the excess LD creation per generation is 1/(2·Ne_b) - 1/(2·Ne_stable).
-3. **Cumulative excess**: Over t_b bottleneck generations, excess LD created at
-   generation t decays by (1-1/(2·Ne_b))^(t_b-1-t) by the end. Summing:
-   Σ_{t=0}^{t_b-1} (1-1/(2·Ne_b))^(t_b-1-t) × [1/(2·Ne_b) - 1/(2·Ne_stable)]
-4. **Geometric sum**: Factor out the constant excess rate and evaluate:
-   = [1/(2·Ne_b) - 1/(2·Ne_stable)] × Σ_{k=0}^{t_b-1} (1-1/(2·Ne_b))^k
-   = [1/(2·Ne_b) - 1/(2·Ne_stable)] × [1 - (1-1/(2·Ne_b))^t_b] / [1/(2·Ne_b)]
-   = [(Ne_stable - Ne_b)/(2·Ne_b·Ne_stable)] × 2·Ne_b × [1 - (1-1/(2·Ne_b))^t_b]
-   = (Ne_stable/Ne_b - 1) × [1 - (1-1/(2·Ne_b))^t_b]   ... (*)
+The derivation was internally consistent and produced the wrong function. It has
+no recombination rate anywhere in it, so the level it accumulates to rises
+without bound toward `1` rather than saturating at the drift-recombination
+equilibrium. That is precisely the defect for which `bottleneckLDAmplification`
+was deleted from `LDDecayTheory.lean` (simulation: overstates by up to
+3.3-fold), and the closed form this derivation targeted,
+`(1 - (1-1/(2 Ne_b))^t_b) - (1 - (1-1/(2 Ne_stable))^t_b)`, contains that
+deleted formula as its first term. Deleted here for the same reason: no constant
+repairs a missing argument.
 
-   But (*) is the *normalized* form. The direct drift accounting gives the
-   equivalent expression:
-   [1 - (1-1/(2·Ne_b))^t_b] - [1 - (1-1/(2·Ne_stable))^t_b]
-   which equals (1-1/(2·Ne_stable))^t_b - (1-1/(2·Ne_b))^t_b.
+Deleted with it: `excessDriftRate`, `cumulativeExcessLD`, `geom_sum_drift`,
+`cumulativeExcessLD_eq_closedForm`, and `derivation_matches_bottleneckExcessLD`.
+The last of these deserves its own note. It was stated as
 
-   This is what `bottleneckExcessLD` computes.
+    (1 - a) - (1 - b) = b - a
+
+proved `by ring`, under a docstring claiming it confirmed that the drift
+derivation produces the `bottleneckExcessLD` formula. It mentions neither
+`cumulativeExcessLD` nor `excessDriftRate`; it is a tautology about two real
+numbers and connects nothing. A theorem named "derivation matches" that relates
+no two things is worse than no theorem, because its name is read as evidence.
+
+`driftLDCreationRate` is retained below because `Conventions.lean` relates it to
+the coalescent time scale, and because it is a correct statement about drift in
+isolation. It is not a model of LD.
+
+The replacement lives in `LDDecayTheory.lean`: `driftLDStep` (the Sved
+drift-recombination recurrence, which does take `c`), `driftLDEquilibrium` with
+`driftLDEquilibrium_isFixedPoint`, and `driftLDTrajectory` with
+`driftLDTrajectory_closedForm`. `bottleneckExcessLD` below is now defined as a
+trajectory of that process and its closed form is proved, not asserted.
 -/
 
 /-- **Drift LD creation rate**: In a population of effective size Ne,
     genetic drift creates new LD at rate 1/(2·Ne) per generation.
     This arises from Cov(Δpᵢ, Δpⱼ) for linked loci under drift.
+
+    This is a creation rate only. Accumulating it without a recombination rate
+    is what produced the falsified `bottleneckExcessLD` formula deleted above;
+    the honest accumulation is `driftLDStep` in `LDDecayTheory.lean`, in which
+    this rate appears multiplied by the non-recombinant fraction `(1-c)²`.
 
     Empirical status: UNTESTED.
 
@@ -557,91 +636,15 @@ in subsequent generations.
 noncomputable def driftLDCreationRate (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 
-/-- **Excess drift rate during bottleneck**: The additional LD creation
-    per generation in a bottlenecked population (Ne_b) relative to
-    a stable population (Ne_stable). -/
-noncomputable def excessDriftRate (Ne_b Ne_stable : ℝ) : ℝ :=
-  driftLDCreationRate Ne_b - driftLDCreationRate Ne_stable
-
-/-- The excess drift rate is positive when Ne_b < Ne_stable. -/
-theorem excessDriftRate_pos (Ne_b Ne_stable : ℝ)
-    (hNb : 0 < Ne_b) (hNs : 0 < Ne_stable) (h_bottle : Ne_b < Ne_stable) :
-    0 < excessDriftRate Ne_b Ne_stable := by
-  unfold excessDriftRate driftLDCreationRate
-  rw [sub_pos]
-  exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
-
-/-- **Cumulative excess LD from drift** over t_b bottleneck generations.
-    Each generation's excess LD contribution decays by (1 - 1/(2·Ne_b))
-    per subsequent generation. The cumulative excess is:
-    Σ_{k=0}^{t_b-1} (1-1/(2·Ne_b))^k × excessDriftRate(Ne_b, Ne_stable)
-
-    Regime: closed population, no mutation, for the duration of the bottleneck.
-    The geometric decay factor is the drift-only retention; see
-    `Calibrator.DriftRegime`, which proves that at mutation-drift balance the
-    measured retention is stationary and this factor does not describe it. Over a
-    short bottleneck the assumption is defensible, which is precisely why it must
-    be stated rather than inferred from the body.
-
-    Empirical status: UNTESTED. -/
-noncomputable def cumulativeExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ) : ℝ :=
-  (Finset.range t_b).sum fun k =>
-    (1 - 1 / (2 * Ne_b)) ^ k * excessDriftRate Ne_b Ne_stable
-
-/-- **Closed-form of cumulative excess LD via geometric sum.**
-    The geometric series Σ_{k=0}^{t_b-1} r^k = (1 - r^t_b)/(1 - r)
-    applied with r = 1 - 1/(2·Ne_b) gives:
-    cumulativeExcessLD = excessDriftRate × (1 - (1-1/(2·Ne_b))^t_b) / (1/(2·Ne_b))
-
-    We show this equals (1-(1-1/(2·Ne_b))^t_b) - (1-(1-1/(2·Ne_stable))^t_b),
-    which is the definition of bottleneckExcessLD below. -/
-theorem cumulativeExcessLD_eq_closedForm (Ne_b Ne_stable : ℝ) (t_b : ℕ) :
-    cumulativeExcessLD Ne_b Ne_stable t_b =
-      excessDriftRate Ne_b Ne_stable *
-        ((Finset.range t_b).sum fun k => (1 - 1 / (2 * Ne_b)) ^ k) := by
-  unfold cumulativeExcessLD
-  rw [Finset.mul_sum]
-  congr 1
-  ext k
-  ring
-
-/-- The geometric sum Σ_{k=0}^{n-1} r^k equals (1 - r^n) / (1 - r) for r ≠ 1.
-    Specialized to r = 1 - 1/(2·Ne_b), so 1 - r = 1/(2·Ne_b). -/
-theorem geom_sum_drift (Ne_b : ℝ) (t_b : ℕ) (hNb : 0 < Ne_b) :
-    ((Finset.range t_b).sum fun k => (1 - 1 / (2 * Ne_b)) ^ k) =
-      (1 - (1 - 1 / (2 * Ne_b)) ^ t_b) / (1 / (2 * Ne_b)) := by
-  have h2Ne : (0 : ℝ) < 2 * Ne_b := by linarith
-  have h_base_ne_one : 1 - 1 / (2 * Ne_b) ≠ 1 := by
-    intro h
-    nlinarith [div_pos one_pos h2Ne]
-  calc
-    ((Finset.range t_b).sum fun k => (1 - 1 / (2 * Ne_b)) ^ k)
-      = (((1 - 1 / (2 * Ne_b)) ^ t_b - 1) / ((1 - 1 / (2 * Ne_b)) - 1)) := by
-          simpa using geom_sum_eq h_base_ne_one t_b
-    _ = (1 - (1 - 1 / (2 * Ne_b)) ^ t_b) / (1 / (2 * Ne_b)) := by
-          field_simp [ne_of_gt h2Ne]
-          ring
-
-/-- **Key derivation**: The closed-form excess drift rate times the geometric sum
-    yields the bottleneck excess LD formula.
-
-    excessDriftRate × geom_sum
-    = [1/(2·Ne_b) - 1/(2·Ne_stable)] × [(1 - (1-1/(2·Ne_b))^t_b) / (1/(2·Ne_b))]
-    = [1/(2·Ne_b) - 1/(2·Ne_stable)] × 2·Ne_b × [1 - (1-1/(2·Ne_b))^t_b]
-    = [1 - Ne_b/Ne_stable] × [1 - (1-1/(2·Ne_b))^t_b]
-
-    And we verify this equals the direct difference:
-    [1-(1-1/(2·Ne_b))^t_b] - [1-(1-1/(2·Ne_stable))^t_b]
-    = (1-1/(2·Ne_stable))^t_b - (1-1/(2·Ne_b))^t_b
-
-    These two expressions are equal when expanded, confirming the drift
-    derivation produces the bottleneckExcessLD formula. We state this as
-    an algebraic identity that the derived cumulative form and the direct
-    per-population drift difference coincide. -/
-theorem derivation_matches_bottleneckExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ) :
-    (1 - (1 - 1/(2 * Ne_b)) ^ t_b) - (1 - (1 - 1/(2 * Ne_stable)) ^ t_b) =
-      (1 - 1/(2 * Ne_stable)) ^ t_b - (1 - 1/(2 * Ne_b)) ^ t_b := by
-  ring
+/-- **Cross-check: this is the same per-generation drift rate that
+`LDDecayTheory` calls `ldDecayRatePerGen`.** One rate, read there as the
+fraction of LD lost per generation and here as the rate at which drift creates
+it; the two readings are opposite in sign of effect and identical in
+magnitude, which is exactly the situation in which a divergence would go
+unnoticed. -/
+theorem driftLDCreationRate_eq_ldDecayRatePerGen (Ne : ℝ) :
+    driftLDCreationRate Ne = ldDecayRatePerGen Ne := by
+  unfold driftLDCreationRate ldDecayRatePerGen; ring
 
 end BottleneckExcessLD_Derivation
 
@@ -658,33 +661,81 @@ section DemographicPortability
     for t_b generations then recovered to Ne_A. Even if their Fst values
     match, pop B has excess LD.
 
-    **Derived from drift dynamics** (see `BottleneckExcessLD_Derivation` section):
-    This equals the cumulative excess drift-generated LD over the bottleneck,
-    computed as the difference between total drift-LD in the bottlenecked vs
-    stable population over t_b generations. See `driftLDCreationRate`,
-    `excessDriftRate`, and `cumulativeExcessLD` for the step-by-step derivation.
+    **Derived from the drift-recombination process** in `LDDecayTheory.lean`:
+    a population sitting at the equilibrium LD level for its stable size
+    `Ne_stable` is bottlenecked to `Ne_b` for `t_b` generations, and this is how
+    far above the stable level it ends up.
 
-    Empirical status: UNTESTED. -/
-noncomputable def bottleneckExcessLD (Ne_b Ne_stable : ℝ) (t_b : ℕ) : ℝ :=
-  (1 - (1 - 1/(2 * Ne_b)) ^ t_b) - (1 - (1 - 1/(2 * Ne_stable)) ^ t_b)
+    The previous body was
+    `(1 - (1-1/(2 Ne_b))^t_b) - (1 - (1-1/(2 Ne_stable))^t_b)`, whose first term
+    is `bottleneckLDAmplification` verbatim -- the formula deleted from
+    `LDDecayTheory.lean` for taking no recombination rate and therefore rising
+    to `1` with time rather than saturating at the drift-recombination
+    equilibrium (simulation: up to 3.3-fold overstatement). The same objection
+    applied here unchanged, so this is now a trajectory of a process that does
+    take `c`, and `bottleneckExcessLD_eq_closedForm` proves the closed form
+    rather than asserting it.
+
+    Empirical status: UNTESTED. The 3.3-fold falsification of the predecessor is
+    not evidence about this body, and neither is anything else: no simulation
+    has been run against the two-equilibrium-gap amplitude this predicts. What
+    is established is structural -- the level is bounded by the gap between two
+    equilibria, each of which is bounded by `1`
+    (`driftLDEquilibrium_le_one`). -/
+noncomputable def bottleneckExcessLD (Ne_b Ne_stable c : ℝ) (t_b : ℕ) : ℝ :=
+  driftLDTrajectory Ne_b c (driftLDEquilibrium Ne_stable c) t_b -
+    driftLDEquilibrium Ne_stable c
+
+/-- **Closed form of the bottleneck excess**, proved from the recurrence: the
+    gap between the two equilibria, approached geometrically over the
+    bottleneck. This is the theorem the deleted `derivation_matches_bottleneckExcessLD`
+    was named for and did not state. -/
+theorem bottleneckExcessLD_eq_closedForm (Ne_b Ne_stable c : ℝ) (t_b : ℕ)
+    (h_b : 1 - driftLDRetention Ne_b c ≠ 0) :
+    bottleneckExcessLD Ne_b Ne_stable c t_b =
+      (driftLDEquilibrium Ne_b c - driftLDEquilibrium Ne_stable c) *
+        (1 - driftLDRetention Ne_b c ^ t_b) := by
+  unfold bottleneckExcessLD
+  rw [driftLDTrajectory_closedForm Ne_b c _ h_b t_b]
+  ring
+
+/-- **One quantity, one definition**: the bottleneck excess is the zero-recovery
+    case of `excessLDAfterBottleneck` in `LDDecayTheory.lean`. Stated so the two
+    copies of this construction cannot drift apart the way the two copies of the
+    deleted formula did. -/
+theorem bottleneckExcessLD_eq_excessLDAfterBottleneck
+    (Ne_b Ne_stable c : ℝ) (t_b : ℕ) :
+    bottleneckExcessLD Ne_b Ne_stable c t_b =
+      excessLDAfterBottleneck Ne_b Ne_stable c t_b 0 := by
+  unfold bottleneckExcessLD excessLDAfterBottleneck
+  rw [driftLDTrajectory_zero]
 
 /-- The bottlenecked population has strictly more LD than the stable population
-    over the same number of generations when bottleneck Ne is smaller. -/
-theorem bottleneck_excess_ld_pos (Ne_b Ne_stable : ℝ) (t_b : ℕ)
-    (hNb : 2 < Ne_b) (hNs : 2 < Ne_stable) (h_bottle : Ne_b < Ne_stable)
+    over the same number of generations when bottleneck Ne is smaller.
+
+    The recombination rate must be strictly between 0 and 1: at `c = 0` both
+    populations equilibrate at `1` and the excess is zero, and at `c = 1` both
+    equilibrate at `0`. The old statement, which had no `c`, reported a strictly
+    positive excess in both of those regimes. -/
+theorem bottleneck_excess_ld_pos (Ne_b Ne_stable c : ℝ) (t_b : ℕ)
+    (hNb : 1 ≤ Ne_b) (h_bottle : Ne_b < Ne_stable)
+    (hc : 0 < c) (hc1 : c < 1)
     (ht : 0 < t_b) :
-    0 < bottleneckExcessLD Ne_b Ne_stable t_b := by
-  unfold bottleneckExcessLD
-  -- (1-(1-1/(2Nb))^t) - (1-(1-1/(2Ns))^t) = (1-1/(2Ns))^t - (1-1/(2Nb))^t
-  -- Since Nb < Ns, 1/(2Nb) > 1/(2Ns), so 1-1/(2Nb) < 1-1/(2Ns),
-  -- hence (1-1/(2Nb))^t < (1-1/(2Ns))^t and the difference is positive.
-  have h_base : 1 - 1/(2 * Ne_b) < 1 - 1/(2 * Ne_stable) := by
-    rw [sub_lt_sub_iff_left]
-    exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
-  have h_nn : 0 ≤ 1 - 1/(2 * Ne_b) := by
-    rw [sub_nonneg, div_le_one (by linarith)]; linarith
-  have h_pow := pow_lt_pow_left₀ h_base h_nn (by omega : t_b ≠ 0)
-  linarith
+    0 < bottleneckExcessLD Ne_b Ne_stable c t_b := by
+  have hc0 : (0 : ℝ) ≤ c := le_of_lt hc
+  have hc1' : c ≤ 1 := le_of_lt hc1
+  have h_b := driftLD_one_sub_retention_pos Ne_b c hNb hc0 hc1'
+  rw [bottleneckExcessLD_eq_closedForm Ne_b Ne_stable c t_b (ne_of_gt h_b)]
+  have h_gap : 0 < driftLDEquilibrium Ne_b c - driftLDEquilibrium Ne_stable c := by
+    have := driftLDEquilibrium_strictAnti Ne_b Ne_stable c hNb h_bottle hc hc1
+    linarith
+  have hLb := driftLDRetention_mem_unit Ne_b c hNb hc0 hc1'
+  have hLb_lt : driftLDRetention Ne_b c < 1 :=
+    driftLDRetention_lt_one Ne_b c hNb hc hc1'
+  have h_amp : 0 < 1 - driftLDRetention Ne_b c ^ t_b := by
+    have := pow_lt_one₀ hLb.1 hLb_lt (by omega : t_b ≠ 0)
+    linarith
+  exact mul_pos h_gap h_amp
 
 /-- **Different demographic histories break the Fst-portability relationship.**
     Derived from `bottleneckExcessLD`: for two source-target pairs with the same Fst,
@@ -692,29 +743,31 @@ theorem bottleneck_excess_ld_pos (Ne_b Ne_stable : ℝ) (t_b : ℕ)
     because `bottleneckExcessLD > 0` adds additional LD mismatch on top of Fst.
     The total mismatch = Fst-based mismatch + bottleneck excess LD. -/
 theorem bottleneck_worsens_portability
-    (Ne_b Ne_stable : ℝ) (t_b : ℕ)
-    (hNb : 2 < Ne_b) (hNs : 2 < Ne_stable) (h_bottle : Ne_b < Ne_stable)
+    (Ne_b Ne_stable c : ℝ) (t_b : ℕ)
+    (hNb : 1 ≤ Ne_b) (h_bottle : Ne_b < Ne_stable)
+    (hc : 0 < c) (hc1 : c < 1)
     (ht : 0 < t_b) (fst_mismatch : ℝ) (h_fst_nn : 0 ≤ fst_mismatch) :
-    fst_mismatch < fst_mismatch + bottleneckExcessLD Ne_b Ne_stable t_b := by
-  linarith [bottleneck_excess_ld_pos Ne_b Ne_stable t_b hNb hNs h_bottle ht]
+    fst_mismatch < fst_mismatch + bottleneckExcessLD Ne_b Ne_stable c t_b := by
+  linarith [bottleneck_excess_ld_pos Ne_b Ne_stable c t_b hNb h_bottle hc hc1 ht]
 
 /-- **Portability ratio under bottleneck** is strictly worse than under stable demography.
     Derived: portability ∝ (1 - Fst) for stable populations. For bottlenecked populations,
     portability ∝ (1 - Fst) · (1 - excessLD_correction). Since bottleneckExcessLD > 0,
     the correction factor is < 1, reducing the portability ratio.
     We model: R²_bottleneck = R²_source · ((1-Fst) - excessLD) where
-    excessLD = bottleneckExcessLD Ne_b Ne_stable t_b. -/
+    excessLD = bottleneckExcessLD Ne_b Ne_stable c t_b. -/
 theorem bottleneck_reduces_portability_ratio
-    (R2_source Ne_b Ne_stable : ℝ) (t_b : ℕ) (fst : ℝ)
+    (R2_source Ne_b Ne_stable c : ℝ) (t_b : ℕ) (fst : ℝ)
     (hR2 : 0 < R2_source)
-    (hNb : 2 < Ne_b) (hNs : 2 < Ne_stable) (h_bottle : Ne_b < Ne_stable)
+    (hNb : 1 ≤ Ne_b) (h_bottle : Ne_b < Ne_stable)
+    (hc : 0 < c) (hc1 : c < 1)
     (ht : 0 < t_b)
     (hfst : 0 ≤ fst) (hfst1 : fst < 1)
-    (h_pen_bound : bottleneckExcessLD Ne_b Ne_stable t_b < 1 - fst) :
-    R2_source * ((1 - fst) - bottleneckExcessLD Ne_b Ne_stable t_b) <
+    (h_pen_bound : bottleneckExcessLD Ne_b Ne_stable c t_b < 1 - fst) :
+    R2_source * ((1 - fst) - bottleneckExcessLD Ne_b Ne_stable c t_b) <
     R2_source * (1 - fst) := by
   apply mul_lt_mul_of_pos_left _ hR2
-  linarith [bottleneck_excess_ld_pos Ne_b Ne_stable t_b hNb hNs h_bottle ht]
+  linarith [bottleneck_excess_ld_pos Ne_b Ne_stable c t_b hNb h_bottle hc hc1 ht]
 
 /-- Populations that experienced expansion retain more pre-existing LD,
     meaning their LD structure is closer to the source population's LD

@@ -41,14 +41,124 @@ noncomputable def fstFromTau (tau : ℝ) : ℝ :=
 noncomputable def fstFromGenerations (t Ne : ℝ) : ℝ :=
   fstFromTau (coalescentTau t Ne)
 
-/-- Branchwise-to-pairwise `F_ST` map under independent drift from a common ancestor. -/
+/-- **Branchwise-to-pairwise `F_ST` map under independent drift from a common
+ancestor.**
+
+    Regime: small divergence, `F_ST` below about `0.05`. Multiplicative
+    composition is the right shape -- additive composition `fstS + fstT` is 53%
+    high at `T = 4000` -- and this map is within simulation error at the shortest
+    branch tested, but it degrades monotonically as divergence grows, and the
+    degradation is one-sided, always too high:
+
+        T      fstS     fstT   pairwise obs      se      this map    err
+      200    0.0461   0.0500     0.09314      0.00612    0.09366    +0.6%
+     1000    0.1867   0.1895     0.31845      0.00941    0.34075    +7.0%
+     2000    0.3374   0.3234     0.48780      0.01002    0.55098   +13.0%
+     4000    0.5029   0.4987     0.65365      0.00801    0.74948   +14.7%
+
+    Twelve to eighteen standard errors on the last two rows. Not an estimator
+    artifact: under Nei's estimator the same rows give -1.4%, +3.3%, +10.0%,
+    +14.2%.
+
+    The mechanism is derivable rather than empirical, and
+    `pairwiseFstFromBranches_eq_fstFromTau_add_mul` states it: composing
+    multiplicatively in `F_ST` is the same as composing *additively in coalescent
+    time* after inserting a spurious `tauS * tauT` of extra divergence time.
+    Coalescence times add along a path; `F_ST` values do not. At `tau` near `1`,
+    which is where `T = 4000` sits, that spurious term doubles the divergence
+    time, which is the sign and the size of the error above.
+    `pairwiseFstFromBranchTaus` is the same composition without it.
+
+    Empirical status: CONDITIONALLY VALID. -/
 noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
   1 - (1 - fstS) * (1 - fstT)
+
+/-- **Pairwise `F_ST` composed in coalescent time instead of in `F_ST`.**
+
+    Under the coalescent, two demes that split `tauS` and `tauT` ago from a
+    common ancestor have `E[T_between] = 1 + tauS + tauT` in units where
+    `E[T_within] = 1`, because expected coalescence times add along the path.
+    Hudson's ratio then gives `fstFromTau (tauS + tauT)` directly.
+
+    This is offered as a candidate for `pairwiseFstFromBranches`, not
+    substituted for it: recomputed against the four rows tabulated on that
+    definition it errs -5.4%, -1.2%, +3.4%, +2.4% where the multiplicative map
+    errs +0.6%, +7.0%, +13.0%, +14.7%.
+
+    Empirical status: UNTESTED. The four residuals just quoted are recomputed
+    from the table on `pairwiseFstFromBranches` rather than measured in a run of
+    their own, so they are a consistency check on the algebra and not an
+    independent validation. -/
+noncomputable def pairwiseFstFromBranchTaus (tauS tauT : ℝ) : ℝ :=
+  fstFromTau (tauS + tauT)
 
 @[simp] theorem pairwise_fst_decomposition (fstS fstT : ℝ) :
     pairwiseFstFromBranches fstS fstT = fstS + fstT - fstS * fstT := by
   unfold pairwiseFstFromBranches
   ring_nf
+
+/-- **What the multiplicative composition actually computes.**
+
+Feeding it two branch `F_ST` values that came from coalescent times `a` and `b`
+returns the `F_ST` of a single branch of length `a + b + a * b`. The `a * b` is
+the whole defect: it is divergence time that no branch spent. This identity is
+the derivation behind the regime note on `pairwiseFstFromBranches`, and it needs
+no simulation to state. -/
+theorem pairwiseFstFromBranches_eq_fstFromTau_add_mul (a b : ℝ)
+    (ha : 0 ≤ a) (hb : 0 ≤ b) :
+    pairwiseFstFromBranches (fstFromTau a) (fstFromTau b) =
+      fstFromTau (a + b + a * b) := by
+  have ha1 : (0 : ℝ) < 1 + a := by linarith
+  have hb1 : (0 : ℝ) < 1 + b := by linarith
+  have ha1' : (1 : ℝ) + a ≠ 0 := ne_of_gt ha1
+  have hb1' : (1 : ℝ) + b ≠ 0 := ne_of_gt hb1
+  have hab : (0 : ℝ) < 1 + (a + b + a * b) := by nlinarith
+  have hab' : (1 : ℝ) + (a + b + a * b) ≠ 0 := ne_of_gt hab
+  unfold pairwiseFstFromBranches fstFromTau
+  field_simp
+  ring
+
+/-- **The multiplicative map is strictly the larger of the two compositions**,
+for every pair of positive branch lengths. The bias has a sign, and it is the
+sign the simulation reports. -/
+theorem pairwiseFstFromBranchTaus_lt_pairwiseFstFromBranches (a b : ℝ)
+    (ha : 0 < a) (hb : 0 < b) :
+    pairwiseFstFromBranchTaus a b <
+      pairwiseFstFromBranches (fstFromTau a) (fstFromTau b) := by
+  rw [pairwiseFstFromBranches_eq_fstFromTau_add_mul a b ha.le hb.le]
+  unfold pairwiseFstFromBranchTaus fstFromTau
+  have h1 : (0 : ℝ) < 1 + (a + b) := by linarith
+  have h2 : (0 : ℝ) < 1 + (a + b + a * b) := by nlinarith
+  rw [div_lt_div_iff₀ h1 h2]
+  nlinarith [mul_pos ha hb]
+
+/-- **The gap between the two compositions is second order in the branch
+lengths.**  It is bounded by `eps ^ 2` when both branches are below `eps`, which
+is the precise sense in which the multiplicative map is accurate at small
+`F_ST` and the reason the `T = 200` row above agrees to `0.6%`. -/
+theorem pairwiseFst_composition_gap_le (a b eps : ℝ)
+    (ha : 0 ≤ a) (hb : 0 ≤ b) (hae : a ≤ eps) (hbe : b ≤ eps) :
+    pairwiseFstFromBranches (fstFromTau a) (fstFromTau b) -
+        pairwiseFstFromBranchTaus a b ≤ eps ^ 2 := by
+  have hab : 0 ≤ a * b := mul_nonneg ha hb
+  have h1 : (0 : ℝ) < 1 + (a + b) := by linarith
+  have h2 : (0 : ℝ) < 1 + (a + b + a * b) := by linarith
+  have h1' : (1 : ℝ) + (a + b) ≠ 0 := ne_of_gt h1
+  have h2' : (1 : ℝ) + (a + b + a * b) ≠ 0 := ne_of_gt h2
+  rw [pairwiseFstFromBranches_eq_fstFromTau_add_mul a b ha hb]
+  unfold pairwiseFstFromBranchTaus fstFromTau
+  have key : (a + b + a * b) / (1 + (a + b + a * b)) - (a + b) / (1 + (a + b)) =
+      a * b / ((1 + (a + b)) * (1 + (a + b + a * b))) := by
+    field_simp
+    ring
+  rw [key]
+  have hden : (0 : ℝ) < (1 + (a + b)) * (1 + (a + b + a * b)) := mul_pos h1 h2
+  have hone : (1 : ℝ) ≤ (1 + (a + b)) * (1 + (a + b + a * b)) := by nlinarith
+  have hstep : a * b / ((1 + (a + b)) * (1 + (a + b + a * b))) ≤ a * b := by
+    rw [div_le_iff₀ hden]
+    nlinarith
+  have hfinal : a * b ≤ eps ^ 2 := by nlinarith
+  linarith
 
 @[simp] theorem coalescenceCdfFromHazard_eq (hazard : ℝ → ℝ) (t : ℝ) :
     coalescenceCdfFromHazard hazard t =
@@ -267,6 +377,241 @@ theorem twoDemeIMEquilibriumDelta_lt_one (M : ℝ) (hM : 0 < M) :
   rw [div_lt_one (by linarith)]
   linarith
 
+/-!
+## The closed-population, no-mutation regime, made into an object
+
+Everything below that decays heterozygosity geometrically assumes a **closed
+population with no mutation**. That assumption used to live inside definition
+bodies, where nothing could contradict it. Simulation at demographic equilibrium
+with `Ne = 1000` measures the retention `het_A / het_anc` as
+
+       T = 200    1.010 ± 0.022    drift-only prediction 0.905
+       T = 1000   0.989 ± 0.022    drift-only prediction 0.607
+       T = 4000   1.025 ± 0.020    drift-only prediction 0.135
+
+so at `T = 4000` the recurrence predicts an 86 percent loss of heterozygosity
+and the population loses none: mutation replenishes diversity as fast as drift
+removes it. The cluster's `F_ST` is therefore near `0` exactly where the
+measurable between-population `F_ST` is `0.50`. These are not two calibrations of
+one quantity; they are different quantities sharing a name, which is why the same
+error was reproduced independently several times.
+
+This section makes the assumption an object rather than a habit.
+`hetStepWithMutation` is the recurrence *with* mutation; the closed-population
+recurrence is its `mu = 0` case (`hetTrajectory_of_no_mutation`);
+`hetMutationFloor` is the heterozygosity that the mutation term holds the
+population above forever (`hetTrajectory_ge_hetMutationFloor`); and
+`driftOnly_lt_hetTrajectory_of_below_floor` is the quantitative cost -- once the
+drift-only prediction dips below that floor it is strictly wrong, with no appeal
+to simulation. `ClosedPopulationNoMutation` carries the assumption in a field, so
+a use site has to discharge it instead of inheriting it silently.
+
+`Calibrator.DriftRegime` states the epistemic half of the same incident: why
+every cross-check inside the cluster passed.
+-/
+
+section ClosedPopulationRegime
+
+/-- **One generation of the heterozygosity recurrence, with mutation.**
+
+Drift removes a fraction `1/(2 Nₑ)` of the standing heterozygosity, and
+mutation converts a fraction `2 mu` of the identical pairs -- one chance per
+lineage -- back into non-identical ones. Dropping the second term is the
+closed-population assumption, and it is dropped nowhere in this definition.
+
+Composition convention: drift and mutation are applied to the same input state
+and added, which is the first-order model. The unlinearised infinite-alleles
+recursion multiplies `(1 - mu)²` against the drift factor and differs at
+`O(mu², mu/Nₑ)`.
+
+    Regime: none. This is the general recurrence; the closed population is the
+    special case `mu = 0`, recorded by `hetTrajectory_of_no_mutation`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def hetStepWithMutation (Ne mu H : ℝ) : ℝ :=
+  (1 - 1 / (2 * Ne)) * H + 2 * mu * (1 - H)
+
+/-- The heterozygosity trajectory generated by `hetStepWithMutation` from `H₀`.
+
+    Regime: none; carries whatever `mu` it is given.
+
+    Empirical status: UNTESTED. -/
+noncomputable def hetTrajectory (Ne mu H₀ : ℝ) : ℕ → ℝ
+  | 0 => H₀
+  | t + 1 => hetStepWithMutation Ne mu (hetTrajectory Ne mu H₀ t)
+
+/-- **The heterozygosity floor that mutation holds.**
+
+`theta / (1 + theta)` with `theta = 4 Nₑ mu`: the level at which mutational
+input balances drift loss. Below it the recurrence gains heterozygosity, above
+it the recurrence loses heterozygosity, and it is never crossed from above.
+This is the number the closed-population model sets to zero.
+
+    Regime: none. Its `mu = 0` value is `0`, which is the closed-population
+    assumption itself, and is why that model predicts unbounded loss.
+
+    Empirical status: UNTESTED as a formula, but the observation it explains is
+    measured: at demographic equilibrium the retention stays at `1.025 ± 0.020`
+    out to `T = 4000` where the floorless model predicts `0.135`. -/
+noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
+  4 * Ne * mu / (1 + 4 * Ne * mu)
+
+/-- **The floor is the rest point of the recurrence.**  Solving
+`(1 - 1/(2 Nₑ)) H + 2 mu (1 - H) = H` gives `H (1/(2 Nₑ) + 2 mu) = 2 mu`, i.e.
+`H = 4 Nₑ mu / (1 + 4 Nₑ mu)`. -/
+theorem hetMutationFloor_isFixedPoint (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 ≤ mu) :
+    hetStepWithMutation Ne mu (hetMutationFloor Ne mu) = hetMutationFloor Ne mu := by
+  have hNe' : Ne ≠ 0 := ne_of_gt hNe
+  have hprod : (0 : ℝ) ≤ 4 * Ne * mu := by positivity
+  have hd : (0 : ℝ) < 1 + 4 * Ne * mu := by linarith
+  have hd' : (1 : ℝ) + 4 * Ne * mu ≠ 0 := ne_of_gt hd
+  unfold hetStepWithMutation hetMutationFloor
+  field_simp
+  ring
+
+/-- **The closed-population recurrence is the `mu = 0` case, and nothing else.**
+This is the theorem that turns the assumption from a habit into a hypothesis:
+the geometric decay formula used throughout is the trajectory at exactly one
+value of the mutation rate. -/
+theorem hetTrajectory_of_no_mutation (Ne H₀ : ℝ) (t : ℕ) :
+    hetTrajectory Ne 0 H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ := by
+  induction t with
+  | zero => simp [hetTrajectory]
+  | succ n ih =>
+      simp only [hetTrajectory, hetStepWithMutation, ih]
+      ring
+
+/-- With mutation present the floor is absorbing from above: one step from a
+state at or above the floor lands at or above the floor. The contraction
+hypothesis `1/(2 Nₑ) + 2 mu ≤ 1` says only that the two forces together do not
+overshoot in a single generation. -/
+theorem hetStepWithMutation_ge_hetMutationFloor (Ne mu H : ℝ)
+    (hNe : 0 < Ne) (hmu : 0 ≤ mu)
+    (hcontract : 1 / (2 * Ne) + 2 * mu ≤ 1)
+    (hH : hetMutationFloor Ne mu ≤ H) :
+    hetMutationFloor Ne mu ≤ hetStepWithMutation Ne mu H := by
+  have hfp := hetMutationFloor_isFixedPoint Ne mu hNe hmu
+  have hslope : (0 : ℝ) ≤ 1 - 1 / (2 * Ne) - 2 * mu := by linarith
+  have hdiff : (0 : ℝ) ≤ H - hetMutationFloor Ne mu := by linarith
+  have key : hetStepWithMutation Ne mu H -
+      hetStepWithMutation Ne mu (hetMutationFloor Ne mu) =
+      (1 - 1 / (2 * Ne) - 2 * mu) * (H - hetMutationFloor Ne mu) := by
+    unfold hetStepWithMutation
+    ring
+  have hprod : (0 : ℝ) ≤
+      (1 - 1 / (2 * Ne) - 2 * mu) * (H - hetMutationFloor Ne mu) :=
+    mul_nonneg hslope hdiff
+  linarith [hfp, key, hprod]
+
+/-- **Heterozygosity never falls below the mutation floor, at any horizon.**
+This is the qualitative fact the closed-population model denies: it predicts
+decay to zero, and the simulated population at demographic equilibrium loses
+nothing in four thousand generations. -/
+theorem hetTrajectory_ge_hetMutationFloor (Ne mu H₀ : ℝ)
+    (hNe : 0 < Ne) (hmu : 0 ≤ mu)
+    (hcontract : 1 / (2 * Ne) + 2 * mu ≤ 1)
+    (hH₀ : hetMutationFloor Ne mu ≤ H₀) (t : ℕ) :
+    hetMutationFloor Ne mu ≤ hetTrajectory Ne mu H₀ t := by
+  induction t with
+  | zero => simpa [hetTrajectory] using hH₀
+  | succ n ih =>
+      simp only [hetTrajectory]
+      exact hetStepWithMutation_ge_hetMutationFloor Ne mu _ hNe hmu hcontract ih
+
+/-- **The quantitative cost of the closed-population assumption.**
+
+Once the drift-only prediction has fallen below the floor that mutation holds,
+it is strictly below the true heterozygosity -- for every mutation rate,
+starting value and horizon in range. This is the inequality that separates the
+drift-only quantity from the equilibrium one, in the same shape as
+`fstFromTau_lt_coalescenceCdf`, so the two can no longer be interchanged
+silently. -/
+theorem driftOnly_lt_hetTrajectory_of_below_floor (Ne mu H₀ : ℝ) (t : ℕ)
+    (hNe : 0 < Ne) (hmu : 0 ≤ mu)
+    (hcontract : 1 / (2 * Ne) + 2 * mu ≤ 1)
+    (hH₀ : hetMutationFloor Ne mu ≤ H₀)
+    (hbelow : (1 - 1 / (2 * Ne)) ^ t * H₀ < hetMutationFloor Ne mu) :
+    (1 - 1 / (2 * Ne)) ^ t * H₀ < hetTrajectory Ne mu H₀ t :=
+  lt_of_lt_of_le hbelow
+    (hetTrajectory_ge_hetMutationFloor Ne mu H₀ hNe hmu hcontract hH₀ t)
+
+/-- **The regime, as an object a use site must construct.**
+
+Any quantity computed from the geometric retention `(1 - 1/(2 Nₑ))^t` is a
+quantity about a population in this regime and about no other. Making the regime
+a structure puts the assumption in the type: `mutation_negligible` is the
+dimensionless condition, and it is stated against the floor that the recurrence
+actually has, not against a rate. If a caller cannot supply it, the
+closed-population answer is not available to them -- which is the whole point,
+since the falsified uses were all callers who could not have supplied it. -/
+structure ClosedPopulationNoMutation where
+  /-- Effective population size. -/
+  Ne : ℝ
+  /-- Mutation rate per generation. -/
+  mu : ℝ
+  /-- Ancestral heterozygosity. -/
+  H₀ : ℝ
+  /-- Number of generations the model is used over. -/
+  horizon : ℕ
+  /-- The fraction of `H₀` that the caller is willing to be wrong by. -/
+  tolerance : ℝ
+  Ne_pos : 0 < Ne
+  mu_nonneg : 0 ≤ mu
+  H₀_pos : 0 < H₀
+  tolerance_pos : 0 < tolerance
+  /-- Drift and mutation together do not overshoot in one generation. -/
+  forces_contract : 1 / (2 * Ne) + 2 * mu ≤ 1
+  /-- **The standing assumption, in the type.** The heterozygosity floor that
+  mutation holds is a negligible fraction of the ancestral heterozygosity. At
+  `Ne = 1000` and the mutation rate of the simulation this fails outright: the
+  floor is the whole of `H₀`, which is why the measured retention is `1.025`. -/
+  mutation_negligible : hetMutationFloor Ne mu ≤ tolerance * H₀
+
+/-- The closed-population retention over the model's horizon.
+
+    Regime: closed population, no mutation -- carried by the structure's
+    `mutation_negligible` field rather than assumed.
+
+    Empirical status: FALSIFIED outside the regime. At demographic equilibrium
+    with `Ne = 1000`, `t = 4000` this is `0.135` and the measurement is
+    `1.025 ± 0.020`. Inside the regime it is untested. -/
+noncomputable def ClosedPopulationNoMutation.retention
+    (r : ClosedPopulationNoMutation) : ℝ :=
+  (1 - 1 / (2 * r.Ne)) ^ r.horizon
+
+/-- Within-population heterozygosity loss over the horizon. Note the name: this
+is a heterozygosity ratio inside one population, not a between-population
+variance ratio, and it must not be read as `F_ST`.
+
+    Regime: closed population, no mutation.
+
+    Empirical status: FALSIFIED outside the regime; see
+    `ClosedPopulationNoMutation.retention`. -/
+noncomputable def ClosedPopulationNoMutation.heterozygosityLoss
+    (r : ClosedPopulationNoMutation) : ℝ :=
+  1 - r.retention
+
+/-- Target heterozygosity after the horizon.
+
+    Regime: closed population, no mutation.
+
+    Empirical status: FALSIFIED outside the regime; see
+    `ClosedPopulationNoMutation.retention`. -/
+noncomputable def ClosedPopulationNoMutation.targetHet
+    (r : ClosedPopulationNoMutation) : ℝ :=
+  r.H₀ * r.retention
+
+/-- The regime's own prediction is the trajectory at `mu = 0`, which is the
+statement that the structure and the recurrence describe the same model. -/
+theorem ClosedPopulationNoMutation.targetHet_eq_trajectory_of_no_mutation
+    (r : ClosedPopulationNoMutation) :
+    r.targetHet = hetTrajectory r.Ne 0 r.H₀ r.horizon := by
+  rw [hetTrajectory_of_no_mutation]
+  unfold ClosedPopulationNoMutation.targetHet ClosedPopulationNoMutation.retention
+  ring
+
+end ClosedPopulationRegime
+
 section PresentDayMetrics
 
 /-- PGS variance from the additive model under HWE.
@@ -279,16 +624,41 @@ the average heterozygosity 2p(1-p) (or its sum, depending on normalisation).
 noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
   β_sq_sum * het
 
-/-- Target-population heterozygosity under drift, derived from the definition of Fst.
-Fst is DEFINED as 1 - E[H_target]/H_source (the proportional reduction in
-expected heterozygosity due to drift), so E[H_target] = H_source × (1 - Fst).
-This connects to the heterozygosity recurrence `hetPostDrift` proved elsewhere:
-after `t` generations of Wright-Fisher drift with effective size N,
-H_t = H_0 × (1 - 1/(2N))^t, giving Fst = 1 - (1 - 1/(2N))^t.
+/-- Target-population heterozygosity from a heterozygosity-loss fraction.
 
-    Empirical status: UNTESTED. -/
+This definition carries no independent content: `fst` here is *defined* as the
+proportional reduction `1 - H_target/H_source`, so `H_target = H_source (1 - fst)`
+is that definition rearranged. It is true for every value of `fst`, which is
+exactly why it could not detect that the value being supplied was wrong.
+
+Its previous docstring made the claim that failed. It read: "after `t`
+generations of Wright-Fisher drift with effective size N, `H_t = H_0 (1 -
+1/(2N))^t`, giving `Fst = 1 - (1 - 1/(2N))^t`." Both halves are wrong as
+written. The recurrence holds only in the closed-population, no-mutation regime
+-- at demographic equilibrium with `Ne = 1000`, `t = 4000` it predicts a
+retention of `0.135` where the measurement is `1.025 ± 0.020`, an 86 percent
+error -- and the resulting quantity is a within-population heterozygosity ratio,
+not a between-population `F_ST`. Where that recurrence is wanted, construct a
+`ClosedPopulationNoMutation` and use `ClosedPopulationNoMutation.targetHet`,
+which carries the assumption in its type;
+`ClosedPopulationNoMutation.targetHet_eq_targetHetFromFst` is the bridge.
+
+    Empirical status: VACUOUS. This is an algebraic rearrangement of the
+    definition of its own second argument, so no measurement can bear on it; the
+    empirical content lives entirely in whatever supplies `fst`. -/
 noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
   het_source * (1 - fst)
+
+/-- The regime object's target heterozygosity is `targetHetFromFst` applied to
+its own loss fraction. Stating it here is what keeps the tautology visible: the
+identity holds for every retention value, correct or not, which is
+`Calibrator.DriftRegime.cluster_identities_hold_at_every_retention`. -/
+theorem ClosedPopulationNoMutation.targetHet_eq_targetHetFromFst
+    (r : ClosedPopulationNoMutation) :
+    r.targetHet = targetHetFromFst r.H₀ r.heterozygosityLoss := by
+  unfold ClosedPopulationNoMutation.targetHet
+    ClosedPopulationNoMutation.heterozygosityLoss targetHetFromFst
+  ring
 
 /-- Target-population PGS variance derived from the additive model and Fst.
 Derivation:
@@ -336,14 +706,30 @@ theorem targetPGSVariance_eq_presentDay (V_A fst : ℝ) :
 noncomputable def wrightFisherDriftRetention (N t : ℕ) : ℝ :=
   (1 - 1 / (2 * (N : ℝ))) ^ t
 
-/-- Exact discrete Wright-Fisher branch drift index after `t` generations. -/
-noncomputable def wrightFisherFst (N t : ℕ) : ℝ :=
+/-- **Within-population heterozygosity loss after `t` generations of drift.**
+
+    This was called `wrightFisherFst`. It is not an `F_ST`: it is the
+    proportional loss of heterozygosity *inside* one population, and a
+    heterozygosity ratio within a population is not a between-population variance
+    ratio. Under that name it was read as a split `F_ST` throughout, which is the
+    substitution that made the cluster wrong.
+
+    Regime: closed population, no mutation, inherited from
+    `wrightFisherDriftRetention`. At demographic equilibrium the measured
+    retention is `1.025 ± 0.020` at `Ne = 1000`, `t = 4000` where this formula's
+    retention is `0.135`, so this quantity is near `0.865` where the measurable
+    between-population `F_ST` is `0.50`.
+
+    Empirical status: FALSIFIED as a split `F_ST`; UNTESTED as heterozygosity
+    loss in the regime it names. Use `ClosedPopulationNoMutation` when the
+    regime is meant, and `fstFromTau` when a split `F_ST` is meant. -/
+noncomputable def wrightFisherHeterozygosityLoss (N t : ℕ) : ℝ :=
   1 - wrightFisherDriftRetention N t
 
-theorem wrightFisherFst_eq
+theorem wrightFisherHeterozygosityLoss_eq
     (N t : ℕ) :
-    wrightFisherFst N t = 1 - (1 - 1 / (2 * (N : ℝ))) ^ t := by
-  simp [wrightFisherFst, wrightFisherDriftRetention]
+    wrightFisherHeterozygosityLoss N t = 1 - (1 - 1 / (2 * (N : ℝ))) ^ t := by
+  simp [wrightFisherHeterozygosityLoss, wrightFisherDriftRetention]
 
 private lemma wrightFisherBase_bounds (N : ℕ) (hN : 0 < N) :
     0 < 1 - 1 / (2 * (N : ℝ)) ∧ 1 - 1 / (2 * (N : ℝ)) ≤ 1 := by
@@ -357,22 +743,22 @@ private lemma wrightFisherBase_bounds (N : ℕ) (hN : 0 < N) :
   · have := div_nonneg (le_refl (0 : ℝ) |>.trans (by norm_num : (0:ℝ) ≤ 1)) (le_of_lt hpos)
     linarith
 
-theorem wrightFisherFst_nonneg
+theorem wrightFisherHeterozygosityLoss_nonneg
     (N t : ℕ)
     (hN : 0 < N) :
-    0 ≤ wrightFisherFst N t := by
+    0 ≤ wrightFisherHeterozygosityLoss N t := by
   obtain ⟨hbase_pos, hbase_le_one⟩ := wrightFisherBase_bounds N hN
-  rw [wrightFisherFst_eq]
+  rw [wrightFisherHeterozygosityLoss_eq]
   have : (1 - 1 / (2 * (N : ℝ))) ^ t ≤ 1 :=
     pow_le_one₀ (le_of_lt hbase_pos) hbase_le_one
   linarith
 
-theorem wrightFisherFst_lt_one
+theorem wrightFisherHeterozygosityLoss_lt_one
     (N t : ℕ)
     (hN : 0 < N) :
-    wrightFisherFst N t < 1 := by
+    wrightFisherHeterozygosityLoss N t < 1 := by
   obtain ⟨hbase_pos, _⟩ := wrightFisherBase_bounds N hN
-  rw [wrightFisherFst_eq]
+  rw [wrightFisherHeterozygosityLoss_eq]
   have : 0 < (1 - 1 / (2 * (N : ℝ))) ^ t := pow_pos hbase_pos t
   linarith
 
@@ -471,15 +857,16 @@ theorem expected_abs_mean_shift_of_wrightFisher
     (hVA_pos : 0 < V_A)
     (hNS : 0 < NS)
     (hNT : 0 < NT) :
-    Expected_Abs_Shift V_A (wrightFisherFst NS tS) (wrightFisherFst NT tT) /
-        Real.sqrt (presentDayPGSVariance V_A (wrightFisherFst NS tS)) =
+    Expected_Abs_Shift V_A (wrightFisherHeterozygosityLoss NS tS)
+          (wrightFisherHeterozygosityLoss NT tT) /
+        Real.sqrt (presentDayPGSVariance V_A (wrightFisherHeterozygosityLoss NS tS)) =
       2 * Real.sqrt
-        ((wrightFisherFst NS tS + wrightFisherFst NT tT) /
-          (Real.pi * (1 - wrightFisherFst NS tS))) := by
+        ((wrightFisherHeterozygosityLoss NS tS + wrightFisherHeterozygosityLoss NT tT) /
+          (Real.pi * (1 - wrightFisherHeterozygosityLoss NS tS))) := by
   apply expected_abs_mean_shift_bound_proved
   · exact hVA_pos
-  · exact add_nonneg (wrightFisherFst_nonneg NS tS hNS) (wrightFisherFst_nonneg NT tT hNT)
-  · exact wrightFisherFst_lt_one NS tS hNS
+  · exact add_nonneg (wrightFisherHeterozygosityLoss_nonneg NS tS hNS) (wrightFisherHeterozygosityLoss_nonneg NT tT hNT)
+  · exact wrightFisherHeterozygosityLoss_lt_one NS tS hNS
 
 /-- Present-day signal-to-noise ratio for prediction under drift. -/
 noncomputable def presentDaySignalToNoise (V_A V_E fst : ℝ) : ℝ :=
@@ -2553,11 +2940,108 @@ theorem targetR2_lt_source_from_neutralAF_benchmark
   simpa [targetR2FromNeutralAFBenchmark] using
     drift_degrades_R2 V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
 
-/-- Neutral allele-frequency benchmark ratio from observable source/target
-`F_ST`. This is a coarse heterozygosity benchmark only, not a mechanistic law
-for cross-population tagging fidelity. -/
+/-- **Neutral allele-frequency benchmark ratio from source/target `F_ST`.**
+
+    On asymmetric effective sizes it is `-37%` to `-74%` low, at nine to fifteen
+    standard errors:
+
+        T    NeA    NeB     fstS     fstT   het_B/het_A   se      this def   err
+      500    200   2000   0.3577   0.0582     3.7862    0.2547    1.4662   -61.3%
+     1000    200   2000   0.4860   0.1187     6.5409    0.3445    1.7147   -73.8%
+     1000    500   5000   0.3165   0.0450     2.2220    0.0771    1.3972   -37.1%
+     2000    300   3000   0.5611   0.1454     5.7238    0.2201    1.9472   -66.0%
+
+    The earlier record of `VALIDATED to 3.2%` was an artifact of a symmetric
+    design: with equal branch lengths both sides of the ratio collapse to about
+    `1`, so the test had no power to reject a wrong functional form.
+    `Calibrator.DriftRegime.symmetric_design_has_no_power` proves that on any
+    symmetric design this form and its *square* are indistinguishable.
+
+    The defect is not a miscalibration, it is the wrong argument list. The
+    observed ratio is `2.2` to `6.5` and is driven by the tenfold ratio in
+    effective size, not by `F_ST`: heterozygosity is governed by `Nₑ` and the
+    mutation floor `hetMutationFloor`, and `F_ST` is a between-population
+    variance ratio that does not determine either. This is quantitative and
+    needs no simulation to see --
+    `neutralAFBenchmarkRatio_cannot_reach_measured` shows that at the measured
+    `fstSource = 0.3577` this expression cannot exceed `1.557` for *any* target
+    `F_ST` whatsoever, while the measurement at that design point is
+    `3.79 ± 0.25`. No calibration of `fstTarget` repairs it; the observable is
+    outside the formula's range.
+
+    No replacement is substituted here. `hetRatioBetweenBranches` is a
+    clearly-labelled candidate for testing, and it is a function of the two
+    effective sizes, the mutation rate and the horizon, which is what the data
+    say the quantity depends on.
+
+    Empirical status: FALSIFIED. -/
 noncomputable def neutralAFBenchmarkRatio (fstSource fstTarget : ℝ) : ℝ :=
   (1 - fstTarget) / (1 - fstSource)
+
+/-- The benchmark ratio is bounded above by `1/(1 - fstSource)` for every target
+`F_ST` in range, because its numerator is at most `1`. -/
+theorem neutralAFBenchmarkRatio_le_inv_one_sub_source (fstSource fstTarget : ℝ)
+    (h0 : 0 ≤ fstTarget) (h1 : fstSource < 1) :
+    neutralAFBenchmarkRatio fstSource fstTarget ≤ 1 / (1 - fstSource) := by
+  have hpos : (0 : ℝ) < 1 - fstSource := by linarith
+  unfold neutralAFBenchmarkRatio
+  rw [div_le_div_iff₀ hpos hpos]
+  nlinarith
+
+/-- **The measured value is outside the formula's range.**
+
+At the design point `fstSource = 0.3577` the benchmark ratio is below `3` for
+every target `F_ST` -- its supremum there is `1/(1 - 0.3577) = 1.557`. The
+measured heterozygosity ratio at that point is `3.79 ± 0.25`, more than nine
+standard errors above `3`. This is the falsification in a form that does not
+depend on the simulation being rerun: no choice of the free argument brings the
+expression into the measured range. -/
+theorem neutralAFBenchmarkRatio_cannot_reach_measured (fstTarget : ℝ)
+    (h0 : 0 ≤ fstTarget) :
+    neutralAFBenchmarkRatio (3577 / 10000) fstTarget < 3 := by
+  have hbound :=
+    neutralAFBenchmarkRatio_le_inv_one_sub_source (3577 / 10000) fstTarget h0
+      (by norm_num)
+  have hnum : (1 : ℝ) / (1 - 3577 / 10000) < 3 := by norm_num
+  linarith
+
+/-- **Candidate replacement, offered for testing and deliberately not
+substituted.**
+
+The ratio of present-day heterozygosities between two branches that started
+from the same ancestral value, as a function of the two effective sizes, the
+mutation rate and the horizon -- which is what the measurement says it depends
+on. It reduces to `1` when the effective sizes agree, and unlike
+`neutralAFBenchmarkRatio` it has the dynamic range the data require:
+`hetRatioBetweenBranches_exceeds_benchmark_ceiling` puts it above `3` at a
+two-generation, tenfold-`Nₑ` design point where the benchmark form is capped at
+`1.557`.
+
+    Regime: none baked in; the closed population is the `mu = 0` case, and the
+    mutation floor enters through `hetTrajectory`.
+
+    Empirical status: UNTESTED. This is written from the recurrence, not fitted
+    to the four rows tabulated on `neutralAFBenchmarkRatio`, and the user has
+    the simulation capability to adjudicate it. -/
+noncomputable def hetRatioBetweenBranches (NeA NeB mu H₀ : ℝ) (t : ℕ) : ℝ :=
+  hetTrajectory NeB mu H₀ t / hetTrajectory NeA mu H₀ t
+
+/-- Equal effective sizes give a ratio of `1`, so the whole signal in this
+quantity is the asymmetry in `Nₑ` -- the variable the falsified form omits. -/
+theorem hetRatioBetweenBranches_self (Ne mu H₀ : ℝ) (t : ℕ)
+    (h : hetTrajectory Ne mu H₀ t ≠ 0) :
+    hetRatioBetweenBranches Ne Ne mu H₀ t = 1 :=
+  div_self h
+
+/-- **The candidate has the range the measurement needs and the falsified form
+does not.**  At `Nₑ_A = 1`, `Nₑ_B = 5`, no mutation and two generations the
+ratio is `81/25 = 3.24`, above the ceiling that
+`neutralAFBenchmarkRatio_cannot_reach_measured` places on the benchmark form. -/
+theorem hetRatioBetweenBranches_exceeds_benchmark_ceiling :
+    3 < hetRatioBetweenBranches 1 5 0 1 2 := by
+  unfold hetRatioBetweenBranches
+  rw [hetTrajectory_of_no_mutation, hetTrajectory_of_no_mutation]
+  norm_num
 
 /-- The neutral allele-frequency benchmark target `R²` is definitionally the
 literal present-day target `R²` in this coarse chart. -/

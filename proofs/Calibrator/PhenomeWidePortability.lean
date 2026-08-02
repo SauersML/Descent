@@ -37,6 +37,17 @@ section TraitClassification
 noncomputable def neutralPortabilityRatioLD (fst_additional ld_factor : ℝ) : ℝ :=
   (1 - fst_additional) * ld_factor
 
+/-- **Cross-check: the neutral transport summary and the post-drift score
+variance are one map.** `PortabilityDrift.presentDayPGSVariance` attenuates an
+ancestral variance by `1 - F_ST`; this attenuates an LD factor by
+`1 - F_ST_additional`. Different quantities, one attenuation, and the argument
+order is the only thing that differs. -/
+theorem neutralPortabilityRatioLD_eq_presentDayPGSVariance
+    (fst_additional ld_factor : ℝ) :
+    neutralPortabilityRatioLD fst_additional ld_factor =
+      presentDayPGSVariance ld_factor fst_additional := by
+  unfold neutralPortabilityRatioLD presentDayPGSVariance; ring
+
 /-- Neutral ratio is in [0, 1] under valid parameters. -/
 theorem neutral_ratio_in_unit (fst ld : ℝ)
     (h_fst : 0 ≤ fst) (h_fst1 : fst ≤ 1)
@@ -71,7 +82,10 @@ Concretely, define:
   selectedDriftFactor(Ne, t, s)  = (1 - 1/(2*Ne) + s_correction)^t
 
 where 0 < s_correction < 1/(2*Ne), so the selected drift factor per
-generation is strictly larger (closer to 1) than the neutral one.
+generation is strictly larger (closer to 1) than the neutral one but still at
+most 1. Both halves of that range are load-bearing and both are now hypotheses
+of every theorem below: the lower bound gives the strict inequality, the upper
+bound is what keeps `fstFromDriftFactor` from returning a negative F_ST.
 
 Since heterozygosity_selected = H_0 * selectedDriftFactor > H_0 * neutralDriftFactor = heterozygosity_neutral,
 and Fst = 1 - H_between / H_total = 1 - driftFactor (in the island model),
@@ -93,17 +107,45 @@ noncomputable def neutralDriftFactor (Ne : ℝ) (t : ℕ) : ℝ :=
   (1 - 1 / (2 * Ne)) ^ t
 
 /-- **Selected drift factor per generation.**
-    Under stabilizing selection with correction s_correction > 0, the
+    Under stabilizing selection with correction s_correction, the
     per-generation heterozygosity retention is higher:
     (1 - 1/(2*Ne) + s_correction)^t.
     The s_correction term reflects selection maintaining polymorphism
-    at causal loci, reducing the effective drift rate. -/
+    at causal loci, reducing the effective drift rate.
+
+    **Admissible range.** `s_correction` must satisfy
+    `0 < s_correction < 1/(2*Ne)`. The prose above this definition always said
+    so; the definition and every theorem about it used to hypothesize only
+    `0 < s_correction`, and above the upper bound the base exceeds `1`, the
+    factor grows without bound in `t`, and `fstFromDriftFactor` returns a
+    negative `F_ST` that then flows into `causalPortabilityFromLocalFst` and
+    `better_than_neutral_implies_stabilizing_selection`. The bound is now in the
+    hypotheses of every theorem here, and `selectedDriftFactor_mem_unit` /
+    `fst_from_selectedDriftFactor_mem_unit` state the ranges so a replacement
+    body that escapes them cannot typecheck.
+
+    **`s_correction` is a free knob, not a derived quantity.** Nothing in this
+    file or the corpus defines it in terms of a selection coefficient, a fitness
+    function, or a stabilizing-selection model; it is a parameter whose sign and
+    magnitude are assumed, and the theorems below establish only what follows
+    from those assumptions. Deriving it from a stabilizing-selection model --
+    which would fix its dependence on the selection strength, the number of
+    loci, and `Ne` -- has not been done, and until it is, the results here are
+    conditional on the assumption rather than evidence for it.
+
+    Empirical status: UNTESTED. -/
 noncomputable def selectedDriftFactor (Ne : ℝ) (t : ℕ) (s_correction : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne) + s_correction) ^ t
 
 /-- **Fst from a drift factor.**
     In the island/drift model, Fst = 1 - driftFactor, where driftFactor
     is the fraction of ancestral heterozygosity retained.
+
+    This map returns a valid `F_ST` only for `driftFactor ∈ (0, 1]`. It has no
+    clamp of its own, deliberately: the constraint belongs on the factor it is
+    fed, and `fstFromDriftFactor_mem_unit` below states exactly which inputs are
+    admissible. Feeding it a factor above `1` -- which `selectedDriftFactor`
+    used to permit -- returns a negative `F_ST`.
 
     Empirical status: UNTESTED.
 
@@ -112,17 +154,75 @@ noncomputable def selectedDriftFactor (Ne : ℝ) (t : ℕ) (s_correction : ℝ) 
 noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
   1 - driftFactor
 
+/-- **Cross-check: `1 - F_ST` read forwards and backwards.**
+`PortabilityDrift.freqCorrFromFst` sends `F_ST` to the retained
+frequency correlation; `fstFromDriftFactor` sends the retained drift factor
+back to `F_ST`. They are the same involution, and stating it keeps the two
+directions from acquiring different conventions. -/
+theorem fstFromDriftFactor_eq_freqCorrFromFst (driftFactor : ℝ) :
+    fstFromDriftFactor driftFactor = freqCorrFromFst driftFactor := by
+  unfold fstFromDriftFactor freqCorrFromFst; ring
+
+/-- **`F_ST` from an admissible drift factor lies in `[0, 1)`.**
+    The range constraint, stated so that a replacement body producing values
+    outside it no longer typechecks as this definition. -/
+theorem fstFromDriftFactor_mem_unit (driftFactor : ℝ)
+    (h_pos : 0 < driftFactor) (h_le : driftFactor ≤ 1) :
+    0 ≤ fstFromDriftFactor driftFactor ∧ fstFromDriftFactor driftFactor < 1 := by
+  unfold fstFromDriftFactor
+  exact ⟨by linarith, by linarith⟩
+
+/-- **The neutral drift factor is an admissible input**: it lies in `(0, 1]`. -/
+theorem neutralDriftFactor_mem_unit (Ne : ℝ) (t : ℕ)
+    (h_base_pos : 0 < 1 - 1 / (2 * Ne)) (h_base_le : 1 - 1 / (2 * Ne) ≤ 1) :
+    0 < neutralDriftFactor Ne t ∧ neutralDriftFactor Ne t ≤ 1 := by
+  unfold neutralDriftFactor
+  exact ⟨pow_pos h_base_pos t, pow_le_one₀ (le_of_lt h_base_pos) h_base_le⟩
+
+/-- **The selected drift factor is an admissible input**, but only inside the
+    stated range for `s_correction`. Above `1/(2*Ne)` the per-generation base
+    exceeds `1` and this fails -- which is how a negative `F_ST` used to reach
+    the portability results. -/
+theorem selectedDriftFactor_mem_unit (Ne : ℝ) (t : ℕ) (s_correction : ℝ)
+    (h_s_pos : 0 < s_correction)
+    (h_s_lt : s_correction < 1 / (2 * Ne))
+    (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
+    0 < selectedDriftFactor Ne t s_correction ∧
+      selectedDriftFactor Ne t s_correction ≤ 1 := by
+  unfold selectedDriftFactor
+  have h_pos : 0 < 1 - 1 / (2 * Ne) + s_correction := by linarith
+  have h_le : 1 - 1 / (2 * Ne) + s_correction ≤ 1 := by linarith
+  exact ⟨pow_pos h_pos t, pow_le_one₀ (le_of_lt h_pos) h_le⟩
+
+/-- **`F_ST` at selected loci stays in `[0, 1)`.** This is the bound the old
+    hypotheses did not enforce: with only `0 < s_correction`, this quantity went
+    negative and fed `causalPortabilityFromLocalFst` and
+    `better_than_neutral_implies_stabilizing_selection` unchecked. -/
+theorem fst_from_selectedDriftFactor_mem_unit (Ne : ℝ) (t : ℕ) (s_correction : ℝ)
+    (h_s_pos : 0 < s_correction)
+    (h_s_lt : s_correction < 1 / (2 * Ne))
+    (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
+    0 ≤ fstFromDriftFactor (selectedDriftFactor Ne t s_correction) ∧
+      fstFromDriftFactor (selectedDriftFactor Ne t s_correction) < 1 := by
+  obtain ⟨hp, hle⟩ :=
+    selectedDriftFactor_mem_unit Ne t s_correction h_s_pos h_s_lt h_base_pos
+  exact fstFromDriftFactor_mem_unit _ hp hle
+
 /-- **Selected drift factor exceeds neutral drift factor.**
     Since s_correction > 0, the per-generation retention rate is strictly
     higher for selected loci, and raising to the t-th power preserves
     the strict inequality (for t ≥ 1). -/
 theorem selected_drift_factor_gt_neutral (Ne : ℝ) (t : ℕ) (s_correction : ℝ)
     (h_s_pos : 0 < s_correction)
-    -- ensures the per-generation factor is in (0, 1)
+    -- keeps the per-generation factor at or below 1; without it the factor
+    -- exceeds 1 and the induced F_ST goes negative
+    (h_s_lt : s_correction < 1 / (2 * Ne))
     (h_t_pos : 1 ≤ t)
     -- the neutral per-generation factor is positive
     (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
     neutralDriftFactor Ne t < selectedDriftFactor Ne t s_correction := by
+  have _hrange :=
+    selectedDriftFactor_mem_unit Ne t s_correction h_s_pos h_s_lt h_base_pos
   unfold neutralDriftFactor selectedDriftFactor
   have h_base_lt : 1 - 1 / (2 * Ne) < 1 - 1 / (2 * Ne) + s_correction := by
     linarith
@@ -137,13 +237,14 @@ theorem selected_drift_factor_gt_neutral (Ne : ℝ) (t : ℕ) (s_correction : �
     at causal loci relative to neutral sites. -/
 theorem stabilizing_selection_reduces_fst (Ne : ℝ) (t : ℕ) (s_correction : ℝ)
     (h_s_pos : 0 < s_correction)
+    (h_s_lt : s_correction < 1 / (2 * Ne))
     (h_t_pos : 1 ≤ t)
     (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
     fstFromDriftFactor (selectedDriftFactor Ne t s_correction) <
       fstFromDriftFactor (neutralDriftFactor Ne t) := by
   unfold fstFromDriftFactor
   linarith [selected_drift_factor_gt_neutral Ne t s_correction
-    h_s_pos h_t_pos h_base_pos]
+    h_s_pos h_s_lt h_t_pos h_base_pos]
 
 /-- **Corollary: Fst at causal loci is strictly less than Fst at neutral loci.**
     This is the exact condition needed by the portability theorem below.
@@ -152,13 +253,14 @@ theorem stabilizing_selection_reduces_fst (Ne : ℝ) (t : ℕ) (s_correction : �
 theorem fst_causal_lt_fst_neutral_of_stabilizing_selection
     (Ne : ℝ) (t : ℕ) (s_correction : ℝ)
     (h_s_pos : 0 < s_correction)
+    (h_s_lt : s_correction < 1 / (2 * Ne))
     (h_t_pos : 1 ≤ t)
     (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
     let fst_causal := fstFromDriftFactor (selectedDriftFactor Ne t s_correction)
     let fst_neutral := fstFromDriftFactor (neutralDriftFactor Ne t)
     fst_causal < fst_neutral := by
   exact stabilizing_selection_reduces_fst Ne t s_correction
-    h_s_pos h_t_pos h_base_pos
+    h_s_pos h_s_lt h_t_pos h_base_pos
 
 /-- Effect-size-weighted retained causal portability from a locus-specific
 causal-`F_ST` profile, resolved per locus rather than as a trait-wide scalar.

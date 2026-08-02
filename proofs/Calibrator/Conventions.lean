@@ -112,6 +112,16 @@ theorem fstFromDrift_uses_coalescentTimeScale (t : ℕ) (Ne : ℝ) :
     heterozygosityLossFromDrift t Ne = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
   unfold heterozygosityLossFromDrift; rw [coalescentTimeScale_eq]
 
+/-- **Cross-check: the within-deme coalescence time carries the same two.**
+`PortabilityDrift.twoDemeIMEquilibriumETss` is `2` in units of `Nₑ`
+generations, and that two is the ploidy: `E[T_within] = ploidy · Nₑ`
+generations is `coalescentTimeScale`, which is `2 Nₑ`. Writing the constant
+without saying so left a bare numeral in an equilibrium; this theorem says
+which two it is. -/
+theorem twoDemeIMEquilibriumETss_eq_ploidy (M : ℝ) :
+    twoDemeIMEquilibriumETss M = ploidy := by
+  unfold twoDemeIMEquilibriumETss ploidy; ring
+
 end Ploidy
 
 section Differentiation
@@ -121,11 +131,33 @@ section Differentiation
     Empirical status: UNTESTED. -/
 noncomputable def meanAlleleFreq (p₁ p₂ : ℝ) : ℝ := (p₁ + p₂) / 2
 
+/-! ### The arithmetic mean of two, shared with the migration rates
+
+`meanAlleleFreq` averages two subgroup allele frequencies;
+`PopulationGeneticsFoundations.effectiveMigration` and
+`PortabilityDrift.effectiveSymmetricMigration` average two directional
+migration rates. Three different quantities, one map, and an equal-weight
+convention that has to be the same equal-weight convention in all three or the
+`F_ST` these feed disagrees with itself. -/
+
+theorem effectiveMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
+    effectiveMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
+  unfold effectiveMigration meanAlleleFreq; ring
+
+theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
+    effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
+  unfold effectiveSymmetricMigration meanAlleleFreq; ring
+
 /-- **Hudson's `F_ST` for two subgroups**, as one minus the ratio of mean
 within-subgroup heterozygosity to total heterozygosity. Restored as a
 definition so that `F` denotes a quantity rather than a name; it had been
 deleted as unreferenced, which is precisely why `F` in the spike was free to
-mean anything. -/
+mean anything.
+
+    Empirical status: UNTESTED. Simulation recovers the spike constant against
+    `F` measured this way (see `four_hudsonFst_eq_standardizedContrastVariance`
+    below), but the estimator itself has not been checked against a simulated
+    `F_ST`. -/
 noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
   1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) /
     (ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
@@ -302,10 +334,6 @@ theorem equilibriumFst_eq_scaled (Ne m : ℝ) :
 `DemographicHistory` and `LDDecayTheory` under three names. It is the
 reciprocal of the coalescent time scale in each. -/
 
-theorem longitudinalDriftDecayRate_eq_inv_timeScale (Ne : ℝ) :
-    longitudinalDriftDecayRate Ne = 1 / coalescentTimeScale Ne := by
-  unfold longitudinalDriftDecayRate; rw [coalescentTimeScale_eq]
-
 theorem driftLDCreationRate_eq_inv_timeScale (Ne : ℝ) :
     driftLDCreationRate Ne = 1 / coalescentTimeScale Ne := by
   unfold driftLDCreationRate; rw [coalescentTimeScale_eq]
@@ -313,6 +341,14 @@ theorem driftLDCreationRate_eq_inv_timeScale (Ne : ℝ) :
 theorem ldDecayRatePerGen_eq_inv_timeScale (Ne : ℝ) :
     ldDecayRatePerGen Ne = 1 / coalescentTimeScale Ne := by
   unfold ldDecayRatePerGen; rw [coalescentTimeScale_eq]
+
+/-- **Cross-check: the `2 Nₑ` inside `coalFst` is the coalescent time scale.**
+`coalFst t Ne = t / (t + 2 Nₑ)` is `t / (t + E[T_within])`, and `E[T_within]`
+is `ploidy · Nₑ` generations. Writing the two inline left the constant free;
+this states which two it is. -/
+theorem coalFst_uses_coalescentTimeScale (t Ne : ℝ) :
+    coalFst t Ne = t / (t + coalescentTimeScale Ne) := by
+  unfold coalFst; rw [coalescentTimeScale_eq]
 
 /-! ### The coalescent `F_ST` map, no longer written out twice
 
@@ -323,15 +359,12 @@ against branch-mode divergence where the drift formula was biased upward by up
 to 28 percent, so it is the survivor; `fstFromCoalescenceTime` has been deleted
 and its uses in `DemographicHistory` now call `coalFst` directly. -/
 
-/-! ### The harmonic mean, written out twice
+/-! ### The harmonic mean, no longer written out twice
 
-`MetricSpecificPortability.f1ScoreMetric` and `OpenQuestions.f1Score` are the
-same expression under two names in two modules, with no theorem relating
-them. -/
-
-theorem f1ScoreMetric_eq_f1Score (precision sens : ℝ) :
-    f1ScoreMetric precision sens = f1Score precision sens := by
-  unfold f1ScoreMetric f1Score; ring_nf
+`MetricSpecificPortability.f1ScoreMetric` and `OpenQuestions.f1Score` were the
+same expression under two names in two modules, with no theorem relating them.
+`f1ScoreMetric` has been deleted and `MetricSpecificPortability` now calls
+`f1Score`. -/
 
 /-! ### Three more quantities written out in two modules each
 
@@ -656,9 +689,13 @@ theorem spikeAndSlabVariance_eq_convexMix (pi sl sm : ℝ) :
     spikeAndSlabVariance pi sl sm = convexMix pi sl sm := by
   unfold spikeAndSlabVariance convexMix; ring
 
-theorem admixedAlleleFreq1_eq_convexMix (alpha p_A p_B : ℝ) :
-    admixedAlleleFreq1 alpha p_A p_B = convexMix alpha p_A p_B := by
-  unfold admixedAlleleFreq1 convexMix; ring
+theorem admixedAlleleFreq_eq_convexMix (α p_A p_B : ℝ) :
+    admixedAlleleFreq α p_A p_B = convexMix α p_A p_B := by
+  unfold admixedAlleleFreq convexMix; ring
+
+theorem averagePhaseInteraction_eq_convexMix (freq_cis i_cis i_trans : ℝ) :
+    averagePhaseInteraction freq_cis i_cis i_trans = convexMix freq_cis i_cis i_trans := by
+  unfold averagePhaseInteraction convexMix; ring
 
 theorem ancestrySpecificEffect_eq_convexMix (b1 b2 alpha : ℝ) :
     ancestrySpecificEffect b1 b2 alpha = convexMix alpha b1 b2 := by
@@ -693,6 +730,15 @@ theorem hudsonFstFromCoalescenceTimes_eq_oneMinusRatio (ETss ETst : ℝ) :
     hudsonFstFromCoalescenceTimes ETss ETst = oneMinusRatio ETss ETst := by
   unfold hudsonFstFromCoalescenceTimes oneMinusRatio; ring_nf
 
+/-- The PC-correction efficacy is the same `1 - a/b` map: what is corrected
+away is one minus the fraction of the ancestry axis that survives correction,
+exactly as `F_ST` is one minus the fraction of heterozygosity that survives
+subdivision. The two are different quantities and must not drift into different
+shapes. -/
+theorem pcTargetAxisEfficacy_eq_oneMinusRatio (H Hres : ℝ) :
+    pcTargetAxisEfficacy H Hres = oneMinusRatio Hres H := by
+  unfold pcTargetAxisEfficacy oneMinusRatio; ring_nf
+
 theorem r2FromMSE_eq_oneMinusRatio (mse varY : ℝ) :
     r2FromMSE mse varY = oneMinusRatio mse varY := by
   unfold r2FromMSE oneMinusRatio; ring_nf
@@ -723,12 +769,10 @@ theorem explainedR2FromTransportMoments_eq_pgsR2 (cov vs vy : ℝ) :
     explainedR2FromTransportMoments cov vs vy = pgsR2 cov vs vy := by
   unfold explainedR2FromTransportMoments pgsR2; ring_nf
 
-/-- The two portability ratios are the same quotient of transported metrics,
-written in `SimulationValidation` and in `GeneticArchitectureDiscovery`. -/
-theorem mechanisticPortabilityRatio_eq_sourceTargetPortabilityRatio
-    {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    mechanisticPortabilityRatio m = sourceTargetPortabilityRatio m := by
-  unfold mechanisticPortabilityRatio sourceTargetPortabilityRatio; ring_nf
+/-! The two portability ratios were the same quotient of transported metrics,
+written once in `SimulationValidation` and once in
+`GeneticArchitectureDiscovery`. `sourceTargetPortabilityRatio` has been deleted
+and `GeneticArchitectureDiscovery` now calls `mechanisticPortabilityRatio`. -/
 
 end EquilibriumAgreements
 

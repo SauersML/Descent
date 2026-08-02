@@ -317,8 +317,7 @@ theorem haplotypePhasePredictionError_eq_zero_of_perfect
     (freq_cis interaction_cis interaction_trans : ℝ) :
     haplotypePhasePredictionError freq_cis 0 interaction_cis interaction_trans
       interaction_cis interaction_trans = 0 := by
-  rw [haplotypePhasePredictionError_correctSpec_eq]
-  ring
+  rw [haplotypePhasePredictionError_correctSpec_eq, zero_mul]
 
 /-- The dosage-only predictor is the phase-aware predictor forced to return the
 same value in both configurations. So the two errors of the previous section are
@@ -344,8 +343,14 @@ theorem haplotypeTransportBias_eq
       |freq_cis_target * (pred_cis - interaction_cis) +
         (1 - freq_cis_target) * (pred_trans - interaction_trans)| := by
   unfold haplotypeTransportBias averagePhaseInteraction
-  congr 1
-  ring
+  have h_factor :
+      freq_cis_target * pred_cis + (1 - freq_cis_target) * pred_trans -
+          (freq_cis_target * interaction_cis +
+            (1 - freq_cis_target) * interaction_trans) =
+        freq_cis_target * (pred_cis - interaction_cis) +
+          (1 - freq_cis_target) * (pred_trans - interaction_trans) := by
+    ring
+  rw [h_factor]
 
 /-- The phase-aware transport bias is zero when the cis and trans effects
 themselves transport. This is now a theorem with its hypothesis in the

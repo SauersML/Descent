@@ -2,6 +2,7 @@ import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.PGSCalibrationTheory
 import Calibrator.OpenQuestions
+import Calibrator.LDDecayTheory
 
 namespace Calibrator
 
@@ -66,28 +67,34 @@ theorem portability_decreases_with_time (r2_initial lambda_total t₁ t₂ : ℝ
   apply Real.exp_lt_exp_of_lt
   nlinarith
 
-/-- **Drift component of decay.**
+/-! **Drift component of decay.**
     Under Wright-Fisher drift with Ne:
     λ_drift = 1/(2Ne) per generation.
 
     Empirical status: UNTESTED.
 
-    Denotes: a per-generation rate. Other definitions share this formula under names from a
-    different concept family; the formula does not fix which is meant. -/
-noncomputable def longitudinalDriftDecayRate (Ne : ℝ) : ℝ := 1 / (2 * Ne)
+    Denotes: a per-generation rate. Other definitions share this formula under
+    names from a different concept family; the formula does not fix which is
+    meant.
+
+This file used to restate `1 / (2 Nₑ)` as `longitudinalDriftDecayRate`. It is
+`ldDecayRatePerGen` from `Calibrator.LDDecayTheory` — one per-generation drift
+rate, read there as the fraction of LD lost per generation and here as the
+fraction of the ancestral score variance lost per generation — and the
+restatement has been deleted in favour of that one. -/
 
 /-- Drift decay rate is positive for positive Ne. -/
 theorem drift_decay_rate_pos (Ne : ℝ) (h : 0 < Ne) :
-    0 < longitudinalDriftDecayRate Ne := by
-  unfold longitudinalDriftDecayRate
+    0 < ldDecayRatePerGen Ne := by
+  unfold ldDecayRatePerGen
   positivity
 
 /-- **Larger populations drift slower.**
     If Ne₁ < Ne₂, then λ_drift₁ > λ_drift₂. -/
 theorem larger_Ne_slower_drift (Ne₁ Ne₂ : ℝ)
     (h₁ : 0 < Ne₁) (h₂ : 0 < Ne₂) (h_lt : Ne₁ < Ne₂) :
-    longitudinalDriftDecayRate Ne₂ < longitudinalDriftDecayRate Ne₁ := by
-  unfold longitudinalDriftDecayRate
+    ldDecayRatePerGen Ne₂ < ldDecayRatePerGen Ne₁ := by
+  unfold ldDecayRatePerGen
   have h1' : 0 < 2 * Ne₁ := by positivity
   have h2' : 0 < 2 * Ne₂ := by positivity
   apply (div_lt_div_iff₀ h2' h1').2
@@ -100,6 +107,18 @@ theorem larger_Ne_slower_drift (Ne₁ Ne₂ : ℝ)
     Empirical status: UNTESTED. -/
 noncomputable def ldDecayPerGeneration (r : ℝ) (t : ℕ) : ℝ :=
   (1 - r) ^ t
+
+/-- **Cross-check: geometric LD decay, recombination survival along a
+genealogy, and admixture-LD decay are one map.** `DGP.discreteRecombinationSurvival`
+and `PortabilityDrift.admixtureLDDecay` spell out `(1 - r)^t` independently;
+these theorems make a divergence between the three a failed proof. -/
+theorem ldDecayPerGeneration_eq_discreteRecombinationSurvival (r : ℝ) (t : ℕ) :
+    ldDecayPerGeneration r t = discreteRecombinationSurvival r t := by
+  unfold ldDecayPerGeneration discreteRecombinationSurvival; ring
+
+theorem ldDecayPerGeneration_eq_admixtureLDDecay (r : ℝ) (t : ℕ) :
+    ldDecayPerGeneration r t = admixtureLDDecay r t := by
+  unfold ldDecayPerGeneration admixtureLDDecay; ring
 
 /-- LD decay is in [0,1] for r ∈ [0,1]. -/
 theorem ld_decay_in_unit (r : ℝ) (t : ℕ)

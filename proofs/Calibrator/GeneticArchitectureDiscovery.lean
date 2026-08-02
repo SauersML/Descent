@@ -3,6 +3,7 @@ import Calibrator.BayesianPGSTheory
 import Calibrator.PortabilityDrift
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Calibrator.OpenQuestions
+import Calibrator.SimulationValidation
 import Calibrator.AncestrySpecificPower
 
 namespace Calibrator
@@ -456,7 +457,20 @@ noncomputable def multiTraitEffectiveSampleSize
     (n₁ n₂ rg : ℝ) : ℝ :=
   n₁ + rg ^ 2 * n₂
 
+/-- **Cross-check: borrowing across traits and borrowing across ancestries are
+the same arithmetic.** `BayesianPGSTheory.multiAncestryEffectiveN` adds
+`rg² · n_other` to the target sample size for a genetically correlated
+*ancestry*; this adds it for a genetically correlated *trait*. They are
+different claims about different data, and they had better not drift apart in
+the exponent on `rg`, which is what this theorem pins. -/
+theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN (n₁ n₂ rg : ℝ) :
+    multiTraitEffectiveSampleSize n₁ n₂ rg = multiAncestryEffectiveN n₁ rg n₂ := by
+  unfold multiTraitEffectiveSampleSize multiAncestryEffectiveN; ring
+
 /-- GWAS noncentrality parameter after cross-trait borrowing.
+
+    Empirical status: UNTESTED. It carried no marker of its own while it sat
+    next to `multiTraitEffectiveSampleSize`, whose marker it was reading.
 
     Convention: `maf_causal` is the causal variant's frequency, as in
     `discoveryNCP`. -/
@@ -658,10 +672,10 @@ population-specific. This has implications for portability.
 
 section WGSAndRareVariants
 
-/-- Portability ratio for a mechanistic transported-score model. -/
-noncomputable def sourceTargetPortabilityRatio {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  targetR2FromSourceWeights m / sourceR2FromSourceWeights m
+/-! The portability ratio for a mechanistic transported-score model was
+restated here as `sourceTargetPortabilityRatio`. It is
+`mechanisticPortabilityRatio` from `Calibrator.SimulationValidation`, and the
+restatement has been deleted in favour of that one. -/
 
 /-- Common-variant-only witness: one shared common causal locus is directly
 scored in both populations, and there is no proxy tagging or target-only
@@ -793,12 +807,12 @@ theorem wgs_eliminates_ld_mismatch
     discovery population. But in the target population the rare component does
     not contribute, so the portability ratio drops from `1` to `1/4`. -/
 theorem rare_variant_pgs_poor_portability :
-    sourceTargetPortabilityRatio commonAndRarePortableModel <
-      sourceTargetPortabilityRatio commonOnlyPortableModel := by
-  unfold sourceTargetPortabilityRatio
+    mechanisticPortabilityRatio commonAndRarePortableModel <
+      mechanisticPortabilityRatio commonOnlyPortableModel := by
+  unfold mechanisticPortabilityRatio
   rw [commonAndRarePortableModel_sourceR2, commonAndRarePortableModel_targetR2,
     commonOnlyPortableModel_sourceR2, commonOnlyPortableModel_targetR2]
-  norm_num [sourceTargetPortabilityRatio]
+  norm_num [mechanisticPortabilityRatio]
 
 /-- **Optimal PGS strategy combines common and rare variants.**
     In the explicit common-vs-rare witness above, adding the source-specific
