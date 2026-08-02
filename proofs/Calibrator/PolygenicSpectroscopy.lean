@@ -981,6 +981,49 @@ variance `hweMellinJetVariance`, and the symmetry verdict
 happened to be computable in closed form; under the Vertex-Weight Law they are three of
 the four things about a genotype coding that any design can see *at all*.
 
+### Complete, but not minimal — and the distinction is not academic
+
+The four-item list is **complete and redundant**, not complete and minimal, and the
+corpus should say which is which. The Tower Rigidity Theorem gives a strictly smaller
+sufficient set: a symmetric unit-variance law with `E[x ^ 4] = 3` whose floor-two and
+floor-three laws carry the Gaussian's odd parts *is* the Gaussian. Four data — symmetry,
+`sigma_1 = sqrt 2`, and two odd parts — then determine every Mellin jet, every arithmetic
+type, every higher floor and every cumulant of every iterated square. The load is carried
+by the odd part of the *squared* law, which no moment list mentions, and that is why four
+successive finite lists failed before it.
+
+So: the redundant data is what is **computable**, and the minimal data is what is
+**decisive**. Nothing here is deleted, because closed forms are what let the condensation
+boundary be located at a given allele frequency, and rigidity does not supply those.
+
+**But the redundancy is a statement about the Gaussian fiber only, and no genotype is on
+it.** Rigidity collapses the list where its hypotheses hold. Off that fiber the four data
+determine nothing, and a polymorphic hard-called locus is never on it: symmetry forces
+`q = 1/2` (`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff`), while
+`q = 1/2` forces `E[x ^ 4] = 2` against the Gaussian's `3`
+(`standardizedFourthMoment_ne_gaussian_at_half`). The two hypotheses are jointly
+unsatisfiable for a genotype. Hence for the objects this file is about, `hweMellinDrift`
+and `hweMellinJetVariance` remain independently informative and the critical-degree
+results are untouched — the redundancy never gets a chance to bite.
+
+What rigidity does buy here is the *converse* reading, and it is a real gain. It supplies
+a decisive test for non-Gaussianity, and the decisive datum is already proved:
+`Calibrator.CondensationUnification.standardizedSquare_never_symmetric` shows the odd part
+of the floor-two law is nonzero at **every** polymorphic frequency, `q = 1/2` included.
+That fills exactly the hole this file otherwise has, since symmetry at floor one goes dark
+at `q = 1/2` and can separate nothing there. Symmetry fails one floor up, always.
+
+### The horizon problem dissolves for rigidity
+
+The statistical-reachability limit formalized in this development — a `log log n` cutoff on
+how far up the tower a finite sample can see — costs the rigidity theorem nothing.
+Rigidity needs floors two and three only, with `sigma_2 = sqrt 14`, comfortably inside any
+sample-size horizon. The floors that are statistically unreachable are exactly the ones
+rigidity has already shown to be redundant, so the obstruction and the theorem never meet.
+The cutoff remains a real limit on what is *computable* from data; it is not a limit on
+what is *decisive*. If the reachability computation later fixes where the tower truncates,
+that answer bears on computability alone.
+
 ### Two consequences, stated carefully
 
 Both are more delicate than they first appear, and the careless versions are wrong.
@@ -1144,6 +1187,105 @@ observationally equal to its Gaussian surrogate in the drift. -/
 theorem balanced_locus_drift_separates :
     hweMellinDrift (1 / 2) ≠ condensationConstant :=
   ne_of_lt hweMellinDrift_half_lt_condensationConstant
+
+/-!
+## 4c. The fourth moment, and why no genotype sits at the Gaussian fiber
+
+The Tower Rigidity Theorem (proved elsewhere in this development) says a symmetric
+unit-variance law with `E[x ^ 4] = 3` whose floor-two and floor-three laws carry the
+Gaussian's odd parts *is* the Gaussian. The hypotheses of that theorem are the "Gaussian
+fiber". This section computes the fourth moment of a standardized genotype and shows the
+fiber is unreachable.
+-/
+
+/-- The fourth moment `E[x ^ 4]` of the standardized genotype. Equivalently `1 + Var(x²)`,
+since `E[x ^ 2] = 1`.
+
+Empirical status: DERIVED from `HardyWeinbergModel.genotypeProb` and
+`HardyWeinbergModel.standardizedSquare` by direct summation over the three genotypes;
+closed form in `standardizedFourthMoment_eq`. No free parameter. -/
+noncomputable def HardyWeinbergModel.standardizedFourthMoment (h : HardyWeinbergModel) : ℝ :=
+  ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedSquare g ^ 2
+
+/-- **The fourth moment in closed form: `E[x ^ 4] = 1 / (2q(1-q))`.**
+
+The three contributions are `4q²`, `(1-2q)⁴ / (2q(1-q))` and `4(1-q)²`, and they collapse
+by the polynomial identity `2q(1-q)(4q² + 4(1-q)²) + (1-2q)⁴ = 1`. Note this is the
+reciprocal of the genotype variance `2q(1-q)`, which is a coincidence of the biallelic
+three-point law and not a general fact. -/
+theorem HardyWeinbergModel.standardizedFourthMoment_eq (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    h.standardizedFourthMoment = 1 / (2 * h.altFreq * (1 - h.altFreq)) := by
+  have hqne : h.altFreq ≠ 0 := ne_of_gt hq0
+  have hpne : (1 : ℝ) - h.altFreq ≠ 0 := by intro hc; apply absurd hq1; linarith [hc]
+  obtain ⟨hX0, hX1, hX2⟩ := standardizedSquare_values h hq0 hq1
+  obtain ⟨hP0, hP1, hP2⟩ := genotypeProb_values h
+  unfold HardyWeinbergModel.standardizedFourthMoment
+  rw [sum_diploidGenotype, hX0, hX1, hX2, hP0, hP1, hP2]
+  first
+    | (field_simp; ring)
+    | field_simp
+
+/-- **Every polymorphic locus has `E[x ^ 4] ≥ 2`,** because `4q(1-q) ≤ 1`. The bound is
+the standardized restatement of the fact that a three-point law cannot be less
+leptokurtic than the balanced one. -/
+theorem standardizedFourthMoment_ge_two (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    2 ≤ h.standardizedFourthMoment := by
+  have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+  have hden : (0 : ℝ) < 2 * h.altFreq * (1 - h.altFreq) := by nlinarith [hq0, hcomp]
+  rw [h.standardizedFourthMoment_eq hq0 hq1, le_div_iff₀ hden]
+  nlinarith [sq_nonneg (1 - 2 * h.altFreq)]
+
+/-- **Equality holds exactly at the balanced locus.** `E[x ^ 4] = 2` iff `q = 1/2`, since
+`(1 - 2q) ^ 2 = 1 - 4q(1-q)`.
+
+This is the *second* independent reason `q = 1/2` is distinguished, the first being
+symmetry (`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff`). The two are not
+a coincidence: both descend from `Binomial(2, q)` being a symmetric law exactly at
+`q = 1/2`, so the right framing is common cause. -/
+theorem standardizedFourthMoment_eq_two_iff_half (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    h.standardizedFourthMoment = 2 ↔ h.altFreq = 1 / 2 := by
+  have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+  have hden : (0 : ℝ) < 2 * h.altFreq * (1 - h.altFreq) := by nlinarith [hq0, hcomp]
+  rw [h.standardizedFourthMoment_eq hq0 hq1]
+  constructor
+  · intro heq
+    rw [div_eq_iff (ne_of_gt hden)] at heq
+    have hsq : (1 - 2 * h.altFreq) ^ 2 = 0 := by nlinarith [heq]
+    have hzero : 1 - 2 * h.altFreq = 0 := by
+      first
+        | exact sq_eq_zero_iff.mp hsq
+        | exact pow_eq_zero_iff (two_ne_zero).mp hsq
+    linarith
+  · intro hhalf
+    rw [hhalf]
+    norm_num
+
+/-- **The balanced locus is not on the Gaussian fiber either.**
+
+At `q = 1/2` the standardized genotype has `E[x ^ 4] = 2`, against the Gaussian's `3`. So
+the one frequency at which the symmetry hypothesis of Tower Rigidity is satisfied is a
+frequency at which its fourth-moment hypothesis fails.
+
+Combined with `Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff` — symmetry
+holds only at `q = 1/2` — this says **no polymorphic hard-called locus lies on the
+Gaussian fiber at all**: symmetry forces `q = 1/2`, and `q = 1/2` forces `E[x ^ 4] = 2`.
+The two hypotheses of the rigidity theorem are jointly unsatisfiable for a genotype. (The
+frequency at which `E[x ^ 4] = 3` alone would hold is `q = (3 - sqrt 3) / 6 = 0.21132...`,
+where symmetry fails.)
+
+The consequence matters for how the redundancy statement of section 4b is read. Tower
+Rigidity makes the computed Mellin invariants redundant *at the Gaussian fiber*, where
+four data already pin the law down completely. A genotype is never at that fiber, so for
+the objects this file is about, `hweMellinDrift` and `hweMellinJetVariance` are **not**
+redundant: nothing in the rigidity data determines them off the fiber. -/
+theorem standardizedFourthMoment_ne_gaussian_at_half (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hhalf : h.altFreq = 1 / 2) :
+    h.standardizedFourthMoment ≠ 3 := by
+  rw [h.standardizedFourthMoment_eq hq0 hq1, hhalf]
+  norm_num
 
 /-!
 ## 5. Where each earlier module now sits
