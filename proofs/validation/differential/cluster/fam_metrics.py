@@ -421,16 +421,32 @@ def arm_hwe(rng):
     rows = []
 
     # -- CONTROL H1 : m = 1. Per-locus moment, no summation. ----------------
+    #
+    # The tolerance here is the ANALYTIC standard error of the estimator, not a
+    # flat percentage. A single Binomial(2, p) at p = 0.01 has excess kurtosis
+    # of order 1/(2p) = 50, so the sample variance is fifty times noisier than
+    # a Gaussian rule of thumb suggests, and a flat 2% band would be about 1.6
+    # standard errors -- a control that fails at random one run in ten is not a
+    # control. Five standard errors from the exact fourth central moment is the
+    # honest band, and it TIGHTENS at p = 0.5 rather than loosening everywhere.
     for p in (0.5, 0.1, 0.01):
         m = hwe_cell(rng, [p], [1.0])
+        q = 1.0 - p
+        mu2 = 2 * p * q
+        mu4 = (q * q * (2 * p) ** 4
+               + 2 * p * q * (1 - 2 * p) ** 4
+               + p * p * (2 * q) ** 4)
+        se_var = math.sqrt(max(mu4 - mu2 ** 2, 0.0) / R_HWE)
+        se_mean = math.sqrt(mu2 / R_HWE)
         rows.append({
             "cell": "H1 control m=1", "p": p,
             "mean_measured": m["mean"], "mean_predicted": 2 * p,
-            "var_measured": m["var"], "var_predicted": 2 * p * (1 - p),
+            "var_measured": m["var"], "var_predicted": mu2,
+            "se_var_analytic": se_var,
+            "sigmas_off": abs(m["var"] - mu2) / se_var if se_var > 0 else 0.0,
             "isolates": "the per-locus moment, with the summation removed",
-            "ok": (abs(m["mean"] - 2 * p) < 0.01
-                   and abs(m["var"] - 2 * p * (1 - p))
-                   < 0.02 * max(2 * p * (1 - p), 1e-3) + 1e-4),
+            "ok": (abs(m["mean"] - 2 * p) < 5 * se_mean
+                   and abs(m["var"] - mu2) < 5 * se_var),
         })
 
     # -- CONTROL H2 : equal beta, equal p. Summation, per-locus pinned. -----
