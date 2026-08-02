@@ -238,22 +238,29 @@ end GeneralAtomic
 
 section HardCalls
 
-/-- **A hard-called locus with lattice log-square values is outside the Cramér
-stratum.**
+/-- **A Hardy-Weinberg locus whose coordinate values are equally spaced is outside the
+Cramér stratum.**
 
-The hypothesis is exactly the arithmetic-progression condition that
+The weights are the genotype probabilities, so this is the three-point law of an actual
+locus rather than an abstract atomic law. `hlat` is the lattice hypothesis in abstract
+form: all gaps between coordinate values lie in `h ℤ`.
+
+Deriving `hlat` for the specific coordinate `log x²` at the critical frequency
+`q* = (2 - √2)/4` is *not* done here. What
 `Calibrator.PolygenicSpectroscopy.hardCall_arithmeticProgression_at_critical_maf`
-establishes at `q* = (2 - √2)/4`, where the three values of `log x²` are equally spaced
-with span `log(3 + 2√2) = 1.7627...`.
+proves is the arithmetic-progression identity on the three squared standardized values;
+turning that into the gap condition below requires the three logarithms, which this file
+does not compute. So the connection is a route, not a discharged hypothesis.
 
 The general statement — that a hard call is outside the stratum at *every* polymorphic
-frequency, not only at `q*` — is `not_cramer_of_recurrence` applied to the three-point
-law, and needs the Kronecker field. -/
-theorem hardCall_not_cramer_of_lattice
-    (w a : DiploidGenotype → ℝ) (hw : ∑ g, w g = 1)
+frequency, not only where the values happen to be equally spaced — is
+`not_cramer_of_recurrence` applied to the three-point law, and needs the Kronecker
+field. -/
+theorem hwe_not_cramer_of_lattice (hwe : HardyWeinbergModel)
+    (a : DiploidGenotype → ℝ)
     (h : ℝ) (hh : 0 < h) (hlat : ∀ u v : DiploidGenotype, ∃ k : ℤ, a u - a v = h * k) :
-    ¬ CramerCondition w a :=
-  not_cramer_of_lattice w a hw h hh hlat
+    ¬ CramerCondition hwe.genotypeProb a :=
+  not_cramer_of_lattice _ a hwe.genotypeProb_sum h hh hlat
 
 end HardCalls
 
