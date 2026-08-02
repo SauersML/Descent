@@ -257,8 +257,8 @@ so a change to the ploidy convention in one would have left the others
 silently disagreeing. These theorems make that disagreement a failed proof. -/
 
 theorem allelicVariance_eq_hwe (p : ℝ) :
-    allelicVariance p = hweGenotypeVariance p := by
-  unfold allelicVariance hweGenotypeVariance ploidy; ring
+    genotypeVarianceAtLocus p = hweGenotypeVariance p := by
+  unfold genotypeVarianceAtLocus hweGenotypeVariance ploidy; ring
 
 theorem heterozygosity_eq_hwe (p : ℝ) :
     heterozygosity p = hweGenotypeVariance p := by

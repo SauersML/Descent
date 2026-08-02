@@ -70,7 +70,10 @@ theorem portability_decreases_with_time (r2_initial lambda_total t₁ t₂ : ℝ
     Under Wright-Fisher drift with Ne:
     λ_drift = 1/(2Ne) per generation.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: a per-generation rate. Other definitions share this formula under names from a
+    different concept family; the formula does not fix which is meant. -/
 noncomputable def longitudinalDriftDecayRate (Ne : ℝ) : ℝ := 1 / (2 * Ne)
 
 /-- Drift decay rate is positive for positive Ne. -/

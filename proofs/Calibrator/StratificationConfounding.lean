@@ -560,7 +560,10 @@ structure MRInstrumentModel where
 
 /-- Heterozygosity 2p(1-p) as a function of allele frequency
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: the reading its name carries. The same formula appears under
+    names from 'heterozygosity', 'variance', and the formula alone does not fix which is meant. -/
 noncomputable def heterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
 
 /-- F-statistic of an instrument at a given allele frequency -/

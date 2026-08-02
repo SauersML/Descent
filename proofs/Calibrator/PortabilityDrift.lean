@@ -3564,7 +3564,10 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
 /-- Allele frequency correlation equals `1 - Fst`, where Fst measures the
     fraction of genetic variance due to population divergence.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: the reading its name carries. The same formula appears under
+    names from 'factor', 'frequency', 'fst', and the formula alone does not fix which is meant. -/
 noncomputable def freqCorrFromFst (fst : ℝ) : ℝ := 1 - fst
 
 /-- LD overlap is directly the shared LD fraction (identity mapping, made

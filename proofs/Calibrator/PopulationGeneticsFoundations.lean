@@ -300,7 +300,10 @@ theorem wright_decomposition (f_IS f_ST : ℝ) :
     docstring were reassigning it to a different observable.
 
     Empirical status: VALIDATED as heterozygosity loss (this is the identity
-    `fstDerived_eq_het_loss` proves); FALSIFIED as split `F_ST`. -/
+    `fstDerived_eq_het_loss` proves); FALSIFIED as split `F_ST`.
+
+    Denotes: the reading its name carries. The same formula appears under
+    names from 'fst', 'heterozygosity', and the formula alone does not fix which is meant. -/
 noncomputable def heterozygosityLossFromDrift (t : ℕ) (Ne : ℝ) : ℝ :=
   1 - (1 - 1 / (2 * Ne)) ^ t
 
@@ -978,7 +981,10 @@ theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
     This is not a definition imposed from outside; it is the fractional
     loss of heterozygosity after t generations of drift.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: the reading its name carries. The same formula appears under
+    names from 'fst', 'heterozygosity', and the formula alone does not fix which is meant. -/
 noncomputable def fstDerived (Ne : ℝ) (t : ℕ) : ℝ :=
   1 - (1 - 1 / (2 * Ne)) ^ t
 

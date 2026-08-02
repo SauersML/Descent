@@ -462,7 +462,10 @@ section LocalAncestryHaplotypes
     At a given locus, the haplotype effect depends on
     which ancestral population the haplotype derives from.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: the reading its name carries. The same formula appears under
+    names from 'frequency', 'variance', and the formula alone does not fix which is meant. -/
 noncomputable def ancestrySpecificEffect (beta_pop1 beta_pop2 alpha : ℝ) : ℝ :=
   alpha * beta_pop1 + (1 - alpha) * beta_pop2
 

@@ -2053,7 +2053,10 @@ variance, and residual variance.
 
 This is the direct moment form of the calibrated Brier coordinate. It is not
 defined by first constructing transported `R²`; any equality to the `R²`
-chart is a derived algebraic identity. -/
+chart is a derived algebraic identity.
+
+    Denotes: the reading its name carries. The same formula appears under
+    names from 'rate', 'variance', and the formula alone does not fix which is meant. -/
 noncomputable def calibratedBrierFromVariances (π vSignal vResidual : ℝ) : ℝ :=
   π * (1 - π) * (1 - vSignal / (vSignal + vResidual))
 

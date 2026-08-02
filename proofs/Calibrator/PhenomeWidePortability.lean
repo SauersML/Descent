@@ -105,7 +105,10 @@ noncomputable def selectedDriftFactor (Ne : ℝ) (t : ℕ) (s_correction : ℝ) 
     In the island/drift model, Fst = 1 - driftFactor, where driftFactor
     is the fraction of ancestral heterozygosity retained.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: the reading its name carries. The same formula appears under
+    names from 'factor', 'frequency', 'fst', and the formula alone does not fix which is meant. -/
 noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
   1 - driftFactor
 

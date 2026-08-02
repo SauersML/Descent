@@ -400,7 +400,10 @@ section ExpansionLD
     The fraction of LD that decays per generation is 1/(2Ne).
     Larger Ne → slower decay → LD persists longer.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: a per-generation rate. Other definitions share this formula under names from a
+    different concept family; the formula does not fix which is meant. -/
 noncomputable def ldDecayRatePerGen (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 

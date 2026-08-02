@@ -54,7 +54,10 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
     (1-π) proportion have effect = 0 (or ~ N(0, σ²_small)).
     π is the polygenicity parameter.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: a variance. Other definitions share this formula under names from a
+    different concept family; the formula does not fix which is meant. -/
 noncomputable def spikeAndSlabVariance (pi sigma_sq_large sigma_sq_small : ℝ) : ℝ :=
   pi * sigma_sq_large + (1 - pi) * sigma_sq_small
 

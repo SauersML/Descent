@@ -78,7 +78,10 @@ noncomputable def fisherInformation (n : ℕ) (v : ℝ) : ℝ := n * v
     follows Binomial(2, p). Its variance is 2p(1-p).
     This is the heterozygosity and equals the per-locus information content.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: the reading its name carries. The same formula appears under
+    names from 'heterozygosity', 'variance', and the formula alone does not fix which is meant. -/
 noncomputable def genotypeVarianceHWE (p : ℝ) : ℝ := 2 * p * (1 - p)
 
 /-- Genotype variance is nonnegative when 0 ≤ p ≤ 1. -/
@@ -311,7 +314,10 @@ section DiscoveryBias
 /-- **Heterozygosity function.** het(p) = 2p(1-p) is the per-variant
     information content for association testing.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: the reading its name carries. The same formula appears under
+    names from 'heterozygosity', 'variance', and the formula alone does not fix which is meant. -/
 noncomputable def ancestryHeterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
 
 /-- Heterozygosity is strictly increasing on (0, 1/2).

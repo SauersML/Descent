@@ -530,7 +530,10 @@ in subsequent generations.
     genetic drift creates new LD at rate 1/(2·Ne) per generation.
     This arises from Cov(Δpᵢ, Δpⱼ) for linked loci under drift.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Denotes: a per-generation rate. Other definitions share this formula under names from a
+    different concept family; the formula does not fix which is meant. -/
 noncomputable def driftLDCreationRate (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 
