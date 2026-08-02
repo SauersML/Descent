@@ -204,7 +204,26 @@ corpus into status reporting before anyone tested the slice it names.
     unaffected: `4·G_ST = ` the standardized contrast variance is a true
     identity for THIS body. What is affected is what a user must supply: an
     `F_ST` from a library's Hudson estimator is the wrong input by the factor
-    above at `p̄ ≠ 1/2`.
+    above, AT EVERY FREQUENCY PAIR WITH `p₁ ≠ p₂`. There is no exempt slice.
+
+    **This sentence used to end "at `p̄ ≠ 1/2`", which is the third instance of
+    one false claim in this file** and the last to be found. It implies the
+    factor VANISHES at `p̄ = 1/2`. It does not: measured ratios along that
+    exact slice are `1.995`, `1.923`, `1.724`, `1.220` -- monotone in
+    `|p₁ - p₂|` and never reaching `1`. The identity already in this file
+    settles it without any measurement: `trueHudsonFst_eq_of_neiGst` gives
+    `Hudson = 2G/(1+G)`, which equals `G` only at `G = 0` or `G = 1`, so the
+    exception named here is empty apart from the endpoints.
+    `hudsonFst_ne_trueHudsonFst_at_mean_half` certifies it at
+    `(9/10, 1/10)` -- `p̄ = 1/2` exactly, ratio `50/41`.
+
+    Why it took three passes to remove: the pre-existing witness
+    `hudsonFst_ne_trueHudsonFst` sits at `p̄ = 2/5`, OUTSIDE the slice the claim
+    names, so the claim looked checked while nothing tested it. A witness
+    outside the exception cannot refute the exception. If you are ever tempted
+    to reintroduce an "except at `p̄ = 1/2`" caveat,
+    `hudsonFst_ne_trueHudsonFst_at_mean_half` below is what will stop you, and
+    it is placed there for that purpose.
 
     Empirical status: CONVENTION IDENTIFIED (Nei `G_ST`), NAME UNCORRECTED. -/
 noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
