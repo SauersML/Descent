@@ -1581,6 +1581,37 @@ noncomputable def fstDriftFlowStep (p : EvolutionaryParameters) (F : ℝ) : ℝ 
 noncomputable def fstEquilibrium (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.theta + p.bigM)
 
+/-!
+### Note for anyone editing the Fst cluster below
+
+Twice today this cluster broke as a side effect of moving or absorbing a
+definition elsewhere, both times in `unfold` lists rather than in any
+mathematics. Recording the shape of both, because the sweeps that follow such
+moves have not been catching them.
+
+**Stale unfold targets.** `unfold X` is an error, not a no-op, when `X` does not
+occur in the goal. So when a definition stops routing through another, *every*
+`unfold` list naming the inner one breaks at once. `fstEquilibrium` above is
+`1 / (1 + θ + M)` and `fstDriftMigration` is `1 / (1 + M)`; neither calls
+`fstMutationDriftEquilibrium`, and only `fstDriftMutation` did. One stale name
+in the lists below produced seven simultaneous failures, which reads like a
+change of shape in the definition itself and is not one — the definition is a
+plain `def (θ : ℝ) : ℝ := 1 / (1 + θ)` throughout and unfolds fine.
+
+**Shape-unaware repointing.** `fstDriftMutation p` was a wrapper for
+`fstMutationDriftEquilibrium p.theta`, was removed as a duplicate, and its call
+sites were repointed textually. That is correct at sites that *apply* it and
+wrong at sites that only *name* it: inside an `unfold` list the argument glued
+onto the constant, giving `fstMutationDriftEquilibrium.theta`, which is not a
+constant. It was caught only because the mangling happened to be ill-formed. A
+repoint that stayed well-formed would have compiled and been silent.
+
+The general rule the two share: a textual repoint sees applications. It does not
+see bare constant names in `unfold`/`simp only`/`rw` argument lists, and it does
+not see docstrings — a third instance left an orphaned `/--` block above the
+`Step 2` section header when `migrationLDBoost` moved.
+-/
+
 /-- **The full equilibrium Fst is the fixed point of the three-force
 balance.** -/
 theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :

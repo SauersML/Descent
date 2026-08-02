@@ -1655,9 +1655,14 @@ noncomputable def metaLearnedSourceWeights {p : ℕ}
     by the meta-learning block below.
 
     Empirical status: UNTESTED. -/
-noncomputable def centeredPopulationEffectDeviation {p : ℕ}
+/-- Per-population deviation of the source effects from the shared ones.
+
+The population index is left general. This was two definitions with identical bodies, one
+indexed by `ℕ` and one by `Fin k`; nothing in the deviation depends on which, so the index
+is a parameter rather than a reason for a second definition. -/
+noncomputable def centeredPopulationEffectDeviation {p : ℕ} {ι : Type*}
     (wShared : Fin p → ℝ)
-    (wSource : ℕ → Fin p → ℝ) : ℕ → Fin p → ℝ :=
+    (wSource : ι → Fin p → ℝ) : ι → Fin p → ℝ :=
   fun j i => wSource j i - wShared i
 
 /-- Exact mean effect vector over the first `k` source populations. -/
@@ -2120,12 +2125,6 @@ noncomputable def weightedPopulationEffectAverage {p k : ℕ}
     (weight : Fin k → ℝ) : Fin p → ℝ :=
   fun i => ∑ j : Fin k, weight j * wSource j i
 
-/-- Centered finite-population effect deviations around a shared effect center. -/
-noncomputable def centeredPopulationEffectDeviationFin {p k : ℕ}
-    (wShared : Fin p → ℝ)
-    (wSource : Fin k → Fin p → ℝ) : Fin k → Fin p → ℝ :=
-  fun j i => wSource j i - wShared i
-
 /-- Any affine meta-aggregator is exactly the weighted average of the source
     effect vectors once deviations are instantiated as centered source effects. -/
 theorem weightedMetaSourceWeights_eq_weightedPopulationEffectAverage
@@ -2135,11 +2134,11 @@ theorem weightedMetaSourceWeights_eq_weightedPopulationEffectAverage
     (weight : Fin k → ℝ)
     (h_sum : ∑ j : Fin k, weight j = 1) :
     weightedMetaSourceWeights wShared
-        (centeredPopulationEffectDeviationFin wShared wSource) weight =
+        (centeredPopulationEffectDeviation wShared wSource) weight =
       weightedPopulationEffectAverage wSource weight := by
   funext i
   unfold weightedMetaSourceWeights weightedPopulationDeviation
-    centeredPopulationEffectDeviationFin weightedPopulationEffectAverage
+    centeredPopulationEffectDeviation weightedPopulationEffectAverage
   calc
     wShared i + ∑ j : Fin k, weight j * (wSource j i - wShared i)
         = wShared i + ((∑ j : Fin k, weight j * wSource j i) -
@@ -2185,7 +2184,7 @@ theorem weightedMetaTransferGapSq_eq_weightedPopulationEffectAverageGapSq
     (weight : Fin k → ℝ)
     (h_sum : ∑ j : Fin k, weight j = 1) :
     weightedMetaTransferGapSq wShared wTarget
-        (centeredPopulationEffectDeviationFin wShared wSource) weight =
+        (centeredPopulationEffectDeviation wShared wSource) weight =
       coefficientGapSq (weightedPopulationEffectAverage wSource weight) wTarget := by
   unfold weightedMetaTransferGapSq
   rw [weightedMetaSourceWeights_eq_weightedPopulationEffectAverage
