@@ -247,7 +247,19 @@ def definition_expected_new_mutations():
         pred = call("expectedNewMutations", theta_total, t)
         m_seg = float(np.mean(segregating))
         m_arose = float(np.mean(arose))
+        # THE OTHER READING, stated so the finding cannot be mistaken for a
+        # claim that the arithmetic is wrong. The number of mutations that
+        # ARISE anywhere in the population over t generations is
+        # 2*Ne*mu*L*t, and theta*t/2 = (4 Ne mu L) t / 2 is exactly that. So
+        # the formula is EXACT for mutations-that-arise and the docstring
+        # names a different observable ("new segregating sites"). The gap
+        # below is the gap between the two observables, not an algebra error.
+        population_arisings = 2.0 * Ne * mu * SEQ * t
         out.append({"Ne": Ne, "n": n, "t_generations": t,
+                    "population_wide_arisings_2_Ne_mu_L_t":
+                        population_arisings,
+                    "identity_check_theta_t_over_2_equals_arisings":
+                        abs(pred - population_arisings) <= 1e-6 * pred,
                     "t_over_2Ne": tfrac,
                     "theta_total": theta_total,
                     "corpus_expectedNewMutations": pred,
@@ -262,8 +274,12 @@ def definition_expected_new_mutations():
               "segregating-in-sample younger than t = %8.1f  |  ratio %8.1fx"
               % (t, tfrac, pred, m_seg, pred / m_seg if m_seg else float("nan")))
     print("  Watterson equilibrium S for this sample = %.1f -- the observable "
-          "STOPS GROWING while theta*t/2 does not."
+          "the docstring NAMES stops growing in t, while theta*t/2 does not."
           % (theta_total * sum(1.0 / i for i in range(1, n))))
+    print("  theta*t/2 IS exactly 2*Ne*mu*L*t, the count of mutations that "
+          "ARISE population-wide. The defect is scope, not arithmetic: the "
+          "formula is right for one observable and the docstring names "
+          "another.")
     return out
 
 
