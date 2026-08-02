@@ -189,6 +189,22 @@ section InformationTheoreticLimits
     β_target | β_source ~ N(ρ·β_source, (1-ρ²)·σ²_β · I).
     The mutual information is -(m/2)·log(1-ρ²).
 
+    **Domain.** This formula is the mutual information only on `ρ ^ 2 < 1`, and
+    every theorem below that reads it as an information carries that hypothesis.
+    Outside the domain the body returns junk, not an error, because Mathlib
+    defines `Real.log` to be `0` at `0` and to satisfy `log x = log |x|`:
+
+    * at `ρ = ±1` — perfect effect portability, the deployment-relevant
+      endpoint, where the information must diverge — the body returns `0`, the
+      same value it returns at `ρ = 0`. `perfect_and_zero_correlation_collide`
+      records that collision as a theorem so it cannot be forgotten.
+    * for `|ρ| > 1` the body returns a finite value of either sign, which is not
+      an information at all.
+
+    The divergence that the formula is supposed to have is stated as a limit
+    statement instead: `effectMutualInformation_unbounded_near_perfect`
+    exhibits, for every bound, an admissible `ρ` whose information exceeds it.
+
     Empirical status: UNTESTED. -/
 noncomputable def effectMutualInformation (m : ℕ) (ρ : ℝ) : ℝ :=
   -(m : ℝ) / 2 * Real.log (1 - ρ ^ 2)
@@ -198,6 +214,73 @@ theorem no_info_when_uncorrelated (m : ℕ) :
     effectMutualInformation m 0 = 0 := by
   unfold effectMutualInformation
   simp [Real.log_one]
+
+/-- **The junk value at perfect correlation.** At `ρ = 1` the body returns `0`,
+because `Real.log 0 = 0` in Mathlib. The mutual information between two
+identical effect vectors is not zero; it is unbounded. -/
+theorem effectMutualInformation_at_perfect_correlation (m : ℕ) :
+    effectMutualInformation m 1 = 0 := by
+  unfold effectMutualInformation
+  first
+    | norm_num
+    | simp
+
+/-- **Perfect portability and zero portability are indistinguishable to this
+formula.** The two endpoints of the deployment question return the same number.
+Any claim read off `effectMutualInformation` at or beyond `|ρ| = 1` is therefore
+not a claim about information, which is why the domain hypothesis `ρ ^ 2 < 1`
+appears in the theorems below. -/
+theorem perfect_and_zero_correlation_collide (m : ℕ) :
+    effectMutualInformation m 1 = effectMutualInformation m 0 := by
+  rw [effectMutualInformation_at_perfect_correlation, no_info_when_uncorrelated]
+
+/-- On its domain the quantity is a nonnegative information. -/
+theorem effectMutualInformation_nonneg (m : ℕ) (ρ : ℝ) (hρ : ρ ^ 2 < 1) :
+    0 ≤ effectMutualInformation m ρ := by
+  unfold effectMutualInformation
+  have h_pos : 0 < 1 - ρ ^ 2 := by linarith
+  have h_le : 1 - ρ ^ 2 ≤ 1 := by nlinarith [sq_nonneg ρ]
+  have h_log : Real.log (1 - ρ ^ 2) ≤ 0 := Real.log_nonpos h_pos.le h_le
+  have hm : (0 : ℝ) ≤ m := Nat.cast_nonneg m
+  nlinarith [h_log, hm]
+
+/-- **The information does diverge at the edge of its domain.** For every bound
+`B` there is an admissible correlation — one strictly inside `ρ ^ 2 < 1` — whose
+mutual information exceeds `B`. This is the statement the junk value at `ρ = ±1`
+was standing in for, and unlike that value it cannot be satisfied by a constant.
+
+The witness is explicit: `ρ = √(1 - exp (-2(|B|+1)/m))`. -/
+theorem effectMutualInformation_unbounded_near_perfect
+    (m : ℕ) (hm : 0 < m) (B : ℝ) :
+    ∃ ρ : ℝ, 0 ≤ ρ ∧ ρ ^ 2 < 1 ∧ B < effectMutualInformation m ρ := by
+  have hm' : (0 : ℝ) < m := Nat.cast_pos.mpr hm
+  have hmne : (m : ℝ) ≠ 0 := ne_of_gt hm'
+  have hB : (0 : ℝ) < |B| + 1 := by positivity
+  have hc_pos : 0 < 2 * (|B| + 1) / (m : ℝ) := by
+    apply div_pos _ hm'
+    linarith
+  set c : ℝ := 2 * (|B| + 1) / (m : ℝ) with hc
+  have ht_pos : 0 < Real.exp (-c) := Real.exp_pos _
+  have ht_le : Real.exp (-c) ≤ 1 := by
+    rw [← Real.exp_zero]
+    exact Real.exp_le_exp.mpr (by linarith)
+  have hsq : Real.sqrt (1 - Real.exp (-c)) ^ 2 = 1 - Real.exp (-c) :=
+    Real.sq_sqrt (by linarith)
+  refine ⟨Real.sqrt (1 - Real.exp (-c)), Real.sqrt_nonneg _, ?_, ?_⟩
+  · rw [hsq]
+    linarith
+  · unfold effectMutualInformation
+    rw [hsq]
+    have harg : (1 : ℝ) - (1 - Real.exp (-c)) = Real.exp (-c) := by ring
+    rw [harg, Real.log_exp]
+    have hval : -(m : ℝ) / 2 * -c = |B| + 1 := by
+      rw [hc]
+      first
+        | (field_simp; ring)
+        | field_simp
+    rw [hval]
+    have hle : B ≤ |B| := le_abs_self B
+    linarith
 
 /-- **Mutual information increases with effect correlation.** -/
 theorem more_correlated_more_informative

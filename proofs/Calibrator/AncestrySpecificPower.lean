@@ -75,14 +75,24 @@ noncomputable def fisherInformation (n : ℕ) (v : ℝ) : ℝ := n * v
 
 /-- **Genotype variance under HWE.**
     For a biallelic locus with MAF p, the dosage G ∈ {0, 1, 2}
-    follows Binomial(2, p). Its variance is 2p(1-p).
-    This is the heterozygosity and equals the per-locus information content.
+    follows Binomial(2, p). Its variance is 2p(1-p), and this equals the
+    per-locus information content.
+
+    This is the corpus-wide genotype variance at a biallelic locus. It was
+    written out independently in `CovarianceStructure`, `StratificationConfounding`
+    and `GeneticArchitectureDiscovery`; those definitions are gone and their
+    references point here, so the ploidy convention is stated in one place.
+    `Conventions.genotypeVarianceHWE_eq_hwe` ties it to `hweGenotypeVariance`,
+    which derives the factor of two from `ploidy`.
 
     Empirical status: UNTESTED.
 
-    Denotes: the reading its name carries. The same formula appears under
-    names from 'heterozygosity', 'variance', and the formula alone does not fix which is meant. -/
-noncomputable def genotypeVarianceHWE (p : ℝ) : ℝ := 2 * p * (1 - p)
+    Denotes: a variance — the variance of the dosage `G ∈ {0, 1, 2}`. It is
+    *not* the allelic variance `p(1-p)`, and it is numerically but not
+    conceptually the heterozygote frequency `hweHeterozygosity`; the formula
+    alone does not fix which is meant, so the identity is stated as
+    `hweHeterozygosity_eq_genotypeVarianceHWE` below. -/
+def genotypeVarianceHWE (p : ℝ) : ℝ := 2 * p * (1 - p)
 
 /-- Genotype variance is nonnegative when 0 ≤ p ≤ 1. -/
 theorem genotypeVariance_nonneg (p : ℝ) (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
@@ -311,14 +321,32 @@ well-tagged in the discovery population, creating systematic bias in PGS.
 
 section DiscoveryBias
 
-/-- **Heterozygosity function.** het(p) = 2p(1-p) is the per-variant
-    information content for association testing.
+/-- **Heterozygosity function.** het(p) = 2p(1-p) is the expected fraction of
+    heterozygotes at a biallelic locus in Hardy-Weinberg proportions, and hence
+    the per-variant information content for association testing.
+
+    This is the corpus-wide heterozygote frequency. It was written out
+    independently as `StratificationConfounding.heterozygosity`; that definition
+    is gone and its references point here.
 
     Empirical status: UNTESTED.
 
-    Denotes: the reading its name carries. The same formula appears under
-    names from 'heterozygosity', 'variance', and the formula alone does not fix which is meant. -/
-noncomputable def ancestryHeterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
+    Denotes: a frequency — the probability that a random individual is a
+    heterozygote. It is a *probability*, not a variance, and it is a different
+    concept from `genotypeVarianceHWE` even though the two coincide as numbers
+    under Hardy-Weinberg. That coincidence is stated as a theorem below rather
+    than left implicit in the shared formula, because conflating the two with
+    the allelic variance `p(1-p)` is what produced the factor-of-four defect
+    this corpus already had to repair. -/
+def hweHeterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
+
+/-- **The heterozygote frequency and the genotype variance coincide under
+Hardy-Weinberg.** They are different quantities — one is a probability, one is
+a second moment — and this is the only thing that licenses writing either
+formula where the other is meant. -/
+theorem hweHeterozygosity_eq_genotypeVarianceHWE (p : ℝ) :
+    hweHeterozygosity p = genotypeVarianceHWE p := by
+  unfold hweHeterozygosity genotypeVarianceHWE; ring
 
 /-- Heterozygosity is strictly increasing on (0, 1/2).
     Proof: het(q) - het(p) = 2(q - p)(1 - p - q). When p < q < 1/2,
@@ -327,8 +355,8 @@ theorem het_strict_mono_on_lower_half (p q : ℝ)
     (h_p : 0 < p) (h_p_lt : p < 1/2)
     (h_q : 0 < q) (h_q_lt : q < 1/2)
     (h_pq : p < q) :
-    ancestryHeterozygosity p < ancestryHeterozygosity q := by
-  unfold ancestryHeterozygosity
+    hweHeterozygosity p < hweHeterozygosity q := by
+  unfold hweHeterozygosity
   nlinarith [sq_nonneg p, sq_nonneg q]
 
 /-- **Discovered variants are biased toward EUR-common.**
@@ -347,8 +375,8 @@ theorem discovered_variants_eur_biased
     (h_afr : 0 < p_afr) (h_afr_lt : p_afr < 1/2)
     (h_drift_down : p_afr < p_eur)
     (h_β_ne : β ≠ 0) :
-    ancestryHeterozygosity p_afr * β ^ 2 <
-      ancestryHeterozygosity p_eur * β ^ 2 := by
+    hweHeterozygosity p_afr * β ^ 2 <
+      hweHeterozygosity p_eur * β ^ 2 := by
   have h_het_lt :=
     het_strict_mono_on_lower_half p_afr p_eur h_afr h_afr_lt h_eur h_eur_lt h_drift_down
   have h_β_sq_pos : 0 < β ^ 2 := sq_pos_of_ne_zero h_β_ne

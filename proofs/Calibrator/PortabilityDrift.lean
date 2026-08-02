@@ -135,9 +135,50 @@ noncomputable def DemographicCoalescenceScalars.delta
     d.delta = 1 - d.ETss / d.ETst := by
   rfl
 
-/-- Empirical status: UNTESTED. -/
+/-- **First-step analysis of the structured coalescent, same-deme state.**
+
+Symmetric two-deme island model with scaled migration `M`.  Time is in units of
+`2 Nₑ` generations, so two lineages sitting in one deme coalesce at rate `1`
+and each lineage leaves its deme at rate `M/2`.  From the same-deme state the
+competing clocks give a total rate `1 + M`, an expected waiting time
+`1/(1 + M)`, and then coalescence with probability `1/(1 + M)` or -- with
+probability `M/(1 + M)` -- a migration that leaves the lineages in different
+demes.  The map below sends a candidate pair of expected coalescence times to
+the pair implied by one such step.
+
+Composition convention: this is the *continuous-time* structured coalescent, in
+which competing exponential clocks make the within-generation ordering of
+migration and coalescence immaterial.  The discrete-generation model with a
+fixed ordering has a different fixed point, differing at O(1/Nₑ).
+
+    Empirical status: UNTESTED. -/
+noncomputable def twoDemeIMFirstStepSame (M _ETss ETst : ℝ) : ℝ :=
+  1 / (1 + M) + (M / (1 + M)) * ETst
+
+/-- **First-step analysis of the structured coalescent, different-deme state.**
+Lineages in different demes cannot coalesce; the only event is a migration, at
+total rate `M`, after which both lineages are in one deme.
+
+    Empirical status: UNTESTED. -/
+noncomputable def twoDemeIMFirstStepDiff (M ETss _ETst : ℝ) : ℝ :=
+  1 / M + ETss
+
+/-- **Expected within-deme coalescence time at migration-drift balance.**
+
+Not stipulated: it is the same-deme component of the fixed point of
+`twoDemeIMFirstStepSame`/`twoDemeIMFirstStepDiff`, which
+`twoDemeIMEquilibriumETss_isFixedPoint` proves.  That it is *free of `M`* is
+Strobeck's invariance -- the content of the model, and just the kind of
+fact a stipulated constant cannot be trusted to carry.
+
+    Empirical status: UNTESTED. -/
 noncomputable def twoDemeIMEquilibriumETss (_M : ℝ) : ℝ := 2
 
+/-- **Expected between-deme coalescence time at migration-drift balance.**
+Derived: see `twoDemeIMEquilibriumETst_isFixedPoint`.  It diverges as `M → 0`,
+which is the complete-isolation limit.
+
+    Empirical status: UNTESTED. -/
 noncomputable def twoDemeIMEquilibriumETst (M : ℝ) : ℝ :=
   (2 * M + 1) / M
 
@@ -145,8 +186,67 @@ noncomputable def twoDemeIMEquilibriumScalars (M : ℝ) : DemographicCoalescence
   ETss := twoDemeIMEquilibriumETss M
   ETst := twoDemeIMEquilibriumETst M
 
+/-- **Hudson's F_ST at two-deme migration-drift balance.**
+
+Derived from the coalescence times above, not asserted:
+`twoDemeIMEquilibriumDelta_isFixedPoint` shows that pushing the equilibrium
+times through one step of first-step analysis and forming Hudson's ratio
+returns this value.  Unlike `twoDemeIMEquilibriumETst`, this closed
+form extends to the boundary: at `M = 0` it takes the value `1`, complete
+differentiation under total isolation, which
+`twoDemeIMEquilibriumDelta_of_no_migration` records.
+
+    Empirical status: UNTESTED. -/
 noncomputable def twoDemeIMEquilibriumDelta (M : ℝ) : ℝ :=
   1 / (2 * M + 1)
+
+/-- **The within-deme coalescence time is a fixed point of first-step
+analysis.**  Solving `ETss = 1/(1+M) + (M/(1+M)) ETst` jointly with
+`ETst = 1/M + ETss` forces `ETss = 2` for every `M > 0`. -/
+theorem twoDemeIMEquilibriumETss_isFixedPoint (M : ℝ) (hM : 0 < M) :
+    twoDemeIMFirstStepSame M (twoDemeIMEquilibriumETss M) (twoDemeIMEquilibriumETst M) =
+      twoDemeIMEquilibriumETss M := by
+  have hM' : M ≠ 0 := ne_of_gt hM
+  have h1 : (0 : ℝ) < 1 + M := by linarith
+  have h1' : (1 : ℝ) + M ≠ 0 := ne_of_gt h1
+  unfold twoDemeIMFirstStepSame twoDemeIMEquilibriumETss twoDemeIMEquilibriumETst
+  field_simp
+  ring
+
+/-- **The between-deme coalescence time is a fixed point of first-step
+analysis.** -/
+theorem twoDemeIMEquilibriumETst_isFixedPoint (M : ℝ) (hM : 0 < M) :
+    twoDemeIMFirstStepDiff M (twoDemeIMEquilibriumETss M) (twoDemeIMEquilibriumETst M) =
+      twoDemeIMEquilibriumETst M := by
+  have hM' : M ≠ 0 := ne_of_gt hM
+  unfold twoDemeIMFirstStepDiff twoDemeIMEquilibriumETss twoDemeIMEquilibriumETst
+  field_simp
+  ring
+
+/-- **The equilibrium F_ST is the Hudson ratio of the coalescent fixed
+point.**  One step of first-step analysis applied to the equilibrium times,
+then Hudson's `1 - E[T_within]/E[T_between]`, returns `1/(2M+1)`. -/
+theorem twoDemeIMEquilibriumDelta_isFixedPoint (M : ℝ) (hM : 0 < M) :
+    hudsonFstFromCoalescenceTimes
+        (twoDemeIMFirstStepSame M (twoDemeIMEquilibriumETss M) (twoDemeIMEquilibriumETst M))
+        (twoDemeIMFirstStepDiff M (twoDemeIMEquilibriumETss M) (twoDemeIMEquilibriumETst M)) =
+      twoDemeIMEquilibriumDelta M := by
+  rw [twoDemeIMEquilibriumETss_isFixedPoint M hM, twoDemeIMEquilibriumETst_isFixedPoint M hM]
+  have hM' : M ≠ 0 := ne_of_gt hM
+  have h2 : (0 : ℝ) < 2 * M + 1 := by linarith
+  have h2' : (2 : ℝ) * M + 1 ≠ 0 := ne_of_gt h2
+  unfold hudsonFstFromCoalescenceTimes twoDemeIMEquilibriumETss twoDemeIMEquilibriumETst
+    twoDemeIMEquilibriumDelta
+  field_simp
+  ring
+
+/-- **Complete isolation is a boundary the closed form attains.**  At `M = 0`
+the two demes exchange nothing, between-deme coalescence times diverge, and
+F_ST is exactly `1` -- not merely close to it. -/
+@[simp] theorem twoDemeIMEquilibriumDelta_of_no_migration :
+    twoDemeIMEquilibriumDelta 0 = 1 := by
+  unfold twoDemeIMEquilibriumDelta
+  norm_num
 
 theorem twoDemeIMEquilibriumDelta_eq (M : ℝ) (h2M1 : 2 * M + 1 ≠ 0) :
     (twoDemeIMEquilibriumScalars M).delta = twoDemeIMEquilibriumDelta M := by
@@ -3472,11 +3572,74 @@ theorem MutationDriftModelAssumptions.theta_pos (m : MutationDriftModelAssumptio
   unfold MutationDriftModelAssumptions.theta
   nlinarith [m.Ne_pos, m.mu_pos]
 
+/-- **One generation of the identity-by-descent balance.**
+
+`F` is the probability that two gene copies drawn from the same subpopulation
+are identical by descent (equivalently, `F_ST` measured against a total
+population in which that probability is zero).  In one generation:
+
+* drift makes a pair identical with probability `1/(2 Nₑ)` among the pairs that
+  are not already identical, contributing `+(1 - F)/(2 Nₑ)`;
+* each of the two lineages independently escapes the local identity class at
+  rate `rate` -- by mutating away from its ancestral allelic state, or by being
+  replaced by a migrant -- contributing `-2 · rate · F`.
+
+`rate` is therefore whichever homogenising force is in play: `μ` for
+mutation-drift balance, `m` for migration-drift balance, `μ + m` for both.
+That the two forces enter identically is the whole content of
+`islandModelFst_eq_mutationForm`.
+
+Composition convention: this is the first-order (weak-force, large-`Nₑ`)
+recursion, in which drift and the homogenising force are *added*, so their
+within-generation ordering does not matter.  The unlinearised discrete-generation
+recursion multiplies them instead -- see `islandFstMultiplicativeStep` -- and its fixed
+point differs from this one at O(rate², rate/Nₑ).
+
+    Empirical status: UNTESTED. -/
+noncomputable def ibdFlowStep (Ne rate F : ℝ) : ℝ :=
+  F + (1 - F) / (2 * Ne) - 2 * rate * F
+
+/-- **`1/(1 + 4 Nₑ · rate)` is the fixed point of the identity balance.**
+Setting `(1 - F)/(2 Nₑ) = 2 · rate · F` gives `1 - F = 4 Nₑ · rate · F`, hence
+`F = 1/(1 + 4 Nₑ · rate)`.  This single lemma is what pins every `1/(1 + θ)`
+and `1/(1 + 4 N m)` in the development; none of them is stipulated. -/
+theorem ibdFlowStep_fixedPoint (Ne rate : ℝ) (hNe : 0 < Ne) (hrate : 0 ≤ rate) :
+    ibdFlowStep Ne rate (1 / (1 + 4 * Ne * rate)) = 1 / (1 + 4 * Ne * rate) := by
+  have hprod : (0 : ℝ) ≤ 4 * Ne * rate := by positivity
+  have hd : (0 : ℝ) < 1 + 4 * Ne * rate := by linarith
+  have hd' : (1 : ℝ) + 4 * Ne * rate ≠ 0 := ne_of_gt hd
+  have hNe' : Ne ≠ 0 := ne_of_gt hNe
+  unfold ibdFlowStep
+  field_simp
+  ring
+
+/-- **Complete fixation is a boundary the balance attains.**  With no
+homogenising force the only fixed point is `F = 1`: drift runs to completion.
+The closed form takes that value exactly, rather than approaching it. -/
+@[simp] theorem ibdFlowStep_one_of_no_flow (Ne : ℝ) :
+    ibdFlowStep Ne 0 1 = 1 := by
+  unfold ibdFlowStep
+  simp
+
 /-- **Equilibrium Fst under mutation-drift balance: Fst = 1/(1 + θ).**
-    This is the Wright (1931) island model result. -/
+    This is the Wright (1931) island model result.
+
+    Not stipulated: `MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint`
+    derives it as the rest point of `ibdFlowStep` with `rate = μ`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def MutationDriftModelAssumptions.fstEquilibrium
     (m : MutationDriftModelAssumptions) : ℝ :=
   1 / (1 + m.theta)
+
+/-- **The mutation-drift equilibrium is the fixed point of the identity
+balance** driven by mutation alone. -/
+theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
+    (m : MutationDriftModelAssumptions) :
+    ibdFlowStep m.Ne m.μ m.fstEquilibrium = m.fstEquilibrium := by
+  have hθ : m.fstEquilibrium = 1 / (1 + 4 * m.Ne * m.μ) := rfl
+  rw [hθ]
+  exact ibdFlowStep_fixedPoint m.Ne m.μ m.Ne_pos (le_of_lt m.mu_pos)
 
 /-- Equilibrium Fst is positive. -/
 theorem MutationDriftModelAssumptions.fstEquilibrium_pos
@@ -3911,7 +4074,87 @@ section MigrationDriftPortability
 noncomputable def fstMigrationDriftEquilibrium (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
-/-- The scaled migration parameter M = 4Nm, analogous to θ = 4Neμ. -/
+/-- **The island-model F_ST is the rest point of the identity balance** driven
+by migration.  It is not a stipulated closed form: substitute any other
+constant and this fails. -/
+theorem fstMigrationDriftEquilibrium_isFixedPoint (Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    ibdFlowStep Ne m (fstMigrationDriftEquilibrium Ne m) =
+      fstMigrationDriftEquilibrium Ne m :=
+  ibdFlowStep_fixedPoint Ne m hNe hm
+
+/-- **Total isolation is a boundary the closed form attains.**  With `m = 0`
+the demes fix independently and F_ST is exactly `1`. -/
+@[simp] theorem fstMigrationDriftEquilibrium_of_no_migration (Ne : ℝ) :
+    fstMigrationDriftEquilibrium Ne 0 = 1 := by
+  unfold fstMigrationDriftEquilibrium
+  norm_num
+
+/-- **The unlinearised discrete-generation identity recursion.**
+
+Two gene copies drawn in the next generation are identical by descent only if
+neither is a migrant -- probability `(1 - m)²` -- and their parental copies
+either coalesced in the deme, probability `1/(2 Nₑ)`, or were already
+identical, probability `1 - 1/(2 Nₑ)` times `F`.
+
+Composition convention: migration acts on the offspring generation *after*
+reproduction, and the two events multiply rather than add.  This is the
+difference from `ibdFlowStep`: that map linearises `(1 - m)²(1 - 1/(2 Nₑ))` to
+`1 - 2m - 1/(2 Nₑ)`, dropping the `O(m², m/Nₑ)` cross terms, and the two maps
+therefore have genuinely different fixed points.
+
+    Empirical status: UNTESTED. -/
+noncomputable def islandFstMultiplicativeStep (Ne m F : ℝ) : ℝ :=
+  (1 - m) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * F)
+
+/-- **Fixed point of the unlinearised discrete recursion.**
+
+`F* = (1-m)² / ((1-m)² + 2 Nₑ m (2 - m))`.  Expanding the denominator gives
+`(1-m)² + 4 Nₑ m − 2 Nₑ m²`, so this reduces to `1/(1 + 4 Nₑ m)` only after
+dropping terms of order `m²` and `m/Nₑ`; the two closed forms are not equal,
+which `fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium` witnesses.
+
+    Empirical status: UNTESTED. -/
+noncomputable def fstIslandMultiplicativeEquilibrium (Ne m : ℝ) : ℝ :=
+  (1 - m) ^ 2 / ((1 - m) ^ 2 + 2 * Ne * m * (2 - m))
+
+/-- **The closed form is the fixed point of the unlinearised recursion.** -/
+theorem fstIslandMultiplicativeEquilibrium_isFixedPoint (Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) (hm1 : m < 1) :
+    islandFstMultiplicativeStep Ne m (fstIslandMultiplicativeEquilibrium Ne m) =
+      fstIslandMultiplicativeEquilibrium Ne m := by
+  have hNe' : Ne ≠ 0 := ne_of_gt hNe
+  have hsq : (0 : ℝ) < (1 - m) ^ 2 := by positivity
+  have hflow : (0 : ℝ) ≤ 2 * Ne * m * (2 - m) := by
+    have h2 : (0 : ℝ) ≤ 2 - m := by linarith
+    positivity
+  have hd : (0 : ℝ) < (1 - m) ^ 2 + 2 * Ne * m * (2 - m) := by linarith
+  have hd' : (1 - m) ^ 2 + 2 * Ne * m * (2 - m) ≠ 0 := ne_of_gt hd
+  unfold islandFstMultiplicativeStep fstIslandMultiplicativeEquilibrium
+  field_simp
+  ring
+
+/-- **Total isolation, unlinearised version.**  This recursion also attains the
+boundary: `m = 0` gives `F = 1`. -/
+@[simp] theorem fstIslandMultiplicativeEquilibrium_of_no_migration (Ne : ℝ) :
+    fstIslandMultiplicativeEquilibrium Ne 0 = 1 := by
+  unfold fstIslandMultiplicativeEquilibrium
+  norm_num
+
+/-- **The two recursions do not have the same fixed point.**
+
+At `Nₑ = 1`, `m = 1/2` the multiplicative recursion rests at `1/7` and the linearised
+one at `1/3`.  This is not a defect of either definition: it is the size of
+the weak-migration approximation, and it is stated here rather than left
+implicit so that the approximation cannot be mistaken for an identity. -/
+theorem fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium :
+    fstIslandMultiplicativeEquilibrium 1 (1 / 2) ≠ fstMigrationDriftEquilibrium 1 (1 / 2) := by
+  unfold fstIslandMultiplicativeEquilibrium fstMigrationDriftEquilibrium
+  norm_num
+
+/-- The scaled migration parameter M = 4Nm, analogous to θ = 4Neμ.
+
+    Empirical status: UNTESTED. -/
 noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
   4 * Ne * m
 

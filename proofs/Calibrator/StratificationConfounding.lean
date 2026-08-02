@@ -1,5 +1,6 @@
 import Calibrator.Probability
 import Calibrator.PCCorrectability
+import Calibrator.AncestrySpecificPower
 
 namespace Calibrator
 
@@ -558,22 +559,24 @@ structure MRInstrumentModel where
   p_target_pos : 0 < p_target
   p_target_lt : p_target < 1
 
-/-- Heterozygosity 2p(1-p) as a function of allele frequency
+/-! Heterozygosity `2p(1-p)` as a function of allele frequency was defined here
+as `heterozygosity`. It is `hweHeterozygosity` from
+`Calibrator.AncestrySpecificPower`, and the definition here has been deleted in
+favour of that one; the empirical status and the `Denotes` declaration
+travelled with it.
 
-    Empirical status: UNTESTED.
-
-    Denotes: the reading its name carries. The same formula appears under
-    names from 'heterozygosity', 'variance', and the formula alone does not fix which is meant. -/
-noncomputable def heterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
+The `F`-statistic below is the one place in this file where the distinction
+matters: what enters the noncentrality is the genotype *variance*, which
+`hweHeterozygosity_eq_genotypeVarianceHWE` says is this same number. -/
 
 /-- F-statistic of an instrument at a given allele frequency -/
 noncomputable def MRInstrumentModel.fStat (m : MRInstrumentModel) (p : ℝ) : ℝ :=
-  m.n * m.β_inst ^ 2 * heterozygosity p / m.σ2_Y
+  m.n * m.β_inst ^ 2 * hweHeterozygosity p / m.σ2_Y
 
 /-- Heterozygosity is maximized at p = 0.5 and decreasing as p moves away. -/
-theorem heterozygosity_pos (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
-    0 < heterozygosity p := by
-  unfold heterozygosity
+theorem hweHeterozygosity_pos (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
+    0 < hweHeterozygosity p := by
+  unfold hweHeterozygosity
   have : 0 < 1 - p := by linarith
   positivity
 
@@ -581,7 +584,7 @@ theorem heterozygosity_pos (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
     If the target has lower heterozygosity (allele frequency further from 0.5
     or toward fixation), F-stat decreases. Derived from the F-stat formula. -/
 theorem instrument_strength_decreases (m : MRInstrumentModel)
-    (h_het : heterozygosity m.p_target < heterozygosity m.p_source) :
+    (h_het : hweHeterozygosity m.p_target < hweHeterozygosity m.p_source) :
     m.fStat m.p_target < m.fStat m.p_source := by
   unfold MRInstrumentModel.fStat
   apply div_lt_div_of_pos_right _ m.σ2_Y_pos

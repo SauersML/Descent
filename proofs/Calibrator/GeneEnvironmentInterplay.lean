@@ -331,18 +331,6 @@ measures and what it doesn't.
 
 section CounterfactualFramework
 
-/-- **Average treatment effect of ancestry on PGS accuracy.**
-    ATE = E[R²(own ancestry) - R²(other ancestry)].
-    This is the portability gap. -/
-noncomputable def portabilityGapATE (r2_own r2_other : ℝ) : ℝ :=
-  r2_own - r2_other
-
-/-- Portability gap is nonneg when own-ancestry PGS is better. -/
-theorem portability_gap_ate_nonneg
-    (r2_own r2_other : ℝ) (h_own_better : r2_other ≤ r2_own) :
-    0 ≤ portabilityGapATE r2_own r2_other := by
-  unfold portabilityGapATE; linarith
-
 /-- **Decomposing portability gap into genetic and environmental.**
     The portability gap R²_own - R²_other decomposes into:
     - Genetic component: loss from LD mismatch and allele frequency differences

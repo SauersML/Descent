@@ -565,26 +565,6 @@ theorem prediction_error_bounded_by_looser_tolerance
     (h_small_error : ε < bound) :
     |actual_port - predicted_port| < bound := by linarith
 
-/-- **Disease traits vs quantitative traits.**
-    Disease traits often show worse portability than their
-    quantitative risk factors because:
-    1. Ascertainment bias in case-control studies (δ_ascertain)
-    2. Different disease prevalence across populations (δ_prev)
-    3. Liability threshold model nonlinearity (δ_threshold)
-    These additive losses degrade disease portability below risk factor portability. -/
-noncomputable def diseasePortability
-    (port_rf δ_ascertain δ_prev δ_threshold : ℝ) : ℝ :=
-  port_rf - (δ_ascertain + δ_prev + δ_threshold)
-
-/-- **Additive disease-specific loss lowers portability below the risk-factor
-baseline.** -/
-theorem additive_disease_loss_lowers_portability
-    (port_rf δ_ascertain δ_prev δ_threshold : ℝ)
-    (h_asc : 0 < δ_ascertain) (h_prev : 0 < δ_prev) (h_thresh : 0 < δ_threshold) :
-    diseasePortability port_rf δ_ascertain δ_prev δ_threshold < port_rf := by
-  dsimp [diseasePortability]
-  linarith
-
 /-- **Pearson `R²` is strictly below `1` under additive prediction noise.**
     For the scalar model `Y = aX + ε` with `σ²_ε > 0`, the induced
     `pearson_r2 = (aσ_X)^2 / ((aσ_X)^2 + σ²_ε)` is strictly below `1`.

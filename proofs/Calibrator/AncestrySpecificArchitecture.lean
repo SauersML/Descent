@@ -353,6 +353,44 @@ The definition below is identical to both. We prove this equality explicitly.
 noncomputable def equilibriumFst (m Ne : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
+/-- **One generation of gene flow against drift**, in the architecture file's
+argument order.
+
+This is `Calibrator.ibdFlowStep` with the homogenising force taken to be
+migration: `F` is the probability that two gene copies from the same population
+are identical by descent, drift adds `(1 - F)/(2 Nₑ)` and migration removes
+`2 m F`.  It is written here, rather than only in `PortabilityDrift`, because
+the obligation to derive `equilibriumFst` belongs to the file that states it;
+`geneFlowFstStep_eq_ibdFlowStep` records that it is the same map.
+
+Composition convention: drift and gene flow are added, not composed, which is
+the weak-migration/large-`Nₑ` first-order model.  The unlinearised multiplicative
+recursion `islandFstMultiplicativeStep` has a different fixed point.
+
+    Empirical status: UNTESTED. -/
+noncomputable def geneFlowFstStep (m Ne F : ℝ) : ℝ :=
+  ibdFlowStep Ne m F
+
+/-- One quantity, one map. -/
+theorem geneFlowFstStep_eq_ibdFlowStep (m Ne F : ℝ) :
+    geneFlowFstStep m Ne F = ibdFlowStep Ne m F := rfl
+
+/-- **`equilibriumFst` is the fixed point of gene flow against drift.**
+Migration homogenises at rate `2m` per pair and drift re-creates identity at
+rate `1/(2 Nₑ)`; balancing them forces `F = 1/(1 + 4 Nₑ m)`.  The formula is
+derived here, not stipulated: no other constant satisfies this. -/
+theorem equilibriumFst_isFixedPoint (m Ne : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    geneFlowFstStep m Ne (equilibriumFst m Ne) = equilibriumFst m Ne :=
+  ibdFlowStep_fixedPoint Ne m hNe hm
+
+/-- **Total isolation is a boundary the formula attains.**  With no gene flow
+the populations differentiate completely and `equilibriumFst` is exactly `1`;
+the smooth form does not merely approach the boundary, it reaches it. -/
+@[simp] theorem equilibriumFst_of_no_migration (Ne : ℝ) :
+    equilibriumFst 0 Ne = 1 := by
+  unfold equilibriumFst
+  norm_num
+
 /-- **equilibriumFst equals the derived fstMigrationDriftEquilibrium.**
     This connects the architecture-level formula to the migration-drift
     fixed point derivation in PortabilityDrift.lean. Both definitions

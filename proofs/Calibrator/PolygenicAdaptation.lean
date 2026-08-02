@@ -5,6 +5,7 @@ import Calibrator.OpenQuestions
 namespace Calibrator
 
 open MeasureTheory
+open scoped BigOperators
 
 /-!
 # Polygenic Adaptation and PGS Portability
@@ -87,6 +88,43 @@ theorem pgsDriftVariance_one_pop_nonneg (V_A fst : ℝ)
     (h_VA : 0 ≤ V_A) (h_fst : 0 ≤ fst) :
     0 ≤ pgsDriftVariance_one_pop V_A fst := by
   unfold pgsDriftVariance_one_pop; positivity
+
+/-- **The same drift variance, as a sum over loci.**
+
+The derivation quoted in the docstring above lived only in that docstring: the
+closed form `fst × V_A` was a definition, and no object in this file was the
+locus-wise process it was supposed to summarise. This is that process, on the
+standardized scale where each locus contributes drift variance `fst` per unit
+squared effect:
+
+  `Var(ΔPGS) = Σᵢ fst × βᵢ²`.
+
+`pgsDriftVarianceFromLoci_eq_closedForm` is the theorem that the sum and the
+closed form agree, so the closed form can now be contradicted by changing either
+one.
+
+    Empirical status: UNTESTED. -/
+noncomputable def pgsDriftVarianceFromLoci {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) : ℝ :=
+  ∑ i : Fin n, fst * β i ^ 2
+
+/-- **The locus sum equals the closed form.** This is the step that was carried
+in prose. -/
+theorem pgsDriftVarianceFromLoci_eq_closedForm {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) :
+    pgsDriftVarianceFromLoci fst β =
+      pgsDriftVariance_one_pop (∑ i : Fin n, β i ^ 2) fst := by
+  unfold pgsDriftVarianceFromLoci pgsDriftVariance_one_pop
+  rw [Finset.mul_sum]
+
+/-- **And the two-population difference variance is the sum of two independent
+copies of it**, which is the content the factor of two was standing for. Chained
+with `pgsDiffVariance_eq_expected`, this ties `expectedPGSDiffVariance` back to a
+process over loci rather than to a restatement of itself. -/
+theorem pgsDiffVariance_two_pop_eq_lociSum {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) :
+    pgsDiffVariance_two_pop (∑ i : Fin n, β i ^ 2) fst =
+      pgsDriftVarianceFromLoci fst β + pgsDriftVarianceFromLoci fst β := by
+  rw [pgsDriftVarianceFromLoci_eq_closedForm]
+  unfold pgsDiffVariance_two_pop
+  ring
 
 /-- **PGS difference variance between two independently drifting populations.**
 
@@ -208,68 +246,118 @@ theorem directional_selection_shifts_pgs
   have h_zero : s * V_A * t = 0 := by linarith
   exact this h_zero
 
+/-!
+### The effect-correlation family
+
+The three correlations below were previously written inline in theorem
+statements, with a docstring that described the stabilizing model as
+`ρ = 1 - drift/(drift + selection)` while the code computed `1 - d/(1 + s·N)`.
+Those are different expressions — the first is `1 - 1/(1 + s·N)` once
+`selection = d·s·N`, which is not the second — so the model that was stated and
+the model that was proved about did not agree. The definitions below are the
+ones the theorems use, and the docstrings now describe them.
+
+The fluctuating correlation is additionally clamped at `-1`. Unclamped,
+`1 - d(1 + f·N)` leaves `[-1, 1]` as soon as `d(1 + f·N) > 2`, which is an
+ordinary parameter regime, and the previous statement of
+`fluctuating_selection_worst_portability` excluded it by a hypothesis assuming
+the answer stayed in range. The clamp is the same absorbing-boundary device as
+the `max 0` in `Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium`,
+and with it the ordering theorem needs no range hypothesis at all.
+-/
+
+/-- **Effect correlation under stabilizing selection.** Neutral drift
+decorrelates effects by `d`; stabilizing selection toward a shared optimum damps
+that decorrelation by the factor `1 / (1 + s·N)`, where `s` is the selection
+strength and `N` the effective population size.
+
+    Empirical status: UNTESTED. -/
+noncomputable def effectCorrelationStabilizing (d s N : ℝ) : ℝ :=
+  1 - d / (1 + s * N)
+
+/-- **Effect correlation under fluctuating selection**, clamped to the correlation
+range. Fluctuating selection accelerates decorrelation by the factor
+`(1 + f·N)`; the clamp at `-1` is what keeps the quantity a correlation for every
+parameter value rather than only on the range the ordering theorem wants.
+
+    Empirical status: UNTESTED. -/
+noncomputable def effectCorrelationFluctuating (d f N : ℝ) : ℝ :=
+  max (-1) (1 - d * (1 + f * N))
+
+/-- Both selected correlations are in `[-1, 1]` by construction, for any
+decorrelation `0 ≤ d ≤ 1` and nonnegative scaled selection. This is the bound
+that was previously supplied as a hypothesis. -/
+theorem effectCorrelation_mem_range
+    (d s f N : ℝ)
+    (h_d_nonneg : 0 ≤ d) (h_d_le : d ≤ 1)
+    (h_sN : 0 ≤ s * N) (h_fN : 0 ≤ f * N) :
+    (-1 ≤ effectCorrelationStabilizing d s N ∧ effectCorrelationStabilizing d s N ≤ 1) ∧
+      (-1 ≤ effectCorrelationFluctuating d f N ∧ effectCorrelationFluctuating d f N ≤ 1) := by
+  have h_denom_pos : (0 : ℝ) < 1 + s * N := by linarith
+  have h_frac_nonneg : 0 ≤ d / (1 + s * N) := div_nonneg h_d_nonneg h_denom_pos.le
+  have h_frac_le : d / (1 + s * N) ≤ 1 := by
+    rw [div_le_one h_denom_pos]
+    linarith
+  have h_prod_nonneg : 0 ≤ d * (1 + f * N) := by nlinarith
+  refine ⟨⟨?_, ?_⟩, ⟨le_max_left _ _, ?_⟩⟩
+  · unfold effectCorrelationStabilizing; linarith
+  · unfold effectCorrelationStabilizing; linarith
+  · unfold effectCorrelationFluctuating
+    apply max_le
+    · norm_num
+    · linarith
+
 /-- **Stabilizing selection maintains architecture.**
     Under stabilizing selection toward the same optimum, extreme-effect
     alleles are removed in all populations. The remaining architecture
     is similar, yielding better portability.
 
-    We model effect correlation as ρ = 1 - drift/(drift + selection),
-    where drift = 1/(2N) and selection strength s determines how quickly
-    deviations from the optimum are corrected. We prove: for any positive
-    selection strength and population size, the effect correlation under
-    stabilizing selection (ρ_stab) exceeds the neutral correlation (ρ_neutral),
-    and ρ_stab is bounded below by s·N/(1 + s·N).
-
-    The neutral correlation under pure drift with divergence parameter d
-    is 1 - d, while under stabilizing selection with strength s the
-    effective decorrelation is reduced to d/(1 + s·N), giving
-    ρ_stab = 1 - d/(1 + s·N) > 1 - d = ρ_neutral. -/
+    The model is the one `effectCorrelationStabilizing` states: neutral drift
+    decorrelates by `d`, and stabilizing selection damps the decorrelation to
+    `d / (1 + s·N)`, so `ρ_stab = 1 - d/(1 + s·N) > 1 - d = ρ_neutral`. -/
 theorem stabilizing_maintains_architecture
     (d s N : ℝ)
     (h_d_pos : 0 < d) (h_d_le : d ≤ 1)
     (h_s : 0 < s) (h_N : 0 < N) :
-    let rho_neutral := 1 - d
-    let rho_stab := 1 - d / (1 + s * N)
-    rho_neutral < rho_stab := by
-  simp only
+    1 - d < effectCorrelationStabilizing d s N := by
+  unfold effectCorrelationStabilizing
   have h_sN : 0 < s * N := mul_pos h_s h_N
-  have h_denom : 1 < 1 + s * N := by linarith
-  have h_denom_pos : 0 < 1 + s * N := by linarith
+  have h_denom_pos : (0 : ℝ) < 1 + s * N := by linarith
   have h_frac_lt : d / (1 + s * N) < d := by
     rw [div_lt_iff₀ h_denom_pos]
     nlinarith
-  nlinarith
+  linarith
 
 /-- **Fluctuating selection is worst for portability.**
     Under the drift-selection model:
     - Stabilizing selection: ρ = 1 - d/(1 + s·N)  (selection restores correlation)
     - Neutral drift:         ρ = 1 - d              (no restoration)
-    - Fluctuating selection:  ρ = 1 - d·(1 + f·N)   (selection accelerates divergence)
+    - Fluctuating selection: ρ = max (-1) (1 - d·(1 + f·N))  (selection
+      accelerates divergence, clamped at the end of the correlation range)
 
     where d is the drift parameter, s is stabilizing selection strength,
     f is the fluctuation intensity, and N is effective population size.
-    We derive the full ordering: ρ_fluctuating < ρ_neutral < ρ_stabilizing. -/
+    We derive the full ordering: ρ_fluctuating < ρ_neutral < ρ_stabilizing.
+
+    **Status change.** The previous statement carried the hypothesis
+    `d * (1 + f * N) < 1`, which assumed the unclamped fluctuating correlation
+    stayed inside the correlation range — that is, it assumed away the regime in
+    which the definition was ill-formed. With the clamp the ordering holds for
+    every `0 < d ≤ 1` and positive `s, f, N`, so the headline claim is now
+    strictly stronger rather than weaker. -/
 theorem fluctuating_selection_worst_portability
     (d s f N : ℝ)
-    (h_d_pos : 0 < d) (h_d_small : d * (1 + f * N) < 1)
+    (h_d_pos : 0 < d) (h_d_le : d ≤ 1)
     (h_s : 0 < s) (h_f : 0 < f) (h_N : 0 < N) :
-    let rho_stab := 1 - d / (1 + s * N)
-    let rho_neutral := 1 - d
-    let rho_fluct := 1 - d * (1 + f * N)
-    rho_fluct < rho_neutral ∧ rho_neutral < rho_stab := by
-  simp only
-  have h_sN : 0 < s * N := mul_pos h_s h_N
+    effectCorrelationFluctuating d f N < 1 - d ∧
+      1 - d < effectCorrelationStabilizing d s N := by
   have h_fN : 0 < f * N := mul_pos h_f h_N
-  have h_denom : 1 < 1 + s * N := by linarith
-  have h_denom_pos : 0 < 1 + s * N := by linarith
-  constructor
-  · -- ρ_fluct < ρ_neutral: 1 - d·(1+fN) < 1 - d ↔ d < d·(1+fN)
-    linarith [mul_lt_mul_of_pos_left (show (1 : ℝ) < 1 + f * N by linarith) h_d_pos]
-  · -- ρ_neutral < ρ_stab: 1 - d < 1 - d/(1+sN) ↔ d/(1+sN) < d
-    have h_frac_lt : d / (1 + s * N) < d := by
-      rw [div_lt_iff₀ h_denom_pos]
-      nlinarith
-    nlinarith
+  refine ⟨?_, stabilizing_maintains_architecture d s N h_d_pos h_d_le h_s h_N⟩
+  unfold effectCorrelationFluctuating
+  apply max_lt
+  · linarith
+  · -- 1 - d(1 + fN) < 1 - d, since d(1 + fN) > d
+    nlinarith [mul_pos h_d_pos h_fN]
 
 /-- **Selection strength determines portability impact.**
     Weak selection (s << 1/(2Ne)): alleles behave neutrally → portable.

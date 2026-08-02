@@ -3,6 +3,7 @@ import Calibrator.BayesianPGSTheory
 import Calibrator.PortabilityDrift
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Calibrator.OpenQuestions
+import Calibrator.AncestrySpecificPower
 
 namespace Calibrator
 
@@ -36,16 +37,16 @@ LD structure and allele frequency spectrum.
 
 section GWASDiscovery
 
-/-- Genotype variance of an additive tag SNP under Hardy-Weinberg equilibrium.
+/-! Genotype variance of an additive tag SNP under Hardy-Weinberg equilibrium
+was defined here as `tagGenotypeVariance`. It is `genotypeVarianceHWE` from
+`Calibrator.AncestrySpecificPower`, and the definition here has been deleted in
+favour of that one; the empirical status and the `Denotes` declaration
+travelled with it.
 
-    Empirical status: UNTESTED.
-
-    Convention: the argument is whatever frequency the caller supplies; this is
-    the genotype variance `2p(1-p)` at that frequency, tied to
-    `hweGenotypeVariance` in `Conventions`. The name says tag for historical
-    reasons, but `discoveryNCP` correctly passes the *causal* frequency. -/
-def tagGenotypeVariance (maf_causal : ℝ) : ℝ :=
-  2 * maf_causal * (1 - maf_causal)
+Convention: the argument is whatever frequency the caller supplies; this is the
+genotype variance `2p(1-p)` at that frequency. The old name said tag for
+historical reasons, but `discoveryNCP` correctly passes the *causal*
+frequency. -/
 
 /-- Noncentrality parameter for a GWAS tag SNP.
 
@@ -66,7 +67,7 @@ def tagGenotypeVariance (maf_causal : ℝ) : ℝ :=
     Empirical status: VALIDATED under this convention (matches simulated NCP to
     three significant figures across mismatched tag and causal frequencies). -/
 def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
-  n * β ^ 2 * ld ^ 2 * tagGenotypeVariance maf_causal
+  n * β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf_causal
 
 /-- A locus is discovered when its test statistic crosses the genome-wide
     `z`-threshold. In the one-degree-of-freedom Gaussian approximation this is
@@ -91,18 +92,18 @@ theorem discoveryNCP_increases_with_n
     have h_var : 0 < 2 * p * (1 - p) := by
       nlinarith
     exact mul_pos (mul_pos hβ2 hld2) h_var
-  simpa [tagGenotypeVariance, mul_assoc] using
+  simpa [genotypeVarianceHWE, mul_assoc] using
     mul_lt_mul_of_pos_right (Nat.cast_lt.mpr h_n) h_factor
 
 /-- On the left half of the allele-frequency spectrum, genotype variance is
 strictly increasing as the allele frequency moves toward `1/2`. -/
-theorem tagGenotypeVariance_strictMono_left_half
+theorem genotypeVarianceHWE_strictMono_left_half
     (maf₁ maf₂ : ℝ)
     (h_maf₂_pos : 0 < maf₂)
     (h_order : maf₂ < maf₁)
     (h_maf₁_half : maf₁ ≤ 1 / 2) :
-    tagGenotypeVariance maf₂ < tagGenotypeVariance maf₁ := by
-  unfold tagGenotypeVariance
+    genotypeVarianceHWE maf₂ < genotypeVarianceHWE maf₁ := by
+  unfold genotypeVarianceHWE
   have h_maf₂_half : maf₂ < 1 / 2 := lt_of_lt_of_le h_order h_maf₁_half
   have h_maf₂_nonneg : 0 ≤ maf₂ := le_of_lt h_maf₂_pos
   -- 2p(1-p) is a genotype variance, so the gap factors as (maf₁ - maf₂)(1 - maf₁ - maf₂),
@@ -132,24 +133,24 @@ theorem different_populations_different_hits
       gwasDiscovered n β maf₁ ld₁ z ∧ ¬ gwasDiscovered n β maf₂ ld₂ z := by
   rcases h_threshold_between with ⟨h_pop2_below, h_pop1_above⟩
   have h_var :
-      tagGenotypeVariance maf₂ < tagGenotypeVariance maf₁ := by
-    exact tagGenotypeVariance_strictMono_left_half
+      genotypeVarianceHWE maf₂ < genotypeVarianceHWE maf₁ := by
+    exact genotypeVarianceHWE_strictMono_left_half
       maf₁ maf₂ h_maf₂_pos h_maf_order h_maf₁_half
-  have h_var_pos : 0 < tagGenotypeVariance maf₂ := by
-    unfold tagGenotypeVariance
+  have h_var_pos : 0 < genotypeVarianceHWE maf₂ := by
+    unfold genotypeVarianceHWE
     have h_maf₂_lt_one : maf₂ < 1 := by
       have h_maf₂_lt_half : maf₂ < 1 / 2 := lt_of_lt_of_le h_maf_order h_maf₁_half
       linarith
     nlinarith [mul_pos h_maf₂_pos (sub_pos.mpr h_maf₂_lt_one)]
   have h_ld_sq_nn : 0 ≤ ld₁ ^ 2 := sq_nonneg ld₁
   have h_prod_lt :
-      ld₂ ^ 2 * tagGenotypeVariance maf₂ <
-        ld₁ ^ 2 * tagGenotypeVariance maf₁ := by
+      ld₂ ^ 2 * genotypeVarianceHWE maf₂ <
+        ld₁ ^ 2 * genotypeVarianceHWE maf₁ := by
     calc
-      ld₂ ^ 2 * tagGenotypeVariance maf₂
-        < ld₁ ^ 2 * tagGenotypeVariance maf₂ := by
+      ld₂ ^ 2 * genotypeVarianceHWE maf₂
+        < ld₁ ^ 2 * genotypeVarianceHWE maf₂ := by
             exact mul_lt_mul_of_pos_right h_ld_sq h_var_pos
-      _ ≤ ld₁ ^ 2 * tagGenotypeVariance maf₁ := by
+      _ ≤ ld₁ ^ 2 * genotypeVarianceHWE maf₁ := by
             exact mul_le_mul_of_nonneg_left (le_of_lt h_var) h_ld_sq_nn
   have h_prefactor_pos : 0 < n * β ^ 2 := by
     have h_beta_sq : 0 < β ^ 2 := sq_pos_of_ne_zero h_beta
@@ -610,19 +611,19 @@ theorem multi_trait_increases_effective_n
   have h_n : n₁ < multiTraitEffectiveSampleSize n₁ n₂ rg := by
     unfold multiTraitEffectiveSampleSize
     linarith
-  have h_factor : 0 < β ^ 2 * ld ^ 2 * tagGenotypeVariance maf := by
+  have h_factor : 0 < β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf := by
     have h_beta_sq : 0 < β ^ 2 := sq_pos_of_ne_zero h_beta
     have h_ld_sq : 0 < ld ^ 2 := sq_pos_of_ne_zero h_ld
-    have h_var : 0 < tagGenotypeVariance maf := by
-      unfold tagGenotypeVariance
+    have h_var : 0 < genotypeVarianceHWE maf := by
+      unfold genotypeVarianceHWE
       nlinarith [mul_pos h_maf (sub_pos.mpr h_maf_lt_one)]
     exact mul_pos (mul_pos h_beta_sq h_ld_sq) h_var
   constructor
   · exact h_n
   · unfold multiTraitDiscoveryNCP discoveryNCP multiTraitEffectiveSampleSize
     have h_ncp :
-        n₁ * (β ^ 2 * ld ^ 2 * tagGenotypeVariance maf) <
-          (n₁ + rg ^ 2 * n₂) * (β ^ 2 * ld ^ 2 * tagGenotypeVariance maf) := by
+        n₁ * (β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf) <
+          (n₁ + rg ^ 2 * n₂) * (β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf) := by
       exact mul_lt_mul_of_pos_right h_n h_factor
     simpa [mul_assoc, mul_left_comm, mul_comm] using h_ncp
 

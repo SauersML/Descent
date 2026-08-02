@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Calibrator.AncestrySpecificPower
 
 namespace Calibrator
 
@@ -34,14 +35,13 @@ semidefinite. Population-specific LD matrices differ in structure.
 
 section LDMatrixProperties
 
-/-- **Diagonal of LD matrix is allelic variance.**
-    Σ_jj = 2p_j(1-p_j) (heterozygosity).
+/-! **Diagonal of LD matrix is genotype variance.** `Σ_jj = 2p_j(1-p_j)`.
 
-    Empirical status: UNTESTED.
-
-    Denotes: a variance. Other definitions share this formula under names from a
-    different concept family; the formula does not fix which is meant. -/
-noncomputable def genotypeVarianceAtLocus (p : ℝ) : ℝ := 2 * p * (1 - p)
+This file used to define that quantity itself, under the name
+`genotypeVarianceAtLocus`. It is `genotypeVarianceHWE` from
+`Calibrator.AncestrySpecificPower`, and the definition here has been deleted in
+favour of that one so that the ploidy convention lives in a single place; the
+empirical status and the `Denotes` declaration travelled with it. -/
 
 /-! **Why this was renamed.** It was called `allelicVariance`, and the allelic
 variance is `p(1-p)`, not `2p(1-p)`. The formula is the *genotype* variance,
@@ -57,25 +57,25 @@ inherited it. -/
 /-- Allelic variance is nonneg. -/
 theorem allelic_variance_nonneg (p : ℝ)
     (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
-    0 ≤ genotypeVarianceAtLocus p := by
-  unfold genotypeVarianceAtLocus; nlinarith
+    0 ≤ genotypeVarianceHWE p := by
+  unfold genotypeVarianceHWE; nlinarith
 
 /-- Allelic variance is maximized at p = 0.5. -/
 theorem allelic_variance_max_at_half (p : ℝ)
     (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
-    genotypeVarianceAtLocus p ≤ genotypeVarianceAtLocus (1/2) := by
-  unfold genotypeVarianceAtLocus
+    genotypeVarianceHWE p ≤ genotypeVarianceHWE (1/2) := by
+  unfold genotypeVarianceHWE
   have : (p - 1/2) ^ 2 ≤ 1/4 := by nlinarith
   nlinarith [sq_nonneg (p - 1/2)]
 
 /-- Allelic variance is zero at fixation. -/
 theorem allelic_variance_zero_at_fixation_zero :
-    genotypeVarianceAtLocus 0 = 0 := by
-  unfold genotypeVarianceAtLocus; ring
+    genotypeVarianceHWE 0 = 0 := by
+  unfold genotypeVarianceHWE; ring
 
 theorem allelic_variance_zero_at_fixation_one :
-    genotypeVarianceAtLocus 1 = 0 := by
-  unfold genotypeVarianceAtLocus; ring
+    genotypeVarianceHWE 1 = 0 := by
+  unfold genotypeVarianceHWE; ring
 
 /-- **Off-diagonal LD is bounded.**
     |D_ij| ≤ min(p_i p_j, (1-p_i)(1-p_j), p_i(1-p_j), (1-p_i)p_j).
@@ -103,15 +103,15 @@ theorem ld_bounded_by_freq (D p_i p_j : ℝ)
     Empirical status: UNTESTED.
 
     Convention: `D` is a dosage covariance, twice the haplotype `D`. The
-    denominator `genotypeVarianceAtLocus p_i * genotypeVarianceAtLocus p_j` cancels only under
+    denominator `genotypeVarianceHWE p_i * genotypeVarianceHWE p_j` cancels only under
     that reading; feeding a haplotype `D` yields `r²/4`. Use
     `ldCorrelationSqOfHaplotypeD` for the other convention. -/
 noncomputable def ldCorrelationSq (D p_i p_j : ℝ) : ℝ :=
-  D^2 / (genotypeVarianceAtLocus p_i * genotypeVarianceAtLocus p_j)
+  D^2 / (genotypeVarianceHWE p_i * genotypeVarianceHWE p_j)
 
 /-! **Convention of `D` in `ldCorrelationSq`.**
 
-The denominator is `genotypeVarianceAtLocus p_i * genotypeVarianceAtLocus p_j = 4 p_i q_i p_j q_j`,
+The denominator is `genotypeVarianceHWE p_i * genotypeVarianceHWE p_j = 4 p_i q_i p_j q_j`,
 which cancels only when `D` is a *dosage* covariance, that is twice the
 haplotype `D`. `admixtureLDTwoLocus` in this same file produces the haplotype
 `D`, so composing the two — the obvious move, since one produces `D` and the
@@ -121,7 +121,7 @@ Both definitions are defensible in isolation and Lean cannot object, because
 both arguments are `ℝ` and nothing records which convention each carries. This
 is the first defect found here that is not local to a single definition: it
 lives in the composition. `tagR2` carries the same hazard if its variance
-arguments are read as `genotypeVarianceAtLocus`.
+arguments are read as `genotypeVarianceHWE`.
 
 The convention is therefore stated: `ldCorrelationSq` expects a dosage
 covariance. `ldCorrelationSq_of_haplotypeD` below converts. -/
@@ -153,8 +153,8 @@ theorem ld_correlation_sq_nonneg (D p_i p_j : ℝ)
   unfold ldCorrelationSq
   apply div_nonneg (sq_nonneg D)
   apply mul_nonneg
-  · unfold genotypeVarianceAtLocus; nlinarith
-  · unfold genotypeVarianceAtLocus; nlinarith
+  · unfold genotypeVarianceHWE; nlinarith
+  · unfold genotypeVarianceHWE; nlinarith
 
 end LDMatrixProperties
 

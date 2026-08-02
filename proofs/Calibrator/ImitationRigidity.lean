@@ -552,6 +552,60 @@ relating the two. Whether a real chromosome's LD is Markov at the scale of
 interest is exactly what the symbol analysis below can be falsified against. -/
 def stationaryLDEntry (decay : ℝ) (separation : ℕ) : ℝ := decay ^ separation
 
+/-- **One site of propagation along the chromosome.**
+
+The first-order Markov model is a *process*, and `stationaryLDEntry` is its
+stationary correlation sequence rather than a stipulated formula.  Given a
+candidate correlation sequence `c`, one step of the model produces the sequence
+whose value at separation `0` is the normalisation `c(0) = 1` — a site is
+perfectly correlated with itself — and whose value at separation `d + 1` is
+`decay * c d`, the Chapman–Kolmogorov relation for a chain whose one-site
+transmission coefficient is `decay`.
+
+Composition convention: separation is measured in sites, and the coefficient
+`decay` is the *per-site* retention, applied once per step.  Reading `decay` as
+a per-generation retention instead gives a numerically different kernel; that
+reading is `ldAfterGenerations`, and
+`stationaryLDEntry_eq_ldAfterGenerations` is the bridge between them.
+
+Empirical status: UNTESTED. -/
+def markovLDStep (decay : ℝ) (c : ℕ → ℝ) (separation : ℕ) : ℝ :=
+  if separation = 0 then 1 else decay * c (separation - 1)
+
+/-- **The geometric sequence is the stationary point of Markov propagation.**
+
+This is the theorem that makes `decay ^ separation` derived rather than
+asserted: it is the unique normalised sequence returned unchanged by
+`markovLDStep`, so no other decay law can be substituted into the symbol,
+hard-edge and whitening-gain results that follow. -/
+theorem stationaryLDEntry_isFixedPoint (decay : ℝ) (separation : ℕ) :
+    markovLDStep decay (stationaryLDEntry decay) separation =
+      stationaryLDEntry decay separation := by
+  cases separation with
+  | zero => simp [markovLDStep, stationaryLDEntry]
+  | succ n =>
+      have hne : (n + 1 : ℕ) ≠ 0 := Nat.succ_ne_zero n
+      simp only [markovLDStep, stationaryLDEntry, if_neg hne, Nat.add_sub_cancel]
+      ring
+
+/-- **The independent-sites boundary is attained.**  At `decay = 0` the kernel
+is exactly the identity: every off-diagonal correlation is `0`, not merely
+small.  This is the regime in which whitening is free, and a decay law that
+could never reach it would be qualitatively wrong about it. -/
+theorem stationaryLDEntry_of_no_decay (separation : ℕ) (h : separation ≠ 0) :
+    stationaryLDEntry 0 separation = 0 := by
+  unfold stationaryLDEntry
+  exact zero_pow h
+
+/-- **The complete-LD boundary is attained.**  At `decay = 1` every pair of
+sites is perfectly correlated at every separation, the kernel is the all-ones
+matrix, and the hard edge `ldHardEdge 1 = 0` is exactly zero: whitening is not
+merely ill-conditioned but undefined. -/
+theorem stationaryLDEntry_of_complete_ld (separation : ℕ) :
+    stationaryLDEntry 1 separation = 1 := by
+  unfold stationaryLDEntry
+  exact one_pow separation
+
 /-- **Symbol (spectral density) of the stationary LD kernel.** The Poisson
 kernel: the Fourier transform of the geometric correlation sequence. Its values
 are the limiting eigenvalues of the LD matrix, so the symbol replaces every
@@ -919,6 +973,75 @@ position alike. -/
 def ridgeBalance (aspect : ℝ) (eig : ι → ℝ) (ridge u : ℝ) : ℝ :=
   (1 - 1 / u) -
     aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ))
+
+/-- **The self-consistency equation read as a one-step map.**
+
+`ridgeBalance` is the residual of the equation `1 - 1/u = A(u)`, where
+`A(u) = aspect · mean_i eig_i/(eig_i + ridge·u)` is the resolvent functional of
+the training spectrum.  Solving that equation for the `u` on the *left* gives
+`u = 1/(1 - A(u))`, which is the map below: from a candidate `u` it recomputes
+the resolvent functional and returns the `u` that functional implies.  A root
+of `ridgeBalance` and a fixed point of this map are the same thing, which
+`ridgeBalance_root_isFixedPoint` proves.
+
+Composition convention: the resolvent is evaluated at the *current* iterate and
+the reciprocal is taken afterwards.  The reversed arrangement — solving for the
+`u` inside the resolvent instead — is a different iteration with the same roots
+but different convergence behaviour, so this is part of the process rather than
+of its presentation.
+
+Empirical status: UNTESTED as an iteration; the root it characterises is the
+VALIDATED quantity recorded on `ridgeBalance`. -/
+def ridgeSelfConsistentStep (aspect : ℝ) (eig : ι → ℝ) (ridge u : ℝ) : ℝ :=
+  1 / (1 - aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ)))
+
+/-- The scalar content of the ridge balance equation, with the spectral
+functional abstracted to a single real `A`. -/
+private theorem ridge_root_iff_aux (A u : ℝ) (hu : u ≠ 0) :
+    (1 - 1 / u) - A = 0 ↔ 1 / (1 - A) = u := by
+  constructor
+  · intro h
+    have hinv : 1 - A = 1 / u := by linarith
+    rw [hinv, one_div_one_div]
+  · intro h
+    by_cases hA : 1 - A = 0
+    · rw [hA, div_zero] at h
+      exact absurd h.symm hu
+    · have hinv : 1 - A = 1 / u := by rw [← h, one_div_one_div]
+      linarith
+
+/-- **The ridge balance root is a fixed point of a process.**
+
+The deterministic equivalent is not a stipulated closed form — there is no
+closed form — but it is also not merely "the zero of some function": it is the
+rest point of the resolvent iteration, and this equivalence is what licenses
+reading `ridgeBalance_root_unique` as uniqueness of a *state* of the model.
+Only `u ≠ 0` is needed; the degenerate case `A = 1`, where the map returns `0`,
+is excluded on both sides at once. -/
+theorem ridgeBalance_root_isFixedPoint (aspect : ℝ) (eig : ι → ℝ) (ridge u : ℝ)
+    (hu : u ≠ 0) :
+    ridgeBalance aspect eig ridge u = 0 ↔
+      ridgeSelfConsistentStep aspect eig ridge u = u := by
+  unfold ridgeBalance ridgeSelfConsistentStep
+  exact ridge_root_iff_aux _ u hu
+
+/-- **The no-shrinkage boundary is attained exactly.**  With `aspect = 0` — an
+infinitely long training sample, no variants-per-individual pressure — the
+resolvent functional vanishes and the fixed point is exactly `u = 1`, i.e.
+`δ = 0`: ridge regression at its unregularised-variance limit, with no
+inflation at all.  The iteration reaches this boundary rather than approaching
+it. -/
+@[simp] theorem ridgeSelfConsistentStep_of_zero_aspect (eig : ι → ℝ) (ridge u : ℝ) :
+    ridgeSelfConsistentStep 0 eig ridge u = 1 := by
+  unfold ridgeSelfConsistentStep
+  norm_num
+
+/-- At `aspect = 0` the balance equation has `u = 1` as its root, matching the
+boundary value of the map. -/
+theorem ridgeBalance_of_zero_aspect (eig : ι → ℝ) (ridge : ℝ) :
+    ridgeBalance 0 eig ridge 1 = 0 := by
+  unfold ridgeBalance
+  norm_num
 
 theorem ridgeBalance_strictMonoOn (aspect : ℝ) (eig : ι → ℝ) (ridge : ℝ)
     (haspect : 0 ≤ aspect) (heig : ∀ i, 0 ≤ eig i) (hridge : 0 < ridge) :

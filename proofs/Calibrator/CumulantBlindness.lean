@@ -227,7 +227,7 @@ theorem contraction_bound_tendsto_zero {k : ℕ} (hk : 1 ≤ k) (κ : ℝ) :
   have hk0 : k ≠ 0 := by omega
   have hcont : Filter.Tendsto (fun τ : ℝ => |κ| * Real.sqrt τ ^ k)
       (nhds 0) (nhds (|κ| * Real.sqrt 0 ^ k)) :=
-    ((Real.continuous_sqrt.pow k).const_mul |κ|).tendsto 0
+    ((continuous_const.mul (Real.continuous_sqrt.pow k)) : Continuous fun τ : ℝ => |κ| * Real.sqrt τ ^ k).tendsto 0
   simp only [Real.sqrt_zero, zero_pow hk0, mul_zero] at hcont
   exact hcont.mono_left nhdsWithin_le_nhds
 

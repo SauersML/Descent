@@ -181,18 +181,6 @@ theorem loo_reduces_overfitting
     approxLOOPGS pgs_full leverage residual < pgs_full := by
   unfold approxLOOPGS; linarith [mul_pos h_lev h_res]
 
-/-- **Jackknife correction for R².**
-    R²_corrected = R²_full - (n-1)/n × Σ (R²_full - R²_{-block})
-    where blocks are non-overlapping subsets of samples. -/
-noncomputable def jackknifeR2 (r2_full jackknife_bias : ℝ) : ℝ :=
-  r2_full - jackknife_bias
-
-/-- Jackknife correction reduces R² when bias is positive. -/
-theorem jackknife_reduces_r2 (r2_full bias : ℝ)
-    (h_bias : 0 < bias) :
-    jackknifeR2 r2_full bias < r2_full := by
-  unfold jackknifeR2; linarith
-
 /-- **GWAS-by-subtraction identifies overlap bias from partial overlap model.**
     Using the `partialOverlapR2` formula: running GWAS on the full sample
     (overlap fraction f) and then on the excluded sample (overlap fraction 0)

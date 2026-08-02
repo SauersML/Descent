@@ -253,30 +253,25 @@ theorem amEquilibrium_then_drift (V_A r h2 fst : ℝ) :
 
 /-! ### Tying the inlined genotype-variance restatements back to `ploidy`
 
-Five definitions across five modules spell out `2 p (1 - p)` independently.
-Each is Hardy-Weinberg genotype variance, and none was related to any other,
-so a change to the ploidy convention in one would have left the others
-silently disagreeing. These theorems make that disagreement a failed proof. -/
-
-theorem allelicVariance_eq_hwe (p : ℝ) :
-    genotypeVarianceAtLocus p = hweGenotypeVariance p := by
-  unfold genotypeVarianceAtLocus hweGenotypeVariance ploidy; ring
-
-theorem heterozygosity_eq_hwe (p : ℝ) :
-    heterozygosity p = hweGenotypeVariance p := by
-  unfold heterozygosity hweGenotypeVariance ploidy; ring
+Five definitions across five modules used to spell out `2 p (1 - p)`
+independently, and none was related to any other, so a change to the ploidy
+convention in one would have left the others silently disagreeing. Four of the
+five are gone: `CovarianceStructure.genotypeVarianceAtLocus`,
+`GeneticArchitectureDiscovery.tagGenotypeVariance` and
+`StratificationConfounding.heterozygosity` were deleted and their references
+repointed, and `AncestrySpecificPower.ancestryHeterozygosity` was renamed
+`hweHeterozygosity`. What survives is one genotype variance and one
+heterozygote frequency, both in `AncestrySpecificPower`, related there by
+`hweHeterozygosity_eq_genotypeVarianceHWE`. These two theorems tie that pair
+back to `ploidy`, so the convention still has exactly one place to change. -/
 
 theorem genotypeVarianceHWE_eq_hwe (p : ℝ) :
     genotypeVarianceHWE p = hweGenotypeVariance p := by
   unfold genotypeVarianceHWE hweGenotypeVariance ploidy; ring
 
-theorem ancestryHeterozygosity_eq_hwe (p : ℝ) :
-    ancestryHeterozygosity p = hweGenotypeVariance p := by
-  unfold ancestryHeterozygosity hweGenotypeVariance ploidy; ring
-
-theorem tagGenotypeVariance_eq_hwe (maf : ℝ) :
-    tagGenotypeVariance maf = hweGenotypeVariance maf := by
-  unfold tagGenotypeVariance hweGenotypeVariance ploidy; ring
+theorem hweHeterozygosity_eq_hwe (p : ℝ) :
+    hweHeterozygosity p = hweGenotypeVariance p := by
+  unfold hweHeterozygosity hweGenotypeVariance ploidy; ring
 
 /-! ### Tying the inlined island-model restatements back to the scaled rate
 

@@ -91,14 +91,88 @@ Under assortative mating, the additive genetic variance increases
 because alleles affecting the trait become correlated within individuals.
 -/
 
+/-- **One generation of Fisher's assortative-mating variance recursion.**
+
+`V` is the additive genetic variance in the current generation; the result is
+the variance in the next one.  `V₀` is the random-mating (linkage-equilibrium)
+additive variance and is a *parameter* of the process, not a state variable.
+Two things happen, in this order:
+
+1. *Mating.*  Mates are correlated `r` in phenotype, so their additive values
+   are correlated through the two regressions of `A` on `P`:
+   `Cov(A_m, A_f) = (V_A/V_P)² · r V_P = r h² V`.  The mid-parent additive
+   value therefore has variance `¼(V + V + 2 r h² V) = ½ V (1 + r h²)`.
+2. *Segregation.*  Mendelian segregation within a family contributes `½ V₀`.
+   It is `V₀` and not `V`: assortative mating builds only *between*-locus
+   gametic disequilibrium, while the within-family segregation variance is
+   fixed by the allele frequencies, which assortative mating does not move.
+   Using `½ V` here instead collapses the recursion to a purely geometric one
+   whose only fixed point is `0` -- a qualitatively different model.
+
+Composition convention: mating precedes segregation within a generation, and
+the transmission coefficient `r * h2` is held at its random-mating value.
+This is the standard Fisher (1918) linearisation; letting `h²` track the
+inflating variance gives a different, slowly-converging recursion.
+
+    Empirical status: UNTESTED. -/
+noncomputable def amVarianceStep (V₀ r h2 V : ℝ) : ℝ :=
+  (V * (1 + r * h2) + V₀) / 2
+
 /-- **AM equilibrium additive variance.**
-    At equilibrium: V_A(AM) = V_A(RM) / (1 - r*h2). -/
+    At equilibrium: V_A(AM) = V_A(RM) / (1 - r*h2).
+
+    This closed form is not stipulated: it is the fixed point of
+    `amVarianceStep`, and `AssortativeMatingModel.equilibriumVariance_isFixedPoint`
+    is the theorem that pins it. -/
 noncomputable def AssortativeMatingModel.equilibriumVariance (m : AssortativeMatingModel) : ℝ :=
   m.V_A / (1 - m.r * m.h2)
 
-/-- **Standalone AM equilibrium variance (for use without the model structure).** -/
+/-- **Standalone AM equilibrium variance (for use without the model structure).**
+
+    Derived, not asserted: see `amEquilibriumVariance_isFixedPoint`. -/
 noncomputable def amEquilibriumVariance (V_A r h2 : ℝ) : ℝ :=
   V_A / (1 - r * h2)
+
+/-- **The AM equilibrium variance is the fixed point of the variance
+recursion.**  Solving `½ V (1 + r h²) + ½ V₀ = V` gives `V (1 - r h²) = V₀`,
+i.e. `V = V₀ / (1 - r h²)`; no other constant can be substituted here and
+still compile. -/
+theorem amEquilibriumVariance_isFixedPoint (V_A r h2 : ℝ) (h_stab : r * h2 < 1) :
+    amVarianceStep V_A r h2 (amEquilibriumVariance V_A r h2) =
+      amEquilibriumVariance V_A r h2 := by
+  have hden : (0 : ℝ) < 1 - r * h2 := by linarith
+  have hden' : (1 : ℝ) - r * h2 ≠ 0 := ne_of_gt hden
+  unfold amVarianceStep amEquilibriumVariance
+  field_simp
+  ring
+
+/-- The structure-level equilibrium is the same fixed point. -/
+theorem AssortativeMatingModel.equilibriumVariance_isFixedPoint
+    (m : AssortativeMatingModel) :
+    amVarianceStep m.V_A m.r m.h2 m.equilibriumVariance = m.equilibriumVariance :=
+  amEquilibriumVariance_isFixedPoint m.V_A m.r m.h2 m.stability
+
+/-- **The zero-variance boundary is absorbing.**  A trait with no additive
+genetic variance acquires none under assortative mating: AM redistributes
+existing variance into gametic disequilibrium, it does not create variance.
+The closed form attains this boundary rather than approaching it. -/
+@[simp] theorem amVarianceStep_zero (r h2 : ℝ) :
+    amVarianceStep 0 r h2 0 = 0 := by
+  simp [amVarianceStep]
+
+/-- The equilibrium attains the absorbing boundary. -/
+@[simp] theorem amEquilibriumVariance_of_zero (r h2 : ℝ) :
+    amEquilibriumVariance 0 r h2 = 0 := by
+  simp [amEquilibriumVariance]
+
+/-- **No assortment, no inflation.**  With `r * h2 = 0` the recursion has the
+random-mating variance itself as its fixed point, so the inflation factor is
+exactly `1` at the boundary of the assortment parameter. -/
+theorem amEquilibriumVariance_of_no_assortment (V_A r h2 : ℝ) (h : r * h2 = 0) :
+    amEquilibriumVariance V_A r h2 = V_A := by
+  unfold amEquilibriumVariance
+  rw [h]
+  norm_num
 
 /-- AM equilibrium variance exceeds random mating variance. -/
 theorem AssortativeMatingModel.variance_exceeds_random (m : AssortativeMatingModel) :

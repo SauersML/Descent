@@ -196,40 +196,6 @@ standard PGS but captured by haplotype-based PGS.
 
 section PhaseDependentEffects
 
-/-- **Cis interaction effect.**
-    When two alleles on the same haplotype interact, the effect
-    differs from the sum of individual effects.
-    g_cis = β₁ + β₂ + δ_cis (where δ_cis ≠ 0 for interactions).
-
-    Empirical status: UNTESTED. -/
-noncomputable def cisEffect (beta1 beta2 delta_cis : ℝ) : ℝ :=
-  beta1 + beta2 + delta_cis
-
-/-- Cis effect differs from additive when δ_cis ≠ 0. -/
-theorem cis_differs_from_additive (beta1 beta2 delta_cis : ℝ)
-    (h_delta : delta_cis ≠ 0) :
-    cisEffect beta1 beta2 delta_cis ≠ beta1 + beta2 := by
-  unfold cisEffect; intro h; apply h_delta; linarith
-
-/-- **Compound heterozygosity.**
-    Having different damaging alleles on each copy (trans)
-    can be pathogenic even when each allele alone is benign.
-    This is a phase-dependent effect that PGS misses. -/
-noncomputable def riskCis (base_risk interaction_cis : ℝ) : ℝ :=
-  base_risk + interaction_cis
-
-/-- Phase-dependent risk under a trans configuration. -/
-noncomputable def riskTrans (base_risk interaction_trans : ℝ) : ℝ :=
-  base_risk + interaction_trans
-
-/-- Exact phase-dependent risk gap between trans and cis configurations. -/
-theorem trans_minus_cis_risk_eq_interaction_gap
-    (base_risk interaction_cis interaction_trans : ℝ) :
-    riskTrans base_risk interaction_trans - riskCis base_risk interaction_cis =
-      interaction_trans - interaction_cis := by
-  dsimp [riskTrans, riskCis]
-  ring
-
 /-- Average interaction contribution when a population has cis-configuration
 frequency `freq_cis` and trans frequency `1 - freq_cis`. -/
 noncomputable def averagePhaseInteraction
@@ -246,12 +212,33 @@ noncomputable def dosagePhaseMisspecificationError
     (1 - freq_cis) *
       (interaction_trans - averagePhaseInteraction freq_cis interaction_cis interaction_trans) ^ 2
 
-/-- A phase-aware haplotype predictor that tracks cis/trans configuration has no
-structural phase-misspecification error.
+/-- **A phase-aware haplotype predictor, and the error it actually incurs.**
+
+The predictor assigns interaction `pred_cis` to an individual it *calls* cis and
+`pred_trans` to one it calls trans. Statistical phasing calls the configuration
+wrongly at switch-error rate `switch_err`, so conditional on a cis individual the
+prediction is `pred_cis` with probability `1 - switch_err` and `pred_trans` with
+probability `switch_err`, and symmetrically for a trans individual. This
+definition is the resulting mean squared phase-prediction error, written out as
+the two-by-two mixture it comes from rather than asserted as a closed form; the
+closed form is `haplotypePhasePredictionError_correctSpec_eq` below.
+
+Nothing here is zero by construction. The error vanishes only when the predictor
+is correctly specified *and* phasing never switches, and both of those are
+hypotheses of theorems below rather than parts of this definition. That is the
+whole difference from the previous version of this file, in which the haplotype
+error was the literal `0` and every comparison against the dosage predictor was
+therefore a tautology.
 
     Empirical status: UNTESTED. -/
-noncomputable def haplotypePhasePredictionError : ℝ :=
-  0
+noncomputable def haplotypePhasePredictionError
+    (freq_cis switch_err pred_cis pred_trans interaction_cis interaction_trans : ℝ) : ℝ :=
+  freq_cis *
+      ((1 - switch_err) * (interaction_cis - pred_cis) ^ 2 +
+        switch_err * (interaction_cis - pred_trans) ^ 2) +
+    (1 - freq_cis) *
+      ((1 - switch_err) * (interaction_trans - pred_trans) ^ 2 +
+        switch_err * (interaction_trans - pred_cis) ^ 2)
 
 /-- Transport bias from carrying a source-trained dosage approximation into a
 target population whose cis/trans configuration frequency differs. -/
@@ -260,13 +247,26 @@ noncomputable def dosageTransportBias
   |averagePhaseInteraction freq_cis_target interaction_cis interaction_trans -
     averagePhaseInteraction freq_cis_source interaction_cis interaction_trans|
 
-/-- A phase-aware haplotype model transports without this structural bias when
-the cis/trans effects themselves are portable and only configuration
-frequencies differ.
+/-- **Transport bias of a phase-aware haplotype model.**
+
+The model is fitted in the source population, which fixes the pair
+`(pred_cis, pred_trans)`; it is then deployed in a target population whose
+cis-configuration frequency is `freq_cis_target`. The bias is the gap between the
+mean interaction the model predicts there and the mean interaction the target
+population has.
+
+Unlike the dosage bias, this one does not move when only the configuration
+frequency moves. It is not zero by construction either: it vanishes just when the
+fitted cis/trans effects agree with the target's, which is the content of
+`haplotypeTransportBias_eq_zero_of_portable_effects`, and it is what fails when
+the effects themselves do not transport — see
+`haplotype_less_portable_when_effects_shift`.
 
     Empirical status: UNTESTED. -/
-noncomputable def haplotypeTransportBias : ℝ :=
-  0
+noncomputable def haplotypeTransportBias
+    (freq_cis_target pred_cis pred_trans interaction_cis interaction_trans : ℝ) : ℝ :=
+  |averagePhaseInteraction freq_cis_target pred_cis pred_trans -
+    averagePhaseInteraction freq_cis_target interaction_cis interaction_trans|
 
 /-- The dosage-only phase-misspecification error has the exact variance form
 `f(1-f)(δ_cis - δ_trans)^2`. -/
@@ -291,18 +291,124 @@ theorem dosageTransportBias_eq
     ring
   rw [h_factor, abs_mul]
 
+/-- **Closed form of the phase-aware haplotype error under correct
+specification.** When the predictor's cis and trans values agree with the
+population's cis and trans interactions, the whole residual error is phasing
+error: `switch_err × (δ_cis − δ_trans)²`.
+
+This is the haplotype-side analogue of `dosagePhaseMisspecificationError_eq`, and
+it is what replaces the previous assertion that the haplotype error is `0`. The
+two closed forms are directly comparable: `switch_err` against
+`freq_cis (1 − freq_cis)`. -/
+theorem haplotypePhasePredictionError_correctSpec_eq
+    (freq_cis switch_err interaction_cis interaction_trans : ℝ) :
+    haplotypePhasePredictionError freq_cis switch_err interaction_cis interaction_trans
+        interaction_cis interaction_trans =
+      switch_err * (interaction_cis - interaction_trans) ^ 2 := by
+  unfold haplotypePhasePredictionError
+  ring
+
+/-- Correct specification *and* perfect phasing give zero residual phase error.
+Both hypotheses are visible in the statement, and both are exactly what fails in
+practice: effects are estimated from finite samples, and statistical phasing
+switches at a nonzero rate that is itself worse in underrepresented populations
+(`phasing_worse_for_underrepresented`). -/
+theorem haplotypePhasePredictionError_eq_zero_of_perfect
+    (freq_cis interaction_cis interaction_trans : ℝ) :
+    haplotypePhasePredictionError freq_cis 0 interaction_cis interaction_trans
+      interaction_cis interaction_trans = 0 := by
+  rw [haplotypePhasePredictionError_correctSpec_eq]
+  ring
+
+/-- The dosage-only predictor is the phase-aware predictor forced to return the
+same value in both configurations. So the two errors of the previous section are
+one functional evaluated at two predictors, not two unrelated quantities. -/
+theorem dosagePhaseMisspecificationError_eq_haplotype_constrained
+    (freq_cis interaction_cis interaction_trans : ℝ) :
+    dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans =
+      haplotypePhasePredictionError freq_cis 0
+        (averagePhaseInteraction freq_cis interaction_cis interaction_trans)
+        (averagePhaseInteraction freq_cis interaction_cis interaction_trans)
+        interaction_cis interaction_trans := by
+  unfold dosagePhaseMisspecificationError haplotypePhasePredictionError
+  ring
+
+/-- Closed form of the phase-aware transport bias: the configuration-weighted
+average of the two effect-estimation gaps. Note what is absent — the source
+configuration frequency does not appear, which is the precise sense in which a
+phase-aware model is insensitive to a configuration shift. -/
+theorem haplotypeTransportBias_eq
+    (freq_cis_target pred_cis pred_trans interaction_cis interaction_trans : ℝ) :
+    haplotypeTransportBias freq_cis_target pred_cis pred_trans interaction_cis
+        interaction_trans =
+      |freq_cis_target * (pred_cis - interaction_cis) +
+        (1 - freq_cis_target) * (pred_trans - interaction_trans)| := by
+  unfold haplotypeTransportBias averagePhaseInteraction
+  congr 1
+  ring
+
+/-- The phase-aware transport bias is zero when the cis and trans effects
+themselves transport. This is now a theorem with its hypothesis in the
+statement — the fitted pair is instantiated at the target's own effects — rather
+than a definitional `0`. -/
+theorem haplotypeTransportBias_eq_zero_of_portable_effects
+    (freq_cis_target interaction_cis interaction_trans : ℝ) :
+    haplotypeTransportBias freq_cis_target interaction_cis interaction_trans
+      interaction_cis interaction_trans = 0 := by
+  rw [haplotypeTransportBias_eq]
+  have h : freq_cis_target * (interaction_cis - interaction_cis) +
+      (1 - freq_cis_target) * (interaction_trans - interaction_trans) = 0 := by ring
+  rw [h, abs_zero]
+
+/-- And it is strictly positive as soon as the fitted effects miss the target's
+on average. -/
+theorem haplotypeTransportBias_pos_of_effects_not_portable
+    (freq_cis_target pred_cis pred_trans interaction_cis interaction_trans : ℝ)
+    (h_gap : freq_cis_target * (pred_cis - interaction_cis) +
+      (1 - freq_cis_target) * (pred_trans - interaction_trans) ≠ 0) :
+    0 < haplotypeTransportBias freq_cis_target pred_cis pred_trans interaction_cis
+      interaction_trans := by
+  rw [haplotypeTransportBias_eq]
+  exact abs_pos.mpr h_gap
+
+/-- **Compound heterozygosity is invisible to a dosage score — but only when
+phasing is good enough.** The comparison is now quantitative: a correctly
+specified phase-aware predictor beats the dosage predictor exactly when its
+switch-error rate is below `freq_cis (1 − freq_cis)`, which is at most `1/4` and
+falls to zero as the configuration becomes monomorphic.
+
+This hypothesis is checkable and is not always satisfied. At `freq_cis = 0.05`
+the threshold is `0.0475`, comparable to reported switch-error rates in
+underrepresented populations, so the conclusion is not available there; see
+`dosage_beats_haplotype_when_phasing_poor` for the reversal. -/
 theorem compound_het_not_captured_by_dosage
-    (freq_cis interaction_cis interaction_trans : ℝ)
-    (h_freq : 0 < freq_cis ∧ freq_cis < 1)
-    (h_phase_gap : interaction_cis ≠ interaction_trans) :
-    haplotypePhasePredictionError < dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans := by
-  rcases h_freq with ⟨h_freq_pos, h_freq_lt_one⟩
-  rw [dosagePhaseMisspecificationError_eq, haplotypePhasePredictionError]
-  have h_gap_sq : 0 < (interaction_cis - interaction_trans) ^ 2 := by
-    exact sq_pos_of_ne_zero (sub_ne_zero.mpr h_phase_gap)
-  have h_mix : 0 < freq_cis * (1 - freq_cis) := by
-    exact mul_pos h_freq_pos (sub_pos.mpr h_freq_lt_one)
-  exact mul_pos h_mix h_gap_sq
+    (freq_cis switch_err interaction_cis interaction_trans : ℝ)
+    (h_phase_gap : interaction_cis ≠ interaction_trans)
+    (h_phasing : switch_err < freq_cis * (1 - freq_cis)) :
+    haplotypePhasePredictionError freq_cis switch_err interaction_cis interaction_trans
+        interaction_cis interaction_trans <
+      dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans := by
+  rw [dosagePhaseMisspecificationError_eq, haplotypePhasePredictionError_correctSpec_eq]
+  have h_gap_sq : 0 < (interaction_cis - interaction_trans) ^ 2 :=
+    sq_pos_of_ne_zero (sub_ne_zero.mpr h_phase_gap)
+  exact mul_lt_mul_of_pos_right h_phasing h_gap_sq
+
+/-- **The comparison reverses when phasing is poor.** Above the threshold the
+dosage-only predictor has strictly smaller error than the phase-aware one, for
+the same cis/trans architecture. A haplotype score is not unconditionally better;
+it trades a structural error of size `freq_cis (1 − freq_cis)` for a phasing
+error of size `switch_err`. -/
+theorem dosage_beats_haplotype_when_phasing_poor
+    (freq_cis switch_err interaction_cis interaction_trans : ℝ)
+    (h_phase_gap : interaction_cis ≠ interaction_trans)
+    (h_phasing : freq_cis * (1 - freq_cis) < switch_err) :
+    dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans <
+      haplotypePhasePredictionError freq_cis switch_err interaction_cis interaction_trans
+        interaction_cis interaction_trans := by
+  rw [dosagePhaseMisspecificationError_eq, haplotypePhasePredictionError_correctSpec_eq]
+  have h_gap_sq : 0 < (interaction_cis - interaction_trans) ^ 2 :=
+    sq_pos_of_ne_zero (sub_ne_zero.mpr h_phase_gap)
+  exact mul_lt_mul_of_pos_right h_phasing h_gap_sq
 
 /-- **Phase effects are population-specific.**
     Haplotype frequencies differ → phase configuration frequencies
@@ -328,37 +434,77 @@ PGS accuracy and portability.
 
 section HaplotypePGS
 
-/-- **Haplotype PGS captures more variance than SNP PGS.**
-    Here the comparison is made on the explicit phase-misspecification error
-    surface from the previous section: a phase-aware haplotype score has zero
-    structural error, while a dosage-only SNP score has nonnegative error, and
-    strictly positive error whenever both cis and trans states occur and their
-    effects differ. -/
-theorem haplotype_pgs_at_least_snp
-    (freq_cis interaction_cis interaction_trans : ℝ)
-    (h_freq_nonneg : 0 ≤ freq_cis) (h_freq_le_one : freq_cis ≤ 1) :
-    haplotypePhasePredictionError ≤
-      dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans := by
-  rw [dosagePhaseMisspecificationError_eq, haplotypePhasePredictionError]
-  have h_mix_nonneg : 0 ≤ freq_cis * (1 - freq_cis) := by
-    exact mul_nonneg h_freq_nonneg (sub_nonneg.mpr h_freq_le_one)
-  exact mul_nonneg h_mix_nonneg (sq_nonneg _)
+/-- **Haplotype PGS captures more variance than SNP PGS — under a stated
+phasing hypothesis.**
 
-/-- **Haplotype PGS portability can be better.**
-    If the causal mechanism acts through cis/trans haplotype configuration,
-    transporting a dosage-only approximation incurs structural bias whenever
-    the target phase-configuration frequency differs from the source. A
-    phase-aware haplotype model avoids this bias. -/
+The comparison is made on the explicit error surface of the previous section. A
+correctly specified phase-aware haplotype score carries error `switch_err × gap²`
+and a dosage-only SNP score carries `freq_cis (1 − freq_cis) × gap²`, so the
+haplotype score is at least as good exactly on `switch_err ≤ freq_cis (1 −
+freq_cis)`.
+
+**Status change.** The previous statement of this theorem was
+`0 ≤ <nonnegative thing>`, true by definitional fiat because the haplotype error
+was defined to be `0`. It is now a genuine comparison with a hypothesis that can
+fail; when it fails the inequality reverses
+(`dosage_beats_haplotype_when_phasing_poor`). -/
+theorem haplotype_pgs_at_least_snp
+    (freq_cis switch_err interaction_cis interaction_trans : ℝ)
+    (h_phasing : switch_err ≤ freq_cis * (1 - freq_cis)) :
+    haplotypePhasePredictionError freq_cis switch_err interaction_cis interaction_trans
+        interaction_cis interaction_trans ≤
+      dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans := by
+  rw [dosagePhaseMisspecificationError_eq, haplotypePhasePredictionError_correctSpec_eq]
+  exact mul_le_mul_of_nonneg_right h_phasing (sq_nonneg _)
+
+/-- **Haplotype PGS portability can be better — when the cis/trans effects
+themselves transport.**
+
+If the causal mechanism acts through cis/trans configuration, transporting a
+dosage-only approximation incurs structural bias whenever the target
+configuration frequency differs from the source. A phase-aware model fitted at
+the target's own cis/trans effects avoids that bias.
+
+**Status change.** The left-hand side was previously the constant `0`, so the
+theorem was `0 < <positive thing>`. It is now the transport bias of an explicit
+predictor, and the portability of the effects is visible in the statement as the
+instantiation of the fitted pair. Drop that instantiation and the conclusion
+fails: see `haplotype_less_portable_when_effects_shift`. -/
 theorem haplotype_pgs_more_portable_for_cis
     (freq_cis_source freq_cis_target interaction_cis interaction_trans : ℝ)
     (h_freq_shift : freq_cis_source ≠ freq_cis_target)
     (h_phase_gap : interaction_cis ≠ interaction_trans) :
-    haplotypeTransportBias < dosageTransportBias
-      freq_cis_source freq_cis_target interaction_cis interaction_trans := by
-  rw [dosageTransportBias_eq, haplotypeTransportBias]
+    haplotypeTransportBias freq_cis_target interaction_cis interaction_trans
+        interaction_cis interaction_trans <
+      dosageTransportBias
+        freq_cis_source freq_cis_target interaction_cis interaction_trans := by
+  rw [dosageTransportBias_eq, haplotypeTransportBias_eq_zero_of_portable_effects]
   exact mul_pos
     (abs_pos.mpr (sub_ne_zero.mpr h_freq_shift.symm))
     (abs_pos.mpr (sub_ne_zero.mpr h_phase_gap))
+
+/-- **And the portability advantage reverses when the effects do not transport.**
+
+Suppose the fitted cis and trans effects are both off by the same amount `e` in
+the target — an effect shift rather than a configuration shift. Then the
+phase-aware model carries bias `|e|` in every target population, while the
+dosage model's structural transport bias is zero whenever the configuration
+frequency has not moved. The advantage in `haplotype_pgs_more_portable_for_cis`
+is therefore an advantage against one failure mode only, and the haplotype model
+buys it by taking on a second. -/
+theorem haplotype_less_portable_when_effects_shift
+    (freq_cis e interaction_cis interaction_trans : ℝ) (h_e : e ≠ 0) :
+    dosageTransportBias freq_cis freq_cis interaction_cis interaction_trans <
+      haplotypeTransportBias freq_cis (interaction_cis + e) (interaction_trans + e)
+        interaction_cis interaction_trans := by
+  rw [dosageTransportBias_eq, haplotypeTransportBias_eq]
+  have h0 : |freq_cis - freq_cis| * |interaction_cis - interaction_trans| = 0 := by
+    simp
+  rw [h0]
+  have hval : freq_cis * (interaction_cis + e - interaction_cis) +
+      (1 - freq_cis) * (interaction_trans + e - interaction_trans) = e := by ring
+  rw [hval]
+  exact abs_pos.mpr h_e
 
 /-- **But haplotype PGS can overfit in training population.**
     Rare haplotypes have fewer observed carriers, so their effect estimates are

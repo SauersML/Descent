@@ -210,7 +210,252 @@ recombination rate, so it rises to 1 with time instead of saturating at the
 drift-recombination equilibrium `1/(1 + 4 N c)`, overstating by up to 3.3-fold.
 The missing argument is the defect, as in five earlier cases, and no constant
 repairs it.
+
+What follows is the replacement.  Rather than asserting a closed form, it
+defines the Sved (1971) drift--recombination *process* -- with the recombination
+rate present -- states the equilibrium separately, and proves that the stated
+equilibrium is a fixed point of the process and that the trajectory converges to
+it.  `driftLDEquilibrium_zero_recomb` isolates exactly the regime in which the
+deleted formula was right (`c = 0`, where the equilibrium really is `1`), and
+`driftLDEquilibrium_le_one` is the bound the deleted formula satisfied only
+because it had no other place to go.
 -/
+
+/-- **One generation of the Sved (1971) drift--recombination recurrence** for
+    the two-locus identity-by-descent measure `Q` (the quantity whose
+    equilibrium is the familiar `E[r²] ≈ 1/(1 + 4 N c)`).
+
+    Two lineage pairs stay non-recombinant across the generation with
+    probability `(1 - c)²`; conditional on that, they are identical either
+    because they coalesced this generation (probability `1/(2 Nₑ)`) or because
+    they were already identical (probability `Q`).
+
+      Q(t+1) = (1 - c)² · [ 1/(2 Nₑ) + (1 - 1/(2 Nₑ)) · Q(t) ]
+
+    Empirical status: UNTESTED as written here.  The formula it replaces
+    (`bottleneckLDAmplification`, deleted above) was falsified by up to 3.3-fold
+    precisely by omitting `c`; the classical small-`c`, large-`Nₑ` limit of the
+    fixed point of this map is the Sved expression `1/(1 + 4 Nₑ c)` that the
+    falsification report cites as truth, but that limit is documented here, not
+    proved, and the map itself has not been simulated. -/
+noncomputable def driftLDStep (Ne c Q : ℝ) : ℝ :=
+  (1 - c) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * Q)
+
+/-- **Per-generation retention factor of the two-locus identity measure**,
+    `(1 - c)² · (1 - 1/(2 Nₑ))`: the slope of `driftLDStep` in `Q`.
+
+    This is the factor whose absence from the deleted formula caused the
+    unbounded rise: with `c = 0` it is the pure-drift retention `1 - 1/(2 Nₑ)`,
+    and only a positive `c` makes the process settle below `1`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def driftLDRetention (Ne c : ℝ) : ℝ :=
+  (1 - c) ^ 2 * (1 - 1 / (2 * Ne))
+
+/-- **Drift--recombination equilibrium of the two-locus identity measure.**
+
+    This closed form is not stipulated: it is the solution of
+    `driftLDStep Ne c Q = Q`, and `driftLDEquilibrium_isFixedPoint` is the
+    theorem that pins it, so no other constant can be substituted here and still
+    compile.
+
+    In the small-`c`, large-`Nₑ` limit this reduces to Sved's `1/(1 + 4 Nₑ c)`;
+    that limit is stated in prose only.  What is proved here is the two
+    properties the deleted formula lacked: it is a genuine fixed point of a map
+    that mentions `c`, and it never exceeds `1`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def driftLDEquilibrium (Ne c : ℝ) : ℝ :=
+  (1 - c) ^ 2 * (1 / (2 * Ne)) / (1 - driftLDRetention Ne c)
+
+/-- The one-generation map is affine in `Q`, with slope `driftLDRetention`. -/
+theorem driftLDStep_affine (Ne c Q : ℝ) :
+    driftLDStep Ne c Q =
+      (1 - c) ^ 2 * (1 / (2 * Ne)) + driftLDRetention Ne c * Q := by
+  unfold driftLDStep driftLDRetention
+  ring
+
+/-- The retention factor is a genuine per-generation probability: it lies in
+    `[0, 1]` whenever `Nₑ ≥ 1` and `c ∈ [0, 1]`. -/
+theorem driftLDRetention_mem_unit (Ne c : ℝ)
+    (hNe : 1 ≤ Ne) (hc : 0 ≤ c) (hc1 : c ≤ 1) :
+    0 ≤ driftLDRetention Ne c ∧ driftLDRetention Ne c ≤ 1 := by
+  have hu_pos : 0 < 1 / (2 * Ne) := div_pos one_pos (by linarith)
+  have hu_le : 1 / (2 * Ne) ≤ 1 := by
+    rw [div_le_one (by linarith)]; linarith
+  have hk_nonneg : 0 ≤ (1 - c) ^ 2 := sq_nonneg _
+  have hk_le : (1 - c) ^ 2 ≤ 1 := by
+    nlinarith [mul_nonneg hc (by linarith : (0:ℝ) ≤ 2 - c)]
+  unfold driftLDRetention
+  constructor
+  · exact mul_nonneg hk_nonneg (by linarith)
+  · nlinarith
+
+/-- The retention factor is strictly below `1` once recombination is present.
+    This is the statement the deleted formula could not make. -/
+theorem driftLDRetention_lt_one (Ne c : ℝ)
+    (hNe : 1 ≤ Ne) (hc : 0 < c) (hc1 : c ≤ 1) :
+    driftLDRetention Ne c < 1 := by
+  have hu_pos : 0 < 1 / (2 * Ne) := div_pos one_pos (by linarith)
+  have hu_le : 1 / (2 * Ne) ≤ 1 := by
+    rw [div_le_one (by linarith)]; linarith
+  have hk_lt : (1 - c) ^ 2 < 1 := by
+    nlinarith [mul_pos hc (by linarith : (0:ℝ) < 2 - c)]
+  have hk_nonneg : 0 ≤ (1 - c) ^ 2 := sq_nonneg _
+  unfold driftLDRetention
+  nlinarith
+
+/-- The retention factor is strictly positive when `c < 1` and `Nₑ > 1/2`. -/
+theorem driftLDRetention_pos (Ne c : ℝ)
+    (hNe : 1 ≤ Ne) (hc1 : c < 1) :
+    0 < driftLDRetention Ne c := by
+  have hu_lt : 1 / (2 * Ne) < 1 := by
+    rw [div_lt_one (by linarith)]; linarith
+  have hk_pos : 0 < (1 - c) ^ 2 := by positivity
+  unfold driftLDRetention
+  exact mul_pos hk_pos (by linarith)
+
+/-- The denominator of the equilibrium is positive, so the equilibrium is
+    well-defined for every admissible `(Nₑ, c)`. -/
+theorem driftLD_one_sub_retention_pos (Ne c : ℝ)
+    (hNe : 1 ≤ Ne) (hc : 0 ≤ c) (hc1 : c ≤ 1) :
+    0 < 1 - driftLDRetention Ne c := by
+  have hu_pos : 0 < 1 / (2 * Ne) := div_pos one_pos (by linarith)
+  have hu_le : 1 / (2 * Ne) ≤ 1 := by
+    rw [div_le_one (by linarith)]; linarith
+  have hk_le : (1 - c) ^ 2 ≤ 1 := by
+    nlinarith [mul_nonneg hc (by linarith : (0:ℝ) ≤ 2 - c)]
+  unfold driftLDRetention
+  nlinarith [mul_nonneg (sub_nonneg.2 hk_le) (sub_nonneg.2 hu_le)]
+
+/-- Clearing the denominator: `Q* · (1 - retention)` is the per-generation
+    coalescence input `(1 - c)²/(2 Nₑ)`. -/
+theorem driftLDEquilibrium_mul_one_sub_retention (Ne c : ℝ)
+    (h_ne : 1 - driftLDRetention Ne c ≠ 0) :
+    driftLDEquilibrium Ne c * (1 - driftLDRetention Ne c) =
+      (1 - c) ^ 2 * (1 / (2 * Ne)) := by
+  unfold driftLDEquilibrium
+  field_simp
+
+/-- **The equilibrium is a fixed point of the one-generation map.**  This is
+    the theorem that makes `driftLDEquilibrium` unfalsifiable-by-stipulation
+    impossible: it is derived from the dynamic, not asserted alongside it.  The
+    deleted `bottleneckLDAmplification` had no such theorem, and no map it could
+    have been a fixed point of, because it had no `c`. -/
+theorem driftLDEquilibrium_isFixedPoint (Ne c : ℝ)
+    (h_ne : 1 - driftLDRetention Ne c ≠ 0) :
+    driftLDStep Ne c (driftLDEquilibrium Ne c) = driftLDEquilibrium Ne c := by
+  rw [driftLDStep_affine, ← driftLDEquilibrium_mul_one_sub_retention Ne c h_ne]
+  ring
+
+/-- **Without recombination the equilibrium really is `1`.**  This records the
+    exact regime in which the deleted formula's limit was correct, and therefore
+    the exact sense in which it was wrong everywhere else: `c = 0` is the only
+    point at which drift-generated identity rises to one. -/
+theorem driftLDEquilibrium_zero_recomb (Ne : ℝ) (hNe : 0 < Ne) :
+    driftLDEquilibrium Ne 0 = 1 := by
+  have hb : (0 : ℝ) < 1 / (2 * Ne) := div_pos one_pos (by linarith)
+  unfold driftLDEquilibrium driftLDRetention
+  have hin : (1 : ℝ) - (1 - 0) ^ 2 * (1 - 1 / (2 * Ne)) = 1 / (2 * Ne) := by ring
+  have hnum : ((1 : ℝ) - 0) ^ 2 * (1 / (2 * Ne)) = 1 / (2 * Ne) := by ring
+  rw [hin, hnum, div_self (ne_of_gt hb)]
+
+/-- **The equilibrium is nonnegative.** -/
+theorem driftLDEquilibrium_nonneg (Ne c : ℝ)
+    (hNe : 1 ≤ Ne) (hc : 0 ≤ c) (hc1 : c ≤ 1) :
+    0 ≤ driftLDEquilibrium Ne c := by
+  have hden := driftLD_one_sub_retention_pos Ne c hNe hc hc1
+  have hu_pos : 0 < 1 / (2 * Ne) := div_pos one_pos (by linarith)
+  unfold driftLDEquilibrium
+  exact div_nonneg (mul_nonneg (sq_nonneg _) (le_of_lt hu_pos)) (le_of_lt hden)
+
+/-- **The equilibrium never exceeds `1`.**  This is the physical constraint the
+    deleted formula satisfied only by saturating at `1`; here it is a bound that
+    any replacement body must also satisfy in order to typecheck. -/
+theorem driftLDEquilibrium_le_one (Ne c : ℝ)
+    (hNe : 1 ≤ Ne) (hc : 0 ≤ c) (hc1 : c ≤ 1) :
+    driftLDEquilibrium Ne c ≤ 1 := by
+  have hden := driftLD_one_sub_retention_pos Ne c hNe hc hc1
+  have hk_le : (1 - c) ^ 2 ≤ 1 := by
+    nlinarith [mul_nonneg hc (by linarith : (0:ℝ) ≤ 2 - c)]
+  unfold driftLDEquilibrium
+  rw [div_le_one hden]
+  unfold driftLDRetention
+  nlinarith
+
+/-- **Smaller populations equilibrate at higher LD**, weakly. -/
+theorem driftLDEquilibrium_antitone (Ne₁ Ne₂ c : ℝ)
+    (hNe₁ : 1 ≤ Ne₁) (h_le : Ne₁ ≤ Ne₂) (hc : 0 ≤ c) (hc1 : c ≤ 1) :
+    driftLDEquilibrium Ne₂ c ≤ driftLDEquilibrium Ne₁ c := by
+  have hNe₂ : (1 : ℝ) ≤ Ne₂ := le_trans hNe₁ h_le
+  have hd₁ := driftLD_one_sub_retention_pos Ne₁ c hNe₁ hc hc1
+  have hd₂ := driftLD_one_sub_retention_pos Ne₂ c hNe₂ hc hc1
+  have hk_nonneg : 0 ≤ (1 - c) ^ 2 := sq_nonneg _
+  have hk_le : (1 - c) ^ 2 ≤ 1 := by
+    nlinarith [mul_nonneg hc (by linarith : (0:ℝ) ≤ 2 - c)]
+  have hu_le : 1 / (2 * Ne₂) ≤ 1 / (2 * Ne₁) :=
+    one_div_le_one_div_of_le (by linarith) (by linarith)
+  unfold driftLDEquilibrium at *
+  unfold driftLDRetention at *
+  rw [div_le_div_iff₀ hd₂ hd₁]
+  nlinarith [mul_nonneg (mul_nonneg hk_nonneg (sub_nonneg.2 hk_le))
+    (sub_nonneg.2 hu_le)]
+
+/-- **Smaller populations equilibrate at strictly higher LD** once recombination
+    is present but not free. -/
+theorem driftLDEquilibrium_strictAnti (Ne₁ Ne₂ c : ℝ)
+    (hNe₁ : 1 ≤ Ne₁) (h_lt : Ne₁ < Ne₂) (hc : 0 < c) (hc1 : c < 1) :
+    driftLDEquilibrium Ne₂ c < driftLDEquilibrium Ne₁ c := by
+  have hNe₂ : (1 : ℝ) ≤ Ne₂ := by linarith
+  have hd₁ := driftLD_one_sub_retention_pos Ne₁ c hNe₁ (le_of_lt hc) (le_of_lt hc1)
+  have hd₂ := driftLD_one_sub_retention_pos Ne₂ c hNe₂ (le_of_lt hc) (le_of_lt hc1)
+  have hk_pos : 0 < (1 - c) ^ 2 := by positivity
+  have hk_lt : (1 - c) ^ 2 < 1 := by
+    nlinarith [mul_pos hc (by linarith : (0:ℝ) < 2 - c)]
+  have hu_lt : 1 / (2 * Ne₂) < 1 / (2 * Ne₁) :=
+    one_div_lt_one_div_of_lt (by linarith) (by linarith)
+  unfold driftLDEquilibrium at *
+  unfold driftLDRetention at *
+  rw [div_lt_div_iff₀ hd₂ hd₁]
+  nlinarith [mul_pos (mul_pos hk_pos (sub_pos.2 hk_lt)) (sub_pos.2 hu_lt)]
+
+/-- **The trajectory of the two-locus identity measure** from an initial level
+    `Q₀`, iterating `driftLDStep`.  This is the process; the closed form below
+    is a theorem about it, not a second definition.
+
+    Empirical status: UNTESTED. -/
+noncomputable def driftLDTrajectory (Ne c Q₀ : ℝ) : ℕ → ℝ
+  | 0 => Q₀
+  | t + 1 => driftLDStep Ne c (driftLDTrajectory Ne c Q₀ t)
+
+@[simp] theorem driftLDTrajectory_zero (Ne c Q₀ : ℝ) :
+    driftLDTrajectory Ne c Q₀ 0 = Q₀ := rfl
+
+@[simp] theorem driftLDTrajectory_succ (Ne c Q₀ : ℝ) (t : ℕ) :
+    driftLDTrajectory Ne c Q₀ (t + 1) =
+      driftLDStep Ne c (driftLDTrajectory Ne c Q₀ t) := rfl
+
+/-- **Closed form of the trajectory**, proved by induction from the recurrence:
+    the deviation from equilibrium decays geometrically at the retention rate.
+
+      Q(t) = Q* + (Q₀ - Q*) · retentionᵗ
+
+    Because `retention < 1` exactly when `c > 0`, the trajectory approaches
+    `Q*` and not `1`.  This identity is what the deleted formula asserted
+    without a process to assert it about. -/
+theorem driftLDTrajectory_closedForm (Ne c Q₀ : ℝ)
+    (h_ne : 1 - driftLDRetention Ne c ≠ 0) (t : ℕ) :
+    driftLDTrajectory Ne c Q₀ t =
+      driftLDEquilibrium Ne c +
+        (Q₀ - driftLDEquilibrium Ne c) * driftLDRetention Ne c ^ t := by
+  induction t with
+  | zero =>
+      rw [driftLDTrajectory_zero, pow_zero, mul_one]
+      ring
+  | succ n ih =>
+      rw [driftLDTrajectory_succ, ih, driftLDStep_affine,
+        ← driftLDEquilibrium_mul_one_sub_retention Ne c h_ne]
+      ring
 
 end BottleneckLD
 

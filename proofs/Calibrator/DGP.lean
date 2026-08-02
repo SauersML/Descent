@@ -1525,10 +1525,70 @@ noncomputable def fstDriftMutation (p : EvolutionaryParameters) : ℝ :=
 noncomputable def fstDriftMigration (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.bigM)
 
+/-- **One generation of the identity-by-descent balance under all three
+forces.**
+
+`F` is the probability that two gene copies drawn from the same population are
+identical by descent.  In one generation drift makes a pair identical with
+probability `1/(2 Nₑ)` among the pairs that are not already identical, and each
+of the two lineages independently leaves the local identity class at rate
+`mig + mu` -- by being replaced by a migrant, or by mutating away from its
+ancestral allelic state.  Migration and mutation enter through their *sum*
+because, to first order, either event destroys identity and neither can undo
+the other.
+
+Composition convention: the three forces are added, not composed, so their
+within-generation ordering does not matter.  This is the first-order
+(weak-force, large-`Nₑ`) model; the unlinearised recursion multiplies
+`(1 - mig)²(1 - mu)²` against `1 - 1/(2 Nₑ)` and has a fixed point differing at
+`O(mig², mu², mig/Nₑ)`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def fstDriftFlowStep (p : EvolutionaryParameters) (F : ℝ) : ℝ :=
+  F + (1 - F) / (2 * p.Ne) - 2 * (p.mig + p.mu) * F
+
 /-- **Full equilibrium Fst** under drift + mutation + migration:
-    Fst = 1/(1 + θ + M). Both mutation and migration counteract drift. -/
+    Fst = 1/(1 + θ + M). Both mutation and migration counteract drift.
+
+    Not stipulated: `fstEquilibrium_isFixedPoint` derives it as the rest point
+    of `fstDriftFlowStep`.  With `θ = 4 Nₑ μ` and `M = 4 Nₑ m`, balancing
+    `(1 - F)/(2 Nₑ)` against `2(m + μ)F` gives `F (1 + 4 Nₑ (m + μ)) = 1`, and
+    `4 Nₑ (m + μ) = θ + M` is exactly why the two scaled rates add. -/
 noncomputable def fstEquilibrium (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.theta + p.bigM)
+
+/-- **The full equilibrium Fst is the fixed point of the three-force
+balance.** -/
+theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :
+    fstDriftFlowStep p (fstEquilibrium p) = fstEquilibrium p := by
+  have hNe' : p.Ne ≠ 0 := ne_of_gt p.Ne_pos
+  have hd : (0 : ℝ) < 1 + p.theta + p.bigM := by
+    linarith [p.theta_nonneg, p.bigM_nonneg]
+  have hd' : (1 : ℝ) + p.theta + p.bigM ≠ 0 := ne_of_gt hd
+  have hscaled : 1 + p.theta + p.bigM = 1 + 4 * p.Ne * (p.mig + p.mu) := by
+    unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM
+    ring
+  unfold fstDriftFlowStep fstEquilibrium
+  rw [hscaled] at hd' ⊢
+  field_simp
+  ring
+
+/-- **Complete fixation is a boundary the closed form attains.**  With neither
+mutation nor migration, `θ = M = 0` and the equilibrium is exactly `1`: drift
+alone runs to fixation, and the formula reaches that value rather than
+approaching it. -/
+theorem fstEquilibrium_of_no_flow (p : EvolutionaryParameters)
+    (hmig : p.mig = 0) (hmu : p.mu = 0) :
+    fstEquilibrium p = 1 := by
+  have hθ : p.theta = 0 := by
+    unfold EvolutionaryParameters.theta
+    rw [hmu]; ring
+  have hM : p.bigM = 0 := by
+    unfold EvolutionaryParameters.bigM
+    rw [hmig]; ring
+  unfold fstEquilibrium
+  rw [hθ, hM]
+  norm_num
 
 /-- Full equilibrium Fst is positive. -/
 theorem fstEquilibrium_pos (p : EvolutionaryParameters) :

@@ -243,25 +243,187 @@ theorem lof_large_effects
   rw [one_lt_div₀ h_common_pos]
   exact h_larger
 
+/-!
+### Mutation-selection balance, as the fixed point of a map
+
+The frequency of a deleterious allele under purifying selection is usually quoted
+as `μ/s`. That number is not a frequency: for `s < μ` it exceeds `1`, and `s < μ`
+is admissible for exactly the weakly-constrained comparison arm the portability
+claim is about. It is also the wrong quantity twice over — the dominant balance
+is `μ/(h s)` and the recessive one is `√(μ/s)` — and this file's subject matter,
+LoF variants scored by pLI and haploinsufficiency, spans both regimes.
+
+So the two regimes are written here as one-generation maps and their equilibria
+are derived as fixed points of those maps, in the shape of
+`Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium_isFixedPoint`.
+Both equilibria land in `[0, 1]` by construction rather than by hypothesis.
+-/
+
+/-- **One generation of mutation-selection dynamics for a rare deleterious allele
+with dominance coefficient `h`.**
+
+Heterozygotes carry selective load `h * s` and are the only carriers that matter
+while the allele is rare, so the selection step multiplies the frequency by
+`1 - h * s`; mutation then converts a fraction `mu` of the wild-type allele.
+The `p ^ 2` homozygote term is dropped, which is the rare-allele linearization
+and is valid only while `h * s` dominates `mu` — see
+`mutationSelectionBalance_at_zero_dominance`, which shows the map degenerates at
+`h = 0` and hands the recessive case to `mutationSelectionStepRecessive`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def mutationSelectionStepRare (mu s h p : ℝ) : ℝ :=
+  p * (1 - h * s) + mu * (1 - p)
+
+/-- **Mutation-selection balance for a partially dominant deleterious allele.**
+
+The fixed point of `mutationSelectionStepRare`. It is `mu / (h * s + mu)`, not
+`mu / (h * s)`: the two agree to leading order when `h * s` is large against
+`mu`, and the difference is precisely what keeps this quantity inside `[0, 1]`
+for every admissible parameter, including the weak-constraint regime `s < mu`
+where `mu / s` is not a frequency at all.
+
+    Empirical status: UNTESTED. -/
+noncomputable def mutationSelectionBalance (mu s h : ℝ) : ℝ :=
+  mu / (h * s + mu)
+
+/-- **The dominant balance is a fixed point of the dominant map.** This is what
+makes the closed form above impossible to stipulate: it is derived from the
+dynamic rather than asserted alongside it. -/
+theorem mutationSelectionBalance_isFixedPoint (mu s h : ℝ)
+    (h_load : 0 < h * s + mu) :
+    mutationSelectionStepRare mu s h (mutationSelectionBalance mu s h) =
+      mutationSelectionBalance mu s h := by
+  have hne : h * s + mu ≠ 0 := ne_of_gt h_load
+  unfold mutationSelectionStepRare mutationSelectionBalance
+  first
+    | (field_simp; ring)
+    | field_simp
+
+/-- The dominant balance is a frequency: it lies in `[0, 1]` for every
+nonnegative mutation rate and positive selective load. The quoted `mu / s` has no
+such bound, and exceeds `1` whenever `s < mu`. -/
+theorem mutationSelectionBalance_mem_unit (mu s h : ℝ)
+    (h_mu : 0 ≤ mu) (h_load : 0 < h * s + mu) :
+    0 ≤ mutationSelectionBalance mu s h ∧ mutationSelectionBalance mu s h ≤ 1 := by
+  unfold mutationSelectionBalance
+  refine ⟨div_nonneg h_mu h_load.le, ?_⟩
+  rw [div_le_one h_load]
+  linarith
+
+/-- The balance is strictly below the textbook `mu / (h s)`, so the classical
+formula is an upper bound and the correction is second order in `mu`. -/
+theorem mutationSelectionBalance_lt_classical (mu s h : ℝ)
+    (h_mu : 0 < mu) (h_hs : 0 < h * s) :
+    mutationSelectionBalance mu s h < mu / (h * s) := by
+  unfold mutationSelectionBalance
+  exact div_lt_div_of_pos_left h_mu h_hs (by linarith)
+
+/-- **The dominant linearization degenerates at full recessivity.** At `h = 0`
+the map has no selection at all, and its fixed point is fixation. This is not a
+defect of the closed form but a statement about the linearization: with `h = 0`
+selection acts only through the dropped `p ^ 2` term, so the recessive case needs
+`mutationSelectionStepRecessive` and gets a different scaling law. -/
+theorem mutationSelectionBalance_at_zero_dominance (mu s : ℝ) (h_mu : mu ≠ 0) :
+    mutationSelectionBalance mu s 0 = 1 := by
+  unfold mutationSelectionBalance
+  rw [zero_mul, zero_add]
+  exact div_self h_mu
+
+/-- **One generation for a fully recessive deleterious allele.** Selection acts
+only on homozygotes, so the load is `s * p` per copy rather than `h * s`, and
+mutation replenishes as before. -/
+noncomputable def mutationSelectionStepRecessive (mu s p : ℝ) : ℝ :=
+  p - s * p ^ 2 + mu * (1 - p)
+
+/-- **Mutation-selection balance for a fully recessive deleterious allele**: the
+nonnegative root of `s p² + mu p − mu = 0`, the fixed point of
+`mutationSelectionStepRecessive`. It is `√(mu/s)` to leading order — a
+qualitatively different scaling from the dominant `mu/(h s)` — and it is bounded
+by `1` for every positive `s`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def mutationSelectionBalanceRecessive (mu s : ℝ) : ℝ :=
+  (Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)
+
+/-- **The recessive balance is a fixed point of the recessive map.** -/
+theorem mutationSelectionBalanceRecessive_isFixedPoint (mu s : ℝ)
+    (h_mu : 0 ≤ mu) (h_s : 0 < s) :
+    mutationSelectionStepRecessive mu s (mutationSelectionBalanceRecessive mu s) =
+      mutationSelectionBalanceRecessive mu s := by
+  have hs : s ≠ 0 := ne_of_gt h_s
+  have hnn : 0 ≤ mu * (mu + 4 * s) := by
+    nlinarith [mul_nonneg h_mu h_mu, mul_nonneg h_mu h_s.le]
+  have hR : Real.sqrt (mu * (mu + 4 * s)) ^ 2 = mu * (mu + 4 * s) := Real.sq_sqrt hnn
+  -- `x` is the candidate frequency; `2 s x = R - mu` is the only fact about it used.
+  have hx : 2 * s * ((Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)) =
+      Real.sqrt (mu * (mu + 4 * s)) - mu := by
+    first
+      | (field_simp; ring)
+      | field_simp
+  have hR' : (2 * s * ((Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)) + mu) ^ 2 =
+      mu * (mu + 4 * s) := by
+    rw [hx]
+    linear_combination hR
+  have hfour : (4 * s) * (s * ((Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)) ^ 2) =
+      (4 * s) * (mu * (1 - (Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s))) := by
+    linear_combination hR'
+  have hfour_ne : (4 : ℝ) * s ≠ 0 := by
+    intro hc
+    apply hs
+    linarith
+  have hkey : s * ((Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)) ^ 2 =
+      mu * (1 - (Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)) :=
+    mul_left_cancel₀ hfour_ne hfour
+  unfold mutationSelectionStepRecessive mutationSelectionBalanceRecessive
+  first
+    | linear_combination -hkey
+    | linarith [hkey]
+
+/-- The recessive balance is a frequency, and its square is bounded by `mu / s`:
+`s p² ≤ mu`, which is the exact sense in which `p ≲ √(mu/s)`. -/
+theorem mutationSelectionBalanceRecessive_sq_le (mu s : ℝ)
+    (h_mu : 0 ≤ mu) (h_s : 0 < s) :
+    s * mutationSelectionBalanceRecessive mu s ^ 2 ≤ mu ∧
+      0 ≤ mutationSelectionBalanceRecessive mu s := by
+  have hnn : 0 ≤ mu * (mu + 4 * s) := by
+    nlinarith [mul_nonneg h_mu h_mu, mul_nonneg h_mu h_s.le]
+  have hR : Real.sqrt (mu * (mu + 4 * s)) ^ 2 = mu * (mu + 4 * s) := Real.sq_sqrt hnn
+  have hRnn : 0 ≤ Real.sqrt (mu * (mu + 4 * s)) := Real.sqrt_nonneg _
+  have hRge : mu ≤ Real.sqrt (mu * (mu + 4 * s)) := by
+    nlinarith [hR, hRnn, h_mu, h_s, mul_nonneg hRnn h_s.le, mul_nonneg h_mu h_s.le]
+  have hnonneg : 0 ≤ mutationSelectionBalanceRecessive mu s := by
+    unfold mutationSelectionBalanceRecessive
+    apply div_nonneg (by linarith)
+    linarith
+  refine ⟨?_, hnonneg⟩
+  have hfix := mutationSelectionBalanceRecessive_isFixedPoint mu s h_mu h_s
+  simp only [mutationSelectionStepRecessive] at hfix
+  nlinarith [hfix, mul_nonneg h_mu hnonneg]
+
 /-- **LoF variant portability depends on gene constraint.**
     Highly constrained genes have LoF variants in all populations
-    (purifying selection maintains them rare). Under purifying selection
-    with coefficient s, the equilibrium frequency is μ/s
-    (mutation-selection balance). For strong selection (large s),
-    variants are rarer but consistently present across populations.
-    The proportion of genetic variance maintained across populations
-    increases with selection strength.
+    (purifying selection maintains them rare). The comparison is made on the
+    dominant mutation-selection balance derived above, at a common dominance
+    coefficient `h`, so both arms are frequencies in `[0, 1]` whatever the
+    selection coefficients are — including the weakly constrained arm with
+    `s < mu`, where the previously stated `mu / s` was not a frequency.
 
     Worked example: Genes with high constraint (e.g., pLI > 0.9) show
-    this pattern most clearly. -/
+    this pattern most clearly, and `haploinsufficiency_consistent_direction`
+    below is about the same `h > 0` regime this theorem is stated in. -/
 theorem constrained_genes_more_portable_lof
-    (s_constrained s_unconstrained μ : ℝ)
+    (s_constrained s_unconstrained μ h : ℝ)
     (h_μ : 0 < μ)
+    (h_h : 0 < h)
     (h_su : 0 < s_unconstrained)
     (h_stronger : s_unconstrained < s_constrained) :
     -- Equilibrium frequency is lower under stronger constraint
-    μ / s_constrained < μ / s_unconstrained := by
-  exact div_lt_div_of_pos_left h_μ h_su h_stronger
+    mutationSelectionBalance μ s_constrained h <
+      mutationSelectionBalance μ s_unconstrained h := by
+  unfold mutationSelectionBalance
+  have h_lo : 0 < h * s_unconstrained + μ := by nlinarith
+  have h_lt : h * s_unconstrained + μ < h * s_constrained + μ := by nlinarith
+  exact div_lt_div_of_pos_left h_μ h_lo h_lt
 
 /-- **Haploinsufficiency gives directional effects.**
     For haploinsufficient genes, any LoF variant reduces function.
