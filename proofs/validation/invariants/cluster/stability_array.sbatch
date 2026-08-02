@@ -23,10 +23,19 @@
 # --open-mode=truncate so a re-run of one array index cannot leave the previous
 # answer in place for a task that failed early. Same rule as `rm -f` first.
 #
-# Submit:
+# REGENERATE defs.json BEFORE SUBMITTING. The staleness guard refuses a table
+# older than the corpus, and 39 tasks cannot each regenerate it -- they would
+# race on the same file. One serial extract, then submit:
+#
 #   cd <clone>/proofs/validation/invariants
+#   python3 extract_defs.py                       # <-- required
 #   mkdir -p /projects/standard/hsiehph/sauer354/inv_stability
 #   sbatch --partition=agsmall cluster/stability_array.sbatch
+#
+# Do not merge origin/main into the clone while the array is in flight: that
+# touches the .lean files, and every task starting afterwards will refuse on
+# staleness. The guard is right to; a sweep spanning two revisions is two
+# sweeps.
 #     (or amdsmall / msismall / sioux -- whichever schedules first)
 #
 # Collect:
