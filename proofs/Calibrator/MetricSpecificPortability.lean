@@ -472,9 +472,9 @@ theorem mechanistic_transport_disrupts_calibration_slope_and_brier
     calibrationSlopeDeviation 1 < profile.slopeDeviation ∧
     profile.slopeDeviation = 1 - profile.slope ∧
     profile.slope =
-      (sourceWeightedTagScore cal.metric (targetDirectCausalProjection cal.metric) +
-        sourceWeightedTagScore cal.metric (targetProxyTaggingProjection cal.metric) +
-        sourceWeightedTagScore cal.metric cal.metric.contextCrossTarget) /
+      (sourceWeightedTagScore cal.metric (directCausalProjection cal.metric Pop.target) +
+        sourceWeightedTagScore cal.metric (proxyTaggingProjection cal.metric Pop.target) +
+        sourceWeightedTagScore cal.metric (cal.metric.contextCross Pop.target)) /
           targetScoreVarianceFromSourceWeights cal.metric ∧
     sourceCalibratedBrierFromSourceWeightsAtPrevalence
         cal.metric cal.metric.targetPrevalence <
@@ -500,9 +500,9 @@ theorem mechanistic_transport_disrupts_calibration_slope_and_brier
       (cal.targetIdentityCalibrationProfile).slope hslope_lt
   have hslope_eq :
       (cal.targetIdentityCalibrationProfile).slope =
-        (sourceWeightedTagScore cal.metric (targetDirectCausalProjection cal.metric) +
-          sourceWeightedTagScore cal.metric (targetProxyTaggingProjection cal.metric) +
-          sourceWeightedTagScore cal.metric cal.metric.contextCrossTarget) /
+        (sourceWeightedTagScore cal.metric (directCausalProjection cal.metric Pop.target) +
+          sourceWeightedTagScore cal.metric (proxyTaggingProjection cal.metric Pop.target) +
+          sourceWeightedTagScore cal.metric (cal.metric.contextCross Pop.target)) /
             targetScoreVarianceFromSourceWeights cal.metric := by
     simpa [CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
       CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile] using

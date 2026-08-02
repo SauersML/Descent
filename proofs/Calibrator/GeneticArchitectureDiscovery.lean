@@ -695,56 +695,48 @@ restatement has been deleted in favour of that one. -/
 scored in both populations, and there is no proxy tagging or target-only
 biology. -/
 noncomputable def commonOnlyPortableModel : CrossPopulationMetricModel 2 2 where
-  betaSource := ![1, 0]
-  betaTarget := ![1, 0]
-  sigmaTagSource := 1
-  sigmaTagTarget := 1
-  directCausalSource := !![1, 0; 0, 0]
-  directCausalTarget := !![1, 0; 0, 0]
-  novelDirectCausalTarget := 0
-  proxyTaggingSource := 0
-  proxyTaggingTarget := 0
-  novelProxyTaggingTarget := 0
-  novelCausalEffectTarget := ![0, 0]
-  contextCrossSource := ![0, 0]
-  contextCrossTarget := ![0, 0]
-  sourceOutcomeVariance := 4
-  targetOutcomeVariance := 4
+  beta := Pop.pair (![1, 0]) (![1, 0])
+  sigmaTag := Pop.pair 1 1
+  directCausal := Pop.pair (!![1, 0; 0, 0]) (!![1, 0; 0, 0])
+  proxyTagging := Pop.pair 0 0
+  contextCross := Pop.pair (![0, 0]) (![0, 0])
+  outcomeVariance := Pop.pair 4 4
+  novelDirectCausal := Pop.pair 0 0
+  novelProxyTagging := Pop.pair 0 0
+  novelCausalEffect := Pop.pair 0 (![0, 0])
   novelUntaggablePhenotypeVarianceTarget := 0
   targetPrevalence := 1 / 2
-  sourceOutcomeVariance_pos := by norm_num
-  targetOutcomeVariance_pos := by norm_num
   novelUntaggablePhenotypeVarianceTarget_nonneg := by norm_num
   targetPrevalence_pos := by norm_num
   targetPrevalence_lt_one := by norm_num
+  novelDirectCausal_source := rfl
+  novelProxyTagging_source := rfl
+  novelCausalEffect_source := rfl
+  outcomeVariance_pos := by intro P; cases P <;> norm_num
 
 /-- Common-plus-rare witness: the source score uses one shared common causal
 locus and one source-specific rare causal locus. The target retains only the
 common locus, so the within-source `R²` rises while the transported target
 signal stays unchanged. -/
 noncomputable def commonAndRarePortableModel : CrossPopulationMetricModel 2 2 where
-  betaSource := ![1, 1]
-  betaTarget := ![1, 0]
-  sigmaTagSource := 1
-  sigmaTagTarget := 1
-  directCausalSource := 1
-  directCausalTarget := 1
-  novelDirectCausalTarget := 0
-  proxyTaggingSource := 0
-  proxyTaggingTarget := 0
-  novelProxyTaggingTarget := 0
-  novelCausalEffectTarget := ![0, 0]
-  contextCrossSource := ![0, 0]
-  contextCrossTarget := ![0, 0]
-  sourceOutcomeVariance := 4
-  targetOutcomeVariance := 4
+  beta := Pop.pair (![1, 1]) (![1, 0])
+  sigmaTag := Pop.pair 1 1
+  directCausal := Pop.pair 1 1
+  proxyTagging := Pop.pair 0 0
+  contextCross := Pop.pair (![0, 0]) (![0, 0])
+  outcomeVariance := Pop.pair 4 4
+  novelDirectCausal := Pop.pair 0 0
+  novelProxyTagging := Pop.pair 0 0
+  novelCausalEffect := Pop.pair 0 (![0, 0])
   novelUntaggablePhenotypeVarianceTarget := 0
   targetPrevalence := 1 / 2
-  sourceOutcomeVariance_pos := by norm_num
-  targetOutcomeVariance_pos := by norm_num
   novelUntaggablePhenotypeVarianceTarget_nonneg := by norm_num
   targetPrevalence_pos := by norm_num
   targetPrevalence_lt_one := by norm_num
+  novelDirectCausal_source := rfl
+  novelProxyTagging_source := rfl
+  novelCausalEffect_source := rfl
+  outcomeVariance_pos := by intro P; cases P <;> norm_num
 
 theorem commonOnlyPortableModel_sourceR2 :
     sourceR2FromSourceWeights commonOnlyPortableModel = 1 / 4 := by
@@ -752,8 +744,8 @@ theorem commonOnlyPortableModel_sourceR2 :
     sourceExplainedSignalVarianceFromSourceWeights,
     sourcePredictiveCovarianceFromSourceWeights,
     sourceScoreVarianceFromExplicitDrivers,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights, sourceCrossCovariance,
-    sigmaTagCausalSource, dotProduct, targetTotalEffect, Matrix.mulVec]
+    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
+    sigmaTagCausal, dotProduct, totalEffect, Matrix.mulVec]
 
 theorem commonOnlyPortableModel_targetR2 :
     targetR2FromSourceWeights commonOnlyPortableModel = 1 / 4 := by
@@ -761,11 +753,11 @@ theorem commonOnlyPortableModel_targetR2 :
     targetExplainedSignalVarianceFromSourceWeights,
     targetPredictiveCovarianceFromSourceWeights,
     targetScoreVarianceFromSourceWeights,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights, targetCrossCovariance,
+    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
     effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden,
     brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    novelUntaggablePhenotypeResidual, sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceCrossCovariance, dotProduct, targetTotalEffect, Matrix.mulVec]
+    novelUntaggablePhenotypeResidual, sigmaTagCausal, sigmaTagCausal,
+    crossCovariance, dotProduct, totalEffect, Matrix.mulVec]
 
 theorem commonAndRarePortableModel_sourceR2 :
     sourceR2FromSourceWeights commonAndRarePortableModel = 1 / 2 := by
@@ -773,8 +765,8 @@ theorem commonAndRarePortableModel_sourceR2 :
     sourceExplainedSignalVarianceFromSourceWeights,
     sourcePredictiveCovarianceFromSourceWeights,
     sourceScoreVarianceFromExplicitDrivers,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights, sourceCrossCovariance,
-    sigmaTagCausalSource, dotProduct, targetTotalEffect, Matrix.mulVec]
+    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
+    sigmaTagCausal, dotProduct, totalEffect, Matrix.mulVec]
 
 theorem commonAndRarePortableModel_targetR2 :
     targetR2FromSourceWeights commonAndRarePortableModel = 1 / 8 := by
@@ -782,11 +774,11 @@ theorem commonAndRarePortableModel_targetR2 :
     targetExplainedSignalVarianceFromSourceWeights,
     targetPredictiveCovarianceFromSourceWeights,
     targetScoreVarianceFromSourceWeights,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights, targetCrossCovariance,
+    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
     effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden,
     brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    novelUntaggablePhenotypeResidual, sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceCrossCovariance, dotProduct, targetTotalEffect, Matrix.mulVec]
+    novelUntaggablePhenotypeResidual, sigmaTagCausal, sigmaTagCausal,
+    crossCovariance, dotProduct, totalEffect, Matrix.mulVec]
 
 /-- **WGS discovers causal variants directly (no tagging needed).**
     This theorem is now stated on the mechanistic portability model itself.
@@ -798,16 +790,16 @@ theorem commonAndRarePortableModel_targetR2 :
 theorem wgs_eliminates_ld_mismatch
     {p q : ℕ}
     (m : CrossPopulationMetricModel p q)
-    (h_direct : m.directCausalTarget = m.directCausalSource)
-    (h_novelDirect : m.novelDirectCausalTarget = 0)
-    (h_proxySource : m.proxyTaggingSource = 0)
-    (h_proxyTarget : m.proxyTaggingTarget = 0)
-    (h_novelProxy : m.novelProxyTaggingTarget = 0) :
+    (h_direct : (m.directCausal Pop.target) = (m.directCausal Pop.source))
+    (h_novelDirect : (m.novelDirectCausal Pop.target) = 0)
+    (h_proxySource : (m.proxyTagging Pop.source) = 0)
+    (h_proxyTarget : (m.proxyTagging Pop.target) = 0)
+    (h_novelProxy : (m.novelProxyTagging Pop.target) = 0) :
     brokenTaggingResidual m = 0 := by
   have h_sigma :
-      sigmaTagCausalSource m = sigmaTagCausalTarget m := by
+      sigmaTagCausal m Pop.source = sigmaTagCausal m Pop.target := by
     ext i j
-    simp [sigmaTagCausalSource, sigmaTagCausalTarget, h_direct,
+    simp [sigmaTagCausal, sigmaTagCausal, h_direct,
       h_novelDirect, h_proxySource, h_proxyTarget, h_novelProxy]
   unfold brokenTaggingResidual
   rw [h_sigma]

@@ -761,9 +761,9 @@ theorem CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direc
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q)
     (link : CalibrationLink) :
     (m.targetCalibrationProfile link).slope =
-      (sourceWeightedTagScore m.metric (targetDirectCausalProjection m.metric) +
-        sourceWeightedTagScore m.metric (targetProxyTaggingProjection m.metric) +
-        sourceWeightedTagScore m.metric m.metric.contextCrossTarget) /
+      (sourceWeightedTagScore m.metric (directCausalProjection m.metric Pop.target) +
+        sourceWeightedTagScore m.metric (proxyTaggingProjection m.metric Pop.target) +
+        sourceWeightedTagScore m.metric (m.metric.contextCross Pop.target)) /
           targetScoreVarianceFromSourceWeights m.metric := by
   simp [CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile,
     CrossPopulationMechanisticCalibrationModel.toShiftModel,

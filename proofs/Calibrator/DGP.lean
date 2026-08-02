@@ -131,7 +131,7 @@ structure SourceTaggedMoments (c t : ℕ) where
 
 /-- Aggregate source scored-to-causal alignment is the sum of directly scored
 causal variants and proxy tagging. -/
-noncomputable def SourceTaggedMoments.sigmaTagCausalSource {c t : ℕ}
+noncomputable def SourceTaggedMoments.sigmaTagCausal {c t : ℕ}
     (mom : SourceTaggedMoments c t) : Matrix (Fin t) (Fin c) ℝ :=
   mom.directCausalSource + mom.proxyTaggingSource
 
@@ -139,7 +139,7 @@ noncomputable def SourceTaggedMoments.sigmaTagCausalSource {c t : ℕ}
 `w*_S = Σ_tag,S^{-1} Σ_tc,S β_c`. -/
 noncomputable def sourceBestLinearWeightsFromLD {c t : ℕ}
     (mom : SourceTaggedMoments c t) (betaCausal : CausalVec c) : TagVec t :=
-  mom.sigmaTagSource⁻¹.mulVec (mom.sigmaTagCausalSource.mulVec betaCausal)
+  mom.sigmaTagSource⁻¹.mulVec (mom.sigmaTagCausal.mulVec betaCausal)
 
 /-- Frobenius norm squared for a square covariance matrix:
 `‖A‖_F² = Σᵢ Σⱼ Aᵢⱼ²`. -/
@@ -216,7 +216,7 @@ def ldWitnessSigmaTargetCorrelated : Matrix (Fin 2) (Fin 2) ℝ :=
   ext i
   fin_cases i <;>
     simp [ldWitnessSourceWeights, sourceBestLinearWeightsFromLD, ldWitnessSourceMoments,
-      SourceTaggedMoments.sigmaTagCausalSource, ldWitnessBeta, Matrix.mulVec, dotProduct]
+      SourceTaggedMoments.sigmaTagCausal, ldWitnessBeta, Matrix.mulVec, dotProduct]
 
 /-- Concrete witness that target LD structure changes target explained variance
 even when the source weights and target predictor/outcome cross-covariance are
@@ -2054,7 +2054,7 @@ live in:
 - `PortabilityDrift.targetEffectHeterogeneity`, where cross-population effect
   mismatch is a locus-resolved vector `β_target - β_source`, not a scalar
   retention coordinate;
-- `PortabilityDrift.targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity`,
+- `PortabilityDrift.taggingProjection_target_eq_source_effect_plus_effectHeterogeneity`,
   where the transported target signal is decomposed into the part induced by
   source-stable effects plus the separate projection of target-effect
   heterogeneity;

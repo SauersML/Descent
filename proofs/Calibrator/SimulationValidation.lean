@@ -47,28 +47,24 @@ noncomputable def identityDirectMetricModel {q : ℕ}
     (h_prev_pos : 0 < targetPrevalence)
     (h_prev_lt : targetPrevalence < 1) :
     CrossPopulationMetricModel q q where
-  betaSource := β
-  betaTarget := β
-  sigmaTagSource := 1
-  sigmaTagTarget := 1
-  directCausalSource := 1
-  directCausalTarget := 1
-  novelDirectCausalTarget := 0
-  proxyTaggingSource := 0
-  proxyTaggingTarget := 0
-  novelProxyTaggingTarget := 0
-  novelCausalEffectTarget := 0
-  contextCrossSource := 0
-  contextCrossTarget := 0
-  sourceOutcomeVariance := outcomeVariance
-  targetOutcomeVariance := outcomeVariance
+  beta := Pop.pair (β) (β)
+  sigmaTag := Pop.pair 1 1
+  directCausal := Pop.pair 1 1
+  proxyTagging := Pop.pair 0 0
+  contextCross := Pop.pair 0 0
+  outcomeVariance := Pop.pair outcomeVariance outcomeVariance
+  novelDirectCausal := Pop.pair 0 0
+  novelProxyTagging := Pop.pair 0 0
+  novelCausalEffect := Pop.pair 0 0
   novelUntaggablePhenotypeVarianceTarget := 0
   targetPrevalence := targetPrevalence
-  sourceOutcomeVariance_pos := h_out
-  targetOutcomeVariance_pos := h_out
   novelUntaggablePhenotypeVarianceTarget_nonneg := by simp
   targetPrevalence_pos := h_prev_pos
   targetPrevalence_lt_one := h_prev_lt
+  novelDirectCausal_source := rfl
+  novelProxyTagging_source := rfl
+  novelCausalEffect_source := rfl
+  outcomeVariance_pos := by intro P; cases P <;> simp_all <;> norm_num
 
 /-- In the generic identity/direct-causal witness, the mechanistic source and
 target `R²` are exactly the squared-effect mass divided by outcome variance,
@@ -84,7 +80,7 @@ theorem identityDirectMetricModel_source_weights {q : ℕ}
           h_out h_prev_pos h_prev_lt) = β := by
   ext i
   simp [identityDirectMetricModel, sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    sourceCrossCovariance, sigmaTagCausalSource, Matrix.one_mulVec]
+    crossCovariance, sigmaTagCausal, Matrix.one_mulVec]
 
 theorem identityDirectMetricModel_metrics {q : ℕ}
     (β : Fin q → ℝ)
@@ -111,19 +107,19 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
     simpa [m] using
       identityDirectMetricModel_source_weights β outcomeVariance targetPrevalence
         h_out h_prev_pos h_prev_lt
-  have h_source_cross : sourceCrossCovariance m = β := by
+  have h_source_cross : crossCovariance m Pop.source = β := by
     ext i
-    simp [m, identityDirectMetricModel, sourceCrossCovariance, sigmaTagCausalSource,
+    simp [m, identityDirectMetricModel, crossCovariance, sigmaTagCausal,
       Matrix.one_mulVec]
-  have h_target_cross : targetCrossCovariance m = β := by
+  have h_target_cross : crossCovariance m Pop.target = β := by
     ext i
-    simp [m, identityDirectMetricModel, targetCrossCovariance, sigmaTagCausalTarget,
-      targetTotalEffect, Matrix.one_mulVec]
+    simp [m, identityDirectMetricModel, crossCovariance, sigmaTagCausal,
+      totalEffect, Matrix.one_mulVec]
   have h_source_score : sourceScoreVarianceFromExplicitDrivers m = sourceSquaredEffectMass β := by
     rw [sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action]
     unfold sourceWeightedTagScore
     rw [h_weights]
-    change dotProduct β (m.sigmaTagSource.mulVec β) = sourceSquaredEffectMass β
+    change dotProduct β ((m.sigmaTag Pop.source).mulVec β) = sourceSquaredEffectMass β
     simpa [m, identityDirectMetricModel, sourceSquaredEffectMass, Matrix.one_mulVec,
       dotProduct, pow_two]
   have h_source_cov : sourcePredictiveCovarianceFromSourceWeights m = sourceSquaredEffectMass β := by
@@ -143,7 +139,7 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
     rw [targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_action]
     unfold sourceWeightedTagScore
     rw [h_weights]
-    change dotProduct β (m.sigmaTagTarget.mulVec β) = sourceSquaredEffectMass β
+    change dotProduct β ((m.sigmaTag Pop.target).mulVec β) = sourceSquaredEffectMass β
     simpa [m, identityDirectMetricModel, sourceSquaredEffectMass, Matrix.one_mulVec,
       dotProduct, pow_two]
   have h_target_cov : targetPredictiveCovarianceFromSourceWeights m = sourceSquaredEffectMass β := by
@@ -172,25 +168,21 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
 /-- Baseline single-locus mechanistic witness with identical source and target
 state where the scored SNP is itself the causal variant. -/
 noncomputable def baselineMetricModel : CrossPopulationMetricModel 1 1 := {
-  betaSource := ![1]
-  betaTarget := ![1]
-  sigmaTagSource := !![1]
-  sigmaTagTarget := !![1]
-  directCausalSource := !![1]
-  directCausalTarget := !![1]
-  novelDirectCausalTarget := !![0]
-  proxyTaggingSource := !![0]
-  proxyTaggingTarget := !![0]
-  novelProxyTaggingTarget := !![0]
-  novelCausalEffectTarget := ![0]
-  contextCrossSource := ![0]
-  contextCrossTarget := ![0]
-  sourceOutcomeVariance := 2
-  targetOutcomeVariance := 2
+  beta := Pop.pair ![1] ![1]
+  sigmaTag := Pop.pair !![1] !![1]
+  directCausal := Pop.pair !![1] !![1]
+  proxyTagging := Pop.pair !![0] !![0]
+  novelDirectCausal := Pop.pair 0 !![0]
+  novelProxyTagging := Pop.pair 0 !![0]
+  novelCausalEffect := Pop.pair 0 ![0]
+  contextCross := Pop.pair ![0] ![0]
+  outcomeVariance := Pop.pair 2 2
   novelUntaggablePhenotypeVarianceTarget := 0
   targetPrevalence := 1 / 2
-  sourceOutcomeVariance_pos := by norm_num
-  targetOutcomeVariance_pos := by norm_num
+  novelDirectCausal_source := rfl
+  novelProxyTagging_source := rfl
+  novelCausalEffect_source := rfl
+  outcomeVariance_pos := by intro P; cases P <;> norm_num
   novelUntaggablePhenotypeVarianceTarget_nonneg := by norm_num
   targetPrevalence_pos := by norm_num
   targetPrevalence_lt_one := by norm_num
@@ -201,29 +193,27 @@ noncomputable def baselineMetricModel : CrossPopulationMetricModel 1 1 := {
     Empirical status: UNTESTED. -/
 noncomputable def targetLDShiftMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineMetricModel with
-      sigmaTagTarget := !![2] }
+      sigmaTag := Pop.withTarget baselineMetricModel.sigmaTag !![2] }
 
 /-- Proxy-tag baseline witness: the scored SNP is not itself causal, but is a
 perfect source and target proxy for the unscored causal variant. -/
 noncomputable def baselineProxyTagMetricModel : CrossPopulationMetricModel 1 1 := {
   baselineMetricModel with
-    directCausalSource := !![0]
-    directCausalTarget := !![0]
-    proxyTaggingSource := !![1]
-    proxyTaggingTarget := !![1] }
+    directCausal := Pop.pair !![0] !![0]
+    proxyTagging := Pop.pair !![1] !![1] }
 
 /-- Target tagging-shift witness: only the target proxy-tagging alignment
 changes. -/
 noncomputable def targetTaggingShiftMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineProxyTagMetricModel with
-      proxyTaggingTarget := !![1 / 2] }
+      proxyTagging := Pop.withTarget baselineProxyTagMetricModel.proxyTagging !![1 / 2] }
 
 /-- Target effect-shift witness: only the target causal effect size changes.
 
     Empirical status: UNTESTED. -/
 noncomputable def targetEffectShiftMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineMetricModel with
-      betaTarget := ![1 / 2] }
+      beta := Pop.withTarget baselineMetricModel.beta ![1 / 2] }
 
 /-- Target context-shift witness: only the target context/environment
 cross-covariance changes. -/
@@ -275,12 +265,12 @@ theorem baseline_mechanistic_metrics :
     targetPredictiveCovarianceFromSourceWeights,
     sourceScoreVarianceFromExplicitDrivers,
     targetScoreVarianceFromSourceWeights,
-    sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceTaggingProjection, targetTaggingProjection,
-    sourceDirectCausalProjection, sourceProxyTaggingProjection,
-    targetDirectCausalProjection, targetProxyTaggingProjection,
+    sigmaTagCausal, sigmaTagCausal,
+    taggingProjection, taggingProjection,
+    directCausalProjection, proxyTaggingProjection,
+    directCausalProjection, proxyTaggingProjection,
     sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    sourceCrossCovariance, targetCrossCovariance,
+    crossCovariance, crossCovariance,
     effectiveTargetOutcomeVariance,
     targetCalibratedBrierFromSourceWeights,
     TransportedMetrics.calibratedBrier, TransportedMetrics.r2FromSignalVariance,
@@ -293,16 +283,16 @@ target population the tag-based score loses portability while the direct-causal
 score does not. This is the explicit direct-vs-tag witness missing from the old
 abstraction. -/
 theorem direct_causal_vs_proxy_tag_same_source_r2_different_portability :
-    sourceDirectCausalProjection baselineMetricModel 0 = 1 ∧
-    sourceProxyTaggingProjection baselineMetricModel 0 = 0 ∧
-    sourceDirectCausalProjection baselineProxyTagMetricModel 0 = 0 ∧
-    sourceProxyTaggingProjection baselineProxyTagMetricModel 0 = 1 ∧
+    directCausalProjection baselineMetricModel Pop.source 0 = 1 ∧
+    proxyTaggingProjection baselineMetricModel Pop.source 0 = 0 ∧
+    directCausalProjection baselineProxyTagMetricModel Pop.source 0 = 0 ∧
+    proxyTaggingProjection baselineProxyTagMetricModel Pop.source 0 = 1 ∧
     sourceR2FromSourceWeights baselineMetricModel =
       sourceR2FromSourceWeights baselineProxyTagMetricModel ∧
     targetR2FromSourceWeights targetTaggingShiftMetricModel <
       targetR2FromSourceWeights baselineMetricModel := by
   simp [baselineMetricModel, baselineProxyTagMetricModel, targetTaggingShiftMetricModel,
-    sourceDirectCausalProjection, sourceProxyTaggingProjection,
+    directCausalProjection, proxyTaggingProjection,
     sourceR2FromSourceWeights, targetR2FromSourceWeights,
     sourceExplainedSignalVarianceFromSourceWeights,
     targetExplainedSignalVarianceFromSourceWeights,
@@ -311,11 +301,11 @@ theorem direct_causal_vs_proxy_tag_same_source_r2_different_portability :
     sourceScoreVarianceFromExplicitDrivers,
     targetScoreVarianceFromSourceWeights,
     sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    sourceCrossCovariance, targetCrossCovariance,
-    sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceTaggingProjection, targetTaggingProjection,
-    sourceDirectCausalProjection, sourceProxyTaggingProjection,
-    targetDirectCausalProjection, targetProxyTaggingProjection,
+    crossCovariance, crossCovariance,
+    sigmaTagCausal, sigmaTagCausal,
+    taggingProjection, taggingProjection,
+    directCausalProjection, proxyTaggingProjection,
+    directCausalProjection, proxyTaggingProjection,
     effectiveTargetOutcomeVariance, brokenTaggingResidual,
     ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
     irreducibleTargetResidualBurden,
@@ -341,12 +331,12 @@ theorem target_ld_shift_changes_portability_without_changing_source_r2 :
     targetPredictiveCovarianceFromSourceWeights,
     sourceScoreVarianceFromExplicitDrivers,
     targetScoreVarianceFromSourceWeights,
-    sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceTaggingProjection, targetTaggingProjection,
-    sourceDirectCausalProjection, sourceProxyTaggingProjection,
-    targetDirectCausalProjection, targetProxyTaggingProjection,
+    sigmaTagCausal, sigmaTagCausal,
+    taggingProjection, taggingProjection,
+    directCausalProjection, proxyTaggingProjection,
+    directCausalProjection, proxyTaggingProjection,
     sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    sourceCrossCovariance, targetCrossCovariance,
+    crossCovariance, crossCovariance,
     effectiveTargetOutcomeVariance,
     Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
   norm_num
@@ -370,12 +360,12 @@ theorem target_tagging_shift_changes_target_r2 :
     targetPredictiveCovarianceFromSourceWeights,
     sourceScoreVarianceFromExplicitDrivers,
     targetScoreVarianceFromSourceWeights,
-    sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceTaggingProjection, targetTaggingProjection,
-    sourceDirectCausalProjection, sourceProxyTaggingProjection,
-    targetDirectCausalProjection, targetProxyTaggingProjection,
+    sigmaTagCausal, sigmaTagCausal,
+    taggingProjection, taggingProjection,
+    directCausalProjection, proxyTaggingProjection,
+    directCausalProjection, proxyTaggingProjection,
     sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    sourceCrossCovariance, targetCrossCovariance,
+    crossCovariance, crossCovariance,
     effectiveTargetOutcomeVariance,
     Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
   norm_num
@@ -398,12 +388,12 @@ theorem target_effect_shift_changes_target_r2 :
     targetPredictiveCovarianceFromSourceWeights,
     sourceScoreVarianceFromExplicitDrivers,
     targetScoreVarianceFromSourceWeights,
-    sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceTaggingProjection, targetTaggingProjection,
-    sourceDirectCausalProjection, sourceProxyTaggingProjection,
-    targetDirectCausalProjection, targetProxyTaggingProjection,
+    sigmaTagCausal, sigmaTagCausal,
+    taggingProjection, taggingProjection,
+    directCausalProjection, proxyTaggingProjection,
+    directCausalProjection, proxyTaggingProjection,
     sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    sourceCrossCovariance, targetCrossCovariance,
+    crossCovariance, crossCovariance,
     effectiveTargetOutcomeVariance,
     Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
   norm_num
@@ -426,12 +416,12 @@ theorem target_context_shift_creates_additive_overfit_loss_and_changes_target_r2
     targetPredictiveCovarianceFromSourceWeights,
     sourceScoreVarianceFromExplicitDrivers,
     targetScoreVarianceFromSourceWeights,
-    sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceTaggingProjection, targetTaggingProjection,
-    sourceDirectCausalProjection, sourceProxyTaggingProjection,
-    targetDirectCausalProjection, targetProxyTaggingProjection,
+    sigmaTagCausal, sigmaTagCausal,
+    taggingProjection, taggingProjection,
+    directCausalProjection, proxyTaggingProjection,
+    directCausalProjection, proxyTaggingProjection,
     sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    sourceCrossCovariance, targetCrossCovariance,
+    crossCovariance, crossCovariance,
     effectiveTargetOutcomeVariance,
     Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
   norm_num
@@ -450,10 +440,10 @@ theorem target_prevalence_shift_changes_brier_without_changing_target_r2 :
     targetExplainedSignalVarianceFromSourceWeights,
     targetPredictiveCovarianceFromSourceWeights,
     targetScoreVarianceFromSourceWeights,
-    sigmaTagCausalSource, sigmaTagCausalTarget,
-    targetTaggingProjection, targetDirectCausalProjection, targetProxyTaggingProjection,
+    sigmaTagCausal, sigmaTagCausal,
+    taggingProjection, directCausalProjection, proxyTaggingProjection,
     sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    sourceCrossCovariance, targetCrossCovariance,
+    crossCovariance, crossCovariance,
     effectiveTargetOutcomeVariance,
     targetCalibratedBrierFromSourceWeights,
     TransportedMetrics.calibratedBrier, TransportedMetrics.r2FromSignalVariance,
@@ -476,12 +466,12 @@ theorem novel_target_only_tagging_changes_target_r2 :
     targetPredictiveCovarianceFromSourceWeights,
     sourceScoreVarianceFromExplicitDrivers,
     targetScoreVarianceFromSourceWeights,
-    sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceTaggingProjection, targetTaggingProjection,
-    sourceDirectCausalProjection, sourceProxyTaggingProjection,
-    targetDirectCausalProjection, targetProxyTaggingProjection,
+    sigmaTagCausal, sigmaTagCausal,
+    taggingProjection, taggingProjection,
+    directCausalProjection, proxyTaggingProjection,
+    directCausalProjection, proxyTaggingProjection,
     sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    sourceCrossCovariance, targetCrossCovariance,
+    crossCovariance, crossCovariance,
     brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
     novelUntaggablePhenotypeResidual, irreducibleTargetResidualBurden,
     effectiveTargetOutcomeVariance, Matrix.mulVec, dotProduct,
@@ -504,12 +494,12 @@ theorem novel_untaggable_phenotype_variance_lowers_target_r2 :
     targetPredictiveCovarianceFromSourceWeights,
     sourceScoreVarianceFromExplicitDrivers,
     targetScoreVarianceFromSourceWeights,
-    sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceTaggingProjection, targetTaggingProjection,
-    sourceDirectCausalProjection, sourceProxyTaggingProjection,
-    targetDirectCausalProjection, targetProxyTaggingProjection,
+    sigmaTagCausal, sigmaTagCausal,
+    taggingProjection, taggingProjection,
+    directCausalProjection, proxyTaggingProjection,
+    directCausalProjection, proxyTaggingProjection,
     sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    sourceCrossCovariance, targetCrossCovariance,
+    crossCovariance, crossCovariance,
     brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
     novelUntaggablePhenotypeResidual, irreducibleTargetResidualBurden,
     effectiveTargetOutcomeVariance, Matrix.mulVec, dotProduct,
@@ -678,7 +668,7 @@ theorem popgenDrivenProxyGenerationalModel_source_weights (t : ℕ) :
     simp [popgenDrivenProxyGenerationalModel,
       CrossPopulationGenerationalModel.toMetricModelAt,
       sourceWeightsFromExplicitDrivers, sourceERMWeights,
-      sourceCrossCovariance, sigmaTagCausalSource,
+      crossCovariance, sigmaTagCausal,
       Matrix.one_mulVec, Matrix.mulVec, dotProduct,
       Matrix.cons_val', Matrix.cons_val_fin_one]
 
@@ -692,9 +682,9 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_at_zero :
     tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
     targetR2FromSourceWeights, targetExplainedSignalVarianceFromSourceWeights,
     targetPredictiveCovarianceFromSourceWeights, targetScoreVarianceFromSourceWeights,
-    sigmaTagCausalSource, sigmaTagCausalTarget,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights, sourceCrossCovariance,
-    targetCrossCovariance, effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden,
+    sigmaTagCausal, sigmaTagCausal,
+    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
+    crossCovariance, effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden,
     brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
     novelUntaggablePhenotypeResidual,
     GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM,
@@ -802,20 +792,20 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     rcases popgenDrivenProxyGenerationalModel_generation_one_scales with
       ⟨_, _, h_proxy0, h_proxy1⟩
     have h_cross :
-        targetCrossCovariance m1 = ![popgenDrivenProxyScale, popgenDrivenProxyScale] := by
+        crossCovariance m1 Pop.target = ![popgenDrivenProxyScale, popgenDrivenProxyScale] := by
       ext i
       fin_cases i
       · simpa [m1, popgenDrivenProxyGenerationalModel,
           CrossPopulationGenerationalModel.toMetricModelAt,
-          targetCrossCovariance, sigmaTagCausalTarget, directCausalTargetAt,
+          crossCovariance, sigmaTagCausal, directCausalTargetAt,
           novelDirectCausalTargetAt, proxyTaggingTargetAt, novelProxyTaggingTargetAt,
-          targetTotalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one]
+          totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one]
           using h_proxy0
       · simpa [m1, popgenDrivenProxyGenerationalModel,
           CrossPopulationGenerationalModel.toMetricModelAt,
-          targetCrossCovariance, sigmaTagCausalTarget, directCausalTargetAt,
+          crossCovariance, sigmaTagCausal, directCausalTargetAt,
           novelDirectCausalTargetAt, proxyTaggingTargetAt, novelProxyTaggingTargetAt,
-          targetTotalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one]
+          totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one]
           using h_proxy1
     rw [targetPredictiveCovarianceFromSourceWeights]
     rw [h_weights, h_cross]
@@ -826,7 +816,7 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     rcases popgenDrivenProxyGenerationalModel_generation_one_scales with
       ⟨h_ld0, h_ld1, _, _⟩
     have h_sigma :
-        m1.sigmaTagTarget = !![popgenDrivenTagScale, 0; 0, popgenDrivenTagScale] := by
+        (m1.sigmaTag Pop.target) = !![popgenDrivenTagScale, 0; 0, popgenDrivenTagScale] := by
       ext i j
       fin_cases i <;> fin_cases j
       · simpa [m1, popgenDrivenProxyGenerationalModel,
@@ -851,7 +841,7 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
       4 ≤ effectiveTargetOutcomeVariance m1 := by
     have := effectiveTargetOutcomeVariance_ge_targetOutcomeVariance m1
     change 4 ≤ effectiveTargetOutcomeVariance m1
-    have h_target_var : m1.targetOutcomeVariance = 4 := by
+    have h_target_var : (m1.outcomeVariance Pop.target) = 4 := by
       simp [m1, popgenDrivenProxyGenerationalModel,
         CrossPopulationGenerationalModel.toMetricModelAt]
     simpa [h_target_var] using this
@@ -1028,12 +1018,12 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       targetExplainedSignalVarianceFromSourceWeights,
       targetPredictiveCovarianceFromSourceWeights,
       targetScoreVarianceFromSourceWeights,
-      sigmaTagCausalSource, sigmaTagCausalTarget,
-      sourceTaggingProjection, targetTaggingProjection,
-      sourceDirectCausalProjection, sourceProxyTaggingProjection,
-      targetDirectCausalProjection, targetProxyTaggingProjection,
+      sigmaTagCausal, sigmaTagCausal,
+      taggingProjection, taggingProjection,
+      directCausalProjection, proxyTaggingProjection,
+      directCausalProjection, proxyTaggingProjection,
       sourceWeightsFromExplicitDrivers, sourceERMWeights,
-      sourceCrossCovariance, targetCrossCovariance,
+      crossCovariance, crossCovariance,
       effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden,
       brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
       GenerationalPopGenParameters.fstTransientAt,
@@ -1056,12 +1046,12 @@ theorem target_r2_changes_along_generation_indexed_af_path :
                 directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
                 tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
                 targetPredictiveCovarianceFromSourceWeights,
-                sigmaTagCausalSource, sigmaTagCausalTarget,
-                sourceTaggingProjection, targetTaggingProjection,
-                sourceDirectCausalProjection, sourceProxyTaggingProjection,
-                targetDirectCausalProjection, targetProxyTaggingProjection,
+                sigmaTagCausal, sigmaTagCausal,
+                taggingProjection, taggingProjection,
+                directCausalProjection, proxyTaggingProjection,
+                directCausalProjection, proxyTaggingProjection,
                 sourceWeightsFromExplicitDrivers, sourceERMWeights,
-                sourceCrossCovariance, targetCrossCovariance,
+                crossCovariance, crossCovariance,
                 GenerationalPopGenParameters.theta,
                 GenerationalPopGenParameters.tauAt,
                 GenerationalPopGenParameters.fstTransientAt,
@@ -1088,10 +1078,10 @@ theorem target_r2_changes_along_generation_indexed_af_path :
                 sigmaTagTargetAt,
                 tagAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
                 targetScoreVarianceFromSourceWeights,
-                sigmaTagCausalSource, sourceTaggingProjection,
-                sourceDirectCausalProjection, sourceProxyTaggingProjection,
+                sigmaTagCausal, taggingProjection,
+                directCausalProjection, proxyTaggingProjection,
                 sourceWeightsFromExplicitDrivers, sourceERMWeights,
-                sourceCrossCovariance,
+                crossCovariance,
                 GenerationalPopGenParameters.theta,
                 GenerationalPopGenParameters.tauAt,
                 GenerationalPopGenParameters.fstTransientAt,
@@ -1126,12 +1116,12 @@ theorem target_r2_changes_along_generation_indexed_af_path :
         effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden,
         brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
         novelUntaggablePhenotypeResidual,
-        sigmaTagCausalSource, sigmaTagCausalTarget,
-        sourceTaggingProjection, targetTaggingProjection,
-        sourceDirectCausalProjection, sourceProxyTaggingProjection,
-        targetDirectCausalProjection, targetProxyTaggingProjection,
+        sigmaTagCausal, sigmaTagCausal,
+        taggingProjection, taggingProjection,
+        directCausalProjection, proxyTaggingProjection,
+        directCausalProjection, proxyTaggingProjection,
         sourceWeightsFromExplicitDrivers, sourceERMWeights,
-        sourceCrossCovariance,
+        crossCovariance,
         GenerationalPopGenParameters.theta,
         GenerationalPopGenParameters.tauAt,
         GenerationalPopGenParameters.fstTransientAt,
@@ -1263,9 +1253,9 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
       targetR2FromSourceWeights, targetExplainedSignalVarianceFromSourceWeights,
       targetPredictiveCovarianceFromSourceWeights, targetScoreVarianceFromSourceWeights,
       sigmaTagTargetAt, directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
-      sigmaTagCausalSource, sigmaTagCausalTarget,
+      sigmaTagCausal, sigmaTagCausal,
       sourceWeightsFromExplicitDrivers, sourceERMWeights,
-      sourceCrossCovariance, targetCrossCovariance,
+      crossCovariance, crossCovariance,
       effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden,
       brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
       tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
@@ -1284,9 +1274,9 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
       targetR2FromSourceWeights, targetExplainedSignalVarianceFromSourceWeights,
       targetPredictiveCovarianceFromSourceWeights, targetScoreVarianceFromSourceWeights,
       sigmaTagTargetAt, directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
-      sigmaTagCausalSource, sigmaTagCausalTarget,
+      sigmaTagCausal, sigmaTagCausal,
       sourceWeightsFromExplicitDrivers, sourceERMWeights,
-      sourceCrossCovariance, targetCrossCovariance,
+      crossCovariance, crossCovariance,
       effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden,
       brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
       tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,

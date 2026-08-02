@@ -1104,7 +1104,7 @@ The fields record the named drivers that can change metrics:
 - proxy tagging via `proxyTaggingSource/Target`
 - novel target-only proxy tagging via `novelProxyTaggingTarget`
 - aggregate tag-to-causal structure via the derived
-  `sigmaTagCausalSource/Target`
+  `sigmaTagCausal/Target`
 - causal-vs-tag distinction via separate tag and causal dimensions plus the
   direct-vs-proxy decomposition
 - source and target LD among scored SNPs via `sigmaTagSource/Target`
@@ -1145,6 +1145,25 @@ def Pop.pair {α : Sort*} (s t : α) : Pop → α
 
 @[simp] theorem Pop.pair_target {α : Sort*} (s t : α) : Pop.pair s t Pop.target = t := rfl
 
+/-- Replace the target component of a population-indexed value, keeping the source one.
+Witness models that perturb exactly one population are written with this. -/
+def Pop.withTarget {α : Sort*} (f : Pop → α) (t : α) : Pop → α := Pop.pair (f Pop.source) t
+
+/-- Replace the source component, keeping the target one. -/
+def Pop.withSource {α : Sort*} (f : Pop → α) (s : α) : Pop → α := Pop.pair s (f Pop.target)
+
+@[simp] theorem Pop.withTarget_source {α : Sort*} (f : Pop → α) (t : α) :
+    Pop.withTarget f t Pop.source = f Pop.source := rfl
+
+@[simp] theorem Pop.withTarget_target {α : Sort*} (f : Pop → α) (t : α) :
+    Pop.withTarget f t Pop.target = t := rfl
+
+@[simp] theorem Pop.withSource_source {α : Sort*} (f : Pop → α) (s : α) :
+    Pop.withSource f s Pop.source = s := rfl
+
+@[simp] theorem Pop.withSource_target {α : Sort*} (f : Pop → α) (s : α) :
+    Pop.withSource f s Pop.target = f Pop.target := rfl
+
 structure CrossPopulationMetricModel (p q : ℕ) where
   beta : Pop → Fin q → ℝ
   sigmaTag : Pop → Matrix (Fin p) (Fin p) ℝ
@@ -1162,8 +1181,8 @@ structure CrossPopulationMetricModel (p q : ℕ) where
   targetPrevalence : ℝ
   /-- **The source is the reference population.** "Novel" means novel *relative to the
   source*, so nothing is novel in the source itself. Previously this was not a hypothesis
-  at all: it was baked into the shape of `sigmaTagCausalSource`, which simply omitted the
-  novel terms that `sigmaTagCausalTarget` included. Stated here, it can be discharged at
+  at all: it was baked into the shape of `sigmaTagCausal`, which simply omitted the
+  novel terms that `sigmaTagCausal` included. Stated here, it can be discharged at
   the use site, and a model that violates it cannot be built by accident. -/
   novelDirectCausal_source : novelDirectCausal Pop.source = 0
   novelProxyTagging_source : novelProxyTagging Pop.source = 0
@@ -1199,7 +1218,7 @@ noncomputable def totalEffect {p q : ℕ}
 
 /-- **In the source the novel terms drop out** — derived from the reference-population
 hypotheses rather than written into a separate definition. This is the equation that used
-to be the *body* of `sigmaTagCausalSource`; making it a theorem is what stops the source
+to be the *body* of `sigmaTagCausal`; making it a theorem is what stops the source
 and target forms from drifting apart silently. -/
 @[simp] theorem sigmaTagCausal_source {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     sigmaTagCausal m Pop.source = m.directCausal Pop.source + m.proxyTagging Pop.source := by
@@ -1289,7 +1308,7 @@ noncomputable def crossCovariance {p q : ℕ}
 context-dependent source cross-covariance term. -/
 noncomputable def sourceWeightsFromExplicitDrivers {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
-  sourceERMWeights m.sigmaTagSource (sourceCrossCovariance m)
+  sourceERMWeights (m.sigmaTag Pop.source) (crossCovariance m Pop.source)
 
 /-- Explicit SNP-level score equation: any tag-genotype state is scored by the
 source-learned weight vector through a linear dot product. This is the
@@ -1318,14 +1337,14 @@ vector. This is the closed-form biological object behind claims that
     Empirical status: UNTESTED. -/
 noncomputable def targetEffectHeterogeneity {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin q → ℝ :=
-  targetTotalEffect m - m.betaSource
+  totalEffect m Pop.target - (m.beta Pop.source)
 
 /-- The full target effect vector is the source effect vector plus an explicit
 locus-resolved heterogeneity term, which may include target-only novel causal
 effects. -/
-theorem targetTotalEffect_eq_betaSource_plus_targetEffectHeterogeneity {p q : ℕ}
+theorem totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetTotalEffect m = m.betaSource + targetEffectHeterogeneity m := by
+    totalEffect m Pop.target = (m.beta Pop.source) + targetEffectHeterogeneity m := by
   ext j
   simp [targetEffectHeterogeneity]
 
@@ -1336,7 +1355,7 @@ identical to source effects.
     Empirical status: UNTESTED. -/
 noncomputable def targetSourceEffectProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
-  (sigmaTagCausalTarget m).mulVec m.betaSource
+  (sigmaTagCausal m Pop.target).mulVec (m.beta Pop.source)
 
 /-- Incremental target-side projection induced purely by effect-size
 heterogeneity relative to the source effect vector.
@@ -1344,7 +1363,7 @@ heterogeneity relative to the source effect vector.
     Empirical status: UNTESTED. -/
 noncomputable def targetEffectHeterogeneityProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
-  (sigmaTagCausalTarget m).mulVec (targetEffectHeterogeneity m)
+  (sigmaTagCausal m Pop.target).mulVec (targetEffectHeterogeneity m)
 
 /-- Projection induced purely by target-only novel causal effects through the
 target tagging surface.
@@ -1352,7 +1371,7 @@ target tagging surface.
     Empirical status: UNTESTED. -/
 noncomputable def targetNovelMutationEffectProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
-  (sigmaTagCausalTarget m).mulVec m.novelCausalEffectTarget
+  (sigmaTagCausal m Pop.target).mulVec (m.novelCausalEffect Pop.target)
 
 /-- **Projection carried by directly observed causal variants**, in a population. -/
 noncomputable def directCausalProjection {p q : ℕ}
@@ -1378,25 +1397,25 @@ theorem taggingProjection_eq_direct_plus_proxy {p q : ℕ}
 /-- The target tagging projection splits into the projection of source effects
 through the target tagging surface plus a separate projection of the
 locus-resolved effect heterogeneity. -/
-theorem targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity {p q : ℕ}
+theorem taggingProjection_target_eq_source_effect_plus_effectHeterogeneity {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetTaggingProjection m =
+    taggingProjection m Pop.target =
       targetSourceEffectProjection m + targetEffectHeterogeneityProjection m := by
-  unfold targetTaggingProjection
-  rw [targetTotalEffect_eq_betaSource_plus_targetEffectHeterogeneity]
+  unfold taggingProjection
+  rw [totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity]
   simp [targetSourceEffectProjection, targetEffectHeterogeneityProjection,
     Matrix.mulVec_add]
 
 /-- The target tagging projection also splits into standing target effects plus
 target-only novel causal effects. -/
-theorem targetTaggingProjection_eq_standing_plus_novelMutationEffect {p q : ℕ}
+theorem taggingProjection_target_eq_standing_plus_novelMutationEffect {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetTaggingProjection m =
-      (sigmaTagCausalTarget m).mulVec m.betaTarget +
+    taggingProjection m Pop.target =
+      (sigmaTagCausal m Pop.target).mulVec (m.beta Pop.target) +
         targetNovelMutationEffectProjection m := by
   ext i
-  simp [targetTaggingProjection, targetNovelMutationEffectProjection,
-    targetTotalEffect, Matrix.mulVec_add, Pi.add_apply]
+  simp [taggingProjection, targetNovelMutationEffectProjection,
+    totalEffect, Matrix.mulVec_add, Pi.add_apply]
 
 /-- **The score/outcome covariance vector is the tagging projection plus the context
 term** — in either population. -/
@@ -1417,33 +1436,33 @@ theorem crossCovariance_eq_direct_plus_proxy_plus_context {p q : ℕ}
 /-- Exact target score/outcome cross-covariance splits into the transport of
 source-stable effects through the target tagging surface, the projection of
 target effect heterogeneity, and the target context term. -/
-theorem targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context
+theorem crossCovariance_target_eq_source_effect_plus_effectHeterogeneity_plus_context
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetCrossCovariance m =
+    crossCovariance m Pop.target =
       targetSourceEffectProjection m +
         targetEffectHeterogeneityProjection m +
-        m.contextCrossTarget := by
-  rw [targetCrossCovariance_eq_taggingProjection_plus_context,
-    targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity]
+        (m.contextCross Pop.target) := by
+  rw [crossCovariance_eq_taggingProjection_plus_context,
+    taggingProjection_target_eq_source_effect_plus_effectHeterogeneity]
 
 /-- Exact target score/outcome cross-covariance also splits into the standing
 target-effect projection, the projection of target-only novel causal effects,
 and the target context term. -/
-theorem targetCrossCovariance_eq_standing_plus_novelMutationEffect_plus_context
+theorem crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetCrossCovariance m =
-      (sigmaTagCausalTarget m).mulVec m.betaTarget +
+    crossCovariance m Pop.target =
+      (sigmaTagCausal m Pop.target).mulVec (m.beta Pop.target) +
         targetNovelMutationEffectProjection m +
-        m.contextCrossTarget := by
-  rw [targetCrossCovariance_eq_taggingProjection_plus_context,
-    targetTaggingProjection_eq_standing_plus_novelMutationEffect]
+        (m.contextCross Pop.target) := by
+  rw [crossCovariance_eq_taggingProjection_plus_context,
+    taggingProjection_target_eq_standing_plus_novelMutationEffect]
 
 /-- Exact score variance in the source population under the learned source
 weights. -/
 noncomputable def sourceScoreVarianceFromExplicitDrivers {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   let wS := sourceWeightsFromExplicitDrivers m
-  dotProduct wS (m.sigmaTagSource.mulVec wS)
+  dotProduct wS ((m.sigmaTag Pop.source).mulVec wS)
 
 /-- Exact score variance in the target population when transporting the
 source-learned weights. This captures changes in the target LD matrix even
@@ -1451,13 +1470,13 @@ when the source weights are held fixed. -/
 noncomputable def targetScoreVarianceFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   let wS := sourceWeightsFromExplicitDrivers m
-  dotProduct wS (m.sigmaTagTarget.mulVec wS)
+  dotProduct wS ((m.sigmaTag Pop.target).mulVec wS)
 
 /-- Exact source score/outcome covariance under the learned source weights. -/
 noncomputable def sourcePredictiveCovarianceFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   let wS := sourceWeightsFromExplicitDrivers m
-  dotProduct wS (sourceCrossCovariance m)
+  dotProduct wS (crossCovariance m Pop.source)
 
 /-- Exact target score/outcome covariance under transported source weights.
 This is where target-side effect changes, target tag-causal alignment, and
@@ -1465,7 +1484,7 @@ target context/environment shifts enter directly. -/
 noncomputable def targetPredictiveCovarianceFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   let wS := sourceWeightsFromExplicitDrivers m
-  dotProduct wS (targetCrossCovariance m)
+  dotProduct wS (crossCovariance m Pop.target)
 
 /-- Exact source calibration slope under the source-learned score equation.
 This is the literal source `Cov(Y, score) / Var(score)` ratio on the explicit
@@ -1488,7 +1507,7 @@ to the source score/outcome cross-covariance vector. -/
 theorem sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     sourcePredictiveCovarianceFromSourceWeights m =
-      sourceWeightedTagScore m (sourceCrossCovariance m) := by
+      sourceWeightedTagScore m (crossCovariance m Pop.source) := by
   simp [sourcePredictiveCovarianceFromSourceWeights, sourceWeightedTagScore]
 
 /-- The target predictive covariance is the transported score equation applied
@@ -1497,7 +1516,7 @@ source-weights-on-target-covariance equation that the biological model needs. -/
 theorem targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     targetPredictiveCovarianceFromSourceWeights m =
-      sourceWeightedTagScore m (targetCrossCovariance m) := by
+      sourceWeightedTagScore m (crossCovariance m Pop.target) := by
   simp [targetPredictiveCovarianceFromSourceWeights, sourceWeightedTagScore]
 
 /-- Exact source calibration-slope law from the source-learned score moments. -/
@@ -1522,9 +1541,9 @@ source-weights-on-target-covariance equation. -/
 theorem targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     targetCalibrationSlopeFromSourceWeights m =
-      sourceWeightedTagScore m (targetCrossCovariance m) /
+      sourceWeightedTagScore m (crossCovariance m Pop.target) /
         sourceWeightedTagScore m
-          (m.sigmaTagTarget.mulVec (sourceWeightsFromExplicitDrivers m)) := by
+          ((m.sigmaTag Pop.target).mulVec (sourceWeightsFromExplicitDrivers m)) := by
   simp [targetCalibrationSlopeFromSourceWeights, targetPredictiveCovarianceFromSourceWeights,
     targetScoreVarianceFromSourceWeights, sourceWeightedTagScore]
 
@@ -1534,11 +1553,11 @@ functional. -/
 theorem sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     sourcePredictiveCovarianceFromSourceWeights m =
-      sourceWeightedTagScore m (sourceDirectCausalProjection m) +
-        sourceWeightedTagScore m (sourceProxyTaggingProjection m) +
-        sourceWeightedTagScore m m.contextCrossSource := by
+      sourceWeightedTagScore m (directCausalProjection m Pop.source) +
+        sourceWeightedTagScore m (proxyTaggingProjection m Pop.source) +
+        sourceWeightedTagScore m (m.contextCross Pop.source) := by
   rw [sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov,
-    sourceCrossCovariance_eq_direct_plus_proxy_plus_context]
+    crossCovariance_eq_direct_plus_proxy_plus_context]
   simp [add_assoc]
 
 /-- The target predictive covariance decomposes into direct-causal,
@@ -1547,11 +1566,11 @@ functional. -/
 theorem targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     targetPredictiveCovarianceFromSourceWeights m =
-      sourceWeightedTagScore m (targetDirectCausalProjection m) +
-        sourceWeightedTagScore m (targetProxyTaggingProjection m) +
-        sourceWeightedTagScore m m.contextCrossTarget := by
+      sourceWeightedTagScore m (directCausalProjection m Pop.target) +
+        sourceWeightedTagScore m (proxyTaggingProjection m Pop.target) +
+        sourceWeightedTagScore m (m.contextCross Pop.target) := by
   rw [targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov,
-    targetCrossCovariance_eq_direct_plus_proxy_plus_context]
+    crossCovariance_eq_direct_plus_proxy_plus_context]
   simp [add_assoc]
 
 /-- Exact transported calibration-slope law with the target predictive
@@ -1559,9 +1578,9 @@ covariance expanded into direct-causal, proxy-tagging, and context channels. -/
 theorem targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     targetCalibrationSlopeFromSourceWeights m =
-      (sourceWeightedTagScore m (targetDirectCausalProjection m) +
-        sourceWeightedTagScore m (targetProxyTaggingProjection m) +
-        sourceWeightedTagScore m m.contextCrossTarget) /
+      (sourceWeightedTagScore m (directCausalProjection m Pop.target) +
+        sourceWeightedTagScore m (proxyTaggingProjection m Pop.target) +
+        sourceWeightedTagScore m (m.contextCross Pop.target)) /
           targetScoreVarianceFromSourceWeights m := by
   rw [targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores]
@@ -1574,9 +1593,9 @@ theorem targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effect
     targetPredictiveCovarianceFromSourceWeights m =
       sourceWeightedTagScore m (targetSourceEffectProjection m) +
         sourceWeightedTagScore m (targetEffectHeterogeneityProjection m) +
-        sourceWeightedTagScore m m.contextCrossTarget := by
+        sourceWeightedTagScore m (m.contextCross Pop.target) := by
   rw [targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov,
-    targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context]
+    crossCovariance_target_eq_source_effect_plus_effectHeterogeneity_plus_context]
   simp [add_assoc]
 
 /-- Exact transported calibration-slope law with target effect heterogeneity
@@ -1586,7 +1605,7 @@ theorem targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law
     targetCalibrationSlopeFromSourceWeights m =
       (sourceWeightedTagScore m (targetSourceEffectProjection m) +
         sourceWeightedTagScore m (targetEffectHeterogeneityProjection m) +
-        sourceWeightedTagScore m m.contextCrossTarget) /
+        sourceWeightedTagScore m (m.contextCross Pop.target)) /
           targetScoreVarianceFromSourceWeights m := by
   rw [targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores]
@@ -1596,11 +1615,11 @@ effects, target-only novel mutation effects, and the target context term. -/
 theorem targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     targetPredictiveCovarianceFromSourceWeights m =
-      sourceWeightedTagScore m ((sigmaTagCausalTarget m).mulVec m.betaTarget) +
+      sourceWeightedTagScore m ((sigmaTagCausal m Pop.target).mulVec (m.beta Pop.target)) +
         sourceWeightedTagScore m (targetNovelMutationEffectProjection m) +
-        sourceWeightedTagScore m m.contextCrossTarget := by
+        sourceWeightedTagScore m (m.contextCross Pop.target) := by
   rw [targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov,
-    targetCrossCovariance_eq_standing_plus_novelMutationEffect_plus_context]
+    crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context]
   simp [add_assoc]
 
 /-- Additive irreducible loss from broken source-to-target tagging.
@@ -1608,7 +1627,7 @@ This is the squared target-effect distortion induced by the gap between the
 source and target tag-to-causal alignment matrices. -/
 noncomputable def brokenTaggingResidual {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
-  let delta := ((sigmaTagCausalSource m) - (sigmaTagCausalTarget m)).mulVec (targetTotalEffect m)
+  let delta := ((sigmaTagCausal m Pop.source) - (sigmaTagCausal m Pop.target)).mulVec (totalEffect m Pop.target)
   dotProduct delta delta
 
 theorem brokenTaggingResidual_nonneg {p q : ℕ}
@@ -1627,7 +1646,7 @@ between the source and target scored-SNP LD matrices.
 noncomputable def ancestrySpecificLDResidual {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   let wS := sourceWeightsFromExplicitDrivers m
-  let delta := (m.sigmaTagSource - m.sigmaTagTarget).mulVec wS
+  let delta := ((m.sigmaTag Pop.source) - (m.sigmaTag Pop.target)).mulVec wS
   dotProduct delta delta
 
 theorem ancestrySpecificLDResidual_nonneg {p q : ℕ}
@@ -1643,7 +1662,7 @@ This is the squared gap between source-only and target score/outcome
 cross-covariance structure. -/
 noncomputable def sourceSpecificOverfitResidual {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
-  let delta := m.contextCrossSource - m.contextCrossTarget
+  let delta := (m.contextCross Pop.source) - (m.contextCross Pop.target)
   dotProduct delta delta
 
 theorem sourceSpecificOverfitResidual_nonneg {p q : ℕ}
@@ -1717,13 +1736,13 @@ source-specific overfit, plus target-only untagged novel-mutation variance.
     Empirical status: UNTESTED. -/
 noncomputable def effectiveTargetOutcomeVariance {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
-  m.targetOutcomeVariance + irreducibleTargetResidualBurden m
+  (m.outcomeVariance Pop.target) + irreducibleTargetResidualBurden m
 
 /-- The effective target outcome variance dominates the baseline target outcome
 variance because the additive residual burden is nonnegative. -/
 theorem effectiveTargetOutcomeVariance_ge_targetOutcomeVariance {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    m.targetOutcomeVariance ≤ effectiveTargetOutcomeVariance m := by
+    (m.outcomeVariance Pop.target) ≤ effectiveTargetOutcomeVariance m := by
   unfold effectiveTargetOutcomeVariance
   linarith [irreducibleTargetResidualBurden_nonneg m]
 
@@ -1734,14 +1753,14 @@ theorem effectiveTargetOutcomeVariance_pos {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     0 < effectiveTargetOutcomeVariance m := by
   unfold effectiveTargetOutcomeVariance
-  linarith [m.targetOutcomeVariance_pos, irreducibleTargetResidualBurden_nonneg m]
+  linarith [(m.outcomeVariance_pos Pop.target), irreducibleTargetResidualBurden_nonneg m]
 
 /-- Exact decomposition of the effective target outcome variance into the base
 target scale plus the three named additive residual-loss terms. -/
 theorem effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     effectiveTargetOutcomeVariance m =
-      m.targetOutcomeVariance +
+      (m.outcomeVariance Pop.target) +
         brokenTaggingResidual m +
         ancestrySpecificLDResidual m +
         sourceSpecificOverfitResidual m +
@@ -1757,7 +1776,7 @@ noncomputable def sourceExplainedSignalVarianceFromSourceWeights {p q : ℕ}
 /-- Exact source `R²` under the full source-side driver state. -/
 noncomputable def sourceR2FromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
-  sourceExplainedSignalVarianceFromSourceWeights m / m.sourceOutcomeVariance
+  sourceExplainedSignalVarianceFromSourceWeights m / (m.outcomeVariance Pop.source)
 
 /-- Exact unexplained source-side liability variance under the full explicit
 source-state score equation. This is the residual variance paired with the
@@ -1765,12 +1784,12 @@ source explained signal when constructing exact source AUC and source Brier
 coordinates from the same mechanistic SNP-level state. -/
 noncomputable def sourceResidualVarianceFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
-  m.sourceOutcomeVariance - sourceExplainedSignalVarianceFromSourceWeights m
+  (m.outcomeVariance Pop.source) - sourceExplainedSignalVarianceFromSourceWeights m
 
 @[simp] theorem sourceResidualVarianceFromSourceWeights_eq_outcome_minus_signal {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     sourceResidualVarianceFromSourceWeights m =
-      m.sourceOutcomeVariance - sourceExplainedSignalVarianceFromSourceWeights m := by
+      (m.outcomeVariance Pop.source) - sourceExplainedSignalVarianceFromSourceWeights m := by
   rfl
 
 /-- Closed-form source calibrated Brier coordinate from the full explicit
@@ -1808,8 +1827,8 @@ construction of source Brier. -/
       TransportedMetrics.calibratedBrier π (sourceR2FromSourceWeights m) := by
   rw [sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances]
   rw [TransportedMetrics.calibratedBrierFromVariances_eq_chart]
-  have h_source_ne : m.sourceOutcomeVariance ≠ 0 := by
-    exact ne_of_gt m.sourceOutcomeVariance_pos
+  have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 := by
+    exact ne_of_gt (m.outcomeVariance_pos Pop.source)
   have hr2 :
       TransportedMetrics.r2FromSignalVariance
           (sourceExplainedSignalVarianceFromSourceWeights m)
@@ -1906,7 +1925,7 @@ theorem targetCalibratedBrierFromSourceWeights_exact_loss_budget_law
         m.targetPrevalence
         ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
           targetScoreVarianceFromSourceWeights m)
-        (m.targetOutcomeVariance +
+        ((m.outcomeVariance Pop.target) +
           brokenTaggingResidual m +
           ancestrySpecificLDResidual m +
           sourceSpecificOverfitResidual m +
@@ -1946,7 +1965,7 @@ theorem target_score_variance_from_source_weights_identity {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     targetScoreVarianceFromSourceWeights m =
       dotProduct (sourceWeightsFromExplicitDrivers m)
-        (m.sigmaTagTarget.mulVec (sourceWeightsFromExplicitDrivers m)) := by
+        ((m.sigmaTag Pop.target).mulVec (sourceWeightsFromExplicitDrivers m)) := by
   simp [targetScoreVarianceFromSourceWeights]
 
 /-- The target score variance is the transported score equation applied to the
@@ -1955,7 +1974,7 @@ theorem targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_actio
     (m : CrossPopulationMetricModel p q) :
     targetScoreVarianceFromSourceWeights m =
       sourceWeightedTagScore m
-        (m.sigmaTagTarget.mulVec (sourceWeightsFromExplicitDrivers m)) := by
+        ((m.sigmaTag Pop.target).mulVec (sourceWeightsFromExplicitDrivers m)) := by
   simp [targetScoreVarianceFromSourceWeights, sourceWeightedTagScore]
 
 /-- The source score variance is the same score equation evaluated against the
@@ -1964,7 +1983,7 @@ theorem sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_act
     (m : CrossPopulationMetricModel p q) :
     sourceScoreVarianceFromExplicitDrivers m =
       sourceWeightedTagScore m
-        (m.sigmaTagSource.mulVec (sourceWeightsFromExplicitDrivers m)) := by
+        ((m.sigmaTag Pop.source).mulVec (sourceWeightsFromExplicitDrivers m)) := by
   simp [sourceScoreVarianceFromExplicitDrivers, sourceWeightedTagScore]
 
 /-- The source `R²` is exactly the explained signal variance from the explicit
@@ -1972,7 +1991,7 @@ score equation divided by the source outcome variance. -/
 theorem sourceR2FromSourceWeights_eq_signalVariance_ratio {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     sourceR2FromSourceWeights m =
-      sourceExplainedSignalVarianceFromSourceWeights m / m.sourceOutcomeVariance := by
+      sourceExplainedSignalVarianceFromSourceWeights m / (m.outcomeVariance Pop.source) := by
   rfl
 
 /-- Exact mechanistic source `R²` law from the source-learned score moments. -/
@@ -1980,7 +1999,7 @@ theorem sourceR2FromSourceWeights_exact_metric_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     sourceR2FromSourceWeights m =
       (sourcePredictiveCovarianceFromSourceWeights m) ^ 2 /
-        (sourceScoreVarianceFromExplicitDrivers m * m.sourceOutcomeVariance) := by
+        (sourceScoreVarianceFromExplicitDrivers m * (m.outcomeVariance Pop.source)) := by
   unfold sourceR2FromSourceWeights sourceExplainedSignalVarianceFromSourceWeights
   ring_nf
 
@@ -2016,7 +2035,7 @@ theorem exactR2PortabilityRatio_mechanistic_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     targetR2FromSourceWeights m / sourceR2FromSourceWeights m =
       ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 *
-          sourceScoreVarianceFromExplicitDrivers m * m.sourceOutcomeVariance) /
+          sourceScoreVarianceFromExplicitDrivers m * (m.outcomeVariance Pop.source)) /
         ((sourcePredictiveCovarianceFromSourceWeights m) ^ 2 *
           targetScoreVarianceFromSourceWeights m * effectiveTargetOutcomeVariance m) := by
   rw [targetR2FromSourceWeights_exact_metric_portability_law,
@@ -2028,9 +2047,9 @@ source-weight score equation and the target covariance operator. -/
 theorem targetR2FromSourceWeights_exact_snp_transport_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     targetR2FromSourceWeights m =
-      (sourceWeightedTagScore m (targetCrossCovariance m)) ^ 2 /
+      (sourceWeightedTagScore m (crossCovariance m Pop.target)) ^ 2 /
         (sourceWeightedTagScore m
-            (m.sigmaTagTarget.mulVec (sourceWeightsFromExplicitDrivers m)) *
+            ((m.sigmaTag Pop.target).mulVec (sourceWeightsFromExplicitDrivers m)) *
           effectiveTargetOutcomeVariance m) := by
   rw [targetR2FromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov,
@@ -2045,7 +2064,7 @@ theorem targetR2FromSourceWeights_exact_loss_budget_law {p q : ℕ}
     targetR2FromSourceWeights m =
       (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
         (targetScoreVarianceFromSourceWeights m *
-          (m.targetOutcomeVariance +
+          ((m.outcomeVariance Pop.target) +
             brokenTaggingResidual m +
             ancestrySpecificLDResidual m +
             sourceSpecificOverfitResidual m +
@@ -2058,9 +2077,9 @@ into direct-causal, proxy-tagging, and context channels. -/
 theorem targetR2FromSourceWeights_exact_direct_proxy_context_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     targetR2FromSourceWeights m =
-      ((sourceWeightedTagScore m (targetDirectCausalProjection m) +
-          sourceWeightedTagScore m (targetProxyTaggingProjection m) +
-          sourceWeightedTagScore m m.contextCrossTarget) ^ 2) /
+      ((sourceWeightedTagScore m (directCausalProjection m Pop.target) +
+          sourceWeightedTagScore m (proxyTaggingProjection m Pop.target) +
+          sourceWeightedTagScore m (m.contextCross Pop.target)) ^ 2) /
         (targetScoreVarianceFromSourceWeights m * effectiveTargetOutcomeVariance m) := by
   rw [targetR2FromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores]
@@ -2074,7 +2093,7 @@ theorem targetR2FromSourceWeights_exact_effect_heterogeneity_law {p q : ℕ}
     targetR2FromSourceWeights m =
       ((sourceWeightedTagScore m (targetSourceEffectProjection m) +
           sourceWeightedTagScore m (targetEffectHeterogeneityProjection m) +
-          sourceWeightedTagScore m m.contextCrossTarget) ^ 2) /
+          sourceWeightedTagScore m (m.contextCross Pop.target)) ^ 2) /
         (targetScoreVarianceFromSourceWeights m * effectiveTargetOutcomeVariance m) := by
   rw [targetR2FromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores]
@@ -2355,12 +2374,12 @@ target-only novel-mutation effect path, not from any single retained-effect
 scalar. -/
 noncomputable def betaTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin q → ℝ :=
-  m.betaSource + m.targetEffectHeterogeneityAt t + m.novelCausalEffectTargetAt t
+  (m.beta Pop.source) + m.targetEffectHeterogeneityAt t + m.novelCausalEffectTargetAt t
 
 @[simp] theorem betaTargetAt_eq_source_plus_effectHeterogeneityAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     betaTargetAt m t =
-      m.betaSource + m.targetEffectHeterogeneityAt t + m.novelCausalEffectTargetAt t := by
+      (m.beta Pop.source) + m.targetEffectHeterogeneityAt t + m.novelCausalEffectTargetAt t := by
   rfl
 
 /-- Explicit target tag-SNP allele frequency after standing drift and
@@ -2531,7 +2550,7 @@ noncomputable def sigmaTagTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin p) ℝ :=
   fun i j =>
-    m.sigmaTagSource i j * jointTagLDKernelAt m t i j
+    (m.sigmaTag Pop.source) i j * jointTagLDKernelAt m t i j
 
 /-- Time-varying target tag-to-causal alignment. This is the explicit tagging
 quality surface, driven by LD decay, allele-frequency divergence, mutation,
@@ -2540,7 +2559,7 @@ noncomputable def directCausalTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin q) ℝ :=
   fun i j =>
-    m.directCausalSource i j * jointDirectCausalKernelAt m t i j
+    (m.directCausal Pop.source) i j * jointDirectCausalKernelAt m t i j
 
 /-- Time-varying target-only novel direct-causal alignment.
 
@@ -2558,7 +2577,7 @@ noncomputable def proxyTaggingTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin q) ℝ :=
   fun i j =>
-    m.proxyTaggingSource i j * jointProxyTaggingKernelAt m t i j
+    (m.proxyTagging Pop.source) i j * jointProxyTaggingKernelAt m t i j
 
 /-- Time-varying target-only novel proxy-tagging alignment created after
 divergence. -/
@@ -2586,7 +2605,7 @@ effects were identical to source effects.
     Empirical status: UNTESTED. -/
 noncomputable def targetSourceEffectProjectionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin p → ℝ :=
-  (sigmaTagCausalTargetAt m t).mulVec m.betaSource
+  (sigmaTagCausalTargetAt m t).mulVec (m.beta Pop.source)
 
 /-- Incremental generation-indexed projection induced purely by per-locus
 target-effect heterogeneity, including target-only novel causal effects.
@@ -2604,28 +2623,24 @@ dynamics to deployed metrics. -/
 noncomputable def CrossPopulationGenerationalModel.toMetricModelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     CrossPopulationMetricModel p q where
-  betaSource := m.betaSource
-  betaTarget := m.betaSource + m.targetEffectHeterogeneityAt t
-  sigmaTagSource := m.sigmaTagSource
-  sigmaTagTarget := sigmaTagTargetAt m t
-  directCausalSource := m.directCausalSource
-  directCausalTarget := directCausalTargetAt m t
-  novelDirectCausalTarget := novelDirectCausalTargetAt m t
-  proxyTaggingSource := m.proxyTaggingSource
-  proxyTaggingTarget := proxyTaggingTargetAt m t
-  novelProxyTaggingTarget := novelProxyTaggingTargetAt m t
-  novelCausalEffectTarget := m.novelCausalEffectTargetAt t
-  contextCrossSource := m.contextCrossSource
-  contextCrossTarget := m.contextCrossTargetAt t
-  sourceOutcomeVariance := m.sourceOutcomeVariance
-  targetOutcomeVariance := m.targetOutcomeVarianceAt t
+  beta := Pop.pair ((m.beta Pop.source)) ((m.beta Pop.source) + m.targetEffectHeterogeneityAt t)
+  sigmaTag := Pop.pair ((m.sigmaTag Pop.source)) (sigmaTagTargetAt m t)
+  directCausal := Pop.pair ((m.directCausal Pop.source)) (directCausalTargetAt m t)
+  proxyTagging := Pop.pair ((m.proxyTagging Pop.source)) (proxyTaggingTargetAt m t)
+  contextCross := Pop.pair ((m.contextCross Pop.source)) (m.contextCrossTargetAt t)
+  outcomeVariance := Pop.pair ((m.outcomeVariance Pop.source)) (m.targetOutcomeVarianceAt t)
+  novelDirectCausal := Pop.pair 0 (novelDirectCausalTargetAt m t)
+  novelProxyTagging := Pop.pair 0 (novelProxyTaggingTargetAt m t)
+  novelCausalEffect := Pop.pair 0 (m.novelCausalEffectTargetAt t)
   novelUntaggablePhenotypeVarianceTarget := m.novelUntaggablePhenotypeVarianceAt t
   targetPrevalence := m.targetPrevalenceAt t
-  sourceOutcomeVariance_pos := m.sourceOutcomeVariance_pos
-  targetOutcomeVariance_pos := m.targetOutcomeVariance_pos t
   novelUntaggablePhenotypeVarianceTarget_nonneg := m.novelUntaggablePhenotypeVariance_nonneg t
   targetPrevalence_pos := m.targetPrevalence_pos t
   targetPrevalence_lt_one := m.targetPrevalence_lt_one t
+  novelDirectCausal_source := rfl
+  novelProxyTagging_source := rfl
+  novelCausalEffect_source := rfl
+  outcomeVariance_pos := by intro P; cases P <;> simp_all <;> norm_num
 
 /-- Exact target `R²` after `t` generations under the full time-varying
 mechanistic state. -/
@@ -2641,7 +2656,7 @@ noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
 @[simp] theorem sigmaTagTargetAt_uses_ld_af_mutation_migration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) :
     sigmaTagTargetAt m t i j =
-      m.sigmaTagSource i j *
+      (m.sigmaTag Pop.source) i j *
         ldCorrelationDecay (m.tagDistance i j)
           (m.popGen.fstTransientAt t) m.popGen.recomb *
         m.popGen.mutationSharedRetentionAt t *
@@ -2653,7 +2668,7 @@ noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
 @[simp] theorem directCausalTargetAt_uses_af_mutation_migration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
     directCausalTargetAt m t i j =
-      m.directCausalSource i j *
+      (m.directCausal Pop.source) i j *
         m.popGen.mutationSharedRetentionAt t *
         m.popGen.migrationSharedBoostAt t *
         tagAlleleFreqRetentionAt m t i *
@@ -2673,7 +2688,7 @@ noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
 @[simp] theorem proxyTaggingTargetAt_uses_ld_tagging_af_mutation_migration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
     proxyTaggingTargetAt m t i j =
-      m.proxyTaggingSource i j *
+      (m.proxyTagging Pop.source) i j *
         ldCorrelationDecay (m.tagCausalDistance i j)
           (m.popGen.fstTransientAt t) m.popGen.recomb *
         m.popGen.mutationSharedRetentionAt t *
@@ -2697,7 +2712,7 @@ noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
 @[simp] theorem sigmaTagCausalTargetAt_uses_ld_tagging_af_mutation_migration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
     sigmaTagCausalTargetAt m t i j =
-      m.directCausalSource i j *
+      (m.directCausal Pop.source) i j *
         m.popGen.mutationSharedRetentionAt t *
         m.popGen.migrationSharedBoostAt t *
         tagAlleleFreqRetentionAt m t i *
@@ -2707,7 +2722,7 @@ noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
         (m.popGen.migrationSharedBoostAt t)⁻¹ *
         tagAlleleFreqRetentionAt m t i *
         causalAlleleFreqRetentionAt m t j +
-      m.proxyTaggingSource i j *
+      (m.proxyTagging Pop.source) i j *
         ldCorrelationDecay (m.tagCausalDistance i j)
           (m.popGen.fstTransientAt t) m.popGen.recomb *
         m.popGen.mutationSharedRetentionAt t *
@@ -2731,14 +2746,14 @@ would be obtained under source-stable effects plus a separate projection of the
 locus-resolved target-effect heterogeneity. -/
 theorem targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity
     {p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetTaggingProjection (m.toMetricModelAt t) =
+    taggingProjection (m.toMetricModelAt t) =
       targetSourceEffectProjectionAt m t +
         targetEffectHeterogeneityProjectionAt m t := by
   simpa [CrossPopulationGenerationalModel.toMetricModelAt,
     targetSourceEffectProjectionAt, targetEffectHeterogeneityProjectionAt,
     targetSourceEffectProjection, targetEffectHeterogeneityProjection,
-    targetEffectHeterogeneity, targetTotalEffect, sigmaTagCausalTargetAt, add_assoc]
-    using targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity
+    targetEffectHeterogeneity, totalEffect, sigmaTagCausalTargetAt, add_assoc]
+    using taggingProjection_target_eq_source_effect_plus_effectHeterogeneity
       (m.toMetricModelAt t)
 
 @[simp] theorem targetR2AtGeneration_eq_targetR2From_slice {p q : ℕ}
@@ -3351,8 +3366,8 @@ theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
     (m : CrossPopulationMetricModel p q) :
     sourceEqualVarianceGaussianAUCFromSourceWeights m =
       equalVarianceGaussianAUCFromExplainedR2 (sourceR2FromSourceWeights m) := by
-  have h_source_ne : m.sourceOutcomeVariance ≠ 0 := by
-    exact ne_of_gt m.sourceOutcomeVariance_pos
+  have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 := by
+    exact ne_of_gt (m.outcomeVariance_pos Pop.source)
   unfold sourceEqualVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromVariances
     sourceResidualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
     sourceR2FromSourceWeights
@@ -3409,7 +3424,7 @@ theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law
       equalVarianceGaussianAUCFromVariances
         ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
           targetScoreVarianceFromSourceWeights m)
-        (m.targetOutcomeVariance +
+        ((m.outcomeVariance Pop.target) +
           brokenTaggingResidual m +
           ancestrySpecificLDResidual m +
           sourceSpecificOverfitResidual m +
@@ -3668,9 +3683,9 @@ theorem targetPredictiveCovarianceAtGeneration_exact_direct_proxy_context_law
       sourceWeightedTagScore (m.toMetricModelAt t) (m.contextCrossTargetAt t) := by
   rw [targetPredictiveCovarianceAtGeneration_eq_slice,
     targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores]
-  simp [targetDirectCausalProjection, targetProxyTaggingProjection,
+  simp [directCausalProjection, proxyTaggingProjection,
     CrossPopulationGenerationalModel.toMetricModelAt, betaTargetAt,
-    targetTotalEffect, add_assoc]
+    totalEffect, add_assoc]
 
 /-- Exact generation-indexed calibration-slope law on the direct-causal,
 proxy-tagging, and context decomposition. -/
@@ -3687,9 +3702,9 @@ theorem targetCalibrationSlopeAtGeneration_exact_mechanistic_popgen_portability_
           targetScoreVarianceAtGeneration m t := by
   rw [targetCalibrationSlopeAtGeneration_eq_slice,
     targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law]
-  simp [targetScoreVarianceAtGeneration, targetDirectCausalProjection,
-    targetProxyTaggingProjection, CrossPopulationGenerationalModel.toMetricModelAt,
-    betaTargetAt, targetTotalEffect, add_assoc]
+  simp [targetScoreVarianceAtGeneration, directCausalProjection,
+    proxyTaggingProjection, CrossPopulationGenerationalModel.toMetricModelAt,
+    betaTargetAt, totalEffect, add_assoc]
 
 /-- Exact generation-indexed target `R²` portability law on the mechanistic
 population-genetic state slice at generation `t`. -/
