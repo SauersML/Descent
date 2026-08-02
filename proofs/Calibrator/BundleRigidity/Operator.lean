@@ -362,9 +362,9 @@ theorem transfer_eq_transfer_evenPart {τ : C(T, T)} (hsym : F.IsSymmetry τ)
     F.transfer κ = F.transfer (evenPart τ κ) := by
   have hodd := F.transfer_eq_zero_of_tauOdd hsym (isTauOdd_oddPart hinv κ)
   ext f
-  have hsplit : evenPart τ κ f + oddPart τ κ f = κ f := by
-    have := congrArg (fun L => L f) (evenPart_add_oddPart τ κ)
-    simpa using this
+  -- No `hsplit` at `f` here: after `ext`, `f : C(ℝ, ℝ)`, whereas `evenPart τ κ` eats
+  -- `C(T, ℝ)`. The split is only ever needed at `F.coTransfer f`, which is where `h1`
+  -- applies it.
   have hz : κ (F.coTransfer f) = evenPart τ κ (F.coTransfer f) := by
     have h1 : evenPart τ κ (F.coTransfer f) + oddPart τ κ (F.coTransfer f)
         = κ (F.coTransfer f) := by

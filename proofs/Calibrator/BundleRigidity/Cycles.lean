@@ -110,9 +110,14 @@ theorem cycle_solvable_iff (ρ : ℕ → ℝ) (n : ℕ) :
   · intro hprod
     refine ⟨fun m => (-1 : ℝ) ^ m * (∏ s ∈ range m, ρ s), by simp, ?_, ?_⟩
     · intro s
+      -- `show` forces the beta reduction that `rw` cannot see through.
+      show (-1 : ℝ) ^ (s + 1) * (∏ t ∈ range (s + 1), ρ t)
+        = -ρ s * ((-1 : ℝ) ^ s * (∏ t ∈ range s, ρ t))
       rw [Finset.prod_range_succ, pow_succ]
       ring
-    · rw [hprod]
+    · show (-1 : ℝ) ^ n * (∏ s ∈ range n, ρ s)
+        = (-1 : ℝ) ^ 0 * (∏ s ∈ range 0, ρ s)
+      rw [hprod]
       simp
 
 /-- **Theorem D for an even cycle**, which is the stated case `n = 2r`.
@@ -152,7 +157,6 @@ theorem solution_unique_of_ne_zero (ρ x y : ℕ → ℝ)
     x m = (x 0 / y 0) * y m := by
   rw [iterate_eq ρ x hx m, iterate_eq ρ y hy m]
   field_simp
-  ring
 
 /-! ## The cycle data, with strong closure in the signature -/
 

@@ -130,7 +130,7 @@ theorem altSum_eq (P Q : ι → ℝ) (Φ A : ι → R)
         (Q i • Φ i + P i • (1 : R)) * (prodWeight Q u • prodOp Φ u)
           = (Q i * prodWeight Q u) • (Φ i * prodOp Φ u)
             + (P i * prodWeight Q u) • prodOp Φ u := by
-      rw [add_mul, mul_smul_comm, mul_smul_comm, smul_smul, smul_smul, one_mul]
+      simp only [add_mul, smul_mul_assoc, mul_smul_comm, smul_smul, one_mul]
     rw [hexpand]
     have hsplit :
         P i • (prodWeight Q u • prodOp Φ u
@@ -164,8 +164,8 @@ theorem altSum_pair (P Q : ι → ℝ) (Φ A : ι → R)
     (hA : ∀ i, A i = Q i • Φ i + P i • (1 : R)) (i j : ι) :
     A i * (Q j • Φ j) - P i • A j
       = (Q i * Q j) • (Φ i * Φ j) - (P i * P j) • (1 : R) := by
-  rw [hA i, hA j, add_mul, mul_smul_comm, mul_smul_comm, smul_smul, smul_smul, one_mul,
-    smul_add, smul_smul, smul_smul]
+  rw [hA i, hA j]
+  simp only [add_mul, smul_mul_assoc, mul_smul_comm, smul_smul, one_mul, smul_add]
   abel
 
 end Calibrator.BundleRigidity

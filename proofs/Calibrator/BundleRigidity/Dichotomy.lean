@@ -157,7 +157,6 @@ theorem commutation_defect_eq_one (P Q : ι → ℝ) (i j : ι)
   unfold defect weightRatio
   simp only [wProd_cons, wProd_nil, mul_one]
   field_simp
-  ring
 
 /-! ## The falsifier's arithmetic
 
@@ -221,7 +220,6 @@ theorem defect_eq_chi_ratio (P Q : ι → ℝ) (hP : ∀ i, 0 < P i) (hQ : ∀ i
   have hQu := wProd_pos Q hQ u
   unfold defect weightRatio chi
   field_simp
-  ring
 
 /-- **The Bézout constant** of a relation `u ≈ v`:
 
