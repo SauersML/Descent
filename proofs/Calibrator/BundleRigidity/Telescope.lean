@@ -148,7 +148,10 @@ theorem altSum_eq (P Q : ι → ℝ) (Φ A : ι → R)
         = -(P i * ((-1 : ℝ) ^ (u.length + 1) * prodWeight P u)) := by
       rw [pow_succ]
       ring
-    rw [hsign]
+    -- `neg_smul` is not optional here: `abel` reasons additively and does not know that
+    -- the real scalar `-Z` acting on `1` is the negation of `Z` acting on `1`. Without
+    -- it the two sides differ only by that identity and `abel` reports unsolved goals.
+    rw [hsign, neg_smul]
     abel
 
 /-! ## The two small cases, which were asserted in the source and are checked here -/
