@@ -151,19 +151,88 @@ theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ
     effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
   unfold effectiveSymmetricMigration meanAlleleFreq; ring
 
-/-- **Hudson's `F_ST` for two subgroups**, as one minus the ratio of mean
-within-subgroup heterozygosity to total heterozygosity. Restored as a
-definition so that `F` denotes a quantity rather than a name; it had been
-deleted as unreferenced, which is the reason `F` in the spike was free to mean
-anything.
+/-- **MISNAMED: this is Nei's `G_ST`, not Hudson's `F_ST`.** One minus the ratio
+of mean within-subgroup heterozygosity to TOTAL heterozygosity is the
+definition of `G_ST`; the docstring said exactly that and nobody noticed it
+described a different estimator from the one in the name. Hudson's `F_ST`
+divides by the BETWEEN-subgroup heterozygosity `p₁(1-p₂) + p₂(1-p₁)`, not by
+the total-pool `2·p̄·(1-p̄)`. The two denominators differ by `(p₁-p₂)²/2`, so
+they agree only when `p₁ = p₂` or `p̄ = 1/2`.
 
-    Empirical status: UNTESTED. Simulation recovers the spike constant against
-    `F` measured this way (see `four_hudsonFst_eq_standardizedContrastVariance`
-    below), but the estimator itself has not been checked against a simulated
-    `F_ST`. -/
+    Derivation, since this is decidable without any simulation. With
+    `d = p₁ - p₂` and `p̄ = (p₁+p₂)/2`,
+    `H_T - H_S = 2p̄(1-p̄) - (p₁(1-p₁) + p₂(1-p₂)) = d²/2`, so this body is
+    `d² / (4·p̄·(1-p̄))`, which is Nei's `G_ST` and is also exactly the body of
+    `PopulationGeneticsFoundations.simpleFst` -- `simpleFst_eq_hudsonFst` below
+    proves the two agree, and what it actually proves is that both are Nei.
+    Hudson's is `d² / (p₁ + p₂ - 2p₁p₂)`; `trueHudsonFst` states it and
+    `trueHudsonFst_eq_of_neiGst` gives the exact conversion. At `p₁ = 0.2`,
+    `p₂ = 0.6` this body gives `0.1667` where Hudson gives `0.2857`, the
+    +71.4% the differential tier measured against an independent
+    implementation.
+
+    THE NAME HAS NOT BEEN CHANGED HERE and it is still wrong. Renaming it
+    touches `DemographicCapacity` and `PCCorrectability/Threshold`, which are
+    owned elsewhere and were in flight; a textual repoint of a bare constant
+    inside `unfold`/`rw` lists is the mangling that has already bitten this
+    corpus, so the rename is routed rather than done. Until it happens, read
+    every `hudsonFst` in the spike chain -- including
+    `four_hudsonFst_eq_standardizedContrastVariance` and MATH_LEDGER row 23,
+    which says "`F` = Hudson `F_ST`" -- as Nei's `G_ST`. The algebra is
+    unaffected: `4·G_ST = ` the standardized contrast variance is a true
+    identity for THIS body. What is affected is what a user must supply: an
+    `F_ST` from a library's Hudson estimator is the wrong input by the factor
+    above at `p̄ ≠ 1/2`.
+
+    Empirical status: CONVENTION IDENTIFIED (Nei `G_ST`), NAME UNCORRECTED. -/
 noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
   1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) /
     (ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
+
+/-- **Hudson's `F_ST` for two subgroups, parametric limit** (Bhatia, Patterson,
+Sankararaman & Price 2013, eq. 10, at infinite sample size):
+
+  `F_ST = (p₁ - p₂)² / (p₁(1-p₂) + p₂(1-p₁))`
+
+The denominator is the probability that two genes drawn from DIFFERENT
+subgroups differ -- the between-subgroup heterozygosity -- which is what makes
+this a ratio of averages and what distinguishes it from Nei's `G_ST`. Added
+alongside `hudsonFst` rather than replacing it, because the corpus's arithmetic
+is Nei's throughout and changing the arithmetic would silently move every
+downstream number; what was missing was a name for the quantity the corpus kept
+saying it meant.
+
+    Empirical status: matches `validation/differential/refs.fst_hudson`, which
+    is checked against scikit-allel. -/
+noncomputable def trueHudsonFst (p₁ p₂ : ℝ) : ℝ :=
+  (p₁ - p₂) ^ 2 / (p₁ * (1 - p₂) + p₂ * (1 - p₁))
+
+/-- **The exact conversion between the two conventions**, which is what turns
+"they disagree by about 72% somewhere in this range" into a statement that
+holds everywhere: `F_ST^Hudson = 2·G_ST / (1 + G_ST)`. Note it is not a
+constant factor -- the discrepancy is 2× as `G_ST → 0` and vanishes as
+`G_ST → 1` -- so no recalibration constant can absorb a convention mix-up. -/
+theorem trueHudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
+    (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
+    (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    trueHudsonFst p₁ p₂ = 2 * hudsonFst p₁ p₂ / (1 + hudsonFst p₁ p₂) := by
+  have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul hbar
+  have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul hbar
+  unfold trueHudsonFst hudsonFst ploidy meanAlleleFreq at *
+  have hne : p₁ * (1 - p₂) + p₂ * (1 - p₁) ≠ 0 := ne_of_gt hpos
+  field_simp at h1 h2 ⊢
+  ring_nf
+  ring_nf at h1 h2 hne ⊢
+  field_simp
+  ring
+
+/-- **Witness that the two estimators are different functions**, not two
+spellings of one. Without an exhibited point the conflation can be
+reintroduced by anyone who reads the `hudsonFst` name and believes it. -/
+theorem hudsonFst_ne_trueHudsonFst :
+    hudsonFst (1/5) (3/5) ≠ trueHudsonFst (1/5) (3/5) := by
+  unfold hudsonFst trueHudsonFst ploidy meanAlleleFreq
+  norm_num
 
 /-- Between-subgroup allele-frequency variance for an equal-weight split. -/
 noncomputable def betweenSubgroupVariance (p₁ p₂ : ℝ) : ℝ := (p₁ - p₂) ^ 2 / 4
