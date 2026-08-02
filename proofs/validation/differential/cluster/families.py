@@ -180,6 +180,46 @@ FAMILIES = [
 ]
 
 
+def sweep_members():
+    """Family membership from sweep_inlined_results.json, not from a hand list.
+
+    The hardcoded lists below went stale INSIDE ONE SESSION: the corpus went
+    from 1003 definitions to 994 while this tier was running, and
+    islandModelFst, equilibriumFst and hetEquilibrium were collapsed onto other
+    definitions by another agent. A hand-maintained membership list silently
+    stops describing the corpus -- which is the exact failure this tier flagged
+    in someone else's code earlier today, so it is fixed here rather than
+    excused.
+
+    Sweep-derived families take their members from the sweep output when it is
+    present. Only AFFINE members count: a co-function shares the form's level
+    sets without computing it.
+    """
+    path = os.path.join(HERE, "sweep_inlined_results.json")
+    if not os.path.exists(path):
+        return {}
+    fh = open(path)
+    data = json.load(fh)
+    fh.close()
+    out = {}
+    for ref_name, blk in (data.get("references") or {}).items():
+        names = []
+        for m in blk.get("members", []):
+            rel = m.get("relation") or {}
+            if rel.get("kind") == "AFFINE":
+                names.append(m["definition"].split(".")[-1])
+        out[ref_name] = sorted(names)
+    return out
+
+
+SWEEP_TO_FAMILY = {
+    "drift_retention": "drift_retention",
+    "island_fst": "island_migration_fst",
+    "split_fst": "split_fst",
+    "sved_ld": "ld_decay_recurrence",
+}
+
+
 def load_defs():
     fh = open(os.path.join(EXTRACT, "defs.json"))
     raw = json.load(fh)
@@ -190,6 +230,17 @@ def load_defs():
 
 def main():
     table = load_defs()
+    live = sweep_members()
+    for fam in FAMILIES:
+        for sweep_name, fam_name in SWEEP_TO_FAMILY.items():
+            if fam["name"] != fam_name or sweep_name not in live:
+                continue
+            declared = set(fam["members"])
+            found = set(live[sweep_name])
+            fam["members"] = sorted(declared | found)
+            fam["found_by"] = "sweep (regenerated)"
+            fam["sweep_only"] = sorted(found - declared)
+            fam["declared_only"] = sorted(declared - found)
     by_short = {}
     for fq in table:
         by_short.setdefault(fq.split(".")[-1], []).append(table[fq])
@@ -221,6 +272,8 @@ def main():
             "n_members_in_slice": len(slice_members),
             "members_in_slice": sorted(slice_members),
             "members_not_found_in_corpus": missing,
+            "sweep_only": fam.get("sweep_only", []),
+            "declared_only_not_confirmed_by_sweep": fam.get("declared_only", []),
         })
 
     n_fam = len(rows)
@@ -247,8 +300,12 @@ def main():
                  "yes" if r["simulator"] else "NO",
                  r["status"].split(".")[0][:70]))
         if r["members_not_found_in_corpus"]:
-            print("      declared but absent from corpus: %s"
+            print("      declared but ABSENT FROM CORPUS (removed or renamed "
+                  "since the list was written): %s"
                   % r["members_not_found_in_corpus"])
+        if r.get("sweep_only"):
+            print("      found by sweep, not in the hand list: %s"
+                  % r["sweep_only"])
     print("")
     print("  %d in-slice statements belong to no family yet:" % len(unassigned))
     for u in unassigned[:40]:
