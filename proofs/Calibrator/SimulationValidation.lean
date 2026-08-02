@@ -642,8 +642,8 @@ theorem popgenDrivenProxyGenerationalModel_source_weights (t : ℕ) :
 /-- At generation `0`, the nondegenerate proxy witness still matches its source
 state exactly, so the target deployed `R²` equals the source-side value `1/2`. -/
 theorem popgenDrivenProxyGenerationalModel_target_r2_at_zero :
-    targetR2AtGeneration popgenDrivenProxyGenerationalModel 0 = 1 / 2 := by
-  simp [targetR2AtGeneration, popgenDrivenProxyGenerationalModel,
+    r2FromSourceWeights (popgenDrivenProxyGenerationalModel.toMetricModelAt 0) Pop.target = 1 / 2 := by
+  simp [r2FromSourceWeights, popgenDrivenProxyGenerationalModel,
     CrossPopulationGenerationalModel.toMetricModelAt,
     sigmaTagTargetAt, directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
     tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
@@ -746,8 +746,8 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
 The loss is caused by the explicit mutation/migration/recombination transport
 kernels, not by hand-injected AF or effect shifts. -/
 theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
-    targetR2AtGeneration popgenDrivenProxyGenerationalModel 1 <
-      targetR2AtGeneration popgenDrivenProxyGenerationalModel 0 := by
+    r2FromSourceWeights (popgenDrivenProxyGenerationalModel.toMetricModelAt 1) Pop.target <
+      r2FromSourceWeights (popgenDrivenProxyGenerationalModel.toMetricModelAt 0) Pop.target := by
   let m1 :=
     CrossPopulationGenerationalModel.toMetricModelAt popgenDrivenProxyGenerationalModel 1
   have h_weights :
@@ -878,8 +878,7 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     rw [h_eq]
     nlinarith
   have h_r2_lt_half :
-      targetR2AtGeneration popgenDrivenProxyGenerationalModel 1 < 1 / 2 := by
-    rw [targetR2AtGeneration_eq_targetR2From_slice]
+      r2FromSourceWeights (popgenDrivenProxyGenerationalModel.toMetricModelAt 1) Pop.target < 1 / 2 := by
     rw [targetR2FromSourceWeights_eq_signalVariance_ratio]
     have h_eff_half_ge_two : 2 ≤ effectiveOutcomeVariance m1 Pop.target / 2 := by
       nlinarith
@@ -971,12 +970,12 @@ drift in the target population. At generation `0` the target matches the
 source, while at generation `1` the target `R²` is reduced by the exact AF
 mismatch penalty carried through the tagging surface. -/
 theorem target_r2_changes_along_generation_indexed_af_path :
-    targetR2AtGeneration timeVaryingAFGenerationalModel 0 = 1 / 2 ∧
-    targetR2AtGeneration timeVaryingAFGenerationalModel 1 =
+    r2FromSourceWeights (timeVaryingAFGenerationalModel.toMetricModelAt 0) Pop.target = 1 / 2 ∧
+    r2FromSourceWeights (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
       Real.exp (-(1 / 2 : ℝ)) /
         (2 + 2 * (1 - Real.exp (-(1 / 2 : ℝ))) ^ 2) := by
   constructor
-  · simp [baselineGenerationalPopGen, targetR2AtGeneration, timeVaryingAFGenerationalModel,
+  · simp [baselineGenerationalPopGen, r2FromSourceWeights, timeVaryingAFGenerationalModel,
       CrossPopulationGenerationalModel.toMetricModelAt,
       sigmaTagTargetAt, directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
       tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
@@ -1097,7 +1096,6 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       ring
     have h_exp_ne : Real.exp (-(1 / 2 : ℝ)) ≠ 0 := by
       exact Real.exp_ne_zero _
-    rw [targetR2AtGeneration_eq_targetR2From_slice]
     unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights Pop.target
     rw [h_cov, h_var, h_eff]
     have hcalc :
@@ -1124,8 +1122,8 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
     targetEffectHeterogeneityProjectionAt timeVaryingEffectGenerationalModel 1 0 = -(1 / 2) ∧
     betaTargetAt timeVaryingEffectGenerationalModel 0 0 = 1 ∧
     betaTargetAt timeVaryingEffectGenerationalModel 1 0 = 1 / 2 ∧
-    targetR2AtGeneration timeVaryingEffectGenerationalModel 0 = 1 / 2 ∧
-    targetR2AtGeneration timeVaryingEffectGenerationalModel 1 = 1 / 8 := by
+    r2FromSourceWeights (timeVaryingEffectGenerationalModel.toMetricModelAt 0) Pop.target = 1 / 2 ∧
+    r2FromSourceWeights (timeVaryingEffectGenerationalModel.toMetricModelAt 1) Pop.target = 1 / 8 := by
   repeat' constructor
   · ext i j
     fin_cases i
@@ -1211,7 +1209,7 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
   · simp [betaTargetAt, baselineGenerationalPopGen, timeVaryingEffectGenerationalModel]
     norm_num
   · simp [baselineGenerationalPopGen, timeVaryingEffectGenerationalModel,
-      betaTargetAt, targetR2AtGeneration,
+      betaTargetAt, r2FromSourceWeights,
       CrossPopulationGenerationalModel.toMetricModelAt,
       r2FromSourceWeights, explainedSignalVarianceFromSourceWeights,
       predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
@@ -1232,7 +1230,7 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
       ldCorrelationDecay,
       Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
   · simp [baselineGenerationalPopGen, timeVaryingEffectGenerationalModel,
-      betaTargetAt, targetR2AtGeneration,
+      betaTargetAt, r2FromSourceWeights,
       CrossPopulationGenerationalModel.toMetricModelAt,
       r2FromSourceWeights, explainedSignalVarianceFromSourceWeights,
       predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
@@ -1261,8 +1259,8 @@ accidental theorem about an implicit witness. -/
 theorem target_metric_profile_at_generation_reads_explicit_target_r2
     {p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     (targetMetricProfileAtGeneration m t).r2 =
-      targetR2AtGeneration m t := by
-  simp [targetR2AtGeneration]
+      r2FromSourceWeights (m.toMetricModelAt t) Pop.target := by
+  simp [r2FromSourceWeights]
 
 end GenerationalMechanisticValidation
 

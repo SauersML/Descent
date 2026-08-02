@@ -2598,105 +2598,6 @@ noncomputable def CrossPopulationGenerationalModel.toMetricModelAt {p q : ℕ}
   novelCausalEffect_source := rfl
   outcomeVariance_pos := by intro P; cases P <;> simp_all <;> norm_num
 
-/-- Exact target `R²` after `t` generations under the full time-varying
-mechanistic state. -/
-noncomputable def targetR2AtGeneration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  r2FromSourceWeights (m.toMetricModelAt t) Pop.target
-
-/-- Exact target calibrated Brier coordinate after `t` generations. -/
-noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  targetCalibratedBrierFromSourceWeights (m.toMetricModelAt t)
-
-@[simp] theorem sigmaTagTargetAt_uses_ld_af_mutation_migration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) :
-    sigmaTagTargetAt m t i j =
-      m.sigmaTagSource i j *
-        ldCorrelationDecay (m.tagDistance i j)
-          (m.popGen.fstTransientAt t) m.popGen.recomb *
-        m.popGen.mutationSharedRetentionAt t *
-        m.popGen.migrationSharedBoostAt t *
-        tagAlleleFreqRetentionAt m t i *
-        tagAlleleFreqRetentionAt m t j := by
-  simp [sigmaTagTargetAt, jointTagLDKernelAt, mul_assoc]
-
-@[simp] theorem directCausalTargetAt_uses_af_mutation_migration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
-    directCausalTargetAt m t i j =
-      m.directCausalSource i j *
-        m.popGen.mutationSharedRetentionAt t *
-        m.popGen.migrationSharedBoostAt t *
-        tagAlleleFreqRetentionAt m t i *
-        causalAlleleFreqRetentionAt m t j := by
-  simp [directCausalTargetAt, jointDirectCausalKernelAt, mul_assoc]
-
-@[simp] theorem novelDirectCausalTargetAt_uses_af_mutation_migration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
-    novelDirectCausalTargetAt m t i j =
-      m.novelDirectCausalTemplate i j *
-        novelVariantInnovationAt m.popGen t *
-        (m.popGen.migrationSharedBoostAt t)⁻¹ *
-        tagAlleleFreqRetentionAt m t i *
-        causalAlleleFreqRetentionAt m t j := by
-  simp [novelDirectCausalTargetAt, jointNovelDirectCausalKernelAt, mul_assoc]
-
-@[simp] theorem proxyTaggingTargetAt_uses_ld_tagging_af_mutation_migration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
-    proxyTaggingTargetAt m t i j =
-      m.proxyTaggingSource i j *
-        ldCorrelationDecay (m.tagCausalDistance i j)
-          (m.popGen.fstTransientAt t) m.popGen.recomb *
-        m.popGen.mutationSharedRetentionAt t *
-        m.popGen.migrationSharedBoostAt t *
-        tagAlleleFreqRetentionAt m t i *
-        causalAlleleFreqRetentionAt m t j := by
-  simp [proxyTaggingTargetAt, jointProxyTaggingKernelAt, mul_assoc]
-
-@[simp] theorem novelProxyTaggingTargetAt_uses_ld_tagging_af_mutation_migration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
-    novelProxyTaggingTargetAt m t i j =
-      m.novelProxyTaggingTemplate i j *
-        ldCorrelationDecay (m.tagCausalDistance i j)
-          (m.popGen.fstTransientAt t) m.popGen.recomb *
-        novelVariantInnovationAt m.popGen t *
-        (m.popGen.migrationSharedBoostAt t)⁻¹ *
-        tagAlleleFreqRetentionAt m t i *
-        causalAlleleFreqRetentionAt m t j := by
-  simp [novelProxyTaggingTargetAt, jointNovelProxyTaggingKernelAt, mul_assoc]
-
-@[simp] theorem sigmaTagCausalTargetAt_uses_ld_tagging_af_mutation_migration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
-    sigmaTagCausalTargetAt m t i j =
-      m.directCausalSource i j *
-        m.popGen.mutationSharedRetentionAt t *
-        m.popGen.migrationSharedBoostAt t *
-        tagAlleleFreqRetentionAt m t i *
-        causalAlleleFreqRetentionAt m t j +
-      m.novelDirectCausalTemplate i j *
-        novelVariantInnovationAt m.popGen t *
-        (m.popGen.migrationSharedBoostAt t)⁻¹ *
-        tagAlleleFreqRetentionAt m t i *
-        causalAlleleFreqRetentionAt m t j +
-      m.proxyTaggingSource i j *
-        ldCorrelationDecay (m.tagCausalDistance i j)
-          (m.popGen.fstTransientAt t) m.popGen.recomb *
-        m.popGen.mutationSharedRetentionAt t *
-        m.popGen.migrationSharedBoostAt t *
-        tagAlleleFreqRetentionAt m t i *
-        causalAlleleFreqRetentionAt m t j +
-      m.novelProxyTaggingTemplate i j *
-        ldCorrelationDecay (m.tagCausalDistance i j)
-          (m.popGen.fstTransientAt t) m.popGen.recomb *
-        novelVariantInnovationAt m.popGen t *
-        (m.popGen.migrationSharedBoostAt t)⁻¹ *
-        tagAlleleFreqRetentionAt m t i *
-        causalAlleleFreqRetentionAt m t j := by
-  simp [sigmaTagCausalTargetAt, directCausalTargetAt, novelDirectCausalTargetAt,
-    proxyTaggingTargetAt, novelProxyTaggingTargetAt, jointDirectCausalKernelAt,
-    jointNovelDirectCausalKernelAt, jointProxyTaggingKernelAt,
-    jointNovelProxyTaggingKernelAt, mul_assoc, add_assoc]
-
 /-- At each generation, the target tagging projection splits into the part that
 would be obtained under source-stable effects plus a separate projection of the
 locus-resolved target-effect heterogeneity. -/
@@ -2711,17 +2612,6 @@ theorem targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeteroge
     targetEffectHeterogeneity, totalEffect, sigmaTagCausalTargetAt, add_assoc]
     using taggingProjection_target_eq_source_effect_plus_effectHeterogeneity
       (m.toMetricModelAt t)
-
-@[simp] theorem targetR2AtGeneration_eq_targetR2From_slice {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetR2AtGeneration m t = r2FromSourceWeights (m.toMetricModelAt t) Pop.target := by
-  rfl
-
-@[simp] theorem targetCalibratedBrierAtGeneration_eq_slice {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetCalibratedBrierAtGeneration m t =
-      targetCalibratedBrierFromSourceWeights (m.toMetricModelAt t) := by
-  rfl
 
 /-- With any imperfect source tagging (`ρS > 0`), worsening target tagging (`ρT < ρS`)
 strictly lowers portability when drift terms are fixed. -/
@@ -3540,14 +3430,6 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
   · rw [targetMetricProfileFromSourceWeights_brier,
       targetCalibratedBrierFromSourceWeights_exact_metric_portability_law]
 
-/-- Closed-form liability-threshold AUC after `t` generations under the full
-time-varying mechanistic state.
-
-    Empirical status: UNTESTED. -/
-noncomputable def targetGaussianAUCAtGeneration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  equalVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t) Pop.target
-
 /-- Canonical mechanistic deployed metric profile after `t` generations. -/
 noncomputable def targetMetricProfileAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
@@ -3560,129 +3442,6 @@ noncomputable def targetMetricProfileAtGeneration {p q : ℕ}
       targetMetricProfileFromSourceWeights (m.toMetricModelAt t) := by
   rfl
 
-@[simp] theorem targetGaussianAUCAtGeneration_eq_slice {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetGaussianAUCAtGeneration m t =
-      equalVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t) Pop.target := by
-  rfl
-
-/-- Exact transported predictive covariance after `t` generations under the
-full time-varying mechanistic state. -/
-noncomputable def targetPredictiveCovarianceAtGeneration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target
-
-/-- Exact transported score variance after `t` generations under the target LD
-matrix and the transported source weights. -/
-noncomputable def targetScoreVarianceAtGeneration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target
-
-/-- Effective target outcome variance after `t` generations, including the full
-additive biological loss budget induced by the time-varying state.
-
-    Empirical status: UNTESTED. -/
-noncomputable def effectiveTargetOutcomeVarianceAtGeneration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target
-
-/-- Exact target residual variance after `t` generations under the mechanistic
-transported-score law. -/
-noncomputable def targetResidualVarianceAtGeneration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  residualVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target
-
-/-- Exact target calibration slope after `t` generations under the mechanistic
-transported-score law. -/
-noncomputable def targetCalibrationSlopeAtGeneration {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  calibrationSlopeFromSourceWeights (m.toMetricModelAt t) Pop.target
-
-@[simp] theorem targetPredictiveCovarianceAtGeneration_eq_slice {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetPredictiveCovarianceAtGeneration m t =
-      predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target := by
-  rfl
-
-@[simp] theorem targetScoreVarianceAtGeneration_eq_slice {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetScoreVarianceAtGeneration m t =
-      scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target := by
-  rfl
-
-@[simp] theorem effectiveTargetOutcomeVarianceAtGeneration_eq_slice {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    effectiveTargetOutcomeVarianceAtGeneration m t =
-      effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target := by
-  rfl
-
-@[simp] theorem targetResidualVarianceAtGeneration_eq_slice {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetResidualVarianceAtGeneration m t =
-      residualVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target := by
-  rfl
-
-@[simp] theorem targetCalibrationSlopeAtGeneration_eq_slice {p q : ℕ}
-    (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetCalibrationSlopeAtGeneration m t =
-      calibrationSlopeFromSourceWeights (m.toMetricModelAt t) Pop.target := by
-  rfl
-
-/-- Exact generation-indexed predictive-covariance law on the direct-causal,
-proxy-tagging, and context decomposition.
-
-This is the closest deployed law to the underlying biology: the transported
-source-weight score is applied directly to the target direct-causal channel,
-the target proxy-tagging channel, and the target context/environment channel at
-generation `t`. -/
-theorem targetPredictiveCovarianceAtGeneration_exact_direct_proxy_context_law
-    {p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetPredictiveCovarianceAtGeneration m t =
-      sourceWeightedTagScore (m.toMetricModelAt t)
-        (((directCausalTargetAt m t) + (novelDirectCausalTargetAt m t)).mulVec
-          (betaTargetAt m t)) +
-      sourceWeightedTagScore (m.toMetricModelAt t)
-        (((proxyTaggingTargetAt m t) + (novelProxyTaggingTargetAt m t)).mulVec
-          (betaTargetAt m t)) +
-      sourceWeightedTagScore (m.toMetricModelAt t) (m.contextCrossTargetAt t) := by
-  rw [targetPredictiveCovarianceAtGeneration_eq_slice,
-    targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores]
-  simp [directCausalProjection, proxyTaggingProjection,
-    CrossPopulationGenerationalModel.toMetricModelAt, betaTargetAt,
-    totalEffect, add_assoc]
-
-/-- Exact generation-indexed calibration-slope law on the direct-causal,
-proxy-tagging, and context decomposition. -/
-theorem targetCalibrationSlopeAtGeneration_exact_mechanistic_popgen_portability_law
-    {p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetCalibrationSlopeAtGeneration m t =
-      (sourceWeightedTagScore (m.toMetricModelAt t)
-          (((directCausalTargetAt m t) + (novelDirectCausalTargetAt m t)).mulVec
-            (betaTargetAt m t)) +
-        sourceWeightedTagScore (m.toMetricModelAt t)
-          (((proxyTaggingTargetAt m t) + (novelProxyTaggingTargetAt m t)).mulVec
-            (betaTargetAt m t)) +
-        sourceWeightedTagScore (m.toMetricModelAt t) (m.contextCrossTargetAt t)) /
-          targetScoreVarianceAtGeneration m t := by
-  rw [targetCalibrationSlopeAtGeneration_eq_slice,
-    targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law]
-  simp [targetScoreVarianceAtGeneration, directCausalProjection,
-    proxyTaggingProjection, CrossPopulationGenerationalModel.toMetricModelAt,
-    betaTargetAt, totalEffect, add_assoc]
-
-/-- Exact generation-indexed target `R²` portability law on the mechanistic
-population-genetic state slice at generation `t`. -/
-theorem targetR2AtGeneration_exact_mechanistic_popgen_portability_law
-    {p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetR2AtGeneration m t =
-      (targetPredictiveCovarianceAtGeneration m t) ^ 2 /
-        (targetScoreVarianceAtGeneration m t *
-          effectiveTargetOutcomeVarianceAtGeneration m t) := by
-  rw [targetR2AtGeneration_eq_targetR2From_slice,
-    targetR2FromSourceWeights_exact_metric_portability_law]
-  simp [targetPredictiveCovarianceAtGeneration, targetScoreVarianceAtGeneration,
-    effectiveTargetOutcomeVarianceAtGeneration]
-
 /-- Display-normalized target `R²` after `t` generations.
 
 This preserves the exact mechanistic portability ratio while anchoring the
@@ -3691,7 +3450,7 @@ state. -/
 noncomputable def sourceNormalizedTargetR2AtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (sourceBaseline : ℝ) (t : ℕ) : ℝ :=
   sourceBaseline *
-    (targetR2AtGeneration m t / r2FromSourceWeights (m.toMetricModelAt t) Pop.source)
+    (r2FromSourceWeights (m.toMetricModelAt t) Pop.target / r2FromSourceWeights (m.toMetricModelAt t) Pop.source)
 
 /-- Exact mechanistic law for display-normalized target `R²` at generation `t`.
 
@@ -3702,51 +3461,16 @@ theorem sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portabilit
     (sourceBaseline : ℝ) (t : ℕ) :
     sourceNormalizedTargetR2AtGeneration m sourceBaseline t =
       sourceBaseline *
-        (((targetPredictiveCovarianceAtGeneration m t) ^ 2 *
+        (((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 *
             scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.source *
             ((m.toMetricModelAt t).outcomeVariance Pop.source)) /
           ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.source) ^ 2 *
-            targetScoreVarianceAtGeneration m t *
-            effectiveTargetOutcomeVarianceAtGeneration m t)) := by
+            scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target *
+            effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target)) := by
   unfold sourceNormalizedTargetR2AtGeneration
-  rw [targetR2AtGeneration_eq_targetR2From_slice,
-    exactR2PortabilityRatio_mechanistic_law]
-  simp [targetPredictiveCovarianceAtGeneration, targetScoreVarianceAtGeneration,
-    effectiveTargetOutcomeVarianceAtGeneration]
-
-/-- Exact generation-indexed target Brier portability law on the mechanistic
-population-genetic state slice at generation `t`. -/
-theorem targetCalibratedBrierAtGeneration_exact_mechanistic_popgen_portability_law
-    {p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetCalibratedBrierAtGeneration m t =
-      TransportedMetrics.calibratedBrierFromVariances
-        (m.targetPrevalenceAt t)
-        ((targetPredictiveCovarianceAtGeneration m t) ^ 2 /
-          targetScoreVarianceAtGeneration m t)
-        (effectiveTargetOutcomeVarianceAtGeneration m t -
-          (targetPredictiveCovarianceAtGeneration m t) ^ 2 /
-            targetScoreVarianceAtGeneration m t) := by
-  rw [targetCalibratedBrierAtGeneration_eq_slice,
-    targetCalibratedBrierFromSourceWeights_exact_metric_portability_law]
-  simp [targetPredictiveCovarianceAtGeneration, targetScoreVarianceAtGeneration,
-    effectiveTargetOutcomeVarianceAtGeneration,
-    CrossPopulationGenerationalModel.toMetricModelAt]
-
-/-- Exact generation-indexed target liability-AUC portability law on the
-mechanistic population-genetic state slice at generation `t`. -/
-theorem targetGaussianAUCAtGeneration_exact_mechanistic_popgen_portability_law
-    {p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetGaussianAUCAtGeneration m t =
-      equalVarianceGaussianAUCFromVariances
-        ((targetPredictiveCovarianceAtGeneration m t) ^ 2 /
-          targetScoreVarianceAtGeneration m t)
-        (effectiveTargetOutcomeVarianceAtGeneration m t -
-          (targetPredictiveCovarianceAtGeneration m t) ^ 2 /
-            targetScoreVarianceAtGeneration m t) := by
-  rw [targetGaussianAUCAtGeneration_eq_slice,
-    targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law]
-  simp [targetPredictiveCovarianceAtGeneration, targetScoreVarianceAtGeneration,
-    effectiveTargetOutcomeVarianceAtGeneration]
+  rw [exactR2PortabilityRatio_mechanistic_law]
+  simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
+    effectiveOutcomeVariance]
 
 /-- Bundled exact metric portability law after `t` generations on the explicit
 population-genetic state. This packages the exact `R²`, liability-AUC, and
@@ -3755,37 +3479,37 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
     {p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     targetMetricProfileAtGeneration m t =
       { r2 :=
-          (targetPredictiveCovarianceAtGeneration m t) ^ 2 /
-            (targetScoreVarianceAtGeneration m t *
-              effectiveTargetOutcomeVarianceAtGeneration m t)
+          (predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
+            (scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target *
+              effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target)
       , auc :=
           equalVarianceGaussianAUCFromVariances
-            ((targetPredictiveCovarianceAtGeneration m t) ^ 2 /
-              targetScoreVarianceAtGeneration m t)
-            (effectiveTargetOutcomeVarianceAtGeneration m t -
-              (targetPredictiveCovarianceAtGeneration m t) ^ 2 /
-                targetScoreVarianceAtGeneration m t)
+            ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
+              scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
+            (effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target -
+              (predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
+                scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
       , brier :=
           TransportedMetrics.calibratedBrierFromVariances
             (m.targetPrevalenceAt t)
-            ((targetPredictiveCovarianceAtGeneration m t) ^ 2 /
-              targetScoreVarianceAtGeneration m t)
-            (effectiveTargetOutcomeVarianceAtGeneration m t -
-              (targetPredictiveCovarianceAtGeneration m t) ^ 2 /
-                targetScoreVarianceAtGeneration m t) } := by
+            ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
+              scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
+            (effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target -
+              (predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
+                scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) } := by
   ext
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
-    simp [targetPredictiveCovarianceAtGeneration, targetScoreVarianceAtGeneration,
-      effectiveTargetOutcomeVarianceAtGeneration]
+    simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
+      effectiveOutcomeVariance]
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
-    simp [targetPredictiveCovarianceAtGeneration, targetScoreVarianceAtGeneration,
-      effectiveTargetOutcomeVarianceAtGeneration]
+    simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
+      effectiveOutcomeVariance]
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
-    simp [targetPredictiveCovarianceAtGeneration, targetScoreVarianceAtGeneration,
-      effectiveTargetOutcomeVarianceAtGeneration,
+    simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
+      effectiveOutcomeVariance,
       CrossPopulationGenerationalModel.toMetricModelAt]
 
 /-- Closed-form target liability-threshold AUC under the neutral allele-frequency

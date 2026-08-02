@@ -1059,12 +1059,12 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
               (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t)) -
             (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
-      , slope := targetCalibrationSlopeAtGeneration m.metric t
+      , slope := calibrationSlopeFromSourceWeights (m.metric.toMetricModelAt t) Pop.target
       , link := link } := by
   rw [targetCalibrationProfileAtGeneration]
   simp [CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law,
     CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt,
-    targetCalibrationSlopeAtGeneration, calibrationSlopeFromSourceWeights]
+    calibrationSlopeFromSourceWeights, calibrationSlopeFromSourceWeights]
 
 /-- Exact generation-indexed target CITL law on the explicit population-genetic
 state slice. -/
@@ -1092,31 +1092,31 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
     (t : ℕ) (link : CalibrationLink) :
     targetMetricProfileAtGeneration m.metric t =
       { r2 :=
-          (targetPredictiveCovarianceAtGeneration m.metric t) ^ 2 /
-            (targetScoreVarianceAtGeneration m.metric t *
-              effectiveTargetOutcomeVarianceAtGeneration m.metric t)
+          (predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
+            (scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target *
+              effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target)
       , auc :=
           equalVarianceGaussianAUCFromVariances
-            ((targetPredictiveCovarianceAtGeneration m.metric t) ^ 2 /
-              targetScoreVarianceAtGeneration m.metric t)
-            (effectiveTargetOutcomeVarianceAtGeneration m.metric t -
-              (targetPredictiveCovarianceAtGeneration m.metric t) ^ 2 /
-                targetScoreVarianceAtGeneration m.metric t)
+            ((predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
+              scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
+            (effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target -
+              (predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
+                scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
       , brier :=
           TransportedMetrics.calibratedBrierFromVariances
             (m.metric.targetPrevalenceAt t)
-            ((targetPredictiveCovarianceAtGeneration m.metric t) ^ 2 /
-              targetScoreVarianceAtGeneration m.metric t)
-            (effectiveTargetOutcomeVarianceAtGeneration m.metric t -
-              (targetPredictiveCovarianceAtGeneration m.metric t) ^ 2 /
-                targetScoreVarianceAtGeneration m.metric t) } ∧
+            ((predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
+              scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
+            (effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target -
+              (predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
+                scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) } ∧
     targetCalibrationProfileAtGeneration m t link =
       { citl :=
           (m.baseObservedMean +
               (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t)) -
             (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
-      , slope := targetCalibrationSlopeAtGeneration m.metric t
+      , slope := calibrationSlopeFromSourceWeights (m.metric.toMetricModelAt t) Pop.target
       , link := link } := by
   constructor
   · exact targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law m.metric t

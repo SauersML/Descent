@@ -1552,6 +1552,19 @@ def locusInfluence (i : Fin n) : ℝ :=
 theorem locusInfluence_nonneg (i : Fin n) : 0 ≤ design.locusInfluence i :=
   Finset.sum_nonneg (fun _ _ => sq_nonneg _)
 
+/-- **Flip the orientation of one locus.** Choosing the other allele as reference
+negates that coordinate, so every tested set containing the locus has its monomial
+negated; the design absorbing that is the one with those coefficients negated.
+
+Empirical status: DERIVED. A relabelling of the design's own coefficients, with no
+modelling content and no free parameter. -/
+def flipOrientation (locus : Fin n) : GenotypeDesign n ι where
+  model := design.model
+  locusSet := design.locusSet
+  coefficient := fun s =>
+    if locus ∈ design.locusSet s then -design.coefficient s else design.coefficient s
+  jointGenotypeProb := design.jointGenotypeProb
+
 /-- **The two-pool interaction design**: two disjoint pools of loci, with the
 tested sets being the cross-pool pairs and at least one tested set per pair.
 
@@ -1567,6 +1580,76 @@ def IsTwoPoolInteraction (poolOne poolTwo : Finset (Fin n)) : Prop :=
     (∀ i ∈ poolOne, ∀ j ∈ poolTwo, ∃ s : ι, design.locusSet s = {i, j})
 
 end Definitions
+
+/-!
+### Orientation equivariance of the admissible class
+
+Which allele is called "reference" is a **gauge choice**, and the question is whether
+the admissible class is closed under changing it at one locus. It is, and the reason is
+that every admissibility condition reads only `|coefficient|` and `locusSet`, both of
+which a flip preserves.
+
+**But closure of the class is not invariance of a design's limit**, and the gauge
+objection lives in exactly that gap. Flipping locus `i` also flips its effect `β_i`, and
+the phenotype `x_i β_i` is unchanged, so a design whose coefficients come from effect
+estimates flips with the coordinate and the two flips cancel. The criterion is sharp:
+
+> orientation randomization genuinely symmetrizes what a design sees **iff the design's
+> coefficients are chosen independently of the orientation**.
+
+A genotype-only interaction scan qualifies, and `GenotypeDesign` enforces it at the type
+level: `coefficient` is a field that cannot depend on `model`. An effect-weighted
+statistic does not qualify, and there the induced correlation between orientation and
+`sign β_i` is precisely the joint law the objection points at. So the answer is not a
+single verdict — it is yes for unweighted scans and no for effect-weighted ones.
+
+Either way the randomization buys exactly one floor: squaring kills the sign, so floor
+two is untouched and remains never symmetric away from `q = 1/2`
+(`Calibrator.CondensationUnification.centeredSquare_third_moment_zero_iff_balanced`).
+-/
+
+/-- Flipping preserves the tested locus-sets, so interaction order, the recurrence
+profile and disjointness are all untouched — each reads only `locusSet`. -/
+theorem flipOrientation_locusSet {design : GenotypeDesign n ι} (locus : Fin n) (s : ι) :
+    (design.flipOrientation locus).locusSet s = design.locusSet s := rfl
+
+/-- Disjointness is orientation-invariant. -/
+theorem flipOrientation_variantDisjoint_iff {design : GenotypeDesign n ι}
+    (locus : Fin n) :
+    (design.flipOrientation locus).VariantDisjoint ↔ design.VariantDisjoint := Iff.rfl
+
+/-- The recurrence profile is orientation-invariant. -/
+theorem flipOrientation_variantRecurrence {design : GenotypeDesign n ι}
+    (locus i : Fin n) :
+    (design.flipOrientation locus).variantRecurrence i = design.variantRecurrence i := rfl
+
+/-- **Every influence is orientation-invariant**, since influence sums squared
+coefficients and a flip only changes signs. -/
+theorem flipOrientation_locusInfluence {design : GenotypeDesign n ι} (locus i : Fin n) :
+    (design.flipOrientation locus).locusInfluence i = design.locusInfluence i := by
+  have hdef : ∀ d : GenotypeDesign n ι, d.locusInfluence i =
+      ∑ s ∈ Finset.univ.filter (fun s => i ∈ d.locusSet s), d.coefficient s ^ 2 :=
+    fun _ => rfl
+  rw [hdef, hdef]
+  refine Finset.sum_congr rfl (fun s _ => ?_)
+  show (if locus ∈ design.locusSet s then -design.coefficient s
+        else design.coefficient s) ^ 2 = design.coefficient s ^ 2
+  by_cases hs : locus ∈ design.locusSet s
+  · rw [if_pos hs, neg_sq]
+  · rw [if_neg hs]
+
+/-- **The total energy is orientation-invariant**, so the unit-variance normalization
+survives a flip. With the three facts above, the admissible class — diverging minimum
+order, vanishing influence, unit variance — is closed under per-coordinate sign flips. -/
+theorem flipOrientation_energy {design : GenotypeDesign n ι} (locus : Fin n) :
+    ∑ s : ι, (design.flipOrientation locus).coefficient s ^ 2 =
+      ∑ s : ι, design.coefficient s ^ 2 := by
+  refine Finset.sum_congr rfl (fun s _ => ?_)
+  show (if locus ∈ design.locusSet s then -design.coefficient s
+        else design.coefficient s) ^ 2 = design.coefficient s ^ 2
+  by_cases hs : locus ∈ design.locusSet s
+  · rw [if_pos hs, neg_sq]
+  · rw [if_neg hs]
 
 /-- Under disjointness a variant determines the tested set it belongs to. -/
 theorem unique_set_of_variantDisjoint {design : GenotypeDesign n ι}
