@@ -106,6 +106,34 @@ section SteppingStone
 noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
+/-- **The functional form the previous derivation produced**, retained so that the
+indistinguishability recorded in the note above can be stated rather than asserted. -/
+noncomputable def steppingStoneFstQuadratic (d Ne m σ_sq : ℝ) : ℝ :=
+  d / (d + 4 * Ne * σ_sq ^ 2 * m ^ 2)
+
+/-- **A freely fitted dispersal variance cannot tell the two forms apart.**
+
+The note on `demoSteppingStoneFst` says a refitted `σ²` absorbs the extra power exactly,
+and that the fit therefore constrains the product `m·σ²` and nothing else. This is that
+claim, proved: at `σ' = √(σ²/m)` the quadratic form takes the same value everywhere, so no
+amount of `F_ST` data with `σ²` free can distinguish them.
+
+The consequence is the regime, and it is now enforceable: evidence for the *functional
+form* requires `σ²` held at an independently measured dispersal variance while `m` varies.
+Evidence gathered with `σ²` free is evidence about `m·σ²`, whatever the fit quality — the
+±11% agreement quoted in the note included. -/
+theorem demoSteppingStoneFst_indistinguishable_from_quadratic
+    (d Ne m σ_sq : ℝ) (hm : 0 < m) (hσ : 0 ≤ σ_sq) :
+    demoSteppingStoneFst d Ne m σ_sq
+      = steppingStoneFstQuadratic d Ne m (Real.sqrt (σ_sq / m)) := by
+  unfold demoSteppingStoneFst steppingStoneFstQuadratic
+  have hnn : (0 : ℝ) ≤ σ_sq / m := div_nonneg hσ (le_of_lt hm)
+  rw [Real.sq_sqrt hnn]
+  have hm' : m ≠ 0 := ne_of_gt hm
+  congr 2
+  field_simp
+  ring
+
 /-- Stepping-stone F_ST increases with geographic distance. -/
 theorem stepping_stone_fst_increasing (d₁ d₂ Ne m σ_sq : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq)
