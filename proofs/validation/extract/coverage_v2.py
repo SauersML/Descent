@@ -236,6 +236,7 @@ def distinguishable(a, b):
 # -------------------------------------------------------------------- main
 
 def main(argv=None):
+    global SEED
     ap = argparse.ArgumentParser()
     ap.add_argument("--json", default=None)
     ap.add_argument("--verbose", action="store_true")
@@ -245,8 +246,6 @@ def main(argv=None):
                          "different value and diff the covered set: a verdict "
                          "that moves was never coverage.")
     a = ap.parse_args(argv)
-
-    global SEED
     SEED = a.seed
     classes = json.loads((HERE / "classes.json").read_text())
     blob = json.loads((HERE / "defs.json").read_text())
