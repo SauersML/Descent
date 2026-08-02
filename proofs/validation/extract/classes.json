@@ -6634,8 +6634,15 @@
   },
   "numeric_standins": null,
   "vector_args": null,
-  "mentioned_by": [],
-  "constraints": {}
+  "mentioned_by": [
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": []
+   }
+  }
  },
  "Calibrator.HWEPolygenicScoreDGP.scoreVariance": {
   "class": "NOT-EXTRACTABLE",
@@ -6814,8 +6821,17 @@
   "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
-  "mentioned_by": [],
-  "constraints": {}
+  "mentioned_by": [
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": []
+   }
+  }
  },
  "Calibrator.crossCovEntry": {
   "class": "NOT-EXTRACTABLE",
@@ -24022,15 +24038,20 @@
   ],
   "constraints": {
    "hypotheses": [
-    "slope < 1"
+    "slope < 1",
+    "slope ≠ 0"
    ],
    "hypotheses_by_theorem": {
     "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
     "Calibrator.calibrationSlopeDeviation_eq_one_sub_of_lt_one": [
      "slope < 1"
     ],
-    "Calibrator.logistic_recalibration_corrects_slope": [],
-    "Calibrator.logistic_recalibration_corrects_citl_and_slope": []
+    "Calibrator.logistic_recalibration_corrects_slope": [
+     "slope ≠ 0"
+    ],
+    "Calibrator.logistic_recalibration_corrects_citl_and_slope": [
+     "slope ≠ 0"
+    ]
    }
   }
  },
@@ -24063,17 +24084,31 @@
   "vector_args": null,
   "mentioned_by": [
    "Calibrator.CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget",
+   "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget",
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
-   "Calibrator.no_citl_shift_same_prevalence"
+   "Calibrator.cross_ancestry_exact_metric_profile",
+   "Calibrator.mechanistic_target_identity_calibration_slope_lt_one",
+   "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier",
+   "Calibrator.no_citl_shift_same_prevalence",
+   "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
     "Calibrator.CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget": [],
+    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget": [],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law": [],
-    "Calibrator.no_citl_shift_same_prevalence": []
+    "Calibrator.cross_ancestry_exact_metric_profile": [],
+    "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget": [],
+    "Calibrator.no_citl_shift_same_prevalence": [],
+    "Calibrator.mechanistic_target_identity_calibration_slope_lt_one": []
    }
   }
  },
@@ -24094,7 +24129,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'calibrationProfile' is not defined\")"
+   "error": "NameError(\"name 'Calibrator_calibrationProfile' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -24131,7 +24166,7 @@
     0.05,
     3.0
    ],
-   "targetSlope": [
+   "slope": [
     0.05,
     3.0
    ]
@@ -24141,6 +24176,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Calibrator.CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget",
+   "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
    "Calibrator.adaptation_shift_recoverable"
@@ -24149,6 +24185,7 @@
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Calibrator.CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget": [],
+    "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted": [],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law": [],
     "Calibrator.adaptation_shift_recoverable": []
@@ -24182,8 +24219,41 @@
   "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
-  "mentioned_by": [],
-  "constraints": {}
+  "mentioned_by": [
+   "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget",
+   "Calibrator.cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget",
+   "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case",
+   "Calibrator.cross_ancestry_exact_metric_profile",
+   "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget",
+   "Calibrator.mechanistic_target_identity_calibration_slopeDeviation_eq_one_sub",
+   "Calibrator.mechanistic_target_identity_calibration_slope_lt_one",
+   "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier",
+   "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts",
+   "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget",
+   "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved",
+   "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts",
+   "Calibrator.source_calibrated_target_citl_eq_shift_budget",
+   "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
+    "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget": [],
+    "Calibrator.source_calibrated_target_citl_eq_shift_budget": [],
+    "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget": [],
+    "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts": [],
+    "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts": [],
+    "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved": [],
+    "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
+    "Calibrator.cross_ancestry_exact_metric_profile": [],
+    "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget": [],
+    "Calibrator.cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget": [],
+    "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case": [],
+    "Calibrator.mechanistic_target_identity_calibration_slope_lt_one": [],
+    "Calibrator.mechanistic_target_identity_calibration_slopeDeviation_eq_one_sub": []
+   }
+  }
  },
  "Calibrator.logisticCalibrationProfile": {
   "class": "STRUCTURAL",
@@ -24217,10 +24287,14 @@
    "Calibrator.no_citl_shift_same_prevalence"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "slope ≠ 0"
+   ],
    "hypotheses_by_theorem": {
     "Calibrator.no_citl_shift_same_prevalence": [],
-    "Calibrator.logistic_recalibrated_profile_corrects_citl_and_slope": []
+    "Calibrator.logistic_recalibrated_profile_corrects_citl_and_slope": [
+     "slope ≠ 0"
+    ]
    }
   }
  },
@@ -24419,6 +24493,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted",
    "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget",
    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
@@ -24435,7 +24510,7 @@
   ],
   "constraints": {
    "hypotheses": [
-    "(m.sourceIdentityCalibrationProfile",
+    "((m.identityCalibrationProfile Pop.source",
     "m.environmentalObservedShift = 0",
     "m.geneticObservedShift = 0",
     "m.scoreMeanShift = 0",
@@ -24443,30 +24518,31 @@
     "m.prevalenceShift = 0"
    ],
    "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted": [],
     "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
     "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget": [],
     "Calibrator.source_calibrated_target_citl_eq_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
+     "((m.identityCalibrationProfile Pop.source"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
+     "((m.identityCalibrationProfile Pop.source"
     ],
     "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.prevalenceShift = 0"
     ],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
@@ -24499,6 +24575,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted",
    "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget",
    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
@@ -24515,7 +24592,7 @@
   ],
   "constraints": {
    "hypotheses": [
-    "(m.sourceIdentityCalibrationProfile",
+    "((m.identityCalibrationProfile Pop.source",
     "m.environmentalObservedShift = 0",
     "m.geneticObservedShift = 0",
     "m.scoreMeanShift = 0",
@@ -24523,30 +24600,31 @@
     "m.prevalenceShift = 0"
    ],
    "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted": [],
     "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
     "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget": [],
     "Calibrator.source_calibrated_target_citl_eq_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
+     "((m.identityCalibrationProfile Pop.source"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
+     "((m.identityCalibrationProfile Pop.source"
     ],
     "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.prevalenceShift = 0"
     ],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
@@ -24558,12 +24636,12 @@
    }
   }
  },
- "Calibrator.CrossPopulationCalibrationShiftModel.targetObservedMean": {
+ "Calibrator.CrossPopulationCalibrationShiftModel.observedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationCalibrationShiftModel.sourceObservedMean: no such definition",
+  "note": "qualified name Pop.pair",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 341,
-  "short": "targetObservedMean",
+  "line": 342,
+  "short": "observedMean",
   "ret_type": "ℝ",
   "empirical_status": "",
   "python": null,
@@ -24573,23 +24651,33 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted",
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
    "Calibrator.cross_ancestry_exact_metric_profile",
-   "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget"
+   "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget",
+   "Calibrator.targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law",
+   "Calibrator.targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_portability_law"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
     "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
-    "Calibrator.cross_ancestry_exact_metric_profile": []
+    "Calibrator.cross_ancestry_exact_metric_profile": [],
+    "Calibrator.targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law": [],
+    "Calibrator.targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_portability_law": []
    }
   }
  },
- "Calibrator.CrossPopulationCalibrationShiftModel.targetPredictedMean": {
+ "Calibrator.CrossPopulationCalibrationShiftModel.predictedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "dot-notation call CrossPopulationCalibrationShiftModel.sourcePredictedMean: no such definition",
+  "note": "qualified name Pop.pair",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 346,
-  "short": "targetPredictedMean",
+  "line": 347,
+  "short": "predictedMean",
   "ret_type": "ℝ",
   "empirical_status": "",
   "python": null,
@@ -24598,15 +24686,24 @@
   "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
-  "mentioned_by": [],
-  "constraints": {}
+  "mentioned_by": [
+   "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted",
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": []
+   }
+  }
  },
- "Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationMoments": {
+ "Calibrator.CrossPopulationCalibrationShiftModel.calibrationMoments": {
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 355,
-  "short": "sourceCalibrationMoments",
+  "line": 361,
+  "short": "calibrationMoments",
   "ret_type": "CalibrationMoments where meanObserved",
   "empirical_status": "",
   "python": null,
@@ -24616,32 +24713,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget",
-   "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law"
-  ],
-  "constraints": {
-   "hypotheses": [],
-   "hypotheses_by_theorem": {
-    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": []
-   }
-  }
- },
- "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments": {
-  "class": "STRUCTURAL",
-  "note": "builds a structure value (CalibrationMoments)",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 365,
-  "short": "targetCalibrationMoments",
-  "ret_type": "CalibrationMoments",
-  "empirical_status": "",
-  "python": null,
-  "args": [],
-  "box": {},
-  "selfcheck": null,
-  "numeric_standins": null,
-  "vector_args": null,
-  "mentioned_by": [
+   "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted",
    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law"
@@ -24649,177 +24721,75 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted": [],
     "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law": []
    }
   }
  },
- "Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationProfile": {
+ "Calibrator.CrossPopulationCalibrationShiftModel.calibrationProfile": {
   "class": "STRUCTURAL",
   "note": "builds a structure value (CalibrationProfile)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 371,
-  "short": "sourceCalibrationProfile",
+  "line": 368,
+  "short": "calibrationProfile",
   "ret_type": "CalibrationProfile",
   "empirical_status": "",
-  "python": "Calibrator_CrossPopulationCalibrationShiftModel_sourceCalibrationProfile",
+  "python": "Calibrator_CrossPopulationCalibrationShiftModel_calibrationProfile",
   "args": [
    "m",
+   "P",
    "link"
   ],
   "box": {},
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "KeyError('sourceCalibrationMoments')"
+   "error": "NameError(\"name 'calibrationMoments' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget",
    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
-   "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget",
-   "Calibrator.cross_ancestry_exact_metric_profile",
-   "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget"
-  ],
-  "constraints": {
-   "hypotheses": [
-    "((m.toMechanisticCalibrationModelAt t"
-   ],
-   "hypotheses_by_theorem": {
-    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget": [],
-    "Calibrator.cross_ancestry_exact_metric_profile": [],
-    "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget": [
-     "((m.toMechanisticCalibrationModelAt t"
-    ]
-   }
-  }
- },
- "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationProfile": {
-  "class": "STRUCTURAL",
-  "note": "builds a structure value (CalibrationProfile)",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 377,
-  "short": "targetCalibrationProfile",
-  "ret_type": "CalibrationProfile",
-  "empirical_status": "",
-  "python": "Calibrator_CrossPopulationCalibrationShiftModel_targetCalibrationProfile",
-  "args": [
-   "m",
-   "link"
-  ],
-  "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "KeyError('targetCalibrationMoments')"
-  },
-  "numeric_standins": null,
-  "vector_args": null,
-  "mentioned_by": [
-   "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
    "Calibrator.cross_ancestry_exact_metric_profile",
    "Calibrator.mechanistic_target_identity_calibration_slope_lt_one",
-   "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier"
-  ],
-  "constraints": {
-   "hypotheses": [],
-   "hypotheses_by_theorem": {
-    "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
-    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law": [],
-    "Calibrator.cross_ancestry_exact_metric_profile": [],
-    "Calibrator.mechanistic_target_identity_calibration_slope_lt_one": []
-   }
-  }
- },
- "Calibrator.CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile": {
-  "class": "STRUCTURAL",
-  "note": "builds a structure value (CalibrationProfile)",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 383,
-  "short": "sourceIdentityCalibrationProfile",
-  "ret_type": "CalibrationProfile",
-  "empirical_status": "",
-  "python": null,
-  "args": [],
-  "box": {},
-  "selfcheck": null,
-  "numeric_standins": null,
-  "vector_args": null,
-  "mentioned_by": [
-   "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget",
-   "Calibrator.cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget",
-   "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case",
-   "Calibrator.cross_ancestry_exact_metric_profile",
-   "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget",
-   "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts",
-   "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget",
-   "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved",
-   "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts",
-   "Calibrator.source_calibrated_target_citl_eq_shift_budget",
+   "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier",
+   "Calibrator.no_citl_shift_same_prevalence",
    "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget"
   ],
   "constraints": {
    "hypotheses": [
-    "(m.sourceIdentityCalibrationProfile",
-    "m.environmentalObservedShift = 0",
-    "m.geneticObservedShift = 0",
-    "m.scoreMeanShift = 0",
-    "m.deploymentInterceptShift = 0",
-    "m.prevalenceShift = 0",
     "((m.toMechanisticCalibrationModelAt t"
    ],
    "hypotheses_by_theorem": {
-    "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget": [],
-    "Calibrator.source_calibrated_target_citl_eq_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
-    ],
-    "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
-    ],
-    "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
-     "m.environmentalObservedShift = 0",
-     "m.geneticObservedShift = 0",
-     "m.scoreMeanShift = 0",
-     "m.deploymentInterceptShift = 0"
-    ],
-    "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
-     "m.environmentalObservedShift = 0",
-     "m.geneticObservedShift = 0",
-     "m.scoreMeanShift = 0",
-     "m.deploymentInterceptShift = 0"
-    ],
-    "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved": [
-     "(m.sourceIdentityCalibrationProfile",
-     "m.prevalenceShift = 0"
-    ],
-    "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
+    "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
+    "Calibrator.CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget": [],
+    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law": [],
     "Calibrator.cross_ancestry_exact_metric_profile": [],
     "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget": [
      "((m.toMechanisticCalibrationModelAt t"
     ],
-    "Calibrator.cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget": [],
-    "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case": []
+    "Calibrator.no_citl_shift_same_prevalence": [],
+    "Calibrator.mechanistic_target_identity_calibration_slope_lt_one": []
    }
   }
  },
- "Calibrator.CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile": {
+ "Calibrator.CrossPopulationCalibrationShiftModel.identityCalibrationProfile": {
   "class": "STRUCTURAL",
   "note": "builds a structure value (CalibrationProfile)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 388,
-  "short": "targetIdentityCalibrationProfile",
+  "line": 374,
+  "short": "identityCalibrationProfile",
   "ret_type": "CalibrationProfile",
   "empirical_status": "",
   "python": null,
@@ -24846,7 +24816,7 @@
   ],
   "constraints": {
    "hypotheses": [
-    "(m.sourceIdentityCalibrationProfile",
+    "((m.identityCalibrationProfile Pop.source",
     "m.environmentalObservedShift = 0",
     "m.geneticObservedShift = 0",
     "m.scoreMeanShift = 0",
@@ -24858,27 +24828,27 @@
     "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
     "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget": [],
     "Calibrator.source_calibrated_target_citl_eq_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
+     "((m.identityCalibrationProfile Pop.source"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
+     "((m.identityCalibrationProfile Pop.source"
     ],
     "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.prevalenceShift = 0"
     ],
     "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
@@ -24893,11 +24863,37 @@
    }
   }
  },
+ "Calibrator.CrossPopulationMechanisticCalibrationModel.deploymentIntercept": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Pop.pair",
+  "file": "Calibrator/PGSCalibrationTheory.lean",
+  "line": 563,
+  "short": "deploymentIntercept",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": []
+   }
+  }
+ },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.observedMeanShift": {
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 554,
+  "line": 568,
   "short": "observedMeanShift",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -24914,6 +24910,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted",
    "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget",
    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
@@ -24930,7 +24927,7 @@
   ],
   "constraints": {
    "hypotheses": [
-    "(m.sourceIdentityCalibrationProfile",
+    "((m.identityCalibrationProfile Pop.source",
     "m.environmentalObservedShift = 0",
     "m.geneticObservedShift = 0",
     "m.scoreMeanShift = 0",
@@ -24938,30 +24935,31 @@
     "m.prevalenceShift = 0"
    ],
    "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted": [],
     "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
     "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget": [],
     "Calibrator.source_calibrated_target_citl_eq_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
+     "((m.identityCalibrationProfile Pop.source"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
+     "((m.identityCalibrationProfile Pop.source"
     ],
     "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.prevalenceShift = 0"
     ],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
@@ -24973,53 +24971,24 @@
    }
   }
  },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceScoreMean": {
+ "Calibrator.CrossPopulationMechanisticCalibrationModel.scoreMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition dotProduct",
+  "note": "self-check: arity/type mismatch (TypeError(\"'dict' object is not callable\"))",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 559,
-  "short": "sourceScoreMean",
+  "line": 573,
+  "short": "scoreMean",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "sourceScoreMean",
+  "python": "Calibrator_CrossPopulationMechanisticCalibrationModel_scoreMean",
   "args": [
-   "m"
+   "m",
+   "P"
   ],
   "box": {},
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'dotProduct' is not defined\")"
-  },
-  "numeric_standins": null,
-  "vector_args": null,
-  "mentioned_by": [
-   "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law"
-  ],
-  "constraints": {
-   "hypotheses": [],
-   "hypotheses_by_theorem": {
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": []
-   }
-  }
- },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.targetScoreMean": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition dotProduct",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 564,
-  "short": "targetScoreMean",
-  "ret_type": "ℝ",
-  "empirical_status": "",
-  "python": "targetScoreMean",
-  "args": [
-   "m"
-  ],
-  "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "NameError(\"name 'dotProduct' is not defined\")"
+   "error": "TypeError(\"'dict' object is not callable\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -25035,22 +25004,16 @@
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.scoreMeanShift": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'function' and)",
+  "note": "qualified name Pop.target",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 571,
+  "line": 580,
   "short": "scoreMeanShift",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "scoreMeanShift",
-  "args": [
-   "m"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for -: 'function' and 'function'\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -25063,7 +25026,7 @@
   ],
   "constraints": {
    "hypotheses": [
-    "(m.sourceIdentityCalibrationProfile",
+    "((m.identityCalibrationProfile Pop.source",
     "m.environmentalObservedShift = 0",
     "m.geneticObservedShift = 0",
     "m.scoreMeanShift = 0",
@@ -25072,21 +25035,21 @@
    ],
    "hypotheses_by_theorem": {
     "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.prevalenceShift = 0"
     ],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget": [],
@@ -25095,47 +25058,87 @@
    }
   }
  },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.sourcePredictedMean": {
+ "Calibrator.CrossPopulationMechanisticCalibrationModel.predictedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition dotProduct",
+  "note": "self-check: calls untranslated definition deploymentIntercept",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 576,
-  "short": "sourcePredictedMean",
+  "line": 585,
+  "short": "predictedMean",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "sourcePredictedMean",
+  "python": "Calibrator_CrossPopulationMechanisticCalibrationModel_predictedMean",
   "args": [
-   "m"
+   "m",
+   "P"
   ],
   "box": {},
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'dotProduct' is not defined\")"
+   "error": "NameError(\"name 'deploymentIntercept' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted": [],
     "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": []
    }
   }
  },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.targetPredictedMean": {
+ "Calibrator.CrossPopulationMechanisticCalibrationModel.observedMean": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Pop.pair",
+  "file": "Calibrator/PGSCalibrationTheory.lean",
+  "line": 590,
+  "short": "observedMean",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted",
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
+   "Calibrator.cross_ancestry_exact_metric_profile",
+   "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget",
+   "Calibrator.targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law",
+   "Calibrator.targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_portability_law"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
+    "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
+    "Calibrator.cross_ancestry_exact_metric_profile": [],
+    "Calibrator.targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law": [],
+    "Calibrator.targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_portability_law": []
+   }
+  }
+ },
+ "Calibrator.CrossPopulationMechanisticCalibrationModel.calibrationSlope": {
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition dotProduct",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 581,
-  "short": "targetPredictedMean",
+  "line": 596,
+  "short": "calibrationSlope",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "Calibrator_CrossPopulationMechanisticCalibrationModel_targetPredictedMean",
+  "python": "calibrationSlope",
   "args": [
-   "m"
+   "m",
+   "P"
   ],
   "box": {},
   "selfcheck": {
@@ -25143,72 +25146,6 @@
    "total_points": 8,
    "error": "NameError(\"name 'dotProduct' is not defined\")"
   },
-  "numeric_standins": null,
-  "vector_args": null,
-  "mentioned_by": [],
-  "constraints": {}
- },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.targetObservedMean": {
-  "class": "NUMERIC",
-  "note": "",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 586,
-  "short": "targetObservedMean",
-  "ret_type": "ℝ",
-  "empirical_status": "",
-  "python": "Calibrator_CrossPopulationMechanisticCalibrationModel_targetObservedMean",
-  "args": [
-   "m"
-  ],
-  "box": {},
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
-  "numeric_standins": null,
-  "vector_args": null,
-  "mentioned_by": [
-   "Calibrator.cross_ancestry_exact_metric_profile",
-   "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget"
-  ],
-  "constraints": {
-   "hypotheses": [],
-   "hypotheses_by_theorem": {
-    "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
-    "Calibrator.cross_ancestry_exact_metric_profile": []
-   }
-  }
- },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name Pop.source",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 591,
-  "short": "sourceCalibrationSlope",
-  "ret_type": "ℝ",
-  "empirical_status": "",
-  "python": null,
-  "args": [],
-  "box": {},
-  "selfcheck": null,
-  "numeric_standins": null,
-  "vector_args": null,
-  "mentioned_by": [],
-  "constraints": {}
- },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name Pop.target",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 596,
-  "short": "targetCalibrationSlope",
-  "ret_type": "ℝ",
-  "empirical_status": "",
-  "python": null,
-  "args": [],
-  "box": {},
-  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -25229,7 +25166,7 @@
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 602,
   "short": "toShiftModel",
-  "ret_type": "CrossPopulationCalibrationShiftModel where sourceObservedMean",
+  "ret_type": "CrossPopulationCalibrationShiftModel where baseObservedMean",
   "empirical_status": "",
   "python": null,
   "args": [],
@@ -25259,17 +25196,18 @@
    }
   }
  },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile": {
+ "Calibrator.CrossPopulationMechanisticCalibrationModel.calibrationProfile": {
   "class": "STRUCTURAL",
   "note": "builds a structure value (CalibrationProfile)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 616,
-  "short": "sourceCalibrationProfile",
+  "line": 615,
+  "short": "calibrationProfile",
   "ret_type": "CalibrationProfile",
   "empirical_status": "",
-  "python": "Calibrator_CrossPopulationMechanisticCalibrationModel_sourceCalibrationProfile",
+  "python": "Calibrator_CrossPopulationMechanisticCalibrationModel_calibrationProfile",
   "args": [
    "m",
+   "P",
    "link"
   ],
   "box": {},
@@ -25281,149 +25219,45 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Calibrator.CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget",
    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
-   "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget",
-   "Calibrator.cross_ancestry_exact_metric_profile",
-   "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget"
-  ],
-  "constraints": {
-   "hypotheses": [
-    "((m.toMechanisticCalibrationModelAt t"
-   ],
-   "hypotheses_by_theorem": {
-    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget": [],
-    "Calibrator.cross_ancestry_exact_metric_profile": [],
-    "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget": [
-     "((m.toMechanisticCalibrationModelAt t"
-    ]
-   }
-  }
- },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile": {
-  "class": "STRUCTURAL",
-  "note": "builds a structure value (CalibrationProfile)",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 622,
-  "short": "targetCalibrationProfile",
-  "ret_type": "CalibrationProfile",
-  "empirical_status": "",
-  "python": "Calibrator_CrossPopulationMechanisticCalibrationModel_targetCalibrationProfile",
-  "args": [
-   "m",
-   "link"
-  ],
-  "box": {},
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "KeyError('toShiftModel')"
-  },
-  "numeric_standins": null,
-  "vector_args": null,
-  "mentioned_by": [
-   "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget",
    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
    "Calibrator.cross_ancestry_exact_metric_profile",
    "Calibrator.mechanistic_target_identity_calibration_slope_lt_one",
-   "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier"
-  ],
-  "constraints": {
-   "hypotheses": [],
-   "hypotheses_by_theorem": {
-    "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
-    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget": [],
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law": [],
-    "Calibrator.cross_ancestry_exact_metric_profile": [],
-    "Calibrator.mechanistic_target_identity_calibration_slope_lt_one": []
-   }
-  }
- },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile": {
-  "class": "STRUCTURAL",
-  "note": "builds a structure value (CalibrationProfile)",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 628,
-  "short": "sourceIdentityCalibrationProfile",
-  "ret_type": "CalibrationProfile",
-  "empirical_status": "",
-  "python": null,
-  "args": [],
-  "box": {},
-  "selfcheck": null,
-  "numeric_standins": null,
-  "vector_args": null,
-  "mentioned_by": [
-   "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget",
-   "Calibrator.cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget",
-   "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case",
-   "Calibrator.cross_ancestry_exact_metric_profile",
-   "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget",
-   "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts",
-   "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget",
-   "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved",
-   "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts",
-   "Calibrator.source_calibrated_target_citl_eq_shift_budget",
+   "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier",
+   "Calibrator.no_citl_shift_same_prevalence",
    "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget"
   ],
   "constraints": {
    "hypotheses": [
-    "(m.sourceIdentityCalibrationProfile",
-    "m.environmentalObservedShift = 0",
-    "m.geneticObservedShift = 0",
-    "m.scoreMeanShift = 0",
-    "m.deploymentInterceptShift = 0",
-    "m.prevalenceShift = 0",
     "((m.toMechanisticCalibrationModelAt t"
    ],
    "hypotheses_by_theorem": {
-    "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget": [],
-    "Calibrator.source_calibrated_target_citl_eq_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
-    ],
-    "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
-    ],
-    "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
-     "m.environmentalObservedShift = 0",
-     "m.geneticObservedShift = 0",
-     "m.scoreMeanShift = 0",
-     "m.deploymentInterceptShift = 0"
-    ],
-    "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
-     "m.environmentalObservedShift = 0",
-     "m.geneticObservedShift = 0",
-     "m.scoreMeanShift = 0",
-     "m.deploymentInterceptShift = 0"
-    ],
-    "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved": [
-     "(m.sourceIdentityCalibrationProfile",
-     "m.prevalenceShift = 0"
-    ],
-    "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
+    "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
+    "Calibrator.CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budget": [],
+    "Calibrator.CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget": [],
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law": [],
     "Calibrator.cross_ancestry_exact_metric_profile": [],
     "Calibrator.targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_shift_budget": [
      "((m.toMechanisticCalibrationModelAt t"
     ],
-    "Calibrator.cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget": [],
-    "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case": []
+    "Calibrator.no_citl_shift_same_prevalence": [],
+    "Calibrator.mechanistic_target_identity_calibration_slope_lt_one": []
    }
   }
  },
- "Calibrator.CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile": {
+ "Calibrator.CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile": {
   "class": "STRUCTURAL",
   "note": "builds a structure value (CalibrationProfile)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 634,
-  "short": "targetIdentityCalibrationProfile",
+  "line": 621,
+  "short": "identityCalibrationProfile",
   "ret_type": "CalibrationProfile",
   "empirical_status": "",
   "python": null,
@@ -25450,7 +25284,7 @@
   ],
   "constraints": {
    "hypotheses": [
-    "(m.sourceIdentityCalibrationProfile",
+    "((m.identityCalibrationProfile Pop.source",
     "m.environmentalObservedShift = 0",
     "m.geneticObservedShift = 0",
     "m.scoreMeanShift = 0",
@@ -25462,27 +25296,27 @@
     "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
     "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget": [],
     "Calibrator.source_calibrated_target_citl_eq_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
+     "((m.identityCalibrationProfile Pop.source"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_shift_budget": [
-     "(m.sourceIdentityCalibrationProfile"
+     "((m.identityCalibrationProfile Pop.source"
     ],
     "Calibrator.source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.environmentalObservedShift = 0",
      "m.geneticObservedShift = 0",
      "m.scoreMeanShift = 0",
      "m.deploymentInterceptShift = 0"
     ],
     "Calibrator.source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_preserved": [
-     "(m.sourceIdentityCalibrationProfile",
+     "((m.identityCalibrationProfile Pop.source",
      "m.prevalenceShift = 0"
     ],
     "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
@@ -25501,7 +25335,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Pop.pair",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 970,
+  "line": 957,
   "short": "tagMeanAt",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "",
@@ -25528,7 +25362,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Pop.pair",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 976,
+  "line": 963,
   "short": "deploymentInterceptAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -25555,7 +25389,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 981,
+  "line": 968,
   "short": "observedMeanShiftAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -25599,7 +25433,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 986,
+  "line": 973,
   "short": "scoreMeanAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -25634,7 +25468,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Pop.target",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 992,
+  "line": 979,
   "short": "scoreMeanShiftAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -25671,7 +25505,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition deploymentInterceptAt",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 997,
+  "line": 984,
   "short": "predictedMeanAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -25706,7 +25540,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Pop.pair",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1002,
+  "line": 989,
   "short": "observedMeanAt",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -25733,7 +25567,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1008,
+  "line": 995,
   "short": "toMechanisticCalibrationModelAt",
   "ret_type": "CrossPopulationMechanisticCalibrationModel p q where metric",
   "empirical_status": "",
@@ -25772,27 +25606,19 @@
   "class": "STRUCTURAL",
   "note": "builds a structure value (CalibrationProfile)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1057,
+  "line": 1043,
   "short": "targetCalibrationProfileAtGeneration",
   "ret_type": "CalibrationProfile",
   "empirical_status": "",
-  "python": "targetCalibrationProfileAtGeneration",
-  "args": [
-   "m",
-   "t",
-   "link"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "t": [
     1.0,
     20.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "NameError(\"name 'toMechanisticCalibrationModelAt' is not defined\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -25821,7 +25647,7 @@
   "class": "STRUCTURAL",
   "note": "builds a structure value (CalibrationProfile)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1063,
+  "line": 1049,
   "short": "targetIdentityCalibrationProfileAtGeneration",
   "ret_type": "CalibrationProfile",
   "empirical_status": "",
@@ -25858,7 +25684,7 @@
   "class": "STRUCTURAL",
   "note": "builds a structure value (CalibrationProfile)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1282,
+  "line": 1268,
   "short": "prevalenceLogisticCalibrationProfile",
   "ret_type": "CalibrationProfile",
   "empirical_status": "UNTESTED",
@@ -25906,7 +25732,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1398,
+  "line": 1384,
   "short": "interceptRecalibrated",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -25952,7 +25778,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1424,
+  "line": 1410,
   "short": "logisticRecalibrated",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26011,17 +25837,17 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1451,
+  "line": 1437,
   "short": "recalibratedCalibrationSlope",
   "ret_type": "ℝ",
   "empirical_status": "",
   "python": "recalibratedCalibrationSlope",
   "args": [
-   "targetSlope",
+   "slope",
    "fittedSlope"
   ],
   "box": {
-   "targetSlope": [
+   "slope": [
     0.05,
     3.0
    ],
@@ -26046,20 +25872,20 @@
   "constraints": {
    "hypotheses": [
     "fittedSlope ≠ 0",
-    "targetSlope ≠ 0"
+    "slope ≠ 0"
    ],
    "hypotheses_by_theorem": {
     "Calibrator.target_linear_predictor_eq_affine_in_logistic_recalibrated": [
      "fittedSlope ≠ 0"
     ],
     "Calibrator.logistic_recalibration_corrects_slope": [
-     "targetSlope ≠ 0"
+     "slope ≠ 0"
     ],
     "Calibrator.logistic_recalibrated_profile_corrects_citl_and_slope": [
-     "targetSlope ≠ 0"
+     "slope ≠ 0"
     ],
     "Calibrator.logistic_recalibration_corrects_citl_and_slope": [
-     "targetSlope ≠ 0"
+     "slope ≠ 0"
     ]
    }
   }
@@ -26068,7 +25894,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1531,
+  "line": 1517,
   "short": "recalibrationTraceMSELowerBound",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26126,7 +25952,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1540,
+  "line": 1526,
   "short": "requiredEventsForRecalibration",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26194,7 +26020,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1606,
+  "line": 1592,
   "short": "requiredTargetCohortSizeForRecalibration",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26262,7 +26088,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1681,
+  "line": 1667,
   "short": "classifiedHighRisk",
   "ret_type": "Prop",
   "empirical_status": "",
@@ -26354,7 +26180,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1703,
+  "line": 1689,
   "short": "nri",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26414,7 +26240,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Set.Ioc",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1737,
+  "line": 1723,
   "short": "thresholdBandRate",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -26457,7 +26283,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "expected ')', found op:{",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1744,
+  "line": 1730,
   "short": "downReclassificationRate",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26493,7 +26319,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition downReclassificationRate",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1766,
+  "line": 1752,
   "short": "nriFromDownwardInterceptRecalibration",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26546,7 +26372,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition thresholdBandRate",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1810,
+  "line": 1796,
   "short": "reclassifiedBandEventPrevalence",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -26604,7 +26430,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1888,
+  "line": 1874,
   "short": "qalyContributionAtTime",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26644,7 +26470,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Finset.univ.sum",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1897,
+  "line": 1883,
   "short": "treatmentMargin",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26708,7 +26534,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1903,
+  "line": 1889,
   "short": "receivesTreatment",
   "ret_type": "Prop",
   "empirical_status": "",
@@ -26792,7 +26618,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition by",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1910,
+  "line": 1896,
   "short": "qalyGainUnderDecision",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26861,7 +26687,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition by",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1923,
+  "line": 1909,
   "short": "qalyLoss",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26957,7 +26783,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition by",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1932,
+  "line": 1918,
   "short": "qalyDecisionRegretMargin",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -26995,7 +26821,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2539,
+  "line": 2525,
   "short": "expectedQalyLoss",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -27027,7 +26853,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2586,
+  "line": 2572,
   "short": "screeningLongitudinalModel",
   "ret_type": "LongitudinalTreatmentModel 1 where discount",
   "empirical_status": "",
@@ -27059,7 +26885,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2596,
+  "line": 2582,
   "short": "screeningClinicalPathway",
   "ret_type": "ClinicalPathway 1 where followupWeight",
   "empirical_status": "",
@@ -27118,7 +26944,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2638,
+  "line": 2624,
   "short": "screeningUtilityFromCounts",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -27170,7 +26996,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2643,
+  "line": 2629,
   "short": "screeningUtilityFromRates",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -27218,7 +27044,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2728,
+  "line": 2714,
   "short": "qalyScreeningDecisionModel",
   "ret_type": "ScreeningDecisionModel where threshold",
   "empirical_status": "",
@@ -27264,7 +27090,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition qalyScreeningDecisionModel",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2758,
+  "line": 2744,
   "short": "screeningQalyGain",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -27363,7 +27189,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2775,
+  "line": 2761,
   "short": "decisionCurveScreeningModel",
   "ret_type": "ScreeningDecisionModel where threshold",
   "empirical_status": "",
@@ -27405,7 +27231,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition decisionCurveScreeningModel",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2807,
+  "line": 2793,
   "short": "decisionCurveNetBenefit",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -27485,7 +27311,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2838,
+  "line": 2824,
   "short": "thresholdLongitudinalModel",
   "ret_type": "LongitudinalTreatmentModel 1 where discount",
   "empirical_status": "UNTESTED",
@@ -27517,7 +27343,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2847,
+  "line": 2833,
   "short": "thresholdClinicalPathway",
   "ret_type": "ClinicalPathway 1 where followupWeight",
   "empirical_status": "",
@@ -27554,7 +27380,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "expected 'then', found op::",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2885,
+  "line": 2871,
   "short": "thresholdQalyGainUnderDecision",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -27604,7 +27430,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition thresholdQalyGainUnderDecision",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2894,
+  "line": 2880,
   "short": "thresholdQalyLoss",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -27686,7 +27512,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition by",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2907,
+  "line": 2893,
   "short": "thresholdDecisionRegretMargin",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -27731,7 +27557,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "measure-theoretic integral (∫ … ∂μ)",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 3079,
+  "line": 3065,
   "short": "expectedThresholdQalyLoss",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -30077,7 +29903,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 1075,
+  "line": 1118,
   "short": "hweCodingInvariants",
   "ret_type": "CodingInvariants where drift",
   "empirical_status": "DERIVED",
@@ -30106,6 +29932,53 @@
      "hweCodingInvariants h arithmeticType squareCumulant = hweCodingInvariants h' arithmeticType' squareCumulant'"
     ],
     "Calibrator.balanced_locus_symmetric_component": [
+     "h.altFreq = 1 / 2"
+    ]
+   }
+  }
+ },
+ "Calibrator.HardyWeinbergModel.standardizedFourthMoment": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "∑ over DiploidGenotype: not a `Fin n` index set",
+  "file": "Calibrator/PolygenicSpectroscopy.lean",
+  "line": 1207,
+  "short": "standardizedFourthMoment",
+  "ret_type": "ℝ",
+  "empirical_status": "DERIVED",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Calibrator.HardyWeinbergModel.standardizedFourthMoment_eq",
+   "Calibrator.standardizedFourthMoment_eq_two_iff_half",
+   "Calibrator.standardizedFourthMoment_ge_two",
+   "Calibrator.standardizedFourthMoment_ne_gaussian_at_half"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < h.altFreq",
+    "h.altFreq < 1",
+    "h.altFreq = 1 / 2"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.HardyWeinbergModel.standardizedFourthMoment_eq": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedFourthMoment_ge_two": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedFourthMoment_eq_two_iff_half": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedFourthMoment_ne_gaussian_at_half": [
+     "0 < h.altFreq",
+     "h.altFreq < 1",
      "h.altFreq = 1 / 2"
     ]
    }
@@ -43977,8 +43850,15 @@
   "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
-  "mentioned_by": [],
-  "constraints": {}
+  "mentioned_by": [
+   "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": []
+   }
+  }
  },
  "Calibrator.HWEScoreModel.scoreVariance": {
   "class": "NOT-EXTRACTABLE",
@@ -45404,7 +45284,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name B.mulVec",
   "file": "Calibrator/ProjectionShiftBounds.lean",
-  "line": 857,
+  "line": 864,
   "short": "sharedCorrectionOptimum",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -45444,7 +45324,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name B.mulVec",
   "file": "Calibrator/ProjectionShiftBounds.lean",
-  "line": 868,
+  "line": 875,
   "short": "irreducibleDegradation",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",

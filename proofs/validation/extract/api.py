@@ -88,7 +88,7 @@ __all__ = ["definition_table", "definition", "structures", "resolve",
            "callable_for", "classification", "body_checksum", "stamp",
            "admissible_box", "hypotheses", "satisfies", "vector_args",
            "numeric_standins", "refresh", "staleness", "collisions",
-           "all_rows", "ARG_CONVENTION"]
+           "all_rows", "theorems", "theorems_mentioning", "ARG_CONVENTION"]
 
 # Bumped whenever the calling convention changes.  Consumers should assert on
 # this rather than discovering a convention change from a TypeError.
@@ -140,6 +140,24 @@ def collisions():
 def structures():
     """All `structure`/`class`/`inductive` declarations, keyed by name."""
     return {s["name"]: s for s in _blob()["structures"]}
+
+
+@functools.lru_cache(maxsize=1)
+def theorems():
+    """All theorem/lemma statements, keyed by fully-qualified name.
+
+    Each row: {name, kind, file, line, statement, mentions}.  `statement` is the
+    signature only -- the proof is Lean's business.  `mentions` lists the
+    definitions the statement names, i.e. the definitions that theorem
+    discriminates if used as a property test.
+    """
+    return {t["name"]: t for t in _blob().get("theorems", [])}
+
+
+def theorems_mentioning(name: str):
+    """Theorem rows whose statement names this definition."""
+    short = name.split(".")[-1]
+    return [t for t in theorems().values() if short in t["mentions"]]
 
 
 def parse_failures():
@@ -366,7 +384,7 @@ def refresh():
     across a refresh, the cause was someone running emit.py, not this.)
     """
     for f in (_blob, definition_table, structures, _by_short, _classes,
-              collisions):
+              collisions, theorems):
         f.cache_clear()
 
 

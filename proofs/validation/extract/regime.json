@@ -1,8 +1,8 @@
 {
  "summary": {
-  "total": 1009,
-  "have_regime": 274,
-  "have_external": 40,
+  "total": 1003,
+  "have_regime": 273,
+  "have_external": 60,
   "internally_validated": 205,
   "internally_validated_no_regime": 118,
   "worst_cell": 4
@@ -19,8 +19,10 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.driftVariance": {
@@ -34,8 +36,10 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.twoPopDriftVariance": {
@@ -47,8 +51,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.expectedFreqDiffSq": {
@@ -60,8 +66,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.gwasHeritability": {
@@ -151,8 +159,10 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.effectiveFisherInformation": {
@@ -491,8 +501,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.optimalShrinkage": {
@@ -504,8 +516,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.snpShrinkage": {
@@ -759,8 +773,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": false
   },
   "Calibrator.populationAttributableFraction": {
@@ -798,8 +814,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": false
   },
   "Calibrator.exactBrierRiskOfCalibrated": {
@@ -928,8 +946,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": false
   },
   "Calibrator.bernoulliKLReal": {
@@ -941,8 +961,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.klBernReal": {
@@ -1045,8 +1067,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": false
   },
   "Calibrator.logBernoulliRisk": {
@@ -1392,8 +1416,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.spikeIdentification": {
@@ -1433,8 +1459,10 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": false
   },
   "Calibrator.oneMinusRatio": {
@@ -1556,8 +1584,10 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": false
   },
   "Calibrator.admixtureLDTwoLocus": {
@@ -1571,8 +1601,10 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": false
   },
   "Calibrator.admixtureLDAtGen": {
@@ -1587,8 +1619,10 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": false
   },
   "Calibrator.admixtureLDMagnitude": {
@@ -1979,8 +2013,10 @@
    "regime_mined": [],
    "has_regime": false,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": false
   },
   "Calibrator.twoLocusIBDCovariance": {
@@ -2535,8 +2571,10 @@
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.TransportedMetrics.gaussianAUCFromSignalVariance": {
@@ -3061,8 +3099,10 @@
    ],
    "has_regime": true,
    "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
+   "external_checked_by": [
+    "invariants[external-reference]:simulation-mutant-rejected"
+   ],
+   "has_external": true,
    "internally_validated": true
   },
   "Calibrator.dominanceVariance": {
@@ -6372,9 +6412,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationCalibrationShiftModel.targetObservedMean": {
+  "Calibrator.CrossPopulationCalibrationShiftModel.observedMean": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 341,
+   "line": 342,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6385,9 +6425,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationCalibrationShiftModel.targetPredictedMean": {
+  "Calibrator.CrossPopulationCalibrationShiftModel.predictedMean": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 346,
+   "line": 347,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6398,9 +6438,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationMoments": {
+  "Calibrator.CrossPopulationCalibrationShiftModel.calibrationMoments": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 355,
+   "line": 361,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6411,9 +6451,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments": {
+  "Calibrator.CrossPopulationCalibrationShiftModel.calibrationProfile": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 365,
+   "line": 368,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6424,9 +6464,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationProfile": {
+  "Calibrator.CrossPopulationCalibrationShiftModel.identityCalibrationProfile": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 371,
+   "line": 374,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6437,36 +6477,10 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationProfile": {
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.deploymentIntercept": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 377,
-   "class": "STRUCTURAL",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile": {
-   "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 383,
-   "class": "STRUCTURAL",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile": {
-   "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 388,
-   "class": "STRUCTURAL",
+   "line": 563,
+   "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [],
@@ -6478,7 +6492,7 @@
   },
   "Calibrator.CrossPopulationMechanisticCalibrationModel.observedMeanShift": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 554,
+   "line": 568,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6489,22 +6503,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceScoreMean": {
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.scoreMean": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 559,
-   "class": "NOT-EXTRACTABLE",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetScoreMean": {
-   "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 564,
+   "line": 573,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6517,7 +6518,7 @@
   },
   "Calibrator.CrossPopulationMechanisticCalibrationModel.scoreMeanShift": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 571,
+   "line": 580,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6528,9 +6529,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourcePredictedMean": {
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.predictedMean": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 576,
+   "line": 585,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6541,9 +6542,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetPredictedMean": {
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.observedMean": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 581,
+   "line": 590,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6554,35 +6555,7 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetObservedMean": {
-   "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 586,
-   "class": "NUMERIC",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope": {
-   "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 591,
-   "class": "NOT-EXTRACTABLE",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [
-    "biallelic"
-   ],
-   "has_regime": true,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope": {
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.calibrationSlope": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
    "line": 596,
    "class": "NOT-EXTRACTABLE",
@@ -6610,9 +6583,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile": {
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.calibrationProfile": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 616,
+   "line": 615,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6623,35 +6596,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile": {
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 622,
-   "class": "STRUCTURAL",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile": {
-   "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 628,
-   "class": "STRUCTURAL",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile": {
-   "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 634,
+   "line": 621,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6664,7 +6611,7 @@
   },
   "Calibrator.CrossPopulationGenerationalCalibrationModel.tagMeanAt": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 970,
+   "line": 957,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6677,7 +6624,7 @@
   },
   "Calibrator.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 976,
+   "line": 963,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6690,7 +6637,7 @@
   },
   "Calibrator.CrossPopulationGenerationalCalibrationModel.observedMeanShiftAt": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 981,
+   "line": 968,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6703,7 +6650,7 @@
   },
   "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanAt": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 986,
+   "line": 973,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6716,7 +6663,7 @@
   },
   "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 992,
+   "line": 979,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6729,7 +6676,7 @@
   },
   "Calibrator.CrossPopulationGenerationalCalibrationModel.predictedMeanAt": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 997,
+   "line": 984,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6742,7 +6689,7 @@
   },
   "Calibrator.CrossPopulationGenerationalCalibrationModel.observedMeanAt": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1002,
+   "line": 989,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6755,7 +6702,7 @@
   },
   "Calibrator.CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1008,
+   "line": 995,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6768,7 +6715,7 @@
   },
   "Calibrator.targetCalibrationProfileAtGeneration": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1057,
+   "line": 1043,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6781,7 +6728,7 @@
   },
   "Calibrator.targetIdentityCalibrationProfileAtGeneration": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1063,
+   "line": 1049,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6794,7 +6741,7 @@
   },
   "Calibrator.prevalenceLogisticCalibrationProfile": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1282,
+   "line": 1268,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -6807,7 +6754,7 @@
   },
   "Calibrator.interceptRecalibrated": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1398,
+   "line": 1384,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6820,7 +6767,7 @@
   },
   "Calibrator.logisticRecalibrated": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1424,
+   "line": 1410,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6833,7 +6780,7 @@
   },
   "Calibrator.recalibratedCalibrationSlope": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1451,
+   "line": 1437,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6846,7 +6793,7 @@
   },
   "Calibrator.recalibrationTraceMSELowerBound": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1531,
+   "line": 1517,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6859,7 +6806,7 @@
   },
   "Calibrator.requiredEventsForRecalibration": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1540,
+   "line": 1526,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6872,7 +6819,7 @@
   },
   "Calibrator.requiredTargetCohortSizeForRecalibration": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1606,
+   "line": 1592,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6885,7 +6832,7 @@
   },
   "Calibrator.classifiedHighRisk": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1681,
+   "line": 1667,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6898,7 +6845,7 @@
   },
   "Calibrator.nri": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1703,
+   "line": 1689,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6911,7 +6858,7 @@
   },
   "Calibrator.thresholdBandRate": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1737,
+   "line": 1723,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -6924,7 +6871,7 @@
   },
   "Calibrator.downReclassificationRate": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1744,
+   "line": 1730,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6937,7 +6884,7 @@
   },
   "Calibrator.nriFromDownwardInterceptRecalibration": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1766,
+   "line": 1752,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6950,7 +6897,7 @@
   },
   "Calibrator.reclassifiedBandEventPrevalence": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1810,
+   "line": 1796,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -6963,7 +6910,7 @@
   },
   "Calibrator.qalyContributionAtTime": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1888,
+   "line": 1874,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6976,7 +6923,7 @@
   },
   "Calibrator.treatmentMargin": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1897,
+   "line": 1883,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -6989,7 +6936,7 @@
   },
   "Calibrator.receivesTreatment": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1903,
+   "line": 1889,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7002,7 +6949,7 @@
   },
   "Calibrator.qalyGainUnderDecision": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1910,
+   "line": 1896,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7015,7 +6962,7 @@
   },
   "Calibrator.qalyLoss": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1923,
+   "line": 1909,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7028,7 +6975,7 @@
   },
   "Calibrator.qalyDecisionRegretMargin": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1932,
+   "line": 1918,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7041,7 +6988,7 @@
   },
   "Calibrator.expectedQalyLoss": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2539,
+   "line": 2525,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7054,7 +7001,7 @@
   },
   "Calibrator.screeningLongitudinalModel": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2586,
+   "line": 2572,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7067,7 +7014,7 @@
   },
   "Calibrator.screeningClinicalPathway": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2596,
+   "line": 2582,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7080,7 +7027,7 @@
   },
   "Calibrator.screeningUtilityFromCounts": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2638,
+   "line": 2624,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7093,7 +7040,7 @@
   },
   "Calibrator.screeningUtilityFromRates": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2643,
+   "line": 2629,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7106,7 +7053,7 @@
   },
   "Calibrator.qalyScreeningDecisionModel": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2728,
+   "line": 2714,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7119,7 +7066,7 @@
   },
   "Calibrator.screeningQalyGain": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2758,
+   "line": 2744,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7132,7 +7079,7 @@
   },
   "Calibrator.decisionCurveScreeningModel": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2775,
+   "line": 2761,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [
@@ -7147,7 +7094,7 @@
   },
   "Calibrator.decisionCurveNetBenefit": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2807,
+   "line": 2793,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7160,7 +7107,7 @@
   },
   "Calibrator.thresholdLongitudinalModel": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2838,
+   "line": 2824,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -7173,7 +7120,7 @@
   },
   "Calibrator.thresholdClinicalPathway": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2847,
+   "line": 2833,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7186,7 +7133,7 @@
   },
   "Calibrator.thresholdQalyGainUnderDecision": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2885,
+   "line": 2871,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -7199,7 +7146,7 @@
   },
   "Calibrator.thresholdQalyLoss": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2894,
+   "line": 2880,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7212,7 +7159,7 @@
   },
   "Calibrator.thresholdDecisionRegretMargin": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2907,
+   "line": 2893,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -7225,7 +7172,7 @@
   },
   "Calibrator.expectedThresholdQalyLoss": {
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 3079,
+   "line": 3065,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -7810,7 +7757,7 @@
   },
   "Calibrator.hweCodingInvariants": {
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 1075,
+   "line": 1118,
    "class": "STRUCTURAL",
    "empirical_status": "DERIVED",
    "regime_explicit": [],
@@ -7818,6 +7765,21 @@
     "hardy-weinberg"
    ],
    "has_regime": true,
+   "external_claimed_in_docstring": [
+    "analytic-reference"
+   ],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
+  },
+  "Calibrator.HardyWeinbergModel.standardizedFourthMoment": {
+   "file": "Calibrator/PolygenicSpectroscopy.lean",
+   "line": 1207,
+   "class": "NOT-EXTRACTABLE",
+   "empirical_status": "DERIVED",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
    "external_claimed_in_docstring": [
     "analytic-reference"
    ],
@@ -11682,7 +11644,7 @@
   },
   "Calibrator.sharedCorrectionOptimum": {
    "file": "Calibrator/ProjectionShiftBounds.lean",
-   "line": 857,
+   "line": 864,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -11695,7 +11657,7 @@
   },
   "Calibrator.irreducibleDegradation": {
    "file": "Calibrator/ProjectionShiftBounds.lean",
-   "line": 868,
+   "line": 875,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],

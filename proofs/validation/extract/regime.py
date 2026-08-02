@@ -198,13 +198,20 @@ def external_checks():
             continue
         tag = path.parent.name
 
-        def walk(node, depth=0):
+        def walk(node, depth=0, key=None):
             if depth > 6:
                 return
             if isinstance(node, dict):
-                name = node.get("definition") or node.get("name") or node.get("def")
+                # The definition name may be a FIELD of the record, or the KEY
+                # the record is filed under (invariants/coverage.json does the
+                # latter, with no name inside the record at all).
+                name = (node.get("definition") or node.get("name")
+                        or node.get("def") or key)
                 verdict = (node.get("verdict") or node.get("status")
-                           or node.get("result") or node.get("class"))
+                           or node.get("result") or node.get("class")
+                           or node.get("demonstration"))
+                if verdict is None and node.get("covered") is True:
+                    verdict = "covered"
                 declared = _declared_class(node)
                 if isinstance(name, str) and isinstance(verdict, str) \
                         and verdict not in NON_VERDICTS:
@@ -218,11 +225,11 @@ def external_checks():
                     elif tier is not None:
                         hits[name.split(".")[-1]].add(
                             f"{tag}[{tier}?]:{verdict}")   # ? = inferred, not declared
-                for v in node.values():
-                    walk(v, depth + 1)
+                for k, v in node.items():
+                    walk(v, depth + 1, k)
             elif isinstance(node, list):
                 for v in node[:5000]:
-                    walk(v, depth + 1)
+                    walk(v, depth + 1, key)
 
         walk(blob)
     return hits, declared_internal

@@ -104,8 +104,9 @@ IDENT_RE = re.compile(r"[A-Za-z_Ͱ-Ͽᴀ-ᶿ℀-⅏]"
 
 @dataclass
 class Decl:
-    name: str            # fully qualified
-    short: str
+    name: str            # fully qualified: namespace stack + declaration name
+    decl_name: str       # the declaration name EXACTLY as written in the source
+    short: str           # last dotted component only -- NOT unique, see below
     kind: str            # def | theorem | structure | ...
     noncomputable: bool
     file: str
@@ -276,7 +277,7 @@ def parse_file(path: pathlib.Path, root: pathlib.Path):
         if mest:
             est = mest.group(1).strip().rstrip(".")
 
-        d = Decl(name=fq, short=name.split(".")[-1], kind=kind,
+        d = Decl(name=fq, decl_name=name, short=name.split(".")[-1], kind=kind,
                  noncomputable="noncomputable" in m.group("mods"),
                  file=str(path.relative_to(root.parent)), line=i + 1,
                  signature=" ".join(sig.split()), args=args, ret_type=ret,
@@ -453,12 +454,34 @@ def find_collisions(defs):
             for n, rows in seen.items() if len(rows) > 1}
 
 
-def to_json(defs, structs, failures):
+def theorem_rows(thms, defs):
+    """Theorem statements, in a form another tier can diff against its own.
+
+    Statement only, never the proof: the proof is Lean's business and the
+    statement is the shared object.  `mentions` is the set of definitions the
+    statement names, which is what makes a theorem usable as a property test --
+    it is the list of definitions that theorem discriminates.
+    """
+    shorts = {d.short for d in defs}
+    rows = []
+    for t in thms:
+        stmt = " ".join(t.signature.split())
+        names = {n.split(".")[-1] for n in IDENT_RE.findall(stmt)}
+        rows.append({
+            "name": t.name, "kind": t.kind, "file": t.file, "line": t.line,
+            "statement": stmt,
+            "mentions": sorted(names & shorts),
+        })
+    return rows
+
+
+def to_json(defs, structs, failures, thms=()):
     def clean(d):
         r = {k: v for k, v in asdict(d).items()}
         return r
     return {
         "collisions": find_collisions(defs),
+        "theorems": theorem_rows(thms, defs),
         "definitions": [clean(d) for d in defs],
         "structures": [clean(d) for d in structs],
         "parse_failures": failures,
@@ -472,7 +495,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     root = pathlib.Path(a.root).resolve()
     defs, thms, structs, failures = build(root)
-    blob = to_json(defs, structs, failures)
+    blob = to_json(defs, structs, failures, thms)
     text = json.dumps(blob, indent=1, ensure_ascii=False)
     if a.out:
         pathlib.Path(a.out).write_text(text)

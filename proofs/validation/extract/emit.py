@@ -117,7 +117,7 @@ import lean_rt as _rt
 def main():
     root = PROOFS / "Calibrator"
     defs, thms, structs, failures = lean_parse.build(root)
-    blob = lean_parse.to_json(defs, structs, failures)
+    blob = lean_parse.to_json(defs, structs, failures, thms)
     (HERE / "defs.json").write_text(json.dumps(blob, indent=1, ensure_ascii=False))
 
     D = blob["definitions"]

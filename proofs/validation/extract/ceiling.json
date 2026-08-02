@@ -1,6 +1,6 @@
 {
- "total": 1009,
- "extractable": 665,
+ "total": 1003,
+ "extractable": 659,
  "roots": [
   "Calibrator.FrequencyResolvedCohort.correctableClasses",
   "Calibrator.GenotypeDesign.cycleDensity",
@@ -65,6 +65,9 @@
   "Calibrator.wTarget_opt"
  ],
  "inherited": [
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.predictedMean",
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.scoreMean",
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.scoreMeanShift",
   "Calibrator.InformationTheoryBridge.klBern",
   "Calibrator.brierBayesRisk",
   "Calibrator.coalescenceCdfFromHazard",
@@ -90,21 +93,17 @@
   "Calibrator.ChaosSpectroscopy.disjointRecord",
   "Calibrator.ColliderModel.inducedCov",
   "Calibrator.ColliderModel.\u03b2_selected",
-  "Calibrator.CrossPopulationCalibrationShiftModel.targetObservedMean",
-  "Calibrator.CrossPopulationCalibrationShiftModel.targetPredictedMean",
+  "Calibrator.CrossPopulationCalibrationShiftModel.observedMean",
+  "Calibrator.CrossPopulationCalibrationShiftModel.predictedMean",
   "Calibrator.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt",
   "Calibrator.CrossPopulationGenerationalCalibrationModel.observedMeanAt",
   "Calibrator.CrossPopulationGenerationalCalibrationModel.predictedMeanAt",
   "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanAt",
   "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt",
   "Calibrator.CrossPopulationGenerationalCalibrationModel.tagMeanAt",
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.scoreMeanShift",
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope",
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourcePredictedMean",
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceScoreMean",
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope",
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetPredictedMean",
-  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetScoreMean",
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.calibrationSlope",
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.deploymentIntercept",
+  "Calibrator.CrossPopulationMechanisticCalibrationModel.observedMean",
   "Calibrator.CrossTraitBorrowingModel.borrowedTraitBCrossCov",
   "Calibrator.CrossTraitBorrowingModel.borrowedTraitBProjection",
   "Calibrator.CrossTraitBorrowingModel.totalTraitBCrossCov",
@@ -135,6 +134,7 @@
   "Calibrator.HardyWeinbergModel.genotypeVariance",
   "Calibrator.HardyWeinbergModel.mellinDrift",
   "Calibrator.HardyWeinbergModel.mellinJetVariance",
+  "Calibrator.HardyWeinbergModel.standardizedFourthMoment",
   "Calibrator.HardyWeinbergModel.standardizedGenotype",
   "Calibrator.HardyWeinbergModel.standardizedSquare",
   "Calibrator.HeterogeneousEffectDGP.trueExp",
@@ -351,5 +351,5 @@
   "Calibrator.weightedResidualMoment",
   "Calibrator.weightedRetentionUpperBound"
  ],
- "ceiling": 679
+ "ceiling": 676
 }

@@ -962,7 +962,7 @@ def calibrationSlopeDeviation(slope):
     return _rt.rabs((slope - 1.0))
 
 def toProfile(mom, link):
-    return calibrationProfile(link, _rt._proj(mom, 'meanObserved'), _rt._proj(mom, 'meanPredicted'), _rt._proj(mom, 'slope'))
+    return Calibrator_calibrationProfile(link, _rt._proj(mom, 'meanObserved'), _rt._proj(mom, 'meanPredicted'), _rt._proj(mom, 'slope'))
 
 def slopeDeviation(p):
     return calibrationSlopeDeviation(_rt._proj(p, 'slope'))
@@ -982,38 +982,23 @@ def Calibrator_CrossPopulationCalibrationShiftModel_observedMeanShift(m):
 def predictedMeanShift(m):
     return (_rt._proj(m, 'scoreMeanShift') + _rt._proj(m, 'deploymentInterceptShift'))
 
-def Calibrator_CrossPopulationCalibrationShiftModel_sourceCalibrationProfile(m, link):
-    return _rt._proj(_rt._proj(m, 'sourceCalibrationMoments'), 'toProfile')(link)
-
-def Calibrator_CrossPopulationCalibrationShiftModel_targetCalibrationProfile(m, link):
-    return _rt._proj(_rt._proj(m, 'targetCalibrationMoments'), 'toProfile')(link)
+def Calibrator_CrossPopulationCalibrationShiftModel_calibrationProfile(m, P, link):
+    return _rt._proj((calibrationMoments(m, P)), 'toProfile')(link)
 
 def Calibrator_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m):
     return ((_rt._proj(m, 'prevalenceShift') + _rt._proj(m, 'environmentalObservedShift')) + _rt._proj(m, 'geneticObservedShift'))
 
-def sourceScoreMean(m):
-    return sourceWeightedTagScore(_rt._proj(m, 'metric'), _rt._proj(m, 'sourceTagMean'))
+def Calibrator_CrossPopulationMechanisticCalibrationModel_scoreMean(m, P):
+    return sourceWeightedTagScore(_rt._proj(m, 'metric'), (_rt._proj(m, 'tagMean')(P)))
 
-def targetScoreMean(m):
-    return sourceWeightedTagScore(_rt._proj(m, 'metric'), _rt._proj(m, 'targetTagMean'))
+def Calibrator_CrossPopulationMechanisticCalibrationModel_predictedMean(m, P):
+    return (deploymentIntercept(m, P) + Calibrator_CrossPopulationMechanisticCalibrationModel_scoreMean(m, P))
 
-def scoreMeanShift(m):
-    return sourceWeightedTagScore(_rt._proj(m, 'metric'), ((_rt._proj(m, 'targetTagMean') - _rt._proj(m, 'sourceTagMean'))))
+def calibrationSlope(m, P):
+    return calibrationSlopeFromSourceWeights(_rt._proj(m, 'metric'), P)
 
-def sourcePredictedMean(m):
-    return (_rt._proj(m, 'sourceDeploymentIntercept') + sourceScoreMean(m))
-
-def Calibrator_CrossPopulationMechanisticCalibrationModel_targetPredictedMean(m):
-    return ((_rt._proj(m, 'sourceDeploymentIntercept') + _rt._proj(m, 'deploymentInterceptShift')) + targetScoreMean(m))
-
-def Calibrator_CrossPopulationMechanisticCalibrationModel_targetObservedMean(m):
-    return (_rt._proj(m, 'sourceObservedMean') + Calibrator_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m))
-
-def Calibrator_CrossPopulationMechanisticCalibrationModel_sourceCalibrationProfile(m, link):
-    return _rt._proj(_rt._proj(m, 'toShiftModel'), 'sourceCalibrationProfile')(link)
-
-def Calibrator_CrossPopulationMechanisticCalibrationModel_targetCalibrationProfile(m, link):
-    return _rt._proj(_rt._proj(m, 'toShiftModel'), 'targetCalibrationProfile')(link)
+def Calibrator_CrossPopulationMechanisticCalibrationModel_calibrationProfile(m, P, link):
+    return _rt._proj(_rt._proj(m, 'toShiftModel'), 'calibrationProfile')(P, link)
 
 def observedMeanShiftAt(m, t):
     return ((_rt._proj(m, 'prevalenceShiftAt')(t) + _rt._proj(m, 'environmentalObservedShiftAt')(t)) + _rt._proj(m, 'geneticObservedShiftAt')(t))
@@ -1024,9 +1009,6 @@ def scoreMeanAt(m, P, t):
 def predictedMeanAt(m, P, t):
     return (deploymentInterceptAt(m, P, t) + scoreMeanAt(m, P, t))
 
-def targetCalibrationProfileAtGeneration(m, t, link):
-    return _rt._proj((toMechanisticCalibrationModelAt(m, t)), 'targetCalibrationProfile')(link)
-
 def prevalenceLogisticCalibrationProfile(pi_source, pi_target, slope):
     return logisticCalibrationProfile((prevalenceLogit(pi_target)), (prevalenceLogit(pi_source)), slope)
 
@@ -1036,8 +1018,8 @@ def interceptRecalibrated(pgs, new_intercept):
 def logisticRecalibrated(pgs, a, b):
     return (a + (b * pgs))
 
-def recalibratedCalibrationSlope(targetSlope, fittedSlope):
-    return _rt.rdiv(targetSlope, fittedSlope)
+def recalibratedCalibrationSlope(slope, fittedSlope):
+    return _rt.rdiv(slope, fittedSlope)
 
 def recalibrationTraceMSELowerBound(nEvents, nParams, infoPerEvent):
     return _rt.rdiv(nParams, ((nEvents * infoPerEvent)))
