@@ -387,7 +387,7 @@ theorem ldsr_chi2_from_beta_sq (h2 M ell_j N : ℝ) (h_N : N ≠ 0) :
     The full model is: E[χ²_j] = N·h²/M·ℓ_j + N·a/M + 1. -/
 theorem ldsr_with_confounding_eq (N h2 M ell_j a : ℝ)
     (h_N : N ≠ 0) :
-    N * ldsrExpectedBetaSq h2 M ell_j N + N * a / M =
+    N * ldsrExpectedBetaSq h2 M ell_j N + N * a =
       ldsrExpectedChi2 N h2 M ell_j a := by
   unfold ldsrExpectedBetaSq ldsrExpectedChi2
   field_simp

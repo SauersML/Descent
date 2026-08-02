@@ -234,6 +234,7 @@ theorem r2_increases_with_n
     (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂) (h_more : n₁ < n₂) :
     expectedR2FromN n₁ h2 M < expectedR2FromN n₂ h2 M := by
   unfold expectedR2FromN
+  refine mul_lt_mul_of_pos_left ?_ h_h2
   rw [div_lt_div_iff₀ (by positivity) (by positivity)]
   nlinarith [mul_pos h_h2 h_M]
 
@@ -246,6 +247,11 @@ theorem r2_concave_in_n
     expectedR2FromN (n + 2*dn) h2 M - expectedR2FromN (n + dn) h2 M <
       expectedR2FromN (n + dn) h2 M - expectedR2FromN n h2 M := by
   unfold expectedR2FromN
+  -- The heritability prefactor is common to all six terms and positive, so it
+  -- factors out of both differences and the inequality is the one about the
+  -- saturating fraction alone.
+  rw [← mul_sub, ← mul_sub]
+  refine mul_lt_mul_of_pos_left ?_ h_h2
   -- This is equivalent to showing f''(n) < 0 for f(n) = nh²/(nh²+M)
   -- f'(n) = h²M/(nh²+M)², f''(n) = -2(h²)²M/(nh²+M)³ < 0
   -- f(n) = nh²/(nh²+M) is concave in n, so f(n+2d)-f(n+d) < f(n+d)-f(n)
@@ -282,6 +288,8 @@ theorem diversity_has_higher_marginal_value
     expectedR2FromN (n_eur + dn) h2 M - expectedR2FromN n_eur h2 M <
       expectedR2FromN (n_underrep + dn) h2 M - expectedR2FromN n_underrep h2 M := by
   unfold expectedR2FromN
+  rw [← mul_sub, ← mul_sub]
+  refine mul_lt_mul_of_pos_left ?_ h_h2
   have h1 : 0 < n_underrep * h2 + M := by nlinarith [mul_pos h_underrep h_h2]
   have h2' : 0 < (n_underrep + dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n_underrep + dn) h_h2]
   have h3 : 0 < n_eur * h2 + M := by nlinarith [mul_pos h_eur h_h2]

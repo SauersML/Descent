@@ -24,6 +24,45 @@ def rawCrossMoment (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
     (Y : Ω → ℝ) : ι → ℝ :=
   fun i => E (fun ω => X ω i * Y ω)
 
+/-- Pairing a coefficient with the raw cross-moment vector is the expectation
+of its linear score times the outcome. -/
+theorem dot_rawCrossMoment
+    (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
+    (Y : Ω → ℝ) (u : ι → ℝ) :
+    dot u (rawCrossMoment E X Y) =
+      E (fun ω => dot u (X ω) * Y ω) := by
+  unfold dot rawCrossMoment
+  have hexpand :
+      (fun ω => (∑ i, u i * X ω i) * Y ω) =
+        ∑ i, (u i) • (fun ω => X ω i * Y ω) := by
+    funext ω
+    rw [Finset.sum_mul]
+    apply Finset.sum_congr rfl
+    intro i _
+    simp only [Pi.smul_apply, smul_eq_mul]
+    ring
+  rw [hexpand, E.eval_sum]
+  apply Finset.sum_congr rfl
+  intro i _
+  rw [E.smul_eval]
+
+/-- **Range-compatibility core for singular second moments.**  A direction in
+the kernel of `E[XXᵀ]` is orthogonal to `E[XY]`.  The sole analytic input is
+the zero-norm implication supplied by Cauchy--Schwarz for genuine
+expectations.  Thus singularity creates non-uniqueness of coefficients, not an
+incompatible normal equation. -/
+theorem rawCrossMoment_annihilates_secondMoment_kernel
+    (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
+    (Y : Ω → ℝ) (kernelDirection : ι → ℝ)
+    (hkernel : (secondMomentMatrix E X).mulVec kernelDirection = 0)
+    (hzeroProduct : ∀ f g : Ω → ℝ,
+      E (fun ω => f ω ^ 2) = 0 → E (fun ω => f ω * g ω) = 0) :
+    dot kernelDirection (rawCrossMoment E X Y) = 0 := by
+  rw [dot_rawCrossMoment]
+  apply hzeroProduct
+  rw [secondMoment_quadratic_form, hkernel]
+  simp [dot]
+
 /-- Observable covariance between each coordinate and the residual of a
 deployed linear coefficient. -/
 def residualScoreMoment (E : ExpFunctional Ω) (X : Ω → ι → ℝ)

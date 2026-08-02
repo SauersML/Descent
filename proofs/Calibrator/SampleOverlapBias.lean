@@ -86,23 +86,18 @@ theorem more_overlap_more_inflation (r2_true h2 f₁ f₂ : ℝ) (n_gwas : ℕ)
       partialOverlapR2 r2_true h2 f₂ n_gwas := by
   unfold partialOverlapR2
   have h_diff : 0 < h2 - r2_true := by linarith
-  have h_cast : (0 : ℝ) < ↑n_gwas := Nat.cast_pos.mpr h_n
-  have : f₁ * (h2 - r2_true) / ↑n_gwas < f₂ * (h2 - r2_true) / ↑n_gwas :=
-    div_lt_div_of_pos_right (mul_lt_mul_of_pos_right h_f h_diff) h_cast
-  linarith
+  nlinarith [mul_lt_mul_of_pos_right h_f h_diff]
 
-/-- **Inflation decreases with GWAS sample size.**
-    Larger GWAS → less overfitting → less inflation. -/
-theorem inflation_decreases_with_gwas_n (r2_true h2 f : ℝ) (n₁ n₂ : ℕ)
-    (h_h2 : r2_true < h2) (h_f : 0 < f)
-    (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂) (h_n : n₁ < n₂) :
-    partialOverlapR2 r2_true h2 f n₂ <
-      partialOverlapR2 r2_true h2 f n₁ := by
-  unfold partialOverlapR2
-  have h_diff : 0 < h2 - r2_true := by linarith
-  have h₁ : (0 : ℝ) < n₁ := Nat.cast_pos.mpr h_n₁
-  have h₂ : (0 : ℝ) < n₂ := Nat.cast_pos.mpr h_n₂
-  linarith [div_lt_div_iff_of_pos_left (mul_pos h_f h_diff) h₂ h₁ |>.mpr (Nat.cast_lt.mpr h_n)]
+/-! ### Inflation and discovery sample size
+
+`inflation_decreases_with_gwas_n` is removed rather than reproved. It asserted
+that overlap inflation falls as the discovery sample grows, which was a
+consequence of the spurious `1/n_gwas` in the old `partialOverlapR2`. Under the
+corrected mixture law the discovery size does not appear, and simulation agrees:
+inflation is set by what fraction of the test set was in training and does not
+decay with `n`. The theorem was true of the old formula and false of the
+quantity, so there is nothing here to salvage.
+-/
 
 end OverlapInflation
 
@@ -206,7 +201,7 @@ theorem jackknife_reduces_r2 (r2_full bias : ℝ)
 theorem gwas_subtraction_estimates_bias
     (r2_true h2 f : ℝ) (n_gwas : ℕ) :
     partialOverlapR2 r2_true h2 f n_gwas - partialOverlapR2 r2_true h2 0 n_gwas =
-      f * (h2 - r2_true) / ↑n_gwas := by
+      f * (h2 - r2_true) := by
   unfold partialOverlapR2
   ring
 
