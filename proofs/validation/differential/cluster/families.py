@@ -281,10 +281,18 @@ FAMILIES = [
         "name": "stepping_stone",
         "model": "1D lattice, nearest-neighbour migration; decay length and "
                  "F_ST versus distance",
-        "simulator": None,
-        "status": "NO SIMULATOR. Contains the 500x "
-                  "steppingStoneCharacteristicLength functional-form error and "
-                  "an 878% contradiction between two corpus formulas.",
+        "simulator": "cluster/fam_stepping_stone.py",
+        "status": "SIMULATED. Two engines: a Wright-Fisher frequency lattice "
+                  "vectorised over replicates, and the two-lineage coalescent "
+                  "on the circle solved exactly as a linear system with the "
+                  "Monte Carlo walk of the same chain kept as a control. The "
+                  "878% contradiction was resolved before this run by deleting "
+                  "continuousSteppingStoneFst; the exponential is now measured "
+                  "against the surviving hyperbolic form rather than argued "
+                  "against. The migration kernel carries a jump size k, so "
+                  "sigma^2 = k^2 is SET and not fitted -- this is the "
+                  "fixed-sigma^2 experiment demoSteppingStoneFst's docstring "
+                  "records as never having been done.",
         "found_by": "manual",
         "spec": "1D lattice of d demes, nearest-neighbour migration m, "
                 "vectorised WF per deme; measure pairwise F_ST as a function "
@@ -311,10 +319,14 @@ FAMILIES = [
         "name": "admixture",
         "model": "pulse admixture of two sources; F_ST and LD in the admixed "
                  "population",
-        "simulator": None,
-        "status": "NO SIMULATOR. admixedFst is -44% against an exact "
-                  "frequency-pair reference but has never been simulated over "
-                  "a frequency spectrum.",
+        "simulator": "cluster/fam_admixture.py",
+        "status": "SIMULATED. admixedFst is now run over three frequency "
+                  "spectra rather than one frequency pair, with the ratio "
+                  "decomposed into the exact per-locus numerator identity the "
+                  "corpus proves and the denominator ratio it omits. The "
+                  "admixture-LD definitions run on a two-locus haplotype pool "
+                  "whose recombination and drift factors are pinned by "
+                  "separate controls.",
         "found_by": "manual",
         "spec": "Two source demes diverged to a target F_ST, then a single "
                 "admixture pulse at fraction alpha; measure F_ST of the "
