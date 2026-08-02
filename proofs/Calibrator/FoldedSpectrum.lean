@@ -464,8 +464,13 @@ theorem diploid_fourth_moment (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
     ring
   have hqne : q ≠ 0 := ne_of_gt hq0
   have h1q : (1 : ℝ) - q ≠ 0 := sub_ne_zero.mpr (Ne.symm (ne_of_lt hq1))
-  simp only [Fin.sum_univ_three, h4, diploidAtomMass, invHeterozygosity]
-  norm_num
+  have m0 : diploidAtomMass 0 q = (1 - q) ^ 2 := by simp [diploidAtomMass]
+  have m1 : diploidAtomMass 1 q = 2 * q * (1 - q) := by simp [diploidAtomMass]
+  have m2 : diploidAtomMass 2 q = q ^ 2 := by simp [diploidAtomMass]
+  have c0 : ((0 : Fin 3) : ℝ) = 0 := by norm_num
+  have c1 : ((1 : Fin 3) : ℝ) = 1 := by norm_num
+  have c2 : ((2 : Fin 3) : ℝ) = 2 := by norm_num
+  rw [Fin.sum_univ_three, m0, m1, m2, h4 0, h4 1, h4 2, c0, c1, c2, invHeterozygosity]
   field_simp
   ring
 
