@@ -195,6 +195,105 @@ theorem master_decay_bound_uniform (E : ℕ → ℝ) (θ γ : ℝ) (ε : ℕ →
     exact Finset.sum_congr rfl fun k _ => by ring
   rwa [hrw] at hmain
 
+/-! ## The effective independence dimension `D`
+
+Sequential freshness is **order-dependent**, so `D` is defined as the maximum of the total
+freshness over all orderings of the coordinates. Orderings are permutations of `Fin n`;
+the coordinate index stays a natural number so that these definitions plug directly into
+the telescope above with no re-indexing.
+-/
+
+variable {n : ℕ}
+
+/-- There is always at least one ordering, namely the identity. -/
+theorem orderings_nonempty :
+    (Finset.univ : Finset (Equiv.Perm (Fin n))).Nonempty :=
+  ⟨1, Finset.mem_univ _⟩
+
+/-- The **total freshness along one ordering**: `∑ᵢ εᵢ` for that order. -/
+def dimSum (fresh : Equiv.Perm (Fin n) → ℕ → ℝ) (σ : Equiv.Perm (Fin n)) : ℝ :=
+  ∑ k ∈ range n, fresh σ k
+
+/-- **The effective independence dimension** `D`: the maximum of total freshness over all
+orderings of the coordinates.
+
+For independent coordinates every freshness is `1` and `D = n`. Under dependence `D`
+collapses gracefully — it is the number of coordinates' worth of genuinely new randomness
+the coupling still carries, and it is exactly the quantity the master bound decays in. -/
+noncomputable def effDim (fresh : Equiv.Perm (Fin n) → ℕ → ℝ) : ℝ :=
+  Finset.univ.sup' orderings_nonempty (dimSum fresh)
+
+/-- **The maximum is attained**: some ordering realizes `D`. This is what lets the master
+bound be stated at `D` rather than at an infimum that might not be achieved — the set of
+orderings is finite. -/
+theorem effDim_attained (fresh : Equiv.Perm (Fin n) → ℕ → ℝ) :
+    ∃ σ : Equiv.Perm (Fin n), dimSum fresh σ = effDim fresh := by
+  obtain ⟨σ, _, hσ⟩ :=
+    Finset.exists_mem_eq_sup' (orderings_nonempty (n := n)) (dimSum fresh)
+  exact ⟨σ, hσ.symm⟩
+
+/-- Every ordering's total freshness is at most `D`. -/
+theorem dimSum_le_effDim (fresh : Equiv.Perm (Fin n) → ℕ → ℝ) (σ : Equiv.Perm (Fin n)) :
+    dimSum fresh σ ≤ effDim fresh :=
+  Finset.le_sup' (dimSum fresh) (Finset.mem_univ σ)
+
+/-- **`D ≤ n`**: freshness is a proportion, so the dimension never exceeds the number of
+coordinates. -/
+theorem effDim_le_card (fresh : Equiv.Perm (Fin n) → ℕ → ℝ)
+    (hle : ∀ σ k, fresh σ k ≤ 1) : effDim fresh ≤ n := by
+  refine Finset.sup'_le _ _ fun σ _ => ?_
+  calc dimSum fresh σ = ∑ k ∈ range n, fresh σ k := rfl
+    _ ≤ ∑ _k ∈ range n, (1 : ℝ) := Finset.sum_le_sum fun k _ => hle σ k
+    _ = n := by simp
+
+/-- **`D ≥ 0`**, since freshness is non-negative. -/
+theorem effDim_nonneg (fresh : Equiv.Perm (Fin n) → ℕ → ℝ)
+    (h0 : ∀ σ k, 0 ≤ fresh σ k) : 0 ≤ effDim fresh := by
+  refine le_trans ?_ (dimSum_le_effDim fresh 1)
+  exact Finset.sum_nonneg fun k _ => h0 1 k
+
+/-- **The positive control: independent coordinates give `D = n`.**
+
+If every coordinate is fully fresh under every ordering — which is what independence says —
+then `D` is exactly the number of coordinates, and the master bound below reduces to the
+classical product decay `exp(-θγn)`.
+
+This matters because the definition is otherwise only ever used to prove *upper* bounds on
+decay. A quantity that can only shrink is informative only if it is known to attain its
+maximum in the case where the classical argument applies, and this is that check. -/
+theorem effDim_eq_of_independent (fresh : Equiv.Perm (Fin n) → ℕ → ℝ)
+    (hone : ∀ σ k, fresh σ k = 1) : effDim fresh = n := by
+  have hconst : ∀ σ : Equiv.Perm (Fin n), dimSum fresh σ = (n : ℝ) := by
+    intro σ
+    calc dimSum fresh σ = ∑ k ∈ range n, fresh σ k := rfl
+      _ = ∑ _k ∈ range n, (1 : ℝ) := Finset.sum_congr rfl fun k _ => hone σ k
+      _ = n := by simp
+  refine le_antisymm (Finset.sup'_le _ _ fun σ _ => le_of_eq (hconst σ)) ?_
+  rw [← hconst 1]
+  exact dimSum_le_effDim fresh 1
+
+/-- **The master decay bound, stated at the effective independence dimension.**
+
+`|E ∏ χ| ≤ exp(-θ · γ · D)`, where `D` is the maximum total freshness over orderings and
+`θ` is the discard constant (`1/2` in the current proof).
+
+The hypotheses are taken along an **optimizing ordering** `σ`, which exists by
+`effDim_attained`. This is the form the dependence theory uses: it needs no independence,
+no regeneration and no conditional-independence hypothesis, and it holds for **any coupling
+whatsoever**. What is assumed is the per-step contraction `hstep`; what is proved is that
+it delivers the exponential decay in `D`. -/
+theorem master_decay_bound_effDim (E : ℕ → ℝ) (θ γ : ℝ)
+    (fresh : Equiv.Perm (Fin n) → ℕ → ℝ) (σ : Equiv.Perm (Fin n))
+    (hopt : dimSum fresh σ = effDim fresh)
+    (hθ0 : 0 ≤ θ) (hγ0 : 0 ≤ γ) (hfresh : ∀ k, 0 ≤ fresh σ k)
+    (hle : ∀ k, θ * fresh σ k * γ ≤ 1)
+    (h0 : |E 0| ≤ 1)
+    (hstep : ∀ k, |E (k + 1)| ≤ (1 - θ * fresh σ k * γ) * |E k|) :
+    |E n| ≤ Real.exp (-(θ * γ * effDim fresh)) := by
+  have hmain := master_decay_bound_uniform E θ γ (fresh σ) hθ0 hγ0 hfresh hle h0 hstep n
+  have hsum : ∑ k ∈ range n, fresh σ k = effDim fresh := hopt
+  rwa [hsum] at hmain
+
 /-! ## The named inputs
 
 House style: what this development does not prove appears as a named field, so anything
