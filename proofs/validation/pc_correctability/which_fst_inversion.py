@@ -36,7 +36,15 @@ attempted below the edge returns a spike that is an artifact of the bulk.
 
 from __future__ import annotations
 
-import numpy as np
+import os
+
+# Keep BLAS single-threaded: this runs on a shared login node and the
+# eigendecomposition is not the bottleneck.
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+           "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+    os.environ.setdefault(_v, "1")
+
+import numpy as np  # noqa: E402
 
 try:
     from scipy.linalg.blas import ssyrk
@@ -111,17 +119,19 @@ def one_rep(n, m, M, F, seed):
 
 
 def main() -> int:
-    n, m, M = 1200, 600, 60_000
-    reps = 12
-    print(f"n={n} m={m} M={M} reps={reps}")
-    print()
+    n = int(os.environ.get("WF_N", 800))
+    m = n // 2
+    M = int(os.environ.get("WF_M", 20_000))
+    reps = int(os.environ.get("WF_REPS", 6))
+    print(f"n={n} m={m} M={M} reps={reps}", flush=True)
+    print(flush=True)
     for F in (0.01, 0.02, 0.05):
         rows = [one_rep(n, m, M, F, seed=int(1000 + F * 1e5 + i)) for i in range(reps)]
         edge = np.sqrt(rows[0]["c"])
         usable = [r for r in rows if np.isfinite(r["s"]) and r["s"] > edge]
         dropped = len(rows) - len(usable)
         if not usable:
-            print(f"F={F}: all {len(rows)} replicates at or below the BBP edge; no inversion.")
+            print(f"F={F}: all {len(rows)} replicates at or below the BBP edge; no inversion.", flush=True)
             continue
         kh = np.array([r["s"] / (r["f_hud"] * r["eff"]) for r in usable])
         kn = np.array([r["s"] / (r["f_nei"] * r["eff"]) for r in usable])
@@ -130,12 +140,13 @@ def main() -> int:
         se = lambda v: v.std(ddof=1) / np.sqrt(len(v))
         print(
             f"F_target={F}: c={rows[0]['c']:.4f} edge={edge:.4f} "
-            f"used {len(usable)}/{len(rows)} (dropped {dropped} below edge)"
+            f"used {len(usable)}/{len(rows)} (dropped {dropped} below edge)",
+            flush=True,
         )
         print(f"    F_hudson={fh:.5f}  F_nei={fn:.5f}  ratio={fh/fn:.4f}")
         print(f"    kappa vs HUDSON = {kh.mean():.4f} +/- {se(kh):.4f}")
-        print(f"    kappa vs NEI    = {kn.mean():.4f} +/- {se(kn):.4f}")
-        print()
+        print(f"    kappa vs NEI    = {kn.mean():.4f} +/- {se(kn):.4f}", flush=True)
+        print(flush=True)
     print("The corpus asserts kappa = 4. Whichever column lands on 4 is the")
     print("estimator demographicSpike's constant was calibrated against.")
     return 0
