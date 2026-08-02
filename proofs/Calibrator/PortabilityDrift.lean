@@ -3149,8 +3149,15 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_processAUC {k : ℕ} [Fintype
     rw [← h_split]; exact ne_of_gt G.moments.vOutcome_pos
   have he : G.vEnv ≠ 0 := ne_of_gt G.vEnv_pos
   congr 2
-  field_simp
-  ring
+  -- `field_simp` was called without the two nonzero facts proved directly
+  -- above, so it could not cancel `vEnv` and left `X * Y * Y⁻¹ = X` for
+  -- `ring`, which cannot discharge it: cancelling needs `Y ≠ 0` and `ring`
+  -- never consults hypotheses. Whether the fed version closes the goal
+  -- outright or leaves a polynomial identity is not knowable in advance, so
+  -- `first` takes neither bet.
+  first
+    | (field_simp [hv, he]; ring)
+    | field_simp [hv, he]
 
 /-- **The boundary escape, exhibited.**  At perfect prediction the chart
 returns `Phi 0`, which for the standard normal `Phi` of
@@ -4491,8 +4498,12 @@ theorem ibdRecurrenceFixedPoint_isFixedPoint (Ne rate : ℝ)
   have hd : (0 : ℝ) < (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) := by linarith
   have hd' : (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) ≠ 0 := ne_of_gt hd
   unfold ibdRecurrenceStep ibdRecurrenceFixedPoint
-  field_simp
-  ring
+  -- Same omission as `equalVarianceGaussianAUCFromExplainedR2_eq_processAUC`:
+  -- `h2Ne'` and `hd'` are proved immediately above and were not passed, so
+  -- `field_simp` left an inverse `ring` cannot cancel.
+  first
+    | (field_simp [h2Ne', hd']; ring)
+    | field_simp [h2Ne', hd']
 
 /-- **Total isolation is a boundary the rest point attains.**  With `rate = 0`
 nothing separates the lineages and the recurrence rests at `1`. -/
