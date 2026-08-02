@@ -346,13 +346,13 @@ check(
 # --- 4. Island model --------------------------------------------------------
 check(
     id="islandModelFst-finite-demes",
-    fqn="Calibrator.PopulationGeneticsFoundations.islandModelFst",
+    fqn="Calibrator.fstMigrationDriftEquilibrium",
     claim="MODEL: 1/(1+4Nm) is the infinite-island limit",
     model_lean="infinite number of demes",
     model_ref="d demes: 1/(1+4Nm(d/(d-1))^2)",
     reference="refs.island_fst_finite_demes",
     grid=grid(Ne=[1000.0], m=[1e-4, 1e-3, 1e-2], d=[2, 5, 10, 40]),
-    lean=lambda D, Ne, m, d: D["islandModelFst"](Ne, m),
+    lean=lambda D, Ne, m, d: D["fstMigrationDriftEquilibrium"](Ne, m),
     ref=lambda Ne, m, d: refs.island_fst_finite_demes(Ne, m, d),
     kind="model",
     canfail_clause=(
@@ -376,13 +376,13 @@ check(
 
 check(
     id="islandModelFst-vs-exact-in-m",
-    fqn="Calibrator.PopulationGeneticsFoundations.islandModelFst",
+    fqn="Calibrator.fstMigrationDriftEquilibrium",
     claim="1/(1+4Nm) vs the exact-in-m island fixed point",
     model_lean="small-m expansion",
     model_ref="exact recursion fixed point",
     reference="refs.island_fst_exact_recursion",
     grid=grid(Ne=[100.0, 1000.0], m=[1e-4, 1e-2, 0.1, 0.3]),
-    lean=lambda D, Ne, m: D["islandModelFst"](Ne, m),
+    lean=lambda D, Ne, m: D["fstMigrationDriftEquilibrium"](Ne, m),
     ref=lambda Ne, m: refs.island_fst_exact_recursion(Ne, m),
     tol=1e-2,
     kind="model",
@@ -394,11 +394,16 @@ check(
     id="steppingStoneLength-missing-mutation",
     fqn="Calibrator.PopulationGeneticsFoundations.steppingStoneCharacteristicLength",
     claim="FORMULA: the 1D decay scale is sqrt(m/2mu), not sqrt(2 Ne m)",
-    model_lean="L = sqrt(2 Ne m); no mutation argument",
+    model_lean="L = sqrt(m/(2 mu)) -- REPAIRED to the Kimura-Weiss/Malecot "
+               "form. Was sqrt(2 Ne m): no mutation argument where the truth "
+               "goes as mu^-1/2, and an Ne dependence the truth does not have. "
+               "The Ne axis stays in the grid deliberately -- the reference is "
+               "flat in Ne and so is the corrected value, so if a later edit "
+               "reintroduces an Ne dependence this check fires.",
     model_ref="Malecot/Kimura-Weiss 1D lattice: L = sqrt(m/(2 mu))",
     reference="refs.stepping_stone_decay_scale_malecot",
     grid=grid(Ne=[100.0, 1000.0, 10000.0], m=[1e-3, 1e-2], mu=[1e-8, 1e-6]),
-    lean=lambda D, Ne, m, mu: D["steppingStoneCharacteristicLength"](Ne, m),
+    lean=lambda D, Ne, m, mu: D["steppingStoneCharacteristicLength"](m, mu),
     ref=lambda Ne, m, mu: refs.stepping_stone_decay_scale_malecot(m, mu),
     kind="formula",
     canfail_clause=(
@@ -408,22 +413,18 @@ check(
     ),
 )
 
-check(
-    id="steppingStone-cross-file-contradiction",
-    fqn="Calibrator.PopulationGeneticsFoundations.continuousSteppingStoneFst",
-    claim="two corpus formulas for stepping-stone F_ST at distance d disagree",
-    model_lean="1 - exp(-d/sqrt(2 Ne m))",
-    model_ref="DemographicHistory.demoSteppingStoneFst = d/(d+4 Ne m sigma^2)",
-    reference="Calibrator.DemographicHistory.demoSteppingStoneFst",
-    grid=grid(Ne=[1000.0], m=[1e-3, 1e-2], d=[1.0, 5.0, 20.0]),
-    lean=lambda D, Ne, m, d: D["continuousSteppingStoneFst"](
-        D["steppingStoneCharacteristicLength"](Ne, m), d
-    ),
-    ref=lambda D, Ne, m, d: D['demoSteppingStoneFst'](d, Ne, m, 1.0),
-    kind="internal",
-    canfail_clause="d must be comparable to or larger than L; at d -> 0 both -> 0",
-)
-
+# `steppingStone-cross-file-contradiction` was DELETED, not repointed.
+#
+# It compared 1 - exp(-d/L) against d/(d + 4 Ne m sigma^2) and found an 878%
+# disagreement. The contradiction is now resolved by REMOVING ONE SIDE:
+# `continuousSteppingStoneFst` has been deleted from the corpus, because the
+# coalescent derivation in DemographicHistory yields the hyperbolic form
+# exactly and the exponential is not derivable from it -- no choice of L
+# reconciles them beyond first order.
+#
+# A check whose Lean side no longer exists cannot fail informatively, so
+# keeping it would have meant a permanent KeyError dressed up as coverage. The
+# surviving side is still checked by `demoSteppingStoneFst-exact` below.
 check(
     id="demoSteppingStoneFst-exact",
     fqn="Calibrator.DemographicHistory.demoSteppingStoneFst",
@@ -457,11 +458,15 @@ check(
     id="ldHalfLife-drops-recombination",
     fqn="Calibrator.LDDecayTheory.ldHalfLife",
     claim="FORMULA: 2 Ne ln2 is the r=0 half-life; the true one depends on r",
-    model_lean="half-life = 2 Ne ln 2; no recombination argument",
+    model_lean="ln2 / -ln[(1-r)(1-1/2Ne)] -- REPAIRED. Was 2 Ne ln 2 with no "
+               "recombination argument, which was 2110x wrong at r=0.1, Ne=1e4. "
+               "This check is now definitionally equal to the reference and is "
+               "EXPECTED TO PASS: that is the fix landing, not the check being "
+               "weakened. Grid and tolerance are unchanged from when it failed.",
     model_ref="ln2 / -ln[(1-r)(1-1/2Ne)], from ldRetentionPerGen in the same file",
     reference="refs.ld_half_life_exact",
     grid=_LD,
-    lean=lambda D, r, Ne: D["ldHalfLife"](Ne),
+    lean=lambda D, r, Ne: D["ldHalfLife"](r, Ne),
     ref=lambda r, Ne: refs.ld_half_life_exact(r, Ne),
     kind="formula",
     canfail_clause=(
@@ -474,11 +479,14 @@ check(
     id="ldRetainedFraction-inconsistent-with-retention",
     fqn="Calibrator.LDDecayTheory.ldRetainedFraction",
     claim="INTERNAL: retained fraction is not ldRetentionPerGen^t",
-    model_lean="(1-1/2Ne)^t; no recombination argument",
+    model_lean="ldRetentionPerGen r Ne ^ t -- REPAIRED. Was (1-1/2Ne)^t with "
+               "no recombination argument, inconsistent with ldRetentionPerGen "
+               "in its own file by 37000x at r=0.1, Ne=1000, t=100. Expected to "
+               "pass now; grid and tolerance unchanged.",
     model_ref="ldRetentionPerGen(r,Ne)^t [same file]",
     reference="Calibrator.LDDecayTheory.ldRetentionPerGen ** t",
     grid=grid(r=[0.0, 1e-4, 1e-2, 0.1], Ne=[1000.0], t=[10, 100]),
-    lean=lambda D, r, Ne, t: D["ldRetainedFraction"](Ne, t),
+    lean=lambda D, r, Ne, t: D["ldRetainedFraction"](r, Ne, t),
     ref=lambda D, r, Ne, t: D['ldRetentionPerGen'](r, Ne) ** t,
     kind="internal",
     canfail_clause="r > 0 required; the r=0 row is in the grid and passes, which is the point",
@@ -619,14 +627,16 @@ check(
 )
 
 # --- 9. Cross-name duplicates ----------------------------------------------
+# The three `dup-islandModelFst-*` entries were REMOVED because the duplication
+# they detected has been REPAIRED. islandModelFst, equilibriumFst and
+# fstMigDriftEquil were absorbed into fstMigrationDriftEquilibrium in 4decc9cd;
+# the corpus previously carried Lean-proved bridge theorems asserting they were
+# equal rather than collapsing them. A duplicate-detection check whose two sides
+# are now the same definition compares that definition to itself and reports
+# 0.0 forever, which is a passing check that has stopped meaning anything.
+#
+# Kept below: the one pair that is still genuinely two definitions.
 for _dup_id, _a, _b, _args in [
-    ("dup-islandModelFst-fstMigDriftEquil",
-     "islandModelFst", "fstMigDriftEquil", grid(Ne=[100.0, 1e4], m=[1e-4, 1e-2])),
-    ("dup-islandModelFst-asymmetricFst",
-     "islandModelFst", "asymmetricFst", grid(Ne=[100.0, 1e4], m=[1e-4, 1e-2])),
-    ("dup-islandModelFst-fstMigrationDriftEquilibrium",
-     "islandModelFst", "fstMigrationDriftEquilibrium",
-     grid(Ne=[100.0, 1e4], m=[1e-4, 1e-2])),
     ("dup-effectiveMigration-effectiveSymmetricMigration",
      "effectiveMigration", "effectiveSymmetricMigration",
      grid(Ne=[0.001, 0.02], m=[0.004, 0.05])),
