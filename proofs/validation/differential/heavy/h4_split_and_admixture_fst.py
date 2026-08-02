@@ -32,6 +32,23 @@ JOB B -- ADMIXED F_ST
     F_ST(A,B) every scaling of a near-zero number is a near-zero number and
     the relative error is dominated by noise.
 
+THEORY-PINNED CONTROLS (mandatory)
+    CONTROL 1 -- ZERO SPLIT TIME.  At t = 0 the two daughters are one
+        population and F_ST must be exactly 0, pinned by definition. Non-zero
+        means the sampling or the estimator is wrong.
+    CONTROL 2 -- WITHIN-POPULATION DIVERSITY.  In the equal-size cell,
+        branch-mode within-population diversity must equal 2*Ne generations of
+        expected coalescence time, pinned by the neutral coalescent and
+        INDEPENDENT of the split-F_ST formula being tested. This is the control
+        that separates "my demography is misspecified" from "the oracle is
+        wrong" -- if E[T_within] is not 2*Ne, the msprime model is not the
+        model refs.split_fst_hudson assumes and the comparison is void.
+    CONTROL 3 (job B) -- ALPHA AT THE ENDPOINTS.  At alpha = 0 the admixed
+        population IS source B and F_ST(C,A) must equal F_ST(B,A); at alpha = 1
+        it IS source A and F_ST(C,A) must be 0. Both pinned by definition.
+        These bracket the admixture machinery without assuming any formula for
+        intermediate alpha.
+
 EXPECTED RUNTIME
     ~15 min on 16 cores.  Job A: 12 cells x 10 replicates, 50 Mb each.
     Job B: 12 cells x 10 replicates.  This is the cheapest item in the queue
@@ -67,7 +84,7 @@ def job_a():
     NA = 1000
     cells = [
         dict(t=t, n1=n1, n2=n2, na=NA)
-        for t in (500, 2000, 8000)
+        for t in (0, 500, 2000, 8000)          # t=0 row is CONTROL 1
         for (n1, n2) in ((NA, NA), (NA // 4, 4 * NA), (NA // 4, NA), (4 * NA, NA))
     ]
     out = []
@@ -105,7 +122,7 @@ def job_b():
     """Pulse admixture: C = alpha*A + (1-alpha)*B, measure F_ST(C, A)."""
     NE, TSPLIT, TADMIX = 1000, 4000, 20
     out = []
-    for alpha in (0.1, 0.3, 0.5, 0.8):
+    for alpha in (0.0, 0.1, 0.3, 0.5, 0.8, 1.0):   # 0.0 and 1.0 are CONTROL 3
         vals_ca, vals_ab = [], []
         for r in range(REPS):
             dem = msprime.Demography()

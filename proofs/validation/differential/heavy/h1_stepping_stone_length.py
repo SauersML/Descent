@@ -41,6 +41,22 @@ EXPECTED RUNTIME
     runs; each is a 40-deme stepping stone with 20 Mb of sequence, roughly
     3-6 s.  Memory < 2 GB.  Scale `SEQ_LEN` down first if it is tight.
 
+THEORY-PINNED CONTROLS (mandatory; both fixed by theory, not by simulation)
+    CONTROL 1 -- PANMIXIA.  Set m = 0.5 so the lattice mixes completely each
+        generation and the D demes are one population. Then F_ST(d) = 0 for
+        every d, pinned by definition, not fitted. A nonzero F_ST here means
+        the deme-labelling or the F_ST estimator is wrong and no decay length
+        from this run may be reported.
+    CONTROL 2 -- WITHIN-DEME DIVERSITY.  Measured within-deme pairwise
+        diversity must equal 4*Ne_effective*mu with the metapopulation's
+        effective size, and in the m -> 0.5 panmictic control it must equal
+        4*(D*Ne)*mu. Pinned by the neutral coalescent, independent of anything
+        about decay lengths. It catches a mis-scaled mutation rate, which would
+        shift L systematically and mimic exactly the mu-dependence this run is
+        trying to measure -- the one artefact that could manufacture the
+        result.
+    Report both before any exponent.
+
 REQUIREMENTS
     pip install msprime tskit numpy      (msprime is NOT installed on the
                                           workstation; see the survey)
