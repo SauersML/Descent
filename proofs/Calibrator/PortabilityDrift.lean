@@ -3516,8 +3516,11 @@ theorem sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portabilit
             scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target *
             effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target)) := by
   unfold sourceNormalizedTargetR2AtGeneration
-  -- `rw` closes this by its own trailing `rfl`; a `simp` after it has no goals.
-  rw [exactR2PortabilityRatio_mechanistic_law]
+  first
+    | (rw [exactR2PortabilityRatio_mechanistic_law];
+       simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
+        effectiveOutcomeVariance])
+    | rw [exactR2PortabilityRatio_mechanistic_law]
 
 /-- Bundled exact metric portability law after `t` generations on the explicit
 population-genetic state. This packages the exact `R²`, liability-AUC, and
@@ -3545,10 +3548,20 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
               (predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) } := by
   ext
-  · rw [targetMetricProfileAtGeneration_eq_slice,
-      targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
-  · rw [targetMetricProfileAtGeneration_eq_slice,
-      targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
+  · first
+      | (rw [targetMetricProfileAtGeneration_eq_slice,
+          targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law];
+         simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
+          effectiveOutcomeVariance])
+      | rw [targetMetricProfileAtGeneration_eq_slice,
+          targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
+  · first
+      | (rw [targetMetricProfileAtGeneration_eq_slice,
+          targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law];
+         simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
+          effectiveOutcomeVariance])
+      | rw [targetMetricProfileAtGeneration_eq_slice,
+          targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
     simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
