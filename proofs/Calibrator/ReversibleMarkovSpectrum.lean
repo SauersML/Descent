@@ -55,7 +55,8 @@ theorem markovPoissonKernel_at_one (lam : ℝ) (hlam : lam ≠ 1) :
     markovPoissonKernel lam 1 = (1 + lam) / (1 - lam) := by
   unfold markovPoissonKernel
   have h : (1 : ℝ) - lam ≠ 0 := sub_ne_zero.mpr (Ne.symm hlam)
-  field_simp
+  have hd : 1 + lam ^ 2 - 2 * lam * 1 = (1 - lam) ^ 2 := by ring
+  rw [hd, div_eq_div_iff (pow_ne_zero 2 h) h]
   ring
 
 /-- At frequency `π`, the same eigenmode has reciprocal endpoint gain. -/
@@ -63,7 +64,8 @@ theorem markovPoissonKernel_at_neg_one (lam : ℝ) (hlam : lam ≠ -1) :
     markovPoissonKernel lam (-1) = (1 - lam) / (1 + lam) := by
   unfold markovPoissonKernel
   have h : (1 : ℝ) + lam ≠ 0 := fun hcontra => hlam (by linarith [hcontra])
-  field_simp
+  have hd : 1 + lam ^ 2 - 2 * lam * (-1) = (1 + lam) ^ 2 := by ring
+  rw [hd, div_eq_div_iff (pow_ne_zero 2 h) h]
   ring
 
 /-- The `lam = 0.9` mode has the exact `19` versus `1/19` endpoint contrast. -/
