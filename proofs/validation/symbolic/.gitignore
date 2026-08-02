@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.log
+# regenerable: `python leanparse.py`; large, and superseded for definitions by
+# the shared extract API (retained only for theorem statements)
+decls.json
