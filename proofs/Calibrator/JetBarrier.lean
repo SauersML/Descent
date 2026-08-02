@@ -38,8 +38,11 @@ calibration object survives with its domain corrected.
 what a *disjoint design* can see: the triple, and nothing else. It does not say the triple
 is a minimal invariant of the coordinate law, and it is not one —
 `Calibrator.CondensationUnification`'s tower rigidity shows `(c, v, lattice)` is
-reconstructible from four data, so the triple is complete-but-redundant at the Gaussian
-fiber, with the load carried by the odd part of the squared law. The two statements live at
+reconstructible from four data **at the Gaussian fiber, and only there** — off it the four
+determine nothing, and no polymorphic genotype is on it, so for genotype data the triple
+remains independently informative. What the corollary demotes is the triple's claim to
+minimality for a general coordinate law, with the load there carried by the odd part of the
+squared law. The two statements live at
 different levels and the bridge between them, from tower data to design-observable data, is
 open upstream. Nothing here should be read as "a design can measure the four".
 

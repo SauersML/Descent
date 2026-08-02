@@ -434,12 +434,13 @@ obstruction is exactly the hub-energy divergence already formalized here, which 
 `ObservableTower` carries it as a field rather than as a remark.
 
 **A later correction, recorded here because this section is where a reader meets the
-list.** §5i's rigidity theorem shows the floor-one channels are *redundant* at the Gaussian
-fiber: `hweMellinDrift`, `hweMellinJetVariance` and the arithmetic type are all
-reconstructible from four data — symmetry, `E[x⁴]`, and the odd parts of floors two and
-three. They are not wrong, and they remain the closed-form handles this corpus computes;
-they are simply not minimal. What is minimal includes the odd part of the squared law,
-which no moment list mentions.
+list.** §5i's rigidity theorem shows the floor-one channels are reconstructible from four
+data — symmetry, `E[x⁴]`, and the odd parts of floors two and three — hence not a *minimal*
+list, **at the Gaussian fiber**. Off that fiber the four determine nothing and the
+reconstruction fails, and no polymorphic genotype is on it, so for genotype data
+`hweMellinDrift` and `hweMellinJetVariance` stay independently informative. What is demoted
+is their claim to minimality for a general coordinate law; what is minimal there includes
+the odd part of the squared law, which no moment list mentions.
 
 **The replacement is a recursion.** The conditional-variance array of an admissible
 design is itself a design — multilinear in the centered squares, with coordinate law the
@@ -1286,20 +1287,32 @@ laws. The mechanism is contraction: matched odd parts confine the difference mea
 small interval, the next floor's map sends that interval strictly negative, and a signed
 measure supported on a strictly negative interval with vanishing odd part is zero.
 
-The mechanism needs the confined squares to stay below one, that is `1/σ₁² < 1`, that is
+A *corollary* of the same proof gives rigidity of the tower fibre at any base law with
+`E[x⁴] > 2`, the condition that keeps the confined squares below one — `1/σ₁² < 1`, that
+is `σ₁² > 1`. Below that threshold the images straddle zero and the argument yields
+nothing, so `E[x⁴] = 2` is a phase boundary.
 
-> `σ₁² > 1`, equivalently `E[x⁴] > 2`.
+**Keep the two apart.** `E[x⁴] > 2` is the corollary's phase condition; the theorem's own
+hypotheses are symmetry, `E[x⁴] = 3`, and the two odd parts. They select very different
+frequency sets — `> 2` is everything except `q = 1/2`, while `= 3` is the two points
+`(3 ± √3)/6` — and conflating them produces a false statement about applicability.
 
-Below that threshold the images straddle zero and the argument yields nothing. So
-`E[x⁴] = 2` is a phase boundary, and the question for this corpus is which side genotypes
-are on.
+Where genotypes sit on the boundary: since `q(1-q) ≤ 1/4` with equality only at `q = 1/2`,
+the variance obeys `V = 2q(1-q) ≤ 1/2` and so `E[x⁴] = 1/V ≥ 2` at every polymorphic
+frequency, with equality exactly at the balanced locus
+(`standardizedGenotype_fourth_moment_ge_two`,
+`standardizedGenotype_fourth_moment_eq_two_iff`). Rare variants sit far from the boundary,
+since `1/(2q(1-q))` diverges as `q → 0`.
 
-**They are strictly inside it, except at one frequency, which sits exactly on it.** Since
-`q(1-q) ≤ 1/4` with equality only at `q = 1/2`, the genotype variance obeys
-`V = 2q(1-q) ≤ 1/2`, and therefore `E[x⁴] = 1/V ≥ 2` at every polymorphic frequency with
-equality exactly at the balanced locus (`standardizedGenotype_fourth_moment_ge_two`,
-`standardizedGenotype_fourth_moment_eq_two_iff`). Rare variants sit far inside, since
-`1/(2q(1-q))` diverges as `q → 0`.
+**But the theorem never applies to a genotype at all.** The hypotheses are jointly
+unsatisfiable here, and the proof is two steps from facts above: symmetry pins the
+frequency to `q = 1/2`, and there the fourth moment is `2`, not `3`
+(`hwe_rigidity_hypotheses_unsatisfiable`). At the one frequency where the fourth moment
+does match, `0.21132…`, the coordinate is not symmetric. Indeed the phase inequality and
+the symmetry hypothesis are *complementary* on the spectrum — the first holds exactly
+where the second fails (`phase_strict_iff_not_symmetric`) — so no allele frequency
+satisfies both. That is a stronger and more useful statement than "applies everywhere but
+one point", which is what an earlier draft of this section said.
 
 ### The balanced locus is special twice, from one cause
 
@@ -1318,15 +1331,23 @@ exactly at that fixed point, which is the symmetry; and a reflection-invariant f
 `q` has its extremum there, which is the kurtosis boundary. One symmetry of
 `Binomial(2, q)`, two consequences.
 
-### What is redundant, which is uncomfortable
+### What is redundant, and exactly where
 
 The rigidity theorem's corollary is that every other tower datum — all Mellin jets, all
 arithmetic types, all higher floors, all cumulants of iterated squares — is reconstructible
-from the four, hence **logically redundant at the Gaussian fiber**. That includes
-`hweMellinDrift` and `hweMellinJetVariance`, which this corpus has treated as its central
-observables. They are not wrong and they remain the computable handles; they are redundant.
-The load is carried by the odd part of the *squared* law, which no moment list mentions —
-which is exactly why four successive finite lists failed to close the question.
+from the four, hence logically redundant **at the Gaussian fiber, and only there**. The
+qualifier is not decoration. Off that fiber, symmetry together with the scale and two odd
+parts determines nothing, and the Mellin invariants are not reconstructible from them.
+
+Since no polymorphic genotype is on the Gaussian fiber — `E[x⁴] = 1/(2q(1-q))` equals `3`
+at two frequencies and the coordinate is symmetric at neither — `hweMellinDrift` and
+`hweMellinJetVariance` remain **independently informative for exactly the objects this
+corpus is about**. What the redundancy corollary demotes is their claim to be a minimal
+complete list for a general coordinate law, not their content for genotypes.
+
+The load in the rigidity argument is carried by the odd part of the *squared* law, which no
+moment list mentions — which is why four successive finite lists failed to close the
+question.
 
 The corpus already owns the decisive fact and it was filed as a side note:
 `standardizedSquare_never_symmetric` proves the odd part of the floor-two law is nonzero at
@@ -1395,11 +1416,18 @@ theorem standardizedGenotype_fourth_moment_eq_two_iff (h : HardyWeinbergModel)
     rw [hveq, hhalf]
     norm_num
 
-/-- **Every polymorphic locus except the balanced one is strictly inside the rigid
-regime.** This is the discharge of the rigidity theorem's phase hypothesis for genotype
-data: it holds everywhere on the frequency spectrum except at a single point, and it holds
-by an ever-wider margin as the variant gets rarer. -/
-theorem hwe_strictly_inside_rigid_regime (h : HardyWeinbergModel)
+/-- **The phase inequality `E[x⁴] > 2` holds off the balanced locus**, and only that.
+
+This discharges the *phase* hypothesis of the kurtosis-boundary corollary, which is one
+hypothesis among several. It says nothing about whether the rigidity theorem applies to a
+genotype, and it must not be read that way: the theorem's own hypotheses are symmetry,
+`E[x⁴] = 3`, and two matched odd parts, and for genotypes those are never jointly
+satisfiable (`hwe_rigidity_hypotheses_unsatisfiable`).
+
+Note also that the phase inequality holds exactly where the symmetry hypothesis fails —
+they are complementary on the frequency spectrum, not cooperative
+(`phase_strict_iff_not_symmetric`). -/
+theorem hwe_phase_inequality_off_balanced (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hunbalanced : h.altFreq ≠ 1 / 2) :
     2 < ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
   have hge := standardizedGenotype_fourth_moment_ge_two h hq0 hq1
@@ -1407,6 +1435,61 @@ theorem hwe_strictly_inside_rigid_regime (h : HardyWeinbergModel)
     intro heq
     exact hunbalanced ((standardizedGenotype_fourth_moment_eq_two_iff h hq0 hq1).mp heq)
   exact lt_of_le_of_ne hge (Ne.symm hne)
+
+/-- **The phase inequality holds exactly where symmetry fails.** For a polymorphic
+genotype the strict inequality `E[x⁴] > 2` and the existence of a value-negating
+relabelling are complementary: the first holds off `q = 1/2`, the second only at it.
+
+So the two hypotheses select disjoint frequency sets, which is the structural reason the
+rigidity theorem cannot be applied to genotype data. -/
+theorem phase_strict_iff_not_symmetric (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    2 < (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) ↔
+      ¬ (∃ coding : SymmetricCoding DiploidGenotype,
+          (∀ g, coding.weight g = h.genotypeProb g) ∧
+          (∀ g, coding.value g = h.standardizedGenotype g)) := by
+  constructor
+  · intro hstrict hsym
+    have hhalf := (standardizedGenotype_symmetric_iff h hq0 hq1).mp hsym
+    have htwo := (standardizedGenotype_fourth_moment_eq_two_iff h hq0 hq1).mpr hhalf
+    rw [htwo] at hstrict
+    exact absurd hstrict (by norm_num)
+  · intro hnosym
+    refine hwe_phase_inequality_off_balanced h hq0 hq1 ?_
+    intro hhalf
+    exact hnosym ((standardizedGenotype_symmetric_iff h hq0 hq1).mpr hhalf)
+
+/-- **The rigidity theorem's hypotheses are never jointly satisfiable on genotype data.**
+
+Symmetry pins the frequency to `q = 1/2` (`standardizedGenotype_symmetric_iff`), and there
+the fourth moment is `2` (`standardizedGenotype_fourth_moment_eq_two_iff`), not the
+Gaussian's `3`. The frequency where the fourth moment alone would match is
+`gaussianKurtosisMaf = 0.21132…`, and the coordinate is not symmetric there.
+
+So the headline rigidity result never gets a satisfied hypothesis on a standardized
+Hardy-Weinberg coordinate — at any allele frequency. This is stronger than saying the
+theorem applies away from a single point, and it is the honest statement of what the tower
+result does and does not say about genotypes. -/
+theorem hwe_rigidity_hypotheses_unsatisfiable (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
+    (hsym : ∃ coding : SymmetricCoding DiploidGenotype,
+      (∀ g, coding.weight g = h.genotypeProb g) ∧
+      (∀ g, coding.value g = h.standardizedGenotype g)) :
+    (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) ≠ 3 := by
+  have hhalf := (standardizedGenotype_symmetric_iff h hq0 hq1).mp hsym
+  have htwo := (standardizedGenotype_fourth_moment_eq_two_iff h hq0 hq1).mpr hhalf
+  rw [htwo]
+  norm_num
+
+/-- The blind frequency is not the balanced one: `(3 - √3)/6 ≠ 1/2`, since `√3 > 0`.
+
+So the one frequency where the fourth moment matches the Gaussian's is a frequency where
+the symmetry hypothesis fails, which is the other half of the unsatisfiability. -/
+theorem gaussianKurtosisMaf_ne_half : gaussianKurtosisMaf ≠ 1 / 2 := by
+  unfold gaussianKurtosisMaf
+  intro hcontra
+  have hpos := sqrt_three_pos
+  linarith [hcontra]
 
 /-- The fourth moment is reflection-invariant, being even data: this is
 `reflect_even_moment` at `k = 2`. -/
@@ -1439,8 +1522,10 @@ theorem balanced_locus_is_reflection_fixed_point (h : HardyWeinbergModel) :
 
 `IsGaussianCoordinate` and the two odd-part data are abstract because the tower's floors
 are not objects of this corpus; what is concrete is the phase hypothesis
-`2 < fourthMoment`, which `hwe_strictly_inside_rigid_regime` discharges for every
-polymorphic genotype except the balanced one.
+`2 < fourthMoment`, which `hwe_phase_inequality_off_balanced` discharges for every
+polymorphic genotype except the balanced one — though discharging that one hypothesis is
+not applying the theorem, and for genotypes the hypotheses are never jointly satisfiable
+(`hwe_rigidity_hypotheses_unsatisfiable`).
 
 **Scope.** This is a statement about complete invariants of a coordinate law. It is not a
 statement about what any design can observe; that bridge is open upstream. -/
