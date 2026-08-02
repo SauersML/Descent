@@ -84,7 +84,7 @@ theorem diagonalPermeability_eq_zero_iff {ι : Type*} [Fintype ι]
     exact (scalarPermeability_eq_zero_iff (hcovariance i)).mp hzero
   · intro hderiv
     unfold diagonalPermeability
-    simp [hderiv]
+    simp [hderiv, scalarPermeability]
 
 /-- A completion with `q` scalar derivative coordinates cannot distinguish `d` independent
 tangent coordinates through an injective coordinate assignment unless `d ≤ q`. The exact
@@ -102,7 +102,10 @@ noncomputable def quadraticChannel (θ : ℝ) : ℝ := θ ^ 2
 /-- The quadratic channel is first-order blind at zero. -/
 theorem quadraticChannel_deriv_zero : deriv quadraticChannel 0 = 0 := by
   unfold quadraticChannel
-  rw [deriv_pow (n := 2) differentiableAt_id, deriv_id]
+  have hderiv : deriv (fun x : ℝ => x ^ 2) 0 =
+      2 * (0 : ℝ) ^ (2 - 1) * deriv (fun x : ℝ => x) 0 := by
+    exact deriv_pow (n := 2) differentiableAt_id
+  rw [hderiv, deriv_id]
   norm_num
 
 /-- But that local flatness is not absolute non-identifiability. -/
