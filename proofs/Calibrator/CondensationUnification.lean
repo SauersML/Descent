@@ -1928,6 +1928,229 @@ theorem rarest_locus_owns_largest_atom (h h' : HardyWeinbergModel)
         centeredSquare_homAlt_strictAnti h h' hq0 hq1 hq0' hq1' hrarer
 
 /-!
+## 5m. Fiber surgery, the matched-order table, and the completeness/observability split
+
+### The surgery, explicitly
+
+The chameleon is built by moving mass inside the fibers of the square law about its
+mean. For each `s ∈ (0,1)` the two preimages of `|u| = s` are the `x²` values `1 + s`
+and `1 - s`, and a transfer moves mass from one to the other. Transferring unit mass
+from `1-s` to `1+s` moves a moment by that moment's **profile**, and the profiles are
+what the constraints are integrated against:
+
+| profile | value | fixes |
+|---|---|---|
+| `varianceProfile s` | `(1+s) - (1-s) = 2s` | `E[x²]` |
+| `fourthMomentProfile s` | `(1+s)² - (1-s)² = 4s` | `E[x⁴]` |
+| `driftProfile s` | `log(1+s)(1+s) - log(1-s)(1-s)` | the floor-one drift |
+| `jetProfile s` | `log²(1+s)(1+s) - log²(1-s)(1-s)` | the floor-one jet variance |
+
+**The `4s` coincidence.** `fourthMomentProfile = 2 · varianceProfile` identically
+(`fourthMomentProfile_eq_two_mul_varianceProfile`, one `ring` step), so a transfer
+annihilating the variance profile annihilates the fourth-moment profile automatically.
+Three imposed constraints buy four matched moments.
+
+**Ledger question, ruled: it is genuinely one coincidence, used once.** The identity is
+asked to do two things — free fourth-moment matching, and the death of `J₂⁰` — and
+those are the *same equation in two vocabularies*. Writing `λ = log x²`, the table's
+entries are `J_θ^j = ∫ λ^j e^{θλ} dω`, so `e^{θλ} = x^{2θ}` and
+
+> `J₁⁰ = Δ E[x²]`,  `J₁¹ = Δ E[x² log x²]`,  `J₁² = Δ E[x² log²x²]`,  `J₂⁰ = Δ E[x⁴]`.
+
+`J₂⁰ = 0` *is* fourth-moment matching, not a second consequence of it. The second use
+needs nothing beyond the first, and `jProfile_two_zero_eq_two_mul_jProfile_one_zero`
+records it as the identity `J₂⁰-profile = 2 · J₁⁰-profile` rather than as a remark.
+
+So the four checkable zeros are three constraints plus one free rider:
+
+| zero | is | status |
+|---|---|---|
+| `J₁⁰ = 0` | variance matched | imposed |
+| `J₁¹ = 0` | drift matched | imposed |
+| `J₁² = 0` | jet variance matched | imposed |
+| `J₂⁰ = 0` | fourth moment matched | **free**, by the `4s` identity |
+
+### Scope, in the signature and not only in prose
+
+`LadderObservability` below carries `CramerModulus` as a field and the blindness input
+takes it as a hypothesis at both laws. That is deliberate: the general
+ladder-measurability claim re-scopes to the smooth-modulus stratum, the non-Cramér
+frontier is open, and a Lean statement asserting the general form when only the scoped
+form is proved would be the exact class of defect this corpus exists to eliminate. See
+§5l for why genotypes sit outside the scope.
+
+### The portable statement
+
+The two halves belong in one theorem because that is the form in which the idea
+travels. Tower Rigidity says the tower data — modulus data *and* odd parts — separates
+laws. Blindness says no admissible experiment reads the odd parts. Put together:
+
+> **there is an invariant that determines the object and is invisible to every
+> admissible measurement of it**, and the gap between the two is exactly the
+> fiber-splitting freedom.
+
+Complete for objects, strictly incomplete for experiments. That shape is not special to
+chaos theory — it is available to identifiability theory, to statistical decision
+theory, and to any field with a complete invariant and a restricted measurement class.
+-/
+
+/-- The variance profile of a fiber transfer at `s`: `(1+s) - (1-s)`.
+
+Empirical status: DERIVED. The first-moment displacement of moving unit mass between
+the two preimages of `|u| = s`; no free parameter. -/
+def varianceProfile (s : ℝ) : ℝ := (1 + s) - (1 - s)
+
+/-- The fourth-moment profile of a fiber transfer at `s`: `(1+s)² - (1-s)²`.
+
+Empirical status: DERIVED. As for `varianceProfile`, one order up; no free parameter. -/
+def fourthMomentProfile (s : ℝ) : ℝ := (1 + s) ^ 2 - (1 - s) ^ 2
+
+theorem varianceProfile_eq (s : ℝ) : varianceProfile s = 2 * s := by
+  unfold varianceProfile
+  ring
+
+theorem fourthMomentProfile_eq (s : ℝ) : fourthMomentProfile s = 4 * s := by
+  unfold fourthMomentProfile
+  ring
+
+/-- **The `4s` coincidence.** The fourth-moment profile is exactly twice the variance
+profile, so one constraint kills both and fourth-moment matching is free. Without it the
+hub channel would separate the pair and the dichotomy would close the other way. -/
+theorem fourthMomentProfile_eq_two_mul_varianceProfile (s : ℝ) :
+    fourthMomentProfile s = 2 * varianceProfile s := by
+  unfold fourthMomentProfile varianceProfile
+  ring
+
+/-- The table entry `J_θ^j` as a profile in `s`: `log^j(1+s)(1+s)^θ - log^j(1-s)(1-s)^θ`,
+the displacement of `∫ λ^j e^{θλ}` under a unit transfer at `s`, where `λ = log x²`.
+
+Empirical status: DERIVED. The integrand of the matched-order table, with no free
+parameter. -/
+noncomputable def jProfile (tilt order : ℕ) (s : ℝ) : ℝ :=
+  Real.log (1 + s) ^ order * (1 + s) ^ tilt -
+    Real.log (1 - s) ^ order * (1 - s) ^ tilt
+
+/-- `J₁⁰` is the variance profile: tilt one, order zero. -/
+theorem jProfile_one_zero (s : ℝ) : jProfile 1 0 s = varianceProfile s := by
+  unfold jProfile varianceProfile
+  simp
+
+/-- `J₂⁰` is the fourth-moment profile: tilt two, order zero. -/
+theorem jProfile_two_zero (s : ℝ) : jProfile 2 0 s = fourthMomentProfile s := by
+  unfold jProfile fourthMomentProfile
+  simp
+
+/-- **`J₂⁰` is twice `J₁⁰`, identically.** This is the `4s` coincidence in the table's
+own vocabulary, and it is why the fourth zero costs nothing: the second use of the
+identity needs nothing beyond the first. -/
+theorem jProfile_two_zero_eq_two_mul_jProfile_one_zero (s : ℝ) :
+    jProfile 2 0 s = 2 * jProfile 1 0 s := by
+  rw [jProfile_two_zero, jProfile_one_zero, fourthMomentProfile_eq_two_mul_varianceProfile]
+
+/-- A finite fiber splitting: signed masses at finitely many transfer locations. The
+generic three-bump solution of the three constraints is the case `k = 3`. -/
+structure FiberSplitting (k : ℕ) where
+  /-- Where each transfer happens, inside `(0, 1)`. -/
+  location : Fin k → ℝ
+  /-- How much mass each transfer moves, signed. -/
+  mass : Fin k → ℝ
+  /-- Locations are interior, so both preimages are genuine points of the square law. -/
+  location_pos : ∀ j, 0 < location j
+  location_lt_one : ∀ j, location j < 1
+
+/-- The displacement a splitting produces in the moment whose profile is `profile`. -/
+noncomputable def FiberSplitting.displacement {k : ℕ} (F : FiberSplitting k)
+    (profile : ℝ → ℝ) : ℝ :=
+  ∑ j, F.mass j * profile (F.location j)
+
+/-- **Fourth-moment matching is free.** A splitting that matches the variance matches
+the fourth moment, with no further constraint imposed — the `4s` identity, integrated.
+
+This is `J₂⁰ = 0` as a consequence of `J₁⁰ = 0`, and it is the whole content of the
+coincidence doing "double duty": one equation, two names. -/
+theorem FiberSplitting.fourthMoment_free {k : ℕ} (F : FiberSplitting k)
+    (hvariance : F.displacement varianceProfile = 0) :
+    F.displacement fourthMomentProfile = 0 := by
+  have hterm : ∀ j : Fin k,
+      F.mass j * fourthMomentProfile (F.location j) =
+        2 * (F.mass j * varianceProfile (F.location j)) := by
+    intro j
+    rw [fourthMomentProfile_eq_two_mul_varianceProfile]
+    ring
+  unfold FiberSplitting.displacement at hvariance ⊢
+  simp_rw [hterm]
+  rw [← Finset.mul_sum, hvariance, mul_zero]
+
+/-- Ladder observability: what separates laws, what experiments can read, and the
+scope on which the second is proved.
+
+`towerData` is the complete invariant — modulus data at every floor **and** the odd
+parts. `ladderData` is the modulus part alone. `CramerModulus` is the smoothness
+hypothesis the blindness argument needs, carried as a field because the general claim
+does not hold without it. -/
+structure LadderObservability (Law Experiment Report TowerDatum LadderDatum : Type*) where
+  /-- The complete tower invariant, odd parts included. -/
+  towerData : Law → TowerDatum
+  /-- The modulus data alone, at every floor. -/
+  ladderData : Law → LadderDatum
+  /-- The law's log-square modulus satisfies Cramér's condition. -/
+  CramerModulus : Law → Prop
+  /-- What an admissible experiment reports about a law. -/
+  reading : Experiment → Law → Report
+  /-- **Tower Rigidity (analytic input).** The tower data separates laws. -/
+  rigidity : ∀ ν ν' : Law, towerData ν = towerData ν' → ν = ν'
+  /-- **Blindness (analytic input), scoped.** On the Cramér stratum, experiments read
+  the ladder and nothing more: laws agreeing in the modulus data agree in every
+  admissible reading. The hypothesis is on both laws because the Edgeworth expansion is
+  applied at each. -/
+  blindness : ∀ ν ν' : Law, CramerModulus ν → CramerModulus ν' →
+    ladderData ν = ladderData ν' → ∀ e : Experiment, reading e ν = reading e ν'
+
+namespace LadderObservability
+
+variable {Law Experiment Report TowerDatum LadderDatum : Type*}
+  (S : LadderObservability Law Experiment Report TowerDatum LadderDatum)
+
+/-- **An invariant that determines the object and is invisible to every admissible
+measurement of it.**
+
+Given two distinct laws on the Cramér stratum that agree in their modulus data, the
+conclusion has two halves and they point opposite ways: their tower data **differs**, so
+the tower invariant does determine the law; and every admissible experiment **agrees** on
+them, so no measurement recovers what the invariant knows.
+
+Complete for objects, strictly incomplete for experiments. The gap between the two is
+exactly the freedom of the fiber splitting — the odd parts, which the surgery moves and
+the modulus data does not see.
+
+Stated without any of this development's machinery: there is a quantity that pins down
+which law you have, and no experiment in the class can measure it. -/
+theorem complete_for_laws_but_invisible_to_experiments (ν ν' : Law)
+    (hcramer : S.CramerModulus ν) (hcramer' : S.CramerModulus ν')
+    (hladder : S.ladderData ν = S.ladderData ν') (hdistinct : ν ≠ ν') :
+    S.towerData ν ≠ S.towerData ν' ∧
+      ∀ e : Experiment, S.reading e ν = S.reading e ν' :=
+  ⟨fun hsame => hdistinct (S.rigidity ν ν' hsame),
+    S.blindness ν ν' hcramer hcramer' hladder⟩
+
+/-- **Covariance universality does not characterize the Gaussian**, in the form the
+witness supplies: a law distinct from the Gaussian, on the Cramér stratum, agreeing with
+it in all modulus data, is indistinguishable from it by every admissible experiment.
+
+The universality class is therefore not `{Gaussian}` but the ladder fiber, and the
+witness is the fiber-surgery construction above rather than an existence claim. -/
+theorem chameleon_indistinguishable_from_gaussian (gaussian chameleon : Law)
+    (hcramer : S.CramerModulus gaussian) (hcramer' : S.CramerModulus chameleon)
+    (hladder : S.ladderData chameleon = S.ladderData gaussian)
+    (hdistinct : chameleon ≠ gaussian) :
+    S.towerData chameleon ≠ S.towerData gaussian ∧
+      ∀ e : Experiment, S.reading e chameleon = S.reading e gaussian :=
+  S.complete_for_laws_but_invisible_to_experiments chameleon gaussian hcramer' hcramer
+    hladder hdistinct
+
+end LadderObservability
+
+/-!
 ## 6. Where the whole development now stands
 
 Four negative results, each with its positive complement, and each attached to a
