@@ -214,6 +214,24 @@ SPECS = [
          oracle=lambda t, Ne: t / (t + 2 * Ne),
          note="documented as split F_ST; compared against the coalescent value",
          tags=["fst"]),
+    # r^2 from D: correct only if D is the dosage covariance.  The repo's own
+    # admixtureLD / ldAfterGenerations produce HAPLOTYPE D, and composing them
+    # with this definition yields r^2/4.  Oracle = the true r^2 for that D.
+    Spec("ldCorrelationSq(hapD)", "CovarianceStructure.lean:91",
+         lambda D, p_i, p_j: D**2 / ((2 * p_i * (1 - p_i)) * (2 * p_j * (1 - p_j))),
+         {"D": (0.001, 0.2, "log"), "p_i": (0.1, 0.9, "lin"),
+          "p_j": (0.1, 0.9, "lin")}, 0.0, 1.0,
+         oracle=lambda D, p_i, p_j: D**2 / (p_i * (1 - p_i) * p_j * (1 - p_j)),
+         note="returns r^2/4 when fed haplotype D", tags=["ld"]),
+    # LDSC confounding term: reference is N*a, the definition has N*a/M
+    Spec("ldsrExpectedChi2", "CovarianceStructure.lean:308",
+         lambda N, h2, M, ell_j, a: N * h2 / M * ell_j + N * a / M + 1,
+         {"N": (1e3, 1e6, "log"), "h2": (0.05, 0.8, "lin"),
+          "M": (1e3, 1e6, "log"), "ell_j": (1.0, 200.0, "log"),
+          "a": (1e-6, 1e-3, "log")}, 1.0, None,
+         oracle=lambda N, h2, M, ell_j, a: N * h2 / M * ell_j + N * a + 1,
+         note="confounding term divided by M; understates inflation ~M-fold",
+         tags=["ldsc"]),
     Spec("bottleneckLDAmplification", "LDDecayTheory.lean:192",
          lambda N_b, t: 1 - (1 - 1 / (2 * N_b)) ** t,
          {"N_b": (10.0, 1e4, "log"), "t": (1.0, 1e4, "log")}, 0.0, 1.0,
