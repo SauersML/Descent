@@ -66,6 +66,18 @@ SPEED
     replicates in Python except the ancestry calls themselves.
 """
 
+import os
+
+# PIN THE THREAD POOLS BEFORE numpy IS IMPORTED. numpy/BLAS otherwise take
+# every core on a SHARED node, and with several agents on one machine that
+# contention gets misdiagnosed as someone else's deadlock. These workloads are
+# memory-bound, so single-threading costs essentially nothing here. Set in the
+# script rather than only on the command line, because an invocation that
+# forgets the environment would silently go back to taking the whole node.
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+           "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+    os.environ.setdefault(_v, "1")
+
 import json
 import math
 import os

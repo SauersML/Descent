@@ -85,6 +85,18 @@ SPEED
     fixed cost; it is not a reduction of replicates, tolerances or grid.
 """
 
+import os
+
+# PIN THE THREAD POOLS BEFORE numpy IS IMPORTED. numpy/BLAS otherwise take
+# every core on a SHARED node, and with several agents on one machine that
+# contention gets misdiagnosed as someone else's deadlock. These workloads are
+# memory-bound, so single-threading costs essentially nothing here. Set in the
+# script rather than only on the command line, because an invocation that
+# forgets the environment would silently go back to taking the whole node.
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+           "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+    os.environ.setdefault(_v, "1")
+
 import json
 import os
 import sys
@@ -184,6 +196,94 @@ def wf_mutation_selection(q, mu, s, h, N, recessive, mu_back=0.0):
     if N is None:
         return q
     return RNG.binomial(2 * N, np.clip(q, 0.0, 1.0)) / (2.0 * N)
+
+
+# ===========================================================================
+# CONTROL 0 -- IS THE VECTORIZED DRAW THE SAME DRAW?
+#
+# Vectorizing over replicates is only sound if the batched form is
+# DISTRIBUTIONALLY IDENTICAL to R separate simulations. It is fast either way;
+# it is correct only if the draws are independent across replicates and have
+# the same per-replicate law. The trap is shared random state -- a batched step
+# that reuses one variate across replicates runs just as fast, agrees on the
+# mean, and has error bars that mean nothing because the replicates are
+# correlated.
+#
+# Selection makes this sharper than plain drift: the fitness reweighting is
+# per-replicate, so the batched form has more places to differ. This control
+# does not assume; it measures.
+#
+#   A. SAME LAW. Run the vectorized kernel for R replicates and a SCALAR loop
+#      of R independent single-replicate simulations with the same parameters,
+#      and compare the two samples with a two-sample Kolmogorov-Smirnov
+#      statistic. Same mean is not enough -- a correlated batch matches the
+#      mean exactly. The whole distribution is compared.
+#   B. INDEPENDENT ACROSS REPLICATES. The mean absolute pairwise correlation
+#      between replicate trajectories must be at the level expected from
+#      finite trajectory length, not at the level of a shared variate.
+#      A batch sharing one binomial draw would score near 1 here and near 0 on
+#      the mean, which is exactly why A alone is not sufficient.
+# ===========================================================================
+
+def control_vectorization_identity():
+    R, GENS = 600, 400
+    s, m, N = 0.10, 0.05, 200
+
+    # vectorized: one binomial call per generation over an array of R
+    p_vec = np.full(R, 0.45)
+    traj = np.empty((GENS, R))
+    for g in range(GENS):
+        p_vec = wf_continent_island(p_vec, s, m, N, "selection_first")
+        traj[g] = p_vec
+
+    # scalar: R independent single-replicate simulations, one at a time
+    p_sca = np.empty(R)
+    for i in range(R):
+        p = np.array([0.45])
+        for _ in range(GENS):
+            p = wf_continent_island(p, s, m, N, "selection_first")
+        p_sca[i] = p[0]
+
+    # A. two-sample KS statistic
+    a = np.sort(p_vec)
+    b = np.sort(p_sca)
+    allv = np.concatenate([a, b])
+    cdf_a = np.searchsorted(a, allv, side="right") / R
+    cdf_b = np.searchsorted(b, allv, side="right") / R
+    ks = float(np.max(np.abs(cdf_a - cdf_b)))
+    # 99.9% critical value for two samples of size R
+    ks_crit = 1.949 * np.sqrt(2.0 / R)
+
+    # B. independence across replicates, measured on the trajectories
+    dev = traj[GENS // 2:] - traj[GENS // 2:].mean(axis=0, keepdims=True)
+    sd = dev.std(axis=0)
+    ok_cols = sd > 0
+    C = np.corrcoef(dev[:, ok_cols].T)
+    off = C[~np.eye(C.shape[0], dtype=bool)]
+    mean_abs_corr = float(np.mean(np.abs(off)))
+    # trajectories of length GENS/2 with autocorrelation give |r| ~ a few
+    # times 1/sqrt(effective length); a SHARED variate would give ~1.
+    corr_bound = 0.25
+
+    ok = bool(ks < ks_crit and mean_abs_corr < corr_bound)
+    print("  C0a KS(vectorized, scalar-loop) = %.4f   99.9%% critical %.4f  %s"
+          % (ks, ks_crit, "PASS" if ks < ks_crit else "FAIL"))
+    print("  C0a means %.6f vs %.6f, sds %.6f vs %.6f  (means alone cannot "
+          "detect a shared variate; the KS statistic can)"
+          % (p_vec.mean(), p_sca.mean(), p_vec.std(), p_sca.std()))
+    print("  C0b mean |pairwise corr| across replicate trajectories = %.4f  "
+          "(a shared draw would give ~1) %s"
+          % (mean_abs_corr, "PASS" if mean_abs_corr < corr_bound else "FAIL"))
+    print("  CONTROL 0 (vectorized draw is the same draw): %s"
+          % ("PASS" if ok else "FAIL"))
+    return ok, {"replicates": R, "generations": GENS,
+                "ks_statistic": ks, "ks_critical_999": float(ks_crit),
+                "mean_vectorized": float(p_vec.mean()),
+                "mean_scalar_loop": float(p_sca.mean()),
+                "sd_vectorized": float(p_vec.std()),
+                "sd_scalar_loop": float(p_sca.std()),
+                "mean_abs_pairwise_corr": mean_abs_corr,
+                "corr_bound": corr_bound}
 
 
 # ===========================================================================
@@ -591,6 +691,9 @@ def main():
            "not_covered": {"selectedDriftFactor":
                            "free parameter s_correction; already UNREACHABLE "
                            "in coverage.py and not disturbed here"}}
+    print("CONTROL 0 -- IS THE VECTORIZED DRAW THE SAME DRAW?")
+    c0, res["control_vectorization_identity"] = control_vectorization_identity()
+    print("")
     print("CONTROL 1 -- ALGEBRA (no drift, no simulator)")
     c1, res["control_algebra"] = control_algebra()
     print("")
@@ -613,11 +716,12 @@ def main():
     print("CONTROL 5 -- POSITIVE CONTROL ON THE NULL")
     c5, res["control_positive"] = control_positive(res["mutation_selection"])
 
-    res["controls"] = {"algebra_closed_form_solves_recurrence": bool(c1),
+    res["controls"] = {"vectorized_draw_is_the_same_draw": bool(c0),
+                       "algebra_closed_form_solves_recurrence": bool(c1),
                        "simulator_equals_recurrence_without_drift": bool(c2),
                        "halves_isolated": bool(c34),
                        "positive_control_can_fail": bool(c5)}
-    res["READ_THE_TEST"] = bool(c1 and c2 and c34 and c5)
+    res["READ_THE_TEST"] = bool(c0 and c1 and c2 and c34 and c5)
     fh = open(os.path.join(HERE, "fam_selection_results.json"), "w")
     json.dump(res, fh, indent=1)
     fh.close()
