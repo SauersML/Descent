@@ -87,7 +87,8 @@ CLASSES_JSON = HERE / "classes.json"
 __all__ = ["definition_table", "definition", "structures", "resolve",
            "callable_for", "classification", "body_checksum", "stamp",
            "admissible_box", "hypotheses", "satisfies", "vector_args",
-           "numeric_standins", "refresh", "staleness", "ARG_CONVENTION"]
+           "numeric_standins", "refresh", "staleness", "collisions",
+           "all_rows", "ARG_CONVENTION"]
 
 # Bumped whenever the calling convention changes.  Consumers should assert on
 # this rather than discovering a convention change from a TypeError.
@@ -106,8 +107,33 @@ def _blob():
 
 @functools.lru_cache(maxsize=1)
 def definition_table():
-    """All `def`/`abbrev` declarations, keyed by fully-qualified name."""
-    return {d["name"]: d for d in _blob()["definitions"]}
+    """All `def`/`abbrev` declarations, keyed by fully-qualified name.
+
+    A fully-qualified name declared twice is a Lean BUILD FAILURE, and keying a
+    dict by name would silently drop one of the two -- a consumer would then
+    compute against a corpus with a declaration missing and a namesake standing
+    in its place, which is worse than not representing the collision at all.
+    Colliding names are therefore EXCLUDED from this table and listed by
+    `collisions()`; `definition()` on one of them raises.  Use `all_rows()` for
+    the complete list including collided declarations.
+    """
+    bad = set(collisions())
+    return {d["name"]: d for d in _blob()["definitions"]
+            if d["name"] not in bad}
+
+
+def all_rows():
+    """Every parsed declaration, including both sides of a name collision."""
+    return list(_blob()["definitions"])
+
+
+@functools.lru_cache(maxsize=1)
+def collisions():
+    """{fully-qualified name: [{file, line, signature}, ...]} for duplicates.
+
+    Non-empty means the corpus does not compile.  Report it; do not model it.
+    """
+    return _blob().get("collisions", {})
 
 
 @functools.lru_cache(maxsize=1)
@@ -122,9 +148,19 @@ def parse_failures():
 
 
 def definition(name: str):
-    """One definition, by fully-qualified or unambiguous bare name."""
+    """One definition, by fully-qualified or unambiguous bare name.
+
+    Raises if `name` is declared more than once: there is no correct answer,
+    and returning either row would be a silent substitution.
+    """
     t = definition_table()
-    return t[name] if name in t else t[resolve(name)]
+    if name in t:
+        return t[name]
+    if name in collisions():
+        raise KeyError(
+            f"{name!r} is DECLARED TWICE and the corpus cannot compile: "
+            f"{collisions()[name]}. This table refuses to pick one.")
+    return t[resolve(name)]
 
 
 @functools.lru_cache(maxsize=1)
@@ -313,6 +349,7 @@ def stamp() -> dict:
     for n in names:
         h.update(body_checksum(n).encode())
     return {"arg_convention": ARG_CONVENTION,
+            "n_collisions": len(collisions()),
             "n_definitions": len(names),
             "n_structures": len(structures()),
             "n_parse_failures": len(parse_failures()),
@@ -328,7 +365,8 @@ def refresh():
     is editing this directory is safe.  (If you have seen artifacts change
     across a refresh, the cause was someone running emit.py, not this.)
     """
-    for f in (_blob, definition_table, structures, _by_short, _classes):
+    for f in (_blob, definition_table, structures, _by_short, _classes,
+              collisions):
         f.cache_clear()
 
 

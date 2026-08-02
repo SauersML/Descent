@@ -174,6 +174,118 @@ def totality():
 
 
 step("Mathlib totality conventions", totality)
+
+
+def no_swallowed_declarations():
+    """Every declaration visible in the source must appear in the table.
+
+    A declaration can be visible to grep and absent from the table -- that is
+    what a name-keyed dict does to two declarations sharing a fully-qualified
+    name, and the symptom is a well-formed-looking namesake row standing in for
+    the missing one.  Counting per file catches it whatever the mechanism.
+    """
+    import api
+    import collections
+    import re as _re
+    api.refresh()
+    DECL = _re.compile(
+        r"^(?:(?:noncomputable|private|protected|partial|unsafe|scoped|local|nonrec)\s+)*"
+        r"(?:def|abbrev)\s+\S")
+    raw = collections.Counter()
+    sources = sorted((PROOFS / "Calibrator").rglob("*.lean"))
+    root = PROOFS / "Calibrator.lean"
+    if root.exists():
+        sources.append(root)          # the root module declares defs too
+    for path in sources:
+        src = path.read_text(errors="ignore")
+        # strip docstrings and block comments: a `def` inside one is prose, not
+        # a declaration (Identification.lean has exactly this).
+        import lean_parse
+        clean, _docs = lean_parse.strip_comments(src)
+        rel = str(path.relative_to(PROOFS))
+        for line in clean.splitlines():
+            if line[:1] not in (" ", "\t") and DECL.match(line):
+                raw[rel] += 1
+    have = collections.Counter()
+    for d in api.all_rows():
+        have[d["file"]] += 1
+    # Two-sided on purpose.  A table with FEWER rows than the source has
+    # swallowed a declaration; a table with MORE has invented one, and a check
+    # that only looks one way would call the second case clean.
+    bad = []
+    for f in sorted(set(raw) | set(have)):
+        if raw.get(f, 0) != have.get(f, 0):
+            bad.append((f, raw.get(f, 0), have.get(f, 0)))
+    print(f"  files checked: {len(raw)}, source declarations: {sum(raw.values())}, "
+          f"table rows: {sum(have.values())}")
+    for f, n, h in bad[:15]:
+        print(f"    MISMATCH {f}: source {n}, table {h}")
+    if bad:
+        raise AssertionError(f"{len(bad)} file(s) where the table and the source "
+                             f"disagree on how many declarations exist")
+    print("  ok  no declaration is missing from the table")
+
+
+step("no swallowed declarations (per-file count reconciliation)",
+     no_swallowed_declarations)
+
+
+def collision_handling_actually_works():
+    """The collision path must be exercised even when the corpus has none.
+
+    Shipping an unexercised code path is how the last two bugs got in.  This
+    injects a synthetic duplicate and asserts the table refuses to pick.
+    """
+    import json as _json
+    import lean_parse
+
+    class Fake:
+        pass
+
+    rows = []
+    for file, line in (("Calibrator/A.lean", 10), ("Calibrator/B.lean", 20)):
+        f = Fake()
+        f.name, f.file, f.line, f.signature = "Calibrator.dup", file, line, "(x : R) : R"
+        rows.append(f)
+    got = lean_parse.find_collisions(rows)
+    assert "Calibrator.dup" in got, "find_collisions missed a real duplicate"
+    assert len(got["Calibrator.dup"]) == 2, got
+    print(f"  ok  duplicate detected: {got['Calibrator.dup']}")
+
+    # and a table built over that blob must exclude it and raise on lookup
+    import api
+    real = api._blob()
+    patched = dict(real)
+    patched["collisions"] = {"Calibrator.dup": got["Calibrator.dup"]}
+    patched["definitions"] = real["definitions"] + [
+        {**real["definitions"][0], "name": "Calibrator.dup"}]
+    api._blob.cache_clear()
+    api.definition_table.cache_clear()
+    api.collisions.cache_clear()
+    orig = api._blob
+    try:
+        api._blob = lambda: patched
+        assert "Calibrator.dup" not in api.definition_table(), \
+            "a collided name leaked into the table"
+        try:
+            api.definition("Calibrator.dup")
+        except KeyError as e:
+            assert "DECLARED TWICE" in str(e), str(e)
+            print("  ok  definition() refuses to pick between duplicates")
+        else:
+            raise AssertionError("definition() silently returned one of two duplicates")
+    finally:
+        api._blob = orig
+        api._blob.cache_clear()
+        api.definition_table.cache_clear()
+        api.collisions.cache_clear()
+
+    live = api.collisions()
+    print(f"  live corpus collisions: {len(live)}"
+          + (f" -- {list(live)}" if live else " (corpus compiles)"))
+
+
+step("collision handling is exercised, not assumed", collision_handling_actually_works)
 step("mechanical extraction ceiling", lambda: run("ceiling.py"))
 step("parser reconciliation against the other tables", lambda: run("reconcile.py"))
 if not QUICK:

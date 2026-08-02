@@ -60,11 +60,14 @@ def portableFraction(r2_causal, r2_total):
 def proportionalAllocation(pop_size, total_n, total_pop):
     return (total_n * (_rt.rdiv(pop_size, total_pop)))
 
+def h2(m):
+    return _rt.rdiv(_rt._proj(m, 'V_A'), _rt._proj(m, 'V_P'))
+
 def amVarianceStep(V_0, r, h2, V):
     return _rt.rdiv((((V * ((1.0 + (r * h2)))) + V_0)), 2.0)
 
 def equilibriumVariance(m):
-    return _rt.rdiv(_rt._proj(m, 'V_A'), ((1.0 - (_rt._proj(m, 'r') * _rt._proj(m, 'h2')))))
+    return _rt.rdiv(_rt._proj(m, 'V_A'), ((1.0 - (_rt._proj(m, 'r') * h2(m)))))
 
 def amEquilibriumVariance(V_A, r, h2):
     return _rt.rdiv(V_A, ((1.0 - (r * h2))))
@@ -73,10 +76,10 @@ def amInducedLD(beta_i, beta_j, r, h2):
     return _rt.rdiv((((beta_i * beta_j) * r) * h2), ((1.0 - (r * h2))))
 
 def observedH2(m):
-    return _rt.rdiv(_rt._proj(m, 'h2'), ((1.0 - (_rt._proj(m, 'r') * _rt._proj(m, 'h2')))))
+    return _rt.rdiv(h2(m), ((1.0 - (_rt._proj(m, 'r') * h2(m)))))
 
 def pgsR2AM(m, R2_rm):
-    return _rt.rdiv(R2_rm, ((1.0 - (_rt._proj(m, 'r') * _rt._proj(m, 'h2')))))
+    return _rt.rdiv(R2_rm, ((1.0 - (_rt._proj(m, 'r') * h2(m)))))
 
 def amGap(m, R2_rm):
     return (pgsR2AM(m, R2_rm) - R2_rm)
@@ -221,6 +224,18 @@ def gaussianKurtosisMaf():
 
 def centeredSquareThirdMoment(spectrum):
     return ((moment(spectrum, 6.0) - (3.0 * moment(spectrum, 4.0))) + 2.0)
+
+def squaringScaleSq(fourthMoment):
+    return (fourthMoment - 1.0)
+
+def nextFloorFourthMoment(m2, m4, m6, m8):
+    return _rt.rdiv((((((m8 - (4.0 * m6)) + (6.0 * m4)) - (4.0 * m2)) + 1.0)), _rt.lpow(((m4 - 1.0)), 2.0))
+
+def squaringStep(scale, x):
+    return _rt.rdiv(((_rt.lpow(x, 2.0) - 1.0)), scale)
+
+def squaringFixedPoint(scale):
+    return _rt.rdiv(((scale + _rt.rsqrt(((_rt.lpow(scale, 2.0) + 4.0))))), 2.0)
 
 def ploidy():
     return 2.0
@@ -997,12 +1012,6 @@ def Calibrator_CrossPopulationMechanisticCalibrationModel_targetPredictedMean(m)
 def Calibrator_CrossPopulationMechanisticCalibrationModel_targetObservedMean(m):
     return (_rt._proj(m, 'sourceObservedMean') + Calibrator_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m))
 
-def sourceCalibrationSlope(m):
-    return sourceCalibrationSlopeFromSourceWeights(_rt._proj(m, 'metric'))
-
-def targetCalibrationSlope(m):
-    return targetCalibrationSlopeFromSourceWeights(_rt._proj(m, 'metric'))
-
 def Calibrator_CrossPopulationMechanisticCalibrationModel_sourceCalibrationProfile(m, link):
     return _rt._proj(_rt._proj(m, 'toShiftModel'), 'sourceCalibrationProfile')(link)
 
@@ -1130,7 +1139,7 @@ def pgsDiffVariance_two_pop(V_A, fst):
 def expectedPGSDiffVariance(V_A, fst):
     return ((V_A * 2.0) * fst)
 
-def Calibrator_effectCorrelationStabilizing(d, s, N):
+def effectCorrelationStabilizingDriftSelection(d, s, N):
     return (1.0 - _rt.rdiv(d, ((1.0 + (s * N)))))
 
 def effectCorrelationFluctuating(d, f, N):
@@ -1396,11 +1405,8 @@ def pgsVarianceFromHet(β_sq_sum, het):
 def targetHetFromFst(het_source, fst):
     return (het_source * ((1.0 - fst)))
 
-def targetPGSVariance(V_A, fst):
-    return pgsVarianceFromHet(V_A, ((1.0 - fst)))
-
 def presentDayPGSVariance(V_A, fst):
-    return (((1.0 - fst)) * V_A)
+    return pgsVarianceFromHet(V_A, ((1.0 - fst)))
 
 def wrightFisherDriftRetention(N, t):
     return _rt.lpow(((1.0 - _rt.rdiv(1.0, ((2.0 * (N)))))), t)
@@ -1417,12 +1423,11 @@ def Expected_Abs_Shift(V_A, fstS, fstT):
 def presentDaySignalToNoise(V_A, V_E, fst):
     return _rt.rdiv(presentDayPGSVariance(V_A, fst), V_E)
 
-def presentDayR2(V_A, V_E, fst):
-    v = presentDayPGSVariance(V_A, fst)
-    return _rt.rdiv(v, ((v + V_E)))
-
 def expectedR2(vSignal, V_E):
     return _rt.rdiv(vSignal, ((vSignal + V_E)))
+
+def presentDayR2(V_A, V_E, fst):
+    return expectedR2((presentDayPGSVariance(V_A, fst)), V_E)
 
 def presentDayGaussianAUC(V_A, V_E, fst):
     return Phi((_rt.rsqrt((_rt.rdiv(presentDaySignalToNoise(V_A, V_E, fst), 2.0)))))
@@ -1436,20 +1441,20 @@ def realWorldPGSVariance(V_A, fst, rhoSq):
 def sourceERMWeights(sigmaObsSource, crossSource):
     return _rt._proj(_rt.rinv(sigmaObsSource), 'mulVec')(crossSource)
 
-def Calibrator_sigmaTagCausal(m, P):
+def sigmaTagCausalSourceAt(m, P):
     return (((_rt._proj(m, 'directCausal')(P) + _rt._proj(m, 'novelDirectCausal')(P))) + ((_rt._proj(m, 'proxyTagging')(P) + _rt._proj(m, 'novelProxyTagging')(P))))
 
 def totalEffect(m, P):
     return (_rt._proj(m, 'beta')(P) + _rt._proj(m, 'novelCausalEffect')(P))
 
 def crossCovariance(m, P):
-    return (_rt._proj((Calibrator_sigmaTagCausal(m, P)), 'mulVec')((totalEffect(m, P))) + _rt._proj(m, 'contextCross')(P))
+    return (_rt._proj((sigmaTagCausalSourceAt(m, P)), 'mulVec')((totalEffect(m, P))) + _rt._proj(m, 'contextCross')(P))
 
 def sourceWeightedTagScore(m, tagState):
     return dotProduct((sourceWeightsFromExplicitDrivers(m)), tagState)
 
 def taggingProjection(m, P):
-    return _rt._proj((Calibrator_sigmaTagCausal(m, P)), 'mulVec')((totalEffect(m, P)))
+    return _rt._proj((sigmaTagCausalSourceAt(m, P)), 'mulVec')((totalEffect(m, P)))
 
 def directCausalProjection(m, P):
     return _rt._proj(((_rt._proj(m, 'directCausal')(P) + _rt._proj(m, 'novelDirectCausal')(P))), 'mulVec')((totalEffect(m, P)))
@@ -1457,11 +1462,15 @@ def directCausalProjection(m, P):
 def proxyTaggingProjection(m, P):
     return _rt._proj(((_rt._proj(m, 'proxyTagging')(P) + _rt._proj(m, 'novelProxyTagging')(P))), 'mulVec')((totalEffect(m, P)))
 
-def sourceCalibrationSlopeFromSourceWeights(m):
-    return _rt.rdiv(sourcePredictiveCovarianceFromSourceWeights(m), sourceScoreVarianceFromExplicitDrivers(m))
+def scoreVarianceFromSourceWeights(m, P):
+    wS = sourceWeightsFromExplicitDrivers(m)
+    return dotProduct(wS, (_rt._proj((_rt._proj(m, 'sigmaTag')(P)), 'mulVec')(wS)))
 
-def targetCalibrationSlopeFromSourceWeights(m):
-    return _rt.rdiv(targetPredictiveCovarianceFromSourceWeights(m), targetScoreVarianceFromSourceWeights(m))
+def predictiveCovarianceFromSourceWeights(m, P):
+    return dotProduct((sourceWeightsFromExplicitDrivers(m)), (crossCovariance(m, P)))
+
+def calibrationSlopeFromSourceWeights(m, P):
+    return _rt.rdiv(predictiveCovarianceFromSourceWeights(m, P), scoreVarianceFromSourceWeights(m, P))
 
 def novelUntaggablePhenotypeResidual(m):
     return _rt._proj(m, 'novelUntaggablePhenotypeVarianceTarget')
@@ -1469,17 +1478,17 @@ def novelUntaggablePhenotypeResidual(m):
 def irreducibleTargetResidualBurden(m):
     return (((brokenTaggingResidual(m) + ancestrySpecificLDResidual(m)) + sourceSpecificOverfitResidual(m)) + novelUntaggablePhenotypeResidual(m))
 
-def sourceExplainedSignalVarianceFromSourceWeights(m):
-    return _rt.rdiv(_rt.lpow((sourcePredictiveCovarianceFromSourceWeights(m)), 2.0), sourceScoreVarianceFromExplicitDrivers(m))
+def effectiveOutcomeVariance(m, P):
+    return ((_rt._proj(m, 'outcomeVariance')(P)) + residualBurden(m, P))
 
-def targetExplainedSignalVarianceFromSourceWeights(m):
-    return _rt.rdiv(_rt.lpow((targetPredictiveCovarianceFromSourceWeights(m)), 2.0), targetScoreVarianceFromSourceWeights(m))
+def explainedSignalVarianceFromSourceWeights(m, P):
+    return _rt.rdiv(_rt.lpow((predictiveCovarianceFromSourceWeights(m, P)), 2.0), scoreVarianceFromSourceWeights(m, P))
 
-def targetR2FromSourceWeights(m):
-    return _rt.rdiv(targetExplainedSignalVarianceFromSourceWeights(m), effectiveTargetOutcomeVariance(m))
+def r2FromSourceWeights(m, P):
+    return _rt.rdiv(explainedSignalVarianceFromSourceWeights(m, P), effectiveOutcomeVariance(m, P))
 
-def targetResidualVarianceFromSourceWeights(m):
-    return (effectiveTargetOutcomeVariance(m) - targetExplainedSignalVarianceFromSourceWeights(m))
+def residualVarianceFromSourceWeights(m, P):
+    return (effectiveOutcomeVariance(m, P) - explainedSignalVarianceFromSourceWeights(m, P))
 
 def ldCorrelationDecay(distance, fstGap, lambda_):
     return _rt.rexp(((-(((lambda_ * fstGap) * distance)))))
@@ -1548,7 +1557,7 @@ def targetEffectHeterogeneityProjectionAt(m, t):
     return _rt._proj((sigmaTagCausalTargetAt(m, t)), 'mulVec')(((_rt._proj(m, 'targetEffectHeterogeneityAt')(t) + _rt._proj(m, 'novelCausalEffectTargetAt')(t))))
 
 def targetR2AtGeneration(m, t):
-    return targetR2FromSourceWeights((toMetricModelAt(m, t)))
+    return r2FromSourceWeights((toMetricModelAt(m, t)))
 
 def targetCalibratedBrierAtGeneration(m, t):
     return targetCalibratedBrierFromSourceWeights((toMetricModelAt(m, t)))
@@ -1563,7 +1572,7 @@ def hetRatioBetweenBranches(NeA, NeB, mu, H_0, t):
     return _rt.rdiv(hetTrajectory(NeB, mu, H_0, t), hetTrajectory(NeA, mu, H_0, t))
 
 def exactCalibratedBrierRiskFromR2(π, r2):
-    return ((_rt.pi * ((1.0 - _rt.pi))) * ((1.0 - r2)))
+    return calibratedBrier(_rt.pi, r2)
 
 def brierFromR2(π, r2):
     return exactCalibratedBrierRiskFromR2(_rt.pi, r2)
@@ -1584,7 +1593,7 @@ def equalVarianceGaussianAUCFromSNR(snr):
     return Phi((_rt.rsqrt((_rt.rdiv(snr, 2.0)))))
 
 def equalVarianceGaussianAUCFromVariances(vSignal, vEnv):
-    return Phi((_rt.rsqrt((_rt.rdiv(vSignal, ((2.0 * vEnv)))))))
+    return gaussianAUCFromSignalVariance(vSignal, vEnv)
 
 def equalVarianceGaussianAUCFromExplainedR2(r2):
     return Phi((_rt.rsqrt((_rt.rdiv(r2, ((2.0 * ((1.0 - r2)))))))))
@@ -1592,38 +1601,35 @@ def equalVarianceGaussianAUCFromExplainedR2(r2):
 def equalVarianceGaussianAUCChart(r2):
     return (1.0 if (1.0 <= r2) else equalVarianceGaussianAUCFromExplainedR2(r2))
 
-def sourceEqualVarianceGaussianAUCFromSourceWeights(m):
-    return equalVarianceGaussianAUCFromVariances((sourceExplainedSignalVarianceFromSourceWeights(m)), (sourceResidualVarianceFromSourceWeights(m)))
-
-def targetEqualVarianceGaussianAUCFromSourceWeights(m):
-    return equalVarianceGaussianAUCFromVariances((targetExplainedSignalVarianceFromSourceWeights(m)), (targetResidualVarianceFromSourceWeights(m)))
+def equalVarianceGaussianAUCFromSourceWeights(m, P):
+    return equalVarianceGaussianAUCFromVariances((explainedSignalVarianceFromSourceWeights(m, P)), (residualVarianceFromSourceWeights(m, P)))
 
 def sourceMetricProfileFromSourceWeightsAtTargetPrevalence(m):
     return sourceMetricProfileFromSourceWeightsAtPrevalence(m, _rt._proj(m, 'targetPrevalence'))
 
 def targetGaussianAUCAtGeneration(m, t):
-    return targetEqualVarianceGaussianAUCFromSourceWeights((toMetricModelAt(m, t)))
+    return equalVarianceGaussianAUCFromSourceWeights((toMetricModelAt(m, t)))
 
 def targetMetricProfileAtGeneration(m, t):
     return targetMetricProfileFromSourceWeights((toMetricModelAt(m, t)))
 
 def targetPredictiveCovarianceAtGeneration(m, t):
-    return targetPredictiveCovarianceFromSourceWeights((toMetricModelAt(m, t)))
+    return predictiveCovarianceFromSourceWeights((toMetricModelAt(m, t)))
 
 def targetScoreVarianceAtGeneration(m, t):
-    return targetScoreVarianceFromSourceWeights((toMetricModelAt(m, t)))
+    return scoreVarianceFromSourceWeights((toMetricModelAt(m, t)))
 
 def effectiveTargetOutcomeVarianceAtGeneration(m, t):
-    return effectiveTargetOutcomeVariance((toMetricModelAt(m, t)))
+    return effectiveOutcomeVariance((toMetricModelAt(m, t)))
 
 def targetResidualVarianceAtGeneration(m, t):
-    return targetResidualVarianceFromSourceWeights((toMetricModelAt(m, t)))
+    return residualVarianceFromSourceWeights((toMetricModelAt(m, t)))
 
 def targetCalibrationSlopeAtGeneration(m, t):
-    return targetCalibrationSlopeFromSourceWeights((toMetricModelAt(m, t)))
+    return calibrationSlopeFromSourceWeights((toMetricModelAt(m, t)))
 
 def sourceNormalizedTargetR2AtGeneration(m, sourceBaseline, t):
-    return (sourceBaseline * (_rt.rdiv(targetR2AtGeneration(m, t), sourceR2FromSourceWeights((toMetricModelAt(m, t))))))
+    return (sourceBaseline * (_rt.rdiv(targetR2AtGeneration(m, t), r2FromSourceWeights((toMetricModelAt(m, t))))))
 
 def targetExactGaussianAUCFromNeutralAFBenchmark(V_A, V_E, fstTarget):
     return targetGaussianAUCFromNeutralAFBenchmark(V_A, V_E, fstTarget)
@@ -1723,7 +1729,7 @@ def effectiveSymmetricMigration(m_1_2, m_2_1):
     return _rt.rdiv(((m_1_2 + m_2_1)), 2.0)
 
 def admixtureLDDecay(r, generations_since):
-    return _rt.lpow(((1.0 - r)), generations_since)
+    return discreteRecombinationSurvival(r, generations_since)
 
 def admixtureLDBoost(r, t_since, equilibrium_ld):
     return _rt.rdiv(admixtureLDDecay(r, t_since), equilibrium_ld)
@@ -1878,6 +1884,9 @@ def equilibriumEffectVariance(v_mutation, s):
 def effectVarianceRecurrence(V, v_mut, s):
     return ((((1.0 - s)) * V) + v_mut)
 
+def effectCorrelationStabilizing(Ns):
+    return (1.0 - _rt.rdiv(1.0, ((2.0 * Ns))))
+
 def fluctuatingEffectCorrelation(t, τ):
     return _rt.rexp((_rt.rdiv((-t), τ)))
 
@@ -1913,9 +1922,6 @@ def missedSelectedVariance(validation, summary):
 
 def selectionModelLRT(validation, nullSummary, altSummary):
     return likelihoodRatioStat((selectionSummaryLogLik(validation, nullSummary)), (selectionSummaryLogLik(validation, altSummary)))
-
-def mechanisticPortabilityRatio(m):
-    return _rt.rdiv(targetR2FromSourceWeights(m), sourceR2FromSourceWeights(m))
 
 def sourceSquaredEffectMass(β):
     return sum((_rt.lpow(β[int(i)], 2.0)) for i in range(int(len(β))))
@@ -1973,7 +1979,7 @@ def sharedLDHeritability(β, ld, var_y):
     return _rt.rdiv(sharedLDGeneticVariance(β, ld), var_y)
 
 def pgsR2(cov_pgs_y, var_pgs, var_y):
-    return _rt.rdiv(_rt.lpow(cov_pgs_y, 2.0), ((var_pgs * var_y)))
+    return explainedR2FromTransportMoments(cov_pgs_y, var_pgs, var_y)
 
 def sourceTruthR2SharedLD(β_source, ld, var_y):
     return pgsR2((sharedLDGeneticVariance(β_source, ld)), (sharedLDGeneticVariance(β_source, ld)), var_y)

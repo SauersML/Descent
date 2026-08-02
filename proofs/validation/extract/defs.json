@@ -1,4 +1,5 @@
 {
+ "collisions": {},
  "definitions": [
   {
    "name": "Calibrator.epistaticVariancePairwise",
@@ -982,12 +983,305 @@
    ]
   },
   {
+   "name": "Calibrator.AssortativeMatingModel.h2",
+   "short": "h2",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/AssortativeMatingPGS.lean",
+   "line": 75,
+   "signature": "(m : AssortativeMatingModel) : ℝ",
+   "args": [
+    {
+     "names": [
+      "m"
+     ],
+     "type": "AssortativeMatingModel",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  m.V_A / m.V_P",
+   "docstring": "**Narrow-sense heritability**, the ratio of additive to total variance.\n\nThis used to be a field of the structure carrying a hypothesis `h2_def : h2 = V_A / V_P`\nthat pinned it. A parameter fixed by an equation is not a parameter: it could be supplied\ninconsistently only by supplying a false proof, and every model had to carry the equation\naround. It is now computed, so `h2_def` is `rfl` and the positivity and upper bound are\ntheorems rather than assumptions.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "heritability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "0 < Real.sqrt (m.h_sq * (1 - R₂ ^ 2",
+     "0 ≤ R₁ * Real.sqrt m.h_sq * m.case_mean - T'",
+     "0 < Real.sqrt (m.h_sq * (1 - R2₂",
+     "0 ≤ Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T'",
+     "0 ≤ T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control",
+     "0 ≤ Real.sqrt r2_old * Real.sqrt m.h_sq * m.case_mean - T'",
+     "0 ≤ T' - Real.sqrt r2_old * Real.sqrt m.h_sq * μ_control",
+     "0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T'",
+     "0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control",
+     "0 ≤ sensFromR2 m r2_target T'",
+     "0 ≤ specFromR2 m r2_target T' μ_control",
+     "specFromR2 m r2_source T' μ_control ≤ 1",
+     "0 < m",
+     "0 ≤ Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * m.case_mean - T'",
+     "0 ≤ T' - Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * μ_control"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.r2_depends_on_prevalence_but_auc_doesnt": [],
+     "Calibrator.freq_change_alters_pgs_variance": [],
+     "Calibrator.AssortativeMatingModel.h2_def": [],
+     "Calibrator.AssortativeMatingModel.h2_pos": [],
+     "Calibrator.AssortativeMatingModel.h2_lt_one": [],
+     "Calibrator.AssortativeMatingModel.rh2_pos": [],
+     "Calibrator.AssortativeMatingModel.rh2_nonneg": [],
+     "Calibrator.AssortativeMatingModel.denom_pos": [],
+     "Calibrator.amEquilibriumVariance_isFixedPoint": [],
+     "Calibrator.AssortativeMatingModel.equilibriumVariance_isFixedPoint": [],
+     "Calibrator.amEquilibriumVariance_of_no_assortment": [],
+     "Calibrator.am_variance_exceeds_random": [],
+     "Calibrator.am_variance_finite": [],
+     "Calibrator.AssortativeMatingModel.variance_inflation_factor": [],
+     "Calibrator.am_ld_sign": [],
+     "Calibrator.am_ld_zero_when_random": [],
+     "Calibrator.AssortativeMatingModel.inflates_observed_h2": [],
+     "Calibrator.AssortativeMatingModel.pgs_r2_inflation_eq_h2_inflation": [],
+     "Calibrator.AssortativeMatingModel.am_gap_formula": [],
+     "Calibrator.DifferentialAMModel.denom_s_pos": [],
+     "Calibrator.DifferentialAMModel.denom_t_pos": [],
+     "Calibrator.DifferentialAMModel.differential_am_misleading": [],
+     "Calibrator.am_correction_increases_portability": [],
+     "Calibrator.am_correction_recovers_true": [],
+     "Calibrator.CrossPopAMLD.source_ld_exceeds_target": [],
+     "Calibrator.am_ld_breaks_cross_population": [],
+     "Calibrator.prs_cs_dominates_ct": [],
+     "Calibrator.liabilitySensitivity_zScore_monotone_in_R": [
+      "0 < Real.sqrt (m.h_sq * (1 - R₂ ^ 2",
+      "0 ≤ R₁ * Real.sqrt m.h_sq * m.case_mean - T'"
+     ],
+     "Calibrator.liabilitySensitivity_monotone_in_R2": [
+      "0 < Real.sqrt (m.h_sq * (1 - R2₂",
+      "0 ≤ Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T'"
+     ],
+     "Calibrator.liabilitySpecificity_monotone_in_R2": [
+      "0 < Real.sqrt (m.h_sq * (1 - R2₂",
+      "0 ≤ T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control"
+     ],
+     "Calibrator.residualVariance_pos": [],
+     "Calibrator.nri_positive_when_pgs_adds_value": [
+      "0 ≤ Real.sqrt r2_old * Real.sqrt m.h_sq * m.case_mean - T'",
+      "0 ≤ T' - Real.sqrt r2_old * Real.sqrt m.h_sq * μ_control"
+     ],
+     "Calibrator.nri_decreases_with_portability_loss": [
+      "0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T'",
+      "0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control"
+     ],
+     "Calibrator.nri_can_be_negative": [
+      "0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T'",
+      "0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control"
+     ],
+     "Calibrator.pgs_useful_when_exceeds_treat_all": [],
+     "Calibrator.portability_narrows_useful_range": [
+      "0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T'",
+      "0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control",
+      "0 ≤ sensFromR2 m r2_target T'",
+      "0 ≤ specFromR2 m r2_target T' μ_control",
+      "specFromR2 m r2_source T' μ_control ≤ 1"
+     ],
+     "Calibrator.lower_portability_lower_cost_effectiveness": [],
+     "Calibrator.bernoulliKLReal_nonneg": [],
+     "Calibrator.MellinProfile.spike_cost_ge": [
+      "0 < m"
+     ],
+     "Calibrator.hudsonFst_eq_varianceRatio": [],
+     "Calibrator.amEquilibrium_then_drift": [],
+     "Calibrator.ldsr_chi2_from_beta_sq": [],
+     "Calibrator.ldsr_with_confounding_eq": [],
+     "Calibrator.ldsr_increases_with_ell": [],
+     "Calibrator.admixture_ld_confounds_pgs": [],
+     "Calibrator.linear_noise_implies_nonlinear_slope": [],
+     "Calibrator.mse_pointwise_larger_for_distant": [],
+     "Calibrator.additive_misses_epistasis": [],
+     "Calibrator.hardCall_coding_dichotomy": [],
+     "Calibrator.expectedR2FromN_le_h2": [],
+     "Calibrator.r2_increases_with_n": [],
+     "Calibrator.r2_concave_in_n": [],
+     "Calibrator.diversity_has_higher_marginal_value": [],
+     "Calibrator.do_no_harm_principle": [
+      "0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T'",
+      "0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control"
+     ],
+     "Calibrator.phased_deployment_reduces_risk": [
+      "0 ≤ Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * m.case_mean - T'",
+      "0 ≤ T' - Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * μ_control"
+     ],
+     "Calibrator.gxe_population_specific_ceiling": [],
+     "Calibrator.estimation_trait_interaction": [],
+     "Calibrator.phase_attenuation_bounded": [],
+     "Calibrator.quadForm_sub_smul": [],
+     "Calibrator.gramForm_sq_le": [],
+     "Calibrator.ldKernelSymbol_denom_pos": [],
+     "Calibrator.ldKernelSymbol_pi": [],
+     "Calibrator.wgs_vs_array_tradeoff": [],
+     "Calibrator.lattice_detection": [],
+     "Calibrator.lattice_observables_ne_gaussian": [],
+     "Calibrator.isChameleonObservable_iff": [],
+     "Calibrator.ld_retention_lt_one": [],
+     "Calibrator.admixture_ld_max_at_half_freq": [],
+     "Calibrator.head_density_pos": [],
+     "Calibrator.tail_mechanism_pos": [],
+     "Calibrator.head_piece_pos": [],
+     "Calibrator.brier_worsens_when_r2_drops_and_prevalence_factor_grows": [],
+     "Calibrator.brier_score_bounded": [],
+     "Calibrator.single_factor_insufficient": [],
+     "Calibrator.turnover_worsens_ld_only_portability": [],
+     "Calibrator.more_exact_population_pcs_reduce_modeled_residual": [],
+     "Calibrator.BackgroundClass.isNull_convex": [],
+     "Calibrator.scalar_three_factor_portability_upper_bound": [],
+     "Calibrator.per_variant_h2_decreases_with_M": [],
+     "Calibrator.coalFst_eq_fstFromTau": [],
+     "Calibrator.fstTransientDiscrete_nonneg": [],
+     "Calibrator.neutralPortability_le_neutralAFBenchmark": [],
+     "Calibrator.pairwiseFstFromBranchTaus_lt_pairwiseFstFromBranches": [],
+     "Calibrator.pairwiseFst_composition_gap_le": [],
+     "Calibrator.twoDemeIMEquilibriumDelta_isFixedPoint": [],
+     "Calibrator.expected_abs_mean_shift_bound_proved": [],
+     "Calibrator.covarianceDivergence_ge_drift": [],
+     "Calibrator.equilibrium_drift_component_improves_with_theta": [],
+     "Calibrator.twoPoint_understates_sample_size": [],
+     "Calibrator.spectralCapture_pruneAllocation": [],
+     "Calibrator.haploinsufficiency_consistent_direction": [],
+     "Calibrator.no_overlap_unbiased": [],
+     "Calibrator.more_overlap_more_inflation": [],
+     "Calibrator.apparent_portability_loss_includes_overlap": [],
+     "Calibrator.gwas_subtraction_estimates_bias": [],
+     "Calibrator.polygenic_h2_summation": [],
+     "Calibrator.polygenic_more_portable_than_oligogenic": [],
+     "Calibrator.survivorship_shifts_genotype_freq": [],
+     "Calibrator.ratio_strict_mono": [],
+     "Calibrator.gxe_changes_heritability": [],
+     "Calibrator.three_way_ceiling": [],
+     "Calibrator.ld_decay_implies_nonlinear_calibration_proved": []
+    },
+    "range_hi_thm": [
+     "Calibrator.AssortativeMatingModel.h2_lt_one",
+     0
+    ],
+    "range_hi": 1
+   },
+   "mentioned_by": [
+    "Calibrator.AssortativeMatingModel.am_gap_formula",
+    "Calibrator.AssortativeMatingModel.denom_pos",
+    "Calibrator.AssortativeMatingModel.equilibriumVariance_isFixedPoint",
+    "Calibrator.AssortativeMatingModel.h2_def",
+    "Calibrator.AssortativeMatingModel.h2_lt_one",
+    "Calibrator.AssortativeMatingModel.h2_pos",
+    "Calibrator.AssortativeMatingModel.inflates_observed_h2",
+    "Calibrator.AssortativeMatingModel.pgs_r2_inflation_eq_h2_inflation",
+    "Calibrator.AssortativeMatingModel.rh2_nonneg",
+    "Calibrator.AssortativeMatingModel.rh2_pos",
+    "Calibrator.AssortativeMatingModel.variance_inflation_factor",
+    "Calibrator.BackgroundClass.isNull_convex",
+    "Calibrator.CrossPopAMLD.source_ld_exceeds_target",
+    "Calibrator.DifferentialAMModel.denom_s_pos",
+    "Calibrator.DifferentialAMModel.denom_t_pos",
+    "Calibrator.DifferentialAMModel.differential_am_misleading",
+    "Calibrator.MellinProfile.spike_cost_ge",
+    "Calibrator.additive_misses_epistasis",
+    "Calibrator.admixture_ld_confounds_pgs",
+    "Calibrator.admixture_ld_max_at_half_freq",
+    "Calibrator.amEquilibriumVariance_isFixedPoint",
+    "Calibrator.amEquilibriumVariance_of_no_assortment",
+    "Calibrator.amEquilibrium_then_drift",
+    "Calibrator.am_correction_increases_portability",
+    "Calibrator.am_correction_recovers_true",
+    "Calibrator.am_ld_breaks_cross_population",
+    "Calibrator.am_ld_sign",
+    "Calibrator.am_ld_zero_when_random",
+    "Calibrator.am_variance_exceeds_random",
+    "Calibrator.am_variance_finite",
+    "Calibrator.apparent_portability_loss_includes_overlap",
+    "Calibrator.bernoulliKLReal_nonneg",
+    "Calibrator.brier_score_bounded",
+    "Calibrator.brier_worsens_when_r2_drops_and_prevalence_factor_grows",
+    "Calibrator.coalFst_eq_fstFromTau",
+    "Calibrator.covarianceDivergence_ge_drift",
+    "Calibrator.diversity_has_higher_marginal_value",
+    "Calibrator.do_no_harm_principle",
+    "Calibrator.equilibrium_drift_component_improves_with_theta",
+    "Calibrator.estimation_trait_interaction",
+    "Calibrator.expectedR2FromN_le_h2",
+    "Calibrator.expected_abs_mean_shift_bound_proved",
+    "Calibrator.freq_change_alters_pgs_variance",
+    "Calibrator.fstTransientDiscrete_nonneg",
+    "Calibrator.gramForm_sq_le",
+    "Calibrator.gwas_subtraction_estimates_bias",
+    "Calibrator.gxe_changes_heritability",
+    "Calibrator.gxe_population_specific_ceiling",
+    "Calibrator.haploinsufficiency_consistent_direction",
+    "Calibrator.hardCall_coding_dichotomy",
+    "Calibrator.head_density_pos",
+    "Calibrator.head_piece_pos",
+    "Calibrator.hudsonFst_eq_varianceRatio",
+    "Calibrator.isChameleonObservable_iff",
+    "Calibrator.lattice_detection",
+    "Calibrator.lattice_observables_ne_gaussian",
+    "Calibrator.ldKernelSymbol_denom_pos",
+    "Calibrator.ldKernelSymbol_pi",
+    "Calibrator.ld_decay_implies_nonlinear_calibration_proved",
+    "Calibrator.ld_retention_lt_one",
+    "Calibrator.ldsr_chi2_from_beta_sq",
+    "Calibrator.ldsr_increases_with_ell",
+    "Calibrator.ldsr_with_confounding_eq",
+    "Calibrator.liabilitySensitivity_monotone_in_R2",
+    "Calibrator.liabilitySensitivity_zScore_monotone_in_R",
+    "Calibrator.liabilitySpecificity_monotone_in_R2",
+    "Calibrator.linear_noise_implies_nonlinear_slope",
+    "Calibrator.lower_portability_lower_cost_effectiveness",
+    "Calibrator.more_exact_population_pcs_reduce_modeled_residual",
+    "Calibrator.more_overlap_more_inflation",
+    "Calibrator.mse_pointwise_larger_for_distant",
+    "Calibrator.neutralPortability_le_neutralAFBenchmark",
+    "Calibrator.no_overlap_unbiased",
+    "Calibrator.nri_can_be_negative",
+    "Calibrator.nri_decreases_with_portability_loss",
+    "Calibrator.nri_positive_when_pgs_adds_value",
+    "Calibrator.pairwiseFstFromBranchTaus_lt_pairwiseFstFromBranches",
+    "Calibrator.pairwiseFst_composition_gap_le",
+    "Calibrator.per_variant_h2_decreases_with_M",
+    "Calibrator.pgs_useful_when_exceeds_treat_all",
+    "Calibrator.phase_attenuation_bounded",
+    "Calibrator.phased_deployment_reduces_risk",
+    "Calibrator.polygenic_h2_summation",
+    "Calibrator.polygenic_more_portable_than_oligogenic",
+    "Calibrator.portability_narrows_useful_range",
+    "Calibrator.prs_cs_dominates_ct",
+    "Calibrator.quadForm_sub_smul",
+    "Calibrator.r2_concave_in_n",
+    "Calibrator.r2_depends_on_prevalence_but_auc_doesnt",
+    "Calibrator.r2_increases_with_n",
+    "Calibrator.ratio_strict_mono",
+    "Calibrator.residualVariance_pos",
+    "Calibrator.scalar_three_factor_portability_upper_bound",
+    "Calibrator.single_factor_insufficient",
+    "Calibrator.spectralCapture_pruneAllocation",
+    "Calibrator.survivorship_shifts_genotype_freq",
+    "Calibrator.tail_mechanism_pos",
+    "Calibrator.three_way_ceiling",
+    "Calibrator.turnover_worsens_ld_only_portability",
+    "Calibrator.twoDemeIMEquilibriumDelta_isFixedPoint",
+    "Calibrator.twoPoint_understates_sample_size",
+    "Calibrator.wgs_vs_array_tradeoff"
+   ]
+  },
+  {
    "name": "Calibrator.amVarianceStep",
    "short": "amVarianceStep",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 118,
+   "line": 136,
    "signature": "(V₀ r h2 V : ℝ) : ℝ",
    "args": [
     {
@@ -1035,7 +1329,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 127,
+   "line": 145,
    "signature": "(m : AssortativeMatingModel) : ℝ",
    "args": [
     {
@@ -1079,7 +1373,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 133,
+   "line": 151,
    "signature": "(V_A r h2 : ℝ) : ℝ",
    "args": [
     {
@@ -1158,7 +1452,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 221,
+   "line": 239,
    "signature": "(beta_i beta_j r h2 : ℝ) : ℝ",
    "args": [
     {
@@ -1225,7 +1519,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 258,
+   "line": 276,
    "signature": "(m : AssortativeMatingModel) : ℝ",
    "args": [
     {
@@ -1265,7 +1559,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 287,
+   "line": 305,
    "signature": "(m : AssortativeMatingModel) (R2_rm : ℝ) : ℝ",
    "args": [
     {
@@ -1321,7 +1615,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 315,
+   "line": 333,
    "signature": "(m : AssortativeMatingModel) (R2_rm : ℝ) : ℝ",
    "args": [
     {
@@ -1373,7 +1667,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 383,
+   "line": 401,
    "signature": "(d : DifferentialAMModel) : ℝ",
    "args": [
     {
@@ -1416,7 +1710,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 400,
+   "line": 418,
    "signature": "(port_measured r_source r_target h2 : ℝ) : ℝ",
    "args": [
     {
@@ -1474,7 +1768,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 535,
+   "line": 553,
    "signature": "(d N sigma_sq : ℝ) : ℝ",
    "args": [
     {
@@ -5038,7 +5332,8 @@
      "Calibrator.gaussianKurtosisMaf_pos": [],
      "Calibrator.gaussianKurtosisMaf_lt_one": [],
      "Calibrator.gaussianKurtosisMaf_genotypeVariance": [],
-     "Calibrator.standardizedGenotype_kurtosis_gaussian_at_blind_maf": []
+     "Calibrator.standardizedGenotype_kurtosis_gaussian_at_blind_maf": [],
+     "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf": []
     },
     "range_hi_thm": [
      "Calibrator.gaussianKurtosisMaf_lt_one",
@@ -5050,6 +5345,7 @@
     "Calibrator.gaussianKurtosisMaf_genotypeVariance",
     "Calibrator.gaussianKurtosisMaf_lt_one",
     "Calibrator.gaussianKurtosisMaf_pos",
+    "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf",
     "Calibrator.standardizedGenotype_kurtosis_gaussian_at_blind_maf"
    ]
   },
@@ -5331,6 +5627,176 @@
    },
    "mentioned_by": [
     "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion"
+   ]
+  },
+  {
+   "name": "Calibrator.squaringScaleSq",
+   "short": "squaringScaleSq",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 1054,
+   "signature": "(fourthMoment : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "fourthMoment"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " fourthMoment - 1",
+   "docstring": "The squared scale of the normalized squaring flow at a unit-variance coordinate:\n`σ² = Var(X²) = E[X⁴] - 1`.\n\nEmpirical status: DERIVED. The variance of the square of a unit-variance coordinate, with\nno free parameter; for genotypes it is `standardizedSquare_second_cumulant`.",
+   "empirical_status": "DERIVED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Calibrator.gaussianFloorOneScaleSq": [],
+     "Calibrator.gaussianFloorTwoScaleSq": [],
+     "Calibrator.hweFloorOneScaleSq_eq": [],
+     "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf": []
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.gaussianFloorOneScaleSq",
+    "Calibrator.gaussianFloorTwoScaleSq",
+    "Calibrator.hweFloorOneScaleSq_eq",
+    "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf"
+   ]
+  },
+  {
+   "name": "Calibrator.nextFloorFourthMoment",
+   "short": "nextFloorFourthMoment",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 1061,
+   "signature": "(m2 m4 m6 m8 : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "m2",
+      "m4",
+      "m6",
+      "m8"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (m8 - 4 * m6 + 6 * m4 - 4 * m2 + 1) / (m4 - 1) ^ 2",
+   "docstring": "The fourth moment of the next floor, `E[((X² - 1)/σ)⁴]`, expanded in the current\nfloor's even moments: `(m₈ - 4m₆ + 6m₄ - 4m₂ + 1) / (m₄ - 1)²`.\n\nEmpirical status: DERIVED. The binomial expansion of `(X² - 1)⁴` divided by `σ⁴`; no free\nparameter and nothing fitted.",
+   "empirical_status": "DERIVED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Calibrator.gaussianFloorTwoFourthMoment": [],
+     "Calibrator.gaussianFloorTwoScaleSq": []
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.gaussianFloorTwoFourthMoment",
+    "Calibrator.gaussianFloorTwoScaleSq"
+   ]
+  },
+  {
+   "name": "Calibrator.squaringStep",
+   "short": "squaringStep",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 1177,
+   "signature": "(scale x : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "scale",
+      "x"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " (x ^ 2 - 1) / scale",
+   "docstring": "**The one-step map of the flow**: `x ↦ (x² - 1)/σ`, one floor of the tower applied to\na point rather than to a law.\n\nEmpirical status: DERIVED. The centering-and-rescaling step that defines the tower; the\ncentering constant is forced by `E[X²] = 1` and the scale by `Var(X²)`, so there is no free\nparameter.",
+   "empirical_status": "DERIVED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "scale ≠ 0"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.squaringFixedPoint_isFixedPoint": [
+      "scale ≠ 0"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.squaringFixedPoint_isFixedPoint"
+   ]
+  },
+  {
+   "name": "Calibrator.squaringFixedPoint",
+   "short": "squaringFixedPoint",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 1183,
+   "signature": "(scale : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "scale"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (scale + Real.sqrt (scale ^ 2 + 4)) / 2",
+   "docstring": "The positive fixed point of the normalized squaring flow, `(σ + √(σ² + 4))/2`.\n\nEmpirical status: DERIVED. The positive root of `x² - σx - 1 = 0`, which is the fixed-point\nequation of `squaringStep`; no free parameter.",
+   "empirical_status": "DERIVED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "scale ≠ 0",
+     "0 ≤ scale"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.squaringFixedPoint_root": [],
+     "Calibrator.squaringFixedPoint_isFixedPoint": [
+      "scale ≠ 0"
+     ],
+     "Calibrator.scale_le_squaringFixedPoint": [
+      "0 ≤ scale"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.scale_le_squaringFixedPoint",
+    "Calibrator.squaringFixedPoint_isFixedPoint",
+    "Calibrator.squaringFixedPoint_root"
    ]
   },
   {
@@ -7039,10 +7505,6 @@
      "Calibrator.commonAndRarePortableModel_sourceR2": [],
      "Calibrator.commonAndRarePortableModel_targetR2": [],
      "Calibrator.wgs_eliminates_ld_mismatch": [],
-     "Calibrator.taggingProjection_eq_direct_plus_proxy": [],
-     "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect": [],
-     "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context": [],
-     "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores": [],
      "Calibrator.identityDirectMetricModel_source_weights": [],
      "Calibrator.identityDirectMetricModel_metrics": [],
      "Calibrator.baseline_mechanistic_metrics": [],
@@ -7069,7 +7531,6 @@
     "Calibrator.commonAndRarePortableModel_targetR2",
     "Calibrator.commonOnlyPortableModel_sourceR2",
     "Calibrator.commonOnlyPortableModel_targetR2",
-    "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context",
     "Calibrator.cross_trait_portability_gain",
     "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
     "Calibrator.identityDirectMetricModel_metrics",
@@ -7079,9 +7540,6 @@
     "Calibrator.popgenDrivenProxyGenerationalModel_source_weights",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
-    "Calibrator.taggingProjection_eq_direct_plus_proxy",
-    "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect",
-    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores",
     "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
     "Calibrator.target_effect_shift_changes_target_r2",
@@ -7140,10 +7598,6 @@
      "Calibrator.commonAndRarePortableModel_sourceR2": [],
      "Calibrator.commonAndRarePortableModel_targetR2": [],
      "Calibrator.wgs_eliminates_ld_mismatch": [],
-     "Calibrator.taggingProjection_eq_direct_plus_proxy": [],
-     "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect": [],
-     "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context": [],
-     "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores": [],
      "Calibrator.identityDirectMetricModel_source_weights": [],
      "Calibrator.identityDirectMetricModel_metrics": [],
      "Calibrator.baseline_mechanistic_metrics": [],
@@ -7170,7 +7624,6 @@
     "Calibrator.commonAndRarePortableModel_targetR2",
     "Calibrator.commonOnlyPortableModel_sourceR2",
     "Calibrator.commonOnlyPortableModel_targetR2",
-    "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context",
     "Calibrator.cross_trait_portability_gain",
     "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
     "Calibrator.identityDirectMetricModel_metrics",
@@ -7180,9 +7633,6 @@
     "Calibrator.popgenDrivenProxyGenerationalModel_source_weights",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
-    "Calibrator.taggingProjection_eq_direct_plus_proxy",
-    "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect",
-    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores",
     "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
     "Calibrator.target_effect_shift_changes_target_r2",
@@ -10387,7 +10837,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/DGP.lean",
-   "line": 2104,
+   "line": 2135,
    "signature": "(vSignal vNoise : ℝ) : ℝ",
    "args": [
     {
@@ -10402,8 +10852,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  Phi (Real.sqrt (vSignal / (2 * vNoise)))",
-   "docstring": "Exact equal-variance Gaussian liability AUC from signal and residual variances.",
-   "empirical_status": "",
+   "docstring": "**AUC of the equal-variance Gaussian model**, from signal and residual\n    variances: `Φ(√(vSignal / (2 · vNoise)))`.\n\n    **Not the liability-threshold AUC.** The docstring here used to call it\n    that. The liability-threshold AUC depends on prevalence, which this\n    signature cannot express, and its sibling\n    `equalVarianceGaussianAUCFromVariances` -- which now calls this body --\n    carries the marker recording that the liability reading is falsified. Two\n    copies of one formula had drifted to opposite claims about which quantity\n    it is; that is why they are one definition now.\n\n    **Boundary defect, measured.** Perfect prediction, `vNoise = 0`, is\n    attainable in this signature, and division being total there sends the\n    argument to `0` rather than to `+∞`. So the body returns `Φ(0) = 1/2`,\n    chance discrimination, where the limit as `vNoise → 0⁺` is `1`, perfect\n    discrimination. The returned value sits at the opposite end of the AUC\n    range from the limit -- the full width of `[1/2, 1]`.\n\n    The defect is upstream of `Phi` and is not an artefact of any numeric\n    stand-in for it: the argument itself jumps from divergent to zero, so every\n    monotone increasing map of it is wrong in the same direction. Checked by\n    substituting the logistic, a shifted `tanh` and `z/(1+z)` for `Phi`; all\n    four return `1/2` at the boundary against `≈ 1` just inside it.\n\n    Empirical status: VALIDATED for the equal-variance Gaussian model, away\n    from `vNoise = 0`. Measured against Monte-Carlo of the underlying\n    two-Gaussian model, 200000 draws per point: predicted against simulated\n    `0.760250/0.760040`, `0.921350/0.921505`, `0.999797/0.999820`,\n    `1.000000/1.000000` at `vNoise = 1, 0.25, 0.04, 0.01` with `vSignal = 1`;\n    largest absolute difference `2.1e-4`. Power: the prediction spans `0.760`\n    to `1.000` across that design, so a wrong functional form of this shape\n    would separate. At the boundary itself it is FALSIFIED, as above.",
+   "empirical_status": "VALIDATED",
    "namespace": "Calibrator.TransportedMetrics",
    "fields": [],
    "equations": [],
@@ -10428,7 +10878,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/DGP.lean",
-   "line": 2108,
+   "line": 2139,
    "signature": "(π r2 : ℝ) : ℝ",
    "args": [
     {
@@ -10487,7 +10937,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/DGP.lean",
-   "line": 2120,
+   "line": 2151,
    "signature": "(π vSignal vResidual : ℝ) : ℝ",
    "args": [
     {
@@ -10541,7 +10991,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/DGP.lean",
-   "line": 2146,
+   "line": 2177,
    "signature": "(penalty : IrreducibleTargetPenalty) : ℝ",
    "args": [
     {
@@ -10586,7 +11036,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/DGP.lean",
-   "line": 2181,
+   "line": 2212,
    "signature": "(π vNoise vSignal : ℝ) : Profile where r2",
    "args": [
     {
@@ -10626,7 +11076,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/DGP.lean",
-   "line": 2213,
+   "line": 2244,
    "signature": "(π vNoise vSignal : ℝ) (penalty : IrreducibleTargetPenalty) : Profile",
    "args": [
     {
@@ -10674,7 +11124,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/DGP.lean",
-   "line": 2246,
+   "line": 2277,
    "signature": "(m : PGSEvolutionaryModel) : EvolutionaryCoordinateSummary where alleleFreqCoordinate",
    "args": [
     {
@@ -10709,7 +11159,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/DGP.lean",
-   "line": 2307,
+   "line": 2338,
    "signature": "(m : PGSEvolutionaryModel) (vSignalTarget : ℝ) (penalty : TransportedMetrics.IrreducibleTargetPenalty) : TransportedMetrics.Profile",
    "args": [
     {
@@ -10757,7 +11207,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/DGP.lean",
-   "line": 2348,
+   "line": 2379,
    "signature": "(Ne mu m_rate : ℝ) : ℝ",
    "args": [
     {
@@ -10809,7 +11259,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/DGP.lean",
-   "line": 2354,
+   "line": 2385,
    "signature": "(r : ℝ) : ℝ",
    "args": [
     {
@@ -12419,6 +12869,11 @@
     "hypotheses": [],
     "hypotheses_by_theorem": {
      "Calibrator.measurement_invariance_violation": [],
+     "Calibrator.squaringFixedPoint_root": [],
+     "Calibrator.squaringFixedPoint_isFixedPoint": [],
+     "Calibrator.scale_le_squaringFixedPoint": [],
+     "Calibrator.ScaleSequence.no_escape_below_radius": [],
+     "Calibrator.ScaleSequence.sampleSize_doubly_exponential": [],
      "Calibrator.standardizedGenotype_symmetric_iff": [],
      "Calibrator.covarianceMatrix_addRankOneSignal": [],
      "Calibrator.covariance_imitation_of_rankOne_closed": [],
@@ -12445,6 +12900,8 @@
     }
    },
    "mentioned_by": [
+    "Calibrator.ScaleSequence.no_escape_below_radius",
+    "Calibrator.ScaleSequence.sampleSize_doubly_exponential",
     "Calibrator.add_rankOneBump_diagonal_gap_ne_of_active",
     "Calibrator.add_rankOneBump_not_constantDiagonal",
     "Calibrator.add_rankOneBump_not_shiftInvariant",
@@ -12461,11 +12918,14 @@
     "Calibrator.rankOneCovarianceBump_conjugate",
     "Calibrator.rankOneCovarianceBump_eq_smul_spikeOuter",
     "Calibrator.rightTransform_addRankOneSignal",
+    "Calibrator.scale_le_squaringFixedPoint",
     "Calibrator.secondMoment_imitation_invisible_to_orthogonal_score",
     "Calibrator.secondMoment_imitation_shift",
     "Calibrator.shiftInvariant_class_is_rankOne_rigid",
     "Calibrator.spiked_eq_add_rankOneCovarianceBump",
     "Calibrator.spiked_genotype_covariance_belowCeiling",
+    "Calibrator.squaringFixedPoint_isFixedPoint",
+    "Calibrator.squaringFixedPoint_root",
     "Calibrator.standardizedGenotype_symmetric_iff",
     "Calibrator.target_axis_control_iff_uniformly_unbiased",
     "Calibrator.varianceNonneg_sub_rankOne_iff"
@@ -12675,6 +13135,13 @@
      ],
      "Calibrator.MafSpectrum.fourthMoment_eq": [],
      "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [],
+     "Calibrator.hweFloorOneScaleSq_eq": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf": [
+      "h.altFreq = gaussianKurtosisMaf"
+     ],
      "Calibrator.standardizedGenotype_symmetric_iff": [
       "0 < h.altFreq",
       "h.altFreq < 1"
@@ -12726,6 +13193,8 @@
     "Calibrator.centeredSquare_expectation_zero",
     "Calibrator.centeredSquare_negative_at_half",
     "Calibrator.centeredSquare_third_moment_eq",
+    "Calibrator.hweFloorOneScaleSq_eq",
+    "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf",
     "Calibrator.hweLevelOne_symmetry",
     "Calibrator.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance",
     "Calibrator.moment_eq_of_altFreq_eq",
@@ -20233,24 +20702,24 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
-     "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
-     "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
+     "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
+     "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
      "m.targetPrevalence * (1 - m.targetPrevalence"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.brierDiscriminationLoss_eq": [],
      "Calibrator.observableBrier_change_decomposition": [],
      "Calibrator.brierDiscriminationLoss_pos_of_mechanistic_r2_drop": [
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m"
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source"
      ],
      "Calibrator.brier_increase_mainly_calibration": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
       "m.targetPrevalence * (1 - m.targetPrevalence"
      ],
      "Calibrator.brier_proper_score_portability_decomposition": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
       "m.targetPrevalence * (1 - m.targetPrevalence"
      ]
     },
@@ -20315,27 +20784,27 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
-     "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
+     "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
      "πSource * (1 - πSource",
-     "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+     "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
      "m.targetPrevalence * (1 - m.targetPrevalence"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.brierCalibrationLoss_eq": [],
      "Calibrator.observableBrier_change_decomposition": [],
      "Calibrator.brierCalibrationLoss_pos_of_prevalence_factor_increase": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
       "πSource * (1 - πSource"
      ],
      "Calibrator.brier_increase_mainly_calibration": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
       "πSource * (1 - πSource",
       "m.targetPrevalence * (1 - m.targetPrevalence"
      ],
      "Calibrator.brier_proper_score_portability_decomposition": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
       "πSource * (1 - πSource",
       "m.targetPrevalence * (1 - m.targetPrevalence"
      ]
@@ -26883,7 +27352,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  sourceCalibrationSlopeFromSourceWeights m.metric",
+   "body": "  calibrationSlopeFromSourceWeights m.metric Pop.source",
    "docstring": "Literal source calibration slope on the explicit SNP-level transport state.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -26920,7 +27389,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  targetCalibrationSlopeFromSourceWeights m.metric",
+   "body": "  calibrationSlopeFromSourceWeights m.metric Pop.target",
    "docstring": "Literal target calibration slope on the explicit SNP-level transport state.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -30713,8 +31182,8 @@
    ]
   },
   {
-   "name": "Calibrator.effectCorrelationStabilizing",
-   "short": "effectCorrelationStabilizing",
+   "name": "Calibrator.effectCorrelationStabilizingDriftSelection",
+   "short": "effectCorrelationStabilizingDriftSelection",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PolygenicAdaptation.lean",
@@ -30743,8 +31212,17 @@
     "declared_kind": "correlation",
     "declared_lo": -1.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.effectCorrelation_mem_range",
+     4
+    ],
+    "range_hi_thm": [
+     "Calibrator.effectCorrelation_mem_range",
+     4
+    ],
+    "range_lo": -1,
+    "range_hi": 1,
     "hypotheses": [
-     "stabilizingSelectedArchitectureVariance v_mutation s < v_selected_obs",
      "0 ≤ d",
      "d ≤ 1",
      "0 ≤ s * N",
@@ -30754,9 +31232,6 @@
      "0 < N"
     ],
     "hypotheses_by_theorem": {
-     "Calibrator.worse_than_neutral_implies_diversifying_selection": [
-      "stabilizingSelectedArchitectureVariance v_mutation s < v_selected_obs"
-     ],
      "Calibrator.effectCorrelation_mem_range": [
       "0 ≤ d",
       "d ≤ 1",
@@ -30774,38 +31249,13 @@
       "d ≤ 1",
       "0 < s",
       "0 < N"
-     ],
-     "Calibrator.effect_correlation_increases_with_Ns": [],
-     "Calibrator.effectCorrelationStabilizing_pos": [],
-     "Calibrator.effectCorrelationStabilizing_lt_one": [],
-     "Calibrator.fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold": [],
-     "Calibrator.effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs": [],
-     "Calibrator.observedSelectionSummary_identifies_fluctuating_not_stabilizing": [
-      "stabilizingSelectedArchitectureVariance v_mutation s < v_selected_obs"
      ]
-    },
-    "range_lo_thm": [
-     "Calibrator.effectCorrelation_mem_range",
-     4
-    ],
-    "range_hi_thm": [
-     "Calibrator.effectCorrelation_mem_range",
-     4
-    ],
-    "range_lo": -1,
-    "range_hi": 1
+    }
    },
    "mentioned_by": [
-    "Calibrator.effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs",
-    "Calibrator.effectCorrelationStabilizing_lt_one",
-    "Calibrator.effectCorrelationStabilizing_pos",
     "Calibrator.effectCorrelation_mem_range",
-    "Calibrator.effect_correlation_increases_with_Ns",
-    "Calibrator.fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold",
     "Calibrator.fluctuating_selection_worst_portability",
-    "Calibrator.observedSelectionSummary_identifies_fluctuating_not_stabilizing",
-    "Calibrator.stabilizing_maintains_architecture",
-    "Calibrator.worse_than_neutral_implies_diversifying_selection"
+    "Calibrator.stabilizing_maintains_architecture"
    ]
   },
   {
@@ -35374,8 +35824,7 @@
      "Calibrator.stabilizing_le_neutral": [],
      "Calibrator.diversifyingPortability_nonneg": [],
      "Calibrator.diversifying_lt_stabilizing": [],
-     "Calibrator.targetPGSVariance_eq_pgsVarianceFromHet": [],
-     "Calibrator.targetPGSVariance_eq_presentDay": [],
+     "Calibrator.presentDayPGSVariance_eq_one_sub_fst_mul": [],
      "Calibrator.variance_mean_pgs_diff": [],
      "Calibrator.presentDayR2_eq_statistical_rsquared": [],
      "Calibrator.presentDayEqualVarianceGaussianAUC_eq": [],
@@ -35441,6 +35890,7 @@
     "Calibrator.portabilityFromArchitecture_from_divergence",
     "Calibrator.portability_bounded_by_rg_sq",
     "Calibrator.presentDayEqualVarianceGaussianAUC_eq",
+    "Calibrator.presentDayPGSVariance_eq_one_sub_fst_mul",
     "Calibrator.presentDayPGSVariance_eq_retainedFraction",
     "Calibrator.presentDayR2_eq_expectedR2",
     "Calibrator.presentDayR2_eq_statistical_rsquared",
@@ -35454,8 +35904,6 @@
     "Calibrator.stabilizingPortability_uses_ploidy",
     "Calibrator.stabilizing_le_neutral",
     "Calibrator.taggedDriftR2Ratio_ge_retention",
-    "Calibrator.targetPGSVariance_eq_pgsVarianceFromHet",
-    "Calibrator.targetPGSVariance_eq_presentDay",
     "Calibrator.targetR2FromNeutralAFBenchmark_self",
     "Calibrator.twoPopDriftVariance_eq_expectedFreqDiffSq",
     "Calibrator.twoPopDriftVariance_eq_sum",
@@ -36277,13 +36725,55 @@
     "declared_hi": 1.0,
     "hypotheses": [],
     "hypotheses_by_theorem": {
-     "Calibrator.targetPGSVariance_eq_pgsVarianceFromHet": [],
-     "Calibrator.targetPGSVariance_eq_presentDay": []
+     "Calibrator.selection_dominant_for_immune": [],
+     "Calibrator.counterfactual_same_ancestry_perfect": [],
+     "Calibrator.amEquilibrium_then_drift": [],
+     "Calibrator.presentDayPGSVariance_eq_retainedFraction": [],
+     "Calibrator.neutralDriftR2Ratio_eq": [],
+     "Calibrator.ascertainment_loss_eq_presentDayPGSVariance": [],
+     "Calibrator.presentDayR2_eq_expectedR2": [],
+     "Calibrator.drift_only_overestimates_immune_portability": [],
+     "Calibrator.neutralPortabilityRatioLD_eq_presentDayPGSVariance": [],
+     "Calibrator.presentDayPGSVariance_eq_one_sub_fst_mul": [],
+     "Calibrator.expected_abs_mean_shift_bound_proved": [],
+     "Calibrator.drift_degrades_signalToNoise": [],
+     "Calibrator.drift_degrades_R2": [],
+     "Calibrator.drift_degrades_AUC_of_strictMono": [],
+     "Calibrator.drift_degrades_equalVarianceGaussianAUC": [],
+     "Calibrator.portability_ratio_with_ld_decay": [],
+     "Calibrator.neutralAFBenchmarkRatio_from_state": [],
+     "Calibrator.equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC": [],
+     "Calibrator.presentDayPGSVarianceMutationDrift_pure_drift": [],
+     "Calibrator.mutationDrift_signal_lt_puredrift": [],
+     "Calibrator.equilibrium_drift_component_improves_with_theta": [],
+     "Calibrator.mutationDrift_variance_ratio": [],
+     "Calibrator.neutral_af_benchmark_correction_factor": []
     }
    },
    "mentioned_by": [
-    "Calibrator.targetPGSVariance_eq_pgsVarianceFromHet",
-    "Calibrator.targetPGSVariance_eq_presentDay"
+    "Calibrator.amEquilibrium_then_drift",
+    "Calibrator.ascertainment_loss_eq_presentDayPGSVariance",
+    "Calibrator.counterfactual_same_ancestry_perfect",
+    "Calibrator.drift_degrades_AUC_of_strictMono",
+    "Calibrator.drift_degrades_R2",
+    "Calibrator.drift_degrades_equalVarianceGaussianAUC",
+    "Calibrator.drift_degrades_signalToNoise",
+    "Calibrator.drift_only_overestimates_immune_portability",
+    "Calibrator.equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC",
+    "Calibrator.equilibrium_drift_component_improves_with_theta",
+    "Calibrator.expected_abs_mean_shift_bound_proved",
+    "Calibrator.mutationDrift_signal_lt_puredrift",
+    "Calibrator.mutationDrift_variance_ratio",
+    "Calibrator.neutralAFBenchmarkRatio_from_state",
+    "Calibrator.neutralDriftR2Ratio_eq",
+    "Calibrator.neutralPortabilityRatioLD_eq_presentDayPGSVariance",
+    "Calibrator.neutral_af_benchmark_correction_factor",
+    "Calibrator.portability_ratio_with_ld_decay",
+    "Calibrator.presentDayPGSVarianceMutationDrift_pure_drift",
+    "Calibrator.presentDayPGSVariance_eq_one_sub_fst_mul",
+    "Calibrator.presentDayPGSVariance_eq_retainedFraction",
+    "Calibrator.presentDayR2_eq_expectedR2",
+    "Calibrator.selection_dominant_for_immune"
    ]
   },
   {
@@ -36327,12 +36817,12 @@
    ]
   },
   {
-   "name": "Calibrator.targetPGSVariance",
-   "short": "targetPGSVariance",
+   "name": "Calibrator.presentDayPGSVariance",
+   "short": "presentDayPGSVariance",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 679,
+   "line": 687,
    "signature": "(V_A fst : ℝ) : ℝ",
    "args": [
     {
@@ -36347,48 +36837,7 @@
    ],
    "ret_type": "ℝ",
    "body": "  pgsVarianceFromHet V_A (1 - fst)",
-   "docstring": "Target-population PGS variance derived from the additive model and Fst.\nDerivation:\n  1. V_PGS_source = Σᵢ βᵢ² × 2p_source_i(1 - p_source_i) = V_A  (source variance)\n  2. Under drift, E[2p_target(1-p_target)] = 2p_source(1-p_source) × (1 - Fst)\n     (this IS the definition of Fst applied per-locus, then summed)\n  3. So E[V_PGS_target] = Σᵢ βᵢ² × 2p_source_i(1-p_source_i) × (1 - Fst)\n                         = V_A × (1 - Fst)\n\nHere V_A encodes both Σᵢ βᵢ² and the source heterozygosity, so the target\nvariance is `pgsVarianceFromHet(V_A, 1 - fst)`.\n\n    Empirical status: UNTESTED.",
-   "empirical_status": "UNTESTED",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "F_ST",
-    "declared_lo": 0.0,
-    "declared_hi": 1.0,
-    "hypotheses": [],
-    "hypotheses_by_theorem": {
-     "Calibrator.targetPGSVariance_eq_pgsVarianceFromHet": [],
-     "Calibrator.targetPGSVariance_eq_presentDay": []
-    }
-   },
-   "mentioned_by": [
-    "Calibrator.targetPGSVariance_eq_pgsVarianceFromHet",
-    "Calibrator.targetPGSVariance_eq_presentDay"
-   ]
-  },
-  {
-   "name": "Calibrator.presentDayPGSVariance",
-   "short": "presentDayPGSVariance",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 689,
-   "signature": "(V_A fst : ℝ) : ℝ",
-   "args": [
-    {
-     "names": [
-      "V_A",
-      "fst"
-     ],
-     "type": "ℝ",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  (1 - fst) * V_A",
-   "docstring": "Present-day PGS variance after drift from an ancestral variance `V_A`.\nThis is definitionally equal to `targetPGSVariance` — both encode\nE[V_PGS_target] = V_A × (1 - Fst), derived from the Fst-heterozygosity identity.",
+   "docstring": "**Present-day PGS variance after drift** from an ancestral variance `V_A`.\n\nThere used to be two names for this — `targetPGSVariance`, defined as\n`pgsVarianceFromHet V_A (1 - fst)`, and `presentDayPGSVariance`, defined as\n`(1 - fst) * V_A` — together with a theorem proving them equal. Two bodies for one\nquantity is the failure this file's own regime discussion is about, so there is now one\ndefinition, and it is the composition rather than a re-typed product: the\nFst-heterozygosity step is applied, not restated.",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
@@ -36434,7 +36883,7 @@
      "Calibrator.worse_than_neutral_implies_diversifying_selection": [
       "0 < V_A"
      ],
-     "Calibrator.targetPGSVariance_eq_presentDay": [],
+     "Calibrator.presentDayPGSVariance_eq_one_sub_fst_mul": [],
      "Calibrator.expected_abs_mean_shift_bound_proved": [
       "0 < V_A"
      ],
@@ -36509,12 +36958,12 @@
     "Calibrator.portability_ratio_with_ld_decay",
     "Calibrator.portability_ratio_with_ld_decay_general",
     "Calibrator.presentDayPGSVarianceMutationDrift_pure_drift",
+    "Calibrator.presentDayPGSVariance_eq_one_sub_fst_mul",
     "Calibrator.presentDayPGSVariance_eq_retainedFraction",
     "Calibrator.presentDayR2_eq_expectedR2",
     "Calibrator.presentDayR2_eq_statistical_rsquared",
     "Calibrator.selection_dominant_for_immune",
     "Calibrator.taggedDriftR2Ratio_ge_retention",
-    "Calibrator.targetPGSVariance_eq_presentDay",
     "Calibrator.worse_than_neutral_implies_diversifying_selection"
    ]
   },
@@ -36524,7 +36973,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 710,
+   "line": 707,
    "signature": "(N t : ℕ) : ℝ",
    "args": [
     {
@@ -36566,7 +37015,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 730,
+   "line": 727,
    "signature": "(N t : ℕ) : ℝ",
    "args": [
     {
@@ -36628,7 +37077,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 773,
+   "line": 770,
    "signature": "(V_A fst : ℝ) : ℝ",
    "args": [
     {
@@ -36675,7 +37124,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 777,
+   "line": 774,
    "signature": "(V_A fstS fstT : ℝ) : ℝ",
    "args": [
     {
@@ -36724,7 +37173,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 876,
+   "line": 873,
    "signature": "(V_A V_E fst : ℝ) : ℝ",
    "args": [
     {
@@ -36783,12 +37232,151 @@
    ]
   },
   {
+   "name": "Calibrator.expectedR2",
+   "short": "expectedR2",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/PortabilityDrift.lean",
+   "line": 882,
+   "signature": "(vSignal V_E : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "vSignal",
+      "V_E"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  vSignal / (vSignal + V_E)",
+   "docstring": "**Explained-variance ratio from a signal variance and a residual variance.**\n\nThis is the single place the ratio `vSignal / (vSignal + V_E)` is written down. Every\npresent-day, mutation-drift and temporal `R²` in the corpus is this function applied to a\ndifferent signal variance, and each of those is now that application rather than a second\ncopy of the same quotient.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "R-squared",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "0 < V_E",
+     "0 < vSignal"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.selection_dominant_for_immune": [
+      "0 < V_E"
+     ],
+     "Calibrator.ld_mediates_portability": [
+      "0 < vSignal",
+      "0 < V_E"
+     ],
+     "Calibrator.environment_mediates_portability": [],
+     "Calibrator.counterfactual_same_ancestry_perfect": [
+      "0 < V_E"
+     ],
+     "Calibrator.counterfactual_wgs_residual": [
+      "0 < vSignal",
+      "0 < V_E"
+     ],
+     "Calibrator.counterfactual_infinite_sample": [
+      "0 < vSignal",
+      "0 < V_E"
+     ],
+     "Calibrator.counterfactual_equal_environments": [
+      "0 < vSignal",
+      "0 < V_E"
+     ],
+     "Calibrator.intervention_hierarchy": [
+      "0 < V_E"
+     ],
+     "Calibrator.diminishing_marginal_returns": [
+      "0 < V_E"
+     ],
+     "Calibrator.presentDayR2_eq_expectedR2": [],
+     "Calibrator.expectedR2_gain_eq": [
+      "0 < V_E"
+     ],
+     "Calibrator.expectedR2_gain_strictAnti_base": [
+      "0 < V_E"
+     ],
+     "Calibrator.portability_concave_in_fst_reduction": [
+      "0 < V_E"
+     ],
+     "Calibrator.drift_only_overestimates_immune_portability": [
+      "0 < V_E"
+     ],
+     "Calibrator.worse_than_neutral_implies_diversifying_selection": [
+      "0 < V_E"
+     ],
+     "Calibrator.presentDayR2_eq_statistical_rsquared": [],
+     "Calibrator.drift_degrades_R2": [
+      "0 < V_E"
+     ],
+     "Calibrator.expectedR2_strictMono_nonneg": [
+      "0 < V_E"
+     ],
+     "Calibrator.portability_ratio_with_target_ld_decay_any_source": [
+      "0 < V_E"
+     ],
+     "Calibrator.portability_ratio_with_ld_decay": [
+      "0 < V_E"
+     ],
+     "Calibrator.portability_ratio_with_ld_decay_general": [
+      "0 < V_E"
+     ],
+     "Calibrator.neutralAFBenchmarkRatio_from_state": [
+      "0 < V_E"
+     ],
+     "Calibrator.equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC": [
+      "0 < V_E"
+     ],
+     "Calibrator.mutationDrift_R2_lt_puredrift_R2": [
+      "0 < V_E"
+     ]
+    },
+    "range_hi_thm": [
+     "Calibrator.environment_mediates_portability",
+     2
+    ],
+    "range_hi": 1
+   },
+   "mentioned_by": [
+    "Calibrator.counterfactual_equal_environments",
+    "Calibrator.counterfactual_infinite_sample",
+    "Calibrator.counterfactual_same_ancestry_perfect",
+    "Calibrator.counterfactual_wgs_residual",
+    "Calibrator.diminishing_marginal_returns",
+    "Calibrator.drift_degrades_R2",
+    "Calibrator.drift_only_overestimates_immune_portability",
+    "Calibrator.environment_mediates_portability",
+    "Calibrator.equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC",
+    "Calibrator.expectedR2_gain_eq",
+    "Calibrator.expectedR2_gain_strictAnti_base",
+    "Calibrator.expectedR2_strictMono_nonneg",
+    "Calibrator.intervention_hierarchy",
+    "Calibrator.ld_mediates_portability",
+    "Calibrator.mutationDrift_R2_lt_puredrift_R2",
+    "Calibrator.neutralAFBenchmarkRatio_from_state",
+    "Calibrator.portability_concave_in_fst_reduction",
+    "Calibrator.portability_ratio_with_ld_decay",
+    "Calibrator.portability_ratio_with_ld_decay_general",
+    "Calibrator.portability_ratio_with_target_ld_decay_any_source",
+    "Calibrator.presentDayR2_eq_expectedR2",
+    "Calibrator.presentDayR2_eq_statistical_rsquared",
+    "Calibrator.selection_dominant_for_immune",
+    "Calibrator.worse_than_neutral_implies_diversifying_selection"
+   ]
+  },
+  {
    "name": "Calibrator.presentDayR2",
    "short": "presentDayR2",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 887,
+   "line": 890,
    "signature": "(V_A V_E fst : ℝ) : ℝ",
    "args": [
     {
@@ -36803,8 +37391,8 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  let v := presentDayPGSVariance V_A fst\n  v / (v + V_E)",
-   "docstring": "Present-day coefficient of determination (R²) under drift.\nThis is the explained-variance ratio, a definitional identity from statistics:\n  R² = V_signal / V_total = V_PGS / (V_PGS + V_E)\nwhere V_PGS = presentDayPGSVariance V_A fst = V_A × (1 - Fst) is the\ndrift-attenuated PGS variance (derived via the Fst-heterozygosity chain above)\nand V_E is the environmental (residual) variance. The ratio is not a claim\nrequiring proof — it is the definition of the fraction of phenotypic variance\nexplained by the PGS in the target population.",
+   "body": "  expectedR2 (presentDayPGSVariance V_A fst) V_E",
+   "docstring": "**Present-day coefficient of determination under drift.**\n\n`R² = V_PGS / (V_PGS + V_E)` where `V_PGS = presentDayPGSVariance V_A fst`. The quotient\nitself is not restated here: this is `expectedR2` applied to the drift-attenuated signal\nvariance, so the two cannot drift apart.",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
@@ -36942,133 +37530,12 @@
    ]
   },
   {
-   "name": "Calibrator.expectedR2",
-   "short": "expectedR2",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 935,
-   "signature": "(vSignal V_E : ℝ) : ℝ",
-   "args": [
-    {
-     "names": [
-      "vSignal",
-      "V_E"
-     ],
-     "type": "ℝ",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  vSignal / (vSignal + V_E)",
-   "docstring": "Expected `R²` from signal variance and environmental variance.",
-   "empirical_status": "",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "R-squared",
-    "declared_lo": 0.0,
-    "declared_hi": 1.0,
-    "hypotheses": [
-     "0 < V_E",
-     "0 < vSignal"
-    ],
-    "hypotheses_by_theorem": {
-     "Calibrator.selection_dominant_for_immune": [
-      "0 < V_E"
-     ],
-     "Calibrator.ld_mediates_portability": [
-      "0 < vSignal",
-      "0 < V_E"
-     ],
-     "Calibrator.environment_mediates_portability": [],
-     "Calibrator.counterfactual_same_ancestry_perfect": [
-      "0 < V_E"
-     ],
-     "Calibrator.counterfactual_wgs_residual": [
-      "0 < vSignal",
-      "0 < V_E"
-     ],
-     "Calibrator.counterfactual_infinite_sample": [
-      "0 < vSignal",
-      "0 < V_E"
-     ],
-     "Calibrator.counterfactual_equal_environments": [
-      "0 < vSignal",
-      "0 < V_E"
-     ],
-     "Calibrator.intervention_hierarchy": [
-      "0 < V_E"
-     ],
-     "Calibrator.diminishing_marginal_returns": [
-      "0 < V_E"
-     ],
-     "Calibrator.presentDayR2_eq_expectedR2": [],
-     "Calibrator.expectedR2_gain_eq": [
-      "0 < V_E"
-     ],
-     "Calibrator.expectedR2_gain_strictAnti_base": [
-      "0 < V_E"
-     ],
-     "Calibrator.portability_concave_in_fst_reduction": [
-      "0 < V_E"
-     ],
-     "Calibrator.drift_only_overestimates_immune_portability": [
-      "0 < V_E"
-     ],
-     "Calibrator.worse_than_neutral_implies_diversifying_selection": [
-      "0 < V_E"
-     ],
-     "Calibrator.expectedR2_strictMono_nonneg": [
-      "0 < V_E"
-     ],
-     "Calibrator.portability_ratio_with_target_ld_decay_any_source": [
-      "0 < V_E"
-     ],
-     "Calibrator.portability_ratio_with_ld_decay": [
-      "0 < V_E"
-     ],
-     "Calibrator.portability_ratio_with_ld_decay_general": [
-      "0 < V_E"
-     ]
-    },
-    "range_hi_thm": [
-     "Calibrator.environment_mediates_portability",
-     2
-    ],
-    "range_hi": 1
-   },
-   "mentioned_by": [
-    "Calibrator.counterfactual_equal_environments",
-    "Calibrator.counterfactual_infinite_sample",
-    "Calibrator.counterfactual_same_ancestry_perfect",
-    "Calibrator.counterfactual_wgs_residual",
-    "Calibrator.diminishing_marginal_returns",
-    "Calibrator.drift_only_overestimates_immune_portability",
-    "Calibrator.environment_mediates_portability",
-    "Calibrator.expectedR2_gain_eq",
-    "Calibrator.expectedR2_gain_strictAnti_base",
-    "Calibrator.expectedR2_strictMono_nonneg",
-    "Calibrator.intervention_hierarchy",
-    "Calibrator.ld_mediates_portability",
-    "Calibrator.portability_concave_in_fst_reduction",
-    "Calibrator.portability_ratio_with_ld_decay",
-    "Calibrator.portability_ratio_with_ld_decay_general",
-    "Calibrator.portability_ratio_with_target_ld_decay_any_source",
-    "Calibrator.presentDayR2_eq_expectedR2",
-    "Calibrator.selection_dominant_for_immune",
-    "Calibrator.worse_than_neutral_implies_diversifying_selection"
-   ]
-  },
-  {
    "name": "Calibrator.presentDayGaussianAUC",
    "short": "presentDayGaussianAUC",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 943,
+   "line": 942,
    "signature": "(V_A V_E fst : ℝ) : ℝ",
    "args": [
     {
@@ -37130,7 +37597,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 952,
+   "line": 951,
    "signature": "(V_A V_E fst : ℝ) : ℝ",
    "args": [
     {
@@ -37197,7 +37664,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1094,
+   "line": 1093,
    "signature": "(V_A fst rhoSq : ℝ) : ℝ",
    "args": [
     {
@@ -37213,8 +37680,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  rhoSq * (1 - fst) * V_A",
-   "docstring": "Real-world PGS variance with both drift and LD tagging efficiency.\n\n    Empirical status: UNTESTED.",
-   "empirical_status": "UNTESTED",
+   "docstring": "",
+   "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
    "equations": [],
@@ -37253,7 +37720,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1140,
+   "line": 1139,
    "signature": "{α : Sort*} (s t : α) : Pop → α",
    "args": [
     {
@@ -37299,7 +37766,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1150,
+   "line": 1149,
    "signature": "{α : Sort*} (f : Pop → α) (t : α) : Pop → α",
    "args": [
     {
@@ -37343,7 +37810,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1153,
+   "line": 1152,
    "signature": "{α : Sort*} (f : Pop → α) (s : α) : Pop → α",
    "args": [
     {
@@ -37387,7 +37854,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1196,
+   "line": 1195,
    "signature": "{p : ℕ} (sigmaObsSource : Matrix (Fin p) (Fin p) ℝ) (crossSource : Fin p → ℝ) : Fin p → ℝ",
    "args": [
     {
@@ -37470,12 +37937,12 @@
    ]
   },
   {
-   "name": "Calibrator.sigmaTagCausal",
-   "short": "sigmaTagCausal",
+   "name": "Calibrator.sigmaTagCausalSourceAt",
+   "short": "sigmaTagCausalSourceAt",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1208,
+   "line": 1207,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -37515,97 +37982,19 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "hypotheses": [
-     "∀ i j, 0 ≤ m.sigmaTagCausal i j",
-     "∀ j, 0 ≤ m.traitBSpecificEffect j",
-     "∀ j, 0 ≤ m.sharedTraitEffect j",
-     "0 ≤ m.rg",
-     "∀ i, 0 ≤ m.sourceWeights i",
-     "(m.directCausal Pop.target",
-     "(m.novelDirectCausal Pop.target",
-     "(m.proxyTagging Pop.source",
-     "(m.proxyTagging Pop.target",
-     "(m.novelProxyTagging Pop.target"
-    ],
+    "hypotheses": [],
     "hypotheses_by_theorem": {
-     "Calibrator.CrossTraitBorrowingModel.traitBSpecificCrossCov_nonneg": [
-      "∀ i j, 0 ≤ m.sigmaTagCausal i j",
-      "∀ j, 0 ≤ m.traitBSpecificEffect j"
-     ],
-     "Calibrator.CrossTraitBorrowingModel.borrowedTraitBCrossCov_nonneg": [
-      "∀ i j, 0 ≤ m.sigmaTagCausal i j",
-      "∀ j, 0 ≤ m.sharedTraitEffect j",
-      "0 ≤ m.rg"
-     ],
-     "Calibrator.cross_trait_portability_gain": [
-      "∀ i, 0 ≤ m.sourceWeights i",
-      "∀ i j, 0 ≤ m.sigmaTagCausal i j",
-      "∀ j, 0 ≤ m.sharedTraitEffect j",
-      "∀ j, 0 ≤ m.traitBSpecificEffect j",
-      "0 ≤ m.rg"
-     ],
-     "Calibrator.commonOnlyPortableModel_sourceR2": [],
-     "Calibrator.commonOnlyPortableModel_targetR2": [],
-     "Calibrator.commonAndRarePortableModel_sourceR2": [],
-     "Calibrator.commonAndRarePortableModel_targetR2": [],
-     "Calibrator.wgs_eliminates_ld_mismatch": [
-      "(m.directCausal Pop.target",
-      "(m.novelDirectCausal Pop.target",
-      "(m.proxyTagging Pop.source",
-      "(m.proxyTagging Pop.target",
-      "(m.novelProxyTagging Pop.target"
-     ],
      "Calibrator.taggingProjection_eq_direct_plus_proxy": [],
      "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect": [],
      "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context": [],
-     "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores": [],
-     "Calibrator.identityDirectMetricModel_source_weights": [],
-     "Calibrator.identityDirectMetricModel_metrics": [],
-     "Calibrator.baseline_mechanistic_metrics": [],
-     "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
-     "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2": [],
-     "Calibrator.target_tagging_shift_changes_target_r2": [],
-     "Calibrator.target_effect_shift_changes_target_r2": [],
-     "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
-     "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2": [],
-     "Calibrator.novel_target_only_tagging_changes_target_r2": [],
-     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
-     "Calibrator.popgenDrivenProxyGenerationalModel_source_weights": [],
-     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
-     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one": [],
-     "Calibrator.target_r2_changes_along_generation_indexed_af_path": [],
-     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change": []
+     "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores": []
     }
    },
    "mentioned_by": [
-    "Calibrator.CrossTraitBorrowingModel.borrowedTraitBCrossCov_nonneg",
-    "Calibrator.CrossTraitBorrowingModel.traitBSpecificCrossCov_nonneg",
-    "Calibrator.baseline_mechanistic_metrics",
-    "Calibrator.commonAndRarePortableModel_sourceR2",
-    "Calibrator.commonAndRarePortableModel_targetR2",
-    "Calibrator.commonOnlyPortableModel_sourceR2",
-    "Calibrator.commonOnlyPortableModel_targetR2",
     "Calibrator.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context",
-    "Calibrator.cross_trait_portability_gain",
-    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
-    "Calibrator.identityDirectMetricModel_metrics",
-    "Calibrator.identityDirectMetricModel_source_weights",
-    "Calibrator.novel_target_only_tagging_changes_target_r2",
-    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
-    "Calibrator.popgenDrivenProxyGenerationalModel_source_weights",
-    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
-    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
     "Calibrator.taggingProjection_eq_direct_plus_proxy",
     "Calibrator.taggingProjection_target_eq_standing_plus_novelMutationEffect",
-    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores",
-    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
-    "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
-    "Calibrator.target_effect_shift_changes_target_r2",
-    "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
-    "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2",
-    "Calibrator.target_r2_changes_along_generation_indexed_af_path",
-    "Calibrator.target_tagging_shift_changes_target_r2",
-    "Calibrator.wgs_eliminates_ld_mismatch"
+    "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores"
    ]
   },
   {
@@ -37614,7 +38003,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1215,
+   "line": 1214,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Fin q → ℝ",
    "args": [
     {
@@ -37689,7 +38078,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1245,
+   "line": 1244,
    "signature": "{p : ℕ} (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ) (crossTarget : Fin p → ℝ) (noiseVar : ℝ) (w : Fin p → ℝ) : ℝ",
    "args": [
     {
@@ -37765,7 +38154,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1253,
+   "line": 1252,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -37794,7 +38183,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1257,
+   "line": 1256,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -37829,7 +38218,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1261,
+   "line": 1260,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -37858,7 +38247,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1265,
+   "line": 1264,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -37905,7 +38294,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1269,
+   "line": 1268,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -37931,7 +38320,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1273,
+   "line": 1272,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -37957,7 +38346,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1303,
+   "line": 1302,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Fin p → ℝ",
    "args": [
     {
@@ -37987,7 +38376,7 @@
     }
    ],
    "ret_type": "Fin p → ℝ",
-   "body": "  (sigmaTagCausal m P).mulVec (totalEffect m P) + m.contextCross P",
+   "body": "  (sigmaTagCausalSourceAt m P).mulVec (totalEffect m P) + m.contextCross P",
    "docstring": "**Predictor/outcome cross-covariance in a population**, from explicit biological and\nobservational drivers.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -38066,7 +38455,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1309,
+   "line": 1308,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin p → ℝ",
    "args": [
     {
@@ -38107,7 +38496,7 @@
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law": [],
      "Calibrator.target_score_variance_from_source_weights_identity": [],
      "Calibrator.targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_action": [],
-     "Calibrator.sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action": [],
+     "Calibrator.scoreVarianceFromSourceWeights_source_eq_score_on_covariance_action": [],
      "Calibrator.targetR2FromSourceWeights_exact_snp_transport_law": [],
      "Calibrator.identityDirectMetricModel_source_weights": [],
      "Calibrator.identityDirectMetricModel_metrics": [],
@@ -38141,7 +38530,7 @@
     "Calibrator.popgenDrivenProxyGenerationalModel_source_weights",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
-    "Calibrator.sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action",
+    "Calibrator.scoreVarianceFromSourceWeights_source_eq_score_on_covariance_action",
     "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law",
     "Calibrator.targetR2FromSourceWeights_exact_snp_transport_law",
     "Calibrator.targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_action",
@@ -38161,7 +38550,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1317,
+   "line": 1316,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (tagState : Fin p → ℝ) : ℝ",
    "args": [
     {
@@ -38216,7 +38605,7 @@
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law": [],
      "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores": [],
      "Calibrator.targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_action": [],
-     "Calibrator.sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action": [],
+     "Calibrator.scoreVarianceFromSourceWeights_source_eq_score_on_covariance_action": [],
      "Calibrator.targetR2FromSourceWeights_exact_snp_transport_law": [],
      "Calibrator.targetR2FromSourceWeights_exact_direct_proxy_context_law": [],
      "Calibrator.targetR2FromSourceWeights_exact_effect_heterogeneity_law": [],
@@ -38231,9 +38620,9 @@
     "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
     "Calibrator.identityDirectMetricModel_metrics",
     "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier",
+    "Calibrator.scoreVarianceFromSourceWeights_source_eq_score_on_covariance_action",
     "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
     "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov",
-    "Calibrator.sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action",
     "Calibrator.targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law",
     "Calibrator.targetCalibrationSlopeAtGeneration_exact_mechanistic_popgen_portability_law",
     "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law",
@@ -38257,7 +38646,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1329,
+   "line": 1328,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Fin p → ℝ",
    "args": [
     {
@@ -38287,7 +38676,7 @@
     }
    ],
    "ret_type": "Fin p → ℝ",
-   "body": "  (sigmaTagCausal m P).mulVec (totalEffect m P)",
+   "body": "  (sigmaTagCausalSourceAt m P).mulVec (totalEffect m P)",
    "docstring": "**Tag-to-causal projection in a population**, induced by that population's causal\neffect vector.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -38337,7 +38726,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1338,
+   "line": 1337,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin q → ℝ",
    "args": [
     {
@@ -38386,7 +38775,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1356,
+   "line": 1355,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin p → ℝ",
    "args": [
     {
@@ -38408,7 +38797,7 @@
     }
    ],
    "ret_type": "Fin p → ℝ",
-   "body": "  (sigmaTagCausal m Pop.target).mulVec (m.beta Pop.source)",
+   "body": "  (sigmaTagCausalSourceAt m Pop.target).mulVec (m.beta Pop.source)",
    "docstring": "Target tagging projection of the source effect vector through the target\ntagging surface. This isolates what would transport if target effects were\nidentical to source effects.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
@@ -38440,7 +38829,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1364,
+   "line": 1363,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin p → ℝ",
    "args": [
     {
@@ -38462,7 +38851,7 @@
     }
    ],
    "ret_type": "Fin p → ℝ",
-   "body": "  (sigmaTagCausal m Pop.target).mulVec (targetEffectHeterogeneity m)",
+   "body": "  (sigmaTagCausalSourceAt m Pop.target).mulVec (targetEffectHeterogeneity m)",
    "docstring": "Incremental target-side projection induced purely by effect-size\nheterogeneity relative to the source effect vector.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
@@ -38494,7 +38883,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1372,
+   "line": 1371,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin p → ℝ",
    "args": [
     {
@@ -38516,7 +38905,7 @@
     }
    ],
    "ret_type": "Fin p → ℝ",
-   "body": "  (sigmaTagCausal m Pop.target).mulVec (m.novelCausalEffect Pop.target)",
+   "body": "  (sigmaTagCausalSourceAt m Pop.target).mulVec (m.novelCausalEffect Pop.target)",
    "docstring": "Projection induced purely by target-only novel causal effects through the\ntarget tagging surface.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
@@ -38542,7 +38931,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1377,
+   "line": 1376,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Fin p → ℝ",
    "args": [
     {
@@ -38635,7 +39024,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1383,
+   "line": 1382,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : Fin p → ℝ",
    "args": [
     {
@@ -38723,13 +39112,13 @@
    ]
   },
   {
-   "name": "Calibrator.sourceScoreVarianceFromExplicitDrivers",
-   "short": "sourceScoreVarianceFromExplicitDrivers",
+   "name": "Calibrator.scoreVarianceFromSourceWeights",
+   "short": "scoreVarianceFromSourceWeights",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1462,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
+   "line": 1461,
+   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
      "names": [
@@ -38747,10 +39136,18 @@
      "type": "CrossPopulationMetricModel p q",
      "binder": "()",
      "implicit": false
+    },
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
     }
    ],
    "ret_type": "ℝ",
-   "body": "  let wS := sourceWeightsFromExplicitDrivers m\n  dotProduct wS ((m.sigmaTag Pop.source).mulVec wS)",
+   "body": "  let wS := sourceWeightsFromExplicitDrivers m\n  dotProduct wS ((m.sigmaTag P).mulVec wS)",
    "docstring": "Exact score variance in the source population under the learned source\nweights.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -38763,97 +39160,25 @@
     "hypotheses": [],
     "hypotheses_by_theorem": {
      "Calibrator.commonOnlyPortableModel_sourceR2": [],
-     "Calibrator.commonAndRarePortableModel_sourceR2": [],
-     "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
-     "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law": [],
-     "Calibrator.sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action": [],
-     "Calibrator.sourceR2FromSourceWeights_exact_metric_law": [],
-     "Calibrator.exactR2PortabilityRatio_mechanistic_law": [],
-     "Calibrator.sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portability_law": [],
-     "Calibrator.identityDirectMetricModel_metrics": [],
-     "Calibrator.baseline_mechanistic_metrics": [],
-     "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
-     "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2": [],
-     "Calibrator.target_tagging_shift_changes_target_r2": [],
-     "Calibrator.target_effect_shift_changes_target_r2": [],
-     "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
-     "Calibrator.novel_target_only_tagging_changes_target_r2": [],
-     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": []
-    }
-   },
-   "mentioned_by": [
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
-    "Calibrator.baseline_mechanistic_metrics",
-    "Calibrator.commonAndRarePortableModel_sourceR2",
-    "Calibrator.commonOnlyPortableModel_sourceR2",
-    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
-    "Calibrator.exactR2PortabilityRatio_mechanistic_law",
-    "Calibrator.identityDirectMetricModel_metrics",
-    "Calibrator.novel_target_only_tagging_changes_target_r2",
-    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
-    "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law",
-    "Calibrator.sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portability_law",
-    "Calibrator.sourceR2FromSourceWeights_exact_metric_law",
-    "Calibrator.sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action",
-    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
-    "Calibrator.target_effect_shift_changes_target_r2",
-    "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
-    "Calibrator.target_tagging_shift_changes_target_r2"
-   ]
-  },
-  {
-   "name": "Calibrator.targetScoreVarianceFromSourceWeights",
-   "short": "targetScoreVarianceFromSourceWeights",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1470,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
-   "args": [
-    {
-     "names": [
-      "p",
-      "q"
-     ],
-     "type": "ℕ",
-     "binder": "{}",
-     "implicit": true
-    },
-    {
-     "names": [
-      "m"
-     ],
-     "type": "CrossPopulationMetricModel p q",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  let wS := sourceWeightsFromExplicitDrivers m\n  dotProduct wS ((m.sigmaTag Pop.target).mulVec wS)",
-   "docstring": "Exact score variance in the target population when transporting the\nsource-learned weights. This captures changes in the target LD matrix even\nwhen the source weights are held fixed.",
-   "empirical_status": "",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "nonnegative",
-    "declared_lo": 0.0,
-    "declared_hi": null,
-    "hypotheses": [],
-    "hypotheses_by_theorem": {
      "Calibrator.commonOnlyPortableModel_targetR2": [],
+     "Calibrator.commonAndRarePortableModel_sourceR2": [],
      "Calibrator.commonAndRarePortableModel_targetR2": [],
      "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
+     "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
      "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
      "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law": [],
+     "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law": [],
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law": [],
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law": [],
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law": [],
+     "Calibrator.explainedSignalVarianceFromSourceWeights_target": [],
      "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.targetCalibratedBrierFromSourceWeights_exact_loss_budget_law": [],
      "Calibrator.target_score_variance_from_source_weights_identity": [],
      "Calibrator.targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_action": [],
+     "Calibrator.scoreVarianceFromSourceWeights_source_eq_score_on_covariance_action": [],
+     "Calibrator.sourceR2FromSourceWeights_exact_metric_law": [],
      "Calibrator.targetR2FromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.exactR2PortabilityRatio_mechanistic_law": [],
      "Calibrator.targetR2FromSourceWeights_exact_loss_budget_law": [],
@@ -38862,6 +39187,7 @@
      "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law": [],
      "Calibrator.targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law": [],
+     "Calibrator.sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portability_law": [],
      "Calibrator.identityDirectMetricModel_metrics": [],
      "Calibrator.baseline_mechanistic_metrics": [],
      "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
@@ -38879,19 +39205,27 @@
     }
    },
    "mentioned_by": [
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
     "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
     "Calibrator.CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law",
     "Calibrator.baseline_mechanistic_metrics",
+    "Calibrator.commonAndRarePortableModel_sourceR2",
     "Calibrator.commonAndRarePortableModel_targetR2",
+    "Calibrator.commonOnlyPortableModel_sourceR2",
     "Calibrator.commonOnlyPortableModel_targetR2",
     "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
     "Calibrator.exactR2PortabilityRatio_mechanistic_law",
+    "Calibrator.explainedSignalVarianceFromSourceWeights_target",
     "Calibrator.identityDirectMetricModel_metrics",
     "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier",
     "Calibrator.novel_target_only_tagging_changes_target_r2",
     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
+    "Calibrator.scoreVarianceFromSourceWeights_source_eq_score_on_covariance_action",
+    "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law",
+    "Calibrator.sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portability_law",
+    "Calibrator.sourceR2FromSourceWeights_exact_metric_law",
     "Calibrator.targetCalibratedBrierFromSourceWeights_exact_loss_budget_law",
     "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law",
     "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law",
@@ -38917,13 +39251,13 @@
    ]
   },
   {
-   "name": "Calibrator.sourcePredictiveCovarianceFromSourceWeights",
-   "short": "sourcePredictiveCovarianceFromSourceWeights",
+   "name": "Calibrator.predictiveCovarianceFromSourceWeights",
+   "short": "predictiveCovarianceFromSourceWeights",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1476,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
+   "line": 1470,
+   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
      "names": [
@@ -38941,11 +39275,19 @@
      "type": "CrossPopulationMetricModel p q",
      "binder": "()",
      "implicit": false
+    },
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
     }
    ],
    "ret_type": "ℝ",
-   "body": "  let wS := sourceWeightsFromExplicitDrivers m\n  dotProduct wS (crossCovariance m Pop.source)",
-   "docstring": "Exact source score/outcome covariance under the learned source weights.",
+   "body": "  dotProduct (sourceWeightsFromExplicitDrivers m) (crossCovariance m P)",
+   "docstring": "**Exact score/outcome covariance in a population** under the source-learned weights.\nAt the target this is where effect changes, tag-causal alignment and context shifts enter;\nat the source it is the ordinary in-sample covariance. One definition, because it is one\nquantity.",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
@@ -38957,103 +39299,31 @@
     "hypotheses": [],
     "hypotheses_by_theorem": {
      "Calibrator.commonOnlyPortableModel_sourceR2": [],
-     "Calibrator.commonAndRarePortableModel_sourceR2": [],
-     "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
-     "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov": [],
-     "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law": [],
-     "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores": [],
-     "Calibrator.sourceR2FromSourceWeights_exact_metric_law": [],
-     "Calibrator.exactR2PortabilityRatio_mechanistic_law": [],
-     "Calibrator.sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portability_law": [],
-     "Calibrator.identityDirectMetricModel_metrics": [],
-     "Calibrator.baseline_mechanistic_metrics": [],
-     "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
-     "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2": [],
-     "Calibrator.target_tagging_shift_changes_target_r2": [],
-     "Calibrator.target_effect_shift_changes_target_r2": [],
-     "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
-     "Calibrator.novel_target_only_tagging_changes_target_r2": [],
-     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": []
-    }
-   },
-   "mentioned_by": [
-    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
-    "Calibrator.baseline_mechanistic_metrics",
-    "Calibrator.commonAndRarePortableModel_sourceR2",
-    "Calibrator.commonOnlyPortableModel_sourceR2",
-    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
-    "Calibrator.exactR2PortabilityRatio_mechanistic_law",
-    "Calibrator.identityDirectMetricModel_metrics",
-    "Calibrator.novel_target_only_tagging_changes_target_r2",
-    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
-    "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law",
-    "Calibrator.sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portability_law",
-    "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
-    "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov",
-    "Calibrator.sourceR2FromSourceWeights_exact_metric_law",
-    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
-    "Calibrator.target_effect_shift_changes_target_r2",
-    "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
-    "Calibrator.target_tagging_shift_changes_target_r2"
-   ]
-  },
-  {
-   "name": "Calibrator.targetPredictiveCovarianceFromSourceWeights",
-   "short": "targetPredictiveCovarianceFromSourceWeights",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1484,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
-   "args": [
-    {
-     "names": [
-      "p",
-      "q"
-     ],
-     "type": "ℕ",
-     "binder": "{}",
-     "implicit": true
-    },
-    {
-     "names": [
-      "m"
-     ],
-     "type": "CrossPopulationMetricModel p q",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  let wS := sourceWeightsFromExplicitDrivers m\n  dotProduct wS (crossCovariance m Pop.target)",
-   "docstring": "Exact target score/outcome covariance under transported source weights.\nThis is where target-side effect changes, target tag-causal alignment, and\ntarget context/environment shifts enter directly.",
-   "empirical_status": "",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "nonnegative",
-    "declared_lo": 0.0,
-    "declared_hi": null,
-    "hypotheses": [],
-    "hypotheses_by_theorem": {
      "Calibrator.commonOnlyPortableModel_targetR2": [],
+     "Calibrator.commonAndRarePortableModel_sourceR2": [],
      "Calibrator.commonAndRarePortableModel_targetR2": [],
+     "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law": [],
      "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law": [],
+     "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov": [],
      "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov": [],
+     "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law": [],
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law": [],
+     "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores": [],
      "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores": [],
      "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores": [],
      "Calibrator.targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores": [],
+     "Calibrator.explainedSignalVarianceFromSourceWeights_target": [],
      "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.targetCalibratedBrierFromSourceWeights_exact_loss_budget_law": [],
+     "Calibrator.sourceR2FromSourceWeights_exact_metric_law": [],
      "Calibrator.targetR2FromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.exactR2PortabilityRatio_mechanistic_law": [],
      "Calibrator.targetR2FromSourceWeights_exact_loss_budget_law": [],
      "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law": [],
      "Calibrator.targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law": [],
+     "Calibrator.sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portability_law": [],
      "Calibrator.identityDirectMetricModel_metrics": [],
      "Calibrator.baseline_mechanistic_metrics": [],
      "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
@@ -39071,17 +39341,26 @@
     }
    },
    "mentioned_by": [
+    "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law",
     "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law",
     "Calibrator.baseline_mechanistic_metrics",
+    "Calibrator.commonAndRarePortableModel_sourceR2",
     "Calibrator.commonAndRarePortableModel_targetR2",
+    "Calibrator.commonOnlyPortableModel_sourceR2",
     "Calibrator.commonOnlyPortableModel_targetR2",
     "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
     "Calibrator.exactR2PortabilityRatio_mechanistic_law",
+    "Calibrator.explainedSignalVarianceFromSourceWeights_target",
     "Calibrator.identityDirectMetricModel_metrics",
     "Calibrator.novel_target_only_tagging_changes_target_r2",
     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
+    "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law",
+    "Calibrator.sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portability_law",
+    "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
+    "Calibrator.sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov",
+    "Calibrator.sourceR2FromSourceWeights_exact_metric_law",
     "Calibrator.targetCalibratedBrierFromSourceWeights_exact_loss_budget_law",
     "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law",
     "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law",
@@ -39105,13 +39384,13 @@
    ]
   },
   {
-   "name": "Calibrator.sourceCalibrationSlopeFromSourceWeights",
-   "short": "sourceCalibrationSlopeFromSourceWeights",
+   "name": "Calibrator.calibrationSlopeFromSourceWeights",
+   "short": "calibrationSlopeFromSourceWeights",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1492,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
+   "line": 1476,
+   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
      "names": [
@@ -39129,55 +39408,19 @@
      "type": "CrossPopulationMetricModel p q",
      "binder": "()",
      "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  sourcePredictiveCovarianceFromSourceWeights m /\n    sourceScoreVarianceFromExplicitDrivers m",
-   "docstring": "Exact source calibration slope under the source-learned score equation.\nThis is the literal source `Cov(Y, score) / Var(score)` ratio on the explicit\nSNP-level model.",
-   "empirical_status": "",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "hypotheses": [],
-    "hypotheses_by_theorem": {
-     "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law": []
-    }
-   },
-   "mentioned_by": [
-    "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law"
-   ]
-  },
-  {
-   "name": "Calibrator.targetCalibrationSlopeFromSourceWeights",
-   "short": "targetCalibrationSlopeFromSourceWeights",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1500,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
-   "args": [
-    {
-     "names": [
-      "p",
-      "q"
-     ],
-     "type": "ℕ",
-     "binder": "{}",
-     "implicit": true
     },
     {
      "names": [
-      "m"
+      "P"
      ],
-     "type": "CrossPopulationMetricModel p q",
+     "type": "Pop",
      "binder": "()",
      "implicit": false
     }
    ],
    "ret_type": "ℝ",
-   "body": "  targetPredictiveCovarianceFromSourceWeights m /\n    targetScoreVarianceFromSourceWeights m",
-   "docstring": "Exact target calibration slope under transported source weights.\nThis is the literal transported `Cov_T(Y, score_S) / Var_T(score_S)` ratio on\nthe explicit SNP-level model.",
+   "body": "  predictiveCovarianceFromSourceWeights m P / scoreVarianceFromSourceWeights m P",
+   "docstring": "**Exact calibration slope in a population** under the source-learned score equation:\nthe literal `Cov(Y, score) / Var(score)` ratio on the explicit SNP-level model.",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
@@ -39187,6 +39430,7 @@
     "hypotheses_by_theorem": {
      "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
      "Calibrator.targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law": [],
+     "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law": [],
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law": [],
      "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law": [],
@@ -39199,6 +39443,7 @@
     "Calibrator.mechanistic_target_identity_calibration_slopeDeviation_eq_one_sub",
     "Calibrator.mechanistic_target_identity_calibration_slope_lt_one",
     "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier",
+    "Calibrator.sourceCalibrationSlopeFromSourceWeights_exact_metric_law",
     "Calibrator.targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law",
     "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law",
     "Calibrator.targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law",
@@ -39212,7 +39457,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1628,
+   "line": 1603,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -39234,7 +39479,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  let delta := ((sigmaTagCausal m Pop.source) - (sigmaTagCausal m Pop.target)).mulVec (totalEffect m Pop.target)\n  dotProduct delta delta",
+   "body": "  let delta := ((sigmaTagCausalSourceAt m Pop.source) - (sigmaTagCausalSourceAt m Pop.target)).mulVec (totalEffect m Pop.target)\n  dotProduct delta delta",
    "docstring": "Additive irreducible loss from broken source-to-target tagging.\nThis is the squared target-effect distortion induced by the gap between the\nsource and target tag-to-causal alignment matrices.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -39316,7 +39561,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1646,
+   "line": 1621,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -39406,7 +39651,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1663,
+   "line": 1638,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -39496,7 +39741,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1678,
+   "line": 1653,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -39565,7 +39810,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1696,
+   "line": 1671,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
    "args": [
     {
@@ -39649,7 +39894,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1713,
+   "line": 1688,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : TransportedMetrics.IrreducibleTargetPenalty where brokenTagging",
    "args": [
     {
@@ -39681,13 +39926,13 @@
    "mentioned_by": []
   },
   {
-   "name": "Calibrator.effectiveTargetOutcomeVariance",
-   "short": "effectiveTargetOutcomeVariance",
+   "name": "Calibrator.residualBurden",
+   "short": "residualBurden",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1737,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
+   "line": 1712,
+   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
      "names": [
@@ -39705,12 +39950,69 @@
      "type": "CrossPopulationMetricModel p q",
      "binder": "()",
      "implicit": false
+    },
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
     }
    ],
    "ret_type": "ℝ",
-   "body": "  (m.outcomeVariance Pop.target) + irreducibleTargetResidualBurden m",
+   "body": "  Pop.pair 0 (irreducibleTargetResidualBurden m) P",
    "docstring": "Effective target outcome variance after adding an irreducible\ntarget-specific residual burden from broken tagging, ancestry-specific LD, and\nsource-specific overfit, plus target-only untagged novel-mutation variance.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Calibrator.effectiveOutcomeVariance",
+   "short": "effectiveOutcomeVariance",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/PortabilityDrift.lean",
+   "line": 1722,
+   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
+   "args": [
+    {
+     "names": [
+      "p",
+      "q"
+     ],
+     "type": "ℕ",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "m"
+     ],
+     "type": "CrossPopulationMetricModel p q",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (m.outcomeVariance P) + residualBurden m P",
+   "docstring": "**The outcome variance a score is actually scored against, in a population.**\n\nThe source carries no transport burden — it is where the weights were fitted — and that\nis now a computed consequence of `residualBurden` rather than the reason for writing two\nseparate definitions. `effectiveOutcomeVariance_source` below is the statement that used\nto be implicit in the fact that only a `target` version existed.",
+   "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
    "equations": [],
@@ -39789,13 +40091,13 @@
    ]
   },
   {
-   "name": "Calibrator.sourceExplainedSignalVarianceFromSourceWeights",
-   "short": "sourceExplainedSignalVarianceFromSourceWeights",
+   "name": "Calibrator.explainedSignalVarianceFromSourceWeights",
+   "short": "explainedSignalVarianceFromSourceWeights",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1771,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
+   "line": 1769,
+   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
      "names": [
@@ -39813,10 +40115,18 @@
      "type": "CrossPopulationMetricModel p q",
      "binder": "()",
      "implicit": false
+    },
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
     }
    ],
    "ret_type": "ℝ",
-   "body": "  (sourcePredictiveCovarianceFromSourceWeights m) ^ 2 /\n    sourceScoreVarianceFromExplicitDrivers m",
+   "body": "  (predictiveCovarianceFromSourceWeights m P) ^ 2 / scoreVarianceFromSourceWeights m P",
    "docstring": "Exact source `R²` under the full source-side driver state.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -39829,11 +40139,21 @@
     "hypotheses": [],
     "hypotheses_by_theorem": {
      "Calibrator.commonOnlyPortableModel_sourceR2": [],
+     "Calibrator.commonOnlyPortableModel_targetR2": [],
      "Calibrator.commonAndRarePortableModel_sourceR2": [],
+     "Calibrator.commonAndRarePortableModel_targetR2": [],
      "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances": [],
+     "Calibrator.explainedSignalVarianceFromSourceWeights_target": [],
+     "Calibrator.targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances": [],
+     "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.sourceR2FromSourceWeights_eq_signalVariance_ratio": [],
      "Calibrator.sourceR2FromSourceWeights_exact_metric_law": [],
+     "Calibrator.targetR2FromSourceWeights_eq_signalVariance_ratio": [],
+     "Calibrator.targetR2FromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances": [],
+     "Calibrator.equalVarianceGaussianAUCFromSourceWeights_target": [],
+     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances": [],
+     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.identityDirectMetricModel_metrics": [],
      "Calibrator.baseline_mechanistic_metrics": [],
      "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
@@ -39841,36 +40161,58 @@
      "Calibrator.target_tagging_shift_changes_target_r2": [],
      "Calibrator.target_effect_shift_changes_target_r2": [],
      "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
+     "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2": [],
      "Calibrator.novel_target_only_tagging_changes_target_r2": [],
-     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": []
+     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
+     "Calibrator.target_metric_profile_auc_uses_explicit_target_moments": [],
+     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
+     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one": [],
+     "Calibrator.target_r2_changes_along_generation_indexed_af_path": [],
+     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change": []
     }
    },
    "mentioned_by": [
     "Calibrator.baseline_mechanistic_metrics",
     "Calibrator.commonAndRarePortableModel_sourceR2",
+    "Calibrator.commonAndRarePortableModel_targetR2",
     "Calibrator.commonOnlyPortableModel_sourceR2",
+    "Calibrator.commonOnlyPortableModel_targetR2",
     "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
+    "Calibrator.equalVarianceGaussianAUCFromSourceWeights_target",
+    "Calibrator.explainedSignalVarianceFromSourceWeights_target",
     "Calibrator.identityDirectMetricModel_metrics",
     "Calibrator.novel_target_only_tagging_changes_target_r2",
     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
+    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
+    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
     "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances",
     "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances",
     "Calibrator.sourceR2FromSourceWeights_eq_signalVariance_ratio",
     "Calibrator.sourceR2FromSourceWeights_exact_metric_law",
+    "Calibrator.targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances",
+    "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law",
+    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances",
+    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law",
+    "Calibrator.targetR2FromSourceWeights_eq_signalVariance_ratio",
+    "Calibrator.targetR2FromSourceWeights_exact_metric_portability_law",
     "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
+    "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
     "Calibrator.target_effect_shift_changes_target_r2",
     "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
+    "Calibrator.target_metric_profile_auc_uses_explicit_target_moments",
+    "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2",
+    "Calibrator.target_r2_changes_along_generation_indexed_af_path",
     "Calibrator.target_tagging_shift_changes_target_r2"
    ]
   },
   {
-   "name": "Calibrator.sourceR2FromSourceWeights",
-   "short": "sourceR2FromSourceWeights",
+   "name": "Calibrator.r2FromSourceWeights",
+   "short": "r2FromSourceWeights",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1777,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
+   "line": 1775,
+   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
      "names": [
@@ -39888,11 +40230,19 @@
      "type": "CrossPopulationMetricModel p q",
      "binder": "()",
      "implicit": false
+    },
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
     }
    ],
    "ret_type": "ℝ",
-   "body": "  sourceExplainedSignalVarianceFromSourceWeights m / (m.outcomeVariance Pop.source)",
-   "docstring": "Exact source `R²` under the full source-side driver state.",
+   "body": "  explainedSignalVarianceFromSourceWeights m P / effectiveOutcomeVariance m P",
+   "docstring": "**Exact `R²` in a population** under the full driver state, against the outcome\nvariance that population is actually scored against.",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
@@ -39902,37 +40252,39 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
-     "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
-     "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
+     "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
+     "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
      "m.targetPrevalence * (1 - m.targetPrevalence",
-     "targetR2FromSourceWeights m ∈ Set.Ico 0 1"
+     "r2FromSourceWeights m Pop.target ∈ Set.Ico 0 1"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.commonOnlyPortableModel_sourceR2": [],
+     "Calibrator.commonOnlyPortableModel_targetR2": [],
      "Calibrator.commonAndRarePortableModel_sourceR2": [],
+     "Calibrator.commonAndRarePortableModel_targetR2": [],
      "Calibrator.combined_strategy_optimal": [],
      "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
      "Calibrator.brierDiscriminationLoss_eq": [],
      "Calibrator.brierCalibrationLoss_eq": [],
      "Calibrator.brierDiscriminationLoss_pos_of_mechanistic_r2_drop": [
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m"
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source"
      ],
      "Calibrator.brierCalibrationLoss_pos_of_prevalence_factor_increase": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1"
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1"
      ],
      "Calibrator.brier_increase_mainly_calibration": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
       "m.targetPrevalence * (1 - m.targetPrevalence"
      ],
      "Calibrator.metrics_both_degrade_under_drift": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m"
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source"
      ],
      "Calibrator.brier_proper_score_portability_decomposition": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
       "m.targetPrevalence * (1 - m.targetPrevalence"
      ],
      "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
@@ -39941,8 +40293,15 @@
      "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case": [],
      "Calibrator.sourceR2FromSourceWeights_eq_signalVariance_ratio": [],
      "Calibrator.sourceR2FromSourceWeights_exact_metric_law": [],
+     "Calibrator.targetR2FromSourceWeights_eq_signalVariance_ratio": [],
+     "Calibrator.targetR2FromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.exactR2PortabilityRatio_mechanistic_law": [],
+     "Calibrator.targetR2FromSourceWeights_exact_snp_transport_law": [],
+     "Calibrator.targetR2FromSourceWeights_exact_loss_budget_law": [],
+     "Calibrator.targetR2FromSourceWeights_exact_direct_proxy_context_law": [],
+     "Calibrator.targetR2FromSourceWeights_exact_effect_heterogeneity_law": [],
      "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": [],
+     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": [],
      "Calibrator.identityDirectMetricModel_metrics": [],
      "Calibrator.baseline_mechanistic_metrics": [],
      "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
@@ -39950,8 +40309,13 @@
      "Calibrator.target_tagging_shift_changes_target_r2": [],
      "Calibrator.target_effect_shift_changes_target_r2": [],
      "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
+     "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2": [],
      "Calibrator.novel_target_only_tagging_changes_target_r2": [],
-     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": []
+     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
+     "Calibrator.target_liability_auc_eq_explainedR2_chart": [],
+     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
+     "Calibrator.target_r2_changes_along_generation_indexed_af_path": [],
+     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change": []
     }
    },
    "mentioned_by": [
@@ -39964,7 +40328,9 @@
     "Calibrator.brier_proper_score_portability_decomposition",
     "Calibrator.combined_strategy_optimal",
     "Calibrator.commonAndRarePortableModel_sourceR2",
+    "Calibrator.commonAndRarePortableModel_targetR2",
     "Calibrator.commonOnlyPortableModel_sourceR2",
+    "Calibrator.commonOnlyPortableModel_targetR2",
     "Calibrator.cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget",
     "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case",
     "Calibrator.cross_ancestry_exact_metric_profile",
@@ -39976,23 +40342,35 @@
     "Calibrator.metrics_both_degrade_under_drift",
     "Calibrator.novel_target_only_tagging_changes_target_r2",
     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
+    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
     "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
     "Calibrator.sourceR2FromSourceWeights_eq_signalVariance_ratio",
     "Calibrator.sourceR2FromSourceWeights_exact_metric_law",
+    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
+    "Calibrator.targetR2FromSourceWeights_eq_signalVariance_ratio",
+    "Calibrator.targetR2FromSourceWeights_exact_direct_proxy_context_law",
+    "Calibrator.targetR2FromSourceWeights_exact_effect_heterogeneity_law",
+    "Calibrator.targetR2FromSourceWeights_exact_loss_budget_law",
+    "Calibrator.targetR2FromSourceWeights_exact_metric_portability_law",
+    "Calibrator.targetR2FromSourceWeights_exact_snp_transport_law",
     "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
+    "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
     "Calibrator.target_effect_shift_changes_target_r2",
     "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
+    "Calibrator.target_liability_auc_eq_explainedR2_chart",
+    "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2",
+    "Calibrator.target_r2_changes_along_generation_indexed_af_path",
     "Calibrator.target_tagging_shift_changes_target_r2"
    ]
   },
   {
-   "name": "Calibrator.sourceResidualVarianceFromSourceWeights",
-   "short": "sourceResidualVarianceFromSourceWeights",
+   "name": "Calibrator.residualVarianceFromSourceWeights",
+   "short": "residualVarianceFromSourceWeights",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1785,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
+   "line": 1783,
+   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
      "names": [
@@ -40010,10 +40388,18 @@
      "type": "CrossPopulationMetricModel p q",
      "binder": "()",
      "implicit": false
+    },
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
     }
    ],
    "ret_type": "ℝ",
-   "body": "  (m.outcomeVariance Pop.source) - sourceExplainedSignalVarianceFromSourceWeights m",
+   "body": "  effectiveOutcomeVariance m P - explainedSignalVarianceFromSourceWeights m P",
    "docstring": "Exact unexplained source-side liability variance under the full explicit\nsource-state score equation. This is the residual variance paired with the\nsource explained signal when constructing exact source AUC and source Brier\ncoordinates from the same mechanistic SNP-level state.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -40026,14 +40412,28 @@
     "hypotheses": [],
     "hypotheses_by_theorem": {
      "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances": [],
+     "Calibrator.targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances": [],
+     "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances": [],
-     "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": []
+     "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": [],
+     "Calibrator.equalVarianceGaussianAUCFromSourceWeights_target": [],
+     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances": [],
+     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law": [],
+     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": [],
+     "Calibrator.target_metric_profile_auc_uses_explicit_target_moments": []
     }
    },
    "mentioned_by": [
+    "Calibrator.equalVarianceGaussianAUCFromSourceWeights_target",
     "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances",
     "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
-    "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances"
+    "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances",
+    "Calibrator.targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances",
+    "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law",
+    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
+    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances",
+    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law",
+    "Calibrator.target_metric_profile_auc_uses_explicit_target_moments"
    ]
   },
   {
@@ -40042,7 +40442,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1802,
+   "line": 1800,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) : ℝ",
    "args": [
     {
@@ -40072,7 +40472,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  TransportedMetrics.calibratedBrierFromVariances\n    π\n    (sourceExplainedSignalVarianceFromSourceWeights m)\n    (sourceResidualVarianceFromSourceWeights m)",
+   "body": "  TransportedMetrics.calibratedBrierFromVariances\n    π\n    (explainedSignalVarianceFromSourceWeights m Pop.source)\n    (residualVarianceFromSourceWeights m Pop.source)",
    "docstring": "Closed-form source calibrated Brier coordinate from the full explicit\nsource-state score equation, evaluated at an arbitrary observed prevalence\ncoordinate `π`. This lets downstream theory compare source and target Brier on\nthe same target-population outcome scale without falling back to a benchmark\n`R²` surrogate.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
@@ -40083,21 +40483,21 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
-     "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-     "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+     "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+     "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
      "m.targetPrevalence * (1 - m.targetPrevalence"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
      "Calibrator.observableBrier_change_decomposition": [],
      "Calibrator.brier_increase_mainly_calibration": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
       "m.targetPrevalence * (1 - m.targetPrevalence"
      ],
      "Calibrator.brier_proper_score_portability_decomposition": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
       "m.targetPrevalence * (1 - m.targetPrevalence"
      ],
      "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances": []
@@ -40112,233 +40512,8 @@
    ]
   },
   {
-   "name": "Calibrator.targetExplainedSignalVarianceFromSourceWeights",
-   "short": "targetExplainedSignalVarianceFromSourceWeights",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1854,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
-   "args": [
-    {
-     "names": [
-      "p",
-      "q"
-     ],
-     "type": "ℕ",
-     "binder": "{}",
-     "implicit": true
-    },
-    {
-     "names": [
-      "m"
-     ],
-     "type": "CrossPopulationMetricModel p q",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /\n    targetScoreVarianceFromSourceWeights m",
-   "docstring": "Exact target `R²` under transported source weights and the full target-side\ndriver state.\n\nRather than collapsing to a scalar retention factor, this depends explicitly on:\n- source and target tag LD,\n- source and target tag-causal alignment,\n- source and target effect vectors,\n- source and target context/environment cross-covariances, and\n- additive irreducible target-side losses from broken tagging,\n  ancestry-specific LD distortion, and source-specific overfit.",
-   "empirical_status": "",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "R-squared",
-    "declared_lo": 0.0,
-    "declared_hi": 1.0,
-    "hypotheses": [],
-    "hypotheses_by_theorem": {
-     "Calibrator.commonOnlyPortableModel_targetR2": [],
-     "Calibrator.commonAndRarePortableModel_targetR2": [],
-     "Calibrator.targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances": [],
-     "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law": [],
-     "Calibrator.targetR2FromSourceWeights_eq_signalVariance_ratio": [],
-     "Calibrator.targetR2FromSourceWeights_exact_metric_portability_law": [],
-     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances": [],
-     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law": [],
-     "Calibrator.identityDirectMetricModel_metrics": [],
-     "Calibrator.baseline_mechanistic_metrics": [],
-     "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
-     "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2": [],
-     "Calibrator.target_tagging_shift_changes_target_r2": [],
-     "Calibrator.target_effect_shift_changes_target_r2": [],
-     "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
-     "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2": [],
-     "Calibrator.novel_target_only_tagging_changes_target_r2": [],
-     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
-     "Calibrator.target_metric_profile_auc_uses_explicit_target_moments": [],
-     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
-     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one": [],
-     "Calibrator.target_r2_changes_along_generation_indexed_af_path": [],
-     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change": []
-    }
-   },
-   "mentioned_by": [
-    "Calibrator.baseline_mechanistic_metrics",
-    "Calibrator.commonAndRarePortableModel_targetR2",
-    "Calibrator.commonOnlyPortableModel_targetR2",
-    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
-    "Calibrator.identityDirectMetricModel_metrics",
-    "Calibrator.novel_target_only_tagging_changes_target_r2",
-    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
-    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
-    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
-    "Calibrator.targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances",
-    "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law",
-    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances",
-    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law",
-    "Calibrator.targetR2FromSourceWeights_eq_signalVariance_ratio",
-    "Calibrator.targetR2FromSourceWeights_exact_metric_portability_law",
-    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
-    "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
-    "Calibrator.target_effect_shift_changes_target_r2",
-    "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
-    "Calibrator.target_metric_profile_auc_uses_explicit_target_moments",
-    "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2",
-    "Calibrator.target_r2_changes_along_generation_indexed_af_path",
-    "Calibrator.target_tagging_shift_changes_target_r2"
-   ]
-  },
-  {
-   "name": "Calibrator.targetR2FromSourceWeights",
-   "short": "targetR2FromSourceWeights",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1861,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
-   "args": [
-    {
-     "names": [
-      "p",
-      "q"
-     ],
-     "type": "ℕ",
-     "binder": "{}",
-     "implicit": true
-    },
-    {
-     "names": [
-      "m"
-     ],
-     "type": "CrossPopulationMetricModel p q",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  targetExplainedSignalVarianceFromSourceWeights m /\n    effectiveTargetOutcomeVariance m",
-   "docstring": "Exact target `R²` under transported source weights and the full target-side\ndriver state.",
-   "empirical_status": "",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "R-squared",
-    "declared_lo": 0.0,
-    "declared_hi": 1.0,
-    "hypotheses": [
-     "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
-     "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-     "m.targetPrevalence * (1 - m.targetPrevalence",
-     "targetR2FromSourceWeights m ∈ Set.Ico 0 1"
-    ],
-    "hypotheses_by_theorem": {
-     "Calibrator.commonOnlyPortableModel_targetR2": [],
-     "Calibrator.commonAndRarePortableModel_targetR2": [],
-     "Calibrator.combined_strategy_optimal": [],
-     "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
-     "Calibrator.brierDiscriminationLoss_eq": [],
-     "Calibrator.brierDiscriminationLoss_pos_of_mechanistic_r2_drop": [
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m"
-     ],
-     "Calibrator.brier_increase_mainly_calibration": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
-      "m.targetPrevalence * (1 - m.targetPrevalence"
-     ],
-     "Calibrator.metrics_both_degrade_under_drift": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m"
-     ],
-     "Calibrator.brier_proper_score_portability_decomposition": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
-      "m.targetPrevalence * (1 - m.targetPrevalence"
-     ],
-     "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
-     "Calibrator.cross_ancestry_exact_metric_profile": [],
-     "Calibrator.cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget": [],
-     "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case": [],
-     "Calibrator.targetR2FromSourceWeights_eq_signalVariance_ratio": [],
-     "Calibrator.targetR2FromSourceWeights_exact_metric_portability_law": [],
-     "Calibrator.exactR2PortabilityRatio_mechanistic_law": [],
-     "Calibrator.targetR2FromSourceWeights_exact_snp_transport_law": [],
-     "Calibrator.targetR2FromSourceWeights_exact_loss_budget_law": [],
-     "Calibrator.targetR2FromSourceWeights_exact_direct_proxy_context_law": [],
-     "Calibrator.targetR2FromSourceWeights_exact_effect_heterogeneity_law": [],
-     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": [],
-     "Calibrator.identityDirectMetricModel_metrics": [],
-     "Calibrator.baseline_mechanistic_metrics": [],
-     "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability": [],
-     "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2": [],
-     "Calibrator.target_tagging_shift_changes_target_r2": [],
-     "Calibrator.target_effect_shift_changes_target_r2": [],
-     "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2": [],
-     "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2": [],
-     "Calibrator.novel_target_only_tagging_changes_target_r2": [],
-     "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2": [],
-     "Calibrator.target_liability_auc_eq_explainedR2_chart": [],
-     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero": [],
-     "Calibrator.target_r2_changes_along_generation_indexed_af_path": [],
-     "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change": []
-    }
-   },
-   "mentioned_by": [
-    "Calibrator.baseline_mechanistic_metrics",
-    "Calibrator.brierDiscriminationLoss_eq",
-    "Calibrator.brierDiscriminationLoss_pos_of_mechanistic_r2_drop",
-    "Calibrator.brier_increase_mainly_calibration",
-    "Calibrator.brier_proper_score_portability_decomposition",
-    "Calibrator.combined_strategy_optimal",
-    "Calibrator.commonAndRarePortableModel_targetR2",
-    "Calibrator.commonOnlyPortableModel_targetR2",
-    "Calibrator.cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget",
-    "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case",
-    "Calibrator.cross_ancestry_exact_metric_profile",
-    "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget",
-    "Calibrator.direct_causal_vs_proxy_tag_same_source_r2_different_portability",
-    "Calibrator.exactR2PortabilityRatio_mechanistic_law",
-    "Calibrator.identityDirectMetricModel_metrics",
-    "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier",
-    "Calibrator.metrics_both_degrade_under_drift",
-    "Calibrator.novel_target_only_tagging_changes_target_r2",
-    "Calibrator.novel_untaggable_phenotype_variance_lowers_target_r2",
-    "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_at_zero",
-    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
-    "Calibrator.targetR2FromSourceWeights_eq_signalVariance_ratio",
-    "Calibrator.targetR2FromSourceWeights_exact_direct_proxy_context_law",
-    "Calibrator.targetR2FromSourceWeights_exact_effect_heterogeneity_law",
-    "Calibrator.targetR2FromSourceWeights_exact_loss_budget_law",
-    "Calibrator.targetR2FromSourceWeights_exact_metric_portability_law",
-    "Calibrator.targetR2FromSourceWeights_exact_snp_transport_law",
-    "Calibrator.target_context_shift_creates_additive_overfit_loss_and_changes_target_r2",
-    "Calibrator.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
-    "Calibrator.target_effect_shift_changes_target_r2",
-    "Calibrator.target_ld_shift_changes_portability_without_changing_source_r2",
-    "Calibrator.target_liability_auc_eq_explainedR2_chart",
-    "Calibrator.target_prevalence_shift_changes_brier_without_changing_target_r2",
-    "Calibrator.target_r2_changes_along_generation_indexed_af_path",
-    "Calibrator.target_tagging_shift_changes_target_r2"
-   ]
-  },
-  {
-   "name": "Calibrator.targetResidualVarianceFromSourceWeights",
-   "short": "targetResidualVarianceFromSourceWeights",
+   "name": "Calibrator.targetCalibratedBrierFromSourceWeights",
+   "short": "targetCalibratedBrierFromSourceWeights",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
@@ -40364,64 +40539,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  effectiveTargetOutcomeVariance m - targetExplainedSignalVarianceFromSourceWeights m",
-   "docstring": "Exact unexplained target-side liability variance under transported source\nweights and the full explicit target-state loss budget. This is the residual\nvariance entering the liability-threshold AUC formula after the mechanistic\nexplained signal has been computed from the transported score moments.",
-   "empirical_status": "",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "probability",
-    "declared_lo": 0.0,
-    "declared_hi": 1.0,
-    "hypotheses": [],
-    "hypotheses_by_theorem": {
-     "Calibrator.targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances": [],
-     "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law": [],
-     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances": [],
-     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law": [],
-     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": [],
-     "Calibrator.target_metric_profile_auc_uses_explicit_target_moments": []
-    }
-   },
-   "mentioned_by": [
-    "Calibrator.targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances",
-    "Calibrator.targetCalibratedBrierFromSourceWeights_exact_metric_portability_law",
-    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
-    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances",
-    "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law",
-    "Calibrator.target_metric_profile_auc_uses_explicit_target_moments"
-   ]
-  },
-  {
-   "name": "Calibrator.targetCalibratedBrierFromSourceWeights",
-   "short": "targetCalibratedBrierFromSourceWeights",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1884,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
-   "args": [
-    {
-     "names": [
-      "p",
-      "q"
-     ],
-     "type": "ℕ",
-     "binder": "{}",
-     "implicit": true
-    },
-    {
-     "names": [
-      "m"
-     ],
-     "type": "CrossPopulationMetricModel p q",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  TransportedMetrics.calibratedBrierFromVariances\n    m.targetPrevalence\n    (targetExplainedSignalVarianceFromSourceWeights m)\n    (targetResidualVarianceFromSourceWeights m)",
+   "body": "  TransportedMetrics.calibratedBrierFromVariances\n    m.targetPrevalence\n    (explainedSignalVarianceFromSourceWeights m Pop.target)\n    (residualVarianceFromSourceWeights m Pop.target)",
    "docstring": "Exact target calibrated Brier coordinate from the full explicit driver\nstate. Prevalence enters here, so Brier can change even when the score moments\nare held fixed.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -40432,21 +40550,21 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
-     "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-     "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+     "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+     "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
      "m.targetPrevalence * (1 - m.targetPrevalence"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.mechanistic_transport_disrupts_calibration_slope_and_brier": [],
      "Calibrator.observableBrier_change_decomposition": [],
      "Calibrator.brier_increase_mainly_calibration": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
       "m.targetPrevalence * (1 - m.targetPrevalence"
      ],
      "Calibrator.brier_proper_score_portability_decomposition": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source",
       "m.targetPrevalence * (1 - m.targetPrevalence"
      ],
      "Calibrator.targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances": [],
@@ -40474,7 +40592,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2105,
+   "line": 2091,
    "signature": "(distance fstGap lambda : ℝ) : ℝ",
    "args": [
     {
@@ -40533,7 +40651,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2153,
+   "line": 2139,
    "signature": "(g : GenerationalPopGenParameters) : ℝ",
    "args": [
     {
@@ -40617,7 +40735,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2157,
+   "line": 2143,
    "signature": "(g : GenerationalPopGenParameters) : ℝ",
    "args": [
     {
@@ -40691,7 +40809,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2161,
+   "line": 2147,
    "signature": "(g : GenerationalPopGenParameters) (t : ℕ) : ℝ",
    "args": [
     {
@@ -40752,7 +40870,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2165,
+   "line": 2151,
    "signature": "(g : GenerationalPopGenParameters) : ℝ",
    "args": [
     {
@@ -40815,7 +40933,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2173,
+   "line": 2159,
    "signature": "(g : GenerationalPopGenParameters) (t : ℕ) : ℝ",
    "args": [
     {
@@ -40872,7 +40990,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2178,
+   "line": 2164,
    "signature": "(g : GenerationalPopGenParameters) (t : ℕ) : ℝ",
    "args": [
     {
@@ -40931,7 +41049,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2183,
+   "line": 2169,
    "signature": "(g : GenerationalPopGenParameters) (t : ℕ) : ℝ",
    "args": [
     {
@@ -40990,7 +41108,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2209,
+   "line": 2195,
    "signature": "(m : PGSEvolutionaryModel) : GenerationalPopGenParameters where Ne",
    "args": [
     {
@@ -41041,7 +41159,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2317,
+   "line": 2303,
    "signature": "(pSource pTarget : ℝ) : ℝ",
    "args": [
     {
@@ -41086,7 +41204,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2375,
+   "line": 2361,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin q → ℝ",
    "args": [
     {
@@ -41146,7 +41264,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2389,
+   "line": 2375,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ",
    "args": [
     {
@@ -41209,7 +41327,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2403,
+   "line": 2389,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41272,7 +41390,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2414,
+   "line": 2400,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ",
    "args": [
     {
@@ -41342,7 +41460,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2421,
+   "line": 2407,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41412,7 +41530,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2427,
+   "line": 2413,
    "signature": "(g : GenerationalPopGenParameters) (t : ℕ) : ℝ",
    "args": [
     {
@@ -41453,7 +41571,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2440,
+   "line": 2426,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) : ℝ",
    "args": [
     {
@@ -41518,7 +41636,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2463,
+   "line": 2449,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41583,7 +41701,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2482,
+   "line": 2468,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41654,7 +41772,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2507,
+   "line": 2493,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41719,7 +41837,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2526,
+   "line": 2512,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ",
    "args": [
     {
@@ -41780,7 +41898,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2549,
+   "line": 2535,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin p) ℝ",
    "args": [
     {
@@ -41843,7 +41961,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2558,
+   "line": 2544,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -41908,7 +42026,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2567,
+   "line": 2553,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -41964,7 +42082,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2576,
+   "line": 2562,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -42031,7 +42149,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2584,
+   "line": 2570,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -42087,7 +42205,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2594,
+   "line": 2580,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Matrix (Fin p) (Fin q) ℝ",
    "args": [
     {
@@ -42145,7 +42263,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2606,
+   "line": 2592,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin p → ℝ",
    "args": [
     {
@@ -42203,7 +42321,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2614,
+   "line": 2600,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin p → ℝ",
    "args": [
     {
@@ -42261,7 +42379,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2623,
+   "line": 2609,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : CrossPopulationMetricModel p q where beta",
    "args": [
     {
@@ -42341,7 +42459,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2647,
+   "line": 2633,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -42371,7 +42489,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  targetR2FromSourceWeights (m.toMetricModelAt t)",
+   "body": "  r2FromSourceWeights (m.toMetricModelAt t)",
    "docstring": "Exact target `R²` after `t` generations under the full time-varying\nmechanistic state.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -42412,7 +42530,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2652,
+   "line": 2638,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -42468,7 +42586,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2903,
+   "line": 2889,
    "signature": "(V_A V_E fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -42538,7 +42656,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2977,
+   "line": 2963,
    "signature": "(fstSource fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -42627,7 +42745,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3025,
+   "line": 3011,
    "signature": "(NeA NeB mu H₀ : ℝ) (t : ℕ) : ℝ",
    "args": [
     {
@@ -42688,7 +42806,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3060,
+   "line": 3046,
    "signature": "(π r2 : ℝ) : ℝ",
    "args": [
     {
@@ -42702,7 +42820,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  π * (1 - π) * (1 - r2)",
+   "body": "  calibratedBrier π r2",
    "docstring": "Exact calibrated Bernoulli Brier risk as a function of prevalence and\nexplained-variance fraction.\n\nFor a calibrated Bernoulli predictor with prevalence `π` and\n`Var(η(Z)) = π(1-π) r2`, the exact population Brier risk is\n`π(1-π)(1-r2)`. This is not a surrogate loss: it is the closed form of the\nexact calibrated Brier risk under the Bernoulli-mixing model.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -42774,7 +42892,7 @@
    "kind": "abbrev",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3065,
+   "line": 3051,
    "signature": "(π r2 : ℝ) : ℝ",
    "args": [
     {
@@ -42860,7 +42978,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3069,
+   "line": 3055,
    "signature": "(V_A V_E fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -42914,7 +43032,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3082,
+   "line": 3068,
    "signature": "(π r2Source : ℝ) : ℝ",
    "args": [
     {
@@ -42977,7 +43095,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3095,
+   "line": 3081,
    "signature": "(π V_A V_E fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -43040,7 +43158,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3102,
+   "line": 3088,
    "signature": "(π V_A V_E fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -43106,7 +43224,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3108,
+   "line": 3094,
    "signature": "(π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile",
    "args": [
     {
@@ -43147,7 +43265,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3176,
+   "line": 3162,
    "signature": "(snr : ℝ) : ℝ",
    "args": [
     {
@@ -43189,7 +43307,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3188,
+   "line": 3174,
    "signature": "(vSignal vEnv : ℝ) : ℝ",
    "args": [
     {
@@ -43203,7 +43321,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  Phi (Real.sqrt (vSignal / (2 * vEnv)))",
+   "body": "  gaussianAUCFromSignalVariance vSignal vEnv",
    "docstring": "AUC of the equal-variance Gaussian model from signal and environmental\n    variances.\n\n    Renamed with its siblings: this is exact for two equal-variance normals and\n    is not the liability-threshold AUC, which depends on prevalence and which\n    none of these signatures can express.\n\n    Empirical status: VALIDATED for the equal-variance Gaussian model;\n    FALSIFIED as the liability-threshold AUC.",
    "empirical_status": "VALIDATED",
    "namespace": "Calibrator",
@@ -43220,6 +43338,7 @@
      "Calibrator.equalVarianceGaussianAUCFromVariances_scaleOne": [],
      "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances": [],
      "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": [],
+     "Calibrator.equalVarianceGaussianAUCFromSourceWeights_target": [],
      "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances": [],
      "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law": [],
@@ -43231,6 +43350,7 @@
     }
    },
    "mentioned_by": [
+    "Calibrator.equalVarianceGaussianAUCFromSourceWeights_target",
     "Calibrator.equalVarianceGaussianAUCFromVariances_eq_aucFromSignalVariance",
     "Calibrator.equalVarianceGaussianAUCFromVariances_scaleOne",
     "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
@@ -43252,7 +43372,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3235,
+   "line": 3221,
    "signature": "(r2 : ℝ) : ℝ",
    "args": [
     {
@@ -43319,7 +43439,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3281,
+   "line": 3267,
    "signature": "(r2 : ℝ) : ℝ",
    "args": [
     {
@@ -43358,13 +43478,13 @@
    ]
   },
   {
-   "name": "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights",
-   "short": "sourceEqualVarianceGaussianAUCFromSourceWeights",
+   "name": "Calibrator.equalVarianceGaussianAUCFromSourceWeights",
+   "short": "equalVarianceGaussianAUCFromSourceWeights",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3344,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
+   "line": 3330,
+   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ",
    "args": [
     {
      "names": [
@@ -43382,10 +43502,18 @@
      "type": "CrossPopulationMetricModel p q",
      "binder": "()",
      "implicit": false
+    },
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
     }
    ],
    "ret_type": "ℝ",
-   "body": "  equalVarianceGaussianAUCFromVariances\n    (sourceExplainedSignalVarianceFromSourceWeights m)\n    (sourceResidualVarianceFromSourceWeights m)",
+   "body": "  equalVarianceGaussianAUCFromVariances\n    (explainedSignalVarianceFromSourceWeights m P)\n    (residualVarianceFromSourceWeights m P)",
    "docstring": "Liability-threshold AUC induced by the full explicit source-side driver\nstate. Like the target-side exported AUC, this is built directly from source\nexplained signal and source residual variance under the source-learned score\nequation.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
@@ -43398,54 +43526,8 @@
     "hypotheses": [],
     "hypotheses_by_theorem": {
      "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances": [],
-     "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": []
-    }
-   },
-   "mentioned_by": [
-    "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
-    "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances"
-   ]
-  },
-  {
-   "name": "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights",
-   "short": "targetEqualVarianceGaussianAUCFromSourceWeights",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3387,
-   "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : ℝ",
-   "args": [
-    {
-     "names": [
-      "p",
-      "q"
-     ],
-     "type": "ℕ",
-     "binder": "{}",
-     "implicit": true
-    },
-    {
-     "names": [
-      "m"
-     ],
-     "type": "CrossPopulationMetricModel p q",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  equalVarianceGaussianAUCFromVariances\n    (targetExplainedSignalVarianceFromSourceWeights m)\n    (targetResidualVarianceFromSourceWeights m)",
-   "docstring": "Liability-threshold AUC induced by the full explicit cross-population\ndriver state.\n\nThe exported mechanistic AUC is computed directly from target explained signal\nvariance and target residual variance under transported source weights. It is\nnot defined by reading target `R²` through a chart, and it does not recover a\nlatent biological signal from source `R²`.\n\n    Empirical status: UNTESTED.",
-   "empirical_status": "UNTESTED",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "probability",
-    "declared_lo": 0.0,
-    "declared_hi": 1.0,
-    "hypotheses": [],
-    "hypotheses_by_theorem": {
+     "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": [],
+     "Calibrator.equalVarianceGaussianAUCFromSourceWeights_target": [],
      "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances": [],
      "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law": [],
      "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law": [],
@@ -43456,6 +43538,9 @@
     }
    },
    "mentioned_by": [
+    "Calibrator.equalVarianceGaussianAUCFromSourceWeights_target",
+    "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
+    "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances",
     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances",
     "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law",
@@ -43471,7 +43556,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3462,
+   "line": 3449,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) : TransportedMetrics.Profile where r2",
    "args": [
     {
@@ -43501,7 +43586,7 @@
     }
    ],
    "ret_type": "TransportedMetrics.Profile where r2",
-   "body": " sourceR2FromSourceWeights m\n  auc := sourceEqualVarianceGaussianAUCFromSourceWeights m\n  brier := sourceCalibratedBrierFromSourceWeightsAtPrevalence m π",
+   "body": " r2FromSourceWeights m Pop.source\n  auc := equalVarianceGaussianAUCFromSourceWeights m Pop.source\n  brier := sourceCalibratedBrierFromSourceWeightsAtPrevalence m π",
    "docstring": "Canonical mechanistic deployed source metric profile evaluated at an\narbitrary observed prevalence coordinate `π`. This is the source-side analogue\nof `targetMetricProfileFromSourceWeights`, and it lets downstream calibration\ntheory compare source and target Brier on the same target-population\nprevalence scale.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
@@ -43528,7 +43613,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3490,
+   "line": 3477,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile",
    "args": [
     {
@@ -43561,15 +43646,15 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
-     "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-     "targetR2FromSourceWeights m ∈ Set.Ico 0 1",
-     "targetR2FromSourceWeights m < sourceR2FromSourceWeights m"
+     "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+     "r2FromSourceWeights m Pop.target ∈ Set.Ico 0 1",
+     "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.metrics_both_degrade_under_drift": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m"
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source"
      ],
      "Calibrator.cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget": [],
      "Calibrator.cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case": []
@@ -43587,7 +43672,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3517,
+   "line": 3504,
    "signature": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile where r2",
    "args": [
     {
@@ -43609,7 +43694,7 @@
     }
    ],
    "ret_type": "TransportedMetrics.Profile where r2",
-   "body": " targetR2FromSourceWeights m\n  auc := targetEqualVarianceGaussianAUCFromSourceWeights m\n  brier := targetCalibratedBrierFromSourceWeights m",
+   "body": " r2FromSourceWeights m Pop.target\n  auc := equalVarianceGaussianAUCFromSourceWeights m Pop.target\n  brier := targetCalibratedBrierFromSourceWeights m",
    "docstring": "Canonical mechanistic deployed metric profile induced by the explicit\nSNP-level transported score equation. The upstream state is the full\nsource-weights/target-LD/target-tagging system, with AUC bundled from the\nexplicit target signal/residual moment pair rather than from a source-side\ntransport surrogate.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -43620,15 +43705,15 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
-     "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-     "targetR2FromSourceWeights m ∈ Set.Ico 0 1",
-     "targetR2FromSourceWeights m < sourceR2FromSourceWeights m"
+     "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+     "r2FromSourceWeights m Pop.target ∈ Set.Ico 0 1",
+     "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source"
     ],
     "hypotheses_by_theorem": {
      "Calibrator.metrics_both_degrade_under_drift": [
-      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m ∈ Set.Ico 0 1",
-      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m"
+      "r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target ∈ Set.Ico 0 1",
+      "r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source"
      ],
      "Calibrator.cross_ancestry_exact_metric_profile_from_shift_budget": [],
      "Calibrator.cross_ancestry_exact_metric_profile": [],
@@ -43654,7 +43739,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3583,
+   "line": 3570,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -43684,7 +43769,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  targetEqualVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t)",
+   "body": "  equalVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t)",
    "docstring": "Closed-form liability-threshold AUC after `t` generations under the full\ntime-varying mechanistic state.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
@@ -43710,7 +43795,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3588,
+   "line": 3575,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : TransportedMetrics.Profile",
    "args": [
     {
@@ -43770,7 +43855,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3607,
+   "line": 3594,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -43800,7 +43885,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  targetPredictiveCovarianceFromSourceWeights (m.toMetricModelAt t)",
+   "body": "  predictiveCovarianceFromSourceWeights (m.toMetricModelAt t)",
    "docstring": "Exact transported predictive covariance after `t` generations under the\nfull time-varying mechanistic state.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -43838,7 +43923,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3613,
+   "line": 3600,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -43868,7 +43953,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  targetScoreVarianceFromSourceWeights (m.toMetricModelAt t)",
+   "body": "  scoreVarianceFromSourceWeights (m.toMetricModelAt t)",
    "docstring": "Exact transported score variance after `t` generations under the target LD\nmatrix and the transported source weights.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -43906,7 +43991,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3621,
+   "line": 3608,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -43936,7 +44021,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  effectiveTargetOutcomeVariance (m.toMetricModelAt t)",
+   "body": "  effectiveOutcomeVariance (m.toMetricModelAt t)",
    "docstring": "Effective target outcome variance after `t` generations, including the full\nadditive biological loss budget induced by the time-varying state.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
@@ -43972,7 +44057,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3627,
+   "line": 3614,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -44002,7 +44087,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  targetResidualVarianceFromSourceWeights (m.toMetricModelAt t)",
+   "body": "  residualVarianceFromSourceWeights (m.toMetricModelAt t)",
    "docstring": "Exact target residual variance after `t` generations under the mechanistic\ntransported-score law.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -44022,7 +44107,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3633,
+   "line": 3620,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -44052,7 +44137,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  targetCalibrationSlopeFromSourceWeights (m.toMetricModelAt t)",
+   "body": "  calibrationSlopeFromSourceWeights (m.toMetricModelAt t)",
    "docstring": "Exact target calibration slope after `t` generations under the mechanistic\ntransported-score law.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -44082,7 +44167,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3727,
+   "line": 3714,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalModel p q) (sourceBaseline : ℝ) (t : ℕ) : ℝ",
    "args": [
     {
@@ -44120,7 +44205,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  sourceBaseline *\n    (targetR2AtGeneration m t / sourceR2FromSourceWeights (m.toMetricModelAt t))",
+   "body": "  sourceBaseline *\n    (targetR2AtGeneration m t / r2FromSourceWeights (m.toMetricModelAt t))",
    "docstring": "Display-normalized target `R²` after `t` generations.\n\nThis preserves the exact mechanistic portability ratio while anchoring the\nsource baseline at a chosen display value, instead of rescaling the biological\nstate.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -44146,7 +44231,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3831,
+   "line": 3818,
    "signature": "(V_A V_E fstTarget : ℝ) : ℝ",
    "args": [
     {
@@ -44212,7 +44297,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3955,
+   "line": 3942,
    "signature": "(η q : ℝ) : ℝ",
    "args": [
     {
@@ -44251,7 +44336,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3959,
+   "line": 3946,
    "signature": "(η qSource qTarget : ℝ) : ℝ",
    "args": [
     {
@@ -44288,7 +44373,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3976,
+   "line": 3963,
    "signature": "(η q : ℝ) : ℝ",
    "args": [
     {
@@ -44334,7 +44419,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3980,
+   "line": 3967,
    "signature": "(η qSource qTarget : ℝ) : ℝ",
    "args": [
     {
@@ -44385,7 +44470,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4064,
+   "line": 4051,
    "signature": "(V_A fstS fstT : ℝ) : ℝ",
    "args": [
     {
@@ -44419,7 +44504,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4074,
+   "line": 4061,
    "signature": "(V_A M : ℝ) : ℝ",
    "args": [
     {
@@ -44462,7 +44547,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4137,
+   "line": 4124,
    "signature": "(m : MutationDriftModelAssumptions) : ℝ",
    "args": [
     {
@@ -44547,7 +44632,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4170,
+   "line": 4157,
    "signature": "(Ne rate F : ℝ) : ℝ",
    "args": [
     {
@@ -44602,7 +44687,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4202,
+   "line": 4189,
    "signature": "(m : MutationDriftModelAssumptions) : ℝ",
    "args": [
     {
@@ -44682,7 +44767,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4236,
+   "line": 4223,
    "signature": "(m : MutationDriftModelAssumptions) : ℝ",
    "args": [
     {
@@ -44726,7 +44811,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4324,
+   "line": 4311,
    "signature": "(freq_corr ld_overlap : ℝ) : ℝ",
    "args": [
     {
@@ -44769,7 +44854,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4334,
+   "line": 4321,
    "signature": "(fst : ℝ) : ℝ",
    "args": [
     {
@@ -44813,7 +44898,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4338,
+   "line": 4325,
    "signature": "(shared_ld : ℝ) : ℝ",
    "args": [
     {
@@ -44852,7 +44937,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4350,
+   "line": 4337,
    "signature": "(fst shared_ld : ℝ) : ℝ",
    "args": [
     {
@@ -44895,7 +44980,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4369,
+   "line": 4356,
    "signature": "(fst_drift shared_ld : ℝ) : ℝ",
    "args": [
     {
@@ -44959,7 +45044,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4425,
+   "line": 4412,
    "signature": "(V_A fst_drift shared_ld : ℝ) : ℝ",
    "args": [
     {
@@ -45046,7 +45131,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4470,
+   "line": 4457,
    "signature": "(V_A V_E fst_drift shared_ld : ℝ) : ℝ",
    "args": [
     {
@@ -45107,7 +45192,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4500,
+   "line": 4487,
    "signature": "(fstSource fstTarget shared_ld_source shared_ld_target : ℝ) : ℝ",
    "args": [
     {
@@ -45160,7 +45245,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4645,
+   "line": 4632,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45296,7 +45381,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4683,
+   "line": 4670,
    "signature": "(Ne rate x : ℝ) : ℝ",
    "args": [
     {
@@ -45347,7 +45432,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4696,
+   "line": 4683,
    "signature": "(Ne rate : ℝ) : ℝ",
    "args": [
     {
@@ -45414,7 +45499,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4786,
+   "line": 4773,
    "signature": "(Ne m F : ℝ) : ℝ",
    "args": [
     {
@@ -45466,7 +45551,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4803,
+   "line": 4790,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45517,7 +45602,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4835,
+   "line": 4822,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45621,7 +45706,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4921,
+   "line": 4908,
    "signature": "(s : SplitMigrationModel) : ℝ",
    "args": [
     {
@@ -45661,7 +45746,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4971,
+   "line": 4958,
    "signature": "(fst_neighbor α : ℝ) (d : ℕ) : ℝ",
    "args": [
     {
@@ -45745,7 +45830,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5056,
+   "line": 5043,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45795,7 +45880,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5082,
+   "line": 5069,
    "signature": "(M : ℝ) : ℝ",
    "args": [
     {
@@ -45866,7 +45951,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5146,
+   "line": 5133,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45934,7 +46019,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5157,
+   "line": 5144,
    "signature": "(V_A Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -46000,7 +46085,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5268,
+   "line": 5255,
    "signature": "(Ne m_into : ℝ) : ℝ",
    "args": [
     {
@@ -46051,7 +46136,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5309,
+   "line": 5296,
    "signature": "(m₁₂ m₂₁ : ℝ) : ℝ",
    "args": [
     {
@@ -46098,7 +46183,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5330,
+   "line": 5317,
    "signature": "(r : ℝ) (generations_since : ℕ) : ℝ",
    "args": [
     {
@@ -46119,7 +46204,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  (1 - r) ^ generations_since",
+   "body": "  discreteRecombinationSurvival r generations_since",
    "docstring": "**Admixture LD from a recent migration pulse.**\n    A pulse of migration (admixture) at time t_adm generations ago creates\n    LD between loci at recombination distance r. This LD decays as:\n    D_adm(t) = D_0 × (1 - r)^(t - t_adm)\n    where D_0 is the initial admixture LD and t is the current time.\n    We model the decay factor.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
@@ -46189,7 +46274,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5377,
+   "line": 5364,
    "signature": "(r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ) : ℝ",
    "args": [
     {
@@ -46254,7 +46339,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5439,
+   "line": 5426,
    "signature": "(Ne m Fst : ℝ) : ℝ",
    "args": [
     {
@@ -46305,7 +46390,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5474,
+   "line": 5461,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -46397,7 +46482,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5556,
+   "line": 5543,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -47602,6 +47687,13 @@
      ],
      "Calibrator.MafSpectrum.fourthMoment_eq": [],
      "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [],
+     "Calibrator.hweFloorOneScaleSq_eq": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf": [
+      "h.altFreq = gaussianKurtosisMaf"
+     ],
      "Calibrator.hweThirdCentralMoment_eq": [],
      "Calibrator.hwe_symmetricCoding_forces_half": [
       "0 < h.altFreq",
@@ -47672,6 +47764,8 @@
     "Calibrator.centeredSquare_third_moment_eq",
     "Calibrator.genotypeProb_values",
     "Calibrator.hweCenteredSixthMoment_eq",
+    "Calibrator.hweFloorOneScaleSq_eq",
+    "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf",
     "Calibrator.hweLevelOne_symmetry",
     "Calibrator.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance",
     "Calibrator.hweThirdCentralMoment_eq",
@@ -47897,6 +47991,10 @@
      ],
      "Calibrator.MafSpectrum.fourthMoment_eq": [],
      "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [],
+     "Calibrator.hweFloorOneScaleSq_eq": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
      "Calibrator.standardizedGenotype_symmetric_iff": [
       "0 < h.altFreq",
       "h.altFreq < 1"
@@ -47944,6 +48042,7 @@
     "Calibrator.centeredSquare_negative_at_half",
     "Calibrator.genotypeVariance_determines_frequency_pair",
     "Calibrator.hweCenteredSixthMoment_eq",
+    "Calibrator.hweFloorOneScaleSq_eq",
     "Calibrator.hwe_variance_eq",
     "Calibrator.mellinDrift_uses_ploidy",
     "Calibrator.reflect_genotypeVariance",
@@ -51339,9 +51438,6 @@
     ],
     "hypotheses_by_theorem": {
      "Calibrator.worse_than_neutral_implies_diversifying_selection": [],
-     "Calibrator.effectCorrelation_mem_range": [],
-     "Calibrator.stabilizing_maintains_architecture": [],
-     "Calibrator.fluctuating_selection_worst_portability": [],
      "Calibrator.effect_correlation_increases_with_Ns": [],
      "Calibrator.effectCorrelationStabilizing_pos": [
       "1 < Ns"
@@ -51357,26 +51453,23 @@
      "Calibrator.observedSelectionSummary_identifies_fluctuating_not_stabilizing": []
     },
     "range_lo_thm": [
-     "Calibrator.effectCorrelation_mem_range",
-     4
+     "Calibrator.effectCorrelationStabilizing_pos",
+     1
     ],
+    "range_lo": 0,
     "range_hi_thm": [
-     "Calibrator.effectCorrelation_mem_range",
-     4
+     "Calibrator.effectCorrelationStabilizing_lt_one",
+     1
     ],
-    "range_lo": -1,
     "range_hi": 1
    },
    "mentioned_by": [
     "Calibrator.effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs",
     "Calibrator.effectCorrelationStabilizing_lt_one",
     "Calibrator.effectCorrelationStabilizing_pos",
-    "Calibrator.effectCorrelation_mem_range",
     "Calibrator.effect_correlation_increases_with_Ns",
     "Calibrator.fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold",
-    "Calibrator.fluctuating_selection_worst_portability",
     "Calibrator.observedSelectionSummary_identifies_fluctuating_not_stabilizing",
-    "Calibrator.stabilizing_maintains_architecture",
     "Calibrator.worse_than_neutral_implies_diversifying_selection"
    ]
   },
@@ -52158,7 +52251,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  targetR2FromSourceWeights m / sourceR2FromSourceWeights m",
+   "body": "  r2FromSourceWeights m Pop.target / r2FromSourceWeights m Pop.source",
    "docstring": "Exact target/source portability ratio from the explicit mechanistic state.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -54238,7 +54331,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  cov_pgs_y ^ 2 / (var_pgs * var_y)",
+   "body": "  explainedR2FromTransportMoments cov_pgs_y var_pgs var_y",
    "docstring": "R² of a PGS: the squared correlation between PGS and phenotype.\n    R² = Cov(PGS, Y)² / (Var(PGS) × Var(Y)).\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
@@ -59891,9 +59984,9 @@
    "noncomputable": false,
    "file": "Calibrator/AssortativeMatingPGS.lean",
    "line": 52,
-   "signature": "where r : ℝ h2 : ℝ V_A : ℝ V_P : ℝ r_pos : 0 < r r_lt_one : r < 1 h2_pos : 0 < h2 h2_lt_one : h2 < 1 V_A_pos : 0 < V_A V_P_pos : 0 < V_P h2_def : h2 = V_A / V_P stability : r * h2 < 1",
+   "signature": "where r : ℝ V_A : ℝ V_P : ℝ r_pos : 0 < r r_lt_one : r < 1 V_A_pos : 0 < V_A V_A_lt_V_P : V_A < V_P stability : r * (V_A / V_P) < 1",
    "args": [],
-   "ret_type": "ℝ h2 : ℝ V_A : ℝ V_P : ℝ r_pos : 0 < r r_lt_one : r < 1 h2_pos : 0 < h2 h2_lt_one : h2 < 1 V_A_pos : 0 < V_A V_P_pos : 0 < V_P h2_def : h2 = V_A / V_P stability : r * h2 < 1",
+   "ret_type": "ℝ V_A : ℝ V_P : ℝ r_pos : 0 < r r_lt_one : r < 1 V_A_pos : 0 < V_A V_A_lt_V_P : V_A < V_P stability : r * (V_A / V_P) < 1",
    "body": "",
    "docstring": "**Assortative mating model at equilibrium.**\n    Captures the key parameters of a population under AM:\n    spousal correlation `r`, random-mating heritability `h2`,\n    and random-mating additive variance `V_A`.\n    The stability condition `r * h2 < 1` ensures finite equilibrium variance.",
    "empirical_status": "",
@@ -59901,10 +59994,6 @@
    "fields": [
     {
      "name": "r",
-     "type": "ℝ"
-    },
-    {
-     "name": "h2",
      "type": "ℝ"
     },
     {
@@ -59924,33 +60013,21 @@
      "type": "r < 1"
     },
     {
-     "name": "h2_pos",
-     "type": "0 < h2"
-    },
-    {
-     "name": "h2_lt_one",
-     "type": "h2 < 1"
-    },
-    {
      "name": "V_A_pos",
      "type": "0 < V_A"
     },
     {
-     "name": "V_P_pos",
-     "type": "0 < V_P"
-    },
-    {
-     "name": "h2_def",
-     "type": "h2 = V_A / V_P"
+     "name": "V_A_lt_V_P",
+     "type": "V_A < V_P"
     },
     {
      "name": "stability",
-     "type": "r * h2 < 1"
+     "type": "r * (V_A / V_P) < 1"
     }
    ],
    "equations": [],
    "constraints": {
-    "raw_chunk_lines": 21
+    "raw_chunk_lines": 23
    },
    "mentioned_by": []
   },
@@ -59960,7 +60037,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 350,
+   "line": 368,
    "signature": "where r_s : ℝ r_t : ℝ h2 : ℝ r_s_pos : 0 < r_s r_s_lt_one : r_s < 1 r_t_nonneg : 0 ≤ r_t h2_pos : 0 < h2 h2_lt_one : h2 < 1 stability_s : r_s * h2 < 1 stability_t : r_t * h2 < 1 more_am_in_source : r_t < r_s",
    "args": [],
    "ret_type": "ℝ r_t : ℝ h2 : ℝ r_s_pos : 0 < r_s r_s_lt_one : r_s < 1 r_t_nonneg : 0 ≤ r_t h2_pos : 0 < h2 h2_lt_one : h2 < 1 stability_s : r_s * h2 < 1 stability_t : r_t * h2 < 1 more_am_in_source : r_t < r_s",
@@ -60026,7 +60103,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 449,
+   "line": 467,
    "signature": "where beta_i : ℝ beta_j : ℝ r_s : ℝ r_t : ℝ h2 : ℝ r_s_pos : 0 < r_s r_t_nonneg : 0 ≤ r_t r_t_lt_rs : r_t < r_s h2_pos : 0 < h2 stability_s : r_s * h2 < 1 stability_t : r_t * h2 < 1",
    "args": [],
    "ret_type": "ℝ beta_j : ℝ r_s : ℝ r_t : ℝ h2 : ℝ r_s_pos : 0 < r_s r_t_nonneg : 0 ≤ r_t r_t_lt_rs : r_t < r_s h2_pos : 0 < h2 stability_s : r_s * h2 < 1 stability_t : r_t * h2 < 1",
@@ -60495,6 +60572,56 @@
    "equations": [],
    "constraints": {
     "raw_chunk_lines": 10
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Calibrator.ScaleSequence",
+   "short": "ScaleSequence",
+   "kind": "structure",
+   "noncomputable": false,
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 1217,
+   "signature": "where scale : ℕ → ℝ scale_pos : ∀ k, 0 < scale k scale_one_sq : scale 1 ^ 2 = 2 scale_two_sq : scale 2 ^ 2 = 14 growthRate : ℝ growthRate_pos : 0 < growthRate doubly_exponential : ∀ k : ℕ, Real.exp (growthRate * 2 ^ k) ≤ scale k",
+   "args": [],
+   "ret_type": "ℕ → ℝ scale_pos : ∀ k, 0 < scale k scale_one_sq : scale 1 ^ 2 = 2 scale_two_sq : scale 2 ^ 2 = 14 growthRate : ℝ growthRate_pos : 0 < growthRate doubly_exponential : ∀ k : ℕ, Real.exp (growthRate * 2 ^ k) ≤ scale k",
+   "body": "",
+   "docstring": "The scale sequence of a tower, with the growth carried as a named hypothesis.\n\nThe two anchor values are theorems (`gaussianFloorOneScaleSq`, `gaussianFloorTwoScaleSq`);\nthe growth law is quadrature evidence, exact through floor seven, and is a hypothesis here\nrather than an assertion.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [
+    {
+     "name": "scale",
+     "type": "ℕ → ℝ"
+    },
+    {
+     "name": "scale_pos",
+     "type": "∀ k, 0 < scale k"
+    },
+    {
+     "name": "scale_one_sq",
+     "type": "scale 1 ^ 2 = 2"
+    },
+    {
+     "name": "scale_two_sq",
+     "type": "scale 2 ^ 2 = 14"
+    },
+    {
+     "name": "growthRate",
+     "type": "ℝ"
+    },
+    {
+     "name": "growthRate_pos",
+     "type": "0 < growthRate"
+    },
+    {
+     "name": "doubly_exponential",
+     "type": "∀ k : ℕ, Real.exp (growthRate * 2 ^ k) ≤ scale k"
+    }
+   ],
+   "equations": [],
+   "constraints": {
+    "raw_chunk_lines": 17
    },
    "mentioned_by": []
   },
@@ -61096,7 +61223,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/DGP.lean",
-   "line": 2135,
+   "line": 2166,
    "signature": "where brokenTagging : ℝ ancestrySpecificLD : ℝ sourceSpecificOverfit : ℝ novelUntaggablePhenotype : ℝ brokenTagging_nonneg : 0 ≤ brokenTagging ancestrySpecificLD_nonneg : 0 ≤ ancestrySpecificLD sourceSpecificOverfit_nonneg : 0 ≤ sourceSpecificOverfit novelUntaggablePhenotype_nonneg : 0 ≤ novelUntaggablePhenotype",
    "args": [],
    "ret_type": "ℝ ancestrySpecificLD : ℝ sourceSpecificOverfit : ℝ novelUntaggablePhenotype : ℝ brokenTagging_nonneg : 0 ≤ brokenTagging ancestrySpecificLD_nonneg : 0 ≤ ancestrySpecificLD sourceSpecificOverfit_nonneg : 0 ≤ sourceSpecificOverfit novelUntaggablePhenotype_nonneg : 0 ≤ novelUntaggablePhenotype",
@@ -61150,7 +61277,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/DGP.lean",
-   "line": 2161,
+   "line": 2192,
    "signature": "where r2 : ℝ auc : ℝ brier : ℝ",
    "args": [],
    "ret_type": "ℝ auc : ℝ brier : ℝ",
@@ -63398,7 +63525,7 @@
    "kind": "inductive",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1132,
+   "line": 1131,
    "signature": "where",
    "args": [],
    "ret_type": "",
@@ -63419,7 +63546,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1167,
+   "line": 1166,
    "signature": "(p q : ℕ) where beta : Pop → Fin q → ℝ sigmaTag : Pop → Matrix (Fin p) (Fin p) ℝ directCausal : Pop → Matrix (Fin p) (Fin q) ℝ proxyTagging : Pop → Matrix (Fin p) (Fin q) ℝ novelDirectCausal : Pop → Matrix (Fin p) (Fin q) ℝ novelProxyTagging : Pop → Matrix (Fin p) (Fin q) ℝ novelCausalEffect : Pop → Fin q → ℝ contextCross : Pop → Fin p → ℝ outcomeVariance : Pop → ℝ novelUntaggablePhenotypeVarianceTarget : ℝ targetPrevalence : ℝ novelDirectCausal_source : novelDirectCausal Pop.source = 0 novelProxyTagging_source : novelProxyTagging Pop.source = 0 novelCausalEffect_source : novelCausalEffect Pop.source = 0 outcomeVariance_pos : ∀ P : Pop, 0 < outcomeVariance P novelUntaggablePhenotypeVarianceTarget_nonneg : 0 ≤ novelUntaggablePhenotypeVarianceTarget targetPrevalence_pos : 0 < targetPrevalence targetPrevalence_lt_one : targetPrevalence < 1",
    "args": [
     {
@@ -63523,7 +63650,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2135,
+   "line": 2121,
    "signature": "where Ne : ℝ μ : ℝ mig : ℝ recomb : ℝ V_A : ℝ Ne_pos : 0 < Ne μ_nonneg : 0 ≤ μ mig_nonneg : 0 ≤ mig recomb_nonneg : 0 ≤ recomb recomb_le_half : recomb ≤ 1 / 2 V_A_pos : 0 < V_A",
    "args": [],
    "ret_type": "ℝ μ : ℝ mig : ℝ recomb : ℝ V_A : ℝ Ne_pos : 0 < Ne μ_nonneg : 0 ≤ μ mig_nonneg : 0 ≤ mig recomb_nonneg : 0 ≤ recomb recomb_le_half : recomb ≤ 1 / 2 V_A_pos : 0 < V_A",
@@ -63581,7 +63708,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2341,
+   "line": 2327,
    "signature": "(p q : ℕ) where popGen : GenerationalPopGenParameters betaSource : Fin q → ℝ targetEffectHeterogeneityAt : ℕ → Fin q → ℝ novelCausalEffectTargetAt : ℕ → Fin q → ℝ sigmaTagSource : Matrix (Fin p) (Fin p) ℝ directCausalSource : Matrix (Fin p) (Fin q) ℝ novelDirectCausalTemplate : Matrix (Fin p) (Fin q) ℝ proxyTaggingSource : Matrix (Fin p) (Fin q) ℝ novelProxyTaggingTemplate : Matrix (Fin p) (Fin q) ℝ tagDistance : Matrix (Fin p) (Fin p) ℝ tagCausalDistance : Matrix (Fin p) (Fin q) ℝ tagAlleleFreqSource : Fin p → ℝ tagAlleleFreqStandingTargetAt : ℕ → Fin p → ℝ tagAlleleFreqMutationShiftAt : ℕ → Fin p → ℝ causalAlleleFreqSource : Fin q → ℝ causalAlleleFreqStandingTargetAt : ℕ → Fin q → ℝ causalAlleleFreqMutationShiftAt : ℕ → Fin q → ℝ contextCrossSource : Fin p → ℝ contextCrossTargetAt : ℕ → Fin p → ℝ sourceOutcomeVariance : ℝ targetOutcomeVarianceAt : ℕ → ℝ novelUntaggablePhenotypeVarianceAt : ℕ → ℝ targetPrevalenceAt : ℕ → ℝ sourceOutcomeVariance_pos : 0 < sourceOutcomeVariance targetOutcomeVariance_pos : ∀ t, 0 < targetOutcomeVarianceAt t novelUntaggablePhenotypeVariance_nonneg : ∀ t, 0 ≤ novelUntaggablePhenotypeVarianceAt t targetPrevalence_pos : ∀ t, 0 < targetPrevalenceAt t targetPrevalence_lt_one : ∀ t, targetPrevalenceAt t < 1",
    "args": [
     {
@@ -63725,7 +63852,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4126,
+   "line": 4113,
    "signature": "where Ne : ℝ μ : ℝ t : ℝ Ne_pos : 0 < Ne mu_pos : 0 < μ t_nonneg : 0 ≤ t",
    "args": [],
    "ret_type": "ℝ μ : ℝ t : ℝ Ne_pos : 0 < Ne mu_pos : 0 < μ t_nonneg : 0 ≤ t",

@@ -436,11 +436,29 @@ def build(root: pathlib.Path):
     return defs, thms, structs, failures
 
 
+def find_collisions(defs):
+    """Fully-qualified names declared more than once.
+
+    Lean rejects a second declaration of the same fully-qualified name whatever
+    its signature, so a collision here is a BUILD FAILURE in the corpus, not a
+    modelling problem for this table.  It is surfaced rather than resolved: any
+    resolution silently drops a real declaration, and a consumer keyed by name
+    would then compute against a corpus with a definition missing.
+    """
+    seen = {}
+    for d in defs:
+        seen.setdefault(d.name, []).append(d)
+    return {n: [{"file": x.file, "line": x.line, "signature": x.signature}
+                for x in rows]
+            for n, rows in seen.items() if len(rows) > 1}
+
+
 def to_json(defs, structs, failures):
     def clean(d):
         r = {k: v for k, v in asdict(d).items()}
         return r
     return {
+        "collisions": find_collisions(defs),
         "definitions": [clean(d) for d in defs],
         "structures": [clean(d) for d in structs],
         "parse_failures": failures,

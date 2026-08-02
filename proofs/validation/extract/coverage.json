@@ -718,10 +718,38 @@
   "killed": [],
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
+ "Calibrator.AssortativeMatingModel.h2": {
+  "class": "NUMERIC",
+  "file": "Calibrator/AssortativeMatingPGS.lean",
+  "line": 75,
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1,
+   "quantity": "heritability",
+   "source_lo": "docstring/name",
+   "source_hi": "theorem",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": [
+    "Calibrator.AssortativeMatingModel.h2_lt_one",
+    0
+   ],
+   "n_points": 40,
+   "box": {}
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 3
+ },
  "Calibrator.amVarianceStep": {
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
-  "line": 118,
+  "line": 136,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -774,36 +802,16 @@
  "Calibrator.AssortativeMatingModel.equilibriumVariance": {
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
-  "line": 127,
-  "status": "RANGE-MISMATCH",
-  "check": {
-   "kind": "range",
-   "lo": 0.0,
-   "hi": 1.0,
-   "quantity": "heritability",
-   "source_lo": "docstring/name",
-   "source_hi": "docstring/name",
-   "hypotheses": [],
-   "hypotheses_not_enforced": [],
-   "thm_lo": null,
-   "thm_hi": null,
-   "n_points": 40,
-   "box": {},
-   "violated_side": "hi",
-   "violated_side_theorem": null
-  },
+  "line": 145,
+  "status": "UNCOVERED",
+  "check": null,
   "killed": [],
-  "reason": "",
-  "violation": {
-   "point": {},
-   "value": 1.2873100702185583,
-   "why": "above 1.0"
-  }
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.amEquilibriumVariance": {
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
-  "line": 133,
+  "line": 151,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -850,7 +858,7 @@
  "Calibrator.amInducedLD": {
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
-  "line": 221,
+  "line": 239,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -913,74 +921,25 @@
  "Calibrator.AssortativeMatingModel.observedH2": {
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
-  "line": 258,
-  "status": "RANGE-MISMATCH",
-  "check": {
-   "kind": "range",
-   "lo": 0.0,
-   "hi": 1.0,
-   "quantity": "heritability",
-   "source_lo": "docstring/name",
-   "source_hi": "docstring/name",
-   "hypotheses": [],
-   "hypotheses_not_enforced": [],
-   "thm_lo": null,
-   "thm_hi": null,
-   "n_points": 40,
-   "box": {},
-   "violated_side": "hi",
-   "violated_side_theorem": null
-  },
+  "line": 276,
+  "status": "UNCOVERED",
+  "check": null,
   "killed": [],
-  "reason": "",
-  "violation": {
-   "point": {},
-   "value": 1.6766345007561454,
-   "why": "above 1.0"
-  }
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.AssortativeMatingModel.pgsR2AM": {
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
-  "line": 287,
-  "status": "RANGE-MISMATCH",
-  "check": {
-   "kind": "range",
-   "lo": 0.0,
-   "hi": 1.0,
-   "quantity": "heritability",
-   "source_lo": "docstring/name",
-   "source_hi": "docstring/name",
-   "hypotheses": [
-    "0 < R2_rm"
-   ],
-   "hypotheses_not_enforced": [],
-   "thm_lo": null,
-   "thm_hi": null,
-   "n_points": 40,
-   "box": {
-    "R2_rm": [
-     0.02,
-     0.98
-    ]
-   },
-   "violated_side": "hi",
-   "violated_side_theorem": null
-  },
+  "line": 305,
+  "status": "UNCOVERED",
+  "check": null,
   "killed": [],
-  "reason": "",
-  "violation": {
-   "point": {
-    "R2_rm": 0.979999
-   },
-   "value": 1.4491398271587197,
-   "why": "above 1.0"
-  }
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.AssortativeMatingModel.amGap": {
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
-  "line": 315,
+  "line": 333,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -989,7 +948,7 @@
  "Calibrator.DifferentialAMModel.apparentPortability": {
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
-  "line": 383,
+  "line": 401,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -1022,7 +981,7 @@
  "Calibrator.amCorrectedPortability": {
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
-  "line": 400,
+  "line": 418,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -1081,7 +1040,7 @@
  "Calibrator.ibdFst": {
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
-  "line": 535,
+  "line": 553,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -2344,6 +2303,69 @@
   "killed": [],
   "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
+ "Calibrator.squaringScaleSq": {
+  "class": "NUMERIC",
+  "file": "Calibrator/CondensationUnification.lean",
+  "line": 1054,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": null,
+   "quantity": "nonnegative",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "fourthMoment": [
+     0.05,
+     3.0
+    ]
+   },
+   "violated_side": "lo",
+   "violated_side_theorem": null
+  },
+  "killed": [],
+  "reason": "",
+  "violation": {
+   "point": {
+    "fourthMoment": 0.050003
+   },
+   "value": -0.94999705,
+   "why": "below 0.0"
+  }
+ },
+ "Calibrator.nextFloorFourthMoment": {
+  "class": "NUMERIC",
+  "file": "Calibrator/CondensationUnification.lean",
+  "line": 1061,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
+ },
+ "Calibrator.squaringStep": {
+  "class": "NUMERIC",
+  "file": "Calibrator/CondensationUnification.lean",
+  "line": 1177,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
+ },
+ "Calibrator.squaringFixedPoint": {
+  "class": "NUMERIC",
+  "file": "Calibrator/CondensationUnification.lean",
+  "line": 1183,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
+ },
  "Calibrator.ploidy": {
   "class": "NUMERIC",
   "file": "Calibrator/Conventions.lean",
@@ -3151,8 +3173,8 @@
  },
  "Calibrator.sigmaTagCausal": {
   "class": "NOT-EXTRACTABLE",
-  "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1189,
+  "file": "Calibrator/DGP.lean",
+  "line": 117,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -3165,7 +3187,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "qualified name Pop.source"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalSource'))"
  },
  "Calibrator.sourceBestLinearWeightsFromLD": {
   "class": "NOT-EXTRACTABLE",
@@ -3174,7 +3196,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "qualified name Pop.source"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.frobeniusNormSq": {
   "class": "NUMERIC",
@@ -3302,7 +3324,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceBestLinearWeightsFromLD"
+  "reason": "self-check: calls untranslated definition ldWitnessSourceMoments"
  },
  "Calibrator.ldWitnessTargetCross": {
   "class": "NOT-EXTRACTABLE",
@@ -4012,7 +4034,7 @@
  "Calibrator.TransportedMetrics.gaussianAUCFromSignalVariance": {
   "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
-  "line": 2104,
+  "line": 2135,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -4046,7 +4068,7 @@
  "Calibrator.TransportedMetrics.calibratedBrier": {
   "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
-  "line": 2108,
+  "line": 2139,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -4087,7 +4109,7 @@
  "Calibrator.TransportedMetrics.calibratedBrierFromVariances": {
   "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
-  "line": 2120,
+  "line": 2151,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -4133,7 +4155,7 @@
  "Calibrator.TransportedMetrics.IrreducibleTargetPenalty.total": {
   "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
-  "line": 2146,
+  "line": 2177,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4142,7 +4164,7 @@
  "Calibrator.TransportedMetrics.profileFromSignalVariance": {
   "class": "STRUCTURAL",
   "file": "Calibrator/DGP.lean",
-  "line": 2181,
+  "line": 2212,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4151,7 +4173,7 @@
  "Calibrator.TransportedMetrics.profileFromSignalVarianceWithPenalty": {
   "class": "STRUCTURAL",
   "file": "Calibrator/DGP.lean",
-  "line": 2213,
+  "line": 2244,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4160,7 +4182,7 @@
  "Calibrator.PGSEvolutionaryModel.coordinateSummary": {
   "class": "STRUCTURAL",
   "file": "Calibrator/DGP.lean",
-  "line": 2246,
+  "line": 2277,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4169,7 +4191,7 @@
  "Calibrator.PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/DGP.lean",
-  "line": 2307,
+  "line": 2338,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4178,7 +4200,7 @@
  "Calibrator.alleleFreqDivergenceRate": {
   "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
-  "line": 2348,
+  "line": 2379,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -4226,7 +4248,7 @@
  "Calibrator.ldBreakageRate": {
   "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
-  "line": 2354,
+  "line": 2385,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5924,7 +5946,7 @@
  "Calibrator.commonAndRarePortableModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/GeneticArchitectureDiscovery.lean",
-  "line": 725,
+  "line": 721,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -10451,7 +10473,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourcePredictiveCovarianceFromSourceWeights"
+  "reason": "qualified name Pop.source"
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope": {
   "class": "NOT-EXTRACTABLE",
@@ -10460,7 +10482,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights"
+  "reason": "qualified name Pop.target"
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.toShiftModel": {
   "class": "STRUCTURAL",
@@ -11114,7 +11136,7 @@
  "Calibrator.selectedDriftFactor": {
   "class": "NUMERIC",
   "file": "Calibrator/PhenomeWidePortability.lean",
-  "line": 165,
+  "line": 169,
   "status": "DEFECT-CANDIDATE",
   "check": {
    "kind": "range",
@@ -11171,7 +11193,7 @@
  "Calibrator.fstFromDriftFactor": {
   "class": "NUMERIC",
   "file": "Calibrator/PhenomeWidePortability.lean",
-  "line": 192,
+  "line": 196,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -11214,7 +11236,7 @@
  "Calibrator.causalPortabilityFromLocalFst": {
   "class": "NUMERIC",
   "file": "Calibrator/PhenomeWidePortability.lean",
-  "line": 307,
+  "line": 311,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -11408,10 +11430,10 @@
    "why": "above 1.0"
   }
  },
- "Calibrator.effectCorrelationStabilizing": {
+ "Calibrator.effectCorrelationStabilizingDriftSelection": {
   "class": "NUMERIC",
-  "file": "Calibrator/SelectionArchitecture.lean",
-  "line": 90,
+  "file": "Calibrator/PolygenicAdaptation.lean",
+  "line": 288,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -11420,8 +11442,14 @@
    "quantity": "correlation",
    "source_lo": "theorem",
    "source_hi": "theorem",
-   "hypotheses": [],
-   "hypotheses_not_enforced": [],
+   "hypotheses": [
+    "0 \u2264 d",
+    "d \u2264 1",
+    "0 \u2264 s * N"
+   ],
+   "hypotheses_not_enforced": [
+    "0 \u2264 f * N"
+   ],
    "thm_lo": [
     "Calibrator.effectCorrelation_mem_range",
     4
@@ -11432,13 +11460,23 @@
    ],
    "n_points": 40,
    "box": {
-    "Ns": [
-     1.001,
+    "d": [
+     0.05,
+     1.0
+    ],
+    "s": [
+     0.05,
      3.0
+    ],
+    "N": [
+     1.0,
+     1000.0
     ]
    }
   },
   "killed": [
+   "first '+'->'-'",
+   "last '+'->'-'",
    "first '-'->'+'",
    "last '-'->'+'",
    "first '/'->'*'",
@@ -11447,7 +11485,7 @@
    "literal 1->2"
   ],
   "reason": "",
-  "mutants_tried": 9
+  "mutants_tried": 11
  },
  "Calibrator.effectCorrelationFluctuating": {
   "class": "NUMERIC",
@@ -14110,51 +14148,10 @@
    "why": "above 1.0"
   }
  },
- "Calibrator.targetPGSVariance": {
-  "class": "NUMERIC",
-  "file": "Calibrator/PortabilityDrift.lean",
-  "line": 679,
-  "status": "RANGE-MISMATCH",
-  "check": {
-   "kind": "range",
-   "lo": 0.0,
-   "hi": 1.0,
-   "quantity": "F_ST",
-   "source_lo": "docstring/name",
-   "source_hi": "docstring/name",
-   "hypotheses": [],
-   "hypotheses_not_enforced": [],
-   "thm_lo": null,
-   "thm_hi": null,
-   "n_points": 40,
-   "box": {
-    "V_A": [
-     0.05,
-     3.0
-    ],
-    "fst": [
-     0.02,
-     0.98
-    ]
-   },
-   "violated_side": "hi",
-   "violated_side_theorem": null
-  },
-  "killed": [],
-  "reason": "",
-  "violation": {
-   "point": {
-    "V_A": 2.999997,
-    "fst": 0.020001
-   },
-   "value": 2.9399942290028322,
-   "why": "above 1.0"
-  }
- },
  "Calibrator.presentDayPGSVariance": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 689,
+  "line": 687,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -14201,7 +14198,7 @@
  "Calibrator.wrightFisherDriftRetention": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 710,
+  "line": 707,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -14243,7 +14240,7 @@
  "Calibrator.wrightFisherHeterozygosityLoss": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 730,
+  "line": 727,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -14289,7 +14286,7 @@
  "Calibrator.Var_Delta_Mu": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 773,
+  "line": 770,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -14332,7 +14329,7 @@
  "Calibrator.Expected_Abs_Shift": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 777,
+  "line": 774,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14341,64 +14338,16 @@
  "Calibrator.presentDaySignalToNoise": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 876,
+  "line": 873,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
- "Calibrator.presentDayR2": {
-  "class": "NUMERIC",
-  "file": "Calibrator/PortabilityDrift.lean",
-  "line": 887,
-  "status": "COVERED",
-  "check": {
-   "kind": "range",
-   "lo": 0.0,
-   "hi": 1.0,
-   "quantity": "F_ST",
-   "source_lo": "docstring/name",
-   "source_hi": "docstring/name",
-   "hypotheses": [
-    "0 < V_A",
-    "0 < V_E",
-    "fst < 1"
-   ],
-   "hypotheses_not_enforced": [
-    "(1 - fst",
-    "0 < presentDayR2 V_A V_E fstS"
-   ],
-   "thm_lo": null,
-   "thm_hi": null,
-   "n_points": 40,
-   "box": {
-    "V_A": [
-     0.05,
-     3.0
-    ],
-    "V_E": [
-     0.05,
-     3.0
-    ],
-    "fst": [
-     0.02,
-     0.98
-    ]
-   }
-  },
-  "killed": [
-   "first '+'->'-'",
-   "last '+'->'-'",
-   "first '/'->'*'",
-   "last '/'->'*'"
-  ],
-  "reason": "",
-  "mutants_tried": 4
- },
  "Calibrator.expectedR2": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 935,
+  "line": 882,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -14436,10 +14385,55 @@
   "reason": "",
   "mutants_tried": 5
  },
+ "Calibrator.presentDayR2": {
+  "class": "NUMERIC",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 890,
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "F_ST",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < V_A",
+    "0 < V_E",
+    "fst < 1"
+   ],
+   "hypotheses_not_enforced": [
+    "(1 - fst",
+    "0 < presentDayR2 V_A V_E fstS"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "V_A": [
+     0.05,
+     3.0
+    ],
+    "V_E": [
+     0.05,
+     3.0
+    ],
+    "fst": [
+     0.02,
+     0.98
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 1
+ },
  "Calibrator.presentDayGaussianAUC": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 943,
+  "line": 942,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -14481,7 +14475,7 @@
  "Calibrator.presentDayEqualVarianceGaussianAUC": {
   "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 952,
+  "line": 951,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -14522,7 +14516,7 @@
  "Calibrator.realWorldPGSVariance": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1094,
+  "line": 1093,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -14562,25 +14556,52 @@
  "Calibrator.Pop.pair": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1140,
+  "line": 1139,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "could not compile body: Untranslatable('recursion has no `0` branch')"
  },
+ "Calibrator.Pop.withTarget": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1149,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable('qualified name Pop.pair')"
+ },
+ "Calibrator.Pop.withSource": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1152,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable('qualified name Pop.pair')"
+ },
  "Calibrator.sourceERMWeights": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1177,
+  "line": 1195,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'l)"
  },
+ "Calibrator.sigmaTagCausalSourceAt": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1207,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "self-check: arity/type mismatch (TypeError(\"'dict' object is not callable\"))"
+ },
  "Calibrator.totalEffect": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1196,
+  "line": 1214,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14589,7 +14610,7 @@
  "Calibrator.targetLinearRisk": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1226,
+  "line": 1244,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14598,7 +14619,7 @@
  "Calibrator.sigmaObsSource": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1234,
+  "line": 1252,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14607,7 +14628,7 @@
  "Calibrator.sigmaObsTarget": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1238,
+  "line": 1256,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14616,7 +14637,7 @@
  "Calibrator.crossSource": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1242,
+  "line": 1260,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14625,7 +14646,7 @@
  "Calibrator.crossTarget": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1246,
+  "line": 1264,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14634,7 +14655,7 @@
  "Calibrator.wSource_opt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1250,
+  "line": 1268,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14643,7 +14664,7 @@
  "Calibrator.wTarget_opt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1254,
+  "line": 1272,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14652,7 +14673,7 @@
  "Calibrator.crossCovariance": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1284,
+  "line": 1302,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14661,7 +14682,7 @@
  "Calibrator.sourceWeightsFromExplicitDrivers": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1290,
+  "line": 1308,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14670,7 +14691,7 @@
  "Calibrator.sourceWeightedTagScore": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1298,
+  "line": 1316,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14679,7 +14700,7 @@
  "Calibrator.taggingProjection": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1310,
+  "line": 1328,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14688,7 +14709,7 @@
  "Calibrator.targetEffectHeterogeneity": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1319,
+  "line": 1337,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14697,7 +14718,7 @@
  "Calibrator.targetSourceEffectProjection": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1337,
+  "line": 1355,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14706,7 +14727,7 @@
  "Calibrator.targetEffectHeterogeneityProjection": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1345,
+  "line": 1363,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14715,7 +14736,7 @@
  "Calibrator.targetNovelMutationEffectProjection": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1353,
+  "line": 1371,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14724,7 +14745,7 @@
  "Calibrator.directCausalProjection": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1358,
+  "line": 1376,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14733,70 +14754,43 @@
  "Calibrator.proxyTaggingProjection": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1364,
+  "line": 1382,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "self-check: arity/type mismatch (TypeError(\"'dict' object is not callable\"))"
  },
- "Calibrator.sourceScoreVarianceFromExplicitDrivers": {
+ "Calibrator.scoreVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1442,
+  "line": 1461,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "qualified name Pop.source"
+  "reason": "self-check: calls untranslated definition sourceWeightsFromExplicitDrivers"
  },
- "Calibrator.targetScoreVarianceFromSourceWeights": {
+ "Calibrator.predictiveCovarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1450,
+  "line": 1470,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "qualified name Pop.target"
+  "reason": "self-check: calls untranslated definition dotProduct"
  },
- "Calibrator.sourcePredictiveCovarianceFromSourceWeights": {
+ "Calibrator.calibrationSlopeFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1456,
+  "line": 1476,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "qualified name Pop.source"
- },
- "Calibrator.targetPredictiveCovarianceFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1464,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "qualified name Pop.target"
- },
- "Calibrator.sourceCalibrationSlopeFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1472,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition sourcePredictiveCovarianceFromSourceWeights"
- },
- "Calibrator.targetCalibrationSlopeFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1480,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights"
+  "reason": "self-check: calls untranslated definition dotProduct"
  },
  "Calibrator.brokenTaggingResidual": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1608,
+  "line": 1603,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14805,7 +14799,7 @@
  "Calibrator.ancestrySpecificLDResidual": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1626,
+  "line": 1621,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14814,7 +14808,7 @@
  "Calibrator.sourceSpecificOverfitResidual": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1643,
+  "line": 1638,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14823,7 +14817,7 @@
  "Calibrator.novelUntaggablePhenotypeResidual": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1658,
+  "line": 1653,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -14848,7 +14842,7 @@
  "Calibrator.irreducibleTargetResidualBurden": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1676,
+  "line": 1671,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14857,88 +14851,70 @@
  "Calibrator.targetIrreduciblePenaltyProfile": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1693,
+  "line": 1688,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
  },
- "Calibrator.effectiveTargetOutcomeVariance": {
+ "Calibrator.residualBurden": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1717,
+  "line": 1712,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "qualified name Pop.target"
+  "reason": "qualified name Pop.pair"
  },
- "Calibrator.sourceExplainedSignalVarianceFromSourceWeights": {
+ "Calibrator.effectiveOutcomeVariance": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1751,
+  "line": 1722,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourcePredictiveCovarianceFromSourceWeights"
+  "reason": "self-check: arity/type mismatch (TypeError(\"'dict' object is not callable\"))"
  },
- "Calibrator.sourceR2FromSourceWeights": {
+ "Calibrator.explainedSignalVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1757,
+  "line": 1769,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "qualified name Pop.source"
+  "reason": "self-check: calls untranslated definition dotProduct"
  },
- "Calibrator.sourceResidualVarianceFromSourceWeights": {
+ "Calibrator.r2FromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1765,
+  "line": 1775,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "qualified name Pop.source"
+  "reason": "self-check: calls untranslated definition dotProduct"
+ },
+ "Calibrator.residualVarianceFromSourceWeights": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1783,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "self-check: arity/type mismatch (TypeError(\"'dict' object is not callable\"))"
  },
  "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1782,
+  "line": 1800,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "qualified name TransportedMetrics.calibratedBrierFromVariances"
  },
- "Calibrator.targetExplainedSignalVarianceFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1834,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights"
- },
- "Calibrator.targetR2FromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1841,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights"
- },
- "Calibrator.targetResidualVarianceFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1850,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition effectiveTargetOutcomeVariance"
- },
  "Calibrator.targetCalibratedBrierFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 1864,
+  "line": 1870,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14947,7 +14923,7 @@
  "Calibrator.ldCorrelationDecay": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2085,
+  "line": 2091,
   "status": "VACUOUS",
   "check": {
    "kind": "range",
@@ -14987,7 +14963,7 @@
  "Calibrator.GenerationalPopGenParameters.theta": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2133,
+  "line": 2139,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14996,7 +14972,7 @@
  "Calibrator.GenerationalPopGenParameters.bigM": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2137,
+  "line": 2143,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15021,7 +14997,7 @@
  "Calibrator.GenerationalPopGenParameters.tauAt": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2141,
+  "line": 2147,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15051,7 +15027,7 @@
  "Calibrator.GenerationalPopGenParameters.hetDecayFactor": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2145,
+  "line": 2151,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15060,7 +15036,7 @@
  "Calibrator.GenerationalPopGenParameters.fstTransientAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2153,
+  "line": 2159,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15069,7 +15045,7 @@
  "Calibrator.GenerationalPopGenParameters.mutationSharedRetentionAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2158,
+  "line": 2164,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15078,7 +15054,7 @@
  "Calibrator.GenerationalPopGenParameters.migrationSharedBoostAt": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2163,
+  "line": 2169,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15087,7 +15063,7 @@
  "Calibrator.PGSEvolutionaryModel.toGenerationalPopGenParameters": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2189,
+  "line": 2195,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15096,7 +15072,7 @@
  "Calibrator.alleleFreqMismatchPenalty": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2297,
+  "line": 2303,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15130,7 +15106,7 @@
  "Calibrator.betaTargetAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2355,
+  "line": 2361,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15139,7 +15115,7 @@
  "Calibrator.tagAlleleFreqTargetAt": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2369,
+  "line": 2375,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15175,7 +15151,7 @@
  "Calibrator.causalAlleleFreqTargetAt": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2383,
+  "line": 2389,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15211,7 +15187,7 @@
  "Calibrator.tagAlleleFreqRetentionAt": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2394,
+  "line": 2400,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15241,7 +15217,7 @@
  "Calibrator.causalAlleleFreqRetentionAt": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2401,
+  "line": 2407,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15271,7 +15247,7 @@
  "Calibrator.novelVariantInnovationAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2407,
+  "line": 2413,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15280,7 +15256,7 @@
  "Calibrator.jointTagLDKernelAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2420,
+  "line": 2426,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15289,7 +15265,7 @@
  "Calibrator.jointDirectCausalKernelAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2443,
+  "line": 2449,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15298,7 +15274,7 @@
  "Calibrator.jointProxyTaggingKernelAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2462,
+  "line": 2468,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15307,7 +15283,7 @@
  "Calibrator.jointNovelDirectCausalKernelAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2487,
+  "line": 2493,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15316,7 +15292,7 @@
  "Calibrator.jointNovelProxyTaggingKernelAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2506,
+  "line": 2512,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15325,7 +15301,7 @@
  "Calibrator.sigmaTagTargetAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2529,
+  "line": 2535,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15334,7 +15310,7 @@
  "Calibrator.directCausalTargetAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2538,
+  "line": 2544,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15343,7 +15319,7 @@
  "Calibrator.novelDirectCausalTargetAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2547,
+  "line": 2553,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15352,7 +15328,7 @@
  "Calibrator.proxyTaggingTargetAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2556,
+  "line": 2562,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15361,7 +15337,7 @@
  "Calibrator.novelProxyTaggingTargetAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2564,
+  "line": 2570,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15370,7 +15346,7 @@
  "Calibrator.sigmaTagCausalTargetAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2574,
+  "line": 2580,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15379,7 +15355,7 @@
  "Calibrator.targetSourceEffectProjectionAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2586,
+  "line": 2592,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15388,7 +15364,7 @@
  "Calibrator.targetEffectHeterogeneityProjectionAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2594,
+  "line": 2600,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15397,16 +15373,16 @@
  "Calibrator.CrossPopulationGenerationalModel.toMetricModelAt": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2603,
+  "line": 2609,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable('qualified name Pop.source')"
+  "reason": "could not compile body: Untranslatable('qualified name Pop.pair')"
  },
  "Calibrator.targetR2AtGeneration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2631,
+  "line": 2633,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15415,7 +15391,7 @@
  "Calibrator.targetCalibratedBrierAtGeneration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2636,
+  "line": 2638,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15424,7 +15400,7 @@
  "Calibrator.targetR2FromNeutralAFBenchmark": {
   "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2887,
+  "line": 2889,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15468,7 +15444,7 @@
  "Calibrator.neutralAFBenchmarkRatio": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 2961,
+  "line": 2963,
   "status": "DEFECT-CANDIDATE",
   "check": {
    "kind": "range",
@@ -15515,16 +15491,16 @@
  "Calibrator.hetRatioBetweenBranches": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3009,
+  "line": 3011,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "mined bounds contradict (lo=3 > hi=1.0); at least one theorem bound is conditional"
  },
  "Calibrator.exactCalibratedBrierRiskFromR2": {
-  "class": "NUMERIC",
+  "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3044,
+  "line": 3046,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15566,7 +15542,7 @@
    "violated_side_theorem": null
   },
   "killed": [],
-  "reason": "",
+  "reason": "delegates to calibratedBrier",
   "violation": {
    "point": {
     "\u03c0": 0.050001,
@@ -15579,7 +15555,7 @@
  "Calibrator.brierFromR2": {
   "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3049,
+  "line": 3051,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15630,7 +15606,7 @@
  "Calibrator.targetGaussianAUCFromNeutralAFBenchmark": {
   "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3053,
+  "line": 3055,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15674,7 +15650,7 @@
  "Calibrator.sourceBrierFromR2": {
   "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3066,
+  "line": 3068,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15719,7 +15695,7 @@
  "Calibrator.targetExactCalibratedBrierRisk": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3079,
+  "line": 3081,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15728,7 +15704,7 @@
  "Calibrator.targetBrierFromNeutralAFBenchmark": {
   "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3086,
+  "line": 3088,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15788,7 +15764,7 @@
  "Calibrator.neutralAFBenchmarkMetricProfile": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3092,
+  "line": 3094,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15797,7 +15773,7 @@
  "Calibrator.equalVarianceGaussianAUCFromSNR": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3160,
+  "line": 3162,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15825,9 +15801,9 @@
   "mutants_tried": 4
  },
  "Calibrator.equalVarianceGaussianAUCFromVariances": {
-  "class": "NUMERIC",
+  "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3172,
+  "line": 3174,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15855,13 +15831,13 @@
   "killed": [
    "negate body"
   ],
-  "reason": "",
-  "mutants_tried": 6
+  "reason": "delegates to gaussianAUCFromSignalVariance",
+  "mutants_tried": 1
  },
  "Calibrator.equalVarianceGaussianAUCFromExplainedR2": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3219,
+  "line": 3221,
   "status": "DEFECT-CANDIDATE",
   "check": {
    "kind": "range",
@@ -15900,7 +15876,7 @@
  "Calibrator.equalVarianceGaussianAUCChart": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3265,
+  "line": 3267,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15929,37 +15905,28 @@
   "reason": "",
   "mutants_tried": 1
  },
- "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights": {
+ "Calibrator.equalVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3328,
+  "line": 3330,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourcePredictiveCovarianceFromSourceWeights"
- },
- "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3371,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights"
+  "reason": "self-check: calls untranslated definition dotProduct"
  },
  "Calibrator.sourceMetricProfileFromSourceWeightsAtPrevalence": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3446,
+  "line": 3449,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
+  "reason": "could not compile body: Untranslatable('qualified name Pop.source')"
  },
  "Calibrator.sourceMetricProfileFromSourceWeightsAtTargetPrevalence": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3474,
+  "line": 3477,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15968,16 +15935,16 @@
  "Calibrator.targetMetricProfileFromSourceWeights": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3501,
+  "line": 3504,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
+  "reason": "could not compile body: Untranslatable('qualified name Pop.target')"
  },
  "Calibrator.targetGaussianAUCAtGeneration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3567,
+  "line": 3570,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15986,7 +15953,7 @@
  "Calibrator.targetMetricProfileAtGeneration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3572,
+  "line": 3575,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15995,34 +15962,34 @@
  "Calibrator.targetPredictiveCovarianceAtGeneration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3591,
+  "line": 3594,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.targetScoreVarianceAtGeneration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3597,
+  "line": 3600,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition targetScoreVarianceFromSourceWeights"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.effectiveTargetOutcomeVarianceAtGeneration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3605,
+  "line": 3608,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition effectiveTargetOutcomeVariance"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.targetResidualVarianceAtGeneration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3611,
+  "line": 3614,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16031,7 +15998,7 @@
  "Calibrator.targetCalibrationSlopeAtGeneration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3617,
+  "line": 3620,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16040,7 +16007,7 @@
  "Calibrator.sourceNormalizedTargetR2AtGeneration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3711,
+  "line": 3714,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16049,7 +16016,7 @@
  "Calibrator.targetExactGaussianAUCFromNeutralAFBenchmark": {
   "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3815,
+  "line": 3818,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16093,7 +16060,7 @@
  "Calibrator.brierRegretPoint": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3939,
+  "line": 3942,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -16134,7 +16101,7 @@
  "Calibrator.brierRegretRatio": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3943,
+  "line": 3946,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16143,7 +16110,7 @@
  "Calibrator.logLossRegretPoint": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3960,
+  "line": 3963,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16152,7 +16119,7 @@
  "Calibrator.logLossRegretRatio": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 3964,
+  "line": 3967,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16161,7 +16128,7 @@
  "Calibrator.expectedSqMeanPGSDiff_pureSplit": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4048,
+  "line": 4051,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16201,7 +16168,7 @@
  "Calibrator.expectedSqMeanPGSDiff_IMEquilibrium": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4058,
+  "line": 4061,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16237,7 +16204,7 @@
  "Calibrator.MutationDriftModelAssumptions.theta": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4121,
+  "line": 4124,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16246,7 +16213,7 @@
  "Calibrator.ibdFlowStep": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4154,
+  "line": 4157,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -16295,7 +16262,7 @@
  "Calibrator.MutationDriftModelAssumptions.fstEquilibrium": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4186,
+  "line": 4189,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16304,7 +16271,7 @@
  "Calibrator.MutationDriftModelAssumptions.fstTransient": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4220,
+  "line": 4223,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16313,7 +16280,7 @@
  "Calibrator.covarianceRetention": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4308,
+  "line": 4311,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -16354,7 +16321,7 @@
  "Calibrator.freqCorrFromFst": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4318,
+  "line": 4321,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16388,7 +16355,7 @@
  "Calibrator.ldOverlapFromSharedLD": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4322,
+  "line": 4325,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16397,7 +16364,7 @@
  "Calibrator.covarianceDivergenceFromRetention": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4334,
+  "line": 4337,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16435,7 +16402,7 @@
  "Calibrator.covarianceDivergenceMutationDrift": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4353,
+  "line": 4356,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16483,7 +16450,7 @@
  "Calibrator.presentDayPGSVarianceMutationDrift": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4409,
+  "line": 4412,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -16541,7 +16508,7 @@
  "Calibrator.presentDayR2MutationDrift": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4454,
+  "line": 4457,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16593,7 +16560,7 @@
  "Calibrator.neutralAFSharedLDBenchmarkRatio": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4484,
+  "line": 4487,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -16650,7 +16617,7 @@
  "Calibrator.fstMigrationDriftEquilibrium": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4629,
+  "line": 4632,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16697,7 +16664,7 @@
  "Calibrator.ibdRecurrenceStep": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4667,
+  "line": 4670,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -16747,7 +16714,7 @@
  "Calibrator.ibdRecurrenceFixedPoint": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4680,
+  "line": 4683,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16795,7 +16762,7 @@
  "Calibrator.islandFstMultiplicativeStep": {
   "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4770,
+  "line": 4773,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16804,7 +16771,7 @@
  "Calibrator.fstIslandMultiplicativeEquilibrium": {
   "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4787,
+  "line": 4790,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16813,7 +16780,7 @@
  "Calibrator.scaledMigrationRate": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4819,
+  "line": 4822,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16853,7 +16820,7 @@
  "Calibrator.SplitMigrationModel.fstMigDriftEq": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4905,
+  "line": 4908,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16878,7 +16845,7 @@
  "Calibrator.steppingStoneFst": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4955,
+  "line": 4958,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16930,7 +16897,7 @@
  "Calibrator.sharedLD_from_equilibrium": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5040,
+  "line": 5043,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16971,7 +16938,7 @@
  "Calibrator.sharedLDFromMigration": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5066,
+  "line": 5069,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -17013,7 +16980,7 @@
  "Calibrator.signalRetentionMigrationDrift": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5130,
+  "line": 5133,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -17057,7 +17024,7 @@
  "Calibrator.retainedSignalVarianceMigrationDrift": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5141,
+  "line": 5144,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -17111,7 +17078,7 @@
  "Calibrator.asymmetricFst": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5252,
+  "line": 5255,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -17152,7 +17119,7 @@
  "Calibrator.effectiveSymmetricMigration": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5293,
+  "line": 5296,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -17193,9 +17160,9 @@
   }
  },
  "Calibrator.admixtureLDDecay": {
-  "class": "NUMERIC",
+  "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5314,
+  "line": 5317,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -17229,19 +17196,15 @@
    }
   },
   "killed": [
-   "first '-'->'+'",
-   "last '-'->'+'",
-   "negate body",
-   "drop '1 -' complement",
-   "literal 1->2"
+   "negate body"
   ],
-  "reason": "",
-  "mutants_tried": 5
+  "reason": "delegates to discreteRecombinationSurvival",
+  "mutants_tried": 1
  },
  "Calibrator.admixtureLDBoost": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5361,
+  "line": 5364,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -17294,7 +17257,7 @@
  "Calibrator.fstMigDriftNext": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5423,
+  "line": 5426,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -17342,7 +17305,7 @@
  "Calibrator.fstMigDriftEquil": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5458,
+  "line": 5461,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -17387,7 +17350,7 @@
  "Calibrator.neutralAFBenchmarkFromRecurrence": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5540,
+  "line": 5543,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -18866,6 +18829,52 @@
    "why": "below 0.0"
   }
  },
+ "Calibrator.effectCorrelationStabilizing": {
+  "class": "NUMERIC",
+  "file": "Calibrator/SelectionArchitecture.lean",
+  "line": 90,
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0,
+   "hi": 1,
+   "quantity": "correlation",
+   "source_lo": "theorem",
+   "source_hi": "theorem",
+   "hypotheses": [
+    "1 < Ns"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": [
+    "Calibrator.effectCorrelationStabilizing_pos",
+    1
+   ],
+   "thm_hi": [
+    "Calibrator.effectCorrelationStabilizing_lt_one",
+    1
+   ],
+   "n_points": 40,
+   "box": {
+    "Ns": [
+     1.001,
+     3.0
+    ]
+   }
+  },
+  "killed": [
+   "first '-'->'+'",
+   "last '-'->'+'",
+   "first '*'->'/'",
+   "last '*'->'/'",
+   "first '/'->'*'",
+   "last '/'->'*'",
+   "negate body",
+   "drop '1 -' complement",
+   "literal 1->2"
+  ],
+  "reason": "",
+  "mutants_tried": 9
+ },
  "Calibrator.fluctuatingEffectCorrelation": {
   "class": "NUMERIC",
   "file": "Calibrator/SelectionArchitecture.lean",
@@ -19311,7 +19320,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition targetPredictiveCovarianceFromSourceWeights"
+  "reason": "qualified name Pop.target"
  },
  "Calibrator.sourceSquaredEffectMass": {
   "class": "NUMERIC",
@@ -19329,12 +19338,12 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
+  "reason": "could not compile body: Untranslatable('qualified name Pop.pair')"
  },
  "Calibrator.baselineMetricModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 174,
+  "line": 170,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19343,7 +19352,7 @@
  "Calibrator.targetLDShiftMetricModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 202,
+  "line": 194,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19352,7 +19361,7 @@
  "Calibrator.baselineProxyTagMetricModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 208,
+  "line": 200,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19361,7 +19370,7 @@
  "Calibrator.targetTaggingShiftMetricModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 217,
+  "line": 207,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19370,7 +19379,7 @@
  "Calibrator.targetEffectShiftMetricModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 224,
+  "line": 214,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19379,7 +19388,7 @@
  "Calibrator.targetContextShiftMetricModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 230,
+  "line": 220,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19388,7 +19397,7 @@
  "Calibrator.targetPrevalenceShiftMetricModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 235,
+  "line": 225,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19397,7 +19406,7 @@
  "Calibrator.novelTargetOnlyTaggingMetricModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 243,
+  "line": 233,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19406,7 +19415,7 @@
  "Calibrator.novelUntaggablePhenotypeMetricModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 251,
+  "line": 241,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19415,7 +19424,7 @@
  "Calibrator.baselineGenerationalPopGen": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 564,
+  "line": 554,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19424,7 +19433,7 @@
  "Calibrator.nondegenerateGenerationalPopGen": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 583,
+  "line": 573,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19433,7 +19442,7 @@
  "Calibrator.popgenDrivenTagScale": {
   "class": "NUMERIC",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 624,
+  "line": 614,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -19458,7 +19467,7 @@
  "Calibrator.popgenDrivenProxyScale": {
   "class": "NUMERIC",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 630,
+  "line": 620,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -19483,7 +19492,7 @@
  "Calibrator.popgenDrivenProxyGenerationalModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 637,
+  "line": 627,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19492,7 +19501,7 @@
  "Calibrator.timeVaryingAFGenerationalModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 943,
+  "line": 933,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19501,7 +19510,7 @@
  "Calibrator.timeVaryingEffectGenerationalModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/SimulationValidation.lean",
-  "line": 980,
+  "line": 970,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -20006,7 +20015,7 @@
   }
  },
  "Calibrator.pgsR2": {
-  "class": "NUMERIC",
+  "class": "WRAPPER",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 77,
   "status": "RANGE-MISMATCH",
@@ -20042,7 +20051,7 @@
    "violated_side_theorem": null
   },
   "killed": [],
-  "reason": "",
+  "reason": "delegates to explainedR2FromTransportMoments",
   "violation": {
    "point": {
     "cov_pgs_y": 2.999997,

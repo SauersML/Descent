@@ -1,10 +1,10 @@
 {
  "summary": {
   "total": 1001,
-  "have_regime": 277,
+  "have_regime": 274,
   "have_external": 40,
-  "internally_validated": 203,
-  "internally_validated_no_regime": 117,
+  "internally_validated": 205,
+  "internally_validated_no_regime": 118,
   "worst_cell": 4
  },
  "definitions": {
@@ -251,9 +251,24 @@
    "has_external": false,
    "internally_validated": false
   },
+  "Calibrator.AssortativeMatingModel.h2": {
+   "file": "Calibrator/AssortativeMatingPGS.lean",
+   "line": 75,
+   "class": "NUMERIC",
+   "empirical_status": "",
+   "regime_explicit": [],
+   "regime_mined": [
+    "additive"
+   ],
+   "has_regime": true,
+   "external_claimed_in_docstring": [],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": true
+  },
   "Calibrator.amVarianceStep": {
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 118,
+   "line": 136,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -271,7 +286,7 @@
   },
   "Calibrator.AssortativeMatingModel.equilibriumVariance": {
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 127,
+   "line": 145,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -288,7 +303,7 @@
   },
   "Calibrator.amEquilibriumVariance": {
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 133,
+   "line": 151,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -301,7 +316,7 @@
   },
   "Calibrator.amInducedLD": {
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 221,
+   "line": 239,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -316,7 +331,7 @@
   },
   "Calibrator.AssortativeMatingModel.observedH2": {
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 258,
+   "line": 276,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -331,7 +346,7 @@
   },
   "Calibrator.AssortativeMatingModel.pgsR2AM": {
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 287,
+   "line": 305,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -347,7 +362,7 @@
   },
   "Calibrator.AssortativeMatingModel.amGap": {
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 315,
+   "line": 333,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -360,7 +375,7 @@
   },
   "Calibrator.DifferentialAMModel.apparentPortability": {
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 383,
+   "line": 401,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -373,7 +388,7 @@
   },
   "Calibrator.amCorrectedPortability": {
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 400,
+   "line": 418,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -386,7 +401,7 @@
   },
   "Calibrator.ibdFst": {
    "file": "Calibrator/AssortativeMatingPGS.lean",
-   "line": 535,
+   "line": 553,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -1234,6 +1249,58 @@
    "has_external": false,
    "internally_validated": false
   },
+  "Calibrator.squaringScaleSq": {
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 1054,
+   "class": "NUMERIC",
+   "empirical_status": "DERIVED",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
+   "external_claimed_in_docstring": [],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
+  },
+  "Calibrator.nextFloorFourthMoment": {
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 1061,
+   "class": "NUMERIC",
+   "empirical_status": "DERIVED",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
+   "external_claimed_in_docstring": [],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
+  },
+  "Calibrator.squaringStep": {
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 1177,
+   "class": "NUMERIC",
+   "empirical_status": "DERIVED",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
+   "external_claimed_in_docstring": [],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
+  },
+  "Calibrator.squaringFixedPoint": {
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 1183,
+   "class": "NUMERIC",
+   "empirical_status": "DERIVED",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
+   "external_claimed_in_docstring": [],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
+  },
   "Calibrator.ploidy": {
    "file": "Calibrator/Conventions.lean",
    "line": 80,
@@ -1667,8 +1734,8 @@
    "internally_validated": false
   },
   "Calibrator.sigmaTagCausal": {
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1208,
+   "file": "Calibrator/DGP.lean",
+   "line": 117,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -2461,23 +2528,25 @@
   },
   "Calibrator.TransportedMetrics.gaussianAUCFromSignalVariance": {
    "file": "Calibrator/DGP.lean",
-   "line": 2104,
+   "line": 2135,
    "class": "NUMERIC",
-   "empirical_status": "",
+   "empirical_status": "VALIDATED",
    "regime_explicit": [],
    "regime_mined": [
     "gaussian",
     "equal-variance"
    ],
    "has_regime": true,
-   "external_claimed_in_docstring": [],
+   "external_claimed_in_docstring": [
+    "simulation"
+   ],
    "external_checked_by": [],
    "has_external": false,
    "internally_validated": true
   },
   "Calibrator.TransportedMetrics.calibratedBrier": {
    "file": "Calibrator/DGP.lean",
-   "line": 2108,
+   "line": 2139,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -2490,7 +2559,7 @@
   },
   "Calibrator.TransportedMetrics.calibratedBrierFromVariances": {
    "file": "Calibrator/DGP.lean",
-   "line": 2120,
+   "line": 2151,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -2503,7 +2572,7 @@
   },
   "Calibrator.TransportedMetrics.IrreducibleTargetPenalty.total": {
    "file": "Calibrator/DGP.lean",
-   "line": 2146,
+   "line": 2177,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -2518,7 +2587,7 @@
   },
   "Calibrator.TransportedMetrics.profileFromSignalVariance": {
    "file": "Calibrator/DGP.lean",
-   "line": 2181,
+   "line": 2212,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -2533,7 +2602,7 @@
   },
   "Calibrator.TransportedMetrics.profileFromSignalVarianceWithPenalty": {
    "file": "Calibrator/DGP.lean",
-   "line": 2213,
+   "line": 2244,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -2548,7 +2617,7 @@
   },
   "Calibrator.PGSEvolutionaryModel.coordinateSummary": {
    "file": "Calibrator/DGP.lean",
-   "line": 2246,
+   "line": 2277,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -2561,7 +2630,7 @@
   },
   "Calibrator.PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty": {
    "file": "Calibrator/DGP.lean",
-   "line": 2307,
+   "line": 2338,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -2576,7 +2645,7 @@
   },
   "Calibrator.alleleFreqDivergenceRate": {
    "file": "Calibrator/DGP.lean",
-   "line": 2348,
+   "line": 2379,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -2589,7 +2658,7 @@
   },
   "Calibrator.ldBreakageRate": {
    "file": "Calibrator/DGP.lean",
-   "line": 2354,
+   "line": 2385,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -7238,14 +7307,16 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.effectCorrelationStabilizing": {
-   "file": "Calibrator/SelectionArchitecture.lean",
-   "line": 90,
+  "Calibrator.effectCorrelationStabilizingDriftSelection": {
+   "file": "Calibrator/PolygenicAdaptation.lean",
+   "line": 288,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
+   "regime_mined": [
+    "neutral"
+   ],
+   "has_regime": true,
    "external_claimed_in_docstring": [],
    "external_checked_by": [],
    "has_external": false,
@@ -8640,24 +8711,9 @@
    "has_external": true,
    "internally_validated": false
   },
-  "Calibrator.targetPGSVariance": {
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 679,
-   "class": "NUMERIC",
-   "empirical_status": "UNTESTED",
-   "regime_explicit": [],
-   "regime_mined": [
-    "additive"
-   ],
-   "has_regime": true,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
   "Calibrator.presentDayPGSVariance": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 689,
+   "line": 687,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8670,7 +8726,7 @@
   },
   "Calibrator.wrightFisherDriftRetention": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 710,
+   "line": 707,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [
@@ -8691,7 +8747,7 @@
   },
   "Calibrator.wrightFisherHeterozygosityLoss": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 730,
+   "line": 727,
    "class": "NUMERIC",
    "empirical_status": "FALSIFIED",
    "regime_explicit": [
@@ -8709,7 +8765,7 @@
   },
   "Calibrator.Var_Delta_Mu": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 773,
+   "line": 770,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -8722,7 +8778,7 @@
   },
   "Calibrator.Expected_Abs_Shift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 777,
+   "line": 774,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8735,7 +8791,7 @@
   },
   "Calibrator.presentDaySignalToNoise": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 876,
+   "line": 873,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8746,9 +8802,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.presentDayR2": {
+  "Calibrator.expectedR2": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 887,
+   "line": 882,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8759,9 +8815,9 @@
    "has_external": false,
    "internally_validated": true
   },
-  "Calibrator.expectedR2": {
+  "Calibrator.presentDayR2": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 935,
+   "line": 890,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8774,7 +8830,7 @@
   },
   "Calibrator.presentDayGaussianAUC": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 943,
+   "line": 942,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8790,7 +8846,7 @@
   },
   "Calibrator.presentDayEqualVarianceGaussianAUC": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 952,
+   "line": 951,
    "class": "WRAPPER",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -8808,14 +8864,12 @@
   },
   "Calibrator.realWorldPGSVariance": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1094,
+   "line": 1093,
    "class": "NUMERIC",
-   "empirical_status": "UNTESTED",
+   "empirical_status": "",
    "regime_explicit": [],
-   "regime_mined": [
-    "linkage-disequilibrium"
-   ],
-   "has_regime": true,
+   "regime_mined": [],
+   "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [],
    "has_external": false,
@@ -8823,7 +8877,7 @@
   },
   "Calibrator.Pop.pair": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1140,
+   "line": 1139,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8836,7 +8890,7 @@
   },
   "Calibrator.Pop.withTarget": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1150,
+   "line": 1149,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8849,7 +8903,7 @@
   },
   "Calibrator.Pop.withSource": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1153,
+   "line": 1152,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8862,7 +8916,7 @@
   },
   "Calibrator.sourceERMWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1196,
+   "line": 1195,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8875,9 +8929,22 @@
    "has_external": false,
    "internally_validated": false
   },
+  "Calibrator.sigmaTagCausalSourceAt": {
+   "file": "Calibrator/PortabilityDrift.lean",
+   "line": 1207,
+   "class": "NOT-EXTRACTABLE",
+   "empirical_status": "",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
+   "external_claimed_in_docstring": [],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
+  },
   "Calibrator.totalEffect": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1215,
+   "line": 1214,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8890,7 +8957,7 @@
   },
   "Calibrator.targetLinearRisk": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1245,
+   "line": 1244,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8903,7 +8970,7 @@
   },
   "Calibrator.sigmaObsSource": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1253,
+   "line": 1252,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8916,7 +8983,7 @@
   },
   "Calibrator.sigmaObsTarget": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1257,
+   "line": 1256,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8929,7 +8996,7 @@
   },
   "Calibrator.crossSource": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1261,
+   "line": 1260,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8942,7 +9009,7 @@
   },
   "Calibrator.crossTarget": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1265,
+   "line": 1264,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8955,7 +9022,7 @@
   },
   "Calibrator.wSource_opt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1269,
+   "line": 1268,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8968,7 +9035,7 @@
   },
   "Calibrator.wTarget_opt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1273,
+   "line": 1272,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8981,7 +9048,7 @@
   },
   "Calibrator.crossCovariance": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1303,
+   "line": 1302,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -8994,7 +9061,7 @@
   },
   "Calibrator.sourceWeightsFromExplicitDrivers": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1309,
+   "line": 1308,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9007,7 +9074,7 @@
   },
   "Calibrator.sourceWeightedTagScore": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1317,
+   "line": 1316,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9022,7 +9089,7 @@
   },
   "Calibrator.taggingProjection": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1329,
+   "line": 1328,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9035,7 +9102,7 @@
   },
   "Calibrator.targetEffectHeterogeneity": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1338,
+   "line": 1337,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9050,7 +9117,7 @@
   },
   "Calibrator.targetSourceEffectProjection": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1356,
+   "line": 1355,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9063,7 +9130,7 @@
   },
   "Calibrator.targetEffectHeterogeneityProjection": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1364,
+   "line": 1363,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9076,7 +9143,7 @@
   },
   "Calibrator.targetNovelMutationEffectProjection": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1372,
+   "line": 1371,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9089,7 +9156,7 @@
   },
   "Calibrator.directCausalProjection": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1377,
+   "line": 1376,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9102,7 +9169,7 @@
   },
   "Calibrator.proxyTaggingProjection": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1383,
+   "line": 1382,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9113,9 +9180,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.sourceScoreVarianceFromExplicitDrivers": {
+  "Calibrator.scoreVarianceFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1462,
+   "line": 1461,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9126,65 +9193,22 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.targetScoreVarianceFromSourceWeights": {
+  "Calibrator.predictiveCovarianceFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
    "line": 1470,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
-   "regime_mined": [
-    "linkage-disequilibrium"
-   ],
-   "has_regime": true,
+   "regime_mined": [],
+   "has_regime": false,
    "external_claimed_in_docstring": [],
    "external_checked_by": [],
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.sourcePredictiveCovarianceFromSourceWeights": {
+  "Calibrator.calibrationSlopeFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
    "line": 1476,
-   "class": "NOT-EXTRACTABLE",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.targetPredictiveCovarianceFromSourceWeights": {
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1484,
-   "class": "NOT-EXTRACTABLE",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.sourceCalibrationSlopeFromSourceWeights": {
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1492,
-   "class": "NOT-EXTRACTABLE",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [
-    "biallelic"
-   ],
-   "has_regime": true,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.targetCalibrationSlopeFromSourceWeights": {
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1500,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9199,7 +9223,7 @@
   },
   "Calibrator.brokenTaggingResidual": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1628,
+   "line": 1603,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9214,7 +9238,7 @@
   },
   "Calibrator.ancestrySpecificLDResidual": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1646,
+   "line": 1621,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9231,7 +9255,7 @@
   },
   "Calibrator.sourceSpecificOverfitResidual": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1663,
+   "line": 1638,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9246,7 +9270,7 @@
   },
   "Calibrator.novelUntaggablePhenotypeResidual": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1678,
+   "line": 1653,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9261,7 +9285,7 @@
   },
   "Calibrator.irreducibleTargetResidualBurden": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1696,
+   "line": 1671,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9276,7 +9300,7 @@
   },
   "Calibrator.targetIrreduciblePenaltyProfile": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1713,
+   "line": 1688,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9289,9 +9313,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.effectiveTargetOutcomeVariance": {
+  "Calibrator.residualBurden": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1737,
+   "line": 1712,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9304,9 +9328,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.sourceExplainedSignalVarianceFromSourceWeights": {
+  "Calibrator.effectiveOutcomeVariance": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1771,
+   "line": 1722,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9317,9 +9341,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.sourceR2FromSourceWeights": {
+  "Calibrator.explainedSignalVarianceFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1777,
+   "line": 1769,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9330,9 +9354,22 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.sourceResidualVarianceFromSourceWeights": {
+  "Calibrator.r2FromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1785,
+   "line": 1775,
+   "class": "NOT-EXTRACTABLE",
+   "empirical_status": "",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
+   "external_claimed_in_docstring": [],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": false
+  },
+  "Calibrator.residualVarianceFromSourceWeights": {
+   "file": "Calibrator/PortabilityDrift.lean",
+   "line": 1783,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9347,7 +9384,7 @@
   },
   "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1802,
+   "line": 1800,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9360,36 +9397,7 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.targetExplainedSignalVarianceFromSourceWeights": {
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1854,
-   "class": "NOT-EXTRACTABLE",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [
-    "linkage-disequilibrium",
-    "additive"
-   ],
-   "has_regime": true,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.targetR2FromSourceWeights": {
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1861,
-   "class": "NOT-EXTRACTABLE",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.targetResidualVarianceFromSourceWeights": {
+  "Calibrator.targetCalibratedBrierFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
    "line": 1870,
    "class": "NOT-EXTRACTABLE",
@@ -9402,22 +9410,9 @@
    "has_external": false,
    "internally_validated": false
   },
-  "Calibrator.targetCalibratedBrierFromSourceWeights": {
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 1884,
-   "class": "NOT-EXTRACTABLE",
-   "empirical_status": "",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
   "Calibrator.ldCorrelationDecay": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2105,
+   "line": 2091,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9434,7 +9429,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.theta": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2153,
+   "line": 2139,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9447,7 +9442,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.bigM": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2157,
+   "line": 2143,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9460,7 +9455,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.tauAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2161,
+   "line": 2147,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9473,7 +9468,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.hetDecayFactor": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2165,
+   "line": 2151,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9488,7 +9483,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.fstTransientAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2173,
+   "line": 2159,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9504,7 +9499,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.mutationSharedRetentionAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2178,
+   "line": 2164,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9517,7 +9512,7 @@
   },
   "Calibrator.GenerationalPopGenParameters.migrationSharedBoostAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2183,
+   "line": 2169,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9530,7 +9525,7 @@
   },
   "Calibrator.PGSEvolutionaryModel.toGenerationalPopGenParameters": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2209,
+   "line": 2195,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9546,7 +9541,7 @@
   },
   "Calibrator.alleleFreqMismatchPenalty": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2317,
+   "line": 2303,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9559,7 +9554,7 @@
   },
   "Calibrator.betaTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2375,
+   "line": 2361,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9572,7 +9567,7 @@
   },
   "Calibrator.tagAlleleFreqTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2389,
+   "line": 2375,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9587,7 +9582,7 @@
   },
   "Calibrator.causalAlleleFreqTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2403,
+   "line": 2389,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9600,7 +9595,7 @@
   },
   "Calibrator.tagAlleleFreqRetentionAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2414,
+   "line": 2400,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9613,7 +9608,7 @@
   },
   "Calibrator.causalAlleleFreqRetentionAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2421,
+   "line": 2407,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9626,7 +9621,7 @@
   },
   "Calibrator.novelVariantInnovationAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2427,
+   "line": 2413,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9639,7 +9634,7 @@
   },
   "Calibrator.jointTagLDKernelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2440,
+   "line": 2426,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9655,7 +9650,7 @@
   },
   "Calibrator.jointDirectCausalKernelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2463,
+   "line": 2449,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9670,7 +9665,7 @@
   },
   "Calibrator.jointProxyTaggingKernelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2482,
+   "line": 2468,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9685,7 +9680,7 @@
   },
   "Calibrator.jointNovelDirectCausalKernelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2507,
+   "line": 2493,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9698,7 +9693,7 @@
   },
   "Calibrator.jointNovelProxyTaggingKernelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2526,
+   "line": 2512,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9713,7 +9708,7 @@
   },
   "Calibrator.sigmaTagTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2549,
+   "line": 2535,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9729,7 +9724,7 @@
   },
   "Calibrator.directCausalTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2558,
+   "line": 2544,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9744,7 +9739,7 @@
   },
   "Calibrator.novelDirectCausalTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2567,
+   "line": 2553,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9757,7 +9752,7 @@
   },
   "Calibrator.proxyTaggingTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2576,
+   "line": 2562,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9772,7 +9767,7 @@
   },
   "Calibrator.novelProxyTaggingTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2584,
+   "line": 2570,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9785,7 +9780,7 @@
   },
   "Calibrator.sigmaTagCausalTargetAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2594,
+   "line": 2580,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9800,7 +9795,7 @@
   },
   "Calibrator.targetSourceEffectProjectionAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2606,
+   "line": 2592,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9813,7 +9808,7 @@
   },
   "Calibrator.targetEffectHeterogeneityProjectionAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2614,
+   "line": 2600,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -9826,7 +9821,7 @@
   },
   "Calibrator.CrossPopulationGenerationalModel.toMetricModelAt": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2623,
+   "line": 2609,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9839,7 +9834,7 @@
   },
   "Calibrator.targetR2AtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2647,
+   "line": 2633,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9852,7 +9847,7 @@
   },
   "Calibrator.targetCalibratedBrierAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2652,
+   "line": 2638,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9865,7 +9860,7 @@
   },
   "Calibrator.targetR2FromNeutralAFBenchmark": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2903,
+   "line": 2889,
    "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9882,7 +9877,7 @@
   },
   "Calibrator.neutralAFBenchmarkRatio": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 2977,
+   "line": 2963,
    "class": "NUMERIC",
    "empirical_status": "FALSIFIED",
    "regime_explicit": [],
@@ -9901,7 +9896,7 @@
   },
   "Calibrator.hetRatioBetweenBranches": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3025,
+   "line": 3011,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [
@@ -9920,8 +9915,8 @@
   },
   "Calibrator.exactCalibratedBrierRiskFromR2": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3060,
-   "class": "NUMERIC",
+   "line": 3046,
+   "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
    "regime_mined": [],
@@ -9935,7 +9930,7 @@
   },
   "Calibrator.brierFromR2": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3065,
+   "line": 3051,
    "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9948,7 +9943,7 @@
   },
   "Calibrator.targetGaussianAUCFromNeutralAFBenchmark": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3069,
+   "line": 3055,
    "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9963,7 +9958,7 @@
   },
   "Calibrator.sourceBrierFromR2": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3082,
+   "line": 3068,
    "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9976,7 +9971,7 @@
   },
   "Calibrator.targetExactCalibratedBrierRisk": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3095,
+   "line": 3081,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -9989,7 +9984,7 @@
   },
   "Calibrator.targetBrierFromNeutralAFBenchmark": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3102,
+   "line": 3088,
    "class": "WRAPPER",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10004,7 +9999,7 @@
   },
   "Calibrator.neutralAFBenchmarkMetricProfile": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3108,
+   "line": 3094,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10019,7 +10014,7 @@
   },
   "Calibrator.equalVarianceGaussianAUCFromSNR": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3176,
+   "line": 3162,
    "class": "NUMERIC",
    "empirical_status": "VALIDATED",
    "regime_explicit": [],
@@ -10037,8 +10032,8 @@
   },
   "Calibrator.equalVarianceGaussianAUCFromVariances": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3188,
-   "class": "NUMERIC",
+   "line": 3174,
+   "class": "WRAPPER",
    "empirical_status": "VALIDATED",
    "regime_explicit": [],
    "regime_mined": [
@@ -10053,7 +10048,7 @@
   },
   "Calibrator.equalVarianceGaussianAUCFromExplainedR2": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3235,
+   "line": 3221,
    "class": "NUMERIC",
    "empirical_status": "VALIDATED",
    "regime_explicit": [
@@ -10073,7 +10068,7 @@
   },
   "Calibrator.equalVarianceGaussianAUCChart": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3281,
+   "line": 3267,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [
@@ -10089,22 +10084,9 @@
    "has_external": false,
    "internally_validated": true
   },
-  "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights": {
+  "Calibrator.equalVarianceGaussianAUCFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3344,
-   "class": "NOT-EXTRACTABLE",
-   "empirical_status": "UNTESTED",
-   "regime_explicit": [],
-   "regime_mined": [],
-   "has_regime": false,
-   "external_claimed_in_docstring": [],
-   "external_checked_by": [],
-   "has_external": false,
-   "internally_validated": false
-  },
-  "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights": {
-   "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3387,
+   "line": 3330,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10117,7 +10099,7 @@
   },
   "Calibrator.sourceMetricProfileFromSourceWeightsAtPrevalence": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3462,
+   "line": 3449,
    "class": "STRUCTURAL",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10130,7 +10112,7 @@
   },
   "Calibrator.sourceMetricProfileFromSourceWeightsAtTargetPrevalence": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3490,
+   "line": 3477,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10143,7 +10125,7 @@
   },
   "Calibrator.targetMetricProfileFromSourceWeights": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3517,
+   "line": 3504,
    "class": "STRUCTURAL",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10159,7 +10141,7 @@
   },
   "Calibrator.targetGaussianAUCAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3583,
+   "line": 3570,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10174,7 +10156,7 @@
   },
   "Calibrator.targetMetricProfileAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3588,
+   "line": 3575,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10187,7 +10169,7 @@
   },
   "Calibrator.targetPredictiveCovarianceAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3607,
+   "line": 3594,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10200,7 +10182,7 @@
   },
   "Calibrator.targetScoreVarianceAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3613,
+   "line": 3600,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10215,7 +10197,7 @@
   },
   "Calibrator.effectiveTargetOutcomeVarianceAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3621,
+   "line": 3608,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10230,7 +10212,7 @@
   },
   "Calibrator.targetResidualVarianceAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3627,
+   "line": 3614,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10243,7 +10225,7 @@
   },
   "Calibrator.targetCalibrationSlopeAtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3633,
+   "line": 3620,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10256,7 +10238,7 @@
   },
   "Calibrator.sourceNormalizedTargetR2AtGeneration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3727,
+   "line": 3714,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10269,7 +10251,7 @@
   },
   "Calibrator.targetExactGaussianAUCFromNeutralAFBenchmark": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3831,
+   "line": 3818,
    "class": "WRAPPER",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10288,7 +10270,7 @@
   },
   "Calibrator.brierRegretPoint": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3955,
+   "line": 3942,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10301,7 +10283,7 @@
   },
   "Calibrator.brierRegretRatio": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3959,
+   "line": 3946,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10314,7 +10296,7 @@
   },
   "Calibrator.logLossRegretPoint": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3976,
+   "line": 3963,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10327,7 +10309,7 @@
   },
   "Calibrator.logLossRegretRatio": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 3980,
+   "line": 3967,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10340,7 +10322,7 @@
   },
   "Calibrator.expectedSqMeanPGSDiff_pureSplit": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4064,
+   "line": 4051,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10353,7 +10335,7 @@
   },
   "Calibrator.expectedSqMeanPGSDiff_IMEquilibrium": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4074,
+   "line": 4061,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [
@@ -10368,7 +10350,7 @@
   },
   "Calibrator.MutationDriftModelAssumptions.theta": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4137,
+   "line": 4124,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10381,7 +10363,7 @@
   },
   "Calibrator.ibdFlowStep": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4170,
+   "line": 4157,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10397,7 +10379,7 @@
   },
   "Calibrator.MutationDriftModelAssumptions.fstEquilibrium": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4202,
+   "line": 4189,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10415,7 +10397,7 @@
   },
   "Calibrator.MutationDriftModelAssumptions.fstTransient": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4236,
+   "line": 4223,
    "class": "NOT-EXTRACTABLE",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10428,7 +10410,7 @@
   },
   "Calibrator.covarianceRetention": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4324,
+   "line": 4311,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10443,7 +10425,7 @@
   },
   "Calibrator.freqCorrFromFst": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4334,
+   "line": 4321,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10456,7 +10438,7 @@
   },
   "Calibrator.ldOverlapFromSharedLD": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4338,
+   "line": 4325,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10471,7 +10453,7 @@
   },
   "Calibrator.covarianceDivergenceFromRetention": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4350,
+   "line": 4337,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -10484,7 +10466,7 @@
   },
   "Calibrator.covarianceDivergenceMutationDrift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4369,
+   "line": 4356,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10499,7 +10481,7 @@
   },
   "Calibrator.presentDayPGSVarianceMutationDrift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4425,
+   "line": 4412,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10512,7 +10494,7 @@
   },
   "Calibrator.presentDayR2MutationDrift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4470,
+   "line": 4457,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10527,7 +10509,7 @@
   },
   "Calibrator.neutralAFSharedLDBenchmarkRatio": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4500,
+   "line": 4487,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10544,7 +10526,7 @@
   },
   "Calibrator.fstMigrationDriftEquilibrium": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4645,
+   "line": 4632,
    "class": "NUMERIC",
    "empirical_status": "CONDITIONALLY VALID",
    "regime_explicit": [
@@ -10564,7 +10546,7 @@
   },
   "Calibrator.ibdRecurrenceStep": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4683,
+   "line": 4670,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10579,7 +10561,7 @@
   },
   "Calibrator.ibdRecurrenceFixedPoint": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4696,
+   "line": 4683,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10592,7 +10574,7 @@
   },
   "Calibrator.islandFstMultiplicativeStep": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4786,
+   "line": 4773,
    "class": "WRAPPER",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10605,7 +10587,7 @@
   },
   "Calibrator.fstIslandMultiplicativeEquilibrium": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4803,
+   "line": 4790,
    "class": "WRAPPER",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10624,7 +10606,7 @@
   },
   "Calibrator.scaledMigrationRate": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4835,
+   "line": 4822,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10637,7 +10619,7 @@
   },
   "Calibrator.SplitMigrationModel.fstMigDriftEq": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4921,
+   "line": 4908,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10650,7 +10632,7 @@
   },
   "Calibrator.steppingStoneFst": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4971,
+   "line": 4958,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [
@@ -10670,7 +10652,7 @@
   },
   "Calibrator.sharedLD_from_equilibrium": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5056,
+   "line": 5043,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10685,7 +10667,7 @@
   },
   "Calibrator.sharedLDFromMigration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5082,
+   "line": 5069,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10702,7 +10684,7 @@
   },
   "Calibrator.signalRetentionMigrationDrift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5146,
+   "line": 5133,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10718,7 +10700,7 @@
   },
   "Calibrator.retainedSignalVarianceMigrationDrift": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5157,
+   "line": 5144,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10733,7 +10715,7 @@
   },
   "Calibrator.asymmetricFst": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5268,
+   "line": 5255,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10746,7 +10728,7 @@
   },
   "Calibrator.effectiveSymmetricMigration": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5309,
+   "line": 5296,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10759,8 +10741,8 @@
   },
   "Calibrator.admixtureLDDecay": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5330,
-   "class": "NUMERIC",
+   "line": 5317,
+   "class": "WRAPPER",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [
@@ -10774,7 +10756,7 @@
   },
   "Calibrator.admixtureLDBoost": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5377,
+   "line": 5364,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10789,7 +10771,7 @@
   },
   "Calibrator.fstMigDriftNext": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5439,
+   "line": 5426,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10804,7 +10786,7 @@
   },
   "Calibrator.fstMigDriftEquil": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5474,
+   "line": 5461,
    "class": "NUMERIC",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
@@ -10819,7 +10801,7 @@
   },
   "Calibrator.neutralAFBenchmarkFromRecurrence": {
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5556,
+   "line": 5543,
    "class": "NUMERIC",
    "empirical_status": "",
    "regime_explicit": [],
@@ -11964,6 +11946,19 @@
    "has_external": false,
    "internally_validated": false
   },
+  "Calibrator.effectCorrelationStabilizing": {
+   "file": "Calibrator/SelectionArchitecture.lean",
+   "line": 90,
+   "class": "NUMERIC",
+   "empirical_status": "UNTESTED",
+   "regime_explicit": [],
+   "regime_mined": [],
+   "has_regime": false,
+   "external_claimed_in_docstring": [],
+   "external_checked_by": [],
+   "has_external": false,
+   "internally_validated": true
+  },
   "Calibrator.fluctuatingEffectCorrelation": {
    "file": "Calibrator/SelectionArchitecture.lean",
    "line": 148,
@@ -12758,7 +12753,7 @@
   "Calibrator.pgsR2": {
    "file": "Calibrator/TransferLearningPGS.lean",
    "line": 77,
-   "class": "NUMERIC",
+   "class": "WRAPPER",
    "empirical_status": "UNTESTED",
    "regime_explicit": [],
    "regime_mined": [],
