@@ -42,14 +42,28 @@ if getattr(api, "ARG_CONVENTION", 1) != EXPECTED_ARG_CONVENTION:
         "Re-check every vector-valued call site before bumping."
     )
 
-MODULES = [
-    "PopulationGeneticsFoundations",
-    "LDDecayTheory",
-    "DemographicHistory",
-    "PortabilityDrift",
-    "CovarianceStructure",
-    "HumanDemography",
-]
+def _all_modules():
+    """Every Calibrator .lean file, discovered rather than listed.
+
+    This was a hardcoded list of six files, and that was a latent bug of
+    exactly the kind extract's key contract warns about. Commit f959f027
+    relocated definitions between files -- fstMutationDriftEquilibrium and
+    scaledMutationRate to DGP.lean, cumulativeDrift to DemographicHistory,
+    harmonicMeanNe to LDDecayTheory -- with identical bodies. DGP.lean was not
+    on the list, so definitions that moved there silently disappeared from the
+    leanexpr table and the cross-check count fell from 43 to 37.
+
+    Nothing about a definition's identity is tied to its file: a declaration
+    can move between files in the same namespace and keep its fully-qualified
+    name. So the file set is discovered, never enumerated. The dependency table
+    is global for the same reason -- a callee that moves must still resolve.
+    """
+    import glob
+    out = []
+    for path in sorted(glob.glob(os.path.join(CALIBRATOR, "**", "*.lean"),
+                                 recursive=True)):
+        out.append(os.path.relpath(path, CALIBRATOR)[: -len(".lean")])
+    return out
 
 # Definitions where extract's callable is known-wrong and leanexpr's is used
 # instead.  Each entry must carry its evidence; an unexplained override is
@@ -85,10 +99,8 @@ FQ_OVERRIDES = {
 def _leanexpr_table():
     table: dict[str, callable] = {}
     defs: dict[str, L.LeanDef] = {}
-    for mod in MODULES:
+    for mod in _all_modules():
         path = os.path.join(CALIBRATOR, mod + ".lean")
-        if not os.path.exists(path):
-            continue
         for d in L.extract_file(path, mod) + L.extract_recursions(path, mod):
             if d.name in defs:
                 continue
