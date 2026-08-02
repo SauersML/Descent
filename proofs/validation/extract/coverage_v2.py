@@ -166,6 +166,12 @@ def make_points(entry, defs_by_name, structs, rng, theorem=None):
         if head in structs:
             for n in a["names"]:
                 structval[pyname(n)] = structs[head]
+    # The argument TYPES travel with every point.  They are what tells
+    # `build_args` how to inhabit an argument that is neither a scalar nor a
+    # structure -- a function, an enumeration index -- and emit.py's self-check
+    # already uses them, so omitting them here would make this file disagree
+    # with the classification about which definitions can be evaluated at all.
+    argtypes = admissible.arg_types(d)
     preds, texts, dropped = admissible.hypothesis_predicates(d, theorem)
     pts, draws = [], 0
     cand = admissible.corners(box, limit=16)
@@ -178,7 +184,7 @@ def make_points(entry, defs_by_name, structs, rng, theorem=None):
         pt = {pyname(k): v for k, v in base.items()}
         if preds and not admissible.satisfies(preds, pt):
             continue
-        pts.append((pt, structval))
+        pts.append((pt, structval, argtypes))
     return pts, texts, dropped
 
 
@@ -186,16 +192,20 @@ def entry_name(entry):
     return entry["_name"]
 
 
-def call(fn, argnames, pt, structval, rng, vecspec=None):
+def call(fn, argnames, pt, structval, rng, vecspec=None, argtypes=None):
+    # `argtypes` must be threaded through: without it a function- or
+    # enumeration-typed argument gets the scalar 1.0 here while emit.py's
+    # self-check gave it a real inhabitant, so this file would judge a
+    # definition unevaluable that the classification says is fine.
     return fn(*admissible.build_args(argnames, pt, structval, vecspec, rng,
-                                     _ALL_STRUCTS))
+                                     _ALL_STRUCTS, argtypes))
 
 
 def range_check(fn, argnames, pts, lo, hi, rng, tol=1e-9, vecspec=None):
     """Return (passes, first_violation) for the invariant lo <= f <= hi."""
-    for pt, sv in pts:
+    for pt, sv, at in pts:
         try:
-            v = call(fn, argnames, pt, sv, rng, vecspec)
+            v = call(fn, argnames, pt, sv, rng, vecspec, at)
         except Exception:                                       # noqa: BLE001
             continue
         if not isinstance(v, (int, float)) or isinstance(v, bool):
@@ -211,9 +221,9 @@ def range_check(fn, argnames, pts, lo, hi, rng, tol=1e-9, vecspec=None):
 
 def values(fn, argnames, pts, rng, vecspec=None):
     out = []
-    for pt, sv in pts:
+    for pt, sv, at in pts:
         try:
-            out.append(call(fn, argnames, pt, sv, rng, vecspec))
+            out.append(call(fn, argnames, pt, sv, rng, vecspec, at))
         except Exception:                                       # noqa: BLE001
             out.append(None)
     return out

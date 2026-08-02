@@ -138,7 +138,8 @@ def adversarial_vectors():
         import translate
         pt = {translate.pyname(k): v for k, v in pt.items()}
         try:
-            vals = admissible.build_args(argnames, pt, structval, spec, rng, structs)
+            vals = admissible.build_args(argnames, pt, structval, spec, rng,
+                                        structs, admissible.arg_types(d))
             out = f(*vals)
         except Exception as e:                                   # noqa: BLE001
             broken.append((name, f"{type(e).__name__}: {e}"))

@@ -62,7 +62,8 @@ first two Fourier coefficients as a stationary covariance profile. -/
 theorem dependent_channel_symbol_positive {x : ℝ} (hx₀ : -1 ≤ x) (hx₁ : x ≤ 1) :
     (2 / 5 : ℝ) ≤ 7 / 5 + x / 5 - (4 / 5) * x ^ 2 := by
   have hsq : x ^ 2 ≤ 1 := by
-    nlinarith [mul_nonneg (sub_nonneg.mpr hx₁) (add_nonneg.mpr hx₀)]
+    have hxplus : 0 ≤ 1 + x := by linarith
+    nlinarith [mul_nonneg (sub_nonneg.mpr hx₁) hxplus]
   nlinarith
 
 /-- Total squared deployment loss for a scalar spectral coordinate across a finite target

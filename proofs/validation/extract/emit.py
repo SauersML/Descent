@@ -85,6 +85,10 @@ def selfcheck_reason(err):
         import re as _re
         m = _re.search(r"name '(\w+)'", err)
         return f"self-check: calls untranslated definition {m.group(1) if m else '?'}"
+    if err.startswith("Uninhabitable"):
+        return f"no inhabitant for an argument type: {err[14:130]}"
+    if err.startswith("IndexError"):
+        return f"evaluated outside the sampled dimension: {err[:90]}"
     if err.startswith("AttributeError") or err.startswith("KeyError"):
         return f"self-check: structure projection unavailable ({err[:60]})"
     if err.startswith("TypeError"):
@@ -309,7 +313,7 @@ def main():
             try:
                 args = admissible.build_args(
                     argnames, pt, structval, vector_arity.get(d["name"]),
-                    rng, _ALL_STRUCTS)
+                    rng, _ALL_STRUCTS, admissible.arg_types(d))
                 v = fn(*args)
             except Exception as e:                                # noqa: BLE001
                 err = repr(e)

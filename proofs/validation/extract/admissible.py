@@ -173,33 +173,255 @@ FIELD_HYP = re.compile(r"^\s*(-?[\d./]+|\w[\w'\u2080-\u2089]*)\s*(<|\u2264|>|\u2
                        r"\s*(-?[\d./]+|\w[\w'\u2080-\u2089]*)\s*$")
 
 
-def struct_value(sdecl, rng, structs=None, _depth=0):
+# ------------------------------------------- shape-directed inhabitants
+#
+# WHY THIS EXISTS.  A definition is classified NOT-EXTRACTABLE when it cannot be
+# evaluated at a single admissible point.  Before this, "an admissible point"
+# was built by matching argument and field types as TEXT: `ℝ`/`ℕ` got a float,
+# a type whose first word named a structure got a dict, a type whose text ended
+# in `→ ℝ` got a lambda, and everything else got nothing at all.  That is wrong
+# in three ways at once, and each way was visible in the failure histogram:
+#
+#   * `Pop → Matrix (Fin p) (Fin q) ℝ` begins with `Pop`, an inductive, so the
+#     field was given a *dict* and `m.directCausal P` raised "'dict' object is
+#     not callable" -- 16 definitions;
+#   * a field with no inhabitant at all raised KeyError on projection -- 14;
+#   * a `Fin m → ℝ` field became a lambda with no length, so `∑ j, s.weight j`
+#     had no dimension to range over -- a large share of the 37 unannotated-∑
+#     refusals;
+#   * an argument of a function type that was not literally `Fin n → ℝ` got the
+#     scalar default 1.0, and applying it raised "'float' object is not
+#     callable" -- 5 more, plus the "value is not a real number: function" band.
+#
+# In total 194 of the 376 NOT-EXTRACTABLE definitions took a structure argument
+# with at least one field this could not inhabit.  Those definitions were
+# TRANSLATED CORRECTLY and then failed on an argument value the harness built
+# wrong; the coverage number was measuring the harness, not the corpus.
+#
+# `type_value` replaces the text matching with a reading of the type's SHAPE,
+# and -- this is the part that keeps it safe -- REFUSES by raising
+# `Uninhabitable` when the shape is not one it models.  It must never fall back
+# to a scalar.  A float standing in for a vector does not make the definition
+# fail; it makes it return a plausible wrong number, which is the one outcome
+# worse than NOT-EXTRACTABLE.
+
+
+class Uninhabitable(Exception):
+    """No inhabitant of this Lean type is modelled.  Refusing, not guessing."""
+
+
+SCALAR_TYPES = {"ℝ", "ℕ", "ℤ", "ℚ", "Real", "Nat", "Int",
+                "NNReal", "ℝ≥0", "ℝ≥0∞", "ENNReal"}
+PROP_TYPES = {"Prop", "Bool"}
+
+# Domains with infinitely many inhabitants.  A function out of one is a genuine
+# function and must NOT be given a length: `profile : ℝ → ℝ` is evaluated at
+# `F.location j`, a real, not at an index.
+CONTINUOUS_DOMAINS = {"ℝ", "ℤ", "ℚ", "Real", "Int", "NNReal", "ℝ≥0", "ℝ≥0∞"}
+# `ℕ` is countable, and the corpus indexes `ℕ → ℝ` fields by generation number,
+# which is unbounded.  Treat it as continuous: a table would raise IndexError at
+# generation 30 and misreport a working definition as broken.
+CONTINUOUS_DOMAINS.add("ℕ")
+
+
+def _norm(ty):
+    ty = " ".join(str(ty).split())
+    while ty.startswith("(") and _matching(ty, 0) == len(ty) - 1:
+        ty = " ".join(ty[1:-1].split())
+    return ty
+
+
+def _matching(s, i):
+    depth = 0
+    for j in range(i, len(s)):
+        if s[j] == "(":
+            depth += 1
+        elif s[j] == ")":
+            depth -= 1
+            if depth == 0:
+                return j
+    return -1
+
+
+def _split_arrow(ty):
+    """Split at the FIRST top-level `→`, or return None."""
+    depth = 0
+    for j, ch in enumerate(ty):
+        if ch in "([{":
+            depth += 1
+        elif ch in ")]}":
+            depth -= 1
+        elif ch == "→" and depth == 0:
+            return _norm(ty[:j]), _norm(ty[j + 1:])
+    return None
+
+
+_ENUM_CACHE = {}
+
+
+def enum_cards(structs):
+    """{inductive name: number of constructors} for the corpus's enumerations.
+
+    `Pop` (`| source | target`) and `DiploidGenotype` (`| homRef | het |
+    homAlt`) are index types: the corpus writes `Pop → Fin q → ℝ` for "the
+    effect vector in each population" and `∑ g : DiploidGenotype, …` for a sum
+    over genotype states.  Modelling them as finite index sets is what lets a
+    `Pop`-indexed field be inhabited at all.  Only constructor-only inductives
+    qualify -- one carrying arguments is not an index set.
+    """
+    key = id(structs)
+    if key in _ENUM_CACHE:
+        return _ENUM_CACHE[key]
+    out = {}
+    for name, s in (structs or {}).items():
+        if s.get("kind") != "inductive":
+            continue
+        ctors = [ln.strip()[1:].strip() for ln in s.get("body", "").splitlines()
+                 if ln.strip().startswith("|")]
+        if ctors and all(c and " " not in c.split("--")[0].strip() for c in ctors):
+            out[name] = len(ctors)
+            out[name.split(".")[-1]] = len(ctors)
+    _ENUM_CACHE[key] = out
+    return out
+
+
+def type_value(ty, rng, structs=None, dim=None, lo=0.05, hi=1.0, _depth=0):
+    """An inhabitant of the Lean type `ty`, or raise `Uninhabitable`.
+
+    `dim` is the size used for every finite index type whose cardinality is not
+    fixed by the type itself (`Fin n` for a symbolic `n`, an abstract `ι`).  A
+    fixed cardinality -- an enumeration's constructor count -- always wins over
+    it, so a `Pop`-indexed table has exactly 2 entries and reading entry 2 of it
+    raises instead of returning a fabricated third population.
+    """
+    if dim is None:
+        dim = VECTOR_DIM
+    ty = _norm(ty)
+    if _depth > 5:
+        raise Uninhabitable(f"type nests deeper than 5 levels: {ty!r}")
+    if not ty:
+        raise Uninhabitable("empty type")
+    if ty in SCALAR_TYPES:
+        return rng.uniform(lo, hi)
+    if ty in PROP_TYPES:
+        return True                     # a structure invariant, not a value
+    import lean_rt as _rt
+
+    arrow = _split_arrow(ty)
+    if arrow is not None:
+        dom, cod = arrow
+        n = _index_card(dom, structs, dim)
+        if n is None:                   # infinite domain: a genuine function
+            if _norm(cod) not in SCALAR_TYPES:
+                raise Uninhabitable(
+                    f"function out of the infinite domain {dom!r} into the "
+                    f"non-scalar {cod!r}: no finite table represents it")
+            a, b = rng.uniform(lo, hi), rng.uniform(lo, hi)
+            return lambda *xs: a + b / (1.0 + sum(
+                x for x in xs if isinstance(x, (int, float))))
+        return _rt.VecFn(type_value(cod, rng, structs, dim, lo, hi, _depth + 1)
+                         for _ in range(n))
+
+    head = ty.split()[0].split(".")[-1]
+    if head == "Matrix":
+        # `Matrix I J α`: two index arguments then the entry type.  Only real
+        # matrices are modelled; anything else is refused rather than assumed.
+        tail = ty.split()[-1]
+        if tail not in SCALAR_TYPES:
+            raise Uninhabitable(f"matrix over {tail!r}, not a scalar")
+        return _rt.VecFn(_rt.VecFn(rng.uniform(lo, hi) for _ in range(dim))
+                         for _ in range(dim))
+    if head == "Fin":
+        return rng.randrange(_index_card(ty, structs, dim) or dim)
+    cards = enum_cards(structs)
+    if head in cards:
+        return rng.randrange(cards[head])       # an enumeration VALUE, an index
+    sd = (structs or {}).get(head)
+    if sd is not None and sd.get("fields"):
+        return struct_value(sd, rng, structs, _depth + 1, dim=dim)
+    raise Uninhabitable(f"no inhabitant modelled for the type {ty!r}")
+
+
+def _index_card(dom, structs, dim):
+    """Cardinality to use for a function domain, or None if it is infinite."""
+    dom = _norm(dom)
+    if dom in CONTINUOUS_DOMAINS:
+        return None
+    head = dom.split()[0].split(".")[-1] if dom.split() else ""
+    if head == "Fin":
+        rest = dom.split(None, 1)[1].strip() if " " in dom else ""
+        return int(rest) if rest.isdigit() else dim
+    cards = enum_cards(structs)
+    if head in cards:
+        return cards[head]
+    if _split_arrow(dom) is not None:
+        # `(Fin n → Fin d) → ℝ`: the domain is itself a finite function space.
+        # Its cardinality is d^n, which we do not enumerate; a table of `dim`
+        # entries is a legitimate finite function on SOME index set, but it is
+        # not this one, so refuse rather than pretend.
+        raise Uninhabitable(
+            f"function whose domain is itself a function space ({dom!r}); its "
+            "index set is not enumerated here")
+    if re.fullmatch(r"[A-Za-zα-ωΑ-Ωι][\w'₀-₉]*", dom) and dom not in SCALAR_TYPES:
+        return dim                      # abstract `Fintype` index (`α`, `ι`, `V`)
+    raise Uninhabitable(f"cannot tell whether the domain {dom!r} is finite")
+
+
+_PROP_MARK = re.compile(r"[∀∃=≤≥<>≠∧∨¬∈]")
+
+
+def _nondata_field(ty):
+    """Is this 'field' actually one of the structure's stated invariants?
+
+    Lean writes them as fields (`weight_nonneg : ∀ j, 0 ≤ weight j`), so they
+    arrive here looking like types.  They carry no data, they are enforced
+    separately below, and trying to inhabit one would refuse noisily for no
+    reason.
+    """
+    return bool(_PROP_MARK.search(ty))
+
+
+def arg_types(d):
+    """{python argname: Lean type text} for the explicit arguments of a def."""
+    import translate
+    return {translate.pyname(n): a["type"]
+            for a in d["args"] if not a["implicit"] for n in a["names"]}
+
+
+def struct_value(sdecl, rng, structs=None, _depth=0, dim=None):
     """An admissible inhabitant of a Lean structure, as a dict of its ℝ/ℕ fields.
 
     The structure's own Prop fields are its stated invariants (`0 < varY`,
     `varCondE ≤ varYhat`); they are enforced here so that the sampled witness is
     actually admissible and a range violation downstream means something.
     """
-    real = [f["name"] for f in sdecl["fields"] if f["type"] in ("\u211d", "\u2115")]
     props = [f["type"] for f in sdecl["fields"] if f["type"] not in ("\u211d", "\u2115")]
-    val = {n: rng.uniform(0.05, 1.0) for n in real}
-    # Structure-typed fields need inhabitants too, or a projection through them
-    # fails and the definition is misreported as not extractable.
-    # Function-valued fields (`ℕ → ℝ`, `Fin p → ℝ`) need an inhabitant too.  A
-    # smooth non-constant one: still a legal element of the type, but varying,
-    # so a wrong body stays distinguishable from the real one.
+    # EVERY field is inhabited by reading its type's SHAPE (see `type_value`).
+    # A field whose type is not modelled is LEFT OUT: projecting it then raises
+    # KeyError and the definition stays NOT-EXTRACTABLE with a reason, which is
+    # the outcome we want.  It must not get a scalar placeholder -- that would
+    # let a body which reads a vector field compute a plausible wrong number.
+    val, refused = {}, {}
     for f in sdecl["fields"]:
-        ty = f["type"].replace(" ", "")
-        if ty.endswith("\u2192\u211d") and f["name"] not in val:
-            c0, c1 = rng.uniform(0.05, 1.0), rng.uniform(0.05, 1.0)
-            val[f["name"]] = (lambda a, b: (lambda *xs: a + b / (1.0 + sum(
-                x for x in xs if isinstance(x, (int, float))))))(c0, c1)
-    if structs and _depth < 4:
-        for f in sdecl["fields"]:
-            head = f["type"].split()[0].split(".")[-1] if f["type"].split() else ""
-            nested = structs.get(head)
-            if nested is not None and nested is not sdecl:
-                val[f["name"]] = struct_value(nested, rng, structs, _depth + 1)
+        if f["name"] in val:
+            continue
+        if _norm(f["type"]) in PROP_TYPES or FIELD_HYP.match(f["type"]) \
+                or _nondata_field(f["type"]):
+            continue                     # a proof obligation, not data
+        head = f["type"].split()[0].split(".")[-1] if f["type"].split() else ""
+        if (structs or {}).get(head) is sdecl:
+            continue                     # self-reference: no finite inhabitant
+        try:
+            val[f["name"]] = type_value(f["type"], rng, structs,
+                                        dim=dim, _depth=_depth + 1)
+        except (Uninhabitable, RecursionError) as e:
+            refused[f["name"]] = str(e) or type(e).__name__
+    if refused:
+        # Carried, not raised: a definition that never touches the offending
+        # field is still perfectly evaluable, and refusing the whole structure
+        # would lose it.  A definition that DOES touch it gets a KeyError out
+        # of `_proj`, which is the loud failure we want.
+        val["__uninhabited__"] = refused
     for _ in range(6):                       # fixed-point repair of the invariants
         changed = False
         for h in props:
@@ -240,14 +462,36 @@ def vector_value(spec, lo, hi, rng, dim=VECTOR_DIM):
     return [[rng.uniform(lo, hi) for _ in range(dim)] for _ in range(dim)]
 
 
-def build_args(argnames, pt, structval, vecspec, rng, structs=None):
-    """Positional arguments for a generated callable, in signature order."""
+def build_args(argnames, pt, structval, vecspec, rng, structs=None,
+               argtypes=None):
+    """Positional arguments for a generated callable, in signature order.
+
+    `argtypes` ({argname: Lean type text}, from `arg_types(d)`) is what lets an
+    argument that is neither a declared vector nor a structure -- `profile : ℝ →
+    ℝ`, `freq : α → ℝ`, `P : Pop` -- be given an inhabitant of its actual type
+    instead of the scalar 1.0.  Passing 1.0 for a function argument is how
+    "'float' object is not callable" became a NOT-EXTRACTABLE verdict on
+    definitions that were translated perfectly well.
+
+    Pass it wherever you have the definition row.  Omitting it keeps the old
+    scalar-default behaviour, which is wrong but not newly wrong; every caller
+    inside this package passes it, so `emit.py`'s self-check and a downstream
+    check see the SAME argument values and cannot disagree about whether a
+    definition evaluates.
+    """
     out = []
     for a in argnames:
         if vecspec and a in vecspec:
             out.append(vector_value(vecspec[a], 0.05, 1.0, rng))
         elif structval and a in structval:
             out.append(struct_value(structval[a], rng, structs))
+        elif a in pt:
+            out.append(pt[a])           # a sampled scalar, box-constrained
+        elif argtypes and a in argtypes:
+            # Raises Uninhabitable if the type is not modelled.  Deliberately
+            # NOT caught here: the caller records it as the reason the
+            # definition could not be evaluated, which is true and specific.
+            out.append(type_value(argtypes[a], rng, structs))
         else:
-            out.append(pt.get(a, 1.0))
+            out.append(1.0)
     return out

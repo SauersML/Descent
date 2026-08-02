@@ -140,13 +140,13 @@ noncomputable def rescale (P : FiniteSpectralModel Band) (c : ℝ) (hc : c ≠ 0
 
 /-- Under `g -> c * g` the optimal readout is `beta / c`: it is scale-covariant, which is
 exactly what makes the score itself invariant. -/
+omit [Fintype Band] in
 theorem optimalReadout_rescale (P : FiniteSpectralModel Band) (c : ℝ) (hc : c ≠ 0)
     (b : Band) :
     optimalReadout (P.rescale c hc) b = optimalReadout P b / c := by
   unfold optimalReadout rescale
   have hfp := ne_of_gt (P.featureSpectrum_pos b)
   field_simp
-  ring
 
 /-- **Degradation is invariant under a change of genotype coding.** The two factors of `c`
 in the squared readout gap cancel the two in the feature spectrum. Any transport residual
@@ -161,7 +161,6 @@ theorem degradation_rescale (source target : FiniteSpectralModel Band) (c : ℝ)
       (c ^ 2 * target.featureSpectrum b) =
     (optimalReadout source b - optimalReadout target b) ^ 2 * target.featureSpectrum b
   field_simp
-  ring
 
 /-- The same degradation restricted to a selected set of frequency bands. -/
 noncomputable def bandDegradation (source target : FiniteSpectralModel Band)
