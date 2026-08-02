@@ -1725,3 +1725,139 @@ check(
         "the constant 1 and fixes it trivially."
     ),
 )
+
+
+# --- 14. Linear prediction transport: what cluster/fam_linear_transport.py
+#         established. ---------------------------------------------------
+#
+# The 47-member `linear_prediction_transport` family is matrix algebra over
+# `CrossPopulationMetricModel`, and only two of its members survive extraction
+# to scalar callables (`explainedR2FromTransportMoments` and
+# `demographicCovarianceGapLowerBound`). The rest are checked in
+# cluster/fam_linear_transport.py, which instantiates the structure from a
+# simulated two-population genotype process rather than from hand-chosen
+# matrices. What is registered here is the scalar residue, plus the two
+# findings that the simulator settled and that a reader of this file must not
+# have to rediscover.
+#
+# FINDING 1 (measured, exact arithmetic, no sampling).
+#   `irreducibleTargetResidualBurden` sums four terms. Three of them --
+#   brokenTaggingResidual, ancestrySpecificLDResidual,
+#   sourceSpecificOverfitResidual -- are dot products of vectors of
+#   COVARIANCES, so they carry units of (genotype scale)^2 x (outcome)^2. The
+#   fourth, novelUntaggablePhenotypeResidual, is a plain outcome variance. The
+#   sum is then added to `outcomeVariance` inside `effectiveOutcomeVariance`,
+#   which is what `r2FromSourceWeights` and
+#   `residualVarianceFromSourceWeights` divide by and subtract from.
+#
+#   Under g -> c*g with beta -> beta/c the phenotype, the ERM weights'
+#   predictions and every measured moment are unchanged BIT FOR BIT -- this is
+#   the free choice between raw dosages and standardised genotypes. Measured:
+#   the target R^2 moved by 0.000e+00 over c in {1,2,4} while the burden grew
+#   by exactly c^2.000 (9.276 -> 37.104 -> 148.417 against a fixed Var(y) =
+#   32.28) and r2FromSourceWeights fell by 77% relative. Commit 43fcfd04.
+#
+#   So `r2FromSourceWeights` is not a scale-free R^2: it depends on the units
+#   the genotypes were coded in. The one-fixed-world N-convergence arm confirms
+#   this is a bias and not sampling: at N = 6k/24k/96k the transport-moment R^2
+#   error falls -0.1998 -> -0.0888 -> +0.0717 while r2FromSourceWeights holds a
+#   floor of -burden/(Var(y)+burden) = -16.6%, and
+#   residualVarianceFromSourceWeights holds +0.277 -> +0.232 -> +0.208.
+#
+# FINDING 2 (missing regime declaration).
+#   `demographicCovarianceGapLowerBound` reads the F_ST DIFFERENCE
+#   fstTarget - fstSource, so for two populations equally diverged from one
+#   ancestor -- the generic split -- it is identically 0 while the measured
+#   squared Frobenius LD mismatch ranged 2.554 to 7.346 across the arms. It is
+#   a true lower bound there and a vacuous one, and nothing in the corpus says
+#   so: it is never proved, appearing only as a HYPOTHESIS of
+#   covariance_mismatch_pos_of_fst_and_sparse_array.
+
+check(
+    id="explainedR2FromTransportMoments-is-squared-correlation",
+    fqn="Calibrator.explainedR2FromTransportMoments",
+    claim="the moment-level transport R^2 is the squared correlation between "
+          "score and outcome, and therefore scale-free in BOTH the score and "
+          "the outcome",
+    model_lean="scoreOutcomeCov^2 / (scoreVariance * outcomeVariance)",
+    model_ref="squared Pearson correlation of a linear score with an outcome, "
+              "computed from the same three moments independently",
+    reference="cov^2/(var_s var_y), the definition of the explained fraction "
+              "for the BEST-SCALED version of a score",
+    grid=grid(cov=[0.2, 1.0, 3.5, 3.85387],
+              vs=[0.5, 3.06, 6.28462, 8.93],
+              vy=[1.0, 28.9, 32.28, 79.6]),
+    lean=lambda D, cov, vs, vy: D["explainedR2FromTransportMoments"](cov, vs, vy),
+    ref=lambda cov, vs, vy: (cov * cov) / (vs * vy),
+    kind="identity",
+    note=(
+        "POSITIVE CONTROL for the pair below. This is the transport R^2 that "
+        "cluster/fam_linear_transport.py measured converging on independent "
+        "target individuals: relative error -0.1998 at N=6000, -0.0888 at "
+        "N=24000, +0.0717 at N=96000, one fixed world, arm B, commit 43fcfd04. "
+        "It is the member of the family that DOES behave like an R^2, and it "
+        "is registered so that the r2FromSourceWeights finding below is "
+        "localised to the effectiveOutcomeVariance denominator rather than to "
+        "the moment algebra it shares."
+    ),
+    canfail_clause=(
+        "the grid must contain points where vs != vy AND cov^2 != vs*vy. At "
+        "cov^2 = vs*vy the value is 1 for any denominator convention and at "
+        "vs = vy a transposed pair of arguments is invisible; either alone "
+        "makes the check unable to separate the intended form from a "
+        "denominator that multiplies the wrong two moments."
+    ),
+)
+
+check(
+    id="demographicCovarianceGapLowerBound-vacuous-at-equal-divergence",
+    fqn="Calibrator.demographicCovarianceGapLowerBound",
+    claim="MISSING REGIME DECLARATION: the demography-to-LD lower bound is "
+          "identically 0 whenever the two populations are equally diverged, "
+          "which is the generic two-population split and precisely the case "
+          "the family names ancestry-specific LD",
+    model_lean="kappa * recombRate * arraySparsity * (fstTarget - fstSource)",
+    model_ref="the squared Frobenius LD mismatch it is assumed to lower-bound, "
+              "MEASURED in cluster/fam_linear_transport.py arm E on genotypes "
+              "from two populations equally diverged from one ancestor",
+    reference="cluster/fam_linear_transport_results.json, E_ld_mismatch",
+    grid=[
+        {"fstS": 0.05, "fstT": 0.05, "r": 0.01, "a": 0.1, "kappa": 1.0,
+         "measured": 2.5539},
+        {"fstS": 0.05, "fstT": 0.05, "r": 0.01, "a": 0.1, "kappa": 1.0,
+         "measured": 4.62042},
+        {"fstS": 0.15, "fstT": 0.15, "r": 0.01, "a": 0.1, "kappa": 1.0,
+         "measured": 5.89507},
+        {"fstS": 0.15, "fstT": 0.15, "r": 0.01, "a": 0.1, "kappa": 1.0,
+         "measured": 7.34606},
+    ],
+    lean=lambda D, fstS, fstT, r, a, kappa, measured: (
+        D["demographicCovarianceGapLowerBound"](fstS, fstT, r, a, kappa)),
+    ref=lambda fstS, fstT, r, a, kappa, measured: measured,
+    kind="scope",
+    expected_verdict="SCOPE",
+    note=(
+        "EXPECTED TO DISAGREE, and the disagreement IS the result. The bound "
+        "is not wrong -- 0 really is a lower bound for a squared Frobenius "
+        "norm -- it is uninformative in the regime the family cares about, and "
+        "the corpus nowhere says so. It is never proved: it occurs only as a "
+        "hypothesis of covariance_mismatch_pos_of_fst_and_sparse_array and of "
+        "target_r2_drop_of_fst_and_sparse_array, so no theorem is weakened by "
+        "its vacuity and no theorem records it either. The repair is a regime "
+        "declaration, not new arithmetic: state that the bound carries "
+        "information only when the two populations differ in their divergence "
+        "from the reference, and that equal-F_ST populations with different "
+        "recombination-scaled LD are outside it.\n\n"
+        "MEASURED, arm E, commit 43fcfd04: bound = 0 at all four grid points "
+        "while the measured mismatch ranged 2.554 to 7.346, i.e. the bound "
+        "leaves the entire quantity unconstrained."
+    ),
+    canfail_clause=(
+        "The grid must hold fstSource == fstTarget. With fstTarget > "
+        "fstSource the bound is strictly positive -- measured 1.0e-4 at "
+        "fstS=0.05, fstT=0.15, r=0.01, a=0.1, kappa=1 -- so a grid that lets "
+        "the F_ST values differ tests the arithmetic and says nothing about "
+        "the regime. That positive value is the control showing this check "
+        "reports vacuity rather than a formula that is always zero."
+    ),
+)
