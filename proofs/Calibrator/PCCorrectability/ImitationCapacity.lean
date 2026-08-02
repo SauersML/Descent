@@ -1640,6 +1640,132 @@ theorem meff_prohibition_with_certificate {decay : ℝ} (hd : |decay| < 1)
 
 end MeffProhibition
 
+/-!
+## One correction serving several targets: the obstruction is a variance
+
+A correction fitted for one target and reused for several is the same object as
+a background class serving several testing problems.  The degradation calculus
+states the obstruction exactly: the irreducible part of a shared correction is
+the energy-weighted variance of the per-target optimal corrections, and the
+correctable part is the coboundary that a single shared correction removes.
+
+This section proves that law and connects it to the linear program.  The bridge
+is short and it is exact, not asymptotic:
+
+* `weighted_dispersion_eq` is the obstruction law — for any shared correction
+  `s`, the weighted loss splits as variance plus the squared distance from the
+  energy-weighted mean.  The variance is what no choice of `s` removes, so it
+  is the irreducible part, and the mean is the optimal shared correction.
+* That irreducible residual is uncorrected background structure, so it consumes
+  headroom.  Since the equi-exit capacity is headroom over load,
+  `sharedCorrection_capacity_deficit` gives the price of sharing in the LP's own
+  units: exactly variance divided by spike load.
+
+**A correction to the conjecture I first offered.**  I guessed the deficit was
+the load-weighted variance of the per-target *exit levels*, to second order in
+their spread.  That was wrong in form.  The deficit of a minimum against a mean
+is first order in the spread, not second, so no variance can equal it; and the
+variance in the degradation law is a variance of *corrections*, not of exit
+levels.  The correct statement is the one proved here, and it is better than
+the conjecture: the variance enters the numerator of the LP additively and the
+deficit is exactly `V / load`, with no approximation and no order condition.
+
+**Why sharing is cheap and rotation is not.**  The two operations enter the LP
+in different places, which is a structural explanation of the measured
+ordering rather than a coincidence of scale.  Sharing perturbs the *numerator*:
+it subtracts `V` from the headroom, so the capacity falls by `V / load`,
+linearly and additively, and if `V` is a `10⁻⁵` fraction of signal energy then
+the capacity moves by a `10⁻⁵` fraction too.  Rotation changes which constraint
+binds, hence the *denominator*: by
+`imitationCapacity_mul_load_eq_headroom` the product of capacity and load is
+the headroom and is what stays fixed, so a change of binding constraint moves
+the capacity by the ratio of the two loads, which is multiplicative and
+unbounded.  Additive-and-tiny against multiplicative-and-unbounded is exactly
+the reported ordering.
+-/
+
+section SharedCorrection
+
+variable {tgt : Type*} [Fintype tgt]
+
+/-- **Energy-weighted mean of the per-target optimal corrections.**  The weights
+are the targets' energies, normalized to sum to one.
+
+    Empirical status: UNTESTED. -/
+def weightedMean (w c : tgt → ℝ) : ℝ := ∑ t, w t * c t
+
+/-- **Energy-weighted variance of the per-target optimal corrections.**  The
+degradation calculus's irreducible part: the component of the correction that
+no single shared choice removes.
+
+    Empirical status: UNTESTED. Measurable directly — fit a correction per
+    target, take the energy-weighted spread. -/
+def energyWeightedVariance (w c : tgt → ℝ) : ℝ :=
+  ∑ t, w t * (c t - weightedMean w c) ^ 2
+
+theorem weighted_sq_expand (w c : tgt → ℝ) (s : ℝ) :
+    ∑ t, w t * (c t - s) ^ 2 =
+      (∑ t, w t * c t ^ 2) - 2 * s * (∑ t, w t * c t) + s ^ 2 * (∑ t, w t) := by
+  have hpoint : ∀ t : tgt, w t * (c t - s) ^ 2 =
+      w t * c t ^ 2 - 2 * s * (w t * c t) + s ^ 2 * w t := fun t => by ring
+  rw [Finset.sum_congr rfl (fun t _ => hpoint t), Finset.sum_add_distrib,
+    Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum]
+
+/-- **The obstruction law.**  For any shared correction `s`, the energy-weighted
+loss is the variance plus the squared distance from the energy-weighted mean.
+The variance is the part no choice of `s` can remove — the irreducible class —
+and the mean is the optimal shared correction. -/
+theorem weighted_dispersion_eq (w c : tgt → ℝ) (hw : ∑ t, w t = 1) (s : ℝ) :
+    ∑ t, w t * (c t - s) ^ 2 =
+      energyWeightedVariance w c + (s - weightedMean w c) ^ 2 := by
+  unfold energyWeightedVariance weightedMean
+  rw [weighted_sq_expand w c s, weighted_sq_expand w c (∑ t, w t * c t), hw]
+  ring
+
+/-- **The variance is a floor on every shared correction.** -/
+theorem energyWeightedVariance_le (w c : tgt → ℝ) (hw : ∑ t, w t = 1) (s : ℝ) :
+    energyWeightedVariance w c ≤ ∑ t, w t * (c t - s) ^ 2 := by
+  rw [weighted_dispersion_eq w c hw s]
+  nlinarith [sq_nonneg (s - weightedMean w c)]
+
+/-- **And the floor is attained, at the energy-weighted mean.**  Together with
+the previous theorem this is the exact law: the obstruction to one correction
+serving several targets is the energy-weighted variance, no more and no
+less. -/
+theorem energyWeightedVariance_attained (w c : tgt → ℝ) :
+    ∑ t, w t * (c t - weightedMean w c) ^ 2 = energyWeightedVariance w c := rfl
+
+/-- **The price of sharing, in the linear program's own units.**  The
+irreducible residual is uncorrected background structure and so consumes
+headroom; since the equi-exit capacity is headroom over spike load, sharing one
+correction across targets lowers the capacity by exactly the energy-weighted
+variance divided by the load.  Additive in the numerator, and exact. -/
+theorem sharedCorrection_capacity_deficit (headroom load V : ℝ) :
+    headroom / load - (headroom - V) / load = V / load := by
+  rw [div_sub_div_same]
+  congr 1
+  ring
+
+end SharedCorrection
+
+section CapacityInvariant
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι] {cidx : Type*}
+
+/-- **Capacity times load is the headroom.**  This is the invariant that
+separates the two ways of degrading a shared correction: sharing moves the
+headroom, and therefore the capacity, additively; changing which constraint
+binds leaves the headroom alone and moves the capacity by the ratio of loads,
+multiplicatively. -/
+theorem imitationCapacity_mul_load_eq_headroom
+    {K : BackgroundClass ι cidx} {S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}
+    (E : EquiExit K S₀ support) (hnull : K.IsNull S₀) :
+    K.imitationCapacity S₀ support * E.load = K.headroom E.binding S₀ := by
+  rw [E.imitationCapacity_eq hnull, div_mul_eq_mul_div, mul_div_assoc,
+    div_self (ne_of_gt E.load_pos), mul_one]
+
+end CapacityInvariant
+
 end
 
 end Calibrator

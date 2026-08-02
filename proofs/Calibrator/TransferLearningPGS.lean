@@ -75,7 +75,13 @@ noncomputable def sharedLDHeritability {m : ℕ}
 
     Empirical status: UNTESTED. -/
 noncomputable def pgsR2 (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
-  explainedR2FromTransportMoments cov_pgs_y var_pgs var_y
+  cov_pgs_y ^ 2 / (var_pgs * var_y)
+
+/-- **One body, two names, tied.** `DGP.explainedR2FromTransportMoments` is the
+same squared-correlation coordinate. -/
+theorem pgsR2_eq_explainedR2FromTransportMoments (cov_pgs_y var_pgs var_y : ℝ) :
+    pgsR2 cov_pgs_y var_pgs var_y =
+      explainedR2FromTransportMoments cov_pgs_y var_pgs var_y := rfl
 
 /-- Source-population `R²` of the score that uses the true source effects as
     weights under a shared LD kernel. -/

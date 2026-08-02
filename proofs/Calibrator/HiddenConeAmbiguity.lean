@@ -221,10 +221,11 @@ theorem boundedLogDistortion_isUnionOfCertificates :
         ∀ n : ℕ, |Real.log (t n) - Real.log (t' n)| ≤ (C : ℝ)) :=
   fun t t' => boundedLogDistortion_iff_nat t t'
 
-/-- **Ceilings transport along reductions.** If a relation `E` reduces to `F` via `f`,
-and `F` is a countable union of conditions `F_C`, then `E` is the countable union of
-their pullbacks. This is the abstract form of the argument that refutes the wildness
-alternative: a reduction cannot raise a relation above the ceiling of its target.
+/-- **The union shape transports along reductions.** If a relation `E` reduces to `F`
+via `f`, and `F` is a countable union of conditions `F_C`, then `E` is the countable
+union of their pullbacks. This is the shape half of the argument against the wildness
+alternative; the half that does the refuting is the base-class restriction, which this
+statement does not carry.
 
 Kept as a named result because it is the load-bearing step of Corollary N; the general
 statement lives in `Calibrator.ObservationalCeiling.unionOfCertificates_of_reduction`.

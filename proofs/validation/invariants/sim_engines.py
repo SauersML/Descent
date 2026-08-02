@@ -137,7 +137,7 @@ def sim_admixed_haplotype_freq(alpha, pA, qA, pB, qB, n=800000, seed=0):
     return float(np.mean(hap_a & hap_b))
 
 
-def sim_admixture_ld(alpha, pA, qA, pB, qB, n=800000, seed=0):
+def sim_admixture_ld(alpha, pA, qA, pB, qB, n=4000000, seed=0):
     """D = P(AB) - P(A)P(B) in a freshly admixed population."""
     rng = np.random.default_rng(seed)
     from_a = rng.random(n) < alpha
@@ -272,7 +272,7 @@ def sim_gwas_estimator_variance(n_ind, p, r2_ld, reps=4000, seed=0):
     return float(np.var(ests))
 
 
-def sim_admixture_ld_at_gen(alpha, pA, qA, pB, qB, r, g, n=400000, seed=0):
+def sim_admixture_ld_at_gen(alpha, pA, qA, pB, qB, r, g, n=2000000, seed=0):
     """Admixture LD after `g` generations of random mating with recombination.
 
     One simulation end to end: build the admixed haplotype pool by drawing each

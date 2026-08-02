@@ -43,11 +43,20 @@ def _takes_seed(fn):
         return False
 
 
-def spec(name, oracle, domain, note, tol=0.02, reps=6, oracle_alt=None):
+# How many seeds the oracle runs under to estimate its own noise.  Two is not
+# enough: an SE estimated from two samples is itself wildly variable, so the
+# allowance is sometimes far too tight and the verdict flips with the seed.
+# The seed-stability sweep caught exactly that on the two admixture-LD specs,
+# which agreed 4/8 and 5/8 while reporting "0 disagreements" on a lucky draw.
+ORACLE_SEEDS = 5
+
+# Independent point-sets each spec must agree on before it counts.
+STABILITY_SEEDS = 5
+
+
+def spec(name, oracle, domain, note, tol=0.02, reps=6, seeds=ORACLE_SEEDS):
     return dict(name=name, oracle=oracle, domain=domain, note=note,
-                tol=tol, reps=reps,
-                oracle_alt=oracle_alt or (lambda *a: oracle(*a, seed=1)
-                                          if _takes_seed(oracle) else None))
+                tol=tol, reps=reps, seeds=seeds)
 
 
 # --------------------------------------------------------------------------
@@ -214,18 +223,29 @@ def oracle_values(sp, pts):
     affordable.
     """
     out = []
+    k = sp.get("seeds", ORACLE_SEEDS)
     for x in pts:
+        vals = []
         try:
-            a = sp["oracle"](*x)
-            b = sp["oracle_alt"](*x) if sp.get("oracle_alt") else a
+            for sd in range(k):
+                v = sp["oracle"](*x, seed=sd)
+                if v is None:
+                    vals = None
+                    break
+                vals.append(v)
         except Exception as e:
             out.append(dict(value=None, se=None, error=str(e)))
             continue
-        if a is None or b is None:
+        if not vals:
             out.append(dict(value=None, se=None, error="oracle undefined here"))
             continue
-        se = abs(a - b) / math.sqrt(2.0)
-        out.append(dict(value=0.5 * (a + b), se=se))
+        m = sum(vals) / len(vals)
+        if len(vals) > 1:
+            var = sum((v - m) ** 2 for v in vals) / (len(vals) - 1)
+            se = math.sqrt(var / len(vals))  # standard error OF THE MEAN
+        else:
+            se = 0.0
+        out.append(dict(value=m, se=se, n_seeds=len(vals)))
     return out
 
 
@@ -301,17 +321,36 @@ def main(argv):
             else:
                 survived.append(tag)
 
+        # Seed stability, recorded ON the result rather than left in a
+        # transcript.  A verdict that depends on the draw is not a verdict,
+        # and two of these specs were reporting agreement on a lucky one.
+        stab = []
+        for sd in range(STABILITY_SEEDS):
+            p2 = _grid(sp["domain"], sp["reps"], seed=4242 + sd * 97)
+            o2 = oracle_values(sp, p2)
+            _, w2 = compare(c.fn, sp, p2, o2)
+            stab.append(w2 <= 1.0)
+        stable = all(stab)
+
         results[k] = dict(
-            verdict="agrees" if agrees else "disagrees",
+            verdict=("agrees" if agrees else "disagrees") if stable
+                    else "unstable",
+            seed_stability=dict(seeds_tried=len(stab),
+                                seeds_agreeing=sum(stab)),
             module=c.d["module"], line=c.d["line"],
             oracle=sp["note"], tolerance=sp["tol"],
             worst_excess_over_allowed=worst,
             n_points=len(pts),
-            covered=bool(agrees and killed),
+            covered=bool(agrees and killed and stable),
+            evidence_class="external-reference",
+            mutants_rejected=len(killed), mutants_tried=len(killed) + len(survived),
             falsifiability=dict(mutants_rejected=killed,
                                 mutants_survived=survived),
             uncovered_reason=(
-                None if (agrees and killed) else
+                None if (agrees and killed and stable) else
+                ("the verdict depends on the random draw: agrees on only "
+                 f"{sum(stab)} of {len(stab)} independent point-sets, so it "
+                 "is not a verdict and is not counted") if not stable else
                 "the oracle disagrees with the definition" if not agrees else
                 "no mutant of this body was rejected, so the comparison does "
                 "not discriminate and this is NOT coverage"),
@@ -323,12 +362,17 @@ def main(argv):
     out.write_text(json.dumps(results, indent=1, default=str))
     ok = [k for k, v in results.items() if v.get("covered")]
     dis = [k for k, v in results.items() if v.get("verdict") == "disagrees"]
+    uns = [k for k, v in results.items() if v.get("verdict") == "unstable"]
     vac = [k for k, v in results.items()
            if v.get("verdict") == "agrees" and not v.get("covered")]
     print(f"{len(SPECS)} specs -> {out}")
     print(f"  {len(ok)} covered (oracle agrees AND a mutant is rejected)")
     print(f"  {len(dis)} DISAGREE with the simulation")
     print(f"  {len(vac)} agree but no mutant was rejected -- not counted")
+    print(f"  {len(uns)} UNSTABLE across seeds -- withdrawn, not counted")
+    for k in uns:
+        st = results[k]["seed_stability"]
+        print(f"      {k}: agrees on {st['seeds_agreeing']}/{st['seeds_tried']}")
     for k in dis:
         v = results[k]
         w = v["worst_point"]

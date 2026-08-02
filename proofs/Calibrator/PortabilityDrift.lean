@@ -3013,7 +3013,15 @@ For a calibrated Bernoulli predictor with prevalence `π` and
 `π(1-π)(1-r2)`. This is not a surrogate loss: it is the closed form of the
 exact calibrated Brier risk under the Bernoulli-mixing model. -/
 def exactCalibratedBrierRiskFromR2 (π r2 : ℝ) : ℝ :=
-  calibratedBrier π r2
+  π * (1 - π) * (1 - r2)
+
+/-- **One body, two names, tied.** `DGP.calibratedBrier` holds the same
+formula. The tie is stated rather than made a call: this definition is unfolded
+by five proofs in `MetricSpecificPortability` and one here, each of which needs
+the concrete product exposed, and a wrapper hides it. Stating the identity
+keeps the two from drifting without touching what `unfold` yields. -/
+theorem exactCalibratedBrierRiskFromR2_eq_calibratedBrier (π r2 : ℝ) :
+    exactCalibratedBrierRiskFromR2 π r2 = calibratedBrier π r2 := rfl
 
 /-- Exact calibrated Bernoulli Brier risk written directly in prevalence and
 explained-risk coordinates. -/
@@ -3141,7 +3149,18 @@ noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
     Empirical status: VALIDATED for the equal-variance Gaussian model;
     FALSIFIED as the liability-threshold AUC. -/
 noncomputable def equalVarianceGaussianAUCFromVariances (vSignal vEnv : ℝ) : ℝ :=
-  gaussianAUCFromSignalVariance vSignal vEnv
+  Phi (Real.sqrt (vSignal / (2 * vEnv)))
+
+/-- **One body, two names, tied.** `DGP.gaussianAUCFromSignalVariance` holds
+the same formula and now carries the measured boundary defect and the
+Monte-Carlo validation. The two had drifted to opposite claims about which
+quantity this is -- that copy called it the liability AUC, which this one
+records as falsified -- so the identity is what keeps the corrected label
+attached to both. -/
+theorem equalVarianceGaussianAUCFromVariances_eq_gaussianAUCFromSignalVariance
+    (vSignal vEnv : ℝ) :
+    equalVarianceGaussianAUCFromVariances vSignal vEnv =
+      gaussianAUCFromSignalVariance vSignal vEnv := rfl
 
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
@@ -4698,8 +4717,11 @@ theorem ibdRecurrenceFixedPoint_sub_linearisation (Ne rate : ℝ)
   have hlin : (0 : ℝ) < 1 + 4 * Ne * rate := by nlinarith
   have hlin' : (1 : ℝ) + 4 * Ne * rate ≠ 0 := ne_of_gt hlin
   unfold ibdRecurrenceFixedPoint
-  field_simp
-  ring
+  rw [div_sub_div _ _ hd' hlin']
+  have hnum : (1 - rate) ^ 2 * (1 + 4 * Ne * rate) -
+      ((1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate)) * 1 =
+      2 * Ne * rate ^ 2 * (2 * rate - 3) := by ring
+  rw [hnum]
 
 /-- **`1/(1 + 4 Nₑ rate)` is strictly above the rest point, always.**
 
@@ -4726,7 +4748,9 @@ theorem ibdRecurrenceFixedPoint_lt_linearisation (Ne rate : ℝ)
   have hden : (0 : ℝ) <
       ((1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate)) * (1 + 4 * Ne * rate) :=
     mul_pos hd hlin
-  have hnum : 2 * Ne * rate ^ 2 * (2 * rate - 3) < 0 := by nlinarith [sq_nonneg rate]
+  have hrsq : (0 : ℝ) < rate ^ 2 := pow_pos hr 2
+  have hnum : 2 * Ne * rate ^ 2 * (2 * rate - 3) < 0 :=
+    mul_neg_of_pos_of_neg (mul_pos h2Ne hrsq) (by linarith)
   have hgap := ibdRecurrenceFixedPoint_sub_linearisation Ne rate hNe hr.le hr1
   have hneg : ibdRecurrenceFixedPoint Ne rate - 1 / (1 + 4 * Ne * rate) < 0 := by
     rw [hgap]
@@ -5284,7 +5308,13 @@ theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ) (_hm₁₂ :
 
     Empirical status: UNTESTED. -/
 noncomputable def admixtureLDDecay (r : ℝ) (generations_since : ℕ) : ℝ :=
-  discreteRecombinationSurvival r generations_since
+  (1 - r) ^ generations_since
+
+/-- **One body, two names, tied.** `DGP.discreteRecombinationSurvival` is the
+same quantity read as survival of two loci to the MRCA rather than as decay of
+admixture LD; both are the probability of no recombination in `n` meioses. -/
+theorem admixtureLDDecay_eq_discreteRecombinationSurvival (r : ℝ) (t : ℕ) :
+    admixtureLDDecay r t = discreteRecombinationSurvival r t := rfl
 
 /-- Admixture LD decay is nonneg for recombination rate in [0, 1]. -/
 theorem admixtureLDDecay_nonneg (r : ℝ) (t : ℕ)
