@@ -3188,15 +3188,6 @@ theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
   congr 1
   field_simp [h_source_ne]
 
-/-- Liability-threshold AUC induced by the full explicit cross-population
-driver state.
-
-The exported mechanistic AUC is computed directly from target explained signal
-variance and target residual variance under transported source weights. It is
-not defined by reading target `R²` through a chart, and it does not recover a
-latent biological signal from source `R²`.
-
-    Empirical status: UNTESTED. -/
 /-- The mechanistic target AUC is exactly the explicit liability-threshold map
 applied to target explained signal and target residual variance. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances {p q : ℕ}

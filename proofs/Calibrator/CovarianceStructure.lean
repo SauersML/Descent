@@ -55,12 +55,6 @@ genotype-scale `D` and wrong by four for the allele-scale `D` that this same
 file produces. The formula was never slipped; the name was, and the formula
 inherited it. -/
 
-/-- Allelic variance is nonneg. -/
-theorem allelic_variance_nonneg (p : ℝ)
-    (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
-    0 ≤ genotypeVarianceHWE p := by
-  unfold genotypeVarianceHWE; nlinarith
-
 /-- Allelic variance is maximized at p = 0.5. -/
 theorem allelic_variance_max_at_half (p : ℝ)
     (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
