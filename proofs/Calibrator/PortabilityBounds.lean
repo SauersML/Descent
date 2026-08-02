@@ -246,6 +246,24 @@ section EvolutionaryModels
 noncomputable def neutralPortability (r2_0 fst : ℝ) : ℝ :=
   r2_0 * max 0 (1 - 2 * fst)
 
+/-- **Beyond `F_ST = 1/2` the law carries no information at all.**
+
+The note on `neutralPortability` says the linear form "can only be defensible for
+`fst ≪ 0.5`, and outside that range the floor -- not the formula -- is doing the work".
+This is that statement, checkable: at `fst ≥ 1/2` the value is `0` for *every* ancestral
+`r2_0`, so the law cannot distinguish a trait with perfect ancestral prediction from one
+with none. It is not a conservative estimate there; it is a constant.
+
+Stated as the regime for a definition whose assumption would otherwise live only in prose:
+a caller working at `F_ST ≥ 1/2` — which includes the deep-divergence comparisons this
+development is often applied to — is reading the floor, not the model. -/
+theorem neutralPortability_vacuous_beyond_half (r2_0 fst : ℝ) (h : 1 / 2 ≤ fst) :
+    neutralPortability r2_0 fst = 0 := by
+  unfold neutralPortability
+  have hle : 1 - 2 * fst ≤ 0 := by linarith
+  rw [max_eq_left hle]
+  ring
+
 /-- **Neutral portability is a nonnegative `R²`.** The constraint the previous
     body violated for every `fst > 0.5`. -/
 theorem neutralPortability_nonneg (r2_0 fst : ℝ) (hr2 : 0 ≤ r2_0) :
@@ -393,6 +411,29 @@ theorem FittedSelectionLaw.magnitude_pinned {r2_0 : ℝ} (F : FittedSelectionLaw
     (fst : ℝ) (hlo : F.fstLo ≤ fst) (hhi : fst ≤ F.fstHi) :
     |stabilizingPortability r2_0 fst F.strength - F.measured fst| ≤ F.tolerance :=
   F.fits fst hlo hhi
+
+/-- **The selection laws inherit the neutral law's vacuity beyond `F_ST = 1/2`.**
+
+Both are defined *through* `neutralPortability` — deliberately, so the nonnegativity floor
+is inherited rather than re-spelled — and that inheritance carries the floor's defect with
+it. Past `fst = 1/2` both return `0` for every ancestral `r2_0` and every selection
+parameter, so beyond that point the selection model is not weakly informative, it is
+silent: no `strength` and no turnover rate changes the answer.
+
+This is worth having explicitly because the ordering results are what these definitions are
+retained for, and an ordering between two constants is not an ordering. Below `1/2` the
+ordering theorems say something; at or above it they compare `0` with `0`. -/
+theorem selectionPortability_vacuous_beyond_half (r2_0 fst strength lam_turn : ℝ)
+    (h : 1 / 2 ≤ fst) :
+    stabilizingPortability r2_0 fst strength = 0 ∧
+      diversifyingPortability r2_0 fst lam_turn = 0 := by
+  constructor
+  · unfold stabilizingPortability
+    rw [neutralPortability_vacuous_beyond_half r2_0 fst h]
+    ring
+  · unfold diversifyingPortability
+    rw [neutralPortability_vacuous_beyond_half r2_0 fst h]
+    ring
 
 /-- Diversifying portability is a nonnegative `R²`. -/
 theorem diversifyingPortability_nonneg (r2_0 fst lam_turn : ℝ) (hr2 : 0 ≤ r2_0) :

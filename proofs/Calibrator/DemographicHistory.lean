@@ -244,6 +244,22 @@ theorem steppingStoneFst_from_coalescence_time (d Ne m σ_sq : ℝ)
   field_simp
   ring
 
+
+/-- **The meeting time inherits the indistinguishability of the `F_ST` it produces.**
+
+`steppingStoneCoalescenceTime` is the only route by which `demoSteppingStoneFst` acquires
+its dispersal variance, so the freedom that makes the `F_ST` unidentifiable is freedom in
+this quantity. Stated so the meeting time carries the regime rather than borrowing it
+silently from a theorem three declarations away: a refitted `σ²` changes the meeting time
+and leaves the observable `F_ST` fixed, which is what it means for the data to constrain
+`m·σ²` and not the dispersal variance itself. -/
+theorem steppingStoneCoalescenceTime_indistinguishable_through_coalFst
+    (d Ne m σ_sq : ℝ) (hd : 0 < d) (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq) :
+    coalFst (steppingStoneCoalescenceTime d σ_sq m) Ne =
+      steppingStoneFstQuadratic d Ne m (Real.sqrt (σ_sq / m)) := by
+  rw [steppingStoneFst_from_coalescence_time d Ne m σ_sq hd hNe hm hσ]
+  exact demoSteppingStoneFst_indistinguishable_from_quadratic d Ne m σ_sq hm (le_of_lt hσ)
+
 /-- The coalescence time is positive for positive distance and dispersal. -/
 theorem steppingStoneCoalescenceTime_pos (d σ_sq m : ℝ)
     (hd : 0 < d) (hσ : 0 < σ_sq) (hm : 0 < m) :
