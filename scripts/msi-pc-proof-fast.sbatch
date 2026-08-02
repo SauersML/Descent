@@ -14,4 +14,5 @@ export PATH="$HOME/.elan/bin:$PATH"
 # Build only the ancestry-correctability proof graph.  In particular, do not
 # pass Lake's `-R`/`--reconfigure` flag: that invalidates the warm incremental
 # state and turns a leaf check into a project-wide replay.
-lake build "${1:-Calibrator.PCCorrectability}"
+# Use every allocated core; Lake defaults to a conservative job count.
+lake build "${1:-Calibrator.PCCorrectability}" --jobs "${SLURM_CPUS_PER_TASK:-4}"
