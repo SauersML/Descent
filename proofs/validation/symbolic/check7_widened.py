@@ -147,7 +147,11 @@ def run():
             for label, mbody in mutate(d["body"], base_table[short][0]):
                 table = dict(base_table)
                 table[short] = (table[short][0], mbody)
-                conv = L.Converter(table)
+                # opaque_fallback lets a statement convert despite an
+                # un-inlinable neighbour; must_inline forbids the definition
+                # under test from going opaque, which would hide its mutation.
+                conv = L.Converter(table, opaque_fallback=True,
+                                   must_inline=frozenset({short}))
                 try:
                     eq = conv.convert(stmt)
                 except L.Unsupported as e:
