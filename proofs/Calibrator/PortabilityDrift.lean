@@ -4310,6 +4310,44 @@ section MigrationDriftPortability
 
     Empirical status: CONDITIONALLY VALID. Accurate in the limit it was derived
     for; frequently violated in use. Neither validated nor falsified. -/
+/-- **The infinite-island limit, as an obligation rather than a footnote.**
+
+The docstring below quantifies the assumption precisely — within 2% at 40 demes, +17% at
+10, +31% at 5, +95% at 2 — and then the formula is used at two demes anyway, because a
+docstring cannot be discharged. This structure makes the deme count a parameter and the
+adequacy of the limit a hypothesis someone has to supply.
+
+`tolerance` is the fraction of `F_ST` the caller is willing to be wrong by, and
+`limit_adequate` says the finite-deme correction sits inside it. The correction is the one
+the note names, `(d/(d-1))²`, whose departure from 1 is the whole error: at `d = 2` it is
+`4`, which is the twofold discrepancy in the two-ancestry comparison this development is
+mostly about. A caller at two demes cannot discharge this at any sane tolerance, which is
+the point — the obligation fails where the formula fails, instead of the formula being
+used and the failure living in prose.
+
+This is the same device as `ClosedPopulationNoMutation.mutation_negligible`. -/
+structure InfiniteIslandLimit where
+  /-- Number of demes. -/
+  demes : ℝ
+  demes_ge_two : 2 ≤ demes
+  /-- The fraction of `F_ST` the caller accepts being wrong by. -/
+  tolerance : ℝ
+  tolerance_pos : 0 < tolerance
+  /-- The finite-deme correction factor is within tolerance of one. -/
+  limit_adequate : (demes / (demes - 1)) ^ 2 - 1 ≤ tolerance
+
+/-- **Two demes cannot discharge the limit at any tolerance below 3.**
+
+At `d = 2` the correction factor is `4`, so the excess is `3`: the formula is off by that
+much in the case the development most often applies it to. Stated as a theorem so the
+obstruction is checkable rather than a remark. -/
+theorem InfiniteIslandLimit.two_demes_excess (I : InfiniteIslandLimit)
+    (h : I.demes = 2) : 3 ≤ I.tolerance := by
+  have := I.limit_adequate
+  rw [h] at this
+  norm_num at this
+  linarith
+
 noncomputable def fstMigrationDriftEquilibrium (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
