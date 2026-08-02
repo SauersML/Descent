@@ -3867,7 +3867,18 @@ section MigrationDriftPortability
     Fst_eq = 1 / (1 + 4Nm) where N is effective size and m is migration rate.
     This is the classical Wright (1931) result.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: CONDITIONALLY VALID.
+
+    Regime: this is the infinite-island limit. Simulation puts it within 2% at
+    40 demes, but +17% at 10, +31% at 5 and +95% at 2. The two-deme case is
+    in the infinite-island limit the two-ancestry comparison this development is about, so the law
+    is off by roughly twofold in its primary application. The finite-deme
+    correction `1/(1 + 4 Nₑ m (d/(d-1))²)` repairs the 5-to-10 deme range and
+    overshoots at `d = 2` by −40%. No copy of this formula documented the
+    assumption, and there are four of them in four files.
+
+    Empirical status: CONDITIONALLY VALID. Accurate in the limit it was derived
+    for; frequently violated in use. Neither validated nor falsified. -/
 noncomputable def fstMigrationDriftEquilibrium (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 

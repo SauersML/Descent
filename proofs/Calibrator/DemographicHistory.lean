@@ -21,11 +21,22 @@ section IslandModel
 
 /-- Island model equilibrium F_ST: 1 / (1 + 4·Ne·m).
 
-    Empirical status: UNTESTED. A simulation check was attempted and was
+    Empirical status: CONDITIONALLY VALID. A simulation check was attempted and was
     invalid, because the migration parameter was supplied per pair of demes, so
     total immigration scaled with the number of demes rather than being held
     fixed. The result of that run says nothing about this formula in either
-    direction and must not be cited as support. -/
+    direction and must not be cited as support.
+
+    Regime: this is the infinite-island limit. Simulation puts it within 2% at
+    40 demes, but +17% at 10, +31% at 5 and +95% at 2. The two-deme case is
+    in the infinite-island limit the two-ancestry comparison this development is about, so the law
+    is off by roughly twofold in its primary application. The finite-deme
+    correction `1/(1 + 4 Nₑ m (d/(d-1))²)` repairs the 5-to-10 deme range and
+    overshoots at `d = 2` by −40%. No copy of this formula documented the
+    assumption, and there are four of them in four files.
+
+    Empirical status: CONDITIONALLY VALID. Accurate in the limit it was derived
+    for; frequently violated in use. Neither validated nor falsified. -/
 noncomputable def demoIslandModelFst (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
@@ -69,7 +80,12 @@ section SteppingStone
 
 /-- Stepping-stone model pairwise F_ST: d / (d + 4·Ne·m·σ²).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED.
+
+    Empirical status: VALIDATED. A single dispersal variance σ² ≈ 2.0 fits
+    every tested distance to within ±11%, inside the standard errors. An
+    earlier apparent 30-123% discrepancy came from fixing σ² = 1 arbitrarily;
+    σ² is a free parameter of the model, not a prediction of it. -/
 noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
