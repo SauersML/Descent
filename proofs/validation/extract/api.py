@@ -9,6 +9,7 @@ Import it; do not re-parse Lean.
     api.definition_table()                 -> dict[str, Definition]
     api.definition("Calibrator.coalFst")   -> Definition
     api.callable_for("Calibrator.coalFst") -> (fn, ["t", "Ne"])
+    api.satisfies("Calibrator.coalFst", {"t": 10.0, "Ne": 100.0})
     api.body_checksum("Calibrator.coalFst")-> "sha256:..."
     api.stamp()                            -> corpus-wide fingerprint
 
@@ -83,7 +84,7 @@ CLASSES_JSON = HERE / "classes.json"
 
 __all__ = ["definition_table", "definition", "structures", "resolve",
            "callable_for", "classification", "body_checksum", "stamp",
-           "admissible_box", "hypotheses", "refresh"]
+           "admissible_box", "hypotheses", "satisfies", "refresh"]
 
 
 # --------------------------------------------------------------- the table
@@ -213,6 +214,21 @@ def hypotheses(name: str, theorem: str | None = None):
     """
     import admissible
     return admissible.hypothesis_predicates(definition(name), theorem)
+
+
+def satisfies(name: str, point: dict, theorem: str | None = None) -> bool:
+    """Is `point` admissible for this definition (under `theorem` if given)?
+
+    USE THIS rather than evaluating the predicates from `hypotheses()` yourself.
+    Those are exec-mode code objects that leave their verdict in `__r` and need
+    `_rt` in the namespace; `eval`-ing one returns None, which reads as False,
+    so every point looks inadmissible and every check manufactures a violation.
+    `point` maps python-level argument names (see `callable_for`) to values.
+    """
+    import admissible
+    preds, _texts, _dropped = admissible.hypothesis_predicates(
+        definition(name), theorem)
+    return admissible.satisfies(preds, point)
 
 
 # ------------------------------------------------------------ provenance

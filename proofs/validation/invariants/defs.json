@@ -1824,6 +1824,76 @@
   "n_theorems": 0
  },
  {
+  "name": "guard_stack_blind_to_retention",
+  "module": "BlindnessRegistry",
+  "path": "proofs/Calibrator/BlindnessRegistry.lean",
+  "line": 108,
+  "params": [
+   [
+    "hne",
+    "wrongRetention ≠ trueRetention"
+   ],
+   [
+    "fun",
+    "StructuralGuard => g.verdict r"
+   ],
+   [
+    "r",
+    "StructuralGuard => g.verdict r"
+   ],
+   [
+    "=>",
+    "StructuralGuard => g.verdict r"
+   ],
+   [
+    "fun",
+    "StructuralGuard => g.verdict r"
+   ],
+   [
+    "g",
+    "StructuralGuard => g.verdict r"
+   ]
+  ],
+  "ret": "ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r) (fun r => r = trueRetention)",
+  "doc": "**The whole guard suite shares one witness pair.**\n\nTwo different retention values — the measured one and the one the cluster assumed —\nproduce identical reports from *every* structural guard. By\n`ProbeBlindness.ofWitnessFamily`, no criterion reading the entire suite decides which\nretention is correct, in any combination and under any rule.\n\nThis is why the same wrong number was certified five times: it was never five\nindependent certifications, it was one blind suite applied five times.",
+  "body": "ProbeBlindness.ofWitnessFamily StructuralGuard.verdict _ trueRetention wrongRetention\n(fun g => propext ⟨fun _ => g.verdict_holds wrongRetention,\nfun _ => g.verdict_holds trueRetention⟩)\nrfl hne",
+  "theorem_hyps": [],
+  "n_theorems": 0
+ },
+ {
+  "name": "extra_algebraic_guard_adds_nothing",
+  "module": "BlindnessRegistry",
+  "path": "proofs/Calibrator/BlindnessRegistry.lean",
+  "line": 128,
+  "params": [
+   [
+    "hne",
+    "wrongRetention ≠ trueRetention"
+   ],
+   [
+    "newGuard",
+    "ℝ → Prop"
+   ],
+   [
+    "hnew",
+    "∀ r, newGuard r"
+   ],
+   [
+    "fun",
+    "StructuralGuard => g.verdict r, newGuard r"
+   ],
+   [
+    "g",
+    "StructuralGuard => g.verdict r, newGuard r"
+   ]
+  ],
+  "ret": "ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r)) (fun r => r = trueRetention) where positive",
+  "doc": "Adding a fourth guard of the same kind changes nothing: any predicate on candidate\nretentions that is satisfied at every retention joins the suite without narrowing it.",
+  "body": "trueRetention\nnegative := wrongRetention\nsame_data := by\nhave h₁ : (fun g : StructuralGuard => g.verdict trueRetention)\n= fun g : StructuralGuard => g.verdict wrongRetention := by\nfunext g\nexact propext ⟨fun _ => g.verdict_holds wrongRetention,\nfun _ => g.verdict_holds trueRetention⟩\nhave h₂ : newGuard trueRetention = newGuard wrongRetention :=\npropext ⟨fun _ => hnew wrongRetention, fun _ => hnew trueRetention⟩\nrw [h₁, h₂]\nholds := rfl\nfails := hne",
+  "theorem_hyps": [],
+  "n_theorems": 0
+ },
+ {
   "name": "proportionMediated",
   "module": "CausalInference",
   "path": "proofs/Calibrator/CausalInference.lean",
@@ -3850,6 +3920,11 @@
     "argmap": {}
    },
    {
+    "thm": "log_two_lt_condensationConstant",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
     "thm": "criticalDegree_gaussian",
     "hyps": [
      "ℝ"
@@ -3885,15 +3960,25 @@
      "0 < Real.log N"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "hweMellinDrift_half_lt_condensationConstant",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "balanced_locus_drift_separates",
+    "hyps": [],
+    "argmap": {}
    }
   ],
-  "n_theorems": 8
+  "n_theorems": 11
  },
  {
   "name": "gaussianJetVariance",
   "module": "Condensation",
   "path": "proofs/Calibrator/Condensation.lean",
-  "line": 221,
+  "line": 262,
   "params": [],
   "ret": "ℝ",
   "doc": "The Gaussian **jet variance** `v_G = pi ^ 2 / 2 - 4 = 0.93480...`, the variance of\n`log chi-square-three`, i.e. `trigamma(3/2)`. It is the second observable of the\nMellin 2-jet and sets the width of the condensation window.",
@@ -3911,7 +3996,7 @@
   "name": "criticalDegree",
   "module": "Condensation",
   "path": "proofs/Calibrator/Condensation.lean",
-  "line": 246,
+  "line": 287,
   "params": [
    [
     "N",
@@ -3980,7 +4065,7 @@
   "name": "gaussianCriticalMultiplier",
   "module": "Condensation",
   "path": "proofs/Calibrator/Condensation.lean",
-  "line": 262,
+  "line": 303,
   "params": [],
   "ret": "ℝ",
   "doc": "The Gaussian critical degree is `1.37035... * log N`. We record the reciprocal\nconstant as a strictly positive multiplier rather than a decimal.",
@@ -4010,7 +4095,7 @@
   "name": "windowVariance",
   "module": "Condensation",
   "path": "proofs/Calibrator/Condensation.lean",
-  "line": 309,
+  "line": 350,
   "params": [
    [
     "w",
@@ -4047,6 +4132,89 @@
    }
   ],
   "n_theorems": 3
+ },
+ {
+  "name": "hweObservableContent",
+  "module": "CondensationUnification",
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "line": 462,
+  "params": [
+   [
+    "squareCumulant",
+    "ℝ → ℕ → ℝ"
+   ],
+   [
+    "q",
+    "ℝ"
+   ]
+  ],
+  "ret": "GenotypeObservableContent where drift",
+  "doc": "The observable content of a Hardy-Weinberg locus at allele frequency `q`, assembled\nfrom the quantities this corpus already computes. The square-cumulant sequence is\nsupplied as a parameter because it is a sequence rather than a closed form; every other\ncomponent is a function of `q` already proved here.\n\nEmpirical status: DERIVED from `hweMellinDrift`, `hweMellinJetVariance` and\n`hweLatticeCondition`, each of which is derived elsewhere in the corpus; no free\nparameter beyond the supplied cumulant sequence, and nothing fitted.",
+  "body": "hweMellinDrift q\njetVariance := hweMellinJetVariance q\nIsLattice := hweLatticeCondition q\nIsSignSymmetric := q = 1 / 2\nsquareCumulant := squareCumulant q",
+  "theorem_hyps": [
+   {
+    "thm": "hweObservableContent_components",
+    "hyps": [
+     "ℝ → ℕ → ℝ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "hweObservableContent_symmetry",
+    "hyps": [
+     "ℝ → ℕ → ℝ",
+     "HardyWeinbergModel",
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "argmap": {
+     "h": "q"
+    }
+   },
+   {
+    "thm": "hweObservableContent_symmetric_jetVariance_zero",
+    "hyps": [
+     "ℝ → ℕ → ℝ",
+     "ℝ",
+     "(hweObservableContent squareCumulant q).IsSignSymmetric"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "experiment_factors_through_observable_content",
+    "hyps": [
+     "Limit → Report",
+     "GenotypeDesign n ι",
+     "VW.isAdmissible (design.reModel model)",
+     "VW.isAdmissible (design.reModel model')",
+     "∀ i : Fin n,\n      hweObservableContent VW.squareCumulant (model i).altFreq =\n        hweObservableContent VW.squareCumulant (model' i).altFreq"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 4
+ },
+ {
+  "name": "GenotypeDesign.reModel",
+  "module": "CondensationUnification",
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "line": 519,
+  "params": [
+   [
+    "design",
+    "GenotypeDesign n ι"
+   ],
+   [
+    "model",
+    "Fin n → HardyWeinbergModel"
+   ]
+  ],
+  "ret": "GenotypeDesign n ι",
+  "doc": "Re-model a design: the same tested locus-sets, coefficients and joint law, at a\ndifferent allele-frequency family. This is what varying the coordinate law while holding\nthe design fixed means, and it is the comparison the Vertex-Weight Law is about.\n\nEmpirical status: UNTESTED. A field update on a design; no modelling content and no free\nparameter.",
+  "body": "{ design with model := model }",
+  "theorem_hyps": [],
+  "n_theorems": 0
  },
  {
   "name": "ploidy",
@@ -4511,6 +4679,28 @@
     "argmap": {}
    },
    {
+    "thm": "contrastSpikeLevel_eq_four_hudsonFst",
+    "hyps": [
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
+    "hyps": [
+     "ℕ",
+     "m ≤ N",
+     "0 < N",
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0",
+     "Matrix (Fin N) (Fin N) ℝ",
+     "ℝ",
+     "Unit",
+     "ℝ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "demographicSpike_eq_contrastVariance_mul_spikeLoad",
     "hyps": [
      "ℕ",
@@ -4526,7 +4716,7 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 7
+  "n_theorems": 9
  },
  {
   "name": "hudsonFst",
@@ -4576,6 +4766,28 @@
     "argmap": {}
    },
    {
+    "thm": "contrastSpikeLevel_eq_four_hudsonFst",
+    "hyps": [
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
+    "hyps": [
+     "ℕ",
+     "m ≤ N",
+     "0 < N",
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0",
+     "Matrix (Fin N) (Fin N) ℝ",
+     "ℝ",
+     "Unit",
+     "ℝ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "demographicSpike_eq_contrastVariance_mul_spikeLoad",
     "hyps": [
      "ℕ",
@@ -4619,7 +4831,7 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 7
+  "n_theorems": 9
  },
  {
   "name": "betweenSubgroupVariance",
@@ -7808,6 +8020,50 @@
   "n_theorems": 1
  },
  {
+  "name": "contrastSpikeLevel",
+  "module": "DemographicCapacity",
+  "path": "proofs/Calibrator/DemographicCapacity.lean",
+  "line": 46,
+  "params": [
+   [
+    "p₁",
+    "ℝ"
+   ],
+   [
+    "p₂",
+    "ℝ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**The spike level of a subgroup contrast**: the variance of the\nstandardized allele-frequency contrast between the two subgroups.\n\nThis is the level, in the linear program's sense, that a demographic spike\nenters at — the multiplier on the spike load.  It is written as a quantity\nrather than as a numeral times `F_ST` for the reason that the numeral is what\nwas wrong before: `contrastSpikeLevel_eq_four_hudsonFst` derives it from\n`Conventions.four_hudsonFst_eq_standardizedContrastVariance` instead of\nstipulating it, so a spike level built on `2 F_ST` is unprovable here rather\nthan merely differently calibrated.\n\n    Empirical status: UNTESTED as an estimator. The constant relating it to\n    Hudson `F_ST` is DERIVED, and simulation recovers `3.9920 ± 0.0045` against\n    the derived `4` (see `Conventions.spikeIdentification`).",
+  "body": "(p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))",
+  "theorem_hyps": [
+   {
+    "thm": "contrastSpikeLevel_eq_four_hudsonFst",
+    "hyps": [
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
+    "hyps": [
+     "ℕ",
+     "m ≤ N",
+     "0 < N",
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0",
+     "Matrix (Fin N) (Fin N) ℝ",
+     "ℝ",
+     "Unit",
+     "ℝ",
+     "ℝ"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 2
+ },
+ {
   "name": "demoSteppingStoneFst",
   "module": "DemographicHistory",
   "path": "proofs/Calibrator/DemographicHistory.lean",
@@ -8323,7 +8579,7 @@
   "name": "closedPopulation",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 99,
+  "line": 103,
   "params": [
    [
     "Ne",
@@ -8339,7 +8595,7 @@
    ]
   ],
   "ret": "HeterozygosityTrajectory where het",
-  "doc": "**Regime A: closed population, no mutation.** Heterozygosity decays geometrically\nat the drift rate. This is the premise the cluster encodes.\n\n    Regime: closed population, no mutation — stated here as the definition's whole\n    content rather than as a hidden assumption.",
+  "doc": "**Regime A: closed population, no mutation.** Heterozygosity decays geometrically\nat the drift rate. This is the premise the cluster encodes.\n\n    Regime: closed population, no mutation — stated here as the definition's whole\n    content rather than as a hidden assumption.\n\n    Empirical status: FALSIFIED at demographic equilibrium. Simulation measures\n    the retention as `1.025 ± 0.020` at `Ne = 1000`, `t = 4000`, where this\n    trajectory gives `0.135`.",
   "body": "fun t => (1 - 1 / (2 * Ne)) ^ t * H₀\nhet_zero_pos := by simpa using hH",
   "theorem_hyps": [
    {
@@ -8366,7 +8622,7 @@
   "name": "mutationDriftBalance",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 106,
+  "line": 116,
   "params": [
    [
     "H₀",
@@ -8378,9 +8634,18 @@
    ]
   ],
   "ret": "HeterozygosityTrajectory where het",
-  "doc": "**Regime B: mutation-drift balance.** At demographic equilibrium mutation replenishes\ndiversity at the rate drift removes it, so heterozygosity is stationary. This is the\nregime the simulation was actually in.",
+  "doc": "**Regime B: mutation-drift balance.** At demographic equilibrium mutation replenishes\ndiversity at the rate drift removes it, so heterozygosity is stationary. This is the\nregime the simulation was actually in.\n\n    Empirical status: VALIDATED as the regime of the reported runs. Measured\n    retention `1.010`, `0.989`, `1.025` at `T = 200`, `1000`, `4000`, each within\n    one standard error of the stationary value `1`. Power: the drift-only rival\n    spans `0.905` to `0.135` across the same design, so the design separates\n    them by a factor of seven at the far end.",
   "body": "fun _ => H₀\nhet_zero_pos := hH",
   "theorem_hyps": [
+   {
+    "thm": "mutationDriftBalance_isFixedPoint",
+    "hyps": [
+     "ℝ",
+     "0 < H₀",
+     "ℕ"
+    ],
+    "argmap": {}
+   },
    {
     "thm": "regimes_disagree",
     "hyps": [
@@ -8391,13 +8656,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 1
+  "n_theorems": 2
  },
  {
   "name": "driftRetention",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 159,
+  "line": 182,
   "params": [
    [
     "Ne",
@@ -8409,7 +8674,7 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "The shared premise, isolated as a single number.\n\n    Regime: closed population, no mutation. Isolating it is the point: every\n    member of the cluster is a function of this one value, so every identity among\n    them is an identity in it.",
+  "doc": "The shared premise, isolated as a single number.\n\n    Regime: closed population, no mutation. Isolating it is the point: every\n    member of the cluster is a function of this one value, so every identity among\n    them is an identity in it.\n\n    Empirical status: FALSIFIED at demographic equilibrium; see\n    `closedPopulation`.",
   "body": "(1 - 1 / (2 * Ne)) ^ t",
   "theorem_hyps": [],
   "n_theorems": 0
@@ -8418,7 +8683,7 @@
   "name": "lossOfRetention",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 162,
+  "line": 194,
   "params": [
    [
     "r",
@@ -8426,7 +8691,7 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "Cluster member: heterozygosity loss.",
+  "doc": "Cluster member: heterozygosity loss.\n\n    Denotes: one minus a retention, and nothing more. The same body carries\n    names from the 'factor', 'frequency' and 'fst' families elsewhere in the\n    corpus, and the body alone does not fix which is meant; here the argument is\n    the closed-population retention and the value is a within-population\n    heterozygosity loss, never a between-population `F_ST`.\n\n    Empirical status: VACUOUS. It is a function of the shared retention, so it\n    carries no evidence independent of it.",
   "body": "1 - r",
   "theorem_hyps": [
    {
@@ -8441,7 +8706,7 @@
   "name": "targetHetOfRetention",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 165,
+  "line": 197,
   "params": [
    [
     "H₀",
@@ -8468,7 +8733,7 @@
   "name": "targetPgsVarOfRetention",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 168,
+  "line": 204,
   "params": [
    [
     "V_A",
@@ -8480,7 +8745,7 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "Cluster member: target PGS variance.",
+  "doc": "Cluster member: target PGS variance.\n\n    Empirical status: VACUOUS. It is a function of the shared retention, so it\n    carries no evidence independent of it; see\n    `cluster_identities_hold_at_every_retention`.",
   "body": "V_A * r",
   "theorem_hyps": [
    {
@@ -8495,7 +8760,7 @@
   "name": "clusterCrossCheck",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 182,
+  "line": 222,
   "params": [
    [
     "r",
@@ -8507,13 +8772,6 @@
   "body": "targetHetOfRetention 1 r = 1 * (1 - lossOfRetention r)",
   "theorem_hyps": [
    {
-    "thm": "crossChecks_blind_to_retention",
-    "hyps": [
-     "wrongRetention ≠ trueRetention"
-    ],
-    "argmap": {}
-   },
-   {
     "thm": "no_crossCheck_criterion_for_retention",
     "hyps": [
      "wrongRetention ≠ trueRetention"
@@ -8521,13 +8779,30 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 2
+  "n_theorems": 1
+ },
+ {
+  "name": "crossChecks_blind_to_retention",
+  "module": "DriftRegime",
+  "path": "proofs/Calibrator/DriftRegime.lean",
+  "line": 244,
+  "params": [
+   [
+    "hne",
+    "wrongRetention ≠ trueRetention"
+   ]
+  ],
+  "ret": "ProbeBlindness clusterCrossCheck (fun r => r = trueRetention) where positive",
+  "doc": "**The common-mode theorem: over-determination is blind to a shared premise.**\n\nTwo different retention values produce *identical* cross-check outcomes, so no criterion\nbuilt from the cluster's internal identities — however many members it relates, in\nwhatever combination — can decide whether the retention is the right one.\n\nThis is the same law as every other impossibility in this development\n(`Calibrator.ObservationalCeiling`), applied to the development's own quality process.\nThe consequence is not that over-determination is useless: it catches divergence, which\nis a real failure mode and was caught twice. The consequence is that it is **not a\nsubstitute for measuring the primitive against an observable**, and must never be\nreported as one.\n\n`ProbeBlindness` carries its two witnesses as data, so this is a `def` and not a\n`theorem`: the proposition it supports is `no_crossCheck_criterion_for_retention`\nimmediately below.\n\n    Empirical status: not an empirical claim. This is a witness construction; the\n    measurement it explains is recorded in `Calibrator.PortabilityDrift`.",
+  "body": "trueRetention\nnegative := wrongRetention\nsame_data := by\nhave h1 : clusterCrossCheck trueRetention :=\n(cluster_identities_hold_at_every_retention 1 1 trueRetention).1\nhave h2 : clusterCrossCheck wrongRetention :=\n(cluster_identities_hold_at_every_retention 1 1 wrongRetention).1\nexact propext ⟨fun _ => h2, fun _ => h1⟩\nholds := rfl\nfails := hne",
+  "theorem_hyps": [],
+  "n_theorems": 0
  },
  {
   "name": "benchmarkRatio",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 227,
+  "line": 274,
   "params": [
    [
     "fstS",
@@ -8556,20 +8831,15 @@
     "thm": "symmetric_design_has_no_power",
     "hyps": [],
     "argmap": {}
-   },
-   {
-    "thm": "no_symmetric_design_criterion",
-    "hyps": [],
-    "argmap": {}
    }
   ],
-  "n_theorems": 4
+  "n_theorems": 3
  },
  {
   "name": "benchmarkRatioSquared",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 231,
+  "line": 278,
   "params": [
    [
     "fstS",
@@ -8593,20 +8863,15 @@
     "thm": "benchmark_forms_differ",
     "hyps": [],
     "argmap": {}
-   },
-   {
-    "thm": "symmetric_design_has_no_power",
-    "hyps": [],
-    "argmap": {}
    }
   ],
-  "n_theorems": 3
+  "n_theorems": 2
  },
  {
   "name": "diagonalDesign",
   "module": "DriftRegime",
   "path": "proofs/Calibrator/DriftRegime.lean",
-  "line": 235,
+  "line": 285,
   "params": [
    [
     "g",
@@ -8614,7 +8879,7 @@
    ]
   ],
   "ret": "ℝ → ℝ",
-  "doc": "What a **symmetric** design observes: the two branch lengths are equal, so only the\ndiagonal of the candidate function is ever evaluated.",
+  "doc": "What a **symmetric** design observes: the two branch lengths are equal, so only the\ndiagonal of the candidate function is ever evaluated.\n\n    Empirical status: not an empirical claim. This is a description of a test\n    design, not a prediction about a population.",
   "body": "fun x => g x x",
   "theorem_hyps": [
    {
@@ -8628,14 +8893,21 @@
     "thm": "symmetric_design_has_no_power",
     "hyps": [],
     "argmap": {}
-   },
-   {
-    "thm": "no_symmetric_design_criterion",
-    "hyps": [],
-    "argmap": {}
    }
   ],
-  "n_theorems": 3
+  "n_theorems": 2
+ },
+ {
+  "name": "symmetricDesignBlindness",
+  "module": "DriftRegime",
+  "path": "proofs/Calibrator/DriftRegime.lean",
+  "line": 322,
+  "params": [],
+  "ret": "ProbeBlindness diagonalDesign (fun g => g = benchmarkRatio) where positive",
+  "doc": "**Symmetric designs have provably zero power to check this functional form.**\n\nNo criterion computed from a symmetric grid can decide whether the benchmark ratio is\nthe right functional form, because the correct form and its square produce identical\ndata on every such grid. The `3.2%` agreement originally recorded was therefore not weak\nevidence — it was *no* evidence about the exponent, and the asymmetric design that\nfollowed found errors of `-37%` to `-74%`.\n\nThe general obligation: a validation must report the spread of its prediction across the\ndesign. A prediction that is constant on the design tests nothing about shape.\n\nAs above this is a `def`, since `ProbeBlindness` carries its witnesses as data; the\nproposition is `symmetric_design_has_no_power` immediately below.\n\n    Empirical status: not an empirical claim. This is a witness construction.",
+  "body": "benchmarkRatio\nnegative := benchmarkRatioSquared\nsame_data := diagonalDesign_benchmark_eq\nholds := rfl\nfails := fun h => benchmark_forms_differ h.symm",
+  "theorem_hyps": [],
+  "n_theorems": 0
  },
  {
   "name": "fisherAverageEffect",
@@ -9212,9 +9484,37 @@
      "Fin n"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "overlap_row_sum_eq_recurrence",
+    "hyps": [
+     "GenotypeDesign nx ιx",
+     "ιx"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "variantRecurrence_eq_card_of_ubiquitous",
+    "hyps": [
+     "GenotypeDesign nx ιx",
+     "Fin nx",
+     "∀ s : ιx, i ∈ design.locusSet s"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "recurrence_matching_leaves_fourth_cycle_density_free",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2",
+     "∀ i : Fin nx,\n      resampled.variantRecurrence i = design.variantRecurrence i",
+     "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+     "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+    ],
+    "argmap": {}
    }
   ],
-  "n_theorems": 2
+  "n_theorems": 5
  },
  {
   "name": "locusInfluence",
@@ -9354,7 +9654,7 @@
   "name": "fourthCumulantFromMoments",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1225,
+  "line": 1229,
   "params": [
    [
     "secondMoment",
@@ -9391,7 +9691,7 @@
   "name": "circulantSpectrumA",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1355,
+  "line": 1359,
   "params": [
    [
     "c",
@@ -9418,15 +9718,41 @@
     "thm": "palindromic_circulant_spectra_differ",
     "hyps": [],
     "argmap": {}
+   },
+   {
+    "thm": "circulantSpectrumA_at_one",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "circulantSpectrumA_at_neg_one",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "circulantSpectrumA_at_root",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "circulantSpectrumA_at_neg_root",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
    }
   ],
-  "n_theorems": 3
+  "n_theorems": 7
  },
  {
   "name": "circulantSpectrumB",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1362,
+  "line": 1366,
   "params": [
    [
     "c",
@@ -9457,9 +9783,292 @@
     "argmap": {
      "c'": "c"
     }
+   },
+   {
+    "thm": "circulantSpectrumB_at_one",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "circulantSpectrumB_at_neg_one",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "circulantSpectrumB_at_zero",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "circulantSpectrumB_at_root",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "circulantSpectrumB_at_neg_root",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 8
+ },
+ {
+  "name": "overlapMatrix",
+  "module": "EpistaticChaos",
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1462,
+  "params": [
+   [
+    "design",
+    "GenotypeDesign nx ιx"
+   ]
+  ],
+  "ret": "Matrix ιx ιx ℝ",
+  "doc": "**The overlap structure of a design.** Entry `(s, t)` counts the variants\ntested by both set `s` and set `t`; the diagonal is the interaction order. This\nis the object whose spectrum the limit law is a function of, and whose row sums\nare the recurrence profile.\n\nEmpirical status: UNTESTED. A count matrix read off the design; no free parameter\nand nothing fitted.",
+  "body": "fun s t => ((design.locusSet s ∩ design.locusSet t).card : ℝ)",
+  "theorem_hyps": [
+   {
+    "thm": "overlapMatrix_symm",
+    "hyps": [
+     "GenotypeDesign nx ιx"
+    ],
+    "argmap": {
+     "s": "design"
+    }
+   }
+  ],
+  "n_theorems": 1
+ },
+ {
+  "name": "cycleDensity",
+  "module": "EpistaticChaos",
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1481,
+  "params": [
+   [
+    "design",
+    "GenotypeDesign nx ιx"
+   ],
+   [
+    "p",
+    "ℕ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**The `p`-th cycle density**: `trace (A ^ p)`, the total weight of closed\nwalks of length `p` in the overlap structure. For `p = 2` it is the squared\nFrobenius norm and for `p = 4` the fourth spectral moment.\n\nThese are the invariants the limit law is a function of, in contrast to the star\ndensities of `variantRecurrence`.\n\nEmpirical status: UNTESTED. A trace of a power of the overlap count matrix; no\nfree parameter and nothing fitted.",
+  "body": "Matrix.trace (design.overlapMatrix ^ p)",
+  "theorem_hyps": [
+   {
+    "thm": "cycle_preserving_resampling_is_a_calibration",
+    "hyps": [
+     "ℕ",
+     "CD.isAdmissible design",
+     "CD.isAdmissible resampled",
+     "design.BoundedHubRecurrence bound",
+     "resampled.BoundedHubRecurrence bound",
+     "∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "no_moment_matching_calibration_off_temperedness",
+    "hyps": [
+     "ℝ",
+     "ℕ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "recurrence_matching_leaves_fourth_cycle_density_free",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2",
+     "∀ i : Fin nx,\n      resampled.variantRecurrence i = design.variantRecurrence i",
+     "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+     "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+    ],
+    "argmap": {}
    }
   ],
   "n_theorems": 3
+ },
+ {
+  "name": "Tempered",
+  "module": "EpistaticChaos",
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1519,
+  "params": [
+   [
+    "design",
+    "GenotypeDesign nx ιx"
+   ],
+   [
+    "rate",
+    "ℝ"
+   ]
+  ],
+  "ret": "Prop",
+  "doc": "**The tempered regime.** The cycle densities grow at most exponentially in\nthe diagram size, so a single truncation level determines the limit law and\nmoment matching is a valid calibration strategy.\n\nEmpirical status: UNTESTED. A growth condition on the design's own cycle\ndensities; checkable on a panel by computing the overlap structure, with no free\nparameter beyond the declared rate.",
+  "body": "∀ p : ℕ, |design.cycleDensity p| ≤ rate ^ p",
+  "theorem_hyps": [],
+  "n_theorems": 0
+ },
+ {
+  "name": "BoundedHubRecurrence",
+  "module": "EpistaticChaos",
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1528,
+  "params": [
+   [
+    "design",
+    "GenotypeDesign nx ιx"
+   ],
+   [
+    "bound",
+    "ℕ"
+   ]
+  ],
+  "ret": "Prop",
+  "doc": "**Bounded hub energy**, in its operational form: no variant is tested more\nthan `bound` times. This is what fails for a lead variant in a dense sliding\nscan, or for a pleiotropic variant across a phenotype panel.\n\nEmpirical status: UNTESTED. A bound on the design's own recurrence profile;\ncheckable by inspection.",
+  "body": "∀ i : Fin nx, design.variantRecurrence i ≤ bound",
+  "theorem_hyps": [],
+  "n_theorems": 0
+ },
+ {
+  "name": "palindromicCycleDensityA",
+  "module": "EpistaticChaos",
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1698,
+  "params": [
+   [
+    "s",
+    "ℝ"
+   ],
+   [
+    "p",
+    "ℕ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "Power sum of the first circulant's eigenvalues, with their multiplicities:\nthe `p`-th cycle density of that overlap structure.\n\nEmpirical status: UNTESTED. A power sum of the eigenvalues of one fixed integer\nmatrix; no modelling content and no free parameter.",
+  "body": "circulantSpectrumA 1 ^ p + 2 * circulantSpectrumA (s / 2) ^ p +\n2 * circulantSpectrumA 0 ^ p + 2 * circulantSpectrumA (-(s / 2)) ^ p +\ncirculantSpectrumA (-1) ^ p",
+  "theorem_hyps": [
+   {
+    "thm": "palindromicCycleDensityA_two",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "palindromic_second_cycle_densities_equal",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "palindromicCycleDensityA_four",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "palindromic_fourth_cycle_densities_differ",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "recurrence_matching_leaves_fourth_cycle_density_free",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2",
+     "∀ i : Fin nx,\n      resampled.variantRecurrence i = design.variantRecurrence i",
+     "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+     "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 5
+ },
+ {
+  "name": "palindromicCycleDensityB",
+  "module": "EpistaticChaos",
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1707,
+  "params": [
+   [
+    "s",
+    "ℝ"
+   ],
+   [
+    "p",
+    "ℕ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "Power sum of the second circulant's eigenvalues, with their multiplicities.\n\nEmpirical status: UNTESTED. As for `palindromicCycleDensityA`: a power sum for\none fixed integer matrix, no free parameter.",
+  "body": "circulantSpectrumB 1 ^ p + 2 * circulantSpectrumB (s / 2) ^ p +\n2 * circulantSpectrumB 0 ^ p + 2 * circulantSpectrumB (-(s / 2)) ^ p +\ncirculantSpectrumB (-1) ^ p",
+  "theorem_hyps": [
+   {
+    "thm": "palindromicCycleDensityB_two",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "palindromic_second_cycle_densities_equal",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "palindromicCycleDensityB_four",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "palindromic_fourth_cycle_densities_differ",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "recurrence_matching_leaves_fourth_cycle_density_free",
+    "hyps": [
+     "ℝ",
+     "s ^ 2 = 2",
+     "∀ i : Fin nx,\n      resampled.variantRecurrence i = design.variantRecurrence i",
+     "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+     "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 5
  },
  {
   "name": "expectedR2FromN",
@@ -11399,6 +12008,18 @@
     "argmap": {}
    },
    {
+    "thm": "add_rankOneBump_diagonal_gap_ne_of_active",
+    "hyps": [
+     "Matrix ι ι ℝ",
+     "ℝ",
+     "ι → ℝ",
+     "K i i = K j j",
+     "scale ≠ 0",
+     "loading i ^ 2 ≠ loading j ^ 2"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "add_rankOneBump_not_constantDiagonal",
     "hyps": [
      "Matrix ι ι ℝ",
@@ -11431,6 +12052,19 @@
      "ι → ℝ",
      "ShiftInvariant shift K",
      "scale ≠ 0"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "add_rankOneBump_shift_entry_ne_of_active",
+    "hyps": [
+     "ι → ι",
+     "Matrix ι ι ℝ",
+     "ℝ",
+     "ι → ℝ",
+     "K (shift i) (shift j) = K i j",
+     "scale ≠ 0",
+     "loading (shift i) * loading (shift j) ≠ loading i * loading j"
     ],
     "argmap": {}
    },
@@ -11530,9 +12164,42 @@
      "ι → ℝ"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "rankOneCovarianceBump_eq_smul_spikeOuter",
+    "hyps": [
+     "ℝ",
+     "ι → ℝ"
+    ],
+    "argmap": {
+     "v": "loading"
+    }
+   },
+   {
+    "thm": "spiked_eq_add_rankOneCovarianceBump",
+    "hyps": [
+     "BackgroundClass ι cidx",
+     "Matrix ι ι ℝ",
+     "ℝ",
+     "ι → ℝ"
+    ],
+    "argmap": {
+     "v": "loading"
+    }
+   },
+   {
+    "thm": "diagonalGap_not_isNull_add_rankOneCovarianceBump",
+    "hyps": [
+     "S₀ i i = S₀ j j",
+     "scale ≠ 0",
+     "v j ^ 2 < v i ^ 2"
+    ],
+    "argmap": {
+     "v": "loading"
+    }
    }
   ],
-  "n_theorems": 16
+  "n_theorems": 21
  },
  {
   "name": "ConstantDiagonal",
@@ -11576,7 +12243,7 @@
   "name": "scalarRowResolvent",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 248,
+  "line": 320,
   "params": [
    [
     "latent",
@@ -11614,7 +12281,7 @@
   "name": "fairTwoPointVariance",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 262,
+  "line": 334,
   "params": [
    [
     "a",
@@ -11657,7 +12324,7 @@
   "name": "gramForm",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 312,
+  "line": 384,
   "params": [
    [
     "A",
@@ -11746,7 +12413,7 @@
   "name": "quadForm",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 318,
+  "line": 390,
   "params": [
    [
     "A",
@@ -11913,7 +12580,7 @@
   "name": "VarianceNonneg",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 323,
+  "line": 395,
   "params": [
    [
     "A",
@@ -11930,7 +12597,7 @@
   "name": "BelowCeiling",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 475,
+  "line": 547,
   "params": [
    [
     "ceiling",
@@ -11951,7 +12618,7 @@
   "name": "stationaryLDEntry",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 554,
+  "line": 626,
   "params": [
    [
     "decay",
@@ -12035,7 +12702,7 @@
   "name": "markovLDStep",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 573,
+  "line": 645,
   "params": [
    [
     "decay",
@@ -12069,7 +12736,7 @@
   "name": "ldKernelSymbol",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 617,
+  "line": 689,
   "params": [
    [
     "decay",
@@ -12190,7 +12857,7 @@
   "name": "ldHardEdge",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 626,
+  "line": 698,
   "params": [
    [
     "decay",
@@ -12223,7 +12890,7 @@
   "name": "ldWhiteningGain",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 636,
+  "line": 708,
   "params": [
    [
     "decay",
@@ -12351,7 +13018,7 @@
   "name": "ldPrecisionTrace",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 796,
+  "line": 868,
   "params": [
    [
     "decay",
@@ -12426,7 +13093,7 @@
   "name": "adjacentBoundarySeparation",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 802,
+  "line": 874,
   "params": [],
   "ret": "ℕ → ℕ | 0 => 1 | d + 1 => d",
   "doc": "Separation from a boundary row to the adjacent row.  At the diagonal the\nadjacent entry is one step away; off the diagonal at separation `d+1`, it is\nat separation `d`.",
@@ -12455,7 +13122,7 @@
   "name": "lossGeometryRisk",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 927,
+  "line": 999,
   "params": [
    [
     "B",
@@ -12491,7 +13158,7 @@
   "name": "ridgeBalance",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 974,
+  "line": 1046,
   "params": [
    [
     "aspect",
@@ -12567,7 +13234,7 @@
   "name": "ridgeSelfConsistentStep",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 996,
+  "line": 1068,
   "params": [
    [
     "aspect",
@@ -12606,7 +13273,7 @@
   "name": "alleleLossProbability",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 1146,
+  "line": 1218,
   "params": [
    [
     "initial",
@@ -12672,7 +13339,7 @@
   "name": "absorptionInformation",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 1151,
+  "line": 1223,
   "params": [
    [
     "initial",
@@ -12701,7 +13368,7 @@
   "name": "absorptionChannelWeight",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 1215,
+  "line": 1287,
   "params": [
    [
     "initial",
@@ -12746,7 +13413,7 @@
   "name": "informationCrossoverTime",
   "module": "ImitationRigidity",
   "path": "proofs/Calibrator/ImitationRigidity.lean",
-  "line": 1226,
+  "line": 1298,
   "params": [
    [
     "initial",
@@ -15245,7 +15912,7 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "**Reconstruction share of a pruned (low-frequency) band** on a stationary\nAR(1) chromosome, as a function of the per-site LD retention `decay` and the\nfraction `kappa` of directions kept.\n\nThis is the closed form of the harmonic-measure integral of the Poisson kernel:\n`(2/π) · arctan( ((1+ρ)/(1-ρ)) · tan(πκ/2) )`.  The claim that it equals the\nintegral is `ldBandReconstructionShare_eq_integral`, which is stated with a\n`sorry`; this definition on its own asserts nothing.\n\nValid for `0 ≤ kappa < 1`.  At `kappa = 1` the expression is not the limit —\n`Real.tan (π/2) = 0` under Mathlib's junk-value convention — so the endpoint\nmust be read off from `ldBandReconstructionShare_eq_integral` rather than from\nthe formula.\n\nEmpirical status: UNTESTED.",
+  "doc": "**Reconstruction share of a pruned (low-frequency) band** on a stationary\nAR(1) chromosome, as a function of the per-site LD retention `decay` and the\nfraction `kappa` of directions kept.\n\nThis is the closed form of the harmonic-measure integral of the Poisson kernel:\n`(2/π) · arctan( ((1+ρ)/(1-ρ)) · tan(πκ/2) )`.  That it equals the integral is\nnot proved here: it is the `reconstruction` field of\n`LDBandIntegralIdentification`, which any result relying on the identification\nmust take as a hypothesis.  This definition on its own asserts nothing.\n\nValid for `0 ≤ kappa < 1`.  At `kappa = 1` the expression is not the limit —\n`Real.tan (π/2) = 0` under Mathlib's junk-value convention — so the endpoint\nmust be read off from the integral rather than from the formula.\n\nEmpirical status: UNTESTED.",
   "body": "2 * Real.arctan (((1 + decay) / (1 - decay)) *\nReal.tan (Real.pi * kappa / 2)) / Real.pi",
   "theorem_hyps": [
    {
@@ -15263,7 +15930,7 @@
   "name": "ldBandDetectionShare",
   "module": "MetricSpecificPortability",
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1182,
+  "line": 1183,
   "params": [
    [
     "decay",
@@ -15275,7 +15942,7 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "**Detection share of a pruned (low-frequency) band** on a stationary AR(1)\nchromosome: the fraction of the total inverse-LD (whitened) weight that survives\npruning down to a fraction `kappa` of the directions.\n\nClosed form `κ - 2ρ sin(πκ) / (π(1 + ρ²))`, obtained by integrating the\nreciprocal symbol; the `1 + ρ²` is the numerator of\n`Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel\ntrace.  The claim that it equals the integral ratio is\n`ldBandDetectionShare_eq_integral`.\n\nEmpirical status: UNTESTED.",
+  "doc": "**Detection share of a pruned (low-frequency) band** on a stationary AR(1)\nchromosome: the fraction of the total inverse-LD (whitened) weight that survives\npruning down to a fraction `kappa` of the directions.\n\nClosed form `κ - 2ρ sin(πκ) / (π(1 + ρ²))`, obtained by integrating the\nreciprocal symbol; the `1 + ρ²` is the numerator of\n`Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel\ntrace.  That it equals the integral ratio is not proved here: it is the\n`detection` field of `LDBandIntegralIdentification`, carried as a hypothesis by\nevery result that relies on the identification.\n\nEmpirical status: UNTESTED.",
   "body": "kappa - 2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))",
   "theorem_hyps": [
    {
@@ -15329,7 +15996,7 @@
   "name": "ldPruningDetectionDeficit",
   "module": "MetricSpecificPortability",
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1189,
+  "line": 1190,
   "params": [
    [
     "decay",
@@ -15401,7 +16068,7 @@
   "name": "ldPanelRetentionFraction",
   "module": "MetricSpecificPortability",
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1393,
+  "line": 1394,
   "params": [
    [
     "retainedMarkers",
@@ -15461,7 +16128,7 @@
   "name": "ldBlockReconstructionShare",
   "module": "MetricSpecificPortability",
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1444,
+  "line": 1445,
   "params": [
    [
     "recomb",
@@ -15490,7 +16157,7 @@
   "name": "ldBlockDetectionShare",
   "module": "MetricSpecificPortability",
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1455,
+  "line": 1456,
   "params": [
    [
     "recomb",
@@ -15547,7 +16214,7 @@
   "name": "ldBlockPruningDeficit",
   "module": "MetricSpecificPortability",
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1465,
+  "line": 1466,
   "params": [
    [
     "recomb",
@@ -15607,7 +16274,7 @@
   "name": "ldTightLinkageDetectionShare",
   "module": "MetricSpecificPortability",
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1476,
+  "line": 1477,
   "params": [
    [
     "retainedMarkers",
@@ -15987,15 +16654,30 @@
     "argmap": {}
    },
    {
+    "thm": "islandFstMultiplicativeStep_eq_ibdRecurrenceStep",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
     "thm": "gene_lof_maximally_portable_rare",
     "hyps": [
      "port_single_rare ≤ port_burden",
      "port_burden ≤ port_lof_burden"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "and",
+    "hyps": [],
+    "argmap": {
+     "is": "B₁",
+     "not": "B₂",
+     "used": "hpos",
+     "in": "hneg"
+    }
    }
   ],
-  "n_theorems": 16
+  "n_theorems": 18
  },
  {
   "name": "ofWitnessFamily",
@@ -17029,9 +17711,24 @@
      "ι → ℝ"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "rankOneCovarianceBump_eq_smul_spikeOuter",
+    "hyps": [
+     "ℝ",
+     "ι → ℝ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "diagonalGapForm_spikeOuter",
+    "hyps": [
+     "ι → ℝ"
+    ],
+    "argmap": {}
    }
   ],
-  "n_theorems": 5
+  "n_theorems": 7
  },
  {
   "name": "twoBlock",
@@ -17122,6 +17819,21 @@
   "body": "K.form a (spikeOuter v)",
   "theorem_hyps": [
    {
+    "thm": "demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
+    "hyps": [
+     "ℕ",
+     "m ≤ N",
+     "0 < N",
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0",
+     "Matrix (Fin N) (Fin N) ℝ",
+     "ℝ",
+     "Unit",
+     "ℝ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "demographicSpike_eq_contrastVariance_mul_spikeLoad",
     "hyps": [
      "ℕ",
@@ -17199,6 +17911,16 @@
     "argmap": {}
    },
    {
+    "thm": "diagonalGapClass_spikeLoad",
+    "hyps": [
+     "Matrix ι ι ℝ",
+     "ℝ",
+     "Unit",
+     "ι → ℝ"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "traceWindow_spikeLoad_demographic",
     "hyps": [
      "ℕ",
@@ -17228,7 +17950,7 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 10
+  "n_theorems": 12
  },
  {
   "name": "headroom",
@@ -17336,9 +18058,17 @@
      "ℕ → ℝ"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "and",
+    "hyps": [],
+    "argmap": {
+     "term": "a",
+     "the": "S₀"
+    }
    }
   ],
-  "n_theorems": 10
+  "n_theorems": 11
  },
  {
   "name": "Active",
@@ -17365,8 +18095,12 @@
   "name": "spiked",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 275,
+  "line": 281,
   "params": [
+   [
+    "_K",
+    "BackgroundClass ι cidx"
+   ],
    [
     "S₀",
     "Matrix ι ι ℝ"
@@ -17381,7 +18115,7 @@
    ]
   ],
   "ret": "Matrix ι ι ℝ",
-  "doc": "The spiked covariance at level `t` in direction `v`.\n\n    Empirical status: DERIVED (this is the bump of\n    `covarianceMatrix_addRankOneSignal`, re-parametrized so the level enters\n    linearly).",
+  "doc": "The spiked covariance at level `t` in direction `v`.\n\nThe class argument names the testing problem this alternative belongs to and is\nwritten `_K` because it does not enter the formula: the alternative is the same\nmatrix whatever class is being tested against.  It is carried so that the\nalternative is addressable as a member of the problem rather than as a free\nmatrix expression, which is what every call site wants.\n\n    Empirical status: DERIVED (this is the bump of\n    `covarianceMatrix_addRankOneSignal`, re-parametrized so the level enters\n    linearly).",
   "body": "S₀ + t • spikeOuter v",
   "theorem_hyps": [
    {
@@ -17470,6 +18204,16 @@
     "argmap": {}
    },
    {
+    "thm": "spiked_eq_add_rankOneCovarianceBump",
+    "hyps": [
+     "BackgroundClass ι cidx",
+     "Matrix ι ι ℝ",
+     "ℝ",
+     "ι → ℝ"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "imitable_despite_positive_pcCorrectabilityMargin",
     "hyps": [
      "ℕ",
@@ -17527,15 +18271,29 @@
      "0 < t"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "positive_pc_margin_does_not_imply_detectable",
+    "hyps": [
+     "ℕ",
+     "0 ≤ F",
+     "m ≤ N",
+     "0 < N",
+     "ℝ",
+     "VarianceNonneg (S₀ - base)",
+     "traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget",
+     "0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ)"
+    ],
+    "argmap": {}
    }
   ],
-  "n_theorems": 13
+  "n_theorems": 15
  },
  {
   "name": "exitLevels",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 303,
+  "line": 310,
   "params": [
    [
     "S₀",
@@ -17601,7 +18359,7 @@
   "name": "imitationCapacity",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 313,
+  "line": 320,
   "params": [
    [
     "S₀",
@@ -17689,6 +18447,16 @@
     "argmap": {}
    },
    {
+    "thm": "diagonalGap_imitationCapacity_eq_zero",
+    "hyps": [
+     "VarianceNonneg (S₀ - base)",
+     "S₀ i i = S₀ j j",
+     "v ∈ support",
+     "v j ^ 2 < v i ^ 2"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "imitationCapacity_eq_whitenedCapacity",
     "hyps": [
      "EquiExit K S₀ support",
@@ -17722,13 +18490,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 11
+  "n_theorems": 12
  },
  {
   "name": "frobeniusForm",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 501,
+  "line": 508,
   "params": [
    [
     "A",
@@ -17783,7 +18551,7 @@
   "name": "traceForm",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 567,
+  "line": 574,
   "params": [
    [
     "M",
@@ -17911,15 +18679,31 @@
     "argmap": {
      "S₀": "M"
     }
+   },
+   {
+    "thm": "positive_pc_margin_does_not_imply_detectable",
+    "hyps": [
+     "ℕ",
+     "0 ≤ F",
+     "m ≤ N",
+     "0 < N",
+     "ℝ",
+     "VarianceNonneg (S₀ - base)",
+     "traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget",
+     "0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ)"
+    ],
+    "argmap": {
+     "S₀": "M"
+    }
    }
   ],
-  "n_theorems": 10
+  "n_theorems": 11
  },
  {
   "name": "traceWindowBudgetClass",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 594,
+  "line": 601,
   "params": [
    [
     "base",
@@ -17934,6 +18718,21 @@
   "doc": "**The trace-window background class**: every legal background carries total\nstandardized variance at most `budget`.\n\n    Empirical status: UNTESTED. `budget` is measurable — it is the trace of the\n    standardized genotype covariance the panel admits as background.",
   "body": "base\nform := fun _ => traceForm\nbound := fun _ => budget\nform_add := fun _ M N => traceForm_add M N\nform_smul := fun _ c M => traceForm_smul c M",
   "theorem_hyps": [
+   {
+    "thm": "demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
+    "hyps": [
+     "ℕ",
+     "m ≤ N",
+     "0 < N",
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0",
+     "Matrix (Fin N) (Fin N) ℝ",
+     "ℝ",
+     "Unit",
+     "ℝ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
    {
     "thm": "demographicSpike_eq_contrastVariance_mul_spikeLoad",
     "hyps": [
@@ -18081,15 +18880,29 @@
      "ℝ"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "positive_pc_margin_does_not_imply_detectable",
+    "hyps": [
+     "ℕ",
+     "0 ≤ F",
+     "m ≤ N",
+     "0 < N",
+     "ℝ",
+     "VarianceNonneg (S₀ - base)",
+     "traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget",
+     "0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ)"
+    ],
+    "argmap": {}
    }
   ],
-  "n_theorems": 12
+  "n_theorems": 14
  },
  {
   "name": "margin",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 687,
+  "line": 694,
   "params": [
    [
     "E",
@@ -18156,7 +18969,7 @@
   "name": "rejectionThreshold",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 713,
+  "line": 720,
   "params": [
    [
     "E",
@@ -18198,7 +19011,7 @@
   "name": "traceWindowClass",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 770,
+  "line": 777,
   "params": [
    [
     "base",
@@ -18268,10 +19081,115 @@
   "n_theorems": 6
  },
  {
+  "name": "diagonalGapForm",
+  "module": "ImitationCapacity",
+  "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 878,
+  "params": [
+   [
+    "i",
+    "ι"
+   ],
+   [
+    "j",
+    "ι"
+   ],
+   [
+    "M",
+    "Matrix ι ι ℝ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**The diagonal-gap functional.**  The difference of two diagonal entries —\nfor a genotype covariance, the difference in standardized variance carried by\ntwo markers.  It is linear, so it is a legal constraint of a background class,\nand `ConstantDiagonal` is the statement that all of these vanish.\n\n    Empirical status: DERIVED (a difference of matrix entries;\n    `diagonalGapForm_spikeOuter` identifies its spike load).",
+  "body": "M i i - M j j",
+  "theorem_hyps": [
+   {
+    "thm": "diagonalGapForm_add",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "diagonalGapForm_smul",
+    "hyps": [
+     "ℝ",
+     "Matrix ι ι ℝ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "diagonalGapForm_spikeOuter",
+    "hyps": [
+     "ι → ℝ"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 3
+ },
+ {
+  "name": "diagonalGapClass",
+  "module": "ImitationCapacity",
+  "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 910,
+  "params": [
+   [
+    "base",
+    "Matrix ι ι ℝ"
+   ],
+   [
+    "i",
+    "ι"
+   ],
+   [
+    "j",
+    "ι"
+   ],
+   [
+    "budget",
+    "ℝ"
+   ]
+  ],
+  "ret": "BackgroundClass ι Unit where base",
+  "doc": "**The diagonal-gap background class**: backgrounds in which two markers\ndiffer in standardized variance by at most `budget`.  At `budget = 0` with the\nconstraint\nactive this is the constant-diagonal condition restricted to one pair, which is\nall `ImitationRigidity` ever used.\n\n    Empirical status: UNTESTED. `budget` is measurable — it is the spread in\n    standardized variance a panel admits between two markers.",
+  "body": "base\nform := fun _ => diagonalGapForm i j\nbound := fun _ => budget\nform_add := fun _ M N => diagonalGapForm_add i j M N\nform_smul := fun _ c M => diagonalGapForm_smul i j c M",
+  "theorem_hyps": [
+   {
+    "thm": "diagonalGapClass_spikeLoad",
+    "hyps": [
+     "Matrix ι ι ℝ",
+     "ℝ",
+     "Unit",
+     "ι → ℝ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "diagonalGap_imitationCapacity_eq_zero",
+    "hyps": [
+     "VarianceNonneg (S₀ - base)",
+     "S₀ i i = S₀ j j",
+     "v ∈ support",
+     "v j ^ 2 < v i ^ 2"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "diagonalGap_not_isNull_add_rankOneCovarianceBump",
+    "hyps": [
+     "S₀ i i = S₀ j j",
+     "scale ≠ 0",
+     "v j ^ 2 < v i ^ 2"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 3
+ },
+ {
   "name": "traceWindowSpikeLoad",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 848,
+  "line": 1000,
   "params": [
    [
     "decay",
@@ -18310,7 +19228,7 @@
   "name": "whitenedCapacity",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 868,
+  "line": 1020,
   "params": [
    [
     "headroom",
@@ -18370,7 +19288,7 @@
   "name": "subgroupContrast",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 985,
+  "line": 1137,
   "params": [
    [
     "n",
@@ -18391,7 +19309,7 @@
   "name": "demographicSpikeDirection",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 991,
+  "line": 1143,
   "params": [
    [
     "n",
@@ -18406,6 +19324,23 @@
   "doc": "The subgroup contrast as a vector on the panel's individuals.\n\n    Empirical status: DERIVED.",
   "body": "fun i => subgroupContrast n m i.val",
   "theorem_hyps": [
+   {
+    "thm": "demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
+    "hyps": [
+     "ℕ",
+     "m ≤ N",
+     "0 < N",
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0",
+     "Matrix (Fin N) (Fin N) ℝ",
+     "ℝ",
+     "Unit",
+     "ℝ",
+     "ℝ"
+    ],
+    "argmap": {
+     "N": "n"
+    }
+   },
    {
     "thm": "demographicSpike_eq_contrastVariance_mul_spikeLoad",
     "hyps": [
@@ -18542,15 +19477,31 @@
     "argmap": {
      "N": "n"
     }
+   },
+   {
+    "thm": "positive_pc_margin_does_not_imply_detectable",
+    "hyps": [
+     "ℕ",
+     "0 ≤ F",
+     "m ≤ N",
+     "0 < N",
+     "ℝ",
+     "VarianceNonneg (S₀ - base)",
+     "traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget",
+     "0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ)"
+    ],
+    "argmap": {
+     "N": "n"
+    }
    }
   ],
-  "n_theorems": 9
+  "n_theorems": 11
  },
  {
   "name": "stratificationCertificateMargin",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1068,
+  "line": 1220,
   "params": [
    [
     "headroom",
@@ -18581,15 +19532,20 @@
     "thm": "stratificationCertificateMargin_zero_headroom",
     "hyps": [],
     "argmap": {}
+   },
+   {
+    "thm": "and",
+    "hyps": [],
+    "argmap": {}
    }
   ],
-  "n_theorems": 1
+  "n_theorems": 2
  },
  {
   "name": "blockSpectrum",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1208,
+  "line": 1360,
   "params": [
    [
     "k",
@@ -18645,7 +19601,7 @@
   "name": "normalizedMoment",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1216,
+  "line": 1368,
   "params": [
    [
     "m",
@@ -18711,7 +19667,7 @@
   "name": "inverseTraceCertificate",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1226,
+  "line": 1378,
   "params": [
    [
     "m",
@@ -18801,7 +19757,7 @@
   "name": "meffPerturbed",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1322,
+  "line": 1474,
   "params": [
    [
     "n",
@@ -18851,7 +19807,7 @@
   "name": "meffFlat",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1327,
+  "line": 1479,
   "params": [
    [
     "n",
@@ -18901,7 +19857,7 @@
   "name": "meffSize",
   "module": "ImitationCapacity",
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1332,
+  "line": 1484,
   "params": [
    [
     "n",
@@ -19224,6 +20180,21 @@
     "argmap": {}
    },
    {
+    "thm": "demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
+    "hyps": [
+     "ℕ",
+     "m ≤ N",
+     "0 < N",
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0",
+     "Matrix (Fin N) (Fin N) ℝ",
+     "ℝ",
+     "Unit",
+     "ℝ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "demographicSpike_eq_contrastVariance_mul_spikeLoad",
     "hyps": [
      "ℕ",
@@ -19347,9 +20318,23 @@
     "argmap": {
      "mBelow": "m"
     }
+   },
+   {
+    "thm": "positive_pc_margin_does_not_imply_detectable",
+    "hyps": [
+     "ℕ",
+     "0 ≤ F",
+     "m ≤ N",
+     "0 < N",
+     "ℝ",
+     "VarianceNonneg (S₀ - base)",
+     "traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget",
+     "0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ)"
+    ],
+    "argmap": {}
    }
   ],
-  "n_theorems": 12
+  "n_theorems": 14
  },
  {
   "name": "bbpProxyThreshold",
@@ -19648,9 +20633,23 @@
      "SubthresholdPCCertificate"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "positive_pc_margin_does_not_imply_detectable",
+    "hyps": [
+     "ℕ",
+     "0 ≤ F",
+     "m ≤ N",
+     "0 < N",
+     "ℝ",
+     "VarianceNonneg (S₀ - base)",
+     "traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget",
+     "0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ)"
+    ],
+    "argmap": {}
    }
   ],
-  "n_theorems": 7
+  "n_theorems": 8
  },
  {
   "name": "modeledPCResidualSusceptibility",
@@ -24546,6 +25545,27 @@
     "argmap": {}
    },
    {
+    "thm": "hweObservableContent_components",
+    "hyps": [
+     "ℝ → ℕ → ℝ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "indistinguishable_of_matching_computed_quantities",
+    "hyps": [
+     "GenotypeDesign n ι",
+     "VW.isAdmissible (design.reModel model)",
+     "VW.isAdmissible (design.reModel model')",
+     "∀ i : Fin n, hweMellinDrift (model i).altFreq =\n      hweMellinDrift (model' i).altFreq",
+     "∀ i : Fin n, hweMellinJetVariance (model i).altFreq =\n      hweMellinJetVariance (model' i).altFreq",
+     "∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq",
+     "∀ i : Fin n, VW.squareCumulant (model i).altFreq =\n      VW.squareCumulant (model' i).altFreq"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "HardyWeinbergModel.mellinDrift_eq",
     "hyps": [
      "HardyWeinbergModel",
@@ -24636,15 +25656,25 @@
      "1 ≤ N"
     ],
     "argmap": {}
+   },
+   {
+    "thm": "hweMellinDrift_half_lt_condensationConstant",
+    "hyps": [],
+    "argmap": {}
+   },
+   {
+    "thm": "balanced_locus_drift_separates",
+    "hyps": [],
+    "argmap": {}
    }
   ],
-  "n_theorems": 18
+  "n_theorems": 22
  },
  {
   "name": "maxSafeEpistaticOrder",
   "module": "PolygenicSpectroscopy",
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 605,
+  "line": 627,
   "params": [
    [
     "N",
@@ -24739,7 +25769,7 @@
   "name": "hweLatticeCondition",
   "module": "PolygenicSpectroscopy",
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 753,
+  "line": 775,
   "params": [
    [
     "q",
@@ -24751,6 +25781,27 @@
   "body": "(1 - 2 * q) ^ 2 = 4 * q * (1 - q)",
   "theorem_hyps": [
    {
+    "thm": "hweObservableContent_components",
+    "hyps": [
+     "ℝ → ℕ → ℝ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "indistinguishable_of_matching_computed_quantities",
+    "hyps": [
+     "GenotypeDesign n ι",
+     "VW.isAdmissible (design.reModel model)",
+     "VW.isAdmissible (design.reModel model')",
+     "∀ i : Fin n, hweMellinDrift (model i).altFreq =\n      hweMellinDrift (model' i).altFreq",
+     "∀ i : Fin n, hweMellinJetVariance (model i).altFreq =\n      hweMellinJetVariance (model' i).altFreq",
+     "∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq",
+     "∀ i : Fin n, VW.squareCumulant (model i).altFreq =\n      VW.squareCumulant (model' i).altFreq"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "hardCall_arithmeticProgression_at_critical_maf",
     "hyps": [],
     "argmap": {
@@ -24758,13 +25809,13 @@
     }
    }
   ],
-  "n_theorems": 1
+  "n_theorems": 3
  },
  {
   "name": "latticeCriticalMaf",
   "module": "PolygenicSpectroscopy",
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 756,
+  "line": 778,
   "params": [],
   "ret": "ℝ",
   "doc": "The critical allele frequency `q* = (2 - sqrt 2) / 4 = 0.146447...`.",
@@ -24792,7 +25843,7 @@
   "name": "mellinJetVariance",
   "module": "PolygenicSpectroscopy",
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 800,
+  "line": 822,
   "params": [
    [
     "h",
@@ -24819,7 +25870,7 @@
   "name": "hweMellinJetVariance",
   "module": "PolygenicSpectroscopy",
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 809,
+  "line": 831,
   "params": [
    [
     "q",
@@ -24842,6 +25893,27 @@
     }
    },
    {
+    "thm": "hweObservableContent_components",
+    "hyps": [
+     "ℝ → ℕ → ℝ",
+     "ℝ"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "indistinguishable_of_matching_computed_quantities",
+    "hyps": [
+     "GenotypeDesign n ι",
+     "VW.isAdmissible (design.reModel model)",
+     "VW.isAdmissible (design.reModel model')",
+     "∀ i : Fin n, hweMellinDrift (model i).altFreq =\n      hweMellinDrift (model' i).altFreq",
+     "∀ i : Fin n, hweMellinJetVariance (model i).altFreq =\n      hweMellinJetVariance (model' i).altFreq",
+     "∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq",
+     "∀ i : Fin n, VW.squareCumulant (model i).altFreq =\n      VW.squareCumulant (model' i).altFreq"
+    ],
+    "argmap": {}
+   },
+   {
     "thm": "HardyWeinbergModel.mellinJetVariance_eq",
     "hyps": [
      "HardyWeinbergModel",
@@ -24853,13 +25925,13 @@
     }
    }
   ],
-  "n_theorems": 2
+  "n_theorems": 4
  },
  {
   "name": "hardCallLatticeSpan",
   "module": "PolygenicSpectroscopy",
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 844,
+  "line": 866,
   "params": [],
   "ret": "ℝ",
   "doc": "The lattice span at `q*` is `h = log ((1 - q*) / q*) = log (3 + 2 sqrt 2)`, which\nis strictly positive; hence the inflation factor `h / (1 - exp (-h))` is strictly\ngreater than one and the separation of `hardCall_arithmeticProgression_at_critical_maf`\nis quantitative.",
@@ -24890,7 +25962,7 @@
   "name": "hardCallObservables",
   "module": "PolygenicSpectroscopy",
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 902,
+  "line": 924,
   "params": [],
   "ret": "MellinObservables where drift",
   "doc": "**The complete observable triple of a hard-called locus at the lattice frequency.**\n\nEvery component is a closed-form function of the allele frequency, and the third\ncomponent is `lattice` because the three values of `log x ^ 2` form an exact arithmetic\nprogression there (`hardCall_arithmeticProgression_at_critical_maf`).",
@@ -24904,6 +25976,53 @@
    {
     "thm": "hardCall_not_chameleon",
     "hyps": [],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 2
+ },
+ {
+  "name": "hweCodingInvariants",
+  "module": "PolygenicSpectroscopy",
+  "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
+  "line": 1075,
+  "params": [
+   [
+    "h",
+    "HardyWeinbergModel"
+   ],
+   [
+    "arithmeticType",
+    "LatticeDatum"
+   ],
+   [
+    "squareCumulant",
+    "ℕ → ℝ"
+   ]
+  ],
+  "ret": "CodingInvariants where drift",
+  "doc": "The invariant quadruple of a hard-called Hardy-Weinberg locus.\n\nThe drift and the jet variance are supplied from the closed forms proved in this file;\nthe arithmetic type and the square-cumulant sequence are taken as *arguments*, because\nneither has a closed form here — the arithmetic type is only pinned at the explicit\nfrequency `latticeCriticalMaf`, and the cumulant sequence is not computed anywhere in\nthis development. Keeping them as arguments is deliberate: the signature then says\nexactly which two of the four this file establishes and which two it assumes.\n\nEmpirical status: DERIVED in its first two components, from `hweMellinDrift` and\n`hweMellinJetVariance`, both of which are proved equal to direct sums over the three\ngenotypes and recomputed numerically by\n`proofs/validation/condensation/check_condensation.py`. The third and fourth components\nare inputs, not claims. No free parameter.",
+  "body": "hweMellinDrift h.altFreq\njetVariance := hweMellinJetVariance h.altFreq\narithmeticType := arithmeticType\nsymmetric := h.altFreq = 1 / 2\nsquareCumulant := squareCumulant",
+  "theorem_hyps": [
+   {
+    "thm": "hwe_observables_exhausted_by_invariants",
+    "hyps": [
+     "VertexWeightCompleteness Law Design Observation",
+     "(Design → Observation) → Report",
+     "W.invariants ν = hweCodingInvariants h arithmeticType squareCumulant",
+     "W.invariants ν' = hweCodingInvariants h' arithmeticType' squareCumulant'",
+     "hweCodingInvariants h arithmeticType squareCumulant\n      = hweCodingInvariants h' arithmeticType' squareCumulant'"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "balanced_locus_symmetric_component",
+    "hyps": [
+     "HardyWeinbergModel",
+     "h.altFreq = 1 / 2",
+     "LatticeDatum",
+     "ℕ → ℝ"
+    ],
     "argmap": {}
    }
   ],
@@ -35483,10 +36602,102 @@
   "n_theorems": 18
  },
  {
+  "name": "ibdRecurrenceStep",
+  "module": "PortabilityDrift",
+  "path": "proofs/Calibrator/PortabilityDrift.lean",
+  "line": 4607,
+  "params": [
+   [
+    "Ne",
+    "ℝ"
+   ],
+   [
+    "rate",
+    "ℝ"
+   ],
+   [
+    "x",
+    "ℝ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**One generation of the identity-by-descent recurrence.**\n\nA lineage pair coalesces this generation with probability `1/(2 Nₑ)`; failing\nthat it is identical only if it already was. Independently, the pair survives\nthe disrupting event -- whatever separates the two lineages -- with probability\n`(1 - rate)²`, one chance per lineage.\n\n    Denotes: the recurrence itself, not either quantity that satisfies it. Read\n    with `rate = m` it is the island-model single-locus IBD recursion; read with\n    `rate = c` it is Sved's two-locus IBD recursion for `E[r²]`. Those are\n    different quantities obeying one map, so the map is named for the map and\n    for neither of them.\n\nComposition convention: the disrupting event acts on the offspring generation\n*after* reproduction, and the two events multiply rather than add. This is the\ndifference from `ibdFlowStep`, which linearises `(1 - rate)² (1 - 1/(2 Nₑ))` to\n`1 - 2 rate - 1/(2 Nₑ)` and therefore has a different fixed point.\n\n    Empirical status: UNTESTED.",
+  "body": "(1 - rate) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * x)",
+  "theorem_hyps": [
+   {
+    "thm": "ibdRecurrenceFixedPoint_isFixedPoint",
+    "hyps": [
+     "0 < Ne",
+     "0 ≤ rate",
+     "rate < 1"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "islandFstMultiplicativeStep_eq_ibdRecurrenceStep",
+    "hyps": [],
+    "argmap": {
+     "m": "rate",
+     "F": "x"
+    }
+   }
+  ],
+  "n_theorems": 2
+ },
+ {
+  "name": "ibdRecurrenceFixedPoint",
+  "module": "PortabilityDrift",
+  "path": "proofs/Calibrator/PortabilityDrift.lean",
+  "line": 4620,
+  "params": [
+   [
+    "Ne",
+    "ℝ"
+   ],
+   [
+    "rate",
+    "ℝ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**The rest point of the identity-by-descent recurrence.**\n\nSolving `x = (1 - rate)² (a + (1 - a) x)` with `a = 1/(2 Nₑ)` gives\n`x* = (1 - rate)² a / (1 - (1 - rate)² (1 - a))`, and clearing `a` writes it as\nthe form below. Both readings of `ibdRecurrenceStep` inherit it: with `rate = m`\nit is the island-model equilibrium `F_ST`, with `rate = c` it is Sved's `E[r²]`.\n\n    Denotes: the rest point of the recurrence, under either reading.\n\n    Empirical status: UNTESTED.",
+  "body": "(1 - rate) ^ 2 / ((1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate))",
+  "theorem_hyps": [
+   {
+    "thm": "ibdRecurrenceFixedPoint_isFixedPoint",
+    "hyps": [
+     "0 < Ne",
+     "0 ≤ rate",
+     "rate < 1"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "ibdRecurrenceFixedPoint_sub_linearisation",
+    "hyps": [
+     "0 < Ne",
+     "0 ≤ rate",
+     "rate < 1"
+    ],
+    "argmap": {}
+   },
+   {
+    "thm": "ibdRecurrenceFixedPoint_lt_linearisation",
+    "hyps": [
+     "0 < Ne",
+     "0 < rate",
+     "rate < 1"
+    ],
+    "argmap": {}
+   }
+  ],
+  "n_theorems": 3
+ },
+ {
   "name": "islandFstMultiplicativeStep",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4602,
+  "line": 4710,
   "params": [
    [
     "Ne",
@@ -35502,8 +36713,8 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "**The unlinearised discrete-generation identity recursion.**\n\nTwo gene copies drawn in the next generation are identical by descent only if\nneither is a migrant -- probability `(1 - m)²` -- and their parental copies\neither coalesced in the deme, probability `1/(2 Nₑ)`, or were already\nidentical, probability `1 - 1/(2 Nₑ)` times `F`.\n\nComposition convention: migration acts on the offspring generation *after*\nreproduction, and the two events multiply rather than add.  This is the\ndifference from `ibdFlowStep`: that map linearises `(1 - m)²(1 - 1/(2 Nₑ))` to\n`1 - 2m - 1/(2 Nₑ)`, dropping the `O(m², m/Nₑ)` cross terms, and the two maps\ntherefore have genuinely different fixed points.\n\n    Empirical status: UNTESTED.",
-  "body": "(1 - m) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * F)",
+  "doc": "**The island-model reading of the recurrence.**  Migration is the disrupting\nevent: the pair is identical only if neither lineage is a migrant, probability\n`(1 - m)²`, and the parental copies either coalesced in the deme or were already\nidentical.\n\n    Empirical status: UNTESTED.",
+  "body": "ibdRecurrenceStep Ne m F",
   "theorem_hyps": [
    {
     "thm": "driftLDStep_eq_islandFstMultiplicativeStep",
@@ -35512,6 +36723,11 @@
      "c": "m",
      "Q": "F"
     }
+   },
+   {
+    "thm": "islandFstMultiplicativeStep_eq_ibdRecurrenceStep",
+    "hyps": [],
+    "argmap": {}
    },
    {
     "thm": "fstIslandMultiplicativeEquilibrium_isFixedPoint",
@@ -35523,13 +36739,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 2
+  "n_theorems": 3
  },
  {
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4613,
+  "line": 4727,
   "params": [
    [
     "Ne",
@@ -35541,8 +36757,8 @@
    ]
   ],
   "ret": "ℝ",
-  "doc": "**Fixed point of the unlinearised discrete recursion.**\n\n`F* = (1-m)² / ((1-m)² + 2 Nₑ m (2 - m))`.  Expanding the denominator gives\n`(1-m)² + 4 Nₑ m − 2 Nₑ m²`, so this reduces to `1/(1 + 4 Nₑ m)` only after\ndropping terms of order `m²` and `m/Nₑ`; the two closed forms are not equal,\nwhich `fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium` witnesses.\n\n    Empirical status: UNTESTED.",
-  "body": "(1 - m) ^ 2 / ((1 - m) ^ 2 + 2 * Ne * m * (2 - m))",
+  "doc": "**Fixed point of the island-model recursion.**\n\n`F* = (1-m)² / ((1-m)² + 2 Nₑ m (2 - m))`.  Expanding the denominator gives\n`(1-m)² + 4 Nₑ m − 2 Nₑ m²`, so this reduces to `1/(1 + 4 Nₑ m)` only after\ndropping terms of order `m²` and `m/Nₑ`; the two closed forms are never equal\nfor `m > 0`, which `ibdRecurrenceFixedPoint_lt_linearisation` proves in general\nand `fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium`\nwitnesses at a point.\n\n    Empirical status: UNTESTED.",
+  "body": "ibdRecurrenceFixedPoint Ne m",
   "theorem_hyps": [
    {
     "thm": "driftLDEquilibrium_eq_fstIslandMultiplicativeEquilibrium",
@@ -35552,6 +36768,11 @@
     "argmap": {
      "c": "m"
     }
+   },
+   {
+    "thm": "islandFstMultiplicativeStep_eq_ibdRecurrenceStep",
+    "hyps": [],
+    "argmap": {}
    },
    {
     "thm": "fstIslandMultiplicativeEquilibrium_isFixedPoint",
@@ -35568,13 +36789,13 @@
     "argmap": {}
    }
   ],
-  "n_theorems": 3
+  "n_theorems": 4
  },
  {
   "name": "scaledMigrationRate",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4663,
+  "line": 4759,
   "params": [
    [
     "Ne",
@@ -35695,7 +36916,7 @@
   "name": "SplitMigrationModel.fstMigDriftEq",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4749,
+  "line": 4845,
   "params": [
    [
     "s",
@@ -35712,7 +36933,7 @@
   "name": "steppingStoneFst",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4782,
+  "line": 4878,
   "params": [
    [
     "fst_neighbor",
@@ -35772,7 +36993,7 @@
   "name": "sharedLD_from_equilibrium",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4844,
+  "line": 4940,
   "params": [
    [
     "Ne",
@@ -35810,7 +37031,7 @@
   "name": "sharedLDFromMigration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4870,
+  "line": 4966,
   "params": [
    [
     "M",
@@ -35871,7 +37092,7 @@
   "name": "signalRetentionMigrationDrift",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4921,
+  "line": 5017,
   "params": [
    [
     "V_A",
@@ -35927,7 +37148,7 @@
   "name": "asymmetricFst",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5002,
+  "line": 5098,
   "params": [
    [
     "Ne",
@@ -35985,7 +37206,7 @@
   "name": "effectiveSymmetricMigration",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5043,
+  "line": 5139,
   "params": [
    [
     "m₁₂",
@@ -36026,7 +37247,7 @@
   "name": "admixtureLDDecay",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5064,
+  "line": 5160,
   "params": [
    [
     "r",
@@ -36162,7 +37383,7 @@
   "name": "admixtureLDBoost",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5111,
+  "line": 5207,
   "params": [
    [
     "r",
@@ -36202,7 +37423,7 @@
   "name": "fstMigDriftNext",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5173,
+  "line": 5269,
   "params": [
    [
     "Ne",
@@ -36251,7 +37472,7 @@
   "name": "fstMigDriftEquil",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5208,
+  "line": 5304,
   "params": [
    [
     "Ne",
@@ -36353,7 +37574,7 @@
   "name": "neutralAFBenchmarkFromRecurrence",
   "module": "PortabilityDrift",
   "path": "proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5290,
+  "line": 5386,
   "params": [
    [
     "Ne",
@@ -38613,7 +39834,7 @@
   "name": "HasThresholdSetAtEveryRank",
   "module": "ProjectionShiftBounds",
   "path": "proofs/Calibrator/ProjectionShiftBounds.lean",
-  "line": 760,
+  "line": 761,
   "params": [
    [
     "score",
@@ -38621,7 +39842,7 @@
    ]
   ],
   "ret": "Prop",
-  "doc": "**A score profile admits threshold sets at every rank**: for each `k` there\nis a set of exactly `k` indices separated from its complement by a cut value.\n\nThis is the one ingredient the frontier packaging needs beyond what is proved\nhere, and it is carried as a named hypothesis rather than discharged, so that\nevery consumer states its dependence on it.  It is not an empirical assumption\nand not an external input: it holds for every score on a finite type, by sorting\nthe values and cutting at rank `k`.  It is a hypothesis here only because that\nsorting argument is not written.\n\nWhat is proved without it: every threshold set is a scalarised optimum\n(`scalarized_optimum_is_coordinate_split`), so every supporting line of the\nachievable region that is attained at all is attained by a coordinate split, and\nthe region is convex (`isRankAllocation_convex`, `spectralCapture_affine`).\nWhat needs it: that a supporting line exists in every direction, i.e. that the\nfrontier is the concave envelope of the split values rather than merely bounded\nby it.\n\nEmpirical status: UNTESTED — and untestable, being a finite-combinatorial\nstatement rather than a claim about genotypes.",
+  "doc": "**A score profile admits threshold sets at every rank**: for each `k` there\nis a set of `k` indices, no more and no fewer, separated from its complement by\na cut value.\n\nThis is the one ingredient the frontier packaging needs beyond what is proved\nhere, and it is carried as a named hypothesis rather than discharged, so that\nevery consumer states its dependence on it.  It is not an empirical assumption\nand not an external input: it holds for every score on a finite type, by sorting\nthe values and cutting at rank `k`.  It is a hypothesis here only because that\nsorting argument is not written.\n\nWhat is proved without it: every threshold set is a scalarised optimum\n(`scalarized_optimum_is_coordinate_split`), so every supporting line of the\nachievable region that is attained at all is attained by a coordinate split, and\nthe region is convex (`isRankAllocation_convex`, `spectralCapture_affine`).\nWhat needs it: that a supporting line exists in every direction, i.e. that the\nfrontier is the concave envelope of the split values rather than merely bounded\nby it.\n\nEmpirical status: UNTESTED — and untestable, being a finite-combinatorial\nstatement rather than a claim about genotypes.",
   "body": "∀ k : ℕ, k ≤ Fintype.card ι →\n∃ (S : Finset ι) (t : ℝ), S.card = k ∧\n(∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t)",
   "theorem_hyps": [],
   "n_theorems": 0

@@ -44,6 +44,11 @@ api.resolve("coalFst")                  # bare -> fully-qualified; raises if amb
 api.classification("Calibrator.coalFst")# NUMERIC | STRUCTURAL | WRAPPER | NOT-EXTRACTABLE
 api.admissible_box("Calibrator.coalFst")# {arg: (lo, hi)} mined from theorem hypotheses
 api.hypotheses("Calibrator.coalFst")    # (predicates, source_text, NOT_ENFORCED)
+api.satisfies(name, point, theorem=None)# is this point admissible? USE THIS --
+                                        # the raw predicates are exec-mode code
+                                        # objects; eval-ing one returns None,
+                                        # which reads False and manufactures a
+                                        # violation at every point
 api.body_checksum("Calibrator.coalFst") # pin next to a result; changes if the Lean changes
 api.stamp()                             # corpus-wide fingerprint for a results file
 ```
@@ -134,6 +139,17 @@ tracked with separate provenance and are never conflated. When two theorems
 bound a definition in contradictory directions, at least one of them is
 conditional on something not enforced; the definition is reported as needing a
 hand-written check rather than being accused.
+
+## Cross-validation
+
+`test_parser.py` also compares this extraction against `leanexpr` in
+`validation/differential/`, an independently written translator using the
+opposite arithmetic convention (strict Python, raising where Mathlib returns 0).
+Agreement at every point means a transcription error would have to be the same
+error in both — the strongest evidence either translator is right. The test
+fails on any disagreement **and** on any drop in the number of definitions
+compared: a definition quietly leaving the comparison is how the `hetDecayFactor`
+overload bug stayed hidden.
 
 ## Reconciliation with the other parsers
 

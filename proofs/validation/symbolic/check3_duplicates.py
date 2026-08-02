@@ -26,6 +26,7 @@ from pathlib import Path
 import sympy as sp
 
 import leansym as L
+import shared
 
 HERE = Path(__file__).parent
 PROBES = 7
@@ -88,9 +89,9 @@ def concept(name: str) -> str:
 
 def run():
     decls = json.load(open(HERE / "decls.json"))
-    table = L.build_table(decls)
+    table = shared.build_table()
     conv = L.Converter(table)
-    defs = [d for d in decls if d["kind"] == "def" and d["body"]]
+    defs = [d for d in shared.def_records() if d["body"]]
 
     parsed, opaque = [], []
     for d in defs:

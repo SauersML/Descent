@@ -58,6 +58,19 @@ QUARANTINE: dict[str, str] = {}
 #   can recur -- the cross-check stays.
 
 
+# Short names that collide across the corpus. extract deliberately refuses to
+# give these a bare alias -- 22 short names map to more than one FQ name, and
+# letting the first emitted definition claim the bare name is what produced the
+# `hetDecayFactor` mis-binding. Any such name a check uses must be pinned here,
+# explicitly, to the definition the CALLER's file resolves to in Lean.
+FQ_OVERRIDES = {
+    # PopulationGeneticsFoundations.lean:1341, binders (Ne θ : ℝ). The sibling
+    # structure methods (DGP's PGSEvolutionaryModel, PortabilityDrift's
+    # GenerationalPopGenParameters) carry the same formula on a record.
+    "hetDecayFactor": "Calibrator.hetDecayFactor",
+}
+
+
 def _leanexpr_table():
     table: dict[str, callable] = {}
     defs: dict[str, L.LeanDef] = {}
@@ -100,10 +113,13 @@ def load():
     names = set(mine) | {fq.split(".")[-1] for fq in api.definition_table()}
 
     for name in sorted(names):
-        try:
-            fq, fq_err = api.resolve(name), None
-        except Exception as e:
-            fq, fq_err = None, f"{type(e).__name__}: {e}"
+        if name in FQ_OVERRIDES:
+            fq, fq_err = FQ_OVERRIDES[name], None
+        else:
+            try:
+                fq, fq_err = api.resolve(name), None
+            except Exception as e:
+                fq, fq_err = None, f"{type(e).__name__}: {e}"
 
         theirs = None
         if fq is not None:

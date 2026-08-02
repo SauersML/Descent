@@ -39,41 +39,58 @@ def _viol(v, lo, hi):
     return max(lo - v, v - hi)
 
 
-def build_feasible(c, defs):
-    """Compile the relational hypotheses into one predicate over the arguments.
+def theorem_guards(c, defs):
+    """Per-theorem hypothesis predicates for the theorems that BOUND `c`.
 
-    Returns (predicate_or_None, [descriptions]).  Hypotheses that fall outside
-    the arithmetic fragment are dropped and reported, never silently ignored.
+    Two corrections over conjoining everything into one feasibility region,
+    both of which produced wrong verdicts here:
+
+    1.  Hypotheses must be grouped BY THEOREM and never conjoined across
+        theorems.  The union is not a domain.  `coalFst` carries
+        `100 * Ne < t` from one asymptotic lemma; conjoining it excludes
+        essentially every sensible F_ST evaluation and the definition then
+        passes vacuously.
+    2.  Only theorems that actually CLAIM a bound may excuse a range escape.
+        A precondition like `p < 1/2`, borrowed from a monotonicity lemma,
+        says nothing about where the quantity is a valid probability, and
+        using it as a guard silently shrank the searched region.
+
+    Returns [{thm, hyps, pred}], one entry per range-claiming theorem whose
+    hypotheses are wholly expressible in the arithmetic fragment.
     """
     d = c.d
-    cons = side_constraints(d)
     ar, rn = build_arity(defs, d["module"])
-    preds, kept, dropped = [], [], []
-    for co in cons:
-        try:
-            src = transpile(co["hyp"], d["params"], ar, d["name"], rn)
-        except Exception as e:
-            dropped.append(dict(hyp=co["hyp"], thm=co["thm"], reason=str(e)))
+    by_thm = {}
+    for co in side_constraints(d):
+        if not co["guards_range"]:
             continue
-        args = ", ".join(pyname(p) for p, _ in d["params"])
-        ns = {"_b": FLOAT}
-        try:
-            exec(compile(f"def _p({args}):\n return {src}", "<hyp>", "exec"), ns)
-        except Exception as e:
-            dropped.append(dict(hyp=co["hyp"], thm=co["thm"], reason=str(e)))
-            continue
-        preds.append(ns["_p"])
-        kept.append(co)
-    if not preds:
-        return None, kept, dropped
+        by_thm.setdefault(co["thm"], []).append(co["hyp"])
+    out, dropped = [], []
+    for thm, hyps in by_thm.items():
+        preds, ok = [], True
+        for h in hyps:
+            try:
+                src = transpile(h, d["params"], ar, d["name"], rn)
+                ns = {"_b": FLOAT}
+                args = ", ".join(pyname(p) for p, _ in d["params"])
+                exec(compile(f"def _p({args}):\n return {src}", "<hyp>", "exec"), ns)
+                preds.append(ns["_p"])
+            except Exception as e:
+                dropped.append(dict(thm=thm, hyp=h, reason=str(e)))
+                ok = False
+        if ok and preds:
+            out.append(dict(thm=thm, hyps=hyps, preds=preds))
+    return out, dropped
 
-    def feasible(*x):
-        for p in preds:
+
+def _satisfies(guard, x):
+    for p in guard["preds"]:
+        try:
             if p(*x) is not True:
                 return False
-        return True
-
-    return feasible, kept, dropped
+        except Exception:
+            return False
+    return True
 
 
 def check_one(c, defs, budget=8000, bnb=1500):
@@ -93,12 +110,18 @@ def check_one(c, defs, budget=8000, bnb=1500):
     def f(*xs):
         return _viol(c(FLOAT, *xs), lo, hi)
 
-    feasible, kept, dropped = build_feasible(c, defs)
-    best, x = maximize(f, box, names, budget=budget, feasible=feasible)
+    # The search runs over the WHOLE admissible box.  Theorem hypotheses are
+    # applied afterwards, to classify the witness, never beforehand to shrink
+    # the region -- shrinking is what makes a definition pass vacuously.
+    guards, dropped = theorem_guards(c, defs)
+    best, x = maximize(f, box, names, budget=budget)
     out = dict(range=[lo, hi], range_why=why,
-               side_constraints=[k["hyp"] for k in kept],
-               side_constraints_from=[k["thm"] for k in kept],
-               side_constraints_dropped=dropped,
+               range_source="name-or-docstring-implied; NOT a theorem-proved "
+                            "bound, so a violation is a lead, not a proof of "
+                            "a defect",
+               bounding_theorems=[g["thm"] for g in guards],
+               bounding_theorem_hyps={g["thm"]: g["hyps"] for g in guards},
+               unmodelled_hypotheses=dropped,
                box={n: [box[n]["lo"], box[n]["hi"], box[n]["source"]] for n in names},
                unguarded=unguarded,
                box_provenance={n: box[n]["why"] for n in names})
@@ -109,24 +132,34 @@ def check_one(c, defs, budget=8000, bnb=1500):
         # which is pinned by a theorem or by an unambiguous parameter name.
         # The two are reported as different verdicts and never pooled.
         blind = [n for n in names if box[n]["source"] == "none"]
-        out.update(verdict="escape-unguarded" if blind else "escape",
+        satisfied = [g["thm"] for g in guards if _satisfies(g, x)]
+        if satisfied:
+            # The witness sits inside the preconditions of a theorem that
+            # proves the bound.  Lean has no `sorry`s, so the theorem is true
+            # and the disagreement is MINE -- a mis-transcribed body, a
+            # mis-parsed hypothesis, or a hypothesis I could not model.  This
+            # is never reported as a corpus defect.
+            out.update(verdict="contradicts-theorem",
+                       witness={n: v for n, v in zip(names, x)},
+                       value=val, contradicted=satisfied,
+                       note="escape found inside a theorem's own hypotheses; "
+                            "this indicates an error in THIS checker, not in "
+                            "the corpus, and needs manual inspection")
+            return out
+        verdict = "escape-unguarded" if blind else "escape"
+        if guards:
+            verdict = "escape-outside-theorem"
+        out.update(verdict=verdict,
                    witness={n: v for n, v in zip(names, x)},
                    value=val, overshoot=best,
                    blind_coordinates=blind,
+                   escapes_only_where_violated=[
+                       g["thm"] for g in guards if not _satisfies(g, x)],
                    side="above" if val > hi else "below")
         return out
 
     def fiv(*xs):
         return c(INTERVAL, *xs)
-
-    if feasible is not None:
-        # The interval proof does not model the side conditions, so it can only
-        # PROVE containment on the unconstrained box.  Failing there says
-        # nothing once constraints exist.
-        out.update(verdict="guarded-by-side-condition", searched=budget,
-                   note="no escape inside the author's relational hypotheses; "
-                        "the range is not implied by the definition alone")
-        return out
 
     status, worst, used = prove_contained(fiv, box, names, lo, hi, max_boxes=bnb)
     out.update(verdict="proved" if status == "proved" else "inconclusive",
@@ -149,7 +182,8 @@ def severity(r):
        outrank magnitude errors;
     3. larger relative overshoot outranks smaller.
     """
-    if r.get("verdict") not in ("escape", "escape-unguarded"):
+    if r.get("verdict") not in ("escape", "escape-unguarded",
+                               "escape-outside-theorem"):
         return -1.0
     lo, hi = r["range"]
     span = (hi - lo) if math.isfinite(hi - lo) else 1.0
@@ -160,6 +194,10 @@ def severity(r):
         s += 30  # a nonnegative quantity going negative is a sign error
     if r.get("side") == "above" and hi == 1.0:
         s += 20  # a probability exceeding one
+    if r["verdict"] == "escape-outside-theorem":
+        # the range does hold where the author proved it; the finding is that
+        # the definition itself does not carry the condition
+        s -= 15
     if r["verdict"] == "escape-unguarded":
         # discount: the witness uses a coordinate whose admissible values we
         # could not determine, so the escape may not be physically reachable.
@@ -193,12 +231,14 @@ def main(argv):
     for v, n in sorted(tally.items(), key=lambda kv: -kv[1]):
         print(f"  {n:5d}  {v}")
     esc = sorted((r for r in results.values()
-                  if r["verdict"] in ("escape", "escape-unguarded")),
+                  if r["verdict"] in ("escape", "escape-unguarded",
+                                      "escape-outside-theorem")),
                  key=lambda r: -r["severity"])
     print(f"\nTop escapes ({len(esc)} total):")
     for r in esc[:25]:
         w = ", ".join(f"{k}={v:.6g}" for k, v in r["witness"].items())
-        tag = "!" if r["verdict"] == "escape" else "?"
+        tag = {"escape": "!", "escape-outside-theorem": "~"}.get(
+            r["verdict"], "?")
         print(f"  {tag}[{r['severity']:5.1f}] {r['module']}.{r['name']}:{r['line']}"
               f"  -> {r['value']:.6g} outside [{r['range'][0]}, {r['range'][1]}]"
               f"   at {w}")

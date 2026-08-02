@@ -410,6 +410,193 @@ theorem recurrence_preserving_resampling_is_not_a_calibration
   exact hnull (hcomplete (resample start) start (fun i => hprofile start i))
 
 /-!
+## 5f. The Vertex-Weight Law: the observable content of a genotype coding is complete
+
+The results above say what a *design* can hide. The Vertex-Weight Law says what a
+*coding* can show, and for this corpus it is a completeness theorem about quantities
+that are already computed here.
+
+In the diagram expansion of any truncated joint cumulant of an admissible design, the
+coordinate law enters in exactly three places: window factors, whose admissible limits
+depend on the Mellin two-jet `(c, v)` and the arithmetic type of `log x²` alone; even
+vertex weights at shared-variable multiplicity `2j`, which are polynomials in the first
+`j` cumulants of `x²`; and odd vertex weights — the sign couplings — which vanish
+identically exactly when the law is symmetric. Nothing else about the law appears
+anywhere in any diagram, at any degree.
+
+So the complete list of coordinate-law invariants that any admissible design can
+transmit is
+
+> two-jet, arithmetic type, symmetry, cumulant sequence of `x²`
+
+and this corpus has already computed the first three for the standardized genotype:
+`hweMellinDrift` is `c`, `hweMellinJetVariance` is `v`, `hweLatticeCondition` is the
+arithmetic type, and `Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff`
+settles symmetry — a single point, `q = 1/2`. The theorem below says those objects are
+not a convenient summary of a genotype coding. They are all of it.
+-/
+
+/-- **The complete observable content of a coordinate law**, per the Vertex-Weight Law:
+the Mellin two-jet, the arithmetic type of `log x²`, the symmetry verdict, and the
+cumulant sequence of `x²`. -/
+structure GenotypeObservableContent where
+  /-- The size-biased drift `c = E[x² log x²]`. -/
+  drift : ℝ
+  /-- The size-biased increment variance `v`. -/
+  jetVariance : ℝ
+  /-- The arithmetic type: whether `log x²` is supported on an arithmetic progression. -/
+  IsLattice : Prop
+  /-- Whether the coding admits a value-negating relabelling. -/
+  IsSignSymmetric : Prop
+  /-- The cumulant sequence of `x²`, which supplies the even vertex weights. -/
+  squareCumulant : ℕ → ℝ
+
+/-- The observable content of a Hardy-Weinberg locus at allele frequency `q`, assembled
+from the quantities this corpus already computes. The square-cumulant sequence is
+supplied as a parameter because it is a sequence rather than a closed form; every other
+component is a function of `q` already proved here.
+
+Empirical status: DERIVED from `hweMellinDrift`, `hweMellinJetVariance` and
+`hweLatticeCondition`, each of which is derived elsewhere in the corpus; no free
+parameter beyond the supplied cumulant sequence, and nothing fitted. -/
+def hweObservableContent (squareCumulant : ℝ → ℕ → ℝ) (q : ℝ) : GenotypeObservableContent where
+  drift := hweMellinDrift q
+  jetVariance := hweMellinJetVariance q
+  IsLattice := hweLatticeCondition q
+  IsSignSymmetric := q = 1 / 2
+  squareCumulant := squareCumulant q
+
+/-- **The observable content is built from the corpus's own quantities**, component by
+component. This is the over-determination guard for the completeness claim: if anyone
+changes what `hweMellinDrift` or `hweMellinJetVariance` or `hweLatticeCondition` means,
+this stops compiling rather than drifting. -/
+theorem hweObservableContent_components (squareCumulant : ℝ → ℕ → ℝ) (q : ℝ) :
+    (hweObservableContent squareCumulant q).drift = hweMellinDrift q ∧
+      (hweObservableContent squareCumulant q).jetVariance = hweMellinJetVariance q ∧
+      (hweObservableContent squareCumulant q).IsLattice = hweLatticeCondition q ∧
+      (hweObservableContent squareCumulant q).IsSignSymmetric = (q = 1 / 2) :=
+  ⟨rfl, rfl, rfl, rfl⟩
+
+/-- **The symmetry component is the corpus's proved characterization.** The
+`IsSignSymmetric` slot of the observable content holds exactly when the standardized
+genotype admits a value-negating relabelling, which
+`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff` proves happens at
+`q = 1/2` and nowhere else in the polymorphic range.
+
+So the third of the four observable invariants is not a free slot to be filled later: it
+is already decided for genotypes, and it is decided negatively almost everywhere. -/
+theorem hweObservableContent_symmetry (squareCumulant : ℝ → ℕ → ℝ)
+    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (hweObservableContent squareCumulant h.altFreq).IsSignSymmetric ↔
+      (∃ coding : SymmetricCoding DiploidGenotype,
+        (∀ g, coding.weight g = h.genotypeProb g) ∧
+        (∀ g, coding.value g = h.standardizedGenotype g)) := by
+  have hcomponent : (hweObservableContent squareCumulant h.altFreq).IsSignSymmetric =
+      (h.altFreq = 1 / 2) := rfl
+  rw [hcomponent]
+  exact (standardizedGenotype_symmetric_iff h hq0 hq1).symm
+
+/-- **The one frequency where symmetry is available is the one where the second
+observable dies.** If the symmetry component holds then the jet-variance component is
+zero, by `hweMellinJetVariance_half`. Two of the four invariants collapse together, so a
+genotype coding cannot be both sign-symmetric and Mellin-nondegenerate — the dichotomy
+of `no_signSymmetric_nondegenerate_locus`, now read off the observable content. -/
+theorem hweObservableContent_symmetric_jetVariance_zero (squareCumulant : ℝ → ℕ → ℝ)
+    (q : ℝ) (hsymmetric : (hweObservableContent squareCumulant q).IsSignSymmetric) :
+    (hweObservableContent squareCumulant q).jetVariance = 0 := by
+  have hcomponent : (hweObservableContent squareCumulant q).IsSignSymmetric = (q = 1 / 2) := rfl
+  rw [hcomponent] at hsymmetric
+  have hjet : (hweObservableContent squareCumulant q).jetVariance = hweMellinJetVariance q := rfl
+  rw [hjet, hsymmetric]
+  exact hweMellinJetVariance_half
+
+/-- Re-model a design: the same tested locus-sets, coefficients and joint law, at a
+different allele-frequency family. This is what varying the coordinate law while holding
+the design fixed means, and it is the comparison the Vertex-Weight Law is about.
+
+Empirical status: UNTESTED. A field update on a design; no modelling content and no free
+parameter. -/
+def GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : GenotypeDesign n ι)
+    (model : Fin n → HardyWeinbergModel) : GenotypeDesign n ι :=
+  { design with model := model }
+
+/-- The Vertex-Weight Law over a genotype panel, carried as a field.
+
+`limitLaw` is the limit of a design's statistic. The field says the limit depends on the
+allele-frequency family only through the observable content of each locus — the two-jet,
+the arithmetic type, the symmetry verdict, and the square-cumulant sequence — and
+through nothing else. -/
+structure VertexWeightLaw (n : ℕ) (ι : Type*) (Limit : Type*) where
+  /-- Minimum interaction order diverging, influence vanishing, unit variance. -/
+  isAdmissible : GenotypeDesign n ι → Prop
+  /-- The limit law of a design's statistic. -/
+  limitLaw : GenotypeDesign n ι → Limit
+  /-- The cumulant sequence of the squared standardized genotype, as a function of the
+  allele frequency. -/
+  squareCumulant : ℝ → ℕ → ℝ
+  /-- **The Vertex-Weight Law (analytic input).** Two allele-frequency families with the
+  same per-locus observable content give the same limit, for every design. The proof is
+  the diagram expansion: window factors see only the two-jet and the arithmetic type,
+  even vertex weights only the square cumulants, odd vertex weights only the symmetry
+  verdict, and there is no fourth place for the law to enter. -/
+  vertex_weight : ∀ (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel),
+    isAdmissible (design.reModel model) → isAdmissible (design.reModel model') →
+    (∀ i : Fin n, hweObservableContent squareCumulant (model i).altFreq =
+      hweObservableContent squareCumulant (model' i).altFreq) →
+    limitLaw (design.reModel model) = limitLaw (design.reModel model')
+
+namespace VertexWeightLaw
+
+variable {n : ℕ} {ι : Type*} {Limit : Type*} (VW : VertexWeightLaw n ι Limit)
+
+/-- **Observability completeness for a genotype coding.** Any experiment reporting a
+function of a design's limit is a function of the observable content alone: two
+allele-frequency families agreeing in the two-jet, the arithmetic type, the symmetry
+verdict and the square cumulants at every locus are indistinguishable by every admissible
+design, at every interaction order, through every diagram.
+
+Nothing outside that list is observable. In particular no diagnostic, however elaborate,
+recovers any property of a genotype coding that is not a function of those four. -/
+theorem experiment_factors_through_observable_content
+    {Report : Type*} (experiment : Limit → Report)
+    (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel)
+    (hadmissible : VW.isAdmissible (design.reModel model))
+    (hadmissible' : VW.isAdmissible (design.reModel model'))
+    (hcontent : ∀ i : Fin n,
+      hweObservableContent VW.squareCumulant (model i).altFreq =
+        hweObservableContent VW.squareCumulant (model' i).altFreq) :
+    experiment (VW.limitLaw (design.reModel model)) =
+      experiment (VW.limitLaw (design.reModel model')) := by
+  rw [VW.vertex_weight design model model' hadmissible hadmissible' hcontent]
+
+/-- **The corpus's computed quantities are the complete observable summary.** Stated in
+the form a reader can act on: if two panels agree locus by locus in `hweMellinDrift`,
+`hweMellinJetVariance`, `hweLatticeCondition`, the symmetry point and the square
+cumulants, then no admissible design distinguishes them.
+
+Every hypothesis here names a quantity this corpus already computes in closed form,
+which is what makes the completeness claim checkable rather than decorative. -/
+theorem indistinguishable_of_matching_computed_quantities
+    (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel)
+    (hadmissible : VW.isAdmissible (design.reModel model))
+    (hadmissible' : VW.isAdmissible (design.reModel model'))
+    (hdrift : ∀ i : Fin n, hweMellinDrift (model i).altFreq =
+      hweMellinDrift (model' i).altFreq)
+    (hjet : ∀ i : Fin n, hweMellinJetVariance (model i).altFreq =
+      hweMellinJetVariance (model' i).altFreq)
+    (hlattice : ∀ i : Fin n, hweLatticeCondition (model i).altFreq =
+      hweLatticeCondition (model' i).altFreq)
+    (hsymmetry : ∀ i : Fin n, ((model i).altFreq = 1 / 2) = ((model' i).altFreq = 1 / 2))
+    (hcumulant : ∀ i : Fin n, VW.squareCumulant (model i).altFreq =
+      VW.squareCumulant (model' i).altFreq) :
+    VW.limitLaw (design.reModel model) = VW.limitLaw (design.reModel model') := by
+  refine VW.vertex_weight design model model' hadmissible hadmissible' (fun i => ?_)
+  unfold hweObservableContent
+  rw [hdrift i, hjet i, hlattice i, hsymmetry i, hcumulant i]
+
+end VertexWeightLaw
+
+/-!
 ## 6. Where the whole development now stands
 
 Four negative results, each with its positive complement, and each attached to a

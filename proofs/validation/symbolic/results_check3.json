@@ -756,7 +756,7 @@
      "fqn": "Calibrator.MetricSpecificPortability.brierScoreMetric",
      "name": "brierScoreMetric",
      "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-     "line": 1021,
+     "line": 1023,
      "binders": [
       "p",
       "y"
@@ -2564,6 +2564,32 @@
   },
   {
    "check": "check3_name_mate_disagreement",
+   "concept": "palindromiccycle",
+   "a": {
+    "fqn": "Calibrator.EpistaticChaos.palindromicCycleDensityA",
+    "line": 1694,
+    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+    "expr": "2*(-4)**x1 + 2**x1 + 6**x1 + 2*(2*x0**2 - x0 - 4)**x1 + 2*(2*x0**2 + x0 - 4)**x1",
+    "binders": [
+     "s",
+     "p"
+    ],
+    "body": "circulantSpectrumA 1 ^ p + 2 * circulantSpectrumA (s / 2) ^ p + 2 * circulantSpectrumA 0 ^ p + 2 * circulantSpectrumA (-(s / 2)) ^ p + circulantSpectrumA (-1) ^ p"
+   },
+   "b": {
+    "fqn": "Calibrator.EpistaticChaos.palindromicCycleDensityB",
+    "line": 1703,
+    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+    "expr": "3*(-2)**x1 + 6**x1 + 2*(x0**2 - 2*x0 - 2)**x1 + 2*(x0**2 + 2*x0 - 2)**x1",
+    "binders": [
+     "s",
+     "p"
+    ],
+    "body": "circulantSpectrumB 1 ^ p + 2 * circulantSpectrumB (s / 2) ^ p + 2 * circulantSpectrumB 0 ^ p + 2 * circulantSpectrumB (-(s / 2)) ^ p + circulantSpectrumB (-1) ^ p"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
    "concept": "agedependent",
    "a": {
     "fqn": "Calibrator.LongitudinalPortability.ageDependentSignalVariance",
@@ -2696,34 +2722,6 @@
   },
   {
    "check": "check3_name_mate_disagreement",
-   "concept": "effectcorrelation",
-   "a": {
-    "fqn": "Calibrator.PolygenicAdaptation.effectCorrelationStabilizing",
-    "line": 288,
-    "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
-    "expr": "-x0/(x1*x2 + 1) + 1",
-    "binders": [
-     "d",
-     "s",
-     "N"
-    ],
-    "body": "1 - d / (1 + s * N)"
-   },
-   "b": {
-    "fqn": "Calibrator.PolygenicAdaptation.effectCorrelationFluctuating",
-    "line": 297,
-    "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
-    "expr": "Max(-1, -x0*(x1*x2 + 1) + 1)",
-    "binders": [
-     "d",
-     "f",
-     "N"
-    ],
-    "body": "max (-1) (1 - d * (1 + f * N))"
-   }
-  },
-  {
-   "check": "check3_name_mate_disagreement",
    "concept": "gradecertified",
    "a": {
     "fqn": "Calibrator.PolygenicArchitecture.gradeCertifiedRisk",
@@ -2765,7 +2763,7 @@
    },
    "b": {
     "fqn": "Calibrator.PolygenicSpectroscopy.hweMellinJetVariance",
-    "line": 825,
+    "line": 831,
     "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
     "expr": "2*x0*(1 - x0)*log((2 - 2*x0)/x0)**2 + 2*x0*(1 - x0)*log(2*x0/(1 - x0))**2 + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))**2 - (4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0))))**2",
     "binders": [
@@ -2826,6 +2824,34 @@
      "m"
     ],
     "body": "max 0 ((s - m - m * s) / (s * (1 - m)))"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "fstmutation",
+   "a": {
+    "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransient",
+    "line": 619,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+    "expr": "(1 - exp(x1*(-x0 - 1)/(2*x2)))/(x0 + 1)",
+    "binders": [
+     "θ",
+     "t",
+     "Ne"
+    ],
+    "body": "fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ) * t / (2 * Ne)))"
+   },
+   "b": {
+    "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransientDiscrete",
+    "line": 1414,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+    "expr": "(1 - ((1 - 1/(2*x1))*(-x0/(2*x1) + 1))**x2)/(x0 + 1)",
+    "binders": [
+     "θ",
+     "Ne",
+     "t"
+    ],
+    "body": "fstMutationDriftEquilibrium θ * (1 - hetDecayFactor Ne θ ^ t)"
    }
   },
   {
@@ -3063,36 +3089,21 @@
    }
   }
  ],
- "homonyms": [
-  {
-   "check": "check3_homonym",
-   "name": "effectCorrelationStabilizing",
-   "distinct_bodies": [
-    {
-     "expr": "-x0/(x1*x2 + 1) + 1",
-     "sites": [
-      "Calibrator.PolygenicAdaptation:288"
-     ]
-    },
-    {
-     "expr": "1 - 1/(2*x0)",
-     "sites": [
-      "Calibrator.SelectionArchitecture:90"
-     ]
-    }
-   ]
-  }
- ],
- "parsed": 370,
- "opaque": 609,
+ "homonyms": [],
+ "parsed": 372,
+ "opaque": 627,
  "opaque_reasons": [
   [
    "non-real binder",
-   482
+   489
   ],
   [
    "Phi expects 0 args [], got 1",
    11
+  ],
+  [
+   "non-closed-form construct: else",
+   10
   ],
   [
    "non-closed-form construct: let",
@@ -3100,14 +3111,14 @@
   ],
   [
    "non-closed-form construct: with",
-   9
-  ],
-  [
-   "non-closed-form construct: then",
-   9
+   8
   ],
   [
    "non-closed-form construct: fun",
+   7
+  ],
+  [
+   "unexpected token '>'",
    7
   ],
   [
@@ -3140,10 +3151,6 @@
   ],
   [
    "lex error at '![1, 1]'",
-   2
-  ],
-  [
-   "applied non-function driftLDTrajectory",
    2
   ]
  ]

@@ -45,7 +45,11 @@ class FloatBackend:
 
     @staticmethod
     def log(x):
-        return math.log(x) if x > 0 else 0.0  # Lean: Real.log x = 0 for x <= 0
+        # Mathlib defines Real.log through |x|, so Real.log (-x) = Real.log x,
+        # and only Real.log 0 is the junk value 0.  Returning 0 for every
+        # nonpositive argument -- which this did before -- is a DIFFERENT
+        # function from the one the corpus is written against.
+        return 0.0 if x == 0 else math.log(abs(x))
 
     @staticmethod
     def logb(b, x):
@@ -103,12 +107,15 @@ class FloatBackend:
 
     @staticmethod
     def rpow(a, b):
-        if a <= 0:
-            # Lean's Real.rpow: 0 ^ y = 0 for y != 0, and negative bases give
-            # the junk value 0 outside integer exponents.
-            return 0.0 if a == 0 and b != 0 else (1.0 if b == 0 else 0.0)
+        # Real.rpow is defined via the complex exponential and taken real
+        # part, so a negative base does NOT give a junk value: it gives
+        # exp(log|a| * b) * cos(pi * b).
+        if a == 0:
+            return 1.0 if b == 0 else 0.0
         try:
-            return math.exp(b * math.log(a))
+            if a > 0:
+                return math.exp(b * math.log(a))
+            return math.exp(b * math.log(-a)) * math.cos(b * math.pi)
         except OverflowError:
             return math.inf
 
@@ -215,11 +222,15 @@ class IntervalBackend:
     @staticmethod
     def log(x):
         x = iv(x)
-        if x.lo <= 0:
-            # junk value 0 for the nonpositive part
-            hi = math.log(x.hi) if x.hi > 0 else 0.0
-            return Iv(-INF if x.hi > 0 else 0.0, max(hi, 0.0))
-        return Iv(math.log(x.lo), math.log(x.hi))
+        if x.lo > 0:
+            return Iv(math.log(x.lo), math.log(x.hi))
+        if x.hi < 0:  # log|x| is DECREASING in x on the negative axis
+            return Iv(math.log(-x.hi), math.log(-x.lo))
+        # the interval straddles zero: log|x| is unbounded below, and the
+        # single point x = 0 contributes the junk value 0
+        top = max(math.log(abs(x.lo)) if x.lo != 0 else -INF,
+                  math.log(abs(x.hi)) if x.hi != 0 else -INF, 0.0)
+        return Iv(-INF, top)
 
     @staticmethod
     def logb(b, x):

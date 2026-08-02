@@ -85,5 +85,20 @@ def rabs(a):
     return abs(a)
 
 
+def Phi(x):
+    """Standard normal CDF.
+
+    NUMERIC STAND-IN.  The corpus defines
+        Calibrator.Phi : ℝ → ℝ := ProbabilityTheory.cdf (gaussianReal 0 1)
+    which is measure-theoretic and has no arithmetic body to extract.  This is
+    the erf form of the same function, accurate to ~1e-16 relative.  It is
+    mathematically equal to the Lean definition, but it was NOT derived from the
+    Lean source, so a disagreement in a definition that routes through it can be
+    a defect in that definition OR a mismatch with the intended Phi.  Anything
+    depending on it is flagged `numeric_standins` in classes.json.
+    """
+    return 0.5 * math.erfc(-x / math.sqrt(2.0))
+
+
 def logb(b, x):
     return rdiv(rlog(x), rlog(b))

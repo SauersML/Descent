@@ -5,20 +5,21 @@
   "note": "all references are closed form; no Monte Carlo error"
  },
  "corpus_stamp": {
-  "n_definitions": 989,
-  "n_structures": 98,
+  "n_definitions": 1001,
+  "n_structures": 101,
   "n_parse_failures": 2,
-  "corpus_digest": "sha256:f87f5260dd9c02fa423e3b73445d4708"
+  "corpus_digest": "sha256:451f21c8568a6b084220562299173821"
  },
  "extraction": {
   "primary_source": "proofs/validation/extract/api.py",
-  "n_callables": 659,
-  "n_unavailable": 305,
+  "n_callables": 681,
+  "n_unavailable": 295,
   "unavailable": {
    "Active": "NotExtractable: Calibrator.BackgroundClass.Active: Prop-valued / set-valued",
    "AsymptoticallyZero": "NotExtractable: Calibrator.AsymptoticallyZero: Prop-valued / set-valued",
    "BelowCeiling": "NotExtractable: Calibrator.BelowCeiling: Prop-valued / set-valued",
    "BoundedBelowAbove": "NotExtractable: Calibrator.BoundedBelowAbove: Prop-valued / set-valued",
+   "BoundedHubRecurrence": "NotExtractable: Calibrator.GenotypeDesign.BoundedHubRecurrence: Prop-valued / set-valued",
    "BoundedLogDistortion": "NotExtractable: Calibrator.BoundedLogDistortion: Prop-valued / set-valued",
    "CausalVec": "NotExtractable: Calibrator.CausalVec: type alias",
    "ConstantDiagonal": "NotExtractable: Calibrator.ConstantDiagonal: Prop-valued / set-valued",
@@ -33,12 +34,12 @@
    "PC": "NotExtractable: Calibrator.PC: trailing tokens after expression: op:\u2192",
    "PGS": "NotExtractable: Calibrator.PGS: type alias",
    "Phenotype": "NotExtractable: Calibrator.Phenotype: type alias",
-   "Phi": "NotExtractable: Calibrator.Phi: qualified name ProbabilityTheory.cdf",
    "Polymorphic": "NotExtractable: Calibrator.GenotypeDesign.Polymorphic: Prop-valued / set-valued",
    "Predictor": "NotExtractable: Calibrator.Predictor: trailing tokens after expression: op:\u2192",
    "ProbPredictor": "NotExtractable: Calibrator.ProbPredictor: type alias",
    "ShiftInvariant": "NotExtractable: Calibrator.ShiftInvariant: Prop-valued / set-valued",
    "TagVec": "NotExtractable: Calibrator.TagVec: type alias",
+   "Tempered": "NotExtractable: Calibrator.GenotypeDesign.Tempered: Prop-valued / set-valued",
    "TrueCondProb": "NotExtractable: Calibrator.TrueCondProb: type alias",
    "UnitProb": "NotExtractable: Calibrator.UnitProb: qualified name Set.Icc",
    "VarianceNonneg": "NotExtractable: Calibrator.VarianceNonneg: Prop-valued / set-valued",
@@ -46,7 +47,6 @@
    "additiveGeneticVariance": "NotExtractable: Calibrator.additiveGeneticVariance: Finset/indexed sum",
    "additiveVariance": "NotExtractable: Calibrator.additiveVariance: Finset/indexed sum",
    "altAlleleCount": "NotExtractable: Calibrator.altAlleleCount: builds a structure value (DiploidGenotype \u2192 \u211d)",
-   "ancestrySpecificLDResidual": "NotExtractable: Calibrator.ancestrySpecificLDResidual: unrecognised character '.'",
    "and": "NotExtractable: Calibrator.ProbeBlindness.and: structure literal",
    "approximationInterval": "NotExtractable: Calibrator.approximationInterval: Prop-valued / set-valued",
    "atLevel": "NotExtractable: Calibrator.LeveledBlindness.atLevel: structure literal",
@@ -56,17 +56,15 @@
    "baselineProxyTagMetricModel": "NotExtractable: Calibrator.baselineProxyTagMetricModel: structure literal",
    "baselineWeight": "NotExtractable: Calibrator.baselineWeight: Finset/indexed sum",
    "bernoulliKL": "NotExtractable: Calibrator.InformationTheoryBridge.bernoulliKL: qualified name InformationTheory.klDiv",
-   "bernoulliMeasure": "NotExtractable: Calibrator.InformationTheoryBridge.bernoulliMeasure: unrecognised character '.'",
    "bernoulliPMF": "NotExtractable: Calibrator.InformationTheoryBridge.bernoulliPMF: qualified name PMF.bernoulli",
    "berryEsseenErrorBound": "KeyError: \"'berryEsseenErrorBound' is ambiguous: ['Calibrator.berryEsseenErrorBound', 'Calibrator.HWEScoreModel.berryEsseenErrorBound']\"",
    "bestScalarCorrection": "NotExtractable: Calibrator.bestScalarCorrection: qualified name B.mulVec",
    "bigM": "KeyError: \"'bigM' is ambiguous: ['Calibrator.EvolutionaryParameters.bigM', 'Calibrator.GenerationalPopGenParameters.bigM']\"",
-   "brierL2Certificate": "NotExtractable: Calibrator.brierL2Certificate: unrecognised character '\u2202'",
-   "brierRegret": "NotExtractable: Calibrator.brierRegret: unrecognised character '\u2202'",
-   "brierRisk": "NotExtractable: Calibrator.brierRisk: unrecognised character '.'",
-   "brokenTaggingResidual": "NotExtractable: Calibrator.brokenTaggingResidual: unrecognised character '.'",
+   "brierL2Certificate": "NotExtractable: Calibrator.brierL2Certificate: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "brierRegret": "NotExtractable: Calibrator.brierRegret: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "brierRisk": "NotExtractable: Calibrator.brierRisk: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "calibrationProfile": "NotExtractable: Calibrator.calibrationProfile: structure literal",
-   "causalMean": "NotExtractable: Calibrator.causalMean: unrecognised character '\u2202'",
+   "causalMean": "NotExtractable: Calibrator.causalMean: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "causalPortabilityFromLocalFst": "NotExtractable: Calibrator.causalPortabilityFromLocalFst: Finset/indexed sum",
    "closedPopulation": "NotExtractable: Calibrator.closedPopulation: structure literal",
    "coefficientEnergy": "NotExtractable: Calibrator.coefficientEnergy: qualified name B.mulVec",
@@ -75,7 +73,7 @@
    "commonOnlyPortableModel": "NotExtractable: Calibrator.commonOnlyPortableModel: structure literal",
    "condensationConstant": "NotExtractable: Calibrator.condensationConstant: qualified name Real.eulerMascheroniConstant",
    "conditionalMean": "NotExtractable: Calibrator.conditionalMean: trailing tokens after expression: op:[",
-   "conditionalMeanApproximationRisk": "NotExtractable: Calibrator.conditionalMeanApproximationRisk: unrecognised character '\u2202'",
+   "conditionalMeanApproximationRisk": "NotExtractable: Calibrator.conditionalMeanApproximationRisk: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "conditionalVariance": "NotExtractable: Calibrator.conditionalVariance: trailing tokens after expression: op:[",
    "configurationWeight": "NotExtractable: Calibrator.configurationWeight: indexed product",
    "congrProp": "NotExtractable: Calibrator.ProbeBlindness.congrProp: structure literal",
@@ -83,32 +81,34 @@
    "correctableClasses": "NotExtractable: Calibrator.FrequencyResolvedCohort.correctableClasses: qualified name Finset.univ.filter",
    "covarianceMatrix": "NotExtractable: Calibrator.covarianceMatrix: qualified name Matrix.of",
    "crossChecks_blind_to_retention": "NotExtractable: Calibrator.crossChecks_blind_to_retention: structure literal",
-   "crossCovEntry": "NotExtractable: Calibrator.crossCovEntry: unrecognised character '\u2202'",
-   "crossS": "NotExtractable: Calibrator.crossS: unrecognised character '!'",
-   "crossSource": "NotExtractable: Calibrator.crossSource: unrecognised character '!'",
-   "crossTarget": "NotExtractable: Calibrator.crossTarget: unrecognised character '!'",
+   "crossCovEntry": "NotExtractable: Calibrator.crossCovEntry: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "crossS": "NotExtractable: Calibrator.crossS: Matrix/vector literal (![\u2026])",
+   "crossSource": "NotExtractable: Calibrator.crossSource: Matrix/vector literal (![\u2026])",
+   "crossTarget": "NotExtractable: Calibrator.crossTarget: Matrix/vector literal (![\u2026])",
    "ctMissedTargetSignal": "NotExtractable: Calibrator.ctMissedTargetSignal: unrecognised character '\\\\'",
    "cumulativeDrift": "NotExtractable: Calibrator.cumulativeDrift: Finset/indexed sum",
+   "cycleDensity": "NotExtractable: Calibrator.GenotypeDesign.cycleDensity: qualified name Matrix.trace",
    "decisionCurveScreeningModel": "NotExtractable: Calibrator.decisionCurveScreeningModel: structure literal",
    "demographicSpikeDirection": "NotExtractable: Calibrator.demographicSpikeDirection: qualified name i.val",
    "dgpAdditiveBias": "NotExtractable: Calibrator.dgpAdditiveBias: structure literal",
    "dgpInteractiveBias": "NotExtractable: Calibrator.dgpInteractiveBias: structure literal",
+   "diagonalGapClass": "NotExtractable: Calibrator.diagonalGapClass: structure literal",
    "diseaseEvent": "NotExtractable: Calibrator.diseaseEvent: structure literal",
    "disjointRecord": "NotExtractable: Calibrator.ChaosSpectroscopy.disjointRecord: qualified name S.limitLaw",
    "disjointWindowLimitVariance": "NotExtractable: Calibrator.disjointWindowLimitVariance: Finset/indexed sum",
    "dominanceVariance": "NotExtractable: Calibrator.dominanceVariance: Finset/indexed sum",
    "dot": "NotExtractable: Calibrator.dot: Finset/indexed sum",
-   "downReclassificationRate": "NotExtractable: Calibrator.downReclassificationRate: unrecognised character '.'",
+   "downReclassificationRate": "NotExtractable: Calibrator.downReclassificationRate: expected ')', found op:{",
    "effectGeneticCorrelation": "NotExtractable: Calibrator.effectGeneticCorrelation: Finset/indexed sum",
    "effectivePolygenicityOfEffects": "NotExtractable: Calibrator.effectivePolygenicityOfEffects: Finset/indexed sum",
    "equalFrequencyGenotypeCoding": "NotExtractable: Calibrator.equalFrequencyGenotypeCoding: structure literal",
    "equivFin3": "NotExtractable: Calibrator.DiploidGenotype.equivFin3: builds a structure value (DiploidGenotype \u2243 Fin 3 where toFun | .homRef => 0 | .het => 1 | .homAlt => 2 invFun | \u27e80, _\u27e9 => .homRef | \u27e81, _\u27e9 => .het | \u27e82, _\u27e9 => .homAlt left_inv g)",
-   "etaLiabilityThreshold": "NotExtractable: Calibrator.etaLiabilityThreshold: unrecognised character '.'",
-   "exactBrierRiskOfCalibrated": "NotExtractable: Calibrator.exactBrierRiskOfCalibrated: unrecognised character '\u2202'",
+   "exactBrierRiskOfCalibrated": "NotExtractable: Calibrator.exactBrierRiskOfCalibrated: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "exitLevels": "NotExtractable: Calibrator.BackgroundClass.exitLevels: structure literal",
    "expectedAltAlleleCount": "NotExtractable: Calibrator.HardyWeinbergModel.expectedAltAlleleCount: Finset/indexed sum",
-   "expectedQalyLoss": "NotExtractable: Calibrator.expectedQalyLoss: unrecognised character '\u2202'",
-   "expectedThresholdQalyLoss": "NotExtractable: Calibrator.expectedThresholdQalyLoss: unrecognised character '\u2202'",
+   "expectedQalyLoss": "NotExtractable: Calibrator.expectedQalyLoss: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "expectedThresholdQalyLoss": "NotExtractable: Calibrator.expectedThresholdQalyLoss: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "extra_algebraic_guard_adds_nothing": "NotExtractable: Calibrator.extra_algebraic_guard_adds_nothing: structure literal",
    "fStat": "NotExtractable: Calibrator.MRInstrumentModel.fStat: unrecognised character '.'",
    "fineScaleSubspace": "NotExtractable: Calibrator.PCCorrectionModel.fineScaleSubspace: structure literal",
    "fixed_se_sq": "NotExtractable: Calibrator.fixed_se_sq: Finset/indexed sum",
@@ -126,12 +126,14 @@
    "genotypeThirdAbsMoment": "NotExtractable: Calibrator.HardyWeinbergModel.genotypeThirdAbsMoment: Finset/indexed sum",
    "genotypeVariance": "NotExtractable: Calibrator.HardyWeinbergModel.genotypeVariance: Finset/indexed sum",
    "gramForm": "NotExtractable: Calibrator.gramForm: Finset/indexed sum",
+   "guard_stack_blind_to_retention": "NotExtractable: Calibrator.guard_stack_blind_to_retention: builds a structure value (ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r) (fun r => r = trueRetention))",
    "haplotypeHomozygosity": "NotExtractable: Calibrator.haplotypeHomozygosity: Finset/indexed sum",
    "hardCallObservables": "NotExtractable: Calibrator.hardCallObservables: structure literal",
    "harmonicMeanNe": "NotExtractable: Calibrator.harmonicMeanNe: Finset/indexed sum",
    "hasInteraction": "NotExtractable: Calibrator.hasInteraction: Prop-valued / set-valued",
    "headroom": "NotExtractable: Calibrator.BackgroundClass.headroom: qualified name K.bound",
    "hweCodingInvariants": "NotExtractable: Calibrator.hweCodingInvariants: structure literal",
+   "hweObservableContent": "NotExtractable: Calibrator.hweObservableContent: structure literal",
    "hweThirdCentralMoment": "NotExtractable: Calibrator.hweThirdCentralMoment: Finset/indexed sum",
    "identityCalibrationProfile": "NotExtractable: Calibrator.identityCalibrationProfile: builds a structure value (CalibrationProfile)",
    "identityDirectMetricModel": "NotExtractable: Calibrator.identityDirectMetricModel: structure literal",
@@ -139,33 +141,33 @@
    "inducedCov": "NotExtractable: Calibrator.ColliderModel.inducedCov: unrecognised character '.'",
    "integratedCoalescentHazard": "NotExtractable: Calibrator.integratedCoalescentHazard: integral",
    "interactionMonomial": "NotExtractable: Calibrator.interactionMonomial: indexed product",
-   "interactionOrder": "NotExtractable: Calibrator.GenotypeDesign.interactionOrder: unrecognised character '.'",
+   "interactionOrder": "NotExtractable: Calibrator.GenotypeDesign.interactionOrder: qualified name design.locusSet",
    "inverseTraceCertificate": "NotExtractable: Calibrator.inverseTraceCertificate: Finset/indexed sum",
-   "irreduciblePredictionRisk": "NotExtractable: Calibrator.irreduciblePredictionRisk: unrecognised character '\u2202'",
+   "irreduciblePredictionRisk": "NotExtractable: Calibrator.irreduciblePredictionRisk: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "lassoActiveLoci": "NotExtractable: Calibrator.lassoActiveLoci: qualified name Finset.univ.filter",
-   "ldWitnessBeta": "NotExtractable: Calibrator.ldWitnessBeta: unrecognised character '!'",
-   "ldWitnessSigmaTargetCorrelated": "NotExtractable: Calibrator.ldWitnessSigmaTargetCorrelated: unrecognised character '!'",
-   "ldWitnessSigmaTargetIndependent": "NotExtractable: Calibrator.ldWitnessSigmaTargetIndependent: unrecognised character '!'",
+   "ldWitnessBeta": "NotExtractable: Calibrator.ldWitnessBeta: Matrix/vector literal (![\u2026])",
+   "ldWitnessSigmaTargetCorrelated": "NotExtractable: Calibrator.ldWitnessSigmaTargetCorrelated: Matrix/vector literal (![\u2026])",
+   "ldWitnessSigmaTargetIndependent": "NotExtractable: Calibrator.ldWitnessSigmaTargetIndependent: Matrix/vector literal (![\u2026])",
    "ldWitnessSourceMoments": "NotExtractable: Calibrator.ldWitnessSourceMoments: structure literal",
-   "ldWitnessTargetCross": "NotExtractable: Calibrator.ldWitnessTargetCross: unrecognised character '!'",
+   "ldWitnessTargetCross": "NotExtractable: Calibrator.ldWitnessTargetCross: Matrix/vector literal (![\u2026])",
    "locusInfluence": "NotExtractable: Calibrator.GenotypeDesign.locusInfluence: Finset/indexed sum",
    "locusTerm": "NotExtractable: Calibrator.locusTerm: Finset/indexed sum",
-   "logLossKLCertificate": "NotExtractable: Calibrator.logLossKLCertificate: unrecognised character '\u2202'",
-   "logLossRegret": "NotExtractable: Calibrator.logLossRegret: unrecognised character '\u2202'",
-   "logRisk": "NotExtractable: Calibrator.logRisk: unrecognised character '.'",
+   "logLossKLCertificate": "NotExtractable: Calibrator.logLossKLCertificate: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "logLossRegret": "NotExtractable: Calibrator.logLossRegret: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "logRisk": "NotExtractable: Calibrator.logRisk: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "logisticCalibrationProfile": "NotExtractable: Calibrator.logisticCalibrationProfile: builds a structure value (CalibrationProfile)",
    "lossGeometryRisk": "NotExtractable: Calibrator.lossGeometryRisk: qualified name Matrix.trace",
    "margin": "NotExtractable: Calibrator.EquiExit.margin: qualified name K.headroom",
    "meanAbsoluteEffect": "NotExtractable: Calibrator.meanAbsoluteEffect: Finset/indexed sum",
-   "measureCovariance": "NotExtractable: Calibrator.measureCovariance: unrecognised character '\u2202'",
-   "measureExpMSE": "NotExtractable: Calibrator.measureExpMSE: unrecognised character '\u2202'",
-   "measureMean": "NotExtractable: Calibrator.measureMean: unrecognised character '\u2202'",
-   "measureVariance": "NotExtractable: Calibrator.measureVariance: unrecognised character '\u2202'",
+   "measureCovariance": "NotExtractable: Calibrator.measureCovariance: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "measureExpMSE": "NotExtractable: Calibrator.measureExpMSE: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "measureMean": "NotExtractable: Calibrator.measureMean: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "measureVariance": "NotExtractable: Calibrator.measureVariance: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "mellinDrift": "NotExtractable: Calibrator.HardyWeinbergModel.mellinDrift: Finset/indexed sum",
    "mellinJetVariance": "NotExtractable: Calibrator.HardyWeinbergModel.mellinJetVariance: Finset/indexed sum",
    "metricProfileFromTargetSignalWithPenalty": "NotExtractable: Calibrator.PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty: qualified name TransportedMetrics.profileFromSignalVarianceWithPenalty",
-   "mse": "NotExtractable: Calibrator.mse: unrecognised character '\u2202'",
-   "mseRisk": "NotExtractable: Calibrator.mseRisk: unrecognised character '\u2202'",
+   "mse": "NotExtractable: Calibrator.mse: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
+   "mseRisk": "NotExtractable: Calibrator.mseRisk: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "mutationDriftBalance": "NotExtractable: Calibrator.mutationDriftBalance: structure literal",
    "noiseMeasureGivenX": "NotExtractable: Calibrator.noiseMeasureGivenX: qualified name ProbabilityTheory.gaussianReal",
    "nondegenerateGenerationalPopGen": "NotExtractable: Calibrator.nondegenerateGenerationalPopGen: structure literal",
@@ -176,6 +178,7 @@
    "ofWitnessFamily": "NotExtractable: Calibrator.ProbeBlindness.ofWitnessFamily: structure literal",
    "optimalWeightsFromMoments": "NotExtractable: Calibrator.optimalWeightsFromMoments: qualified name sigmaInv.mulVec",
    "oracleRisk": "NotExtractable: Calibrator.oracleRisk: unrecognised character \"'\"",
+   "overlapMatrix": "NotExtractable: Calibrator.GenotypeDesign.overlapMatrix: expected ')', found op:\u2229",
    "pgsDriftVarianceFromLoci": "NotExtractable: Calibrator.pgsDriftVarianceFromLoci: Finset/indexed sum",
    "pgsMean": "NotExtractable: Calibrator.pgsMean: Finset/indexed sum",
    "pgsMeanShift": "NotExtractable: Calibrator.pgsMeanShift: Finset/indexed sum",
@@ -186,10 +189,10 @@
    "popgenDrivenProxyGenerationalModel": "NotExtractable: Calibrator.popgenDrivenProxyGenerationalModel: structure literal",
    "populationAUC": "NotExtractable: Calibrator.populationAUC: unrecognised character '.'",
    "populationDeviationSum": "NotExtractable: Calibrator.populationDeviationSum: qualified name Finset.sum",
-   "populationRisk": "NotExtractable: Calibrator.populationRisk: unrecognised character '.'",
+   "populationRisk": "NotExtractable: Calibrator.populationRisk: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "predSource": "NotExtractable: Calibrator.RGEModel.predSource: unrecognised character '.'",
    "predTarget": "NotExtractable: Calibrator.RGEModel.predTarget: unrecognised character '.'",
-   "predictionRiskY": "NotExtractable: Calibrator.predictionRiskY: unrecognised character '\u2202'",
+   "predictionRiskY": "NotExtractable: Calibrator.predictionRiskY: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "predictorCausalCovariance": "NotExtractable: Calibrator.predictorCausalCovariance: qualified name Matrix.of",
    "profileFromSignalVariance": "NotExtractable: Calibrator.TransportedMetrics.profileFromSignalVariance: structure literal",
    "pruneAllocation": "NotExtractable: Calibrator.pruneAllocation: expected 'then', found op:\u2208",
@@ -200,6 +203,7 @@
    "r2_obs": "NotExtractable: Calibrator.RGEInflationModel.r2_obs: unrecognised character '.'",
    "r2_target": "NotExtractable: Calibrator.TransportabilityModel.r2_target: unrecognised character '.'",
    "random_se_sq": "NotExtractable: Calibrator.random_se_sq: Finset/indexed sum",
+   "reModel": "NotExtractable: Calibrator.GenotypeDesign.reModel: structure literal",
    "rejectionThreshold": "NotExtractable: Calibrator.EquiExit.rejectionThreshold: qualified name K.bound",
    "removeTopPCs": "NotExtractable: Calibrator.PCCorrectionModel.removeTopPCs: qualified name i.val",
    "residualBias": "NotExtractable: Calibrator.PCCorrectionModel.residualBias: Finset/indexed sum",
@@ -207,36 +211,32 @@
    "ridgeBalance": "NotExtractable: Calibrator.ridgeBalance: Finset/indexed sum",
    "ridgeSelfConsistentStep": "NotExtractable: Calibrator.ridgeSelfConsistentStep: Finset/indexed sum",
    "rightTransform": "NotExtractable: Calibrator.rightTransform: qualified name transform.transpose.mulVec",
-   "rsquared": "NotExtractable: Calibrator.rsquared: unrecognised character '\u2202'",
+   "rsquared": "NotExtractable: Calibrator.rsquared: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "scalarCorrectionFloor": "NotExtractable: Calibrator.scalarCorrectionFloor: qualified name B.mulVec",
    "scale": "NotExtractable: Calibrator.SymmetricCoding.scale: structure literal",
    "scoreMean": "KeyError: \"'scoreMean' is ambiguous: ['Calibrator.HWEPolygenicScoreDGP.scoreMean', 'Calibrator.HWEScoreModel.scoreMean']\"",
-   "scoreThirdAbsMomentBound": "NotExtractable: Calibrator.HWEScoreModel.scoreThirdAbsMomentBound: unrecognised character '.'",
+   "scoreThirdAbsMomentBound": "NotExtractable: Calibrator.HWEScoreModel.scoreThirdAbsMomentBound: Finset/indexed sum",
    "scoreVariance": "KeyError: \"'scoreVariance' is ambiguous: ['Calibrator.HWEPolygenicScoreDGP.scoreVariance', 'Calibrator.HWEScoreModel.scoreVariance']\"",
    "screeningClinicalPathway": "NotExtractable: Calibrator.screeningClinicalPathway: structure literal",
    "screeningLongitudinalModel": "NotExtractable: Calibrator.screeningLongitudinalModel: structure literal",
    "secondMomentMatrix": "NotExtractable: Calibrator.secondMomentMatrix: qualified name Matrix.of",
    "shifted": "NotExtractable: Calibrator.CalibrationMoments.shifted: structure literal",
-   "sigmaObsSource": "NotExtractable: Calibrator.sigmaObsSource: unrecognised character '!'",
-   "sigmaObsTarget": "NotExtractable: Calibrator.sigmaObsTarget: unrecognised character '!'",
-   "sigmaS": "NotExtractable: Calibrator.sigmaS: unrecognised character '!'",
-   "sigmaT": "NotExtractable: Calibrator.sigmaT: unrecognised character '!'",
-   "sigmaT2": "NotExtractable: Calibrator.sigmaT2: unrecognised character '!'",
+   "sigmaObsSource": "NotExtractable: Calibrator.sigmaObsSource: Matrix/vector literal (![\u2026])",
+   "sigmaObsTarget": "NotExtractable: Calibrator.sigmaObsTarget: Matrix/vector literal (![\u2026])",
+   "sigmaS": "NotExtractable: Calibrator.sigmaS: Matrix/vector literal (![\u2026])",
+   "sigmaT": "NotExtractable: Calibrator.sigmaT: Matrix/vector literal (![\u2026])",
+   "sigmaT2": "NotExtractable: Calibrator.sigmaT2: Matrix/vector literal (![\u2026])",
    "sigmaTagCausal": "NotExtractable: Calibrator.sigmaTagCausal: qualified name Matrix.of",
    "sigmaTagCausalSource": "KeyError: \"'sigmaTagCausalSource' is ambiguous: ['Calibrator.SourceTaggedMoments.sigmaTagCausalSource', 'Calibrator.sigmaTagCausalSource']\"",
    "slidingWindowDesign": "NotExtractable: Calibrator.slidingWindowDesign: structure literal",
-   "sourceBestLinearWeightsFromLD": "NotExtractable: Calibrator.sourceBestLinearWeightsFromLD: unrecognised character '.'",
    "sourceCalibratedBrierFromSourceWeightsAtPrevalence": "NotExtractable: Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence: qualified name TransportedMetrics.calibratedBrierFromVariances",
    "sourceCalibrationMoments": "NotExtractable: Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationMoments: structure literal",
    "sourceCalibrationProfile": "KeyError: \"'sourceCalibrationProfile' is ambiguous: ['Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationProfile', 'Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile']\"",
-   "sourceCrossCovariance": "NotExtractable: Calibrator.sourceCrossCovariance: unrecognised character '.'",
-   "sourceERMWeights": "NotExtractable: Calibrator.sourceERMWeights: unrecognised character '.'",
    "sourceEffectMass": "NotExtractable: Calibrator.SNPArchitecturePortabilityModel.sourceEffectMass: Finset/indexed sum",
    "sourceIdentityCalibrationProfile": "KeyError: \"'sourceIdentityCalibrationProfile' is ambiguous: ['Calibrator.CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile', 'Calibrator.CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile']\"",
    "sourceMetricProfileFromSourceWeightsAtPrevalence": "NotExtractable: Calibrator.sourceMetricProfileFromSourceWeightsAtPrevalence: structure literal",
    "sourcePopulationMeanWeights": "NotExtractable: Calibrator.sourcePopulationMeanWeights: qualified name Finset.sum",
    "sourceSquaredEffectMass": "NotExtractable: Calibrator.sourceSquaredEffectMass: Finset/indexed sum",
-   "sourceTaggingProjection": "NotExtractable: Calibrator.sourceTaggingProjection: unrecognised character '.'",
    "spectralCapture": "NotExtractable: Calibrator.spectralCapture: Finset/indexed sum",
    "spectralResidualBiasEnergy": "NotExtractable: Calibrator.spectralResidualBiasEnergy: Finset/indexed sum",
    "spectralTotal": "NotExtractable: Calibrator.spectralTotal: Finset/indexed sum",
@@ -244,20 +244,15 @@
    "spikeLoad": "NotExtractable: Calibrator.BackgroundClass.spikeLoad: qualified name K.form",
    "spiked": "NotExtractable: Calibrator.BackgroundClass.spiked: unrecognised character '\u2022'",
    "stabilizingSelectionSummary": "NotExtractable: Calibrator.stabilizingSelectionSummary: structure literal",
-   "statistic": "NotExtractable: Calibrator.GenotypeDesign.statistic: unrecognised character '.'",
+   "statistic": "NotExtractable: Calibrator.GenotypeDesign.statistic: Finset/indexed sum",
    "stdGaussianMeasure": "NotExtractable: Calibrator.stdGaussianMeasure: qualified name ProbabilityTheory.gaussianReal",
-   "stdNormalProdMeasure": "NotExtractable: Calibrator.stdNormalProdMeasure: unrecognised character '.'",
+   "stdNormalProdMeasure": "NotExtractable: Calibrator.stdNormalProdMeasure: qualified name ProbabilityTheory.gaussianReal",
    "symmetricDesignBlindness": "NotExtractable: Calibrator.symmetricDesignBlindness: structure literal",
-   "tagMean": "NotExtractable: Calibrator.tagMean: unrecognised character '\u2202'",
+   "tagMean": "NotExtractable: Calibrator.tagMean: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "taggedScoreEstimationRisk": "NotExtractable: Calibrator.taggedScoreEstimationRisk: Finset/indexed sum",
    "targetCalibratedBrierFromSourceWeights": "NotExtractable: Calibrator.targetCalibratedBrierFromSourceWeights: qualified name TransportedMetrics.calibratedBrierFromVariances",
    "targetCalibrationProfile": "KeyError: \"'targetCalibrationProfile' is ambiguous: ['Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationProfile', 'Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile']\"",
-   "targetCalibrationProfileAtGeneration": "NotExtractable: Calibrator.targetCalibrationProfileAtGeneration: builds a structure value (CalibrationProfile)",
    "targetContextShiftMetricModel": "NotExtractable: Calibrator.targetContextShiftMetricModel: structure literal",
-   "targetCrossCovariance": "NotExtractable: Calibrator.targetCrossCovariance: unrecognised character '.'",
-   "targetDirectCausalProjection": "NotExtractable: Calibrator.targetDirectCausalProjection: unrecognised character '.'",
-   "targetEffectHeterogeneityProjection": "NotExtractable: Calibrator.targetEffectHeterogeneityProjection: unrecognised character '.'",
-   "targetEffectHeterogeneityProjectionAt": "NotExtractable: Calibrator.targetEffectHeterogeneityProjectionAt: unrecognised character '.'",
    "targetEffectShiftMetricModel": "NotExtractable: Calibrator.targetEffectShiftMetricModel: structure literal",
    "targetIdentityCalibrationProfile": "KeyError: \"'targetIdentityCalibrationProfile' is ambiguous: ['Calibrator.CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile', 'Calibrator.CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile']\"",
    "targetIdentityCalibrationProfileAtGeneration": "NotExtractable: Calibrator.targetIdentityCalibrationProfileAtGeneration: builds a structure value (CalibrationProfile)",
@@ -265,22 +260,16 @@
    "targetLDShiftMetricModel": "NotExtractable: Calibrator.targetLDShiftMetricModel: structure literal",
    "targetLinearRisk": "NotExtractable: Calibrator.targetLinearRisk: qualified name sigmaObsTarget.mulVec",
    "targetMetricProfileFromSourceWeights": "NotExtractable: Calibrator.targetMetricProfileFromSourceWeights: structure literal",
-   "targetNovelMutationEffectProjection": "NotExtractable: Calibrator.targetNovelMutationEffectProjection: unrecognised character '.'",
    "targetObservedMean": "KeyError: \"'targetObservedMean' is ambiguous: ['Calibrator.CrossPopulationCalibrationShiftModel.targetObservedMean', 'Calibrator.CrossPopulationMechanisticCalibrationModel.targetObservedMean']\"",
    "targetPredictedMean": "KeyError: \"'targetPredictedMean' is ambiguous: ['Calibrator.CrossPopulationCalibrationShiftModel.targetPredictedMean', 'Calibrator.CrossPopulationMechanisticCalibrationModel.targetPredictedMean']\"",
    "targetPrevalenceShiftMetricModel": "NotExtractable: Calibrator.targetPrevalenceShiftMetricModel: structure literal",
-   "targetProxyTaggingProjection": "NotExtractable: Calibrator.targetProxyTaggingProjection: unrecognised character '.'",
    "targetRetainedEffectMass": "NotExtractable: Calibrator.SNPArchitecturePortabilityModel.targetRetainedEffectMass: Finset/indexed sum",
-   "targetSourceEffectProjection": "NotExtractable: Calibrator.targetSourceEffectProjection: unrecognised character '.'",
-   "targetSourceEffectProjectionAt": "NotExtractable: Calibrator.targetSourceEffectProjectionAt: unrecognised character '.'",
-   "targetTaggingProjection": "NotExtractable: Calibrator.targetTaggingProjection: unrecognised character '.'",
    "targetTaggingShiftMetricModel": "NotExtractable: Calibrator.targetTaggingShiftMetricModel: structure literal",
    "tau": "KeyError: \"'tau' is ambiguous: ['Calibrator.EvolutionaryParameters.tau', 'Calibrator.PureSplitModel.tau']\"",
-   "temporalExactBrierRisk": "NotExtractable: Calibrator.temporalExactBrierRisk: unrecognised character '.'",
    "temporalMetricProfile": "NotExtractable: Calibrator.temporalMetricProfile: qualified name TransportedMetrics.profileFromSignalVariance",
    "temporalR2": "NotExtractable: Calibrator.temporalR2: qualified name TransportedMetrics.r2FromSignalVariance",
    "theta": "KeyError: \"'theta' is ambiguous: ['Calibrator.EvolutionaryParameters.theta', 'Calibrator.GenerationalPopGenParameters.theta', 'Calibrator.MutationDriftModelAssumptions.theta']\"",
-   "thresholdBandRate": "NotExtractable: Calibrator.thresholdBandRate: unrecognised character '.'",
+   "thresholdBandRate": "NotExtractable: Calibrator.thresholdBandRate: qualified name Set.Ioc",
    "thresholdClinicalPathway": "NotExtractable: Calibrator.thresholdClinicalPathway: structure literal",
    "thresholdLongitudinalModel": "NotExtractable: Calibrator.thresholdLongitudinalModel: structure literal",
    "thresholdQalyGainUnderDecision": "NotExtractable: Calibrator.thresholdQalyGainUnderDecision: expected 'then', found op::",
@@ -288,6 +277,7 @@
    "timeVaryingEffectGenerationalModel": "NotExtractable: Calibrator.timeVaryingEffectGenerationalModel: structure literal",
    "toApprox": "NotExtractable: Calibrator.ProbeBlindness.toApprox: structure literal",
    "toDGP": "KeyError: \"'toDGP' is ambiguous: ['Calibrator.PrevalenceDGP.toDGP', 'Calibrator.HeterogeneousEffectDGP.toDGP', 'Calibrator.ConditionalMeanDGP.toDGP']\"",
+   "toEvo": "NotExtractable: Calibrator.PGSEvolutionaryModel.toEvo: builds a structure value (EvolutionaryParameters)",
    "toGenerationalPopGenParameters": "NotExtractable: Calibrator.PGSEvolutionaryModel.toGenerationalPopGenParameters: structure literal",
    "toMechanisticCalibrationModelAt": "NotExtractable: Calibrator.CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt: structure literal",
    "toMetricModelAt": "NotExtractable: Calibrator.CrossPopulationGenerationalModel.toMetricModelAt: structure literal",
@@ -306,13 +296,13 @@
    "uncorrectedBias": "NotExtractable: Calibrator.PCCorrectionModel.uncorrectedBias: Finset/indexed sum",
    "uniformCatastrophicPortabilityScore": "NotExtractable: Calibrator.uniformCatastrophicPortabilityScore: qualified name mismatched.card",
    "unitProbToNNReal": "NotExtractable: Calibrator.InformationTheoryBridge.unitProbToNNReal: anonymous constructor",
-   "var": "NotExtractable: Calibrator.var: unrecognised character '\u2202'",
+   "var": "NotExtractable: Calibrator.var: measure-theoretic integral (\u222b \u2026 \u2202\u03bc)",
    "varBias": "NotExtractable: Calibrator.StratificationModel.varBias: Finset/indexed sum",
    "varTrue": "NotExtractable: Calibrator.StratificationModel.varTrue: unrecognised character '.'",
-   "variantRecurrence": "NotExtractable: Calibrator.GenotypeDesign.variantRecurrence: unrecognised character '.'",
+   "variantRecurrence": "NotExtractable: Calibrator.GenotypeDesign.variantRecurrence: qualified name Finset.univ.filter",
    "verdict": "NotExtractable: Calibrator.StructuralGuard.verdict: Prop-valued / set-valued",
-   "wSource_opt": "NotExtractable: Calibrator.wSource_opt: unrecognised character '!'",
-   "wTarget_opt": "NotExtractable: Calibrator.wTarget_opt: unrecognised character '!'",
+   "wSource_opt": "NotExtractable: Calibrator.wSource_opt: Matrix/vector literal (![\u2026])",
+   "wTarget_opt": "NotExtractable: Calibrator.wTarget_opt: Matrix/vector literal (![\u2026])",
    "weightedNoise": "NotExtractable: Calibrator.FrequencyResolvedCohort.weightedNoise: Finset/indexed sum",
    "weightedPopulationDeviation": "NotExtractable: Calibrator.weightedPopulationDeviation: Finset/indexed sum",
    "weightedPopulationEffectAverage": "NotExtractable: Calibrator.weightedPopulationEffectAverage: Finset/indexed sum",
@@ -709,10 +699,21 @@
    },
    "Calibrator.hetDecayFactor": {
     "fq": "Calibrator.hetDecayFactor",
-    "translator": "leanexpr (extract unavailable)",
-    "extract_error": "KeyError: \"'hetDecayFactor' is ambiguous: ['Calibrator.PGSEvolutionaryModel.hetDecayFactor', 'Calibrator.hetDecayFactor', 'Calibrator.GenerationalPopGenParameters.hetDecayFactor']\"",
-    "source": "PopulationGeneticsFoundations.lean:1341",
-    "leanexpr_sha16": "177ecd21092d890e"
+    "translator": "extract",
+    "source": "Calibrator/PopulationGeneticsFoundations.lean:1341",
+    "checksum": "sha256:ff57c38b205c3012d5cfc3ab753d8ff3",
+    "empirical_status": "UNTESTED",
+    "admissible_box": {
+     "Ne": [
+      2.0,
+      1000.0
+     ],
+     "\u03b8": [
+      0.05,
+      3.0
+     ]
+    },
+    "also_in_leanexpr": true
    },
    "Calibrator.hetEquilibrium": {
     "fq": "Calibrator.hetEquilibrium",
@@ -737,6 +738,46 @@
     "translator": "extract",
     "source": "Calibrator/PopulationGeneticsFoundations.lean:1192",
     "checksum": "sha256:7299fe8fd153c7b39e576e5867975796",
+    "empirical_status": "UNTESTED",
+    "admissible_box": {
+     "Ne": [
+      1.0,
+      1000.0
+     ],
+     "mu": [
+      0.05,
+      3.0
+     ],
+     "H\u2080": [
+      0.05,
+      3.0
+     ]
+    },
+    "also_in_leanexpr": true
+   },
+   "Calibrator.hetRecurrence": {
+    "fq": "Calibrator.hetRecurrence",
+    "translator": "extract",
+    "source": "Calibrator/PopulationGeneticsFoundations.lean:1090",
+    "checksum": "sha256:d60d619c453e7c7134283492b5bf2813",
+    "empirical_status": "",
+    "admissible_box": {
+     "Ne": [
+      1.0,
+      1000.0
+     ],
+     "H\u2080": [
+      0.05,
+      3.0
+     ]
+    },
+    "also_in_leanexpr": true
+   },
+   "Calibrator.hetTrajectory": {
+    "fq": "Calibrator.hetTrajectory",
+    "translator": "extract",
+    "source": "Calibrator/PortabilityDrift.lean:443",
+    "checksum": "sha256:27e4c6fa273222d1cff0af1a6d486822",
     "empirical_status": "UNTESTED",
     "admissible_box": {
      "Ne": [
@@ -814,6 +855,24 @@
      "Ne": [
       1.0,
       1000.0
+     ]
+    },
+    "also_in_leanexpr": true
+   },
+   "Calibrator.ldRecurrence": {
+    "fq": "Calibrator.ldRecurrence",
+    "translator": "extract",
+    "source": "Calibrator/LDDecayTheory.lean:937",
+    "checksum": "sha256:2fa8259e31d6c55345d27131bea6503f",
+    "empirical_status": "UNTESTED",
+    "admissible_box": {
+     "r": [
+      0.05,
+      0.999
+     ],
+     "D\u2080": [
+      0.05,
+      3.0
      ]
     },
     "also_in_leanexpr": true
@@ -1052,9 +1111,9 @@
  },
  "cross_validation": {
   "method": "leanexpr.py vs extract/api.py over every evaluated argument tuple",
-  "n_definitions_compared": 39,
-  "n_arg_tuples": 404,
-  "n_agree_all_points": 39,
+  "n_definitions_compared": 43,
+  "n_arg_tuples": 441,
+  "n_agree_all_points": 43,
   "agree": {
    "Calibrator.admixedFst": 16,
    "Calibrator.alleleFreqAfterMigration": 24,
@@ -1076,14 +1135,18 @@
    "Calibrator.fstMigrationDriftEquilibrium": 4,
    "Calibrator.fstMutationDriftTransient": 12,
    "Calibrator.fstMutationDriftTransientDiscrete": 12,
+   "Calibrator.hetDecayFactor": 12,
    "Calibrator.hetEquilibrium": 12,
    "Calibrator.hetMutationDriftRecurrence": 18,
+   "Calibrator.hetRecurrence": 9,
+   "Calibrator.hetTrajectory": 18,
    "Calibrator.heterozygosityLossFromDrift": 15,
    "Calibrator.islandModelFst": 11,
    "Calibrator.ldCorrelationFromMigration": 4,
    "Calibrator.ldHalfLife": 3,
+   "Calibrator.ldRecurrence": 6,
    "Calibrator.ldRetainedFraction": 2,
-   "Calibrator.ldRetentionPerGen": 14,
+   "Calibrator.ldRetentionPerGen": 18,
    "Calibrator.neiFst": 16,
    "Calibrator.neutralAFBenchmarkRatio": 4,
    "Calibrator.pairwiseFstFromBranchTaus": 9,
@@ -1098,13 +1161,11 @@
   },
   "quarantined_disagreements": [],
   "unresolved_disagreements": [],
-  "not_comparable": {
-   "hetDecayFactor": "not in extract table"
-  }
+  "not_comparable": {}
  },
  "contract_totality": {
   "method": "strict-arithmetic leanexpr vs lean_rt-backed extract, same points",
-  "points_checked": 392,
+  "points_checked": 429,
   "totality_boundary_points": [],
   "value_mismatches": [],
   "clean": true
@@ -1140,6 +1201,7 @@
     "ref": 0.006661732050333158,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 16,
    "rows": [
@@ -1320,11 +1382,32 @@
     "ref": 0.01323529411764706,
     "rel_err": 0.49666913397483337
    },
+   "worst_point_definition_args": {
+    "p_1": 0.02,
+    "p_2": 0.05
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "no-constraint",
-     "satisfied": [],
-     "violated": []
+     "verdict": "all-satisfied",
+     "satisfied": [
+      {
+       "theorem": "Calibrator.simpleFst_eq_hudsonFst",
+       "hypotheses": [
+        "meanAlleleFreq p\u2081 p\u2082 * (1 - meanAlleleFreq p\u2081 p\u2082"
+       ]
+      },
+      {
+       "theorem": "Calibrator.simple_fst_nonneg",
+       "hypotheses": [
+        "0 < p\u2081",
+        "p\u2081 < 1",
+        "0 < p\u2082",
+        "p\u2082 < 1"
+       ]
+      }
+     ],
+     "violated": [],
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -1337,12 +1420,8 @@
     "unmodelled_hypotheses": [
      "meanAlleleFreq p\u2081 p\u2082 * (1 - meanAlleleFreq p\u2081 p\u2082"
     ],
-    "unevaluable_hypotheses": [
-     "0 < p\u2081",
-     "p\u2081 < 1",
-     "0 < p\u2082",
-     "p\u2082 < 1"
-    ]
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 16,
    "rows": [
@@ -1523,6 +1602,7 @@
     "ref": 0.006661732050333158,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 16,
    "rows": [
@@ -1699,6 +1779,7 @@
     "ref": 0.01323529411764706,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 16,
    "rows": [
@@ -1879,11 +1960,13 @@
     "ref": 0.0263157894736842,
     "rel_err": 1.9473684210526325
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "no-constraint",
      "satisfied": [],
-     "violated": []
+     "violated": [],
+     "granularity": "per theorem, via api.satisfies(fq, point, theorem)"
     },
     "docstring_implied": {
      "verdict": "no-constraint"
@@ -2069,6 +2152,7 @@
     "ref": 0.00990099009900991,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 15,
    "rows": [
@@ -2240,44 +2324,58 @@
     "ref": 0.3169318430247382,
     "rel_err": 0.36894949371058006
    },
+   "worst_point_definition_args": {
+    "t": 500.0,
+    "Ne": 1000.0
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "some-violated",
      "satisfied": [
       {
-       "hypothesis": "0 < Ne",
-       "stated_by": [
-        "Calibrator.steppingStoneFst_from_coalescence_time",
-        "Calibrator.fstFromCoalescenceTime_in_unit",
-        "Calibrator.coalFst_eq_fstFromTau",
-        "Calibrator.coal_fst_nonneg",
-        "Calibrator.coal_fst_increases_with_time",
-        "Calibrator.coal_fst_approaches_one"
+       "theorem": "Calibrator.coalFst_eq_fstFromTau",
+       "hypotheses": [
+        "0 \u2264 t",
+        "0 < Ne"
        ]
       },
       {
-       "hypothesis": "0 \u2264 t",
-       "stated_by": [
-        "Calibrator.coalFst_eq_fstFromTau",
-        "Calibrator.coal_fst_nonneg"
+       "theorem": "Calibrator.coal_fst_increases_with_time",
+       "hypotheses": [
+        "0 < Ne"
        ]
       },
       {
-       "hypothesis": "0 < t",
-       "stated_by": [
-        "Calibrator.coal_fst_approaches_one"
+       "theorem": "Calibrator.coal_fst_nonneg",
+       "hypotheses": [
+        "0 \u2264 t",
+        "0 < Ne"
+       ]
+      },
+      {
+       "theorem": "Calibrator.fstFromCoalescenceTime_in_unit",
+       "hypotheses": [
+        "0 < Ne"
+       ]
+      },
+      {
+       "theorem": "Calibrator.steppingStoneFst_from_coalescence_time",
+       "hypotheses": [
+        "0 < Ne"
        ]
       }
      ],
      "violated": [
       {
-       "hypothesis": "100 * Ne < t",
-       "stated_by": [
-        "Calibrator.coal_fst_approaches_one"
+       "theorem": "Calibrator.coal_fst_approaches_one",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < t",
+        "100 * Ne < t"
        ]
       }
      ],
-     "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -2288,7 +2386,8 @@
      "provenance": "mined from prose; NOT machine-checked"
     },
     "unmodelled_hypotheses": [],
-    "unevaluable_hypotheses": []
+    "unevaluable_theorems": [],
+    "union_satisfied": false
    },
    "n_grid": 3,
    "rows": [
@@ -2352,32 +2451,41 @@
     "ref": 0.6666666666666667,
     "rel_err": 0.22910891633179434
    },
+   "worst_point_definition_args": {
+    "Ne": 500.0,
+    "t": 2000
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "all-satisfied",
      "satisfied": [
       {
-       "hypothesis": "2 < Ne",
-       "stated_by": [
-        "Calibrator.fstDerived_mono"
+       "theorem": "Calibrator.fstDerived_faster_small_Ne",
+       "hypotheses": [
+        "1 \u2264 t"
        ]
       },
       {
-       "hypothesis": "2 \u2264 Ne",
-       "stated_by": [
-        "Calibrator.fstDerived_nonneg",
-        "Calibrator.fstDerived_lt_one"
+       "theorem": "Calibrator.fstDerived_lt_one",
+       "hypotheses": [
+        "2 \u2264 Ne"
        ]
       },
       {
-       "hypothesis": "1 \u2264 t",
-       "stated_by": [
-        "Calibrator.fstDerived_faster_small_Ne"
+       "theorem": "Calibrator.fstDerived_mono",
+       "hypotheses": [
+        "2 < Ne"
+       ]
+      },
+      {
+       "theorem": "Calibrator.fstDerived_nonneg",
+       "hypotheses": [
+        "2 \u2264 Ne"
        ]
       }
      ],
      "violated": [],
-     "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -2388,7 +2496,8 @@
      "provenance": "mined from prose; NOT machine-checked"
     },
     "unmodelled_hypotheses": [],
-    "unevaluable_hypotheses": []
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 15,
    "rows": [
@@ -2560,6 +2669,7 @@
     "ref": 0.009955119790251765,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 15,
    "rows": [
@@ -2731,6 +2841,7 @@
     "ref": 0.009955119790251765,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 15,
    "rows": [
@@ -2902,6 +3013,7 @@
     "ref": 0.00990099009900991,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 15,
    "rows": [
@@ -3074,11 +3186,16 @@
     "ref": 0.8,
     "rel_err": 0.0999999999999999
    },
+   "worst_point_definition_args": {
+    "fstS": 0.6666666666666666,
+    "fstT": 0.6666666666666666
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "no-constraint",
      "satisfied": [],
-     "violated": []
+     "violated": [],
+     "granularity": "per theorem, via api.satisfies(fq, point, theorem)"
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -3089,7 +3206,8 @@
      "provenance": "mined from prose; NOT machine-checked"
     },
     "unmodelled_hypotheses": [],
-    "unevaluable_hypotheses": []
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 9,
    "rows": [
@@ -3215,6 +3333,7 @@
     "ref": 0.2860206853479077,
     "rel_err": 0.0010712499106463203
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 12,
    "rows": [
@@ -3330,9 +3449,9 @@
   },
   "hetDecayFactor-vs-exact-eigenvalue": {
    "definition": "Calibrator.hetDecayFactor",
-   "definition_source": "PopulationGeneticsFoundations.lean:1341",
-   "definition_checksum": null,
-   "translator": "leanexpr (extract unavailable)",
+   "definition_source": "Calibrator/PopulationGeneticsFoundations.lean:1341",
+   "definition_checksum": "sha256:ff57c38b205c3012d5cfc3ab753d8ff3",
+   "translator": "extract",
    "claim": "(1-1/2Ne)(1-theta/2Ne) vs the exact IAM eigenvalue (1-1/2Ne)(1-mu)^2",
    "model_definition": "theta passed in must be 4*Ne*mu for the SAME Ne",
    "model_reference": "exact IAM",
@@ -3359,6 +3478,7 @@
     "ref": 0.9979510999500001,
     "rel_err": 1.0020030041409253e-06
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 12,
    "rows": [
@@ -3503,6 +3623,7 @@
     "ref": 0.2860206853479077,
     "rel_err": 0.0010712499106546659
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 18,
    "rows": [
@@ -3720,20 +3841,40 @@
     "ref": 0.6294861588400759,
     "rel_err": 0.02903464751593405
    },
+   "worst_point_definition_args": {
+    "\u03b8": 0.01,
+    "Ne": 5.0,
+    "t": 10
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "all-satisfied",
      "satisfied": [
       {
-       "hypothesis": "2 \u2264 Ne",
-       "stated_by": [
-        "Calibrator.fstTransientDiscrete_nonneg",
-        "Calibrator.fstTransientDiscrete_le_equilibrium"
+       "theorem": "Calibrator.fstTransientDiscrete_le_equilibrium",
+       "hypotheses": [
+        "0 \u2264 \u03b8",
+        "2 \u2264 Ne",
+        "\u03b8 \u2264 2 * Ne"
+       ]
+      },
+      {
+       "theorem": "Calibrator.fstTransientDiscrete_nonneg",
+       "hypotheses": [
+        "0 \u2264 \u03b8",
+        "2 \u2264 Ne",
+        "\u03b8 \u2264 2 * Ne"
+       ]
+      },
+      {
+       "theorem": "Calibrator.fstTransient_derived_from_recurrence",
+       "hypotheses": [
+        "0 \u2264 \u03b8"
        ]
       }
      ],
      "violated": [],
-     "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -3746,9 +3887,8 @@
     "unmodelled_hypotheses": [
      "0 \u2264 \u03b8"
     ],
-    "unevaluable_hypotheses": [
-     "\u03b8 \u2264 2 * Ne"
-    ]
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 12,
    "rows": [
@@ -3906,50 +4046,85 @@
     "ref": 0.006211180124223602,
     "rel_err": 0.7453416149068324
    },
+   "worst_point_definition_args": {
+    "Ne": 1000.0,
+    "m": 0.01
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "all-satisfied",
      "satisfied": [
       {
-       "hypothesis": "0 < Ne",
-       "stated_by": [
-        "Calibrator.island_fst_in_unit_interval",
-        "Calibrator.more_migration_lower_fst",
-        "Calibrator.islandModelFst_pos",
-        "Calibrator.islandModelFst_lt_one",
-        "Calibrator.islandModelFst_strictAnti_m",
-        "Calibrator.islandModelFst_lt_half_of_one_migrant",
-        "Calibrator.islandModelFst_small_of_large_migration",
-        "Calibrator.fstMigrationMutation_lt_migrationOnly",
-        "Calibrator.asymmetric_fst_difference_sign"
+       "theorem": "Calibrator.asymmetric_fst_difference_sign",
+       "hypotheses": [
+        "0 < Ne"
        ]
       },
       {
-       "hypothesis": "0 < m",
-       "stated_by": [
-        "Calibrator.island_fst_in_unit_interval",
-        "Calibrator.islandModelFst_lt_one",
-        "Calibrator.islandModelFst_strictAnti_Ne",
-        "Calibrator.islandModelFst_lt_half_of_one_migrant",
-        "Calibrator.islandModelFst_small_of_large_migration",
-        "Calibrator.fstMigrationMutation_lt_migrationOnly"
+       "theorem": "Calibrator.fstMigrationMutation_lt_migrationOnly",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m"
        ]
       },
       {
-       "hypothesis": "0 \u2264 m",
-       "stated_by": [
-        "Calibrator.islandModelFst_pos"
+       "theorem": "Calibrator.islandModelFst_lt_half_of_one_migrant",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m",
+        "1 < 4 * Ne * m"
        ]
       },
       {
-       "hypothesis": "1 < 4 * Ne * m",
-       "stated_by": [
-        "Calibrator.islandModelFst_lt_half_of_one_migrant"
+       "theorem": "Calibrator.islandModelFst_lt_one",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m"
+       ]
+      },
+      {
+       "theorem": "Calibrator.islandModelFst_pos",
+       "hypotheses": [
+        "0 < Ne",
+        "0 \u2264 m"
+       ]
+      },
+      {
+       "theorem": "Calibrator.islandModelFst_small_of_large_migration",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m",
+        "k < 4 * Ne * m"
+       ]
+      },
+      {
+       "theorem": "Calibrator.islandModelFst_strictAnti_Ne",
+       "hypotheses": [
+        "0 < m"
+       ]
+      },
+      {
+       "theorem": "Calibrator.islandModelFst_strictAnti_m",
+       "hypotheses": [
+        "0 < Ne"
+       ]
+      },
+      {
+       "theorem": "Calibrator.island_fst_in_unit_interval",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m"
+       ]
+      },
+      {
+       "theorem": "Calibrator.more_migration_lower_fst",
+       "hypotheses": [
+        "0 < Ne"
        ]
       }
      ],
      "violated": [],
-     "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -3962,7 +4137,8 @@
     "unmodelled_hypotheses": [
      "k < 4 * Ne * m"
     ],
-    "unevaluable_hypotheses": []
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 12,
    "rows": [
@@ -4119,6 +4295,7 @@
     "ref": 0.9615329134934582,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 8,
    "rows": [
@@ -4227,50 +4404,85 @@
     "ref": 0.00048016149104841786,
     "rel_err": 0.42332604925085016
    },
+   "worst_point_definition_args": {
+    "Ne": 1000.0,
+    "m": 0.3
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "all-satisfied",
      "satisfied": [
       {
-       "hypothesis": "0 < Ne",
-       "stated_by": [
-        "Calibrator.island_fst_in_unit_interval",
-        "Calibrator.more_migration_lower_fst",
-        "Calibrator.islandModelFst_pos",
-        "Calibrator.islandModelFst_lt_one",
-        "Calibrator.islandModelFst_strictAnti_m",
-        "Calibrator.islandModelFst_lt_half_of_one_migrant",
-        "Calibrator.islandModelFst_small_of_large_migration",
-        "Calibrator.fstMigrationMutation_lt_migrationOnly",
-        "Calibrator.asymmetric_fst_difference_sign"
+       "theorem": "Calibrator.asymmetric_fst_difference_sign",
+       "hypotheses": [
+        "0 < Ne"
        ]
       },
       {
-       "hypothesis": "0 < m",
-       "stated_by": [
-        "Calibrator.island_fst_in_unit_interval",
-        "Calibrator.islandModelFst_lt_one",
-        "Calibrator.islandModelFst_strictAnti_Ne",
-        "Calibrator.islandModelFst_lt_half_of_one_migrant",
-        "Calibrator.islandModelFst_small_of_large_migration",
-        "Calibrator.fstMigrationMutation_lt_migrationOnly"
+       "theorem": "Calibrator.fstMigrationMutation_lt_migrationOnly",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m"
        ]
       },
       {
-       "hypothesis": "0 \u2264 m",
-       "stated_by": [
-        "Calibrator.islandModelFst_pos"
+       "theorem": "Calibrator.islandModelFst_lt_half_of_one_migrant",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m",
+        "1 < 4 * Ne * m"
        ]
       },
       {
-       "hypothesis": "1 < 4 * Ne * m",
-       "stated_by": [
-        "Calibrator.islandModelFst_lt_half_of_one_migrant"
+       "theorem": "Calibrator.islandModelFst_lt_one",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m"
+       ]
+      },
+      {
+       "theorem": "Calibrator.islandModelFst_pos",
+       "hypotheses": [
+        "0 < Ne",
+        "0 \u2264 m"
+       ]
+      },
+      {
+       "theorem": "Calibrator.islandModelFst_small_of_large_migration",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m",
+        "k < 4 * Ne * m"
+       ]
+      },
+      {
+       "theorem": "Calibrator.islandModelFst_strictAnti_Ne",
+       "hypotheses": [
+        "0 < m"
+       ]
+      },
+      {
+       "theorem": "Calibrator.islandModelFst_strictAnti_m",
+       "hypotheses": [
+        "0 < Ne"
+       ]
+      },
+      {
+       "theorem": "Calibrator.island_fst_in_unit_interval",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m"
+       ]
+      },
+      {
+       "theorem": "Calibrator.more_migration_lower_fst",
+       "hypotheses": [
+        "0 < Ne"
        ]
       }
      ],
      "violated": [],
-     "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -4283,7 +4495,8 @@
     "unmodelled_hypotheses": [
      "k < 4 * Ne * m"
     ],
-    "unevaluable_hypotheses": []
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 8,
    "rows": [
@@ -4393,25 +4606,24 @@
     "ref": 223.60679774997897,
     "rel_err": 0.998
    },
+   "worst_point_definition_args": {
+    "Ne": 100.0,
+    "m": 0.001
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "all-satisfied",
      "satisfied": [
       {
-       "hypothesis": "0 < Ne",
-       "stated_by": [
-        "Calibrator.steppingStoneCharacteristicLength_pos"
-       ]
-      },
-      {
-       "hypothesis": "0 < m",
-       "stated_by": [
-        "Calibrator.steppingStoneCharacteristicLength_pos"
+       "theorem": "Calibrator.steppingStoneCharacteristicLength_pos",
+       "hypotheses": [
+        "0 < Ne",
+        "0 < m"
        ]
       }
      ],
      "violated": [],
-     "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -4422,7 +4634,8 @@
      "provenance": "mined from prose; NOT machine-checked"
     },
     "unmodelled_hypotheses": [],
-    "unevaluable_hypotheses": []
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 12,
    "rows": [
@@ -4580,25 +4793,36 @@
     "ref": 0.024390243902439025,
     "rel_err": 0.8782742842676788
    },
+   "worst_point_definition_args": {
+    "L": 4.47213595499958,
+    "d": 1.0
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "all-satisfied",
      "satisfied": [
       {
-       "hypothesis": "0 \u2264 d",
-       "stated_by": [
-        "Calibrator.continuousSteppingStoneFst_nonneg"
+       "theorem": "Calibrator.continuousSteppingStoneFst_decreases_with_L",
+       "hypotheses": [
+        "0 < d"
        ]
       },
       {
-       "hypothesis": "0 < d",
-       "stated_by": [
-        "Calibrator.continuousSteppingStoneFst_decreases_with_L"
+       "theorem": "Calibrator.continuousSteppingStoneFst_increases",
+       "hypotheses": [
+        "0 < L"
+       ]
+      },
+      {
+       "theorem": "Calibrator.continuousSteppingStoneFst_nonneg",
+       "hypotheses": [
+        "0 < L",
+        "0 \u2264 d"
        ]
       }
      ],
      "violated": [],
-     "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -4609,9 +4833,8 @@
      "provenance": "mined from prose; NOT machine-checked"
     },
     "unmodelled_hypotheses": [],
-    "unevaluable_hypotheses": [
-     "0 < L"
-    ]
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 6,
    "rows": [
@@ -4710,6 +4933,7 @@
     "ref": 0.3333333333333333,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 24,
    "rows": [
@@ -5010,6 +5234,7 @@
     "ref": 0.9949900500000001,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 12,
    "rows": [
@@ -5154,11 +5379,15 @@
     "ref": 6.575692833057423,
     "rel_err": 0.9995256640279669
    },
+   "worst_point_definition_args": {
+    "Ne": 10000.0
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "no-constraint",
      "satisfied": [],
-     "violated": []
+     "violated": [],
+     "granularity": "per theorem, via api.satisfies(fq, point, theorem)"
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -5169,7 +5398,8 @@
      "provenance": "mined from prose; NOT machine-checked"
     },
     "unmodelled_hypotheses": [],
-    "unevaluable_hypotheses": []
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 12,
    "rows": [
@@ -5315,26 +5545,35 @@
     "ref": 2.5265668249632505e-05,
     "rel_err": 0.9999734386011123
    },
+   "worst_point_definition_args": {
+    "Ne": 1000.0,
+    "t": 100
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "all-satisfied",
      "satisfied": [
       {
-       "hypothesis": "0 < t",
-       "stated_by": [
-        "Calibrator.larger_ne_more_ld_retained",
-        "Calibrator.different_ne_different_ld_persistence"
+       "theorem": "Calibrator.different_ne_different_ld_persistence",
+       "hypotheses": [
+        "0 < t"
        ]
       },
       {
-       "hypothesis": "2 < Ne",
-       "stated_by": [
-        "Calibrator.ld_retained_decreasing"
+       "theorem": "Calibrator.larger_ne_more_ld_retained",
+       "hypotheses": [
+        "0 < t"
+       ]
+      },
+      {
+       "theorem": "Calibrator.ld_retained_decreasing",
+       "hypotheses": [
+        "2 < Ne"
        ]
       }
      ],
      "violated": [],
-     "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -5345,7 +5584,8 @@
      "provenance": "mined from prose; NOT machine-checked"
     },
     "unmodelled_hypotheses": [],
-    "unevaluable_hypotheses": []
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 8,
    "rows": [
@@ -5462,6 +5702,7 @@
     "ref": 0.9615329134934755,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 8,
    "rows": [
@@ -5570,68 +5811,118 @@
     "ref": 0.45365466812648786,
     "rel_err": 0.5445307104790772
    },
+   "worst_point_definition_args": {
+    "Ne": 1000.0,
+    "c": 1e-06
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
      "verdict": "all-satisfied",
      "satisfied": [
       {
-       "hypothesis": "0 < c",
-       "stated_by": [
-        "Calibrator.bottleneck_excess_ld_pos",
-        "Calibrator.driftLDEquilibrium_strictAnti",
-        "Calibrator.more_severe_bottleneck_more_ld",
-        "Calibrator.excess_ld_decays_after_recovery"
+       "theorem": "Calibrator.bottleneckExcessLD_eq_closedForm",
+       "hypotheses": [
+        "1 - driftLDRetention Ne_b c \u2260 0"
        ]
       },
       {
-       "hypothesis": "c < 1",
-       "stated_by": [
-        "Calibrator.bottleneck_excess_ld_pos",
-        "Calibrator.driftLDEquilibrium_strictAnti",
-        "Calibrator.more_severe_bottleneck_more_ld",
-        "Calibrator.excess_ld_decays_after_recovery"
+       "theorem": "Calibrator.bottleneck_excess_ld_pos",
+       "hypotheses": [
+        "0 < c",
+        "c < 1"
        ]
       },
       {
-       "hypothesis": "Ne \u2260 0",
-       "stated_by": [
-        "Calibrator.driftLDEquilibrium_eq_fstIslandMultiplicativeEquilibrium"
+       "theorem": "Calibrator.driftLDEquilibrium_antitone",
+       "hypotheses": [
+        "0 \u2264 c",
+        "c \u2264 1"
        ]
       },
       {
-       "hypothesis": "0 < Ne",
-       "stated_by": [
-        "Calibrator.driftLDEquilibrium_zero_recomb"
+       "theorem": "Calibrator.driftLDEquilibrium_eq_fstIslandMultiplicativeEquilibrium",
+       "hypotheses": [
+        "Ne \u2260 0"
        ]
       },
       {
-       "hypothesis": "1 \u2264 Ne",
-       "stated_by": [
-        "Calibrator.driftLDEquilibrium_nonneg",
-        "Calibrator.driftLDEquilibrium_le_one"
+       "theorem": "Calibrator.driftLDEquilibrium_isFixedPoint",
+       "hypotheses": [
+        "1 - driftLDRetention Ne c \u2260 0"
        ]
       },
       {
-       "hypothesis": "0 \u2264 c",
-       "stated_by": [
-        "Calibrator.driftLDEquilibrium_nonneg",
-        "Calibrator.driftLDEquilibrium_le_one",
-        "Calibrator.driftLDEquilibrium_antitone",
-        "Calibrator.excess_ld_nonneg"
+       "theorem": "Calibrator.driftLDEquilibrium_le_one",
+       "hypotheses": [
+        "1 \u2264 Ne",
+        "0 \u2264 c",
+        "c \u2264 1"
        ]
       },
       {
-       "hypothesis": "c \u2264 1",
-       "stated_by": [
-        "Calibrator.driftLDEquilibrium_nonneg",
-        "Calibrator.driftLDEquilibrium_le_one",
-        "Calibrator.driftLDEquilibrium_antitone",
-        "Calibrator.excess_ld_nonneg"
+       "theorem": "Calibrator.driftLDEquilibrium_mul_one_sub_retention",
+       "hypotheses": [
+        "1 - driftLDRetention Ne c \u2260 0"
+       ]
+      },
+      {
+       "theorem": "Calibrator.driftLDEquilibrium_nonneg",
+       "hypotheses": [
+        "1 \u2264 Ne",
+        "0 \u2264 c",
+        "c \u2264 1"
+       ]
+      },
+      {
+       "theorem": "Calibrator.driftLDEquilibrium_strictAnti",
+       "hypotheses": [
+        "0 < c",
+        "c < 1"
+       ]
+      },
+      {
+       "theorem": "Calibrator.driftLDEquilibrium_zero_recomb",
+       "hypotheses": [
+        "0 < Ne"
+       ]
+      },
+      {
+       "theorem": "Calibrator.driftLDTrajectory_closedForm",
+       "hypotheses": [
+        "1 - driftLDRetention Ne c \u2260 0"
+       ]
+      },
+      {
+       "theorem": "Calibrator.excessLDAfterBottleneck_closedForm",
+       "hypotheses": [
+        "1 - driftLDRetention N_b c \u2260 0",
+        "1 - driftLDRetention N_r c \u2260 0"
+       ]
+      },
+      {
+       "theorem": "Calibrator.excess_ld_decays_after_recovery",
+       "hypotheses": [
+        "0 < c",
+        "c < 1"
+       ]
+      },
+      {
+       "theorem": "Calibrator.excess_ld_nonneg",
+       "hypotheses": [
+        "0 \u2264 c",
+        "c \u2264 1"
+       ]
+      },
+      {
+       "theorem": "Calibrator.more_severe_bottleneck_more_ld",
+       "hypotheses": [
+        "0 < c",
+        "c < 1"
        ]
       }
      ],
      "violated": [],
-     "note": "constraints.hypotheses is a UNION over mentioning theorems, not a conjunctive domain; a violated entry means the point is outside THAT theorem's scope, not outside the definition's"
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -5647,7 +5938,8 @@
      "1 - driftLDRetention N_b c \u2260 0",
      "1 - driftLDRetention N_r c \u2260 0"
     ],
-    "unevaluable_hypotheses": []
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 5,
    "rows": [
@@ -5728,6 +6020,7 @@
     "ref": 0.7139793146520865,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 4,
    "rows": [
@@ -5800,6 +6093,7 @@
     "ref": 0.8989999999998843,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 12,
    "rows": [
@@ -5946,6 +6240,7 @@
     "ref": 0.1002,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 24,
    "rows": [
@@ -6247,11 +6542,25 @@
     "ref": 0.019607843137254943,
     "rel_err": 0.4395604395604412
    },
+   "worst_point_definition_args": {
+    "\u03b1": 0.8,
+    "fst_AB": 0.27472527472527464
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "no-constraint",
-     "satisfied": [],
-     "violated": []
+     "verdict": "all-satisfied",
+     "satisfied": [
+      {
+       "theorem": "Calibrator.admixed_fst_smaller",
+       "hypotheses": [
+        "0 < \u03b1",
+        "\u03b1 < 1",
+        "0 < fst_AB"
+       ]
+      }
+     ],
+     "violated": [],
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -6265,9 +6574,8 @@
      "0 < \u03b1",
      "\u03b1 < 1"
     ],
-    "unevaluable_hypotheses": [
-     "0 < fst_AB"
-    ]
+    "unevaluable_theorems": [],
+    "union_satisfied": true
    },
    "n_grid": 16,
    "rows": [
@@ -6460,6 +6768,7 @@
     "ref": 0.9615384615384615,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 4,
    "rows": [
@@ -6528,6 +6837,7 @@
     "ref": 0.9615384615384615,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 4,
    "rows": [
@@ -6596,6 +6906,7 @@
     "ref": 0.9615384615384615,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 4,
    "rows": [
@@ -6664,6 +6975,7 @@
     "ref": 0.0025,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 4,
    "rows": [
@@ -6737,6 +7049,7 @@
     "ref": 0.16666666666666663,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 9,
    "rows": [
@@ -6862,6 +7175,7 @@
     "ref": 0.00039984006397441024,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 12,
    "rows": [
@@ -7004,6 +7318,7 @@
     "ref": 0.008264462809917356,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 4,
    "rows": [
@@ -7072,6 +7387,7 @@
     "ref": 0.05,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 6,
    "rows": [
@@ -7164,11 +7480,52 @@
     "ref": 1.0,
     "rel_err": 0.5833333333333334
    },
+   "worst_point_definition_args": {
+    "fstSource": 0.6666666666666666,
+    "fstTarget": 0.2
+   },
    "worst_point_admissibility": {
     "theorem_proved": {
-     "verdict": "no-constraint",
-     "satisfied": [],
-     "violated": []
+     "verdict": "some-violated",
+     "satisfied": [
+      {
+       "theorem": "Calibrator.neutralAFBenchmarkRatio_cannot_reach_measured",
+       "hypotheses": [
+        "0 \u2264 fstTarget"
+       ]
+      },
+      {
+       "theorem": "Calibrator.neutralAFBenchmarkRatio_le_inv_one_sub_source",
+       "hypotheses": [
+        "0 \u2264 fstTarget",
+        "fstSource < 1"
+       ]
+      },
+      {
+       "theorem": "Calibrator.neutralAFBenchmarkRatio_nonneg",
+       "hypotheses": [
+        "fstSource < 1",
+        "fstTarget \u2264 1"
+       ]
+      },
+      {
+       "theorem": "Calibrator.neutralAFSharedLDBenchmarkRatio_lt_neutralAFBenchmarkRatio",
+       "hypotheses": [
+        "fstSource < 1",
+        "fstTarget < 1"
+       ]
+      }
+     ],
+     "violated": [
+      {
+       "theorem": "Calibrator.neutralAFBenchmarkRatio_lt_one",
+       "hypotheses": [
+        "fstSource < 1",
+        "fstSource < fstTarget"
+       ]
+      }
+     ],
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
     },
     "docstring_implied": {
      "verdict": "declared-range",
@@ -7179,13 +7536,8 @@
      "provenance": "mined from prose; NOT machine-checked"
     },
     "unmodelled_hypotheses": [],
-    "unevaluable_hypotheses": [
-     "0 \u2264 fstTarget",
-     "fstSource < 1",
-     "fstTarget \u2264 1",
-     "fstSource < fstTarget",
-     "fstTarget < 1"
-    ]
+    "unevaluable_theorems": [],
+    "union_satisfied": false
    },
    "n_grid": 4,
    "rows": [
@@ -7265,6 +7617,7 @@
     "ref": 0.0,
     "rel_err": 0.0
    },
+   "worst_point_definition_args": null,
    "worst_point_admissibility": null,
    "n_grid": 12,
    "rows": [
@@ -7375,6 +7728,585 @@
      "lean": 0.65,
      "ref": 0.65,
      "rel_err": 0.0
+    }
+   ]
+  },
+  "hetRecurrence-at-mutation-drift-balance": {
+   "definition": "Calibrator.hetRecurrence",
+   "definition_source": "Calibrator/PopulationGeneticsFoundations.lean:1090",
+   "definition_checksum": "sha256:d60d619c453e7c7134283492b5bf2813",
+   "translator": "extract",
+   "claim": "MODEL, THE CLUSTER ROOT: a population AT equilibrium loses no heterozygosity, where the closed-population recurrence predicts 86%",
+   "model_definition": "closed population, NO mutation: H(t) = H0 (1 - 1/2Ne)^t",
+   "model_reference": "same Ne, same t, but at mutation-drift balance: start at H* and run the exact infinite-alleles trajectory, which stays at H*",
+   "reference": "refs.iam_het_trajectory started from refs.iam_het_equilibrium",
+   "tol": 1e-09,
+   "verdict": "MODEL",
+   "kind": "model",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5"
+   ],
+   "canfail_clause": "t must reach order 2Ne. At t << 2Ne the recurrence has barely decayed and both sides sit near 1.0 -- the both-sides-collapse-to-1 geometry exactly. The mu axis is also required: it moves the reference's equilibrium but not the recurrence, which has no mu argument at all.",
+   "note": "Both sides are RETENTION RATIOS, so the comparison is scale-free. The recurrence is correct for what it says -- a closed population with no mutation -- and the reference is correct for a population at mutation-drift balance. They are different populations, not two calibrations of one quantity. Fixing the algebra would change nothing.",
+   "max_rel_err": 0.8647323900439459,
+   "min_rel_err": 0.09518521015967307,
+   "worst_point": {
+    "params": {
+     "Ne": 1000.0,
+     "mu": 1e-06,
+     "t": 4000
+    },
+    "lean": 0.13526760995605414,
+    "ref": 1.0,
+    "rel_err": 0.8647323900439459
+   },
+   "worst_point_definition_args": {
+    "Ne": 1000.0,
+    "H_0": 0.0039840696973822975,
+    "t": 4000
+   },
+   "worst_point_admissibility": {
+    "theorem_proved": {
+     "verdict": "all-satisfied",
+     "satisfied": [
+      {
+       "theorem": "Calibrator.fstDerived_eq_het_loss",
+       "hypotheses": [
+        "H\u2080 \u2260 0"
+       ]
+      }
+     ],
+     "violated": [],
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
+    },
+    "docstring_implied": {
+     "verdict": "declared-range",
+     "declared_lo": 0.0,
+     "declared_hi": 1.0,
+     "declared_kind": "F_ST",
+     "units": "generation",
+     "provenance": "mined from prose; NOT machine-checked"
+    },
+    "unmodelled_hypotheses": [],
+    "unevaluable_theorems": [],
+    "union_satisfied": true
+   },
+   "n_grid": 9,
+   "rows": [
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-06,
+      "t": 200
+     },
+     "lean": 0.9048147898403253,
+     "ref": 1.0,
+     "rel_err": 0.09518521015967474
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-06,
+      "t": 1000
+     },
+     "lean": 0.6064548228400937,
+     "ref": 1.0,
+     "rel_err": 0.39354517715990633
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-06,
+      "t": 4000
+     },
+     "lean": 0.13526760995605414,
+     "ref": 1.0,
+     "rel_err": 0.8647323900439459
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05,
+      "t": 200
+     },
+     "lean": 0.904814789840326,
+     "ref": 1.0,
+     "rel_err": 0.09518521015967396
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05,
+      "t": 1000
+     },
+     "lean": 0.6064548228400951,
+     "ref": 1.0,
+     "rel_err": 0.3935451771599049
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05,
+      "t": 4000
+     },
+     "lean": 0.13526760995605486,
+     "ref": 1.0,
+     "rel_err": 0.8647323900439452
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001,
+      "t": 200
+     },
+     "lean": 0.9048147898403269,
+     "ref": 1.0,
+     "rel_err": 0.09518521015967307
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001,
+      "t": 1000
+     },
+     "lean": 0.6064548228400957,
+     "ref": 1.0,
+     "rel_err": 0.39354517715990434
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001,
+      "t": 4000
+     },
+     "lean": 0.1352676099560542,
+     "ref": 1.0,
+     "rel_err": 0.8647323900439459
+    }
+   ]
+  },
+  "ldRecurrence-drops-drift": {
+   "definition": "Calibrator.ldRecurrence",
+   "definition_source": "Calibrator/LDDecayTheory.lean:937",
+   "definition_checksum": "sha256:2fa8259e31d6c55345d27131bea6503f",
+   "translator": "extract",
+   "claim": "INTERNAL: D0(1-r)^t omits the drift factor that ldRetentionPerGen carries",
+   "model_definition": "D(t) = D0 (1-r)^t; no Ne argument",
+   "model_reference": "ldRetentionPerGen(r, Ne)^t = [(1-r)(1-1/2Ne)]^t [same file]",
+   "reference": "Calibrator.ldRetentionPerGen ** t",
+   "tol": 1e-09,
+   "verdict": "INTERNAL-INCONSISTENT",
+   "kind": "internal",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "Ne must be SMALL (100) and t large. At Ne=10000 the drift factor is 1-5e-5 per generation and the two agree to <3% over 500 generations, so a large-Ne-only grid cannot fail.",
+   "note": "ldRecurrence is the Ne -> infinity limit of ldAfterGenerations in the same file. Under Hill & Robertson the drift factor is not optional: E[D] decays by (1-r)(1-1/2Ne) per generation, not (1-r).",
+   "max_rel_err": 0.9184281385597234,
+   "min_rel_err": 0.0004998875149986315,
+   "worst_point": {
+    "params": {
+     "r": 0.0001,
+     "Ne": 100.0,
+     "t": 500
+    },
+    "lean": 0.9512270462715811,
+    "ref": 0.077593360816709,
+    "rel_err": 0.9184281385597234
+   },
+   "worst_point_definition_args": {
+    "r": 0.0001,
+    "D_0": 1.0,
+    "t": 500
+   },
+   "worst_point_admissibility": {
+    "theorem_proved": {
+     "verdict": "all-satisfied",
+     "satisfied": [
+      {
+       "theorem": "Calibrator.ld_decay_ratio_decreasing",
+       "hypotheses": [
+        "0 < r",
+        "r < 1",
+        "0 < D\u2080"
+       ]
+      },
+      {
+       "theorem": "Calibrator.ld_recurrence_decreasing",
+       "hypotheses": [
+        "0 < r",
+        "r < 1",
+        "D\u2080 \u2260 0"
+       ]
+      },
+      {
+       "theorem": "Calibrator.ld_recurrence_monotone_decay",
+       "hypotheses": [
+        "0 < r",
+        "r < 1",
+        "0 < D\u2080"
+       ]
+      },
+      {
+       "theorem": "Calibrator.ld_recurrence_ratio_eq_decay_factor",
+       "hypotheses": [
+        "D\u2080 \u2260 0"
+       ]
+      }
+     ],
+     "violated": [],
+     "note": "a violated entry means the point is outside THAT theorem's scope, not outside the definition's. constraints.hypotheses is a UNION over mentioning theorems and is never used as a domain; `union_satisfied` is recorded as a label only."
+    },
+    "docstring_implied": {
+     "verdict": "no-constraint"
+    },
+    "unmodelled_hypotheses": [],
+    "unevaluable_theorems": [],
+    "union_satisfied": true
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "r": 0.0,
+      "Ne": 100.0,
+      "t": 10
+     },
+     "lean": 1.0,
+     "ref": 0.9511101304657719,
+     "rel_err": 0.048889869534228136
+    },
+    {
+     "params": {
+      "r": 0.0,
+      "Ne": 100.0,
+      "t": 500
+     },
+     "lean": 1.0,
+     "ref": 0.08157186144027832,
+     "rel_err": 0.9184281385597217
+    },
+    {
+     "params": {
+      "r": 0.0,
+      "Ne": 10000.0,
+      "t": 10
+     },
+     "lean": 1.0,
+     "ref": 0.9995001124850014,
+     "rel_err": 0.0004998875149986315
+    },
+    {
+     "params": {
+      "r": 0.0,
+      "Ne": 10000.0,
+      "t": 500
+     },
+     "lean": 1.0,
+     "ref": 0.9753093024395111,
+     "rel_err": 0.024690697560488917
+    },
+    {
+     "params": {
+      "r": 0.0001,
+      "Ne": 100.0,
+      "t": 10
+     },
+     "lean": 0.9990004498800211,
+     "ref": 0.9501594482207513,
+     "rel_err": 0.048889869534228546
+    },
+    {
+     "params": {
+      "r": 0.0001,
+      "Ne": 100.0,
+      "t": 500
+     },
+     "lean": 0.9512270462715811,
+     "ref": 0.077593360816709,
+     "rel_err": 0.9184281385597234
+    },
+    {
+     "params": {
+      "r": 0.0001,
+      "Ne": 10000.0,
+      "t": 10
+     },
+     "lean": 0.9990004498800211,
+     "ref": 0.9985010620276478,
+     "rel_err": 0.0004998875149989495
+    },
+    {
+     "params": {
+      "r": 0.0001,
+      "Ne": 10000.0,
+      "t": 500
+     },
+     "lean": 0.9512270462715811,
+     "ref": 0.927740586960718,
+     "rel_err": 0.02469069756050386
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 100.0,
+      "t": 10
+     },
+     "lean": 0.9043820750088043,
+     "ref": 0.8601669533525294,
+     "rel_err": 0.048889869534228116
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 100.0,
+      "t": 500
+     },
+     "lean": 0.006570483042414605,
+     "ref": 0.0005359665323315409,
+     "rel_err": 0.9184281385597219
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 10000.0,
+      "t": 10
+     },
+     "lean": 0.9043820750088043,
+     "ref": 0.9039299857007186,
+     "rel_err": 0.0004998875149989138
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 10000.0,
+      "t": 500
+     },
+     "lean": 0.006570483042414605,
+     "ref": 0.0064082532327878906,
+     "rel_err": 0.02469069756050937
+    }
+   ]
+  },
+  "hetTrajectory-vs-exact-iam": {
+   "definition": "Calibrator.hetTrajectory",
+   "definition_source": "Calibrator/PortabilityDrift.lean:443",
+   "definition_checksum": "sha256:27e4c6fa273222d1cff0af1a6d486822",
+   "translator": "extract",
+   "claim": "PortabilityDrift's trajectory reproduces the exact IAM trajectory",
+   "model_definition": "iterated hetStepWithMutation",
+   "model_reference": "exact IAM recursion",
+   "reference": "refs.iam_het_trajectory",
+   "tol": 0.01,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5"
+   ],
+   "canfail_clause": "H0 must differ from H*, and t must not be so large that both sides have converged -- at t -> inf this degenerates into the equilibrium check and cannot see a wrong eigenvalue.",
+   "note": "",
+   "max_rel_err": 0.0010712499106546659,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "mu": 0.001,
+     "t": 10000
+    },
+    "lean": 0.28571428571428337,
+    "ref": 0.2860206853479077,
+    "rel_err": 0.0010712499106546659
+   },
+   "worst_point_definition_args": null,
+   "worst_point_admissibility": null,
+   "n_grid": 18,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-05,
+      "t": 100
+     },
+     "lean": 0.0015754819992516893,
+     "ref": 0.0015754813057283247,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-05,
+      "t": 1000
+     },
+     "lean": 0.003958081456613332,
+     "ref": 0.003958137977959461,
+     "rel_err": 1.42797816660789e-05
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-05,
+      "t": 10000
+     },
+     "lean": 0.003984063745019868,
+     "ref": 0.0039841232686591566,
+     "rel_err": 1.4940210248158997e-05
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.0001,
+      "t": 100
+     },
+     "lean": 0.015626365165267855,
+     "ref": 0.015626300511084802,
+     "rel_err": 4.137506219052888e-06
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.0001,
+      "t": 1000
+     },
+     "lean": 0.0382522220648358,
+     "ref": 0.03825752727353697,
+     "rel_err": 0.00013867097743248998
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.0001,
+      "t": 10000
+     },
+     "lean": 0.03846153846153788,
+     "ref": 0.03846708650654018,
+     "rel_err": 0.00014422836523785782
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.001,
+      "t": 100
+     },
+     "lean": 0.14418158132689923,
+     "ref": 0.14417923520257148,
+     "rel_err": 1.6272011349614814e-05
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.001,
+      "t": 1000
+     },
+     "lean": 0.28546008284339813,
+     "ref": 0.2857633765471764,
+     "rel_err": 0.0010613456050347647
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.001,
+      "t": 10000
+     },
+     "lean": 0.28571428571428337,
+     "ref": 0.2860206853479077,
+     "rel_err": 0.0010712499106546659
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05,
+      "t": 100
+     },
+     "lean": 0.0019493835556824422,
+     "ref": 0.0019493747753143165,
+     "rel_err": 4.504176769173576e-06
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05,
+      "t": 1000
+     },
+     "lean": 0.015598455909476837,
+     "ref": 0.015598449849407357,
+     "rel_err": 3.8850444649040105e-07
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05,
+      "t": 10000
+     },
+     "lean": 0.03824964967376644,
+     "ref": 0.038250179945160674,
+     "rel_err": 1.386323920547075e-05
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001,
+      "t": 100
+     },
+     "lean": 0.019322581179575717,
+     "ref": 0.019321719085161504,
+     "rel_err": 4.461590334134996e-05
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001,
+      "t": 1000
+     },
+     "lean": 0.1438675432850402,
+     "ref": 0.143867343166011,
+     "rel_err": 1.3909949710646146e-06
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001,
+      "t": 10000
+     },
+     "lean": 0.28545438584324817,
+     "ref": 0.28548468674373695,
+     "rel_err": 0.00010613844418204162
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.001,
+      "t": 100
+     },
+     "lean": 0.17715436832822554,
+     "ref": 0.17708262175800937,
+     "rel_err": 0.00040499464333407746
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.001,
+      "t": 1000
+     },
+     "lean": 0.7345372348800305,
+     "ref": 0.7346262336764668,
+     "rel_err": 0.0001211484049390865
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.001,
+      "t": 10000
+     },
+     "lean": 0.7999999999892492,
+     "ref": 0.8002400319665854,
+     "rel_err": 0.0002999499746924234
     }
    ]
   }

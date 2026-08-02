@@ -773,3 +773,81 @@ check(
 # reference available without simulation is a loose upper bound, and a bound
 # with a tolerance wide enough to hold is a check that cannot fail.  It is
 # queued for the stochastic tier instead (see HEAVY_QUEUE.md).
+
+
+# --- 11. The drift/LD recurrences (available since extract added ℕ-recursion) ---
+
+check(
+    id="hetRecurrence-at-mutation-drift-balance",
+    fqn="Calibrator.hetRecurrence",
+    claim="MODEL, THE CLUSTER ROOT: a population AT equilibrium loses no "
+          "heterozygosity, where the closed-population recurrence predicts 86%",
+    model_lean="closed population, NO mutation: H(t) = H0 (1 - 1/2Ne)^t",
+    model_ref="same Ne, same t, but at mutation-drift balance: start at H* and "
+              "run the exact infinite-alleles trajectory, which stays at H*",
+    reference="refs.iam_het_trajectory started from refs.iam_het_equilibrium",
+    grid=grid(Ne=[1000.0], mu=[1e-6, 1e-5, 1e-4], t=[200, 1000, 4000]),
+    lean=lambda D, Ne, mu, t: (
+        D["hetRecurrence"](Ne, refs.iam_het_equilibrium(Ne, mu), t)
+        / refs.iam_het_equilibrium(Ne, mu)
+    ),
+    ref=lambda Ne, mu, t: (
+        refs.iam_het_trajectory(Ne, mu, refs.iam_het_equilibrium(Ne, mu), t)
+        / refs.iam_het_equilibrium(Ne, mu)
+    ),
+    kind="model",
+    note=(
+        "Both sides are RETENTION RATIOS, so the comparison is scale-free. The "
+        "recurrence is correct for what it says -- a closed population with no "
+        "mutation -- and the reference is correct for a population at "
+        "mutation-drift balance. They are different populations, not two "
+        "calibrations of one quantity. Fixing the algebra would change nothing."
+    ),
+    canfail_clause=(
+        "t must reach order 2Ne. At t << 2Ne the recurrence has barely decayed "
+        "and both sides sit near 1.0 -- the both-sides-collapse-to-1 geometry "
+        "exactly. The mu axis is also required: it moves the reference's "
+        "equilibrium but not the recurrence, which has no mu argument at all."
+    ),
+)
+
+check(
+    id="ldRecurrence-drops-drift",
+    fqn="Calibrator.ldRecurrence",
+    claim="INTERNAL: D0(1-r)^t omits the drift factor that ldRetentionPerGen carries",
+    model_lean="D(t) = D0 (1-r)^t; no Ne argument",
+    model_ref="ldRetentionPerGen(r, Ne)^t = [(1-r)(1-1/2Ne)]^t [same file]",
+    reference="Calibrator.ldRetentionPerGen ** t",
+    grid=grid(r=[0.0, 1e-4, 1e-2], Ne=[100.0, 10000.0], t=[10, 500]),
+    lean=lambda D, r, Ne, t: D["ldRecurrence"](r, 1.0, t),
+    ref=lambda D, r, Ne, t: D["ldRetentionPerGen"](r, Ne) ** t,
+    kind="internal",
+    note=(
+        "ldRecurrence is the Ne -> infinity limit of ldAfterGenerations in the "
+        "same file. Under Hill & Robertson the drift factor is not optional: "
+        "E[D] decays by (1-r)(1-1/2Ne) per generation, not (1-r)."
+    ),
+    canfail_clause=(
+        "Ne must be SMALL (100) and t large. At Ne=10000 the drift factor is "
+        "1-5e-5 per generation and the two agree to <3% over 500 generations, "
+        "so a large-Ne-only grid cannot fail."
+    ),
+)
+
+check(
+    id="hetTrajectory-vs-exact-iam",
+    fqn="Calibrator.hetTrajectory",
+    claim="PortabilityDrift's trajectory reproduces the exact IAM trajectory",
+    model_lean="iterated hetStepWithMutation",
+    model_ref="exact IAM recursion",
+    reference="refs.iam_het_trajectory",
+    grid=grid(Ne=[100.0, 1000.0], mu=[1e-5, 1e-4, 1e-3], t=[100, 1000, 10000]),
+    lean=lambda D, Ne, mu, t: D["hetTrajectory"](Ne, mu, 0.0, t),
+    ref=lambda Ne, mu, t: refs.iam_het_trajectory(Ne, mu, 0.0, t),
+    tol=1e-2,
+    canfail_clause=(
+        "H0 must differ from H*, and t must not be so large that both sides "
+        "have converged -- at t -> inf this degenerates into the equilibrium "
+        "check and cannot see a wrong eigenvalue."
+    ),
+)

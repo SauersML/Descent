@@ -24,7 +24,67 @@ if EXTRACT not in sys.path:
 import api  # noqa: E402
 
 
+def _eval(fn, D, params):
+    """Call a check's lean/ref side, passing the corpus table iff it wants one."""
+    import inspect
+
+    names = list(inspect.signature(fn).parameters)
+    return fn(D, **params) if (names and names[0] == "D") else fn(**params)
+
+
+def battery_points() -> dict[str, list[tuple]]:
+    """Every (definition, argument tuple) the differential battery evaluates.
+
+    Zero-argument entry point for external harnesses -- extract's
+    `test_parser.py` calls this at emit time so the cross-check runs whenever
+    the definition table is regenerated, which is when it matters most.
+    Returns bare Lean name -> sorted list of positional argument tuples.
+
+    Deliberately derived by RECORDING an actual battery run rather than by
+    listing points by hand: a hand-maintained list silently stops covering new
+    checks, and a cross-check that quietly stops covering things is the failure
+    mode this whole exercise is about.
+    """
+    import collections
+
+    import checks
+
+    D, _prov, _unavail = corpus.load()
+    pts = collections.defaultdict(set)
+
+    class Recorder(dict):
+        def __getitem__(self, k):
+            f = D[k]
+
+            def w(*a, **kw):
+                pts[k].add(tuple(a))
+                return f(*a, **kw)
+
+            return w
+
+    R = Recorder()
+    for chk in checks.CHECKS:
+        for p in chk.grid:
+            for fn in (chk.lean, chk.ref):
+                try:
+                    _eval(fn, R, p)
+                except Exception:
+                    pass
+    return {k: sorted(v) for k, v in pts.items()}
+
+
+def battery_names() -> list[str]:
+    """The definitions the battery exercises; pairs with `battery_points()`."""
+    return sorted(battery_points())
+
+
 def _resolve(name: str) -> str | None:
+    # Honour the same explicit pins corpus.py uses. Without this, every
+    # ambiguous short name silently drops out of the comparison -- and the
+    # ambiguous names are precisely the ones most in need of it, since a
+    # mis-bound overload is the failure this cross-check exists to catch.
+    if name in corpus.FQ_OVERRIDES:
+        return corpus.FQ_OVERRIDES[name]
     try:
         return api.resolve(name)
     except Exception:

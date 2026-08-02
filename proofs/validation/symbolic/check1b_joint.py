@@ -22,6 +22,7 @@ from pathlib import Path
 import sympy as sp
 
 import leansym as L
+import shared
 import fixedpoint as FP
 from check1_fixedpoints import EQ_NAME, _split_app_args
 
@@ -30,11 +31,11 @@ HERE = Path(__file__).parent
 
 def run():
     decls = json.load(open(HERE / "decls.json"))
-    table = L.build_table(decls)
+    table = shared.build_table()
     conv = L.Converter(table)
-    defs = {d["name"]: d for d in decls if d["kind"] == "def"}
-    eq_names = {d["name"] for d in decls
-                if d["kind"] == "def" and d["body"] and EQ_NAME.search(d["name"])}
+    defs = {d["name"]: d for d in shared.def_records()}
+    eq_names = {d["name"] for d in shared.def_records()
+                if d["body"] and EQ_NAME.search(d["name"])}
 
     # guard theorems, grouped by module
     guards = defaultdict(list)

@@ -35,6 +35,7 @@ from pathlib import Path
 import sympy as sp
 
 import leansym as L
+import shared
 import hyps as H
 import fixedpoint as FP
 
@@ -54,7 +55,7 @@ NOT_A_REST_POINT = re.compile(r"(_from_|From[A-Z]|Ratio$|Scalars$|Shift$|Gap$)")
 
 def load():
     decls = json.load(open(HERE / "decls.json"))
-    return decls, L.build_table(decls)
+    return decls, shared.build_table()
 
 
 def backticked(doc: str) -> list[str]:
@@ -258,8 +259,10 @@ def run():
             base = t["name"][: -len("_isFixedPoint")].split(".")[-1]
             guards.setdefault(base, t)
 
-    targets = [d for d in decls if d["kind"] == "def" and d["body"]
-               and EQ_NAME.search(d["name"])]
+    # definitions from the shared parse; theorems still from the local one,
+    # because the shared API does not expose theorem statements yet
+    sdefs = shared.def_records()
+    targets = [d for d in sdefs if d["body"] and EQ_NAME.search(d["name"])]
     equilibrium_names = {d["name"] for d in targets}
 
     results = []

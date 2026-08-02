@@ -100,6 +100,58 @@ approx("Real.sqrt of a negative is 0", __import__("lean_rt").rsqrt(-1.0), 0.0)
 approx("Real.log 0 is 0", __import__("lean_rt").rlog(0.0), 0.0)
 approx("Real.log of a negative is log|x|", __import__("lean_rt").rlog(-math.e), 1.0)
 
+# ---- cross-validation against the independent leanexpr extraction ---------
+#
+# The strongest evidence either translator is correct.  `leanexpr` (in
+# validation/differential/) was written separately from the same Lean sources
+# and uses the OPPOSITE arithmetic convention (strict Python, raising where
+# Mathlib returns 0).  Agreement at every point means a transcription error
+# would have to be the same error in both.
+#
+# Two failure modes are asserted against, per differential's advice:
+#   - any disagreement, and
+#   - any DROP in how many definitions are compared.  A definition quietly
+#     leaving the comparison is how the hetDecayFactor overload bug hid.
+
+CROSSVALIDATE_FLOOR = 43        # raise this when the battery grows; never lower it
+
+def cross_validate():
+    diffdir = str(HERE.parent / "differential")
+    if not pathlib.Path(diffdir, "crossvalidate.py").exists():
+        print("cross-validation: harness absent, skipped")
+        return
+    sys.path.insert(0, diffdir)
+    try:
+        import crossvalidate
+        import corpus
+    except Exception as e:                                       # noqa: BLE001
+        print(f"cross-validation: could not import harness ({e!r}), skipped")
+        return
+    points = getattr(corpus, "CROSSCHECK_POINTS", None)
+    if points is None:
+        battery = getattr(crossvalidate, "battery_points", None)
+        points = battery() if callable(battery) else None
+    if not points:
+        print("cross-validation: harness exposes no argument tuples, skipped")
+        return
+    agree, disagree, unavailable = crossvalidate.compare(list(points), points)
+    n = len(agree)
+    print(f"cross-validated against leanexpr: {n} definitions, "
+          f"{sum(a[2] for a in agree)} points, {len(disagree)} disagreements")
+    if disagree:
+        for row in disagree[:5]:
+            failures.append(f"cross-validation disagreement: {row}")
+    if n < CROSSVALIDATE_FLOOR:
+        failures.append(
+            f"cross-validated definition count DROPPED to {n}, floor is "
+            f"{CROSSVALIDATE_FLOOR}. A definition leaving the comparison is as "
+            f"serious as a disagreement -- check for a name that stopped "
+            f"resolving. unavailable={unavailable[:5]}")
+
+
+cross_validate()
+
+
 # ---- recall ---------------------------------------------------------------
 
 import re                                                       # noqa: E402

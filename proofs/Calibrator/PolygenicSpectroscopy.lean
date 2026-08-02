@@ -327,7 +327,13 @@ end ClosedForm
 Compare the Gaussian value `c_G = 2 - gamma - log 2 = 0.7296...`: the two differ, so
 `Calibrator.Condensation` already separates a balanced hard-called locus from its
 Gaussian surrogate. The drift mismatch at the most benign possible allele frequency is
-about `5%` — small, but the separation is a statement about limits, not about size. -/
+about `5%` — small, but the separation is a statement about limits, not about size.
+
+That comparison is proved, not merely asserted: see
+`hweMellinDrift_half_lt_condensationConstant`, which rests on
+`Calibrator.Condensation.log_two_lt_condensationConstant`. It was for a long time stated
+here in prose while being underivable, because `condensationConstant_bounds` brackets
+`c_G` in `(0.640, 0.807)` and that interval straddles `log 2`. -/
 @[simp] theorem hweMellinDrift_half : hweMellinDrift (1 / 2) = Real.log 2 := by
   unfold hweMellinDrift
   norm_num
@@ -1116,27 +1122,28 @@ theorem balanced_locus_symmetric_component
     rw [hhalf]
     exact hweMellinJetVariance_half
 
-/-- **Drift separation at the balanced locus, conditional on a sharper Gaussian
-constant.**
+/-- **Drift separation at the balanced locus, now proved outright.**
 
 `c(1/2) = log 2 = 0.69315` and `c_G = 2 - gamma - log 2 = 0.72964` differ, so the drift
-does separate a balanced hard-called locus from its Gaussian surrogate. But this is *not*
-currently provable from `condensationConstant_bounds`, which gives only
-`0.640 < c_G < 0.807` — an interval that straddles `log 2`. The separation is therefore
-stated with the missing numeric input as a named hypothesis rather than asserted.
+does separate a balanced hard-called locus from its Gaussian surrogate — and separates it
+strictly downward, `c(1/2) < c_G`, so a balanced locus is *more* condensation-prone than
+its Gaussian surrogate, with a slightly larger critical degree.
 
-Sharpening `condensationConstant_bounds` to exclude `log 2` lives in
-`Calibrator.Condensation` and would discharge `hsharp` outright. Until then, the claim
-made in prose at `hweMellinDrift_half` — that the balanced locus is already separated by
-drift — is an arithmetic fact that this development does not yet prove. -/
-theorem balanced_locus_drift_separates
-    (hsharp : (0.72 : ℝ) < condensationConstant) :
-    hweMellinDrift (1 / 2) ≠ condensationConstant := by
+This was asserted in prose at `hweMellinDrift_half` long before it was provable:
+`condensationConstant_bounds` gives only `0.640 < c_G < 0.807`, an interval that
+straddles `log 2`, so nothing in the development established it. The gap is now closed by
+`Calibrator.Condensation.log_two_lt_condensationConstant`, which takes the
+Euler-Mascheroni bound out to `H_16 - log 16` and lands at `c_G > 0.69871`. -/
+theorem hweMellinDrift_half_lt_condensationConstant :
+    hweMellinDrift (1 / 2) < condensationConstant := by
   rw [hweMellinDrift_half]
-  have hl2 : Real.log 2 < (0.6931471808 : ℝ) := Real.log_two_lt_d9
-  intro hEq
-  rw [hEq] at hl2
-  linarith
+  exact log_two_lt_condensationConstant
+
+/-- The same fact in the form the separation argument uses: the balanced locus is not
+observationally equal to its Gaussian surrogate in the drift. -/
+theorem balanced_locus_drift_separates :
+    hweMellinDrift (1 / 2) ≠ condensationConstant :=
+  ne_of_lt hweMellinDrift_half_lt_condensationConstant
 
 /-!
 ## 5. Where each earlier module now sits

@@ -46,23 +46,6 @@
   "fqn": "Calibrator.AncestrySpecificArchitecture.geneFlowFstStep",
   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
   "line": 371,
-  "compared_to": "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
-  "status": "skipped_binders_do_not_correspond",
-  "binders": [
-   "m",
-   "Ne",
-   "F"
-  ],
-  "other_binders": [
-   "m",
-   "Ne"
-  ]
- },
- {
-  "check": "check4_docstring_approximation",
-  "fqn": "Calibrator.AncestrySpecificArchitecture.geneFlowFstStep",
-  "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
-  "line": 371,
   "compared_to": "Calibrator.PortabilityDrift.ibdFlowStep",
   "status": "skipped_binders_do_not_correspond",
   "binders": [
@@ -74,6 +57,23 @@
    "Ne",
    "rate",
    "F"
+  ]
+ },
+ {
+  "check": "check4_docstring_approximation",
+  "fqn": "Calibrator.AncestrySpecificArchitecture.geneFlowFstStep",
+  "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
+  "line": 371,
+  "compared_to": "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
+  "status": "skipped_binders_do_not_correspond",
+  "binders": [
+   "m",
+   "Ne",
+   "F"
+  ],
+  "other_binders": [
+   "m",
+   "Ne"
   ]
  },
  {
@@ -151,24 +151,6 @@
   "fqn": "Calibrator.LDDecayTheory.driftLDStep",
   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
   "line": 263,
-  "compared_to": "Calibrator.PortabilityDrift.ibdRecurrenceStep",
-  "status": "skipped_binders_do_not_correspond",
-  "binders": [
-   "Ne",
-   "c",
-   "Q"
-  ],
-  "other_binders": [
-   "Ne",
-   "rate",
-   "x"
-  ]
- },
- {
-  "check": "check4_docstring_approximation",
-  "fqn": "Calibrator.LDDecayTheory.driftLDStep",
-  "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
-  "line": 263,
   "compared_to": "Calibrator.PortabilityDrift.islandFstMultiplicativeStep",
   "status": "skipped_binders_do_not_correspond",
   "binders": [
@@ -180,6 +162,24 @@
    "Ne",
    "m",
    "F"
+  ]
+ },
+ {
+  "check": "check4_docstring_approximation",
+  "fqn": "Calibrator.LDDecayTheory.driftLDStep",
+  "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+  "line": 263,
+  "compared_to": "Calibrator.PortabilityDrift.ibdRecurrenceStep",
+  "status": "skipped_binders_do_not_correspond",
+  "binders": [
+   "Ne",
+   "c",
+   "Q"
+  ],
+  "other_binders": [
+   "Ne",
+   "rate",
+   "x"
   ]
  },
  {
@@ -219,7 +219,7 @@
   "check": "check4_docstring_approximation",
   "fqn": "Calibrator.PolygenicSpectroscopy.maxSafeEpistaticOrder",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 621,
+  "line": 627,
   "compared_to": "Calibrator.Condensation.criticalDegree",
   "status": "skipped_binders_do_not_correspond",
   "binders": [
@@ -284,19 +284,15 @@
  },
  {
   "check": "check4_docstring_approximation",
-  "fqn": "Calibrator.PortabilityBounds.neutralPortability",
-  "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityBounds.lean",
-  "line": 246,
-  "compared_to": "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio",
-  "status": "skipped_binders_do_not_correspond",
-  "binders": [
-   "r2_0",
-   "fst"
-  ],
-  "other_binders": [
-   "fstSource",
-   "fstTarget"
-  ]
+  "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransientDiscrete",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1414,
+  "compared_to": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransient",
+  "expr": "(1 - ((1 - 1/(2*Ne))*(1 - θ/(2*Ne)))**t)/(θ + 1)",
+  "other_expr": "(1 - exp(t*(-θ - 1)/(2*Ne)))/(θ + 1)",
+  "status": "APPROXIMATION_UNSUPPORTED",
+  "regimes": [],
+  "regime_stated_in_docstring": true
  },
  {
   "check": "check4_docstring_approximation",
@@ -312,6 +308,22 @@
   "other_binders": [
    "s",
    "m"
+  ]
+ },
+ {
+  "check": "check4_docstring_approximation",
+  "fqn": "Calibrator.PortabilityBounds.neutralPortability",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityBounds.lean",
+  "line": 246,
+  "compared_to": "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio",
+  "status": "skipped_binders_do_not_correspond",
+  "binders": [
+   "r2_0",
+   "fst"
+  ],
+  "other_binders": [
+   "fstSource",
+   "fstTarget"
   ]
  },
  {

@@ -39,14 +39,16 @@ POS = (1e-300, INF)
 NAME_RANGES = [
     # -- correlations: [-1, 1] --------------------------------------------
     # a SQUARED correlation is a proportion; check it before the signed rule
-    (r"(?i)correlationsq|corrsq|rsq|(?i)correlation.*squared", UNIT,
-     "a squared correlation -- a proportion of variance"),
+    # `rsq` needs a left boundary or it fires inside `standardErrorSq`,
+    # which is a variance and unbounded above.
+    (r"(?i)correlationsq|corrsq|(?:^|[^a-z])rsq|(?i)correlation.*squared",
+     UNIT, "a squared correlation -- a proportion of variance"),
     (r"(?i)genetic[_]?correlation|^r[_]?g$|(?i)correlation", CORR,
      "a correlation coefficient"),
     (r"(?i)(^|[^a-z])rho($|[^a-z])", CORR, "rho denotes a correlation"),
     (r"(?i)cosine|cossim", CORR, "a cosine similarity"),
     # -- squared / variance-explained quantities: [0, 1] -------------------
-    (r"(?i)r2|rsquared|varianceexplained|explainedvariance|pve",
+    (r"(?i)(?:^|[^a-z])r2|rsquared|varianceexplained|explainedvariance|pve",
      UNIT, "a proportion of variance explained"),
     (r"(?i)heritability|(^|[^a-z])h2($|[^a-z])", UNIT, "a heritability"),
     # -- F_ST and relatives: [0, 1] ---------------------------------------

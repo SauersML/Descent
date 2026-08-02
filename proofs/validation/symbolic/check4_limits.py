@@ -30,6 +30,7 @@ from pathlib import Path
 import sympy as sp
 
 import leansym as L
+import shared
 import hyps as H
 import fixedpoint as FP
 
@@ -104,13 +105,13 @@ def find_regime(a, b, binders, max_vars=6):
 
 def run():
     decls = json.load(open(HERE / "decls.json"))
-    table = L.build_table(decls)
+    table = shared.build_table()
     conv = L.Converter(table)
     defs = {d["name"]: d for d in decls if d["kind"] == "def"}
 
     exprs = {}
-    for d in decls:
-        if d["kind"] != "def" or not d["body"]:
+    for d in shared.def_records():
+        if not d["body"]:
             continue
         e, b = canonical(conv, d)
         if e is not None:

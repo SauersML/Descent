@@ -19,14 +19,16 @@ import sys
 
 import compile_defs as C
 import invariants as INV
-from check_ranges import build_feasible
 
 HERE = pathlib.Path(__file__).resolve().parent
 
 
 def check_one(c, defs):
-    feasible, kept, _ = build_feasible(c, defs)
-    checks, skipped = INV.derive(c, feasible=feasible)
+    # No feasibility filter.  A metamorphic invariant -- symmetry, scale
+    # invariance, an absorbing boundary -- is claimed over the whole
+    # admissible box, and filtering the sample by a union of theorem
+    # hypotheses would shrink the box rather than sharpen the claim.
+    checks, skipped = INV.derive(c)
     out = []
     for ch in checks:
         try:
@@ -34,8 +36,8 @@ def check_one(c, defs):
         except Exception as e:
             ok, detail = None, dict(error=f"{type(e).__name__}: {e}")
         out.append(dict(kind=ch["kind"], why=ch["why"], holds=ok, detail=detail))
-    return dict(checks=out, skipped=[dict(kind=k, reason=r) for k, r in skipped],
-                side_constraints=[k["hyp"] for k in kept])
+    return dict(checks=out,
+                skipped=[dict(kind=k, reason=r) for k, r in skipped])
 
 
 def severity(r):

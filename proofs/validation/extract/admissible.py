@@ -173,7 +173,7 @@ FIELD_HYP = re.compile(r"^\s*(-?[\d./]+|\w[\w'\u2080-\u2089]*)\s*(<|\u2264|>|\u2
                        r"\s*(-?[\d./]+|\w[\w'\u2080-\u2089]*)\s*$")
 
 
-def struct_value(sdecl, rng):
+def struct_value(sdecl, rng, structs=None, _depth=0):
     """An admissible inhabitant of a Lean structure, as a dict of its ℝ/ℕ fields.
 
     The structure's own Prop fields are its stated invariants (`0 < varY`,
@@ -183,6 +183,23 @@ def struct_value(sdecl, rng):
     real = [f["name"] for f in sdecl["fields"] if f["type"] in ("\u211d", "\u2115")]
     props = [f["type"] for f in sdecl["fields"] if f["type"] not in ("\u211d", "\u2115")]
     val = {n: rng.uniform(0.05, 1.0) for n in real}
+    # Structure-typed fields need inhabitants too, or a projection through them
+    # fails and the definition is misreported as not extractable.
+    # Function-valued fields (`ℕ → ℝ`, `Fin p → ℝ`) need an inhabitant too.  A
+    # smooth non-constant one: still a legal element of the type, but varying,
+    # so a wrong body stays distinguishable from the real one.
+    for f in sdecl["fields"]:
+        ty = f["type"].replace(" ", "")
+        if ty.endswith("\u2192\u211d") and f["name"] not in val:
+            c0, c1 = rng.uniform(0.05, 1.0), rng.uniform(0.05, 1.0)
+            val[f["name"]] = (lambda a, b: (lambda *xs: a + b / (1.0 + sum(
+                x for x in xs if isinstance(x, (int, float))))))(c0, c1)
+    if structs and _depth < 4:
+        for f in sdecl["fields"]:
+            head = f["type"].split()[0].split(".")[-1] if f["type"].split() else ""
+            nested = structs.get(head)
+            if nested is not None and nested is not sdecl:
+                val[f["name"]] = struct_value(nested, rng, structs, _depth + 1)
     for _ in range(6):                       # fixed-point repair of the invariants
         changed = False
         for h in props:
@@ -204,3 +221,33 @@ def struct_value(sdecl, rng):
         if not changed:
             break
     return val
+
+
+# ------------------------------------------------------- vector arguments
+
+VECTOR_DIM = 4          # the finite dimension used when evaluating `Fin n` sums
+
+
+def vector_value(spec, lo, hi, rng, dim=VECTOR_DIM):
+    """An inhabitant of `Fin n → ℝ` (rank 1) or a `Fin p × Fin q` matrix (rank 2).
+
+    Entries are drawn from the same admissible interval the scalar arguments
+    use, so a range invariant means the same thing for a vector argument as for
+    a scalar one.
+    """
+    if spec["rank"] == 1:
+        return [rng.uniform(lo, hi) for _ in range(dim)]
+    return [[rng.uniform(lo, hi) for _ in range(dim)] for _ in range(dim)]
+
+
+def build_args(argnames, pt, structval, vecspec, rng, structs=None):
+    """Positional arguments for a generated callable, in signature order."""
+    out = []
+    for a in argnames:
+        if vecspec and a in vecspec:
+            out.append(vector_value(vecspec[a], 0.05, 1.0, rng))
+        elif structval and a in structval:
+            out.append(struct_value(structval[a], rng, structs))
+        else:
+            out.append(pt.get(a, 1.0))
+    return out

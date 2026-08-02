@@ -5,9 +5,10 @@
    Infinity
   ],
   "range_why": "`epistaticVariancePairwise` names a variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03b3": [
     0.001,
@@ -69,15 +70,10 @@
    1.0
   ],
   "range_why": "`equilibriumFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "m\u2081 < m",
-    "thm": "fst_decreases_with_migration",
-    "reason": "unknown identifier m\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "m": [
     1e-09,
@@ -129,9 +125,10 @@
    1.0
   ],
   "range_why": "`geneFlowFstStep` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "m": [
     1e-09,
@@ -176,6 +173,7 @@
   "blind_coordinates": [
    "F"
   ],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "geneFlowFstStep",
   "module": "AncestrySpecificArchitecture",
@@ -190,9 +188,10 @@
    1.0
   ],
   "range_why": "`gwasHeritability` names a heritability",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "h2_true": [
     0.001,
@@ -233,9 +232,10 @@
    1.0
   ],
   "range_why": "`portability` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "rg": [
     -1.0,
@@ -281,6 +281,7 @@
   "blind_coordinates": [
    "tagging_ratio"
   ],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "portabilityFromArchitecture",
   "module": "AncestrySpecificArchitecture",
@@ -335,15 +336,10 @@
    Infinity
   ],
   "range_why": "`genotypeVarianceHWE` names a variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "p < maf\u2081",
-    "thm": "genotypeVarianceHWE_strictMono_left_half",
-    "reason": "unknown identifier maf\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "p": [
     1e-06,
@@ -386,29 +382,10 @@
    1.0
   ],
   "range_why": "`hweHeterozygosity` names a heterozygosity",
-  "side_constraints": [
-   "p < 1/2"
-  ],
-  "side_constraints_from": [
-   "het_strict_mono_on_lower_half"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "p < q",
-    "thm": "het_strict_mono_on_lower_half",
-    "reason": "unknown identifier q"
-   },
-   {
-    "hyp": "p < p_eur",
-    "thm": "discovered_variants_eur_biased",
-    "reason": "unknown identifier p_eur"
-   },
-   {
-    "hyp": "hweHeterozygosity p.p_target < hweHeterozygosity p.p_source",
-    "thm": "instrument_strength_decreases",
-    "reason": "unknown identifier p.p_target"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "p": [
     1e-06,
@@ -426,9 +403,9 @@
     "hweHeterozygosity_pos: p < 1"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "proved",
+  "bnb_boxes": 3,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
   "name": "hweHeterozygosity",
   "module": "AncestrySpecificPower",
   "line": 341,
@@ -442,13 +419,10 @@
    Infinity
   ],
   "range_why": "`ncp` names a noncentrality parameter",
-  "side_constraints": [
-   "n_eff \u2264 \u03b2"
-  ],
-  "side_constraints_from": [
-   "powerAtThreshold_antitone_in_threshold"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "n_eff": [
     1.0,
@@ -473,9 +447,9 @@
     "an effect size on a standardized scale"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "proved",
+  "bnb_boxes": 1,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
   "name": "ncp",
   "module": "AncestrySpecificPower",
   "line": 285,
@@ -489,13 +463,16 @@
    1.0
   ],
   "range_why": "`portableFraction` names a proportion",
-  "side_constraints": [
-   "r2_causal \u2264 r2_total"
-  ],
-  "side_constraints_from": [
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [
    "portable_fraction_le_one"
   ],
-  "side_constraints_dropped": [],
+  "bounding_theorem_hyps": {
+   "portable_fraction_le_one": [
+    "r2_causal \u2264 r2_total"
+   ]
+  },
+  "unmodelled_hypotheses": [],
   "box": {
    "r2_causal": [
     0.0001,
@@ -520,15 +497,24 @@
     "portable_fraction_le_one: 0 < r2_total"
    ]
   },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "escape-outside-theorem",
+  "witness": {
+   "r2_causal": 1.0,
+   "r2_total": 0.0001
+  },
+  "value": 10000.0,
+  "overshoot": 9999.0,
+  "blind_coordinates": [],
+  "escapes_only_where_violated": [
+   "portable_fraction_le_one"
+  ],
+  "side": "above",
   "name": "portableFraction",
   "module": "AncestrySpecificPower",
   "line": 415,
   "family": "range",
   "py": "_b.div(r2_causal, r2_total)",
-  "severity": -1.0
+  "severity": 45.0
  },
  "AncestrySpecificPower.proportionalAllocation": {
   "range": [
@@ -536,9 +522,10 @@
    1.0
   ],
   "range_why": "`proportionalAllocation` names a proportion",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "pop_size": [
     1.0,
@@ -583,6 +570,7 @@
   "blind_coordinates": [
    "total_pop"
   ],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "proportionalAllocation",
   "module": "AncestrySpecificPower",
@@ -594,16 +582,13 @@
  "AncestrySpecificPower.standardErrorSq": {
   "range": [
    0.0,
-   1.0
+   Infinity
   ],
-  "range_why": "`standardErrorSq` names a squared correlation -- a proportion of variance",
-  "side_constraints": [
-   "0 < effectiveFisherInformation n p r2_ld"
-  ],
-  "side_constraints_from": [
-   "ncp_from_wald_test"
-  ],
-  "side_constraints_dropped": [],
+  "range_why": "`standardErrorSq` names a standard deviation / standard error",
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "n": [
     1.0,
@@ -637,9 +622,9 @@
     "an R\u00b2 / variance-explained lies in (0,1]"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "proved",
+  "bnb_boxes": 1,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
   "name": "standardErrorSq",
   "module": "AncestrySpecificPower",
   "line": 167,
@@ -653,17 +638,10 @@
    1.0
   ],
   "range_why": "`amCorrectedPortability` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [
-   "r_target < r_source",
-   "r_source * h2 < 1",
-   "r_target * h2 < 1"
-  ],
-  "side_constraints_from": [
-   "am_correction_increases_portability",
-   "am_correction_increases_portability",
-   "am_correction_increases_portability"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "port_measured": [
     -1000.0,
@@ -711,22 +689,23 @@
   "verdict": "escape-unguarded",
   "witness": {
    "port_measured": -1000.0,
-   "r_source": 0.5,
-   "r_target": 0.4999999995,
-   "h2": 0.0001
+   "r_source": 1e-08,
+   "r_target": 0.5,
+   "h2": 1.0
   },
-  "value": -999.9999999999501,
-  "overshoot": 999.9999999999501,
+  "value": -1999.9999799999998,
+  "overshoot": 1999.9999799999998,
   "blind_coordinates": [
    "port_measured"
   ],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "amCorrectedPortability",
   "module": "AssortativeMatingPGS",
   "line": 400,
   "family": "range",
   "py": "_b.div((port_measured * ((1.0 - (r_source * h2)))), ((1.0 - (r_target * h2))))",
-  "severity": 35.00434077479297
+  "severity": 38.01247084295437
  },
  "AssortativeMatingPGS.amEquilibriumVariance": {
   "verdict": "no-range",
@@ -754,13 +733,10 @@
    Infinity
   ],
   "range_why": "`amVarianceStep` names a variance",
-  "side_constraints": [
-   "r * h2 < 1"
-  ],
-  "side_constraints_from": [
-   "amEquilibriumVariance_isFixedPoint"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V\u2080": [
     1e-06,
@@ -803,9 +779,9 @@
     "a variance / scale parameter is positive"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "proved",
+  "bnb_boxes": 1,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
   "name": "amVarianceStep",
   "module": "AssortativeMatingPGS",
   "line": 118,
@@ -819,20 +795,10 @@
    1.0
   ],
   "range_why": "`ibdFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "d < d\u2082",
-    "thm": "ibd_fst_increases_with_distance",
-    "reason": "unknown identifier d\u2082"
-   },
-   {
-    "hyp": "N < N_large",
-    "thm": "founder_effect_excess_fst",
-    "reason": "unknown identifier N_large"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "d": [
     1.0,
@@ -891,20 +857,10 @@
    1.0
   ],
   "range_why": "`gaussianPosteriorShrinkage` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "n < n\u2082",
-    "thm": "shrinkage_increases_with_n",
-    "reason": "unknown identifier n\u2082"
-   },
-   {
-    "hyp": "h < h\u2082",
-    "thm": "shrinkage_increases_with_h",
-    "reason": "unknown identifier h\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "n": [
     1.0,
@@ -942,6 +898,7 @@
   "blind_coordinates": [
    "h"
   ],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "gaussianPosteriorShrinkage",
   "module": "BayesianPGSTheory",
@@ -986,9 +943,10 @@
    1.0
   ],
   "range_why": "`optimalShrinkage` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03c3_sq": [
     1e-06,
@@ -1041,9 +999,10 @@
    1.0
   ],
   "range_why": "`snpShrinkage` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03c3": [
     1e-06,
@@ -1115,13 +1074,16 @@
    1.0
   ],
   "range_why": "`proportionMediated` names a proportion",
-  "side_constraints": [
-   "indirect_effect \u2264 total_effect"
-  ],
-  "side_constraints_from": [
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [
    "proportion_mediated_in_unit"
   ],
-  "side_constraints_dropped": [],
+  "bounding_theorem_hyps": {
+   "proportion_mediated_in_unit": [
+    "indirect_effect \u2264 total_effect"
+   ]
+  },
+  "unmodelled_hypotheses": [],
   "box": {
    "indirect_effect": [
     0.0,
@@ -1145,15 +1107,24 @@
     "proportion_mediated_in_unit: 0 < te"
    ]
   },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "escape-outside-theorem",
+  "witness": {
+   "indirect_effect": 3.0,
+   "total_effect": 3.0000000000000004e-09
+  },
+  "value": 999999999.9999999,
+  "overshoot": 999999998.9999999,
+  "blind_coordinates": [],
+  "escapes_only_where_violated": [
+   "proportion_mediated_in_unit"
+  ],
+  "side": "above",
   "name": "proportionMediated",
   "module": "CausalInference",
   "line": 116,
   "family": "range",
   "py": "_b.div(indirect_effect, total_effect)",
-  "severity": -1.0
+  "severity": 65.00000434294265
  },
  "ClinicalUtilityFairness.netReclassificationImprovement": {
   "verdict": "no-range",
@@ -1181,20 +1152,10 @@
    1.0
   ],
   "range_why": "`populationAttributableFraction` names a proportion",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "p_high < p_high_s",
-    "thm": "paf_lower_in_target",
-    "reason": "unknown identifier p_high_s"
-   },
-   {
-    "hyp": "p_high_t < p_high",
-    "thm": "equity_gap_in_public_health",
-    "reason": "unknown identifier p_high_t"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "p_high": [
     -1000.0,
@@ -1230,6 +1191,7 @@
    "p_high",
    "rr_reduction"
   ],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "populationAttributableFraction",
   "module": "ClinicalUtilityFairness",
@@ -1244,9 +1206,10 @@
    1.0
   ],
   "range_why": "`ppv` names a classification rate",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "prev": [
     1e-05,
@@ -1297,9 +1260,10 @@
    1.0
   ],
   "range_why": "`proportionCorrectlyClassified` names a proportion",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "sensitivity": [
     0.0,
@@ -1380,9 +1344,10 @@
    1.0
   ],
   "range_why": "`brierScore` names a Brier score for a binary outcome",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "p": [
     1e-06,
@@ -1417,6 +1382,7 @@
   "blind_coordinates": [
    "y"
   ],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "brierScore",
   "module": "Conclusions",
@@ -1431,9 +1397,10 @@
    1.0
   ],
   "range_why": "`expectedBrierScore` names a Brier score for a binary outcome",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "p": [
     1e-06,
@@ -1493,7 +1460,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "criticalDegree",
   "module": "Condensation",
-  "line": 246,
+  "line": 287,
   "family": "range",
   "py": "_b.div(_b.log(N), c)",
   "severity": -1.0
@@ -1503,7 +1470,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "gaussianJetVariance",
   "module": "Condensation",
-  "line": 221,
+  "line": 262,
   "family": "range",
   "py": "(_b.div(_b.pow(_b.pi, 2.0), 2.0) - 4.0)",
   "severity": -1.0
@@ -1513,7 +1480,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "windowVariance",
   "module": "Condensation",
-  "line": 309,
+  "line": 350,
   "family": "range",
   "py": "_b.Phi((_b.div(w, _b.sqrt(v))))",
   "severity": -1.0
@@ -1554,9 +1521,10 @@
    1.0
   ],
   "range_why": "`meanAlleleFreq` names a probability or allele frequency",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "p\u2081": [
     1e-06,
@@ -1617,9 +1585,10 @@
    1.0
   ],
   "range_why": "`retainedFraction` names a proportion",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "loss": [
     -1000.0,
@@ -1655,6 +1624,7 @@
    "loss",
    "total"
   ],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "retainedFraction",
   "module": "Conventions",
@@ -1709,9 +1679,10 @@
    1.0
   ],
   "range_why": "`ldCorrelationSq` names a squared correlation -- a proportion of variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "D": [
     1.0,
@@ -1756,6 +1727,7 @@
   "value": 2.5000050000075e+17,
   "overshoot": 2.5000050000075e+17,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "ldCorrelationSq",
   "module": "CovarianceStructure",
@@ -1770,9 +1742,10 @@
    1.0
   ],
   "range_why": "`ldCorrelationSqOfHaplotypeD` names a squared correlation -- a proportion of variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "D": [
     1.0,
@@ -1815,6 +1788,7 @@
   "value": 1.000002000003e+18,
   "overshoot": 1.000002000003e+18,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "ldCorrelationSqOfHaplotypeD",
   "module": "CovarianceStructure",
@@ -1849,15 +1823,10 @@
    Infinity
   ],
   "range_why": "`numBlocks` names a count",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "block\u2081 < mean_block_size",
-    "thm": "smaller_blocks_more_segments",
-    "reason": "unknown identifier block\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "genome_length": [
     0.001,
@@ -1897,15 +1866,10 @@
    1.0
   ],
   "range_why": "`alleleFreqDivergenceRate` names a probability or allele frequency",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "1 / (2 * Ne) < 2 * r",
-    "thm": "ld_breakage_dominates_alleleFreq_divergence",
-    "reason": "unknown identifier r"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -1954,9 +1918,10 @@
    1.0
   ],
   "range_why": "`calibratedBrier` names a Brier score for a binary outcome",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03c0": [
     0.0001,
@@ -1997,9 +1962,10 @@
    1.0
   ],
   "range_why": "`calibratedBrier` names a Brier score for a binary outcome",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03c0": [
     0.0001,
@@ -2050,19 +2016,10 @@
    Infinity
   ],
   "range_why": "`demographicCovarianceGapLowerBound` names a variance",
-  "side_constraints": [
-   "fstSource < fstTarget"
-  ],
-  "side_constraints_from": [
-   "covariance_mismatch_pos_of_fst_and_sparse_array"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity kappa\n        \u2264 frobeniusNormSq (sigmaSource - sigmaTarget)",
-    "thm": "covariance_mismatch_pos_of_fst_and_sparse_array",
-    "reason": "trailing tokens at [('op', '('), ('ident', 'sigmaSource'), ('op', '-'), ('ident', 'sigmaTarget')]"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "fstSource": [
     0.0,
@@ -2117,15 +2074,25 @@
     "target_r2_drop_of_fst_and_sparse_array: 0 < kappa"
    ]
   },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "escape",
+  "witness": {
+   "fstSource": 1.0,
+   "fstTarget": 0.0,
+   "recombRate": 0.5,
+   "arraySparsity": 1.0,
+   "kappa": 1000.0
+  },
+  "value": -500.0,
+  "overshoot": 500.0,
+  "blind_coordinates": [],
+  "escapes_only_where_violated": [],
+  "side": "below",
   "name": "demographicCovarianceGapLowerBound",
   "module": "DGP",
   "line": 293,
   "family": "range",
   "py": "((kappa * DGP_taggingMismatchScale(recombRate, arraySparsity)) * ((fstTarget - fstSource)))",
-  "severity": -1.0
+  "severity": 56.99837725867246
  },
  "DGP.discreteRecombinationSurvival": {
   "verdict": "no-range",
@@ -2138,65 +2105,14 @@
   "severity": -1.0
  },
  "DGP.explainedR2FromTransportMoments": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`explainedR2` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
-  "box": {
-   "scoreOutcomeCov": [
-    -1000.0,
-    1000.0,
-    "none"
-   ],
-   "scoreVariance": [
-    0.0001,
-    1000.0,
-    "meaning"
-   ],
-   "outcomeVariance": [
-    0.0001,
-    1000.0,
-    "meaning"
-   ]
-  },
-  "unguarded": [
-   "scoreOutcomeCov",
-   "scoreVariance",
-   "outcomeVariance"
-  ],
-  "box_provenance": {
-   "scoreOutcomeCov": [
-    "no theorem hypothesis and no recognised meaning for parameter `scoreOutcomeCov` : \u211d"
-   ],
-   "scoreVariance": [
-    "a variance / positive scale parameter"
-   ],
-   "outcomeVariance": [
-    "a variance / positive scale parameter"
-   ]
-  },
-  "verdict": "escape-unguarded",
-  "witness": {
-   "scoreOutcomeCov": -1000.0,
-   "scoreVariance": 0.0001,
-   "outcomeVariance": 0.0001
-  },
-  "value": 100000000000000.0,
-  "overshoot": 99999999999999.0,
-  "blind_coordinates": [
-   "scoreOutcomeCov"
-  ],
-  "side": "above",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "explainedR2FromTransportMoments",
   "module": "DGP",
   "line": 182,
   "family": "range",
   "py": "_b.div(_b.pow(scoreOutcomeCov, 2.0), ((scoreVariance * outcomeVariance)))",
-  "severity": 55.000004342942646
+  "severity": -1.0
  },
  "DGP.gaussianAUCFromSignalVariance": {
   "range": [
@@ -2204,9 +2120,10 @@
    1.0
   ],
   "range_why": "`gaussianAUC` names an AUC / c-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "vSignal": [
     1e-06,
@@ -2301,15 +2218,26 @@
   "py": "(ibdWeight * DGP_discreteRecombinationSurvival(recombRate, tmrca))",
   "severity": -1.0
  },
+ "DemographicCapacity.contrastSpikeLevel": {
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
+  "name": "contrastSpikeLevel",
+  "module": "DemographicCapacity",
+  "line": 46,
+  "family": "range",
+  "py": "_b.div(_b.pow(((p1 - p2)), 2.0), ((Conventions_meanAlleleFreq(p1, p2) * ((1.0 - Conventions_meanAlleleFreq(p1, p2))))))",
+  "severity": -1.0
+ },
  "DemographicHistory.admixedAlleleFreq": {
   "range": [
    0.0,
    1.0
   ],
   "range_why": "`admixedAlleleFreq` names a probability or allele frequency",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03b1": [
     0.0,
@@ -2360,9 +2288,10 @@
    1.0
   ],
   "range_why": "`admixedFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03b1": [
     0.0,
@@ -2403,9 +2332,10 @@
    1.0
   ],
   "range_why": "`demoSteppingStoneFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "d": [
     1.0,
@@ -2481,15 +2411,10 @@
    1.0
   ],
   "range_why": "`founderFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "k\u2082 < k",
-    "thm": "smaller_founder_larger_fst",
-    "reason": "unknown identifier k\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "k": [
     2.0,
@@ -2608,7 +2533,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "benchmarkRatio",
   "module": "DriftRegime",
-  "line": 227,
+  "line": 274,
   "family": "range",
   "py": "_b.div(((1.0 - fstT)), ((1.0 - fstS)))",
   "severity": -1.0
@@ -2618,7 +2543,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "benchmarkRatioSquared",
   "module": "DriftRegime",
-  "line": 231,
+  "line": 278,
   "family": "range",
   "py": "_b.pow((_b.div(((1.0 - fstT)), ((1.0 - fstS)))), 2.0)",
   "severity": -1.0
@@ -2629,9 +2554,10 @@
    1.0
   ],
   "range_why": "`driftRetention` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -2661,7 +2587,7 @@
   "searched": 8000,
   "name": "driftRetention",
   "module": "DriftRegime",
-  "line": 159,
+  "line": 182,
   "family": "range",
   "py": "_b.pow(((1.0 - _b.div(1.0, ((2.0 * Ne))))), t)",
   "severity": -1.0
@@ -2672,9 +2598,10 @@
    1.0
   ],
   "range_why": "`lossOfRetention` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "r": [
     1e-08,
@@ -2695,7 +2622,7 @@
   "searched": 8000,
   "name": "lossOfRetention",
   "module": "DriftRegime",
-  "line": 162,
+  "line": 194,
   "family": "range",
   "py": "(1.0 - r)",
   "severity": -1.0
@@ -2706,9 +2633,10 @@
    1.0
   ],
   "range_why": "`targetHetOfRetention` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "H\u2080": [
     1e-09,
@@ -2738,7 +2666,7 @@
   "searched": 8000,
   "name": "targetHetOfRetention",
   "module": "DriftRegime",
-  "line": 165,
+  "line": 197,
   "family": "range",
   "py": "(H0 * r)",
   "severity": -1.0
@@ -2749,9 +2677,10 @@
    1.0
   ],
   "range_why": "`targetPgsVarOfRetention` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
     1e-06,
@@ -2784,10 +2713,11 @@
   "value": 500.0,
   "overshoot": 499.0,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "targetPgsVarOfRetention",
   "module": "DriftRegime",
-  "line": 168,
+  "line": 204,
   "family": "range",
   "py": "(V_A * r)",
   "severity": 46.98970004336019
@@ -2827,7 +2757,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "circulantSpectrumA",
   "module": "EpistaticChaos",
-  "line": 1355,
+  "line": 1359,
   "family": "range",
   "py": "(((8.0 * _b.pow(c, 2.0)) + (2.0 * c)) - 4.0)",
   "severity": -1.0
@@ -2837,7 +2767,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "circulantSpectrumB",
   "module": "EpistaticChaos",
-  "line": 1362,
+  "line": 1366,
   "family": "range",
   "py": "(((4.0 * _b.pow(c, 2.0)) + (4.0 * c)) - 2.0)",
   "severity": -1.0
@@ -2847,76 +2777,34 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "fourthCumulantFromMoments",
   "module": "EpistaticChaos",
-  "line": 1225,
+  "line": 1229,
   "family": "range",
   "py": "(fourthMoment - (3.0 * _b.pow(secondMoment, 2.0)))",
   "severity": -1.0
  },
+ "EpistaticChaos.palindromicCycleDensityA": {
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
+  "name": "palindromicCycleDensityA",
+  "module": "EpistaticChaos",
+  "line": 1698,
+  "family": "range",
+  "py": "((((_b.pow(EpistaticChaos_circulantSpectrumA(1.0), p) + (2.0 * _b.pow(EpistaticChaos_circulantSpectrumA((_b.div(s, 2.0))), p))) + (2.0 * _b.pow(EpistaticChaos_circulantSpectrumA(0.0), p))) + (2.0 * _b.pow(EpistaticChaos_circulantSpectrumA(((- (_b.div(s, 2.0))))), p))) + _b.pow(EpistaticChaos_circulantSpectrumA(((- 1.0))), p))",
+  "severity": -1.0
+ },
+ "EpistaticChaos.palindromicCycleDensityB": {
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
+  "name": "palindromicCycleDensityB",
+  "module": "EpistaticChaos",
+  "line": 1707,
+  "family": "range",
+  "py": "((((_b.pow(EpistaticChaos_circulantSpectrumB(1.0), p) + (2.0 * _b.pow(EpistaticChaos_circulantSpectrumB((_b.div(s, 2.0))), p))) + (2.0 * _b.pow(EpistaticChaos_circulantSpectrumB(0.0), p))) + (2.0 * _b.pow(EpistaticChaos_circulantSpectrumB(((- (_b.div(s, 2.0))))), p))) + _b.pow(EpistaticChaos_circulantSpectrumB(((- 1.0))), p))",
+  "severity": -1.0
+ },
  "EquityAndImplementation.expectedR2FromN": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`expectedR2` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "n < n\u2082",
-    "thm": "r2_increases_with_n",
-    "reason": "unknown identifier n\u2082"
-   },
-   {
-    "hyp": "n_underrep < n",
-    "thm": "diversity_has_higher_marginal_value",
-    "reason": "unknown identifier n_underrep"
-   }
-  ],
-  "box": {
-   "n": [
-    1.0,
-    10000000.0,
-    "theorem+meaning"
-   ],
-   "h2": [
-    0.0001,
-    1.0,
-    "theorem+meaning"
-   ],
-   "M": [
-    1e-09,
-    0.5,
-    "theorem+meaning"
-   ]
-  },
-  "unguarded": [],
-  "box_provenance": {
-   "n": [
-    "a sample or variant count is a positive integer",
-    "expectedR2FromN_le_h2: 0 \u2264 n",
-    "r2_increases_with_n: 0 < n\u2081",
-    "r2_concave_in_n: 0 < n",
-    "diversity_has_higher_marginal_value: 0 < n_eur"
-   ],
-   "h2": [
-    "a heritability in (0,1]",
-    "expectedR2FromN_le_h2: 0 \u2264 h2",
-    "r2_increases_with_n: 0 < h2",
-    "r2_concave_in_n: 0 < h2",
-    "diversity_has_higher_marginal_value: 0 < h2"
-   ],
-   "M": [
-    "a migration rate is a per-generation probability",
-    "expectedR2FromN_le_h2: 0 < M",
-    "r2_increases_with_n: 0 < M",
-    "r2_concave_in_n: 0 < M",
-    "diversity_has_higher_marginal_value: 0 < M"
-   ]
-  },
-  "verdict": "inconclusive",
-  "bnb_boxes": 1500,
-  "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "expectedR2FromN",
   "module": "EquityAndImplementation",
   "line": 215,
@@ -2940,20 +2828,10 @@
    Infinity
   ],
   "range_why": "`linearNormOfReaction` names a distance or norm",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "a\u2082 < a",
-    "thm": "crossover_gxe_possible",
-    "reason": "unknown identifier a\u2082"
-   },
-   {
-    "hyp": "b < b\u2082",
-    "thm": "crossover_gxe_possible",
-    "reason": "unknown identifier b\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "a": [
     -1000.0,
@@ -2999,6 +2877,7 @@
    "a",
    "E"
   ],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "linearNormOfReaction",
   "module": "GeneEnvironmentInterplay",
@@ -3033,13 +2912,16 @@
    1.0
   ],
   "range_why": "`geneticCorrelation` names a correlation coefficient",
-  "side_constraints": [
-   "cov_g ^ 2 \u2264 vg\u2081 * vg\u2082"
-  ],
-  "side_constraints_from": [
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [
    "genetic_correlation_bounded"
   ],
-  "side_constraints_dropped": [],
+  "bounding_theorem_hyps": {
+   "genetic_correlation_bounded": [
+    "cov_g ^ 2 \u2264 vg\u2081 * vg\u2082"
+   ]
+  },
+  "unmodelled_hypotheses": [],
   "box": {
    "cov_g": [
     -1000.0,
@@ -3075,15 +2957,27 @@
     "genetic_correlation_population_specific: 0 < vg\u2082"
    ]
   },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "escape-outside-theorem",
+  "witness": {
+   "cov_g": -1000.0,
+   "vg\u2081": 1e-06,
+   "vg\u2082": 1e-06
+  },
+  "value": -1000000000.0,
+  "overshoot": 999999999.0,
+  "blind_coordinates": [
+   "cov_g"
+  ],
+  "escapes_only_where_violated": [
+   "genetic_correlation_bounded"
+  ],
+  "side": "below",
   "name": "geneticCorrelation",
   "module": "GeneticArchitectureDiscovery",
   "line": 462,
   "family": "range",
   "py": "_b.div(cov_g, _b.sqrt(((vg1 * vg2))))",
-  "severity": -1.0
+  "severity": 45.000004342942646
  },
  "GeneticArchitectureDiscovery.multiTraitDiscoveryNCP": {
   "verdict": "no-range",
@@ -3241,24 +3135,16 @@
    1.0
   ],
   "range_why": "`phaseAttenuation` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [
-   "s \u2264 1 / 2"
-  ],
-  "side_constraints_from": [
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [
    "phase_attenuation_bounded"
   ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "s\u2081 < s",
-    "thm": "more_errors_more_attenuation",
-    "reason": "unknown identifier s\u2081"
-   },
-   {
-    "hyp": "s_source < s",
-    "thm": "phasing_worse_for_underrepresented",
-    "reason": "unknown identifier s_source"
-   }
-  ],
+  "bounding_theorem_hyps": {
+   "phase_attenuation_bounded": [
+    "s \u2264 1 / 2"
+   ]
+  },
+  "unmodelled_hypotheses": [],
   "box": {
    "s": [
     1e-06,
@@ -3273,9 +3159,9 @@
     "phase_attenuation_bounded: 0 \u2264 s"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "proved",
+  "bnb_boxes": 1,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
   "name": "phaseAttenuation",
   "module": "HaplotypeTheory",
   "line": 566,
@@ -3308,7 +3194,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "stratificationCertificateMargin",
   "module": "ImitationCapacity",
-  "line": 1068,
+  "line": 1220,
   "family": "range",
   "py": "(Threshold_demographicSpike(n, F, m) - ((headroom + Threshold_bbpProxyThreshold(n, M))))",
   "severity": -1.0
@@ -3318,7 +3204,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "traceWindowSpikeLoad",
   "module": "ImitationCapacity",
-  "line": 848,
+  "line": 1000,
   "family": "range",
   "py": "_b.div(ImitationRigidity_ldPrecisionTrace(decay, nSites), nSites)",
   "severity": -1.0
@@ -3328,7 +3214,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "whitenedCapacity",
   "module": "ImitationCapacity",
-  "line": 868,
+  "line": 1020,
   "family": "range",
   "py": "_b.div(headroom, ImitationRigidity_ldWhiteningGain(decay))",
   "severity": -1.0
@@ -3338,7 +3224,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "absorptionChannelWeight",
   "module": "ImitationRigidity",
-  "line": 1215,
+  "line": 1287,
   "family": "range",
   "py": "_b.div((initial * ImitationRigidity_alleleLossProbability(initial, time)), ((4.0 * time)))",
   "severity": -1.0
@@ -3348,7 +3234,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "absorptionInformation",
   "module": "ImitationRigidity",
-  "line": 1151,
+  "line": 1223,
   "family": "range",
   "py": "_b.div(ImitationRigidity_alleleLossProbability(initial, time), ((4.0 * _b.pow(time, 2.0))))",
   "severity": -1.0
@@ -3359,9 +3245,10 @@
    1.0
   ],
   "range_why": "`alleleLossProbability` names a probability or allele frequency",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "initial": [
     -1000.0,
@@ -3398,10 +3285,11 @@
   "blind_coordinates": [
    "initial"
   ],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "alleleLossProbability",
   "module": "ImitationRigidity",
-  "line": 1146,
+  "line": 1218,
   "family": "range",
   "py": "_b.exp(((- (_b.div(initial, ((2.0 * time)))))))",
   "severity": 55.000004342942646
@@ -3411,7 +3299,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "fairTwoPointVariance",
   "module": "ImitationRigidity",
-  "line": 262,
+  "line": 334,
   "family": "range",
   "py": "_b.div(_b.pow(((a - b)), 2.0), 4.0)",
   "severity": -1.0
@@ -3421,7 +3309,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "informationCrossoverTime",
   "module": "ImitationRigidity",
-  "line": 1226,
+  "line": 1298,
   "family": "range",
   "py": "_b.div(initial, 2.0)",
   "severity": -1.0
@@ -3431,7 +3319,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ldHardEdge",
   "module": "ImitationRigidity",
-  "line": 626,
+  "line": 698,
   "family": "range",
   "py": "_b.div(((1.0 - decay)), ((1.0 + decay)))",
   "severity": -1.0
@@ -3441,7 +3329,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ldKernelSymbol",
   "module": "ImitationRigidity",
-  "line": 617,
+  "line": 689,
   "family": "range",
   "py": "_b.div(((1.0 - _b.pow(decay, 2.0))), (((1.0 - ((2.0 * decay) * _b.cos(angle))) + _b.pow(decay, 2.0))))",
   "severity": -1.0
@@ -3451,7 +3339,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ldPrecisionTrace",
   "module": "ImitationRigidity",
-  "line": 796,
+  "line": 868,
   "family": "range",
   "py": "_b.div((((nSites * ((1.0 + _b.pow(decay, 2.0)))) - (2.0 * _b.pow(decay, 2.0)))), ((1.0 - _b.pow(decay, 2.0))))",
   "severity": -1.0
@@ -3461,7 +3349,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ldWhiteningGain",
   "module": "ImitationRigidity",
-  "line": 636,
+  "line": 708,
   "family": "range",
   "py": "_b.div(((1.0 + _b.pow(decay, 2.0))), ((1.0 - _b.pow(decay, 2.0))))",
   "severity": -1.0
@@ -3471,7 +3359,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "scalarRowResolvent",
   "module": "ImitationRigidity",
-  "line": 248,
+  "line": 320,
   "family": "range",
   "py": "_b.div(1.0, ((1.0 + (_b.pow(latent, 2.0) * quadraticForm))))",
   "severity": -1.0
@@ -3481,7 +3369,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "stationaryLDEntry",
   "module": "ImitationRigidity",
-  "line": 554,
+  "line": 626,
   "family": "range",
   "py": "_b.pow(decay, separation)",
   "severity": -1.0
@@ -3527,57 +3415,8 @@
   "severity": -1.0
  },
  "ImputationPortability.meanImputationR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`meanImputationR2` names a proportion of variance explained",
-  "side_constraints": [
-   "c < ld_extent"
-  ],
-  "side_constraints_from": [
-   "shorter_ld_worse_imputation"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "c < ld_extent_long",
-    "thm": "shorter_ld_worse_imputation",
-    "reason": "unknown identifier ld_extent_long"
-   },
-   {
-    "hyp": "ld_extent < ld_extent_long",
-    "thm": "shorter_ld_worse_imputation",
-    "reason": "unknown identifier ld_extent_long"
-   }
-  ],
-  "box": {
-   "c": [
-    1e-08,
-    0.5,
-    "theorem+meaning"
-   ],
-   "ld_extent": [
-    -1000.0,
-    1000.0,
-    "none"
-   ]
-  },
-  "unguarded": [
-   "ld_extent"
-  ],
-  "box_provenance": {
-   "c": [
-    "a recombination fraction in (0,0.5]",
-    "meanImputationR2_mem_unit: 0 < c",
-    "shorter_ld_worse_imputation: 0 < c"
-   ],
-   "ld_extent": [
-    "no theorem hypothesis and no recognised meaning for parameter `ld_extent` : \u211d"
-   ]
-  },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "meanImputationR2",
   "module": "ImputationPortability",
   "line": 112,
@@ -3651,15 +3490,10 @@
    1.0
   ],
   "range_why": "`driftLDRetention` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "Ne < Ne\u2082",
-    "thm": "driftLDRetention_strictMono",
-    "reason": "unknown identifier Ne\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -3750,20 +3584,10 @@
    1.0
   ],
   "range_why": "`ldRetainedFraction` names a proportion",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "Ne < Ne\u2082",
-    "thm": "larger_ne_more_ld_retained",
-    "reason": "unknown identifier Ne\u2082"
-   },
-   {
-    "hyp": "t\u2081 < t",
-    "thm": "ld_retained_decreasing",
-    "reason": "unknown identifier t\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     2.0,
@@ -3806,15 +3630,10 @@
    1.0
   ],
   "range_why": "`ldRetentionPerGen` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "r\u2081 < r",
-    "thm": "ldWhiteningGain_of_ldRetention_antitone",
-    "reason": "unknown identifier r\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "r": [
     1e-08,
@@ -3871,62 +3690,8 @@
   "severity": -1.0
  },
  "LDDecayTheory.tagR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`tagR2` names a proportion of variance explained",
-  "side_constraints": [
-   "D_sq \u2264 var_tag * var_causal"
-  ],
-  "side_constraints_from": [
-   "tag_r2_le_one"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "D_sq < D_sq_source",
-    "thm": "tag_r2_decreases_with_ld_change",
-    "reason": "unknown identifier D_sq_source"
-   }
-  ],
-  "box": {
-   "D_sq": [
-    0.0001,
-    1000.0,
-    "meaning"
-   ],
-   "var_tag": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ],
-   "var_causal": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ]
-  },
-  "unguarded": [
-   "D_sq"
-  ],
-  "box_provenance": {
-   "D_sq": [
-    "a variance / positive scale parameter"
-   ],
-   "var_tag": [
-    "a variance / scale parameter is positive",
-    "tag_r2_le_one: 0 < var_tag",
-    "tag_r2_decreases_with_ld_change: 0 < var_tag"
-   ],
-   "var_causal": [
-    "a variance / scale parameter is positive",
-    "tag_r2_le_one: 0 < var_causal",
-    "tag_r2_decreases_with_ld_change: 0 < var_causal"
-   ]
-  },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "tagR2",
   "module": "LDDecayTheory",
   "line": 117,
@@ -3990,15 +3755,10 @@
    1.0
   ],
   "range_why": "`portabilityAtTime` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "t\u2081 < t",
-    "thm": "portability_decreases_with_time",
-    "reason": "unknown identifier t\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "r2_initial": [
     0.0001,
@@ -4049,15 +3809,10 @@
    Infinity
   ],
   "range_why": "`secularTrendBias` names a standard deviation / standard error",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "t < t\u2082",
-    "thm": "secular_trend_grows",
-    "reason": "unknown identifier t\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "trend_rate": [
     1e-06,
@@ -4128,9 +3883,10 @@
    1.0
   ],
   "range_why": "`ldBandDetectionShare` names a proportion",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "decay": [
     0.0,
@@ -4166,10 +3922,11 @@
   "value": 1000.0000000000001,
   "overshoot": 999.0000000000001,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "ldBandDetectionShare",
   "module": "MetricSpecificPortability",
-  "line": 1182,
+  "line": 1183,
   "family": "range",
   "py": "(kappa - _b.div(((2.0 * decay) * _b.sin(((_b.pi * kappa)))), ((_b.pi * ((1.0 + _b.pow(decay, 2.0)))))))",
   "severity": 50.0
@@ -4180,13 +3937,10 @@
    1.0
   ],
   "range_why": "`ldBlockDetectionShare` names a proportion",
-  "side_constraints": [
-   "retainedMarkers < totalMarkers"
-  ],
-  "side_constraints_from": [
-   "ldBlockDetectionShare_le_retention"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "recomb": [
     1e-08,
@@ -4234,22 +3988,31 @@
     "a \u2115 argument is a nonnegative integer"
    ]
   },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "escape",
+  "witness": {
+   "recomb": 0.0015482372184684094,
+   "Ne": 163209.3122260625,
+   "retainedMarkers": 1000.0,
+   "totalMarkers": 1.0
+  },
+  "value": 1000.0000000000001,
+  "overshoot": 999.0000000000001,
+  "blind_coordinates": [],
+  "escapes_only_where_violated": [],
+  "side": "above",
   "name": "ldBlockDetectionShare",
   "module": "MetricSpecificPortability",
-  "line": 1455,
+  "line": 1456,
   "family": "range",
   "py": "MetricSpecificPortability_ldBandDetectionShare((LDDecayTheory_ldRetentionPerGen(recomb, Ne)), (MetricSpecificPortability_ldPanelRetentionFraction(retainedMarkers, totalMarkers)))",
-  "severity": -1.0
+  "severity": 50.0
  },
  "MetricSpecificPortability.ldBlockPruningDeficit": {
   "verdict": "no-range",
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ldBlockPruningDeficit",
   "module": "MetricSpecificPortability",
-  "line": 1465,
+  "line": 1466,
   "family": "range",
   "py": "MetricSpecificPortability_ldPruningDetectionDeficit((LDDecayTheory_ldRetentionPerGen(recomb, Ne)), (MetricSpecificPortability_ldPanelRetentionFraction(retainedMarkers, totalMarkers)))",
   "severity": -1.0
@@ -4260,13 +4023,10 @@
    1.0
   ],
   "range_why": "`ldPanelRetentionFraction` names a proportion",
-  "side_constraints": [
-   "retainedMarkers < totalMarkers"
-  ],
-  "side_constraints_from": [
-   "ldPanelRetentionFraction_mem"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "retainedMarkers": [
     0.0,
@@ -4293,22 +4053,29 @@
     "a \u2115 argument is a nonnegative integer"
    ]
   },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "escape",
+  "witness": {
+   "retainedMarkers": 1000.0,
+   "totalMarkers": 1.0
+  },
+  "value": 1000.0,
+  "overshoot": 999.0,
+  "blind_coordinates": [],
+  "escapes_only_where_violated": [],
+  "side": "above",
   "name": "ldPanelRetentionFraction",
   "module": "MetricSpecificPortability",
-  "line": 1393,
+  "line": 1394,
   "family": "range",
   "py": "_b.div(retainedMarkers, totalMarkers)",
-  "severity": -1.0
+  "severity": 50.0
  },
  "MetricSpecificPortability.ldPruningDetectionDeficit": {
   "verdict": "no-range",
   "reason": "name and docstring commit the definition to no particular range",
   "name": "ldPruningDetectionDeficit",
   "module": "MetricSpecificPortability",
-  "line": 1189,
+  "line": 1190,
   "family": "range",
   "py": "_b.div(((2.0 * decay) * _b.sin(((_b.pi * kappa)))), ((_b.pi * ((1.0 + _b.pow(decay, 2.0))))))",
   "severity": -1.0
@@ -4319,13 +4086,10 @@
    1.0
   ],
   "range_why": "`ldTightLinkageDetectionShare` names a proportion",
-  "side_constraints": [
-   "retainedMarkers < totalMarkers"
-  ],
-  "side_constraints_from": [
-   "ldTightLinkage_le_ldBlockDetectionShare"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "retainedMarkers": [
     0.0,
@@ -4350,15 +4114,22 @@
     "a \u2115 argument is a nonnegative integer"
    ]
   },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "escape",
+  "witness": {
+   "retainedMarkers": 1000.0,
+   "totalMarkers": 1.0
+  },
+  "value": 1000.0000000000001,
+  "overshoot": 999.0000000000001,
+  "blind_coordinates": [],
+  "escapes_only_where_violated": [],
+  "side": "above",
   "name": "ldTightLinkageDetectionShare",
   "module": "MetricSpecificPortability",
-  "line": 1476,
+  "line": 1477,
   "family": "range",
   "py": "(MetricSpecificPortability_ldPanelRetentionFraction(retainedMarkers, totalMarkers) - _b.div(_b.sin(((_b.pi * MetricSpecificPortability_ldPanelRetentionFraction(retainedMarkers, totalMarkers)))), _b.pi))",
-  "severity": -1.0
+  "severity": 50.0
  },
  "MetricSpecificPortability.metricPPV": {
   "range": [
@@ -4366,20 +4137,10 @@
    1.0
   ],
   "range_why": "`metricPPV` names a classification rate",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "prevalence < K\u2082",
-    "thm": "ppv_increases_with_prevalence",
-    "reason": "unknown identifier K\u2082"
-   },
-   {
-    "hyp": "prevalence < K_target",
-    "thm": "different_uses_different_metrics",
-    "reason": "unknown identifier K_target"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "sensitivity": [
     0.0,
@@ -4434,13 +4195,10 @@
    1.0
   ],
   "range_why": "`ppvPortabilityGap` names a classification rate",
-  "side_constraints": [
-   "prevalenceSource < prevalenceTarget"
-  ],
-  "side_constraints_from": [
-   "sensitivity_more_portable_than_ppv"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "sensitivity": [
     0.0,
@@ -4488,9 +4246,10 @@
     "different_uses_different_metrics: K_target < 1"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "inconclusive",
+  "bnb_boxes": 1500,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "ppvPortabilityGap",
   "module": "MetricSpecificPortability",
   "line": 804,
@@ -4514,9 +4273,10 @@
    1.0
   ],
   "range_why": "`sensitivityPortabilityGap` names a classification rate",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "sensSource": [
     0.0,
@@ -4558,9 +4318,10 @@
    Infinity
   ],
   "range_why": "`effectMutualInformation` names an information-theoretic divergence",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "m": [
     1.0,
@@ -4602,9 +4363,10 @@
    1.0
   ],
   "range_why": "`portabilityGap` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "r2_source": [
     0.0001,
@@ -4637,6 +4399,7 @@
   "value": -0.9999,
   "overshoot": 0.9999,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "portabilityGap",
   "module": "MultiAncestryTheory",
@@ -4651,15 +4414,10 @@
    1.0
   ],
   "range_why": "`combinedPortability` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "lam_eff_neutral < lam_eff",
-    "thm": "immune_combined_decay_faster",
-    "reason": "unknown identifier lam_eff_neutral"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "r2_src": [
     0.0001,
@@ -4717,6 +4475,7 @@
    "lam_LD",
    "lam_eff"
   ],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "combinedPortability",
   "module": "OpenQuestions",
@@ -4771,26 +4530,10 @@
    1.0
   ],
   "range_why": "`samplePCResidualAxisFraction` names a proportion",
-  "side_constraints": [
-   "spike \u2264 bbpProxyThreshold n M",
-   "bbpProxyThreshold n M < spike"
-  ],
-  "side_constraints_from": [
-   "subthreshold_sample_pc_leaves_full_axis",
-   "superthreshold_sample_pc_residual_fraction"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "bbpProxyThreshold n M < spike\u2081",
-    "thm": "samplePCResidualAxisFraction_strictAntiOn_superthreshold",
-    "reason": "unknown identifier spike\u2081"
-   },
-   {
-    "hyp": "spike\u2081 < spike",
-    "thm": "samplePCResidualAxisFraction_strictAntiOn_superthreshold",
-    "reason": "unknown identifier spike\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "n": [
     1.0,
@@ -4828,9 +4571,10 @@
     "no theorem hypothesis and no recognised meaning for parameter `spike` : \u211d"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "inconclusive",
+  "bnb_boxes": 1500,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "samplePCResidualAxisFraction",
   "module": "Overlap",
   "line": 64,
@@ -4904,13 +4648,10 @@
    1.0
   ],
   "range_why": "`prevalenceCITLShift` names a probability or allele frequency",
-  "side_constraints": [
-   "pi_source < pi_target"
-  ],
-  "side_constraints_from": [
-   "citl_shift_positive_higher_prevalence"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "pi_source": [
     -1000.0,
@@ -4937,22 +4678,23 @@
   },
   "verdict": "escape-unguarded",
   "witness": {
-   "pi_source": 9.512544968747502e-05,
-   "pi_target": 530.4492555591769
+   "pi_source": 1.000074706696589,
+   "pi_target": -1.1188724040584299e-05
   },
-  "value": 9.260218884487003,
-  "overshoot": 8.260218884487003,
+  "value": -20.902630784872358,
+  "overshoot": 20.902630784872358,
   "blind_coordinates": [
    "pi_source",
    "pi_target"
   ],
-  "side": "above",
+  "escapes_only_where_violated": [],
+  "side": "below",
   "name": "prevalenceCITLShift",
   "module": "PGSCalibrationTheory",
   "line": 259,
   "family": "range",
   "py": "(PGSCalibrationTheory_prevalenceLogit(pi_target) - PGSCalibrationTheory_prevalenceLogit(pi_source))",
-  "severity": 4.666212522544392
+  "severity": 18.40496282270888
  },
  "PGSCalibrationTheory.prevalenceLogit": {
   "verdict": "no-range",
@@ -5020,9 +4762,10 @@
    1.0
   ],
   "range_why": "`fst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "driftFactor": [
     0.001,
@@ -5045,6 +4788,7 @@
   "value": -99.0,
   "overshoot": 99.0,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "fstFromDriftFactor",
   "module": "PhenomeWidePortability",
@@ -5069,9 +4813,10 @@
    1.0
   ],
   "range_why": "`neutralPortabilityRatioLD` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "fst_additional": [
     0.0,
@@ -5105,6 +4850,7 @@
   "value": 100.0,
   "overshoot": 99.0,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "neutralPortabilityRatioLD",
   "module": "PhenomeWidePortability",
@@ -5119,15 +4865,10 @@
    Infinity
   ],
   "range_why": "`selectedDriftFactor` names a standard deviation / standard error",
-  "side_constraints": [
-   "s_correction < 1 / (2 * Ne)",
-   "0 < 1 - 1 / (2 * Ne)"
-  ],
-  "side_constraints_from": [
-   "selectedDriftFactor_mem_unit",
-   "selectedDriftFactor_mem_unit"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -5167,9 +4908,9 @@
     "fst_causal_lt_fst_neutral_of_stabilizing_selection: 0 < s_correction"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "proved",
+  "bnb_boxes": 1,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
   "name": "selectedDriftFactor",
   "module": "PhenomeWidePortability",
   "line": 137,
@@ -5183,16 +4924,13 @@
    1.0
   ],
   "range_why": "`effectCorrelationFluctuating` names a correlation coefficient",
-  "side_constraints": [
-   "0 \u2264 f * N"
-  ],
-  "side_constraints_from": [
-   "effectCorrelation_mem_range"
-  ],
-  "side_constraints_dropped": [
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [
    {
-    "hyp": "0 \u2264 s * N",
     "thm": "effectCorrelation_mem_range",
+    "hyp": "0 \u2264 s * N",
     "reason": "unknown identifier s"
    }
   ],
@@ -5232,15 +4970,25 @@
     "fluctuating_selection_worst_portability: 0 < N"
    ]
   },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "escape-unguarded",
+  "witness": {
+   "d": 1000.0,
+   "f": -1000.0,
+   "N": 10000000.0
+  },
+  "value": 9999999999001.0,
+  "overshoot": 9999999999000.0,
+  "blind_coordinates": [
+   "f"
+  ],
+  "escapes_only_where_violated": [],
+  "side": "above",
   "name": "effectCorrelationFluctuating",
   "module": "PolygenicAdaptation",
   "line": 297,
   "family": "range",
   "py": "_b.mx(((- 1.0)), ((1.0 - (d * ((1.0 + (f * N)))))))",
-  "severity": -1.0
+  "severity": 55.000004342942646
  },
  "PolygenicAdaptation.effectCorrelationStabilizing": {
   "range": [
@@ -5248,16 +4996,13 @@
    1.0
   ],
   "range_why": "`effectCorrelationStabilizing` names a correlation coefficient",
-  "side_constraints": [
-   "0 \u2264 s * N"
-  ],
-  "side_constraints_from": [
-   "effectCorrelation_mem_range"
-  ],
-  "side_constraints_dropped": [
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [
    {
-    "hyp": "0 \u2264 f * N",
     "thm": "effectCorrelation_mem_range",
+    "hyp": "0 \u2264 f * N",
     "reason": "unknown identifier f"
    }
   ],
@@ -5305,6 +5050,7 @@
   "value": -998.9990000010001,
   "overshoot": 997.9990000010001,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "effectCorrelationStabilizing",
   "module": "PolygenicAdaptation",
@@ -5329,9 +5075,10 @@
    Infinity
   ],
   "range_why": "`pgsDiffVariance_two_pop` names a variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
     1e-06,
@@ -5372,9 +5119,10 @@
    Infinity
   ],
   "range_why": "`pgsDriftVariance_one_pop` names a variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
     1e-06,
@@ -5503,7 +5251,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "hweMellinJetVariance",
   "module": "PolygenicSpectroscopy",
-  "line": 809,
+  "line": 831,
   "family": "range",
   "py": "((((((2.0 * q) * ((1.0 - q))) * _b.pow((_b.log((_b.div((2.0 * q), ((1.0 - q)))))), 2.0)) + (_b.pow(((1.0 - (2.0 * q))), 2.0) * _b.pow((_b.log((_b.div(_b.pow(((1.0 - (2.0 * q))), 2.0), (((2.0 * q) * ((1.0 - q)))))))), 2.0))) + (((2.0 * q) * ((1.0 - q))) * _b.pow((_b.log((_b.div((2.0 * ((1.0 - q))), q)))), 2.0))) - _b.pow(PolygenicSpectroscopy_hweMellinDrift(q), 2.0))",
   "severity": -1.0
@@ -5519,7 +5267,7 @@
   "witness": {},
   "name": "latticeCriticalMaf",
   "module": "PolygenicSpectroscopy",
-  "line": 756,
+  "line": 778,
   "family": "range",
   "py": "_b.div(((2.0 - _b.sqrt(2.0))), 4.0)",
   "severity": -1.0
@@ -5529,7 +5277,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "maxSafeEpistaticOrder",
   "module": "PolygenicSpectroscopy",
-  "line": 605,
+  "line": 627,
   "family": "range",
   "py": "_b.div(_b.log(N), PolygenicSpectroscopy_hweMellinDrift(q))",
   "severity": -1.0
@@ -5540,15 +5288,10 @@
    1.0
   ],
   "range_why": "`alleleFreqAfterMigration` names a probability or allele frequency",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "t\u2081 < t",
-    "thm": "alleleFreq_deviation_decreases",
-    "reason": "unknown identifier t\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "p\u2080": [
     1e-06,
@@ -5609,19 +5352,10 @@
    1.0
   ],
   "range_why": "`coalFst` names a fixation index / F-statistic",
-  "side_constraints": [
-   "100 * Ne < t"
-  ],
-  "side_constraints_from": [
-   "coal_fst_approaches_one"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "t < t\u2082",
-    "thm": "coal_fst_increases_with_time",
-    "reason": "unknown identifier t\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "t": [
     0.0,
@@ -5654,9 +5388,10 @@
     "coal_fst_approaches_one: 0 < Ne"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "inconclusive",
+  "bnb_boxes": 1500,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "coalFst",
   "module": "PopulationGeneticsFoundations",
   "line": 127,
@@ -5690,20 +5425,10 @@
    1.0
   ],
   "range_why": "`continuousSteppingStoneFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "d < d\u2082",
-    "thm": "continuousSteppingStoneFst_increases",
-    "reason": "unknown identifier d\u2082"
-   },
-   {
-    "hyp": "L\u2081 < L",
-    "thm": "continuousSteppingStoneFst_decreases_with_L",
-    "reason": "unknown identifier L\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "L": [
     0.001,
@@ -5757,9 +5482,10 @@
    1.0
   ],
   "range_why": "`expectedHeterozygosity` names a heterozygosity",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03b8": [
     1e-06,
@@ -5805,20 +5531,10 @@
    1.0
   ],
   "range_why": "`fstDerived` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "t < t\u2082",
-    "thm": "fstDerived_mono",
-    "reason": "unknown identifier t\u2082"
-   },
-   {
-    "hyp": "Ne\u2081 < Ne",
-    "thm": "fstDerived_faster_small_Ne",
-    "reason": "unknown identifier Ne\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     2.0,
@@ -5861,9 +5577,10 @@
    1.0
   ],
   "range_why": "`fst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "H": [
     -1000.0,
@@ -5898,6 +5615,7 @@
   "blind_coordinates": [
    "H"
   ],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "fstFromHetRatio",
   "module": "PopulationGeneticsFoundations",
@@ -5912,9 +5630,10 @@
    1.0
   ],
   "range_why": "`fstMigrationMutationEquilibrium` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -5966,9 +5685,10 @@
    1.0
   ],
   "range_why": "`fstMutationDriftEquilibrium` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03b8": [
     1e-06,
@@ -6009,9 +5729,10 @@
    1.0
   ],
   "range_why": "`fstMutationDriftTransient` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03b8": [
     1e-06,
@@ -6065,13 +5786,16 @@
    1.0
   ],
   "range_why": "`fstMutationDriftTransientDiscrete` names a fixation index / F-statistic",
-  "side_constraints": [
-   "\u03b8 \u2264 2 * Ne"
-  ],
-  "side_constraints_from": [
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [
    "fstTransientDiscrete_nonneg"
   ],
-  "side_constraints_dropped": [],
+  "bounding_theorem_hyps": {
+   "fstTransientDiscrete_nonneg": [
+    "\u03b8 \u2264 2 * Ne"
+   ]
+  },
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03b8": [
     1e-06,
@@ -6108,9 +5832,9 @@
     "a \u2115 time in generations"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "proved",
+  "bnb_boxes": 1,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
   "name": "fstMutationDriftTransientDiscrete",
   "module": "PopulationGeneticsFoundations",
   "line": 1414,
@@ -6124,9 +5848,10 @@
    1.0
   ],
   "range_why": "`hetDecayFactor` names a heterozygosity",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -6168,15 +5893,10 @@
    1.0
   ],
   "range_why": "`hetEquilibrium` names a heterozygosity",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "Ne\u2081 < Ne",
-    "thm": "fstEquilibrium_derived_decreases",
-    "reason": "unknown identifier Ne\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -6243,39 +5963,10 @@
    1.0
   ],
   "range_why": "`islandModelFst` names a fixation index / F-statistic",
-  "side_constraints": [
-   "1 < 4 * Ne * m"
-  ],
-  "side_constraints_from": [
-   "islandModelFst_lt_half_of_one_migrant"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "m\u2081 < m",
-    "thm": "more_migration_lower_fst",
-    "reason": "unknown identifier m\u2081"
-   },
-   {
-    "hyp": "a < m",
-    "thm": "islandModelFst_strictAnti_m",
-    "reason": "unknown identifier a"
-   },
-   {
-    "hyp": "a < Ne",
-    "thm": "islandModelFst_strictAnti_Ne",
-    "reason": "unknown identifier a"
-   },
-   {
-    "hyp": "k < 4 * Ne * m",
-    "thm": "islandModelFst_small_of_large_migration",
-    "reason": "unknown identifier k"
-   },
-   {
-    "hyp": "m\u2082\u2081 < m",
-    "thm": "asymmetric_fst_difference_sign",
-    "reason": "unknown identifier m\u2082\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -6314,9 +6005,9 @@
     "fstMigrationMutation_lt_migrationOnly: 0 < m"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "proved",
+  "bnb_boxes": 1,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
   "name": "islandModelFst",
   "module": "PopulationGeneticsFoundations",
   "line": 791,
@@ -6330,15 +6021,10 @@
    1.0
   ],
   "range_why": "`ldCorrelation` names a correlation coefficient",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "M < M\u2082",
-    "thm": "ldCorrelationFromMigration_increases",
-    "reason": "unknown identifier M\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "M": [
     1e-09,
@@ -6370,13 +6056,16 @@
    1.0
   ],
   "range_why": "`neiFst` names a fixation index / F-statistic",
-  "side_constraints": [
-   "H_S \u2264 H_T"
-  ],
-  "side_constraints_from": [
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [
    "nei_fst_in_unit"
   ],
-  "side_constraints_dropped": [],
+  "bounding_theorem_hyps": {
+   "nei_fst_in_unit": [
+    "H_S \u2264 H_T"
+   ]
+  },
+  "unmodelled_hypotheses": [],
   "box": {
    "H_T": [
     1e-09,
@@ -6400,15 +6089,24 @@
     "nei_fst_in_unit: 0 \u2264 H_S"
    ]
   },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "escape-outside-theorem",
+  "witness": {
+   "H_T": 1e-09,
+   "H_S": 1.0
+  },
+  "value": -999999999.0,
+  "overshoot": 999999999.0,
+  "blind_coordinates": [],
+  "escapes_only_where_violated": [
+   "nei_fst_in_unit"
+  ],
+  "side": "below",
   "name": "neiFst",
   "module": "PopulationGeneticsFoundations",
   "line": 42,
   "family": "range",
   "py": "_b.div(((H_T - H_S)), H_T)",
-  "severity": -1.0
+  "severity": 75.00000434294265
  },
  "PopulationGeneticsFoundations.scaledMutationRate": {
   "verdict": "no-range",
@@ -6426,15 +6124,10 @@
    Infinity
   ],
   "range_why": "`selectionMigrationEquilibrium` names a standard deviation / standard error",
-  "side_constraints": [
-   "m * (1 + s) < s",
-   "s \u2264 m * (1 + s)"
-  ],
-  "side_constraints_from": [
-   "selectionMigrationEquilibrium_isFixedPoint",
-   "selectionMigrationEquilibrium_eq_zero"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "s": [
     1e-06,
@@ -6464,9 +6157,9 @@
     "selectionMigrationEquilibrium_orderings: m < 1"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "proved",
+  "bnb_boxes": 1,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
   "name": "selectionMigrationEquilibrium",
   "module": "PopulationGeneticsFoundations",
   "line": 243,
@@ -6480,9 +6173,10 @@
    Infinity
   ],
   "range_why": "`selectionMigrationEquilibriumMigrationFirst` names a standard deviation / standard error",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "s": [
     1e-06,
@@ -6522,9 +6216,10 @@
    1.0
   ],
   "range_why": "`sharedLDFraction` names a proportion",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03b8": [
     1e-06,
@@ -6565,9 +6260,10 @@
    1.0
   ],
   "range_why": "`simpleFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "p\u2081": [
     1e-06,
@@ -6621,9 +6317,10 @@
    1.0
   ],
   "range_why": "`wrightFIT` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "f_IS": [
     -1000.0,
@@ -6658,6 +6355,7 @@
   "blind_coordinates": [
    "f_IS"
   ],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "wrightFIT",
   "module": "PopulationGeneticsFoundations",
@@ -6672,19 +6370,10 @@
    1.0
   ],
   "range_why": "`diversifyingPortability` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [
-   "2 * fst < 1"
-  ],
-  "side_constraints_from": [
-   "diversifying_lt_stabilizing"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "2 * lam_turn > lam_stab",
-    "thm": "diversifying_lt_stabilizing",
-    "reason": "unknown identifier lam_stab"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "r2_0": [
     0.0001,
@@ -6730,6 +6419,7 @@
   "blind_coordinates": [
    "lam_turn"
   ],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "diversifyingPortability",
   "module": "PortabilityBounds",
@@ -6744,9 +6434,10 @@
    1.0
   ],
   "range_why": "`neutralPortability` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "r2_0": [
     0.0001,
@@ -6795,19 +6486,10 @@
    1.0
   ],
   "range_why": "`stabilizingPortability` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [
-   "2 * fst < 1"
-  ],
-  "side_constraints_from": [
-   "diversifying_lt_stabilizing"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "2 * lam_turn > strength",
-    "thm": "diversifying_lt_stabilizing",
-    "reason": "unknown identifier lam_turn"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "r2_0": [
     0.0001,
@@ -6855,6 +6537,7 @@
   "blind_coordinates": [
    "strength"
   ],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "stabilizingPortability",
   "module": "PortabilityBounds",
@@ -6879,9 +6562,10 @@
    Infinity
   ],
   "range_why": "`Var_Delta_Mu` names a variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
     1e-06,
@@ -6921,7 +6605,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "admixtureLDBoost",
   "module": "PortabilityDrift",
-  "line": 5111,
+  "line": 5207,
   "family": "range",
   "py": "_b.div(PortabilityDrift_admixtureLDDecay(r, t_since), equilibrium_ld)",
   "severity": -1.0
@@ -6931,7 +6615,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "admixtureLDDecay",
   "module": "PortabilityDrift",
-  "line": 5064,
+  "line": 5160,
   "family": "range",
   "py": "_b.pow(((1.0 - r)), generations_since)",
   "severity": -1.0
@@ -6942,9 +6626,10 @@
    1.0
   ],
   "range_why": "`alleleFreqMismatchPenalty` names a probability or allele frequency",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "pSource": [
     1e-06,
@@ -6985,20 +6670,10 @@
    1.0
   ],
   "range_why": "`asymmetricFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "m\u2082\u2081 < m_into",
-    "thm": "asymmetric_migration_directional_fst",
-    "reason": "unknown identifier m\u2082\u2081"
-   },
-   {
-    "hyp": "m_into < m\u2081\u2082",
-    "thm": "asymmetric_migration_portability_direction",
-    "reason": "unknown identifier m\u2081\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -7034,10 +6709,11 @@
   "blind_coordinates": [
    "m_into"
   ],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "asymmetricFst",
   "module": "PortabilityDrift",
-  "line": 5002,
+  "line": 5098,
   "family": "range",
   "py": "_b.div(1.0, ((1.0 + ((4.0 * Ne) * m_into))))",
   "severity": 39.49360472935638
@@ -7078,9 +6754,10 @@
    Infinity
   ],
   "range_why": "`covarianceDivergence` names a variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "fst": [
     0.0,
@@ -7121,9 +6798,10 @@
    Infinity
   ],
   "range_why": "`covarianceDivergenceMutationDrift` names a variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "fst_drift": [
     0.0,
@@ -7168,9 +6846,10 @@
    1.0
   ],
   "range_why": "`covarianceRetention` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "freq_corr": [
     -1.0,
@@ -7203,6 +6882,7 @@
   "value": -1.0,
   "overshoot": 1.0,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "covarianceRetention",
   "module": "PortabilityDrift",
@@ -7216,7 +6896,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "effectiveSymmetricMigration",
   "module": "PortabilityDrift",
-  "line": 5043,
+  "line": 5139,
   "family": "range",
   "py": "_b.div(((m12 + m21)), 2.0)",
   "severity": -1.0
@@ -7227,15 +6907,10 @@
    1.0
   ],
   "range_why": "`equalVarianceGaussianAUC` names an AUC / c-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "r2 < r2\u2082",
-    "thm": "sourceLiabilityAUC_strictly_increases_with_r2",
-    "reason": "unknown identifier r2\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "r2": [
     1e-06,
@@ -7266,9 +6941,10 @@
    1.0
   ],
   "range_why": "`equalVarianceGaussianAUC` names an AUC / c-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "snr": [
     -1000.0,
@@ -7300,9 +6976,10 @@
    1.0
   ],
   "range_why": "`equalVarianceGaussianAUC` names an AUC / c-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "vSignal": [
     1e-06,
@@ -7348,67 +7025,8 @@
   "severity": -1.0
  },
  "PortabilityDrift.expectedR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`expectedR2` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "vSignal < y",
-    "thm": "expectedR2_strictMono_nonneg",
-    "reason": "unknown identifier y"
-   }
-  ],
-  "box": {
-   "vSignal": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ],
-   "V_E": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ]
-  },
-  "unguarded": [],
-  "box_provenance": {
-   "vSignal": [
-    "a variance / scale parameter is positive",
-    "ld_mediates_portability: 0 < vSignal",
-    "environment_mediates_portability: 0 < V_genetic",
-    "counterfactual_wgs_residual: 0 < vSignal",
-    "counterfactual_infinite_sample: 0 < vSignal",
-    "counterfactual_equal_environments: 0 < vSignal",
-    "intervention_hierarchy: 0 < vSig",
-    "diminishing_marginal_returns: 0 \u2264 v",
-    "expectedR2_strictMono_nonneg: 0 \u2264 x"
-   ],
-   "V_E": [
-    "a variance / scale parameter is positive",
-    "selection_dominant_for_immune: 0 < V_E",
-    "ld_mediates_portability: 0 < V_E",
-    "environment_mediates_portability: 0 < V_env",
-    "counterfactual_same_ancestry_perfect: 0 < V_E",
-    "counterfactual_wgs_residual: 0 < V_E",
-    "counterfactual_infinite_sample: 0 < V_E",
-    "counterfactual_equal_environments: 0 < V_E",
-    "intervention_hierarchy: 0 < V_E",
-    "diminishing_marginal_returns: 0 < V_E",
-    "drift_only_overestimates_immune_portability: 0 < V_E",
-    "expectedR2_strictMono_nonneg: 0 < V_E",
-    "portability_ratio_with_target_ld_decay_any_source: 0 < V_E",
-    "portability_ratio_with_ld_decay: 0 < V_E",
-    "portability_ratio_with_ld_decay_general: 0 < V_E"
-   ]
-  },
-  "verdict": "inconclusive",
-  "bnb_boxes": 1500,
-  "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "expectedR2",
   "module": "PortabilityDrift",
   "line": 935,
@@ -7452,9 +7070,10 @@
    1.0
   ],
   "range_why": "`fst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "t": [
     0.0,
@@ -7497,15 +7116,10 @@
    1.0
   ],
   "range_why": "`fst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "tau \u2264 eps",
-    "thm": "pairwiseFst_composition_gap_le",
-    "reason": "unknown identifier eps"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "tau": [
     0.0001,
@@ -7542,9 +7156,10 @@
    1.0
   ],
   "range_why": "`fstIslandMultiplicativeEquilibrium` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -7575,9 +7190,9 @@
   "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4613,
+  "line": 4727,
   "family": "range",
-  "py": "_b.div(_b.pow(((1.0 - m)), 2.0), ((_b.pow(((1.0 - m)), 2.0) + (((2.0 * Ne) * m) * ((2.0 - m))))))",
+  "py": "PortabilityDrift_ibdRecurrenceFixedPoint(Ne, m)",
   "severity": -1.0
  },
  "PortabilityDrift.fstMigDriftEquil": {
@@ -7586,25 +7201,10 @@
    1.0
   ],
   "range_why": "`fstMigDriftEquil` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "m\u2081 < m",
-    "thm": "fstMigDriftEquil_decreasing_in_m",
-    "reason": "unknown identifier m\u2081"
-   },
-   {
-    "hyp": "Ne\u2081 < Ne",
-    "thm": "fstMigDriftEquil_decreasing_in_Ne",
-    "reason": "unknown identifier Ne\u2081"
-   },
-   {
-    "hyp": "m < m\u2082",
-    "thm": "recurrence_derived_R2_increases_with_m",
-    "reason": "unknown identifier m\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -7645,7 +7245,7 @@
   "searched": 8000,
   "name": "fstMigDriftEquil",
   "module": "PortabilityDrift",
-  "line": 5208,
+  "line": 5304,
   "family": "range",
   "py": "_b.div(1.0, ((((4.0 * Ne) * m) + 1.0)))",
   "severity": -1.0
@@ -7656,9 +7256,10 @@
    1.0
   ],
   "range_why": "`fstMigDriftNext` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -7698,7 +7299,7 @@
   "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "fstMigDriftNext",
   "module": "PortabilityDrift",
-  "line": 5173,
+  "line": 5269,
   "family": "range",
   "py": "(((((1.0 - (2.0 * m)) - _b.div(1.0, ((2.0 * Ne))))) * Fst) + _b.div(1.0, ((2.0 * Ne))))",
   "severity": -1.0
@@ -7709,33 +7310,14 @@
    1.0
   ],
   "range_why": "`fstMigrationDriftEquilibrium` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [
    {
-    "hyp": "m\u2081 < m",
-    "thm": "fstMigrationDriftEquilibrium_decreases_with_m",
-    "reason": "unknown identifier m\u2081"
-   },
-   {
-    "hyp": "Ne\u2081 < Ne",
-    "thm": "fstMigrationDriftEquilibrium_decreases_with_Ne",
-    "reason": "unknown identifier Ne\u2081"
-   },
-   {
-    "hyp": "1 / (1 + 4 * Ne * m) < t / (t + 2 * Ne)",
-    "thm": "migration_reduces_fst_vs_pure_drift",
-    "reason": "unknown identifier t"
-   },
-   {
-    "hyp": "fst_observed \u2264 fstMigrationDriftEquilibrium Ne m",
     "thm": "migration_bounds_fst_below_one",
+    "hyp": "fst_observed \u2264 fstMigrationDriftEquilibrium Ne m",
     "reason": "unknown identifier fst_observed"
-   },
-   {
-    "hyp": "fstMigrationDriftEquilibrium Ne m < fst_nomial",
-    "thm": "migration_improves_R2_over_pure_drift",
-    "reason": "unknown identifier fst_nomial"
    }
   ],
   "box": {
@@ -7797,24 +7379,10 @@
    1.0
   ],
   "range_why": "`hetMutationFloor` names a heterozygosity",
-  "side_constraints": [
-   "1 / (2 * Ne) + 2 * mu \u2264 1"
-  ],
-  "side_constraints_from": [
-   "hetStepWithMutation_ge_hetMutationFloor"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "hetMutationFloor Ne mu \u2264 H",
-    "thm": "hetStepWithMutation_ge_hetMutationFloor",
-    "reason": "unknown identifier H"
-   },
-   {
-    "hyp": "hetMutationFloor Ne mu \u2264 H\u2080",
-    "thm": "hetTrajectory_ge_hetMutationFloor",
-    "reason": "unknown identifier H\u2080"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -7844,9 +7412,10 @@
     "driftOnly_lt_hetTrajectory_of_below_floor: 0 \u2264 mu"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "inconclusive",
+  "bnb_boxes": 1500,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
   "name": "hetMutationFloor",
   "module": "PortabilityDrift",
   "line": 460,
@@ -7860,15 +7429,10 @@
    1.0
   ],
   "range_why": "`hetStepWithMutation` names a heterozygosity",
-  "side_constraints": [
-   "1 / (2 * Ne) + 2 * mu \u2264 1",
-   "hetMutationFloor Ne mu \u2264 H"
-  ],
-  "side_constraints_from": [
-   "hetStepWithMutation_ge_hetMutationFloor",
-   "hetStepWithMutation_ge_hetMutationFloor"
-  ],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -7904,15 +7468,25 @@
     "no theorem hypothesis and no recognised meaning for parameter `H` : \u211d"
    ]
   },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "escape-unguarded",
+  "witness": {
+   "Ne": 10000000.0,
+   "mu": 1e-10,
+   "H": -1000.0
+  },
+  "value": -999.9999497998,
+  "overshoot": 999.9999497998,
+  "blind_coordinates": [
+   "H"
+  ],
+  "escapes_only_where_violated": [],
+  "side": "below",
   "name": "hetStepWithMutation",
   "module": "PortabilityDrift",
   "line": 435,
   "family": "range",
   "py": "((((1.0 - _b.div(1.0, ((2.0 * Ne))))) * H) + ((2.0 * mu) * ((1.0 - H))))",
-  "severity": -1.0
+  "severity": 35.00434055699428
  },
  "PortabilityDrift.hudsonFstFromCoalescenceTimes": {
   "range": [
@@ -7920,9 +7494,10 @@
    1.0
   ],
   "range_why": "`hudsonFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "ETss": [
     -1000.0,
@@ -7958,6 +7533,7 @@
    "ETss",
    "ETst"
   ],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "hudsonFstFromCoalescenceTimes",
   "module": "PortabilityDrift",
@@ -7976,15 +7552,36 @@
   "py": "((F + _b.div(((1.0 - F)), ((2.0 * Ne)))) - ((2.0 * rate) * F))",
   "severity": -1.0
  },
+ "PortabilityDrift.ibdRecurrenceFixedPoint": {
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
+  "name": "ibdRecurrenceFixedPoint",
+  "module": "PortabilityDrift",
+  "line": 4620,
+  "family": "range",
+  "py": "_b.div(_b.pow(((1.0 - rate)), 2.0), ((_b.pow(((1.0 - rate)), 2.0) + (((2.0 * Ne) * rate) * ((2.0 - rate))))))",
+  "severity": -1.0
+ },
+ "PortabilityDrift.ibdRecurrenceStep": {
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
+  "name": "ibdRecurrenceStep",
+  "module": "PortabilityDrift",
+  "line": 4607,
+  "family": "range",
+  "py": "(_b.pow(((1.0 - rate)), 2.0) * ((_b.div(1.0, ((2.0 * Ne))) + (((1.0 - _b.div(1.0, ((2.0 * Ne))))) * x))))",
+  "severity": -1.0
+ },
  "PortabilityDrift.islandFstMultiplicativeStep": {
   "range": [
    0.0,
    1.0
   ],
   "range_why": "`islandFstMultiplicativeStep` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -8030,12 +7627,13 @@
   "blind_coordinates": [
    "F"
   ],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "islandFstMultiplicativeStep",
   "module": "PortabilityDrift",
-  "line": 4602,
+  "line": 4710,
   "family": "range",
-  "py": "(_b.pow(((1.0 - m)), 2.0) * ((_b.div(1.0, ((2.0 * Ne))) + (((1.0 - _b.div(1.0, ((2.0 * Ne))))) * F))))",
+  "py": "PortabilityDrift_ibdRecurrenceStep(Ne, m, F)",
   "severity": 35.00434054896873
  },
  "PortabilityDrift.ldCorrelationDecay": {
@@ -8044,24 +7642,10 @@
    1.0
   ],
   "range_why": "`ldCorrelationDecay` names a correlation coefficient",
-  "side_constraints": [
-   "0 < lambda * fstGap"
-  ],
-  "side_constraints_from": [
-   "ldCorrelationDecay_strictAnti_distance"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "d1 < distance",
-    "thm": "ldCorrelationDecay_strictAnti_distance",
-    "reason": "unknown identifier d1"
-   },
-   {
-    "hyp": "fstSource < fstGap",
-    "thm": "ldCorrelationDecay_strictAnti_fst",
-    "reason": "unknown identifier fstSource"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "distance": [
     1.0,
@@ -8095,9 +7679,9 @@
     "ldCorrelationDecay_strictAnti_fst: 0 < lambda"
    ]
   },
-  "verdict": "guarded-by-side-condition",
+  "verdict": "proved",
+  "bnb_boxes": 1,
   "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
   "name": "ldCorrelationDecay",
   "module": "PortabilityDrift",
   "line": 2106,
@@ -8140,7 +7724,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "neutralAFBenchmarkFromRecurrence",
   "module": "PortabilityDrift",
-  "line": 5290,
+  "line": 5386,
   "family": "range",
   "py": "(1.0 - PortabilityDrift_fstMigDriftEquil(Ne, m))",
   "severity": -1.0
@@ -8171,20 +7755,10 @@
    1.0
   ],
   "range_why": "`pairwiseFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "tauS \u2264 eps",
-    "thm": "pairwiseFst_composition_gap_le",
-    "reason": "unknown identifier eps"
-   },
-   {
-    "hyp": "tauT \u2264 eps",
-    "thm": "pairwiseFst_composition_gap_le",
-    "reason": "unknown identifier eps"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "tauS": [
     0.0001,
@@ -8227,9 +7801,10 @@
    1.0
   ],
   "range_why": "`pairwiseFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "fstS": [
     0.0,
@@ -8280,35 +7855,10 @@
    1.0
   ],
   "range_why": "`presentDayEqualVarianceGaussianAUC` names an AUC / c-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "fst < fstT",
-    "thm": "neutralAF_benchmark_liability_auc_sensitive_to_drift",
-    "reason": "unknown identifier fstT"
-   },
-   {
-    "hyp": "0 \u2264 fst \u2227 fstT < 1",
-    "thm": "neutralAF_benchmark_liability_auc_sensitive_to_drift",
-    "reason": "trailing tokens at [('op', '\u2227'), ('ident', 'fstT'), ('op', '<'), ('num', '1')]"
-   },
-   {
-    "hyp": "fst < fstTarget",
-    "thm": "neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens",
-    "reason": "unknown identifier fstTarget"
-   },
-   {
-    "hyp": "0 \u2264 fst \u2227 fstTarget < 1",
-    "thm": "neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens",
-    "reason": "trailing tokens at [('op', '\u2227'), ('ident', 'fstTarget'), ('op', '<'), ('num', '1')]"
-   },
-   {
-    "hyp": "fstS < fst",
-    "thm": "drift_degrades_equalVarianceGaussianAUC",
-    "reason": "unknown identifier fstS"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
     1e-06,
@@ -8363,25 +7913,10 @@
    1.0
   ],
   "range_why": "`presentDayGaussianAUC` names an AUC / c-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "fstS < fst",
-    "thm": "drift_degrades_AUC_of_strictMono",
-    "reason": "unknown identifier fstS"
-   },
-   {
-    "hyp": "fst < fstTarget",
-    "thm": "targetAUC_lt_source_of_neutralAF_benchmark",
-    "reason": "unknown identifier fstTarget"
-   },
-   {
-    "hyp": "0 \u2264 fst \u2227 fstTarget < 1",
-    "thm": "targetAUC_lt_source_of_neutralAF_benchmark",
-    "reason": "trailing tokens at [('op', '\u2227'), ('ident', 'fstTarget'), ('op', '<'), ('num', '1')]"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
     1e-06,
@@ -8445,15 +7980,10 @@
    Infinity
   ],
   "range_why": "`presentDayPGSVarianceMutationDrift` names a variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "shared_ld < admixtureLDDecay r t_since",
-    "thm": "admixture_portability_above_equilibrium",
-    "reason": "unknown identifier r"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
     1e-06,
@@ -8517,132 +8047,8 @@
   "severity": -1.0
  },
  "PortabilityDrift.presentDayR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`presentDayR2` names a proportion of variance explained",
-  "side_constraints": [
-   "0 < presentDayPGSVariance V_A fst",
-   "0 < presentDayPGSVariance V_A fst + V_E",
-   "0 < presentDayR2 V_A V_E fst"
-  ],
-  "side_constraints_from": [
-   "presentDayR2_eq_statistical_rsquared",
-   "presentDayR2_eq_statistical_rsquared",
-   "portability_ratio_lt_one_of_positive_drift"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "fst < fstT",
-    "thm": "neutralAF_benchmark_r2_sensitive_to_drift",
-    "reason": "unknown identifier fstT"
-   },
-   {
-    "hyp": "fst\u2081 < fst",
-    "thm": "portability_concave_in_fst_reduction",
-    "reason": "unknown identifier fst\u2081"
-   },
-   {
-    "hyp": "fst \u2264 fstT",
-    "thm": "portability_gap_nonneg",
-    "reason": "unknown identifier fstT"
-   },
-   {
-    "hyp": "fst < fstTarget",
-    "thm": "neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens",
-    "reason": "unknown identifier fstTarget"
-   },
-   {
-    "hyp": "0 \u2264 fst \u2227 fstTarget < 1",
-    "thm": "neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens",
-    "reason": "trailing tokens at [('op', '\u2227'), ('ident', 'fstTarget'), ('op', '<'), ('num', '1')]"
-   },
-   {
-    "hyp": "fstS < fst",
-    "thm": "drift_degrades_R2",
-    "reason": "unknown identifier fstS"
-   },
-   {
-    "hyp": "fstMigrationDriftEquilibrium Ne m < fst",
-    "thm": "migration_improves_R2_over_pure_drift",
-    "reason": "unknown identifier Ne"
-   }
-  ],
-  "box": {
-   "V_A": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ],
-   "V_E": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ],
-   "fst": [
-    0.0,
-    1.0,
-    "theorem+meaning"
-   ]
-  },
-  "unguarded": [],
-  "box_provenance": {
-   "V_A": [
-    "a variance / scale parameter is positive",
-    "neutralAF_benchmark_r2_sensitive_to_drift: 0 < V_A",
-    "multi_ancestry_reduces_fst: 0 < V_A",
-    "portability_concave_in_fst_reduction: 0 < V_A",
-    "portability_gap_nonneg: 0 < V_A",
-    "portability_gap_increases_with_distance: 0 < V_A",
-    "diversity_reduces_max_gap: 0 < V_A",
-    "neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens: 0 < V_A",
-    "drift_degrades_R2: 0 < V_A",
-    "portability_ratio_lt_one_of_positive_drift: 0 < V_A",
-    "neutralAFBenchmarkRatio_from_state: 0 < V_A",
-    "targetR2_lt_source_from_neutralAF_benchmark: 0 < V_A",
-    "equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC: 0 < V_A",
-    "targetBrier_ge_source_of_neutralAF_benchmark: 0 < V_A",
-    "targetBrier_strict_gt_source_of_neutralAF_benchmark: 0 < V_A",
-    "mutationDrift_R2_lt_puredrift_R2: 0 < V_A",
-    "migration_improves_R2_over_pure_drift: 0 < V_A",
-    "asymmetric_migration_portability_direction: 0 < V_A",
-    "recurrence_derived_R2_increases_with_m: 0 < V_A"
-   ],
-   "V_E": [
-    "a variance / scale parameter is positive",
-    "neutralAF_benchmark_r2_sensitive_to_drift: 0 < V_E",
-    "multi_ancestry_reduces_fst: 0 < V_E",
-    "portability_concave_in_fst_reduction: 0 < V_E",
-    "portability_gap_nonneg: 0 < V_E",
-    "portability_gap_increases_with_distance: 0 < V_E",
-    "diversity_reduces_max_gap: 0 < V_E",
-    "neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens: 0 < V_E",
-    "drift_degrades_R2: 0 < V_E",
-    "portability_ratio_lt_one_of_positive_drift: 0 < V_E",
-    "neutralAFBenchmarkRatio_from_state: 0 < V_E",
-    "targetR2_lt_source_from_neutralAF_benchmark: 0 < V_E",
-    "equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC: 0 < V_E",
-    "targetBrier_ge_source_of_neutralAF_benchmark: 0 < V_E",
-    "targetBrier_strict_gt_source_of_neutralAF_benchmark: 0 < V_E",
-    "mutationDrift_R2_lt_puredrift_R2: 0 < V_E",
-    "migration_improves_R2_over_pure_drift: 0 < V_E",
-    "asymmetric_migration_portability_direction: 0 < V_E",
-    "recurrence_derived_R2_increases_with_m: 0 < V_E"
-   ],
-   "fst": [
-    "an F_ST in [0,1]",
-    "portability_concave_in_fst_reduction: fst\u2082 \u2264 1",
-    "drift_degrades_R2: fstT \u2264 1",
-    "equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC: fst < 1",
-    "mutationDrift_R2_lt_puredrift_R2: 0 \u2264 fst_drift",
-    "mutationDrift_R2_lt_puredrift_R2: fst_drift < 1",
-    "migration_improves_R2_over_pure_drift: fst_nomial < 1"
-   ]
-  },
-  "verdict": "guarded-by-side-condition",
-  "searched": 8000,
-  "note": "no escape inside the author's relational hypotheses; the range is not implied by the definition alone",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "presentDayR2",
   "module": "PortabilityDrift",
   "line": 887,
@@ -8651,61 +8057,8 @@
   "severity": -1.0
  },
  "PortabilityDrift.presentDayR2MutationDrift": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`presentDayR2MutationDrift` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
-  "box": {
-   "V_A": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ],
-   "V_E": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ],
-   "fst_drift": [
-    0.0,
-    1.0,
-    "theorem+meaning"
-   ],
-   "shared_ld": [
-    0.0,
-    1.0,
-    "theorem+meaning"
-   ]
-  },
-  "unguarded": [],
-  "box_provenance": {
-   "V_A": [
-    "a variance / scale parameter is positive",
-    "mutationDrift_R2_lt_puredrift_R2: 0 < V_A"
-   ],
-   "V_E": [
-    "a variance / scale parameter is positive",
-    "mutationDrift_R2_lt_puredrift_R2: 0 < V_E"
-   ],
-   "fst_drift": [
-    "an F_ST in [0,1]",
-    "mutationDrift_R2_lt_puredrift_R2: 0 \u2264 fst_drift",
-    "mutationDrift_R2_lt_puredrift_R2: fst_drift < 1"
-   ],
-   "shared_ld": [
-    "a proportion / probability lies in [0,1]",
-    "mutationDrift_R2_lt_puredrift_R2: 0 < shared_ld",
-    "mutationDrift_R2_lt_puredrift_R2: shared_ld < 1"
-   ]
-  },
-  "verdict": "inconclusive",
-  "bnb_boxes": 1500,
-  "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "presentDayR2MutationDrift",
   "module": "PortabilityDrift",
   "line": 4394,
@@ -8738,7 +8091,7 @@
   "reason": "name and docstring commit the definition to no particular range",
   "name": "scaledMigrationRate",
   "module": "PortabilityDrift",
-  "line": 4663,
+  "line": 4759,
   "family": "range",
   "py": "((4.0 * Ne) * m)",
   "severity": -1.0
@@ -8749,15 +8102,10 @@
    1.0
   ],
   "range_why": "`sharedLD` names a proportion",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "M < M\u2082",
-    "thm": "sharedLDFromMigration_increases",
-    "reason": "unknown identifier M\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "M": [
     1e-09,
@@ -8779,7 +8127,7 @@
   "searched": 8000,
   "name": "sharedLDFromMigration",
   "module": "PortabilityDrift",
-  "line": 4870,
+  "line": 4966,
   "family": "range",
   "py": "_b.div(M, ((1.0 + M)))",
   "severity": -1.0
@@ -8790,9 +8138,10 @@
    1.0
   ],
   "range_why": "`sharedLD_from_equilibrium` names a proportion",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
     1.0,
@@ -8823,7 +8172,7 @@
   "searched": 8000,
   "name": "sharedLD_from_equilibrium",
   "module": "PortabilityDrift",
-  "line": 4844,
+  "line": 4940,
   "family": "range",
   "py": "(1.0 - PortabilityDrift_fstMigrationDriftEquilibrium(Ne, m))",
   "severity": -1.0
@@ -8834,15 +8183,10 @@
    1.0
   ],
   "range_why": "`signalRetentionMigrationDrift` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "m < m\u2082",
-    "thm": "signalRetention_increases_with_migration",
-    "reason": "unknown identifier m\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
     1e-06,
@@ -8889,10 +8233,11 @@
   "value": 999.9999000000076,
   "overshoot": 998.9999000000076,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "signalRetentionMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 4921,
+  "line": 5017,
   "family": "range",
   "py": "(lambda fst: (lambda M: (lambda shared_ld: ((((1.0 - fst)) * shared_ld) * V_A))(PortabilityDrift_sharedLDFromMigration(M)))(PortabilityDrift_scaledMigrationRate(Ne, m)))(PortabilityDrift_fstMigrationDriftEquilibrium(Ne, m))",
   "severity": 49.99999956570553
@@ -8903,9 +8248,10 @@
    1.0
   ],
   "range_why": "`sourceBrier` names a Brier score for a binary outcome",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03c0": [
     0.0001,
@@ -8949,9 +8295,10 @@
    1.0
   ],
   "range_why": "`steppingStoneFst` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "fst_neighbor": [
     0.0,
@@ -8998,10 +8345,11 @@
   "value": 10000.0,
   "overshoot": 9999.0,
   "blind_coordinates": [],
+  "escapes_only_where_violated": [],
   "side": "above",
   "name": "steppingStoneFst",
   "module": "PortabilityDrift",
-  "line": 4782,
+  "line": 4878,
   "family": "range",
   "py": "(fst_neighbor * ((1.0 + (\u03b1 * ((d - 1.0))))))",
   "severity": 60.0
@@ -9012,20 +8360,10 @@
    1.0
   ],
   "range_why": "`targetBrier` names a Brier score for a binary outcome",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "fstSource < fstTarget",
-    "thm": "targetBrier_ge_source_of_neutralAF_benchmark",
-    "reason": "unknown identifier fstSource"
-   },
-   {
-    "hyp": "0 \u2264 fstSource \u2227 fstTarget < 1",
-    "thm": "targetBrier_ge_source_of_neutralAF_benchmark",
-    "reason": "unknown identifier fstSource"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "\u03c0": [
     0.0001,
@@ -9098,30 +8436,10 @@
    1.0
   ],
   "range_why": "`targetExactGaussianAUC` names an AUC / c-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "fstS < fstTarget",
-    "thm": "neutralAF_benchmark_liability_auc_sensitive_to_drift",
-    "reason": "unknown identifier fstS"
-   },
-   {
-    "hyp": "0 \u2264 fstS \u2227 fstTarget < 1",
-    "thm": "neutralAF_benchmark_liability_auc_sensitive_to_drift",
-    "reason": "unknown identifier fstS"
-   },
-   {
-    "hyp": "fstSource < fstTarget",
-    "thm": "neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens",
-    "reason": "unknown identifier fstSource"
-   },
-   {
-    "hyp": "0 \u2264 fstSource \u2227 fstTarget < 1",
-    "thm": "neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens",
-    "reason": "unknown identifier fstSource"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
     1e-06,
@@ -9175,20 +8493,10 @@
    1.0
   ],
   "range_why": "`targetGaussianAUC` names an AUC / c-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "fstSource < fstTarget",
-    "thm": "targetAUC_lt_source_of_neutralAF_benchmark",
-    "reason": "unknown identifier fstSource"
-   },
-   {
-    "hyp": "0 \u2264 fstSource \u2227 fstTarget < 1",
-    "thm": "targetAUC_lt_source_of_neutralAF_benchmark",
-    "reason": "unknown identifier fstSource"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
     1e-06,
@@ -9253,64 +8561,8 @@
   "severity": -1.0
  },
  "PortabilityDrift.targetR2FromNeutralAFBenchmark": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`targetR2` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "fstSource < fstTarget",
-    "thm": "neutralAFBenchmarkRatio_from_state",
-    "reason": "unknown identifier fstSource"
-   },
-   {
-    "hyp": "0 \u2264 fstSource \u2227 fstTarget < 1",
-    "thm": "neutralAFBenchmarkRatio_from_state",
-    "reason": "unknown identifier fstSource"
-   }
-  ],
-  "box": {
-   "V_A": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ],
-   "V_E": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ],
-   "fstTarget": [
-    0.0,
-    1.0,
-    "meaning"
-   ]
-  },
-  "unguarded": [
-   "fstTarget"
-  ],
-  "box_provenance": {
-   "V_A": [
-    "a variance / scale parameter is positive",
-    "neutralAFBenchmarkRatio_from_state: 0 < V_A",
-    "targetR2_lt_source_from_neutralAF_benchmark: 0 < V_A"
-   ],
-   "V_E": [
-    "a variance / scale parameter is positive",
-    "neutralAFBenchmarkRatio_from_state: 0 < V_E",
-    "targetR2_lt_source_from_neutralAF_benchmark: 0 < V_E"
-   ],
-   "fstTarget": [
-    "an F_ST in [0,1]"
-   ]
-  },
-  "verdict": "inconclusive",
-  "bnb_boxes": 1500,
-  "searched": 8000,
-  "inconclusive_reason": "no escape found by sampling+pattern search, and interval branch-and-bound did not close the box within 1500 subdivisions",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "targetR2FromNeutralAFBenchmark",
   "module": "PortabilityDrift",
   "line": 2908,
@@ -9374,9 +8626,10 @@
    1.0
   ],
   "range_why": "`wrightFisherDriftRetention` names a fixation index / F-statistic",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "N": [
     1.0,
@@ -9447,25 +8700,10 @@
    Infinity
   ],
   "range_why": "`noncentralityParam` names a noncentrality parameter",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "n < n\u2082",
-    "thm": "ncp_increases_with_n",
-    "reason": "unknown identifier n\u2082"
-   },
-   {
-    "hyp": "p < p_common",
-    "thm": "rare_variant_lower_power",
-    "reason": "unknown identifier p_common"
-   },
-   {
-    "hyp": "p + p_common < 1",
-    "thm": "rare_variant_lower_power",
-    "reason": "unknown identifier p_common"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "n": [
     1.0,
@@ -9519,20 +8757,10 @@
    1.0
   ],
   "range_why": "`powerAtThreshold` names a statistical power",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "ncp \u2264 ncp\u2082",
-    "thm": "powerAtThreshold_mono",
-    "reason": "unknown identifier ncp\u2082"
-   },
-   {
-    "hyp": "z\u2081 \u2264 z_alpha",
-    "thm": "powerAtThreshold_antitone_in_threshold",
-    "reason": "unknown identifier z\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "ncp": [
     1.0,
@@ -9573,30 +8801,10 @@
    1.0
   ],
   "range_why": "`r2ScalingModel` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "n < n\u2082",
-    "thm": "r2_scaling_increasing",
-    "reason": "unknown identifier n\u2082"
-   },
-   {
-    "hyp": "n\u2081 < n",
-    "thm": "diminishing_returns",
-    "reason": "unknown identifier n\u2081"
-   },
-   {
-    "hyp": "n_small < n",
-    "thm": "invest_in_undersampled",
-    "reason": "unknown identifier n_small"
-   },
-   {
-    "hyp": "delta < n",
-    "thm": "balanced_allocation_maximizes_total_utility",
-    "reason": "unknown identifier delta"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "n": [
     1.0,
@@ -9714,9 +8922,10 @@
    Infinity
   ],
   "range_why": "the docstring states nonnegativity",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "mu": [
     1e-10,
@@ -9804,91 +9013,14 @@
   "severity": -1.0
  },
  "SampleOverlapBias.partialOverlapR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`partialOverlapR2` names a proportion of variance explained",
-  "side_constraints": [
-   "r2_true < h2"
-  ],
-  "side_constraints_from": [
-   "more_overlap_more_inflation"
-  ],
-  "side_constraints_dropped": [
-   {
-    "hyp": "f < f\u2082",
-    "thm": "more_overlap_more_inflation",
-    "reason": "unknown identifier f\u2082"
-   },
-   {
-    "hyp": "r2_cross < r2_true",
-    "thm": "apparent_portability_loss_includes_overlap",
-    "reason": "unknown identifier r2_cross"
-   }
-  ],
-  "box": {
-   "r2_true": [
-    0.0001,
-    1.0,
-    "meaning"
-   ],
-   "h2": [
-    0.0001,
-    1.0,
-    "meaning"
-   ],
-   "f": [
-    -1000.0,
-    1000.0,
-    "none"
-   ],
-   "_n_gwas": [
-    1.0,
-    100000.0,
-    "theorem+meaning"
-   ]
-  },
-  "unguarded": [
-   "r2_true",
-   "h2",
-   "f"
-  ],
-  "box_provenance": {
-   "r2_true": [
-    "an R\u00b2 / variance-explained lies in (0,1]"
-   ],
-   "h2": [
-    "a heritability in (0,1]"
-   ],
-   "f": [
-    "no theorem hypothesis and no recognised meaning for parameter `f` : \u211d"
-   ],
-   "_n_gwas": [
-    "a sample / variant count is a positive integer (a \u2115 argument)",
-    "more_overlap_more_inflation: 0 < n_gwas",
-    "apparent_portability_loss_includes_overlap: 0 < n_gwas"
-   ]
-  },
-  "verdict": "escape-unguarded",
-  "witness": {
-   "r2_true": 0.0001,
-   "h2": 1.0,
-   "f": -1000.0,
-   "_n_gwas": 1.0
-  },
-  "value": -999.8999,
-  "overshoot": 999.8999,
-  "blind_coordinates": [
-   "f"
-  ],
-  "side": "below",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "partialOverlapR2",
   "module": "SampleOverlapBias",
   "line": 73,
   "family": "range",
   "py": "((((1.0 - f)) * r2_true) + (f * h2))",
-  "severity": 35.00390645859511
+  "severity": -1.0
  },
  "ScoreDistribution.benchmarkHighScoreRate": {
   "verdict": "no-range",
@@ -9936,15 +9068,10 @@
    1.0
   ],
   "range_why": "`effectCorrelationStabilizing` names a correlation coefficient",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "Ns < Ns\u2082",
-    "thm": "effect_correlation_increases_with_Ns",
-    "reason": "unknown identifier Ns\u2082"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "Ns": [
     1.0,
@@ -9984,9 +9111,10 @@
    Infinity
   ],
   "range_why": "`effectVarianceRecurrence` names a variance",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "V": [
     1e-06,
@@ -10046,9 +9174,10 @@
    1.0
   ],
   "range_why": "`fluctuatingEffectCorrelation` names a correlation coefficient",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "t": [
     0.0,
@@ -10162,9 +9291,10 @@
    Infinity
   ],
   "range_why": "`effectiveSampleSizeSE` names an effective sample size",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "se": [
     -1000.0,
@@ -10192,53 +9322,14 @@
   "severity": -1.0
  },
  "StatisticalGeneticsMethodology.incrementalR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`incrementalR2` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
-  "box": {
-   "r2_full": [
-    0.0001,
-    1.0,
-    "meaning"
-   ],
-   "r2_covariates": [
-    0.0001,
-    1.0,
-    "meaning"
-   ]
-  },
-  "unguarded": [
-   "r2_full",
-   "r2_covariates"
-  ],
-  "box_provenance": {
-   "r2_full": [
-    "an R\u00b2 / variance-explained lies in (0,1]"
-   ],
-   "r2_covariates": [
-    "an R\u00b2 / variance-explained lies in (0,1]"
-   ]
-  },
-  "verdict": "escape",
-  "witness": {
-   "r2_full": 0.0001,
-   "r2_covariates": 1.0
-  },
-  "value": -0.9999,
-  "overshoot": 0.9999,
-  "blind_coordinates": [],
-  "side": "below",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "incrementalR2",
   "module": "StatisticalGeneticsMethodology",
   "line": 42,
   "family": "range",
   "py": "(r2_full - r2_covariates)",
-  "severity": 33.01008280397
+  "severity": -1.0
  },
  "StatisticalGeneticsMethodology.portabilityRatio": {
   "verdict": "no-range",
@@ -10256,15 +9347,10 @@
    1.0
   ],
   "range_why": "`pgsAttenuationFactor` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "r2_gwas < r2_source",
-    "thm": "attenuation_decreases_with_r2",
-    "reason": "unknown identifier r2_source"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "r2_gwas": [
     0.0001,
@@ -10360,144 +9446,24 @@
   "severity": -1.0
  },
  "TransferLearningPGS.deployedTransferTargetR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`deployedTransferTargetR2` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
-  "box": {
-   "transported_r2": [
-    0.0001,
-    1.0,
-    "meaning"
-   ],
-   "adaptation_gain": [
-    -1000.0,
-    1000.0,
-    "none"
-   ],
-   "estimation_penalty": [
-    -1000.0,
-    1000.0,
-    "none"
-   ]
-  },
-  "unguarded": [
-   "transported_r2",
-   "adaptation_gain",
-   "estimation_penalty"
-  ],
-  "box_provenance": {
-   "transported_r2": [
-    "an R\u00b2 / variance-explained lies in (0,1]"
-   ],
-   "adaptation_gain": [
-    "no theorem hypothesis and no recognised meaning for parameter `adaptation_gain` : \u211d"
-   ],
-   "estimation_penalty": [
-    "no theorem hypothesis and no recognised meaning for parameter `estimation_penalty` : \u211d"
-   ]
-  },
-  "verdict": "escape-unguarded",
-  "witness": {
-   "transported_r2": 1.0,
-   "adaptation_gain": 1000.0,
-   "estimation_penalty": -1000.0
-  },
-  "value": 2001.0,
-  "overshoot": 2000.0,
-  "blind_coordinates": [
-   "adaptation_gain",
-   "estimation_penalty"
-  ],
-  "side": "above",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "deployedTransferTargetR2",
   "module": "TransferLearningPGS",
   "line": 1114,
   "family": "range",
   "py": "((transported_r2 + adaptation_gain) - estimation_penalty)",
-  "severity": 28.01247088636211
+  "severity": -1.0
  },
  "TransferLearningPGS.fineTunedTargetR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`fineTunedTargetR2` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "oracle_target_r2 \u2264 r2_source + adaptation_gain",
-    "thm": "fine_tuned_target_r2_exceeds_scratch_of_penalty_gap",
-    "reason": "unknown identifier oracle_target_r2"
-   },
-   {
-    "hyp": "divergence_penalty < estimation_penalty",
-    "thm": "fine_tuned_target_r2_exceeds_scratch_of_penalty_gap",
-    "reason": "unknown identifier estimation_penalty"
-   },
-   {
-    "hyp": "fineTunedTargetR2 r2_source divergence_penalty adaptation_gain <\n        oracle_target_r2",
-    "thm": "scratchTargetR2_eq_fineTunedTargetR2_at_critical_sample_size",
-    "reason": "unknown identifier oracle_target_r2"
-   }
-  ],
-  "box": {
-   "r2_source": [
-    0.0001,
-    1.0,
-    "meaning"
-   ],
-   "divergence_penalty": [
-    -1000.0,
-    1000.0,
-    "none"
-   ],
-   "adaptation_gain": [
-    -1000.0,
-    1000.0,
-    "none"
-   ]
-  },
-  "unguarded": [
-   "r2_source",
-   "divergence_penalty",
-   "adaptation_gain"
-  ],
-  "box_provenance": {
-   "r2_source": [
-    "an R\u00b2 / variance-explained lies in (0,1]"
-   ],
-   "divergence_penalty": [
-    "no theorem hypothesis and no recognised meaning for parameter `divergence_penalty` : \u211d"
-   ],
-   "adaptation_gain": [
-    "no theorem hypothesis and no recognised meaning for parameter `adaptation_gain` : \u211d"
-   ]
-  },
-  "verdict": "escape-unguarded",
-  "witness": {
-   "r2_source": 1.0,
-   "divergence_penalty": -1000.0,
-   "adaptation_gain": 1000.0
-  },
-  "value": 2001.0,
-  "overshoot": 2000.0,
-  "blind_coordinates": [
-   "divergence_penalty",
-   "adaptation_gain"
-  ],
-  "side": "above",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "fineTunedTargetR2",
   "module": "TransferLearningPGS",
   "line": 1103,
   "family": "range",
   "py": "((r2_source - divergence_penalty) + adaptation_gain)",
-  "severity": 28.01247088636211
+  "severity": -1.0
  },
  "TransferLearningPGS.gaussianSourceResidualRisk": {
   "verdict": "no-range",
@@ -10555,15 +9521,10 @@
    1.0
   ],
   "range_why": "`optimalSourceShrinkageWeight` names a portability / retention factor -- a fraction of what transfers",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "n\u2081 < nTarget",
-    "thm": "optimal_lambda_decreases_with_n",
-    "reason": "unknown identifier n\u2081"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "gapSq": [
     0.0001,
@@ -10654,65 +9615,14 @@
   "severity": -1.0
  },
  "TransferLearningPGS.pgsR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`pgsR2` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [],
-  "box": {
-   "cov_pgs_y": [
-    -1000.0,
-    1000.0,
-    "none"
-   ],
-   "var_pgs": [
-    1e-06,
-    1000.0,
-    "meaning"
-   ],
-   "var_y": [
-    1e-06,
-    1000.0,
-    "meaning"
-   ]
-  },
-  "unguarded": [
-   "cov_pgs_y",
-   "var_pgs",
-   "var_y"
-  ],
-  "box_provenance": {
-   "cov_pgs_y": [
-    "no theorem hypothesis and no recognised meaning for parameter `cov_pgs_y` : \u211d"
-   ],
-   "var_pgs": [
-    "a variance / scale parameter is positive"
-   ],
-   "var_y": [
-    "a variance / scale parameter is positive"
-   ]
-  },
-  "verdict": "escape-unguarded",
-  "witness": {
-   "cov_pgs_y": -1000.0,
-   "var_pgs": 1e-06,
-   "var_y": 1e-06
-  },
-  "value": 1e+18,
-  "overshoot": 1e+18,
-  "blind_coordinates": [
-   "cov_pgs_y"
-  ],
-  "side": "above",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "pgsR2",
   "module": "TransferLearningPGS",
   "line": 77,
   "family": "range",
   "py": "_b.div(_b.pow(cov_pgs_y, 2.0), ((var_pgs * var_y)))",
-  "severity": 55.000004342942646
+  "severity": -1.0
  },
  "TransferLearningPGS.pinskerAncestryDivergenceCap": {
   "range": [
@@ -10720,30 +9630,10 @@
    Infinity
   ],
   "range_why": "`pinskerAncestryDivergenceCap` names an information-theoretic divergence",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "I_phi_A \u2264 I\u2082",
-    "thm": "pinskerAncestryDivergenceCap_mono",
-    "reason": "unknown identifier I\u2082"
-   },
-   {
-    "hyp": "divergence \u2264 pinskerAncestryDivergenceCap I_phi_A",
-    "thm": "benDavidUpperBound_le_infoCertifiedBenDavidUpperBound",
-    "reason": "unknown identifier divergence"
-   },
-   {
-    "hyp": "cert_new.divergence \u2264 pinskerAncestryDivergenceCap I_phi_A",
-    "thm": "higher_info_bottleneck_objective_lowers_target_error_cap",
-    "reason": "unknown identifier cert_new.divergence"
-   },
-   {
-    "hyp": "infoBottleneckObjective I_phi_Y_new I_phi_A lam >\n        infoBottleneckObjective I_phi_Y_standard I_phi_A lam",
-    "thm": "higher_info_bottleneck_objective_lowers_target_error_cap",
-    "reason": "unknown identifier I_phi_Y_new"
-   }
-  ],
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [],
   "box": {
    "I_phi_A": [
     -1000.0,
@@ -10790,131 +9680,24 @@
   "severity": -1.0
  },
  "TransferLearningPGS.sampleLimitedScratchTargetR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`sampleLimitedScratchTargetR2` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "fineTunedTargetR2 r2_source divergence_penalty adaptation_gain <\n        oracle_target_r2",
-    "thm": "scratchTargetR2_eq_fineTunedTargetR2_at_critical_sample_size",
-    "reason": "unknown identifier r2_source"
-   }
-  ],
-  "box": {
-   "oracle_target_r2": [
-    0.0001,
-    1.0,
-    "meaning"
-   ],
-   "noiseVar": [
-    1e-06,
-    1000.0,
-    "theorem+meaning"
-   ],
-   "nTarget": [
-    1.0,
-    10000000.0,
-    "theorem+meaning"
-   ]
-  },
-  "unguarded": [
-   "oracle_target_r2"
-  ],
-  "box_provenance": {
-   "oracle_target_r2": [
-    "an R\u00b2 / variance-explained lies in (0,1]"
-   ],
-   "noiseVar": [
-    "a variance / scale parameter is positive",
-    "scratchTargetR2_eq_fineTunedTargetR2_at_critical_sample_size: 0 < noiseVar"
-   ],
-   "nTarget": [
-    "a sample or variant count is a positive integer",
-    "scratch_beats_fine_tuning_iff_target_sample_exceeds_critical: 0 < nTarget"
-   ]
-  },
-  "verdict": "escape",
-  "witness": {
-   "oracle_target_r2": 0.0001,
-   "noiseVar": 1000.0,
-   "nTarget": 1.0
-  },
-  "value": -999.9999,
-  "overshoot": 999.9999,
-  "blind_coordinates": [],
-  "side": "below",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "sampleLimitedScratchTargetR2",
   "module": "TransferLearningPGS",
   "line": 1225,
   "family": "range",
   "py": "TransferLearningPGS_scratchTargetR2(oracle_target_r2, (_b.div(noiseVar, nTarget)))",
-  "severity": 60.00434034093254
+  "severity": -1.0
  },
  "TransferLearningPGS.scratchTargetR2": {
-  "range": [
-   0.0,
-   1.0
-  ],
-  "range_why": "`scratchTargetR2` names a proportion of variance explained",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
-   {
-    "hyp": "oracle_target_r2 \u2264 r2_source + adaptation_gain",
-    "thm": "fine_tuned_target_r2_exceeds_scratch_of_penalty_gap",
-    "reason": "unknown identifier r2_source"
-   },
-   {
-    "hyp": "divergence_penalty < estimation_penalty",
-    "thm": "fine_tuned_target_r2_exceeds_scratch_of_penalty_gap",
-    "reason": "unknown identifier divergence_penalty"
-   }
-  ],
-  "box": {
-   "oracle_target_r2": [
-    0.0001,
-    1.0,
-    "meaning"
-   ],
-   "estimation_penalty": [
-    -1000.0,
-    1000.0,
-    "none"
-   ]
-  },
-  "unguarded": [
-   "oracle_target_r2",
-   "estimation_penalty"
-  ],
-  "box_provenance": {
-   "oracle_target_r2": [
-    "an R\u00b2 / variance-explained lies in (0,1]"
-   ],
-   "estimation_penalty": [
-    "no theorem hypothesis and no recognised meaning for parameter `estimation_penalty` : \u211d"
-   ]
-  },
-  "verdict": "escape-unguarded",
-  "witness": {
-   "oracle_target_r2": 1.0,
-   "estimation_penalty": -1000.0
-  },
-  "value": 1001.0,
-  "overshoot": 1000.0,
-  "blind_coordinates": [
-   "estimation_penalty"
-  ],
-  "side": "above",
+  "verdict": "no-range",
+  "reason": "name and docstring commit the definition to no particular range",
   "name": "scratchTargetR2",
   "module": "TransferLearningPGS",
   "line": 1107,
   "family": "range",
   "py": "(oracle_target_r2 - estimation_penalty)",
-  "severity": 25.004340774793192
+  "severity": -1.0
  },
  "TransferLearningPGS.scratchVsFineTuningCriticalSampleSize": {
   "verdict": "no-range",
@@ -10952,12 +9735,13 @@
    1.0
   ],
   "range_why": "`explainableFraction` names a proportion",
-  "side_constraints": [],
-  "side_constraints_from": [],
-  "side_constraints_dropped": [
+  "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "bounding_theorems": [],
+  "bounding_theorem_hyps": {},
+  "unmodelled_hypotheses": [
    {
-    "hyp": "total = between + within",
     "thm": "explainable_fraction_bound_of_noise_floor",
+    "hyp": "total = between + within",
     "reason": "bad char '='"
    }
   ],
@@ -10996,6 +9780,7 @@
    "between",
    "total"
   ],
+  "escapes_only_where_violated": [],
   "side": "below",
   "name": "explainableFraction",
   "module": "TransportIdentities",
@@ -11124,6 +9909,18 @@
   "family": "range",
   "severity": -1.0
  },
+ "BlindnessRegistry.guard_stack_blind_to_retention": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r) (fun r => r = trueRetention))",
+  "family": "range",
+  "severity": -1.0
+ },
+ "BlindnessRegistry.extra_algebraic_guard_adds_nothing": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r)) (fun r => r = trueRetention) where positive)",
+  "family": "range",
+  "severity": -1.0
+ },
  "ClinicalUtilityFairness.liabilitySensitivity": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d)",
@@ -11241,6 +10038,18 @@
  "Condensation.condensationConstant": {
   "verdict": "not-transpiled",
   "reason": "unknown identifier Real.eulerMascheroniConstant",
+  "family": "range",
+  "severity": -1.0
+ },
+ "CondensationUnification.hweObservableContent": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (GenotypeObservableContent where drift)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "CondensationUnification.GenotypeDesign.reModel": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (GenotypeDesign n \u03b9)",
   "family": "range",
   "severity": -1.0
  },
@@ -11670,9 +10479,21 @@
   "family": "range",
   "severity": -1.0
  },
+ "DriftRegime.crossChecks_blind_to_retention": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (ProbeBlindness clusterCrossCheck (fun r => r = trueRetention) where positive)",
+  "family": "range",
+  "severity": -1.0
+ },
  "DriftRegime.diagonalDesign": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (\u211d \u2192 \u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "DriftRegime.symmetricDesignBlindness": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (ProbeBlindness diagonalDesign (fun g => g = benchmarkRatio) where positive)",
   "family": "range",
   "severity": -1.0
  },
@@ -11787,6 +10608,30 @@
  "EpistaticChaos.slidingWindowDesign": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (GenotypeDesign n (Fin n) where model)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "EpistaticChaos.overlapMatrix": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (Matrix \u03b9x \u03b9x \u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "EpistaticChaos.cycleDensity": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "EpistaticChaos.Tempered": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (Prop)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "EpistaticChaos.BoundedHubRecurrence": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (Prop)",
   "family": "range",
   "severity": -1.0
  },
@@ -12313,6 +11158,18 @@
   "severity": -1.0
  },
  "ImitationCapacity.traceWindowClass": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (BackgroundClass \u03b9 Unit where base)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "ImitationCapacity.diagonalGapForm": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (\u211d)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "ImitationCapacity.diagonalGapClass": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (BackgroundClass \u03b9 Unit where base)",
   "family": "range",
@@ -12867,6 +11724,12 @@
  "PolygenicSpectroscopy.hardCallObservables": {
   "verdict": "not-transpiled",
   "reason": "non-scalar signature (MellinObservables where drift)",
+  "family": "range",
+  "severity": -1.0
+ },
+ "PolygenicSpectroscopy.hweCodingInvariants": {
+  "verdict": "not-transpiled",
+  "reason": "non-scalar signature (CodingInvariants where drift)",
   "family": "range",
   "severity": -1.0
  },

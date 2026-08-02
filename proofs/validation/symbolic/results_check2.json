@@ -297,7 +297,7 @@
   "statement": "m.posteriorMean y = m.shrinkageFactor * y",
   "status": "opaque",
   "detail": {
-   "reason": "unresolved name m.prior_var"
+   "reason": "unresolved name m.posteriorMean"
   }
  },
  {
@@ -313,7 +313,7 @@
   "detail": {
    "names_definition": "posteriorVariance",
    "mentions_definition": true,
-   "reason": "unresolved name m.prior_var"
+   "reason": "unresolved name m.posteriorVariance"
   }
  },
  {
@@ -329,7 +329,7 @@
   "detail": {
    "names_definition": "shrinkageFactor",
    "mentions_definition": true,
-   "reason": "unresolved name m.prior_var"
+   "reason": "unresolved name m.shrinkageFactor"
   }
  },
  {
@@ -343,7 +343,7 @@
   "statement": "m.shrinkageFactor = gaussianPosteriorShrinkage m.data_precision m.prior_var",
   "status": "opaque",
   "detail": {
-   "reason": "unresolved name m.prior_var"
+   "reason": "unresolved name m.shrinkageFactor"
   }
  },
  {
@@ -457,7 +457,7 @@
   "statement": "logLossRegret μ p q = logLossKLCertificate μ p q",
   "status": "opaque",
   "detail": {
-   "reason": "logLossRegret expects 0 args [], got 3"
+   "reason": "applied non-function logLossRegret"
   }
  },
  {
@@ -513,7 +513,7 @@
   "statement": "brierRegret μ p q = brierL2Certificate μ p q",
   "status": "opaque",
   "detail": {
-   "reason": "brierRegret expects 0 args [], got 3"
+   "reason": "applied non-function brierRegret"
   }
  },
  {
@@ -597,7 +597,7 @@
   "statement": "logBayesRisk μ η F = logRisk μ η η",
   "status": "opaque",
   "detail": {
-   "reason": "logBayesRisk expects 0 args [], got 3"
+   "reason": "applied non-function logBayesRisk"
   }
  },
  {
@@ -611,7 +611,7 @@
   "statement": "brierBayesRisk μ η F = brierRisk μ η η",
   "status": "opaque",
   "detail": {
-   "reason": "brierBayesRisk expects 0 args [], got 3"
+   "reason": "applied non-function brierBayesRisk"
   }
  },
  {
@@ -653,7 +653,7 @@
   "statement": "h.standardizedSquare g = (h.centeredAltAlleleCount g) ^ 2 / hweGenotypeVariance h.altFreq",
   "status": "opaque",
   "detail": {
-   "reason": "standardizedSquare expects 0 args [], got 1"
+   "reason": "unresolved name h.standardizedSquare"
   }
  },
  {
@@ -959,7 +959,7 @@
   "statement": "GenerationalPopGenParameters.theta g = 2 * ploidy * g.Ne * g.μ",
   "status": "opaque",
   "detail": {
-   "reason": "theta expects 0 args [], got 1"
+   "reason": "unresolved name GenerationalPopGenParameters.theta"
   }
  },
  {
@@ -973,7 +973,7 @@
   "statement": "GenerationalPopGenParameters.bigM g = 2 * ploidy * g.Ne * g.mig",
   "status": "opaque",
   "detail": {
-   "reason": "bigM expects 0 args [], got 1"
+   "reason": "unresolved name GenerationalPopGenParameters.bigM"
   }
  },
  {
@@ -987,7 +987,7 @@
   "statement": "EvolutionaryParameters.theta p = 2 * ploidy * p.Ne * p.mu",
   "status": "opaque",
   "detail": {
-   "reason": "theta expects 0 args [], got 1"
+   "reason": "unresolved name EvolutionaryParameters.theta"
   }
  },
  {
@@ -1001,7 +1001,7 @@
   "statement": "EvolutionaryParameters.bigM p = 2 * ploidy * p.Ne * p.mig",
   "status": "opaque",
   "detail": {
-   "reason": "bigM expects 0 args [], got 1"
+   "reason": "unresolved name EvolutionaryParameters.bigM"
   }
  },
  {
@@ -1075,7 +1075,7 @@
   "statement": "SplitMigrationModel.scaledMigration m = 2 * ploidy * m.Ne * m.mig",
   "status": "opaque",
   "detail": {
-   "reason": "SplitMigrationModel.scaledMigration expects 0 args [], got 1"
+   "reason": "unresolved name SplitMigrationModel.scaledMigration"
   }
  },
  {
@@ -1257,10 +1257,8 @@
   "line": 752,
   "claim_source": "name",
   "statement": "r2FromMSE mse varY = oneMinusRatio mse varY",
-  "status": "opaque",
-  "detail": {
-   "reason": "non-closed-form construct: ∫"
-  }
+  "status": "not_an_equation",
+  "detail": {}
  },
  {
   "check": "check2_derivation",
@@ -1566,7 +1564,7 @@
   "statement": "measureExpMSE μ Y S = measureVariance μ Y + measureVariance μ S - 2 * measureCovariance μ Y S + (measureBias μ Y S) ^ 2",
   "status": "opaque",
   "detail": {
-   "reason": "measureExpMSE expects 0 args [], got 3"
+   "reason": "applied non-function measureExpMSE"
   }
  },
  {
@@ -1580,7 +1578,7 @@
   "statement": "predictionRiskY cmdgp pred = irreduciblePredictionRisk cmdgp + conditionalMeanApproximationRisk cmdgp pred",
   "status": "opaque",
   "detail": {
-   "reason": "predictionRiskY expects 0 args [], got 2"
+   "reason": "applied non-function predictionRiskY"
   }
  },
  {
@@ -1594,7 +1592,7 @@
   "statement": "conditionalMeanApproximationRisk cmdgp pred = mseRisk cmdgp.toDGP pred",
   "status": "opaque",
   "detail": {
-   "reason": "conditionalMeanApproximationRisk expects 0 args [], got 2"
+   "reason": "applied non-function conditionalMeanApproximationRisk"
   }
  },
  {
@@ -1608,7 +1606,7 @@
   "statement": "let pred_raw := fun p c => β * p + hdgp.baseline c mse hdgp.toDGP pred_raw = ∫ pc, (hdgp.alpha pc.2 - β)^2 * pc.1^2 ∂hdgp.jointMeasure",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: fun"
+   "reason": "non-closed-form construct: ∫"
   }
  },
  {
@@ -1807,7 +1805,7 @@
   "statement": "bottleneckExcessLD Ne_b Ne_stable c t_b = (driftLDEquilibrium Ne_b c - driftLDEquilibrium Ne_stable c) * (1 - driftLDRetention Ne_b c ^ t_b)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function driftLDTrajectory"
+   "reason": "driftLDTrajectory expects 3 args ['Ne', 'c', 'Q₀'], got 4"
   }
  },
  {
@@ -1821,7 +1819,7 @@
   "statement": "bottleneckExcessLD Ne_b Ne_stable c t_b = excessLDAfterBottleneck Ne_b Ne_stable c t_b 0",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function driftLDTrajectory"
+   "reason": "driftLDTrajectory expects 3 args ['Ne', 'c', 'Q₀'], got 4"
   }
  },
  {
@@ -1847,7 +1845,7 @@
   "statement": "diagonalDesign benchmarkRatio = diagonalDesign benchmarkRatioSquared",
   "status": "opaque",
   "detail": {
-   "reason": "diagonalDesign expects 0 args [], got 1"
+   "reason": "applied non-function diagonalDesign"
   }
  },
  {
@@ -1863,7 +1861,7 @@
   "detail": {
    "names_definition": "hweThirdCentralMoment",
    "mentions_definition": true,
-   "reason": "hweThirdCentralMoment expects 0 args [], got 1"
+   "reason": "applied non-function hweThirdCentralMoment"
   }
  },
  {
@@ -1877,7 +1875,7 @@
   "statement": "design.locusInfluence i = design.coefficient s ^ 2",
   "status": "opaque",
   "detail": {
-   "reason": "locusInfluence expects 0 args [], got 1"
+   "reason": "unresolved name design.locusInfluence"
   }
  },
  {
@@ -1920,6 +1918,34 @@
    "opaque_lhs": "4*cos(θ) + 2*cos(2*θ)",
    "opaque_rhs": "circulantSpectrumB(cos(θ))",
    "mentions_any_definition": true
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.EpistaticChaos.overlap_row_sum_eq_recurrence",
+  "name": "overlap_row_sum_eq_recurrence",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1492,
+  "claim_source": "name",
+  "statement": "∑ t : ιx, ((design.locusSet s ∩ design.locusSet t).card : ℕ) = ∑ i ∈ design.locusSet s, design.variantRecurrence i",
+  "status": "opaque",
+  "detail": {
+   "reason": "non-closed-form construct: ∑"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.EpistaticChaos.variantRecurrence_eq_card_of_ubiquitous",
+  "name": "variantRecurrence_eq_card_of_ubiquitous",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1533,
+  "claim_source": "name",
+  "statement": "design.variantRecurrence i = Fintype.card ιx",
+  "status": "opaque",
+  "detail": {
+   "reason": "unresolved name design.variantRecurrence"
   }
  },
  {
@@ -2334,7 +2360,7 @@
   "detail": {
    "names_definition": "driftLDTrajectory",
    "mentions_definition": true,
-   "reason": "applied non-function driftLDTrajectory"
+   "reason": "driftLDTrajectory expects 3 args ['Ne', 'c', 'Q₀'], got 4"
   }
  },
  {
@@ -2350,7 +2376,7 @@
   "detail": {
    "names_definition": "excessLDAfterBottleneck",
    "mentions_definition": true,
-   "reason": "applied non-function driftLDTrajectory"
+   "reason": "driftLDTrajectory expects 3 args ['Ne', 'c', 'Q₀'], got 4"
   }
  },
  {
@@ -2364,7 +2390,7 @@
   "statement": "ldRecurrence r D₀ t = D₀ * (1 - r) ^ t",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function ldRecurrence"
+   "reason": "ldRecurrence expects 2 args ['r', 'D₀'], got 3"
   }
  },
  {
@@ -2378,7 +2404,7 @@
   "statement": "ldRecurrence r D₀ t / D₀ = (1 - r) ^ t",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function ldRecurrence"
+   "reason": "ldRecurrence expects 2 args ['r', 'D₀'], got 3"
   }
  },
  {
@@ -2522,7 +2548,7 @@
   "detail": {
    "names_definition": "brierDiscriminationLoss",
    "mentions_definition": true,
-   "reason": "brierDiscriminationLoss expects 0 args [], got 1"
+   "reason": "applied non-function brierDiscriminationLoss"
   }
  },
  {
@@ -2538,7 +2564,7 @@
   "detail": {
    "names_definition": "brierCalibrationLoss",
    "mentions_definition": true,
-   "reason": "brierCalibrationLoss expects 1 args ['πSource'], got 2"
+   "reason": "applied non-function brierCalibrationLoss"
   }
  },
  {
@@ -2641,7 +2667,7 @@
   "statement": "additiveGeneticVariance β = dotProduct β β",
   "status": "opaque",
   "detail": {
-   "reason": "additiveGeneticVariance expects 0 args [], got 1"
+   "reason": "applied non-function additiveGeneticVariance"
   }
  },
  {
@@ -2669,7 +2695,7 @@
   "statement": "ConfusionMatrix.precision c = (ConfusionMatrix.prevalence c * ConfusionMatrix.recallRate c) / (ConfusionMatrix.prevalence c * ConfusionMatrix.recallRate c + (1 - ConfusionMatrix.prevalence c) * ConfusionMatrix.fpr c)",
   "status": "opaque",
   "detail": {
-   "reason": "precision expects 0 args [], got 1"
+   "reason": "unresolved name ConfusionMatrix.precision"
   }
  },
  {
@@ -2758,7 +2784,7 @@
   "statement": "spikeOuter v = rankOneCovarianceBump 1 v",
   "status": "opaque",
   "detail": {
-   "reason": "spikeOuter expects 0 args [], got 1"
+   "reason": "applied non-function spikeOuter"
   }
  },
  {
@@ -2772,7 +2798,7 @@
   "statement": "K.headroom a S₀ = 0",
   "status": "opaque",
   "detail": {
-   "reason": "headroom expects 0 args [], got 2"
+   "reason": "unresolved name K.headroom"
   }
  },
  {
@@ -2786,7 +2812,7 @@
   "statement": "K.imitationCapacity S₀ support = 0",
   "status": "opaque",
   "detail": {
-   "reason": "imitationCapacity expects 0 args [], got 2"
+   "reason": "unresolved name K.imitationCapacity"
   }
  },
  {
@@ -2802,7 +2828,7 @@
   "detail": {
    "names_definition": "imitationCapacity",
    "mentions_definition": true,
-   "reason": "imitationCapacity expects 0 args [], got 2"
+   "reason": "unresolved name K.imitationCapacity"
   }
  },
  {
@@ -2844,7 +2870,7 @@
   "statement": "K.spiked S₀ (scale ^ 2) v = S₀ + rankOneCovarianceBump scale v",
   "status": "opaque",
   "detail": {
-   "reason": "spiked expects 1 args ['t'], got 3"
+   "reason": "unresolved name K.spiked"
   }
  },
  {
@@ -2870,11 +2896,10 @@
   "line": 1023,
   "claim_source": "name",
   "statement": "whitenedCapacity headroom decay = headroom * (1 - decay ^ 2) / (1 + decay ^ 2)",
-  "status": "opaque",
+  "status": "not_an_equation",
   "detail": {
    "names_definition": "whitenedCapacity",
-   "mentions_definition": true,
-   "reason": "unresolved name K.bound"
+   "mentions_definition": true
   }
  },
  {
@@ -2888,7 +2913,7 @@
   "statement": "K.imitationCapacity S₀ support = whitenedCapacity (K.headroom E.binding S₀) decay",
   "status": "opaque",
   "detail": {
-   "reason": "imitationCapacity expects 0 args [], got 2"
+   "reason": "unresolved name K.imitationCapacity"
   }
  },
  {
@@ -2916,7 +2941,7 @@
   "statement": "inverseTraceCertificate m lam = traceWindowSpikeLoad decay m",
   "status": "opaque",
   "detail": {
-   "reason": "inverseTraceCertificate expects 1 args ['m'], got 2"
+   "reason": "applied non-function inverseTraceCertificate"
   }
  },
  {
@@ -2930,7 +2955,7 @@
   "statement": "samplePCOverlapSq n M spike = 0",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: if"
+   "reason": "non-closed-form construct: else"
   }
  },
  {
@@ -2944,7 +2969,7 @@
   "statement": "samplePCOverlapSq n M spike = (1 - (n / M) / spike ^ 2) / (1 + (n / M) / spike)",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: if"
+   "reason": "non-closed-form construct: else"
   }
  },
  {
@@ -2958,7 +2983,7 @@
   "statement": "samplePCResidualAxisFraction n M spike = (n / M) * (spike + 1) / (spike * (spike + n / M))",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: if"
+   "reason": "non-closed-form construct: else"
   }
  },
  {
@@ -2972,7 +2997,7 @@
   "statement": "modeledPCResidualSusceptibility markerAxisVariance ancestryVariance n markers spike = ancestryGradientSusceptibility markerAxisVariance ancestryVariance",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: if"
+   "reason": "non-closed-form construct: else"
   }
  },
  {
@@ -3340,7 +3365,7 @@
   "statement": "downReclassificationRate μ threshold δ = thresholdBandRate μ threshold δ",
   "status": "opaque",
   "detail": {
-   "reason": "downReclassificationRate expects 2 args ['threshold', 'δ'], got 3"
+   "reason": "applied non-function downReclassificationRate"
   }
  },
  {
@@ -3354,7 +3379,7 @@
   "statement": "nriFromDownwardInterceptRecalibration μevent μnonevent threshold δ = thresholdBandRate μnonevent threshold δ - thresholdBandRate μevent threshold δ",
   "status": "opaque",
   "detail": {
-   "reason": "nriFromDownwardInterceptRecalibration expects 2 args ['threshold', 'δ'], got 4"
+   "reason": "applied non-function nriFromDownwardInterceptRecalibration"
   }
  },
  {
@@ -3368,7 +3393,7 @@
   "statement": "qalyGainUnderDecision model path path = max (treatmentMargin model path) 0",
   "status": "opaque",
   "detail": {
-   "reason": "qalyGainUnderDecision expects 0 args [], got 3"
+   "reason": "applied non-function qalyGainUnderDecision"
   }
  },
  {
@@ -3382,7 +3407,7 @@
   "statement": "qalyLoss model truePath predictedPath = qalyDecisionRegretMargin model truePath predictedPath",
   "status": "opaque",
   "detail": {
-   "reason": "qalyLoss expects 0 args [], got 3"
+   "reason": "applied non-function qalyLoss"
   }
  },
  {
@@ -3396,7 +3421,7 @@
   "statement": "qalyLoss model truePath predictedPath = 0",
   "status": "opaque",
   "detail": {
-   "reason": "qalyLoss expects 0 args [], got 3"
+   "reason": "applied non-function qalyLoss"
   }
  },
  {
@@ -3410,7 +3435,7 @@
   "statement": "qalyLoss model truePath predictedPath = 0",
   "status": "opaque",
   "detail": {
-   "reason": "qalyLoss expects 0 args [], got 3"
+   "reason": "applied non-function qalyLoss"
   }
  },
  {
@@ -3424,7 +3449,7 @@
   "statement": "qalyLoss model truePath predictedPath = 0",
   "status": "opaque",
   "detail": {
-   "reason": "qalyLoss expects 0 args [], got 3"
+   "reason": "applied non-function qalyLoss"
   }
  },
  {
@@ -3438,7 +3463,7 @@
   "statement": "treatmentMargin model predictedPath - treatmentMargin model truePath = Finset.univ.sum (fun t => model.discount t * ((predictedPath.followupWeight t - truePath.followupWeight t) * (truePath.eventProb t * truePath.treatmentBenefit t - truePath.treatmentHarm t) + predictedPath.followupWeight t * ((predictedPath.eventProb t - truePath.eventProb t) * truePath.treatmentBenefit t + predictedPath.eventPr",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: fun"
+   "reason": "non-closed-form construct: Finset"
   }
  },
  {
@@ -3452,7 +3477,7 @@
   "statement": "qalyLoss model truePath predictedPath = 0",
   "status": "opaque",
   "detail": {
-   "reason": "qalyLoss expects 0 args [], got 3"
+   "reason": "applied non-function qalyLoss"
   }
  },
  {
@@ -3466,7 +3491,7 @@
   "statement": "expectedQalyLoss μ model truePath predictedPath = 0",
   "status": "opaque",
   "detail": {
-   "reason": "expectedQalyLoss expects 0 args [], got 4"
+   "reason": "applied non-function expectedQalyLoss"
   }
  },
  {
@@ -3494,7 +3519,7 @@
   "statement": "screeningUtilityFromCounts model (sens * prevalence * n) ((1 - spec) * (1 - prevalence) * n) n = screeningUtilityFromRates model sens spec prevalence",
   "status": "opaque",
   "detail": {
-   "reason": "unresolved name c.tp"
+   "reason": "applied non-function screeningUtilityFromCounts"
   }
  },
  {
@@ -3564,7 +3589,7 @@
   "statement": "qalyGainUnderDecision (thresholdLongitudinalModel model) (thresholdClinicalPathway model trueRisk) (thresholdClinicalPathway model decisionRisk) = thresholdQalyGainUnderDecision model trueRisk decisionRisk",
   "status": "opaque",
   "detail": {
-   "reason": "thresholdLongitudinalModel expects 0 args [], got 1"
+   "reason": "applied non-function thresholdLongitudinalModel"
   }
  },
  {
@@ -3578,7 +3603,7 @@
   "statement": "qalyLoss (thresholdLongitudinalModel model) (thresholdClinicalPathway model trueRisk) (thresholdClinicalPathway model predictedRisk) = thresholdQalyLoss model trueRisk predictedRisk",
   "status": "opaque",
   "detail": {
-   "reason": "thresholdLongitudinalModel expects 0 args [], got 1"
+   "reason": "applied non-function thresholdLongitudinalModel"
   }
  },
  {
@@ -3592,7 +3617,7 @@
   "statement": "thresholdQalyLoss model trueRisk predictedRisk = model.benefit * thresholdDecisionRegretMargin model trueRisk predictedRisk",
   "status": "opaque",
   "detail": {
-   "reason": "thresholdQalyLoss expects 2 args ['trueRisk', 'predictedRisk'], got 3"
+   "reason": "applied non-function thresholdQalyLoss"
   }
  },
  {
@@ -3606,7 +3631,7 @@
   "statement": "thresholdQalyLoss model trueRisk predictedRisk = 0",
   "status": "opaque",
   "detail": {
-   "reason": "thresholdQalyLoss expects 2 args ['trueRisk', 'predictedRisk'], got 3"
+   "reason": "applied non-function thresholdQalyLoss"
   }
  },
  {
@@ -3634,7 +3659,7 @@
   "statement": "expectedThresholdQalyLoss μ model trueRisk predictedRisk = 0",
   "status": "opaque",
   "detail": {
-   "reason": "expectedThresholdQalyLoss expects 0 args [], got 4"
+   "reason": "applied non-function expectedThresholdQalyLoss"
   }
  },
  {
@@ -3826,7 +3851,7 @@
   "statement": "model.portabilityScore = 1 - model.relativePortabilityLoss",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: ∑"
+   "reason": "unresolved name model.portabilityScore"
   }
  },
  {
@@ -3855,7 +3880,7 @@
   "statement": "predictedPortability model = weightedRetentionUpperBound model retentionUpper",
   "status": "opaque",
   "detail": {
-   "reason": "predictedPortability expects 0 args [], got 1"
+   "reason": "applied non-function predictedPortability"
   }
  },
  {
@@ -3897,7 +3922,7 @@
   "detail": {
    "names_definition": "mellinDrift",
    "mentions_definition": true,
-   "reason": "non-closed-form construct: ∑"
+   "reason": "unresolved name h.mellinDrift"
   }
  },
  {
@@ -3906,7 +3931,7 @@
   "name": "maxSafeEpistaticOrder_eq_criticalDegree",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 624,
+  "line": 630,
   "claim_source": "name",
   "statement": "maxSafeEpistaticOrder N q = criticalDegree N (hweMellinDrift q)",
   "status": "not_an_equation",
@@ -3918,27 +3943,15 @@
   "name": "HardyWeinbergModel.mellinJetVariance_eq",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 832,
+  "line": 838,
   "claim_source": "name",
   "statement": "h.mellinJetVariance = hweMellinJetVariance h.altFreq",
   "status": "opaque",
   "detail": {
    "names_definition": "mellinJetVariance",
    "mentions_definition": true,
-   "reason": "non-closed-form construct: ∑"
+   "reason": "unresolved name h.mellinJetVariance"
   }
- },
- {
-  "check": "check2_derivation",
-  "fqn": "Calibrator.PolygenicSpectroscopy.balanced_locus_drift_separates",
-  "name": "balanced_locus_drift_separates",
-  "module": "Calibrator.PolygenicSpectroscopy",
-  "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 1132,
-  "claim_source": "+doc",
-  "statement": "hweMellinDrift (1 / 2) ≠ condensationConstant",
-  "status": "not_an_equation",
-  "detail": {}
  },
  {
   "check": "check2_derivation",
@@ -4081,7 +4094,7 @@
   "statement": "fstDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function hetRecurrence"
+   "reason": "hetRecurrence expects 2 args ['Ne', 'H₀'], got 3"
   }
  },
  {
@@ -4194,7 +4207,7 @@
   "statement": "fstFromHetRatio (hetMutationRecurrence lam Hstar H₀ t) H₀ = (1 - Hstar / H₀) * (1 - lam ^ t)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function hetMutationRecurrence"
+   "reason": "hetMutationRecurrence expects 3 args ['lam', 'Hstar', 'H₀'], got 4"
   }
  },
  {
@@ -4208,7 +4221,7 @@
   "statement": "fstFromHetRatio (hetMutationRecurrence (hetDecayFactor Ne θ) (expectedHeterozygosity θ) 1 t) 1 = fstMutationDriftTransientDiscrete θ Ne t",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function hetDecayFactor"
+   "reason": "hetMutationRecurrence expects 3 args ['lam', 'Hstar', 'H₀'], got 4"
   }
  },
  {
@@ -4220,10 +4233,8 @@
   "line": 1512,
   "claim_source": "name",
   "statement": "fstMutationDriftTransientDiscrete θ Ne t = 1 / (1 + θ) * (1 - ((1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))) ^ t)",
-  "status": "opaque",
-  "detail": {
-   "reason": "applied non-function hetDecayFactor"
-  }
+  "status": "not_an_equation",
+  "detail": {}
  },
  {
   "check": "check2_derivation",
@@ -4274,7 +4285,7 @@
   "detail": {
    "names_definition": "coalescenceCdfFromHazard",
    "mentions_definition": true,
-   "reason": "coalescenceCdfFromHazard expects 1 args ['t'], got 2"
+   "reason": "applied non-function coalescenceCdfFromHazard"
   }
  },
  {
@@ -4455,7 +4466,7 @@
   "statement": "sigmaTagCausalSource m = m.directCausalSource + m.proxyTaggingSource",
   "status": "opaque",
   "detail": {
-   "reason": "sigmaTagCausalSource expects 0 args [], got 1"
+   "reason": "applied non-function sigmaTagCausalSource"
   }
  },
  {
@@ -4469,7 +4480,7 @@
   "statement": "sigmaTagCausalTarget m = m.directCausalTarget + m.novelDirectCausalTarget + m.proxyTaggingTarget + m.novelProxyTaggingTarget",
   "status": "opaque",
   "detail": {
-   "reason": "sigmaTagCausalTarget expects 0 args [], got 1"
+   "reason": "applied non-function sigmaTagCausalTarget"
   }
  },
  {
@@ -4483,7 +4494,7 @@
   "statement": "targetTotalEffect m = m.betaTarget + m.novelCausalEffectTarget",
   "status": "opaque",
   "detail": {
-   "reason": "targetTotalEffect expects 0 args [], got 1"
+   "reason": "applied non-function targetTotalEffect"
   }
  },
  {
@@ -4497,7 +4508,7 @@
   "statement": "targetTotalEffect m = m.betaSource + targetEffectHeterogeneity m",
   "status": "opaque",
   "detail": {
-   "reason": "targetTotalEffect expects 0 args [], got 1"
+   "reason": "applied non-function targetTotalEffect"
   }
  },
  {
@@ -4511,7 +4522,7 @@
   "statement": "sourceTaggingProjection m = sourceDirectCausalProjection m + sourceProxyTaggingProjection m",
   "status": "opaque",
   "detail": {
-   "reason": "sourceTaggingProjection expects 0 args [], got 1"
+   "reason": "applied non-function sourceTaggingProjection"
   }
  },
  {
@@ -4525,7 +4536,7 @@
   "statement": "targetTaggingProjection m = targetDirectCausalProjection m + targetProxyTaggingProjection m",
   "status": "opaque",
   "detail": {
-   "reason": "targetTaggingProjection expects 0 args [], got 1"
+   "reason": "applied non-function targetTaggingProjection"
   }
  },
  {
@@ -4539,7 +4550,7 @@
   "statement": "targetTaggingProjection m = targetSourceEffectProjection m + targetEffectHeterogeneityProjection m",
   "status": "opaque",
   "detail": {
-   "reason": "targetTaggingProjection expects 0 args [], got 1"
+   "reason": "applied non-function targetTaggingProjection"
   }
  },
  {
@@ -4567,7 +4578,7 @@
   "statement": "sourceCrossCovariance m = sourceTaggingProjection m + m.contextCrossSource",
   "status": "opaque",
   "detail": {
-   "reason": "sourceCrossCovariance expects 0 args [], got 1"
+   "reason": "applied non-function sourceCrossCovariance"
   }
  },
  {
@@ -4581,7 +4592,7 @@
   "statement": "targetCrossCovariance m = targetTaggingProjection m + m.contextCrossTarget",
   "status": "opaque",
   "detail": {
-   "reason": "targetCrossCovariance expects 0 args [], got 1"
+   "reason": "applied non-function targetCrossCovariance"
   }
  },
  {
@@ -4595,7 +4606,7 @@
   "statement": "sourceCrossCovariance m = sourceDirectCausalProjection m + sourceProxyTaggingProjection m + m.contextCrossSource",
   "status": "opaque",
   "detail": {
-   "reason": "sourceCrossCovariance expects 0 args [], got 1"
+   "reason": "applied non-function sourceCrossCovariance"
   }
  },
  {
@@ -4609,7 +4620,7 @@
   "statement": "targetCrossCovariance m = targetDirectCausalProjection m + targetProxyTaggingProjection m + m.contextCrossTarget",
   "status": "opaque",
   "detail": {
-   "reason": "targetCrossCovariance expects 0 args [], got 1"
+   "reason": "applied non-function targetCrossCovariance"
   }
  },
  {
@@ -4623,7 +4634,7 @@
   "statement": "targetCrossCovariance m = targetSourceEffectProjection m + targetEffectHeterogeneityProjection m + m.contextCrossTarget",
   "status": "opaque",
   "detail": {
-   "reason": "targetCrossCovariance expects 0 args [], got 1"
+   "reason": "applied non-function targetCrossCovariance"
   }
  },
  {
@@ -4651,7 +4662,7 @@
   "statement": "sourcePredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m (sourceCrossCovariance m)",
   "status": "opaque",
   "detail": {
-   "reason": "sourcePredictiveCovarianceFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function sourcePredictiveCovarianceFromSourceWeights"
   }
  },
  {
@@ -4665,7 +4676,7 @@
   "statement": "targetPredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m (targetCrossCovariance m)",
   "status": "opaque",
   "detail": {
-   "reason": "targetPredictiveCovarianceFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetPredictiveCovarianceFromSourceWeights"
   }
  },
  {
@@ -4679,7 +4690,7 @@
   "statement": "sourcePredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m (sourceDirectCausalProjection m) + sourceWeightedTagScore m (sourceProxyTaggingProjection m) + sourceWeightedTagScore m m.contextCrossSource",
   "status": "opaque",
   "detail": {
-   "reason": "sourcePredictiveCovarianceFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function sourcePredictiveCovarianceFromSourceWeights"
   }
  },
  {
@@ -4693,7 +4704,7 @@
   "statement": "targetPredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m (targetDirectCausalProjection m) + sourceWeightedTagScore m (targetProxyTaggingProjection m) + sourceWeightedTagScore m m.contextCrossTarget",
   "status": "opaque",
   "detail": {
-   "reason": "targetPredictiveCovarianceFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetPredictiveCovarianceFromSourceWeights"
   }
  },
  {
@@ -4707,7 +4718,7 @@
   "statement": "targetPredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m (targetSourceEffectProjection m) + sourceWeightedTagScore m (targetEffectHeterogeneityProjection m) + sourceWeightedTagScore m m.contextCrossTarget",
   "status": "opaque",
   "detail": {
-   "reason": "targetPredictiveCovarianceFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetPredictiveCovarianceFromSourceWeights"
   }
  },
  {
@@ -4735,7 +4746,7 @@
   "statement": "novelUntaggablePhenotypeResidual m = m.novelUntaggablePhenotypeVarianceTarget",
   "status": "opaque",
   "detail": {
-   "reason": "novelUntaggablePhenotypeResidual expects 0 args [], got 1"
+   "reason": "applied non-function novelUntaggablePhenotypeResidual"
   }
  },
  {
@@ -4749,7 +4760,7 @@
   "statement": "effectiveTargetOutcomeVariance m = m.targetOutcomeVariance + brokenTaggingResidual m + ancestrySpecificLDResidual m + sourceSpecificOverfitResidual m + novelUntaggablePhenotypeResidual m",
   "status": "opaque",
   "detail": {
-   "reason": "effectiveTargetOutcomeVariance expects 0 args [], got 1"
+   "reason": "applied non-function effectiveTargetOutcomeVariance"
   }
  },
  {
@@ -4763,7 +4774,7 @@
   "statement": "sourceResidualVarianceFromSourceWeights m = m.sourceOutcomeVariance - sourceExplainedSignalVarianceFromSourceWeights m",
   "status": "opaque",
   "detail": {
-   "reason": "sourceResidualVarianceFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function sourceResidualVarianceFromSourceWeights"
   }
  },
  {
@@ -4777,7 +4788,7 @@
   "statement": "sourceCalibratedBrierFromSourceWeightsAtPrevalence m π = TransportedMetrics.calibratedBrierFromVariances π (sourceExplainedSignalVarianceFromSourceWeights m) (sourceResidualVarianceFromSourceWeights m)",
   "status": "opaque",
   "detail": {
-   "reason": "sourceCalibratedBrierFromSourceWeightsAtPrevalence expects 1 args ['π'], got 2"
+   "reason": "applied non-function sourceCalibratedBrierFromSourceWeightsAtPrevalence"
   }
  },
  {
@@ -4791,7 +4802,7 @@
   "statement": "sourceCalibratedBrierFromSourceWeightsAtPrevalence m π = TransportedMetrics.calibratedBrier π (sourceR2FromSourceWeights m)",
   "status": "opaque",
   "detail": {
-   "reason": "sourceCalibratedBrierFromSourceWeightsAtPrevalence expects 1 args ['π'], got 2"
+   "reason": "applied non-function sourceCalibratedBrierFromSourceWeightsAtPrevalence"
   }
  },
  {
@@ -4805,7 +4816,7 @@
   "statement": "targetResidualVarianceFromSourceWeights m = effectiveTargetOutcomeVariance m - targetExplainedSignalVarianceFromSourceWeights m",
   "status": "opaque",
   "detail": {
-   "reason": "targetResidualVarianceFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetResidualVarianceFromSourceWeights"
   }
  },
  {
@@ -4819,7 +4830,7 @@
   "statement": "targetCalibratedBrierFromSourceWeights m = TransportedMetrics.calibratedBrierFromVariances m.targetPrevalence (targetExplainedSignalVarianceFromSourceWeights m) (targetResidualVarianceFromSourceWeights m)",
   "status": "opaque",
   "detail": {
-   "reason": "targetCalibratedBrierFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetCalibratedBrierFromSourceWeights"
   }
  },
  {
@@ -4833,7 +4844,7 @@
   "statement": "targetCalibratedBrierFromSourceWeights m = TransportedMetrics.calibratedBrier m.targetPrevalence (targetR2FromSourceWeights m)",
   "status": "opaque",
   "detail": {
-   "reason": "targetCalibratedBrierFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetCalibratedBrierFromSourceWeights"
   }
  },
  {
@@ -4847,7 +4858,7 @@
   "statement": "targetScoreVarianceFromSourceWeights m = dotProduct (sourceWeightsFromExplicitDrivers m) (m.sigmaTagTarget.mulVec (sourceWeightsFromExplicitDrivers m))",
   "status": "opaque",
   "detail": {
-   "reason": "targetScoreVarianceFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetScoreVarianceFromSourceWeights"
   }
  },
  {
@@ -4861,7 +4872,7 @@
   "statement": "targetScoreVarianceFromSourceWeights m = sourceWeightedTagScore m (m.sigmaTagTarget.mulVec (sourceWeightsFromExplicitDrivers m))",
   "status": "opaque",
   "detail": {
-   "reason": "targetScoreVarianceFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetScoreVarianceFromSourceWeights"
   }
  },
  {
@@ -4875,7 +4886,7 @@
   "statement": "sourceScoreVarianceFromExplicitDrivers m = sourceWeightedTagScore m (m.sigmaTagSource.mulVec (sourceWeightsFromExplicitDrivers m))",
   "status": "opaque",
   "detail": {
-   "reason": "sourceScoreVarianceFromExplicitDrivers expects 0 args [], got 1"
+   "reason": "applied non-function sourceScoreVarianceFromExplicitDrivers"
   }
  },
  {
@@ -4889,7 +4900,7 @@
   "statement": "sourceR2FromSourceWeights m = sourceExplainedSignalVarianceFromSourceWeights m / m.sourceOutcomeVariance",
   "status": "opaque",
   "detail": {
-   "reason": "sourceR2FromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function sourceR2FromSourceWeights"
   }
  },
  {
@@ -4903,7 +4914,7 @@
   "statement": "targetR2FromSourceWeights m = targetExplainedSignalVarianceFromSourceWeights m / effectiveTargetOutcomeVariance m",
   "status": "opaque",
   "detail": {
-   "reason": "targetR2FromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetR2FromSourceWeights"
   }
  },
  {
@@ -4917,7 +4928,7 @@
   "statement": "betaTargetAt m t = m.betaSource + m.targetEffectHeterogeneityAt t + m.novelCausalEffectTargetAt t",
   "status": "opaque",
   "detail": {
-   "reason": "betaTargetAt expects 1 args ['t'], got 2"
+   "reason": "applied non-function betaTargetAt"
   }
  },
  {
@@ -4931,7 +4942,7 @@
   "statement": "tagAlleleFreqTargetAt m t i = m.tagAlleleFreqStandingTargetAt t i + m.tagAlleleFreqMutationShiftAt t i",
   "status": "opaque",
   "detail": {
-   "reason": "tagAlleleFreqTargetAt expects 1 args ['t'], got 3"
+   "reason": "applied non-function tagAlleleFreqTargetAt"
   }
  },
  {
@@ -4945,7 +4956,7 @@
   "statement": "causalAlleleFreqTargetAt m t j = m.causalAlleleFreqStandingTargetAt t j + m.causalAlleleFreqMutationShiftAt t j",
   "status": "opaque",
   "detail": {
-   "reason": "causalAlleleFreqTargetAt expects 1 args ['t'], got 3"
+   "reason": "applied non-function causalAlleleFreqTargetAt"
   }
  },
  {
@@ -4973,7 +4984,7 @@
   "statement": "targetR2AtGeneration m t = targetR2FromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
-   "reason": "targetR2AtGeneration expects 1 args ['t'], got 2"
+   "reason": "applied non-function targetR2AtGeneration"
   }
  },
  {
@@ -4987,7 +4998,7 @@
   "statement": "targetCalibratedBrierAtGeneration m t = targetCalibratedBrierFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
-   "reason": "targetCalibratedBrierAtGeneration expects 1 args ['t'], got 2"
+   "reason": "applied non-function targetCalibratedBrierAtGeneration"
   }
  },
  {
@@ -5099,7 +5110,7 @@
   "statement": "sourceEqualVarianceGaussianAUCFromSourceWeights m = equalVarianceGaussianAUCFromVariances (sourceExplainedSignalVarianceFromSourceWeights m) (sourceResidualVarianceFromSourceWeights m)",
   "status": "opaque",
   "detail": {
-   "reason": "sourceEqualVarianceGaussianAUCFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function sourceEqualVarianceGaussianAUCFromSourceWeights"
   }
  },
  {
@@ -5113,7 +5124,7 @@
   "statement": "sourceEqualVarianceGaussianAUCFromSourceWeights m = equalVarianceGaussianAUCFromExplainedR2 (sourceR2FromSourceWeights m)",
   "status": "opaque",
   "detail": {
-   "reason": "sourceEqualVarianceGaussianAUCFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function sourceEqualVarianceGaussianAUCFromSourceWeights"
   }
  },
  {
@@ -5127,7 +5138,7 @@
   "statement": "targetEqualVarianceGaussianAUCFromSourceWeights m = equalVarianceGaussianAUCFromVariances (targetExplainedSignalVarianceFromSourceWeights m) (targetResidualVarianceFromSourceWeights m)",
   "status": "opaque",
   "detail": {
-   "reason": "targetEqualVarianceGaussianAUCFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetEqualVarianceGaussianAUCFromSourceWeights"
   }
  },
  {
@@ -5141,7 +5152,7 @@
   "statement": "targetEqualVarianceGaussianAUCFromSourceWeights m = equalVarianceGaussianAUCFromExplainedR2 (targetR2FromSourceWeights m)",
   "status": "opaque",
   "detail": {
-   "reason": "targetEqualVarianceGaussianAUCFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetEqualVarianceGaussianAUCFromSourceWeights"
   }
  },
  {
@@ -5155,7 +5166,7 @@
   "statement": "targetMetricProfileAtGeneration m t = targetMetricProfileFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
-   "reason": "targetMetricProfileAtGeneration expects 1 args ['t'], got 2"
+   "reason": "applied non-function targetMetricProfileAtGeneration"
   }
  },
  {
@@ -5169,7 +5180,7 @@
   "statement": "targetGaussianAUCAtGeneration m t = targetEqualVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
-   "reason": "targetGaussianAUCAtGeneration expects 1 args ['t'], got 2"
+   "reason": "applied non-function targetGaussianAUCAtGeneration"
   }
  },
  {
@@ -5183,7 +5194,7 @@
   "statement": "targetPredictiveCovarianceAtGeneration m t = targetPredictiveCovarianceFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
-   "reason": "targetPredictiveCovarianceAtGeneration expects 1 args ['t'], got 2"
+   "reason": "applied non-function targetPredictiveCovarianceAtGeneration"
   }
  },
  {
@@ -5197,7 +5208,7 @@
   "statement": "targetScoreVarianceAtGeneration m t = targetScoreVarianceFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
-   "reason": "targetScoreVarianceAtGeneration expects 1 args ['t'], got 2"
+   "reason": "applied non-function targetScoreVarianceAtGeneration"
   }
  },
  {
@@ -5211,7 +5222,7 @@
   "statement": "effectiveTargetOutcomeVarianceAtGeneration m t = effectiveTargetOutcomeVariance (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
-   "reason": "effectiveTargetOutcomeVarianceAtGeneration expects 1 args ['t'], got 2"
+   "reason": "applied non-function effectiveTargetOutcomeVarianceAtGeneration"
   }
  },
  {
@@ -5225,7 +5236,7 @@
   "statement": "targetResidualVarianceAtGeneration m t = targetResidualVarianceFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
-   "reason": "targetResidualVarianceAtGeneration expects 1 args ['t'], got 2"
+   "reason": "applied non-function targetResidualVarianceAtGeneration"
   }
  },
  {
@@ -5239,7 +5250,7 @@
   "statement": "targetCalibrationSlopeAtGeneration m t = targetCalibrationSlopeFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
-   "reason": "targetCalibrationSlopeAtGeneration expects 1 args ['t'], got 2"
+   "reason": "applied non-function targetCalibrationSlopeAtGeneration"
   }
  },
  {
@@ -5284,7 +5295,7 @@
   "statement": "exactBrierRiskOfCalibrated μ η = exactCalibratedBrierRiskFromR2 π r2",
   "status": "opaque",
   "detail": {
-   "reason": "exactBrierRiskOfCalibrated expects 0 args [], got 2"
+   "reason": "applied non-function exactBrierRiskOfCalibrated"
   }
  },
  {
@@ -5740,7 +5751,7 @@
   "statement": "klBern p q = InformationTheory.klDiv (bernoulliMeasure (unitProbToNNReal p) (unitProbToNNReal_le_one p)) (bernoulliMeasure (unitProbToNNReal q) (unitProbToNNReal_le_one q))",
   "status": "opaque",
   "detail": {
-   "reason": "klBern expects 0 args [], got 2"
+   "reason": "applied non-function klBern"
   }
  },
  {
@@ -5796,7 +5807,7 @@
   "statement": "etaLiabilityThreshold hN T s x = 1 - ProbabilityTheory.cdf (ProbabilityTheory.gaussianReal s (hN.sigma2 x)) (T x)",
   "status": "opaque",
   "detail": {
-   "reason": "etaLiabilityThreshold expects 1 args ['s'], got 4"
+   "reason": "applied non-function etaLiabilityThreshold"
   }
  },
  {
@@ -5810,7 +5821,7 @@
   "statement": "∑ i, (A.mulVec u) i * v i = ∑ i, u i * ((Matrix.transpose A).mulVec v) i",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: Matrix"
+   "reason": "non-closed-form construct: ∑"
   }
  },
  {
@@ -5928,7 +5939,7 @@
   "statement": "pgsMeanShift β p_source p_target = pgsMean β p_target - pgsMean β p_source",
   "status": "opaque",
   "detail": {
-   "reason": "pgsMeanShift expects 0 args [], got 3"
+   "reason": "applied non-function pgsMeanShift"
   }
  },
  {
@@ -5942,7 +5953,7 @@
   "statement": "calibrationInTheLarge mean_observed (pgsMean β p_target) - calibrationInTheLarge mean_observed (pgsMean β p_source) = -pgsMeanShift β p_source p_target",
   "status": "opaque",
   "detail": {
-   "reason": "pgsMean expects 0 args [], got 2"
+   "reason": "applied non-function pgsMean"
   }
  },
  {
@@ -5970,7 +5981,7 @@
   "statement": "pgsMean β p_target - pgsMeanShift β p_source p_target = pgsMean β p_source",
   "status": "opaque",
   "detail": {
-   "reason": "pgsMean expects 0 args [], got 2"
+   "reason": "applied non-function pgsMean"
   }
  },
  {
@@ -6010,10 +6021,8 @@
   "line": 267,
   "claim_source": "name",
   "statement": "effectCorrelationStabilizing (stabilizingNsFromObservedCorrelation rho) = rho",
-  "status": "opaque",
-  "detail": {
-   "reason": "applied non-function effectCorrelationStabilizing"
-  }
+  "status": "not_an_equation",
+  "detail": {}
  },
  {
   "check": "check2_derivation",
@@ -6062,7 +6071,7 @@
   "statement": "selectionSummaryLogLik validation summary = gaussianProfileLogLik validation.observedEffectCorrelation validation.observedEffectCorrelation validation.effectCorrelationNoise + gaussianProfileLogLik validation.observedSelectedVariance summary.predictedSelectedVariance validation.selectedVarianceNoise",
   "status": "opaque",
   "detail": {
-   "reason": "selectionSummaryLogLik expects 0 args [], got 2"
+   "reason": "applied non-function selectionSummaryLogLik"
   }
  },
  {
@@ -6090,7 +6099,7 @@
   "statement": "targetEqualVarianceGaussianAUCFromSourceWeights m = equalVarianceGaussianAUCFromExplainedR2 (targetR2FromSourceWeights m)",
   "status": "opaque",
   "detail": {
-   "reason": "targetEqualVarianceGaussianAUCFromSourceWeights expects 0 args [], got 1"
+   "reason": "applied non-function targetEqualVarianceGaussianAUCFromSourceWeights"
   }
  },
  {
@@ -6228,7 +6237,7 @@
   "statement": "sourceTruthR2SharedLD β ld var_y = sharedLDHeritability β ld var_y",
   "status": "opaque",
   "detail": {
-   "reason": "sourceTruthR2SharedLD expects 1 args ['var_y'], got 3"
+   "reason": "applied non-function sourceTruthR2SharedLD"
   }
  },
  {
@@ -6242,7 +6251,7 @@
   "statement": "transportedTargetR2SharedLD β_s β_t ld var_y = (ldEffectGeneticCorrelation β_s β_t ld) ^ 2 * sharedLDHeritability β_t ld var_y",
   "status": "opaque",
   "detail": {
-   "reason": "transportedTargetR2SharedLD expects 1 args ['var_y'], got 4"
+   "reason": "applied non-function transportedTargetR2SharedLD"
   }
  },
  {
@@ -6256,7 +6265,7 @@
   "statement": "sharedLDGeneticVariance β standardizedDiagonalLD = additiveGeneticVariance β",
   "status": "opaque",
   "detail": {
-   "reason": "sharedLDGeneticVariance expects 0 args [], got 2"
+   "reason": "applied non-function sharedLDGeneticVariance"
   }
  },
  {
@@ -6270,7 +6279,7 @@
   "statement": "sharedLDHeritability β standardizedDiagonalLD var_y = additiveHeritability β var_y",
   "status": "opaque",
   "detail": {
-   "reason": "sharedLDHeritability expects 1 args ['var_y'], got 3"
+   "reason": "applied non-function sharedLDHeritability"
   }
  },
  {
@@ -6284,7 +6293,7 @@
   "statement": "ldEffectGeneticCorrelation β_s β_t standardizedDiagonalLD = effectGeneticCorrelation β_s β_t",
   "status": "opaque",
   "detail": {
-   "reason": "ldEffectGeneticCorrelation expects 0 args [], got 3"
+   "reason": "applied non-function ldEffectGeneticCorrelation"
   }
  },
  {
@@ -6298,7 +6307,7 @@
   "statement": "sourceSelfR2DiagonalLD β var_y = additiveHeritability β var_y",
   "status": "opaque",
   "detail": {
-   "reason": "sourceSelfR2DiagonalLD expects 1 args ['var_y'], got 2"
+   "reason": "applied non-function sourceSelfR2DiagonalLD"
   }
  },
  {
@@ -6312,7 +6321,7 @@
   "statement": "transportedTargetR2DiagonalLD β_s β_t var_y = (effectGeneticCorrelation β_s β_t) ^ 2 * additiveHeritability β_t var_y",
   "status": "opaque",
   "detail": {
-   "reason": "transportedTargetR2DiagonalLD expects 1 args ['var_y'], got 3"
+   "reason": "applied non-function transportedTargetR2DiagonalLD"
   }
  },
  {
@@ -6362,7 +6371,7 @@
   "statement": "scratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) estimation_penalty = additiveHeritability β_target var_y - estimation_penalty",
   "status": "opaque",
   "detail": {
-   "reason": "targetOracleR2DiagonalLD expects 1 args ['var_y'], got 2"
+   "reason": "applied non-function targetOracleR2DiagonalLD"
   }
  },
  {
@@ -6400,7 +6409,7 @@
   "statement": "sampleLimitedScratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) noiseVar nTarget = additiveHeritability β_target var_y - noiseVar / nTarget",
   "status": "opaque",
   "detail": {
-   "reason": "targetOracleR2DiagonalLD expects 1 args ['var_y'], got 2"
+   "reason": "applied non-function targetOracleR2DiagonalLD"
   }
  },
  {
@@ -6414,7 +6423,7 @@
   "statement": "sampleLimitedScratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) noiseVar nTarget = deployedTransferTargetR2 transported_r2 (oracleTransportAdaptationGain transported_r2 (targetOracleR2DiagonalLD β_target var_y)) (noiseVar / nTarget)",
   "status": "opaque",
   "detail": {
-   "reason": "targetOracleR2DiagonalLD expects 1 args ['var_y'], got 2"
+   "reason": "applied non-function targetOracleR2DiagonalLD"
   }
  },
  {
@@ -6428,7 +6437,7 @@
   "statement": "sampleLimitedScratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) noiseVar nTarget = deployedTransferTargetR2 transported_r2 (additiveHeritability β_target var_y - transported_r2) (noiseVar / nTarget)",
   "status": "opaque",
   "detail": {
-   "reason": "targetOracleR2DiagonalLD expects 1 args ['var_y'], got 2"
+   "reason": "applied non-function targetOracleR2DiagonalLD"
   }
  },
  {
@@ -6501,7 +6510,7 @@
   "statement": "metaLearnedSourceWeights wShared (centeredPopulationEffectDeviation wShared wSource) k = sourcePopulationMeanWeights wSource k",
   "status": "opaque",
   "detail": {
-   "reason": "centeredPopulationEffectDeviation expects 0 args [], got 2"
+   "reason": "applied non-function centeredPopulationEffectDeviation"
   }
  },
  {
@@ -6515,7 +6524,7 @@
   "statement": "metaLearnedTransferGapSq wShared wTarget (centeredPopulationEffectDeviation wShared wSource) k = coefficientGapSq (sourcePopulationMeanWeights wSource k) wTarget",
   "status": "opaque",
   "detail": {
-   "reason": "centeredPopulationEffectDeviation expects 0 args [], got 2"
+   "reason": "applied non-function centeredPopulationEffectDeviation"
   }
  },
  {
@@ -6529,7 +6538,7 @@
   "statement": "dotProduct (populationDeviationSum deviation k) (deviation k) = 0",
   "status": "opaque",
   "detail": {
-   "reason": "populationDeviationSum expects 1 args ['k'], got 2"
+   "reason": "applied non-function populationDeviationSum"
   }
  },
  {
@@ -6557,7 +6566,7 @@
   "statement": "dotProduct (meanPopulationDeviation deviation k) (meanPopulationDeviation deviation k) = populationSpecificGap / k",
   "status": "opaque",
   "detail": {
-   "reason": "meanPopulationDeviation expects 1 args ['k'], got 2"
+   "reason": "applied non-function meanPopulationDeviation"
   }
  },
  {
@@ -6571,7 +6580,7 @@
   "statement": "dotProduct u (meanPopulationDeviation deviation k) = 0",
   "status": "opaque",
   "detail": {
-   "reason": "meanPopulationDeviation expects 1 args ['k'], got 2"
+   "reason": "applied non-function meanPopulationDeviation"
   }
  },
  {
@@ -6585,7 +6594,7 @@
   "statement": "metaLearnedTransferGapSq wShared wTarget deviation k = irreducibleGap + populationSpecificGap / k",
   "status": "opaque",
   "detail": {
-   "reason": "metaLearnedTransferGapSq expects 1 args ['k'], got 4"
+   "reason": "applied non-function metaLearnedTransferGapSq"
   }
  },
  {
@@ -6599,7 +6608,7 @@
   "statement": "coefficientGapSq (sourcePopulationMeanWeights wSource k) wTarget = irreducibleGap + populationSpecificGap / k",
   "status": "opaque",
   "detail": {
-   "reason": "sourcePopulationMeanWeights expects 1 args ['k'], got 2"
+   "reason": "applied non-function sourcePopulationMeanWeights"
   }
  },
  {
@@ -6613,7 +6622,7 @@
   "statement": "weightedMetaSourceWeights wShared (centeredPopulationEffectDeviationFin wShared wSource) weight = weightedPopulationEffectAverage wSource weight",
   "status": "opaque",
   "detail": {
-   "reason": "centeredPopulationEffectDeviationFin expects 0 args [], got 2"
+   "reason": "applied non-function centeredPopulationEffectDeviationFin"
   }
  },
  {
@@ -6627,7 +6636,7 @@
   "statement": "weightedMetaTransferGapSq wShared wTarget (centeredPopulationEffectDeviationFin wShared wSource) weight = coefficientGapSq (weightedPopulationEffectAverage wSource weight) wTarget",
   "status": "opaque",
   "detail": {
-   "reason": "centeredPopulationEffectDeviationFin expects 0 args [], got 2"
+   "reason": "applied non-function centeredPopulationEffectDeviationFin"
   }
  },
  {
@@ -6734,7 +6743,7 @@
   "statement": "fineTunedTargetR2 source_r2 (transportPenalty source_r2 transported_r2) (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar) = transported_r2 + exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar",
   "status": "opaque",
   "detail": {
-   "reason": "exactAdaptationGain expects 1 args ['noiseVar'], got 6"
+   "reason": "applied non-function exactAdaptationGain"
   }
  },
  {
@@ -6748,7 +6757,7 @@
   "statement": "fineTunedTargetR2 source_r2 (transportPenalty source_r2 transported_r2) (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar) = deployedTransferTargetR2 transported_r2 (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar) 0",
   "status": "opaque",
   "detail": {
-   "reason": "exactAdaptationGain expects 1 args ['noiseVar'], got 6"
+   "reason": "applied non-function exactAdaptationGain"
   }
  },
  {
@@ -6832,7 +6841,7 @@
   "statement": "expMse E Y S = variance E Y + variance E S - 2 * covariance E Y S + (bias E Y S) ^ 2",
   "status": "opaque",
   "detail": {
-   "reason": "expMse expects 0 args [], got 3"
+   "reason": "applied non-function expMse"
   }
  },
  {
@@ -6846,7 +6855,7 @@
   "statement": "secondMomentMatrix E X = covarianceMatrix E X",
   "status": "opaque",
   "detail": {
-   "reason": "secondMomentMatrix expects 0 args [], got 2"
+   "reason": "applied non-function secondMomentMatrix"
   }
  },
  {
@@ -6891,7 +6900,7 @@
    "names_definition": "mse",
    "mentions_definition": false,
    "MENTION_GAP": "theorem is named for `mse` but its statement never mentions it",
-   "reason": "expMse expects 0 args [], got 3"
+   "reason": "applied non-function expMse"
   }
  },
  {
@@ -6905,7 +6914,7 @@
   "statement": "precision c = (prevalence c * recallRate c) / (prevalence c * recallRate c + (1 - prevalence c) * fpr c)",
   "status": "opaque",
   "detail": {
-   "reason": "precision expects 0 args [], got 1"
+   "reason": "applied non-function precision"
   }
  },
  {

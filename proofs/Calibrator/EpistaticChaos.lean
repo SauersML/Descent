@@ -758,6 +758,72 @@ theorem standardizedGenotype_second_moment_one (h : HardyWeinbergModel)
   rw [← Finset.sum_div, hnum]
   exact div_self (ne_of_gt hvar)
 
+/-- **The fourth moment of the standardized genotype is the reciprocal of the
+genotype variance**: `E[x⁴] = 1 / (2q(1-q))`.
+
+The computation is exact and needs no new machinery. The fourth central moment of
+a `Binomial(2, q)` dosage is `2q(1-q)` — the general binomial fourth central
+moment `n q (1-q) (1 + 3 (n - 2) q (1-q))` has its correction term vanish at
+`n = 2`, which is special to diploidy — so dividing by `Var² = (2q(1-q))²` leaves
+`1 / (2q(1-q))`.
+
+This is the fourth channel of the observable algebra, and unlike the drift and the
+jet variance it is a rational function of a quantity the corpus already owns:
+`Calibrator.CondensationUnification.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance`
+states it against `hweGenotypeVariance` itself. It diverges as the allele
+frequency goes to zero, so rare variants have heavy-tailed standardized
+coordinates in the precise sense that the fourth channel is large. -/
+theorem standardizedGenotype_fourth_moment (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 =
+      1 / h.genotypeVariance := by
+  have hvar : 0 < h.genotypeVariance := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+    nlinarith [hq0, hcomp]
+  have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
+    Real.sq_sqrt hvar.le
+  have hquart : Real.sqrt h.genotypeVariance ^ 4 = h.genotypeVariance ^ 2 := by
+    have hrewrite : Real.sqrt h.genotypeVariance ^ 4 =
+        (Real.sqrt h.genotypeVariance ^ 2) ^ 2 := by ring
+    rw [hrewrite, hsq]
+  have hfactor : ∀ g : DiploidGenotype,
+      h.genotypeProb g * h.standardizedGenotype g ^ 4 =
+        h.genotypeProb g * h.centeredAltAlleleCount g ^ 4 / h.genotypeVariance ^ 2 := by
+    intro g
+    unfold HardyWeinbergModel.standardizedGenotype
+    rw [div_pow, hquart]
+    ring
+  have hnum : ∑ g : DiploidGenotype,
+      h.genotypeProb g * h.centeredAltAlleleCount g ^ 4 = h.genotypeVariance := by
+    rw [h.genotypeVariance_eq, sum_over_genotypes]
+    simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
+      HardyWeinbergModel.centeredAltAlleleCount,
+      HardyWeinbergModel.expectedAltAlleleCount_eq, altAlleleCount]
+    ring
+  simp_rw [hfactor]
+  rw [← Finset.sum_div, hnum, pow_two, ← div_div, div_self (ne_of_gt hvar)]
+
+/-- **The second cumulant of the squared standardized genotype**, `κ₂(x²) = E[x⁴] - 1`,
+in closed form: `(1 - 2q(1-q)) / (2q(1-q))`.
+
+This is the variance of the level-two coordinate, which is why it is the one
+square-cumulant that a design can expose: it is a *variance*, and variances are
+what the second floor of the observable tower reads. It diverges as the allele
+frequency goes to zero. -/
+theorem standardizedSquare_second_cumulant (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) - 1 =
+      (1 - h.genotypeVariance) / h.genotypeVariance := by
+  have hvar : 0 < h.genotypeVariance := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+    nlinarith [hq0, hcomp]
+  rw [standardizedGenotype_fourth_moment h hq0 hq1]
+  rw [div_sub_div_eq_sub_div, one_mul]
+
 /-! ### The design: locus-sets over a Hardy-Weinberg panel -/
 
 /-- A **design over a genotype panel**: the locus-sets a study tests, the
@@ -1492,10 +1558,14 @@ recurrence matches a star density and leaves every cycle density free. -/
 theorem overlap_row_sum_eq_recurrence (design : GenotypeDesign nx ιx) (s : ιx) :
     ∑ t : ιx, ((design.locusSet s ∩ design.locusSet t).card : ℕ) =
       ∑ i ∈ design.locusSet s, design.variantRecurrence i := by
+  have hinter : ∀ t : ιx, design.locusSet s ∩ design.locusSet t =
+      (design.locusSet s).filter (fun i => i ∈ design.locusSet t) := by
+    intro t
+    exact Finset.filter_mem_eq_inter.symm
   have hcard : ∀ t : ιx, (design.locusSet s ∩ design.locusSet t).card =
       ∑ i ∈ design.locusSet s, if i ∈ design.locusSet t then 1 else 0 := by
     intro t
-    rw [← Finset.filter_mem_eq_inter, Finset.card_filter]
+    rw [hinter t, Finset.card_filter]
   have hrec : ∀ i : Fin nx, design.variantRecurrence i =
       ∑ t : ιx, if i ∈ design.locusSet t then 1 else 0 := by
     intro i

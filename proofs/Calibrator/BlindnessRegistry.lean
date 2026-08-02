@@ -90,7 +90,7 @@ theorem StructuralGuard.verdict_holds (g : StructuralGuard) (r : ℝ) : g.verdic
   cases g <;>
     · simp only [StructuralGuard.verdict, targetHetOfRetention, lossOfRetention,
         targetPgsVarOfRetention]
-      ring
+      try ring
 
 /-!
 ## 2. The suite is blind, as a suite
@@ -105,7 +105,7 @@ retention is correct, in any combination and under any rule.
 
 This is why the same wrong number was certified five times: it was never five
 independent certifications, it was one blind suite applied five times. -/
-theorem guard_stack_blind_to_retention {trueRetention wrongRetention : ℝ}
+noncomputable def guard_stack_blind_to_retention {trueRetention wrongRetention : ℝ}
     (hne : wrongRetention ≠ trueRetention) :
     ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r)
       (fun r => r = trueRetention) :=
@@ -125,7 +125,7 @@ theorem no_guard_stack_criterion {trueRetention wrongRetention : ℝ}
 
 /-- Adding a fourth guard of the same kind changes nothing: any predicate on candidate
 retentions that is satisfied at every retention joins the suite without narrowing it. -/
-theorem extra_algebraic_guard_adds_nothing {trueRetention wrongRetention : ℝ}
+noncomputable def extra_algebraic_guard_adds_nothing {trueRetention wrongRetention : ℝ}
     (hne : wrongRetention ≠ trueRetention)
     (newGuard : ℝ → Prop) (hnew : ∀ r, newGuard r) :
     ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r))

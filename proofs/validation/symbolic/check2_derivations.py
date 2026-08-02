@@ -33,6 +33,7 @@ from pathlib import Path
 import sympy as sp
 
 import leansym as L
+import shared
 import hyps as H
 
 HERE = Path(__file__).parent
@@ -61,7 +62,7 @@ def base_name(thm_name: str) -> str | None:
 
 def run():
     decls = json.load(open(HERE / "decls.json"))
-    table = L.build_table(decls)
+    table = shared.build_table()
     inline = L.Converter(table)
     opaque = L.Converter(table, opaque_defs=True)
     defnames = {d["name"] for d in decls if d["kind"] == "def"}

@@ -365,6 +365,31 @@
    }
   }
  },
+ "Calibrator.Conventions.meanAlleleFreq": {
+  "fqn": "Calibrator.Conventions.meanAlleleFreq",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.Conventions.hudsonFst_eq_varianceRatio",
+    "mutations_rejected": [
+     "literal 2->3",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   },
+   "check3_duplicate_body": {
+    "covered": true,
+    "group_expression": "x0/2 + x1/2",
+    "mutations_rejected": [
+     "literal 2->3",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
  "Calibrator.Conventions.betweenSubgroupVariance": {
   "fqn": "Calibrator.Conventions.betweenSubgroupVariance",
   "checks": {
@@ -405,28 +430,17 @@
    }
   }
  },
- "Calibrator.Conventions.meanAlleleFreq": {
-  "fqn": "Calibrator.Conventions.meanAlleleFreq",
+ "Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize": {
+  "fqn": "Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize",
   "checks": {
    "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.Conventions.hudsonFst_eq_varianceRatio",
-    "mutations_rejected": [
-     "literal 2->3",
+    "covered": false,
+    "via_theorem": "Calibrator.Conventions.demographicSpike_eq_contrastVariance_mul_effectiveSize",
+    "mutations_rejected": [],
+    "mutations_survived": [
      "scale by 2",
      "shift by 1"
-    ],
-    "mutations_survived": []
-   },
-   "check3_duplicate_body": {
-    "covered": true,
-    "group_expression": "x0/2 + x1/2",
-    "mutations_rejected": [
-     "literal 2->3",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
+    ]
    }
   }
  },
@@ -442,20 +456,6 @@
      "shift by 1"
     ],
     "mutations_survived": []
-   }
-  }
- },
- "Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize": {
-  "fqn": "Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize",
-  "checks": {
-   "check2_derivation": {
-    "covered": false,
-    "via_theorem": "Calibrator.Conventions.demographicSpike_eq_contrastVariance_mul_effectiveSize",
-    "mutations_rejected": [],
-    "mutations_survived": [
-     "scale by 2",
-     "shift by 1"
-    ]
    }
   }
  },
@@ -589,12 +589,22 @@
    }
   }
  },
- "Calibrator.DemographicHistory.steppingStoneCoalescenceTime": {
-  "fqn": "Calibrator.DemographicHistory.steppingStoneCoalescenceTime",
+ "Calibrator.PopulationGeneticsFoundations.coalFst": {
+  "fqn": "Calibrator.PopulationGeneticsFoundations.coalFst",
   "checks": {
    "check2_derivation": {
     "covered": true,
     "via_theorem": "Calibrator.DemographicHistory.steppingStoneFst_from_coalescence_time",
+    "mutations_rejected": [
+     "literal 2->3",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   },
+   "check3_duplicate_body": {
+    "covered": true,
+    "group_expression": "x0/(x0 + 2*x1)",
     "mutations_rejected": [
      "literal 2->3",
      "scale by 2",
@@ -619,22 +629,12 @@
    }
   }
  },
- "Calibrator.PopulationGeneticsFoundations.coalFst": {
-  "fqn": "Calibrator.PopulationGeneticsFoundations.coalFst",
+ "Calibrator.DemographicHistory.steppingStoneCoalescenceTime": {
+  "fqn": "Calibrator.DemographicHistory.steppingStoneCoalescenceTime",
   "checks": {
    "check2_derivation": {
     "covered": true,
     "via_theorem": "Calibrator.DemographicHistory.steppingStoneFst_from_coalescence_time",
-    "mutations_rejected": [
-     "literal 2->3",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   },
-   "check3_duplicate_body": {
-    "covered": true,
-    "group_expression": "x0/(x0 + 2*x1)",
     "mutations_rejected": [
      "literal 2->3",
      "scale by 2",
@@ -889,6 +889,21 @@
    }
   }
  },
+ "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium": {
+  "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.PopulationGeneticsFoundations.het_plus_fst_eq_one",
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
  "Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity": {
   "fqn": "Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity",
   "checks": {
@@ -905,21 +920,6 @@
    "check3_duplicate_body": {
     "covered": true,
     "group_expression": "x0/(x0 + 1)",
-    "mutations_rejected": [
-     "literal 1->2",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
- "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium": {
-  "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.PopulationGeneticsFoundations.het_plus_fst_eq_one",
     "mutations_rejected": [
      "literal 1->2",
      "scale by 2",
@@ -1250,6 +1250,20 @@
    }
   }
  },
+ "Calibrator.TransferLearningPGS.optimalSourceShrinkageWeight": {
+  "fqn": "Calibrator.TransferLearningPGS.optimalSourceShrinkageWeight",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.TransferLearningPGS.sourceShrinkageMSE_eq_optimal_plus_square",
+    "mutations_rejected": [
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
  "Calibrator.TransferLearningPGS.sourceShrinkageMSE": {
   "fqn": "Calibrator.TransferLearningPGS.sourceShrinkageMSE",
   "checks": {
@@ -1265,12 +1279,12 @@
    }
   }
  },
- "Calibrator.TransferLearningPGS.optimalSourceShrinkageWeight": {
-  "fqn": "Calibrator.TransferLearningPGS.optimalSourceShrinkageWeight",
+ "Calibrator.TransferLearningPGS.optimalFineTuningMSE": {
+  "fqn": "Calibrator.TransferLearningPGS.optimalFineTuningMSE",
   "checks": {
    "check2_derivation": {
     "covered": true,
-    "via_theorem": "Calibrator.TransferLearningPGS.sourceShrinkageMSE_eq_optimal_plus_square",
+    "via_theorem": "Calibrator.TransferLearningPGS.optimalFineTuningMSE_eq_closed_form",
     "mutations_rejected": [
      "scale by 2",
      "shift by 1"
@@ -1279,12 +1293,12 @@
    }
   }
  },
- "Calibrator.TransferLearningPGS.optimalFineTuningMSE": {
-  "fqn": "Calibrator.TransferLearningPGS.optimalFineTuningMSE",
+ "Calibrator.VarianceComponents.narrowSenseH2": {
+  "fqn": "Calibrator.VarianceComponents.narrowSenseH2",
   "checks": {
    "check2_derivation": {
     "covered": true,
-    "via_theorem": "Calibrator.TransferLearningPGS.optimalFineTuningMSE_eq_closed_form",
+    "via_theorem": "Calibrator.VarianceComponents.narrow_h2_sub_snp_h2_eq",
     "mutations_rejected": [
      "scale by 2",
      "shift by 1"
@@ -1308,20 +1322,6 @@
    "check3_duplicate_body": {
     "covered": true,
     "group_expression": "x0/x1",
-    "mutations_rejected": [
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
- "Calibrator.VarianceComponents.narrowSenseH2": {
-  "fqn": "Calibrator.VarianceComponents.narrowSenseH2",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.VarianceComponents.narrow_h2_sub_snp_h2_eq",
     "mutations_rejected": [
      "scale by 2",
      "shift by 1"

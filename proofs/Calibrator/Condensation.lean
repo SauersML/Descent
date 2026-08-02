@@ -215,6 +215,47 @@ theorem condensationConstant_pos : 0 < condensationConstant := by
   have h := condensationConstant_bounds.1
   linarith
 
+/-- **A sharper lower bound: `log 2 < c_G`.**
+
+`condensationConstant_bounds` is too coarse for one downstream question. Its bracket
+`(0.640, 0.807)` *straddles* `log 2 = 0.69315`, so it cannot decide whether the
+condensation constant exceeds `log 2` — and that comparison is exactly what separates a
+balanced hard-called genotype locus from its Gaussian surrogate, since
+`Calibrator.PolygenicSpectroscopy.hweMellinDrift_half` gives `c(1/2) = log 2`. The claim
+was asserted in prose there while being underivable from anything in the development.
+
+The gap is closed by taking more terms. Mathlib's `eulerMascheroniConstant_lt_two_thirds`
+is `eulerMascheroniSeq' 6`, but `eulerMascheroniConstant_lt_eulerMascheroniSeq'` holds at
+*every* index, and the sequence `H_n - log n` decreases to `gamma`. At `n = 16`,
+
+  `gamma < H_16 - log 16 = 2436559 / 720720 - 4 log 2`,
+
+which gives `c_G > 2 - H_16 + 3 log 2 > 0.69871`, clearing `log 2 < 0.69315` with a
+margin of about `0.0056`. Index `16` is chosen because it is the smallest power of two
+that clears the comparison, so `log 16` collapses to `4 log 2` and mathlib's tight
+rational bounds on `log 2` are the only numeric input needed. -/
+theorem log_two_lt_condensationConstant : Real.log 2 < condensationConstant := by
+  have hlog16 : Real.log 16 = 4 * Real.log 2 := by
+    rw [show (16 : ℝ) = 2 ^ (4 : ℕ) by norm_num, Real.log_pow]
+    norm_num
+  -- `H_16 - log 16` in closed form. Whether `norm_num` leaves the logarithm as
+  -- `log 16` or folds the cast differently is not something we rely on: both
+  -- routes are tried.
+  have hseq : Real.eulerMascheroniSeq' 16 = (2436559 : ℝ) / 720720 - 4 * Real.log 2 := by
+    rw [Real.eulerMascheroniSeq']
+    first
+      | norm_num [hlog16]
+      | (norm_num; rw [hlog16])
+      | (rw [if_neg (by norm_num : ¬((16 : ℕ) = 0)),
+             show ((16 : ℕ) : ℝ) = 2 ^ (4 : ℕ) by norm_num, Real.log_pow]
+         norm_num)
+  have hγ : Real.eulerMascheroniConstant < (2436559 : ℝ) / 720720 - 4 * Real.log 2 := by
+    have h := Real.eulerMascheroniConstant_lt_eulerMascheroniSeq' 16
+    rwa [hseq] at h
+  have hl2 : (0.6931471803 : ℝ) < Real.log 2 := Real.log_two_gt_d9
+  unfold condensationConstant
+  linarith
+
 /-- The Gaussian **jet variance** `v_G = pi ^ 2 / 2 - 4 = 0.93480...`, the variance of
 `log chi-square-three`, i.e. `trigamma(3/2)`. It is the second observable of the
 Mellin 2-jet and sets the width of the condensation window. -/

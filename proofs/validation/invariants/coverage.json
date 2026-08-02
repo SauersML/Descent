@@ -518,19 +518,26 @@
    "r2_ld"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "proved",
     "required_range": [
      0.0,
-     1.0
+     Infinity
     ],
-    "why": "`standardErrorSq` names a squared correlation -- a proportion of variance"
+    "why": "`standardErrorSq` names a standard deviation / standard error"
    },
    {
     "family": "invariant",
@@ -551,17 +558,7 @@
     "why": "`r2_ld` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "negate",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(p,r2_ld)"
-   ]
-  }
+  "findings": []
  },
  "AncestrySpecificPower.effectiveSampleSize": {
   "module": "AncestrySpecificPower",
@@ -628,13 +625,19 @@
     "rejected_by": [
      "range"
     ]
+   },
+   {
+    "mutation": "swap-args(n_eff,\u03b2)",
+    "rejected_by": [
+     "range"
+    ]
    }
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "proved",
     "required_range": [
      0.0,
      Infinity
@@ -691,7 +694,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -729,32 +732,15 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "mutant-rejected",
+  "demonstration": "rejects-as-written",
   "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "rejected_by": [
-     "range"
-    ]
-   }
+   "range"
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -774,7 +760,18 @@
     "why": "`r2_total` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape-outside-theorem",
+    "required_range": [
+     0.0,
+     1.0
+    ],
+    "why": "`portableFraction` names a proportion"
+   }
+  ]
  },
  "AncestrySpecificPower.proportionalAllocation": {
   "module": "AncestrySpecificPower",
@@ -841,7 +838,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "proved",
     "required_range": [
      0.0,
      Infinity
@@ -1622,6 +1619,51 @@
    "detail": "non-scalar signature (StructuralGuard \u2192 \u211d \u2192 Prop | .overDetermination, r => targetHetOfRetention 1 r = 1 * (1 - lossOfRetention r) | .duplicateBody, r => lossOfRetention r = 1 - r | .conflation, r => targetPgsVarOfRetention 1 r = 1 * r)"
   }
  },
+ "BlindnessRegistry.guard_stack_blind_to_retention": {
+  "module": "BlindnessRegistry",
+  "line": 108,
+  "path": "proofs/Calibrator/BlindnessRegistry.lean",
+  "params": [
+   "hne",
+   "fun",
+   "r",
+   "=>",
+   "fun",
+   "g"
+  ],
+  "ret": "ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r) (fun r => r = trueRetention)",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r) (fun r => r = trueRetention))"
+  }
+ },
+ "BlindnessRegistry.extra_algebraic_guard_adds_nothing": {
+  "module": "BlindnessRegistry",
+  "line": 128,
+  "path": "proofs/Calibrator/BlindnessRegistry.lean",
+  "params": [
+   "hne",
+   "newGuard",
+   "hnew",
+   "fun",
+   "g"
+  ],
+  "ret": "ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r)) (fun r => r = trueRetention) where positive",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r)) (fun r => r = trueRetention) where positive)"
+  }
+ },
  "CausalInference.proportionMediated": {
   "module": "CausalInference",
   "line": 116,
@@ -1632,32 +1674,15 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "mutant-rejected",
+  "demonstration": "rejects-as-written",
   "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "rejected_by": [
-     "range"
-    ]
-   }
+   "range"
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -1677,7 +1702,18 @@
     "why": "`total_effect` reaches 0 and 3 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape-outside-theorem",
+    "required_range": [
+     0.0,
+     1.0
+    ],
+    "why": "`proportionMediated` names a proportion"
+   }
+  ]
  },
  "CausalInference.costEffectiveness": {
   "module": "CausalInference",
@@ -2624,7 +2660,7 @@
  },
  "Condensation.gaussianJetVariance": {
   "module": "Condensation",
-  "line": 221,
+  "line": 262,
   "path": "proofs/Calibrator/Condensation.lean",
   "params": [],
   "ret": "\u211d",
@@ -2641,7 +2677,7 @@
  },
  "Condensation.criticalDegree": {
   "module": "Condensation",
-  "line": 246,
+  "line": 287,
   "path": "proofs/Calibrator/Condensation.lean",
   "params": [
    "N",
@@ -2679,7 +2715,7 @@
  },
  "Condensation.gaussianCriticalMultiplier": {
   "module": "Condensation",
-  "line": 262,
+  "line": 303,
   "path": "proofs/Calibrator/Condensation.lean",
   "params": [],
   "ret": "\u211d",
@@ -2695,7 +2731,7 @@
  },
  "Condensation.windowVariance": {
   "module": "Condensation",
-  "line": 309,
+  "line": 350,
   "path": "proofs/Calibrator/Condensation.lean",
   "params": [
    "w",
@@ -2711,6 +2747,44 @@
    "stage": "falsifiability",
    "detail": "no check on this definition currently holds, so there is nothing to falsify",
    "survived": null
+  }
+ },
+ "CondensationUnification.hweObservableContent": {
+  "module": "CondensationUnification",
+  "line": 462,
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "params": [
+   "squareCumulant",
+   "q"
+  ],
+  "ret": "GenotypeObservableContent where drift",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (GenotypeObservableContent where drift)"
+  }
+ },
+ "CondensationUnification.GenotypeDesign.reModel": {
+  "module": "CondensationUnification",
+  "line": 519,
+  "path": "proofs/Calibrator/CondensationUnification.lean",
+  "params": [
+   "design",
+   "model"
+  ],
+  "ret": "GenotypeDesign n \u03b9",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (GenotypeDesign n \u03b9)"
   }
  },
  "Conventions.ploidy": {
@@ -3784,21 +3858,22 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "rejects-as-written",
+  "demonstration": "mutant-rejected",
   "falsifiability_evidence": [
-   "range"
+   {
+    "mutation": "const-off-by-one",
+    "rejected_by": [
+     "scale"
+    ]
+   },
+   {
+    "mutation": "swap-times-div",
+    "rejected_by": [
+     "scale"
+    ]
+   }
   ],
   "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`explainedR2` names a proportion of variance explained"
-   },
    {
     "family": "invariant",
     "kind": "scale",
@@ -3806,18 +3881,7 @@
     "why": "`explainedR2` is dimensionless and ['scoreOutcomeCov', 'scoreVariance', 'outcomeVariance'] are second moments, so scaling them together must leave the value unchanged"
    }
   ],
-  "findings": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`explainedR2` names a proportion of variance explained"
-   }
-  ]
+  "findings": []
  },
  "DGP.ldWitnessSourceMoments": {
   "module": "DGP",
@@ -3967,32 +4031,15 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "mutant-rejected",
+  "demonstration": "rejects-as-written",
   "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(fstSource,fstTarget)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(fstSource,recombRate)",
-    "rejected_by": [
-     "range"
-    ]
-   }
+   "range"
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "escape",
     "required_range": [
      0.0,
      Infinity
@@ -4030,7 +4077,18 @@
     "why": "`kappa` reaches 0.001 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape",
+    "required_range": [
+     0.0,
+     Infinity
+    ],
+    "why": "`demographicCovarianceGapLowerBound` names a variance"
+   }
+  ]
  },
  "DGP.twoLocusIdx0": {
   "module": "DGP",
@@ -5289,6 +5347,47 @@
    ]
   }
  },
+ "DemographicCapacity.contrastSpikeLevel": {
+  "module": "DemographicCapacity",
+  "line": 46,
+  "path": "proofs/Calibrator/DemographicCapacity.lean",
+  "params": [
+   "p\u2081",
+   "p\u2082"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`p\u2081` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`p\u2082` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   }
+  ],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(p\u2081,p\u2082)"
+   ]
+  }
+ },
  "DemographicHistory.demoSteppingStoneFst": {
   "module": "DemographicHistory",
   "line": 134,
@@ -5594,7 +5693,6 @@
    {
     "mutation": "swap-times-div",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    }
@@ -5735,7 +5833,7 @@
  },
  "DriftRegime.closedPopulation": {
   "module": "DriftRegime",
-  "line": 99,
+  "line": 103,
   "path": "proofs/Calibrator/DriftRegime.lean",
   "params": [
    "Ne",
@@ -5755,7 +5853,7 @@
  },
  "DriftRegime.mutationDriftBalance": {
   "module": "DriftRegime",
-  "line": 106,
+  "line": 116,
   "path": "proofs/Calibrator/DriftRegime.lean",
   "params": [
    "H\u2080",
@@ -5774,7 +5872,7 @@
  },
  "DriftRegime.driftRetention": {
   "module": "DriftRegime",
-  "line": 159,
+  "line": 182,
   "path": "proofs/Calibrator/DriftRegime.lean",
   "params": [
    "Ne",
@@ -5799,7 +5897,6 @@
    {
     "mutation": "swap-times-div",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    }
@@ -5832,7 +5929,7 @@
  },
  "DriftRegime.lossOfRetention": {
   "module": "DriftRegime",
-  "line": 162,
+  "line": 194,
   "path": "proofs/Calibrator/DriftRegime.lean",
   "params": [
    "r"
@@ -5882,7 +5979,7 @@
  },
  "DriftRegime.targetHetOfRetention": {
   "module": "DriftRegime",
-  "line": 165,
+  "line": 197,
   "path": "proofs/Calibrator/DriftRegime.lean",
   "params": [
    "H\u2080",
@@ -5939,7 +6036,7 @@
  },
  "DriftRegime.targetPgsVarOfRetention": {
   "module": "DriftRegime",
-  "line": 168,
+  "line": 204,
   "path": "proofs/Calibrator/DriftRegime.lean",
   "params": [
    "V_A",
@@ -5990,7 +6087,7 @@
  },
  "DriftRegime.clusterCrossCheck": {
   "module": "DriftRegime",
-  "line": 182,
+  "line": 222,
   "path": "proofs/Calibrator/DriftRegime.lean",
   "params": [
    "r"
@@ -6006,9 +6103,27 @@
    "detail": "non-scalar signature (Prop)"
   }
  },
+ "DriftRegime.crossChecks_blind_to_retention": {
+  "module": "DriftRegime",
+  "line": 244,
+  "path": "proofs/Calibrator/DriftRegime.lean",
+  "params": [
+   "hne"
+  ],
+  "ret": "ProbeBlindness clusterCrossCheck (fun r => r = trueRetention) where positive",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (ProbeBlindness clusterCrossCheck (fun r => r = trueRetention) where positive)"
+  }
+ },
  "DriftRegime.benchmarkRatio": {
   "module": "DriftRegime",
-  "line": 227,
+  "line": 274,
   "path": "proofs/Calibrator/DriftRegime.lean",
   "params": [
    "fstS",
@@ -6047,7 +6162,7 @@
  },
  "DriftRegime.benchmarkRatioSquared": {
   "module": "DriftRegime",
-  "line": 231,
+  "line": 278,
   "path": "proofs/Calibrator/DriftRegime.lean",
   "params": [
    "fstS",
@@ -6087,7 +6202,7 @@
  },
  "DriftRegime.diagonalDesign": {
   "module": "DriftRegime",
-  "line": 235,
+  "line": 285,
   "path": "proofs/Calibrator/DriftRegime.lean",
   "params": [
    "g"
@@ -6101,6 +6216,22 @@
   "uncovered_reason": {
    "stage": "transpile",
    "detail": "non-scalar signature (\u211d \u2192 \u211d)"
+  }
+ },
+ "DriftRegime.symmetricDesignBlindness": {
+  "module": "DriftRegime",
+  "line": 322,
+  "path": "proofs/Calibrator/DriftRegime.lean",
+  "params": [],
+  "ret": "ProbeBlindness diagonalDesign (fun g => g = benchmarkRatio) where positive",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (ProbeBlindness diagonalDesign (fun g => g = benchmarkRatio) where positive)"
   }
  },
  "EpistasisAndNonAdditivity.fisherAverageEffect": {
@@ -6542,7 +6673,7 @@
  },
  "EpistaticChaos.fourthCumulantFromMoments": {
   "module": "EpistaticChaos",
-  "line": 1225,
+  "line": 1229,
   "path": "proofs/Calibrator/EpistaticChaos.lean",
   "params": [
    "secondMoment",
@@ -6562,7 +6693,7 @@
  },
  "EpistaticChaos.circulantSpectrumA": {
   "module": "EpistaticChaos",
-  "line": 1355,
+  "line": 1359,
   "path": "proofs/Calibrator/EpistaticChaos.lean",
   "params": [
    "c"
@@ -6595,7 +6726,7 @@
  },
  "EpistaticChaos.circulantSpectrumB": {
   "module": "EpistaticChaos",
-  "line": 1362,
+  "line": 1366,
   "path": "proofs/Calibrator/EpistaticChaos.lean",
   "params": [
    "c"
@@ -6626,6 +6757,155 @@
    ]
   }
  },
+ "EpistaticChaos.overlapMatrix": {
+  "module": "EpistaticChaos",
+  "line": 1462,
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "params": [
+   "design"
+  ],
+  "ret": "Matrix \u03b9x \u03b9x \u211d",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (Matrix \u03b9x \u03b9x \u211d)"
+  }
+ },
+ "EpistaticChaos.cycleDensity": {
+  "module": "EpistaticChaos",
+  "line": 1481,
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "params": [
+   "design",
+   "p"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
+  }
+ },
+ "EpistaticChaos.Tempered": {
+  "module": "EpistaticChaos",
+  "line": 1519,
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "params": [
+   "design",
+   "rate"
+  ],
+  "ret": "Prop",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (Prop)"
+  }
+ },
+ "EpistaticChaos.BoundedHubRecurrence": {
+  "module": "EpistaticChaos",
+  "line": 1528,
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "params": [
+   "design",
+   "bound"
+  ],
+  "ret": "Prop",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (Prop)"
+  }
+ },
+ "EpistaticChaos.palindromicCycleDensityA": {
+  "module": "EpistaticChaos",
+  "line": 1698,
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "params": [
+   "s",
+   "p"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`s` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   }
+  ],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "swap-plus-minus",
+    "swap-times-div"
+   ]
+  }
+ },
+ "EpistaticChaos.palindromicCycleDensityB": {
+  "module": "EpistaticChaos",
+  "line": 1707,
+  "path": "proofs/Calibrator/EpistaticChaos.lean",
+  "params": [
+   "s",
+   "p"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`s` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   }
+  ],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "swap-plus-minus",
+    "swap-times-div"
+   ]
+  }
+ },
  "EquityAndImplementation.expectedR2FromN": {
   "module": "EquityAndImplementation",
   "line": 215,
@@ -6640,16 +6920,6 @@
   "demonstration": null,
   "falsifiability_evidence": null,
   "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "inconclusive",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`expectedR2` names a proportion of variance explained"
-   },
    {
     "family": "invariant",
     "kind": "continuity",
@@ -6982,33 +7252,15 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "mutant-rejected",
+  "demonstration": "rejects-as-written",
   "falsifiability_evidence": [
-   {
-    "mutation": "swap-times-div",
-    "rejected_by": [
-     "range",
-     "scale"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "rejected_by": [
-     "range"
-    ]
-   }
+   "range"
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      -1.0,
      1.0
@@ -7022,7 +7274,18 @@
     "why": "`geneticCorrelation` is dimensionless and ['cov_g', 'vg\u2081', 'vg\u2082'] are second moments, so scaling them together must leave the value unchanged"
    }
   ],
-  "findings": []
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape-outside-theorem",
+    "required_range": [
+     -1.0,
+     1.0
+    ],
+    "why": "`geneticCorrelation` names a correlation coefficient"
+   }
+  ]
  },
  "GeneticArchitectureDiscovery.multiTraitEffectiveSampleSize": {
   "module": "GeneticArchitectureDiscovery",
@@ -7468,6 +7731,12 @@
   "demonstration": "mutant-rejected",
   "falsifiability_evidence": [
    {
+    "mutation": "const-off-by-one",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
     "mutation": "drop-a-one-minus",
     "rejected_by": [
      "range"
@@ -7478,19 +7747,13 @@
     "rejected_by": [
      "range"
     ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "rejected_by": [
-     "range"
-    ]
    }
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -7923,7 +8186,7 @@
  },
  "ImitationRigidity.scalarRowResolvent": {
   "module": "ImitationRigidity",
-  "line": 248,
+  "line": 320,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "latent",
@@ -7943,7 +8206,7 @@
  },
  "ImitationRigidity.fairTwoPointVariance": {
   "module": "ImitationRigidity",
-  "line": 262,
+  "line": 334,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "a",
@@ -7963,7 +8226,7 @@
  },
  "ImitationRigidity.gramForm": {
   "module": "ImitationRigidity",
-  "line": 312,
+  "line": 384,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "A",
@@ -7983,7 +8246,7 @@
  },
  "ImitationRigidity.quadForm": {
   "module": "ImitationRigidity",
-  "line": 318,
+  "line": 390,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "A",
@@ -8002,7 +8265,7 @@
  },
  "ImitationRigidity.VarianceNonneg": {
   "module": "ImitationRigidity",
-  "line": 323,
+  "line": 395,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "A"
@@ -8020,7 +8283,7 @@
  },
  "ImitationRigidity.BelowCeiling": {
   "module": "ImitationRigidity",
-  "line": 475,
+  "line": 547,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "ceiling",
@@ -8039,7 +8302,7 @@
  },
  "ImitationRigidity.stationaryLDEntry": {
   "module": "ImitationRigidity",
-  "line": 554,
+  "line": 626,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "decay",
@@ -8076,7 +8339,7 @@
  },
  "ImitationRigidity.markovLDStep": {
   "module": "ImitationRigidity",
-  "line": 573,
+  "line": 645,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "decay",
@@ -8096,7 +8359,7 @@
  },
  "ImitationRigidity.ldKernelSymbol": {
   "module": "ImitationRigidity",
-  "line": 617,
+  "line": 689,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "decay",
@@ -8116,7 +8379,7 @@
  },
  "ImitationRigidity.ldHardEdge": {
   "module": "ImitationRigidity",
-  "line": 626,
+  "line": 698,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "decay"
@@ -8144,7 +8407,7 @@
  },
  "ImitationRigidity.ldWhiteningGain": {
   "module": "ImitationRigidity",
-  "line": 636,
+  "line": 708,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "decay"
@@ -8172,7 +8435,7 @@
  },
  "ImitationRigidity.ldPrecisionTrace": {
   "module": "ImitationRigidity",
-  "line": 796,
+  "line": 868,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "decay",
@@ -8213,7 +8476,7 @@
  },
  "ImitationRigidity.adjacentBoundarySeparation": {
   "module": "ImitationRigidity",
-  "line": 802,
+  "line": 874,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [],
   "ret": "\u2115 \u2192 \u2115 | 0 => 1 | d + 1 => d",
@@ -8229,7 +8492,7 @@
  },
  "ImitationRigidity.lossGeometryRisk": {
   "module": "ImitationRigidity",
-  "line": 927,
+  "line": 999,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "B",
@@ -8248,7 +8511,7 @@
  },
  "ImitationRigidity.ridgeBalance": {
   "module": "ImitationRigidity",
-  "line": 974,
+  "line": 1046,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "aspect",
@@ -8269,7 +8532,7 @@
  },
  "ImitationRigidity.ridgeSelfConsistentStep": {
   "module": "ImitationRigidity",
-  "line": 996,
+  "line": 1068,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "aspect",
@@ -8290,7 +8553,7 @@
  },
  "ImitationRigidity.alleleLossProbability": {
   "module": "ImitationRigidity",
-  "line": 1146,
+  "line": 1218,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "initial",
@@ -8329,7 +8592,7 @@
  },
  "ImitationRigidity.absorptionInformation": {
   "module": "ImitationRigidity",
-  "line": 1151,
+  "line": 1223,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "initial",
@@ -8349,7 +8612,7 @@
  },
  "ImitationRigidity.absorptionChannelWeight": {
   "module": "ImitationRigidity",
-  "line": 1215,
+  "line": 1287,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "initial",
@@ -8369,7 +8632,7 @@
  },
  "ImitationRigidity.informationCrossoverTime": {
   "module": "ImitationRigidity",
-  "line": 1226,
+  "line": 1298,
   "path": "proofs/Calibrator/ImitationRigidity.lean",
   "params": [
    "initial"
@@ -8492,41 +8755,16 @@
    "ld_extent"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "drop-a-one-minus",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "guarded-by-side-condition",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`meanImputationR2` names a proportion of variance explained"
-   }
-  ],
-  "findings": []
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
+  }
  },
  "ImputationPortability.apparent_portability_loss": {
   "module": "ImputationPortability",
@@ -8823,16 +9061,9 @@
    "t"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "swap-args(D\u2080,r)",
-    "rejected_by": [
-     "continuity"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "invariant",
@@ -8859,7 +9090,20 @@
     "why": "`t` reaches 0 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(D\u2080,r)",
+    "swap-args(D\u2080,Ne)",
+    "swap-args(r,Ne)"
+   ]
+  }
  },
  "LDDecayTheory.tagR2": {
   "module": "LDDecayTheory",
@@ -8871,39 +9115,10 @@
    "var_causal"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "guarded-by-side-condition",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`tagR2` names a proportion of variance explained"
-   },
    {
     "family": "invariant",
     "kind": "continuity",
@@ -8923,7 +9138,20 @@
     "why": "`var_causal` reaches 1e-06 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(D_sq,var_tag)",
+    "swap-args(D_sq,var_causal)",
+    "swap-args(var_tag,var_causal)"
+   ]
+  }
  },
  "LDDecayTheory.admixtureLD": {
   "module": "LDDecayTheory",
@@ -9265,7 +9493,6 @@
    {
     "mutation": "swap-times-div",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    }
@@ -9961,7 +10188,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "inconclusive",
     "required_range": [
      0.0,
      1.0
@@ -10028,7 +10255,7 @@
  },
  "MetricSpecificPortability.ldBandDetectionShare": {
   "module": "MetricSpecificPortability",
-  "line": 1182,
+  "line": 1183,
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
   "params": [
    "decay",
@@ -10079,7 +10306,7 @@
  },
  "MetricSpecificPortability.ldPruningDetectionDeficit": {
   "module": "MetricSpecificPortability",
-  "line": 1189,
+  "line": 1190,
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
   "params": [
    "decay",
@@ -10120,7 +10347,7 @@
  },
  "MetricSpecificPortability.ldPanelRetentionFraction": {
   "module": "MetricSpecificPortability",
-  "line": 1393,
+  "line": 1394,
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
   "params": [
    "retainedMarkers",
@@ -10128,32 +10355,15 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "mutant-rejected",
+  "demonstration": "rejects-as-written",
   "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "rejected_by": [
-     "range"
-    ]
-   }
+   "range"
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "escape",
     "required_range": [
      0.0,
      1.0
@@ -10173,11 +10383,22 @@
     "why": "`totalMarkers` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape",
+    "required_range": [
+     0.0,
+     1.0
+    ],
+    "why": "`ldPanelRetentionFraction` names a proportion"
+   }
+  ]
  },
  "MetricSpecificPortability.ldBlockReconstructionShare": {
   "module": "MetricSpecificPortability",
-  "line": 1444,
+  "line": 1445,
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
   "params": [
    "recomb",
@@ -10198,7 +10419,7 @@
  },
  "MetricSpecificPortability.ldBlockDetectionShare": {
   "module": "MetricSpecificPortability",
-  "line": 1455,
+  "line": 1456,
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
   "params": [
    "recomb",
@@ -10208,20 +10429,15 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "mutant-rejected",
+  "demonstration": "rejects-as-written",
   "falsifiability_evidence": [
-   {
-    "mutation": "swap-args(retainedMarkers,totalMarkers)",
-    "rejected_by": [
-     "range"
-    ]
-   }
+   "range"
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "escape",
     "required_range": [
      0.0,
      1.0
@@ -10253,11 +10469,22 @@
     "why": "`totalMarkers` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape",
+    "required_range": [
+     0.0,
+     1.0
+    ],
+    "why": "`ldBlockDetectionShare` names a proportion"
+   }
+  ]
  },
  "MetricSpecificPortability.ldBlockPruningDeficit": {
   "module": "MetricSpecificPortability",
-  "line": 1465,
+  "line": 1466,
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
   "params": [
    "recomb",
@@ -10307,7 +10534,7 @@
  },
  "MetricSpecificPortability.ldTightLinkageDetectionShare": {
   "module": "MetricSpecificPortability",
-  "line": 1476,
+  "line": 1477,
   "path": "proofs/Calibrator/MetricSpecificPortability.lean",
   "params": [
    "retainedMarkers",
@@ -10315,20 +10542,15 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "mutant-rejected",
+  "demonstration": "rejects-as-written",
   "falsifiability_evidence": [
-   {
-    "mutation": "swap-args(retainedMarkers,totalMarkers)",
-    "rejected_by": [
-     "range"
-    ]
-   }
+   "range"
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "escape",
     "required_range": [
      0.0,
      1.0
@@ -10348,7 +10570,18 @@
     "why": "`totalMarkers` reaches 0 and 1000 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape",
+    "required_range": [
+     0.0,
+     1.0
+    ],
+    "why": "`ldTightLinkageDetectionShare` names a proportion"
+   }
+  ]
  },
  "MultiAncestryTheory.effectMutualInformation": {
   "module": "MultiAncestryTheory",
@@ -11359,9 +11592,10 @@
  },
  "ImitationCapacity.spiked": {
   "module": "ImitationCapacity",
-  "line": 275,
+  "line": 281,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
+   "_K",
    "S\u2080",
    "t",
    "v"
@@ -11379,7 +11613,7 @@
  },
  "ImitationCapacity.exitLevels": {
   "module": "ImitationCapacity",
-  "line": 303,
+  "line": 310,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "S\u2080"
@@ -11397,7 +11631,7 @@
  },
  "ImitationCapacity.imitationCapacity": {
   "module": "ImitationCapacity",
-  "line": 313,
+  "line": 320,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "S\u2080"
@@ -11415,7 +11649,7 @@
  },
  "ImitationCapacity.frobeniusForm": {
   "module": "ImitationCapacity",
-  "line": 501,
+  "line": 508,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "A",
@@ -11434,7 +11668,7 @@
  },
  "ImitationCapacity.traceForm": {
   "module": "ImitationCapacity",
-  "line": 567,
+  "line": 574,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "M"
@@ -11452,7 +11686,7 @@
  },
  "ImitationCapacity.traceWindowBudgetClass": {
   "module": "ImitationCapacity",
-  "line": 594,
+  "line": 601,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "base",
@@ -11471,7 +11705,7 @@
  },
  "ImitationCapacity.margin": {
   "module": "ImitationCapacity",
-  "line": 687,
+  "line": 694,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "E",
@@ -11490,7 +11724,7 @@
  },
  "ImitationCapacity.rejectionThreshold": {
   "module": "ImitationCapacity",
-  "line": 713,
+  "line": 720,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "E",
@@ -11509,7 +11743,7 @@
  },
  "ImitationCapacity.traceWindowClass": {
   "module": "ImitationCapacity",
-  "line": 770,
+  "line": 777,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "base",
@@ -11527,9 +11761,50 @@
    "detail": "non-scalar signature (BackgroundClass \u03b9 Unit where base)"
   }
  },
+ "ImitationCapacity.diagonalGapForm": {
+  "module": "ImitationCapacity",
+  "line": 878,
+  "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "params": [
+   "i",
+   "j",
+   "M"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (\u211d)"
+  }
+ },
+ "ImitationCapacity.diagonalGapClass": {
+  "module": "ImitationCapacity",
+  "line": 910,
+  "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "params": [
+   "base",
+   "i",
+   "j",
+   "budget"
+  ],
+  "ret": "BackgroundClass \u03b9 Unit where base",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (BackgroundClass \u03b9 Unit where base)"
+  }
+ },
  "ImitationCapacity.traceWindowSpikeLoad": {
   "module": "ImitationCapacity",
-  "line": 848,
+  "line": 1000,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "decay",
@@ -11566,7 +11841,7 @@
  },
  "ImitationCapacity.whitenedCapacity": {
   "module": "ImitationCapacity",
-  "line": 868,
+  "line": 1020,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "headroom",
@@ -11586,7 +11861,7 @@
  },
  "ImitationCapacity.subgroupContrast": {
   "module": "ImitationCapacity",
-  "line": 985,
+  "line": 1137,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "n",
@@ -11605,7 +11880,7 @@
  },
  "ImitationCapacity.demographicSpikeDirection": {
   "module": "ImitationCapacity",
-  "line": 991,
+  "line": 1143,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "n",
@@ -11624,7 +11899,7 @@
  },
  "ImitationCapacity.stratificationCertificateMargin": {
   "module": "ImitationCapacity",
-  "line": 1068,
+  "line": 1220,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "headroom",
@@ -11647,7 +11922,7 @@
  },
  "ImitationCapacity.blockSpectrum": {
   "module": "ImitationCapacity",
-  "line": 1208,
+  "line": 1360,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "k",
@@ -11666,7 +11941,7 @@
  },
  "ImitationCapacity.normalizedMoment": {
   "module": "ImitationCapacity",
-  "line": 1216,
+  "line": 1368,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "m",
@@ -11686,7 +11961,7 @@
  },
  "ImitationCapacity.inverseTraceCertificate": {
   "module": "ImitationCapacity",
-  "line": 1226,
+  "line": 1378,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "m",
@@ -11705,7 +11980,7 @@
  },
  "ImitationCapacity.meffPerturbed": {
   "module": "ImitationCapacity",
-  "line": 1322,
+  "line": 1474,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "n"
@@ -11723,7 +11998,7 @@
  },
  "ImitationCapacity.meffFlat": {
   "module": "ImitationCapacity",
-  "line": 1327,
+  "line": 1479,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "n"
@@ -11741,7 +12016,7 @@
  },
  "ImitationCapacity.meffSize": {
   "module": "ImitationCapacity",
-  "line": 1332,
+  "line": 1484,
   "path": "proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
   "params": [
    "n"
@@ -11795,7 +12070,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "inconclusive",
     "required_range": [
      0.0,
      1.0
@@ -11806,16 +12081,8 @@
   "findings": [],
   "uncovered_reason": {
    "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "drop-a-one-minus",
-    "negate",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(n,M)",
-    "swap-args(n,spike)",
-    "swap-args(M,spike)"
-   ]
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
   }
  },
  "Phase.EmpiricalPCOverlapModel.residualBiasEnergy": {
@@ -13658,16 +13925,9 @@
    "t"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "swap-times-div",
-    "rejected_by": [
-     "continuity"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "invariant",
@@ -13682,7 +13942,19 @@
     "why": "`t` reaches 1 and 500 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ]
+  }
  },
  "PhenomeWidePortability.selectedDriftFactor": {
   "module": "PhenomeWidePortability",
@@ -13704,16 +13976,14 @@
     ]
    },
    {
-    "mutation": "swap-times-div",
+    "mutation": "swap-plus-minus",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    },
    {
-    "mutation": "swap-args(Ne,s_correction)",
+    "mutation": "swap-times-div",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    }
@@ -13722,7 +13992,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "proved",
     "required_range": [
      0.0,
      Infinity
@@ -14072,32 +14342,15 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "mutant-rejected",
+  "demonstration": "rejects-as-written",
   "falsifiability_evidence": [
-   {
-    "mutation": "drop-a-one-minus",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-plus-minus",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "rejected_by": [
-     "range"
-    ]
-   }
+   "range"
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "escape-unguarded",
     "required_range": [
      -1.0,
      1.0
@@ -14105,7 +14358,18 @@
     "why": "`effectCorrelationFluctuating` names a correlation coefficient"
    }
   ],
-  "findings": []
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape-unguarded",
+    "required_range": [
+     -1.0,
+     1.0
+    ],
+    "why": "`effectCorrelationFluctuating` names a correlation coefficient"
+   }
+  ]
  },
  "PolygenicArchitecture.expectedSquaredEffect": {
   "module": "PolygenicArchitecture",
@@ -14621,7 +14885,7 @@
  },
  "PolygenicSpectroscopy.maxSafeEpistaticOrder": {
   "module": "PolygenicSpectroscopy",
-  "line": 605,
+  "line": 627,
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
   "params": [
    "N",
@@ -14659,7 +14923,7 @@
  },
  "PolygenicSpectroscopy.hweLatticeCondition": {
   "module": "PolygenicSpectroscopy",
-  "line": 753,
+  "line": 775,
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
   "params": [
    "q"
@@ -14677,7 +14941,7 @@
  },
  "PolygenicSpectroscopy.latticeCriticalMaf": {
   "module": "PolygenicSpectroscopy",
-  "line": 756,
+  "line": 778,
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
   "params": [],
   "ret": "\u211d",
@@ -14707,7 +14971,7 @@
  },
  "PolygenicSpectroscopy.mellinJetVariance": {
   "module": "PolygenicSpectroscopy",
-  "line": 800,
+  "line": 822,
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
   "params": [
    "h"
@@ -14725,7 +14989,7 @@
  },
  "PolygenicSpectroscopy.hweMellinJetVariance": {
   "module": "PolygenicSpectroscopy",
-  "line": 809,
+  "line": 831,
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
   "params": [
    "q"
@@ -14755,7 +15019,7 @@
  },
  "PolygenicSpectroscopy.hardCallLatticeSpan": {
   "module": "PolygenicSpectroscopy",
-  "line": 844,
+  "line": 866,
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
   "params": [],
   "ret": "\u211d",
@@ -14771,7 +15035,7 @@
  },
  "PolygenicSpectroscopy.hardCallObservables": {
   "module": "PolygenicSpectroscopy",
-  "line": 902,
+  "line": 924,
   "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
   "params": [],
   "ret": "MellinObservables where drift",
@@ -14785,6 +15049,26 @@
    "detail": "non-scalar signature (MellinObservables where drift)"
   }
  },
+ "PolygenicSpectroscopy.hweCodingInvariants": {
+  "module": "PolygenicSpectroscopy",
+  "line": 1075,
+  "path": "proofs/Calibrator/PolygenicSpectroscopy.lean",
+  "params": [
+   "h",
+   "arithmeticType",
+   "squareCumulant"
+  ],
+  "ret": "CodingInvariants where drift",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "transpile",
+   "detail": "non-scalar signature (CodingInvariants where drift)"
+  }
+ },
  "PopulationGeneticsFoundations.neiFst": {
   "module": "PopulationGeneticsFoundations",
   "line": 42,
@@ -14795,32 +15079,15 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "mutant-rejected",
+  "demonstration": "rejects-as-written",
   "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "rejected_by": [
-     "range"
-    ]
-   }
+   "range"
   ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -14840,7 +15107,18 @@
     "why": "`H_S` reaches 1e-09 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape-outside-theorem",
+    "required_range": [
+     0.0,
+     1.0
+    ],
+    "why": "`neiFst` names a fixation index / F-statistic"
+   }
+  ]
  },
  "PopulationGeneticsFoundations.simpleFst": {
   "module": "PopulationGeneticsFoundations",
@@ -14965,15 +15243,13 @@
    {
     "mutation": "negate",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "swap-plus-minus",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
@@ -14987,7 +15263,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "inconclusive",
     "required_range": [
      0.0,
      1.0
@@ -15144,14 +15420,27 @@
    "m"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "negate",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "drop-max-guard",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "proved",
     "required_range": [
      0.0,
      Infinity
@@ -15171,19 +15460,7 @@
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "negate",
-    "swap-times-div",
-    "drop-max-guard",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(s,m)"
-   ]
-  }
+  "findings": []
  },
  "PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst": {
   "module": "PopulationGeneticsFoundations",
@@ -15284,16 +15561,9 @@
    "Ne"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "swap-times-div",
-    "rejected_by": [
-     "continuity"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "invariant",
@@ -15308,7 +15578,19 @@
     "why": "`Ne` reaches 2 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ]
+  }
  },
  "PopulationGeneticsFoundations.scaledMutationRate": {
   "module": "PopulationGeneticsFoundations",
@@ -15607,7 +15889,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -16009,7 +16291,6 @@
    {
     "mutation": "swap-times-div",
     "rejected_by": [
-     "continuity",
      "limit",
      "range"
     ]
@@ -16250,22 +16531,19 @@
    {
     "mutation": "drop-a-one-minus",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "negate",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "swap-times-div",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    }
   ],
@@ -16273,7 +16551,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "proved",
     "required_range": [
      0.0,
      1.0
@@ -17036,14 +17314,16 @@
    "H"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "falsifiability_evidence": [
+   "range"
+  ],
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "escape-unguarded",
     "required_range": [
      0.0,
      1.0
@@ -17051,23 +17331,18 @@
     "why": "`hetStepWithMutation` names a heterozygosity"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "const-off-by-one",
-    "drop-a-one-minus",
-    "negate",
-    "swap-plus-minus",
-    "swap-times-div",
-    "shift-by-half",
-    "scale-by-three",
-    "swap-args(Ne,mu)",
-    "swap-args(Ne,H)",
-    "swap-args(mu,H)"
-   ]
-  }
+  "findings": [
+   {
+    "family": "range",
+    "kind": "range",
+    "verdict": "escape-unguarded",
+    "required_range": [
+     0.0,
+     1.0
+    ],
+    "why": "`hetStepWithMutation` names a heterozygosity"
+   }
+  ]
  },
  "PortabilityDrift.hetTrajectory": {
   "module": "PortabilityDrift",
@@ -17098,33 +17373,14 @@
    "mu"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "const-off-by-one",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-plus-minus",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "inconclusive",
     "required_range": [
      0.0,
      1.0
@@ -17144,7 +17400,20 @@
     "why": "`mu` reaches 1e-10 and 0.01 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "negate",
+    "swap-plus-minus",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(Ne,mu)"
+   ]
+  }
  },
  "PortabilityDrift.ClosedPopulationNoMutation.retention": {
   "module": "PortabilityDrift",
@@ -17385,7 +17654,6 @@
    {
     "mutation": "swap-times-div",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    }
@@ -17612,16 +17880,6 @@
   "falsifiability_evidence": null,
   "checks": [
    {
-    "family": "range",
-    "kind": "range",
-    "verdict": "guarded-by-side-condition",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`presentDayR2` names a proportion of variance explained"
-   },
-   {
     "family": "invariant",
     "kind": "continuity",
     "verdict": "holds",
@@ -17665,16 +17923,6 @@
   "demonstration": null,
   "falsifiability_evidence": null,
   "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "inconclusive",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`expectedR2` names a proportion of variance explained"
-   },
    {
     "family": "invariant",
     "kind": "scale",
@@ -18740,7 +18988,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "guarded-by-side-condition",
+    "verdict": "proved",
     "required_range": [
      -1.0,
      1.0
@@ -19419,16 +19667,6 @@
   "demonstration": null,
   "falsifiability_evidence": null,
   "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "inconclusive",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`targetR2` names a proportion of variance explained"
-   },
    {
     "family": "invariant",
     "kind": "continuity",
@@ -20885,16 +21123,6 @@
   "falsifiability_evidence": null,
   "checks": [
    {
-    "family": "range",
-    "kind": "range",
-    "verdict": "inconclusive",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`presentDayR2MutationDrift` names a proportion of variance explained"
-   },
-   {
     "family": "invariant",
     "kind": "continuity",
     "verdict": "holds",
@@ -21073,9 +21301,72 @@
   ],
   "findings": []
  },
+ "PortabilityDrift.ibdRecurrenceStep": {
+  "module": "PortabilityDrift",
+  "line": 4607,
+  "path": "proofs/Calibrator/PortabilityDrift.lean",
+  "params": [
+   "Ne",
+   "rate",
+   "x"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
+  }
+ },
+ "PortabilityDrift.ibdRecurrenceFixedPoint": {
+  "module": "PortabilityDrift",
+  "line": 4620,
+  "path": "proofs/Calibrator/PortabilityDrift.lean",
+  "params": [
+   "Ne",
+   "rate"
+  ],
+  "ret": "\u211d",
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`Ne` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   },
+   {
+    "family": "invariant",
+    "kind": "continuity",
+    "verdict": "holds",
+    "why": "`rate` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
+   }
+  ],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-plus-minus",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(Ne,rate)"
+   ]
+  }
+ },
  "PortabilityDrift.islandFstMultiplicativeStep": {
   "module": "PortabilityDrift",
-  "line": 4602,
+  "line": 4710,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "Ne",
@@ -21115,7 +21406,7 @@
  },
  "PortabilityDrift.fstIslandMultiplicativeEquilibrium": {
   "module": "PortabilityDrift",
-  "line": 4613,
+  "line": 4727,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "Ne",
@@ -21132,13 +21423,13 @@
     ]
    },
    {
-    "mutation": "swap-plus-minus",
+    "mutation": "shift-by-half",
     "rejected_by": [
      "limit"
     ]
    },
    {
-    "mutation": "swap-times-div",
+    "mutation": "swap-args(Ne,m)",
     "rejected_by": [
      "limit"
     ]
@@ -21178,7 +21469,7 @@
  },
  "PortabilityDrift.scaledMigrationRate": {
   "module": "PortabilityDrift",
-  "line": 4663,
+  "line": 4759,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "Ne",
@@ -21218,7 +21509,7 @@
  },
  "PortabilityDrift.SplitMigrationModel.fstMigDriftEq": {
   "module": "PortabilityDrift",
-  "line": 4749,
+  "line": 4845,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "s"
@@ -21236,7 +21527,7 @@
  },
  "PortabilityDrift.steppingStoneFst": {
   "module": "PortabilityDrift",
-  "line": 4782,
+  "line": 4878,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "fst_neighbor",
@@ -21294,7 +21585,7 @@
  },
  "PortabilityDrift.sharedLD_from_equilibrium": {
   "module": "PortabilityDrift",
-  "line": 4844,
+  "line": 4940,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "Ne",
@@ -21351,7 +21642,7 @@
  },
  "PortabilityDrift.sharedLDFromMigration": {
   "module": "PortabilityDrift",
-  "line": 4870,
+  "line": 4966,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "M"
@@ -21389,7 +21680,7 @@
  },
  "PortabilityDrift.signalRetentionMigrationDrift": {
   "module": "PortabilityDrift",
-  "line": 4921,
+  "line": 5017,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "V_A",
@@ -21447,7 +21738,7 @@
  },
  "PortabilityDrift.asymmetricFst": {
   "module": "PortabilityDrift",
-  "line": 5002,
+  "line": 5098,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "Ne",
@@ -21486,7 +21777,7 @@
  },
  "PortabilityDrift.effectiveSymmetricMigration": {
   "module": "PortabilityDrift",
-  "line": 5043,
+  "line": 5139,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "m\u2081\u2082",
@@ -21526,7 +21817,7 @@
  },
  "PortabilityDrift.admixtureLDDecay": {
   "module": "PortabilityDrift",
-  "line": 5064,
+  "line": 5160,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "r",
@@ -21564,7 +21855,7 @@
  },
  "PortabilityDrift.admixtureLDBoost": {
   "module": "PortabilityDrift",
-  "line": 5111,
+  "line": 5207,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "r",
@@ -21585,7 +21876,7 @@
  },
  "PortabilityDrift.fstMigDriftNext": {
   "module": "PortabilityDrift",
-  "line": 5173,
+  "line": 5269,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "Ne",
@@ -21646,7 +21937,7 @@
  },
  "PortabilityDrift.fstMigDriftEquil": {
   "module": "PortabilityDrift",
-  "line": 5208,
+  "line": 5304,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "Ne",
@@ -21726,7 +22017,7 @@
  },
  "PortabilityDrift.neutralAFBenchmarkFromRecurrence": {
   "module": "PortabilityDrift",
-  "line": 5290,
+  "line": 5386,
   "path": "proofs/Calibrator/PortabilityDrift.lean",
   "params": [
    "Ne",
@@ -22947,7 +23238,7 @@
  },
  "ProjectionShiftBounds.HasThresholdSetAtEveryRank": {
   "module": "ProjectionShiftBounds",
-  "line": 760,
+  "line": 761,
   "path": "proofs/Calibrator/ProjectionShiftBounds.lean",
   "params": [
    "score"
@@ -23297,35 +23588,16 @@
    "_n_gwas"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "falsifiability_evidence": [
-   "range"
-  ],
-  "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`partialOverlapR2` names a proportion of variance explained"
-   }
-  ],
-  "findings": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`partialOverlapR2` names a proportion of variance explained"
-   }
-  ]
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
+  }
  },
  "SampleOverlapBias.approxLOOPGS": {
   "module": "SampleOverlapBias",
@@ -24061,9 +24333,22 @@
    "rho"
   ],
   "ret": "\u211d",
-  "covered": false,
-  "demonstration": null,
-  "falsifiability_evidence": null,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "falsifiability_evidence": [
+   {
+    "mutation": "swap-args(v_mutation,t)",
+    "rejected_by": [
+     "continuity"
+    ]
+   },
+   {
+    "mutation": "swap-args(s,t)",
+    "rejected_by": [
+     "continuity"
+    ]
+   }
+  ],
   "checks": [
    {
     "family": "invariant",
@@ -24096,25 +24381,7 @@
     "why": "`rho` reaches -1 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": [],
-  "uncovered_reason": {
-   "stage": "falsifiability",
-   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
-   "survived": [
-    "const-off-by-one",
-    "swap-times-div",
-    "swap-args(v_selected,v_mutation)",
-    "swap-args(v_selected,s)",
-    "swap-args(v_selected,t)",
-    "swap-args(v_selected,rho)",
-    "swap-args(v_mutation,s)",
-    "swap-args(v_mutation,t)",
-    "swap-args(v_mutation,rho)",
-    "swap-args(s,t)",
-    "swap-args(s,rho)",
-    "swap-args(t,rho)"
-   ]
-  }
+  "findings": []
  },
  "SelectionArchitecture.polygenicAdaptationShift": {
   "module": "SelectionArchitecture",
@@ -24607,22 +24874,10 @@
    "r2_covariates"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "falsifiability_evidence": [
-   "range"
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`incrementalR2` names a proportion of variance explained"
-   },
    {
     "family": "invariant",
     "kind": "continuity",
@@ -24636,18 +24891,17 @@
     "why": "`r2_covariates` reaches 0.0001 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`incrementalR2` names a proportion of variance explained"
-   }
-  ]
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "negate",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(r2_full,r2_covariates)"
+   ]
+  }
  },
  "StatisticalGeneticsMethodology.portabilityRatio": {
   "module": "StatisticalGeneticsMethodology",
@@ -25262,21 +25516,22 @@
   ],
   "ret": "\u211d",
   "covered": true,
-  "demonstration": "rejects-as-written",
+  "demonstration": "mutant-rejected",
   "falsifiability_evidence": [
-   "range"
+   {
+    "mutation": "const-off-by-one",
+    "rejected_by": [
+     "scale"
+    ]
+   },
+   {
+    "mutation": "swap-times-div",
+    "rejected_by": [
+     "scale"
+    ]
+   }
   ],
   "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`pgsR2` names a proportion of variance explained"
-   },
    {
     "family": "invariant",
     "kind": "scale",
@@ -25284,18 +25539,7 @@
     "why": "`pgsR2` is dimensionless and ['cov_pgs_y', 'var_pgs', 'var_y'] are second moments, so scaling them together must leave the value unchanged"
    }
   ],
-  "findings": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`pgsR2` names a proportion of variance explained"
-   }
-  ]
+  "findings": []
  },
  "TransferLearningPGS.sourceTruthR2SharedLD": {
   "module": "TransferLearningPGS",
@@ -25794,35 +26038,16 @@
    "adaptation_gain"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "falsifiability_evidence": [
-   "range"
-  ],
-  "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`fineTunedTargetR2` names a proportion of variance explained"
-   }
-  ],
-  "findings": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`fineTunedTargetR2` names a proportion of variance explained"
-   }
-  ]
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
+  }
  },
  "TransferLearningPGS.scratchTargetR2": {
   "module": "TransferLearningPGS",
@@ -25833,35 +26058,16 @@
    "estimation_penalty"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "falsifiability_evidence": [
-   "range"
-  ],
-  "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`scratchTargetR2` names a proportion of variance explained"
-   }
-  ],
-  "findings": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`scratchTargetR2` names a proportion of variance explained"
-   }
-  ]
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
+  }
  },
  "TransferLearningPGS.deployedTransferTargetR2": {
   "module": "TransferLearningPGS",
@@ -25873,35 +26079,16 @@
    "estimation_penalty"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "falsifiability_evidence": [
-   "range"
-  ],
-  "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`deployedTransferTargetR2` names a proportion of variance explained"
-   }
-  ],
-  "findings": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape-unguarded",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`deployedTransferTargetR2` names a proportion of variance explained"
-   }
-  ]
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
+  "checks": [],
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "no check on this definition currently holds, so there is nothing to falsify",
+   "survived": null
+  }
  },
  "TransferLearningPGS.oracleTransportAdaptationGain": {
   "module": "TransferLearningPGS",
@@ -26008,22 +26195,10 @@
    "nTarget"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "falsifiability_evidence": [
-   "range"
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`sampleLimitedScratchTargetR2` names a proportion of variance explained"
-   },
    {
     "family": "invariant",
     "kind": "continuity",
@@ -26043,18 +26218,19 @@
     "why": "`nTarget` reaches 1 and 1e+07 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": [
-   {
-    "family": "range",
-    "kind": "range",
-    "verdict": "escape",
-    "required_range": [
-     0.0,
-     1.0
-    ],
-    "why": "`sampleLimitedScratchTargetR2` names a proportion of variance explained"
-   }
-  ]
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "negate",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(oracle_target_r2,noiseVar)",
+    "swap-args(oracle_target_r2,nTarget)",
+    "swap-args(noiseVar,nTarget)"
+   ]
+  }
  },
  "TransferLearningPGS.scratchVsFineTuningCriticalSampleSize": {
   "module": "TransferLearningPGS",

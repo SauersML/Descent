@@ -44,6 +44,7 @@ from translate import Untranslatable, pyname, translate_def   # noqa: E402
 
 PROOFS = HERE.parent.parent
 N_POINTS = 40
+_ALL_STRUCTS = {}
 
 
 # ------------------------------------------------------------------ mutants
@@ -134,17 +135,16 @@ def entry_name(entry):
     return entry["_name"]
 
 
-def call(fn, argnames, pt, structval, rng):
-    args = [admissible.struct_value(structval[a], rng) if a in structval
-            else pt.get(a, 1.0) for a in argnames]
-    return fn(*args)
+def call(fn, argnames, pt, structval, rng, vecspec=None):
+    return fn(*admissible.build_args(argnames, pt, structval, vecspec, rng,
+                                     _ALL_STRUCTS))
 
 
-def range_check(fn, argnames, pts, lo, hi, rng, tol=1e-9):
+def range_check(fn, argnames, pts, lo, hi, rng, tol=1e-9, vecspec=None):
     """Return (passes, first_violation) for the invariant lo <= f <= hi."""
     for pt, sv in pts:
         try:
-            v = call(fn, argnames, pt, sv, rng)
+            v = call(fn, argnames, pt, sv, rng, vecspec)
         except Exception:                                       # noqa: BLE001
             continue
         if not isinstance(v, (int, float)) or isinstance(v, bool):
@@ -158,11 +158,11 @@ def range_check(fn, argnames, pts, lo, hi, rng, tol=1e-9):
     return True, None
 
 
-def values(fn, argnames, pts, rng):
+def values(fn, argnames, pts, rng, vecspec=None):
     out = []
     for pt, sv in pts:
         try:
-            out.append(call(fn, argnames, pt, sv, rng))
+            out.append(call(fn, argnames, pt, sv, rng, vecspec))
         except Exception:                                       # noqa: BLE001
             out.append(None)
     return out
@@ -195,6 +195,8 @@ def main(argv=None):
     blob = json.loads((HERE / "defs.json").read_text())
     defs_by_name = {d["name"]: d for d in blob["definitions"]}
     structs = {s["short"]: s for s in blob["structures"]}
+    global _ALL_STRUCTS
+    _ALL_STRUCTS = structs
     for k, v in classes.items():
         v["_name"] = k
 
@@ -243,7 +245,8 @@ def main(argv=None):
             rec["reason"] = ("mined hypotheses admit no sampled point; "
                              f"constraints: {hyps[:4]}")
             continue
-        base_vals = values(fn, argnames, pts, random.Random(11))
+        vecspec = entry.get("vector_args")
+        base_vals = values(fn, argnames, pts, random.Random(11), vecspec)
         if all(v is None for v in base_vals):
             rec["reason"] = "no admissible point evaluates"
             continue
@@ -273,7 +276,8 @@ def main(argv=None):
                             "n_points": len(pts),
                             "box": {k: list(v) for k, v in
                                     admissible.box_for(d).items()}}
-            ok, viol = range_check(fn, argnames, pts, lo, hi, random.Random(11))
+            ok, viol = range_check(fn, argnames, pts, lo, hi,
+                                   random.Random(11), vecspec=vecspec)
             if not ok:
                 # A range proved by a Lean theorem cannot be violated by a correct
                 # translation: that is a real finding.  A range only *suggested*
@@ -293,7 +297,8 @@ def main(argv=None):
                 rec["violation"] = {"point": {k: round(v, 6) for k, v in viol[0].items()},
                                     "value": viol[1], "why": viol[2]}
                 continue
-            test = lambda f, an: range_check(f, an, pts, lo, hi, random.Random(11))[0]
+            test = lambda f, an: range_check(f, an, pts, lo, hi,
+                                             random.Random(11), vecspec=vecspec)[0]
         else:                                    # STRUCTURAL
             truthy = [v for v in base_vals if isinstance(v, bool)]
             if not truthy:
@@ -318,7 +323,7 @@ def main(argv=None):
                 mfn, man = compile_variant(d, mbody, fname + "_mut", struct_args)
             except (Untranslatable, Exception):                 # noqa: BLE001
                 continue
-            mvals = values(mfn, man, pts, random.Random(11))
+            mvals = values(mfn, man, pts, random.Random(11), vecspec)
             if not distinguishable(base_vals, mvals):
                 continue                                        # equivalent mutant
             tried += 1

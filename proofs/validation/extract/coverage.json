@@ -951,13 +951,13 @@
   }
  },
  "Calibrator.AssortativeMatingModel.amGap": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
   "line": 315,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('pgsR2AM'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.DifferentialAMModel.apparentPortability": {
   "class": "NUMERIC",
@@ -1111,31 +1111,31 @@
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.BayesianLinearModel.posteriorVariance": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/BayesianPGSTheory.lean",
   "line": 79,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('posteriorPrecision'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.BayesianLinearModel.posteriorMean": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/BayesianPGSTheory.lean",
   "line": 91,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('posteriorVariance'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.BayesianLinearModel.shrinkageFactor": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/BayesianPGSTheory.lean",
   "line": 96,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('posteriorVariance'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.gaussianPosteriorShrinkage": {
   "class": "NUMERIC",
@@ -1741,7 +1741,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.sigmoid": {
   "class": "NUMERIC",
@@ -1809,7 +1809,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.oracleRisk": {
   "class": "NOT-EXTRACTABLE",
@@ -1915,7 +1915,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.logLossKLCertificate": {
   "class": "NOT-EXTRACTABLE",
@@ -1924,7 +1924,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.brierRegret": {
   "class": "NOT-EXTRACTABLE",
@@ -1933,7 +1933,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.brierL2Certificate": {
   "class": "NOT-EXTRACTABLE",
@@ -1942,7 +1942,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.logRisk": {
   "class": "NOT-EXTRACTABLE",
@@ -1951,7 +1951,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.brierRisk": {
   "class": "NOT-EXTRACTABLE",
@@ -1960,7 +1960,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.brierBernoulliRisk": {
   "class": "WRAPPER",
@@ -2019,7 +2019,7 @@
  "Calibrator.gaussianJetVariance": {
   "class": "NUMERIC",
   "file": "Calibrator/Condensation.lean",
-  "line": 221,
+  "line": 254,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -2048,7 +2048,7 @@
  "Calibrator.criticalDegree": {
   "class": "NUMERIC",
   "file": "Calibrator/Condensation.lean",
-  "line": 246,
+  "line": 279,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -2086,7 +2086,7 @@
  "Calibrator.gaussianCriticalMultiplier": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/Condensation.lean",
-  "line": 262,
+  "line": 295,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -2095,11 +2095,29 @@
  "Calibrator.windowVariance": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/Condensation.lean",
-  "line": 309,
+  "line": 342,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "self-check: calls untranslated definition Phi"
+ },
+ "Calibrator.hweObservableContent": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/CondensationUnification.lean",
+  "line": 462,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
+ },
+ "Calibrator.GenotypeDesign.reModel": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/CondensationUnification.lean",
+  "line": 515,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable(\"unsupported token '{'\")"
  },
  "Calibrator.ploidy": {
   "class": "NUMERIC",
@@ -2821,7 +2839,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('scoreModel'))"
+  "reason": "self-check: structure projection unavailable (KeyError('scoreMean'))"
  },
  "Calibrator.HWEPolygenicScoreDGP.scoreVariance": {
   "class": "NOT-EXTRACTABLE",
@@ -2830,7 +2848,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('scoreModel'))"
+  "reason": "self-check: structure projection unavailable (KeyError('scoreVariance'))"
  },
  "Calibrator.HWEPolygenicScoreDGP.scoreApproximationError": {
   "class": "NOT-EXTRACTABLE",
@@ -2839,7 +2857,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('scoreModel'))"
+  "reason": "self-check: structure projection unavailable (KeyError('berryEsseenErrorBound'))"
  },
  "Calibrator.HWEPolygenicScoreDGP.aucApproximationInterval": {
   "class": "STRUCTURAL",
@@ -2866,7 +2884,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.tagMean": {
   "class": "NOT-EXTRACTABLE",
@@ -2875,7 +2893,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.crossCovEntry": {
   "class": "NOT-EXTRACTABLE",
@@ -2884,7 +2902,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.sigmaTagCausal": {
   "class": "NOT-EXTRACTABLE",
@@ -2911,7 +2929,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.frobeniusNormSq": {
   "class": "NOT-EXTRACTABLE",
@@ -3026,7 +3044,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.ldWitnessSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -3035,7 +3053,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceBestLinearWeightsFromLD"
+  "reason": "self-check: calls untranslated definition ldWitnessSourceMoments"
  },
  "Calibrator.ldWitnessTargetCross": {
   "class": "NOT-EXTRACTABLE",
@@ -3044,7 +3062,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.ldWitnessSigmaTargetIndependent": {
   "class": "NOT-EXTRACTABLE",
@@ -3053,7 +3071,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.ldWitnessSigmaTargetCorrelated": {
   "class": "NOT-EXTRACTABLE",
@@ -3062,7 +3080,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.taggingMismatchScale": {
   "class": "NUMERIC",
@@ -3231,7 +3249,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2203'\")"
+  "reason": "could not compile body: Untranslatable('existential quantifier')"
  },
  "Calibrator.optimalSlopeLinearNoise": {
   "class": "NUMERIC",
@@ -3243,31 +3261,111 @@
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.totalVariance": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 757,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('V_genic'))"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": null,
+   "quantity": "nonnegative",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [
+    "arch.V_genic c \u2260 0",
+    "arch.V_cov c \u2260 0",
+    "arch.V_genic c\u2081 \u2260 0",
+    "arch.V_genic c\u2082 \u2260 0",
+    "\u2200 c, arch.selection_effect c = arch.V_cov c / arch.V_genic c",
+    "arch.selection_effect c\u2081 \u2260 arch.selection_effect c\u2082",
+    "arch.V_genic c > 0",
+    "arch.V_cov c > 0"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {}
+  },
+  "killed": [
+   "first '+'->'-'",
+   "last '+'->'-'",
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 3
  },
  "Calibrator.optimalSlopeFromVariance": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 760,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('V_genic'))"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": null,
+   "quantity": "nonnegative",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [
+    "arch.V_genic c \u2260 0",
+    "arch.V_cov c \u2260 0",
+    "arch.V_genic c\u2081 \u2260 0",
+    "arch.V_genic c\u2082 \u2260 0",
+    "\u2200 c, arch.selection_effect c = arch.V_cov c / arch.V_genic c",
+    "arch.selection_effect c\u2081 \u2260 arch.selection_effect c\u2082",
+    "arch.V_genic c > 0",
+    "arch.V_cov c > 0"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {}
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 3
  },
  "Calibrator.prevalenceDGP_trueExpectation": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 892,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [
+    "\u2200 p c, f_norm p c = pi_bar + pdgp.pgs_effect * p",
+    "\u2200 c, pdgp.prevalence c = \u03c0\u2080"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "p": [
+     0.02,
+     0.98
+    ]
+   }
+  },
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('prevalence'))"
+  "reason": "",
+  "violation": {
+   "point": {
+    "p": 0.020001
+   },
+   "value": 1.055379466274582,
+   "why": "above 1.0"
+  }
  },
  "Calibrator.PrevalenceDGP.toDGP": {
   "class": "STRUCTURAL",
@@ -3279,13 +3377,13 @@
   "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
  },
  "Calibrator.decaySlope": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 966,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('tagging_efficiency'))"
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.var": {
   "class": "NOT-EXTRACTABLE",
@@ -3294,7 +3392,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.rsquared": {
   "class": "NOT-EXTRACTABLE",
@@ -3303,7 +3401,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.measureMean": {
   "class": "NOT-EXTRACTABLE",
@@ -3312,7 +3410,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.measureVariance": {
   "class": "NOT-EXTRACTABLE",
@@ -3321,7 +3419,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.measureCovariance": {
   "class": "NOT-EXTRACTABLE",
@@ -3330,7 +3428,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.measureExpMSE": {
   "class": "NOT-EXTRACTABLE",
@@ -3339,7 +3437,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.measureBias": {
   "class": "NOT-EXTRACTABLE",
@@ -3357,7 +3455,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.conditionalMeanApproximationRisk": {
   "class": "NOT-EXTRACTABLE",
@@ -3366,7 +3464,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.mse": {
   "class": "NOT-EXTRACTABLE",
@@ -3375,7 +3473,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.HeterogeneousEffectDGP.trueExp": {
   "class": "NOT-EXTRACTABLE",
@@ -3444,22 +3542,22 @@
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.fstDriftMutation": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 1520,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('theta'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.fstDriftMigration": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 1525,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('bigM'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.fstDriftFlowStep": {
   "class": "NUMERIC",
@@ -3496,13 +3594,13 @@
   }
  },
  "Calibrator.fstEquilibrium": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 1557,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('theta'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.sharedLDRetention": {
   "class": "NUMERIC",
@@ -3536,22 +3634,22 @@
   "mutants_tried": 4
  },
  "Calibrator.mutationLDErosion": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 1671,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('theta'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.migrationLDBoost": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 1691,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('bigM'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.EvolutionaryParameters.coordinateSummary": {
   "class": "STRUCTURAL",
@@ -3578,7 +3676,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('Ne'))"
+  "reason": "dot-notation call PGSEvolutionaryModel.Ne: no such definition"
  },
  "Calibrator.PGSEvolutionaryModel.fstTransient": {
   "class": "NOT-EXTRACTABLE",
@@ -3596,7 +3694,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toEvo'))"
+  "reason": "self-check: calls untranslated definition toEvo"
  },
  "Calibrator.PGSEvolutionaryModel.mutErosion": {
   "class": "NOT-EXTRACTABLE",
@@ -3605,7 +3703,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toEvo'))"
+  "reason": "self-check: calls untranslated definition toEvo"
  },
  "Calibrator.PGSEvolutionaryModel.migBoost": {
   "class": "NOT-EXTRACTABLE",
@@ -3614,7 +3712,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toEvo'))"
+  "reason": "self-check: calls untranslated definition toEvo"
  },
  "Calibrator.TransportedMetrics.r2FromSignalVariance": {
   "class": "NUMERIC",
@@ -4264,13 +4362,42 @@
   "mutants_tried": 1
  },
  "Calibrator.HeterozygosityTrajectory.measuredLoss": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DriftRegime.lean",
   "line": 90,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('het'))"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "heterozygosity",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < t"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "t": [
+     1.0,
+     20.0
+    ]
+   }
+  },
+  "killed": [
+   "first '-'->'+'",
+   "last '-'->'+'",
+   "first '/'->'*'",
+   "last '/'->'*'",
+   "negate body",
+   "drop '1 -' complement",
+   "literal 1->2"
+  ],
+  "reason": "",
+  "mutants_tried": 7
  },
  "Calibrator.closedPopulation": {
   "class": "STRUCTURAL",
@@ -4466,7 +4593,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '.'\")"
+  "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
  },
  "Calibrator.benchmarkRatio": {
   "class": "NUMERIC",
@@ -4750,7 +4877,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('centeredAltAlleleCount'))"
+  "reason": "self-check: calls untranslated definition altAlleleCount"
  },
  "Calibrator.GenotypeDesign.interactionOrder": {
   "class": "NOT-EXTRACTABLE",
@@ -4759,7 +4886,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "qualified name design.locusSet"
  },
  "Calibrator.GenotypeDesign.statistic": {
   "class": "NOT-EXTRACTABLE",
@@ -4768,7 +4895,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "Finset/indexed sum"
  },
  "Calibrator.GenotypeDesign.InLinkageEquilibrium": {
   "class": "STRUCTURAL",
@@ -4777,7 +4904,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.GenotypeDesign.Polymorphic": {
   "class": "STRUCTURAL",
@@ -4786,7 +4913,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.GenotypeDesign.VariantDisjoint": {
   "class": "STRUCTURAL",
@@ -4795,7 +4922,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.GenotypeDesign.variantRecurrence": {
   "class": "NOT-EXTRACTABLE",
@@ -4804,7 +4931,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "qualified name Finset.univ.filter"
  },
  "Calibrator.GenotypeDesign.locusInfluence": {
   "class": "NOT-EXTRACTABLE",
@@ -4822,7 +4949,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.geneBurdenDesign": {
   "class": "STRUCTURAL",
@@ -4868,6 +4995,128 @@
   "check": null,
   "killed": [],
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
+ },
+ "Calibrator.GenotypeDesign.overlapMatrix": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1462,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "expected ')', found op:\u2229"
+ },
+ "Calibrator.GenotypeDesign.cycleDensity": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1481,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "qualified name Matrix.trace"
+ },
+ "Calibrator.GenotypeDesign.Tempered": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1515,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
+ },
+ "Calibrator.GenotypeDesign.BoundedHubRecurrence": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1524,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
+ },
+ "Calibrator.palindromicCycleDensityA": {
+  "class": "NUMERIC",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1694,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [
+    "s ^ 2 = 2",
+    "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+    "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "s": [
+     0.05,
+     3.0
+    ],
+    "p": [
+     1.0,
+     20.0
+    ]
+   }
+  },
+  "killed": [],
+  "reason": "",
+  "violation": {
+   "point": {
+    "s": 0.050003,
+    "p": 1.000019
+   },
+   "value": -15.98039826904718,
+   "why": "below 0.0"
+  }
+ },
+ "Calibrator.palindromicCycleDensityB": {
+  "class": "NUMERIC",
+  "file": "Calibrator/EpistaticChaos.lean",
+  "line": 1703,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [
+    "s ^ 2 = 2",
+    "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+    "resampled.cycleDensity 4 = palindromicCycleDensityB s 4"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "s": [
+     0.05,
+     3.0
+    ],
+    "p": [
+     1.0,
+     20.0
+    ]
+   }
+  },
+  "killed": [],
+  "reason": "",
+  "violation": {
+   "point": {
+    "s": 0.050003,
+    "p": 1.000019
+   },
+   "value": -7.989978778075417,
+   "why": "below 0.0"
+  }
  },
  "Calibrator.expectedR2FromN": {
   "class": "NUMERIC",
@@ -5376,7 +5625,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.commonAndRarePortableModel": {
   "class": "STRUCTURAL",
@@ -5385,7 +5634,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.expectedDistinctHaplotypes": {
   "class": "NUMERIC",
@@ -5843,7 +6092,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2203'\")"
+  "reason": "could not compile body: Untranslatable('existential quantifier')"
  },
  "Calibrator.codedDecayProfile": {
   "class": "NOT-EXTRACTABLE",
@@ -5861,7 +6110,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.neutralDriftR2Ratio": {
   "class": "NUMERIC",
@@ -5983,7 +6232,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.ShiftInvariant": {
   "class": "STRUCTURAL",
@@ -5992,7 +6241,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.scalarRowResolvent": {
   "class": "NUMERIC",
@@ -6067,7 +6316,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.BelowCeiling": {
   "class": "STRUCTURAL",
@@ -7516,7 +7765,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: calls untranslated definition temporalMetricProfile"
  },
  "Calibrator.modelStaleness": {
   "class": "NUMERIC",
@@ -7975,7 +8224,7 @@
  "Calibrator.ldBandDetectionShare": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1182,
+  "line": 1183,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -8024,7 +8273,7 @@
  "Calibrator.ldPruningDetectionDeficit": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1189,
+  "line": 1190,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -8068,7 +8317,7 @@
  "Calibrator.ldPanelRetentionFraction": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1393,
+  "line": 1394,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -8113,7 +8362,7 @@
  "Calibrator.ldBlockReconstructionShare": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1444,
+  "line": 1445,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8122,7 +8371,7 @@
  "Calibrator.ldBlockDetectionShare": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1455,
+  "line": 1456,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -8170,7 +8419,7 @@
  "Calibrator.ldBlockPruningDeficit": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1465,
+  "line": 1466,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -8221,7 +8470,7 @@
  "Calibrator.ldTightLinkageDetectionShare": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1476,
+  "line": 1477,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -8412,7 +8661,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.IsUnionOfCertificates": {
   "class": "STRUCTURAL",
@@ -8421,7 +8670,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.ldTaggingDecay": {
   "class": "NUMERIC",
@@ -8599,7 +8848,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.PCCorrectionModel.fineScaleSubspace": {
   "class": "STRUCTURAL",
@@ -8608,7 +8857,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.PCCorrectionModel.removeTopPCs": {
   "class": "NOT-EXTRACTABLE",
@@ -8759,13 +9008,31 @@
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.FrequencyResolvedCohort.classMargin": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/Frequency.lean",
   "line": 26,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "frequency",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {}
+  },
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('effectiveMarkers'))"
+  "reason": "",
+  "violation": {
+   "point": {},
+   "value": -1.0531530453628017,
+   "why": "below 0.0"
+  }
  },
  "Calibrator.FrequencyResolvedCohort.correctableClasses": {
   "class": "NOT-EXTRACTABLE",
@@ -8777,22 +9044,61 @@
   "reason": "qualified name Finset.univ.filter"
  },
  "Calibrator.FrequencyResolvedCohort.classInformation": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/Frequency.lean",
   "line": 41,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "frequency",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {}
+  },
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('effectiveMarkers'))"
+  "reason": "",
+  "violation": {
+   "point": {},
+   "value": 1.620491869340133,
+   "why": "above 1.0"
+  }
  },
  "Calibrator.FrequencyResolvedCohort.informationMatchedWeight": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/Frequency.lean",
   "line": 46,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "frequency",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [
+    "0 < cohort.weightedNoise weight",
+    "0 < cohort.totalInformation"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {}
+  },
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('effectiveMarkers'))"
+  "reason": "",
+  "violation": {
+   "point": {},
+   "value": 1.1051241765411859,
+   "why": "above 1.0"
+  }
  },
  "Calibrator.FrequencyResolvedCohort.totalInformation": {
   "class": "NOT-EXTRACTABLE",
@@ -8828,7 +9134,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('weightedSignal'))"
+  "reason": "self-check: calls untranslated definition weightedSignal"
  },
  "Calibrator.spikeOuter": {
   "class": "NOT-EXTRACTABLE",
@@ -8855,7 +9161,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.BackgroundClass.spikeLoad": {
   "class": "NOT-EXTRACTABLE",
@@ -8900,7 +9206,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2203'\")"
+  "reason": "could not compile body: Untranslatable('existential quantifier')"
  },
  "Calibrator.BackgroundClass.imitationCapacity": {
   "class": "NOT-EXTRACTABLE",
@@ -8965,10 +9271,28 @@
   "killed": [],
   "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
  },
+ "Calibrator.diagonalGapForm": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 878,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))"
+ },
+ "Calibrator.diagonalGapClass": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 910,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
+ },
  "Calibrator.traceWindowSpikeLoad": {
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 855,
+  "line": 1000,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -9009,7 +9333,7 @@
  "Calibrator.whitenedCapacity": {
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 875,
+  "line": 1020,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9018,7 +9342,7 @@
  "Calibrator.subgroupContrast": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 992,
+  "line": 1137,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9027,7 +9351,7 @@
  "Calibrator.demographicSpikeDirection": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 998,
+  "line": 1143,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9036,7 +9360,7 @@
  "Calibrator.stratificationCertificateMargin": {
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1075,
+  "line": 1220,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9045,7 +9369,7 @@
  "Calibrator.blockSpectrum": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1215,
+  "line": 1360,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9054,7 +9378,7 @@
  "Calibrator.normalizedMoment": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1223,
+  "line": 1368,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9063,7 +9387,7 @@
  "Calibrator.inverseTraceCertificate": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1233,
+  "line": 1378,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9072,7 +9396,7 @@
  "Calibrator.meffPerturbed": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1329,
+  "line": 1474,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9081,7 +9405,7 @@
  "Calibrator.meffFlat": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1334,
+  "line": 1479,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9090,7 +9414,7 @@
  "Calibrator.meffSize": {
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1339,
+  "line": 1484,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9648,22 +9972,22 @@
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.CrossPopulationCalibrationShiftModel.targetObservedMean": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 339,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('observedMeanShift'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.CrossPopulationCalibrationShiftModel.targetPredictedMean": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 344,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('predictedMeanShift'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationMoments": {
   "class": "STRUCTURAL",
@@ -9735,7 +10059,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('metric'))"
+  "reason": "self-check: calls untranslated definition dotProduct"
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetScoreMean": {
   "class": "NOT-EXTRACTABLE",
@@ -9744,7 +10068,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('metric'))"
+  "reason": "self-check: calls untranslated definition dotProduct"
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.scoreMeanShift": {
   "class": "NOT-EXTRACTABLE",
@@ -9753,7 +10077,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('metric'))"
+  "reason": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'function' and)"
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourcePredictedMean": {
   "class": "NOT-EXTRACTABLE",
@@ -9762,7 +10086,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('sourceScoreMean'))"
+  "reason": "self-check: calls untranslated definition dotProduct"
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetPredictedMean": {
   "class": "NOT-EXTRACTABLE",
@@ -9771,16 +10095,16 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('targetScoreMean'))"
+  "reason": "self-check: calls untranslated definition dotProduct"
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetObservedMean": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 584,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('observedMeanShift'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope": {
   "class": "NOT-EXTRACTABLE",
@@ -9789,7 +10113,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('metric'))"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope": {
   "class": "NOT-EXTRACTABLE",
@@ -9798,7 +10122,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('metric'))"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.CrossPopulationMechanisticCalibrationModel.toShiftModel": {
   "class": "STRUCTURAL",
@@ -9846,13 +10170,38 @@
   "reason": "could not compile body: Untranslatable('qualified name CalibrationLink.identity')"
  },
  "Calibrator.CrossPopulationGenerationalCalibrationModel.observedMeanShiftAt": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 966,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('prevalenceShiftAt'))"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": null,
+   "quantity": "nonnegative",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [
+    "((m.toMechanisticCalibrationModelAt t"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "t": [
+     1.0,
+     20.0
+    ]
+   }
+  },
+  "killed": [
+   "first '+'->'-'",
+   "last '+'->'-'",
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 3
  },
  "Calibrator.CrossPopulationGenerationalCalibrationModel.sourceScoreMeanAt": {
   "class": "NOT-EXTRACTABLE",
@@ -9861,7 +10210,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('metric'))"
+  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
  },
  "Calibrator.CrossPopulationGenerationalCalibrationModel.targetScoreMeanAt": {
   "class": "NOT-EXTRACTABLE",
@@ -9870,7 +10219,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('metric'))"
+  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
  },
  "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt": {
   "class": "NOT-EXTRACTABLE",
@@ -9879,7 +10228,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('metric'))"
+  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
  },
  "Calibrator.CrossPopulationGenerationalCalibrationModel.sourcePredictedMeanAt": {
   "class": "NOT-EXTRACTABLE",
@@ -9888,7 +10237,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('sourceScoreMeanAt'))"
+  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
  },
  "Calibrator.CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt": {
   "class": "NOT-EXTRACTABLE",
@@ -9897,16 +10246,16 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('deploymentInterceptShiftAt'))"
+  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
  },
  "Calibrator.CrossPopulationGenerationalCalibrationModel.targetObservedMeanAt": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 1000,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('observedMeanShiftAt'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt": {
   "class": "STRUCTURAL",
@@ -9924,7 +10273,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '.'\")"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.targetIdentityCalibrationProfileAtGeneration": {
   "class": "STRUCTURAL",
@@ -10106,7 +10455,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "qualified name Set.Ioc"
  },
  "Calibrator.downReclassificationRate": {
   "class": "NOT-EXTRACTABLE",
@@ -10115,7 +10464,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "expected ')', found op:{"
  },
  "Calibrator.nriFromDownwardInterceptRecalibration": {
   "class": "NOT-EXTRACTABLE",
@@ -10136,13 +10485,13 @@
   "reason": "self-check: calls untranslated definition thresholdBandRate"
  },
  "Calibrator.qalyContributionAtTime": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
   "line": 1887,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('discount'))"
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.treatmentMargin": {
   "class": "NOT-EXTRACTABLE",
@@ -10196,7 +10545,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.screeningLongitudinalModel": {
   "class": "STRUCTURAL",
@@ -10322,7 +10671,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.neutralPortabilityRatioLD": {
   "class": "NUMERIC",
@@ -10977,7 +11326,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('sourceEffectMass'))"
+  "reason": "self-check: calls untranslated definition sourceEffectMass"
  },
  "Calibrator.SNPArchitecturePortabilityModel.relativePortabilityLoss": {
   "class": "NOT-EXTRACTABLE",
@@ -10986,7 +11335,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('lostEffectMass'))"
+  "reason": "self-check: calls untranslated definition sourceEffectMass"
  },
  "Calibrator.SNPArchitecturePortabilityModel.portabilityScore": {
   "class": "NOT-EXTRACTABLE",
@@ -10995,7 +11344,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('targetRetainedEffectMass'))"
+  "reason": "self-check: calls untranslated definition targetRetainedEffectMass"
  },
  "Calibrator.uniformCatastrophicPortabilityScore": {
   "class": "NOT-EXTRACTABLE",
@@ -11172,7 +11521,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('portabilityScore'))"
+  "reason": "self-check: calls untranslated definition targetRetainedEffectMass"
  },
  "Calibrator.weightedRetentionUpperBound": {
   "class": "NOT-EXTRACTABLE",
@@ -11199,7 +11548,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('centeredAltAlleleCount'))"
+  "reason": "self-check: calls untranslated definition altAlleleCount"
  },
  "Calibrator.HardyWeinbergModel.mellinDrift": {
   "class": "NOT-EXTRACTABLE",
@@ -11250,7 +11599,7 @@
  "Calibrator.maxSafeEpistaticOrder": {
   "class": "NUMERIC",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 621,
+  "line": 627,
   "status": "DEFECT-CANDIDATE",
   "check": {
    "kind": "range",
@@ -11295,7 +11644,7 @@
  "Calibrator.hweLatticeCondition": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 769,
+  "line": 775,
   "status": "VACUOUS",
   "check": {
    "kind": "witness/non-witness",
@@ -11308,7 +11657,7 @@
  "Calibrator.latticeCriticalMaf": {
   "class": "NUMERIC",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 772,
+  "line": 778,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -11341,7 +11690,7 @@
  "Calibrator.HardyWeinbergModel.mellinJetVariance": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 816,
+  "line": 822,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -11350,7 +11699,7 @@
  "Calibrator.hweMellinJetVariance": {
   "class": "NUMERIC",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 825,
+  "line": 831,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -11360,7 +11709,9 @@
    "source_lo": "docstring/name",
    "source_hi": "docstring/name",
    "hypotheses": [],
-   "hypotheses_not_enforced": [],
+   "hypotheses_not_enforced": [
+    "(hweObservableContent squareCumulant q"
+   ],
    "thm_lo": null,
    "thm_hi": null,
    "n_points": 40,
@@ -11382,7 +11733,7 @@
  "Calibrator.hardCallLatticeSpan": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 860,
+  "line": 866,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -11391,7 +11742,7 @@
  "Calibrator.hardCallObservables": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 918,
+  "line": 924,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -11400,7 +11751,7 @@
  "Calibrator.hweCodingInvariants": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 1069,
+  "line": 1075,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -12880,13 +13231,13 @@
   }
  },
  "Calibrator.PureSplitModel.fst": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 215,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('tau'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.SplitMigrationModel.scaledMigration": {
   "class": "NUMERIC",
@@ -12898,13 +13249,13 @@
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.SplitMigrationModel.fstEqLimitLowMutationManyDemes": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 233,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('scaledMigration'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.hudsonFstFromCoalescenceTimes": {
   "class": "NUMERIC",
@@ -13248,22 +13599,22 @@
   }
  },
  "Calibrator.ClosedPopulationNoMutation.heterozygosityLoss": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 594,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('retention'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.ClosedPopulationNoMutation.targetHet": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 604,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('retention'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.pgsVarianceFromHet": {
   "class": "NUMERIC",
@@ -13728,7 +14079,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (AttributeError(\"'float' object has no attribute 'mulVec'\"))"
  },
  "Calibrator.sigmaTagCausalSource": {
   "class": "NOT-EXTRACTABLE",
@@ -13755,7 +14106,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('betaTarget'))"
+  "reason": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)"
  },
  "Calibrator.targetLinearRisk": {
   "class": "NOT-EXTRACTABLE",
@@ -13773,7 +14124,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.sigmaObsTarget": {
   "class": "NOT-EXTRACTABLE",
@@ -13782,7 +14133,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.crossSource": {
   "class": "NOT-EXTRACTABLE",
@@ -13791,7 +14142,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.crossTarget": {
   "class": "NOT-EXTRACTABLE",
@@ -13800,7 +14151,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.wSource_opt": {
   "class": "NOT-EXTRACTABLE",
@@ -13809,7 +14160,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.wTarget_opt": {
   "class": "NOT-EXTRACTABLE",
@@ -13818,7 +14169,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.sourceCrossCovariance": {
   "class": "NOT-EXTRACTABLE",
@@ -13827,7 +14178,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalSource'))"
  },
  "Calibrator.targetCrossCovariance": {
   "class": "NOT-EXTRACTABLE",
@@ -13836,7 +14187,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalTarget'))"
  },
  "Calibrator.sourceWeightsFromExplicitDrivers": {
   "class": "NOT-EXTRACTABLE",
@@ -13845,7 +14196,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.sourceWeightedTagScore": {
   "class": "NOT-EXTRACTABLE",
@@ -13863,7 +14214,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalSource'))"
  },
  "Calibrator.targetTaggingProjection": {
   "class": "NOT-EXTRACTABLE",
@@ -13872,7 +14223,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalTarget'))"
  },
  "Calibrator.targetEffectHeterogeneity": {
   "class": "NOT-EXTRACTABLE",
@@ -13881,7 +14232,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('betaTarget'))"
+  "reason": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)"
  },
  "Calibrator.targetSourceEffectProjection": {
   "class": "NOT-EXTRACTABLE",
@@ -13890,7 +14241,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalTarget'))"
  },
  "Calibrator.targetEffectHeterogeneityProjection": {
   "class": "NOT-EXTRACTABLE",
@@ -13899,7 +14250,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalTarget'))"
  },
  "Calibrator.targetNovelMutationEffectProjection": {
   "class": "NOT-EXTRACTABLE",
@@ -13908,7 +14259,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalTarget'))"
  },
  "Calibrator.sourceDirectCausalProjection": {
   "class": "NOT-EXTRACTABLE",
@@ -13935,7 +14286,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalTarget'))"
  },
  "Calibrator.targetProxyTaggingProjection": {
   "class": "NOT-EXTRACTABLE",
@@ -13944,7 +14295,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('proxyTaggingTarget'))"
  },
  "Calibrator.sourceScoreVarianceFromExplicitDrivers": {
   "class": "NOT-EXTRACTABLE",
@@ -13953,7 +14304,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.targetScoreVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -13962,7 +14313,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.sourcePredictiveCovarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -13971,7 +14322,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.targetPredictiveCovarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -13980,7 +14331,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.sourceCalibrationSlopeFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -13989,7 +14340,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.targetCalibrationSlopeFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -13998,7 +14349,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.brokenTaggingResidual": {
   "class": "NOT-EXTRACTABLE",
@@ -14007,7 +14358,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalSource'))"
  },
  "Calibrator.ancestrySpecificLDResidual": {
   "class": "NOT-EXTRACTABLE",
@@ -14016,7 +14367,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.sourceSpecificOverfitResidual": {
   "class": "NOT-EXTRACTABLE",
@@ -14025,7 +14376,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('contextCrossSource'))"
+  "reason": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'function' and)"
  },
  "Calibrator.novelUntaggablePhenotypeResidual": {
   "class": "NUMERIC",
@@ -14059,7 +14410,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition brokenTaggingResidual"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalSource'))"
  },
  "Calibrator.targetIrreduciblePenaltyProfile": {
   "class": "STRUCTURAL",
@@ -14077,7 +14428,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition brokenTaggingResidual"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalSource'))"
  },
  "Calibrator.sourceExplainedSignalVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -14086,7 +14437,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.sourceR2FromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -14095,7 +14446,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.sourceResidualVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -14104,7 +14455,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
   "class": "NOT-EXTRACTABLE",
@@ -14122,7 +14473,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.targetR2FromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -14131,7 +14482,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.targetResidualVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -14140,7 +14491,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition brokenTaggingResidual"
+  "reason": "self-check: structure projection unavailable (KeyError('directCausalSource'))"
  },
  "Calibrator.targetCalibratedBrierFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -14262,7 +14613,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('theta'))"
+  "reason": "self-check: calls untranslated definition Calibrator_GenerationalPopGenParameters_theta"
  },
  "Calibrator.GenerationalPopGenParameters.fstTransientAt": {
   "class": "NOT-EXTRACTABLE",
@@ -14271,7 +14622,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('theta'))"
+  "reason": "self-check: calls untranslated definition Calibrator_GenerationalPopGenParameters_theta"
  },
  "Calibrator.GenerationalPopGenParameters.mutationSharedRetentionAt": {
   "class": "NOT-EXTRACTABLE",
@@ -14280,16 +14631,16 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('theta'))"
+  "reason": "self-check: calls untranslated definition Calibrator_GenerationalPopGenParameters_theta"
  },
  "Calibrator.GenerationalPopGenParameters.migrationSharedBoostAt": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 2184,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('bigM'))"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.PGSEvolutionaryModel.toGenerationalPopGenParameters": {
   "class": "STRUCTURAL",
@@ -14341,43 +14692,135 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('betaSource'))"
+  "reason": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)"
  },
  "Calibrator.tagAlleleFreqTargetAt": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 2390,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "frequency",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "t": [
+     1.0,
+     20.0
+    ]
+   }
+  },
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('tagAlleleFreqStandingTargetAt'))"
+  "reason": "",
+  "violation": {
+   "point": {
+    "t": 1.000019
+   },
+   "value": 1.2334100780102082,
+   "why": "above 1.0"
+  }
  },
  "Calibrator.causalAlleleFreqTargetAt": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 2404,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "frequency",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "t": [
+     1.0,
+     20.0
+    ]
+   }
+  },
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('causalAlleleFreqStandingTargetAt'))"
+  "reason": "",
+  "violation": {
+   "point": {
+    "t": 1.000019
+   },
+   "value": 1.6077394380822039,
+   "why": "above 1.0"
+  }
  },
  "Calibrator.tagAlleleFreqRetentionAt": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 2415,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('tagAlleleFreqSource'))"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "frequency",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "t": [
+     1.0,
+     20.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 1
  },
  "Calibrator.causalAlleleFreqRetentionAt": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 2422,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('causalAlleleFreqSource'))"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "frequency",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "t": [
+     1.0,
+     20.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 1
  },
  "Calibrator.novelVariantInnovationAt": {
   "class": "NOT-EXTRACTABLE",
@@ -14386,7 +14829,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('mutationSharedRetentionAt'))"
+  "reason": "self-check: calls untranslated definition Calibrator_GenerationalPopGenParameters_theta"
  },
  "Calibrator.jointTagLDKernelAt": {
   "class": "NOT-EXTRACTABLE",
@@ -14404,7 +14847,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('popGen'))"
+  "reason": "self-check: structure projection unavailable (KeyError('mutationSharedRetentionAt'))"
  },
  "Calibrator.jointProxyTaggingKernelAt": {
   "class": "NOT-EXTRACTABLE",
@@ -14422,7 +14865,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('popGen'))"
+  "reason": "self-check: calls untranslated definition Calibrator_GenerationalPopGenParameters_theta"
  },
  "Calibrator.jointNovelProxyTaggingKernelAt": {
   "class": "NOT-EXTRACTABLE",
@@ -14494,7 +14937,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)"
  },
  "Calibrator.targetEffectHeterogeneityProjectionAt": {
   "class": "NOT-EXTRACTABLE",
@@ -14503,7 +14946,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)"
  },
  "Calibrator.CrossPopulationGenerationalModel.toMetricModelAt": {
   "class": "STRUCTURAL",
@@ -14521,7 +14964,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.targetCalibratedBrierAtGeneration": {
   "class": "NOT-EXTRACTABLE",
@@ -14894,7 +15337,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -14903,7 +15346,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.sourceMetricProfileFromSourceWeightsAtPrevalence": {
   "class": "STRUCTURAL",
@@ -14939,7 +15382,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.targetMetricProfileAtGeneration": {
   "class": "NOT-EXTRACTABLE",
@@ -14957,7 +15400,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.targetScoreVarianceAtGeneration": {
   "class": "NOT-EXTRACTABLE",
@@ -14966,7 +15409,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.effectiveTargetOutcomeVarianceAtGeneration": {
   "class": "NOT-EXTRACTABLE",
@@ -14975,7 +15418,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.targetResidualVarianceAtGeneration": {
   "class": "NOT-EXTRACTABLE",
@@ -14984,7 +15427,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.targetCalibrationSlopeAtGeneration": {
   "class": "NOT-EXTRACTABLE",
@@ -14993,7 +15436,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.sourceNormalizedTargetR2AtGeneration": {
   "class": "NOT-EXTRACTABLE",
@@ -15002,7 +15445,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
+  "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.targetExactGaussianAUCFromNeutralAFBenchmark": {
   "class": "NOT-EXTRACTABLE",
@@ -15218,7 +15661,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('theta'))"
+  "reason": "self-check: calls untranslated definition Calibrator_MutationDriftModelAssumptions_theta"
  },
  "Calibrator.MutationDriftModelAssumptions.fstTransient": {
   "class": "NOT-EXTRACTABLE",
@@ -15227,7 +15670,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('fstEquilibrium'))"
+  "reason": "self-check: calls untranslated definition Calibrator_MutationDriftModelAssumptions_theta"
  },
  "Calibrator.covarianceRetention": {
   "class": "NUMERIC",
@@ -16525,7 +16968,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: calls untranslated definition bernoulliPMF"
  },
  "Calibrator.InformationTheoryBridge.bernoulliKL": {
   "class": "NOT-EXTRACTABLE",
@@ -16701,7 +17144,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "Finset/indexed sum"
  },
  "Calibrator.HWEScoreModel.scoreVariance": {
   "class": "NOT-EXTRACTABLE",
@@ -16710,7 +17153,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "Finset/indexed sum"
  },
  "Calibrator.HWEScoreModel.scoreThirdAbsMomentBound": {
   "class": "NOT-EXTRACTABLE",
@@ -16719,7 +17162,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "Finset/indexed sum"
  },
  "Calibrator.berryEsseenErrorBound": {
   "class": "NUMERIC",
@@ -16809,7 +17252,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "qualified name ProbabilityTheory.gaussianReal"
  },
  "Calibrator.Phi": {
   "class": "NOT-EXTRACTABLE",
@@ -16854,7 +17297,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '.'"
+  "reason": "self-check: calls untranslated definition noiseMeasureGivenX"
  },
  "Calibrator.Predictor": {
   "class": "NOT-EXTRACTABLE",
@@ -16872,7 +17315,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.predictionRiskY": {
   "class": "NOT-EXTRACTABLE",
@@ -16881,7 +17324,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '\u2202'"
+  "reason": "measure-theoretic integral (\u222b \u2026 \u2202\u03bc)"
  },
  "Calibrator.ConditionalMeanDGP.toDGP": {
   "class": "STRUCTURAL",
@@ -17078,7 +17521,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.quadraticRisk": {
   "class": "NOT-EXTRACTABLE",
@@ -17096,7 +17539,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.quadraticCoefficientDistance": {
   "class": "NOT-EXTRACTABLE",
@@ -18130,7 +18573,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition sourceERMWeights"
+  "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.sourceSquaredEffectMass": {
   "class": "NOT-EXTRACTABLE",
@@ -18157,7 +18600,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.targetLDShiftMetricModel": {
   "class": "STRUCTURAL",
@@ -18166,7 +18609,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.baselineProxyTagMetricModel": {
   "class": "STRUCTURAL",
@@ -18175,7 +18618,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.targetTaggingShiftMetricModel": {
   "class": "STRUCTURAL",
@@ -18184,7 +18627,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.targetEffectShiftMetricModel": {
   "class": "STRUCTURAL",
@@ -18193,7 +18636,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.targetContextShiftMetricModel": {
   "class": "STRUCTURAL",
@@ -18202,7 +18645,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.targetPrevalenceShiftMetricModel": {
   "class": "STRUCTURAL",
@@ -18220,7 +18663,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.novelUntaggablePhenotypeMetricModel": {
   "class": "STRUCTURAL",
@@ -18306,7 +18749,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.timeVaryingAFGenerationalModel": {
   "class": "STRUCTURAL",
@@ -18315,7 +18758,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.timeVaryingEffectGenerationalModel": {
   "class": "STRUCTURAL",
@@ -18324,7 +18767,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '!'\")"
+  "reason": "could not compile body: Untranslatable('Matrix/vector literal (![\u2026])')"
  },
  "Calibrator.incrementalR2": {
   "class": "NUMERIC",
@@ -18443,22 +18886,22 @@
   "mutants_tried": 5
  },
  "Calibrator.fixed_weights": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/StatisticalGeneticsMethodology.lean",
   "line": 173,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('variances'))"
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.random_weights": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/StatisticalGeneticsMethodology.lean",
   "line": 176,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (KeyError('variances'))"
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.fixed_se_sq": {
   "class": "NOT-EXTRACTABLE",
@@ -18945,7 +19388,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+  "reason": "could not compile body: Untranslatable('universal quantifier')"
  },
  "Calibrator.AsymptoticallyConsistent": {
   "class": "STRUCTURAL",
@@ -20263,7 +20706,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.sigmaT": {
   "class": "NOT-EXTRACTABLE",
@@ -20272,7 +20715,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.crossS": {
   "class": "NOT-EXTRACTABLE",
@@ -20281,7 +20724,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  },
  "Calibrator.sigmaT2": {
   "class": "NOT-EXTRACTABLE",
@@ -20290,6 +20733,6 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "unrecognised character '!'"
+  "reason": "Matrix/vector literal (![\u2026])"
  }
 }

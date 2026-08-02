@@ -4870,45 +4870,85 @@ theorem splitMigration_more_migration_less_fst
 /-- **Stepping-stone Fst model.**
     In the stepping-stone model, migration occurs only between adjacent demes.
     Fst between demes separated by d steps is approximately:
-    Fst(d) ≈ Fst_neighbor × (1 + α × (d - 1))
+    Fst(d) ≈ min 1 (Fst_neighbor × (1 + α × (d - 1)))
     where α controls the rate of increase with distance (isolation by distance).
-    This is a linear approximation to the closed-form result.
+
+    The `min 1` is not cosmetic. An `F_ST` is a variance ratio and lies in
+    `[0, 1]`; the bare linear form returns `10000` at
+    `fst_neighbor = 1, α = 1, d = 10000`, which is not a value the quantity can
+    take. Clamping also makes the fixation boundary attainable rather than
+    merely approached: `steppingStoneFst_eq_one_of_saturated` exhibits the
+    regime where distant demes are completely differentiated, which is the
+    physically correct behaviour of isolation by distance at long range.
+
+    Regime: linear, valid below saturation. This is a first-order approximation
+    to the closed form, so it is trustworthy only while
+    `fst_neighbor * (1 + α (d - 1))` is well below `1`; the monotonicity results
+    below carry that condition as a hypothesis rather than assuming it. The
+    saturating closed forms are `demoSteppingStoneFst` in
+    `Calibrator.DemographicHistory`, which is derived from a coalescence time,
+    and `continuousSteppingStoneFst` in
+    `Calibrator.PopulationGeneticsFoundations`, which is `1 - exp (-d/L)`.
+    Neither is this function and neither is being replaced here.
 
     Empirical status: UNTESTED. -/
 noncomputable def steppingStoneFst (fst_neighbor α : ℝ) (d : ℕ) : ℝ :=
-  fst_neighbor * (1 + α * ((d : ℝ) - 1))
+  min 1 (fst_neighbor * (1 + α * ((d : ℝ) - 1)))
 
-/-- Stepping-stone Fst at distance 1 equals the neighbor Fst. -/
-theorem steppingStoneFst_at_one (fst_neighbor α : ℝ) :
+/-- **Stepping-stone Fst never leaves the unit interval**, which is what the
+range of the quantity requires and what the unclamped body violated. -/
+theorem steppingStoneFst_le_one (fst_neighbor α : ℝ) (d : ℕ) :
+    steppingStoneFst fst_neighbor α d ≤ 1 :=
+  min_le_left _ _
+
+/-- **The fixation boundary is attained**, not merely approached: once the
+linear form reaches `1` the demes are completely differentiated and stay so. -/
+theorem steppingStoneFst_eq_one_of_saturated (fst_neighbor α : ℝ) (d : ℕ)
+    (hsat : 1 ≤ fst_neighbor * (1 + α * ((d : ℝ) - 1))) :
+    steppingStoneFst fst_neighbor α d = 1 :=
+  min_eq_left hsat
+
+/-- Stepping-stone Fst at distance 1 equals the neighbor Fst, provided the
+neighbour value is itself a valid `F_ST`. -/
+theorem steppingStoneFst_at_one (fst_neighbor α : ℝ) (hle : fst_neighbor ≤ 1) :
     steppingStoneFst fst_neighbor α 1 = fst_neighbor := by
   unfold steppingStoneFst
-  simp
+  simp only [Nat.cast_one, sub_self, mul_zero, add_zero, mul_one]
+  exact min_eq_right hle
 
 /-- **Stepping-stone Fst increases with geographic distance** (isolation by distance).
     For positive neighbor Fst and positive distance scaling parameter α,
-    Fst is strictly increasing in the number of steps. -/
+    Fst is strictly increasing in the number of steps -- below saturation.
+    Above it both values are `1` and the increase stops, which is the correct
+    behaviour and the reason the hypothesis is needed. -/
 theorem steppingStoneFst_increases_with_distance
     (fst_neighbor α : ℝ) (d₁ d₂ : ℕ)
-    (hfst : 0 < fst_neighbor) (hα : 0 < α) (hd : d₁ < d₂) :
+    (hfst : 0 < fst_neighbor) (hα : 0 < α) (hd : d₁ < d₂)
+    (hsat : fst_neighbor * (1 + α * ((d₂ : ℝ) - 1)) ≤ 1) :
     steppingStoneFst fst_neighbor α d₁ < steppingStoneFst fst_neighbor α d₂ := by
   unfold steppingStoneFst
   have hd_real : (d₁ : ℝ) < (d₂ : ℝ) := Nat.cast_lt.mpr hd
   have h_inner : α * ((d₁ : ℝ) - 1) < α * ((d₂ : ℝ) - 1) := by nlinarith
-  nlinarith
+  have hlin : fst_neighbor * (1 + α * ((d₁ : ℝ) - 1)) <
+      fst_neighbor * (1 + α * ((d₂ : ℝ) - 1)) := by nlinarith
+  rw [min_eq_right (le_of_lt (lt_of_lt_of_le hlin hsat)), min_eq_right hsat]
+  exact hlin
 
 /-- **Nearby demes have lower Fst than distant demes.**
-    Fst(1) < Fst(d) for d > 1 under the stepping-stone model. -/
+    Fst(1) < Fst(d) for d > 1 under the stepping-stone model, below saturation. -/
 theorem steppingStoneFst_neighbor_lt_distant
     (fst_neighbor α : ℝ) (d : ℕ)
-    (hfst : 0 < fst_neighbor) (hα : 0 < α) (hd : 1 < d) :
-    steppingStoneFst fst_neighbor α 1 < steppingStoneFst fst_neighbor α d := by
-  exact steppingStoneFst_increases_with_distance fst_neighbor α 1 d hfst hα hd
+    (hfst : 0 < fst_neighbor) (hα : 0 < α) (hd : 1 < d)
+    (hsat : fst_neighbor * (1 + α * ((d : ℝ) - 1)) ≤ 1) :
+    steppingStoneFst fst_neighbor α 1 < steppingStoneFst fst_neighbor α d :=
+  steppingStoneFst_increases_with_distance fst_neighbor α 1 d hfst hα hd hsat
 
 /-- **Stepping-stone Fst is nonneg for valid parameters.** -/
 theorem steppingStoneFst_nonneg (fst_neighbor α : ℝ) (d : ℕ)
     (hfst : 0 < fst_neighbor) (hα : 0 ≤ α) (hd : 1 ≤ d) :
     0 ≤ steppingStoneFst fst_neighbor α d := by
   unfold steppingStoneFst
+  apply le_min (by norm_num)
   apply mul_nonneg (le_of_lt hfst)
   have : 0 ≤ α * ((d : ℝ) - 1) := by
     apply mul_nonneg hα

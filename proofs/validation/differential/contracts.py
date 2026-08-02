@@ -92,7 +92,8 @@ def admissibility(fq: str, params: dict) -> dict:
     Neither is combined into a single "admissible" flag, deliberately.
     """
     out = {
-        "theorem_proved": {"verdict": "no-constraint", "satisfied": [], "violated": []},
+        "theorem_proved": {"verdict": "no-constraint", "satisfied": [], "violated": [],
+                           "granularity": "per theorem, via api.satisfies(fq, point, theorem)"},
         "docstring_implied": {"verdict": "no-constraint"},
         "unmodelled_hypotheses": [],
     }
@@ -110,44 +111,44 @@ def admissibility(fq: str, params: dict) -> dict:
         codes, texts, unmodelled = [], [], []
     out["unmodelled_hypotheses"] = list(unmodelled)
 
-    # extract compiles hypotheses in EXEC mode: the verdict lands in `__r` and
-    # the namespace must carry `_rt` (lean_rt) for total arithmetic. Evaluating
-    # them with `eval` returns None, which reads as False and manufactures a
-    # violation at every point -- the precise failure the totality contract is
-    # about. Mirror `admissible.satisfies` instead of improvising.
-    import lean_rt as _rt
-
+    # Use `api.satisfies`, never the raw predicates. They are compiled in EXEC
+    # mode with the verdict in `__r` and require `_rt` (lean_rt) in scope;
+    # evaluating them with `eval` returns None, which reads as False and
+    # manufactures a violation at EVERY point -- silent, uniform, and it looks
+    # like a finding rather than a bug. That is exactly what happened here
+    # before the wrapper existed.
+    #
+    # Verdicts are taken PER THEOREM. The union over all mentioning theorems is
+    # recorded too, but only as a label: it is not a domain, and for coalFst it
+    # is False everywhere sensible because of the asymptotic lemma's
+    # `100 * Ne < t`.
     sat, vio, unevaluable = [], [], []
-    for code, text in zip(codes, texts):
-        ns = dict(params)
-        ns["_rt"] = _rt
+    for thm in sorted(by_thm):
+        if not by_thm[thm]:
+            continue
         try:
-            exec(code, {"__builtins__": {}}, ns)
-        except NameError:
-            # hypothesis constrains a binder this check's grid does not name
-            unevaluable.append(text)
-            continue
+            ok = api.satisfies(fq, dict(params), thm)
         except Exception:
-            unevaluable.append(text)
+            unevaluable.append(thm)
             continue
-        r = ns.get("__r")
-        if r is None:
-            unevaluable.append(text)
-            continue
-        sources = [t for t, hs in by_thm.items() if text in hs]
-        (sat if r is True else vio).append(
-            {"hypothesis": text, "stated_by": sources}
+        (sat if ok else vio).append(
+            {"theorem": thm, "hypotheses": by_thm[thm]}
         )
-    out["unevaluable_hypotheses"] = unevaluable
+    out["unevaluable_theorems"] = unevaluable
+    try:
+        out["union_satisfied"] = api.satisfies(fq, dict(params))
+    except Exception:
+        out["union_satisfied"] = None
     if sat or vio:
         out["theorem_proved"] = {
             "verdict": "all-satisfied" if not vio else "some-violated",
             "satisfied": sat,
             "violated": vio,
             "note": (
-                "constraints.hypotheses is a UNION over mentioning theorems, "
-                "not a conjunctive domain; a violated entry means the point is "
-                "outside THAT theorem's scope, not outside the definition's"
+                "a violated entry means the point is outside THAT theorem's "
+                "scope, not outside the definition's. constraints.hypotheses "
+                "is a UNION over mentioning theorems and is never used as a "
+                "domain; `union_satisfied` is recorded as a label only."
             ),
         }
 

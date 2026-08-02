@@ -25,6 +25,7 @@ from pathlib import Path
 import sympy as sp
 
 import leansym as L
+import shared
 import hyps as H
 
 HERE = Path(__file__).parent
@@ -47,8 +48,8 @@ def mutate(body: str) -> list[tuple[str, str]]:
 
 def run():
     decls = json.load(open(HERE / "decls.json"))
-    base_table = L.build_table(decls)
-    defs = {d["name"]: d for d in decls if d["kind"] == "def"}
+    base_table = shared.build_table()
+    defs = {d["name"]: d for d in shared.def_records()}
     thms = {t["name"]: t for t in decls if t["kind"] == "theorem"}
 
     coverage: dict[str, dict] = {}

@@ -23,7 +23,7 @@ import sys
 import backends
 import compile_defs as C
 import invariants as INV
-from check_ranges import build_feasible, check_one as range_check
+from check_ranges import check_one as range_check
 from transpile import Untranspilable, build_arity, pyname, transpile
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -73,8 +73,8 @@ def arg_swap_mutants(d):
 
 def range_verdict_rejects(before, after):
     """Did the range check change from accepting to rejecting?"""
-    good = ("proved", "guarded-by-side-condition")
-    bad = ("escape", "escape-unguarded")
+    good = ("proved",)
+    bad = ("escape", "escape-unguarded", "escape-outside-theorem")
     return before in good and after in bad
 
 
@@ -89,8 +89,7 @@ def main(argv):
         c = cs[k]
         d = c.d
         base_range = range_check(c, defs)
-        feasible, _, _ = build_feasible(c, defs)
-        base_checks, _ = INV.derive(c, feasible=feasible)
+        base_checks, _ = INV.derive(c)
         base_inv = []
         for ch in base_checks:
             try:
@@ -103,14 +102,15 @@ def main(argv):
         # its own falsifiability on the spot -- no mutant is needed, the real
         # body is the counterexample.
         fires = []
-        if base_range["verdict"] in ("escape", "escape-unguarded"):
+        if base_range["verdict"] in ("escape", "escape-unguarded",
+                                     "escape-outside-theorem"):
             fires.append("range")
         for ch, ok in zip(base_checks, base_inv):
             if ok is False:
                 fires.append(ch["kind"])
 
         registered = list(fires)
-        if base_range["verdict"] in ("proved", "guarded-by-side-condition"):
+        if base_range["verdict"] == "proved":
             registered.append("range")
         for ch, ok in zip(base_checks, base_inv):
             if ok is True:

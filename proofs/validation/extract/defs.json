@@ -2157,17 +2157,121 @@
     "hypotheses": [],
     "hypotheses_by_theorem": {
      "Calibrator.StructuralGuard.verdict_holds": [],
-     "Calibrator.guard_stack_blind_to_retention": [],
-     "Calibrator.no_guard_stack_criterion": [],
-     "Calibrator.extra_algebraic_guard_adds_nothing": []
+     "Calibrator.no_guard_stack_criterion": []
     }
    },
    "mentioned_by": [
     "Calibrator.StructuralGuard.verdict_holds",
-    "Calibrator.extra_algebraic_guard_adds_nothing",
-    "Calibrator.guard_stack_blind_to_retention",
     "Calibrator.no_guard_stack_criterion"
    ]
+  },
+  {
+   "name": "Calibrator.guard_stack_blind_to_retention",
+   "short": "guard_stack_blind_to_retention",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/BlindnessRegistry.lean",
+   "line": 108,
+   "signature": "{trueRetention wrongRetention : ℝ} (hne : wrongRetention ≠ trueRetention) : ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r) (fun r => r = trueRetention)",
+   "args": [
+    {
+     "names": [
+      "trueRetention",
+      "wrongRetention"
+     ],
+     "type": "ℝ",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "hne"
+     ],
+     "type": "wrongRetention ≠ trueRetention",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r) (fun r => r = trueRetention)",
+   "body": "  ProbeBlindness.ofWitnessFamily StructuralGuard.verdict _ trueRetention wrongRetention\n    (fun g => propext ⟨fun _ => g.verdict_holds wrongRetention,\n                       fun _ => g.verdict_holds trueRetention⟩)\n    rfl hne",
+   "docstring": "**The whole guard suite shares one witness pair.**\n\nTwo different retention values — the measured one and the one the cluster assumed —\nproduce identical reports from *every* structural guard. By\n`ProbeBlindness.ofWitnessFamily`, no criterion reading the entire suite decides which\nretention is correct, in any combination and under any rule.\n\nThis is why the same wrong number was certified five times: it was never five\nindependent certifications, it was one blind suite applied five times.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "ratio",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "wrongRetention ≠ trueRetention"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.no_guard_stack_criterion": [
+      "wrongRetention ≠ trueRetention"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.no_guard_stack_criterion"
+   ]
+  },
+  {
+   "name": "Calibrator.extra_algebraic_guard_adds_nothing",
+   "short": "extra_algebraic_guard_adds_nothing",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/BlindnessRegistry.lean",
+   "line": 128,
+   "signature": "{trueRetention wrongRetention : ℝ} (hne : wrongRetention ≠ trueRetention) (newGuard : ℝ → Prop) (hnew : ∀ r, newGuard r) : ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r)) (fun r => r = trueRetention) where positive",
+   "args": [
+    {
+     "names": [
+      "trueRetention",
+      "wrongRetention"
+     ],
+     "type": "ℝ",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "hne"
+     ],
+     "type": "wrongRetention ≠ trueRetention",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "newGuard"
+     ],
+     "type": "ℝ → Prop",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "hnew"
+     ],
+     "type": "∀ r, newGuard r",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r)) (fun r => r = trueRetention) where positive",
+   "body": " trueRetention\n  negative := wrongRetention\n  same_data := by\n    have h₁ : (fun g : StructuralGuard => g.verdict trueRetention)\n        = fun g : StructuralGuard => g.verdict wrongRetention := by\n      funext g\n      exact propext ⟨fun _ => g.verdict_holds wrongRetention,\n                     fun _ => g.verdict_holds trueRetention⟩\n    have h₂ : newGuard trueRetention = newGuard wrongRetention :=\n      propext ⟨fun _ => hnew wrongRetention, fun _ => hnew trueRetention⟩\n    rw [h₁, h₂]\n  holds := rfl\n  fails := hne",
+   "docstring": "Adding a fourth guard of the same kind changes nothing: any predicate on candidate\nretentions that is satisfied at every retention joins the suite without narrowing it.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "ratio",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0
+   },
+   "mentioned_by": []
   },
   {
    "name": "Calibrator.proportionMediated",
@@ -4683,6 +4787,7 @@
     "hypotheses_by_theorem": {
      "Calibrator.condensationConstant_bounds": [],
      "Calibrator.condensationConstant_pos": [],
+     "Calibrator.log_two_lt_condensationConstant": [],
      "Calibrator.criticalDegree_gaussian": [],
      "Calibrator.gaussianCriticalMultiplier_bounds": [],
      "Calibrator.condensationConstant_lt_drift_of_rare": [],
@@ -4690,6 +4795,7 @@
      "Calibrator.maxSafeEpistaticOrder_lt_gaussian_of_drift_excess": [],
      "Calibrator.sevenfold_drift_excess_at_rare_maf": [],
      "Calibrator.maxSafeEpistaticOrder_collapse_at_rare_maf": [],
+     "Calibrator.hweMellinDrift_half_lt_condensationConstant": [],
      "Calibrator.balanced_locus_drift_separates": []
     },
     "range_lo_thm": [
@@ -4706,6 +4812,8 @@
     "Calibrator.criticalDegree_gaussian",
     "Calibrator.drift_straddles_condensationConstant",
     "Calibrator.gaussianCriticalMultiplier_bounds",
+    "Calibrator.hweMellinDrift_half_lt_condensationConstant",
+    "Calibrator.log_two_lt_condensationConstant",
     "Calibrator.maxSafeEpistaticOrder_collapse_at_rare_maf",
     "Calibrator.maxSafeEpistaticOrder_lt_gaussian_of_drift_excess",
     "Calibrator.sevenfold_drift_excess_at_rare_maf"
@@ -4717,7 +4825,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Condensation.lean",
-   "line": 221,
+   "line": 262,
    "signature": ": ℝ",
    "args": [],
    "ret_type": "ℝ",
@@ -4751,7 +4859,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Condensation.lean",
-   "line": 246,
+   "line": 287,
    "signature": "(N c : ℝ) : ℝ",
    "args": [
     {
@@ -4811,7 +4919,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Condensation.lean",
-   "line": 262,
+   "line": 303,
    "signature": ": ℝ",
    "args": [],
    "ret_type": "ℝ",
@@ -4846,7 +4954,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/Condensation.lean",
-   "line": 309,
+   "line": 350,
    "signature": "(w v : ℝ) : ℝ",
    "args": [
     {
@@ -4898,6 +5006,155 @@
     "Calibrator.windowVariance_mem_unitInterval",
     "Calibrator.windowVariance_mono",
     "Calibrator.windowVariance_ne_of_arg_ne"
+   ]
+  },
+  {
+   "name": "Calibrator.hweObservableContent",
+   "short": "hweObservableContent",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 462,
+   "signature": "(squareCumulant : ℝ → ℕ → ℝ) (q : ℝ) : GenotypeObservableContent where drift",
+   "args": [
+    {
+     "names": [
+      "squareCumulant"
+     ],
+     "type": "ℝ → ℕ → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "q"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "GenotypeObservableContent where drift",
+   "body": " hweMellinDrift q\n  jetVariance := hweMellinJetVariance q\n  IsLattice := hweLatticeCondition q\n  IsSignSymmetric := q = 1 / 2\n  squareCumulant := squareCumulant q",
+   "docstring": "The observable content of a Hardy-Weinberg locus at allele frequency `q`, assembled\nfrom the quantities this corpus already computes. The square-cumulant sequence is\nsupplied as a parameter because it is a sequence rather than a closed form; every other\ncomponent is a function of `q` already proved here.\n\nEmpirical status: DERIVED from `hweMellinDrift`, `hweMellinJetVariance` and\n`hweLatticeCondition`, each of which is derived elsewhere in the corpus; no free\nparameter beyond the supplied cumulant sequence, and nothing fitted.",
+   "empirical_status": "DERIVED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "frequency",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "(hweObservableContent squareCumulant q",
+     "∀ i : Fin n, hweObservableContent VW.squareCumulant (model i",
+     "∀ i : Fin n, VW.squareCumulant (model i"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.hweObservableContent_components": [],
+     "Calibrator.hweObservableContent_symmetry": [],
+     "Calibrator.hweObservableContent_symmetric_jetVariance_zero": [
+      "(hweObservableContent squareCumulant q"
+     ],
+     "Calibrator.VertexWeightLaw.experiment_factors_through_observable_content": [
+      "∀ i : Fin n, hweObservableContent VW.squareCumulant (model i"
+     ],
+     "Calibrator.VertexWeightLaw.indistinguishable_of_matching_computed_quantities": [
+      "∀ i : Fin n, VW.squareCumulant (model i"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.VertexWeightLaw.experiment_factors_through_observable_content",
+    "Calibrator.VertexWeightLaw.indistinguishable_of_matching_computed_quantities",
+    "Calibrator.hweObservableContent_components",
+    "Calibrator.hweObservableContent_symmetric_jetVariance_zero",
+    "Calibrator.hweObservableContent_symmetry"
+   ]
+  },
+  {
+   "name": "Calibrator.GenotypeDesign.reModel",
+   "short": "reModel",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 519,
+   "signature": "{ι : Type*} {n : ℕ} (design : GenotypeDesign n ι) (model : Fin n → HardyWeinbergModel) : GenotypeDesign n ι",
+   "args": [
+    {
+     "names": [
+      "ι"
+     ],
+     "type": "Type*",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "design"
+     ],
+     "type": "GenotypeDesign n ι",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "model"
+     ],
+     "type": "Fin n → HardyWeinbergModel",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "GenotypeDesign n ι",
+   "body": "  { design with model := model }",
+   "docstring": "Re-model a design: the same tested locus-sets, coefficients and joint law, at a\ndifferent allele-frequency family. This is what varying the coordinate law while holding\nthe design fixed means, and it is the comparison the Vertex-Weight Law is about.\n\nEmpirical status: UNTESTED. A field update on a design; no modelling content and no free\nparameter.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "frequency",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "VW.isAdmissible (design.reModel model",
+     "VW.isAdmissible (design.reModel model'",
+     "∀ i : Fin n, hweObservableContent VW.squareCumulant (model i",
+     "∀ i : Fin n, hweMellinDrift (model i",
+     "∀ i : Fin n, hweMellinJetVariance (model i",
+     "∀ i : Fin n, hweLatticeCondition (model i",
+     "∀ i : Fin n, ((model i",
+     "∀ i : Fin n, VW.squareCumulant (model i"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.VertexWeightLaw.experiment_factors_through_observable_content": [
+      "VW.isAdmissible (design.reModel model",
+      "VW.isAdmissible (design.reModel model'",
+      "∀ i : Fin n, hweObservableContent VW.squareCumulant (model i"
+     ],
+     "Calibrator.VertexWeightLaw.indistinguishable_of_matching_computed_quantities": [
+      "VW.isAdmissible (design.reModel model",
+      "VW.isAdmissible (design.reModel model'",
+      "∀ i : Fin n, hweMellinDrift (model i",
+      "∀ i : Fin n, hweMellinJetVariance (model i",
+      "∀ i : Fin n, hweLatticeCondition (model i",
+      "∀ i : Fin n, ((model i",
+      "∀ i : Fin n, VW.squareCumulant (model i"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Calibrator.VertexWeightLaw.experiment_factors_through_observable_content",
+    "Calibrator.VertexWeightLaw.indistinguishable_of_matching_computed_quantities"
    ]
   },
   {
@@ -12174,6 +12431,10 @@
      "h.altFreq < 1"
     ],
     "hypotheses_by_theorem": {
+     "Calibrator.hweObservableContent_symmetry": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
      "Calibrator.standardizedGenotype_symmetric_iff": [
       "0 < h.altFreq",
       "h.altFreq < 1"
@@ -12186,6 +12447,7 @@
     }
    },
    "mentioned_by": [
+    "Calibrator.hweObservableContent_symmetry",
     "Calibrator.standardizedGenotype_expectation_zero",
     "Calibrator.standardizedGenotype_second_moment_one",
     "Calibrator.standardizedGenotype_symmetric_iff"
@@ -12945,7 +13207,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1515,
+   "line": 1519,
    "signature": "(design : GenotypeDesign nx ιx) (rate : ℝ) : Prop",
    "args": [
     {
@@ -12988,7 +13250,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1524,
+   "line": 1528,
    "signature": "(design : GenotypeDesign nx ιx) (bound : ℕ) : Prop",
    "args": [
     {
@@ -13050,7 +13312,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1694,
+   "line": 1698,
    "signature": "(s : ℝ) (p : ℕ) : ℝ",
    "args": [
     {
@@ -13120,7 +13382,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1703,
+   "line": 1707,
    "signature": "(s : ℝ) (p : ℕ) : ℝ",
    "args": [
     {
@@ -20706,15 +20968,8 @@
    "namespace": "Calibrator.ProbeBlindness",
    "fields": [],
    "equations": [],
-   "constraints": {
-    "hypotheses": [],
-    "hypotheses_by_theorem": {
-     "Calibrator.guard_stack_blind_to_retention": []
-    }
-   },
-   "mentioned_by": [
-    "Calibrator.guard_stack_blind_to_retention"
-   ]
+   "constraints": {},
+   "mentioned_by": []
   },
   {
    "name": "Calibrator.ProbeBlindness.toApprox",
@@ -31644,6 +31899,8 @@
       "m < maxSafeEpistaticOrder N q"
      ],
      "Calibrator.moment_body_reached_at_every_drift": [],
+     "Calibrator.hweObservableContent_components": [],
+     "Calibrator.VertexWeightLaw.indistinguishable_of_matching_computed_quantities": [],
      "Calibrator.HardyWeinbergModel.mellinDrift_eq": [],
      "Calibrator.hweMellinDrift_at_sqrt5_point": [],
      "Calibrator.rare_variant_drift_lower_bound": [
@@ -31676,6 +31933,7 @@
      "Calibrator.exists_maf_supercritical": [],
      "Calibrator.HardyWeinbergModel.mellinJetVariance_eq": [],
      "Calibrator.balanced_locus_symmetric_component": [],
+     "Calibrator.hweMellinDrift_half_lt_condensationConstant": [],
      "Calibrator.balanced_locus_drift_separates": [],
      "Calibrator.additive_score_subcritical_at_balanced_locus_proved": [],
      "Calibrator.pairwise_epistasis_supercritical_proved": []
@@ -31689,6 +31947,7 @@
    "mentioned_by": [
     "Calibrator.HardyWeinbergModel.mellinDrift_eq",
     "Calibrator.HardyWeinbergModel.mellinJetVariance_eq",
+    "Calibrator.VertexWeightLaw.indistinguishable_of_matching_computed_quantities",
     "Calibrator.additive_score_is_subcritical",
     "Calibrator.additive_score_subcritical_at_balanced_locus_proved",
     "Calibrator.balanced_locus_drift_separates",
@@ -31700,6 +31959,8 @@
     "Calibrator.epistatic_order_unsafe_iff",
     "Calibrator.exists_maf_supercritical",
     "Calibrator.hweMellinDrift_at_sqrt5_point",
+    "Calibrator.hweMellinDrift_half_lt_condensationConstant",
+    "Calibrator.hweObservableContent_components",
     "Calibrator.maxSafeEpistaticOrder_collapse_at_rare_maf",
     "Calibrator.maxSafeEpistaticOrder_eq_criticalDegree",
     "Calibrator.maxSafeEpistaticOrder_lt_gaussian_of_drift_excess",
@@ -31719,7 +31980,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 621,
+   "line": 627,
    "signature": "(N q : ℝ) : ℝ",
    "args": [
     {
@@ -31800,7 +32061,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 769,
+   "line": 775,
    "signature": "(q : ℝ) : Prop",
    "args": [
     {
@@ -31825,11 +32086,15 @@
     "declared_hi": null,
     "hypotheses": [],
     "hypotheses_by_theorem": {
+     "Calibrator.hweObservableContent_components": [],
+     "Calibrator.VertexWeightLaw.indistinguishable_of_matching_computed_quantities": [],
      "Calibrator.hardCall_arithmeticProgression_at_critical_maf": []
     }
    },
    "mentioned_by": [
-    "Calibrator.hardCall_arithmeticProgression_at_critical_maf"
+    "Calibrator.VertexWeightLaw.indistinguishable_of_matching_computed_quantities",
+    "Calibrator.hardCall_arithmeticProgression_at_critical_maf",
+    "Calibrator.hweObservableContent_components"
    ]
   },
   {
@@ -31838,7 +32103,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 772,
+   "line": 778,
    "signature": ": ℝ",
    "args": [],
    "ret_type": "ℝ",
@@ -31883,7 +32148,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 816,
+   "line": 822,
    "signature": "(h : HardyWeinbergModel) : ℝ",
    "args": [
     {
@@ -31927,7 +32192,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 825,
+   "line": 831,
    "signature": "(q : ℝ) : ℝ",
    "args": [
     {
@@ -31950,16 +32215,26 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "hypotheses": [],
+    "hypotheses": [
+     "(hweObservableContent squareCumulant q"
+    ],
     "hypotheses_by_theorem": {
      "Calibrator.no_signSymmetric_nondegenerate_locus": [],
+     "Calibrator.hweObservableContent_components": [],
+     "Calibrator.hweObservableContent_symmetric_jetVariance_zero": [
+      "(hweObservableContent squareCumulant q"
+     ],
+     "Calibrator.VertexWeightLaw.indistinguishable_of_matching_computed_quantities": [],
      "Calibrator.HardyWeinbergModel.mellinJetVariance_eq": [],
      "Calibrator.balanced_locus_symmetric_component": []
     }
    },
    "mentioned_by": [
     "Calibrator.HardyWeinbergModel.mellinJetVariance_eq",
+    "Calibrator.VertexWeightLaw.indistinguishable_of_matching_computed_quantities",
     "Calibrator.balanced_locus_symmetric_component",
+    "Calibrator.hweObservableContent_components",
+    "Calibrator.hweObservableContent_symmetric_jetVariance_zero",
     "Calibrator.no_signSymmetric_nondegenerate_locus"
    ]
   },
@@ -31969,7 +32244,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 860,
+   "line": 866,
    "signature": ": ℝ",
    "args": [],
    "ret_type": "ℝ",
@@ -32006,7 +32281,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 918,
+   "line": 924,
    "signature": ": MellinObservables where drift",
    "args": [],
    "ret_type": "MellinObservables where drift",
@@ -32037,7 +32312,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 1069,
+   "line": 1075,
    "signature": "(h : HardyWeinbergModel) (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) : CodingInvariants where drift",
    "args": [
     {
@@ -46952,6 +47227,10 @@
       "0 < h.altFreq",
       "h.altFreq < 1"
      ],
+     "Calibrator.hweObservableContent_symmetry": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
      "Calibrator.hweThirdCentralMoment_eq": [],
      "Calibrator.hwe_symmetricCoding_forces_half": [
       "0 < h.altFreq",
@@ -46985,6 +47264,7 @@
     "Calibrator.HardyWeinbergModel.genotypeProb_sum",
     "Calibrator.HardyWeinbergModel.genotypeVariance_eq",
     "Calibrator.genotypeProb_values",
+    "Calibrator.hweObservableContent_symmetry",
     "Calibrator.hweThirdCentralMoment_eq",
     "Calibrator.hwe_symmetricCoding_forces_half",
     "Calibrator.hwe_symmetricCoding_iff_half",
@@ -59514,6 +59794,111 @@
    "mentioned_by": []
   },
   {
+   "name": "Calibrator.GenotypeObservableContent",
+   "short": "GenotypeObservableContent",
+   "kind": "structure",
+   "noncomputable": false,
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 442,
+   "signature": "where drift : ℝ jetVariance : ℝ IsLattice : Prop IsSignSymmetric : Prop squareCumulant : ℕ → ℝ",
+   "args": [],
+   "ret_type": "ℝ jetVariance : ℝ IsLattice : Prop IsSignSymmetric : Prop squareCumulant : ℕ → ℝ",
+   "body": "",
+   "docstring": "**The complete observable content of a coordinate law**, per the Vertex-Weight Law:\nthe Mellin two-jet, the arithmetic type of `log x²`, the symmetry verdict, and the\ncumulant sequence of `x²`.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [
+    {
+     "name": "drift",
+     "type": "ℝ"
+    },
+    {
+     "name": "jetVariance",
+     "type": "ℝ"
+    },
+    {
+     "name": "IsLattice",
+     "type": "Prop"
+    },
+    {
+     "name": "IsSignSymmetric",
+     "type": "Prop"
+    },
+    {
+     "name": "squareCumulant",
+     "type": "ℕ → ℝ"
+    }
+   ],
+   "equations": [],
+   "constraints": {
+    "raw_chunk_lines": 20
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Calibrator.VertexWeightLaw",
+   "short": "VertexWeightLaw",
+   "kind": "structure",
+   "noncomputable": false,
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 529,
+   "signature": "(n : ℕ) (ι : Type*) (Limit : Type*) where isAdmissible : GenotypeDesign n ι → Prop limitLaw : GenotypeDesign n ι → Limit squareCumulant : ℝ → ℕ → ℝ vertex_weight : ∀ (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel), isAdmissible (design.reModel model) → isAdmissible (design.reModel model') → (∀ i : Fin n, hweObservableContent squareCumulant (model i).altFreq = hweObservableContent squareCumulant (model' i).altFreq) → limitLaw (design.reModel model) = limitLaw (design.reModel model')",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "ι"
+     ],
+     "type": "Type*",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "Limit"
+     ],
+     "type": "Type*",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "GenotypeDesign n ι → Prop limitLaw : GenotypeDesign n ι → Limit squareCumulant : ℝ → ℕ → ℝ vertex_weight : ∀ (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel), isAdmissible (design.reModel model) → isAdmissible (design.reModel model') → (∀ i : Fin n, hweObservableContent squareCumulant (model i).altFreq = hweObservableContent squareCumulant (model' i).altFreq) → limitLaw (design.reModel model) = limitLaw (design.reModel model')",
+   "body": "",
+   "docstring": "The Vertex-Weight Law over a genotype panel, carried as a field.\n\n`limitLaw` is the limit of a design's statistic. The field says the limit depends on the\nallele-frequency family only through the observable content of each locus — the two-jet,\nthe arithmetic type, the symmetry verdict, and the square-cumulant sequence — and\nthrough nothing else.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [
+    {
+     "name": "isAdmissible",
+     "type": "GenotypeDesign n ι → Prop"
+    },
+    {
+     "name": "limitLaw",
+     "type": "GenotypeDesign n ι → Limit"
+    },
+    {
+     "name": "squareCumulant",
+     "type": "ℝ → ℕ → ℝ"
+    },
+    {
+     "name": "vertex_weight",
+     "type": "∀ (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel),"
+    }
+   ],
+   "equations": [],
+   "constraints": {
+    "raw_chunk_lines": 19
+   },
+   "mentioned_by": []
+  },
+  {
    "name": "Calibrator.HWEPolygenicScoreDGP",
    "short": "HWEPolygenicScoreDGP",
    "kind": "structure",
@@ -60431,7 +60816,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1558,
+   "line": 1562,
    "signature": "(nx : ℕ) (ιx : Type*) [Fintype ιx] [DecidableEq ιx] (Limit : Type*) where isAdmissible : GenotypeDesign nx ιx → Prop limitLaw : GenotypeDesign nx ιx → Limit temperingRate : ℕ → ℝ cycles_determine : ∀ (rate : ℝ) (designOne designTwo : GenotypeDesign nx ιx), isAdmissible designOne → isAdmissible designTwo → designOne.Tempered rate → designTwo.Tempered rate → (∀ p : ℕ, designOne.cycleDensity p = designTwo.cycleDensity p) → limitLaw designOne = limitLaw designTwo tempered_of_boundedHub : ∀ (design : GenotypeDesign nx ιx) (bound : ℕ), isAdmissible design → design.BoundedHubRecurrence bound → design.Tempered (temperingRate bound) divergence_phase : ∀ (rate : ℝ) (truncation : ℕ), ∃ designOne designTwo : GenotypeDesign nx ιx, isAdmissible designOne ∧ isAdmissible designTwo ∧ ¬ designOne.Tempered rate ∧ (∀ p : ℕ, p ≤ truncation → designOne.cycleDensity p = designTwo.cycleDensity p) ∧ limitLaw designOne ≠ limitLaw designTwo",
    "args": [
     {
@@ -62138,7 +62523,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 1010,
+   "line": 1016,
    "signature": "where drift : ℝ jetVariance : ℝ arithmeticType : LatticeDatum symmetric : Prop squareCumulant : ℕ → ℝ",
    "args": [],
    "ret_type": "ℝ jetVariance : ℝ arithmeticType : LatticeDatum symmetric : Prop squareCumulant : ℕ → ℝ",
@@ -62180,7 +62565,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PolygenicSpectroscopy.lean",
-   "line": 1029,
+   "line": 1035,
    "signature": "(Law Design Observation : Type*) where invariants : Law → CodingInvariants observe : Law → Design → Observation complete : ∀ ν ν' : Law, invariants ν = invariants ν' → ∀ D : Design, observe ν D = observe ν' D",
    "args": [
     {

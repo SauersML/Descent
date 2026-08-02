@@ -399,15 +399,21 @@
     "rejected_by": [
      "range"
     ]
+   },
+   {
+    "mutation": "swap-args(n_eff,\u03b2)",
+    "body": "\u03b2 * n_eff ^ 2",
+    "rejected_by": [
+     "range"
+    ]
    }
   ],
-  "n_killed": 1,
+  "n_killed": 2,
   "survived": [
    "const-off-by-one",
    "swap-times-div",
    "shift-by-half",
-   "scale-by-three",
-   "swap-args(n_eff,\u03b2)"
+   "scale-by-three"
   ],
   "reason": null
  },
@@ -419,42 +425,12 @@
    "continuity",
    "range"
   ],
-  "n_mutants": 4,
   "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(r2_causal / r2_total)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "(r2_causal / r2_total) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (r2_causal / r2_total)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(r2_causal,r2_total)",
-    "body": "r2_total / r2_causal",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 4,
-  "survived": [],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "AncestrySpecificPower.proportionalAllocation": {
   "name": "proportionalAllocation",
@@ -479,17 +455,24 @@
    "range"
   ],
   "n_mutants": 4,
-  "covered": false,
-  "demonstration": null,
-  "killed": [],
-  "n_killed": 0,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "killed": [
+   {
+    "mutation": "negate",
+    "body": "-(1 / effectiveFisherInformation n p r2_ld)",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
+  "n_killed": 1,
   "survived": [
-   "negate",
    "shift-by-half",
    "scale-by-three",
    "swap-args(p,r2_ld)"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": null
  },
  "AssortativeMatingPGS.amCorrectedPortability": {
   "name": "amCorrectedPortability",
@@ -813,42 +796,12 @@
    "continuity",
    "range"
   ],
-  "n_mutants": 4,
   "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(indirect_effect / total_effect)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "(indirect_effect / total_effect) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (indirect_effect / total_effect)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(indirect_effect,total_effect)",
-    "body": "total_effect / indirect_effect",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 4,
-  "survived": [],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "ClinicalUtilityFairness.netReclassificationImprovement": {
   "name": "netReclassificationImprovement",
@@ -1115,7 +1068,7 @@
  "Condensation.criticalDegree": {
   "name": "criticalDegree",
   "module": "Condensation",
-  "line": 246,
+  "line": 287,
   "registered": [
    "continuity"
   ],
@@ -1135,7 +1088,7 @@
  "Condensation.gaussianJetVariance": {
   "name": "gaussianJetVariance",
   "module": "Condensation",
-  "line": 221,
+  "line": 262,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -1143,7 +1096,7 @@
  "Condensation.windowVariance": {
   "name": "windowVariance",
   "module": "Condensation",
-  "line": 309,
+  "line": 350,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -1589,49 +1542,12 @@
    "continuity",
    "range"
   ],
-  "n_mutants": 14,
   "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(kappa * taggingMismatchScale recombRate arraySparsity * (fstTarget - fstSource))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(fstSource,fstTarget)",
-    "body": "kappa * taggingMismatchScale recombRate arraySparsity * (fstSource - fstTarget)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(fstSource,recombRate)",
-    "body": "kappa * taggingMismatchScale fstSource arraySparsity * (fstTarget - recombRate)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(fstSource,arraySparsity)",
-    "body": "kappa * taggingMismatchScale recombRate fstSource * (fstTarget - arraySparsity)",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 8,
-  "survived": [
-   "swap-times-div",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(recombRate,arraySparsity)",
-   "swap-args(recombRate,kappa)",
-   "swap-args(arraySparsity,kappa)"
-  ],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "DGP.discreteRecombinationSurvival": {
   "name": "discreteRecombinationSurvival",
@@ -1658,15 +1574,37 @@
   "module": "DGP",
   "line": 182,
   "registered": [
-   "range",
    "scale"
   ],
+  "n_mutants": 8,
   "covered": true,
-  "demonstration": "rejects-as-written",
-  "rejected_by": [
-   "range"
+  "demonstration": "mutant-rejected",
+  "killed": [
+   {
+    "mutation": "const-off-by-one",
+    "body": "scoreOutcomeCov ^ 4 / (scoreVariance * outcomeVariance)",
+    "rejected_by": [
+     "scale"
+    ]
+   },
+   {
+    "mutation": "swap-times-div",
+    "body": "scoreOutcomeCov ^ 2 / (scoreVariance / outcomeVariance)",
+    "rejected_by": [
+     "scale"
+    ]
+   }
   ],
-  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
+  "n_killed": 2,
+  "survived": [
+   "negate",
+   "shift-by-half",
+   "scale-by-three",
+   "swap-args(scoreOutcomeCov,scoreVariance)",
+   "swap-args(scoreOutcomeCov,outcomeVariance)",
+   "swap-args(scoreVariance,outcomeVariance)"
+  ],
+  "reason": null
  },
  "DGP.gaussianAUCFromSignalVariance": {
   "name": "gaussianAUCFromSignalVariance",
@@ -1831,6 +1769,29 @@
   ],
   "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
+ "DemographicCapacity.contrastSpikeLevel": {
+  "name": "contrastSpikeLevel",
+  "module": "DemographicCapacity",
+  "line": 46,
+  "registered": [
+   "continuity"
+  ],
+  "n_mutants": 7,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
+  "survived": [
+   "const-off-by-one",
+   "drop-a-one-minus",
+   "negate",
+   "swap-times-div",
+   "shift-by-half",
+   "scale-by-three",
+   "swap-args(p\u2081,p\u2082)"
+  ],
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+ },
  "DemographicHistory.admixedAlleleFreq": {
   "name": "admixedAlleleFreq",
   "module": "DemographicHistory",
@@ -1983,7 +1944,6 @@
     "mutation": "swap-times-div",
     "body": "1 - (1 - 1 / (2 / (k : \u211d))) ^ t",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    },
@@ -2121,7 +2081,7 @@
  "DriftRegime.benchmarkRatio": {
   "name": "benchmarkRatio",
   "module": "DriftRegime",
-  "line": 227,
+  "line": 274,
   "registered": [
    "continuity"
   ],
@@ -2142,7 +2102,7 @@
  "DriftRegime.benchmarkRatioSquared": {
   "name": "benchmarkRatioSquared",
   "module": "DriftRegime",
-  "line": 231,
+  "line": 278,
   "registered": [
    "continuity"
   ],
@@ -2164,7 +2124,7 @@
  "DriftRegime.driftRetention": {
   "name": "driftRetention",
   "module": "DriftRegime",
-  "line": 159,
+  "line": 182,
   "registered": [
    "continuity",
    "range"
@@ -2191,7 +2151,6 @@
     "mutation": "swap-times-div",
     "body": "(1 - 1 / (2 / Ne)) ^ t",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    },
@@ -2212,7 +2171,7 @@
  "DriftRegime.lossOfRetention": {
   "name": "lossOfRetention",
   "module": "DriftRegime",
-  "line": 162,
+  "line": 194,
   "registered": [
    "continuity",
    "range"
@@ -2257,7 +2216,7 @@
  "DriftRegime.targetHetOfRetention": {
   "name": "targetHetOfRetention",
   "module": "DriftRegime",
-  "line": 165,
+  "line": 197,
   "registered": [
    "continuity",
    "range"
@@ -2298,7 +2257,7 @@
  "DriftRegime.targetPgsVarOfRetention": {
   "name": "targetPgsVarOfRetention",
   "module": "DriftRegime",
-  "line": 168,
+  "line": 204,
   "registered": [
    "continuity",
    "range"
@@ -2354,7 +2313,7 @@
  "EpistaticChaos.circulantSpectrumA": {
   "name": "circulantSpectrumA",
   "module": "EpistaticChaos",
-  "line": 1355,
+  "line": 1359,
   "registered": [
    "continuity"
   ],
@@ -2376,7 +2335,7 @@
  "EpistaticChaos.circulantSpectrumB": {
   "name": "circulantSpectrumB",
   "module": "EpistaticChaos",
-  "line": 1362,
+  "line": 1366,
   "registered": [
    "continuity"
   ],
@@ -2398,10 +2357,48 @@
  "EpistaticChaos.fourthCumulantFromMoments": {
   "name": "fourthCumulantFromMoments",
   "module": "EpistaticChaos",
-  "line": 1225,
+  "line": 1229,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
+ },
+ "EpistaticChaos.palindromicCycleDensityA": {
+  "name": "palindromicCycleDensityA",
+  "module": "EpistaticChaos",
+  "line": 1698,
+  "registered": [
+   "continuity"
+  ],
+  "n_mutants": 3,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
+  "survived": [
+   "const-off-by-one",
+   "swap-plus-minus",
+   "swap-times-div"
+  ],
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+ },
+ "EpistaticChaos.palindromicCycleDensityB": {
+  "name": "palindromicCycleDensityB",
+  "module": "EpistaticChaos",
+  "line": 1707,
+  "registered": [
+   "continuity"
+  ],
+  "n_mutants": 3,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
+  "survived": [
+   "const-off-by-one",
+   "swap-plus-minus",
+   "swap-times-div"
+  ],
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "EquityAndImplementation.expectedR2FromN": {
   "name": "expectedR2FromN",
@@ -2486,46 +2483,12 @@
    "range",
    "scale"
   ],
-  "n_mutants": 7,
   "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "swap-times-div",
-    "body": "cov_g / Real.sqrt (vg\u2081 / vg\u2082)",
-    "rejected_by": [
-     "range",
-     "scale"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "(cov_g / Real.sqrt (vg\u2081 * vg\u2082)) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (cov_g / Real.sqrt (vg\u2081 * vg\u2082))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(cov_g,vg\u2081)",
-    "body": "vg\u2081 / Real.sqrt (cov_g * vg\u2082)",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 5,
-  "survived": [
-   "negate",
-   "swap-args(vg\u2081,vg\u2082)"
-  ],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "GeneticArchitectureDiscovery.multiTraitDiscoveryNCP": {
   "name": "multiTraitDiscoveryNCP",
@@ -2779,6 +2742,13 @@
   "demonstration": "mutant-rejected",
   "killed": [
    {
+    "mutation": "const-off-by-one",
+    "body": "(1 - 4 * s)^2",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
     "mutation": "drop-a-one-minus",
     "body": "(1 + 2 * s)^2",
     "rejected_by": [
@@ -2793,13 +2763,6 @@
     ]
    },
    {
-    "mutation": "swap-times-div",
-    "body": "(1 - 2 / s)^2",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
     "mutation": "shift-by-half",
     "body": "((1 - 2 * s)^2) + 0.5",
     "rejected_by": [
@@ -2809,7 +2772,7 @@
   ],
   "n_killed": 5,
   "survived": [
-   "const-off-by-one"
+   "swap-times-div"
   ],
   "reason": null
  },
@@ -2883,7 +2846,7 @@
  "ImitationCapacity.stratificationCertificateMargin": {
   "name": "stratificationCertificateMargin",
   "module": "ImitationCapacity",
-  "line": 1068,
+  "line": 1220,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -2891,7 +2854,7 @@
  "ImitationCapacity.traceWindowSpikeLoad": {
   "name": "traceWindowSpikeLoad",
   "module": "ImitationCapacity",
-  "line": 848,
+  "line": 1000,
   "registered": [
    "continuity"
   ],
@@ -2910,7 +2873,7 @@
  "ImitationCapacity.whitenedCapacity": {
   "name": "whitenedCapacity",
   "module": "ImitationCapacity",
-  "line": 868,
+  "line": 1020,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -2918,7 +2881,7 @@
  "ImitationRigidity.absorptionChannelWeight": {
   "name": "absorptionChannelWeight",
   "module": "ImitationRigidity",
-  "line": 1215,
+  "line": 1287,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -2926,7 +2889,7 @@
  "ImitationRigidity.absorptionInformation": {
   "name": "absorptionInformation",
   "module": "ImitationRigidity",
-  "line": 1151,
+  "line": 1223,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -2934,7 +2897,7 @@
  "ImitationRigidity.alleleLossProbability": {
   "name": "alleleLossProbability",
   "module": "ImitationRigidity",
-  "line": 1146,
+  "line": 1218,
   "registered": [
    "range"
   ],
@@ -2948,7 +2911,7 @@
  "ImitationRigidity.fairTwoPointVariance": {
   "name": "fairTwoPointVariance",
   "module": "ImitationRigidity",
-  "line": 262,
+  "line": 334,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -2956,7 +2919,7 @@
  "ImitationRigidity.informationCrossoverTime": {
   "name": "informationCrossoverTime",
   "module": "ImitationRigidity",
-  "line": 1226,
+  "line": 1298,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -2964,7 +2927,7 @@
  "ImitationRigidity.ldHardEdge": {
   "name": "ldHardEdge",
   "module": "ImitationRigidity",
-  "line": 626,
+  "line": 698,
   "registered": [
    "continuity"
   ],
@@ -2992,7 +2955,7 @@
  "ImitationRigidity.ldKernelSymbol": {
   "name": "ldKernelSymbol",
   "module": "ImitationRigidity",
-  "line": 617,
+  "line": 689,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -3000,7 +2963,7 @@
  "ImitationRigidity.ldPrecisionTrace": {
   "name": "ldPrecisionTrace",
   "module": "ImitationRigidity",
-  "line": 796,
+  "line": 868,
   "registered": [
    "continuity"
   ],
@@ -3023,7 +2986,7 @@
  "ImitationRigidity.ldWhiteningGain": {
   "name": "ldWhiteningGain",
   "module": "ImitationRigidity",
-  "line": 636,
+  "line": 708,
   "registered": [
    "continuity"
   ],
@@ -3052,7 +3015,7 @@
  "ImitationRigidity.scalarRowResolvent": {
   "name": "scalarRowResolvent",
   "module": "ImitationRigidity",
-  "line": 248,
+  "line": 320,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -3060,7 +3023,7 @@
  "ImitationRigidity.stationaryLDEntry": {
   "name": "stationaryLDEntry",
   "module": "ImitationRigidity",
-  "line": 554,
+  "line": 626,
   "registered": [
    "continuity"
   ],
@@ -3169,48 +3132,9 @@
   "name": "meanImputationR2",
   "module": "ImputationPortability",
   "line": 112,
-  "registered": [
-   "range"
-  ],
-  "n_mutants": 6,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "drop-a-one-minus",
-    "body": "max 0 (1 + c / ld_extent)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "body": "-(max 0 (1 - c / ld_extent))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "(max 0 (1 - c / ld_extent)) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (max 0 (1 - c / ld_extent))",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 4,
-  "survived": [
-   "drop-max-guard",
-   "swap-args(c,ld_extent)"
-  ],
-  "reason": null
+  "registered": [],
+  "covered": false,
+  "reason": "no check on this definition currently holds, so there is nothing to falsify"
  },
  "ImputationPortability.total_portability_loss": {
   "name": "total_portability_loss",
@@ -3368,27 +3292,20 @@
    "continuity"
   ],
   "n_mutants": 7,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "swap-args(D\u2080,r)",
-    "body": "r * (ldRetentionPerGen D\u2080 Ne) ^ t",
-    "rejected_by": [
-     "continuity"
-    ]
-   }
-  ],
-  "n_killed": 1,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
    "negate",
    "swap-times-div",
    "shift-by-half",
    "scale-by-three",
+   "swap-args(D\u2080,r)",
    "swap-args(D\u2080,Ne)",
    "swap-args(r,Ne)"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "LDDecayTheory.ldDecayRatePerGen": {
   "name": "ldDecayRatePerGen",
@@ -3462,7 +3379,6 @@
     "mutation": "swap-times-div",
     "body": "(1 - 1/(2 / Ne)) ^ t",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    },
@@ -3532,47 +3448,23 @@
   "module": "LDDecayTheory",
   "line": 117,
   "registered": [
-   "continuity",
-   "range"
+   "continuity"
   ],
   "n_mutants": 7,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(D_sq / (var_tag * var_causal))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "body": "D_sq / (var_tag / var_causal)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "(D_sq / (var_tag * var_causal)) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (D_sq / (var_tag * var_causal))",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 6,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
+   "negate",
+   "swap-times-div",
+   "shift-by-half",
+   "scale-by-three",
+   "swap-args(D_sq,var_tag)",
+   "swap-args(D_sq,var_causal)",
    "swap-args(var_tag,var_causal)"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "LocalToGlobalCoherence.expanderAgreementFloor": {
   "name": "expanderAgreementFloor",
@@ -3751,7 +3643,7 @@
  "MetricSpecificPortability.ldBandDetectionShare": {
   "name": "ldBandDetectionShare",
   "module": "MetricSpecificPortability",
-  "line": 1182,
+  "line": 1183,
   "registered": [
    "continuity",
    "range"
@@ -3766,33 +3658,22 @@
  "MetricSpecificPortability.ldBlockDetectionShare": {
   "name": "ldBlockDetectionShare",
   "module": "MetricSpecificPortability",
-  "line": 1455,
+  "line": 1456,
   "registered": [
    "continuity",
    "range"
   ],
-  "n_mutants": 2,
   "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "swap-args(retainedMarkers,totalMarkers)",
-    "body": "ldBandDetectionShare (ldRetentionPerGen recomb Ne)\n(ldPanelRetentionFraction totalMarkers retainedMarkers)",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 1,
-  "survived": [
-   "swap-args(recomb,Ne)"
-  ],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "MetricSpecificPortability.ldBlockPruningDeficit": {
   "name": "ldBlockPruningDeficit",
   "module": "MetricSpecificPortability",
-  "line": 1465,
+  "line": 1466,
   "registered": [
    "continuity"
   ],
@@ -3810,52 +3691,22 @@
  "MetricSpecificPortability.ldPanelRetentionFraction": {
   "name": "ldPanelRetentionFraction",
   "module": "MetricSpecificPortability",
-  "line": 1393,
+  "line": 1394,
   "registered": [
    "continuity",
    "range"
   ],
-  "n_mutants": 4,
   "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-((retainedMarkers : \u211d) / (totalMarkers : \u211d))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "((retainedMarkers : \u211d) / (totalMarkers : \u211d)) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * ((retainedMarkers : \u211d) / (totalMarkers : \u211d))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(retainedMarkers,totalMarkers)",
-    "body": "(totalMarkers : \u211d) / (retainedMarkers : \u211d)",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 4,
-  "survived": [],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "MetricSpecificPortability.ldPruningDetectionDeficit": {
   "name": "ldPruningDetectionDeficit",
   "module": "MetricSpecificPortability",
-  "line": 1189,
+  "line": 1190,
   "registered": [
    "continuity"
   ],
@@ -3878,26 +3729,17 @@
  "MetricSpecificPortability.ldTightLinkageDetectionShare": {
   "name": "ldTightLinkageDetectionShare",
   "module": "MetricSpecificPortability",
-  "line": 1476,
+  "line": 1477,
   "registered": [
    "continuity",
    "range"
   ],
-  "n_mutants": 1,
   "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "swap-args(retainedMarkers,totalMarkers)",
-    "body": "ldPanelRetentionFraction totalMarkers retainedMarkers -\nReal.sin (Real.pi *\nldPanelRetentionFraction totalMarkers retainedMarkers) / Real.pi",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 1,
-  "survived": [],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "MetricSpecificPortability.metricPPV": {
   "name": "metricPPV",
@@ -3926,8 +3768,7 @@
   "module": "MetricSpecificPortability",
   "line": 804,
   "registered": [
-   "continuity",
-   "range"
+   "continuity"
   ],
   "n_mutants": 6,
   "covered": false,
@@ -4126,24 +3967,9 @@
   "name": "samplePCResidualAxisFraction",
   "module": "Overlap",
   "line": 64,
-  "registered": [
-   "range"
-  ],
-  "n_mutants": 7,
+  "registered": [],
   "covered": false,
-  "demonstration": null,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "drop-a-one-minus",
-   "negate",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(n,M)",
-   "swap-args(n,spike)",
-   "swap-args(M,spike)"
-  ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "no check on this definition currently holds, so there is nothing to falsify"
  },
  "PGSCalibrationTheory.calibrationInTheLarge": {
   "name": "calibrationInTheLarge",
@@ -4313,26 +4139,19 @@
    "continuity"
   ],
   "n_mutants": 6,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "swap-times-div",
-    "body": "(1 - 1 / (2 / Ne)) ^ t",
-    "rejected_by": [
-     "continuity"
-    ]
-   }
-  ],
-  "n_killed": 1,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
    "const-off-by-one",
    "drop-a-one-minus",
    "negate",
+   "swap-times-div",
    "shift-by-half",
    "scale-by-three"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PhenomeWidePortability.neutralPortabilityRatioLD": {
   "name": "neutralPortabilityRatioLD",
@@ -4369,10 +4188,16 @@
     ]
    },
    {
+    "mutation": "swap-plus-minus",
+    "body": "(1 - 1 / (2 * Ne) - s_correction) ^ t",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
     "mutation": "swap-times-div",
     "body": "(1 - 1 / (2 / Ne) + s_correction) ^ t",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    },
@@ -4380,16 +4205,14 @@
     "mutation": "swap-args(Ne,s_correction)",
     "body": "(1 - 1 / (2 * s_correction) + Ne) ^ t",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    }
   ],
-  "n_killed": 3,
+  "n_killed": 4,
   "survived": [
    "const-off-by-one",
    "drop-a-one-minus",
-   "swap-plus-minus",
    "shift-by-half",
    "scale-by-three"
   ],
@@ -4402,42 +4225,12 @@
   "registered": [
    "range"
   ],
-  "n_mutants": 9,
   "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "drop-a-one-minus",
-    "body": "max (-1) (1 + d * (1 + f * N))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-plus-minus",
-    "body": "max (-1) (1 - d * (1 - f * N))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (max (-1) (1 - d * (1 + f * N)))",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 3,
-  "survived": [
-   "negate",
-   "swap-times-div",
-   "shift-by-half",
-   "swap-args(d,f)",
-   "swap-args(d,N)",
-   "swap-args(f,N)"
-  ],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PolygenicAdaptation.effectCorrelationStabilizing": {
   "name": "effectCorrelationStabilizing",
@@ -4700,7 +4493,7 @@
  "PolygenicSpectroscopy.hweMellinJetVariance": {
   "name": "hweMellinJetVariance",
   "module": "PolygenicSpectroscopy",
-  "line": 809,
+  "line": 831,
   "registered": [
    "continuity"
   ],
@@ -4719,7 +4512,7 @@
  "PolygenicSpectroscopy.latticeCriticalMaf": {
   "name": "latticeCriticalMaf",
   "module": "PolygenicSpectroscopy",
-  "line": 756,
+  "line": 778,
   "registered": [
    "range"
   ],
@@ -4746,7 +4539,7 @@
  "PolygenicSpectroscopy.maxSafeEpistaticOrder": {
   "name": "maxSafeEpistaticOrder",
   "module": "PolygenicSpectroscopy",
-  "line": 605,
+  "line": 627,
   "registered": [
    "continuity"
   ],
@@ -4794,8 +4587,7 @@
   "line": 127,
   "registered": [
    "continuity",
-   "limit",
-   "range"
+   "limit"
   ],
   "n_mutants": 7,
   "covered": true,
@@ -4805,16 +4597,14 @@
     "mutation": "negate",
     "body": "-(t / (t + 2 * Ne))",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "swap-plus-minus",
     "body": "t / (t - 2 * Ne)",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
@@ -4828,14 +4618,14 @@
     "mutation": "shift-by-half",
     "body": "(t / (t + 2 * Ne)) + 0.5",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    }
   ],
-  "n_killed": 6,
+  "n_killed": 5,
   "survived": [
-   "const-off-by-one"
+   "const-off-by-one",
+   "scale-by-three"
   ],
   "reason": null
  },
@@ -5094,7 +4884,6 @@
     "mutation": "swap-times-div",
     "body": "1 - (1 - 1 / (2 / Ne)) ^ t",
     "rejected_by": [
-     "continuity",
      "limit",
      "range"
     ]
@@ -5297,37 +5086,35 @@
     "mutation": "drop-a-one-minus",
     "body": "fstMutationDriftEquilibrium \u03b8 * (1 + hetDecayFactor Ne \u03b8 ^ t)",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "negate",
     "body": "-(fstMutationDriftEquilibrium \u03b8 * (1 - hetDecayFactor Ne \u03b8 ^ t))",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "swap-times-div",
     "body": "fstMutationDriftEquilibrium \u03b8 / (1 - hetDecayFactor Ne \u03b8 ^ t)",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "shift-by-half",
     "body": "(fstMutationDriftEquilibrium \u03b8 * (1 - hetDecayFactor Ne \u03b8 ^ t)) + 0.5",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    }
   ],
-  "n_killed": 6,
-  "survived": [],
+  "n_killed": 5,
+  "survived": [
+   "scale-by-three"
+  ],
   "reason": null
  },
  "PopulationGeneticsFoundations.hetDecayFactor": {
@@ -5408,26 +5195,19 @@
    "continuity"
   ],
   "n_mutants": 6,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "swap-times-div",
-    "body": "1 - (1 - 1 / (2 / Ne)) ^ t",
-    "rejected_by": [
-     "continuity"
-    ]
-   }
-  ],
-  "n_killed": 1,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
    "const-off-by-one",
    "drop-a-one-minus",
    "negate",
+   "swap-times-div",
    "shift-by-half",
    "scale-by-three"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PopulationGeneticsFoundations.islandModelFst": {
   "name": "islandModelFst",
@@ -5469,7 +5249,8 @@
     "mutation": "shift-by-half",
     "body": "(1 / (1 + 4 * Ne * m)) + 0.5",
     "rejected_by": [
-     "limit"
+     "limit",
+     "range"
     ]
    }
   ],
@@ -5510,42 +5291,12 @@
    "continuity",
    "range"
   ],
-  "n_mutants": 4,
   "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-((H_T - H_S) / H_T)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "((H_T - H_S) / H_T) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * ((H_T - H_S) / H_T)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(H_T,H_S)",
-    "body": "(H_S - H_T) / H_S",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "n_killed": 4,
-  "survived": [],
-  "reason": null
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PopulationGeneticsFoundations.scaledMutationRate": {
   "name": "scaledMutationRate",
@@ -5578,19 +5329,32 @@
    "range"
   ],
   "n_mutants": 6,
-  "covered": false,
-  "demonstration": null,
-  "killed": [],
-  "n_killed": 0,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "killed": [
+   {
+    "mutation": "negate",
+    "body": "-(max 0 ((s - m - m * s) / s))",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "drop-max-guard",
+    "body": "((s - m - m * s) / s)",
+    "rejected_by": [
+     "range"
+    ]
+   }
+  ],
+  "n_killed": 2,
   "survived": [
-   "negate",
    "swap-times-div",
-   "drop-max-guard",
    "shift-by-half",
    "scale-by-three",
    "swap-args(s,m)"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": null
  },
  "PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst": {
   "name": "selectionMigrationEquilibriumMigrationFirst",
@@ -5876,7 +5640,7 @@
  "PortabilityDrift.admixtureLDBoost": {
   "name": "admixtureLDBoost",
   "module": "PortabilityDrift",
-  "line": 5111,
+  "line": 5207,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -5884,7 +5648,7 @@
  "PortabilityDrift.admixtureLDDecay": {
   "name": "admixtureLDDecay",
   "module": "PortabilityDrift",
-  "line": 5064,
+  "line": 5160,
   "registered": [
    "continuity"
   ],
@@ -5944,7 +5708,7 @@
  "PortabilityDrift.asymmetricFst": {
   "name": "asymmetricFst",
   "module": "PortabilityDrift",
-  "line": 5002,
+  "line": 5098,
   "registered": [
    "range"
   ],
@@ -6103,7 +5867,7 @@
  "PortabilityDrift.effectiveSymmetricMigration": {
   "name": "effectiveSymmetricMigration",
   "module": "PortabilityDrift",
-  "line": 5043,
+  "line": 5139,
   "registered": [
    "continuity"
   ],
@@ -6398,48 +6162,39 @@
  "PortabilityDrift.fstIslandMultiplicativeEquilibrium": {
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4613,
+  "line": 4727,
   "registered": [
    "continuity",
    "limit"
   ],
-  "n_mutants": 8,
+  "n_mutants": 4,
   "covered": true,
   "demonstration": "mutant-rejected",
   "killed": [
    {
     "mutation": "negate",
-    "body": "-((1 - m) ^ 2 / ((1 - m) ^ 2 + 2 * Ne * m * (2 - m)))",
-    "rejected_by": [
-     "limit"
-    ]
-   },
-   {
-    "mutation": "swap-plus-minus",
-    "body": "(1 - m) ^ 2 / ((1 - m) ^ 2 - 2 * Ne * m * (2 - m))",
-    "rejected_by": [
-     "limit"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "body": "(1 - m) ^ 2 / ((1 - m) ^ 2 + 2 / Ne * m * (2 - m))",
+    "body": "-(ibdRecurrenceFixedPoint Ne m)",
     "rejected_by": [
      "limit"
     ]
    },
    {
     "mutation": "shift-by-half",
-    "body": "((1 - m) ^ 2 / ((1 - m) ^ 2 + 2 * Ne * m * (2 - m))) + 0.5",
+    "body": "(ibdRecurrenceFixedPoint Ne m) + 0.5",
+    "rejected_by": [
+     "limit"
+    ]
+   },
+   {
+    "mutation": "swap-args(Ne,m)",
+    "body": "ibdRecurrenceFixedPoint m Ne",
     "rejected_by": [
      "limit"
     ]
    }
   ],
-  "n_killed": 5,
+  "n_killed": 3,
   "survived": [
-   "const-off-by-one",
-   "drop-a-one-minus",
    "scale-by-three"
   ],
   "reason": null
@@ -6447,7 +6202,7 @@
  "PortabilityDrift.fstMigDriftEquil": {
   "name": "fstMigDriftEquil",
   "module": "PortabilityDrift",
-  "line": 5208,
+  "line": 5304,
   "registered": [
    "continuity",
    "limit",
@@ -6503,7 +6258,7 @@
  "PortabilityDrift.fstMigDriftNext": {
   "name": "fstMigDriftNext",
   "module": "PortabilityDrift",
-  "line": 5173,
+  "line": 5269,
   "registered": [
    "continuity"
   ],
@@ -6587,48 +6342,23 @@
   "module": "PortabilityDrift",
   "line": 460,
   "registered": [
-   "continuity",
-   "range"
+   "continuity"
   ],
   "n_mutants": 7,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "const-off-by-one",
-    "body": "8 * Ne * mu / (1 + 4 * Ne * mu)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "body": "-(4 * Ne * mu / (1 + 4 * Ne * mu))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-plus-minus",
-    "body": "4 * Ne * mu / (1 - 4 * Ne * mu)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "(4 * Ne * mu / (1 + 4 * Ne * mu)) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 5,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
+   "const-off-by-one",
+   "negate",
+   "swap-plus-minus",
    "swap-times-div",
+   "shift-by-half",
+   "scale-by-three",
    "swap-args(Ne,mu)"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PortabilityDrift.hetStepWithMutation": {
   "name": "hetStepWithMutation",
@@ -6637,24 +6367,12 @@
   "registered": [
    "range"
   ],
-  "n_mutants": 10,
-  "covered": false,
-  "demonstration": null,
-  "killed": [],
-  "n_killed": 0,
-  "survived": [
-   "const-off-by-one",
-   "drop-a-one-minus",
-   "negate",
-   "swap-plus-minus",
-   "swap-times-div",
-   "shift-by-half",
-   "scale-by-three",
-   "swap-args(Ne,mu)",
-   "swap-args(Ne,H)",
-   "swap-args(mu,H)"
+  "covered": true,
+  "demonstration": "rejects-as-written",
+  "rejected_by": [
+   "range"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
  },
  "PortabilityDrift.hudsonFstFromCoalescenceTimes": {
   "name": "hudsonFstFromCoalescenceTimes",
@@ -6678,10 +6396,42 @@
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
  },
+ "PortabilityDrift.ibdRecurrenceFixedPoint": {
+  "name": "ibdRecurrenceFixedPoint",
+  "module": "PortabilityDrift",
+  "line": 4620,
+  "registered": [
+   "continuity"
+  ],
+  "n_mutants": 8,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
+  "survived": [
+   "const-off-by-one",
+   "drop-a-one-minus",
+   "negate",
+   "swap-plus-minus",
+   "swap-times-div",
+   "shift-by-half",
+   "scale-by-three",
+   "swap-args(Ne,rate)"
+  ],
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+ },
+ "PortabilityDrift.ibdRecurrenceStep": {
+  "name": "ibdRecurrenceStep",
+  "module": "PortabilityDrift",
+  "line": 4607,
+  "registered": [],
+  "covered": false,
+  "reason": "no check on this definition currently holds, so there is nothing to falsify"
+ },
  "PortabilityDrift.islandFstMultiplicativeStep": {
   "name": "islandFstMultiplicativeStep",
   "module": "PortabilityDrift",
-  "line": 4602,
+  "line": 4710,
   "registered": [
    "range"
   ],
@@ -6799,7 +6549,7 @@
  "PortabilityDrift.neutralAFBenchmarkFromRecurrence": {
   "name": "neutralAFBenchmarkFromRecurrence",
   "module": "PortabilityDrift",
-  "line": 5290,
+  "line": 5386,
   "registered": [
    "continuity",
    "monotone"
@@ -7116,8 +6866,7 @@
   "module": "PortabilityDrift",
   "line": 887,
   "registered": [
-   "continuity",
-   "range"
+   "continuity"
   ],
   "n_mutants": 4,
   "covered": false,
@@ -7204,7 +6953,7 @@
  "PortabilityDrift.scaledMigrationRate": {
   "name": "scaledMigrationRate",
   "module": "PortabilityDrift",
-  "line": 4663,
+  "line": 4759,
   "registered": [
    "continuity"
   ],
@@ -7226,7 +6975,7 @@
  "PortabilityDrift.sharedLDFromMigration": {
   "name": "sharedLDFromMigration",
   "module": "PortabilityDrift",
-  "line": 4870,
+  "line": 4966,
   "registered": [
    "continuity",
    "range"
@@ -7254,7 +7003,7 @@
  "PortabilityDrift.sharedLD_from_equilibrium": {
   "name": "sharedLD_from_equilibrium",
   "module": "PortabilityDrift",
-  "line": 4844,
+  "line": 4940,
   "registered": [
    "continuity",
    "range"
@@ -7301,7 +7050,7 @@
  "PortabilityDrift.signalRetentionMigrationDrift": {
   "name": "signalRetentionMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 4921,
+  "line": 5017,
   "registered": [
    "continuity",
    "range"
@@ -7344,7 +7093,7 @@
  "PortabilityDrift.steppingStoneFst": {
   "name": "steppingStoneFst",
   "module": "PortabilityDrift",
-  "line": 4782,
+  "line": 4878,
   "registered": [
    "continuity",
    "range"
@@ -7662,7 +7411,6 @@
     "mutation": "swap-times-div",
     "body": "(1 - 1 / (2 / (N : \u211d))) ^ t",
     "rejected_by": [
-     "continuity",
      "range"
     ]
    },
@@ -8035,15 +7783,9 @@
   "name": "partialOverlapR2",
   "module": "SampleOverlapBias",
   "line": 73,
-  "registered": [
-   "range"
-  ],
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "rejected_by": [
-   "range"
-  ],
-  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
+  "registered": [],
+  "covered": false,
+  "reason": "no check on this definition currently holds, so there is nothing to falsify"
  },
  "ScoreDistribution.benchmarkHighScoreRate": {
   "name": "benchmarkHighScoreRate",
@@ -8344,10 +8086,25 @@
    "continuity"
   ],
   "n_mutants": 12,
-  "covered": false,
-  "demonstration": null,
-  "killed": [],
-  "n_killed": 0,
+  "covered": true,
+  "demonstration": "mutant-rejected",
+  "killed": [
+   {
+    "mutation": "swap-args(v_mutation,t)",
+    "body": "Real.sqrt\n(2 * (v_selected - stabilizingSelectedArchitectureVariance t s) /\ntauFromObservedEffectCorrelation v_mutation rho)",
+    "rejected_by": [
+     "continuity"
+    ]
+   },
+   {
+    "mutation": "swap-args(s,t)",
+    "body": "Real.sqrt\n(2 * (v_selected - stabilizingSelectedArchitectureVariance v_mutation t) /\ntauFromObservedEffectCorrelation s rho)",
+    "rejected_by": [
+     "continuity"
+    ]
+   }
+  ],
+  "n_killed": 2,
   "survived": [
    "const-off-by-one",
    "swap-times-div",
@@ -8356,13 +8113,11 @@
    "swap-args(v_selected,t)",
    "swap-args(v_selected,rho)",
    "swap-args(v_mutation,s)",
-   "swap-args(v_mutation,t)",
    "swap-args(v_mutation,rho)",
-   "swap-args(s,t)",
    "swap-args(s,rho)",
    "swap-args(t,rho)"
   ],
-  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
+  "reason": null
  },
  "SelectionArchitecture.stabilizingNsFromObservedCorrelation": {
   "name": "stabilizingNsFromObservedCorrelation",
@@ -8439,15 +8194,20 @@
   "module": "StatisticalGeneticsMethodology",
   "line": 42,
   "registered": [
-   "continuity",
-   "range"
+   "continuity"
   ],
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "rejected_by": [
-   "range"
+  "n_mutants": 4,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
+  "survived": [
+   "negate",
+   "shift-by-half",
+   "scale-by-three",
+   "swap-args(r2_full,r2_covariates)"
   ],
-  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "StatisticalGeneticsMethodology.portabilityRatio": {
   "name": "portabilityRatio",
@@ -8619,29 +8379,17 @@
   "name": "deployedTransferTargetR2",
   "module": "TransferLearningPGS",
   "line": 1114,
-  "registered": [
-   "range"
-  ],
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "rejected_by": [
-   "range"
-  ],
-  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
+  "registered": [],
+  "covered": false,
+  "reason": "no check on this definition currently holds, so there is nothing to falsify"
  },
  "TransferLearningPGS.fineTunedTargetR2": {
   "name": "fineTunedTargetR2",
   "module": "TransferLearningPGS",
   "line": 1103,
-  "registered": [
-   "range"
-  ],
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "rejected_by": [
-   "range"
-  ],
-  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
+  "registered": [],
+  "covered": false,
+  "reason": "no check on this definition currently holds, so there is nothing to falsify"
  },
  "TransferLearningPGS.gaussianSourceResidualRisk": {
   "name": "gaussianSourceResidualRisk",
@@ -8811,15 +8559,37 @@
   "module": "TransferLearningPGS",
   "line": 77,
   "registered": [
-   "range",
    "scale"
   ],
+  "n_mutants": 8,
   "covered": true,
-  "demonstration": "rejects-as-written",
-  "rejected_by": [
-   "range"
+  "demonstration": "mutant-rejected",
+  "killed": [
+   {
+    "mutation": "const-off-by-one",
+    "body": "cov_pgs_y ^ 4 / (var_pgs * var_y)",
+    "rejected_by": [
+     "scale"
+    ]
+   },
+   {
+    "mutation": "swap-times-div",
+    "body": "cov_pgs_y ^ 2 / (var_pgs / var_y)",
+    "rejected_by": [
+     "scale"
+    ]
+   }
   ],
-  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
+  "n_killed": 2,
+  "survived": [
+   "negate",
+   "shift-by-half",
+   "scale-by-three",
+   "swap-args(cov_pgs_y,var_pgs)",
+   "swap-args(cov_pgs_y,var_y)",
+   "swap-args(var_pgs,var_y)"
+  ],
+  "reason": null
  },
  "TransferLearningPGS.pinskerAncestryDivergenceCap": {
   "name": "pinskerAncestryDivergenceCap",
@@ -8885,29 +8655,30 @@
   "module": "TransferLearningPGS",
   "line": 1225,
   "registered": [
-   "continuity",
-   "range"
+   "continuity"
   ],
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "rejected_by": [
-   "range"
+  "n_mutants": 6,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
+  "survived": [
+   "negate",
+   "shift-by-half",
+   "scale-by-three",
+   "swap-args(oracle_target_r2,noiseVar)",
+   "swap-args(oracle_target_r2,nTarget)",
+   "swap-args(noiseVar,nTarget)"
   ],
-  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "TransferLearningPGS.scratchTargetR2": {
   "name": "scratchTargetR2",
   "module": "TransferLearningPGS",
   "line": 1107,
-  "registered": [
-   "range"
-  ],
-  "covered": true,
-  "demonstration": "rejects-as-written",
-  "rejected_by": [
-   "range"
-  ],
-  "reason": "the check rejects the definition as it stands, which is itself the demonstration that it can fail"
+  "registered": [],
+  "covered": false,
+  "reason": "no check on this definition currently holds, so there is nothing to falsify"
  },
  "TransferLearningPGS.scratchVsFineTuningCriticalSampleSize": {
   "name": "scratchVsFineTuningCriticalSampleSize",

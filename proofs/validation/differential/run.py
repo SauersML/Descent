@@ -118,6 +118,53 @@ def classify(chk: checks.Check, res: dict) -> str:
     }.get(chk.kind, "FORMULA")
 
 
+def _actual_args(chk, D, bare, params):
+    """The exact positional arguments the check passes to the definition under
+    test at one grid point, keyed by the DEFINITION's own argument names.
+
+    A check's grid axes are named for the experiment, not for the Lean binders
+    -- `simpleFst-vs-hudson` sweeps `p1`/`p2` while the definition's binders are
+    `p_1`/`p_2`, and `steppingStoneLength-missing-mutation` sweeps a `mu` axis
+    the definition does not take at all. Handing grid keys to `api.satisfies`
+    therefore raises NameError, which reads as False, and reports every point
+    as violating every theorem. That is the third appearance of this same
+    failure mode, so it is fixed at the source: record what was actually passed.
+    """
+    captured = []
+
+    class Recorder(dict):
+        def __getitem__(self, k):
+            f = D[k]
+
+            def w(*a, **kw):
+                if k == bare:
+                    captured.append(a)
+                return f(*a, **kw)
+
+            return w
+
+    try:
+        _eval(chk.lean, Recorder(), params)
+    except Exception:
+        return None
+    if not captured:
+        return None
+    try:
+        _fn, argnames = corpus.api.callable_for(corpus.api.resolve(bare))
+    except Exception:
+        return None
+    args = captured[0]
+    if len(args) != len(argnames):
+        return None
+    return dict(zip(argnames, args))
+
+
+def _crossvalidate_points():
+    import crossvalidate as X
+
+    return X.battery_points()
+
+
 def _definitions_used(D) -> list[str]:
     """Which corpus definitions does the battery actually evaluate?"""
     import collections
@@ -140,33 +187,6 @@ def _definitions_used(D) -> list[str]:
     return sorted(seen)
 
 
-def _call_points(D):
-    """Every (definition, argument tuple) the battery actually evaluates."""
-    import collections
-
-    pts = collections.defaultdict(set)
-
-    class Recorder(dict):
-        def __getitem__(self, k):
-            f = D[k]
-
-            def w(*a, **kw):
-                pts[k].add(tuple(a))
-                return f(*a, **kw)
-
-            return w
-
-    R = Recorder()
-    for chk in checks.CHECKS:
-        for p in chk.grid:
-            for fn in (chk.lean, chk.ref):
-                try:
-                    _eval(fn, R, p)
-                except Exception:
-                    pass
-    return {k: sorted(v) for k, v in pts.items()}
-
-
 def _cross_validate(D, used) -> dict:
     """Re-run the independent leanexpr translation over the same call points.
 
@@ -176,7 +196,7 @@ def _cross_validate(D, used) -> dict:
     """
     import crossvalidate as X
 
-    pts = _call_points(D)
+    pts = X.battery_points()
     agree, dis, unav = X.compare(used, pts)
 
     def row(n, fq, pt, a, b):
@@ -221,7 +241,7 @@ def main() -> int:
         },
         "cross_validation": _cross_validate(D, used),
         "contract_totality": contracts.totality_audit(
-            corpus._leanexpr_table()[0], _call_points(D)
+            corpus._leanexpr_table()[0], _crossvalidate_points()
         ),
         "checks": {},
     }
@@ -250,9 +270,15 @@ def main() -> int:
             "max_rel_err": res["max_rel_err"],
             "min_rel_err": res["min_rel_err"],
             "worst_point": res["worst_point"],
+            "worst_point_definition_args": (
+                _actual_args(chk, D, bare, res["worst_point"]["params"])
+                if res["worst_point"] and verdict != "AGREE"
+                else None
+            ),
             "worst_point_admissibility": (
                 contracts.admissibility(
-                    prov.get(bare, {}).get("fq", chk.fqn), res["worst_point"]["params"]
+                    prov.get(bare, {}).get("fq", chk.fqn),
+                    _actual_args(chk, D, bare, res["worst_point"]["params"]) or {},
                 )
                 if res["worst_point"] and verdict != "AGREE"
                 else None

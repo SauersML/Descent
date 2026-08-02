@@ -19,6 +19,62 @@ import sympy as sp
 import leansym as L
 
 
+
+# --------------------------------------------------------------- Mathlib totality
+#
+# Lean's real operations are TOTAL: `x / 0 = 0`, `Real.log 0 = 0` (and log of a
+# negative is 0), `Real.sqrt` of a negative is 0.  A checker that raises, skips,
+# or flags at those points is measuring a different function from the one Lean
+# proved theorems about, and would manufacture defects at exactly the boundary
+# points a reviewer cares about.  Sampling therefore evaluates under Lean's
+# semantics, not Python's.
+
+_tinv = sp.Function("_tinv")   # 1/x, with 1/0 = 0
+_tlog = sp.Function("_tlog")   # Real.log, 0 outside (0, inf)
+_tsqrt = sp.Function("_tsqrt")  # Real.sqrt, 0 on negatives
+
+
+def _py_tinv(x):
+    try:
+        return 0.0 if x == 0 else 1.0 / x
+    except ZeroDivisionError:
+        return 0.0
+
+
+def _py_tlog(x):
+    import math
+    x = x.real if isinstance(x, complex) else x
+    return math.log(x) if x > 0 else 0.0
+
+
+def _py_tsqrt(x):
+    import math
+    x = x.real if isinstance(x, complex) else x
+    return math.sqrt(x) if x >= 0 else 0.0
+
+
+TOTAL_FUNCS = {"_tinv": _py_tinv, "_tlog": _py_tlog, "_tsqrt": _py_tsqrt}
+
+
+def totalize(expr):
+    """Rewrite an expression so it evaluates with Lean/Mathlib totality."""
+    if not isinstance(expr, sp.Basic):
+        return expr
+
+    def repl_pow(e):
+        b, x = e.base, e.exp
+        b = totalize(b)
+        if x.is_number and x.is_negative:
+            return _tinv(b) ** (-x)
+        if x == sp.Rational(1, 2):
+            return _tsqrt(b)
+        return sp.Pow(b, totalize(x))
+
+    expr = expr.replace(lambda e: e.is_Pow, repl_pow)
+    expr = expr.replace(sp.log, lambda a: _tlog(a))
+    return expr
+
+
 def parse_hypotheses(binders, conv):
     """Return (parsed_relationals, unparsed_texts) from a declaration's binders.
 
@@ -120,7 +176,9 @@ def equal_under(lhs, rhs, hyps, nats=(), trials=4000, need=12, seed=20260801):
     _extra = {"Abs": abs, "Min": min, "Max": max}
 
     def compile_(e):
-        for mods in ([_extra, "cmath", "math"], [_extra, "math"]):
+        e = totalize(e)
+        for mods in ([{**_extra, **TOTAL_FUNCS}, "cmath", "math"],
+                     [{**_extra, **TOTAL_FUNCS}, "math"]):
             try:
                 return sp.lambdify(syms, e, modules=mods)
             except Exception:
@@ -139,6 +197,9 @@ def equal_under(lhs, rhs, hyps, nats=(), trials=4000, need=12, seed=20260801):
         for s in syms:
             if str(s) in nats:
                 vals.append(float(rng.randint(0, 6)))
+            elif rng.random() < 0.08:
+                # exercise the boundaries where Lean's totality bites
+                vals.append(rng.choice([0.0, 1.0, -1.0]))
             else:
                 vals.append(rng.randint(-300, 300) / rng.randint(1, 200))
         try:
@@ -152,8 +213,10 @@ def equal_under(lhs, rhs, hyps, nats=(), trials=4000, need=12, seed=20260801):
             continue
         if any(z != z or abs(z) == float("inf") for z in (a, b)):
             continue
-        # a point where a side leaves the reals is a domain artefact, not a
-        # disagreement
+        # Under Mathlib totality a real expression never leaves the reals, so a
+        # complex value means the SAMPLER stepped outside the modelled domain
+        # (a symbolic power with a non-integer exponent), not that the corpus
+        # disagrees.  Still skipped, but for that reason only.
         if abs(a.imag) > 1e-9 or abs(b.imag) > 1e-9:
             continue
         accepted += 1

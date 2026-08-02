@@ -6484,7 +6484,7 @@
   "docstring": "**Every guard passes at every retention value.** The guards are satisfied by the\nalgebra alone, so they are satisfied by the wrong number exactly as readily as by the\nright one.",
   "signature": "(g : StructuralGuard) (r : ℝ)",
   "body": "g.verdict r",
-  "proof": "by\n  cases g <;>\n    · simp only [StructuralGuard.verdict, targetHetOfRetention, lossOfRetention,\n        targetPgsVarOfRetention]\n      ring",
+  "proof": "by\n  cases g <;>\n    · simp only [StructuralGuard.verdict, targetHetOfRetention, lossOfRetention,\n        targetPgsVarOfRetention]\n      try ring",
   "binders": [
    [
     [
@@ -6501,18 +6501,18 @@
     "("
    ]
   ],
-  "raw": "theorem StructuralGuard.verdict_holds (g : StructuralGuard) (r : ℝ) : g.verdict r := by\n  cases g <;>\n    · simp only [StructuralGuard.verdict, targetHetOfRetention, lossOfRetention,\n        targetPgsVarOfRetention]\n      ring"
+  "raw": "theorem StructuralGuard.verdict_holds (g : StructuralGuard) (r : ℝ) : g.verdict r := by\n  cases g <;>\n    · simp only [StructuralGuard.verdict, targetHetOfRetention, lossOfRetention,\n        targetPgsVarOfRetention]\n      try ring"
  },
  {
-  "kind": "theorem",
+  "kind": "def",
   "name": "guard_stack_blind_to_retention",
   "module": "Calibrator.BlindnessRegistry",
   "file": "/Users/user/gnomon/proofs/Calibrator/BlindnessRegistry.lean",
   "line": 108,
   "docstring": "**The whole guard suite shares one witness pair.**\n\nTwo different retention values — the measured one and the one the cluster assumed —\nproduce identical reports from *every* structural guard. By\n`ProbeBlindness.ofWitnessFamily`, no criterion reading the entire suite decides which\nretention is correct, in any combination and under any rule.\n\nThis is why the same wrong number was certified five times: it was never five\nindependent certifications, it was one blind suite applied five times.",
-  "signature": "{trueRetention wrongRetention : ℝ}\n    (hne : wrongRetention ≠ trueRetention)",
-  "body": "ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r)\n      (fun r => r = trueRetention)",
-  "proof": "ProbeBlindness.ofWitnessFamily StructuralGuard.verdict _ trueRetention wrongRetention\n    (fun g => propext ⟨fun _ => g.verdict_holds wrongRetention,\n                       fun _ => g.verdict_holds trueRetention⟩)\n    rfl hne",
+  "signature": "{trueRetention wrongRetention : ℝ}\n    (hne : wrongRetention ≠ trueRetention) :\n    ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r)\n      (fun r => r = trueRetention)",
+  "body": "ProbeBlindness.ofWitnessFamily StructuralGuard.verdict _ trueRetention wrongRetention\n    (fun g => propext ⟨fun _ => g.verdict_holds wrongRetention,\n                       fun _ => g.verdict_holds trueRetention⟩)\n    rfl hne",
+  "proof": "",
   "binders": [
    [
     [
@@ -6528,9 +6528,20 @@
     ],
     "wrongRetention ≠ trueRetention",
     "("
+   ],
+   [
+    [
+     "fun",
+     "r",
+     "=>",
+     "fun",
+     "g"
+    ],
+    "StructuralGuard => g.verdict r",
+    "("
    ]
   ],
-  "raw": "theorem guard_stack_blind_to_retention {trueRetention wrongRetention : ℝ}\n    (hne : wrongRetention ≠ trueRetention) :\n    ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r)\n      (fun r => r = trueRetention) :=\n  ProbeBlindness.ofWitnessFamily StructuralGuard.verdict _ trueRetention wrongRetention\n    (fun g => propext ⟨fun _ => g.verdict_holds wrongRetention,\n                       fun _ => g.verdict_holds trueRetention⟩)\n    rfl hne"
+  "raw": "noncomputable def guard_stack_blind_to_retention {trueRetention wrongRetention : ℝ}\n    (hne : wrongRetention ≠ trueRetention) :\n    ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r)\n      (fun r => r = trueRetention) :=\n  ProbeBlindness.ofWitnessFamily StructuralGuard.verdict _ trueRetention wrongRetention\n    (fun g => propext ⟨fun _ => g.verdict_holds wrongRetention,\n                       fun _ => g.verdict_holds trueRetention⟩)\n    rfl hne"
  },
  {
   "kind": "theorem",
@@ -6576,15 +6587,15 @@
   "raw": "theorem no_guard_stack_criterion {trueRetention wrongRetention : ℝ}\n    (hne : wrongRetention ≠ trueRetention)\n    {Verdict : Type*} (combine : (StructuralGuard → Prop) → Verdict) :\n    ¬ ∃ accept : Verdict → Prop,\n        ∀ r : ℝ, r = trueRetention ↔ accept (combine (fun g => g.verdict r)) :=\n  (guard_stack_blind_to_retention hne).no_criterion_of_factors combine"
  },
  {
-  "kind": "theorem",
+  "kind": "def",
   "name": "extra_algebraic_guard_adds_nothing",
   "module": "Calibrator.BlindnessRegistry",
   "file": "/Users/user/gnomon/proofs/Calibrator/BlindnessRegistry.lean",
   "line": 128,
   "docstring": "Adding a fourth guard of the same kind changes nothing: any predicate on candidate\nretentions that is satisfied at every retention joins the suite without narrowing it.",
-  "signature": "{trueRetention wrongRetention : ℝ}\n    (hne : wrongRetention ≠ trueRetention)\n    (newGuard : ℝ → Prop) (hnew : ∀ r, newGuard r)",
-  "body": "ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r))\n      (fun r => r = trueRetention) where\n  positive := trueRetention\n  negative := wrongRetention\n  same_data",
-  "proof": "by\n    have h₁ : (fun g : StructuralGuard => g.verdict trueRetention)\n        = fun g : StructuralGuard => g.verdict wrongRetention := by\n      funext g\n      exact propext ⟨fun _ => g.verdict_holds wrongRetention,\n                     fun _ => g.verdict_holds trueRetention⟩\n    have h₂ : newGuard trueRetention = newGuard wrongRetention :=\n      propext ⟨fun _ => hnew wrongRetention, fun _ => hnew trueRetention⟩\n    rw [h₁, h₂]\n  holds := rfl\n  fails := hne",
+  "signature": "{trueRetention wrongRetention : ℝ}\n    (hne : wrongRetention ≠ trueRetention)\n    (newGuard : ℝ → Prop) (hnew : ∀ r, newGuard r) :\n    ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r))\n      (fun r => r = trueRetention) where\n  positive",
+  "body": "trueRetention\n  negative := wrongRetention\n  same_data := by\n    have h₁ : (fun g : StructuralGuard => g.verdict trueRetention)\n        = fun g : StructuralGuard => g.verdict wrongRetention := by\n      funext g\n      exact propext ⟨fun _ => g.verdict_holds wrongRetention,\n                     fun _ => g.verdict_holds trueRetention⟩\n    have h₂ : newGuard trueRetention = newGuard wrongRetention :=\n      propext ⟨fun _ => hnew wrongRetention, fun _ => hnew trueRetention⟩\n    rw [h₁, h₂]\n  holds := rfl\n  fails := hne",
+  "proof": "",
   "binders": [
    [
     [
@@ -6614,9 +6625,20 @@
     ],
     "∀ r, newGuard r",
     "("
+   ],
+   [
+    [
+     "fun",
+     "r",
+     "=>",
+     "(fun",
+     "g"
+    ],
+    "StructuralGuard => g.verdict r, newGuard r)",
+    "("
    ]
   ],
-  "raw": "theorem extra_algebraic_guard_adds_nothing {trueRetention wrongRetention : ℝ}\n    (hne : wrongRetention ≠ trueRetention)\n    (newGuard : ℝ → Prop) (hnew : ∀ r, newGuard r) :\n    ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r))\n      (fun r => r = trueRetention) where\n  positive := trueRetention\n  negative := wrongRetention\n  same_data := by\n    have h₁ : (fun g : StructuralGuard => g.verdict trueRetention)\n        = fun g : StructuralGuard => g.verdict wrongRetention := by\n      funext g\n      exact propext ⟨fun _ => g.verdict_holds wrongRetention,\n                     fun _ => g.verdict_holds trueRetention⟩\n    have h₂ : newGuard trueRetention = newGuard wrongRetention :=\n      propext ⟨fun _ => hnew wrongRetention, fun _ => hnew trueRetention⟩\n    rw [h₁, h₂]\n  holds := rfl\n  fails := hne"
+  "raw": "noncomputable def extra_algebraic_guard_adds_nothing {trueRetention wrongRetention : ℝ}\n    (hne : wrongRetention ≠ trueRetention)\n    (newGuard : ℝ → Prop) (hnew : ∀ r, newGuard r) :\n    ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r))\n      (fun r => r = trueRetention) where\n  positive := trueRetention\n  negative := wrongRetention\n  same_data := by\n    have h₁ : (fun g : StructuralGuard => g.verdict trueRetention)\n        = fun g : StructuralGuard => g.verdict wrongRetention := by\n      funext g\n      exact propext ⟨fun _ => g.verdict_holds wrongRetention,\n                     fun _ => g.verdict_holds trueRetention⟩\n    have h₂ : newGuard trueRetention = newGuard wrongRetention :=\n      propext ⟨fun _ => hnew wrongRetention, fun _ => hnew trueRetention⟩\n    rw [h₁, h₂]\n  holds := rfl\n  fails := hne"
  },
  {
   "kind": "theorem",
@@ -12989,11 +13011,24 @@
   "raw": "theorem condensationConstant_pos : 0 < condensationConstant := by\n  have h := condensationConstant_bounds.1\n  linarith"
  },
  {
+  "kind": "theorem",
+  "name": "log_two_lt_condensationConstant",
+  "module": "Calibrator.Condensation",
+  "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
+  "line": 237,
+  "docstring": "**A sharper lower bound: `log 2 < c_G`.**\n\n`condensationConstant_bounds` is too coarse for one downstream question. Its bracket\n`(0.640, 0.807)` *straddles* `log 2 = 0.69315`, so it cannot decide whether the\ncondensation constant exceeds `log 2` — and that comparison is exactly what separates a\nbalanced hard-called genotype locus from its Gaussian surrogate, since\n`Calibrator.PolygenicSpectroscopy.hweMellinDrift_half` gives `c(1/2) = log 2`. The claim\nwas asserted in prose there while being underivable from anything in the development.\n\nThe gap is closed by taking more terms. Mathlib's `eulerMascheroniConstant_lt_two_thirds`\nis `eulerMascheroniSeq' 6`, but `eulerMascheroniConstant_lt_eulerMascheroniSeq'` holds at\n*every* index, and the sequence `H_n - log n` decreases to `gamma`. At `n = 16`,\n\n  `gamma < H_16 - log 16 = 2436559 / 720720 - 4 log 2`,\n\nwhich gives `c_G > 2 - H_16 + 3 log 2 > 0.69871`, clearing `log 2 < 0.69315` with a\nmargin of about `0.0056`. Index `16` is chosen because it is the smallest power of two\nthat clears the comparison, so `log 16` collapses to `4 log 2` and mathlib's tight\nrational bounds on `log 2` are the only numeric input needed.",
+  "signature": "",
+  "body": "Real.log 2 < condensationConstant",
+  "proof": "by\n  have hlog16 : Real.log 16 = 4 * Real.log 2 := by\n    rw [show (16 : ℝ) = 2 ^ (4 : ℕ) by norm_num, Real.log_pow]\n    norm_num\n  -- `H_16 - log 16` in closed form. Whether `norm_num` leaves the logarithm as\n  -- `log 16` or folds the cast differently is not something we rely on: both\n  -- routes are tried.\n  have hseq : Real.eulerMascheroniSeq' 16 = (2436559 : ℝ) / 720720 - 4 * Real.log 2 := by\n    rw [Real.eulerMascheroniSeq']\n    first\n      | norm_num [hlog16]\n      | (norm_num; rw [hlog16])\n      | (rw [if_neg (by norm_num : ¬((16 : ℕ) = 0)),\n             show ((16 : ℕ) : ℝ) = 2 ^ (4 : ℕ) by norm_num, Real.log_pow]\n         norm_num)\n  have hγ : Real.eulerMascheroniConstant < (2436559 : ℝ) / 720720 - 4 * Real.log 2 := by\n    have h := Real.eulerMascheroniConstant_lt_eulerMascheroniSeq' 16\n    rwa [hseq] at h\n  have hl2 : (0.6931471803 : ℝ) < Real.log 2 := Real.log_two_gt_d9\n  unfold condensationConstant\n  linarith",
+  "binders": [],
+  "raw": "theorem log_two_lt_condensationConstant : Real.log 2 < condensationConstant := by\n  have hlog16 : Real.log 16 = 4 * Real.log 2 := by\n    rw [show (16 : ℝ) = 2 ^ (4 : ℕ) by norm_num, Real.log_pow]\n    norm_num\n  -- `H_16 - log 16` in closed form. Whether `norm_num` leaves the logarithm as\n  -- `log 16` or folds the cast differently is not something we rely on: both\n  -- routes are tried.\n  have hseq : Real.eulerMascheroniSeq' 16 = (2436559 : ℝ) / 720720 - 4 * Real.log 2 := by\n    rw [Real.eulerMascheroniSeq']\n    first\n      | norm_num [hlog16]\n      | (norm_num; rw [hlog16])\n      | (rw [if_neg (by norm_num : ¬((16 : ℕ) = 0)),\n             show ((16 : ℕ) : ℝ) = 2 ^ (4 : ℕ) by norm_num, Real.log_pow]\n         norm_num)\n  have hγ : Real.eulerMascheroniConstant < (2436559 : ℝ) / 720720 - 4 * Real.log 2 := by\n    have h := Real.eulerMascheroniConstant_lt_eulerMascheroniSeq' 16\n    rwa [hseq] at h\n  have hl2 : (0.6931471803 : ℝ) < Real.log 2 := Real.log_two_gt_d9\n  unfold condensationConstant\n  linarith"
+ },
+ {
   "kind": "def",
   "name": "gaussianJetVariance",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 221,
+  "line": 262,
   "docstring": "The Gaussian **jet variance** `v_G = pi ^ 2 / 2 - 4 = 0.93480...`, the variance of\n`log chi-square-three`, i.e. `trigamma(3/2)`. It is the second observable of the\nMellin 2-jet and sets the width of the condensation window.",
   "signature": ": ℝ",
   "body": "Real.pi ^ 2 / 2 - 4",
@@ -13006,7 +13041,7 @@
   "name": "gaussianJetVariance_pos",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 224,
+  "line": 265,
   "docstring": "`v_G > 0`, from `pi > 3`.",
   "signature": "",
   "body": "0 < gaussianJetVariance",
@@ -13019,7 +13054,7 @@
   "name": "criticalDegree",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 246,
+  "line": 287,
   "docstring": "The critical degree `m* = log N / c`. Below it, chaos is Lindeberg-democratic;\nabove it, the variance is carried by values too large ever to be witnessed among `N`\nsamples and the observed sum is empty.",
   "signature": "(N c : ℝ) : ℝ",
   "body": "Real.log N / c",
@@ -13041,7 +13076,7 @@
   "name": "subcritical_iff",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 249,
+  "line": 290,
   "docstring": "Subcriticality is exactly `c * m < log N`.",
   "signature": "{N c m : ℝ} (hc : 0 < c)",
   "body": "m < criticalDegree N c ↔ c * m < Real.log N",
@@ -13071,7 +13106,7 @@
   "name": "supercritical_iff",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 255,
+  "line": 296,
   "docstring": "Supercriticality is exactly `log N < c * m`.",
   "signature": "{N c m : ℝ} (hc : 0 < c)",
   "body": "criticalDegree N c < m ↔ Real.log N < c * m",
@@ -13101,7 +13136,7 @@
   "name": "gaussianCriticalMultiplier",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 262,
+  "line": 303,
   "docstring": "The Gaussian critical degree is `1.37035... * log N`. We record the reciprocal\nconstant as a strictly positive multiplier rather than a decimal.",
   "signature": ": ℝ",
   "body": "1 / condensationConstant",
@@ -13114,7 +13149,7 @@
   "name": "gaussianCriticalMultiplier_pos",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 264,
+  "line": 305,
   "docstring": "",
   "signature": "",
   "body": "0 < gaussianCriticalMultiplier",
@@ -13127,7 +13162,7 @@
   "name": "criticalDegree_gaussian",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 269,
+  "line": 310,
   "docstring": "`m* = (1 / c_G) * log N`.",
   "signature": "(N : ℝ)",
   "body": "criticalDegree N condensationConstant = gaussianCriticalMultiplier * Real.log N",
@@ -13148,7 +13183,7 @@
   "name": "gaussianCriticalMultiplier_bounds",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 277,
+  "line": 318,
   "docstring": "The critical multiplier is bounded strictly between `1.23` and `1.57`; the true\nvalue is `1.37035...`. Coarse, but it certifies that the boundary sits at a degree\nof order `log N` with an order-one constant, which is the qualitative content.",
   "signature": "",
   "body": "(1.23 : ℝ) < gaussianCriticalMultiplier ∧ gaussianCriticalMultiplier < (1.57 : ℝ)",
@@ -13161,7 +13196,7 @@
   "name": "windowVariance",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 309,
+  "line": 350,
   "docstring": "Retained variance fraction at window position `w` for a law with jet variance `v`:\nthe limit law at the condensation window is `N(0, windowVariance w v)`.",
   "signature": "(w v : ℝ) : ℝ",
   "body": "Phi (w / Real.sqrt v)",
@@ -13183,7 +13218,7 @@
   "name": "monotone_Phi",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 311,
+  "line": 352,
   "docstring": "",
   "signature": "",
   "body": "Monotone Phi",
@@ -13196,7 +13231,7 @@
   "name": "Phi_nonneg",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 315,
+  "line": 356,
   "docstring": "",
   "signature": "(x : ℝ)",
   "body": "0 ≤ Phi x",
@@ -13217,7 +13252,7 @@
   "name": "Phi_le_one",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 319,
+  "line": 360,
   "docstring": "",
   "signature": "(x : ℝ)",
   "body": "Phi x ≤ 1",
@@ -13238,7 +13273,7 @@
   "name": "windowVariance_mem_unitInterval",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 324,
+  "line": 365,
   "docstring": "The retained fraction is a genuine variance fraction.",
   "signature": "(w v : ℝ)",
   "body": "0 ≤ windowVariance w v ∧ windowVariance w v ≤ 1",
@@ -13260,7 +13295,7 @@
   "name": "windowVariance_mono",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 333,
+  "line": 374,
   "docstring": "**The window interpolates.** For fixed jet variance `v > 0`, the retained variance\nfraction is monotone in the window position `w`: pushing the design deeper into the\nsubcritical side retains more variance, pushing it into the supercritical side retains\nless. This is the precise sense in which the transition, viewed at scale `sqrt m`, is\na smooth interpolation rather than a jump.",
   "signature": "{v : ℝ} (hv : 0 < v)",
   "body": "Monotone (fun w => windowVariance w v)",
@@ -13288,7 +13323,7 @@
   "name": "windowVariance_ne_of_arg_ne",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 345,
+  "line": 386,
   "docstring": "**The window separates laws with different jet variance.** Two laws with the same\ndrift `c` but different jet variances `v ≠ v'` retain different variance fractions at\nthe same window position `w ≠ 0`, provided the Gaussian cdf is strictly increasing on\nthe relevant range. We record the separation in the form actually used: distinct\nwindow arguments give the separation whenever `Phi` is injective there.",
   "signature": "{w v v' : ℝ}\n    (hinj : Function.Injective Phi)\n    (h : w / Real.sqrt v ≠ w / Real.sqrt v')",
   "body": "windowVariance w v ≠ windowVariance w v'",
@@ -13325,7 +13360,7 @@
   "name": "condensation_bridge_is_documentation",
   "module": "Calibrator.Condensation",
   "file": "/Users/user/gnomon/proofs/Calibrator/Condensation.lean",
-  "line": 372,
+  "line": 413,
   "docstring": "",
   "signature": "",
   "body": "True",
@@ -14087,6 +14122,323 @@
    ]
   ],
   "raw": "theorem recurrence_preserving_resampling_is_not_a_calibration\n    {ι : Type*} [Fintype ι] {n : ℕ} {Limit : Type*}\n    (Sp : GenotypeChaosLimits n ι Limit)\n    (resample : GenotypeDesign n ι → GenotypeDesign n ι)\n    (hprofile : ∀ (design : GenotypeDesign n ι) (i : Fin n),\n      (resample design).variantRecurrence i = design.variantRecurrence i)\n    (start : GenotypeDesign n ι)\n    (hnull : Sp.limitLaw (resample start) ≠ Sp.limitLaw start) :\n    ¬ ∀ designOne designTwo : GenotypeDesign n ι,\n        (∀ i : Fin n, designOne.variantRecurrence i = designTwo.variantRecurrence i) →\n        Sp.limitLaw designOne = Sp.limitLaw designTwo := by\n  intro hcomplete\n  exact hnull (hcomplete (resample start) start (fun i => hprofile start i))"
+ },
+ {
+  "kind": "def",
+  "name": "hweObservableContent",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 462,
+  "docstring": "The observable content of a Hardy-Weinberg locus at allele frequency `q`, assembled\nfrom the quantities this corpus already computes. The square-cumulant sequence is\nsupplied as a parameter because it is a sequence rather than a closed form; every other\ncomponent is a function of `q` already proved here.\n\nEmpirical status: DERIVED from `hweMellinDrift`, `hweMellinJetVariance` and\n`hweLatticeCondition`, each of which is derived elsewhere in the corpus; no free\nparameter beyond the supplied cumulant sequence, and nothing fitted.",
+  "signature": "(squareCumulant : ℝ → ℕ → ℝ) (q : ℝ) : GenotypeObservableContent where\n  drift",
+  "body": "hweMellinDrift q\n  jetVariance := hweMellinJetVariance q\n  IsLattice := hweLatticeCondition q\n  IsSignSymmetric := q = 1 / 2\n  squareCumulant := squareCumulant q",
+  "proof": "",
+  "binders": [
+   [
+    [
+     "squareCumulant"
+    ],
+    "ℝ → ℕ → ℝ",
+    "("
+   ],
+   [
+    [
+     "q"
+    ],
+    "ℝ",
+    "("
+   ]
+  ],
+  "raw": "def hweObservableContent (squareCumulant : ℝ → ℕ → ℝ) (q : ℝ) : GenotypeObservableContent where\n  drift := hweMellinDrift q\n  jetVariance := hweMellinJetVariance q\n  IsLattice := hweLatticeCondition q\n  IsSignSymmetric := q = 1 / 2\n  squareCumulant := squareCumulant q"
+ },
+ {
+  "kind": "theorem",
+  "name": "hweObservableContent_components",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 473,
+  "docstring": "**The observable content is built from the corpus's own quantities**, component by\ncomponent. This is the over-determination guard for the completeness claim: if anyone\nchanges what `hweMellinDrift` or `hweMellinJetVariance` or `hweLatticeCondition` means,\nthis stops compiling rather than drifting.",
+  "signature": "(squareCumulant : ℝ → ℕ → ℝ) (q : ℝ)",
+  "body": "(hweObservableContent squareCumulant q).drift = hweMellinDrift q ∧\n      (hweObservableContent squareCumulant q).jetVariance = hweMellinJetVariance q ∧\n      (hweObservableContent squareCumulant q).IsLattice = hweLatticeCondition q ∧\n      (hweObservableContent squareCumulant q).IsSignSymmetric = (q = 1 / 2)",
+  "proof": "⟨rfl, rfl, rfl, rfl⟩",
+  "binders": [
+   [
+    [
+     "squareCumulant"
+    ],
+    "ℝ → ℕ → ℝ",
+    "("
+   ],
+   [
+    [
+     "q"
+    ],
+    "ℝ",
+    "("
+   ]
+  ],
+  "raw": "theorem hweObservableContent_components (squareCumulant : ℝ → ℕ → ℝ) (q : ℝ) :\n    (hweObservableContent squareCumulant q).drift = hweMellinDrift q ∧\n      (hweObservableContent squareCumulant q).jetVariance = hweMellinJetVariance q ∧\n      (hweObservableContent squareCumulant q).IsLattice = hweLatticeCondition q ∧\n      (hweObservableContent squareCumulant q).IsSignSymmetric = (q = 1 / 2) :=\n  ⟨rfl, rfl, rfl, rfl⟩"
+ },
+ {
+  "kind": "theorem",
+  "name": "hweObservableContent_symmetry",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 488,
+  "docstring": "**The symmetry component is the corpus's proved characterization.** The\n`IsSignSymmetric` slot of the observable content holds exactly when the standardized\ngenotype admits a value-negating relabelling, which\n`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff` proves happens at\n`q = 1/2` and nowhere else in the polymorphic range.\n\nSo the third of the four observable invariants is not a free slot to be filled later: it\nis already decided for genotypes, and it is decided negatively almost everywhere.",
+  "signature": "(squareCumulant : ℝ → ℕ → ℝ)\n    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)",
+  "body": "(hweObservableContent squareCumulant h.altFreq).IsSignSymmetric ↔\n      (∃ coding : SymmetricCoding DiploidGenotype,\n        (∀ g, coding.weight g = h.genotypeProb g) ∧\n        (∀ g, coding.value g = h.standardizedGenotype g))",
+  "proof": "by\n  have hcomponent : (hweObservableContent squareCumulant h.altFreq).IsSignSymmetric =\n      (h.altFreq = 1 / 2) := rfl\n  rw [hcomponent]\n  exact (standardizedGenotype_symmetric_iff h hq0 hq1).symm",
+  "binders": [
+   [
+    [
+     "squareCumulant"
+    ],
+    "ℝ → ℕ → ℝ",
+    "("
+   ],
+   [
+    [
+     "h"
+    ],
+    "HardyWeinbergModel",
+    "("
+   ],
+   [
+    [
+     "hq0"
+    ],
+    "0 < h.altFreq",
+    "("
+   ],
+   [
+    [
+     "hq1"
+    ],
+    "h.altFreq < 1",
+    "("
+   ]
+  ],
+  "raw": "theorem hweObservableContent_symmetry (squareCumulant : ℝ → ℕ → ℝ)\n    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :\n    (hweObservableContent squareCumulant h.altFreq).IsSignSymmetric ↔\n      (∃ coding : SymmetricCoding DiploidGenotype,\n        (∀ g, coding.weight g = h.genotypeProb g) ∧\n        (∀ g, coding.value g = h.standardizedGenotype g)) := by\n  have hcomponent : (hweObservableContent squareCumulant h.altFreq).IsSignSymmetric =\n      (h.altFreq = 1 / 2) := rfl\n  rw [hcomponent]\n  exact (standardizedGenotype_symmetric_iff h hq0 hq1).symm"
+ },
+ {
+  "kind": "theorem",
+  "name": "hweObservableContent_symmetric_jetVariance_zero",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 504,
+  "docstring": "**The one frequency where symmetry is available is the one where the second\nobservable dies.** If the symmetry component holds then the jet-variance component is\nzero, by `hweMellinJetVariance_half`. Two of the four invariants collapse together, so a\ngenotype coding cannot be both sign-symmetric and Mellin-nondegenerate — the dichotomy\nof `no_signSymmetric_nondegenerate_locus`, now read off the observable content.",
+  "signature": "(squareCumulant : ℝ → ℕ → ℝ)\n    (q : ℝ) (hsymmetric : (hweObservableContent squareCumulant q).IsSignSymmetric)",
+  "body": "(hweObservableContent squareCumulant q).jetVariance = 0",
+  "proof": "by\n  have hcomponent : (hweObservableContent squareCumulant q).IsSignSymmetric = (q = 1 / 2) := rfl\n  rw [hcomponent] at hsymmetric\n  have hjet : (hweObservableContent squareCumulant q).jetVariance = hweMellinJetVariance q := rfl\n  rw [hjet, hsymmetric]\n  exact hweMellinJetVariance_half",
+  "binders": [
+   [
+    [
+     "squareCumulant"
+    ],
+    "ℝ → ℕ → ℝ",
+    "("
+   ],
+   [
+    [
+     "q"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hsymmetric"
+    ],
+    "(hweObservableContent squareCumulant q).IsSignSymmetric",
+    "("
+   ]
+  ],
+  "raw": "theorem hweObservableContent_symmetric_jetVariance_zero (squareCumulant : ℝ → ℕ → ℝ)\n    (q : ℝ) (hsymmetric : (hweObservableContent squareCumulant q).IsSignSymmetric) :\n    (hweObservableContent squareCumulant q).jetVariance = 0 := by\n  have hcomponent : (hweObservableContent squareCumulant q).IsSignSymmetric = (q = 1 / 2) := rfl\n  rw [hcomponent] at hsymmetric\n  have hjet : (hweObservableContent squareCumulant q).jetVariance = hweMellinJetVariance q := rfl\n  rw [hjet, hsymmetric]\n  exact hweMellinJetVariance_half"
+ },
+ {
+  "kind": "def",
+  "name": "GenotypeDesign.reModel",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 519,
+  "docstring": "Re-model a design: the same tested locus-sets, coefficients and joint law, at a\ndifferent allele-frequency family. This is what varying the coordinate law while holding\nthe design fixed means, and it is the comparison the Vertex-Weight Law is about.\n\nEmpirical status: UNTESTED. A field update on a design; no modelling content and no free\nparameter.",
+  "signature": "{ι : Type*} {n : ℕ} (design : GenotypeDesign n ι)\n    (model : Fin n → HardyWeinbergModel) : GenotypeDesign n ι",
+  "body": "{ design with model := model }",
+  "proof": "",
+  "binders": [
+   [
+    [
+     "ι"
+    ],
+    "Type*",
+    "{"
+   ],
+   [
+    [
+     "n"
+    ],
+    "ℕ",
+    "{"
+   ],
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign n ι",
+    "("
+   ],
+   [
+    [
+     "model"
+    ],
+    "Fin n → HardyWeinbergModel",
+    "("
+   ]
+  ],
+  "raw": "def GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : GenotypeDesign n ι)\n    (model : Fin n → HardyWeinbergModel) : GenotypeDesign n ι :=\n  { design with model := model }"
+ },
+ {
+  "kind": "theorem",
+  "name": "experiment_factors_through_observable_content",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 560,
+  "docstring": "**Observability completeness for a genotype coding.** Any experiment reporting a\nfunction of a design's limit is a function of the observable content alone: two\nallele-frequency families agreeing in the two-jet, the arithmetic type, the symmetry\nverdict and the square cumulants at every locus are indistinguishable by every admissible\ndesign, at every interaction order, through every diagram.\n\nNothing outside that list is observable. In particular no diagnostic, however elaborate,\nrecovers any property of a genotype coding that is not a function of those four.",
+  "signature": "{Report : Type*} (experiment : Limit → Report)\n    (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel)\n    (hadmissible : VW.isAdmissible (design.reModel model))\n    (hadmissible' : VW.isAdmissible (design.reModel model'))\n    (hcontent : ∀ i : Fin n,\n      hweObservableContent VW.squareCumulant (model i).altFreq =\n        hweObservableContent VW.squareCumulant (model' i).altFreq)",
+  "body": "experiment (VW.limitLaw (design.reModel model)) =\n      experiment (VW.limitLaw (design.reModel model'))",
+  "proof": "by\n  rw [VW.vertex_weight design model model' hadmissible hadmissible' hcontent]",
+  "binders": [
+   [
+    [
+     "Report"
+    ],
+    "Type*",
+    "{"
+   ],
+   [
+    [
+     "experiment"
+    ],
+    "Limit → Report",
+    "("
+   ],
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign n ι",
+    "("
+   ],
+   [
+    [
+     "model",
+     "model'"
+    ],
+    "Fin n → HardyWeinbergModel",
+    "("
+   ],
+   [
+    [
+     "hadmissible"
+    ],
+    "VW.isAdmissible (design.reModel model)",
+    "("
+   ],
+   [
+    [
+     "hadmissible'"
+    ],
+    "VW.isAdmissible (design.reModel model')",
+    "("
+   ],
+   [
+    [
+     "hcontent"
+    ],
+    "∀ i : Fin n,\n      hweObservableContent VW.squareCumulant (model i).altFreq =\n        hweObservableContent VW.squareCumulant (model' i).altFreq",
+    "("
+   ]
+  ],
+  "raw": "theorem experiment_factors_through_observable_content\n    {Report : Type*} (experiment : Limit → Report)\n    (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel)\n    (hadmissible : VW.isAdmissible (design.reModel model))\n    (hadmissible' : VW.isAdmissible (design.reModel model'))\n    (hcontent : ∀ i : Fin n,\n      hweObservableContent VW.squareCumulant (model i).altFreq =\n        hweObservableContent VW.squareCumulant (model' i).altFreq) :\n    experiment (VW.limitLaw (design.reModel model)) =\n      experiment (VW.limitLaw (design.reModel model')) := by\n  rw [VW.vertex_weight design model model' hadmissible hadmissible' hcontent]"
+ },
+ {
+  "kind": "theorem",
+  "name": "indistinguishable_of_matching_computed_quantities",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 579,
+  "docstring": "**The corpus's computed quantities are the complete observable summary.** Stated in\nthe form a reader can act on: if two panels agree locus by locus in `hweMellinDrift`,\n`hweMellinJetVariance`, `hweLatticeCondition`, the symmetry point and the square\ncumulants, then no admissible design distinguishes them.\n\nEvery hypothesis here names a quantity this corpus already computes in closed form,\nwhich is what makes the completeness claim checkable rather than decorative.",
+  "signature": "(design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel)\n    (hadmissible : VW.isAdmissible (design.reModel model))\n    (hadmissible' : VW.isAdmissible (design.reModel model'))\n    (hdrift : ∀ i : Fin n, hweMellinDrift (model i).altFreq =\n      hweMellinDrift (model' i).altFreq)\n    (hjet : ∀ i : Fin n, hweMellinJetVariance (model i).altFreq =\n      hweMellinJetVariance (model' i).altFreq)\n    (hlattice : ∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq)\n    (hsymmetry : ∀ i : Fin n, ((model i).altFreq = 1 / 2) = ((model' i).altFreq = 1 / 2))\n    (hcumulant : ∀ i : Fin n, VW.squareCumulant (model i).altFreq =\n      VW.squareCumulant (model' i).altFreq)",
+  "body": "VW.limitLaw (design.reModel model) = VW.limitLaw (design.reModel model')",
+  "proof": "by\n  refine VW.vertex_weight design model model' hadmissible hadmissible' (fun i => ?_)\n  unfold hweObservableContent\n  rw [hdrift i, hjet i, hlattice i, hsymmetry i, hcumulant i]",
+  "binders": [
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign n ι",
+    "("
+   ],
+   [
+    [
+     "model",
+     "model'"
+    ],
+    "Fin n → HardyWeinbergModel",
+    "("
+   ],
+   [
+    [
+     "hadmissible"
+    ],
+    "VW.isAdmissible (design.reModel model)",
+    "("
+   ],
+   [
+    [
+     "hadmissible'"
+    ],
+    "VW.isAdmissible (design.reModel model')",
+    "("
+   ],
+   [
+    [
+     "hdrift"
+    ],
+    "∀ i : Fin n, hweMellinDrift (model i).altFreq =\n      hweMellinDrift (model' i).altFreq",
+    "("
+   ],
+   [
+    [
+     "hjet"
+    ],
+    "∀ i : Fin n, hweMellinJetVariance (model i).altFreq =\n      hweMellinJetVariance (model' i).altFreq",
+    "("
+   ],
+   [
+    [
+     "hlattice"
+    ],
+    "∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq",
+    "("
+   ],
+   [
+    [
+     "hsymmetry"
+    ],
+    "∀ i : Fin n, ((model i).altFreq = 1 / 2) = ((model' i).altFreq = 1 / 2)",
+    "("
+   ],
+   [
+    [
+     "hcumulant"
+    ],
+    "∀ i : Fin n, VW.squareCumulant (model i).altFreq =\n      VW.squareCumulant (model' i).altFreq",
+    "("
+   ]
+  ],
+  "raw": "theorem indistinguishable_of_matching_computed_quantities\n    (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel)\n    (hadmissible : VW.isAdmissible (design.reModel model))\n    (hadmissible' : VW.isAdmissible (design.reModel model'))\n    (hdrift : ∀ i : Fin n, hweMellinDrift (model i).altFreq =\n      hweMellinDrift (model' i).altFreq)\n    (hjet : ∀ i : Fin n, hweMellinJetVariance (model i).altFreq =\n      hweMellinJetVariance (model' i).altFreq)\n    (hlattice : ∀ i : Fin n, hweLatticeCondition (model i).altFreq =\n      hweLatticeCondition (model' i).altFreq)\n    (hsymmetry : ∀ i : Fin n, ((model i).altFreq = 1 / 2) = ((model' i).altFreq = 1 / 2))\n    (hcumulant : ∀ i : Fin n, VW.squareCumulant (model i).altFreq =\n      VW.squareCumulant (model' i).altFreq) :\n    VW.limitLaw (design.reModel model) = VW.limitLaw (design.reModel model') := by\n  refine VW.vertex_weight design model model' hadmissible hadmissible' (fun i => ?_)\n  unfold hweObservableContent\n  rw [hdrift i, hjet i, hlattice i, hsymmetry i, hcumulant i]"
  },
  {
   "kind": "def",
@@ -29410,6 +29762,802 @@
   "proof": "by\n  refine ⟨0, fun c' hcontra => ?_⟩\n  rw [circulantSpectrumA_at_quarter_turn] at hcontra\n  exact circulantSpectrumB_ne_neg_four c' hcontra.symm",
   "binders": [],
   "raw": "theorem palindromic_circulant_spectra_differ :\n    ∃ c : ℝ, ∀ c' : ℝ, circulantSpectrumA c ≠ circulantSpectrumB c' := by\n  refine ⟨0, fun c' hcontra => ?_⟩\n  rw [circulantSpectrumA_at_quarter_turn] at hcontra\n  exact circulantSpectrumB_ne_neg_four c' hcontra.symm"
+ },
+ {
+  "kind": "def",
+  "name": "overlapMatrix",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1462,
+  "docstring": "**The overlap structure of a design.** Entry `(s, t)` counts the variants\ntested by both set `s` and set `t`; the diagonal is the interaction order. This\nis the object whose spectrum the limit law is a function of, and whose row sums\nare the recurrence profile.\n\nEmpirical status: UNTESTED. A count matrix read off the design; no free parameter\nand nothing fitted.",
+  "signature": "(design : GenotypeDesign nx ιx) : Matrix ιx ιx ℝ",
+  "body": "fun s t => ((design.locusSet s ∩ design.locusSet t).card : ℝ)",
+  "proof": "",
+  "binders": [
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign nx ιx",
+    "("
+   ]
+  ],
+  "raw": "def overlapMatrix (design : GenotypeDesign nx ιx) : Matrix ιx ιx ℝ :=\n  fun s t => ((design.locusSet s ∩ design.locusSet t).card : ℝ)"
+ },
+ {
+  "kind": "theorem",
+  "name": "overlapMatrix_symm",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1466,
+  "docstring": "The overlap structure is symmetric: sharing is a symmetric relation.",
+  "signature": "(design : GenotypeDesign nx ιx) (s t : ιx)",
+  "body": "design.overlapMatrix s t = design.overlapMatrix t s",
+  "proof": "by\n  have hdef : ∀ u v : ιx, design.overlapMatrix u v =\n      ((design.locusSet u ∩ design.locusSet v).card : ℝ) := fun _ _ => rfl\n  rw [hdef, hdef, Finset.inter_comm]",
+  "binders": [
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign nx ιx",
+    "("
+   ],
+   [
+    [
+     "s",
+     "t"
+    ],
+    "ιx",
+    "("
+   ]
+  ],
+  "raw": "theorem overlapMatrix_symm (design : GenotypeDesign nx ιx) (s t : ιx) :\n    design.overlapMatrix s t = design.overlapMatrix t s := by\n  have hdef : ∀ u v : ιx, design.overlapMatrix u v =\n      ((design.locusSet u ∩ design.locusSet v).card : ℝ) := fun _ _ => rfl\n  rw [hdef, hdef, Finset.inter_comm]"
+ },
+ {
+  "kind": "def",
+  "name": "cycleDensity",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1481,
+  "docstring": "**The `p`-th cycle density**: `trace (A ^ p)`, the total weight of closed\nwalks of length `p` in the overlap structure. For `p = 2` it is the squared\nFrobenius norm and for `p = 4` the fourth spectral moment.\n\nThese are the invariants the limit law is a function of, in contrast to the star\ndensities of `variantRecurrence`.\n\nEmpirical status: UNTESTED. A trace of a power of the overlap count matrix; no\nfree parameter and nothing fitted.",
+  "signature": "(design : GenotypeDesign nx ιx) (p : ℕ) : ℝ",
+  "body": "Matrix.trace (design.overlapMatrix ^ p)",
+  "proof": "",
+  "binders": [
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign nx ιx",
+    "("
+   ],
+   [
+    [
+     "p"
+    ],
+    "ℕ",
+    "("
+   ]
+  ],
+  "raw": "def cycleDensity (design : GenotypeDesign nx ιx) (p : ℕ) : ℝ :=\n  Matrix.trace (design.overlapMatrix ^ p)"
+ },
+ {
+  "kind": "theorem",
+  "name": "overlap_row_sum_eq_recurrence",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1492,
+  "docstring": "**Recurrence is a star density.** The row sum of the overlap structure at a\ntested set is the total recurrence of the variants in it. So the\nvariant-recurrence profile is a functional of the row sums of `A` — a sum over\nwalks out of one vertex — and row sums do not determine the spectrum of a\nsymmetric matrix.\n\nThis is the diagnosis, in the one case a practitioner acts on: matching\nrecurrence matches a star density and leaves every cycle density free.",
+  "signature": "(design : GenotypeDesign nx ιx) (s : ιx)",
+  "body": "∑ t : ιx, ((design.locusSet s ∩ design.locusSet t).card : ℕ) =\n      ∑ i ∈ design.locusSet s, design.variantRecurrence i",
+  "proof": "by\n  have hinter : ∀ t : ιx, design.locusSet s ∩ design.locusSet t =\n      (design.locusSet s).filter (fun i => i ∈ design.locusSet t) := by\n    intro t\n    exact Finset.filter_mem_eq_inter.symm\n  have hcard : ∀ t : ιx, (design.locusSet s ∩ design.locusSet t).card =\n      ∑ i ∈ design.locusSet s, if i ∈ design.locusSet t then 1 else 0 := by\n    intro t\n    rw [hinter t, Finset.card_filter]\n  have hrec : ∀ i : Fin nx, design.variantRecurrence i =\n      ∑ t : ιx, if i ∈ design.locusSet t then 1 else 0 := by\n    intro i\n    have hdef : design.variantRecurrence i =\n        (Finset.univ.filter (fun t => i ∈ design.locusSet t)).card := rfl\n    rw [hdef, Finset.card_filter]\n  simp_rw [hcard, hrec]\n  exact Finset.sum_comm",
+  "binders": [
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign nx ιx",
+    "("
+   ],
+   [
+    [
+     "s"
+    ],
+    "ιx",
+    "("
+   ]
+  ],
+  "raw": "theorem overlap_row_sum_eq_recurrence (design : GenotypeDesign nx ιx) (s : ιx) :\n    ∑ t : ιx, ((design.locusSet s ∩ design.locusSet t).card : ℕ) =\n      ∑ i ∈ design.locusSet s, design.variantRecurrence i := by\n  have hinter : ∀ t : ιx, design.locusSet s ∩ design.locusSet t =\n      (design.locusSet s).filter (fun i => i ∈ design.locusSet t) := by\n    intro t\n    exact Finset.filter_mem_eq_inter.symm\n  have hcard : ∀ t : ιx, (design.locusSet s ∩ design.locusSet t).card =\n      ∑ i ∈ design.locusSet s, if i ∈ design.locusSet t then 1 else 0 := by\n    intro t\n    rw [hinter t, Finset.card_filter]\n  have hrec : ∀ i : Fin nx, design.variantRecurrence i =\n      ∑ t : ιx, if i ∈ design.locusSet t then 1 else 0 := by\n    intro i\n    have hdef : design.variantRecurrence i =\n        (Finset.univ.filter (fun t => i ∈ design.locusSet t)).card := rfl\n    rw [hdef, Finset.card_filter]\n  simp_rw [hcard, hrec]\n  exact Finset.sum_comm"
+ },
+ {
+  "kind": "def",
+  "name": "Tempered",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1519,
+  "docstring": "**The tempered regime.** The cycle densities grow at most exponentially in\nthe diagram size, so a single truncation level determines the limit law and\nmoment matching is a valid calibration strategy.\n\nEmpirical status: UNTESTED. A growth condition on the design's own cycle\ndensities; checkable on a panel by computing the overlap structure, with no free\nparameter beyond the declared rate.",
+  "signature": "(design : GenotypeDesign nx ιx) (rate : ℝ) : Prop",
+  "body": "∀ p : ℕ, |design.cycleDensity p| ≤ rate ^ p",
+  "proof": "",
+  "binders": [
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign nx ιx",
+    "("
+   ],
+   [
+    [
+     "rate"
+    ],
+    "ℝ",
+    "("
+   ]
+  ],
+  "raw": "def Tempered (design : GenotypeDesign nx ιx) (rate : ℝ) : Prop :=\n  ∀ p : ℕ, |design.cycleDensity p| ≤ rate ^ p"
+ },
+ {
+  "kind": "def",
+  "name": "BoundedHubRecurrence",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1528,
+  "docstring": "**Bounded hub energy**, in its operational form: no variant is tested more\nthan `bound` times. This is what fails for a lead variant in a dense sliding\nscan, or for a pleiotropic variant across a phenotype panel.\n\nEmpirical status: UNTESTED. A bound on the design's own recurrence profile;\ncheckable by inspection.",
+  "signature": "(design : GenotypeDesign nx ιx) (bound : ℕ) : Prop",
+  "body": "∀ i : Fin nx, design.variantRecurrence i ≤ bound",
+  "proof": "",
+  "binders": [
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign nx ιx",
+    "("
+   ],
+   [
+    [
+     "bound"
+    ],
+    "ℕ",
+    "("
+   ]
+  ],
+  "raw": "def BoundedHubRecurrence (design : GenotypeDesign nx ιx) (bound : ℕ) : Prop :=\n  ∀ i : Fin nx, design.variantRecurrence i ≤ bound"
+ },
+ {
+  "kind": "theorem",
+  "name": "variantRecurrence_eq_card_of_ubiquitous",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1533,
+  "docstring": "A variant entering *every* tested set has recurrence equal to the number of\ntested sets.",
+  "signature": "(design : GenotypeDesign nx ιx)\n    (i : Fin nx) (hall : ∀ s : ιx, i ∈ design.locusSet s)",
+  "body": "design.variantRecurrence i = Fintype.card ιx",
+  "proof": "by\n  have hdef : design.variantRecurrence i =\n      (Finset.univ.filter (fun s => i ∈ design.locusSet s)).card := rfl\n  have hfilter : Finset.univ.filter (fun s => i ∈ design.locusSet s) = Finset.univ :=\n    Finset.filter_true_of_mem (fun s _ => hall s)\n  rw [hdef, hfilter, Finset.card_univ]",
+  "binders": [
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign nx ιx",
+    "("
+   ],
+   [
+    [
+     "i"
+    ],
+    "Fin nx",
+    "("
+   ],
+   [
+    [
+     "hall"
+    ],
+    "∀ s : ιx, i ∈ design.locusSet s",
+    "("
+   ]
+  ],
+  "raw": "theorem variantRecurrence_eq_card_of_ubiquitous (design : GenotypeDesign nx ιx)\n    (i : Fin nx) (hall : ∀ s : ιx, i ∈ design.locusSet s) :\n    design.variantRecurrence i = Fintype.card ιx := by\n  have hdef : design.variantRecurrence i =\n      (Finset.univ.filter (fun s => i ∈ design.locusSet s)).card := rfl\n  have hfilter : Finset.univ.filter (fun s => i ∈ design.locusSet s) = Finset.univ :=\n    Finset.filter_true_of_mem (fun s _ => hall s)\n  rw [hdef, hfilter, Finset.card_univ]"
+ },
+ {
+  "kind": "theorem",
+  "name": "ubiquitous_variant_forces_hub_bound",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1547,
+  "docstring": "**A ubiquitous variant forces the hub bound up with the number of tested\nsets.** A lead variant present in every window of a dense scan, or a pleiotropic\nvariant in every panel of a phenome-wide scan, makes any hub bound at least as\nlarge as the design itself — so along a family of scans with more and more tested\nsets there is no bound uniform in panel size, and temperedness is lost.",
+  "signature": "(design : GenotypeDesign nx ιx)\n    (i : Fin nx) (hall : ∀ s : ιx, i ∈ design.locusSet s) (bound : ℕ)\n    (hhub : design.BoundedHubRecurrence bound)",
+  "body": "Fintype.card ιx ≤ bound",
+  "proof": "by\n  have hrec := design.variantRecurrence_eq_card_of_ubiquitous i hall\n  have hle := hhub i\n  rw [hrec] at hle\n  exact hle",
+  "binders": [
+   [
+    [
+     "design"
+    ],
+    "GenotypeDesign nx ιx",
+    "("
+   ],
+   [
+    [
+     "i"
+    ],
+    "Fin nx",
+    "("
+   ],
+   [
+    [
+     "hall"
+    ],
+    "∀ s : ιx, i ∈ design.locusSet s",
+    "("
+   ],
+   [
+    [
+     "bound"
+    ],
+    "ℕ",
+    "("
+   ],
+   [
+    [
+     "hhub"
+    ],
+    "design.BoundedHubRecurrence bound",
+    "("
+   ]
+  ],
+  "raw": "theorem ubiquitous_variant_forces_hub_bound (design : GenotypeDesign nx ιx)\n    (i : Fin nx) (hall : ∀ s : ιx, i ∈ design.locusSet s) (bound : ℕ)\n    (hhub : design.BoundedHubRecurrence bound) : Fintype.card ιx ≤ bound := by\n  have hrec := design.variantRecurrence_eq_card_of_ubiquitous i hall\n  have hle := hhub i\n  rw [hrec] at hle\n  exact hle"
+ },
+ {
+  "kind": "theorem",
+  "name": "cycle_preserving_resampling_is_a_calibration",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1600,
+  "docstring": "**The prescription.** A resampling scheme that preserves every cycle density\npreserves the null, provided both designs have bounded hub recurrence. This is\nthe positive replacement for the recurrence-matching argument that fails.",
+  "signature": "(design resampled : GenotypeDesign nx ιx) (bound : ℕ)\n    (hadmissible : CD.isAdmissible design) (hadmissibleResampled : CD.isAdmissible resampled)\n    (hhub : design.BoundedHubRecurrence bound)\n    (hhubResampled : resampled.BoundedHubRecurrence bound)\n    (hcycles : ∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p)",
+  "body": "CD.limitLaw design = CD.limitLaw resampled",
+  "proof": "CD.cycles_determine (CD.temperingRate bound) design resampled hadmissible\n    hadmissibleResampled\n    (CD.tempered_of_boundedHub design bound hadmissible hhub)\n    (CD.tempered_of_boundedHub resampled bound hadmissibleResampled hhubResampled)\n    hcycles",
+  "binders": [
+   [
+    [
+     "design",
+     "resampled"
+    ],
+    "GenotypeDesign nx ιx",
+    "("
+   ],
+   [
+    [
+     "bound"
+    ],
+    "ℕ",
+    "("
+   ],
+   [
+    [
+     "hadmissible"
+    ],
+    "CD.isAdmissible design",
+    "("
+   ],
+   [
+    [
+     "hadmissibleResampled"
+    ],
+    "CD.isAdmissible resampled",
+    "("
+   ],
+   [
+    [
+     "hhub"
+    ],
+    "design.BoundedHubRecurrence bound",
+    "("
+   ],
+   [
+    [
+     "hhubResampled"
+    ],
+    "resampled.BoundedHubRecurrence bound",
+    "("
+   ],
+   [
+    [
+     "hcycles"
+    ],
+    "∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p",
+    "("
+   ]
+  ],
+  "raw": "theorem cycle_preserving_resampling_is_a_calibration\n    (design resampled : GenotypeDesign nx ιx) (bound : ℕ)\n    (hadmissible : CD.isAdmissible design) (hadmissibleResampled : CD.isAdmissible resampled)\n    (hhub : design.BoundedHubRecurrence bound)\n    (hhubResampled : resampled.BoundedHubRecurrence bound)\n    (hcycles : ∀ p : ℕ, design.cycleDensity p = resampled.cycleDensity p) :\n    CD.limitLaw design = CD.limitLaw resampled :=\n  CD.cycles_determine (CD.temperingRate bound) design resampled hadmissible\n    hadmissibleResampled\n    (CD.tempered_of_boundedHub design bound hadmissible hhub)\n    (CD.tempered_of_boundedHub resampled bound hadmissibleResampled hhubResampled)\n    hcycles"
+ },
+ {
+  "kind": "theorem",
+  "name": "no_moment_matching_calibration_off_temperedness",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1617,
+  "docstring": "**No moment-matching calibration is correct off the tempered class.** For\nevery truncation level, two admissible designs agree in all cycle densities up to\nthat level and still have different nulls. Matching more densities does not help,\nbecause the statement is quantified over the truncation.",
+  "signature": "(rate : ℝ) (truncation : ℕ)",
+  "body": "∃ designOne designTwo : GenotypeDesign nx ιx,\n      CD.isAdmissible designOne ∧ CD.isAdmissible designTwo ∧\n      ¬ designOne.Tempered rate ∧\n      (∀ p : ℕ, p ≤ truncation → designOne.cycleDensity p = designTwo.cycleDensity p) ∧\n      CD.limitLaw designOne ≠ CD.limitLaw designTwo",
+  "proof": "CD.divergence_phase rate truncation",
+  "binders": [
+   [
+    [
+     "rate"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "truncation"
+    ],
+    "ℕ",
+    "("
+   ]
+  ],
+  "raw": "theorem no_moment_matching_calibration_off_temperedness (rate : ℝ) (truncation : ℕ) :\n    ∃ designOne designTwo : GenotypeDesign nx ιx,\n      CD.isAdmissible designOne ∧ CD.isAdmissible designTwo ∧\n      ¬ designOne.Tempered rate ∧\n      (∀ p : ℕ, p ≤ truncation → designOne.cycleDensity p = designTwo.cycleDensity p) ∧\n      CD.limitLaw designOne ≠ CD.limitLaw designTwo :=\n  CD.divergence_phase rate truncation"
+ },
+ {
+  "kind": "theorem",
+  "name": "circulantSpectrumA_at_one",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1645,
+  "docstring": "The eigenvalue at `cos 0 = 1`.",
+  "signature": "",
+  "body": "circulantSpectrumA 1 = 6",
+  "proof": "by\n  unfold circulantSpectrumA\n  norm_num",
+  "binders": [],
+  "raw": "theorem circulantSpectrumA_at_one : circulantSpectrumA 1 = 6 := by\n  unfold circulantSpectrumA\n  norm_num"
+ },
+ {
+  "kind": "theorem",
+  "name": "circulantSpectrumA_at_neg_one",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1650,
+  "docstring": "The eigenvalue at `cos π = -1`.",
+  "signature": "",
+  "body": "circulantSpectrumA (-1) = 2",
+  "proof": "by\n  unfold circulantSpectrumA\n  norm_num",
+  "binders": [],
+  "raw": "theorem circulantSpectrumA_at_neg_one : circulantSpectrumA (-1) = 2 := by\n  unfold circulantSpectrumA\n  norm_num"
+ },
+ {
+  "kind": "theorem",
+  "name": "circulantSpectrumA_at_root",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1655,
+  "docstring": "The eigenvalue at `cos (π/4) = s/2` with `s² = 2`.",
+  "signature": "(s : ℝ) (hs : s ^ 2 = 2)",
+  "body": "circulantSpectrumA (s / 2) = s",
+  "proof": "by\n  unfold circulantSpectrumA\n  linarith [hs]",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ]
+  ],
+  "raw": "theorem circulantSpectrumA_at_root (s : ℝ) (hs : s ^ 2 = 2) :\n    circulantSpectrumA (s / 2) = s := by\n  unfold circulantSpectrumA\n  linarith [hs]"
+ },
+ {
+  "kind": "theorem",
+  "name": "circulantSpectrumA_at_neg_root",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1661,
+  "docstring": "The eigenvalue at `cos (3π/4) = -s/2`.",
+  "signature": "(s : ℝ) (hs : s ^ 2 = 2)",
+  "body": "circulantSpectrumA (-(s / 2)) = -s",
+  "proof": "by\n  unfold circulantSpectrumA\n  linarith [hs]",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ]
+  ],
+  "raw": "theorem circulantSpectrumA_at_neg_root (s : ℝ) (hs : s ^ 2 = 2) :\n    circulantSpectrumA (-(s / 2)) = -s := by\n  unfold circulantSpectrumA\n  linarith [hs]"
+ },
+ {
+  "kind": "theorem",
+  "name": "circulantSpectrumB_at_one",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1667,
+  "docstring": "The eigenvalue at `cos 0 = 1`, second circulant.",
+  "signature": "",
+  "body": "circulantSpectrumB 1 = 6",
+  "proof": "by\n  unfold circulantSpectrumB\n  norm_num",
+  "binders": [],
+  "raw": "theorem circulantSpectrumB_at_one : circulantSpectrumB 1 = 6 := by\n  unfold circulantSpectrumB\n  norm_num"
+ },
+ {
+  "kind": "theorem",
+  "name": "circulantSpectrumB_at_neg_one",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1672,
+  "docstring": "The eigenvalue at `cos π = -1`, second circulant.",
+  "signature": "",
+  "body": "circulantSpectrumB (-1) = -2",
+  "proof": "by\n  unfold circulantSpectrumB\n  norm_num",
+  "binders": [],
+  "raw": "theorem circulantSpectrumB_at_neg_one : circulantSpectrumB (-1) = -2 := by\n  unfold circulantSpectrumB\n  norm_num"
+ },
+ {
+  "kind": "theorem",
+  "name": "circulantSpectrumB_at_zero",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1677,
+  "docstring": "The eigenvalue at `cos (π/2) = 0`, second circulant.",
+  "signature": "",
+  "body": "circulantSpectrumB 0 = -2",
+  "proof": "by\n  unfold circulantSpectrumB\n  norm_num",
+  "binders": [],
+  "raw": "theorem circulantSpectrumB_at_zero : circulantSpectrumB 0 = -2 := by\n  unfold circulantSpectrumB\n  norm_num"
+ },
+ {
+  "kind": "theorem",
+  "name": "circulantSpectrumB_at_root",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1682,
+  "docstring": "The eigenvalue at `cos (π/4) = s/2`, second circulant.",
+  "signature": "(s : ℝ) (hs : s ^ 2 = 2)",
+  "body": "circulantSpectrumB (s / 2) = 2 * s",
+  "proof": "by\n  unfold circulantSpectrumB\n  linarith [hs]",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ]
+  ],
+  "raw": "theorem circulantSpectrumB_at_root (s : ℝ) (hs : s ^ 2 = 2) :\n    circulantSpectrumB (s / 2) = 2 * s := by\n  unfold circulantSpectrumB\n  linarith [hs]"
+ },
+ {
+  "kind": "theorem",
+  "name": "circulantSpectrumB_at_neg_root",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1688,
+  "docstring": "The eigenvalue at `cos (3π/4) = -s/2`, second circulant.",
+  "signature": "(s : ℝ) (hs : s ^ 2 = 2)",
+  "body": "circulantSpectrumB (-(s / 2)) = -(2 * s)",
+  "proof": "by\n  unfold circulantSpectrumB\n  linarith [hs]",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ]
+  ],
+  "raw": "theorem circulantSpectrumB_at_neg_root (s : ℝ) (hs : s ^ 2 = 2) :\n    circulantSpectrumB (-(s / 2)) = -(2 * s) := by\n  unfold circulantSpectrumB\n  linarith [hs]"
+ },
+ {
+  "kind": "def",
+  "name": "palindromicCycleDensityA",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1698,
+  "docstring": "Power sum of the first circulant's eigenvalues, with their multiplicities:\nthe `p`-th cycle density of that overlap structure.\n\nEmpirical status: UNTESTED. A power sum of the eigenvalues of one fixed integer\nmatrix; no modelling content and no free parameter.",
+  "signature": "(s : ℝ) (p : ℕ) : ℝ",
+  "body": "circulantSpectrumA 1 ^ p + 2 * circulantSpectrumA (s / 2) ^ p +\n    2 * circulantSpectrumA 0 ^ p + 2 * circulantSpectrumA (-(s / 2)) ^ p +\n    circulantSpectrumA (-1) ^ p",
+  "proof": "",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "p"
+    ],
+    "ℕ",
+    "("
+   ]
+  ],
+  "raw": "def palindromicCycleDensityA (s : ℝ) (p : ℕ) : ℝ :=\n  circulantSpectrumA 1 ^ p + 2 * circulantSpectrumA (s / 2) ^ p +\n    2 * circulantSpectrumA 0 ^ p + 2 * circulantSpectrumA (-(s / 2)) ^ p +\n    circulantSpectrumA (-1) ^ p"
+ },
+ {
+  "kind": "def",
+  "name": "palindromicCycleDensityB",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1707,
+  "docstring": "Power sum of the second circulant's eigenvalues, with their multiplicities.\n\nEmpirical status: UNTESTED. As for `palindromicCycleDensityA`: a power sum for\none fixed integer matrix, no free parameter.",
+  "signature": "(s : ℝ) (p : ℕ) : ℝ",
+  "body": "circulantSpectrumB 1 ^ p + 2 * circulantSpectrumB (s / 2) ^ p +\n    2 * circulantSpectrumB 0 ^ p + 2 * circulantSpectrumB (-(s / 2)) ^ p +\n    circulantSpectrumB (-1) ^ p",
+  "proof": "",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "p"
+    ],
+    "ℕ",
+    "("
+   ]
+  ],
+  "raw": "def palindromicCycleDensityB (s : ℝ) (p : ℕ) : ℝ :=\n  circulantSpectrumB 1 ^ p + 2 * circulantSpectrumB (s / 2) ^ p +\n    2 * circulantSpectrumB 0 ^ p + 2 * circulantSpectrumB (-(s / 2)) ^ p +\n    circulantSpectrumB (-1) ^ p"
+ },
+ {
+  "kind": "theorem",
+  "name": "palindromicCycleDensityA_two",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1713,
+  "docstring": "Second cycle density of the first structure: `80`.",
+  "signature": "(s : ℝ) (hs : s ^ 2 = 2)",
+  "body": "palindromicCycleDensityA s 2 = 80",
+  "proof": "by\n  unfold palindromicCycleDensityA\n  rw [circulantSpectrumA_at_one, circulantSpectrumA_at_neg_one,\n    circulantSpectrumA_at_quarter_turn, circulantSpectrumA_at_root s hs,\n    circulantSpectrumA_at_neg_root s hs]\n  have hsq : (-s) ^ 2 = s ^ 2 := by ring\n  rw [hsq, hs]\n  norm_num",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ]
+  ],
+  "raw": "theorem palindromicCycleDensityA_two (s : ℝ) (hs : s ^ 2 = 2) :\n    palindromicCycleDensityA s 2 = 80 := by\n  unfold palindromicCycleDensityA\n  rw [circulantSpectrumA_at_one, circulantSpectrumA_at_neg_one,\n    circulantSpectrumA_at_quarter_turn, circulantSpectrumA_at_root s hs,\n    circulantSpectrumA_at_neg_root s hs]\n  have hsq : (-s) ^ 2 = s ^ 2 := by ring\n  rw [hsq, hs]\n  norm_num"
+ },
+ {
+  "kind": "theorem",
+  "name": "palindromicCycleDensityB_two",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1726,
+  "docstring": "Second cycle density of the second structure: also `80`. The agreement is\nforced by the shared entry multiset, since the second density is the squared\nFrobenius norm.",
+  "signature": "(s : ℝ) (hs : s ^ 2 = 2)",
+  "body": "palindromicCycleDensityB s 2 = 80",
+  "proof": "by\n  unfold palindromicCycleDensityB\n  rw [circulantSpectrumB_at_one, circulantSpectrumB_at_neg_one,\n    circulantSpectrumB_at_zero, circulantSpectrumB_at_root s hs,\n    circulantSpectrumB_at_neg_root s hs]\n  have hsq : (2 * s) ^ 2 = 4 * s ^ 2 := by ring\n  have hsqneg : (-(2 * s)) ^ 2 = 4 * s ^ 2 := by ring\n  rw [hsq, hsqneg, hs]\n  norm_num",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ]
+  ],
+  "raw": "theorem palindromicCycleDensityB_two (s : ℝ) (hs : s ^ 2 = 2) :\n    palindromicCycleDensityB s 2 = 80 := by\n  unfold palindromicCycleDensityB\n  rw [circulantSpectrumB_at_one, circulantSpectrumB_at_neg_one,\n    circulantSpectrumB_at_zero, circulantSpectrumB_at_root s hs,\n    circulantSpectrumB_at_neg_root s hs]\n  have hsq : (2 * s) ^ 2 = 4 * s ^ 2 := by ring\n  have hsqneg : (-(2 * s)) ^ 2 = 4 * s ^ 2 := by ring\n  rw [hsq, hsqneg, hs]\n  norm_num"
+ },
+ {
+  "kind": "theorem",
+  "name": "palindromic_second_cycle_densities_equal",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1738,
+  "docstring": "**The second cycle densities agree.**",
+  "signature": "(s : ℝ) (hs : s ^ 2 = 2)",
+  "body": "palindromicCycleDensityA s 2 = palindromicCycleDensityB s 2",
+  "proof": "by\n  rw [palindromicCycleDensityA_two s hs, palindromicCycleDensityB_two s hs]",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ]
+  ],
+  "raw": "theorem palindromic_second_cycle_densities_equal (s : ℝ) (hs : s ^ 2 = 2) :\n    palindromicCycleDensityA s 2 = palindromicCycleDensityB s 2 := by\n  rw [palindromicCycleDensityA_two s hs, palindromicCycleDensityB_two s hs]"
+ },
+ {
+  "kind": "theorem",
+  "name": "palindromicCycleDensityA_four",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1743,
+  "docstring": "Fourth cycle density of the first structure: `1840`.",
+  "signature": "(s : ℝ) (hs : s ^ 2 = 2)",
+  "body": "palindromicCycleDensityA s 4 = 1840",
+  "proof": "by\n  have hfour : s ^ 4 = 4 := by\n    have hrewrite : s ^ 4 = (s ^ 2) ^ 2 := by ring\n    rw [hrewrite, hs]\n    norm_num\n  unfold palindromicCycleDensityA\n  rw [circulantSpectrumA_at_one, circulantSpectrumA_at_neg_one,\n    circulantSpectrumA_at_quarter_turn, circulantSpectrumA_at_root s hs,\n    circulantSpectrumA_at_neg_root s hs]\n  have hneg : (-s) ^ 4 = s ^ 4 := by ring\n  rw [hneg, hfour]\n  norm_num",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ]
+  ],
+  "raw": "theorem palindromicCycleDensityA_four (s : ℝ) (hs : s ^ 2 = 2) :\n    palindromicCycleDensityA s 4 = 1840 := by\n  have hfour : s ^ 4 = 4 := by\n    have hrewrite : s ^ 4 = (s ^ 2) ^ 2 := by ring\n    rw [hrewrite, hs]\n    norm_num\n  unfold palindromicCycleDensityA\n  rw [circulantSpectrumA_at_one, circulantSpectrumA_at_neg_one,\n    circulantSpectrumA_at_quarter_turn, circulantSpectrumA_at_root s hs,\n    circulantSpectrumA_at_neg_root s hs]\n  have hneg : (-s) ^ 4 = s ^ 4 := by ring\n  rw [hneg, hfour]\n  norm_num"
+ },
+ {
+  "kind": "theorem",
+  "name": "palindromicCycleDensityB_four",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1758,
+  "docstring": "Fourth cycle density of the second structure: `1600`.",
+  "signature": "(s : ℝ) (hs : s ^ 2 = 2)",
+  "body": "palindromicCycleDensityB s 4 = 1600",
+  "proof": "by\n  have hfour : s ^ 4 = 4 := by\n    have hrewrite : s ^ 4 = (s ^ 2) ^ 2 := by ring\n    rw [hrewrite, hs]\n    norm_num\n  unfold palindromicCycleDensityB\n  rw [circulantSpectrumB_at_one, circulantSpectrumB_at_neg_one,\n    circulantSpectrumB_at_zero, circulantSpectrumB_at_root s hs,\n    circulantSpectrumB_at_neg_root s hs]\n  have hpos : (2 * s) ^ 4 = 16 * s ^ 4 := by ring\n  have hneg : (-(2 * s)) ^ 4 = 16 * s ^ 4 := by ring\n  rw [hpos, hneg, hfour]\n  norm_num",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ]
+  ],
+  "raw": "theorem palindromicCycleDensityB_four (s : ℝ) (hs : s ^ 2 = 2) :\n    palindromicCycleDensityB s 4 = 1600 := by\n  have hfour : s ^ 4 = 4 := by\n    have hrewrite : s ^ 4 = (s ^ 2) ^ 2 := by ring\n    rw [hrewrite, hs]\n    norm_num\n  unfold palindromicCycleDensityB\n  rw [circulantSpectrumB_at_one, circulantSpectrumB_at_neg_one,\n    circulantSpectrumB_at_zero, circulantSpectrumB_at_root s hs,\n    circulantSpectrumB_at_neg_root s hs]\n  have hpos : (2 * s) ^ 4 = 16 * s ^ 4 := by ring\n  have hneg : (-(2 * s)) ^ 4 = 16 * s ^ 4 := by ring\n  rw [hpos, hneg, hfour]\n  norm_num"
+ },
+ {
+  "kind": "theorem",
+  "name": "palindromic_fourth_cycle_densities_differ",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1776,
+  "docstring": "**The fourth cycle densities differ.** `1840` against `1600`: the witness\npair is separated by the fourth spectral moment of the overlap structure, the\nfirst cycle density their shared profile does not fix.",
+  "signature": "(s : ℝ) (hs : s ^ 2 = 2)",
+  "body": "palindromicCycleDensityA s 4 ≠ palindromicCycleDensityB s 4",
+  "proof": "by\n  rw [palindromicCycleDensityA_four s hs, palindromicCycleDensityB_four s hs]\n  norm_num",
+  "binders": [
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ]
+  ],
+  "raw": "theorem palindromic_fourth_cycle_densities_differ (s : ℝ) (hs : s ^ 2 = 2) :\n    palindromicCycleDensityA s 4 ≠ palindromicCycleDensityB s 4 := by\n  rw [palindromicCycleDensityA_four s hs, palindromicCycleDensityB_four s hs]\n  norm_num"
+ },
+ {
+  "kind": "theorem",
+  "name": "recurrence_matching_leaves_fourth_cycle_density_free",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1794,
+  "docstring": "**Matching the recurrence profile leaves the fourth cycle density free.**\n\nTwo designs whose overlap structures are the two palindromic circulants have\nequal second cycle densities and unequal fourth ones. The hypothesis\n`hrecurrence` — that the two agree in the whole variant-recurrence profile — is\nan argument of the theorem and is *never used in the proof*. That is the content:\nrecurrence is a star density, it is compatible with either value of the fourth\ncycle density, and a scheme that preserves it has preserved nothing the limit law\ndepends on.\n\nThe prescription is `CycleDeterminacy.cycle_preserving_resampling_is_a_calibration`:\npreserve the cycle densities, of which the fourth is the first that bites in the\nquadratic sector.",
+  "signature": "(design resampled : GenotypeDesign nx ιx) (s : ℝ) (hs : s ^ 2 = 2)\n    (_hrecurrence : ∀ i : Fin nx,\n      resampled.variantRecurrence i = design.variantRecurrence i)\n    (hdesign : design.cycleDensity 4 = palindromicCycleDensityA s 4)\n    (hresampled : resampled.cycleDensity 4 = palindromicCycleDensityB s 4)",
+  "body": "design.cycleDensity 4 ≠ resampled.cycleDensity 4",
+  "proof": "by\n  rw [hdesign, hresampled]\n  exact palindromic_fourth_cycle_densities_differ s hs",
+  "binders": [
+   [
+    [
+     "design",
+     "resampled"
+    ],
+    "GenotypeDesign nx ιx",
+    "("
+   ],
+   [
+    [
+     "s"
+    ],
+    "ℝ",
+    "("
+   ],
+   [
+    [
+     "hs"
+    ],
+    "s ^ 2 = 2",
+    "("
+   ],
+   [
+    [
+     "_hrecurrence"
+    ],
+    "∀ i : Fin nx,\n      resampled.variantRecurrence i = design.variantRecurrence i",
+    "("
+   ],
+   [
+    [
+     "hdesign"
+    ],
+    "design.cycleDensity 4 = palindromicCycleDensityA s 4",
+    "("
+   ],
+   [
+    [
+     "hresampled"
+    ],
+    "resampled.cycleDensity 4 = palindromicCycleDensityB s 4",
+    "("
+   ]
+  ],
+  "raw": "theorem recurrence_matching_leaves_fourth_cycle_density_free\n    (design resampled : GenotypeDesign nx ιx) (s : ℝ) (hs : s ^ 2 = 2)\n    (_hrecurrence : ∀ i : Fin nx,\n      resampled.variantRecurrence i = design.variantRecurrence i)\n    (hdesign : design.cycleDensity 4 = palindromicCycleDensityA s 4)\n    (hresampled : resampled.cycleDensity 4 = palindromicCycleDensityB s 4) :\n    design.cycleDensity 4 ≠ resampled.cycleDensity 4 := by\n  rw [hdesign, hresampled]\n  exact palindromic_fourth_cycle_densities_differ s hs"
  },
  {
   "kind": "theorem",
@@ -71034,8 +72182,8 @@
   "name": "hweMellinDrift_half",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 331,
-  "docstring": "At an equal-frequency locus the Mellin drift is exactly `log 2 = 0.6931...`.\n\nCompare the Gaussian value `c_G = 2 - gamma - log 2 = 0.7296...`: the two differ, so\n`Calibrator.Condensation` already separates a balanced hard-called locus from its\nGaussian surrogate. The drift mismatch at the most benign possible allele frequency is\nabout `5%` — small, but the separation is a statement about limits, not about size.",
+  "line": 337,
+  "docstring": "At an equal-frequency locus the Mellin drift is exactly `log 2 = 0.6931...`.\n\nCompare the Gaussian value `c_G = 2 - gamma - log 2 = 0.7296...`: the two differ, so\n`Calibrator.Condensation` already separates a balanced hard-called locus from its\nGaussian surrogate. The drift mismatch at the most benign possible allele frequency is\nabout `5%` — small, but the separation is a statement about limits, not about size.\n\nThat comparison is proved, not merely asserted: see\n`hweMellinDrift_half_lt_condensationConstant`, which rests on\n`Calibrator.Condensation.log_two_lt_condensationConstant`. It was for a long time stated\nhere in prose while being underivable, because `condensationConstant_bounds` brackets\n`c_G` in `(0.640, 0.807)` and that interval straddles `log 2`.",
   "signature": "",
   "body": "hweMellinDrift (1 / 2) = Real.log 2",
   "proof": "by\n  unfold hweMellinDrift\n  norm_num",
@@ -71047,7 +72195,7 @@
   "name": "hweMellinDrift_at_sqrt5_point",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 342,
+  "line": 348,
   "docstring": "**An exactly solvable interior point.** At `q = (5 - sqrt 5) / 10 = 0.27639...`\nthe closed form degenerates: `(1 - 2q) ^ 2 = q (1 - q) = 1/5`, so the heterozygote's\nsquared standardized value is exactly `1/2` and the drift is exactly `(3/5) log 2`.\n\nThis is below the drift at `q = 1/2`, which is what makes the drift non-monotone\nacross the frequency spectrum: it dips through a minimum in the common-variant range\nbefore diverging for rare variants.",
   "signature": "",
   "body": "hweMellinDrift ((5 - Real.sqrt 5) / 10) = (3 / 5) * Real.log 2",
@@ -71060,7 +72208,7 @@
   "name": "rare_variant_drift_lower_bound",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 365,
+  "line": 371,
   "docstring": "**Rare-variant lower bound.** For `0 < q ≤ 1/8` the Mellin drift is at least\n`(1/4) * log (1 / (8q))`, hence grows without bound as the allele frequency falls.\n\nThe mechanism is transparent in the closed form: the heterozygote carries squared\nstandardized value `(1 - 2q) ^ 2 / (2q(1-q)) ≈ 1 / (2q)`, which diverges, and it\ncarries essentially all of the second moment. A rare variant is a *large* multiplicative\ncoordinate that occurs *rarely* — exactly the configuration the condensation mechanism\npunishes.",
   "signature": "{q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8)",
   "body": "(1 / 4) * Real.log (1 / (8 * q)) ≤ hweMellinDrift q",
@@ -71095,7 +72243,7 @@
   "name": "rare_variant_drift_upper_bound",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 419,
+  "line": 425,
   "docstring": "**Rare-variant upper bound.** For `0 < q ≤ 1/8`,\n`c(q) ≤ log (1 / (2q)) + 4 q log 2`.\n\nThe two ingredients are that the heterozygote's squared standardized value\n`(1 - 2q) ^ 2 / (2q(1-q))` never exceeds `1 / (2q)` on this range — because\n`(1 - 2q) ^ 2 ≤ 1 - q` — and that the two homozygote contributions together\nsupply only `4q(1-q) log 2`, which is `O(q)`.\n\nThis is the missing half of the rare-variant asymptotic. `rare_variant_drift_lower_bound`\nshows the drift diverges; this shows it diverges no faster than `log (1 / (2q))`,\nand `rare_variant_drift_sharp_lower_bound` matches the same leading term from\nbelow.",
   "signature": "{q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8)",
   "body": "hweMellinDrift q ≤ Real.log (1 / (2 * q)) + 4 * q * Real.log 2",
@@ -71130,7 +72278,7 @@
   "name": "rare_variant_drift_sharp_lower_bound",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 490,
+  "line": 496,
   "docstring": "**Rare-variant sharp lower bound.** For `0 < q ≤ 1/8`,\n`(1 - 4q) log (1 / (2q)) - 6q ≤ c(q)`.\n\nPaired with `rare_variant_drift_upper_bound` this sandwiches the drift between\n`(1 - 4q) log (1/(2q)) - 6q` and `log (1/(2q)) + 4q log 2`, so\n\n  `c(q) = log (1 / (2q)) + O(q log (1/q))`,\n\nand in particular `c(q) / log (1 / (2q)) → 1` as `q → 0`. The sandwich is tight\nin practice: at `q = 10 ^ (-5)` the two sides agree to four decimal places.\n\n**Where the divergence comes from, since it is easy to get wrong.** It is the\n**heterozygote**, not the rare homozygote. The heterozygote has probability\n`2q(1-q)` and squared standardized value `(1-2q)^2 / (2q(1-q))`, and those\nmultiply to `(1-2q)^2 → 1`: it carries essentially the entire second moment, at\na log-value `≈ log (1/(2q))` that diverges. The rare homozygote is the tempting\nculprit because its standardized value is large, `≈ sqrt (2/q)`, but its\ncontribution is `q^2 * (2/q) * log (2/q) ≈ 2q log (1/q) → 0` — it is *too rare\nto matter*. This is why the leading constant is `log (1/(2q))` and not\n`log (1/q)` or `log (2/q)`: the `2` is the heterozygote's `2q(1-q)`\ndenominator.\n\nThe proof splits the heterozygote logarithm as\n`log (1/(2q)) + log ((1-2q)^2 / (1-q))` and bounds the second piece below by\n`-6q`, via `(1-2q)^2 / (1-q) ≥ 1 - 3q ≥ exp (-6q)`.",
   "signature": "{q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8)",
   "body": "(1 - 4 * q) * Real.log (1 / (2 * q)) - 6 * q ≤ hweMellinDrift q",
@@ -71165,7 +72313,7 @@
   "name": "condensationConstant_lt_drift_of_rare",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 575,
+  "line": 581,
   "docstring": "**The genotype drift exceeds the Gaussian condensation constant for rare\nvariants.** Already at `q = 1 / 256` the drift is above `c_G`.\n\nTogether with `hweMellinDrift_at_sqrt5_point` — which gives a drift of\n`(3/5) log 2 = 0.4159...`, strictly *below* `c_G = 0.7296...` — this proves the drift\n**crosses** the Gaussian constant somewhere in the ordinary allele-frequency range.\nAt the crossing frequency (numerically `q ≈ 0.140`) drift separation is blind, and the\ngenotype law is distinguished from its Gaussian surrogate only by the jet variance and\nthe lattice datum.",
   "signature": "",
   "body": "condensationConstant < hweMellinDrift (1 / 256)",
@@ -71178,7 +72326,7 @@
   "name": "drift_straddles_condensationConstant",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 591,
+  "line": 597,
   "docstring": "**The drift-blind frequency band exists.** There are allele frequencies on both\nsides of the Gaussian constant, so the first observable of the trichotomy fails to\nseparate somewhere strictly inside the common-variant range.",
   "signature": "",
   "body": "hweMellinDrift ((5 - Real.sqrt 5) / 10) < condensationConstant ∧\n    condensationConstant < hweMellinDrift (1 / 256)",
@@ -71191,7 +72339,7 @@
   "name": "maxSafeEpistaticOrder",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 621,
+  "line": 627,
   "docstring": "The largest epistatic order at which the Gaussian genotype surrogate is still\nvalid for an aggregate of `N` disjoint monomials at loci of allele frequency `q`:\n`m*(N, q) = log N / c(q)`.\n\nNote that this is a function of the allele frequency, not of the Gaussian\nconstant: it is `criticalDegree N (hweMellinDrift q)`, so the frequency argument\nis carried and the Gaussian value `criticalDegree N condensationConstant` is a\ndifferent number, recovered only when `c(q) = c_G`. The gap between them at rare\nfrequencies is `maxSafeEpistaticOrder_collapse_at_rare_maf`.\n\nEmpirical status: UNTESTED as a claim about real interaction analyses. The\nquantity is `criticalDegree N (hweMellinDrift q)` by definition and its inputs\nare derived, but the assertion that it is the order at which a real\nepistatic-aggregate null distribution changes limit has not been checked against\nsimulated or empirical interaction statistics. What has been checked is the\narithmetic: `proofs/validation/condensation/check_condensation.py` recomputes the\nsafe-order column of the module docstring table.",
   "signature": "(N q : ℝ) : ℝ",
   "body": "Real.log N / hweMellinDrift q",
@@ -71213,7 +72361,7 @@
   "name": "maxSafeEpistaticOrder_eq_criticalDegree",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 624,
+  "line": 630,
   "docstring": "",
   "signature": "(N q : ℝ)",
   "body": "maxSafeEpistaticOrder N q = criticalDegree N (hweMellinDrift q)",
@@ -71235,7 +72383,7 @@
   "name": "epistatic_order_safe_iff",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 628,
+  "line": 634,
   "docstring": "Subcriticality (the Gaussian surrogate is valid) is exactly `m * c(q) < log N`.",
   "signature": "{N q m : ℝ} (hc : 0 < hweMellinDrift q)",
   "body": "m < maxSafeEpistaticOrder N q ↔ hweMellinDrift q * m < Real.log N",
@@ -71265,7 +72413,7 @@
   "name": "maxSafeEpistaticOrder_lt_gaussian_of_drift_excess",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 639,
+  "line": 645,
   "docstring": "**A drift above the Gaussian constant is a safe order below the Gaussian value.**\n\n`maxSafeEpistaticOrder` is `log N / c(q)` and the Gaussian calculation is\n`log N / c_G`; both share the numerator, so the comparison is entirely a\ncomparison of drifts. Stated separately because it is the step at which the\nfrequency-dependence of `c(q)` becomes an actionable statement about a study\ndesign rather than a fact about a function.",
   "signature": "{N q : ℝ} (hN : 0 < Real.log N)\n    (hlt : condensationConstant < hweMellinDrift q)",
   "body": "maxSafeEpistaticOrder N q < criticalDegree N condensationConstant",
@@ -71301,7 +72449,7 @@
   "name": "sevenfold_drift_excess_at_rare_maf",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 658,
+  "line": 664,
   "docstring": "**The rare-variant drift is more than seven times the Gaussian constant.**\n\nAt `q = 1 / 1024 = 0.00098`, essentially the `q = 0.001` row of the table in the\nmodule docstring, `rare_variant_drift_sharp_lower_bound` gives\n`c(q) ≥ (1 - 4/1024) * 9 log 2 - 6/1024 = 6.2081...`, while\n`condensationConstant_bounds` gives `c_G < 0.807`. So `c(q) > 7 c_G`.\n\nThe crude `rare_variant_drift_lower_bound` cannot reach this: it would only give\n`c(q) ≥ (1/4) log (128) = 1.213`, a factor of `1.5`. Recovering the true factor\n— numerically `8.5` — is what the sharp bound buys.",
   "signature": "",
   "body": "7 * condensationConstant < hweMellinDrift (1 / 1024)",
@@ -71314,7 +72462,7 @@
   "name": "maxSafeEpistaticOrder_collapse_at_rare_maf",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 683,
+  "line": 689,
   "docstring": "**The safe epistatic order collapses by more than sevenfold at MAF `10 ^ (-3)`.**\n\n`7 * maxSafeEpistaticOrder N (1/1024) < criticalDegree N c_G`: a design calibrated\nby the Gaussian condensation constant overstates the safe interaction order at a\nrare-variant panel by more than a factor of seven.\n\nThe number that matters downstream: at `N = 10 ^ 6` disjoint terms\n(`log N = 13.8`) the Gaussian calculation gives a safe order near `19`, and the\ngenotype drift at this frequency gives a safe order near `2`. Pairwise\ninteraction statistics on standardized rare variants therefore sit *at* the\ncondensation boundary, not two decades below it, and the Gaussian-surrogate null\nused to calibrate them is converging to a different limit.",
   "signature": "{N : ℝ} (hN : 0 < Real.log N)",
   "body": "7 * maxSafeEpistaticOrder N (1 / 1024) < criticalDegree N condensationConstant",
@@ -71342,7 +72490,7 @@
   "name": "supercritical_of_small_maf",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 709,
+  "line": 715,
   "docstring": "**Supercriticality from a small allele frequency, in usable form.**\n\nIf the frequency is low enough that `(m/4) * log (1 / (8q))` already exceeds `log N`,\nthen order-`m` epistatic aggregates at that frequency are past the condensation\nboundary: the Gaussian surrogate converges to a different limit than the genotypes do.\n\nAt `N = 10 ^ 6` and `m = 2` the hypothesis holds for `q` below roughly `10 ^ (-11)`\nthrough this (deliberately crude) bound; the exact drift, which is about four times\nlarger than the bound at such frequencies, puts the true crossing near\n`q ≈ 10 ^ (-4)`. The bound is stated in the weak form because it is the form that is\nproved.",
   "signature": "{N m q : ℝ}\n    (hq0 : 0 < q) (hq : q ≤ 1 / 8) (hm : 0 < m)\n    (hsmall : Real.log N < (m / 4) * Real.log (1 / (8 * q)))",
   "body": "Real.log N < m * hweMellinDrift q",
@@ -71393,7 +72541,7 @@
   "name": "exists_maf_supercritical",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 724,
+  "line": 730,
   "docstring": "**There is always a frequency below which even order-`m` aggregates condense.**\n\nExplicitly: for `N ≥ 1` and any order `m > 0`, the frequency\n`q = exp (-(4 log N / m + 1)) / 8` is supercritical. Taking `m = 2` this says that\npairwise epistasis among sufficiently rare variants is *always* past the boundary, at\nevery fixed number of terms `N`.",
   "signature": "{N m : ℝ} (hm : 0 < m) (hN : 1 ≤ N)",
   "body": "∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧ Real.log N < m * hweMellinDrift q",
@@ -71429,7 +72577,7 @@
   "name": "hweLatticeCondition",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 769,
+  "line": 775,
   "docstring": "The three log-values of `x ^ 2` are in arithmetic progression exactly when the\nheterozygote's squared standardized value is the geometric mean of the two\nhomozygotes', i.e. when `(1 - 2q) ^ 2 = 4 q (1 - q)`.",
   "signature": "(q : ℝ) : Prop",
   "body": "(1 - 2 * q) ^ 2 = 4 * q * (1 - q)",
@@ -71450,7 +72598,7 @@
   "name": "latticeCriticalMaf",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 772,
+  "line": 778,
   "docstring": "The critical allele frequency `q* = (2 - sqrt 2) / 4 = 0.146447...`.",
   "signature": ": ℝ",
   "body": "(2 - Real.sqrt 2) / 4",
@@ -71463,7 +72611,7 @@
   "name": "latticeCriticalMaf_pos",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 774,
+  "line": 780,
   "docstring": "",
   "signature": "",
   "body": "0 < latticeCriticalMaf",
@@ -71476,7 +72624,7 @@
   "name": "latticeCriticalMaf_lt_one",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 781,
+  "line": 787,
   "docstring": "",
   "signature": "",
   "body": "latticeCriticalMaf < 1",
@@ -71489,7 +72637,7 @@
   "name": "hardCall_arithmeticProgression_at_critical_maf",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 797,
+  "line": 803,
   "docstring": "**The hard-call lattice point.** At `q* = (2 - sqrt 2) / 4` the three values of\n`log x ^ 2` for a hard-called Hardy-Weinberg locus form an exact arithmetic\nprogression: the coordinate law is *lattice*.\n\nBy `Calibrator.JetBarrier.lattice_detection` this locus is therefore separated from\nevery nonlattice law with the same Mellin 2-jet — in particular from any imputed-dosage\nor Gaussian surrogate — by an explicit high-degree design, with Poisson intensity\ninflated by `latticeInflation h > 1`. Moment matching cannot remove the effect, because\nit is a property of the support.",
   "signature": "",
   "body": "hweLatticeCondition latticeCriticalMaf",
@@ -71502,7 +72650,7 @@
   "name": "mellinJetVariance",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 816,
+  "line": 822,
   "docstring": "The second Mellin observable: `v(q) = Var(log x^2)` under the size-biased law.",
   "signature": "(h : HardyWeinbergModel) : ℝ",
   "body": "(∑ g : DiploidGenotype,\n      h.genotypeProb g * h.standardizedSquare g * (Real.log (h.standardizedSquare g)) ^ 2)\n    - h.mellinDrift ^ 2",
@@ -71523,7 +72671,7 @@
   "name": "hweMellinJetVariance",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 825,
+  "line": 831,
   "docstring": "Closed form of the Hardy-Weinberg jet variance. The coefficient collapse is the\nsame one that produces `hweMellinDrift`; only the logarithm is squared.",
   "signature": "(q : ℝ) : ℝ",
   "body": "2 * q * (1 - q) * (Real.log (2 * q / (1 - q))) ^ 2 +\n      (1 - 2 * q) ^ 2 * (Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))) ^ 2 +\n      2 * q * (1 - q) * (Real.log (2 * (1 - q) / q)) ^ 2 -\n    hweMellinDrift q ^ 2",
@@ -71544,7 +72692,7 @@
   "name": "HardyWeinbergModel.mellinJetVariance_eq",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 832,
+  "line": 838,
   "docstring": "**The jet variance of a Hardy-Weinberg locus in closed form.**",
   "signature": "(h : HardyWeinbergModel)\n    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)",
   "body": "h.mellinJetVariance = hweMellinJetVariance h.altFreq",
@@ -71579,7 +72727,7 @@
   "name": "hardCallLatticeSpan",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 860,
+  "line": 866,
   "docstring": "The lattice span at `q*` is `h = log ((1 - q*) / q*) = log (3 + 2 sqrt 2)`, which\nis strictly positive; hence the inflation factor `h / (1 - exp (-h))` is strictly\ngreater than one and the separation of `hardCall_arithmeticProgression_at_critical_maf`\nis quantitative.",
   "signature": ": ℝ",
   "body": "Real.log ((1 - latticeCriticalMaf) / latticeCriticalMaf)",
@@ -71592,7 +72740,7 @@
   "name": "hardCallLatticeSpan_pos",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 863,
+  "line": 869,
   "docstring": "",
   "signature": "",
   "body": "0 < hardCallLatticeSpan",
@@ -71605,7 +72753,7 @@
   "name": "hweMellinJetVariance_half",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 906,
+  "line": 912,
   "docstring": "**The second observable degenerates at the balanced locus.** `v(1/2) = 0`.\n\nAt `q = 1/2` the standardized square takes only the two values `2` (both homozygotes)\nand `0` (the heterozygote), so `log x ^ 2` is confined to a single point and its\nsize-biased variance vanishes. This is the same degeneracy that\n`Calibrator.EpistaticChaos.centeredDosageSquare_two_valued_at_half` records from the\ncoding side, reached here from the Mellin side; the two computations agree.\n\n**And `q = 1/2` is the only frequency at which the symmetry hypothesis holds.**\n`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff` proves that a\nstandardized Hardy-Weinberg genotype is sign-symmetric exactly at `q = 1/2`. So the\none frequency where the symmetric-law results of `Calibrator.JetBarrier` may be\ninstantiated at a genotype is the one frequency where the second observable they\nspeak about is identically zero. The drift is *not* degenerate there — `c(1/2) = log 2`\nby `hweMellinDrift_half`, not zero, since the standardized coordinate takes the values\n`-sqrt 2, 0, sqrt 2` and is not Rademacher — so drift separation survives; it is the\nwindow theory and the barrier that have nothing to work with.\n\nThe consequence is a genuine caveat on the spectroscopy, and it is worth stating\nplainly: `MellinProfile.jetVariance_pos` **fails** at exactly `q = 1/2`. The\ncondensation-window theory of `Calibrator.Condensation` — which needs a non-degenerate\nsize-biased increment to have a window at all — does not apply at a perfectly balanced\nlocus. Drift separation still does, since `hweMellinDrift_half` gives `log 2 ≠ c_G`.\n\nSo the balanced locus is the one frequency at which the *second* observable carries no\ninformation. Combined with the drift-blind band near `q ≈ 0.140`, the picture is that\neach of the three observables has its own blind frequency, and only the trichotomy as a\nwhole separates genotypes from their Gaussian surrogate across the spectrum.",
   "signature": "",
   "body": "hweMellinJetVariance (1 / 2) = 0",
@@ -71618,7 +72766,7 @@
   "name": "hardCallObservables",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 918,
+  "line": 924,
   "docstring": "**The complete observable triple of a hard-called locus at the lattice frequency.**\n\nEvery component is a closed-form function of the allele frequency, and the third\ncomponent is `lattice` because the three values of `log x ^ 2` form an exact arithmetic\nprogression there (`hardCall_arithmeticProgression_at_critical_maf`).",
   "signature": ": MellinObservables where\n  drift",
   "body": "hweMellinDrift latticeCriticalMaf\n  jetVariance := hweMellinJetVariance latticeCriticalMaf\n  latticeDatum :=\n    LatticeDatum.lattice hardCallLatticeSpan\n      (Real.log (2 * latticeCriticalMaf / (1 - latticeCriticalMaf)))",
@@ -71631,7 +72779,7 @@
   "name": "hardCallObservables_ne_gaussian",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 932,
+  "line": 938,
   "docstring": "**A hard-called locus is observationally distinct from the Gaussian, whatever its\n2-jet.** The third observable separates them outright — no moment computation, no\nwindow tuning, and nothing a cumulant can see.\n\nThis is the instantiation that makes `Calibrator.JetBarrier` bite: the abstract\ntrichotomy is not merely a classification, it has a concrete genotype in the lattice\nstratum.",
   "signature": "",
   "body": "hardCallObservables ≠ gaussianObservables",
@@ -71644,7 +72792,7 @@
   "name": "hardCall_not_chameleon",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 947,
+  "line": 953,
   "docstring": "Equivalently: a hard-called locus at the lattice frequency is **not** a chameleon.\nThe chameleon stratum is nonlattice, so no hard call can hide there — the blind spot of\nthe additive apparatus is populated by imputed dosages, not by genotypes.\n\n**Applicability note.** This theorem is a comparison of observable triples and needs no\nsymmetry: it holds at `q* = 0.1464...`, where the genotype law is *not* sign-symmetric.\nWhat does need symmetry is the surrounding *completeness* reading — \"and nothing else is\nobservable\" — since that is the `ChaosSpectroscopy.barrier` field, whose `Law` parameter\nranges over symmetric laws and which a genotype satisfies only at `q = 1/2`\n(`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff`). So the licensed claim\nhere is the positive one, \"this locus is separated from the Gaussian\", and not the\nnegative one, \"these three numbers are all that a design can see about this locus\".",
   "signature": "",
   "body": "¬ IsChameleonObservable hardCallObservables",
@@ -71657,7 +72805,7 @@
   "name": "hardCall_intensity_inflated",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 955,
+  "line": 961,
   "docstring": "**Hard calls are separated from dosage surrogates at high epistatic order.**\nThe inflation factor at `q*` is strictly above one, so the Poisson exceedance\nintensities differ and the compound-Poisson limits differ.",
   "signature": "",
   "body": "1 < latticeInflation hardCallLatticeSpan",
@@ -71670,7 +72818,7 @@
   "name": "experiment_factors_through_invariants",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 1045,
+  "line": 1051,
   "docstring": "**Every experiment factors through the four invariants.** Any report computed from\nthe design observations is a function of the invariant quadruple alone.",
   "signature": "{Report : Type*} (experiment : (Design → Observation) → Report)\n    (ν ν' : Law) (hinv : W.invariants ν = W.invariants ν')",
   "body": "experiment (W.observe ν) = experiment (W.observe ν')",
@@ -71713,7 +72861,7 @@
   "name": "hweCodingInvariants",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 1069,
+  "line": 1075,
   "docstring": "The invariant quadruple of a hard-called Hardy-Weinberg locus.\n\nThe drift and the jet variance are supplied from the closed forms proved in this file;\nthe arithmetic type and the square-cumulant sequence are taken as *arguments*, because\nneither has a closed form here — the arithmetic type is only pinned at the explicit\nfrequency `latticeCriticalMaf`, and the cumulant sequence is not computed anywhere in\nthis development. Keeping them as arguments is deliberate: the signature then says\nexactly which two of the four this file establishes and which two it assumes.\n\nEmpirical status: DERIVED in its first two components, from `hweMellinDrift` and\n`hweMellinJetVariance`, both of which are proved equal to direct sums over the three\ngenotypes and recomputed numerically by\n`proofs/validation/condensation/check_condensation.py`. The third and fourth components\nare inputs, not claims. No free parameter.",
   "signature": "(h : HardyWeinbergModel)\n    (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) : CodingInvariants where\n  drift",
   "body": "hweMellinDrift h.altFreq\n  jetVariance := hweMellinJetVariance h.altFreq\n  arithmeticType := arithmeticType\n  symmetric := h.altFreq = 1 / 2\n  squareCumulant := squareCumulant",
@@ -71748,7 +72896,7 @@
   "name": "hwe_observables_exhausted_by_invariants",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 1084,
+  "line": 1090,
   "docstring": "**The observable content of a hard-called locus is exhausted by four numbers-worth\nof data, two of which are computed here.**\n\nGiven the Vertex-Weight Law, two Hardy-Weinberg loci whose invariant quadruples agree are\nindistinguishable by every admissible design at every interaction degree. Since the first\ntwo components are closed-form functions of the allele frequency, this is the sense in\nwhich the spectroscopy of this file is *complete* rather than merely *available*.",
   "signature": "{Law Design Observation Report : Type*}\n    (W : VertexWeightCompleteness Law Design Observation)\n    (experiment : (Design → Observation) → Report)\n    (ν ν' : Law) (h h' : HardyWeinbergModel)\n    (arithmeticType arithmeticType' : LatticeDatum)\n    (squareCumulant squareCumulant' : ℕ → ℝ)\n    (hν : W.invariants ν = hweCodingInvariants h arithmeticType squareCumulant)\n    (hν' : W.invariants ν' = hweCodingInvariants h' arithmeticType' squareCumulant')\n    (hmatch : hweCodingInvariants h arithmeticType squareCumulant\n      = hweCodingInvariants h' arithmeticType' squareCumulant')",
   "body": "experiment (W.observe ν) = experiment (W.observe ν')",
@@ -71839,7 +72987,7 @@
   "name": "balanced_locus_symmetric_component",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 1105,
+  "line": 1111,
   "docstring": "**At the balanced locus, symmetry is the invariant that stops separating.**\n\n`q = 1/2` is the unique polymorphic frequency at which the genotype coding is\nsign-symmetric, so it is the unique frequency at which the sign-coupling channel agrees\nwith the Gaussian's. This is the precise form of the \"coincidence\": not that the drift\ndegenerates — it does not, `c(1/2) = log 2` — but that the one invariant which does match\nthe Gaussian matches it exactly where the jet variance is unusable.",
   "signature": "(h : HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2)\n    (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ)",
   "body": "(hweCodingInvariants h arithmeticType squareCumulant).symmetric ∧\n      (hweCodingInvariants h arithmeticType squareCumulant).drift = Real.log 2 ∧\n      (hweCodingInvariants h arithmeticType squareCumulant).jetVariance = 0",
@@ -71878,24 +73026,29 @@
  },
  {
   "kind": "theorem",
+  "name": "hweMellinDrift_half_lt_condensationConstant",
+  "module": "Calibrator.PolygenicSpectroscopy",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
+  "line": 1137,
+  "docstring": "**Drift separation at the balanced locus, now proved outright.**\n\n`c(1/2) = log 2 = 0.69315` and `c_G = 2 - gamma - log 2 = 0.72964` differ, so the drift\ndoes separate a balanced hard-called locus from its Gaussian surrogate — and separates it\nstrictly downward, `c(1/2) < c_G`, so a balanced locus is *more* condensation-prone than\nits Gaussian surrogate, with a slightly larger critical degree.\n\nThis was asserted in prose at `hweMellinDrift_half` long before it was provable:\n`condensationConstant_bounds` gives only `0.640 < c_G < 0.807`, an interval that\nstraddles `log 2`, so nothing in the development established it. The gap is now closed by\n`Calibrator.Condensation.log_two_lt_condensationConstant`, which takes the\nEuler-Mascheroni bound out to `H_16 - log 16` and lands at `c_G > 0.69871`.",
+  "signature": "",
+  "body": "hweMellinDrift (1 / 2) < condensationConstant",
+  "proof": "by\n  rw [hweMellinDrift_half]\n  exact log_two_lt_condensationConstant",
+  "binders": [],
+  "raw": "theorem hweMellinDrift_half_lt_condensationConstant :\n    hweMellinDrift (1 / 2) < condensationConstant := by\n  rw [hweMellinDrift_half]\n  exact log_two_lt_condensationConstant"
+ },
+ {
+  "kind": "theorem",
   "name": "balanced_locus_drift_separates",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 1132,
-  "docstring": "**Drift separation at the balanced locus, conditional on a sharper Gaussian\nconstant.**\n\n`c(1/2) = log 2 = 0.69315` and `c_G = 2 - gamma - log 2 = 0.72964` differ, so the drift\ndoes separate a balanced hard-called locus from its Gaussian surrogate. But this is *not*\ncurrently provable from `condensationConstant_bounds`, which gives only\n`0.640 < c_G < 0.807` — an interval that straddles `log 2`. The separation is therefore\nstated with the missing numeric input as a named hypothesis rather than asserted.\n\nSharpening `condensationConstant_bounds` to exclude `log 2` lives in\n`Calibrator.Condensation` and would discharge `hsharp` outright. Until then, the claim\nmade in prose at `hweMellinDrift_half` — that the balanced locus is already separated by\ndrift — is an arithmetic fact that this development does not yet prove.",
-  "signature": "(hsharp : (0.72 : ℝ) < condensationConstant)",
+  "line": 1144,
+  "docstring": "The same fact in the form the separation argument uses: the balanced locus is not\nobservationally equal to its Gaussian surrogate in the drift.",
+  "signature": "",
   "body": "hweMellinDrift (1 / 2) ≠ condensationConstant",
-  "proof": "by\n  rw [hweMellinDrift_half]\n  have hl2 : Real.log 2 < (0.6931471808 : ℝ) := Real.log_two_lt_d9\n  intro hEq\n  rw [hEq] at hl2\n  linarith",
-  "binders": [
-   [
-    [
-     "hsharp"
-    ],
-    "(0.72 : ℝ) < condensationConstant",
-    "("
-   ]
-  ],
-  "raw": "theorem balanced_locus_drift_separates\n    (hsharp : (0.72 : ℝ) < condensationConstant) :\n    hweMellinDrift (1 / 2) ≠ condensationConstant := by\n  rw [hweMellinDrift_half]\n  have hl2 : Real.log 2 < (0.6931471808 : ℝ) := Real.log_two_lt_d9\n  intro hEq\n  rw [hEq] at hl2\n  linarith"
+  "proof": "ne_of_lt hweMellinDrift_half_lt_condensationConstant",
+  "binders": [],
+  "raw": "theorem balanced_locus_drift_separates :\n    hweMellinDrift (1 / 2) ≠ condensationConstant :=\n  ne_of_lt hweMellinDrift_half_lt_condensationConstant"
  },
  {
   "kind": "def",

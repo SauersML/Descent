@@ -64,6 +64,7 @@ def build():
             checks=checks,
             findings=[c for c in checks
                       if c["verdict"] in ("escape", "escape-unguarded",
+                                          "escape-outside-theorem",
                                           "violated")],
         )
         if not covered:
@@ -125,6 +126,9 @@ def main(argv):
         print(f"\n{len(rows)} definitions with a finding, by severity:\n")
         for sev, k, v, r, i in rows:
             print(f"[{sev:5.1f}] {k}  ({v['path']}:{v['line']})")
+            if r.get("verdict") == "contradicts-theorem":
+                print(f"        CHECKER ERROR, not a corpus defect: "
+                      f"contradicts {r['contradicted']}")
             if r.get("verdict", "").startswith("escape"):
                 w = ", ".join(f"{a}={b:.6g}" for a, b in r["witness"].items())
                 print(f"        {r['range_why']}")

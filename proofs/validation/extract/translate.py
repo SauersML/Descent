@@ -75,7 +75,7 @@ CONSTS = {"Real.pi": "_rt.pi", "π": "_rt.pi"}
 # tokens whose presence means the body is outside the arithmetic fragment
 HARD_STOP = {
     ".card": "Finset cardinality", "∂": "integral / derivative",
-    "∑": "Finset/indexed sum", "∏": "indexed product", "∫": "integral",
+    "∏": "indexed product", "∫": "integral",
     "√": "notation √ (use Real.sqrt)", "⌊": "floor", "⌋": "floor",
     "‖": "norm of a vector/matrix", "∘": "function composition",
     "∈": "set membership", "∉": "set membership", "⊆": "set inclusion",
@@ -132,16 +132,41 @@ def tokenize(src: str):
 # ------------------------------------------------------------------ parser
 
 class Parser:
-    def __init__(self, toks, struct_args, locals_=(), resolver=None):
+    def __init__(self, toks, struct_args, locals_=(), resolver=None,
+                 struct_types=None, fields_of=None, dot_resolver=None,
+                 vector_args=None, dims=None):
         self.t = toks
         self.i = 0
         self.stop_cols = []            # layout barriers introduced by `let`
         self.struct_args = struct_args  # names bound to structures/tuples
         self.locals = set(locals_)      # binders: never a cross-definition call
         self.resolver = resolver        # (short, n_args) -> python name, or None
+        self.struct_types = struct_types or {}   # arg name -> structure type name
+        self.fields_of = fields_of or {}         # structure type -> set of fields
+        self.dot_resolver = dot_resolver         # (Type, method, n_args) -> pyname
+        self.vector_args = vector_args or {}     # arg name -> (dim var, rank)
+        self.dims = dims or {}                   # dim var -> python length expr
+        self.sum_vars = []                       # indices bound by an enclosing ∑
+
+    def _dot(self, x, nargs):
+        """Resolve `base.method` now that its application arity is known.
+
+        Lean's dot notation means `m.foo a` = `T.foo m a` when `m : T`.  Treating
+        it as a field access silently turns a method call into a KeyError, or
+        worse, into a projection that happens to exist.
+        """
+        if not isinstance(x, str) or not x.startswith("_DOT:"):
+            return x
+        base, ty, meth = x[5:].split("|")
+        if self.dot_resolver is None:
+            raise Untranslatable(f"dot-notation call {ty}.{meth}")
+        return self.dot_resolver(ty, meth, nargs), pyname(base)
 
     def _dep(self, x, nargs):
         """Resolve a `_DEP:` marker now that its application arity is known."""
+        x = self._dot(x, nargs)
+        if isinstance(x, tuple):                 # dot-call with no extra args
+            return f"{x[0]}({x[1]})"
         if not isinstance(x, str) or not x.startswith("_DEP:"):
             return x
         short = x[5:]
@@ -237,7 +262,21 @@ class Parser:
                 continue
             break
         if not args:
+            if isinstance(head, str) and head.startswith("_VEC:"):
+                return pyname(head[5:].split("|")[0])
             return self._dep(head, 0)
+        if isinstance(head, str) and head.startswith("_VEC:"):
+            name, dim, rank = head[5:].split("|")
+            if len(args) != int(rank):
+                raise Untranslatable(
+                    f"{name}: indexed with {len(args)} of {rank} indices "
+                    "(partial application of a vector is not modelled)")
+            idx = "".join(f"[int({a})]" for a in args)
+            return f"{pyname(name)}{idx}"
+        dot = self._dot(head, len(args))
+        if isinstance(dot, tuple):
+            fn, base = dot
+            return f"{fn}({', '.join([base] + args)})"
         if head.startswith("_FN:"):
             fn, arity = head[4:].split("|")
             arity = int(arity)
@@ -252,6 +291,47 @@ class Parser:
             raise Untranslatable("unexpected end of body")
         if p.text in HARD_STOP:
             raise Untranslatable(HARD_STOP[p.text])
+        if p.text == "∑":
+            self.next()
+            if self.peek() is None or self.peek().kind != "ident":
+                raise Untranslatable("∑ without a simple index binder")
+            idx = self.next().text
+            dimexpr = None
+            if self.at(":"):                       # ∑ i : Fin t, …
+                self.next()
+                toks = []
+                while self.peek() and self.peek().text != ",":
+                    toks.append(self.next().text)
+                if len(toks) >= 2 and toks[0] == "Fin":
+                    dimexpr = self.dims.get(toks[1]) or (
+                        toks[1] if toks[1].isdigit() else None)
+                if dimexpr is None:
+                    raise Untranslatable(
+                        f"∑ over {' '.join(toks)}: not a `Fin n` index set")
+            elif self.at("∈"):                     # ∑ i ∈ Finset.univ, …
+                self.next()
+                toks = []
+                while self.peek() and self.peek().text != ",":
+                    toks.append(self.next().text)
+                if "".join(toks) not in ("Finset.univ", "Finset.univ()"):
+                    raise Untranslatable(
+                        f"∑ over the Finset `{' '.join(toks)}`, not `Finset.univ`")
+            if dimexpr is None:
+                cand = {d for d, _ in self.vector_args.values()}
+                if len(cand) != 1:
+                    raise Untranslatable(
+                        "∑ with an unannotated index and "
+                        f"{len(cand)} candidate dimensions: cannot tell which")
+                dimexpr = self.dims.get(next(iter(cand)))
+            if dimexpr is None:
+                raise Untranslatable("∑ over a dimension with no runtime length")
+            self.expect(",")
+            self.locals.add(idx)
+            self.sum_vars.append(idx)
+            body = self.expr()
+            self.sum_vars.pop()
+            self.locals.discard(idx)
+            return f"sum(({body}) for {pyname(idx)} in range(int({dimexpr})))"
         if p.text == "|":                       # |e|  absolute value
             self.next()
             e = self.expr()
@@ -310,11 +390,21 @@ class Parser:
             if "." in name:                     # projection or qualified name
                 base, *flds = name.split(".")
                 if base in self.struct_args or (flds and flds[0].isdigit()):
+                    ty = self.struct_types.get(base)
+                    known = self.fields_of.get(ty, set())
+                    if len(flds) == 1 and ty and flds[0] not in known \
+                            and not flds[0].isdigit():
+                        # not a field of this structure: Lean dot notation, so
+                        # this is the method `ty.flds[0]` applied to `base`
+                        return f"_DOT:{base}|{ty}|{flds[0]}"
                     out = pyname(base)
                     for f in flds:
                         out = f"_rt._proj({out}, {f!r})"
                     return out
                 raise Untranslatable(f"qualified name {name}")
+            if name in self.vector_args:
+                dim, rank = self.vector_args[name]
+                return f"_VEC:{name}|{dim}|{rank}"
             if name in self.locals:
                 return pyname(name)
             return f"_DEP:{name}"
@@ -329,13 +419,16 @@ class Parser:
 LET_RE = re.compile(r"^(\s*)let\s+([A-Za-z_][\w'₀-₉ₐ-ₜ]*)\s*(?::[^:=]*)?:=\s*(.*)$")
 
 
-def translate_body(body: str, struct_args=(), locals_=(), resolver=None):
+def translate_body(body: str, struct_args=(), locals_=(), resolver=None,
+                   struct_types=None, fields_of=None, dot_resolver=None,
+                 vector_args=None, dims=None):
     """Translate a Lean body into (statements, return_expression)."""
     toks = tokenize(body)
     if not toks:
         raise Untranslatable("empty body")
     stmts = []
-    p = Parser(toks, set(struct_args), locals_, resolver)
+    p = Parser(toks, set(struct_args), locals_, resolver,
+               struct_types, fields_of, dot_resolver)
     while p.at("let"):
         letcol = p.peek().col
         p.next()
@@ -441,7 +534,9 @@ def translate_recursion(d, struct_arg_names=(), fname=None, resolver=None):
     return "\n".join(lines), args
 
 
-def translate_def(d, struct_arg_names=(), fname=None, resolver=None):
+def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
+                  struct_types=None, fields_of=None, dot_resolver=None,
+                 vector_args=None, dims=None):
     """Return (python_source, argnames) or raise Untranslatable.
 
     `resolver(short, n_args) -> python_name` decides which definition an
@@ -456,7 +551,9 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None):
     if not argnames and not d["body"].strip():
         raise Untranslatable("no explicit arguments and no body")
     binders = [n for a in d["args"] for n in a["names"]]      # incl. implicit
-    stmts, ret = translate_body(d["body"], struct_arg_names, binders, resolver)
+    stmts, ret = translate_body(d["body"], struct_arg_names, binders, resolver,
+                                struct_types, fields_of, dot_resolver,
+                                vector_args, dims)
     lines = [f"def {fname or pyname(d['short'])}({', '.join(argnames)}):"]
     for s in stmts:
         lines.append(f"    {s}")

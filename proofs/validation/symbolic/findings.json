@@ -1,25 +1,4 @@
 {
- "Calibrator.AssortativeMatingPGS.AssortativeMatingModel.equilibriumVariance": [
-  {
-   "check": "check1_fixed_point",
-   "severity": "gap",
-   "status": "UNGUARDED_ARITY_MISMATCH",
-   "file": "/Users/user/gnomon/proofs/Calibrator/AssortativeMatingPGS.lean",
-   "line": 127,
-   "detail": {
-    "claimed": null,
-    "claimed_opaque": "unresolved name m.V_A",
-    "map": "amVarianceStep",
-    "map_binders": [
-     "V₀",
-     "r",
-     "h2",
-     "V"
-    ],
-    "eq_binders": []
-   }
-  }
- ],
  "Calibrator.EpistaticChaos.InLinkageEquilibrium": [
   {
    "check": "check1_fixed_point",
@@ -127,26 +106,6 @@
     "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
     "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence"
    ]
-  }
- ],
- "Calibrator.PortabilityDrift.MutationDriftModelAssumptions.fstEquilibrium": [
-  {
-   "check": "check1_fixed_point",
-   "severity": "gap",
-   "status": "UNGUARDED_ARITY_MISMATCH",
-   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 4126,
-   "detail": {
-    "claimed": null,
-    "claimed_opaque": "unresolved name g.Ne",
-    "map": "ibdFlowStep",
-    "map_binders": [
-     "Ne",
-     "rate",
-     "F"
-    ],
-    "eq_binders": []
-   }
   }
  ],
  "Calibrator.QuadraticShift.scalarCorrectionFloor": [
@@ -328,7 +287,7 @@
     "names_definition": "mse",
     "mentions_definition": false,
     "MENTION_GAP": "theorem is named for `mse` but its statement never mentions it",
-    "reason": "expMse expects 0 args [], got 3"
+    "reason": "applied non-function expMse"
    }
   }
  ],
@@ -1371,7 +1330,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-   "line": 1021,
+   "line": 1023,
    "expression": "(-x0 + x1)**2",
    "other_members": [
     "Calibrator.Conclusions.brierScore",
@@ -3058,6 +3017,30 @@
    "other_expr": "8*x0**2 + 2*x0 - 4"
   }
  ],
+ "Calibrator.EpistaticChaos.palindromicCycleDensityA": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+   "line": 1694,
+   "this_expr": "2*(-4)**x1 + 2**x1 + 6**x1 + 2*(2*x0**2 - x0 - 4)**x1 + 2*(2*x0**2 + x0 - 4)**x1",
+   "other": "Calibrator.EpistaticChaos.palindromicCycleDensityB",
+   "other_expr": "3*(-2)**x1 + 6**x1 + 2*(x0**2 - 2*x0 - 2)**x1 + 2*(x0**2 + 2*x0 - 2)**x1"
+  }
+ ],
+ "Calibrator.EpistaticChaos.palindromicCycleDensityB": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+   "line": 1703,
+   "this_expr": "3*(-2)**x1 + 6**x1 + 2*(x0**2 - 2*x0 - 2)**x1 + 2*(x0**2 + 2*x0 - 2)**x1",
+   "other": "Calibrator.EpistaticChaos.palindromicCycleDensityA",
+   "other_expr": "2*(-4)**x1 + 2**x1 + 6**x1 + 2*(2*x0**2 - x0 - 4)**x1 + 2*(2*x0**2 + x0 - 4)**x1"
+  }
+ ],
  "Calibrator.LongitudinalPortability.ageDependentSignalVariance": [
   {
    "check": "check3_name_mate_disagreement",
@@ -3118,30 +3101,6 @@
    "other_expr": "x1*(1 - x0)"
   }
  ],
- "Calibrator.PolygenicAdaptation.effectCorrelationStabilizing": [
-  {
-   "check": "check3_name_mate_disagreement",
-   "severity": "disagreement",
-   "status": "NAME_MATE_BODIES_DIFFER",
-   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
-   "line": 288,
-   "this_expr": "-x0/(x1*x2 + 1) + 1",
-   "other": "Calibrator.PolygenicAdaptation.effectCorrelationFluctuating",
-   "other_expr": "Max(-1, -x0*(x1*x2 + 1) + 1)"
-  }
- ],
- "Calibrator.PolygenicAdaptation.effectCorrelationFluctuating": [
-  {
-   "check": "check3_name_mate_disagreement",
-   "severity": "disagreement",
-   "status": "NAME_MATE_BODIES_DIFFER",
-   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
-   "line": 297,
-   "this_expr": "Max(-1, -x0*(x1*x2 + 1) + 1)",
-   "other": "Calibrator.PolygenicAdaptation.effectCorrelationStabilizing",
-   "other_expr": "-x0/(x1*x2 + 1) + 1"
-  }
- ],
  "Calibrator.PolygenicArchitecture.gradeCertifiedRisk": [
   {
    "check": "check3_name_mate_disagreement",
@@ -3184,7 +3143,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-   "line": 825,
+   "line": 831,
    "this_expr": "2*x0*(1 - x0)*log((2 - 2*x0)/x0)**2 + 2*x0*(1 - x0)*log(2*x0/(1 - x0))**2 + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))**2 - (4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0))))**2",
    "other": "Calibrator.PolygenicSpectroscopy.hweMellinDrift",
    "other_expr": "4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))"
@@ -3274,6 +3233,47 @@
     "mutations_survived": [
      "scale by 2"
     ]
+   }
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransient": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 619,
+   "this_expr": "(1 - exp(x1*(-x0 - 1)/(2*x2)))/(x0 + 1)",
+   "other": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransientDiscrete",
+   "other_expr": "(1 - ((1 - 1/(2*x1))*(-x0/(2*x1) + 1))**x2)/(x0 + 1)"
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransientDiscrete": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1414,
+   "this_expr": "(1 - ((1 - 1/(2*x1))*(-x0/(2*x1) + 1))**x2)/(x0 + 1)",
+   "other": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransient",
+   "other_expr": "(1 - exp(x1*(-x0 - 1)/(2*x2)))/(x0 + 1)"
+  },
+  {
+   "check": "check4_docstring_approximation",
+   "severity": "error",
+   "status": "APPROXIMATION_UNSUPPORTED",
+   "detail": {
+    "check": "check4_docstring_approximation",
+    "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransientDiscrete",
+    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+    "line": 1414,
+    "compared_to": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransient",
+    "expr": "(1 - ((1 - 1/(2*Ne))*(1 - θ/(2*Ne)))**t)/(θ + 1)",
+    "other_expr": "(1 - exp(t*(-θ - 1)/(2*Ne)))/(θ + 1)",
+    "status": "APPROXIMATION_UNSUPPORTED",
+    "regimes": [],
+    "regime_stated_in_docstring": true
    }
   }
  ],
@@ -3437,27 +3437,6 @@
    "this_expr": "x0*(1 - x2) - x1*x2**2 + x2",
    "other": "Calibrator.RareVariantPortability.mutationSelectionBalance",
    "other_expr": "x0/(x0 + x1*x2)"
-  }
- ],
- "effectCorrelationStabilizing": [
-  {
-   "check": "check3_homonym",
-   "severity": "error",
-   "status": "ONE_NAME_TWO_FUNCTIONS",
-   "distinct_bodies": [
-    {
-     "expr": "-x0/(x1*x2 + 1) + 1",
-     "sites": [
-      "Calibrator.PolygenicAdaptation:288"
-     ]
-    },
-    {
-     "expr": "1 - 1/(2*x0)",
-     "sites": [
-      "Calibrator.SelectionArchitecture:90"
-     ]
-    }
-   ]
   }
  ],
  "Calibrator.Conclusions.bernoulliLogLoss": [

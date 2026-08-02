@@ -29,7 +29,8 @@ def check(name, cond, detail=""):
 
 
 def table():
-    return L.build_table(json.load(open(HERE / "decls.json")))
+    import shared
+    return shared.build_table()
 
 
 def main():
@@ -91,6 +92,24 @@ def main():
           bool(m0) and m0[0]["agree_to_order"] == 1
           and m0[0]["leading_error_order"] == 2,
           str(m0[0] if m0 else None))
+    # the exact identity supplied by the team lead, pinned as ground truth
+    D = (1 - mm) ** 2 + 2 * Ne * mm * (2 - mm)
+    xstar = (1 - mm) ** 2 / D
+    lead_err = 2 * Ne * mm ** 2 * (2 * mm - 3) / (D * (1 + 4 * Ne * mm))
+    check("lead's x* is the exact fixed point of the IBD recurrence",
+          sp.simplify((1 - mm) ** 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * xstar)
+                      - xstar) == 0)
+    check("x* - 1/(1+4Ne r) equals the supplied error term exactly",
+          sp.simplify(xstar - 1 / (1 + 4 * Ne * mm) - lead_err) == 0)
+    check("the classical form strictly OVERSTATES the rest point on (0,1)",
+          float(xstar.subs({mm: sp.Rational(1, 4), Ne: 2}))
+          < float((1 / (1 + 4 * Ne * mm)).subs({mm: sp.Rational(1, 4), Ne: 2})))
+    lead_hits = FP.linearisation_verdict(1 / (1 + 4 * Ne * mm), xstar, [Ne, mm])
+    lead_r0 = [h for h in lead_hits if h["regime"] == "r -> 0" or h["regime"] == "m -> 0"]
+    check("verdict on the supplied pair is holds_to_first_order, error order 2",
+          bool(lead_r0) and lead_r0[0]["leading_error_order"] == 2,
+          str(lead_r0[0] if lead_r0 else None))
+
     check("a genuinely wrong form is NOT excused as a linearisation",
           not FP.linearisation_verdict(1 / (1 + 4 * Ne * mm) + 7, exact_fp, [Ne, mm]))
     check("a trivial shared zero limit is not counted as agreement",
@@ -104,6 +123,26 @@ def main():
     check("|slope-1| = 1-slope under slope < 1", v is True)
     v, _ = H.equal_under(sp.Abs(slope - 1), 1 - slope, [], ())
     check("...and is rejected without the hypothesis", v is False)
+
+    print("shared parser is the source of definition bodies")
+    import shared
+    check("shared table is non-empty and excludes the phantom singletonProportion",
+          len(shared.build_table()) > 500
+          and "singletonProportion" not in shared.build_table(),
+          f"{len(shared.build_table())} definitions")
+
+    print("Mathlib totality")
+    xx = sp.Symbol("xx", real=True)
+    import hyps
+    f = sp.lambdify([xx], hyps.totalize(1 / xx),
+                    modules=[hyps.TOTAL_FUNCS, "math"])
+    check("1/0 evaluates to 0, as in Mathlib", f(0.0) == 0.0)
+    g = sp.lambdify([xx], hyps.totalize(sp.log(xx)),
+                    modules=[hyps.TOTAL_FUNCS, "math"])
+    check("log 0 evaluates to 0, as in Mathlib", g(0.0) == 0.0)
+    h = sp.lambdify([xx], hyps.totalize(sp.sqrt(xx)),
+                    modules=[hyps.TOTAL_FUNCS, "math"])
+    check("sqrt of a negative evaluates to 0, as in Mathlib", h(-4.0) == 0.0)
 
     print("checks can fail: perturbed bodies are rejected")
     cov = json.load(open(HERE / "coverage.json"))

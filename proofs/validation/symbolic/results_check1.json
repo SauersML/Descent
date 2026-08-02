@@ -29,25 +29,31 @@
   }
  },
  {
-  "fqn": "Calibrator.AssortativeMatingPGS.AssortativeMatingModel.equilibriumVariance",
-  "name": "AssortativeMatingModel.equilibriumVariance",
+  "fqn": "Calibrator.AssortativeMatingPGS.equilibriumVariance",
+  "name": "equilibriumVariance",
   "module": "Calibrator.AssortativeMatingPGS",
   "file": "/Users/user/gnomon/proofs/Calibrator/AssortativeMatingPGS.lean",
   "line": 127,
   "check": "check1_fixed_point",
-  "guard_theorem": null,
-  "status": "UNGUARDED_ARITY_MISMATCH",
+  "guard_theorem": "AssortativeMatingModel.equilibriumVariance_isFixedPoint",
+  "status": "opaque_theorem",
   "detail": {
    "claimed": null,
    "claimed_opaque": "unresolved name m.V_A",
+   "guard_statement": "amVarianceStep m.V_A m.r m.h2 m.equilibriumVariance = m.equilibriumVariance",
+   "reason": "unresolved name m.V_A",
    "map": "amVarianceStep",
-   "map_binders": [
-    "V₀",
-    "r",
-    "h2",
-    "V"
+   "map_roots": [
+    "-V₀/(h2*r - 1)"
    ],
-   "eq_binders": []
+   "map_derivative": "h2*r/2 + 1/2",
+   "root_stability": [
+    {
+     "root": "-V₀/(h2*r - 1)",
+     "stability": "unknown",
+     "derivative": "h2*r/2 + 1/2"
+    }
+   ]
   }
  },
  {
@@ -90,11 +96,9 @@
   "status": "opaque_theorem",
   "detail": {
    "claimed": null,
-   "claimed_opaque": "unresolved name g.Ne",
+   "claimed_opaque": "unresolved name p.theta",
    "guard_statement": "fstDriftFlowStep p (fstEquilibrium p) = fstEquilibrium p",
-   "reason": "fstEquilibrium expects 0 args [], got 1",
-   "map": "fstDriftFlowStep",
-   "root_analysis_skipped": "guard theorem is not a self-map in its final argument"
+   "reason": "applied non-function fstEquilibrium"
   }
  },
  {
@@ -139,9 +143,7 @@
   "detail": {
    "claimed": "decay**separation",
    "guard_statement": "markovLDStep decay (stationaryLDEntry decay) separation = stationaryLDEntry decay separation",
-   "reason": "stationaryLDEntry expects 2 args ['decay', 'separation'], got 1",
-   "map": "markovLDStep",
-   "root_analysis_skipped": "guard theorem is not a self-map in its final argument"
+   "reason": "stationaryLDEntry expects 2 args ['decay', 'separation'], got 1"
   }
  },
  {
@@ -414,24 +416,19 @@
   }
  },
  {
-  "fqn": "Calibrator.PortabilityDrift.MutationDriftModelAssumptions.fstEquilibrium",
-  "name": "MutationDriftModelAssumptions.fstEquilibrium",
+  "fqn": "Calibrator.PortabilityDrift.fstEquilibrium",
+  "name": "fstEquilibrium",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
   "line": 4126,
   "check": "check1_fixed_point",
-  "guard_theorem": null,
-  "status": "UNGUARDED_ARITY_MISMATCH",
+  "guard_theorem": "fstEquilibrium_isFixedPoint",
+  "status": "opaque_theorem",
   "detail": {
    "claimed": null,
-   "claimed_opaque": "unresolved name g.Ne",
-   "map": "ibdFlowStep",
-   "map_binders": [
-    "Ne",
-    "rate",
-    "F"
-   ],
-   "eq_binders": []
+   "claimed_opaque": "unresolved name m.theta",
+   "guard_statement": "fstDriftFlowStep p (fstEquilibrium p) = fstEquilibrium p",
+   "reason": "applied non-function fstEquilibrium"
   }
  },
  {

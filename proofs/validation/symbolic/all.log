@@ -1,11 +1,10 @@
-parsed 989 defs, 2260 theorems
+parsed 999 defs, 2287 theorems
 wrote /Users/user/gnomon/proofs/validation/symbolic/decls.json
 CHECK 1: 30 equilibrium/rest-point definitions
   fixed_point_verified       13
   no_fixed_point_theorem     9
-  opaque_theorem             3
+  opaque_theorem             5
   derived_from_equilibrium   3
-  UNGUARDED_ARITY_MISMATCH   2
 
 --- multiple rest points (relevance question Lean does not ask) ---
    Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium: roots ['0', '-m - m/s + 1']
@@ -15,7 +14,7 @@ CHECK 1: 30 equilibrium/rest-point definitions
       (-mu - sqrt(mu*(mu + 4*s)))/(2*s)        unknown
       (-mu + sqrt(mu*(mu + 4*s)))/(2*s)        unknown
 
-unguarded equilibrium claims: 2
+unguarded equilibrium claims: 0
 CHECK 1b: 1 coupled equilibrium systems detected
   joint_fixed_point_verified     1
 
@@ -26,10 +25,10 @@ CHECK 1b: 1 coupled equilibrium systems detected
       solve: twoDemeIMEquilibriumETst = 2 + 1/M   (claimed (2*M + 1)/M)
       unique solution: True
 
-CHECK 3: converted 370 definitions to sympy (609 opaque)
+CHECK 3: converted 372 definitions to sympy (627 opaque)
   symbolically identical groups: 50 (43 spanning more than one file)
-  name-mate disagreements      : 31
-  homonyms with distinct bodies: 1
+  name-mate disagreements      : 32
+  homonyms with distinct bodies: 0
 
 === identical bodies across files ===
   4*x0**2*x1*x2*(1 - x1)*(1 - x2)
@@ -113,7 +112,7 @@ CHECK 3: converted 370 definitions to sympy (609 opaque)
 
   (-x0 + x1)**2
       Calibrator.Conclusions.brierScore  (Conclusions.lean:49)  ['p', 'y']
-      Calibrator.MetricSpecificPortability.brierScoreMetric  (MetricSpecificPortability.lean:1021)  ['p', 'y']
+      Calibrator.MetricSpecificPortability.brierScoreMetric  (MetricSpecificPortability.lean:1023)  ['p', 'y']
       Calibrator.PortabilityDrift.brierRegretPoint  (PortabilityDrift.lean:3879)  ['η', 'q']
 
   2*x0
@@ -268,17 +267,15 @@ CHECK 3: converted 370 definitions to sympy (609 opaque)
       Calibrator.TransferLearningPGS.infoBottleneckObjective  (TransferLearningPGS.lean:953)  ['I_phi_Y', 'I_phi_A', 'lam']
 
 === homonyms ===
-  effectCorrelationStabilizing:
-      -x0/(x1*x2 + 1) + 1   @ ['Calibrator.PolygenicAdaptation:288']
-      1 - 1/(2*x0)   @ ['Calibrator.SelectionArchitecture:90']
 
 === opaque reasons ===
-    482  non-real binder
+    489  non-real binder
      11  Phi expects 0 args [], got 1
+     10  non-closed-form construct: else
      10  non-closed-form construct: let
-      9  non-closed-form construct: with
-      9  non-closed-form construct: then
+      8  non-closed-form construct: with
       7  non-closed-form construct: fun
+      7  unexpected token '>'
       5  lex error at 'ℝ) / (totalMarkers :'
       4  lex error at 'ℝ'
       4  r2FromSignalVariance expects 2 args ['vSignal', 'vNoise'], got 3
@@ -287,10 +284,9 @@ CHECK 3: converted 370 definitions to sympy (609 opaque)
       3  lex error at 'ℝ))) ^ t'
       2  unresolved name Real.eulerMascheroniConstant
       2  lex error at '![1, 1]'
-      2  applied non-function driftLDTrajectory
-CHECK 2: 480 derivation-claiming theorems
-  opaque                     275
-  not_an_equation            154
+CHECK 2: 481 derivation-claiming theorems
+  opaque                     273
+  not_an_equation            157
   derivation_verified        49
   VACUOUS_DERIVATION_NO_DEFS 1
   inconclusive               1
@@ -307,10 +303,17 @@ CHECK 2: 480 derivation-claiming theorems
   Calibrator.PortabilityDrift.neutralAFBenchmarkRatio_from_state:2914  -> theorem is named for `neutralAFBenchmarkRatio` but its statement never mentions it
   Calibrator.PortabilityDrift.targetBrierFromNeutralAFBenchmark_eq:3801  -> theorem is named for `targetBrierFromNeutralAFBenchmark` but its statement never mentions it
   Calibrator.TransportIdentities.mse_from_variance_ratio_corr_bias:788  -> theorem is named for `mse` but its statement never mentions it
-CHECK 4: 21 approximation/limit claims tested
+CHECK 4: 22 approximation/limit claims tested
   skipped_binders_do_not_correspond      18
   approximation_holds_in_regime          2
+  APPROXIMATION_UNSUPPORTED              1
   LINEARISATION_WITHOUT_STATED_REGIME    1
+
+!! UNSUPPORTED APPROXIMATION  Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransientDiscrete  (PopulationGeneticsFoundations.lean:1414)
+   docstring compares it to Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransient
+   (1 - ((1 - 1/(2*Ne))*(1 - θ/(2*Ne)))**t)/(θ + 1)
+   (1 - exp(t*(-θ - 1)/(2*Ne)))/(θ + 1)
+   no single-variable limit reconciles them
 
 !! LINEARISATION, REGIME NOT STATED
    Calibrator.PopulationGeneticsFoundations.continentIslandStepSelectionFirst:219  = p*(1 - m)*(s + 1)/(p*s + 1)
@@ -348,10 +351,10 @@ MUTATION TESTING: 206 definitions reached by a check
 --- check4_limits.py
 --- mutation.py
 
-findings.json: 210 names with at least one finding
+findings.json: 209 names with at least one finding
   duplicate              149
-  disagreement           62
-  gap                    11
+  disagreement           64
+  gap                    9
   vacuous_coverage       8
   naming_gap             6
   vacuous                1
