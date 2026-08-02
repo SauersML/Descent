@@ -267,7 +267,7 @@ change in one goes unnoticed in the others. -/
 theorem ascertainment_loss_eq_presentDayPGSVariance (coverage v_causal : ℝ) :
     ascertainment_loss coverage v_causal =
       presentDayPGSVariance v_causal coverage := by
-  unfold ascertainment_loss presentDayPGSVariance; ring
+  unfold ascertainment_loss presentDayPGSVariance pgsVarianceFromHet; ring
 
 theorem ascertainment_loss_eq_neutralPortabilityRatioLD (coverage v_causal : ℝ) :
     ascertainment_loss coverage v_causal =

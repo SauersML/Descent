@@ -676,25 +676,22 @@ Here V_A encodes both Σᵢ βᵢ² and the source heterozygosity, so the target
 variance is `pgsVarianceFromHet(V_A, 1 - fst)`.
 
     Empirical status: UNTESTED. -/
-noncomputable def targetPGSVariance (V_A fst : ℝ) : ℝ :=
+/-- **Present-day PGS variance after drift** from an ancestral variance `V_A`.
+
+There used to be two names for this — `targetPGSVariance`, defined as
+`pgsVarianceFromHet V_A (1 - fst)`, and `presentDayPGSVariance`, defined as
+`(1 - fst) * V_A` — together with a theorem proving them equal. Two bodies for one
+quantity is the failure this file's own regime discussion is about, so there is now one
+definition, and it is the composition rather than a re-typed product: the
+Fst-heterozygosity step is applied, not restated. -/
+noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
   pgsVarianceFromHet V_A (1 - fst)
 
-theorem targetPGSVariance_eq_pgsVarianceFromHet (V_A fst : ℝ) :
-    targetPGSVariance V_A fst = pgsVarianceFromHet V_A (1 - fst) := by
-  rfl
-
-/-- Present-day PGS variance after drift from an ancestral variance `V_A`.
-This is definitionally equal to `targetPGSVariance` — both encode
-E[V_PGS_target] = V_A × (1 - Fst), derived from the Fst-heterozygosity identity. -/
-noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
-  (1 - fst) * V_A
-
-/-- The `targetPGSVariance` derivation equals `presentDayPGSVariance`.
-This closes the derivation chain:
-  pgsVarianceFromHet → targetHetFromFst → targetPGSVariance = presentDayPGSVariance -/
-theorem targetPGSVariance_eq_presentDay (V_A fst : ℝ) :
-    targetPGSVariance V_A fst = presentDayPGSVariance V_A fst := by
-  unfold targetPGSVariance pgsVarianceFromHet presentDayPGSVariance
+/-- The closed form, derived rather than taken as the definition. This closes the chain
+`pgsVarianceFromHet → targetHetFromFst → presentDayPGSVariance`. -/
+theorem presentDayPGSVariance_eq_one_sub_fst_mul (V_A fst : ℝ) :
+    presentDayPGSVariance V_A fst = (1 - fst) * V_A := by
+  unfold presentDayPGSVariance pgsVarianceFromHet
   ring
 
 /-- The closed-form discrete Wright-Fisher retention factor after `t` generations.
@@ -791,7 +788,7 @@ theorem expected_abs_mean_shift_bound_proved
     (hfstS_lt_one : fstS < 1) :
     Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
       2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) := by
-  unfold Expected_Abs_Shift Var_Delta_Mu presentDayPGSVariance
+  unfold Expected_Abs_Shift Var_Delta_Mu presentDayPGSVariance pgsVarianceFromHet
   have h1 :
       Real.sqrt (2 * (fstS + fstT) * V_A) =
         Real.sqrt (2 * (fstS + fstT)) * Real.sqrt V_A := by
@@ -876,17 +873,22 @@ theorem expected_abs_mean_shift_of_wrightFisher
 noncomputable def presentDaySignalToNoise (V_A V_E fst : ℝ) : ℝ :=
   presentDayPGSVariance V_A fst / V_E
 
-/-- Present-day coefficient of determination (R²) under drift.
-This is the explained-variance ratio, a definitional identity from statistics:
-  R² = V_signal / V_total = V_PGS / (V_PGS + V_E)
-where V_PGS = presentDayPGSVariance V_A fst = V_A × (1 - Fst) is the
-drift-attenuated PGS variance (derived via the Fst-heterozygosity chain above)
-and V_E is the environmental (residual) variance. The ratio is not a claim
-requiring proof — it is the definition of the fraction of phenotypic variance
-explained by the PGS in the target population. -/
+/-- **Explained-variance ratio from a signal variance and a residual variance.**
+
+This is the single place the ratio `vSignal / (vSignal + V_E)` is written down. Every
+present-day, mutation-drift and temporal `R²` in the corpus is this function applied to a
+different signal variance, and each of those is now that application rather than a second
+copy of the same quotient. -/
+noncomputable def expectedR2 (vSignal V_E : ℝ) : ℝ :=
+  vSignal / (vSignal + V_E)
+
+/-- **Present-day coefficient of determination under drift.**
+
+`R² = V_PGS / (V_PGS + V_E)` where `V_PGS = presentDayPGSVariance V_A fst`. The quotient
+itself is not restated here: this is `expectedR2` applied to the drift-attenuated signal
+variance, so the two cannot drift apart. -/
 noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
-  let v := presentDayPGSVariance V_A fst
-  v / (v + V_E)
+  expectedR2 (presentDayPGSVariance V_A fst) V_E
 
 /-- Exact bridge theorem: the dashboard algebraic `presentDayR2` equals statistical
 `rsquared` when the relevant second-moment identities hold. -/
@@ -927,13 +929,10 @@ theorem presentDayR2_eq_statistical_rsquared
     unfold rsquared
     simp [h_vf, h_vg, h_cov, h_if_not]
   rw [h_rs]
-  unfold presentDayR2
+  unfold presentDayR2 expectedR2
   field_simp [h_vsig_ne, h_vtrue_ne]
 
 
-/-- Expected `R²` from signal variance and environmental variance. -/
-noncomputable def expectedR2 (vSignal V_E : ℝ) : ℝ :=
-  vSignal / (vSignal + V_E)
 
 
 /-- Exact present-day AUC under the equal-variance Gaussian liability model.
@@ -958,7 +957,7 @@ theorem drift_degrades_signalToNoise
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT) :
     presentDaySignalToNoise V_A V_E fstT < presentDaySignalToNoise V_A V_E fstS := by
-  unfold presentDaySignalToNoise presentDayPGSVariance
+  unfold presentDaySignalToNoise presentDayPGSVariance pgsVarianceFromHet
   have hnum : (1 - fstT) * V_A < (1 - fstS) * V_A := by
     nlinarith [mul_lt_mul_of_pos_right hfst hVA]
   have hInv : 0 < V_E⁻¹ := inv_pos.mpr hVE
@@ -974,7 +973,7 @@ theorem drift_degrades_R2
     (hfst : fstS < fstT)
     (hfstT_le_one : fstT ≤ 1) :
     presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS := by
-  unfold presentDayR2 presentDayPGSVariance
+  unfold presentDayR2 expectedR2 presentDayPGSVariance pgsVarianceFromHet
   have h_mono : ∀ (x y : ℝ), 0 ≤ x → x < y → x / (x + V_E) < y / (y + V_E) := by
     intro x y hx hxy
     have hxE : 0 < x + V_E := by linarith
@@ -1045,7 +1044,7 @@ theorem drift_degrades_AUC_of_strictMono
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
     have hsnr_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT := by
-      unfold presentDaySignalToNoise presentDayPGSVariance
+      unfold presentDaySignalToNoise presentDayPGSVariance pgsVarianceFromHet
       have hnum : 0 ≤ (1 - fstT) * V_A := by
         have h_one_minus : 0 ≤ 1 - fstT := by linarith
         exact mul_nonneg h_one_minus (le_of_lt hVA)
@@ -1077,7 +1076,7 @@ theorem drift_degrades_equalVarianceGaussianAUC
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
     have hsnr_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT := by
-      unfold presentDaySignalToNoise presentDayPGSVariance
+      unfold presentDaySignalToNoise presentDayPGSVariance pgsVarianceFromHet
       have hnum : 0 ≤ (1 - fstT) * V_A := by
         have h_one_minus : 0 ≤ 1 - fstT := by linarith
         exact mul_nonneg h_one_minus (le_of_lt hVA)
@@ -2824,7 +2823,7 @@ theorem portability_ratio_with_ld_decay
       exact mul_nonneg hRhoTerm_nonneg (le_of_lt hVA)
     · exact hRealTarget_lt
   have hSourcePos : 0 < presentDayPGSVariance V_A fstS := by
-    unfold presentDayPGSVariance
+    unfold presentDayPGSVariance pgsVarianceFromHet
     have : 0 < 1 - fstS := by linarith
     exact mul_pos this hVA
   have hR2Source_pos : 0 < expectedR2 (presentDayPGSVariance V_A fstS) V_E := by
@@ -2900,9 +2899,9 @@ theorem neutralAFBenchmarkRatio_from_state
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
     targetR2FromNeutralAFBenchmark V_A V_E fstTarget / presentDayR2 V_A V_E fstSource < 1 := by
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstSource := by
-    unfold presentDayR2
+    unfold presentDayR2 expectedR2
     have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
-      unfold presentDayPGSVariance
+      unfold presentDayPGSVariance pgsVarianceFromHet
       have h_one_minus : 0 < 1 - fstSource := by linarith [h_fst_bounds.2, h_fst]
       exact mul_pos h_one_minus hVA
     exact div_pos hv_pos (by linarith)
@@ -3173,7 +3172,7 @@ noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
     Empirical status: VALIDATED for the equal-variance Gaussian model;
     FALSIFIED as the liability-threshold AUC. -/
 noncomputable def equalVarianceGaussianAUCFromVariances (vSignal vEnv : ℝ) : ℝ :=
-  Phi (Real.sqrt (vSignal / (2 * vEnv)))
+  gaussianAUCFromSignalVariance vSignal vEnv
 
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
@@ -3830,7 +3829,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
     equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 V_A V_E fst) =
       presentDayGaussianAUC V_A V_E fst := by
   have hv_pos : 0 < presentDayPGSVariance V_A fst := by
-    unfold presentDayPGSVariance
+    unfold presentDayPGSVariance pgsVarianceFromHet
     have h_one_minus : 0 < 1 - fst := by linarith
     exact mul_pos h_one_minus hVA
   have hsum_ne : presentDayPGSVariance V_A fst + V_E ≠ 0 := by
@@ -3839,7 +3838,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
   have hchart :
       presentDayR2 V_A V_E fst / (2 * (1 - presentDayR2 V_A V_E fst)) =
         presentDaySignalToNoise V_A V_E fst / 2 := by
-    unfold presentDayR2 presentDaySignalToNoise
+    unfold presentDayR2 expectedR2 presentDaySignalToNoise
     field_simp [hsum_ne, hve_ne]
     ring
   unfold equalVarianceGaussianAUCFromExplainedR2 presentDayGaussianAUC
@@ -4426,7 +4425,7 @@ theorem presentDayPGSVarianceMutationDrift_eq (V_A fst_drift shared_ld : ℝ) :
 theorem presentDayPGSVarianceMutationDrift_pure_drift (V_A fst_drift : ℝ) :
     presentDayPGSVarianceMutationDrift V_A fst_drift 1 = presentDayPGSVariance V_A fst_drift := by
   rw [presentDayPGSVarianceMutationDrift_eq]
-  unfold presentDayPGSVariance
+  unfold presentDayPGSVariance pgsVarianceFromHet
   ring
 
 /-- Signal retention is nonneg under valid parameters. -/
@@ -4446,7 +4445,7 @@ theorem mutationDrift_signal_lt_puredrift (V_A fst_drift shared_ld : ℝ)
     presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld <
       presentDayPGSVariance V_A fst_drift := by
   rw [presentDayPGSVarianceMutationDrift_eq]
-  unfold presentDayPGSVariance
+  unfold presentDayPGSVariance pgsVarianceFromHet
   have h1 : 0 < 1 - fst_drift := by linarith
   have h_factor : (1 - fst_drift) * shared_ld < (1 - fst_drift) * 1 := by
     exact mul_lt_mul_of_pos_left hld_lt h1
@@ -4469,7 +4468,7 @@ theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
     (hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
     presentDayR2MutationDrift V_A V_E fst_drift shared_ld <
       presentDayR2 V_A V_E fst_drift := by
-  unfold presentDayR2MutationDrift presentDayR2
+  unfold presentDayR2MutationDrift presentDayR2 expectedR2
   have h_sig_lt := mutationDrift_signal_lt_puredrift V_A fst_drift shared_ld
     hVA hfst hfst_lt hld hld_lt
   have h_md_nonneg : 0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld := by
@@ -4531,7 +4530,7 @@ theorem equilibrium_drift_component_improves_with_theta
     (h_more : θ₁ < θ₂) :
     presentDayPGSVariance V_A (1 / (1 + θ₁)) <
       presentDayPGSVariance V_A (1 / (1 + θ₂)) := by
-  unfold presentDayPGSVariance
+  unfold presentDayPGSVariance pgsVarianceFromHet
   have h1 : 0 < 1 + θ₁ := by linarith
   have h2 : 0 < 1 + θ₂ := by linarith
   -- 1/(1+θ₂) < 1/(1+θ₁), so 1 - 1/(1+θ₁) < 1 - 1/(1+θ₂)
@@ -4561,7 +4560,7 @@ theorem mutationDrift_variance_ratio (V_A fst shared_ld : ℝ)
     presentDayPGSVarianceMutationDrift V_A fst shared_ld /
       presentDayPGSVariance V_A fst = shared_ld := by
   rw [presentDayPGSVarianceMutationDrift_eq]
-  unfold presentDayPGSVariance
+  unfold presentDayPGSVariance pgsVarianceFromHet
   have hfst_ne : 1 - fst ≠ 0 := by linarith
   have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
   field_simp [hfst_ne, hVA_ne]
@@ -4577,7 +4576,7 @@ theorem neutral_af_benchmark_correction_factor (V_A V_E fst_target shared_ld : �
     presentDayPGSVarianceMutationDrift V_A fst_target shared_ld =
       shared_ld * presentDayPGSVariance V_A fst_target := by
   rw [presentDayPGSVarianceMutationDrift_eq]
-  unfold presentDayPGSVariance
+  unfold presentDayPGSVariance pgsVarianceFromHet
   ring
 
 /-- **Pairwise Fst under mutation-drift balance is bounded.**

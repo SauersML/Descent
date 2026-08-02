@@ -82,9 +82,9 @@ theorem selection_dominant_for_immune
       expectedR2 (presentDayPGSVariance V_A fst) V_E := by
   apply expectedR2_strictMono_nonneg V_E _ _ hVE
   · exact le_of_lt (mul_pos (sq_pos_of_pos hρ_pos)
-      (by unfold presentDayPGSVariance; exact mul_pos (by linarith) hVA))
+      (by unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos (by linarith) hVA))
   · have h_pdv_pos : 0 < presentDayPGSVariance V_A fst := by
-      unfold presentDayPGSVariance; exact mul_pos (by linarith) hVA
+      unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos (by linarith) hVA
     calc ρ ^ 2 * presentDayPGSVariance V_A fst
         < 1 * presentDayPGSVariance V_A fst := by
           apply mul_lt_mul_of_pos_right _ h_pdv_pos
@@ -202,9 +202,9 @@ theorem counterfactual_same_ancestry_perfect
     expectedR2 (presentDayPGSVariance V_A fst) V_E <
       expectedR2 (presentDayPGSVariance V_A 0) V_E := by
   apply expectedR2_strictMono_nonneg V_E _ _ hVE
-  · unfold presentDayPGSVariance
+  · unfold presentDayPGSVariance pgsVarianceFromHet
     exact le_of_lt (mul_pos (by linarith) hVA)
-  · unfold presentDayPGSVariance
+  · unfold presentDayPGSVariance pgsVarianceFromHet
     simp only [sub_zero]
     have : (1 - fst) * V_A < 1 * V_A := by
       exact mul_lt_mul_of_pos_right (by linarith) hVA

@@ -1036,10 +1036,14 @@ of order `4·10²`, `9·10⁴`, `5·10⁹`. **The observable algebra is infinite
 finite in practice, truncated at about floor three no matter how large the study.**
 
 For genotypes the first floor's scale is not the Gaussian's. It is `σ₁² = 1/V - 1` with
-`V = 2q(1-q)` (`hweFloorOneScaleSq_eq`), which equals the Gaussian's `2` at exactly one
-frequency — `gaussianKurtosisMaf`, the same `MAF = 0.2113…` at which the hub channel goes
-blind — and diverges for rare variants, where it is about `49` at MAF `0.01`. So rare
-variants start the tower further from the Gaussian and are harder to read at every floor.
+`V = 2q(1-q)` (`hweFloorOneScaleSq_eq`), about `49` at MAF `0.01` and `1` at MAF `0.5`, so
+rare variants start the tower further from the Gaussian and are harder to read at every
+floor.
+
+It equals the Gaussian's `2` at `gaussianKurtosisMaf`, the same `MAF = 0.2113…` at which
+the hub channel goes blind — necessarily, not coincidentally: `σ₁² = E[x⁴] - 1`
+identically, so the two conditions are the single equation `2q(1-q) = 1/3`. Floor-one
+scale and coordinate kurtosis are one observable.
 -/
 
 /-- The squared scale of the normalized squaring flow at a unit-variance coordinate:
@@ -1096,13 +1100,21 @@ theorem hweFloorOneScaleSq_eq (h : HardyWeinbergModel)
   unfold squaringScaleSq
   exact standardizedSquare_second_cumulant h hq0 hq1
 
-/-- **The genotype's floor-one scale equals the Gaussian's at exactly one frequency**, and
-it is the blind frequency `gaussianKurtosisMaf = (3 - √3)/6`.
+/-- **The genotype's floor-one scale equals the Gaussian's at the blind frequency**
+`gaussianKurtosisMaf = (3 - √3)/6`, where the genotype variance is `1/3` and so
+`σ₁² = 1/V - 1 = 2`.
 
-At that MAF the genotype variance is `1/3`, so `σ₁² = 1/V - 1 = 2`, the Gaussian value.
-The frequency at which the hub channel cannot separate a genotype from a Gaussian is the
-same frequency at which the two towers start from the same scale — one fact, reached from
-two directions. -/
+**These are not two facts.** `squaringScaleSq` is `E[x⁴] - 1` by definition, so matching a
+coordinate's kurtosis to the Gaussian's `3` and matching its floor-one scale to the
+Gaussian's `2` are the same equation, `2q(1-q) = 1/3`. This theorem is therefore a
+consistency check on the two derivations, not a coincidence between them, and nobody should
+go looking for a mechanism that explains the agreement.
+
+The identity behind it is the content worth keeping: **floor-one scale and coordinate
+kurtosis are one observable**, differing by the constant `1`. What survives independently
+of the framing is the direction — `σ₁² = 1/V - 1` is about `49` at MAF `0.01` and `1` at
+MAF `0.5`, so rare variants start the tower further from the Gaussian and are harder to
+read at every floor. -/
 theorem hweFloorOneScaleSq_eq_gaussian_at_blind_maf (h : HardyWeinbergModel)
     (hmaf : h.altFreq = gaussianKurtosisMaf) :
     squaringScaleSq

@@ -290,7 +290,7 @@ survived. -/
 theorem amEquilibrium_then_drift (V_A r h2 fst : ℝ) :
     presentDayPGSVariance (amEquilibriumVariance V_A r h2) fst =
       (1 - fst) * (V_A / (1 - r * h2)) := by
-  unfold presentDayPGSVariance amEquilibriumVariance
+  unfold presentDayPGSVariance pgsVarianceFromHet amEquilibriumVariance
   ring
 
 /-! ### Tying the inlined genotype-variance restatements back to `ploidy`
@@ -771,7 +771,7 @@ theorem neutralPortabilityRatioLD_eq_retainedFraction (fst ld : ℝ) :
 
 theorem presentDayPGSVariance_eq_retainedFraction (V_A fst : ℝ) :
     presentDayPGSVariance V_A fst = retainedFraction fst V_A := by
-  unfold presentDayPGSVariance retainedFraction; ring
+  unfold presentDayPGSVariance pgsVarianceFromHet retainedFraction; ring
 
 /-- Squared covariance over the product of variances: the transport-moment
 explained `R²` and the PGS `R²` are one map. -/

@@ -54,7 +54,7 @@ signal variance `V_A × (1 - fst)`. -/
 private theorem presentDayR2_eq_expectedR2
     (V_A V_E fst : ℝ) :
     presentDayR2 V_A V_E fst = expectedR2 ((1 - fst) * V_A) V_E := by
-  simp [presentDayR2, presentDayPGSVariance, expectedR2]
+  simp [presentDayR2, presentDayPGSVariance, pgsVarianceFromHet, expectedR2]
 
 /-- Exact gain from adding `δ` units of taggable signal variance to a deployed
 target state with baseline signal variance `x`. -/

@@ -47,7 +47,7 @@ theorem neutralPortabilityRatioLD_eq_presentDayPGSVariance
     (fst_additional ld_factor : ℝ) :
     neutralPortabilityRatioLD fst_additional ld_factor =
       presentDayPGSVariance ld_factor fst_additional := by
-  unfold neutralPortabilityRatioLD presentDayPGSVariance; ring
+  unfold neutralPortabilityRatioLD presentDayPGSVariance pgsVarianceFromHet; ring
 
 /-- Neutral ratio is in [0, 1] under valid parameters. -/
 theorem neutral_ratio_in_unit (fst ld : ℝ)

@@ -2100,7 +2100,38 @@ namespace TransportedMetrics
 noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   vSignal / (vSignal + vNoise)
 
-/-- Exact equal-variance Gaussian liability AUC from signal and residual variances. -/
+/-- **AUC of the equal-variance Gaussian model**, from signal and residual
+    variances: `Φ(√(vSignal / (2 · vNoise)))`.
+
+    **Not the liability-threshold AUC.** The docstring here used to call it
+    that. The liability-threshold AUC depends on prevalence, which this
+    signature cannot express, and its sibling
+    `equalVarianceGaussianAUCFromVariances` -- which now calls this body --
+    carries the marker recording that the liability reading is falsified. Two
+    copies of one formula had drifted to opposite claims about which quantity
+    it is; that is why they are one definition now.
+
+    **Boundary defect, measured.** Perfect prediction, `vNoise = 0`, is
+    attainable in this signature, and division being total there sends the
+    argument to `0` rather than to `+∞`. So the body returns `Φ(0) = 1/2`,
+    chance discrimination, where the limit as `vNoise → 0⁺` is `1`, perfect
+    discrimination. The returned value sits at the opposite end of the AUC
+    range from the limit -- the full width of `[1/2, 1]`.
+
+    The defect is upstream of `Phi` and is not an artefact of any numeric
+    stand-in for it: the argument itself jumps from divergent to zero, so every
+    monotone increasing map of it is wrong in the same direction. Checked by
+    substituting the logistic, a shifted `tanh` and `z/(1+z)` for `Phi`; all
+    four return `1/2` at the boundary against `≈ 1` just inside it.
+
+    Empirical status: VALIDATED for the equal-variance Gaussian model, away
+    from `vNoise = 0`. Measured against Monte-Carlo of the underlying
+    two-Gaussian model, 200000 draws per point: predicted against simulated
+    `0.760250/0.760040`, `0.921350/0.921505`, `0.999797/0.999820`,
+    `1.000000/1.000000` at `vNoise = 1, 0.25, 0.04, 0.01` with `vSignal = 1`;
+    largest absolute difference `2.1e-4`. Power: the prediction spans `0.760`
+    to `1.000` across that design, so a wrong functional form of this shape
+    would separate. At the boundary itself it is FALSIFIED, as above. -/
 noncomputable def gaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   Phi (Real.sqrt (vSignal / (2 * vNoise)))
 

@@ -76,7 +76,7 @@ theorem neutralDriftR2Ratio_eq (V_A V_E fst : ℝ)
     ne_of_gt (add_pos (mul_pos h1f hVA) hVE)
   have hsum : V_A + V_E ≠ 0 := ne_of_gt (add_pos hVA hVE)
   have hVA' : V_A ≠ 0 := ne_of_gt hVA
-  unfold neutralDriftR2Ratio presentDayR2 presentDayPGSVariance
+  unfold neutralDriftR2Ratio presentDayR2 presentDayPGSVariance pgsVarianceFromHet
   field_simp
   ring
 
