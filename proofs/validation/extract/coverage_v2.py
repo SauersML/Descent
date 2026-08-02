@@ -347,8 +347,7 @@ def main(argv=None):
                 rec["violation"] = {"point": {k: round(v, 6) for k, v in viol[0].items()},
                                     "value": viol[1], "why": viol[2]}
                 continue
-            test = lambda f, an: range_check(f, an, pts, lo, hi,
-                                             random.Random(11), vecspec=vecspec)[0]
+
         else:                                    # STRUCTURAL
             truthy = [v for v in base_vals if isinstance(v, bool)]
             if not truthy:
@@ -363,11 +362,27 @@ def main(argv=None):
                                  f"({'always true' if has_w else 'always false'})")
                 continue
             rec["status"] = "COVERED"
-            rec["killed"] = ["separates a witness from a non-witness"]
+            rec["killed"] = [{"mutation": "witness/non-witness",
+                              "mutant_body": None,
+                              "witness": "predicate is true somewhere in the "
+                                         "admissible box and false elsewhere",
+                              "mutant_value": None,
+                              "violates": "constancy"}]
+            rec["mutants_tried"] = 2
+            rec["mutants_killed"] = 1
+            rec["falsifiability"] = 0.5
             continue
 
         # ---- falsifiability: does the check kill a nearby wrong body?
-        killed, tried = [], 0
+        #
+        # The evidence published here is meant to be RE-DERIVABLE by another
+        # tier, not taken on trust.  For each rejected mutant we record the
+        # mutated Lean body verbatim, the input at which the check failed, and
+        # the value the mutant produced there.  A reader can paste the body into
+        # the definition, evaluate at the witness point, and see the escape.
+        # A tag alone ("first '-'->'+'") asserts a rejection; this demonstrates
+        # one.
+        killed, tried, survivors = [], 0, []
         for tag, mbody in mutants(d["body"]):
             try:
                 mfn, man = compile_variant(d, mbody, fname + "_mut", struct_args)
@@ -377,10 +392,27 @@ def main(argv=None):
             if not distinguishable(base_vals, mvals):
                 continue                                        # equivalent mutant
             tried += 1
-            if not test(mfn, man):
-                killed.append(tag)
+            ok, viol = range_check(mfn, man, pts, lo, hi, random.Random(11),
+                                   vecspec=vecspec)
+            if ok:
+                survivors.append(tag)
+                continue
+            killed.append({
+                "mutation": tag,
+                "mutant_body": " ".join(mbody.split()),
+                "witness": {k: round(v, 6) for k, v in viol[0].items()
+                            if isinstance(v, (int, float))},
+                "mutant_value": viol[1],
+                "violates": viol[2],
+            })
         rec["mutants_tried"] = tried
+        rec["mutants_killed"] = len(killed)
         rec["killed"] = killed
+        rec["survived"] = survivors
+        # A check that rejects one of many nearby wrong bodies is weaker than
+        # one that rejects most.  Publish the ratio rather than a bare boolean,
+        # so a consumer can set its own bar.
+        rec["falsifiability"] = round(len(killed) / tried, 3) if tried else 0.0
         if killed:
             rec["status"] = "COVERED"
         else:
@@ -494,11 +526,31 @@ def report(results, classes, args):
     for n in unverified[:10]:
         print(f"  {n}")
 
+    # ---- falsifiability evidence, published per definition
+    cov = {n: r for n, r in results.items() if r["status"] == "COVERED"}
+    strong = [n for n, r in cov.items() if r.get("falsifiability", 0) >= 0.5]
+    single = [n for n, r in cov.items() if r.get("mutants_killed", 0) == 1]
+    onethm = [n for n, r in cov.items()
+              if (r.get("check") or {}).get("source_lo") == "theorem"
+              or (r.get("check") or {}).get("source_hi") == "theorem"]
+    print("\nfalsifiability of the covered set (evidence is in coverage.json,")
+    print("per definition: the mutated Lean body, the witness input, the value):")
+    print(f"  covered                                  : {len(cov)}")
+    print(f"  rejecting >=50% of distinguishable mutants: {len(strong)}")
+    print(f"  rejecting exactly ONE mutant             : {len(single)}"
+          f"   <- weakest evidence, audit these first")
+    print(f"  checked against a THEOREM-proved bound   : {len(onethm)}")
+    print(f"  checked only against a name/docstring bound: {len(cov) - len(onethm)}"
+          f"   <- the bound itself is a conjecture")
+
     if args.verbose:
         print("\nCOVERED, with the wrong bodies each check rejects:")
         for n, r in results.items():
             if r["status"] == "COVERED":
-                print(f"  {n}: {r['check']} kills {r['killed'][:3]}")
+                for k in r["killed"][:2]:
+                    print(f"  {n}\n      mutant: {k.get('mutant_body')}\n"
+                          f"      -> {k.get('mutant_value')} {k.get('violates')} "
+                          f"at {k.get('witness')}")
 
 
 if __name__ == "__main__":

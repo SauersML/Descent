@@ -357,5 +357,37 @@ class IntervalBackend:
         return None
 
 
+class TolerantBackend(FloatBackend):
+    """FloatBackend whose comparisons carry a floating-point tolerance.
+
+    Theorem statements are exact over the reals: `simpleFst p p = 0`, or
+    `coalFst t1 Ne < coalFst t2 Ne`.  Evaluated in double precision, an exact
+    `==` is essentially never true and a strict `<` fails on ties that the
+    reals do not have.  Checking a proved theorem with exact float comparisons
+    reports failures that are entirely artifacts of rounding.
+    """
+
+    name = "tolerant"
+    REL = 1e-9
+
+    @staticmethod
+    def cmp(a, op, b):
+        tol = TolerantBackend.REL * max(1.0, abs(a), abs(b))
+        if op == "==":
+            return abs(a - b) <= tol
+        if op == "!=":
+            return abs(a - b) > tol
+        if op == "<":
+            return a < b + tol
+        if op == "<=":
+            return a <= b + tol
+        if op == ">":
+            return a > b - tol
+        if op == ">=":
+            return a >= b - tol
+        raise ValueError(op)
+
+
 FLOAT = FloatBackend
+TOLERANT = TolerantBackend
 INTERVAL = IntervalBackend

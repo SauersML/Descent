@@ -65,7 +65,7 @@ import numpy as np
 
 N_ATOMS = 40
 MAF_LO, MAF_HI = 0.005, 0.5
-N_PER_ATOM = 4_000_000
+N_PER_ATOM = 16_000_000
 CHUNK = 500_000
 SEED = 20260802
 STEP = "lead"          # "lead" = conservative t=0.2/10; "max" = maximal nullspace step
@@ -188,10 +188,27 @@ def main():
         "max_abs_err": max(abs(x - y) for _, x, y in ident),
     }
 
-    q, a, wA, wB = build_arms(step=STEP)
+    out["control_2_degenerate_arm"] = _control2()
+    out["steps"] = {}
+    for step in ("lead", "max"):
+        out["steps"][step] = _run_step(step, rng, out)
+    out["READ_THE_TEST"] = bool(
+        ident_ok
+        and all(v["control_1_matched_M4_does_not_separate"]["ok"]
+                for v in out["steps"].values())
+        and all(c["ok"] for c in out["control_2_degenerate_arm"])
+    )
+    print(json.dumps(out, indent=1))
+    json.dump(out, open("h5_results.json", "w"), indent=1)
+    return 0 if out["READ_THE_TEST"] else 1
+
+
+def _run_step(step, rng, out):
+    q, a, wA, wB = build_arms(step=step)
     mA = panel_moments(wA, a)
     mB = panel_moments(wB, a)
-    out["construction"] = {
+    res = {}
+    res["construction"] = {
         "n_atoms": N_ATOMS, "maf_range": [MAF_LO, MAF_HI],
         "matched_functionals": ["mass", "mean a = M4", "mean 2q(1-q)", "mean q"],
         "armA": {"M4": mA[0], "M6": mA[1], "dispersion": mA[2]},
@@ -202,51 +219,40 @@ def main():
         "min_weight": float(min(wA.min(), wB.min())),
     }
 
-    # ---- CONTROL 2: one-atom arm has zero dispersion identically ----------
-    for q_one in (0.01, 0.1, 0.4):
-        w1 = np.array([1.0])
-        a1 = np.array([a_of_q(q_one)])
-        m4_1, m6_1, disp_1 = panel_moments(w1, a1)
-        out.setdefault("control_2_degenerate_arm", []).append({
-            "q": q_one, "dispersion": disp_1,
-            "M6_panel": m6_1, "M6_single_locus_identity": e_x6_direct(q_one),
-            "ok": abs(disp_1) < 1e-12
-                  and abs(m6_1 - e_x6_direct(q_one)) < 1e-9 * abs(m6_1),
-        })
-
-    # ---- simulate both arms ----------------------------------------------
     sA = simulate_arm(q, wA, rng)
     sB = simulate_arm(q, wB, rng)
     m4A, e4A, m6A, e6A = sA
     m4B, e4B, m6B, e6B = sB
-
-    d4 = m4A - m4B
-    s4 = np.hypot(e4A, e4B)
-    d6 = m6A - m6B
-    s6 = np.hypot(e6A, e6B)
-
-    out["simulation"] = {
+    d4, s4 = m4A - m4B, np.hypot(e4A, e4B)
+    d6, s6 = m6A - m6B, np.hypot(e6A, e6B)
+    res["simulation"] = {
         "n_per_atom": N_PER_ATOM,
         "armA": {"M4": m4A, "M4_sem": e4A, "M6": m6A, "M6_sem": e6A},
         "armB": {"M4": m4B, "M4_sem": e4B, "M6": m6B, "M6_sem": e6B},
         "M4_gap_measured": d4, "M4_gap_sem": s4, "M4_gap_in_sem": d4 / s4 if s4 else None,
         "M6_gap_measured": d6, "M6_gap_sem": s6, "M6_gap_in_sem": d6 / s6 if s6 else None,
         "M6_gap_predicted": mA[1] - mB[1],
+        "predicted_minus_measured_in_sem": ((mA[1] - mB[1]) - d6) / s6 if s6 else None,
     }
-
-    # ---- CONTROL 1: matched M4 must NOT separate --------------------------
-    c1_ok = abs(d4) <= 3.0 * s4 if s4 > 0 else None
-    out["control_1_matched_M4_does_not_separate"] = {
-        "ok": bool(c1_ok), "gap": d4, "sem": s4,
-        "gap_in_sem": d4 / s4 if s4 else None,
+    res["control_1_matched_M4_does_not_separate"] = {
+        "ok": bool(abs(d4) <= 3.0 * s4) if s4 > 0 else None,
+        "gap": d4, "sem": s4, "gap_in_sem": d4 / s4 if s4 else None,
         "pinned_by": "M4 is a matched linear constraint of the construction",
     }
-    c2_ok = all(c["ok"] for c in out["control_2_degenerate_arm"])
-    out["READ_THE_TEST"] = bool(ident_ok and c1_ok and c2_ok)
+    return res
 
-    print(json.dumps(out, indent=1))
-    json.dump(out, open("h5_results.json", "w"), indent=1)
-    return 0 if out["READ_THE_TEST"] else 1
+
+def _control2():
+    rows = []
+    for q_one in (0.01, 0.1, 0.4):
+        w1 = np.array([1.0]); a1 = np.array([a_of_q(q_one)])
+        m4_1, m6_1, disp_1 = panel_moments(w1, a1)
+        rows.append({
+            "q": q_one, "dispersion": disp_1,
+            "M6_panel": m6_1, "M6_single_locus_identity": e_x6_direct(q_one),
+            "ok": abs(disp_1) < 1e-12 and abs(m6_1 - e_x6_direct(q_one)) < 1e-9 * abs(m6_1),
+        })
+    return rows
 
 
 if __name__ == "__main__":

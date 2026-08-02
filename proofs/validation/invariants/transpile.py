@@ -163,17 +163,35 @@ class Parser:
             "<=": "<=", ">=": ">=", "==": "=="}
 
     def cmp_(self):
+        """Conjunction/disjunction of comparisons.
+
+        `and`/`or` bind LOOSER than comparison, so `0 <= f x and f x <= 1`
+        parses as two comparisons joined -- getting this wrong silently
+        reassociated every two-sided bound in the corpus.
+        """
+        left = self.rel()
+        while self.peek()[1] in ("\u2227", "\u2228"):
+            v = self.eat()
+            right = self.rel()
+            op = "_b.land" if v == "\u2227" else "_b.lor"
+            left = f"{op}({left}, {right})"
+        return left
+
+    def rel(self):
         left = self.add()
-        kind, v = self.peek()
+        v = self.peek()[1]
         if v in self.CMPS:
             self.eat()
             right = self.add()
-            return f"_b.cmp({left}, '{self.CMPS[v]}', {right})"
-        if v in ("∧", "∨"):
-            self.eat()
-            right = self.cmp_()
-            op = "_b.land" if v == "∧" else "_b.lor"
-            return f"{op}({left}, {right})"
+            e = f"_b.cmp({left}, '{self.CMPS[v]}', {right})"
+            # chained relations such as `0 < x < 1` do occur
+            v2 = self.peek()[1]
+            if v2 in self.CMPS:
+                self.eat()
+                third = self.add()
+                e = (f"_b.land({e}, _b.cmp({right}, '{self.CMPS[v2]}', "
+                     f"{third}))")
+            return e
         return left
 
     def add(self):

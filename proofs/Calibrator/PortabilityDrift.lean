@@ -215,15 +215,20 @@ noncomputable def PureSplitModel.tau (m : PureSplitModel) : ℝ :=
 noncomputable def PureSplitModel.fst (m : PureSplitModel) : ℝ :=
   fstFromTau m.tau
 
+/-- A split with ongoing migration.
+
+`nDemes`, together with its `2 ≤ nDemes` hypothesis, used to sit here. Nothing read it:
+the deme count entered no formula and no theorem, so it was a free parameter that could
+take any value without changing a single statement in the file. The many-deme regime that
+`fstEqLimitLowMutationManyDemes` names is a limit, not a stored count, and naming it in a
+field gave the appearance of tracking something the development does not track. -/
 structure SplitMigrationModel where
   t : ℝ
   Ne : ℝ
   mig : ℝ
-  nDemes : ℕ
   mu : ℝ
   Ne_pos : 0 < Ne
   mig_nonneg : 0 ≤ mig
-  nDemes_ge_two : 2 ≤ nDemes
   mu_nonneg : 0 ≤ mu
 
 /-- Empirical status: UNTESTED. -/
@@ -4919,11 +4924,11 @@ theorem SplitMigrationModel.fstMigDriftEq_eq_limit (s : SplitMigrationModel) :
 /-- **Increased migration strictly improves equilibrium Fst in the SplitMigration framework.**
     Comparing two SplitMigrationModels with same Ne but different migration rates. -/
 theorem splitMigration_more_migration_less_fst
-    (Ne m₁ m₂ : ℝ) (nDemes : ℕ) (mu : ℝ)
+    (Ne m₁ m₂ : ℝ) (mu : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
-    (hnD : 2 ≤ nDemes) (hmu : 0 ≤ mu) (h_more : m₁ < m₂) :
-    let s₁ : SplitMigrationModel := ⟨0, Ne, m₁, nDemes, mu, hNe, le_of_lt hm₁, hnD, hmu⟩
-    let s₂ : SplitMigrationModel := ⟨0, Ne, m₂, nDemes, mu, hNe, le_of_lt hm₂, hnD, hmu⟩
+    (hmu : 0 ≤ mu) (h_more : m₁ < m₂) :
+    let s₁ : SplitMigrationModel := ⟨0, Ne, m₁, mu, hNe, le_of_lt hm₁, hmu⟩
+    let s₂ : SplitMigrationModel := ⟨0, Ne, m₂, mu, hNe, le_of_lt hm₂, hmu⟩
     s₂.fstMigDriftEq < s₁.fstMigDriftEq := by
   simp only [SplitMigrationModel.fstMigDriftEq]
   exact fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ hm₂ h_more

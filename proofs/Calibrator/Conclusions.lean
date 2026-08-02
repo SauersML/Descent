@@ -167,10 +167,21 @@ structure PosteriorPrediction where
   η_mean : ℝ
   /-- The posterior mean of sigmoid(η) = E[sigmoid(η)] -/
   prob_mean : ℝ
-  /-- The mode prediction = sigmoid(E[η]) -/
-  prob_mode : ℝ
-  /-- Constraint: mode prediction uses sigmoid of mean -/
-  mode_is_sigmoid_of_mean : prob_mode = 1 / (1 + Real.exp (-η_mean))
+
+/-- **The mode prediction, `sigmoid(E[η])`.**
+
+This was a field of `PosteriorPrediction` pinned by the hypothesis
+`mode_is_sigmoid_of_mean : prob_mode = 1 / (1 + exp (-η_mean))`. Carrying it as a free
+field meant the structure had a degree of freedom the equation immediately removed, and
+every consumer had to be handed the equation to make use of it. Computing it makes
+`mode_is_sigmoid_of_mean` an `rfl` theorem, and the distinction this structure exists to
+draw — that `prob_mean` is `E[sigmoid(η)]` while the mode is `sigmoid(E[η])` — is now
+carried by the shape of the definitions rather than by an assumption. -/
+noncomputable def PosteriorPrediction.prob_mode (pred : PosteriorPrediction) : ℝ :=
+  1 / (1 + Real.exp (-pred.η_mean))
+
+theorem PosteriorPrediction.mode_is_sigmoid_of_mean (pred : PosteriorPrediction) :
+    pred.prob_mode = 1 / (1 + Real.exp (-pred.η_mean)) := rfl
 
 /-- **Main Theorem**: The Posterior Mean is the Bayes-optimal predictor under Brier Score.
 
