@@ -475,6 +475,19 @@ def report(results, classes, args):
           f"{grand['UNCOVERED']:11d}{grand['DEFECT'] + grand['DEFECT-CANDIDATE']:8d}{grand['RANGE-MISMATCH']:10d}"
           f"{100 * grand['COVERED'] / total:6.1f}%")
 
+    # The split belongs at the TOP, not in the detail.  "Covered" has meant two
+    # different things: graded against a bound a theorem proves, and graded
+    # against a bound inferred from the definition's own name.  Both are
+    # falsifiable; only the first tests conformance to something the corpus
+    # asserts rather than to a reading of a name.
+    cv = [r for r in results.values() if r["status"] == "COVERED"]
+    thm = sum(1 for r in cv
+              if "theorem" in ((r.get("check") or {}).get("source_lo"),
+                               (r.get("check") or {}).get("source_hi")))
+    print(f"\n  of the {len(cv)} COVERED: {thm} are graded against a "
+          f"THEOREM-PROVED bound,\n  {len(cv) - thm} against a bound inferred "
+          f"from the name or docstring (a conjecture).")
+
     ext = sum(1 for r in results.values() if r["class"] != "NOT-EXTRACTABLE")
     print(f"\nextractable definitions: {ext} / {total} "
           f"({100 * ext / total:.1f}%);  covered among extractable: "

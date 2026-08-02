@@ -4,15 +4,15 @@
   "arg_convention": 2,
   "n_collisions": 0,
   "n_definitions": 1009,
-  "n_structures": 104,
+  "n_structures": 105,
   "n_parse_failures": 2,
-  "corpus_digest": "sha256:6fced06a92b612cf53e1a30428cc4504"
+  "corpus_digest": "sha256:97c32edfdc831565960df90791d0307f"
  },
  "invariants/defs.json": {
-  "shared": 948,
-  "only_ours": 36,
-  "only_theirs": 17,
-  "body": 32,
+  "shared": 943,
+  "only_ours": 41,
+  "only_theirs": 22,
+  "body": 34,
   "params": 25,
   "order": 0,
   "body_names": [
@@ -28,6 +28,7 @@
    "pgsR2",
    "presentDayPGSVariance",
    "presentDayR2",
+   "scoreMeanShiftAt",
    "sigmaTagCausal",
    "sourceBestLinearWeightsFromLD",
    "sourceCalibratedBrierFromSourceWeightsAtPrevalence",
@@ -47,6 +48,7 @@
    "targetResidualVarianceAtGeneration",
    "targetScoreVarianceAtGeneration",
    "targetSourceEffectProjection",
+   "toMechanisticCalibrationModelAt",
    "twoLocusCoalescentCovarianceMatrix"
   ],
   "param_names": [
@@ -83,17 +85,22 @@
    "sourceCalibrationSlopeFromSourceWeights",
    "sourceEqualVarianceGaussianAUCFromSourceWeights",
    "sourceExplainedSignalVarianceFromSourceWeights",
+   "sourcePredictedMeanAt",
    "sourcePredictiveCovarianceFromSourceWeights",
    "sourceR2FromSourceWeights",
    "sourceResidualVarianceFromSourceWeights",
+   "sourceScoreMeanAt",
    "sourceScoreVarianceFromExplicitDrivers",
    "targetCalibrationSlopeFromSourceWeights",
    "targetEqualVarianceGaussianAUCFromSourceWeights",
    "targetExplainedSignalVarianceFromSourceWeights",
+   "targetObservedMeanAt",
    "targetPGSVariance",
+   "targetPredictedMeanAt",
    "targetPredictiveCovarianceFromSourceWeights",
    "targetR2FromSourceWeights",
    "targetResidualVarianceFromSourceWeights",
+   "targetScoreMeanAt",
    "targetScoreVarianceFromSourceWeights"
   ],
   "detail": {
@@ -559,6 +566,42 @@
      "at": "proofs/Calibrator/PortabilityDrift.lean:887"
     }
    },
+   "scoreMeanShiftAt": {
+    "disagreement": [
+     "body"
+    ],
+    "source": "Calibrator/PGSCalibrationTheory.lean:992",
+    "ours": {
+     "params": [
+      [
+       "m",
+       "CrossPopulationGenerationalCalibrationModel p q"
+      ],
+      [
+       "t",
+       "ℕ"
+      ]
+     ],
+     "body": "m.scoreMeanAt Pop.target t - m.scoreMeanAt Pop.source t",
+     "ret": "ℝ",
+     "fq": "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt"
+    },
+    "theirs": {
+     "params": [
+      [
+       "m",
+       "CrossPopulationGenerationalCalibrationModel p q"
+      ],
+      [
+       "t",
+       "ℕ"
+      ]
+     ],
+     "body": "sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t - m.sourceTagMean)",
+     "ret": "ℝ",
+     "at": "proofs/Calibrator/PGSCalibrationTheory.lean:984"
+    }
+   },
    "sigmaTagCausal": {
     "disagreement": [
      "body",
@@ -668,7 +711,7 @@
     "disagreement": [
      "body"
     ],
-    "source": "Calibrator/PGSCalibrationTheory.lean:589",
+    "source": "Calibrator/PGSCalibrationTheory.lean:591",
     "ours": {
      "params": [
       [
@@ -840,7 +883,7 @@
     "disagreement": [
      "body"
     ],
-    "source": "Calibrator/PGSCalibrationTheory.lean:594",
+    "source": "Calibrator/PGSCalibrationTheory.lean:596",
     "ours": {
      "params": [
       [
@@ -1190,6 +1233,42 @@
      "body": "(sigmaTagCausal m Pop.target).mulVec (m.beta Pop.source)",
      "ret": "Fin p → ℝ",
      "at": "proofs/Calibrator/PortabilityDrift.lean:1356"
+    }
+   },
+   "toMechanisticCalibrationModelAt": {
+    "disagreement": [
+     "body"
+    ],
+    "source": "Calibrator/PGSCalibrationTheory.lean:1008",
+    "ours": {
+     "params": [
+      [
+       "m",
+       "CrossPopulationGenerationalCalibrationModel p q"
+      ],
+      [
+       "t",
+       "ℕ"
+      ]
+     ],
+     "body": "m.metric.toMetricModelAt t sourceObservedMean := m.sourceObservedMean prevalenceShift := m.prevalenceShiftAt t environmentalObservedShift := m.environmentalObservedShiftAt t geneticObservedShift := m.geneticObservedShiftAt t sourceDeploymentIntercept := m.baseDeploymentIntercept deploymentInterceptShift := m.deploymentInterceptShiftAt t sourceTagMean := m.baseTagMean targetTagMean := m.targetTagMeanAt t",
+     "ret": "CrossPopulationMechanisticCalibrationModel p q where metric",
+     "fq": "Calibrator.CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt"
+    },
+    "theirs": {
+     "params": [
+      [
+       "m",
+       "CrossPopulationGenerationalCalibrationModel p q"
+      ],
+      [
+       "t",
+       "ℕ"
+      ]
+     ],
+     "body": "m.metric.toMetricModelAt t sourceObservedMean := m.sourceObservedMean prevalenceShift := m.prevalenceShiftAt t environmentalObservedShift := m.environmentalObservedShiftAt t geneticObservedShift := m.geneticObservedShiftAt t sourceDeploymentIntercept := m.sourceDeploymentIntercept deploymentInterceptShift := m.deploymentInterceptShiftAt t sourceTagMean := m.sourceTagMean targetTagMean := m.targetTagMeanAt t",
+     "ret": "CrossPopulationMechanisticCalibrationModel p q where metric",
+     "at": "proofs/Calibrator/PGSCalibrationTheory.lean:1006"
     }
    },
    "twoLocusCoalescentCovarianceMatrix": {
@@ -2175,10 +2254,10 @@
   }
  },
  "symbolic/decls.json": {
-  "shared": 968,
-  "only_ours": 16,
-  "only_theirs": 2,
-  "body": 12,
+  "shared": 963,
+  "only_ours": 21,
+  "only_theirs": 7,
+  "body": 14,
   "params": 3,
   "order": 0,
   "body_names": [
@@ -2188,11 +2267,13 @@
    "equalVarianceGaussianAUCFromVariances",
    "exactCalibratedBrierRiskFromR2",
    "pgsR2",
+   "scoreMeanShiftAt",
    "sigmaTagCausal",
    "taggingProjection",
    "targetEffectHeterogeneityProjection",
    "targetNovelMutationEffectProjection",
    "targetSourceEffectProjection",
+   "toMechanisticCalibrationModelAt",
    "twoLocusCoalescentCovarianceMatrix"
   ],
   "param_names": [
@@ -2203,7 +2284,12 @@
   "order_names": [],
   "only_theirs_names": [
    "",
-   "singletonProportion"
+   "singletonProportion",
+   "sourcePredictedMeanAt",
+   "sourceScoreMeanAt",
+   "targetObservedMeanAt",
+   "targetPredictedMeanAt",
+   "targetScoreMeanAt"
   ],
   "detail": {
    "admixtureLDDecay": {
@@ -2422,6 +2508,42 @@
      "at": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean:77"
     }
    },
+   "scoreMeanShiftAt": {
+    "disagreement": [
+     "body"
+    ],
+    "source": "Calibrator/PGSCalibrationTheory.lean:992",
+    "ours": {
+     "params": [
+      [
+       "m",
+       "CrossPopulationGenerationalCalibrationModel p q"
+      ],
+      [
+       "t",
+       "ℕ"
+      ]
+     ],
+     "body": "m.scoreMeanAt Pop.target t - m.scoreMeanAt Pop.source t",
+     "ret": "ℝ",
+     "fq": "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt"
+    },
+    "theirs": {
+     "params": [
+      [
+       "m",
+       "CrossPopulationGenerationalCalibrationModel p q"
+      ],
+      [
+       "t",
+       "ℕ"
+      ]
+     ],
+     "body": "sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t - m.sourceTagMean)",
+     "ret": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ",
+     "at": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean:984"
+    }
+   },
    "sigmaTagCausal": {
     "disagreement": [
      "body",
@@ -2573,6 +2695,42 @@
      "body": "(sigmaTagCausal m Pop.target).mulVec (m.beta Pop.source)",
      "ret": "{p q : ℕ} (m : CrossPopulationMetricModel p q) : Fin p → ℝ",
      "at": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean:1355"
+    }
+   },
+   "toMechanisticCalibrationModelAt": {
+    "disagreement": [
+     "body"
+    ],
+    "source": "Calibrator/PGSCalibrationTheory.lean:1008",
+    "ours": {
+     "params": [
+      [
+       "m",
+       "CrossPopulationGenerationalCalibrationModel p q"
+      ],
+      [
+       "t",
+       "ℕ"
+      ]
+     ],
+     "body": "m.metric.toMetricModelAt t sourceObservedMean := m.sourceObservedMean prevalenceShift := m.prevalenceShiftAt t environmentalObservedShift := m.environmentalObservedShiftAt t geneticObservedShift := m.geneticObservedShiftAt t sourceDeploymentIntercept := m.baseDeploymentIntercept deploymentInterceptShift := m.deploymentInterceptShiftAt t sourceTagMean := m.baseTagMean targetTagMean := m.targetTagMeanAt t",
+     "ret": "CrossPopulationMechanisticCalibrationModel p q where metric",
+     "fq": "Calibrator.CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt"
+    },
+    "theirs": {
+     "params": [
+      [
+       "m",
+       "CrossPopulationGenerationalCalibrationModel p q"
+      ],
+      [
+       "t",
+       "ℕ"
+      ]
+     ],
+     "body": "m.metric.toMetricModelAt t sourceObservedMean := m.sourceObservedMean prevalenceShift := m.prevalenceShiftAt t environmentalObservedShift := m.environmentalObservedShiftAt t geneticObservedShift := m.geneticObservedShiftAt t sourceDeploymentIntercept := m.sourceDeploymentIntercept deploymentInterceptShift := m.deploymentInterceptShiftAt t sourceTagMean := m.sourceTagMean targetTagMean := m.targetTagMeanAt t",
+     "ret": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : CrossPopulationMechanisticCalibrationModel p q where metric",
+     "at": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean:1006"
     }
    },
    "twoLocusCoalescentCovarianceMatrix": {

@@ -5357,7 +5357,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 555,
+   "line": 570,
    "signature": ": ℝ",
    "args": [],
    "ret_type": "ℝ",
@@ -5404,7 +5404,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 631,
+   "line": 646,
    "signature": "(q : ℝ) : LevelChannels where drift",
    "args": [
     {
@@ -5452,7 +5452,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 677,
+   "line": 692,
    "signature": "{ι : Type*} {n : ℕ} (design : GenotypeDesign n ι) (model : Fin n → HardyWeinbergModel) : GenotypeDesign n ι",
    "args": [
     {
@@ -5533,7 +5533,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 830,
+   "line": 845,
    "signature": "(spectrum : MafSpectrum m) (k : ℕ) : ℝ",
    "args": [
     {
@@ -5596,7 +5596,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 869,
+   "line": 884,
    "signature": "(spectrum : MafSpectrum m) : ℝ",
    "args": [
     {
@@ -5642,7 +5642,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 882,
+   "line": 897,
    "signature": "(spectrum : MafSpectrum m) : ℝ",
    "args": [
     {
@@ -5684,7 +5684,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 1054,
+   "line": 1069,
    "signature": "(fourthMoment : ℝ) : ℝ",
    "args": [
     {
@@ -5728,7 +5728,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 1061,
+   "line": 1076,
    "signature": "(m2 m4 m6 m8 : ℝ) : ℝ",
    "args": [
     {
@@ -5768,7 +5768,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 1177,
+   "line": 1192,
    "signature": "(scale x : ℝ) : ℝ",
    "args": [
     {
@@ -5808,7 +5808,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 1183,
+   "line": 1198,
    "signature": "(scale : ℝ) : ℝ",
    "args": [
     {
@@ -13174,6 +13174,7 @@
      "0 < h.altFreq",
      "h.altFreq < 1",
      "h.altFreq = gaussianKurtosisMaf",
+     "h.altFreq ≠ 1 / 2",
      "h.altFreq = 1 / 2",
      "h.altFreq = h'.altFreq",
      "(∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4"
@@ -13203,6 +13204,20 @@
      "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf": [
       "h.altFreq = gaussianKurtosisMaf"
      ],
+     "Calibrator.standardizedGenotype_fourth_moment_ge_two": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.standardizedGenotype_fourth_moment_eq_two_iff": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.hwe_strictly_inside_rigid_regime": [
+      "0 < h.altFreq",
+      "h.altFreq < 1",
+      "h.altFreq ≠ 1 / 2"
+     ],
+     "Calibrator.fourthMoment_reflection_invariant": [],
      "Calibrator.standardizedGenotype_symmetric_iff": [
       "0 < h.altFreq",
       "h.altFreq < 1"
@@ -13254,10 +13269,12 @@
     "Calibrator.centeredSquare_expectation_zero",
     "Calibrator.centeredSquare_negative_at_half",
     "Calibrator.centeredSquare_third_moment_eq",
+    "Calibrator.fourthMoment_reflection_invariant",
     "Calibrator.hweFloorOneScaleSq_eq",
     "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf",
     "Calibrator.hweLevelOne_symmetry",
     "Calibrator.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance",
+    "Calibrator.hwe_strictly_inside_rigid_regime",
     "Calibrator.moment_eq_of_altFreq_eq",
     "Calibrator.reflect_even_moment",
     "Calibrator.reflect_moment",
@@ -13265,6 +13282,8 @@
     "Calibrator.singleLocus_tower_collapses",
     "Calibrator.standardizedGenotype_expectation_zero",
     "Calibrator.standardizedGenotype_fourth_moment",
+    "Calibrator.standardizedGenotype_fourth_moment_eq_two_iff",
+    "Calibrator.standardizedGenotype_fourth_moment_ge_two",
     "Calibrator.standardizedGenotype_kurtosis_gaussian_at_blind_maf",
     "Calibrator.standardizedGenotype_second_moment_one",
     "Calibrator.standardizedGenotype_sixth_moment",
@@ -18474,7 +18493,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/JetBarrier.lean",
-   "line": 141,
+   "line": 150,
    "signature": "(h : ℝ) : ℝ",
    "args": [
     {
@@ -18534,7 +18553,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/JetBarrier.lean",
-   "line": 146,
+   "line": 155,
    "signature": "(h δ : ℝ) : ℝ",
    "args": [
     {
@@ -18574,7 +18593,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/JetBarrier.lean",
-   "line": 297,
+   "line": 306,
    "signature": "(ν : Law) : {D : Design // S.isDisjoint D} → Limit",
    "args": [
     {
@@ -18617,7 +18636,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/JetBarrier.lean",
-   "line": 403,
+   "line": 412,
    "signature": ": MellinObservables where drift",
    "args": [],
    "ret_type": "MellinObservables where drift",
@@ -18647,7 +18666,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/JetBarrier.lean",
-   "line": 420,
+   "line": 429,
    "signature": "(O : MellinObservables) : Prop",
    "args": [
     {
@@ -26689,7 +26708,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 329,
+   "line": 331,
    "signature": "(m : CrossPopulationCalibrationShiftModel) : ℝ",
    "args": [
     {
@@ -26774,7 +26793,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 334,
+   "line": 336,
    "signature": "(m : CrossPopulationCalibrationShiftModel) : ℝ",
    "args": [
     {
@@ -26859,7 +26878,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 339,
+   "line": 341,
    "signature": "(m : CrossPopulationCalibrationShiftModel) : ℝ",
    "args": [
     {
@@ -26896,7 +26915,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 344,
+   "line": 346,
    "signature": "(m : CrossPopulationCalibrationShiftModel) : ℝ",
    "args": [
     {
@@ -26924,7 +26943,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 353,
+   "line": 355,
    "signature": "(m : CrossPopulationCalibrationShiftModel) : CalibrationMoments where meanObserved",
    "args": [
     {
@@ -26961,7 +26980,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 363,
+   "line": 365,
    "signature": "(m : CrossPopulationCalibrationShiftModel) : CalibrationMoments",
    "args": [
     {
@@ -27000,7 +27019,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 369,
+   "line": 371,
    "signature": "(m : CrossPopulationCalibrationShiftModel) (link : CalibrationLink) : CalibrationProfile",
    "args": [
     {
@@ -27055,7 +27074,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 375,
+   "line": 377,
    "signature": "(m : CrossPopulationCalibrationShiftModel) (link : CalibrationLink) : CalibrationProfile",
    "args": [
     {
@@ -27110,7 +27129,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 381,
+   "line": 383,
    "signature": "(m : CrossPopulationCalibrationShiftModel) : CalibrationProfile",
    "args": [
     {
@@ -27194,7 +27213,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 386,
+   "line": 388,
    "signature": "(m : CrossPopulationCalibrationShiftModel) : CalibrationProfile",
    "args": [
     {
@@ -27284,7 +27303,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 552,
+   "line": 554,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ",
    "args": [
     {
@@ -27378,7 +27397,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 557,
+   "line": 559,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ",
    "args": [
     {
@@ -27422,7 +27441,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 562,
+   "line": 564,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ",
    "args": [
     {
@@ -27466,7 +27485,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 569,
+   "line": 571,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ",
    "args": [
     {
@@ -27542,7 +27561,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 574,
+   "line": 576,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ",
    "args": [
     {
@@ -27586,7 +27605,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 579,
+   "line": 581,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ",
    "args": [
     {
@@ -27623,7 +27642,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 584,
+   "line": 586,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ",
    "args": [
     {
@@ -27669,7 +27688,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 589,
+   "line": 591,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ",
    "args": [
     {
@@ -27706,7 +27725,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 594,
+   "line": 596,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ",
    "args": [
     {
@@ -27752,7 +27771,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 600,
+   "line": 602,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : CrossPopulationCalibrationShiftModel where sourceObservedMean",
    "args": [
     {
@@ -27808,7 +27827,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 614,
+   "line": 616,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) (link : CalibrationLink) : CalibrationProfile",
    "args": [
     {
@@ -27872,7 +27891,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 620,
+   "line": 622,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) (link : CalibrationLink) : CalibrationProfile",
    "args": [
     {
@@ -27936,7 +27955,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 626,
+   "line": 628,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : CalibrationProfile",
    "args": [
     {
@@ -28029,7 +28048,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 632,
+   "line": 634,
    "signature": "{p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : CalibrationProfile",
    "args": [
     {
@@ -28123,12 +28142,128 @@
    ]
   },
   {
+   "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.tagMeanAt",
+   "short": "tagMeanAt",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/PGSCalibrationTheory.lean",
+   "line": 970,
+   "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (P : Pop) (t : ℕ) : Fin p → ℝ",
+   "args": [
+    {
+     "names": [
+      "p",
+      "q"
+     ],
+     "type": "ℕ",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "m"
+     ],
+     "type": "CrossPopulationGenerationalCalibrationModel p q",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "t"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Fin p → ℝ",
+   "body": "  Pop.pair m.baseTagMean (m.targetTagMeanAt t) P",
+   "docstring": "**Mean tag genotype in a population at generation `t`.** The source state is fixed, so\nthe source slice ignores `t`; indexing both populations the same way is what lets the\nscore, prediction and observation below be one definition each instead of two.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "units": "generation"
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt",
+   "short": "deploymentInterceptAt",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/PGSCalibrationTheory.lean",
+   "line": 976,
+   "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (P : Pop) (t : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "p",
+      "q"
+     ],
+     "type": "ℕ",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "m"
+     ],
+     "type": "CrossPopulationGenerationalCalibrationModel p q",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "t"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  m.baseDeploymentIntercept + Pop.pair 0 (m.deploymentInterceptShiftAt t) P",
+   "docstring": "**Deployment intercept in a population at generation `t`.**",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "units": "generation"
+   },
+   "mentioned_by": []
+  },
+  {
    "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.observedMeanShiftAt",
    "short": "observedMeanShiftAt",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 966,
+   "line": 981,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -28183,13 +28318,13 @@
    ]
   },
   {
-   "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.sourceScoreMeanAt",
-   "short": "sourceScoreMeanAt",
+   "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanAt",
+   "short": "scoreMeanAt",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 973,
-   "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ",
+   "line": 986,
+   "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (P : Pop) (t : ℕ) : ℝ",
    "args": [
     {
      "names": [
@@ -28210,51 +28345,9 @@
     },
     {
      "names": [
-      "t"
+      "P"
      ],
-     "type": "ℕ",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  sourceWeightedTagScore (m.metric.toMetricModelAt t) m.sourceTagMean",
-   "docstring": "Mean transported source score in the source population at generation `t`.\nThe source state is fixed, but the definition is slice-based so the calibration\nlayer matches the metric layer exactly.",
-   "empirical_status": "",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "nonnegative",
-    "declared_lo": 0.0,
-    "declared_hi": null,
-    "units": "generation"
-   },
-   "mentioned_by": []
-  },
-  {
-   "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.targetScoreMeanAt",
-   "short": "targetScoreMeanAt",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 978,
-   "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ",
-   "args": [
-    {
-     "names": [
-      "p",
-      "q"
-     ],
-     "type": "ℕ",
-     "binder": "{}",
-     "implicit": true
-    },
-    {
-     "names": [
-      "m"
-     ],
-     "type": "CrossPopulationGenerationalCalibrationModel p q",
+     "type": "Pop",
      "binder": "()",
      "implicit": false
     },
@@ -28268,8 +28361,8 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t)",
-   "docstring": "Mean transported source score in the target population at generation `t`.",
+   "body": "  sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.tagMeanAt P t)",
+   "docstring": "**Mean transported score in a population at generation `t`.**",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
@@ -28288,7 +28381,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 984,
+   "line": 992,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ",
    "args": [
     {
@@ -28318,8 +28411,8 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  sourceWeightedTagScore (m.metric.toMetricModelAt t)\n    (m.targetTagMeanAt t - m.sourceTagMean)",
-   "docstring": "Score-mean shift at generation `t`, induced by source weights acting on the\ntarget-vs-source tag-mean difference.",
+   "body": "  m.scoreMeanAt Pop.target t - m.scoreMeanAt Pop.source t",
+   "docstring": "**Score-mean shift at generation `t`**, as the difference of the two score means\nrather than a separately written score of a tag-mean difference.",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
@@ -28343,13 +28436,13 @@
    ]
   },
   {
-   "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.sourcePredictedMeanAt",
-   "short": "sourcePredictedMeanAt",
+   "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.predictedMeanAt",
+   "short": "predictedMeanAt",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 990,
-   "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ",
+   "line": 997,
+   "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (P : Pop) (t : ℕ) : ℝ",
    "args": [
     {
      "names": [
@@ -28370,6 +28463,14 @@
     },
     {
      "names": [
+      "P"
+     ],
+     "type": "Pop",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
       "t"
      ],
      "type": "ℕ",
@@ -28378,8 +28479,8 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  m.sourceDeploymentIntercept + m.sourceScoreMeanAt t",
-   "docstring": "Source deployed mean prediction at generation `t`.",
+   "body": "  m.deploymentInterceptAt P t + m.scoreMeanAt P t",
+   "docstring": "**Deployed mean prediction in a population at generation `t`.**",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
@@ -28393,13 +28494,13 @@
    "mentioned_by": []
   },
   {
-   "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt",
-   "short": "targetPredictedMeanAt",
+   "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.observedMeanAt",
+   "short": "observedMeanAt",
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 995,
-   "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ",
+   "line": 1002,
+   "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (P : Pop) (t : ℕ) : ℝ",
    "args": [
     {
      "names": [
@@ -28420,51 +28521,9 @@
     },
     {
      "names": [
-      "t"
+      "P"
      ],
-     "type": "ℕ",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  m.sourceDeploymentIntercept + m.deploymentInterceptShiftAt t + m.targetScoreMeanAt t",
-   "docstring": "Target deployed mean prediction at generation `t`.",
-   "empirical_status": "",
-   "namespace": "Calibrator",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "nonnegative",
-    "declared_lo": 0.0,
-    "declared_hi": null,
-    "units": "generation"
-   },
-   "mentioned_by": []
-  },
-  {
-   "name": "Calibrator.CrossPopulationGenerationalCalibrationModel.targetObservedMeanAt",
-   "short": "targetObservedMeanAt",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1000,
-   "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ",
-   "args": [
-    {
-     "names": [
-      "p",
-      "q"
-     ],
-     "type": "ℕ",
-     "binder": "{}",
-     "implicit": true
-    },
-    {
-     "names": [
-      "m"
-     ],
-     "type": "CrossPopulationGenerationalCalibrationModel p q",
+     "type": "Pop",
      "binder": "()",
      "implicit": false
     },
@@ -28478,8 +28537,8 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  m.sourceObservedMean + m.observedMeanShiftAt t",
-   "docstring": "Target observed mean at generation `t`.",
+   "body": "  m.baseObservedMean + Pop.pair 0 (m.observedMeanShiftAt t) P",
+   "docstring": "**Observed mean in a population at generation `t`.**",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [],
@@ -28498,7 +28557,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1006,
+   "line": 1008,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : CrossPopulationMechanisticCalibrationModel p q where metric",
    "args": [
     {
@@ -28528,7 +28587,7 @@
     }
    ],
    "ret_type": "CrossPopulationMechanisticCalibrationModel p q where metric",
-   "body": " m.metric.toMetricModelAt t\n  sourceObservedMean := m.sourceObservedMean\n  prevalenceShift := m.prevalenceShiftAt t\n  environmentalObservedShift := m.environmentalObservedShiftAt t\n  geneticObservedShift := m.geneticObservedShiftAt t\n  sourceDeploymentIntercept := m.sourceDeploymentIntercept\n  deploymentInterceptShift := m.deploymentInterceptShiftAt t\n  sourceTagMean := m.sourceTagMean\n  targetTagMean := m.targetTagMeanAt t",
+   "body": " m.metric.toMetricModelAt t\n  sourceObservedMean := m.sourceObservedMean\n  prevalenceShift := m.prevalenceShiftAt t\n  environmentalObservedShift := m.environmentalObservedShiftAt t\n  geneticObservedShift := m.geneticObservedShiftAt t\n  sourceDeploymentIntercept := m.baseDeploymentIntercept\n  deploymentInterceptShift := m.deploymentInterceptShiftAt t\n  sourceTagMean := m.baseTagMean\n  targetTagMean := m.targetTagMeanAt t",
    "docstring": "Slice the generational calibration state to the static mechanistic\ncalibration state at generation `t`.",
    "empirical_status": "",
    "namespace": "Calibrator",
@@ -28560,7 +28619,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1056,
+   "line": 1057,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) (link : CalibrationLink) : CalibrationProfile",
    "args": [
     {
@@ -28632,7 +28691,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1062,
+   "line": 1063,
    "signature": "{p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : CalibrationProfile",
    "args": [
     {
@@ -28692,7 +28751,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1281,
+   "line": 1282,
    "signature": "(pi_source pi_target slope : ℝ) : CalibrationProfile",
    "args": [
     {
@@ -28732,7 +28791,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1397,
+   "line": 1398,
    "signature": "(pgs new_intercept : ℝ) : ℝ",
    "args": [
     {
@@ -28774,7 +28833,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1423,
+   "line": 1424,
    "signature": "(pgs a b : ℝ) : ℝ",
    "args": [
     {
@@ -28825,7 +28884,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1450,
+   "line": 1451,
    "signature": "(targetSlope fittedSlope : ℝ) : ℝ",
    "args": [
     {
@@ -28878,7 +28937,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1530,
+   "line": 1531,
    "signature": "(nEvents nParams infoPerEvent : ℝ) : ℝ",
    "args": [
     {
@@ -28928,7 +28987,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1539,
+   "line": 1540,
    "signature": "(nParams infoPerEvent targetTraceMSE : ℝ) : ℝ",
    "args": [
     {
@@ -28988,7 +29047,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1605,
+   "line": 1606,
    "signature": "(nParams prevalence infoPerEvent targetTraceMSE : ℝ) : ℝ",
    "args": [
     {
@@ -29044,7 +29103,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1680,
+   "line": 1681,
    "signature": "(threshold predictedRisk : ℝ) : Prop",
    "args": [
     {
@@ -29132,7 +29191,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1702,
+   "line": 1703,
    "signature": "(up_events down_events up_nonevents down_nonevents n_events n_nonevents : ℝ) : ℝ",
    "args": [
     {
@@ -29172,7 +29231,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1736,
+   "line": 1737,
    "signature": "(μ : Measure ℝ) [IsProbabilityMeasure μ] (threshold δ : ℝ) : ℝ",
    "args": [
     {
@@ -29235,7 +29294,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1743,
+   "line": 1744,
    "signature": "(μ : Measure ℝ) [IsProbabilityMeasure μ] (threshold δ : ℝ) : ℝ",
    "args": [
     {
@@ -29291,7 +29350,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1765,
+   "line": 1766,
    "signature": "(μevent μnonevent : Measure ℝ) [IsProbabilityMeasure μevent] [IsProbabilityMeasure μnonevent] (threshold δ : ℝ) : ℝ",
    "args": [
     {
@@ -29365,7 +29424,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1809,
+   "line": 1810,
    "signature": "(π : ℝ) (μevent μnonevent : Measure ℝ) [IsProbabilityMeasure μevent] [IsProbabilityMeasure μnonevent] (threshold δ : ℝ) : ℝ",
    "args": [
     {
@@ -29447,7 +29506,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1887,
+   "line": 1888,
    "signature": "{T : ℕ} (model : LongitudinalTreatmentModel T) (path : ClinicalPathway T) (t : Fin T) : ℝ",
    "args": [
     {
@@ -29514,7 +29573,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1896,
+   "line": 1897,
    "signature": "{T : ℕ} (model : LongitudinalTreatmentModel T) (path : ClinicalPathway T) : ℝ",
    "args": [
     {
@@ -29605,7 +29664,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1902,
+   "line": 1903,
    "signature": "{T : ℕ} (model : LongitudinalTreatmentModel T) (path : ClinicalPathway T) : Prop",
    "args": [
     {
@@ -29709,7 +29768,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1909,
+   "line": 1910,
    "signature": "{T : ℕ} (model : LongitudinalTreatmentModel T) (truePath predictedPath : ClinicalPathway T) : ℝ",
    "args": [
     {
@@ -29798,7 +29857,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1922,
+   "line": 1923,
    "signature": "{T : ℕ} (model : LongitudinalTreatmentModel T) (truePath predictedPath : ClinicalPathway T) : ℝ",
    "args": [
     {
@@ -29914,7 +29973,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1931,
+   "line": 1932,
    "signature": "{T : ℕ} (model : LongitudinalTreatmentModel T) (truePath predictedPath : ClinicalPathway T) : ℝ",
    "args": [
     {
@@ -29972,7 +30031,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2538,
+   "line": 2539,
    "signature": "{Z : Type*} [MeasurableSpace Z] {T : ℕ} (μ : Measure Z) (model : LongitudinalTreatmentModel T) (truePath predictedPath : Z → ClinicalPathway T) : ℝ",
    "args": [
     {
@@ -30057,7 +30116,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2585,
+   "line": 2586,
    "signature": "(_model : ScreeningDecisionModel) : LongitudinalTreatmentModel 1 where discount",
    "args": [
     {
@@ -30100,7 +30159,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2595,
+   "line": 2596,
    "signature": "(model : ScreeningDecisionModel) (risk : ℝ) : ClinicalPathway 1 where followupWeight",
    "args": [
     {
@@ -30173,7 +30232,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2637,
+   "line": 2638,
    "signature": "(model : ScreeningDecisionModel) (tp fp n : ℝ) : ℝ",
    "args": [
     {
@@ -30224,7 +30283,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2642,
+   "line": 2643,
    "signature": "(model : ScreeningDecisionModel) (sens spec prevalence : ℝ) : ℝ",
    "args": [
     {
@@ -30271,7 +30330,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2727,
+   "line": 2728,
    "signature": "(benefit harm : ℝ) : ScreeningDecisionModel where threshold",
    "args": [
     {
@@ -30320,7 +30379,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2757,
+   "line": 2758,
    "signature": "(sens spec prevalence benefit harm : ℝ) : ℝ",
    "args": [
     {
@@ -30403,7 +30462,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2774,
+   "line": 2775,
    "signature": "(t : ℝ) : ScreeningDecisionModel where threshold",
    "args": [
     {
@@ -30451,7 +30510,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2806,
+   "line": 2807,
    "signature": "(tp fp n t : ℝ) : ℝ",
    "args": [
     {
@@ -30519,7 +30578,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2837,
+   "line": 2838,
    "signature": "(_model : ThresholdTreatmentModel) : LongitudinalTreatmentModel 1 where discount",
    "args": [
     {
@@ -30562,7 +30621,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2846,
+   "line": 2847,
    "signature": "(model : ThresholdTreatmentModel) (risk : ℝ) : ClinicalPathway 1 where followupWeight",
    "args": [
     {
@@ -30613,7 +30672,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2884,
+   "line": 2885,
    "signature": "(model : ThresholdTreatmentModel) (trueRisk decisionRisk : ℝ) : ℝ",
    "args": [
     {
@@ -30674,7 +30733,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2893,
+   "line": 2894,
    "signature": "(model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ",
    "args": [
     {
@@ -30759,7 +30818,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2906,
+   "line": 2907,
    "signature": "(model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ",
    "args": [
     {
@@ -30807,7 +30866,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 3078,
+   "line": 3079,
    "signature": "{Z : Type*} [MeasurableSpace Z] (μ : Measure Z) (model : ThresholdTreatmentModel) (trueRisk predictedRisk : Z → ℝ) : ℝ",
    "args": [
     {
@@ -47903,6 +47962,15 @@
       "0 < h.altFreq",
       "h.altFreq < 1"
      ],
+     "Calibrator.hweGenotypeVariance_le_half": [],
+     "Calibrator.standardizedGenotype_fourth_moment_ge_two": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.standardizedGenotype_fourth_moment_eq_two_iff": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
      "Calibrator.hweThirdCentralMoment_eq": [],
      "Calibrator.standardizedGenotype_symmetric_iff": [
       "0 < h.altFreq",
@@ -47961,6 +48029,7 @@
     "Calibrator.genotypeProb_values",
     "Calibrator.genotypeVariance_determines_frequency_pair",
     "Calibrator.hweCenteredSixthMoment_eq",
+    "Calibrator.hweGenotypeVariance_le_half",
     "Calibrator.hweThirdCentralMoment_eq",
     "Calibrator.hwe_variance_eq",
     "Calibrator.mellinDrift_uses_ploidy",
@@ -47969,6 +48038,8 @@
     "Calibrator.reflect_genotypeVariance",
     "Calibrator.standardizedGenotype_expectation_zero",
     "Calibrator.standardizedGenotype_fourth_moment",
+    "Calibrator.standardizedGenotype_fourth_moment_eq_two_iff",
+    "Calibrator.standardizedGenotype_fourth_moment_ge_two",
     "Calibrator.standardizedGenotype_second_moment_one",
     "Calibrator.standardizedGenotype_sixth_moment",
     "Calibrator.standardizedGenotype_sq_eq_standardizedSquare",
@@ -48023,6 +48094,7 @@
      "0 < h.altFreq",
      "h.altFreq < 1",
      "h.altFreq = gaussianKurtosisMaf",
+     "h.altFreq ≠ 1 / 2",
      "∀ g, coding.weight g = h.genotypeProb g",
      "∀ g, coding.value g = h.centeredAltAlleleCount g",
      "h.altFreq = h'.altFreq",
@@ -48057,6 +48129,20 @@
      "Calibrator.hweFloorOneScaleSq_eq_gaussian_at_blind_maf": [
       "h.altFreq = gaussianKurtosisMaf"
      ],
+     "Calibrator.standardizedGenotype_fourth_moment_ge_two": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.standardizedGenotype_fourth_moment_eq_two_iff": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.hwe_strictly_inside_rigid_regime": [
+      "0 < h.altFreq",
+      "h.altFreq < 1",
+      "h.altFreq ≠ 1 / 2"
+     ],
+     "Calibrator.fourthMoment_reflection_invariant": [],
      "Calibrator.hweThirdCentralMoment_eq": [],
      "Calibrator.hwe_symmetricCoding_forces_half": [
       "0 < h.altFreq",
@@ -48125,6 +48211,7 @@
     "Calibrator.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
     "Calibrator.centeredSquare_expectation_zero",
     "Calibrator.centeredSquare_third_moment_eq",
+    "Calibrator.fourthMoment_reflection_invariant",
     "Calibrator.genotypeProb_values",
     "Calibrator.hweCenteredSixthMoment_eq",
     "Calibrator.hweFloorOneScaleSq_eq",
@@ -48132,6 +48219,7 @@
     "Calibrator.hweLevelOne_symmetry",
     "Calibrator.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance",
     "Calibrator.hweThirdCentralMoment_eq",
+    "Calibrator.hwe_strictly_inside_rigid_regime",
     "Calibrator.hwe_symmetricCoding_forces_half",
     "Calibrator.hwe_symmetricCoding_iff_half",
     "Calibrator.moment_eq_of_altFreq_eq",
@@ -48142,6 +48230,8 @@
     "Calibrator.singleLocus_tower_collapses",
     "Calibrator.standardizedGenotype_expectation_zero",
     "Calibrator.standardizedGenotype_fourth_moment",
+    "Calibrator.standardizedGenotype_fourth_moment_eq_two_iff",
+    "Calibrator.standardizedGenotype_fourth_moment_ge_two",
     "Calibrator.standardizedGenotype_kurtosis_gaussian_at_blind_maf",
     "Calibrator.standardizedGenotype_second_moment_one",
     "Calibrator.standardizedGenotype_sixth_moment",
@@ -48358,6 +48448,15 @@
       "0 < h.altFreq",
       "h.altFreq < 1"
      ],
+     "Calibrator.hweGenotypeVariance_le_half": [],
+     "Calibrator.standardizedGenotype_fourth_moment_ge_two": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.standardizedGenotype_fourth_moment_eq_two_iff": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
      "Calibrator.standardizedGenotype_symmetric_iff": [
       "0 < h.altFreq",
       "h.altFreq < 1"
@@ -48395,7 +48494,12 @@
      "Calibrator.hwe_variance_eq": [],
      "Calibrator.HardyWeinbergModel.genotypeVariance_eq": [],
      "Calibrator.HWEScoreModel.scoreVariance_nonneg": []
-    }
+    },
+    "range_hi_thm": [
+     "Calibrator.hweGenotypeVariance_le_half",
+     1
+    ],
+    "range_hi": 1
    },
    "mentioned_by": [
     "Calibrator.HWEScoreModel.scoreVariance_nonneg",
@@ -48406,12 +48510,15 @@
     "Calibrator.genotypeVariance_determines_frequency_pair",
     "Calibrator.hweCenteredSixthMoment_eq",
     "Calibrator.hweFloorOneScaleSq_eq",
+    "Calibrator.hweGenotypeVariance_le_half",
     "Calibrator.hwe_variance_eq",
     "Calibrator.mellinDrift_uses_ploidy",
     "Calibrator.reflect_genotypeVariance",
     "Calibrator.singleLocus_tower_collapses",
     "Calibrator.standardizedGenotype_expectation_zero",
     "Calibrator.standardizedGenotype_fourth_moment",
+    "Calibrator.standardizedGenotype_fourth_moment_eq_two_iff",
+    "Calibrator.standardizedGenotype_fourth_moment_ge_two",
     "Calibrator.standardizedGenotype_second_moment_one",
     "Calibrator.standardizedGenotype_sixth_moment",
     "Calibrator.standardizedGenotype_sq_eq_standardizedSquare",
@@ -50326,7 +50433,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/ProjectionShiftBounds.lean",
-   "line": 870,
+   "line": 857,
    "signature": "(B : Matrix ι ι ℝ) (beta theta : ι → ℝ) : ℝ",
    "args": [
     {
@@ -50386,7 +50493,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/ProjectionShiftBounds.lean",
-   "line": 881,
+   "line": 868,
    "signature": "(B : Matrix ι ι ℝ) (beta theta : ι → ℝ) : ℝ",
    "args": [
     {
@@ -58615,14 +58722,14 @@
      "Calibrator.projection_artifact_energy_le_chiSquare_mul_curvature": [],
      "Calibrator.coefficientEnergy_add": [],
      "Calibrator.total_shift_energy_le_sum_budget_sq": [],
-     "Calibrator.dot_smul_left": [],
-     "Calibrator.dot_smul_right": [],
      "Calibrator.coefficientEnergy_sub": [],
      "Calibrator.coefficientEnergy_rescaled_expand": [],
      "Calibrator.irreducibleDegradation_le_rescaled": [],
      "Calibrator.rescaled_at_optimum_eq_irreducibleDegradation": [],
      "Calibrator.rescaled_energy_sub_irreducible_eq_sq": [],
      "Calibrator.dot_sub_right": [],
+     "Calibrator.dot_smul_left": [],
+     "Calibrator.dot_smul_right": [],
      "Calibrator.singular_quadratic_excess_risk_identity": [],
      "Calibrator.normal_solution_minimizes_singular_quadratic_risk": [],
      "Calibrator.singular_minimizer_kernel_invariance": [],
@@ -60971,7 +61078,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 614,
+   "line": 629,
    "signature": "where drift : ℝ jetVariance : ℝ IsLattice : Prop IsSignSymmetric : Prop",
    "args": [],
    "ret_type": "ℝ jetVariance : ℝ IsLattice : Prop IsSignSymmetric : Prop",
@@ -61009,7 +61116,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 691,
+   "line": 706,
    "signature": "(n : ℕ) (ι : Type*) (Limit : Type*) where isAdmissible : GenotypeDesign n ι → Prop limitLaw : GenotypeDesign n ι → Limit depth : ℕ levelChannels : ℕ → ℝ → LevelChannels levelChannels_zero : ∀ q : ℝ, levelChannels 0 q = hweLevelOne q Exposes : GenotypeDesign n ι → ℕ → Prop vertex_weight : ∀ (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel), isAdmissible (design.reModel model) → isAdmissible (design.reModel model') → (∀ (floor : ℕ) (i : Fin n), floor ≤ depth → levelChannels floor (model i).altFreq = levelChannels floor (model' i).altFreq) → limitLaw (design.reModel model) = limitLaw (design.reModel model') higher_cumulants_need_divergent_hub : ∀ (design : GenotypeDesign n ι) (order : ℕ), 3 ≤ order → Exposes design order → ∀ bound : ℕ, ¬ design.BoundedHubRecurrence bound",
    "args": [
     {
@@ -61088,7 +61195,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 811,
+   "line": 826,
    "signature": "(m : ℕ) where model : Fin m → HardyWeinbergModel weight : Fin m → ℝ weight_nonneg : ∀ j, 0 ≤ weight j weight_sum : ∑ j, weight j = 1",
    "args": [
     {
@@ -61135,7 +61242,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/CondensationUnification.lean",
-   "line": 1217,
+   "line": 1232,
    "signature": "where scale : ℕ → ℝ scale_pos : ∀ k, 0 < scale k scale_one_sq : scale 1 ^ 2 = 2 scale_two_sq : scale 2 ^ 2 = 14 growthRate : ℝ growthRate_pos : 0 < growthRate doubly_exponential : ∀ k : ℕ, Real.exp (growthRate * 2 ^ k) ≤ scale k",
    "args": [],
    "ret_type": "ℕ → ℝ scale_pos : ∀ k, 0 < scale k scale_one_sq : scale 1 ^ 2 = 2 scale_two_sq : scale 2 ^ 2 = 14 growthRate : ℝ growthRate_pos : 0 < growthRate doubly_exponential : ∀ k : ℕ, Real.exp (growthRate * 2 ^ k) ≤ scale k",
@@ -61176,6 +61283,61 @@
    "equations": [],
    "constraints": {
     "raw_chunk_lines": 17
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Calibrator.TowerRigidity",
+   "short": "TowerRigidity",
+   "kind": "structure",
+   "noncomputable": false,
+   "file": "Calibrator/CondensationUnification.lean",
+   "line": 1447,
+   "signature": "(Law : Type*) where fourthMoment : Law → ℝ IsSymmetric : Law → Prop floorTwoOddPart : Law → ℝ floorThreeOddPart : Law → ℝ IsGaussianCoordinate : Law → Prop rigidity : ∀ ν gaussian : Law, IsGaussianCoordinate gaussian → 2 < fourthMoment ν → IsSymmetric ν → fourthMoment ν = fourthMoment gaussian → floorTwoOddPart ν = floorTwoOddPart gaussian → floorThreeOddPart ν = floorThreeOddPart gaussian → IsGaussianCoordinate ν",
+   "args": [
+    {
+     "names": [
+      "Law"
+     ],
+     "type": "Type*",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Law → ℝ IsSymmetric : Law → Prop floorTwoOddPart : Law → ℝ floorThreeOddPart : Law → ℝ IsGaussianCoordinate : Law → Prop rigidity : ∀ ν gaussian : Law, IsGaussianCoordinate gaussian → 2 < fourthMoment ν → IsSymmetric ν → fourthMoment ν = fourthMoment gaussian → floorTwoOddPart ν = floorTwoOddPart gaussian → floorThreeOddPart ν = floorThreeOddPart gaussian → IsGaussianCoordinate ν",
+   "body": "",
+   "docstring": "Tower rigidity, carried as a named hypothesis with its phase condition in the type.\n\n`IsGaussianCoordinate` and the two odd-part data are abstract because the tower's floors\nare not objects of this corpus; what is concrete is the phase hypothesis\n`2 < fourthMoment`, which `hwe_strictly_inside_rigid_regime` discharges for every\npolymorphic genotype except the balanced one.\n\n**Scope.** This is a statement about complete invariants of a coordinate law. It is not a\nstatement about what any design can observe; that bridge is open upstream.",
+   "empirical_status": "",
+   "namespace": "Calibrator",
+   "fields": [
+    {
+     "name": "fourthMoment",
+     "type": "Law → ℝ"
+    },
+    {
+     "name": "IsSymmetric",
+     "type": "Law → Prop"
+    },
+    {
+     "name": "floorTwoOddPart",
+     "type": "Law → ℝ"
+    },
+    {
+     "name": "floorThreeOddPart",
+     "type": "Law → ℝ"
+    },
+    {
+     "name": "IsGaussianCoordinate",
+     "type": "Law → Prop"
+    },
+    {
+     "name": "rigidity",
+     "type": "∀ ν gaussian : Law, IsGaussianCoordinate gaussian →"
+    }
+   ],
+   "equations": [],
+   "constraints": {
+    "raw_chunk_lines": 21
    },
    "mentioned_by": []
   },
@@ -62348,7 +62510,7 @@
    "kind": "inductive",
    "noncomputable": false,
    "file": "Calibrator/JetBarrier.lean",
-   "line": 124,
+   "line": 133,
    "signature": "where",
    "args": [],
    "ret_type": "",
@@ -62369,7 +62531,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/JetBarrier.lean",
-   "line": 129,
+   "line": 138,
    "signature": "where drift : ℝ jetVariance : ℝ latticeDatum : LatticeDatum",
    "args": [],
    "ret_type": "ℝ jetVariance : ℝ latticeDatum : LatticeDatum",
@@ -62403,7 +62565,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/JetBarrier.lean",
-   "line": 265,
+   "line": 274,
    "signature": "(Law Design Limit : Type*) where observables : Law → MellinObservables isDisjoint : Design → Prop limitLaw : Law → Design → Limit barrier : ∀ ν ν' : Law, observables ν = observables ν' → ∀ D : Design, isDisjoint D → limitLaw ν D = limitLaw ν' D",
    "args": [
     {
@@ -63394,20 +63556,20 @@
    "noncomputable": false,
    "file": "Calibrator/PGSCalibrationTheory.lean",
    "line": 317,
-   "signature": "where sourceObservedMean : ℝ sourcePredictedMean : ℝ prevalenceShift : ℝ environmentalObservedShift : ℝ geneticObservedShift : ℝ scoreMeanShift : ℝ deploymentInterceptShift : ℝ sourceSlope : ℝ targetSlope : ℝ",
+   "signature": "where baseObservedMean : ℝ basePredictedMean : ℝ prevalenceShift : ℝ environmentalObservedShift : ℝ geneticObservedShift : ℝ scoreMeanShift : ℝ deploymentInterceptShift : ℝ slope : Pop → ℝ",
    "args": [],
-   "ret_type": "ℝ sourcePredictedMean : ℝ prevalenceShift : ℝ environmentalObservedShift : ℝ geneticObservedShift : ℝ scoreMeanShift : ℝ deploymentInterceptShift : ℝ sourceSlope : ℝ targetSlope : ℝ",
+   "ret_type": "ℝ basePredictedMean : ℝ prevalenceShift : ℝ environmentalObservedShift : ℝ geneticObservedShift : ℝ scoreMeanShift : ℝ deploymentInterceptShift : ℝ slope : Pop → ℝ",
    "body": "",
    "docstring": "Explicit cross-population calibration-shift budget.\n\nThis state separates the distinct reasons why identity-scale calibration can\nchange after transport:\n\n- prevalence / mean outcome shift,\n- environmental mean-outcome shift,\n- genetic mean-outcome shift not captured by prevalence alone,\n- score-mean transport shift from changed target genetic architecture, and\n- any deployment intercept offset applied to the transported score.\n\nThis does not treat target calibration drift as a function of prevalence\nalone.",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [
     {
-     "name": "sourceObservedMean",
+     "name": "baseObservedMean",
      "type": "ℝ"
     },
     {
-     "name": "sourcePredictedMean",
+     "name": "basePredictedMean",
      "type": "ℝ"
     },
     {
@@ -63431,17 +63593,13 @@
      "type": "ℝ"
     },
     {
-     "name": "sourceSlope",
-     "type": "ℝ"
-    },
-    {
-     "name": "targetSlope",
-     "type": "ℝ"
+     "name": "slope",
+     "type": "Pop → ℝ"
     }
    ],
    "equations": [],
    "constraints": {
-    "raw_chunk_lines": 12
+    "raw_chunk_lines": 14
    },
    "mentioned_by": []
   },
@@ -63451,7 +63609,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 540,
+   "line": 542,
    "signature": "(p q : ℕ) where metric : CrossPopulationMetricModel p q sourceObservedMean : ℝ prevalenceShift : ℝ environmentalObservedShift : ℝ geneticObservedShift : ℝ sourceDeploymentIntercept : ℝ deploymentInterceptShift : ℝ sourceTagMean : Fin p → ℝ targetTagMean : Fin p → ℝ",
    "args": [
     {
@@ -63519,8 +63677,8 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 954,
-   "signature": "(p q : ℕ) where metric : CrossPopulationGenerationalModel p q sourceObservedMean : ℝ prevalenceShiftAt : ℕ → ℝ environmentalObservedShiftAt : ℕ → ℝ geneticObservedShiftAt : ℕ → ℝ sourceDeploymentIntercept : ℝ deploymentInterceptShiftAt : ℕ → ℝ sourceTagMean : Fin p → ℝ targetTagMeanAt : ℕ → Fin p → ℝ",
+   "line": 956,
+   "signature": "(p q : ℕ) where metric : CrossPopulationGenerationalModel p q baseObservedMean : ℝ prevalenceShiftAt : ℕ → ℝ environmentalObservedShiftAt : ℕ → ℝ geneticObservedShiftAt : ℕ → ℝ baseDeploymentIntercept : ℝ deploymentInterceptShiftAt : ℕ → ℝ baseTagMean : Fin p → ℝ targetTagMeanAt : ℕ → Fin p → ℝ",
    "args": [
     {
      "names": [
@@ -63532,7 +63690,7 @@
      "implicit": false
     }
    ],
-   "ret_type": "CrossPopulationGenerationalModel p q sourceObservedMean : ℝ prevalenceShiftAt : ℕ → ℝ environmentalObservedShiftAt : ℕ → ℝ geneticObservedShiftAt : ℕ → ℝ sourceDeploymentIntercept : ℝ deploymentInterceptShiftAt : ℕ → ℝ sourceTagMean : Fin p → ℝ targetTagMeanAt : ℕ → Fin p → ℝ",
+   "ret_type": "CrossPopulationGenerationalModel p q baseObservedMean : ℝ prevalenceShiftAt : ℕ → ℝ environmentalObservedShiftAt : ℕ → ℝ geneticObservedShiftAt : ℕ → ℝ baseDeploymentIntercept : ℝ deploymentInterceptShiftAt : ℕ → ℝ baseTagMean : Fin p → ℝ targetTagMeanAt : ℕ → Fin p → ℝ",
    "body": "",
    "docstring": "Generation-indexed mechanistic calibration state tied directly to the\ngeneration-indexed SNP/popgen transport model.",
    "empirical_status": "",
@@ -63543,7 +63701,7 @@
      "type": "CrossPopulationGenerationalModel p q"
     },
     {
-     "name": "sourceObservedMean",
+     "name": "baseObservedMean",
      "type": "ℝ"
     },
     {
@@ -63559,7 +63717,7 @@
      "type": "ℕ → ℝ"
     },
     {
-     "name": "sourceDeploymentIntercept",
+     "name": "baseDeploymentIntercept",
      "type": "ℝ"
     },
     {
@@ -63567,7 +63725,7 @@
      "type": "ℕ → ℝ"
     },
     {
-     "name": "sourceTagMean",
+     "name": "baseTagMean",
      "type": "Fin p → ℝ"
     },
     {
@@ -63577,7 +63735,7 @@
    ],
    "equations": [],
    "constraints": {
-    "raw_chunk_lines": 12
+    "raw_chunk_lines": 14
    },
    "mentioned_by": []
   },
@@ -63587,7 +63745,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1869,
+   "line": 1870,
    "signature": "(T : ℕ) where discount : Fin T → ℝ discount_nonneg : ∀ t, 0 ≤ discount t",
    "args": [
     {
@@ -63626,7 +63784,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 1877,
+   "line": 1878,
    "signature": "(T : ℕ) where followupWeight : Fin T → ℝ eventProb : Fin T → ℝ treatmentBenefit : Fin T → ℝ treatmentHarm : Fin T → ℝ followupWeight_nonneg : ∀ t, 0 ≤ followupWeight t",
    "args": [
     {
@@ -63677,7 +63835,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2579,
+   "line": 2580,
    "signature": "where threshold : ℝ benefit : ℝ harm : ℝ",
    "args": [],
    "ret_type": "ℝ benefit : ℝ harm : ℝ",
@@ -63711,7 +63869,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PGSCalibrationTheory.lean",
-   "line": 2826,
+   "line": 2827,
    "signature": "where threshold : ℝ benefit : ℝ harm : ℝ benefit_pos : 0 < benefit harm_eq_threshold : harm = benefit * threshold",
    "args": [],
    "ret_type": "ℝ benefit : ℝ harm : ℝ benefit_pos : 0 < benefit harm_eq_threshold : harm = benefit * threshold",

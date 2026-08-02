@@ -1,6 +1,6 @@
 {
  "total": 1009,
- "extractable": 668,
+ "extractable": 665,
  "roots": [
   "Calibrator.FrequencyResolvedCohort.correctableClasses",
   "Calibrator.GenotypeDesign.cycleDensity",
@@ -90,11 +90,14 @@
   "Calibrator.ChaosSpectroscopy.disjointRecord",
   "Calibrator.ColliderModel.inducedCov",
   "Calibrator.ColliderModel.\u03b2_selected",
+  "Calibrator.CrossPopulationCalibrationShiftModel.targetObservedMean",
+  "Calibrator.CrossPopulationCalibrationShiftModel.targetPredictedMean",
+  "Calibrator.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt",
+  "Calibrator.CrossPopulationGenerationalCalibrationModel.observedMeanAt",
+  "Calibrator.CrossPopulationGenerationalCalibrationModel.predictedMeanAt",
+  "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanAt",
   "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt",
-  "Calibrator.CrossPopulationGenerationalCalibrationModel.sourcePredictedMeanAt",
-  "Calibrator.CrossPopulationGenerationalCalibrationModel.sourceScoreMeanAt",
-  "Calibrator.CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt",
-  "Calibrator.CrossPopulationGenerationalCalibrationModel.targetScoreMeanAt",
+  "Calibrator.CrossPopulationGenerationalCalibrationModel.tagMeanAt",
   "Calibrator.CrossPopulationMechanisticCalibrationModel.scoreMeanShift",
   "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope",
   "Calibrator.CrossPopulationMechanisticCalibrationModel.sourcePredictedMean",
@@ -348,5 +351,5 @@
   "Calibrator.weightedResidualMoment",
   "Calibrator.weightedRetentionUpperBound"
  ],
- "ceiling": 682
+ "ceiling": 679
 }

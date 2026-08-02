@@ -3533,7 +3533,7 @@
  "Calibrator.gaussianKurtosisMaf": {
   "class": "NUMERIC",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 555,
+  "line": 570,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -3593,7 +3593,7 @@
  "Calibrator.hweLevelOne": {
   "class": "STRUCTURAL",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 631,
+  "line": 646,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -3604,7 +3604,7 @@
  "Calibrator.GenotypeDesign.reModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 677,
+  "line": 692,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -3615,7 +3615,7 @@
  "Calibrator.MafSpectrum.moment": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 830,
+  "line": 845,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -3626,7 +3626,7 @@
  "Calibrator.MafSpectrum.centeredSquareThirdMoment": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 869,
+  "line": 884,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -3637,7 +3637,7 @@
  "Calibrator.MafSpectrum.fourthMomentDispersion": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 882,
+  "line": 897,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -3648,7 +3648,7 @@
  "Calibrator.squaringScaleSq": {
   "class": "NUMERIC",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 1054,
+  "line": 1069,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -3686,7 +3686,7 @@
  "Calibrator.nextFloorFourthMoment": {
   "class": "NUMERIC",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 1061,
+  "line": 1076,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -3697,7 +3697,7 @@
  "Calibrator.squaringStep": {
   "class": "NUMERIC",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 1177,
+  "line": 1192,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -3708,7 +3708,7 @@
  "Calibrator.squaringFixedPoint": {
   "class": "NUMERIC",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 1183,
+  "line": 1198,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -10118,7 +10118,7 @@
  "Calibrator.latticeInflation": {
   "class": "NUMERIC",
   "file": "Calibrator/JetBarrier.lean",
-  "line": 141,
+  "line": 150,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -10218,7 +10218,7 @@
  "Calibrator.latticeBracket": {
   "class": "NUMERIC",
   "file": "Calibrator/JetBarrier.lean",
-  "line": 146,
+  "line": 155,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -10229,7 +10229,7 @@
  "Calibrator.ChaosSpectroscopy.disjointRecord": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/JetBarrier.lean",
-  "line": 297,
+  "line": 306,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -10240,7 +10240,7 @@
  "Calibrator.gaussianObservables": {
   "class": "STRUCTURAL",
   "file": "Calibrator/JetBarrier.lean",
-  "line": 403,
+  "line": 412,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -10251,7 +10251,7 @@
  "Calibrator.IsChameleonObservable": {
   "class": "STRUCTURAL",
   "file": "Calibrator/JetBarrier.lean",
-  "line": 420,
+  "line": 429,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -12822,6 +12822,61 @@
   "survived": [],
   "falsifiability": 1.0
  },
+ "Calibrator.targetCorrectionCurvature": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/MetricSpecificPortability.lean",
+  "line": 1780,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "evidence_class": "internal-consistency",
+  "evidence_detail": "range-invariant + mutation-rejection",
+  "reason": "self-check: value is not a real number: function (vector- or function-valued)"
+ },
+ "Calibrator.targetCorrectionOptimum": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/MetricSpecificPortability.lean",
+  "line": 1788,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "evidence_class": "internal-consistency",
+  "evidence_detail": "range-invariant + mutation-rejection",
+  "reason": "self-check: value is not a real number: function (vector- or function-valued)"
+ },
+ "Calibrator.sharedCorrectionConsensus": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/MetricSpecificPortability.lean",
+  "line": 1796,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "evidence_class": "internal-consistency",
+  "evidence_detail": "range-invariant + mutation-rejection",
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
+ },
+ "Calibrator.sharedCorrectionSpread": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/MetricSpecificPortability.lean",
+  "line": 1803,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "evidence_class": "internal-consistency",
+  "evidence_detail": "range-invariant + mutation-rejection",
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
+ },
+ "Calibrator.sharedCorrectionCost": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/MetricSpecificPortability.lean",
+  "line": 1811,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "evidence_class": "internal-consistency",
+  "evidence_detail": "range-invariant + mutation-rejection",
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
+ },
  "Calibrator.effectMutualInformation": {
   "class": "NUMERIC",
   "file": "Calibrator/MultiAncestryTheory.lean",
@@ -14694,7 +14749,7 @@
  "Calibrator.CrossPopulationCalibrationShiftModel.observedMeanShift": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 329,
+  "line": 331,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14705,7 +14760,7 @@
  "Calibrator.CrossPopulationCalibrationShiftModel.predictedMeanShift": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 334,
+  "line": 336,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14714,31 +14769,31 @@
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.CrossPopulationCalibrationShiftModel.targetObservedMean": {
-  "class": "NUMERIC",
+  "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 339,
+  "line": 341,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "evidence_class": "internal-consistency",
   "evidence_detail": "range-invariant + mutation-rejection",
-  "reason": "no admissible point evaluates"
+  "reason": "dot-notation call CrossPopulationCalibrationShiftModel.sourceObservedMean: no such definition"
  },
  "Calibrator.CrossPopulationCalibrationShiftModel.targetPredictedMean": {
-  "class": "NUMERIC",
+  "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 344,
+  "line": 346,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "evidence_class": "internal-consistency",
   "evidence_detail": "range-invariant + mutation-rejection",
-  "reason": "no admissible point evaluates"
+  "reason": "dot-notation call CrossPopulationCalibrationShiftModel.sourcePredictedMean: no such definition"
  },
  "Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationMoments": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 353,
+  "line": 355,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14749,7 +14804,7 @@
  "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationMoments": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 363,
+  "line": 365,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14760,7 +14815,7 @@
  "Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationProfile": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 369,
+  "line": 371,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14771,7 +14826,7 @@
  "Calibrator.CrossPopulationCalibrationShiftModel.targetCalibrationProfile": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 375,
+  "line": 377,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14782,7 +14837,7 @@
  "Calibrator.CrossPopulationCalibrationShiftModel.sourceIdentityCalibrationProfile": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 381,
+  "line": 383,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14793,7 +14848,7 @@
  "Calibrator.CrossPopulationCalibrationShiftModel.targetIdentityCalibrationProfile": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 386,
+  "line": 388,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14804,7 +14859,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.observedMeanShift": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 552,
+  "line": 554,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14815,7 +14870,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceScoreMean": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 557,
+  "line": 559,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14826,7 +14881,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetScoreMean": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 562,
+  "line": 564,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14837,7 +14892,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.scoreMeanShift": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 569,
+  "line": 571,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14848,7 +14903,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourcePredictedMean": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 574,
+  "line": 576,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14859,7 +14914,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetPredictedMean": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 579,
+  "line": 581,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14870,7 +14925,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetObservedMean": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 584,
+  "line": 586,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14881,7 +14936,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 589,
+  "line": 591,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14892,7 +14947,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 594,
+  "line": 596,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14903,7 +14958,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.toShiftModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 600,
+  "line": 602,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14914,7 +14969,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 614,
+  "line": 616,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14925,7 +14980,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 620,
+  "line": 622,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14936,7 +14991,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.sourceIdentityCalibrationProfile": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 626,
+  "line": 628,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14947,7 +15002,7 @@
  "Calibrator.CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 632,
+  "line": 634,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -14955,10 +15010,32 @@
   "evidence_detail": "range-invariant + mutation-rejection",
   "reason": "could not compile body: Untranslatable('qualified name CalibrationLink.identity')"
  },
+ "Calibrator.CrossPopulationGenerationalCalibrationModel.tagMeanAt": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/PGSCalibrationTheory.lean",
+  "line": 970,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "evidence_class": "internal-consistency",
+  "evidence_detail": "range-invariant + mutation-rejection",
+  "reason": "qualified name Pop.pair"
+ },
+ "Calibrator.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/PGSCalibrationTheory.lean",
+  "line": 976,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "evidence_class": "internal-consistency",
+  "evidence_detail": "range-invariant + mutation-rejection",
+  "reason": "qualified name Pop.pair"
+ },
  "Calibrator.CrossPopulationGenerationalCalibrationModel.observedMeanShiftAt": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 966,
+  "line": 981,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15018,21 +15095,10 @@
   "survived": [],
   "falsifiability": 1.0
  },
- "Calibrator.CrossPopulationGenerationalCalibrationModel.sourceScoreMeanAt": {
+ "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 973,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "evidence_class": "internal-consistency",
-  "evidence_detail": "range-invariant + mutation-rejection",
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
- },
- "Calibrator.CrossPopulationGenerationalCalibrationModel.targetScoreMeanAt": {
-  "class": "NOT-EXTRACTABLE",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 978,
+  "line": 986,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15043,51 +15109,40 @@
  "Calibrator.CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 984,
+  "line": 992,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "evidence_class": "internal-consistency",
   "evidence_detail": "range-invariant + mutation-rejection",
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
+  "reason": "qualified name Pop.target"
  },
- "Calibrator.CrossPopulationGenerationalCalibrationModel.sourcePredictedMeanAt": {
+ "Calibrator.CrossPopulationGenerationalCalibrationModel.predictedMeanAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 990,
+  "line": 997,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "evidence_class": "internal-consistency",
   "evidence_detail": "range-invariant + mutation-rejection",
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
+  "reason": "self-check: calls untranslated definition deploymentInterceptAt"
  },
- "Calibrator.CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt": {
+ "Calibrator.CrossPopulationGenerationalCalibrationModel.observedMeanAt": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 995,
+  "line": 1002,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "evidence_class": "internal-consistency",
   "evidence_detail": "range-invariant + mutation-rejection",
-  "reason": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))"
- },
- "Calibrator.CrossPopulationGenerationalCalibrationModel.targetObservedMeanAt": {
-  "class": "NUMERIC",
-  "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1000,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "evidence_class": "internal-consistency",
-  "evidence_detail": "range-invariant + mutation-rejection",
-  "reason": "no admissible point evaluates"
+  "reason": "qualified name Pop.pair"
  },
  "Calibrator.CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1006,
+  "line": 1008,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15098,7 +15153,7 @@
  "Calibrator.targetCalibrationProfileAtGeneration": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1056,
+  "line": 1057,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15109,7 +15164,7 @@
  "Calibrator.targetIdentityCalibrationProfileAtGeneration": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1062,
+  "line": 1063,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15120,7 +15175,7 @@
  "Calibrator.prevalenceLogisticCalibrationProfile": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1281,
+  "line": 1282,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15131,7 +15186,7 @@
  "Calibrator.interceptRecalibrated": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1397,
+  "line": 1398,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15142,7 +15197,7 @@
  "Calibrator.logisticRecalibrated": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1423,
+  "line": 1424,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15153,7 +15208,7 @@
  "Calibrator.recalibratedCalibrationSlope": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1450,
+  "line": 1451,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15164,7 +15219,7 @@
  "Calibrator.recalibrationTraceMSELowerBound": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1530,
+  "line": 1531,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15225,7 +15280,7 @@
  "Calibrator.requiredEventsForRecalibration": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1539,
+  "line": 1540,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15236,7 +15291,7 @@
  "Calibrator.requiredTargetCohortSizeForRecalibration": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1605,
+  "line": 1606,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15294,7 +15349,7 @@
  "Calibrator.classifiedHighRisk": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1680,
+  "line": 1681,
   "status": "COVERED",
   "check": {
    "kind": "witness/non-witness",
@@ -15320,7 +15375,7 @@
  "Calibrator.nri": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1702,
+  "line": 1703,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15331,7 +15386,7 @@
  "Calibrator.thresholdBandRate": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1736,
+  "line": 1737,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15342,7 +15397,7 @@
  "Calibrator.downReclassificationRate": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1743,
+  "line": 1744,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15353,7 +15408,7 @@
  "Calibrator.nriFromDownwardInterceptRecalibration": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1765,
+  "line": 1766,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15364,7 +15419,7 @@
  "Calibrator.reclassifiedBandEventPrevalence": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1809,
+  "line": 1810,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15375,7 +15430,7 @@
  "Calibrator.qalyContributionAtTime": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1887,
+  "line": 1888,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15386,7 +15441,7 @@
  "Calibrator.treatmentMargin": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1896,
+  "line": 1897,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15397,7 +15452,7 @@
  "Calibrator.receivesTreatment": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1902,
+  "line": 1903,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15408,7 +15463,7 @@
  "Calibrator.qalyGainUnderDecision": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1909,
+  "line": 1910,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15419,7 +15474,7 @@
  "Calibrator.qalyLoss": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1922,
+  "line": 1923,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15430,7 +15485,7 @@
  "Calibrator.qalyDecisionRegretMargin": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 1931,
+  "line": 1932,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15441,7 +15496,7 @@
  "Calibrator.expectedQalyLoss": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2538,
+  "line": 2539,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15452,7 +15507,7 @@
  "Calibrator.screeningLongitudinalModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2585,
+  "line": 2586,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15463,7 +15518,7 @@
  "Calibrator.screeningClinicalPathway": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2595,
+  "line": 2596,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15474,7 +15529,7 @@
  "Calibrator.screeningUtilityFromCounts": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2637,
+  "line": 2638,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15485,7 +15540,7 @@
  "Calibrator.screeningUtilityFromRates": {
   "class": "NUMERIC",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2642,
+  "line": 2643,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15496,7 +15551,7 @@
  "Calibrator.qalyScreeningDecisionModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2727,
+  "line": 2728,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15507,7 +15562,7 @@
  "Calibrator.screeningQalyGain": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2757,
+  "line": 2758,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15518,7 +15573,7 @@
  "Calibrator.decisionCurveScreeningModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2774,
+  "line": 2775,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15529,7 +15584,7 @@
  "Calibrator.decisionCurveNetBenefit": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2806,
+  "line": 2807,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15540,7 +15595,7 @@
  "Calibrator.thresholdLongitudinalModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2837,
+  "line": 2838,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15551,7 +15606,7 @@
  "Calibrator.thresholdClinicalPathway": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2846,
+  "line": 2847,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15562,7 +15617,7 @@
  "Calibrator.thresholdQalyGainUnderDecision": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2884,
+  "line": 2885,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15573,7 +15628,7 @@
  "Calibrator.thresholdQalyLoss": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2893,
+  "line": 2894,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15584,7 +15639,7 @@
  "Calibrator.thresholdDecisionRegretMargin": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 2906,
+  "line": 2907,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15595,7 +15650,7 @@
  "Calibrator.expectedThresholdQalyLoss": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PGSCalibrationTheory.lean",
-  "line": 3078,
+  "line": 3079,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -26430,7 +26485,7 @@
  "Calibrator.sharedCorrectionOptimum": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/ProjectionShiftBounds.lean",
-  "line": 870,
+  "line": 857,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -26441,7 +26496,7 @@
  "Calibrator.irreducibleDegradation": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/ProjectionShiftBounds.lean",
-  "line": 881,
+  "line": 868,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],

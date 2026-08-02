@@ -982,15 +982,6 @@ def Calibrator_CrossPopulationCalibrationShiftModel_observedMeanShift(m):
 def predictedMeanShift(m):
     return (_rt._proj(m, 'scoreMeanShift') + _rt._proj(m, 'deploymentInterceptShift'))
 
-def Calibrator_CrossPopulationCalibrationShiftModel_targetObservedMean(m):
-    return (_rt._proj(m, 'sourceObservedMean') + Calibrator_CrossPopulationCalibrationShiftModel_observedMeanShift(m))
-
-def Calibrator_CrossPopulationCalibrationShiftModel_targetPredictedMean(m):
-    return (_rt._proj(m, 'sourcePredictedMean') + predictedMeanShift(m))
-
-def targetCalibrationMoments(m):
-    return _rt._proj(_rt._proj(m, 'sourceCalibrationMoments'), 'shifted')(Calibrator_CrossPopulationCalibrationShiftModel_observedMeanShift(m), predictedMeanShift(m), _rt._proj(m, 'targetSlope'))
-
 def Calibrator_CrossPopulationCalibrationShiftModel_sourceCalibrationProfile(m, link):
     return _rt._proj(_rt._proj(m, 'sourceCalibrationMoments'), 'toProfile')(link)
 
@@ -1027,23 +1018,11 @@ def Calibrator_CrossPopulationMechanisticCalibrationModel_targetCalibrationProfi
 def observedMeanShiftAt(m, t):
     return ((_rt._proj(m, 'prevalenceShiftAt')(t) + _rt._proj(m, 'environmentalObservedShiftAt')(t)) + _rt._proj(m, 'geneticObservedShiftAt')(t))
 
-def sourceScoreMeanAt(m, t):
-    return sourceWeightedTagScore((_rt._proj(_rt._proj(m, 'metric'), 'toMetricModelAt')(t)), _rt._proj(m, 'sourceTagMean'))
+def scoreMeanAt(m, P, t):
+    return sourceWeightedTagScore((_rt._proj(_rt._proj(m, 'metric'), 'toMetricModelAt')(t)), (tagMeanAt(m, P, t)))
 
-def targetScoreMeanAt(m, t):
-    return sourceWeightedTagScore((_rt._proj(_rt._proj(m, 'metric'), 'toMetricModelAt')(t)), (_rt._proj(m, 'targetTagMeanAt')(t)))
-
-def scoreMeanShiftAt(m, t):
-    return sourceWeightedTagScore((_rt._proj(_rt._proj(m, 'metric'), 'toMetricModelAt')(t)), ((_rt._proj(m, 'targetTagMeanAt')(t) - _rt._proj(m, 'sourceTagMean'))))
-
-def sourcePredictedMeanAt(m, t):
-    return (_rt._proj(m, 'sourceDeploymentIntercept') + sourceScoreMeanAt(m, t))
-
-def targetPredictedMeanAt(m, t):
-    return ((_rt._proj(m, 'sourceDeploymentIntercept') + _rt._proj(m, 'deploymentInterceptShiftAt')(t)) + targetScoreMeanAt(m, t))
-
-def targetObservedMeanAt(m, t):
-    return (_rt._proj(m, 'sourceObservedMean') + observedMeanShiftAt(m, t))
+def predictedMeanAt(m, P, t):
+    return (deploymentInterceptAt(m, P, t) + scoreMeanAt(m, P, t))
 
 def targetCalibrationProfileAtGeneration(m, t, link):
     return _rt._proj((toMechanisticCalibrationModelAt(m, t)), 'targetCalibrationProfile')(link)

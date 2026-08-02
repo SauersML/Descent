@@ -71,9 +71,9 @@ def other_tier_coverage():
                             or node.get("name") or node.get("def"))
                     verdict = (node.get("verdict") or node.get("status")
                                or node.get("result") or node.get("check"))
-                    if isinstance(name, str) and name and (
-                            not isinstance(verdict, str)
-                            or verdict not in NON_VERDICTS):
+                    if isinstance(name, str) and name \
+                            and isinstance(verdict, str) \
+                            and verdict not in NON_VERDICTS:
                         hits[name.split(".")[-1]].add(tier)
                     for k, v in node.items():
                         walk(v, depth + 1, k)
@@ -81,12 +81,24 @@ def other_tier_coverage():
                     for v in node[:8000]:
                         walk(v, depth + 1, key)
 
-            # top-level dicts keyed BY definition name (invariants does this)
+            # Top-level dicts keyed BY definition name (invariants does this).
+            # The KEY SET is every definition that tier knows about, which is
+            # not the same as every definition it CHECKS -- 992 entries, 100
+            # real verdicts.  Counting a key as coverage is mention-not-check,
+            # the same error this project has now made four times; require a
+            # verdict that records an outcome.
             if isinstance(blob, dict) and blob and all(
                     isinstance(v, dict) for v in list(blob.values())[:5]):
-                for k in blob:
-                    if "." in k or k[:1].islower():
-                        hits[k.split(".")[-1]].add(tier)
+                for k, v in blob.items():
+                    if not ("." in k or k[:1].islower()):
+                        continue
+                    verdict = (v.get("verdict") or v.get("status")
+                               or v.get("result"))
+                    if isinstance(verdict, str) and verdict in NON_VERDICTS:
+                        continue
+                    if verdict is None:
+                        continue        # no stated outcome is not an outcome
+                    hits[k.split(".")[-1]].add(tier)
             walk(blob)
     return hits
 
