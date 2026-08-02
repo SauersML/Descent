@@ -25,6 +25,7 @@ import sympy as sp
 
 import leansym as L
 import shared
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 
@@ -127,7 +128,7 @@ def run():
 
 def main():
     res, consumers = run()
-    (HERE / "results_check5.json").write_text(
+    (ART / "results_check5.json").write_text(
         json.dumps({"recurrences": res, "consumers": consumers}, indent=1, ensure_ascii=False))
     c = Counter(r["status"] for r in res)
     print(f"CHECK 5: {len(res)} recurrences analysed")

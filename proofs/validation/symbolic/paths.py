@@ -18,6 +18,40 @@ REPO = PROOFS.parent                            # repo root
 CALIBRATOR = PROOFS / "Calibrator"
 EXTRACT = VALIDATION / "extract"
 
+# ---------------------------------------------------------------- artifacts
+#
+# Generated result JSONs are BUILD PRODUCTS: derived, regenerable in about
+# fifteen minutes, and large.  They are not in git.  Committing them created a
+# standing problem -- the cluster checkout cannot push, so the in-repo copies
+# went stale every run, and a stale artifact that still parses is
+# indistinguishable from a current one.
+#
+# They are written to shared cluster storage instead, which every tier can
+# reach now that every tier runs on the cluster.  Resolution order:
+#   1. $GNOMON_ARTIFACTS          explicit override
+#   2. the shared cluster path, if it exists
+#   3. this directory             so a local run still works and is obvious
+#
+# For a frozen snapshot, copy one deliberately with the revision in the
+# filename.  Do not commit these.
+SHARED_ARTIFACTS = Path("/projects/standard/hsiehph/sauer354/gnomon-artifacts/symbolic")
+
+
+def _resolve_artifacts() -> Path:
+    import os
+    override = os.environ.get("GNOMON_ARTIFACTS")
+    if override:
+        p = Path(override)
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+    if SHARED_ARTIFACTS.parent.exists():
+        SHARED_ARTIFACTS.mkdir(parents=True, exist_ok=True)
+        return SHARED_ARTIFACTS
+    return HERE
+
+
+ARTIFACTS = _resolve_artifacts()
+
 
 def require(p: Path, what: str) -> Path:
     """Fail loudly rather than yielding an empty result from a missing tree."""

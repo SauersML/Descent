@@ -25,12 +25,13 @@ import leansym as L
 import shared
 import fixedpoint as FP
 from check1_fixedpoints import EQ_NAME, _split_app_args
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 
 
 def run():
-    decls = json.load(open(HERE / "decls.json"))
+    decls = json.load(open(ART / "decls.json"))
     table = shared.build_table()
     conv = L.Converter(table)
     defs = {d["name"]: d for d in shared.def_records()}
@@ -150,7 +151,7 @@ def run():
 
 def main():
     res = run()
-    (HERE / "results_check1b.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
+    (ART / "results_check1b.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
     c = Counter(r["status"] for r in res)
     print(f"CHECK 1b: {len(res)} coupled equilibrium systems detected")
     for k, v in sorted(c.items(), key=lambda kv: -kv[1]):

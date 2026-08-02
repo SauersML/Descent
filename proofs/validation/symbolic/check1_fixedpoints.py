@@ -38,6 +38,7 @@ import leansym as L
 import shared
 import hyps as H
 import fixedpoint as FP
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 
@@ -54,7 +55,7 @@ NOT_A_REST_POINT = re.compile(r"(_from_|From[A-Z]|Ratio$|Scalars$|Shift$|Gap$)")
 
 
 def load():
-    decls = json.load(open(HERE / "decls.json"))
+    decls = json.load(open(ART / "decls.json"))
     return decls, shared.build_table()
 
 
@@ -403,7 +404,7 @@ def run():
 
 def main():
     res = run()
-    (HERE / "results_check1.json").write_text(
+    (ART / "results_check1.json").write_text(
         json.dumps(res, indent=1, ensure_ascii=False))
     c = Counter(r["status"] for r in res)
     print(f"CHECK 1: {len(res)} equilibrium/rest-point definitions")

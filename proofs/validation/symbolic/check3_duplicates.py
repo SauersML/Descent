@@ -27,6 +27,7 @@ import sympy as sp
 
 import leansym as L
 import shared
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 PROBES = 7
@@ -88,7 +89,7 @@ def concept(name: str) -> str:
 
 
 def run():
-    decls = json.load(open(HERE / "decls.json"))
+    decls = json.load(open(ART / "decls.json"))
     table = shared.build_table()
     conv = L.Converter(table)
     defs = [d for d in shared.def_records() if d["body"]]
@@ -199,7 +200,7 @@ def run():
 
 def main():
     res = run()
-    (HERE / "results_check3.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
+    (ART / "results_check3.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
     print(f'CHECK 3: converted {res["parsed"]} definitions to sympy '
           f'({res["opaque"]} opaque)')
     cross = [g for g in res["equal_groups"] if g["cross_file"]]

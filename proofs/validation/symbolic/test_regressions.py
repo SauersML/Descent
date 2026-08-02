@@ -17,6 +17,7 @@ import sympy as sp
 import leansym as L
 import hyps as H
 import fixedpoint as FP
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 FAILURES = []
@@ -66,7 +67,7 @@ def main():
           str(sols[0] if sols else None))
 
     print("BUG 3 -- no variable capture in map/equilibrium binding")
-    c1 = json.load(open(HERE / "results_check1.json"))
+    c1 = json.load(open(ART / "results_check1.json"))
     delta = [r for r in c1 if r["name"] == "twoDemeIMEquilibriumDelta"]
     check("twoDemeIMEquilibriumDelta is not reported as a failed fixed point",
           all(r["status"] not in ("FIXED_POINT_FAILS",) for r in delta),
@@ -145,7 +146,7 @@ def main():
     check("sqrt of a negative evaluates to 0, as in Mathlib", h(-4.0) == 0.0)
 
     print("checks can fail: perturbed bodies are rejected")
-    cov = json.load(open(HERE / "coverage.json"))
+    cov = json.load(open(ART / "coverage.json"))
     covered = [f for f, e in cov.items()
                if any(c["covered"] for c in e["checks"].values())]
     check("at least 150 definitions have a mutation-rejecting check",

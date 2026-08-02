@@ -21,7 +21,7 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
-from paths import CALIBRATOR as CAL, require
+from paths import CALIBRATOR as CAL, require, ARTIFACTS as ART
 
 require(CAL, "proofs/Calibrator")
 
@@ -81,7 +81,7 @@ def run():
 
 def main():
     r = run()
-    (Path(__file__).parent / "results_homonyms.json").write_text(
+    (ART / "results_homonyms.json").write_text(
         json.dumps(r, indent=1, ensure_ascii=False))
     print("HOMONYM SCAN (raw declarations, no name-keyed table)")
     print(f"  declarations read        : {r['declarations']}")

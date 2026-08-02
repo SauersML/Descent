@@ -33,6 +33,7 @@ import leansym as L
 import shared
 import hyps as H
 import fixedpoint as FP
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 
@@ -104,7 +105,7 @@ def find_regime(a, b, binders, max_vars=6):
 
 
 def run():
-    decls = json.load(open(HERE / "decls.json"))
+    decls = json.load(open(ART / "decls.json"))
     table = shared.build_table()
     conv = L.Converter(table)
     defs = {d["name"]: d for d in decls if d["kind"] == "def"}
@@ -171,7 +172,7 @@ def run():
 
     # ---- arm 2: name-mates that differ -- is one a linearisation of the other?
     try:
-        c3 = json.load(open(HERE / "results_check3.json"))
+        c3 = json.load(open(ART / "results_check3.json"))
     except FileNotFoundError:
         c3 = {"disagreements": []}
     for dis in c3["disagreements"]:
@@ -208,7 +209,7 @@ def run():
 
 def main():
     res = run()
-    (HERE / "results_check4.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
+    (ART / "results_check4.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
     c = Counter(r["status"] for r in res)
     print(f"CHECK 4: {len(res)} approximation/limit claims tested")
     for k, v in sorted(c.items(), key=lambda kv: -kv[1]):

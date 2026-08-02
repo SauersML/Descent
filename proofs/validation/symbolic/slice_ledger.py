@@ -27,6 +27,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import shared
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 
@@ -208,7 +209,7 @@ def run():
 
 def main():
     ledger = run()
-    (HERE / "slice_ledger.json").write_text(json.dumps(ledger, indent=1, ensure_ascii=False))
+    (ART / "slice_ledger.json").write_text(json.dumps(ledger, indent=1, ensure_ascii=False))
     total_corpus = len(shared.definitions())
     c = Counter(r["status"] for r in ledger.values())
     print(f"SLICE: derivation / fixed-point / closed-form definitions")

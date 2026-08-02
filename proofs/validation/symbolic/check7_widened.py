@@ -39,7 +39,7 @@ import sympy as sp
 import leansym as L
 import hyps as H
 import shared
-from paths import HERE
+from paths import HERE, ARTIFACTS as ART
 
 MAX_THEOREMS_PER_DEF = 6
 NUM = re.compile(r"(?<![A-Za-z0-9_.])(\d+)(?![A-Za-z0-9_.])")
@@ -74,7 +74,7 @@ def mutate(body: str, argnames=()):
 
 
 def run():
-    decls = json.load(open(HERE / "decls.json"))
+    decls = json.load(open(ART / "decls.json"))
     base_table = shared.build_table()
     sdefs = {d["name"]: d for d in shared.def_records()}
     thms = [t for t in decls if t["kind"] == "theorem" and t["body"]]
@@ -86,7 +86,7 @@ def run():
         for n in set(re.findall(r"[A-Za-z_][A-Za-z0-9_.']*", t["body"])):
             mentions.setdefault(n.split(".")[-1], []).append(t)
 
-    ledger = json.loads((HERE / "slice_ledger.json").read_text())
+    ledger = json.loads((ART / "slice_ledger.json").read_text())
     targets = [r for r in ledger.values() if r["status"] == "UNREACHABLE"]
 
     results = []
@@ -175,7 +175,7 @@ def run():
 
 def main():
     res = run()
-    (HERE / "results_check7.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
+    (ART / "results_check7.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
     c = Counter(r["status"] for r in res)
     print(f"CHECK 7: widened certificate power over {len(res)} UNREACHABLE definitions")
     for k, v in sorted(c.items(), key=lambda kv: -kv[1]):

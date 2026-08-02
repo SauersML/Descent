@@ -22,6 +22,7 @@ import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 PY = sys.executable
@@ -76,25 +77,25 @@ def main():
     def add(fqn, rec):
         findings.setdefault(fqn, []).append(rec)
 
-    for r in json.load(open(HERE / "results_check1.json")):
+    for r in json.load(open(ART / "results_check1.json")):
         if r["status"] in FINDING:
             add(r["fqn"], {"check": "check1_fixed_point", "severity": FINDING[r["status"]],
                            "status": r["status"], "file": r["file"], "line": r["line"],
                            "detail": r["detail"]})
-    for r in json.load(open(HERE / "results_check1b.json")):
+    for r in json.load(open(ART / "results_check1b.json")):
         if r["status"] in FINDING:
             add(r["module"] + ".<joint>", {"check": "check1b_joint_system",
                                            "severity": FINDING[r["status"]],
                                            "status": r["status"],
                                            "unknowns": r["unknowns"],
                                            "detail": r["detail"]})
-    for r in json.load(open(HERE / "results_check2.json")):
+    for r in json.load(open(ART / "results_check2.json")):
         if r["status"] in FINDING or r["detail"].get("MENTION_GAP"):
             add(r["fqn"], {"check": "check2_derivation",
                            "severity": FINDING.get(r["status"], "naming_gap"),
                            "status": r["status"], "file": r["file"], "line": r["line"],
                            "statement": r["statement"], "detail": r["detail"]})
-    c3 = json.load(open(HERE / "results_check3.json"))
+    c3 = json.load(open(ART / "results_check3.json"))
     for g in c3["equal_groups"]:
         if not g["cross_file"]:
             continue
@@ -118,20 +119,20 @@ def main():
         add(h["name"], {"check": "check3_homonym", "severity": "error",
                         "status": "ONE_NAME_TWO_FUNCTIONS",
                         "distinct_bodies": h["distinct_bodies"]})
-    for r in json.load(open(HERE / "results_check4.json")):
+    for r in json.load(open(ART / "results_check4.json")):
         if r["status"] in FINDING:
             fqn = r.get("fqn") or r["a"]["fqn"]
             add(fqn, {"check": r["check"], "severity": FINDING[r["status"]],
                       "status": r["status"], "detail": r})
 
-    c5 = json.load(open(HERE / "results_check5.json"))
+    c5 = json.load(open(ART / "results_check5.json"))
     for r in c5["recurrences"]:
         if r["status"] in FINDING:
             add(r["fqn"], {"check": "check5_recurrence_limit",
                            "severity": FINDING[r["status"]], "status": r["status"],
                            "file": r["file"], "line": r["line"], "detail": r["detail"]})
 
-    c6 = json.load(open(HERE / "results_check6.json"))
+    c6 = json.load(open(ART / "results_check6.json"))
     for p_ in c6["pairs"]:
         if p_["status"] == "VACUOUS_FOR":
             add(p_["definition"], {"check": "check6_certificate_power",
@@ -141,13 +142,13 @@ def main():
                                    "file": p_["definition_file"],
                                    "line": p_["definition_line"],
                                    "mutations_survived": p_["mutations_survived"]})
-    hom = json.load(open(HERE / "results_homonyms.json"))
+    hom = json.load(open(ART / "results_homonyms.json"))
     for fq, sites in hom["colliding_public"].items():
         add(fq, {"check": "homonyms", "severity": "error",
                  "status": "NAME_DECLARED_MORE_THAN_ONCE",
                  "sites": sites})
 
-    cov = json.load(open(HERE / "coverage.json"))
+    cov = json.load(open(ART / "coverage.json"))
     for fqn, e in cov.items():
         for check, info in e["checks"].items():
             if not info["covered"]:
@@ -162,7 +163,7 @@ def main():
                     r["in_flux"] = why
                     r["actionable"] = False
 
-    (HERE / "findings.json").write_text(json.dumps(findings, indent=1, ensure_ascii=False))
+    (ART / "findings.json").write_text(json.dumps(findings, indent=1, ensure_ascii=False))
     n_flux = sum(1 for v in findings.values() for f in v if f.get("in_flux"))
     if n_flux:
         print(f"  ({n_flux} findings suppressed as not actionable: upstream revision "

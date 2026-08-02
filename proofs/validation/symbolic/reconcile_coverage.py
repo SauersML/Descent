@@ -48,7 +48,7 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from paths import VALIDATION, require  # noqa: E402
+from paths import VALIDATION, require  # noqa: E402, ARTIFACTS as ART
 
 require(VALIDATION, "proofs/validation")
 HERE = VALIDATION / "symbolic"
@@ -132,7 +132,7 @@ def tier_extract(uni, by_short):
 
 def tier_symbolic(uni, by_short):
     out, unmapped = set(), set()
-    p = HERE / "slice_ledger.json"
+    p = ART / "slice_ledger.json"
     if p.exists():
         for fq, r in json.loads(p.read_text()).items():
             if r.get("status") == "VERIFIED":
@@ -198,7 +198,7 @@ def run():
 
 def main():
     r = run()
-    (HERE / "reconciled_coverage.json").write_text(
+    (ART / "reconciled_coverage.json").write_text(
         json.dumps({k: (dict(v) if isinstance(v, Counter) else v)
                     for k, v in r.items()}, indent=1, ensure_ascii=False))
     u = r["universe"]

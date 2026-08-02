@@ -13,7 +13,7 @@ import re
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
-from paths import CALIBRATOR, require  # noqa: E402
+from paths import CALIBRATOR, require  # noqa: E402, ARTIFACTS as ART
 
 require(CALIBRATOR, "proofs/Calibrator")
 
@@ -230,7 +230,7 @@ def main():
     defs = [d for d in decls if d.kind == "def"]
     thms = [d for d in decls if d.kind == "theorem"]
     print(f"parsed {len(defs)} defs, {len(thms)} theorems")
-    out = Path(__file__).parent / "decls.json"
+    out = ART / "decls.json"
     out.write_text(json.dumps([asdict(d) for d in decls], ensure_ascii=False, indent=1))
     print(f"wrote {out}")
 

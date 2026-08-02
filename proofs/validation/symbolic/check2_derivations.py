@@ -35,6 +35,7 @@ import sympy as sp
 import leansym as L
 import shared
 import hyps as H
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 
@@ -61,7 +62,7 @@ def base_name(thm_name: str) -> str | None:
 
 
 def run():
-    decls = json.load(open(HERE / "decls.json"))
+    decls = json.load(open(ART / "decls.json"))
     table = shared.build_table()
     inline = L.Converter(table)
     opaque = L.Converter(table, opaque_defs=True)
@@ -159,7 +160,7 @@ def run():
 
 def main():
     res = run()
-    (HERE / "results_check2.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
+    (ART / "results_check2.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
     c = Counter(r["status"] for r in res)
     print(f"CHECK 2: {len(res)} derivation-claiming theorems")
     for k, v in sorted(c.items(), key=lambda kv: -kv[1]):

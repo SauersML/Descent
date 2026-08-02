@@ -71,6 +71,7 @@ import sympy as sp
 import leansym as L
 import hyps as H
 import shared
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 
@@ -110,12 +111,12 @@ def mutate(body: str, argnames=()):
 
 
 def run():
-    decls = json.load(open(HERE / "decls.json"))
+    decls = json.load(open(ART / "decls.json"))
     base_table = shared.build_table()
     sdefs = {d["name"]: d for d in shared.def_records()}
     thms = {t["name"]: t for t in decls if t["kind"] == "theorem"}
 
-    c2 = json.load(open(HERE / "results_check2.json"))
+    c2 = json.load(open(ART / "results_check2.json"))
     # every theorem that claims a derivation and whose statement we can evaluate
     population = [r for r in c2 if r["status"] in
                   ("derivation_verified", "VACUOUS_DERIVATION",
@@ -180,7 +181,7 @@ def main():
            "definitions_mentioned": len(by_def),
            "definitions_constrained": len(by_def) - len(unconstrained),
            "definitions_unconstrained": sorted(unconstrained)}
-    (HERE / "results_check6.json").write_text(json.dumps(out, indent=1, ensure_ascii=False))
+    (ART / "results_check6.json").write_text(json.dumps(out, indent=1, ensure_ascii=False))
 
     c = Counter(p["status"] for p in pairs)
     print("CHECK 6: constraining power of derivation certificates")

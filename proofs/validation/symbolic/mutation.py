@@ -27,6 +27,7 @@ import sympy as sp
 import leansym as L
 import shared
 import hyps as H
+from paths import ARTIFACTS as ART
 
 HERE = Path(__file__).parent
 
@@ -47,7 +48,7 @@ def mutate(body: str) -> list[tuple[str, str]]:
 
 
 def run():
-    decls = json.load(open(HERE / "decls.json"))
+    decls = json.load(open(ART / "decls.json"))
     base_table = shared.build_table()
     defs = {d["name"]: d for d in shared.def_records()}
     thms = {t["name"]: t for t in decls if t["kind"] == "theorem"}
@@ -59,7 +60,7 @@ def run():
         e["checks"][check] = {"covered": covered, **detail}
 
     # ---------------- CHECK 1: guarded equilibria
-    c1 = json.load(open(HERE / "results_check1.json"))
+    c1 = json.load(open(ART / "results_check1.json"))
     for r in c1:
         if r["status"] not in ("fixed_point_verified", "UNGUARDED_but_verified"):
             continue
@@ -88,7 +89,7 @@ def run():
               "guard": r["guard_theorem"]})
 
     # ---------------- CHECK 2: verified derivations
-    c2 = json.load(open(HERE / "results_check2.json"))
+    c2 = json.load(open(ART / "results_check2.json"))
     for r in c2:
         if r["status"] != "derivation_verified":
             continue
@@ -124,7 +125,7 @@ def run():
                   "mutations_survived": survived})
 
     # ---------------- CHECK 3: duplicate-body groups
-    c3 = json.load(open(HERE / "results_check3.json"))
+    c3 = json.load(open(ART / "results_check3.json"))
     for g in c3["equal_groups"]:
         target = sp.sympify(g["expression"])
         for mem in g["members"]:
@@ -152,7 +153,7 @@ def run():
 
 def main():
     cov = run()
-    (HERE / "coverage.json").write_text(json.dumps(cov, indent=1, ensure_ascii=False))
+    (ART / "coverage.json").write_text(json.dumps(cov, indent=1, ensure_ascii=False))
     total = len(cov)
     per_check = Counter()
     vacuous = []

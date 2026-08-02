@@ -1,6 +1,9 @@
 .venv/
 __pycache__/
 *.log
-# regenerable: `python leanparse.py`; large, and superseded for definitions by
-# the shared extract API (retained only for theorem statements)
-decls.json
+# Generated result artifacts are BUILD PRODUCTS, not source: derived,
+# regenerable in ~15 minutes, and large. They live on shared cluster storage
+# (see README.md). Committing them meant the in-repo copies went stale every
+# run, because the cluster checkout cannot push -- and a stale artifact that
+# still parses is indistinguishable from a current one.
+*.json

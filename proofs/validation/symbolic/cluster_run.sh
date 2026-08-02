@@ -16,6 +16,10 @@ module load python3/3.10.9_anaconda2023.03_libmamba
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$HERE" || exit 1
 
+echo "=== where results are written ==="
+python3 -c 'from paths import ARTIFACTS; print(ARTIFACTS)'
+echo
+
 echo "=== interpreter and library versions (please return this block) ==="
 python3 -c 'import sys, sympy, numpy; print("python", sys.version.split()[0]); print("sympy", sympy.__version__); print("numpy", numpy.__version__)'
 echo
