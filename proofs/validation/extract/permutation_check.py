@@ -289,6 +289,17 @@ def main(argv=None):
         return 0
 
     findings, examined, permuted = scan(a.commits)
+    # STATE WHAT THE WINDOW COVERED.  At 60 commits this reported zero; the one
+    # real permutation in this corpus's history sat at position 70, so the zero
+    # was honest and covered nothing that mattered.  A scan window is a claim
+    # about a range, and printing the range is the difference between a result
+    # and a number.
+    oldest = git("log", "--format=%h %ad %s", "--date=short",
+                 f"-{a.commits}", "--", "proofs/Calibrator").strip().splitlines()
+    if oldest:
+        print(f"\nwindow: newest {oldest[0][:60]}")
+        print(f"        oldest {oldest[-1][:60]}")
+        print("        anything older than this was NOT examined.")
     print(f"\ncommits scanned            : {a.commits}")
     print(f"removed definitions examined: {examined}")
     print(f"absorbed WITH a permutation : {permuted}")
