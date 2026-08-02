@@ -53,7 +53,12 @@ Two halves, with different status here:
   sharpest instance the corpus has, since
   `Calibrator.PolygenicSpectroscopy.hardCall_arithmeticProgression_at_critical_maf`
   proves that at `q* = (2 - √2)/4` the three values of `log x²` for a hard-called
-  Hardy-Weinberg locus form an exact arithmetic progression.
+  Hardy-Weinberg locus form an exact arithmetic progression. That instance is now a
+  *consumer* of this file rather than a remark about it:
+  `Calibrator.PolygenicSpectroscopy.hardCall_not_cramer_at_critical_maf` is
+  `not_cramer_of_lattice` applied to the genotype coordinate, and it is not provable in
+  that file without this one — the return of `|φ|²` to one at the frequencies `2πn/h`
+  has no counterpart in the spectroscopy machinery.
 * **General atomic: carried as a hypothesis.** The nonlattice atomic case needs
   Kronecker's theorem on *simultaneous* Diophantine approximation — for gaps `1` and
   `√2` one needs `t ≈ 2πm` and `t√2 ≈ 2πn` at once — and mathlib carries only the
@@ -246,11 +251,19 @@ locus rather than an abstract atomic law. `hlat` is the lattice hypothesis in ab
 form: all gaps between coordinate values lie in `h ℤ`.
 
 Deriving `hlat` for the specific coordinate `log x²` at the critical frequency
-`q* = (2 - √2)/4` is *not* done here. What
+`q* = (2 - √2)/4` is *not* done here, and cannot be: what
 `Calibrator.PolygenicSpectroscopy.hardCall_arithmeticProgression_at_critical_maf`
 proves is the arithmetic-progression identity on the three squared standardized values;
 turning that into the gap condition below requires the three logarithms, which this file
-does not compute. So the connection is a route, not a discharged hypothesis.
+does not compute.
+
+**It is discharged there instead, and this file is imported for that purpose.**
+`Calibrator.PolygenicSpectroscopy.hardCall_logSquare_lattice_at_critical_maf` supplies
+`hlat` for `a = log x²` with span `hardCallLatticeSpan = log ((1 - q*) / q*)`, and
+`Calibrator.PolygenicSpectroscopy.hardCall_not_cramer_at_critical_maf` is this theorem
+applied to it. So the dependency runs `PolygenicSpectroscopy → CramerStratum`, not the
+other way, and the arrow above stays a citation on purpose: reversing it would be a
+cycle. Do not add an import of `PolygenicSpectroscopy` here.
 
 The general statement — that a hard call is outside the stratum at *every* polymorphic
 frequency, not only where the values happen to be equally spaced — is
