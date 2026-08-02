@@ -4279,7 +4279,7 @@ theorem equilibrium_drift_component_improves_with_theta
   have h_ratio_lt : θ₁ / (1 + θ₁) < θ₂ / (1 + θ₂) := by
     rw [div_lt_div_iff₀ h1 h2]
     nlinarith
-  exact mul_lt_mul_of_pos_right h_ratio_lt hVA
+  exact mul_lt_mul_of_pos_left h_ratio_lt hVA
 
 /-- **Pure drift benchmark overestimates retained variance.**
     The drift-only benchmark (which sets `negligibleMutation` = True) always
