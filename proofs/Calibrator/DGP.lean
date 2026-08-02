@@ -18,7 +18,13 @@ and `fstMutationDriftEquilibrium` lived in `PopulationGeneticsFoundations` and
 `scaledMigrationRate` in `PortabilityDrift`, each of which *imports* the modules whose
 definitions were computing them. A definition that cannot reach the function it is
 computing will be written out again, so placing these correctly is what removes the
-duplication rather than merely forbidding it. -/
+duplication rather than merely forbidding it.
+
+Moving definitions like these has now broken this module three times, never in the
+mathematics and always in sites that *name* a definition without *applying* it —
+`unfold` lists and docstrings. Search this file for "Note for anyone editing the Fst
+cluster" for the two failure shapes and the rule they share, recorded next to
+`fstEquilibrium` where they landed. -/
 
 /-- **Scaled mutation rate** `θ = 4 Nₑ μ`, the fundamental parameter of neutral theory. -/
 noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
