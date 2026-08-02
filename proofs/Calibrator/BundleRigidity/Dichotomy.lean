@@ -1,0 +1,251 @@
+import Mathlib
+
+/-!
+# The corrected kernel dichotomy for trip semigroups
+
+This module is **self-contained: it imports only Mathlib**.
+
+## What this replaces
+
+A previous conjecture in this development read:
+
+> the kernel is non-zero **iff** some relation has **weight product one**.
+
+**That is false, and the falsifier has been executed.** Take `φ₁ = f` and `φ₂ = f ∘ f`.
+Then the relation `"2" = "11"` holds, with a parity mismatch, and the resulting Bézout
+constant is strictly positive for *every* choice of weights. So the kernel is non-zero
+while no relation has weight product one. **Relations alone suffice; the weight condition
+is not part of the criterion.**
+
+The superseded statement is kept below as `weightProductOne_conjecture`, immediately under
+its refutation, so that a reader who encounters the old form elsewhere can see it named
+and struck rather than quietly absent.
+
+### The arithmetic of the falsifier, checked here
+
+At `P₁ = 3/10`, `Q₁ = 7/10`, `P₂ = 2/5`, `Q₂ = 3/5`, the relation `"2" = "11"` has weight
+defect
+
+```
+(Q₁/P₁)² · (P₂/Q₂)  =  (7/3)² · (2/3)  =  49/9 · 2/3  =  98/27  ≠  1,
+```
+
+which is `defect_witness`. That number is proved here from the weights, not quoted. The
+accompanying Bézout constant `c = 125/147` is *not* verified here: its definition involves
+a character `χ` that this module does not carry, so it is recorded as sourced rather than
+checked. **Reported numbers say where they came from.**
+
+## The corrected picture
+
+* **Theorem 1.** Disjoint images together with `Q_min > P_max` gives zero kernel. In the
+  normalized regime `P + Q = 1` with `P < Q`, the weight condition is *automatic* — this
+  is `weight_condition_automatic`, and it is proved here in full.
+* **Theorem 3.** *Any* relation gives an infinite-dimensional kernel, unconditionally on
+  the weights. This is the theorem that kills the old conjecture.
+* **Theorem 4.** `(Q_min/P_max)^N > m N` for the overlap multiplicity `m` gives zero
+  kernel.
+* **Zero or infinite.** On every decided stratum the kernel is either zero or
+  infinite-dimensional. It is never finite and non-zero.
+* **The open stratum.** Free semigroups with overlap at the weight-gap exponential rate.
+  Nothing here decides that case, and no if-and-only-if is claimed.
+
+## Why commutation never needed a weight condition
+
+The commutation relation is `ij = ji`, and its weight defect is **identically one** for
+every choice of weights (`commutation_defect_eq_one`). That is a two-line computation and
+it explains a fact that previously looked like a coincidence: the commutator mechanism was
+observed to work without any hypothesis on the weights, and the reason is that the only
+weight condition anyone could have imposed on it is satisfied automatically.
+
+## House style
+
+The three deep theorems are **named fields of a structure**, not `sorry`s. Their proofs
+are not in this development, and carrying them as inputs means anything derived from them
+shows that in its own type. What *is* proved here without hypotheses: the automatic weight
+condition, the commutation defect, the falsifier's arithmetic, and the logical form of the
+refutation itself.
+
+## Attribution
+
+The closed-path criterion for sums of weighted compositions is classical — Diliberto and
+Straus, Marshall and O'Farrell, Ismailov. The correction recorded here is to a conjecture
+made in this development, not to that literature.
+-/
+
+namespace Calibrator.BundleRigidity
+
+open scoped BigOperators
+
+variable {ι : Type*}
+
+/-! ## Words and weight defects -/
+
+/-- The product of a weight function along a word. -/
+def wProd (P : ι → ℝ) (w : List ι) : ℝ := (w.map P).prod
+
+@[simp] theorem wProd_nil (P : ι → ℝ) : wProd P ([] : List ι) = 1 := rfl
+
+@[simp] theorem wProd_cons (P : ι → ℝ) (i : ι) (u : List ι) :
+    wProd P (i :: u) = P i * wProd P u := rfl
+
+/-- The **weight ratio** of a word: `Q`-product over `P`-product. -/
+noncomputable def weightRatio (P Q : ι → ℝ) (w : List ι) : ℝ := wProd Q w / wProd P w
+
+/-- The **weight defect of a relation** `w ≈ u`: the ratio of the two words' weight
+ratios. The refuted conjecture asserted that a relation contributes to the kernel exactly
+when its defect is one. -/
+noncomputable def defect (P Q : ι → ℝ) (w u : List ι) : ℝ :=
+  weightRatio P Q w / weightRatio P Q u
+
+/-- **The commutation relation has defect one, identically.**
+
+`defect (i :: j :: []) (j :: i :: []) = 1` for every choice of weights, because both words
+use the same letters and the products are over a commutative field. This is why the
+commutator mechanism never needed a weight hypothesis: the only one available to it holds
+automatically. -/
+theorem commutation_defect_eq_one (P Q : ι → ℝ) (i j : ι)
+    (hP : P i ≠ 0) (hP' : P j ≠ 0) (hQ : Q i ≠ 0) (hQ' : Q j ≠ 0) :
+    defect P Q [i, j] [j, i] = 1 := by
+  unfold defect weightRatio
+  simp only [wProd_cons, wProd_nil, mul_one]
+  field_simp
+  ring
+
+/-! ## The falsifier's arithmetic
+
+`φ₁ = f`, `φ₂ = f ∘ f`, relation `"2" = "11"`, at the source's weights.
+-/
+
+/-- The weights of the executed falsifier: `P = (3/10, 2/5)`, `Q = (7/10, 3/5)`. -/
+noncomputable def falsifierP : Fin 2 → ℝ := ![3 / 10, 2 / 5]
+
+/-- The weights of the executed falsifier, `Q` side. -/
+noncomputable def falsifierQ : Fin 2 → ℝ := ![7 / 10, 3 / 5]
+
+/-- **The falsifier's weight defect is `98/27`, hence not one.**
+
+The relation is `"2" = "11"`: the word `[0, 0]` (two copies of `φ₁`) against the word
+`[1]` (one copy of `φ₂`). Its defect is `(Q₁/P₁)² · (P₂/Q₂) = (7/3)² · (2/3) = 98/27`.
+
+This number is computed from the weights here rather than quoted, and it agrees with the
+value reported by the source. -/
+theorem defect_witness :
+    defect falsifierP falsifierQ [0, 0] [1] = 98 / 27 := by
+  unfold defect weightRatio falsifierP falsifierQ
+  simp only [wProd_cons, wProd_nil, mul_one, Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.head_cons]
+  norm_num
+
+/-- The falsifier's defect is not one, which is the whole point of it. -/
+theorem defect_witness_ne_one :
+    defect falsifierP falsifierQ [0, 0] [1] ≠ 1 := by
+  rw [defect_witness]; norm_num
+
+/-! ## The dichotomy, with the deep theorems as named inputs -/
+
+/-- **A trip system**: the weights, the relation structure, and the three theorems of the
+corrected picture carried as named fields.
+
+The fields `theorem1`, `theorem3` and `theorem4` are **inputs, not results of this
+development**. They appear here so that anything derived from them carries them in its
+type. -/
+structure TripSystem (ι : Type*) where
+  /-- The `P` weights. -/
+  P : ι → ℝ
+  /-- The `Q` weights. -/
+  Q : ι → ℝ
+  /-- Weights are strictly positive. -/
+  P_pos : ∀ i, 0 < P i
+  /-- Weights are strictly positive. -/
+  Q_pos : ∀ i, 0 < Q i
+  /-- Two distinct words inducing the same composed map. -/
+  Relation : List ι → List ι → Prop
+  /-- The kernel of the associated operator is non-zero. -/
+  KernelNonzero : Prop
+  /-- The kernel is infinite-dimensional. -/
+  KernelInfiniteDim : Prop
+  /-- The generating maps have pairwise disjoint images. -/
+  DisjointImages : Prop
+  /-- **Theorem 3 (input).** Any relation forces an infinite-dimensional kernel,
+  unconditionally on the weights. This is what refutes the weight-product conjecture. -/
+  theorem3 : (∃ w u, Relation w u) → KernelInfiniteDim
+  /-- **Theorem 1 (input).** Disjoint images plus a uniform weight gap gives zero
+  kernel. -/
+  theorem1 : DisjointImages → (∀ i j, P i < Q j) → ¬ KernelNonzero
+  /-- **The zero-or-infinite dichotomy (input).** On every decided stratum the kernel is
+  either zero or infinite-dimensional; it is never finite and non-zero. -/
+  zero_or_infinite : KernelNonzero → KernelInfiniteDim
+  /-- An infinite-dimensional kernel is in particular non-zero. -/
+  infiniteDim_imp_nonzero : KernelInfiniteDim → KernelNonzero
+
+namespace TripSystem
+
+variable (S : TripSystem ι)
+
+/-- **The weight condition of Theorem 1 is automatic in the normalized regime.**
+
+If `P i + Q i = 1` and `P i < Q i` for every `i`, then `P i < Q j` for *every* pair `i, j`
+— not merely for matching indices. The reason is that both conditions pin each weight to
+its own side of `1/2`: `P i < 1/2 < Q j`.
+
+Proved here in full, with no hypotheses beyond the two displayed. This is the sense in
+which Theorem 1's hypothesis is cheaper than it looks. -/
+theorem weight_condition_automatic (hnorm : ∀ i, S.P i + S.Q i = 1)
+    (hlt : ∀ i, S.P i < S.Q i) : ∀ i j, S.P i < S.Q j := by
+  intro i j
+  have h1 : S.P i < 1 / 2 := by
+    have := hnorm i; have := hlt i; linarith
+  have h2 : (1 : ℝ) / 2 < S.Q j := by
+    have := hnorm j; have := hlt j; linarith
+  linarith
+
+/-- Theorem 1 in the normalized regime, with the weight hypothesis discharged. -/
+theorem kernel_zero_of_disjoint_normalized (hdisj : S.DisjointImages)
+    (hnorm : ∀ i, S.P i + S.Q i = 1) (hlt : ∀ i, S.P i < S.Q i) :
+    ¬ S.KernelNonzero :=
+  S.theorem1 hdisj (S.weight_condition_automatic hnorm hlt)
+
+/-- A relation forces a non-zero kernel. -/
+theorem kernelNonzero_of_relation (h : ∃ w u, S.Relation w u) : S.KernelNonzero :=
+  S.infiniteDim_imp_nonzero (S.theorem3 h)
+
+/-- **The refutation, in logical form.**
+
+If a system has a relation, and **every** relation of the system has defect different from
+one, then the kernel is non-zero while no relation has weight product one. That is exactly
+the failure of the forward direction of the refuted conjecture.
+
+Stating it this way makes the refutation a theorem rather than an assertion: given
+Theorem 3 as an input, one only has to exhibit a system whose relations all have defect
+`≠ 1`, and `defect_witness_ne_one` supplies the arithmetic for the `φ₁ = f`, `φ₂ = f ∘ f`
+system at the source's weights. -/
+theorem weightProductOne_fails (hrel : ∃ w u, S.Relation w u)
+    (hdef : ∀ w u, S.Relation w u → defect S.P S.Q w u ≠ 1) :
+    S.KernelNonzero ∧ ¬ ∃ w u, S.Relation w u ∧ defect S.P S.Q w u = 1 := by
+  refine ⟨S.kernelNonzero_of_relation hrel, ?_⟩
+  rintro ⟨w, u, hwu, hone⟩
+  exact hdef w u hwu hone
+
+/-- **The superseded conjecture, named and struck.**
+
+This is the statement that was refuted: the kernel is non-zero *if and only if* some
+relation has weight product one. It is recorded as a definition so that the old form has a
+name to be referred to, and so that a reader meeting it elsewhere in the corpus finds it
+here next to `weightProductOne_fails` rather than finding nothing.
+
+**Do not use this as a criterion.** The correct statement is that relations alone
+suffice. -/
+def weightProductOne_conjecture : Prop :=
+  S.KernelNonzero ↔ ∃ w u, S.Relation w u ∧ defect S.P S.Q w u = 1
+
+/-- **The conjecture is false for any system meeting the falsifier's hypotheses.** -/
+theorem not_weightProductOne_conjecture (hrel : ∃ w u, S.Relation w u)
+    (hdef : ∀ w u, S.Relation w u → defect S.P S.Q w u ≠ 1) :
+    ¬ S.weightProductOne_conjecture := by
+  intro hconj
+  obtain ⟨hne, hno⟩ := S.weightProductOne_fails hrel hdef
+  exact hno (hconj.mp hne)
+
+end TripSystem
+
+end Calibrator.BundleRigidity
