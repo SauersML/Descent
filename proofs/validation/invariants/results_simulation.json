@@ -1,0 +1,674 @@
+{
+ "AncestrySpecificPower.genotypeVarianceHWE": {
+  "verdict": "agrees",
+  "module": "AncestrySpecificPower",
+  "line": 95,
+  "oracle": "variance of a diploid dosage drawn Binomial(2, p)",
+  "tolerance": 0.02,
+  "worst_excess_over_allowed": 0.06453590431970482,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.106422
+   ],
+   "lean": 0.1901933311867194,
+   "oracle": 0.19043913442187496,
+   "mc_se": 0.00013976598832663936,
+   "gap": 0.0002458032351555506,
+   "allowed": 0.0038087826884374994,
+   "excess": 0.06453590431970482
+  }
+ },
+ "AncestrySpecificArchitecture.driftVariance": {
+  "verdict": "agrees",
+  "module": "AncestrySpecificArchitecture",
+  "line": 74,
+  "oracle": "Var(p_t) from an explicit binomial Wright-Fisher run drifted to the requested F_ST",
+  "tolerance": 0.06,
+  "worst_excess_over_allowed": 0.08973179491093157,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.484018,
+    0.178232
+   ],
+   "lean": 0.04451253011848217,
+   "oracle": 0.044753478716908754,
+   "mc_se": 0.0001389531873868837,
+   "gap": 0.00024094859842658384,
+   "allowed": 0.002685208723014525,
+   "excess": 0.08973179491093157
+  }
+ },
+ "AncestrySpecificArchitecture.expectedFreqDiffSq": {
+  "verdict": "agrees",
+  "module": "AncestrySpecificArchitecture",
+  "line": 103,
+  "oracle": "E[(p1-p2)^2] for two Wright-Fisher populations drifting independently from the same start",
+  "tolerance": 0.06,
+  "worst_excess_over_allowed": 0.27413770475176363,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.026992,
+    0.748653
+   ],
+   "lean": 0.010158105712071992,
+   "oracle": 0.009991022525,
+   "mc_se": 7.240600198188804e-05,
+   "gap": 0.00016708318707199174,
+   "allowed": 0.0006094863427243195,
+   "excess": 0.27413770475176363
+  }
+ },
+ "AncestrySpecificArchitecture.twoPopDriftVariance": {
+  "verdict": "agrees",
+  "module": "AncestrySpecificArchitecture",
+  "line": 92,
+  "oracle": "Var(p1-p2) between two independently drifting populations",
+  "tolerance": 0.06,
+  "worst_excess_over_allowed": 0.08317660310710194,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "const-off-by-one",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.644358,
+    0.194757
+   ],
+   "lean": 0.08926114964049185,
+   "oracle": 0.0888156832875,
+   "mc_se": 0.0010549123659205854,
+   "gap": 0.00044546635299184956,
+   "allowed": 0.005355668978429511,
+   "excess": 0.08317660310710194
+  }
+ },
+ "AncestryCalibration.epistaticVariancePairwise": {
+  "verdict": "agrees",
+  "module": "AncestryCalibration",
+  "line": 296,
+  "oracle": "variance of the pairwise product of centred Hardy-Weinberg dosages",
+  "tolerance": 0.05,
+  "worst_excess_over_allowed": 0.11032206559118997,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.299926,
+    0.796489,
+    0.118683
+   ],
+   "lean": 0.006100681139562491,
+   "oracle": 0.006134519784262987,
+   "mc_se": 3.779589325515884e-05,
+   "gap": 3.383864470049569e-05,
+   "allowed": 0.00030672598921314937,
+   "excess": 0.11032206559118997
+  }
+ },
+ "EpistasisAndNonAdditivity.epistaticVariance": {
+  "verdict": "agrees",
+  "module": "EpistasisAndNonAdditivity",
+  "line": 126,
+  "oracle": "variance of the pairwise product of centred Hardy-Weinberg dosages",
+  "tolerance": 0.05,
+  "worst_excess_over_allowed": 0.08889011687376969,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    1.014517,
+    0.824326,
+    0.700695
+   ],
+   "lean": 0.12503380908376813,
+   "oracle": 0.12559200347714283,
+   "mc_se": 0.0007135316999184285,
+   "gap": 0.0005581943933747058,
+   "allowed": 0.006279600173857142,
+   "excess": 0.08889011687376969
+  }
+ },
+ "Conventions.betweenSubgroupVariance": {
+  "verdict": "agrees",
+  "module": "Conventions",
+  "line": 167,
+  "oracle": "between-group component of allele-frequency variance over two equally sized subgroups",
+  "tolerance": 0.05,
+  "worst_excess_over_allowed": 0.110643873607579,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "const-off-by-one",
+    "negate",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.522126,
+    0.380509
+   ],
+   "lean": 0.005013858038568726,
+   "oracle": 0.0049767648406939344,
+   "mc_se": 0.00011174951570703308,
+   "gap": 3.70931978747914e-05,
+   "allowed": 0.00033524854712109925,
+   "excess": 0.110643873607579
+  }
+ },
+ "CovarianceStructure.haplotypeFreqAdmixed": {
+  "verdict": "agrees",
+  "module": "CovarianceStructure",
+  "line": 497,
+  "oracle": "frequency of the AB haplotype among individuals drawn from source A with probability alpha, each source in linkage equilibrium",
+  "tolerance": 0.02,
+  "worst_excess_over_allowed": 0.08249302206181515,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "drop-a-one-minus",
+    "negate",
+    "swap-plus-minus",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.132051,
+    0.638743,
+    0.140934,
+    0.376907,
+    0.503733
+   ],
+   "lean": 0.1766764915543119,
+   "oracle": 0.17638500000000001,
+   "mc_se": 0.00048790367901871504,
+   "gap": 0.000291491554311879,
+   "allowed": 0.003533529831086238,
+   "excess": 0.08249302206181515
+  }
+ },
+ "CovarianceStructure.admixtureLDTwoLocus": {
+  "verdict": "agrees",
+  "module": "CovarianceStructure",
+  "line": 520,
+  "oracle": "D = P(AB) - P(A)P(B) measured in a simulated admixed population",
+  "tolerance": 0.05,
+  "worst_excess_over_allowed": 0.8155790403101882,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "swap-times-div"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.835569,
+    0.15811,
+    0.272602,
+    0.462353,
+    0.089596
+   ],
+   "lean": -0.007649796453945562,
+   "oracle": -0.007975008961718748,
+   "mc_se": 9.109083132135377e-05,
+   "gap": 0.0003252125077731864,
+   "allowed": 0.00039875044808593746,
+   "excess": 0.8155790403101882
+  }
+ },
+ "CovarianceStructure.admixtureLDAtGen": {
+  "verdict": "agrees",
+  "module": "CovarianceStructure",
+  "line": 550,
+  "oracle": "admixture LD after g generations of random mating with recombination, simulated end to end rather than multiplied by a decay factor",
+  "tolerance": 0.06,
+  "worst_excess_over_allowed": 0.4350918324537666,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.587651,
+    0.697359,
+    0.608867,
+    0.468527,
+    0.854807,
+    0.09401,
+    8.0
+   ],
+   "lean": -0.006190382461064496,
+   "oracle": -0.005686161290624991,
+   "mc_se": 0.00038629482546697675,
+   "gap": 0.0005042211704395045,
+   "allowed": 0.0011588844764009302,
+   "excess": 0.4350918324537666
+  }
+ },
+ "DGP.discreteRecombinationSurvival": {
+  "verdict": "agrees",
+  "module": "DGP",
+  "line": 306,
+  "oracle": "P(no recombination in t meioses), sampled",
+  "tolerance": 0.02,
+  "worst_excess_over_allowed": 0.22627562354284808,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "drop-a-one-minus",
+    "negate",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.282037,
+    12.0
+   ],
+   "lean": 0.0187597167174867,
+   "oracle": 0.018845,
+   "mc_se": 8.485281374238715e-05,
+   "gap": 8.528328251329945e-05,
+   "allowed": 0.0003769,
+   "excess": 0.22627562354284808
+  }
+ },
+ "Conventions.geometricDecay": {
+  "verdict": "agrees",
+  "module": "Conventions",
+  "line": 716,
+  "oracle": "fraction of LD surviving t generations of recombination, from an explicit two-locus haplotype pool",
+  "tolerance": 0.06,
+  "worst_excess_over_allowed": 0.1607013298548672,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "drop-a-one-minus",
+    "negate",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.282859,
+    5.0
+   ],
+   "lean": 0.18968097228844502,
+   "oracle": 0.18785205321874998,
+   "mc_se": 0.0022503595087573066,
+   "gap": 0.0018289190696950397,
+   "allowed": 0.0113808583373067,
+   "excess": 0.1607013298548672
+  }
+ },
+ "DGP.r2FromSignalVariance": {
+  "verdict": "agrees",
+  "module": "DGP",
+  "line": 2100,
+  "oracle": "squared correlation between signal and signal+noise, sampled",
+  "tolerance": 0.02,
+  "worst_excess_over_allowed": 0.27036337868185856,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "negate",
+    "swap-plus-minus",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.209857,
+    2.448767
+   ],
+   "lean": 0.07893429917559529,
+   "oracle": 0.07814352954345946,
+   "mc_se": 0.0009749466760761997,
+   "gap": 0.0007907696321358265,
+   "allowed": 0.002924840028228599,
+   "excess": 0.27036337868185856
+  }
+ },
+ "BayesianPGSTheory.jamesSteinMSE": {
+  "verdict": "agrees",
+  "module": "BayesianPGSTheory",
+  "line": 188,
+  "oracle": "MSE of the shrunk estimator lam*(beta+noise) for beta, sampled",
+  "tolerance": 0.03,
+  "worst_excess_over_allowed": 0.02914862067039388,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-plus-minus",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.417839,
+    2.291574,
+    1.905453
+   ],
+   "lean": 1.0458641974632423,
+   "oracle": 1.0467795628753556,
+   "mc_se": 0.005771774826130561,
+   "gap": 0.0009153654121132337,
+   "allowed": 0.03140338688626067,
+   "excess": 0.02914862067039388
+  }
+ },
+ "BayesianPGSTheory.optimalShrinkage": {
+  "verdict": "agrees",
+  "module": "BayesianPGSTheory",
+  "line": 200,
+  "oracle": "the shrinkage minimising MSE, found by grid search over a simulated sample rather than by formula",
+  "tolerance": 0.03,
+  "worst_excess_over_allowed": 0.02856409210646344,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "negate",
+    "swap-plus-minus",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    1.673289,
+    0.48285
+   ],
+   "lean": 0.22394190091252486,
+   "oracle": 0.22375,
+   "mc_se": 0.00035355339059327403,
+   "gap": 0.00019190091252485608,
+   "allowed": 0.006718257027375746,
+   "excess": 0.02856409210646344
+  }
+ },
+ "Conclusions.bernoulliLogLoss": {
+  "verdict": "agrees",
+  "module": "Conclusions",
+  "line": 457,
+  "oracle": "E[-log P_q(y)] for y ~ Bernoulli(p), sampled",
+  "tolerance": 0.02,
+  "worst_excess_over_allowed": 0.03228561187614079,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "drop-a-one-minus",
+    "negate",
+    "swap-plus-minus",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.472486,
+    0.207348
+   ],
+   "lean": 0.8659686393164366,
+   "oracle": 0.8665281671581289,
+   "mc_se": 0.0003666456718010008,
+   "gap": 0.00055952784169222,
+   "allowed": 0.01733056334316258,
+   "excess": 0.03228561187614079
+  }
+ },
+ "Conclusions.bernoulliKLReal": {
+  "verdict": "agrees",
+  "module": "Conclusions",
+  "line": 461,
+  "oracle": "E[log(P_p(y)/P_q(y))] for y ~ Bernoulli(p), sampled",
+  "tolerance": 0.15,
+  "worst_excess_over_allowed": 0.00754691761034585,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "drop-a-one-minus",
+    "negate",
+    "swap-plus-minus",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.727289,
+    0.157145
+   ],
+   "lean": 0.8065954204049623,
+   "oracle": 0.8056823240275606,
+   "mc_se": 9.092861888775271e-05,
+   "gap": 0.0009130963774017786,
+   "allowed": 0.12098931306074434,
+   "excess": 0.00754691761034585
+  }
+ },
+ "Conclusions.expectedBrierScore": {
+  "verdict": "agrees",
+  "module": "Conclusions",
+  "line": 55,
+  "oracle": "E[(p - y)^2] for y ~ Bernoulli(pi), sampled",
+  "tolerance": 0.02,
+  "worst_excess_over_allowed": 0.016064024140395247,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-plus-minus",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.303259,
+    0.355148
+   ],
+   "lean": 0.2317101415561175,
+   "oracle": 0.23163569760996686,
+   "mc_se": 0.00028658026339620874,
+   "gap": 7.444394615063743e-05,
+   "allowed": 0.00463420283112235,
+   "excess": 0.016064024140395247
+  }
+ },
+ "Conclusions.brierBernoulliRisk": {
+  "verdict": "agrees",
+  "module": "Conclusions",
+  "line": 834,
+  "oracle": "E[(q - y)^2] for y ~ Bernoulli(eta), sampled",
+  "tolerance": 0.02,
+  "worst_excess_over_allowed": 0.02377179012473413,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "negate",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.461096,
+    0.238711
+   ],
+   "lean": 0.2979415864781192,
+   "oracle": 0.29808330595389565,
+   "mc_se": 0.0001065443566007203,
+   "gap": 0.00014171947577645838,
+   "allowed": 0.005961666119077913,
+   "excess": 0.02377179012473413
+  }
+ },
+ "ClinicalUtilityFairness.numberNeededToScreen": {
+  "verdict": "agrees",
+  "module": "ClinicalUtilityFairness",
+  "line": 955,
+  "oracle": "expected number screened to detect one case, sampled as a waiting time rather than computed",
+  "tolerance": 0.03,
+  "worst_excess_over_allowed": 0.09246751713424531,
+  "n_points": 6,
+  "covered": true,
+  "falsifiability": {
+   "mutants_rejected": [
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ],
+   "mutants_survived": []
+  },
+  "uncovered_reason": null,
+  "worst_point": {
+   "point": [
+    0.769349,
+    0.026792
+   ],
+   "lean": 48.51431494745981,
+   "oracle": 48.379735,
+   "mc_se": 0.09765851754967733,
+   "gap": 0.1345799474598124,
+   "allowed": 1.4554294484237942,
+   "excess": 0.09246751713424531
+  }
+ }
+}

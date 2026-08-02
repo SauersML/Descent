@@ -6,15 +6,15 @@
  },
  "corpus_stamp": {
   "arg_convention": 2,
-  "n_definitions": 998,
+  "n_definitions": 1001,
   "n_structures": 103,
   "n_parse_failures": 2,
-  "corpus_digest": "sha256:06199d9d4150a316350dcf21fe975ca5"
+  "corpus_digest": "sha256:4929e7e6718e4c710368b6a4808a59f7"
  },
  "extraction": {
   "primary_source": "proofs/validation/extract/api.py",
   "n_callables": 529,
-  "n_unavailable": 444,
+  "n_unavailable": 447,
   "unavailable": {
    "Active": "NotExtractable: Calibrator.BackgroundClass.Active: Prop-valued / set-valued",
    "AsymptoticallyZero": "NotExtractable: Calibrator.AsymptoticallyZero: Prop-valued / set-valued",
@@ -148,6 +148,7 @@
    "fineScaleSubspace": "NotExtractable: Calibrator.PCCorrectionModel.fineScaleSubspace: structure literal",
    "fixed_se_sq": "NotExtractable: Calibrator.fixed_se_sq: \u2211 with an unannotated index and 0 candidate dimensions: cannot tell which",
    "flipLocus": "NotExtractable: Calibrator.flipLocus: qualified name Function.update",
+   "fourthMomentDispersion": "NotExtractable: Calibrator.MafSpectrum.fourthMomentDispersion: \u2211 with an unannotated index and 0 candidate dimensions: cannot tell which",
    "frobeniusForm": "NotExtractable: Calibrator.frobeniusForm: \u2211 with an unannotated index and 0 candidate dimensions: cannot tell which",
    "fstEquilibrium": "KeyError: \"'fstEquilibrium' is ambiguous: ['Calibrator.fstEquilibrium', 'Calibrator.MutationDriftModelAssumptions.fstEquilibrium']\"",
    "fstTransient": "KeyError: \"'fstTransient' is ambiguous: ['Calibrator.PGSEvolutionaryModel.fstTransient', 'Calibrator.MutationDriftModelAssumptions.fstTransient']\"",
@@ -196,7 +197,7 @@
    "ldWitnessSigmaTargetCorrelated": "NotExtractable: Calibrator.ldWitnessSigmaTargetCorrelated: Matrix/vector literal (![\u2026])",
    "ldWitnessSigmaTargetIndependent": "NotExtractable: Calibrator.ldWitnessSigmaTargetIndependent: Matrix/vector literal (![\u2026])",
    "ldWitnessSourceMoments": "NotExtractable: Calibrator.ldWitnessSourceMoments: structure literal",
-   "ldWitnessSourceWeights": "NotExtractable: Calibrator.ldWitnessSourceWeights: self-check: calls untranslated definition sourceBestLinearWeightsFromLD",
+   "ldWitnessSourceWeights": "NotExtractable: Calibrator.ldWitnessSourceWeights: self-check: calls untranslated definition ldWitnessSourceMoments",
    "ldWitnessTargetCross": "NotExtractable: Calibrator.ldWitnessTargetCross: Matrix/vector literal (![\u2026])",
    "liabilitySensitivity": "NotExtractable: Calibrator.liabilitySensitivity: self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
    "liabilitySpecificity": "NotExtractable: Calibrator.liabilitySpecificity: self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
@@ -315,7 +316,7 @@
    "sigmaTagCausalTargetAt": "NotExtractable: Calibrator.sigmaTagCausalTargetAt: self-check: calls untranslated definition directCausalTargetAt",
    "sigmaTagTargetAt": "NotExtractable: Calibrator.sigmaTagTargetAt: qualified name Pop.source",
    "slidingWindowDesign": "NotExtractable: Calibrator.slidingWindowDesign: structure literal",
-   "sourceBestLinearWeightsFromLD": "NotExtractable: Calibrator.sourceBestLinearWeightsFromLD: qualified name Pop.source",
+   "sourceBestLinearWeightsFromLD": "NotExtractable: Calibrator.sourceBestLinearWeightsFromLD: self-check: structure projection unavailable (KeyError('sigmaTagSource'))",
    "sourceCalibratedBrierFromSourceWeightsAtPrevalence": "NotExtractable: Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence: qualified name TransportedMetrics.calibratedBrierFromVariances",
    "sourceCalibrationMoments": "NotExtractable: Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationMoments: structure literal",
    "sourceCalibrationProfile": "KeyError: \"'sourceCalibrationProfile' is ambiguous: ['Calibrator.CrossPopulationCalibrationShiftModel.sourceCalibrationProfile', 'Calibrator.CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile']\"",
@@ -458,6 +459,8 @@
    "weightedPopulationEffectAverage": "NotExtractable: Calibrator.weightedPopulationEffectAverage: self-check: value is not a real number: function (vector- or function-valued)",
    "weightedResidualMoment": "NotExtractable: Calibrator.weightedResidualMoment: self-check: value is not a real number: function (vector- or function-valued)",
    "weightedRetentionUpperBound": "NotExtractable: Calibrator.weightedRetentionUpperBound: self-check: calls untranslated definition sourceEffectMass",
+   "withSource": "NotExtractable: Calibrator.Pop.withSource: builds a structure value (Pop \u2192 \u03b1)",
+   "withTarget": "NotExtractable: Calibrator.Pop.withTarget: builds a structure value (Pop \u2192 \u03b1)",
    "\u03b2_obs": "NotExtractable: Calibrator.AttenuationModel.\u03b2_obs: unrecognised character '.'",
    "\u03b2_selected": "NotExtractable: Calibrator.ColliderModel.\u03b2_selected: unrecognised character '.'"
   },
@@ -510,7 +513,7 @@
    "Calibrator.asymmetricFst": {
     "fq": "Calibrator.asymmetricFst",
     "translator": "extract",
-    "source": "Calibrator/PortabilityDrift.lean:5252",
+    "source": "Calibrator/PortabilityDrift.lean:5268",
     "checksum": "sha256:c1f3f91a6c7d76d7004605b1644e65cf",
     "empirical_status": "UNTESTED",
     "admissible_box": {
@@ -675,7 +678,7 @@
    "Calibrator.effectiveSymmetricMigration": {
     "fq": "Calibrator.effectiveSymmetricMigration",
     "translator": "extract",
-    "source": "Calibrator/PortabilityDrift.lean:5293",
+    "source": "Calibrator/PortabilityDrift.lean:5309",
     "checksum": "sha256:350f7aa7e8bc816d0bab73e8a2ba5461",
     "empirical_status": "UNTESTED",
     "admissible_box": {
@@ -761,7 +764,7 @@
    "Calibrator.fstIslandMultiplicativeEquilibrium": {
     "fq": "Calibrator.fstIslandMultiplicativeEquilibrium",
     "translator": "extract",
-    "source": "Calibrator/PortabilityDrift.lean:4787",
+    "source": "Calibrator/PortabilityDrift.lean:4803",
     "checksum": "sha256:59aa02e063b154a063c1c43564a36810",
     "empirical_status": "UNTESTED",
     "admissible_box": {
@@ -779,7 +782,7 @@
    "Calibrator.fstMigDriftEquil": {
     "fq": "Calibrator.fstMigDriftEquil",
     "translator": "extract",
-    "source": "Calibrator/PortabilityDrift.lean:5458",
+    "source": "Calibrator/PortabilityDrift.lean:5474",
     "checksum": "sha256:c7e1f73d48906b67ffc2ba0c1b8834cd",
     "empirical_status": "UNTESTED",
     "admissible_box": {
@@ -797,7 +800,7 @@
    "Calibrator.fstMigrationDriftEquilibrium": {
     "fq": "Calibrator.fstMigrationDriftEquilibrium",
     "translator": "extract",
-    "source": "Calibrator/PortabilityDrift.lean:4629",
+    "source": "Calibrator/PortabilityDrift.lean:4645",
     "checksum": "sha256:2beac72abbeb91d6964b32bdc5124b10",
     "empirical_status": "CONDITIONALLY VALID",
     "admissible_box": {
@@ -1120,7 +1123,7 @@
    "Calibrator.neutralAFBenchmarkRatio": {
     "fq": "Calibrator.neutralAFBenchmarkRatio",
     "translator": "extract",
-    "source": "Calibrator/PortabilityDrift.lean:2961",
+    "source": "Calibrator/PortabilityDrift.lean:2977",
     "checksum": "sha256:90afd8f349996c9268ce4885ccc41a89",
     "empirical_status": "FALSIFIED",
     "admissible_box": {
@@ -1210,7 +1213,7 @@
    "Calibrator.sharedLDFromMigration": {
     "fq": "Calibrator.sharedLDFromMigration",
     "translator": "extract",
-    "source": "Calibrator/PortabilityDrift.lean:5066",
+    "source": "Calibrator/PortabilityDrift.lean:5082",
     "checksum": "sha256:2b22946071e6cf5aaac42fa1e13aee1d",
     "empirical_status": "UNTESTED",
     "admissible_box": {
@@ -4474,7 +4477,7 @@
   },
   "fstIslandMultiplicative-exact-fixedpoint": {
    "definition": "Calibrator.fstIslandMultiplicativeEquilibrium",
-   "definition_source": "Calibrator/PortabilityDrift.lean:4787",
+   "definition_source": "Calibrator/PortabilityDrift.lean:4803",
    "definition_checksum": "sha256:59aa02e063b154a063c1c43564a36810",
    "translator": "extract",
    "numeric_standin": null,
@@ -7679,7 +7682,7 @@
   },
   "neutralAFBenchmarkRatio-bounded": {
    "definition": "Calibrator.neutralAFBenchmarkRatio",
-   "definition_source": "Calibrator/PortabilityDrift.lean:2961",
+   "definition_source": "Calibrator/PortabilityDrift.lean:2977",
    "definition_checksum": "sha256:90afd8f349996c9268ce4885ccc41a89",
    "translator": "extract",
    "numeric_standin": null,
