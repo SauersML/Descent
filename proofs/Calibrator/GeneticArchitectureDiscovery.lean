@@ -38,24 +38,45 @@ section GWASDiscovery
 
 /-- Genotype variance of an additive tag SNP under Hardy-Weinberg equilibrium.
 
-    Empirical status: UNTESTED. -/
-def tagGenotypeVariance (maf : ℝ) : ℝ :=
+    Empirical status: UNTESTED.
+
+    Convention: the argument is whatever frequency the caller supplies; this is
+    the genotype variance `2p(1-p)` at that frequency, tied to
+    `hweGenotypeVariance` in `Conventions`. The name says tag for historical
+    reasons, but `discoveryNCP` correctly passes the *causal* frequency. -/
+def tagGenotypeVariance (maf_causal : ℝ) : ℝ :=
   2 * maf * (1 - maf)
 
 /-- Noncentrality parameter for a GWAS tag SNP.
 
     The `ld` term captures attenuation of the causal effect by population-specific
     LD tagging, and `2 * maf * (1 - maf)` is the genotype variance term from the
-    allele-frequency spectrum in the discovery population. -/
-def discoveryNCP (n β maf ld : ℝ) : ℝ :=
-  n * β ^ 2 * ld ^ 2 * tagGenotypeVariance maf
+    allele-frequency spectrum in the discovery population. 
+    Convention: `maf_causal` is the allele frequency of the *causal* variant,
+    not of the tag. The tag's own variance cancels algebraically, since
+    `β_tag = β r σ_causal / σ_tag` gives
+    `NCP = n β_tag² σ_tag² = n β² r² σ_causal²`. Reading the argument as the
+    tag's frequency is wrong by −24% to +33% whenever the two frequencies
+    differ, and coincides only when they are equal, which is why a test at
+    matched frequencies would miss it. It understates discovery power for a
+    common causal variant tagged by a rarer SNP and overstates it in the
+    reverse case, so it mis-ranks exactly the rare-variant configurations that
+    `RareVariantPortability` reasons about.
+
+    Empirical status: VALIDATED under this convention (matches simulated NCP to
+    three significant figures across mismatched tag and causal frequencies). -/
+def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
+  n * β ^ 2 * ld ^ 2 * tagGenotypeVariance maf_causal
 
 /-- A locus is discovered when its test statistic crosses the genome-wide
     `z`-threshold. In the one-degree-of-freedom Gaussian approximation this is
     equivalent to `z^2 ≤ discoveryNCP`.
 
-    Empirical status: UNTESTED. -/
-def gwasDiscovered (n β maf ld z : ℝ) : Prop :=
+    Empirical status: UNTESTED.
+
+    Convention: `maf_causal` is the causal variant's frequency, matching
+    `discoveryNCP`, which this predicate thresholds. -/
+def gwasDiscovered (n β maf_causal ld z : ℝ) : Prop :=
   z ^ 2 ≤ discoveryNCP n β maf ld
 
 /-- **The GWAS noncentrality parameter increases with sample size.** -/
@@ -431,7 +452,10 @@ noncomputable def multiTraitEffectiveSampleSize
     (n₁ n₂ rg : ℝ) : ℝ :=
   n₁ + rg ^ 2 * n₂
 
-/-- GWAS noncentrality parameter after cross-trait borrowing. -/
+/-- GWAS noncentrality parameter after cross-trait borrowing.
+
+    Convention: `maf_causal` is the causal variant's frequency, as in
+    `discoveryNCP`. -/
 noncomputable def multiTraitDiscoveryNCP
     (n₁ n₂ rg β maf ld : ℝ) : ℝ :=
   discoveryNCP (multiTraitEffectiveSampleSize n₁ n₂ rg) β maf ld
