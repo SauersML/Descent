@@ -22,7 +22,8 @@ HERE = Path(__file__).parent
 PY = str(HERE / ".venv" / "bin" / "python")
 
 STEPS = ["leanparse.py", "check1_fixedpoints.py", "check1b_joint.py", "check3_duplicates.py",
-         "check2_derivations.py", "check4_limits.py", "check5_recurrences.py", "mutation.py"]
+         "check2_derivations.py", "check4_limits.py", "check5_recurrences.py", "mutation.py",
+         "check6_certificates.py", "homonyms.py"]
 
 # statuses that constitute a finding rather than a pass
 FINDING = {
@@ -37,6 +38,7 @@ FINDING = {
     "HOLDS_TO_FIRST_ORDER": "linearisation",
     "no_fixed_point_theorem": "gap",
     "ONLY_REST_POINT_IS_ZERO": "degenerate_limit",
+    "VACUOUS_FOR": "vacuous_certificate",
     "UNGUARDED_BINDERS_DO_NOT_CORRESPOND": "gap",
     "LINEARISATION_WITHOUT_STATED_REGIME": "unstated_regime",
     "UNGUARDED_NO_MAP": "gap",
@@ -110,6 +112,22 @@ def main():
             add(r["fqn"], {"check": "check5_recurrence_limit",
                            "severity": FINDING[r["status"]], "status": r["status"],
                            "file": r["file"], "line": r["line"], "detail": r["detail"]})
+
+    c6 = json.load(open(HERE / "results_check6.json"))
+    for p_ in c6["pairs"]:
+        if p_["status"] == "VACUOUS_FOR":
+            add(p_["definition"], {"check": "check6_certificate_power",
+                                   "severity": "vacuous_certificate",
+                                   "status": "CERTIFICATE_DOES_NOT_CONSTRAIN",
+                                   "theorem": p_["theorem"],
+                                   "file": p_["definition_file"],
+                                   "line": p_["definition_line"],
+                                   "mutations_survived": p_["mutations_survived"]})
+    hom = json.load(open(HERE / "results_homonyms.json"))
+    for fq, sites in hom["colliding_public"].items():
+        add(fq, {"check": "homonyms", "severity": "error",
+                 "status": "NAME_DECLARED_MORE_THAN_ONCE",
+                 "sites": sites})
 
     cov = json.load(open(HERE / "coverage.json"))
     for fqn, e in cov.items():

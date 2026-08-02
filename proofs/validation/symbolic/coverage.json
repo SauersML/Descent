@@ -125,6 +125,46 @@
    }
   }
  },
+ "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium": {
+  "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium",
+  "checks": {
+   "check1_fixed_point": {
+    "covered": true,
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": [],
+    "guard": "fstMutationDriftEquilibrium_isFixedPoint"
+   },
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.PopulationGeneticsFoundations.het_plus_fst_eq_one",
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.PopulationGeneticsFoundations.fstMigrationMutationEquilibrium": {
+  "fqn": "Calibrator.PopulationGeneticsFoundations.fstMigrationMutationEquilibrium",
+  "checks": {
+   "check1_fixed_point": {
+    "covered": true,
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": [],
+    "guard": "fstMigrationMutationEquilibrium_isFixedPoint"
+   }
+  }
+ },
  "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETss": {
   "fqn": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETss",
   "checks": {
@@ -380,31 +420,6 @@
    }
   }
  },
- "Calibrator.Conventions.meanAlleleFreq": {
-  "fqn": "Calibrator.Conventions.meanAlleleFreq",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.Conventions.hudsonFst_eq_varianceRatio",
-    "mutations_rejected": [
-     "literal 2->3",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   },
-   "check3_duplicate_body": {
-    "covered": true,
-    "group_expression": "x0/2 + x1/2",
-    "mutations_rejected": [
-     "literal 2->3",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
  "Calibrator.Conventions.hudsonFst": {
   "fqn": "Calibrator.Conventions.hudsonFst",
   "checks": {
@@ -445,17 +460,28 @@
    }
   }
  },
- "Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize": {
-  "fqn": "Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize",
+ "Calibrator.Conventions.meanAlleleFreq": {
+  "fqn": "Calibrator.Conventions.meanAlleleFreq",
   "checks": {
    "check2_derivation": {
-    "covered": false,
-    "via_theorem": "Calibrator.Conventions.demographicSpike_eq_contrastVariance_mul_effectiveSize",
-    "mutations_rejected": [],
-    "mutations_survived": [
+    "covered": true,
+    "via_theorem": "Calibrator.Conventions.hudsonFst_eq_varianceRatio",
+    "mutations_rejected": [
+     "literal 2->3",
      "scale by 2",
      "shift by 1"
-    ]
+    ],
+    "mutations_survived": []
+   },
+   "check3_duplicate_body": {
+    "covered": true,
+    "group_expression": "x0/2 + x1/2",
+    "mutations_rejected": [
+     "literal 2->3",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
    }
   }
  },
@@ -471,6 +497,20 @@
      "shift by 1"
     ],
     "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize": {
+  "fqn": "Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize",
+  "checks": {
+   "check2_derivation": {
+    "covered": false,
+    "via_theorem": "Calibrator.Conventions.demographicSpike_eq_contrastVariance_mul_effectiveSize",
+    "mutations_rejected": [],
+    "mutations_survived": [
+     "scale by 2",
+     "shift by 1"
+    ]
    }
   }
  },
@@ -548,21 +588,6 @@
    }
   }
  },
- "Calibrator.DGP.twoLocusIBDCovariance": {
-  "fqn": "Calibrator.DGP.twoLocusIBDCovariance",
-  "checks": {
-   "check2_derivation": {
-    "covered": false,
-    "via_theorem": "Calibrator.DGP.twoLocusIBDCovariance_gap_eq",
-    "mutations_rejected": [
-     "scale by 2"
-    ],
-    "mutations_survived": [
-     "shift by 1"
-    ]
-   }
-  }
- },
  "Calibrator.DGP.discreteRecombinationSurvival": {
   "fqn": "Calibrator.DGP.discreteRecombinationSurvival",
   "checks": {
@@ -589,12 +614,42 @@
    }
   }
  },
+ "Calibrator.DGP.twoLocusIBDCovariance": {
+  "fqn": "Calibrator.DGP.twoLocusIBDCovariance",
+  "checks": {
+   "check2_derivation": {
+    "covered": false,
+    "via_theorem": "Calibrator.DGP.twoLocusIBDCovariance_gap_eq",
+    "mutations_rejected": [
+     "scale by 2"
+    ],
+    "mutations_survived": [
+     "shift by 1"
+    ]
+   }
+  }
+ },
  "Calibrator.DemographicCapacity.contrastSpikeLevel": {
   "fqn": "Calibrator.DemographicCapacity.contrastSpikeLevel",
   "checks": {
    "check2_derivation": {
     "covered": true,
     "via_theorem": "Calibrator.DemographicCapacity.contrastSpikeLevel_eq_four_hudsonFst",
+    "mutations_rejected": [
+     "literal 2->3",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.DemographicHistory.steppingStoneCoalescenceTime": {
+  "fqn": "Calibrator.DemographicHistory.steppingStoneCoalescenceTime",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.DemographicHistory.steppingStoneFst_from_coalescence_time",
     "mutations_rejected": [
      "literal 2->3",
      "scale by 2",
@@ -620,21 +675,6 @@
    "check3_duplicate_body": {
     "covered": true,
     "group_expression": "x0/(x0 + 2*x1)",
-    "mutations_rejected": [
-     "literal 2->3",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
- "Calibrator.DemographicHistory.steppingStoneCoalescenceTime": {
-  "fqn": "Calibrator.DemographicHistory.steppingStoneCoalescenceTime",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.DemographicHistory.steppingStoneFst_from_coalescence_time",
     "mutations_rejected": [
      "literal 2->3",
      "scale by 2",
@@ -929,21 +969,6 @@
    }
   }
  },
- "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium": {
-  "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.PopulationGeneticsFoundations.het_plus_fst_eq_one",
-    "mutations_rejected": [
-     "literal 1->2",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
  "Calibrator.PopulationGeneticsFoundations.hetEquilibrium": {
   "fqn": "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
   "checks": {
@@ -1134,31 +1159,6 @@
    }
   }
  },
- "Calibrator.PortabilityDrift.sharedLD_from_equilibrium": {
-  "fqn": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
-  "checks": {
-   "check2_derivation": {
-    "covered": true,
-    "via_theorem": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium_eq",
-    "mutations_rejected": [
-     "literal 1->2",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   },
-   "check3_duplicate_body": {
-    "covered": true,
-    "group_expression": "4*x0*x1/(4*x0*x1 + 1)",
-    "mutations_rejected": [
-     "literal 1->2",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
  "Calibrator.PortabilityDrift.scaledMigrationRate": {
   "fqn": "Calibrator.PortabilityDrift.scaledMigrationRate",
   "checks": {
@@ -1177,6 +1177,31 @@
     "group_expression": "4*x0*x1",
     "mutations_rejected": [
      "literal 4->5",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.PortabilityDrift.sharedLD_from_equilibrium": {
+  "fqn": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium_eq",
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   },
+   "check3_duplicate_body": {
+    "covered": true,
+    "group_expression": "4*x0*x1/(4*x0*x1 + 1)",
+    "mutations_rejected": [
+     "literal 1->2",
      "scale by 2",
      "shift by 1"
     ],
@@ -1289,6 +1314,35 @@
     ],
     "mutations_survived": [
      "literal 1->2",
+     "shift by 1"
+    ]
+   }
+  }
+ },
+ "Calibrator.TransferLearningPGS.usableScratchTargetR2": {
+  "fqn": "Calibrator.TransferLearningPGS.usableScratchTargetR2",
+  "checks": {
+   "check2_derivation": {
+    "covered": true,
+    "via_theorem": "Calibrator.TransferLearningPGS.usableScratchTargetR2_eq_of_nonneg",
+    "mutations_rejected": [
+     "literal 0->1",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.TransferLearningPGS.sampleLimitedScratchTargetR2": {
+  "fqn": "Calibrator.TransferLearningPGS.sampleLimitedScratchTargetR2",
+  "checks": {
+   "check2_derivation": {
+    "covered": false,
+    "via_theorem": "Calibrator.TransferLearningPGS.usableScratchTargetR2_eq_of_nonneg",
+    "mutations_rejected": [],
+    "mutations_survived": [
+     "scale by 2",
      "shift by 1"
     ]
    }
@@ -2564,51 +2618,6 @@
    }
   }
  },
- "Calibrator.DriftRegime.driftRetention": {
-  "fqn": "Calibrator.DriftRegime.driftRetention",
-  "checks": {
-   "check3_duplicate_body": {
-    "covered": true,
-    "group_expression": "(1 - 1/(2*x0))**x1",
-    "mutations_rejected": [
-     "literal 1->2",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
- "Calibrator.LDDecayTheory.ldRetainedFraction": {
-  "fqn": "Calibrator.LDDecayTheory.ldRetainedFraction",
-  "checks": {
-   "check3_duplicate_body": {
-    "covered": true,
-    "group_expression": "(1 - 1/(2*x0))**x1",
-    "mutations_rejected": [
-     "literal 1->2",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
- "Calibrator.PhenomeWidePortability.neutralDriftFactor": {
-  "fqn": "Calibrator.PhenomeWidePortability.neutralDriftFactor",
-  "checks": {
-   "check3_duplicate_body": {
-    "covered": true,
-    "group_expression": "(1 - 1/(2*x0))**x1",
-    "mutations_rejected": [
-     "literal 1->2",
-     "scale by 2",
-     "shift by 1"
-    ],
-    "mutations_survived": []
-   }
-  }
- },
  "Calibrator.DriftRegime.lossOfRetention": {
   "fqn": "Calibrator.DriftRegime.lossOfRetention",
   "checks": {
@@ -2946,6 +2955,36 @@
     "covered": true,
     "group_expression": "(1 - x1)**2*(x2*(1 - 1/(2*x0)) + 1/(2*x0))",
     "mutations_rejected": [
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.LDDecayTheory.ldRetainedFraction": {
+  "fqn": "Calibrator.LDDecayTheory.ldRetainedFraction",
+  "checks": {
+   "check3_duplicate_body": {
+    "covered": true,
+    "group_expression": "(1 - 1/(2*x0))**x1",
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": []
+   }
+  }
+ },
+ "Calibrator.PhenomeWidePortability.neutralDriftFactor": {
+  "fqn": "Calibrator.PhenomeWidePortability.neutralDriftFactor",
+  "checks": {
+   "check3_duplicate_body": {
+    "covered": true,
+    "group_expression": "(1 - 1/(2*x0))**x1",
+    "mutations_rejected": [
+     "literal 1->2",
      "scale by 2",
      "shift by 1"
     ],

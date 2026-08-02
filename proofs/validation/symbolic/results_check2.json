@@ -686,6 +686,62 @@
  },
  {
   "check": "check2_derivation",
+  "fqn": "Calibrator.CondensationUnification.fourthMoment_eq",
+  "name": "fourthMoment_eq",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 841,
+  "claim_source": "name",
+  "statement": "spectrum.moment 4 = ∑ j, spectrum.weight j / (spectrum.model j).genotypeVariance",
+  "status": "opaque",
+  "detail": {
+   "reason": "non-closed-form construct: ∑"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.CondensationUnification.sixthMoment_eq_floorOne_plus_dispersion",
+  "name": "sixthMoment_eq_floorOne_plus_dispersion",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 899,
+  "claim_source": "name",
+  "statement": "spectrum.moment 6 = (spectrum.moment 4) ^ 2 + 10 * spectrum.moment 4 - 20 + spectrum.fourthMomentDispersion",
+  "status": "opaque",
+  "detail": {
+   "reason": "unresolved name spectrum.moment"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.CondensationUnification.hweFloorOneScaleSq_eq",
+  "name": "hweFloorOneScaleSq_eq",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 1090,
+  "claim_source": "name",
+  "statement": "h.genotypeVariance * squaringScaleSq (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) = 1 - h.genotypeVariance",
+  "status": "opaque",
+  "detail": {
+   "reason": "non-closed-form construct: ∑"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.CondensationUnification.hweFloorOneScaleSq_eq_gaussian_at_blind_maf",
+  "name": "hweFloorOneScaleSq_eq_gaussian_at_blind_maf",
+  "module": "Calibrator.CondensationUnification",
+  "file": "/Users/user/gnomon/proofs/Calibrator/CondensationUnification.lean",
+  "line": 1106,
+  "claim_source": "name",
+  "statement": "squaringScaleSq (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) = squaringScaleSq 3",
+  "status": "opaque",
+  "detail": {
+   "reason": "non-closed-form construct: ∑"
+  }
+ },
+ {
+  "check": "check2_derivation",
   "fqn": "Calibrator.Conventions.coalescentTimeScale_eq",
   "name": "coalescentTimeScale_eq",
   "module": "Calibrator.Conventions",
@@ -1634,7 +1690,7 @@
   "statement": "let pred_raw := fun p c => β * p + hdgp.baseline c mse hdgp.toDGP pred_raw = ∫ pc, (hdgp.alpha pc.2 - β)^2 * pc.1^2 ∂hdgp.jointMeasure",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: fun"
+   "reason": "non-closed-form construct: ∫"
   }
  },
  {
@@ -1868,7 +1924,7 @@
   "name": "diagonalDesign_benchmark_eq",
   "module": "Calibrator.DriftRegime",
   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-  "line": 288,
+  "line": 284,
   "claim_source": "name",
   "statement": "diagonalDesign benchmarkRatio = diagonalDesign benchmarkRatioSquared",
   "status": "opaque",
@@ -1894,11 +1950,53 @@
  },
  {
   "check": "check2_derivation",
+  "fqn": "Calibrator.EpistaticChaos.centeredSquare_third_moment_eq",
+  "name": "centeredSquare_third_moment_eq",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 915,
+  "claim_source": "name",
+  "statement": "∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3 = (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) - 3 * (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) + (3 * (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2) - ∑ g : DiploidGenotype, h.genotypeProb g)",
+  "status": "opaque",
+  "detail": {
+   "reason": "non-closed-form construct: ∑"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.EpistaticChaos.hweCenteredSixthMoment_eq",
+  "name": "hweCenteredSixthMoment_eq",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 939,
+  "claim_source": "name",
+  "statement": "∑ g : DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ 6 = h.genotypeVariance + 10 * h.genotypeVariance ^ 2 - 20 * h.genotypeVariance ^ 3",
+  "status": "opaque",
+  "detail": {
+   "reason": "non-closed-form construct: ∑"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.EpistaticChaos.moment_eq_of_altFreq_eq",
+  "name": "moment_eq_of_altFreq_eq",
+  "module": "Calibrator.EpistaticChaos",
+  "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+  "line": 1096,
+  "claim_source": "name",
+  "statement": "∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ k = ∑ g : DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ k",
+  "status": "opaque",
+  "detail": {
+   "reason": "non-closed-form construct: ∑"
+  }
+ },
+ {
+  "check": "check2_derivation",
   "fqn": "Calibrator.EpistaticChaos.locusInfluence_eq_of_disjoint",
   "name": "locusInfluence_eq_of_disjoint",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 986,
+  "line": 1321,
   "claim_source": "name",
   "statement": "design.locusInfluence i = design.coefficient s ^ 2",
   "status": "opaque",
@@ -1912,7 +2010,7 @@
   "name": "circulantSpectrumA_eq_cos",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1436,
+  "line": 1771,
   "claim_source": "name",
   "statement": "2 * Real.cos θ + 4 * Real.cos (2 * θ) = circulantSpectrumA (Real.cos θ)",
   "status": "derivation_verified",
@@ -1933,7 +2031,7 @@
   "name": "circulantSpectrumB_eq_cos",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1443,
+  "line": 1778,
   "claim_source": "name",
   "statement": "4 * Real.cos θ + 2 * Real.cos (2 * θ) = circulantSpectrumB (Real.cos θ)",
   "status": "derivation_verified",
@@ -1954,7 +2052,7 @@
   "name": "overlap_row_sum_eq_recurrence",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1559,
+  "line": 1894,
   "claim_source": "name",
   "statement": "∑ t : ιx, ((design.locusSet s ∩ design.locusSet t).card : ℕ) = ∑ i ∈ design.locusSet s, design.variantRecurrence i",
   "status": "opaque",
@@ -1968,7 +2066,7 @@
   "name": "variantRecurrence_eq_card_of_ubiquitous",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1600,
+  "line": 1935,
   "claim_source": "name",
   "statement": "design.variantRecurrence i = Fintype.card ιx",
   "status": "opaque",
@@ -2413,7 +2511,7 @@
   "name": "ld_recurrence_eq_pure_recombination",
   "module": "Calibrator.LDDecayTheory",
   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
-  "line": 1028,
+  "line": 1039,
   "claim_source": "name",
   "statement": "ldRecurrence r D₀ t = D₀ * (1 - r) ^ t",
   "status": "opaque",
@@ -2427,7 +2525,7 @@
   "name": "ld_recurrence_ratio_eq_decay_factor",
   "module": "Calibrator.LDDecayTheory",
   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
-  "line": 1038,
+  "line": 1049,
   "claim_source": "name",
   "statement": "ldRecurrence r D₀ t / D₀ = (1 - r) ^ t",
   "status": "opaque",
@@ -2571,7 +2669,7 @@
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
   "line": 665,
   "claim_source": "name",
-  "statement": "brierDiscriminationLoss m = m.targetPrevalence * (1 - m.targetPrevalence) * (sourceR2FromSourceWeights m - targetR2FromSourceWeights m)",
+  "statement": "brierDiscriminationLoss m = m.targetPrevalence * (1 - m.targetPrevalence) * (r2FromSourceWeights m Pop.source - r2FromSourceWeights m Pop.target)",
   "status": "opaque",
   "detail": {
    "names_definition": "brierDiscriminationLoss",
@@ -2587,7 +2685,7 @@
   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
   "line": 679,
   "claim_source": "name",
-  "statement": "brierCalibrationLoss πSource m = (m.targetPrevalence * (1 - m.targetPrevalence) - πSource * (1 - πSource)) * (1 - sourceR2FromSourceWeights m)",
+  "statement": "brierCalibrationLoss πSource m = (m.targetPrevalence * (1 - m.targetPrevalence) - πSource * (1 - πSource)) * (1 - r2FromSourceWeights m Pop.source)",
   "status": "opaque",
   "detail": {
    "names_definition": "brierCalibrationLoss",
@@ -3283,7 +3381,7 @@
   "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
   "line": 760,
   "claim_source": "name",
-  "statement": "(m.targetCalibrationProfile link).slope = (sourceWeightedTagScore m.metric (targetDirectCausalProjection m.metric) + sourceWeightedTagScore m.metric (targetProxyTaggingProjection m.metric) + sourceWeightedTagScore m.metric m.metric.contextCrossTarget) / targetScoreVarianceFromSourceWeights m.metric",
+  "statement": "(m.targetCalibrationProfile link).slope = (sourceWeightedTagScore m.metric (directCausalProjection m.metric Pop.target) + sourceWeightedTagScore m.metric (proxyTaggingProjection m.metric Pop.target) + sourceWeightedTagScore m.metric (m.metric.contextCross Pop.target)) / scoreVarianceFromSourceWeights m.metric Pop.target",
   "status": "opaque",
   "detail": {
    "reason": "lex error at '.slope =\\n      (sour'"
@@ -3491,7 +3589,7 @@
   "statement": "treatmentMargin model predictedPath - treatmentMargin model truePath = Finset.univ.sum (fun t => model.discount t * ((predictedPath.followupWeight t - truePath.followupWeight t) * (truePath.eventProb t * truePath.treatmentBenefit t - truePath.treatmentHarm t) + predictedPath.followupWeight t * ((predictedPath.eventProb t - truePath.eventProb t) * truePath.treatmentBenefit t + predictedPath.eventPr",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: fun"
+   "reason": "non-closed-form construct: Finset"
   }
  },
  {
@@ -3710,7 +3808,7 @@
   "name": "neutralPortabilityRatioLD_eq_presentDayPGSVariance",
   "module": "Calibrator.PhenomeWidePortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
-  "line": 45,
+  "line": 46,
   "claim_source": "name",
   "statement": "neutralPortabilityRatioLD fst_additional ld_factor = presentDayPGSVariance ld_factor fst_additional",
   "status": "not_an_equation",
@@ -3718,11 +3816,25 @@
  },
  {
   "check": "check2_derivation",
+  "fqn": "Calibrator.PhenomeWidePortability.closedPopulation_het_eq_neutralDriftFactor",
+  "name": "closedPopulation_het_eq_neutralDriftFactor",
+  "module": "Calibrator.PhenomeWidePortability",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+  "line": 137,
+  "claim_source": "name",
+  "statement": "(closedPopulation Ne H₀ hH).het t = neutralDriftFactor Ne t * H₀",
+  "status": "opaque",
+  "detail": {
+   "reason": "lex error at '.het t = neutralDrif'"
+  }
+ },
+ {
+  "check": "check2_derivation",
   "fqn": "Calibrator.PhenomeWidePortability.fstFromDriftFactor_eq_freqCorrFromFst",
   "name": "fstFromDriftFactor_eq_freqCorrFromFst",
   "module": "Calibrator.PhenomeWidePortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
-  "line": 162,
+  "line": 204,
   "claim_source": "name",
   "statement": "fstFromDriftFactor driftFactor = freqCorrFromFst driftFactor",
   "status": "not_an_equation",
@@ -3734,7 +3846,7 @@
   "name": "fst_from_selectedDriftFactor_mem_unit",
   "module": "Calibrator.PhenomeWidePortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
-  "line": 201,
+  "line": 243,
   "claim_source": "name",
   "statement": "0 ≤ fstFromDriftFactor (selectedDriftFactor Ne t s_correction) ∧ fstFromDriftFactor (selectedDriftFactor Ne t s_correction) < 1",
   "status": "not_an_equation",
@@ -3746,7 +3858,7 @@
   "name": "causalPortabilityFromLocalFst_eq_one_sub_weightedLocalFst",
   "module": "Calibrator.PhenomeWidePortability",
   "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
-  "line": 274,
+  "line": 316,
   "claim_source": "name",
   "statement": "causalPortabilityFromLocalFst sourceSquaredEffect fstCausal = 1 - (∑ i, sourceSquaredEffect i * fstCausal i) / (∑ i, sourceSquaredEffect i)",
   "status": "opaque",
@@ -3826,7 +3938,7 @@
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
   "line": 361,
   "claim_source": "+doc",
-  "statement": "effectCorrelationFluctuating d f N < 1 - d ∧ 1 - d < effectCorrelationStabilizing d s N",
+  "statement": "effectCorrelationFluctuating d f N < 1 - d ∧ 1 - d < effectCorrelationStabilizingDriftSelection d s N",
   "status": "not_an_equation",
   "detail": {}
  },
@@ -4117,7 +4229,7 @@
   "name": "fstDerived_eq_het_loss",
   "module": "Calibrator.PopulationGeneticsFoundations",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1217,
+  "line": 1232,
   "claim_source": "name",
   "statement": "fstDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀",
   "status": "opaque",
@@ -4131,7 +4243,7 @@
   "name": "fstDerived_eq_fstFromDrift",
   "module": "Calibrator.PopulationGeneticsFoundations",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1276,
+  "line": 1291,
   "claim_source": "name",
   "statement": "fstDerived Ne t = heterozygosityLossFromDrift t Ne",
   "status": "not_an_equation",
@@ -4143,7 +4255,7 @@
   "name": "fstEquilibrium_derived",
   "module": "Calibrator.PopulationGeneticsFoundations",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1358,
+  "line": 1373,
   "claim_source": "name",
   "statement": "1 - hetEquilibrium Ne mu = 1 / (1 + 4 * Ne * mu)",
   "status": "derivation_verified",
@@ -4170,7 +4282,7 @@
   "name": "fstEquilibrium_derived_consistent",
   "module": "Calibrator.PopulationGeneticsFoundations",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1369,
+  "line": 1384,
   "claim_source": "name+doc",
   "statement": "1 - hetEquilibrium Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu)",
   "status": "derivation_verified",
@@ -4194,7 +4306,7 @@
   "name": "fstEquilibrium_derived_pos",
   "module": "Calibrator.PopulationGeneticsFoundations",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1389,
+  "line": 1404,
   "claim_source": "name",
   "statement": "0 < 1 - hetEquilibrium Ne mu",
   "status": "not_an_equation",
@@ -4206,7 +4318,7 @@
   "name": "fstEquilibrium_derived_lt_one",
   "module": "Calibrator.PopulationGeneticsFoundations",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1393,
+  "line": 1408,
   "claim_source": "name",
   "statement": "1 - hetEquilibrium Ne mu < 1",
   "status": "not_an_equation",
@@ -4218,7 +4330,7 @@
   "name": "fstEquilibrium_derived_decreases",
   "module": "Calibrator.PopulationGeneticsFoundations",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1399,
+  "line": 1414,
   "claim_source": "name",
   "statement": "1 - hetEquilibrium Ne₂ mu < 1 - hetEquilibrium Ne₁ mu",
   "status": "not_an_equation",
@@ -4230,7 +4342,7 @@
   "name": "fst_from_closed_form_het",
   "module": "Calibrator.PopulationGeneticsFoundations",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1490,
+  "line": 1505,
   "claim_source": "name",
   "statement": "fstFromHetRatio (hetMutationRecurrence lam Hstar H₀ t) H₀ = (1 - Hstar / H₀) * (1 - lam ^ t)",
   "status": "opaque",
@@ -4244,7 +4356,7 @@
   "name": "fstTransient_derived_from_recurrence",
   "module": "Calibrator.PopulationGeneticsFoundations",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1534,
+  "line": 1549,
   "claim_source": "name",
   "statement": "fstFromHetRatio (hetMutationRecurrence (hetDecayFactor Ne θ) (expectedHeterozygosity θ) 1 t) 1 = fstMutationDriftTransientDiscrete θ Ne t",
   "status": "opaque",
@@ -4258,7 +4370,7 @@
   "name": "fstTransientDiscrete_eq_explicit",
   "module": "Calibrator.PopulationGeneticsFoundations",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1616,
+  "line": 1631,
   "claim_source": "name",
   "statement": "fstMutationDriftTransientDiscrete θ Ne t = 1 / (1 + θ) * (1 - ((1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))) ^ t)",
   "status": "not_an_equation",
@@ -4415,25 +4527,13 @@
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetPGSVariance_eq_pgsVarianceFromHet",
-  "name": "targetPGSVariance_eq_pgsVarianceFromHet",
+  "fqn": "Calibrator.PortabilityDrift.presentDayPGSVariance_eq_one_sub_fst_mul",
+  "name": "presentDayPGSVariance_eq_one_sub_fst_mul",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 682,
+  "line": 692,
   "claim_source": "name",
-  "statement": "targetPGSVariance V_A fst = pgsVarianceFromHet V_A (1 - fst)",
-  "status": "not_an_equation",
-  "detail": {}
- },
- {
-  "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetPGSVariance_eq_presentDay",
-  "name": "targetPGSVariance_eq_presentDay",
-  "module": "Calibrator.PortabilityDrift",
-  "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 695,
-  "claim_source": "name",
-  "statement": "targetPGSVariance V_A fst = presentDayPGSVariance V_A fst",
+  "statement": "presentDayPGSVariance V_A fst = (1 - fst) * V_A",
   "status": "not_an_equation",
   "detail": {}
  },
@@ -4443,7 +4543,7 @@
   "name": "wrightFisherHeterozygosityLoss_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 733,
+  "line": 730,
   "claim_source": "name",
   "statement": "wrightFisherHeterozygosityLoss N t = 1 - (1 - 1 / (2 * (N : ℝ))) ^ t",
   "status": "opaque",
@@ -4459,7 +4559,7 @@
   "name": "presentDayR2_eq_statistical_rsquared",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 893,
+  "line": 895,
   "claim_source": "name",
   "statement": "presentDayR2 V_A V_E fst = rsquared dgp signal dgp.trueExpectation",
   "status": "opaque",
@@ -4473,7 +4573,7 @@
   "name": "presentDayEqualVarianceGaussianAUC_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1060,
+  "line": 1059,
   "claim_source": "name",
   "statement": "presentDayEqualVarianceGaussianAUC V_A V_E fst = Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2))",
   "status": "opaque",
@@ -4485,198 +4585,156 @@
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.sigmaTagCausalSource_eq_direct_plus_proxy",
-  "name": "sigmaTagCausalSource_eq_direct_plus_proxy",
+  "fqn": "Calibrator.PortabilityDrift.sigmaTagCausal_source",
+  "name": "sigmaTagCausal_source",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1169,
-  "claim_source": "name",
-  "statement": "sigmaTagCausalSource m = m.directCausalSource + m.proxyTaggingSource",
+  "line": 1222,
+  "claim_source": "+doc",
+  "statement": "sigmaTagCausal m Pop.source = m.directCausal Pop.source + m.proxyTagging Pop.source",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sigmaTagCausalSource"
+   "reason": "unresolved name Pop.source"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.sigmaTagCausalTarget_eq_direct_plus_novelDirect_plus_proxy_plus_novelProxy",
-  "name": "sigmaTagCausalTarget_eq_direct_plus_novelDirect_plus_proxy_plus_novelProxy",
+  "fqn": "Calibrator.PortabilityDrift.sigmaTagCausal_eq_direct_plus_novelDirect_plus_proxy_plus_novelProxy",
+  "name": "sigmaTagCausal_eq_direct_plus_novelDirect_plus_proxy_plus_novelProxy",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1174,
+  "line": 1231,
   "claim_source": "name",
-  "statement": "sigmaTagCausalTarget m = m.directCausalTarget + m.novelDirectCausalTarget + m.proxyTaggingTarget + m.novelProxyTaggingTarget",
+  "statement": "sigmaTagCausal m P = m.directCausal P + m.novelDirectCausal P + m.proxyTagging P + m.novelProxyTagging P",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sigmaTagCausalTarget"
+   "reason": "applied non-function sigmaTagCausal"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetTotalEffect_eq_betaTarget_plus_novel",
-  "name": "targetTotalEffect_eq_betaTarget_plus_novel",
+  "fqn": "Calibrator.PortabilityDrift.totalEffect_eq_beta_plus_novel",
+  "name": "totalEffect_eq_beta_plus_novel",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1189,
+  "line": 1238,
   "claim_source": "name",
-  "statement": "targetTotalEffect m = m.betaTarget + m.novelCausalEffectTarget",
+  "statement": "totalEffect m P = m.beta P + m.novelCausalEffect P",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetTotalEffect"
+   "reason": "applied non-function totalEffect"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetTotalEffect_eq_betaSource_plus_targetEffectHeterogeneity",
-  "name": "targetTotalEffect_eq_betaSource_plus_targetEffectHeterogeneity",
+  "fqn": "Calibrator.PortabilityDrift.totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity",
+  "name": "totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1305,
+  "line": 1344,
   "claim_source": "name",
-  "statement": "targetTotalEffect m = m.betaSource + targetEffectHeterogeneity m",
+  "statement": "totalEffect m Pop.target = (m.beta Pop.source) + targetEffectHeterogeneity m",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetTotalEffect"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.sourceTaggingProjection_eq_direct_plus_proxy",
-  "name": "sourceTaggingProjection_eq_direct_plus_proxy",
+  "fqn": "Calibrator.PortabilityDrift.taggingProjection_eq_direct_plus_proxy",
+  "name": "taggingProjection_eq_direct_plus_proxy",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1358,
+  "line": 1389,
   "claim_source": "name",
-  "statement": "sourceTaggingProjection m = sourceDirectCausalProjection m + sourceProxyTaggingProjection m",
+  "statement": "taggingProjection m P = directCausalProjection m P + proxyTaggingProjection m P",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sourceTaggingProjection"
+   "reason": "applied non-function taggingProjection"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetTaggingProjection_eq_direct_plus_proxy",
-  "name": "targetTaggingProjection_eq_direct_plus_proxy",
+  "fqn": "Calibrator.PortabilityDrift.taggingProjection_target_eq_source_effect_plus_effectHeterogeneity",
+  "name": "taggingProjection_target_eq_source_effect_plus_effectHeterogeneity",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1369,
+  "line": 1399,
   "claim_source": "name",
-  "statement": "targetTaggingProjection m = targetDirectCausalProjection m + targetProxyTaggingProjection m",
+  "statement": "taggingProjection m Pop.target = targetSourceEffectProjection m + targetEffectHeterogeneityProjection m",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetTaggingProjection"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity",
-  "name": "targetTaggingProjection_eq_source_effect_plus_effectHeterogeneity",
-  "module": "Calibrator.PortabilityDrift",
-  "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1381,
-  "claim_source": "name",
-  "statement": "targetTaggingProjection m = targetSourceEffectProjection m + targetEffectHeterogeneityProjection m",
-  "status": "opaque",
-  "detail": {
-   "reason": "applied non-function targetTaggingProjection"
-  }
- },
- {
-  "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetTaggingProjection_eq_standing_plus_novelMutationEffect",
-  "name": "targetTaggingProjection_eq_standing_plus_novelMutationEffect",
-  "module": "Calibrator.PortabilityDrift",
-  "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1392,
-  "claim_source": "name",
-  "statement": "targetTaggingProjection m = (sigmaTagCausalTarget m).mulVec m.betaTarget + targetNovelMutationEffectProjection m",
-  "status": "opaque",
-  "detail": {
-   "reason": "lex error at '.mulVec m.betaTarget'"
-  }
- },
- {
-  "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.sourceCrossCovariance_eq_taggingProjection_plus_context",
-  "name": "sourceCrossCovariance_eq_taggingProjection_plus_context",
-  "module": "Calibrator.PortabilityDrift",
-  "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1403,
-  "claim_source": "name",
-  "statement": "sourceCrossCovariance m = sourceTaggingProjection m + m.contextCrossSource",
-  "status": "opaque",
-  "detail": {
-   "reason": "applied non-function sourceCrossCovariance"
-  }
- },
- {
-  "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetCrossCovariance_eq_taggingProjection_plus_context",
-  "name": "targetCrossCovariance_eq_taggingProjection_plus_context",
+  "fqn": "Calibrator.PortabilityDrift.taggingProjection_target_eq_standing_plus_novelMutationEffect",
+  "name": "taggingProjection_target_eq_standing_plus_novelMutationEffect",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
   "line": 1410,
   "claim_source": "name",
-  "statement": "targetCrossCovariance m = targetTaggingProjection m + m.contextCrossTarget",
+  "statement": "taggingProjection m Pop.target = (sigmaTagCausal m Pop.target).mulVec (m.beta Pop.target) + targetNovelMutationEffectProjection m",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetCrossCovariance"
+   "reason": "lex error at '.mulVec (m.beta Pop.'"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.sourceCrossCovariance_eq_direct_plus_proxy_plus_context",
-  "name": "sourceCrossCovariance_eq_direct_plus_proxy_plus_context",
+  "fqn": "Calibrator.PortabilityDrift.crossCovariance_eq_taggingProjection_plus_context",
+  "name": "crossCovariance_eq_taggingProjection_plus_context",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1417,
+  "line": 1421,
   "claim_source": "name",
-  "statement": "sourceCrossCovariance m = sourceDirectCausalProjection m + sourceProxyTaggingProjection m + m.contextCrossSource",
+  "statement": "crossCovariance m P = taggingProjection m P + m.contextCross P",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sourceCrossCovariance"
+   "reason": "applied non-function crossCovariance"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetCrossCovariance_eq_direct_plus_proxy_plus_context",
-  "name": "targetCrossCovariance_eq_direct_plus_proxy_plus_context",
+  "fqn": "Calibrator.PortabilityDrift.crossCovariance_eq_direct_plus_proxy_plus_context",
+  "name": "crossCovariance_eq_direct_plus_proxy_plus_context",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
   "line": 1428,
   "claim_source": "name",
-  "statement": "targetCrossCovariance m = targetDirectCausalProjection m + targetProxyTaggingProjection m + m.contextCrossTarget",
+  "statement": "crossCovariance m P = directCausalProjection m P + proxyTaggingProjection m P + m.contextCross P",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetCrossCovariance"
+   "reason": "applied non-function crossCovariance"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context",
-  "name": "targetCrossCovariance_eq_source_effect_plus_effectHeterogeneity_plus_context",
+  "fqn": "Calibrator.PortabilityDrift.crossCovariance_target_eq_source_effect_plus_effectHeterogeneity_plus_context",
+  "name": "crossCovariance_target_eq_source_effect_plus_effectHeterogeneity_plus_context",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1440,
+  "line": 1438,
   "claim_source": "name",
-  "statement": "targetCrossCovariance m = targetSourceEffectProjection m + targetEffectHeterogeneityProjection m + m.contextCrossTarget",
+  "statement": "crossCovariance m Pop.target = targetSourceEffectProjection m + targetEffectHeterogeneityProjection m + (m.contextCross Pop.target)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetCrossCovariance"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetCrossCovariance_eq_standing_plus_novelMutationEffect_plus_context",
-  "name": "targetCrossCovariance_eq_standing_plus_novelMutationEffect_plus_context",
+  "fqn": "Calibrator.PortabilityDrift.crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context",
+  "name": "crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1452,
+  "line": 1450,
   "claim_source": "name",
-  "statement": "targetCrossCovariance m = (sigmaTagCausalTarget m).mulVec m.betaTarget + targetNovelMutationEffectProjection m + m.contextCrossTarget",
+  "statement": "crossCovariance m Pop.target = (sigmaTagCausal m Pop.target).mulVec (m.beta Pop.target) + targetNovelMutationEffectProjection m + (m.contextCross Pop.target)",
   "status": "opaque",
   "detail": {
-   "reason": "lex error at '.mulVec m.betaTarget'"
+   "reason": "lex error at '.mulVec (m.beta Pop.'"
   }
  },
  {
@@ -4685,12 +4743,12 @@
   "name": "sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1508,
+  "line": 1482,
   "claim_source": "name",
-  "statement": "sourcePredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m (sourceCrossCovariance m)",
+  "statement": "predictiveCovarianceFromSourceWeights m Pop.source = sourceWeightedTagScore m (crossCovariance m Pop.source)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sourcePredictiveCovarianceFromSourceWeights"
+   "reason": "unresolved name Pop.source"
   }
  },
  {
@@ -4699,12 +4757,12 @@
   "name": "targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1517,
+  "line": 1491,
   "claim_source": "name",
-  "statement": "targetPredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m (targetCrossCovariance m)",
+  "statement": "predictiveCovarianceFromSourceWeights m Pop.target = sourceWeightedTagScore m (crossCovariance m Pop.target)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetPredictiveCovarianceFromSourceWeights"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
@@ -4713,12 +4771,12 @@
   "name": "sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1554,
+  "line": 1528,
   "claim_source": "name",
-  "statement": "sourcePredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m (sourceDirectCausalProjection m) + sourceWeightedTagScore m (sourceProxyTaggingProjection m) + sourceWeightedTagScore m m.contextCrossSource",
+  "statement": "predictiveCovarianceFromSourceWeights m Pop.source = sourceWeightedTagScore m (directCausalProjection m Pop.source) + sourceWeightedTagScore m (proxyTaggingProjection m Pop.source) + sourceWeightedTagScore m (m.contextCross Pop.source)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sourcePredictiveCovarianceFromSourceWeights"
+   "reason": "unresolved name Pop.source"
   }
  },
  {
@@ -4727,12 +4785,12 @@
   "name": "targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1567,
+  "line": 1541,
   "claim_source": "name",
-  "statement": "targetPredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m (targetDirectCausalProjection m) + sourceWeightedTagScore m (targetProxyTaggingProjection m) + sourceWeightedTagScore m m.contextCrossTarget",
+  "statement": "predictiveCovarianceFromSourceWeights m Pop.target = sourceWeightedTagScore m (directCausalProjection m Pop.target) + sourceWeightedTagScore m (proxyTaggingProjection m Pop.target) + sourceWeightedTagScore m (m.contextCross Pop.target)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetPredictiveCovarianceFromSourceWeights"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
@@ -4741,12 +4799,12 @@
   "name": "targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1592,
+  "line": 1566,
   "claim_source": "name",
-  "statement": "targetPredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m (targetSourceEffectProjection m) + sourceWeightedTagScore m (targetEffectHeterogeneityProjection m) + sourceWeightedTagScore m m.contextCrossTarget",
+  "statement": "predictiveCovarianceFromSourceWeights m Pop.target = sourceWeightedTagScore m (targetSourceEffectProjection m) + sourceWeightedTagScore m (targetEffectHeterogeneityProjection m) + sourceWeightedTagScore m (m.contextCross Pop.target)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetPredictiveCovarianceFromSourceWeights"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
@@ -4755,12 +4813,12 @@
   "name": "targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1616,
+  "line": 1590,
   "claim_source": "name",
-  "statement": "targetPredictiveCovarianceFromSourceWeights m = sourceWeightedTagScore m ((sigmaTagCausalTarget m).mulVec m.betaTarget) + sourceWeightedTagScore m (targetNovelMutationEffectProjection m) + sourceWeightedTagScore m m.contextCrossTarget",
+  "statement": "predictiveCovarianceFromSourceWeights m Pop.target = sourceWeightedTagScore m ((sigmaTagCausal m Pop.target).mulVec (m.beta Pop.target)) + sourceWeightedTagScore m (targetNovelMutationEffectProjection m) + sourceWeightedTagScore m (m.contextCross Pop.target)",
   "status": "opaque",
   "detail": {
-   "reason": "lex error at '.mulVec m.betaTarget'"
+   "reason": "lex error at '.mulVec (m.beta Pop.'"
   }
  },
  {
@@ -4769,7 +4827,7 @@
   "name": "novelUntaggablePhenotypeResidual_eq_field",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1683,
+  "line": 1657,
   "claim_source": "name",
   "statement": "novelUntaggablePhenotypeResidual m = m.novelUntaggablePhenotypeVarianceTarget",
   "status": "opaque",
@@ -4783,26 +4841,26 @@
   "name": "effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1761,
+  "line": 1758,
   "claim_source": "name",
-  "statement": "effectiveTargetOutcomeVariance m = m.targetOutcomeVariance + brokenTaggingResidual m + ancestrySpecificLDResidual m + sourceSpecificOverfitResidual m + novelUntaggablePhenotypeResidual m",
+  "statement": "effectiveOutcomeVariance m Pop.target = (m.outcomeVariance Pop.target) + brokenTaggingResidual m + ancestrySpecificLDResidual m + sourceSpecificOverfitResidual m + novelUntaggablePhenotypeResidual m",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function effectiveTargetOutcomeVariance"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.sourceResidualVarianceFromSourceWeights_eq_outcome_minus_signal",
-  "name": "sourceResidualVarianceFromSourceWeights_eq_outcome_minus_signal",
+  "fqn": "Calibrator.PortabilityDrift.residualVarianceFromSourceWeights_eq_effective_minus_signal",
+  "name": "residualVarianceFromSourceWeights_eq_effective_minus_signal",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1790,
+  "line": 1787,
   "claim_source": "name",
-  "statement": "sourceResidualVarianceFromSourceWeights m = m.sourceOutcomeVariance - sourceExplainedSignalVarianceFromSourceWeights m",
+  "statement": "residualVarianceFromSourceWeights m Pop.source = (m.outcomeVariance Pop.source) - explainedSignalVarianceFromSourceWeights m Pop.source",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sourceResidualVarianceFromSourceWeights"
+   "reason": "unresolved name Pop.source"
   }
  },
  {
@@ -4811,9 +4869,9 @@
   "name": "sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1812,
+  "line": 1809,
   "claim_source": "name",
-  "statement": "sourceCalibratedBrierFromSourceWeightsAtPrevalence m π = TransportedMetrics.calibratedBrierFromVariances π (sourceExplainedSignalVarianceFromSourceWeights m) (sourceResidualVarianceFromSourceWeights m)",
+  "statement": "sourceCalibratedBrierFromSourceWeightsAtPrevalence m π = TransportedMetrics.calibratedBrierFromVariances π (explainedSignalVarianceFromSourceWeights m Pop.source) (residualVarianceFromSourceWeights m Pop.source)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function sourceCalibratedBrierFromSourceWeightsAtPrevalence"
@@ -4825,9 +4883,9 @@
   "name": "sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1825,
+  "line": 1822,
   "claim_source": "name",
-  "statement": "sourceCalibratedBrierFromSourceWeightsAtPrevalence m π = TransportedMetrics.calibratedBrier π (sourceR2FromSourceWeights m)",
+  "statement": "sourceCalibratedBrierFromSourceWeightsAtPrevalence m π = TransportedMetrics.calibratedBrier π (r2FromSourceWeights m Pop.source)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function sourceCalibratedBrierFromSourceWeightsAtPrevalence"
@@ -4835,16 +4893,16 @@
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.targetResidualVarianceFromSourceWeights_eq_effective_minus_signal",
-  "name": "targetResidualVarianceFromSourceWeights_eq_effective_minus_signal",
+  "fqn": "Calibrator.PortabilityDrift.residualVarianceFromSourceWeights_eq_effective_minus_signal",
+  "name": "residualVarianceFromSourceWeights_eq_effective_minus_signal",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1875,
+  "line": 1862,
   "claim_source": "name",
-  "statement": "targetResidualVarianceFromSourceWeights m = effectiveTargetOutcomeVariance m - targetExplainedSignalVarianceFromSourceWeights m",
+  "statement": "residualVarianceFromSourceWeights m P = effectiveOutcomeVariance m P - explainedSignalVarianceFromSourceWeights m P",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetResidualVarianceFromSourceWeights"
+   "reason": "applied non-function residualVarianceFromSourceWeights"
   }
  },
  {
@@ -4853,9 +4911,9 @@
   "name": "targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1894,
+  "line": 1879,
   "claim_source": "name",
-  "statement": "targetCalibratedBrierFromSourceWeights m = TransportedMetrics.calibratedBrierFromVariances m.targetPrevalence (targetExplainedSignalVarianceFromSourceWeights m) (targetResidualVarianceFromSourceWeights m)",
+  "statement": "targetCalibratedBrierFromSourceWeights m = TransportedMetrics.calibratedBrierFromVariances m.targetPrevalence (explainedSignalVarianceFromSourceWeights m Pop.target) (residualVarianceFromSourceWeights m Pop.target)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function targetCalibratedBrierFromSourceWeights"
@@ -4867,9 +4925,9 @@
   "name": "targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1943,
+  "line": 1928,
   "claim_source": "name",
-  "statement": "targetCalibratedBrierFromSourceWeights m = TransportedMetrics.calibratedBrier m.targetPrevalence (targetR2FromSourceWeights m)",
+  "statement": "targetCalibratedBrierFromSourceWeights m = TransportedMetrics.calibratedBrier m.targetPrevalence (r2FromSourceWeights m Pop.target)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function targetCalibratedBrierFromSourceWeights"
@@ -4881,12 +4939,12 @@
   "name": "target_score_variance_from_source_weights_identity",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1965,
+  "line": 1950,
   "claim_source": "name",
-  "statement": "targetScoreVarianceFromSourceWeights m = dotProduct (sourceWeightsFromExplicitDrivers m) (m.sigmaTagTarget.mulVec (sourceWeightsFromExplicitDrivers m))",
+  "statement": "scoreVarianceFromSourceWeights m Pop.target = dotProduct (sourceWeightsFromExplicitDrivers m) ((m.sigmaTag Pop.target).mulVec (sourceWeightsFromExplicitDrivers m))",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetScoreVarianceFromSourceWeights"
+   "reason": "lex error at '.mulVec (sourceWeigh'"
   }
  },
  {
@@ -4895,26 +4953,26 @@
   "name": "targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_action",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1974,
+  "line": 1959,
   "claim_source": "name",
-  "statement": "targetScoreVarianceFromSourceWeights m = sourceWeightedTagScore m (m.sigmaTagTarget.mulVec (sourceWeightsFromExplicitDrivers m))",
+  "statement": "scoreVarianceFromSourceWeights m Pop.target = sourceWeightedTagScore m ((m.sigmaTag Pop.target).mulVec (sourceWeightsFromExplicitDrivers m))",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetScoreVarianceFromSourceWeights"
+   "reason": "lex error at '.mulVec (sourceWeigh'"
   }
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.PortabilityDrift.sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action",
-  "name": "sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action",
+  "fqn": "Calibrator.PortabilityDrift.scoreVarianceFromSourceWeights_source_eq_score_on_covariance_action",
+  "name": "scoreVarianceFromSourceWeights_source_eq_score_on_covariance_action",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1983,
+  "line": 1968,
   "claim_source": "name",
-  "statement": "sourceScoreVarianceFromExplicitDrivers m = sourceWeightedTagScore m (m.sigmaTagSource.mulVec (sourceWeightsFromExplicitDrivers m))",
+  "statement": "scoreVarianceFromSourceWeights m Pop.source = sourceWeightedTagScore m ((m.sigmaTag Pop.source).mulVec (sourceWeightsFromExplicitDrivers m))",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sourceScoreVarianceFromExplicitDrivers"
+   "reason": "lex error at '.mulVec (sourceWeigh'"
   }
  },
  {
@@ -4923,12 +4981,12 @@
   "name": "sourceR2FromSourceWeights_eq_signalVariance_ratio",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 1992,
+  "line": 1977,
   "claim_source": "name",
-  "statement": "sourceR2FromSourceWeights m = sourceExplainedSignalVarianceFromSourceWeights m / m.sourceOutcomeVariance",
+  "statement": "r2FromSourceWeights m Pop.source = explainedSignalVarianceFromSourceWeights m Pop.source / (m.outcomeVariance Pop.source)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sourceR2FromSourceWeights"
+   "reason": "unresolved name Pop.source"
   }
  },
  {
@@ -4937,12 +4995,12 @@
   "name": "targetR2FromSourceWeights_eq_signalVariance_ratio",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2009,
+  "line": 1994,
   "claim_source": "name",
-  "statement": "targetR2FromSourceWeights m = targetExplainedSignalVarianceFromSourceWeights m / effectiveTargetOutcomeVariance m",
+  "statement": "r2FromSourceWeights m Pop.target = explainedSignalVarianceFromSourceWeights m Pop.target / effectiveOutcomeVariance m Pop.target",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetR2FromSourceWeights"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
@@ -4951,9 +5009,9 @@
   "name": "betaTargetAt_eq_source_plus_effectHeterogeneityAt",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2380,
+  "line": 2365,
   "claim_source": "name",
-  "statement": "betaTargetAt m t = m.betaSource + m.targetEffectHeterogeneityAt t + m.novelCausalEffectTargetAt t",
+  "statement": "betaTargetAt m t = (m.beta Pop.source) + m.targetEffectHeterogeneityAt t + m.novelCausalEffectTargetAt t",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function betaTargetAt"
@@ -4965,7 +5023,7 @@
   "name": "tagAlleleFreqTargetAt_eq_standing_plus_mutationShift",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2394,
+  "line": 2379,
   "claim_source": "name",
   "statement": "tagAlleleFreqTargetAt m t i = m.tagAlleleFreqStandingTargetAt t i + m.tagAlleleFreqMutationShiftAt t i",
   "status": "opaque",
@@ -4979,7 +5037,7 @@
   "name": "causalAlleleFreqTargetAt_eq_standing_plus_mutationShift",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2408,
+  "line": 2393,
   "claim_source": "name",
   "statement": "causalAlleleFreqTargetAt m t j = m.causalAlleleFreqStandingTargetAt t j + m.causalAlleleFreqMutationShiftAt t j",
   "status": "opaque",
@@ -4993,9 +5051,9 @@
   "name": "targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2752,
+  "line": 2733,
   "claim_source": "name",
-  "statement": "targetTaggingProjection (m.toMetricModelAt t) = targetSourceEffectProjectionAt m t + targetEffectHeterogeneityProjectionAt m t",
+  "statement": "taggingProjection (m.toMetricModelAt t) = targetSourceEffectProjectionAt m t + targetEffectHeterogeneityProjectionAt m t",
   "status": "opaque",
   "detail": {
    "reason": "unresolved name m.toMetricModelAt"
@@ -5007,9 +5065,9 @@
   "name": "targetR2AtGeneration_eq_targetR2From_slice",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2764,
+  "line": 2745,
   "claim_source": "name",
-  "statement": "targetR2AtGeneration m t = targetR2FromSourceWeights (m.toMetricModelAt t)",
+  "statement": "targetR2AtGeneration m t = r2FromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function targetR2AtGeneration"
@@ -5021,7 +5079,7 @@
   "name": "targetCalibratedBrierAtGeneration_eq_slice",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2769,
+  "line": 2750,
   "claim_source": "name",
   "statement": "targetCalibratedBrierAtGeneration m t = targetCalibratedBrierFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
@@ -5035,7 +5093,7 @@
   "name": "neutralAFBenchmarkRatio_from_state",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2914,
+  "line": 2895,
   "claim_source": "name",
   "statement": "targetR2FromNeutralAFBenchmark V_A V_E fstTarget / presentDayR2 V_A V_E fstSource < 1",
   "status": "not_an_equation",
@@ -5051,7 +5109,7 @@
   "name": "targetR2_lt_source_from_neutralAF_benchmark",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 2938,
+  "line": 2919,
   "claim_source": "name",
   "statement": "targetR2FromNeutralAFBenchmark V_A V_E fstTarget < presentDayR2 V_A V_E fstSource",
   "status": "not_an_equation",
@@ -5063,7 +5121,7 @@
   "name": "targetR2FromNeutralAFBenchmark_eq_presentDayR2",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3052,
+  "line": 3033,
   "claim_source": "name",
   "statement": "targetR2FromNeutralAFBenchmark V_A V_E fstTarget = presentDayR2 V_A V_E fstTarget",
   "status": "opaque",
@@ -5077,7 +5135,7 @@
   "name": "targetAUCFromNeutralAFBenchmark_eq_presentDayAUC",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3080,
+  "line": 3061,
   "claim_source": "name",
   "statement": "targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget = presentDayGaussianAUC V_A V_E fstTarget",
   "status": "opaque",
@@ -5091,7 +5149,7 @@
   "name": "sourceBrierFromR2_eq_transportedMetrics",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3092,
+  "line": 3073,
   "claim_source": "name",
   "statement": "sourceBrierFromR2 π r2Source = TransportedMetrics.calibratedBrier π r2Source",
   "status": "not_an_equation",
@@ -5103,7 +5161,7 @@
   "name": "neutralAFBenchmarkMetricProfile_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3119,
+  "line": 3100,
   "claim_source": "name",
   "statement": "neutralAFBenchmarkMetricProfile π V_A V_E fstTarget = { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget , auc := targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget , brier := targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget }",
   "status": "opaque",
@@ -5119,12 +5177,12 @@
   "name": "equalVarianceGaussianAUCChart_eq_of_lt_one",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3291,
+  "line": 3272,
   "claim_source": "name",
   "statement": "equalVarianceGaussianAUCChart r2 = equalVarianceGaussianAUCFromExplainedR2 r2",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function equalVarianceGaussianAUCChart"
+   "reason": "non-closed-form construct: then"
   }
  },
  {
@@ -5133,7 +5191,7 @@
   "name": "equalVarianceGaussianAUCFromExplainedR2_eq_fromSNR",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3315,
+  "line": 3296,
   "claim_source": "name",
   "statement": "equalVarianceGaussianAUCFromExplainedR2 r2 = equalVarianceGaussianAUCFromSNR (r2 / (1 - r2))",
   "status": "opaque",
@@ -5147,12 +5205,12 @@
   "name": "sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3357,
+  "line": 3338,
   "claim_source": "name",
-  "statement": "sourceEqualVarianceGaussianAUCFromSourceWeights m = equalVarianceGaussianAUCFromVariances (sourceExplainedSignalVarianceFromSourceWeights m) (sourceResidualVarianceFromSourceWeights m)",
+  "statement": "equalVarianceGaussianAUCFromSourceWeights m Pop.source = equalVarianceGaussianAUCFromVariances (explainedSignalVarianceFromSourceWeights m Pop.source) (residualVarianceFromSourceWeights m Pop.source)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sourceEqualVarianceGaussianAUCFromSourceWeights"
+   "reason": "unresolved name Pop.source"
   }
  },
  {
@@ -5161,12 +5219,12 @@
   "name": "sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3370,
+  "line": 3351,
   "claim_source": "name",
-  "statement": "sourceEqualVarianceGaussianAUCFromSourceWeights m = equalVarianceGaussianAUCFromExplainedR2 (sourceR2FromSourceWeights m)",
+  "statement": "equalVarianceGaussianAUCFromSourceWeights m Pop.source = equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.source)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function sourceEqualVarianceGaussianAUCFromSourceWeights"
+   "reason": "unresolved name Pop.source"
   }
  },
  {
@@ -5175,12 +5233,12 @@
   "name": "targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3400,
+  "line": 3382,
   "claim_source": "name",
-  "statement": "targetEqualVarianceGaussianAUCFromSourceWeights m = equalVarianceGaussianAUCFromVariances (targetExplainedSignalVarianceFromSourceWeights m) (targetResidualVarianceFromSourceWeights m)",
+  "statement": "equalVarianceGaussianAUCFromSourceWeights m Pop.target = equalVarianceGaussianAUCFromVariances (explainedSignalVarianceFromSourceWeights m Pop.target) (residualVarianceFromSourceWeights m Pop.target)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetEqualVarianceGaussianAUCFromSourceWeights"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
@@ -5189,12 +5247,12 @@
   "name": "targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3447,
+  "line": 3429,
   "claim_source": "name",
-  "statement": "targetEqualVarianceGaussianAUCFromSourceWeights m = equalVarianceGaussianAUCFromExplainedR2 (targetR2FromSourceWeights m)",
+  "statement": "equalVarianceGaussianAUCFromSourceWeights m Pop.target = equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetEqualVarianceGaussianAUCFromSourceWeights"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
@@ -5203,7 +5261,7 @@
   "name": "targetMetricProfileAtGeneration_eq_slice",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3598,
+  "line": 3580,
   "claim_source": "name",
   "statement": "targetMetricProfileAtGeneration m t = targetMetricProfileFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
@@ -5217,9 +5275,9 @@
   "name": "targetGaussianAUCAtGeneration_eq_slice",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3604,
+  "line": 3586,
   "claim_source": "name",
-  "statement": "targetGaussianAUCAtGeneration m t = targetEqualVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t)",
+  "statement": "targetGaussianAUCAtGeneration m t = equalVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function targetGaussianAUCAtGeneration"
@@ -5231,9 +5289,9 @@
   "name": "targetPredictiveCovarianceAtGeneration_eq_slice",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3642,
+  "line": 3624,
   "claim_source": "name",
-  "statement": "targetPredictiveCovarianceAtGeneration m t = targetPredictiveCovarianceFromSourceWeights (m.toMetricModelAt t)",
+  "statement": "targetPredictiveCovarianceAtGeneration m t = predictiveCovarianceFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function targetPredictiveCovarianceAtGeneration"
@@ -5245,9 +5303,9 @@
   "name": "targetScoreVarianceAtGeneration_eq_slice",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3648,
+  "line": 3630,
   "claim_source": "name",
-  "statement": "targetScoreVarianceAtGeneration m t = targetScoreVarianceFromSourceWeights (m.toMetricModelAt t)",
+  "statement": "targetScoreVarianceAtGeneration m t = scoreVarianceFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function targetScoreVarianceAtGeneration"
@@ -5259,9 +5317,9 @@
   "name": "effectiveTargetOutcomeVarianceAtGeneration_eq_slice",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3654,
+  "line": 3636,
   "claim_source": "name",
-  "statement": "effectiveTargetOutcomeVarianceAtGeneration m t = effectiveTargetOutcomeVariance (m.toMetricModelAt t)",
+  "statement": "effectiveTargetOutcomeVarianceAtGeneration m t = effectiveOutcomeVariance (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function effectiveTargetOutcomeVarianceAtGeneration"
@@ -5273,9 +5331,9 @@
   "name": "targetResidualVarianceAtGeneration_eq_slice",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3660,
+  "line": 3642,
   "claim_source": "name",
-  "statement": "targetResidualVarianceAtGeneration m t = targetResidualVarianceFromSourceWeights (m.toMetricModelAt t)",
+  "statement": "targetResidualVarianceAtGeneration m t = residualVarianceFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function targetResidualVarianceAtGeneration"
@@ -5287,9 +5345,9 @@
   "name": "targetCalibrationSlopeAtGeneration_eq_slice",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3666,
+  "line": 3648,
   "claim_source": "name",
-  "statement": "targetCalibrationSlopeAtGeneration m t = targetCalibrationSlopeFromSourceWeights (m.toMetricModelAt t)",
+  "statement": "targetCalibrationSlopeAtGeneration m t = calibrationSlopeFromSourceWeights (m.toMetricModelAt t)",
   "status": "opaque",
   "detail": {
    "reason": "applied non-function targetCalibrationSlopeAtGeneration"
@@ -5301,7 +5359,7 @@
   "name": "equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3843,
+  "line": 3825,
   "claim_source": "name",
   "statement": "equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 V_A V_E fst) = presentDayGaussianAUC V_A V_E fst",
   "status": "opaque",
@@ -5315,7 +5373,7 @@
   "name": "targetBrierFromNeutralAFBenchmark_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3882,
+  "line": 3864,
   "claim_source": "name",
   "statement": "targetExactCalibratedBrierRisk π V_A V_E fstTarget = exactCalibratedBrierRiskFromR2 π (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)",
   "status": "opaque",
@@ -5332,7 +5390,7 @@
   "name": "exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3893,
+  "line": 3875,
   "claim_source": "name",
   "statement": "exactBrierRiskOfCalibrated μ η = exactCalibratedBrierRiskFromR2 π r2",
   "status": "opaque",
@@ -5346,7 +5404,7 @@
   "name": "brierRegretPoint_eq_sq_error",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3968,
+  "line": 3950,
   "claim_source": "name",
   "statement": "brierRegretPoint η q = (q - η) ^ 2",
   "status": "derivation_verified",
@@ -5367,7 +5425,7 @@
   "name": "brierRegretRatio_eq_sq_error_ratio",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3974,
+  "line": 3956,
   "claim_source": "name",
   "statement": "brierRegretRatio η qSource qTarget = ((qTarget - η) ^ 2) / ((qSource - η) ^ 2)",
   "status": "derivation_verified",
@@ -5388,7 +5446,7 @@
   "name": "logLossRegretPoint_eq_kl",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3989,
+  "line": 3971,
   "claim_source": "name",
   "statement": "logLossRegretPoint η q = bernoulliKLReal η q",
   "status": "derivation_verified",
@@ -5414,7 +5472,7 @@
   "name": "logLossRegretRatio_eq_kl_ratio",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 3997,
+  "line": 3979,
   "claim_source": "name",
   "statement": "logLossRegretRatio η qSource qTarget = bernoulliKLReal η qTarget / bernoulliKLReal η qSource",
   "status": "derivation_verified",
@@ -5442,7 +5500,7 @@
   "name": "expectedSqMeanPGSDiff_pureSplit_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4073,
+  "line": 4055,
   "claim_source": "name",
   "statement": "expectedSqMeanPGSDiff_pureSplit V_A fstS fstT = 2 * (fstS + fstT) * V_A",
   "status": "not_an_equation",
@@ -5457,7 +5515,7 @@
   "name": "expectedSqMeanPGSDiff_IMEquilibrium_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4083,
+  "line": 4065,
   "claim_source": "name",
   "statement": "expectedSqMeanPGSDiff_IMEquilibrium V_A M = 4 * twoDemeIMEquilibriumDelta M * V_A",
   "status": "not_an_equation",
@@ -5472,7 +5530,7 @@
   "name": "covarianceRetention_from_fst_ld",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4346,
+  "line": 4328,
   "claim_source": "name",
   "statement": "covarianceRetention (freqCorrFromFst fst) (ldOverlapFromSharedLD shared_ld) = (1 - fst) * shared_ld",
   "status": "not_an_equation",
@@ -5487,7 +5545,7 @@
   "name": "covarianceDivergenceFromRetention_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4359,
+  "line": 4341,
   "claim_source": "name",
   "statement": "covarianceDivergenceFromRetention fst shared_ld = 1 - (1 - fst) * shared_ld",
   "status": "not_an_equation",
@@ -5502,7 +5560,7 @@
   "name": "covarianceDivergenceMutationDrift_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4379,
+  "line": 4361,
   "claim_source": "name",
   "statement": "covarianceDivergenceMutationDrift fst_drift shared_ld = 1 - (1 - fst_drift) * shared_ld",
   "status": "derivation_verified",
@@ -5525,7 +5583,7 @@
   "name": "covarianceDivergence_derivation_matches",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4389,
+  "line": 4371,
   "claim_source": "name",
   "statement": "covarianceDivergenceFromRetention fst shared_ld = covarianceDivergenceMutationDrift fst shared_ld",
   "status": "derivation_verified",
@@ -5546,7 +5604,7 @@
   "name": "presentDayPGSVarianceMutationDrift_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4435,
+  "line": 4417,
   "claim_source": "name",
   "statement": "presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld = (1 - fst_drift) * shared_ld * V_A",
   "status": "derivation_verified",
@@ -5569,7 +5627,7 @@
   "name": "islandFstMultiplicativeStep_eq_ibdRecurrenceStep",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4795,
+  "line": 4777,
   "claim_source": "name",
   "statement": "islandFstMultiplicativeStep Ne m F = ibdRecurrenceStep Ne m F",
   "status": "not_an_equation",
@@ -5581,7 +5639,7 @@
   "name": "fstMigrationDriftEquilibrium_eq_from_M",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4850,
+  "line": 4832,
   "claim_source": "name",
   "statement": "fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m)",
   "status": "not_an_equation",
@@ -5593,7 +5651,7 @@
   "name": "SplitMigrationModel.fstMigDriftEq_eq_limit",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4930,
+  "line": 4912,
   "claim_source": "name",
   "statement": "s.fstMigDriftEq = s.fstEqLimitLowMutationManyDemes",
   "status": "opaque",
@@ -5607,7 +5665,7 @@
   "name": "steppingStoneFst_eq_one_of_saturated",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4987,
+  "line": 4969,
   "claim_source": "name",
   "statement": "steppingStoneFst fst_neighbor α d = 1",
   "status": "opaque",
@@ -5621,7 +5679,7 @@
   "name": "sharedLD_from_equilibrium_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5067,
+  "line": 5049,
   "claim_source": "name+doc",
   "statement": "sharedLD_from_equilibrium Ne m = scaledMigrationRate Ne m / (1 + scaledMigrationRate Ne m)",
   "status": "derivation_verified",
@@ -5647,7 +5705,7 @@
   "name": "sharedLD_from_equilibrium_eq_sharedLDFromMigration",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5093,
+  "line": 5075,
   "claim_source": "name",
   "statement": "sharedLD_from_equilibrium Ne m = sharedLDFromMigration (scaledMigrationRate Ne m)",
   "status": "derivation_verified",
@@ -5671,7 +5729,7 @@
   "name": "fst_plus_sharedLD_eq_one",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5125,
+  "line": 5107,
   "claim_source": "name",
   "statement": "fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (scaledMigrationRate Ne m) = 1",
   "status": "derivation_verified",
@@ -5695,7 +5753,7 @@
   "name": "retainedSignalVarianceMigrationDrift_eq_retention_mul_VA",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5167,
+  "line": 5149,
   "claim_source": "name",
   "statement": "retainedSignalVarianceMigrationDrift V_A Ne m = signalRetentionMigrationDrift Ne m * V_A",
   "status": "not_an_equation",
@@ -5707,7 +5765,7 @@
   "name": "signalRetentionMigrationDrift_eq_ratio",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5172,
+  "line": 5154,
   "claim_source": "name",
   "statement": "signalRetentionMigrationDrift Ne m = (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2",
   "status": "derivation_verified",
@@ -5731,7 +5789,7 @@
   "name": "retainedSignalVarianceMigrationDrift_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5201,
+  "line": 5183,
   "claim_source": "name",
   "statement": "retainedSignalVarianceMigrationDrift V_A Ne m = (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 * V_A",
   "status": "derivation_verified",
@@ -5757,7 +5815,7 @@
   "name": "asymmetricFst_eq_migrationDriftEq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5277,
+  "line": 5259,
   "claim_source": "name",
   "statement": "asymmetricFst Ne m_into = fstMigrationDriftEquilibrium Ne m_into",
   "status": "not_an_equation",
@@ -5769,7 +5827,7 @@
   "name": "fstMigDriftNext_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5449,
+  "line": 5431,
   "claim_source": "name",
   "statement": "fstMigDriftNext Ne m Fst = (1 - 2 * m - 1 / (2 * Ne)) * Fst + 1 / (2 * Ne)",
   "status": "not_an_equation",
@@ -5784,7 +5842,7 @@
   "name": "fstMigDriftEquil_eq_fstMigrationDriftEquilibrium",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5483,
+  "line": 5465,
   "claim_source": "name",
   "statement": "fstMigDriftEquil Ne m = fstMigrationDriftEquilibrium Ne m",
   "status": "not_an_equation",
@@ -5796,7 +5854,7 @@
   "name": "neutralAFBenchmarkFromRecurrence_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5566,
+  "line": 5548,
   "claim_source": "name",
   "statement": "neutralAFBenchmarkFromRecurrence Ne m = 4 * Ne * m / (4 * Ne * m + 1)",
   "status": "derivation_verified",
@@ -5822,7 +5880,7 @@
   "name": "recurrence_derived_R2_increases_with_m",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5610,
+  "line": 5592,
   "claim_source": "name",
   "statement": "presentDayR2 V_A V_E (fstMigDriftEquil Ne m₁) < presentDayR2 V_A V_E (fstMigDriftEquil Ne m₂)",
   "status": "not_an_equation",
@@ -6168,7 +6226,7 @@
   "name": "selectionSummaryLogLik_eq_of_matchedEffectCorrelation",
   "module": "Calibrator.SelectionValidation",
   "file": "/Users/user/gnomon/proofs/Calibrator/SelectionValidation.lean",
-  "line": 88,
+  "line": 73,
   "claim_source": "name",
   "statement": "selectionSummaryLogLik validation summary = gaussianProfileLogLik validation.observedEffectCorrelation validation.observedEffectCorrelation validation.effectCorrelationNoise + gaussianProfileLogLik validation.observedSelectedVariance summary.predictedSelectedVariance validation.selectedVarianceNoise",
   "status": "opaque",
@@ -6182,7 +6240,7 @@
   "name": "gaussianProfileLogLik_eq_missedSelectedVariance",
   "module": "Calibrator.SelectionValidation",
   "file": "/Users/user/gnomon/proofs/Calibrator/SelectionValidation.lean",
-  "line": 105,
+  "line": 90,
   "claim_source": "name",
   "statement": "gaussianProfileLogLik validation.observedSelectedVariance summary.predictedSelectedVariance validation.selectedVarianceNoise = -(missedSelectedVariance validation summary) ^ 2 / (2 * validation.selectedVarianceNoise) - Real.log (2 * Real.pi * validation.selectedVarianceNoise) / 2",
   "status": "opaque",
@@ -6196,12 +6254,12 @@
   "name": "target_liability_auc_eq_explainedR2_chart",
   "module": "Calibrator.SimulationValidation",
   "file": "/Users/user/gnomon/proofs/Calibrator/SimulationValidation.lean",
-  "line": 533,
+  "line": 523,
   "claim_source": "name",
-  "statement": "targetEqualVarianceGaussianAUCFromSourceWeights m = equalVarianceGaussianAUCFromExplainedR2 (targetR2FromSourceWeights m)",
+  "statement": "equalVarianceGaussianAUCFromSourceWeights m Pop.target = equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target)",
   "status": "opaque",
   "detail": {
-   "reason": "applied non-function targetEqualVarianceGaussianAUCFromSourceWeights"
+   "reason": "unresolved name Pop.target"
   }
  },
  {
@@ -6509,9 +6567,18 @@
   "line": 1280,
   "claim_source": "name",
   "statement": "usableScratchTargetR2 oracle_target_r2 noiseVar nTarget = sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar nTarget",
-  "status": "opaque",
+  "status": "derivation_verified",
   "detail": {
-   "reason": "applied non-function usableScratchTargetR2"
+   "lhs": "Max(0, oracle_target_r2 - noiseVar/nTarget)",
+   "rhs": "oracle_target_r2 - noiseVar/nTarget",
+   "hypotheses": [
+    "noiseVar/nTarget <= oracle_target_r2"
+   ],
+   "unparsed_hypotheses": [],
+   "method": "numeric",
+   "opaque_lhs": "usableScratchTargetR2(oracle_target_r2, noiseVar, nTarget)",
+   "opaque_rhs": "sampleLimitedScratchTargetR2(oracle_target_r2, noiseVar, nTarget)",
+   "mentions_any_definition": true
   }
  },
  {
@@ -6523,9 +6590,18 @@
   "line": 1297,
   "claim_source": "name",
   "statement": "usableScratchTargetR2 oracle_target_r2 noiseVar nTarget = 0",
-  "status": "opaque",
+  "status": "derivation_verified",
   "detail": {
-   "reason": "applied non-function usableScratchTargetR2"
+   "lhs": "Max(0, oracle_target_r2 - noiseVar/nTarget)",
+   "rhs": "0",
+   "hypotheses": [
+    "oracle_target_r2 <= noiseVar/nTarget"
+   ],
+   "unparsed_hypotheses": [],
+   "method": "numeric",
+   "opaque_lhs": "usableScratchTargetR2(oracle_target_r2, noiseVar, nTarget)",
+   "opaque_rhs": "0",
+   "mentions_any_definition": true
   }
  },
  {

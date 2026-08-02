@@ -1,0 +1,40 @@
+{
+ "declarations": 1103,
+ "distinct_names": 1102,
+ "colliding_names": {
+  "Calibrator.sigmaTagCausal": [
+   {
+    "file": "Calibrator/DGP.lean",
+    "line": 117,
+    "short": "sigmaTagCausal",
+    "private": false,
+    "kind": "def"
+   },
+   {
+    "file": "Calibrator/PortabilityDrift.lean",
+    "line": 1207,
+    "short": "sigmaTagCausal",
+    "private": false,
+    "kind": "def"
+   }
+  ]
+ },
+ "colliding_public": {
+  "Calibrator.sigmaTagCausal": [
+   {
+    "file": "Calibrator/DGP.lean",
+    "line": 117,
+    "short": "sigmaTagCausal",
+    "private": false,
+    "kind": "def"
+   },
+   {
+    "file": "Calibrator/PortabilityDrift.lean",
+    "line": 1207,
+    "short": "sigmaTagCausal",
+    "private": false,
+    "kind": "def"
+   }
+  ]
+ }
+}

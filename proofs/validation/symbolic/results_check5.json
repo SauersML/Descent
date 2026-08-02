@@ -25,7 +25,7 @@
    "fqn": "Calibrator.ldRecurrence",
    "name": "ldRecurrence",
    "file": "Calibrator/LDDecayTheory.lean",
-   "line": 937,
+   "line": 948,
    "status": "ONLY_REST_POINT_IS_ZERO",
    "detail": {
     "step": "_H*(1 - r)",
@@ -45,7 +45,7 @@
    "fqn": "Calibrator.hetRecurrence",
    "name": "hetRecurrence",
    "file": "Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1090,
+   "line": 1186,
    "status": "ONLY_REST_POINT_IS_ZERO",
    "detail": {
     "step": "_H*(1 - 1/(2*Ne))",
@@ -65,7 +65,7 @@
    "fqn": "Calibrator.hetMutationDriftRecurrence",
    "name": "hetMutationDriftRecurrence",
    "file": "Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1192,
+   "line": 1303,
    "status": "has_nonzero_rest_point",
    "detail": {
     "step": "_H*(1 - 1/(2*Ne)) + 2*mu*(1 - _H)",
@@ -85,7 +85,7 @@
    "fqn": "Calibrator.hetMutationRecurrence",
    "name": "hetMutationRecurrence",
    "file": "Calibrator/PopulationGeneticsFoundations.lean",
-   "line": 1350,
+   "line": 1469,
    "status": "has_nonzero_rest_point",
    "detail": {
     "step": "Hstar*(1 - lam) + _H*lam",

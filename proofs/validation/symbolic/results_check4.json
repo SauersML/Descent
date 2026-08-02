@@ -22,6 +22,23 @@
   "fqn": "Calibrator.AncestrySpecificArchitecture.geneFlowFstStep",
   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
   "line": 371,
+  "compared_to": "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
+  "status": "skipped_binders_do_not_correspond",
+  "binders": [
+   "m",
+   "Ne",
+   "F"
+  ],
+  "other_binders": [
+   "m",
+   "Ne"
+  ]
+ },
+ {
+  "check": "check4_docstring_approximation",
+  "fqn": "Calibrator.AncestrySpecificArchitecture.geneFlowFstStep",
+  "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
+  "line": 371,
   "compared_to": "Calibrator.PortabilityDrift.islandFstMultiplicativeStep",
   "expr": "-2*F*m + F + (1 - F)/(2*Ne)",
   "other_expr": "(1 - m)**2*(F*(1 - 1/(2*Ne)) + 1/(2*Ne))",
@@ -61,19 +78,21 @@
  },
  {
   "check": "check4_docstring_approximation",
-  "fqn": "Calibrator.AncestrySpecificArchitecture.geneFlowFstStep",
-  "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
-  "line": 371,
-  "compared_to": "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
+  "fqn": "Calibrator.DemographicHistory.demoSteppingStoneFst",
+  "file": "/Users/user/gnomon/proofs/Calibrator/DemographicHistory.lean",
+  "line": 134,
+  "compared_to": "Calibrator.DemographicHistory.steppingStoneCoalescenceTime",
   "status": "skipped_binders_do_not_correspond",
   "binders": [
-   "m",
+   "d",
    "Ne",
-   "F"
+   "m",
+   "σ_sq"
   ],
   "other_binders": [
-   "m",
-   "Ne"
+   "d",
+   "σ_sq",
+   "m"
   ]
  },
  {
@@ -92,25 +111,6 @@
   "other_binders": [
    "t",
    "Ne"
-  ]
- },
- {
-  "check": "check4_docstring_approximation",
-  "fqn": "Calibrator.DemographicHistory.demoSteppingStoneFst",
-  "file": "/Users/user/gnomon/proofs/Calibrator/DemographicHistory.lean",
-  "line": 134,
-  "compared_to": "Calibrator.DemographicHistory.steppingStoneCoalescenceTime",
-  "status": "skipped_binders_do_not_correspond",
-  "binders": [
-   "d",
-   "Ne",
-   "m",
-   "σ_sq"
-  ],
-  "other_binders": [
-   "d",
-   "σ_sq",
-   "m"
   ]
  },
  {
@@ -286,7 +286,7 @@
   "check": "check4_docstring_approximation",
   "fqn": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransientDiscrete",
   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
-  "line": 1414,
+  "line": 1533,
   "compared_to": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransient",
   "expr": "(1 - ((1 - 1/(2*Ne))*(1 - θ/(2*Ne)))**t)/(θ + 1)",
   "other_expr": "(1 - exp(t*(-θ - 1)/(2*Ne)))/(θ + 1)",
@@ -330,7 +330,7 @@
   "check": "check4_docstring_approximation",
   "fqn": "Calibrator.PortabilityDrift.ibdFlowStep",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4094,
+  "line": 4170,
   "compared_to": "Calibrator.PortabilityDrift.islandFstMultiplicativeStep",
   "status": "skipped_binders_do_not_correspond",
   "binders": [
@@ -348,7 +348,7 @@
   "check": "check4_docstring_approximation",
   "fqn": "Calibrator.PortabilityDrift.ibdRecurrenceStep",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4607,
+  "line": 4683,
   "compared_to": "Calibrator.PortabilityDrift.ibdFlowStep",
   "status": "skipped_binders_do_not_correspond",
   "binders": [
@@ -416,6 +416,18 @@
    "s",
    "p"
   ]
+ },
+ {
+  "check": "check4_docstring_approximation",
+  "fqn": "Calibrator.TransferLearningPGS.sampleLimitedScratchTargetR2",
+  "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+  "line": 1241,
+  "compared_to": "Calibrator.TransferLearningPGS.usableScratchTargetR2",
+  "expr": "oracle_target_r2 - noiseVar/nTarget",
+  "other_expr": "Max(0, oracle_target_r2 - noiseVar/nTarget)",
+  "status": "APPROXIMATION_UNSUPPORTED",
+  "regimes": [],
+  "regime_stated_in_docstring": true
  },
  {
   "check": "check4_unstated_regime",

@@ -3467,9 +3467,10 @@
   "body_checksum": "sha256:c71e42c2c6131ab1f67299019a56add0",
   "status": "VERIFIED",
   "evidence": [
+   "check1_fixed_point",
    "check2_derivation"
   ],
-  "falsifiable_via": "check2_derivation"
+  "falsifiable_via": "check1_fixed_point"
  },
  "Calibrator.fstMutationDriftTransient": {
   "fqn": "Calibrator.fstMutationDriftTransient",
@@ -3501,8 +3502,11 @@
   "reason_in_slice": "name asserts equilibrium/derivation/closed form",
   "empirical_status": "UNTESTED",
   "body_checksum": "sha256:aabb65b7195e34fda54e1754fffd4a7a",
-  "status": "UNREACHABLE",
-  "reason": "check1: opaque_theorem"
+  "status": "VERIFIED",
+  "evidence": [
+   "check1_fixed_point"
+  ],
+  "falsifiable_via": "check1_fixed_point"
  },
  "Calibrator.effectiveMigration": {
   "fqn": "Calibrator.effectiveMigration",
@@ -5861,7 +5865,10 @@
   "empirical_status": "UNTESTED",
   "body_checksum": "sha256:508146116d30beec0e87ecf43d4e143e",
   "status": "UNREACHABLE",
-  "reason": "no derivation or fixed-point theorem reaches it"
+  "reason": "check passed but no perturbed body was rejected; the check cannot fail for this definition",
+  "evidence": [
+   "check2_derivation"
+  ]
  },
  "Calibrator.usableScratchTargetR2": {
   "fqn": "Calibrator.usableScratchTargetR2",
@@ -5871,8 +5878,11 @@
   "reason_in_slice": "claimed by theorem usableScratchTargetR2_eq_of_nonneg",
   "empirical_status": "UNTESTED",
   "body_checksum": "sha256:b5116cc43eeb45b2087fa8cd6015d467",
-  "status": "UNREACHABLE",
-  "reason": "no derivation or fixed-point theorem reaches it"
+  "status": "VERIFIED",
+  "evidence": [
+   "check2_derivation"
+  ],
+  "falsifiable_via": "check2_derivation"
  },
  "Calibrator.scratchVsFineTuningCriticalSampleSize": {
   "fqn": "Calibrator.scratchVsFineTuningCriticalSampleSize",
