@@ -31,9 +31,9 @@ Of 402 `Empirical status:` markers, 323 are `UNTESTED`, ~28 `DERIVED`, ~20 `VALI
 | 2 | **Disjoint segment (Theorem D).** Disjoint designs realize exactly the Gaussian segment `{N(0,s²) : 0≤s²≤1}`. | standing | `GenotypeChaosLimits.disjoint_segment` (field, :1644); `gaussian_null_licensed_of_disjoint` (:1693), `geneBurden_gaussian_null` (:1707), `disjoint_limit_fourthCumulant_zero` (:1723); `CondensationUnification.disjoint_design_gaussian_null_below_condensation` (:278) | Gaussian null **licensed** for gene-based burden/kernel over non-overlapping genes, at every polymorphic frequency, with variance the only free parameter. Disjointness is *discharged* for `geneBurdenDesign` and *refuted* for `slidingWindowDesign` — both proved. | HYPOTHESIS (field) + PROVED corollaries; the design-side gating lemmas are PROVED | The limit theorem itself is an analytic input. No simulation. |
 | 3 | **Non-soficity witness.** Two-pool product has limiting fourth cumulant `6` under every coordinate law. | standing | `GenotypeChaosLimits.twoPool_witness` (field, :1670); `twoPool_interaction_fourthCumulant` (:1858), `twoPool_fourthCumulant_ne_disjoint` (:1869), `twoPool_witness_not_a_disjoint_limit` (:1878), `sign_symmetry_does_not_license_disjoint_reduction` (:1909) | A two-pool (gene×gene, pathway×pathway) interaction statistic is non-Gaussian in the limit at **every** allele frequency; sign symmetry does not rescue it. Frequency-free, so it applies to rare-variant panels. | Arithmetic `9−3=6` PROVED; the identification of the limit as a product of two independent Gaussians is HYPOTHESIS | The CLT/independence step is a field. No simulation of κ₄→6, which would be cheap. |
 | 4 | **Star versus cycle.** Profile invariants are star densities; the limit lives in cycle densities. Palindromic circulant pair: equal 2nd cycle densities (80 = 80), different 4th (1840 vs 1600). | standing | `EpistaticChaos` §StarVersusCycle: `palindromicCycleDensityA_two`/`B_two` = 80 (:2323,:2336), `palindromic_second_cycle_densities_equal` (:2348), `..._A_four` = 1840 (:2353), `..._B_four` = 1600 (:2368), `palindromic_fourth_cycle_densities_differ` (:2386), `recurrence_matching_leaves_fourth_cycle_density_free` (:2404), `palindromic_circulant_spectra_differ` (:2010); `CycleDeterminacy` (:2172), `cycle_preserving_resampling_is_a_calibration` (:2210), `no_moment_matching_calibration_off_temperedness` (:2227) | A permutation/resampling calibration that preserves the variant-recurrence profile has preserved **nothing the null depends on**. The prescription is to preserve cycle densities; the 4th is the first that bites in the quadratic sector. | **PROVED** in closed form. The numbers 80/80 and 1840/1600 are theorems, not simulations. `recurrence_matching_...` deliberately never uses its recurrence hypothesis — that *is* the content. | `cycleDensity` of a real design is connected to no estimator and no pipeline. `CycleDeterminacy` carries determinacy as a field. |
-| 5 | **Vertex-Weight Law.** The only invariants a design can transmit are the two-jet, arithmetic type, symmetry, and cumulants of the squared law. | standing, **but superseded in form** | Two independent wirings: `PolygenicSpectroscopy.VertexWeightCompleteness` (structure, :1078) + `experiment_factors_through_invariants` (:1094), `hwe_observables_exhausted_by_invariants` (:1133), `CodingInvariants` (:1059); and `CondensationUnification.ObservableTower.vertex_weight` (field, :731) + `experiment_factors_through_channels` (:749), `complete_content_of_truncation` (:780) | Complete observable content of a genotype coding, at truncation depth one, is a four-element list — drift, jet variance, arithmetic type, symmetry — plus `E[x⁴]=1/(2q(1−q))` as the variance of floor two. Two panels agreeing floor-by-floor are indistinguishable by every admissible design at every interaction order. | HYPOTHESIS (field, twice) + PROVED corollaries | Unproved analytic input. **The naive 4-list is wrong on its own**: `CondensationUnification`:415–449 records that the correct statement is a recursion, `OA(ν) = {two-jet, arith type, symmetry} ∪ OA(law of x²)`. Anyone quoting the 4-list must also quote row 20. Two formalizations that are never linked. |
+| 5 | **Vertex-Weight Law.** The only invariants a design can transmit are the two-jet, arithmetic type, symmetry, and cumulants of the squared law. | standing, **but superseded in form** | Two independent wirings: `PolygenicSpectroscopy.VertexWeightCompleteness` (structure, :1078) + `experiment_factors_through_invariants` (:1094), `hwe_observables_exhausted_by_invariants` (:1133), `CodingInvariants` (:1059); and `CondensationUnification.ObservableTower.vertex_weight` (field, :731) + `experiment_factors_through_channels` (:749), `complete_content_of_truncation` (:780) | Complete observable content of a genotype coding, at truncation depth one, is a four-element list — drift, jet variance, arithmetic type, symmetry — plus `E[x⁴]=1/(2q(1−q))` as the variance of floor two. Two panels agreeing floor-by-floor are indistinguishable by every admissible design at every interaction order. | HYPOTHESIS (field, twice) + PROVED corollaries | Unproved analytic input. **The naive 4-list is wrong on its own**: `CondensationUnification`:415–449 records that the correct statement is a recursion, `OA(ν) = {two-jet, arith type, symmetry} ∪ OA(law of x²)`. Anyone quoting the 4-list must also quote row 20. Two formalizations that are never linked. **Plus:** `PolygenicSpectroscopy` §4b compares this (an *observability* list) against Tower Rigidity's four data (a *separation* set) as "a strictly smaller sufficient set". Session 10's completeness/observability split makes that comparison invalid — the two lists are in different currencies. See reversal audit R2. |
 | 6 | **Tower floor two.** `E[x⁶] = (E[x⁴])² + 10 E[x⁴] − 20` per locus; for a panel `M₆ =` that `+` dispersion of `1/(2q(1−q))`. | standing | `CondensationUnification.sixthMoment_eq_floorOne_plus_dispersion` (:924), `fourthMomentDispersion` (:907), `MafSpectrum` (:836), `centeredSquareThirdMoment_differs_of_sixth` (:980), `floorOne_match_does_not_transport_calibration` (:1005); `EpistaticChaos.hweCenteredSixthMoment_eq` (:939), `standardizedGenotype_sixth_moment` (:959) | A panel matched on M₄, mean `q` and mean `2q(1−q)` **still separates at M₆**. So MAF-spectrum matching is not sufficient for calibration transport between panels. | **PROVED + SIMULATED.** `validation/differential/heavy/h5_results.json`: identity verified, `max_abs_err = 9.09e-13`. Lead arm, 40 atoms, 1.6e7 draws/atom: M₆ gap predicted 43.876, measured 45.283 ± 4.872 → **9.30 SEM separation**, predicted−measured = −0.29 SEM. M₄ control gap −0.011 ± 0.022 = 0.49 SEM (correctly does not separate). Max arm: predicted 181.45, dispersions 781.3 vs 599.8. | The strongest row in the table. Only gap: the M₆ contrast is exposed in no pipeline, so the separation is not usable as a diagnostic. |
-| 7 | **Tower Rigidity + kurtosis phase boundary.** Symmetry + `E[x⁴]=3` + two matched odd parts forces Gaussian; boundary at `E[x⁴] > 2`. | standing | `CondensationUnification.TowerRigidity` (structure, :1541, `rigidity` field) + `redundant_invariant_of_matched_four` (:1574). Phase side PROVED: `standardizedGenotype_fourth_moment_ge_two` (:1388), `..._eq_two_iff` (:1403), `hwe_phase_inequality_off_balanced` (:1439), `phase_strict_iff_not_symmetric` (:1454), `hwe_rigidity_hypotheses_unsatisfiable` (:1482) | **NONE, in the forward direction** — and the corpus says so itself. For a genotype the hypotheses are jointly unsatisfiable: symmetry forces `q=1/2`, and `q=1/2` forces `E[x⁴]=2` against the Gaussian's 3. The usable direction is the converse test, via `standardizedSquare_never_symmetric` (:522): the floor-two odd part is nonzero at **every** polymorphic frequency, `q=1/2` included — so non-Gaussianity is decidable one floor up where floor-one symmetry goes dark. | Rigidity = HYPOTHESIS; phase boundary and the unsatisfiability = **PROVED** | The rigidity input is unproved and, applied to genotypes, vacuous by the corpus's own theorem. The converse (non-Gaussianity) test that *is* live is instantiated by nothing downstream. |
+| 7 | **Tower Rigidity + kurtosis phase boundary.** Symmetry + `E[x⁴]=3` + two matched odd parts forces Gaussian; boundary at `E[x⁴] > 2`. | **standing as a separation result; its universality narration is REVERSED by Session 10 — see the reversal audit** | `CondensationUnification.TowerRigidity` (structure, :1541, `rigidity` field) + `redundant_invariant_of_matched_four` (:1574). Phase side PROVED: `standardizedGenotype_fourth_moment_ge_two` (:1388), `..._eq_two_iff` (:1403), `hwe_phase_inequality_off_balanced` (:1439), `phase_strict_iff_not_symmetric` (:1454), `hwe_rigidity_hypotheses_unsatisfiable` (:1482) | **NONE, in the forward direction** — and the corpus says so itself. For a genotype the hypotheses are jointly unsatisfiable: symmetry forces `q=1/2`, and `q=1/2` forces `E[x⁴]=2` against the Gaussian's 3. The usable direction is the converse test, via `standardizedSquare_never_symmetric` (:522): the floor-two odd part is nonzero at **every** polymorphic frequency, `q=1/2` included — so non-Gaussianity is decidable one floor up where floor-one symmetry goes dark. | Rigidity = HYPOTHESIS; phase boundary and the unsatisfiability = **PROVED** | The rigidity input is unproved and, applied to genotypes, vacuous by the corpus's own theorem. The converse (non-Gaussianity) test that *is* live is instantiated by nothing downstream. **Plus:** the prose framing this as "universality holds exactly when the coordinate law is Gaussian" (`CondensationUnification`:1292) is now **known false**. The Lean field is a *separation* statement and survives; the narration conflates separation with universality. See reversal audit R1. |
 | 8 | **Scale sequence σ_k, doubly exponential.** `σ₁²=2`, `σ₂²=14`. | standing (quadrature evidence) | `CondensationUnification.ScaleSequence` (:1242). `scale_one_sq`/`scale_two_sq` are **fields**, but anchored by proved theorems `gaussianFloorOneScaleSq` (:1090), `gaussianFloorTwoFourthMoment` (:1098), `gaussianFloorTwoScaleSq` (:1107). `doubly_exponential` is a **numerical-input field**. Consequences PROVED: `sampleSize_doubly_exponential` (:1280), `no_escape_below_radius` (:1269) | The tower is observationally truncated at about floor three for any study that will ever be run: ≈4·10² samples at floor 3, 9·10⁴ at floor 4, 5·10⁹ at floor 5. | Anchors **PROVED**; growth law is quadrature, recorded in-docstring: Gauss–Hermite, 200 nodes, exact through floor 7 — `1.414, 3.742, 19.07, 294.1, 7.276e4, 4.699e9, 2.005e19`, logarithms doubling to 4 s.f. | **The quadrature numbers exist only in a docstring.** No script in `proofs/validation/` reproduces them. That is a reproducibility hole on the one numerical input the tower's truncation depends on. |
 | 9 | **`E[x⁴]=1/(2q(1−q))`; blind frequency `(3−√3)/6`.** | standing | **PROVED throughout.** `PolygenicSpectroscopy.standardizedFourthMoment_eq` (:1216), `..._ge_two` (:1232), `..._eq_two_iff_half` (:1247), `..._ne_gaussian_at_half` (:1284); `CondensationUnification.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance` (:473), `gaussianKurtosisMaf := (3−√3)/6` (:580), `gaussianKurtosisMaf_genotypeVariance = 1/3` (:600), `standardizedGenotype_kurtosis_gaussian_at_blind_maf` (:617), `hweFloorOneScaleSq_eq_gaussian_at_blind_maf` (:1143), `gaussianKurtosisMaf_ne_half` (:1497) | At MAF ≈ **0.2113** a standardized genotype is kurtosis-indistinguishable from a Gaussian. Any interaction statistic relying on fourth-cumulant separation loses power there. | **PROVED**; the fourth-moment identity is checked in `validation/condensation/check_condensation.py` and the popgen batteries | The docstring itself (`CondensationUnification`:575–578) says the **consequence** is untested and calls it "the most directly falsifiable number this development produces". A power-loss simulation at MAF 0.2113 is cheap and unrun. |
 | 10 | **RETRACTED: sliding-design coupling correction `2b²/(1−b²)`.** | **RETRACTED upstream** | Retraction **properly landed**. `CondensationUnification` §5j (:1587–1640) records it; `EpistaticChaos`:1113–1121, :1200 carry the matching note. `couplingVarianceInflation`, `boundedHub_does_not_bound_coupling`, and the rationals `13122/3439`, `11529602/485199` are **gone** — grep finds them only inside the retraction text. `validation/coupling/sliding_window_coupling.py` has the arm removed under a scoped retraction header with a do-not-resurrect note. | **NONE now.** `b` is a property of the coordinate law with no established design-level consequence. The file explicitly asserts neither miscalibration nor safety for sliding-window scans. What stands: `hweSignBias_eq` `E[x\|x\|]=(1−2q)²` for `q≤1/2` (:1150, PROVED), `hweSignBias_zero_iff_balanced` (:1201, PROVED), `signBias` as the correct *name* for what a symmetric law destroys. | Standing parts **PROVED** | **Open:** whether any admissible design exposes `b` at all. No replacement mechanism supplied. A **second** retraction rode with it — the jet-to-strip upgrade is false (the window channel probes the truncated second moment at tilt θ=1 whatever the tuning slope), which is what `JetBarrier` had already proved. |
@@ -57,6 +57,155 @@ Of 402 `Empirical status:` markers, 323 are `UNTESTED`, ~28 `DERIVED`, ~20 `VALI
 | 23 | **Spike constant and effective-marker count for PC correctability.** `demographicSpike = 4 F · m(n−m)/n`, `F` = Hudson `F_ST`. | standing, previously wrong and now corrected | `PCCorrectability/Threshold.lean:31` | The sharp criterion `1 < M F² n` is the Patterson–Price–Reich boundary. | **VALIDATED**: BBP inversion recovers **3.9920 ± 0.0045** against the derived 4. Separately measured: supplying a **raw** variant count for `M` overstates correctability ~20-fold in `M`, predicting eigenvector overlap **0.87** at `F_ST = 0.001` where the observed value is **0.014**. | The two errors partially masked each other (spike-constant error conservative, marker-count error optimistic). `validation/pc_correctability/analyze.py` still documents `KAPPA = 2` in its module docstring — **stale**, contradicting `Threshold.lean` and `analyze_b.py`, both of which use 4. |
 | 24 | **Heterozygosity / drift-regime laws** — several defs marked FALSIFIED at demographic equilibrium. | falsified | `DriftRegime.lean:100` (`HeterozygosityTrajectory.measuredLoss`), `PhenomeWidePortability.lean:122`, `PopulationGeneticsFoundations.lean:1199`, `LDDecayTheory.lean:881` | Drift-only heterozygosity-loss laws overestimate loss once mutation balances drift. | **SIMULATED.** `validation/differential/heavy/h0_results.json`: both controls pass (mutation-off reproduces the closed form; equilibrium level matches Kimura–Crow θ/(1+θ)). Test rows at t=2000 show retention **measured 1.22 / 1.01** where the drift-only cluster prediction is **0.135**. Equilibrium levels agree with theory within 0.4–1.7 SEM. | Flagged correctly in-file. **Note for the lead:** I could not find a "240 standard errors" heterozygosity cluster anywhere in `proofs/validation/` — the h0 equilibrium deviations are all under 2 SEM and the *separation* is against the drift-only prediction, not a 240-σ cluster. If that number is real it lives outside this repo. |
 
+### Session 10 (closes the upstream arc)
+
+| # | RESULT | STATUS UPSTREAM | WHERE IN CORPUS | BIOLOGY | EVIDENCE | GAP |
+|---|---|---|---|---|---|---|
+| 25 | **The Blindness Theorem.** Every admissible design merges under the Session 9 pair, so covariance universality does **not** characterize the Gaussian; the universality class is the **ladder fiber**, an infinite-dimensional stratum. | standing, modulo two pre-registered audit points | **NOT WIRED.** Nothing in the corpus mentions the ladder fiber, the Session 9 pair, or design merging. The nearest existing objects are `JetBarrier`'s chameleon stratum (the nonlattice, 2-jet-matched class) and `EpistaticChaos.GenotypeChaosLimits`, both of which are lower-dimensional shadows of the same phenomenon. | Would license: *no* distributional diagnostic built from covariance/universality behaviour can certify a Gaussian coordinate law — the class of laws passing every such test is infinite-dimensional, not a point. This is the strongest available form of "the Gaussian score assumption cannot be certified from the data it is applied to". | ASSERTED (upstream), pending **AP1** (uniform C³ window-smoothness of profiles across designs) and **AP2** (uniformity across renormalization levels) | Everything. Do not formalize downward until spectrum clears AP1/AP2 — the whole theorem is conditional on uniformity claims that are exactly the kind that have failed before in this arc (see the retracted tilt-bookkeeping error, row 10). |
+| 26 | **Completeness/observability split.** The tower data separates laws; statistics cannot read the odd parts; the gap between them is exactly the fiber-splitting freedom. | standing, same two audit points | **NOT WIRED as a theorem**, but the corpus already contains the *hedge* it vindicates: `JetBarrier`:36–47 ("Two completeness claims, and they are not the same claim… the bridge between them, from tower data to design-observable data, is open upstream") and `CondensationUnification`:1375 ("nothing here should be read as 'a design can measure the four'"). | The distinction the corpus has been carrying as an open question becomes a theorem: what *separates* coordinate laws and what a *design can measure* are different algebras, and the difference is measurable (the fiber-splitting freedom). Everything in the corpus that computes closed forms (drift, jet variance, symmetry verdict) sits on the observability side and is untouched. | ASSERTED (upstream); the corpus's matching hedges are PROVED-adjacent prose | Once AP1/AP2 clear, this is the row that should be formalized **first** — it is the one that turns two existing prose hedges into a theorem and retires the corpus's single largest open question. |
+
+---
+
+## Reversal audit: Sessions 1–9 imports against later overturns
+
+The lead's characterization of the reversal pattern — *five conjectures that sought a
+characterization where the truth was a classification* — is the right lens, and it
+found real damage. What follows is what I can establish from this repo.
+
+**Scope limit, stated up front.** This repository contains **no upstream session
+record**. There are no session notes, and no file in `proofs/` references a session
+number (checked by grep across `*.lean` and `*.md`). I can therefore audit *by shape* —
+find every characterization-form claim in the corpus and test it against what Session 10
+asserts — but I **cannot enumerate "the five"** and have not tried to guess them. R1 is
+established with certainty because the lead stated the Session 10 result that contradicts
+it. R2 follows from the completeness/observability split. R3–R5 are the remaining
+characterization-shaped claims in the affected domain, assessed on their merits; none of
+them is currently falsified, and I am flagging them as the places to *check first* when
+the upstream record arrives, not asserting they were reversed. See "what I need" below.
+
+### The single most important finding: the blast radius in Lean is zero
+
+All four completeness structures — `TowerRigidity`, `VertexWeightCompleteness`,
+`ObservableTower`, `ChaosSpectroscopy` — are **terminal nodes**. Each is used only
+inside its own namespace, in its own file, and **no genetics theorem anywhere in the
+corpus consumes any of them** (verified by grep for every structure name and every
+theorem in their namespaces). The genetics-facing statements in those files
+(`hwe_observables_exhausted_by_invariants`, `complete_content_of_truncation`,
+`redundant_invariant_of_matched_four`) are *consequences*, and nothing uses them either.
+
+So a reversal upstream of any completeness claim **cannot propagate into a biological
+claim in this corpus**, because none of them feeds one. The damage from R1 and R2 is
+confined to **prose**. That is a much better position than the `2b²/(1−b²)` episode,
+where the retracted object had exact rationals formalized downstream.
+
+The corpus also firewalled the one place it mattered, explicitly:
+`CondensationUnification`:1300ff records that `hweMellinDrift` and
+`hweMellinJetVariance` "remain independently informative and the critical-degree results
+are untouched — the redundancy never gets a chance to bite." That firewall holds under
+Session 10, and for the same reason: the condensation boundary is a drift computation,
+which lives on the observability side.
+
+### R1 — KNOWN FALSE. "Universality holds exactly when the coordinate law is Gaussian."
+
+**Site:** `CondensationUnification.lean:1292`, §5i header. Unhedged, stated as settled
+upstream, and used to frame the whole `TowerRigidity` section.
+
+**Why it is false:** this is precisely the characterization the Blindness Theorem
+reverses. The universality class is the ladder fiber, an infinite-dimensional stratum,
+not the single point `{Gaussian}`.
+
+**What survives:** the Lean object. The `TowerRigidity.rigidity` field asserts that
+symmetry + `E[x⁴]=3` + two matched odd parts forces the Gaussian — that is a statement
+about **tower data separating laws**, which Session 10 explicitly *confirms* ("the tower
+data separates laws"). The field is on the separation side of the split and is
+untouched. Its consequence `redundant_invariant_of_matched_four` is likewise about
+reports factoring through matched invariants, not about universality.
+
+**Fix:** restate the §5i header. "Universality holds exactly when the law is Gaussian"
+must become "the tower data separates laws, the Gaussian included" — a separation claim,
+not a universality claim. One paragraph, no Lean change. **This is the reversal that was
+announced as a new result rather than as a correction**, and it is the one the lead was
+right to expect.
+
+### R2 — NEEDS RESTATING. The "strictly smaller sufficient set" comparison.
+
+**Site:** `PolygenicSpectroscopy.lean` §4b, :962–1000, under the heading "Complete, but
+not minimal — and the distinction is not academic".
+
+**The claim:** the transmissible list is `(c,v)`, arithmetic type, symmetry, and the
+cumulants of `x²`; Tower Rigidity "gives a strictly smaller sufficient set" of four data
+including the odd parts of the floor-two and floor-three laws; therefore "the redundant
+data is what is computable, and the minimal data is what is decisive", and "that is why
+four successive finite lists failed before it."
+
+**Why it needs restating:** the two lists are in **different currencies**. The
+transmissible list is what a *design can see* (observability); the rigidity four are
+what *separates laws* (completeness). Session 10's split says the odd parts are exactly
+what statistics **cannot read**. So the rigidity set is not "smaller" than the
+transmissible set — it is not comparable to it, and the "four successive finite lists
+failed" narrative reads a sequence of results in one currency as progress toward a
+minimum in the other.
+
+**Aggravating detail:** the corpus is already **internally inconsistent** here. Two
+other files state the correct position explicitly — `JetBarrier`:36–47 and
+`CondensationUnification`:1375 both say the bridge from tower data to design-observable
+data is *open upstream* and that nothing may be read as "a design can measure the four".
+§4b compares the lists as if that bridge existed. Session 10 resolves the inconsistency
+**in favour of the hedges**.
+
+**Fix:** §4b keeps its positive content (the closed forms are what locate the
+condensation boundary; rigidity does not supply those — both still true) and drops the
+minimality comparison. Restate as: complete *for observability*, with the separation
+question living in a different algebra. No Lean change; `VertexWeightCompleteness` is
+unaffected as a field.
+
+### R3–R5 — the remaining characterization-shaped claims in the affected domain
+
+Assessed and **currently sound**; listed so that whoever holds the upstream record can
+check them first.
+
+- **R3. `HiddenConeAmbiguity`: "identifiable if and only if the mixing is bounded
+  below"** (:93, :308). A genuine characterization, and the highest-risk *shape* in the
+  corpus. But it is **proved outright** with no analytic field, and it already has the
+  classification form the reversals moved toward — the ambiguity is a fiber, the
+  ceiling is σ-compact, the jump is trivial-to-maximal with nothing between. This file
+  has also already absorbed two unconditional retractions and an erratum in the same
+  direction (row 19), which is evidence it has been through this audit once.
+- **R4. `JetBarrier`: the trichotomy, "observes exactly `(c, v, lattice)` and nothing
+  else"** (:24). This is a **blindness** statement — an upper bound on what designs can
+  see — and its chameleon stratum is *already* a stratum rather than a point. Session 10
+  runs in the same direction and **strengthens** it. Note this file has itself been
+  corrected once in exactly the reversal pattern: an earlier form claimed the observable
+  algebra was the 2-jet, and lattice laws turned out to be "not an exception to be
+  excluded but a *third observable*". That is a characterization→classification move,
+  already landed, correctly narrated as a correction.
+- **R5. `ObservationalCeiling` / `BlindnessRegistry`: the seven blindness instances.**
+  All negative, all classification-shaped, all safe and reinforced. This file is the
+  model for how the corpus should handle a reversal: it documents two honest
+  self-corrections in its own header (`unionOfCertificates_vacuous` showing the bare
+  union shape is satisfied by everything; the missing preservation hypothesis that made
+  an earlier theorem "consequently free") and states flatly that **"the ceiling is a
+  classification of the probes, not the proof."**
+
+### What I need to close this out
+
+The audit above is complete *by shape* over this repo. To close it *by provenance* I
+need the upstream Sessions 1–9 record — or just the five reversed conjecture statements.
+With that list I can do in one pass what I cannot do now: for each reversal, grep the
+corpus for the conjecture's objects and report whether we imported it, in what form, and
+whether the import predates or postdates the reversal. Without it I can only certify
+that **no Lean object in this corpus depends on a claim I can show to be reversed**,
+which is true and is the safety property that matters, but is weaker than a provenance
+audit.
+
+**Standing recommendation until that list arrives:** do not formalize Session 10 downward.
+Rows 25 and 26 are both conditional on AP1 and AP2, and AP1 (uniform C³ window-smoothness
+across designs) is a uniformity claim of exactly the type whose failure produced the
+`2b²/(1−b²)` retraction — that was a weight-bookkeeping error inside a first-order
+argument, found by the author's own audit after the theorem had been formalized
+downstream with exact rationals. The cost of waiting is one session; the cost of not
+waiting is the same cleanup we did today.
+
 ---
 
 ## Summary counts
@@ -72,22 +221,32 @@ Of 402 `Empirical status:` markers, 323 are `UNTESTED`, ~28 `DERIVED`, ~20 `VALI
 | **NOT WIRED** | **1** | **11** |
 | **RETRACTED upstream** | **1** | **10** — retraction correctly landed; no stale artifacts remain |
 
-**All 24 rows:**
+**Session 10 (rows 25–26):** both NOT WIRED, both conditional on audit points AP1/AP2.
+
+**Reversal audit:** 1 claim **known false** (R1, prose only) · 1 **needs restating**
+(R2, prose only) · 3 characterization-shaped claims assessed and **currently sound**
+(R3–R5) · **0 Lean objects affected** · **0 biological claims affected**.
+
+**All 26 rows:**
 
 - PROVED, no analytic field on the path: **13** (4, 9, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23)
 - Result itself carried as a named hypothesis / structure field: **7** (1, 2, 3, 5, 7, 8, 20)
 - Backed by simulation with recorded numbers: **7** (6, 17, 21, 22, 23, 24, and the estimation half of 16)
-- ASSERTED in prose only: **1** (11)
+- ASSERTED in prose only: **3** (11, 25, 26)
 - Retracted upstream: **1** (10), plus 3 sub-retractions already landed in-file (19's Polish-orbit claim, 19's "third regime", 10's jet-to-strip upgrade)
 - Falsified by simulation and repaired or flagged: **3** (22, 23, 24)
 - `sorry`s: **0**. `axiom`s: **0**.
 
-**No retracted-but-still-present rows found.** Row 10 is the only upstream retraction in the seed list and it has been cleanly executed: the retracted definitions and numbers are absent from Lean, the validation script's corresponding arm is removed under a do-not-resurrect header, and both affected files carry matching notes. The two things to watch instead are the *naming hazard* in row 20 (a live "exposure correction" that greps identically to the dead one) and the *duplication* in rows 5 and 13 (one result formalized twice, in files that never cite each other).
+**No retracted-but-still-present rows found in Lean.** The reversal audit adds two
+**prose-only** casualties (R1 known false, R2 needs restating), neither of which any Lean
+object or biological claim depends on. Row 10 is the only upstream retraction in the seed
+list with formalized downstream consequences, and it has been cleanly executed: the retracted definitions and numbers are absent from Lean, the validation script's corresponding arm is removed under a do-not-resurrect header, and both affected files carry matching notes. The two things to watch instead are the *naming hazard* in row 20 (a live "exposure correction" that greps identically to the dead one) and the *duplication* in rows 5 and 13 (one result formalized twice, in files that never cite each other).
 
 ---
 
 ## Top ten gaps, ranked by biological licence
 
+0. **R1 and R2 — two prose statements that read as settled and are not.** `CondensationUnification`:1292 asserts a characterization the Blindness Theorem reverses; `PolygenicSpectroscopy` §4b compares an observability list against a separation set as if commensurable, contradicting two other files in this same corpus. Neither has a Lean dependency, so both are one-paragraph edits — but they are the rows most likely to be quoted as settled by someone who does not read to the end of the file. Fix before anything else, because the cost is minutes and the exposure is the corpus's own credibility.
 1. **Row 16 — `map/correctability.rs` ships the estimation half only.** The untracked 445-line Rust calculator computes `margin = bbp_spike − bbp_threshold` with no headroom term, which is exactly the omission `imitable_despite_positive_pcCorrectabilityMargin` proves is *not conservative*. A user gets "correctable" for a stratification spike that is provably undetectable at any sample size. Licence if fixed: an honest PC-correctability verdict. Cheapest high-value fix in the table — the Lean side is already proved.
 2. **Row 11 — the dyadic Mellin ladder is entirely unwired.** It is the only candidate mechanism that would turn row 8's `doubly_exponential` *numerical-input field* into a derived theorem, making "how many tower floors can a study of size n see" computable rather than read off a quadrature table. Licence: a sample-size formula for spectroscopic architecture inference. Highest ceiling; also the most work.
 3. **Row 13 — the spread law's measured numbers do not exist in this repo.** The whole "sharing is cheap, rotation is expensive" argument (1e-6–5e-3 vs 8×–6000×) is quoted structurally in `ImitationCapacity`'s prose as "the reported ordering" and reported nowhere. Licence: multi-population deployment incompatibility as a number a practitioner can compute. The identity is proved; only the measurement is missing.
