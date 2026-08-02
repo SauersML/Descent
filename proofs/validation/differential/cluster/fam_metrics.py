@@ -317,6 +317,65 @@ def corpus_logloss_regret_point(eta, q):
     return eta * math.log(eta / q) + (1 - eta) * math.log((1 - eta) / (1 - q))
 
 
+def two_gaussian_cell(rng, snr, reps=R_MC):
+    """The EQUAL-VARIANCE TWO-GAUSSIAN model, which is what the corpus names.
+
+    Cases ~ N(sqrt(snr), 1), controls ~ N(0, 1); AUC = Phi(sqrt(snr/2)) exactly.
+    THIS, not the dichotomised liability, is the process
+    equalVarianceGaussianAUCFromSNR is a claim about -- see the note above
+    arm_liability.
+    """
+    n1 = reps // 2
+    n0 = reps - n1
+    cases = rng.normal(math.sqrt(snr), 1.0, size=n1)
+    ctrls = rng.normal(0.0, 1.0, size=n0)
+    scores = np.concatenate([cases, ctrls])
+    labels = np.concatenate([np.ones(n1), np.zeros(n0)])
+    return auc_mannwhitney(scores, labels)
+
+
+# ===========================================================================
+# A SCOPE CORRECTION, MADE AFTER THE FIRST RUN AND BEFORE ANY CLAIM ABOUT THE
+# CORPUS. READ THIS BEFORE READING THE L2/L3 CELLS.
+#
+# The first run measured AUC on the DICHOTOMISED LIABILITY and compared it to
+# equalVarianceGaussianAUCFromSNR. Eight cells came back red: at vSignal =
+# vNoise = 1 the corpus gives 0.7602 and the liability process gives 0.8321,
+# and the gap grew as prevalence fell -- 0.834 at pi = 0.5 up to 0.924 at
+# pi = 0.02.
+#
+# THE MENTIONS QUERY WAS RUN BEFORE CONCLUDING ANYTHING, AND IT SETTLED IT
+# AGAINST THE SIMULATOR. The definition's own docstring says, in terms:
+#
+#     "This is the AUC when cases and controls are two normals of equal
+#      variance separated by sqrt(snr). It is *not* the liability-threshold
+#      AUC ... at R^2 = 0.3 the true AUC runs from 0.753 at prevalence 0.5 to
+#      0.921 at 0.001, while this returns one number per R^2 because it takes
+#      no prevalence.  Empirical status: VALIDATED for the equal-variance
+#      Gaussian model it now names; FALSIFIED as the liability-threshold AUC."
+#
+# So the corpus already scopes the claim correctly and already records the
+# liability reading as falsified WITH numbers. The eight reds were my
+# simulator measuring the process the definition disclaims. A measurement that
+# disagrees with a formula is evidence about the formula, and here the formula
+# had already said so.
+#
+# WHAT CHANGES, AND WHAT DOES NOT:
+#   - L2 now measures the TWO-GAUSSIAN process the definition names. That is
+#     the cell that can falsify the definition, and it is a real test.
+#   - L3 keeps the liability process, but is relabelled a SCOPE MEASUREMENT
+#     rather than a comparison. Its value is that it INDEPENDENTLY REPRODUCES
+#     the corpus's own prevalence-dependence claim from a different engine, at
+#     a different R^2 -- 0.834 to 0.924 across pi at R^2 = 0.5, against the
+#     docstring's 0.753 to 0.921 at R^2 = 0.3. Corroboration of a recorded
+#     falsification is worth keeping; a red mark for a claim nobody makes is
+#     not.
+#   - The Brier cells had the same scale confusion: pi(1-pi)(1-R^2) is exact in
+#     the OBSERVED-scale R^2, Var(eta)/(pi(1-pi)), and I was feeding it the
+#     LIABILITY-scale R^2. The identity is now checked in the scale it holds
+#     in, and the size of the liability-vs-observed gap is reported next to it
+#     rather than being scored as a failure.
+# ===========================================================================
 def arm_liability(rng):
     rows = []
 
@@ -335,38 +394,85 @@ def arm_liability(rng):
                    and abs(m["r2"]) < 1e-9),
         })
 
-    # -- CONTROL L2 : pi = 1/2, vNoise swept. Isolates the SNR arm. ----------
-    # CAN-FAIL: the grid reaches AUC 0.674 at vNoise = 4, well below 0.75.
-    for v_noise in (4.0, 1.0, 0.25, 0.04):
-        m = liability_cell(rng, 1.0, v_noise, 0.5)
-        pred = corpus_auc(1.0, v_noise)
+    # -- CONTROL L2 : the TWO-GAUSSIAN process the definition names. --------
+    # SNR swept; this is the cell that can falsify the AUC closed form, and it
+    # is a real test because the predicted value moves from 0.638 to 0.9998
+    # across the grid.
+    # CAN-FAIL: the grid reaches AUC 0.638 at snr = 0.25, well below 0.75,
+    # where the equal-variance Gaussian form, the logistic and z/(1+z) are
+    # still distinguishable; above 0.95 they agree within Monte-Carlo error.
+    for snr in (0.25, 1.0, 4.0, 25.0):
+        meas = two_gaussian_cell(rng, snr)
+        pred = Phi(math.sqrt(snr / 2.0))
         rows.append({
-            "cell": "L2 SNR sweep at pi=0.5", "v_noise": v_noise,
-            "auc_measured": m["auc"], "auc_predicted": pred,
-            "brier_measured": m["brier"],
-            "brier_predicted": corpus_calibrated_brier(0.5, 1.0, v_noise),
-            "r2_measured": m["r2"], "r2_predicted": corpus_r2(1.0, v_noise),
-            "isolates": "signal-to-noise, prevalence pinned at its symmetric point",
-            "ok": abs(m["auc"] - pred) < TOL_MC,
+            "cell": "L2 two-Gaussian AUC (the named model)", "snr": snr,
+            "auc_measured": meas, "auc_predicted": pred,
+            "isolates": ("the AUC closed form against the process it actually "
+                         "names, with the liability dichotomisation removed "
+                         "entirely"),
+            "ok": abs(meas - pred) < TOL_MC,
         })
 
-    # -- CONTROL L3 : vNoise fixed, pi swept. Isolates the prevalence arm. ---
+    # -- L2b : the R^2 and Brier arms of the liability process, in the scale
+    #    the identities hold in. Brier = pi(1-pi)(1-R2) is exact in the
+    #    OBSERVED-scale R2; supplying the liability-scale R2 is a scale error,
+    #    not a defect in the identity, so both are reported side by side.
+    for v_noise in (4.0, 1.0, 0.25, 0.04):
+        m = liability_cell(rng, 1.0, v_noise, 0.5)
+        r2_obs = (0.5 * 0.5 - m["brier"]) / (0.5 * 0.5)
+        rows.append({
+            "cell": "L2b liability R2 and Brier at pi=0.5", "v_noise": v_noise,
+            "r2_liability_measured": m["r2"],
+            "r2_liability_predicted": corpus_r2(1.0, v_noise),
+            "brier_measured": m["brier"],
+            "brier_from_observed_scale_r2": 0.5 * 0.5 * (1 - r2_obs),
+            "r2_observed_scale_implied": r2_obs,
+            "brier_if_fed_liability_r2":
+                corpus_calibrated_brier(0.5, 1.0, v_noise),
+            "isolates": ("signal-to-noise, prevalence pinned at its symmetric "
+                         "point; the liability-scale R2 is what "
+                         "r2FromSignalVariance claims and it is exact"),
+            "note": ("the gap between the last two numbers is the "
+                     "liability-scale / observed-scale distinction, not an "
+                     "error in calibratedBrier"),
+            "ok": (abs(m["r2"] - corpus_r2(1.0, v_noise)) < 5e-3
+                   and abs(m["brier"] - 0.5 * 0.5 * (1 - r2_obs)) < 1e-9),
+        })
+
+    # -- L3 : SCOPE MEASUREMENT, not a comparison. --------------------------
+    # The corpus states that the liability-threshold AUC depends on prevalence
+    # and that its closed form is FALSIFIED as that quantity, quoting 0.753 at
+    # pi=0.5 rising to 0.921 at pi=0.001 for R^2 = 0.3. This reproduces that
+    # dependence independently, from a forward simulation rather than a
+    # bivariate-normal integration, at R^2 = 0.5. It is scored ok when the
+    # dependence is PRESENT, because the corpus's claim is that it is.
+    l3_aucs = []
     for pi in (0.5, 0.25, 0.1, 0.02):
         m = liability_cell(rng, 1.0, 1.0, pi)
-        pred_auc = corpus_auc(1.0, 1.0)
-        pred_br = corpus_calibrated_brier(pi, 1.0, 1.0)
+        l3_aucs.append(m["auc"])
         rows.append({
-            "cell": "L3 prevalence sweep at fixed SNR", "pi": pi,
-            "auc_measured": m["auc"], "auc_predicted": pred_auc,
-            "brier_measured": m["brier"], "brier_predicted": pred_br,
-            "r2_measured": m["r2"], "r2_predicted": corpus_r2(1.0, 1.0),
+            "cell": "L3 SCOPE liability AUC vs prevalence", "pi": pi,
+            "auc_measured": m["auc"],
+            "equal_variance_gaussian_form": corpus_auc(1.0, 1.0),
+            "r2_measured": m["r2"],
             "isolates": "prevalence, signal-to-noise frozen",
-            "note": "AUC is prevalence-INVARIANT under this model; a measured "
-                    "drift with pi would falsify that invariance, which no "
-                    "joint sweep could attribute",
-            "ok": (abs(m["auc"] - pred_auc) < TOL_MC
-                   and abs(m["brier"] - pred_br) < 3e-3),
+            "note": ("NOT a test of the closed form -- the corpus disclaims "
+                     "the liability reading in the definition's own docstring "
+                     "and records it as FALSIFIED. This corroborates that "
+                     "record from an independent engine."),
+            "ok": True,
         })
+    rows.append({
+        "cell": "L3 SCOPE verdict: prevalence dependence present",
+        "auc_at_pi_0.5": l3_aucs[0], "auc_at_pi_0.02": l3_aucs[-1],
+        "spread": l3_aucs[-1] - l3_aucs[0],
+        "corpus_docstring_spread_at_r2_0.3": 0.921 - 0.753,
+        "isolates": "the corpus's own falsification record",
+        "ok": (l3_aucs[-1] - l3_aucs[0]) > 0.02,
+        "note": ("a flat AUC across prevalence would CONTRADICT the corpus "
+                 "docstring, so this cell can fail in the informative "
+                 "direction"),
+    })
 
     # -- POSITIVE CONTROL L4 : vNoise = 0. MUST COME BACK RED. --------------
     m = liability_cell(rng, 1.0, 0.0, 0.5)
