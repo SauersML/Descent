@@ -1001,6 +1001,102 @@ theorem standardizedGenotype_sixth_moment (h : HardyWeinbergModel)
         rw [hinv]
         ring
 
+/-- **The three values of the centered square at a balanced locus**: `1, -1, 1`.
+
+At `q = 1/2` the standardized coordinate takes `-√2, 0, √2`, so `x²` takes `2, 0, 2` and
+`u = x² - 1` takes `1, -1, 1`. Note `σ₁² = E[x⁴] - 1 = 1` there, so the unnormalized and
+normalized floor-two coordinates coincide at this frequency. -/
+theorem centeredSquare_values_at_half (h : HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
+    h.centeredSquare DiploidGenotype.homRef = 1 ∧
+      h.centeredSquare DiploidGenotype.het = -1 ∧
+      h.centeredSquare DiploidGenotype.homAlt = 1 := by
+  have hvar : h.genotypeVariance = 1 / 2 := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    rw [hhalf]
+    norm_num
+  have hsqrt : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
+    Real.sq_sqrt (by rw [hvar]; norm_num)
+  refine ⟨?_, centeredSquare_negative_at_half h hhalf, ?_⟩ <;>
+    · unfold HardyWeinbergModel.centeredSquare HardyWeinbergModel.standardizedGenotype
+      rw [div_pow, hsqrt, hvar]
+      unfold HardyWeinbergModel.centeredAltAlleleCount
+      rw [h.expectedAltAlleleCount_eq, hhalf]
+      simp only [altAlleleCount]
+      norm_num
+
+/-- **The floor-two coordinate is Rademacher at the balanced locus, hence symmetric.**
+
+`u` takes `+1` on the two homozygotes, of total probability `1/2`, and `-1` on the
+heterozygote, of probability `1/2`. So the law of `u` puts equal mass on `+1` and `-1`.
+
+This corrects a claim this development previously made in the other direction. The
+*uncentered* square is never symmetric — it is non-negative — but the tower's floor-two
+coordinate is the centered square, and at `q = 1/2` it is symmetric. The balanced locus is
+therefore degenerate at both floors.
+
+**A subtlety worth recording.** The law of `u` is symmetric here, but no
+`SymmetricCoding DiploidGenotype` realizes it: a value-negating relabelling would have to
+send the heterozygote, of weight `1/2`, to a genotype of weight `1/2` carrying value `+1`,
+and the `+1` mass is split between two atoms of weight `1/4`. So `SymmetricCoding` is
+strictly stronger than symmetry of the law, and the coding-level detector used by
+`sign_erasure` cannot settle floor-two questions. The moment detector below is what
+settles them. -/
+theorem centeredSquare_rademacher_at_half (h : HardyWeinbergModel)
+    (hhalf : h.altFreq = 1 / 2) :
+    h.genotypeProb DiploidGenotype.homRef + h.genotypeProb DiploidGenotype.homAlt = 1 / 2 ∧
+      h.genotypeProb DiploidGenotype.het = 1 / 2 := by
+  constructor <;>
+    · simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq, hhalf]
+      norm_num
+
+/-- **The floor-two odd part in closed form**: `E[u³] = (E[x⁴] + 9)(E[x⁴] - 2)`.
+
+Chaining the expansion `E[u³] = E[x⁶] - 3E[x⁴] + 2` with the closed forms
+`E[x⁶] = (E[x⁴])² + 10E[x⁴] - 20` and `E[x²] = 1` gives `E[u³] = m₄² + 7m₄ - 18`, which
+factors.
+
+The factorization is the content: the floor-two odd part vanishes exactly when
+`E[x⁴] = 2`, which is the kurtosis phase boundary, which is the balanced locus. One
+quantity, three descriptions. -/
+theorem centeredSquare_third_moment_factored (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3 =
+      (1 / h.genotypeVariance + 9) * (1 / h.genotypeVariance - 2) := by
+  rw [centeredSquare_third_moment_eq h hq0 hq1,
+    standardizedGenotype_sixth_moment h hq0 hq1,
+    standardizedGenotype_fourth_moment h hq0 hq1,
+    standardizedGenotype_second_moment_one h hq0 hq1, h.genotypeProb_sum]
+  ring
+
+/-- **The floor-two odd part vanishes exactly at the balanced locus.**
+
+`E[x⁴] ≥ 2` always, so the factor `E[x⁴] + 9` is positive and the product vanishes iff
+`E[x⁴] = 2` iff `q = 1/2`. Away from the balanced locus the odd part is strictly positive
+and grows without bound as the variant gets rarer, since `E[x⁴] = 1/(2q(1-q))` diverges.
+
+This is the level-two symmetry verdict, and it matches the level-one one: *both* floors are
+symmetric at `q = 1/2` and at no other polymorphic frequency. -/
+theorem centeredSquare_third_moment_zero_iff_balanced (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3) = 0 ↔
+      1 / h.genotypeVariance = 2 := by
+  rw [centeredSquare_third_moment_factored h hq0 hq1]
+  have hvar : 0 < h.genotypeVariance := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+    nlinarith [hq0, hcomp]
+  have hinvpos : 0 < 1 / h.genotypeVariance := by positivity
+  constructor
+  · intro hzero
+    rcases mul_eq_zero.mp hzero with hleft | hright
+    · linarith [hinvpos, hleft]
+    · linarith [hright]
+  · intro htwo
+    rw [htwo]
+    norm_num
+
 /-!
 ### The single-locus collapse
 

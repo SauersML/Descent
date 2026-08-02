@@ -32,6 +32,16 @@ pair has coalesced by `tau`, not the between-population variance ratio.  The two
 were conflated, and `fstFromTau_lt_coalescenceCdf` now records that they are
 never equal.
 
+    Regime: instantaneous clean split, constant equal daughter sizes, no
+    migration, no selection, continuous (large-N) coalescent -- the model under
+    which `validation/differential/refs.py`'s `split_fst_hudson` is exact.  The
+    regime is the whole point of this definition rather than a caveat on it: the
+    closed-population drift recurrence is a *different* model, not the `F_ST` of
+    a split, and confusing the two is the model error that the
+    `fstDerived`/`fstFromTau`/`targetHetFromFst` cluster turns on (see the
+    `fstDerived-is-not-split-fst` check).  Outside a clean split -- under
+    migration, unequal sizes, or ongoing gene flow -- this map is not claimed.
+
     Empirical status: VALIDATED (0.0909/0.2000/0.3333/0.5000/0.6667/0.8000 at
     tau = .1/.25/.5/1/2/4 against simulated 0.0905/0.1887/0.3137/0.4782/0.6589/
     0.8028, within simulation error at every point). -/
@@ -1108,7 +1118,7 @@ The fields record the named drivers that can change metrics:
 - proxy tagging via `proxyTaggingSource/Target`
 - novel target-only proxy tagging via `novelProxyTaggingTarget`
 - aggregate tag-to-causal structure via the derived
-  `sigmaTagCausalSourceAt/Target`
+  `sigmaTagCausal`
 - causal-vs-tag distinction via separate tag and causal dimensions plus the
   direct-vs-proxy decomposition
 - source and target LD among scored SNPs via `sigmaTagSource/Target`
@@ -1125,49 +1135,6 @@ The fields record the named drivers that can change metrics:
 
 No source `R²` summary appears here because it is not a sufficient biological
 state variable for transport. -/
-/-- Which population a quantity is evaluated in.
-
-Every cross-population quantity below is a function of this index rather than a pair of
-separately written definitions. That is not cosmetic: when the source and target forms are
-written twice, the fact that they are the *same* quantity is carried by their names, and
-nothing forces the two bodies to stay in step. Indexing makes the shared content one
-object and leaves only the genuine asymmetry — which lives in the `novel*` components —
-to be stated, and to be discharged, explicitly. -/
-inductive Pop where
-  | source
-  | target
-  deriving DecidableEq, Repr
-
-/-- A population-indexed value given by its two components. Model literals supply their
-fields with this, so a field that genuinely differs between populations still reads as one
-line rather than two. -/
-def Pop.pair {α : Sort*} (s t : α) : Pop → α
-  | Pop.source => s
-  | Pop.target => t
-
-@[simp] theorem Pop.pair_source {α : Sort*} (s t : α) : Pop.pair s t Pop.source = s := rfl
-
-@[simp] theorem Pop.pair_target {α : Sort*} (s t : α) : Pop.pair s t Pop.target = t := rfl
-
-/-- Replace the target component of a population-indexed value, keeping the source one.
-Witness models that perturb exactly one population are written with this. -/
-def Pop.withTarget {α : Sort*} (f : Pop → α) (t : α) : Pop → α := Pop.pair (f Pop.source) t
-
-/-- Replace the source component, keeping the target one. -/
-def Pop.withSource {α : Sort*} (f : Pop → α) (s : α) : Pop → α := Pop.pair s (f Pop.target)
-
-@[simp] theorem Pop.withTarget_source {α : Sort*} (f : Pop → α) (t : α) :
-    Pop.withTarget f t Pop.source = f Pop.source := rfl
-
-@[simp] theorem Pop.withTarget_target {α : Sort*} (f : Pop → α) (t : α) :
-    Pop.withTarget f t Pop.target = t := rfl
-
-@[simp] theorem Pop.withSource_source {α : Sort*} (f : Pop → α) (s : α) :
-    Pop.withSource f s Pop.source = s := rfl
-
-@[simp] theorem Pop.withSource_target {α : Sort*} (f : Pop → α) (s : α) :
-    Pop.withSource f s Pop.target = f Pop.target := rfl
-
 structure CrossPopulationMetricModel (p q : ℕ) where
   beta : Pop → Fin q → ℝ
   sigmaTag : Pop → Matrix (Fin p) (Fin p) ℝ
@@ -1185,9 +1152,9 @@ structure CrossPopulationMetricModel (p q : ℕ) where
   targetPrevalence : ℝ
   /-- **The source is the reference population.** "Novel" means novel *relative to the
   source*, so nothing is novel in the source itself. Previously this was not a hypothesis
-  at all: it was baked into the shape of `sigmaTagCausalSourceAt`, which simply omitted the
-  novel terms that `sigmaTagCausalSourceAt` included. Stated here, it can be discharged at
-  the use site, and a model that violates it cannot be built by accident. -/
+  at all: it was baked into the shape of two separate definitions, the source one simply
+  omitting the novel terms that its target twin included. Stated here, it can be
+  discharged at the use site, and a model that violates it cannot be built by accident. -/
   novelDirectCausal_source : novelDirectCausal Pop.source = 0
   novelProxyTagging_source : novelProxyTagging Pop.source = 0
   novelCausalEffect_source : novelCausalEffect Pop.source = 0
@@ -1209,7 +1176,7 @@ divergence.
 One definition now covers both populations. The source form is not a second definition
 but a consequence of `novelDirectCausal_source` and `novelProxyTagging_source`, recorded
 as `sigmaTagCausal_source` below. -/
-noncomputable def sigmaTagCausalSourceAt {p q : ℕ}
+noncomputable def sigmaTagCausal {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : Matrix (Fin p) (Fin q) ℝ :=
   (m.directCausal P + m.novelDirectCausal P) +
     (m.proxyTagging P + m.novelProxyTagging P)
@@ -1222,11 +1189,11 @@ noncomputable def totalEffect {p q : ℕ}
 
 /-- **In the source the novel terms drop out** — derived from the reference-population
 hypotheses rather than written into a separate definition. This is the equation that used
-to be the *body* of `sigmaTagCausalSourceAt`; making it a theorem is what stops the source
+to be the *body* of `sigmaTagCausal`; making it a theorem is what stops the source
 and target forms from drifting apart silently. -/
 @[simp] theorem sigmaTagCausal_source {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    sigmaTagCausalSourceAt m Pop.source = m.directCausal Pop.source + m.proxyTagging Pop.source := by
-  simp [sigmaTagCausalSourceAt, m.novelDirectCausal_source, m.novelProxyTagging_source]
+    sigmaTagCausal m Pop.source = m.directCausal Pop.source + m.proxyTagging Pop.source := by
+  simp [sigmaTagCausal, m.novelDirectCausal_source, m.novelProxyTagging_source]
 
 /-- Likewise the source effect vector is the standing one. -/
 @[simp] theorem totalEffect_source {p q : ℕ} (m : CrossPopulationMetricModel p q) :
@@ -1235,10 +1202,10 @@ and target forms from drifting apart silently. -/
 
 @[simp] theorem sigmaTagCausal_eq_direct_plus_novelDirect_plus_proxy_plus_novelProxy {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) :
-    sigmaTagCausalSourceAt m P =
+    sigmaTagCausal m P =
       m.directCausal P + m.novelDirectCausal P +
         m.proxyTagging P + m.novelProxyTagging P := by
-  simp [sigmaTagCausalSourceAt, add_assoc]
+  simp [sigmaTagCausal, add_assoc]
 
 @[simp] theorem totalEffect_eq_beta_plus_novel {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) :
@@ -1253,60 +1220,57 @@ noncomputable def targetLinearRisk {p : ℕ}
     (w : Fin p → ℝ) : ℝ :=
   noiseVar + dotProduct w (sigmaObsTarget.mulVec w) - 2 * dotProduct w crossTarget
 
-/-- Dense source covariance witness for non-degenerate ERM-transport tests. -/
-def sigmaObsSource : Matrix (Fin 2) (Fin 2) ℝ :=
-  !![1, 0.5; 0.5, 1]
+/-- Dense covariance witness in each population, for non-degenerate ERM-transport tests.
 
-/-- Dense target covariance witness for non-degenerate ERM-transport tests. -/
-def sigmaObsTarget : Matrix (Fin 2) (Fin 2) ℝ :=
-  !![1, 0.1; 0.1, 1]
+These names were previously six separate constants, three of which shadowed the parameter
+names of `sourceERMWeights` and `targetLinearRisk` directly above — the same identifier
+meaning a global witness in one declaration and a bound argument in the next. -/
+def witnessSigmaObs : Pop → Matrix (Fin 2) (Fin 2) ℝ :=
+  Pop.pair !![1, 0.5; 0.5, 1] !![1, 0.1; 0.1, 1]
 
-/-- Source cross-covariance vector paired with `sigmaObsSource`. -/
-def crossSource : Fin 2 → ℝ :=
-  ![0.8, 0.4]
+/-- Cross-covariance vector in each population, paired with `witnessSigmaObs`.
 
-/-- Target cross-covariance vector paired with `sigmaObsTarget`. -/
-def crossTarget : Fin 2 → ℝ :=
-  ![0.8, 0.4]
+The two components are deliberately equal: the witness holds the cross-covariance fixed so
+that the source/target ERM difference it exhibits is driven purely by the shift in LD, not
+by a change in the predictor/outcome relationship. Written as two constants that fact was
+a coincidence of two literals; written this way it is visible. -/
+def witnessCross : Pop → Fin 2 → ℝ :=
+  Pop.pair ![0.8, 0.4] ![0.8, 0.4]
 
-/-- Exact source OLS solution for the dense witness system. -/
-noncomputable def wSource_opt : Fin 2 → ℝ :=
-  ![0.8, 0.0]
-
-/-- Exact target OLS solution for the dense witness system. -/
-noncomputable def wTarget_opt : Fin 2 → ℝ :=
-  ![76 / 99, 32 / 99]
+/-- Exact OLS solution in each population for the dense witness system. -/
+noncomputable def witnessW_opt : Pop → Fin 2 → ℝ :=
+  Pop.pair ![0.8, 0.0] ![76 / 99, 32 / 99]
 
 /-- A concrete proof that ERM mismatch occurs under LD shift, without relying on
     the abstract `hConflict` hypothesis, using dense 2x2 witnesses. -/
 theorem source_target_erm_differ_dense_witness_proved :
-    sigmaObsSource.mulVec wSource_opt = crossSource ∧
-    sigmaObsTarget.mulVec wTarget_opt = crossTarget ∧
-    wSource_opt ≠ wTarget_opt := by
+    (witnessSigmaObs Pop.source).mulVec (witnessW_opt Pop.source) = (witnessCross Pop.source) ∧
+    (witnessSigmaObs Pop.target).mulVec (witnessW_opt Pop.target) = (witnessCross Pop.target) ∧
+    (witnessW_opt Pop.source) ≠ (witnessW_opt Pop.target) := by
   refine ⟨?_, ?_, ?_⟩
   · ext i
     fin_cases i
-    · simp [wSource_opt, sigmaObsSource, crossSource, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct]
+    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
       norm_num
-    · simp [wSource_opt, sigmaObsSource, crossSource, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct]
+    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
       norm_num
   · ext i
     fin_cases i
-    · simp [wTarget_opt, sigmaObsTarget, crossTarget, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct]
+    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
       norm_num
-    · simp [wTarget_opt, sigmaObsTarget, crossTarget, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct]
+    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
       norm_num
   · intro heq
-    have h : wSource_opt 0 = wTarget_opt 0 := congrFun heq 0
+    have h : (witnessW_opt Pop.source) 0 = (witnessW_opt Pop.target) 0 := congrFun heq 0
     revert h
-    simp [wSource_opt, wTarget_opt]
+    simp [witnessW_opt, witnessW_opt, Pop.pair]
     norm_num
 
 /-- **Predictor/outcome cross-covariance in a population**, from explicit biological and
 observational drivers. -/
 noncomputable def crossCovariance {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : Fin p → ℝ :=
-  (sigmaTagCausalSourceAt m P).mulVec (totalEffect m P) + m.contextCross P
+  (sigmaTagCausal m P).mulVec (totalEffect m P) + m.contextCross P
 
 /-- Source-learned linear weights from the full source state, including any
 context-dependent source cross-covariance term. -/
@@ -1332,7 +1296,7 @@ noncomputable def sourceWeightedTagScore {p q : ℕ}
 effect vector. -/
 noncomputable def taggingProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : Fin p → ℝ :=
-  (sigmaTagCausalSourceAt m P).mulVec (totalEffect m P)
+  (sigmaTagCausal m P).mulVec (totalEffect m P)
 
 /-- Locus-resolved target effect heterogeneity relative to the source effect
 vector. This is the closed-form biological object behind claims that
@@ -1359,7 +1323,7 @@ identical to source effects.
     Empirical status: UNTESTED. -/
 noncomputable def targetSourceEffectProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
-  (sigmaTagCausalSourceAt m Pop.target).mulVec (m.beta Pop.source)
+  (sigmaTagCausal m Pop.target).mulVec (m.beta Pop.source)
 
 /-- Incremental target-side projection induced purely by effect-size
 heterogeneity relative to the source effect vector.
@@ -1367,7 +1331,7 @@ heterogeneity relative to the source effect vector.
     Empirical status: UNTESTED. -/
 noncomputable def targetEffectHeterogeneityProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
-  (sigmaTagCausalSourceAt m Pop.target).mulVec (targetEffectHeterogeneity m)
+  (sigmaTagCausal m Pop.target).mulVec (targetEffectHeterogeneity m)
 
 /-- Projection induced purely by target-only novel causal effects through the
 target tagging surface.
@@ -1375,7 +1339,7 @@ target tagging surface.
     Empirical status: UNTESTED. -/
 noncomputable def targetNovelMutationEffectProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
-  (sigmaTagCausalSourceAt m Pop.target).mulVec (m.novelCausalEffect Pop.target)
+  (sigmaTagCausal m Pop.target).mulVec (m.novelCausalEffect Pop.target)
 
 /-- **Projection carried by directly observed causal variants**, in a population. -/
 noncomputable def directCausalProjection {p q : ℕ}
@@ -1396,7 +1360,7 @@ theorem taggingProjection_eq_direct_plus_proxy {p q : ℕ}
     taggingProjection m P = directCausalProjection m P + proxyTaggingProjection m P := by
   ext i
   simp [taggingProjection, directCausalProjection, proxyTaggingProjection,
-    sigmaTagCausalSourceAt, Matrix.add_mulVec, add_assoc, Pi.add_apply]
+    sigmaTagCausal, Matrix.add_mulVec, add_assoc, Pi.add_apply]
 
 /-- The target tagging projection splits into the projection of source effects
 through the target tagging surface plus a separate projection of the
@@ -1415,7 +1379,7 @@ target-only novel causal effects. -/
 theorem taggingProjection_target_eq_standing_plus_novelMutationEffect {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     taggingProjection m Pop.target =
-      (sigmaTagCausalSourceAt m Pop.target).mulVec (m.beta Pop.target) +
+      (sigmaTagCausal m Pop.target).mulVec (m.beta Pop.target) +
         targetNovelMutationEffectProjection m := by
   ext i
   simp [taggingProjection, targetNovelMutationEffectProjection,
@@ -1455,7 +1419,7 @@ and the target context term. -/
 theorem crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     crossCovariance m Pop.target =
-      (sigmaTagCausalSourceAt m Pop.target).mulVec (m.beta Pop.target) +
+      (sigmaTagCausal m Pop.target).mulVec (m.beta Pop.target) +
         targetNovelMutationEffectProjection m +
         (m.contextCross Pop.target) := by
   rw [crossCovariance_eq_taggingProjection_plus_context,
@@ -1595,7 +1559,7 @@ effects, target-only novel mutation effects, and the target context term. -/
 theorem targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     predictiveCovarianceFromSourceWeights m Pop.target =
-      sourceWeightedTagScore m ((sigmaTagCausalSourceAt m Pop.target).mulVec (m.beta Pop.target)) +
+      sourceWeightedTagScore m ((sigmaTagCausal m Pop.target).mulVec (m.beta Pop.target)) +
         sourceWeightedTagScore m (targetNovelMutationEffectProjection m) +
         sourceWeightedTagScore m (m.contextCross Pop.target) := by
   rw [targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov,
@@ -1607,7 +1571,7 @@ This is the squared target-effect distortion induced by the gap between the
 source and target tag-to-causal alignment matrices. -/
 noncomputable def brokenTaggingResidual {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
-  let delta := ((sigmaTagCausalSourceAt m Pop.source) - (sigmaTagCausalSourceAt m Pop.target)).mulVec (totalEffect m Pop.target)
+  let delta := ((sigmaTagCausal m Pop.source) - (sigmaTagCausal m Pop.target)).mulVec (totalEffect m Pop.target)
   dotProduct delta delta
 
 theorem brokenTaggingResidual_nonneg {p q : ℕ}

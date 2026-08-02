@@ -265,32 +265,29 @@ structure RGEModel where
   β_genetic : ℝ
   /-- Effect of environment on outcome -/
   β_env : ℝ
-  /-- Gene-environment correlation in source -/
-  rge_source : ℝ
-  /-- Gene-environment correlation in target -/
-  rge_target : ℝ
+  /-- Gene-environment correlation in each population -/
+  rge : Pop → ℝ
   β_genetic_ne : β_genetic ≠ 0
   β_env_ne : β_env ≠ 0
-  rge_diff : rge_source ≠ rge_target
+  rge_diff : rge Pop.source ≠ rge Pop.target
 
-/-- Total prediction in source population -/
-noncomputable def RGEModel.predSource (m : RGEModel) : ℝ :=
-  m.β_direct + m.β_genetic * m.rge_source * m.β_env
-
-/-- Total prediction in target population -/
-noncomputable def RGEModel.predTarget (m : RGEModel) : ℝ :=
-  m.β_direct + m.β_genetic * m.rge_target * m.β_env
+/-- **Total prediction in a population.** -/
+noncomputable def RGEModel.pred (m : RGEModel) (P : Pop) : ℝ :=
+  m.β_direct + m.β_genetic * m.rge P * m.β_env
 
 /-- If rGE differs across populations, total prediction changes
     even with identical direct genetic effects. -/
 theorem rge_changes_total_prediction (m : RGEModel) :
-    m.predSource ≠ m.predTarget := by
-  unfold RGEModel.predSource RGEModel.predTarget
+    m.pred Pop.source ≠ m.pred Pop.target := by
+  unfold RGEModel.pred
   intro h
-  have h_eq : m.β_genetic * m.rge_source * m.β_env = m.β_genetic * m.rge_target * m.β_env := by linarith
+  have h_eq :
+      m.β_genetic * m.rge Pop.source * m.β_env =
+        m.β_genetic * m.rge Pop.target * m.β_env := by linarith
   apply m.rge_diff
   have h_ne : m.β_genetic * m.β_env ≠ 0 := mul_ne_zero m.β_genetic_ne m.β_env_ne
-  have : m.rge_source * (m.β_genetic * m.β_env) = m.rge_target * (m.β_genetic * m.β_env) := by nlinarith
+  have : m.rge Pop.source * (m.β_genetic * m.β_env)
+      = m.rge Pop.target * (m.β_genetic * m.β_env) := by nlinarith
   exact mul_right_cancel₀ h_ne this
 
 /-- **rGE inflation model.**

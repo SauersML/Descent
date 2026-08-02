@@ -500,16 +500,25 @@ The proof is the third-moment detector of `symmetricCoding_third_moment_zero`: a
 symmetric coding has vanishing third moment, while `E[(x²)³]` is a sum of non-negative
 terms with a strictly positive one.
 
-So the sign-coupling channel, which at level one is live only away from `q = 1/2`
-(`standardizedGenotype_symmetric_iff`), is live at level two at every frequency. Symmetry
-fails one floor up, always.
+**Read the scope of this theorem carefully; an earlier draft of this file did not.** It is
+about the *uncentered* square `x²`, which is non-negative and therefore trivially never
+symmetric. It is **not** about the tower's floor-two coordinate, which is the *centered*
+square `u = (x² - 1)/σ₁`, and it does not settle the floor-two symmetry question.
 
-**This is the decisive fact, not a side note.** The tower rigidity theorem of §5i consumes
-exactly the odd part of the floor-two law, and this theorem says that part is nonzero for
-genotypes at every polymorphic frequency — including `q = 1/2`, where the level-one
-coordinate is symmetric and every moment list therefore reports nothing. The load in the
-rigidity argument is carried by data no moment list mentions, which is why four successive
-finite lists failed to settle the question. -/
+That question has the opposite answer at the balanced locus. At `q = 1/2` the standardized
+values are `-√2, 0, √2` with probabilities `1/4, 1/2, 1/4`, so `x²` is `2, 0, 2` and
+`σ₁² = E[x⁴] - 1 = 1`, giving `u = +1, -1, +1` — the Rademacher law, which is symmetric
+(`Calibrator.EpistaticChaos.centeredSquare_rademacher_at_half`). Away from `1/2` the
+floor-two odd part is nonzero and grows as the variant gets rarer
+(`centeredSquare_third_moment_zero_iff_balanced`).
+
+So the balanced locus is symmetric at *both* floors, a sharper degeneracy than either the
+level-one statement or a naive reading of this theorem suggests. The distinction between
+`x²` and `u` is exactly the trap recorded at
+`Calibrator.EpistaticChaos.uncentered_square_log_additive`: the uncentered square recycles
+level-one data and looks like a new floor. This theorem is a true statement about the
+uncentered object, and inferring the floor-two channel from it is the mistake the trap
+predicts. -/
 theorem standardizedSquare_never_symmetric (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ¬ ∃ coding : SymmetricCoding DiploidGenotype,

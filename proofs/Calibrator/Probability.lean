@@ -19,6 +19,53 @@ namespace Calibrator
 /-- Unit interval as a subtype, used for Bernoulli probabilities. -/
 abbrev UnitProb := Set.Icc (0 : ℝ) 1
 
+/-- **Which population a quantity is evaluated in.**
+
+Every cross-population quantity in this development is a function of this index rather
+than a pair of separately written definitions. That is not cosmetic: when the source and
+target forms are written twice, the fact that they are the *same* quantity is carried only
+by their names, and nothing forces the two bodies to stay in step. Indexing makes the
+shared content one object and leaves only the genuine asymmetries to be stated — and to be
+discharged — explicitly.
+
+It lives here, at the base of the import graph, because it is used by the transport, the
+calibration and the confounding modules alike, none of which should have to depend on each
+other to say which population they mean. -/
+inductive Pop where
+  | source
+  | target
+  deriving DecidableEq, Repr
+
+/-- A population-indexed value given by its two components. Model literals supply their
+fields with this, so a field that genuinely differs between populations still reads as one
+line rather than two. -/
+def Pop.pair {α : Sort*} (s t : α) : Pop → α
+  | Pop.source => s
+  | Pop.target => t
+
+@[simp] theorem Pop.pair_source {α : Sort*} (s t : α) : Pop.pair s t Pop.source = s := rfl
+
+@[simp] theorem Pop.pair_target {α : Sort*} (s t : α) : Pop.pair s t Pop.target = t := rfl
+
+/-- Replace the target component of a population-indexed value, keeping the source one.
+Witness models that perturb exactly one population are written with this. -/
+def Pop.withTarget {α : Sort*} (f : Pop → α) (t : α) : Pop → α := Pop.pair (f Pop.source) t
+
+/-- Replace the source component, keeping the target one. -/
+def Pop.withSource {α : Sort*} (f : Pop → α) (s : α) : Pop → α := Pop.pair s (f Pop.target)
+
+@[simp] theorem Pop.withTarget_source {α : Sort*} (f : Pop → α) (t : α) :
+    Pop.withTarget f t Pop.source = f Pop.source := rfl
+
+@[simp] theorem Pop.withTarget_target {α : Sort*} (f : Pop → α) (t : α) :
+    Pop.withTarget f t Pop.target = t := rfl
+
+@[simp] theorem Pop.withSource_source {α : Sort*} (f : Pop → α) (s : α) :
+    Pop.withSource f s Pop.source = s := rfl
+
+@[simp] theorem Pop.withSource_target {α : Sort*} (f : Pop → α) (s : α) :
+    Pop.withSource f s Pop.target = f Pop.target := rfl
+
 namespace InformationTheoryBridge
 
 /-- Bernoulli PMF on `Bool`, using mathlib's canonical construction. -/

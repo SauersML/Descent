@@ -202,12 +202,21 @@ theorem boundedLogDistortion_eq_iUnion :
   simp only [Set.mem_setOf_eq, Set.mem_iUnion]
   exact boundedLogDistortion_iff_nat p.1 p.2
 
-/-- The fiber relation is **countably certified** in the sense of
+/-- The fiber relation has the **union shape** of
 `Calibrator.ObservationalCeiling`: membership is witnessed by a single natural number,
-the distortion constant. This is the exact statement that all of the ambiguity is
-carried by the sigma-compact escape hatch. -/
-theorem boundedLogDistortion_isCountablyCertified :
-    IsCountablyCertified BoundedLogDistortion
+the distortion constant.
+
+This is deliberately *not* stated as `IsCountablyCertified`, which is the ceiling.
+`ObservationalCeiling.IsUnionOfCertificates` and `unionOfCertificates_vacuous` record
+why: every relation is the union of the one-element family containing itself, so the
+union shape alone refutes nothing. A ceiling additionally requires each certificate to
+lie in a base class `Base` that is a genuine restriction, and this module has no such
+class in scope — it imports no topology, so the σ-compact reading of `Base` is not
+available here. Supplying `fun _ => True` would satisfy the elaborator and establish
+nothing, which `ObservationalCeiling.countablyCertified_trivialBase` exists to make
+visible. What is proved here is the union shape, so that is what is claimed. -/
+theorem boundedLogDistortion_isUnionOfCertificates :
+    IsUnionOfCertificates BoundedLogDistortion
       (fun C : ℕ => fun t t' : ℕ → ℝ =>
         ∀ n : ℕ, |Real.log (t n) - Real.log (t' n)| ≤ (C : ℝ)) :=
   fun t t' => boundedLogDistortion_iff_nat t t'
@@ -218,14 +227,19 @@ their pullbacks. This is the abstract form of the argument that refutes the wild
 alternative: a reduction cannot raise a relation above the ceiling of its target.
 
 Kept as a named result because it is the load-bearing step of Corollary N; the general
-statement lives in `Calibrator.ObservationalCeiling.countablyCertified_of_reduction`. -/
+statement lives in `Calibrator.ObservationalCeiling.unionOfCertificates_of_reduction`.
+
+Note this transports the *union shape* only, and needs no countability of the index and
+no base class. The corresponding statement for the ceiling itself is
+`ObservationalCeiling.countablyCertified_of_reduction`, which additionally requires
+`[Countable ι]` and a proof that the base class pulls back along `f`. -/
 theorem reduction_preserves_countable_union
     {α β ι : Type*} (E : α → α → Prop) (F : β → β → Prop) (F' : ι → β → β → Prop)
     (f : α → β)
     (hred : ∀ x y, E x y ↔ F (f x) (f y))
     (hunion : ∀ u v, F u v ↔ ∃ C : ι, F' C u v) :
     ∀ x y, E x y ↔ ∃ C : ι, F' C (f x) (f y) :=
-  countablyCertified_of_reduction (E := E) (F := F) (cert := F') f hred hunion
+  unionOfCertificates_of_reduction f hred hunion
 
 /-!
 ## 4. The explicit reduction: unbounded ambiguity inside one observable
