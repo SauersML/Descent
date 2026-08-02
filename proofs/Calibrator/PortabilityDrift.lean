@@ -1915,9 +1915,16 @@ construction of transported Brier. -/
     unfold TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
       r2FromSourceWeights
     field_simp [h_eff_ne]
-    -- `ring` cannot finish here: it treats `x⁻¹` as an atom, so it has no way
-    -- to cancel `Y * Y⁻¹` without the nonzero hypothesis. Cancel explicitly.
-    exact mul_inv_cancel_right₀ h_eff_ne _
+    -- The residual variance is `Y - X`, so the denominator is `X + (Y - X)`.
+    -- `ring` alone cannot finish: after collapsing that to `Y` the goal is
+    -- `X * Y / Y = X`, and cancelling needs `Y ≠ 0`, which `ring` never
+    -- consults. Collapse with `ring`, then cancel explicitly.
+    have hden :
+        explainedSignalVarianceFromSourceWeights m Pop.target +
+            (effectiveOutcomeVariance m Pop.target -
+              explainedSignalVarianceFromSourceWeights m Pop.target)
+          = effectiveOutcomeVariance m Pop.target := by ring
+    rw [hden, mul_div_assoc, div_self h_eff_ne, mul_one]
   rw [hr2]
 
 /-- The target score variance is exactly the target quadratic form
