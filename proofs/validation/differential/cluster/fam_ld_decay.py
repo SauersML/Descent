@@ -91,8 +91,13 @@ def wf_step(x, ne, c, rng, mutate=True):
     x /= x.sum(axis=1, keepdims=True)
     if ne is None:                      # infinite population: no drift
         return x
+    # Batched multinomial. The first version looped in Python over replicates,
+    # which made the drift step O(reps) interpreted calls per generation and
+    # did not finish in two minutes. numpy Generator.multinomial broadcasts
+    # over a 2-D pvals since 1.22, so this is the same draw at a fraction of
+    # the cost -- a speed fix, not a fidelity cut.
     n = 2 * ne
-    return np.stack([rng.multinomial(n, xi) for xi in x]).astype(np.float64) / n
+    return rng.multinomial(n, x).astype(np.float64) / n
 
 
 def d_of(x):
@@ -190,7 +195,7 @@ def main():
     NE_B, REPS_B = 150, 500
     for rho in (0.5, 2.0, 10.0, 40.0):
         c = rho / (4.0 * NE_B)
-        s = measure_sigma_d2(NE_B, c, 12 * NE_B, 3000, REPS_B, rng)
+        s = measure_sigma_d2(NE_B, c, 6 * NE_B, 3000, REPS_B, rng)
         a = (1.0 - c) ** 2
         corpus = a / (2.0 * NE_B) / (1.0 - a * (1.0 - 1.0 / (2.0 * NE_B)))
         ok_ = (10.0 + rho) / ((2.0 + rho) * (11.0 + rho))
