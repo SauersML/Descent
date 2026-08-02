@@ -973,17 +973,22 @@ theorem rescaled_eq_irreducible_iff_optimal
     rescaled_energy_sub_irreducible_eq_sq B beta theta a hsymmetric hbeta
   constructor
   · intro hEq
-    rw [hEq, sub_self] at hfactor
+    have hzero : coefficientEnergy B beta *
+        (a - sharedCorrectionOptimum B beta theta) ^ 2 = 0 := by
+      rw [← hfactor, hEq, sub_self]
     have hsq : (a - sharedCorrectionOptimum B beta theta) ^ 2 = 0 := by
-      rcases mul_eq_zero.mp hfactor.symm with hzero | hzero
-      · exact absurd hzero (ne_of_gt hbeta)
-      · exact hzero
-    have := pow_eq_zero_iff (n := 2) (by norm_num) |>.mp hsq
+      rcases mul_eq_zero.mp hzero with hcase | hcase
+      · exact absurd hcase (ne_of_gt hbeta)
+      · exact hcase
+    have hdiff : a - sharedCorrectionOptimum B beta theta = 0 :=
+      sq_eq_zero_iff.mp hsq
     linarith
   · intro hEq
-    rw [hEq] at hfactor
-    rw [sub_self, mul_zero] at hfactor
-    linarith
+    have hzero : coefficientEnergy B beta *
+        (a - sharedCorrectionOptimum B beta theta) ^ 2 = 0 := by
+      rw [hEq, sub_self]
+      norm_num
+    linarith [hfactor, hzero]
 
 end RescalingAndRotation
 

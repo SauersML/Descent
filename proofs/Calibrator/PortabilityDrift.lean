@@ -669,7 +669,7 @@ theorem ClosedPopulationNoMutation.targetHet_eq_targetHetFromFst
     ClosedPopulationNoMutation.heterozygosityLoss targetHetFromFst
   ring
 
-/-- Target-population PGS variance derived from the additive model and Fst.
+/-! Target-population PGS variance derived from the additive model and Fst.
 Derivation:
   1. V_PGS_source = Σᵢ βᵢ² × 2p_source_i(1 - p_source_i) = V_A  (source variance)
   2. Under drift, E[2p_target(1-p_target)] = 2p_source(1-p_source) × (1 - Fst)
