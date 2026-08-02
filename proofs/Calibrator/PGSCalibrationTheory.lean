@@ -588,12 +588,12 @@ noncomputable def CrossPopulationMechanisticCalibrationModel.targetObservedMean
 /-- Literal source calibration slope on the explicit SNP-level transport state. -/
 noncomputable def CrossPopulationMechanisticCalibrationModel.sourceCalibrationSlope
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
-  sourceCalibrationSlopeFromSourceWeights m.metric
+  calibrationSlopeFromSourceWeights m.metric Pop.source
 
 /-- Literal target calibration slope on the explicit SNP-level transport state. -/
 noncomputable def CrossPopulationMechanisticCalibrationModel.targetCalibrationSlope
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) : ℝ :=
-  targetCalibrationSlopeFromSourceWeights m.metric
+  calibrationSlopeFromSourceWeights m.metric Pop.target
 
 /-- Algebraic bridge from the mechanistic calibration state into the generic
 shift-profile container. -/
@@ -654,12 +654,12 @@ noncomputable def CrossPopulationMechanisticCalibrationModel.targetIdentityCalib
 
 @[simp] theorem CrossPopulationMechanisticCalibrationModel.toShiftModel_sourceSlope
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
-    m.toShiftModel.sourceSlope = sourceCalibrationSlopeFromSourceWeights m.metric := by
+    m.toShiftModel.sourceSlope = calibrationSlopeFromSourceWeights m.metric Pop.source := by
   rfl
 
 @[simp] theorem CrossPopulationMechanisticCalibrationModel.toShiftModel_targetSlope
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
-    m.toShiftModel.targetSlope = targetCalibrationSlopeFromSourceWeights m.metric := by
+    m.toShiftModel.targetSlope = calibrationSlopeFromSourceWeights m.metric Pop.target := by
   rfl
 
 @[simp] theorem CrossPopulationMechanisticCalibrationModel.toShiftModel_targetObservedMean
@@ -695,8 +695,8 @@ theorem CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exac
             (m.sourceDeploymentIntercept +
               sourceWeightedTagScore m.metric m.sourceTagMean)
       , slope :=
-          sourcePredictiveCovarianceFromSourceWeights m.metric /
-            sourceScoreVarianceFromExplicitDrivers m.metric
+          predictiveCovarianceFromSourceWeights m.metric Pop.source /
+            scoreVarianceFromSourceWeights m.metric Pop.source
       , link := link } := by
   cases link <;> rfl
 
@@ -714,8 +714,8 @@ theorem CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exac
             (m.sourceDeploymentIntercept + m.deploymentInterceptShift +
               sourceWeightedTagScore m.metric m.targetTagMean)
       , slope :=
-          targetPredictiveCovarianceFromSourceWeights m.metric /
-            targetScoreVarianceFromSourceWeights m.metric
+          predictiveCovarianceFromSourceWeights m.metric Pop.target /
+            scoreVarianceFromSourceWeights m.metric Pop.target
       , link := link } := by
   cases link <;>
     simp [CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile,
@@ -764,7 +764,7 @@ theorem CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direc
       (sourceWeightedTagScore m.metric (directCausalProjection m.metric Pop.target) +
         sourceWeightedTagScore m.metric (proxyTaggingProjection m.metric Pop.target) +
         sourceWeightedTagScore m.metric (m.metric.contextCross Pop.target)) /
-          targetScoreVarianceFromSourceWeights m.metric := by
+          scoreVarianceFromSourceWeights m.metric Pop.target := by
   simp [CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile,
     CrossPopulationMechanisticCalibrationModel.toShiftModel,
     CrossPopulationCalibrationShiftModel.targetCalibrationProfile,
@@ -794,10 +794,10 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
     (cal : CrossPopulationCalibrationShiftModel)
     (h_target_mean_eq_prevalence :
       cal.targetObservedMean = metric.targetPrevalence)
-    (h_source_r2_unit : sourceR2FromSourceWeights metric ∈ Set.Ico 0 1)
-    (h_target_r2_unit : targetR2FromSourceWeights metric ∈ Set.Ico 0 1)
+    (h_source_r2_unit : r2FromSourceWeights metric Pop.source ∈ Set.Ico 0 1)
+    (h_target_r2_unit : r2FromSourceWeights metric Pop.target ∈ Set.Ico 0 1)
     (h_r2_drop :
-      targetR2FromSourceWeights metric < sourceR2FromSourceWeights metric)
+      r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
     (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
     (h_shift_nonzero :
       cal.observedMeanShift - cal.predictedMeanShift ≠ 0)
@@ -873,10 +873,10 @@ theorem cross_ancestry_exact_metric_profile
     (cal : CrossPopulationMechanisticCalibrationModel p q)
     (h_target_mean_eq_prevalence :
       cal.targetObservedMean = cal.metric.targetPrevalence)
-    (h_source_r2_unit : sourceR2FromSourceWeights cal.metric ∈ Set.Ico 0 1)
-    (h_target_r2_unit : targetR2FromSourceWeights cal.metric ∈ Set.Ico 0 1)
+    (h_source_r2_unit : r2FromSourceWeights cal.metric Pop.source ∈ Set.Ico 0 1)
+    (h_target_r2_unit : r2FromSourceWeights cal.metric Pop.target ∈ Set.Ico 0 1)
     (h_r2_drop :
-      targetR2FromSourceWeights cal.metric < sourceR2FromSourceWeights cal.metric)
+      r2FromSourceWeights cal.metric Pop.target < r2FromSourceWeights cal.metric Pop.source)
     (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
     (h_shift_nonzero :
       cal.observedMeanShift - (cal.scoreMeanShift + cal.deploymentInterceptShift) ≠ 0)
@@ -1080,7 +1080,7 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
   rw [targetCalibrationProfileAtGeneration]
   simp [CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law,
     CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt,
-    targetCalibrationSlopeAtGeneration, targetCalibrationSlopeFromSourceWeights]
+    targetCalibrationSlopeAtGeneration, calibrationSlopeFromSourceWeights]
 
 /-- Exact generation-indexed target CITL law on the explicit population-genetic
 state slice. -/
@@ -1149,10 +1149,10 @@ theorem cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
     (cal : CrossPopulationCalibrationShiftModel)
-    (h_source_r2_unit : sourceR2FromSourceWeights metric ∈ Set.Ico 0 1)
-    (h_target_r2_unit : targetR2FromSourceWeights metric ∈ Set.Ico 0 1)
+    (h_source_r2_unit : r2FromSourceWeights metric Pop.source ∈ Set.Ico 0 1)
+    (h_target_r2_unit : r2FromSourceWeights metric Pop.target ∈ Set.Ico 0 1)
     (h_r2_drop :
-      targetR2FromSourceWeights metric < sourceR2FromSourceWeights metric)
+      r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
     (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
     (h_shift_nonzero :
       cal.observedMeanShift - cal.predictedMeanShift ≠ 0)
@@ -1203,10 +1203,10 @@ theorem cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
     (cal : CrossPopulationCalibrationShiftModel)
-    (h_source_r2_unit : sourceR2FromSourceWeights metric ∈ Set.Ico 0 1)
-    (h_target_r2_unit : targetR2FromSourceWeights metric ∈ Set.Ico 0 1)
+    (h_source_r2_unit : r2FromSourceWeights metric Pop.source ∈ Set.Ico 0 1)
+    (h_target_r2_unit : r2FromSourceWeights metric Pop.target ∈ Set.Ico 0 1)
     (h_r2_drop :
-      targetR2FromSourceWeights metric < sourceR2FromSourceWeights metric)
+      r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
     (h_src_cal : (cal.sourceIdentityCalibrationProfile).citl = 0)
     (h_env : cal.environmentalObservedShift = 0)
     (h_genetic : cal.geneticObservedShift = 0)

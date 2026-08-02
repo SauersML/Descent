@@ -1482,53 +1482,53 @@ noncomputable def calibrationSlopeFromSourceWeights {p q : ℕ}
 to the source score/outcome cross-covariance vector. -/
 theorem sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    sourcePredictiveCovarianceFromSourceWeights m =
+    predictiveCovarianceFromSourceWeights m Pop.source =
       sourceWeightedTagScore m (crossCovariance m Pop.source) := by
-  simp [sourcePredictiveCovarianceFromSourceWeights, sourceWeightedTagScore]
+  simp [predictiveCovarianceFromSourceWeights, sourceWeightedTagScore]
 
 /-- The target predictive covariance is the transported score equation applied
 to the target score/outcome cross-covariance vector. This is the explicit
 source-weights-on-target-covariance equation that the biological model needs. -/
 theorem targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetPredictiveCovarianceFromSourceWeights m =
+    predictiveCovarianceFromSourceWeights m Pop.target =
       sourceWeightedTagScore m (crossCovariance m Pop.target) := by
-  simp [targetPredictiveCovarianceFromSourceWeights, sourceWeightedTagScore]
+  simp [predictiveCovarianceFromSourceWeights, sourceWeightedTagScore]
 
 /-- Exact source calibration-slope law from the source-learned score moments. -/
 theorem sourceCalibrationSlopeFromSourceWeights_exact_metric_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    sourceCalibrationSlopeFromSourceWeights m =
-      sourcePredictiveCovarianceFromSourceWeights m /
-        sourceScoreVarianceFromExplicitDrivers m := by
+    calibrationSlopeFromSourceWeights m Pop.source =
+      predictiveCovarianceFromSourceWeights m Pop.source /
+        scoreVarianceFromSourceWeights m Pop.source := by
   rfl
 
 /-- Exact transported calibration-slope law from the explicit SNP-level score
 equation and target LD/cross-covariance structure. -/
 theorem targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetCalibrationSlopeFromSourceWeights m =
-      targetPredictiveCovarianceFromSourceWeights m /
-        targetScoreVarianceFromSourceWeights m := by
+    calibrationSlopeFromSourceWeights m Pop.target =
+      predictiveCovarianceFromSourceWeights m Pop.target /
+        scoreVarianceFromSourceWeights m Pop.target := by
   rfl
 
 /-- Exact transported calibration-slope law written directly on the
 source-weights-on-target-covariance equation. -/
 theorem targetCalibrationSlopeFromSourceWeights_exact_snp_transport_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetCalibrationSlopeFromSourceWeights m =
+    calibrationSlopeFromSourceWeights m Pop.target =
       sourceWeightedTagScore m (crossCovariance m Pop.target) /
         sourceWeightedTagScore m
           ((m.sigmaTag Pop.target).mulVec (sourceWeightsFromExplicitDrivers m)) := by
-  simp [targetCalibrationSlopeFromSourceWeights, targetPredictiveCovarianceFromSourceWeights,
-    targetScoreVarianceFromSourceWeights, sourceWeightedTagScore]
+  simp [calibrationSlopeFromSourceWeights, predictiveCovarianceFromSourceWeights,
+    scoreVarianceFromSourceWeights, sourceWeightedTagScore]
 
 /-- The source predictive covariance decomposes into direct-causal,
 proxy-tagging, and context contributions under the transported score
 functional. -/
 theorem sourcePredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    sourcePredictiveCovarianceFromSourceWeights m =
+    predictiveCovarianceFromSourceWeights m Pop.source =
       sourceWeightedTagScore m (directCausalProjection m Pop.source) +
         sourceWeightedTagScore m (proxyTaggingProjection m Pop.source) +
         sourceWeightedTagScore m (m.contextCross Pop.source) := by
@@ -1541,7 +1541,7 @@ proxy-tagging, and context contributions under the transported score
 functional. -/
 theorem targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetPredictiveCovarianceFromSourceWeights m =
+    predictiveCovarianceFromSourceWeights m Pop.target =
       sourceWeightedTagScore m (directCausalProjection m Pop.target) +
         sourceWeightedTagScore m (proxyTaggingProjection m Pop.target) +
         sourceWeightedTagScore m (m.contextCross Pop.target) := by
@@ -1553,11 +1553,11 @@ theorem targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_co
 covariance expanded into direct-causal, proxy-tagging, and context channels. -/
 theorem targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetCalibrationSlopeFromSourceWeights m =
+    calibrationSlopeFromSourceWeights m Pop.target =
       (sourceWeightedTagScore m (directCausalProjection m Pop.target) +
         sourceWeightedTagScore m (proxyTaggingProjection m Pop.target) +
         sourceWeightedTagScore m (m.contextCross Pop.target)) /
-          targetScoreVarianceFromSourceWeights m := by
+          scoreVarianceFromSourceWeights m Pop.target := by
   rw [targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores]
 
@@ -1566,7 +1566,7 @@ stable effect projection, the projection of effect-size heterogeneity, and the
 target context term. -/
 theorem targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetPredictiveCovarianceFromSourceWeights m =
+    predictiveCovarianceFromSourceWeights m Pop.target =
       sourceWeightedTagScore m (targetSourceEffectProjection m) +
         sourceWeightedTagScore m (targetEffectHeterogeneityProjection m) +
         sourceWeightedTagScore m (m.contextCross Pop.target) := by
@@ -1578,11 +1578,11 @@ theorem targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effect
 made explicit. -/
 theorem targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetCalibrationSlopeFromSourceWeights m =
+    calibrationSlopeFromSourceWeights m Pop.target =
       (sourceWeightedTagScore m (targetSourceEffectProjection m) +
         sourceWeightedTagScore m (targetEffectHeterogeneityProjection m) +
         sourceWeightedTagScore m (m.contextCross Pop.target)) /
-          targetScoreVarianceFromSourceWeights m := by
+          scoreVarianceFromSourceWeights m Pop.target := by
   rw [targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores]
 
@@ -1590,7 +1590,7 @@ theorem targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law
 effects, target-only novel mutation effects, and the target context term. -/
 theorem targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetPredictiveCovarianceFromSourceWeights m =
+    predictiveCovarianceFromSourceWeights m Pop.target =
       sourceWeightedTagScore m ((sigmaTagCausal m Pop.target).mulVec (m.beta Pop.target)) +
         sourceWeightedTagScore m (targetNovelMutationEffectProjection m) +
         sourceWeightedTagScore m (m.contextCross Pop.target) := by
@@ -1741,8 +1741,8 @@ noncomputable def effectiveOutcomeVariance {p q : ℕ}
 variance because the additive residual burden is nonnegative. -/
 theorem effectiveTargetOutcomeVariance_ge_targetOutcomeVariance {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    (m.outcomeVariance Pop.target) ≤ effectiveTargetOutcomeVariance m := by
-  unfold effectiveTargetOutcomeVariance
+    (m.outcomeVariance Pop.target) ≤ effectiveOutcomeVariance m Pop.target := by
+  unfold effectiveOutcomeVariance
   linarith [irreducibleTargetResidualBurden_nonneg m]
 
 /-- The effective target outcome variance stays strictly positive because the
@@ -1750,21 +1750,21 @@ base target outcome variance is positive and the additive residual burden is
 nonnegative. -/
 theorem effectiveTargetOutcomeVariance_pos {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    0 < effectiveTargetOutcomeVariance m := by
-  unfold effectiveTargetOutcomeVariance
+    0 < effectiveOutcomeVariance m Pop.target := by
+  unfold effectiveOutcomeVariance
   linarith [(m.outcomeVariance_pos Pop.target), irreducibleTargetResidualBurden_nonneg m]
 
 /-- Exact decomposition of the effective target outcome variance into the base
 target scale plus the three named additive residual-loss terms. -/
 theorem effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    effectiveTargetOutcomeVariance m =
+    effectiveOutcomeVariance m Pop.target =
       (m.outcomeVariance Pop.target) +
         brokenTaggingResidual m +
         ancestrySpecificLDResidual m +
         sourceSpecificOverfitResidual m +
         novelUntaggablePhenotypeResidual m := by
-  simp [effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden, add_assoc]
+  simp [effectiveOutcomeVariance, irreducibleTargetResidualBurden, add_assoc]
 
 /-- Exact source `R²` under the full source-side driver state. -/
 noncomputable def explainedSignalVarianceFromSourceWeights {p q : ℕ}
@@ -1785,10 +1785,10 @@ noncomputable def residualVarianceFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
   effectiveOutcomeVariance m P - explainedSignalVarianceFromSourceWeights m P
 
-@[simp] theorem sourceResidualVarianceFromSourceWeights_eq_outcome_minus_signal {p q : ℕ}
+@[simp] theorem residualVarianceFromSourceWeights_eq_effective_minus_signal {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    sourceResidualVarianceFromSourceWeights m =
-      (m.outcomeVariance Pop.source) - sourceExplainedSignalVarianceFromSourceWeights m := by
+    residualVarianceFromSourceWeights m Pop.source =
+      (m.outcomeVariance Pop.source) - explainedSignalVarianceFromSourceWeights m Pop.source := by
   rfl
 
 /-- Closed-form source calibrated Brier coordinate from the full explicit
@@ -1802,8 +1802,8 @@ noncomputable def sourceCalibratedBrierFromSourceWeightsAtPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) : ℝ :=
   TransportedMetrics.calibratedBrierFromVariances
     π
-    (sourceExplainedSignalVarianceFromSourceWeights m)
-    (sourceResidualVarianceFromSourceWeights m)
+    (explainedSignalVarianceFromSourceWeights m Pop.source)
+    (residualVarianceFromSourceWeights m Pop.source)
 
 /-- The mechanistic source calibrated Brier coordinate is built directly from
 source explained signal variance and source residual variance. -/
@@ -1812,8 +1812,8 @@ theorem sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_va
     sourceCalibratedBrierFromSourceWeightsAtPrevalence m π =
       TransportedMetrics.calibratedBrierFromVariances
         π
-        (sourceExplainedSignalVarianceFromSourceWeights m)
-        (sourceResidualVarianceFromSourceWeights m) := by
+        (explainedSignalVarianceFromSourceWeights m Pop.source)
+        (residualVarianceFromSourceWeights m Pop.source) := by
   rfl
 
 /-- The direct mechanistic source calibrated Brier coordinate agrees with the
@@ -1823,18 +1823,18 @@ construction of source Brier. -/
 @[simp] theorem sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart
     {p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) :
     sourceCalibratedBrierFromSourceWeightsAtPrevalence m π =
-      TransportedMetrics.calibratedBrier π (sourceR2FromSourceWeights m) := by
+      TransportedMetrics.calibratedBrier π (r2FromSourceWeights m Pop.source) := by
   rw [sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances]
   rw [TransportedMetrics.calibratedBrierFromVariances_eq_chart]
   have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 := by
     exact ne_of_gt (m.outcomeVariance_pos Pop.source)
   have hr2 :
       TransportedMetrics.r2FromSignalVariance
-          (sourceExplainedSignalVarianceFromSourceWeights m)
-          (sourceResidualVarianceFromSourceWeights m) =
-        sourceR2FromSourceWeights m := by
-    unfold TransportedMetrics.r2FromSignalVariance sourceResidualVarianceFromSourceWeights
-      sourceR2FromSourceWeights
+          (explainedSignalVarianceFromSourceWeights m Pop.source)
+          (residualVarianceFromSourceWeights m Pop.source) =
+        r2FromSourceWeights m Pop.source := by
+    unfold TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
+      r2FromSourceWeights
     field_simp [h_source_ne]
     ring
   rw [hr2]
@@ -1872,8 +1872,8 @@ noncomputable def targetCalibratedBrierFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   TransportedMetrics.calibratedBrierFromVariances
     m.targetPrevalence
-    (targetExplainedSignalVarianceFromSourceWeights m)
-    (targetResidualVarianceFromSourceWeights m)
+    (explainedSignalVarianceFromSourceWeights m Pop.target)
+    (residualVarianceFromSourceWeights m Pop.target)
 
 /-- The mechanistic target calibrated Brier coordinate is built directly from
 target explained signal variance and target residual variance. -/
@@ -1882,8 +1882,8 @@ theorem targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances {p q
     targetCalibratedBrierFromSourceWeights m =
       TransportedMetrics.calibratedBrierFromVariances
         m.targetPrevalence
-        (targetExplainedSignalVarianceFromSourceWeights m)
-        (targetResidualVarianceFromSourceWeights m) := by
+        (explainedSignalVarianceFromSourceWeights m Pop.target)
+        (residualVarianceFromSourceWeights m Pop.target) := by
   rfl
 
 /-- Exact mechanistic target Brier portability law from transported score
@@ -1894,14 +1894,14 @@ theorem targetCalibratedBrierFromSourceWeights_exact_metric_portability_law
     targetCalibratedBrierFromSourceWeights m =
       TransportedMetrics.calibratedBrierFromVariances
         m.targetPrevalence
-        ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-          targetScoreVarianceFromSourceWeights m)
-        (effectiveTargetOutcomeVariance m -
-          (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-            targetScoreVarianceFromSourceWeights m) := by
+        ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+          scoreVarianceFromSourceWeights m Pop.target)
+        (effectiveOutcomeVariance m Pop.target -
+          (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+            scoreVarianceFromSourceWeights m Pop.target) := by
   rw [targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances]
-  simp [targetExplainedSignalVarianceFromSourceWeights,
-    targetResidualVarianceFromSourceWeights]
+  simp [explainedSignalVarianceFromSourceWeights,
+    residualVarianceFromSourceWeights]
 
 /-- Exact mechanistic target Brier portability law with the additive biological
 loss budget made explicit in the residual term. -/
@@ -1910,15 +1910,15 @@ theorem targetCalibratedBrierFromSourceWeights_exact_loss_budget_law
     targetCalibratedBrierFromSourceWeights m =
       TransportedMetrics.calibratedBrierFromVariances
         m.targetPrevalence
-        ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-          targetScoreVarianceFromSourceWeights m)
+        ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+          scoreVarianceFromSourceWeights m Pop.target)
         ((m.outcomeVariance Pop.target) +
           brokenTaggingResidual m +
           ancestrySpecificLDResidual m +
           sourceSpecificOverfitResidual m +
           novelUntaggablePhenotypeResidual m -
-          (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-            targetScoreVarianceFromSourceWeights m) := by
+          (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+            scoreVarianceFromSourceWeights m Pop.target) := by
   rw [targetCalibratedBrierFromSourceWeights_exact_metric_portability_law,
     effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses]
 
@@ -1930,18 +1930,18 @@ construction of transported Brier. -/
     (m : CrossPopulationMetricModel p q) :
     targetCalibratedBrierFromSourceWeights m =
       TransportedMetrics.calibratedBrier
-        m.targetPrevalence (targetR2FromSourceWeights m) := by
+        m.targetPrevalence (r2FromSourceWeights m Pop.target) := by
   rw [targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances]
   rw [TransportedMetrics.calibratedBrierFromVariances_eq_chart]
-  have h_eff_ne : effectiveTargetOutcomeVariance m ≠ 0 := by
+  have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 := by
     exact ne_of_gt (effectiveTargetOutcomeVariance_pos m)
   have hr2 :
       TransportedMetrics.r2FromSignalVariance
-          (targetExplainedSignalVarianceFromSourceWeights m)
-          (targetResidualVarianceFromSourceWeights m) =
-        targetR2FromSourceWeights m := by
-    unfold TransportedMetrics.r2FromSignalVariance targetResidualVarianceFromSourceWeights
-      targetR2FromSourceWeights
+          (explainedSignalVarianceFromSourceWeights m Pop.target)
+          (residualVarianceFromSourceWeights m Pop.target) =
+        r2FromSourceWeights m Pop.target := by
+    unfold TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
+      r2FromSourceWeights
     field_simp [h_eff_ne]
     ring
   rw [hr2]
@@ -1950,52 +1950,52 @@ construction of transported Brier. -/
 `w_Sᵀ Σ_T w_S`. -/
 theorem target_score_variance_from_source_weights_identity {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetScoreVarianceFromSourceWeights m =
+    scoreVarianceFromSourceWeights m Pop.target =
       dotProduct (sourceWeightsFromExplicitDrivers m)
         ((m.sigmaTag Pop.target).mulVec (sourceWeightsFromExplicitDrivers m)) := by
-  simp [targetScoreVarianceFromSourceWeights]
+  simp [scoreVarianceFromSourceWeights]
 
 /-- The target score variance is the transported score equation applied to the
 target LD operator acting on the transported source weights. -/
 theorem targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_action {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetScoreVarianceFromSourceWeights m =
+    scoreVarianceFromSourceWeights m Pop.target =
       sourceWeightedTagScore m
         ((m.sigmaTag Pop.target).mulVec (sourceWeightsFromExplicitDrivers m)) := by
-  simp [targetScoreVarianceFromSourceWeights, sourceWeightedTagScore]
+  simp [scoreVarianceFromSourceWeights, sourceWeightedTagScore]
 
 /-- The source score variance is the same score equation evaluated against the
 source LD operator. -/
-theorem sourceScoreVarianceFromExplicitDrivers_eq_score_on_source_covariance_action {p q : ℕ}
+theorem scoreVarianceFromSourceWeights_source_eq_score_on_covariance_action {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    sourceScoreVarianceFromExplicitDrivers m =
+    scoreVarianceFromSourceWeights m Pop.source =
       sourceWeightedTagScore m
         ((m.sigmaTag Pop.source).mulVec (sourceWeightsFromExplicitDrivers m)) := by
-  simp [sourceScoreVarianceFromExplicitDrivers, sourceWeightedTagScore]
+  simp [scoreVarianceFromSourceWeights, sourceWeightedTagScore]
 
 /-- The source `R²` is exactly the explained signal variance from the explicit
 score equation divided by the source outcome variance. -/
 theorem sourceR2FromSourceWeights_eq_signalVariance_ratio {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    sourceR2FromSourceWeights m =
-      sourceExplainedSignalVarianceFromSourceWeights m / (m.outcomeVariance Pop.source) := by
+    r2FromSourceWeights m Pop.source =
+      explainedSignalVarianceFromSourceWeights m Pop.source / (m.outcomeVariance Pop.source) := by
   rfl
 
 /-- Exact mechanistic source `R²` law from the source-learned score moments. -/
 theorem sourceR2FromSourceWeights_exact_metric_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    sourceR2FromSourceWeights m =
-      (sourcePredictiveCovarianceFromSourceWeights m) ^ 2 /
-        (sourceScoreVarianceFromExplicitDrivers m * (m.outcomeVariance Pop.source)) := by
-  unfold sourceR2FromSourceWeights sourceExplainedSignalVarianceFromSourceWeights
+    r2FromSourceWeights m Pop.source =
+      (predictiveCovarianceFromSourceWeights m Pop.source) ^ 2 /
+        (scoreVarianceFromSourceWeights m Pop.source * (m.outcomeVariance Pop.source)) := by
+  unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights Pop.source
   ring_nf
 
 /-- The target `R²` is exactly the explained signal variance from the explicit
 transported score equation divided by the effective target outcome variance. -/
 theorem targetR2FromSourceWeights_eq_signalVariance_ratio {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetR2FromSourceWeights m =
-      targetExplainedSignalVarianceFromSourceWeights m / effectiveTargetOutcomeVariance m := by
+    r2FromSourceWeights m Pop.target =
+      explainedSignalVarianceFromSourceWeights m Pop.target / effectiveOutcomeVariance m Pop.target := by
   rfl
 
 /-- Exact mechanistic target `R²` portability law from transported score
@@ -2004,15 +2004,15 @@ moments.
 This is the exact `R²` law on the explicit SNP-level transport model:
 
 `R²_target = Cov(score_sourceWeights,target)^2 /
-             (Var(score_sourceWeights,target) * effectiveTargetOutcomeVariance)`.
+             (Var(score_sourceWeights,target) * effectiveOutcomeVariance)`.
 
 No source-`R²` inversion or scalar transport factor appears. -/
 theorem targetR2FromSourceWeights_exact_metric_portability_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetR2FromSourceWeights m =
-      (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-        (targetScoreVarianceFromSourceWeights m * effectiveTargetOutcomeVariance m) := by
-  unfold targetR2FromSourceWeights targetExplainedSignalVarianceFromSourceWeights
+    r2FromSourceWeights m Pop.target =
+      (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+        (scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target) := by
+  unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights Pop.target
   ring_nf
 
 /-- Exact mechanistic source/target `R²` portability ratio law. The ratio is
@@ -2020,11 +2020,11 @@ determined by transported score/outcome covariance, source/target score
 variance, and source/target outcome scales, not by any source-`R²` summary. -/
 theorem exactR2PortabilityRatio_mechanistic_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetR2FromSourceWeights m / sourceR2FromSourceWeights m =
-      ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 *
-          sourceScoreVarianceFromExplicitDrivers m * (m.outcomeVariance Pop.source)) /
-        ((sourcePredictiveCovarianceFromSourceWeights m) ^ 2 *
-          targetScoreVarianceFromSourceWeights m * effectiveTargetOutcomeVariance m) := by
+    r2FromSourceWeights m Pop.target / r2FromSourceWeights m Pop.source =
+      ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 *
+          scoreVarianceFromSourceWeights m Pop.source * (m.outcomeVariance Pop.source)) /
+        ((predictiveCovarianceFromSourceWeights m Pop.source) ^ 2 *
+          scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target) := by
   rw [targetR2FromSourceWeights_exact_metric_portability_law,
     sourceR2FromSourceWeights_exact_metric_law]
   simp [pow_two, div_eq_mul_inv, mul_assoc, mul_left_comm, mul_comm, inv_inv]
@@ -2033,11 +2033,11 @@ theorem exactR2PortabilityRatio_mechanistic_law {p q : ℕ}
 source-weight score equation and the target covariance operator. -/
 theorem targetR2FromSourceWeights_exact_snp_transport_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetR2FromSourceWeights m =
+    r2FromSourceWeights m Pop.target =
       (sourceWeightedTagScore m (crossCovariance m Pop.target)) ^ 2 /
         (sourceWeightedTagScore m
             ((m.sigmaTag Pop.target).mulVec (sourceWeightsFromExplicitDrivers m)) *
-          effectiveTargetOutcomeVariance m) := by
+          effectiveOutcomeVariance m Pop.target) := by
   rw [targetR2FromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov,
     targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_action]
@@ -2048,9 +2048,9 @@ source-specific overfit, and target-only untaggable phenotype variance enter
 only through the target effective outcome scale. -/
 theorem targetR2FromSourceWeights_exact_loss_budget_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetR2FromSourceWeights m =
-      (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-        (targetScoreVarianceFromSourceWeights m *
+    r2FromSourceWeights m Pop.target =
+      (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+        (scoreVarianceFromSourceWeights m Pop.target *
           ((m.outcomeVariance Pop.target) +
             brokenTaggingResidual m +
             ancestrySpecificLDResidual m +
@@ -2063,11 +2063,11 @@ theorem targetR2FromSourceWeights_exact_loss_budget_law {p q : ℕ}
 into direct-causal, proxy-tagging, and context channels. -/
 theorem targetR2FromSourceWeights_exact_direct_proxy_context_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetR2FromSourceWeights m =
+    r2FromSourceWeights m Pop.target =
       ((sourceWeightedTagScore m (directCausalProjection m Pop.target) +
           sourceWeightedTagScore m (proxyTaggingProjection m Pop.target) +
           sourceWeightedTagScore m (m.contextCross Pop.target)) ^ 2) /
-        (targetScoreVarianceFromSourceWeights m * effectiveTargetOutcomeVariance m) := by
+        (scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target) := by
   rw [targetR2FromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_direct_plus_proxy_plus_context_scores]
 
@@ -2077,11 +2077,11 @@ and target context channel contribute additively to the transported
 score/outcome covariance before squaring. -/
 theorem targetR2FromSourceWeights_exact_effect_heterogeneity_law {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetR2FromSourceWeights m =
+    r2FromSourceWeights m Pop.target =
       ((sourceWeightedTagScore m (targetSourceEffectProjection m) +
           sourceWeightedTagScore m (targetEffectHeterogeneityProjection m) +
           sourceWeightedTagScore m (m.contextCross Pop.target)) ^ 2) /
-        (targetScoreVarianceFromSourceWeights m * effectiveTargetOutcomeVariance m) := by
+        (scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target) := by
   rw [targetR2FromSourceWeights_exact_metric_portability_law,
     targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores]
 
@@ -2633,7 +2633,7 @@ noncomputable def CrossPopulationGenerationalModel.toMetricModelAt {p q : ℕ}
 mechanistic state. -/
 noncomputable def targetR2AtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  targetR2FromSourceWeights (m.toMetricModelAt t)
+  r2FromSourceWeights (m.toMetricModelAt t)
 
 /-- Exact target calibrated Brier coordinate after `t` generations. -/
 noncomputable def targetCalibratedBrierAtGeneration {p q : ℕ}
@@ -2745,7 +2745,7 @@ theorem targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeteroge
 
 @[simp] theorem targetR2AtGeneration_eq_targetR2From_slice {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    targetR2AtGeneration m t = targetR2FromSourceWeights (m.toMetricModelAt t) := by
+    targetR2AtGeneration m t = r2FromSourceWeights (m.toMetricModelAt t) := by
   rfl
 
 @[simp] theorem targetCalibratedBrierAtGeneration_eq_slice {p q : ℕ}
@@ -3338,10 +3338,10 @@ noncomputable def equalVarianceGaussianAUCFromSourceWeights {p q : ℕ}
 applied to source explained signal and source residual variance. -/
 theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    sourceEqualVarianceGaussianAUCFromSourceWeights m =
+    equalVarianceGaussianAUCFromSourceWeights m Pop.source =
       equalVarianceGaussianAUCFromVariances
-        (sourceExplainedSignalVarianceFromSourceWeights m)
-        (sourceResidualVarianceFromSourceWeights m) := by
+        (explainedSignalVarianceFromSourceWeights m Pop.source)
+        (residualVarianceFromSourceWeights m Pop.source) := by
   rfl
 
 /-- The direct mechanistic source AUC agrees with the `R²` chart induced by the
@@ -3351,13 +3351,13 @@ This is only a derived coordinate identity; it is not the defining
 construction of source AUC. -/
 theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    sourceEqualVarianceGaussianAUCFromSourceWeights m =
-      equalVarianceGaussianAUCFromExplainedR2 (sourceR2FromSourceWeights m) := by
+    equalVarianceGaussianAUCFromSourceWeights m Pop.source =
+      equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.source) := by
   have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 := by
     exact ne_of_gt (m.outcomeVariance_pos Pop.source)
-  unfold sourceEqualVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromVariances
-    sourceResidualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
-    sourceR2FromSourceWeights
+  unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromVariances Pop.source
+    residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2 Pop.source
+    r2FromSourceWeights
   congr 1
   congr 1
   field_simp [h_source_ne]
@@ -3382,10 +3382,10 @@ theorem equalVarianceGaussianAUCFromSourceWeights_target {p q : ℕ}
 applied to target explained signal and target residual variance. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetEqualVarianceGaussianAUCFromSourceWeights m =
+    equalVarianceGaussianAUCFromSourceWeights m Pop.target =
       equalVarianceGaussianAUCFromVariances
-        (targetExplainedSignalVarianceFromSourceWeights m)
-        (targetResidualVarianceFromSourceWeights m) := by
+        (explainedSignalVarianceFromSourceWeights m Pop.target)
+        (residualVarianceFromSourceWeights m Pop.target) := by
   rfl
 
 /-- Exact mechanistic target liability-AUC portability law from transported
@@ -3393,32 +3393,32 @@ score moments. This is the direct liability-threshold variance law on the
 explicit SNP-level transport model. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetEqualVarianceGaussianAUCFromSourceWeights m =
+    equalVarianceGaussianAUCFromSourceWeights m Pop.target =
       equalVarianceGaussianAUCFromVariances
-        ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-          targetScoreVarianceFromSourceWeights m)
-        (effectiveTargetOutcomeVariance m -
-          (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-            targetScoreVarianceFromSourceWeights m) := by
+        ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+          scoreVarianceFromSourceWeights m Pop.target)
+        (effectiveOutcomeVariance m Pop.target -
+          (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+            scoreVarianceFromSourceWeights m Pop.target) := by
   rw [targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances]
-  simp [targetExplainedSignalVarianceFromSourceWeights,
-    targetResidualVarianceFromSourceWeights]
+  simp [explainedSignalVarianceFromSourceWeights,
+    residualVarianceFromSourceWeights]
 
 /-- Exact mechanistic target liability-AUC portability law with the additive
 biological loss budget made explicit in the residual term. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetEqualVarianceGaussianAUCFromSourceWeights m =
+    equalVarianceGaussianAUCFromSourceWeights m Pop.target =
       equalVarianceGaussianAUCFromVariances
-        ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-          targetScoreVarianceFromSourceWeights m)
+        ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+          scoreVarianceFromSourceWeights m Pop.target)
         ((m.outcomeVariance Pop.target) +
           brokenTaggingResidual m +
           ancestrySpecificLDResidual m +
           sourceSpecificOverfitResidual m +
           novelUntaggablePhenotypeResidual m -
-          (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-            targetScoreVarianceFromSourceWeights m) := by
+          (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+            scoreVarianceFromSourceWeights m Pop.target) := by
   rw [targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law,
     effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses]
 
@@ -3429,13 +3429,13 @@ This is only a derived coordinate identity; it is not the defining
 construction of target AUC. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    targetEqualVarianceGaussianAUCFromSourceWeights m =
-      equalVarianceGaussianAUCFromExplainedR2 (targetR2FromSourceWeights m) := by
-  have h_eff_ne : effectiveTargetOutcomeVariance m ≠ 0 := by
+    equalVarianceGaussianAUCFromSourceWeights m Pop.target =
+      equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) := by
+  have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 := by
     exact ne_of_gt (effectiveTargetOutcomeVariance_pos m)
-  unfold targetEqualVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromVariances
-    targetResidualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
-    targetR2FromSourceWeights
+  unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromVariances Pop.target
+    residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2 Pop.target
+    r2FromSourceWeights
   congr 1
   congr 1
   field_simp [h_eff_ne]
@@ -3449,20 +3449,20 @@ prevalence scale.
     Empirical status: UNTESTED. -/
 noncomputable def sourceMetricProfileFromSourceWeightsAtPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) : TransportedMetrics.Profile where
-  r2 := sourceR2FromSourceWeights m
-  auc := sourceEqualVarianceGaussianAUCFromSourceWeights m
+  r2 := r2FromSourceWeights m Pop.source
+  auc := equalVarianceGaussianAUCFromSourceWeights m Pop.source
   brier := sourceCalibratedBrierFromSourceWeightsAtPrevalence m π
 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtPrevalence_r2 {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) :
     (sourceMetricProfileFromSourceWeightsAtPrevalence m π).r2 =
-      sourceR2FromSourceWeights m := by
+      r2FromSourceWeights m Pop.source := by
   rfl
 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtPrevalence_auc {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) :
     (sourceMetricProfileFromSourceWeightsAtPrevalence m π).auc =
-      sourceEqualVarianceGaussianAUCFromSourceWeights m := by
+      equalVarianceGaussianAUCFromSourceWeights m Pop.source := by
   rfl
 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtPrevalence_brier {p q : ℕ}
@@ -3482,13 +3482,13 @@ noncomputable def sourceMetricProfileFromSourceWeightsAtTargetPrevalence {p q : 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtTargetPrevalence_r2 {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).r2 =
-      sourceR2FromSourceWeights m := by
+      r2FromSourceWeights m Pop.source := by
   rfl
 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).auc =
-      sourceEqualVarianceGaussianAUCFromSourceWeights m := by
+      equalVarianceGaussianAUCFromSourceWeights m Pop.source := by
   rfl
 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtTargetPrevalence_brier {p q : ℕ}
@@ -3504,18 +3504,18 @@ explicit target signal/residual moment pair rather than from a source-side
 transport surrogate. -/
 noncomputable def targetMetricProfileFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile where
-  r2 := targetR2FromSourceWeights m
-  auc := targetEqualVarianceGaussianAUCFromSourceWeights m
+  r2 := r2FromSourceWeights m Pop.target
+  auc := equalVarianceGaussianAUCFromSourceWeights m Pop.target
   brier := targetCalibratedBrierFromSourceWeights m
 
 @[simp] theorem targetMetricProfileFromSourceWeights_r2 {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    (targetMetricProfileFromSourceWeights m).r2 = targetR2FromSourceWeights m := by
+    (targetMetricProfileFromSourceWeights m).r2 = r2FromSourceWeights m Pop.target := by
   rfl
 
 @[simp] theorem targetMetricProfileFromSourceWeights_auc {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    (targetMetricProfileFromSourceWeights m).auc = targetEqualVarianceGaussianAUCFromSourceWeights m := by
+    (targetMetricProfileFromSourceWeights m).auc = equalVarianceGaussianAUCFromSourceWeights m Pop.target := by
   rfl
 
 @[simp] theorem targetMetricProfileFromSourceWeights_brier {p q : ℕ}
@@ -3539,23 +3539,23 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     targetMetricProfileFromSourceWeights m =
       { r2 :=
-          (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-            (targetScoreVarianceFromSourceWeights m * effectiveTargetOutcomeVariance m)
+          (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+            (scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target)
       , auc :=
           equalVarianceGaussianAUCFromVariances
-            ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-              targetScoreVarianceFromSourceWeights m)
-            (effectiveTargetOutcomeVariance m -
-              (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-                targetScoreVarianceFromSourceWeights m)
+            ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+              scoreVarianceFromSourceWeights m Pop.target)
+            (effectiveOutcomeVariance m Pop.target -
+              (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+                scoreVarianceFromSourceWeights m Pop.target)
       , brier :=
           TransportedMetrics.calibratedBrierFromVariances
             m.targetPrevalence
-            ((targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-              targetScoreVarianceFromSourceWeights m)
-            (effectiveTargetOutcomeVariance m -
-              (targetPredictiveCovarianceFromSourceWeights m) ^ 2 /
-                targetScoreVarianceFromSourceWeights m) } := by
+            ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+              scoreVarianceFromSourceWeights m Pop.target)
+            (effectiveOutcomeVariance m Pop.target -
+              (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
+                scoreVarianceFromSourceWeights m Pop.target) } := by
   ext
   · rw [targetMetricProfileFromSourceWeights_r2,
       targetR2FromSourceWeights_exact_metric_portability_law]
@@ -3570,7 +3570,7 @@ time-varying mechanistic state.
     Empirical status: UNTESTED. -/
 noncomputable def targetGaussianAUCAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  targetEqualVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t)
+  equalVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t)
 
 /-- Canonical mechanistic deployed metric profile after `t` generations. -/
 noncomputable def targetMetricProfileAtGeneration {p q : ℕ}
@@ -3587,20 +3587,20 @@ noncomputable def targetMetricProfileAtGeneration {p q : ℕ}
 @[simp] theorem targetGaussianAUCAtGeneration_eq_slice {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     targetGaussianAUCAtGeneration m t =
-      targetEqualVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t) := by
+      equalVarianceGaussianAUCFromSourceWeights (m.toMetricModelAt t) := by
   rfl
 
 /-- Exact transported predictive covariance after `t` generations under the
 full time-varying mechanistic state. -/
 noncomputable def targetPredictiveCovarianceAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  targetPredictiveCovarianceFromSourceWeights (m.toMetricModelAt t)
+  predictiveCovarianceFromSourceWeights (m.toMetricModelAt t)
 
 /-- Exact transported score variance after `t` generations under the target LD
 matrix and the transported source weights. -/
 noncomputable def targetScoreVarianceAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  targetScoreVarianceFromSourceWeights (m.toMetricModelAt t)
+  scoreVarianceFromSourceWeights (m.toMetricModelAt t)
 
 /-- Effective target outcome variance after `t` generations, including the full
 additive biological loss budget induced by the time-varying state.
@@ -3608,48 +3608,48 @@ additive biological loss budget induced by the time-varying state.
     Empirical status: UNTESTED. -/
 noncomputable def effectiveTargetOutcomeVarianceAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  effectiveTargetOutcomeVariance (m.toMetricModelAt t)
+  effectiveOutcomeVariance (m.toMetricModelAt t)
 
 /-- Exact target residual variance after `t` generations under the mechanistic
 transported-score law. -/
 noncomputable def targetResidualVarianceAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  targetResidualVarianceFromSourceWeights (m.toMetricModelAt t)
+  residualVarianceFromSourceWeights (m.toMetricModelAt t)
 
 /-- Exact target calibration slope after `t` generations under the mechanistic
 transported-score law. -/
 noncomputable def targetCalibrationSlopeAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : ℝ :=
-  targetCalibrationSlopeFromSourceWeights (m.toMetricModelAt t)
+  calibrationSlopeFromSourceWeights (m.toMetricModelAt t)
 
 @[simp] theorem targetPredictiveCovarianceAtGeneration_eq_slice {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     targetPredictiveCovarianceAtGeneration m t =
-      targetPredictiveCovarianceFromSourceWeights (m.toMetricModelAt t) := by
+      predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) := by
   rfl
 
 @[simp] theorem targetScoreVarianceAtGeneration_eq_slice {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     targetScoreVarianceAtGeneration m t =
-      targetScoreVarianceFromSourceWeights (m.toMetricModelAt t) := by
+      scoreVarianceFromSourceWeights (m.toMetricModelAt t) := by
   rfl
 
 @[simp] theorem effectiveTargetOutcomeVarianceAtGeneration_eq_slice {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     effectiveTargetOutcomeVarianceAtGeneration m t =
-      effectiveTargetOutcomeVariance (m.toMetricModelAt t) := by
+      effectiveOutcomeVariance (m.toMetricModelAt t) := by
   rfl
 
 @[simp] theorem targetResidualVarianceAtGeneration_eq_slice {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     targetResidualVarianceAtGeneration m t =
-      targetResidualVarianceFromSourceWeights (m.toMetricModelAt t) := by
+      residualVarianceFromSourceWeights (m.toMetricModelAt t) := by
   rfl
 
 @[simp] theorem targetCalibrationSlopeAtGeneration_eq_slice {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     targetCalibrationSlopeAtGeneration m t =
-      targetCalibrationSlopeFromSourceWeights (m.toMetricModelAt t) := by
+      calibrationSlopeFromSourceWeights (m.toMetricModelAt t) := by
   rfl
 
 /-- Exact generation-indexed predictive-covariance law on the direct-causal,
@@ -3715,7 +3715,7 @@ state. -/
 noncomputable def sourceNormalizedTargetR2AtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (sourceBaseline : ℝ) (t : ℕ) : ℝ :=
   sourceBaseline *
-    (targetR2AtGeneration m t / sourceR2FromSourceWeights (m.toMetricModelAt t))
+    (targetR2AtGeneration m t / r2FromSourceWeights (m.toMetricModelAt t))
 
 /-- Exact mechanistic law for display-normalized target `R²` at generation `t`.
 
@@ -3727,9 +3727,9 @@ theorem sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portabilit
     sourceNormalizedTargetR2AtGeneration m sourceBaseline t =
       sourceBaseline *
         (((targetPredictiveCovarianceAtGeneration m t) ^ 2 *
-            sourceScoreVarianceFromExplicitDrivers (m.toMetricModelAt t) *
+            scoreVarianceFromSourceWeights (m.toMetricModelAt t) *
             (m.toMetricModelAt t).sourceOutcomeVariance) /
-          ((sourcePredictiveCovarianceFromSourceWeights (m.toMetricModelAt t)) ^ 2 *
+          ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t)) ^ 2 *
             targetScoreVarianceAtGeneration m t *
             effectiveTargetOutcomeVarianceAtGeneration m t)) := by
   unfold sourceNormalizedTargetR2AtGeneration

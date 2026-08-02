@@ -464,9 +464,9 @@ theorem neutralAF_benchmark_discrimination_preserved_calibration_lost
       evaluated on the same target prevalence scale. -/
 theorem mechanistic_transport_disrupts_calibration_slope_and_brier
     {p q : ℕ} (cal : CrossPopulationMechanisticCalibrationModel p q)
-    (h_target_slope_lt : targetCalibrationSlopeFromSourceWeights cal.metric < 1)
+    (h_target_slope_lt : calibrationSlopeFromSourceWeights cal.metric Pop.target < 1)
     (h_r2_drop :
-      targetR2FromSourceWeights cal.metric < sourceR2FromSourceWeights cal.metric) :
+      r2FromSourceWeights cal.metric Pop.target < r2FromSourceWeights cal.metric Pop.source) :
     let profile := cal.targetIdentityCalibrationProfile
     profile.slope < 1 ∧
     calibrationSlopeDeviation 1 < profile.slopeDeviation ∧
@@ -475,7 +475,7 @@ theorem mechanistic_transport_disrupts_calibration_slope_and_brier
       (sourceWeightedTagScore cal.metric (directCausalProjection cal.metric Pop.target) +
         sourceWeightedTagScore cal.metric (proxyTaggingProjection cal.metric Pop.target) +
         sourceWeightedTagScore cal.metric (cal.metric.contextCross Pop.target)) /
-          targetScoreVarianceFromSourceWeights cal.metric ∧
+          scoreVarianceFromSourceWeights cal.metric Pop.target ∧
     sourceCalibratedBrierFromSourceWeightsAtPrevalence
         cal.metric cal.metric.targetPrevalence <
       targetCalibratedBrierFromSourceWeights cal.metric := by
@@ -503,7 +503,7 @@ theorem mechanistic_transport_disrupts_calibration_slope_and_brier
         (sourceWeightedTagScore cal.metric (directCausalProjection cal.metric Pop.target) +
           sourceWeightedTagScore cal.metric (proxyTaggingProjection cal.metric Pop.target) +
           sourceWeightedTagScore cal.metric (cal.metric.contextCross Pop.target)) /
-            targetScoreVarianceFromSourceWeights cal.metric := by
+            scoreVarianceFromSourceWeights cal.metric Pop.target := by
     simpa [CrossPopulationMechanisticCalibrationModel.targetIdentityCalibrationProfile,
       CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile] using
       CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direct_proxy_context_law
@@ -666,7 +666,7 @@ theorem brierDiscriminationLoss_eq
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     brierDiscriminationLoss m =
       m.targetPrevalence * (1 - m.targetPrevalence) *
-        (sourceR2FromSourceWeights m - targetR2FromSourceWeights m) := by
+        (r2FromSourceWeights m Pop.source - r2FromSourceWeights m Pop.target) := by
   unfold brierDiscriminationLoss
   rw [targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart,
     sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart]
@@ -681,7 +681,7 @@ theorem brierCalibrationLoss_eq
     brierCalibrationLoss πSource m =
       (m.targetPrevalence * (1 - m.targetPrevalence) -
           πSource * (1 - πSource)) *
-        (1 - sourceR2FromSourceWeights m) := by
+        (1 - r2FromSourceWeights m Pop.source) := by
   unfold brierCalibrationLoss
   rw [sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart,
     sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart]
@@ -703,19 +703,19 @@ theorem observableBrier_change_decomposition
 contribution positive on the target prevalence scale. -/
 theorem brierDiscriminationLoss_pos_of_mechanistic_r2_drop
     {p q : ℕ} (m : CrossPopulationMetricModel p q)
-    (h_r2_drop : targetR2FromSourceWeights m < sourceR2FromSourceWeights m) :
+    (h_r2_drop : r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source) :
     0 < brierDiscriminationLoss m := by
   unfold brierDiscriminationLoss
   exact sub_pos.mpr <|
     brierFromR2_strictAnti m.targetPrevalence
       m.targetPrevalence_pos m.targetPrevalence_lt_one
-      (by simpa [targetR2FromSourceWeights, sourceR2FromSourceWeights] using h_r2_drop)
+      (by simpa [r2FromSourceWeights, r2FromSourceWeights] using h_r2_drop)
 
 /-- If the Bernoulli variance factor increases from source to target on the
 same mechanistic source score, the outcome-scale contribution is positive. -/
 theorem brierCalibrationLoss_pos_of_prevalence_factor_increase
     {p q : ℕ} (πSource : ℝ) (m : CrossPopulationMetricModel p q)
-    (h_source_r2_unit : sourceR2FromSourceWeights m ∈ Set.Ico 0 1)
+    (h_source_r2_unit : r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1)
     (h_prev_factor :
       πSource * (1 - πSource) <
         m.targetPrevalence * (1 - m.targetPrevalence)) :
@@ -725,7 +725,7 @@ theorem brierCalibrationLoss_pos_of_prevalence_factor_increase
       0 < m.targetPrevalence * (1 - m.targetPrevalence) -
         πSource * (1 - πSource) := by
     linarith
-  have h_one_minus_source_r2 : 0 < 1 - sourceR2FromSourceWeights m := by
+  have h_one_minus_source_r2 : 0 < 1 - r2FromSourceWeights m Pop.source := by
     linarith [h_source_r2_unit.2]
   exact mul_pos h_prev_gap h_one_minus_source_r2
 
@@ -744,17 +744,17 @@ If the outcome-scale term is larger than the mechanistic signal-loss term,
 then it contributes more than half of the total Brier worsening. -/
 theorem brier_increase_mainly_calibration
     {p q : ℕ} (πSource : ℝ) (m : CrossPopulationMetricModel p q)
-    (h_source_r2_unit : sourceR2FromSourceWeights m ∈ Set.Ico 0 1)
-    (h_r2_drop : targetR2FromSourceWeights m < sourceR2FromSourceWeights m)
+    (h_source_r2_unit : r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1)
+    (h_r2_drop : r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source)
     (h_prev_factor :
       πSource * (1 - πSource) <
         m.targetPrevalence * (1 - m.targetPrevalence))
     (h_scale_dom :
       m.targetPrevalence * (1 - m.targetPrevalence) *
-          (sourceR2FromSourceWeights m - targetR2FromSourceWeights m) <
+          (r2FromSourceWeights m Pop.source - r2FromSourceWeights m Pop.target) <
         (m.targetPrevalence * (1 - m.targetPrevalence) -
             πSource * (1 - πSource)) *
-          (1 - sourceR2FromSourceWeights m)) :
+          (1 - r2FromSourceWeights m Pop.source)) :
     targetCalibratedBrierFromSourceWeights m -
       sourceCalibratedBrierFromSourceWeightsAtPrevalence m πSource =
         brierDiscriminationLoss m +
@@ -975,9 +975,9 @@ deterioration across discrimination- and calibration-sensitive metrics from the
 same mechanistic target state. -/
 theorem metrics_both_degrade_under_drift
     {p q : ℕ} (m : CrossPopulationMetricModel p q)
-    (h_source_r2_unit : sourceR2FromSourceWeights m ∈ Set.Ico 0 1)
-    (h_target_r2_unit : targetR2FromSourceWeights m ∈ Set.Ico 0 1)
-    (h_r2_drop : targetR2FromSourceWeights m < sourceR2FromSourceWeights m)
+    (h_source_r2_unit : r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1)
+    (h_target_r2_unit : r2FromSourceWeights m Pop.target ∈ Set.Ico 0 1)
+    (h_r2_drop : r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source)
     (hPhiStrict : StrictMono Phi) :
     let sourceMetrics := sourceMetricProfileFromSourceWeightsAtTargetPrevalence m
     let targetMetrics := targetMetricProfileFromSourceWeights m
@@ -1065,17 +1065,17 @@ If the latter dominates, it contributes more than half of the total Brier
 worsening. -/
 theorem brier_proper_score_portability_decomposition
     {p q : ℕ} (πSource : ℝ) (m : CrossPopulationMetricModel p q)
-    (h_source_r2_unit : sourceR2FromSourceWeights m ∈ Set.Ico 0 1)
-    (h_r2_drop : targetR2FromSourceWeights m < sourceR2FromSourceWeights m)
+    (h_source_r2_unit : r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1)
+    (h_r2_drop : r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source)
     (h_prev_factor :
       πSource * (1 - πSource) <
         m.targetPrevalence * (1 - m.targetPrevalence))
     (h_scale_dom :
       m.targetPrevalence * (1 - m.targetPrevalence) *
-          (sourceR2FromSourceWeights m - targetR2FromSourceWeights m) <
+          (r2FromSourceWeights m Pop.source - r2FromSourceWeights m Pop.target) <
         (m.targetPrevalence * (1 - m.targetPrevalence) -
             πSource * (1 - πSource)) *
-          (1 - sourceR2FromSourceWeights m)) :
+          (1 - r2FromSourceWeights m Pop.source)) :
     targetCalibratedBrierFromSourceWeights m -
       sourceCalibratedBrierFromSourceWeightsAtPrevalence m πSource =
         brierDiscriminationLoss m +

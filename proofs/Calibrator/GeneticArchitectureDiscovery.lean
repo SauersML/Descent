@@ -739,43 +739,43 @@ noncomputable def commonAndRarePortableModel : CrossPopulationMetricModel 2 2 wh
   outcomeVariance_pos := by intro P; cases P <;> norm_num
 
 theorem commonOnlyPortableModel_sourceR2 :
-    sourceR2FromSourceWeights commonOnlyPortableModel = 1 / 4 := by
-  norm_num [commonOnlyPortableModel, sourceR2FromSourceWeights,
-    sourceExplainedSignalVarianceFromSourceWeights,
-    sourcePredictiveCovarianceFromSourceWeights,
-    sourceScoreVarianceFromExplicitDrivers,
+    r2FromSourceWeights commonOnlyPortableModel Pop.source = 1 / 4 := by
+  norm_num [commonOnlyPortableModel, r2FromSourceWeights,
+    explainedSignalVarianceFromSourceWeights,
+    predictiveCovarianceFromSourceWeights,
+    scoreVarianceFromSourceWeights,
     sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
     sigmaTagCausal, dotProduct, totalEffect, Matrix.mulVec]
 
 theorem commonOnlyPortableModel_targetR2 :
-    targetR2FromSourceWeights commonOnlyPortableModel = 1 / 4 := by
-  norm_num [commonOnlyPortableModel, targetR2FromSourceWeights,
-    targetExplainedSignalVarianceFromSourceWeights,
-    targetPredictiveCovarianceFromSourceWeights,
-    targetScoreVarianceFromSourceWeights,
+    r2FromSourceWeights commonOnlyPortableModel Pop.target = 1 / 4 := by
+  norm_num [commonOnlyPortableModel, r2FromSourceWeights,
+    explainedSignalVarianceFromSourceWeights,
+    predictiveCovarianceFromSourceWeights,
+    scoreVarianceFromSourceWeights,
     sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
-    effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden,
+    effectiveOutcomeVariance, irreducibleTargetResidualBurden,
     brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
     novelUntaggablePhenotypeResidual, sigmaTagCausal, sigmaTagCausal,
     crossCovariance, dotProduct, totalEffect, Matrix.mulVec]
 
 theorem commonAndRarePortableModel_sourceR2 :
-    sourceR2FromSourceWeights commonAndRarePortableModel = 1 / 2 := by
-  norm_num [commonAndRarePortableModel, sourceR2FromSourceWeights,
-    sourceExplainedSignalVarianceFromSourceWeights,
-    sourcePredictiveCovarianceFromSourceWeights,
-    sourceScoreVarianceFromExplicitDrivers,
+    r2FromSourceWeights commonAndRarePortableModel Pop.source = 1 / 2 := by
+  norm_num [commonAndRarePortableModel, r2FromSourceWeights,
+    explainedSignalVarianceFromSourceWeights,
+    predictiveCovarianceFromSourceWeights,
+    scoreVarianceFromSourceWeights,
     sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
     sigmaTagCausal, dotProduct, totalEffect, Matrix.mulVec]
 
 theorem commonAndRarePortableModel_targetR2 :
-    targetR2FromSourceWeights commonAndRarePortableModel = 1 / 8 := by
-  norm_num [commonAndRarePortableModel, targetR2FromSourceWeights,
-    targetExplainedSignalVarianceFromSourceWeights,
-    targetPredictiveCovarianceFromSourceWeights,
-    targetScoreVarianceFromSourceWeights,
+    r2FromSourceWeights commonAndRarePortableModel Pop.target = 1 / 8 := by
+  norm_num [commonAndRarePortableModel, r2FromSourceWeights,
+    explainedSignalVarianceFromSourceWeights,
+    predictiveCovarianceFromSourceWeights,
+    scoreVarianceFromSourceWeights,
     sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
-    effectiveTargetOutcomeVariance, irreducibleTargetResidualBurden,
+    effectiveOutcomeVariance, irreducibleTargetResidualBurden,
     brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
     novelUntaggablePhenotypeResidual, sigmaTagCausal, sigmaTagCausal,
     crossCovariance, dotProduct, totalEffect, Matrix.mulVec]
@@ -827,10 +827,10 @@ theorem rare_variant_pgs_poor_portability :
     the idea that rare variation helps local prediction without improving
     cross-population transport. -/
 theorem combined_strategy_optimal :
-    sourceR2FromSourceWeights commonOnlyPortableModel <
-      sourceR2FromSourceWeights commonAndRarePortableModel ∧
-    targetR2FromSourceWeights commonAndRarePortableModel <
-      targetR2FromSourceWeights commonOnlyPortableModel := by
+    r2FromSourceWeights commonOnlyPortableModel Pop.source <
+      r2FromSourceWeights commonAndRarePortableModel Pop.source ∧
+    r2FromSourceWeights commonAndRarePortableModel Pop.target <
+      r2FromSourceWeights commonOnlyPortableModel Pop.target := by
   rw [commonOnlyPortableModel_sourceR2, commonAndRarePortableModel_sourceR2,
     commonAndRarePortableModel_targetR2, commonOnlyPortableModel_targetR2]
   norm_num

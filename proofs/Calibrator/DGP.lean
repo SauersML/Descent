@@ -1925,7 +1925,7 @@ state-space model of transport. The mechanistic transport objects live
 downstream in
 `PortabilityDrift.CrossPopulationMetricModel`,
 `PortabilityDrift.sourceWeightedTagScore`,
-`PortabilityDrift.targetR2FromSourceWeights`, and
+`PortabilityDrift.r2FromSourceWeights`, and
 `TransferLearningPGS.transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD`.
 -/
 
@@ -2064,7 +2064,7 @@ live in:
 - `PortabilityDrift.sourceWeightedTagScore`, which is the explicit SNP-level
   score equation applying source-learned weights to any source or target
   tag-genotype state;
-- `PortabilityDrift.targetR2FromSourceWeights`, where transported source weights
+- `PortabilityDrift.r2FromSourceWeights`, where transported source weights
   are evaluated against that full explicit state through the target LD and
   target tag-to-causal covariance operators; and
 - `PortabilityDrift.targetMetricProfileFromSourceWeights`, where the deployed
