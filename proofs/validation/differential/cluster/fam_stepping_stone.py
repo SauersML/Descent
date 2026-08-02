@@ -15,13 +15,25 @@ script `heavy/h1_stepping_stone_length.py` was budgeted for.
 THE MODEL, ONCE, FOR BOTH ENGINES
 
   A circle of D demes, each of diploid size Ne. Per generation a lineage
-  migrates with probability m; a migrant moves +k or -k demes with probability
-  1/2 each. So the per-generation dispersal variance is
+  migrates with probability m; a migrant moves +/-1 with probability (1-w)/2
+  each and +/-k with probability w/2 each. So the per-generation dispersal
+  variance is
 
-      V  =  m * k^2   =   m * sigma^2 ,      sigma^2 = k^2 .
+      V  =  m * sigma^2 ,      sigma^2  =  (1 - w) + w * k^2 .
 
-  k is what lets sigma^2 be varied AT FIXED m, and m at fixed sigma^2. That is
-  the whole point. `demoSteppingStoneFst`'s own docstring records that its
+  w is what lets sigma^2 be varied AT FIXED m, and m at fixed sigma^2. That is
+  the whole point.
+
+  THE +/-1 COMPONENT IS LOAD-BEARING, not decoration. The first version of
+  this file used a pure +/-k kernel, which is WRONG for k > 1: a step of +/-k
+  preserves the deme index modulo gcd(k, D), so the circle silently splits
+  into k non-communicating sublattices. The two-lineage walk started at an odd
+  distance then never reaches 0 -- the run reported a meeting time of 1.4e17
+  at d = 1 and an F_ST of exactly 1 -- and the spatial autocovariance
+  alternates between a real value and zero, which biased the fitted decay
+  length about 20% high at k = 2 and 3. Keeping w < 1 restores irreducibility
+  and aperiodicity while leaving sigma^2 free, and control F2 measures sigma^2
+  back from the kernel rather than trusting the formula. `demoSteppingStoneFst`'s own docstring records that its
   evidence came from a FREELY FITTED sigma^2, that such a fit constrains only
   the product m*sigma^2, and that "distinguishing the two forms empirically
   requires holding sigma^2 fixed at an independently measured dispersal
@@ -117,7 +129,9 @@ SEVEN CONTROLS, EACH ISOLATING ONE FACTOR, NONE FITTED
     E1  COALESCENCE ALONE.  D = 1: no migration is possible, E[T] = 2*Ne
         exactly (a geometric waiting time), with no random-walk content.
     E2  RANDOM WALK ALONE.  2*Ne = 1, so lineages coalesce the instant they
-        meet and T(d) IS the hitting time of distance 0. The expectation is
+        meet and T(d) IS the hitting time of distance 0. Run on the MIXED
+        kernel (k = 3, w = 0.375), so it exercises the kernel the grid uses
+        rather than a simpler one. The expectation is
         obtained EXACTLY by solving the D-state linear system for the actual
         step distribution -- linear algebra, not a fit, and no population
         genetics in it. (The textbook d*(D-d)/V_rel is reported alongside; it
@@ -152,8 +166,11 @@ CAN-FAIL CLAUSES
       scale is matched at d = 1. Only the far half of the lattice separates
       them, so a short-distance grid would validate all four.
 
-  sigma^2:  the (m, k) grid contains two cells with the SAME m*sigma^2 = 0.1
-      and m differing by 4x. `demoSteppingStoneFst` sees the pair only through
+  sigma^2:  the (m, w) grid contains two cells with the SAME m*sigma^2 = 0.1
+      and m differing by 4x. sigma^2 is NEVER fitted here -- it is set by
+      (k, w) and measured back by F2 -- which matters because a freely fitted
+      sigma^2 absorbs the extra power of the quadratic form exactly and makes
+      the comparison unable to fail at all. `demoSteppingStoneFst` sees the pair only through
       m*sigma^2 and must give the same F_ST in both; `steppingStoneFstQuadratic`
       sees sigma^4*m^2 and must not. sigma^2 is set, not fitted, so the
       degeneracy the corpus records is broken here.
@@ -172,15 +189,41 @@ SEED = 20260802
 # ENGINE 1 -- Wright-Fisher frequency lattice
 # ===========================================================================
 
-def migrate(p, m, k):
-    """Circular +/-k migration along the deme axis of a (reps, D) array."""
+def sigma_sq_of(k, w):
+    """Dispersal variance PER MIGRATION EVENT of the mixed kernel."""
+    return (1.0 - w) * 1.0 + w * float(k) ** 2
+
+
+def migrate(p, m, k, w):
+    """Circular migration along the deme axis of a (reps, D) array.
+
+    A migrant moves +/-1 with probability (1-w)/2 each and +/-k with
+    probability w/2 each, so sigma^2 = (1-w) + w k^2 is tunable at fixed m
+    WITHOUT disconnecting the lattice.
+
+    A pure +/-k kernel is what the first version used, and it is WRONG for
+    k > 1: steps of +/-k preserve the residue of the deme index modulo
+    gcd(k, D), so the circle splits into k non-communicating sublattices, the
+    two-lineage walk started at an odd distance never reaches 0, and the
+    spatial autocovariance alternates between a real value and zero. It
+    produced an infinite meeting time at d = 1 and a decay length biased ~20%
+    high. Keeping the +/-1 component with weight 1-w > 0 makes the walk
+    aperiodic and irreducible again while leaving sigma^2 free.
+    """
     if m == 0.0:
         return p
-    return (1.0 - m) * p + 0.5 * m * (np.roll(p, k, axis=1) + np.roll(p, -k, axis=1))
+    out = (1.0 - m) * p
+    if w < 1.0:
+        out = out + 0.5 * m * (1.0 - w) * (np.roll(p, 1, axis=1)
+                                           + np.roll(p, -1, axis=1))
+    if w > 0.0:
+        out = out + 0.5 * m * w * (np.roll(p, k, axis=1)
+                                   + np.roll(p, -k, axis=1))
+    return out
 
 
-def wf_lattice_step(p, ne, m, k, mu, rng):
-    p = migrate(p, m, k)
+def wf_lattice_step(p, ne, m, k, w, mu, rng):
+    p = migrate(p, m, k, w)
     if mu:
         p = p * (1.0 - mu) + (1.0 - p) * mu
     if ne is None:
@@ -189,7 +232,7 @@ def wf_lattice_step(p, ne, m, k, mu, rng):
     return rng.binomial(n, np.clip(p, 0.0, 1.0)).astype(np.float64) / n
 
 
-def covariance_profile(ne, m, k, mu, D, reps, burn, samples, thin, rng):
+def covariance_profile(ne, m, k, w, mu, D, reps, burn, samples, thin, rng):
     """Circular spatial autocovariance C(d), d = 0..D//2, at equilibrium.
 
     Centred per replicate per time point, which removes the fluctuation of the
@@ -199,12 +242,12 @@ def covariance_profile(ne, m, k, mu, D, reps, burn, samples, thin, rng):
     """
     p = np.full((reps, D), 0.5)
     for _ in range(burn):
-        p = wf_lattice_step(p, ne, m, k, mu, rng)
+        p = wf_lattice_step(p, ne, m, k, w, mu, rng)
     half = D // 2
     acc = np.zeros(half + 1)
     cnt = 0
     for i in range(samples):
-        p = wf_lattice_step(p, ne, m, k, mu, rng)
+        p = wf_lattice_step(p, ne, m, k, w, mu, rng)
         if i % thin:
             continue
         x = p - p.mean(axis=1, keepdims=True)
@@ -247,7 +290,7 @@ def fit_cosh_length(c, D, dmin):
 # ENGINE 2 -- two-lineage coalescent on the circle
 # ===========================================================================
 
-def meeting_times(D, ne, m, k, reps, rng, max_gen):
+def meeting_times(D, ne, m, k, w, reps, rng, max_gen):
     """E[T(d)] for d = 0..D//2 under the backwards WF described in the header.
 
     Order within a generation: test coalescence, then migrate. That makes
@@ -277,10 +320,16 @@ def meeting_times(D, ne, m, k, reps, rng, max_gen):
                 n = dist.shape[0]
                 if n == 0:
                     break
-            s1 = rng.random(n)
-            s2 = rng.random(n)
-            step = np.where(s1 < m * 0.5, k, np.where(s1 < m, -k, 0))
-            step = step - np.where(s2 < m * 0.5, k, np.where(s2 < m, -k, 0))
+            def draw(u):
+                a = m * (1.0 - w) * 0.5
+                b = a + m * (1.0 - w) * 0.5
+                c = b + m * w * 0.5
+                d = c + m * w * 0.5
+                return np.where(u < a, 1,
+                       np.where(u < b, -1,
+                       np.where(u < c, k,
+                       np.where(u < d, -k, 0))))
+            step = draw(rng.random(n)) - draw(rng.random(n))
             dist = (dist + step) % D
             dist = np.minimum(dist, D - dist)
         if done < reps:
@@ -290,17 +339,23 @@ def meeting_times(D, ne, m, k, reps, rng, max_gen):
     return out, cens
 
 
-def _step_kernel(D, m, k):
+def _step_kernel(D, m, k, w):
     """Distribution of the change in circular distance in one generation."""
+    one = [(1, m * (1.0 - w) / 2.0), (-1, m * (1.0 - w) / 2.0),
+           (k, m * w / 2.0), (-k, m * w / 2.0), (0, 1.0 - m)]
     steps = {}
-    for a, pa in ((k, m / 2.0), (-k, m / 2.0), (0, 1.0 - m)):
-        for b, pb in ((k, m / 2.0), (-k, m / 2.0), (0, 1.0 - m)):
-            s = (a - b) % D
-            steps[s] = steps.get(s, 0.0) + pa * pb
+    for a, pa in one:
+        if pa == 0.0:
+            continue
+        for b, pb in one:
+            if pb == 0.0:
+                continue
+            sft = (a - b) % D
+            steps[sft] = steps.get(sft, 0.0) + pa * pb
     return steps
 
 
-def exact_meeting_times(D, ne, m, k):
+def exact_meeting_times(D, ne, m, k, w):
     """EXACT E[T(d)] for the model engine 2 simulates, by one linear solve.
 
     u(d) = 1 + (1 - c(d)) * sum_s P(step = s) * u((d + s) mod D),
@@ -313,7 +368,7 @@ def exact_meeting_times(D, ne, m, k):
     model. Passing ne = 0.5 gives instant coalescence on meeting, i.e. the pure
     hitting time used by control E2.
     """
-    steps = _step_kernel(D, m, k)
+    steps = _step_kernel(D, m, k, w)
     pcoal = 1.0 / (2.0 * ne)
     A = np.zeros((D, D))
     rhs = np.ones(D)
@@ -329,6 +384,25 @@ def exact_meeting_times(D, ne, m, k):
 # ===========================================================================
 # candidate closed forms
 # ===========================================================================
+
+def _exact_root(m, k, w, mu):
+    """L solving m*[(1-w)(cosh(1/L)-1) + w(cosh(k/L)-1)] = 2 mu/(1-2 mu).
+
+    The exact characteristic root of the discrete two-allele lattice for the
+    mixed kernel; its small-1/L limit is sqrt(m*sigma^2/(4 mu_sim)).
+    """
+    rhs = 2.0 * mu / (1.0 - 2.0 * mu)
+    lo, hi = 1e-3, 1e6
+    for _ in range(200):
+        mid = math.sqrt(lo * hi)
+        val = m * ((1.0 - w) * (math.cosh(1.0 / mid) - 1.0)
+                   + w * (math.cosh(float(k) / mid) - 1.0))
+        if val > rhs:
+            lo = mid
+        else:
+            hi = mid
+    return math.sqrt(lo * hi)
+
 
 def lean_demo_fst(d, ne, m, sigma_sq):
     return d / (d + 4.0 * ne * m * sigma_sq)
@@ -354,7 +428,7 @@ def main():
     p = np.full((REPS_F1, 1), 0.5)
     h0 = float(np.mean(p * (1 - p)))
     for _ in range(GENS_F1):
-        p = wf_lattice_step(p, NE_F1, 0.0, 1, 0.0, rng)
+        p = wf_lattice_step(p, NE_F1, 0.0, 1, 0.0, 0.0, rng)
     h1 = float(np.mean(p * (1 - p)))
     f1_meas = (h1 / h0) ** (1.0 / GENS_F1)
     f1_want = 1.0 - 1.0 / (2.0 * NE_F1)
@@ -364,19 +438,21 @@ def main():
 
     f2rows = []
     f2 = True
-    for k in (1, 2, 3):
+    for (k, w) in ((1, 0.0), (3, 0.125), (3, 0.375), (3, 1.0), (2, 0.5)):
         for m in (0.05, 0.2):
             D = 401
             q = np.zeros((1, D))
             q[0, D // 2] = 1.0
             T = 60
             for _ in range(T):
-                q = migrate(q, m, k)
+                q = migrate(q, m, k, w)
             x = np.arange(D) - D // 2
             var = float((q[0] * x ** 2).sum() / q[0].sum())
-            want = m * k * k * T
+            sig = sigma_sq_of(k, w)
+            want = m * sig * T
             rel = (var - want) / want
-            f2rows.append({"k": k, "m": m, "var_measured": var,
+            f2rows.append({"k": k, "w": w, "m": m, "sigma_sq": sig,
+                           "var_measured": var,
                            "var_expected_m_sigma2_t": want, "rel_err": rel})
             if abs(rel) > 1e-6:
                 f2 = False
@@ -387,7 +463,7 @@ def main():
     q = np.ones((1, 1))
     T = 500
     for _ in range(T):
-        q = wf_lattice_step(q, None, 0.0, 1, MU_F3, rng)
+        q = wf_lattice_step(q, None, 0.0, 1, 0.0, MU_F3, rng)
     f3_meas = (float(q[0, 0]) - 0.5) / 0.5
     f3_want = (1.0 - 2.0 * MU_F3) ** T
     f3 = abs(f3_meas - f3_want) < 1e-9
@@ -404,17 +480,17 @@ def main():
     print("")
     print("CONTROLS -- ENGINE 2 (two factors of F_ST = H/(H+T0), split)")
     NE_E1 = 40
-    t, _ = meeting_times(1, NE_E1, 0.0, 1, 60000, rng, 40000)
+    t, _ = meeting_times(1, NE_E1, 0.0, 1, 0.0, 60000, rng, 40000)
     e1_meas = float(t[0])
     e1_want = 2.0 * NE_E1
     e1 = abs(e1_meas - e1_want) / e1_want < 0.02
     print("  E1 coalescence alone: E[T] in one deme %.3f vs 2Ne %.1f -> %s"
           % (e1_meas, e1_want, "PASS" if e1 else "FAIL"))
 
-    D_E2, M_E2, K_E2 = 24, 0.25, 1
-    t, _ = meeting_times(D_E2, 0.5, M_E2, K_E2, 60000, rng, 40000)
-    exact = exact_meeting_times(D_E2, 0.5, M_E2, K_E2)
-    vrel = 2.0 * M_E2 * K_E2 * K_E2
+    D_E2, M_E2, K_E2, W_E2 = 24, 0.25, 3, 0.375
+    t, _ = meeting_times(D_E2, 0.5, M_E2, K_E2, W_E2, 60000, rng, 40000)
+    exact = exact_meeting_times(D_E2, 0.5, M_E2, K_E2, W_E2)
+    vrel = 2.0 * M_E2 * sigma_sq_of(K_E2, W_E2)
     e2rows = []
     e2 = True
     for d in range(1, D_E2 // 2 + 1):
@@ -429,7 +505,7 @@ def main():
           % (max(abs(r["rel_err"]) for r in e2rows), "PASS" if e2 else "FAIL"))
 
     NE_E3 = 200
-    t, _ = meeting_times(3, NE_E3, 2.0 / 3.0, 1, 60000, rng, 60000)
+    t, _ = meeting_times(3, NE_E3, 2.0 / 3.0, 1, 0.0, 60000, rng, 60000)
     e3_want = 2.0 * NE_E3 * 3
     e3_fst = float((t[1] - t[0]) / t[1])
     e3 = abs(t[0] - e3_want) / e3_want < 0.03 and abs(e3_fst) < 0.01
@@ -453,9 +529,9 @@ def main():
     print("   below uses that. The corpus body has no sigma^2, so it is the")
     print("   sigma^2 = 1 case; the k axis is what measures that exponent.")
     print("   %-6s %-7s %-4s %-9s %-10s %-10s %-10s %-9s"
-          % ("Ne", "m", "k", "mu_sim", "L_meas", "L_corpus", "L_exact", "err_corp"))
+          % ("Ne", "m", "sig2", "mu_sim", "L_meas", "L_corpus", "L_exact", "err_corp"))
     D_A, REPS_A = 384, 200
-    BASE = {"ne": 100, "m": 0.1, "k": 1, "mu": 5e-4}
+    BASE = {"ne": 100, "m": 0.1, "k": 3, "w": 0.0, "mu": 5e-4}
     cells = []
     for mu in (2e-3, 5e-4, 1.25e-4):
         c = dict(BASE); c["mu"] = mu; cells.append(c)
@@ -463,23 +539,24 @@ def main():
         c = dict(BASE); c["ne"] = ne; cells.append(c)
     for m in (0.025, 0.2):
         c = dict(BASE); c["m"] = m; cells.append(c)
-    for k in (2, 3):
-        c = dict(BASE); c["k"] = k; cells.append(c)
+    for w in (0.125, 0.375):               # sigma^2 = 2 and 4 at k = 3
+        c = dict(BASE); c["w"] = w; cells.append(c)
     rowsA = []
     for c in cells:
         burn = int(min(30000, max(3000, 8.0 / (2.0 * c["mu"]), 20 * c["ne"])))
-        prof = covariance_profile(c["ne"], c["m"], c["k"], c["mu"], D_A,
-                                  REPS_A, burn, 4000, 10, rng)
+        sig = sigma_sq_of(c["k"], c["w"])
+        prof = covariance_profile(c["ne"], c["m"], c["k"], c["w"], c["mu"],
+                                  D_A, REPS_A, burn, 4000, 10, rng)
         L, sse = fit_cosh_length(prof, D_A, 1)
         mu_corpus = 2.0 * c["mu"]              # see the convention block above
         # exact characteristic root of the discrete two-allele lattice
-        Lexact = c["k"] / math.acosh(
-            1.0 + 2.0 * c["mu"] / (c["m"] * (1.0 - 2.0 * c["mu"])))
+        Lexact = _exact_root(c["m"], c["k"], c["w"], c["mu"])
         # the corpus body, in the corpus's own convention: no sigma^2
         Lcorpus = math.sqrt(c["m"] / (2.0 * mu_corpus))
         # the same body with the dispersal variance restored
-        Ltruth = math.sqrt(c["m"] * c["k"] ** 2 / (2.0 * mu_corpus))
+        Ltruth = math.sqrt(c["m"] * sig / (2.0 * mu_corpus))
         row = dict(c)
+        row["sigma_sq"] = sig
         row["burn"] = burn
         row["mu_corpus_convention"] = mu_corpus
         row["L_measured"] = L
@@ -491,8 +568,8 @@ def main():
         row["rel_err_exact"] = None if L is None else (Lexact - L) / L
         row["C0"] = float(prof[0])
         rowsA.append(row)
-        print("   %-6d %-7.4f %-4d %-9.2e %-10s %-10.3f %-10.3f %-9s"
-              % (c["ne"], c["m"], c["k"], c["mu"],
+        print("   %-6d %-7.4f %-4.1f %-9.2e %-10s %-10.3f %-10.3f %-9s"
+              % (c["ne"], c["m"], sig, c["mu"],
                  "None" if L is None else ("%.3f" % L), Lcorpus, Lexact,
                  "None" if L is None else ("%+.3f" % row["rel_err_corpus"])))
     out["A_characteristic_length"] = rowsA
@@ -504,9 +581,9 @@ def main():
         return float(np.polyfit(np.log([float(x[key]) for x in r]),
                                 np.log([x["L_measured"] for x in r]), 1)[0])
 
-    mu_rows = [r for r in rowsA if r["ne"] == 100 and r["m"] == 0.1 and r["k"] == 1]
-    ne_rows = [r for r in rowsA if r["m"] == 0.1 and r["k"] == 1 and r["mu"] == 5e-4]
-    m_rows = [r for r in rowsA if r["ne"] == 100 and r["k"] == 1 and r["mu"] == 5e-4]
+    mu_rows = [r for r in rowsA if r["ne"] == 100 and r["m"] == 0.1 and r["w"] == 0.0]
+    ne_rows = [r for r in rowsA if r["m"] == 0.1 and r["w"] == 0.0 and r["mu"] == 5e-4]
+    m_rows = [r for r in rowsA if r["ne"] == 100 and r["w"] == 0.0 and r["mu"] == 5e-4]
     k_rows = [r for r in rowsA if r["ne"] == 100 and r["m"] == 0.1 and r["mu"] == 5e-4]
     exps = {
         "dlogL_dlogmu": {"measured": loglog(mu_rows, "mu"), "corpus": -0.5, "truth": -0.5},
@@ -517,7 +594,7 @@ def main():
     kr = [x for x in k_rows if x["L_measured"]]
     if len(kr) >= 2:
         exps["dlogL_dlogsigma2"]["measured"] = float(np.polyfit(
-            np.log([float(x["k"]) ** 2 for x in kr]),
+            np.log([float(x["sigma_sq"]) for x in kr]),
             np.log([x["L_measured"] for x in kr]), 1)[0])
     out["A_exponents"] = exps
     print("   fitted exponents           measured   corpus   truth")
@@ -535,8 +612,8 @@ def main():
     # share no code beyond the parameters, so a disagreement means one of them
     # is not the model in the header.
     D_X, NE_X = 32, 10
-    mc, cens_x = meeting_times(D_X, NE_X, 0.15, 1, 60000, rng, 200000)
-    ex = exact_meeting_times(D_X, NE_X, 0.15, 1)
+    mc, cens_x = meeting_times(D_X, NE_X, 0.15, 3, 0.375, 60000, rng, 200000)
+    ex = exact_meeting_times(D_X, NE_X, 0.15, 3, 0.375)
     e4rel = [abs(float(mc[d]) - float(ex[d])) / float(ex[d])
              for d in range(D_X // 2 + 1)]
     e4 = max(e4rel) < 0.02 and cens_x.max() < 1e-3
@@ -549,9 +626,10 @@ def main():
 
     D_B, NE_B = 256, 25
     rowsB = []
-    for (m, k) in ((0.1, 1), (0.025, 2), (0.4, 1), (0.1, 2)):
-        sigma_sq = float(k * k)
-        t = exact_meeting_times(D_B, NE_B, m, k)
+    for (m, k, w) in ((0.1, 3, 0.0), (0.025, 3, 0.375), (0.4, 3, 0.0),
+                      (0.1, 3, 0.375)):
+        sigma_sq = sigma_sq_of(k, w)
+        t = exact_meeting_times(D_B, NE_B, m, k, w)
         T0 = float(t[0])
         vrel = 2.0 * m * sigma_sq
         H1 = float(t[1] - t[0])
@@ -587,7 +665,7 @@ def main():
             v = [(c[key] - c["fst_measured"]) / c["fst_measured"] for c in cells]
             return float(np.sqrt(np.mean(np.square(v))))
 
-        rec = {"m": m, "k": k, "sigma_sq": sigma_sq, "Ne": NE_B, "D": D_B,
+        rec = {"m": m, "k": k, "w": w, "sigma_sq": sigma_sq, "Ne": NE_B, "D": D_B,
                "method": "exact linear solve of the engine-2 chain; the "
                          "Monte Carlo is cross-checked against it by control E4",
                "T0_measured": T0, "T0_reference_2NeD": 2.0 * NE_B * D_B,
@@ -600,8 +678,8 @@ def main():
                },
                "cells": cells}
         rowsB.append(rec)
-        print("  m=%.3f k=%d sigma^2=%.0f  T0=%.0f (2NeD=%.0f)"
-              % (m, k, sigma_sq, T0, 2.0 * NE_B * D_B))
+        print("  m=%.3f sigma^2=%.1f (k=%d w=%.3f)  T0=%.0f (2NeD=%.0f)"
+              % (m, sigma_sq, k, w, T0, 2.0 * NE_B * D_B))
         print("    %-5s %-10s %-10s %-10s %-10s %-10s | %-11s %-11s"
               % ("d", "fst_meas", "demoSSFst", "quadratic", "linear",
                  "exp(fit)", "H_measured", "H_corpus"))
@@ -622,18 +700,18 @@ def main():
 
     pair = {}
     for r in rowsB:
-        pair[(r["m"], r["k"])] = r
-    if (0.1, 1) in pair and (0.025, 2) in pair:
-        a = pair[(0.1, 1)]
-        b = pair[(0.025, 2)]
+        pair[(r["m"], r["w"])] = r
+    if (0.1, 0.0) in pair and (0.025, 0.375) in pair:
+        a = pair[(0.1, 0.0)]
+        b = pair[(0.025, 0.375)]
         ca = dict((c["d"], c) for c in a["cells"])
         cb = dict((c["d"], c) for c in b["cells"])
         rows = []
         for d in (1, 4, 16, 64, D_B // 2):
             rows.append({
                 "d": d,
-                "fst_measured_m0.1_k1": ca[d]["fst_measured"],
-                "fst_measured_m0.025_k2": cb[d]["fst_measured"],
+                "fst_measured_m0.1_sig1": ca[d]["fst_measured"],
+                "fst_measured_m0.025_sig4": cb[d]["fst_measured"],
                 "demo_predicts_equal": [ca[d]["fst_demoSteppingStone"],
                                         cb[d]["fst_demoSteppingStone"]],
                 "quadratic_predicts_unequal": [ca[d]["fst_quadratic"],
@@ -652,7 +730,7 @@ def main():
         print("  FIXED-PRODUCT EXPERIMENT (m*sigma^2 = 0.1, m varied 4x)")
         for r in rows:
             print("    d=%-4d measured %.5f vs %.5f | demo %.5f/%.5f | quad %.5f/%.5f"
-                  % (r["d"], r["fst_measured_m0.1_k1"], r["fst_measured_m0.025_k2"],
+                  % (r["d"], r["fst_measured_m0.1_sig1"], r["fst_measured_m0.025_sig4"],
                      r["demo_predicts_equal"][0], r["demo_predicts_equal"][1],
                      r["quadratic_predicts_unequal"][0],
                      r["quadratic_predicts_unequal"][1]))
@@ -660,8 +738,17 @@ def main():
     out["READ_THE_TEST"] = ok_all
     print("")
     print("READ_THE_TEST (all seven controls): %s" % ok_all)
+    def _plain(o):
+        if isinstance(o, (np.bool_,)):
+            return bool(o)
+        if isinstance(o, (np.integer,)):
+            return int(o)
+        if isinstance(o, (np.floating,)):
+            return float(o)
+        raise TypeError(repr(o))
+
     fh = open("fam_stepping_stone_results.json", "w")
-    json.dump(out, fh, indent=1)
+    json.dump(out, fh, indent=1, default=_plain)
     fh.close()
     print("-> fam_stepping_stone_results.json")
     return 0 if ok_all else 1
