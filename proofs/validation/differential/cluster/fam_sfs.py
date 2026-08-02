@@ -368,62 +368,113 @@ def definition_expected_new_mutations():
 
 # ===========================================================================
 # DEFINITION 2 -- expectedFreqDiffSq (fst p0) = 2 fst p0 (1-p0).
-# Measured: E[(p1-p2)^2] across independent sites after a clean split, with
-# F_ST measured on the SAME data so the two sides are commensurable.
+#
+# THE CORPUS SCOPES ITS ARGUMENT AND THE FIRST VERSION OF THIS CHECK IGNORED
+# IT. AncestrySpecificArchitecture.lean says in prose, above the definition,
+# that p0 is "the ancestral frequency" and that F_ST is the DRIFT F_ST defined
+# by Var(p_t - p0) = p0(1-p0)·F_ST. The first version used the mean of the two
+# present-day frequencies as a stand-in for p0 and the Hudson estimator for
+# F_ST, and got -11%, +15.7%, -2.2% -- numbers that move around because the
+# stand-ins move around, not because the definition does. Reporting those as a
+# discrepancy would have been a finding about my proxy.
+#
+# So the ancestral frequency is now OBSERVED, by drawing ANCIENT SAMPLES from
+# the ancestral population at the split time. Nothing is proxied.
+#
+# SPLIT INTO TWO CONTROLS, because the definition makes two claims:
+#   D2a SINGLE-POPULATION DRIFT. Var(p1 - p0) / [p0(1-p0)] must equal the drift
+#       F_ST, 1 - exp(-t/(2Ne)). This is driftVariance's claim and it involves
+#       no factor of 2 and no independence assumption.
+#   D2b THE FACTOR OF 2 AND INDEPENDENCE. E[(p1-p2)^2] must be TWICE that.
+#       This is the step the definition's own prose calls "independence of
+#       drift".
+# A combined check would pass if the drift variance were low by the same
+# factor the independence step were high. The two are therefore separated, and
+# the F_ST fed to the corpus definition is the THEORETICAL 1 - exp(-t/(2Ne)),
+# not one estimated from the same data, so the comparison cannot be circular.
 # ===========================================================================
 
 def definition_expected_freq_diff_sq():
     out = []
-    Ne, n = 2000, 100
+    Ne, n, n_anc = 2000, 100, 100
     for tfrac in (0.05, 0.2, 0.8):
         t = tfrac * 2.0 * Ne
-        p1s, p2s = [], []
+        p1s, p2s, p0s = [], [], []
         for r in range(REPS):
             d = msprime.Demography()
             d.add_population(name="A", initial_size=Ne)
             d.add_population(name="B", initial_size=Ne)
             d.add_population(name="ANC", initial_size=Ne)
             d.add_population_split(time=t, derived=["A", "B"], ancestral="ANC")
-            ts = msprime.sim_ancestry(samples={"A": n // 2, "B": n // 2},
-                                      demography=d, sequence_length=SEQ,
-                                      recombination_rate=1e-8,
-                                      random_seed=6100 + r)
-            ts = msprime.sim_mutations(ts, rate=2e-8, random_seed=6200 + r)
+            ts = msprime.sim_ancestry(
+                samples=[
+                    msprime.SampleSet(n // 2, population="A", time=0),
+                    msprime.SampleSet(n // 2, population="B", time=0),
+                    # ANCIENT SAMPLE: the ancestral population, AT the split
+                    # time. This is p0 itself, not a stand-in for it.
+                    msprime.SampleSet(n_anc // 2, population="ANC", time=t),
+                ],
+                demography=d, sequence_length=SEQ,
+                recombination_rate=1e-8, random_seed=6_100_000 + r)
+            ts = msprime.sim_mutations(ts, rate=2e-8,
+                                       random_seed=6_200_000 + r)
             sa = ts.samples(population=0)
             sb = ts.samples(population=1)
+            sanc = ts.samples(population=2)
             G = ts.genotype_matrix()
             p1s.append(G[:, sa].mean(axis=1))
             p2s.append(G[:, sb].mean(axis=1))
+            p0s.append(G[:, sanc].mean(axis=1))
         p1 = np.concatenate(p1s)
         p2 = np.concatenate(p2s)
-        pbar = 0.5 * (p1 + p2)
-        keep = (pbar > 0.05) & (pbar < 0.95)      # ancestrally common sites
-        p1, p2, pbar = p1[keep], p2[keep], pbar[keep]
+        p0 = np.concatenate(p0s)
+        # Condition on being POLYMORPHIC IN THE ANCESTOR, which is the
+        # population the definition's p0 refers to. Ascertaining on the
+        # ancestral sample is the ascertainment the definition assumes; using
+        # the descendants would condition on the very drift being measured.
+        keep = (p0 > 0.05) & (p0 < 0.95)
+        p1, p2, p0 = p1[keep], p2[keep], p0[keep]
+        het0 = float(np.mean(p0 * (1.0 - p0)))
         d2 = float(np.mean((p1 - p2) ** 2))
-        # Hudson F_ST measured on the same sites, ratio of averages.
-        num = (p1 - p2) ** 2 - p1 * (1 - p1) / (n / 2 - 1) \
-            - p2 * (1 - p2) / (n / 2 - 1)
-        den = p1 * (1 - p2) + p2 * (1 - p1)
-        fst = float(num.mean() / den.mean())
-        p0 = float(pbar.mean())
-        pred = call("expectedFreqDiffSq", fst, p0)
-        # p0 in the definition is the ANCESTRAL frequency; using the mean of
-        # the present-day mean is the closest observable, and E[p0(1-p0)] is
-        # not E[p0](1-E[p0]) -- both are reported so the reader can see which
-        # convention the number rests on.
-        pred_exp = 2.0 * fst * float(np.mean(pbar * (1 - pbar)))
-        out.append({"t_over_2Ne": tfrac, "n_sites": int(p1.size),
+        # D2a: single-population drift variance, averaged over the two
+        # daughters so the two are not treated as one observation.
+        var1 = float(np.mean((p1 - p0) ** 2))
+        var2 = float(np.mean((p2 - p0) ** 2))
+        fst_drift_measured = 0.5 * (var1 + var2) / het0
+        fst_theory = 1.0 - np.exp(-t / (2.0 * Ne))
+        # D2b: the corpus definition, fed the THEORETICAL drift F_ST.
+        # p0 enters as p0(1-p0), and E[p0(1-p0)] is NOT E[p0](1-E[p0]), so the
+        # per-site form is summed rather than the mean substituted.
+        pred = 2.0 * fst_theory * het0
+        pred_via_corpus_body = float(np.mean(
+            [call("expectedFreqDiffSq", float(fst_theory), float(x))
+             for x in p0[:20000]]))
+        out.append({"t_over_2Ne": tfrac, "t_generations": t, "Ne": Ne,
+                    "n_sites_polymorphic_in_ancestor": int(p1.size),
+                    "mean_p0_times_1_minus_p0": het0,
                     "measured_E_freq_diff_sq": d2,
-                    "measured_hudson_fst": fst,
-                    "mean_pbar": p0,
-                    "corpus_at_mean_p0": pred,
-                    "corpus_at_mean_of_p0_times_1_minus_p0": pred_exp,
-                    "rel_err_mean_p0": (pred - d2) / d2,
-                    "rel_err_expectation_form": (pred_exp - d2) / d2})
-        print("  t=%.2f x 2Ne  sites=%6d  E[(p1-p2)^2]=%.5f  F_ST=%.5f  "
-              "2*F*p0(1-p0)=%.5f (%+.1f%%)  2*F*E[p(1-p)]=%.5f (%+.1f%%)"
-              % (tfrac, p1.size, d2, fst, pred, 100 * (pred - d2) / d2,
-                 pred_exp, 100 * (pred_exp - d2) / d2))
+                    "measured_single_pop_drift_var_A": var1,
+                    "measured_single_pop_drift_var_B": var2,
+                    "D2a_measured_drift_fst": fst_drift_measured,
+                    "D2a_theory_drift_fst": float(fst_theory),
+                    "D2a_rel_err": (float(fst_theory) - fst_drift_measured)
+                        / fst_drift_measured,
+                    "D2b_corpus_prediction": pred,
+                    "D2b_corpus_prediction_per_site_body":
+                        pred_via_corpus_body,
+                    "D2b_rel_err": (pred - d2) / d2,
+                    "D2b_ratio_two_pop_over_one_pop":
+                        d2 / (0.5 * (var1 + var2))})
+        print("  t=%.2f x 2Ne  sites=%6d  E[p0(1-p0)]=%.5f" %
+              (tfrac, p1.size, het0))
+        print("     D2a drift F_ST: measured %.5f  theory 1-exp(-t/2Ne) %.5f  "
+              "(%+.2f%%)"
+              % (fst_drift_measured, fst_theory,
+                 100 * (fst_theory - fst_drift_measured) / fst_drift_measured))
+        print("     D2b E[(p1-p2)^2] = %.5f   corpus 2*F*p0(1-p0) = %.5f "
+              "(%+.2f%%)   two-pop/one-pop ratio %.4f (definition says 2)"
+              % (d2, pred, 100 * (pred - d2) / d2,
+                 d2 / (0.5 * (var1 + var2))))
     return out
 
 

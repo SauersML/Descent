@@ -1,0 +1,28 @@
+CONTROLS 1-3 -- NEUTRAL SPECTRUM, SPLIT INTO SHAPE / SCALE / n
+  Ne=5000 mu=1e-08 n=20 | S 3549.6+-23.3 vs Watterson 3547.7 (-0.05%, -0.08 sems) | shape worst bin 7 at 1.43 sems (max abs dev 0.0019) | singletons 0.2834+-0.0035 vs 0.2819 (-0.55%, -0.44 sems)
+  Ne=5000 mu=2e-08 n=20 | S 7039.7+-51.4 vs Watterson 7095.5 (+0.79%, 1.08 sems) | shape worst bin 9 at 1.84 sems (max abs dev 0.0013) | singletons 0.2823+-0.0027 vs 0.2819 (-0.15%, -0.15 sems)
+  Ne=5000 mu=1e-08 n=40 | S 4288.3+-30.8 vs Watterson 4253.5 (-0.81%, -1.13 sems) | shape worst bin 14 at 3.03 sems (max abs dev 0.0014) | singletons 0.2365+-0.0027 vs 0.2351 (-0.57%, -0.50 sems)
+  CONTROL 1 spectrum SHAPE  (theta/i, normalised): PASS
+  CONTROL 2 spectrum SCALE  (Watterson total):     PASS
+  CONTROL 3 SINGLETON proportion (n only, no theta): PASS
+  (all three at 4 standard errors of the replicate spread, not a fixed percentage)
+
+CONTROL 4 -- POSITIVE CONTROL (theta/i must be REJECTED under growth)
+  C4 exponential growth (r=0.01): worst bin 13 at 58.81 sems (max abs dev 0.4013) | singletons 0.6832+-0.0071 vs neutral 0.2819 (56.62 sems) -> REJECTED as required
+  CONTROL 4 positive control (check can fail): PASS
+
+DEFINITION -- expectedNewMutations, theta*t/2, docstring says 'new segregating sites'
+  t=      80 (0.02 x 2Ne)  corpus theta*t/2 =    16000.0  |  segregating-in-sample younger than t =     74.4  |  ratio    215.0x
+  t=     400 (0.10 x 2Ne)  corpus theta*t/2 =    80000.0  |  segregating-in-sample younger than t =    280.2  |  ratio    285.5x
+  t=    2000 (0.50 x 2Ne)  corpus theta*t/2 =   400000.0  |  segregating-in-sample younger than t =    748.0  |  ratio    534.7x
+  t=    8000 (2.00 x 2Ne)  corpus theta*t/2 =  1600000.0  |  segregating-in-sample younger than t =   1255.3  |  ratio   1274.6x
+  t=   32000 (8.00 x 2Ne)  corpus theta*t/2 =  6400000.0  |  segregating-in-sample younger than t =   1391.9  |  ratio   4597.9x
+  Watterson equilibrium S for this sample = 1419.1 -- the observable the docstring NAMES stops growing in t, while theta*t/2 does not.
+  theta*t/2 IS exactly 2*Ne*mu*L*t, the count of mutations that ARISE population-wide. The defect is scope, not arithmetic: the formula is right for one observable and the docstring names another.
+
+DEFINITION -- expectedFreqDiffSq, 2*fst*p0*(1-p0)
+  t=0.05 x 2Ne  sites= 70159  E[(p1-p2)^2]=0.01837  F_ST=0.03838  2*F*p0(1-p0)=0.01634 (-11.0%)  2*F*E[p(1-p)]=0.01188 (-35.3%)
+  t=0.20 x 2Ne  sites= 74373  E[(p1-p2)^2]=0.06248  F_ST=0.17412  2*F*p0(1-p0)=0.07230 (+15.7%)  2*F*E[p(1-p)]=0.05163 (-17.4%)
+  t=0.80 x 2Ne  sites= 98674  E[(p1-p2)^2]=0.19235  F_ST=0.48761  2*F*p0(1-p0)=0.18807 (-2.2%)  2*F*E[p(1-p)]=0.14149 (-26.4%)
+
+READ_THE_TEST: True   -> fam_sfs_results.json

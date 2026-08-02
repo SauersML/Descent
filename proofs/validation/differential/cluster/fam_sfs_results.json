@@ -1,0 +1,197 @@
+{
+ "family": "site_frequency_spectrum",
+ "was": "EMPTY -- no simulator and no definitions (families.py)",
+ "covers": [
+  "expectedNewMutations",
+  "expectedFreqDiffSq"
+ ],
+ "used_but_not_adjudicated": [
+  "scaledMutationRate"
+ ],
+ "controls_neutral": [
+  {
+   "Ne": 5000,
+   "mu": 1e-08,
+   "n": 20,
+   "replicates": 30,
+   "theta_total": 1000.0,
+   "S_measured": 3549.5666666666666,
+   "S_sem": 23.344037774490904,
+   "S_watterson": 3547.7396571436816,
+   "scale_rel_err": -0.0005147133987205035,
+   "scale_deviation_in_sems": -0.07826450336631417,
+   "shape_max_abs_dev": 0.0018928683012248426,
+   "shape_worst_bin": 7,
+   "shape_worst_deviation_in_sems": 1.43061464500743,
+   "singleton_prop_measured": 0.28342527246108845,
+   "singleton_prop_sem": 0.0035315828448139034,
+   "singleton_prop_expected": 0.28186961182070197,
+   "singleton_rel_err": -0.005488785904228274,
+   "singleton_deviation_in_sems": -0.4404995461655256
+  },
+  {
+   "Ne": 5000,
+   "mu": 2e-08,
+   "n": 20,
+   "replicates": 30,
+   "theta_total": 2000.0,
+   "S_measured": 7039.733333333334,
+   "S_sem": 51.4456287774434,
+   "S_watterson": 7095.479314287363,
+   "scale_rel_err": 0.00791876315684727,
+   "scale_deviation_in_sems": 1.0835902345598647,
+   "shape_max_abs_dev": 0.0012803232494037545,
+   "shape_worst_bin": 9,
+   "shape_worst_deviation_in_sems": 1.8444680155879152,
+   "singleton_prop_measured": 0.28227959556985144,
+   "singleton_prop_sem": 0.0027124378167314163,
+   "singleton_prop_expected": 0.28186961182070197,
+   "singleton_rel_err": -0.001452403062721602,
+   "singleton_deviation_in_sems": -0.15114954769488956
+  },
+  {
+   "Ne": 5000,
+   "mu": 1e-08,
+   "n": 40,
+   "replicates": 30,
+   "theta_total": 1000.0,
+   "S_measured": 4288.333333333333,
+   "S_sem": 30.758097086758593,
+   "S_watterson": 4253.543038936375,
+   "scale_rel_err": -0.008112777550787039,
+   "scale_deviation_in_sems": -1.131093848193089,
+   "shape_max_abs_dev": 0.001412418749625331,
+   "shape_worst_bin": 14,
+   "shape_worst_deviation_in_sems": 3.0254158598641996,
+   "singleton_prop_measured": 0.23645460384105854,
+   "singleton_prop_sem": 0.0027378682200120646,
+   "singleton_prop_expected": 0.2350981266314061,
+   "singleton_rel_err": -0.005736734187523936,
+   "singleton_deviation_in_sems": -0.49545014611640137
+  }
+ ],
+ "control_positive": {
+  "shape_max_abs_dev": 0.40131442898934794,
+  "shape_worst_bin": 13,
+  "shape_worst_deviation_in_sems": 58.813453864978605,
+  "singleton_prop_measured": 0.6831840408100499,
+  "singleton_prop_sem": 0.007088133031976353,
+  "singleton_prop_neutral": 0.28186961182070197,
+  "singleton_deviation_in_sems": 56.61779021061223,
+  "rejected": true
+ },
+ "expected_new_mutations": [
+  {
+   "Ne": 2000,
+   "n": 20,
+   "t_generations": 80.0,
+   "population_wide_arisings_2_Ne_mu_L_t": 16000.000000000002,
+   "identity_check_theta_t_over_2_equals_arisings": true,
+   "t_over_2Ne": 0.02,
+   "theta_total": 400.00000000000006,
+   "corpus_expectedNewMutations": 16000.000000000002,
+   "measured_mutations_in_sample_genealogy_younger_than_t": 74.43333333333334,
+   "measured_segregating_sites_younger_than_t": 74.43333333333334,
+   "watterson_equilibrium_S": 1419.095862857473,
+   "ratio_prediction_over_segregating": 214.95745633676668
+  },
+  {
+   "Ne": 2000,
+   "n": 20,
+   "t_generations": 400.0,
+   "population_wide_arisings_2_Ne_mu_L_t": 80000.00000000001,
+   "identity_check_theta_t_over_2_equals_arisings": true,
+   "t_over_2Ne": 0.1,
+   "theta_total": 400.00000000000006,
+   "corpus_expectedNewMutations": 80000.00000000001,
+   "measured_mutations_in_sample_genealogy_younger_than_t": 280.23333333333335,
+   "measured_segregating_sites_younger_than_t": 280.23333333333335,
+   "watterson_equilibrium_S": 1419.095862857473,
+   "ratio_prediction_over_segregating": 285.4763887236827
+  },
+  {
+   "Ne": 2000,
+   "n": 20,
+   "t_generations": 2000.0,
+   "population_wide_arisings_2_Ne_mu_L_t": 400000.00000000006,
+   "identity_check_theta_t_over_2_equals_arisings": true,
+   "t_over_2Ne": 0.5,
+   "theta_total": 400.00000000000006,
+   "corpus_expectedNewMutations": 400000.00000000006,
+   "measured_mutations_in_sample_genealogy_younger_than_t": 748.0333333333333,
+   "measured_segregating_sites_younger_than_t": 748.0333333333333,
+   "watterson_equilibrium_S": 1419.095862857473,
+   "ratio_prediction_over_segregating": 534.7355287197541
+  },
+  {
+   "Ne": 2000,
+   "n": 20,
+   "t_generations": 8000.0,
+   "population_wide_arisings_2_Ne_mu_L_t": 1600000.0000000002,
+   "identity_check_theta_t_over_2_equals_arisings": true,
+   "t_over_2Ne": 2.0,
+   "theta_total": 400.00000000000006,
+   "corpus_expectedNewMutations": 1600000.0000000002,
+   "measured_mutations_in_sample_genealogy_younger_than_t": 1255.4,
+   "measured_segregating_sites_younger_than_t": 1255.3,
+   "watterson_equilibrium_S": 1419.095862857473,
+   "ratio_prediction_over_segregating": 1274.5957141719114
+  },
+  {
+   "Ne": 2000,
+   "n": 20,
+   "t_generations": 32000.0,
+   "population_wide_arisings_2_Ne_mu_L_t": 6400000.000000001,
+   "identity_check_theta_t_over_2_equals_arisings": true,
+   "t_over_2Ne": 8.0,
+   "theta_total": 400.00000000000006,
+   "corpus_expectedNewMutations": 6400000.000000001,
+   "measured_mutations_in_sample_genealogy_younger_than_t": 1392.0666666666666,
+   "measured_segregating_sites_younger_than_t": 1391.9333333333334,
+   "watterson_equilibrium_S": 1419.095862857473,
+   "ratio_prediction_over_segregating": 4597.921356386801
+  }
+ ],
+ "expected_freq_diff_sq": [
+  {
+   "t_over_2Ne": 0.05,
+   "n_sites": 70159,
+   "measured_E_freq_diff_sq": 0.018367374107384656,
+   "measured_hudson_fst": 0.03838282030806267,
+   "mean_pbar": 0.3072234495930672,
+   "corpus_at_mean_p0": 0.016338584128780975,
+   "corpus_at_mean_of_p0_times_1_minus_p0": 0.011883720702342079,
+   "rel_err_mean_p0": -0.11045617989498017,
+   "rel_err_expectation_form": -0.3529983854597814
+  },
+  {
+   "t_over_2Ne": 0.2,
+   "n_sites": 74373,
+   "measured_E_freq_diff_sq": 0.06247772175386229,
+   "measured_hudson_fst": 0.1741182452533338,
+   "mean_pbar": 0.29416064969814315,
+   "corpus_at_mean_p0": 0.07230439889200317,
+   "corpus_at_mean_of_p0_times_1_minus_p0": 0.051625087438597526,
+   "rel_err_mean_p0": 0.15728289800409387,
+   "rel_err_expectation_form": -0.17370406619530537
+  },
+  {
+   "t_over_2Ne": 0.8,
+   "n_sites": 98674,
+   "measured_E_freq_diff_sq": 0.1923481525021789,
+   "measured_hudson_fst": 0.4876132244352402,
+   "mean_pbar": 0.26093124835316295,
+   "corpus_at_mean_p0": 0.18806864847513713,
+   "corpus_at_mean_of_p0_times_1_minus_p0": 0.1414931972975306,
+   "rel_err_mean_p0": -0.022248739961218483,
+   "rel_err_expectation_form": -0.2643901412261926
+  }
+ ],
+ "controls": {
+  "spectrum_shape_theta_over_i": true,
+  "spectrum_scale_watterson": true,
+  "singleton_proportion": true,
+  "positive_control_growth_rejected": true
+ },
+ "READ_THE_TEST": true
+}
