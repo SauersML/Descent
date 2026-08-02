@@ -173,6 +173,22 @@ def exact_identity(ne, m, mu, d):
     surv = (1 - mu) ** 2
     c = 1.0 / (2.0 * ne)
 
+    # BOUNDARY CASES, HANDLED EXPLICITLY RATHER THAN BY A SOLVER.
+    # At mu = 0 the identity chain has 1 as an eigenvalue and the 2x2 system
+    # below is SINGULAR -- which is not a numerical accident, it is the
+    # statement that with nothing destroying identity every pair that can
+    # coalesce eventually does.  The J1 control runs exactly here, so the
+    # boundary is written out rather than left to a solve that would raise.
+    if mu <= 0.0:
+        reachable = (d > 1 and m > 0.0)
+        return (1.0, 1.0 if reachable else 0.0)
+    if m <= 0.0 or d == 1:
+        # The separated state is unreachable from the co-resident one, so f_S
+        # decouples into the scalar recurrence f = surv (c + (1-c) f) -- which
+        # is the corpus body verbatim, with rate read as mu.
+        f_s = surv * c / (1.0 - surv * (1.0 - c))
+        return float(f_s), 0.0
+
     # f_S = surv [ M_SS (c + (1-c) f_S) + M_SB f_B ]
     # f_B = surv [ M_BS (c + (1-c) f_S) + M_BB f_B ]
     a = np.array([[1.0 - surv * m_ss * (1 - c), -surv * m_sb],
