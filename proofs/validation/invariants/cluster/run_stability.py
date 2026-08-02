@@ -67,6 +67,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, default=8,
                     help="independent point-sets per spec")
+    ap.add_argument("--only-index", type=int, default=None,
+                    help="run ONE spec by index, for a SLURM job array")
+    ap.add_argument("--json-out", default=None,
+                    help="write results here instead of the default path")
     args = ap.parse_args()
 
     defs = C.load_defs()
@@ -77,7 +81,13 @@ def main():
     print(f"seed-stability sweep: {len(CS.SPECS)} specs x {args.seeds} "
           f"independent point-sets\ncorpus revision: {rev}\n")
     print(f"{'definition':56s} {'agree':>7s} {'worst excess':>13s}")
-    for sp in CS.SPECS:
+    specs = list(CS.SPECS)
+    if args.only_index is not None:
+        if not 0 <= args.only_index < len(specs):
+            print(f"index {args.only_index} out of range for {len(specs)} specs")
+            return 2
+        specs = [specs[args.only_index]]
+    for sp in specs:
         k = sp["name"]
         if k not in cs:
             out[k] = dict(status="not-compiled")
@@ -100,8 +110,11 @@ def main():
         mark = "" if stable else "   <-- FLICKERS, withdraw"
         print(f"{k:56s} {agree:3d}/{args.seeds:<3d} {max(excess):13.3f}{mark}")
 
-    (HERE.parent / "results_simulation_stability.json").write_text(
-        json.dumps(dict(revision=rev, seeds=args.seeds, specs=out), indent=1))
+    dest = (pathlib.Path(args.json_out) if args.json_out
+            else HERE.parent / "results_simulation_stability.json")
+    dest.write_text(json.dumps(
+        dict(revision=rev, seeds=args.seeds, specs=out,
+             only_index=args.only_index), indent=1))
     print(f"\n{len(CS.SPECS) - len(flaky)} stable, {len(flaky)} flicker")
     if flaky:
         print("WITHDRAW these -- their verdicts depend on the draw:")
