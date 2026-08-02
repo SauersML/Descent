@@ -45,7 +45,16 @@ MAX_THEOREMS_PER_DEF = 6
 NUM = re.compile(r"(?<![A-Za-z0-9_.])(\d+)(?![A-Za-z0-9_.])")
 
 
-def mutate(body: str):
+def mutate(body: str, argnames=()):
+    """Perturbations of a definition body.
+
+    The scalar perturbations (bump a literal, scale, shift, negate) all move the
+    value at EVERY point, so a theorem pinning a single point rejects all of
+    them and scores full strength while constraining almost nothing about the
+    shape: `effectiveSubgroupSize n (n/2) = n/4` is satisfied by the constant
+    `n/4`. Transposing two arguments changes the function while often preserving
+    such a point, so it separates a theorem that pins a value from one that pins
+    a form."""
     out = []
     m = NUM.search(body)
     if m:
@@ -54,6 +63,13 @@ def mutate(body: str):
     out.append(("scale by 2", f"2 * ({body})"))
     out.append(("add 1/3", f"(1/3) + ({body})"))
     out.append(("negate", f"-({body})"))
+    if len(argnames) >= 2:
+        a, b = argnames[0], argnames[1]
+        swapped = re.sub(r"(?<![A-Za-z0-9_])(%s|%s)(?![A-Za-z0-9_])" %
+                         (re.escape(a), re.escape(b)),
+                         lambda m: b if m.group(1) == a else a, body)
+        if swapped != body:
+            out.append((f"transpose {a}<->{b}", swapped))
     return out
 
 
@@ -94,7 +110,7 @@ def run():
                 break  # this theorem already rejects every mutation
             stmt = t["body"]
             here_rej, here_sur = [], []
-            for label, mbody in mutate(d["body"]):
+            for label, mbody in mutate(d["body"], base_table[short][0]):
                 table = dict(base_table)
                 table[short] = (table[short][0], mbody)
                 conv = L.Converter(table)
