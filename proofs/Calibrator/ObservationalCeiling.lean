@@ -13,7 +13,7 @@ a guard suite whose members share a witness pair is blind as a suite, so adding 
 guard of the same kind cannot help.
 
 
-Five separate results in this development have the same skeleton, and until this file
+Several separate results in this development have the same skeleton, and until this file
 they each carried their own copy of it. The skeleton:
 
 > A **probe** reports what some class of experiments can see. Exhibit two objects with
@@ -24,25 +24,17 @@ they each carried their own copy of it. The skeleton:
 
 That is `ProbeBlindness.no_criterion_of_factors`, and it is three lines. The content of
 each result is never the logic; it is the **construction of the witness pair**. Naming
-the logic once makes that visible, and makes the five results comparable.
-
-## The five instances
-
-| instance | probe | witness pair | module |
-|---|---|---|---|
-| fixed-order cumulants | joint cumulant tensors of order `≤ K` | Gaussian vs. `tanh`-tilted blocks | `CumulantBlindness` |
-| all-order contractions | normalized cumulant contractions, every order | Gaussian vs. i.i.d. Rademacher | `CumulantBlindness` |
-| bounded-radius audits | data on unions of `≤ r` cover elements | bipartite vs. non-bipartite Ramanujan twins | `LocalToGlobalCoherence` |
-| independent designs | limits of disjoint-support chaos | Gaussian vs. a chameleon law | `JetBarrier` |
-| bounded-distortion witnesses | any complete invariant of the fiber relation | `ℓ∞`-divergent coded decay profiles | `HiddenConeAmbiguity` |
+the logic once makes that visible, and makes the results comparable. The catalogue of
+instances is in `Calibrator.BlindnessRegistry`; it is deliberately not repeated here, so
+that there is one place to add a row and one place that can go stale.
 
 ## The second half of the law
 
-The four probes above are not arbitrary. Each is certified by a witness ranging over a
+The mathematical probes are not arbitrary. Each is certified by a witness ranging over a
 **σ-compact** parameter: a distortion constant `C`, a radius `r`, a cumulant order `K`,
 a bounded operator. Any relation so certified is a countable union of closed conditions
 (`IsCountablyCertified`), and reductions cannot raise a relation above the ceiling of
-its target (`countablyCertified_of_reduction`). In each of the five settings the true
+its target (`countablyCertified_of_reduction`). In each of those settings the true
 object provably sits above that ceiling — which is why the failures are structural
 rather than a matter of finding a better statistic.
 
@@ -256,37 +248,159 @@ theorem no_complete_catalogue_factoring
 ## 4. The σ-compact ceiling
 
 Every probe in the five instances is certified by a witness ranging over a σ-compact
-parameter. Relations so certified are countable unions of closed conditions, and
-reductions cannot raise a relation above the ceiling of its target.
+parameter. Relations so certified are countable unions of *simple* conditions, and
+reductions cannot raise a relation above the ceiling of its target **provided the
+reducing map preserves what "simple" means**.
+
+Both qualifications are load-bearing, and this section previously dropped both. The
+condition as it stood — `∀ x y, E x y ↔ ∃ c : ι, cert c x y`, with `ι` arbitrary and
+`cert` arbitrary — is satisfied by *every* relation whatsoever, by `ι := Unit` and
+`cert := fun _ => E`. `unionOfCertificates_vacuous` below proves that, so the collapse
+is on the record rather than in a reviewer's head. A ceiling everything meets bounds
+nothing, and no theorem stated over it can refute anything.
+
+The two missing hypotheses are restored here:
+
+* the index is **countable** — `[Countable ι]` is required to even state the ceiling,
+  so an uncountable union is rejected at elaboration rather than by inspection;
+* each certificate lies in a **base class** `Base` of conditions simpler than the
+  relation they certify. In the topological reading, `Base r` is "`{p | r p.1 p.2}` is
+  closed"; in a computable reading it is decidability of `r`. `Base` is left as a
+  parameter deliberately: with no ambient topology in scope, *any* concrete base class
+  definable here from arbitrary functions is met by every relation classically (take
+  the indicator of `r`), so writing one down would only re-hide the vacuity one level
+  further in. The content lives in `Base`, and `countablyCertified_trivialBase` proves
+  that the ceiling collapses again the moment `Base` is taken to be trivial.
 -/
 
-/-- A relation is **countably certified** by `cert` when membership is witnessed by a
-single index — a distortion constant, a radius, an order. -/
-def IsCountablyCertified {α ι : Type*} (E : α → α → Prop) (cert : ι → α → α → Prop) :
+/-- The **shape** statement, named for what it actually says: `E` is the union of the
+family `cert`. This is a real and useful shape — it is what `boundedLogDistortion` and
+the bounded-radius audits establish — but on its own it is not a ceiling, and the name
+must not claim one. -/
+def IsUnionOfCertificates {α ι : Type*} (E : α → α → Prop) (cert : ι → α → α → Prop) :
     Prop :=
   ∀ x y, E x y ↔ ∃ c : ι, cert c x y
 
-/-- **Ceilings transport along reductions.** If `E` reduces to `F` via `f` and `F` is
-countably certified, then so is `E`, by the pullback certificates.
+/-- **The union shape alone is vacuous.** Every relation is the union of a one-element
+family containing itself. Any "ceiling" argument resting on the union shape without a
+restriction on the certificates therefore refutes nothing.
 
-Consequence, used to refute representation-theoretic wildness: a reduction of a
-relation into a countably certified one makes the source countably certified too, so
-nothing above the ceiling reduces into anything below it. -/
-theorem countablyCertified_of_reduction
+This theorem exists to make the collapse un-reintroducible: it fails to compile if the
+unrestricted condition is ever strengthened, and it stands as the reason
+`IsCountablyCertified` below carries hypotheses. -/
+theorem unionOfCertificates_vacuous {α : Type*} (E : α → α → Prop) :
+    IsUnionOfCertificates E (fun _ : Unit => E) := by
+  intro x y
+  constructor
+  · intro h
+    exact ⟨(), h⟩
+  · rintro ⟨_, h⟩
+    exact h
+
+/-- The union shape transports along a reduction, with no hypotheses — which is exactly
+why it is not a ceiling argument. Kept because the shape statement is still what several
+instances want to record. -/
+theorem unionOfCertificates_of_reduction
     {α β ι : Type*} {E : α → α → Prop} {F : β → β → Prop} {cert : ι → β → β → Prop}
     (f : α → β) (hred : ∀ x y, E x y ↔ F (f x) (f y))
-    (hF : IsCountablyCertified F cert) :
-    IsCountablyCertified E (fun c x y => cert c (f x) (f y)) := by
+    (hF : IsUnionOfCertificates F cert) :
+    IsUnionOfCertificates E (fun c x y => cert c (f x) (f y)) := by
   intro x y
   rw [hred x y]
   exact hF (f x) (f y)
 
-/-- A countably certified relation with an increasing certificate family is the union
-of its levels; this is the form in which the Borel ceiling is read off. -/
-theorem countablyCertified_iff_exists
-    {α ι : Type*} {E : α → α → Prop} {cert : ι → α → α → Prop}
-    (h : IsCountablyCertified E cert) (x y : α) :
-    E x y ↔ ∃ c : ι, cert c x y := h x y
+/-- A relation is **countably certified relative to a base class** when it is the union
+of a countable family of certificates, each of which lies in `Base`.
+
+`Base` is the class of conditions a single certificate is allowed to be — closed sets in
+the σ-compact reading, decidable relations in the computable one. The bundle carries its
+hypotheses as fields, in the pattern the rest of this corpus uses for structures whose
+content is their side conditions.
+
+The ceiling is a statement about `E` *relative to* `Base`: it says the whole complexity
+of `E` is carried by a countable quantifier over conditions of a fixed simple kind. -/
+structure IsCountablyCertified {α ι : Type*} [Countable ι]
+    (Base : (α → α → Prop) → Prop) (E : α → α → Prop) (cert : ι → α → α → Prop) :
+    Prop where
+  /-- Each certificate is one of the simple conditions. -/
+  base_certificates : ∀ c : ι, Base (cert c)
+  /-- The relation is the union of them. -/
+  is_union : IsUnionOfCertificates E cert
+
+/-- **The trivial base class collapses the ceiling again.** With `Base` taken to be
+`True`, every relation is certified, so the countability requirement alone buys nothing:
+all of the content is in `Base` being a genuine restriction. Stated so that the
+restriction cannot be quietly dropped later. -/
+theorem countablyCertified_trivialBase {α : Type*} (E : α → α → Prop) :
+    IsCountablyCertified (fun _ => True) E (fun _ : Unit => E) where
+  base_certificates := fun _ => trivial
+  is_union := unionOfCertificates_vacuous E
+
+/-- **Ceilings transport along reductions that preserve the base class.**
+
+If `E` reduces to `F` via `f`, `F` is countably certified over `BaseB`, and pulling a
+`BaseB` condition back along `f` lands in `BaseA`, then `E` is countably certified over
+`BaseA` by the pullback certificates.
+
+`hpull` is the hypothesis the previous version of this theorem omitted, and it is the
+whole mathematical content: in the topological reading it says exactly that `f` is
+continuous, since the preimage of a closed set under a continuous map is closed; in the
+measurable reading, that `f` is measurable. Without it the conclusion does not follow —
+an arbitrary `f` pulls a closed condition back to an arbitrary one — and the theorem
+that omitted it was not a ceiling argument but a restatement of
+`unionOfCertificates_of_reduction`.
+
+Consequence, used to refute representation-theoretic wildness: a *structure-preserving*
+reduction of a relation into a countably certified one makes the source countably
+certified too, so nothing above the ceiling reduces into anything below it along a map
+that respects the class. -/
+theorem countablyCertified_of_reduction
+    {α β ι : Type*} [Countable ι]
+    {BaseA : (α → α → Prop) → Prop} {BaseB : (β → β → Prop) → Prop}
+    {E : α → α → Prop} {F : β → β → Prop} {cert : ι → β → β → Prop}
+    (f : α → β)
+    (hpull : ∀ r : β → β → Prop, BaseB r → BaseA (fun x y => r (f x) (f y)))
+    (hred : ∀ x y, E x y ↔ F (f x) (f y))
+    (hF : IsCountablyCertified BaseB F cert) :
+    IsCountablyCertified BaseA E (fun c x y => cert c (f x) (f y)) where
+  base_certificates := fun c => hpull (cert c) (hF.base_certificates c)
+  is_union := unionOfCertificates_of_reduction f hred hF.is_union
+
+/-- **How a ceiling refutes something.** To place a relation *above* the ceiling it
+suffices to exhibit a property `Inv` that every countable union of `Base` conditions
+has and that `E` lacks. This is the only way a ceiling ever does work, and stating it
+here records what an instance owes: not a restatement of the union shape, but a
+union-stable invariant that separates.
+
+None of the five instances currently discharges `hInv`; that obligation is stated in
+`countablyCertified_open_obligation` below and is open. -/
+theorem not_countablyCertified_of_invariant
+    {α ι : Type*} [Countable ι] {Base : (α → α → Prop) → Prop} {E : α → α → Prop}
+    (Inv : (α → α → Prop) → Prop)
+    (hInv : ∀ cert : ι → α → α → Prop, (∀ c, Base (cert c)) →
+      Inv (fun x y => ∃ c : ι, cert c x y))
+    (hE : ¬ Inv E) (cert : ι → α → α → Prop) :
+    ¬ IsCountablyCertified Base E cert := by
+  intro h
+  refine hE ?_
+  have hEeq : E = fun x y => ∃ c : ι, cert c x y := by
+    funext x y
+    exact propext (h.is_union x y)
+  rw [hEeq]
+  exact hInv cert h.base_certificates
+
+/-- **What is still owed.** The prose of this development says the true object in each
+of the five settings sits *above* the ceiling. That is a statement of the form refuted
+by `not_countablyCertified_of_invariant`, and discharging it requires, per instance, a
+union-stable invariant of `Base` conditions that the true relation fails. No instance
+supplies one, and this file does not prove one exists.
+
+What the corpus does establish is the opposite direction — that the *probes* sit below
+the ceiling (`IsUnionOfCertificates`, e.g. `HiddenConeAmbiguity`'s
+`boundedLogDistortion_iff_nat`) — together with the blindness results of sections 1
+to 3, which are what actually carry the impossibility claims. The ceiling is a
+classification, not the proof. -/
+theorem countablyCertified_open_obligation : True := trivial
 
 /-!
 ## 5. The shape, stated once

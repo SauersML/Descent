@@ -1,4 +1,5 @@
 import Calibrator.PopulationGeneticsFoundations
+import Calibrator.ImitationRigidity
 import Calibrator.DemographicHistory
 import Calibrator.AncestrySpecificArchitecture
 import Calibrator.PCCorrectability.Threshold
@@ -164,6 +165,15 @@ noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
 
 /-- Between-subgroup allele-frequency variance for an equal-weight split. -/
 noncomputable def betweenSubgroupVariance (p₁ p₂ : ℝ) : ℝ := (p₁ - p₂) ^ 2 / 4
+
+/-- **Cross-check: the fair two-point variance in `ImitationRigidity` is the
+between-subgroup variance.** Both are `(a - b)² / 4`: the variance of a
+two-point law with equal weights. One is used as a nonconcentration witness for
+a resolvent and the other as the numerator of `F_ST`, and neither file knew the
+other existed. -/
+theorem fairTwoPointVariance_eq_betweenSubgroupVariance (a b : ℝ) :
+    fairTwoPointVariance a b = betweenSubgroupVariance a b := by
+  unfold fairTwoPointVariance betweenSubgroupVariance; ring
 
 /-- **Cross-check: the heterozygosity form and the variance form of `F_ST`
 agree.** The corpus contained both shapes and never related them. -/

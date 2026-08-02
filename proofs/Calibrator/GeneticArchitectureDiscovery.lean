@@ -5,6 +5,7 @@ import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Calibrator.OpenQuestions
 import Calibrator.SimulationValidation
 import Calibrator.AncestrySpecificPower
+import Calibrator.HaplotypeTheory
 
 namespace Calibrator
 
@@ -331,6 +332,19 @@ sample size `n`. -/
 noncomputable def olsEffectEstimationVariance
     (σ2 varX n : ℝ) : ℝ :=
   σ2 / (n * varX)
+
+/-- **Cross-check: haplotype effect estimation and one-locus OLS have the same
+estimation variance.** `HaplotypeTheory.haplotypeEffectEstimationVariance`
+divides by `n × f` with `f` a haplotype frequency; this divides by `n × varX`
+with `varX` a genotype variance. The two denominators are different quantities
+and the map is the same, so the arguments have to be read in the same order —
+which is the mistake this theorem is here to prevent, since the two definitions
+list `n` and the scale factor in opposite positions. -/
+theorem olsEffectEstimationVariance_eq_haplotypeEffectEstimationVariance
+    (σ2 varX n : ℝ) :
+    olsEffectEstimationVariance σ2 varX n =
+      haplotypeEffectEstimationVariance σ2 n varX := by
+  unfold olsEffectEstimationVariance haplotypeEffectEstimationVariance; ring
 
 /-- The set of loci retained by a hard-threshold sparse estimator such as
 LASSO, modeled here by the loci whose marginal effect magnitude clears the

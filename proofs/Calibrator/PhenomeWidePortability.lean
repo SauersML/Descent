@@ -143,7 +143,7 @@ noncomputable def selectedDriftFactor (Ne : ℝ) (t : ℕ) (s_correction : ℝ) 
 
     This map returns a valid `F_ST` only for `driftFactor ∈ (0, 1]`. It has no
     clamp of its own, deliberately: the constraint belongs on the factor it is
-    fed, and `fstFromDriftFactor_mem_unit` below states exactly which inputs are
+    fed, and `fstFromDriftFactor_mem_unit` below states which inputs are
     admissible. Feeding it a factor above `1` -- which `selectedDriftFactor`
     used to permit -- returns a negative `F_ST`.
 

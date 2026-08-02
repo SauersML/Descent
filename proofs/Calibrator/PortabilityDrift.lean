@@ -153,11 +153,15 @@ theorem pairwiseFst_composition_gap_le (a b eps : ℝ)
     ring
   rw [key]
   have hden : (0 : ℝ) < (1 + (a + b)) * (1 + (a + b + a * b)) := mul_pos h1 h2
-  have hone : (1 : ℝ) ≤ (1 + (a + b)) * (1 + (a + b + a * b)) := by nlinarith
+  have hsum : (0 : ℝ) ≤ a + b := by linarith
+  have hsum' : (0 : ℝ) ≤ a + b + a * b := by linarith
+  have hone : (1 : ℝ) ≤ (1 + (a + b)) * (1 + (a + b + a * b)) := by
+    nlinarith [mul_nonneg hsum hsum']
   have hstep : a * b / ((1 + (a + b)) * (1 + (a + b + a * b))) ≤ a * b := by
     rw [div_le_iff₀ hden]
-    nlinarith
-  have hfinal : a * b ≤ eps ^ 2 := by nlinarith
+    nlinarith [mul_le_mul_of_nonneg_left hone hab]
+  have heps : (0 : ℝ) ≤ eps := le_trans ha hae
+  have hfinal : a * b ≤ eps ^ 2 := by nlinarith [mul_le_mul hae hbe hb heps]
   linarith
 
 @[simp] theorem coalescenceCdfFromHazard_eq (hazard : ℝ → ℝ) (t : ℝ) :
@@ -2986,7 +2990,7 @@ theorem neutralAFBenchmarkRatio_le_inv_one_sub_source (fstSource fstTarget : ℝ
   have hpos : (0 : ℝ) < 1 - fstSource := by linarith
   unfold neutralAFBenchmarkRatio
   rw [div_le_div_iff₀ hpos hpos]
-  nlinarith
+  nlinarith [mul_nonneg h0 hpos.le]
 
 /-- **The measured value is outside the formula's range.**
 
@@ -4623,6 +4627,8 @@ theorem fstIslandMultiplicativeEquilibrium_isFixedPoint (Ne m : ℝ)
   have hd : (0 : ℝ) < (1 - m) ^ 2 + 2 * Ne * m * (2 - m) := by linarith
   have hd' : (1 - m) ^ 2 + 2 * Ne * m * (2 - m) ≠ 0 := ne_of_gt hd
   unfold islandFstMultiplicativeStep fstIslandMultiplicativeEquilibrium
+  have h2Ne : (2 : ℝ) * Ne ≠ 0 := mul_ne_zero two_ne_zero hNe'
+  rw [eq_div_iff hd']
   field_simp
   ring
 

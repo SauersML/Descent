@@ -234,7 +234,7 @@ because it had no other place to go.
 
     Empirical status: UNTESTED as written here.  The formula it replaces
     (`bottleneckLDAmplification`, deleted above) was falsified by up to 3.3-fold
-    precisely by omitting `c`; the classical small-`c`, large-`Nₑ` limit of the
+    through omitting `c`; the classical small-`c`, large-`Nₑ` limit of the
     fixed point of this map is the Sved expression `1/(1 + 4 Nₑ c)` that the
     falsification report cites as truth, but that limit is documented here, not
     proved, and the map itself has not been simulated. -/
@@ -646,7 +646,7 @@ theorem excess_ld_nonneg (N_b N_r c : ℝ) (t_b t_r : ℕ)
   have h_Lb := driftLDRetention_mem_unit N_b c hNb hc hc1
   have h_Lr := driftLDRetention_mem_unit N_r c hNr hc hc1
   have h_amp : 0 ≤ 1 - driftLDRetention N_b c ^ t_b := by
-    have := pow_le_one₀ h_Lb.1 h_Lb.2 (n := t_b)
+    have hp : driftLDRetention N_b c ^ t_b ≤ 1 := pow_le_one₀ h_Lb.1 h_Lb.2
     linarith
   have h_dec : 0 ≤ driftLDRetention N_r c ^ t_r := pow_nonneg h_Lr.1 t_r
   exact mul_nonneg (mul_nonneg h_gap h_amp) h_dec
@@ -686,7 +686,7 @@ theorem more_severe_bottleneck_more_ld (N₁ N₂ N_r c : ℝ) (t_b t_r : ℕ)
       driftLDRetention N₂ c ^ t_b < driftLDRetention N₁ c ^ t_b :=
     pow_lt_pow_left₀ h_ret_lt hL₂.1 (by omega)
   have h_amp₁ : 0 ≤ 1 - driftLDRetention N₁ c ^ t_b := by
-    have := pow_le_one₀ hL₁.1 hL₁.2 (n := t_b)
+    have hp : driftLDRetention N₁ c ^ t_b ≤ 1 := pow_le_one₀ hL₁.1 hL₁.2
     linarith
   have h_amp₂_pos : 0 < 1 - driftLDRetention N₂ c ^ t_b := by linarith
   -- the recovery decay factor is strictly positive

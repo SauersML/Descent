@@ -121,8 +121,9 @@ def sigmaT : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 1], ![1, 1]]
 /-- Source cross-covariances. -/
 def crossS : Fin 2 → ℝ := ![1, 0]
 
-/-- Target cross-covariances. -/
-def crossT : Fin 2 → ℝ := ![1, 1]
+/-! Target cross-covariances were restated here as `ldWitnessTargetCross`. The same witness
+vector `![1, 1]` is `DGP.ldWitnessTargetCross`, and the restatement has been
+deleted so that the two `2 × 2` witnesses in this development are one witness. -/
 
 /-- Another target LD matrix with a different correlation structure. -/
 def sigmaT2 : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 0.5], ![0.5, 1]]
@@ -133,7 +134,7 @@ def sigmaT2 : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 0.5], ![0.5, 1]]
 theorem source_erm_is_ld_specific_proved :
     let wS : Fin 2 → ℝ := ![1, 0]
     sigmaS.mulVec wS = crossS ∧
-    sigmaT2.mulVec wS ≠ crossT := by
+    sigmaT2.mulVec wS ≠ ldWitnessTargetCross := by
   intro wS
   refine ⟨?_, ?_⟩
   · ext i
@@ -141,9 +142,9 @@ theorem source_erm_is_ld_specific_proved :
     · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
     · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
   · intro heq
-    have h : (sigmaT2.mulVec wS) 1 = crossT 1 := congrFun heq 1
+    have h : (sigmaT2.mulVec wS) 1 = ldWitnessTargetCross 1 := congrFun heq 1
     revert h
-    simp [wS, sigmaT2, crossT, Matrix.mulVec, dotProduct]
+    simp [wS, sigmaT2, ldWitnessTargetCross, Matrix.mulVec, dotProduct]
     norm_num
 
 /-- A concrete proof that ERM mismatch occurs under LD shift, without assuming an
@@ -154,12 +155,12 @@ theorem source_target_erm_differ_proved :
     let wS : Fin 2 → ℝ := ![1, 0]
     let wT : Fin 2 → ℝ := ![1/2, 1/2]
     sigmaS.mulVec wS = crossS ∧
-    sigmaT.mulVec wT = crossT ∧
+    sigmaT.mulVec wT = ldWitnessTargetCross ∧
     wS ≠ wT := by
   intro wS wT
   refine ⟨?_, ?_, ?_⟩
   · ext i; fin_cases i <;> simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
-  · ext i; fin_cases i <;> simp [wT, sigmaT, crossT, Matrix.mulVec, dotProduct] <;> ring
+  · ext i; fin_cases i <;> simp [wT, sigmaT, ldWitnessTargetCross, Matrix.mulVec, dotProduct] <;> ring
   · intro heq
     have h : wS 0 = wT 0 := congrFun heq 0
     simp [wS, wT] at h
