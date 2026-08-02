@@ -1,0 +1,232 @@
+{
+ "control_fold_present": {
+  "findings": [
+   {
+    "family": "CONTROL-fold-present",
+    "branch": "b0",
+    "site": "t = 1/2",
+    "q0": 0.5,
+    "critical_value": 0.0,
+    "delta": 1e-06,
+    "self_coverage": 2,
+    "other_coverage": {
+     "b1": 0
+    },
+    "FOLD": true
+   },
+   {
+    "family": "CONTROL-fold-present",
+    "branch": "b0",
+    "site": "t = 1/2",
+    "q0": 0.5,
+    "critical_value": 0.0,
+    "delta": 0.0001,
+    "self_coverage": 2,
+    "other_coverage": {
+     "b1": 0
+    },
+    "FOLD": true
+   },
+   {
+    "family": "CONTROL-fold-present",
+    "branch": "b0",
+    "site": "t = 1/2",
+    "q0": 0.5,
+    "critical_value": 0.0,
+    "delta": 0.01,
+    "self_coverage": 2,
+    "other_coverage": {
+     "b1": 0
+    },
+    "FOLD": true
+   },
+   {
+    "family": "CONTROL-fold-present",
+    "branch": "b0",
+    "site": "t = 1/2",
+    "q0": 0.5,
+    "critical_value": 0.0,
+    "delta": 0.1,
+    "self_coverage": 2,
+    "other_coverage": {
+     "b1": 0
+    },
+    "FOLD": true
+   }
+  ],
+  "pass": true
+ },
+ "control_fold_excluded": {
+  "findings": [
+   {
+    "family": "CONTROL-fold-excluded",
+    "branch": "b0",
+    "site": "t = 1/2",
+    "q0": 0.5,
+    "critical_value": 0.0,
+    "delta": 1e-06,
+    "self_coverage": 2,
+    "other_coverage": {
+     "b1": 0
+    },
+    "FOLD": true
+   },
+   {
+    "family": "CONTROL-fold-excluded",
+    "branch": "b0",
+    "site": "t = 1/2",
+    "q0": 0.5,
+    "critical_value": 0.0,
+    "delta": 0.0001,
+    "self_coverage": 2,
+    "other_coverage": {
+     "b1": 0
+    },
+    "FOLD": true
+   },
+   {
+    "family": "CONTROL-fold-excluded",
+    "branch": "b0",
+    "site": "t = 1/2",
+    "q0": 0.5,
+    "critical_value": 0.0,
+    "delta": 0.01,
+    "self_coverage": 2,
+    "other_coverage": {
+     "b1": 0
+    },
+    "FOLD": true
+   },
+   {
+    "family": "CONTROL-fold-excluded",
+    "branch": "b0",
+    "site": "t = 1/2",
+    "q0": 0.5,
+    "critical_value": 0.0,
+    "delta": 0.1,
+    "self_coverage": 2,
+    "other_coverage": {
+     "b1": 0
+    },
+    "FOLD": true
+   }
+  ],
+  "pass": false
+ },
+ "genotype": [
+  {
+   "family": "genotype",
+   "branch": "m0",
+   "site": "q = 1/3",
+   "q0": 0.3333333333333333,
+   "critical_value": 0.0,
+   "delta": 1e-06,
+   "self_coverage": 0,
+   "other_coverage": {
+    "m1": 0,
+    "m2": 0
+   },
+   "FOLD": false
+  },
+  {
+   "family": "genotype",
+   "branch": "m0",
+   "site": "q = 1/3",
+   "q0": 0.3333333333333333,
+   "critical_value": 0.0,
+   "delta": 0.0001,
+   "self_coverage": 1,
+   "other_coverage": {
+    "m1": 1,
+    "m2": 0
+   },
+   "FOLD": false
+  },
+  {
+   "family": "genotype",
+   "branch": "m0",
+   "site": "q = 1/3",
+   "q0": 0.3333333333333333,
+   "critical_value": 0.0,
+   "delta": 0.01,
+   "self_coverage": 1,
+   "other_coverage": {
+    "m1": 1,
+    "m2": 0
+   },
+   "FOLD": false
+  },
+  {
+   "family": "genotype",
+   "branch": "m0",
+   "site": "q = 1/3",
+   "q0": 0.3333333333333333,
+   "critical_value": 0.0,
+   "delta": 0.1,
+   "self_coverage": 1,
+   "other_coverage": {
+    "m1": 1,
+    "m2": 0
+   },
+   "FOLD": false
+  },
+  {
+   "family": "genotype",
+   "branch": "m1",
+   "site": "q = (3-sqrt(3))/6",
+   "q0": 0.21132486540518713,
+   "critical_value": 1.1102230246251565e-16,
+   "delta": 1e-06,
+   "self_coverage": 0,
+   "other_coverage": {
+    "m0": 0,
+    "m2": 0
+   },
+   "FOLD": false
+  },
+  {
+   "family": "genotype",
+   "branch": "m1",
+   "site": "q = (3-sqrt(3))/6",
+   "q0": 0.21132486540518713,
+   "critical_value": 1.1102230246251565e-16,
+   "delta": 0.0001,
+   "self_coverage": 1,
+   "other_coverage": {
+    "m0": 1,
+    "m2": 0
+   },
+   "FOLD": false
+  },
+  {
+   "family": "genotype",
+   "branch": "m1",
+   "site": "q = (3-sqrt(3))/6",
+   "q0": 0.21132486540518713,
+   "critical_value": 1.1102230246251565e-16,
+   "delta": 0.01,
+   "self_coverage": 1,
+   "other_coverage": {
+    "m0": 1,
+    "m2": 0
+   },
+   "FOLD": false
+  },
+  {
+   "family": "genotype",
+   "branch": "m1",
+   "site": "q = (3-sqrt(3))/6",
+   "q0": 0.21132486540518713,
+   "critical_value": 1.1102230246251565e-16,
+   "delta": 0.1,
+   "self_coverage": 1,
+   "other_coverage": {
+    "m0": 1,
+    "m2": 0
+   },
+   "FOLD": false
+  }
+ ],
+ "genotype_fold_found": false,
+ "READ_THE_TEST": false
+}
