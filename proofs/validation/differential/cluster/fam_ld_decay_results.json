@@ -1,0 +1,85 @@
+{
+ "controls": {
+  "C1_drift_only": 0.9974548963376884,
+  "C1_expected": 0.9975,
+  "C1_pass": true,
+  "C2_recomb_only": 0.98,
+  "C2_expected": 0.98,
+  "C2_pass": true
+ },
+ "A_D_retention": [
+  {
+   "r": 0.0,
+   "measured": 0.9974424698877205,
+   "hill_robertson": 0.9975,
+   "rel_err": -5.767429802466402e-05,
+   "gens_used": 61
+  },
+  {
+   "r": 0.00125,
+   "measured": 0.9965396351174278,
+   "hill_robertson": 0.9962531250000001,
+   "rel_err": 0.00028758767248810563,
+   "gens_used": 61
+  },
+  {
+   "r": 0.0025,
+   "measured": 0.9947643105586548,
+   "hill_robertson": 0.9950062500000001,
+   "rel_err": -0.00024315369008518083,
+   "gens_used": 61
+  },
+  {
+   "r": 0.005,
+   "measured": 0.9918763216957229,
+   "hill_robertson": 0.9925125,
+   "rel_err": -0.0006409776242385771,
+   "gens_used": 61
+  },
+  {
+   "r": 0.02,
+   "measured": 0.9775032334894908,
+   "hill_robertson": 0.97755,
+   "rel_err": -4.7840530417142225e-05,
+   "gens_used": 61
+  },
+  {
+   "r": 0.1,
+   "measured": 0.9041279670176698,
+   "hill_robertson": 0.89775,
+   "rel_err": 0.0071043909971259195,
+   "gens_used": 61
+  }
+ ],
+ "B_sigma_d2": [
+  {
+   "rho": 0.5,
+   "measured": 0.3782047579583377,
+   "corpus_driftLDEquilibrium": 0.6663886958750639,
+   "ohta_kimura": 0.3652173913043478,
+   "closer_to": "Ohta-Kimura"
+  },
+  {
+   "rho": 2.0,
+   "measured": 0.22860355173292807,
+   "corpus_driftLDEquilibrium": 0.3322209876589098,
+   "ohta_kimura": 0.23076923076923078,
+   "closer_to": "Ohta-Kimura"
+  },
+  {
+   "rho": 10.0,
+   "measured": 0.09076188764582752,
+   "corpus_driftLDEquilibrium": 0.08884408259105159,
+   "ohta_kimura": 0.07936507936507936,
+   "closer_to": "corpus"
+  },
+  {
+   "rho": 40.0,
+   "measured": 0.024234480352281346,
+   "corpus_driftLDEquilibrium": 0.022032374100719447,
+   "ohta_kimura": 0.02334267040149393,
+   "closer_to": "Ohta-Kimura"
+  }
+ ],
+ "READ_THE_TEST": true
+}
