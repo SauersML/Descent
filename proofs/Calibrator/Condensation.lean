@@ -410,6 +410,5 @@ function of allele frequency in `Calibrator.PolygenicSpectroscopy`. It is **not*
 `c_G`, and it diverges as the allele frequency goes to zero. So the degree at which
 the Gaussian surrogate fails is allele-frequency dependent, and fails soonest for rare
 variants. -/
-theorem condensation_bridge_is_documentation : True := trivial
 
 end Calibrator

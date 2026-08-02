@@ -62,38 +62,23 @@ theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
   unfold fstMigrationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by positivity) (by nlinarith)
 
-/-- **Connection to the other copy of this formula**: `fstMigrationDriftEquilibrium`
-    equals `fstMigrationDriftEquilibrium` from `PortabilityDrift.lean` when
-    M = 4·Ne·m. Both express Wright's (1931) island model Fst = 1/(1 + 4Nem).
+/-! **This module used to hold its own copy of the island-model `F_ST`.**
 
-    This theorem relates two stipulated constants; it does not derive either.
-    An earlier version of this docstring said `fstMigrationDriftEquilibrium`
-    "was derived from first principles via the migration-drift balance in
-    `PortabilityDrift`". That claim was unearned and has been removed.
-    `PortabilityDrift` does define a one-generation migration-drift map
-    (`fstMigDriftNext`) and, separately, the constant `fstMigDriftEquil`, but no
-    theorem anywhere states that the constant is a fixed point of the map: the
-    algebra exists only in a docstring. The status is therefore "unverified but
-    probably true", not "derived" — the hand algebra checks out
-    (`b = F*(1-a)` with `a = 1 - 2m - 1/(2Nₑ)`, `b = 1/(2Nₑ)`,
-    `F* = 1/(1 + 4Nₑm)` reduces to `1/(2Nₑ) = 1/(2Nₑ)`), but Lean has not
-    checked it. The missing theorem is
-    `fstMigDriftNext Ne m (fstMigDriftEquil Ne m) = fstMigDriftEquil Ne m`,
-    which belongs in `PortabilityDrift.lean` next to the two definitions.
+`demoIslandModelFst` was one of four independently written spellings of
+`1/(1 + 4 Nₑ m)`, and this section carried a theorem relating this copy to the one in
+`PortabilityDrift`. There is now a single definition, so the relating theorem had become
+`X = X` and is gone, along with the no-op rewrite that used it.
 
-    Compare `selectionMigrationEquilibrium_isFixedPoint` in
-    `PopulationGeneticsFoundations.lean`, which is what this claim would look
-    like if it were true. -/
-theorem islandModelFst_eq_derived (Ne m : ℝ) :
-    fstMigrationDriftEquilibrium Ne m = fstMigrationDriftEquilibrium Ne m := by
-  unfold fstMigrationDriftEquilibrium fstMigrationDriftEquilibrium
-  ring
+The caveat that stood here is also discharged. It recorded that the constant was merely
+stipulated — that `PortabilityDrift` defined a one-generation migration-drift map and,
+separately, the constant, with no theorem saying the constant is a fixed point of the map,
+so the status was "unverified but probably true" rather than "derived". That theorem now
+exists: `fstMigrationDriftEquilibrium_isFixedPoint`. -/
 
 /-- Equivalent formulation: `fstMigrationDriftEquilibrium` = 1/(1 + M) where M = `scaledMigrationRate`. -/
 theorem islandModelFst_eq_from_scaledMigration (Ne m : ℝ) :
-    fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
-  rw [islandModelFst_eq_derived]
-  exact fstMigrationDriftEquilibrium_eq_from_M Ne m
+    fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m) :=
+  fstMigrationDriftEquilibrium_eq_from_M Ne m
 
 end IslandModel
 

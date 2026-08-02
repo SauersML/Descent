@@ -832,7 +832,8 @@ theorem coefficientEnergy_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ)
         2 * dot x (B.mulVec y) := by
   have hrw : (fun i => x i - y i) = (fun i => x i + ((-1 : ℝ) • y) i) := by
     funext i
-    simp
+    show x i - y i = x i + (-1 : ℝ) * y i
+    ring
   rw [hrw, coefficientEnergy_add B x ((-1 : ℝ) • y) hsymmetric,
     coefficientEnergy_smul, matrix_mulVec_smul, dot_smul_right]
   ring
