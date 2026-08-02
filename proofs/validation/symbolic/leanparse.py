@@ -13,7 +13,7 @@ import re
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
-from paths import CALIBRATOR, require  # noqa: E402, ARTIFACTS as ART
+from paths import CALIBRATOR, require, ARTIFACTS as ART  # noqa: E402
 
 require(CALIBRATOR, "proofs/Calibrator")
 

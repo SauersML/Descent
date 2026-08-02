@@ -48,7 +48,7 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from paths import VALIDATION, require  # noqa: E402, ARTIFACTS as ART
+from paths import VALIDATION, require, ARTIFACTS as ART  # noqa: E402
 
 require(VALIDATION, "proofs/validation")
 HERE = VALIDATION / "symbolic"
