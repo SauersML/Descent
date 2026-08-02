@@ -59,6 +59,15 @@
 >   internal verdicts, or absences.
 > - A clean run on the wrong revision is worse than no run, because it reads as
 >   confirmation.
+> - **Elaboration reads as rigour.** A 2001-point grid search was found where a
+>   closed form existed — the search was not buying accuracy over solving it, it
+>   was *costing* accuracy by quantising the answer to the grid, and it had been
+>   kept because it looked more empirical. This tier is the same shape: it
+>   samples 40 admissible points where, for many bodies, monotonicity or a value
+>   at a distinguished point would settle the question exactly. Sampling is what
+>   you do when you cannot solve, not a more honest version of solving.
+> - A diff can only report a number. A **prediction** can be wrong in a way that
+>   indicts the tool. Prefer instruments that can embarrass themselves.
 
 Every validation script in this repo used to re-transcribe a Lean formula into
 Python by hand. That transcription is an unvalidated step *inside* the
