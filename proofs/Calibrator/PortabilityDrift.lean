@@ -2779,7 +2779,7 @@ theorem neutralAFBenchmarkRatio_from_state
     have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
       unfold presentDayPGSVariance pgsVarianceFromHet
       have h_one_minus : 0 < 1 - fstSource := by linarith [h_fst_bounds.2, h_fst]
-      exact mul_pos h_one_minus hVA
+      exact mul_pos hVA h_one_minus
     exact div_pos hv_pos (by linarith)
   have hdrop :
       targetR2FromNeutralAFBenchmark V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by

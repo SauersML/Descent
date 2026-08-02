@@ -76,6 +76,39 @@
 #       grep -c '^error: proofs/'      <- correct
 #       grep -c '^error:'              <- WRONG, matches git and lake messages
 #
+#   READING LEAN ERRORS: THREE SHAPES OF "unfold failed", ALL PRINTING THE SAME
+#   MESSAGE AND ALL WANTING DIFFERENT REPAIRS. Found the hard way on
+#   2026-08-02, across DGP and PortabilityDrift:
+#
+#     (a) THE NAME MOVED.       A definition no longer routes through the name
+#                               being unfolded. Repair: restore the routing.
+#     (b) THE REQUEST IS
+#         IMPOSSIBLE.           The name is an inductive CONSTRUCTOR, e.g.
+#                               `Pop.source`. Constructors have no body, so this
+#                               could never have worked. Repair: DELETE the
+#                               token; the surrounding proof is fine.
+#     (c) THE REQUEST IS
+#         REDUNDANT.            `unfold` is NOT idempotent. A name listed twice
+#                               unfolds on the first occurrence and ERRORS on
+#                               the second, because the constant is gone by
+#                               then. Repair: delete the duplicate.
+#
+#   The message cannot distinguish these, and reading (b) as (a) sends you
+#   hunting for reducibility attributes that do not exist. CHECK WHAT THE NAME
+#   IS before theorising: `inductive` constructor, or `def`?
+#
+#   AND THE GENERAL FORM OF THAT TRAP, which cost the most time of anything
+#   today: A TOOL REPORTS THE FAILURE IT CAN EXPRESS, NOT THE FAILURE THAT
+#   OCCURRED. The clearest instance was `linarith failed to find a
+#   contradiction` whose actual cause was a MISSING SIMP LEMMA: a `@[simp]`
+#   pair had one half stated (`residualBurden_source`) and the other missing,
+#   so target-side facts were phrased about one name while goals said another.
+#   `linarith` was handed a hypothesis about a term ABSENT FROM ITS GOAL and
+#   truthfully reported that it could not close the arithmetic. Nobody would
+#   reach "missing bridge lemma" from that message. So when a tactic fails on
+#   something that looks obviously true, READ THE PRINTED GOAL and check that
+#   every hypothesis you supplied actually mentions a term that occurs in it.
+#
 #   THEN, AND THIS IS NOT OPTIONAL, check MODULE_STATUS for the files you care
 #   about. "NO ERRORS FOR FILE X" IS ONLY MEANINGFUL IF X COMPILED. On
 #   2026-08-02 a cancelled build produced a log with zero errors in
@@ -133,6 +166,29 @@
 #   not run it, because doing so writes into a shared tree during someone else's
 #   rebuild. Try it in an isolated clone first.
 # * Never run heavy compute on a login node; submit with sbatch.
+#
+# ---------------------------------------------------------------------------
+# NEGATIVE RESULT: DO NOT REBUILD THE "DUPLICATE unfold ARGUMENT" SCANNER.
+#
+# Having found one `unfold` list that named the same constant twice, the
+# obvious next move is a scan over every `unfold` block in a file. I wrote it
+# on 2026-08-02. IT REPORTED TEN HITS, OF WHICH ONE WAS REAL, and it is not
+# fixable by tightening the regex in any way I could see.
+#
+# The reason is structural. An `unfold` tactic's argument list continues onto
+# following lines by INDENTATION, and the tactic lines that follow it are
+# indented too. So any indent-based capture swallows the subsequent `have`,
+# `exact` and `simp` lines, and then reports ordinary repeated words -- `have`,
+# `exact`, `0`, `:=`, `by` -- as duplicate unfold arguments. Distinguishing a
+# continued argument list from the next tactic needs the parser, not a regex.
+#
+# IT WAS NOT COMMITTED AND ITS OUTPUT WAS NOT USED AS EVIDENCE. The rule this
+# is an instance of: a detector with a 90% false-positive rate is WORSE THAN NO
+# DETECTOR, because it gets ignored within a day and its real hits become
+# invisible along with the noise. Most checks that fail here fail by being
+# unable to FIRE; this one fails by firing too easily, and that is equally
+# disqualifying. The real duplicate was found by the compiler, which is the
+# tool that actually parses the file.
 # ---------------------------------------------------------------------------
 
 set -uo pipefail
