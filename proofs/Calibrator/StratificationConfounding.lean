@@ -631,6 +631,34 @@ section PowerAnalysis
 /-- **Variance of R² estimator.**
     Var(R²) ≈ 4R²(1-R²)²/n for the standard R² estimator.
 
+    Regime: the delta-method (large-sample) variance of the plug-in R² from a
+    simple bivariate-normal regression, valid when the non-centrality `n R²` is
+    large -- roughly `n R² >= 50`.  The controlling variable is `n R²`, not `n`:
+    the approximation fails when R² is small relative to `1 / n`, because the
+    plug-in estimator then sits on its noise floor (`E[R̂²] ≈ R² + (1-R²)/n`) and
+    carries variance this formula does not model.  Measured ratios of formula to
+    a 20000-replicate Monte Carlo, replicating `check_stats.mc_r2_variance`:
+
+        R²      n     n R²    formula / MC
+      0.01    200        2       0.825
+      0.01   1000       10       0.954
+      0.01   5000       50       0.985
+      0.05    200       10       0.984
+      0.05   1000       50       0.993
+      0.20    200       40       1.011
+      0.50   1000      500       0.992
+
+    Every cell with `n R² >= 40` is within about 1%; the departures are the
+    small-`n R²` cells and they are one-sided, the formula always too low.
+
+    Note this does not match the boundary asserted below.  The Empirical status
+    line states `0.99-1.01 for n >= 1000`, but at `R² = 0.01` the ratio is 0.954
+    at `n = 1000` and 0.985 at `n = 5000` -- both outside that band, at sample
+    sizes the band claims to cover.  The formula is right and its regime is
+    real; it is the stated boundary that is in the wrong variable.  Correcting
+    the status line is left to this file's owner, since it is a claim-versus-
+    evidence question rather than a missing regime.
+
     Empirical status: VALIDATED (40000-replicate Monte Carlo, ratio 0.99-1.01 for n >= 1000). -/
 noncomputable def r2EstimatorVariance (r2 : ℝ) (n : ℕ) : ℝ :=
   4 * r2 * (1 - r2) ^ 2 / n
