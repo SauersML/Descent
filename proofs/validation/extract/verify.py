@@ -384,6 +384,67 @@ def shape_directed_inhabitants_are_right():
             raise AssertionError(f"invented an inhabitant of {ty!r}")
 
 
+def finite_index_types_translate_correctly():
+    """POSITIVE CONTROLS for the finite-index-type translation.
+
+    Enumerations (`Pop`, `DiploidGenotype`) are index types in this corpus, and
+    an ordinal is assigned in two independent places -- emit.py's `enums` table
+    and admissible.type_value's tables.  If those two ever disagreed,
+    `m.beta Pop.target` would silently read the SOURCE population's entry and
+    hand back a number from the wrong population.  Nothing else in this project
+    would notice, so it is asserted here against the Lean declaration order.
+    """
+    import api
+    import lean_rt as _rt
+    api.refresh()
+
+    # `def Pop.pair (s t : α) : Pop → α | Pop.source => s | Pop.target => t`
+    # -- a case split, so the answers are the arguments themselves.
+    fn, argnames = api.callable_for("Calibrator.Pop.pair")
+    assert fn(11.0, 22.0, 0) == 11.0, "Pop.source must be ordinal 0"
+    assert fn(11.0, 22.0, 1) == 22.0, "Pop.target must be ordinal 1"
+    print(f"  ok  Pop.pair{tuple(argnames)}: source->first, target->second")
+    try:
+        fn(11.0, 22.0, 2)
+    except IndexError:
+        print("  ok  Pop.pair refuses a third population")
+    else:
+        raise AssertionError("Pop.pair answered for a constructor that does "
+                             "not exist")
+
+    # A ∑ whose index has no type annotation and no `Fin n` argument to read a
+    # dimension from: the range comes from what the index is APPLIED to.
+    # `haplotypeHomozygosity (freq : α → ℝ) := ∑ i, freq i ^ 2`, so a uniform
+    # frequency vector of length n gives n * (1/n)^2 = 1/n -- known by hand.
+    fn, _a = api.callable_for("Calibrator.haplotypeHomozygosity")
+    for n in (2, 4, 5):
+        close(f"haplotypeHomozygosity(uniform {n}) = 1/{n}",
+              float(fn([1.0 / n] * n)), 1.0 / n)
+
+    # ... and if two things the index runs over have different lengths, the
+    # range is ambiguous and the sum must REFUSE, not pick one.
+    try:
+        _rt.sumdim("i", 4, 5)
+    except ValueError as e:
+        assert "DIFFERENT lengths" in str(e), str(e)
+        print("  ok  a ∑ over mismatched dimensions refuses instead of choosing")
+    else:
+        raise AssertionError("sumdim silently chose between 4 and 5")
+    close("sumdim agrees with itself", float(_rt.sumdim("i", 3, 3, 3)), 3.0)
+
+    # Mathlib's dotProduct reached through a real definition:
+    # `coefficientGapSq wS wT = dotProduct (wS - wT) (wS - wT)` = Σ (wSᵢ-wTᵢ)².
+    fn, _a = api.callable_for("Calibrator.coefficientGapSq")
+    close("coefficientGapSq([1,2,3],[0,0,0]) = 1+4+9",
+          float(fn([1.0, 2.0, 3.0], [0.0, 0.0, 0.0])), 14.0)
+    close("coefficientGapSq(v,v) = 0",
+          float(fn([1.0, 2.0, 3.0], [1.0, 2.0, 3.0])), 0.0)
+
+
+step("finite index types: enums, inferred ∑ ranges, Mathlib linear algebra",
+     finite_index_types_translate_correctly)
+
+
 step("shape-directed inhabitants (positive controls)",
      shape_directed_inhabitants_are_right)
 

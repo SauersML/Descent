@@ -45,6 +45,24 @@ NUMERIC_STANDINS = {
 
 # ------------------------------------------------------------- taxonomy
 
+# A FINITE INDEX DOMAIN, as the corpus writes one.  `Fin n`, or a bare type
+# name standing for an abstract `[Fintype]` index -- `α`, `ι`, `V`, `Band`, or
+# an enumeration like `Pop`.
+#
+# This used to accept only `Fin n`, which meant `freq : α → ℝ` and `A : Matrix ι
+# ι ℝ` were not recognised as sequences: their `∑` had no dimension, and a
+# caller who passed a Python list got "'list' object is not callable" because
+# the body applied them instead of indexing them.  The Lean types are the same
+# shape and must get the same calling convention, or `api.vector_args` tells a
+# consumer the truth for one definition and not for its neighbour.
+#
+# `ℝ`, `ℕ` and `ℤ` are excluded on purpose: `profile : ℝ → ℝ` is a genuine
+# function evaluated at a real location, not a table, and reading it as a
+# sequence would index it with a coordinate.
+IDX = (r"(?:Fin\s+\w+|(?!ℝ\b|ℕ\b|ℤ\b|ℚ\b)"
+       r"[A-Za-zΑ-Ωα-ωϑ-ϵ][\w'₀-₉]*)")
+
+
 PROP_RETS = {"Prop"}
 
 
@@ -268,13 +286,13 @@ def main():
             if a["implicit"]:
                 continue
             ty = " ".join(a["type"].split())
-            mv = re.fullmatch(r"Fin\s+(\w+)\s*→\s*ℝ", ty)
-            mm = re.fullmatch(r"Matrix\s*\(Fin\s+(\w+)\)\s*\(Fin\s+(\w+)\)\s*ℝ", ty)
+            mv = re.fullmatch(rf"{IDX}\s*→\s*ℝ", ty)
+            mm = re.fullmatch(rf"Matrix\s*\(?{IDX}\)?\s*\(?{IDX}\)?\s*ℝ", ty)
             if mm is None:
                 # Curried index functions: `Fin m → Fin m → ℝ` is how the corpus
                 # writes an LD matrix in several places, and it indexes exactly
                 # like a Matrix.
-                mm = re.fullmatch(r"Fin\s+(\w+)\s*→\s*Fin\s+(\w+)\s*→\s*ℝ", ty)
+                mm = re.fullmatch(rf"{IDX}\s*→\s*{IDX}\s*→\s*ℝ", ty)
             for n in a["names"]:
                 if mv:
                     vector_args[n] = (mv.group(1), 1)
