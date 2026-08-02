@@ -1,5 +1,9 @@
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Algebra.BigOperators.Fin
+-- `Finset.sum_nonneg` and `Finset.single_le_sum` live here, not in
+-- `Algebra.BigOperators.Fin`; without this import they resolve as unknown constants and
+-- `degradation_nonneg` / `degradation_eq_zero_iff` fail to elaborate.
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.Linarith
@@ -48,9 +52,12 @@ noncomputable def optimalReadout (P : FiniteSpectralModel Band) (b : Band) : ℝ
   P.crossSpectrum b / P.featureSpectrum b
 
 /-- Population quadratic risk of a bandwise linear readout. -/
+-- The parentheses are load-bearing. `∑ b, x - y + z` binds the summation to `x` alone,
+-- so without them the second and third terms sit outside the binder and their `b` is a
+-- free variable -- which is exactly how this definition failed to elaborate.
 noncomputable def risk (P : FiniteSpectralModel Band) (readout : Band → ℝ) : ℝ :=
-  ∑ b, P.featureSpectrum b * readout b ^ 2 -
-    2 * P.crossSpectrum b * readout b + P.targetPower b
+  ∑ b, (P.featureSpectrum b * readout b ^ 2 -
+    2 * P.crossSpectrum b * readout b + P.targetPower b)
 
 /-- Directed degradation: excess target risk incurred by transporting the source-optimal
 readout instead of refitting the target-optimal readout. -/
@@ -245,8 +252,10 @@ theorem twoBand_reversal_values (a : ℝ) :
     FiniteSpectralModel.bandDegradation twoBandBaseline (twoBandHighShift a) {0} = 0 ∧
     FiniteSpectralModel.bandDegradation twoBandBaseline (twoBandLowShift a) {1} = 0 ∧
     FiniteSpectralModel.bandDegradation twoBandBaseline (twoBandHighShift a) {1} = a ^ 2 := by
+  -- All three models have to be unfolded: with only `twoBandBaseline` in the list the
+  -- goal reduces to four claims about the *shifted* models' spectra and stalls there.
   simp [FiniteSpectralModel.bandDegradation, FiniteSpectralModel.optimalReadout,
-    twoBandBaseline]
+    twoBandBaseline, twoBandLowShift, twoBandHighShift]
 
 /-- **No task-independent scalar ranks the two genomic-band shifts.**  For any nonzero
 shift, pair 1 is strictly worse on the low-frequency task and pair 2 is strictly worse on

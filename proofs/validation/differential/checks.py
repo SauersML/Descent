@@ -1522,9 +1522,17 @@ def _ibd_exact_island_fst(ne, m, d, theta=1e-3):
 
 
 def _fixed_point(step, x0=0.0, n=200000):
+    """Iterate to the rest point, with the convergence CHECKED rather than a
+    fixed iteration count asserted. The cap is unchanged at 200000; the early
+    exit fires only once successive iterates stop moving at double precision,
+    so the returned value is the same value, reached sooner.
+    """
     x = x0
     for _ in range(n):
-        x = step(x)
+        nxt = step(x)
+        if nxt == x:
+            return x
+        x = nxt
     return x
 
 
