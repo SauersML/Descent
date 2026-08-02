@@ -161,7 +161,8 @@ def phase2(recon):
     """Attempt level-set invariance with structure-valued arguments."""
     import math
 
-    results = {"attempted": 0, "members": [], "excluded": [], "errors": []}
+    results = {"attempted": 0, "members": [], "excluded": [], "errors": [],
+               "skipped": {}}
     NE_FIELDS = ["Ne", "N", "N_e"]
     T_FIELDS = ["horizon", "t", "t_div", "gens", "generations"]
     LEVELS = [0.9, 0.6, 0.3, 0.1]
@@ -174,10 +175,26 @@ def phase2(recon):
         args = rec["args"]
         explicit = [a for a in args if not a.get("implicit")]
         if len(explicit) != 1:
+            results["skipped"]["not_single_explicit_arg"] = \
+                results["skipped"].get("not_single_explicit_arg", 0) + 1
             continue
-        tname = explicit[0].get("type")
-        fields = _numeric_fields(structs.get(tname, {}))
+        # Argument types carry parameters ("HWEPolygenicScoreDGP m") and the
+        # structure table is keyed by FULLY QUALIFIED name
+        # ("Calibrator.EvolutionaryParameters"), so neither a raw nor an exact
+        # lookup finds it. Strip parameters, then try short and qualified.
+        tname = (explicit[0].get("type") or "").split()[0]
+        spec = structs.get(tname)
+        if spec is None:
+            spec = structs.get("Calibrator." + tname)
+        if spec is None:
+            for k in structs:
+                if k.split(".")[-1] == tname:
+                    spec = structs[k]
+                    break
+        fields = _numeric_fields(spec or {})
         if not fields:
+            results["skipped"]["structure_spec_not_found_or_no_fields"] = \
+                results["skipped"].get("structure_spec_not_found_or_no_fields", 0) + 1
             continue
         ne_f = None
         t_f = None
@@ -187,6 +204,8 @@ def phase2(recon):
             if t_f is None and f in T_FIELDS:
                 t_f = f
         if ne_f is None or t_f is None:
+            results["skipped"]["no_Ne_and_t_fields"] = \
+                results["skipped"].get("no_Ne_and_t_fields", 0) + 1
             continue
 
         results["attempted"] += 1
@@ -296,21 +315,34 @@ def main():
         print("  attempted %d, members %d, excluded %d, errors %d"
               % (res["attempted"], len(res["members"]), len(res["excluded"]),
                  len(res["errors"])))
+        if res.get("skipped"):
+            print("  skipped:")
+            for k in sorted(res["skipped"]):
+                print("    %-40s %d" % (k, res["skipped"][k]))
         for m in res["members"]:
             print("    MEMBER   %-46s (%s,%s) status=%s"
                   % (m["definition"], m["ne_field"], m["t_field"],
                      m["empirical_status"]))
         # control: tau / theta / bigM must NOT be members
+        # A control that passes when nothing ran is not a control. If phase 2
+        # attempted no definitions, tau/theta/bigM were never evaluated and
+        # their absence from the member list says nothing at all.
         bad = [m["definition"] for m in res["members"]
                if m["definition"].split(".")[-1] in ("tau", "theta", "bigM")]
-        if bad:
+        if res["attempted"] == 0:
+            print("  CONTROL UNDETERMINED: phase 2 attempted 0 definitions, so "
+                  "tau/theta/bigM being absent from the member list is vacuous. "
+                  "Neither pass nor fail.")
+            out["control_failed"] = None
+        elif bad:
             print("  CONTROL FAILED: %s reported as members of the "
                   "drift-retention form. They are not functions of it, so the "
                   "record construction is feeding identical values to every "
                   "field. Do not read the member list." % bad)
             out["control_failed"] = bad
         else:
-            print("  CONTROL PASSED: tau/theta/bigM correctly excluded")
+            print("  CONTROL PASSED: tau/theta/bigM evaluated and correctly "
+                  "excluded (%d definitions attempted)" % res["attempted"])
             out["control_failed"] = []
         if res["errors"]:
             print("  first 5 errors:")
