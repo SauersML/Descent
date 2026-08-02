@@ -62,7 +62,141 @@ Of 402 `Empirical status:` markers, 323 are `UNTESTED`, ~28 `DERIVED`, ~20 `VALI
 | # | RESULT | STATUS UPSTREAM | WHERE IN CORPUS | BIOLOGY | EVIDENCE | GAP |
 |---|---|---|---|---|---|---|
 | 25 | **The Blindness Theorem.** Every admissible design merges under the Session 9 pair, so covariance universality does **not** characterize the Gaussian; the universality class is the **ladder fiber**, an infinite-dimensional stratum. | standing, modulo two pre-registered audit points | **NOT WIRED.** Nothing in the corpus mentions the ladder fiber, the Session 9 pair, or design merging. The nearest existing objects are `JetBarrier`'s chameleon stratum (the nonlattice, 2-jet-matched class) and `EpistaticChaos.GenotypeChaosLimits`, both of which are lower-dimensional shadows of the same phenomenon. | Would license: *no* distributional diagnostic built from covariance/universality behaviour can certify a Gaussian coordinate law — the class of laws passing every such test is infinite-dimensional, not a point. This is the strongest available form of "the Gaussian score assumption cannot be certified from the data it is applied to". | ASSERTED (upstream), pending **AP1** (uniform C³ window-smoothness of profiles across designs) and **AP2** (uniformity across renormalization levels) | Everything. Do not formalize downward until spectrum clears AP1/AP2 — the whole theorem is conditional on uniformity claims that are exactly the kind that have failed before in this arc (see the retracted tilt-bookkeeping error, row 10). |
+| 25s | **SCOPE on row 25 (Cramér stratum).** The blindness argument runs through a second-order Edgeworth expansion with an `O(b^(-3/2))` remainder, needing **Cramér's condition on the log-square law**. Nonlattice atomic-modulus laws violate it; Theorem C is proved for its own pair only because both members have smooth modulus densities. General ladder-measurability holds only on the **smooth-modulus stratum**; the non-Cramér frontier is **explicitly open**. | standing as a scope restriction | `CondensationUnification`:1754–1779 (landed by another agent, commit `d7d71356`) | **Genotypes are the canonical member of the open annex, not an edge case of it.** A standardized diallelic genotype takes three values, so `log x²` is finitely supported — purely atomic, generically nonlattice (arithmetic progression only under `hweLatticeCondition`). **Nothing in the blindness theorem transfers to genotype data.** | PROVED-adjacent prose; the supporting genotype arithmetic is PROVED | The corpus points the same way from the other side: `JetBarrier.one_lt_latticeInflation` and `lattice_detection` show a lattice law's exceedance prefactor is *not* universal and carries information a design reads — a worked example of the mechanism blindness needs absent. **Open:** whether reflection data leaks at atomic modulus. If it does, the odd parts are readable from genotype data. |
 | 26 | **Completeness/observability split.** The tower data separates laws; statistics cannot read the odd parts; the gap between them is exactly the fiber-splitting freedom. | standing, same two audit points | **NOT WIRED as a theorem**, but the corpus already contains the *hedge* it vindicates: `JetBarrier`:36–47 ("Two completeness claims, and they are not the same claim… the bridge between them, from tower data to design-observable data, is open upstream") and `CondensationUnification`:1375 ("nothing here should be read as 'a design can measure the four'"). | The distinction the corpus has been carrying as an open question becomes a theorem: what *separates* coordinate laws and what a *design can measure* are different algebras, and the difference is measurable (the fiber-splitting freedom). Everything in the corpus that computes closed forms (drift, jet variance, symmetry verdict) sits on the observability side and is untouched. | ASSERTED (upstream); the corpus's matching hedges are PROVED-adjacent prose | Once AP1/AP2 clear, this is the row that should be formalized **first** — it is the one that turns two existing prose hedges into a theorem and retires the corpus's single largest open question. |
+
+---
+
+## Placement: where the invisible-invariant result goes, and why not where it was asked to go
+
+### The measurement, first
+
+`proofs/validation/wiring/check_wiring.py` enforces the testable condition — *a result
+is wired in when removing it breaks something biological* — by counting references from
+outside the upstream arc to declarations inside it, with docstrings stripped so that a
+citation in prose is not scored as a dependency. Run on the cluster:
+
+```
+upstream-arc modules:      11
+upstream-arc declarations: 383
+cross-boundary references: 1
+
+  WIRED   ObservationalCeiling      22 decls  <- DriftRegime(ProbeBlindness)
+  UNWIRED  (the other ten, 361 declarations)
+```
+
+**383 declarations, one crossing.** And that one crossing is `ProbeBlindness` used by
+`DriftRegime` — a *methodological* guard about the corpus's own QA process, not a
+biological result. The import graph says the same thing from the other side:
+`CondensationUnification` *imports* `ScoreDistribution`, `ImputationPortability`,
+`Conventions` and `PCCorrectability.Threshold`, and is itself imported by nothing but the
+root. **The arc consumes the biology; the biology does not consume the arc.** That is the
+"two corpora that agree rather than one corpus" failure, confirmed quantitatively.
+
+### The finding that changes the placement
+
+The instruction was to place results 1–4 in a unified core on the premise that *3 and 4
+are 1 and 2 with the coordinate law read as a genotype*. **That premise is now known
+false, by a proof that landed in this corpus while this audit was running** (commits
+`ca068508` and `d7d71356`, `CondensationUnification`:1745–1930):
+
+- **The ladder fiber is empty over genotype panels.** `rarest_locus_owns_largest_atom`
+  proves the rarest locus owns the strictly largest `|u|` atom and owns it alone, so
+  peeling forces every weight and the nullspace is trivial. There is no direction moving
+  the odd part with `|u|` fixed. Verified in exact rational arithmetic
+  (`validation/coupling/fiber_splitting.py`, nullity zero over uniform, rare-weighted,
+  clustered and fifty-locus sets, with the `q ↔ 1−q` reflection as a control that must
+  and does produce the one dependency theory demands).
+- **Genotypes are the canonical member of the open non-Cramér annex.** The blindness
+  argument needs Cramér's condition on the log-square law; a standardized diallelic
+  genotype makes `log x²` finitely supported, hence purely atomic and generically
+  nonlattice. Nothing in the blindness theorem transfers to genotype data.
+
+So the genotype reading of results 1 and 2 is not merely unproved — it is **empty on one
+side and out of scope on the other**. Wiring 1 and 2 into the biology as if they
+instantiated there would be the exact "stated it too broadly" error this ledger exists to
+catch, committed deliberately.
+
+### The placement, and it is better than the one requested
+
+**Result 2 goes in `Calibrator/ObservationalCeiling.lean`.** Three reasons, and the third
+is decisive:
+
+1. That module is already the corpus's abstract core — "one law, many instances", built
+   to be instantiated, carrying no genetics vocabulary. It already holds **both halves of
+   result 2 separately**: `IsCompleteCatalogue` (a labelling complete for an equivalence)
+   and `ProbeBlindness` (no criterion built from probe data decides a property). Result 2
+   is their conjunction and needs no new machinery.
+2. It is written in exactly the register the portability requirement demands — sets,
+   functions, equivalences, no floors, no jets, no tempered limits.
+3. **It is the only module in the entire arc that has ever crossed the boundary.** The
+   measurement above is not neutral about where to put a result you want wired: it names
+   the one place wiring has ever worked.
+
+**Results 3 and 4 do not get wired as instantiations, because the instantiation is
+empty.** The genotype-side content is the *non-membership* theorem, and that is a
+stronger and more useful biological statement than the one requested: matching the ladder
+**pins** the MAF spectrum, so genotype architecture at that level is identifiable rather
+than invisible. Result 3 is the positive form of this and is compatible with it. Result 4
+as described — fiber surgery on genotype panels — is **refuted** at the MAF-spectrum
+level by the peeling theorem.
+
+### The import direction that actually creates a dependency
+
+Non-membership is the honest bridge, and it is a real dependency rather than a gestured
+one: **to prove genotypes lie outside the ladder fiber you must import the definition of
+the ladder fiber.** Delete the definition and the biological theorem stops compiling.
+That satisfies the lead's criterion exactly, and it is achievable now:
+
+1. Move the ladder-fiber definition (and `IsCompleteCatalogue`-style scaffolding) out of
+   `CondensationUnification`, which is a leaf nothing imports, into a low module — the
+   natural home is `ObservationalCeiling`, which already sits below seven importers.
+2. `CondensationUnification` then *imports* it and proves non-membership. The dependency
+   runs upward from a genotype theorem to an abstract definition, which is the direction
+   that survives deletion testing.
+3. Add `--require ObservationalCeiling` (and, once step 2 lands, the modules carrying the
+   non-membership theorems) to the guard, so the contract is enforced by CI rather than
+   by memory.
+
+**What I did not do:** steps 1 and 2 are Lean edits to files three agents are actively
+holding — `CondensationUnification` took 239 lines from another agent during this audit,
+and `MetricSpecificPortability`, `PGSCalibrationTheory`, `PortabilityDrift` and
+`ScoreDistribution` all have uncommitted modifications. Routing those edits is the lead's
+call; the guard and this specification are the parts that are safe to land now.
+
+### The portable statement of result 2
+
+The requirement is that it be findable by someone who knows none of this program's
+machinery. That rules out floors, jets, ladders and tempered limits, and it is achievable
+because the result genuinely does not need them:
+
+> Let `X` be a set of objects and `~` an equivalence relation on it — "the same object
+> for our purposes". Let `M` be a class of **admissible measurements**: functions on `X`
+> that some experiment can actually evaluate. Call a labelling `I : X → L` **complete**
+> if `I x = I y` exactly when `x ~ y`; a complete labelling determines the object.
+> Call `I` **invisible to `M`** if some `x, y` have `I x ≠ I y` while `m x = m y` for
+> every `m ∈ M`.
+>
+> **The phenomenon:** there are settings admitting a complete labelling in which *every*
+> complete labelling is invisible to `M`. The equivalence generated by `M` is then
+> strictly coarser than `~`, and the gap is a property of the measurement class — no
+> cleverer choice of invariant closes it.
+
+That is five lines, it is stated in the vocabulary of identifiability theory and
+statistical decision theory rather than this program's, and it is a conjunction of two
+predicates the corpus already defines. The genetics is then an *instance* — and the
+honest instance available today is a **negative** one: genotype panels are a setting where
+the analogous invariant is *not* invisible, proved by peeling. That is worth stating
+plainly, because a general phenomenon plus a sharp counterexample in the applied domain is
+a stronger contribution than a general phenomenon with an assumed instance.
+
+### The genotype side of Session 10 (rows 27–29)
+
+| # | RESULT | STATUS UPSTREAM | WHERE IN CORPUS | BIOLOGY | EVIDENCE | GAP |
+|---|---|---|---|---|---|---|
+| 27 | **The ladder fiber is empty over genotype panels (peeling).** Writing `u = x²−1`, a locus at frequency `q` contributes three atoms; on `(0, 1/2]` the rare-homozygote atom `2/q − 3` strictly dominates the other two and is strictly decreasing in `q`. So the rarest locus owns the strictly largest `|u|` atom alone, its weight is forced, and induction empties the nullspace. | standing | `CondensationUnification`: `abs_centeredSquare_le_homAlt`, `centeredSquare_homAlt_strictAnti`, `rarest_locus_owns_largest_atom` (:1918), §1786–1830 | **Matching the ladder pins the MAF spectrum.** Two genotype panels agreeing in the ladder are the same panel. The chameleon phenomenon has **no genetic realization**. Sharp contrast with floor-one matching, where four scalars left the spectrum badly underdetermined: floor-one matching is cheap and says little; ladder matching is rigid and says everything. | **PROVED + SIMULATED.** Exact rational arithmetic (`validation/coupling/fiber_splitting.py`): nullity zero over uniform, rare-weighted, clustered and fifty-locus frequency sets. Control: the `q ↔ 1−q` reflection *must* produce a dependency (identical laws of `u` by `reflect_even_moment`) and does, moving the odd part by exactly zero — a search that found nothing anywhere would not have been shown to work. | Independent of the Cramér question: exact linear algebra on the `|u|` law, holds whatever the modulus regularity. A false positive is recorded rather than quietly fixed (a `1e-9` tolerance merged `(3−√3)/6` with the decimal `0.2113248654`, straddling the root of `u_het` where the signs are opposite). This is the strongest genotype-side row added this session. |
+| 28 | **Result 3: portability driven by a few moments of the allele-frequency spectrum, not its whole shape.** | standing (genostratum) | **NOT WIRED as such.** The objects exist but are stranded: `MafSpectrum`, `moment`, `fourthMomentDispersion`, `sixthMoment_eq_floorOne_plus_dispersion`, `floorOne_match_does_not_transport_calibration` all live inside `CondensationUnification`, a leaf module nothing imports. The portability modules (`PortabilityDrift`, `TransferLearningPGS`, `MetricSpecificPortability`) carry their own allele-frequency vocabulary (`alleleFreqMismatchPenalty`, `freqCorrFromFst`, `expectedFreqDiffSq`) and reference none of it. | Would license: score-distribution portability predicted from a few spectrum functionals rather than the full spectrum — and row 27 supplies the identifiability half, since ladder matching pins the spectrum. | The moment identities are PROVED and row 6 is SIMULATED at 9.30 SEM | **This is the textbook instance of the failure the wiring guard detects:** two vocabularies for one object, on opposite sides of an import wall, neither depending on the other. Closing it needs no new mathematics — only moving `MafSpectrum` below the portability modules and having them consume it. |
+| 29 | **Result 4: architecture features that fully determine it and that no polygenic-scale statistic can recover.** | **split — MAF-spectrum form REFUTED, effect-size form open** | **MAF-spectrum form: refuted** by row 27 (`rarest_locus_owns_largest_atom`). **Effect-size form: NOT WIRED and genuinely distinct** — redistributing *effect-size* mass so every moment- or LD-score-based estimator is unchanged is a statement about the effect-size distribution, not the `|u|` law of standardized genotypes, and the peeling theorem does not touch it. The corpus has `LDSCModel` (`StatisticalGeneticsMethodology`:226) and effect-size distributions (`PolygenicArchitecture`:31) but **no theorem connecting them** and no invisibility result. | If the effect-size form holds: two architectures indistinguishable to every LD-score and moment-based estimator, which would bound what heritability partitioning can claim. | MAF form: REFUTED with proof and exact arithmetic. Effect-size form: ASSERTED only. | **Do not state result 4 in the MAF-spectrum vocabulary — that version is false and the proof is in this corpus.** The live target is the effect-size form, which needs `LDSCModel` and `PolygenicArchitecture`'s effect-size objects joined by an invisibility theorem that does not exist yet. This is the one place where the "characterization vs classification" lens still has unexplored ground on the biology side. |
 
 ---
 
@@ -221,18 +355,26 @@ waiting is the same cleanup we did today.
 | **NOT WIRED** | **1** | **11** |
 | **RETRACTED upstream** | **1** | **10** — retraction correctly landed; no stale artifacts remain |
 
-**Session 10 (rows 25–26):** both NOT WIRED, both conditional on audit points AP1/AP2.
+**Session 10 (rows 25–29):** rows 25, 26, 28 and the effect-size half of 29 are NOT
+WIRED. Row 25 is scoped to the Cramér stratum (row 25s) and genotypes are outside it.
+Row 27 is PROVED and SIMULATED. The MAF-spectrum half of row 29 is REFUTED by row 27.
+
+**Wiring measurement (cluster, `validation/wiring/check_wiring.py`):** 11 upstream-arc
+modules, 383 declarations, **1 cross-boundary reference** (`ObservationalCeiling`'s
+`ProbeBlindness`, used by `DriftRegime`, methodological rather than biological). Ten
+modules are UNWIRED under the deletion test.
 
 **Reversal audit:** 1 claim **known false** (R1, prose only) · 1 **needs restating**
 (R2, prose only) · 3 characterization-shaped claims assessed and **currently sound**
 (R3–R5) · **0 Lean objects affected** · **0 biological claims affected**.
 
-**All 26 rows:**
+**All 29 rows:**
 
 - PROVED, no analytic field on the path: **13** (4, 9, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23)
 - Result itself carried as a named hypothesis / structure field: **7** (1, 2, 3, 5, 7, 8, 20)
 - Backed by simulation with recorded numbers: **7** (6, 17, 21, 22, 23, 24, and the estimation half of 16)
-- ASSERTED in prose only: **3** (11, 25, 26)
+- ASSERTED in prose only: **4** (11, 25, 26, and the effect-size half of 29)
+- REFUTED this session: **1** (the MAF-spectrum form of 29, by row 27)
 - Retracted upstream: **1** (10), plus 3 sub-retractions already landed in-file (19's Polish-orbit claim, 19's "third regime", 10's jet-to-strip upgrade)
 - Falsified by simulation and repaired or flagged: **3** (22, 23, 24)
 - `sorry`s: **0**. `axiom`s: **0**.
@@ -246,7 +388,9 @@ list with formalized downstream consequences, and it has been cleanly executed: 
 
 ## Top ten gaps, ranked by biological licence
 
-0. **R1 and R2 — two prose statements that read as settled and are not.** `CondensationUnification`:1292 asserts a characterization the Blindness Theorem reverses; `PolygenicSpectroscopy` §4b compares an observability list against a separation set as if commensurable, contradicting two other files in this same corpus. Neither has a Lean dependency, so both are one-paragraph edits — but they are the rows most likely to be quoted as settled by someone who does not read to the end of the file. Fix before anything else, because the cost is minutes and the exposure is the corpus's own credibility.
+0. **The wiring wall — 383 upstream declarations, 1 crossing, and that one is methodological.** Measured on the cluster by `validation/wiring/check_wiring.py`. Ten of the eleven arc modules could be deleted without breaking a single biological theorem. The cheapest real fix is row 28: move `MafSpectrum` below the portability modules and have them consume it, which needs no new mathematics and closes a duplicate-vocabulary split that already exists. Everything else in this list is downstream of this one.
+0b. **Row 29 — result 4 must not be stated in the MAF-spectrum vocabulary.** That form is refuted by row 27, with the proof and the exact arithmetic sitting in this corpus. The live version is the effect-size form, which is genuinely distinct and genuinely unwired.
+1. **R1 and R2 — two prose statements that read as settled and are not.** `CondensationUnification`:1292 asserts a characterization the Blindness Theorem reverses; `PolygenicSpectroscopy` §4b compares an observability list against a separation set as if commensurable, contradicting two other files in this same corpus. Neither has a Lean dependency, so both are one-paragraph edits — but they are the rows most likely to be quoted as settled by someone who does not read to the end of the file. Fix before anything else, because the cost is minutes and the exposure is the corpus's own credibility.
 1. **Row 16 — `map/correctability.rs` ships the estimation half only.** The untracked 445-line Rust calculator computes `margin = bbp_spike − bbp_threshold` with no headroom term, which is exactly the omission `imitable_despite_positive_pcCorrectabilityMargin` proves is *not conservative*. A user gets "correctable" for a stratification spike that is provably undetectable at any sample size. Licence if fixed: an honest PC-correctability verdict. Cheapest high-value fix in the table — the Lean side is already proved.
 2. **Row 11 — the dyadic Mellin ladder is entirely unwired.** It is the only candidate mechanism that would turn row 8's `doubly_exponential` *numerical-input field* into a derived theorem, making "how many tower floors can a study of size n see" computable rather than read off a quadrature table. Licence: a sample-size formula for spectroscopic architecture inference. Highest ceiling; also the most work.
 3. **Row 13 — the spread law's measured numbers do not exist in this repo.** The whole "sharing is cheap, rotation is expensive" argument (1e-6–5e-3 vs 8×–6000×) is quoted structurally in `ImitationCapacity`'s prose as "the reported ordering" and reported nowhere. Licence: multi-population deployment incompatibility as a number a practitioner can compute. The identity is proved; only the measurement is missing.
