@@ -1,0 +1,96 @@
+{
+  "instances": {
+    "B1_symmetry_worst_deviation": 8.526512829121202e-14,
+    "B1_symmetry_holds": true,
+    "B2_degeneracy_at_half": 4.440892098500626e-16,
+    "B2_resonance_present_at_half": true,
+    "B2_beside_the_witness": [
+      {
+        "eps": 0.0001,
+        "degeneracy": 0.0016000000640001844,
+        "degeneracy_minus": 0.0016000000640001844
+      },
+      {
+        "eps": 0.001,
+        "degeneracy": 0.016000064000255554,
+        "degeneracy_minus": 0.016000064000255554
+      },
+      {
+        "eps": 0.01,
+        "degeneracy": 0.16006402561024413,
+        "degeneracy_minus": 0.16006402561024413
+      },
+      {
+        "eps": 0.1,
+        "degeneracy": 1.6666666666666659,
+        "degeneracy_minus": 1.6666666666666659
+      }
+    ],
+    "B2_isolated": true,
+    "B3_tied_residual": 0.0,
+    "B3_untied_residual": 0.48999999999999994,
+    "B3_support_blind_when_tied": true,
+    "B3_visible_when_tie_broken": true
+  },
+  "band_shift": {
+    "shift": [
+      -0.35230293943593405,
+      -0.31634939370302106,
+      -0.35230293943593405
+    ],
+    "B1_after_shift_worst_deviation": 8.526512829121202e-14,
+    "B1_survives_shift": true,
+    "B2_degeneracy_at_half_after_shift": 0.03595354573291343,
+    "B2_dies_under_shift": true,
+    "B3_tied_residual_after_shift": 0.0,
+    "B3_survives_shift": true,
+    "table": {
+      "symmetry_survives_shift": true,
+      "resonance_survives_shift": false,
+      "support_survives_shift": true
+    },
+    "three_distinct_rows": true
+  },
+  "mutation_gate": {
+    "mutants": [
+      {
+        "mutant": "M1_wrong_gauge_map_1_minus_0.9q",
+        "statistic": Infinity,
+        "rejected": true,
+        "expected_rejected": true
+      },
+      {
+        "mutant": "M2_masses_not_permuted",
+        "statistic": 0.96,
+        "rejected": true,
+        "expected_rejected": true
+      },
+      {
+        "mutant": "M3_resonance_probe_outside_S_at_q_0.3",
+        "statistic": 3.523809523809525,
+        "rejected": true,
+        "expected_rejected": true,
+        "note": "rejection here means the probe would have found no resonance, i.e. siting the witness outside S tests nothing"
+      },
+      {
+        "mutant": "M4_tie_broken",
+        "statistic": 0.48999999999999994,
+        "rejected": true,
+        "expected_rejected": true
+      },
+      {
+        "mutant": "M5_modulus_without_absolute_value",
+        "statistic": 8.526512829121202e-14,
+        "rejected": false,
+        "expected_rejected": false,
+        "note": "SURVIVES BY DESIGN: the symmetry test is blind to this mutation, because a_j(1-q) = -a_{2-j}(q) and the square precedes the absolute value. Declared rather than hidden."
+      }
+    ],
+    "pass": true
+  },
+  "headline": {
+    "trichotomy_three_distinct_rows": true,
+    "collapse_claim_first_horn_resonance_broken_by_generic_shift": true,
+    "gate_pass": true
+  }
+}
