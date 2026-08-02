@@ -102,10 +102,6 @@ noncomputable def logisticCalibrationProfile
     (mean_observed mean_predicted slope : ℝ) : CalibrationProfile :=
   calibrationProfile CalibrationLink.logistic mean_observed mean_predicted slope
 
-/-- Calibration-slope deviation attached to a shared calibration profile. -/
-noncomputable def CalibrationProfile.slopeDeviation (p : CalibrationProfile) : ℝ :=
-  calibrationSlopeDeviation p.slope
-
 /-- The simp lemmas immediately below are definitional facts about the shared
 calibration-profile container. They do not encode any cross-population
 transport model. The biologically meaningful cross-ancestry calibration state
@@ -163,7 +159,7 @@ starts later in `CrossPopulationCalibrationShiftModel`. -/
 
 @[simp] theorem calibrationProfile_slopeDeviation
     (link : CalibrationLink) (mean_observed mean_predicted slope : ℝ) :
-    (calibrationProfile link mean_observed mean_predicted slope).slopeDeviation =
+    calibrationSlopeDeviation (calibrationProfile link mean_observed mean_predicted slope).slope =
       calibrationSlopeDeviation slope := by
   rfl
 
@@ -185,7 +181,7 @@ starts later in `CrossPopulationCalibrationShiftModel`. -/
 
 @[simp] theorem CalibrationMoments.toProfile_slopeDeviation
     (mom : CalibrationMoments) (link : CalibrationLink) :
-    (mom.toProfile link).slopeDeviation =
+    calibrationSlopeDeviation (mom.toProfile link).slope =
       calibrationSlopeDeviation mom.slope := by
   rfl
 
@@ -1472,7 +1468,7 @@ theorem logistic_recalibrated_profile_corrects_citl_and_slope
         mean_obs
         (logisticRecalibrated mean_pgs (mean_obs - slope * mean_pgs) slope)
         (recalibratedCalibrationSlope slope slope)
-    profile.citl = 0 ∧ profile.slopeDeviation = 0 := by
+    profile.citl = 0 ∧ calibrationSlopeDeviation profile.slope = 0 := by
   dsimp
   constructor
   · exact logistic_recalibration_corrects_citl mean_obs mean_pgs slope
@@ -1487,7 +1483,7 @@ theorem logistic_recalibration_corrects_citl_and_slope
         (logisticRecalibrated mean_pgs (mean_obs - slope * mean_pgs) slope) = 0 ∧
       calibrationSlopeDeviation
         (recalibratedCalibrationSlope slope slope) = 0 := by
-  simpa [CalibrationProfile.slopeDeviation] using
+  simpa [calibrationSlopeDeviation] using
     logistic_recalibrated_profile_corrects_citl_and_slope
       mean_obs mean_pgs slope h_slope_nonzero
 

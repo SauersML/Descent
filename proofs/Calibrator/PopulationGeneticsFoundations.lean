@@ -523,14 +523,6 @@ theorem scaledIdentityStep_fixedPoint (scaledRate : ℝ) (h : 0 ≤ scaledRate) 
   unfold scaledIdentityStep
   rw [mul_one_div, sub_eq_iff_eq_add, div_add_div_same, div_self hd']
 
-/-- **Wright's Fst under mutation-drift balance (island model).**
-    Fst_eq = 1 / (1 + 4Neμ) = 1 / (1 + θ).
-    This is the equilibrium Fst when mutation counteracts drift.
-
-    Not stipulated: `fstMutationDriftEquilibrium_isFixedPoint` derives it as the
-    rest point of `scaledIdentityStep` at scaled rate `θ`.
-
-    Empirical status: UNTESTED. -/
 /-- **The mutation-drift equilibrium is the rest point of the scaled identity
 balance** driven by mutation alone. -/
 theorem fstMutationDriftEquilibrium_isFixedPoint (θ : ℝ) (hθ : 0 ≤ θ) :
@@ -1047,11 +1039,6 @@ theorem alleleFreq_deviation_decreases (p₀ p_c m : ℝ) (t₁ t₂ : ℕ)
 
 /-! ### Effective Migration Rate -/
 
-/-- **Effective migration rate for asymmetric migration.**
-    When migration is asymmetric between two demes, the effective migration
-    rate that determines the overall Fst is the arithmetic mean.
-
-    Empirical status: UNTESTED. -/
 /-- Effective migration is between the two directional rates. -/
 theorem effectiveMigration_bounds (m₁₂ m₂₁ : ℝ) (h : m₂₁ < m₁₂) :
     m₂₁ < effectiveSymmetricMigration m₁₂ m₂₁ ∧ effectiveSymmetricMigration m₁₂ m₂₁ < m₁₂ := by
@@ -1273,8 +1260,6 @@ noncomputable def hetMutationDriftRecurrence (Ne mu : ℝ) (H₀ : ℝ) : ℕ �
   | t + 1 => (1 - 1 / (2 * Ne)) * hetMutationDriftRecurrence Ne mu H₀ t +
               2 * mu * (1 - hetMutationDriftRecurrence Ne mu H₀ t)
 
-/-- **Equilibrium heterozygosity.**
-    At mutation-drift balance, H* = θ/(1+θ) where θ = 4Neμ. -/
 /-- **Algebraic verification of the fixed point.**
     If we start at H* = θ/(1+θ), one step of the recurrence returns H*.
     This proves H* is indeed a fixed point — the equilibrium heterozygosity. -/

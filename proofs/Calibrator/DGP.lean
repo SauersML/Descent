@@ -1550,10 +1550,6 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
   exact div_nonneg p.t_div_nonneg (by linarith [p.Ne_pos])
 
 
-/-- **Drift-mutation equilibrium Fst**: Fst = 1/(1 + θ).
-    Mutation prevents Fst from reaching 1 by introducing shared variation.
-
-    Empirical status: UNTESTED. -/
 /-- **Drift-migration equilibrium Fst**: Fst = 1/(1 + M).
     Migration homogenizes populations, reducing Fst. -/
 noncomputable def fstDriftMigration (p : EvolutionaryParameters) : ℝ :=
@@ -2015,26 +2011,6 @@ noncomputable def PGSEvolutionaryModel.hetDecayFactor (m : PGSEvolutionaryModel)
 noncomputable def PGSEvolutionaryModel.fstTransient (m : PGSEvolutionaryModel) : ℝ :=
   fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))
 
-/-- **Transient LD retention**: fraction of ancestral LD shared after t generations.
-    Each generation, recombination breaks LD with probability r per lineage.
-    For two lineages (source and target), shared LD decays as (1-r)^(2t).
-
-    We use the continuous approximation exp(-2rt) which is derived from
-    (1-r)^(2t) ≈ exp(-2rt) for small r.
-
-    DERIVED from the LD recurrence D(t+1) = (1-r) × D(t) by induction
-    in LDDecayTheory.lean.
-
-    Empirical status: UNTESTED. -/
-/-- **Mutation LD erosion**: new mutations after divergence create
-    population-specific LD that is NOT shared.
-
-    The fraction of LD from ancestral variants (which IS shared) decays as
-    exp(-θτ) where θ = 4Neμ and τ = t/(2Ne).
-
-    DERIVED: new mutations arrive at rate 2μ per locus per generation.
-    Over t generations, the fraction of polymorphisms that are ancestral
-    (and thus shared) is approximately exp(-2μt) = exp(-θτ). -/
 /-- **Migration LD boost**: gene flow between populations introduces
     shared haplotypes, partially counteracting drift and mutation erosion.
 

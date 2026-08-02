@@ -276,7 +276,7 @@ when the deployed target slope lies below `1`.** -/
 theorem mechanistic_target_identity_calibration_slopeDeviation_eq_one_sub
     {p q : ℕ} (cal : CrossPopulationMechanisticCalibrationModel p q)
     (h_target_slope_lt : calibrationSlopeFromSourceWeights cal.metric Pop.target < 1) :
-    ((cal.identityCalibrationProfile Pop.target)).slopeDeviation =
+    calibrationSlopeDeviation ((cal.identityCalibrationProfile Pop.target)).slope =
       1 - ((cal.identityCalibrationProfile Pop.target)).slope := by
   exact calibrationSlopeDeviation_eq_one_sub_of_lt_one
     ((cal.identityCalibrationProfile Pop.target)).slope

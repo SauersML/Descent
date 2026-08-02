@@ -214,18 +214,6 @@ theorem fstFromTau_lt_coalescenceCdf (tau : ℝ) (htau : 0 < tau) :
 
 
 
-structure PureSplitModel where
-  t : ℝ
-  Ne : ℝ
-  Ne_pos : 0 < Ne
-
-noncomputable def PureSplitModel.tau (m : PureSplitModel) : ℝ :=
-  coalescentTau m.t m.Ne
-
-/-- Empirical status: UNTESTED. -/
-noncomputable def PureSplitModel.fst (m : PureSplitModel) : ℝ :=
-  fstFromTau m.tau
-
 /-- A split with ongoing migration.
 
 `nDemes`, together with its `2 ≤ nDemes` hypothesis, used to sit here. Nothing read it:
@@ -666,29 +654,6 @@ which carries the assumption in its type;
 noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
   het_source * (1 - fst)
 
-/-- The regime object's target heterozygosity is `targetHetFromFst` applied to
-its own loss fraction. Stating it here is what keeps the tautology visible: the
-identity holds for every retention value, correct or not, which is
-`Calibrator.DriftRegime.cluster_identities_hold_at_every_retention`. -/
-theorem ClosedPopulationNoMutation.targetHet_eq_targetHetFromFst
-    (r : ClosedPopulationNoMutation) :
-    r.targetHet = targetHetFromFst r.H₀ r.heterozygosityLoss := by
-  unfold ClosedPopulationNoMutation.targetHet
-    ClosedPopulationNoMutation.heterozygosityLoss targetHetFromFst
-  ring
-
-/-! Target-population PGS variance derived from the additive model and Fst.
-Derivation:
-  1. V_PGS_source = Σᵢ βᵢ² × 2p_source_i(1 - p_source_i) = V_A  (source variance)
-  2. Under drift, E[2p_target(1-p_target)] = 2p_source(1-p_source) × (1 - Fst)
-     (this IS the definition of Fst applied per-locus, then summed)
-  3. So E[V_PGS_target] = Σᵢ βᵢ² × 2p_source_i(1-p_source_i) × (1 - Fst)
-                         = V_A × (1 - Fst)
-
-Here V_A encodes both Σᵢ βᵢ² and the source heterozygosity, so the target
-variance is `pgsVarianceFromHet(V_A, 1 - fst)`.
-
-    Empirical status: UNTESTED. -/
 /-- **Present-day PGS variance after drift** from an ancestral variance `V_A`.
 
 There used to be two names for this — `targetPGSVariance`, defined as
