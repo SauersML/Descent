@@ -283,8 +283,10 @@ theorem gaussianCriticalMultiplier_bounds :
     field_simp
   have hmpos : 0 < gaussianCriticalMultiplier := gaussianCriticalMultiplier_pos
   constructor
-  · nlinarith [hmul, hmpos, h₂, hpos]
-  · nlinarith [hmul, hmpos, h₁, hpos]
+  · -- `g * c = 1` and `c < 0.807` give `1 < 0.807 * g`, i.e. `g > 1.239 > 1.23`.
+    nlinarith [hmul, hmpos, h₂, hpos, mul_pos hmpos (sub_pos.mpr h₂)]
+  · -- `g * c = 1` and `c > 0.640` give `1 > 0.640 * g`, i.e. `g < 1.563 < 1.57`.
+    nlinarith [hmul, hmpos, h₁, hpos, mul_pos hmpos (sub_pos.mpr h₁)]
 
 /-!
 ## 4. The condensation-window law

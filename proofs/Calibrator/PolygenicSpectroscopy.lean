@@ -217,9 +217,8 @@ theorem standardizedSquare_values (h : HardyWeinbergModel)
     · unfold HardyWeinbergModel.standardizedSquare
       rw [hwe_centered, hwe_variance_eq]
       simp only [altAlleleCount]
-      first
-        | (field_simp; ring)
-        | field_simp
+      field_simp
+      try ring
 
 /-- The three Hardy-Weinberg genotype probabilities in terms of `q`. -/
 theorem genotypeProb_values (h : HardyWeinbergModel) :
@@ -331,9 +330,21 @@ theorem rare_variant_drift_lower_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8
   have hpne : (0 : ℝ) < 1 - q := by linarith
   -- the argument of the heterozygote logarithm dominates `1 / (8q)`
   have hden : (0 : ℝ) < 2 * q * (1 - q) := by positivity
+  have h8 : (0 : ℝ) < 8 * q := by linarith
   have hkey : 1 / (8 * q) ≤ (1 - 2 * q) ^ 2 / (2 * q * (1 - q)) := by
-    rw [div_le_div_iff₀ (by positivity) hden]
-    nlinarith [hq0, hq, hpne]
+    -- The difference factors as `2 q (3 - 15 q + 16 q^2)` over a positive denominator,
+    -- and `3 - 15 q ≥ 9/8` on `q ≤ 1/8`.
+    rw [← sub_nonneg]
+    have hfac : (1 - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1 / (8 * q)
+        = (2 * q * (3 - 15 * q + 16 * q ^ 2)) / ((8 * q) * (2 * q * (1 - q))) := by
+      first
+        | (field_simp; ring)
+        | field_simp
+    rw [hfac]
+    refine div_nonneg ?_ (by positivity)
+    have hbracket : (0 : ℝ) ≤ 3 - 15 * q + 16 * q ^ 2 := by
+      nlinarith [hq0, hq, sq_nonneg q]
+    nlinarith [hq0, hbracket]
   have hlog : Real.log (1 / (8 * q)) ≤ Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) :=
     Real.log_le_log (by positivity) hkey
   -- the log is nonnegative because `8 q ≤ 1`

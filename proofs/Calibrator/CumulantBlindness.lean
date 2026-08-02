@@ -77,7 +77,7 @@ theorem exists_zero_exponent_of_sum_lt_card
   have hge : ∀ i ∈ B, 1 ≤ a i := by
     intro i hi
     exact Nat.one_le_iff_ne_zero.mpr (hcon i hi)
-  have hle : B.card * 1 ≤ ∑ i ∈ B, a i := by
+  have hle : B.card ≤ ∑ i ∈ B, a i := by
     simpa using Finset.card_nsmul_le_sum B a 1 hge
   rw [hcard] at hle
   omega
@@ -194,11 +194,9 @@ theorem diagonal_contraction_bound
     |κ * ∑ i ∈ s, a i * b i * w i| ≤ |κ| * M := by
   have hbound := abs_sum_mul_mul_le s a b w M hM0 hM
   have hsa : Real.sqrt (∑ i ∈ s, a i ^ 2) ≤ 1 := by
-    rw [show (1 : ℝ) = Real.sqrt 1 by simp]
-    exact Real.sqrt_le_sqrt ha
+    simpa using Real.sqrt_le_sqrt ha
   have hsb : Real.sqrt (∑ i ∈ s, b i ^ 2) ≤ 1 := by
-    rw [show (1 : ℝ) = Real.sqrt 1 by simp]
-    exact Real.sqrt_le_sqrt hb
+    simpa using Real.sqrt_le_sqrt hb
   have hprod : Real.sqrt (∑ i ∈ s, a i ^ 2) * Real.sqrt (∑ i ∈ s, b i ^ 2) ≤ 1 := by
     nlinarith [Real.sqrt_nonneg (∑ i ∈ s, a i ^ 2), Real.sqrt_nonneg (∑ i ∈ s, b i ^ 2)]
   rw [abs_mul]
@@ -226,16 +224,12 @@ for every contraction order `r = k + 2 ≥ 3`. -/
 theorem contraction_bound_tendsto_zero {k : ℕ} (hk : 1 ≤ k) (κ : ℝ) :
     Filter.Tendsto (fun τ : ℝ => |κ| * Real.sqrt τ ^ k)
       (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
-  have hcont : Filter.Tendsto (fun τ : ℝ => Real.sqrt τ) (nhdsWithin 0 (Set.Ioi 0))
-      (nhds 0) := by
-    have := (Real.continuous_sqrt.tendsto (0 : ℝ))
-    simpa using this.mono_left nhdsWithin_le_nhds
-  have hpow : Filter.Tendsto (fun τ : ℝ => Real.sqrt τ ^ k) (nhdsWithin 0 (Set.Ioi 0))
-      (nhds 0) := by
-    have := hcont.pow k
-    simpa [zero_pow (by omega : k ≠ 0)] using this
-  have := hpow.const_mul |κ|
-  simpa using this
+  have hk0 : k ≠ 0 := by omega
+  have hcont : Filter.Tendsto (fun τ : ℝ => |κ| * Real.sqrt τ ^ k)
+      (nhds 0) (nhds (|κ| * Real.sqrt 0 ^ k)) :=
+    ((Real.continuous_sqrt.pow k).const_mul |κ|).tendsto 0
+  simp only [Real.sqrt_zero, zero_pow hk0, mul_zero] at hcont
+  exact hcont.mono_left nhdsWithin_le_nhds
 
 end DiagonalContraction
 
