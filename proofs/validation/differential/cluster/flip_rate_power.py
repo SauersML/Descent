@@ -184,11 +184,14 @@ def main():
     for m in (200, 2_000, 20_000, 100_000, 300_000):
         r = run_architecture(m, H2, rng)
         rows.append(r)
-        print("    %-10d %-12.6f %-14.3f %-14s %-10.0f"
-              % (m, r["h2"], r["true_z_replication"],
+        print("    %-10d %-12.6f %-14s %-16s %-10.0f"
+              % (m, r["h2"],
+                 ("%.3f" % r["selected_mean_true_z_replication"])
+                 if r["selected_mean_true_z_replication"] is not None else "-",
                  ("%.4f +-%.4f" % (r["simulated_flip_rate"], r["flip_sem"]))
-                 if r["simulated_flip_rate"] is not None else "no SNP selected",
-                 r["mean_n_selected"]))
+                 if r["simulated_flip_rate"] is not None
+                 else "too few selected",
+                 r["total_selected"]))
     out["matched_h2"] = rows
 
     got = [r for r in rows if r["simulated_flip_rate"] is not None]
