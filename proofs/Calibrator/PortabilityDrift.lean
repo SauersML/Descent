@@ -782,10 +782,10 @@ theorem expected_abs_mean_shift_bound_proved
     have h_nonneg : 0 ≤ 2 * (fstS + fstT) := mul_nonneg (by norm_num) hfst_sum_nonneg
     rw [Real.sqrt_mul h_nonneg]
   have h2 :
-      Real.sqrt ((1 - fstS) * V_A) =
+      Real.sqrt (V_A * (1 - fstS)) =
         Real.sqrt (1 - fstS) * Real.sqrt V_A := by
     have h_nonneg : 0 ≤ 1 - fstS := by linarith
-    rw [Real.sqrt_mul h_nonneg]
+    rw [mul_comm, Real.sqrt_mul h_nonneg]
   rw [h1, h2]
   have h_sqrt_VA_ne_zero : Real.sqrt V_A ≠ 0 := Real.sqrt_ne_zero'.mpr hVA_pos
   have h_div :
@@ -992,12 +992,12 @@ theorem drift_degrades_R2
       field_simp [hyne]
       ring
     simpa [hxrepr, hyrepr] using hsub
-  have hT_nonneg : 0 ≤ (1 - fstT) * V_A := by
+  have hT_nonneg : 0 ≤ V_A * (1 - fstT) := by
     have : 0 ≤ 1 - fstT := by linarith
-    exact mul_nonneg this (le_of_lt hVA)
-  have h_lt : (1 - fstT) * V_A < (1 - fstS) * V_A := by
+    exact mul_nonneg (le_of_lt hVA) this
+  have h_lt : V_A * (1 - fstT) < V_A * (1 - fstS) := by
     nlinarith [mul_lt_mul_of_pos_right hfst hVA]
-  exact h_mono ((1 - fstT) * V_A) ((1 - fstS) * V_A) hT_nonneg h_lt
+  exact h_mono (V_A * (1 - fstT)) (V_A * (1 - fstS)) hT_nonneg h_lt
 
 /-- For fixed `V_E > 0`, `v ↦ v / (v + V_E)` is strictly increasing on nonnegative variances. -/
 theorem expectedR2_strictMono_nonneg
@@ -1041,9 +1041,9 @@ theorem drift_degrades_AUC_of_strictMono
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
     have hsnr_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT := by
       unfold presentDaySignalToNoise presentDayPGSVariance pgsVarianceFromHet
-      have hnum : 0 ≤ (1 - fstT) * V_A := by
+      have hnum : 0 ≤ V_A * (1 - fstT) := by
         have h_one_minus : 0 ≤ 1 - fstT := by linarith
-        exact mul_nonneg h_one_minus (le_of_lt hVA)
+        exact mul_nonneg (le_of_lt hVA) h_one_minus
       exact div_nonneg hnum (le_of_lt hVE)
     exact div_nonneg hsnr_nonneg (by positivity)
   have hhalf_lt : presentDaySignalToNoise V_A V_E fstT / 2 <
@@ -1073,9 +1073,9 @@ theorem drift_degrades_equalVarianceGaussianAUC
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
     have hsnr_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT := by
       unfold presentDaySignalToNoise presentDayPGSVariance pgsVarianceFromHet
-      have hnum : 0 ≤ (1 - fstT) * V_A := by
+      have hnum : 0 ≤ V_A * (1 - fstT) := by
         have h_one_minus : 0 ≤ 1 - fstT := by linarith
-        exact mul_nonneg h_one_minus (le_of_lt hVA)
+        exact mul_nonneg (le_of_lt hVA) h_one_minus
       exact div_nonneg hnum (le_of_lt hVE)
     exact div_nonneg hsnr_nonneg (by positivity)
   have hhalf_lt : presentDaySignalToNoise V_A V_E fstT / 2 <
