@@ -1,0 +1,106 @@
+CONTROL 0 -- IS THE VECTORIZED DRAW THE SAME DRAW?
+  C0a KS(vectorized, scalar-loop) = 0.0500  99.9% critical 0.1125  PASS
+      means 0.432100 vs 0.428408, sds 0.090144 vs 0.095017
+  C0b one batched generation vs Binomial(400, 0.450000): chi2 50.8 on 36 dof, 99.9% critical 68.1  PASS
+  C0c mean |pairwise corr|: vectorized 0.2549 vs MEASURED scalar-loop null 0.2488  PASS
+      (the null is measured, not assumed: independent autocorrelated chains of this length give ~0.25, so a fixed small bound would be unsatisfiable by construction)
+  C0d POSITIVE CONTROL, a kernel sharing ONE variate across replicates: KS 0.9950, chi2 6.37e+04, corr 1.0000 -> REJECTED by all three as required
+  CONTROL 0 (vectorized draw is the same draw): PASS
+
+CONTROL 1 -- ALGEBRA (no drift, no simulator)
+  C1 selection_first        s=0.1 m=0.05     iterated 0.45   closed 0.45   |d| 2.6e-15
+  C1 migration_first        s=0.1 m=0.05     iterated 0.47368421   closed 0.47368421   |d| 2.7e-15
+  C1 selection_first        s=0.1 m=0.08     iterated 0.12   closed 0.12   |d| 3.4e-15
+  C1 migration_first        s=0.1 m=0.08     iterated 0.13043478   closed 0.13043478   |d| 3.7e-15
+  C1 selection_first        s=0.2 m=0.02     iterated 0.88   closed 0.88   |d| 6.7e-16
+  C1 migration_first        s=0.2 m=0.02     iterated 0.89795918   closed 0.89795918   |d| 7.8e-16
+  C1 selection_first        s=0.05 m=0.04    iterated 0.16   closed 0.16   |d| 5.9e-15
+  C1 migration_first        s=0.05 m=0.04    iterated 0.16666667   closed 0.16666667   |d| 6.1e-15
+  C1 rare_additive          mu=1e-05 s=0.01  iterated 0.001996008   closed 0.001996008   |d| 2.7e-17
+  C1 rare_additive          mu=1e-05 s=0.0006 iterated 0.032258065   closed 0.032258065   |d| 3.4e-15
+  C1 rare_additive          mu=1e-06 s=0.001 iterated 0.0049751244   closed 0.0049751244   |d| 2.6e-15
+  C1 rare_recessive         mu=1e-05 s=0.01  iterated 0.031126729   closed 0.031126729   |d| 4.1e-15
+  C1 rare_recessive         mu=1e-06 s=0.05  iterated 0.0044621471   closed 0.0044621471   |d| 6e-16
+  CONTROL 1 (closed form solves the corpus recurrence): PASS
+
+CONTROL 2 -- DRIFT-FREE LIMIT OF THE SIMULATOR
+  C2 selection_first  s=0.10 m=0.050  N=1e7 measured 0.450012  corpus 0.450000  rel -0.0026%
+  C2 migration_first  s=0.10 m=0.050  N=1e7 measured 0.473708  corpus 0.473684  rel -0.0051%
+  C2 selection_first  s=0.20 m=0.020  N=1e7 measured 0.879998  corpus 0.880000  rel +0.0003%
+  CONTROL 2 (simulator == recurrence when drift is off): PASS
+
+CONTROLS 3-4 -- HALVES ISOLATED
+  C3a s=0, mu=1e-03 nu=3e-03: measured q=0.24897  expected 0.25000  PASS
+  C3b pure drift: E[q] 0.29865 +- 0.00204 vs 0.30000  PASS
+  C4  mu=0, s=0.02 deterministic: q=3.35e-88  PASS
+  CONTROLS 3-4 (halves isolated): PASS
+
+REGIME 1 -- CONTINENT-ISLAND (axis: N, which no member takes)
+  s=0.10 m=0.050 selection_first  N=100       E[p]=0.12023 +-0.00267  lost=70.7%  corpus 0.45000  rel  +274.27%
+  s=0.10 m=0.050 selection_first  N=1000      E[p]=0.44675 +-0.00008  lost= 0.0%  corpus 0.45000  rel    +0.73%
+  s=0.10 m=0.050 selection_first  N=10000     E[p]=0.44967 +-0.00002  lost= 0.0%  corpus 0.45000  rel    +0.07%
+  s=0.10 m=0.050 selection_first  N=1000000   E[p]=0.45000 +-0.00000  lost= 0.0%  corpus 0.45000  rel    +0.00%
+  s=0.10 m=0.050 migration_first  N=100       E[p]=0.17609 +-0.00311  lost=59.6%  corpus 0.47368  rel  +169.00%
+  s=0.10 m=0.050 migration_first  N=1000      E[p]=0.47073 +-0.00008  lost= 0.0%  corpus 0.47368  rel    +0.63%
+  s=0.10 m=0.050 migration_first  N=10000     E[p]=0.47339 +-0.00002  lost= 0.0%  corpus 0.47368  rel    +0.06%
+  s=0.10 m=0.050 migration_first  N=1000000   E[p]=0.47368 +-0.00000  lost= 0.0%  corpus 0.47368  rel    -0.00%
+  s=0.10 m=0.080 selection_first  N=100       E[p]=0.00000 +-0.00000  lost=100.0%  corpus 0.12000  rel     +nan%
+  s=0.10 m=0.080 selection_first  N=1000      E[p]=0.01674 +-0.00054  lost=83.6%  corpus 0.12000  rel  +616.69%
+  s=0.10 m=0.080 selection_first  N=10000     E[p]=0.11806 +-0.00006  lost= 0.0%  corpus 0.12000  rel    +1.65%
+  s=0.10 m=0.080 selection_first  N=1000000   E[p]=0.11997 +-0.00001  lost= 0.0%  corpus 0.12000  rel    +0.02%
+  s=0.10 m=0.080 migration_first  N=100       E[p]=0.00000 +-0.00000  lost=100.0%  corpus 0.13043  rel     +nan%
+  s=0.10 m=0.080 migration_first  N=1000      E[p]=0.02722 +-0.00070  lost=75.5%  corpus 0.13043  rel  +379.27%
+  s=0.10 m=0.080 migration_first  N=10000     E[p]=0.12851 +-0.00006  lost= 0.0%  corpus 0.13043  rel    +1.50%
+  s=0.10 m=0.080 migration_first  N=1000000   E[p]=0.13041 +-0.00001  lost= 0.0%  corpus 0.13043  rel    +0.02%
+  s=0.05 m=0.040 selection_first  N=100       E[p]=0.00000 +-0.00000  lost=100.0%  corpus 0.16000  rel     +nan%
+  s=0.05 m=0.040 selection_first  N=1000      E[p]=0.03019 +-0.00084  lost=77.9%  corpus 0.16000  rel  +429.93%
+  s=0.05 m=0.040 selection_first  N=10000     E[p]=0.15712 +-0.00010  lost= 0.0%  corpus 0.16000  rel    +1.83%
+  s=0.05 m=0.040 selection_first  N=1000000   E[p]=0.15999 +-0.00001  lost= 0.0%  corpus 0.16000  rel    +0.01%
+  s=0.05 m=0.040 migration_first  N=100       E[p]=0.00000 +-0.00000  lost=100.0%  corpus 0.16667  rel     +nan%
+  s=0.05 m=0.040 migration_first  N=1000      E[p]=0.03833 +-0.00093  lost=72.8%  corpus 0.16667  rel  +334.86%
+  s=0.05 m=0.040 migration_first  N=10000     E[p]=0.16411 +-0.00010  lost= 0.0%  corpus 0.16667  rel    +1.56%
+  s=0.05 m=0.040 migration_first  N=1000000   E[p]=0.16666 +-0.00001  lost= 0.0%  corpus 0.16667  rel    +0.00%
+
+REGIME 2 -- MUTATION-SELECTION BALANCE (axis: N; grid reaches where mu/(hs+mu) and mu/(hs) separate)
+  mu=1e-05 hs=3e-04 N=500      E[q]=0.203095 +-0.005839 | corpus 0.032258 (-84.12%) | mu/hs 0.033333 (-83.59%) | forms differ by 3.33%
+  mu=1e-05 hs=3e-04 N=5000     E[q]=0.042926 +-0.001231 | corpus 0.032258 (-24.85%) | mu/hs 0.033333 (-22.35%) | forms differ by 3.33%
+  mu=1e-05 hs=3e-04 N=50000    E[q]=0.033508 +-0.000195 | corpus 0.032258 (-3.73%) | mu/hs 0.033333 (-0.52%) | forms differ by 3.33%
+  mu=1e-05 hs=3e-04 N=1000000  E[q]=0.033316 +-0.000044 | corpus 0.032258 (-3.17%) | mu/hs 0.033333 (+0.05%) | forms differ by 3.33%
+  mu=1e-05 hs=1e-03 N=500      E[q]=0.033612 +-0.002352 | corpus 0.009901 (-70.54%) | mu/hs 0.010000 (-70.25%) | forms differ by 1.00%
+  mu=1e-05 hs=1e-03 N=5000     E[q]=0.010461 +-0.000208 | corpus 0.009901 (-5.35%) | mu/hs 0.010000 (-4.41%) | forms differ by 1.00%
+  mu=1e-05 hs=1e-03 N=50000    E[q]=0.010029 +-0.000059 | corpus 0.009901 (-1.27%) | mu/hs 0.010000 (-0.29%) | forms differ by 1.00%
+  mu=1e-05 hs=1e-03 N=1000000  E[q]=0.010033 +-0.000013 | corpus 0.009901 (-1.31%) | mu/hs 0.010000 (-0.33%) | forms differ by 1.00%
+  mu=1e-05 hs=1e-02 N=500      E[q]=0.000973 +-0.000057 | corpus 0.000999 (+2.69%) | mu/hs 0.001000 (+2.79%) | forms differ by 0.10%
+  mu=1e-05 hs=1e-02 N=5000     E[q]=0.000997 +-0.000018 | corpus 0.000999 (+0.16%) | mu/hs 0.001000 (+0.26%) | forms differ by 0.10%
+  mu=1e-05 hs=1e-02 N=50000    E[q]=0.000999 +-0.000006 | corpus 0.000999 (+0.05%) | mu/hs 0.001000 (+0.15%) | forms differ by 0.10%
+  mu=1e-05 hs=1e-02 N=1000000  E[q]=0.000999 +-0.000001 | corpus 0.000999 (-0.00%) | mu/hs 0.001000 (+0.10%) | forms differ by 0.10%
+  mu=1e-04 hs=1e-02 N=500      E[q]=0.010580 +-0.000194 | corpus 0.009901 (-6.41%) | mu/hs 0.010000 (-5.48%) | forms differ by 1.00%
+  mu=1e-04 hs=1e-02 N=5000     E[q]=0.009989 +-0.000060 | corpus 0.009901 (-0.88%) | mu/hs 0.010000 (+0.11%) | forms differ by 1.00%
+  mu=1e-04 hs=1e-02 N=50000    E[q]=0.009997 +-0.000019 | corpus 0.009901 (-0.97%) | mu/hs 0.010000 (+0.03%) | forms differ by 1.00%
+  mu=1e-04 hs=1e-02 N=1000000  E[q]=0.009998 +-0.000004 | corpus 0.009901 (-0.97%) | mu/hs 0.010000 (+0.02%) | forms differ by 1.00%
+  RECESSIVE mu=1e-05 s=1e-02 N=5000     E[q]=0.016439 +-0.000208 | corpus 0.031127 (+89.35%) | sqrt(mu/s) 0.031623
+  RECESSIVE mu=1e-05 s=1e-02 N=50000    E[q]=0.028209 +-0.000122 | corpus 0.031127 (+10.34%) | sqrt(mu/s) 0.031623
+  RECESSIVE mu=1e-05 s=1e-02 N=1000000  E[q]=0.031473 +-0.000029 | corpus 0.031127 (-1.10%) | sqrt(mu/s) 0.031623
+  RECESSIVE mu=1e-05 s=1e-03 N=5000     E[q]=0.061055 +-0.000833 | corpus 0.095125 (+55.80%) | sqrt(mu/s) 0.100000
+  RECESSIVE mu=1e-05 s=1e-03 N=50000    E[q]=0.091564 +-0.000404 | corpus 0.095125 (+3.89%) | sqrt(mu/s) 0.100000
+  RECESSIVE mu=1e-05 s=1e-03 N=1000000  E[q]=0.099574 +-0.000095 | corpus 0.095125 (-4.47%) | sqrt(mu/s) 0.100000
+
+REGIME 3 -- STABILIZING SELECTION
+  Vs=2.0   start_p=0.50  V=0.48783  loss/gen=0.000536  realized s = loss/V = 0.00110
+  Vs=2.0   start_p=0.20  V=0.31162  loss/gen=0.000432  realized s = loss/V = 0.00139
+  Vs=2.0   start_p=0.05  V=0.09274  loss/gen=0.000115  realized s = loss/V = 0.00124
+  Vs=10.0  start_p=0.50  V=0.48927  loss/gen=0.000483  realized s = loss/V = 0.00099
+  Vs=10.0  start_p=0.20  V=0.31370  loss/gen=0.000290  realized s = loss/V = 0.00093
+  Vs=10.0  start_p=0.05  V=0.09294  loss/gen=0.000039  realized s = loss/V = 0.00042
+  Vs=50.0  start_p=0.50  V=0.48905  loss/gen=0.000499  realized s = loss/V = 0.00102
+  Vs=50.0  start_p=0.20  V=0.31574  loss/gen=0.000176  realized s = loss/V = 0.00056
+  Vs=50.0  start_p=0.05  V=0.09497  loss/gen=0.000022  realized s = loss/V = 0.00023
+  Vs=2.0    s(V=0.0927)=0.00124  vs  s(V=0.4878)=0.00110   ratio 0.885
+  Vs=10.0   s(V=0.0929)=0.00042  vs  s(V=0.4893)=0.00099   ratio 2.342
+  Vs=50.0   s(V=0.0950)=0.00023  vs  s(V=0.4890)=0.00102   ratio 4.420
+  effectVarianceRecurrence asserts this ratio is 1.000 at every Vs.
+
+CONTROL 5 -- POSITIVE CONTROL ON THE NULL
+  CONTROL 5 positive control: 4/4 corrupted predictions rejected while the true one passed: PASS
+
+READ_THE_TEST: True   -> fam_selection_results.json

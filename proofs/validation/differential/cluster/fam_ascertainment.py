@@ -175,6 +175,7 @@ def gwas(R, n, beta, maf_causal, maf_tag, r2, sigma_e=1.0, seed=None):
 
     bc = np.empty(R); sec = np.empty(R)
     bt = np.empty(R); set_ = np.empty(R)
+    setrue = np.empty(R)
     r_real = []
     step = max(1, CELLS_PER_CHUNK // n)
     done = 0
@@ -197,12 +198,21 @@ def gwas(R, n, beta, maf_causal, maf_tag, r2, sigma_e=1.0, seed=None):
 
         bc[done:done + C], sec[done:done + C] = ols(g_c)
         bt[done:done + C], set_[done:done + C] = ols(g_t)
+        # THE TRUE SAMPLING SD OF beta_hat GIVEN THE GENOTYPES, sigma/sqrt(Sxx).
+        # Not the estimate: conditional on g, beta_hat ~ N(beta, this^2)
+        # EXACTLY, which is the model the exact winner's-curse formula
+        # describes. Selecting on beta_hat/se_hat instead is a t statistic, and
+        # the difference is a real finite-sample effect that has to be
+        # separated from the formula rather than blamed on it.
+        xcc = g_c - g_c.mean(axis=1, keepdims=True)
+        setrue[done:done + C] = sigma_e / np.sqrt((xcc * xcc).sum(axis=1))
         if not r_real:
             r_real = [float(np.corrcoef(g_c[i], g_t[i])[0, 1])
                       for i in range(min(C, 200))]
         done += C
     return {"beta_causal": bc, "se_causal": sec,
             "beta_tag": bt, "se_tag": set_,
+            "se_causal_true": setrue,
             "r_realized": float(np.mean(r_real))}
 
 
@@ -384,15 +394,44 @@ def control_power():
 # This measures both readings against the simulated NCP at the tag.
 # ===========================================================================
 
+def max_r2(pc, pt):
+    """Largest r^2 attainable between two biallelic sites at these frequencies.
+
+    D is bounded by min(pc(1-pt), (1-pc)pt) above and the correlation is
+    D/sqrt(pc qc pt qt). THIS BOUND IS WHY THE FIRST RUN OF THIS REGIME
+    MEASURED NOTHING: it asked for r2 = 0.5 at every cell, and at
+    (0.05, 0.45) the maximum attainable r2 is 0.064, so EVERY off-diagonal
+    cell was infeasible and skipped. The grid collapsed onto its diagonal --
+    exactly the matched-frequency grid the family docstring says cannot
+    distinguish the two readings. Control 5 caught it and reported "0/0
+    cells" rather than passing vacuously, which is the only reason it was not
+    filed as agreement.
+    """
+    d_max = min(pc * (1 - pt), (1 - pc) * pt)
+    r = d_max / math.sqrt(pc * (1 - pc) * pt * (1 - pt))
+    return min(1.0, r * r)
+
+
 def regime_frequency_mismatch():
     out = []
-    R, n, beta, r2 = 20000, 4000, 0.05, 0.5
+    R, n = 20000, 4000
+    TARGET_NCP = 4.0
     for pc in (0.05, 0.15, 0.45):
         for pt in (0.05, 0.15, 0.45):
+            # r2 AS A FIXED FRACTION OF WHAT IS ATTAINABLE at these two
+            # frequencies. Holding r2 numerically constant across cells is
+            # impossible, so what is held constant is the position within the
+            # feasible range; the realized r is passed to the corpus body, so
+            # the ONLY thing differing between the two readings is which
+            # frequency they use, which is the axis.
+            r2 = 0.9 * max_r2(pc, pt)
+            # beta scaled so every cell has a measurable NCP. Both readings
+            # use the SAME beta, so this cannot favour either.
+            beta = math.sqrt(TARGET_NCP / (n * r2 * 2 * pc * (1 - pc)))
             res = gwas(R, n, beta, pc, pt, r2, seed=51)
             if res is None:
-                print("  maf_causal=%.2f maf_tag=%.2f r2=%.2f INFEASIBLE "
-                      "haplotype frequencies -- skipped" % (pc, pt, r2))
+                print("  maf_causal=%.2f maf_tag=%.2f r2=%.3f STILL "
+                      "INFEASIBLE -- this should not happen" % (pc, pt, r2))
                 continue
             chi2 = float(np.mean((res["beta_tag"] / res["se_tag"]) ** 2))
             ncp_meas = chi2 - 1.0
@@ -400,7 +439,10 @@ def regime_frequency_mismatch():
                              math.sqrt(r2))
             as_tag = call("discoveryNCP", float(n), beta, pt, math.sqrt(r2))
             out.append({"maf_causal": pc, "maf_tag": pt, "r2": r2,
+                        "max_attainable_r2_at_these_frequencies":
+                            max_r2(pc, pt),
                         "beta": beta, "n": n,
+                        "frequency_ratio": max(pc, pt) / min(pc, pt),
                         "realized_allelic_corr": res["r_realized"],
                         "measured_ncp_at_tag": ncp_meas,
                         "corpus_read_as_causal_maf": as_causal,
@@ -409,9 +451,9 @@ def regime_frequency_mismatch():
                             (as_causal - ncp_meas) / ncp_meas,
                         "rel_err_tag_reading":
                             (as_tag - ncp_meas) / ncp_meas})
-            print("  maf_c=%.2f maf_t=%.2f  measured NCP %.4f | as CAUSAL "
-                  "%.4f (%+7.1f%%) | as TAG %.4f (%+7.1f%%)"
-                  % (pc, pt, ncp_meas, as_causal,
+            print("  maf_c=%.2f maf_t=%.2f (r2=%.3f, max %.3f)  measured NCP "
+                  "%.4f | as CAUSAL %.4f (%+7.1f%%) | as TAG %.4f (%+7.1f%%)"
+                  % (pc, pt, r2, max_r2(pc, pt), ncp_meas, as_causal,
                      100 * (as_causal - ncp_meas) / ncp_meas, as_tag,
                      100 * (as_tag - ncp_meas) / ncp_meas))
     return out
@@ -480,36 +522,76 @@ def regime_winners_curse():
     n, p = 3000, 0.25
     probe = gwas(2000, n, 0.0, p, p, 1.0, seed=61)
     se_nom = float(probe["se_causal"].mean())
+    # WHY TWO SELECTION RULES, NOT ONE.
+    #
+    # The first run FAILED this control at lam = 4 by 5.11 sems: exact 5.8974
+    # against a simulated 5.8838 +- 0.0027, a 0.23% gap. That gap is real and
+    # it is neither the formula's fault nor the simulator's -- it is that they
+    # were describing DIFFERENT SELECTION EVENTS.
+    #
+    # wc_exact describes selection on beta_hat/SE with SE KNOWN: a z test.
+    # A real GWAS selects on beta_hat/SE_hat, a t statistic, whose denominator
+    # is itself noisy. Selecting on a ratio with a noisy denominator is not the
+    # same event, and at n = 3000 the SE estimate carries ~1.3% relative noise.
+    # Blaming the formula for that would have been a defect report about my own
+    # choice of test statistic.
+    #
+    # So both are run, and they isolate different things:
+    #   z rule -- SE known. This is EXACTLY wc_exact's model, so agreement here
+    #             is the control: it says the formula describes the model.
+    #   t rule -- SE estimated. This is what a GWAS does. The difference
+    #             between the two columns is the finite-sample t correction,
+    #             REPORTED as a magnitude rather than folded into a verdict.
     for (lam, z, R) in ((4.0, Z_GW, 300000), (6.0, Z_GW, 60000),
                         (0.0, 1.96, 200000), (1.0, 1.96, 200000)):
         res = gwas(R, n, lam * se_nom, p, p, 1.0, seed=62)
-        zz = res["beta_causal"] / res["se_causal"]
-        sel = np.abs(zz) > z
-        k = int(sel.sum())
-        if k < 100:
-            out_sim.append({"beta_over_se": lam, "z_alpha": z,
-                            "selected": k, "replicates": R,
-                            "note": "fewer than 100 selected; not estimated"})
-            print("  SIM lam=%.1f z=%.2f: only %d/%d selected -- not estimated"
-                  % (lam, z, k, R))
-            continue
-        cond = float(res["beta_causal"][sel].mean()) / se_nom
-        sem = float(res["beta_causal"][sel].std()) / se_nom / math.sqrt(k)
         exact, P = wc_exact(lam, z)
-        out_sim.append({"beta_over_se": lam, "z_alpha": z, "replicates": R,
-                        "selected": k, "selection_rate": k / R,
-                        "exact_selection_probability": P,
-                        "simulated_E_in_SE": cond, "sem": sem,
-                        "exact_E_in_SE": exact,
-                        "deviation_in_sems": (exact - cond) / sem if sem else None})
-        print("  SIM lam=%4.1f z=%5.2f  selected %6d (%.3e vs exact %.3e)  "
-              "E[b|sel]=%8.4f +- %.4f SE   exact %8.4f  (%.2f sems)"
-              % (lam, z, k, k / R, P, cond, sem, exact,
-                 (exact - cond) / sem if sem else float("nan")))
-    ok = all(abs(r.get("deviation_in_sems") or 0.0) < 4.0 for r in out_sim
-             if "deviation_in_sems" in r)
-    print("  CONTROL 6 (exact conditional mean reproduces a simulated GWAS): "
-          "%s" % ("PASS" if ok else "FAIL"))
+        row = {"beta_over_se": lam, "z_alpha": z, "replicates": R,
+               "exact_selection_probability": P, "exact_E_in_SE": exact}
+        for rule, denom in (("z_known_SE", res["se_causal_true"]),
+                            ("t_estimated_SE", res["se_causal"])):
+            sel = np.abs(res["beta_causal"] / denom) > z
+            k = int(sel.sum())
+            if k < 100:
+                row[rule] = {"selected": k,
+                             "note": "fewer than 100 selected; not estimated"}
+                continue
+            # normalise by the SAME true SE in both, so the two rules differ
+            # only in what they SELECT on, never in what they report.
+            vals = res["beta_causal"][sel] / res["se_causal_true"][sel]
+            cond = float(vals.mean())
+            sem = float(vals.std()) / math.sqrt(k)
+            row[rule] = {"selected": k, "selection_rate": k / R,
+                         "simulated_E_in_SE": cond, "sem": sem,
+                         "deviation_in_sems": (exact - cond) / sem if sem
+                         else None}
+        out_sim.append(row)
+        zr = row.get("z_known_SE", {})
+        tr = row.get("t_estimated_SE", {})
+        print("  SIM lam=%4.1f z=%5.2f exact %8.4f | z-rule %8.4f +-%.4f "
+              "(%+.2f sems) | t-rule %8.4f +-%.4f (%+.2f sems)"
+              % (lam, z, exact,
+                 zr.get("simulated_E_in_SE", float("nan")),
+                 zr.get("sem", float("nan")),
+                 zr.get("deviation_in_sems", float("nan")),
+                 tr.get("simulated_E_in_SE", float("nan")),
+                 tr.get("sem", float("nan")),
+                 tr.get("deviation_in_sems", float("nan"))))
+    # THE CONTROL IS THE z RULE, which is wc_exact's own model.
+    devs = [r["z_known_SE"]["deviation_in_sems"] for r in out_sim
+            if "deviation_in_sems" in r.get("z_known_SE", {})]
+    ok = bool(devs) and all(abs(d) < 4.0 for d in devs)
+    tdevs = [abs(r["t_estimated_SE"]["deviation_in_sems"]) for r in out_sim
+             if "deviation_in_sems" in r.get("t_estimated_SE", {})]
+    print("  CONTROL 6 (exact conditional mean reproduces a simulated GWAS "
+          "under its OWN selection rule, %d cells at 4 sems): %s"
+          % (len(devs), "PASS" if ok else "FAIL"))
+    print("  REPORTED, not scored: switching to the t statistic a real GWAS "
+          "actually uses moves the conditional mean by up to %.2f sems "
+          "(%.3f%% of the value). That is the finite-sample cost of an "
+          "estimated denominator, not an error in the formula."
+          % (max(tdevs, default=float("nan")),
+             100 * max(tdevs, default=float("nan")) * 0.0027 / 5.9))
     return ok, {"exact": out_exact, "simulation_control": out_sim}
 
 

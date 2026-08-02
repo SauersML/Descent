@@ -99,6 +99,16 @@ SLICE_FILES = [
 #       another's deadlock. Anything heavier than a grep goes through srun or
 #       sbatch, not the login node.
 #
+#   O5b AN IDENTIFIER COLLISION IN A MEMBERSHIP TEST ALWAYS OVER-COUNTS,
+#       NEVER UNDER-COUNTS, SO IT ALWAYS FLATTERS. Matching members by SHORT
+#       name merged thirteen out-of-slice declarations into the slice here --
+#       `total`, `fst`, `theta`, `tau`, `var`, `delta`, `retention`,
+#       `scoreMean` and more -- and the headline moved from "295" to 316 once
+#       fully qualified. The direction is not luck: a collision adds spurious
+#       matches to the NUMERATOR and leaves the denominator untouched. Any
+#       membership or coverage join must key on the fully qualified name, and a
+#       count that improved after a join was loosened should be assumed wrong.
+#
 #   O5  VECTORISE ONLY WHERE THE VECTORISED DRAW IS PROVABLY THE SAME DRAW.
 #       The rule is not "vectorise over replicates"; it is that a batched
 #       `multinomial` or `binomial` over a 2-D parameter array draws each
@@ -351,47 +361,105 @@ FAMILIES = [
     {
         "name": "site_frequency_spectrum",
         "model": "standard neutral SFS, E[xi_i] = theta/i",
-        "simulator": None,
-        "status": "NO SIMULATOR AND NO DEFINITIONS. singletonProportion was "
-                  "removed from the corpus. The reference exists in refs.py "
-                  "and currently checks nothing -- an empty family, recorded "
-                  "so it is not mistaken for a covered one.",
+        "simulator": "cluster/fam_sfs.py",
+        "status": "SIMULATED -- NO LONGER EMPTY. The family was recorded as "
+                  "having no simulator AND no definitions after "
+                  "singletonProportion was removed. The members were missing "
+                  "because they do not have 'spectrum' in their names: "
+                  "expectedNewMutations and expectedFreqDiffSq are both claims "
+                  "about the frequency spectrum. FINDING: "
+                  "expectedNewMutations (theta*t/2) is 215x to 4598x above "
+                  "segregating sites in a sample and the ratio GROWS in t, "
+                  "because the prediction is linear where the observable "
+                  "saturates at Watterson's 1419.1. It is EXACT for mutations "
+                  "that ARISE population-wide (2*Ne*mu*L*t); the docstring "
+                  "names segregating sites and the sole consumer "
+                  "sharedLDFractionFromMutation uses it as a per-locus Poisson "
+                  "exponent. Scope declaration, not new arithmetic. "
+                  "expectedFreqDiffSq is CONFIRMED once p0 is observed from "
+                  "ancient samples and second moments are corrected for "
+                  "sampling variance: -2.6%, -0.5%, +2.6%, with the "
+                  "definition's own factor of 2 measured at 2.06, 1.98, 1.97.",
         "found_by": "manual",
-        "spec": "EMPTY FAMILY -- no spec, because a spec for zero members "
-                "would be coverage theatre. If a definition ever lands here, "
-                "the spec is: coalescent with mutation, measure the folded and "
-                "unfolded SFS, reference E[xi_i] = theta/i; control is that "
-                "sum_i i xi_i must equal the measured Watterson theta times "
-                "the harmonic number, which is an identity the simulator "
-                "cannot fit.",
-        "members": [],
+        "spec": "Coalescent with mutation (msprime); measure the unfolded SFS "
+                "and, for the two definitions, segregating sites younger than "
+                "t and E[(p1-p2)^2] after a clean split with ANCIENT SAMPLES "
+                "drawn from the ancestral population at the split time so p0 "
+                "is observed rather than proxied. SPLIT CONTROLS: (a) spectrum "
+                "SHAPE against theta/i normalised, (b) spectrum SCALE against "
+                "Watterson's theta*H, (c) singleton proportion 1/H, which "
+                "depends on n and not on theta -- (b) and (c) separate the two "
+                "factors that (a) normalises away, and a mutation rate wrong "
+                "by 2x passes (a) and fails (b). Every one is judged at 4 "
+                "standard errors of the REPLICATE spread, because sites along "
+                "a recombining sequence are linked and a per-site binomial "
+                "error would be far too small. POSITIVE CONTROL: the identical "
+                "statistic and identical 4-sigma rule applied to an "
+                "exponentially growing population, which must be REJECTED; it "
+                "fires at 58.8 sems. CAN-FAIL: the t grid spans 0.02 to 8.0 "
+                "times 2Ne, crossing the point where the sample spectrum "
+                "saturates; a grid at small t alone would validate theta*t/2 "
+                "because nothing has been lost yet.",
+        "members": ["expectedNewMutations", "expectedFreqDiffSq"],
     },
     {
         "name": "selection_regimes",
         "model": "selection-migration balance, stabilizing and directional "
                  "selection, and the portability laws fitted under each",
-        "simulator": None,
-        "status": "NO SIMULATOR. Needs forward simulation with selection; "
-                  "SLiM is absent and a Wright-Fisher implementation would be "
-                  "the honest substitute.",
+        "simulator": "cluster/fam_selection.py",
+        "status": "SIMULATED -- REGIME DEFECT, and SLiM was not needed. Every "
+                  "member is a one-locus deterministic recursion or its fixed "
+                  "point, so a Wright-Fisher generation is array arithmetic. "
+                  "FINDING: the axis is POPULATION SIZE, which no member "
+                  "takes. The continent-island closed forms are exact in the "
+                  "deterministic limit (0.00% to 0.02% at N = 10^6, and the "
+                  "closed forms solve their own recurrences to 1e-15) and "
+                  "collapse at small N: at s = 0.10, m = 0.05, N = 100 the "
+                  "allele is LOST in 59.6-70.2% of replicates and E[p] is "
+                  "0.176 against a predicted 0.474, an error of +169%. At "
+                  "m(1+s) close to s the boundary is absorbing and the allele "
+                  "is lost in 100% of replicates at N = 100 where the corpus "
+                  "predicts 0.12-0.17. By N = 10^4 the corpus is within 1.8%. "
+                  "The formulas are right about the deterministic limit and "
+                  "silent about needing it, which is a scope declaration "
+                  "rather than new arithmetic. selectedDriftFactor is NOT "
+                  "covered and stays UNREACHABLE: s_correction is a free "
+                  "parameter the corpus derives from nothing, so any "
+                  "measurement can be fitted. The four portability members "
+                  "(neutralPortability, neutralPortabilityRatioLD, "
+                  "stabilizingPortability, diversifyingPortability) are also "
+                  "NOT covered by this simulator -- it is one-locus and they "
+                  "are score-level claims.",
         "found_by": "manual",
-        "spec": "Forward Wright-Fisher with a selection coefficient s applied "
-                "before or after migration (the corpus has BOTH orderings as "
-                "separate definitions, and they differ at O(sm)); measure the "
-                "equilibrium island frequency and, for the portability arm, "
-                "the r^2 of a source-fitted score in a target at a range of "
-                "F_ST under stabilizing versus diversifying selection. "
-                "References: p* = m/(m+s) for continent-island balance; "
-                "r2(fst) = r2_0 (1-2 fst) for the neutral law. SPLIT CONTROLS: "
-                "(a) s = 0 must reproduce the neutral island family exactly -- "
-                "isolates migration; (b) m = 0 must reproduce deterministic "
-                "selection p_t -> 0 -- isolates selection. The ORDERING axis "
-                "is the discriminating one: running both orderings on the same "
-                "seed and same s, m is the only way to tell which of the two "
-                "corpus definitions is the continent-island equilibrium, and "
-                "neither combined control can do it. CAN-FAIL: s and m must be "
-                "comparable in magnitude; when s >> m or m >> s the two "
-                "orderings agree to O(sm) and both validate.",
+        "spec": "Forward Wright-Fisher, VECTORIZED OVER REPLICATES, with "
+                "selection applied before or after migration (the corpus has "
+                "BOTH orderings as separate definitions and they differ at "
+                "O(sm)); mutation-selection balance additive and recessive; "
+                "and an individual-based stabilizing-selection population for "
+                "the linearity claim inside effectVarianceRecurrence. "
+                "Predictions come from api.callable_for, i.e. the Lean bodies, "
+                "not from retyping them. SPLIT CONTROLS: (0) the VECTORIZED "
+                "DRAW IS THE SAME DRAW -- batch versus a scalar loop by "
+                "two-sample KS, one batched generation against Binomial(2N,p) "
+                "by chi-square, and cross-correlation against the MEASURED "
+                "scalar-loop null; a kernel deliberately sharing one variate "
+                "must be rejected by all three, and is (KS 0.995, chi2 6.4e4, "
+                "corr 1.0000). (1) ALGEBRA: deterministic iteration of the "
+                "corpus step map must reach the corpus closed form, isolating "
+                "'the closed form solves the recurrence' from 'the recurrence "
+                "is right'. (2) the same Wright-Fisher code at N = 10^7 must "
+                "reproduce (1), isolating 'the simulator implements the model' "
+                "from 'drift matters'. (3) s = 0 must give mu/(mu+nu) and pure "
+                "drift must be a martingale -- isolates the mutation/drift "
+                "half. (4) mu = 0 deterministic must send q to 0 -- isolates "
+                "the selection half; (3) and (4) split what a single "
+                "'reproduces mu/(hs)' check would fuse, since compensating "
+                "errors in the two halves pass it. (5) POSITIVE CONTROL: a "
+                "prediction corrupted by s -> 1.3s must be flagged where the "
+                "true one passes. CAN-FAIL: mu/(hs+mu) and the textbook "
+                "mu/(hs) CONVERGE as s grows, so the grid runs down to "
+                "h*s = 3e-4 where they separate by 3.2%; the N axis spans "
+                "5x10^2 to 10^6, which is 4N(hs) from 0.6 to 1200.",
         "members": ["selectionMigrationEquilibrium",
                     "selectionMigrationEquilibriumMigrationFirst",
                     "continentIslandStepSelectionFirst",
@@ -399,30 +467,68 @@ FAMILIES = [
                     "selectedDriftFactor",
                     # newly classified
                     "neutralPortability", "neutralPortabilityRatioLD",
-                    "stabilizingPortability", "diversifyingPortability"],
+                    "stabilizingPortability", "diversifyingPortability",
+                    # mutation-selection balance, covered by fam_selection.py
+                    "mutationSelectionStepRare", "mutationSelectionBalance",
+                    "mutationSelectionStepRecessive",
+                    "mutationSelectionBalanceRecessive",
+                    "effectVarianceRecurrence",
+                    "equilibriumEffectVariance"],
     },
     {
         "name": "ascertainment",
         "model": "discovery thresholds, winner's curse, tag/causal MAF "
                  "mismatch",
-        "simulator": None,
-        "status": "NO SIMULATOR in this tier. Several members were falsified "
-                  "analytically by earlier work; none has a generative check.",
+        "simulator": "cluster/fam_ascertainment.py",
+        "status": "SIMULATED. THE MEMBERSHIP LIST ON THIS ENTRY WAS STALE AND "
+                  "IS CORRECTED BELOW: truncationBias, winnersCurseInflation "
+                  "and approxPower were REMOVED from PowerAnalysis.lean and "
+                  "tagGenotypeVariance is not in defs.json, so three of the "
+                  "five listed members no longer exist and a simulator aimed "
+                  "at the list would have checked a corpus that is gone. The "
+                  "live members were found by grepping defs.json. The "
+                  "REMOVALS are themselves checked, because each rests on "
+                  "stated numbers that had never been simulated.",
         "found_by": "manual",
-        "spec": "Draw true effects from a spike-and-slab, draw GWAS estimates "
-                "with sampling noise, keep those exceeding a discovery "
-                "threshold, and measure E[betahat | discovered] / beta. "
-                "Reference: the truncated-normal mean, and non-central "
-                "chi-squared power at the given NCP. SPLIT CONTROLS: "
-                "(a) threshold = 0 must give zero inflation, isolating the "
-                "estimator from the truncation; (b) sampling noise -> 0 at "
-                "fixed threshold must also give zero inflation, isolating the "
-                "truncation from the noise. Both together pin the two factors "
-                "of the winner's-curse product separately. CAN-FAIL: the power "
-                "grid must include the 20-60% band; at power near 1 the "
-                "truncation is inert and every candidate returns 1.",
-        "members": ["discoveryNCP", "truncationBias", "winnersCurseInflation",
-                    "approxPower", "tagGenotypeVariance"],
+        "spec": "Vectorized GWAS: R replicates x n individuals drawn in one "
+                "block per chunk, one causal variant and one tag built from a "
+                "haplotype model so r^2 and the tag/causal frequency mismatch "
+                "move INDEPENDENTLY -- that separation is the whole design. "
+                "Predictions come from api.callable_for. SPLIT CONTROLS: "
+                "(1) SAMPLING VARIANCE ALONE, no threshold and no LD: measured "
+                "Var(betahat) against standardErrorSq at r2 = 1, isolating the "
+                "n*2p(1-p) factor. (2) LD ATTENUATION ALONE at MATCHED "
+                "frequencies: the noncentrality ratio must be exactly r^2, "
+                "isolating the ld^2 factor -- split from (1) because a "
+                "simulator with the genotype variance wrong by 1/r^2 and the "
+                "LD term wrong by r^2 passes a combined check and fails both. "
+                "(3) THRESHOLD ALONE under the null: rejection rate must equal "
+                "2*Phi(-z) and E[betahat | selected] must be ZERO by symmetry, "
+                "which is exactly where the removed one-sided truncationBias "
+                "went wrong. (4) POWER against the two-sided reference, with "
+                "powerAtThreshold REPORTED rather than scored outside the "
+                "ncp in [1,20] its own docstring declares. (5) POSITIVE "
+                "CONTROL on the mismatch axis: the wrong frequency reading "
+                "must be caught where the frequencies differ AND must not be "
+                "caught where they agree. (6) the exact two-sided conditional "
+                "mean must reproduce a simulated GWAS where selection is "
+                "common enough to measure directly, which is what licenses "
+                "quoting it in the rare-selection regime no affordable "
+                "replicate count reaches. CAN-FAIL: maf_causal and maf_tag are "
+                "swept independently at fixed r^2, so the grid contains cells "
+                "where the two readings of discoveryNCP COINCIDE and cells "
+                "where they differ 9-fold; a matched-frequency grid validates "
+                "both readings and settles nothing, which is the failure mode "
+                "the discoveryNCP docstring itself names.",
+        "members": ["discoveryNCP", "noncentralityParam", "powerAtThreshold",
+                    "effectiveSampleSize", "standardErrorSq",
+                    "ascertainment_loss",
+                    # REMOVED FROM THE CORPUS -- kept here as a record of what
+                    # the old membership list pointed at, not as coverage:
+                    #   truncationBias, winnersCurseInflation, approxPower
+                    #   (removed from PowerAnalysis.lean)
+                    #   tagGenotypeVariance (absent from defs.json)
+                    ],
     },
 
     # =====================================================================
@@ -435,15 +541,25 @@ FAMILIES = [
                  "(Nei G_ST, Hudson, Weir-Cockerham, Wright F_IT) and the "
                  "heterozygosity-ratio and drift-factor inversions that the "
                  "corpus treats as interchangeable",
-        "simulator": None,   # UNCONFIRMED: script exists, run not confirmed
-        "status": "SIMULATOR WRITTEN, NOT YET CONFIRMED GREEN. The script "
-                  "exists and its controls are specified, but the run on the "
-                  "node exited without writing output and I could not confirm "
-                  "a completed pass before handing over. That is recorded as "
-                  "UNCONFIRMED rather than as SIMULATED, because a family "
-                  "counted as covered on the strength of an unrun script is "
-                  "exactly the coverage inflation this inventory exists to "
-                  "remove. Treat the 5 members here as UNCHECKED. The corpus "
+        "simulator": "cluster/fam_fst_estimators.py",
+        "status": "SIMULATED AND GREEN, 0 cells red, positive control fired. "
+                  "The earlier run had not failed -- it was a node-locality "
+                  "problem, exactly as O1 predicts, and a foreground rerun "
+                  "completed with rc 0. E1: at n = 20000 the corrected Hudson "
+                  "estimator matches its parametric limit to four decimals at "
+                  "every cell (0.050133/0.0501402, 0.149729/0.149717); at "
+                  "n = 50 the UNCORRECTED estimator is inflated to 0.0692 "
+                  "while the corrected one holds at 0.0503, so the "
+                  "sample-size correction is doing visible work. E2, the "
+                  "estimator-convention control at true F_ST = 0: Hudson "
+                  "corrected returns -6.5e-05 and 6.3e-06, while Nei returns "
+                  "0.0100684 and 0.0025094 against the predicted 1/(2n-1) "
+                  "bias of 0.010101 and 0.0025063 -- the offset the corpus "
+                  "inherits every time it converts between them. POSITIVE "
+                  "CONTROL E3 FIRED: Hudson/Nei = 1.749 at p = 0.5, 1.751 at "
+                  "0.1 and 1.751 at 0.02, so the two differ by 75% and "
+                  "agreements elsewhere in the arm mean something. wrightFIT "
+                  "composition exact to 1e-6 at both F_IS levels. The corpus "
                   "contains at least four "
                   "distinct quantities all called F_ST and converts freely "
                   "between them; the generative process that distinguishes "
@@ -1059,6 +1175,21 @@ FAMILIES = [
 # unfolding them changes no proof obligation and no numeric value.
 # ---------------------------------------------------------------------------
 # EVERY ENTRY BELOW LOST ITS FALSIFIER. THE PARKED COUNT IS ZERO.
+#
+# THE PRIOR THE NEXT AGENT SHOULD INHERIT RATHER THAN REDISCOVER:
+# ACROSS TWO TIERS AND THIRTY-ONE ATTEMPTS, NOTHING IN THIS SLICE HAS SURVIVED
+# THE UN-SIMULATABLE CLAIM. The earlier tier lost 27 of 27; this one lost 4 of
+# 4. That is no longer a rule about process, it is an empirical finding about
+# this corpus: the probability that any given definition is genuinely beyond
+# reach is very low, and a new claim of un-simulatability should be expected to
+# lose before it is written.
+#
+# Note what the record also says about the falsifier requirement itself. It was
+# introduced as a safeguard, and its entire recorded effect has been to destroy
+# every claim it was applied to. A safeguard with a 31-for-31 record is not a
+# safeguard; it is a refutation of the category it was meant to police. The
+# machinery is kept live anyway, because the cheapest way to keep the finding
+# true is to make the next candidate face the same test.
 #
 # These four were parked as carrying no real-valued content, with the falsifier
 # in `falsify_unsimulatable` named before it was run. It was run, on defs.json
