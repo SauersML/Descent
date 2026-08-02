@@ -216,6 +216,12 @@ def gaussianCriticalMultiplier():
 def windowVariance(w, v):
     return Phi((_rt.rdiv(w, _rt.rsqrt(v))))
 
+def gaussianKurtosisMaf():
+    return _rt.rdiv(((3.0 - _rt.rsqrt(3.0))), 6.0)
+
+def centeredSquareThirdMoment(spectrum):
+    return ((moment(spectrum, 6.0) - (3.0 * moment(spectrum, 4.0))) + 2.0)
+
 def ploidy():
     return 2.0
 
@@ -282,13 +288,14 @@ def Calibrator_HWEPolygenicScoreDGP_scoreVariance(dgp):
 def scoreApproximationError(dgp):
     return _rt._proj(_rt._proj(dgp, 'scoreModel'), 'berryEsseenErrorBound')(_rt._proj(dgp, 'berryEsseenConstant'))
 
-def Calibrator_SourceTaggedMoments_sigmaTagCausalSource(mom):
+def sigmaTagCausalSource(mom):
     return (_rt._proj(mom, 'directCausalSource') + _rt._proj(mom, 'proxyTaggingSource'))
 
 def sourceBestLinearWeightsFromLD(mom, betaCausal):
     return _rt._proj(_rt.rinv(_rt._proj(mom, 'sigmaTagSource')), 'mulVec')((_rt._proj(_rt._proj(mom, 'sigmaTagCausalSource'), 'mulVec')(betaCausal)))
 
 def frobeniusNormSq(A):
+    t = float(len(A))
     return sum((sum((_rt.lpow((A[int(i)][int(j)]), 2.0)) for j in range(int(len(A))))) for i in range(int(len(A))))
 
 def r2FromMSE(mse, varY):
@@ -319,13 +326,13 @@ def optimalSlopeLinearNoise(sigma_g_sq, base_error, slope_error, c):
     return _rt.rdiv(sigma_g_sq, (((sigma_g_sq + base_error) + (slope_error * c))))
 
 def totalVariance(arch, c):
-    return (_rt._proj(arch, 'V_genic')(c) + _rt._proj(arch, 'V_cov')(c))
+    return _rt.add(_rt._proj(arch, 'V_genic')(c), _rt._proj(arch, 'V_cov')(c))
 
 def optimalSlopeFromVariance(arch, c):
     return _rt.rdiv((totalVariance(arch, c)), (_rt._proj(arch, 'V_genic')(c)))
 
 def prevalenceDGP_trueExpectation(pdgp, p, c):
-    return (_rt._proj(pdgp, 'prevalence')(c) + (_rt._proj(pdgp, 'pgs_effect') * p))
+    return _rt.add(_rt._proj(pdgp, 'prevalence')(c), _rt.mul(_rt._proj(pdgp, 'pgs_effect'), p))
 
 def decaySlope(mech, c):
     return _rt._proj(mech, 'tagging_efficiency')((_rt._proj(mech, 'distance')(c)))
@@ -423,10 +430,10 @@ def founderFst(k, t):
     return (1.0 - _rt.lpow(((1.0 - _rt.rdiv(1.0, ((2.0 * (k)))))), t))
 
 def cumulativeDrift(Ne):
-    return sum((_rt.rdiv(1.0, ((2.0 * Ne[int(i)])))) for i in range(int(len(Ne))))
+    return sum((_rt.rdiv(1.0, (_rt.mul(2.0, Ne[int(i)])))) for i in range(int(len(Ne))))
 
 def fstVariableNe(Ne):
-    return (1.0 - _rt.rexp(((-(cumulativeDrift(Ne))))))
+    return _rt.sub(1.0, _rt.rexp((_rt.neg((cumulativeDrift(Ne))))))
 
 def driftLDCreationRate(Ne):
     return _rt.rdiv(1.0, ((2.0 * Ne)))
@@ -436,9 +443,6 @@ def bottleneckExcessLD(Ne_b, Ne_stable, c, t_b):
 
 def measuredLoss(M, t):
     return (1.0 - _rt.rdiv(_rt._proj(M, 'het')(t), _rt._proj(M, 'het')(0.0)))
-
-def driftRetention(Ne, t):
-    return _rt.lpow(((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))), t)
 
 def lossOfRetention(r):
     return (1.0 - r)
@@ -471,10 +475,13 @@ def epistaticVariance(beta12, p1, p2):
     return ((_rt.lpow(beta12, 2.0) * (((2.0 * p1) * ((1.0 - p1))))) * (((2.0 * p2) * ((1.0 - p2)))))
 
 def dominanceVariance(p, d):
-    return sum((_rt.lpow(((((2.0 * p[int(i)]) * ((1.0 - p[int(i)]))) * d[int(i)])), 2.0)) for i in range(int(len(p))))
+    return sum((_rt.lpow((_rt.mul(_rt.mul(_rt.mul(2.0, p[int(i)]), (_rt.sub(1.0, p[int(i)]))), d[int(i)])), 2.0)) for i in range(int(len(p))))
 
 def standardizedGenotype(h, g):
     return _rt.rdiv(centeredAltAlleleCount(h, g), _rt.rsqrt(genotypeVariance(h)))
+
+def centeredSquare(h, g):
+    return (_rt.lpow(standardizedGenotype(h, g), 2.0) - 1.0)
 
 def fourthCumulantFromMoments(secondMoment, fourthMoment):
     return (fourthMoment - (3.0 * _rt.lpow(secondMoment, 2.0)))
@@ -507,7 +514,7 @@ def gwasDiscovered(n, β, maf_causal, ld, z):
     return (_rt.lpow(z, 2.0) <= discoveryNCP(n, β, maf_causal, ld))
 
 def taggedScoreEstimationRisk(targetTagVariance, estimatorMSE):
-    return sum(((targetTagVariance[int(i)] * estimatorMSE[int(i)])) for i in range(int(len(targetTagVariance))))
+    return sum((_rt.mul(targetTagVariance[int(i)], estimatorMSE[int(i)])) for i in range(int(len(targetTagVariance))))
 
 def expectedLinearEffectEstimate(β_true, meanEstimationError):
     return (β_true + meanEstimationError)
@@ -696,9 +703,10 @@ def driftLDTrajectory(Ne, c, Q_0, t):
     return _prev
 
 def ldMismatchFrobenius(Sig_S, Sig_T):
-    return frobeniusNormSq(((Sig_S - Sig_T)))
+    return frobeniusNormSq((_rt.sub(Sig_S, Sig_T)))
 
 def harmonicMeanNe(Ne):
+    T = float(len(Ne))
     return _rt.rdiv((T), sum(((_rt.rdiv(1.0, Ne[int(i)]))) for i in range(int(len(Ne)))))
 
 def excessLDAfterBottleneck(N_b, N_r, c, t_b, t_r):
@@ -800,9 +808,6 @@ def ldPruningDetectionDeficit(decay, kappa):
 def ldPanelRetentionFraction(retainedMarkers, totalMarkers):
     return _rt.rdiv((retainedMarkers), (totalMarkers))
 
-def ldBlockReconstructionShare(recomb, Ne, retainedMarkers, totalMarkers):
-    return ldBandReconstructionShare((ldRetentionPerGen(recomb, Ne)), (ldPanelRetentionFraction(retainedMarkers, totalMarkers)))
-
 def ldBlockDetectionShare(recomb, Ne, retainedMarkers, totalMarkers):
     return ldBandDetectionShare((ldRetentionPerGen(recomb, Ne)), (ldPanelRetentionFraction(retainedMarkers, totalMarkers)))
 
@@ -831,10 +836,10 @@ def f1Score(precision, sensitivity):
     return _rt.rdiv(((2.0 * precision) * sensitivity), ((precision + sensitivity)))
 
 def spectralResidualBiasEnergy(retention, bias):
-    return sum((_rt.lpow(((retention[int(i)] * bias[int(i)])), 2.0)) for i in range(int(len(retention))))
+    return sum((_rt.lpow((_rt.mul(retention[int(i)], bias[int(i)])), 2.0)) for i in range(int(len(retention))))
 
 def pgsTestAxisBias(scale, expectedPhenotype, residualTargetAxis):
-    return (scale * sum(((expectedPhenotype[int(i)] * residualTargetAxis[int(i)])) for i in range(int(len(expectedPhenotype)))))
+    return _rt.mul(scale, sum((_rt.mul(expectedPhenotype[int(i)], residualTargetAxis[int(i)])) for i in range(int(len(expectedPhenotype)))))
 
 def ancestryGradientSusceptibility(markerAxisVariance, ancestryVariance):
     return (markerAxisVariance * ancestryVariance)
@@ -864,7 +869,7 @@ def informationMatchedWeight(cohort, i):
     return (_rt._proj(cohort, 'effectiveMarkers')(i) * _rt._proj(cohort, 'differentiation')(i))
 
 def weightedSignal(cohort, weight):
-    return sum(((weight[int(i)] * _rt._proj(cohort, 'differentiation')(i))) for i in range(int(len(weight))))
+    return sum((_rt.mul(weight[int(i)], _rt._proj(cohort, 'differentiation')(i))) for i in range(int(len(weight))))
 
 def weightedNoise(cohort, weight):
     return sum((_rt.rdiv(_rt.lpow(weight[int(i)], 2.0), _rt._proj(cohort, 'effectiveMarkers')(i))) for i in range(int(len(weight))))
@@ -1107,7 +1112,7 @@ def fstFromDriftFactor(driftFactor):
     return (1.0 - driftFactor)
 
 def causalPortabilityFromLocalFst(sourceSquaredEffect, fstCausal):
-    return _rt.rdiv((sum(((sourceSquaredEffect[int(i)] * ((1.0 - fstCausal[int(i)])))) for i in range(int(len(sourceSquaredEffect))))), (sum((sourceSquaredEffect[int(i)]) for i in range(int(len(sourceSquaredEffect))))))
+    return _rt.rdiv((sum((_rt.mul(sourceSquaredEffect[int(i)], (_rt.sub(1.0, fstCausal[int(i)])))) for i in range(int(len(sourceSquaredEffect))))), (sum((sourceSquaredEffect[int(i)]) for i in range(int(len(sourceSquaredEffect))))))
 
 def qst(V_between, V_within):
     return _rt.rdiv(V_between, ((V_between + (2.0 * V_within))))
@@ -1116,7 +1121,8 @@ def pgsDriftVariance_one_pop(V_A, fst):
     return (fst * V_A)
 
 def pgsDriftVarianceFromLoci(fst, β):
-    return sum(((fst * _rt.lpow(β[int(i)], 2.0))) for i in range(int(len(β))))
+    n = float(len(β))
+    return sum((_rt.mul(fst, _rt.lpow(β[int(i)], 2.0))) for i in range(int(len(β))))
 
 def pgsDiffVariance_two_pop(V_A, fst):
     return (2.0 * pgsDriftVariance_one_pop(V_A, fst))
@@ -1152,6 +1158,7 @@ def portabilityScore(model):
     return _rt.rdiv(targetRetainedEffectMass(model), sourceEffectMass(model))
 
 def meanAbsoluteEffect(beta):
+    q = float(len(beta))
     return _rt.rdiv((sum((_rt.rabs(beta[int(j)])) for j in range(int(len(beta))))), q)
 
 def nonsmoothSummaryRisk(q):
@@ -1170,10 +1177,10 @@ def predictedPortability(model):
     return portabilityScore(model)
 
 def weightedRetentionUpperBound(model, retentionUpper):
-    return _rt.rdiv((sum(((retentionUpper[int(j)] * _rt._proj(model, 'sourceSquaredEffect')(j))) for j in range(int(len(retentionUpper))))), sourceEffectMass(model))
+    return _rt.rdiv((sum((_rt.mul(retentionUpper[int(j)], _rt._proj(model, 'sourceSquaredEffect')(j))) for j in range(int(len(retentionUpper))))), sourceEffectMass(model))
 
 def rgFstWeightedUpperBound(model, rgUpper, fstLower):
-    return weightedRetentionUpperBound(model, ((lambda j: (_rt.lpow((rgUpper[int(j)]), 2.0) * ((1.0 - fstLower[int(j)]))))))
+    return weightedRetentionUpperBound(model, ((lambda j: _rt.mul(_rt.lpow((rgUpper[int(j)]), 2.0), (_rt.sub(1.0, fstLower[int(j)]))))))
 
 def standardizedSquare(h, g):
     return _rt.rdiv(_rt.lpow((centeredAltAlleleCount(h, g)), 2.0), genotypeVariance(h))
@@ -1229,6 +1236,9 @@ def heterozygosityLossFromDrift(t, Ne):
 
 def scaledMutationRate(Ne, μ):
     return ((4.0 * Ne) * μ)
+
+def scaledIdentityStep(scaledRate, F):
+    return (1.0 - (scaledRate * F))
 
 def fstMutationDriftEquilibrium(θ):
     return _rt.rdiv(1.0, ((1.0 + θ)))
@@ -1426,56 +1436,29 @@ def realWorldPGSVariance(V_A, fst, rhoSq):
 def sourceERMWeights(sigmaObsSource, crossSource):
     return _rt._proj(_rt.rinv(sigmaObsSource), 'mulVec')(crossSource)
 
-def Calibrator_sigmaTagCausalSource(m):
-    return (_rt._proj(m, 'directCausalSource') + _rt._proj(m, 'proxyTaggingSource'))
+def Calibrator_sigmaTagCausal(m, P):
+    return (((_rt._proj(m, 'directCausal')(P) + _rt._proj(m, 'novelDirectCausal')(P))) + ((_rt._proj(m, 'proxyTagging')(P) + _rt._proj(m, 'novelProxyTagging')(P))))
 
-def sigmaTagCausalTarget(m):
-    return (_rt._proj(m, 'directCausalTarget') + ((_rt._proj(m, 'novelDirectCausalTarget') + ((_rt._proj(m, 'proxyTaggingTarget') + _rt._proj(m, 'novelProxyTaggingTarget'))))))
+def totalEffect(m, P):
+    return (_rt._proj(m, 'beta')(P) + _rt._proj(m, 'novelCausalEffect')(P))
 
-def targetTotalEffect(m):
-    return (_rt._proj(m, 'betaTarget') + _rt._proj(m, 'novelCausalEffectTarget'))
-
-def sourceCrossCovariance(m):
-    return (_rt._proj((Calibrator_sigmaTagCausalSource(m)), 'mulVec')(_rt._proj(m, 'betaSource')) + _rt._proj(m, 'contextCrossSource'))
-
-def targetCrossCovariance(m):
-    return (_rt._proj((sigmaTagCausalTarget(m)), 'mulVec')((targetTotalEffect(m))) + _rt._proj(m, 'contextCrossTarget'))
-
-def sourceWeightsFromExplicitDrivers(m):
-    return sourceERMWeights(_rt._proj(m, 'sigmaTagSource'), (sourceCrossCovariance(m)))
+def crossCovariance(m, P):
+    return (_rt._proj((Calibrator_sigmaTagCausal(m, P)), 'mulVec')((totalEffect(m, P))) + _rt._proj(m, 'contextCross')(P))
 
 def sourceWeightedTagScore(m, tagState):
     return dotProduct((sourceWeightsFromExplicitDrivers(m)), tagState)
 
-def sourceTaggingProjection(m):
-    return _rt._proj((Calibrator_sigmaTagCausalSource(m)), 'mulVec')(_rt._proj(m, 'betaSource'))
-
-def targetTaggingProjection(m):
-    return _rt._proj((sigmaTagCausalTarget(m)), 'mulVec')((targetTotalEffect(m)))
-
-def targetEffectHeterogeneity(m):
-    return (targetTotalEffect(m) - _rt._proj(m, 'betaSource'))
-
-def targetSourceEffectProjection(m):
-    return _rt._proj((sigmaTagCausalTarget(m)), 'mulVec')(_rt._proj(m, 'betaSource'))
+def taggingProjection(m, P):
+    return _rt._proj((Calibrator_sigmaTagCausal(m, P)), 'mulVec')((totalEffect(m, P)))
 
 def targetEffectHeterogeneityProjection(m):
     return _rt._proj((sigmaTagCausalTarget(m)), 'mulVec')((targetEffectHeterogeneity(m)))
 
-def targetNovelMutationEffectProjection(m):
-    return _rt._proj((sigmaTagCausalTarget(m)), 'mulVec')(_rt._proj(m, 'novelCausalEffectTarget'))
+def directCausalProjection(m, P):
+    return _rt._proj(((_rt._proj(m, 'directCausal')(P) + _rt._proj(m, 'novelDirectCausal')(P))), 'mulVec')((totalEffect(m, P)))
 
-def sourceDirectCausalProjection(m):
-    return _rt._proj(_rt._proj(m, 'directCausalSource'), 'mulVec')(_rt._proj(m, 'betaSource'))
-
-def sourceProxyTaggingProjection(m):
-    return _rt._proj(_rt._proj(m, 'proxyTaggingSource'), 'mulVec')(_rt._proj(m, 'betaSource'))
-
-def targetDirectCausalProjection(m):
-    return _rt._proj(((_rt._proj(m, 'directCausalTarget') + _rt._proj(m, 'novelDirectCausalTarget'))), 'mulVec')((targetTotalEffect(m)))
-
-def targetProxyTaggingProjection(m):
-    return _rt._proj(((_rt._proj(m, 'proxyTaggingTarget') + _rt._proj(m, 'novelProxyTaggingTarget'))), 'mulVec')((targetTotalEffect(m)))
+def proxyTaggingProjection(m, P):
+    return _rt._proj(((_rt._proj(m, 'proxyTagging')(P) + _rt._proj(m, 'novelProxyTagging')(P))), 'mulVec')((totalEffect(m, P)))
 
 def sourceScoreVarianceFromExplicitDrivers(m):
     wS = sourceWeightsFromExplicitDrivers(m)
@@ -1500,16 +1483,7 @@ def targetCalibrationSlopeFromSourceWeights(m):
     return _rt.rdiv(targetPredictiveCovarianceFromSourceWeights(m), targetScoreVarianceFromSourceWeights(m))
 
 def brokenTaggingResidual(m):
-    delta = _rt._proj((((Calibrator_sigmaTagCausalSource(m)) - (sigmaTagCausalTarget(m)))), 'mulVec')((targetTotalEffect(m)))
-    return dotProduct(delta, delta)
-
-def ancestrySpecificLDResidual(m):
-    wS = sourceWeightsFromExplicitDrivers(m)
-    delta = _rt._proj(((_rt._proj(m, 'sigmaTagSource') - _rt._proj(m, 'sigmaTagTarget'))), 'mulVec')(wS)
-    return dotProduct(delta, delta)
-
-def sourceSpecificOverfitResidual(m):
-    delta = (_rt._proj(m, 'contextCrossSource') - _rt._proj(m, 'contextCrossTarget'))
+    delta = _rt._proj((((sigmaTagCausalSource(m)) - (sigmaTagCausalTarget(m)))), 'mulVec')((targetTotalEffect(m)))
     return dotProduct(delta, delta)
 
 def novelUntaggablePhenotypeResidual(m):
@@ -1518,17 +1492,8 @@ def novelUntaggablePhenotypeResidual(m):
 def irreducibleTargetResidualBurden(m):
     return (((brokenTaggingResidual(m) + ancestrySpecificLDResidual(m)) + sourceSpecificOverfitResidual(m)) + novelUntaggablePhenotypeResidual(m))
 
-def effectiveTargetOutcomeVariance(m):
-    return (_rt._proj(m, 'targetOutcomeVariance') + irreducibleTargetResidualBurden(m))
-
 def sourceExplainedSignalVarianceFromSourceWeights(m):
     return _rt.rdiv(_rt.lpow((sourcePredictiveCovarianceFromSourceWeights(m)), 2.0), sourceScoreVarianceFromExplicitDrivers(m))
-
-def sourceR2FromSourceWeights(m):
-    return _rt.rdiv(sourceExplainedSignalVarianceFromSourceWeights(m), _rt._proj(m, 'sourceOutcomeVariance'))
-
-def sourceResidualVarianceFromSourceWeights(m):
-    return (_rt._proj(m, 'sourceOutcomeVariance') - sourceExplainedSignalVarianceFromSourceWeights(m))
 
 def targetExplainedSignalVarianceFromSourceWeights(m):
     return _rt.rdiv(_rt.lpow((targetPredictiveCovarianceFromSourceWeights(m)), 2.0), targetScoreVarianceFromSourceWeights(m))
@@ -1661,6 +1626,9 @@ def equalVarianceGaussianAUCFromVariances(vSignal, vEnv):
 
 def equalVarianceGaussianAUCFromExplainedR2(r2):
     return Phi((_rt.rsqrt((_rt.rdiv(r2, ((2.0 * ((1.0 - r2)))))))))
+
+def equalVarianceGaussianAUCChart(r2):
+    return (1.0 if (1.0 <= r2) else equalVarianceGaussianAUCFromExplainedR2(r2))
 
 def sourceEqualVarianceGaussianAUCFromSourceWeights(m):
     return equalVarianceGaussianAUCFromVariances((sourceExplainedSignalVarianceFromSourceWeights(m)), (sourceResidualVarianceFromSourceWeights(m)))
@@ -1916,13 +1884,13 @@ def kinshipInflation(r2_true, K, h2_family):
     return (r2_true + (K * h2_family))
 
 def pgsMean(β, p):
-    return sum(((β[int(i)] * ((2.0 * p[int(i)])))) for i in range(int(len(β))))
+    return sum((_rt.mul(β[int(i)], (_rt.mul(2.0, p[int(i)])))) for i in range(int(len(β))))
 
 def pgsVariance(β, p):
-    return sum(((_rt.lpow(β[int(i)], 2.0) * (((2.0 * p[int(i)]) * ((1.0 - p[int(i)])))))) for i in range(int(len(β))))
+    return sum((_rt.mul(_rt.lpow(β[int(i)], 2.0), (_rt.mul(_rt.mul(2.0, p[int(i)]), (_rt.sub(1.0, p[int(i)])))))) for i in range(int(len(β))))
 
 def pgsMeanShift(β, p_source, p_target):
-    return sum(((β[int(i)] * ((2.0 * ((p_target[int(i)] - p_source[int(i)])))))) for i in range(int(len(β))))
+    return sum((_rt.mul(β[int(i)], (_rt.mul(2.0, (_rt.sub(p_target[int(i)], p_source[int(i)])))))) for i in range(int(len(β))))
 
 def thresholdStandardizedCoordinate(threshold, μ, σ):
     return _rt.rdiv(((threshold - μ)), σ)
@@ -1970,7 +1938,7 @@ def sigmaThetaFromObservedSelectedVariance(v_selected, v_mutation, s, t, rho):
     return _rt.rsqrt((_rt.rdiv((2.0 * ((v_selected - stabilizingSelectedArchitectureVariance(v_mutation, s)))), tauFromObservedEffectCorrelation(t, rho))))
 
 def polygenicAdaptationShift(β, Δp):
-    return sum(((β[int(i)] * Δp[int(i)])) for i in range(int(len(β))))
+    return sum((_rt.mul(β[int(i)], Δp[int(i)])) for i in range(int(len(β))))
 
 def gwasNCP(n, β, p):
     return ((n * _rt.lpow(β, 2.0)) * (((2.0 * p) * ((1.0 - p)))))
@@ -2033,7 +2001,8 @@ def r2EstimatorVariance(r2, n):
     return _rt.rdiv(((4.0 * r2) * _rt.lpow(((1.0 - r2)), 2.0)), n)
 
 def pgsPhenoCov(β_weights, β_causal, ld):
-    return sum((sum((((β_weights[int(i)] * ld(i, j)) * β_causal[int(j)])) for j in range(int(len(β_weights))))) for i in range(int(len(β_weights))))
+    m = float(len(β_weights))
+    return sum((sum((_rt.mul(_rt.mul(β_weights[int(i)], ld(i, j)), β_causal[int(j)])) for j in range(int(len(β_weights))))) for i in range(int(len(β_weights))))
 
 def sharedLDGeneticVariance(β, ld):
     return pgsPhenoCov(β, β, ld)
@@ -2051,15 +2020,17 @@ def transportedTargetR2SharedLD(β_source, β_target, ld, var_y):
     return pgsR2((pgsPhenoCov(β_source, β_target, ld)), (sharedLDGeneticVariance(β_source, ld)), var_y)
 
 def ldEffectGeneticCorrelation(β_source, β_target, ld):
-    return _rt.rdiv(pgsPhenoCov(β_source, β_target, ld), _rt.rsqrt(((sharedLDGeneticVariance(β_source, ld) * sharedLDGeneticVariance(β_target, ld)))))
+    return _rt.rdiv(pgsPhenoCov(β_source, β_target, ld), _rt.rsqrt((_rt.mul(sharedLDGeneticVariance(β_source, ld), sharedLDGeneticVariance(β_target, ld)))))
 
 def effectGeneticCorrelation(β_source, β_target):
-    return _rt.rdiv((sum(((β_source[int(i)] * β_target[int(i)])) for i in range(int(len(β_source))))), _rt.rsqrt((((sum((_rt.lpow(β_source[int(i)], 2.0)) for i in range(int(len(β_source))))) * (sum((_rt.lpow(β_target[int(i)], 2.0)) for i in range(int(len(β_source)))))))))
+    m = float(len(β_source))
+    return _rt.rdiv((sum((_rt.mul(β_source[int(i)], β_target[int(i)])) for i in range(int(len(β_source))))), _rt.rsqrt((_rt.mul((sum((_rt.lpow(β_source[int(i)], 2.0)) for i in range(int(len(β_source))))), (sum((_rt.lpow(β_target[int(i)], 2.0)) for i in range(int(len(β_source)))))))))
 
 def standardizedDiagonalLD():
     return (lambda i, j: (1.0 if (i == j) else 0.0))
 
 def additiveGeneticVariance(β):
+    m = float(len(β))
     return sum((_rt.lpow(β[int(i)], 2.0)) for i in range(int(len(β))))
 
 def additiveHeritability(β, var_y):
@@ -2122,6 +2093,9 @@ def targetOracleR2DiagonalLD(β_target, var_y):
 def sampleLimitedScratchTargetR2(oracle_target_r2, noiseVar, nTarget):
     return scratchTargetR2(oracle_target_r2, (_rt.rdiv(noiseVar, nTarget)))
 
+def usableScratchTargetR2(oracle_target_r2, noiseVar, nTarget):
+    return _rt.rmax(0.0, (sampleLimitedScratchTargetR2(oracle_target_r2, noiseVar, nTarget)))
+
 def scratchVsFineTuningCriticalSampleSize(r2_source, divergence_penalty, adaptation_gain, oracle_target_r2, noiseVar):
     return _rt.rdiv(noiseVar, ((oracle_target_r2 - fineTunedTargetR2(r2_source, divergence_penalty, adaptation_gain))))
 
@@ -2132,25 +2106,26 @@ def optimalSourceShrinkageWeight(gapSq, noiseVar, nTarget):
     return _rt.rdiv((_rt.rdiv(noiseVar, nTarget)), ((gapSq + _rt.rdiv(noiseVar, nTarget))))
 
 def coefficientGapSq(wSource, wTarget):
-    return dotProduct(((lambda i: (wSource[int(i)] - wTarget[int(i)]))), ((lambda i: (wSource[int(i)] - wTarget[int(i)]))))
+    return dotProduct(((lambda i: _rt.sub(wSource[int(i)], wTarget[int(i)]))), ((lambda i: _rt.sub(wSource[int(i)], wTarget[int(i)]))))
 
 def meanPopulationDeviation(deviation, k):
     return (lambda i: (_rt.rinv((k)) * populationDeviationSum(deviation, k, i)))
 
 def metaLearnedSourceWeights(wShared, deviation, k):
-    return (lambda i: (wShared[int(i)] + meanPopulationDeviation(deviation, k, i)))
+    return (lambda i: _rt.add(wShared[int(i)], meanPopulationDeviation(deviation, k, i)))
 
 def centeredPopulationEffectDeviation(wShared, wSource):
-    return (lambda j, i: (wSource(j, i) - wShared[int(i)]))
+    return (lambda j, i: _rt.sub(wSource(j, i), wShared[int(i)]))
 
 def metaLearnedTransferGapSq(wShared, wTarget, deviation, k):
     return coefficientGapSq((metaLearnedSourceWeights(wShared, deviation, k)), wTarget)
 
 def weightedPopulationDeviation(deviation, weight):
-    return (lambda i: sum(((weight[int(j)] * deviation(j, i))) for j in range(int(len(weight)))))
+    k = float(len(weight))
+    return (lambda i: sum((_rt.mul(weight[int(j)], deviation(j, i))) for j in range(int(len(weight)))))
 
 def weightedMetaSourceWeights(wShared, deviation, weight):
-    return (lambda i: (wShared[int(i)] + weightedPopulationDeviation(deviation, weight, i)))
+    return (lambda i: _rt.add(wShared[int(i)], weightedPopulationDeviation(deviation, weight, i)))
 
 def weightedMetaTransferGapSq(wShared, wTarget, deviation, weight):
     return coefficientGapSq((weightedMetaSourceWeights(wShared, deviation, weight)), wTarget)
@@ -2159,10 +2134,11 @@ def uniformMetaWeight(k):
     return (lambda _: _rt.rinv((k)))
 
 def weightedPopulationEffectAverage(wSource, weight):
-    return (lambda i: sum(((weight[int(j)] * wSource(j, i))) for j in range(int(len(weight)))))
+    k = float(len(weight))
+    return (lambda i: sum((_rt.mul(weight[int(j)], wSource(j, i))) for j in range(int(len(weight)))))
 
 def centeredPopulationEffectDeviationFin(wShared, wSource):
-    return (lambda j, i: (wSource(j, i) - wShared[int(i)]))
+    return (lambda j, i: _rt.sub(wSource(j, i), wShared[int(i)]))
 
 def optimalFineTuningMSE(gapSq, noiseVar, nTarget):
     return sourceShrinkageMSE(gapSq, noiseVar, nTarget, (optimalSourceShrinkageWeight(gapSq, noiseVar, nTarget)))
@@ -2171,10 +2147,10 @@ def requiredTargetSamplesForOptimalFineTuningMSE(gapSq, noiseVar, tau):
     return _rt.rdiv((noiseVar * ((gapSq - tau))), ((tau * gapSq)))
 
 def targetLinearExcessRisk(sigmaObsTarget, crossTarget, noiseVar, w, wStar):
-    return (targetLinearRisk(sigmaObsTarget, crossTarget, noiseVar, w) - targetLinearRisk(sigmaObsTarget, crossTarget, noiseVar, wStar))
+    return _rt.sub(targetLinearRisk(sigmaObsTarget, crossTarget, noiseVar, w), targetLinearRisk(sigmaObsTarget, crossTarget, noiseVar, wStar))
 
 def exactAdaptationGain(sigmaObsTarget, crossTarget, noiseVar, wBefore, wAfter, wStar):
-    return (targetLinearExcessRisk(sigmaObsTarget, crossTarget, noiseVar, wBefore, wStar) - targetLinearExcessRisk(sigmaObsTarget, crossTarget, noiseVar, wAfter, wStar))
+    return _rt.sub(targetLinearExcessRisk(sigmaObsTarget, crossTarget, noiseVar, wBefore, wStar), targetLinearExcessRisk(sigmaObsTarget, crossTarget, noiseVar, wAfter, wStar))
 
 def privateArchitectureTransferCeiling(h2_target, f_private, M):
     return ((h2_target * ((1.0 - f_private))) * sharedLDFromMigration(M))
@@ -2237,7 +2213,7 @@ def snpH2(V_A_tagged, V_P):
     return _rt.rdiv(V_A_tagged, V_P)
 
 def additiveVariance(p, α):
-    return sum(((((2.0 * p[int(i)]) * ((1.0 - p[int(i)]))) * _rt.lpow((α[int(i)]), 2.0))) for i in range(int(len(p))))
+    return sum((_rt.mul(_rt.mul(_rt.mul(2.0, p[int(i)]), (_rt.sub(1.0, p[int(i)]))), _rt.lpow((α[int(i)]), 2.0))) for i in range(int(len(p))))
 
 def liabilityScaleH2(h2_observed, prevalence, z_height):
     return _rt.rdiv(((h2_observed * prevalence) * ((1.0 - prevalence))), _rt.lpow(z_height, 2.0))

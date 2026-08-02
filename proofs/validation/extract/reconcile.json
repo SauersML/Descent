@@ -1,17 +1,18 @@
 {
  "ours": 974,
  "stamp": {
-  "n_definitions": 999,
-  "n_structures": 101,
+  "arg_convention": 2,
+  "n_definitions": 998,
+  "n_structures": 103,
   "n_parse_failures": 2,
-  "corpus_digest": "sha256:959b583d74bc4142e4e63d10d3e1eeec"
+  "corpus_digest": "sha256:24ba93005b446214d914dbc0711a881d"
  },
  "invariants/defs.json": {
-  "shared": 962,
-  "only_ours": 12,
+  "shared": 961,
+  "only_ours": 13,
   "only_theirs": 1,
   "body": 2,
-  "params": 21,
+  "params": 23,
   "order": 0,
   "body_names": [
    "driftLDTrajectory",
@@ -25,7 +26,9 @@
    "etaLiabilityThreshold",
    "exactAdaptationGain",
    "exitLevels",
+   "extra_algebraic_guard_adds_nothing",
    "geneBurdenDesign",
+   "guard_stack_blind_to_retention",
    "imitationCapacity",
    "infRisk",
    "interactionMonomial",
@@ -46,20 +49,44 @@
   ]
  },
  "symbolic/decls.json": {
-  "shared": 960,
-  "only_ours": 14,
-  "only_theirs": 2,
-  "body": 1,
-  "params": 0,
+  "shared": 958,
+  "only_ours": 16,
+  "only_theirs": 19,
+  "body": 3,
+  "params": 4,
   "order": 0,
   "body_names": [
+   "sigmaTagCausal",
+   "sigmaTagCausalSource",
    "twoLocusCoalescentCovarianceMatrix"
   ],
-  "param_names": [],
+  "param_names": [
+   "extra_algebraic_guard_adds_nothing",
+   "guard_stack_blind_to_retention",
+   "sigmaTagCausal",
+   "sigmaTagCausalSource"
+  ],
   "order_names": [],
   "only_theirs_names": [
    "",
-   "singletonProportion"
+   "comap",
+   "congrProp",
+   "driftRetention",
+   "fluctuatingSelectionSummary",
+   "ldBlockReconstructionShare",
+   "sigmaTagCausalTarget",
+   "singletonProportion",
+   "sourceCrossCovariance",
+   "sourceDirectCausalProjection",
+   "sourceProxyTaggingProjection",
+   "sourceTaggingProjection",
+   "stabilizingSelectionSummary",
+   "targetCrossCovariance",
+   "targetDirectCausalProjection",
+   "targetProxyTaggingProjection",
+   "targetTaggingProjection",
+   "targetTotalEffect",
+   "toApprox"
   ]
  },
  "differential/": {

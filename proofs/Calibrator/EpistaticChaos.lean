@@ -931,6 +931,59 @@ theorem centeredSquare_third_moment_eq (h : HardyWeinbergModel)
   rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.sum_sub_distrib,
     ← Finset.mul_sum, ← Finset.mul_sum]
 
+/-- **The sixth central moment of the dosage**, in closed form:
+`E[(G - 2q)⁶] = V + 10V² - 20V³` with `V = 2q(1-q)`.
+
+A three-term computation like the fourth, and the input to the sixth standardized
+moment below. -/
+theorem hweCenteredSixthMoment_eq (h : HardyWeinbergModel) :
+    ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ 6 =
+      h.genotypeVariance + 10 * h.genotypeVariance ^ 2 - 20 * h.genotypeVariance ^ 3 := by
+  rw [h.genotypeVariance_eq, sum_over_genotypes]
+  simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
+    HardyWeinbergModel.centeredAltAlleleCount,
+    HardyWeinbergModel.expectedAltAlleleCount_eq, altAlleleCount]
+  ring
+
+/-- **The sixth moment of the standardized genotype is a quadratic in the fourth.**
+
+`E[x⁶] = (E[x⁴])² + 10 E[x⁴] - 20`, since `E[x⁶] = 1/V² + 10/V - 20` and
+`E[x⁴] = 1/V`.
+
+For a single locus this is the collapse made quantitative: floor two's data is a
+*function* of floor one's, with no freedom left. For a panel it is the opposite —
+the mixture average of a quadratic is not the quadratic of the mixture average,
+and the gap is exactly the across-locus dispersion of `E[x⁴]`. That gap is the
+panel's floor-two datum, and it is what
+`Calibrator.CondensationUnification.MafSpectrum.fourthMomentDispersion` names. -/
+theorem standardizedGenotype_sixth_moment (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6 =
+      (1 / h.genotypeVariance) ^ 2 + 10 * (1 / h.genotypeVariance) - 20 := by
+  have hvar : 0 < h.genotypeVariance := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+    nlinarith [hq0, hcomp]
+  have hne : h.genotypeVariance ≠ 0 := ne_of_gt hvar
+  have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
+    Real.sq_sqrt hvar.le
+  have hsix : Real.sqrt h.genotypeVariance ^ 6 = h.genotypeVariance ^ 3 := by
+    have hrewrite : Real.sqrt h.genotypeVariance ^ 6 =
+        (Real.sqrt h.genotypeVariance ^ 2) ^ 3 := by ring
+    rw [hrewrite, hsq]
+  have hfactor : ∀ g : DiploidGenotype,
+      h.genotypeProb g * h.standardizedGenotype g ^ 6 =
+        h.genotypeProb g * h.centeredAltAlleleCount g ^ 6 / h.genotypeVariance ^ 3 := by
+    intro g
+    unfold HardyWeinbergModel.standardizedGenotype
+    rw [div_pow, hsix]
+    ring
+  simp_rw [hfactor]
+  rw [← Finset.sum_div, hweCenteredSixthMoment_eq]
+  field_simp
+  ring
+
 /-!
 ### The single-locus collapse
 

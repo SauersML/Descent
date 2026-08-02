@@ -869,7 +869,18 @@ section LDHalfLifeTrajectory
 
 /-- **LD retained fraction** after t generations at constant size Ne.
 
-    Empirical status: UNTESTED. -/
+    Regime: closed population, no mutation. This body is the closed-population
+    retention factor, the same one `driftRetention` carries, and it is written
+    here as though constant `Ne` were the only assumption it needs. It is not:
+    the formula also assumes nothing replenishes variation. Under
+    mutation-drift balance the retention is measured at `1.025 ± 0.020` at
+    `Ne = 1000`, `t = 4000`, where this expression gives `0.135`;
+    `Calibrator.DriftRegime` exhibits the two regimes and proves they disagree
+    at every positive time.
+
+    Empirical status: FALSIFIED at demographic equilibrium; see
+    `closedPopulation`. Inside the declared regime it stands, so the half-life
+    results below are conditional on that regime rather than wrong. -/
 noncomputable def ldRetainedFraction (Ne : ℝ) (t : ℕ) : ℝ :=
   (1 - 1/(2 * Ne)) ^ t
 

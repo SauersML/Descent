@@ -88,7 +88,15 @@ def adversarial_vectors():
         "scalar-only definition reported as taking vectors"
     print("  ok  scalar-only signatures unchanged")
 
-    # Every vector definition must at least evaluate.
+    # Every vector definition must at least evaluate.  Arguments come from the
+    # same sampler the accounting uses -- structure-typed and function-typed
+    # arguments need real inhabitants, and feeding them a bare float tests the
+    # sampler rather than the feature.
+    import admissible
+    import random
+    import json as _json
+    structs = {s["short"]: s
+               for s in _json.loads((HERE / "defs.json").read_text())["structures"]}
     broken = []
     for name in api.definition_table():
         spec = api.vector_args(name)
@@ -98,16 +106,21 @@ def adversarial_vectors():
             f, argnames = api.callable_for(name)
         except api.NotExtractable:
             continue
-        vals = []
-        for an in argnames:
-            s = spec.get(an)
-            if s is None:
-                vals.append(0.5)
-            elif s["rank"] == 1:
-                vals.append([0.3, 0.6, 0.9])
-            else:
-                vals.append([[0.3, 0.6, 0.9]] * 3)
+        d = api.definition(name)
+        structval = {}
+        for a in d["args"]:
+            head = a["type"].split()[0].split(".")[-1] if a["type"].split() else ""
+            if head in structs:
+                for n in a["names"]:
+                    import translate
+                    structval[translate.pyname(n)] = structs[head]
+        rng = random.Random(7)
+        box = api.admissible_box(name)
+        pt = {k: (lo + hi) / 2 for k, (lo, hi) in box.items()}
+        import translate
+        pt = {translate.pyname(k): v for k, v in pt.items()}
         try:
+            vals = admissible.build_args(argnames, pt, structval, spec, rng, structs)
             out = f(*vals)
         except Exception as e:                                   # noqa: BLE001
             broken.append((name, f"{type(e).__name__}: {e}"))
