@@ -142,7 +142,27 @@ import math
 import os
 import sys
 
+# THREAD PINNING, BEFORE numpy IS IMPORTED -- it reads these at import time.
+# The `g @ beta` in the HWE arm is a BLAS call and will otherwise take every
+# core on a shared node, where the contention it causes gets misdiagnosed as
+# some other agent's deadlock.
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+           "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+    os.environ.setdefault(_v, "1")
+
 import numpy as np
+
+# WHY THE BATCHED DRAWS HERE ARE PROVABLY THE SAME DRAWS.
+#   rng.normal(0, s, size=R)        -- R iid draws from one distribution.
+#   rng.binomial(2, p, size=(R, m)) -- p is an (m,) array broadcast over R
+#                                      rows; every element is drawn from its
+#                                      OWN Binomial(2, p_j), independently.
+#   rng.random(R)                   -- R iid uniforms.
+# None of these shares state across replicates, so each is identical in
+# distribution to the loop it replaces. That is the condition under which
+# vectorising is a speed change and not a fidelity change; a batched draw that
+# reused one variate across the replicate axis would correlate the replicates
+# and make every error bar in this file meaningless.
 
 SEED = 20260802
 R_MC = 400000           # draws per liability cell

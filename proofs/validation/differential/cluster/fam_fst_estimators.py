@@ -114,7 +114,25 @@ import math
 import os
 import sys
 
+# THREAD PINNING, BEFORE numpy IS IMPORTED -- it reads these at import time.
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+           "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+    os.environ.setdefault(_v, "1")
+
 import numpy as np
+
+# WHY THE BATCHED DRAWS HERE ARE PROVABLY THE SAME DRAWS.
+#   rng.beta(a, b, size=(R, L))  -- scalar a, b; R*L iid draws.
+#   rng.binomial(n, p)           -- p is an (R, L) array; every element is
+#                                   drawn from its own Binomial(n, p_ij),
+#                                   independently, which is exactly what a
+#                                   loop over replicates and loci would do.
+# The generation loop in the Wright-Fisher arms calls rng.binomial once per
+# generation on the whole (R, L) frequency array, so replicates advance on
+# independent variates and never share state. That is the condition under which
+# vectorising is a speed change rather than a fidelity change: a batched draw
+# that reused one variate across the replicate axis would correlate the
+# trajectories and the measured F_ST would have no usable error bar.
 
 SEED = 20260802
 HERE = os.path.dirname(os.path.abspath(__file__))

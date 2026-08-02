@@ -71,6 +71,47 @@ SLICE_FILES = [
 ]
 
 # ---------------------------------------------------------------------------
+# OPERATIONAL PRECONDITIONS FOR EVERY SPEC BELOW.
+#
+# These are not housekeeping. Each one caused a MISDIAGNOSIS on this cluster
+# today, and a spec that omits them produces simulators whose authors read the
+# symptom as something else entirely.
+#
+#   O1  OUTPUT GOES UNDER /projects/standard/hsiehph/sauer354/, NEVER /tmp.
+#       /tmp is node-local. The relay does not land on the same node twice --
+#       three consecutive calls asking `hostname` and checking one path gave
+#       PRESENT once and ABSENT twice, same path, same second. A log in /tmp is
+#       therefore invisible to the call that checks it, and absence reads as
+#       "the job never started". One agent spent several rounds concluding its
+#       run had been killed while `pgrep` reported the process alive.
+#
+#   O2  UNIQUE FILENAME PER RUN. A fixed path leaves the previous run's log
+#       impersonating this one's. Combined with O1, absence then genuinely
+#       means not written, rather than not written HERE.
+#
+#   O3  AN EMPTY LOG IS NOT EVIDENCE OF A KILL. The claim that the relay tears
+#       down the process tree on return was a misdiagnosis of O1. Keep
+#       `setsid nohup ... & disown`; stop reading silence as death.
+#
+#   O4  PIN THE THREAD COUNT: OMP_NUM_THREADS=1, OPENBLAS_NUM_THREADS=1,
+#       MKL_NUM_THREADS=1. numpy will otherwise take every core, and with
+#       several agents on one node one agent's contention gets misdiagnosed as
+#       another's deadlock. Anything heavier than a grep goes through srun or
+#       sbatch, not the login node.
+#
+#   O5  VECTORISE ONLY WHERE THE VECTORISED DRAW IS PROVABLY THE SAME DRAW.
+#       The rule is not "vectorise over replicates"; it is that a batched
+#       `multinomial` or `binomial` over a 2-D parameter array draws each
+#       element from its own distribution independently, which makes it
+#       provably the same experiment as the loop it replaces. Vectorising a
+#       step that is NOT distributionally identical -- above all one that
+#       shares random state across replicates -- buys speed by silently
+#       correlating the replicates, and the error bars then mean nothing.
+#       Every spec below that says "vectorised" means it in this sense, and a
+#       simulator author who cannot state why their batched draw is the same
+#       draw should write the loop.
+#
+# ---------------------------------------------------------------------------
 # Families. `simulator` is None when nothing simulates the family yet -- that
 # is the count to drive down, and an honest None is worth more than a
 # simulator that only exercises the easy corner of a family.
