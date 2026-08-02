@@ -846,7 +846,93 @@ Key results:
 
 section MigrationDriftFoundations
 
-/-! ### Island Model Equilibrium -/
+/-! ### Island Model Equilibrium
+
+**REGIME, stated once for everything in this section.** `1/(1 + 4·Nₑ·m)` is the
+INFINITE-ISLAND LIMIT. It is the `d → ∞` case of the finite-island result
+
+  `F_ST = 1 / (1 + 4·Nₑ·m·(d/(d-1))²)`
+
+for `d` demes, and it is not the finite-`d` answer. The correction factor
+`(d/(d-1))²` is `4` at `d = 2` and `2.25` at `d = 3`, so with two demes the
+limit understates the migration pressure by a factor of four in the scaled rate
+and overstates `F_ST` correspondingly. Nothing about the expression `1/(1+4Nm)`
+announces this, which is why every theorem below is a theorem about the limit
+and not about a two-deme system. `islandFstFiniteDemes` states the finite form,
+`islandFstFiniteDemes_lt_islandLimit` proves the limit is an overstatement at
+every finite `d`, and `islandDemeCorrection_tendsto_one` proves the two agree
+only in the limit.
+
+The reason this matters here specifically: two-population comparisons are the
+common case in this corpus, and `d = 2` is exactly where the limit is worst. -/
+
+/-- **Finite-island correction factor** `(d/(d-1))²`, in the number of demes
+`d`. This is the entire difference between the infinite-island limit and the
+finite-island result, isolated so that it can be stated about rather than
+carried implicitly. -/
+noncomputable def islandDemeCorrection (d : ℝ) : ℝ := (d / (d - 1)) ^ 2
+
+/-- **Finite-island `F_ST` for `d` demes** (Wright; Nei):
+`F_ST = 1/(1 + 4·Nₑ·m·(d/(d-1))²)`.
+
+    Regime: `d` demes of equal size `Nₑ`, symmetric migration at rate `m`,
+    mutation negligible relative to migration. This is the finite-`d`
+    statement; `fstMigrationDriftEquilibrium` is its `d → ∞` limit.
+
+    Empirical status: matches `validation/differential/refs.island_fst_finite_demes`,
+    against which the differential check `islandModelFst-finite-demes` measures
+    the corpus's limit form. -/
+noncomputable def islandFstFiniteDemes (Ne m d : ℝ) : ℝ :=
+  1 / (1 + 4 * Ne * m * islandDemeCorrection d)
+
+/-- At two demes the correction is exactly `4`: the scaled migration rate is
+`16·Nₑ·m`, not `4·Nₑ·m`. Stated as an equation because `d = 2` is the case the
+corpus actually uses. -/
+theorem islandDemeCorrection_at_two : islandDemeCorrection 2 = 4 := by
+  unfold islandDemeCorrection; norm_num
+
+/-- The correction is strictly above `1` at every finite number of demes, so
+the limit is never exact for a real population. -/
+theorem one_lt_islandDemeCorrection (d : ℝ) (hd : 1 < d) :
+    1 < islandDemeCorrection d := by
+  unfold islandDemeCorrection
+  have hpos : 0 < d - 1 := by linarith
+  have h1 : 1 < d / (d - 1) := by
+    rw [lt_div_iff₀ hpos]; linarith
+  nlinarith
+
+/-- **The infinite-island limit overstates `F_ST` at every finite `d`.** This is
+the claim the section header makes, made machine-checked: a definition that is
+correct in its regime and silent about the regime is still a defect, and this
+is what stops the limit from being read as the general answer. -/
+theorem islandFstFiniteDemes_lt_islandLimit (Ne m d : ℝ)
+    (hNe : 0 < Ne) (hm : 0 < m) (hd : 1 < d) :
+    islandFstFiniteDemes Ne m d < fstMigrationDriftEquilibrium Ne m := by
+  unfold islandFstFiniteDemes fstMigrationDriftEquilibrium
+  have hc : 1 < islandDemeCorrection d := one_lt_islandDemeCorrection d hd
+  have hNm : 0 < 4 * Ne * m := by positivity
+  apply div_lt_div_of_pos_left one_pos (by nlinarith)
+  nlinarith
+
+/-- **And the two agree only in the limit.** Without this the phrase
+"infinite-island limit" is prose; with it, the regime is a proved property of
+the definition rather than a claim in a comment. -/
+theorem islandDemeCorrection_tendsto_one :
+    Filter.Tendsto islandDemeCorrection Filter.atTop (nhds 1) := by
+  have h1 : Filter.Tendsto (fun d : ℝ => d - 1) Filter.atTop Filter.atTop := by
+    simpa using Filter.tendsto_atTop_add_const_right Filter.atTop (-1)
+      (Filter.tendsto_id (α := ℝ))
+  have h2 : Filter.Tendsto (fun d : ℝ => (d - 1)⁻¹) Filter.atTop (nhds 0) :=
+    tendsto_inv_atTop_zero.comp h1
+  have h3 : Filter.Tendsto (fun d : ℝ => 1 + (d - 1)⁻¹) Filter.atTop (nhds 1) := by
+    simpa using (tendsto_const_nhds (α := ℝ) (x := (1 : ℝ))
+      (f := Filter.atTop)).add h2
+  have h4 : Filter.Tendsto (fun d : ℝ => d / (d - 1)) Filter.atTop (nhds 1) := by
+    apply h3.congr'
+    filter_upwards [Filter.eventually_gt_atTop (1 : ℝ)] with d hd
+    have hne : d - 1 ≠ 0 := by intro h; linarith [sub_eq_zero.mp h]
+    field_simp
+  simpa [islandDemeCorrection] using h4.pow 2
 
 /-- Island model Fst is the reciprocal of (1 + 4Nm). -/
 theorem islandModelFst_eq_inv (Ne m : ℝ) :
