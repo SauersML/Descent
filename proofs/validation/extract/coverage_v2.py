@@ -102,7 +102,7 @@ def compile_variant(d, body, fname, struct_args):
 
 # ------------------------------------------------------------------- checks
 
-def make_points(entry, defs_by_name, structs, rng):
+def make_points(entry, defs_by_name, structs, rng, theorem=None):
     """Admissible points, including structure inhabitants for structure args."""
     d = defs_by_name[entry_name(entry)]
     box = admissible.box_for(d)
@@ -114,7 +114,7 @@ def make_points(entry, defs_by_name, structs, rng):
         if head in structs:
             for n in a["names"]:
                 structval[pyname(n)] = structs[head]
-    preds, texts, dropped = admissible.hypothesis_predicates(d)
+    preds, texts, dropped = admissible.hypothesis_predicates(d, theorem)
     pts, draws = [], 0
     cand = admissible.corners(box, limit=16)
     while len(pts) < N_POINTS and draws < 4000:
@@ -229,7 +229,16 @@ def main(argv=None):
             rec["reason"] = f"could not compile body: {e!r}"[:120]
             continue
 
-        pts, hyps, dropped = make_points(entry, defs_by_name, structs, random.Random(11))
+        # Run under the preconditions of the theorem that proves the bound we
+        # are about to check -- not under the union over all theorems, which is
+        # not a domain and would discard admissible points.
+        bounding = None
+        for key in ("range_lo_thm", "range_hi_thm"):
+            if d["constraints"].get(key):
+                bounding = d["constraints"][key][0]
+                break
+        pts, hyps, dropped = make_points(entry, defs_by_name, structs,
+                                         random.Random(11), bounding)
         if not pts:
             rec["reason"] = ("mined hypotheses admit no sampled point; "
                              f"constraints: {hyps[:4]}")

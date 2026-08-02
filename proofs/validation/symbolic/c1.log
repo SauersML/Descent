@@ -1,0 +1,16 @@
+CHECK 1: 29 equilibrium/rest-point definitions
+  fixed_point_verified       12
+  no_fixed_point_theorem     10
+  derived_from_equilibrium   3
+  UNGUARDED_ARITY_MISMATCH   2
+  opaque_theorem             2
+
+--- multiple rest points (relevance question Lean does not ask) ---
+   Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium: roots ['0', '-m - m/s + 1']
+      0                                        unknown
+      -m - m/s + 1                             unknown
+   Calibrator.RareVariantPortability.mutationSelectionBalanceRecessive: roots ['(-mu - sqrt(mu*(mu + 4*s)))/(2*s)', '(-mu + sqrt(mu*(mu + 4*s)))/(2*s)']
+      (-mu - sqrt(mu*(mu + 4*s)))/(2*s)        unknown
+      (-mu + sqrt(mu*(mu + 4*s)))/(2*s)        unknown
+
+unguarded equilibrium claims: 2

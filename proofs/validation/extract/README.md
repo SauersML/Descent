@@ -108,6 +108,12 @@ discarded as equivalent. Then:
 * check fails on the real body → a finding, tiered by how much the corpus
   actually proves (below).
 
+`constraints["hypotheses"]` is the **union** over every theorem mentioning a
+definition, not a domain. Read as a conjunction it excludes admissible points —
+`coalFst` carries `100 * Ne < t` from one asymptotic lemma. Use
+`constraints["hypotheses_by_theorem"]`, or `api.hypotheses(name, theorem)`, and
+enforce the preconditions of the one theorem whose claim you are testing.
+
 The admissible box is not invented. Per-argument bounds come from the
 hypotheses of the theorems that mention the definition, plus the quantity kind
 implied by the argument's name; inter-argument constraints (`H_S ≤ H_T`,

@@ -1212,9 +1212,13 @@ theorem twoPool_not_variantDisjoint {design : GenotypeDesign n ι}
     intro hEq
     rw [hEq, ht] at hs
     exact hsetne hs.symm
-  refine GenotypeDesign.not_variantDisjoint_of_recurrent hst ?_ ?_
-  · rw [hs]; simp
-  · rw [ht]; simp
+  have hmem : i ∈ design.locusSet s := by
+    rw [hs]
+    simp
+  have hmem' : i ∈ design.locusSet t := by
+    rw [ht]
+    simp
+  exact GenotypeDesign.not_variantDisjoint_of_recurrent hst hmem hmem'
 
 /-- Fourth cumulant of a centered law in terms of its second and fourth moments,
 `κ₄ = m₄ - 3 m₂²`.

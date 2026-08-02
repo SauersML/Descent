@@ -334,7 +334,7 @@ theorem twoDemeIMEquilibriumETst_isFixedPoint (M : ℝ) (hM : 0 < M) :
       twoDemeIMEquilibriumETst M := by
   have hM' : M ≠ 0 := ne_of_gt hM
   unfold twoDemeIMFirstStepDiff twoDemeIMEquilibriumETss twoDemeIMEquilibriumETst
-  field_simp
+  rw [eq_div_iff hM', add_mul, one_div_mul_cancel hM']
   ring
 
 /-- **The equilibrium F_ST is the Hudson ratio of the coalescent fixed
@@ -4585,77 +4585,173 @@ the demes fix independently and F_ST is exactly `1`. -/
   unfold fstMigrationDriftEquilibrium
   norm_num
 
-/-- **The unlinearised discrete-generation identity recursion.**
+/-- **One generation of the identity-by-descent recurrence.**
 
-Two gene copies drawn in the next generation are identical by descent only if
-neither is a migrant -- probability `(1 - m)²` -- and their parental copies
-either coalesced in the deme, probability `1/(2 Nₑ)`, or were already
-identical, probability `1 - 1/(2 Nₑ)` times `F`.
+A lineage pair coalesces this generation with probability `1/(2 Nₑ)`; failing
+that it is identical only if it already was. Independently, the pair survives
+the disrupting event -- whatever separates the two lineages -- with probability
+`(1 - rate)²`, one chance per lineage.
 
-Composition convention: migration acts on the offspring generation *after*
-reproduction, and the two events multiply rather than add.  This is the
-difference from `ibdFlowStep`: that map linearises `(1 - m)²(1 - 1/(2 Nₑ))` to
-`1 - 2m - 1/(2 Nₑ)`, dropping the `O(m², m/Nₑ)` cross terms, and the two maps
-therefore have genuinely different fixed points.
+    Denotes: the recurrence itself, not either quantity that satisfies it. Read
+    with `rate = m` it is the island-model single-locus IBD recursion; read with
+    `rate = c` it is Sved's two-locus IBD recursion for `E[r²]`. Those are
+    different quantities obeying one map, so the map is named for the map and
+    for neither of them.
 
-    Empirical status: UNTESTED. -/
-noncomputable def islandFstMultiplicativeStep (Ne m F : ℝ) : ℝ :=
-  (1 - m) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * F)
-
-/-- **Fixed point of the unlinearised discrete recursion.**
-
-`F* = (1-m)² / ((1-m)² + 2 Nₑ m (2 - m))`.  Expanding the denominator gives
-`(1-m)² + 4 Nₑ m − 2 Nₑ m²`, so this reduces to `1/(1 + 4 Nₑ m)` only after
-dropping terms of order `m²` and `m/Nₑ`; the two closed forms are not equal,
-which `fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium` witnesses.
+Composition convention: the disrupting event acts on the offspring generation
+*after* reproduction, and the two events multiply rather than add. This is the
+difference from `ibdFlowStep`, which linearises `(1 - rate)² (1 - 1/(2 Nₑ))` to
+`1 - 2 rate - 1/(2 Nₑ)` and therefore has a different fixed point.
 
     Empirical status: UNTESTED. -/
-noncomputable def fstIslandMultiplicativeEquilibrium (Ne m : ℝ) : ℝ :=
-  (1 - m) ^ 2 / ((1 - m) ^ 2 + 2 * Ne * m * (2 - m))
+noncomputable def ibdRecurrenceStep (Ne rate x : ℝ) : ℝ :=
+  (1 - rate) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * x)
 
-/-- **The closed form is the fixed point of the unlinearised recursion.** -/
-theorem fstIslandMultiplicativeEquilibrium_isFixedPoint (Ne m : ℝ)
-    (hNe : 0 < Ne) (hm : 0 ≤ m) (hm1 : m < 1) :
-    islandFstMultiplicativeStep Ne m (fstIslandMultiplicativeEquilibrium Ne m) =
-      fstIslandMultiplicativeEquilibrium Ne m := by
-  have hNe' : Ne ≠ 0 := ne_of_gt hNe
-  have hpos : (0 : ℝ) < 1 - m := by linarith
-  have hsq : (0 : ℝ) < (1 - m) ^ 2 := pow_pos hpos 2
-  have hflow : (0 : ℝ) ≤ 2 * Ne * m * (2 - m) := by
-    have h2 : (0 : ℝ) ≤ 2 - m := by linarith
-    positivity
-  have hd : (0 : ℝ) < (1 - m) ^ 2 + 2 * Ne * m * (2 - m) := by linarith
-  have hd' : (1 - m) ^ 2 + 2 * Ne * m * (2 - m) ≠ 0 := ne_of_gt hd
-  unfold islandFstMultiplicativeStep fstIslandMultiplicativeEquilibrium
-  have h2Ne : (2 : ℝ) * Ne ≠ 0 := mul_ne_zero two_ne_zero hNe'
-  set D : ℝ := (1 - m) ^ 2 + 2 * Ne * m * (2 - m) with hDdef
-  rw [eq_div_iff hd']
-  have hAD : (1 - m) ^ 2 / D * D = (1 - m) ^ 2 := div_mul_cancel₀ _ hd'
-  have hexpand :
-      (1 - m) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * ((1 - m) ^ 2 / D)) * D =
-        (1 - m) ^ 2 * (1 / (2 * Ne)) * D +
-          (1 - m) ^ 2 * (1 - 1 / (2 * Ne)) * ((1 - m) ^ 2 / D * D) := by ring
-  rw [hexpand, hAD, hDdef]
+/-- **The rest point of the identity-by-descent recurrence.**
+
+Solving `x = (1 - rate)² (a + (1 - a) x)` with `a = 1/(2 Nₑ)` gives
+`x* = (1 - rate)² a / (1 - (1 - rate)² (1 - a))`, and clearing `a` writes it as
+the form below. Both readings of `ibdRecurrenceStep` inherit it: with `rate = m`
+it is the island-model equilibrium `F_ST`, with `rate = c` it is Sved's `E[r²]`.
+
+    Denotes: the rest point of the recurrence, under either reading.
+
+    Empirical status: UNTESTED. -/
+noncomputable def ibdRecurrenceFixedPoint (Ne rate : ℝ) : ℝ :=
+  (1 - rate) ^ 2 / ((1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate))
+
+/-- **The rest point is a fixed point of the recurrence.**  Stated once here so
+that the island-model and Sved readings cannot acquire different answers. -/
+theorem ibdRecurrenceFixedPoint_isFixedPoint (Ne rate : ℝ)
+    (hNe : 0 < Ne) (hr : 0 ≤ rate) (hr1 : rate < 1) :
+    ibdRecurrenceStep Ne rate (ibdRecurrenceFixedPoint Ne rate) =
+      ibdRecurrenceFixedPoint Ne rate := by
+  have h2Ne : (0 : ℝ) < 2 * Ne := by linarith
+  have h2Ne' : (2 : ℝ) * Ne ≠ 0 := ne_of_gt h2Ne
+  have hpos : (0 : ℝ) < 1 - rate := by linarith
+  have hsq : (0 : ℝ) < (1 - rate) ^ 2 := pow_pos hpos 2
+  have hflow : (0 : ℝ) ≤ 2 * Ne * rate * (2 - rate) :=
+    mul_nonneg (mul_nonneg h2Ne.le hr) (by linarith : (0 : ℝ) ≤ 2 - rate)
+  have hd : (0 : ℝ) < (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) := by linarith
+  have hd' : (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) ≠ 0 := ne_of_gt hd
+  unfold ibdRecurrenceStep ibdRecurrenceFixedPoint
   field_simp
   ring
 
-/-- **Total isolation, unlinearised version.**  This recursion also attains the
+/-- **Total isolation is a boundary the rest point attains.**  With `rate = 0`
+nothing separates the lineages and the recurrence rests at `1`. -/
+@[simp] theorem ibdRecurrenceFixedPoint_of_zero_rate (Ne : ℝ) :
+    ibdRecurrenceFixedPoint Ne 0 = 1 := by
+  unfold ibdRecurrenceFixedPoint
+  norm_num
+
+/-- **The exact error of the `1/(1 + 4 Nₑ rate)` linearisation.**
+
+`x* - 1/(1 + 4 Nₑ rate) = 2 Nₑ rate² (2 rate - 3) / (D (1 + 4 Nₑ rate))` where
+`D = (1 - rate)² + 2 Nₑ rate (2 - rate)`. The error is second order in `rate`,
+which is what makes `1/(1 + 4 Nₑ rate)` a first-order approximation rather than
+an identity. -/
+theorem ibdRecurrenceFixedPoint_sub_linearisation (Ne rate : ℝ)
+    (hNe : 0 < Ne) (hr : 0 ≤ rate) (hr1 : rate < 1) :
+    ibdRecurrenceFixedPoint Ne rate - 1 / (1 + 4 * Ne * rate) =
+      2 * Ne * rate ^ 2 * (2 * rate - 3) /
+        (((1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate)) * (1 + 4 * Ne * rate)) := by
+  have h2Ne : (0 : ℝ) < 2 * Ne := by linarith
+  have hpos : (0 : ℝ) < 1 - rate := by linarith
+  have hsq : (0 : ℝ) < (1 - rate) ^ 2 := pow_pos hpos 2
+  have hflow : (0 : ℝ) ≤ 2 * Ne * rate * (2 - rate) :=
+    mul_nonneg (mul_nonneg h2Ne.le hr) (by linarith : (0 : ℝ) ≤ 2 - rate)
+  have hd : (0 : ℝ) < (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) := by linarith
+  have hd' : (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) ≠ 0 := ne_of_gt hd
+  have hlin : (0 : ℝ) < 1 + 4 * Ne * rate := by nlinarith
+  have hlin' : (1 : ℝ) + 4 * Ne * rate ≠ 0 := ne_of_gt hlin
+  unfold ibdRecurrenceFixedPoint
+  field_simp
+  ring
+
+/-- **`1/(1 + 4 Nₑ rate)` is strictly above the rest point, always.**
+
+This is the theorem that stops the classical formula being re-derived as if it
+were exact. One statement covers both readings: `1/(1 + 4 Nₑ m)` for the island
+model and Sved's `1/(1 + 4 Nₑ c)` for two-locus LD are the same weak-rate
+linearisation of `ibdRecurrenceFixedPoint`, each overstates it, and the gap is
+the second-order term of `ibdRecurrenceFixedPoint_sub_linearisation`. At
+`Nₑ = 1`, `rate = 1/2` the rest point is `1/7` and the linearisation is `1/3`.
+
+Regime of the linearisation: small `rate`, large `Nₑ`. Outside it the corpus
+already records a roughly twofold discrepancy at two demes on the island-model
+definitions, and this theorem says the discrepancy has a sign. -/
+theorem ibdRecurrenceFixedPoint_lt_linearisation (Ne rate : ℝ)
+    (hNe : 0 < Ne) (hr : 0 < rate) (hr1 : rate < 1) :
+    ibdRecurrenceFixedPoint Ne rate < 1 / (1 + 4 * Ne * rate) := by
+  have h2Ne : (0 : ℝ) < 2 * Ne := by linarith
+  have hpos : (0 : ℝ) < 1 - rate := by linarith
+  have hsq : (0 : ℝ) < (1 - rate) ^ 2 := pow_pos hpos 2
+  have hflow : (0 : ℝ) ≤ 2 * Ne * rate * (2 - rate) :=
+    mul_nonneg (mul_nonneg h2Ne.le hr.le) (by linarith : (0 : ℝ) ≤ 2 - rate)
+  have hd : (0 : ℝ) < (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) := by linarith
+  have hlin : (0 : ℝ) < 1 + 4 * Ne * rate := by nlinarith
+  have hden : (0 : ℝ) <
+      ((1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate)) * (1 + 4 * Ne * rate) :=
+    mul_pos hd hlin
+  have hnum : 2 * Ne * rate ^ 2 * (2 * rate - 3) < 0 := by nlinarith [sq_nonneg rate]
+  have hgap := ibdRecurrenceFixedPoint_sub_linearisation Ne rate hNe hr.le hr1
+  have hneg : ibdRecurrenceFixedPoint Ne rate - 1 / (1 + 4 * Ne * rate) < 0 := by
+    rw [hgap]
+    exact div_neg_of_neg_of_pos hnum hden
+  linarith
+
+/-- **The island-model reading of the recurrence.**  Migration is the disrupting
+event: the pair is identical only if neither lineage is a migrant, probability
+`(1 - m)²`, and the parental copies either coalesced in the deme or were already
+identical.
+
+    Empirical status: UNTESTED. -/
+noncomputable def islandFstMultiplicativeStep (Ne m F : ℝ) : ℝ :=
+  ibdRecurrenceStep Ne m F
+
+/-- One map, one name: the island reading is the recurrence. -/
+theorem islandFstMultiplicativeStep_eq_ibdRecurrenceStep (Ne m F : ℝ) :
+    islandFstMultiplicativeStep Ne m F = ibdRecurrenceStep Ne m F := rfl
+
+/-- **Fixed point of the island-model recursion.**
+
+`F* = (1-m)² / ((1-m)² + 2 Nₑ m (2 - m))`.  Expanding the denominator gives
+`(1-m)² + 4 Nₑ m − 2 Nₑ m²`, so this reduces to `1/(1 + 4 Nₑ m)` only after
+dropping terms of order `m²` and `m/Nₑ`; the two closed forms are never equal
+for `m > 0`, which `ibdRecurrenceFixedPoint_lt_linearisation` proves in general
+and `fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium`
+witnesses at a point.
+
+    Empirical status: UNTESTED. -/
+noncomputable def fstIslandMultiplicativeEquilibrium (Ne m : ℝ) : ℝ :=
+  ibdRecurrenceFixedPoint Ne m
+
+/-- **The closed form is the fixed point of the island-model recursion.** -/
+theorem fstIslandMultiplicativeEquilibrium_isFixedPoint (Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) (hm1 : m < 1) :
+    islandFstMultiplicativeStep Ne m (fstIslandMultiplicativeEquilibrium Ne m) =
+      fstIslandMultiplicativeEquilibrium Ne m :=
+  ibdRecurrenceFixedPoint_isFixedPoint Ne m hNe hm hm1
+
+/-- **Total isolation, island reading.**  This recursion also attains the
 boundary: `m = 0` gives `F = 1`. -/
 @[simp] theorem fstIslandMultiplicativeEquilibrium_of_no_migration (Ne : ℝ) :
-    fstIslandMultiplicativeEquilibrium Ne 0 = 1 := by
-  unfold fstIslandMultiplicativeEquilibrium
-  norm_num
+    fstIslandMultiplicativeEquilibrium Ne 0 = 1 :=
+  ibdRecurrenceFixedPoint_of_zero_rate Ne
 
 /-- **The two recursions do not have the same fixed point.**
 
-At `Nₑ = 1`, `m = 1/2` the multiplicative recursion rests at `1/7` and the linearised
-one at `1/3`.  This is not a defect of either definition: it is the size of
-the weak-migration approximation, and it is stated here rather than left
-implicit so that the approximation cannot be mistaken for an identity. -/
+At `Nₑ = 1`, `m = 1/2` the multiplicative recursion rests at `1/7` and the
+linearised one at `1/3`.  This is not a defect of either definition: it is the
+size of the weak-migration approximation, and it is stated here rather than
+left implicit so that the approximation cannot be mistaken for an identity. -/
 theorem fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium :
     fstIslandMultiplicativeEquilibrium 1 (1 / 2) ≠ fstMigrationDriftEquilibrium 1 (1 / 2) := by
-  unfold fstIslandMultiplicativeEquilibrium fstMigrationDriftEquilibrium
+  unfold fstIslandMultiplicativeEquilibrium ibdRecurrenceFixedPoint
+    fstMigrationDriftEquilibrium
   norm_num
+
 
 /-- The scaled migration parameter M = 4Nm, analogous to θ = 4Neμ.
 

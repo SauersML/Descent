@@ -15,6 +15,7 @@ import os
 import sys
 
 import checks
+import contracts
 import corpus
 
 
@@ -117,12 +118,91 @@ def classify(chk: checks.Check, res: dict) -> str:
     }.get(chk.kind, "FORMULA")
 
 
+def _definitions_used(D) -> list[str]:
+    """Which corpus definitions does the battery actually evaluate?"""
+    import collections
+    seen = set()
+
+    class Recorder(dict):
+        def __getitem__(self, k):
+            seen.add(k)
+            f = D[k]
+            return lambda *a, **kw: f(*a, **kw)
+
+    R = Recorder()
+    for chk in checks.CHECKS:
+        for p in chk.grid:
+            for fn in (chk.lean, chk.ref):
+                try:
+                    _eval(fn, R, p)
+                except Exception:
+                    pass
+    return sorted(seen)
+
+
+def _call_points(D):
+    """Every (definition, argument tuple) the battery actually evaluates."""
+    import collections
+
+    pts = collections.defaultdict(set)
+
+    class Recorder(dict):
+        def __getitem__(self, k):
+            f = D[k]
+
+            def w(*a, **kw):
+                pts[k].add(tuple(a))
+                return f(*a, **kw)
+
+            return w
+
+    R = Recorder()
+    for chk in checks.CHECKS:
+        for p in chk.grid:
+            for fn in (chk.lean, chk.ref):
+                try:
+                    _eval(fn, R, p)
+                except Exception:
+                    pass
+    return {k: sorted(v) for k, v in pts.items()}
+
+
+def _cross_validate(D, used) -> dict:
+    """Re-run the independent leanexpr translation over the same call points.
+
+    Two separately written translators agreeing bit-for-bit is the only
+    protection this battery has against a mistranslated definition producing a
+    confident finding about nothing.
+    """
+    import crossvalidate as X
+
+    pts = _call_points(D)
+    agree, dis, unav = X.compare(used, pts)
+
+    def row(n, fq, pt, a, b):
+        return {"name": n, "fq": fq, "args": list(pt), "leanexpr": a, "extract": b}
+
+    known = [row(*d) for d in dis if d[0] in corpus.QUARANTINE]
+    unresolved = [row(*d) for d in dis if d[0] not in corpus.QUARANTINE]
+    return {
+        "method": "leanexpr.py vs extract/api.py over every evaluated argument tuple",
+        "n_definitions_compared": len(agree),
+        "n_arg_tuples": sum(len(v) for v in pts.values()),
+        "n_agree_all_points": len(agree),
+        "agree": {fq: n for _n, fq, n, _a, _c in agree},
+        "quarantined_disagreements": known,
+        "unresolved_disagreements": unresolved,
+        "not_comparable": dict(unav),
+    }
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--json", default="results.json")
     args = ap.parse_args()
 
-    D, defs, failures = corpus.load()
+    D, prov, unavailable = corpus.load()
+    used = _definitions_used(D)
 
     out = {
         "environment": {
@@ -130,19 +210,19 @@ def main() -> int:
             "sampling": False,
             "note": "all references are closed form; no Monte Carlo error",
         },
+        "corpus_stamp": corpus.api.stamp(),
         "extraction": {
+            "primary_source": "proofs/validation/extract/api.py",
             "n_callables": len(D),
-            "n_refused": len(failures),
-            "refused": failures,
-            "provenance": {
-                name: {
-                    "source": f"{d.module}.lean:{d.line}",
-                    "sha256_16": d.sha256,
-                }
-                for name, d in sorted(defs.items())
-                if d.py_src is not None
-            },
+            "n_unavailable": len(unavailable),
+            "unavailable": unavailable,
+            "quarantined": corpus.QUARANTINE,
+            "provenance": {prov[n]["fq"]: prov[n] for n in used if n in prov},
         },
+        "cross_validation": _cross_validate(D, used),
+        "contract_totality": contracts.totality_audit(
+            corpus._leanexpr_table()[0], _call_points(D)
+        ),
         "checks": {},
     }
 
@@ -150,8 +230,12 @@ def main() -> int:
         res = evaluate(chk, D)
         vac = prove_can_fail(chk, D)
         verdict = classify(chk, res)
+        bare = chk.fqn.split(".")[-1]
         out["checks"][chk.id] = {
-            "definition": chk.fqn,
+            "definition": prov.get(bare, {}).get("fq", chk.fqn),
+            "definition_source": prov.get(bare, {}).get("source"),
+            "definition_checksum": prov.get(bare, {}).get("checksum"),
+            "translator": prov.get(bare, {}).get("translator"),
             "claim": chk.claim,
             "model_definition": chk.model_lean,
             "model_reference": chk.model_ref,
@@ -166,6 +250,13 @@ def main() -> int:
             "max_rel_err": res["max_rel_err"],
             "min_rel_err": res["min_rel_err"],
             "worst_point": res["worst_point"],
+            "worst_point_admissibility": (
+                contracts.admissibility(
+                    prov.get(bare, {}).get("fq", chk.fqn), res["worst_point"]["params"]
+                )
+                if res["worst_point"] and verdict != "AGREE"
+                else None
+            ),
             "n_grid": len(chk.grid),
             "rows": res["rows"],
         }
@@ -174,7 +265,14 @@ def main() -> int:
         json.dump(out, fh, indent=1, default=str)
 
     # ---- console summary --------------------------------------------------
-    print(f"extracted {len(D)} callables, refused {len(failures)}")
+    cv = out["cross_validation"]
+    print(
+        f"{len(D)} callables (primary: extract); "
+        f"cross-validated {cv['n_definitions_compared']} defs over "
+        f"{cv['n_arg_tuples']} arg tuples, "
+        f"{len(cv['unresolved_disagreements'])} unresolved disagreements "
+        f"({len(cv['quarantined_disagreements'])} quarantined)"
+    )
     print(f"{'verdict':<22} {'vac':<4} {'max rel err':>12}  check")
     print("-" * 96)
     for cid, c in out["checks"].items():
@@ -191,7 +289,20 @@ def main() -> int:
         f"\n{len(out['checks'])} checks, {n_vac} vacuous "
         f"(identity and reference self-test checks are excluded) -> {args.json}"
     )
-    return 1 if n_vac else 0
+    tot = out["contract_totality"]
+    print(
+        f"totality audit: {tot['points_checked']} points, "
+        f"{len(tot['totality_boundary_points'])} on a Mathlib boundary, "
+        f"{len(tot['value_mismatches'])} value mismatches -> "
+        f"{'CLEAN' if tot['clean'] else 'REVIEW'}"
+    )
+    n_unresolved = len(out["cross_validation"]["unresolved_disagreements"])
+    if n_unresolved:
+        print(
+            f"FAIL: {n_unresolved} translation disagreements are unresolved. "
+            "No verdict below is trustworthy until they are."
+        )
+    return 1 if (n_vac or n_unresolved) else 0
 
 
 if __name__ == "__main__":

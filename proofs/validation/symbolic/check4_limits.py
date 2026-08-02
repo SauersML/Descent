@@ -31,6 +31,7 @@ import sympy as sp
 
 import leansym as L
 import hyps as H
+import fixedpoint as FP
 
 HERE = Path(__file__).parent
 
@@ -157,10 +158,13 @@ def run():
             if v is True:
                 rec["status"] = "exactly_equal"
             else:
-                regimes = find_regime(e, oe2, b)
-                rec["status"] = ("approximation_holds_in_regime" if regimes
+                params = [sp.Symbol(x, positive=True) for x in b]
+                lin = FP.linearisation_verdict(e, oe2, params)
+                if not lin:
+                    lin = FP.linearisation_verdict(oe2, e, params)
+                rec["status"] = ("approximation_holds_in_regime" if lin
                                  else "APPROXIMATION_UNSUPPORTED")
-                rec["regimes"] = regimes
+                rec["regimes"] = lin[:4]
                 rec["regime_stated_in_docstring"] = bool(REGIME_DOC.search(doc))
             results.append(rec)
 
@@ -175,11 +179,15 @@ def run():
             continue
         da, ea, ba = exprs[fa]
         db, eb, bb = exprs[fb]
-        if len(ba) != len(bb):
+        # Align by name here too.  Positional renaming across definitions with
+        # different argument meanings is what turned `admixtureLDMagnitude`
+        # into the nonsense `(1 - p_B)**q_B`.
+        if sorted(ba) != sorted(bb):
             continue
-        eb2 = eb.subs({sp.Symbol(x, positive=True): sp.Symbol(y, positive=True)
-                       for x, y in zip(bb, ba)}, simultaneous=True)
-        regimes = find_regime(ea, eb2, ba)
+        eb2 = eb
+        params = [sp.Symbol(x, positive=True) for x in ba]
+        regimes = [g for g in FP.linearisation_verdict(ea, eb2, params)
+                   if (g["agree_to_order"] or 0) >= 1][:4]
         if not regimes:
             continue
         doca, docb = da["docstring"] or "", db["docstring"] or ""
@@ -219,7 +227,9 @@ def main():
             print(f'   {r["a"]["fqn"]}:{r["a"]["line"]}  = {r["a"]["expr"]}')
             print(f'   {r["b"]["fqn"]}:{r["b"]["line"]}  = {r["b"]["expr"]}')
             for g in r["regimes"]:
-                print(f'      agree as {g["regime"]}  (ratio -> {g["ratio_limit"]})')
+                print(f'      agree as {g["regime"]} to order {g["agree_to_order"]}; '
+                      f'leading error O(eps^{g["leading_error_order"]}) '
+                      f'coefficient {g["leading_error_coefficient"]}')
             print()
     for r in res:
         if r["status"] == "approximation_holds_in_regime" and not r.get("regime_stated_in_docstring"):

@@ -376,12 +376,23 @@ def mine_from_theorems(defs, theorems):
                     d.constraints["range_hi"] = hi
                 # hypothesis constraints on the def's own argument names
                 argnames = {n for a in d.args for n in a["names"]}
+                # NOTE ON SEMANTICS: `hypotheses` is the UNION over every
+                # theorem mentioning this definition, so it is NOT a domain and
+                # must not be read as a conjunction -- one asymptotic lemma's
+                # `100 * Ne < t` would otherwise exclude every sensible
+                # evaluation.  `hypotheses_by_theorem` keeps the grouping, and
+                # that is what a check should enforce: the preconditions of the
+                # ONE theorem whose claim is being tested.
                 hyps = d.constraints.setdefault("hypotheses", [])
+                per = d.constraints.setdefault("hypotheses_by_theorem", {})
+                mine = per.setdefault(t.name, [])
                 for mm in re.finditer(r"\(\s*h[\w'₀-ₜ]*\s*:\s*([^)]*)\)", stmt):
                     h = " ".join(mm.group(1).split())
                     if any(re.search(rf"(?<![\w']){re.escape(a)}(?![\w'])", h) for a in argnames):
                         if h not in hyps:
                             hyps.append(h)
+                        if h not in mine:
+                            mine.append(h)
 
 
 def mine_from_docstring(d: Decl):

@@ -95,17 +95,37 @@ noncomputable def HeterozygosityTrajectory.measuredLoss
 at the drift rate. This is the premise the cluster encodes.
 
     Regime: closed population, no mutation — stated here as the definition's whole
-    content rather than as a hidden assumption. -/
+    content rather than as a hidden assumption.
+
+    Empirical status: FALSIFIED at demographic equilibrium. Simulation measures
+    the retention as `1.025 ± 0.020` at `Ne = 1000`, `t = 4000`, where this
+    trajectory gives `0.135`. -/
 noncomputable def closedPopulation (Ne H₀ : ℝ) (hH : 0 < H₀) : HeterozygosityTrajectory where
   het := fun t => (1 - 1 / (2 * Ne)) ^ t * H₀
   het_zero_pos := by simpa using hH
 
 /-- **Regime B: mutation-drift balance.** At demographic equilibrium mutation replenishes
 diversity at the rate drift removes it, so heterozygosity is stationary. This is the
-regime the simulation was actually in. -/
+regime the simulation was actually in.
+
+    Empirical status: VALIDATED as the regime of the reported runs. Measured
+    retention `1.010`, `0.989`, `1.025` at `T = 200`, `1000`, `4000`, each within
+    one standard error of the stationary value `1`. Power: the drift-only rival
+    spans `0.905` to `0.135` across the same design, so the design separates
+    them by a factor of seven at the far end. -/
 noncomputable def mutationDriftBalance (H₀ : ℝ) (hH : 0 < H₀) : HeterozygosityTrajectory where
   het := fun _ => H₀
   het_zero_pos := hH
+
+/-- **The balance regime is a stationary point of the trajectory**, which is what
+makes it a balance rather than a value: the measured loss does not move from one
+generation to the next, at any starting heterozygosity. The closed-population
+regime has no such generation, which is the whole of the disagreement. -/
+theorem mutationDriftBalance_isFixedPoint (H₀ : ℝ) (hH : 0 < H₀) (t : ℕ) :
+    (mutationDriftBalance H₀ hH).measuredLoss (t + 1) =
+      (mutationDriftBalance H₀ hH).measuredLoss t := by
+  unfold HeterozygosityTrajectory.measuredLoss mutationDriftBalance
+  simp
 
 /-- Under mutation-drift balance the measured loss is **exactly zero at every time**. -/
 @[simp] theorem measuredLoss_mutationDriftBalance (H₀ : ℝ) (hH : 0 < H₀) (t : ℕ) :
@@ -155,16 +175,32 @@ at every value of it, correct or not.
 
     Regime: closed population, no mutation. Isolating it is the point: every
     member of the cluster is a function of this one value, so every identity among
-    them is an identity in it. -/
+    them is an identity in it.
+
+    Empirical status: FALSIFIED at demographic equilibrium; see
+    `closedPopulation`. -/
 noncomputable def driftRetention (Ne : ℝ) (t : ℕ) : ℝ := (1 - 1 / (2 * Ne)) ^ t
 
-/-- Cluster member: heterozygosity loss. -/
+/-- Cluster member: heterozygosity loss.
+
+    Denotes: one minus a retention, and nothing more. The same body carries
+    names from the 'factor', 'frequency' and 'fst' families elsewhere in the
+    corpus, and the body alone does not fix which is meant; here the argument is
+    the closed-population retention and the value is a within-population
+    heterozygosity loss, never a between-population `F_ST`.
+
+    Empirical status: VACUOUS. It is a function of the shared retention, so it
+    carries no evidence independent of it. -/
 noncomputable def lossOfRetention (r : ℝ) : ℝ := 1 - r
 
 /-- Cluster member: target heterozygosity. -/
 noncomputable def targetHetOfRetention (H₀ r : ℝ) : ℝ := H₀ * r
 
-/-- Cluster member: target PGS variance. -/
+/-- Cluster member: target PGS variance.
+
+    Empirical status: VACUOUS. It is a function of the shared retention, so it
+    carries no evidence independent of it; see
+    `cluster_identities_hold_at_every_retention`. -/
 noncomputable def targetPgsVarOfRetention (V_A r : ℝ) : ℝ := V_A * r
 
 /-- **Every internal identity of the cluster holds at every retention value.**
@@ -242,7 +278,10 @@ these two has no power to check the functional form. -/
 noncomputable def benchmarkRatioSquared (fstS fstT : ℝ) : ℝ := ((1 - fstT) / (1 - fstS)) ^ 2
 
 /-- What a **symmetric** design observes: the two branch lengths are equal, so only the
-diagonal of the candidate function is ever evaluated. -/
+diagonal of the candidate function is ever evaluated.
+
+    Empirical status: not an empirical claim. This is a description of a test
+    design, not a prediction about a population. -/
 noncomputable def diagonalDesign (g : ℝ → ℝ → ℝ) : ℝ → ℝ := fun x => g x x
 
 /-- **A symmetric design sees `1` whatever the exponent is.** -/
@@ -277,10 +316,10 @@ The general obligation: a validation must report the spread of its prediction ac
 design. A prediction that is constant on the design tests nothing about shape.
 
 As above this is a `def`, since `ProbeBlindness` carries its witnesses as data; the
-proposition is `no_symmetric_design_criterion` immediately below.
+proposition is `symmetric_design_has_no_power` immediately below.
 
     Empirical status: not an empirical claim. This is a witness construction. -/
-noncomputable def symmetric_design_has_no_power :
+noncomputable def symmetricDesignBlindness :
     ProbeBlindness diagonalDesign (fun g => g = benchmarkRatio) where
   positive := benchmarkRatio
   negative := benchmarkRatioSquared
@@ -290,10 +329,10 @@ noncomputable def symmetric_design_has_no_power :
 
 /-- Spelled out: no rule reading only symmetric-design output decides the functional
 form. -/
-theorem no_symmetric_design_criterion :
+theorem symmetric_design_has_no_power :
     ¬ ∃ decide : (ℝ → ℝ) → Prop,
         ∀ g : ℝ → ℝ → ℝ, g = benchmarkRatio ↔ decide (diagonalDesign g) :=
-  symmetric_design_has_no_power.no_criterion
+  symmetricDesignBlindness.no_criterion
 
 /-!
 ## 4. The obligations, and where they are enforced

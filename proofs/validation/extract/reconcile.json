@@ -1,20 +1,22 @@
 {
- "ours": 958,
+ "ours": 964,
  "stamp": {
-  "n_definitions": 983,
-  "n_structures": 96,
+  "n_definitions": 989,
+  "n_structures": 98,
   "n_parse_failures": 2,
-  "corpus_digest": "sha256:05d7227c4bc9537e79bbf4040bde6007"
+  "corpus_digest": "sha256:f87f5260dd9c02fa423e3b73445d4708"
  },
  "invariants/defs.json": {
   "shared": 946,
-  "only_ours": 12,
+  "only_ours": 18,
   "only_theirs": 1,
-  "body": 2,
-  "params": 21,
+  "body": 4,
+  "params": 22,
   "order": 0,
   "body_names": [
    "driftLDTrajectory",
+   "fstIslandMultiplicativeEquilibrium",
+   "islandFstMultiplicativeStep",
    "twoLocusCoalescentCovarianceMatrix"
   ],
   "param_names": [
@@ -35,6 +37,7 @@
    "slidingWindowDesign",
    "sourceERMWeights",
    "spikeIdentification",
+   "spiked",
    "targetLinearExcessRisk",
    "targetLinearRisk",
    "uniformCatastrophicPortabilityScore",
@@ -46,14 +49,13 @@
   ]
  },
  "symbolic/decls.json": {
-  "shared": 940,
-  "only_ours": 18,
+  "shared": 958,
+  "only_ours": 6,
   "only_theirs": 2,
-  "body": 2,
+  "body": 1,
   "params": 0,
   "order": 0,
   "body_names": [
-   "blockSpectrum",
    "twoLocusCoalescentCovarianceMatrix"
   ],
   "param_names": [],

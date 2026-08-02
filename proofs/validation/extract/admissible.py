@@ -73,17 +73,25 @@ def box_for(d):
     return box
 
 
-def hypothesis_predicates(d):
+def hypothesis_predicates(d, theorem=None):
     """Mined theorem hypotheses, compiled into Python predicates over the args.
 
-    These are the conditions under which the corpus itself asserts things about
-    the definition; sampling outside them produces false accusations, so the
-    admissible set is the box intersected with these.
+    `theorem` selects ONE theorem's preconditions, which is almost always what
+    you want: a check tests a particular theorem's claim, so it must be run
+    under that theorem's hypotheses.  With `theorem=None` you get the union over
+    every theorem mentioning the definition, which is NOT a domain -- read
+    conjunctively it excludes points the corpus considers perfectly admissible
+    (`coalFst` picks up `100 * Ne < t` from one asymptotic lemma).
     """
     import translate
     preds, texts, dropped = [], [], []
+    if theorem is not None:
+        src_hyps = d.get("constraints", {}).get(
+            "hypotheses_by_theorem", {}).get(theorem, [])
+    else:
+        src_hyps = d.get("constraints", {}).get("hypotheses", [])
     argnames = {translate.pyname(n) for a in d["args"] for n in a["names"]}
-    for h in d.get("constraints", {}).get("hypotheses", []):
+    for h in src_hyps:
         try:
             stmts, ret = translate.translate_body(h)
         except Exception:                                        # noqa: BLE001

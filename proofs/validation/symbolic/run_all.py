@@ -21,7 +21,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 PY = str(HERE / ".venv" / "bin" / "python")
 
-STEPS = ["leanparse.py", "check1_fixedpoints.py", "check3_duplicates.py",
+STEPS = ["leanparse.py", "check1_fixedpoints.py", "check1b_joint.py", "check3_duplicates.py",
          "check2_derivations.py", "check4_limits.py", "mutation.py"]
 
 # statuses that constitute a finding rather than a pass
@@ -32,6 +32,11 @@ FINDING = {
     "VACUOUS_DERIVATION": "vacuous",
     "VACUOUS_DERIVATION_NO_DEFS": "vacuous",
     "APPROXIMATION_UNSUPPORTED": "error",
+    "JOINT_FIXED_POINT_FAILS": "error",
+    "JOINT_SOLVE_FAILED": "gap",
+    "HOLDS_TO_FIRST_ORDER": "linearisation",
+    "no_fixed_point_theorem": "gap",
+    "UNGUARDED_BINDERS_DO_NOT_CORRESPOND": "gap",
     "LINEARISATION_WITHOUT_STATED_REGIME": "unstated_regime",
     "UNGUARDED_NO_MAP": "gap",
     "UNGUARDED_ARITY_MISMATCH": "gap",
@@ -55,6 +60,13 @@ def main():
             add(r["fqn"], {"check": "check1_fixed_point", "severity": FINDING[r["status"]],
                            "status": r["status"], "file": r["file"], "line": r["line"],
                            "detail": r["detail"]})
+    for r in json.load(open(HERE / "results_check1b.json")):
+        if r["status"] in FINDING:
+            add(r["module"] + ".<joint>", {"check": "check1b_joint_system",
+                                           "severity": FINDING[r["status"]],
+                                           "status": r["status"],
+                                           "unknowns": r["unknowns"],
+                                           "detail": r["detail"]})
     for r in json.load(open(HERE / "results_check2.json")):
         if r["status"] in FINDING or r["detail"].get("MENTION_GAP"):
             add(r["fqn"], {"check": "check2_derivation",

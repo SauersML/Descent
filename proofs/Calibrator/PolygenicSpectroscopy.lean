@@ -235,12 +235,28 @@ theorem standardizedSquare_values (h : HardyWeinbergModel)
     h.standardizedSquare DiploidGenotype.homAlt = 2 * (1 - h.altFreq) / h.altFreq := by
   have hqne : h.altFreq ≠ 0 := ne_of_gt hq0
   have hpne : (1 : ℝ) - h.altFreq ≠ 0 := by intro hc; apply absurd hq1; linarith [hc]
-  refine ⟨?_, ?_, ?_⟩ <;>
-    · unfold HardyWeinbergModel.standardizedSquare
-      rw [hwe_centered, hwe_variance_eq]
-      simp only [altAlleleCount]
-      field_simp
-      try ring
+  -- The three cases need different endgames, so they are split rather than run
+  -- through one `<;>` block: the heterozygote goal closes at `simp only`, and a
+  -- `field_simp` chained after it would run on an empty goal list.
+  refine ⟨?_, ?_, ?_⟩
+  · -- homRef: `(0 - 2q)² / (2q(1-q)) = 2q / (1-q)`
+    unfold HardyWeinbergModel.standardizedSquare
+    rw [hwe_centered, hwe_variance_eq]
+    simp only [altAlleleCount]
+    first
+      | (field_simp; ring)
+      | field_simp
+  · -- het: `(1 - 2q)² / (2q(1-q))` is already the target, up to `altAlleleCount het = 1`
+    unfold HardyWeinbergModel.standardizedSquare
+    rw [hwe_centered, hwe_variance_eq]
+    simp only [altAlleleCount]
+  · -- homAlt: `(2 - 2q)² / (2q(1-q)) = 2(1-q) / q`
+    unfold HardyWeinbergModel.standardizedSquare
+    rw [hwe_centered, hwe_variance_eq]
+    simp only [altAlleleCount]
+    first
+      | (field_simp; ring)
+      | field_simp
 
 /-- The three Hardy-Weinberg genotype probabilities in terms of `q`. -/
 theorem genotypeProb_values (h : HardyWeinbergModel) :
@@ -939,6 +955,188 @@ intensities differ and the compound-Poisson limits differ. -/
 theorem hardCall_intensity_inflated :
     1 < latticeInflation hardCallLatticeSpan :=
   one_lt_latticeInflation hardCallLatticeSpan_pos
+
+/-!
+## 4b. The complete invariant list of a genotype coding
+
+The Vertex-Weight Law — proved elsewhere in this development, and carried here as a
+structure field rather than reproved — says that in the diagram expansion of a truncated
+joint cumulant of an admissible design, the coordinate law enters only through window
+factors (functions of the Mellin 2-jet and the arithmetic type of `log x ^ 2`), even
+vertex weights (polynomials in the cumulants of `x ^ 2`), and odd vertex weights
+(sign-couplings, vanishing exactly when the law is symmetric). So the complete list of
+transmissible invariants is
+
+  `(c, v)`, the arithmetic type of `log x ^ 2`, symmetry, and the cumulants of `x ^ 2`.
+
+This upgrades the status of what this file computes. The drift `hweMellinDrift`, the jet
+variance `hweMellinJetVariance`, and the symmetry verdict
+`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff` were three quantities that
+happened to be computable in closed form; under the Vertex-Weight Law they are three of
+the four things about a genotype coding that any design can see *at all*.
+
+### Two consequences, stated carefully
+
+Both are more delicate than they first appear, and the careless versions are wrong.
+
+**At the balanced locus.** It is tempting to say that at `q = 1/2` the drift is the only
+surviving channel. That is false. Of the four invariants, only *symmetry* fails to
+separate a balanced genotype from a Gaussian there — both are symmetric. The other three
+all still differ: `c(1/2) = log 2 = 0.6931` against `c_G = 0.7296`; `v(1/2) = 0` against
+`v_G = pi ^ 2 / 2 - 4 = 0.9348`; and `Var(x ^ 2) = 1` against the Gaussian's `2`. What is
+true is narrower and is about *usability*, not information: `v(1/2) = 0` means the
+condensation-window machinery, which needs a nondegenerate size-biased increment, cannot
+be run at that frequency even though the value `0` is itself distinguishing.
+
+**In the rare regime.** The drift diverges like `log (1 / (2q))`
+(`rare_variant_drift_sharp_lower_bound`, `rare_variant_drift_upper_bound`), and the jet
+variance does *not* — numerically `v` peaks near `q ≈ 0.1` and decays back toward zero
+(`v = 1.81` at `q = 0.1`, `0.31` at `q = 0.001`, `0.0094` at `q = 10 ^ (-5)`), so between
+the two Mellin invariants the drift is indeed the dominant rare-variant channel and the
+critical-degree collapse is governed by it alone. But it is *not* true that no invariant
+grows faster: the second cumulant of `x ^ 2` is `Var(x ^ 2) ~ 1 / (2q)`, which diverges
+polynomially rather than logarithmically and dwarfs the drift. That does not disturb the
+critical-degree result, because `criticalDegree` is a function of the drift by
+definition — but the completeness list does not license "the drift is the fastest-growing
+invariant", only "the drift is the one that sets the condensation boundary".
+-/
+
+/-- The four invariants of a coordinate law that the Vertex-Weight Law identifies as its
+complete observable content.
+
+`squareCumulant n` is the `n`-th cumulant of `x ^ 2`; `symmetric` is the sign-coupling
+datum, which by `Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff` holds for a
+polymorphic Hardy-Weinberg genotype exactly at `q = 1/2`. -/
+structure CodingInvariants where
+  /-- `c = E[x ^ 2 log x ^ 2]`, the size-biased drift. -/
+  drift : ℝ
+  /-- `v`, the size-biased increment variance. -/
+  jetVariance : ℝ
+  /-- The arithmetic type (lattice datum) of `log x ^ 2`. -/
+  arithmeticType : LatticeDatum
+  /-- Whether the coordinate law is sign-symmetric. -/
+  symmetric : Prop
+  /-- The cumulant sequence of `x ^ 2`. -/
+  squareCumulant : ℕ → ℝ
+
+/-- **The Vertex-Weight Law, carried as a hypothesis.**
+
+The `complete` field is the content: two coordinate laws agreeing in all four invariants
+are indistinguishable by every admissible design at every interaction degree. It is
+proved elsewhere in this development and is *not* reproved here; it is a named field so
+that every consumer has to say it is assuming it, in the style of
+`Calibrator.JetBarrier.ChaosSpectroscopy`. -/
+structure VertexWeightCompleteness (Law Design Observation : Type*) where
+  /-- The four invariants of a coordinate law. -/
+  invariants : Law → CodingInvariants
+  /-- What a design observes under a coordinate law. -/
+  observe : Law → Design → Observation
+  /-- **Completeness (analytic input).** Nothing outside the four invariants is
+  transmissible through any diagram of any admissible design. -/
+  complete : ∀ ν ν' : Law, invariants ν = invariants ν' →
+    ∀ D : Design, observe ν D = observe ν' D
+
+namespace VertexWeightCompleteness
+
+variable {Law Design Observation : Type*} (W : VertexWeightCompleteness Law Design Observation)
+
+/-- **Every experiment factors through the four invariants.** Any report computed from
+the design observations is a function of the invariant quadruple alone. -/
+theorem experiment_factors_through_invariants
+    {Report : Type*} (experiment : (Design → Observation) → Report)
+    (ν ν' : Law) (hinv : W.invariants ν = W.invariants ν') :
+    experiment (W.observe ν) = experiment (W.observe ν') := by
+  congr 1
+  funext D
+  exact W.complete ν ν' hinv D
+
+end VertexWeightCompleteness
+
+/-- The invariant quadruple of a hard-called Hardy-Weinberg locus.
+
+The drift and the jet variance are supplied from the closed forms proved in this file;
+the arithmetic type and the square-cumulant sequence are taken as *arguments*, because
+neither has a closed form here — the arithmetic type is only pinned at the explicit
+frequency `latticeCriticalMaf`, and the cumulant sequence is not computed anywhere in
+this development. Keeping them as arguments is deliberate: the signature then says
+exactly which two of the four this file establishes and which two it assumes.
+
+Empirical status: DERIVED in its first two components, from `hweMellinDrift` and
+`hweMellinJetVariance`, both of which are proved equal to direct sums over the three
+genotypes and recomputed numerically by
+`proofs/validation/condensation/check_condensation.py`. The third and fourth components
+are inputs, not claims. No free parameter. -/
+noncomputable def hweCodingInvariants (h : HardyWeinbergModel)
+    (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) : CodingInvariants where
+  drift := hweMellinDrift h.altFreq
+  jetVariance := hweMellinJetVariance h.altFreq
+  arithmeticType := arithmeticType
+  symmetric := h.altFreq = 1 / 2
+  squareCumulant := squareCumulant
+
+/-- **The observable content of a hard-called locus is exhausted by four numbers-worth
+of data, two of which are computed here.**
+
+Given the Vertex-Weight Law, two Hardy-Weinberg loci whose invariant quadruples agree are
+indistinguishable by every admissible design at every interaction degree. Since the first
+two components are closed-form functions of the allele frequency, this is the sense in
+which the spectroscopy of this file is *complete* rather than merely *available*. -/
+theorem hwe_observables_exhausted_by_invariants
+    {Law Design Observation Report : Type*}
+    (W : VertexWeightCompleteness Law Design Observation)
+    (experiment : (Design → Observation) → Report)
+    (ν ν' : Law) (h h' : HardyWeinbergModel)
+    (arithmeticType arithmeticType' : LatticeDatum)
+    (squareCumulant squareCumulant' : ℕ → ℝ)
+    (hν : W.invariants ν = hweCodingInvariants h arithmeticType squareCumulant)
+    (hν' : W.invariants ν' = hweCodingInvariants h' arithmeticType' squareCumulant')
+    (hmatch : hweCodingInvariants h arithmeticType squareCumulant
+      = hweCodingInvariants h' arithmeticType' squareCumulant') :
+    experiment (W.observe ν) = experiment (W.observe ν') :=
+  W.experiment_factors_through_invariants experiment ν ν' (by rw [hν, hν', hmatch])
+
+/-- **At the balanced locus, symmetry is the invariant that stops separating.**
+
+`q = 1/2` is the unique polymorphic frequency at which the genotype coding is
+sign-symmetric, so it is the unique frequency at which the sign-coupling channel agrees
+with the Gaussian's. This is the precise form of the "coincidence": not that the drift
+degenerates — it does not, `c(1/2) = log 2` — but that the one invariant which does match
+the Gaussian matches it exactly where the jet variance is unusable. -/
+theorem balanced_locus_symmetric_component
+    (h : HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2)
+    (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) :
+    (hweCodingInvariants h arithmeticType squareCumulant).symmetric ∧
+      (hweCodingInvariants h arithmeticType squareCumulant).drift = Real.log 2 ∧
+      (hweCodingInvariants h arithmeticType squareCumulant).jetVariance = 0 := by
+  refine ⟨hhalf, ?_, ?_⟩
+  · show hweMellinDrift h.altFreq = Real.log 2
+    rw [hhalf]
+    exact hweMellinDrift_half
+  · show hweMellinJetVariance h.altFreq = 0
+    rw [hhalf]
+    exact hweMellinJetVariance_half
+
+/-- **Drift separation at the balanced locus, conditional on a sharper Gaussian
+constant.**
+
+`c(1/2) = log 2 = 0.69315` and `c_G = 2 - gamma - log 2 = 0.72964` differ, so the drift
+does separate a balanced hard-called locus from its Gaussian surrogate. But this is *not*
+currently provable from `condensationConstant_bounds`, which gives only
+`0.640 < c_G < 0.807` — an interval that straddles `log 2`. The separation is therefore
+stated with the missing numeric input as a named hypothesis rather than asserted.
+
+Sharpening `condensationConstant_bounds` to exclude `log 2` lives in
+`Calibrator.Condensation` and would discharge `hsharp` outright. Until then, the claim
+made in prose at `hweMellinDrift_half` — that the balanced locus is already separated by
+drift — is an arithmetic fact that this development does not yet prove. -/
+theorem balanced_locus_drift_separates
+    (hsharp : (0.72 : ℝ) < condensationConstant) :
+    hweMellinDrift (1 / 2) ≠ condensationConstant := by
+  rw [hweMellinDrift_half]
+  have hl2 : Real.log 2 < (0.6931471808 : ℝ) := Real.log_two_lt_d9
+  intro hEq
+  rw [hEq] at hl2
+  linarith
 
 /-!
 ## 5. Where each earlier module now sits

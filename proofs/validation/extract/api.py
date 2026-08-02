@@ -41,9 +41,18 @@ Definition fields (see also defs.json, which is this table serialised):
     fields          list   structures only: [{"name","type"}]
     mentioned_by    list   fully-qualified names of theorems mentioning this def
     constraints     dict   mined domain/range facts:
-                             hypotheses     [str]  Lean hypothesis source from the
-                                                   theorems that mention it, e.g.
-                                                   ["0 < Ne", "H_S ≤ H_T"]
+                             hypotheses     [str]  UNION of the hypotheses of every
+                                                   theorem mentioning this def.  NOT a
+                                                   domain -- do not read it as a
+                                                   conjunction.  coalFst carries
+                                                   "100 * Ne < t" from one asymptotic
+                                                   lemma; conjoining it would discard
+                                                   almost every sensible F_ST point.
+                             hypotheses_by_theorem
+                                            dict   {theorem_name: [hypothesis, ...]}.
+                                                   THIS is what a check should enforce:
+                                                   the preconditions of the one theorem
+                                                   whose claim is being tested.
                              range_lo/hi    float  bound PROVED by a theorem
                              range_lo_thm   [thm_name, n_hypotheses_of_that_thm]
                              range_hi_thm   [thm_name, n_hypotheses_of_that_thm]
@@ -189,15 +198,21 @@ def admissible_box(name: str):
     return admissible.box_for(definition(name))
 
 
-def hypotheses(name: str):
+def hypotheses(name: str, theorem: str | None = None):
     """(enforceable_predicates, their_source_text, hypotheses_we_could_not_model).
+
+    Pass `theorem` to get ONE theorem's preconditions, which is what a check
+    testing that theorem's claim must run under.  With `theorem=None` you get
+    the union over every mentioning theorem, which is not a domain: read
+    conjunctively it excludes points the corpus considers admissible.  See
+    `definition(name)["constraints"]["hypotheses_by_theorem"]`.
 
     The third element is the honest part: if it is non-empty, a point drawn from
     the box may be inadmissible, and a violation found there is a lead, not a
     verdict.
     """
     import admissible
-    return admissible.hypothesis_predicates(definition(name))
+    return admissible.hypothesis_predicates(definition(name), theorem)
 
 
 # ------------------------------------------------------------ provenance

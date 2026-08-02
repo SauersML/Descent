@@ -273,16 +273,16 @@ def admixtureLDAtGen(alpha, p_A, q_A, p_B, q_B, r, g):
 def admixtureLDMagnitude(alpha, p_A, p_B, r, g):
     return (((alpha * ((1.0 - alpha))) * _rt.lpow(((p_A - p_B)), 2.0)) * _rt.lpow(((1.0 - r)), g))
 
-def scoreMean(dgp):
+def Calibrator_HWEPolygenicScoreDGP_scoreMean(dgp):
     return _rt._proj(_rt._proj(dgp, 'scoreModel'), 'scoreMean')
 
-def scoreVariance(dgp):
+def Calibrator_HWEPolygenicScoreDGP_scoreVariance(dgp):
     return _rt._proj(_rt._proj(dgp, 'scoreModel'), 'scoreVariance')
 
 def scoreApproximationError(dgp):
     return _rt._proj(_rt._proj(dgp, 'scoreModel'), 'berryEsseenErrorBound')(_rt._proj(dgp, 'berryEsseenConstant'))
 
-def sigmaTagCausalSource(mom):
+def Calibrator_SourceTaggedMoments_sigmaTagCausalSource(mom):
     return (_rt._proj(mom, 'directCausalSource') + _rt._proj(mom, 'proxyTaggingSource'))
 
 def r2FromMSE(mse, varY):
@@ -330,13 +330,13 @@ def measureBias(μ, Y, S):
 def trueExp(hdgp):
     return (lambda p, c: ((_rt._proj(hdgp, 'alpha')(c) * p) + _rt._proj(hdgp, 'baseline')(c)))
 
-def tau(p):
+def Calibrator_EvolutionaryParameters_tau(p):
     return _rt.rdiv(_rt._proj(p, 't_div'), ((2.0 * _rt._proj(p, 'Ne'))))
 
-def theta(p):
+def Calibrator_EvolutionaryParameters_theta(p):
     return ((4.0 * _rt._proj(p, 'Ne')) * _rt._proj(p, 'mu'))
 
-def bigM(p):
+def Calibrator_EvolutionaryParameters_bigM(p):
     return ((4.0 * _rt._proj(p, 'Ne')) * _rt._proj(p, 'mig'))
 
 def fstDriftMutation(p):
@@ -348,7 +348,7 @@ def fstDriftMigration(p):
 def fstDriftFlowStep(p, F):
     return ((F + _rt.rdiv(((1.0 - F)), ((2.0 * _rt._proj(p, 'Ne'))))) - ((2.0 * ((_rt._proj(p, 'mig') + _rt._proj(p, 'mu')))) * F))
 
-def fstEquilibrium(p):
+def Calibrator_fstEquilibrium(p):
     return _rt.rdiv(1.0, (((1.0 + _rt._proj(p, 'theta')) + _rt._proj(p, 'bigM'))))
 
 def sharedLDRetention(p):
@@ -363,7 +363,7 @@ def migrationLDBoost(p):
 def toEvo(m):
     return _rt._proj(m, 'toEvolutionaryParameters')
 
-def hetDecayFactor(m):
+def Calibrator_PGSEvolutionaryModel_hetDecayFactor(m):
     return (((1.0 - _rt.rdiv(1.0, ((2.0 * _rt._proj(m, 'Ne')))))) * ((1.0 - _rt.rdiv(_rt._proj(m, 'theta'), ((2.0 * _rt._proj(m, 'Ne')))))))
 
 def ldRetention(m):
@@ -400,6 +400,9 @@ def alleleFreqDivergenceRate(Ne, mu, m_rate):
 
 def ldBreakageRate(r):
     return (2.0 * r)
+
+def contrastSpikeLevel(p_1, p_2):
+    return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), ((meanAlleleFreq(p_1, p_2) * ((1.0 - meanAlleleFreq(p_1, p_2))))))
 
 def demoSteppingStoneFst(d, Ne, m, σ_sq):
     return _rt.rdiv(d, ((d + (((4.0 * Ne) * m) * σ_sq))))
@@ -605,6 +608,12 @@ def ldWhiteningGain(decay):
 def ldPrecisionTrace(decay, nSites):
     return _rt.rdiv(((((nSites) * ((1.0 + _rt.lpow(decay, 2.0)))) - (2.0 * _rt.lpow(decay, 2.0)))), ((1.0 - _rt.lpow(decay, 2.0))))
 
+def adjacentBoundarySeparation(d):
+    if d == 0:
+        return 1.0
+    d = d - 1     # the `n + 1` pattern
+    return d
+
 def alleleLossProbability(initial, time):
     return _rt.rexp(((-(_rt.rdiv(initial, ((2.0 * time)))))))
 
@@ -665,6 +674,12 @@ def driftLDRetention(Ne, c):
 def driftLDEquilibrium(Ne, c):
     return _rt.rdiv((_rt.lpow(((1.0 - c)), 2.0) * (_rt.rdiv(1.0, ((2.0 * Ne))))), ((1.0 - driftLDRetention(Ne, c))))
 
+def driftLDTrajectory(Ne, c, Q_0, t):
+    _prev = Q_0
+    for _ in range(int(t)):
+        _prev = driftLDStep(Ne, c, (_prev))
+    return _prev
+
 def ldMismatchFrobenius(Sig_S, Sig_T):
     return frobeniusNormSq(((Sig_S - Sig_T)))
 
@@ -679,6 +694,12 @@ def ldHalfLife(Ne):
 
 def ldRetainedFraction(Ne, t):
     return _rt.lpow(((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))), t)
+
+def ldRecurrence(r, D_0, t):
+    _prev = D_0
+    for _ in range(int(t)):
+        _prev = (((1.0 - r)) * _prev)
+    return _prev
 
 def expanderAgreementFloor():
     return (_rt.rdiv(1.0, 2.0) - _rt.rdiv(_rt.rsqrt(5.0), 6.0))
@@ -893,25 +914,25 @@ def prevalenceLogit(pi):
 def prevalenceCITLShift(pi_source, pi_target):
     return (prevalenceLogit(pi_target) - prevalenceLogit(pi_source))
 
-def observedMeanShift(m):
+def Calibrator_CrossPopulationCalibrationShiftModel_observedMeanShift(m):
     return ((_rt._proj(m, 'prevalenceShift') + _rt._proj(m, 'environmentalObservedShift')) + _rt._proj(m, 'geneticObservedShift'))
 
 def predictedMeanShift(m):
     return (_rt._proj(m, 'scoreMeanShift') + _rt._proj(m, 'deploymentInterceptShift'))
 
-def targetObservedMean(m):
+def Calibrator_CrossPopulationCalibrationShiftModel_targetObservedMean(m):
     return (_rt._proj(m, 'sourceObservedMean') + _rt._proj(m, 'observedMeanShift'))
 
-def targetPredictedMean(m):
+def Calibrator_CrossPopulationCalibrationShiftModel_targetPredictedMean(m):
     return (_rt._proj(m, 'sourcePredictedMean') + _rt._proj(m, 'predictedMeanShift'))
 
 def targetCalibrationMoments(m):
     return _rt._proj(_rt._proj(m, 'sourceCalibrationMoments'), 'shifted')(_rt._proj(m, 'observedMeanShift'), _rt._proj(m, 'predictedMeanShift'), _rt._proj(m, 'targetSlope'))
 
-def sourceCalibrationProfile(m, link):
+def Calibrator_CrossPopulationCalibrationShiftModel_sourceCalibrationProfile(m, link):
     return _rt._proj(_rt._proj(m, 'sourceCalibrationMoments'), 'toProfile')(link)
 
-def targetCalibrationProfile(m, link):
+def Calibrator_CrossPopulationCalibrationShiftModel_targetCalibrationProfile(m, link):
     return _rt._proj(_rt._proj(m, 'targetCalibrationMoments'), 'toProfile')(link)
 
 def Calibrator_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m):
@@ -1058,7 +1079,7 @@ def pgsDiffVariance_two_pop(V_A, fst):
 def expectedPGSDiffVariance(V_A, fst):
     return ((V_A * 2.0) * fst)
 
-def effectCorrelationStabilizing(d, s, N):
+def Calibrator_effectCorrelationStabilizing(d, s, N):
     return (1.0 - _rt.rdiv(d, ((1.0 + (s * N)))))
 
 def effectCorrelationFluctuating(d, f, N):
@@ -1188,8 +1209,20 @@ def effectiveMigration(m_1_2, m_2_1):
 def ldCorrelationFromMigration(M):
     return _rt.rdiv(_rt.lpow(M, 2.0), _rt.lpow(((1.0 + M)), 2.0))
 
+def hetRecurrence(Ne, H_0, t):
+    _prev = H_0
+    for _ in range(int(t)):
+        _prev = (((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))) * _prev)
+    return _prev
+
 def fstDerived(Ne, t):
     return (1.0 - _rt.lpow(((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))), t))
+
+def hetMutationDriftRecurrence(Ne, mu, H_0, t):
+    _prev = H_0
+    for _ in range(int(t)):
+        _prev = ((((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))) * _prev) + ((2.0 * mu) * ((1.0 - _prev))))
+    return _prev
 
 def hetEquilibrium(Ne, mu):
     return _rt.rdiv(((4.0 * Ne) * mu), ((1.0 + ((4.0 * Ne) * mu))))
@@ -1197,11 +1230,17 @@ def hetEquilibrium(Ne, mu):
 def Calibrator_hetDecayFactor(Ne, θ):
     return (((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))) * ((1.0 - _rt.rdiv(θ, ((2.0 * Ne))))))
 
+def hetMutationRecurrence(lam, Hstar, H_0, t):
+    _prev = H_0
+    for _ in range(int(t)):
+        _prev = ((lam * _prev) + (((1.0 - lam)) * Hstar))
+    return _prev
+
 def fstFromHetRatio(H, H_0):
     return (1.0 - _rt.rdiv(H, H_0))
 
 def fstMutationDriftTransientDiscrete(θ, Ne, t):
-    return (fstMutationDriftEquilibrium(θ) * ((1.0 - _rt.lpow(hetDecayFactor(Ne, θ), t))))
+    return (fstMutationDriftEquilibrium(θ) * ((1.0 - _rt.lpow(Calibrator_hetDecayFactor(Ne, θ), t))))
 
 def neutralPortability(r2_0, fst):
     return (r2_0 * _rt.rmax(0.0, ((1.0 - (2.0 * fst)))))
@@ -1268,6 +1307,12 @@ def twoDemeIMEquilibriumDelta(M):
 
 def hetStepWithMutation(Ne, mu, H):
     return ((((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))) * H) + ((2.0 * mu) * ((1.0 - H))))
+
+def hetTrajectory(Ne, mu, H_0, t):
+    _prev = H_0
+    for _ in range(int(t)):
+        _prev = hetStepWithMutation(Ne, mu, (_prev))
+    return _prev
 
 def hetMutationFloor(Ne, mu):
     return _rt.rdiv(((4.0 * Ne) * mu), ((1.0 + ((4.0 * Ne) * mu))))
@@ -1578,7 +1623,7 @@ def ibdFlowStep(Ne, rate, F):
 def Calibrator_MutationDriftModelAssumptions_fstEquilibrium(m):
     return _rt.rdiv(1.0, ((1.0 + _rt._proj(m, 'theta'))))
 
-def fstTransient(m):
+def Calibrator_MutationDriftModelAssumptions_fstTransient(m):
     return (_rt._proj(m, 'fstEquilibrium') * ((1.0 - _rt.rexp((_rt.rdiv(((-((1.0 + _rt._proj(m, 'theta')))) * _rt._proj(m, 't')), ((2.0 * _rt._proj(m, 'Ne')))))))))
 
 def covarianceRetention(freq_corr, ld_overlap):
@@ -1609,11 +1654,17 @@ def neutralAFSharedLDBenchmarkRatio(fstSource, fstTarget, shared_ld_source, shar
 def fstMigrationDriftEquilibrium(Ne, m):
     return _rt.rdiv(1.0, ((1.0 + ((4.0 * Ne) * m))))
 
+def ibdRecurrenceStep(Ne, rate, x):
+    return (_rt.lpow(((1.0 - rate)), 2.0) * ((_rt.rdiv(1.0, ((2.0 * Ne))) + (((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))) * x))))
+
+def ibdRecurrenceFixedPoint(Ne, rate):
+    return _rt.rdiv(_rt.lpow(((1.0 - rate)), 2.0), ((_rt.lpow(((1.0 - rate)), 2.0) + (((2.0 * Ne) * rate) * ((2.0 - rate))))))
+
 def islandFstMultiplicativeStep(Ne, m, F):
-    return (_rt.lpow(((1.0 - m)), 2.0) * ((_rt.rdiv(1.0, ((2.0 * Ne))) + (((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))) * F))))
+    return ibdRecurrenceStep(Ne, m, F)
 
 def fstIslandMultiplicativeEquilibrium(Ne, m):
-    return _rt.rdiv(_rt.lpow(((1.0 - m)), 2.0), ((_rt.lpow(((1.0 - m)), 2.0) + (((2.0 * Ne) * m) * ((2.0 - m))))))
+    return ibdRecurrenceFixedPoint(Ne, m)
 
 def scaledMigrationRate(Ne, m):
     return ((4.0 * Ne) * m)
@@ -1693,13 +1744,13 @@ def refFreq(h):
 def centeredAltAlleleCount(h, g):
     return (altAlleleCount(g) - _rt._proj(h, 'expectedAltAlleleCount'))
 
-def berryEsseenErrorBound(berryEsseenConstant, variance, thirdMomentSum):
+def Calibrator_berryEsseenErrorBound(berryEsseenConstant, variance, thirdMomentSum):
     return _rt.rdiv((berryEsseenConstant * thirdMomentSum), ((variance * _rt.rsqrt(variance))))
 
-def aucApproximationInterval(aucGaussian, epsilon):
+def Calibrator_aucApproximationInterval(aucGaussian, epsilon):
     return approximationInterval(aucGaussian, epsilon)
 
-def r2ApproximationInterval(r2Gaussian, epsilon):
+def Calibrator_r2ApproximationInterval(r2Gaussian, epsilon):
     return approximationInterval(r2Gaussian, epsilon)
 
 def latentLiability(s, e):
@@ -1779,9 +1830,6 @@ def equilibriumEffectVariance(v_mutation, s):
 
 def effectVarianceRecurrence(V, v_mut, s):
     return ((((1.0 - s)) * V) + v_mut)
-
-def Calibrator_effectCorrelationStabilizing(Ns):
-    return (1.0 - _rt.rdiv(1.0, ((2.0 * Ns))))
 
 def fluctuatingEffectCorrelation(t, τ):
     return _rt.rexp((_rt.rdiv((-t), τ)))

@@ -83,10 +83,11 @@ HARD_STOP = {
 
 
 class Tok:
-    __slots__ = ("kind", "text", "line", "col")
+    __slots__ = ("kind", "text", "line", "col", "col_off")
 
-    def __init__(self, kind, text, line, col):
+    def __init__(self, kind, text, line, col, col_off=0):
         self.kind, self.text, self.line, self.col = kind, text, line, col
+        self.col_off = col_off          # absolute offset in the source string
 
     def __repr__(self):
         return f"{self.kind}:{self.text}"
@@ -107,7 +108,7 @@ def tokenize(src: str):
             continue
         if kind == "other":
             raise Untranslatable(f"unrecognised character {text!r}")
-        toks.append(Tok(kind, text, line, col))
+        toks.append(Tok(kind, text, line, col, m.start()))
         col += len(text)
     return toks
 
@@ -115,11 +116,22 @@ def tokenize(src: str):
 # ------------------------------------------------------------------ parser
 
 class Parser:
-    def __init__(self, toks, struct_args):
+    def __init__(self, toks, struct_args, locals_=(), resolver=None):
         self.t = toks
         self.i = 0
         self.stop_cols = []            # layout barriers introduced by `let`
         self.struct_args = struct_args  # names bound to structures/tuples
+        self.locals = set(locals_)      # binders: never a cross-definition call
+        self.resolver = resolver        # (short, n_args) -> python name, or None
+
+    def _dep(self, x, nargs):
+        """Resolve a `_DEP:` marker now that its application arity is known."""
+        if not isinstance(x, str) or not x.startswith("_DEP:"):
+            return x
+        short = x[5:]
+        if self.resolver is None:
+            return pyname(short)
+        return self.resolver(short, nargs)
 
     def peek(self, k=0):
         j = self.i + k
@@ -201,18 +213,18 @@ class Parser:
                 head = f"_rt.rinv({head})"
                 continue
             if p.kind in ("ident", "num") or p.text in ("(", "-", "↑", "|"):
-                args.append(self.atom())
+                args.append(self._dep(self.atom(), 0))
                 continue
             break
         if not args:
-            return head
+            return self._dep(head, 0)
         if head.startswith("_FN:"):
             fn, arity = head[4:].split("|")
             arity = int(arity)
             if len(args) != arity:
                 raise Untranslatable(f"arity mismatch for {fn}: got {len(args)}")
             return f"{fn}({', '.join(args)})"
-        return f"{head}({', '.join(args)})"
+        return f"{self._dep(head, len(args))}({', '.join(args)})"
 
     def atom(self):
         p = self.peek()
@@ -283,7 +295,9 @@ class Parser:
                         out = f"_rt._proj({out}, {f!r})"
                     return out
                 raise Untranslatable(f"qualified name {name}")
-            return pyname(name)
+            if name in self.locals:
+                return pyname(name)
+            return f"_DEP:{name}"
         raise Untranslatable(f"unsupported token {p.text!r}")
 
     def let_tail(self):
@@ -295,13 +309,13 @@ class Parser:
 LET_RE = re.compile(r"^(\s*)let\s+([A-Za-z_][\w'₀-₉ₐ-ₜ]*)\s*(?::[^:=]*)?:=\s*(.*)$")
 
 
-def translate_body(body: str, struct_args=()):
+def translate_body(body: str, struct_args=(), locals_=(), resolver=None):
     """Translate a Lean body into (statements, return_expression)."""
     toks = tokenize(body)
     if not toks:
         raise Untranslatable("empty body")
     stmts = []
-    p = Parser(toks, set(struct_args))
+    p = Parser(toks, set(struct_args), locals_, resolver)
     while p.at("let"):
         letcol = p.peek().col
         p.next()
@@ -315,21 +329,114 @@ def translate_body(body: str, struct_args=()):
         p.stop_cols.append(letcol)
         val = p.expr()
         p.stop_cols.pop()
-        stmts.append(f"{pyname(name_tok.text)} = {val}")
+        stmts.append(f"{pyname(name_tok.text)} = {p._dep(val, 0)}")
+        p.locals.add(name_tok.text)          # let-bound: shadows any definition
         if p.at(";"):
             p.next()
-    ret = p.expr()
+    ret = p._dep(p.expr(), 0)
     if p.peek() is not None:
         raise Untranslatable(f"trailing tokens after expression: {p.peek()!r}")
     return stmts, ret
 
 
-def translate_def(d, struct_arg_names=(), fname=None):
-    """Return (python_source, argnames) or raise Untranslatable."""
+def translate_recursion(d, struct_arg_names=(), fname=None, resolver=None):
+    """Compile a two-branch `ℕ`-recursion into an iteration, or refuse.
+
+        def f (a b : ℝ) : ℕ → ℝ
+          | 0     => <base>
+          | t + 1 => <step mentioning `f a b t` exactly once>
+
+    becomes a loop carrying the previous value.  This is only sound when the
+    recursion is a simple iteration: the step may use the recursive value but
+    NOT the index `t` itself, and may recurse only on `t`.  Anything else --
+    a step that reads `t`, a call on `t - 1` or on different arguments, more
+    than two branches -- is refused, because it is a different computation.
+    """
+    eqs = d.get("equations") or []
+    if len(eqs) != 2:
+        raise Untranslatable(f"recursion with {len(eqs)} branches, expected 2")
+    base_eq = next((e for e in eqs if e["pattern"].strip() in ("0", "Nat.zero")), None)
+    step_eq = next((e for e in eqs if e is not base_eq), None)
+    if base_eq is None or step_eq is None:
+        raise Untranslatable("recursion has no `0` branch")
+    m = re.match(r"^([A-Za-z_][\w'₀-₉]*)\s*\+\s*1$", step_eq["pattern"].strip())
+    if not m:
+        raise Untranslatable(f"step pattern {step_eq['pattern']!r} is not `n + 1`")
+    var = m.group(1)
+
+    explicit = [n for a in d["args"] if not a["implicit"] for n in a["names"]]
+    short = d["short"]
+    toks = tokenize(step_eq["rhs"])
+    want = [short] + explicit + [var]
+    hits = [i for i in range(len(toks) - len(want) + 1)
+            if [t.text for t in toks[i:i + len(want)]] == want]
+    # Every occurrence must be the SAME call `f <same args> t`, so they all
+    # denote one value; a call on other arguments would be a different function.
+    step_src, cut = "", 0
+    for i in hits:
+        step_src += step_eq["rhs"][cut:toks[i].col_off] + " _prev "
+        last = toks[i + len(want) - 1]
+        cut = last.col_off + len(last.text)
+    step_src += step_eq["rhs"][cut:]
+
+    if not hits:
+        # No recursive call: the step is a closed formula in the predecessor
+        # index, so this is a case split rather than an iteration.
+        if re.search(rf"(?<![\w'])({re.escape(short)})(?![\w'])", step_eq["rhs"]):
+            raise Untranslatable("recursive call is not of the expected shape")
+        binders0 = [n for a in d["args"] for n in a["names"]] + [var]
+        b_stmts, b_ret = translate_body(base_eq["rhs"], struct_arg_names,
+                                        binders0, resolver)
+        s_stmts, s_ret = translate_body(step_eq["rhs"], struct_arg_names,
+                                        binders0, resolver)
+        args0 = [pyname(n) for n in explicit] + [pyname(var)]
+        out = [f"def {fname or pyname(short)}({', '.join(args0)}):"]
+        out += [f"    {st}" for st in b_stmts]
+        out.append(f"    if {pyname(var)} == 0:")
+        out.append(f"        return {b_ret}")
+        out.append(f"    {pyname(var)} = {pyname(var)} - 1     # the `n + 1` pattern")
+        out += [f"    {st}" for st in s_stmts]
+        out.append(f"    return {s_ret}")
+        return "\n".join(out), args0
+
+    if re.search(rf"(?<![\w'])(?:{re.escape(var)})(?![\w'])", step_src):
+        raise Untranslatable(
+            f"step uses the index {var!r} outside the recursive call; "
+            "not a simple iteration")
+
+    binders = [n for a in d["args"] for n in a["names"]] + ["_prev"]
+    b_stmts, b_ret = translate_body(base_eq["rhs"], struct_arg_names,
+                                    binders, resolver)
+    s_stmts, s_ret = translate_body(step_src, struct_arg_names, binders, resolver)
+    args = [pyname(n) for n in explicit] + [pyname(var)]
+    lines = [f"def {fname or pyname(short)}({', '.join(args)}):"]
+    for st in b_stmts:
+        lines.append(f"    {st}")
+    lines.append(f"    _prev = {b_ret}")
+    lines.append(f"    for _ in range(int({pyname(var)})):")
+    for st in s_stmts:
+        lines.append(f"        {st}")
+    lines.append(f"        _prev = {s_ret}")
+    lines.append("    return _prev")
+    return "\n".join(lines), args
+
+
+def translate_def(d, struct_arg_names=(), fname=None, resolver=None):
+    """Return (python_source, argnames) or raise Untranslatable.
+
+    `resolver(short, n_args) -> python_name` decides which definition an
+    unqualified call refers to.  Lean resolves such a call by namespace and by
+    type; we approximate with file/namespace locality plus arity, and REFUSE
+    rather than pick when that is not decisive -- a silently wrong pick produces
+    a callable that computes a different function than the Lean says.
+    """
+    if d.get("equations"):
+        return translate_recursion(d, struct_arg_names, fname, resolver)
     argnames = [pyname(n) for a in d["args"] if not a["implicit"] for n in a["names"]]
     if not argnames and not d["body"].strip():
         raise Untranslatable("no explicit arguments and no body")
-    stmts, ret = translate_body(d["body"], struct_arg_names)
+    binders = [n for a in d["args"] for n in a["names"]]      # incl. implicit
+    stmts, ret = translate_body(d["body"], struct_arg_names, binders, resolver)
     lines = [f"def {fname or pyname(d['short'])}({', '.join(argnames)}):"]
     for s in stmts:
         lines.append(f"    {s}")

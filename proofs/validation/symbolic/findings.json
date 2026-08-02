@@ -20,24 +20,11 @@
    }
   }
  ],
- "Calibrator.DriftRegime.mutationDriftBalance": [
-  {
-   "check": "check1_fixed_point",
-   "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
-   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-   "line": 106,
-   "detail": {
-    "claimed": null,
-    "claimed_opaque": "non-closed-form construct: fun"
-   }
-  }
- ],
  "Calibrator.EpistaticChaos.InLinkageEquilibrium": [
   {
    "check": "check1_fixed_point",
    "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
+   "status": "no_fixed_point_theorem",
    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
    "line": 821,
    "detail": {
@@ -50,9 +37,9 @@
   {
    "check": "check1_fixed_point",
    "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
+   "status": "no_fixed_point_theorem",
    "file": "/Users/user/gnomon/proofs/Calibrator/ImitationRigidity.lean",
-   "line": 974,
+   "line": 1046,
    "detail": {
     "claimed": null,
     "claimed_opaque": "non-closed-form construct: ∑"
@@ -63,7 +50,7 @@
   {
    "check": "check1_fixed_point",
    "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
+   "status": "no_fixed_point_theorem",
    "file": "/Users/user/gnomon/proofs/Calibrator/LocalToGlobalCoherence.lean",
    "line": 93,
    "detail": {
@@ -75,7 +62,7 @@
   {
    "check": "check1_fixed_point",
    "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
+   "status": "no_fixed_point_theorem",
    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
    "line": 247,
    "detail": {
@@ -97,7 +84,7 @@
   {
    "check": "check1_fixed_point",
    "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
+   "status": "no_fixed_point_theorem",
    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
    "line": 469,
    "detail": {
@@ -109,7 +96,7 @@
   {
    "check": "check1_fixed_point",
    "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
+   "status": "no_fixed_point_theorem",
    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
    "line": 867,
    "detail": {
@@ -121,7 +108,7 @@
   {
    "check": "check1_fixed_point",
    "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
+   "status": "no_fixed_point_theorem",
    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
    "line": 1199,
    "detail": {
@@ -140,18 +127,6 @@
     "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
     "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence"
    ]
-  }
- ],
- "Calibrator.PortabilityDrift.expectedSqMeanPGSDiff_IMEquilibrium": [
-  {
-   "check": "check1_fixed_point",
-   "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
-   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 3998,
-   "detail": {
-    "claimed": "4*V_A/(2*M + 1)"
-   }
   }
  ],
  "Calibrator.PortabilityDrift.MutationDriftModelAssumptions.fstEquilibrium": [
@@ -178,7 +153,7 @@
   {
    "check": "check1_fixed_point",
    "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
+   "status": "no_fixed_point_theorem",
    "file": "/Users/user/gnomon/proofs/Calibrator/QuadraticShift.lean",
    "line": 131,
    "detail": {
@@ -191,7 +166,7 @@
   {
    "check": "check1_fixed_point",
    "severity": "gap",
-   "status": "UNGUARDED_NO_MAP",
+   "status": "no_fixed_point_theorem",
    "file": "/Users/user/gnomon/proofs/Calibrator/SelectionArchitecture.lean",
    "line": 44,
    "detail": {
@@ -478,7 +453,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-   "line": 165,
+   "line": 197,
    "expression": "x0*x1",
    "other_members": [
     "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
@@ -497,7 +472,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-   "line": 165,
+   "line": 197,
    "this_expr": "x0*x1",
    "other": "Calibrator.PortabilityDrift.targetHetFromFst",
    "other_expr": "x0*(1 - x1)"
@@ -509,7 +484,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-   "line": 168,
+   "line": 204,
    "expression": "x0*x1",
    "other_members": [
     "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
@@ -528,7 +503,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-   "line": 168,
+   "line": 204,
    "this_expr": "x0*x1",
    "other": "Calibrator.PortabilityDrift.targetPGSVariance",
    "other_expr": "x0*(1 - x1)"
@@ -693,7 +668,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5002,
+   "line": 5098,
    "expression": "1/(4*x0*x1 + 1)",
    "other_members": [
     "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
@@ -709,7 +684,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5208,
+   "line": 5304,
    "expression": "1/(4*x0*x1 + 1)",
    "other_members": [
     "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
@@ -1478,7 +1453,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5043,
+   "line": 5139,
    "expression": "x0/2 + x1/2",
    "other_members": [
     "Calibrator.Conventions.meanAlleleFreq",
@@ -1505,7 +1480,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/ImitationRigidity.lean",
-   "line": 262,
+   "line": 334,
    "expression": "(x0 - x1)**2/4",
    "other_members": [
     "Calibrator.Conventions.betweenSubgroupVariance"
@@ -1639,7 +1614,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5064,
+   "line": 5160,
    "expression": "(1 - x0)**x1",
    "other_members": [
     "Calibrator.Conventions.geometricDecay",
@@ -1908,7 +1883,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-   "line": 159,
+   "line": 182,
    "expression": "(1 - 1/(2*x0))**x1",
    "other_members": [
     "Calibrator.LDDecayTheory.ldRetainedFraction",
@@ -1950,7 +1925,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-   "line": 162,
+   "line": 194,
    "expression": "1 - x0",
    "other_members": [
     "Calibrator.PhenomeWidePortability.fstFromDriftFactor",
@@ -2002,7 +1977,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-   "line": 227,
+   "line": 274,
    "expression": "(1 - x1)/(1 - x0)",
    "other_members": [
     "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio"
@@ -2013,7 +1988,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-   "line": 227,
+   "line": 274,
    "this_expr": "(1 - x1)/(1 - x0)",
    "other": "Calibrator.DriftRegime.benchmarkRatioSquared",
    "other_expr": "(1 - x1)**2/(1 - x0)**2"
@@ -2353,6 +2328,21 @@
    "line": 263,
    "expression": "(1 - x1)**2*(x2*(1 - 1/(2*x0)) + 1/(2*x0))",
    "other_members": [
+    "Calibrator.PortabilityDrift.ibdRecurrenceStep",
+    "Calibrator.PortabilityDrift.islandFstMultiplicativeStep"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.ibdRecurrenceStep": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4607,
+   "expression": "(1 - x1)**2*(x2*(1 - 1/(2*x0)) + 1/(2*x0))",
+   "other_members": [
+    "Calibrator.LDDecayTheory.driftLDStep",
     "Calibrator.PortabilityDrift.islandFstMultiplicativeStep"
    ]
   }
@@ -2363,10 +2353,11 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 4602,
+   "line": 4710,
    "expression": "(1 - x1)**2*(x2*(1 - 1/(2*x0)) + 1/(2*x0))",
    "other_members": [
-    "Calibrator.LDDecayTheory.driftLDStep"
+    "Calibrator.LDDecayTheory.driftLDStep",
+    "Calibrator.PortabilityDrift.ibdRecurrenceStep"
    ]
   }
  ],
@@ -2379,6 +2370,7 @@
    "line": 300,
    "expression": "(1 - x1)**2/(2*x0*(-(1 - 1/(2*x0))*(1 - x1)**2 + 1))",
    "other_members": [
+    "Calibrator.PortabilityDrift.ibdRecurrenceFixedPoint",
     "Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium"
    ]
   },
@@ -2393,16 +2385,31 @@
    "other_expr": "(1 - 1/(2*x0))*(1 - x1)**2"
   }
  ],
+ "Calibrator.PortabilityDrift.ibdRecurrenceFixedPoint": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4620,
+   "expression": "(1 - x1)**2/(2*x0*(-(1 - 1/(2*x0))*(1 - x1)**2 + 1))",
+   "other_members": [
+    "Calibrator.LDDecayTheory.driftLDEquilibrium",
+    "Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium"
+   ]
+  }
+ ],
  "Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium": [
   {
    "check": "check3_duplicate_body",
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 4613,
+   "line": 4727,
    "expression": "(1 - x1)**2/(2*x0*(-(1 - 1/(2*x0))*(1 - x1)**2 + 1))",
    "other_members": [
-    "Calibrator.LDDecayTheory.driftLDEquilibrium"
+    "Calibrator.LDDecayTheory.driftLDEquilibrium",
+    "Calibrator.PortabilityDrift.ibdRecurrenceFixedPoint"
    ]
   }
  ],
@@ -2467,7 +2474,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 4870,
+   "line": 4966,
    "expression": "x0/(x0 + 1)",
    "other_members": [
     "Calibrator.LongitudinalPortability.temporalR2",
@@ -2703,7 +2710,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 4663,
+   "line": 4759,
    "expression": "4*x0*x1",
    "other_members": [
     "Calibrator.PopulationGeneticsFoundations.scaledMutationRate"
@@ -2731,7 +2738,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 4844,
+   "line": 4940,
    "expression": "4*x0*x1/(4*x0*x1 + 1)",
    "other_members": [
     "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
@@ -2744,7 +2751,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 4844,
+   "line": 4940,
    "this_expr": "1 - 1/(4*x0*x1 + 1)",
    "other": "Calibrator.PopulationGeneticsFoundations.sharedLDFractionFromMutation",
    "other_expr": "exp(-x0*x1/2)"
@@ -2756,7 +2763,7 @@
    "severity": "duplicate",
    "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5290,
+   "line": 5386,
    "expression": "4*x0*x1/(4*x0*x1 + 1)",
    "other_members": [
     "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
@@ -2769,7 +2776,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5290,
+   "line": 5386,
    "this_expr": "1 - 1/(4*x0*x1 + 1)",
    "other": "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio",
    "other_expr": "(1 - x1)/(1 - x0)"
@@ -2973,7 +2980,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-   "line": 5111,
+   "line": 5207,
    "this_expr": "(1 - x0)**x1/x2",
    "other": "Calibrator.LDDecayTheory.admixtureLD",
    "other_expr": "x0*x1*x2*(1 - x0)"
@@ -3021,7 +3028,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-   "line": 231,
+   "line": 278,
    "this_expr": "(1 - x1)**2/(1 - x0)**2",
    "other": "Calibrator.DriftRegime.benchmarkRatio",
    "other_expr": "(1 - x1)/(1 - x0)"
@@ -3033,7 +3040,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-   "line": 1355,
+   "line": 1359,
    "this_expr": "8*x0**2 + 2*x0 - 4",
    "other": "Calibrator.EpistaticChaos.circulantSpectrumB",
    "other_expr": "4*x0**2 + 4*x0 - 2"
@@ -3045,7 +3052,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-   "line": 1362,
+   "line": 1366,
    "this_expr": "4*x0**2 + 4*x0 - 2",
    "other": "Calibrator.EpistaticChaos.circulantSpectrumA",
    "other_expr": "8*x0**2 + 2*x0 - 4"
@@ -3061,46 +3068,6 @@
    "this_expr": "x0*exp(-(x1 - x2)**2/(2*x3**2))",
    "other": "Calibrator.LongitudinalPortability.ageDependentR2",
    "other_expr": "x0*exp(-(x1 - x2)**2/(2*x3**2))/(x0*exp(-(x1 - x2)**2/(2*x3**2)) + 1)"
-  },
-  {
-   "check": "check4_unstated_regime",
-   "severity": "unstated_regime",
-   "status": "LINEARISATION_WITHOUT_STATED_REGIME",
-   "detail": {
-    "check": "check4_unstated_regime",
-    "status": "LINEARISATION_WITHOUT_STATED_REGIME",
-    "a": {
-     "fqn": "Calibrator.LongitudinalPortability.ageDependentSignalVariance",
-     "line": 245,
-     "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
-     "expr": "sourceSignalPeak*exp(-(age - age_peak)**2/(2*width**2))",
-     "regime_stated": false
-    },
-    "b": {
-     "fqn": "Calibrator.LongitudinalPortability.ageDependentR2",
-     "line": 275,
-     "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
-     "expr": "sourceSignalPeak*exp(-(age - age_peak)**2/(2*width**2))/(sourceSignalPeak*exp(-(age - age_peak)**2/(2*width**2)) + 1)",
-     "regime_stated": false
-    },
-    "regimes": [
-     {
-      "regime": "sourceSignalPeak -> 0",
-      "ratio_limit": "1",
-      "leading_difference": "-sourceSignalPeak**3*exp(age**2/(2*width**2))*exp(age_peak**2/(2*width**2))*exp(-2*(age - age_peak)**2/width**2)*exp(-age*age_peak/width**2) + sourceSignalPeak**2*exp(-(age - age_peak)**2/width**2)"
-     },
-     {
-      "regime": "age -> infinity",
-      "ratio_limit": "1",
-      "leading_difference": null
-     },
-     {
-      "regime": "age_peak -> infinity",
-      "ratio_limit": "1",
-      "leading_difference": null
-     }
-    ]
-   }
   }
  ],
  "Calibrator.LongitudinalPortability.ageDependentR2": [
@@ -3217,7 +3184,7 @@
    "severity": "disagreement",
    "status": "NAME_MATE_BODIES_DIFFER",
    "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-   "line": 809,
+   "line": 825,
    "this_expr": "2*x0*(1 - x0)*log((2 - 2*x0)/x0)**2 + 2*x0*(1 - x0)*log(2*x0/(1 - x0))**2 + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))**2 - (4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0))))**2",
    "other": "Calibrator.PolygenicSpectroscopy.hweMellinDrift",
    "other_expr": "4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))"
@@ -3257,19 +3224,14 @@
     },
     "regimes": [
      {
-      "regime": "s -> 0",
-      "ratio_limit": "1",
-      "leading_difference": "s**3*(m**2*p**4 + m**2*p**3*(-m*p + p) - m**2*p**3 + m**2*p**2*(-m*p + p)**2 - m**2*p**2*(-m*p + p) - m*p**4 - m*p**3*(-m*p + p) + m*p**3 - m*p**2*(-m*p + p)**2 + m*p**2*(-m*p + p)) + s**2*(-m**2*p**3 - m**2*p**2*(-m*p + p) + m**2*p**2 + m*p**3 + m*p**2*(-m*p + p) - m*p**2) + s*(m**2*p**2 - m*p**2)"
-     },
-     {
-      "regime": "m -> 0",
-      "ratio_limit": "1",
-      "leading_difference": "m**3*(p**4*s**4/((-p*s - 1)**3*(p*s + 1)) + p**4*s**3/((-p*s - 1)**3*(p*s + 1)) + p**3*s**3/((-p*s - 1)**2*(p*s + 1)) + p**3*s**2/((-p*s - 1)**2*(p*s + 1))) + m**2*(-p**3*s**3/((-p*s - 1)**2*(p*s + 1)) - p**3*s**2/((-p*s - 1)**2*(p*s + 1)) - p**2*s**2/((-p*s - 1)*(p*s + 1)) - p**2*s/((-p*s - 1)*(p*s + 1))) + m*(p**2*s**2/((-p*s - 1)*(p*s + 1)) + p**2*s/((-p*s - 1)*(p*s + 1)))"
-     },
-     {
-      "regime": "p -> 0",
-      "ratio_limit": "1",
-      "leading_difference": "p**3*(-m**2*s**3 - m**2*s**2*(-m*s + s) - m**2*s**2 - m**2*s*(-m*s + s) + m*s**3 + m*s**2*(-m*s + s) + m*s**2 + m*s*(-m*s + s)) + p**2*(m**2*s**2 + m**2*s - m*s**2 - m*s)"
+      "regime": "s -> 0, m -> 0",
+      "assignments": {
+       "s": "small",
+       "m": "small"
+      },
+      "agree_to_order": 1,
+      "leading_error_order": 2,
+      "leading_error_coefficient": "m*p**2*s"
      }
     ]
    }

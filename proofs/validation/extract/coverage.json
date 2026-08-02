@@ -143,10 +143,7 @@
    "hypotheses": [
     "0 \u2264 fst",
     "0 \u2264 p0",
-    "p0 \u2264 1",
-    "0 < p0",
-    "p0 < 1",
-    "0 < fst"
+    "p0 \u2264 1"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -401,9 +398,7 @@
    "source_hi": "docstring/name",
    "hypotheses": [
     "0 \u2264 p",
-    "p \u2264 1",
-    "0 < p",
-    "p < 1"
+    "p \u2264 1"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -542,11 +537,7 @@
    "hypotheses": [
     "0 \u2264 p",
     "p \u2264 1",
-    "0 \u2264 r2_ld",
-    "0 < n",
-    "0 < p",
-    "p < 1",
-    "0 < r2_ld"
+    "0 \u2264 r2_ld"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -639,10 +630,7 @@
     "0 < p",
     "p < 1"
    ],
-   "hypotheses_not_enforced": [
-    "p < 1/2",
-    "p < q"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.hweHeterozygosity_pos",
     2
@@ -798,10 +786,48 @@
   "class": "NUMERIC",
   "file": "Calibrator/AssortativeMatingPGS.lean",
   "line": 133,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "mined hypotheses admit no sampled point; constraints: ['r * h2 < 1', 'r * h2 = 0', '0 < V_A', '0 < r']"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0,
+   "hi": null,
+   "quantity": "nonnegative",
+   "source_lo": "theorem",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < V_A",
+    "r * h2 < 1",
+    "0 \u2264 r * h2"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": [
+    "Calibrator.am_variance_finite",
+    3
+   ],
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "V_A": [
+     0.05,
+     3.0
+    ],
+    "r": [
+     0.05,
+     0.999
+    ],
+    "h2": [
+     0.02,
+     0.98
+    ]
+   }
+  },
+  "killed": [
+   "first '*'->'/'",
+   "last '*'->'/'",
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 9
  },
  "Calibrator.amInducedLD": {
   "class": "NUMERIC",
@@ -822,10 +848,7 @@
     "0 < beta_i",
     "0 < beta_j"
    ],
-   "hypotheses_not_enforced": [
-    "0 < c.beta_i",
-    "0 < c.beta_j"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.am_ld_sign",
     5
@@ -1039,10 +1062,9 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 < N",
-    "0 < sigma_sq",
     "0 \u2264 d",
-    "0 < d"
+    "0 < N",
+    "0 < sigma_sq"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -1428,7 +1450,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '.'\")"
+  "reason": "could not compile body: Untranslatable('recursion with 3 branches, expected 2')"
  },
  "Calibrator.proportionMediated": {
   "class": "NUMERIC",
@@ -1725,10 +1747,42 @@
   "class": "NUMERIC",
   "file": "Calibrator/Conclusions.lean",
   "line": 214,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "mined hypotheses admit no sampled point; constraints: ['x > 0', 'x < 0']"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0,
+   "hi": 1,
+   "quantity": null,
+   "source_lo": "theorem",
+   "source_hi": "theorem",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": [
+    "Calibrator.sigmoid_pos",
+    0
+   ],
+   "thm_hi": [
+    "Calibrator.sigmoid_lt_one",
+    0
+   ],
+   "n_points": 40,
+   "box": {
+    "x": [
+     0.05,
+     1.05
+    ]
+   }
+  },
+  "killed": [
+   "first '+'->'-'",
+   "last '+'->'-'",
+   "first '/'->'*'",
+   "last '/'->'*'",
+   "negate body",
+   "literal 1->2"
+  ],
+  "reason": "",
+  "mutants_tried": 6
  },
  "Calibrator.TrueCondProb": {
   "class": "STRUCTURAL",
@@ -1811,9 +1865,7 @@
     "0 < q",
     "q < 1"
    ],
-   "hypotheses_not_enforced": [
-    "bernoulliKLReal \u03b7 q = 0 \u2194 q = \u03b7"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.bernoulliKLReal_nonneg",
     4
@@ -2705,16 +2757,9 @@
     "0 \u2264 alpha",
     "alpha \u2264 1",
     "0 \u2264 r",
-    "r \u2264 1",
-    "p_A \u2260 p_B",
-    "0 < alpha",
-    "alpha < 1",
-    "0 < r",
-    "r < 1"
+    "r \u2264 1"
    ],
-   "hypotheses_not_enforced": [
-    "q_A - q_B = p_A - p_B"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.admixture_ld_nonneg",
     4
@@ -3363,10 +3408,7 @@
    "source_lo": null,
    "source_hi": "theorem",
    "hypotheses": [],
-   "hypotheses_not_enforced": [
-    "(1 : Matrix (Fin p",
-    "targetLinearExcessRisk (1 : Matrix (Fin p"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": [
     "Calibrator.fst_from_tau_lt_one",
@@ -3806,6 +3848,47 @@
   "killed": [],
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
+ "Calibrator.contrastSpikeLevel": {
+  "class": "NUMERIC",
+  "file": "Calibrator/DemographicCapacity.lean",
+  "line": 46,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "F_ST",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [
+    "meanAlleleFreq p\u2081 p\u2082 * (1 - meanAlleleFreq p\u2081 p\u2082"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "p\u2081": [
+     0.02,
+     0.98
+    ],
+    "p\u2082": [
+     0.02,
+     0.98
+    ]
+   }
+  },
+  "killed": [],
+  "reason": "",
+  "violation": {
+   "point": {
+    "p_1": 0.979999,
+    "p_2": 0.020001
+   },
+   "value": 3.6863852544147457,
+   "why": "above 1.0"
+  }
+ },
  "Calibrator.demoSteppingStoneFst": {
   "class": "NUMERIC",
   "file": "Calibrator/DemographicHistory.lean",
@@ -4130,13 +4213,55 @@
   "mutants_tried": 6
  },
  "Calibrator.bottleneckExcessLD": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DemographicHistory.lean",
   "line": 685,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition driftLDTrajectory"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0,
+   "hi": 1.0,
+   "quantity": "F_ST",
+   "source_lo": "theorem",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "1 \u2264 Ne_b",
+    "Ne_b < Ne_stable",
+    "0 < c",
+    "c < 1",
+    "0 < t_b"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": [
+    "Calibrator.bottleneck_excess_ld_pos",
+    5
+   ],
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "Ne_b": [
+     1.0,
+     3.0
+    ],
+    "Ne_stable": [
+     0.05,
+     3.0
+    ],
+    "c": [
+     0.05,
+     0.999
+    ],
+    "t_b": [
+     1.0,
+     20.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 1
  },
  "Calibrator.HeterozygosityTrajectory.measuredLoss": {
   "class": "NOT-EXTRACTABLE",
@@ -4150,7 +4275,7 @@
  "Calibrator.closedPopulation": {
   "class": "STRUCTURAL",
   "file": "Calibrator/DriftRegime.lean",
-  "line": 99,
+  "line": 103,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4159,7 +4284,7 @@
  "Calibrator.mutationDriftBalance": {
   "class": "STRUCTURAL",
   "file": "Calibrator/DriftRegime.lean",
-  "line": 106,
+  "line": 116,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4168,7 +4293,7 @@
  "Calibrator.driftRetention": {
   "class": "NUMERIC",
   "file": "Calibrator/DriftRegime.lean",
-  "line": 159,
+  "line": 182,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -4210,13 +4335,13 @@
  "Calibrator.lossOfRetention": {
   "class": "NUMERIC",
   "file": "Calibrator/DriftRegime.lean",
-  "line": 162,
+  "line": 194,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
    "lo": 0.0,
    "hi": 1.0,
-   "quantity": "heterozygosity",
+   "quantity": "F_ST",
    "source_lo": "docstring/name",
    "source_hi": "docstring/name",
    "hypotheses": [],
@@ -4244,7 +4369,7 @@
  "Calibrator.targetHetOfRetention": {
   "class": "NUMERIC",
   "file": "Calibrator/DriftRegime.lean",
-  "line": 165,
+  "line": 197,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -4283,7 +4408,7 @@
  "Calibrator.targetPgsVarOfRetention": {
   "class": "NUMERIC",
   "file": "Calibrator/DriftRegime.lean",
-  "line": 168,
+  "line": 204,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -4322,7 +4447,7 @@
  "Calibrator.clusterCrossCheck": {
   "class": "STRUCTURAL",
   "file": "Calibrator/DriftRegime.lean",
-  "line": 182,
+  "line": 222,
   "status": "COVERED",
   "check": {
    "kind": "witness/non-witness",
@@ -4334,10 +4459,19 @@
   ],
   "reason": "Prop-valued / set-valued"
  },
+ "Calibrator.crossChecks_blind_to_retention": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/DriftRegime.lean",
+  "line": 244,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable(\"unrecognised character '.'\")"
+ },
  "Calibrator.benchmarkRatio": {
   "class": "NUMERIC",
   "file": "Calibrator/DriftRegime.lean",
-  "line": 227,
+  "line": 274,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -4376,7 +4510,7 @@
  "Calibrator.benchmarkRatioSquared": {
   "class": "NUMERIC",
   "file": "Calibrator/DriftRegime.lean",
-  "line": 231,
+  "line": 278,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -4415,11 +4549,20 @@
  "Calibrator.diagonalDesign": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/DriftRegime.lean",
-  "line": 235,
+  "line": 285,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "self-check: value is not a real number: function (vector- or function-valued)"
+ },
+ "Calibrator.symmetricDesignBlindness": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/DriftRegime.lean",
+  "line": 322,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
  },
  "Calibrator.fisherAverageEffect": {
   "class": "NUMERIC",
@@ -4492,8 +4635,7 @@
     "0 \u2264 p1",
     "p1 \u2264 1",
     "0 \u2264 p2",
-    "p2 \u2264 1",
-    "beta12 \u2260 0"
+    "p2 \u2264 1"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -4703,7 +4845,7 @@
  "Calibrator.fourthCumulantFromMoments": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1225,
+  "line": 1229,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4712,7 +4854,7 @@
  "Calibrator.circulantSpectrumA": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1355,
+  "line": 1359,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4721,7 +4863,7 @@
  "Calibrator.circulantSpectrumB": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1362,
+  "line": 1366,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5454,12 +5596,9 @@
    "quantity": "frequency",
    "source_lo": "theorem",
    "source_hi": "docstring/name",
-   "hypotheses": [
-    "interaction_cis \u2260 interaction_trans"
-   ],
+   "hypotheses": [],
    "hypotheses_not_enforced": [
-    "freq_cis_target * (pred_cis - interaction_cis",
-    "freq_cis_source \u2260 freq_cis_target"
+    "freq_cis_target * (pred_cis - interaction_cis"
    ],
    "thm_lo": [
     "Calibrator.haplotypeTransportBias_pos_of_effects_not_portable",
@@ -5858,7 +5997,7 @@
  "Calibrator.scalarRowResolvent": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 248,
+  "line": 320,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5867,7 +6006,7 @@
  "Calibrator.fairTwoPointVariance": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 262,
+  "line": 334,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -5906,7 +6045,7 @@
  "Calibrator.gramForm": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 312,
+  "line": 384,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5915,7 +6054,7 @@
  "Calibrator.quadForm": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 318,
+  "line": 390,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5924,7 +6063,7 @@
  "Calibrator.VarianceNonneg": {
   "class": "STRUCTURAL",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 323,
+  "line": 395,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5933,7 +6072,7 @@
  "Calibrator.BelowCeiling": {
   "class": "STRUCTURAL",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 475,
+  "line": 547,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5942,7 +6081,7 @@
  "Calibrator.stationaryLDEntry": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 554,
+  "line": 626,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -5984,7 +6123,7 @@
  "Calibrator.markovLDStep": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 573,
+  "line": 645,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5993,7 +6132,7 @@
  "Calibrator.ldKernelSymbol": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 617,
+  "line": 689,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -6002,14 +6141,9 @@
    "quantity": "correlation",
    "source_lo": "theorem",
    "source_hi": "docstring/name",
-   "hypotheses": [
-    "0 \u2264 decay"
-   ],
+   "hypotheses": [],
    "hypotheses_not_enforced": [
-    "|decay| < 1",
-    "LDBandIntegralIdentification decay",
-    "\u2200 i \u2208 S, Real.cos cutAngle \u2264 Real.cos (angle i",
-    "\u2200 i \u2209 S, Real.cos (angle i"
+    "|decay| < 1"
    ],
    "thm_lo": [
     "Calibrator.ldKernelSymbol_pos",
@@ -6042,7 +6176,7 @@
  "Calibrator.ldHardEdge": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 626,
+  "line": 698,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -6080,7 +6214,7 @@
  "Calibrator.ldWhiteningGain": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 636,
+  "line": 708,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -6089,13 +6223,9 @@
    "quantity": "nonnegative",
    "source_lo": "theorem",
    "source_hi": "docstring/name",
-   "hypotheses": [
-    "0 \u2264 decay",
-    "decay < 1"
-   ],
+   "hypotheses": [],
    "hypotheses_not_enforced": [
-    "|decay| < 1",
-    "E.load = ldWhiteningGain decay"
+    "|decay| < 1"
    ],
    "thm_lo": [
     "Calibrator.ldWhiteningGain_ge_one",
@@ -6121,7 +6251,7 @@
  "Calibrator.ldPrecisionTrace": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 796,
+  "line": 868,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -6160,18 +6290,18 @@
   }
  },
  "Calibrator.adjacentBoundarySeparation": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 802,
+  "line": 874,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "expected '|', found op:=>"
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.lossGeometryRisk": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 927,
+  "line": 999,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -6180,7 +6310,7 @@
  "Calibrator.ridgeBalance": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 974,
+  "line": 1046,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -6189,7 +6319,7 @@
  "Calibrator.ridgeSelfConsistentStep": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 996,
+  "line": 1068,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -6198,7 +6328,7 @@
  "Calibrator.alleleLossProbability": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 1146,
+  "line": 1218,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -6207,12 +6337,7 @@
    "quantity": "probability",
    "source_lo": "theorem",
    "source_hi": "theorem",
-   "hypotheses": [
-    "0 \u2264 initial",
-    "0 < time",
-    "time \u2260 0",
-    "0 < initial"
-   ],
+   "hypotheses": [],
    "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.alleleLossProbability_pos",
@@ -6243,7 +6368,7 @@
  "Calibrator.absorptionInformation": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 1151,
+  "line": 1223,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -6252,7 +6377,7 @@
  "Calibrator.absorptionChannelWeight": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 1215,
+  "line": 1287,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -6261,7 +6386,7 @@
  "Calibrator.informationCrossoverTime": {
   "class": "NUMERIC",
   "file": "Calibrator/ImitationRigidity.lean",
-  "line": 1226,
+  "line": 1298,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -6410,10 +6535,7 @@
     "0 < c",
     "0 < ld_extent"
    ],
-   "hypotheses_not_enforced": [
-    "c < ld_extent_long",
-    "c < ld_extent_short"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.meanImputationR2_mem_unit",
     2
@@ -6555,12 +6677,8 @@
    "quantity": null,
    "source_lo": "theorem",
    "source_hi": null,
-   "hypotheses": [
-    "0 < h"
-   ],
-   "hypotheses_not_enforced": [
-    "latticeLimit = limitOfIntensity (latticeInflation h * \u03bc\u2080"
-   ],
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.imputation_rescaling_cannot_repair_lattice",
     1
@@ -6635,18 +6753,11 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "1 < Ne",
-    "0 < r",
-    "r < 1",
     "0 \u2264 r",
     "r \u2264 1",
     "1 \u2264 Ne"
    ],
-   "hypotheses_not_enforced": [
-    "0 < spectralTotal (fun i => detectionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne",
-    "0 < spectralTotal (fun i => reconstructionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne",
-    "LDBandIntegralIdentification (ldRetentionPerGen recomb Ne"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.ld_retention_nonneg",
     3
@@ -6852,20 +6963,11 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 < c",
-    "c < 1",
-    "Ne \u2260 0",
     "1 \u2264 Ne",
     "0 \u2264 c",
-    "c \u2264 1",
-    "0 < Ne"
+    "c \u2264 1"
    ],
-   "hypotheses_not_enforced": [
-    "1 - driftLDRetention Ne_b c \u2260 0",
-    "1 - driftLDRetention Ne c \u2260 0",
-    "1 - driftLDRetention N_b c \u2260 0",
-    "1 - driftLDRetention N_r c \u2260 0"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.driftLDRetention_mem_unit",
     3
@@ -6913,20 +7015,11 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 < c",
-    "c < 1",
-    "Ne \u2260 0",
-    "0 < Ne",
     "1 \u2264 Ne",
     "0 \u2264 c",
     "c \u2264 1"
    ],
-   "hypotheses_not_enforced": [
-    "1 - driftLDRetention Ne_b c \u2260 0",
-    "1 - driftLDRetention Ne c \u2260 0",
-    "1 - driftLDRetention N_b c \u2260 0",
-    "1 - driftLDRetention N_r c \u2260 0"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.driftLDEquilibrium_nonneg",
     3
@@ -6960,13 +7053,13 @@
   "mutants_tried": 10
  },
  "Calibrator.driftLDTrajectory": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 495,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "expected '|', found op:=>"
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.ldMismatchFrobenius": {
   "class": "NOT-EXTRACTABLE",
@@ -6987,13 +7080,58 @@
   "reason": "Finset/indexed sum"
  },
  "Calibrator.excessLDAfterBottleneck": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 660,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition driftLDTrajectory"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0,
+   "hi": null,
+   "quantity": "nonnegative",
+   "source_lo": "theorem",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "1 \u2264 N_b",
+    "N_b \u2264 N_r",
+    "0 \u2264 c",
+    "c \u2264 1"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": [
+    "Calibrator.excess_ld_nonneg",
+    4
+   ],
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "N_b": [
+     1.0,
+     3.0
+    ],
+    "N_r": [
+     0.05,
+     3.0
+    ],
+    "c": [
+     0.05,
+     0.999
+    ],
+    "t_b": [
+     1.0,
+     20.0
+    ],
+    "t_r": [
+     1.0,
+     20.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 1
  },
  "Calibrator.ldDecayRatePerGen": {
   "class": "NUMERIC",
@@ -7100,13 +7238,13 @@
   "mutants_tried": 7
  },
  "Calibrator.ldRecurrence": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 937,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "expected '|', found op:=>"
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.expanderAgreementFloor": {
   "class": "NUMERIC",
@@ -7151,9 +7289,7 @@
    "source_lo": "theorem",
    "source_hi": "docstring/name",
    "hypotheses": [
-    "0 \u2264 r2_initial",
-    "0 < r2_initial",
-    "0 < lambda_total"
+    "0 \u2264 r2_initial"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -7198,8 +7334,7 @@
    "source_hi": "theorem",
    "hypotheses": [
     "0 \u2264 r",
-    "r \u2264 1",
-    "0 < t"
+    "r \u2264 1"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -7397,8 +7532,7 @@
    "source_hi": null,
    "hypotheses": [
     "0 \u2264 lambda",
-    "0 \u2264 t",
-    "0 < lambda"
+    "0 \u2264 t"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -7437,10 +7571,7 @@
    "source_lo": "docstring/name",
    "source_hi": "theorem",
    "hypotheses": [],
-   "hypotheses_not_enforced": [
-    "d.varCondE = d.varYhat",
-    "d.varCondE < d.varYhat"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": [
     "Calibrator.R2DecompositionData.r2_le_one",
@@ -7468,10 +7599,7 @@
    "source_lo": "docstring/name",
    "source_hi": "theorem",
    "hypotheses": [],
-   "hypotheses_not_enforced": [
-    "d.varCondE = d.varYhat",
-    "d.varCondE < d.varYhat"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": [
     "Calibrator.R2DecompositionData.disc_le_one",
@@ -7906,11 +8034,7 @@
    "source_lo": null,
    "source_hi": "theorem",
    "hypotheses": [
-    "0 \u2264 decay",
-    "0 < kappa",
-    "kappa < 1",
-    "0 \u2264 kappa",
-    "kappa \u2264 1"
+    "0 \u2264 decay"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": null,
@@ -8763,7 +8887,7 @@
  "Calibrator.BackgroundClass.spiked": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 275,
+  "line": 281,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8772,7 +8896,7 @@
  "Calibrator.BackgroundClass.exitLevels": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 303,
+  "line": 310,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8781,7 +8905,7 @@
  "Calibrator.BackgroundClass.imitationCapacity": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 313,
+  "line": 320,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8790,7 +8914,7 @@
  "Calibrator.frobeniusForm": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 501,
+  "line": 508,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8799,7 +8923,7 @@
  "Calibrator.traceForm": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 567,
+  "line": 574,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8808,7 +8932,7 @@
  "Calibrator.traceWindowBudgetClass": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 594,
+  "line": 601,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8817,7 +8941,7 @@
  "Calibrator.EquiExit.margin": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 687,
+  "line": 694,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8826,7 +8950,7 @@
  "Calibrator.EquiExit.rejectionThreshold": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 713,
+  "line": 720,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8835,7 +8959,7 @@
  "Calibrator.traceWindowClass": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 770,
+  "line": 777,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8844,7 +8968,7 @@
  "Calibrator.traceWindowSpikeLoad": {
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 848,
+  "line": 855,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -8885,7 +9009,7 @@
  "Calibrator.whitenedCapacity": {
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 868,
+  "line": 875,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8894,7 +9018,7 @@
  "Calibrator.subgroupContrast": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 985,
+  "line": 992,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8903,7 +9027,7 @@
  "Calibrator.demographicSpikeDirection": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 991,
+  "line": 998,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8912,7 +9036,7 @@
  "Calibrator.stratificationCertificateMargin": {
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1068,
+  "line": 1075,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8921,7 +9045,7 @@
  "Calibrator.blockSpectrum": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1208,
+  "line": 1215,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8930,7 +9054,7 @@
  "Calibrator.normalizedMoment": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1216,
+  "line": 1223,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8939,7 +9063,7 @@
  "Calibrator.inverseTraceCertificate": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1226,
+  "line": 1233,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8948,7 +9072,7 @@
  "Calibrator.meffPerturbed": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1322,
+  "line": 1329,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8957,7 +9081,7 @@
  "Calibrator.meffFlat": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1327,
+  "line": 1334,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8966,7 +9090,7 @@
  "Calibrator.meffSize": {
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1332,
+  "line": 1339,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8989,7 +9113,6 @@
     "0 < M"
    ],
    "hypotheses_not_enforced": [
-    "spike \u2264 bbpProxyThreshold n M",
     "bbpProxyThreshold n M < spike"
    ],
    "thm_lo": [
@@ -9042,10 +9165,7 @@
     "0 < M"
    ],
    "hypotheses_not_enforced": [
-    "spike \u2264 bbpProxyThreshold n M",
-    "bbpProxyThreshold n M < spike",
-    "bbpProxyThreshold n M < spike\u2081",
-    "bbpProxyThreshold n markers < spike"
+    "bbpProxyThreshold n M < spike"
    ],
    "thm_lo": [
     "Calibrator.samplePCResidualAxisFraction_pos_and_lt_one",
@@ -9210,7 +9330,7 @@
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/Threshold.lean",
   "line": 48,
-  "status": "DEFECT-CANDIDATE",
+  "status": "DEFECT",
   "check": {
    "kind": "range",
    "lo": null,
@@ -9218,13 +9338,8 @@
    "quantity": null,
    "source_lo": null,
    "source_hi": "theorem",
-   "hypotheses": [
-    "0 < n",
-    "0 \u2264 F"
-   ],
-   "hypotheses_not_enforced": [
-    "m \u2264 N"
-   ],
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": [
     "Calibrator.subthreshold_pc_residual_bias_floor",
@@ -9282,7 +9397,6 @@
     "0 < markers"
    ],
    "hypotheses_not_enforced": [
-    "spike \u2264 bbpProxyThreshold n markers",
     "bbpProxyThreshold n markers < spike"
    ],
    "thm_lo": [
@@ -10267,13 +10381,10 @@
    "quantity": "probability",
    "source_lo": "theorem",
    "source_hi": "theorem",
-   "hypotheses": [
-    "1 \u2264 t"
-   ],
+   "hypotheses": [],
    "hypotheses_not_enforced": [
     "0 < 1 - 1 / (2 * Ne",
-    "1 - 1 / (2 * Ne",
-    "s_correction < 1 / (2 * Ne"
+    "1 - 1 / (2 * Ne"
    ],
    "thm_lo": [
     "Calibrator.neutralDriftFactor_mem_unit",
@@ -10322,8 +10433,7 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 < s_correction",
-    "1 \u2264 t"
+    "0 < s_correction"
    ],
    "hypotheses_not_enforced": [
     "s_correction < 1 / (2 * Ne",
@@ -10611,12 +10721,8 @@
    "quantity": "correlation",
    "source_lo": "theorem",
    "source_hi": "theorem",
-   "hypotheses": [
-    "1 < Ns"
-   ],
-   "hypotheses_not_enforced": [
-    "tau < t / (-Real.log (effectCorrelationStabilizing Ns"
-   ],
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.effectCorrelation_mem_range",
     4
@@ -10659,10 +10765,7 @@
    "hypotheses": [
     "0 \u2264 d",
     "d \u2264 1",
-    "0 \u2264 f * N",
-    "0 < d",
-    "0 < f",
-    "0 < N"
+    "0 \u2264 f * N"
    ],
    "hypotheses_not_enforced": [
     "0 \u2264 s * N"
@@ -10758,11 +10861,8 @@
    "hypotheses": [
     "0 \u2264 pi",
     "pi \u2264 1",
-    "sigma_sq_small \u2264 sigma_sq_large",
     "0 \u2264 sigma_sq_large",
-    "0 \u2264 sigma_sq_small",
-    "0 < sigma_sq_small",
-    "sigma_sq_small < sigma_sq_large"
+    "0 \u2264 sigma_sq_small"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -10794,10 +10894,10 @@
   "violation": {
    "point": {
     "pi": 0.050001,
-    "sigma_sq_large": 2.999997,
+    "sigma_sq_large": 0.050003,
     "sigma_sq_small": 0.050003
    },
-   "value": 0.19750545749439502,
+   "value": 0.05000295,
    "why": "above 0"
   }
  },
@@ -11026,11 +11126,7 @@
    "source_lo": "theorem",
    "source_hi": "docstring/name",
    "hypotheses": [],
-   "hypotheses_not_enforced": [
-    "M_region / M_total < \u03b1",
-    "\u03b2 < h2_region / h2_total",
-    "0 < h2_region \u2227 0 < h2_total \u2227 0 < M_region \u2227 0 < M_total"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.enrichment_interpretation",
     3
@@ -11126,16 +11222,8 @@
    "quantity": "frequency",
    "source_lo": "theorem",
    "source_hi": "docstring/name",
-   "hypotheses": [
-    "0 < q"
-   ],
-   "hypotheses_not_enforced": [
-    "0 < hweMellinDrift q",
-    "hweMellinDrift q < Real.log N",
-    "m < maxSafeEpistaticOrder N q",
-    "q \u2264 1 / 8",
-    "condensationConstant < hweMellinDrift q"
-   ],
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.disjoint_design_gaussian_null_below_condensation",
     6
@@ -11162,7 +11250,7 @@
  "Calibrator.maxSafeEpistaticOrder": {
   "class": "NUMERIC",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 605,
+  "line": 621,
   "status": "DEFECT-CANDIDATE",
   "check": {
    "kind": "range",
@@ -11174,10 +11262,7 @@
    "hypotheses": [],
    "hypotheses_not_enforced": [
     "0 < hweMellinDrift q",
-    "hweMellinDrift q < Real.log N",
-    "m < maxSafeEpistaticOrder N q",
-    "0 < Real.log N",
-    "condensationConstant < hweMellinDrift q"
+    "hweMellinDrift q < Real.log N"
    ],
    "thm_lo": [
     "Calibrator.additive_score_is_subcritical",
@@ -11210,7 +11295,7 @@
  "Calibrator.hweLatticeCondition": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 753,
+  "line": 769,
   "status": "VACUOUS",
   "check": {
    "kind": "witness/non-witness",
@@ -11223,7 +11308,7 @@
  "Calibrator.latticeCriticalMaf": {
   "class": "NUMERIC",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 756,
+  "line": 772,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -11256,7 +11341,7 @@
  "Calibrator.HardyWeinbergModel.mellinJetVariance": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 800,
+  "line": 816,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -11265,7 +11350,7 @@
  "Calibrator.hweMellinJetVariance": {
   "class": "NUMERIC",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 809,
+  "line": 825,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -11297,7 +11382,7 @@
  "Calibrator.hardCallLatticeSpan": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 844,
+  "line": 860,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -11306,7 +11391,16 @@
  "Calibrator.hardCallObservables": {
   "class": "STRUCTURAL",
   "file": "Calibrator/PolygenicSpectroscopy.lean",
-  "line": 902,
+  "line": 918,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
+ },
+ "Calibrator.hweCodingInvariants": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/PolygenicSpectroscopy.lean",
+  "line": 1069,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -11327,8 +11421,7 @@
    "hypotheses": [
     "0 < H_T",
     "0 \u2264 H_S",
-    "H_S \u2264 H_T",
-    "H_T \u2260 0"
+    "H_S \u2264 H_T"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -11379,9 +11472,7 @@
     "0 < p\u2082",
     "p\u2082 < 1"
    ],
-   "hypotheses_not_enforced": [
-    "meanAlleleFreq p\u2081 p\u2082 * (1 - meanAlleleFreq p\u2081 p\u2082"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.simple_fst_nonneg",
     4
@@ -11459,10 +11550,7 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 < Ne",
-    "0 \u2264 t",
-    "0 < t",
-    "100 * Ne < t"
+    "0 < Ne"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -11473,7 +11561,7 @@
     "Calibrator.fstFromCoalescenceTime_in_unit",
     2
    ],
-   "n_points": 12,
+   "n_points": 40,
    "box": {
     "t": [
      1.0,
@@ -11555,7 +11643,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "mined hypotheses admit no sampled point; constraints: ['0 < s', 'm < 1', '0 < m']"
+  "reason": "mined bounds contradict (lo=10 > hi=1); at least one theorem bound is conditional"
  },
  "Calibrator.selectionMigrationEquilibriumMigrationFirst": {
   "class": "NUMERIC",
@@ -11618,8 +11706,7 @@
    "source_lo": "theorem",
    "source_hi": "docstring/name",
    "hypotheses": [
-    "2 \u2264 Ne",
-    "2 < Ne"
+    "2 \u2264 Ne"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -11846,13 +11933,9 @@
    "source_hi": "theorem",
    "hypotheses": [
     "0 < Ne",
-    "0 < m",
-    "0 \u2264 m",
-    "1 < 4 * Ne * m"
+    "0 < m"
    ],
-   "hypotheses_not_enforced": [
-    "k < 4 * Ne * m"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.island_fst_in_unit_interval",
     2
@@ -11989,8 +12072,7 @@
    "source_hi": "docstring/name",
    "hypotheses": [
     "0 < L",
-    "0 \u2264 d",
-    "0 < d"
+    "0 \u2264 d"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -12082,9 +12164,7 @@
    "quantity": "frequency",
    "source_lo": "theorem",
    "source_hi": "theorem",
-   "hypotheses": [
-    "0 \u2264 M"
-   ],
+   "hypotheses": [],
    "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.ldCorrelationFromMigration_nonneg",
@@ -12114,13 +12194,45 @@
   "mutants_tried": 7
  },
  "Calibrator.hetRecurrence": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1090,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "F_ST",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "H\u2080 \u2260 0"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "Ne": [
+     1.0,
+     1000.0
+    ],
+    "H\u2080": [
+     0.05,
+     3.0
+    ]
+   }
+  },
   "killed": [],
-  "reason": "expected '|', found op:=>"
+  "reason": "",
+  "violation": {
+   "point": {
+    "Ne": 1.000999,
+    "H_0": 2.999997
+   },
+   "value": 1.5014955280204574,
+   "why": "above 1.0"
+  }
  },
  "Calibrator.fstDerived": {
   "class": "NUMERIC",
@@ -12135,9 +12247,7 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "2 < Ne",
-    "2 \u2264 Ne",
-    "1 \u2264 t"
+    "2 \u2264 Ne"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -12175,13 +12285,51 @@
   "mutants_tried": 9
  },
  "Calibrator.hetMutationDriftRecurrence": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1192,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "heterozygosity",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < Ne",
+    "0 < mu"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "Ne": [
+     1.0,
+     1000.0
+    ],
+    "mu": [
+     0.05,
+     3.0
+    ],
+    "H\u2080": [
+     0.05,
+     3.0
+    ]
+   }
+  },
   "killed": [],
-  "reason": "expected '|', found op:=>"
+  "reason": "",
+  "violation": {
+   "point": {
+    "Ne": 1.000999,
+    "mu": 2.999997,
+    "H_0": 0.050003
+   },
+   "value": 5.7250031215643356,
+   "why": "above 1.0"
+  }
  },
  "Calibrator.hetEquilibrium": {
   "class": "NUMERIC",
@@ -12199,9 +12347,7 @@
     "0 < Ne",
     "0 < mu"
    ],
-   "hypotheses_not_enforced": [
-    "(1 - 1 / (2 * Ne"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.hetEquilibrium_pos",
     2
@@ -12284,13 +12430,50 @@
   "mutants_tried": 9
  },
  "Calibrator.hetMutationRecurrence": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1350,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "heterozygosity",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "H\u2080 \u2260 0"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "lam": [
+     0.05,
+     3.0
+    ],
+    "Hstar": [
+     0.05,
+     3.0
+    ],
+    "H\u2080": [
+     0.05,
+     3.0
+    ]
+   }
+  },
   "killed": [],
-  "reason": "expected '|', found op:=>"
+  "reason": "",
+  "violation": {
+   "point": {
+    "lam": 0.050003,
+    "Hstar": 2.999997,
+    "H_0": 0.050003
+   },
+   "value": 2.852488642517405,
+   "why": "above 1.0"
+  }
  },
  "Calibrator.fstFromHetRatio": {
   "class": "NUMERIC",
@@ -12334,13 +12517,13 @@
   }
  },
  "Calibrator.fstMutationDriftTransientDiscrete": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1414,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: arity/type mismatch (TypeError('hetDecayFactor() takes 1 positional argument but )"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.neutralPortability": {
   "class": "NUMERIC",
@@ -12355,12 +12538,7 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 \u2264 r2_0",
-    "0 \u2264 fst",
-    "r2_0 \u2264 1",
-    "0 < r2_0",
-    "0 < fst",
-    "2 * fst < 1"
+    "0 \u2264 r2_0"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -12406,12 +12584,7 @@
    "source_lo": "theorem",
    "source_hi": "docstring/name",
    "hypotheses": [
-    "0 \u2264 r2_0",
-    "0 \u2264 fst",
-    "0 \u2264 strength",
-    "0 < r2_0",
-    "0 < fst",
-    "2 * fst < 1"
+    "0 \u2264 r2_0"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -12454,14 +12627,9 @@
    "source_lo": "theorem",
    "source_hi": "docstring/name",
    "hypotheses": [
-    "0 \u2264 r2_0",
-    "0 < r2_0",
-    "0 < fst",
-    "2 * fst < 1"
+    "0 \u2264 r2_0"
    ],
-   "hypotheses_not_enforced": [
-    "2 * lam_turn > lam_stab"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.diversifyingPortability_nonneg",
     1
@@ -12539,8 +12707,7 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 \u2264 tau",
-    "0 < tau"
+    "0 \u2264 tau"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -12695,9 +12862,7 @@
    "source_lo": null,
    "source_hi": "theorem",
    "hypotheses": [],
-   "hypotheses_not_enforced": [
-    "m.t_div = (Nat.floor m.t_div : \u211d"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": [
     "Calibrator.fst_from_tau_lt_one",
@@ -12875,8 +13040,7 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 < M",
-    "2 * M + 1 \u2260 0"
+    "0 < M"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -12957,13 +13121,56 @@
   }
  },
  "Calibrator.hetTrajectory": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 443,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "heterozygosity",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < Ne",
+    "0 \u2264 mu"
+   ],
+   "hypotheses_not_enforced": [
+    "1 / (2 * Ne",
+    "hetMutationFloor Ne mu \u2264 H\u2080",
+    "(1 - 1 / (2 * Ne",
+    "hetTrajectory Ne mu H\u2080 t \u2260 0"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "Ne": [
+     1.0,
+     1000.0
+    ],
+    "mu": [
+     0.05,
+     3.0
+    ],
+    "H\u2080": [
+     0.05,
+     3.0
+    ]
+   }
+  },
   "killed": [],
-  "reason": "expected '|', found op:=>"
+  "reason": "",
+  "violation": {
+   "point": {
+    "Ne": 1.000999,
+    "mu": 2.999997,
+    "H_0": 0.050003
+   },
+   "value": 5.7250031215643356,
+   "why": "above 1.0"
+  }
  },
  "Calibrator.hetMutationFloor": {
   "class": "NUMERIC",
@@ -13427,10 +13634,7 @@
    "quantity": "R-squared",
    "source_lo": "docstring/name",
    "source_hi": "theorem",
-   "hypotheses": [
-    "0 < V_E",
-    "0 < vSignal"
-   ],
+   "hypotheses": [],
    "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": [
@@ -14376,7 +14580,7 @@
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 2982,
-  "status": "COVERED",
+  "status": "DEFECT-CANDIDATE",
   "check": {
    "kind": "range",
    "lo": 0,
@@ -14384,13 +14588,7 @@
    "quantity": "F_ST",
    "source_lo": "theorem",
    "source_hi": "theorem",
-   "hypotheses": [
-    "0 \u2264 fstTarget",
-    "fstSource < 1",
-    "fstTarget \u2264 1",
-    "fstSource < fstTarget",
-    "fstTarget < 1"
-   ],
+   "hypotheses": [],
    "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.neutral_af_benchmark_bounded_by_fst",
@@ -14412,23 +14610,25 @@
     ]
    }
   },
-  "killed": [
-   "first '-'->'+'",
-   "negate body",
-   "drop '1 -' complement",
-   "literal 1->2"
-  ],
+  "killed": [],
   "reason": "",
-  "mutants_tried": 7
+  "violation": {
+   "point": {
+    "fstSource": 0.979999,
+    "fstTarget": 0.020001
+   },
+   "value": 48.99760011519431,
+   "why": "above 1"
+  }
  },
  "Calibrator.hetRatioBetweenBranches": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 3030,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition hetTrajectory"
+  "reason": "mined bounds contradict (lo=3 > hi=1.0); at least one theorem bound is conditional"
  },
  "Calibrator.exactCalibratedBrierRiskFromR2": {
   "class": "NUMERIC",
@@ -15163,7 +15363,6 @@
    "source_hi": "theorem",
    "hypotheses": [
     "fst_drift \u2264 1",
-    "shared_ld \u2264 1",
     "0 \u2264 shared_ld"
    ],
    "hypotheses_not_enforced": [],
@@ -15213,12 +15412,7 @@
    "hypotheses": [
     "0 \u2264 V_A",
     "fst_drift \u2264 1",
-    "0 \u2264 shared_ld",
-    "0 < V_A",
-    "fst_drift < 1",
-    "shared_ld < 1",
-    "0 \u2264 fst_drift",
-    "0 < shared_ld"
+    "0 \u2264 shared_ld"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -15375,14 +15569,9 @@
    "source_hi": "theorem",
    "hypotheses": [
     "0 < Ne",
-    "0 \u2264 m",
-    "0 < m"
+    "0 \u2264 m"
    ],
-   "hypotheses_not_enforced": [
-    "1 / (1 + 4 * Ne * m",
-    "fst_observed \u2264 fstMigrationDriftEquilibrium Ne m",
-    "fstMigrationDriftEquilibrium Ne m < fst_nomial"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.fstMigrationDriftEquilibrium_pos",
     2
@@ -15413,19 +15602,115 @@
   "reason": "",
   "mutants_tried": 8
  },
- "Calibrator.islandFstMultiplicativeStep": {
+ "Calibrator.ibdRecurrenceStep": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4602,
+  "line": 4607,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < Ne",
+    "0 \u2264 rate",
+    "rate < 1"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "Ne": [
+     1.0,
+     1000.0
+    ],
+    "rate": [
+     0.02,
+     0.98
+    ],
+    "x": [
+     0.05,
+     3.0
+    ]
+   }
+  },
+  "killed": [],
+  "reason": "",
+  "violation": {
+   "point": {
+    "Ne": 1.000999,
+    "rate": 0.020001,
+    "x": 2.999997
+   },
+   "value": 1.9217532989994246,
+   "why": "above 1.0"
+  }
+ },
+ "Calibrator.ibdRecurrenceFixedPoint": {
+  "class": "NUMERIC",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4620,
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1,
+   "quantity": "F_ST",
+   "source_lo": "docstring/name",
+   "source_hi": "theorem",
+   "hypotheses": [
+    "0 < Ne",
+    "0 < rate",
+    "rate < 1"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": [
+    "Calibrator.ibdRecurrenceFixedPoint_lt_linearisation",
+    3
+   ],
+   "n_points": 40,
+   "box": {
+    "Ne": [
+     1.0,
+     1000.0
+    ],
+    "rate": [
+     0.02,
+     0.98
+    ]
+   }
+  },
+  "killed": [
+   "first '+'->'-'",
+   "last '+'->'-'",
+   "first '-'->'+'",
+   "first '/'->'*'",
+   "last '/'->'*'",
+   "negate body",
+   "drop '1 -' complement",
+   "literal 1->2"
+  ],
+  "reason": "",
+  "mutants_tried": 12
+ },
+ "Calibrator.islandFstMultiplicativeStep": {
+  "class": "WRAPPER",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4710,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "mined hypotheses admit no sampled point; constraints: ['0 < Ne', '0 \u2264 m', 'm < 1']"
  },
  "Calibrator.fstIslandMultiplicativeEquilibrium": {
-  "class": "NUMERIC",
+  "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4613,
+  "line": 4727,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -15434,7 +15719,7 @@
  "Calibrator.scaledMigrationRate": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4663,
+  "line": 4759,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15445,8 +15730,7 @@
    "source_hi": null,
    "hypotheses": [
     "0 < Ne",
-    "0 < m",
-    "0 \u2264 m"
+    "0 < m"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -15475,7 +15759,7 @@
  "Calibrator.SplitMigrationModel.fstMigDriftEq": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4749,
+  "line": 4845,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15500,7 +15784,7 @@
  "Calibrator.steppingStoneFst": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4782,
+  "line": 4878,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15551,7 +15835,7 @@
  "Calibrator.sharedLD_from_equilibrium": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4844,
+  "line": 4940,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15592,7 +15876,7 @@
  "Calibrator.sharedLDFromMigration": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4870,
+  "line": 4966,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15602,12 +15886,9 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 \u2264 M",
-    "0 < M"
+    "0 \u2264 M"
    ],
-   "hypotheses_not_enforced": [
-    "r2_target \u2264 privateArchitectureTransferCeiling h2_target f_private M"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.sharedLDFromMigration_nonneg",
     1
@@ -15637,7 +15918,7 @@
  "Calibrator.signalRetentionMigrationDrift": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4921,
+  "line": 5017,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15647,9 +15928,8 @@
    "source_lo": "theorem",
    "source_hi": "docstring/name",
    "hypotheses": [
-    "0 < Ne",
-    "0 \u2264 m",
     "0 < V_A",
+    "0 < Ne",
     "0 < m"
    ],
    "hypotheses_not_enforced": [],
@@ -15689,7 +15969,7 @@
  "Calibrator.asymmetricFst": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5002,
+  "line": 5098,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15730,7 +16010,7 @@
  "Calibrator.effectiveSymmetricMigration": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5043,
+  "line": 5139,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15771,7 +16051,7 @@
  "Calibrator.admixtureLDDecay": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5064,
+  "line": 5160,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15781,14 +16061,9 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "r \u2264 1",
-    "0 \u2264 r",
-    "0 < r",
-    "r < 1"
+    "r \u2264 1"
    ],
-   "hypotheses_not_enforced": [
-    "equilibrium_ld < admixtureLDDecay r t_since"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.admixtureLDDecay_nonneg",
     1
@@ -15822,7 +16097,7 @@
  "Calibrator.admixtureLDBoost": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5111,
+  "line": 5207,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15873,7 +16148,7 @@
  "Calibrator.fstMigDriftNext": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5173,
+  "line": 5269,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -15919,7 +16194,7 @@
  "Calibrator.fstMigDriftEquil": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5208,
+  "line": 5304,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15930,8 +16205,7 @@
    "source_hi": "theorem",
    "hypotheses": [
     "0 < Ne",
-    "0 \u2264 m",
-    "0 < m"
+    "0 \u2264 m"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -15965,7 +16239,7 @@
  "Calibrator.neutralAFBenchmarkFromRecurrence": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5290,
+  "line": 5386,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -15976,8 +16250,7 @@
    "source_hi": "theorem",
    "hypotheses": [
     "0 < Ne",
-    "0 \u2264 m",
-    "0 < m"
+    "0 \u2264 m"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -16024,11 +16297,7 @@
    "source_hi": "docstring/name",
    "hypotheses": [
     "0 \u2264 p",
-    "p \u2264 1",
-    "beta \u2260 0",
-    "0 < p",
-    "p < 1",
-    "0 < n"
+    "p \u2264 1"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -16116,9 +16385,7 @@
     "0 < C",
     "0 \u2264 n"
    ],
-   "hypotheses_not_enforced": [
-    "delta < n"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": [
     "Calibrator.r2_scaling_bounded",
@@ -16348,7 +16615,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '.'\")"
+  "reason": "could not compile body: Untranslatable('recursion with 3 branches, expected 2')"
  },
  "Calibrator.HardyWeinbergModel.refFreq": {
   "class": "NUMERIC",
@@ -16363,10 +16630,7 @@
    "source_lo": "docstring/name",
    "source_hi": "theorem",
    "hypotheses": [],
-   "hypotheses_not_enforced": [
-    "0 < h.altFreq",
-    "h.altFreq < 1"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": [
     "Calibrator.HardyWeinbergModel.refFreq_le_one",
@@ -16392,7 +16656,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "could not compile body: Untranslatable(\"unrecognised character '.'\")"
+  "reason": "could not compile body: Untranslatable('recursion with 3 branches, expected 2')"
  },
  "Calibrator.HardyWeinbergModel.expectedAltAlleleCount": {
   "class": "NOT-EXTRACTABLE",
@@ -16810,7 +17074,7 @@
  "Calibrator.HasThresholdSetAtEveryRank": {
   "class": "STRUCTURAL",
   "file": "Calibrator/ProjectionShiftBounds.lean",
-  "line": 760,
+  "line": 761,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -16925,12 +17189,8 @@
    "source_lo": "theorem",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 < h * s + mu",
     "0 \u2264 mu",
-    "0 < mu",
-    "0 < h * s",
-    "mu \u2260 0",
-    "0 < h"
+    "0 < h * s + mu"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -17676,7 +17936,6 @@
     "rho < 1"
    ],
    "hypotheses_not_enforced": [
-    "stabilizingSelectedArchitectureVariance v_mutation s < v_selected_obs",
     "stabilizingSelectedArchitectureVariance v_mutation s < v_selected"
    ],
    "thm_lo": [
@@ -17840,14 +18099,7 @@
    "source_lo": "theorem",
    "source_hi": "docstring/name",
    "hypotheses": [],
-   "hypotheses_not_enforced": [
-    "summary\u2081.predictedEffectCorrelation = validation.observedEffectCorrelation",
-    "summary\u2082.predictedEffectCorrelation = validation.observedEffectCorrelation",
-    "missedSelectedVariance validation summary\u2081 < missedSelectedVariance validation summary\u2082",
-    "null\u2081.predictedEffectCorrelation = validation.observedEffectCorrelation",
-    "null\u2082.predictedEffectCorrelation = validation.observedEffectCorrelation",
-    "missedSelectedVariance validation null\u2081 < missedSelectedVariance validation null\u2082"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.missedSelectedVariance_nonneg",
     0
@@ -19156,15 +19408,11 @@
    "source_lo": "docstring/name",
    "source_hi": "theorem",
    "hypotheses": [
-    "0 < nTarget",
-    "0 \u2264 gapSq",
-    "0 \u2264 noiseVar",
     "0 < gapSq",
-    "0 < noiseVar"
+    "0 < noiseVar",
+    "0 < nTarget"
    ],
-   "hypotheses_not_enforced": [
-    "gapSq + noiseVar / nTarget \u2260 0"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": [
     "Calibrator.optimalSourceShrinkageWeight_le_half_iff_target_samples_dominate_gap",
@@ -19372,10 +19620,7 @@
     "0 < tau",
     "tau < gapSq"
    ],
-   "hypotheses_not_enforced": [
-    "tau < coefficientGapSq wSourceNew wTarget",
-    "tau < metaLearnedTransferGapSq wShared wTarget deviation k\u2082"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.requiredTargetSamplesForOptimalFineTuningMSE_pos",
     3
@@ -19800,8 +20045,7 @@
    "source_lo": "theorem",
    "source_hi": null,
    "hypotheses": [
-    "logLNull \u2264 logLAlt",
-    "logLNull < logLAlt"
+    "logLNull \u2264 logLAlt"
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
@@ -19848,9 +20092,7 @@
     "0 \u2264 V_E",
     "0 < V_A + V_D + V_I + V_E"
    ],
-   "hypotheses_not_enforced": [
-    "0 < V_A_total + V_D + V_I + V_E"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": [
     "Calibrator.narrow_h2_in_unit",
     5

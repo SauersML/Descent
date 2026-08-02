@@ -269,10 +269,17 @@ def Active (a : cidx) (S₀ : Matrix ι ι ℝ) : Prop := K.form a S₀ = K.boun
 
 /-- The spiked covariance at level `t` in direction `v`.
 
+The class argument names the testing problem this alternative belongs to and is
+written `_K` because it does not enter the formula: the alternative is the same
+matrix whatever class is being tested against.  It is carried so that the
+alternative is addressable as a member of the problem rather than as a free
+matrix expression, which is what every call site wants.
+
     Empirical status: DERIVED (this is the bump of
     `covarianceMatrix_addRankOneSignal`, re-parametrized so the level enters
     linearly). -/
-def spiked (S₀ : Matrix ι ι ℝ) (t : ℝ) (v : ι → ℝ) : Matrix ι ι ℝ :=
+def spiked (_K : BackgroundClass ι cidx) (S₀ : Matrix ι ι ℝ) (t : ℝ)
+    (v : ι → ℝ) : Matrix ι ι ℝ :=
   S₀ + t • spikeOuter v
 
 theorem headroom_nonneg {S₀ : Matrix ι ι ℝ} (hnull : K.IsNull S₀) (a : cidx) :
@@ -819,6 +826,151 @@ theorem traceWindow_every_level_detectable {base A S₀ : Matrix ι ι ℝ}
   exact hpd v hvne
 
 end NoSymmetry
+
+/-!
+## The rigidity mechanisms of `ImitationRigidity` are certificates
+
+`Calibrator.ImitationRigidity` proves that a rank-one bump with unequal squared
+loadings at a pair `(i, j)` separates two diagonal entries that agreed, and
+that a bump moving a loading product separates two entries a shift had
+identified.  Those theorems are now stated pointwise there, because inspecting
+their proofs shows the global stationarity hypotheses were consumed only at the
+witnessing pair.
+
+This section is the statement that the pointwise hypothesis *is* the
+certificate condition of this file: the diagonal gap is a linear functional,
+its spike load is `vᵢ² - vⱼ²`, and an active diagonal-gap constraint with
+positive load drives the imitation capacity to zero.  The mechanism generalizes
+off stationary classes entirely, which matters because a standardized genotype
+panel has unit diagonal — the constraint is active automatically — so the
+loading condition is the whole of what rigidity requires there.
+-/
+
+section RigidityInstances
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- **The two spike parametrizations agree.**  `ImitationRigidity`'s bump at
+scale `s` is this file's spike at level `s²`; the level is squared because the
+bump's scale multiplies the effect vector while the level multiplies the
+covariance. -/
+theorem rankOneCovarianceBump_eq_smul_spikeOuter (scale : ℝ) (v : ι → ℝ) :
+    rankOneCovarianceBump scale v = (scale ^ 2) • spikeOuter v := by
+  ext i j
+  simp only [rankOneCovarianceBump, Matrix.smul_apply, spikeOuter, smul_eq_mul]
+  ring
+
+/-- The linear program's alternative and `ImitationRigidity`'s bumped
+background are the same matrix. -/
+theorem spiked_eq_add_rankOneCovarianceBump {cidx : Type*}
+    (K : BackgroundClass ι cidx) (S₀ : Matrix ι ι ℝ) (scale : ℝ) (v : ι → ℝ) :
+    K.spiked S₀ (scale ^ 2) v = S₀ + rankOneCovarianceBump scale v := by
+  unfold BackgroundClass.spiked
+  rw [rankOneCovarianceBump_eq_smul_spikeOuter]
+
+/-- **The diagonal-gap functional.**  The difference of two diagonal entries —
+for a genotype covariance, the difference in standardized variance carried by
+two markers.  It is linear, so it is a legal constraint of a background class,
+and `ConstantDiagonal` is the statement that all of these vanish.
+
+    Empirical status: DERIVED (a difference of matrix entries;
+    `diagonalGapForm_spikeOuter` identifies its spike load). -/
+def diagonalGapForm (i j : ι) (M : Matrix ι ι ℝ) : ℝ := M i i - M j j
+
+theorem diagonalGapForm_add (i j : ι) (M N : Matrix ι ι ℝ) :
+    diagonalGapForm i j (M + N) =
+      diagonalGapForm i j M + diagonalGapForm i j N := by
+  unfold diagonalGapForm
+  simp only [Matrix.add_apply]
+  ring
+
+theorem diagonalGapForm_smul (i j : ι) (c : ℝ) (M : Matrix ι ι ℝ) :
+    diagonalGapForm i j (c • M) = c * diagonalGapForm i j M := by
+  unfold diagonalGapForm
+  simp only [Matrix.smul_apply, smul_eq_mul]
+  ring
+
+/-- **The spike load of the diagonal gap is the squared-loading gap.**  This is
+the quantity `ImitationRigidity`'s `hloading` hypothesis asserts is nonzero, now
+identified as a spike load rather than an algebraic coincidence. -/
+theorem diagonalGapForm_spikeOuter (i j : ι) (v : ι → ℝ) :
+    diagonalGapForm i j (spikeOuter v) = v i ^ 2 - v j ^ 2 := by
+  unfold diagonalGapForm
+  simp only [spikeOuter]
+  ring
+
+/-- **The diagonal-gap background class**: backgrounds in which two markers
+differ in standardized variance by at most `budget`.  At `budget = 0` with the
+constraint
+active this is the constant-diagonal condition restricted to one pair, which is
+all `ImitationRigidity` ever used.
+
+    Empirical status: UNTESTED. `budget` is measurable — it is the spread in
+    standardized variance a panel admits between two markers. -/
+def diagonalGapClass (base : Matrix ι ι ℝ) (i j : ι) (budget : ℝ) :
+    BackgroundClass ι Unit where
+  base := base
+  form := fun _ => diagonalGapForm i j
+  bound := fun _ => budget
+  form_add := fun _ M N => diagonalGapForm_add i j M N
+  form_smul := fun _ c M => diagonalGapForm_smul i j c M
+
+theorem diagonalGapClass_spikeLoad (base : Matrix ι ι ℝ) (i j : ι) (budget : ℝ)
+    (a : Unit) (v : ι → ℝ) :
+    (diagonalGapClass base i j budget).spikeLoad a v = v i ^ 2 - v j ^ 2 :=
+  diagonalGapForm_spikeOuter i j v
+
+/-- **The `ConstantDiagonal` mechanism, as a certificate.**  Two diagonal
+entries that agree at the baseline are an active constraint; unequal squared
+loadings are positive spike load; the imitation capacity is therefore zero.
+Only the one pair is constrained — nothing is assumed about the rest of the
+matrix, so the class is not Toeplitz, not stationary, and has no symmetry. -/
+theorem diagonalGap_imitationCapacity_eq_zero
+    {base S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)} {i j : ι}
+    (hbase : VarianceNonneg (S₀ - base))
+    (hactive : S₀ i i = S₀ j j)
+    {v : ι → ℝ} (hv : v ∈ support) (hload : v j ^ 2 < v i ^ 2) :
+    (diagonalGapClass base i j 0).imitationCapacity S₀ support = 0 := by
+  have hgap : diagonalGapForm i j S₀ = 0 := by
+    unfold diagonalGapForm
+    rw [hactive]
+    ring
+  have hnull : (diagonalGapClass base i j 0).IsNull S₀ := by
+    refine ⟨hbase, ?_⟩
+    intro _a
+    exact le_of_eq hgap
+  have hactive' : (diagonalGapClass base i j 0).Active () S₀ := hgap
+  have hload' : 0 < (diagonalGapClass base i j 0).spikeLoad () v := by
+    rw [diagonalGapClass_spikeLoad]
+    linarith
+  exact (diagonalGapClass base i j 0).imitationCapacity_eq_zero_of_active
+    hnull hv hactive' hload'
+
+/-- **The two files draw the same conclusion.**  `ImitationRigidity`'s
+`add_rankOneBump_diagonal_gap_ne_of_active` says the bumped background leaves
+the constant-diagonal condition at the witnessing pair; this says the same
+matrix is not a member of the diagonal-gap class.  Both are the normal-cone
+condition, and neither needs stationarity. -/
+theorem diagonalGap_not_isNull_add_rankOneCovarianceBump
+    {base S₀ : Matrix ι ι ℝ} {i j : ι}
+    (hactive : S₀ i i = S₀ j j) {scale : ℝ} (hscale : scale ≠ 0)
+    {v : ι → ℝ} (hload : v j ^ 2 < v i ^ 2) :
+    ¬ (diagonalGapClass base i j 0).IsNull
+      (S₀ + rankOneCovarianceBump scale v) := by
+  have hgap : diagonalGapForm i j S₀ = 0 := by
+    unfold diagonalGapForm
+    rw [hactive]
+    ring
+  have hactive' : (diagonalGapClass base i j 0).Active () S₀ := hgap
+  have hload' : 0 < (diagonalGapClass base i j 0).spikeLoad () v := by
+    rw [diagonalGapClass_spikeLoad]
+    linarith
+  have hscaleSq : (0 : ℝ) < scale ^ 2 := sq_pos_of_ne_zero hscale
+  rw [← spiked_eq_add_rankOneCovarianceBump (diagonalGapClass base i j 0) S₀ scale v]
+  exact (diagonalGapClass base i j 0).not_isNull_spiked_of_active
+    hactive' hload' hscaleSq
+
+end RigidityInstances
 
 /-!
 ## The AR(1) whitening gain is the certificate value of the trace window

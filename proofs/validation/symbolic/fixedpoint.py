@@ -108,7 +108,12 @@ def linearisation_verdict(claimed, exact, params, max_vars=2, order=3):
                 lc, le = _leading(c), _leading(e)
                 if lc is None or le is None:
                     continue
+                # A shared leading term of ZERO is not agreement: every pair of
+                # expressions vanishing in a limit would qualify, which made
+                # `benchmarkRatio` look like a linearisation of its own square.
                 try:
+                    if sp.simplify(lc) == 0 or sp.simplify(le) == 0:
+                        continue
                     if sp.simplify(lc - le) != 0:
                         continue
                 except Exception:

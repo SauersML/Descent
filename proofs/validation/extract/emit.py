@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import math
 import pathlib
+import collections
 import random
 import re
 import sys
@@ -109,6 +110,50 @@ def main():
                    {s["name"] for s in blob["structures"]}
     def_names = {d["short"] for d in D}
 
+    # ---- python names: an ambiguous short name gets NO bare alias.  If three
+    # definitions are called `hetDecayFactor`, none of them may quietly own the
+    # name `hetDecayFactor`, or a call resolves to whichever was emitted first.
+    by_short = collections.defaultdict(list)
+    for d in D:
+        by_short[d["short"]].append(d)
+    pynames = {}
+    for short, group in by_short.items():
+        for d in group:
+            pynames[d["name"]] = pyname(short) if len(group) == 1 else pyname(d["name"])
+
+    def make_resolver(caller):
+        """Resolve an unqualified call the way Lean would, or refuse.
+
+        Preference: same file AND namespace, then same file, then same
+        namespace, then (within the surviving set) matching explicit arity.
+        A remaining tie raises rather than guessing.
+        """
+        def resolve(short, nargs):
+            group = by_short.get(short)
+            if not group:
+                return pyname(short)        # not ours: Mathlib, or a `where` local
+            cands = group
+            for pred in (lambda t: t["file"] == caller["file"]
+                         and t["namespace"] == caller["namespace"],
+                         lambda t: t["file"] == caller["file"],
+                         lambda t: t["namespace"] == caller["namespace"]):
+                narrowed = [t for t in cands if pred(t)]
+                if narrowed:
+                    cands = narrowed
+                    break
+            if len(cands) > 1:
+                arity = [t for t in cands
+                         if sum(len(a["names"]) for a in t["args"]
+                                if not a["implicit"]) == nargs]
+                if arity:
+                    cands = arity
+            if len(cands) > 1:
+                raise Untranslatable(
+                    f"ambiguous call to {short!r} with {nargs} argument(s): "
+                    f"{[t['name'] for t in cands]}")
+            return pynames[cands[0]["name"]]
+        return resolve
+
     sources, translated, reasons = {}, {}, {}
     for d in D:
         struct_args = [n for a in d["args"]
@@ -116,11 +161,10 @@ def main():
                        if a["type"].split() and a["type"].split()[0] in struct_names]
         struct_args += [n for a in d["args"] for n in a["names"]
                         if "×" in a["type"]]
-        fname = pyname(d["short"])
-        if fname in sources:
-            fname = pyname(d["name"])
+        fname = pynames[d["name"]]
         try:
-            src, argnames = translate_def(d, struct_args, fname=fname)
+            src, argnames = translate_def(d, struct_args, fname=fname,
+                                          resolver=make_resolver(d))
         except Untranslatable as e:
             reasons[d["name"]] = str(e)
             continue
@@ -203,7 +247,6 @@ def main():
         }
     (HERE / "classes.json").write_text(json.dumps(classes, indent=1, ensure_ascii=False))
 
-    import collections
     tally = collections.Counter(v["class"] for v in classes.values())
     print(f"definitions parsed : {len(D)}")
     print(f"parse failures     : {len(failures)}")

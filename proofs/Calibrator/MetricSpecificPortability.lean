@@ -1154,14 +1154,14 @@ AR(1) chromosome, as a function of the per-site LD retention `decay` and the
 fraction `kappa` of directions kept.
 
 This is the closed form of the harmonic-measure integral of the Poisson kernel:
-`(2/π) · arctan( ((1+ρ)/(1-ρ)) · tan(πκ/2) )`.  The claim that it equals the
-integral is `ldBandReconstructionShare_eq_integral`, which is stated with a
-`sorry`; this definition on its own asserts nothing.
+`(2/π) · arctan( ((1+ρ)/(1-ρ)) · tan(πκ/2) )`.  That it equals the integral is
+not proved here: it is the `reconstruction` field of
+`LDBandIntegralIdentification`, which any result relying on the identification
+must take as a hypothesis.  This definition on its own asserts nothing.
 
 Valid for `0 ≤ kappa < 1`.  At `kappa = 1` the expression is not the limit —
 `Real.tan (π/2) = 0` under Mathlib's junk-value convention — so the endpoint
-must be read off from `ldBandReconstructionShare_eq_integral` rather than from
-the formula.
+must be read off from the integral rather than from the formula.
 
 Empirical status: UNTESTED. -/
 def ldBandReconstructionShare (decay kappa : ℝ) : ℝ :=
@@ -1175,8 +1175,9 @@ pruning down to a fraction `kappa` of the directions.
 Closed form `κ - 2ρ sin(πκ) / (π(1 + ρ²))`, obtained by integrating the
 reciprocal symbol; the `1 + ρ²` is the numerator of
 `Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel
-trace.  The claim that it equals the integral ratio is
-`ldBandDetectionShare_eq_integral`.
+trace.  That it equals the integral ratio is not proved here: it is the
+`detection` field of `LDBandIntegralIdentification`, carried as a hypothesis by
+every result that relies on the identification.
 
 Empirical status: UNTESTED. -/
 def ldBandDetectionShare (decay kappa : ℝ) : ℝ :=
@@ -1587,7 +1588,7 @@ theorem ldPruningDetectionDeficit_strictMono {p₁ p₂ kappa : ℝ}
   have hprod : (0 : ℝ) < 1 - p₁ * p₂ := by
     nlinarith [mul_nonneg h₁ (by linarith : (0:ℝ) ≤ 1 - p₂)]
   unfold ldPruningDetectionDeficit
-  rw [div_lt_div_iff hd1 hd2]
+  rw [div_lt_div_iff₀ hd1 hd2]
   nlinarith [mul_pos (mul_pos (mul_pos hsin hpi) (sub_pos.mpr hlt)) hprod]
 
 /-- **Tighter linkage, larger surrendered detection power.**  Lowering the
@@ -1624,7 +1625,7 @@ theorem ldPruningDetectionDeficit_le_sin_div_pi {decay kappa : ℝ}
     · exact mul_nonneg (le_of_lt hpi) hk0
     · nlinarith [mul_nonneg (le_of_lt hpi) (by linarith : (0:ℝ) ≤ 1 - kappa)]
   unfold ldPruningDetectionDeficit
-  rw [div_le_div_iff hden hpi]
+  rw [div_le_div_iff₀ hden hpi]
   nlinarith [mul_nonneg (mul_nonneg hsin (le_of_lt hpi)) (sq_nonneg (1 - decay))]
 
 /-- **The tight-linkage floor.**  At every recombination rate and effective

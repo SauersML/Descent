@@ -46,7 +46,8 @@ def severity(r):
     asserted MONOTONICITY is next -- the author wrote down the direction and
     the formula disagrees.  Broken SYMMETRY and SCALE invariance follow.
     """
-    weight = dict(absorbing=100, monotone=80, symmetry=60, scale=55, limit=70)
+    weight = dict(absorbing=100, monotone=80, limit=70, continuity=65,
+                  symmetry=60, scale=55)
     s = -1.0
     for ch in r.get("checks", []):
         if ch["holds"] is False:

@@ -37,7 +37,12 @@ def compare(names, points_by_name, atol=1e-12, rtol=1e-10):
     `points_by_name` maps a bare Lean name to a list of positional argument
     tuples.  Returns (agreements, disagreements, unavailable).
     """
-    mine, _defs, _fail = corpus.load()
+    # MUST be the raw leanexpr table, NOT corpus.load(): load() returns the
+    # hybrid table whose entries are mostly extract's own callables, so
+    # comparing against it would compare extract with itself and pass
+    # vacuously. This comparison is only worth anything if the two sides are
+    # genuinely independent.
+    mine, _defs = corpus._leanexpr_table()
     agree, disagree, unavailable = [], [], []
 
     for name in names:

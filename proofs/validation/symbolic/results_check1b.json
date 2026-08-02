@@ -1,0 +1,31 @@
+[
+ {
+  "check": "check1b_joint_system",
+  "module": "Calibrator.PortabilityDrift",
+  "unknowns": [
+   "twoDemeIMEquilibriumETss",
+   "twoDemeIMEquilibriumETst"
+  ],
+  "guard_theorems": [
+   "twoDemeIMEquilibriumETss_isFixedPoint",
+   "twoDemeIMEquilibriumETst_isFixedPoint"
+  ],
+  "status": "joint_fixed_point_verified",
+  "detail": {
+   "equations": [
+    "Eq((M*twoDemeIMEquilibriumETst + 1)/(M + 1), twoDemeIMEquilibriumETss)",
+    "Eq((M*twoDemeIMEquilibriumETss + 1)/M, twoDemeIMEquilibriumETst)"
+   ],
+   "joint_solution": {
+    "twoDemeIMEquilibriumETss": "2",
+    "twoDemeIMEquilibriumETst": "2 + 1/M"
+   },
+   "unique": true,
+   "claims": {
+    "twoDemeIMEquilibriumETss": "2",
+    "twoDemeIMEquilibriumETst": "(2*M + 1)/M"
+   },
+   "mismatches": []
+  }
+ }
+]

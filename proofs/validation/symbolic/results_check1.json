@@ -102,13 +102,15 @@
   "name": "mutationDriftBalance",
   "module": "Calibrator.DriftRegime",
   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-  "line": 106,
+  "line": 116,
   "check": "check1_fixed_point",
-  "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "guard_theorem": "mutationDriftBalance_isFixedPoint",
+  "status": "opaque_theorem",
   "detail": {
    "claimed": null,
-   "claimed_opaque": "non-closed-form construct: fun"
+   "claimed_opaque": "non-closed-form construct: fun",
+   "guard_statement": "(mutationDriftBalance H₀ hH).measuredLoss (t + 1) = (mutationDriftBalance H₀ hH).measuredLoss t",
+   "reason": "lex error at '.measuredLoss (t + 1'"
   }
  },
  {
@@ -119,7 +121,7 @@
   "line": 821,
   "check": "check1_fixed_point",
   "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "status": "no_fixed_point_theorem",
   "detail": {
    "claimed": null,
    "claimed_opaque": "non-closed-form construct: ∏"
@@ -130,7 +132,7 @@
   "name": "stationaryLDEntry",
   "module": "Calibrator.ImitationRigidity",
   "file": "/Users/user/gnomon/proofs/Calibrator/ImitationRigidity.lean",
-  "line": 554,
+  "line": 626,
   "check": "check1_fixed_point",
   "guard_theorem": "stationaryLDEntry_isFixedPoint",
   "status": "opaque_theorem",
@@ -147,10 +149,10 @@
   "name": "ridgeBalance",
   "module": "Calibrator.ImitationRigidity",
   "file": "/Users/user/gnomon/proofs/Calibrator/ImitationRigidity.lean",
-  "line": 974,
+  "line": 1046,
   "check": "check1_fixed_point",
   "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "status": "no_fixed_point_theorem",
   "detail": {
    "claimed": null,
    "claimed_opaque": "non-closed-form construct: ∑"
@@ -193,7 +195,7 @@
   "line": 93,
   "check": "check1_fixed_point",
   "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "status": "no_fixed_point_theorem",
   "detail": {
    "claimed": "1/2 - sqrt(5)/6"
   }
@@ -245,7 +247,7 @@
   "line": 247,
   "check": "check1_fixed_point",
   "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "status": "no_fixed_point_theorem",
   "detail": {
    "claimed": "Max(0, (-m*s - m + s)/(s*(1 - m)))"
   }
@@ -258,7 +260,7 @@
   "line": 469,
   "check": "check1_fixed_point",
   "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "status": "no_fixed_point_theorem",
   "detail": {
    "claimed": "1/(θ + 1)"
   }
@@ -271,7 +273,7 @@
   "line": 867,
   "check": "check1_fixed_point",
   "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "status": "no_fixed_point_theorem",
   "detail": {
    "claimed": "1/(4*Ne*m + 4*Ne*μ + 1)"
   }
@@ -284,7 +286,7 @@
   "line": 1199,
   "check": "check1_fixed_point",
   "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "status": "no_fixed_point_theorem",
   "detail": {
    "claimed": "4*Ne*mu/(4*Ne*mu + 1)"
   }
@@ -325,6 +327,25 @@
    "residual": "0",
    "map": "twoDemeIMFirstStepDiff",
    "root_analysis_skipped": "state variable absent from map body"
+  }
+ },
+ {
+  "fqn": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumScalars",
+  "name": "twoDemeIMEquilibriumScalars",
+  "module": "Calibrator.PortabilityDrift",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+  "line": 299,
+  "check": "check1_fixed_point",
+  "guard_theorem": null,
+  "status": "derived_from_equilibrium",
+  "detail": {
+   "claimed": null,
+   "claimed_opaque": "twoDemeIMEquilibriumETss expects 1 args ['_M'], got 2",
+   "built_on": [
+    "twoDemeIMEquilibriumETss",
+    "twoDemeIMEquilibriumETst"
+   ],
+   "substituted": null
   }
  },
  {
@@ -383,9 +404,13 @@
   "line": 3998,
   "check": "check1_fixed_point",
   "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "status": "derived_from_equilibrium",
   "detail": {
-   "claimed": "4*V_A/(2*M + 1)"
+   "claimed": "4*V_A/(2*M + 1)",
+   "built_on": [
+    "twoDemeIMEquilibriumDelta"
+   ],
+   "substituted": "4*V_A/(2*M + 1)"
   }
  },
  {
@@ -439,11 +464,40 @@
   }
  },
  {
+  "fqn": "Calibrator.PortabilityDrift.ibdRecurrenceFixedPoint",
+  "name": "ibdRecurrenceFixedPoint",
+  "module": "Calibrator.PortabilityDrift",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+  "line": 4620,
+  "check": "check1_fixed_point",
+  "guard_theorem": "ibdRecurrenceFixedPoint_isFixedPoint",
+  "status": "fixed_point_verified",
+  "detail": {
+   "claimed": "(1 - rate)**2/(2*Ne*rate*(2 - rate) + (1 - rate)**2)",
+   "guard_statement": "ibdRecurrenceStep Ne rate (ibdRecurrenceFixedPoint Ne rate) = ibdRecurrenceFixedPoint Ne rate",
+   "lhs_map_applied": "(1 - rate)**2*((1 - 1/(2*Ne))*(1 - rate)**2/(2*Ne*rate*(2 - rate) + (1 - rate)**2) + 1/(2*Ne))",
+   "rhs_claimed": "(1 - rate)**2/(2*Ne*rate*(2 - rate) + (1 - rate)**2)",
+   "residual": "0",
+   "map": "ibdRecurrenceStep",
+   "map_roots": [
+    "(rate - 1)**2/(-2*Ne*(rate - 1)**2 + 2*Ne + (rate - 1)**2)"
+   ],
+   "map_derivative": "(1 - 1/(2*Ne))*(1 - rate)**2",
+   "root_stability": [
+    {
+     "root": "(rate - 1)**2/(-2*Ne*(rate - 1)**2 + 2*Ne + (rate - 1)**2)",
+     "stability": "unknown",
+     "derivative": "(Ne - 1/2)*(rate - 1)**2/Ne"
+    }
+   ]
+  }
+ },
+ {
   "fqn": "Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium",
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4613,
+  "line": 4727,
   "check": "check1_fixed_point",
   "guard_theorem": "fstIslandMultiplicativeEquilibrium_isFixedPoint",
   "status": "fixed_point_verified",
@@ -468,6 +522,23 @@
   }
  },
  {
+  "fqn": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
+  "name": "sharedLD_from_equilibrium",
+  "module": "Calibrator.PortabilityDrift",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+  "line": 4940,
+  "check": "check1_fixed_point",
+  "guard_theorem": null,
+  "status": "derived_from_equilibrium",
+  "detail": {
+   "claimed": "1 - 1/(4*Ne*m + 1)",
+   "built_on": [
+    "fstMigrationDriftEquilibrium"
+   ],
+   "substituted": "1 - 1/(4*Ne*m + 1)"
+  }
+ },
+ {
   "fqn": "Calibrator.QuadraticShift.scalarCorrectionFloor",
   "name": "scalarCorrectionFloor",
   "module": "Calibrator.QuadraticShift",
@@ -475,7 +546,7 @@
   "line": 131,
   "check": "check1_fixed_point",
   "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "status": "no_fixed_point_theorem",
   "detail": {
    "claimed": null,
    "claimed_opaque": "unresolved name B.mulVec"
@@ -557,7 +628,7 @@
   "line": 44,
   "check": "check1_fixed_point",
   "guard_theorem": null,
-  "status": "UNGUARDED_NO_MAP",
+  "status": "no_fixed_point_theorem",
   "detail": {
    "claimed": "v_mutation/s"
   }

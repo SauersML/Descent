@@ -1608,7 +1608,7 @@
   "statement": "let pred_raw := fun p c => β * p + hdgp.baseline c mse hdgp.toDGP pred_raw = ∫ pc, (hdgp.alpha pc.2 - β)^2 * pc.1^2 ∂hdgp.jointMeasure",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: let"
+   "reason": "non-closed-form construct: fun"
   }
  },
  {
@@ -1842,7 +1842,7 @@
   "name": "diagonalDesign_benchmark_eq",
   "module": "Calibrator.DriftRegime",
   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-  "line": 238,
+  "line": 288,
   "claim_source": "name",
   "statement": "diagonalDesign benchmarkRatio = diagonalDesign benchmarkRatioSquared",
   "status": "opaque",
@@ -1886,7 +1886,7 @@
   "name": "circulantSpectrumA_eq_cos",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1365,
+  "line": 1369,
   "claim_source": "name",
   "statement": "2 * Real.cos θ + 4 * Real.cos (2 * θ) = circulantSpectrumA (Real.cos θ)",
   "status": "derivation_verified",
@@ -1907,7 +1907,7 @@
   "name": "circulantSpectrumB_eq_cos",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1372,
+  "line": 1376,
   "claim_source": "name",
   "statement": "4 * Real.cos θ + 2 * Real.cos (2 * θ) = circulantSpectrumB (Real.cos θ)",
   "status": "derivation_verified",
@@ -2207,7 +2207,7 @@
   "name": "stationaryLDEntry_eq_ldAfterGenerations",
   "module": "Calibrator.ImitationRigidity",
   "file": "/Users/user/gnomon/proofs/Calibrator/ImitationRigidity.lean",
-  "line": 638,
+  "line": 710,
   "claim_source": "name",
   "statement": "stationaryLDEntry (ldRetentionPerGen r Ne) separation = ldAfterGenerations 1 r Ne separation",
   "status": "not_an_equation",
@@ -2219,7 +2219,7 @@
   "name": "ldPrecisionTrace_eq_boundary_add_interior",
   "module": "Calibrator.ImitationRigidity",
   "file": "/Users/user/gnomon/proofs/Calibrator/ImitationRigidity.lean",
-  "line": 866,
+  "line": 938,
   "claim_source": "name",
   "statement": "ldPrecisionTrace decay nSites = 1 + ((nSites : ℝ) - 1) * ldWhiteningGain decay",
   "status": "opaque",
@@ -2767,7 +2767,7 @@
   "name": "headroom_eq_zero_of_active",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 282,
+  "line": 289,
   "claim_source": "name",
   "statement": "K.headroom a S₀ = 0",
   "status": "opaque",
@@ -2781,7 +2781,7 @@
   "name": "imitationCapacity_eq_zero_of_active",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 428,
+  "line": 435,
   "claim_source": "name",
   "statement": "K.imitationCapacity S₀ support = 0",
   "status": "opaque",
@@ -2795,7 +2795,7 @@
   "name": "imitationCapacity_eq",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 668,
+  "line": 675,
   "claim_source": "name",
   "statement": "K.imitationCapacity S₀ support = K.headroom E.binding S₀ / E.load",
   "status": "opaque",
@@ -2811,7 +2811,7 @@
   "name": "form_spiked_eq_bound_add_margin",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 700,
+  "line": 707,
   "claim_source": "name",
   "statement": "K.form E.binding (K.spiked S₀ t v) = K.bound E.binding + E.margin t",
   "status": "opaque",
@@ -2825,7 +2825,7 @@
   "name": "whitenedCapacity_closedForm",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 871,
+  "line": 878,
   "claim_source": "name",
   "statement": "whitenedCapacity headroom decay = headroom * (1 - decay ^ 2) / (1 + decay ^ 2)",
   "status": "opaque",
@@ -2841,7 +2841,7 @@
   "name": "imitationCapacity_eq_whitenedCapacity",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 882,
+  "line": 889,
   "claim_source": "name",
   "statement": "K.imitationCapacity S₀ support = whitenedCapacity (K.headroom E.binding S₀) decay",
   "status": "opaque",
@@ -2855,7 +2855,7 @@
   "name": "demographicSpike_eq_level_mul_spikeLoad",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1048,
+  "line": 1055,
   "claim_source": "name",
   "statement": "demographicSpike (N : ℝ) F (m : ℝ) = (4 * F) * (traceWindowBudgetClass base budget).spikeLoad a (demographicSpikeDirection N m)",
   "status": "opaque",
@@ -2869,7 +2869,7 @@
   "name": "inverseTraceCertificate_eq_traceWindowSpikeLoad",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1245,
+  "line": 1252,
   "claim_source": "name",
   "statement": "inverseTraceCertificate m lam = traceWindowSpikeLoad decay m",
   "status": "opaque",
@@ -2888,7 +2888,7 @@
   "statement": "samplePCOverlapSq n M spike = 0",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: if"
+   "reason": "non-closed-form construct: else"
   }
  },
  {
@@ -2902,7 +2902,7 @@
   "statement": "samplePCOverlapSq n M spike = (1 - (n / M) / spike ^ 2) / (1 + (n / M) / spike)",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: if"
+   "reason": "non-closed-form construct: else"
   }
  },
  {
@@ -2916,7 +2916,7 @@
   "statement": "samplePCResidualAxisFraction n M spike = (n / M) * (spike + 1) / (spike * (spike + n / M))",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: if"
+   "reason": "non-closed-form construct: else"
   }
  },
  {
@@ -2930,7 +2930,7 @@
   "statement": "modeledPCResidualSusceptibility markerAxisVariance ancestryVariance n markers spike = ancestryGradientSusceptibility markerAxisVariance ancestryVariance",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: if"
+   "reason": "non-closed-form construct: else"
   }
  },
  {
@@ -3845,7 +3845,7 @@
   "name": "HardyWeinbergModel.mellinDrift_eq",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 261,
+  "line": 277,
   "claim_source": "name",
   "statement": "h.mellinDrift = hweMellinDrift h.altFreq",
   "status": "opaque",
@@ -3861,7 +3861,7 @@
   "name": "maxSafeEpistaticOrder_eq_criticalDegree",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 608,
+  "line": 624,
   "claim_source": "name",
   "statement": "maxSafeEpistaticOrder N q = criticalDegree N (hweMellinDrift q)",
   "status": "not_an_equation",
@@ -3873,7 +3873,7 @@
   "name": "HardyWeinbergModel.mellinJetVariance_eq",
   "module": "Calibrator.PolygenicSpectroscopy",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
-  "line": 816,
+  "line": 832,
   "claim_source": "name",
   "statement": "h.mellinJetVariance = hweMellinJetVariance h.altFreq",
   "status": "opaque",
@@ -3882,6 +3882,18 @@
    "mentions_definition": true,
    "reason": "non-closed-form construct: ∑"
   }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.PolygenicSpectroscopy.balanced_locus_drift_separates",
+  "name": "balanced_locus_drift_separates",
+  "module": "Calibrator.PolygenicSpectroscopy",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
+  "line": 1132,
+  "claim_source": "+doc",
+  "statement": "hweMellinDrift (1 / 2) ≠ condensationConstant",
+  "status": "not_an_equation",
+  "detail": {}
  },
  {
   "check": "check2_derivation",
@@ -5452,11 +5464,23 @@
  },
  {
   "check": "check2_derivation",
+  "fqn": "Calibrator.PortabilityDrift.islandFstMultiplicativeStep_eq_ibdRecurrenceStep",
+  "name": "islandFstMultiplicativeStep_eq_ibdRecurrenceStep",
+  "module": "Calibrator.PortabilityDrift",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+  "line": 4714,
+  "claim_source": "name",
+  "statement": "islandFstMultiplicativeStep Ne m F = ibdRecurrenceStep Ne m F",
+  "status": "not_an_equation",
+  "detail": {}
+ },
+ {
+  "check": "check2_derivation",
   "fqn": "Calibrator.PortabilityDrift.fstMigrationDriftEquilibrium_eq_from_M",
   "name": "fstMigrationDriftEquilibrium_eq_from_M",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4673,
+  "line": 4769,
   "claim_source": "name",
   "statement": "fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m)",
   "status": "not_an_equation",
@@ -5468,7 +5492,7 @@
   "name": "SplitMigrationModel.fstMigDriftEq_eq_limit",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4753,
+  "line": 4849,
   "claim_source": "name",
   "statement": "s.fstMigDriftEq = s.fstEqLimitLowMutationManyDemes",
   "status": "opaque",
@@ -5482,7 +5506,7 @@
   "name": "sharedLD_from_equilibrium_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4850,
+  "line": 4946,
   "claim_source": "name+doc",
   "statement": "sharedLD_from_equilibrium Ne m = scaledMigrationRate Ne m / (1 + scaledMigrationRate Ne m)",
   "status": "derivation_verified",
@@ -5508,7 +5532,7 @@
   "name": "sharedLD_from_equilibrium_eq_sharedLDFromMigration",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4876,
+  "line": 4972,
   "claim_source": "name",
   "statement": "sharedLD_from_equilibrium Ne m = sharedLDFromMigration (scaledMigrationRate Ne m)",
   "status": "derivation_verified",
@@ -5532,7 +5556,7 @@
   "name": "fst_plus_sharedLD_eq_one",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4908,
+  "line": 5004,
   "claim_source": "name",
   "statement": "fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (scaledMigrationRate Ne m) = 1",
   "status": "derivation_verified",
@@ -5556,7 +5580,7 @@
   "name": "signalRetentionMigrationDrift_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 4928,
+  "line": 5024,
   "claim_source": "name",
   "statement": "signalRetentionMigrationDrift V_A Ne m = (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 * V_A",
   "status": "opaque",
@@ -5572,7 +5596,7 @@
   "name": "asymmetricFst_eq_migrationDriftEq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5006,
+  "line": 5102,
   "claim_source": "name",
   "statement": "asymmetricFst Ne m_into = fstMigrationDriftEquilibrium Ne m_into",
   "status": "not_an_equation",
@@ -5584,7 +5608,7 @@
   "name": "fstMigDriftNext_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5178,
+  "line": 5274,
   "claim_source": "name",
   "statement": "fstMigDriftNext Ne m Fst = (1 - 2 * m - 1 / (2 * Ne)) * Fst + 1 / (2 * Ne)",
   "status": "not_an_equation",
@@ -5599,7 +5623,7 @@
   "name": "fstMigDriftEquil_eq_fstMigrationDriftEquilibrium",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5212,
+  "line": 5308,
   "claim_source": "name",
   "statement": "fstMigDriftEquil Ne m = fstMigrationDriftEquilibrium Ne m",
   "status": "not_an_equation",
@@ -5611,7 +5635,7 @@
   "name": "neutralAFBenchmarkFromRecurrence_eq",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5295,
+  "line": 5391,
   "claim_source": "name",
   "statement": "neutralAFBenchmarkFromRecurrence Ne m = 4 * Ne * m / (4 * Ne * m + 1)",
   "status": "derivation_verified",
@@ -5637,7 +5661,7 @@
   "name": "recurrence_derived_R2_increases_with_m",
   "module": "Calibrator.PortabilityDrift",
   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-  "line": 5339,
+  "line": 5435,
   "claim_source": "name",
   "statement": "presentDayR2 V_A V_E (fstMigDriftEquil Ne m₁) < presentDayR2 V_A V_E (fstMigDriftEquil Ne m₂)",
   "status": "not_an_equation",
@@ -5738,7 +5762,7 @@
   "statement": "∑ i, (A.mulVec u) i * v i = ∑ i, u i * ((Matrix.transpose A).mulVec v) i",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: Matrix"
+   "reason": "non-closed-form construct: ∑"
   }
  },
  {

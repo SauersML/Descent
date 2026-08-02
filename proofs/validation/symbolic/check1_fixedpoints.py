@@ -35,6 +35,8 @@ from pathlib import Path
 import sympy as sp
 
 import leansym as L
+import hyps as H
+import fixedpoint as FP
 
 HERE = Path(__file__).parent
 
@@ -164,6 +166,87 @@ def check_guarded(conv, thm, rec):
         rec["status"] = "inconclusive"
 
 
+
+def try_joint(conv, table, d, named_maps, decls, equilibrium_names):
+    """Solve a coupled system when a docstring names several maps.
+
+    The two-deme coalescent is the case: `twoDemeIMFirstStepSame` mentions
+    ETst and `twoDemeIMFirstStepDiff` mentions ETss, so neither equation
+    determines anything on its own.
+    """
+    maps, states = {}, {}
+    for mn in named_maps:
+        mbind, mbody = table[mn]
+        if not mbind:
+            return None
+        # the state arguments are the map binders that name sibling equilibria
+        maps[mn] = (mbind, mbody)
+    # the shared state variables are the binder names common to all the maps,
+    # minus the model parameters this equilibrium itself takes
+    own = {n for grp, ty, op in d["binders"] if op == "(" for n in grp}
+    state_names = set()
+    for mn, (mbind, _) in maps.items():
+        for b in mbind:
+            if b.lstrip("_") not in own:
+                state_names.add(b.lstrip("_"))
+    if len(state_names) < 2:
+        return None
+    syms = {n: sp.Symbol(n, positive=True) for n in state_names}
+    params = {n: sp.Symbol(n, positive=True) for n in own}
+    system = {}
+    for mn, (mbind, mbody) in maps.items():
+        env = {}
+        for b in mbind:
+            key = b.lstrip("_")
+            env[b] = syms.get(key) or params.get(key)
+        if any(v is None for v in env.values()):
+            return None
+        try:
+            expr = conv.convert(mbody, dict(env))
+        except Exception:
+            return None
+        # which state does this map compute?  the one it does NOT read
+        # linearly on the right is ambiguous, so use the map's own name
+        target = None
+        for n in state_names:
+            if n.lower() in mn.lower():
+                target = n
+                break
+        if target is None:
+            # fall back: the state absent from its own binder list as a
+            # non-underscored argument
+            cands = [b.lstrip("_") for b in mbind if b.startswith("_")]
+            target = cands[0] if cands else None
+        if target is None or target in system:
+            return None
+        system[target] = expr
+    if len(system) != len(state_names):
+        return None
+    sols, info = FP.joint_fixed_point(system, syms)
+    if not sols:
+        return "JOINT_SOLVE_FAILED", {"equations": info.get("equations")}
+    # compare each claimed sibling equilibrium against the joint solution
+    claims, agree = {}, True
+    for n in state_names:
+        sib = next((x for x in decls if x["kind"] == "def" and x["module"] == d["module"]
+                    and x["name"] in equilibrium_names and x["name"].endswith(n)), None)
+        if sib is None:
+            continue
+        try:
+            cl = conv.convert(sib["body"], {b: params[b] for grp, ty, op in sib["binders"]
+                                            if op == "(" for b in grp if b in params})
+        except Exception:
+            continue
+        claims[sib["name"]] = sp.sstr(cl)
+        got = sols[0].get(n)
+        if got is None or sp.simplify(got - cl) != 0:
+            agree = False
+    return (("joint_fixed_point_verified" if agree else "JOINT_FIXED_POINT_FAILS"),
+            {"joint_equations": info.get("equations"),
+             "joint_solution": {k: sp.sstr(v) for k, v in sols[0].items()},
+             "claims": claims})
+
+
 def run():
     decls, table = load()
     conv = L.Converter(table)
@@ -176,8 +259,8 @@ def run():
             guards.setdefault(base, t)
 
     targets = [d for d in decls if d["kind"] == "def" and d["body"]
-               and EQ_NAME.search(d["name"])
-               and not NOT_A_REST_POINT.search(d["name"])]
+               and EQ_NAME.search(d["name"])]
+    equilibrium_names = {d["name"] for d in targets}
 
     results = []
     for d in targets:
@@ -195,6 +278,21 @@ def run():
         except L.Unsupported as e:
             rec["detail"]["claimed"] = None
             rec["detail"]["claimed_opaque"] = str(e)
+
+        # --- is this a quantity DERIVED from equilibria rather than a rest
+        # point itself?  An F_ST is a ratio of coalescence times; it is not the
+        # fixed point of anything, and checking it as one produced two of the
+        # five false positives in the first run.
+        built_on = [n for n in FP.is_derived_from(d["body"], table, equilibrium_names)
+                    if n != name]
+        if built_on and name not in guards:
+            rec["status"] = "derived_from_equilibrium"
+            rec["detail"]["built_on"] = built_on
+            # verify differently: substitute the equilibria in and compare the
+            # body against the closed form the docstring/definition claims
+            rec["detail"]["substituted"] = rec["detail"].get("claimed")
+            results.append(rec)
+            continue
 
         thm = guards.get(name)
         if thm:
@@ -218,8 +316,15 @@ def run():
             # unguarded: accept only an explicitly named map
             named = [b.split(".")[-1] for b in backticked(d["docstring"])
                      if b.split(".")[-1] in table and MAP_NAME.search(b.split(".")[-1])]
+            if len(named) > 1:
+                jres = try_joint(conv, table, d, named, decls, equilibrium_names)
+                if jres is not None:
+                    rec["status"], extra = jres
+                    rec["detail"].update(extra)
+                    results.append(rec)
+                    continue
             if not named:
-                rec["status"] = "UNGUARDED_NO_MAP"
+                rec["status"] = "no_fixed_point_theorem"
                 results.append(rec)
                 continue
             map_name = named[0]
@@ -229,6 +334,16 @@ def run():
                        if op == "(" and ty.strip() in ("ℝ", "ℕ") for n in grp]
             if len(mbind) != len(binders) + 1:
                 rec["status"] = "UNGUARDED_ARITY_MISMATCH"
+                rec["detail"]["map_binders"] = mbind
+                rec["detail"]["eq_binders"] = binders
+                results.append(rec)
+                continue
+            # Anti-capture: bind the map's parameters to the equilibrium's by
+            # NAME.  Zipping them positionally is how an earlier version
+            # substituted `M` into the slot Hudson's ratio reserves for
+            # `ETss`, silently checking a formula nobody wrote.
+            if mbind[:-1] != binders:
+                rec["status"] = "UNGUARDED_BINDERS_DO_NOT_CORRESPOND"
                 rec["detail"]["map_binders"] = mbind
                 rec["detail"]["eq_binders"] = binders
                 results.append(rec)
@@ -246,19 +361,36 @@ def run():
                 continue
             var = syms[mbind[-1]]
             rec["detail"]["step"] = sp.sstr(step)
-            verdict = L.equal(step.subs(var, claimed), claimed)
+            verdict, vinfo = H.verdict_for(step.subs(var, claimed), claimed,
+                                           d["binders"], conv)
             rec["detail"]["residual"] = sp.sstr(
                 sp.simplify(sp.together(step.subs(var, claimed) - claimed)))
             if verdict is True:
                 rec["status"] = "UNGUARDED_but_verified"
             elif verdict is False:
-                rec["status"] = "FIXED_POINT_FAILS"
+                # Not the exact root -- but is it the exact root's leading
+                # term?  "Linearised" and "wrong" are different findings.
+                roots = []
                 try:
-                    roots = sp.solve(sp.Eq(sp.together(step - var), 0), var)
-                    rec["detail"]["correct_closed_form"] = [sp.sstr(sp.simplify(r))
-                                                            for r in roots]
+                    roots = [sp.simplify(r) for r in
+                             sp.solve(sp.Eq(sp.together(step - var), 0), var)]
                 except Exception:
                     pass
+                rec["detail"]["exact_roots"] = [sp.sstr(r) for r in roots]
+                params = [sp.Symbol(b, positive=True) for b in binders]
+                lin = []
+                for r in roots:
+                    lin = FP.linearisation_verdict(claimed, r, params)
+                    if lin:
+                        rec["detail"]["linearised_from_root"] = sp.sstr(r)
+                        break
+                if lin:
+                    rec["status"] = "HOLDS_TO_FIRST_ORDER"
+                    rec["detail"]["regimes"] = lin[:4]
+                else:
+                    rec["status"] = "FIXED_POINT_FAILS"
+                    rec["detail"]["correct_closed_form"] = [sp.sstr(r) for r in roots]
+                    rec["detail"]["witness"] = vinfo.get("witness")
             else:
                 rec["status"] = "inconclusive"
             state_var_analysis(conv, table, map_name, name, rec)

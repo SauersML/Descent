@@ -304,8 +304,8 @@ theorem wienerWeight_strictMono {noise s₁ s₂ : ℝ}
   have d₁ : 0 < s₁ + noise := by linarith
   have d₂ : 0 < s₂ + noise := by linarith
   unfold wienerWeight
-  rw [div_lt_div_iff d₁ d₂]
-  nlinarith
+  rw [div_lt_div_iff₀ d₁ d₂]
+  nlinarith [mul_pos hn (sub_pos.mpr h)]
 
 /-- **The two weight profiles are inversely ordered.**  On a background with
 distinct eigenvalues, moving to a higher-variance direction strictly increases
@@ -453,11 +453,11 @@ theorem spectralCapture_le_of_threshold
     calc ∑ i, M i * (w i - t)
         = ∑ i, (M i * w i - t * M i) :=
           Finset.sum_congr rfl (fun i _ => by ring)
-      _ = (∑ i, M i * w i) - ∑ i, t * M i := Finset.sum_sub_distrib
+      _ = (∑ i, M i * w i) - ∑ i, t * M i := by rw [Finset.sum_sub_distrib]
       _ = (∑ i, M i * w i) - t * ∑ i, M i := by rw [← Finset.mul_sum]
   have hR : ∑ i ∈ S, (w i - t) = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
     calc ∑ i ∈ S, (w i - t)
-        = (∑ i ∈ S, w i) - ∑ i ∈ S, t := Finset.sum_sub_distrib
+        = (∑ i ∈ S, w i) - ∑ i ∈ S, t := by rw [Finset.sum_sub_distrib]
       _ = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
           rw [Finset.sum_const, nsmul_eq_mul]; ring
   rw [hL, hM.trace] at hstep1
@@ -489,11 +489,11 @@ theorem spectralCapture_ge_of_threshold
     calc ∑ i, M i * (w i - t)
         = ∑ i, (M i * w i - t * M i) :=
           Finset.sum_congr rfl (fun i _ => by ring)
-      _ = (∑ i, M i * w i) - ∑ i, t * M i := Finset.sum_sub_distrib
+      _ = (∑ i, M i * w i) - ∑ i, t * M i := by rw [Finset.sum_sub_distrib]
       _ = (∑ i, M i * w i) - t * ∑ i, M i := by rw [← Finset.mul_sum]
   have hR : ∑ i ∈ S, (w i - t) = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
     calc ∑ i ∈ S, (w i - t)
-        = (∑ i ∈ S, w i) - ∑ i ∈ S, t := Finset.sum_sub_distrib
+        = (∑ i ∈ S, w i) - ∑ i ∈ S, t := by rw [Finset.sum_sub_distrib]
       _ = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
           rw [Finset.sum_const, nsmul_eq_mul]; ring
   rw [hL, hM.trace] at hstep1

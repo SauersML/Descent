@@ -158,9 +158,57 @@ Toeplitz and stationary covariance classes are instances of this condition. -/
 def ShiftInvariant (shift : ι → ι) (A : Matrix ι ι ℝ) : Prop :=
   ∀ i j, A (shift i) (shift j) = A i j
 
+/-! ### Stationarity computes; it does not conclude
+
+The two rigidity theorems below were originally stated with a *global*
+hypothesis — constant diagonal, or invariance under an index shift — and read
+as saying that stationarity is what buys resistance to imitation.  It is not.
+Inspecting the proofs shows each uses its global hypothesis exactly once, at
+the single witnessing pair `(i, j)`, as one scalar equation.  That equation is
+an active linear constraint, and the loading condition beside it is that the
+constraint has positive load on the spike.  Rigidity is therefore a normal-cone
+condition, not a symmetry condition, and
+`Calibrator.PCCorrectability.ImitationCapacity` proves it in that generality,
+where the certificate is a constraint index and the witnessing class need have
+no symmetry at all.
+
+The consequence for this file is a strict strengthening at no cost: the
+pointwise theorems come first and the global ones are derived from them.  The
+strengthened statements reach LD structures that are *not* stationary, which is
+every real one — and for a standardized genotype panel the diagonal constraint
+is active automatically, since a correlation matrix has unit diagonal, so the
+loading condition is the whole of what is required.
+
+Where stationarity is genuinely needed it is left alone: the symbol, the hard
+edge, the harmonic mean and the exact finite-chromosome inverse trace of the
+`StationaryLD` section below all *compute* a spectrum, and no normal-cone
+argument computes a spectrum. -/
+
+/-- **The pointwise form: one active constraint, one direction with positive
+load.** If the diagonal entries at `i` and `j` agree — one linear equation, not
+a global class condition — then a rank-one bump with unequal squared loadings
+at those two coordinates separates them. No stationarity, no symmetry, and no
+hypothesis about any other entry of `K`. -/
+theorem add_rankOneBump_diagonal_gap_ne_of_active
+    (K : Matrix ι ι ℝ) (scale : ℝ) (loading : ι → ℝ) (i j : ι)
+    (hactive : K i i = K j j)
+    (hscale : scale ≠ 0)
+    (hloading : loading i ^ 2 ≠ loading j ^ 2) :
+    (K + rankOneCovarianceBump scale loading) i i ≠
+      (K + rankOneCovarianceBump scale loading) j j := by
+  intro hij
+  simp only [Matrix.add_apply, rankOneCovarianceBump] at hij
+  have hscaleSq : 0 < scale ^ 2 := sq_pos_of_ne_zero hscale
+  apply hloading
+  nlinarith [hij, hactive]
+
 /-- A rank-one bump with nonconstant squared loadings leaves the
 constant-diagonal class. This is the finite-dimensional rigidity mechanism
-behind the failure of stationary nuisance classes to absorb a generic spike. -/
+behind the failure of stationary nuisance classes to absorb a generic spike.
+
+Constant diagonality is now visibly stronger than what the conclusion needs:
+the proof consumes it only as `hK i j`, the single active constraint of
+`add_rankOneBump_diagonal_gap_ne_of_active`. -/
 theorem add_rankOneBump_not_constantDiagonal
     (K : Matrix ι ι ℝ) (scale : ℝ) (loading : ι → ℝ) (i j : ι)
     (hK : ConstantDiagonal K)
@@ -168,12 +216,8 @@ theorem add_rankOneBump_not_constantDiagonal
     (hloading : loading i ^ 2 ≠ loading j ^ 2) :
     ¬ ConstantDiagonal (K + rankOneCovarianceBump scale loading) := by
   intro hconstant
-  have hij := hconstant i j
-  have hdiag := hK i j
-  simp only [Matrix.add_apply, rankOneCovarianceBump] at hij
-  have hscaleSq : 0 < scale ^ 2 := sq_pos_of_ne_zero hscale
-  apply hloading
-  nlinarith [hij, hdiag]
+  exact add_rankOneBump_diagonal_gap_ne_of_active K scale loading i j
+    (hK i j) hscale hloading (hconstant i j)
 
 /-- Consequently the class of constant-diagonal covariances is not closed
 under such a bump. -/
@@ -212,10 +256,37 @@ theorem add_rankOneBump_shiftInvariant_iff_of_ne
     rw [hK i j]
     nlinarith [hloading i j]
 
+/-- **The pointwise form for an off-diagonal constraint.** If `K` is unmoved by
+the shift at the single pair `(i, j)` — again one linear equation, with no
+hypothesis about any other entry and no requirement that `shift` generate a
+group — then a bump whose loading product is moved there separates the two
+entries. This is the same normal-cone mechanism as the diagonal case, applied
+to a different active constraint. -/
+theorem add_rankOneBump_shift_entry_ne_of_active
+    (shift : ι → ι) (K : Matrix ι ι ℝ)
+    (scale : ℝ) (loading : ι → ℝ) (i j : ι)
+    (hactive : K (shift i) (shift j) = K i j)
+    (hscale : scale ≠ 0)
+    (hloading :
+      loading (shift i) * loading (shift j) ≠ loading i * loading j) :
+    (K + rankOneCovarianceBump scale loading) (shift i) (shift j) ≠
+      (K + rankOneCovarianceBump scale loading) i j := by
+  intro hbump
+  simp only [Matrix.add_apply, rankOneCovarianceBump] at hbump
+  apply hloading
+  have hscaled :
+      scale ^ 2 * (loading (shift i) * loading (shift j)) =
+        scale ^ 2 * (loading i * loading j) := by
+    nlinarith [hbump, hactive]
+  exact mul_left_cancel₀ (pow_ne_zero 2 hscale) hscaled
+
 /-- **Stationary rigidity.** A shift-invariant covariance cannot absorb a
 rank-one bump whose pairwise loading products are changed by the shift. Unlike
 the diagonal corollary above, this detects nonstationarity in off-diagonal
-entries as well. -/
+entries as well.
+
+Shift invariance is now visibly stronger than what the conclusion needs: the
+proof consumes it only as `hK i j`. -/
 theorem add_rankOneBump_not_shiftInvariant
     (shift : ι → ι) (K : Matrix ι ι ℝ)
     (scale : ℝ) (loading : ι → ℝ) (i j : ι)
@@ -224,8 +295,9 @@ theorem add_rankOneBump_not_shiftInvariant
     (hloading :
       loading (shift i) * loading (shift j) ≠ loading i * loading j) :
     ¬ ShiftInvariant shift (K + rankOneCovarianceBump scale loading) := by
-  rw [add_rankOneBump_shiftInvariant_iff_of_ne shift K scale loading hK hscale]
-  exact not_forall_of_exists_not ⟨i, not_forall_of_exists_not ⟨j, hloading⟩⟩
+  intro hinvariant
+  exact add_rankOneBump_shift_entry_ne_of_active shift K scale loading i j
+    (hK i j) hscale hloading (hinvariant i j)
 
 /-- The whole shift-invariant nuisance class is therefore rigid against a
 generic rank-one covariance bump. -/

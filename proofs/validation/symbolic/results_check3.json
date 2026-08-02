@@ -105,7 +105,7 @@
      "fqn": "Calibrator.DriftRegime.targetHetOfRetention",
      "name": "targetHetOfRetention",
      "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-     "line": 165,
+     "line": 197,
      "binders": [
       "H₀",
       "r"
@@ -116,7 +116,7 @@
      "fqn": "Calibrator.DriftRegime.targetPgsVarOfRetention",
      "name": "targetPgsVarOfRetention",
      "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-     "line": 168,
+     "line": 204,
      "binders": [
       "V_A",
       "r"
@@ -223,7 +223,7 @@
      "fqn": "Calibrator.PortabilityDrift.asymmetricFst",
      "name": "asymmetricFst",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 5002,
+     "line": 5098,
      "binders": [
       "Ne",
       "m_into"
@@ -234,7 +234,7 @@
      "fqn": "Calibrator.PortabilityDrift.fstMigDriftEquil",
      "name": "fstMigDriftEquil",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 5208,
+     "line": 5304,
      "binders": [
       "Ne",
       "m"
@@ -866,7 +866,7 @@
      "fqn": "Calibrator.PortabilityDrift.effectiveSymmetricMigration",
      "name": "effectiveSymmetricMigration",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 5043,
+     "line": 5139,
      "binders": [
       "m₁₂",
       "m₂₁"
@@ -896,7 +896,7 @@
      "fqn": "Calibrator.ImitationRigidity.fairTwoPointVariance",
      "name": "fairTwoPointVariance",
      "file": "/Users/user/gnomon/proofs/Calibrator/ImitationRigidity.lean",
-     "line": 262,
+     "line": 334,
      "binders": [
       "a",
       "b"
@@ -1004,7 +1004,7 @@
      "fqn": "Calibrator.PortabilityDrift.admixtureLDDecay",
      "name": "admixtureLDDecay",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 5064,
+     "line": 5160,
      "binders": [
       "r",
       "generations_since"
@@ -1228,7 +1228,7 @@
      "fqn": "Calibrator.DriftRegime.driftRetention",
      "name": "driftRetention",
      "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-     "line": 159,
+     "line": 182,
      "binders": [
       "Ne",
       "t"
@@ -1269,7 +1269,7 @@
      "fqn": "Calibrator.DriftRegime.lossOfRetention",
      "name": "lossOfRetention",
      "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-     "line": 162,
+     "line": 194,
      "binders": [
       "r"
      ],
@@ -1307,7 +1307,7 @@
      "fqn": "Calibrator.DriftRegime.benchmarkRatio",
      "name": "benchmarkRatio",
      "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
-     "line": 227,
+     "line": 274,
      "binders": [
       "fstS",
       "fstT"
@@ -1565,16 +1565,28 @@
      "body": "(1 - c) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * Q)"
     },
     {
+     "fqn": "Calibrator.PortabilityDrift.ibdRecurrenceStep",
+     "name": "ibdRecurrenceStep",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4607,
+     "binders": [
+      "Ne",
+      "rate",
+      "x"
+     ],
+     "body": "(1 - rate) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * x)"
+    },
+    {
      "fqn": "Calibrator.PortabilityDrift.islandFstMultiplicativeStep",
      "name": "islandFstMultiplicativeStep",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 4602,
+     "line": 4710,
      "binders": [
       "Ne",
       "m",
       "F"
      ],
-     "body": "(1 - m) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * F)"
+     "body": "ibdRecurrenceStep Ne m F"
     }
    ]
   },
@@ -1596,15 +1608,26 @@
      "body": "(1 - c) ^ 2 * (1 / (2 * Ne)) / (1 - driftLDRetention Ne c)"
     },
     {
+     "fqn": "Calibrator.PortabilityDrift.ibdRecurrenceFixedPoint",
+     "name": "ibdRecurrenceFixedPoint",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4620,
+     "binders": [
+      "Ne",
+      "rate"
+     ],
+     "body": "(1 - rate) ^ 2 / ((1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate))"
+    },
+    {
      "fqn": "Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium",
      "name": "fstIslandMultiplicativeEquilibrium",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 4613,
+     "line": 4727,
      "binders": [
       "Ne",
       "m"
      ],
-     "body": "(1 - m) ^ 2 / ((1 - m) ^ 2 + 2 * Ne * m * (2 - m))"
+     "body": "ibdRecurrenceFixedPoint Ne m"
     }
    ]
   },
@@ -1648,7 +1671,7 @@
      "fqn": "Calibrator.PortabilityDrift.sharedLDFromMigration",
      "name": "sharedLDFromMigration",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 4870,
+     "line": 4966,
      "binders": [
       "M"
      ],
@@ -1881,7 +1904,7 @@
      "fqn": "Calibrator.PortabilityDrift.scaledMigrationRate",
      "name": "scaledMigrationRate",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 4663,
+     "line": 4759,
      "binders": [
       "Ne",
       "m"
@@ -1922,7 +1945,7 @@
      "fqn": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
      "name": "sharedLD_from_equilibrium",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 4844,
+     "line": 4940,
      "binders": [
       "Ne",
       "m"
@@ -1933,7 +1956,7 @@
      "fqn": "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence",
      "name": "neutralAFBenchmarkFromRecurrence",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 5290,
+     "line": 5386,
      "binders": [
       "Ne",
       "m"
@@ -2037,7 +2060,7 @@
      "fqn": "Calibrator.PortabilityDrift.fstMigDriftNext",
      "name": "fstMigDriftNext",
      "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
-     "line": 5173,
+     "line": 5269,
      "binders": [
       "Ne",
       "m",
@@ -2374,7 +2397,7 @@
    },
    "b": {
     "fqn": "Calibrator.PortabilityDrift.admixtureLDBoost",
-    "line": 5111,
+    "line": 5207,
     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
     "expr": "(1 - x0)**x1/x2",
     "binders": [
@@ -2442,7 +2465,7 @@
    "concept": "targethet",
    "a": {
     "fqn": "Calibrator.DriftRegime.targetHetOfRetention",
-    "line": 165,
+    "line": 197,
     "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
     "expr": "x0*x1",
     "binders": [
@@ -2468,7 +2491,7 @@
    "concept": "targetpgs",
    "a": {
     "fqn": "Calibrator.DriftRegime.targetPgsVarOfRetention",
-    "line": 168,
+    "line": 204,
     "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
     "expr": "x0*x1",
     "binders": [
@@ -2494,7 +2517,7 @@
    "concept": "benchmarkratio",
    "a": {
     "fqn": "Calibrator.DriftRegime.benchmarkRatio",
-    "line": 227,
+    "line": 274,
     "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
     "expr": "(1 - x1)/(1 - x0)",
     "binders": [
@@ -2505,7 +2528,7 @@
    },
    "b": {
     "fqn": "Calibrator.DriftRegime.benchmarkRatioSquared",
-    "line": 231,
+    "line": 278,
     "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
     "expr": "(1 - x1)**2/(1 - x0)**2",
     "binders": [
@@ -2520,7 +2543,7 @@
    "concept": "circulantspectrum",
    "a": {
     "fqn": "Calibrator.EpistaticChaos.circulantSpectrumA",
-    "line": 1355,
+    "line": 1359,
     "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
     "expr": "8*x0**2 + 2*x0 - 4",
     "binders": [
@@ -2530,7 +2553,7 @@
    },
    "b": {
     "fqn": "Calibrator.EpistaticChaos.circulantSpectrumB",
-    "line": 1362,
+    "line": 1366,
     "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
     "expr": "4*x0**2 + 4*x0 - 2",
     "binders": [
@@ -2742,7 +2765,7 @@
    },
    "b": {
     "fqn": "Calibrator.PolygenicSpectroscopy.hweMellinJetVariance",
-    "line": 809,
+    "line": 825,
     "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
     "expr": "2*x0*(1 - x0)*log((2 - 2*x0)/x0)**2 + 2*x0*(1 - x0)*log(2*x0/(1 - x0))**2 + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))**2 - (4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0))))**2",
     "binders": [
@@ -2821,7 +2844,7 @@
    },
    "b": {
     "fqn": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
-    "line": 4844,
+    "line": 4940,
     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
     "expr": "1 - 1/(4*x0*x1 + 1)",
     "binders": [
@@ -3001,7 +3024,7 @@
    },
    "b": {
     "fqn": "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence",
-    "line": 5290,
+    "line": 5386,
     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
     "expr": "1 - 1/(4*x0*x1 + 1)",
     "binders": [
@@ -3060,19 +3083,19 @@
    ]
   }
  ],
- "parsed": 368,
- "opaque": 604,
+ "parsed": 370,
+ "opaque": 607,
  "opaque_reasons": [
   [
    "non-real binder",
-   478
+   480
+  ],
+  [
+   "non-closed-form construct: fun",
+   13
   ],
   [
    "Phi expects 0 args [], got 1",
-   11
-  ],
-  [
-   "non-closed-form construct: then",
    11
   ],
   [
@@ -3100,15 +3123,15 @@
    4
   ],
   [
+   "non-closed-form construct: then",
+   4
+  ],
+  [
    "non-closed-form construct: Set",
    4
   ],
   [
    "lex error at 'ℝ))) ^ t'",
-   3
-  ],
-  [
-   "non-closed-form construct: fun",
    3
   ],
   [
@@ -3120,7 +3143,7 @@
    2
   ],
   [
-   "non-closed-form construct: ∑",
+   "applied non-function driftLDTrajectory",
    2
   ]
  ]
