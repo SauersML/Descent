@@ -2618,7 +2618,13 @@ noncomputable def CrossPopulationGenerationalModel.toMetricModelAt {p q : ℕ}
   novelDirectCausal_source := rfl
   novelProxyTagging_source := rfl
   novelCausalEffect_source := rfl
-  outcomeVariance_pos := by intro P; cases P <;> simp_all <;> norm_num
+  -- The two cases are exactly the model's own positivity fields; `simp_all`
+  -- reduces the `Pop.pair` but has no way to discharge them.
+  outcomeVariance_pos := by
+    intro P
+    cases P
+    · exact m.sourceOutcomeVariance_pos
+    · exact m.targetOutcomeVariance_pos t
 
 /-- At each generation, the target tagging projection splits into the part that
 would be obtained under source-stable effects plus a separate projection of the
@@ -2723,7 +2729,11 @@ theorem portability_ratio_with_ld_decay
           r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E * (r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E)⁻¹ :=
       mul_lt_mul_of_pos_right hR2Target_lt (inv_pos.mpr hR2Source_pos)
     simpa [div_eq_mul_inv] using hmul
-  simpa [hRhoS, realWorldPGSVariance] using hL
+  -- `hL` is phrased with `presentDayPGSVariance`; with `rhoS = 1` the goal
+  -- normalises to `(1 - fst) * V_A`. `presentDayPGSVariance_eq_one_sub_fst_mul`
+  -- is exactly that equation, so it is the bridge -- not a guessed simp set.
+  simpa [hRhoS, realWorldPGSVariance, presentDayPGSVariance_eq_one_sub_fst_mul]
+    using hL
 
 /-- General LD-aware portability theorem without assuming perfect source tagging.
 Under `0 < rhoT < rhoS ≤ 1` and `fstS < fstT < 1`, the LD+drift portability ratio
@@ -3506,9 +3516,8 @@ theorem sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portabilit
             scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target *
             effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target)) := by
   unfold sourceNormalizedTargetR2AtGeneration
+  -- `rw` closes this by its own trailing `rfl`; a `simp` after it has no goals.
   rw [exactR2PortabilityRatio_mechanistic_law]
-  simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
-    effectiveOutcomeVariance]
 
 /-- Bundled exact metric portability law after `t` generations on the explicit
 population-genetic state. This packages the exact `R²`, liability-AUC, and
@@ -3538,12 +3547,8 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
   ext
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
-    simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
-      effectiveOutcomeVariance]
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
-    simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
-      effectiveOutcomeVariance]
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
     simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
