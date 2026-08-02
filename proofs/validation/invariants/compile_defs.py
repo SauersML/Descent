@@ -41,8 +41,52 @@ class Compiled:
         return self.fn(backend, *args)
 
 
+class StaleTable(RuntimeError):
+    """defs.json is older than the Lean sources it was extracted from."""
+
+
+def check_fresh(defs_path):
+    """Refuse a definition table older than the corpus it describes.
+
+    Running a checker standalone reads whatever `defs.json` is on disk. If the
+    corpus has moved since it was written, every signature, body and arity may
+    be wrong -- and the failures do not look like staleness. They look like
+    the corpus disagreeing with a proved theorem, which is the one shape this
+    project treats as important.
+
+    That is exactly what happened: `steppingStoneCharacteristicLength` changed
+    its parameters, a stale table kept the old ones, and two theorems reported
+    0 accepted / 40 failed against a checker that was evaluating a function
+    the corpus no longer contains.
+
+    Refusing is right rather than silently regenerating, because a checker
+    that quietly rebuilds its inputs mid-run produces numbers whose
+    provenance nobody can reconstruct.
+    """
+    import os
+
+    if not defs_path.exists():
+        return
+    table_mtime = defs_path.stat().st_mtime
+    newest, newest_src = 0.0, None
+    cal = HERE.parents[1] / "Calibrator"
+    for src in cal.rglob("*.lean"):
+        m = src.stat().st_mtime
+        if m > newest:
+            newest, newest_src = m, src
+    if newest > table_mtime + 1.0:
+        raise StaleTable(
+            f"{defs_path.name} was written before {newest_src.name} was last "
+            f"modified ({newest - table_mtime:.0f}s older than the corpus). "
+            "Run extract_defs.py first. Every signature and body in the table "
+            "may be wrong, and the failures will look like corpus defects "
+            "rather than like staleness."
+        )
+
+
 def load_defs():
     p = HERE / "defs.json"
+    check_fresh(p)
     if not p.exists():
         import extract_defs
 
