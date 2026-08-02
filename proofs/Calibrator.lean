@@ -8,6 +8,7 @@ import Calibrator.Identification
 import Calibrator.ImitationRigidity
 import Calibrator.Conventions
 import Calibrator.DriftRegime
+import Calibrator.BlindnessRegistry
 import Calibrator.OpenQuestions
 import Calibrator.TransportIdentities
 import Calibrator.SecondMomentShift

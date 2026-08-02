@@ -1,0 +1,174 @@
+import Calibrator.ObservationalCeiling
+import Calibrator.DriftRegime
+
+namespace Calibrator
+
+/-!
+# The registry: seven instances of one law, and what a guard suite can buy
+
+`Calibrator.ObservationalCeiling` states the law: a probe that reports the same data on
+two objects certifies neither, so no criterion built from that probe decides any
+property separating them. This file collects every instance the development now has,
+and then proves the thing the collection is for.
+
+## The instances
+
+| # | probe | witness pair | kind | module |
+|---|---|---|---|---|
+| 1 | joint cumulant tensors of order `≤ K` | Gaussian vs. `tanh`-tilted blocks | mathematical | `CumulantBlindness` |
+| 2 | normalized cumulant contractions, all orders | Gaussian vs. i.i.d. Rademacher | mathematical | `CumulantBlindness` |
+| 3 | data on unions of `≤ r` cover elements | bipartite vs. non-bipartite Ramanujan twins | mathematical | `LocalToGlobalCoherence` |
+| 4 | limits of disjoint-support chaos designs | Gaussian vs. a chameleon law | mathematical | `JetBarrier` |
+| 5 | any complete invariant of the fiber relation | `ℓ∞`-divergent coded decay profiles | mathematical | `HiddenConeAmbiguity` |
+| 6 | the cluster's internal cross-checks | two retention values | **methodological** | `DriftRegime` |
+| 7 | a symmetric validation design | the ratio vs. its square | **methodological** | `DriftRegime` |
+
+Instances 1-5 are theorems about the mathematics. Instances 6 and 7 are theorems about
+the **development's own quality process**, and that is the point of assembling them in
+one place: a cross-check is a probe, a validation design is a probe, and neither is
+exempt from the law they are used to establish. A guard that cannot separate two
+candidate definitions certifies neither of them, exactly as a cumulant that cannot
+separate two laws certifies neither.
+
+## What this file proves
+
+The standing response to a discovered defect has been to add another guard. That
+response works against *new* witness pairs and provably does not work against old ones:
+`ProbeBlindness.ofWitnessFamily` says a single witness pair blinds an arbitrary family
+of probes simultaneously, in any combination, under any rule for combining them.
+
+`guard_stack_blind_to_retention` instantiates that at the incident. The three structural
+guards that were in place — over-determination between related formulas, the duplicate
+body check, and the naming-conflation check — all evaluate identically at every
+retention value, because each of them examines the *algebra* relating cluster members
+and the premise enters only as the *value* they share. So the suite as a whole was blind
+before any of its members was written, and a fourth guard of the same kind would have
+been blind too.
+
+That is not an argument against guards. It is the criterion for what a new guard has to
+do to be worth adding: **exhibit a pair the existing suite identifies and it separates.**
+Guard 3j of `scripts/check-identifications.py` (declare your regime) meets it — the two
+regimes of `Calibrator.DriftRegime` are separated as objects, and a regime declaration is
+data no algebraic check can supply. Guards 3k and 3l meet it for the same reason: they
+read the *provenance* and the *power* of a validation, neither of which is a function of
+the formulas.
+-/
+
+/-!
+## 1. The structural guards, as probes on a candidate premise
+
+The object under test is a candidate value of the shared premise `retention`. Each guard
+is a predicate on that candidate: what the guard reports when the cluster is built from
+it.
+-/
+
+/-- The three structural guards that were in place when the retention cluster was
+written. Each is faithful to what the guard actually examines: a relation *among* the
+cluster's members. -/
+inductive StructuralGuard
+  /-- Over-determination: relate independently written formulas so drift between them
+  fails to compile (`Calibrator.Conventions`). -/
+  | overDetermination
+  /-- Duplicate bodies: one body under two names in two files, tied by nothing. -/
+  | duplicateBody
+  /-- Naming conflation: one formula carrying names from different concept families. -/
+  | conflation
+
+/-- What each guard reports when the cluster is instantiated at retention `r`.
+
+Every one of these is a statement relating cluster members to each other. None of them
+mentions an observable, and that is precisely the defect. -/
+def StructuralGuard.verdict : StructuralGuard → ℝ → Prop
+  | .overDetermination, r => targetHetOfRetention 1 r = 1 * (1 - lossOfRetention r)
+  | .duplicateBody, r => lossOfRetention r = 1 - r
+  | .conflation, r => targetPgsVarOfRetention 1 r = 1 * r
+
+/-- **Every guard passes at every retention value.** The guards are satisfied by the
+algebra alone, so they are satisfied by the wrong number exactly as readily as by the
+right one. -/
+theorem StructuralGuard.verdict_holds (g : StructuralGuard) (r : ℝ) : g.verdict r := by
+  cases g <;>
+    · simp only [StructuralGuard.verdict, targetHetOfRetention, lossOfRetention,
+        targetPgsVarOfRetention]
+      ring
+
+/-!
+## 2. The suite is blind, as a suite
+-/
+
+/-- **The whole guard suite shares one witness pair.**
+
+Two different retention values — the measured one and the one the cluster assumed —
+produce identical reports from *every* structural guard. By
+`ProbeBlindness.ofWitnessFamily`, no criterion reading the entire suite decides which
+retention is correct, in any combination and under any rule.
+
+This is why the same wrong number was certified five times: it was never five
+independent certifications, it was one blind suite applied five times. -/
+theorem guard_stack_blind_to_retention {trueRetention wrongRetention : ℝ}
+    (hne : wrongRetention ≠ trueRetention) :
+    ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r)
+      (fun r => r = trueRetention) :=
+  ProbeBlindness.ofWitnessFamily StructuralGuard.verdict _ trueRetention wrongRetention
+    (fun g => propext ⟨fun _ => g.verdict_holds wrongRetention,
+                       fun _ => g.verdict_holds trueRetention⟩)
+    rfl hne
+
+/-- Spelled out, including every way of folding the suite's answers into one verdict:
+no rule reading the structural guards decides whether the premise is right. -/
+theorem no_guard_stack_criterion {trueRetention wrongRetention : ℝ}
+    (hne : wrongRetention ≠ trueRetention)
+    {Verdict : Type*} (combine : (StructuralGuard → Prop) → Verdict) :
+    ¬ ∃ accept : Verdict → Prop,
+        ∀ r : ℝ, r = trueRetention ↔ accept (combine (fun g => g.verdict r)) :=
+  (guard_stack_blind_to_retention hne).no_criterion_of_factors combine
+
+/-- Adding a fourth guard of the same kind changes nothing: any predicate on candidate
+retentions that is satisfied at every retention joins the suite without narrowing it. -/
+theorem extra_algebraic_guard_adds_nothing {trueRetention wrongRetention : ℝ}
+    (hne : wrongRetention ≠ trueRetention)
+    (newGuard : ℝ → Prop) (hnew : ∀ r, newGuard r) :
+    ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r))
+      (fun r => r = trueRetention) where
+  positive := trueRetention
+  negative := wrongRetention
+  same_data := by
+    have h₁ : (fun g : StructuralGuard => g.verdict trueRetention)
+        = fun g : StructuralGuard => g.verdict wrongRetention := by
+      funext g
+      exact propext ⟨fun _ => g.verdict_holds wrongRetention,
+                     fun _ => g.verdict_holds trueRetention⟩
+    have h₂ : newGuard trueRetention = newGuard wrongRetention :=
+      propext ⟨fun _ => hnew wrongRetention, fun _ => hnew trueRetention⟩
+    rw [h₁, h₂]
+  holds := rfl
+  fails := hne
+
+/-!
+## 3. The criterion a new guard must meet
+
+A guard is worth adding exactly when it separates a pair the existing suite identifies.
+Stated as the contrapositive of the law: if the new guard is blind on the same pair, the
+enlarged suite is blind on that pair (`extra_algebraic_guard_adds_nothing`); if it
+separates the pair, it is not a function of the data the old suite read.
+
+The three guards added after the incident are of the second kind, and each reads
+something the algebra does not contain:
+
+* **Regime declaration** reads the data-generating assumption. `DriftRegime.regimes_disagree`
+  separates the two regimes as objects, so the declaration is not recoverable from any
+  identity among formulas.
+* **Validation provenance** reads whether a `VALIDATED` tag cites a measurement or a
+  sibling. `DriftRegime.crossChecks_blind_to_retention` is exactly the statement that the
+  sibling carries no information, so the distinction is real.
+* **Validation power** reads the spread of the prediction across the design.
+  `DriftRegime.symmetric_design_has_no_power` shows a design can have none, so the
+  spread is not implied by the residual.
+
+The general lesson, and the reason this registry exists rather than a longer list of
+guards: an impossibility result and a quality process are the same kind of object. Both
+are probes. Asking "what pair does this fail to separate?" is the only question that
+distinguishes a check which can fail from one which cannot.
+-/
+
+end Calibrator

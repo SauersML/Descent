@@ -3,7 +3,15 @@ import Calibrator.Probability
 namespace Calibrator
 
 /-!
-# The observational ceiling: one law, five instances
+# The observational ceiling: one law, many instances
+
+The instances live in `Calibrator.BlindnessRegistry`, which is the single place they are
+listed and the place to add a new one. Two of them are theorems about this
+development's own quality process rather than about mathematics, and
+`BlindnessRegistry.guard_stack_blind_to_retention` proves the consequence that matters:
+a guard suite whose members share a witness pair is blind as a suite, so adding another
+guard of the same kind cannot help.
+
 
 Five separate results in this development have the same skeleton, and until this file
 they each carried their own copy of it. The skeleton:
@@ -109,6 +117,51 @@ def comap (B : ProbeBlindness probe P) {Data' : Type*} (coarse : Data → Data')
   same_data := by rw [B.same_data]
   holds := B.holds
   fails := B.fails
+
+end ProbeBlindness
+
+/-!
+### Stacking probes does not help when they share a witness
+
+The standing response to a discovered defect is to add another check. This section
+says exactly when that response cannot work: two probes that fail on the *same* pair
+of objects combine into a probe that still fails on that pair, and so does any family
+of them, however large. Adding checks buys coverage only against *new* witness pairs.
+-/
+
+namespace ProbeBlindness
+
+variable {Object : Type*}
+
+/-- **Two probes with a shared witness pair combine into a blind probe.** Running both
+checks and reading the pair of answers is no better than running either. -/
+def and {D₁ D₂ : Type*} {p₁ : Object → D₁} {p₂ : Object → D₂} {P : Object → Prop}
+    (B₁ : ProbeBlindness p₁ P) (B₂ : ProbeBlindness p₂ P)
+    (hpos : B₂.positive = B₁.positive) (hneg : B₂.negative = B₁.negative) :
+    ProbeBlindness (fun o => (p₁ o, p₂ o)) P where
+  positive := B₁.positive
+  negative := B₁.negative
+  same_data := by
+    have h₂ : p₂ B₁.positive = p₂ B₁.negative := by
+      rw [← hpos, ← hneg]; exact B₂.same_data
+    rw [B₁.same_data, h₂]
+  holds := B₁.holds
+  fails := B₁.fails
+
+/-- **A single witness pair blinds an entire family of probes at once.**
+
+This is the general form: give one pair of objects that every member of the family
+reports identically on, and no criterion reading the whole family — in any combination,
+by any rule — decides the property. A guard suite is exactly such a family. -/
+def ofWitnessFamily {Data ι : Type*} (p : ι → Object → Data) (P : Object → Prop)
+    (pos neg : Object) (hsame : ∀ i, p i pos = p i neg)
+    (hpos : P pos) (hneg : ¬ P neg) :
+    ProbeBlindness (fun o => fun i => p i o) P where
+  positive := pos
+  negative := neg
+  same_data := by funext i; exact hsame i
+  holds := hpos
+  fails := hneg
 
 end ProbeBlindness
 
