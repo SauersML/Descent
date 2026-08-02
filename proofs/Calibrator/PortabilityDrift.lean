@@ -3249,7 +3249,7 @@ theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
   have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 := by
     exact ne_of_gt (m.outcomeVariance_pos Pop.source)
   unfold equalVarianceGaussianAUCFromSourceWeights gaussianAUCFromSignalVariance
-    residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2 Pop.source
+    residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
     r2FromSourceWeights
   congr 1
   congr 1
@@ -3311,7 +3311,7 @@ theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
   have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 := by
     exact ne_of_gt (effectiveTargetOutcomeVariance_pos m)
   unfold equalVarianceGaussianAUCFromSourceWeights gaussianAUCFromSignalVariance
-    residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2 Pop.target
+    residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
     r2FromSourceWeights
   congr 1
   congr 1
