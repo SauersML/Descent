@@ -583,8 +583,18 @@ exactly the gap between the two counts. -/
 
 /-- **Duplicating a channel buys no separation.** The modulus of the doubled probe is the
 modulus of the original, so a perfectly redundant coordinate contributes nothing to
-resolving objects. -/
-theorem duplicate_separation {Object : Type*} [MetricSpace Object] (f : Object → ℝ)
+resolving objects.
+
+Declared `def` rather than `theorem`: `ProbeSeparation` is a STRUCTURE carrying a real
+modulus, so this returns data, not a proof, and `theorem` requires a `Prop`. That
+mismatch is what the elaborator was reporting as "type of theorem
+`Calibrator.duplicate_separation` is not a proposition". Nothing about the statement or
+the construction changes -- the body already built the witness with `where`, and it is
+the keyword that was wrong. Keeping it as data is also strictly stronger than the
+`Nonempty (ProbeSeparation _)` a `theorem` would have forced: the duplicated probe's
+modulus is available, and `duplicate_separation f S |>.sigma` is definitionally
+`S.sigma`, which is the content the surrounding prose claims. -/
+def duplicate_separation {Object : Type*} [MetricSpace Object] (f : Object → ℝ)
     (S : ProbeSeparation f) :
     ProbeSeparation (fun o => ((f o, f o) : ℝ × ℝ)) where
   sigma := S.sigma
