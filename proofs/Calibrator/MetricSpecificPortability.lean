@@ -825,31 +825,49 @@ theorem ppv_increases_with_prevalence
   field_simp [h_d1_ne, h_d2_ne]
   nlinarith [mul_pos h_se (sub_pos.mpr h_sp1)]
 
-/-- **If prevalence shifts while sensitivity and specificity are fixed, PPV changes but sensitivity does not.**
-    This is the concrete metric statement behind the portability claim. Under a
-    pure prevalence shift with identical sensitivity and specificity,
-    sensitivity has zero portability gap while PPV has a strictly positive gap,
-    so the PPV portability gap strictly exceeds the sensitivity portability gap. -/
-theorem sensitivity_more_portable_than_ppv
+/-- **The sensitivity gap between a use case and itself is zero, definitionally.**
+
+`sensitivityPortabilityGap` takes the source and target sensitivities as two separate
+arguments, so passing the same `se` twice gives `|se - se|`. This is stated as its own
+lemma because it used to be buried inside the conclusion of
+`ppv_gap_pos_under_prevalence_shift` below, where `sensitivityPortabilityGap se se`
+read as a *proved* consequence of a prevalence shift rather than as the definitional
+zero it is. Nothing about prevalence enters here, and nothing can: prevalence is not an
+argument of `sensitivityPortabilityGap`. -/
+@[simp] theorem sensitivityPortabilityGap_self (se : ℝ) :
+    sensitivityPortabilityGap se se = 0 := by
+  unfold sensitivityPortabilityGap
+  simp
+
+/-- **A pure prevalence shift moves PPV by a strictly positive amount.**
+
+This is the whole empirical content of the metric split: at fixed sensitivity and
+specificity, PPV is prevalence-dependent and its portability gap cannot be zero. The
+companion claim — that sensitivity's gap *is* zero — is not proved here and is not
+provable here; it is `sensitivityPortabilityGap_self`, an identity, and holds because
+sensitivity is defined without reference to prevalence. Keeping the two apart is the
+point: one is a fact about `metricPPV`, the other is a fact about an argument list.
+
+RENAMED from `sensitivity_more_portable_than_ppv`, whose conclusion was
+`sensitivityPortabilityGap se se < ppvPortabilityGap …`. That is this statement with `0`
+spelled as `|se - se|`, and the old name and docstring presented the resulting inequality
+as a comparison of two measured gaps. -/
+theorem ppv_gap_pos_under_prevalence_shift
     (se sp K_source K_target : ℝ)
     (h_se : 0 < se) (h_sp1 : sp < 1)
     (h_Ks : 0 < K_source) (h_Ks' : K_source < 1)
     (h_Kt' : K_target < 1)
     (h_order : K_source < K_target) :
-    sensitivityPortabilityGap se se <
-      ppvPortabilityGap se sp K_source K_target := by
+    0 < ppvPortabilityGap se sp K_source K_target := by
   have h_ppv :
       metricPPV se sp K_source < metricPPV se sp K_target :=
     ppv_increases_with_prevalence
       se sp K_source K_target h_se h_sp1 h_Ks h_Ks' h_Kt' h_order
   have h_gap_pos :
       0 < metricPPV se sp K_target - metricPPV se sp K_source := sub_pos.mpr h_ppv
-  have h_ppv_gap :
-      0 < ppvPortabilityGap se sp K_source K_target := by
-    unfold ppvPortabilityGap
-    rw [abs_of_pos h_gap_pos]
-    exact h_gap_pos
-  simpa [sensitivityPortabilityGap] using h_ppv_gap
+  unfold ppvPortabilityGap
+  rw [abs_of_pos h_gap_pos]
+  exact h_gap_pos
 
 /-- **Number needed to screen (NNS) portability.**
     NNS = 1/PPV. If PPV drops, NNS increases → more individuals
@@ -893,23 +911,26 @@ specific portability has direct practical consequences.
 
 section MetricAndClinicalDecisions
 
-/-- **Screening PPV can shift even when case-finding sensitivity is unchanged.**
-    Under a pure prevalence shift with identical sensitivity and specificity,
-    the sensitivity portability gap stays below the PPV portability gap, and the
-    higher-prevalence use case has strictly higher PPV.
-    This is the metric split relevant to screening versus case-finding use
-    cases. -/
+/-- **Screening PPV shifts even when case-finding sensitivity is unchanged.**
+    Under a pure prevalence shift with identical sensitivity and specificity, the PPV
+    portability gap is strictly positive and the higher-prevalence use case has strictly
+    higher PPV. This is the metric split relevant to screening versus case-finding use
+    cases.
+
+    The first conjunct used to be written `sensitivityPortabilityGap se se <
+    ppvPortabilityGap …`, which is this statement with `0` spelled as `|se - se|`; the
+    sensitivity half is `sensitivityPortabilityGap_self` and is an identity, not a
+    consequence of the prevalence shift. -/
 theorem different_uses_different_metrics
     (se sp K_source K_target : ℝ)
     (h_se : 0 < se) (h_sp1 : sp < 1)
     (h_Ks : 0 < K_source) (h_Ks' : K_source < 1)
     (h_Kt' : K_target < 1)
     (h_order : K_source < K_target) :
-    sensitivityPortabilityGap se se <
-      ppvPortabilityGap se sp K_source K_target ∧
+    0 < ppvPortabilityGap se sp K_source K_target ∧
     metricPPV se sp K_source < metricPPV se sp K_target := by
   constructor
-  · exact sensitivity_more_portable_than_ppv
+  · exact ppv_gap_pos_under_prevalence_shift
       se sp K_source K_target h_se h_sp1 h_Ks h_Ks' h_Kt' h_order
   · exact ppv_increases_with_prevalence
       se sp K_source K_target h_se h_sp1 h_Ks h_Ks' h_Kt' h_order

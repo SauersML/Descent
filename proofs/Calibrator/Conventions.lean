@@ -866,11 +866,11 @@ theorem presentDayPGSVariance_eq_retainedFraction (V_A fst : ℝ) :
     presentDayPGSVariance V_A fst = retainedFraction fst V_A := by
   unfold presentDayPGSVariance pgsVarianceFromHet retainedFraction; ring
 
-/-- Squared covariance over the product of variances: the transport-moment
-explained `R²` and the PGS `R²` are one map. -/
-theorem explainedR2FromTransportMoments_eq_pgsR2 (cov vs vy : ℝ) :
-    explainedR2FromTransportMoments cov vs vy = pgsR2 cov vs vy := by
-  unfold explainedR2FromTransportMoments pgsR2; ring_nf
+/-! `explainedR2FromTransportMoments_eq_pgsR2` used to sit here. It was the `Eq.symm` of
+`TransferLearningPGS.pgsR2_eq_explainedR2FromTransportMoments`, which states the same
+identity and proves it by `rfl` — the two bodies are the same term, not merely `ring`-equal.
+Two names for one restatement is one restatement too many, and nothing referenced either,
+so the copy in this file is deleted and the identity is stated once, next to `pgsR2`. -/
 
 /-! The two portability ratios were the same quotient of transported metrics,
 written once in `SimulationValidation` and once in

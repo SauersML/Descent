@@ -324,26 +324,36 @@ def ldMismatchFrobenius(Sig_S, Sig_T):
 # ---------------------------------------------------------------------------
 def build_world(rng, fst, ar_source, ar_target, ntag, effect_shift=0.0,
                 novel_frac=0.0, pheno_scale=1.0, overfit_n=0,
-                n_ref=N_REF, n_eval=N_EVAL):
-    """Simulate two populations and instantiate CrossPopulationMetricModel."""
-    anc = rng.uniform(0.1, 0.9, size=L)
+                n_ref=N_REF, n_eval=N_EVAL, world_seed=None):
+    """Simulate two populations and instantiate CrossPopulationMetricModel.
+
+    `world_seed` pins the POPULATION PARAMETERS (ancestral and drifted allele
+    frequencies, effect vectors) to a fixed draw so that two calls differing
+    only in n_ref/n_eval are the SAME WORLD observed at two sample sizes. The
+    genotypes are still drawn from the caller's stream, so the samples are
+    independent draws and no replicate shares random state with another."""
+    if world_seed is not None:
+        rng_w = np.random.default_rng(world_seed)
+    else:
+        rng_w = rng
+    anc = rng_w.uniform(0.1, 0.9, size=L)
     tag_idx = np.arange(0, L, 2)[:ntag]
     causal_idx = np.arange(1, L, 2)[:ntag]
     q = causal_idx.shape[0]
 
-    fS = balding_nichols(anc, fst, rng)
-    fT = fS.copy() if fst <= 0.0 else balding_nichols(anc, fst, rng)
+    fS = balding_nichols(anc, fst, rng_w)
+    fT = fS.copy() if fst <= 0.0 else balding_nichols(anc, fst, rng_w)
 
-    beta_s = rng.standard_normal(q) * pheno_scale
-    beta_t = beta_s + effect_shift * rng.standard_normal(q) * pheno_scale
+    beta_s = rng_w.standard_normal(q) * pheno_scale
+    beta_t = beta_s + effect_shift * rng_w.standard_normal(q) * pheno_scale
 
     # novel target-only causal variants: absent in the source (freq clamped to
     # the floor there), segregating in the target.
     novel_t = np.zeros(q)
     if novel_frac > 0.0:
         k = max(1, int(novel_frac * q))
-        who = rng.choice(q, size=k, replace=False)
-        novel_t[who] = rng.standard_normal(k) * pheno_scale
+        who = rng_w.choice(q, size=k, replace=False)
+        novel_t[who] = rng_w.standard_normal(k) * pheno_scale
         fS[causal_idx[who]] = 0.01
 
     gS_ref = draw_genotypes(n_ref, fS, ar_source, rng)
@@ -643,34 +653,63 @@ def main():
 
     # =====================================================================
     print("")
-    print("B. IS THE r2FromSourceWeights GAP NOISE OR BIAS?  N-convergence.")
-    print("   Sampling error falls as 1/sqrt(N); a bias does not.")
-    print("   %-8s %-12s %-12s %-12s %-12s"
-          % ("N", "measured r2", "transportMom", "fromSrcWts", "burden/Var(y)"))
+    print("B. NOISE OR BIAS?  ONE FIXED WORLD, THREE SAMPLE SIZES.")
+    print("   world_seed pins the populations; only N changes. A sampling")
+    print("   residual falls as 1/sqrt(N); a bias floor does not.")
+    print("   %-8s %-24s %-13s %-13s %-9s"
+          % ("N", "quantity", "corpus", "measured", "rel err"))
     rowsB = []
     for n in (6000, 24000, 96000):
-        mb, eb = build_world(rng, 0.15, 0.90, 0.55, 60, n_ref=n, n_eval=n)
+        mb, eb = build_world(rng, 0.15, 0.90, 0.55, 60, n_ref=n, n_eval=n,
+                             world_seed=777)
         meb = measure(mb, eb, "target")
-        tm = explainedR2FromTransportMoments(
-            predictiveCovarianceFromSourceWeights(mb, "target"),
-            scoreVarianceFromSourceWeights(mb, "target"),
-            mb["outcomeVariance"]["target"])
-        fs = r2FromSourceWeights(mb, "target")
+        w = sourceWeightsFromExplicitDrivers(mb)
+        preds = {
+            "scoreVariance": scoreVarianceFromSourceWeights(mb, "target"),
+            "predictiveCovariance": predictiveCovarianceFromSourceWeights(mb, "target"),
+            "slope": calibrationSlopeFromSourceWeights(mb, "target"),
+            "risk": targetLinearRisk(mb["sigmaTag"]["target"],
+                                     crossCovariance(mb, "target"),
+                                     mb["outcomeVariance"]["target"], w),
+            "explainedR2FromTransportMoments": explainedR2FromTransportMoments(
+                predictiveCovarianceFromSourceWeights(mb, "target"),
+                scoreVarianceFromSourceWeights(mb, "target"),
+                mb["outcomeVariance"]["target"]),
+            "r2FromSourceWeights": r2FromSourceWeights(mb, "target"),
+            "residualVarianceFromSourceWeights":
+                residualVarianceFromSourceWeights(mb, "target"),
+        }
+        meas = {"scoreVariance": meb["scoreVariance"],
+                "predictiveCovariance": meb["predictiveCovariance"],
+                "slope": meb["slope"], "risk": meb["risk"],
+                "explainedR2FromTransportMoments": meb["r2"],
+                "r2FromSourceWeights": meb["r2"],
+                "residualVarianceFromSourceWeights": meb["residualVariance"]}
         bd = irreducibleTargetResidualBurden(mb) / mb["outcomeVariance"]["target"]
-        rowsB.append({"N": n, "measured_r2": meb["r2"],
-                      "explainedR2FromTransportMoments": tm,
-                      "r2FromSourceWeights": fs,
-                      "rel_err_transportMoments": rel(tm, meb["r2"]),
-                      "rel_err_fromSourceWeights": rel(fs, meb["r2"]),
-                      "burden_over_outcomeVariance": bd})
-        print("   %-8d %-12.6g %-12.6g %-12.6g %-12.6g   rel err %+.4f / %+.4f"
-              % (n, meb["r2"], tm, fs, bd, rel(tm, meb["r2"]), rel(fs, meb["r2"])))
-    b_ok = (abs(rowsB[-1]["rel_err_transportMoments"])
-            < abs(rowsB[0]["rel_err_transportMoments"])
-            and abs(rowsB[-1]["rel_err_fromSourceWeights"]) > 0.05)
-    print("   -> transport-moment R^2 converges; r2FromSourceWeights keeps a floor "
-          "of -burden/(Var(y)+burden): %s" % ("CONFIRMED" if b_ok else "not seen"))
-    out["B_convergence"] = {"rows": rowsB, "bias_floor_confirmed": bool(b_ok)}
+        for k in preds:
+            rowsB.append({"N": n, "quantity": k, "corpus": preds[k],
+                          "measured": meas[k], "rel_err": rel(preds[k], meas[k]),
+                          "burden_over_outcomeVariance": bd})
+            print("   %-8d %-24s %-13.6g %-13.6g %+9.4f"
+                  % (n, k, preds[k], meas[k], rel(preds[k], meas[k])))
+        print("      burden/Var(y) = %.5f" % bd)
+    def _err(n, q):
+        for r in rowsB:
+            if r["N"] == n and r["quantity"] == q:
+                return abs(r["rel_err"])
+        return None
+    conv = [q for q in ("scoreVariance", "predictiveCovariance", "slope", "risk",
+                        "explainedR2FromTransportMoments")
+            if _err(96000, q) < _err(6000, q)]
+    b_ok = (len(conv) >= 4 and _err(96000, "r2FromSourceWeights") > 0.05
+            and _err(96000, "r2FromSourceWeights") > _err(96000,
+                                                          "explainedR2FromTransportMoments"))
+    print("   converging with N: %s" % (conv,))
+    print("   r2FromSourceWeights rel err at N=96000: %.4f  (bias floor, does not"
+          " converge): %s" % (_err(96000, "r2FromSourceWeights"),
+                              "CONFIRMED" if b_ok else "not seen"))
+    out["B_convergence"] = {"rows": rowsB, "converging": conv,
+                            "bias_floor_confirmed": bool(b_ok)}
 
     # =====================================================================
     print("")

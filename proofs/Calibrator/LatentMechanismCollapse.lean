@@ -218,11 +218,13 @@ end Tail
 ## 3. Assembly
 -/
 
-/-- **The split reassembles exactly.** With head weight `1 - ε` and tail weight `ε`,
-and head/tail defined as the corresponding renormalized pieces, the mixture returns the
-original family. -/
-theorem head_tail_assembly (ε A B p : ℝ) (hsplit : p = (1 - ε) * A + ε * B) :
-    (1 - ε) * A + ε * B = p := hsplit.symm
+/-! `head_tail_assembly` used to sit here, stating that `(1-ε)·A + ε·B = p` under the
+hypothesis `p = (1-ε)·A + ε·B`. Its hypothesis was its conclusion and its proof was
+`Eq.symm`, so it asserted nothing about the split: it did not construct `A` and `B` from
+`p`, it received them already assembled. It is deleted rather than repaired because
+nothing referenced it. A statement that would carry content here is an existence claim —
+for a given `p` and `ε`, exhibit head and tail pieces with the stated normalisations —
+and that is what `head_piece_pos` and the `Tail` section below actually do. -/
 
 /-- The head piece is a genuine kernel: bounded below by `δ₀` times the reference
 whenever the truncated remainder is small relative to the margin. -/

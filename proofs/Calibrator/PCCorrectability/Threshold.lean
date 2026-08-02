@@ -16,6 +16,22 @@ size `n`.
     Empirical status: VALIDATED (recovered spike/F over m(n-m)/n is 3.95-4.06 for m in 100..900). -/
 noncomputable def effectiveSubgroupSize (n m : ℝ) : ℝ := m * (n - m) / n
 
+/-- **The effective size is the harmonic combination of the two arms**: its reciprocal is
+the sum of the reciprocals of the subgroup and its complement. This pins the body — a
+scaled, shifted, negated or `n`/`m`-transposed version of `m(n-m)/n` fails it — which is
+why it is stated. Every other theorem mentioning `effectiveSubgroupSize` has it on both
+sides of an equation, where it cancels: `demographicSpike_eq_contrastVariance_mul_effectiveSize`
+in `Conventions.lean` and the `spikeIdentification` certificate built from it constrain
+the factor `4` and the scale of `F`, and constrain this definition not at all. The
+certificate census recorded that pair as VACUOUS_FOR `effectiveSubgroupSize` and this
+lemma is the repair; the certificate is sound for what it does certify, so it stays. -/
+theorem inv_effectiveSubgroupSize (n m : ℝ)
+    (hn : n ≠ 0) (hm : m ≠ 0) (hnm : n - m ≠ 0) :
+    (effectiveSubgroupSize n m)⁻¹ = m⁻¹ + (n - m)⁻¹ := by
+  unfold effectiveSubgroupSize
+  field_simp
+  ring
+
 /-- Rank-one signal contributed by a subgroup contrast with differentiation
 `F`, where `F` is Hudson `F_ST` between the two subgroups.
 

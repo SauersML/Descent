@@ -290,10 +290,13 @@ theorem detectionWeight_strictAnti {s₁ s₂ : ℝ} (h₁ : 0 < s₁) (h : s₁
   unfold detectionWeight
   exact lt_of_mul_lt_mul_right key (le_of_lt hprod)
 
-/-- **Reconstruction weights are strictly increasing in the background
-variance.** -/
-theorem reconstructionWeight_strictMono {s₁ s₂ : ℝ} (h : s₁ < s₂) :
-    reconstructionWeight s₁ < reconstructionWeight s₂ := h
+/-! `reconstructionWeight_strictMono` used to sit here. `reconstructionWeight` is the
+identity `fun s => s`, so its statement `reconstructionWeight s₁ < reconstructionWeight s₂`
+under the hypothesis `s₁ < s₂` was the hypothesis itself and its proof was `h`. It is
+deleted for the same reason `factor_lt_one_of_cos_lt` was. The monotonicity that carries
+content is `wienerWeight_strictMono` below, whose weight profile is not the identity;
+`weight_orders_reversed` now discharges its reconstruction conjunct with `h` directly, so
+the tautology is visible at the point of use instead of hidden behind a name. -/
 
 /-- The Wiener profile is strictly increasing too: the inverse ordering is a
 property of the two *tasks*, not of the particular reconstruction weight. -/
@@ -315,7 +318,7 @@ section quantifies the resulting loss. -/
 theorem weight_orders_reversed {s₁ s₂ : ℝ} (h₁ : 0 < s₁) (h : s₁ < s₂) :
     reconstructionWeight s₁ < reconstructionWeight s₂ ∧
       detectionWeight s₂ < detectionWeight s₁ :=
-  ⟨reconstructionWeight_strictMono h, detectionWeight_strictAnti h₁ h⟩
+  ⟨h, detectionWeight_strictAnti h₁ h⟩
 
 /-- **A relaxed rank-`k` reduction**, written in the eigenbasis of the
 background.  `M i` is the fraction of eigendirection `i` that survives the
