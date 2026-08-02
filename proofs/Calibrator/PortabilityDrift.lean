@@ -1098,7 +1098,7 @@ theorem drift_degrades_equalVarianceGaussianAUC
 noncomputable def realWorldPGSVariance (V_A fst rhoSq : ℝ) : ℝ :=
   rhoSq * (1 - fst) * V_A
 
-/-- Explicit cross-population biological and observational state that can
+/-! Explicit cross-population biological and observational state that can
 change deployed portability metrics.
 
 The fields record the named drivers that can change metrics:
