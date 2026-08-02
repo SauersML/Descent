@@ -1,4 +1,8 @@
-import Mathlib
+import Mathlib.Data.Real.Basic
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
 
 namespace Calibrator
 
@@ -6,46 +10,63 @@ namespace Calibrator
 # Reversible Markov spectral kernels
 
 For a centered observable of a stationary reversible Markov chain, the spectral theorem
-reduces each real transition eigenvalue `λ ∈ (-1,1)` to the Poisson kernel
+reduces each real transition eigenvalue `lam ∈ (-1,1)` to the Poisson kernel
 
-`(1 - λ²) / (1 + λ² - 2 λ cos s)`.
+`(1 - lam²) / (1 + lam² - 2 lam cos s)`.
 
 This module proves the algebraic kernel laws used by that representation; it does not
-claim the representation for arbitrary nonreversible chains.  Positive `λ` describes
-persistence and concentrates power near frequency zero. Negative `λ` is its reflected,
+claim the representation for arbitrary nonreversible chains.  Positive `lam` describes
+persistence and concentrates power near frequency zero. Negative `lam` is its reflected,
 alternating counterpart and concentrates power near frequency `π`.
 
 For genetics, a two-state local-ancestry or haplotype-state chain has second eigenvalue
 `1 - a - b`. Recombination and switching rates therefore control the spectral shape
 directly. The endpoint contrast below is an exact diagnostic law, not a generic distance
 between populations.
+
+## Two repairs, recorded here rather than only in a commit message
+
+**The eigenvalue is named `lam`, not `λ`.** `λ` is reserved lambda syntax in Lean 4, so
+every binder using it as a variable was a parse error (`unexpected token 'λ'; expected '_'
+or identifier`) and this module did not compile at all. The rename is mechanical and
+changes no statement. The mathematical notation `λ` survives in prose above; only the
+binders changed.
+
+**The import was `import Mathlib`.** That pulls the whole library, and the root
+`Mathlib.olean` is not always present in this checkout, so the file could fail for a second
+and unrelated reason. The imports are now the five this file actually uses. This matters
+beyond one module: a wholesale import makes every downstream module wait on the entire
+library, and `Calibrator.SpectralDegradation` and `Calibrator.FoldedSpectrum` are
+downstream of this one.
 -/
 
 /-- Poisson kernel written as a function of `x = cos s`. -/
-noncomputable def markovPoissonKernel (λ x : ℝ) : ℝ :=
-  (1 - λ ^ 2) / (1 + λ ^ 2 - 2 * λ * x)
+noncomputable def markovPoissonKernel (lam x : ℝ) : ℝ :=
+  (1 - lam ^ 2) / (1 + lam ^ 2 - 2 * lam * x)
 
 /-- Reversing the transition eigenvalue reflects the frequency coordinate. -/
-theorem markovPoissonKernel_neg (λ x : ℝ) :
-    markovPoissonKernel (-λ) x = markovPoissonKernel λ (-x) := by
+theorem markovPoissonKernel_neg (lam x : ℝ) :
+    markovPoissonKernel (-lam) x = markovPoissonKernel lam (-x) := by
   unfold markovPoissonKernel
   congr 1 <;> ring
 
-/-- At zero frequency, a persistent eigenmode has gain `(1+λ)/(1-λ)`. -/
-theorem markovPoissonKernel_at_one (λ : ℝ) (hλ : λ ≠ 1) :
-    markovPoissonKernel λ 1 = (1 + λ) / (1 - λ) := by
+/-- At zero frequency, a persistent eigenmode has gain `(1+lam)/(1-lam)`. -/
+theorem markovPoissonKernel_at_one (lam : ℝ) (hlam : lam ≠ 1) :
+    markovPoissonKernel lam 1 = (1 + lam) / (1 - lam) := by
   unfold markovPoissonKernel
+  have h : (1 : ℝ) - lam ≠ 0 := sub_ne_zero.mpr (Ne.symm hlam)
   field_simp
   ring
 
 /-- At frequency `π`, the same eigenmode has reciprocal endpoint gain. -/
-theorem markovPoissonKernel_at_neg_one (λ : ℝ) (hλ : λ ≠ -1) :
-    markovPoissonKernel λ (-1) = (1 - λ) / (1 + λ) := by
+theorem markovPoissonKernel_at_neg_one (lam : ℝ) (hlam : lam ≠ -1) :
+    markovPoissonKernel lam (-1) = (1 - lam) / (1 + lam) := by
   unfold markovPoissonKernel
+  have h : (1 : ℝ) + lam ≠ 0 := fun hcontra => hlam (by linarith [hcontra])
   field_simp
   ring
 
-/-- The `λ = 0.9` mode has the exact `19` versus `1/19` endpoint contrast. -/
+/-- The `lam = 0.9` mode has the exact `19` versus `1/19` endpoint contrast. -/
 theorem markovPoissonKernel_nine_tenths :
     markovPoissonKernel (9 / 10 : ℝ) 1 = 19 ∧
       markovPoissonKernel (9 / 10 : ℝ) (-1) = 1 / 19 := by
@@ -62,8 +83,8 @@ theorem twoStatePersistence_eq_zero_iff (a b : ℝ) :
   constructor <;> intro h <;> linarith
 
 /-- Swapping persistence for alternation mirrors the spectral kernel exactly. -/
-theorem persistent_alternating_mirror (λ x : ℝ) :
-    markovPoissonKernel (-λ) x = markovPoissonKernel λ (-x) :=
-  markovPoissonKernel_neg λ x
+theorem persistent_alternating_mirror (lam x : ℝ) :
+    markovPoissonKernel (-lam) x = markovPoissonKernel lam (-x) :=
+  markovPoissonKernel_neg lam x
 
 end Calibrator
