@@ -587,6 +587,31 @@ theorem hardCallLatticeSpan_pos : 0 < hardCallLatticeSpan := by
   unfold hardCallLatticeSpan
   exact Real.log_pos hgt
 
+/-- **The second observable degenerates at the balanced locus.** `v(1/2) = 0`.
+
+At `q = 1/2` the standardized square takes only the two values `2` (both homozygotes)
+and `0` (the heterozygote), so `log x ^ 2` is confined to a single point and its
+size-biased variance vanishes. This is the same degeneracy that
+`Calibrator.EpistaticChaos.standardizedSquare_two_valued_at_half` records from the
+coding side, reached here from the Mellin side; the two computations agree.
+
+The consequence is a genuine caveat on the spectroscopy, and it is worth stating
+plainly: `MellinProfile.jetVariance_pos` **fails** at exactly `q = 1/2`. The
+condensation-window theory of `Calibrator.Condensation` — which needs a non-degenerate
+size-biased increment to have a window at all — does not apply at a perfectly balanced
+locus. Drift separation still does, since `hweMellinDrift_half` gives `log 2 ≠ c_G`.
+
+So the balanced locus is the one frequency at which the *second* observable carries no
+information. Combined with the drift-blind band near `q ≈ 0.140`, the picture is that
+each of the three observables has its own blind frequency, and only the trichotomy as a
+whole separates genotypes from their Gaussian surrogate across the spectrum. -/
+@[simp] theorem hweMellinJetVariance_half : hweMellinJetVariance (1 / 2) = 0 := by
+  unfold hweMellinJetVariance
+  rw [hweMellinDrift_half]
+  first
+    | (norm_num; ring)
+    | norm_num
+
 /-- **The complete observable triple of a hard-called locus at the lattice frequency.**
 
 Every component is a closed-form function of the allele frequency, and the third

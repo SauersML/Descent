@@ -1,4 +1,5 @@
 import Calibrator.PolygenicSpectroscopy
+import Calibrator.EpistaticChaos
 import Calibrator.LatentMechanismCollapse
 import Calibrator.Conventions
 import Calibrator.ScoreDistribution
@@ -189,6 +190,47 @@ theorem mechanism_count_not_identifiable
     ∀ F, ¬ isContextInvariant F → minimalDim F = 1 :=
   minimal_latent_dimension_is_constant admitsDim minimalDim isContextInvariant
     hminimal hleast hcollapse hnonzero
+
+/-!
+## 5b. Overlap is not free for genotypes
+
+`Calibrator.EpistaticChaos.sign_erasure` shows that when a coding is **sign-symmetric**
+— invariant under a value-negating relabelling — every truncated cross-moment between
+distinct interaction monomials vanishes exactly, so overlapping designs collapse onto
+their disjoint skeletons and the independent-design theory of `Calibrator.JetBarrier`
+is the whole story.
+
+That would be a large simplification if genotypes had it. They do not, and the two
+developments meet on exactly this point.
+-/
+
+/-- **No polymorphic hard-called locus is both sign-symmetric and Mellin-non-degenerate.**
+
+Two obstructions at complementary frequencies:
+
+* away from `q = 1/2` the dosage has non-zero third central moment, so no
+  value-negating relabelling exists and `sign_erasure` simply does not apply;
+* at `q = 1/2` the relabelling exists, but the standardized square collapses to two
+  values, `log x ^ 2` sits on a single point, and the second Mellin observable
+  vanishes.
+
+Consequence, and it is the honest statement of where the open direction lies: for real
+genotypes the overlap between interaction terms — which in genetics *is* linkage
+disequilibrium — cannot be argued away by symmetry. The disjoint-design theory proved
+in this development is therefore not the whole story for a genome, and the overlapping
+case remains exactly what `Calibrator.JetBarrier` says it is: the direction where the
+observable algebra grows beyond the triple, and which is not proved here. -/
+theorem no_signSymmetric_nondegenerate_locus
+    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (∀ coding : SymmetricCoding DiploidGenotype,
+        (∀ g, coding.weight g = h.genotypeProb g) →
+        (∀ g, coding.value g = h.centeredAltAlleleCount g) →
+        h.altFreq = 1 / 2) ∧
+      (h.altFreq = 1 / 2 → hweMellinJetVariance h.altFreq = 0) := by
+  refine ⟨fun coding hweight hvalue => ?_, fun hhalf => ?_⟩
+  · exact hwe_symmetricCoding_forces_half h hq0 hq1 coding hweight hvalue
+  · rw [hhalf]
+    exact hweMellinJetVariance_half
 
 /-!
 ## 6. Where the whole development now stands

@@ -58,6 +58,7 @@ import Calibrator.LocalToGlobalCoherence
 import Calibrator.HiddenConeAmbiguity
 import Calibrator.LatentMechanismCollapse
 import Calibrator.PolygenicSpectroscopy
+import Calibrator.EpistaticChaos
 import Calibrator.CondensationUnification
 
 namespace Calibrator

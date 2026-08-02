@@ -276,7 +276,7 @@ theorem lattice_detection
 
 /-- The Gaussian's own lattice datum: `log g²` has a density, so the Gaussian is
 nonlattice. Recorded as the definitional fact it is. -/
-def gaussianObservables : MellinObservables where
+noncomputable def gaussianObservables : MellinObservables where
   drift := condensationConstant
   jetVariance := gaussianJetVariance
   latticeDatum := LatticeDatum.nonlattice
