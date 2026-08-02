@@ -164,11 +164,29 @@ def compare(name, mine, theirs):
         print(f"      theirs: {theirs[k]['body'][:130]}")
     if only_theirs[:12]:
         print(f"    names they have and we do not: {only_theirs[:12]}")
+    # Publish BOTH SIDES of every disagreement, keyed by name.  A count tells
+    # someone there is a problem; both parses plus the source location tell them
+    # which side is wrong and let them fix it without re-deriving anything.
+    detail = {}
+    for k in body_diff + param_diff + order_diff:
+        kinds = ([] + (["body"] if k in body_diff else [])
+                 + (["params"] if k in param_diff else [])
+                 + (["order"] if k in order_diff else []))
+        detail[k] = {
+            "disagreement": kinds,
+            "source": f"{mine[k]['file']}:{mine[k]['line']}",
+            "ours": {"params": mine[k]["params"], "body": mine[k]["body"],
+                     "ret": mine[k]["ret"], "fq": mine[k]["fq"]},
+            "theirs": {"params": theirs[k]["params"], "body": theirs[k]["body"],
+                       "ret": theirs[k]["ret"],
+                       "at": f"{theirs[k]['file']}:{theirs[k]['line']}"},
+        }
     rows = {"shared": len(shared), "only_ours": len(only_mine),
             "only_theirs": len(only_theirs), "body": len(body_diff),
             "params": len(param_diff), "order": len(order_diff),
             "body_names": body_diff, "param_names": param_diff,
-            "order_names": order_diff, "only_theirs_names": only_theirs}
+            "order_names": order_diff, "only_theirs_names": only_theirs,
+            "detail": detail}
     return rows
 
 
@@ -192,7 +210,26 @@ def main():
     tot = sum(v.get("body", 0) + v.get("params", 0) + v.get("order", 0)
               for v in report.values() if isinstance(v, dict))
     print(f"\nTOTAL DISAGREEMENTS ACROSS PARSERS: {tot}")
-    print("Each one is a bug in at least one parser.")
+    print("Each one is a bug in at least one parser.  Both sides' parse and the")
+    print("source location are in reconcile.json under [<table>][\"detail\"],")
+    print("keyed by definition name -- routable without re-deriving anything.")
+
+    # The dominant cause is worth naming rather than leaving to be rediscovered.
+    multiline = []
+    for label, v in report.items():
+        if not isinstance(v, dict) or "detail" not in v:
+            continue
+        for k, row in v["detail"].items():
+            ours = [p[0] for p in row["ours"]["params"]]
+            theirs_p = [p[0] for p in row["theirs"]["params"]]
+            if len(theirs_p) < len(ours) and set(theirs_p) <= set(ours):
+                multiline.append((label, k, sorted(set(ours) - set(theirs_p))))
+    if multiline:
+        print(f"\n{len(multiline)} of these are the SAME failure: a parameter "
+              "dropped from a\nmulti-line signature.  A callable built from the "
+              "short list mis-binds every\nargument after the missing one.")
+        for label, k, missing in multiline[:20]:
+            print(f"  {label}  {k}: missing {missing}")
 
 
 if __name__ == "__main__":

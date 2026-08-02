@@ -75,7 +75,7 @@ This is the precise reason the lattice discrepancy of `Calibrator.JetBarrier` is
 restatement of the `r ^ 2` attenuation modelled in `Calibrator.ImputationPortability`:
 attenuation is a rescaling, and rescalings act trivially on everything the
 condensation theory measures. -/
-theorem standardizedSquare_scale_invariant (c V lam : ℝ) (hV : V ≠ 0) (hlam : lam ≠ 0) :
+theorem standardizedSquare_scale_invariant (c V lam : ℝ) (hlam : lam ≠ 0) :
     (lam * c) ^ 2 / (lam ^ 2 * V) = c ^ 2 / V := by
   rw [mul_pow, mul_div_mul_left _ _ (pow_ne_zero 2 hlam)]
 
@@ -127,7 +127,7 @@ nonlattice surrogate's. -/
 theorem imputation_rescaling_cannot_repair_lattice (lam : ℝ) (hlam : lam ≠ 0) :
     1 < latticeInflation hardCallLatticeSpan ∧
       ∀ c V : ℝ, V ≠ 0 → (lam * c) ^ 2 / (lam ^ 2 * V) = c ^ 2 / V :=
-  ⟨hardCall_intensity_inflated, fun c V hV => standardizedSquare_scale_invariant c V lam hV hlam⟩
+  ⟨hardCall_intensity_inflated, fun c V _hV => standardizedSquare_scale_invariant c V lam hlam⟩
 
 /-!
 ## 4. The number of principal components is a convention

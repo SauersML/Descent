@@ -74,8 +74,7 @@ theorem snp_h2_le_narrow_h2
     the numerator, and with it goes the ability to say when the two coincide,
     which is now visible — never, unless the tagging is complete. -/
 theorem narrow_h2_sub_snp_h2_eq
-    (V_A_tagged V_A_total V_D V_I V_E : ℝ)
-    (h_total : 0 < V_A_total + V_D + V_I + V_E) :
+    (V_A_tagged V_A_total V_D V_I V_E : ℝ) :
     narrowSenseH2 V_A_total V_D V_I V_E -
         snpH2 V_A_tagged (V_A_total + V_D + V_I + V_E) =
       (V_A_total - V_A_tagged) / (V_A_total + V_D + V_I + V_E) := by
@@ -99,8 +98,7 @@ theorem narrow_h2_sub_snp_h2_eq
     take the numerator on trust. -/
 theorem missing_heritability_gap
     (V_A_tagged V_A_untagged V_D V_I V_E : ℝ)
-    (h_tagged_nn : 0 ≤ V_A_tagged) (h_untagged_pos : 0 < V_A_untagged)
-    (h_D : 0 ≤ V_D) (h_I : 0 ≤ V_I) (h_E : 0 ≤ V_E)
+    (h_untagged_pos : 0 < V_A_untagged)
     (h_total : 0 < V_A_tagged + V_A_untagged + V_D + V_I + V_E) :
     let V_P := V_A_tagged + V_A_untagged + V_D + V_I + V_E
     let h2_twin := (V_A_tagged + V_A_untagged) / V_P
@@ -456,7 +454,7 @@ theorem liability_h2_larger_for_rare
     prevalence have different observed h², which can be mistaken
     for a portability effect. -/
 theorem prevalence_confounds_h2_portability
-    (h2_liability : ℝ) (K₁ K₂ z₁ z₂ : ℝ)
+    (K₁ K₂ z₁ z₂ : ℝ)
     (h_diff_ratio : K₁ * (1 - K₁) / z₁ ^ 2 ≠ K₂ * (1 - K₂) / z₂ ^ 2) :
     -- Different observed h² even with same genetic architecture
     liabilityScaleH2 1 K₁ z₁ ≠ liabilityScaleH2 1 K₂ z₂ := by

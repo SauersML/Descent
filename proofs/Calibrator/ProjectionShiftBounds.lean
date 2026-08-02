@@ -793,6 +793,200 @@ theorem exists_split_attaining_scalarized_optimum
 
 end DetectionReconstructionFrontier
 
+/-!
+## Rescaling is removable, rotation is not
+
+A predictor `beta` carried to a new population is wrong in two separable ways.
+It can be wrong in *scale*, and it can be wrong in *direction*.  This section
+proves that the first costs nothing that a single scalar cannot undo, and the
+second costs a quantity no scalar can touch — the target-metric angle between
+the transported direction and the target truth, scaled by target signal energy.
+
+That is the formal content behind `MetricSpecificPortability`'s
+`recalibration_easier_than_rediscovery`: recalibration searches the orbit
+`{a * beta}`, and `irreducibleDegradation` is exactly what that orbit cannot
+reach.
+
+Everything is stated over the corpus's own second-moment objects: `B` is
+instantiated at `secondMomentMatrix` or `covarianceMatrix` of the target
+population, `beta` is the transported coefficient vector and `theta` the target
+optimum.  No abstract covariance is introduced.
+-/
+
+section RescalingAndRotation
+
+theorem dot_smul_left (c : ℝ) (x y : ι → ℝ) :
+    dot (fun i => c * x i) y = c * dot x y := by
+  simp [dot, Finset.mul_sum, mul_assoc]
+
+theorem dot_smul_right (c : ℝ) (x y : ι → ℝ) :
+    dot x (fun i => c * y i) = c * dot x y := by
+  simp [dot, Finset.mul_sum, mul_left_comm]
+
+theorem matrix_mulVec_smul (A : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
+    A.mulVec (fun i => c * x i) = fun j => c * A.mulVec x j := by
+  ext j
+  simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_comm]
+
+/-- Rescaling a coefficient vector scales its energy by the square. -/
+theorem coefficientEnergy_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
+    coefficientEnergy B (fun i => c * x i) = c ^ 2 * coefficientEnergy B x := by
+  unfold coefficientEnergy
+  rw [matrix_mulVec_smul, dot_smul_left, dot_smul_right]
+  ring
+
+theorem coefficientEnergy_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B) :
+    coefficientEnergy B (fun i => x i - y i) =
+      coefficientEnergy B x + coefficientEnergy B y -
+        2 * dot x (B.mulVec y) := by
+  have hrw : (fun i => x i - y i) = (fun i => x i + (-1) * y i) := by
+    funext i
+    ring
+  rw [hrw, coefficientEnergy_add B x (fun i => (-1) * y i) hsymmetric,
+    coefficientEnergy_smul, matrix_mulVec_smul, dot_smul_right]
+  ring
+
+/-- **Excess risk along the recalibration orbit.**  Expanding the energy of
+`a * beta - theta` in the target metric gives a quadratic in the single scalar
+`a`; every statement below is about that quadratic. -/
+theorem coefficientEnergy_rescaled_expand
+    (B : Matrix ι ι ℝ) (beta theta : ι → ℝ) (a : ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B) :
+    coefficientEnergy B (fun i => a * beta i - theta i) =
+      a ^ 2 * coefficientEnergy B beta -
+        2 * a * dot beta (B.mulVec theta) + coefficientEnergy B theta := by
+  rw [coefficientEnergy_sub B (fun i => a * beta i) theta hsymmetric,
+    coefficientEnergy_smul, dot_smul_left]
+  ring
+
+/-- **The optimal recalibration of a transported predictor for one target.**
+
+`a* = (beta' B theta) / (beta' B beta)`, the scalar that best rescales the
+transported direction `beta` towards the target optimum `theta` in the target
+metric `B`.  This is the correction a recalibration step finds.
+
+Empirical status: UNTESTED. -/
+def sharedCorrectionOptimum (B : Matrix ι ι ℝ) (beta theta : ι → ℝ) : ℝ :=
+  dot beta (B.mulVec theta) / coefficientEnergy B beta
+
+/-- **The part of the degradation no rescaling can remove.**
+
+`theta' B theta - (beta' B theta)^2 / (beta' B beta)`, which is the target
+signal energy times the squared sine of the `B`-angle between `beta` and
+`theta`.  It vanishes when the transported direction is `B`-parallel to the
+target truth and is strictly positive otherwise.
+
+Empirical status: UNTESTED. -/
+def irreducibleDegradation (B : Matrix ι ι ℝ) (beta theta : ι → ℝ) : ℝ :=
+  coefficientEnergy B theta -
+    dot beta (B.mulVec theta) ^ 2 / coefficientEnergy B beta
+
+/-- **No rescaling reaches below the angle term.**  The recalibration orbit
+`{a * beta}` is bounded below by `irreducibleDegradation`, uniformly in `a`. -/
+theorem irreducibleDegradation_le_rescaled
+    (B : Matrix ι ι ℝ) (beta theta : ι → ℝ) (a : ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B)
+    (hbeta : 0 < coefficientEnergy B beta) :
+    irreducibleDegradation B beta theta ≤
+      coefficientEnergy B (fun i => a * beta i - theta i) := by
+  rw [coefficientEnergy_rescaled_expand B beta theta a hsymmetric]
+  have hkey : 2 * a * dot beta (B.mulVec theta) -
+      a ^ 2 * coefficientEnergy B beta ≤
+      dot beta (B.mulVec theta) ^ 2 / coefficientEnergy B beta := by
+    rw [le_div_iff₀ hbeta]
+    nlinarith [sq_nonneg (a * coefficientEnergy B beta -
+      dot beta (B.mulVec theta))]
+  unfold irreducibleDegradation
+  linarith
+
+/-- **And the bound is attained, at the optimal recalibration.**  So
+`irreducibleDegradation` is the value of the recalibration problem, not merely a
+lower bound for it. -/
+theorem rescaled_at_optimum_eq_irreducibleDegradation
+    (B : Matrix ι ι ℝ) (beta theta : ι → ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B)
+    (hbeta : 0 < coefficientEnergy B beta) :
+    coefficientEnergy B
+        (fun i => sharedCorrectionOptimum B beta theta * beta i - theta i) =
+      irreducibleDegradation B beta theta := by
+  rw [coefficientEnergy_rescaled_expand B beta theta _ hsymmetric]
+  unfold sharedCorrectionOptimum irreducibleDegradation
+  have hu : coefficientEnergy B beta * (coefficientEnergy B beta)⁻¹ = 1 :=
+    mul_inv_cancel₀ (ne_of_gt hbeta)
+  linear_combination
+    (dot beta (B.mulVec theta) ^ 2 * (coefficientEnergy B beta)⁻¹) * hu
+
+/-- **The degradation splits into a removable part and a class, and the
+removable part is a perfect square.**
+
+Degradation at correction `a` minus the angle term equals
+`(beta' B beta) * (a - a*)^2`: the coboundary is the squared distance from the
+correction actually applied to the correction that target wanted, weighted by
+the transported direction's energy in the target metric.
+
+Three consequences, and this is why the identity is worth having rather than
+the three statements separately: the removable part is nonnegative; it is zero
+when `a = a*`; and it is zero *only* then, so recalibration removes the whole
+coboundary and nothing of the class.  A predictor that is merely mis-scaled has
+degradation entirely of the first kind; a rotated predictor has degradation of
+the second, and refitting rather than recalibration is the only remedy. -/
+theorem rescaled_energy_sub_irreducible_eq_sq
+    (B : Matrix ι ι ℝ) (beta theta : ι → ℝ) (a : ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B)
+    (hbeta : 0 < coefficientEnergy B beta) :
+    coefficientEnergy B (fun i => a * beta i - theta i) -
+        irreducibleDegradation B beta theta =
+      coefficientEnergy B beta *
+        (a - sharedCorrectionOptimum B beta theta) ^ 2 := by
+  rw [coefficientEnergy_rescaled_expand B beta theta a hsymmetric]
+  unfold sharedCorrectionOptimum irreducibleDegradation
+  have hu : coefficientEnergy B beta * (coefficientEnergy B beta)⁻¹ = 1 :=
+    mul_inv_cancel₀ (ne_of_gt hbeta)
+  linear_combination
+    (2 * a * dot beta (B.mulVec theta) -
+      dot beta (B.mulVec theta) ^ 2 * (coefficientEnergy B beta)⁻¹) * hu
+
+/-- The removable part is nonnegative, so the split is a decomposition into two
+nonnegative pieces rather than a cancellation. -/
+theorem removable_part_nonneg
+    (B : Matrix ι ι ℝ) (beta theta : ι → ℝ) (a : ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B)
+    (hbeta : 0 < coefficientEnergy B beta) :
+    0 ≤ coefficientEnergy B (fun i => a * beta i - theta i) -
+      irreducibleDegradation B beta theta := by
+  rw [rescaled_energy_sub_irreducible_eq_sq B beta theta a hsymmetric hbeta]
+  exact mul_nonneg (le_of_lt hbeta) (sq_nonneg _)
+
+/-- **Recalibration removes the coboundary and only the coboundary.**  The
+degradation drops to the angle term exactly when the correction applied is the
+one that target wanted; any other scalar leaves a strictly positive remainder on
+top of the irreducible part. -/
+theorem rescaled_eq_irreducible_iff_optimal
+    (B : Matrix ι ι ℝ) (beta theta : ι → ℝ) (a : ℝ)
+    (hsymmetric : IsSymmetricBilinearMatrix B)
+    (hbeta : 0 < coefficientEnergy B beta) :
+    coefficientEnergy B (fun i => a * beta i - theta i) =
+        irreducibleDegradation B beta theta ↔
+      a = sharedCorrectionOptimum B beta theta := by
+  have hfactor :=
+    rescaled_energy_sub_irreducible_eq_sq B beta theta a hsymmetric hbeta
+  constructor
+  · intro hEq
+    rw [hEq, sub_self] at hfactor
+    have hsq : (a - sharedCorrectionOptimum B beta theta) ^ 2 = 0 := by
+      rcases mul_eq_zero.mp hfactor.symm with hzero | hzero
+      · exact absurd hzero (ne_of_gt hbeta)
+      · exact hzero
+    have := pow_eq_zero_iff (n := 2) (by norm_num) |>.mp hsq
+    linarith
+  · intro hEq
+    rw [hEq] at hfactor
+    rw [sub_self, mul_zero] at hfactor
+    linarith
+
+end RescalingAndRotation
+
 end
 
 end Calibrator

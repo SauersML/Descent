@@ -788,7 +788,6 @@ variable {Ω : Type*}
 theorem mse_from_variance_ratio_corr_bias
     (E : ExpFunctional Ω) (Y S : Ω → ℝ)
     (ρ lam : ℝ)
-    (hvarY : 0 < variance E Y)
     (hlam : variance E S = variance E Y * lam)
     (hρ : covariance E Y S = ρ * variance E Y * Real.sqrt lam) :
     expMse E Y S
