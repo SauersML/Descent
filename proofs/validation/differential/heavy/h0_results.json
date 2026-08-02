@@ -1,0 +1,280 @@
+{
+ "cells": [
+  {
+   "mu": 0.0,
+   "theta": 0.0,
+   "H0_measured": 0.9990000000000002,
+   "H0_sem": 2.0269806481627057e-17,
+   "H_equilibrium_theory": null,
+   "role": "CONTROL 1 (mu=0)",
+   "checkpoints": [
+    {
+     "t": 0,
+     "n_usable_replicates": 120,
+     "retention_measured": 1.0,
+     "retention_sem": 0.0,
+     "retention_predicted_by_cluster": 1.0,
+     "retention_predicted_by_theory": null
+    },
+    {
+     "t": 100,
+     "n_usable_replicates": 120,
+     "retention_measured": 0.9025204371037705,
+     "retention_sem": 0.0021354352642193306,
+     "retention_predicted_by_cluster": 0.9047921471137089,
+     "retention_predicted_by_theory": null
+    },
+    {
+     "t": 500,
+     "n_usable_replicates": 120,
+     "retention_measured": 0.6055511011011011,
+     "retention_sem": 0.013137178464348444,
+     "retention_predicted_by_cluster": 0.6063789448611847,
+     "retention_predicted_by_theory": null
+    },
+    {
+     "t": 2000,
+     "n_usable_replicates": 120,
+     "retention_measured": 0.11542939606272941,
+     "retention_sem": 0.017026801758725597,
+     "retention_predicted_by_cluster": 0.13519992539749945,
+     "retention_predicted_by_theory": null
+    }
+   ]
+  },
+  {
+   "mu": 2.5e-05,
+   "theta": 0.05,
+   "H0_measured": 0.04386388333333333,
+   "H0_sem": 0.010111527074534946,
+   "H_equilibrium_theory": 0.047619047619047616,
+   "role": "test",
+   "checkpoints": [
+    {
+     "t": 0,
+     "n_usable_replicates": 42,
+     "retention_measured": 1.0,
+     "retention_sem": 0.0,
+     "retention_predicted_by_cluster": 1.0,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 100,
+     "n_usable_replicates": 42,
+     "retention_measured": 1.0201176556527183,
+     "retention_sem": 0.1600020303428596,
+     "retention_predicted_by_cluster": 0.9047921471137089,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 500,
+     "n_usable_replicates": 42,
+     "retention_measured": 1.242125071951949,
+     "retention_sem": 0.3404879067870944,
+     "retention_predicted_by_cluster": 0.6063789448611847,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 2000,
+     "n_usable_replicates": 42,
+     "retention_measured": 2.061910536160667,
+     "retention_sem": 0.5465091701851083,
+     "retention_predicted_by_cluster": 0.13519992539749945,
+     "retention_predicted_by_theory": 1.0
+    }
+   ]
+  },
+  {
+   "mu": 0.00025,
+   "theta": 0.5,
+   "H0_measured": 0.3253806166666667,
+   "H0_sem": 0.02043879622587065,
+   "H_equilibrium_theory": 0.3333333333333333,
+   "role": "test",
+   "checkpoints": [
+    {
+     "t": 0,
+     "n_usable_replicates": 115,
+     "retention_measured": 1.0,
+     "retention_sem": 0.0,
+     "retention_predicted_by_cluster": 1.0,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 100,
+     "n_usable_replicates": 115,
+     "retention_measured": 1.9800465240770508,
+     "retention_sem": 0.5736722841804025,
+     "retention_predicted_by_cluster": 0.9047921471137089,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 500,
+     "n_usable_replicates": 115,
+     "retention_measured": 5.546230213603132,
+     "retention_sem": 2.641473333561509,
+     "retention_predicted_by_cluster": 0.6063789448611847,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 2000,
+     "n_usable_replicates": 115,
+     "retention_measured": 10.200375084683769,
+     "retention_sem": 4.075849767145497,
+     "retention_predicted_by_cluster": 0.13519992539749945,
+     "retention_predicted_by_theory": 1.0
+    }
+   ]
+  },
+  {
+   "mu": 0.001,
+   "theta": 2.0,
+   "H0_measured": 0.6855710833333333,
+   "H0_sem": 0.010968358765682308,
+   "H_equilibrium_theory": 0.6666666666666666,
+   "role": "test",
+   "checkpoints": [
+    {
+     "t": 0,
+     "n_usable_replicates": 120,
+     "retention_measured": 1.0,
+     "retention_sem": 0.0,
+     "retention_predicted_by_cluster": 1.0,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 100,
+     "n_usable_replicates": 120,
+     "retention_measured": 0.9917224871109108,
+     "retention_sem": 0.01617134578500146,
+     "retention_predicted_by_cluster": 0.9047921471137089,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 500,
+     "n_usable_replicates": 120,
+     "retention_measured": 1.0031081564111493,
+     "retention_sem": 0.028736366960379213,
+     "retention_predicted_by_cluster": 0.6063789448611847,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 2000,
+     "n_usable_replicates": 120,
+     "retention_measured": 1.0129629480260618,
+     "retention_sem": 0.027013943691652727,
+     "retention_predicted_by_cluster": 0.13519992539749945,
+     "retention_predicted_by_theory": 1.0
+    }
+   ]
+  },
+  {
+   "mu": 0.004,
+   "theta": 8.0,
+   "H0_measured": 0.8902634500000001,
+   "H0_sem": 0.003604747800853333,
+   "H_equilibrium_theory": 0.8888888888888888,
+   "role": "test",
+   "checkpoints": [
+    {
+     "t": 0,
+     "n_usable_replicates": 120,
+     "retention_measured": 1.0,
+     "retention_sem": 0.0,
+     "retention_predicted_by_cluster": 1.0,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 100,
+     "n_usable_replicates": 120,
+     "retention_measured": 1.0003638767810572,
+     "retention_sem": 0.004198441710205632,
+     "retention_predicted_by_cluster": 0.9047921471137089,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 500,
+     "n_usable_replicates": 120,
+     "retention_measured": 0.9996769103148664,
+     "retention_sem": 0.005995332619240673,
+     "retention_predicted_by_cluster": 0.6063789448611847,
+     "retention_predicted_by_theory": 1.0
+    },
+    {
+     "t": 2000,
+     "n_usable_replicates": 120,
+     "retention_measured": 1.003507700612296,
+     "retention_sem": 0.005143555696263451,
+     "retention_predicted_by_cluster": 0.13519992539749945,
+     "retention_predicted_by_theory": 1.0
+    }
+   ]
+  }
+ ],
+ "summary": {
+  "control_1_mutation_off_reproduces_closed_form": true,
+  "control_2_equilibrium_level_matches_theory": true,
+  "controls_pinned_by": [
+   "hetRecurrence_closed_form (theorem)",
+   "Kimura & Crow 1964 theta/(1+theta) == Calibrator.hetEquilibrium"
+  ],
+  "control_2_detail": [
+   {
+    "mu": 2.5e-05,
+    "H_measured": 0.04386388333333333,
+    "H_theory": 0.047619047619047616,
+    "ok": true
+   },
+   {
+    "mu": 0.00025,
+    "H_measured": 0.3253806166666667,
+    "H_theory": 0.3333333333333333,
+    "ok": true
+   },
+   {
+    "mu": 0.001,
+    "H_measured": 0.6855710833333333,
+    "H_theory": 0.6666666666666666,
+    "ok": true
+   },
+   {
+    "mu": 0.004,
+    "H_measured": 0.8902634500000001,
+    "H_theory": 0.8888888888888888,
+    "ok": true
+   }
+  ],
+  "READ_THE_TEST": true,
+  "note": "If either control is False the test rows are uninterpretable and must NOT be reported as a falsification of anything.",
+  "test": [
+   {
+    "mu": 2.5e-05,
+    "t": 2000,
+    "retention_measured": 2.061910536160667,
+    "cluster_predicts": 0.13519992539749945,
+    "theory_predicts": 1.0
+   },
+   {
+    "mu": 0.00025,
+    "t": 2000,
+    "retention_measured": 10.200375084683769,
+    "cluster_predicts": 0.13519992539749945,
+    "theory_predicts": 1.0
+   },
+   {
+    "mu": 0.001,
+    "t": 2000,
+    "retention_measured": 1.0129629480260618,
+    "cluster_predicts": 0.13519992539749945,
+    "theory_predicts": 1.0
+   },
+   {
+    "mu": 0.004,
+    "t": 2000,
+    "retention_measured": 1.003507700612296,
+    "cluster_predicts": 0.13519992539749945,
+    "theory_predicts": 1.0
+   }
+  ]
+ }
+}

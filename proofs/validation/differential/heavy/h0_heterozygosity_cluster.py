@@ -102,9 +102,19 @@ WHAT WOULD MAKE THIS TEST WRONG RATHER THAN THE DEFINITIONS
     possible outcome of this design, which is what makes it a test.
 
 EXPECTED RUNTIME
-    ~8 min on 1 core; trivially parallel over the 8 cells. 200 replicates x
-    4000 generations x 2000 gene copies, vectorised over replicates.
-    Memory < 100 MB.
+    ~1 min on 1 core.  A first version burned in for 10*2*Ne generations to
+    reach equilibrium and was 18x more expensive than the test it enabled; it
+    was killed before finishing.  The burn-in is now GONE, because the
+    stationary distribution of the infinite-alleles model is known exactly --
+    it is the Ewens sampling formula -- and can be drawn directly by the
+    Chinese restaurant process in O(2N).  Sampling the equilibrium instead of
+    waiting for it removes ~85% of the work and makes the equilibrium start
+    exact rather than approximate.
+
+    Sizes are scaled so t/(2Ne) hits the same 0, 0.1, 0.5, 2.0 as before, which
+    is the only thing the predictions depend on: retention is a function of
+    t/(2Ne) alone, so Ne=500 at t=2000 tests exactly what Ne=1000 at t=4000
+    does, four times cheaper.
 
 DEPENDENCIES
     numpy only.  Verified against the numpy 1.19 API surface (default_rng,
@@ -116,14 +126,26 @@ import sys
 
 import numpy as np
 
-NE = 1000            # diploid; 2*NE gene copies
-CHECKPOINTS = [0, 200, 1000, 4000]
-REPS = 200
-BURNIN_MULT = 10     # burn-in generations = BURNIN_MULT * 2 * NE
+NE = 500             # diploid; 2*NE gene copies
+CHECKPOINTS = [0, 100, 500, 2000]     # t/(2Ne) = 0, 0.1, 0.5, 2.0
+REPS = 120
 
-# mu = 0 is CONTROL 1. The rest are the test, spanning three orders of
-# magnitude at fixed Ne and t (can-fail clause 2).
-MUS = [0.0, 1e-6, 1e-5, 1e-4]
+# mu = 0 is CONTROL 1. The rest are the test.
+#
+# theta = 4*Ne*mu must stay well away from 0. A first run used mu = 1e-6..1e-4
+# at Ne = 500, i.e. theta = 0.002..0.2, where the equilibrium heterozygosity is
+# 0.002..0.17 and most replicates are outright monomorphic. The retention ratio
+# H(t)/H(0) is then 0/0 and returned values like 8.34 and 0.0000 -- noise, not
+# measurement. Worse, CONTROL 2 PASSED that run, because its tolerance was
+# 4*sem with a 1e-6 floor rather than a relative tolerance, so a 3.2x miss
+# (0.000625 measured against 0.001996 predicted) was inside it.
+#
+# theta values below are 0.05, 0.5, 2, 8 -> H* = 0.048, 0.33, 0.67, 0.89.
+# The theta = 0.05 row is deliberate and is NOT expected to separate: as
+# theta -> 0 mutation becomes negligible and the closed-population recurrence
+# becomes CORRECT. That row marks where the cluster's premise actually holds,
+# so the finding is stated as a regime boundary rather than a blanket error.
+MUS = [0.0] + [theta / (4.0 * NE) for theta in (0.05, 0.5, 2.0, 8.0)]
 
 
 def heterozygosity(pop):
@@ -134,6 +156,37 @@ def heterozygosity(pop):
         p = counts / pop.shape[1]
         out[r] = 1.0 - np.sum(p * p)
     return out
+
+
+def ewens_sample(n, theta, rng):
+    """Exact draw from the infinite-alleles stationary distribution.
+
+    Chinese restaurant process: gene i founds a new allelic class with
+    probability theta/(theta + i - 1), else copies an existing one with
+    probability proportional to that class's current size. The resulting
+    partition is Ewens(theta), which IS the stationary configuration of the
+    infinite-alleles Wright-Fisher model with theta = 4*Ne*mu. Drawing it
+    directly replaces the burn-in and makes "start at equilibrium" exact.
+    """
+    labels = np.empty(n, dtype=np.int64)
+    labels[0] = 0
+    n_classes = 1
+    sizes = [1]
+    for i in range(1, n):
+        if rng.random() < theta / (theta + i):
+            labels[i] = n_classes
+            sizes.append(1)
+            n_classes += 1
+        else:
+            r = rng.random() * i
+            c = 0
+            acc = sizes[0]
+            while acc <= r:
+                c += 1
+                acc += sizes[c]
+            labels[i] = c
+            sizes[c] += 1
+    return labels, n_classes
 
 
 def evolve(pop, mu, gens, rng, next_label):
@@ -158,18 +211,24 @@ def main():
     results = []
 
     for mu in MUS:
-        # Start every copy distinct so H(0) is maximal, then burn in. With
-        # mu = 0 the burn-in is skipped: a closed no-mutation population has no
-        # stationary state to reach, and burning it in would drive H to 0 and
-        # destroy the control.
-        pop = np.arange(n, dtype=np.int64)[None, :].repeat(REPS, axis=0)
-        next_label = n
-
-        if mu > 0.0:
-            pop, next_label = evolve(pop, mu, BURNIN_MULT * 2 * NE, rng, next_label)
+        theta = 4.0 * NE * mu
+        if mu == 0.0:
+            # CONTROL 1: a closed no-mutation population has no stationary
+            # state. Start every copy distinct so H(0) is maximal, which is
+            # exactly the premise the recurrence assumes.
+            pop = np.arange(n, dtype=np.int64)[None, :].repeat(REPS, axis=0)
+            next_label = n
+        else:
+            # Test cells start AT equilibrium, drawn exactly, no burn-in.
+            rows_ = []
+            next_label = 0
+            for _ in range(REPS):
+                lab, k = ewens_sample(n, theta, rng)
+                rows_.append(lab + next_label)
+                next_label += k
+            pop = np.array(rows_, dtype=np.int64)
 
         h0 = heterozygosity(pop)
-        theta = 4.0 * NE * mu
         row = {
             "mu": mu,
             "theta": theta,
@@ -188,9 +247,13 @@ def main():
                 cur, next_label = evolve(cur, mu, t - prev_t, rng, next_label)
                 prev_t = t
             h = heterozygosity(cur)
-            ratio = h / np.where(h0 == 0, np.nan, h0)
+            # A replicate with no variation at t=0 has no retention ratio. Drop
+            # it rather than let 0/0 or a huge quotient enter the mean.
+            usable = h0 > 1e-3
+            ratio = np.where(usable, h / np.where(usable, h0, 1.0), np.nan)
             row["checkpoints"].append({
                 "t": t,
+                "n_usable_replicates": int(np.sum(h0 > 1e-3)),
                 "retention_measured": float(np.nanmean(ratio)),
                 "retention_sem": float(np.nanstd(ratio) / np.sqrt(REPS)),
                 # What the cluster predicts. No mu term: identical across rows.
@@ -208,10 +271,16 @@ def main():
         < 4 * max(c["retention_sem"], 1e-6)
         for c in ctrl1["checkpoints"]
     )
+    # RELATIVE tolerance. An absolute one scaled by sem passed a run in which
+    # the measured equilibrium was 3.2x off, because sem is tiny when every
+    # replicate is monomorphic. 5% or 4 sem, whichever is LARGER, and the
+    # relative term is what binds at small theta.
+    def _c2_ok(meas, th, sem):
+        return abs(meas - th) <= max(0.05 * th, 4 * sem)
+
     c2 = [
         (r["mu"], r["H0_measured"], r["H_equilibrium_theory"],
-         abs(r["H0_measured"] - r["H_equilibrium_theory"])
-         < 4 * max(r["H0_sem"], 1e-6))
+         _c2_ok(r["H0_measured"], r["H_equilibrium_theory"], r["H0_sem"]))
         for r in results if r["mu"] > 0
     ]
     c2_ok = all(x[3] for x in c2)

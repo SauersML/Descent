@@ -1,0 +1,2900 @@
+[
+ {
+  "definition": "Calibrator.CausalVec",
+  "file": "Calibrator/DGP.lean",
+  "line": 14,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.ClosedPopulationNoMutation.heterozygosityLoss",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 594,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "FALSIFIED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ClosedPopulationNoMutation.retention",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 582,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "FALSIFIED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ClosedPopulationNoMutation.targetHet",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 604,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "FALSIFIED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.CrossPopulationGenerationalModel.toMetricModelAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2623,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.DemographicCoalescenceScalars.delta",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 243,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.EvolutionaryParameters.bigM",
+  "file": "Calibrator/DGP.lean",
+  "line": 1492,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.EvolutionaryParameters.coordinateSummary",
+  "file": "Calibrator/DGP.lean",
+  "line": 1726,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.EvolutionaryParameters.tau",
+  "file": "Calibrator/DGP.lean",
+  "line": 1484,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.EvolutionaryParameters.theta",
+  "file": "Calibrator/DGP.lean",
+  "line": 1488,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.Expected_Abs_Shift",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 777,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.GenerationalPopGenParameters.bigM",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2157,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.GenerationalPopGenParameters.fstTransientAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2173,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.GenerationalPopGenParameters.hetDecayFactor",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2165,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.GenerationalPopGenParameters.migrationSharedBoostAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2183,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.GenerationalPopGenParameters.mutationSharedRetentionAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2178,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.GenerationalPopGenParameters.tauAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2161,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.GenerationalPopGenParameters.theta",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2153,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.HWEPolygenicScoreDGP.aucApproximationInterval",
+  "file": "Calibrator/DGP.lean",
+  "line": 46,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.HWEPolygenicScoreDGP.r2ApproximationInterval",
+  "file": "Calibrator/DGP.lean",
+  "line": 51,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.HWEPolygenicScoreDGP.scoreApproximationError",
+  "file": "Calibrator/DGP.lean",
+  "line": 41,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.HWEPolygenicScoreDGP.scoreMean",
+  "file": "Calibrator/DGP.lean",
+  "line": 31,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.HWEPolygenicScoreDGP.scoreVariance",
+  "file": "Calibrator/DGP.lean",
+  "line": 36,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.HeterogeneousEffectDGP.toDGP",
+  "file": "Calibrator/DGP.lean",
+  "line": 1351,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.HeterogeneousEffectDGP.trueExp",
+  "file": "Calibrator/DGP.lean",
+  "line": 1347,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.MutationDriftModelAssumptions.fstEquilibrium",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4202,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.MutationDriftModelAssumptions.fstTransient",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4236,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.MutationDriftModelAssumptions.theta",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4137,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PGSEvolutionaryModel.coordinateSummary",
+  "file": "Calibrator/DGP.lean",
+  "line": 2246,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PGSEvolutionaryModel.fstTransient",
+  "file": "Calibrator/DGP.lean",
+  "line": 1981,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PGSEvolutionaryModel.hetDecayFactor",
+  "file": "Calibrator/DGP.lean",
+  "line": 1967,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PGSEvolutionaryModel.ldRetention",
+  "file": "Calibrator/DGP.lean",
+  "line": 1995,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty",
+  "file": "Calibrator/DGP.lean",
+  "line": 2307,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PGSEvolutionaryModel.migBoost",
+  "file": "Calibrator/DGP.lean",
+  "line": 2018,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PGSEvolutionaryModel.mutErosion",
+  "file": "Calibrator/DGP.lean",
+  "line": 2007,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PGSEvolutionaryModel.toEvo",
+  "file": "Calibrator/DGP.lean",
+  "line": 1946,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PGSEvolutionaryModel.toGenerationalPopGenParameters",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2209,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.Pop.pair",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1140,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.Pop.withSource",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1153,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.Pop.withTarget",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1150,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PrevalenceDGP.toDGP",
+  "file": "Calibrator/DGP.lean",
+  "line": 897,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.PureSplitModel.fst",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 215,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.PureSplitModel.tau",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 211,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.SourceTaggedMoments.sigmaTagCausal",
+  "file": "Calibrator/DGP.lean",
+  "line": 134,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.SplitMigrationModel.fstEqLimitLowMutationManyDemes",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 233,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.SplitMigrationModel.fstMigDriftEq",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4921,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.SplitMigrationModel.scaledMigration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 230,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.TagVec",
+  "file": "Calibrator/DGP.lean",
+  "line": 15,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.TransportedMetrics.IrreducibleTargetPenalty.total",
+  "file": "Calibrator/DGP.lean",
+  "line": 2146,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.TransportedMetrics.calibratedBrier",
+  "file": "Calibrator/DGP.lean",
+  "line": 2108,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.TransportedMetrics.calibratedBrierFromVariances",
+  "file": "Calibrator/DGP.lean",
+  "line": 2120,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.TransportedMetrics.gaussianAUCFromSignalVariance",
+  "file": "Calibrator/DGP.lean",
+  "line": 2104,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.TransportedMetrics.profileFromSignalVariance",
+  "file": "Calibrator/DGP.lean",
+  "line": 2181,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.TransportedMetrics.profileFromSignalVarianceWithPenalty",
+  "file": "Calibrator/DGP.lean",
+  "line": 2213,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.TransportedMetrics.r2FromSignalVariance",
+  "file": "Calibrator/DGP.lean",
+  "line": 2100,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.Var_Delta_Mu",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 773,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.admixedAlleleFreq",
+  "file": "Calibrator/DemographicHistory.lean",
+  "line": 351,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.admixedFst",
+  "file": "Calibrator/DemographicHistory.lean",
+  "line": 271,
+  "state": "COVERED",
+  "why": "admixedFst-ratio-not-numerator",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.admixtureLD",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 169,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.admixtureLDBoost",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5377,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.admixtureLDDecay",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5330,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.alleleFreqAfterMigration",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1050,
+  "state": "COVERED",
+  "why": "alleleFreqAfterMigration",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.alleleFreqDivergenceRate",
+  "file": "Calibrator/DGP.lean",
+  "line": 2348,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.alleleFreqMismatchPenalty",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2317,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ancestrySpecificLDResidual",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1646,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.asymmetricFst",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5268,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.betaTargetAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2375,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.bottleneckExcessLD",
+  "file": "Calibrator/DemographicHistory.lean",
+  "line": 685,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.brierFromR2",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3065,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.brierRegretPoint",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3955,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.brierRegretRatio",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3959,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.brokenTaggingResidual",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1628,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.causalAlleleFreqRetentionAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2421,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.causalAlleleFreqTargetAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2403,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.causalMean",
+  "file": "Calibrator/DGP.lean",
+  "line": 100,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.causalPortabilityFromLocalFst",
+  "file": "Calibrator/PhenomeWidePortability.lean",
+  "line": 311,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.coalFst",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 127,
+  "state": "COVERED",
+  "why": "coalFst-exact-split,coalFst-asymmetric-sizes",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.coalescenceCdfFromHazard",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 18,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.coalescenceSurvivalFromHazard",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 15,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.coalescentTau",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 21,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.conditionalMeanApproximationRisk",
+  "file": "Calibrator/DGP.lean",
+  "line": 1195,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.continentIslandStepMigrationFirst",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 226,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.continentIslandStepSelectionFirst",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 219,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.continuousSteppingStoneFst",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1003,
+  "state": "COVERED",
+  "why": "steppingStone-cross-file-contradiction",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.covarianceDivergenceFromRetention",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4350,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.covarianceDivergenceMutationDrift",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4369,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.covarianceRetention",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4324,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.crossCovEntry",
+  "file": "Calibrator/DGP.lean",
+  "line": 110,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.crossCovariance",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1303,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.crossSource",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1261,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.crossTarget",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1265,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.cumulativeDrift",
+  "file": "Calibrator/DemographicHistory.lean",
+  "line": 506,
+  "state": "COVERED",
+  "why": "cumulativeDrift-first-order",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.decaySlope",
+  "file": "Calibrator/DGP.lean",
+  "line": 966,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.demoSteppingStoneFst",
+  "file": "Calibrator/DemographicHistory.lean",
+  "line": 134,
+  "state": "COVERED",
+  "why": "demoSteppingStoneFst-exact",
+  "empirical_status": "CONDITIONALLY VALID",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.demographicCovarianceGapLowerBound",
+  "file": "Calibrator/DGP.lean",
+  "line": 293,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.dgpAdditiveBias",
+  "file": "Calibrator/DGP.lean",
+  "line": 593,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.dgpInteractiveBias",
+  "file": "Calibrator/DGP.lean",
+  "line": 576,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.directCausalProjection",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1377,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.directCausalTargetAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2558,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.discreteRecombinationSurvival",
+  "file": "Calibrator/DGP.lean",
+  "line": 306,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.diversifyingPortability",
+  "file": "Calibrator/PortabilityBounds.lean",
+  "line": 354,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "FALSIFIED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.driftLDCreationRate",
+  "file": "Calibrator/DemographicHistory.lean",
+  "line": 636,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.driftLDEquilibrium",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 300,
+  "state": "COVERED",
+  "why": "driftLDEquilibrium-exact-fixedpoint,driftLDEquilibrium-vs-ohta-kimura",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.driftLDRetention",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 284,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.driftLDStep",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 263,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.driftLDTrajectory",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 495,
+  "state": "COVERED",
+  "why": "driftLDTrajectory-converges",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.effectiveMigration",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1084,
+  "state": "UNACCOUNTED",
+  "why": "only identity/vacuous checks: dup-effectiveMigration-effectiveSymmetricMigration",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.effectiveSymmetricMigration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5309,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.effectiveTargetOutcomeVariance",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1737,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.effectiveTargetOutcomeVarianceAtGeneration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3621,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.equalVarianceGaussianAUCChart",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3281,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.equalVarianceGaussianAUCFromExplainedR2",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3235,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.equalVarianceGaussianAUCFromSNR",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3176,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.equalVarianceGaussianAUCFromVariances",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3188,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.exactCalibratedBrierRiskFromR2",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3060,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.excessLDAfterBottleneck",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 660,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.expectedHeterozygosity",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 100,
+  "state": "UNACCOUNTED",
+  "why": "only identity/vacuous checks: expectedHeterozygosity-equals-hetEquilibrium",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.expectedNewMutations",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 773,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.expectedR2",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 935,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.expectedSqMeanPGSDiff_IMEquilibrium",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4074,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.expectedSqMeanPGSDiff_pureSplit",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4064,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.explainedR2FromTransportMoments",
+  "file": "Calibrator/DGP.lean",
+  "line": 182,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.founderFst",
+  "file": "Calibrator/DemographicHistory.lean",
+  "line": 451,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.freqCorrFromFst",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4334,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.frobeniusNormSq",
+  "file": "Calibrator/DGP.lean",
+  "line": 146,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstDerived",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1227,
+  "state": "COVERED",
+  "why": "fstDerived-is-not-split-fst,fstDerived-is-coalescence-prob",
+  "empirical_status": "FALSIFIED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstDriftFlowStep",
+  "file": "Calibrator/DGP.lean",
+  "line": 1547,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstDriftMigration",
+  "file": "Calibrator/DGP.lean",
+  "line": 1525,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstDriftMutation",
+  "file": "Calibrator/DGP.lean",
+  "line": 1520,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstEquilibrium",
+  "file": "Calibrator/DGP.lean",
+  "line": 1557,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstFromDriftFactor",
+  "file": "Calibrator/PhenomeWidePortability.lean",
+  "line": 196,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstFromGenerations",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 41,
+  "state": "COVERED",
+  "why": "fstFromGenerations-equals-coalFst",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstFromHetRatio",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1497,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstFromTau",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 38,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstIslandMultiplicativeEquilibrium",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4803,
+  "state": "COVERED",
+  "why": "fstIslandMultiplicative-exact-fixedpoint",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstMigDriftEquil",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5474,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstMigDriftNext",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5439,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstMigrationDriftEquilibrium",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4645,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "CONDITIONALLY VALID",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstMigrationMutationEquilibrium",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 945,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstMutationDriftEquilibrium",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 540,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstMutationDriftTransient",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 697,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstMutationDriftTransientDiscrete",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1533,
+  "state": "COVERED",
+  "why": "transient-discrete-vs-continuous",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.fstVariableNe",
+  "file": "Calibrator/DemographicHistory.lean",
+  "line": 510,
+  "state": "COVERED",
+  "why": "fstVariableNe-vs-exact-product",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.harmonicMeanNe",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 578,
+  "state": "COVERED",
+  "why": "harmonicMeanNe-is-harmonic-mean",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.hasInteraction",
+  "file": "Calibrator/DGP.lean",
+  "line": 598,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.hetDecayFactor",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1460,
+  "state": "COVERED",
+  "why": "hetDecayFactor-vs-exact-eigenvalue",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.hetEquilibrium",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1310,
+  "state": "COVERED",
+  "why": "hetEquilibrium-vs-exact-iam",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.hetMutationDriftRecurrence",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1303,
+  "state": "COVERED",
+  "why": "hetMutationDriftRecurrence-trajectory",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.hetMutationFloor",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 460,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.hetMutationRecurrence",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1469,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.hetRatioBetweenBranches",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3025,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.hetRecurrence",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1186,
+  "state": "COVERED",
+  "why": "hetRecurrence-at-mutation-drift-balance",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.hetStepWithMutation",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 435,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.hetTrajectory",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 443,
+  "state": "COVERED",
+  "why": "hetTrajectory-vs-exact-iam",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.heterozygosityLossFromDrift",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 454,
+  "state": "COVERED",
+  "why": "hetLossFromDrift-duplicates-fstDerived",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.hudsonFstFromCoalescenceTimes",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 236,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ibdFlowStep",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4170,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ibdRecurrenceFixedPoint",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4696,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ibdRecurrenceStep",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4683,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.integratedCoalescentHazard",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 12,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.introgressionVariants",
+  "file": "Calibrator/DemographicHistory.lean",
+  "line": 405,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.irreduciblePredictionRisk",
+  "file": "Calibrator/DGP.lean",
+  "line": 1190,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.irreducibleTargetResidualBurden",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1696,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.islandFstMultiplicativeStep",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4786,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.islandModelFst",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 869,
+  "state": "COVERED",
+  "why": "islandModelFst-finite-demes,islandModelFst-vs-exact-in-m",
+  "empirical_status": "CONDITIONALLY VALID",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.jointDirectCausalKernelAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2463,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.jointNovelDirectCausalKernelAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2507,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.jointNovelProxyTaggingKernelAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2526,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.jointProxyTaggingKernelAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2482,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.jointTagLDKernelAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2440,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.ldAfterGenerations",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 76,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldBreakageRate",
+  "file": "Calibrator/DGP.lean",
+  "line": 2354,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldCorrelationDecay",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2105,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldCorrelationFromMigration",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 1117,
+  "state": "COVERED",
+  "why": "ldCorrelationFromMigration-vs-sharedLD-squared",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldDecayRatePerGen",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 813,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldHalfLife",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 828,
+  "state": "COVERED",
+  "why": "ldHalfLife-drops-recombination",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldMismatchFrobenius",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 545,
+  "state": "COVERED",
+  "why": "ldMismatchFrobenius-exact",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldOverlapFromSharedLD",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4338,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldRecurrence",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 948,
+  "state": "COVERED",
+  "why": "ldRecurrence-drops-drift",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldRetainedFraction",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 884,
+  "state": "COVERED",
+  "why": "ldRetainedFraction-inconsistent-with-retention",
+  "empirical_status": "FALSIFIED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldRetentionPerGen",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 45,
+  "state": "COVERED",
+  "why": "ldRetentionPerGen-exact",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.ldWitnessBeta",
+  "file": "Calibrator/DGP.lean",
+  "line": 195,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.ldWitnessSigmaTargetCorrelated",
+  "file": "Calibrator/DGP.lean",
+  "line": 211,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.ldWitnessSigmaTargetIndependent",
+  "file": "Calibrator/DGP.lean",
+  "line": 207,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.ldWitnessSourceMoments",
+  "file": "Calibrator/DGP.lean",
+  "line": 189,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.ldWitnessSourceWeights",
+  "file": "Calibrator/DGP.lean",
+  "line": 198,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.ldWitnessTargetCross",
+  "file": "Calibrator/DGP.lean",
+  "line": 204,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.logLossRegretPoint",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3976,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.logLossRegretRatio",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3980,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.measureBias",
+  "file": "Calibrator/DGP.lean",
+  "line": 1022,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.measureCovariance",
+  "file": "Calibrator/DGP.lean",
+  "line": 1014,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.measureExpMSE",
+  "file": "Calibrator/DGP.lean",
+  "line": 1018,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.measureMean",
+  "file": "Calibrator/DGP.lean",
+  "line": 1006,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.measureVariance",
+  "file": "Calibrator/DGP.lean",
+  "line": 1010,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.migrationLDBoost",
+  "file": "Calibrator/DGP.lean",
+  "line": 1691,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.mse",
+  "file": "Calibrator/DGP.lean",
+  "line": 1335,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.mutationLDErosion",
+  "file": "Calibrator/DGP.lean",
+  "line": 1671,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.neiFst",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 42,
+  "state": "COVERED",
+  "why": "neiFst-identity",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.neutralAFBenchmarkFromRecurrence",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5556,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.neutralAFBenchmarkMetricProfile",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3108,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.neutralAFBenchmarkRatio",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2977,
+  "state": "COVERED",
+  "why": "neutralAFBenchmarkRatio-bounded",
+  "empirical_status": "FALSIFIED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.neutralAFSharedLDBenchmarkRatio",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4500,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.neutralDriftFactor",
+  "file": "Calibrator/PhenomeWidePortability.lean",
+  "line": 125,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "FALSIFIED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.neutralPortability",
+  "file": "Calibrator/PortabilityBounds.lean",
+  "line": 246,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.neutralPortabilityRatioLD",
+  "file": "Calibrator/PhenomeWidePortability.lean",
+  "line": 38,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.novelDirectCausalTargetAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2567,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.novelProxyTaggingTargetAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2584,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.novelUntaggablePhenotypeResidual",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1678,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.novelVariantInnovationAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2427,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.optimalSlopeFromVariance",
+  "file": "Calibrator/DGP.lean",
+  "line": 760,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.optimalSlopeLinearNoise",
+  "file": "Calibrator/DGP.lean",
+  "line": 667,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.pairwiseFstFromBranchTaus",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 92,
+  "state": "COVERED",
+  "why": "pairwiseFstFromBranchTaus-correct-composition",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.pairwiseFstFromBranches",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 73,
+  "state": "COVERED",
+  "why": "pairwiseFstFromBranches",
+  "empirical_status": "CONDITIONALLY VALID",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.pgsVarianceFromHet",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 628,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.presentDayEqualVarianceGaussianAUC",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 952,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.presentDayGaussianAUC",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 943,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.presentDayPGSVariance",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 689,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.presentDayPGSVarianceMutationDrift",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4425,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.presentDayR2",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 887,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.presentDayR2MutationDrift",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4470,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.presentDaySignalToNoise",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 876,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.prevalenceDGP_trueExpectation",
+  "file": "Calibrator/DGP.lean",
+  "line": 892,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.proxyTaggingProjection",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1383,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.proxyTaggingTargetAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2576,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.r2FromMSE",
+  "file": "Calibrator/DGP.lean",
+  "line": 176,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.realWorldPGSVariance",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1094,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.retainedSignalVarianceMigrationDrift",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5157,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.rsquared",
+  "file": "Calibrator/DGP.lean",
+  "line": 983,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.scaledIdentityStep",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 519,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.scaledMigrationRate",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4835,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.scaledMutationRate",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 494,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.selectedDriftFactor",
+  "file": "Calibrator/PhenomeWidePortability.lean",
+  "line": 169,
+  "state": "UNREACHABLE",
+  "why": "free-parameter: `s_correction` is a knob no model in the corpus derives; the Lean docstring says so.",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.selectionMigrationEquilibrium",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 243,
+  "state": "COVERED",
+  "why": "selectionMigrationEquilibrium",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.selectionMigrationEquilibriumMigrationFirst",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 258,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "VALIDATED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.sharedLDFractionFromMutation",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 803,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.sharedLDFromMigration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5082,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.sharedLDRetention",
+  "file": "Calibrator/DGP.lean",
+  "line": 1638,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.sharedLD_from_equilibrium",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5056,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.sigmaObsSource",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1253,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sigmaObsTarget",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1257,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sigmaTagCausal",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1208,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sigmaTagCausalTargetAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2594,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sigmaTagTargetAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2549,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.signalRetentionMigrationDrift",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5146,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.simpleFst",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 60,
+  "state": "COVERED",
+  "why": "simpleFst-is-nei,simpleFst-vs-hudson",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.sourceBestLinearWeightsFromLD",
+  "file": "Calibrator/DGP.lean",
+  "line": 140,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceBrierFromR2",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3082,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.sourceCalibratedBrierFromSourceWeightsAtPrevalence",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1802,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceCalibrationSlopeFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1492,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceERMWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1196,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3344,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceExplainedSignalVarianceFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1771,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceMetricProfileFromSourceWeightsAtPrevalence",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3462,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceMetricProfileFromSourceWeightsAtTargetPrevalence",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3490,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceNormalizedTargetR2AtGeneration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3727,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourcePredictiveCovarianceFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1476,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceR2FromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1777,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceResidualVarianceFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1785,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceScoreVarianceFromExplicitDrivers",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1462,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceSpecificOverfitResidual",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1663,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceWeightedTagScore",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1317,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.sourceWeightsFromExplicitDrivers",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1309,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.stabilizingPortability",
+  "file": "Calibrator/PortabilityBounds.lean",
+  "line": 316,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "FALSIFIED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.steppingStoneCharacteristicLength",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 989,
+  "state": "COVERED",
+  "why": "steppingStoneLength-missing-mutation",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.steppingStoneCoalescenceTime",
+  "file": "Calibrator/DemographicHistory.lean",
+  "line": 202,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.steppingStoneFst",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 4971,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.tagAlleleFreqRetentionAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2414,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.tagAlleleFreqTargetAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2389,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.tagMean",
+  "file": "Calibrator/DGP.lean",
+  "line": 105,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.tagR2",
+  "file": "Calibrator/LDDecayTheory.lean",
+  "line": 117,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.taggingMismatchScale",
+  "file": "Calibrator/DGP.lean",
+  "line": 289,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.taggingProjection",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1329,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetBrierFromNeutralAFBenchmark",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3102,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.targetCalibratedBrierAtGeneration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2652,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetCalibratedBrierFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1884,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetCalibrationSlopeAtGeneration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3633,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetCalibrationSlopeFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1500,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetEffectHeterogeneity",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1338,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetEffectHeterogeneityProjection",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1364,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetEffectHeterogeneityProjectionAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2614,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetEqualVarianceGaussianAUCFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3387,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetExactCalibratedBrierRisk",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3095,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.targetExactGaussianAUCFromNeutralAFBenchmark",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3831,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.targetExplainedSignalVarianceFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1854,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetGaussianAUCAtGeneration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3583,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetGaussianAUCFromNeutralAFBenchmark",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3069,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.targetHetFromFst",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 653,
+  "state": "UNREACHABLE",
+  "why": "tautology: round-trips to the identity with fstFromHetRatio for every input, so no grid can make it fail. Demonstrated in check targetHetFromFst-tautology.",
+  "empirical_status": "VACUOUS",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.targetIrreduciblePenaltyProfile",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1713,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetLinearRisk",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1245,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetMetricProfileAtGeneration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3588,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetMetricProfileFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3517,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetNovelMutationEffectProjection",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1372,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetPGSVariance",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 679,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.targetPredictiveCovarianceAtGeneration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3607,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetPredictiveCovarianceFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1484,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetR2AtGeneration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2647,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetR2FromNeutralAFBenchmark",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2903,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.targetR2FromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1861,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetResidualVarianceAtGeneration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3627,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetResidualVarianceFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1870,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetScoreVarianceAtGeneration",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 3613,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetScoreVarianceFromSourceWeights",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1470,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetSourceEffectProjection",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1356,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.targetSourceEffectProjectionAt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 2606,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.totalEffect",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1215,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.totalVariance",
+  "file": "Calibrator/DGP.lean",
+  "line": 757,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.twoDemeIMEquilibriumDelta",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 314,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.twoDemeIMEquilibriumETss",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 289,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.twoDemeIMEquilibriumETst",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 296,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.twoDemeIMEquilibriumScalars",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 299,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.twoDemeIMFirstStepDiff",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 277,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.twoDemeIMFirstStepSame",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 269,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.twoLocusCoalescentCovarianceMatrix",
+  "file": "Calibrator/DGP.lean",
+  "line": 316,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.twoLocusIBDCovariance",
+  "file": "Calibrator/DGP.lean",
+  "line": 310,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.twoLocusIdx0",
+  "file": "Calibrator/DGP.lean",
+  "line": 297,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.twoLocusIdx1",
+  "file": "Calibrator/DGP.lean",
+  "line": 300,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.var",
+  "file": "Calibrator/DGP.lean",
+  "line": 977,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.wSource_opt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1269,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.wTarget_opt",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 1273,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "",
+  "extractable": false
+ },
+ {
+  "definition": "Calibrator.wrightFIT",
+  "file": "Calibrator/PopulationGeneticsFoundations.lean",
+  "line": 422,
+  "state": "COVERED",
+  "why": "wrightFIT-composition",
+  "empirical_status": "",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.wrightFisherDriftRetention",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 710,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "UNTESTED",
+  "extractable": true
+ },
+ {
+  "definition": "Calibrator.wrightFisherHeterozygosityLoss",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 730,
+  "state": "UNACCOUNTED",
+  "why": "",
+  "empirical_status": "FALSIFIED",
+  "extractable": true
+ }
+]

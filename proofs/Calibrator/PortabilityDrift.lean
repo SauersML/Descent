@@ -1459,48 +1459,24 @@ theorem crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context
 
 /-- Exact score variance in the source population under the learned source
 weights. -/
-noncomputable def sourceScoreVarianceFromExplicitDrivers {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
+noncomputable def scoreVarianceFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
   let wS := sourceWeightsFromExplicitDrivers m
-  dotProduct wS ((m.sigmaTag Pop.source).mulVec wS)
+  dotProduct wS ((m.sigmaTag P).mulVec wS)
 
-/-- Exact score variance in the target population when transporting the
-source-learned weights. This captures changes in the target LD matrix even
-when the source weights are held fixed. -/
-noncomputable def targetScoreVarianceFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  let wS := sourceWeightsFromExplicitDrivers m
-  dotProduct wS ((m.sigmaTag Pop.target).mulVec wS)
+/-- **Exact score/outcome covariance in a population** under the source-learned weights.
+At the target this is where effect changes, tag-causal alignment and context shifts enter;
+at the source it is the ordinary in-sample covariance. One definition, because it is one
+quantity. -/
+noncomputable def predictiveCovarianceFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
+  dotProduct (sourceWeightsFromExplicitDrivers m) (crossCovariance m P)
 
-/-- Exact source score/outcome covariance under the learned source weights. -/
-noncomputable def sourcePredictiveCovarianceFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  let wS := sourceWeightsFromExplicitDrivers m
-  dotProduct wS (crossCovariance m Pop.source)
-
-/-- Exact target score/outcome covariance under transported source weights.
-This is where target-side effect changes, target tag-causal alignment, and
-target context/environment shifts enter directly. -/
-noncomputable def targetPredictiveCovarianceFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  let wS := sourceWeightsFromExplicitDrivers m
-  dotProduct wS (crossCovariance m Pop.target)
-
-/-- Exact source calibration slope under the source-learned score equation.
-This is the literal source `Cov(Y, score) / Var(score)` ratio on the explicit
-SNP-level model. -/
-noncomputable def sourceCalibrationSlopeFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  sourcePredictiveCovarianceFromSourceWeights m /
-    sourceScoreVarianceFromExplicitDrivers m
-
-/-- Exact target calibration slope under transported source weights.
-This is the literal transported `Cov_T(Y, score_S) / Var_T(score_S)` ratio on
-the explicit SNP-level model. -/
-noncomputable def targetCalibrationSlopeFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  targetPredictiveCovarianceFromSourceWeights m /
-    targetScoreVarianceFromSourceWeights m
+/-- **Exact calibration slope in a population** under the source-learned score equation:
+the literal `Cov(Y, score) / Var(score)` ratio on the explicit SNP-level model. -/
+noncomputable def calibrationSlopeFromSourceWeights {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
+  predictiveCovarianceFromSourceWeights m P / scoreVarianceFromSourceWeights m P
 
 /-- The source predictive covariance is the transported score equation applied
 to the source score/outcome cross-covariance vector. -/
@@ -1734,9 +1710,32 @@ target-specific residual burden from broken tagging, ancestry-specific LD, and
 source-specific overfit, plus target-only untagged novel-mutation variance.
 
     Empirical status: UNTESTED. -/
-noncomputable def effectiveTargetOutcomeVariance {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : ℝ :=
-  (m.outcomeVariance Pop.target) + irreducibleTargetResidualBurden m
+noncomputable def residualBurden {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
+  Pop.pair 0 (irreducibleTargetResidualBurden m) P
+
+/-- **The outcome variance a score is actually scored against, in a population.**
+
+The source carries no transport burden — it is where the weights were fitted — and that
+is now a computed consequence of `residualBurden` rather than the reason for writing two
+separate definitions. `effectiveOutcomeVariance_source` below is the statement that used
+to be implicit in the fact that only a `target` version existed. -/
+noncomputable def effectiveOutcomeVariance {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
+  (m.outcomeVariance P) + residualBurden m P
+
+@[simp] theorem residualBurden_source {p q : ℕ} (m : CrossPopulationMetricModel p q) :
+    residualBurden m Pop.source = 0 := rfl
+
+@[simp] theorem effectiveOutcomeVariance_source {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    effectiveOutcomeVariance m Pop.source = m.outcomeVariance Pop.source := by
+  simp [effectiveOutcomeVariance]
+
+@[simp] theorem effectiveOutcomeVariance_target {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) :
+    effectiveOutcomeVariance m Pop.target =
+      (m.outcomeVariance Pop.target) + irreducibleTargetResidualBurden m := rfl
 
 /-- The effective target outcome variance dominates the baseline target outcome
 variance because the additive residual burden is nonnegative. -/

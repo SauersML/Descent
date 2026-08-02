@@ -285,7 +285,7 @@ that decorrelation by the factor `1 / (1 + s·N)`, where `s` is the selection
 strength and `N` the effective population size.
 
     Empirical status: UNTESTED. -/
-noncomputable def effectCorrelationStabilizing (d s N : ℝ) : ℝ :=
+noncomputable def effectCorrelationStabilizingDriftSelection (d s N : ℝ) : ℝ :=
   1 - d / (1 + s * N)
 
 /-- **Effect correlation under fluctuating selection**, clamped to the correlation
@@ -304,7 +304,7 @@ theorem effectCorrelation_mem_range
     (d s f N : ℝ)
     (h_d_nonneg : 0 ≤ d) (h_d_le : d ≤ 1)
     (h_sN : 0 ≤ s * N) (h_fN : 0 ≤ f * N) :
-    (-1 ≤ effectCorrelationStabilizing d s N ∧ effectCorrelationStabilizing d s N ≤ 1) ∧
+    (-1 ≤ effectCorrelationStabilizingDriftSelection d s N ∧ effectCorrelationStabilizingDriftSelection d s N ≤ 1) ∧
       (-1 ≤ effectCorrelationFluctuating d f N ∧ effectCorrelationFluctuating d f N ≤ 1) := by
   have h_denom_pos : (0 : ℝ) < 1 + s * N := by linarith
   have h_frac_nonneg : 0 ≤ d / (1 + s * N) := div_nonneg h_d_nonneg h_denom_pos.le
@@ -312,7 +312,7 @@ theorem effectCorrelation_mem_range
     rw [div_le_one h_denom_pos]
     linarith
   have h_prod_nonneg : 0 ≤ d * (1 + f * N) := by nlinarith
-  unfold effectCorrelationStabilizing effectCorrelationFluctuating
+  unfold effectCorrelationStabilizingDriftSelection effectCorrelationFluctuating
   refine ⟨⟨?_, ?_⟩, ⟨le_max_left _ _, ?_⟩⟩
   · linarith
   · linarith
@@ -325,15 +325,15 @@ theorem effectCorrelation_mem_range
     alleles are removed in all populations. The remaining architecture
     is similar, yielding better portability.
 
-    The model is the one `effectCorrelationStabilizing` states: neutral drift
+    The model is the one `effectCorrelationStabilizingDriftSelection` states: neutral drift
     decorrelates by `d`, and stabilizing selection damps the decorrelation to
     `d / (1 + s·N)`, so `ρ_stab = 1 - d/(1 + s·N) > 1 - d = ρ_neutral`. -/
 theorem stabilizing_maintains_architecture
     (d s N : ℝ)
     (h_d_pos : 0 < d) (h_d_le : d ≤ 1)
     (h_s : 0 < s) (h_N : 0 < N) :
-    1 - d < effectCorrelationStabilizing d s N := by
-  unfold effectCorrelationStabilizing
+    1 - d < effectCorrelationStabilizingDriftSelection d s N := by
+  unfold effectCorrelationStabilizingDriftSelection
   have h_sN : 0 < s * N := mul_pos h_s h_N
   have h_denom_pos : (0 : ℝ) < 1 + s * N := by linarith
   have h_frac_lt : d / (1 + s * N) < d := by
@@ -363,7 +363,7 @@ theorem fluctuating_selection_worst_portability
     (h_d_pos : 0 < d) (h_d_le : d ≤ 1)
     (h_s : 0 < s) (h_f : 0 < f) (h_N : 0 < N) :
     effectCorrelationFluctuating d f N < 1 - d ∧
-      1 - d < effectCorrelationStabilizing d s N := by
+      1 - d < effectCorrelationStabilizingDriftSelection d s N := by
   have h_fN : 0 < f * N := mul_pos h_f h_N
   refine ⟨?_, stabilizing_maintains_architecture d s N h_d_pos h_d_le h_s h_N⟩
   unfold effectCorrelationFluctuating
