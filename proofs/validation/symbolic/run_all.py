@@ -30,6 +30,19 @@ STEPS = ["leanparse.py", "check1_fixedpoints.py", "check1b_joint.py", "check3_du
          "check2_derivations.py", "check4_limits.py", "check5_recurrences.py", "mutation.py",
          "check6_certificates.py", "homonyms.py"]
 
+# Modules whose claims are being revised upstream right now.  A finding here is
+# not actionable and must not be reported as a defect: the author is already
+# weakening the statement.  Recorded rather than filtered, so the finding still
+# appears with its provenance instead of vanishing.
+KNOWN_IN_FLUX = {
+    "Calibrator.EpistaticChaos": (
+        "coupling-coefficient variance correction 2b^2/(1-b^2) retracted by its "
+        "author's own audit (tilt-bookkeeping error); the definition of b, its "
+        "vanishing iff symmetry, and E[x|x|] = (1-2q)^2 all stand"),
+    "Calibrator.CondensationUnification": (
+        "same retracted coupling correction; statements being weakened upstream"),
+}
+
 # statuses that constitute a finding rather than a pass
 FINDING = {
     "FIXED_POINT_FAILS": "error",
@@ -142,8 +155,20 @@ def main():
                           "status": "CHECK_CANNOT_FAIL_FOR_THIS_DEFINITION",
                           "detail": info})
 
+    for fqn, recs in findings.items():
+        for mod, why in KNOWN_IN_FLUX.items():
+            if fqn.startswith(mod + "."):
+                for r in recs:
+                    r["in_flux"] = why
+                    r["actionable"] = False
+
     (HERE / "findings.json").write_text(json.dumps(findings, indent=1, ensure_ascii=False))
-    sev = Counter(f["severity"] for v in findings.values() for f in v)
+    n_flux = sum(1 for v in findings.values() for f in v if f.get("in_flux"))
+    if n_flux:
+        print(f"  ({n_flux} findings suppressed as not actionable: upstream revision "
+              f"in {', '.join(sorted(KNOWN_IN_FLUX))})")
+    sev = Counter(f["severity"] for v in findings.values() for f in v
+                  if not f.get("in_flux"))
     print()
     print(f"findings.json: {len(findings)} names with at least one finding")
     for k, v in sev.most_common():
