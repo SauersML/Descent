@@ -134,7 +134,7 @@ def tokenize(src: str):
 class Parser:
     def __init__(self, toks, struct_args, locals_=(), resolver=None,
                  struct_types=None, fields_of=None, dot_resolver=None,
-                 vector_args=None, dims=None):
+                 vector_args=None, dims=None, lift_arith=False):
         self.t = toks
         self.i = 0
         self.stop_cols = []            # layout barriers introduced by `let`
@@ -147,6 +147,10 @@ class Parser:
         self.vector_args = vector_args or {}     # arg name -> (dim var, rank)
         self.dims = dims or {}                   # dim var -> python length expr
         self.sum_vars = []                       # indices bound by an enclosing ∑
+        # Only definitions that actually take a vector need elementwise
+        # arithmetic.  Scalar-only definitions keep plain Python operators, so
+        # their generated source is unchanged by this feature.
+        self.lift_arith = lift_arith
 
     def _dot(self, x, nargs):
         """Resolve `base.method` now that its application arity is known.
@@ -222,6 +226,9 @@ class Parser:
                 left = f"_rt.lpow({left}, {right})"
             elif pyop in ("and", "or"):
                 left = f"({left} {pyop} {right})"
+            elif self.lift_arith and pyop in ("+", "-", "*"):
+                fn = {"+": "add", "-": "sub", "*": "mul"}[pyop]
+                left = f"_rt.{fn}({left}, {right})"
             else:
                 left = f"({left} {pyop} {right})"
         return left
@@ -232,7 +239,8 @@ class Parser:
             raise Untranslatable("unexpected end of body")
         if p.text == "-":
             self.next()
-            return f"(-{self.unary()})"
+            inner = self.unary()
+            return f"_rt.neg({inner})" if self.lift_arith else f"(-{inner})"
         if p.text == "¬":
             self.next()
             return f"(not {self.unary()})"
@@ -423,14 +431,15 @@ LET_RE = re.compile(r"^(\s*)let\s+([A-Za-z_][\w'₀-₉ₐ-ₜ]*)\s*(?::[^:=]*)?
 
 def translate_body(body: str, struct_args=(), locals_=(), resolver=None,
                    struct_types=None, fields_of=None, dot_resolver=None,
-                 vector_args=None, dims=None):
+                 vector_args=None, dims=None, lift_arith=False):
     """Translate a Lean body into (statements, return_expression)."""
     toks = tokenize(body)
     if not toks:
         raise Untranslatable("empty body")
     stmts = []
     p = Parser(toks, set(struct_args), locals_, resolver,
-               struct_types, fields_of, dot_resolver, vector_args, dims)
+               struct_types, fields_of, dot_resolver, vector_args, dims,
+               lift_arith)
     while p.at("let"):
         letcol = p.peek().col
         p.next()
@@ -538,7 +547,7 @@ def translate_recursion(d, struct_arg_names=(), fname=None, resolver=None):
 
 def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
                   struct_types=None, fields_of=None, dot_resolver=None,
-                 vector_args=None, dims=None):
+                 vector_args=None, dims=None, lift_arith=False):
     """Return (python_source, argnames) or raise Untranslatable.
 
     `resolver(short, n_args) -> python_name` decides which definition an
@@ -555,8 +564,15 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
     binders = [n for a in d["args"] for n in a["names"]]      # incl. implicit
     stmts, ret = translate_body(d["body"], struct_arg_names, binders, resolver,
                                 struct_types, fields_of, dot_resolver,
-                                vector_args, dims)
+                                vector_args, dims, bool(vector_args))
     lines = [f"def {fname or pyname(d['short'])}({', '.join(argnames)}):"]
+    # BUG A fix: a dimension variable is an IMPLICIT binder, so it is correctly
+    # absent from the signature -- but the body may still use it (`(T : ℝ) / ∑ i,
+    # …`).  Bind each referenced dimension to the length of the argument that
+    # carries it, before any other statement.
+    for dimvar, lenexpr in (dims or {}).items():
+        if re.search(rf"(?<![\w']){re.escape(dimvar)}(?![\w'])", d["body"]):
+            lines.append(f"    {pyname(dimvar)} = float({lenexpr})")
     for s in stmts:
         lines.append(f"    {s}")
     lines.append(f"    return {ret}")
