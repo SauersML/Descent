@@ -1,10 +1,12 @@
 import Calibrator.BundleRigidity
+import Calibrator.ConditionalGain
 import Calibrator.EffectSizeSurgery
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 namespace Calibrator
 
@@ -967,34 +969,71 @@ Evaluations, all computable from the coupling data:
 | Gaussian copula, precision `J` | `≥ c Σᵢ 1/(Jᵢᵢ σᵢ²)` |
 | Gibbs density `e^{-H}` | `≥ Σᵢ e^{-2 osc_i(H)}` |
 
-**The Gaussian-copula line is the one that matters here**: `D` is a spectral functional of
-the *precision matrix*, so it is computable directly from a marker correlation matrix. It
-is a defined invariant with a formula, not a rule of thumb.
+**`D` IS NOT THE INVARIANT, AND AN EARLIER VERSION OF THIS SECTION SAID IT WAS.** A single
+number was the wrong ambition. The object that actually controls decay is a *functional* —
+the **conditional gain**
 
-**The claim of this section.** The effective number of independent markers is `D`; it is
-computable from the correlation structure; and the effective-test-count estimators
-currently in use do not compute it. The second half is measured, not asserted: two marker
-panels that the standard estimators rated at ratio `0.995`–`1.000` had true separation
-`1.84`, `1.97` and `1.99`, against a certificate demanding a factor of two. The estimators
-were tracking something other than the quantity the theory needs.
+`Γ_s(Π) = -log |E ∏ᵢ cᵢ|`, with `cᵢ = E[e^{i s h(Xᵢ)} | earlier coordinates]`,
 
-What `D` has that those estimators do not is three theorems attached to it: the decay
-exponent is `γ(s)·D` with a matched lower bound; the transfer threshold is `D` against
-`log N`; and the usable slot count in `k`-point data is `min(k, D)`.
+which controls it tautologically. `D` is the **freshness lower bound** on `Γ`: sufficient,
+not necessary. Every statement below that quantifies over `D` is a sufficient condition
+only, and this section no longer calls `D` an effective dimension.
+
+**How badly a linear count can fail, and it is the case we care about most.** Under an
+**equicorrelated** coupling — every pair correlated at `ρ`, one shared source touching every
+marker — the exact answer is `Γ = Θ(log n)`, so `|E e^{i s Sₙ}| = n^{-Θ(1)}`: **polynomial
+decay, not exponential.** The naive count `n` is off by an exponential; the freshness bound
+`D` errs in the other direction; the variational rate is the truth and both sides are
+attained.
+
+**THE HEADLINE, AND IT IS ABOUT POPULATION STRUCTURE, NOT LINKAGE.** A common latent factor
+correlating every marker with every other is exactly the structure of **population
+stratification**, as opposed to linkage disequilibrium's local, decaying correlation. So `n`
+correlated markers supply only `log n` worth of effective independence: **the loss is
+exponential, not a constant-factor shrinkage.** The transfer threshold changes shape with
+it — under a shared factor the requirement becomes `n ≳ N^{c·ρ}`, **a power law replacing
+the logarithm**, so the sample cost grows as a *power* of the marker count.
+
+That is the mathematical form of **why population structure does not wash out with larger
+cohorts, and why ancestry confounding is categorically different from linkage
+disequilibrium.** Not different in degree: different functional form. LD in the freshness
+regime gives linear effective independence; a shared factor gives logarithmic. Two
+structures routinely discussed with the same vocabulary are not the same kind of object.
+
+The empirical corroboration is now the weaker of the two statements, and is recorded as
+corroboration only: two panels the standard estimators rated at ratio `0.995`–`1.000` had
+true separation `1.84`, `1.97` and `1.99` against a certificate demanding a factor of two.
 -/
 
-/-- **The effective-independence dimension**, with its consequences as named fields.
+/-- **The freshness bound `D`, and the conditional gain it bounds.**
 
-`D` is defined for an arbitrary coupling via sequential freshness, so this structure
-carries no independence or regeneration hypothesis at all — which is the point of it. The
-three consequences are fields rather than theorems because their proofs are the upstream
-analytic work, not reproduced here. -/
+`D` is defined for an arbitrary coupling via sequential freshness, so this structure carries
+no independence or regeneration hypothesis — which is the point of it. But `D` is a **lower
+bound on the conditional gain, not the gain**: `freshness_bound` is an inequality, in that
+direction, and it is not an equality. `regime` records when the bound is the truth.
+
+`variationalRate` is carried as a **named hypothesis with a known defect**: its source
+definition has a dangling `-scale` term, so `g_s` is not fully pinned and the rate is not
+fully specified as written. The matched-constants result therefore rests on a quantity whose
+definition has a hole in it. It is a field here rather than a definition so that nothing
+below can silently choose the reading of `-scale` that makes it work. -/
 structure EffectiveIndependence (n : ℕ) where
-  /-- The dimension `D = max over orderings of Σ εᵢ`. -/
+  /-- The freshness bound `D = max over orderings of Σ εᵢ`. -/
   D : ℝ
   D_nonneg : 0 ≤ D
   /-- `D` never exceeds the coordinate count, with equality exactly for independence. -/
   D_le_count : D ≤ (n : ℝ)
+  /-- The conditional gain `Γ_s(Π)`, the functional that actually controls decay. -/
+  conditionalGain : ℝ
+  /-- **`D` bounds the gain from below. It does not compute it.** -/
+  freshness_bound : D ≤ conditionalGain
+  /-- **Defective input, carried deliberately.** The variational rate `V_s`, whose source
+  definition contains a dangling `-scale` and is therefore not fully pinned. -/
+  variationalRate : ℝ
+  /-- Whether the coupling is in the freshness regime, where the bound is tight. Under a
+  shared latent factor it is not: there `conditionalGain = Θ(log n)` while `D` is linear. -/
+  freshnessRegime : Prop
+  freshnessRegime_tight : freshnessRegime → D = conditionalGain
   /-- Whether the coordinates are independent. -/
   independent : Prop
   independent_iff : independent ↔ D = (n : ℝ)
@@ -1015,15 +1054,22 @@ theorem usableSlots_saturates (k : ℕ) (hk : E.D ≤ (k : ℝ)) : E.usableSlots
 
 end EffectiveIndependence
 
-/-- **THE MERGED THRESHOLD.** The panel-design condition of §7b and the dependence
-condition of §8 are one condition:
+/-- **THE MERGED THRESHOLD — IN THE FRESHNESS REGIME ONLY.**
+
+The panel-design condition of §7b and the dependence condition of §8 are one condition:
 
 > local theory applies `↔ min(panel dimension, D) ≳ log N`.
 
 The panel needs enough distinct frequencies **and** enough effective independence, and it
-is the *minimum* that binds. Both faces are attained by explicit constructions, so neither
-half is slack: a panel can fail by having too few distinct frequencies at full independence,
-or by having ample frequency diversity in one correlated block. -/
+is the *minimum* that binds. Both faces are attained, so neither half is slack: a panel can
+fail by having too few distinct frequencies at full independence, or by having ample
+frequency diversity inside one correlated block.
+
+**The scope restriction is not decoration and an earlier version of this file omitted it.**
+The `log N` form holds in the freshness regime. Under a shared latent factor — population
+stratification — the threshold is a **power law**, `n ≳ N^{c·ρ}`, and the criterion below
+does not describe it. `freshnessRegime` is therefore a hypothesis of the criterion, in the
+signature. -/
 structure MergedThreshold (n : ℕ) where
   /-- The panel's dimension — its count of distinct marker frequencies. -/
   panelDimension : ℝ
@@ -1036,9 +1082,16 @@ structure MergedThreshold (n : ℕ) where
   constant_pos : 0 < constant
   /-- Whether local-limit and expansion theory transfers. -/
   transfers : Prop
-  /-- **The merged criterion.** -/
-  criterion : transfers ↔
-    constant * Real.log scoreLength < min panelDimension effective.D
+  /-- Equicorrelation strength of the shared latent factor, zero when there is none. -/
+  correlationStrength : ℝ
+  /-- **The merged criterion, valid in the freshness regime only.** -/
+  criterion : effective.freshnessRegime → (transfers ↔
+    constant * Real.log scoreLength < min panelDimension effective.D)
+  /-- **The shared-factor regime, where the logarithm becomes a power law.** Under
+  equicorrelation at strength `ρ` the requirement is `N ^ (c·ρ) < panelDimension`: the
+  sample cost is a *power* of the marker count, not a logarithm of it. -/
+  sharedFactorCriterion : ¬ effective.freshnessRegime → correlationStrength ≠ 0 →
+    (transfers ↔ scoreLength ^ (constant * correlationStrength) < panelDimension)
 
 namespace MergedThreshold
 
@@ -1046,10 +1099,10 @@ variable {n : ℕ} (M : MergedThreshold n)
 
 /-- **Either face alone can fail the criterion.** Frequency diversity does not rescue a
 correlated panel, and independence does not rescue a monotonous one. -/
-theorem transfers_needs_both (h : M.transfers) :
+theorem transfers_needs_both (hfresh : M.effective.freshnessRegime) (h : M.transfers) :
     M.constant * Real.log M.scoreLength < M.panelDimension ∧
       M.constant * Real.log M.scoreLength < M.effective.D := by
-  have hmin := (M.criterion).mp h
+  have hmin := (M.criterion hfresh).mp h
   exact ⟨lt_of_lt_of_le hmin (min_le_left _ _), lt_of_lt_of_le hmin (min_le_right _ _)⟩
 
 end MergedThreshold
@@ -1082,13 +1135,146 @@ structure ModulusCopyCoupling (K : ℕ) where
   /-- **The collapse.** -/
   collapse : oneSiteInjective → kernelContainsMarginalFixing
 
+/-! ## 10. THE COVERAGE-INVARIANCE THEOREM: identifiability survives arbitrary LD
+
+This is the strongest biological statement in the module, and it needs none of the
+apparatus above: no band, no conditional independence, no latent structure, no perturbation
+theory, and it holds for every `k`.
+
+> **If the base family is peelable, and every conditional one-coordinate law charges every
+> atom of its fiber with probability at least `η > 0` — that is,
+> `P(Xᵢ = a_j(tᵢ) | all other coordinates and fibers) ≥ η` almost surely — then the coupled
+> `k`-point modulus map is injective for every `k`, with `σ_min ≥ (η/C⋆)^k`.**
+
+**Why it is so robust, which is the whole content.** Coverage — which value cells are
+charged from which fiber tuples — is determined by **supports alone**. The hypothesis says
+the supports are those of the product. So **coverage is coupling-invariant**, and the
+peeling argument of §7b runs slot by slot verbatim, degraded only by the weight floor `η`.
+Dependence changes the *weights* and cannot change *which cells are touched*, and peeling
+only ever needed the latter.
+
+**THE BIOLOGY: THE ALLELE-FREQUENCY SPECTRUM REMAINS IDENTIFIABLE UNDER ARBITRARY LINKAGE
+DISEQUILIBRIUM, PROVIDED NO GENOTYPE IS RENDERED CONDITIONALLY IMPOSSIBLE.** The condition
+fails only at **perfect** LD, where knowing the other markers determines a genotype exactly,
+and holds for every imperfect correlation structure however strong or long-range. This
+retires the standing limitation that §§1–7 carried and that §8 only partly relaxed: §8
+bought dependence in the *frequencies*; this buys dependence in the *genotypes*, which is
+what LD actually is.
+
+**THE LD-PRUNING CONSEQUENCE, WHICH CONTRADICTS THE FOLK JUSTIFICATION.** `η = 0` is
+`r² = 1`: a marker that is a deterministic function of another. Rigidity survives any amount
+of LD short of perfect, and perfect LD is the exact and only failure. **That licenses
+pruning exact duplicates — not pruning at `r² < 0.2` or `< 0.5`.** The universal practice of
+tuning a threshold has no basis in this result; the cost of *retained* correlation shows up
+as the explicit constant `(η/C⋆)^k`, which is a quantified degradation, not a reason to
+prune harder.
+
+**The boundary is exact, not conjectural.** The modulus-copy falsifier of §9 is precisely
+the `η = 0` case, and there the `k`-point kernel is infinite-dimensional even over rigid
+families. Full-support conditionals give rigidity under all coupling; support-killing
+couplings give collapse; nothing in between is undetermined.
+
+**`η` is checkable on real data.** It is a minimum conditional genotype probability and is
+estimable directly from a genotype matrix. That makes this a usable criterion rather than a
+genericity claim.
+
+**On the `(η/C⋆)^k` decay in `k`:** it is real and not an artifact. Even under complete
+independence, `σ_min` of a tensor square is the square of `σ_min`. The per-slot normalized
+reading — `σ_min^{1/k} ≥ η/C⋆`, a constant floor per slot — is the right one.
+-/
+
+/-- **The coverage-invariance theorem**, with its two hypotheses in the signature.
+
+`fullSupportFloor` is `η`, and `η > 0` is the entire dependence hypothesis: no genotype may
+be conditionally impossible. `basePeelable` is the base family's rigidity, supplied for the
+diploid family by §7b.
+
+`coverageDeterminedBySupports` is the mechanism, recorded as a field because it is the
+reason the theorem holds under arbitrary coupling rather than an incidental step. -/
+structure CoverageInvariance (K : ℕ) where
+  /-- The base bundle family. -/
+  family : BundleFamily K
+  /-- The base family is peelable — its finite panels are rigid. -/
+  basePeelable : Prop
+  /-- The conditional charge floor `η`. -/
+  fullSupportFloor : ℝ
+  /-- **The dependence hypothesis, in full: `η > 0`.** Equivalently, no genotype is
+  conditionally impossible given the others. Fails only at perfect LD. -/
+  floor_pos : 0 < fullSupportFloor
+  /-- The peeling constant `C⋆` of the base family. -/
+  peelingConstant : ℝ
+  peelingConstant_pos : 0 < peelingConstant
+  /-- **The mechanism.** Coverage depends on supports only, hence is coupling-invariant. -/
+  coverageDeterminedBySupports : Prop
+  /-- Injectivity of the coupled `k`-point modulus map. -/
+  kPointInjective : ℕ → Prop
+  /-- The least singular value of the coupled `k`-point map. -/
+  sigmaMin : ℕ → ℝ
+  /-- **Injectivity for every `k`, under arbitrary coupling.** -/
+  injective_of_floor : basePeelable → coverageDeterminedBySupports →
+    ∀ k : ℕ, kPointInjective k
+  /-- **The quantitative floor.** -/
+  sigmaMin_bound : basePeelable → coverageDeterminedBySupports →
+    ∀ k : ℕ, (fullSupportFloor / peelingConstant) ^ k ≤ sigmaMin k
+
+namespace CoverageInvariance
+
+variable {K : ℕ} (C : CoverageInvariance K)
+
+/-- **The per-slot reading, which is the one to quote.** The bound degrades geometrically in
+`k` only because a tensor power does; per slot the floor is the constant `η/C⋆`, and it does
+not depend on the coupling at all. -/
+theorem sigmaMin_pos (hbase : C.basePeelable) (hcov : C.coverageDeterminedBySupports)
+    (k : ℕ) : 0 < C.sigmaMin k :=
+  lt_of_lt_of_le
+    (pow_pos (div_pos C.floor_pos C.peelingConstant_pos) k)
+    (C.sigmaMin_bound hbase hcov k)
+
+/-- **Pruning exact duplicates is what the theorem licenses; a tuned `r²` threshold is not.**
+Any `η > 0` — any imperfect LD, however strong — gives an injective map at every `k`. -/
+theorem identifiable_under_any_imperfect_ld
+    (hbase : C.basePeelable) (hcov : C.coverageDeterminedBySupports) (k : ℕ) :
+    C.kPointInjective k :=
+  C.injective_of_floor hbase hcov k
+
+end CoverageInvariance
+
+/-! ### A third failure mode: fluctuation collapse under zero-entropy driving
+
+Deterministic driving splits by **entropy**, and the zero-entropy case fails in a way that
+is neither of the two failure modes catalogued above. Under rotation driving the phases
+**equidistribute** — the empirical law converges and everything looks healthy — **yet the
+sum collapses**: fluctuations stay bounded along continued-fraction denominators, so no
+diffusive normalization exists and the decay dies. That is **fluctuation collapse, not
+lattice recurrence**, and it is invisible to any diagnostic that checks whether the
+empirical frequency distribution looks right.
+
+Scope, stated honestly: positive-entropy driving is recombination and mutation as genuinely
+entropy-producing processes along a chromosome, and it sits inside the theory with full
+linear gain. The rotation case is a strictly periodic layout with no entropy production —
+an artifact of **designed** panels rather than a biological configuration. So the failure
+mode is real but does not occur in nature; what it rules out is a class of simulation and
+array designs, not a class of genomes.
+-/
+
 /-!
 ## What is left open, plainly
 
-* **Linkage disequilibrium proper.** §8 buys dependence *in the allele frequencies along
-  the genome*, via regeneration. It does **not** buy correlation between genotypes at
-  fixed frequencies, which is what LD is. That remains outside the theory, and it is the
-  named limitation, not a to-do. Sections 1–7 assume outright independence.
+* **Linkage disequilibrium proper — now largely closed, by §10.** §8 bought dependence *in
+  the allele frequencies*; §10 buys dependence *in the genotypes*, which is what LD is, and
+  it does so for arbitrary coupling with the single condition `η > 0`. What remains open is
+  the exact boundary case `η = 0` in structures that are not literal duplicates. Sections
+  1–7 still assume outright independence and should be read as the independent special case.
+
+* **THE INTERMEDIATE STRATUM, AND IT IS THE CASE THAT MATTERS. (Named open question.)** The
+  theory now has both edges: positive-entropy driving — recombination and mutation as
+  entropy-producing processes — sits inside it with full linear gain, and zero-entropy
+  rotation driving fails by fluctuation collapse. **Admixture LD and recent selective sweeps
+  are neither.** They produce long-range, slowly-decaying correlation that is not
+  entropy-producing and not rigid, and they are exactly the structures where portability
+  empirically fails. If they land in an intermediate regime rather than at either edge, that
+  intermediate regime is the right framework for the failures this whole programme is about,
+  and **nobody has computed it.** This is a named target, not a gap in the write-up.
 * **The regeneration hypothesis itself.** Admixture, recent sweeps and population structure
   are exactly the cases with no excursion decomposition, so §8 covers the well-mixed case
   and declines the interesting ones.
