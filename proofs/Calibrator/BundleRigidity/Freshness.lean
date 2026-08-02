@@ -12,19 +12,47 @@ characteristic function as a **product over coordinates**. That step needs indep
 and under linkage disequilibrium it is false. The master bound below replaces it with one
 inequality that holds for **any coupling whatsoever**.
 
-## The objects
+## The right object is a functional, not a number
 
-Fix an ordering of the coordinates. The **sequential freshness** `ε i` of coordinate `i`
-is the largest `ε` with
+**`D` is not the invariant, and nothing here should be read as saying it is.** The object
+that controls decay — tautologically, by construction — is the **conditional gain**
 
 ```
-Law(X i | earlier coordinates)  ≥  ε · (fiber reference measure)     a.s.
+Γ_s(Π)  =  - log | E ∏ᵢ cᵢ |,        cᵢ(s; past)  =  E[ e^{i s h(Xᵢ)} | X_{<i} ].
 ```
 
-— how much genuinely new randomness coordinate `i` still carries once everything before it
-is known. The **effective independence dimension** `D` is the maximum over orderings of
-`∑ i, ε i`. For independent coordinates every `ε i = 1` and `D` is the number of
-coordinates; under strong dependence `D` collapses.
+`D` is a **sufficient lower bound on `Γ_s`**, and only that:
+
+```
+Γ_s  ≥  γ(s) · D / 2          sufficient, NOT necessary.
+```
+
+This module proves that inequality. It does not characterize `Γ_s`, and `D` must not be
+cited as the answer — see `freshness_bound_not_tight` below, where the equicorrelated
+Gaussian copula gives `Γ = Θ(log n)`, so the true decay is **polynomial** while the
+freshness bound reports an exponential. The naive count is off by an exponential and `D`
+is off the other way.
+
+### The definitional correction, and what forced it
+
+An earlier formulation defined freshness against the **full fiber law**. That was **too
+strong**: a fresh binary source charges *two* atoms, not all `d` of them, so demanding
+domination of the whole fiber reference measure understates the freshness of exactly the
+sources that are most obviously fresh. The conditional-gain formulation above is the
+correct weakening, and the digit-theorem analysis is what forced it.
+
+The proof below is unaffected, because **it was already using only the conditional-gain
+form** — the per-step bound `|E(χ | past)| ≤ 1 - εₙγₙ` is a statement about conditional
+expectations, never about domination of a fiber reference. So what changes is the reading
+of `ε`, not a single line of the argument.
+
+## The quantity `D`
+
+Fix an ordering of the coordinates. Write `ε i` for the per-coordinate contraction
+available at step `i` in the conditional-gain sense above, and let `D` be the maximum over
+orderings of `∑ i, ε i`. For independent coordinates every `ε i = 1` and `D` is the number
+of coordinates; under strong dependence `D` collapses. It is a **lower-bound parameter**,
+not a characterization.
 
 ## The master theorem
 
@@ -173,10 +201,10 @@ theorem master_decay_bound (E : ℕ → ℝ) (θ : ℝ) (ε γ : ℕ → ℝ)
   exact le_trans (abs_le_prod_of_step E _ ha0 hle h0 hstep n)
     (prod_one_sub_le_exp_neg_sum _ ha0 hle n)
 
-/-- **The master bound in terms of the effective independence dimension.**
+/-- **The master bound in terms of the freshness floor `D`.**
 
 If the oscillation gain is uniform, `γ k = γ`, then the exponent is `θ · γ · D` with
-`D = ∑ ε k` the effective independence dimension along the chosen ordering. Taking the
+`D = ∑ ε k` the freshness floor along the chosen ordering. Taking the
 maximum over orderings gives `D` and hence the sharpest form of the bound.
 
 For independent coordinates every `ε k = 1`, so `D = n` and the bound recovers the
@@ -195,7 +223,7 @@ theorem master_decay_bound_uniform (E : ℕ → ℝ) (θ γ : ℝ) (ε : ℕ →
     exact Finset.sum_congr rfl fun k _ => by ring
   rwa [hrw] at hmain
 
-/-! ## The effective independence dimension `D`
+/-! ## The freshness floor `D`
 
 Sequential freshness is **order-dependent**, so `D` is defined as the maximum of the total
 freshness over all orderings of the coordinates. Orderings are permutations of `Fin n`;
@@ -214,8 +242,11 @@ theorem orderings_nonempty :
 def dimSum (fresh : Equiv.Perm (Fin n) → ℕ → ℝ) (σ : Equiv.Perm (Fin n)) : ℝ :=
   ∑ k ∈ range n, fresh σ k
 
-/-- **The effective independence dimension** `D`: the maximum of total freshness over all
-orderings of the coordinates.
+/-- **The freshness floor** `D`: the maximum of total freshness over all orderings of the
+coordinates.
+
+It is a lower-bound parameter for the conditional gain, **not** a characterization of it
+and **not** an "effective dimension". See `freshness_bound_not_tight`.
 
 For independent coordinates every freshness is `1` and `D = n`. Under dependence `D`
 collapses gracefully — it is the number of coordinates' worth of genuinely new randomness
@@ -272,10 +303,11 @@ theorem effDim_eq_of_independent (fresh : Equiv.Perm (Fin n) → ℕ → ℝ)
   rw [← hconst 1]
   exact dimSum_le_effDim fresh 1
 
-/-- **The master decay bound, stated at the effective independence dimension.**
+/-- **The master decay bound, stated at the freshness floor.**
 
 `|E ∏ χ| ≤ exp(-θ · γ · D)`, where `D` is the maximum total freshness over orderings and
-`θ` is the discard constant (`1/2` in the current proof).
+`θ` is the discard constant (`1/2` in the current proof). Equivalently `θγD ≤ Γ_s`: a
+floor on the conditional gain, sufficient and not necessary.
 
 The hypotheses are taken along an **optimizing ordering** `σ`, which exists by
 `effDim_attained`. This is the form the dependence theory uses: it needs no independence,
@@ -293,6 +325,49 @@ theorem master_decay_bound_effDim (E : ℕ → ℝ) (θ γ : ℝ)
   have hmain := master_decay_bound_uniform E θ γ (fresh σ) hθ0 hγ0 hfresh hle h0 hstep n
   have hsum : ∑ k ∈ range n, fresh σ k = effDim fresh := hopt
   rwa [hsum] at hmain
+
+/-! ## The conditional gain, and the fact that `D` does not characterize it -/
+
+/-- **The conditional gain** `Γ_s = - log |E ∏ cᵢ|`, the functional that actually controls
+decay. It is defined directly from the quantity being bounded, so it controls decay
+tautologically; the content of any theorem about it is a *lower bound*. -/
+noncomputable def condGain (absProd : ℝ) : ℝ := -Real.log absProd
+
+/-- **The master bound, restated as a lower bound on the conditional gain.**
+
+`γ · D ≤ Γ_s`. This is the same inequality as `master_decay_bound_effDim`, read the way it
+should be read: `D` supplies a *floor* for the gain functional, and a floor is all it
+supplies. -/
+theorem condGain_ge (absProd θ γ D : ℝ) (hpos : 0 < absProd)
+    (hbound : absProd ≤ Real.exp (-(θ * γ * D))) :
+    θ * γ * D ≤ condGain absProd := by
+  have hlog : Real.log absProd ≤ -(θ * γ * D) := by
+    have := Real.log_le_log hpos hbound
+    rwa [Real.log_exp] at this
+  unfold condGain
+  linarith
+
+/-- **The freshness bound is not tight, and here is the shape of the witness.**
+
+For the equicorrelated Gaussian copula the true conditional gain is `Γ = Θ(log n)` — the
+decay is **polynomial in `n`**, not exponential. Any bound of the form `Γ ≥ γ · D` with `D`
+growing linearly in `n` therefore cannot be an equality: a linear-in-`n` floor and a
+logarithmic truth are incompatible for large `n`.
+
+This lemma records exactly that incompatibility, in the only form that needs no analysis:
+if a purported characterization claimed `Γ = γ · D` with `D` linear and `Γ` logarithmic,
+the two disagree once `n` is large. It exists to **prevent `D` being cited as the answer**,
+which is its whole purpose.
+
+The hypotheses are the two growth facts, supplied as inequalities rather than asserted:
+`hlin` says the freshness floor grows at least linearly, `hlog` says the true gain is at
+most logarithmic. -/
+theorem freshness_bound_not_tight (Γ Dfloor : ℕ → ℝ) (a b : ℝ) (ha : 0 < a)
+    (hlin : ∀ n : ℕ, a * n ≤ Dfloor n)
+    (hlog : ∀ n : ℕ, Γ n ≤ b * Real.log (n + 1))
+    (n : ℕ) (hgap : b * Real.log (n + 1) < a * n) :
+    Γ n < Dfloor n :=
+  lt_of_le_of_lt (hlog n) (lt_of_lt_of_le hgap (hlin n))
 
 /-! ## The named inputs
 
