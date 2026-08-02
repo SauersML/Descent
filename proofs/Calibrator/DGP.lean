@@ -1051,6 +1051,74 @@ noncomputable def measureExpMSE (μ : Measure Ω) (Y S : Ω → ℝ) : ℝ :=
 noncomputable def measureBias (μ : Measure Ω) (Y S : Ω → ℝ) : ℝ :=
   measureMean μ S - measureMean μ Y
 
+end ExactMeasureMetricIdentities
+
+/-! ### Reading a data-generating process at the second-moment level
+
+Almost every closed form in this development is a function of three numbers: the variance
+of the signal, the variance of the outcome, and their covariance. Those numbers are
+*stipulated* wherever the closed forms are used — `V_A`, `V_E` and `fst` arrive as bare
+reals — and nothing connects them to a probability measure. That is why an algebraic
+identity between them can be proved without establishing anything about a data-generating
+process.
+
+A `MomentReading` is the missing connection, and it is deliberately a structure rather
+than a hypothesis list: the three equations are obligations a caller must discharge, and
+until someone does, no closed form built on it says anything about a `dgp`. It is the same
+device as `Calibrator.Identification`, at the level of moments rather than of names. -/
+
+section MomentReadings
+
+/-- **A second-moment reading of a data-generating process by a predictor.**
+
+The fields are the three numbers the closed forms are written in; the equations say those
+numbers really are the corresponding moments of `dgp` under `signal`. -/
+structure MomentReading {k : ℕ} [Fintype (Fin k)]
+    (dgp : DataGeneratingProcess k) (signal : Predictor k) where
+  /-- Variance of the signal. -/
+  vSignal : ℝ
+  /-- Variance of the outcome's conditional mean. -/
+  vOutcome : ℝ
+  /-- Covariance of signal with that conditional mean. -/
+  cov : ℝ
+  vSignal_eq : var dgp signal = vSignal
+  vOutcome_eq : var dgp dgp.trueExpectation = vOutcome
+  cov_eq :
+    measureCovariance dgp.jointMeasure
+      (fun pc => signal pc.1 pc.2) (fun pc => dgp.trueExpectation pc.1 pc.2) = cov
+  vSignal_pos : 0 < vSignal
+  vOutcome_pos : 0 < vOutcome
+
+/-- **The statistical `R²` of a reading is the squared correlation of its three moments.**
+
+This is what makes the reading useful: once the obligations are discharged, `rsquared` -
+an integral expression - is a rational function of three reals, and every algebraic
+identity about those reals becomes a statement about the process. -/
+theorem rsquared_eq_of_momentReading {k : ℕ} [Fintype (Fin k)]
+    {dgp : DataGeneratingProcess k} {signal : Predictor k} (R : MomentReading dgp signal) :
+    rsquared dgp signal dgp.trueExpectation = R.cov ^ 2 / (R.vSignal * R.vOutcome) := by
+  have hf : var dgp signal = R.vSignal := R.vSignal_eq
+  have hg : var dgp dgp.trueExpectation = R.vOutcome := R.vOutcome_eq
+  have hc :
+      measureCovariance dgp.jointMeasure
+        (fun pc => signal pc.1 pc.2) (fun pc => dgp.trueExpectation pc.1 pc.2) = R.cov :=
+    R.cov_eq
+  unfold rsquared
+  unfold var at hf hg
+  unfold measureCovariance measureMean at hc
+  simp only
+  rw [hf, hg, hc]
+  rw [if_neg (by
+    rintro (h | h)
+    · exact absurd h (ne_of_gt R.vSignal_pos)
+    · exact absurd h (ne_of_gt R.vOutcome_pos))]
+
+end MomentReadings
+
+section ExactMeasureMetricIdentities
+
+variable {Ω : Type*} [MeasurableSpace Ω]
+
 theorem measureVariance_eq_expect_sq_sub_sq_mean
     (μ : Measure Ω) [IsProbabilityMeasure μ]
     (Z : Ω → ℝ)
@@ -1606,8 +1674,14 @@ repoint that stayed well-formed would have compiled and been silent.
 
 The general rule the two share: a textual repoint sees applications. It does not
 see bare constant names in `unfold`/`simp only`/`rw` argument lists, and it does
-not see docstrings — a third instance left an orphaned `/--` block above the
+not see docstrings — a third instance left an orphaned doc comment above the
 `Step 2` section header when `migrationLDBoost` moved.
+
+(That sentence originally quoted the doc-comment opener literally. Lean nests
+block comments, so the quoted opener opened one, the closer below shut only
+that, and this note left its own module unterminated — the failure
+`check-identifications.py` counts delimiters for. Do not write the opener
+literally in prose here.)
 -/
 
 /-- **The full equilibrium Fst is the fixed point of the three-force
