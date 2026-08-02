@@ -877,6 +877,41 @@ written once in `SimulationValidation` and once in
 `GeneticArchitectureDiscovery`. `sourceTargetPortabilityRatio` has been deleted
 and `GeneticArchitectureDiscovery` now calls `mechanisticPortabilityRatio`. -/
 
+/-! ### The regime obligation, stated once
+
+A closed form whose docstring reads `Empirical status: FALSIFIED` or `CONDITIONALLY VALID`
+is making two claims at once: an algebraic one, which Lean checks, and a claim about the
+conditions under which the algebra describes a population, which until recently nothing
+checked. `DriftRegime` established why that matters — a formula carrying its regime in a
+docstring can be moved into a regime where it is false, and every internal cross-check will
+still pass, because the identities are identities *in* the shared premise.
+
+Every such closed form now carries its regime in a machine-checkable form, by one of four
+mechanisms. Recorded here so that a new one added without any of them is visibly a
+departure rather than an oversight:
+
+* **In the signature.** The definition takes a structure whose fields include the
+  assumption: `ClosedPopulationNoMutation.mutation_negligible`,
+  `InfiniteIslandLimit.limit_adequate`.
+* **Tied to a regime object.** A theorem identifies the bare formula with a quantity of a
+  named regime: `closedPopulation_het_eq_neutralDriftFactor`,
+  `heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss` and its two siblings.
+* **As an external obligation.** The quantity the closed form claims to be is a field
+  supplied by the caller, and the regime is the hypothesis that they agree:
+  `PowerAgreement`, `GaussianLiabilityRegime`, `FittedSelectionLaw`. Used where the
+  development has no derivation available, so that asserting one would be the
+  `singletonProportion` failure.
+* **As a proved failure.** The departure is itself a theorem, so the limit is checkable
+  rather than described: `neutralAFBenchmarkRatio_cannot_reach_measured`,
+  `InfiniteIslandLimit.two_demes_excess`,
+  `demoSteppingStoneFst_indistinguishable_from_quadratic`,
+  `pairwiseFstFromBranches_eq_fstFromTau_add_mul`,
+  `sampleLimitedScratchTargetR2_negative_of_small_sample`.
+
+The fourth is the one worth noticing. Several of these regimes are not conditions under
+which the formula holds but statements of how it fails — and a proved failure is stronger
+than a hedged docstring, because it cannot be read past. -/
+
 /-! ### Attaching the drift closed forms to the regime they came from
 
 `DriftRegime` records the incident these two definitions are the residue of: a cluster of
