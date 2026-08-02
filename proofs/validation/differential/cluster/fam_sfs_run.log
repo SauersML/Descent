@@ -21,8 +21,14 @@ DEFINITION -- expectedNewMutations, theta*t/2, docstring says 'new segregating s
   theta*t/2 IS exactly 2*Ne*mu*L*t, the count of mutations that ARISE population-wide. The defect is scope, not arithmetic: the formula is right for one observable and the docstring names another.
 
 DEFINITION -- expectedFreqDiffSq, 2*fst*p0*(1-p0)
-  t=0.05 x 2Ne  sites= 70159  E[(p1-p2)^2]=0.01837  F_ST=0.03838  2*F*p0(1-p0)=0.01634 (-11.0%)  2*F*E[p(1-p)]=0.01188 (-35.3%)
-  t=0.20 x 2Ne  sites= 74373  E[(p1-p2)^2]=0.06248  F_ST=0.17412  2*F*p0(1-p0)=0.07230 (+15.7%)  2*F*E[p(1-p)]=0.05163 (-17.4%)
-  t=0.80 x 2Ne  sites= 98674  E[(p1-p2)^2]=0.19235  F_ST=0.48761  2*F*p0(1-p0)=0.18807 (-2.2%)  2*F*E[p(1-p)]=0.14149 (-26.4%)
+  t=0.05 x 2Ne  sites= 69614  E[p0(1-p0)]=0.15538
+     D2a drift F_ST: measured 0.04861  theory 1-exp(-t/2Ne) 0.04877  (+0.33%)   [uncorrected estimator would say 0.05863]
+     D2b E[(p1-p2)^2] = 0.01557   corpus 2*F*p0(1-p0) = 0.01516 (-2.63%)   two-pop/one-pop ratio 2.0607 (definition says 2)
+  t=0.20 x 2Ne  sites= 69636  E[p0(1-p0)]=0.15610
+     D2a drift F_ST: measured 0.18382  theory 1-exp(-t/2Ne) 0.18127  (-1.39%)   [uncorrected estimator would say 0.19385]
+     D2b E[(p1-p2)^2] = 0.05687   corpus 2*F*p0(1-p0) = 0.05659 (-0.49%)   two-pop/one-pop ratio 1.9819 (definition says 2)
+  t=0.80 x 2Ne  sites= 70507  E[p0(1-p0)]=0.15629
+     D2a drift F_ST: measured 0.54592  theory 1-exp(-t/2Ne) 0.55067  (+0.87%)   [uncorrected estimator would say 0.55588]
+     D2b E[(p1-p2)^2] = 0.16783   corpus 2*F*p0(1-p0) = 0.17212 (+2.56%)   two-pop/one-pop ratio 1.9671 (definition says 2)
 
 READ_THE_TEST: True   -> fam_sfs_results.json
