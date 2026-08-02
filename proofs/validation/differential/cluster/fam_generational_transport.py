@@ -304,6 +304,21 @@ def joint_proxy_tagging_kernel_at(dist_tc, ne, mu, mig, recomb, t,
     return base * np.outer(ret_tag, ret_causal)
 
 
+def erm_weights(sigma, cross):
+    """sourceERMWeights = sigmaTag_source^{-1} crossCovariance_source.
+
+    Falls back to the pseudo-inverse when the SOURCE second-moment matrix is
+    singular, which happens only when a locus is monomorphic in the source
+    sample. The SAME function is used by the closed form and by the simulated
+    fit, so the fallback cannot create a discrepancy between them; it is not a
+    tolerance change.
+    """
+    try:
+        return np.linalg.solve(sigma, cross)
+    except np.linalg.LinAlgError:
+        return np.linalg.pinv(sigma) @ cross
+
+
 # --- metric layer (CrossPopulationMetricModel, novel/context terms zeroed) ---
 def metric_layer(sig_tag_S, sig_tc_S, beta_S, sig_tag_T, sig_tc_T, beta_T,
                  outcome_var_S, outcome_var_T, novel_untaggable=0.0):
@@ -315,7 +330,7 @@ def metric_layer(sig_tag_S, sig_tc_S, beta_S, sig_tag_T, sig_tc_T, beta_T,
     """
     cS = sig_tc_S @ beta_S
     cT = sig_tc_T @ beta_T
-    w = np.linalg.solve(sig_tag_S, cS)
+    w = erm_weights(sig_tag_S, cS)
 
     def block(sig_tag, c, ov, burden):
         pcov = float(w @ c)
@@ -519,7 +534,7 @@ def measure_metrics(G0, GT, tag_idx, causal_idx, beta, ve, rng,
     same source moments the closed form uses, so any disagreement is in the
     transport and not in the fit.
     """
-    w = np.linalg.solve(sig_tag_S, sig_tc_S @ beta)
+    w = erm_weights(sig_tag_S, sig_tc_S @ beta)
     out = {}
     for tag, G in (("S", G0), ("T", GT)):
         reps = G.shape[0]
