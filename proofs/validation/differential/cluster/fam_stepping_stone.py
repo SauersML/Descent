@@ -47,13 +47,37 @@ ENGINE 1 -- WRIGHT-FISHER FREQUENCY LATTICE, array shape (reps, D)
   contribute); a bare exp(-d/L) fit biases L upward at large d. B absorbs the
   offset left by per-replicate centring.
 
-  DECIDES `steppingStoneCharacteristicLength`. The equilibrium balance away
-  from the origin is 2*V*C'' = 4*mu*C, giving
+  THE MUTATION CONVENTION, SETTLED BEFORE ANY COMPARISON IS MADE.
 
-      L_true = sqrt(V / (2 mu)) = sqrt(m * sigma^2 / (2 mu)) ,
+  This is the trap in this definition and it must be disarmed explicitly
+  rather than absorbed into a fitted constant. `steppingStoneCharacteristicLength`
+  is stated in the INFINITE-ALLELES convention and its docstring says so in
+  words: "identity is destroyed by mutation in the two lineages at rate 2*mu",
+  i.e. mu is the per-lineage rate and the identity-decay rate is 2*mu.
 
-  against the corpus body sqrt(m / (2 mu)), which carries no sigma^2. The two
-  agree exactly at sigma^2 = 1 and differ by a factor sigma otherwise.
+  This simulator uses a SYMMETRIC TWO-ALLELE model at rate mu_sim per gene,
+  under which (p - 1/2) is multiplied by (1 - 2*mu_sim) per gene per
+  generation and the two-deme covariance therefore decays at rate 4*mu_sim.
+  Equating identity-decay rates:
+
+      2 * mu_corpus  =  4 * mu_sim        so        mu_corpus = 2 * mu_sim .
+
+  Comparing the corpus body against a two-allele rate WITHOUT that factor
+  reports a spurious +41% error, which is the shape of defect this corpus
+  keeps turning up and is NOT one here: the convention is declared in the
+  docstring, so this is a conversion, not a discrepancy. Every reference
+  column below is computed at mu_corpus = 2*mu_sim.
+
+  WHAT IS ACTUALLY BEING DECIDED, then, is the DISPERSAL VARIANCE. The exact
+  characteristic root of the discrete lattice is the L solving
+
+      m * (cosh(k/L) - 1)  =  2 * mu_sim / (1 - 2 * mu_sim) ,
+
+  whose small-k/L limit is L = sqrt(m * sigma^2 / (2 * mu_corpus)), sigma^2 =
+  k^2. The corpus body is sqrt(m / (2 * mu)) and carries NO sigma^2, so it is
+  the sigma^2 = 1 case of that. The k axis of the grid is what measures the
+  exponent the corpus sets to zero, and it is the only axis on which the two
+  can disagree.
 
 ENGINE 2 -- TWO-LINEAGE COALESCENT ON THE CIRCLE, array shape (reps,)
 
@@ -423,10 +447,13 @@ def main():
     # ------------------------------------------------------------------
     print("")
     print("A. steppingStoneCharacteristicLength   corpus: L = sqrt(m/(2 mu))")
-    print("   diffusion balance 2*V*C'' = 4*mu*C gives sqrt(m*sigma^2/(2 mu)),")
-    print("   sigma^2 = k^2, which the corpus body does not contain.")
+    print("   CONVENTION: corpus mu is infinite-alleles (identity decays at")
+    print("   2*mu); this model is two-allele at mu_sim (covariance decays at")
+    print("   4*mu_sim), so mu_corpus = 2*mu_sim and every reference column")
+    print("   below uses that. The corpus body has no sigma^2, so it is the")
+    print("   sigma^2 = 1 case; the k axis is what measures that exponent.")
     print("   %-6s %-7s %-4s %-9s %-10s %-10s %-10s %-9s"
-          % ("Ne", "m", "k", "mu", "L_meas", "L_corpus", "L_truth", "err_corp"))
+          % ("Ne", "m", "k", "mu_sim", "L_meas", "L_corpus", "L_exact", "err_corp"))
     D_A, REPS_A = 384, 200
     BASE = {"ne": 100, "m": 0.1, "k": 1, "mu": 5e-4}
     cells = []
@@ -444,20 +471,29 @@ def main():
         prof = covariance_profile(c["ne"], c["m"], c["k"], c["mu"], D_A,
                                   REPS_A, burn, 4000, 10, rng)
         L, sse = fit_cosh_length(prof, D_A, 1)
-        Ltruth = math.sqrt(c["m"] * c["k"] ** 2 / (2.0 * c["mu"]))
-        Lcorpus = math.sqrt(c["m"] / (2.0 * c["mu"]))
+        mu_corpus = 2.0 * c["mu"]              # see the convention block above
+        # exact characteristic root of the discrete two-allele lattice
+        Lexact = c["k"] / math.acosh(
+            1.0 + 2.0 * c["mu"] / (c["m"] * (1.0 - 2.0 * c["mu"])))
+        # the corpus body, in the corpus's own convention: no sigma^2
+        Lcorpus = math.sqrt(c["m"] / (2.0 * mu_corpus))
+        # the same body with the dispersal variance restored
+        Ltruth = math.sqrt(c["m"] * c["k"] ** 2 / (2.0 * mu_corpus))
         row = dict(c)
         row["burn"] = burn
+        row["mu_corpus_convention"] = mu_corpus
         row["L_measured"] = L
-        row["L_corpus"] = Lcorpus
-        row["L_truth_with_sigma2"] = Ltruth
+        row["L_corpus_as_written"] = Lcorpus
+        row["L_corpus_with_sigma2_restored"] = Ltruth
+        row["L_exact_discrete_root"] = Lexact
         row["rel_err_corpus"] = None if L is None else (Lcorpus - L) / L
         row["rel_err_truth"] = None if L is None else (Ltruth - L) / L
+        row["rel_err_exact"] = None if L is None else (Lexact - L) / L
         row["C0"] = float(prof[0])
         rowsA.append(row)
         print("   %-6d %-7.4f %-4d %-9.2e %-10s %-10.3f %-10.3f %-9s"
               % (c["ne"], c["m"], c["k"], c["mu"],
-                 "None" if L is None else ("%.3f" % L), Lcorpus, Ltruth,
+                 "None" if L is None else ("%.3f" % L), Lcorpus, Lexact,
                  "None" if L is None else ("%+.3f" % row["rel_err_corpus"])))
     out["A_characteristic_length"] = rowsA
 
