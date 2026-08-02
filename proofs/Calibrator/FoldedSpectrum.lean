@@ -3,6 +3,8 @@ import Calibrator.EffectSizeSurgery
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Exp
 
 namespace Calibrator
 
@@ -549,9 +551,9 @@ theorem portability_gap_not_attributable_to_spectrum (q₁ q₂ q₃ : ℝ)
       = T { support := ![q₃, q₃], weight := ![1 / 2, 1 / 2] } := by
   refine matched_functionals_give_equal_estimates T _ hT _ _ (fun a => ?_)
   fin_cases a
-  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-    Matrix.head_fin_const]
-  linarith [hmean]
+  simp only [Fin.isValue, Matrix.cons_val_fin_one, Fin.sum_univ_two, Matrix.cons_val_zero,
+    Matrix.cons_val_one, Matrix.head_cons]
+  linarith
 
 /-! ## 7. The pair theorem -/
 
@@ -635,26 +637,33 @@ is worth recording as such rather than cited as if it applied.
 
 This is the atom that dominates. On `(0, 1/2]` it is at least `1`, and it is the strictly
 largest of the three moduli below balance. -/
-theorem diploid_modulus_alt_eq (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
+theorem diploid_modulus_alt_eq (q : ℝ) (hq0 : 0 < q) (hhalf : q ≤ 1 / 2) :
     diploidFamily.modulus 2 q = 2 / q - 3 := by
-  have hden : (0 : ℝ) < 2 * q * (1 - q) := by nlinarith
+  have hq1 : q < 1 := by linarith
+  have hqne : q ≠ 0 := ne_of_gt hq0
+  have h1q : (1 : ℝ) - q ≠ 0 := by linarith
   rw [diploid_modulus_eq 2 q hq0 hq1]
   have hcast : ((2 : Fin 3) : ℝ) = 2 := by norm_num
   rw [hcast]
   have hval : (2 - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1 = 2 / q - 3 := by
     field_simp
     ring
-  rw [hval, abs_of_nonneg]
-  nlinarith
+  have hnn : (0 : ℝ) ≤ 2 / q - 3 := by
+    have h4 : (4 : ℝ) ≤ 2 / q := by
+      rw [le_div_iff₀ hq0]
+      linarith
+    linarith
+  rw [hval, abs_of_nonneg hnn]
 
 /-- **The dominating atom is strictly decreasing in the frequency**: the rarer the locus,
 the larger its extreme modulus value. This is what gives peeling a starting point, and it
 is why the argument needs a *minimum* — hence a finite panel. -/
-theorem diploid_modulus_alt_strictAnti (q r : ℝ) (hq0 : 0 < q) (hq1 : q < 1)
-    (hr1 : r < 1) (hlt : q < r) :
+theorem diploid_modulus_alt_strictAnti (q r : ℝ) (hq0 : 0 < q) (hrhalf : r ≤ 1 / 2)
+    (hlt : q < r) :
     diploidFamily.modulus 2 r < diploidFamily.modulus 2 q := by
   have hr0 : 0 < r := lt_trans hq0 hlt
-  rw [diploid_modulus_alt_eq q hq0 hq1, diploid_modulus_alt_eq r hr0 hr1]
+  have hqhalf : q ≤ 1 / 2 := by linarith
+  rw [diploid_modulus_alt_eq q hq0 hqhalf, diploid_modulus_alt_eq r hr0 hrhalf]
   have : 2 / r < 2 / q := by
     apply div_lt_div_of_pos_left (by norm_num) hq0 hlt
   linarith
@@ -664,19 +673,17 @@ alternate one never falls below it. The dominance is not an asymptotic statement
 theorem diploid_modulus_ref_le_one (q : ℝ) (hq0 : 0 < q) (hhalf : q ≤ 1 / 2) :
     diploidFamily.modulus 0 q ≤ 1 := by
   have hq1 : q < 1 := by linarith
-  have hden : (0 : ℝ) < 2 * q * (1 - q) := by nlinarith
+  have hqne : q ≠ 0 := ne_of_gt hq0
+  have h1q : (1 : ℝ) - q ≠ 0 := by linarith
   rw [diploid_modulus_eq 0 q hq0 hq1]
   have hcast : ((0 : Fin 3) : ℝ) = 0 := by norm_num
   rw [hcast]
   have hval : (0 - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1 = (3 * q - 1) / (1 - q) := by
     field_simp
     ring
-  rw [hval, abs_le]
-  constructor
-  · rw [le_div_iff (by linarith)]
-    linarith
-  · rw [div_le_one (by linarith)]
-    linarith
+  rw [hval, abs_div, abs_of_pos (show (0 : ℝ) < 1 - q by linarith),
+    div_le_one (by linarith)]
+  exact abs_le.mpr ⟨by linarith, by linarith⟩
 
 /-- **The finite identifiability theorem, in this file's vocabulary.**
 
