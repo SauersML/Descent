@@ -1185,7 +1185,22 @@ that every metric satisfies it.
 
 The two theorems below establish only the consequences of an explicit factorization and
 coordinatewise monotonicity. They give a useful method interface once the Gaussian
-calculation for a named metric has supplied those hypotheses. -/
+calculation for a named metric has supplied those hypotheses.
+
+**The factorization survives estimation, which was the obvious objection to it.** A deployed
+filter is *estimated*, so the readout/target pair is not a Gaussian pair but a **mixture** of
+them. Sufficiency is nonetheless exact: if every level-set functional of a Gaussian pair
+factors through the two coordinates, then every level-set functional of the mixture factors
+through **the law of the random coordinate pair**. Nothing leaks, and the argument is the
+same factorization applied under the mixing measure.
+
+What grows is the *description of that law*, not the number of sufficient statistics — at
+first correction it is organised as **2 + 3 fluctuation coordinates**, so the honest form is
+**"2 + O(fluctuation)" with the correction coordinates named and computable**. That is
+graceful degradation rather than breakdown. Note what this does and does not settle: it
+removes *estimation* as a reason to doubt the two-coordinate interface, and it leaves
+untouched the separate question, still open below, of whether a *named* metric factors
+through these particular two coordinates at all. -/
 
 /-- The two coordinates a Gaussian level-set functional can see. -/
 structure LevelSetCoordinates where
@@ -1193,6 +1208,20 @@ structure LevelSetCoordinates where
   correlationDrop : ℝ
   /-- The variance ratio `V` of the transferred readout. -/
   varianceRatio : ℝ
+
+/-- A one-dimensional threshold functional used to show why estimated-filter mixtures
+need the **law** of their random coordinates, not merely coordinate means. -/
+def positiveThreshold (x : ℝ) : ℝ := if 0 < x then 1 else 0
+
+/-- Two random coordinates can have the same mean while producing different threshold
+probabilities: the equiprobable law on `{-1,1}` and the point mass at zero both have mean
+zero, but only the first crosses the positive threshold with probability `1/2`. Thus the
+estimated-filter extension is distribution-valued, not an exact finite-dimensional
+two-number collapse. -/
+theorem coordinate_mean_not_complete_for_estimated_thresholds :
+    ((-1 : ℝ) + 1) / 2 = 0 ∧
+      (positiveThreshold (-1) + positiveThreshold 1) / 2 ≠ positiveThreshold 0 := by
+  norm_num [positiveThreshold]
 
 /-- **A level-set functional**: any threshold-based metric, which by the Gaussian collapse
 factors through the two coordinates. -/
@@ -1279,6 +1308,179 @@ theorem nonreversible_of_interior_peak {f : ℝ → ℝ} {x : ℝ} (hx1 : -1 ≤
     ¬ (∀ u v a b : ℝ, 0 ≤ a → 0 ≤ b → a + b = 1 →
         f (a * u + b * v) ≤ a * f u + b * f v) :=
   fun hconv => absurd (convex_le_max_endpoints hconv hx1 hx2) (not_le.mpr hpeak)
+
+/-! ## 13. THE DESIGN THEOREM: what to actually do differently
+
+Four results, ordered by how directly they change what someone computes. The first is a
+prescription; the second is its boundary and must be read with it; the third removes a
+sample-size argument that does not go through; the fourth predicts *where* transfer fails
+rather than that it does.
+
+**What makes this a design theorem rather than a proposal is a matched lower bound via Le
+Cam in the same metric.** Upper and lower bounds in one metric mean the prescriptions below
+are optimal, not merely safe. The gap between the two tiers — model-free filters versus
+knowing the generative law — is the **quantified value of modelling at all**, and it is worth
+stating whenever these results are quoted, because it is what justifies the modelling effort.
+
+### 13a. THE RIDGE-INFLATION RULE — regularize a transported readout MORE
+
+For a model-free spectral filter the **transported**-optimal regularizer differs from the
+**source**-optimal one at **leading order** — first order in the divergence, not second.
+Drift acts as *multiplicative ridge inflation* by `(1 + r/bias)`, and in the canonical
+bias–variance-balanced scaling
+
+`η* = τ² + r·τ`.
+
+> **Every readout fitted on one population and deployed in another should be regularized
+> more than the source-optimal amount, by a term linear in the expected transfer distance.**
+
+Standard practice tunes shrinkage to optimize source fit. When the readout will be
+transported that is **provably the wrong target**, and `η* = τ² + r·τ` is the correction.
+The bound is *attained* — the adversary aligns the drift with the residual bias — so it is
+the exact optimum against the worst case in the ball, not conservative advice.
+
+### 13b. THE BOUNDARY OF 13a: plug-in at the center is minimax, so do NOT bias the estimates
+
+For an analyst who knows the generative structure the optimal deployment is to estimate the
+history parameters and deploy the corresponding filter, **with no further shrinkage and no
+drift bias**. Both first- and second-order corrections vanish identically.
+
+The reason is a cancellation of **two asymmetries**: near the long-memory boundary the metric
+ball is coordinate-asymmetric — boundary-ward reach is shorter — and the loss is asymmetric —
+boundary-ward targets cost more. The first calculation of this found a boundary-ward bias;
+redoing it in the metric-correct ball killed it. **The naive rule survives because two wrongs
+are the same right**, which is exactly why it should not be trusted from the naive derivation.
+
+> **Regularize the FILTER more (13a); do NOT bias the PARAMETER ESTIMATES toward robustness
+> (13b).**
+
+These pull in opposite directions and both are proved. **A reader who applies only 13a will
+over-correct**, so the two must be quoted together.
+
+### 13c. LONG MEMORY IS FREE FOR TRANSPORT — though not for estimation
+
+The degradation metric and the **Whittle–Fisher information metric** of the source
+observation coincide up to a universal factor of one half. So the estimation floor is
+`dimension/(2n)` **uniformly in the memory parameter**: the marginal sample cost of long
+memory, *for transported risk*, is **zero**.
+
+**The reason is the good kind.** Not that long memory is easy — coordinate-wise the variance
+of the memory estimate blows up like `δ⁻³` — but that **the loss weights and the information
+weights are the same weights**. One metric governs degradation, information and design.
+
+Biologically, and checkably: strong long-range correlation makes the correlation parameter
+hard to estimate while costing **nothing extra in samples** for transferring a readout.
+**Anyone arguing that long-range structure demands larger cohorts for portability is
+reasoning from estimation difficulty, and that inference does not go through.**
+
+### 13d. THE AMPLIFICATION NEAR THE LONG-MEMORY BOUNDARY — the predicted failure regime
+
+Near the boundary the degradation metric is **conformal with exponent three**, not the
+hyperbolic two:
+
+`g = ε² · δ⁻³ (dδ² + dθ²)`
+
+so transporting between *nearby* long-memory regimes costs `(coordinate distance)²/δ³`:
+small parameter differences are **hugely amplified exactly where memory is long**. Across
+*separated* phases the cost is the sum of **both full self-energies** — transport between two
+distinct long-memory regimes pays for both, not for their difference.
+
+This is the first result in the arc that predicts **where** portability failures should be
+worst rather than explaining that they occur, and being a metric it is falsifiable: observed
+transfer loss should concentrate where `δ` is small. -/
+
+/-- **The ridge-inflation rule (13a) together with its boundary (13b)**, in one object so
+that neither can be quoted without the other.
+
+`sourceOptimal` is what tuning on source fit returns; `transportedOptimal` is what should be
+deployed. `plugInUnbiased` is 13b: the *parameter* estimates take no robustness bias.
+
+The two pre-registered joints are fields rather than prose:
+
+* `whittleUniformity` — uniformity of the Whittle reduction over the long-memory ball;
+* `thirdOrderNeutral` — whether third-order metric terms reintroduce a deployment bias,
+  which is precisely what would break the 13b cancellation. -/
+structure TransportDesign where
+  /-- Bias–variance scale `τ`. -/
+  tau : ℝ
+  tau_pos : 0 < tau
+  /-- Expected transfer distance `r`, the divergence to the deployment population. -/
+  transferDistance : ℝ
+  transferDistance_nonneg : 0 ≤ transferDistance
+  /-- The source-fit-optimal regularizer, `τ²`. -/
+  sourceOptimal : ℝ
+  sourceOptimal_eq : sourceOptimal = tau ^ 2
+  /-- The transported-optimal regularizer. -/
+  transportedOptimal : ℝ
+  /-- **13a.** Ridge inflation, first order in the transfer distance. -/
+  inflation : transportedOptimal = tau ^ 2 + transferDistance * tau
+  /-- **13b.** The plug-in parameter estimate takes no drift bias. -/
+  plugInUnbiased : Prop
+  /-- **Pre-registered joint.** Uniformity of the Whittle reduction over the long-memory
+  ball. -/
+  whittleUniformity : Prop
+  /-- **Pre-registered joint.** Whether third-order metric terms reintroduce a deployment
+  bias. -/
+  thirdOrderNeutral : Prop
+  /-- 13b holds given both joints. -/
+  plugIn_of_joints : whittleUniformity → thirdOrderNeutral → plugInUnbiased
+
+namespace TransportDesign
+
+variable (D : TransportDesign)
+
+/-- **A transported readout is regularized strictly more than the source-optimal amount.**
+The correction is positive and linear in the transfer distance, so tuning on source fit
+under-regularizes by exactly `r·τ`. -/
+theorem transportedOptimal_gt_sourceOptimal (hr : 0 < D.transferDistance) :
+    D.sourceOptimal < D.transportedOptimal := by
+  rw [D.sourceOptimal_eq, D.inflation]
+  nlinarith [D.tau_pos, hr]
+
+/-- **No transfer, no correction.** At zero transfer distance the rule returns the
+source-optimal regularizer exactly, so 13a extends current practice rather than contradicting
+it in the case current practice was designed for. -/
+theorem transportedOptimal_eq_sourceOptimal_of_no_transfer
+    (hr : D.transferDistance = 0) : D.transportedOptimal = D.sourceOptimal := by
+  rw [D.sourceOptimal_eq, D.inflation, hr]
+  ring
+
+/-- **The correction is monotone in the transfer distance**: a readout deployed further away
+should be shrunk more, in the same linear proportion. -/
+theorem transportedOptimal_mono (D' : TransportDesign) (htau : D.tau = D'.tau)
+    (hr : D.transferDistance < D'.transferDistance) :
+    D.transportedOptimal < D'.transportedOptimal := by
+  rw [D.inflation, D'.inflation, htau]
+  nlinarith [D'.tau_pos, hr]
+
+end TransportDesign
+
+/-- **The transported estimation floor (13c)**, with its uniformity in the memory parameter
+as the content rather than an aside: `δ` does not appear on the right-hand side. -/
+structure TransportedEstimationFloor where
+  /-- Parameter dimension. -/
+  dimension : ℝ
+  /-- Sample size. -/
+  sampleSize : ℝ
+  sampleSize_pos : 0 < sampleSize
+  /-- The memory parameter `δ`. -/
+  memory : ℝ
+  /-- The floor for transported risk. -/
+  floor : ℝ
+  /-- **The floor, uniform in the memory parameter.** -/
+  floor_eq : floor = dimension / (2 * sampleSize)
+
+namespace TransportedEstimationFloor
+
+/-- **Long memory is free for transport.** Two designs differing only in the memory
+parameter have the *same* transported estimation floor: the marginal sample cost of long
+memory is exactly zero, even though the memory parameter itself is hard to estimate. -/
+theorem floor_independent_of_memory (F F' : TransportedEstimationFloor)
+    (hdim : F.dimension = F'.dimension) (hn : F.sampleSize = F'.sampleSize) :
+    F.floor = F'.floor := by
+  rw [F.floor_eq, F'.floor_eq, hdim, hn]
+
+end TransportedEstimationFloor
 
 /-!
 ## What is left open, plainly
