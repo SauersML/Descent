@@ -1310,8 +1310,8 @@
    "reason": "hypotheses rejected almost every sampled point"
   },
   "ldRetainedFraction_uses_timeScale": {
-   "status": "no-admissible-points",
-   "reason": "hypotheses rejected almost every sampled point"
+   "status": "untranspilable",
+   "reason": "trailing tokens at [('ident', 't'), ('op', '='), ('op', '('), ('op', '(')]"
   },
   "fstDerived_uses_timeScale": {
    "status": "no-admissible-points",
@@ -1366,12 +1366,8 @@
    "reason": "hypotheses rejected almost every sampled point"
   },
   "ldHalfLife_uses_timeScale": {
-   "status": "no-admissible-points",
-   "reason": "hypotheses rejected almost every sampled point"
-  },
-  "steppingStoneCharacteristicLength_uses_timeScale": {
-   "status": "no-admissible-points",
-   "reason": "hypotheses rejected almost every sampled point"
+   "status": "untranspilable",
+   "reason": "trailing tokens at [('ident', 'Ne'), ('op', '='), ('ident', 'Real.log'), ('num', '2')]"
   },
   "ldRetentionPerGen_uses_timeScale": {
    "status": "no-admissible-points",
@@ -1701,17 +1697,6 @@
     "TransferLearningPGS.pgsR2"
    ]
   },
-  "allelic_variance_nonneg": {
-   "status": "holds",
-   "module": "CovarianceStructure",
-   "accepted": 40,
-   "mentions": [
-    "genotypeVarianceHWE"
-   ],
-   "discriminates": [
-    "AncestrySpecificPower.genotypeVarianceHWE"
-   ]
-  },
   "allelic_variance_max_at_half": {
    "status": "holds",
    "module": "CovarianceStructure",
@@ -1955,17 +1940,6 @@
   "rigid_pcCorrectabilityMargin_is_the_criterion": {
    "status": "hypothesis-not-modelled"
   },
-  "island_fst_in_unit_interval": {
-   "status": "holds",
-   "module": "DemographicHistory",
-   "accepted": 40,
-   "mentions": [
-    "fstMigrationDriftEquilibrium"
-   ],
-   "discriminates": [
-    "PortabilityDrift.fstMigrationDriftEquilibrium"
-   ]
-  },
   "more_migration_lower_fst": {
    "status": "holds",
    "module": "DemographicHistory",
@@ -1975,19 +1949,6 @@
    ],
    "discriminates": [
     "PortabilityDrift.fstMigrationDriftEquilibrium"
-   ]
-  },
-  "islandModelFst_eq_from_scaledMigration": {
-   "status": "holds",
-   "module": "DemographicHistory",
-   "accepted": 40,
-   "mentions": [
-    "fstMigrationDriftEquilibrium",
-    "scaledMigrationRate"
-   ],
-   "discriminates": [
-    "PortabilityDrift.fstMigrationDriftEquilibrium",
-    "PortabilityDrift.scaledMigrationRate"
    ]
   },
   "stepping_stone_fst_increasing": {
@@ -3441,49 +3402,29 @@
     "LDDecayTheory.ldDecayRatePerGen"
    ]
   },
+  "ldHalfLife_halves_retention": {
+   "status": "untranspilable",
+   "reason": "expected ')' got 'Ne'"
+  },
   "ld_half_life_increasing": {
-   "status": "holds",
-   "module": "LDDecayTheory",
-   "accepted": 40,
-   "mentions": [
-    "ldHalfLife"
-   ],
-   "discriminates": [
-    "LDDecayTheory.ldHalfLife"
-   ]
+   "status": "untranspilable",
+   "reason": "trailing tokens at [('ident', 'Ne\u2081'), ('op', '<'), ('ident', 'ldHalfLife'), ('ident', 'r')]"
+  },
+  "ldAfterGenerations_eq_retainedFraction": {
+   "status": "untranspilable",
+   "reason": "trailing tokens at [('ident', 't'), ('op', ':='), ('ident', 'rfl'), ('op', '/')]"
   },
   "larger_ne_more_ld_retained": {
-   "status": "holds",
-   "module": "LDDecayTheory",
-   "accepted": 40,
-   "mentions": [
-    "ldRetainedFraction"
-   ],
-   "discriminates": [
-    "LDDecayTheory.ldRetainedFraction"
-   ]
+   "status": "untranspilable",
+   "reason": "trailing tokens at [('ident', 't'), ('op', '<'), ('ident', 'ldRetainedFraction'), ('ident', 'r')]"
   },
   "ld_retained_decreasing": {
-   "status": "holds",
-   "module": "LDDecayTheory",
-   "accepted": 40,
-   "mentions": [
-    "ldRetainedFraction"
-   ],
-   "discriminates": [
-    "LDDecayTheory.ldRetainedFraction"
-   ]
+   "status": "untranspilable",
+   "reason": "trailing tokens at [('ident', 't\u2082'), ('op', '<'), ('ident', 'ldRetainedFraction'), ('ident', 'r')]"
   },
   "different_ne_different_ld_persistence": {
-   "status": "holds",
-   "module": "LDDecayTheory",
-   "accepted": 40,
-   "mentions": [
-    "ldRetainedFraction"
-   ],
-   "discriminates": [
-    "LDDecayTheory.ldRetainedFraction"
-   ]
+   "status": "untranspilable",
+   "reason": "trailing tokens at [('ident', 't'), ('op', '<'), ('ident', 'D\u2080'), ('op', '*')]"
   },
   "expanderAgreementFloor_gt": {
    "status": "untranspilable",
@@ -5716,28 +5657,6 @@
     "PortabilityDrift.fstMigrationDriftEquilibrium"
    ]
   },
-  "islandModelFst_pos": {
-   "status": "holds",
-   "module": "PopulationGeneticsFoundations",
-   "accepted": 40,
-   "mentions": [
-    "fstMigrationDriftEquilibrium"
-   ],
-   "discriminates": [
-    "PortabilityDrift.fstMigrationDriftEquilibrium"
-   ]
-  },
-  "islandModelFst_lt_one": {
-   "status": "holds",
-   "module": "PopulationGeneticsFoundations",
-   "accepted": 40,
-   "mentions": [
-    "fstMigrationDriftEquilibrium"
-   ],
-   "discriminates": [
-    "PortabilityDrift.fstMigrationDriftEquilibrium"
-   ]
-  },
   "islandModelFst_strictAnti_m": {
    "status": "holds",
    "module": "PopulationGeneticsFoundations",
@@ -5845,37 +5764,40 @@
     "PopulationGeneticsFoundations.steppingStoneCharacteristicLength"
    ]
   },
-  "continuousSteppingStoneFst_nonneg": {
-   "status": "holds",
+  "steppingStoneCharacteristicLength_balances_mutation": {
+   "status": "checker-disagrees-with-proved-theorem",
    "module": "PopulationGeneticsFoundations",
-   "accepted": 40,
-   "mentions": [
-    "continuousSteppingStoneFst"
-   ],
-   "discriminates": [
-    "PopulationGeneticsFoundations.continuousSteppingStoneFst"
-   ]
+   "accepted": 0,
+   "failed": 40,
+   "first_failure": {
+    "m": 5.8369340462624895e-09,
+    "\u03bc": 1.0431208038738323e-05
+   },
+   "conclusion": "steppingStoneCharacteristicLength m \u03bc ^ 2 * (2 * \u03bc) = m",
+   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
   },
-  "continuousSteppingStoneFst_increases": {
-   "status": "holds",
+  "steppingStoneCharacteristicLength_strictAnti_mutation": {
+   "status": "checker-disagrees-with-proved-theorem",
    "module": "PopulationGeneticsFoundations",
-   "accepted": 40,
-   "mentions": [
-    "continuousSteppingStoneFst"
-   ],
-   "discriminates": [
-    "PopulationGeneticsFoundations.continuousSteppingStoneFst"
-   ]
+   "accepted": 0,
+   "failed": 40,
+   "first_failure": {
+    "m": 4.160289275948074e-05,
+    "\u03bc\u2081": 0.000294239066609818,
+    "\u03bc\u2082": 0.004004367036006106
+   },
+   "conclusion": "steppingStoneCharacteristicLength m \u03bc\u2082 < steppingStoneCharacteristicLength m \u03bc\u2081",
+   "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
   },
-  "continuousSteppingStoneFst_decreases_with_L": {
+  "steppingStoneCharacteristicLength_strictMono_migration": {
    "status": "holds",
    "module": "PopulationGeneticsFoundations",
    "accepted": 40,
    "mentions": [
-    "continuousSteppingStoneFst"
+    "steppingStoneCharacteristicLength"
    ],
    "discriminates": [
-    "PopulationGeneticsFoundations.continuousSteppingStoneFst"
+    "PopulationGeneticsFoundations.steppingStoneCharacteristicLength"
    ]
   },
   "alleleFreqAfterMigration_at_zero": {
@@ -6037,10 +5959,6 @@
    ]
   },
   "hetMutationDrift_fixed_point": {
-   "status": "untranspilable",
-   "reason": "trailing tokens at [('num', '1'), ('op', '='), ('ident', 'hetMutationFloor'), ('ident', 'Ne')]"
-  },
-  "hetEquilibrium_isFixedPoint": {
    "status": "untranspilable",
    "reason": "trailing tokens at [('num', '1'), ('op', '='), ('ident', 'hetMutationFloor'), ('ident', 'Ne')]"
   },
@@ -6868,9 +6786,6 @@
    "status": "hypothesis-not-modelled"
   },
   "sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart": {
-   "status": "hypothesis-not-modelled"
-  },
-  "equalVarianceGaussianAUCFromSourceWeights_target": {
    "status": "hypothesis-not-modelled"
   },
   "targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances": {
@@ -8102,12 +8017,12 @@
   "gradeCertifiedSampleSize_attains": {
    "status": "checker-disagrees-with-proved-theorem",
    "module": "PowerAnalysis",
-   "accepted": 32,
-   "failed": 8,
+   "accepted": 39,
+   "failed": 1,
    "first_failure": {
-    "epsilon": 0.035456285983933175,
-    "K": 0.16542033645305096,
-    "c": 7.379164901631935e-06
+    "epsilon": 6.529570538680771,
+    "K": 0.01265725879705957,
+    "c": 3.2246788905425844e-06
    },
    "conclusion": "gradeCertifiedRisk (gradeCertifiedSampleSize epsilon K c) K c = epsilon",
    "note": "Lean has no sorry, so this is an error in THIS checker -- a mis-transcribed body or an unmodelled hypothesis -- and is never reported as a corpus defect"
@@ -9268,34 +9183,14 @@
     "conclusion": "fstMigrationDriftEquilibrium Ne m = fstMutationDriftEquilibrium (scaledMigrationRate Ne m)"
    },
    {
-    "theorem": "island_fst_in_unit_interval",
-    "mutation": "negate",
-    "conclusion": "0 < fstMigrationDriftEquilibrium Ne m \u2227 fstMigrationDriftEquilibrium Ne m < 1"
-   },
-   {
     "theorem": "more_migration_lower_fst",
     "mutation": "negate",
     "conclusion": "fstMigrationDriftEquilibrium Ne m\u2082 < fstMigrationDriftEquilibrium Ne m\u2081"
    },
    {
-    "theorem": "islandModelFst_eq_from_scaledMigration",
-    "mutation": "const-off-by-one",
-    "conclusion": "fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m)"
-   },
-   {
     "theorem": "islandModelFst_eq_inv",
     "mutation": "const-off-by-one",
     "conclusion": "fstMigrationDriftEquilibrium Ne m = (1 + 4 * Ne * m)\u207b\u00b9"
-   },
-   {
-    "theorem": "islandModelFst_pos",
-    "mutation": "negate",
-    "conclusion": "0 < fstMigrationDriftEquilibrium Ne m"
-   },
-   {
-    "theorem": "islandModelFst_lt_one",
-    "mutation": "swap-plus-minus",
-    "conclusion": "fstMigrationDriftEquilibrium Ne m < 1"
    },
    {
     "theorem": "islandModelFst_strictAnti_m",
@@ -9495,11 +9390,6 @@
     "theorem": "hweHeterozygosity_eq_genotypeVarianceHWE",
     "mutation": "const-off-by-one",
     "conclusion": "hweHeterozygosity p = genotypeVarianceHWE p"
-   },
-   {
-    "theorem": "allelic_variance_nonneg",
-    "mutation": "negate",
-    "conclusion": "0 \u2264 genotypeVarianceHWE p"
    },
    {
     "theorem": "allelic_variance_max_at_half",
@@ -10216,11 +10106,6 @@
     "theorem": "demoSteppingStoneFst_eq_scaled",
     "mutation": "const-off-by-one",
     "conclusion": "demoSteppingStoneFst d Ne m \u03c3_sq = d / (d + scaledMigrationRate Ne m * \u03c3_sq)"
-   },
-   {
-    "theorem": "islandModelFst_eq_from_scaledMigration",
-    "mutation": "const-off-by-one",
-    "conclusion": "fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m)"
    },
    {
     "theorem": "scaledMigrationRate_pos",
@@ -11645,30 +11530,6 @@
     "conclusion": "islandFstMultiplicativeStep Ne m (fstIslandMultiplicativeEquilibrium Ne m) = fstIslandMultiplicativeEquilibrium Ne m"
    }
   ],
-  "LDDecayTheory.ldHalfLife": [
-   {
-    "theorem": "ld_half_life_increasing",
-    "mutation": "negate",
-    "conclusion": "ldHalfLife Ne\u2081 < ldHalfLife Ne\u2082"
-   }
-  ],
-  "LDDecayTheory.ldRetainedFraction": [
-   {
-    "theorem": "larger_ne_more_ld_retained",
-    "mutation": "drop-a-one-minus",
-    "conclusion": "ldRetainedFraction Ne\u2081 t < ldRetainedFraction Ne\u2082 t"
-   },
-   {
-    "theorem": "ld_retained_decreasing",
-    "mutation": "drop-a-one-minus",
-    "conclusion": "ldRetainedFraction Ne t\u2082 < ldRetainedFraction Ne t\u2081"
-   },
-   {
-    "theorem": "different_ne_different_ld_persistence",
-    "mutation": "drop-a-one-minus",
-    "conclusion": "D\u2080 * ldRetainedFraction Ne\u2081 t < D\u2080 * ldRetainedFraction Ne\u2082 t"
-   }
-  ],
   "LongitudinalPortability.portabilityAtTime": [
    {
     "theorem": "portability_at_zero",
@@ -12690,24 +12551,12 @@
    {
     "theorem": "steppingStoneCharacteristicLength_pos",
     "mutation": "negate",
-    "conclusion": "0 < steppingStoneCharacteristicLength Ne m"
-   }
-  ],
-  "PopulationGeneticsFoundations.continuousSteppingStoneFst": [
+    "conclusion": "0 < steppingStoneCharacteristicLength m \u03bc"
+   },
    {
-    "theorem": "continuousSteppingStoneFst_nonneg",
+    "theorem": "steppingStoneCharacteristicLength_strictMono_migration",
     "mutation": "negate",
-    "conclusion": "0 \u2264 continuousSteppingStoneFst L d"
-   },
-   {
-    "theorem": "continuousSteppingStoneFst_increases",
-    "mutation": "drop-a-one-minus",
-    "conclusion": "continuousSteppingStoneFst L d\u2081 < continuousSteppingStoneFst L d\u2082"
-   },
-   {
-    "theorem": "continuousSteppingStoneFst_decreases_with_L",
-    "mutation": "drop-a-one-minus",
-    "conclusion": "continuousSteppingStoneFst L\u2082 d < continuousSteppingStoneFst L\u2081 d"
+    "conclusion": "steppingStoneCharacteristicLength m\u2081 \u03bc < steppingStoneCharacteristicLength m\u2082 \u03bc"
    }
   ],
   "PopulationGeneticsFoundations.alleleFreqAfterMigration": [

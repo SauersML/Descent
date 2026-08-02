@@ -242,4 +242,45 @@ theorem no_averageEffect_criterion_for_additivity {δ : ℝ} (hδ : δ ≠ 0) (a
         ∀ m : OneLocusArchitecture, m.d = 0 ↔ accept (combine m.averageEffect) :=
   (averageEffect_blind_to_dominance hδ a).no_criterion_of_factors combine
 
+/-! ### The separation modulus, and why `p = 1/2` is not an isolated accident
+
+Instance 8 is exact blindness at one frequency, and exact statements at single points are
+the weakest kind of warning: a reader concludes the difficulty is confined to `p = 1/2` and
+that any real panel avoids it. The quantitative statement says otherwise.
+
+`averageEffect_separation` computes the modulus exactly: two loci differing by `Δ` in
+dominance differ in average effect by `|1 - 2p| · Δ`. So the separation constant of
+`ObservationalCeiling.ProbeSeparation` is here `σ(p) = |1 - 2p|`, and it does not fall off a
+cliff at `1/2` — it decays linearly into it. `dominance_resolution_bound` is the
+`δ / σ` form: at average-effect resolution `δ`, dominance is pinned only to `δ / |1 - 2p|`.
+
+That is the practical reading of the whole registry. Instance 8 says common variants at
+`p = 1/2` are a blind spot; this says the blind spot has a *neighbourhood*, with radius set
+by the resolution of the study, and that common variants — the ones best powered for
+additive effects — are exactly the ones in it. The two statements are the `σ = 0` and
+`σ ≈ 0` faces of one fact. -/
+
+/-- **The average effect separates dominance at rate `|1 - 2p|`.** -/
+theorem averageEffect_separation (a d d' p : ℝ) :
+    |(OneLocusArchitecture.mk a d p).averageEffect
+        - (OneLocusArchitecture.mk a d' p).averageEffect|
+      = |1 - 2 * p| * |d - d'| := by
+  unfold OneLocusArchitecture.averageEffect
+  have h : a + d * (1 - 2 * p) - (a + d' * (1 - 2 * p)) = (1 - 2 * p) * (d - d') := by ring
+  simp only
+  rw [h, abs_mul]
+
+/-- **Dominance is pinned only to `δ / |1 - 2p|`.**
+
+The recovery bound of `ProbeSeparation` in the genotypic instance: an average effect known
+to resolution `δ` leaves a dominance interval that widens without bound as the allele
+frequency approaches one half. -/
+theorem dominance_resolution_bound (a d d' p δ : ℝ) (hp : 1 - 2 * p ≠ 0)
+    (h : |(OneLocusArchitecture.mk a d p).averageEffect
+          - (OneLocusArchitecture.mk a d' p).averageEffect| ≤ δ) :
+    |d - d'| ≤ δ / |1 - 2 * p| := by
+  rw [averageEffect_separation] at h
+  rw [le_div_iff₀ (abs_pos.mpr hp), mul_comm]
+  exact h
+
 end Calibrator

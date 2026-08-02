@@ -485,4 +485,74 @@ convention plus a theorem about what the convention buys — which is the progra
 quantities.
 -/
 
+/-!
+## The other end of the scale: separation, and why injectivity is not enough
+
+Every instance in `Calibrator.BlindnessRegistry` is exact. `same_data` is an equality, so
+each says the probe assigns *identical* data to two objects. That is the `σ = 0` endpoint
+of a scale, and it is the only point on the scale the development can currently speak
+about.
+
+The endpoint is not where measurement lives. A probe can be injective — no blindness
+witness exists at all — and still be useless, if the data it assigns to distinguishable
+objects differ by less than the resolution available. What decides that is not injectivity
+but a *modulus*: how far apart the probe pushes objects that are far apart.
+
+`ProbeSeparation` is that modulus, and `recovery` is what it buys: an object is pinned by
+its probe value to within `resolution / σ`. The two structures are incompatible
+(`no_blindness`), which is the formal content of "identifiable or blind" — but the
+practical content is in the constant, because `1 / σ` is unbounded over families of probes
+that are each individually injective. A separating probe with small `σ` is identifiable in
+principle and hopeless in practice, and nothing about `ProbeBlindness` distinguishes that
+case from a good one.
+
+`Calibrator.BlindnessRegistry.averageEffect_separation` is the instance with a genotypic
+referent: there `σ = |1 - 2p|`, which vanishes exactly at the allele frequency where
+instance 8 exhibits outright blindness, and degrades linearly on the way in. -/
+
+section EffectiveSeparation
+
+variable {Object Data : Type*} [MetricSpace Object] [MetricSpace Data]
+variable {probe : Object → Data}
+
+/-- **The modulus by which a probe separates objects.**
+
+`σ` is a lower bound on how much probe data must move when the object moves. It is the
+quantitative form of injectivity, and unlike injectivity it has a size. -/
+structure ProbeSeparation (probe : Object → Data) where
+  /-- The separation modulus. -/
+  sigma : ℝ
+  sigma_pos : 0 < sigma
+  /-- Objects far apart have data far apart, at rate `sigma`. -/
+  separates : ∀ o o' : Object, sigma * dist o o' ≤ dist (probe o) (probe o')
+
+/-- **What separation buys: an object is pinned by its data to within `resolution / σ`.**
+
+This is the modulus of continuity of the inverse. It is the only statement in this file
+with a number in it, and the number is what an experiment has to beat. -/
+theorem ProbeSeparation.recovery (S : ProbeSeparation probe) (o o' : Object) :
+    dist o o' ≤ dist (probe o) (probe o') / S.sigma := by
+  rw [le_div_iff₀ S.sigma_pos, mul_comm]
+  exact S.separates o o'
+
+/-- A probe with positive separation cannot be blind: the witness pair would have to be
+one object. -/
+theorem ProbeSeparation.witness_collapses (S : ProbeSeparation probe) {P : Object → Prop}
+    (B : ProbeBlindness probe P) : B.positive = B.negative := by
+  have h := S.separates B.positive B.negative
+  rw [B.same_data, dist_self] at h
+  have hd : dist B.positive B.negative ≤ 0 := by
+    by_contra hpos
+    push_neg at hpos
+    nlinarith [S.sigma_pos]
+  exact dist_le_zero.mp hd
+
+/-- **Separation and blindness are incompatible.** The scale has two ends and nothing in
+this development yet describes the middle, which is where measurement happens. -/
+theorem ProbeSeparation.no_blindness (S : ProbeSeparation probe) {P : Object → Prop}
+    (B : ProbeBlindness probe P) : False :=
+  B.fails ((S.witness_collapses B) ▸ B.holds)
+
+end EffectiveSeparation
+
 end Calibrator
