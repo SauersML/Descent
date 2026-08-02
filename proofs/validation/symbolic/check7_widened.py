@@ -88,10 +88,12 @@ def run():
             continue
 
         rejected_by, tried, errors = None, 0, Counter()
+        best = {"theorem": None, "rejected": [], "survived": []}
         for t in cands[:MAX_THEOREMS_PER_DEF]:
-            if rejected_by:
-                break
+            if best["theorem"] and not best["survived"]:
+                break  # this theorem already rejects every mutation
             stmt = t["body"]
+            here_rej, here_sur = [], []
             for label, mbody in mutate(d["body"]):
                 table = dict(base_table)
                 table[short] = (table[short][0], mbody)
@@ -107,8 +109,10 @@ def run():
                 tried += 1
                 try:
                     if eq is sp.false:
-                        rejected_by = (t["name"], label, "statement is false")
-                        break
+                        here_rej.append(label)
+                        if rejected_by is None:
+                            rejected_by = (t["name"], label, "statement is false")
+                        continue
                     if eq is sp.true:
                         continue
                     if isinstance(eq, sp.Eq):
@@ -121,8 +125,19 @@ def run():
                 except Exception:
                     v = None
                 if v is False:
-                    rejected_by = (t["name"], label, "equation no longer holds")
-                    break
+                    here_rej.append(label)
+                    if rejected_by is None:
+                        rejected_by = (t["name"], label, "equation no longer holds")
+                else:
+                    here_sur.append(label)
+            # Strength, not just presence.  A theorem pinning a boundary value
+            # ("variance is 0 at fixation") rejects an additive perturbation and
+            # survives a scaling one; that is real coverage but weaker than a
+            # theorem pinning the whole function, and the count says which.
+            if here_rej and (best["theorem"] is None
+                             or len(here_rej) > len(best["rejected"])):
+                best = {"theorem": t["name"], "rejected": here_rej,
+                        "survived": here_sur}
         results.append({
             "fqn": r["fqn"], "short": short,
             "status": "NEWLY_COVERED" if rejected_by else "still_unreachable",
@@ -130,6 +145,12 @@ def run():
             "rejecting_theorem": rejected_by[0] if rejected_by else None,
             "rejecting_mutation": rejected_by[1] if rejected_by else None,
             "why": rejected_by[2] if rejected_by else None,
+            "strongest_theorem": best["theorem"],
+            "mutations_rejected": best["rejected"],
+            "mutations_survived": best["survived"],
+            "strength": (f'{len(best["rejected"])}/'
+                         f'{len(best["rejected"]) + len(best["survived"])}'
+                         if best["theorem"] else "0/0"),
             "theorems_available": len(cands), "mutations_evaluated": tried,
             "convert_errors": errors.most_common(3),
         })
@@ -150,6 +171,12 @@ def main():
     for r in new[:25]:
         print(f'  {r["fqn"]}')
         print(f'      rejected by {r["rejecting_theorem"]} on mutation "{r["rejecting_mutation"]}"')
+    print()
+    print("STRENGTH -- how many of the perturbations the best theorem rejects:")
+    for k, v in sorted(Counter(r.get("strength") for r in new).items()):
+        print(f"  {k:>6}   {v:5d}")
+    full = [r for r in new if r.get("mutations_survived") == []]
+    print(f"  rejecting EVERY perturbation: {len(full)} of {len(new)}")
     print()
     prior = Counter(r["prior_reason"] for r in new)
     print("newly covered, by the reason they were previously filed under:")
