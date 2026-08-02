@@ -203,14 +203,26 @@ def sim_shrinkage_mse(lam, sigma_sq, beta_sq, n=400000, seed=0):
 
 
 def sim_optimal_shrinkage(sigma_sq, beta_sq, n=400000, seed=0):
-    """The shrinkage minimising MSE, found by search rather than by formula."""
-    grid = np.linspace(0.0, 1.0, 2001)
+    """The shrinkage minimising MSE of `lam * obs` for beta, from the sample.
+
+    MSE(lam) = lam^2 E[obs^2] - 2 lam E[obs*beta] + E[beta^2] is quadratic in
+    lam, so its minimiser is E[obs*beta]/E[obs^2] -- which is the least-squares
+    slope of beta on obs and is computed here from the SIMULATED MOMENTS only.
+    Nothing from the Lean formula enters, so this stays an independent oracle.
+
+    The earlier version searched a 2001-point grid, evaluating a mean over
+    400k elements at each point: about 800 million operations per call, and
+    the dominant cost of the whole stability sweep. Minimising a quadratic by
+    grid search was never buying accuracy over solving it -- it was costing
+    accuracy, since the answer was quantised to the grid spacing.
+    """
     rng = np.random.default_rng(seed)
     beta = rng.normal(0, np.sqrt(beta_sq), n)
     obs = beta + rng.normal(0, np.sqrt(sigma_sq), n)
-    # MSE(lam) is quadratic in lam; evaluate on a grid and take the argmin
-    mses = [np.mean((g * obs - beta) ** 2) for g in grid]
-    return float(grid[int(np.argmin(mses))])
+    denom = float(obs @ obs)
+    if denom <= 0:
+        return None
+    return float((obs @ beta) / denom)
 
 
 def sim_bernoulli_logloss(p, q, n=600000, seed=0):

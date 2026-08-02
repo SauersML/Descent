@@ -47,6 +47,46 @@ ROOT = HERE.parent
 STAGES = ["check_ranges", "check_invariants", "check_theorems"]
 
 
+def z3_fragment():
+    """Partition range-checked definitions by whether z3 can decide them.
+
+    This is knowable BEFORE running anything: it is a syntactic property of
+    the body.  A polynomial or rational body is decided by the solver, so an
+    escape that sampling misses is caught as SAT and the escape/inconclusive
+    verdict cannot depend on the draw.  A body containing exp, log, rpow or
+    Phi has no decidable theory here, the solver returns `unsupported`, and
+    sampling is the ONLY evidence -- which is exactly where draw-dependence
+    can live.
+
+    So this job makes a PREDICTION and tests it, rather than reporting an
+    undifferentiated diff:
+
+        decidable fragment  -> zero movement expected.  Any movement here is a
+                               bug in this harness, not instability in the
+                               corpus.
+        outside it          -> movement is possible and is the real finding.
+    """
+    import compile_defs as C
+    import z3backend
+    from semantics import admissible_box, required_range
+
+    defs = C.load_defs()
+    cs, _, _ = C.compile_all(defs)
+    inside, outside = set(), set()
+    for k, c in cs.items():
+        rng = required_range(c.d)
+        if rng is None:
+            continue
+        box, _ = admissible_box(c.d)
+        if not c.names:
+            inside.add(k)
+            continue
+        v, _, detail = z3backend.decide_range(c, box, c.names, rng[0], rng[1],
+                                              timeout_ms=1)
+        (outside if v in ("unsupported", "no-z3") else inside).add(k)
+    return inside, outside
+
+
 def run_at_seed(seed):
     """Run the sampling tiers at one master seed; return their verdicts."""
     env = dict(os.environ, GNOMON_SEED=str(seed))
@@ -85,6 +125,16 @@ def main():
     ap.add_argument("--seeds", type=int, nargs="+", default=[0, 11, 977])
     args = ap.parse_args()
 
+    try:
+        inside, outside = z3_fragment()
+        print(f"range checks in the decidable fragment: {len(inside)}  "
+              f"(zero movement expected)")
+        print(f"range checks outside it: {len(outside)}  "
+              f"(draw-dependence can live here)")
+    except Exception as e:
+        inside, outside = set(), set()
+        print(f"could not partition by decidability: {e}")
+
     runs = {}
     for sd in args.seeds:
         print(f"\n=== master seed {sd} ===", flush=True)
@@ -105,15 +155,36 @@ def main():
         if len({json.dumps(v, sort_keys=True) for v in vals.values()}) > 1:
             moved[k] = vals
 
+    # split the movements against the prediction
+    harness_bugs, real = [], []
+    for k in moved:
+        if not k.startswith("range::"):
+            real.append(k)
+            continue
+        (harness_bugs if k[len("range::"):] in inside else real).append(k)
+
     (ROOT / "results_seed_variation.json").write_text(json.dumps(
-        dict(seeds=args.seeds, n_compared=len(common), moved=moved), indent=1))
+        dict(seeds=args.seeds, n_compared=len(common), moved=moved,
+             decidable_fragment=sorted(inside), outside_fragment=sorted(outside),
+             moved_inside_decidable_fragment=harness_bugs,
+             moved_outside=real), indent=1))
 
     print(f"\n{len(common)} verdicts compared across {len(args.seeds)} master "
           f"seeds")
     print(f"{len(moved)} DEPEND ON THE DRAW\n")
+    if harness_bugs:
+        print(f"\n{len(harness_bugs)} MOVED INSIDE THE DECIDABLE FRAGMENT.")
+        print("The solver decides these, so the verdict cannot legitimately "
+              "depend on the draw. This is a bug in THIS HARNESS, not "
+              "instability in the corpus:")
+        for k in harness_bugs[:20]:
+            print(f"      {k}  {moved[k]}")
     if not moved:
         print("No verdict moved. Every tier's answer is draw-independent on "
               "this corpus, which is what had never been established.")
+        print("NOTE: this is ONE PASSING TEST, not proof of stability. "
+              f"{len(args.seeds)} seeds sample the space of point-sets; they "
+              "do not cover it.")
     else:
         print("These were never really covered -- withdraw them:")
         by_tier = {}
