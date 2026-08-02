@@ -59,8 +59,82 @@ NUMERIC_STANDINS = {
 # `ℝ`, `ℕ` and `ℤ` are excluded on purpose: `profile : ℝ → ℝ` is a genuine
 # function evaluated at a real location, not a table, and reading it as a
 # sequence would index it with a coordinate.
-IDX = (r"(?:Fin\s+\w+|(?!ℝ\b|ℕ\b|ℤ\b|ℚ\b)"
-       r"[A-Za-zΑ-Ωα-ωϑ-ϵ][\w'₀-₉]*)")
+_IDX_NAME = re.compile(r"[A-Za-zΑ-Ωα-ωϑ-ϵ][\w'₀-₉]*")
+_NOT_AN_INDEX = {"ℝ", "ℕ", "ℤ", "ℚ", "Real", "Nat", "Int", "Prop", "Type"}
+
+
+def index_dim(dom):
+    """The dimension KEY for a finite index domain, or None if it is not one.
+
+    `Fin T` keys on `T`, because that is the name a `∑ i : Fin T` annotation
+    uses to look the dimension up.  An abstract index type keys on its own name.
+    """
+    dom = " ".join(dom.split()).strip("()")
+    m = re.fullmatch(r"Fin\s+(\w+)", dom)
+    if m:
+        return m.group(1)
+    if dom in _NOT_AN_INDEX:
+        return None
+    return dom if _IDX_NAME.fullmatch(dom) else None
+
+
+def sequence_shape(ty):
+    """[index keys] if this Lean type is a real-valued finite table, else [].
+
+    Recognises `ι → ℝ`, `ι → κ → ℝ` and `Matrix ι κ ℝ` for ANY finite index
+    types, not only `Fin n`.  This used to accept `Fin n` alone, so `freq : α →
+    ℝ` and `A : Matrix ι ι ℝ` were not seen as sequences: their `∑` had no
+    dimension to range over, and a caller who passed a Python list got "'list'
+    object is not callable" because the generated body applied them instead of
+    indexing them.  The Lean types have the same shape and must get the same
+    calling convention, or `api.vector_args` tells the truth about one
+    definition and lies about its neighbour.
+
+    `ℝ → ℝ` is deliberately NOT a sequence: `profile : ℝ → ℝ` is evaluated at a
+    real location, and reading it as a table would index it by a coordinate.
+    """
+    ty = " ".join(ty.split())
+    if ty.startswith("Matrix "):
+        # Split on TOP-LEVEL whitespace: `Matrix (Fin p) (Fin p) ℝ` has
+        # parenthesised arguments, and a regex with non-greedy groups tears
+        # `(Fin p)` into `(Fin` and `p)`.  That silently produced a rank-2
+        # entry under a nonsense dimension key, which turned elementwise
+        # arithmetic OFF for ldMismatchFrobenius -- one of the four definitions
+        # only this path can reach.
+        parts, depth, cur = [], 0, ""
+        for ch in ty:
+            if ch in "([":
+                depth += 1
+            elif ch in ")]":
+                depth -= 1
+            if ch == " " and depth == 0:
+                if cur:
+                    parts.append(cur)
+                cur = ""
+            else:
+                cur += ch
+        if cur:
+            parts.append(cur)
+        if len(parts) == 4 and parts[-1] == "ℝ":
+            a, b = index_dim(parts[1]), index_dim(parts[2])
+            return [a, b] if a and b else []
+        return []
+    parts, depth, cur = [], 0, ""
+    for ch in ty:
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth -= 1
+        if ch == "→" and depth == 0:
+            parts.append(cur)
+            cur = ""
+        else:
+            cur += ch
+    parts.append(cur)
+    if len(parts) < 2 or parts[-1].strip() != "ℝ":
+        return []
+    keys = [index_dim(x) for x in parts[:-1]]
+    return keys if len(keys) <= 2 and all(keys) else []
 
 
 PROP_RETS = {"Prop"}
@@ -285,22 +359,14 @@ def main():
         for a in d["args"]:
             if a["implicit"]:
                 continue
-            ty = " ".join(a["type"].split())
-            mv = re.fullmatch(rf"{IDX}\s*→\s*ℝ", ty)
-            mm = re.fullmatch(rf"Matrix\s*\(?{IDX}\)?\s*\(?{IDX}\)?\s*ℝ", ty)
-            if mm is None:
-                # Curried index functions: `Fin m → Fin m → ℝ` is how the corpus
-                # writes an LD matrix in several places, and it indexes exactly
-                # like a Matrix.
-                mm = re.fullmatch(rf"{IDX}\s*→\s*{IDX}\s*→\s*ℝ", ty)
+            idxs = sequence_shape(a["type"])
             for n in a["names"]:
-                if mv:
-                    vector_args[n] = (mv.group(1), 1)
-                    dims.setdefault(mv.group(1), f"len({pyname(n)})")
-                elif mm:
-                    vector_args[n] = (mm.group(1), 2)
-                    dims.setdefault(mm.group(1), f"len({pyname(n)})")
-                    dims.setdefault(mm.group(2), f"len({pyname(n)}[0])")
+                if not idxs:
+                    continue
+                vector_args[n] = (idxs[0], len(idxs))
+                dims.setdefault(idxs[0], f"len({pyname(n)})")
+                if len(idxs) == 2:
+                    dims.setdefault(idxs[1], f"len({pyname(n)}[0])")
         struct_args = list(struct_types)
         struct_args += [n for a in d["args"] for n in a["names"]
                         if "×" in a["type"]]

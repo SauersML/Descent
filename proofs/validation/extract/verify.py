@@ -432,13 +432,18 @@ def finite_index_types_translate_correctly():
         raise AssertionError("sumdim silently chose between 4 and 5")
     close("sumdim agrees with itself", float(_rt.sumdim("i", 3, 3, 3)), 3.0)
 
-    # Mathlib's dotProduct reached through a real definition:
-    # `coefficientGapSq wS wT = dotProduct (wS - wT) (wS - wT)` = Σ (wSᵢ-wTᵢ)².
-    fn, _a = api.callable_for("Calibrator.coefficientGapSq")
-    close("coefficientGapSq([1,2,3],[0,0,0]) = 1+4+9",
-          float(fn([1.0, 2.0, 3.0], [0.0, 0.0, 0.0])), 14.0)
-    close("coefficientGapSq(v,v) = 0",
-          float(fn([1.0, 2.0, 3.0], [1.0, 2.0, 3.0])), 0.0)
+    # A RANK-2 abstract index: `gramForm (A : Matrix ι ι ℝ) (x y : ι → ℝ) :=
+    # ∑ i, ∑ j, x i * A i j * y j`.  Neither index is annotated and neither
+    # argument is a `Fin n`, so both ranges are inferred; picking e_0 and e_1
+    # makes the answer a single matrix entry, which is checkable by eye.
+    fn, argnames = api.callable_for("Calibrator.gramForm")
+    A = [[1.0, 2.0], [3.0, 4.0]]
+    close("gramForm(A, e0, e1) = A[0][1]", float(fn(A, [1.0, 0.0], [0.0, 1.0])), 2.0)
+    close("gramForm(A, e1, e0) = A[1][0]", float(fn(A, [0.0, 1.0], [1.0, 0.0])), 3.0)
+    close("gramForm(A, 1, 1) = sum of A", float(fn(A, [1.0, 1.0], [1.0, 1.0])), 10.0)
+    assert api.vector_args("Calibrator.gramForm")["A"]["rank"] == 2, \
+        "a Matrix over an abstract index must be reported as rank 2"
+    print("  ok  api.vector_args reports the abstract-index Matrix as rank 2")
 
 
 step("finite index types: enums, inferred ∑ ranges, Mathlib linear algebra",
