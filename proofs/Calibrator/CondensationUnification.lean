@@ -433,6 +433,14 @@ cumulants of x²}` overstates what is observable, and this file no longer assert
 obstruction is exactly the hub-energy divergence already formalized here, which is why
 `ObservableTower` carries it as a field rather than as a remark.
 
+**A later correction, recorded here because this section is where a reader meets the
+list.** §5i's rigidity theorem shows the floor-one channels are *redundant* at the Gaussian
+fiber: `hweMellinDrift`, `hweMellinJetVariance` and the arithmetic type are all
+reconstructible from four data — symmetry, `E[x⁴]`, and the odd parts of floors two and
+three. They are not wrong, and they remain the closed-form handles this corpus computes;
+they are simply not minimal. What is minimal includes the odd part of the squared law,
+which no moment list mentions.
+
 **The replacement is a recursion.** The conditional-variance array of an admissible
 design is itself a design — multilinear in the centered squares, with coordinate law the
 law of `x²` — so the observable algebra is self-similar:
@@ -493,7 +501,14 @@ terms with a strictly positive one.
 
 So the sign-coupling channel, which at level one is live only away from `q = 1/2`
 (`standardizedGenotype_symmetric_iff`), is live at level two at every frequency. Symmetry
-fails one floor up, always. -/
+fails one floor up, always.
+
+**This is the decisive fact, not a side note.** The tower rigidity theorem of §5i consumes
+exactly the odd part of the floor-two law, and this theorem says that part is nonzero for
+genotypes at every polymorphic frequency — including `q = 1/2`, where the level-one
+coordinate is symmetric and every moment list therefore reports nothing. The load in the
+rigidity argument is carried by data no moment list mentions, which is why four successive
+finite lists failed to settle the question. -/
 theorem standardizedSquare_never_symmetric (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ¬ ∃ coding : SymmetricCoding DiploidGenotype,
@@ -1260,6 +1275,219 @@ theorem sampleSize_doubly_exponential (k : ℕ) :
   exact mul_le_mul hbound hbound hpos.le (le_trans hpos.le hbound)
 
 end ScaleSequence
+
+/-!
+## 5i. The rigidity phase boundary, and where genotypes sit on it
+
+The founding dichotomy of this arc is settled upstream: **universality holds exactly when
+the coordinate law is Gaussian**, proved at the tower level from four data — symmetry,
+`σ₁ = √2` (equivalently `E[x⁴] = 3`), and the odd parts of the floor-two and floor-three
+laws. The mechanism is contraction: matched odd parts confine the difference measure to a
+small interval, the next floor's map sends that interval strictly negative, and a signed
+measure supported on a strictly negative interval with vanishing odd part is zero.
+
+The mechanism needs the confined squares to stay below one, that is `1/σ₁² < 1`, that is
+
+> `σ₁² > 1`, equivalently `E[x⁴] > 2`.
+
+Below that threshold the images straddle zero and the argument yields nothing. So
+`E[x⁴] = 2` is a phase boundary, and the question for this corpus is which side genotypes
+are on.
+
+**They are strictly inside it, except at one frequency, which sits exactly on it.** Since
+`q(1-q) ≤ 1/4` with equality only at `q = 1/2`, the genotype variance obeys
+`V = 2q(1-q) ≤ 1/2`, and therefore `E[x⁴] = 1/V ≥ 2` at every polymorphic frequency with
+equality exactly at the balanced locus (`standardizedGenotype_fourth_moment_ge_two`,
+`standardizedGenotype_fourth_moment_eq_two_iff`). Rare variants sit far inside, since
+`1/(2q(1-q))` diverges as `q → 0`.
+
+### The balanced locus is special twice, from one cause
+
+`q = 1/2` is now distinguished for two genuinely different reasons: it is the only
+frequency where the coordinate is sign-symmetric (`standardizedGenotype_symmetric_iff`, a
+statement about odd moments), and it is the only frequency on the kurtosis phase boundary
+(a statement about the fourth). These are not the same condition — unlike floor-one scale
+and kurtosis, which are one observable differing by `1`.
+
+They have a **common cause** rather than being a coincidence, and the cause is provable
+here: the reflection `q ↦ 1 - q` sends the standardized coordinate to its negative
+(`reflect_standardizedGenotype`), so every even moment is reflection-invariant
+(`fourthMoment_reflection_invariant`) and `q = 1/2` is the reflection's unique fixed point
+(`balanced_locus_is_reflection_fixed_point`). A coordinate law equals its own negation
+exactly at that fixed point, which is the symmetry; and a reflection-invariant function of
+`q` has its extremum there, which is the kurtosis boundary. One symmetry of
+`Binomial(2, q)`, two consequences.
+
+### What is redundant, which is uncomfortable
+
+The rigidity theorem's corollary is that every other tower datum — all Mellin jets, all
+arithmetic types, all higher floors, all cumulants of iterated squares — is reconstructible
+from the four, hence **logically redundant at the Gaussian fiber**. That includes
+`hweMellinDrift` and `hweMellinJetVariance`, which this corpus has treated as its central
+observables. They are not wrong and they remain the computable handles; they are redundant.
+The load is carried by the odd part of the *squared* law, which no moment list mentions —
+which is exactly why four successive finite lists failed to close the question.
+
+The corpus already owns the decisive fact and it was filed as a side note:
+`standardizedSquare_never_symmetric` proves the odd part of the floor-two law is nonzero at
+every polymorphic frequency, including `q = 1/2`. That is precisely the datum the rigidity
+theorem consumes.
+
+### The horizon problem does not bite
+
+Rigidity needs floors two and three only, with `σ₂ = √14`, comfortably inside any
+sample-size horizon. The doubly-exponentially unreachable floors of §5h are exactly the
+redundant ones, so the cutoff and the theorem never meet: the cutoff stands as a real limit
+on what is measurable and costs the theorem nothing.
+
+**Scope, kept explicit.** These are statements about *complete invariants* of a coordinate
+law, not about what a design can see. The bridge from tower data to design-observable data
+is open upstream, so nothing here should be read as "a design can measure the four".
+-/
+
+/-- The genotype variance is at most one half, with equality at the balanced locus:
+`2q(1-q) ≤ 1/2` because `(2q-1)² ≥ 0`. -/
+theorem hweGenotypeVariance_le_half (h : HardyWeinbergModel) :
+    h.genotypeVariance ≤ 1 / 2 := by
+  rw [h.genotypeVariance_eq]
+  unfold HardyWeinbergModel.refFreq
+  nlinarith [sq_nonneg (h.altFreq - 1 / 2)]
+
+/-- **Every polymorphic genotype coordinate has `E[x⁴] ≥ 2`**, so it lies inside or on the
+rigidity phase boundary. -/
+theorem standardizedGenotype_fourth_moment_ge_two (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    2 ≤ ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
+  have hvar : 0 < h.genotypeVariance := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+    nlinarith [hq0, hcomp]
+  rw [standardizedGenotype_fourth_moment h hq0 hq1, le_div_iff₀ hvar]
+  have hle := hweGenotypeVariance_le_half h
+  linarith [hle]
+
+/-- **Equality holds exactly at the balanced locus.** `E[x⁴] = 2` iff `q = 1/2`, so the
+balanced genotype sits precisely on the phase boundary where the rigidity mechanism's
+one-sided image collapses. -/
+theorem standardizedGenotype_fourth_moment_eq_two_iff (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) = 2 ↔
+      h.altFreq = 1 / 2 := by
+  have hvar : 0 < h.genotypeVariance := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+    nlinarith [hq0, hcomp]
+  have hveq : h.genotypeVariance = 2 * h.altFreq * (1 - h.altFreq) := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    ring
+  rw [standardizedGenotype_fourth_moment h hq0 hq1, div_eq_iff (ne_of_gt hvar)]
+  constructor
+  · intro heq
+    rw [hveq] at heq
+    have hsq : (2 * h.altFreq - 1) ^ 2 = 0 := by nlinarith [heq]
+    have hzero : 2 * h.altFreq - 1 = 0 := by
+      exact pow_eq_zero_iff (n := 2) (by norm_num) |>.mp hsq
+    linarith [hzero]
+  · intro hhalf
+    rw [hveq, hhalf]
+    norm_num
+
+/-- **Every polymorphic locus except the balanced one is strictly inside the rigid
+regime.** This is the discharge of the rigidity theorem's phase hypothesis for genotype
+data: it holds everywhere on the frequency spectrum except at a single point, and it holds
+by an ever-wider margin as the variant gets rarer. -/
+theorem hwe_strictly_inside_rigid_regime (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hunbalanced : h.altFreq ≠ 1 / 2) :
+    2 < ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
+  have hge := standardizedGenotype_fourth_moment_ge_two h hq0 hq1
+  have hne : (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) ≠ 2 := by
+    intro heq
+    exact hunbalanced ((standardizedGenotype_fourth_moment_eq_two_iff h hq0 hq1).mp heq)
+  exact lt_of_le_of_ne hge (Ne.symm hne)
+
+/-- The fourth moment is reflection-invariant, being even data: this is
+`reflect_even_moment` at `k = 2`. -/
+theorem fourthMoment_reflection_invariant (h : HardyWeinbergModel) :
+    (∑ g : DiploidGenotype,
+        h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ 4) =
+      ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
+  have hk := reflect_even_moment h 2
+  norm_num at hk
+  exact hk
+
+/-- **The balanced locus is the unique fixed point of the frequency reflection.**
+
+This is the common cause of the balanced locus being special twice. The reflection sends
+the coordinate to its negative, so a law equals its own negation exactly at the fixed point
+— that is the symmetry — while every even moment is reflection-invariant and so takes its
+extremum there — that is the kurtosis boundary. Two different statements, one symmetry of
+`Binomial(2, q)`. -/
+theorem balanced_locus_is_reflection_fixed_point (h : HardyWeinbergModel) :
+    h.reflect.altFreq = h.altFreq ↔ h.altFreq = 1 / 2 := by
+  rw [HardyWeinbergModel.reflect_altFreq]
+  constructor
+  · intro hfix
+    linarith [hfix]
+  · intro hhalf
+    rw [hhalf]
+    norm_num
+
+/-- Tower rigidity, carried as a named hypothesis with its phase condition in the type.
+
+`IsGaussianCoordinate` and the two odd-part data are abstract because the tower's floors
+are not objects of this corpus; what is concrete is the phase hypothesis
+`2 < fourthMoment`, which `hwe_strictly_inside_rigid_regime` discharges for every
+polymorphic genotype except the balanced one.
+
+**Scope.** This is a statement about complete invariants of a coordinate law. It is not a
+statement about what any design can observe; that bridge is open upstream. -/
+structure TowerRigidity (Law : Type*) where
+  /-- The fourth moment of the coordinate law. -/
+  fourthMoment : Law → ℝ
+  /-- The law admits a value-negating relabelling. -/
+  IsSymmetric : Law → Prop
+  /-- The odd part of the floor-two law. -/
+  floorTwoOddPart : Law → ℝ
+  /-- The odd part of the floor-three law. -/
+  floorThreeOddPart : Law → ℝ
+  /-- The law is the standard Gaussian. -/
+  IsGaussianCoordinate : Law → Prop
+  /-- **Rigidity (analytic input).** Above the phase boundary `E[x⁴] > 2`, a symmetric
+  unit-variance law with the Gaussian's fourth moment and the Gaussian's floor-two and
+  floor-three odd parts is Gaussian. Four data, and the phase hypothesis is an argument
+  because below it the mechanism's images straddle zero. -/
+  rigidity : ∀ ν gaussian : Law, IsGaussianCoordinate gaussian →
+    2 < fourthMoment ν → IsSymmetric ν → fourthMoment ν = fourthMoment gaussian →
+    floorTwoOddPart ν = floorTwoOddPart gaussian →
+    floorThreeOddPart ν = floorThreeOddPart gaussian →
+    IsGaussianCoordinate ν
+
+namespace TowerRigidity
+
+variable {Law : Type*} (R : TowerRigidity Law)
+
+/-- **The redundancy corollary.** Every other tower datum is reconstructible from the four,
+so any further invariant — Mellin drift, jet variance, arithmetic type, higher floors — is
+determined once the four match. Stated as the factoring it is: a report of any function of
+the law agrees on two laws that agree in the four, at the Gaussian fiber.
+
+The corpus's `hweMellinDrift` and `hweMellinJetVariance` are therefore complete-but-
+redundant rather than wrong. They remain the computable handles; the load is carried by the
+odd part of the squared law. -/
+theorem redundant_invariant_of_matched_four {Report : Type*} (report : Law → Report)
+    (ν gaussian : Law) (hgauss : R.IsGaussianCoordinate gaussian)
+    (hphase : 2 < R.fourthMoment ν) (hsym : R.IsSymmetric ν)
+    (hfourth : R.fourthMoment ν = R.fourthMoment gaussian)
+    (htwo : R.floorTwoOddPart ν = R.floorTwoOddPart gaussian)
+    (hthree : R.floorThreeOddPart ν = R.floorThreeOddPart gaussian)
+    (hreport : ∀ μ : Law, R.IsGaussianCoordinate μ → report μ = report gaussian) :
+    report ν = report gaussian :=
+  hreport ν (R.rigidity ν gaussian hgauss hphase hsym hfourth htwo hthree)
+
+end TowerRigidity
 
 /-!
 ## 6. Where the whole development now stands

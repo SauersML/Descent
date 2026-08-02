@@ -953,53 +953,53 @@ theorem cross_ancestry_exact_metric_profile
 generation-indexed SNP/popgen transport model. -/
 structure CrossPopulationGenerationalCalibrationModel (p q : ℕ) where
   metric : CrossPopulationGenerationalModel p q
-  sourceObservedMean : ℝ
+  baseObservedMean : ℝ
   prevalenceShiftAt : ℕ → ℝ
   environmentalObservedShiftAt : ℕ → ℝ
   geneticObservedShiftAt : ℕ → ℝ
-  sourceDeploymentIntercept : ℝ
+  baseDeploymentIntercept : ℝ
   deploymentInterceptShiftAt : ℕ → ℝ
-  sourceTagMean : Fin p → ℝ
+  baseTagMean : Fin p → ℝ
   targetTagMeanAt : ℕ → Fin p → ℝ
+
+/-- **Mean tag genotype in a population at generation `t`.** The source state is fixed, so
+the source slice ignores `t`; indexing both populations the same way is what lets the
+score, prediction and observation below be one definition each instead of two. -/
+noncomputable def CrossPopulationGenerationalCalibrationModel.tagMeanAt
+    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (P : Pop) (t : ℕ) :
+    Fin p → ℝ :=
+  Pop.pair m.baseTagMean (m.targetTagMeanAt t) P
+
+/-- **Deployment intercept in a population at generation `t`.** -/
+noncomputable def CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt
+    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (P : Pop) (t : ℕ) : ℝ :=
+  m.baseDeploymentIntercept + Pop.pair 0 (m.deploymentInterceptShiftAt t) P
 
 /-- Total target observed-mean shift at generation `t`. -/
 noncomputable def CrossPopulationGenerationalCalibrationModel.observedMeanShiftAt
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ :=
   m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t
 
-/-- Mean transported source score in the source population at generation `t`.
-The source state is fixed, but the definition is slice-based so the calibration
-layer matches the metric layer exactly. -/
-noncomputable def CrossPopulationGenerationalCalibrationModel.sourceScoreMeanAt
-    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ :=
-  sourceWeightedTagScore (m.metric.toMetricModelAt t) m.sourceTagMean
+/-- **Mean transported score in a population at generation `t`.** -/
+noncomputable def CrossPopulationGenerationalCalibrationModel.scoreMeanAt
+    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (P : Pop) (t : ℕ) : ℝ :=
+  sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.tagMeanAt P t)
 
-/-- Mean transported source score in the target population at generation `t`. -/
-noncomputable def CrossPopulationGenerationalCalibrationModel.targetScoreMeanAt
-    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ :=
-  sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t)
-
-/-- Score-mean shift at generation `t`, induced by source weights acting on the
-target-vs-source tag-mean difference. -/
+/-- **Score-mean shift at generation `t`**, as the difference of the two score means
+rather than a separately written score of a tag-mean difference. -/
 noncomputable def CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ :=
-  sourceWeightedTagScore (m.metric.toMetricModelAt t)
-    (m.targetTagMeanAt t - m.sourceTagMean)
+  m.scoreMeanAt Pop.target t - m.scoreMeanAt Pop.source t
 
-/-- Source deployed mean prediction at generation `t`. -/
-noncomputable def CrossPopulationGenerationalCalibrationModel.sourcePredictedMeanAt
-    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ :=
-  m.sourceDeploymentIntercept + m.sourceScoreMeanAt t
+/-- **Deployed mean prediction in a population at generation `t`.** -/
+noncomputable def CrossPopulationGenerationalCalibrationModel.predictedMeanAt
+    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (P : Pop) (t : ℕ) : ℝ :=
+  m.deploymentInterceptAt P t + m.scoreMeanAt P t
 
-/-- Target deployed mean prediction at generation `t`. -/
-noncomputable def CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt
-    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ :=
-  m.sourceDeploymentIntercept + m.deploymentInterceptShiftAt t + m.targetScoreMeanAt t
-
-/-- Target observed mean at generation `t`. -/
-noncomputable def CrossPopulationGenerationalCalibrationModel.targetObservedMeanAt
-    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) : ℝ :=
-  m.sourceObservedMean + m.observedMeanShiftAt t
+/-- **Observed mean in a population at generation `t`.** -/
+noncomputable def CrossPopulationGenerationalCalibrationModel.observedMeanAt
+    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (P : Pop) (t : ℕ) : ℝ :=
+  m.baseObservedMean + Pop.pair 0 (m.observedMeanShiftAt t) P
 
 /-- Slice the generational calibration state to the static mechanistic
 calibration state at generation `t`. -/
@@ -1011,44 +1011,43 @@ noncomputable def CrossPopulationGenerationalCalibrationModel.toMechanisticCalib
   prevalenceShift := m.prevalenceShiftAt t
   environmentalObservedShift := m.environmentalObservedShiftAt t
   geneticObservedShift := m.geneticObservedShiftAt t
-  sourceDeploymentIntercept := m.sourceDeploymentIntercept
+  sourceDeploymentIntercept := m.baseDeploymentIntercept
   deploymentInterceptShift := m.deploymentInterceptShiftAt t
-  sourceTagMean := m.sourceTagMean
+  sourceTagMean := m.baseTagMean
   targetTagMean := m.targetTagMeanAt t
 
+/-- The score-mean shift is the difference of the two score means. This needed a
+`sourceWeightedTagScore`/`dotProduct` linearity argument while the shift was defined as the
+score of a tag-mean difference; defining it as the difference makes it `rfl`. -/
 @[simp] theorem CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt_eq_target_minus_source
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) :
-    m.scoreMeanShiftAt t = m.targetScoreMeanAt t - m.sourceScoreMeanAt t := by
-  unfold CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt
-    CrossPopulationGenerationalCalibrationModel.targetScoreMeanAt
-    CrossPopulationGenerationalCalibrationModel.sourceScoreMeanAt
-    sourceWeightedTagScore
-  simp [dotProduct, Finset.sum_sub_distrib, mul_sub]
+    m.scoreMeanShiftAt t = m.scoreMeanAt Pop.target t - m.scoreMeanAt Pop.source t := rfl
 
 @[simp] theorem CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt_eq
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) :
-    m.targetPredictedMeanAt t =
-      m.sourcePredictedMeanAt t + m.scoreMeanShiftAt t + m.deploymentInterceptShiftAt t := by
-  rw [CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt_eq_target_minus_source]
-  unfold CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt
-    CrossPopulationGenerationalCalibrationModel.sourcePredictedMeanAt
+    m.predictedMeanAt Pop.target t =
+      m.predictedMeanAt Pop.source t + m.scoreMeanShiftAt t + m.deploymentInterceptShiftAt t := by
+  unfold CrossPopulationGenerationalCalibrationModel.predictedMeanAt
+    CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt
+    CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt
+  simp
   ring
 
 @[simp] theorem CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt_targetObservedMean
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) :
-    (m.toMechanisticCalibrationModelAt t).targetObservedMean = m.targetObservedMeanAt t := by
+    (m.toMechanisticCalibrationModelAt t).targetObservedMean = m.observedMeanAt Pop.target t := by
   simp [CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt,
-    CrossPopulationGenerationalCalibrationModel.targetObservedMeanAt,
+    CrossPopulationGenerationalCalibrationModel.observedMeanAt,
     CrossPopulationGenerationalCalibrationModel.observedMeanShiftAt,
     CrossPopulationMechanisticCalibrationModel.targetObservedMean,
     CrossPopulationMechanisticCalibrationModel.observedMeanShift, add_assoc]
 
 @[simp] theorem CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt_targetPredictedMean
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) :
-    (m.toMechanisticCalibrationModelAt t).targetPredictedMean = m.targetPredictedMeanAt t := by
+    (m.toMechanisticCalibrationModelAt t).targetPredictedMean = m.predictedMeanAt Pop.target t := by
   simp [CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt,
-    CrossPopulationGenerationalCalibrationModel.targetPredictedMeanAt,
-    CrossPopulationGenerationalCalibrationModel.targetScoreMeanAt,
+    CrossPopulationGenerationalCalibrationModel.predictedMeanAt,
+    CrossPopulationGenerationalCalibrationModel.scoreMeanAt,
     CrossPopulationMechanisticCalibrationModel.targetPredictedMean,
     CrossPopulationMechanisticCalibrationModel.targetScoreMean]
 
@@ -1073,7 +1072,7 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
       { citl :=
           (m.sourceObservedMean +
               (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t)) -
-            (m.sourceDeploymentIntercept + m.deploymentInterceptShiftAt t +
+            (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
       , slope := targetCalibrationSlopeAtGeneration m.metric t
       , link := link } := by
@@ -1130,7 +1129,7 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
       { citl :=
           (m.sourceObservedMean +
               (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t)) -
-            (m.sourceDeploymentIntercept + m.deploymentInterceptShiftAt t +
+            (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
       , slope := targetCalibrationSlopeAtGeneration m.metric t
       , link := link } := by

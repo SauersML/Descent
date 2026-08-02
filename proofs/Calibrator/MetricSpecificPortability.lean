@@ -1746,4 +1746,219 @@ theorem ldBlock_detection_integral_ratio_le_retention {recomb Ne : ℝ}
 
 end GeneticFrontier
 
+/-!
+## One correction, several deployment targets: the spread law
+
+`ProjectionShiftBounds.sharedCorrectionOptimum` gives the recalibration each
+target would choose on its own.  A score deployed to several populations gets
+*one* correction.  This section prices that constraint, and the price has a
+closed form: it is the curvature-weighted variance of the per-target optimal
+corrections, zero exactly when they agree.
+
+The curvature weight is not a free parameter — it is
+`weight i * coefficientEnergy (B i) beta`, the deployment weight times the
+transported direction's energy in that target's own second-moment matrix.  So a
+target with little signal energy in the score's direction pulls the shared
+correction weakly, which is the right behaviour and is forced rather than
+stipulated.
+
+Why this is worth having: multi-population incompatibility becomes a number
+computable from quantities already in the corpus — compute `a_i*` per target,
+take the weighted variance — instead of a program to be solved or a qualitative
+warning to be repeated.
+-/
+
+section SharedCorrectionFamily
+
+variable {ι J : Type*} [Fintype ι] [Fintype J] [DecidableEq J]
+
+/-- **Curvature of a target's recalibration objective**: how hard target `i`
+pulls on the shared correction.  Deployment weight times the energy of the
+transported direction in that target's own second-moment matrix.
+
+Empirical status: UNTESTED. -/
+def targetCorrectionCurvature (weight : ι → ℝ) (B : ι → Matrix J J ℝ)
+    (beta : J → ℝ) : ι → ℝ :=
+  fun i => weight i * coefficientEnergy (B i) beta
+
+/-- **The correction each target would choose alone**, as a family indexed by
+deployment target.
+
+Empirical status: UNTESTED. -/
+def targetCorrectionOptimum (B : ι → Matrix J J ℝ) (beta theta : J → ℝ) :
+    ι → ℝ :=
+  fun i => sharedCorrectionOptimum (B i) beta theta
+
+/-- The curvature-weighted mean of the per-target optimal corrections: the
+shared correction that a weighted-least-squares compromise selects.
+
+Empirical status: UNTESTED. -/
+def sharedCorrectionConsensus (curvature optimum : ι → ℝ) : ℝ :=
+  (∑ i, curvature i * optimum i) / ∑ i, curvature i
+
+/-- **The spread law's right-hand side**: the curvature-weighted variance of the
+per-target optimal corrections.
+
+Empirical status: UNTESTED. -/
+def sharedCorrectionSpread (curvature optimum : ι → ℝ) : ℝ :=
+  ∑ i, curvature i *
+    (optimum i - sharedCorrectionConsensus curvature optimum) ^ 2
+
+/-- Total excess risk incurred across the family by applying the single
+correction `correction` instead of each target's own optimum.
+
+Empirical status: UNTESTED. -/
+def sharedCorrectionCost (curvature optimum : ι → ℝ) (correction : ℝ) : ℝ :=
+  ∑ i, curvature i * (correction - optimum i) ^ 2
+
+/-- The consensus correction is the curvature-weighted centroid: deviations from
+it cancel under the curvature weights.  This is the one computation the spread
+law rests on. -/
+theorem sharedCorrection_centered (curvature optimum : ι → ℝ)
+    (hC : ∑ i, curvature i ≠ 0) :
+    ∑ i, curvature i *
+        (sharedCorrectionConsensus curvature optimum - optimum i) = 0 := by
+  have hsplit : ∑ i, curvature i *
+        (sharedCorrectionConsensus curvature optimum - optimum i) =
+      sharedCorrectionConsensus curvature optimum * (∑ i, curvature i) -
+        ∑ i, curvature i * optimum i := by
+    calc ∑ i, curvature i *
+          (sharedCorrectionConsensus curvature optimum - optimum i)
+        = ∑ i, (sharedCorrectionConsensus curvature optimum * curvature i -
+            curvature i * optimum i) :=
+          Finset.sum_congr rfl (fun i _ => by ring)
+      _ = (∑ i, sharedCorrectionConsensus curvature optimum * curvature i) -
+            ∑ i, curvature i * optimum i := by
+          rw [Finset.sum_sub_distrib]
+      _ = sharedCorrectionConsensus curvature optimum * (∑ i, curvature i) -
+            ∑ i, curvature i * optimum i := by
+          rw [← Finset.mul_sum]
+  rw [hsplit]
+  unfold sharedCorrectionConsensus
+  rw [div_mul_cancel₀ _ hC, sub_self]
+
+/-- **The spread law.**  The cost of any single shared correction splits into a
+consensus term, which the best shared correction drives to zero, and the
+curvature-weighted variance of the per-target optima, which nothing drives to
+zero.  The second term is the price of sharing. -/
+theorem sharedCorrectionCost_eq_consensus_add_spread
+    (curvature optimum : ι → ℝ) (correction : ℝ) (hC : ∑ i, curvature i ≠ 0) :
+    sharedCorrectionCost curvature optimum correction =
+      (∑ i, curvature i) *
+          (correction - sharedCorrectionConsensus curvature optimum) ^ 2 +
+        sharedCorrectionSpread curvature optimum := by
+  have hcentered := sharedCorrection_centered curvature optimum hC
+  unfold sharedCorrectionCost sharedCorrectionSpread
+  calc ∑ i, curvature i * (correction - optimum i) ^ 2
+      = ∑ i, (curvature i *
+              (correction - sharedCorrectionConsensus curvature optimum) ^ 2 +
+            2 * (correction - sharedCorrectionConsensus curvature optimum) *
+              (curvature i *
+                (sharedCorrectionConsensus curvature optimum - optimum i)) +
+            curvature i *
+              (optimum i - sharedCorrectionConsensus curvature optimum) ^ 2) :=
+        Finset.sum_congr rfl (fun i _ => by ring)
+    _ = (∑ i, curvature i *
+            (correction - sharedCorrectionConsensus curvature optimum) ^ 2) +
+          (∑ i, 2 * (correction - sharedCorrectionConsensus curvature optimum) *
+            (curvature i *
+              (sharedCorrectionConsensus curvature optimum - optimum i))) +
+          ∑ i, curvature i *
+            (optimum i - sharedCorrectionConsensus curvature optimum) ^ 2 := by
+        rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
+    _ = (∑ i, curvature i) *
+            (correction - sharedCorrectionConsensus curvature optimum) ^ 2 +
+          ∑ i, curvature i *
+            (optimum i - sharedCorrectionConsensus curvature optimum) ^ 2 := by
+        rw [← Finset.sum_mul, ← Finset.mul_sum, hcentered, mul_zero, add_zero]
+
+/-- No shared correction beats the spread. -/
+theorem sharedCorrectionSpread_le_cost (curvature optimum : ι → ℝ)
+    (correction : ℝ) (hCpos : 0 < ∑ i, curvature i) :
+    sharedCorrectionSpread curvature optimum ≤
+      sharedCorrectionCost curvature optimum correction := by
+  rw [sharedCorrectionCost_eq_consensus_add_spread curvature optimum correction
+    (ne_of_gt hCpos)]
+  nlinarith [mul_nonneg (le_of_lt hCpos)
+    (sq_nonneg (correction - sharedCorrectionConsensus curvature optimum))]
+
+/-- And the consensus correction attains it, so the spread is the value of the
+shared-correction problem rather than a lower bound for it. -/
+theorem sharedCorrectionCost_at_consensus (curvature optimum : ι → ℝ)
+    (hC : ∑ i, curvature i ≠ 0) :
+    sharedCorrectionCost curvature optimum
+        (sharedCorrectionConsensus curvature optimum) =
+      sharedCorrectionSpread curvature optimum := by
+  rw [sharedCorrectionCost_eq_consensus_add_spread curvature optimum _ hC,
+    sub_self]
+  norm_num
+
+theorem sharedCorrectionSpread_nonneg (curvature optimum : ι → ℝ)
+    (hc : ∀ i, 0 ≤ curvature i) :
+    0 ≤ sharedCorrectionSpread curvature optimum := by
+  unfold sharedCorrectionSpread
+  exact Finset.sum_nonneg (fun i _ => mul_nonneg (hc i) (sq_nonneg _))
+
+/-- **The price of sharing vanishes exactly on agreement.** -/
+theorem sharedCorrectionSpread_eq_zero_iff (curvature optimum : ι → ℝ)
+    (hc : ∀ i, 0 < curvature i) :
+    sharedCorrectionSpread curvature optimum = 0 ↔
+      ∀ i, optimum i = sharedCorrectionConsensus curvature optimum := by
+  have hnn : ∀ j ∈ (Finset.univ : Finset ι), 0 ≤ curvature j *
+      (optimum j - sharedCorrectionConsensus curvature optimum) ^ 2 :=
+    fun j _ => mul_nonneg (le_of_lt (hc j)) (sq_nonneg _)
+  constructor
+  · intro h i
+    have hle : curvature i *
+        (optimum i - sharedCorrectionConsensus curvature optimum) ^ 2 ≤
+        sharedCorrectionSpread curvature optimum :=
+      Finset.single_le_sum hnn (Finset.mem_univ i)
+    have hterm : curvature i *
+        (optimum i - sharedCorrectionConsensus curvature optimum) ^ 2 = 0 := by
+      linarith [hnn i (Finset.mem_univ i), hle, h]
+    have hsq : (optimum i -
+        sharedCorrectionConsensus curvature optimum) ^ 2 = 0 := by
+      rcases mul_eq_zero.mp hterm with hcase | hcase
+      · exact absurd hcase (ne_of_gt (hc i))
+      · exact hcase
+    have hdiff := sq_eq_zero_iff.mp hsq
+    linarith
+  · intro h
+    unfold sharedCorrectionSpread
+    refine Finset.sum_eq_zero ?_
+    intro i _
+    rw [h i, sub_self]
+    ring
+
+/-- **The obstruction restated on the per-target optima.**  The shared
+correction is free exactly when every target wants the same correction — which
+is the vanishing of the pairwise differences `a_i* - a_j*`. -/
+theorem sharedCorrectionSpread_eq_zero_iff_agree (curvature optimum : ι → ℝ)
+    (hc : ∀ i, 0 < curvature i) (hC : ∑ i, curvature i ≠ 0) :
+    sharedCorrectionSpread curvature optimum = 0 ↔
+      ∀ i j, optimum i = optimum j := by
+  rw [sharedCorrectionSpread_eq_zero_iff curvature optimum hc]
+  constructor
+  · intro h i j
+    rw [h i, h j]
+  · intro h i
+    have hsum : ∑ j, curvature j * optimum j =
+        optimum i * ∑ j, curvature j := by
+      rw [Finset.mul_sum]
+      exact Finset.sum_congr rfl (fun j _ => by rw [h j i]; ring)
+    unfold sharedCorrectionConsensus
+    rw [hsum, mul_div_assoc, div_self hC, mul_one]
+
+/-- **The degenerate control, pinned by proof rather than by a run.**  A family
+of targets that all want the same correction pays nothing for sharing one.  Any
+simulation of the spread law must return exactly zero here. -/
+theorem sharedCorrectionSpread_of_identical_optima (curvature : ι → ℝ)
+    (a : ℝ) (hc : ∀ i, 0 < curvature i) (hC : ∑ i, curvature i ≠ 0) :
+    sharedCorrectionSpread curvature (fun _ => a) = 0 := by
+  rw [sharedCorrectionSpread_eq_zero_iff_agree curvature (fun _ => a) hc hC]
+  intro i j
+  rfl
+
+end SharedCorrectionFamily
+
 end Calibrator

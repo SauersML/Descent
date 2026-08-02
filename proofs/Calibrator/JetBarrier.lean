@@ -34,6 +34,15 @@ therefore the **nonlattice, 2-jet-matched** class. The chameleon construction (a
 exponential-family perturbation of a continuous log-density) lives there, so the
 calibration object survives with its domain corrected.
 
+**Two completeness claims, and they are not the same claim.** This file's trichotomy says
+what a *disjoint design* can see: the triple, and nothing else. It does not say the triple
+is a minimal invariant of the coordinate law, and it is not one —
+`Calibrator.CondensationUnification`'s tower rigidity shows `(c, v, lattice)` is
+reconstructible from four data, so the triple is complete-but-redundant at the Gaussian
+fiber, with the load carried by the odd part of the squared law. The two statements live at
+different levels and the bridge between them, from tower data to design-observable data, is
+open upstream. Nothing here should be read as "a design can measure the four".
+
 ## Status labels
 
 * Theorem 1a (nonlattice barrier): the slab-comparison step is discharged by **Stone's
