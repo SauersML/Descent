@@ -8,6 +8,8 @@ import Calibrator.CovarianceStructure
 import Calibrator.AncestrySpecificPower
 import Calibrator.GeneticArchitectureDiscovery
 import Calibrator.LongitudinalPortability
+import Calibrator.ImputationPortability
+import Calibrator.SimulationValidation
 import Calibrator.LDDecayTheory
 import Calibrator.MetricSpecificPortability
 import Calibrator.PhenomeWidePortability
@@ -22,6 +24,8 @@ import Calibrator.PortabilityBounds
 import Calibrator.CovarianceStructure
 import Calibrator.HaplotypeTheory
 import Calibrator.LongitudinalPortability
+import Calibrator.ImputationPortability
+import Calibrator.SimulationValidation
 import Calibrator.PortabilityDrift
 import Calibrator.StratificationConfounding
 
@@ -698,6 +702,39 @@ theorem hudsonFstFromCoalescenceTimes_eq_oneMinusRatio (ETss ETst : ℝ) :
 theorem r2FromMSE_eq_oneMinusRatio (mse varY : ℝ) :
     r2FromMSE mse varY = oneMinusRatio mse varY := by
   unfold r2FromMSE oneMinusRatio; ring_nf
+
+/-! ### Retention and ratio maps
+
+Three further groups are one map under several names. -/
+
+/-- Retained fraction, `(1 - loss) · total`: the ascertainment-loss survivor,
+the neutral portability ratio and the present-day PGS variance are one map. -/
+noncomputable def retainedFraction (loss total : ℝ) : ℝ := (1 - loss) * total
+
+theorem ascertainment_loss_eq_retainedFraction (coverage v_causal : ℝ) :
+    ascertainment_loss coverage v_causal = retainedFraction coverage v_causal := by
+  unfold ascertainment_loss retainedFraction; ring
+
+theorem neutralPortabilityRatioLD_eq_retainedFraction (fst ld : ℝ) :
+    neutralPortabilityRatioLD fst ld = retainedFraction fst ld := by
+  unfold neutralPortabilityRatioLD retainedFraction; ring
+
+theorem presentDayPGSVariance_eq_retainedFraction (V_A fst : ℝ) :
+    presentDayPGSVariance V_A fst = retainedFraction fst V_A := by
+  unfold presentDayPGSVariance retainedFraction; ring
+
+/-- Squared covariance over the product of variances: the transport-moment
+explained `R²` and the PGS `R²` are one map. -/
+theorem explainedR2FromTransportMoments_eq_pgsR2 (cov vs vy : ℝ) :
+    explainedR2FromTransportMoments cov vs vy = pgsR2 cov vs vy := by
+  unfold explainedR2FromTransportMoments pgsR2; ring_nf
+
+/-- The two portability ratios are the same quotient of transported metrics,
+written in `SimulationValidation` and in `GeneticArchitectureDiscovery`. -/
+theorem mechanisticPortabilityRatio_eq_sourceTargetPortabilityRatio
+    {p q : ℕ} (m : CrossPopulationMetricModel p q) :
+    mechanisticPortabilityRatio m = sourceTargetPortabilityRatio m := by
+  unfold mechanisticPortabilityRatio sourceTargetPortabilityRatio; ring_nf
 
 end EquilibriumAgreements
 

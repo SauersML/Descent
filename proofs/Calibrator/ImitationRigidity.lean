@@ -718,6 +718,81 @@ theorem ldWhiteningGain_of_ldRetention_antitone
     · exact hone
   exact ldWhiteningGain_strictMono hret₂ habs hlt'
 
+/-- **Exact whitening cost of a finite chromosome**: `tr K⁻¹` for the
+stationary LD kernel on `nSites` variants, in closed form at every finite size
+rather than only in the limit.
+
+Empirical status: DERIVED from the first-order Markov structure — one
+unconstrained variant plus `nSites - 1` variants each whitened against its
+neighbour, which is the content of `ldPrecisionTrace_eq_boundary_add_interior`.
+The three-term identities below are the interior verification that the
+tridiagonal precision inverts the kernel; the boundary rows and the resulting
+finite-size correction are checked numerically in
+`proofs/validation/imitation_rigidity/check_imitation.py`. -/
+def ldPrecisionTrace (decay : ℝ) (nSites : ℕ) : ℝ :=
+  ((nSites : ℝ) * (1 + decay ^ 2) - 2 * decay ^ 2) / (1 - decay ^ 2)
+
+/-- **Interior three-term identity.** Away from the ends of the chromosome the
+geometric LD sequence is annihilated by the tridiagonal AR(1) precision
+stencil: this is why the inverse of a stationary LD matrix is banded, and hence
+why whitening is a local operation on the genome rather than a global one. -/
+theorem stationaryLD_three_term (decay : ℝ) (separation : ℕ) (h : 1 ≤ separation) :
+    (1 + decay ^ 2) * stationaryLDEntry decay separation
+      - decay * stationaryLDEntry decay (separation - 1)
+      - decay * stationaryLDEntry decay (separation + 1) = 0 := by
+  obtain ⟨e, rfl⟩ := Nat.exists_eq_add_of_le h
+  unfold stationaryLDEntry
+  simp only [Nat.add_sub_cancel_left, pow_add, pow_succ, pow_one]
+  ring
+
+/-- The same stencil applied at zero separation returns the whitening constant
+`1 - ρ²`: the diagonal of the identity, and the origin of the whitening gain. -/
+theorem stationaryLD_three_term_diagonal (decay : ℝ) :
+    (1 + decay ^ 2) * stationaryLDEntry decay 0
+      - decay * stationaryLDEntry decay 1
+      - decay * stationaryLDEntry decay 1 = 1 - decay ^ 2 := by
+  unfold stationaryLDEntry
+  ring
+
+/-- **The whitening cost decomposes into one boundary variant plus interior
+variants.** Each interior variant contributes exactly the whitening gain; the
+first variant, having no left neighbour to be whitened against, contributes
+one. This is the finite-chromosome correction that the limit hides. -/
+theorem ldPrecisionTrace_eq_boundary_add_interior {decay : ℝ} (hd : |decay| < 1)
+    (nSites : ℕ) (hsites : 1 ≤ nSites) :
+    ldPrecisionTrace decay nSites =
+      1 + ((nSites : ℝ) - 1) * ldWhiteningGain decay := by
+  have hne : (1 : ℝ) - decay ^ 2 ≠ 0 := by
+    have := sq_abs decay
+    nlinarith [abs_nonneg decay, hd]
+  unfold ldPrecisionTrace ldWhiteningGain
+  field_simp
+  ring
+
+/-- **The whitening gain is the per-variant limit of the whitening cost.** The
+quantity that detection thresholds are stated in is the large-chromosome limit
+of an exactly computable finite-size quantity. -/
+theorem ldPrecisionTrace_div_sites_tendsto {decay : ℝ} (hd : |decay| < 1) :
+    Filter.Tendsto (fun nSites : ℕ => ldPrecisionTrace decay nSites / (nSites : ℝ))
+      Filter.atTop (nhds (ldWhiteningGain decay)) := by
+  have hne : (1 : ℝ) - decay ^ 2 ≠ 0 := by
+    have := sq_abs decay
+    nlinarith [abs_nonneg decay, hd]
+  have heq : ∀ᶠ nSites : ℕ in Filter.atTop,
+      ldPrecisionTrace decay nSites / (nSites : ℝ) =
+        ldWhiteningGain decay + (1 - ldWhiteningGain decay) / (nSites : ℝ) := by
+    filter_upwards [Filter.eventually_ge_atTop 1] with nSites hsites
+    have hpos : (0 : ℝ) < (nSites : ℝ) := by
+      exact_mod_cast Nat.lt_of_lt_of_le Nat.zero_lt_one hsites
+    rw [ldPrecisionTrace_eq_boundary_add_interior hd nSites hsites]
+    field_simp
+    ring
+  refine Filter.Tendsto.congr' heq.symm ?_
+  have hzero : Filter.Tendsto
+      (fun nSites : ℕ => (1 - ldWhiteningGain decay) / (nSites : ℝ))
+      Filter.atTop (nhds 0) := tendsto_const_div_atTop_nhds_zero_nat _
+  simpa using tendsto_const_nhds.add hzero
+
 end StationaryLD
 
 section Spectator
