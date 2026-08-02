@@ -86,13 +86,39 @@ check("structure invariant fields carried",
 
 import lean_defs                                                # noqa: E402
 
-approx("neiFst(0.4, 0.3)", lean_defs.neiFst(0.4, 0.3), (0.4 - 0.3) / 0.4)
-approx("simpleFst(0.2, 0.6)", lean_defs.simpleFst(0.2, 0.6),
-       (0.2 - 0.6) ** 2 / (4 * 0.4 * (1 - 0.4)))
-approx("coalFst(100, 1000)", lean_defs.coalFst(100.0, 1000.0), 100 / (100 + 2000))
-approx("expectedHeterozygosity(0.5)", lean_defs.expectedHeterozygosity(0.5), 1 / 3)
-approx("equilibriumFst(0.01, 1000)", lean_defs.equilibriumFst(0.01, 1000.0),
-       1 / (1 + 4 * 1000 * 0.01))
+
+def evaluates(label, fq, args, want, tol=1e-12):
+    """Hand-checked value, with a DELETED definition reported as deletion.
+
+    Several agents edit this corpus continuously, so a name in this file can
+    stop existing.  A bare `lean_defs.foo(...)` then raises AttributeError,
+    which is indistinguishable from the extractor having broken -- and the
+    difference is the whole verdict.  Look the name up first and say which
+    happened.
+    """
+    if fq not in BY_NAME:
+        print(f"  SKIP {label}: {fq} is no longer in the corpus "
+              f"(deleted upstream, not an extraction failure)")
+        return
+    fn = getattr(lean_defs, fq.replace(".", "_"), None) \
+        or getattr(lean_defs, fq.split(".")[-1], None)
+    if fn is None:
+        failures.append(f"{label}: {fq} is in the table but has no callable; "
+                        f"if its short name became ambiguous this test must use "
+                        f"the fully-qualified form")
+        return
+    approx(label, fn(*args), want, tol)
+
+
+evaluates("neiFst(0.4, 0.3)", "Calibrator.neiFst", (0.4, 0.3), (0.4 - 0.3) / 0.4)
+evaluates("simpleFst(0.2, 0.6)", "Calibrator.simpleFst", (0.2, 0.6),
+          (0.2 - 0.6) ** 2 / (4 * 0.4 * (1 - 0.4)))
+evaluates("coalFst(100, 1000)", "Calibrator.coalFst", (100.0, 1000.0),
+          100 / (100 + 2000))
+evaluates("expectedHeterozygosity(0.5)", "Calibrator.expectedHeterozygosity",
+          (0.5,), 1 / 3)
+evaluates("equilibriumFst(0.01, 1000)", "Calibrator.equilibriumFst",
+          (0.01, 1000.0), 1 / (1 + 4 * 1000 * 0.01))
 
 # Mathlib totality: these are exactly the cases a hand transcription gets wrong
 approx("Lean division by zero is 0", lean_defs.neiFst(0.0, 0.0), 0.0)
