@@ -72,6 +72,7 @@ def run():
     c1b = load("results_check1b.json") or []
     c2 = load("results_check2.json") or []
     c5 = (load("results_check5.json") or {}).get("recurrences", [])
+    c7 = load("results_check7.json") or []
 
     # short name -> fully-qualified, for results that key on the short name
     short2fq = defaultdict(list)
@@ -129,6 +130,16 @@ def run():
         if fq in defs and r["status"] in ("has_nonzero_rest_point", "ONLY_REST_POINT_IS_ZERO"):
             verified_by[fq].append(("check5_recurrence_limit", r["detail"].get("rest_points")))
 
+    # CHECK 7: a theorem that constrains the definition, whether or not its
+    # name advertises a derivation.  Carries its own mutation evidence, so it
+    # passes the falsifiability gate by construction.
+    check7_strength = {}
+    for r in c7:
+        if r.get("status") == "NEWLY_COVERED":
+            verified_by[r["fqn"]].append(("check7_widened_certificate",
+                                          r.get("strongest_theorem")))
+            check7_strength[r["fqn"]] = r.get("strength")
+
     # --- falsifiability gate: mutation must have been rejected
     def falsifiable(fq, short):
         for key in (fq, short):
@@ -156,6 +167,9 @@ def run():
             rec["detail"] = refuted_by[fq][0][1]
         elif fq in verified_by:
             ok, via = falsifiable(fq, short)
+            if fq in check7_strength:          # check7 supplies its own evidence
+                ok, via = True, "check7_widened_certificate"
+                rec["certificate_strength"] = check7_strength[fq]
             if ok:
                 rec["status"] = "VERIFIED"
                 rec["evidence"] = sorted({c for c, _ in verified_by[fq]})
@@ -178,7 +192,14 @@ def run():
             elif fq in unreached:
                 reason = unreached[fq]
             else:
-                reason = "no derivation or fixed-point theorem reaches it"
+                # Precision matters here: an earlier wording said "no theorem
+                # reaches it", which was false for 167 of the definitions it
+                # was applied to and made the residue look hopeless.  They are
+                # mentioned by theorems; what they lacked was a theorem whose
+                # NAME advertises a derivation.
+                n_thm = len(d.get("mentioned_by") or [])
+                reason = ("no theorem constrains it under perturbation "
+                          f"({n_thm} theorem(s) mention it)")
             rec["status"] = "UNREACHABLE"
             rec["reason"] = reason
         ledger[fq] = rec

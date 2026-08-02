@@ -28,7 +28,7 @@ PY = sys.executable
 
 STEPS = ["leanparse.py", "check1_fixedpoints.py", "check1b_joint.py", "check3_duplicates.py",
          "check2_derivations.py", "check4_limits.py", "check5_recurrences.py", "mutation.py",
-         "check6_certificates.py", "homonyms.py"]
+         "check6_certificates.py", "homonyms.py", "check7_widened.py"]
 
 # Modules whose claims are being revised upstream right now.  A finding here is
 # not actionable and must not be reported as a defect: the author is already

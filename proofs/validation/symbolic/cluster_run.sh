@@ -45,7 +45,7 @@ echo "=== regression suite (against the results just produced) ==="
 python3 test_regressions.py
 echo
 
-echo "=== slice ledger ==="
+echo "=== slice ledger (consumes check7) ==="
 python3 slice_ledger.py
 echo
 
