@@ -351,6 +351,7 @@ theorem catalogue_induces_reduction
     inv (codedDecayProfile B x) ≠ inv (codedDecayProfile B y) :=
   by
   have hcatalogue : IsCompleteCatalogue BoundedLogDistortion inv := hcomplete
-  exact hcatalogue.separates (inequivalent_of_unbounded_coding B x y hdiv)
+  exact IsCompleteCatalogue.separates hcatalogue
+    (inequivalent_of_unbounded_coding B x y hdiv)
 
 end Calibrator

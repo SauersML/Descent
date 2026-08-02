@@ -276,7 +276,6 @@ theorem selectionMigrationEquilibrium_isFixedPoint (s m : ℝ)
     ring
   rw [hden]
   field_simp
-  ring
 
 /-- **Migration swamps selection.**  Once migration exceeds the selective
 advantage the allele is lost, not merely rare.  The previous statement of this
@@ -316,11 +315,19 @@ theorem selectionMigrationEquilibrium_orderings (s m : ℝ)
     selectionMigrationEquilibrium s m =
       (1 - m) * selectionMigrationEquilibriumMigrationFirst s m := by
   have hm : (0 : ℝ) < 1 - m := by linarith
+  have hs : s ≠ 0 := ne_of_gt h_s
+  have hm' : (1 : ℝ) - m ≠ 0 := ne_of_gt hm
+  -- One migration step is exactly the factor between the two conventions.
+  have hkey : (s - m - m * s) / s =
+      (1 - m) * ((s - m - m * s) / (s * (1 - m))) := by
+    field_simp
+    ring
   unfold selectionMigrationEquilibrium selectionMigrationEquilibriumMigrationFirst
-  rw [← mul_max_of_nonneg _ _ hm.le, mul_zero]
-  congr 1
-  field_simp
-  ring
+  rcases le_or_lt ((s - m - m * s) / (s * (1 - m))) 0 with h | h
+  · have h0 : (s - m - m * s) / s ≤ 0 := by rw [hkey]; nlinarith
+    rw [max_eq_left h0, max_eq_left h, mul_zero]
+  · have h0 : 0 ≤ (s - m - m * s) / s := by rw [hkey]; nlinarith
+    rw [max_eq_right h0, max_eq_right h.le, hkey]
 
 /-- **Loci under selection contribute disproportionally to portability loss.**
     Selected loci have higher Fst → larger portability impact
