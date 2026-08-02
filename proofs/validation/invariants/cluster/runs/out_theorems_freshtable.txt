@@ -1,1 +1,7 @@
 982 definitions -> /projects/standard/hsiehph/sauer354/ranges_wt/proofs/validation/invariants/defs.json
+2268 theorem statements parsed
+  680 usable (hypotheses modelled, admissible points found)
+  680 hold numerically
+  0 disagree with this checker -- checker bugs, not corpus defects
+  321 definitions are DISCRIMINATED by some theorem (a mutant breaks it)
+REV: 7901f79c
