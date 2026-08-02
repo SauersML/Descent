@@ -100,7 +100,12 @@ def call(name, *pos):
     return float(fn(*pos))
 
 
-REPS = 8
+# Replicates are the unit of independence: sites along a recombining sequence
+# are linked, so 3500 segregating sites are nowhere near 3500 observations and
+# the standard error has to come from the spread ACROSS replicates. Eight was
+# too few to give that spread a shape; thirty is the number the sigma-based
+# controls below are judged with.
+REPS = 30
 SEQ = 5_000_000
 RHO = 1e-8
 
@@ -117,53 +122,98 @@ def sfs_of(ts, n):
 # ===========================================================================
 
 def controls_neutral():
+    """EACH CONTROL IS JUDGED AGAINST ITS OWN MONTE CARLO NOISE.
+
+    A fixed threshold on a Monte Carlo quantity reports the run's precision
+    rather than its correctness -- the mistake fam_coalescent.py records having
+    made at its t = 0 cell. Sites along a recombining sequence are LINKED, so
+    the number of sites is not the number of independent observations and a
+    binomial standard error would be far too small. The replicate is the unit
+    of independence here, so every statistic is computed PER REPLICATE and the
+    spread across replicates supplies the standard error.
+
+    Cells also get INDEPENDENT SEEDS. Sharing seeds across the mu = 1e-8 and
+    mu = 2e-8 cells would place the same trees under both, and three cells that
+    agree because they are the same trees would look like three confirmations.
+    """
     rows = []
-    for (Ne, mu, n) in ((5000, 1e-8, 20), (5000, 2e-8, 20), (5000, 1e-8, 40)):
+    for cell, (Ne, mu, n) in enumerate(((5000, 1e-8, 20), (5000, 2e-8, 20),
+                                        (5000, 1e-8, 40))):
         theta_per_site = call("scaledMutationRate", float(Ne), mu)
-        acc = np.zeros(n - 1)
+        theta_total = theta_per_site * SEQ
+        per_rep = []
         for r in range(REPS):
+            seed = 1_000_000 * (cell + 1) + r
             ts = msprime.sim_ancestry(samples=n // 2, population_size=Ne,
                                       sequence_length=SEQ,
                                       recombination_rate=RHO,
-                                      random_seed=1000 + r)
-            ts = msprime.sim_mutations(ts, rate=mu, random_seed=7000 + r)
-            acc += sfs_of(ts, n)
-        eta = acc / REPS
-        theta_total = theta_per_site * SEQ
+                                      random_seed=seed)
+            ts = msprime.sim_mutations(ts, rate=mu, random_seed=seed + 7)
+            per_rep.append(sfs_of(ts, n))
+        per_rep = np.asarray(per_rep)                  # (REPS, n-1)
+        eta = per_rep.mean(axis=0)
         pred = np.asarray(refs.sfs_expected_counts(n, theta_total))
-        # C1 SHAPE: normalise both to sum 1 and compare.
-        shape_meas = eta / eta.sum()
-        shape_pred = pred / pred.sum()
-        shape_err = float(np.max(np.abs(shape_meas - shape_pred)))
-        # C2 SCALE: total segregating sites vs Watterson.
-        S_meas = float(eta.sum())
+
+        # --- C2 SCALE: total segregating sites vs Watterson -----------------
+        S_rep = per_rep.sum(axis=1)
+        S_meas = float(S_rep.mean())
+        S_sem = float(S_rep.std(ddof=1)) / np.sqrt(REPS)
         S_pred = float(pred.sum())
         scale_rel = (S_pred - S_meas) / S_meas
-        # C3 SINGLETONS: proportion, sample-size dependent, theta-free.
-        sing_meas = float(eta[0] / eta.sum())
+        scale_sigmas = (S_pred - S_meas) / S_sem if S_sem else float("inf")
+
+        # --- C1 SHAPE: normalised spectrum, worst bin, in sigmas ------------
+        shape_rep = per_rep / S_rep[:, None]
+        shape_meas = shape_rep.mean(axis=0)
+        shape_sem = shape_rep.std(axis=0, ddof=1) / np.sqrt(REPS)
+        shape_pred = pred / pred.sum()
+        shape_sig = np.abs(shape_meas - shape_pred) / np.where(shape_sem > 0,
+                                                               shape_sem, 1e-12)
+        worst = int(np.argmax(shape_sig))
+        shape_err = float(np.max(np.abs(shape_meas - shape_pred)))
+
+        # --- C3 SINGLETONS: proportion, n only, theta-free ------------------
+        sing_rep = per_rep[:, 0] / S_rep
+        sing_meas = float(sing_rep.mean())
+        sing_sem = float(sing_rep.std(ddof=1)) / np.sqrt(REPS)
         sing_pred = refs.sfs_singleton_proportion(n)
-        rows.append({"Ne": Ne, "mu": mu, "n": n,
+        sing_sigmas = (sing_pred - sing_meas) / sing_sem if sing_sem \
+            else float("inf")
+
+        rows.append({"Ne": Ne, "mu": mu, "n": n, "replicates": REPS,
                      "theta_total": theta_total,
-                     "S_measured": S_meas, "S_watterson": S_pred,
+                     "S_measured": S_meas, "S_sem": S_sem,
+                     "S_watterson": S_pred,
                      "scale_rel_err": scale_rel,
+                     "scale_deviation_in_sems": scale_sigmas,
                      "shape_max_abs_dev": shape_err,
+                     "shape_worst_bin": worst + 1,
+                     "shape_worst_deviation_in_sems": float(shape_sig[worst]),
                      "singleton_prop_measured": sing_meas,
+                     "singleton_prop_sem": sing_sem,
                      "singleton_prop_expected": sing_pred,
-                     "singleton_rel_err": (sing_pred - sing_meas) / sing_meas})
-        print("  Ne=%d mu=%.0e n=%d | S %.1f vs Watterson %.1f (%+.2f%%) | "
-              "shape max dev %.4f | singletons %.4f vs %.4f (%+.2f%%)"
-              % (Ne, mu, n, S_meas, S_pred, 100 * scale_rel, shape_err,
-                 sing_meas, sing_pred,
-                 100 * (sing_pred - sing_meas) / sing_meas))
-    c1 = all(r["shape_max_abs_dev"] < 0.02 for r in rows)
-    c2 = all(abs(r["scale_rel_err"]) < 0.06 for r in rows)
-    c3 = all(abs(r["singleton_rel_err"]) < 0.05 for r in rows)
+                     "singleton_rel_err": (sing_pred - sing_meas) / sing_meas,
+                     "singleton_deviation_in_sems": sing_sigmas})
+        print("  Ne=%d mu=%.0e n=%d | S %.1f+-%.1f vs Watterson %.1f "
+              "(%+.2f%%, %.2f sems) | shape worst bin %d at %.2f sems "
+              "(max abs dev %.4f) | singletons %.4f+-%.4f vs %.4f "
+              "(%+.2f%%, %.2f sems)"
+              % (Ne, mu, n, S_meas, S_sem, S_pred, 100 * scale_rel,
+                 scale_sigmas, worst + 1, shape_sig[worst], shape_err,
+                 sing_meas, sing_sem, sing_pred,
+                 100 * (sing_pred - sing_meas) / sing_meas, sing_sigmas))
+    SIG = 4.0
+    c1 = all(abs(r["shape_worst_deviation_in_sems"]) < SIG for r in rows)
+    c2 = all(abs(r["scale_deviation_in_sems"]) < SIG for r in rows)
+    c3 = all(abs(r["singleton_deviation_in_sems"]) < SIG for r in rows)
     print("  CONTROL 1 spectrum SHAPE  (theta/i, normalised): %s"
           % ("PASS" if c1 else "FAIL"))
     print("  CONTROL 2 spectrum SCALE  (Watterson total):     %s"
           % ("PASS" if c2 else "FAIL"))
     print("  CONTROL 3 SINGLETON proportion (n only, no theta): %s"
           % ("PASS" if c3 else "FAIL"))
+    print("  (all three at %.0f standard errors of the replicate spread, not "
+          "a fixed percentage)" % SIG)
     return (c1, c2, c3), rows
 
 
@@ -172,34 +222,55 @@ def controls_neutral():
 # ===========================================================================
 
 def control_positive():
+    """The SAME sigma criterion that stayed silent on neutral data, on growth.
+
+    Deliberately the identical statistic and the identical 4-sigma rule as
+    controls 1 and 3. If the threshold were relaxed here, or the statistic
+    changed, "it passed there and failed here" would be about the threshold
+    rather than about the data.
+    """
     Ne, mu, n = 5000, 1e-8, 20
-    acc = np.zeros(n - 1)
+    per_rep = []
     for r in range(REPS):
         d = msprime.Demography()
         d.add_population(name="A", initial_size=Ne, growth_rate=0.01)
         ts = msprime.sim_ancestry(samples={"A": n // 2}, demography=d,
                                   sequence_length=SEQ, recombination_rate=RHO,
-                                  random_seed=3000 + r)
-        ts = msprime.sim_mutations(ts, rate=mu, random_seed=9000 + r)
-        acc += sfs_of(ts, n)
-    eta = acc / REPS
-    shape_meas = eta / eta.sum()
+                                  random_seed=4_000_000 + r)
+        ts = msprime.sim_mutations(ts, rate=mu, random_seed=4_000_007 + r)
+        per_rep.append(sfs_of(ts, n))
+    per_rep = np.asarray(per_rep)
+    S_rep = per_rep.sum(axis=1)
+    shape_rep = per_rep / S_rep[:, None]
+    shape_meas = shape_rep.mean(axis=0)
+    shape_sem = shape_rep.std(axis=0, ddof=1) / np.sqrt(REPS)
     pred = np.asarray(refs.sfs_expected_counts(n, 1.0))
     shape_pred = pred / pred.sum()
+    sig = np.abs(shape_meas - shape_pred) / np.where(shape_sem > 0, shape_sem,
+                                                     1e-12)
+    worst = int(np.argmax(sig))
     dev = float(np.max(np.abs(shape_meas - shape_pred)))
-    sing_meas = float(shape_meas[0])
+    sing_rep = per_rep[:, 0] / S_rep
+    sing_meas = float(sing_rep.mean())
+    sing_sem = float(sing_rep.std(ddof=1)) / np.sqrt(REPS)
     sing_pred = refs.sfs_singleton_proportion(n)
-    rejected = dev >= 0.02
-    print("  C4 exponential growth (r=0.01): shape max dev %.4f (threshold "
-          "0.02) singletons %.4f vs neutral %.4f -> %s"
-          % (dev, sing_meas, sing_pred,
-             "REJECTED as required" if rejected else "NOT REJECTED"))
+    sing_sig = abs(sing_pred - sing_meas) / sing_sem if sing_sem else float("inf")
+    rejected = bool(float(sig[worst]) >= 4.0)
+    print("  C4 exponential growth (r=0.01): worst bin %d at %.2f sems "
+          "(max abs dev %.4f) | singletons %.4f+-%.4f vs neutral %.4f "
+          "(%.2f sems) -> %s"
+          % (worst + 1, sig[worst], dev, sing_meas, sing_sem, sing_pred,
+             sing_sig, "REJECTED as required" if rejected else "NOT REJECTED"))
     print("  CONTROL 4 positive control (check can fail): %s"
           % ("PASS" if rejected else "FAIL"))
     return rejected, {"shape_max_abs_dev": dev,
+                      "shape_worst_bin": worst + 1,
+                      "shape_worst_deviation_in_sems": float(sig[worst]),
                       "singleton_prop_measured": sing_meas,
+                      "singleton_prop_sem": sing_sem,
                       "singleton_prop_neutral": sing_pred,
-                      "rejected": bool(rejected)}
+                      "singleton_deviation_in_sems": sing_sig,
+                      "rejected": rejected}
 
 
 # ===========================================================================
