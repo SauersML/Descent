@@ -1772,7 +1772,23 @@ theorem explainedSignalVarianceFromSourceWeights_target {p q : ℕ}
 /-- Exact unexplained target-side liability variance under transported source
 weights and the full explicit target-state loss budget. This is the residual
 variance entering the liability-threshold AUC formula after the mechanistic
-explained signal has been computed from the transported score moments. -/
+explained signal has been computed from the transported score moments.
+
+**Simp direction changed here, and it affects every downstream file.** This name
+was declared twice — once here, general in `P`, and once earlier in the file
+specialised to `Pop.source` and spelling the right-hand side
+`m.outcomeVariance Pop.source`. The second declaration was being rejected, so the
+lemma actually in the simp set was the specialised one, and simp rewrote toward
+`m.outcomeVariance`, at source only. The specialised copy has been removed as the
+pre-index leftover, so from here simp rewrites toward `effectiveOutcomeVariance`,
+at every `P`.
+
+That is the direction the population index is going, and this statement is the
+definitional unfolding of `residualVarianceFromSourceWeights`, which the
+specialised one was not. But it is a behaviour change to a `@[simp]` lemma rather
+than only a deletion, so if a downstream proof now normalises somewhere
+unexpected, this is the cause. Reverting is one line — restore the specialised
+copy and delete this — at the cost of losing the general form. -/
 @[simp] theorem residualVarianceFromSourceWeights_eq_effective_minus_signal {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) :
     residualVarianceFromSourceWeights m P =
@@ -3181,13 +3197,6 @@ not defined by reading target `R²` through a chart, and it does not recover a
 latent biological signal from source `R²`.
 
     Empirical status: UNTESTED. -/
-theorem equalVarianceGaussianAUCFromSourceWeights_target {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) :
-    equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      equalVarianceGaussianAUCFromVariances
-        (explainedSignalVarianceFromSourceWeights m Pop.target)
-        (residualVarianceFromSourceWeights m Pop.target) := rfl
-
 /-- The mechanistic target AUC is exactly the explicit liability-threshold map
 applied to target explained signal and target residual variance. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances {p q : ℕ}
