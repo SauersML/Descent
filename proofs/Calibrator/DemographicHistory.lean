@@ -40,7 +40,7 @@ section IslandModel
     for; frequently violated in use. Neither validated nor falsified.
 
 This file used to restate the formula as `demoIslandModelFst`. It is
-`islandModelFst` from `Calibrator.PopulationGeneticsFoundations`, which this
+`fstMigrationDriftEquilibrium` from `Calibrator.PopulationGeneticsFoundations`, which this
 file already imports, so the restatement has been deleted and the theorems
 below are stated about that one definition. The regime caveats above travel
 with it. -/
@@ -48,8 +48,8 @@ with it. -/
 /-- Island model F_ST is in (0, 1) for positive Ne and m. -/
 theorem island_fst_in_unit_interval (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) :
-    0 < islandModelFst Ne m ∧ islandModelFst Ne m < 1 := by
-  unfold islandModelFst
+    0 < fstMigrationDriftEquilibrium Ne m ∧ fstMigrationDriftEquilibrium Ne m < 1 := by
+  unfold fstMigrationDriftEquilibrium
   constructor
   · positivity
   · rw [div_lt_one (by positivity)]; linarith [mul_pos hNe hm]
@@ -58,11 +58,11 @@ theorem island_fst_in_unit_interval (Ne m : ℝ)
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
     (h_more : m₁ < m₂) :
-    islandModelFst Ne m₂ < islandModelFst Ne m₁ := by
-  unfold islandModelFst
+    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
+  unfold fstMigrationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by positivity) (by nlinarith)
 
-/-- **Connection to the other copy of this formula**: `islandModelFst`
+/-- **Connection to the other copy of this formula**: `fstMigrationDriftEquilibrium`
     equals `fstMigrationDriftEquilibrium` from `PortabilityDrift.lean` when
     M = 4·Ne·m. Both express Wright's (1931) island model Fst = 1/(1 + 4Nem).
 
@@ -85,13 +85,13 @@ theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     `PopulationGeneticsFoundations.lean`, which is what this claim would look
     like if it were true. -/
 theorem islandModelFst_eq_derived (Ne m : ℝ) :
-    islandModelFst Ne m = fstMigrationDriftEquilibrium Ne m := by
-  unfold islandModelFst fstMigrationDriftEquilibrium
+    fstMigrationDriftEquilibrium Ne m = fstMigrationDriftEquilibrium Ne m := by
+  unfold fstMigrationDriftEquilibrium fstMigrationDriftEquilibrium
   ring
 
-/-- Equivalent formulation: `islandModelFst` = 1/(1 + M) where M = `scaledMigrationRate`. -/
+/-- Equivalent formulation: `fstMigrationDriftEquilibrium` = 1/(1 + M) where M = `scaledMigrationRate`. -/
 theorem islandModelFst_eq_from_scaledMigration (Ne m : ℝ) :
-    islandModelFst Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
+    fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
   rw [islandModelFst_eq_derived]
   exact fstMigrationDriftEquilibrium_eq_from_M Ne m
 

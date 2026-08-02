@@ -318,7 +318,7 @@ may converge, improving portability over time.
 section ArchitectureConvergence
 
 /-!
-### Derivation: equilibriumFst = 1/(1 + 4·Ne·m) from migration-drift balance
+### Derivation: fstMigrationDriftEquilibrium = 1/(1 + 4·Ne·m) from migration-drift balance
 
 The island model equilibrium Fst is already derived in two places:
 
@@ -327,31 +327,11 @@ The island model equilibrium Fst is already derived in two places:
    drift (ΔFst_drift = (1 - Fst)/(2N)) balances the decrease from migration
    (ΔFst_migration = -m·Fst·(2 - m)), yielding Fst_eq = 1/(1 + 4Nm).
 
-2. **PopulationGeneticsFoundations.lean**: `islandModelFst` provides the same
+2. **PopulationGeneticsFoundations.lean**: `fstMigrationDriftEquilibrium` provides the same
    formula with additional properties (positivity, monotonicity in migration).
 
 The definition below is identical to both. We prove this equality explicitly.
 -/
-
-/-- **Gene flow homogenizes architecture.**
-    Migration between populations at rate m per generation
-    reduces FST toward m/(m + 1/(4Ne)) at equilibrium.
-    This improves portability for common variants.
-
-    Empirical status: CONDITIONALLY VALID.
-
-    Regime: this is the infinite-island limit. Simulation puts it within 2% at
-    40 demes, but +17% at 10, +31% at 5 and +95% at 2. The two-deme case is
-    in the infinite-island limit the two-ancestry comparison this development is about, so the law
-    is off by roughly twofold in its primary application. The finite-deme
-    correction `1/(1 + 4 Nₑ m (d/(d-1))²)` repairs the 5-to-10 deme range and
-    overshoots at `d = 2` by −40%. No copy of this formula documented the
-    assumption, and there are four of them in four files.
-
-    Empirical status: CONDITIONALLY VALID. Accurate in the limit it was derived
-    for; frequently violated in use. Neither validated nor falsified. -/
-noncomputable def equilibriumFst (m Ne : ℝ) : ℝ :=
-  1 / (1 + 4 * Ne * m)
 
 /-- **One generation of gene flow against drift**, in the architecture file's
 argument order.
@@ -360,7 +340,7 @@ This is `Calibrator.ibdFlowStep` with the homogenising force taken to be
 migration: `F` is the probability that two gene copies from the same population
 are identical by descent, drift adds `(1 - F)/(2 Nₑ)` and migration removes
 `2 m F`.  It is written here, rather than only in `PortabilityDrift`, because
-the obligation to derive `equilibriumFst` belongs to the file that states it;
+the obligation to derive `fstMigrationDriftEquilibrium` belongs to the file that states it;
 `geneFlowFstStep_eq_ibdFlowStep` records that it is the same map.
 
 Composition convention: drift and gene flow are added, not composed, which is
@@ -375,44 +355,28 @@ noncomputable def geneFlowFstStep (m Ne F : ℝ) : ℝ :=
 theorem geneFlowFstStep_eq_ibdFlowStep (m Ne F : ℝ) :
     geneFlowFstStep m Ne F = ibdFlowStep Ne m F := rfl
 
-/-- **`equilibriumFst` is the fixed point of gene flow against drift.**
+/-- **`fstMigrationDriftEquilibrium` is the fixed point of gene flow against drift.**
 Migration homogenises at rate `2m` per pair and drift re-creates identity at
 rate `1/(2 Nₑ)`; balancing them forces `F = 1/(1 + 4 Nₑ m)`.  The formula is
 derived here, not stipulated: no other constant satisfies this. -/
 theorem equilibriumFst_isFixedPoint (m Ne : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    geneFlowFstStep m Ne (equilibriumFst m Ne) = equilibriumFst m Ne :=
+    geneFlowFstStep m Ne (fstMigrationDriftEquilibrium Ne m) = fstMigrationDriftEquilibrium Ne m :=
   ibdFlowStep_fixedPoint Ne m hNe hm
 
 /-- **Total isolation is a boundary the formula attains.**  With no gene flow
-the populations differentiate completely and `equilibriumFst` is exactly `1`;
+the populations differentiate completely and `fstMigrationDriftEquilibrium` is exactly `1`;
 the smooth form does not merely approach the boundary, it reaches it. -/
 @[simp] theorem equilibriumFst_of_no_migration (Ne : ℝ) :
-    equilibriumFst 0 Ne = 1 := by
-  unfold equilibriumFst
+    fstMigrationDriftEquilibrium Ne 0 = 1 := by
+  unfold fstMigrationDriftEquilibrium
   norm_num
-
-/-- **equilibriumFst equals the derived fstMigrationDriftEquilibrium.**
-    This connects the architecture-level formula to the migration-drift
-    fixed point derivation in PortabilityDrift.lean. Both definitions
-    compute 1/(1 + 4·Ne·m); we prove they are definitionally equal
-    (up to argument order). -/
-theorem equilibriumFst_eq_fstMigrationDriftEquilibrium (m Ne : ℝ) :
-    equilibriumFst m Ne = fstMigrationDriftEquilibrium Ne m := by
-  unfold equilibriumFst fstMigrationDriftEquilibrium; ring
-
-/-- **equilibriumFst equals islandModelFst from PopulationGeneticsFoundations.**
-    The island model Fst 1/(1 + 4Nm) derived from Wright's (1931) infinite-island
-    model is the same formula used here. -/
-theorem equilibriumFst_eq_islandModelFst (m Ne : ℝ) :
-    equilibriumFst m Ne = islandModelFst Ne m := by
-  unfold equilibriumFst islandModelFst; ring
 
 /-- Equilibrium FST decreases with migration rate. -/
 theorem fst_decreases_with_migration (m₁ m₂ Ne : ℝ)
     (h_Ne : 0 < Ne) (h_m₁ : 0 < m₁) (h_m₂ : 0 < m₂)
     (h_m : m₁ < m₂) :
-    equilibriumFst m₂ Ne < equilibriumFst m₁ Ne := by
-  unfold equilibriumFst
+    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
+  unfold fstMigrationDriftEquilibrium
   rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
   nlinarith
 

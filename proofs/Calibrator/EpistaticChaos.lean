@@ -1098,18 +1098,32 @@ theorem centeredSquare_third_moment_zero_iff_balanced (h : HardyWeinbergModel)
     norm_num
 
 /-!
-### The coupling channel: the sign bias of a genotype coordinate
+### The sign bias of a genotype coordinate, and what is open about it
 
-The Sign-Erasure Lemma kills cross-terms when the coordinate law is symmetric. What
-survives when it is not is the **coupling channel**, whose strength is governed by the
-conditional sign bias `b = E[x |x|] / E[x²]` — at unit variance simply `E[x |x|]`, the
-mean of the signed square.
+The Sign-Erasure Lemma kills cross-terms when the coordinate law is symmetric. The
+quantity that measures how far a law is from that, and so what survives when it is
+not, is the conditional sign bias `b = E[x |x|] / E[x²]` — at unit variance simply
+`E[x |x|]`, the mean of the signed square.
 
-For a Hardy-Weinberg coordinate this has a closed form, `b = (1 - 2q)²` below frequency one
-half, proved below. It vanishes exactly at `q = 1/2`, which is where the coding is
-symmetric, so the Sign-Erasure Lemma is recovered as the zero fibre of this channel rather
-than as a separate phenomenon.
--/
+For a Hardy-Weinberg coordinate this has a closed form, `b = (1 - 2q)²` below
+frequency one half, proved below. It vanishes exactly at `q = 1/2`, which is where
+the coding is symmetric, so the Sign-Erasure Lemma is the zero fibre of `b` rather
+than a separate phenomenon.
+
+**What is open, and a retraction.** An earlier version of this section went further
+and claimed `b` governs a *separate* coupling channel, with a sliding design carrying
+a tuned-sector variance inflation `2b²/(1 - b²)`. That mechanism was withdrawn
+upstream by its author's own audit: the vanishing-first-order argument used a
+`θ = 1/2` weight, mixing a level-two normalization into a level-one computation, and
+at the correct weights the solo-factor mean is `E[(x² - 1) x²] = σ₁² = 2` rather than
+zero. What the first-order cross term exposes is `Λ(2)` data, that is `E[x⁴]` — which
+the hub channel already exposes. So the term is **hub-redundant, not a new channel**,
+and the inflation formula and its numbers are retracted; see
+`Calibrator.CondensationUnification` §5j for the full record.
+
+`b` itself is untouched: it is well defined, it vanishes exactly on symmetric laws,
+and for genotypes it is `(1 - 2q)²`. What is **open** is whether any admissible design
+exposes it at all. Nothing below should be read as asserting that one does. -/
 
 /-- **The sign bias of the standardized genotype at tilt one**: `E[x |x|]`, the mean signed
 square. It is the numerator of `b = E[x|x|]/E[x²]`, and the denominator is `1` because the
@@ -1129,8 +1143,10 @@ heterozygote term is what remains.
 
 Stated for `q ≤ 1/2` so the signs of the three centered dosages are determined, which is
 the minor-allele convention. It vanishes iff `q = 1/2` and rises to `1` as the variant
-becomes rare, so the coupling channel is strongest exactly where rare-variant methods
-operate. -/
+becomes rare.
+
+This is arithmetic about the genotype law and stands on its own; it does not depend on
+any claim about what a design can see. -/
 theorem hweSignBias_eq (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
     (hhalf : h.altFreq ≤ 1 / 2) : h.signBias = (1 - 2 * h.altFreq) ^ 2 := by
   have hq1 : h.altFreq < 1 := by linarith
@@ -1176,8 +1192,12 @@ theorem hweSignBias_eq (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
   ring
 
 /-- **The sign bias vanishes exactly at the balanced locus**, where the coding is
-symmetric. So the Sign-Erasure Lemma is the zero fibre of the coupling channel rather than
-an independent phenomenon. -/
+symmetric. So the Sign-Erasure Lemma is the zero fibre of `b` rather than an
+independent phenomenon.
+
+This is the whole of what `b` is currently known to do for genotypes. Whether any
+admissible design exposes `b` is open; the mechanism this file once asserted for that
+was retracted, and no replacement has been supplied. -/
 theorem hweSignBias_zero_iff_balanced (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
     (hhalf : h.altFreq ≤ 1 / 2) : h.signBias = 0 ↔ h.altFreq = 1 / 2 := by
   rw [hweSignBias_eq h hq0 hhalf]
@@ -1188,33 +1208,6 @@ theorem hweSignBias_zero_iff_balanced (h : HardyWeinbergModel) (hq0 : 0 < h.altF
   · intro hbal
     rw [hbal]
     norm_num
-
-/-- **The coupling channel's variance inflation**, `2b²/(1 - b²)`: the correction a design
-with shared cores carries relative to the disjoint case, as a function of the sign bias.
-
-Empirical status: UNTESTED. The functional form is an input from the diagram expansion of
-the tuned sector; what is derived here is its value on genotype coordinates, through
-`hweSignBias_eq`. The predicted inflation has not been checked against a simulated window
-scan. -/
-noncomputable def couplingVarianceInflation (bias : ℝ) : ℝ := 2 * bias ^ 2 / (1 - bias ^ 2)
-
-/-- Zero bias, zero inflation: the disjoint answer is recovered exactly on the symmetric
-fibre. -/
-theorem couplingVarianceInflation_zero : couplingVarianceInflation 0 = 0 := by
-  unfold couplingVarianceInflation
-  norm_num
-
-/-- **The genotype coupling inflation in closed form**: `2(1-2q)⁴ / (1 - (1-2q)⁴)`.
-
-Zero at `q = 1/2` and diverging as `q → 0`, so a design with shared cores carries an
-order-one variance correction on a rare-variant panel and none at all on a balanced one. -/
-theorem hweCouplingVarianceInflation_eq (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
-    (hhalf : h.altFreq ≤ 1 / 2) :
-    couplingVarianceInflation h.signBias =
-      2 * (1 - 2 * h.altFreq) ^ 4 / (1 - (1 - 2 * h.altFreq) ^ 4) := by
-  rw [hweSignBias_eq h hq0 hhalf]
-  unfold couplingVarianceInflation
-  ring
 
 /-!
 ### The single-locus collapse

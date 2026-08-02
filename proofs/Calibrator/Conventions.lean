@@ -253,13 +253,17 @@ end Differentiation
 
 section EquilibriumAgreements
 
-/-! **Cross-check: the island-model `F_ST` in `DemographicHistory` and the
-architecture-level `equilibriumFst` in `AncestrySpecificArchitecture` are the
-same function.** They were written in separate files, each spelling out its own
-factor of four. `DemographicHistory.demoIslandModelFst` has since been deleted
-in favour of `PopulationGeneticsFoundations.islandModelFst`, and
-`AncestrySpecificArchitecture.equilibriumFst_eq_islandModelFst` carries what
-this theorem used to say. -/
+/-! **The island-model `F_ST` is now one definition.** It used to be written out
+independently in several modules — `DemographicHistory.demoIslandModelFst`,
+`PopulationGeneticsFoundations.islandModelFst`, `AncestrySpecificArchitecture.equilibriumFst`
+and `PortabilityDrift.fstMigrationDriftEquilibrium` — each spelling out its own factor of
+four, and this file carried a cross-check theorem per pair to keep them in step. The copies
+are gone in favour of the single `fstMigrationDriftEquilibrium`, so the cross-checks have
+nothing left to relate.
+
+`equilibriumFst` is worth recording as a hazard: it took its arguments in the opposite
+order to the other two, so the same call spelled the same way meant different things
+depending on which copy was in scope. -/
 
 /-- **Cross-check: the two assortative-mating inflation claims agree only at
 full heritability.**
@@ -315,27 +319,17 @@ theorem hweHeterozygosity_eq_hwe (p : ℝ) :
     hweHeterozygosity p = hweGenotypeVariance p := by
   unfold hweHeterozygosity hweGenotypeVariance ploidy; ring
 
-/-! ### Tying the inlined island-model restatements back to the scaled rate
+/-! ### Tying the island-model equilibrium back to the scaled rate
 
-Five definitions across five modules spell out `1 / (1 + 4 Nₑ m)`. Each is the
-migration-drift equilibrium at the scaled migration rate. -/
+`1 / (1 + 4 Nₑ m)` used to be spelled out by several definitions across several modules,
+and this section carried one bridge theorem per copy — three of them with identical
+statements and identical proofs. There is now a single definition, so there is a single
+bridge: it is the migration-drift equilibrium at the scaled migration rate. -/
 
 theorem fstMigrationDriftEquilibrium_eq_scaled (Ne m : ℝ) :
     fstMigrationDriftEquilibrium Ne m =
       fstMutationDriftEquilibrium (scaledMigrationRate Ne m) := by
   unfold fstMigrationDriftEquilibrium fstMutationDriftEquilibrium
-  rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
-
-theorem islandModelFst_eq_scaled (Ne m : ℝ) :
-    islandModelFst Ne m =
-      fstMutationDriftEquilibrium (scaledMigrationRate Ne m) := by
-  unfold islandModelFst fstMutationDriftEquilibrium
-  rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
-
-theorem equilibriumFst_eq_scaled (Ne m : ℝ) :
-    equilibriumFst m Ne =
-      fstMutationDriftEquilibrium (scaledMigrationRate Ne m) := by
-  unfold equilibriumFst fstMutationDriftEquilibrium
   rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
 
 /-! ### Per-generation drift rate, written out in three modules

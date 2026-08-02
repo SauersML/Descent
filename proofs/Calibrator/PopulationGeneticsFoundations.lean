@@ -849,41 +849,21 @@ section MigrationDriftFoundations
 
 /-! ### Island Model Equilibrium -/
 
-/-- **Wright's island model Fst.** Fst = 1/(1 + 4Nm).
-    Under the infinite-island model, each deme exchanges a fraction m of
-    its individuals with a common migrant pool each generation. At equilibrium,
-    drift (increasing differentiation) balances migration (decreasing it).
-
-    Empirical status: CONDITIONALLY VALID.
-
-    Regime: this is the infinite-island limit. Simulation puts it within 2% at
-    40 demes, but +17% at 10, +31% at 5 and +95% at 2. The two-deme case is
-    in the infinite-island limit the two-ancestry comparison this development is about, so the law
-    is off by roughly twofold in its primary application. The finite-deme
-    correction `1/(1 + 4 Nₑ m (d/(d-1))²)` repairs the 5-to-10 deme range and
-    overshoots at `d = 2` by −40%. No copy of this formula documented the
-    assumption, and there are four of them in four files.
-
-    Empirical status: CONDITIONALLY VALID. Accurate in the limit it was derived
-    for; frequently violated in use. Neither validated nor falsified. -/
-noncomputable def islandModelFst (Ne m : ℝ) : ℝ :=
-  1 / (1 + 4 * Ne * m)
-
 /-- Island model Fst is the reciprocal of (1 + 4Nm). -/
 theorem islandModelFst_eq_inv (Ne m : ℝ) :
-    islandModelFst Ne m = (1 + 4 * Ne * m)⁻¹ := by
-  unfold islandModelFst
+    fstMigrationDriftEquilibrium Ne m = (1 + 4 * Ne * m)⁻¹ := by
+  unfold fstMigrationDriftEquilibrium
   rw [one_div]
 
 /-- Island model Fst is in (0, 1) for positive Ne and m. -/
 theorem islandModelFst_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    0 < islandModelFst Ne m := by
-  unfold islandModelFst
+    0 < fstMigrationDriftEquilibrium Ne m := by
+  unfold fstMigrationDriftEquilibrium
   positivity
 
 theorem islandModelFst_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
-    islandModelFst Ne m < 1 := by
-  unfold islandModelFst
+    fstMigrationDriftEquilibrium Ne m < 1 := by
+  unfold fstMigrationDriftEquilibrium
   rw [div_lt_one (by nlinarith)]
   nlinarith
 
@@ -891,8 +871,8 @@ theorem islandModelFst_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
     The function m ↦ 1/(1 + 4Nm) is strictly anti-monotone for positive Ne. -/
 theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
     (ha : 0 ≤ a) (hab : a < b) :
-    islandModelFst Ne b < islandModelFst Ne a := by
-  unfold islandModelFst
+    fstMigrationDriftEquilibrium Ne b < fstMigrationDriftEquilibrium Ne a := by
+  unfold fstMigrationDriftEquilibrium
   have hden_pos : 0 < 1 + 4 * Ne * a := by nlinarith
   have hden_lt : 1 + 4 * Ne * a < 1 + 4 * Ne * b := by nlinarith
   exact div_lt_div_of_pos_left one_pos hden_pos hden_lt
@@ -901,8 +881,8 @@ theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
     Larger populations have more effective migrants per generation. -/
 theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
     (ha : 0 ≤ a) (hab : a < b) :
-    islandModelFst b m < islandModelFst a m := by
-  unfold islandModelFst
+    fstMigrationDriftEquilibrium b m < fstMigrationDriftEquilibrium a m := by
+  unfold fstMigrationDriftEquilibrium
   have hden_pos : 0 < 1 + 4 * a * m := by nlinarith
   have hden_lt : 1 + 4 * a * m < 1 + 4 * b * m := by nlinarith
   exact div_lt_div_of_pos_left one_pos hden_pos hden_lt
@@ -912,8 +892,8 @@ theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
     (Nm = 0.25, so 4Nm = 1) is enough to prevent substantial differentiation. -/
 theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m)
     (h_threshold : 1 < 4 * Ne * m) :
-    islandModelFst Ne m < 1 / 2 := by
-  unfold islandModelFst
+    fstMigrationDriftEquilibrium Ne m < 1 / 2 := by
+  unfold fstMigrationDriftEquilibrium
   rw [div_lt_div_iff₀ (by nlinarith : 0 < 1 + 4 * Ne * m) (by norm_num : (0:ℝ) < 2)]
   linarith
 
@@ -921,8 +901,8 @@ theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ) (hNe : 0 < Ne) (hm : 
 theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hk : 0 < k)
     (h_large : k < 4 * Ne * m) :
-    islandModelFst Ne m < 1 / (1 + k) := by
-  unfold islandModelFst
+    fstMigrationDriftEquilibrium Ne m < 1 / (1 + k) := by
+  unfold fstMigrationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by linarith) (by nlinarith)
 
 /-! ### Relationship between Migration and Mutation Effects on Fst -/
@@ -933,8 +913,8 @@ theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
     Fst_migration = 1/(1+4Nm), Fst_mutation = 1/(1+4Neμ).
     The key parameter is the scaled rate 4N × (rate). -/
 theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
-    islandModelFst Ne m = fstMutationDriftEquilibrium (4 * Ne * m) := by
-  unfold islandModelFst fstMutationDriftEquilibrium
+    fstMigrationDriftEquilibrium Ne m = fstMutationDriftEquilibrium (4 * Ne * m) := by
+  unfold fstMigrationDriftEquilibrium fstMutationDriftEquilibrium
   ring
 
 /-- **Combined migration and mutation reduce Fst below either alone.**
@@ -966,8 +946,8 @@ theorem fstMigrationMutationEquilibrium_isFixedPoint (Ne m μ : ℝ)
 /-- Combined Fst is below migration-only Fst. -/
 theorem fstMigrationMutation_lt_migrationOnly (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
-    fstMigrationMutationEquilibrium Ne m μ < islandModelFst Ne m := by
-  unfold fstMigrationMutationEquilibrium islandModelFst
+    fstMigrationMutationEquilibrium Ne m μ < fstMigrationDriftEquilibrium Ne m := by
+  unfold fstMigrationMutationEquilibrium fstMigrationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-- Combined Fst is below mutation-only Fst. -/
@@ -1102,7 +1082,7 @@ theorem effectiveMigration_symmetric (m : ℝ) :
 theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
     (hNe : 0 < Ne) (hm₂₁ : 0 < m₂₁)
     (h_asym : m₂₁ < m₁₂) :
-    islandModelFst Ne m₁₂ < islandModelFst Ne m₂₁ := by
+    fstMigrationDriftEquilibrium Ne m₁₂ < fstMigrationDriftEquilibrium Ne m₂₁ := by
   exact islandModelFst_strictAnti_m Ne m₂₁ m₁₂ hNe (le_of_lt hm₂₁) h_asym
 
 /-! ### Migration and LD Homogenization -/
