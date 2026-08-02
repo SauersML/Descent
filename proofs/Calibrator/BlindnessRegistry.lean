@@ -268,24 +268,9 @@ theorem averageEffect_eq_regression_slope
   unfold OneLocusArchitecture.valueDosageCovariance OneLocusArchitecture.meanValue
     HardyWeinbergModel.centeredAltAlleleCount OneLocusArchitecture.averageEffect
   rw [h.expectedAltAlleleCount_eq, h.genotypeVariance_eq]
-  rw [Fintype.sum_equiv DiploidGenotype.equivFin3 _
-      (fun i : Fin 3 =>
-        h.genotypeProb (DiploidGenotype.equivFin3.symm i) *
-          m.genotypicValue (DiploidGenotype.equivFin3.symm i))
-      (by intro x; rw [DiploidGenotype.equivFin3_symm_apply_apply])]
-  rw [Fintype.sum_equiv DiploidGenotype.equivFin3 _
-      (fun i : Fin 3 =>
-        h.genotypeProb (DiploidGenotype.equivFin3.symm i) *
-          (m.genotypicValue (DiploidGenotype.equivFin3.symm i) -
-            ∑ j : Fin 3,
-              h.genotypeProb (DiploidGenotype.equivFin3.symm j) *
-                m.genotypicValue (DiploidGenotype.equivFin3.symm j)) *
-          (altAlleleCount (DiploidGenotype.equivFin3.symm i) - 2 * h.altFreq))
-      (by intro x; rw [DiploidGenotype.equivFin3_symm_apply_apply])]
-  rw [Fin.sum_univ_three, Fin.sum_univ_three]
-  simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb, altAlleleCount,
-    OneLocusArchitecture.genotypicValue]
-  unfold HardyWeinbergModel.refFreq
+  rw [sum_over_genotypes, sum_over_genotypes]
+  simp only [HardyWeinbergModel.genotypeProb, altAlleleCount,
+    OneLocusArchitecture.genotypicValue, HardyWeinbergModel.refFreq]
   rw [← hq]
   ring_nf
 

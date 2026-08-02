@@ -382,18 +382,6 @@ and repeated on each symmetry-carrying theorem.
 -/
 
 /-- Expand a sum over the three diploid genotypes. -/
-private theorem sum_over_genotypes (f : DiploidGenotype → ℝ) :
-    (∑ g : DiploidGenotype, f g) =
-      f DiploidGenotype.homRef + f DiploidGenotype.het + f DiploidGenotype.homAlt := by
-  have hrewrite :
-      (∑ g : DiploidGenotype, f g) =
-        ∑ i : Fin 3, f (DiploidGenotype.equivFin3.symm i) :=
-    Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
-      intro x
-      rw [DiploidGenotype.equivFin3_symm_apply_apply])
-  rw [hrewrite, Fin.sum_univ_three]
-  rfl
-
 /-- Third central moment of the hard-called dosage at a Hardy–Weinberg locus.
 
 Empirical status: DERIVED from `HardyWeinbergModel.genotypeProb` and

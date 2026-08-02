@@ -229,6 +229,28 @@ def DiploidGenotype.equivFin3 : DiploidGenotype ≃ Fin 3 where
     DiploidGenotype.equivFin3.symm (DiploidGenotype.equivFin3 g) = g := by
   exact DiploidGenotype.equivFin3.left_inv g
 
+/-- **A sum over genotypes is its three terms.**
+
+Every closed form at a Hardy-Weinberg locus is proved by expanding this sum, and the
+expansion was written out separately at each site — routed through `equivFin3` and
+`Fin.sum_univ_three` by hand in `genotypeVariance_eq`, again as a `private` lemma in
+`EpistaticChaos`, and again wherever else a moment was computed. A private copy is not
+reusable by construction, so the third and fourth sites had no choice but to repeat it.
+
+It belongs here, beside the equivalence it uses and above every module that computes a
+genotype moment. -/
+theorem sum_over_genotypes (f : DiploidGenotype → ℝ) :
+    (∑ g : DiploidGenotype, f g) =
+      f DiploidGenotype.homRef + f DiploidGenotype.het + f DiploidGenotype.homAlt := by
+  have hrewrite :
+      (∑ g : DiploidGenotype, f g) =
+        ∑ i : Fin 3, f (DiploidGenotype.equivFin3.symm i) :=
+    Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
+      intro x
+      rw [DiploidGenotype.equivFin3_symm_apply_apply])
+  rw [hrewrite, Fin.sum_univ_three]
+  rfl
+
 /-- Number of alternative alleles carried by a diploid genotype.
 
     Empirical status: UNTESTED. -/
@@ -351,19 +373,8 @@ theorem HardyWeinbergModel.genotypeVariance_eq
     unfold HardyWeinbergModel.refFreq
     ring
   unfold HardyWeinbergModel.genotypeVariance HardyWeinbergModel.centeredAltAlleleCount
-  rw [h.expectedAltAlleleCount_eq]
-  have hrewrite :
-      (∑ g : DiploidGenotype, h.genotypeProb g * (altAlleleCount g - 2 * h.altFreq) ^ 2) =
-        ∑ i : Fin 3,
-          h.genotypeProb (DiploidGenotype.equivFin3.symm i) *
-            (altAlleleCount (DiploidGenotype.equivFin3.symm i) - 2 * h.altFreq) ^ 2 := by
-    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
-      intro x
-      rw [DiploidGenotype.equivFin3_symm_apply_apply])
-  rw [hrewrite]
-  rw [Fin.sum_univ_three]
-  simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb, altAlleleCount]
-  unfold HardyWeinbergModel.refFreq
+  rw [h.expectedAltAlleleCount_eq, sum_over_genotypes]
+  simp only [HardyWeinbergModel.genotypeProb, altAlleleCount, HardyWeinbergModel.refFreq]
   ring_nf
 
 /-- Absolute third centered moment at one Hardy-Weinberg locus. This is the term that
