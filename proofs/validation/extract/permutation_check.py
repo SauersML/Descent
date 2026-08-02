@@ -181,8 +181,16 @@ def scan(n_commits):
         # in AncestrySpecificArchitecture and its survivor in PortabilityDrift.
         # Searching only the changed files misses exactly the cross-file case
         # this detector exists for, so fall back to the whole tree.
+        # Fall back to the whole tree ONLY for removals with no survivor among
+        # the changed files.  Parsing the full corpus at every removal commit is
+        # correct and unusably slow -- the first version did that and produced
+        # no output in ten minutes, which is the same as not having the check.
         removed_here = set(before) - set(after)
-        if removed_here:
+        needs_wide = [n for n in removed_here
+                      if explicit_args(before[n])
+                      and not any(bodies_equivalent(before[n], s2)
+                                  for k2, s2 in after.items() if k2 != n)]
+        if needs_wide:
             after.update(full_tree(rev))
         # a definition present before and absent after was removed by this commit
         for name in set(before) - set(after):
