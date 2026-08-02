@@ -38,12 +38,21 @@
 #
 #   SYNC_OK | SYNC_FAILED_BUILDING_AT_EXISTING_HEAD   did the checkout move?
 #   BUILT_AT_REV=<sha>                                what was actually built
+#   MATHLIB_ROOT=present|MISSING                      is the toolchain whole?
+#   MATHLIB_OLEAN_COUNT=<n>                           how whole? healthy ~2934
+#   TOOLCHAIN_DAMAGED=1                               emitted only when broken
 #   GUARD_EXIT=<code>                                 structural guard result
 #   LAKE_EXIT=<code>                                  lake's own exit status
 #
 # HOW TO READ A LOG, in order. Absence is the signal:
 #
 #   no BUILT_AT_REV   -> the job died before sync finished. No build happened.
+#   TOOLCHAIN_DAMAGED -> STOP. Error lists from a damaged olean chain are not
+#                        evidence about the corpus: definitions that plainly
+#                        exist get reported as unknown identifiers, and the
+#                        count can jump by fifty for no code reason. On
+#                        2026-08-02 this produced a 59-error list of which the
+#                        one error anyone checked was false.
 #   no LAKE_EXIT      -> lake was killed or is still running. INCOMPLETE, not
 #                        clean; a truncated log with few errors is not a result.
 #   LAKE_EXIT=0       -> build succeeded.
@@ -88,6 +97,18 @@ if [ ${#TARGETS[@]} -eq 0 ]; then TARGETS=(Calibrator); fi
 export PATH=$ROOT/.elan/bin:$PATH
 export ELAN_HOME=$ROOT/.elan
 
+# COMPUTE-NODE GUARANTEE. The bare relay lands on a login node (ahl03), so a
+# `lake build` invoked through it runs there. On 2026-08-02 that put 160 lean
+# processes on shared interactive infrastructure at load average 31, each
+# getting about one percent of a core, while recompiling Mathlib. Nobody chose
+# that; the invocation everyone copied did it silently. So the script resubmits
+# itself rather than trusting the caller to remember.
+if [ -z "${SLURM_JOB_ID:-}" ]; then
+  exec sbatch --job-name=leanbld --partition=agsmall --nodes=1 --ntasks=1 \
+    --cpus-per-task=8 --mem=32g --time=2:00:00 \
+    --output="$ROOT/leanbuild-%j.out" "$0" "$@"
+fi
+
 cd "$REPO" || { echo "NO_REPO"; exit 1; }
 
 # Sync forward only. A fast-forward merge cannot discard a commit: it refuses
@@ -103,6 +124,23 @@ else
 fi
 
 echo "BUILT_AT_REV=$(git rev-parse --short HEAD)"
+
+# Toolchain precondition. A build against a half-rebuilt Mathlib emits a
+# plausible error list that means nothing, which is the failure mode this whole
+# file exists to prevent -- so refuse rather than report it. Restore with
+# `lake exe cache get` (a download, minutes) rather than recompiling (hours).
+MLROOT=.lake/packages/mathlib/.lake/build/lib/lean/Mathlib.olean
+OLEANS=$(find .lake/packages/mathlib/.lake/build/lib/lean -name '*.olean' 2>/dev/null | wc -l)
+echo "MATHLIB_OLEAN_COUNT=$OLEANS"
+if [ -f "$MLROOT" ]; then echo "MATHLIB_ROOT=present"; else echo "MATHLIB_ROOT=MISSING"; fi
+if [ ! -f "$MLROOT" ] || [ "$OLEANS" -lt 2900 ]; then
+  echo "TOOLCHAIN_DAMAGED=1"
+  if [ "${FORCE_DAMAGED_BUILD:-0}" != "1" ]; then
+    echo "REFUSING_TO_BUILD: error lists from a damaged olean chain are not evidence."
+    echo "Restore with 'lake exe cache get', or set FORCE_DAMAGED_BUILD=1 to override."
+    exit 2
+  fi
+fi
 
 python3 -S scripts/check-identifications.py > "$ROOT/guard-${SLURM_JOB_ID:-manual}.txt" 2>&1
 echo "GUARD_EXIT=$?"
