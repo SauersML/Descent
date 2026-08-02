@@ -36,6 +36,24 @@ WHAT THE FLIP RATE ACTUALLY MEASURES
     The script reports this inversion alongside the simulated rates so the two
     can be compared directly.
 
+A CONTROL WAS REWRITTEN AFTER IT FAILED. WHY THAT WAS LEGITIMATE HERE.
+    C2 originally demanded a flip rate of ~0 at a high-signal architecture. Once
+    effects are DRAWN rather than fixed that criterion is UNSATISFIABLE BY
+    CONSTRUCTION: there is always a tail of small-|beta| SNPs that pass
+    selection on noise and then flip. A control that cannot pass is not
+    measuring the simulator, so it was replaced by a comparison against the
+    analytic expectation computed from the ACTUAL selected effects, which is
+    strictly stronger -- it checks every architecture rather than only the
+    trivially-small end.
+
+    The test separating this from the forbidden move is that THE DISCREPANCY
+    UNDER TEST WAS NOT THE FINDING. The finding is the spread of flip rate at
+    matched h2, which was already green and was untouched. Weakening a control
+    that was failing ON the finding would be tuning the simulation to match the
+    model, which is the one thing this whole effort exists to prevent. A later
+    reader cannot reconstruct that distinction from the diff, so it is recorded
+    here.
+
 TWO CONTROLS PINNED BY THEORY, NEITHER FITTED
     C1  NULL. With every true beta = 0 the replication sign is a coin flip and
         the rate must be 50%, whatever the architecture, whatever the
