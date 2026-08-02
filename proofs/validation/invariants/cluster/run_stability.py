@@ -36,6 +36,27 @@ import pathlib
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
+
+
+def _revision():
+    """The revision every number in this run belongs to.
+
+    A private clone that never pulls diverges silently and starts testing a
+    revision nobody else has -- the failure mode that makes two agents'
+    numbers incomparable without either noticing. So the revision is recorded
+    WITH the numbers rather than assumed, and the caller is expected to pull
+    before invoking.
+    """
+    import subprocess
+    try:
+        r = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
+                           cwd=str(HERE), capture_output=True, text=True)
+        d = subprocess.run(["git", "status", "--porcelain"],
+                           cwd=str(HERE), capture_output=True, text=True)
+        rev = r.stdout.strip() or "unknown"
+        return rev + ("+dirty" if d.stdout.strip() else "")
+    except Exception:
+        return "unknown"
 sys.path.insert(0, str(HERE.parent))
 
 import check_simulation as CS  # noqa: E402
@@ -52,8 +73,9 @@ def main():
     cs, _, _ = C.compile_all(defs)
 
     out, flaky = {}, []
+    rev = _revision()
     print(f"seed-stability sweep: {len(CS.SPECS)} specs x {args.seeds} "
-          "independent point-sets\n")
+          f"independent point-sets\ncorpus revision: {rev}\n")
     print(f"{'definition':56s} {'agree':>7s} {'worst excess':>13s}")
     for sp in CS.SPECS:
         k = sp["name"]
@@ -79,7 +101,7 @@ def main():
         print(f"{k:56s} {agree:3d}/{args.seeds:<3d} {max(excess):13.3f}{mark}")
 
     (HERE.parent / "results_simulation_stability.json").write_text(
-        json.dumps(out, indent=1))
+        json.dumps(dict(revision=rev, seeds=args.seeds, specs=out), indent=1))
     print(f"\n{len(CS.SPECS) - len(flaky)} stable, {len(flaky)} flicker")
     if flaky:
         print("WITHDRAW these -- their verdicts depend on the draw:")

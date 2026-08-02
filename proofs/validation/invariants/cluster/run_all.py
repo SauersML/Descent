@@ -27,6 +27,27 @@ import shutil
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
+
+
+def _revision():
+    """The revision every number in this run belongs to.
+
+    A private clone that never pulls diverges silently and starts testing a
+    revision nobody else has -- the failure mode that makes two agents'
+    numbers incomparable without either noticing. So the revision is recorded
+    WITH the numbers rather than assumed, and the caller is expected to pull
+    before invoking.
+    """
+    import subprocess
+    try:
+        r = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
+                           cwd=str(HERE), capture_output=True, text=True)
+        d = subprocess.run(["git", "status", "--porcelain"],
+                           cwd=str(HERE), capture_output=True, text=True)
+        rev = r.stdout.strip() or "unknown"
+        return rev + ("+dirty" if d.stdout.strip() else "")
+    except Exception:
+        return "unknown"
 ROOT = HERE.parent
 sys.path.insert(0, str(ROOT))
 
