@@ -276,24 +276,51 @@ def main(argv=None):
                             "n_points": len(pts),
                             "box": {k: list(v) for k, v in
                                     admissible.box_for(d).items()}}
-            ok, viol = range_check(fn, argnames, pts, lo, hi,
-                                   random.Random(11), vecspec=vecspec)
-            if not ok:
-                # A range proved by a Lean theorem cannot be violated by a correct
-                # translation: that is a real finding.  A range only *suggested*
-                # by the docstring or the name is a conjecture, and a violation
-                # is a lead for a human, never a verdict.
-                src = src_lo if viol[3] == "lo" else src_hi
+            # SIDE-AWARE.  Each end of the range has its own provenance AND its
+            # own preconditions: `steppingStoneFst_nonneg` proves `0 ≤ f` and
+            # says nothing whatever about an escape above 1.  Grading an upper
+            # escape against a theorem that only proved a lower bound -- or
+            # enforcing that theorem's hypotheses while checking the other end --
+            # mis-grades in both directions.  So each side is checked separately,
+            # under the hypotheses of the theorem that proved THAT side.
+            violation = None
+            for side, bound, src in (("lo", lo, src_lo), ("hi", hi, src_hi)):
+                if bound is None:
+                    continue
+                thm = (d["constraints"].get(f"range_{side}_thm") or [None, 0])
+                side_pts, side_hyps, side_dropped = make_points(
+                    entry, defs_by_name, structs, random.Random(11), thm[0])
+                if not side_pts:
+                    continue
+                ok, viol = range_check(
+                    fn, argnames, side_pts,
+                    bound if side == "lo" else None,
+                    bound if side == "hi" else None,
+                    random.Random(11), vecspec=vecspec)
+                if ok:
+                    continue
+                # A range proved by a Lean theorem cannot be violated by a
+                # correct translation: that is a real finding.  A range only
+                # *suggested* by the docstring or the name is a conjecture, and
+                # a violation is a lead for a human, never a verdict.
                 if src != "theorem":
-                    rec["status"] = "RANGE-MISMATCH"
-                elif dropped or len(hyps) < max(
-                        d["constraints"].get("range_lo_thm", ["", 0])[1],
-                        d["constraints"].get("range_hi_thm", ["", 0])[1]):
-                    # Some stated precondition could not be enforced, so the
-                    # violating point may simply be inadmissible.  Not a verdict.
-                    rec["status"] = "DEFECT-CANDIDATE"
+                    status = "RANGE-MISMATCH"
+                elif side_dropped or len(side_hyps) < thm[1]:
+                    # Some stated precondition of THAT theorem could not be
+                    # enforced, so the point may be inadmissible.  Not a verdict.
+                    status = "DEFECT-CANDIDATE"
                 else:
-                    rec["status"] = "DEFECT"
+                    status = "DEFECT"
+                violation = (status, viol, side, thm[0], side_hyps, side_dropped)
+                if status == "DEFECT":
+                    break                       # strongest finding wins
+            if violation is not None:
+                status, viol, side, thm_name, side_hyps, side_dropped = violation
+                rec["status"] = status
+                rec["check"]["violated_side"] = side
+                rec["check"]["violated_side_theorem"] = thm_name
+                rec["check"]["hypotheses"] = side_hyps
+                rec["check"]["hypotheses_not_enforced"] = side_dropped
                 rec["violation"] = {"point": {k: round(v, 6) for k, v in viol[0].items()},
                                     "value": viol[1], "why": viol[2]}
                 continue
