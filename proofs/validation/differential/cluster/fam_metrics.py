@@ -416,16 +416,39 @@ def arm_liability(rng):
 # ===========================================================================
 # ARM 2 -- HWE GENOTYPE SCORE
 # ===========================================================================
+CHUNK = 20000        # individuals per binomial call; see hwe_cell
+
+
 def hwe_cell(rng, p, beta, gamma=None, reps=R_HWE):
-    """One vectorised binomial draw over the whole (individuals x loci) array."""
+    """Vectorised binomial draw over an (individuals x loci) block.
+
+    CHUNKED OVER INDIVIDUALS, AND WHY THAT IS NOT A FIDELITY CHANGE.
+    A single call at reps = 200000 and m = 1000 would allocate an int64 array of
+    1.6 GB and then a float64 copy of the same size, on a node shared with
+    several other agents. Chunking draws the SAME experiment: `rng.binomial(2,
+    p, size=(k, m))` draws every element independently from its own
+    Binomial(2, p_j), so concatenating consecutive chunks from one Generator is
+    distributionally identical to one call of size (reps, m) -- the chunk
+    boundary is not a synchronisation point and no variate is reused across the
+    replicate axis. Replicate count, loci and grids are unchanged; only the
+    allocation is.
+    """
     p = np.asarray(p, dtype=np.float64)
     beta = np.asarray(beta, dtype=np.float64)
-    g = rng.binomial(2, p, size=(reps, p.shape[0])).astype(np.float64)
-    s = g @ beta
+    m = p.shape[0]
+    parts_s, parts_c = [], []
+    done = 0
+    while done < reps:
+        k = min(CHUNK, reps - done)
+        g = rng.binomial(2, p, size=(k, m)).astype(np.float64)
+        parts_s.append(g @ beta)
+        if gamma is not None:
+            parts_c.append(g @ np.asarray(gamma, dtype=np.float64))
+        done += k
+    s = np.concatenate(parts_s)
     out = {"mean": float(s.mean()), "var": float(s.var(ddof=0))}
     if gamma is not None:
-        gamma = np.asarray(gamma, dtype=np.float64)
-        c = g @ gamma
+        c = np.concatenate(parts_c)
         out["cov"] = float(np.mean((s - s.mean()) * (c - c.mean())))
     # Kolmogorov distance to the standard normal, for scoreApproximationError.
     z = (s - s.mean()) / (s.std(ddof=0) if s.std(ddof=0) > 0 else 1.0)
