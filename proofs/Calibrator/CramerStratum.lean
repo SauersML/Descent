@@ -157,8 +157,10 @@ theorem charFnSq_eq_one_of_lattice (w a : V → ℝ) (hw : ∑ v, w v = 1)
     have hrw : 2 * Real.pi * (n : ℝ) / h * (h * (k : ℝ))
         = (((n : ℤ) * k : ℤ) : ℝ) * (2 * Real.pi) := by
       push_cast
-      field_simp
-      ring
+      first
+        | (field_simp; ring)
+        | field_simp
+        | ring
     rw [hrw]
     exact Real.cos_int_mul_two_pi _
   simp_rw [hterm, mul_one]
