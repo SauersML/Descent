@@ -88,7 +88,8 @@ __all__ = ["definition_table", "definition", "structures", "resolve",
            "callable_for", "classification", "body_checksum", "stamp",
            "admissible_box", "hypotheses", "satisfies", "vector_args",
            "numeric_standins", "refresh", "staleness", "collisions",
-           "all_rows", "theorems", "theorems_mentioning", "ARG_CONVENTION"]
+           "all_rows", "theorems", "theorems_mentioning", "require_fresh",
+           "ARG_CONVENTION"]
 
 # Bumped whenever the calling convention changes.  Consumers should assert on
 # this rather than discovering a convention change from a TypeError.
@@ -366,7 +367,13 @@ def stamp() -> dict:
     h = hashlib.sha256()
     for n in names:
         h.update(body_checksum(n).encode())
+    import lean_parse
+    live, nfiles = lean_parse.source_digest(HERE.parent.parent / "Calibrator")
     return {"arg_convention": ARG_CONVENTION,
+            "source_digest_of_table": _blob().get("source_digest"),
+            "source_digest_on_disk": live,
+            "source_files": nfiles,
+            "table_is_current": _blob().get("source_digest") == live,
             "n_collisions": len(collisions()),
             "n_definitions": len(names),
             "n_structures": len(structures()),
@@ -388,6 +395,23 @@ def refresh():
         f.cache_clear()
 
 
+def require_fresh():
+    """Raise unless the table describes the corpus on disk RIGHT NOW.
+
+    A checker must not rebuild its own inputs mid-run: the numbers it then
+    produces have a provenance nobody can reconstruct afterwards.  Refusing is
+    louder, cheaper, and leaves the operator in control of when the table moves.
+    Call this at the top of anything that reports a number.
+    """
+    bad = staleness()
+    if bad:
+        raise RuntimeError(
+            "extraction table is not current: " + "; ".join(bad)
+            + ".  Run `python3 validation/extract/emit.py` and re-run. "
+            "Refusing rather than regenerating, so the numbers you get have a "
+            "revision you can name.")
+
+
 def staleness():
     """Is the generated module older than the table it was generated from?
 
@@ -399,6 +423,27 @@ def staleness():
     """
     import os
     out = []
+    # THE CHECK THAT MATTERS: does the table describe the Lean on disk?
+    # Everything below this compares derived artifacts against each other,
+    # which is uninformative by construction -- they were written by one run,
+    # so they agree whether or not they match the source.  A table that is a
+    # perfectly coherent snapshot of a corpus that no longer exists passes
+    # every one of those checks and yields confident wrong numbers.
+    try:
+        import lean_parse
+        stored = _blob().get("source_digest")
+        live, n = lean_parse.source_digest(HERE.parent.parent / "Calibrator")
+        if stored is None:
+            out.append("table predates source-digest recording; regenerate to "
+                       "make freshness checkable at all")
+        elif stored != live:
+            out.append(
+                f"table was generated from DIFFERENT Lean sources "
+                f"(table {stored}, on disk {live} over {n} files) -- every "
+                f"count from it describes a corpus that is no longer there")
+    except Exception as e:                                       # noqa: BLE001
+        out.append(f"could not compare against the Lean sources: {e!r}")
+
     defs_m = DEFS_JSON.stat().st_mtime if DEFS_JSON.exists() else 0
     mod = HERE / "lean_defs.py"
     mod_m = mod.stat().st_mtime if mod.exists() else 0
