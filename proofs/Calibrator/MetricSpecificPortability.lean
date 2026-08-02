@@ -1772,23 +1772,6 @@ section SharedCorrectionFamily
 
 variable {ι J : Type*} [Fintype ι] [Fintype J] [DecidableEq J]
 
-/-- **Curvature of a target's recalibration objective**: how hard target `i`
-pulls on the shared correction.  Deployment weight times the energy of the
-transported direction in that target's own second-moment matrix.
-
-Empirical status: UNTESTED. -/
-def targetCorrectionCurvature (weight : ι → ℝ) (B : ι → Matrix J J ℝ)
-    (beta : J → ℝ) : ι → ℝ :=
-  fun i => weight i * coefficientEnergy (B i) beta
-
-/-- **The correction each target would choose alone**, as a family indexed by
-deployment target.
-
-Empirical status: UNTESTED. -/
-def targetCorrectionOptimum (B : ι → Matrix J J ℝ) (beta theta : J → ℝ) :
-    ι → ℝ :=
-  fun i => sharedCorrectionOptimum (B i) beta theta
-
 /-- The curvature-weighted mean of the per-target optimal corrections: the
 shared correction that a weighted-least-squares compromise selects.
 

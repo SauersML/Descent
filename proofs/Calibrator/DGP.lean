@@ -1003,9 +1003,6 @@ structure LDDecayMechanism (k : ℕ) where
   /-- Tagging efficiency ρ² decreases with distance. -/
   tagging_efficiency : ℝ → ℝ
 
-def decaySlope {k : ℕ} (mech : LDDecayMechanism k) (c : Fin k → ℝ) : ℝ :=
-  mech.tagging_efficiency (mech.distance c)
-
 theorem optimal_slope_trace_variance {k : ℕ} [Fintype (Fin k)]
     (arch : GeneticArchitecture k) (c : Fin k → ℝ)
     (h_genic_pos : arch.V_genic c ≠ 0) :

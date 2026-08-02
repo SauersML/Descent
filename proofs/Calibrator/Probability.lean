@@ -51,20 +51,11 @@ def Pop.pair {α : Sort*} (s t : α) : Pop → α
 Witness models that perturb exactly one population are written with this. -/
 def Pop.withTarget {α : Sort*} (f : Pop → α) (t : α) : Pop → α := Pop.pair (f Pop.source) t
 
-/-- Replace the source component, keeping the target one. -/
-def Pop.withSource {α : Sort*} (f : Pop → α) (s : α) : Pop → α := Pop.pair s (f Pop.target)
-
 @[simp] theorem Pop.withTarget_source {α : Sort*} (f : Pop → α) (t : α) :
     Pop.withTarget f t Pop.source = f Pop.source := rfl
 
 @[simp] theorem Pop.withTarget_target {α : Sort*} (f : Pop → α) (t : α) :
     Pop.withTarget f t Pop.target = t := rfl
-
-@[simp] theorem Pop.withSource_source {α : Sort*} (f : Pop → α) (s : α) :
-    Pop.withSource f s Pop.source = s := rfl
-
-@[simp] theorem Pop.withSource_target {α : Sort*} (f : Pop → α) (s : α) :
-    Pop.withSource f s Pop.target = f Pop.target := rfl
 
 namespace InformationTheoryBridge
 

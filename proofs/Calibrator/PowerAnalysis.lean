@@ -257,13 +257,6 @@ theorem GWASObservationModel.observation_decomposition (m : GWASObservationModel
   unfold GWASObservationModel.observedBeta
   ring
 
-/-- **Selection event: significance thresholding.**
-    A variant is selected (declared significant) when |β̂ / SE| > z_α,
-    equivalently when |β + ε| > z_α · SE. This predicate defines the
-    selection event. -/
-def GWASObservationModel.isSelected (m : GWASObservationModel) (epsilon z_alpha : ℝ) : Prop :=
-  z_alpha * m.standardError < |m.true_beta + epsilon|
-
 /-! ### Truncation bias under selection
 
 Removed.  This defined `truncationBias se beta z_alpha` as `se · φ(z_α - β/se)`,
