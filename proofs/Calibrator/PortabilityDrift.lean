@@ -3005,28 +3005,16 @@ theorem targetR2FromNeutralAFBenchmark_eq_presentDayR2
       presentDayR2 V_A V_E fstTarget := by
   rfl
 
-/-- Exact calibrated Bernoulli Brier risk as a function of prevalence and
-explained-variance fraction.
-
-For a calibrated Bernoulli predictor with prevalence `π` and
-`Var(η(Z)) = π(1-π) r2`, the exact population Brier risk is
-`π(1-π)(1-r2)`. This is not a surrogate loss: it is the closed form of the
-exact calibrated Brier risk under the Bernoulli-mixing model. -/
-def exactCalibratedBrierRiskFromR2 (π r2 : ℝ) : ℝ :=
-  π * (1 - π) * (1 - r2)
-
-/-- **One body, two names, tied.** `DGP.calibratedBrier` holds the same
-formula. The tie is stated rather than made a call: this definition is unfolded
-by five proofs in `MetricSpecificPortability` and one here, each of which needs
-the concrete product exposed, and a wrapper hides it. Stating the identity
-keeps the two from drifting without touching what `unfold` yields. -/
-theorem exactCalibratedBrierRiskFromR2_eq_calibratedBrier (π r2 : ℝ) :
-    exactCalibratedBrierRiskFromR2 π r2 = calibratedBrier π r2 := rfl
+/-! The exact calibrated Bernoulli Brier risk `π(1-π)(1-r2)` used to be written out again
+here under a second name, tied to `TransportedMetrics.calibratedBrier` by a theorem. The
+stated reason was that several proofs `unfold` it and need the concrete product exposed,
+which a wrapper would hide — but that argues against a *wrapper*, not for a second
+definition: unfolding the one definition yields the same product. -/
 
 /-- Exact calibrated Bernoulli Brier risk written directly in prevalence and
 explained-risk coordinates. -/
 abbrev brierFromR2 (π r2 : ℝ) : ℝ :=
-  exactCalibratedBrierRiskFromR2 π r2
+  TransportedMetrics.calibratedBrier π r2
 
 /-- Exact target AUC from the neutral allele-frequency benchmark state. -/
 noncomputable def targetGaussianAUCFromNeutralAFBenchmark
@@ -3043,7 +3031,7 @@ theorem targetAUCFromNeutralAFBenchmark_eq_presentDayAUC
 
 /-- Source Brier chart as a function of prevalence and source `R²`. -/
 noncomputable def sourceBrierFromR2 (π r2Source : ℝ) : ℝ :=
-  exactCalibratedBrierRiskFromR2 π r2Source
+  TransportedMetrics.calibratedBrier π r2Source
 
 /-- The source Brier chart is the canonical source Brier
 specialization. -/
@@ -3057,7 +3045,7 @@ theorem sourceBrierFromR2_eq_transportedMetrics
 explicit target state. -/
 noncomputable def targetExactCalibratedBrierRisk
     (π V_A V_E fstTarget : ℝ) : ℝ :=
-  exactCalibratedBrierRiskFromR2 π
+  TransportedMetrics.calibratedBrier π
     (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)
 
 /-- Neutral allele-frequency benchmark target Brier map used by the dashboard
@@ -3099,7 +3087,7 @@ theorem neutralAFBenchmarkMetricProfile_eq
         (TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E) =
         targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget
     unfold targetBrierFromNeutralAFBenchmark targetExactCalibratedBrierRisk
-      exactCalibratedBrierRiskFromR2 targetR2FromNeutralAFBenchmark
+      TransportedMetrics.calibratedBrier targetR2FromNeutralAFBenchmark
       TransportedMetrics.calibratedBrier TransportedMetrics.r2FromSignalVariance
       presentDayR2
     rfl
@@ -3847,12 +3835,12 @@ theorem targetLiabilityAUC_lt_source_of_neutralAF_benchmark
     drift_degrades_equalVarianceGaussianAUC
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
-/-- The exact target calibrated Brier risk is `exactCalibratedBrierRiskFromR2`
+/-- The exact target calibrated Brier risk is `TransportedMetrics.calibratedBrier`
 evaluated at the explicit target `R²` by definition. -/
 @[simp] theorem targetBrierFromNeutralAFBenchmark_eq
     (π V_A V_E fstTarget : ℝ) :
     targetExactCalibratedBrierRisk π V_A V_E fstTarget =
-      exactCalibratedBrierRiskFromR2 π
+      TransportedMetrics.calibratedBrier π
         (targetR2FromNeutralAFBenchmark V_A V_E fstTarget) := by
   rfl
 
@@ -3868,7 +3856,7 @@ theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
     (hvar_int : Integrable (fun z => (η z - π) ^ 2) μ)
     (hmean : ∫ z, η z ∂μ = π)
     (hvar : ∫ z, (η z - π) ^ 2 ∂μ = π * (1 - π) * r2) :
-    exactBrierRiskOfCalibrated μ η = exactCalibratedBrierRiskFromR2 π r2 := by
+    exactBrierRiskOfCalibrated μ η = TransportedMetrics.calibratedBrier π r2 := by
   rw [exactBrierRiskOfCalibrated_eq_integral]
   have hdiff_int : Integrable (fun z => η z - π) μ := by
     simpa [sub_eq_add_neg] using hη_int.sub (integrable_const π)
@@ -3896,9 +3884,9 @@ theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
     _ = π * (1 - π) - ∫ z, (η z - π) ^ 2 ∂μ := by
             rw [hlin_zero]
             ring
-    _ = exactCalibratedBrierRiskFromR2 π r2 := by
+    _ = TransportedMetrics.calibratedBrier π r2 := by
             rw [hvar]
-            unfold exactCalibratedBrierRiskFromR2
+            unfold TransportedMetrics.calibratedBrier
             ring
 
 /-- Full neutral allele-frequency benchmark Brier degradation theorem: if
@@ -3919,7 +3907,7 @@ theorem targetBrier_ge_source_of_neutralAF_benchmark
       hVA hVE h_fst h_fst_bounds
   have hcoef_nonneg : 0 ≤ π * (1 - π) := by nlinarith
   unfold sourceBrierFromR2 targetBrierFromNeutralAFBenchmark
-    targetExactCalibratedBrierRisk exactCalibratedBrierRiskFromR2
+    targetExactCalibratedBrierRisk TransportedMetrics.calibratedBrier
   have hbase :
       1 - presentDayR2 V_A V_E fstSource ≤
         1 - targetR2FromNeutralAFBenchmark V_A V_E fstTarget := by

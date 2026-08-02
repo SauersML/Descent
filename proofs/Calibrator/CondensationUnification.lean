@@ -1636,7 +1636,93 @@ the coordinate law with no established design-level consequence, and this file a
 In particular nothing here now says a sliding-window scan is miscalibrated through `b`, and
 nothing here says it is safe either — the hub statement remains a statement about the hub
 channel, and the coupling question is open rather than answered in either direction.
+
+## 5k. The dyadic Mellin ladder, and why the horizon is where it is
+
+§5h recorded that the scale sequence diverges doubly exponentially and that the sample cost
+of reading floor `k` therefore grows like `σ_k²`, truncating the tower at about floor three.
+That was stated as a numerical fact about one sequence. It has a mechanism, and with the
+mechanism it stops being a separate observation and becomes a consequence of how the
+tower's coordinates are laid out.
+
+The tower's coordinate system is a **dyadic Mellin ladder**: floor `k` carries the jet,
+arithmetic, hub and coupling data of the log-square hierarchy at scale `2^(k-1)`. Floor one
+sits at tilt `θ = 1` and reads second moments; the hub and shared blocks sit at `θ = 2` and
+read fourth moments, which is `σ₁`; floor two sits near `θ = 2` and floor three near
+`θ = 4`. The rungs are dyadic in *moment order*: successive floors probe moments of order
+`2, 4, 8, 16, …`.
+
+That is the mechanism. Reading a moment of order `2m` costs a sample budget growing with
+the size of that moment, and for a standardized genotype the moments grow along the ladder
+in a way this corpus has already computed at its first three orders:
+
+| moment | value | growth as `V → 0` |
+|---|---|---|
+| `E[x²]` | `1` | bounded |
+| `E[x⁴]` | `1/V` | `V⁻¹` |
+| `E[x⁶]` | `1/V² + 10/V - 20` | `V⁻²` |
+
+with `V = 2q(1-q)` (`standardizedGenotype_second_moment_one`,
+`standardizedGenotype_fourth_moment`, `standardizedGenotype_sixth_moment`, collected as
+`hweLadderMoments`). The exponent of `V⁻¹` advances by one per moment-order step of two, so
+along the ladder — whose steps *double* the moment order — it advances by `2^(k-1)`. A
+doubling of moment order squares the divergence.
+
+So the doubly-exponential sample cost is not an accident of how the floors were normalized.
+It is dyadic rung spacing measured against a polynomial sample budget: reachable floors go
+like `log log n` because the ladder's rungs are dyadic in moment order and the budget is
+not. `ScaleSequence.sampleSize_doubly_exponential` is that statement's quantitative form,
+and `ladderMomentOrder` below names the spacing it comes from.
+
+The biology reads off the table. `E[x⁴] = 1/(2q(1-q))` already diverges as a variant gets
+rarer, and each further rung squares that dependence, so a rare-variant panel is not merely
+further from the Gaussian at floor one — it is further by an exponentially growing margin at
+every floor above. Rare variants are hardest to read exactly where the ladder climbs
+fastest.
 -/
+
+/-- **The moment order probed at rung `k` of the dyadic ladder**: `2^k`.
+
+Floor one reads second moments, the hub and shared blocks read fourth moments, and each
+subsequent floor doubles the order again.
+
+Empirical status: DERIVED. The rung spacing of the tower's coordinate system, with no free
+parameter and nothing fitted. -/
+def ladderMomentOrder (rung : ℕ) : ℕ := 2 ^ rung
+
+/-- The ladder's first three rungs are the moment orders `2`, `4` and `8`, the first two of
+which this corpus computes in closed form. -/
+theorem ladderMomentOrder_low_rungs :
+    ladderMomentOrder 1 = 2 ∧ ladderMomentOrder 2 = 4 ∧ ladderMomentOrder 3 = 8 := by
+  refine ⟨?_, ?_, ?_⟩ <;>
+    · unfold ladderMomentOrder
+      norm_num
+
+/-- **The rung spacing doubles.** This is the whole mechanism behind the horizon: a
+polynomial sample budget advances the readable moment order linearly while the ladder
+advances it geometrically, so the number of reachable rungs grows like the logarithm of the
+logarithm of the budget. -/
+theorem ladderMomentOrder_doubles (rung : ℕ) :
+    ladderMomentOrder (rung + 1) = 2 * ladderMomentOrder rung := by
+  unfold ladderMomentOrder
+  rw [pow_succ]
+  ring
+
+/-- The genotype moments at the first three computed orders, collected so the growth
+pattern `1`, `V⁻¹`, `V⁻²` is visible in one place and a later change to any of them
+contradicts this theorem rather than drifting silently. -/
+theorem hweLadderMoments (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2) = 1 ∧
+      (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) =
+        1 / h.genotypeVariance ∧
+      (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) =
+        (1 / h.genotypeVariance) ^ 2 + 10 * (1 / h.genotypeVariance) - 20 :=
+  ⟨standardizedGenotype_second_moment_one h hq0 hq1,
+    standardizedGenotype_fourth_moment h hq0 hq1,
+    standardizedGenotype_sixth_moment h hq0 hq1⟩
+
+/-!
 ## 6. Where the whole development now stands
 
 Four negative results, each with its positive complement, and each attached to a

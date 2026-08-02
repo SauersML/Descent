@@ -319,7 +319,7 @@ theorem brier_depends_on_prevalence
     (h_r2_lt : r2 < 1)
     (h_order : π₁ < π₂) (h_half : π₂ ≤ 1/2) :
     brierFromR2 π₁ r2 < brierFromR2 π₂ r2 := by
-  unfold brierFromR2 exactCalibratedBrierRiskFromR2
+  unfold brierFromR2 TransportedMetrics.calibratedBrier
   have h_factor : 0 < 1 - r2 := by linarith
   -- Need: π₁(1-π₁) < π₂(1-π₂) when 0 < π₁ < π₂ ≤ 1/2
   -- f(x) = x(1-x) is increasing on (0, 1/2)
@@ -375,7 +375,7 @@ theorem brier_worsens_when_r2_drops_and_prevalence_factor_grows
     (h_prev : π_source * (1 - π_source) ≤ π_target * (1 - π_target)) :
     -- Target Brier ≥ source Brier (higher = worse)
     brierFromR2 π_source r2_source ≤ brierFromR2 π_target r2_target := by
-  unfold brierFromR2 exactCalibratedBrierRiskFromR2
+  unfold brierFromR2 TransportedMetrics.calibratedBrier
   have h1 : 0 < 1 - r2_source := by linarith
   have h2 : 0 < 1 - r2_target := by linarith
   -- (1 - r2_target) ≥ (1 - r2_source) and π_t(1-π_t) ≥ π_s(1-π_s)
@@ -628,7 +628,7 @@ theorem brier_increases_with_portability_loss
     (h_π : 0 < π) (h_π' : π < 1)
     (h_drop : r2_target < r2_source) :
     brierFromR2 π r2_source < brierFromR2 π r2_target := by
-  unfold brierFromR2 exactCalibratedBrierRiskFromR2
+  unfold brierFromR2 TransportedMetrics.calibratedBrier
   have h_prev : 0 < π * (1 - π) := by nlinarith
   nlinarith
 
@@ -641,7 +641,7 @@ theorem brier_bounded_by_prevalence
     (h_π : 0 < π) (h_π' : π < 1)
     (h_r2 : 0 < r2) :
     brierFromR2 π r2 < π * (1 - π) := by
-  unfold brierFromR2 exactCalibratedBrierRiskFromR2
+  unfold brierFromR2 TransportedMetrics.calibratedBrier
   have h_prev : 0 < π * (1 - π) := by nlinarith
   nlinarith
 
@@ -1042,7 +1042,7 @@ theorem brier_score_bounded
     (h_π : 0 ≤ π) (h_π' : π ≤ 1)
     (h_r2 : 0 ≤ r2) (h_r2' : r2 ≤ 1) :
     brierFromR2 π r2 ≤ 1/4 := by
-  unfold brierFromR2 exactCalibratedBrierRiskFromR2
+  unfold brierFromR2 TransportedMetrics.calibratedBrier
   have h1 : π * (1 - π) ≤ 1/4 := by nlinarith [sq_nonneg (π - 1/2)]
   have h_one_minus_pi : 0 ≤ 1 - π := by linarith
   have h2 : 0 ≤ 1 - r2 := by linarith
