@@ -848,6 +848,39 @@ copy of the same quotient. -/
 noncomputable def expectedR2 (vSignal V_E : ℝ) : ℝ :=
   vSignal / (vSignal + V_E)
 
+/-- **The explained-variance ratio really is the `R²` of a data-generating process** —
+under a regime that is now written down rather than assumed.
+
+Two hypotheses carry the whole modelling content, and both are discharged by the caller:
+
+* `h_additive` says the outcome's conditional mean tracks the signal one for one, i.e. the
+  outcome is the signal plus a residual uncorrelated with it. This is the additive-noise
+  regime. Outside it the covariance is not the signal variance and the ratio below is not
+  an `R²` — it is a number.
+* `h_split` says the outcome variance decomposes as signal plus `V_E`, which is what makes
+  `V_E` deserve the name "environmental variance" rather than being an arbitrary second
+  argument.
+
+This is the bridge the development was missing. `presentDayR2`, and with it every drift,
+mutation-drift and generational `R²`, is `expectedR2` applied to a different signal
+variance, so each of them inherits this theorem instead of needing its own. Before it,
+the statement "this quotient is the `R²` of the process" was not something the corpus
+could express, let alone check: the quotient was a definition, and a definition cannot be
+wrong. -/
+theorem expectedR2_eq_rsquared {k : ℕ} [Fintype (Fin k)]
+    {dgp : DataGeneratingProcess k} {signal : Predictor k}
+    (R : MomentReading dgp signal) (V_E : ℝ)
+    (h_additive : R.cov = R.vSignal)
+    (h_split : R.vOutcome = R.vSignal + V_E) :
+    expectedR2 R.vSignal V_E = rsquared dgp signal dgp.trueExpectation := by
+  rw [rsquared_eq_of_momentReading R, h_additive, h_split]
+  unfold expectedR2
+  have hs : R.vSignal ≠ 0 := ne_of_gt R.vSignal_pos
+  have ho : R.vSignal + V_E ≠ 0 := by
+    rw [← h_split]; exact ne_of_gt R.vOutcome_pos
+  field_simp
+  ring
+
 /-- **Present-day coefficient of determination under drift.**
 
 `R² = V_PGS / (V_PGS + V_E)` where `V_PGS = presentDayPGSVariance V_A fst`. The quotient
@@ -855,6 +888,24 @@ itself is not restated here: this is `expectedR2` applied to the drift-attenuate
 variance, so the two cannot drift apart. -/
 noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
   expectedR2 (presentDayPGSVariance V_A fst) V_E
+
+/-- **The drift `R²` is the process `R²`**, inherited rather than re-derived.
+
+The only thing this adds to `expectedR2_eq_rsquared` is the identification of the signal
+variance with the drift-attenuated one, which is the single modelling step this quantity
+makes. Everything else - the additive-noise regime, the variance split, the reduction of
+an integral to a quotient - is already discharged upstream. That is the point of routing
+these through one definition: a bridge written once reaches all of them. -/
+theorem presentDayR2_eq_rsquared {k : ℕ} [Fintype (Fin k)]
+    {dgp : DataGeneratingProcess k} {signal : Predictor k}
+    (R : MomentReading dgp signal) (V_A V_E fst : ℝ)
+    (h_signal : R.vSignal = presentDayPGSVariance V_A fst)
+    (h_additive : R.cov = R.vSignal)
+    (h_split : R.vOutcome = R.vSignal + V_E) :
+    presentDayR2 V_A V_E fst = rsquared dgp signal dgp.trueExpectation := by
+  unfold presentDayR2
+  rw [← h_signal]
+  exact expectedR2_eq_rsquared R V_E h_additive h_split
 
 /-- Exact bridge theorem: the dashboard algebraic `presentDayR2` equals statistical
 `rsquared` when the relevant second-moment identities hold. -/
