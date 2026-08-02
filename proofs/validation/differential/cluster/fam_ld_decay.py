@@ -145,6 +145,82 @@ def measure_sigma_d2(ne, c, burn, samples, reps, rng):
     return float(num.mean() / den.mean())
 
 
+def corpus_bottleneck_prediction(n_b, n_r, c, t_b, t_r):
+    """What the corpus predicts: driftLDStep iterated at N_b then at N_r.
+
+    Written here rather than called from the Lean table so this script has no
+    dependency on the extract layer, which is currently stale relative to the
+    repaired definitions. The recursion is transcribed from driftLDStep,
+    Q' = (1-c)^2 (1/(2Ne) + (1-1/(2Ne)) Q), and its fixed point.
+    """
+    a = (1.0 - c) ** 2
+
+    def eq(ne):
+        return a / (2.0 * ne) / (1.0 - a * (1.0 - 1.0 / (2.0 * ne)))
+
+    def run(q, ne, t):
+        for _ in range(int(t)):
+            q = a * (1.0 / (2.0 * ne) + (1.0 - 1.0 / (2.0 * ne)) * q)
+        return q
+
+    return run(run(eq(n_r), n_b, t_b), n_r, t_r)
+
+
+def family_bottleneck(rng):
+    """Section C: LD excess after a bottleneck.
+
+    The only two definitions in this family with NO closed-form reference under
+    a size change, which is why they were never in the analytic tier: the only
+    available reference was a bound wide enough to always hold, and a check
+    that cannot fail is worse than an acknowledged gap.
+
+    CONTROL PINNED BY THEORY: the NULL BOTTLENECK. Run the identical code path
+    with N_b = N_r, i.e. no size change at all. Stationarity then fixes the
+    ratio at exactly 1.0, independent of which of Sved, Ohta-Kimura or the
+    corpus recursion is right. A null ratio departing from 1 means the burn-in
+    is short or the engine drifts, and any amplification measured in the real
+    cells is that artefact rather than a bottleneck effect.
+
+    Note the null cell is exactly the degenerate case the can-fail clause
+    forbids for the TEST -- with N_b = N_r nothing happens and every candidate
+    reproduces a constant. Useless as a test, decisive as a control.
+    """
+    N_R, N_B = 500, 50
+    REPS = 200
+    rows = []
+    for rho_at_nb in (2.0, 10.0):
+        c = rho_at_nb / (4.0 * N_B)
+        x = rng.multinomial(2 * N_R, [0.25] * 4, size=REPS).astype(np.float64) / (2 * N_R)
+        for _ in range(8 * N_R):
+            x = wf_step(x, N_R, c, rng)
+        pre = _sigma_d2_now(x)
+        for (nb, tag) in ((N_R, "NULL (no bottleneck)"), (N_B, "bottleneck")):
+            for t_b in (25, 100):
+                xb = x.copy()
+                for _ in range(t_b):
+                    xb = wf_step(xb, nb, c, rng)
+                post = _sigma_d2_now(xb)
+                pred = corpus_bottleneck_prediction(nb, N_R, c, t_b, 0)
+                rows.append({
+                    "rho_at_Nb": rho_at_nb, "c": c, "N_b": nb, "t_b": t_b,
+                    "arm": tag,
+                    "sigma_d2_pre": pre, "sigma_d2_post": post,
+                    "ratio_measured": post / pre,
+                    "corpus_prediction": pred,
+                    "corpus_ratio": pred / pre,
+                })
+                print("    rho@Nb=%-5.1f %-22s t_b=%-4d  ratio %.4f   corpus %.4f"
+                      % (rho_at_nb, tag, t_b, post / pre, pred / pre), flush=True)
+    return rows
+
+
+def _sigma_d2_now(x):
+    pa = x[:, 0] + x[:, 1]
+    pb = x[:, 0] + x[:, 2]
+    D = d_of(x)
+    return float((D ** 2).mean() / (pa * (1 - pa) * pb * (1 - pb)).mean())
+
+
 def main():
     rng = np.random.default_rng(SEED)
     out = {}
@@ -206,7 +282,18 @@ def main():
               % (rho, s, corpus, ok_, closer))
     out["B_sigma_d2"] = rowsB
 
-    out["READ_THE_TEST"] = bool(c1 and c2)
+    print("")
+    print("C. LD EXCESS AFTER A BOTTLENECK  (null arm is the control)")
+    rowsC = family_bottleneck(rng)
+    out["C_bottleneck"] = rowsC
+    nulls = [r for r in rowsC if r["arm"].startswith("NULL")]
+    c3 = all(abs(r["ratio_measured"] - 1.0) < 0.15 for r in nulls)
+    print("    CONTROL null bottleneck, ratio must be 1.0: %s  (%s)"
+          % ("PASS" if c3 else "FAIL",
+             ", ".join("%.4f" % r["ratio_measured"] for r in nulls)))
+    out["controls"]["C3_null_bottleneck_pass"] = bool(c3)
+
+    out["READ_THE_TEST"] = bool(c1 and c2 and c3)
     print("")
     print("READ_THE_TEST: %s" % out["READ_THE_TEST"])
     fh = open("fam_ld_decay_results.json", "w")
