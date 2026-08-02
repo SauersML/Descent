@@ -25,6 +25,28 @@
 > a consumer by reading the consumer, not the producer. Establish stability by
 > varying the seed, not by observing that the code looks deterministic.
 >
+> ### The sharpest version: resemblance supplies false confidence
+>
+> A fifth instance arrived while this section was being written, and it is worse
+> than the four above. One tier proposed that its `proved` verdict pooled two
+> claims — sampling and a proof — exactly mirroring the determinism/stability
+> conflation in the row above. It was elegant, it fitted the shape of the code,
+> and it was **invented**: reading the function showed `proved` is only ever set
+> by branch-and-bound, z3 UNSAT, or exact evaluation, never by sampling. The
+> author had not opened the function. The other tier (this one) **endorsed it
+> and relayed it upward without asking for evidence**, because it rhymed with a
+> real bug already confirmed here.
+>
+> So: **a story that explains the evidence *and* rhymes with a story you already
+> trust is more dangerous than one that only does the first.** The resemblance
+> supplies the confidence that checking would have. And an analogy between two
+> systems is a claim about *both* of them — endorsing one costs you the right to
+> treat your own half as still-verified.
+>
+> The practical rule this yields: when a diagnosis about someone else's code
+> arrives and matches your own, that is the moment to ask which function they
+> read, not the moment to agree.
+>
 > This cannot be automated — an automated check is itself a fit to evidence. It
 > is written here because it applies to every tier and to every number in this
 > directory, and because message history is not where anyone looks in a week.
