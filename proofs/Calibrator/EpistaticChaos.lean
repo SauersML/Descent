@@ -979,10 +979,27 @@ theorem standardizedGenotype_sixth_moment (h : HardyWeinbergModel)
     unfold HardyWeinbergModel.standardizedGenotype
     rw [div_pow, hsix]
     ring
-  simp_rw [hfactor]
-  rw [← Finset.sum_div, hweCenteredSixthMoment_eq]
-  field_simp
-  ring
+  have hsum : ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6 =
+      (h.genotypeVariance + 10 * h.genotypeVariance ^ 2 - 20 * h.genotypeVariance ^ 3) /
+        h.genotypeVariance ^ 3 := by
+    simp_rw [hfactor]
+    rw [← Finset.sum_div, hweCenteredSixthMoment_eq]
+  have hinv : (1 / h.genotypeVariance) * h.genotypeVariance = 1 := by
+    rw [one_div, inv_mul_cancel₀ hne]
+  have hcancel : (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) *
+      h.genotypeVariance ^ 3 =
+        h.genotypeVariance + 10 * h.genotypeVariance ^ 2 - 20 * h.genotypeVariance ^ 3 := by
+    rw [hsum, div_mul_cancel₀ _ (pow_ne_zero 3 hne)]
+  refine mul_right_cancel₀ (pow_ne_zero 3 hne) ?_
+  rw [hcancel]
+  calc ((1 / h.genotypeVariance) ^ 2 + 10 * (1 / h.genotypeVariance) - 20) *
+        h.genotypeVariance ^ 3
+      = ((1 / h.genotypeVariance) * h.genotypeVariance) ^ 2 * h.genotypeVariance +
+          10 * ((1 / h.genotypeVariance) * h.genotypeVariance) * h.genotypeVariance ^ 2 -
+          20 * h.genotypeVariance ^ 3 := by ring
+    _ = h.genotypeVariance + 10 * h.genotypeVariance ^ 2 - 20 * h.genotypeVariance ^ 3 := by
+        rw [hinv]
+        ring
 
 /-!
 ### The single-locus collapse

@@ -869,6 +869,81 @@ no free parameter. -/
 noncomputable def centeredSquareThirdMoment (spectrum : MafSpectrum m) : ℝ :=
   spectrum.moment 6 - 3 * spectrum.moment 4 + 2
 
+/-- **The across-locus dispersion of the fourth moment**: `∑ w_j (1/V_j)² - (∑ w_j /V_j)²`,
+the variance of the per-locus `E[x⁴] = 1/(2q(1-q))` across the panel.
+
+This is the panel's floor-two datum. Floor one sees the *mean* of `1/(2q(1-q))`; floor two
+sees its spread. Two panels with the same mean and different spread agree at floor one and
+differ at floor two.
+
+Empirical status: UNTESTED. A dispersion computed from the panel's own allele-frequency
+spectrum; no free parameter and nothing fitted. It is directly computable from any real
+panel's MAF distribution without simulation. -/
+noncomputable def fourthMomentDispersion (spectrum : MafSpectrum m) : ℝ :=
+  (∑ j, spectrum.weight j * (1 / (spectrum.model j).genotypeVariance) ^ 2) -
+    (spectrum.moment 4) ^ 2
+
+/-- **The panel's sixth moment is floor-one data plus the dispersion.**
+
+Per locus `E[x⁶] = (E[x⁴])² + 10 E[x⁴] - 20` exactly
+(`standardizedGenotype_sixth_moment`), so for a single locus floor two is a *function* of
+floor one. For a mixture the average of the quadratic is not the quadratic of the average,
+and the whole gap is `fourthMomentDispersion`:
+
+`M₆ = (M₄² + 10 M₄ - 20) + dispersion`.
+
+So the panel effect is exactly the across-locus spread of `1/(2q(1-q))`, and two spectra
+matching in floor one differ at floor two precisely when their MAF spectra differ in that
+spread. This is what makes the claim checkable on real panels rather than only in
+principle. -/
+theorem sixthMoment_eq_floorOne_plus_dispersion (spectrum : MafSpectrum m)
+    (hpoly : ∀ j, 0 < (spectrum.model j).altFreq ∧ (spectrum.model j).altFreq < 1) :
+    spectrum.moment 6 =
+      (spectrum.moment 4) ^ 2 + 10 * spectrum.moment 4 - 20 +
+        spectrum.fourthMomentDispersion := by
+  have hterm : ∀ j : Fin m,
+      spectrum.weight j *
+          ∑ g : DiploidGenotype,
+            (spectrum.model j).genotypeProb g *
+              (spectrum.model j).standardizedGenotype g ^ 6 =
+        spectrum.weight j * (1 / (spectrum.model j).genotypeVariance) ^ 2 +
+          (10 * (spectrum.weight j * (1 / (spectrum.model j).genotypeVariance)) -
+            20 * spectrum.weight j) := by
+    intro j
+    rw [standardizedGenotype_sixth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2]
+    ring
+  have hfour : ∀ j : Fin m,
+      spectrum.weight j * (1 / (spectrum.model j).genotypeVariance) =
+        spectrum.weight j *
+          ∑ g : DiploidGenotype,
+            (spectrum.model j).genotypeProb g *
+              (spectrum.model j).standardizedGenotype g ^ 4 := by
+    intro j
+    rw [standardizedGenotype_fourth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2]
+  have hdef6 : spectrum.moment 6 =
+      ∑ j, spectrum.weight j *
+        ∑ g : DiploidGenotype,
+          (spectrum.model j).genotypeProb g *
+            (spectrum.model j).standardizedGenotype g ^ 6 := rfl
+  have hdef4 : spectrum.moment 4 =
+      ∑ j, spectrum.weight j *
+        ∑ g : DiploidGenotype,
+          (spectrum.model j).genotypeProb g *
+            (spectrum.model j).standardizedGenotype g ^ 4 := rfl
+  have hsplit : spectrum.moment 6 =
+      (∑ j, spectrum.weight j * (1 / (spectrum.model j).genotypeVariance) ^ 2) +
+        (10 * spectrum.moment 4 - 20) := by
+    rw [hdef6]
+    simp_rw [hterm]
+    rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum,
+      spectrum.weight_sum, mul_one]
+    congr 2
+    rw [hdef4]
+    exact Finset.sum_congr rfl (fun j _ => hfour j)
+  rw [hsplit]
+  unfold fourthMomentDispersion
+  ring
+
 /-- **Floor one does not determine floor two, for panels.** Two spectra agreeing in the
 fourth moment — a floor-one invariant — but differing in the sixth have different
 floor-two data.
