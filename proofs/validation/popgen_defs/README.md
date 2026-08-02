@@ -45,6 +45,39 @@ theory at a null or control point in the same run.
 | `discoveryNCP` | `GeneticArchitectureDiscovery.lean:51` | uses `tagGenotypeVariance`, but the NCP at a tag carries the *causal* variant's genotype variance; −24%…+33% whenever the MAFs differ |
 | `r2ScalingModel` | `PowerAnalysis.lean:346` | same missing `h²` prefactor as `expectedR2FromN`; the fix was applied to one of the pair and not the other |
 
+| `selectionMigrationEquilibrium` | `PopulationGeneticsFoundations.lean:197` | `s/(s+m)` vs the classical `1−m/s`; returns 1/2 at m=s and 1/3 at m=2s where the allele is in fact lost |
+| `fstFromTau` | `PortabilityDrift.lean:26` | third formula for split F_ST and the second wrong one; +5% to +32%, biased upward in all six cells |
+| `pairwiseFstFromBranches` | `PortabilityDrift.lean:33` | multiplicative composition biased +15% at F_ST≈0.5 under *both* Hudson and Nei estimators |
+| `neutralAFBenchmarkRatio` | `PortabilityDrift.lean:2424` | −37% to −74% with asymmetric branches; bounded above by `1/(1−fstS)` so it cannot express the observed ratio at all |
+| `equilibriumEffectVariance` | `SelectionArchitecture.lean` | SLiM gives `V_g ~ MU^1.01 · ALPHA^1.12`; `v_m/s` requires `ALPHA^2` (preliminary) |
+
+### Root cause: drift without mutation
+
+`fstDerived`, `fstFromDrift`, `fstFromTau`, `targetHetFromFst` and
+`neutralAFBenchmarkRatio` are not five independent errors. They form one cluster
+resting on the closed-population recurrence `H_t = H_0 (1 − 1/2N)^t`, and
+`targetHetFromFst` is *tautologically* true given the F_ST that recurrence
+defines.
+
+With an ancestral sample drawn at the split time, a constant-size population at
+equilibrium loses **no** heterozygosity over 4000 generations (ratio 1.025 ±
+0.02) where the recurrence predicts a **86%** loss — mutation replenishes
+diversity. The cluster's "F_ST" is therefore ≈0 where the measurable
+between-population F_ST is 0.50: not two calibrations of one quantity, but two
+different quantities sharing a name.
+
+This is why the same error recurs in three files. Fixing the three formulas
+individually would not address it; the assumption has to be stated, or the
+cluster re-derived against a measurable F_ST.
+
+### What is sound
+
+`PortabilityDrift`'s core drift model is correct: `Var_Delta_Mu = 2·fst·V_A` per
+branch and `Expected_Abs_Shift` both match simulation to within 4%, including
+asymmetric branch pairs. The file's failures sit in two layers built on top of
+that foundation — the F_ST↔heterozygosity cluster above, and the equal-variance
+Gaussian AUC family.
+
 ### The composition hazard
 
 `ldCorrelationSq` is the first bug found that is not local to one definition.
@@ -73,6 +106,37 @@ agrees on it.
 | `coalFst` | unbiased; errors scatter both signs within a few SE |
 | `admixtureLD` | ≤0.2% |
 | `Expected_Abs_Shift` | ≤0.1% (correct half-normal mean) |
+
+## Coverage
+
+`coverage.py` reports which definitions have been checked against an independent
+ground truth. At the time of writing: **43 of 859 (5.0%)**.
+
+| best covered | | worst covered | |
+| --- | --- | --- | --- |
+| `LDDecayTheory` | 55% | `PortabilityDrift` (165 defs) | 1% |
+| `DemographicHistory` | 29% | `PGSCalibrationTheory` (79) | 1% |
+| `PopulationGeneticsFoundations` | 26% | `TransferLearningPGS` (52) | 0% |
+
+The defect rate among definitions actually tested is roughly 35%. That should
+not be extrapolated naively to the remaining 816 — this work *selected* for
+substantive quantitative definitions, and much of the untested mass is
+definitional bookkeeping (`PGSCalibrationTheory`'s shift definitions are sums of
+named shifts: tautologically true, impossible to falsify). But the direction is
+unambiguous, and the worst-covered file is the one that has already produced the
+most errors.
+
+## Four things fuzzing cannot do
+
+Fuzzing compares a formula against an oracle. It finds *magnitudes*. These find
+*classes*, and the cheapest of them has the best yield of anything here:
+
+| technique | script | what it catches | result |
+| --- | --- | --- | --- |
+| cross-definition consistency | `scan_consistency.py` | one quantity, two formulas | found the F_ST cluster and the root cause of the r²/4 bug, in under a second |
+| unit composition | (same) | producer/consumer convention mismatch | `ldCorrelationSq` |
+| vacuity / satisfiability | `vacuity.py` | theorems whose hypotheses are unsatisfiable — machine-checked and contentless | 0 of 31 unsatisfiable |
+| end-to-end pipeline | `check_portability.py` | process claims that are not formulas | the M_eff bridge, `stabilizingPortability` |
 
 ## Recurring defect: the missing parameter
 
