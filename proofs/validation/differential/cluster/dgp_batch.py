@@ -161,14 +161,55 @@ def phase2(recon):
     """Attempt level-set invariance with structure-valued arguments."""
     import math
 
+    # Two references, because DGP's structure-valued definitions are not all
+    # time-dependent. The first pass found 9 and excluded all 9 -- correctly:
+    # fstEquilibrium, fstDriftMigration and fstDriftMutation carry no t at all,
+    # so they are constant across level sets of a form that has one, and the
+    # non-constancy guard rightly rejects them. They are EQUILIBRIUM forms, and
+    # the reference they should be swept against is the island form in the
+    # structure's migration field.
+    REFS = [
+        {"name": "drift_retention",
+         "form": "(1 - 1/(2 Ne))^t",
+         "f1": ["Ne", "N", "N_e"],
+         "f2": ["horizon", "t", "t_div", "gens", "generations"],
+         "levels": [0.9, 0.6, 0.3, 0.1],
+         "p1_values": [50.0, 200.0, 1000.0, 5000.0],
+         "solve": lambda ne, lv: math.log(lv) / math.log(1.0 - 1.0 / (2.0 * ne))},
+        {"name": "island_fst",
+         "form": "1/(1 + 4 Ne m)",
+         "f1": ["Ne", "N", "N_e"],
+         "f2": ["mig", "m", "migration", "m_rate"],
+         "levels": [0.8, 0.5, 0.2, 0.05],
+         "p1_values": [50.0, 200.0, 1000.0, 5000.0],
+         "solve": lambda ne, lv: (1.0 / lv - 1.0) / (4.0 * ne)},
+    ]
+
     results = {"attempted": 0, "members": [], "excluded": [], "errors": [],
-               "skipped": {}}
-    NE_FIELDS = ["Ne", "N", "N_e"]
-    T_FIELDS = ["horizon", "t", "t_div", "gens", "generations"]
-    LEVELS = [0.9, 0.6, 0.3, 0.1]
-    NES = [50.0, 200.0, 1000.0, 5000.0]
+               "skipped": {}, "by_reference": {}}
 
     structs = recon.get("structures") or {}
+    for REF in REFS:
+        NE_FIELDS = REF["f1"]
+        T_FIELDS = REF["f2"]
+        LEVELS = REF["levels"]
+        NES = REF["p1_values"]
+        _solve = REF["solve"]
+        before_m = len(results["members"])
+        before_a = results["attempted"]
+        _phase2_one(recon, structs, results, NE_FIELDS, T_FIELDS, LEVELS, NES,
+                    _solve, REF["name"])
+        results["by_reference"][REF["name"]] = {
+            "form": REF["form"],
+            "attempted": results["attempted"] - before_a,
+            "members": len(results["members"]) - before_m,
+        }
+    return results
+
+
+def _phase2_one(recon, structs, results, NE_FIELDS, T_FIELDS, LEVELS, NES,
+                _solve, ref_name):
+    import math
     for rec in recon["definitions"]:
         if not rec["callable"]:
             continue
@@ -224,7 +265,7 @@ def phase2(recon):
             vals = []
             for ne in NES:
                 try:
-                    t = math.log(level) / math.log(1.0 - 1.0 / (2.0 * ne))
+                    t = _solve(ne, level)
                 except Exception:
                     continue
                 kw = {}
@@ -258,13 +299,12 @@ def phase2(recon):
             moved = (max(per_level) - min(per_level)) > RTOL * sc
 
         entry = {"definition": rec["definition"], "line": rec["line"],
-                 "ne_field": ne_f, "t_field": t_f,
+                 "reference": ref_name, "ne_field": ne_f, "t_field": t_f,
                  "levels": per_level, "empirical_status": rec["empirical_status"]}
         if all_inv and moved:
             results["members"].append(entry)
         else:
             results["excluded"].append(entry)
-    return results
 
 
 def main():
@@ -319,10 +359,14 @@ def main():
             print("  skipped:")
             for k in sorted(res["skipped"]):
                 print("    %-40s %d" % (k, res["skipped"][k]))
+        for name in sorted(res.get("by_reference", {})):
+            b = res["by_reference"][name]
+            print("    %-18s %-22s attempted %d, members %d"
+                  % (name, b["form"], b["attempted"], b["members"]))
         for m in res["members"]:
-            print("    MEMBER   %-46s (%s,%s) status=%s"
-                  % (m["definition"], m["ne_field"], m["t_field"],
-                     m["empirical_status"]))
+            print("    MEMBER   %-42s [%s] (%s,%s) status=%s"
+                  % (m["definition"].split(".")[-1], m["reference"],
+                     m["ne_field"], m["t_field"], m["empirical_status"]))
         # control: tau / theta / bigM must NOT be members
         # A control that passes when nothing ran is not a control. If phase 2
         # attempted no definitions, tau/theta/bigM were never evaluated and
