@@ -1704,12 +1704,6 @@ noncomputable def residualVarianceFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
   effectiveOutcomeVariance m P - explainedSignalVarianceFromSourceWeights m P
 
-@[simp] theorem residualVarianceFromSourceWeights_eq_effective_minus_signal {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) :
-    residualVarianceFromSourceWeights m Pop.source =
-      (m.outcomeVariance Pop.source) - explainedSignalVarianceFromSourceWeights m Pop.source := by
-  rfl
-
 /-- Closed-form source calibrated Brier coordinate from the full explicit
 source-state score equation, evaluated at an arbitrary observed prevalence
 coordinate `π`. This lets downstream theory compare source and target Brier on
